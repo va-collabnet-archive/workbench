@@ -31,21 +31,30 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.ihtsdo.project.ContextualizedDescription;
+import org.ihtsdo.project.I_ContextualizeDescription;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.I_TerminologyProject;
+import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
-import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.panel.WorkListChooser;
+import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
+import org.ihtsdo.project.workflow.api.WfComponentProvider;
+import org.ihtsdo.project.workflow.api.WorkflowSearcher;
+import org.ihtsdo.project.workflow.model.WfInstance;
+import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 import au.com.bytecode.opencsv.CSVReader;
 
 public class WorklistMemberByStatusReport implements I_Report {
+
+	private I_GetConceptData preferred;
 
 	@Override
 	public File getCsv() throws Exception {
@@ -53,6 +62,7 @@ public class WorklistMemberByStatusReport implements I_Report {
 		boolean dataFound = false;
 		try {
 			I_TermFactory tf = Terms.get();
+			WorkflowSearcher searcher = new WorkflowSearcher();
 			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
 			WorkListChooser wlChooser = new WorkListChooser(config);
 			WorkList wl = wlChooser.showModalDialog();
@@ -60,79 +70,81 @@ public class WorklistMemberByStatusReport implements I_Report {
 			PrintWriter pw = new PrintWriter(csvFile);
 			pw.append("worklist|status|term|target preferred|last user");
 			pw.println();
+			preferred = Terms.get().getConcept(SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid());
 
 			if (wl != null) {
-				HashMap<String, List<WorkListMember>> wlMembersByStatus = null;
-				List<WorkListMember> wlMembers = TerminologyProjectDAO.getAllWorkListMembers(wl, config);
-				
+				HashMap<String, List<WfInstance>> wlMembersByStatus = null;
+				List<WfInstance> wfInstnaces = searcher.getAllWrokflowInstancesForWorklist(wl.getUids());
+
 				I_TerminologyProject project = TerminologyProjectDAO.getProjectForWorklist(wl, config);
 				int projectId = project.getId();
-				
+
 				Integer targetLanguage = TerminologyProjectDAO.getTargetLanguageRefsetIdForProjectId(projectId, config);
-				
-				if (wlMembers != null) {
-					wlMembersByStatus = new HashMap<String, List<WorkListMember>>();
-					for (WorkListMember wlMember : wlMembers) {
-						I_GetConceptData activitiStatus = wlMember.getActivityStatus();
-						if (wlMembersByStatus.containsKey(activitiStatus.toString())) {
-							wlMembersByStatus.get(activitiStatus.toString()).add(wlMember);
+
+				if (wfInstnaces != null) {
+					wlMembersByStatus = new HashMap<String, List<WfInstance>>();
+					for (WfInstance wfInstnace : wfInstnaces) {
+						WfState state = wfInstnace.getState();
+						if (wlMembersByStatus.containsKey(state.toString())) {
+							wlMembersByStatus.get(state.toString()).add(wfInstnace);
 						} else {
-							List<WorkListMember> wlms = new ArrayList<WorkListMember>();
-							wlms.add(wlMember);
-							wlMembersByStatus.put(activitiStatus.toString(), wlms);
+							List<WfInstance> wlms = new ArrayList<WfInstance>();
+							wlms.add(wfInstnace);
+							wlMembersByStatus.put(state.toString(), wlms);
 						}
 					}
 					if (wlMembersByStatus != null) {
 						Set<String> keySet = wlMembersByStatus.keySet();
 						for (Iterator<String> iterator = keySet.iterator(); iterator.hasNext();) {
 							String key = iterator.next();
-							List<WorkListMember> members = wlMembersByStatus.get(key);
-							for (WorkListMember workListMember : members) {
+							List<WfInstance> members = wlMembersByStatus.get(key);
+							for (WfInstance workListMember : members) {
 								dataFound = true;
 								pw.append(wl.getName() + "|");
 								pw.append(key + "|");
 
-								List<UUID> uuids = workListMember.getUids();
-								I_GetConceptData concept = tf.getConcept(uuids);
-								
-								I_IntSet descriptionTypes =  tf.newIntSet();
+								UUID componentId = workListMember.getComponentId();
+
+								I_IntSet descriptionTypes = tf.newIntSet();
 								I_IntSet allowedStatus = tf.newIntSet();
 
-								descriptionTypes.add(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
+								pw.append(workListMember.getComponentName() + "|");
+
+								descriptionTypes = tf.newIntSet();
+								allowedStatus = tf.newIntSet();
 								allowedStatus.add(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
 								allowedStatus.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
 								allowedStatus.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()));
 
-								List<ContextualizedDescription> descriptions = ContextualizedDescription.getContextualizedDescriptions(concept.getConceptNid(),targetLanguage,allowedStatus,
-										descriptionTypes,config.getViewPositionSetReadOnly(), true);
-								String sourceDesc = "";
-								for (ContextualizedDescription desc : descriptions) {
-									if(desc.getLang().equals(ArchitectonicAuxiliary.LANG_CODE.EN.getFormatedLanguageCode())){
-										sourceDesc = desc.getText();
-									}
-								}
-								pw.append(sourceDesc+ "|");
-								
-								descriptionTypes = tf.newIntSet();
-								allowedStatus = tf.newIntSet();
-								
-								descriptionTypes.add(SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid());
-								allowedStatus.add(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
-								allowedStatus.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
-								allowedStatus.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()));
-								
-								descriptions = ContextualizedDescription.getContextualizedDescriptions(concept.getConceptNid(),targetLanguage,allowedStatus,
-										descriptionTypes,config.getViewPositionSetReadOnly(), true);
+								descriptionTypes.add(SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid());
+
 								String targetPreferred = "";
-								for (ContextualizedDescription desc : descriptions) {
-									if(desc.getLanguageRefsetId() == targetLanguage){
-										if(desc.getAcceptabilityId() == SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid()){
-											targetPreferred = desc.getText();
+								try {
+									I_GetConceptData langRefset = null;
+									List<ContextualizedDescription> descriptions = new ArrayList<ContextualizedDescription>();
+									I_TerminologyProject projectConcept = TerminologyProjectDAO.getProjectForWorklist(workListMember.getWorkList(), config);
+									TranslationProject translationProject = TerminologyProjectDAO.getTranslationProject(projectConcept.getConcept(), config);
+									langRefset = translationProject.getTargetLanguageRefset();
+									descriptions = ContextualizedDescription.getContextualizedDescriptions(Terms.get().uuidToNative(workListMember.getComponentId()), targetLanguage, allowedStatus, descriptionTypes,
+											config.getViewPositionSetReadOnly(), true);
+									for (I_ContextualizeDescription description : descriptions) {
+										if (description.getLanguageExtension() != null && description.getLanguageRefsetId() == langRefset.getConceptNid()) {
+											if (description.getAcceptabilityId() == preferred.getConceptNid()) {
+												targetPreferred = description.getText();
+											}
 										}
 									}
+								} catch (Exception e) {
+									e.printStackTrace();
 								}
-								pw.append(targetPreferred +"|");
-								pw.append(workListMember.getLastAuthorName());
+
+								pw.append(targetPreferred + "|");
+								WfComponentProvider provider = new WfComponentProvider();
+								WorkList workList = workListMember.getWorkList();
+								PromotionAndAssignmentRefset promotionRefset = workList.getPromotionRefset(config);
+								I_Identify nid = Terms.get().getId(workListMember.getComponentId());
+								I_GetConceptData prevUser = promotionRefset.getPreviousUser(nid.getConceptNid(), config);
+								pw.append(prevUser.toUserString());
 								pw.println();
 							}
 						}
@@ -172,17 +184,17 @@ public class WorklistMemberByStatusReport implements I_Report {
 			input = new FileReader(csvFile);
 			reader = new CSVReader(input, '|');
 			if (excelRep.exists()) {
-				
+
 				SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-hh-mm");
 				Date date = new Date();
-				reportCopy  = new File("reports/" + sdf.format(date) + "_worklist_member_by_status.xls");
+				reportCopy = new File("reports/" + sdf.format(date) + "_worklist_member_by_status.xls");
 				try {
 					ExcelReportUtil.copyFile(excelRep, reportCopy);
 				} catch (IOException e) {
 					e.printStackTrace();
 					throw e;
 				}
-				
+
 				Workbook wb = ExcelReportUtil.readFile(reportCopy);
 				FileOutputStream out = new FileOutputStream(reportCopy);
 
@@ -224,17 +236,18 @@ public class WorklistMemberByStatusReport implements I_Report {
 						}
 
 						Integer num = null;
-						try{
+						try {
 							num = Integer.valueOf(nextLine[cellnum]);
 							cell.setCellType(Cell.CELL_TYPE_NUMERIC);
-						}catch (Exception e) {}
-						
-						if(num != null){
+						} catch (Exception e) {
+						}
+
+						if (num != null) {
 							cell.setCellValue(num);
-						}else{
+						} else {
 							cell.setCellValue(nextLine[cellnum]);
 						}
-						
+
 						if (s.getColumnWidth(cellnum) < 3000 + nextLine[cellnum].length() * 200) {
 							s.setColumnWidth((short) (cellnum), (short) (3000 + nextLine[cellnum].length() * 200));
 						}
@@ -289,6 +302,12 @@ public class WorklistMemberByStatusReport implements I_Report {
 	@Override
 	public String toString() {
 		return "Worklist members by status report";
+	}
+
+	@Override
+	public void cancelReporting() throws Exception {
+		// TODO Auto-generated method stub
+
 	}
 
 }

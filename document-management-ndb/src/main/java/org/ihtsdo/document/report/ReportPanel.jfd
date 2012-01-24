@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.6.0_26" class="java.beans.XMLDecoder"> 
+<java version="1.6.0_29" class="java.beans.XMLDecoder"> 
  <object class="com.jformdesigner.model.FormModel"> 
   <void property="contentType"> 
    <string>form/swing</string> 
@@ -39,12 +39,10 @@
       <void method="setProperty"> 
        <string>border</string> 
        <object class="javax.swing.border.EmptyBorder"> 
-        <object class="java.awt.Insets"> 
-         <int>5</int> 
-         <int>5</int> 
-         <int>5</int> 
-         <int>5</int> 
-        </object> 
+        <int>5</int> 
+        <int>5</int> 
+        <int>5</int> 
+        <int>5</int> 
        </object> 
       </void> 
       <void property="name"> 
@@ -284,7 +282,7 @@
          </void> 
          <void method="setProperty"> 
           <string>$rowSpecs</string> 
-          <string>0</string> 
+          <string>0, 14</string> 
          </void> 
          <void method="setProperty"> 
           <string>$hGap</string> 
@@ -315,20 +313,9 @@
          </object> 
          <object class="com.jformdesigner.model.FormLayoutConstraints"> 
           <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
-         </object> 
-        </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JProgressBar</string> 
-          <void property="name"> 
-           <string>progressBar1</string> 
-          </void> 
-         </object> 
-         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-          <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
           <void method="setProperty"> 
-           <string>gridx</string> 
-           <int>1</int> 
+           <string>gridwidth</string> 
+           <int>2</int> 
           </void> 
          </object> 
         </void> 
@@ -386,6 +373,25 @@
           </void> 
          </object> 
         </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormComponent"> 
+          <string>javax.swing.JProgressBar</string> 
+          <void property="name"> 
+           <string>progressBar1</string> 
+          </void> 
+         </object> 
+         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+          <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
+          <void method="setProperty"> 
+           <string>gridy</string> 
+           <int>1</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>gridwidth</string> 
+           <int>2</int> 
+          </void> 
+         </object> 
+        </void> 
        </object> 
        <object class="com.jformdesigner.model.FormLayoutConstraints"> 
         <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
@@ -412,8 +418,8 @@
       <void method="setProperty"> 
        <string>size</string> 
        <object class="java.awt.Dimension"> 
-        <int>715</int> 
-        <int>165</int> 
+        <int>1015</int> 
+        <int>205</int> 
        </object> 
       </void> 
      </object> 

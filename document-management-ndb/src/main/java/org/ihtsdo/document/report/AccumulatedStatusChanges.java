@@ -17,6 +17,7 @@ import java.util.Set;
 import java.util.logging.Level;
 
 import javax.swing.JFrame;
+import javax.swing.SwingWorker;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -24,6 +25,7 @@ import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.tools.ant.types.selectors.ExtendSelector;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -46,18 +48,23 @@ import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.model.WorkSet;
 import org.ihtsdo.project.panel.TranslationProjectDialog;
 import org.ihtsdo.project.refset.PromotionRefset;
+import org.ihtsdo.project.workflow.api.WfComponentProvider;
+import org.ihtsdo.project.workflow.api.WorkflowInterpreter;
+import org.ihtsdo.project.workflow.model.WfMembership;
+import org.ihtsdo.project.workflow.model.WfRole;
+import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 import au.com.bytecode.opencsv.CSVReader;
 
-public class AccumulatedStatusChanges implements I_Report { 
+public class AccumulatedStatusChanges extends SwingWorker<File, String> implements I_Report {
 
 	private SimpleDateFormat formatter;
 	private I_TermFactory tf;
 	private ProjectPermissionsAPI projPermApi;
 	private HashMap<I_GetConceptData, String> userRolesCache;
-	
+
 	public AccumulatedStatusChanges() {
 		super();
 		formatter = new SimpleDateFormat("dd-MMM-yyyy");
@@ -81,7 +88,7 @@ public class AccumulatedStatusChanges implements I_Report {
 			input = new FileReader(csvFile);
 			reader = new CSVReader(input, '|');
 			if (excelRep.exists()) {
-				
+
 				SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-hh-mm");
 				Date date = new Date();
 				reportCopy = new File("reports/" + sdf.format(date) + "_accumulated_status_changes.xls");
@@ -92,9 +99,9 @@ public class AccumulatedStatusChanges implements I_Report {
 					e.printStackTrace();
 					throw e;
 				}
-				
-				Workbook wb = ExcelReportUtil.readFile(reportCopy );
-				FileOutputStream out = new FileOutputStream(reportCopy );
+
+				Workbook wb = ExcelReportUtil.readFile(reportCopy);
+				FileOutputStream out = new FileOutputStream(reportCopy);
 				wb.getSheetIndex("Data");
 				wb.removeSheetAt(wb.getSheetIndex("Data"));
 				wb.createSheet("Data");
@@ -131,16 +138,17 @@ public class AccumulatedStatusChanges implements I_Report {
 						} else {
 							cell.setCellStyle(cs2);
 						}
-						if(cellnum == nextLine.length - 1){
+						if (cellnum == nextLine.length - 1) {
 							cell.setCellType(Cell.CELL_TYPE_NUMERIC);
 						}
 						Integer num = null;
-						try{
+						try {
 							num = Integer.valueOf(nextLine[cellnum]);
-						}catch (Exception e) {}
-						if(num != null){
+						} catch (Exception e) {
+						}
+						if (num != null) {
 							cell.setCellValue(num);
-						}else{
+						} else {
 							cell.setCellValue(nextLine[cellnum]);
 						}
 						if (s.getColumnWidth(cellnum) < 3000 + nextLine[cellnum].length() * 200) {
@@ -169,7 +177,7 @@ public class AccumulatedStatusChanges implements I_Report {
 			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
 			projPermApi = new ProjectPermissionsAPI(config);
 			SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy-mm-hh-ss");
-			csvFile = File.createTempFile("acumulated_status_changes_"+ sdf.format(new Date()), ".csv");
+			csvFile = File.createTempFile("acumulated_status_changes_" + sdf.format(new Date()), ".csv");
 			PrintWriter pw = new PrintWriter(csvFile);
 			pw.append("project|workset|worklist|date|role|author|status|count");
 			pw.println();
@@ -207,8 +215,8 @@ public class AccumulatedStatusChanges implements I_Report {
 									I_IntSet descriptionTypes = termFactory.newIntSet();
 									descriptionTypes.add(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
 
-									List<? extends I_DescriptionTuple> descTuples = member.getDescriptionTuples(config.getAllowedStatus(), descriptionTypes,
-											config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
+									List<? extends I_DescriptionTuple> descTuples = member
+											.getDescriptionTuples(config.getAllowedStatus(), descriptionTypes, config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
 									String name;
 									if (!descTuples.isEmpty()) {
 										name = descTuples.iterator().next().getText();
@@ -230,12 +238,7 @@ public class AccumulatedStatusChanges implements I_Report {
 											PromotionRefset promotionRefset = wl.getPromotionRefset(config);
 											I_GetConceptData status = promotionRefset.getPromotionStatus(member.getConceptNid(), config);
 											Long statusDate = promotionRefset.getLastStatusTime(member.getConceptNid(), config);
-											workListMember = new WorkListMember(name,
-													member.getConceptNid(), 
-													member.getUids(), 
-													wl.getUids().iterator().next(), 
-													status, 
-													statusDate);
+											workListMember = new WorkListMember(name, member.getConceptNid(), member.getUids(), wl.getUids().iterator().next(), status, statusDate);
 										}
 									}
 									if (history != null) {
@@ -247,7 +250,7 @@ public class AccumulatedStatusChanges implements I_Report {
 									e.printStackTrace();
 								}
 							}
-							
+
 							Set<WorkListMember> keys = workListMembers.keySet();
 							for (WorkListMember workListMember : keys) {
 								I_ExtendByRef history = workListMembers.get(workListMember);
@@ -262,7 +265,7 @@ public class AccumulatedStatusChanges implements I_Report {
 										I_GetConceptData user = tf.getConcept(part.getAuthorNid());
 										current.setUserName(user + "");
 										current.setStatus(concept + "");
-										current.setRole(getUserRole(project, user));
+										current.setRole(getUserRole(wl, user));
 										results.add(current);
 									}
 
@@ -276,7 +279,7 @@ public class AccumulatedStatusChanges implements I_Report {
 								for (UserStatusCount userStatusCount : results) {
 									if (userStatusCount.equals(first)) {
 										count++;
-										if(count == results.size()){
+										if (count == results.size()) {
 											pw.append(projectName + "|");
 											pw.append(worksetName + "|");
 											pw.append(worklistName + "|");
@@ -284,7 +287,7 @@ public class AccumulatedStatusChanges implements I_Report {
 											pw.append(userStatusCount.getRole() + "|");
 											pw.append(userStatusCount.getUserName() + "|");
 											pw.append(userStatusCount.getStatus() + "|");
-											pw.append(count+"");
+											pw.append(count + "");
 											pw.println();
 										}
 									} else {
@@ -295,7 +298,7 @@ public class AccumulatedStatusChanges implements I_Report {
 										pw.append(userStatusCount.getRole() + "|");
 										pw.append(userStatusCount.getUserName() + "|");
 										pw.append(userStatusCount.getStatus() + "|");
-										pw.append(count+"");
+										pw.append(count + "");
 										pw.println();
 										first = userStatusCount;
 										count = 1;
@@ -325,43 +328,35 @@ public class AccumulatedStatusChanges implements I_Report {
 
 	}
 
-	private String getUserRole(TranslationProject project, I_GetConceptData user)
-			throws IOException, TerminologyException {
-		if(userRolesCache.containsKey(user)){
+	private String getUserRole(WorkList workList, I_GetConceptData user) throws IOException, TerminologyException {
+		if (userRolesCache.containsKey(user)) {
 			return userRolesCache.get(user).toString();
-		}else{
-			Set<I_GetConceptData> roles = getRolesForUser(user,project.getConcept());
-			if(roles.size() > 1){
+		} else {
+			Set<WfRole> roles = getRolesForUser(user, workList);
+			if (roles.size() > 1) {
 				AceLog.getAppLog().alertAndLog(Level.WARNING, "User: " + user.toString() + " has more then one role, using the first one in report.",
 						new Exception("User: " + user.toString() + " has more then one role, using the first one in report."));
-			}else if(roles.size() < 1){
-				AceLog.getAppLog().alertAndLog(Level.WARNING, "User: " + user.toString() + " has no roles in this project.",
-						new Exception("User: " + user.toString() + " has no roles in this project."));
+			} else if (roles.size() < 1) {
+				AceLog.getAppLog().alertAndLog(Level.WARNING, "User: " + user.toString() + " has no roles in this project.", new Exception("User: " + user.toString() + " has no roles in this project."));
 				userRolesCache.put(user, "No role");
 				return "No role";
 			}
 			StringBuilder sb = new StringBuilder();
-			for (I_GetConceptData i_GetConceptData : roles) {
-				sb.append(i_GetConceptData + " ");
+			for (WfRole role : roles) {
+				sb.append(role.getName() + " ");
 			}
 			userRolesCache.put(user, sb.toString().trim());
 			return sb.toString().trim();
 		}
 	}
 
-	public Set<I_GetConceptData> getRolesForUser(I_GetConceptData user, I_GetConceptData project
-	) throws IOException, TerminologyException {
-
-		Set<I_GetConceptData> returnRoles = new HashSet<I_GetConceptData>();
-		Set<I_GetConceptData> allRoles = new HashSet<I_GetConceptData>();
-		allRoles = ProjectPermissionsAPI.getDescendants(allRoles, Terms.get().getConcept(ArchitectonicAuxiliary.Concept.TRANSLATOR_ROLE.getUids()));
-
-		for (I_GetConceptData role : allRoles) {
-			if (projPermApi.checkPermissionForProject(user, project, role)) {
-				returnRoles.add(role);
+	private Set<WfRole> getRolesForUser(I_GetConceptData user, WorkList worklist) throws IOException, TerminologyException {
+		Set<WfRole> returnRoles = new HashSet<WfRole>();
+		for (WfMembership loopMembership : worklist.getWorkflowUserRoles()) {
+			if (user.getUids().contains(loopMembership.getUser().getId())) {
+				returnRoles.add(loopMembership.getRole());
 			}
 		}
-
 		return returnRoles;
 	}
 
@@ -379,5 +374,18 @@ public class AccumulatedStatusChanges implements I_Report {
 
 	public String toString() {
 		return "Accumulated status canges report";
+	}
+
+	@Override
+	public void cancelReporting() throws Exception {
+		if (isCancelled()) {
+			cancel(true);
+		}
+	}
+
+	@Override
+	protected File doInBackground() throws Exception {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.Serializable;
 
 import javax.swing.JFrame;
+import javax.swing.JProgressBar;
 
 public interface I_Report {
 	
@@ -33,5 +34,6 @@ public interface I_Report {
 	public JFrame getReportPanel()throws Exception;
 	public File getExcelSourceWorkbook()throws Exception;
 	public File getExcelPivotTableWorkBook()throws Exception;
+	public void cancelReporting() throws Exception;
 	
 }

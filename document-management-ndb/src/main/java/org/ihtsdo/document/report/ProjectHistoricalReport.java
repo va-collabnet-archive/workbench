@@ -36,6 +36,9 @@ import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.model.WorkSet;
 import org.ihtsdo.project.panel.ProjectDatePeriodDialog;
+import org.ihtsdo.project.workflow.api.WorkflowSearcher;
+import org.ihtsdo.project.workflow.model.WfInstance;
+import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 
@@ -164,6 +167,9 @@ public class ProjectHistoricalReport implements I_Report {
 
 			HashMap<String, Object> data = new ProjectDatePeriodDialog(config).showModalDialog();
 			if (data != null) {
+				
+				WorkflowSearcher searcher = new WorkflowSearcher();
+				
 				I_TerminologyProject project = (I_TerminologyProject) data.get(ProjectDatePeriodDialog.PROJECT_KEY);
 				String projectName = project.getName();
 
@@ -191,16 +197,17 @@ public class ProjectHistoricalReport implements I_Report {
 						List<WorkList> Worklists = TerminologyProjectDAO.getAllWorklistForWorkset(workSet, configVer);
 						for (WorkList wl : Worklists) {
 							String worklistName = wl.getName();
-							HashMap<String, List<WorkListMember>> wlMembersByStatus = null;
-							List<WorkListMember> wlMembers = TerminologyProjectDAO.getAllWorkListMembers(wl, configVer);
+							HashMap<String, List<WfInstance>> wlMembersByStatus = null;
+							List<WfInstance> wlMembers = searcher.getAllWrokflowInstancesForWorklist(wl.getUids());
+							
 							if (wlMembers != null) {
-								wlMembersByStatus = new HashMap<String, List<WorkListMember>>();
-								for (WorkListMember wlMember : wlMembers) {
-									I_GetConceptData activitiStatus = wlMember.getActivityStatus();
+								wlMembersByStatus = new HashMap<String, List<WfInstance>>();
+								for (WfInstance wlMember : wlMembers) {
+									WfState activitiStatus = wlMember.getState();
 									if (wlMembersByStatus.containsKey(activitiStatus.toString())) {
 										wlMembersByStatus.get(activitiStatus.toString()).add(wlMember);
 									} else {
-										List<WorkListMember> wlms = new ArrayList<WorkListMember>();
+										List<WfInstance> wlms = new ArrayList<WfInstance>();
 										wlms.add(wlMember);
 										wlMembersByStatus.put(activitiStatus.toString(), wlms);
 									}
@@ -209,16 +216,16 @@ public class ProjectHistoricalReport implements I_Report {
 									Set<String> keySet = wlMembersByStatus.keySet();
 									for (Iterator<String> iterator = keySet.iterator(); iterator.hasNext();) {
 										String key = iterator.next();
-										List<WorkListMember> members = wlMembersByStatus.get(key);
-										for (WorkListMember workListMember : members) {
+										List<WfInstance> members = wlMembersByStatus.get(key);
+										for (WfInstance wfInstance : members) {
 											dataFound = true;
 											pw.append(strDate + "|");
 											pw.append(projectName + "|");
 											pw.append(worksetName + "|");
 											pw.append(worklistName + "|");
-											pw.append(workListMember.getName() + "|");
+											pw.append(wfInstance.getComponentName() + "|");
 											pw.append(key + "|");
-											pw.append(workListMember.getLastAuthorName());
+											pw.append(wfInstance.getDestination().getUsername());
 											pw.println();
 										}
 									}
@@ -291,5 +298,11 @@ public class ProjectHistoricalReport implements I_Report {
 
 	public String toString() {
 		return "Project history report";
+	}
+
+	@Override
+	public void cancelReporting() throws Exception {
+		// TODO Auto-generated method stub
+		
 	}
 }
