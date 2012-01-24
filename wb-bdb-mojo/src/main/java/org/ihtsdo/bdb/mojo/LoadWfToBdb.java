@@ -44,7 +44,7 @@ public class LoadWfToBdb extends AbstractMojo {
 	/**
 	 * Generated resources directory.
 	 * 
-	 * @parameter expression="${project.build.directory}/workflow"
+	 * @parameter expression="${project.build.directory}/workflow/lucene"
 	 */
 	private File wfLuceneDir;
 
@@ -58,7 +58,7 @@ public class LoadWfToBdb extends AbstractMojo {
 	        } catch (Exception e) {
 				throw new MojoExecutionException("Failed to setup or read database successfully from directory: " + berkeleyDir.getAbsolutePath(), e);
 	        }
-	        
+        
 	        // Init Lucene
 			LuceneManager.setLuceneRootDir(wfLuceneDir, LuceneSearchType.WORKFLOW_HISTORY);
 

@@ -1404,10 +1404,10 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             if (LuceneManager.indexExists(LuceneSearchType.WORKFLOW_HISTORY) == false) {
 
                 // If first time through, Lucene Dir must be set.  If still empty, then make index.
-                File wfLuceneDirectory = new File("workflow");
+                File wfLuceneDirectory = new File("workflow/lucene");
 
                 LuceneManager.setLuceneRootDir(wfLuceneDirectory, LuceneSearchType.WORKFLOW_HISTORY);
-
+                
                 if (LuceneManager.indexExists(LuceneSearchType.WORKFLOW_HISTORY) == false) {
                     wfHxUpdater.setProgressInfo("Making lucene index -- this may take a while...");
                     WfHxIndexGenerator.setSourceInputFile(null);

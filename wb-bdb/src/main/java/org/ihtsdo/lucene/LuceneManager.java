@@ -122,8 +122,11 @@ public abstract class LuceneManager {
 				try {
 					if (wfHxLuceneDir == null) {
 						if (WfHxLuceneManager.runningLuceneDirFile.exists()) {
+							// For execution in application
+							setLuceneRootDir(WfHxLuceneManager.runningLuceneDirFile, LuceneSearchType.WORKFLOW_HISTORY);
 							wfHxLuceneDir = initDirectory(WfHxLuceneManager.runningLuceneDirFile, true, LuceneSearchType.WORKFLOW_HISTORY);
 						} else {
+							// For creating index via LoadWfToBdb mojo for which setLuceneRootDir has already been called
 							wfHxLuceneDir = initDirectory(WfHxLuceneManager.wfHxLuceneDirFile, true, LuceneSearchType.WORKFLOW_HISTORY);
 						}
 					}
@@ -424,7 +427,7 @@ public abstract class LuceneManager {
 			searcher = descSearcher;
 			writer = descWriter;
 		} else {
-			WfHxLuceneManager.wfHxLuceneDirFile = new File(root, WfHxLuceneManager.wfLuceneFileSuffix);
+			WfHxLuceneManager.wfHxLuceneDirFile = root;
 			searcher = wfHxSearcher;
 			writer = wfHxWriter;
 		}

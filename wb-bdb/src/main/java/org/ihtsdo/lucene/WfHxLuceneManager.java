@@ -141,7 +141,9 @@ public class WfHxLuceneManager extends LuceneManager {
 	}
 
 	public static void writeUnwrittenWorkflows() throws IOException, TerminologyException {
-	    if (LuceneManager.indexExists(LuceneSearchType.WORKFLOW_HISTORY) == false) {
+		init(LuceneSearchType.WORKFLOW_HISTORY);
+
+	    if (LuceneManager.indexExists(LuceneSearchType.WORKFLOW_HISTORY) != false) {
 	    	if (runningLuceneDirFile.exists()) {
 				writeToLuceneNoLock(beansToAdd, null, null);
 				beansToAdd.clear();
