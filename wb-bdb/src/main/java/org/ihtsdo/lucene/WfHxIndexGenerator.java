@@ -164,7 +164,7 @@ public class WfHxIndexGenerator extends IndexGenerator {
 				vc = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
 			}
 			
-			WfHxLuceneManager.writeToLuceneNoLock(wfHxJavaBeansToWrite, vc);
+			WfHxLuceneManager.writeToLuceneNoLock(wfHxJavaBeansToWrite, lastBeanInWfMap, vc);
 		} catch (Exception e) {
 			e.printStackTrace();	
 		}

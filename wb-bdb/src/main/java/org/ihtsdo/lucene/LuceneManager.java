@@ -225,7 +225,7 @@ public abstract class LuceneManager {
 			if (type == LuceneSearchType.DESCRIPTION) {
 				DescriptionLuceneManager.writeToLuceneNoLock(items);
 			} else {
-				WfHxLuceneManager.writeToLuceneNoLock(items, viewCoord);
+				WfHxLuceneManager.writeToLuceneNoLock(items, null, viewCoord);
 			}
 		} catch (IOException e) {
 			throw new IOException(e);

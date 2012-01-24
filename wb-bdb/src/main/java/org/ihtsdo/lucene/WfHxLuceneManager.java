@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -31,7 +32,7 @@ public class WfHxLuceneManager extends LuceneManager {
 
 	private static HashSet<WorkflowHistoryJavaBean> beansToAdd;
 
-	public static void writeToLuceneNoLock(Collection<WorkflowHistoryJavaBean> beans, ViewCoordinate viewCoord) throws IOException, TerminologyException {
+	public static void writeToLuceneNoLock(Collection<WorkflowHistoryJavaBean> beans, Map<UUID, WorkflowLuceneSearchResult> lastBeanInWfMap, ViewCoordinate viewCoord) throws IOException, TerminologyException {
 		int recordsImported = 0;
 		Set<UUID> processedIds = new HashSet<UUID>();
         WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
@@ -68,17 +69,24 @@ public class WfHxLuceneManager extends LuceneManager {
 						Set<WorkflowHistoryJavaBean> wfIdBeans = searcher.getAllHistoryForWorkflowId(con, bean.getWorkflowId());
 						
 						// Get the latest Wf entry for Wf
-						WorkflowHistoryJavaBean lastBean = WorkflowHelper.getLatestWfHxJavaBeanForWorkflowId(con, bean.getWorkflowId());
-						if (lastBean == null) {
-							lastBean = bean;
-						} 
+						WorkflowLuceneSearchResult lastBeanVals = null;
+						if (lastBeanInWfMap != null) {
+							lastBeanVals = lastBeanInWfMap.get(bean.getWorkflowId());
+						} else {
+							WorkflowHistoryJavaBean lastBean = WorkflowHelper.getLatestWfHxJavaBeanForWorkflowId(con, bean.getWorkflowId());
+							if (lastBean == null) {
+								lastBean = bean;
+							} 
 
+							// Add all workflow Id beans as lucene document
+							lastBeanVals = new WorkflowLuceneSearchResult(lastBean);
+						}
+							
 						// Add all workflow Id beans as lucene document
-						WorkflowLuceneSearchResult vals = new WorkflowLuceneSearchResult(lastBean);
-			            if (vals != null) {
+			            if (lastBeanVals != null) {
 				            for (WorkflowHistoryJavaBean beanToIndex : wfIdBeans) {
 				            	recordsImported++;
-				            	wfHxWriter.addDocument(WfHxIndexGenerator.createDoc(beanToIndex, vals));
+				            	wfHxWriter.addDocument(WfHxIndexGenerator.createDoc(beanToIndex, lastBeanVals));
 				            }
 			            } 
 					}
@@ -135,11 +143,11 @@ public class WfHxLuceneManager extends LuceneManager {
 	public static void writeUnwrittenWorkflows() throws IOException, TerminologyException {
 	    if (LuceneManager.indexExists(LuceneSearchType.WORKFLOW_HISTORY) == false) {
 	    	if (runningLuceneDirFile.exists()) {
-				writeToLuceneNoLock(beansToAdd, null);
+				writeToLuceneNoLock(beansToAdd, null, null);
 				beansToAdd.clear();
 	    	} else {
 	            AceLog.getAppLog().severe("Cannot be here unless bundle is executed");
 	    	}
 	    }
-	}
+	} 
 }

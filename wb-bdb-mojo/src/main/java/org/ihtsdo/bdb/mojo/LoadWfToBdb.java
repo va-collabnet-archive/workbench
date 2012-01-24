@@ -34,13 +34,6 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
  */
 public class LoadWfToBdb extends AbstractMojo {
 	/**
-	 * workflow history text file to speed up lucene indexing.
-	 * 
-	 * @parameter
-	 */
-	private String inputWfHxFilePath;
-
-	/**
 	 * Generated resources directory.
 	 * 
 	 * @parameter expression="${project.build.directory}/generated-resources/berkeley-db"
@@ -58,8 +51,6 @@ public class LoadWfToBdb extends AbstractMojo {
 	public void execute() throws MojoExecutionException {
         ViewCoordinate vc;
 		try {
-            Bdb.allowWfLuceneSetup(true);
-
 	        try {
 	        	// Setup Database
 				Bdb.setup(berkeleyDir.getAbsolutePath());
@@ -74,6 +65,8 @@ public class LoadWfToBdb extends AbstractMojo {
 	        // Generate Lucene Index
 	        LuceneManager.createLuceneIndex(LuceneSearchType.WORKFLOW_HISTORY, vc);
 
+	        // Close
+			LuceneManager.close(LuceneSearchType.WORKFLOW_HISTORY);
 			Bdb.close();
 		} catch (Exception ex) {
 			throw new MojoExecutionException(ex.getLocalizedMessage(), ex);
