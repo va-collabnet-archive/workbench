@@ -50,6 +50,7 @@ public class InboxTableModel extends DefaultTableModel {
 	private JProgressBar pBar;
 	private HashMap<String, InboxTag> tagCache = new HashMap<String, InboxTag>();
 	private I_GetConceptData preferred;
+	private I_GetConceptData synonym;
 	private I_GetConceptData fsn;
 	private InboxWorker inboxWorker;
 
@@ -66,6 +67,7 @@ public class InboxTableModel extends DefaultTableModel {
 			config = Terms.get().getActiveAceFrameConfig();
 			preferred = Terms.get().getConcept(SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid());
 			fsn = Terms.get().getConcept(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
+			synonym = Terms.get().getConcept(SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid());
 		} catch (TerminologyException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -357,15 +359,35 @@ public class InboxTableModel extends DefaultTableModel {
 				}
 			}
 		}
-		String concept = wfInstance.getComponentName();
+		String sourcePreferred = "";
+		TranslationProject translationProject = null;
+		I_TerminologyProject projectConcept;
+		try {
+			List<I_GetConceptData> langRefset = null;
+			List<ContextualizedDescription> descriptions = new ArrayList<ContextualizedDescription>();
+			projectConcept = TerminologyProjectDAO.getProjectForWorklist(wfInstance.getWorkList(), config);
+			translationProject = TerminologyProjectDAO.getTranslationProject(projectConcept.getConcept(), config);
+			langRefset = translationProject.getSourceLanguageRefsets();
+			descriptions = LanguageUtil.getContextualizedDescriptions(Terms.get().getConcept(wfInstance.getComponentId()).getConceptNid(), langRefset.get(0).getConceptNid(), true);
+			for (I_ContextualizeDescription description : descriptions) {
+				if (description.getLanguageExtension() != null && description.getLanguageRefsetId() == langRefset.get(0).getConceptNid()) {
+					if (description.getAcceptabilityId() == preferred.getConceptNid() && description.getTypeId() == synonym.getConceptNid() ) {
+						sourcePreferred  = description.getText();
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		
+		
 		String targetFSN = "";
 		String targetPreferred = "";
 		
 		try {
 			I_GetConceptData langRefset = null;
 			List<ContextualizedDescription> descriptions = new ArrayList<ContextualizedDescription>();
-			I_TerminologyProject projectConcept = TerminologyProjectDAO.getProjectForWorklist(wfInstance.getWorkList(), config);
-			TranslationProject translationProject = TerminologyProjectDAO.getTranslationProject(projectConcept.getConcept(), config);
 			langRefset = translationProject.getTargetLanguageRefset();
 			descriptions = LanguageUtil.getContextualizedDescriptions(Terms.get().uuidToNative(wfInstance.getComponentId()), langRefset.getConceptNid(), true);
 			for (I_ContextualizeDescription description : descriptions) {
@@ -383,7 +405,7 @@ public class InboxTableModel extends DefaultTableModel {
 		}
 		
 		row = new Object[InboxColumn.values().length + 1];
-		String componentStr = tagStr + concept;
+		String componentStr = tagStr + sourcePreferred;
 		row[InboxColumn.SOURCE_PREFERRED.getColumnNumber()] = componentStr;
 		row[InboxColumn.TARGET_FSN.getColumnNumber()] = targetFSN;
 	//	row[InboxColumn.STATUS_DATE.getColumnNumber()] = targetPreferred;
