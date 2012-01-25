@@ -41,7 +41,6 @@ import org.ihtsdo.project.ProjectPermissionsAPI;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
-import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
 import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.api.WorkflowInterpreter;
 import org.ihtsdo.project.workflow.api.WorkflowSearcher;
@@ -61,7 +60,6 @@ public class WorklistMemberReAssignment extends JPanel {
 	private static final String DELETE_OPTION = "Delete from queue";
 	private I_ConfigAceFrame config;
 	private HashMap<UUID, String> contract;
-	private String assignedStat;
 	private WorkList workList;
 	private WfComponentProvider provider;
 	private WorkflowSearcher searcher;
@@ -84,7 +82,6 @@ public class WorklistMemberReAssignment extends JPanel {
 			ProjectPermissionsAPI permissionApi = new ProjectPermissionsAPI(config);
 			pBarW.setVisible(false);
 			DefaultTableModel model = getMembersTableModel();
-			assignedStat = tf.getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids()).toString();
 			getMemberList(workList, model);
 			membersTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
@@ -216,15 +213,6 @@ public class WorklistMemberReAssignment extends JPanel {
 		int[] sRows = membersTable.getSelectedRows();
 		DefaultTableModel model = (DefaultTableModel) membersTable.getModel();
 		DefaultTableModel model2 = (DefaultTableModel) membersTable2.getModel();
-		for (int i = sRows.length - 1; i > -1; i--) {
-			int rowModel = membersTable.convertRowIndexToModel(sRows[i]);
-			String status = (String) model.getValueAt(rowModel, 1);
-			if (status.equals(assignedStat)) {
-
-				JOptionPane.showMessageDialog(WorklistMemberReAssignment.this, "Members with status " + status + " cannot be reassigned.", "", JOptionPane.ERROR_MESSAGE);
-				return;
-			}
-		}
 		for (int i = sRows.length - 1; i > -1; i--) {
 			int rowModel = membersTable.convertRowIndexToModel(sRows[i]);
 			WorkListMember member = (WorkListMember) model.getValueAt(rowModel, 0);
