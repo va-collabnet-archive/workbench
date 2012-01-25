@@ -126,7 +126,6 @@ public class WfInboxPanel extends JPanel {
 			tagManager = TagManager.getInstance();
 			model = new InboxTableModel(progressBar1);
 			sorter = new TableRowSorter<InboxTableModel>(model);
-			inboxTable.setModel(model);
 			inboxTable.setRowSorter(sorter);
 			inboxTable.setSelectionMode(DefaultListSelectionModel.SINGLE_SELECTION);
 
@@ -777,10 +776,10 @@ public class WfInboxPanel extends JPanel {
 			expanded = true;
 			label5.setText("- Atach");
 			label5.setToolTipText("Click to atach back to inbox.");
+			model.fireTableStructureChanged();
 		} else {
 			atachToInboxPanel();
 		}
-		model.fireTableStructureChanged();
 	}
 
 	private void atachToInboxPanel() {
@@ -792,6 +791,7 @@ public class WfInboxPanel extends JPanel {
 		splitPanel.setBottomComponent(d.getContentPane());
 		d.dispose();
 		expanded = false;
+		model.fireTableStructureChanged();
 	}
 
 	private void initComponents() {
