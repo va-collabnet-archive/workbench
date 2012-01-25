@@ -4,7 +4,9 @@
 
 package org.ihtsdo.project.workflow.wizard;
 
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -29,6 +31,7 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
@@ -42,6 +45,8 @@ import org.ihtsdo.project.panel.details.ZebraJTable;
 import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.model.WfRole;
 import org.ihtsdo.project.workflow.model.WfUser;
+import org.ihtsdo.project.workflow.wizard.DataGridCollectorFromList.CheckBoxEditor;
+import org.ihtsdo.project.workflow.wizard.DataGridCollectorFromList.RadioEditor;
 import org.ihtsdo.wizard.I_fastWizard;
 
 /**
@@ -173,17 +178,19 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 			}
 			tblObjs.setModel(model);
 			TableColumnModel cmodel = tblObjs.getColumnModel();
-			CheckBoxRenderer checkBoxRenderer = new CheckBoxRenderer();
-			RadioRenderer rr= new RadioRenderer();
+			CheckBoxRenderer checkBoxRenderer = new CheckBoxRenderer(data);
+			CheckBoxEditor checkBoxEditor = new CheckBoxEditor(new JCheckBox(),new JCheckBox());
+			RadioRenderer radioRenderer= new RadioRenderer(data);
+			RadioEditor radioEditor = new RadioEditor(new JCheckBox(),new JRadioButton());
 			cmodel.getColumn(0).setCellRenderer(new DefaultTableCellRenderer());
 			for (int i = 1; i < (columnNames.length); i++) {
 				if(i%2==1){
 				cmodel.getColumn(i).setCellRenderer(checkBoxRenderer);
-				cmodel.getColumn(i).setCellEditor(new CheckBoxEditor(new JCheckBox(),new JCheckBox()));
+				cmodel.getColumn(i).setCellEditor(checkBoxEditor);
 				}
 				else{
-				cmodel.getColumn(i).setCellRenderer(rr);
-				cmodel.getColumn(i).setCellEditor(new RadioEditor(new JCheckBox(),new JRadioButton()));
+				cmodel.getColumn(i).setCellRenderer(radioRenderer);
+				cmodel.getColumn(i).setCellEditor(radioEditor);
 				cmodel.getColumn(i).setMaxWidth(0);
 				cmodel.getColumn(i).setMinWidth(0);
 				}
@@ -199,57 +206,83 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 		this.label1.setText(strLabel);
 	}
 
-	class RadioRenderer extends DefaultTableCellRenderer implements
+	class RadioRenderer extends JPanel implements
 	TableCellRenderer {
 		/**
 		 * 
 		 */
 		private static final long serialVersionUID = 1L;
+		Object[][] grid;
 
-		RadioRenderer() {
+		RadioRenderer(Object[][] data) {
 			super();
-			setHorizontalAlignment(LEFT);
+			grid=data;
 		}
 
 		public Component getTableCellRendererComponent(JTable table,
 				Object value, boolean isSelected, boolean hasFocus, int row,
 				int column) {
+			this.removeAll();
 			JRadioButton button = new JRadioButton();
-			Boolean val=(Boolean)value;
-			button.setSelected(val);
-			return button;
-		}
-	}
-
-	class CheckBoxRenderer extends DefaultTableCellRenderer implements
-	TableCellRenderer {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
-		
-		CheckBoxRenderer() {
-			super();
-		}
-
-		public Component getTableCellRendererComponent(JTable table,
-				Object value, boolean isSelected, boolean hasFocus, int row,
-				int column) {
-			JCheckBox button = new JCheckBox();
 			Boolean val=(Boolean)value;
 			button.setSelected(val);
 			button.setHorizontalAlignment(JButton.RIGHT);
 			button.setHorizontalTextPosition(JButton.LEFT);
-			return button;
+			button.setOpaque(true);
+			setOpaque(true);
+			if((Boolean)grid[row][column]==false){
+				button.setForeground(Color.LIGHT_GRAY);
+				button.setBackground(Color.LIGHT_GRAY);
+				setForeground(Color.LIGHT_GRAY);
+				setBackground(Color.LIGHT_GRAY);
+			}
+			this.add(button);
+			return this;
 		}
 	}
 
-	class RadioEditor extends DefaultCellEditor implements ActionListener {
+	class CheckBoxRenderer extends JPanel implements
+	TableCellRenderer {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		Object[][] grid;
+		
+		CheckBoxRenderer(Object[][] data) {
+			super();
+			grid= data;
+		}
+
+		public Component getTableCellRendererComponent(JTable table,
+				Object value, boolean isSelected, boolean hasFocus, int row,
+				int column) {
+			this.removeAll();
+			Boolean val=(Boolean)value;
+			JCheckBox button= new JCheckBox();
+			button.setHorizontalAlignment(JButton.RIGHT);
+			button.setHorizontalTextPosition(JButton.LEFT);
+			button.setOpaque(true);
+			setOpaque(true);
+			button.setSelected(val);
+			if((Boolean)grid[row][column]==false){
+				button.setForeground(Color.LIGHT_GRAY);
+				button.setBackground(Color.LIGHT_GRAY);
+				setForeground(Color.LIGHT_GRAY);
+				setBackground(Color.LIGHT_GRAY);
+			}
+			this.add(button);
+			return this;
+		}
+	}
+
+	class RadioEditor extends DefaultCellEditor implements TableCellEditor, ActionListener {
 		/**
 		 * 
 		 */
 		private static final long serialVersionUID = 1L;
 		JRadioButton rbutton;
+		JPanel panel;
 		int row;
 		int column;
 		public RadioEditor(JCheckBox checkBox, JRadioButton button) {
@@ -264,7 +297,15 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 			rbutton.setSelected(val);
 			this.row=row;
 			this.column= column;
-			return rbutton;
+			panel= new JPanel();
+			panel.setOpaque(true);
+			if(!table.getModel().isCellEditable(row, column)){
+				panel.setForeground(Color.LIGHT_GRAY);
+				panel.setBackground(Color.LIGHT_GRAY);
+			}
+			panel.add(rbutton);
+			panel.setMinimumSize(new Dimension(0, 20));
+			return panel;
 		}
 
 		public Object getCellEditorValue() {
@@ -286,7 +327,7 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 
 	}
 
-	class CheckBoxEditor extends DefaultCellEditor implements ActionListener {
+	class CheckBoxEditor extends DefaultCellEditor implements TableCellEditor, ActionListener {
 		/**
 		 * 
 		 */
@@ -308,7 +349,16 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 			rbutton.setSelected(val);
 			this.row=row;
 			this.column= column;
-			return rbutton;
+			JPanel panel= new JPanel();
+			panel.setOpaque(true);
+			if(!table.getModel().isCellEditable(row, column)){
+				panel.setForeground(Color.LIGHT_GRAY);
+				panel.setBackground(Color.LIGHT_GRAY);
+			}
+			panel.add(rbutton);
+			rbutton.setHorizontalAlignment(JButton.RIGHT);
+			rbutton.setHorizontalTextPosition(JButton.LEFT);
+			return panel;
 		}
 
 		public Object getCellEditorValue() {
@@ -390,9 +440,42 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 		model.fireTableDataChanged();
 	}
 
+	private void button1ActionPerformed(ActionEvent e) {
+		DefaultTableModel model=(DefaultTableModel) tblObjs.getModel();
+		if(button1.getText().equals("Fill")){
+			button1.setText("Clear");
+			for (int i = 1; i < model.getColumnCount(); i+=2) {
+				boolean def=false;
+				for (int j = 0; j < model.getRowCount(); j++) {
+					if(model.isCellEditable(j, i)){
+						model.setValueAt(true, j, i);
+						if(!def){ 
+							model.setValueAt(true, j, i+1);
+							def=true;
+						}
+						else
+							model.setValueAt(false, j, i+1);
+					}
+				}
+			}
+		}
+		else{
+			button1.setText("Fill");
+			for (int i = 1; i < model.getColumnCount(); i++) {
+				for (int k = 0; k < model.getRowCount(); k++) {
+					model.setValueAt(false, k, i);
+				}
+			}
+		}
+		tblObjs.setModel(model);
+		hideColumns();		
+	}
+
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
+		panel1 = new JPanel();
 		label1 = new JLabel();
+		button1 = new JButton();
 		scrollPane1 = new JScrollPane();
 		tblObjs = new ZebraJTable();
 
@@ -403,9 +486,33 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 		((GridBagLayout)getLayout()).columnWeights = new double[] {0.0, 1.0, 1.0E-4};
 		((GridBagLayout)getLayout()).rowWeights = new double[] {0.0, 1.0, 0.0, 1.0E-4};
 
-		//---- label1 ----
-		label1.setText("Set users for role:");
-		add(label1, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+		//======== panel1 ========
+		{
+			panel1.setLayout(new GridBagLayout());
+			((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 0, 0};
+			((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0};
+			((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {1.0, 0.0, 1.0E-4};
+			((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+
+			//---- label1 ----
+			label1.setText("Set users for role:");
+			panel1.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
+
+			//---- button1 ----
+			button1.setText("Fill");
+			button1.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					button1ActionPerformed(e);
+				}
+			});
+			panel1.add(button1, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 0), 0, 0));
+		}
+		add(panel1, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(0, 0, 5, 0), 0, 0));
 
@@ -413,8 +520,10 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 		{
 
 			//---- tblObjs ----
-			tblObjs.setColumnSelectionAllowed(true);
 			tblObjs.setAutoCreateRowSorter(true);
+			tblObjs.setRowHeight(25);
+			tblObjs.setRowSelectionAllowed(false);
+			tblObjs.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			scrollPane1.setViewportView(tblObjs);
 		}
 		add(scrollPane1, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
@@ -424,7 +533,9 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	private JPanel panel1;
 	private JLabel label1;
+	private JButton button1;
 	private JScrollPane scrollPane1;
 	private ZebraJTable tblObjs;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
