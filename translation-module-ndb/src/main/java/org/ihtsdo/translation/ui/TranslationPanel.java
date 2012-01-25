@@ -18,19 +18,6 @@
 package org.ihtsdo.translation.ui;
 
 import java.awt.*;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Desktop;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -3282,7 +3269,7 @@ public class TranslationPanel extends JPanel {
 						rbAct.setSelected(descriptionInEditor.getExtensionStatusId() == active.getConceptNid());
 						saveDesc = true;
 						mSpellChk.setEnabled(true);
-						if(!ArchitectonicAuxiliary.LANG_CODE.valueOf(langCode).getFormatedLanguageCode().equals(descrpt.getLang())){
+						if(!langCode.equals(descrpt.getLang())){
 							targetTextField.setEnabled(false);
 						}
 						// mAddPref.setEnabled(false);
