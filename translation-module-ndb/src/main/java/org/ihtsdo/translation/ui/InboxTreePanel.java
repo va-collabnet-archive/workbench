@@ -146,6 +146,8 @@ public class InboxTreePanel extends JPanel {
 				InboxTreeItem inboxTreeItem = new InboxTreeItem(newTag, newTag.getUuidList().size(), "icons/85.png");
 				DefaultMutableTreeNode chldNode = new DefaultMutableTreeNode(inboxTreeItem);
 				cNode.add(chldNode);
+				TreeNode[] path = cNode.getPath();
+				inboxFolderTree.expandPath(new TreePath(path));
 				model.reload(cNode);
 			}
 		});
