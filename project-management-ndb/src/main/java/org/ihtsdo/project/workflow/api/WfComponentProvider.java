@@ -1,11 +1,7 @@
 package org.ihtsdo.project.workflow.api;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,11 +29,11 @@ import org.ihtsdo.project.workflow.model.WfPermission;
 import org.ihtsdo.project.workflow.model.WfRole;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WfUser;
-import org.ihtsdo.project.workflow.model.WorkflowDefinition;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.Precedence;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
 public class WfComponentProvider {
 
@@ -88,21 +84,19 @@ public class WfComponentProvider {
 		I_ConfigAceFrame config;
 		try {
 			config = Terms.get().getActiveAceFrameConfig();
-			List<? extends I_DescriptionTuple> descTuples;
-
-			descTuples = concept.getDescriptionTuples(config.getAllowedStatus(), (config.getDescTypes().getSetValues().length == 0) ? null : config.getDescTypes(),
-					config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
-
-			for (I_DescriptionTuple tuple : descTuples) {
-				if (tuple.getTypeNid() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid() && TerminologyProjectDAO.isActive(tuple.getStatusNid())) {
-					return tuple.getText();
+			
+			ConceptVersionBI conceptBi = ((ConceptChronicleBI) concept).getVersion(config.getViewCoordinate());
+			
+			for (DescriptionVersionBI loopDesc : conceptBi.getDescsActive()) {
+				if (loopDesc.getTypeNid() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()) {
+					return loopDesc.getText();
 				}
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TerminologyException e) {
-			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ContradictionException e) {
 			e.printStackTrace();
 		}
 		return "";
@@ -277,7 +271,8 @@ public class WfComponentProvider {
 		}
 
 		try {
-			wfUser = new WfUser(user.getInitialText(), user.getPrimUuid(), getPermissions());
+			wfUser = new WfUser(user.getInitialText(), user.getPrimUuid(), new ArrayList<WfPermission>());
+			wfUser.setPermissions(getPermissionsForUser(wfUser));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
