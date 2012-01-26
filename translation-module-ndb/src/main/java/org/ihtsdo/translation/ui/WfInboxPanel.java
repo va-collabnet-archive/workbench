@@ -126,6 +126,7 @@ public class WfInboxPanel extends JPanel {
 			tagManager = TagManager.getInstance();
 			model = new InboxTableModel(progressBar1);
 			sorter = new TableRowSorter<InboxTableModel>(model);
+			inboxTable.setModel(model);
 			inboxTable.setRowSorter(sorter);
 			inboxTable.setSelectionMode(DefaultListSelectionModel.SINGLE_SELECTION);
 
