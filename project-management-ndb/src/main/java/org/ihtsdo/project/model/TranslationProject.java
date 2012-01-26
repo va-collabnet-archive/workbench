@@ -174,6 +174,18 @@ public class TranslationProject implements I_TerminologyProject, Serializable {
 	public I_GetConceptData getTargetLanguageRefset() throws TerminologyException, IOException, Exception {
 		return TerminologyProjectDAO.getTargetLanguageRefsetForProject(this, Terms.get().getActiveAceFrameConfig());
 	}
+
+	public I_GetConceptData getReleasePathRefset() throws TerminologyException, IOException, Exception {
+		return TerminologyProjectDAO.getReleasePathRefsetForProject(this, Terms.get().getActiveAceFrameConfig());
+	}
+
+	public I_GetConceptData getModuleIdRefset() throws TerminologyException, IOException, Exception {
+		return TerminologyProjectDAO.getModuleIdRefsetForProject(this, Terms.get().getActiveAceFrameConfig());
+	}
+	
+	public I_GetConceptData getNamespaceRefset() throws TerminologyException, IOException, Exception {
+		return TerminologyProjectDAO.getNamespaceRefsetForProject(this, Terms.get().getActiveAceFrameConfig());
+	}
 	
 	public I_GetConceptData getSourceIssueRepo() throws TerminologyException, IOException, Exception {
 		return TerminologyProjectDAO.getSourceIssueRepoForProject(this, Terms.get().getActiveAceFrameConfig());
@@ -185,6 +197,15 @@ public class TranslationProject implements I_TerminologyProject, Serializable {
 
 	public void setTargetLanguageRefset(I_GetConceptData refset) throws TerminologyException, IOException {
 		TerminologyProjectDAO.setLanguageTargetRefset(this, refset, Terms.get().getActiveAceFrameConfig());
+	}
+	public void setReleasePathRefset(I_GetConceptData refset) throws TerminologyException, IOException {
+		TerminologyProjectDAO.setReleasePathRefset(this, refset, Terms.get().getActiveAceFrameConfig());
+	}
+	public void setModuleIdRefset(I_GetConceptData refset) throws TerminologyException, IOException {
+		TerminologyProjectDAO.setModuleIdRefset(this, refset, Terms.get().getActiveAceFrameConfig());
+	}
+	public void setNamespaceRefset(I_GetConceptData refset) throws TerminologyException, IOException {
+		TerminologyProjectDAO.setNamespaceRefset(this, refset, Terms.get().getActiveAceFrameConfig());
 	}
 	public void setSourceIssueRepo(I_GetConceptData repo) throws TerminologyException, IOException {
 		TerminologyProjectDAO.setSourceIssueRepo(this, repo, Terms.get().getActiveAceFrameConfig());
