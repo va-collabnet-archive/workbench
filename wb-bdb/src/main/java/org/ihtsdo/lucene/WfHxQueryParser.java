@@ -88,7 +88,7 @@ public class WfHxQueryParser {
 	    		}
 	    	}
 		} catch (Exception e) {
-        	AceLog.getAppLog().log(Level.WARNING, "Unable in creating Wf Lucene Query with error: " + e.getMessage());
+        	return null;
 		}
     	
     	return booleanQuery;
@@ -145,26 +145,40 @@ public class WfHxQueryParser {
 			return null; 
 		}
 		
-		if (wfInProgress && !completedWf &&
-			wfCrit.getTestType() == AbstractWorkflowHistorySearchTest.currentState &&
-			identifyVal(wfCrit).equals(WorkflowHelper.getApprovedState().toString())) {
-			// MUST-NOT on currentState == APPROVED -- Therefore request for last state must not be approve
-			throw new ParseException("LastState requested and val != ACCEPT while wfInProgress && !completedWfs"); 
-		}
-
-		if (wfInProgress && !completedWf &&
-			wfCrit.getTestType() == AbstractWorkflowHistorySearchTest.currentAction &&
-			identifyVal(wfCrit).equals(WorkflowHelper.getAcceptAction().toString())) {
-			// MUST-NOT on currentAction == ACCEPT -- Therefore request for last action must not be accept
-			throw new ParseException("LastAction requested and val = APPROVATED while wfInProgress && !completedWfs"); 
-		}
+		try {
+			if (wfInProgress && !completedWf &&
+				wfCrit.getTestType() == AbstractWorkflowHistorySearchTest.currentState &&
+				WorkflowHelper.isEndWorkflowState(UUID.fromString(identifyVal(wfCrit)))) {
+				// MUST-NOT on currentState == APPROVED -- Therefore request for last state must not be approve
+				throw new ParseException("LastState requested and val != ACCEPT while wfInProgress && !completedWfs"); 
+			}
 	
-
-		if (!wfInProgress && completedWf &&
-			wfCrit.getTestType() == AbstractWorkflowHistorySearchTest.currentState &&
-			!identifyVal(wfCrit).equals(WorkflowHelper.getAcceptAction().toString())) {
-			// MUST on currentState -- Therefore request for last state must be other than approved 
-			throw new ParseException("LastState requested and val != APPROVATED while !wfInProgress && completedWfs"); 
+			if (wfInProgress && !completedWf &&
+				wfCrit.getTestType() == AbstractWorkflowHistorySearchTest.currentAction &&
+				WorkflowHelper.isEndWorkflowAction(UUID.fromString(identifyVal(wfCrit)))) {
+				// MUST-NOT on currentAction == ACCEPT -- Therefore request for last action must not be accept
+				throw new ParseException("LastAction requested and val = APPROVED while wfInProgress && !completedWfs"); 
+			}
+		
+	
+			if (!wfInProgress && completedWf &&
+				wfCrit.getTestType() == AbstractWorkflowHistorySearchTest.currentState &&
+				!WorkflowHelper.isEndWorkflowState(UUID.fromString(identifyVal(wfCrit)))) {
+				// MUST on currentState -- Therefore request for last state must be other than approved 
+				throw new ParseException("LastState requested and val != APPROVED while !wfInProgress && completedWfs"); 
+			}
+			
+			/*
+			 * Below combination is not valid due to auto-approve
+			 *
+			 * 	if (!wfInProgress && completedWf &&
+			 *  	wfCrit.getTestType() == AbstractWorkflowHistorySearchTest.currentAction &&
+			 *  	!WorkflowHelper.isEndWorkflowAction(UUID.fromString(identifyVal(wfCrit)))) {
+			 *  	throw new ParseException("LastAction requested and val != APPROVED while !wfInProgress && completedWfs"); 
+			 *  }
+			 */  
+		} catch (Exception e) {
+        	AceLog.getAppLog().log(Level.WARNING, "Problem with getting endWorkflowState");
 		}
 		
 		String key = identifyKey(wfCrit);

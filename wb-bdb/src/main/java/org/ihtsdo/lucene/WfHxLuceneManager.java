@@ -116,20 +116,23 @@ public class WfHxLuceneManager extends LuceneManager {
 	        // Create Query
 	        Query wfQuery = wfHxParser.getStandardAnalyzerQuery();
 
-	        // Search WfHx
-	        SearchResult result = LuceneManager.search(wfQuery, LuceneSearchType.WORKFLOW_HISTORY);
-
-	        if (result.topDocs.totalHits > 0) {
-	            AceLog.getAppLog().info("StandardAnalyzer query returned " + result.topDocs.totalHits + " hits");
-	        } else {
-	            AceLog.getAppLog().info("StandardAnalyzer query returned empty results.");
+	        if (wfQuery != null) {
+		        // Search WfHx
+		        SearchResult result = LuceneManager.search(wfQuery, LuceneSearchType.WORKFLOW_HISTORY);
+	
+		        if (result.topDocs.totalHits > 0) {
+		            AceLog.getAppLog().info("StandardAnalyzer query returned " + result.topDocs.totalHits + " hits");
+		        } else {
+		            AceLog.getAppLog().info("StandardAnalyzer query returned empty results.");
+		        }
+		        
+		        return result;
 	        }
-	        
-	        return result;
-        } else {
-            TopDocs emptyDocs = new TopDocs(0, new ScoreDoc[0], 0);
-            return new SearchResult(emptyDocs, null);
-        }
+		}
+
+		// If searcher not initialize or Query is empty, return 0 results
+        TopDocs emptyDocs = new TopDocs(0, new ScoreDoc[0], 0);
+        return new SearchResult(emptyDocs, null);
 	}
 	
 	public static void addToLuceneNoWrite(WorkflowHistoryJavaBean latestWorkflow) {
