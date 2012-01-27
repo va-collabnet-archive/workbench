@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
+
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 
 public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
@@ -61,6 +63,7 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
 
         int count = Rf2File.countFileLines(f);
         int countExludedMembers = 0;
+        int currentCount = 0;
         ArrayList<Rf2_RefsetCRecord> a = new ArrayList<Rf2_RefsetCRecord>();
 
         // DATA COLUMNS
@@ -77,32 +80,39 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
         Set idSet = new HashSet<Long>();
 
         br.readLine(); // Header row
-        while (br.ready()) {
-            String[] line = br.readLine().split(TAB_CHARACTER);
+        currentCount++;
+        try {
+			while (br.ready()) {
+			    String[] line = br.readLine().split(TAB_CHARACTER);
+			    currentCount++;
 
-            Long refsetIdL = Long.parseLong(line[REFSET_ID]);
-            boolean found = false;
-            if (exclusions != null) {
-                for (Long excludedId : exclusions) {
-                    if (excludedId.compareTo(refsetIdL) == 0) {
-                        found = true;
-                    }
-                }
-            }
-            if (found) {
-                countExludedMembers++;
-                continue;
-            }
-            idSet.add(refsetIdL);
+			    Long refsetIdL = Long.parseLong(line[REFSET_ID]);
+			    boolean found = false;
+			    if (exclusions != null) {
+			        for (Long excludedId : exclusions) {
+			            if (excludedId.compareTo(refsetIdL) == 0) {
+			                found = true;
+			            }
+			        }
+			    }
+			    if (found) {
+			        countExludedMembers++;
+			        continue;
+			    }
+			    idSet.add(refsetIdL);
 
-            a.add(new Rf2_RefsetCRecord(line[ID],
-                    Rf2x.convertEffectiveTimeToDate(line[EFFECTIVE_TIME]),
-                    Rf2x.convertStringToBoolean(line[ACTIVE]),
-                    Rf2x.convertIdToUuidStr(line[MODULE_ID]),
-                    Long.parseLong(line[REFSET_ID]),
-                    Long.parseLong(line[REFERENCED_COMPONENT_ID]),
-                    Long.parseLong(line[VALUE_ID])));
-        }
+			    a.add(new Rf2_RefsetCRecord(line[ID],
+			            Rf2x.convertEffectiveTimeToDate(line[EFFECTIVE_TIME]),
+			            Rf2x.convertStringToBoolean(line[ACTIVE]),
+			            Rf2x.convertIdToUuidStr(line[MODULE_ID]),
+			            Long.parseLong(line[REFSET_ID]),
+			            Long.parseLong(line[REFERENCED_COMPONENT_ID]),
+			            Long.parseLong(line[VALUE_ID])));
+			}
+		} catch (NumberFormatException e) {
+			AceLog.getAppLog().severe("Error parsing Refset recors: File=" + f.file.getName() + " Line=" + currentCount);
+			throw e;
+		}
 
         Long[] aLongs = (Long[]) idSet.toArray(new Long[0]);
         StringBuilder sb = new StringBuilder();
