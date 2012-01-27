@@ -75,8 +75,8 @@ public class CreateDescriptionsDiffRefsets extends AbstractTask {
             I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             DescriptionsDiffComputer diff = new DescriptionsDiffComputer(config,
             		"Comparison Jan 12 to Jul 11",
-            		"2011.07.31 23:59:59 CST", 
-            		"2012.01.31 23:59:59 CST",
+            		"2011.01.31 23:59:59 CST", 
+            		"2011.07.31 23:59:59 CST",
             		UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2"), 
             		UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2")
             		);
