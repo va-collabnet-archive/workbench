@@ -54,7 +54,7 @@ import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
  *  6- Coneptos que cambiaron el Preferred Term (EN-US)
  *  7- Conceptos Activos al que se le retiraron descripciones (desc status active->inactive, o en lang refset EN-US member status active -> inactive) 
  *  8- Coneptos con terminos nuevos
- *  9- Concepts con tŽrminos con acceptabilidad EN-US cambiado
+ *  9- Concepts con terminos con acceptabilidad EN-US cambiado
  * 10- Conceptos con descripciones que pasaron de (desc status inactive->active, o en lang refset EN-US member status inactive->active) 
  */
 public class DescriptionsDiffComputer {
