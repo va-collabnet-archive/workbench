@@ -912,7 +912,8 @@ public class TerminologyProjectDAO {
 			if ((concept != null) && (project.getReleasePathRefset() == null) || (concept.getConceptNid() != project.getReleasePathRefset().getConceptNid())) {
 				List<? extends I_RelTuple> targetRefsetRels = null;
 				I_IntSet allowedDestRelTypes = termFactory.newIntSet();
-				allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.HAS_MODULE_ID_REFSET_ATTRIBUTE.localize().getNid());
+				//allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.HAS_MODULE_ID_REFSET_ATTRIBUTE.localize().getNid());
+				allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.HAS_COMMON_REFSET_ATTRIBUTE.localize().getNid());
 				targetRefsetRels = project.getConcept().getSourceRelTuples(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
 
 				if (targetRefsetRels.size() > 0) {
@@ -926,9 +927,12 @@ public class TerminologyProjectDAO {
 						termFactory.commit();
 					}
 				}
-				I_RelVersioned newRelationship = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), termFactory.getConcept(ArchitectonicAuxiliary.Concept.HAS_MODULE_ID_REFSET_ATTRIBUTE.getUids()), concept,
+				I_RelVersioned newRelationship = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), termFactory.getConcept(ArchitectonicAuxiliary.Concept.HAS_COMMON_REFSET_ATTRIBUTE.getUids()), concept,
 						termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
 						termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
+//				I_RelVersioned newRelationship = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), termFactory.getConcept(ArchitectonicAuxiliary.Concept.HAS_MODULE_ID_REFSET_ATTRIBUTE.getUids()), concept,
+//						termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
+//						termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 
 				termFactory.addUncommittedNoChecks(project.getConcept());
 				termFactory.commit();
@@ -948,7 +952,8 @@ public class TerminologyProjectDAO {
 			if ((concept != null) && (project.getReleasePathRefset() == null) || (concept.getConceptNid() != project.getReleasePathRefset().getConceptNid())) {
 				List<? extends I_RelTuple> targetRefsetRels = null;
 				I_IntSet allowedDestRelTypes = termFactory.newIntSet();
-				allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.HAS_NAMESPACE_STRING_REFSET_ATTRIBUTE.localize().getNid());
+				//allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.HAS_NAMESPACE_STRING_REFSET_ATTRIBUTE.localize().getNid());
+				allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.HAS_COMMON_REFSET_ATTRIBUTE.localize().getNid());
 				targetRefsetRels = project.getConcept().getSourceRelTuples(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
 
 				if (targetRefsetRels.size() > 0) {
@@ -962,9 +967,12 @@ public class TerminologyProjectDAO {
 						termFactory.commit();
 					}
 				}
-				I_RelVersioned newRelationship = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), termFactory.getConcept(ArchitectonicAuxiliary.Concept.HAS_NAMESPACE_STRING_REFSET_ATTRIBUTE.getUids()), concept,
+				I_RelVersioned newRelationship = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), termFactory.getConcept(ArchitectonicAuxiliary.Concept.HAS_COMMON_REFSET_ATTRIBUTE.getUids()), concept,
 						termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
 						termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
+//				I_RelVersioned newRelationship = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), termFactory.getConcept(ArchitectonicAuxiliary.Concept.HAS_NAMESPACE_STRING_REFSET_ATTRIBUTE.getUids()), concept,
+//						termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
+//						termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 
 				termFactory.addUncommittedNoChecks(project.getConcept());
 				termFactory.commit();
@@ -984,7 +992,8 @@ public class TerminologyProjectDAO {
 			if ((concept != null) && (project.getReleasePathRefset() == null) || (concept.getConceptNid() != project.getReleasePathRefset().getConceptNid())) {
 				List<? extends I_RelTuple> targetRefsetRels = null;
 				I_IntSet allowedDestRelTypes = termFactory.newIntSet();
-				allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.HAS_RELEASE_PATH_REFSET_ATTRIBUTE.localize().getNid());
+				//allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.HAS_RELEASE_PATH_REFSET_ATTRIBUTE.localize().getNid());
+				allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.HAS_COMMON_REFSET_ATTRIBUTE.localize().getNid());
 				targetRefsetRels = project.getConcept().getSourceRelTuples(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
 
 				if (targetRefsetRels.size() > 0) {
@@ -998,9 +1007,12 @@ public class TerminologyProjectDAO {
 						termFactory.commit();
 					}
 				}
-				I_RelVersioned newRelationship = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), termFactory.getConcept(ArchitectonicAuxiliary.Concept.HAS_RELEASE_PATH_REFSET_ATTRIBUTE.getUids()), concept,
+				I_RelVersioned newRelationship = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), termFactory.getConcept(ArchitectonicAuxiliary.Concept.HAS_COMMON_REFSET_ATTRIBUTE.getUids()), concept,
 						termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
 						termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
+//				I_RelVersioned newRelationship = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), termFactory.getConcept(ArchitectonicAuxiliary.Concept.HAS_RELEASE_PATH_REFSET_ATTRIBUTE.getUids()), concept,
+//						termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
+//						termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 
 				termFactory.addUncommittedNoChecks(project.getConcept());
 				termFactory.commit();
@@ -1257,7 +1269,8 @@ public class TerminologyProjectDAO {
 
 		try {
 			I_IntSet allowedDestRelTypes = termFactory.newIntSet();
-			allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.HAS_RELEASE_PATH_REFSET_ATTRIBUTE.localize().getNid());
+			allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.HAS_COMMON_REFSET_ATTRIBUTE.localize().getNid());
+//			allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.HAS_RELEASE_PATH_REFSET_ATTRIBUTE.localize().getNid());
 			targetRefsetsTuples = project.getConcept().getSourceRelTuples(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
 
 			targetRefsetsTuples = cleanRelTuplesList(targetRefsetsTuples);
