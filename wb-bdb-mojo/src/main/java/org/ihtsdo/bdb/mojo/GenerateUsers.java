@@ -264,7 +264,7 @@ public class GenerateUsers extends AbstractMojo {
 
                 wfLine = wfReader.readLine();
             }
-            
+            if (relPermissionsFile.exists()) {
             try {
 				FileReader     fr = new FileReader(relPermissionsFile);
 				BufferedReader br = new BufferedReader(fr);
@@ -282,6 +282,9 @@ public class GenerateUsers extends AbstractMojo {
 			} catch (Exception ex) {
 				throw new TaskFailedException(ex);
 			}
+            } else {
+                getLog().warn("No relPermissionsFile: " + relPermissionsFile.getAbsolutePath());
+            }
 
             Terms.get().commit();
 
