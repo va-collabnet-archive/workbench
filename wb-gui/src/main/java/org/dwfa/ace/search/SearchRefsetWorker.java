@@ -26,9 +26,11 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.swing.SwingWorker;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentBI;
+import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 public class SearchRefsetWorker extends SwingWorker<I_UpdateProgress> implements I_TrackContinuation {
 
@@ -52,6 +54,7 @@ public class SearchRefsetWorker extends SwingWorker<I_UpdateProgress> implements
             updateTimer.start();
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (continueWork == false) {
                 updateTimer.stop();
@@ -62,6 +65,7 @@ public class SearchRefsetWorker extends SwingWorker<I_UpdateProgress> implements
 
     private class StopActionListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             continueWork = false;
             AceLog.getAppLog().info("Search canceled by user");
@@ -94,6 +98,7 @@ public class SearchRefsetWorker extends SwingWorker<I_UpdateProgress> implements
          * org.dwfa.ace.search.I_UpdateProgress#actionPerformed(java.awt.event
          * .ActionEvent)
          */
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (continueWork) {
                 if (firstUpdate) {
@@ -167,7 +172,9 @@ public class SearchRefsetWorker extends SwingWorker<I_UpdateProgress> implements
             completeLatch = new CountDownLatch(extensionCount);
             new MatchUpdator();
             List<I_TestSearchResults> criterion = searchPanel.getExtraCriterion();
-            int fsnNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+            NidSet fsnSet = new NidSet();
+            fsnSet.add(Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()));
+            fsnSet.add(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getConceptNid());
             nextExt:
             for (I_ExtendByRef ext : extensions) {
                 completeLatch.countDown();
@@ -177,8 +184,10 @@ public class SearchRefsetWorker extends SwingWorker<I_UpdateProgress> implements
                 int errorCount = 0;
                 for (I_ExtendByRefVersion extVer : versions) {
                     for (I_TestSearchResults test : criterion) {
+                        if (!(test instanceof ActiveConceptAndDescTest)) {
                         if (!test.test(extVer, config)) {
                             continue nextExt;
+                        }
                         }
                     }
                     // passed the tests. Add to results.
@@ -188,7 +197,7 @@ public class SearchRefsetWorker extends SwingWorker<I_UpdateProgress> implements
                             ConceptChronicleBI conceptChr = (ConceptChronicleBI) referencedComponent;
                             for (DescriptionChronicleBI descChr : conceptChr.getDescs()) {
                                 for (DescriptionVersionBI descV : descChr.getVersions(config.getViewCoordinate())) {
-                                    if (descV.getTypeNid() == fsnNid) {
+                                    if (fsnSet.contains(descV.getTypeNid())) {
                                         refsetMatches.add((I_DescriptionVersioned) descChr);
                                         continue nextExt;
                                     }
@@ -228,6 +237,7 @@ public class SearchRefsetWorker extends SwingWorker<I_UpdateProgress> implements
         return updater;
     }
 
+    @Override
     protected void finished() {
         try {
             if (continueWork) {
@@ -249,6 +259,7 @@ public class SearchRefsetWorker extends SwingWorker<I_UpdateProgress> implements
         searchPanel.setProgressValue(0);
     }
 
+    @Override
     public boolean continueWork() {
         return continueWork;
     }

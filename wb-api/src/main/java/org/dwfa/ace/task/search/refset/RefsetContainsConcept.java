@@ -57,23 +57,23 @@ public class RefsetContainsConcept extends AbstractSearchTest {
 				if (I_ExtendByRefPartCid.class.isAssignableFrom(part.getClass())) {
 					found = ((I_ExtendByRefPartCid) part).getC1id() == matchNid;
 					if (found) {
-						return true;
+						return applyInversion(true);
 					}
 				}
 				if (I_ExtendByRefPartCidCid.class.isAssignableFrom(part.getClass())) {
 					found = ((I_ExtendByRefPartCidCid) part).getC2id() == matchNid;
 					if (found) {
-						return true;
+						return applyInversion(true);
 					}
 				}
 				if (I_ExtendByRefPartCidCidCid.class.isAssignableFrom(part.getClass())) {
 					found = ((I_ExtendByRefPartCidCidCid) part).getC3id() == matchNid;
 					if (found) {
-						return true;
+						return applyInversion(true);
 					}
 				}
 			}
-			return false;
+			return applyInversion(false);
 		} catch (IOException e) {
 			throw new TaskFailedException(e);
 		}

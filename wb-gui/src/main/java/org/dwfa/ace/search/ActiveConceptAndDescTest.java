@@ -49,7 +49,7 @@ public class ActiveConceptAndDescTest implements I_TestSearchResults {
 		            List<? extends I_ConceptAttributeTuple> attributes = concept.getConceptAttributeTuples(
 		                frameConfig.getAllowedStatus(), frameConfig.getViewPositionSetReadOnly(), 
 		                frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());
-		            if (attributes == null || attributes.size() == 0) {
+		            if (attributes == null || attributes.isEmpty()) {
 		                return false;
 		            }
 		            List<I_DescriptionTuple> matchingTuples = new ArrayList<I_DescriptionTuple>();
@@ -60,7 +60,7 @@ public class ActiveConceptAndDescTest implements I_TestSearchResults {
 		            descV.addTuples(frameConfig.getAllowedStatus(), allowedTypes, 
 		                    frameConfig.getViewPositionSetReadOnly(), matchingTuples, 
 		                    frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());
-		            if (matchingTuples.size() == 0) {
+		            if (matchingTuples.isEmpty()) {
 		                return false;
 		            }
 		    	}
