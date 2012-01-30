@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.AnalogBI;
@@ -465,10 +467,14 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         for (Entry<RefexProperty, Object> entry : properties.entrySet()) {
             switch (entry.getKey()) {
                 case RC_UUID:
-                    if (!entry.getValue().equals(version.getPrimUuid())) {
-                        return false;
+                    try {
+                        if (!entry.getValue().equals(Ts.get().getUuidPrimordialForNid(version.getReferencedComponentNid()))) {
+                            return false;
+                        }
+                        break;
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
                     }
-                    break;
                 case COLLECTION_NID:
                     if (!entry.getValue().equals(version.getCollectionNid())) {
                         return false;
