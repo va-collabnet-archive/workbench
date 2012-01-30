@@ -105,9 +105,15 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid_str.RefexCnidStrVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
@@ -912,8 +918,8 @@ public class TerminologyProjectDAO {
 			if ((concept != null) && (project.getReleasePathRefset() == null) || (concept.getConceptNid() != project.getReleasePathRefset().getConceptNid())) {
 				List<? extends I_RelTuple> targetRefsetRels = null;
 				I_IntSet allowedDestRelTypes = termFactory.newIntSet();
-				//allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.HAS_MODULE_ID_REFSET_ATTRIBUTE.localize().getNid());
-				allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.HAS_COMMON_REFSET_ATTRIBUTE.localize().getNid());
+//				allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.PATRICIA_HOUGHTON.localize().getNid());
+				allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.PATRICIA_HOUGHTON.localize().getNid());
 				targetRefsetRels = project.getConcept().getSourceRelTuples(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
 
 				if (targetRefsetRels.size() > 0) {
@@ -927,12 +933,12 @@ public class TerminologyProjectDAO {
 						termFactory.commit();
 					}
 				}
-				I_RelVersioned newRelationship = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), termFactory.getConcept(ArchitectonicAuxiliary.Concept.HAS_COMMON_REFSET_ATTRIBUTE.getUids()), concept,
-						termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
-						termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 //				I_RelVersioned newRelationship = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), termFactory.getConcept(ArchitectonicAuxiliary.Concept.HAS_MODULE_ID_REFSET_ATTRIBUTE.getUids()), concept,
 //						termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
 //						termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
+				I_RelVersioned newRelationship = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), termFactory.getConcept(ArchitectonicAuxiliary.Concept.PATRICIA_HOUGHTON.getUids()), concept,
+						termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
+						termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 
 				termFactory.addUncommittedNoChecks(project.getConcept());
 				termFactory.commit();
@@ -946,41 +952,20 @@ public class TerminologyProjectDAO {
 		}
 	}
 
-	public static void setNamespaceRefset(TranslationProject project, I_GetConceptData concept, I_ConfigAceFrame config) {
-		I_TermFactory termFactory = Terms.get();
+	public static void setNamespaceRefset(TranslationProject project, String namespaceText, I_ConfigAceFrame config) {
 		try {
-			if ((concept != null) && (project.getReleasePathRefset() == null) || (concept.getConceptNid() != project.getReleasePathRefset().getConceptNid())) {
-				List<? extends I_RelTuple> targetRefsetRels = null;
-				I_IntSet allowedDestRelTypes = termFactory.newIntSet();
-				//allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.HAS_NAMESPACE_STRING_REFSET_ATTRIBUTE.localize().getNid());
-				allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.HAS_COMMON_REFSET_ATTRIBUTE.localize().getNid());
-				targetRefsetRels = project.getConcept().getSourceRelTuples(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
+			I_TermFactory termFactory = Terms.get();
+			
+			I_GetConceptData projectConcept = project.getConcept();
+//			I_GetConceptData namespaceRefset = termFactory.getConcept(ArchitectonicAuxiliary.Concept.PROJECT_NAMESPACE_REFSET.localize().getNid());
+			I_GetConceptData namespaceRefset = termFactory.getConcept(ArchitectonicAuxiliary.Concept.ALEJANDRO_RODRIGUEZ.localize().getNid());
 
-				if (targetRefsetRels.size() > 0) {
-					for (I_RelTuple rel : targetRefsetRels) {
-						I_RelVersioned relVersioned = rel.getFixedPart();
-						for (PathBI editPath : config.getEditingPathSet()) {
-							I_RelPart newPart = (I_RelPart) rel.getMutablePart().makeAnalog(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid(), Terms.get().getAuthorNid(), editPath.getConceptNid(), Long.MAX_VALUE);
-							relVersioned.addVersion(newPart);
-						}
-						termFactory.addUncommittedNoChecks(project.getConcept());
-						termFactory.commit();
-					}
-				}
-				I_RelVersioned newRelationship = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), termFactory.getConcept(ArchitectonicAuxiliary.Concept.HAS_COMMON_REFSET_ATTRIBUTE.getUids()), concept,
-						termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
-						termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
-//				I_RelVersioned newRelationship = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), termFactory.getConcept(ArchitectonicAuxiliary.Concept.HAS_NAMESPACE_STRING_REFSET_ATTRIBUTE.getUids()), concept,
-//						termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
-//						termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
-
-				termFactory.addUncommittedNoChecks(project.getConcept());
-				termFactory.commit();
-			}
-		} catch (TerminologyException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+			RefexCAB newBluePrint = new RefexCAB(TK_REFSET_TYPE.CID_STR, projectConcept.getNid(), namespaceRefset.getNid());
+			newBluePrint.put(RefexProperty.CNID1, ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
+			newBluePrint.put(RefexProperty.STRING1, namespaceText);
+			Ts.get().getTerminologyBuilder(config.getEditCoordinate(), config.getViewCoordinate()).constructIfNotCurrent(newBluePrint);
+			termFactory.addUncommittedNoChecks(namespaceRefset);
+			termFactory.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -993,7 +978,7 @@ public class TerminologyProjectDAO {
 				List<? extends I_RelTuple> targetRefsetRels = null;
 				I_IntSet allowedDestRelTypes = termFactory.newIntSet();
 				//allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.HAS_RELEASE_PATH_REFSET_ATTRIBUTE.localize().getNid());
-				allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.HAS_COMMON_REFSET_ATTRIBUTE.localize().getNid());
+				allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.ALEJANDRO_LOPEZ.localize().getNid());
 				targetRefsetRels = project.getConcept().getSourceRelTuples(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
 
 				if (targetRefsetRels.size() > 0) {
@@ -1007,12 +992,12 @@ public class TerminologyProjectDAO {
 						termFactory.commit();
 					}
 				}
-				I_RelVersioned newRelationship = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), termFactory.getConcept(ArchitectonicAuxiliary.Concept.HAS_COMMON_REFSET_ATTRIBUTE.getUids()), concept,
-						termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
-						termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 //				I_RelVersioned newRelationship = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), termFactory.getConcept(ArchitectonicAuxiliary.Concept.HAS_RELEASE_PATH_REFSET_ATTRIBUTE.getUids()), concept,
 //						termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
 //						termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
+				I_RelVersioned newRelationship = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), termFactory.getConcept(ArchitectonicAuxiliary.Concept.ALEJANDRO_LOPEZ.getUids()), concept,
+						termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
+						termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 
 				termFactory.addUncommittedNoChecks(project.getConcept());
 				termFactory.commit();
@@ -1269,8 +1254,8 @@ public class TerminologyProjectDAO {
 
 		try {
 			I_IntSet allowedDestRelTypes = termFactory.newIntSet();
-			allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.HAS_COMMON_REFSET_ATTRIBUTE.localize().getNid());
 //			allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.HAS_RELEASE_PATH_REFSET_ATTRIBUTE.localize().getNid());
+			allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.ALEJANDRO_LOPEZ.localize().getNid());
 			targetRefsetsTuples = project.getConcept().getSourceRelTuples(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
 
 			targetRefsetsTuples = cleanRelTuplesList(targetRefsetsTuples);
@@ -1295,12 +1280,60 @@ public class TerminologyProjectDAO {
 
 	}
 	
-	public static I_GetConceptData getModuleIdRefsetForProject(TranslationProject translationProject, I_ConfigAceFrame activeAceFrameConfig) {
-		return null;
+	public static I_GetConceptData getModuleIdRefsetForProject(TranslationProject project, I_ConfigAceFrame config) throws Exception {
+		List<I_RelTuple> targetRefsets = new ArrayList<I_RelTuple>();
+		List<? extends I_RelTuple> targetRefsetsTuples = null;
+		I_TermFactory termFactory = Terms.get();
+
+		try {
+			I_IntSet allowedDestRelTypes = termFactory.newIntSet();
+//			allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.HAS_MODULE_ID_REFSET_ATTRIBUTE.localize().getNid());
+			allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.PATRICIA_HOUGHTON.localize().getNid());
+			targetRefsetsTuples = project.getConcept().getSourceRelTuples(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
+
+			targetRefsetsTuples = cleanRelTuplesList(targetRefsetsTuples);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		for (I_RelTuple rel : targetRefsetsTuples) {
+			if (isActive(rel.getStatusNid())) {
+				targetRefsets.add(rel);
+			}
+		}
+
+		if (targetRefsets.size() == 0) {
+			return null;
+		} else if (targetRefsets.size() == 1) {
+			return termFactory.getConcept(targetRefsets.iterator().next().getC2Id());
+		} else {
+			throw new Exception("Wrong number of target refsets.");
+		}
 	}
 
-	public static I_GetConceptData getNamespaceRefsetForProject(TranslationProject translationProject, I_ConfigAceFrame activeAceFrameConfig) {
-		return null;
+	public static String getNamespaceRefsetForProject(TranslationProject project, I_ConfigAceFrame config) throws Exception{
+		List<I_RelTuple> targetRefsets = new ArrayList<I_RelTuple>();
+		List<? extends I_RelTuple> targetRefsetsTuples = null;
+		I_TermFactory termFactory = Terms.get();
+
+		String namespaceStr = "";
+		try {
+			I_IntSet allowedDestRelTypes = termFactory.newIntSet();
+			//allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.PROJECT_NAMESPACE_REFSET.localize().getNid());
+			ConceptChronicleBI rodriguez = Ts.get().getConcept(ArchitectonicAuxiliary.Concept.ALEJANDRO_RODRIGUEZ.localize().getNid());
+			Collection<? extends RefexVersionBI<?>> members = rodriguez.getCurrentRefsetMembers(config.getViewCoordinate());
+			for (RefexVersionBI<?> member : members) {
+				if(member.getReferencedComponentNid() == project.getConcept().getNid()){
+					RefexCnidStrVersionBI namespaceBi = (RefexCnidStrVersionBI)member;
+					namespaceStr  = namespaceBi.getStr1();
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return namespaceStr;
 	}
 
 
