@@ -189,7 +189,6 @@ public class CloneAndRetireAction extends AbstractAction {
             int dosNid = SnomedMetadataRfx.getSYNONYMY_REFEX_NID();
             for (RefexChronicleBI refex : refexes) {
                 int refexNid = refex.getCollectionNid();
-                if (refexNid == gbNid || refexNid == usNid || refexNid == dosNid) {
                     componentVersion = (I_AmPart) refex;
                     for (PathBI ep : config.getEditingPathSet()) {
                         componentVersion.makeAnalog(
@@ -200,9 +199,6 @@ public class CloneAndRetireAction extends AbstractAction {
                     }
                     I_GetConceptData concept = Terms.get().getConceptForNid(component.getNid());
                     Terms.get().addUncommitted(concept);
-                } else {
-                    throw new UnsupportedOperationException("Can't convert: RefexCnidVersionBI");
-                }
             }
         } catch (IOException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
