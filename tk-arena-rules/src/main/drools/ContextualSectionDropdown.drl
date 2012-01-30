@@ -180,3 +180,23 @@ rule "mark completed"
                             new File("plugins/add-concept/mark_completed.bp")));
 end
 
+rule "mark un-reviewed"
+	when
+                ViewFact(view == View.STATED)
+ 		$c: ConceptFact(context == Context.FOCUS_CONCEPT)
+
+	then 
+                    conceptActions.add(actionFactory.make(
+                            new File("plugins/add-concept/mark_unreviewed.bp")));
+end
+
+rule "mark flagged"
+	when
+                ViewFact(view == View.STATED)
+ 		$c: ConceptFact(context == Context.FOCUS_CONCEPT)
+
+	then 
+                    conceptActions.add(actionFactory.make(
+                            new File("plugins/add-concept/mark_flagged.bp")));
+end
+
