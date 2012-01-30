@@ -320,6 +320,7 @@ public class InboxTableModel extends DefaultTableModel {
 		public void done() {
 			try {
 				get();
+				fireTableDataChanged();
 			} catch (Exception ignore) {
 				ignore.printStackTrace();
 			}
