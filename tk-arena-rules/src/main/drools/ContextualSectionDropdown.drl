@@ -170,3 +170,13 @@ rule "remove if in refset: VTM refset"
             }
 end
 
+rule "mark completed"
+	when
+                ViewFact(view == View.STATED)
+ 		$c: ConceptFact(context == Context.FOCUS_CONCEPT)
+
+	then 
+                    conceptActions.add(actionFactory.make(
+                            new File("plugins/add-concept/mark_completed.bp")));
+end
+
