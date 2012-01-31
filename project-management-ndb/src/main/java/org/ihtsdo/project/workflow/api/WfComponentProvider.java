@@ -134,7 +134,7 @@ public class WfComponentProvider {
 
 		try {
 			Set<I_GetConceptData> allRoles = new HashSet<I_GetConceptData>();
-			allRoles = ProjectPermissionsAPI.getDescendants(allRoles, Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER_ROLE.getUids()));
+			allRoles = ProjectPermissionsAPI.getDescendants(allRoles, Terms.get().getConcept(ArchitectonicAuxiliary.Concept.TRANSLATOR_ROLE.getUids()));
 
 			for (I_GetConceptData role : allRoles) {
 				returnRoles.add(roleConceptToWfRole(role));
