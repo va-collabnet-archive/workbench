@@ -47,50 +47,43 @@ public class RetireAction extends AbstractAction {
                             ep.getConceptNid(),
                             Long.MAX_VALUE);
                 }
-                
-                if(DescriptionVersionBI.class.isAssignableFrom(component.getClass())){
-                	retireFromRefexes(component);
+
+                if (DescriptionVersionBI.class.isAssignableFrom(component.getClass())) {
+                    retireFromRefexes(component);
                 }
-                if(RelationshipVersionBI.class.isAssignableFrom(component.getClass())){
-                	RelationshipAnalogBI ra = (RelationshipAnalogBI) analog;
-                        RelationshipVersionBI rv = (RelationshipVersionBI) analog;
-                        ra.setGroup(rv.getGroup());
+                if (RelationshipVersionBI.class.isAssignableFrom(component.getClass())) {
+                    RelationshipAnalogBI ra = (RelationshipAnalogBI) analog;
+                    RelationshipVersionBI rv = (RelationshipVersionBI) analog;
+                    ra.setGroup(rv.getGroup());
                 }
                 I_GetConceptData concept = Terms.get().getConceptForNid(analog.getNid());
                 Terms.get().addUncommitted(concept);
             }
         } catch (IOException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
-        }catch (PropertyVetoException e1) {
+        } catch (PropertyVetoException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         }
     }
-    
+
     private void retireFromRefexes(ComponentVersionBI component) {
         DescriptionVersionBI desc = (DescriptionVersionBI) component;
         try {
             I_AmPart componentVersion;
             ViewCoordinate vc = config.getViewCoordinate();
             Collection<? extends RefexChronicleBI> refexes = desc.getCurrentRefexes(vc);
-            int usNid = SnomedMetadataRfx.getUS_DIALECT_REFEX_NID();
-            int gbNid = SnomedMetadataRfx.getGB_DIALECT_REFEX_NID();
-            int dosNid =SnomedMetadataRfx.getSYNONYMY_REFEX_NID();
             for (RefexChronicleBI refex : refexes) {
                 int refexNid = refex.getCollectionNid();
-                if (refexNid == gbNid || refexNid == usNid || refexNid == dosNid) {
-                    componentVersion = (I_AmPart) refex;
-                    for (PathBI ep : config.getEditingPathSet()) {
-                        componentVersion.makeAnalog(
-                                SnomedMetadataRfx.getSTATUS_RETIRED_NID(),
-                                config.getDbConfig().getUserConcept().getNid(),
-                                ep.getConceptNid(),
-                                Long.MAX_VALUE);
-                    }
-                    I_GetConceptData concept = Terms.get().getConceptForNid(analog.getNid());
-                    Terms.get().addUncommitted(concept);
-                } else {
-                    throw new UnsupportedOperationException("Can't convert: RefexCnidVersionBI");
+                componentVersion = (I_AmPart) refex;
+                for (PathBI ep : config.getEditingPathSet()) {
+                    componentVersion.makeAnalog(
+                            SnomedMetadataRfx.getSTATUS_RETIRED_NID(),
+                            config.getDbConfig().getUserConcept().getNid(),
+                            ep.getConceptNid(),
+                            Long.MAX_VALUE);
                 }
+                I_GetConceptData concept = Terms.get().getConceptForNid(analog.getNid());
+                Terms.get().addUncommitted(concept);
             }
         } catch (IOException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
