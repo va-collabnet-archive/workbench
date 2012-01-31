@@ -49,7 +49,7 @@ public class NewLangSynonymAction extends AbstractAction {
             DescCAB descBp = new DescCAB(desc.getConceptNid(), 
                     SnomedMetadataRfx.getDES_SYNONYM_NID(),
                     lang,
-                    lang + " SYN",
+                    "Clone of " + desc.getText(),
                     false);
             descBp.setComponentUuidNoRecompute(UUID.randomUUID());
             DescriptionChronicleBI dc = builder.construct(descBp);
