@@ -183,7 +183,7 @@ public class TranslationProject implements I_TerminologyProject, Serializable {
 		return TerminologyProjectDAO.getModuleIdRefsetForProject(this, Terms.get().getActiveAceFrameConfig());
 	}
 	
-	public I_GetConceptData getNamespaceRefset() throws TerminologyException, IOException, Exception {
+	public String getNamespaceRefset() throws TerminologyException, IOException, Exception {
 		return TerminologyProjectDAO.getNamespaceRefsetForProject(this, Terms.get().getActiveAceFrameConfig());
 	}
 	
@@ -204,8 +204,8 @@ public class TranslationProject implements I_TerminologyProject, Serializable {
 	public void setModuleIdRefset(I_GetConceptData refset) throws TerminologyException, IOException {
 		TerminologyProjectDAO.setModuleIdRefset(this, refset, Terms.get().getActiveAceFrameConfig());
 	}
-	public void setNamespaceRefset(I_GetConceptData refset) throws TerminologyException, IOException {
-		TerminologyProjectDAO.setNamespaceRefset(this, refset, Terms.get().getActiveAceFrameConfig());
+	public void setNamespaceRefset(String namespaceText) throws TerminologyException, IOException {
+		TerminologyProjectDAO.setNamespaceRefset(this, namespaceText, Terms.get().getActiveAceFrameConfig());
 	}
 	public void setSourceIssueRepo(I_GetConceptData repo) throws TerminologyException, IOException {
 		TerminologyProjectDAO.setSourceIssueRepo(this, repo, Terms.get().getActiveAceFrameConfig());
