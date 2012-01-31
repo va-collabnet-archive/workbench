@@ -75,7 +75,7 @@ public class AddFromSpecAction extends AbstractAction {
                     relSpec.getRelTypeSpec().getLenient().getNid(),
                     relSpec.getDestinationSpec().getLenient().getNid(),
                     SnomedMetadataRf1.HISTORICAL_CHARACTERISTIC_TYPE_RF1.getLenient().getNid(),
-                    SnomedMetadataRfx.getREL_OPTIONAL_REFINABILITY_NID(),
+                    SnomedMetadataRfx.getREL_NOT_REFINABLE_NID(),
                     0,
                     SnomedMetadataRfx.getSTATUS_CURRENT_NID(),
                     config.getDbConfig().getUserConcept().getNid(),
