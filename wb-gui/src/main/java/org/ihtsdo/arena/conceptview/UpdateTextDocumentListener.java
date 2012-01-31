@@ -81,9 +81,11 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
         c = Terms.get().getConcept(desc.getConceptNid());
         Ts.get().addVetoablePropertyChangeListener(TerminologyStoreDI.CONCEPT_EVENT.PRE_COMMIT, this);
     }
-
+    long lastChange = Long.MIN_VALUE;
+    
     @Override
     public void insertUpdate(DocumentEvent e) {
+        lastChange++;
         text = editorPane.extractText();
         text = text.replaceAll("[\\s]", " ");
         text = text.replaceAll("   *", " ");
@@ -102,6 +104,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
 
     @Override
     public void removeUpdate(DocumentEvent e) {
+        lastChange++;
         text = editorPane.extractText();
         text = text.replaceAll("[\\s]", " ");
         text = text.replaceAll("   *", " ");
@@ -117,8 +120,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
         }
         update = true;
     }
-    long lastChange = Long.MIN_VALUE;
-
+    
     @Override
     public void changedUpdate(DocumentEvent e) {
         lastChange++;
