@@ -75,6 +75,11 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
     private static IntSet classifierCharacteristics;
     //~--- fields --------------------------------------------------------------
     private Concept concept;
+
+    @Override
+    public Collection<Integer> getAllNids() throws IOException {
+        return concept.getAllNids();
+    }
     NidListBI fsnOrder;
     NidListBI preferredOrder;
     NidListBI synonymOrder;

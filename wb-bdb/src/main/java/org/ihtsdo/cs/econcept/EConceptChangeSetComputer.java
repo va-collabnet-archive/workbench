@@ -54,6 +54,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.ihtsdo.concept.component.refsetmember.cidCid.CidCidRevision;
+import org.ihtsdo.db.change.ChangeNotifier;
 
 public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet {
    private int                       minSapNid  = Integer.MIN_VALUE;
@@ -108,6 +109,7 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
             changed.set(true);
 
             if ((commitSapNids == null) || commitSapNids.contains(v.getSapNid())) {
+                ChangeNotifier.touch(c.getNid(), ChangeNotifier.Change.COMPONENT);
                if (eca == null) {
                   eca = new EConceptAttributes();
                   eca.setDefined(v.isDefined());
@@ -137,6 +139,7 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
                changed.set(true);
 
                if ((commitSapNids == null) || commitSapNids.contains(v.getSapNid())) {
+                ChangeNotifier.touch(c.getNid(), ChangeNotifier.Change.COMPONENT);
                   if (ecd == null) {
                      ecd = new EDescription();
                      eDescriptions.add(ecd);
@@ -174,6 +177,7 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
                     && (v.getTime() != Long.MAX_VALUE)) {
                if ((commitSapNids == null) || commitSapNids.contains(v.getSapNid())) {
                   changed.set(true);
+                ChangeNotifier.touch(v.getNid(), ChangeNotifier.Change.COMPONENT);
 
                   if (eImg == null) {
                      eImg = new EImage();
@@ -215,6 +219,8 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
                        && (v.getTime() != Long.MAX_VALUE)) {
                   if ((commitSapNids == null) || commitSapNids.contains(v.getSapNid())) {
                      changed.set(true);
+                ChangeNotifier.touch(v.getNid(), ChangeNotifier.Change.COMPONENT);
+                ChangeNotifier.touch(v.getReferencedComponentNid(), ChangeNotifier.Change.REFEX_XREF);
 
                      if (eMember == null) {
                     	 try {
@@ -260,6 +266,9 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
                if ((commitSapNids == null) || commitSapNids.contains(v.getSapNid())) {
                   try {
                      changed.set(true);
+                ChangeNotifier.touch(v.getNid(), ChangeNotifier.Change.COMPONENT);
+                ChangeNotifier.touch(v.getOriginNid(), ChangeNotifier.Change.REL_ORIGIN);
+                ChangeNotifier.touch(v.getDestinationNid(), ChangeNotifier.Change.REL_XREF);
 
                      if (ecr == null) {
                         ecr = new ERelationship();

@@ -769,8 +769,10 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
 
             @Override
             public void run() {
-                label.setTermComponent(termComponent);
-                contentScroller.scrollRectToVisible(new Rectangle(0, 0, 1, 1));
+                if (termComponent != null || label.getTermComponent() != null) {
+                    label.setTermComponent(termComponent);
+                    contentScroller.scrollRectToVisible(new Rectangle(0, 0, 1, 1));
+                }
             }
         });
 

@@ -84,4 +84,6 @@ public interface ConceptChronicleBI extends ComponentChroncileBI<ConceptVersionB
    //~--- set methods ---------------------------------------------------------
 
    void setAnnotationStyleRefex(boolean annotationSyleRefex);
+   
+   Collection<Integer> getAllNids() throws IOException;
 }

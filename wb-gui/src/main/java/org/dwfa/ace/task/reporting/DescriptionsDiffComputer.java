@@ -379,7 +379,7 @@ public class DescriptionsDiffComputer {
 				String v2Pref = "";
 				HashMap<UUID, DescriptionVersionBI> v1Descs = new HashMap<UUID,DescriptionVersionBI>();
 				for (DescriptionVersionBI loopDescPre : version1.getDescsActive()) {
-					DescriptionVersionBI loopDesc = loopDescPre.getVersion(v1);
+					DescriptionVersionBI loopDesc = (DescriptionVersionBI) loopDescPre.getVersion(v1);
 					v1Descs.put(loopDesc.getPrimUuid(), loopDesc);
 					for (RefexVersionBI<?> loopAnnot : loopDesc.getCurrentAnnotationMembers(v1, usLangRefNid)) {
 						RefexCnidVersionBI loopAnnotC = (RefexCnidVersionBI) loopAnnot;
@@ -399,7 +399,7 @@ public class DescriptionsDiffComputer {
 
 				HashMap<UUID, DescriptionVersionBI> v2Descs = new HashMap<UUID,DescriptionVersionBI>();
 				for (DescriptionVersionBI loopDescPre : version2.getDescsActive()) {
-					DescriptionVersionBI loopDesc = loopDescPre.getVersion(v2);
+					DescriptionVersionBI loopDesc = (DescriptionVersionBI) loopDescPre.getVersion(v2);
 					v2Descs.put(loopDesc.getPrimUuid(), loopDesc);
 					for (RefexVersionBI<?> loopAnnot : loopDesc.getCurrentAnnotationMembers(v2, usLangRefNid)) {
 						RefexCnidVersionBI loopAnnotC = (RefexCnidVersionBI) loopAnnot;

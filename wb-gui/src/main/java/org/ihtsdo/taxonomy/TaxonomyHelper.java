@@ -132,6 +132,7 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
                             Set<Integer> referencedComponentsOfChangedRefexs, 
                             Set<Integer> changedComponents) {
         try {
+            if (renderer != null && model != null) {
             NodeUpdator changeWorker = new NodeUpdator(model, 
                             sequence, 
                             originsOfChangedRels,
@@ -141,6 +142,7 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
                             renderer);
 
             FutureHelper.addFuture(ACE.threadPool.submit(changeWorker));
+            }
         } catch (IOException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }

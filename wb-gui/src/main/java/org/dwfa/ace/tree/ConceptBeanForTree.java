@@ -86,6 +86,10 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
    List<DefaultMutableTreeNode> extraParentNodes = new ArrayList<DefaultMutableTreeNode>();
    I_GetConceptData             bean;
 
+    public Collection<Integer> getAllNids() throws IOException {
+        return bean.getAllNids();
+    }
+
     public ConceptChronicleBI getEnclosingConcept() {
         return bean.getEnclosingConcept();
     }

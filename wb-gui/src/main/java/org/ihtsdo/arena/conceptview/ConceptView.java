@@ -67,6 +67,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
+import org.ihtsdo.tk.api.*;
 
 public class ConceptView extends JPanel {
 
@@ -81,7 +82,7 @@ public class ConceptView extends JPanel {
       Collections.synchronizedCollection(new ArrayList<Action>());
    private Map<PanelSection, CollapsePanelPrefs> prefMap    = new EnumMap<PanelSection,
                                                                  CollapsePanelPrefs>(PanelSection.class);
-   long                                  lastLayoutSequence       = Long.MIN_VALUE;
+   long                                  lastChangeModificationLayoutSequence       = Long.MIN_VALUE;
    private Set<File>                     kbFiles                  = new HashSet<File>();
    private boolean                       historyShown             = false;
    private JPanel                        historyPanel             = new JPanel(new GridBagLayout());
@@ -96,6 +97,7 @@ public class ConceptView extends JPanel {
    private EditPanelKb                   kb;
    private Object                        lastThingBeingDropped;
    private ConceptViewSettings           settings;
+   private CVChangeListener cvChangeListener = new CVChangeListener();
 
 
    //~--- constant enums ------------------------------------------------------
@@ -114,6 +116,7 @@ public class ConceptView extends JPanel {
       addCommitListener(settings);
       setupPrefMap();
       dropPanelMgr = new DropPanelActionManager();
+      Ts.get().addTermChangeListener(cvChangeListener);
    }
 
    //~--- methods -------------------------------------------------------------
@@ -126,7 +129,10 @@ public class ConceptView extends JPanel {
             if ((evt.getPropagationId() == null) || (Long) evt.getPropagationId() > lastPropId) {
                try {
                   if (ConceptView.this.concept == null) {
-                     layoutConcept(ConceptView.this.concept);
+                      if (evt.getOldValue() != null || evt.getNewValue() != null) {
+                          layoutConcept(ConceptView.this.concept);
+                      }
+                     
                   } else {
                      if (ConceptView.this.concept.isCanceled()) {
                         getSettings().getHost().setTermComponent(null);
@@ -152,9 +158,92 @@ public class ConceptView extends JPanel {
       }
    }
 
+   private class CVChangeListener extends TermChangeListener {
+
+        @Override
+        public void changeNotify(long sequence, 
+            Set<Integer> originsOfChangedRels, 
+            Set<Integer> destinationsOfChangedRels, 
+            Set<Integer> referencedComponentsOfChangedRefexs, 
+            Set<Integer> changedComponents) {
+            ChangeListenerSwingWorker worker = new ChangeListenerSwingWorker(sequence, 
+                    originsOfChangedRels, 
+                    destinationsOfChangedRels, 
+                    referencedComponentsOfChangedRefexs, 
+                    changedComponents, 
+                    concept);
+            worker.execute();
+        }
+   }
+   
+   private class ChangeListenerSwingWorker extends SwingWorker<Boolean, Boolean> {
+       long sequence; 
+       Set<Integer> originsOfChangedRels; 
+       Set<Integer> destinationsOfChangedRels; 
+       Set<Integer> referencedComponentsOfChangedRefexs; 
+       Set<Integer> changedComponents;
+       I_GetConceptData validConcept;
+
+        public ChangeListenerSwingWorker(long sequence, 
+                Set<Integer> originsOfChangedRels, 
+                Set<Integer> destinationsOfChangedRels, 
+                Set<Integer> referencedComponentsOfChangedRefexs, 
+                Set<Integer> changedComponents, 
+                I_GetConceptData validConcept) {
+            this.sequence = sequence;
+            this.originsOfChangedRels = originsOfChangedRels;
+            this.destinationsOfChangedRels = destinationsOfChangedRels;
+            this.referencedComponentsOfChangedRefexs = referencedComponentsOfChangedRefexs;
+            this.changedComponents = changedComponents;
+            this.validConcept = validConcept;
+        }
+       
+       
+       @Override
+       protected Boolean doInBackground() throws Exception {
+           if (validConcept != null) {
+               Collection<Integer> allNids = ConceptView.this.concept.getAllNids();
+               if (setContainsCollectionMember(originsOfChangedRels, allNids)
+                       || setContainsCollectionMember(destinationsOfChangedRels, allNids)
+                       || setContainsCollectionMember(referencedComponentsOfChangedRefexs, allNids)
+                       || setContainsCollectionMember(changedComponents, allNids)) {
+                   lastTouchSequence++;
+                   return true;
+               }
+           }
+           return false;
+       }
+
+        @Override
+        protected void done() {
+            try {
+                Boolean redoLayout = get();
+                if (redoLayout && ConceptView.this.concept == validConcept) {
+                    layoutConcept(validConcept);
+                }
+            } catch (Exception ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+            }
+        }
+       
+   }
+   
+   private static boolean setContainsCollectionMember(Set<Integer> set, Collection<Integer> collection) {
+       for (Integer member: collection) {
+           if (set.contains(member)) {
+               return true;
+           }
+       }
+       return false;
+   }
+   
+   private long lastTouchSequence = Long.MIN_VALUE;
+   private long lastTouchLayoutSequence = Long.MIN_VALUE;
+   
    public void layoutConcept(I_GetConceptData concept) throws IOException {
       if (concept != null) {
-         if ((lastLayoutSequence == concept.getLastModificationSequence()) && (concept == this.concept)) {
+         if ((lastChangeModificationLayoutSequence == concept.getLastModificationSequence()) && (concept == this.concept) &&
+                 lastTouchLayoutSequence == lastTouchSequence) {
             if (this.settings.isNavigatorSetup()) {
                this.settings.getNavigator().resetHistoryPanel();
             }
@@ -162,9 +251,11 @@ public class ConceptView extends JPanel {
             return;
          }
 
-         lastLayoutSequence = concept.getLastModificationSequence();
+         lastChangeModificationLayoutSequence = concept.getLastModificationSequence();
       }
 
+      lastTouchLayoutSequence = lastTouchSequence;
+      
       removeAll();
 
       if ((concept == null) || (this.concept == null) || (this.concept.equals(concept) == false)
@@ -188,7 +279,7 @@ public class ConceptView extends JPanel {
    }
 
    public void resetLastLayoutSequence() {
-      lastLayoutSequence = Long.MIN_VALUE;
+      lastChangeModificationLayoutSequence = Long.MIN_VALUE;
    }
 
    public void setupDrop(Object thingBeingDropped) {
