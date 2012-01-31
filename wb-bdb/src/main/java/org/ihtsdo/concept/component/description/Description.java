@@ -47,6 +47,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.api.blueprint.DescCAB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
@@ -608,7 +609,7 @@ public class Description extends ConceptComponent<DescriptionRevision, Descripti
 
     @Override
     public void setText(String text) {
-        this.text = text;
+        this.text = StringEscapeUtils.unescapeHtml4(text);
         modified();
     }
 
