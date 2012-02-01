@@ -17,7 +17,6 @@ package org.ihtsdo.mojo.maven.rf2;
 
 import java.io.*;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,11 +29,11 @@ import org.dwfa.tapi.TerminologyException;
 /**
  * @author Marc E. Campbell
  *
- * @goal sct-rf2-to-arf 
+ * @goal sct-rf2-to-arf-no-status
  * @requiresDependencyResolution compile
  * @requiresProject false
  */
-public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
+public class SctRf2ToArfNoStatusMojo extends AbstractMojo implements Serializable {
 
     private static final String FILE_SEPARATOR = File.separator;
     /**
@@ -60,11 +59,6 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
      * @required
      */
     private String inputDir;
-    /**
-     * @parameter
-     * @required
-     */
-    private String statusDir;
     /**
      * Directory used to output the eConcept format files Default value "/classes"
      * set programmatically due to file separator
@@ -103,28 +97,7 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
                     outDir + "ids.txt"), "UTF-8"));
             getLog().info("::: IDS OUTPUT: " + outDir + "ids_sct.txt");
 
-            // :NYI: extended status implementation does not support multiple version years
-            filesInStatus = Rf2File.getFiles(wDir, targetSubDir, statusDir, "AttributeValue", ".txt");
-
-            ArrayList<Rf2_RefsetCRecord[]> rf2_RefsetCRecordArray = new ArrayList<Rf2_RefsetCRecord[]>();
-            int arrayCont = 0;
-            for (Rf2File rf2File : filesInStatus) {
-                rf2_RefsetCRecordArray.add(Rf2_RefsetCRecord.parseRefset(rf2File, null));
-            }
-            for (Rf2_RefsetCRecord[] rf2_RefsetCRecordTmp : rf2_RefsetCRecordArray) {
-                arrayCont += rf2_RefsetCRecordTmp.length;
-            }
-
-            Rf2_RefsetCRecord[] statusRecords = new Rf2_RefsetCRecord[arrayCont];
-            int index = 0;
-            for (Rf2_RefsetCRecord[] rf2_RefsetCRecordTmp : rf2_RefsetCRecordArray) {
-                for (int i = 0; i < rf2_RefsetCRecordTmp.length; i++) {
-                    statusRecords[index] = rf2_RefsetCRecordTmp[i];
-                    index++;
-                }
-            }
             
-            // Rf2_RefsetCRecord[] statusRecords = Rf2_RefsetCRecord.parseRefset(filesInStatus.get(0), null);
             // hardcoded
             // CONCEPT FILES: parse, write
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
@@ -134,7 +107,6 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
             for (Rf2File rf2File : filesIn) {
                 getLog().info("    ... " + rf2File.file.getName());
                 Sct2_ConRecord[] concepts = Sct2_ConRecord.parseConcepts(rf2File);
-                concepts = Sct2_ConRecord.attachStatus(concepts, statusRecords);
                 for (Sct2_ConRecord c : concepts) {
                     c.writeArf(bw);
                     writeSctSnomedLongId(bwIds, c.conSnoIdL, c.effDateStr, c.pathStr);
@@ -151,7 +123,6 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
             for (Rf2File rf2File : filesIn) {
                 getLog().info("    ... " + rf2File.file.getName());
                 Sct2_DesRecord[] descriptions = Sct2_DesRecord.parseDescriptions(rf2File);
-                descriptions = Sct2_DesRecord.attachStatus(descriptions, statusRecords);
                 for (Sct2_DesRecord d : descriptions) {
                     d.writeArf(bw);
                     writeSctSnomedLongId(bwIds, d.desSnoIdL, d.effDateStr, d.pathStr);
@@ -169,7 +140,6 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
             for (Rf2File rf2File : filesIn) {
                 getLog().info("    ... " + rf2File.file.getName());
                 Sct2_RelRecord[] rels = Sct2_RelRecord.parseRelationships(rf2File, true);
-                rels = Sct2_RelRecord.attachStatus(rels, statusRecords);
                 for (Sct2_RelRecord r : rels) {
                     r.writeArf(bw);
                     writeSctSnomedLongId(bwIds, r.relSnoId, r.effDateStr, r.pathStr);
@@ -193,15 +163,15 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
             bwIds.close();
 
         } catch (TerminologyException ex) {
-            Logger.getLogger(SctRf2ToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SctRf2ToArfNoStatusMojo.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(SctRf2ToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SctRf2ToArfNoStatusMojo.class.getName()).log(Level.SEVERE, null, ex);
             throw new MojoFailureException("RF2/ARF file error", ex);
         } catch (MojoFailureException ex) {
-            Logger.getLogger(SctRf2ToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SctRf2ToArfNoStatusMojo.class.getName()).log(Level.SEVERE, null, ex);
             throw ex;
         } catch (ParseException ex) {
-            Logger.getLogger(SctRf2ToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SctRf2ToArfNoStatusMojo.class.getName()).log(Level.SEVERE, null, ex);
             throw new MojoFailureException("RF2/ARF file name parse error", ex);
         }
     }

@@ -15,13 +15,7 @@
  */
 package org.ihtsdo.mojo.maven.rf2;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.text.ParseException;
 import java.util.List;
 import java.util.logging.Level;
