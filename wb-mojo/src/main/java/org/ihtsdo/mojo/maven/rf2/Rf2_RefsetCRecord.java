@@ -171,7 +171,15 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
         writer.append(Rf2x.convertIdToUuidStr(refsetIdL) + TAB_CHARACTER);
 
         // Member UUID
-        writer.append(id + TAB_CHARACTER);
+        if (id.length() == 36) {
+            writer.append(id + TAB_CHARACTER);
+        } else {
+            writer.append(id.substring(0,8) + '-');
+            writer.append(id.substring(8,12) + '-');
+            writer.append(id.substring(12,16) + '-');
+            writer.append(id.substring(16,20) + '-');
+            writer.append(id.substring(20,32) + TAB_CHARACTER);
+        }
 
         // Status UUID
         writer.append(Rf2x.convertActiveToStatusUuid(isActive) + TAB_CHARACTER);
