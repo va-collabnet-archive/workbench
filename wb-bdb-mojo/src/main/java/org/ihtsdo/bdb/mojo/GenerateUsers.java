@@ -319,7 +319,9 @@ public class GenerateUsers extends AbstractMojo {
 			}
 		}
 		if (user == null) {
-			throw new Exception("User unknown");
+			//throw new Exception("User unknown");
+			//skip line
+			System.out.println("User not found:" + userName + " for rel permission");
 		} else {
 			RelCAB relCab = new RelCAB(user.getPrimUuid(),UUID.fromString(typeUid),
 					UUID.fromString(targetUid),0,TkRelType.STATED_ROLE);
