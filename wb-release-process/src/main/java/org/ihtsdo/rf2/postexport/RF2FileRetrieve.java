@@ -48,18 +48,18 @@ public class RF2FileRetrieve {
 	private String relationshipAuxiliaryFile = "";
 	private String statedRelationshipAuxiliaryFile = "";
 
-	private static final String ATTRIBUTEVALUE_FILENAME_PART = "_crefset_attributevaluefull_int_";
+	private static final String ATTRIBUTEVALUE_FILENAME_PART = "_crefset_attributevaluefull_";
 	private static final String END_FILE = ".txt";
 	private static final String ASSOCIATION_FILENAME_PART = "_crefset_associationreferencefull_int_";
-	private static final String LANGUAGE_FILENAME_PART = "_crefset_languagefull-en_int_";
+	private static final String LANGUAGE_FILENAME_PART = "_crefset_languagefull";
 	private static final String IDENTIFIER_FILENAME_PART = "_identifier_full_int_";
 	private static final String SIMPLEMAP_FILENAME_PART = "srefset_simplemapfull_int_";
-	private static final String CONCEPT_FILENAME_PART = "_concept_full_int_";
-	private static final String DESCRIPTION_FILENAME_PART = "_description_full-en_int_";
-	private static final String RELATIONSHIP_FILENAME_PART = "_relationship_full_int_";
-	private static final String STATEDRELATIONSHIP_FILENAME_PART = "_statedrelationship_full_int_";
+	private static final String CONCEPT_FILENAME_PART = "_concept_full_";
+	private static final String DESCRIPTION_FILENAME_PART = "_description_full";
+	private static final String RELATIONSHIP_FILENAME_PART = "_relationship_full_";
+	private static final String STATEDRELATIONSHIP_FILENAME_PART = "_statedrelationship_full_";
 	private static final String REFSETSIMPLE_FILENAME_PART = "_refset_simplefull_int_";
-	private static final String TEXTDEFINITION_FILENAME_PART = "_textdefinition_full-en_int_";
+	private static final String TEXTDEFINITION_FILENAME_PART = "_textdefinition_full";
 	private static final String DESCRIPTIONTYPE_FILENAME_PART = "_cirefset_descriptiontypefull_int_";
 	private static final String REFSETDESCRIPTOR_FILENAME_PART = "_ccirefset_refsetdescriptorfull_int_";
 	private static final String MODULEDEPENDENCY_FILENAME_PART = "_ssrefset_moduledependencyfull_int_";
