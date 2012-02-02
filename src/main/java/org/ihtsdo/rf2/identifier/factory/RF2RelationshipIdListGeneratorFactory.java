@@ -34,11 +34,9 @@ public class RF2RelationshipIdListGeneratorFactory extends RF2IDFactory {
 			RF2RelationshipIdListGeneratorImpl iterator = new RF2RelationshipIdListGeneratorImpl(getConfig());		
 			iterator.generateIdentifier();
 	
-			closeExportFileWriter();			
+//			closeExportFileWriter();			
 			logger.info("Finished RelationshipId Generation Snapshot Export...");
 
-		} catch (IOException e) {
-			logger.error(e.getMessage());
 		} catch (Exception e) {
 			logger.error(e.getMessage());			
 		}

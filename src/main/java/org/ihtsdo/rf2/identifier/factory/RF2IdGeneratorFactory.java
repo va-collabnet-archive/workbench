@@ -38,11 +38,9 @@ public class RF2IdGeneratorFactory extends RF2IDFactory {
 			RF2IdGeneratorImpl iterator = new RF2IdGeneratorImpl(getConfig());		
 			iterator.generateIdentifier();
 	
-			closeExportFileWriter();			
+//			closeExportFileWriter();			
 			logger.info("Finished Id Generation Snapshot Export...");
 
-		} catch (IOException e) {
-			logger.error(e.getMessage());
 		} catch (Exception e) {
 			logger.error(e.getMessage());			
 		}

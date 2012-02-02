@@ -23,7 +23,7 @@ public abstract class RF2IDFactory {
 
 		RF2IDFactory.config = config;
 
-		setBufferedWriter();
+//		setBufferedWriter();
 	}
 	
 
