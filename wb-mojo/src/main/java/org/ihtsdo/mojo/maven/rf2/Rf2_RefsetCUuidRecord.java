@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 
-public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
+public class Rf2_RefsetCUuidRecord implements Comparable<Rf2_RefsetCUuidRecord> {
 
     private static final String LINE_TERMINATOR = "\r\n";
     private static final String TAB_CHARACTER = "\t";
@@ -36,10 +36,10 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
     final String pathStr;
     final long refsetIdL;
     final long referencedComponentIdL;
-    final long valueIdL; // SCT_ID. For Language refset valueIdL is acceptibilityId
+    final String valueUuid; // SCT_ID. For Language refset valueIdL is acceptibilityId
 
-    public Rf2_RefsetCRecord(String id, String dateStr, boolean active, String path,
-            long refsetIdL, long referencedComponentIdL, long valueIdL) throws ParseException {
+    public Rf2_RefsetCUuidRecord(String id, String dateStr, boolean active, String path,
+            long refsetIdL, long referencedComponentIdL, String valueUuid) throws ParseException {
         this.id = id;
         this.effDateStr = dateStr;
         this.timeL = Rf2x.convertDateToTime(dateStr);
@@ -50,16 +50,16 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
 
         this.refsetIdL = refsetIdL;
         this.referencedComponentIdL = referencedComponentIdL;
-        this.valueIdL = valueIdL;
+        this.valueUuid = valueUuid;
     }
 
-    static Rf2_RefsetCRecord[] parseRefset(Rf2File f, Long[] exclusions)
+    static Rf2_RefsetCUuidRecord[] parseRefset(Rf2File f, Long[] exclusions)
             throws IOException, ParseException {
 
         int count = Rf2File.countFileLines(f);
         int countExludedMembers = 0;
         int currentCount = 0;
-        ArrayList<Rf2_RefsetCRecord> a = new ArrayList<Rf2_RefsetCRecord>();
+        ArrayList<Rf2_RefsetCUuidRecord> a = new ArrayList<Rf2_RefsetCUuidRecord>();
 
         // DATA COLUMNS
         int ID = 0;// id
@@ -96,13 +96,13 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
 			    }
 			    idSet.add(refsetIdL);
 
-			    a.add(new Rf2_RefsetCRecord(line[ID],
+			    a.add(new Rf2_RefsetCUuidRecord(line[ID],
 			            Rf2x.convertEffectiveTimeToDate(line[EFFECTIVE_TIME]),
 			            Rf2x.convertStringToBoolean(line[ACTIVE]),
 			            Rf2x.convertIdToUuidStr(line[MODULE_ID]),
 			            Long.parseLong(line[REFSET_ID]),
 			            Long.parseLong(line[REFERENCED_COMPONENT_ID]),
-			            Long.parseLong(line[VALUE_ID])));
+			            line[VALUE_ID]));
 			}
 		} catch (NumberFormatException e) {
 			AceLog.getAppLog().severe("Error parsing Refset recors: File=" + f.file.getName() + " Line=" + currentCount);
@@ -120,7 +120,7 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
             sb.append(Rf2x.convertIdToUuidStr(l));
             sb.append("\r\n");
         }
-        Logger.getLogger(Rf2_RefsetCRecord.class.getName()).info(sb.toString());
+        Logger.getLogger(Rf2_RefsetCUuidRecord.class.getName()).info(sb.toString());
 
         sb = new StringBuilder();
         sb.append("Concept Refset SCT IDs excluded:\r\n");
@@ -136,7 +136,7 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
         } else {
             sb.append("none.\r\n");
         }
-        Logger.getLogger(Rf2_RefsetCRecord.class.getName()).info(sb.toString());
+        Logger.getLogger(Rf2_RefsetCUuidRecord.class.getName()).info(sb.toString());
 
         sb = new StringBuilder();
         sb.append("Filter Stats\r\n");
@@ -148,11 +148,11 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
         sb.append("\r\nTotal members excluded =\t");
         sb.append(countExludedMembers);
         sb.append("\r\n");
-        Logger.getLogger(Rf2_RefsetCRecord.class.getName()).info(sb.toString());
+        Logger.getLogger(Rf2_RefsetCUuidRecord.class.getName()).info(sb.toString());
 
-        Rf2_RefsetCRecord[] b = new Rf2_RefsetCRecord[a.size()];
+        Rf2_RefsetCUuidRecord[] b = new Rf2_RefsetCUuidRecord[a.size()];
         int idx = 0;
-        for (Rf2_RefsetCRecord rec : a) {
+        for (Rf2_RefsetCUuidRecord rec : a) {
             b[idx] = rec;
             idx++;
         }
@@ -189,11 +189,11 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
         writer.append(pathStr + TAB_CHARACTER);
 
         // Concept Extension Value UUID
-        writer.append(Rf2x.convertIdToUuidStr(valueIdL) + LINE_TERMINATOR);
+        writer.append(valueUuid + LINE_TERMINATOR);
     }
 
     @Override
-    public int compareTo(Rf2_RefsetCRecord t) {
+    public int compareTo(Rf2_RefsetCUuidRecord t) {
         if (this.referencedComponentIdL < t.referencedComponentIdL) {
             return -1; // instance less than received
         } else if (this.referencedComponentIdL > t.referencedComponentIdL) {

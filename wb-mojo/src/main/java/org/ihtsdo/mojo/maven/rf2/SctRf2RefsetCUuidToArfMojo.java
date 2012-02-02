@@ -29,11 +29,11 @@ import org.dwfa.tapi.TerminologyException;
 /**
  * @author Marc E. Campbell
  *
- * @goal sct-rf2-refset-c-to-arf
+ * @goal sct-rf2-refset-cuuid-to-arf
  * @requiresDependencyResolution compile
  * @requiresProject false
  */
-public class SctRf2RefsetCToArfMojo extends AbstractMojo implements Serializable {
+public class SctRf2RefsetCUuidToArfMojo extends AbstractMojo implements Serializable {
 
     private static final String FILE_SEPARATOR = File.separator;
     /**
@@ -115,8 +115,8 @@ public class SctRf2RefsetCToArfMojo extends AbstractMojo implements Serializable
             getLog().info("::: CONCEPT REFSET FILE: " + outDir + "concept_refsetc_rf2.refset");
             filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, inputFile, ".txt");
             for (Rf2File rf2File : filesIn) {
-                Rf2_RefsetCRecord[] members = Rf2_RefsetCRecord.parseRefset(rf2File, exclusions);
-                for (Rf2_RefsetCRecord m : members) {
+                Rf2_RefsetCUuidRecord[] members = Rf2_RefsetCUuidRecord.parseRefset(rf2File, exclusions);
+                for (Rf2_RefsetCUuidRecord m : members) {
                     m.writeArf(bw);
                 }
             }
@@ -124,7 +124,7 @@ public class SctRf2RefsetCToArfMojo extends AbstractMojo implements Serializable
             bw.close();
 
         } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(SctRf2RefsetCToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SctRf2RefsetCUuidToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
             throw new MojoFailureException("RF2/ARF SctRf2RefsetCToArfMojo UnsupportedEncodingException", ex);
         } catch (TerminologyException ex) {
             Logger.getLogger(SctRf2ToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
