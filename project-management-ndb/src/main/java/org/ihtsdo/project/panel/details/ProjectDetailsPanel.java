@@ -74,7 +74,7 @@ import org.ihtsdo.project.help.HelpApi;
 import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkSet;
-import org.ihtsdo.project.panel.ExportDescrAndLangSubsetPanel;
+import org.ihtsdo.project.panel.ExportTabPanel;
 import org.ihtsdo.project.panel.TranslationHelperPanel;
 import org.ihtsdo.project.panel.dnd.GetAndSetIssueRepo;
 import org.ihtsdo.project.panel.dnd.I_UpdateRepository;
@@ -119,7 +119,7 @@ public class ProjectDetailsPanel extends JPanel {
 			label38.setText("");
 			issuesHelpLbl.setIcon(IconUtilities.helpIcon);
 			issuesHelpLbl.setText("");
-			ExportDescrAndLangSubsetPanel expPanel=new ExportDescrAndLangSubsetPanel(project);
+			ExportTabPanel expPanel=new ExportTabPanel(project);
 			expPanel.revalidate();
 			tabbedPane1.addTab("Export Target Language", expPanel);
 			//TODO: hardcoded test fixture, for demo purposes

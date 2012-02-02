@@ -1,4 +1,4 @@
-package org.ihtsdo.project.refset;
+package org.ihtsdo.project.dataexport;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -20,6 +20,7 @@ import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.refset.members.RefsetUtilImpl;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.project.refset.ConceptMembershipRefset;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 public class ExportConceptMemberRefsetToRefset {

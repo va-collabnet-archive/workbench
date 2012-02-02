@@ -35,11 +35,11 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.project.dataexport.ExportDescriptionAndLanguageSubset;
 import org.ihtsdo.project.help.HelpApi;
 import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.panel.dnd.I_GetItemForModel;
 import org.ihtsdo.project.panel.dnd.ObjectTransferHandler;
-import org.ihtsdo.project.refset.ExportDescriptionAndLanguageSubset;
 import org.ihtsdo.project.util.IconUtilities;
 import org.ihtsdo.tk.api.Precedence;
 

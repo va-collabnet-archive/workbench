@@ -1,4 +1,4 @@
-package org.ihtsdo.project.refset;
+package org.ihtsdo.project.dataimport;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -17,8 +17,10 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type3UuidFactory;
+import org.ihtsdo.project.refset.ConceptMembershipRefset;
+import org.ihtsdo.project.refset.RefsetMemberValueMgr;
 
-public class ImportConceptSubsetAsRefset {
+public class ImportConceptRefsetAsRefset {
 	PrintWriter outputFileWriter;
 	BufferedReader inputFileReader;
 	int lineCount;
@@ -32,7 +34,7 @@ public class ImportConceptSubsetAsRefset {
 	private HashSet<Integer> conIdHash;
 	private boolean incremental;
     
-    public ImportConceptSubsetAsRefset(){
+    public ImportConceptRefsetAsRefset(){
 		termFactory = Terms.get();
     	
     }
@@ -49,7 +51,6 @@ public class ImportConceptSubsetAsRefset {
 		String currentLine = inputFileReader.readLine();
 		lineCount = 1;
 		imported=0;
-
 		refsetUUID=UUID.nameUUIDFromBytes(refsetName.getBytes());
 		if (termFactory.hasId(refsetUUID))
 			throw new Exception ("The refset already exists");
@@ -62,7 +63,7 @@ public class ImportConceptSubsetAsRefset {
 		while (currentLine != null) {
 
 			if (!currentLine.trim().equals("")) {
-				importSubsetLine(currentLine);
+				importRefsetLine(currentLine);
 			}
 
             currentLine = inputFileReader.readLine();
@@ -77,16 +78,21 @@ public class ImportConceptSubsetAsRefset {
 		return new Integer[]{imported,0};
 	}
 	
-	private boolean importSubsetLine (String inputLine) throws Exception {
+	private boolean importRefsetLine (String inputLine) throws Exception {
 
 		String memberId ;
 		String[] lineParts = inputLine.split("\t");
 
-		memberId = lineParts[1];
+		memberId = lineParts[5];
 
 		int conceptMemberId=0;
 		try {
-			conceptMemberId = termFactory.getId( Type3UuidFactory.fromSNOMED(memberId)).getNid();
+			try{
+				Long.parseLong(memberId);
+				conceptMemberId = termFactory.getId( Type3UuidFactory.fromSNOMED(memberId)).getNid();
+			}catch(NumberFormatException e){
+				conceptMemberId = termFactory.getId( UUID.fromString(memberId)).getNid();
+			}
 			memberValueMgr.putConceptMember(conceptMemberId);
 			imported++;
 			if (!incremental){
@@ -127,13 +133,12 @@ public class ImportConceptSubsetAsRefset {
 		while (currentLine != null) {
 
 			if (!currentLine.trim().equals("")) {
-				importSubsetLine(currentLine);
+				importRefsetLine(currentLine);
 			}
             currentLine = inputFileReader.readLine();
             lineCount++;
 		}
 		inputFileReader.close();
-		
 		if (!incremental){
 			inactivateNotExistentMembers(refset);
 		}
@@ -153,7 +158,7 @@ public class ImportConceptSubsetAsRefset {
 		BufferedReader inputFileReaderCtrl = new BufferedReader(new FileReader(importFile));
 		
 		boolean ret=true;
-		conIdHash=new HashSet<Integer>();
+		HashSet<String> conUuidHash = new HashSet<String>();
 		String currentLine = inputFileReaderCtrl.readLine();
 		lineCount=1;
 		String memberId ;
@@ -161,14 +166,13 @@ public class ImportConceptSubsetAsRefset {
 
 			if (!currentLine.trim().equals("")) {
 				String[] lineParts = currentLine.split("\t");
-				memberId = lineParts[1];
-				if (conIdHash.contains(Integer.valueOf( memberId))){
+				memberId = lineParts[5];
+				if (conUuidHash.contains(memberId)){
 					ret=false;
 		            outputFileWriter.println("Error on line " + lineCount + " : ");
 					outputFileWriter.println("Duplicated component " + memberId);
-
 				}else{
-					conIdHash.add(Integer.valueOf(memberId));
+					conUuidHash.add(memberId);
 				}
 
 			}
@@ -180,9 +184,9 @@ public class ImportConceptSubsetAsRefset {
 		return ret;
 		
 	}
-	private void inactivateNotExistentMembers(I_GetConceptData refset) throws Exception {
+	private void inactivateNotExistentMembers(I_GetConceptData concept) throws Exception {
 		
-		Collection<? extends I_ExtendByRef> extensions=termFactory.getRefsetExtensionMembers(refset.getConceptNid());
+		Collection<? extends I_ExtendByRef> extensions=termFactory.getRefsetExtensionMembers(concept.getConceptNid());
 		for (I_ExtendByRef extension : extensions) {
 			if (!conIdHash.contains(extension.getComponentNid())){
 				memberValueMgr.delConceptMember(extension.getComponentNid());

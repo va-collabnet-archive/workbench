@@ -58,6 +58,12 @@
 		</dependency>
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
+			<artifactId>id-generation-api</artifactId>
+			<version>${workbench.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.ihtsdo</groupId>
 			<artifactId>wb-gui</artifactId>
 			<version>${workbench.version}</version>
 		</dependency>

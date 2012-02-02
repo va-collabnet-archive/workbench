@@ -39,13 +39,13 @@ import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type3UuidFactory;
+import org.ihtsdo.project.dataexport.ExportConceptMemberRefsetAsSubset;
+import org.ihtsdo.project.dataexport.ExportConceptMemberRefsetToRefset;
+import org.ihtsdo.project.dataimport.ImportConceptRefsetAsRefset;
+import org.ihtsdo.project.dataimport.ImportConceptSubsetAsRefset;
 import org.ihtsdo.project.help.HelpApi;
 import org.ihtsdo.project.panel.dnd.I_GetItemForModel;
 import org.ihtsdo.project.panel.dnd.ObjectTransferHandler;
-import org.ihtsdo.project.refset.ExportConceptMemberRefsetAsSubset;
-import org.ihtsdo.project.refset.ExportConceptMemberRefsetToRefset;
-import org.ihtsdo.project.refset.ImportConceptRefsetAsRefset;
-import org.ihtsdo.project.refset.ImportConceptSubsetAsRefset;
 import org.ihtsdo.project.util.IconUtilities;
 
 /**

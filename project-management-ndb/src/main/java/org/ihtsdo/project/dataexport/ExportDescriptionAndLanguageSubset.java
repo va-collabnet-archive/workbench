@@ -1,4 +1,4 @@
-package org.ihtsdo.project.refset;
+package org.ihtsdo.project.dataexport;
 
 import java.io.BufferedWriter;
 import java.io.File;
