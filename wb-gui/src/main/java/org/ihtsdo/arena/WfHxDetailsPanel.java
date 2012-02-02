@@ -32,7 +32,7 @@ public class WfHxDetailsPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	// Table-Based fields
-	private static final String[] columnNames = {"Action", "State", "Modeler", "Timestamp"};
+	private static final String[] columnNames = {"Action", "State", "Modeler", "Timestamp", "WfId"};
 	private JTable table = null;
 	private List<Boolean> newWfUidIndices;
 
@@ -167,17 +167,19 @@ public class WfHxDetailsPanel extends JPanel {
 	        Object[][] data = new Object[conceptWfBeans.size()][];
 
 			for (WorkflowHistoryJavaBean bean : conceptWfBeans) {
-	        	String[] row = new String[4];
+	        	String[] row = new String[5];
 	        	
 	        	String action = reader.processMetaForDisplay(Terms.get().getConcept(bean.getAction()), viewCoord);
 	    		String state = reader.processMetaForDisplay(Terms.get().getConcept(bean.getState()), viewCoord);
 	    		String modeler = WorkflowHelper.identifyPrefTerm(Terms.get().uuidToNative(bean.getModeler()), viewCoord);
 	    		String time = WorkflowHelper.format.format(new Date(bean.getWorkflowTime()));
+                        String wfId = bean.getWorkflowId().toString();
 	    		
 	    		row[0] = action;
 	    		row[1] = state;
 	    		row[2] = modeler;
 	    		row[3] = time;
+                        row[4] = wfId;
 	    		
 	    		data[counter++] = row;
 	        
