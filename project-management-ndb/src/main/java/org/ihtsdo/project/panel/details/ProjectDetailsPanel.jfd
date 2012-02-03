@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.6.0_24" class="java.beans.XMLDecoder"> 
+<java version="1.6.0_29" class="java.beans.XMLDecoder"> 
  <object class="com.jformdesigner.model.FormModel"> 
   <void method="setProperty"> 
    <string>i18n.bundlePackage</string> 
@@ -109,7 +109,7 @@
              </void> 
              <void method="setProperty"> 
               <string>$rowSpecs</string> 
-              <string>0, 0, 0:1.0, 0</string> 
+              <string>0, 0:1.0, 0</string> 
              </void> 
              <void method="setProperty"> 
               <string>$hGap</string> 
@@ -161,11 +161,11 @@
                <class>java.awt.GridBagLayout</class> 
                <void method="setProperty"> 
                 <string>$columnSpecs</string> 
-                <string>0, 307</string> 
+                <string>122:1.0, 307:1.0</string> 
                </void> 
                <void method="setProperty"> 
                 <string>$rowSpecs</string> 
-                <string>0</string> 
+                <string>0, 0, 9, 30, 30</string> 
                </void> 
                <void method="setProperty"> 
                 <string>$hGap</string> 
@@ -200,6 +200,10 @@
                </object> 
                <object class="com.jformdesigner.model.FormLayoutConstraints"> 
                 <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
+                <void method="setProperty"> 
+                 <string>vAlign</string> 
+                 <int>1</int> 
+                </void> 
                </object> 
               </void> 
               <void method="add"> 
@@ -222,6 +226,167 @@
                 <void method="setProperty"> 
                  <string>gridx</string> 
                  <int>1</int> 
+                </void> 
+               </object> 
+              </void> 
+              <void method="add"> 
+               <object class="com.jformdesigner.model.FormComponent"> 
+                <string>javax.swing.JLabel</string> 
+                <void method="setProperty"> 
+                 <string>text</string> 
+                 <string>Namespace</string> 
+                </void> 
+                <void property="name"> 
+                 <string>label41</string> 
+                </void> 
+               </object> 
+               <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+                <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
+                <void method="setProperty"> 
+                 <string>gridy</string> 
+                 <int>1</int> 
+                </void> 
+               </object> 
+              </void> 
+              <void method="add"> 
+               <object class="com.jformdesigner.model.FormComponent"> 
+                <string>javax.swing.JTextField</string> 
+                <void property="name"> 
+                 <string>namespaceTextField</string> 
+                </void> 
+               </object> 
+               <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+                <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
+                <void method="setProperty"> 
+                 <string>gridx</string> 
+                 <int>1</int> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>gridy</string> 
+                 <int>1</int> 
+                </void> 
+               </object> 
+              </void> 
+              <void method="add"> 
+               <object class="com.jformdesigner.model.FormComponent"> 
+                <string>javax.swing.JSeparator</string> 
+                <void property="name"> 
+                 <string>separator1</string> 
+                </void> 
+               </object> 
+               <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+                <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
+                <void method="setProperty"> 
+                 <string>gridy</string> 
+                 <int>2</int> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>gridwidth</string> 
+                 <int>2</int> 
+                </void> 
+               </object> 
+              </void> 
+              <void method="add"> 
+               <object class="com.jformdesigner.model.FormComponent"> 
+                <string>javax.swing.JLabel</string> 
+                <void method="setProperty"> 
+                 <string>text</string> 
+                 <string>&lt;html&gt;Release candidate&lt;br&gt;path</string> 
+                </void> 
+                <void property="name"> 
+                 <string>label39</string> 
+                </void> 
+               </object> 
+               <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+                <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
+                <void method="setProperty"> 
+                 <string>gridy</string> 
+                 <int>3</int> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>vAlign</string> 
+                 <int>1</int> 
+                </void> 
+               </object> 
+              </void> 
+              <void method="add"> 
+               <object class="com.jformdesigner.model.FormComponent"> 
+                <string>javax.swing.JList</string> 
+                <void method="setProperty"> 
+                 <string>visibleRowCount</string> 
+                 <int>1</int> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>border</string> 
+                 <object id="EtchedBorder0" class="javax.swing.border.EtchedBorder"> 
+                  <int>1</int> 
+                  <null/> 
+                  <null/> 
+                 </object> 
+                </void> 
+                <void property="name"> 
+                 <string>releaseCandidateList</string> 
+                </void> 
+               </object> 
+               <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+                <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
+                <void method="setProperty"> 
+                 <string>gridx</string> 
+                 <int>1</int> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>gridy</string> 
+                 <int>3</int> 
+                </void> 
+               </object> 
+              </void> 
+              <void method="add"> 
+               <object class="com.jformdesigner.model.FormComponent"> 
+                <string>javax.swing.JLabel</string> 
+                <void method="setProperty"> 
+                 <string>text</string> 
+                 <string>&lt;html&gt;Module</string> 
+                </void> 
+                <void property="name"> 
+                 <string>label40</string> 
+                </void> 
+               </object> 
+               <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+                <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
+                <void method="setProperty"> 
+                 <string>gridy</string> 
+                 <int>4</int> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>vAlign</string> 
+                 <int>1</int> 
+                </void> 
+               </object> 
+              </void> 
+              <void method="add"> 
+               <object class="com.jformdesigner.model.FormComponent"> 
+                <string>javax.swing.JList</string> 
+                <void method="setProperty"> 
+                 <string>border</string> 
+                 <object idref="EtchedBorder0"/> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>selectionMode</string> 
+                 <int>0</int> 
+                </void> 
+                <void property="name"> 
+                 <string>moduleIdList</string> 
+                </void> 
+               </object> 
+               <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+                <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
+                <void method="setProperty"> 
+                 <string>gridx</string> 
+                 <int>1</int> 
+                </void> 
+                <void method="setProperty"> 
+                 <string>gridy</string> 
+                 <int>4</int> 
                 </void> 
                </object> 
               </void> 
@@ -338,7 +503,7 @@
               <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
               <void method="setProperty"> 
                <string>gridy</string> 
-               <int>3</int> 
+               <int>2</int> 
               </void> 
              </object> 
             </void> 
@@ -354,7 +519,7 @@
              <class>java.awt.GridBagLayout</class> 
              <void method="setProperty"> 
               <string>$columnSpecs</string> 
-              <string>230:1.0, 0</string> 
+              <string>230, 0:1.0</string> 
              </void> 
              <void method="setProperty"> 
               <string>$rowSpecs</string> 
@@ -1294,12 +1459,10 @@ Select a refset and type ‘d’ for removing it
                 <void method="setProperty"> 
                  <string>border</string> 
                  <object class="javax.swing.border.MatteBorder"> 
-                  <object class="java.awt.Insets"> 
-                   <int>1</int> 
-                   <int>1</int> 
-                   <int>1</int> 
-                   <int>1</int> 
-                  </object> 
+                  <int>1</int> 
+                  <int>1</int> 
+                  <int>1</int> 
+                  <int>1</int> 
                   <object class="java.awt.Color" field="black"/> 
                  </object> 
                 </void> 

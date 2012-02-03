@@ -33,6 +33,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+
+import javax.swing.*;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -51,17 +54,21 @@ import javax.swing.JTextField;
 import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
-import javax.swing.border.LineBorder;
-import javax.swing.border.MatteBorder;
+import javax.swing.border.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
+import org.apache.bcel.generic.IF_ACMPEQ;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.issue.IssueRepoRegistration;
 import org.ihtsdo.issue.issuerepository.IssueRepository;
@@ -82,6 +89,8 @@ import org.ihtsdo.project.panel.dnd.ListDragGestureListenerWithImage;
 import org.ihtsdo.project.panel.dnd.ObjectTransferHandler;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.util.IconUtilities;
+import org.ihtsdo.rf2.refset.dao.RefsetConceptDAO;
+import org.ihtsdo.testmodel.RefsetType;
 /**
  * @author Guillermo Reynoso
  */
@@ -106,6 +115,8 @@ public class ProjectDetailsPanel extends JPanel {
 
 	ObjectTransferHandler ConceptDnDHandler ;
 	private DefaultListModel list8Model;
+	private DefaultListModel releaseCandidateListModel;
+	private DefaultListModel moduleIdModel;
 
 	public ProjectDetailsPanel(TranslationProject project, I_ConfigAceFrame config) {
 		initComponents();
@@ -147,6 +158,8 @@ public class ProjectDetailsPanel extends JPanel {
 			textField1.setText(project.getName());
 			button3.setEnabled(false);
 
+			namespaceTextField.setText(project.getNamespaceRefset());
+			
 			list4Model = new DefaultListModel();
 			List<I_GetConceptData> exclusionRefsets = project.getExclusionRefsets();
 			Collections.sort(exclusionRefsets,
@@ -225,6 +238,22 @@ public class ProjectDetailsPanel extends JPanel {
 										"The selected Target Language refset is not valid or is empty.", 
 										"Warning", JOptionPane.WARNING_MESSAGE);
 							}
+						}else if(((ListModel)listDataEvent.getSource()).equals(releaseCandidateListModel)){
+							I_GetConceptData addedRfst = (I_GetConceptData)releaseCandidateListModel.get(index);
+							if(!validateAsPathRefset(addedRfst.getConceptNid(), ProjectDetailsPanel.this.config)){
+								releaseCandidateListModel.remove(index);
+								JOptionPane.showMessageDialog(ProjectDetailsPanel.this,
+										"The selected refset is not a valid Path", 
+										"Warning", JOptionPane.WARNING_MESSAGE);
+							}
+						}else if(((ListModel)listDataEvent.getSource()).equals(moduleIdList)){
+							I_GetConceptData addedRfst = (I_GetConceptData)moduleIdModel.get(index);
+							if(!validateAsModuleRefset(addedRfst.getConceptNid(), ProjectDetailsPanel.this.config)){
+								moduleIdModel.remove(index);
+								JOptionPane.showMessageDialog(ProjectDetailsPanel.this,
+										"The selected refset is not a valid Moudle", 
+										"Warning", JOptionPane.WARNING_MESSAGE);
+							}
 						}
 					} catch (IOException e) {
 						e.printStackTrace();
@@ -258,6 +287,26 @@ public class ProjectDetailsPanel extends JPanel {
 			list8.setTransferHandler(ConceptDnDHandler);
 			list8.validate();
 
+			releaseCandidateListModel = new DefaultListModel();
+			releaseCandidateList.setModel(releaseCandidateListModel);
+			releaseCandidateListModel.addListDataListener(listDataListener);
+			I_GetConceptData releaseCandidatePath = project.getReleasePathRefset();
+			if(releaseCandidatePath != null){
+				releaseCandidateListModel.addElement(releaseCandidatePath);
+			}
+			releaseCandidateList.setName(TARGET_LIST_NAME);
+			releaseCandidateList.setTransferHandler(ConceptDnDHandler);
+
+			moduleIdModel = new DefaultListModel();
+			moduleIdList.setModel(moduleIdModel);
+			moduleIdModel.addListDataListener(listDataListener);
+			I_GetConceptData moduleIdRefset = project.getModuleIdRefset();
+			if(moduleIdRefset != null){
+				moduleIdModel.addElement(moduleIdRefset);
+			}
+			moduleIdList.setName(TARGET_LIST_NAME);
+			moduleIdList.setTransferHandler(ConceptDnDHandler);
+			
 			//			targetLanguageLabel = new TermComponentLabel();
 			//			targetLanguageLabel.setTermComponent(project.getTargetLanguageRefset());
 			//			targetLanguageLabel.setAlignmentX(LEFT_ALIGNMENT);
@@ -346,6 +395,35 @@ public class ProjectDetailsPanel extends JPanel {
 			e.printStackTrace();
 		}
 	}
+	
+	public static boolean validateAsPathRefset(int pathRefsetId, I_ConfigAceFrame config) throws IOException, TerminologyException {
+		I_TermFactory tf = Terms.get();
+		I_GetConceptData languageRefsetConcept = tf.getConcept(pathRefsetId);
+		I_GetConceptData pathRefset = tf.getConcept(ArchitectonicAuxiliary.Concept.PATH.localize().getNid());
+		I_IntSet allowedTypes = tf.newIntSet();
+		//allowedTypes.add(ArchitectonicAuxiliary.Concept.HAS_RELEASE_PATH_REFSET_ATTRIBUTE.localize().getNid());
+		allowedTypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
+		
+		return pathRefset.isParentOf(languageRefsetConcept, config.getAllowedStatus(), config.getDestRelTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
+	}
+	
+	public static boolean validateAsModuleRefset(int moduleRefsetId, I_ConfigAceFrame config) throws IOException, TerminologyException {
+		return false;
+//		I_TermFactory tf = Terms.get();
+//		I_GetConceptData languageRefsetConcept = tf.getConcept(languageRefsetId);
+//		I_GetConceptData refsetTypeConcept = tf.getConcept(
+//				RefsetAuxiliary.Concept.LANGUAGE_ENUMERATION_EXTENSION.getUids());
+//		Set<? extends I_GetConceptData> refsetTypes = getSourceRelTarget(languageRefsetConcept, config, 
+//				RefsetAuxiliary.Concept.REFSET_TYPE_REL.localize().getNid());
+//		boolean isValid = false;
+//		for (I_GetConceptData refsetType : refsetTypes) {
+//			if (refsetType.getConceptNid() == refsetTypeConcept.getConceptNid()) {
+//				isValid = true;
+//			}
+//		}
+//		return isValid;
+	}
+	
 	public class UpdateRepositoryData implements I_UpdateRepository{
 		String source;
 		public UpdateRepositoryData(String source){
@@ -564,18 +642,36 @@ public class ProjectDetailsPanel extends JPanel {
 	}
 
 	private void button3ActionPerformed(ActionEvent e) {
-		project.setName(textField1.getText());
-		TerminologyProjectDAO.updateTranslationProjectMetadata(project, config);
 		try {
+			project.setName(textField1.getText());
+			project.setModuleIdRefset((I_GetConceptData) (moduleIdModel.isEmpty() ? null : moduleIdModel.get(0)));
+			project.setReleasePathRefset((I_GetConceptData) (releaseCandidateListModel.isEmpty() ? null : releaseCandidateListModel.get(0)));
+			String namespaceText = namespaceTextField.getText();
+			if(!namespaceText.trim().equals("")){
+				try{
+					if(namespaceText.length() == 7){
+						Integer.valueOf(namespaceText);
+					}else{
+						JOptionPane.showMessageDialog(ProjectDetailsPanel.this,
+								"Namespace wont be saved, it must be a 7 digit number.", 
+								"Warning", JOptionPane.WARNING_MESSAGE);
+					}
+					project.setNamespaceRefset(namespaceText);
+				}catch (Exception nfx) {
+					JOptionPane.showMessageDialog(ProjectDetailsPanel.this,
+							"Namespace wont be saved, it must be a 7 digit number.", 
+							"Warning", JOptionPane.WARNING_MESSAGE);
+				}
+			}
+			
+			TerminologyProjectDAO.updateTranslationProjectMetadata(project, config);
 			Terms.get().commit();
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
 		button3.setEnabled(false);
 		TranslationHelperPanel.refreshProjectPanelNode(config);
-		JOptionPane.showMessageDialog(this,
-				"Project saved!", 
-				"Message", JOptionPane.INFORMATION_MESSAGE);
+		JOptionPane.showMessageDialog(this, "Project saved!", "Message", JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	private void button4ActionPerformed(ActionEvent e) {
@@ -1149,6 +1245,13 @@ public class ProjectDetailsPanel extends JPanel {
 		panel2 = new JPanel();
 		label2 = new JLabel();
 		textField1 = new JTextField();
+		label41 = new JLabel();
+		namespaceTextField = new JTextField();
+		separator1 = new JSeparator();
+		label39 = new JLabel();
+		releaseCandidateList = new JList();
+		label40 = new JLabel();
+		moduleIdList = new JList();
 		panel4 = new JPanel();
 		button1 = new JButton();
 		button2 = new JButton();
@@ -1275,9 +1378,9 @@ public class ProjectDetailsPanel extends JPanel {
 				{
 					panel1.setLayout(new GridBagLayout());
 					((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 0};
-					((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0};
+					((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0, 0, 0};
 					((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-					((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0, 0.0, 1.0E-4};
+					((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 1.0, 0.0, 1.0E-4};
 
 					//---- label1 ----
 					label1.setText("Translation project details");
@@ -1289,16 +1392,16 @@ public class ProjectDetailsPanel extends JPanel {
 					//======== panel2 ========
 					{
 						panel2.setLayout(new GridBagLayout());
-						((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {0, 307, 0};
-						((GridBagLayout)panel2.getLayout()).rowHeights = new int[] {0, 0};
-						((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {0.0, 0.0, 1.0E-4};
-						((GridBagLayout)panel2.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+						((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {127, 307, 0};
+						((GridBagLayout)panel2.getLayout()).rowHeights = new int[] {0, 0, 14, 35, 30, 0};
+						((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {1.0, 1.0, 1.0E-4};
+						((GridBagLayout)panel2.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
 
 						//---- label2 ----
 						label2.setText("Name");
 						panel2.add(label2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 0, 5), 0, 0));
+							GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
+							new Insets(0, 0, 5, 5), 0, 0));
 
 						//---- textField1 ----
 						textField1.addKeyListener(new KeyAdapter() {
@@ -1308,6 +1411,44 @@ public class ProjectDetailsPanel extends JPanel {
 							}
 						});
 						panel2.add(textField1, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 0), 0, 0));
+
+						//---- label41 ----
+						label41.setText("Namespace");
+						panel2.add(label41, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 5), 0, 0));
+						panel2.add(namespaceTextField, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 0), 0, 0));
+						panel2.add(separator1, new GridBagConstraints(0, 2, 2, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 0), 0, 0));
+
+						//---- label39 ----
+						label39.setText("<html>Release candidate<br>path");
+						panel2.add(label39, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
+							GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
+							new Insets(0, 0, 5, 5), 0, 0));
+
+						//---- releaseCandidateList ----
+						releaseCandidateList.setVisibleRowCount(1);
+						releaseCandidateList.setBorder(new EtchedBorder());
+						panel2.add(releaseCandidateList, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 0), 0, 0));
+
+						//---- label40 ----
+						label40.setText("<html>Module");
+						panel2.add(label40, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0,
+							GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
+							new Insets(0, 0, 0, 5), 0, 0));
+
+						//---- moduleIdList ----
+						moduleIdList.setBorder(new EtchedBorder());
+						moduleIdList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+						panel2.add(moduleIdList, new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 0, 0), 0, 0));
 					}
@@ -1349,7 +1490,7 @@ public class ProjectDetailsPanel extends JPanel {
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 0, 0), 0, 0));
 					}
-					panel1.add(panel4, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
+					panel1.add(panel4, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
 						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						new Insets(0, 0, 0, 0), 0, 0));
 				}
@@ -1362,7 +1503,7 @@ public class ProjectDetailsPanel extends JPanel {
 					panel9.setLayout(new GridBagLayout());
 					((GridBagLayout)panel9.getLayout()).columnWidths = new int[] {235, 0, 0};
 					((GridBagLayout)panel9.getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0};
-					((GridBagLayout)panel9.getLayout()).columnWeights = new double[] {1.0, 0.0, 1.0E-4};
+					((GridBagLayout)panel9.getLayout()).columnWeights = new double[] {0.0, 1.0, 1.0E-4};
 					((GridBagLayout)panel9.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0, 0.0, 1.0E-4};
 
 					//---- label18 ----
@@ -2255,6 +2396,13 @@ public class ProjectDetailsPanel extends JPanel {
 	private JPanel panel2;
 	private JLabel label2;
 	private JTextField textField1;
+	private JLabel label41;
+	private JTextField namespaceTextField;
+	private JSeparator separator1;
+	private JLabel label39;
+	private JList releaseCandidateList;
+	private JLabel label40;
+	private JList moduleIdList;
 	private JPanel panel4;
 	private JButton button1;
 	private JButton button2;

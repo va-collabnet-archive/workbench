@@ -293,6 +293,7 @@ public class PartitionDetailsPanel extends JPanel {
 		final I_ShowActivity activity = Terms.get().newActivityPanel(true, config, "<html>Generating Worklist from partition", true);
 		activity.setIndeterminate(true);
 		final Long startTime = System.currentTimeMillis();
+		activity.update();
 		worker = new SwingWorker<String, String>() {
 			@Override
 			protected String doInBackground() throws Exception {
