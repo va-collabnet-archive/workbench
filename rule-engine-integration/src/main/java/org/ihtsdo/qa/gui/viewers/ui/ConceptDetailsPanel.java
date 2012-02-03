@@ -110,7 +110,7 @@ public class ConceptDetailsPanel extends JPanel {
 	}
 
 	private void initCustomComponents() throws IOException, TerminologyException {
-		definingChar = ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.localize().getNid();
+		definingChar = ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.localize().getNid();
 
 		inactive = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.INACTIVE.getUids());
 		retired = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
