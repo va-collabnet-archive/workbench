@@ -71,22 +71,22 @@ import org.dwfa.util.id.Type5UuidFactory;
 import org.dwfa.util.io.FileIO;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
+import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.PositionBI;
-import org.ihtsdo.tk.api.Precedence;
-import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.api.*;
+import org.ihtsdo.tk.api.blueprint.ConceptCB;
+import org.ihtsdo.tk.api.blueprint.DescCAB;
+import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RelCAB;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.binding.snomed.Snomed;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
-import org.ihtsdo.tk.binding.snomed.Taxonomies;
-import org.ihtsdo.tk.binding.snomed.TermAux;
+import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
+import org.ihtsdo.tk.binding.snomed.*;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelType;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetSearcher;
@@ -153,6 +153,7 @@ public class GenerateUsers extends AbstractMojo {
     private String projectDevelopmentPathFsn;
     private String projectDevelopmentViewPathFsn;
     private I_ConfigAceFrame userConfig;
+    private I_ConfigAceFrame wfConfig;
     private Boolean create = true;
 
     @Override
@@ -207,11 +208,12 @@ public class GenerateUsers extends AbstractMojo {
 
             //add users to wf permissions refset
             I_TermFactory tf = Terms.get();
-            if (userConfig == null) {
-                userConfig = newProfile(null, null, null, null, null);
-                tf.setActiveAceFrameConfig(userConfig);
-            }
-            ViewCoordinate vc = userConfig.getViewCoordinate();
+            wfConfig = newProfile(null, null, null, null, null);
+            Set<PathBI> editingPathSet = wfConfig.getEditingPathSet();
+            editingPathSet.clear();
+            editingPathSet.add(Ts.get().getPath(TermAux.WB_AUX_PATH.getLenient().getNid()));
+            tf.setActiveAceFrameConfig(wfConfig);
+            ViewCoordinate vc = wfConfig.getViewCoordinate();
             EditorCategoryRefsetWriter writer = new EditorCategoryRefsetWriter();
 
             BufferedReader wfReader = new BufferedReader(new FileReader(wfPermissionsFile));
@@ -254,12 +256,16 @@ public class GenerateUsers extends AbstractMojo {
                     }
 
                     if (addingRequired) {
+                        if(modelers.get(columns[0]) == null){
+                            System.out.println("null found: " + columns[0]);
+                            System.out.println(modelers);
+                            ConceptVersionBI modeler = modelers.get(columns[0]);
+                        }
                         writer.setEditor(modelers.get(columns[0]));
                         writer.setSemanticArea(columns[1]);
 
                         writer.setCategory(newCategory);
                         writer.addMember();
-                    }
                 }
 
                 wfLine = wfReader.readLine();
@@ -284,6 +290,7 @@ public class GenerateUsers extends AbstractMojo {
 			}
             } else {
                 getLog().warn("No relPermissionsFile: " + relPermissionsFile.getAbsolutePath());
+            }
             }
 
             Terms.get().commit();
@@ -549,9 +556,9 @@ public class GenerateUsers extends AbstractMojo {
         }
     }
 
-    private I_GetConceptData createUser()
+    private ConceptChronicleBI createUser()
             throws TerminologyException, IOException, UnsupportedEncodingException,
-            NoSuchAlgorithmException, MojoExecutionException {
+            NoSuchAlgorithmException, MojoExecutionException, InvalidCAB, ContradictionException {
         AceLog.getAppLog().info("Create new path for user: " + userConfig.getDbConfig().getFullName());
 
         if ((userConfig.getDbConfig().getFullName() == null)
@@ -567,54 +574,50 @@ public class GenerateUsers extends AbstractMojo {
         // Needs a concept record...
         UUID userUuid = Type5UuidFactory.get(Type5UuidFactory.USER_FULLNAME_NAMESPACE,
                 userConfig.getDbConfig().getFullName());
-        I_GetConceptData userConcept;
+        ConceptCB userConceptBp;
 
         if (Ts.get().hasUuid(userUuid)) {
             setUserConcept(userUuid.toString());
             addWfRelIfDoesNotExist(userUuid.toString());
-            return (I_GetConceptData) Ts.get().getConcept(userUuid);
+            return Ts.get().getConcept(userUuid);
         } else {
-            userConcept = tf.newConcept(userUuid, false, userConfig);
+            ConceptSpec userParent = new ConceptSpec("user",
+                    UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c"));
+            userConceptBp = new ConceptCB(userConfig.getDbConfig().getFullName(),
+                    userConfig.getUsername(),
+                    LANG_CODE.EN,
+                    TermAux.IS_A.getLenient().getPrimUuid(),
+                    userParent.getLenient().getPrimUuid());
 
             // Needs a description record...
-            tf.newDescription(
-                    UUID.randomUUID(), userConcept, "en", userConfig.getDbConfig().getFullName(),
-                    Terms.get().getConcept(
-                    ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()), userConfig);
-            tf.newDescription(
-                    UUID.randomUUID(), userConcept, "en", userConfig.getUsername(),
-                    Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()),
-                    userConfig);
-            tf.newDescription(UUID.randomUUID(), userConcept, "en", userConfig.getUsername() + ".inbox",
-                    Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER_INBOX.getUids()),
-                    userConfig);
-
-            // Needs a relationship record...
-            tf.newRelationship(UUID.randomUUID(), userConcept,
-                    tf.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()),
-                    tf.getConcept(ArchitectonicAuxiliary.Concept.USER.getUids()),
-                    tf.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()),
-                    tf.getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()),
-                    tf.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0,
-                    userConfig);
+            DescCAB inboxDescBp = new DescCAB(userConceptBp.getComponentUuid(),
+                    Ts.get().getUuidPrimordialForNid(SnomedMetadataRfx.getDES_SYNONYM_NID()),
+                    LANG_CODE.EN,
+                    userConfig.getUsername() + ".inbox",
+                    false);
 
             //add workflow relationship
-            tf.newRelationship(UUID.randomUUID(), userConcept,
-                    tf.getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS.getUids()),
-                    tf.getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ACTIVE_MODELER.getUids()),
-                    tf.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()),
-                    tf.getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()),
-                    tf.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0,
-                    userConfig);
-
-            userConfig.getDbConfig().setUserConcept(userConcept);
-            tf.addUncommitted(userConcept);
+            RelCAB wfRelBp = new RelCAB(userConceptBp.getComponentUuid(),
+                    ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS.getPrimoridalUid(),
+                    ArchitectonicAuxiliary.Concept.WORKFLOW_ACTIVE_MODELER.getPrimoridalUid(),
+                    0,
+                    TkRelType.STATED_ROLE);
+            ViewCoordinate vc = userConfig.getViewCoordinate();
+            EditCoordinate oldEc = userConfig.getEditCoordinate();
+            EditCoordinate ec = new EditCoordinate(oldEc.getAuthorNid(),
+                    TermAux.WB_AUX_PATH.getLenient().getNid());
+            TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(ec, vc);
+            userConceptBp.setDescCABs(inboxDescBp);
+            userConceptBp.setRelCABs(wfRelBp);
+            ConceptChronicleBI userConcept = builder.construct(userConceptBp);
+            userConfig.getDbConfig().setUserConcept((I_GetConceptData)userConcept);
+            Ts.get().addUncommitted(userConcept);
 
             return userConcept;
         }
     }
 
-    private void addWfRelIfDoesNotExist(String userUuidString) throws TerminologyException, IOException {
+    private void addWfRelIfDoesNotExist(String userUuidString) throws TerminologyException, IOException, InvalidCAB, ContradictionException {
         I_GetConceptData userConcept = Terms.get().getConcept(UUID.fromString(userUuidString));
         int wfNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.WORKFLOW_ACTIVE_MODELER.getUids());
         boolean found = false;
@@ -624,24 +627,36 @@ public class GenerateUsers extends AbstractMojo {
             }
         }
         if (!found) {
-            I_TermFactory tf = Terms.get();
-            tf.newRelationship(UUID.randomUUID(), userConcept,
-                    tf.getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS.getUids()),
-                    tf.getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ACTIVE_MODELER.getUids()),
-                    tf.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()),
-                    tf.getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()),
-                    tf.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0,
-                    userConfig);
+            RelCAB wfRelBp = new RelCAB(userConcept.getPrimUuid(),
+                    ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS.getPrimoridalUid(),
+                    ArchitectonicAuxiliary.Concept.WORKFLOW_ACTIVE_MODELER.getPrimoridalUid(),
+                    0,
+                    TkRelType.STATED_ROLE);
+            ViewCoordinate vc = userConfig.getViewCoordinate();
+            EditCoordinate oldEc = userConfig.getEditCoordinate();
+            EditCoordinate ec = new EditCoordinate(oldEc.getAuthorNid(),
+                    TermAux.WB_AUX_PATH.getLenient().getNid());
+            TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(ec, vc);
+            builder.construct(wfRelBp);
+            
         }
         Ts.get().addUncommitted(userConcept);
     }
 
-    private void setUserConcept(String userUuidString) throws TerminologyException, IOException {
+    private void setUserConcept(String userUuidString) throws TerminologyException, IOException, InvalidCAB, ContradictionException {
         I_GetConceptData userConcept = Terms.get().getConcept(UUID.fromString(userUuidString));
         I_TermFactory tf = Terms.get();
-        tf.newDescription(UUID.randomUUID(), userConcept, "en", userConfig.getUsername() + ".inbox",
-                Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER_INBOX.getUids()),
-                userConfig);
+        DescCAB inboxDescBp = new DescCAB(userConcept.getPrimUuid(),
+                    Ts.get().getUuidPrimordialForNid(SnomedMetadataRfx.getDES_SYNONYM_NID()),
+                    LANG_CODE.EN,
+                    userConfig.getUsername() + ".inbox",
+                    false);
+        ViewCoordinate vc = userConfig.getViewCoordinate();
+        EditCoordinate oldEc = userConfig.getEditCoordinate();
+        EditCoordinate ec = new EditCoordinate(oldEc.getAuthorNid(),
+                    TermAux.WB_AUX_PATH.getLenient().getNid());
+        TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(ec, vc);
+        builder.construct(inboxDescBp);
         userConfig.getDbConfig().setUserConcept(userConcept);
         System.out.println("** 1: " + userConfig.getDbConfig().getUserConcept());
         Ts.get().addUncommitted(userConcept);

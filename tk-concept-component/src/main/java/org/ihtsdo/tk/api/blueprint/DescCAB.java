@@ -100,6 +100,7 @@ public class DescCAB extends CreateOrAmendBlueprint {
             IOException, InvalidCAB, ContradictionException {
         setComponentUuid(UuidT5Generator.get(descSpecNamespace,
                 getPrimoridalUuidStr(conceptUuid)
+                + typeUuid
                 + lang
                 + text));
         for(RefexCAB annotBp: getAnnotationBlueprints()){

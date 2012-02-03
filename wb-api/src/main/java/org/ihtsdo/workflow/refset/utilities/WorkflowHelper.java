@@ -1591,7 +1591,7 @@ public class WorkflowHelper {
 
 	public static String getPrefTerm(I_GetConceptData con) throws IOException, TerminologyException {
 		int descTypeNid = ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid();
-		int rf2DescTypeNid = Terms.get().uuidToNative(SnomedMetadataRf2.PREFERRED_RF2.getUuids()[0]);
+		int rf2DescTypeNid = Terms.get().uuidToNative(SnomedMetadataRf2.SYNONYM_RF2.getUuids()[0]);
 
 		Collection<? extends I_DescriptionVersioned> descs = con.getDescriptions();
 		

@@ -44,4 +44,7 @@ public class TermAux {
     public static ConceptSpec SCT_ID_AUTHORITY =
             new ConceptSpec("SNOMED integer id",
             UUID.fromString("0418a591-f75b-39ad-be2c-3ab849326da9"));
+    public static ConceptSpec WB_AUX_PATH =
+            new ConceptSpec("Workbench Auxiliary",
+            UUID.fromString("2faa9260-8fb2-11db-b606-0800200c9a66"));
 }
