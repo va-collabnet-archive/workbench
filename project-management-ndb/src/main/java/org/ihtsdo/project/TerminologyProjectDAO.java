@@ -2461,7 +2461,7 @@ public class TerminologyProjectDAO {
 					I_DescriptionVersioned<?> foundDescription = tf.getDescription(dnid);
 					I_GetConceptData foundConcept = tf.getConcept(foundDescription.getConceptNid());
 					if (foundDescription.getTuples(config.getConflictResolutionStrategy()).iterator().next().getText().equals(description)
-							&& foundConcept.getConceptAttributeTuples(config.getPrecedence(), config.getConflictResolutionStrategy()).iterator().next().getStatusNid() == tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids())) {
+							&& foundConcept.getConceptAttributeTuples(config.getPrecedence(), config.getConflictResolutionStrategy()).iterator().next().getStatusNid() == SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid()) {
 						result = true;
 					}
 				} catch (Exception e) {
