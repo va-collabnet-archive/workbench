@@ -1699,8 +1699,10 @@ public class TerminologyProjectDAO {
 			if (!currentVersionOfWorkList.getName().equals(workListWithMetadata.getName())) {
 				updatePreferredTerm(workListWithMetadata.getConcept(), workListWithMetadata.getName(), config);
 			}
-			WorklistMetadata worklistMetadata = new WorklistMetadata(workListWithMetadata.getName(), workListWithMetadata.getId(), workListWithMetadata.getUids(), workListWithMetadata.getPartitionUUID(),
-					workListWithMetadata.getWorkflowDefinitionFileName(), workListWithMetadata.getWorkflowUserRoles());
+			WorklistMetadata worklistMetadata = new WorklistMetadata(workListWithMetadata.getName(), 
+					workListWithMetadata.getUids(), workListWithMetadata.getPartitionUUID(),
+					workListWithMetadata.getWorkflowDefinitionFileName(), 
+					workListWithMetadata.getWorkflowUserRoles());
 			String metadata = serialize(worklistMetadata);
 
 			Collection<? extends I_ExtendByRef> extensions = termFactory.getAllExtensionsForComponent(workListConcept.getConceptNid());
@@ -2344,7 +2346,7 @@ public class TerminologyProjectDAO {
 
 		workList.setWorkflowUserRoles(workListWithMetadata.getWorkflowUserRoles());
 		// String metadata = serialize(workList);
-		WorklistMetadata worklistMetadata = new WorklistMetadata(workList.getName(), workList.getId(), workList.getUids(), workList.getPartitionUUID(), workList.getWorkflowDefinitionFileName(), workList.getWorkflowUserRoles());
+		WorklistMetadata worklistMetadata = new WorklistMetadata(workList.getName(), workList.getUids(), workList.getPartitionUUID(), workList.getWorkflowDefinitionFileName(), workList.getWorkflowUserRoles());
 		String metadata = serialize(worklistMetadata);
 
 		termFactory.addUncommittedNoChecks(newConcept);
@@ -3220,7 +3222,10 @@ public class TerminologyProjectDAO {
 			// String metadata = serialize(objectWithMetadata);
 			if (objectWithMetadata instanceof WorkList) {
 				WorkList workList = (WorkList) objectWithMetadata;
-				WorklistMetadata worklistMetadata = new WorklistMetadata(workList.getName(), workList.getId(), workList.getUids(), workList.getPartitionUUID(), workList.getWorkflowDefinitionFileName(), workList.getWorkflowUserRoles());
+				WorklistMetadata worklistMetadata = new WorklistMetadata(workList.getName(), 
+						workList.getUids(), 
+						workList.getPartitionUUID(), workList.getWorkflowDefinitionFileName(), 
+						workList.getWorkflowUserRoles());
 				metadata = serialize(worklistMetadata);
 			} else {
 				metadata = serialize(objectWithMetadata);

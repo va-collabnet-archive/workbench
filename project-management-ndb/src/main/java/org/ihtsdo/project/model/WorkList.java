@@ -92,7 +92,9 @@ public class WorkList extends WorkflowRefset implements Serializable{
 	}
 
 	public static WorkList getInstanceFromMetadata(WorklistMetadata worklistMetadata) throws TerminologyException, IOException{
-		WorkList worklist=new WorkList(worklistMetadata.getName(),worklistMetadata.getId(),worklistMetadata.getUids(),worklistMetadata.getPartitionUUID());
+		WorkList worklist=new WorkList(worklistMetadata.getName(),
+				Terms.get().uuidToNative(worklistMetadata.getUids())
+				,worklistMetadata.getUids(),worklistMetadata.getPartitionUUID());
 		worklist.setWorkflowDefinition(WorkflowDefinitionManager.readWfDefinition(worklistMetadata.getWorkflowDefinitionFileName()));
 		worklist.setWorkflowUserRoles(worklistMetadata.getWorkflowUserRoles());
 		return worklist;
