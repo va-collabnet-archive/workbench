@@ -94,7 +94,7 @@ public class TestContextualizedDescriptions extends TestCase {
 			I_GetConceptData concept = tf.getConcept(UUID.fromString("c265cf22-2a11-3488-b71e-296ec0317f96"));
 			//UUID.fromString("900042ba-b637-38ae-95d7-1974896da7fb")
 			I_GetConceptData languageRefset = tf.getConcept(RefsetAuxiliary.Concept.ADDED_CONCEPT.getUids());
-			I_GetConceptData defining = tf.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
+			I_GetConceptData defining = tf.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
 			I_GetConceptData refinability = tf.getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
 			I_GetConceptData current = tf.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
 			I_GetConceptData refsetTypeConcept = tf.getConcept(RefsetAuxiliary.Concept.LANGUAGE_ENUMERATION_EXTENSION.getUids());

@@ -96,7 +96,7 @@ public class StressTestContextualizedDescriptions extends TestCase {
 			//UUID.fromString("900042ba-b637-38ae-95d7-1974896da7fb")
 			//I_GetConceptData languageRefset = tf.getConcept(RefsetAuxiliary.Concept.ADDED_CONCEPT.getUids());
 			I_GetConceptData languageRefset = tf.getConcept(UUID.fromString("72385094-f0ea-36b0-9580-c1a193166b2c"));
-			I_GetConceptData defining = tf.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
+			I_GetConceptData defining = tf.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
 			I_GetConceptData refinability = tf.getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
 			I_GetConceptData current = tf.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
 			I_GetConceptData refsetTypeConcept = tf.getConcept(RefsetAuxiliary.Concept.LANGUAGE_ENUMERATION_EXTENSION.getUids());

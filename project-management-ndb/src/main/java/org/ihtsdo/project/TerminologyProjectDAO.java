@@ -203,7 +203,7 @@ public class TerminologyProjectDAO {
 
 			termFactory.newDescription(UUID.randomUUID(), newConcept, "en", projectName, termFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()), config);
 
-			termFactory.newRelationship(UUID.randomUUID(), newConcept, termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()), projectsRoot, termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()),
+			termFactory.newRelationship(UUID.randomUUID(), newConcept, termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()), projectsRoot, termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()),
 					termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 
 			project = new TranslationProject(projectWithMetadata.getName(), newConcept.getConceptNid(), newConcept.getUids());
@@ -449,7 +449,7 @@ public class TerminologyProjectDAO {
 			I_GetConceptData promotionRelConcept = termFactory.getConcept(RefsetAuxiliary.Concept.PROMOTION_REL.getUids());
 			I_GetConceptData purposeRelConcept = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids());
 			I_GetConceptData typeRelConcept = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_TYPE_REL.getUids());
-			I_GetConceptData defining = termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
+			I_GetConceptData defining = termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
 			I_GetConceptData refinability = termFactory.getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
 			I_GetConceptData current = termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
 
@@ -459,10 +459,10 @@ public class TerminologyProjectDAO {
 
 			termFactory.newDescription(UUID.randomUUID(), newConcept, "en", workSetName, termFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()), config);
 
-			termFactory.newRelationship(UUID.randomUUID(), newConcept, termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()), worksetsRoot, termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()),
+			termFactory.newRelationship(UUID.randomUUID(), newConcept, termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()), worksetsRoot, termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()),
 					termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 
-			termFactory.newRelationship(UUID.randomUUID(), newConcept, includesFromAttribute, project, termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()),
+			termFactory.newRelationship(UUID.randomUUID(), newConcept, includesFromAttribute, project, termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()),
 					termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 
 			I_GetConceptData newCommentsConcept = termFactory.newConcept(UUID.randomUUID(), false, config);
@@ -775,7 +775,7 @@ public class TerminologyProjectDAO {
 		if (!alreadyExclusion) {
 			try {
 				I_RelVersioned relVersioned = termFactory.newRelationship(UUID.randomUUID(), refset, termFactory.getConcept(ArchitectonicAuxiliary.Concept.HAS_EXCLUSION_REFSET_ATTRIBUTE.getUids()), exclusion,
-						termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
+						termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
 						termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 
 				termFactory.addUncommittedNoChecks(refset);
@@ -816,7 +816,7 @@ public class TerminologyProjectDAO {
 		if (!alreadyExclusion) {
 			try {
 				I_RelVersioned relVersioned = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), termFactory.getConcept(ArchitectonicAuxiliary.Concept.HAS_COMMON_REFSET_ATTRIBUTE.getUids()), common,
-						termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
+						termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
 						termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 
 				termFactory.addUncommittedNoChecks(project.getConcept());
@@ -848,7 +848,7 @@ public class TerminologyProjectDAO {
 		if (!alreadySource) {
 			try {
 				I_RelVersioned newRelationship = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), termFactory.getConcept(ArchitectonicAuxiliary.Concept.HAS_LANGUAGE_SOURCE_REFSET_ATTRIBUTE.getUids()), language,
-						termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
+						termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
 						termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 
 				termFactory.addUncommittedNoChecks(project.getConcept());
@@ -895,7 +895,7 @@ public class TerminologyProjectDAO {
 				// promote(workSet.getConcept(), config);
 			}
 			I_RelVersioned relVersioned = termFactory.newRelationship(UUID.randomUUID(), workSet.getConcept(), termFactory.getConcept(ArchitectonicAuxiliary.Concept.HAS_SOURCE_REFSET_ATTRIBUTE.getUids()), concept,
-					termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
+					termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
 					termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 
 			termFactory.addUncommittedNoChecks(workSet.getConcept());
@@ -934,10 +934,10 @@ public class TerminologyProjectDAO {
 					}
 				}
 //				I_RelVersioned newRelationship = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), termFactory.getConcept(ArchitectonicAuxiliary.Concept.HAS_MODULE_ID_REFSET_ATTRIBUTE.getUids()), concept,
-//						termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
+//						termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
 //						termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 				I_RelVersioned newRelationship = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), termFactory.getConcept(ArchitectonicAuxiliary.Concept.PATRICIA_HOUGHTON.getUids()), concept,
-						termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
+						termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
 						termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 
 				termFactory.addUncommittedNoChecks(project.getConcept());
@@ -993,10 +993,10 @@ public class TerminologyProjectDAO {
 					}
 				}
 //				I_RelVersioned newRelationship = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), termFactory.getConcept(ArchitectonicAuxiliary.Concept.HAS_RELEASE_PATH_REFSET_ATTRIBUTE.getUids()), concept,
-//						termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
+//						termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
 //						termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 				I_RelVersioned newRelationship = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), termFactory.getConcept(ArchitectonicAuxiliary.Concept.ALEJANDRO_LOPEZ.getUids()), concept,
-						termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
+						termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
 						termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 
 				termFactory.addUncommittedNoChecks(project.getConcept());
@@ -1041,7 +1041,7 @@ public class TerminologyProjectDAO {
 					// termFactory.commit();
 				}
 				I_RelVersioned newRelationship = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), termFactory.getConcept(ArchitectonicAuxiliary.Concept.HAS_LANGUAGE_TARGET_REFSET_ATTRIBUTE.getUids()), concept,
-						termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
+						termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
 						termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 
 				termFactory.addUncommittedNoChecks(project.getConcept());
@@ -1119,7 +1119,7 @@ public class TerminologyProjectDAO {
 					// termFactory.commit();
 				}
 				I_RelVersioned newRelationship = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), termFactory.getConcept(ArchitectonicAuxiliary.Concept.HAS_SOURCE_DEFECTS_ISSUE_REPO.getUids()), concept,
-						termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
+						termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
 						termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 
 				termFactory.addUncommittedNoChecks(project.getConcept());
@@ -1196,7 +1196,7 @@ public class TerminologyProjectDAO {
 					// termFactory.commit();
 				}
 				I_RelVersioned newRelationship = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), termFactory.getConcept(ArchitectonicAuxiliary.Concept.HAS_PROJECT_ISSUE_REPO.getUids()), concept,
-						termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
+						termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
 						termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 
 				termFactory.addUncommittedNoChecks(project.getConcept());
@@ -2310,7 +2310,7 @@ public class TerminologyProjectDAO {
 		I_GetConceptData promotionRelConcept = termFactory.getConcept(RefsetAuxiliary.Concept.PROMOTION_REL.getUids());
 		I_GetConceptData purposeRelConcept = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids());
 		I_GetConceptData typeRelConcept = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_TYPE_REL.getUids());
-		I_GetConceptData defining = termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
+		I_GetConceptData defining = termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
 		I_GetConceptData refinability = termFactory.getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
 		I_GetConceptData current = termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
 
@@ -2322,10 +2322,10 @@ public class TerminologyProjectDAO {
 
 		termFactory.newDescription(UUID.randomUUID(), newConcept, "en", worklistName, termFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()), config);
 
-		termFactory.newRelationship(UUID.randomUUID(), newConcept, termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()), workListsRoot, termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()),
+		termFactory.newRelationship(UUID.randomUUID(), newConcept, termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()), workListsRoot, termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()),
 				termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 
-		termFactory.newRelationship(UUID.randomUUID(), newConcept, includesFromAttribute, partition, termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()),
+		termFactory.newRelationship(UUID.randomUUID(), newConcept, includesFromAttribute, partition, termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()),
 				termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 
 		I_GetConceptData newCommentsConcept = termFactory.newConcept(UUID.randomUUID(), false, config);
@@ -2533,10 +2533,10 @@ public class TerminologyProjectDAO {
 			termFactory.newDescription(UUID.randomUUID(), newConcept, "en", partitionName, termFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()), config);
 
 			termFactory.newRelationship(UUID.randomUUID(), newConcept, termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()), parentConcept,
-					termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
+					termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
 					termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 
-			termFactory.newRelationship(UUID.randomUUID(), newConcept, includesFromAttribute, partitionScheme, termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()),
+			termFactory.newRelationship(UUID.randomUUID(), newConcept, includesFromAttribute, partitionScheme, termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()),
 					termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 
 			partition = new Partition(partitionWithMetadata.getName(), newConcept.getConceptNid(), newConcept.getUids(), partitionWithMetadata.getPartitionSchemeUUID());
@@ -2595,10 +2595,10 @@ public class TerminologyProjectDAO {
 			termFactory.newDescription(UUID.randomUUID(), newConcept, "en", partitionSchemeName, termFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()), config);
 
 			termFactory.newRelationship(UUID.randomUUID(), newConcept, termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()), worksetConcept,
-					termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
+					termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
 					termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 
-			termFactory.newRelationship(UUID.randomUUID(), newConcept, includesFromAttribute, workSet, termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()),
+			termFactory.newRelationship(UUID.randomUUID(), newConcept, includesFromAttribute, workSet, termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()),
 					termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 
 			partitionScheme = new PartitionScheme(partitionSchemeWithMetadata.getName(), newConcept.getConceptNid(), newConcept.getUids(), partitionSchemeWithMetadata.getSourceRefsetUUID());

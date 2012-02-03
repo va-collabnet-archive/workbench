@@ -47,7 +47,7 @@ public class ProjectPermissionsAPI {
 		I_TermFactory tf = Terms.get();
 
 		I_RelVersioned relVersioned = tf.newRelationship(UUID.randomUUID(), user, permission, domain, 
-				tf.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()),
+				tf.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()),
 				tf.getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()),
 				tf.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 

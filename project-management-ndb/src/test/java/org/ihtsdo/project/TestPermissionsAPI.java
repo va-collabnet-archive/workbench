@@ -105,7 +105,7 @@ public class TestPermissionsAPI extends TestCase {
             tf.newRelationship(UUID.randomUUID(), user, 
             		tf.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()),
             		tf.getConcept(ArchitectonicAuxiliary.Concept.USER.getUids()),
-    				tf.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()),
+    				tf.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()),
     				tf.getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()),
     				tf.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 			
@@ -125,7 +125,7 @@ public class TestPermissionsAPI extends TestCase {
             tf.newRelationship(UUID.randomUUID(), user2, 
             		tf.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()),
             		tf.getConcept(ArchitectonicAuxiliary.Concept.USER.getUids()),
-            		tf.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()),
+            		tf.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()),
             		tf.getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()),
             		tf.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
             
