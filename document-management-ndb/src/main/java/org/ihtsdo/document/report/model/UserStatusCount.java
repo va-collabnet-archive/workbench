@@ -60,4 +60,9 @@ public class UserStatusCount {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return this.date + " " + this.userName + " " + this.role + " " + this.status;
+	}
+
 }

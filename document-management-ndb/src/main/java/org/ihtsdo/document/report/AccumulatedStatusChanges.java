@@ -25,36 +25,26 @@ import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.tools.ant.types.selectors.ExtendSelector;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.document.report.I_Report;
 import org.ihtsdo.document.report.model.UserStatusCount;
 import org.ihtsdo.document.report.model.UserStatusCountComparator;
-import org.ihtsdo.project.ProjectPermissionsAPI;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.model.WorkSet;
 import org.ihtsdo.project.panel.TranslationProjectDialog;
-import org.ihtsdo.project.refset.PromotionRefset;
-import org.ihtsdo.project.workflow.api.WfComponentProvider;
-import org.ihtsdo.project.workflow.api.WorkflowInterpreter;
+import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
 import org.ihtsdo.project.workflow.model.WfMembership;
 import org.ihtsdo.project.workflow.model.WfRole;
-import org.ihtsdo.project.workflow.model.WorkflowDefinition;
-import org.ihtsdo.tk.api.Precedence;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.type_cnid_cnid.RefexCnidCnidVersionBI;
 
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -62,7 +52,6 @@ public class AccumulatedStatusChanges extends SwingWorker<File, String> implemen
 
 	private SimpleDateFormat formatter;
 	private I_TermFactory tf;
-	private ProjectPermissionsAPI projPermApi;
 	private HashMap<I_GetConceptData, String> userRolesCache;
 
 	public AccumulatedStatusChanges() {
@@ -175,7 +164,6 @@ public class AccumulatedStatusChanges extends SwingWorker<File, String> implemen
 		boolean dataFound = false;
 		try {
 			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
-			projPermApi = new ProjectPermissionsAPI(config);
 			SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy-mm-hh-ss");
 			csvFile = File.createTempFile("acumulated_status_changes_" + sdf.format(new Date()), ".csv");
 			PrintWriter pw = new PrintWriter(csvFile);
@@ -188,89 +176,42 @@ public class AccumulatedStatusChanges extends SwingWorker<File, String> implemen
 
 				List<WorkSet> workSets = TerminologyProjectDAO.getAllWorkSetsForProject(project, config);
 				for (WorkSet workSet : workSets) {
+					// Workset Loop
 					String worksetName = workSet.getName();
 					List<WorkList> Worklists = TerminologyProjectDAO.getAllWorklistForWorkset(workSet, config);
 					for (WorkList wl : Worklists) {
+						// WORKLIST LOOP
 						String worklistName = wl.getName();
-						HashMap<WorkListMember, I_ExtendByRef> workListMembers = new HashMap<WorkListMember, I_ExtendByRef>();
+						PromotionAndAssignmentRefset wlPromRefset = wl.getPromotionRefset(config);
 						try {
-							Collection<? extends I_ExtendByRef> membersExtensions = tf.getRefsetExtensionMembers(wl.getId());
-							List<I_GetConceptData> members = new ArrayList<I_GetConceptData>();
 							ArrayList<UserStatusCount> results = new ArrayList<UserStatusCount>();
-							for (I_ExtendByRef extension : membersExtensions) {
-								I_IntSet allowedStatus = Terms.get().newIntSet();
-								allowedStatus.addAll(config.getAllowedStatus().getSetValues());
-								allowedStatus.add(ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid());
-								allowedStatus.add(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid());
-								allowedStatus.add(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
-								members.add(tf.getConcept(extension.getComponentNid()));
-							}
-							for (I_GetConceptData member : members) {
-								WorkListMember workListMember = null;
-								I_TermFactory termFactory = Terms.get();
-
-								try {
-									I_GetConceptData workListRefset = termFactory.getConcept(wl.getId());
-
-									I_IntSet descriptionTypes = termFactory.newIntSet();
-									descriptionTypes.add(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
-
-									List<? extends I_DescriptionTuple> descTuples = member
-											.getDescriptionTuples(config.getAllowedStatus(), descriptionTypes, config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
-									String name;
-									if (!descTuples.isEmpty()) {
-										name = descTuples.iterator().next().getText();
-										for (I_DescriptionTuple loopTup : descTuples) {
-											if (loopTup.getLang().equals(ArchitectonicAuxiliary.LANG_CODE.EN.getFormatedLanguageCode())) {
-												name = loopTup.getText();
+							List<WorkListMember> members = wl.getWorkListMembers();
+							for (WorkListMember member : members) {
+								I_GetConceptData wlMemberConcept = member.getConcept();
+								Collection<? extends RefexChronicleBI<?>> promMembers = wlMemberConcept.getAnnotations();
+								for (RefexChronicleBI<?> promMember : promMembers) {
+									if (promMember.getCollectionNid() == wlPromRefset.getRefsetId()) {
+										Collection<?> promVersions = promMember.getVersions();
+										for (Object object : promVersions) {
+											if (object instanceof RefexCnidCnidVersionBI) {
+												RefexCnidCnidVersionBI version = (RefexCnidCnidVersionBI) object;
+												I_GetConceptData statusConcept = tf.getConcept(version.getCnid1());
+												if (!statusConcept.getUids().iterator().next().equals(
+														ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids().iterator().next())
+														&& version.getCnid2() != version.getAuthorNid()) {
+													dataFound = true;
+													UserStatusCount current = new UserStatusCount();
+													current.setDate(formatter.format(new Date(version.getTime())));
+													I_GetConceptData user = tf.getConcept(version.getAuthorNid());
+													current.setUserName(user + "");
+													current.setStatus(statusConcept + "");
+													current.setRole(getUserRole(wl, user));
+													results.add(current);
+												}
 											}
 										}
-									} else {
-										name = "No FSN!";
 									}
-									Collection<? extends I_ExtendByRef> extensions = termFactory.getAllExtensionsForComponent(member.getConceptNid());
-									I_ExtendByRef history = null;
-									for (I_ExtendByRef extension : extensions) {
-										if (extension.getRefsetId() == wl.getPromotionRefset(config).getRefsetId()) {
-											history = extension;
-										}
-										if (extension.getRefsetId() == workListRefset.getConceptNid()) {
-											PromotionRefset promotionRefset = wl.getPromotionRefset(config);
-											I_GetConceptData status = promotionRefset.getPromotionStatus(member.getConceptNid(), config);
-											Long statusDate = promotionRefset.getLastStatusTime(member.getConceptNid(), config);
-											workListMember = new WorkListMember(name, member.getConceptNid(), member.getUids(), wl.getUids().iterator().next(), status, statusDate);
-										}
-									}
-									if (history != null) {
-										workListMembers.put(workListMember, history);
-									}
-								} catch (TerminologyException e) {
-									e.printStackTrace();
-								} catch (IOException e) {
-									e.printStackTrace();
 								}
-							}
-
-							Set<WorkListMember> keys = workListMembers.keySet();
-							for (WorkListMember workListMember : keys) {
-								I_ExtendByRef history = workListMembers.get(workListMember);
-								List<? extends I_ExtendByRefPartCid> parts = (List<? extends I_ExtendByRefPartCid>) history.getMutableParts();
-								for (I_ExtendByRefPartCid part : parts) {
-									I_GetConceptData concept = tf.getConcept(part.getC1id());
-									if (!concept.getUids().iterator().next().equals(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids().iterator().next())
-											&& !concept.getUids().iterator().next().equals(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_DELIVERED_STATUS.getUids().iterator().next())) {
-										dataFound = true;
-										UserStatusCount current = new UserStatusCount();
-										current.setDate(formatter.format(new Date(part.getTime())));
-										I_GetConceptData user = tf.getConcept(part.getAuthorNid());
-										current.setUserName(user + "");
-										current.setStatus(concept + "");
-										current.setRole(getUserRole(wl, user));
-										results.add(current);
-									}
-
-								}
-
 							}
 							if (!results.isEmpty()) {
 								Collections.sort(results, new UserStatusCountComparator());
@@ -294,10 +235,10 @@ public class AccumulatedStatusChanges extends SwingWorker<File, String> implemen
 										pw.append(projectName + "|");
 										pw.append(worksetName + "|");
 										pw.append(worklistName + "|");
-										pw.append(userStatusCount.getDate() + "|");
-										pw.append(userStatusCount.getRole() + "|");
-										pw.append(userStatusCount.getUserName() + "|");
-										pw.append(userStatusCount.getStatus() + "|");
+										pw.append(first.getDate() + "|");
+										pw.append(first.getRole() + "|");
+										pw.append(first.getUserName() + "|");
+										pw.append(first.getStatus() + "|");
 										pw.append(count + "");
 										pw.println();
 										first = userStatusCount;
