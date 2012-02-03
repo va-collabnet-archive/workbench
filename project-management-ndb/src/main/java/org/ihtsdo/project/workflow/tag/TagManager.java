@@ -60,7 +60,7 @@ public class TagManager {
 			return result;
 		}
 		for (File file : tags) {
-			if (!file.isHidden()) {
+			if (!file.isHidden() && !file.getName().contains(".svn") && !file.getName().contains("svn")) {
 				FileInputStream ifis = new FileInputStream(file);
 				InputStreamReader iisr = new InputStreamReader(ifis, "UTF-8");
 				BufferedReader br = new BufferedReader(iisr);
@@ -111,7 +111,7 @@ public class TagManager {
 	private void removeUuidFromAllTagFiles(String uuidToRemove) throws FileNotFoundException, IOException {
 		File[] tags = tagFolder.listFiles();
 		for (File file : tags) {
-			if (!file.isHidden()) {
+			if (!file.isHidden() && !file.getName().contains(".svn") && !file.getName().contains("svn")) {
 				FileInputStream ifis = new FileInputStream(file);
 				InputStreamReader iisr = new InputStreamReader(ifis, "UTF-8");
 				BufferedReader br = new BufferedReader(iisr);
@@ -158,7 +158,7 @@ public class TagManager {
 			return result;
 		}
 		for (File file : tags) {
-			if (!file.isHidden()) {
+			if (!file.isHidden() && !file.getName().contains(".svn") && !file.getName().contains("svn")) {
 				FileInputStream ifis = new FileInputStream(file);
 				InputStreamReader iisr = new InputStreamReader(ifis, "UTF-8");
 				BufferedReader br = new BufferedReader(iisr);
