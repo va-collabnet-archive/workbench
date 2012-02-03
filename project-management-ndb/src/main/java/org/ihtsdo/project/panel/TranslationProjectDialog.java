@@ -8,6 +8,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.FlowLayout;
+import java.awt.event.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -51,16 +52,16 @@ public class TranslationProjectDialog extends JDialog {
 		super();
 		initComponents();
 		initCustomComponents();
-		
+
 		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				close(null);
 			}
 		});
-		
+
 	}
-	
+
 	public TranslationProject showModalDialog() {
 		setModal(true);
 		pack();
@@ -72,30 +73,30 @@ public class TranslationProjectDialog extends JDialog {
 		this.selectedProject = canceled;
 		dispose();
 	}
-	
+
 	private void initCustomComponents() {
 		try {
-			
+
 			this.getRootPane().setDefaultButton(okButton);
-			
+
 			loadProjects();
-			
+
 			TreeSelectionListener tl = new TreeSelectionListener() {
 				@Override
 				public void valueChanged(TreeSelectionEvent arg0) {
 					errorLabel.setText("");
 				}
 			};
-			
+
 			jTree1.addTreeSelectionListener(tl);
-			
+
 			cancelButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					close(null);
 				}
 			});
-			
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -110,8 +111,26 @@ public class TranslationProjectDialog extends JDialog {
 			return;
 		}
 		Object nodeInfo = node.getUserObject();
-		TreeObj proj = (TreeObj)nodeInfo;
-		close((TranslationProject)proj.getAtrValue());
+		TreeObj proj = (TreeObj) nodeInfo;
+		close((TranslationProject) proj.getAtrValue());
+	}
+
+	private void jTree1MouseClicked(MouseEvent e) {
+		if (e.getClickCount() == 2) {
+			TreePath pathForLocation = jTree1.getPathForLocation(e.getX(), e.getY());
+			if (pathForLocation != null) {
+				jTree1.setSelectionPath(pathForLocation);
+				DefaultMutableTreeNode node = (DefaultMutableTreeNode) jTree1.getLastSelectedPathComponent();
+				if (node == null) {
+					errorLabel.setForeground(Color.RED);
+					errorLabel.setText("Select a project to continue");
+					return;
+				}
+				Object nodeInfo = node.getUserObject();
+				TreeObj proj = (TreeObj) nodeInfo;
+				close((TranslationProject) proj.getAtrValue());
+			}
+		}
 	}
 
 	private void initComponents() {
@@ -156,6 +175,14 @@ public class TranslationProjectDialog extends JDialog {
 
 			//======== scrollPane1 ========
 			{
+
+				//---- jTree1 ----
+				jTree1.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						jTree1MouseClicked(e);
+					}
+				});
 				scrollPane1.setViewportView(jTree1);
 			}
 			panel2.add(scrollPane1, BorderLayout.CENTER);
@@ -198,14 +225,13 @@ public class TranslationProjectDialog extends JDialog {
 
 	}
 
-	private DefaultMutableTreeNode addProjectToTree (DefaultMutableTreeNode node,TranslationProject project,boolean visibleChildren) throws Exception{
+	private DefaultMutableTreeNode addProjectToTree(DefaultMutableTreeNode node, TranslationProject project, boolean visibleChildren) throws Exception {
 		DefaultMutableTreeNode tNode;
-		tNode=addObject(node,new TreeObj(PROJECTNODE,project.getName(),project),visibleChildren);
+		tNode = addObject(node, new TreeObj(PROJECTNODE, project.getName(), project), visibleChildren);
 		return tNode;
 	}
-	
-	private DefaultMutableTreeNode addObject(DefaultMutableTreeNode parent,
-			Object child, boolean shouldBeVisible) {
+
+	private DefaultMutableTreeNode addObject(DefaultMutableTreeNode parent, Object child, boolean shouldBeVisible) {
 		DefaultMutableTreeNode childNode = new DefaultMutableTreeNode(child);
 
 		treeModel.insertNodeInto(childNode, parent, parent.getChildCount());
