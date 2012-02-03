@@ -181,7 +181,7 @@ public class TranslationConceptEditor3old extends JPanel {
 			acceptable =  Terms.get().getConcept(ArchitectonicAuxiliary.Concept.ACCEPTABLE.getUids());
 			current =  Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
 			active=Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
-			definingChar=ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.localize().getNid();
+			definingChar=ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.localize().getNid();
 			config.getDescTypes().add(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid());
 			config.getDescTypes().add(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid());
 			config.getDescTypes().add(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.localize().getNid());

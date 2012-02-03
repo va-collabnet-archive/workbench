@@ -162,7 +162,7 @@ public class IssueRepositoryDAO {
 			termFactory.newRelationship(UUID.randomUUID(), newConcept, 
 					termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()), 
 					issueReposRoot, 
-					termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), 
+					termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()), 
 					termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
 					termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 
 					0, config);

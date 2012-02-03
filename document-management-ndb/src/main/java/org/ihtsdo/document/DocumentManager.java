@@ -738,7 +738,7 @@ public class DocumentManager {
 		termFactory.newDescription(UUID.randomUUID(), newConcept, "en", recommendation, termFactory.getConcept(ArchitectonicAuxiliary.Concept.XHTML_PREFERRED_DESC_TYPE.getUids()), config);
 
 		termFactory.newRelationship(UUID.randomUUID(), newConcept, termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()), infoRoot,
-				termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
+				termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
 				termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 	}
 
