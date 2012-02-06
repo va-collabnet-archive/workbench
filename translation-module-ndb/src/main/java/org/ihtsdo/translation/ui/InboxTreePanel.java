@@ -504,20 +504,26 @@ public class InboxTreePanel extends JPanel {
 	protected void addToWorklistNode(WfInstance wfInstance) {
 		try {
 			WorkList worklist = wfInstance.getWorkList();
-			int statusChildCount = wNode.getChildCount();
-			for (int i = 0; i < statusChildCount; i++) {
+			int wlChildCount = wNode.getChildCount();
+			boolean wlExists = false;
+			for (int i = 0; i < wlChildCount; i++) {
 				DefaultMutableTreeNode child = (DefaultMutableTreeNode) wNode.getChildAt(i);
 				InboxTreeItem childTreeItem = (InboxTreeItem) child.getUserObject();
 				WorkList childWorklist = (WorkList) childTreeItem.getUserObject();
 				if (childWorklist.getName().equals(worklist.getName())) {
+					wlExists = true;
 					childTreeItem.setItemSize(childTreeItem.getItemSize() + 1);
 					if (childTreeItem.getItemSize() > 0) {
 						child.setUserObject(childTreeItem);
 						model.reload(child);
-					} else {
-						wNode.remove(i);
-						model.reload(sNode);
 					}
+				}
+				if (!wlExists) {
+					InboxTreeItem inboxTreeItem = new InboxTreeItem(worklist, 1, IconUtilities.WORKLIST_NODE);
+					DefaultMutableTreeNode chldNode = new DefaultMutableTreeNode(inboxTreeItem);
+					wNode.add(chldNode);
+					model.reload(wNode);
+					inboxFolderTree.expandPath(new TreePath(wNode.getPath()));
 				}
 			}
 		} catch (Exception e) {
@@ -534,7 +540,7 @@ public class InboxTreePanel extends JPanel {
 		iNode.setUserObject(childTreeItem);
 		model.reload(iNode);
 	}
-	
+
 	/**
 	 * Rest from inbox node.
 	 */
@@ -597,6 +603,7 @@ public class InboxTreePanel extends JPanel {
 			DefaultMutableTreeNode chldNode = new DefaultMutableTreeNode(new InboxTreeItem(state, 1, IconUtilities.STATUS_NODE));
 			sNode.add(chldNode);
 			model.reload(sNode);
+			inboxFolderTree.expandPath(new TreePath(sNode.getPath()));
 		}
 	}
 
@@ -608,7 +615,7 @@ public class InboxTreePanel extends JPanel {
 	 */
 	public void itemUserAndStateChanged(WfInstance oldWfInstance, WfInstance newWfInstance) {
 		restFromStateNode(oldWfInstance.getState());
-		//addToStateNode(newWfInstance.getState());
+		// addToStateNode(newWfInstance.getState());
 		restFromWorklistNode(newWfInstance);
 	}
 
