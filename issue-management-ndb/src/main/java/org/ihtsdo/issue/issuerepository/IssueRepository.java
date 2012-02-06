@@ -249,6 +249,9 @@ public class IssueRepository implements Serializable{
 		this.externalProjectId = externalProjectId;
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	public String toString() {
 		return this.name;
 	}

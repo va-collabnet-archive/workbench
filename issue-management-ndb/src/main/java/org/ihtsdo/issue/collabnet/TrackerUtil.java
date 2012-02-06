@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.issue.collabnet;
 
 
@@ -38,32 +54,36 @@ import com.collabnet.ce.soap50.webservices.tracker.TrackerSoapDO;
 /**
  * This utility class operates on Trackers and the elements within them
  * (artifacts)
- * <p>
- *
+ * <p>.
  */
 public class TrackerUtil
 {
 
 	/* the TeamForge tracker interface */
+	/** The m_tracker soap. */
 	private ITrackerAppSoap m_trackerSoap;
 
 	/* the session id returned from a previous call to login() */
+	/** The m_session id. */
 	private String m_sessionId;
 
 
+	/** The MA p_ filename. */
 	private String MAP_FILENAME="FieldMap.bin";
 
+	/** The m_server url. */
 	private String m_serverUrl;
 
 
 
 	/**
 	 * a simple constructor built around the URL of the TeamForge server
-	 * <p>
+	 * <p>.
+	 *
 	 * @param serverUrl The fully qualified URL of the TeamForge server
-	 *                  instance
+	 * instance
 	 * @param sessionId A session identifier returned from a prior call
-	 *                  to login()
+	 * to login()
 	 */
 	public TrackerUtil(String serverUrl, String sessionId)
 	{
@@ -80,10 +100,12 @@ public class TrackerUtil
 	 * sets the priority data element associated with the soap row passed
 	 * in on the command line.
 	 * <p>
-	 * @param asr The artifact retrieved by a previous call to getArtifact()
+	 *
+	 * @param asd the asd
+	 * @param comment the comment
 	 * @throws RemoteException if anything goes wrong within the TeamForge
-	 *                         calls, wrap a remote exception around it and
-	 *                         re-throw
+	 * calls, wrap a remote exception around it and
+	 * re-throw
 	 */
 	public void setArtifactData(ArtifactSoapDO asd,String comment)
 	throws RemoteException
@@ -104,6 +126,12 @@ public class TrackerUtil
 		}
 	}
 
+	/**
+	 * Sets the active asd.
+	 *
+	 * @param asdAct the asd act
+	 * @param asdCust the asd cust
+	 */
 	private void setActiveASD(ArtifactSoapDO asdAct, ArtifactSoapDO asdCust){
 
 		asdAct.setCategory(asdCust.getCategory());
@@ -115,6 +143,20 @@ public class TrackerUtil
 		asdAct.setGroup(asdCust.getGroup());
 	}
 
+	/**
+	 * Gets the artifact detail list.
+	 *
+	 * @param trackerId the tracker id
+	 * @param selectedColumns the selected columns
+	 * @param filters the filters
+	 * @param sortKeys the sort keys
+	 * @param startIndex the start index
+	 * @param maxRows the max rows
+	 * @param exceptionIfExpiredCache the exception if expired cache
+	 * @param forceNewQuery the force new query
+	 * @return the artifact detail list
+	 * @throws RemoteException the remote exception
+	 */
 	public ArtifactDetailSoapRow[] getArtifactDetailList(java.lang.String trackerId,
 			java.lang.String[] selectedColumns,
 			SoapFilter[] filters,
@@ -137,6 +179,15 @@ public class TrackerUtil
 		return adrl;
 	}
 
+	/**
+	 * Find artifacts.
+	 *
+	 * @param queryString the query string
+	 * @param projectId the project id
+	 * @param searchAttachments the search attachments
+	 * @return the artifact soap row[]
+	 * @throws RemoteException the remote exception
+	 */
 	public ArtifactSoapRow[] findArtifacts(
 			java.lang.String queryString,
 			java.lang.String projectId,
@@ -151,6 +202,13 @@ public class TrackerUtil
 		return asl;
 	}
 
+	/**
+	 * Send field map.
+	 *
+	 * @param map the map
+	 * @return the string
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public String sendFieldMap (HashMap map) throws IOException{
 		DataHandler dh = new DataHandler(new org.ihtsdo.issue.util.JODataSource(map));
 		IFileStorageAppSoap fileStorage = (IFileStorageAppSoap) ClientSoapStubFactory.getSoapStub(IFileStorageAppSoap.class,m_serverUrl);
@@ -158,6 +216,13 @@ public class TrackerUtil
 		return ObjId; 
 	}
 
+	/**
+	 * Sets the artifact field map.
+	 *
+	 * @param artifactId the artifact id
+	 * @param mapFileId the map file id
+	 * @throws RemoteException the remote exception
+	 */
 	public void setArtifactFieldMap(String artifactId,String mapFileId )
 	throws RemoteException
 	{
@@ -183,6 +248,14 @@ public class TrackerUtil
 	}
 
 	// Get the field map of attachments of the artifact
+	/**
+	 * Gets the field map.
+	 *
+	 * @param artifactId the artifact id
+	 * @return the field map
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws ClassNotFoundException the class not found exception
+	 */
 	public Object[] getFieldMap (String artifactId) throws IOException, ClassNotFoundException{
 		Object[] retObj = null;
 		HashMap <String,Object> map=new HashMap<String,Object>();
@@ -203,6 +276,14 @@ public class TrackerUtil
 	}
 
 
+	/**
+	 * Gets the field map attachment.
+	 *
+	 * @param artifactId the artifact id
+	 * @return the field map attachment
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws ClassNotFoundException the class not found exception
+	 */
 	public AttachmentSoapRow getFieldMapAttachment (String artifactId) throws IOException, ClassNotFoundException{
 		ICollabNetSoap sfSoap = (ICollabNetSoap) ClientSoapStubFactory.getSoapStub(ICollabNetSoap.class, m_serverUrl);
 		AttachmentSoapList attachmentSoapList = sfSoap.listAttachments(m_sessionId, artifactId);
@@ -219,6 +300,14 @@ public class TrackerUtil
 		return Att;
 	}
 
+	/**
+	 * Del field map.
+	 *
+	 * @param artifactId the artifact id
+	 * @param fieldMapId the field map id
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws ClassNotFoundException the class not found exception
+	 */
 	public void delFieldMap (String artifactId,String fieldMapId) throws IOException, ClassNotFoundException{
 		ICollabNetSoap sfSoap = (ICollabNetSoap) ClientSoapStubFactory.getSoapStub(ICollabNetSoap.class, m_serverUrl);
 		sfSoap.deleteAttachment(m_sessionId, artifactId, fieldMapId);
@@ -228,16 +317,17 @@ public class TrackerUtil
 	/**
 	 * returns a type-safe list built from the artifacts within the trackerId,
 	 * given as an argument
-	 * <p>
+	 * <p>.
+	 *
 	 * @param trackerId the containing tracker the contents of which we're
-	 *                  going to read and return
-	 * <p>
-	 * @throws RemoteException if any errors occur in a TeamForge API, we wrap
-	 *                         this in an exception and throw it on up the call
-	 *                         stack
+	 * going to read and return
 	 * <p>
 	 * @return a list containing all artifacts within the trackerId given on
-	 *         the command line
+	 * the command line
+	 * @throws RemoteException if any errors occur in a TeamForge API, we wrap
+	 * this in an exception and throw it on up the call
+	 * stack
+	 * <p>
 	 */
 
 	public List<ArtifactSoapRow> getArtifactList(String trackerId)
@@ -246,6 +336,14 @@ public class TrackerUtil
 		return getArtifactList( trackerId,null);
 	}
 
+	/**
+	 * Gets the artifact list.
+	 *
+	 * @param trackerId the tracker id
+	 * @param soapFilters the soap filters
+	 * @return the artifact list
+	 * @throws RemoteException the remote exception
+	 */
 	public List<ArtifactSoapRow> getArtifactList(String trackerId,SoapFilter[] soapFilters)
 	throws RemoteException
 	{
@@ -273,6 +371,17 @@ public class TrackerUtil
 
 		return (artifacts);
 	}
+	
+	/**
+	 * Creates the tracker.
+	 *
+	 * @param projectId the project id
+	 * @param trackerName the tracker name
+	 * @param trackerTitle the tracker title
+	 * @param trackerDescription the tracker description
+	 * @return the tracker soap do
+	 * @throws RemoteException the remote exception
+	 */
 	public TrackerSoapDO CreateTracker(String projectId,String trackerName, String trackerTitle,String trackerDescription) throws RemoteException{
 		TrackerSoapDO tsd;
 		try {
@@ -285,6 +394,27 @@ public class TrackerUtil
 		return tsd;
 	}
 
+	/**
+	 * Creates the artifact.
+	 *
+	 * @param trackerId the tracker id
+	 * @param artTitle the art title
+	 * @param artDescription the art description
+	 * @param group the group
+	 * @param category the category
+	 * @param status the status
+	 * @param customer the customer
+	 * @param priority the priority
+	 * @param estimatedHours the estimated hours
+	 * @param assignedUsername the assigned username
+	 * @param releasedId the released id
+	 * @param flexFields the flex fields
+	 * @param attachmentFileName the attachment file name
+	 * @param attachmentMimeType the attachment mime type
+	 * @param attachmentFileId the attachment file id
+	 * @return the artifact soap do
+	 * @throws RemoteException the remote exception
+	 */
 	public ArtifactSoapDO CreateArtifact(String trackerId, String artTitle,String artDescription,String group,String category,String status,
 			String customer,int priority,int estimatedHours,String assignedUsername, String releasedId,SoapFieldValues flexFields,
 			String attachmentFileName, String attachmentMimeType, String attachmentFileId) throws RemoteException{
@@ -303,6 +433,14 @@ public class TrackerUtil
 	}
 
 
+	/**
+	 * Gets the artifact data.
+	 *
+	 * @param sessionId the session id
+	 * @param issueExternalId the issue external id
+	 * @return the artifact data
+	 * @throws RemoteException the remote exception
+	 */
 	public ArtifactSoapDO getArtifactData(String sessionId, String issueExternalId) throws RemoteException {
 
 		ArtifactSoapDO asd=m_trackerSoap.getArtifactData(sessionId, issueExternalId);
@@ -310,12 +448,27 @@ public class TrackerUtil
 	}
 
 
+	/**
+	 * Delete artifact.
+	 *
+	 * @param sessionId the session id
+	 * @param issueExternalId the issue external id
+	 * @throws RemoteException the remote exception
+	 */
 	public void deleteArtifact(String sessionId, String issueExternalId) throws RemoteException {
 
 		m_trackerSoap.deleteArtifact(sessionId, issueExternalId);
 		return ;
 	}
 
+	/**
+	 * Gets the attachment list.
+	 *
+	 * @param artifactId the artifact id
+	 * @return the attachment list
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws ClassNotFoundException the class not found exception
+	 */
 	public AttachmentSoapRow[] getAttachmentList(String artifactId) throws IOException, ClassNotFoundException{
 
 		ICollabNetSoap sfSoap = (ICollabNetSoap) ClientSoapStubFactory.getSoapStub(ICollabNetSoap.class, m_serverUrl);
@@ -325,6 +478,15 @@ public class TrackerUtil
 		return attachmentRows;
 	}
 
+	/**
+	 * Sets the artifact attachment.
+	 *
+	 * @param artifactId the artifact id
+	 * @param attachmentId the attachment id
+	 * @param fileName the file name
+	 * @param mimeType the mime type
+	 * @throws RemoteException the remote exception
+	 */
 	public void setArtifactAttachment(String artifactId,String attachmentId ,String fileName, String mimeType)
 	throws RemoteException
 	{
@@ -349,6 +511,13 @@ public class TrackerUtil
 		}
 	}
 
+	/**
+	 * Send attachment.
+	 *
+	 * @param ds the ds
+	 * @return the string
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public String sendAttachment (DataSource ds) throws IOException{
 		DataHandler dh = new DataHandler(ds);
 		IFileStorageAppSoap fileStorage = (IFileStorageAppSoap) ClientSoapStubFactory.getSoapStub(IFileStorageAppSoap.class,m_serverUrl);
@@ -356,12 +525,28 @@ public class TrackerUtil
 		return ObjId; 
 	}
 	
+	/**
+	 * Adds the dependency.
+	 *
+	 * @param originArtifactId the origin artifact id
+	 * @param targetArtifactId the target artifact id
+	 * @param description the description
+	 * @throws RemoteException the remote exception
+	 */
 	public void addDependency(String originArtifactId, String targetArtifactId, String description) throws RemoteException{
 		
 		String desc=(description==null)? "":description;
 		m_trackerSoap.createArtifactDependency(m_sessionId, originArtifactId, targetArtifactId, desc);
 	}
 
+	/**
+	 * Del attachment.
+	 *
+	 * @param artifactId the artifact id
+	 * @param attachmentId the attachment id
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws ClassNotFoundException the class not found exception
+	 */
 	public void delAttachment (String artifactId,String attachmentId) throws IOException, ClassNotFoundException{
 		ICollabNetSoap sfSoap = (ICollabNetSoap) ClientSoapStubFactory.getSoapStub(ICollabNetSoap.class, m_serverUrl);
 		sfSoap.deleteAttachment(m_sessionId, artifactId, attachmentId);
@@ -369,12 +554,27 @@ public class TrackerUtil
 	}
 
 
+	/**
+	 * Removes the artifact dependency.
+	 *
+	 * @param originArtifactId the origin artifact id
+	 * @param targetArtifactId the target artifact id
+	 * @throws RemoteException the remote exception
+	 */
 	public void removeArtifactDependency(String originArtifactId, String targetArtifactId) throws RemoteException {
 		m_trackerSoap.removeArtifactDependency(m_sessionId, originArtifactId, targetArtifactId);
 		
 	}
 
 
+	/**
+	 * Gets the attachment file.
+	 *
+	 * @param artifactId the artifact id
+	 * @param rawFileId the raw file id
+	 * @return the attachment file
+	 * @throws RemoteException the remote exception
+	 */
 	public DataHandler getAttachmentFile(String artifactId, String rawFileId) throws RemoteException {
 		IFileStorageAppSoap fileStorage = (IFileStorageAppSoap) ClientSoapStubFactory.getSoapStub(IFileStorageAppSoap.class,m_serverUrl);
 
@@ -385,6 +585,13 @@ public class TrackerUtil
 	}
 
 
+	/**
+	 * Gets the parent dependency list.
+	 *
+	 * @param artifactId the artifact id
+	 * @return the parent dependency list
+	 * @throws RemoteException the remote exception
+	 */
 	public ArtifactDependencySoapRow[] getParentDependencyList(String artifactId) throws RemoteException {
 		ArtifactDependencySoapList adsl = m_trackerSoap.getParentDependencyList(m_sessionId, artifactId);
 		return adsl.getDataRows();
@@ -392,6 +599,13 @@ public class TrackerUtil
 	}
 
 
+	/**
+	 * Gets the child dependency list.
+	 *
+	 * @param artifactId the artifact id
+	 * @return the child dependency list
+	 * @throws RemoteException the remote exception
+	 */
 	public ArtifactDependencySoapRow[] getChildDependencyList(String artifactId) throws RemoteException {
 		ArtifactDependencySoapList adsl = m_trackerSoap.getChildDependencyList(m_sessionId, artifactId);
 		return adsl.getDataRows();

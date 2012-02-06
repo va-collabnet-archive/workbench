@@ -409,6 +409,14 @@ public static I_GetConceptData retireIssueRepository(I_GetConceptData conceptToR
 	return conceptToRetire;
 }
 
+/**
+ * Gets the last extension part.
+ *
+ * @param extension the extension
+ * @return the last extension part
+ * @throws TerminologyException the terminology exception
+ * @throws IOException Signals that an I/O exception has occurred.
+ */
 public static I_ExtendByRefPart getLastExtensionPart(I_ExtendByRef extension) throws TerminologyException, IOException {
 	int lastVersion = Integer.MIN_VALUE;
 	I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
@@ -542,6 +550,12 @@ private static Object deserialize(String string) {
 	return object;
 }
 
+/**
+ * Promote.
+ *
+ * @param termComponent the term component
+ * @param config the config
+ */
 public static void promote(I_AmTermComponent termComponent, I_ConfigAceFrame config) {
 	PositionBI viewPosition = config.getViewPositionSetReadOnly().iterator().next();
 	I_IntSet allowedStatusWithRetired = Terms.get().newIntSet();
@@ -589,6 +603,12 @@ public static void promote(I_AmTermComponent termComponent, I_ConfigAceFrame con
 
 }
 
+/**
+ * Checks if is concept duplicate.
+ *
+ * @param descriptionText the description text
+ * @return true, if is concept duplicate
+ */
 private static boolean isConceptDuplicate(String descriptionText) {
 	boolean result = false;
 	I_TermFactory tf = Terms.get();

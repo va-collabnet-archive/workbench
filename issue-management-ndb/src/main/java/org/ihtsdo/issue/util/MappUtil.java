@@ -319,6 +319,12 @@ public class MappUtil {
 		return issue;
 	}
 
+	/**
+	 * Gets the issue attach ref list from attach row list.
+	 *
+	 * @param asrs the asrs
+	 * @return the issue attach ref list from attach row list
+	 */
 	public static List<IssueAttachmentRef> getIssueAttachRefListFromAttachRowList(
 			AttachmentSoapRow[] asrs) {
 		List<IssueAttachmentRef> issueRefList=new ArrayList<IssueAttachmentRef>();
@@ -328,6 +334,12 @@ public class MappUtil {
 		return issueRefList;
 	}
 
+	/**
+	 * Gets the issue attach ref from attach row.
+	 *
+	 * @param asr the asr
+	 * @return the issue attach ref from attach row
+	 */
 	private static IssueAttachmentRef getIssueAttachRefFromAttachRow(
 			AttachmentSoapRow asr) {
 		IssueAttachmentRef iar=new IssueAttachmentRef();

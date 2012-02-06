@@ -86,6 +86,7 @@ public class Issue implements Serializable {
 	/** The field map att id. */
 	private String fieldMapAttId="";
 	
+	/** The last modified date. */
 	private long lastModifiedDate;
 	
 	/** The field map. */
@@ -493,10 +494,20 @@ Pending
 		this.downloadStatus = downloadStatus;
 	}
 
+	/**
+	 * Gets the last modified date.
+	 *
+	 * @return the last modified date
+	 */
 	public long getLastModifiedDate() {
 		return lastModifiedDate;
 	}
 
+	/**
+	 * Sets the last modified date.
+	 *
+	 * @param lastModifiedDate the new last modified date
+	 */
 	public void setLastModifiedDate(long lastModifiedDate) {
 		this.lastModifiedDate = lastModifiedDate;
 	}

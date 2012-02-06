@@ -146,27 +146,91 @@ public interface I_IssueManager {
 	public List<IssueComment> getCommentsList (Issue issue) throws Exception;
 	
 	
+	/**
+	 * Gets the attachment list.
+	 *
+	 * @param issue the issue
+	 * @return the attachment list
+	 * @throws Exception the exception
+	 */
 	public List<IssueAttachmentRef> getAttachmentList (Issue issue) throws Exception;
 	
 	
+	/**
+	 * Adds the attachment.
+	 *
+	 * @param issue the issue
+	 * @param file the file
+	 * @param mimeType the mime type
+	 * @throws Exception the exception
+	 */
 	public void addAttachment(Issue issue, File file, String mimeType) throws Exception;
 	
 	
+	/**
+	 * Del attachment.
+	 *
+	 * @param issueAttachmentRef the issue attachment ref
+	 * @throws Exception the exception
+	 */
 	public void delAttachment(IssueAttachmentRef issueAttachmentRef) throws Exception;
 	
+	/**
+	 * Del dependency.
+	 *
+	 * @param originIssue the origin issue
+	 * @param targetIssue the target issue
+	 * @throws Exception the exception
+	 */
 	public void delDependency(Issue originIssue, Issue targetIssue) throws Exception;
 
+	/**
+	 * Gets the attachment file.
+	 *
+	 * @param issueAttachmentRef the issue attachment ref
+	 * @param toFolder the to folder
+	 * @return the attachment file
+	 * @throws Exception the exception
+	 */
 	public File getAttachmentFile(IssueAttachmentRef issueAttachmentRef, File toFolder)
 			throws Exception;
 
+	/**
+	 * Gets the parent dependency list.
+	 *
+	 * @param issue the issue
+	 * @return the parent dependency list
+	 * @throws Exception the exception
+	 */
 	public List<IssueDependency> getParentDependencyList(Issue issue) throws Exception;
 	
 
+	/**
+	 * Gets the child dependency list.
+	 *
+	 * @param issue the issue
+	 * @return the child dependency list
+	 * @throws Exception the exception
+	 */
 	public List<IssueDependency> getChildDependencyList(Issue issue) throws Exception;
 
+	/**
+	 * Del dependency.
+	 *
+	 * @param originIssue the origin issue
+	 * @param issueDependency the issue dependency
+	 * @throws Exception the exception
+	 */
 	void delDependency(Issue originIssue, IssueDependency issueDependency)
 			throws Exception;
 
+	/**
+	 * Adds the dependency.
+	 *
+	 * @param originIssue the origin issue
+	 * @param issueDependency the issue dependency
+	 * @throws Exception the exception
+	 */
 	void addDependency(Issue originIssue, IssueDependency issueDependency)
 			throws Exception;
 	

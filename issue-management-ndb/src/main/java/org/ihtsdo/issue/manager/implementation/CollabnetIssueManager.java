@@ -426,6 +426,9 @@ public class CollabnetIssueManager implements I_IssueManager{
 
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.issue.manager.implementation.I_IssueManager#addAttachment(org.ihtsdo.issue.Issue, java.io.File, java.lang.String)
+	 */
 	@Override
 	public void addAttachment(Issue issue, File file, String mimeType)
 			throws Exception {
@@ -441,6 +444,9 @@ public class CollabnetIssueManager implements I_IssueManager{
 		return;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.issue.manager.implementation.I_IssueManager#addDependency(org.ihtsdo.issue.Issue, org.ihtsdo.issue.IssueDependency)
+	 */
 	@Override
 	public void addDependency(Issue originIssue, IssueDependency issueDependency)
 			throws Exception {
@@ -450,6 +456,9 @@ public class CollabnetIssueManager implements I_IssueManager{
 		
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.issue.manager.implementation.I_IssueManager#delAttachment(org.ihtsdo.issue.IssueAttachmentRef)
+	 */
 	@Override
 	public void delAttachment(IssueAttachmentRef issueAttachmentRef)
 			throws Exception {
@@ -465,6 +474,9 @@ public class CollabnetIssueManager implements I_IssueManager{
 		
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.issue.manager.implementation.I_IssueManager#delDependency(org.ihtsdo.issue.Issue, org.ihtsdo.issue.Issue)
+	 */
 	@Override
 	public void delDependency(Issue originIssue, Issue targetIssue)
 			throws Exception {
@@ -474,6 +486,9 @@ public class CollabnetIssueManager implements I_IssueManager{
 		
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.issue.manager.implementation.I_IssueManager#delDependency(org.ihtsdo.issue.Issue, org.ihtsdo.issue.IssueDependency)
+	 */
 	@Override
 	public void delDependency(Issue originIssue,IssueDependency issueDependency)
 	throws Exception {
@@ -483,6 +498,9 @@ public class CollabnetIssueManager implements I_IssueManager{
 
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.issue.manager.implementation.I_IssueManager#getAttachmentFile(org.ihtsdo.issue.IssueAttachmentRef, java.io.File)
+	 */
 	@Override
 	public File getAttachmentFile(IssueAttachmentRef issueAttachmentRef,File toFolder)
 	throws Exception {
@@ -501,6 +519,9 @@ public class CollabnetIssueManager implements I_IssueManager{
 		return file;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.issue.manager.implementation.I_IssueManager#getAttachmentList(org.ihtsdo.issue.Issue)
+	 */
 	@Override
 	public List<IssueAttachmentRef> getAttachmentList(Issue issue)
 			throws Exception {
@@ -515,6 +536,9 @@ public class CollabnetIssueManager implements I_IssueManager{
 
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.issue.manager.implementation.I_IssueManager#getParentDependencyList(org.ihtsdo.issue.Issue)
+	 */
 	@Override
 	public List<IssueDependency> getParentDependencyList(Issue issue)
 			throws Exception {
@@ -538,6 +562,9 @@ public class CollabnetIssueManager implements I_IssueManager{
 		return issueDepList;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.issue.manager.implementation.I_IssueManager#getChildDependencyList(org.ihtsdo.issue.Issue)
+	 */
 	@Override
 	public List<IssueDependency> getChildDependencyList(Issue issue)
 			throws Exception {

@@ -57,17 +57,13 @@ public class IssueDAO {
 	}
 
 	/**
-	 * Create the issue
-	 * 
-	 * @param repository
-	 * 				the repository
-	 * @param issue
-	 * 				the issue
-	 * @param repoRegis
-	 * 				the report register
+	 * Create the issue.
+	 *
+	 * @param repository the repository
+	 * @param issue the issue
+	 * @param repoRegis the report register
 	 * @return the issue
-	 * 
-	 * @throws Exception
+	 * @throws Exception the exception
 	 */
 	public Issue createIssue(IssueRepository repository, Issue issue,
 			IssueRepoRegistration repoRegis) throws Exception {
@@ -259,6 +255,14 @@ public class IssueDAO {
 	}
 	
 
+	/**
+	 * Gets the attachment list.
+	 *
+	 * @param repository the repository
+	 * @param issue the issue
+	 * @return the attachment list
+	 * @throws Exception the exception
+	 */
 	public List<IssueAttachmentRef> getAttachmentList (IssueRepository repository,Issue issue) throws Exception{
 		I_IssueManager cim = getIssueManager(repository);
 		List<IssueAttachmentRef> issueAttRef = cim.getAttachmentList(issue);
@@ -266,24 +270,57 @@ public class IssueDAO {
 	}
 	
 	
+	/**
+	 * Adds the attachment.
+	 *
+	 * @param repository the repository
+	 * @param issue the issue
+	 * @param file the file
+	 * @param mimeType the mime type
+	 * @throws Exception the exception
+	 */
 	public void addAttachment(IssueRepository repository,Issue issue, File file, String mimeType) throws Exception{
 		I_IssueManager cim = getIssueManager(repository);
 		cim.addAttachment(issue, file, mimeType);
 		return;
 	}
 	
+	/**
+	 * Del attachment.
+	 *
+	 * @param repository the repository
+	 * @param issueAttachmentRef the issue attachment ref
+	 * @throws Exception the exception
+	 */
 	public void delAttachment(IssueRepository repository,IssueAttachmentRef issueAttachmentRef) throws Exception{
 		I_IssueManager cim = getIssueManager(repository);
 		cim.delAttachment(issueAttachmentRef);
 		return;
 	}
 	
+	/**
+	 * Del dependency.
+	 *
+	 * @param repository the repository
+	 * @param originIssue the origin issue
+	 * @param targetIssue the target issue
+	 * @throws Exception the exception
+	 */
 	public void delDependency(IssueRepository repository,Issue originIssue, Issue targetIssue) throws Exception{
 		I_IssueManager cim = getIssueManager(repository);
 		cim.delDependency(originIssue, targetIssue);
 		return;
 	}
 
+	/**
+	 * Gets the attachment file.
+	 *
+	 * @param repository the repository
+	 * @param issueAttachmentRef the issue attachment ref
+	 * @param toFolder the to folder
+	 * @return the attachment file
+	 * @throws Exception the exception
+	 */
 	public File getAttachmentFile(IssueRepository repository,IssueAttachmentRef issueAttachmentRef, File toFolder)
 			throws Exception{
 		I_IssueManager cim = getIssueManager(repository);
@@ -291,6 +328,14 @@ public class IssueDAO {
 		return file;
 	}
 
+	/**
+	 * Gets the parent dependency list.
+	 *
+	 * @param repository the repository
+	 * @param issue the issue
+	 * @return the parent dependency list
+	 * @throws Exception the exception
+	 */
 	public List<IssueDependency> getParentDependencyList(IssueRepository repository,Issue issue) throws Exception{
 		I_IssueManager cim = getIssueManager(repository);
 		List<IssueDependency> issueDepList = cim.getParentDependencyList(issue);
@@ -299,6 +344,14 @@ public class IssueDAO {
 	}
 	
 
+	/**
+	 * Gets the child dependency list.
+	 *
+	 * @param repository the repository
+	 * @param issue the issue
+	 * @return the child dependency list
+	 * @throws Exception the exception
+	 */
 	public List<IssueDependency> getChildDependencyList(IssueRepository repository,Issue issue) throws Exception{
 		I_IssueManager cim = getIssueManager(repository);
 		List<IssueDependency> issueDepList = cim.getChildDependencyList(issue);
@@ -306,6 +359,14 @@ public class IssueDAO {
 		
 	}
 
+	/**
+	 * Del dependency.
+	 *
+	 * @param repository the repository
+	 * @param originIssue the origin issue
+	 * @param issueDependency the issue dependency
+	 * @throws Exception the exception
+	 */
 	public void delDependency(IssueRepository repository,Issue originIssue, IssueDependency issueDependency)
 			throws Exception{
 		I_IssueManager cim = getIssueManager(repository);
@@ -313,6 +374,14 @@ public class IssueDAO {
 		return;
 	}
 
+	/**
+	 * Adds the dependency.
+	 *
+	 * @param repository the repository
+	 * @param originIssue the origin issue
+	 * @param issueDependency the issue dependency
+	 * @throws Exception the exception
+	 */
 	public void addDependency(IssueRepository repository,Issue originIssue, IssueDependency issueDependency)
 			throws Exception{
 		I_IssueManager cim = getIssueManager(repository);

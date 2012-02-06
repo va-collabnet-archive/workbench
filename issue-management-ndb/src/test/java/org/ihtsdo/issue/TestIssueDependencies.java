@@ -74,10 +74,19 @@ public class TestIssueDependencies extends TestCase {
 	/** The allowed statuses with retired. */
 	I_IntSet allowedStatusesWithRetired;
 
+	/** The issue repo concept. */
 	I_GetConceptData issueRepoConcept;
+	
+	/** The new repository. */
 	IssueRepository newRepository;
+	
+	/** The issue title. */
 	String issueTitle;
+	
+	/** The Constant DATE_FORMAT_NOW. */
 	public static final String DATE_FORMAT_NOW = "yyyy-MM-dd HH:mm:ss";
+	
+	/** The new issue. */
 	Issue newIssue;
 
 	/* (non-Javadoc)
@@ -98,6 +107,11 @@ public class TestIssueDependencies extends TestCase {
 		tf.setActiveAceFrameConfig(config);
 	}
 
+	/**
+	 * Test dependencies.
+	 *
+	 * @throws Exception the exception
+	 */
 	public void testDependencies() throws Exception{
 		Integer repositoryTypeInt = IssueRepository.REPOSITORY_TYPE.WEB_SITE.ordinal();
 		newRepository = new IssueRepository("tracker1264", "https://csfe.aceworkspace.net", 
@@ -203,6 +217,11 @@ public class TestIssueDependencies extends TestCase {
 		
 	}
 	
+	/**
+	 * Gets the test config.
+	 *
+	 * @return the test config
+	 */
 	private I_ConfigAceFrame getTestConfig() {
 		I_ConfigAceFrame config = null;
 		try {
@@ -239,6 +258,13 @@ public class TestIssueDependencies extends TestCase {
 	}
 
 	// If targetLocation does not exist, it will be created.
+	/**
+	 * Copy directory.
+	 *
+	 * @param sourceLocation the source location
+	 * @param targetLocation the target location
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public void copyDirectory(File sourceLocation , File targetLocation)
 	throws IOException {
 
@@ -268,6 +294,12 @@ public class TestIssueDependencies extends TestCase {
 		}
 	}
 
+	/**
+	 * Delete directory.
+	 *
+	 * @param path the path
+	 * @return true, if successful
+	 */
 	public boolean deleteDirectory(File path) {
 		if( path.exists() ) {
 			File[] files = path.listFiles();
@@ -283,6 +315,11 @@ public class TestIssueDependencies extends TestCase {
 		return( path.delete() );
 	}
 
+	/**
+	 * Sleep.
+	 *
+	 * @param n the n
+	 */
 	public static void sleep(int n){
 		long t0, t1;
 		t0 =  System.currentTimeMillis();
@@ -292,6 +329,11 @@ public class TestIssueDependencies extends TestCase {
 		while ((t1 - t0) < (n * 1000));
 	}
 
+	/**
+	 * Now.
+	 *
+	 * @return the string
+	 */
 	public static String now() {
 		Calendar cal = Calendar.getInstance();
 		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_NOW);
