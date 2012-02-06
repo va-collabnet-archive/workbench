@@ -37,6 +37,7 @@ public class SpellCheckingDialogTester extends JPanel implements ActionListener 
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
 
+	/** The lng code. */
 	private static String lngCode;
 
 	/** The query field. */
@@ -53,8 +54,9 @@ public class SpellCheckingDialogTester extends JPanel implements ActionListener 
 
 	/**
 	 * Instantiates a new spell checking dialog tester.
-	 * 
+	 *
 	 * @param frame the frame
+	 * @param langCode the lang code
 	 */
 	public SpellCheckingDialogTester(JFrame frame, String langCode) {
 		this.frame = frame;
@@ -87,6 +89,8 @@ public class SpellCheckingDialogTester extends JPanel implements ActionListener 
 
 	/**
 	 * Creates the and show gui.
+	 *
+	 * @param langCode the lang code
 	 */
 	private static void createAndShowGUI(String langCode) {
 		//Create and set up the window.

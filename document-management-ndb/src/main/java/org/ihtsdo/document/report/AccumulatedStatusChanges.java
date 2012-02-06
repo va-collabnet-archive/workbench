@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.document.report;
 
 import java.io.File;
@@ -48,12 +64,23 @@ import org.ihtsdo.tk.api.refex.type_cnid_cnid.RefexCnidCnidVersionBI;
 
 import au.com.bytecode.opencsv.CSVReader;
 
+/**
+ * The Class AccumulatedStatusChanges.
+ */
 public class AccumulatedStatusChanges extends SwingWorker<File, String> implements I_Report {
 
+	/** The formatter. */
 	private SimpleDateFormat formatter;
+	
+	/** The tf. */
 	private I_TermFactory tf;
+	
+	/** The user roles cache. */
 	private HashMap<I_GetConceptData, String> userRolesCache;
 
+	/**
+	 * Instantiates a new accumulated status changes.
+	 */
 	public AccumulatedStatusChanges() {
 		super();
 		formatter = new SimpleDateFormat("dd-MMM-yyyy");
@@ -61,6 +88,9 @@ public class AccumulatedStatusChanges extends SwingWorker<File, String> implemen
 		tf = Terms.get();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.document.report.I_Report#getExcelSourceWorkbook()
+	 */
 	@Override
 	public File getExcelSourceWorkbook() throws Exception {
 		userRolesCache = new HashMap<I_GetConceptData, String>();
@@ -158,6 +188,9 @@ public class AccumulatedStatusChanges extends SwingWorker<File, String> implemen
 		return reportCopy;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.document.report.I_Report#getCsv()
+	 */
 	@Override
 	public File getCsv() throws Exception {
 		File csvFile = null;
@@ -269,6 +302,15 @@ public class AccumulatedStatusChanges extends SwingWorker<File, String> implemen
 
 	}
 
+	/**
+	 * Gets the user role.
+	 *
+	 * @param workList the work list
+	 * @param user the user
+	 * @return the user role
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	private String getUserRole(WorkList workList, I_GetConceptData user) throws IOException, TerminologyException {
 		if (userRolesCache.containsKey(user)) {
 			return userRolesCache.get(user).toString();
@@ -291,6 +333,15 @@ public class AccumulatedStatusChanges extends SwingWorker<File, String> implemen
 		}
 	}
 
+	/**
+	 * Gets the roles for user.
+	 *
+	 * @param user the user
+	 * @param worklist the worklist
+	 * @return the roles for user
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	private Set<WfRole> getRolesForUser(I_GetConceptData user, WorkList worklist) throws IOException, TerminologyException {
 		Set<WfRole> returnRoles = new HashSet<WfRole>();
 		for (WfMembership loopMembership : worklist.getWorkflowUserRoles()) {
@@ -301,22 +352,34 @@ public class AccumulatedStatusChanges extends SwingWorker<File, String> implemen
 		return returnRoles;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.document.report.I_Report#getExcelPivotTableWorkBook()
+	 */
 	@Override
 	public File getExcelPivotTableWorkBook() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.document.report.I_Report#getReportPanel()
+	 */
 	@Override
 	public JFrame getReportPanel() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	public String toString() {
 		return "Accumulated status canges report";
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.document.report.I_Report#cancelReporting()
+	 */
 	@Override
 	public void cancelReporting() throws Exception {
 		if (isCancelled()) {
@@ -324,6 +387,9 @@ public class AccumulatedStatusChanges extends SwingWorker<File, String> implemen
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.swing.SwingWorker#doInBackground()
+	 */
 	@Override
 	protected File doInBackground() throws Exception {
 		// TODO Auto-generated method stub

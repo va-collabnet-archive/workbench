@@ -25,6 +25,9 @@ import java.beans.SimpleBeanInfo;
  */
 public class WorklistMembersXlsReportBeanInfo extends SimpleBeanInfo {
 
+	/**
+	 * Instantiates a new worklist members xls report bean info.
+	 */
 	public WorklistMembersXlsReportBeanInfo() {
 		super();
 	}

@@ -94,6 +94,7 @@ import org.xml.sax.SAXException;
  */
 public class DocumentManager {
 
+	/** The Constant PROFILES_SHARED_DICTIONARIES. */
 	private static final String PROFILES_SHARED_DICTIONARIES = "profiles/shared/dictionaries";
 
 	/**
@@ -220,9 +221,10 @@ public class DocumentManager {
 
 	/**
 	 * Index memory from xls.
-	 * 
+	 *
 	 * @return the string
-	 * @throws IOException
+	 * @throws OfficeXmlFileException the office xml file exception
+	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	public static String indexMemoryFromXls() throws OfficeXmlFileException, IOException {
 		String output = "<html><body><font style='font-family:arial,sans-serif'>";
@@ -387,12 +389,10 @@ public class DocumentManager {
 	}
 
 	/**
-	 * 
-	 * 
-	 * @param overwrite
-	 *            the overwrite
-	 * @param dictionaryTextFile
-	 * 
+	 * Index dictionary from text file.
+	 *
+	 * @param overwrite the overwrite
+	 * @param dictionaryTextFile the dictionary text file
 	 * @return the string
 	 */
 	/**
@@ -452,6 +452,17 @@ public class DocumentManager {
 		return output;
 	}
 
+	/**
+	 * Reindex dictionaries.
+	 *
+	 * @param overwrite the overwrite
+	 * @param output the output
+	 * @param sharedFiles the shared files
+	 * @return the string
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws UnsupportedEncodingException the unsupported encoding exception
+	 * @throws FileNotFoundException the file not found exception
+	 */
 	private static String reindexDictionaries(boolean overwrite, String output, File[] sharedFiles) throws IOException, UnsupportedEncodingException, FileNotFoundException {
 
 		File dictionaryFolder = new File("spellIndexDirectory/");
@@ -473,6 +484,12 @@ public class DocumentManager {
 		return output;
 	}
 
+	/**
+	 * Copyfile.
+	 *
+	 * @param srFile the sr file
+	 * @param dtFile the dt file
+	 */
 	private static void copyfile(File srFile, File dtFile) {
 		try {
 			InputStream in = new FileInputStream(srFile);
@@ -493,10 +510,9 @@ public class DocumentManager {
 
 	/**
 	 * Adds the to dictionary.
-	 * 
-	 * @param word
-	 *            the word
-	 * 
+	 *
+	 * @param word the word
+	 * @param langCode the lang code
 	 * @return the string
 	 */
 	public static String addToDictionary(String word, String langCode) {
@@ -518,12 +534,9 @@ public class DocumentManager {
 
 	/**
 	 * Saves the new words to a file.
-	 * 
-	 * @param word
-	 *            the word.
-	 * @param langCode
-	 *            the language code the code belongs to.
-	 * @throws IOException
+	 *
+	 * @param word the word.
+	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	public static void addToNewWordsfile(String word) throws IOException {
 		BufferedWriter bw = null;
@@ -568,10 +581,9 @@ public class DocumentManager {
 
 	/**
 	 * Exists in dictionary.
-	 * 
-	 * @param word
-	 *            the word
-	 * 
+	 *
+	 * @param word the word
+	 * @param langCode the lang code
 	 * @return true, if successful
 	 */
 	public static boolean existsInDictionary(String word, String langCode) {
@@ -589,10 +601,9 @@ public class DocumentManager {
 
 	/**
 	 * Gets the sugestions from dictionary.
-	 * 
-	 * @param word
-	 *            the word
-	 * 
+	 *
+	 * @param word the word
+	 * @param langCode the lang code
 	 * @return the sugestions from dictionary
 	 */
 	public static String[] getSugestionsFromDictionary(String word, String langCode) {
@@ -610,16 +621,11 @@ public class DocumentManager {
 
 	/**
 	 * Spellcheck phrase.
-	 * 
-	 * @param phrase
-	 *            the phrase
-	 * @param frame
-	 *            the frame
-	 * 
+	 *
+	 * @param phrase the phrase
+	 * @param frame the frame
+	 * @param langCode the lang code
 	 * @return the string
-	 * @throws TerminologyException
-	 * @throws IOException
-	 * @throws NoSuchElementException
 	 */
 	static public String spellcheckPhrase(String phrase, JFrame frame, String langCode) {
 		String[] words = phrase.split("[\\s+\\p{Punct}]");
@@ -724,6 +730,17 @@ public class DocumentManager {
 		return descendants;
 	}
 
+	/**
+	 * Adds the new linguistic guideline.
+	 *
+	 * @param name the name
+	 * @param pattern the pattern
+	 * @param recommendation the recommendation
+	 * @param infoRoot the info root
+	 * @param config the config
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static void addNewLinguisticGuideline(String name, String pattern, String recommendation, I_GetConceptData infoRoot, I_ConfigAceFrame config) throws TerminologyException, IOException {
 		I_TermFactory termFactory = Terms.get();
 		termFactory.setActiveAceFrameConfig(config);
@@ -795,6 +812,14 @@ public class DocumentManager {
 		return selectedInfo;
 	}
 
+	/**
+	 * Gets the info for term.
+	 *
+	 * @param term the term
+	 * @param infoRoot the info root
+	 * @param config the config
+	 * @return the info for term
+	 */
 	public static String getInfoForTerm(String term, I_GetConceptData infoRoot, I_ConfigAceFrame config) {
 		String selectedInfo = "";
 		if (term != null) {
@@ -834,6 +859,12 @@ public class DocumentManager {
 		return selectedInfo;
 	}
 
+	/**
+	 * Wildcard to regex.
+	 *
+	 * @param wildcard the wildcard
+	 * @return the string
+	 */
 	public static String wildcardToRegex(String wildcard) {
 		StringBuffer s = new StringBuffer(wildcard.length());
 		s.append('^');

@@ -79,13 +79,15 @@ public class DictionaryResultsDialog extends JDialog implements ActionListener {
 	/** The exit. */
 	boolean exit = false;
 	
+	/** The lang code. */
 	String langCode;
 
 	/**
 	 * Instantiates a new dictionary results dialog.
-	 * 
+	 *
 	 * @param aFrame the a frame
 	 * @param query the query
+	 * @param langCode the lang code
 	 */
 	public DictionaryResultsDialog(Frame aFrame, String query,String langCode) {
 		super(aFrame, true);

@@ -55,6 +55,7 @@ public class TranslationMemoryIndexPanel extends JPanel  implements ActionListen
 	/** The index button. */
 	JButton indexButton;
 	
+	/** The help label. */
 	private JLabel helpLabel;
 
 

@@ -65,6 +65,7 @@ public class DocumentsSearchPanel extends JPanel implements ActionListener {
 	/** The browser pane. */
 	JScrollPane browserPane;
 	
+	/** The help label. */
 	private JLabel helpLabel;
 
 	/**

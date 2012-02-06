@@ -55,6 +55,7 @@ public class TranslationMemoryResultsPanel extends JPanel implements ActionListe
 	/** The table model. */
 	DefaultTableModel tableModel;
 	
+	/** The help label. */
 	private JLabel helpLabel;
 	
 	/**

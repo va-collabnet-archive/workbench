@@ -69,16 +69,20 @@ public class DictionaryResultsPanel extends JPanel implements ActionListener {
 	/** The search button. */
 	JButton searchButton;
 
+	/** The lang code. */
 	private String langCode;
 
+	/** The cmb langs. */
 	private JComboBox cmbLangs;
 	
+	/** The help label. */
 	private JLabel helpLabel;
 
 	/**
 	 * Instantiates a new dictionary results panel.
-	 * 
+	 *
 	 * @param query the query
+	 * @param langCode the lang code
 	 */
 	public DictionaryResultsPanel(String query,String langCode) {
 		this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
@@ -175,6 +179,8 @@ public class DictionaryResultsPanel extends JPanel implements ActionListener {
 
 	/**
 	 * Creates the and show gui.
+	 *
+	 * @param langCode the lang code
 	 */
 	private static void createAndShowGUI(String langCode) {
 		//Create and set up the window.

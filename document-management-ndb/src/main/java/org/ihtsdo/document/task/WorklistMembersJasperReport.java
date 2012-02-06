@@ -35,7 +35,7 @@ import org.dwfa.util.bean.Spec;
 import org.ihtsdo.document.report.WorklistMemberByStatusReport;
 
 /**
- * The Class
+ * The Class.
  */
 @BeanList(specs = 
 { @Spec(directory = "tasks/documents tasks", type = BeanType.TASK_BEAN)})

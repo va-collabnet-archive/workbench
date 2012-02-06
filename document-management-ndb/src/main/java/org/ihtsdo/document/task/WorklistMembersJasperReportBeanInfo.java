@@ -25,6 +25,9 @@ import java.beans.SimpleBeanInfo;
  */
 public class WorklistMembersJasperReportBeanInfo extends SimpleBeanInfo {
 
+	/**
+	 * Instantiates a new worklist members jasper report bean info.
+	 */
 	public WorklistMembersJasperReportBeanInfo() {
 		super();
 	}

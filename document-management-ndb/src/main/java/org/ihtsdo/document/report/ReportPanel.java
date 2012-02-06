@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Fri Aug 27 15:58:59 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.document.report;
@@ -41,30 +54,48 @@ import org.ihtsdo.project.panel.TranslationHelperPanel;
 import org.ihtsdo.project.util.IconUtilities;
 
 /**
+ * The Class ReportPanel.
+ *
  * @author Guillermo Reynoso
  */
 public class ReportPanel extends JPanel {
 
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -5420825015191719954L;
 
+	/** The Constant NO_SELECTION_MESSAGE. */
 	public static final String NO_SELECTION_MESSAGE = "No reports selected.";
+	
+	/** The Constant NO_DATA. */
 	public static final String NO_DATA = "No data found to report";
 
+	/** The Constant EXCEPTION. */
 	public static final String EXCEPTION = "Exception creating report, check log for more details.";
+	
+	/** The Constant EXEL_SIZE_EXCEDED_EXCEPTION. */
 	public static final String EXEL_SIZE_EXCEDED_EXCEPTION = "Data size is outside excel allowable range (0..65535). Please choos smaller interval.";
 	
+	/** The button group1. */
 	private ButtonGroup buttonGroup1;
 
+	/** The report list model. */
 	private DefaultListModel reportListModel;
 	
+	/** The report worker. */
 	@SuppressWarnings("rawtypes")
 	private SwingWorker reportWorker;
 
+	/**
+	 * Instantiates a new report panel.
+	 */
 	public ReportPanel() {
 		initComponents();
 		initCustomComponents();
 	}
 
+	/**
+	 * Inits the custom components.
+	 */
 	private void initCustomComponents() {
 		// ---- buttonGroup1 ----
 		buttonGroup1 = new ButtonGroup();
@@ -103,16 +134,31 @@ public class ReportPanel extends JPanel {
 
 	}
 
+	/**
+	 * Show error.
+	 *
+	 * @param error the error
+	 */
 	void showError(String error) {
 		errorLabel.setForeground(Color.RED);
 		errorLabel.setText(error);
 	}
 
+	/**
+	 * Show message.
+	 *
+	 * @param message the message
+	 */
 	private void showMessage(String message) {
 		errorLabel.setForeground(Color.BLACK);
 		errorLabel.setText(message);
 	}
 
+	/**
+	 * Pdf report action performed.
+	 *
+	 * @param e the e
+	 */
 	private void pdfReportActionPerformed(ActionEvent e) {
 		I_Report report = (I_Report) reportList.getSelectedValue();
 		if (report != null) {
@@ -128,6 +174,11 @@ public class ReportPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Excel report action performed.
+	 *
+	 * @param e the e
+	 */
 	private void excelReportActionPerformed(ActionEvent e) {
 		I_Report report = (I_Report) reportList.getSelectedValue();
 		if (report != null) {
@@ -143,6 +194,12 @@ public class ReportPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Gets the report action performed.
+	 *
+	 * @param e the e
+	 * @return the report action performed
+	 */
 	private void getReportActionPerformed(final ActionEvent e) {
 		if (previewButton.isSelected()) {
 			SwingUtilities.invokeLater(new Runnable() {
@@ -168,6 +225,11 @@ public class ReportPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Csv file action performed.
+	 *
+	 * @param e the e
+	 */
 	private void csvFileActionPerformed(ActionEvent e) {
 		I_Report report = (I_Report) reportList.getSelectedValue();
 		if (report != null) {
@@ -181,6 +243,12 @@ public class ReportPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Gets the frame.
+	 *
+	 * @param component the component
+	 * @return the frame
+	 */
 	public Component getFrame(Component component) {
 		Component result = null;
 		if(component instanceof JFrame){
@@ -191,6 +259,11 @@ public class ReportPanel extends JPanel {
 		return result;
 	}
 
+	/**
+	 * Close button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void closeButtonActionPerformed(ActionEvent e) {
 		try {
 			TranslationHelperPanel thp = PanelHelperFactory.getTranslationHelperPanel();
@@ -212,10 +285,18 @@ public class ReportPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Technical dificulties mouse clicked.
+	 *
+	 * @param e the e
+	 */
 	private void technicalDificultiesMouseClicked(MouseEvent e) {
 		technicalDificulties.setVisible(false);
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -352,19 +433,46 @@ public class ReportPanel extends JPanel {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The report list. */
 	private JList reportList;
+	
+	/** The technical dificulties. */
 	private JLabel technicalDificulties;
+	
+	/** The preview button. */
 	private JRadioButton previewButton;
+	
+	/** The excel button. */
 	private JRadioButton excelButton;
+	
+	/** The csv button. */
 	private JRadioButton csvButton;
+	
+	/** The panel3. */
 	private JPanel panel3;
+	
+	/** The error label. */
 	private JLabel errorLabel;
+	
+	/** The get report. */
 	private JButton getReport;
+	
+	/** The close button. */
 	private JButton closeButton;
+	
+	/** The progress bar1. */
 	private JProgressBar progressBar1;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 }

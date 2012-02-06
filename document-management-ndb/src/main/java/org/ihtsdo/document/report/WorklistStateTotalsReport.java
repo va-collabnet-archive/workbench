@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.document.report;
 
 import java.io.File;
@@ -43,10 +59,17 @@ import org.ihtsdo.project.workflow.model.WfState;
 
 import au.com.bytecode.opencsv.CSVReader;
 
+/**
+ * The Class WorklistStateTotalsReport.
+ */
 public class WorklistStateTotalsReport implements I_Report {
 
+	/** The states cache. */
 	private HashMap<String, String> statesCache = new HashMap<String, String>();
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.document.report.I_Report#getCsv()
+	 */
 	@Override
 	public File getCsv() throws Exception {
 		File csvFile = null;
@@ -148,6 +171,12 @@ public class WorklistStateTotalsReport implements I_Report {
 		}
 	}
 
+	/**
+	 * Gets the first letter to upper case.
+	 *
+	 * @param string the string
+	 * @return the first letter to upper case
+	 */
 	private String getFirstLetterToUpperCase(String string) {
 		if (statesCache.containsKey(string)) {
 			return statesCache.get(string);
@@ -162,12 +191,18 @@ public class WorklistStateTotalsReport implements I_Report {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.document.report.I_Report#getExcelPivotTableWorkBook()
+	 */
 	@Override
 	public File getExcelPivotTableWorkBook() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.document.report.I_Report#getExcelSourceWorkbook()
+	 */
 	@Override
 	public File getExcelSourceWorkbook() throws Exception {
 		File csvFile;
@@ -269,6 +304,9 @@ public class WorklistStateTotalsReport implements I_Report {
 		return reportCopy;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.document.report.I_Report#getReportPanel()
+	 */
 	@Override
 	public JFrame getReportPanel() throws Exception {
 		JasperViewer jviewer = null;
@@ -304,11 +342,17 @@ public class WorklistStateTotalsReport implements I_Report {
 		return jviewer;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 		return "Project worklists status totals";
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.document.report.I_Report#cancelReporting()
+	 */
 	@Override
 	public void cancelReporting() throws Exception {
 		// TODO Auto-generated method stub

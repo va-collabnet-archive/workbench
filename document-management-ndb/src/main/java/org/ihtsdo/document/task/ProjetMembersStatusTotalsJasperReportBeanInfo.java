@@ -25,6 +25,9 @@ import java.beans.SimpleBeanInfo;
  */
 public class ProjetMembersStatusTotalsJasperReportBeanInfo extends SimpleBeanInfo {
 
+	/**
+	 * Instantiates a new projet members status totals jasper report bean info.
+	 */
 	public ProjetMembersStatusTotalsJasperReportBeanInfo() {
 		super();
 	}

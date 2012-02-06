@@ -53,6 +53,7 @@ public class DocumentsIndexPanel extends JPanel  implements ActionListener {
 	/** The index button. */
 	JButton indexButton;
 	
+	/** The help label. */
 	private JLabel helpLabel;
 
 	

@@ -65,8 +65,10 @@ public class DictionaryIndexPanel extends JPanel  implements ActionListener {
 	/** The index wb button. */
 	JButton indexWBButton;
 
+	/** The cmb langs. */
 	private JComboBox cmbLangs;
 
+	/** The help label. */
 	private JLabel helpLabel;
 
 
