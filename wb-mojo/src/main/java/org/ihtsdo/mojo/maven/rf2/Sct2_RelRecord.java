@@ -266,34 +266,63 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
         // notRefinable	RF2==900000000000007000, RF1="0"
         // optional     RF2==900000000000216007, RF1="1"
         // mandatory    RF2==900000000000218008, RF1="2"
-        long refinibilityId = Long.parseLong("900000000000216007");
+        long refinibilityNotRefinableId = Long.parseLong("900000000000007000");
+        long refinibilityOptionalId = Long.parseLong("900000000000216007");
+        long refinibilityMandatoryId = Long.parseLong("900000000000218008");
 
-        // Inferred relationship SCTID 900000000000011006
-        String inferredRelSctIdString = "900000000000011006";
+        // Inferred relationship SCTID RF2==900000000000011006
+        long inferredRelSctId = Long.parseLong("900000000000011006");
+
+        // ISA relationship SCTID RF2==116680003
+        long isaRelSctId = Long.parseLong("116680003");
+
+        // Qualifier relationship SCTID RF2==900000000000225001
+        long qualifierRelSctId = Long.parseLong("900000000000225001");
 
         int idx = 0;
         br.readLine(); // Header row
         while (br.ready()) {
             String[] line = br.readLine().split(TAB_CHARACTER);
 
+            // Get characteristic sct id
+            long thisCharacteristicId = Long.parseLong(line[CHARACTERISTIC_TYPE]);
+            // Get role type sct id
+            long thisRoleTypeSctId = Long.parseLong(line[TYPE_ID]);
+
+            // Set inferred to false for non-inferred relationships
             boolean inferredRel = inferredB;
-            if (inferredB && !line[CHARACTERISTIC_TYPE].equalsIgnoreCase(inferredRelSctIdString)) {
+            if (inferredB && thisCharacteristicId != inferredRelSctId) {
                 // If "Inferred" file contains a relationship which is not inferred
                 // ... for example, an "Additional" relationship ...
-                // then set the inferred flag to false so that the author is not later set to classifier.
+                // then set the inferred flag to false so the author is not later set to classifier.
                 inferredRel = false;
             }
+
+            // Set Historical relationships refinibility to 'not refinable'
+            long thisRefinabilityId = refinibilityOptionalId;
+            // Historical have thisCharacteristicId of -1
+            if (thisCharacteristicId == -1L)
+                thisRefinabilityId = refinibilityNotRefinableId;
+
+            // Set ISA relationships refinibility to 'not refinable'
+            if (thisRoleTypeSctId == isaRelSctId)
+                thisRefinabilityId = refinibilityNotRefinableId;
+
+            // Set Qualifier relationships refinibility to 'mandatory'
+            if (thisCharacteristicId == qualifierRelSctId)
+                thisRefinabilityId = refinibilityMandatoryId;
+            
 
             a[idx] = new Sct2_RelRecord(Long.parseLong(line[ID]),
                     Rf2x.convertEffectiveTimeToDate(line[EFFECTIVE_TIME]),
                     Rf2x.convertStringToBoolean(line[ACTIVE]),
                     Rf2x.convertIdToUuidStr(line[MODULE_ID]),
                     Long.parseLong(line[SOURCE_ID]),
-                    Long.parseLong(line[TYPE_ID]),
+                    thisRoleTypeSctId,
                     Long.parseLong(line[DESTINATION_ID]),
                     Integer.parseInt(line[RELATIONSHIP_GROUP]),
-                    Long.parseLong(line[CHARACTERISTIC_TYPE]),
-                    refinibilityId,
+                    thisCharacteristicId,
+                    thisRefinabilityId,
                     inferredRel,
                     Long.MAX_VALUE);
             idx++;

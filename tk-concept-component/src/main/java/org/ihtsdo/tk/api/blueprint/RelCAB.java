@@ -112,7 +112,7 @@ public class RelCAB extends CreateOrAmendBlueprint {
                 characteristicUuid =
                         ts.getUuidsForNid(SnomedMetadataRfx.getREL_CH_QUALIFIER_CHARACTERISTIC_NID()).get(0);
                 refinabilityUuid =
-                        ts.getUuidsForNid(SnomedMetadataRfx.getREL_OPTIONAL_REFINABILITY_NID()).get(0);
+                        ts.getUuidsForNid(SnomedMetadataRfx.getREL_MANDATORY_REFINABILITY_NID()).get(0);
                 break;
             case INFERRED_ROLE:
                 characteristicUuid =
