@@ -48,27 +48,37 @@ import org.ihtsdo.project.FileLinkAPI;
 import org.ihtsdo.project.model.I_TerminologyProject;
 
 /**
- * The Class
+ * The Class.
  */
 @BeanList(specs = 
 { @Spec(directory = "tasks/translation tasks", type = BeanType.TASK_BEAN)})
 public class SetWFDtoWFUserSelection extends AbstractTask {
 
+	/** The profile prop name. */
 	private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
+	
+	/** The project prop name. */
 	private String projectPropName = ProcessAttachmentKeys.TERMINOLOGY_PROJECT.getAttachmentKey();
 
+	/** The worklist name. */
 	public Boolean worklistName = true;
 	
+	/** The business process. */
 	public Boolean businessProcess = true;
 	
+	/** The translator. */
 	public Boolean translator = true;
 
+	/** The reviewer1. */
 	public Boolean reviewer1 = true;
 
+	/** The reviewer2. */
 	public Boolean reviewer2 = true;
 
+	/** The sme. */
 	public Boolean sme = true;
 
+	/** The editorial board. */
 	public Boolean editorialBoard = true;
 
 	/** The Constant serialVersionUID. */
@@ -217,74 +227,164 @@ public class SetWFDtoWFUserSelection extends AbstractTask {
 		return new int[] {  };
 	}
 
+	/**
+	 * Gets the profile prop name.
+	 *
+	 * @return the profile prop name
+	 */
 	public String getProfilePropName() {
 		return profilePropName;
 	}
 
+	/**
+	 * Sets the profile prop name.
+	 *
+	 * @param profilePropName the new profile prop name
+	 */
 	public void setProfilePropName(String profilePropName) {
 		this.profilePropName = profilePropName;
 	}
 
+	/**
+	 * Gets the translator.
+	 *
+	 * @return the translator
+	 */
 	public Boolean getTranslator() {
 		return translator;
 	}
 
+	/**
+	 * Sets the translator.
+	 *
+	 * @param translator the new translator
+	 */
 	public void setTranslator(Boolean translator) {
 		this.translator = translator;
 	}
 
+	/**
+	 * Gets the reviewer1.
+	 *
+	 * @return the reviewer1
+	 */
 	public Boolean getReviewer1() {
 		return reviewer1;
 	}
 
+	/**
+	 * Sets the reviewer1.
+	 *
+	 * @param reviewer1 the new reviewer1
+	 */
 	public void setReviewer1(Boolean reviewer1) {
 		this.reviewer1 = reviewer1;
 	}
 
+	/**
+	 * Gets the reviewer2.
+	 *
+	 * @return the reviewer2
+	 */
 	public Boolean getReviewer2() {
 		return reviewer2;
 	}
 
+	/**
+	 * Sets the reviewer2.
+	 *
+	 * @param reviewer2 the new reviewer2
+	 */
 	public void setReviewer2(Boolean reviewer2) {
 		this.reviewer2 = reviewer2;
 	}
 
+	/**
+	 * Gets the sme.
+	 *
+	 * @return the sme
+	 */
 	public Boolean getSme() {
 		return sme;
 	}
 
+	/**
+	 * Sets the sme.
+	 *
+	 * @param sme the new sme
+	 */
 	public void setSme(Boolean sme) {
 		this.sme = sme;
 	}
 
+	/**
+	 * Gets the editorial board.
+	 *
+	 * @return the editorial board
+	 */
 	public Boolean getEditorialBoard() {
 		return editorialBoard;
 	}
 
+	/**
+	 * Sets the editorial board.
+	 *
+	 * @param editorialBoard the new editorial board
+	 */
 	public void setEditorialBoard(Boolean editorialBoard) {
 		this.editorialBoard = editorialBoard;
 	}
 
+	/**
+	 * Gets the project prop name.
+	 *
+	 * @return the project prop name
+	 */
 	public String getProjectPropName() {
 		return projectPropName;
 	}
 
+	/**
+	 * Sets the project prop name.
+	 *
+	 * @param projectPropName the new project prop name
+	 */
 	public void setProjectPropName(String projectPropName) {
 		this.projectPropName = projectPropName;
 	}
 
+	/**
+	 * Gets the business process.
+	 *
+	 * @return the business process
+	 */
 	public Boolean getBusinessProcess() {
 		return businessProcess;
 	}
 
+	/**
+	 * Sets the business process.
+	 *
+	 * @param businessProcess the new business process
+	 */
 	public void setBusinessProcess(Boolean businessProcess) {
 		this.businessProcess = businessProcess;
 	}
 
+	/**
+	 * Gets the worklist name.
+	 *
+	 * @return the worklist name
+	 */
 	public Boolean getWorklistName() {
 		return worklistName;
 	}
 
+	/**
+	 * Sets the worklist name.
+	 *
+	 * @param worklistName the new worklist name
+	 */
 	public void setWorklistName(Boolean worklistName) {
 		this.worklistName = worklistName;
 	}

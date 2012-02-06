@@ -25,6 +25,9 @@ import java.beans.SimpleBeanInfo;
  */
 public class DisplayLinguisticGuidelinesForSelectedConceptInConsoleBeanInfo extends SimpleBeanInfo {
 
+	/**
+	 * Instantiates a new display linguistic guidelines for selected concept in console bean info.
+	 */
 	public DisplayLinguisticGuidelinesForSelectedConceptInConsoleBeanInfo() {
 		super();
 	}

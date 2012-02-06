@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2009 International Health Terminology Standards Development
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
  * Organisation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -51,29 +51,57 @@ import org.ihtsdo.project.refset.PromotionRefset;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 
+/**
+ * The Class SearchLangRefsetStatusDateUser.
+ */
 @BeanList(specs = { @Spec(directory = "tasks/ide/search", type = BeanType.TASK_BEAN)/*,
 		@Spec(directory = "search", type = BeanType.TASK_BEAN)*/ })
 		public class SearchLangRefsetStatusDateUser extends AbstractSearchTest {
 
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1;
 
+	/** The Constant dataVersion. */
 	private static final int dataVersion = 1;
 
 	/**
 	 * Status concept for the term component to test.
 	 */
 	private TermEntry langRefsetTerm = new TermEntry(RefsetAuxiliary.Concept.LANGUAGE_REFSET_EN.getUids());
+	
+	/** The status term. */
 	private TermEntry statusTerm = new TermEntry(ArchitectonicAuxiliary.Concept.STATUS.getUids());
+	
+	/** The day. */
 	private Integer day = 1;
+	
+	/** The month. */
 	private Integer month = 1;
+	
+	/** The year. */
 	private Integer year = 2010;
+	
+	/** The author term. */
 	private TermEntry authorTerm = new TermEntry(ArchitectonicAuxiliary.Concept.USER.getUids());;
 
+	/**
+	 * Write object.
+	 *
+	 * @param out the out
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
 		out.writeObject(this.statusTerm);
 	}
 
+	/**
+	 * Read object.
+	 *
+	 * @param in the in
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws ClassNotFoundException the class not found exception
+	 */
 	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
 		int objDataVersion = in.readInt();
 		if (objDataVersion == 1) {
@@ -83,6 +111,9 @@ import org.ihtsdo.tk.api.Precedence;
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.task.search.AbstractSearchTest#test(org.dwfa.ace.api.I_AmTermComponent, org.dwfa.ace.api.I_ConfigAceFrame)
+	 */
 	@Override
 	public boolean test(I_AmTermComponent component, I_ConfigAceFrame frameConfig) throws TaskFailedException {
 		try {
@@ -169,50 +200,110 @@ import org.ihtsdo.tk.api.Precedence;
 		}
 	}
 
+	/**
+	 * Gets the status term.
+	 *
+	 * @return the status term
+	 */
 	public TermEntry getStatusTerm() {
 		return statusTerm;
 	}
 
+	/**
+	 * Sets the status term.
+	 *
+	 * @param statusTerm the new status term
+	 */
 	public void setStatusTerm(TermEntry statusTerm) {
 		this.statusTerm = statusTerm;
 	}
 
+	/**
+	 * Gets the lang refset term.
+	 *
+	 * @return the lang refset term
+	 */
 	public TermEntry getLangRefsetTerm() {
 		return langRefsetTerm;
 	}
 
+	/**
+	 * Sets the lang refset term.
+	 *
+	 * @param langRefsetTerm the new lang refset term
+	 */
 	public void setLangRefsetTerm(TermEntry langRefsetTerm) {
 		this.langRefsetTerm = langRefsetTerm;
 	}
 
+	/**
+	 * Gets the day.
+	 *
+	 * @return the day
+	 */
 	public Integer getDay() {
 		return day;
 	}
 
+	/**
+	 * Sets the day.
+	 *
+	 * @param day the new day
+	 */
 	public void setDay(Integer day) {
 		this.day = day;
 	}
 
+	/**
+	 * Gets the month.
+	 *
+	 * @return the month
+	 */
 	public Integer getMonth() {
 		return month;
 	}
 
+	/**
+	 * Sets the month.
+	 *
+	 * @param month the new month
+	 */
 	public void setMonth(Integer month) {
 		this.month = month;
 	}
 
+	/**
+	 * Gets the year.
+	 *
+	 * @return the year
+	 */
 	public Integer getYear() {
 		return year;
 	}
 
+	/**
+	 * Sets the year.
+	 *
+	 * @param year the new year
+	 */
 	public void setYear(Integer year) {
 		this.year = year;
 	}
 
+	/**
+	 * Gets the author term.
+	 *
+	 * @return the author term
+	 */
 	public TermEntry getAuthorTerm() {
 		return authorTerm;
 	}
 
+	/**
+	 * Sets the author term.
+	 *
+	 * @param authorTerm the new author term
+	 */
 	public void setAuthorTerm(TermEntry authorTerm) {
 		this.authorTerm = authorTerm;
 	}

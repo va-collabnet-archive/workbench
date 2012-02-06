@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Mon Apr 05 12:50:50 GMT-04:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.translation.ui;
@@ -25,17 +38,27 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.ihtsdo.document.DocumentManager;
 
 /**
+ * The Class AddLinguisticGuideline.
+ *
  * @author Guillermo Reynoso
  */
 public class AddLinguisticGuideline extends JPanel {
-	/**
-	 * 
-	 */
+	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
+	
+	/**
+	 * Instantiates a new adds the linguistic guideline.
+	 */
 	public AddLinguisticGuideline() {
 		initComponents();
 	}
 
+	/**
+	 * Button1 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button1ActionPerformed(ActionEvent e) {
 		try {
 			I_GetConceptData linguisticGuidelinesRoot = Terms.get().getConcept(
@@ -62,6 +85,9 @@ public class AddLinguisticGuideline extends JPanel {
 		}
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		label1 = new JLabel();
@@ -160,16 +186,37 @@ public class AddLinguisticGuideline extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The text field1. */
 	private JTextField textField1;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The text field2. */
 	private JTextField textField2;
+	
+	/** The label4. */
 	private JLabel label4;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The text area1. */
 	private JTextArea textArea1;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The button1. */
 	private JButton button1;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

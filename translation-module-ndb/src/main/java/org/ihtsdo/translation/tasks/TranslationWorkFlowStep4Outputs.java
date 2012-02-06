@@ -731,18 +731,38 @@ public class TranslationWorkFlowStep4Outputs extends AbstractTask {
 		this.done = done;
 	}
 
+	/**
+	 * Gets the exit4 label and destination.
+	 *
+	 * @return the exit4 label and destination
+	 */
 	public String getExit4LabelAndDestination() {
 		return exit4LabelAndDestination;
 	}
 
+	/**
+	 * Sets the exit4 label and destination.
+	 *
+	 * @param exit4LabelAndDestination the new exit4 label and destination
+	 */
 	public void setExit4LabelAndDestination(String exit4LabelAndDestination) {
 		this.exit4LabelAndDestination = exit4LabelAndDestination;
 	}
 
+	/**
+	 * Gets the exit4 next status.
+	 *
+	 * @return the exit4 next status
+	 */
 	public TermEntry getExit4NextStatus() {
 		return exit4NextStatus;
 	}
 
+	/**
+	 * Sets the exit4 next status.
+	 *
+	 * @param exit4NextStatus the new exit4 next status
+	 */
 	public void setExit4NextStatus(TermEntry exit4NextStatus) {
 		this.exit4NextStatus = exit4NextStatus;
 	}

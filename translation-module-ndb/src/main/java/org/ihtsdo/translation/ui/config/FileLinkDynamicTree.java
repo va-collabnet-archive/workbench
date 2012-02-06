@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.translation.ui.config;
 
 import java.awt.GridLayout;
@@ -26,12 +42,28 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.FileLink;
 import org.ihtsdo.project.FileLinkAPI;
 
+/**
+ * The Class FileLinkDynamicTree.
+ */
 public class FileLinkDynamicTree extends JPanel {
+	
+	/** The fl api. */
 	FileLinkAPI flApi;
+	
+	/** The root node. */
 	protected DefaultMutableTreeNode rootNode;
+	
+	/** The tree model. */
 	protected DefaultTreeModel treeModel;
+	
+	/** The tree. */
 	protected JTree tree;
 
+	/**
+	 * Instantiates a new file link dynamic tree.
+	 *
+	 * @param config the config
+	 */
 	public FileLinkDynamicTree(I_ConfigAceFrame config) {
 		super(new GridLayout(1, 0));
 		this.flApi = new FileLinkAPI(config);
@@ -64,12 +96,20 @@ public class FileLinkDynamicTree extends JPanel {
 		
 	}
 	
+	/**
+	 * Gets the tree.
+	 *
+	 * @return the tree
+	 */
 	public JTree getTree(){
 		return this.tree;
 	}
 
-	/** Remove the currently selected node. 
-	 * @throws IOException */
+	/**
+	 * Remove the currently selected node.
+	 *
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public void removeCurrentNode() throws IOException {
 		TreePath currentSelection = tree.getSelectionPath();
 		if (currentSelection != null) {
@@ -85,8 +125,12 @@ public class FileLinkDynamicTree extends JPanel {
 
 	}
 
-	/** Add child to the currently selected node. 
-	 * @throws Exception */
+	/**
+	 * Add child to the currently selected node.
+	 *
+	 * @param file the file
+	 * @throws Exception the exception
+	 */
 	public void addObject(File file) throws Exception {
 		
 		if(file.isDirectory()){
@@ -96,6 +140,12 @@ public class FileLinkDynamicTree extends JPanel {
 		}
 	}
 	
+	/**
+	 * Adds the dir.
+	 *
+	 * @param file the file
+	 * @throws Exception the exception
+	 */
 	public void addDir(File file) throws Exception{
 		File[] files = file.listFiles();
 		for (File file2 : files) {
@@ -107,6 +157,12 @@ public class FileLinkDynamicTree extends JPanel {
 		}
 	}
 	
+	/**
+	 * Adds the file.
+	 *
+	 * @param file the file
+	 * @throws Exception the exception
+	 */
 	public void addFile(File file) throws Exception{
 		TreePath parentPath = tree.getSelectionPath();
 		
@@ -123,10 +179,25 @@ public class FileLinkDynamicTree extends JPanel {
 		addObject(parentNode, fileNode, true);
 	}
 
+	/**
+	 * Adds the object.
+	 *
+	 * @param parent the parent
+	 * @param child the child
+	 * @return the default mutable tree node
+	 */
 	public DefaultMutableTreeNode addObject(DefaultMutableTreeNode parent,Object child) {
 		return addObject(parent, child, false);
 	}
 
+	/**
+	 * Adds the object.
+	 *
+	 * @param parent the parent
+	 * @param child the child
+	 * @param shouldBeVisible the should be visible
+	 * @return the default mutable tree node
+	 */
 	public DefaultMutableTreeNode addObject(DefaultMutableTreeNode parent, Object child, boolean shouldBeVisible) {
 		DefaultMutableTreeNode childNode = (DefaultMutableTreeNode)child;
 
@@ -142,6 +213,11 @@ public class FileLinkDynamicTree extends JPanel {
 		return childNode;
 	}
 	
+	/**
+	 * Creates the nodes.
+	 *
+	 * @param top the top
+	 */
 	private void createNodes(DefaultMutableTreeNode top) {
 		I_TermFactory tf = Terms.get();
 
@@ -171,7 +247,22 @@ public class FileLinkDynamicTree extends JPanel {
 
 	}
 
+	/**
+	 * The listener interface for receiving myTreeModel events.
+	 * The class that is interested in processing a myTreeModel
+	 * event implements this interface, and the object created
+	 * with that class is registered with a component using the
+	 * component's <code>addMyTreeModelListener<code> method. When
+	 * the myTreeModel event occurs, that object's appropriate
+	 * method is invoked.
+	 *
+	 * @see MyTreeModelEvent
+	 */
 	class MyTreeModelListener implements TreeModelListener {
+		
+		/* (non-Javadoc)
+		 * @see javax.swing.event.TreeModelListener#treeNodesChanged(javax.swing.event.TreeModelEvent)
+		 */
 		public void treeNodesChanged(TreeModelEvent e) {
 			DefaultMutableTreeNode node;
 			node = (DefaultMutableTreeNode) (e.getTreePath()
@@ -190,12 +281,21 @@ public class FileLinkDynamicTree extends JPanel {
 			System.out.println("New value: " + node.getUserObject());
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.event.TreeModelListener#treeNodesInserted(javax.swing.event.TreeModelEvent)
+		 */
 		public void treeNodesInserted(TreeModelEvent e) {
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.event.TreeModelListener#treeNodesRemoved(javax.swing.event.TreeModelEvent)
+		 */
 		public void treeNodesRemoved(TreeModelEvent e) {
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.event.TreeModelListener#treeStructureChanged(javax.swing.event.TreeModelEvent)
+		 */
 		public void treeStructureChanged(TreeModelEvent e) {
 		}
 	}

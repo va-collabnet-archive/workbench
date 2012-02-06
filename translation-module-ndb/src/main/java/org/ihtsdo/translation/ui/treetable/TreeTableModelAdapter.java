@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.translation.ui.treetable;
 /*
  * %W% %E%
@@ -60,9 +76,19 @@ import javax.swing.tree.TreePath;
 
 public class TreeTableModelAdapter extends AbstractTableModel
 {
+    
+    /** The tree. */
     JTree tree;
+    
+    /** The tree table model. */
     TreeTableModel treeTableModel;
 
+    /**
+     * Instantiates a new tree table model adapter.
+     *
+     * @param treeTableModel the tree table model
+     * @param tree the tree
+     */
     public TreeTableModelAdapter(TreeTableModel treeTableModel, JTree tree) {
         this.tree = tree;
         this.tree.setRootVisible(false);
@@ -82,35 +108,62 @@ public class TreeTableModelAdapter extends AbstractTableModel
 
   // Wrappers, implementing TableModel interface. 
 
-    public int getColumnCount() {
+    /* (non-Javadoc)
+   * @see javax.swing.table.TableModel#getColumnCount()
+   */
+  public int getColumnCount() {
 	return treeTableModel.getColumnCount();
     }
 
+    /* (non-Javadoc)
+     * @see javax.swing.table.AbstractTableModel#getColumnName(int)
+     */
     public String getColumnName(int column) {
 	return treeTableModel.getColumnName(column);
     }
 
+    /* (non-Javadoc)
+     * @see javax.swing.table.AbstractTableModel#getColumnClass(int)
+     */
     public Class getColumnClass(int column) {
 	return treeTableModel.getColumnClass(column);
     }
 
+    /* (non-Javadoc)
+     * @see javax.swing.table.TableModel#getRowCount()
+     */
     public int getRowCount() {
 	return tree.getRowCount();
     }
 
+    /**
+     * Node for row.
+     *
+     * @param row the row
+     * @return the object
+     */
     public Object nodeForRow(int row) {
 	TreePath treePath = tree.getPathForRow(row);
 	return treePath.getLastPathComponent();         
     }
 
+    /* (non-Javadoc)
+     * @see javax.swing.table.TableModel#getValueAt(int, int)
+     */
     public Object getValueAt(int row, int column) {
 	return treeTableModel.getValueAt(nodeForRow(row), column);
     }
 
+    /* (non-Javadoc)
+     * @see javax.swing.table.AbstractTableModel#isCellEditable(int, int)
+     */
     public boolean isCellEditable(int row, int column) {
          return treeTableModel.isCellEditable(nodeForRow(row), column); 
     }
 
+    /* (non-Javadoc)
+     * @see javax.swing.table.AbstractTableModel#setValueAt(java.lang.Object, int, int)
+     */
     public void setValueAt(Object value, int row, int column) {
 	treeTableModel.setValueAt(value, nodeForRow(row), column);
     }

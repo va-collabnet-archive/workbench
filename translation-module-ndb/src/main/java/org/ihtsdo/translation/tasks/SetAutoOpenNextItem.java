@@ -51,6 +51,7 @@ public class SetAutoOpenNextItem extends AbstractTask {
 	/** The Constant dataVersion. */
 	private static final int dataVersion = 1;
 	
+	/** The auto open item. */
 	private boolean autoOpenItem;
 	/**
 	 * Write object.
@@ -141,10 +142,20 @@ public class SetAutoOpenNextItem extends AbstractTask {
 		return new int[] {  };
 	}
 
+	/**
+	 * Checks if is auto open item.
+	 *
+	 * @return true, if is auto open item
+	 */
 	public boolean isAutoOpenItem() {
 		return autoOpenItem;
 	}
 
+	/**
+	 * Sets the auto open item.
+	 *
+	 * @param autoOpenItem the new auto open item
+	 */
 	public void setAutoOpenItem(boolean autoOpenItem) {
 		this.autoOpenItem = autoOpenItem;
 	}

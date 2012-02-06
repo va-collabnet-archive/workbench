@@ -199,6 +199,8 @@ public class TranslationConceptEditor2 extends JPanel {
 	
 	/**
 	 * Clear form.
+	 *
+	 * @param clearAll the clear all
 	 */
 	private void clearForm(boolean clearAll){
 		descriptionInEditor = null;
@@ -439,8 +441,7 @@ public class TranslationConceptEditor2 extends JPanel {
 
 	/**
 	 * Spellcheck action performed.
-	 * 
-	 * @param e the e
+	 *
 	 */
 	private void mSpellChkActionPerformed() {
 
@@ -448,6 +449,9 @@ public class TranslationConceptEditor2 extends JPanel {
 
 	}
 
+	/**
+	 * M close action performed.
+	 */
 	private void mCloseActionPerformed() {
 		AceFrameConfig config;
 		try {
@@ -472,10 +476,16 @@ public class TranslationConceptEditor2 extends JPanel {
 		}
 	}
 
+	/**
+	 * M sw tsv action performed.
+	 */
 	private void mSwTSVActionPerformed() {
 		LanguageUtil.openTranlationUI(concept, config, sourceLangCode, targetLangCode, LanguageUtil.SIMPLE_UI);
 	}
 
+	/**
+	 * M add pref action performed.
+	 */
 	private void mAddPrefActionPerformed() {
 		descriptionInEditor = null;
 		label4.setText("");
@@ -490,6 +500,9 @@ public class TranslationConceptEditor2 extends JPanel {
 		comboBox1.setVisible(true);
 	}
 
+	/**
+	 * M add desc action performed.
+	 */
 	private void mAddDescActionPerformed() {
 		descriptionInEditor = null;
 		label4.setText("");
@@ -504,6 +517,9 @@ public class TranslationConceptEditor2 extends JPanel {
 		comboBox1.setVisible(true);
 	}
 
+	/**
+	 * M get assign action performed.
+	 */
 	private void mGetAssignActionPerformed() {
 		I_IntSet allowedDestRelTypes =  Terms.get().newIntSet();
 		try {
@@ -538,6 +554,9 @@ public class TranslationConceptEditor2 extends JPanel {
 		}
 	}
 
+	/**
+	 * B exec action performed.
+	 */
 	private void bExecActionPerformed() {
 		if (this.concept!=null){
 			populateTree();
@@ -552,11 +571,19 @@ public class TranslationConceptEditor2 extends JPanel {
 	}
 
 
+	/**
+	 * Adds the listeners.
+	 *
+	 * @param table the table
+	 */
 	private void addListeners(JTable table){
 		   SelectionListener listener = new SelectionListener(table);
 		   table.getSelectionModel().addListSelectionListener(listener);
 	}
 
+	/**
+	 * B keep action performed.
+	 */
 	private void bKeepActionPerformed() {
 		clearForm(true);
 
@@ -568,10 +595,16 @@ public class TranslationConceptEditor2 extends JPanel {
 		mClose.setEnabled(true);
 	}
 
+	/**
+	 * B review action performed.
+	 */
 	private void bReviewActionPerformed() {
 		clearAndRemove();
 	}
 	
+	/**
+	 * Clear and remove.
+	 */
 	private void clearAndRemove() {
 		clearForm(true);
 
@@ -595,10 +628,24 @@ public class TranslationConceptEditor2 extends JPanel {
 		
 	}
 
+	/**
+	 * B escalate action performed.
+	 */
 	private void bEscalateActionPerformed() {
 		clearAndRemove();
 	}
 
+	/**
+	 * The listener interface for receiving selection events.
+	 * The class that is interested in processing a selection
+	 * event implements this interface, and the object created
+	 * with that class is registered with a component using the
+	 * component's <code>addSelectionListener<code> method. When
+	 * the selection event occurs, that object's appropriate
+	 * method is invoked.
+	 *
+	 * @see SelectionEvent
+	 */
 	class SelectionListener implements ListSelectionListener {
         
         /** The table. */
@@ -1227,64 +1274,181 @@ public class TranslationConceptEditor2 extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The menu bar1. */
 	private JMenuBar menuBar1;
+	
+	/** The menu5. */
 	private JMenu menu5;
+	
+	/** The m get assign. */
 	private JMenuItem mGetAssign;
+	
+	/** The m close. */
 	private JMenuItem mClose;
+	
+	/** The menu1. */
 	private JMenu menu1;
+	
+	/** The b add fsn. */
 	private JMenuItem bAddFSN;
+	
+	/** The m add pref. */
 	private JMenuItem mAddPref;
+	
+	/** The m add desc. */
 	private JMenuItem mAddDesc;
+	
+	/** The menu2. */
 	private JMenu menu2;
+	
+	/** The b cpt issue. */
 	private JMenuItem bCptIssue;
+	
+	/** The b desc issue. */
 	private JMenuItem bDescIssue;
+	
+	/** The b view issue. */
 	private JMenuItem bViewIssue;
+	
+	/** The menu3. */
 	private JMenu menu3;
+	
+	/** The m spell chk. */
 	private JMenuItem mSpellChk;
+	
+	/** The menu4. */
 	private JMenu menu4;
+	
+	/** The m sw tsv. */
 	private JMenuItem mSwTSV;
+	
+	/** The split pane1. */
 	private JSplitPane splitPane1;
+	
+	/** The panel11. */
 	private JPanel panel11;
+	
+	/** The label9. */
 	private JLabel label9;
+	
+	/** The scroll pane6. */
 	private JScrollPane scrollPane6;
+	
+	/** The table3. */
 	private JTable table3;
+	
+	/** The panel8. */
 	private JPanel panel8;
+	
+	/** The b exec. */
 	private JButton bExec;
+	
+	/** The panel10. */
 	private JPanel panel10;
+	
+	/** The split pane2. */
 	private JSplitPane splitPane2;
+	
+	/** The panel9. */
 	private JPanel panel9;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The tree1. */
 	private JTree tree1;
+	
+	/** The tabbed pane1. */
 	private JTabbedPane tabbedPane1;
+	
+	/** The scroll pane2. */
 	private JScrollPane scrollPane2;
+	
+	/** The table1. */
 	private JTable table1;
+	
+	/** The scroll pane3. */
 	private JScrollPane scrollPane3;
+	
+	/** The table2. */
 	private JTable table2;
+	
+	/** The scroll pane4. */
 	private JScrollPane scrollPane4;
+	
+	/** The editor pane1. */
 	private JEditorPane editorPane1;
+	
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The panel7. */
 	private JPanel panel7;
+	
+	/** The label4. */
 	private JLabel label4;
+	
+	/** The combo box1. */
 	private JComboBox comboBox1;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The text field1. */
 	private JTextField textField1;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The panel4. */
 	private JPanel panel4;
+	
+	/** The label5. */
 	private JLabel label5;
+	
+	/** The rb yes. */
 	private JRadioButton rbYes;
+	
+	/** The label6. */
 	private JLabel label6;
+	
+	/** The label7. */
 	private JLabel label7;
+	
+	/** The rb no. */
 	private JRadioButton rbNo;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The panel3. */
 	private JPanel panel3;
+	
+	/** The button1. */
 	private JButton button1;
+	
+	/** The button5. */
 	private JButton button5;
+	
+	/** The panel6. */
 	private JPanel panel6;
+	
+	/** The panel5. */
 	private JPanel panel5;
+	
+	/** The label8. */
 	private JLabel label8;
+	
+	/** The b keep. */
 	private JButton bKeep;
+	
+	/** The b review. */
 	private JButton bReview;
+	
+	/** The b escalate. */
 	private JButton bEscalate;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 	/** The descriptions. */

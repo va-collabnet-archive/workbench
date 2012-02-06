@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.translation.tasks;
 
 import java.awt.Component;
@@ -28,30 +44,62 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.tapi.TerminologyException;
 
+/**
+ * The Class Translation_InboxReviewEscalate.
+ */
 public abstract class Translation_InboxReviewEscalate extends AbstractTask {
 
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1;
 
+	/** The Constant dataVersion. */
 	private static final int dataVersion = 1;
 
+	/** The profile prop name. */
 	private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
 
+	/** The return condition. */
 	protected transient Condition returnCondition;
 
+	/** The done. */
 	protected transient boolean done;
 
+	/** The config. */
 	protected transient I_ConfigAceFrame config;
+	
+	/** The builder visible. */
 	protected transient boolean builderVisible;
+	
+	/** The progress panel visible. */
 	protected transient boolean progressPanelVisible;
+	
+	/** The subversion button visible. */
 	protected transient boolean subversionButtonVisible;
+	
+	/** The inbox button visible. */
 	protected transient boolean inboxButtonVisible;
+	
+	/** The workflow panel. */
 	protected transient JPanel workflowPanel;
 
+	/**
+	 * Write object.
+	 *
+	 * @param out the out
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
 		out.writeObject(profilePropName);
 	}
 
+	/**
+	 * Read object.
+	 *
+	 * @param in the in
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws ClassNotFoundException the class not found exception
+	 */
 	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
 		int objDataVersion = in.readInt();
 		if (objDataVersion == 1) {
@@ -61,9 +109,23 @@ public abstract class Translation_InboxReviewEscalate extends AbstractTask {
 		}
 	}
 
+	/**
+	 * The listener interface for receiving previousAction events.
+	 * The class that is interested in processing a previousAction
+	 * event implements this interface, and the object created
+	 * with that class is registered with a component using the
+	 * component's <code>addPreviousActionListener<code> method. When
+	 * the previousAction event occurs, that object's appropriate
+	 * method is invoked.
+	 *
+	 * @see PreviousActionEvent
+	 */
 	private class PreviousActionListener implements ActionListener {
 
 		/**
+		 * Action performed.
+		 *
+		 * @param e the e
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
 		public void actionPerformed(ActionEvent e) {
@@ -75,9 +137,23 @@ public abstract class Translation_InboxReviewEscalate extends AbstractTask {
 		}
 	}
 
+	/**
+	 * The listener interface for receiving continueAction events.
+	 * The class that is interested in processing a continueAction
+	 * event implements this interface, and the object created
+	 * with that class is registered with a component using the
+	 * component's <code>addContinueActionListener<code> method. When
+	 * the continueAction event occurs, that object's appropriate
+	 * method is invoked.
+	 *
+	 * @see ContinueActionEvent
+	 */
 	public class ContinueActionListener implements ActionListener {
 
 		/**
+		 * Action performed.
+		 *
+		 * @param e the e
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
 		public void actionPerformed(ActionEvent e) {
@@ -89,9 +165,23 @@ public abstract class Translation_InboxReviewEscalate extends AbstractTask {
 		}
 	}
 
+	/**
+	 * The listener interface for receiving stopAction events.
+	 * The class that is interested in processing a stopAction
+	 * event implements this interface, and the object created
+	 * with that class is registered with a component using the
+	 * component's <code>addStopActionListener<code> method. When
+	 * the stopAction event occurs, that object's appropriate
+	 * method is invoked.
+	 *
+	 * @see StopActionEvent
+	 */
 	public class StopActionListener implements ActionListener {
 
 		/**
+		 * Action performed.
+		 *
+		 * @param e the e
 		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 		 */
 		public void actionPerformed(ActionEvent e) {
@@ -103,6 +193,11 @@ public abstract class Translation_InboxReviewEscalate extends AbstractTask {
 		}
 	}
 
+	/**
+	 * Wait till done.
+	 *
+	 * @param l the l
+	 */
 	protected void waitTillDone(Logger l) {
 		while (!this.isDone()) {
 			try {
@@ -113,10 +208,21 @@ public abstract class Translation_InboxReviewEscalate extends AbstractTask {
 		}
 	}
 
+	/**
+	 * Checks if is done.
+	 *
+	 * @return true, if is done
+	 */
 	public boolean isDone() {
 		return this.done;
 	}
 
+	/**
+	 * Setup previous next or cancel buttons.
+	 *
+	 * @param workflowPanel the workflow panel
+	 * @param c the c
+	 */
 	protected void setupPreviousNextOrCancelButtons(final JPanel workflowPanel, GridBagConstraints c) {
 		c.gridx++;
 		workflowPanel.add(new JLabel("  "), c);
@@ -151,8 +257,19 @@ public abstract class Translation_InboxReviewEscalate extends AbstractTask {
 		workflowPanel.repaint();
 	}
 
+	/**
+	 * Show previous.
+	 *
+	 * @return true, if successful
+	 */
 	protected abstract boolean showPrevious();
 
+	/**
+	 * Restore.
+	 *
+	 * @throws InterruptedException the interrupted exception
+	 * @throws InvocationTargetException the invocation target exception
+	 */
 	protected void restore() throws InterruptedException, InvocationTargetException {
 		if (SwingUtilities.isEventDispatchThread()) {
 			doRun();
@@ -168,6 +285,14 @@ public abstract class Translation_InboxReviewEscalate extends AbstractTask {
 		config.setInboxToggleVisible(inboxButtonVisible);
 	}
 
+	/**
+	 * Sets the up.
+	 *
+	 * @param process the new up
+	 * @throws IntrospectionException the introspection exception
+	 * @throws IllegalAccessException the illegal access exception
+	 * @throws InvocationTargetException the invocation target exception
+	 */
 	protected void setup(I_EncodeBusinessProcess process) throws IntrospectionException, IllegalAccessException,
 	InvocationTargetException {
 		this.done = false;
@@ -192,6 +317,9 @@ public abstract class Translation_InboxReviewEscalate extends AbstractTask {
 	}
 
 	/**
+	 * Gets the conditions.
+	 *
+	 * @return the conditions
 	 * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
 	 */
 	public Collection<Condition> getConditions() {
@@ -201,14 +329,27 @@ public abstract class Translation_InboxReviewEscalate extends AbstractTask {
 		return AbstractTask.CONTINUE_CANCEL;
 	}
 
+	/**
+	 * Gets the profile prop name.
+	 *
+	 * @return the profile prop name
+	 */
 	public String getProfilePropName() {
 		return profilePropName;
 	}
 
+	/**
+	 * Sets the profile prop name.
+	 *
+	 * @param profilePropName the new profile prop name
+	 */
 	public void setProfilePropName(String profilePropName) {
 		this.profilePropName = profilePropName;
 	}
 
+	/**
+	 * Do run.
+	 */
 	private void doRun() {
 		Component[] components = workflowPanel.getComponents();
 		for (int i = 0; i < components.length; i++) {
@@ -224,14 +365,29 @@ public abstract class Translation_InboxReviewEscalate extends AbstractTask {
 		}
 	}
 
+	/**
+	 * Gets the previous image.
+	 *
+	 * @return the previous image
+	 */
 	protected static String getPreviousImage() {
 		return "/16x16/plain/navigate_left.png";
 	}
 
+	/**
+	 * Gets the continue image.
+	 *
+	 * @return the continue image
+	 */
 	protected static String getContinueImage() {
 		return "/16x16/plain/navigate_right.png";
 	}
 
+	/**
+	 * Gets the cancel image.
+	 *
+	 * @return the cancel image
+	 */
 	protected static String getCancelImage() {
 		return "/16x16/plain/navigate_cross.png";
 	}

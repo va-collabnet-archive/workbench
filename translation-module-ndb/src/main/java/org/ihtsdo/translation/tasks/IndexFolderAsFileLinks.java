@@ -37,14 +37,16 @@ import org.dwfa.util.bean.Spec;
 import org.ihtsdo.project.FileLinkAPI;
 
 /**
- * The Class
+ * The Class.
  */
 @BeanList(specs = 
 { @Spec(directory = "tasks/translation tasks", type = BeanType.TASK_BEAN)})
 public class IndexFolderAsFileLinks extends AbstractTask {
 
+	/** The profile prop name. */
 	private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
 
+	/** The folder name. */
 	private String folderName = "sampleProcesess";
 
 	/** The Constant serialVersionUID. */
@@ -126,18 +128,38 @@ public class IndexFolderAsFileLinks extends AbstractTask {
 		return new int[] {  };
 	}
 
+	/**
+	 * Gets the profile prop name.
+	 *
+	 * @return the profile prop name
+	 */
 	public String getProfilePropName() {
 		return profilePropName;
 	}
 
+	/**
+	 * Sets the profile prop name.
+	 *
+	 * @param profilePropName the new profile prop name
+	 */
 	public void setProfilePropName(String profilePropName) {
 		this.profilePropName = profilePropName;
 	}
 
+	/**
+	 * Gets the folder name.
+	 *
+	 * @return the folder name
+	 */
 	public String getFolderName() {
 		return folderName;
 	}
 
+	/**
+	 * Sets the folder name.
+	 *
+	 * @param folderName the new folder name
+	 */
 	public void setFolderName(String folderName) {
 		this.folderName = folderName;
 	}

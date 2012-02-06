@@ -24,6 +24,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.bpa.tasks.editor.AbstractComboEditor;
 
 /**
+ * The Class BooleanStringComboEditor.
  */
 public class BooleanStringComboEditor extends AbstractComboEditor {
 

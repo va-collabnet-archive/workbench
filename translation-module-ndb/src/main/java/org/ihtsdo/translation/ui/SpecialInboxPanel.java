@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Thu Sep 02 18:40:03 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.translation.ui;
@@ -91,39 +104,96 @@ import org.ihtsdo.translation.LanguageUtil;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.InboxColumn;
 
 /**
+ * The Class SpecialInboxPanel.
+ *
  * @author Guillermo Reynoso
  */
 public class SpecialInboxPanel extends JPanel {
 
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -8941067319987416891L;
 
+	/** The Constant CUSTOM_NODE_KEY. */
 	private static final String CUSTOM_NODE_KEY = "CUSTOM_NODE_KEY";
 
+	/** The queue name. */
 	private String queueName;
+	
+	/** The selector. */
 	private I_SelectProcesses selector;
+	
+	/** The revision proc selector. */
 	private SelectRevisionProcess2 revisionProcSelector;
+	
+	/** The worker. */
 	private Worker worker;
+	
+	/** The queue. */
 	private I_QueueProcesses queue;
+	
+	/** The fsn. */
 	private I_GetConceptData fsn;
+	
+	/** The preferred. */
 	private I_GetConceptData preferred;
+	
+	/** The not acceptable. */
 	private I_GetConceptData notAcceptable;
+	
+	/** The inactive. */
 	private I_GetConceptData inactive;
+	
+	/** The retired. */
 	private I_GetConceptData retired;
+	
+	/** The closing. */
 	private boolean closing;
+	
+	/** The en refset. */
 	private I_GetConceptData enRefset;
+	
+	/** The Entry id bean type. */
 	public final String EntryIDBeanType = DataFlavor.javaJVMLocalObjectMimeType + ";class=" + EntryID.class.getName();
+	
+	/** The hash folders. */
 	private HashMap<String, Set<EntryID>> hashFolders;
+	
+	/** The hash all items. */
 	private HashMap<EntryID, QueueTableObj> hashAllItems;
+	
+	/** The c names. */
 	private String[] cNames = { "Source Name", "Status" };
+	
+	/** The col set. */
 	private LinkedHashSet<InboxColumn> colSet;
+	
+	/** The col pos. */
 	private ArrayList<InboxColumn> colPos;
+	
+	/** The l sort keys. */
 	private List<SortKey> lSortKeys;
+	
+	/** The outbox read worker. */
 	private I_Work outboxReadWorker;
+	
+	/** The outbox queue. */
 	private I_QueueProcesses outboxQueue;
+	
+	/** The translation concept viewer1. */
 	TranslationConceptEditorRO translationConceptViewer1;
 
+	/** The formatter. */
 	private SimpleDateFormat formatter;
 
+	/**
+	 * Instantiates a new special inbox panel.
+	 *
+	 * @param worker the worker
+	 * @param userName the user name
+	 * @param selector the selector
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public SpecialInboxPanel(I_Work worker, String userName, I_SelectProcesses selector) throws TerminologyException, IOException {
 
 		initComponents();
@@ -147,6 +217,9 @@ public class SpecialInboxPanel extends JPanel {
 		initCustomComponents();
 	}
 
+	/**
+	 * Inits the custom components.
+	 */
 	private void initCustomComponents() {
 		itemsTable.setAutoCreateRowSorter(true);
 		itemsTable.setShowHorizontalLines(true);
@@ -177,6 +250,9 @@ public class SpecialInboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Refresh items table.
+	 */
 	private void refreshItemsTable() {
 		try {
 			getOutboxItems();
@@ -227,6 +303,12 @@ public class SpecialInboxPanel extends JPanel {
 
 	}
 
+	/**
+	 * Sets the table model data.
+	 *
+	 * @param tableModel the table model
+	 * @param queueTO the queue to
+	 */
 	private void setTableModelData(DefaultTableModel tableModel, List<QueueTableObj> queueTO) {
 		int rowLen = cNames.length;
 		for (QueueTableObj qTO : queueTO) {
@@ -258,6 +340,18 @@ public class SpecialInboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Load queue items.
+	 *
+	 * @throws RemoteException the remote exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TaskFailedException the task failed exception
+	 * @throws InterruptedException the interrupted exception
+	 * @throws PrivilegedActionException the privileged action exception
+	 * @throws ConfigurationException the configuration exception
+	 * @throws LeaseDeniedException the lease denied exception
+	 * @throws TerminologyException the terminology exception
+	 */
 	private void loadQueueItems() throws RemoteException, IOException, TaskFailedException, InterruptedException, PrivilegedActionException, ConfigurationException, LeaseDeniedException,
 			TerminologyException {
 
@@ -349,13 +443,17 @@ public class SpecialInboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * The Class SelectRevisionProcess2.
+	 */
 	class SelectRevisionProcess2 implements I_SelectProcesses {
 
-		/**
-		 * 
-		 */
+		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = 1L;
 
+		/* (non-Javadoc)
+		 * @see org.dwfa.bpa.process.I_SelectProcesses#select(org.dwfa.bpa.process.I_DescribeBusinessProcess)
+		 */
 		@Override
 		public boolean select(I_DescribeBusinessProcess process) {
 			String sub = process.getSubject();
@@ -364,6 +462,9 @@ public class SpecialInboxPanel extends JPanel {
 			return false;
 		}
 
+		/* (non-Javadoc)
+		 * @see org.dwfa.bpa.process.I_SelectObjects#select(org.dwfa.bpa.process.I_DescribeObject)
+		 */
 		@Override
 		public boolean select(I_DescribeObject object) {
 			I_DescribeBusinessProcess objectBP = (I_DescribeBusinessProcess) object;
@@ -375,6 +476,11 @@ public class SpecialInboxPanel extends JPanel {
 
 	}
 
+	/**
+	 * Gets the column headers.
+	 *
+	 * @return the column headers
+	 */
 	private String[] getColumnHeaders() {
 		ConfigTranslationModule cfg = null;
 		try {
@@ -410,6 +516,18 @@ public class SpecialInboxPanel extends JPanel {
 		return cNames;
 	}
 
+	/**
+	 * Gets the outbox items.
+	 *
+	 * @return the outbox items
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TaskFailedException the task failed exception
+	 * @throws LoginException the login exception
+	 * @throws ConfigurationException the configuration exception
+	 * @throws PrivilegedActionException the privileged action exception
+	 * @throws InterruptedException the interrupted exception
+	 */
 	private void getOutboxItems() throws TerminologyException, IOException, TaskFailedException, LoginException, ConfigurationException, PrivilegedActionException, InterruptedException {
 
 		I_ConfigAceFrame config;
@@ -486,6 +604,12 @@ public class SpecialInboxPanel extends JPanel {
 
 	}
 
+	/**
+	 * Adds the entry to worklist folder.
+	 *
+	 * @param worklistName the worklist name
+	 * @param entryID the entry id
+	 */
 	private void addEntryToWorklistFolder(String worklistName, EntryID entryID) {
 		Set<EntryID> foldEntries = null;
 		if (hashFolders.containsKey(worklistName))
@@ -498,6 +622,15 @@ public class SpecialInboxPanel extends JPanel {
 
 	}
 
+	/**
+	 * Gets the project for member.
+	 *
+	 * @param member the member
+	 * @param config the config
+	 * @return the project for member
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	private I_TerminologyProject getProjectForMember(WorkListMember member, I_ConfigAceFrame config) throws TerminologyException, IOException {
 		I_GetConceptData workListConcept = Terms.get().getConcept(member.getWorkListUUID());
 		WorkList workList = TerminologyProjectDAO.getWorkList(workListConcept, config);
@@ -505,6 +638,14 @@ public class SpecialInboxPanel extends JPanel {
 		return project;
 	}
 
+	/**
+	 * Gets the terms.
+	 *
+	 * @param member the member
+	 * @param translationProject the translation project
+	 * @param targetLanguage the target language
+	 * @return the terms
+	 */
 	private String[] getTerms(WorkListMember member, I_TerminologyProject translationProject, boolean targetLanguage) {
 		String[] retString = { "", "" };
 		if (translationProject instanceof TranslationProject) {
@@ -567,11 +708,28 @@ public class SpecialInboxPanel extends JPanel {
 		return retString;
 	}
 
+	/**
+	 * The listener interface for receiving menuItem events.
+	 * The class that is interested in processing a menuItem
+	 * event implements this interface, and the object created
+	 * with that class is registered with a component using the
+	 * component's <code>addMenuItemListener<code> method. When
+	 * the menuItem event occurs, that object's appropriate
+	 * method is invoked.
+	 *
+	 * @see MenuItemEvent
+	 */
 	class MenuItemListener implements ActionListener {
 
+		/** The node. */
 		private QueueTableObj node;
+		
+		/** The folder type. */
 		private String folderType;
 
+		/* (non-Javadoc)
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (node != null) {
@@ -616,6 +774,12 @@ public class SpecialInboxPanel extends JPanel {
 
 		}
 
+		/**
+		 * Sets the item.
+		 *
+		 * @param node the node
+		 * @param folderType the folder type
+		 */
 		public void setItem(QueueTableObj node, String folderType) {
 			this.node = node;
 			this.folderType = folderType;
@@ -623,14 +787,34 @@ public class SpecialInboxPanel extends JPanel {
 
 	}
 
+	/**
+	 * The Class InboxTableMouselistener.
+	 */
 	public class InboxTableMouselistener extends MouseAdapter {
+		
+		/** The table. */
 		private JTable table;
+		
+		/** The menu. */
 		private JPopupMenu menu;
+		
+		/** The m item. */
 		private JMenuItem mItem;
+		
+		/** The m item listener. */
 		private MenuItemListener mItemListener;
+		
+		/** The x point. */
 		private int xPoint;
+		
+		/** The y point. */
 		private int yPoint;
 
+		/**
+		 * Instantiates a new inbox table mouselistener.
+		 *
+		 * @param table the table
+		 */
 		InboxTableMouselistener(JTable table) {
 			this.table = table;
 			menu = new JPopupMenu();
@@ -641,6 +825,9 @@ public class SpecialInboxPanel extends JPanel {
 			menu.add(mItem);
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.event.MouseAdapter#mouseClicked(java.awt.event.MouseEvent)
+		 */
 		@Override
 		public void mouseClicked(MouseEvent e) {
 
@@ -707,8 +894,12 @@ public class SpecialInboxPanel extends JPanel {
 
 	}
 
+	/** The clone list. */
 	List<I_Work> cloneList = new ArrayList<I_Work>();
 
+	/**
+	 * Execute process.
+	 */
 	protected void executeProcess() {
 		Runnable r = new Runnable() {
 
@@ -793,14 +984,23 @@ public class SpecialInboxPanel extends JPanel {
 
 	}
 
+	/**
+	 * The Class ReloadOS.
+	 */
 	public class ReloadOS extends SwingWorker<Boolean> {
 
+		/* (non-Javadoc)
+		 * @see org.dwfa.swing.SwingWorker#construct()
+		 */
 		@Override
 		protected Boolean construct() throws Exception {
 			ObjectServerCore.refreshServers();
 			return true;
 		}
 
+		/* (non-Javadoc)
+		 * @see org.dwfa.swing.SwingWorker#finished()
+		 */
 		@Override
 		protected void finished() {
 			try {
@@ -822,6 +1022,12 @@ public class SpecialInboxPanel extends JPanel {
 
 	}
 
+	/**
+	 * Del entry from status folder.
+	 *
+	 * @param statusFolder the status folder
+	 * @param entryId the entry id
+	 */
 	private void delEntryFromStatusFolder(String statusFolder, EntryID entryId) {
 
 		Set<EntryID> foldEntries = null;
@@ -832,6 +1038,12 @@ public class SpecialInboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Del entry from worklist folder.
+	 *
+	 * @param worklistName the worklist name
+	 * @param entId the ent id
+	 */
 	private void delEntryFromWorklistFolder(String worklistName, EntryID entId) {
 		Set<EntryID> foldEntries = null;
 		if (hashFolders.containsKey(worklistName)) {
@@ -842,6 +1054,12 @@ public class SpecialInboxPanel extends JPanel {
 
 	}
 
+	/**
+	 * Del entry from folders.
+	 *
+	 * @param tagsArray the tags array
+	 * @param entryId the entry id
+	 */
 	private void delEntryFromFolders(Set<String> tagsArray, EntryID entryId) {
 
 		for (String folderKey : tagsArray) {
@@ -855,27 +1073,54 @@ public class SpecialInboxPanel extends JPanel {
 
 	}
 
+	/** The entry id. */
 	private EntryID entryId;
 
+	/**
+	 * Gets the entry id.
+	 *
+	 * @return the entry id
+	 */
 	public EntryID getEntryID() {
 		return entryId;
 	}
 
+	/**
+	 * Sets the entry id.
+	 *
+	 * @param entryId the new entry id
+	 */
 	public void setEntryID(EntryID entryId) {
 		this.entryId = entryId;
 	}
 
+	/** The next entry id. */
 	private EntryID nextEntryId;
 
+	/**
+	 * Gets the next entry id.
+	 *
+	 * @return the next entry id
+	 */
 	public EntryID getNextEntryID() {
 		return nextEntryId;
 	}
 
+	/**
+	 * Sets the next entry id.
+	 *
+	 * @param nextEntryId the new next entry id
+	 */
 	public void setNextEntryID(EntryID nextEntryId) {
 
 		this.nextEntryId = nextEntryId;
 	}
 
+	/**
+	 * Close button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void closeButtonActionPerformed(ActionEvent e) {
 		AceFrameConfig config;
 		try {
@@ -911,6 +1156,11 @@ public class SpecialInboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Label2 mouse clicked.
+	 *
+	 * @param e the e
+	 */
 	private void label2MouseClicked(MouseEvent e) {
 		try {
 			HelpApi.openHelpForComponent("ARCHIVAL_QUEUE");
@@ -921,8 +1171,12 @@ public class SpecialInboxPanel extends JPanel {
 		}
 	}
 
+	/** The process in execution. */
 	private int processInExecution;
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -1002,12 +1256,25 @@ public class SpecialInboxPanel extends JPanel {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
+	/** The container panel. */
 	private JPanel containerPanel;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The close button. */
 	private JButton closeButton;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The items table. */
 	private JTable itemsTable;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 }

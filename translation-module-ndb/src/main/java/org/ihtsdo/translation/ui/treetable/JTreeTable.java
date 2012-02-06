@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.translation.ui.treetable;
 /*
 
@@ -66,14 +82,26 @@ import javax.swing.tree.TreeModel;
  */
 
 public class JTreeTable extends JTable {
+	
+	/** The tree. */
 	protected TreeTableCellRenderer tree;
+	
+	/** The row sorter. */
 	private TableRowSorter rowSorter;
 
+	/**
+	 * Instantiates a new j tree table.
+	 */
 	public JTreeTable(){
 
 //		this.setAutoCreateRowSorter(true);
 	}
 
+	/**
+	 * Instantiates a new j tree table.
+	 *
+	 * @param treeTableModel the tree table model
+	 */
 	public JTreeTable(TreeTableModel treeTableModel) {
 		super();
 		setTreeTableModel( treeTableModel);
@@ -91,7 +119,12 @@ public class JTreeTable extends JTable {
 //		}
 //		
 //	}
-	public void setTreeTableModel(TreeTableModel treeTableModel){
+	/**
+ * Sets the tree table model.
+ *
+ * @param treeTableModel the new tree table model
+ */
+public void setTreeTableModel(TreeTableModel treeTableModel){
 		// Create the tree. It will be used as a renderer and editor. 
 		tree = new TreeTableCellRenderer(treeTableModel); 
 
@@ -126,15 +159,28 @@ public class JTreeTable extends JTable {
 	 * is not the right thing to do for an editor. Returning -1 for the 
 	 * editing row in this case, ensures the editor is never painted. 
 	 */
+	/* (non-Javadoc)
+	 * @see javax.swing.JTable#getEditingRow()
+	 */
 	public int getEditingRow() {
 		return (getColumnClass(editingColumn) == TreeTableModel.class) ? -1 : editingRow;  
 		
 	}
 	
+	/**
+	 * Sets the selected row.
+	 *
+	 * @param row the new selected row
+	 */
 	public void setSelectedRow(int row){
 		tree.setSelectionRow(row);
 	}
 	
+	/**
+	 * Expand row.
+	 *
+	 * @param row the row
+	 */
 	public void expandRow(int row){
 		tree.expandRow(row);
 	}
@@ -143,23 +189,41 @@ public class JTreeTable extends JTable {
 	// The renderer used to display the tree nodes, a JTree.  
 	//
 
+	/**
+	 * The Class TreeTableCellRenderer.
+	 */
 	public class TreeTableCellRenderer extends JTree implements TableCellRenderer {
 
+		/** The visible row. */
 		protected int visibleRow;
 
+		/**
+		 * Instantiates a new tree table cell renderer.
+		 *
+		 * @param model the model
+		 */
 		public TreeTableCellRenderer(TreeModel model) { 
 			super(model); 
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.Component#setBounds(int, int, int, int)
+		 */
 		public void setBounds(int x, int y, int w, int h) {
 			super.setBounds(x, 0, w, JTreeTable.this.getHeight());
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.JComponent#paint(java.awt.Graphics)
+		 */
 		public void paint(Graphics g) {
 			g.translate(0, -visibleRow * getRowHeight());
 			super.paint(g);
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.TableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
+		 */
 		public Component getTableCellRendererComponent(JTable table,
 				Object value,
 				boolean isSelected,
@@ -179,7 +243,14 @@ public class JTreeTable extends JTable {
 	// The editor used to interact with tree nodes, a JTree.  
 	//
 
+	/**
+	 * The Class TreeTableCellEditor.
+	 */
 	public class TreeTableCellEditor extends AbstractCellEditor implements TableCellEditor {
+		
+		/* (non-Javadoc)
+		 * @see javax.swing.table.TableCellEditor#getTableCellEditorComponent(javax.swing.JTable, java.lang.Object, boolean, int, int)
+		 */
 		public Component getTableCellEditorComponent(JTable table, Object value,
 				boolean isSelected, int r, int c) {
 			return tree;

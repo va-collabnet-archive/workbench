@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Fri Jun 18 16:53:24 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.translation.ui.config;
@@ -36,16 +49,33 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.EditingPanelOpenMode;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.EditorMode;
 
 /**
+ * The Class EditorModePanel.
+ *
  * @author Guillermo Reynoso
  */
 public class EditorModePanel extends JPanel{
 
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1653665739753572691L;
+	
+	/** The conf trans. */
 	private ConfigTranslationModule confTrans;
+	
+	/** The group. */
 	final ButtonGroup group = new ButtonGroup();
+	
+	/** The group2. */
 	final ButtonGroup group2 = new ButtonGroup();
+	
+	/** The tf. */
 	I_TermFactory tf = Terms.get();
 
+	/**
+	 * Instantiates a new editor mode panel.
+	 *
+	 * @param config the config
+	 * @param confTrans the conf trans
+	 */
 	public EditorModePanel(I_ConfigAceFrame config, ConfigTranslationModule confTrans){
 		this.confTrans = confTrans;
 		initComponents();
@@ -55,6 +85,9 @@ public class EditorModePanel extends JPanel{
 		} 
 	}
 	
+	/**
+	 * Inits the custom components.
+	 */
 	private void initCustomComponents() {
 		openModeContainer.setEnabled(false);
 		
@@ -197,6 +230,9 @@ public class EditorModePanel extends JPanel{
 		});
 	}
 	
+	/**
+	 * Select current conf button.
+	 */
 	public void selectCurrentConfButton(){
 		if(confTrans != null){
 			Enumeration<AbstractButton> buttons = group.getElements();
@@ -219,6 +255,9 @@ public class EditorModePanel extends JPanel{
 		}
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -286,44 +325,94 @@ public class EditorModePanel extends JPanel{
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
+	/** The config container. */
 	private JPanel configContainer;
+	
+	/** The button container. */
 	private JPanel buttonContainer;
+	
+	/** The apply button. */
 	private JButton applyButton;
+	
+	/** The revert button. */
 	private JButton revertButton;
+	
+	/** The error container. */
 	private JPanel errorContainer;
+	
+	/** The error. */
 	private JLabel error;
+	
+	/** The open mode container. */
 	private JPanel openModeContainer;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 
+	/**
+	 * Sets the buttons enabled.
+	 *
+	 * @param b the new buttons enabled
+	 */
 	private void setButtonsEnabled(boolean b){
 		applyButton.setEnabled(b);
 		revertButton.setEnabled(b);
 	}
 
+	/**
+	 * The Class EditorModeRadioButton.
+	 */
 	private class EditorModeRadioButton extends JRadioButton{
 		
+		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = 6624960715151454927L;
+		
+		/** The editor mode. */
 		private EditorMode editorMode;
 		
+		/**
+		 * Gets the editor mode.
+		 *
+		 * @return the editor mode
+		 */
 		public EditorMode getEditorMode() {
 			return editorMode;
 		}
 		
+		/**
+		 * Sets the editor mode.
+		 *
+		 * @param editorMode the new editor mode
+		 */
 		public void setEditorMode(EditorMode editorMode) {
 			this.editorMode = editorMode;
 		}
 		
 	}
 	
+	/**
+	 * The Class EditingOpenModeRb.
+	 */
 	private class EditingOpenModeRb extends JRadioButton{
+		
+		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = 6424049142919640725L;
 		
+		/** The open mode. */
 		private EditingPanelOpenMode openMode;
 
+		/**
+		 * Gets the open mode.
+		 *
+		 * @return the open mode
+		 */
 		public EditingPanelOpenMode getOpenMode() {
 			return openMode;
 		}
 
+		/**
+		 * Sets the open mode.
+		 *
+		 * @param openMode the new open mode
+		 */
 		public void setOpenMode(EditingPanelOpenMode openMode) {
 			this.openMode = openMode;
 		}

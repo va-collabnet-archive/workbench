@@ -87,8 +87,10 @@ public class PropBasedTransWorkFlowStep3Outputs extends AbstractTask {
 	/** The exit1 label and destination. */
 	private String exit1PropName;
 
+	/** The exit1 label. */
 	private String exit1Label;
 
+	/** The exit1 destination. */
 	private String exit1Destination;
 
 	/** The exit1 next status. */
@@ -97,8 +99,10 @@ public class PropBasedTransWorkFlowStep3Outputs extends AbstractTask {
 	/** The exit2 label and destination. */
 	private String exit2PropName;
 
+	/** The exit2 label. */
 	private String exit2Label;
 
+	/** The exit2 destination. */
 	private String exit2Destination;
 
 	/** The exit2 next status. */
@@ -107,13 +111,16 @@ public class PropBasedTransWorkFlowStep3Outputs extends AbstractTask {
 	/** The exit3 label and destination. */
 	private String exit3PropName;
 
+	/** The exit3 label. */
 	private String exit3Label;
 
+	/** The exit3 destination. */
 	private String exit3Destination;
 
 	/** The exit3 next status. */
 	private TermEntry exit3NextStatus;
 
+	/** The todo status. */
 	private TermEntry todoStatus;
 
 	/** The return condition. */
@@ -140,6 +147,7 @@ public class PropBasedTransWorkFlowStep3Outputs extends AbstractTask {
 	/** The ui panel. */
 	private TranslationConceptEditor6 uiPanel;
 
+	/** The config2. */
 	private I_ConfigAceFrame config2;
 
 	/**
@@ -575,6 +583,17 @@ public class PropBasedTransWorkFlowStep3Outputs extends AbstractTask {
 		}
 	}
 
+	/**
+	 * The listener interface for receiving exit3Action events.
+	 * The class that is interested in processing a exit3Action
+	 * event implements this interface, and the object created
+	 * with that class is registered with a component using the
+	 * component's <code>addExit3ActionListener<code> method. When
+	 * the exit3Action event occurs, that object's appropriate
+	 * method is invoked.
+	 *
+	 * @see Exit3ActionEvent
+	 */
 	private class Exit3ActionListener implements ActionListener {
 
 		/* (non-Javadoc)
@@ -594,6 +613,17 @@ public class PropBasedTransWorkFlowStep3Outputs extends AbstractTask {
 		}
 	}
 
+	/**
+	 * The listener interface for receiving exit4Action events.
+	 * The class that is interested in processing a exit4Action
+	 * event implements this interface, and the object created
+	 * with that class is registered with a component using the
+	 * component's <code>addExit4ActionListener<code> method. When
+	 * the exit4Action event occurs, that object's appropriate
+	 * method is invoked.
+	 *
+	 * @see Exit4ActionEvent
+	 */
 	private class Exit4ActionListener implements ActionListener {
 
 		/* (non-Javadoc)
@@ -610,6 +640,18 @@ public class PropBasedTransWorkFlowStep3Outputs extends AbstractTask {
 			}
 		}
 	}
+	
+	/**
+	 * The listener interface for receiving exit5Action events.
+	 * The class that is interested in processing a exit5Action
+	 * event implements this interface, and the object created
+	 * with that class is registered with a component using the
+	 * component's <code>addExit5ActionListener<code> method. When
+	 * the exit5Action event occurs, that object's appropriate
+	 * method is invoked.
+	 *
+	 * @see Exit5ActionEvent
+	 */
 	private class Exit5ActionListener implements ActionListener {
 
 		/* (non-Javadoc)
@@ -627,8 +669,15 @@ public class PropBasedTransWorkFlowStep3Outputs extends AbstractTask {
 			}
 		}
 	}
+	
+	/**
+	 * The Class ThisAutoKeep.
+	 */
 	public class ThisAutoKeep implements I_KeepTaskInInbox{
 
+		/* (non-Javadoc)
+		 * @see org.ihtsdo.translation.ui.I_KeepTaskInInbox#KeepInInbox()
+		 */
 		public void KeepInInbox(){
 			returnCondition = Condition.STOP;
 			done=true;
@@ -779,106 +828,236 @@ public class PropBasedTransWorkFlowStep3Outputs extends AbstractTask {
 		this.done = done;
 	}
 
+	/**
+	 * Gets the profile prop name.
+	 *
+	 * @return the profile prop name
+	 */
 	public String getProfilePropName() {
 		return profilePropName;
 	}
 
+	/**
+	 * Sets the profile prop name.
+	 *
+	 * @param profilePropName the new profile prop name
+	 */
 	public void setProfilePropName(String profilePropName) {
 		this.profilePropName = profilePropName;
 	}
 
+	/**
+	 * Gets the exit1 prop name.
+	 *
+	 * @return the exit1 prop name
+	 */
 	public String getExit1PropName() {
 		return exit1PropName;
 	}
 
+	/**
+	 * Sets the exit1 prop name.
+	 *
+	 * @param exit1PropName the new exit1 prop name
+	 */
 	public void setExit1PropName(String exit1PropName) {
 		this.exit1PropName = exit1PropName;
 	}
 
+	/**
+	 * Gets the exit2 prop name.
+	 *
+	 * @return the exit2 prop name
+	 */
 	public String getExit2PropName() {
 		return exit2PropName;
 	}
 
+	/**
+	 * Sets the exit2 prop name.
+	 *
+	 * @param exit2PropName the new exit2 prop name
+	 */
 	public void setExit2PropName(String exit2PropName) {
 		this.exit2PropName = exit2PropName;
 	}
 
+	/**
+	 * Gets the work list item prop name.
+	 *
+	 * @return the work list item prop name
+	 */
 	public String getWorkListItemPropName() {
 		return workListItemPropName;
 	}
 
+	/**
+	 * Sets the work list item prop name.
+	 *
+	 * @param workListItemPropName the new work list item prop name
+	 */
 	public void setWorkListItemPropName(String workListItemPropName) {
 		this.workListItemPropName = workListItemPropName;
 	}
 
+	/**
+	 * Gets the exit1 label.
+	 *
+	 * @return the exit1 label
+	 */
 	public String getExit1Label() {
 		return exit1Label;
 	}
 
+	/**
+	 * Sets the exit1 label.
+	 *
+	 * @param exit1Label the new exit1 label
+	 */
 	public void setExit1Label(String exit1Label) {
 		this.exit1Label = exit1Label;
 	}
 
+	/**
+	 * Gets the exit1 destination.
+	 *
+	 * @return the exit1 destination
+	 */
 	public String getExit1Destination() {
 		return exit1Destination;
 	}
 
+	/**
+	 * Sets the exit1 destination.
+	 *
+	 * @param exit1Destination the new exit1 destination
+	 */
 	public void setExit1Destination(String exit1Destination) {
 		this.exit1Destination = exit1Destination;
 	}
 
+	/**
+	 * Gets the exit2 label.
+	 *
+	 * @return the exit2 label
+	 */
 	public String getExit2Label() {
 		return exit2Label;
 	}
 
+	/**
+	 * Sets the exit2 label.
+	 *
+	 * @param exit2Label the new exit2 label
+	 */
 	public void setExit2Label(String exit2Label) {
 		this.exit2Label = exit2Label;
 	}
 
+	/**
+	 * Gets the exit2 destination.
+	 *
+	 * @return the exit2 destination
+	 */
 	public String getExit2Destination() {
 		return exit2Destination;
 	}
 
+	/**
+	 * Sets the exit2 destination.
+	 *
+	 * @param exit2Destination the new exit2 destination
+	 */
 	public void setExit2Destination(String exit2Destination) {
 		this.exit2Destination = exit2Destination;
 	}
 
+	/**
+	 * Gets the exit3 prop name.
+	 *
+	 * @return the exit3 prop name
+	 */
 	public String getExit3PropName() {
 		return exit3PropName;
 	}
 
+	/**
+	 * Sets the exit3 prop name.
+	 *
+	 * @param exit3PropName the new exit3 prop name
+	 */
 	public void setExit3PropName(String exit3PropName) {
 		this.exit3PropName = exit3PropName;
 	}
 
+	/**
+	 * Gets the exit3 label.
+	 *
+	 * @return the exit3 label
+	 */
 	public String getExit3Label() {
 		return exit3Label;
 	}
 
+	/**
+	 * Sets the exit3 label.
+	 *
+	 * @param exit3Label the new exit3 label
+	 */
 	public void setExit3Label(String exit3Label) {
 		this.exit3Label = exit3Label;
 	}
 
+	/**
+	 * Gets the exit3 destination.
+	 *
+	 * @return the exit3 destination
+	 */
 	public String getExit3Destination() {
 		return exit3Destination;
 	}
 
+	/**
+	 * Sets the exit3 destination.
+	 *
+	 * @param exit3Destination the new exit3 destination
+	 */
 	public void setExit3Destination(String exit3Destination) {
 		this.exit3Destination = exit3Destination;
 	}
 
+	/**
+	 * Gets the exit3 next status.
+	 *
+	 * @return the exit3 next status
+	 */
 	public TermEntry getExit3NextStatus() {
 		return exit3NextStatus;
 	}
 
+	/**
+	 * Sets the exit3 next status.
+	 *
+	 * @param exit3NextStatus the new exit3 next status
+	 */
 	public void setExit3NextStatus(TermEntry exit3NextStatus) {
 		this.exit3NextStatus = exit3NextStatus;
 	}
 
+	/**
+	 * Gets the todo status.
+	 *
+	 * @return the todo status
+	 */
 	public TermEntry getTodoStatus() {
 		return todoStatus;
 	}
 
+	/**
+	 * Sets the todo status.
+	 *
+	 * @param todoStatus the new todo status
+	 */
 	public void setTodoStatus(TermEntry todoStatus) {
 		this.todoStatus = todoStatus;
 	}

@@ -44,11 +44,12 @@ import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.TranslationProject;
 
 /**
- * The Class
+ * The Class.
  */
 @BeanList(specs = { @Spec(directory = "tasks/translation tasks", type = BeanType.TASK_BEAN) })
 public class CreateIssueForInternationalEdition extends AbstractTask {
 
+	/** The profile prop name. */
 	private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE
 			.getAttachmentKey();
 
@@ -217,10 +218,20 @@ public class CreateIssueForInternationalEdition extends AbstractTask {
 		return new int[] {};
 	}
 
+	/**
+	 * Gets the profile prop name.
+	 *
+	 * @return the profile prop name
+	 */
 	public String getProfilePropName() {
 		return profilePropName;
 	}
 
+	/**
+	 * Sets the profile prop name.
+	 *
+	 * @param profilePropName the new profile prop name
+	 */
 	public void setProfilePropName(String profilePropName) {
 		this.profilePropName = profilePropName;
 	}

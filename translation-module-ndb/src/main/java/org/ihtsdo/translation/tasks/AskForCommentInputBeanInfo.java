@@ -25,6 +25,9 @@ import java.beans.SimpleBeanInfo;
  */
 public class AskForCommentInputBeanInfo extends SimpleBeanInfo {
 
+	/**
+	 * Instantiates a new ask for comment input bean info.
+	 */
 	public AskForCommentInputBeanInfo() {
 		super();
 	}

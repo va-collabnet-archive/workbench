@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Mon Jul 19 19:45:14 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.translation.ui.config;
@@ -40,20 +53,38 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.EditorMode;
 
 /**
+ * The Class TranslatorDefaultEditorModePanel.
+ *
  * @author Guillermo Reynoso
  */
 public class TranslatorDefaultEditorModePanel extends JPanel {
 
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -1739339632756238461L;
 
+	/** The config. */
 	private I_ConfigAceFrame config;
+	
+	/** The conf trans. */
 	private ConfigTranslationModule confTrans;
+	
+	/** The current role configuration. */
 	HashMap<UUID, EditorMode> currentRoleConfiguration;
+	
+	/** The role concepts. */
 	Set<I_GetConceptData> roleConcepts = new HashSet<I_GetConceptData>();
+	
+	/** The edit modes. */
 	EditorMode[] editModes = EditorMode.values();
 
 	// private boolean translatorDefaultEditorModePanel;
 
+	/**
+	 * Instantiates a new translator default editor mode panel.
+	 *
+	 * @param config the config
+	 * @param confTrans the conf trans
+	 */
 	public TranslatorDefaultEditorModePanel(I_ConfigAceFrame config, ConfigTranslationModule confTrans) {
 		try {
 			this.config = config;
@@ -78,6 +109,11 @@ public class TranslatorDefaultEditorModePanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Inits the custom components.
+	 *
+	 * @throws TerminologyException the terminology exception
+	 */
 	private void initCustomComponents() throws TerminologyException {
 		try {
 			// Current role configuration
@@ -167,6 +203,9 @@ public class TranslatorDefaultEditorModePanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Revert selections.
+	 */
 	protected void revertSelections() {
 		List<JComboBox> comboBoxes = getCombos(container);
 		for (JComboBox comboBox : comboBoxes) {
@@ -179,6 +218,12 @@ public class TranslatorDefaultEditorModePanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Gets the combos.
+	 *
+	 * @param panel the panel
+	 * @return the combos
+	 */
 	private List<JComboBox> getCombos(JPanel panel) {
 		List<JComboBox> result = new ArrayList<JComboBox>();
 		Component[] components = panel.getComponents();
@@ -192,6 +237,9 @@ public class TranslatorDefaultEditorModePanel extends JPanel {
 		return result;
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -247,11 +295,22 @@ public class TranslatorDefaultEditorModePanel extends JPanel {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
+	/** The container. */
 	private JPanel container;
+	
+	/** The error container. */
 	private JPanel errorContainer;
+	
+	/** The error label. */
 	private JLabel errorLabel;
+	
+	/** The button container. */
 	private JPanel buttonContainer;
+	
+	/** The apply button. */
 	private JButton applyButton;
+	
+	/** The revert button. */
 	private JButton revertButton;
 
 	// JFormDesigner - End of variables declaration //GEN-END:variables
@@ -260,10 +319,10 @@ public class TranslatorDefaultEditorModePanel extends JPanel {
 	 * Calculates a set of valid users - a user is valid is they are a child of
 	 * the User concept in the top hierarchy, and have a description of type
 	 * "user inbox".
-	 * 
+	 *
 	 * @return The set of valid users.
-	 * @throws IOException 
-	 * @throws TerminologyException 
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	public static Set<I_GetConceptData> getTranslationRoles() throws TerminologyException, IOException {
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
@@ -283,31 +342,67 @@ public class TranslatorDefaultEditorModePanel extends JPanel {
 		return validRoles;
 	}
 
+	/**
+	 * The Class ComboItem.
+	 */
 	class ComboItem {
+		
+		/** The editor mode. */
 		private EditorMode editorMode;
+		
+		/** The uuid. */
 		private UUID uuid;
 
+		/**
+		 * Instantiates a new combo item.
+		 *
+		 * @param editorMode the editor mode
+		 * @param uuid the uuid
+		 */
 		ComboItem(EditorMode editorMode, UUID uuid) {
 			this.setEditorMode(editorMode);
 			this.uuid = uuid;
 		}
 
+		/**
+		 * Gets the uuid.
+		 *
+		 * @return the uuid
+		 */
 		public UUID getUuid() {
 			return uuid;
 		}
 
+		/**
+		 * Sets the uuid.
+		 *
+		 * @param uuid the new uuid
+		 */
 		public void setUuid(UUID uuid) {
 			this.uuid = uuid;
 		}
 
+		/**
+		 * Sets the editor mode.
+		 *
+		 * @param editorMode the new editor mode
+		 */
 		public void setEditorMode(EditorMode editorMode) {
 			this.editorMode = editorMode;
 		}
 
+		/**
+		 * Gets the editor mode.
+		 *
+		 * @return the editor mode
+		 */
 		public EditorMode getEditorMode() {
 			return editorMode;
 		}
 
+		/* (non-Javadoc)
+		 * @see java.lang.Object#toString()
+		 */
 		@Override
 		public String toString() {
 			if(editorMode != null){

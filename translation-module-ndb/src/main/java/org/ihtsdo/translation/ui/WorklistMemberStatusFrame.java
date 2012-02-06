@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Mon Oct 25 14:43:45 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.translation.ui;
@@ -20,12 +33,25 @@ import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.panel.details.WorklistMemberStatusPanel;
 
 /**
+ * The Class WorklistMemberStatusFrame.
+ *
  * @author Guillermo Reynoso
  */
 public class WorklistMemberStatusFrame extends JFrame {
+	
+	/**
+	 * Instantiates a new worklist member status frame.
+	 */
 	public WorklistMemberStatusFrame() {
 		initComponents();
 	}
+	
+	/**
+	 * Instantiates a new worklist member status frame.
+	 *
+	 * @param workList the work list
+	 * @param config the config
+	 */
 	public WorklistMemberStatusFrame(WorkList workList, I_ConfigAceFrame config) {
 		initComponents();
 
@@ -51,6 +77,9 @@ public class WorklistMemberStatusFrame extends JFrame {
 		SwingUtilities.updateComponentTreeUI(worklistMemberStatusPanel1);
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 

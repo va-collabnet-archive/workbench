@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.translation.ui;
 
 import java.awt.Component;
@@ -25,13 +41,29 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableRowSorter;
 
+/**
+ * The Class TableFilterDemo.
+ */
 public class TableFilterDemo extends JPanel {
+	
+	/** The DEBUG. */
 	private boolean DEBUG = false;
+	
+	/** The table. */
 	private JTable table;
+	
+	/** The filter text. */
 	private JTextField filterText;
+	
+	/** The status text. */
 	private JTextField statusText;
+	
+	/** The sorter. */
 	private TableRowSorter<MyTableModel> sorter;
 
+	/**
+	 * Instantiates a new table filter demo.
+	 */
 	public TableFilterDemo() {
 		super();
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -121,24 +153,43 @@ public class TableFilterDemo extends JPanel {
 		sorter.setRowFilter(rf2);
 	}
 
+	/**
+	 * The Class MyTableModel.
+	 */
 	class MyTableModel extends AbstractTableModel {
+		
+		/** The column names. */
 		private String[] columnNames = { "First Name", "Last Name", "Sport", "# of Years", "Vegetarian" };
+		
+		/** The data. */
 		private Object[][] data = { { "Mary", "Campione", "Snowboarding", new Integer(5), new Boolean(false) }, { "Alison", "Huml", "Rowing", new Integer(3), new Boolean(true) },
 				{ "Kathy", "Walrath", "Knitting", new Integer(2), new Boolean(false) }, { "Sharon", "Zakhour", "Speed reading", new Integer(20), new Boolean(true) },
 				{ "Philip", "Milne", "Pool", new Integer(10), new Boolean(false) }, };
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.TableModel#getColumnCount()
+		 */
 		public int getColumnCount() {
 			return columnNames.length;
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.TableModel#getRowCount()
+		 */
 		public int getRowCount() {
 			return data.length;
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.AbstractTableModel#getColumnName(int)
+		 */
 		public String getColumnName(int col) {
 			return columnNames[col];
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.TableModel#getValueAt(int, int)
+		 */
 		public Object getValueAt(int row, int col) {
 			return data[row][col];
 		}
@@ -148,12 +199,18 @@ public class TableFilterDemo extends JPanel {
 		 * each cell. If we didn't implement this method, then the last column
 		 * would contain text ("true"/"false"), rather than a check box.
 		 */
+		/* (non-Javadoc)
+		 * @see javax.swing.table.AbstractTableModel#getColumnClass(int)
+		 */
 		public Class getColumnClass(int c) {
 			return getValueAt(0, c).getClass();
 		}
 
 		/*
 		 * Don't need to implement this method unless your table's editable.
+		 */
+		/* (non-Javadoc)
+		 * @see javax.swing.table.AbstractTableModel#isCellEditable(int, int)
 		 */
 		public boolean isCellEditable(int row, int col) {
 			// Note that the data/cell address is constant,
@@ -169,6 +226,9 @@ public class TableFilterDemo extends JPanel {
 		 * Don't need to implement this method unless your table's data can
 		 * change.
 		 */
+		/* (non-Javadoc)
+		 * @see javax.swing.table.AbstractTableModel#setValueAt(java.lang.Object, int, int)
+		 */
 		public void setValueAt(Object value, int row, int col) {
 			if (DEBUG) {
 				System.out.println("Setting value at " + row + "," + col + " to " + value + " (an instance of " + value.getClass() + ")");
@@ -183,6 +243,9 @@ public class TableFilterDemo extends JPanel {
 			}
 		}
 
+		/**
+		 * Prints the debug data.
+		 */
 		private void printDebugData() {
 			int numRows = getRowCount();
 			int numCols = getColumnCount();
@@ -217,6 +280,11 @@ public class TableFilterDemo extends JPanel {
 		frame.setVisible(true);
 	}
 
+	/**
+	 * The main method.
+	 *
+	 * @param args the arguments
+	 */
 	public static void main(String[] args) {
 		// Schedule a job for the event-dispatching thread:
 		// creating and showing this application's GUI.

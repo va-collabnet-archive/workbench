@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Mon Jun 28 22:22:36 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.translation.ui.config;
@@ -34,16 +47,31 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.IcsGenerationStrategy;
 
 /**
+ * The Class IcsGenerationStrategyPanel.
+ *
  * @author Guillermo Reynoso
  */
 public class IcsGenerationStrategyPanel extends JPanel {
 	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 8383288501373765842L;
+	
+	/** The conf trans. */
 	private ConfigTranslationModule confTrans;
+	
+	/** The group. */
 	final ButtonGroup group = new ButtonGroup();
+	
+	/** The tf. */
 	I_TermFactory tf = Terms.get();
 	//private boolean icsGenStrategyPermission;
 	
+	/**
+	 * Instantiates a new ics generation strategy panel.
+	 *
+	 * @param config the config
+	 * @param confTrans2 the conf trans2
+	 */
 	public IcsGenerationStrategyPanel(I_ConfigAceFrame config, ConfigTranslationModule confTrans2) {
 		super();
 		initComponents();
@@ -72,6 +100,9 @@ public class IcsGenerationStrategyPanel extends JPanel {
 //		}
 	}
 
+	/**
+	 * Inits the custom components.
+	 */
 	private void initCustomComponents() {
 		this.setBorder(new EmptyBorder(new Insets(5, 5, 0, 5)));
 		configContainer.setBorder(new BevelBorder(BevelBorder.LOWERED));
@@ -143,6 +174,9 @@ public class IcsGenerationStrategyPanel extends JPanel {
 		});
 	}
 	
+	/**
+	 * Select current conf button.
+	 */
 	public void selectCurrentConfButton(){
 		Enumeration<AbstractButton> buttons = group.getElements();
 		if(confTrans != null){
@@ -155,6 +189,9 @@ public class IcsGenerationStrategyPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT
 		  //GEN-BEGIN:initComponents
@@ -208,28 +245,60 @@ public class IcsGenerationStrategyPanel extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The button panel. */
 	private JPanel buttonPanel;
+	
+	/** The apply button. */
 	private JButton applyButton;
+	
+	/** The revert button. */
 	private JButton revertButton;
+	
+	/** The config container. */
 	private JPanel configContainer;
+	
+	/** The error container. */
 	private JPanel errorContainer;
+	
+	/** The error. */
 	private JLabel error;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 	
+	/**
+	 * Sets the buttons enabled.
+	 *
+	 * @param b the new buttons enabled
+	 */
 	private void setButtonsEnabled(boolean b){
 		applyButton.setEnabled(b);
 		revertButton.setEnabled(b);
 	}
 	
+	/**
+	 * The Class IcsGenerationStrategyRadioButton.
+	 */
 	private class IcsGenerationStrategyRadioButton extends JRadioButton{
 		
+		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = -4031344696119564880L;
+		
+		/** The ics generation strategy. */
 		private IcsGenerationStrategy icsGenerationStrategy;
 		
+		/**
+		 * Gets the ics generation strategy.
+		 *
+		 * @return the ics generation strategy
+		 */
 		public IcsGenerationStrategy getIcsGenerationStrategy() {
 			return icsGenerationStrategy;
 		}
 		
+		/**
+		 * Sets the ics generation strategy.
+		 *
+		 * @param icsGenerationStrategy the new ics generation strategy
+		 */
 		public void setIcsGenerationStrategy(IcsGenerationStrategy icsGenerationStrategy) {
 			this.icsGenerationStrategy = icsGenerationStrategy;
 		}

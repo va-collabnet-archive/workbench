@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.translation.tasks;
 
 import java.util.List;
@@ -11,18 +27,55 @@ import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.Terms;
 import org.ihtsdo.project.ContextualizedDescription;
 
+/**
+ * The Class PutsDescriptionsInLanguageRefset.
+ */
 public class PutsDescriptionsInLanguageRefset implements I_ProcessConcepts {
+	
+	/** The snomed root. */
 	I_GetConceptData snomedRoot;
+	
+	/** The config. */
 	I_ConfigAceFrame config;
+	
+	/** The isa type. */
 	I_IntSet isaType;
+	
+	/** The english language refset concept. */
 	I_GetConceptData englishLanguageRefsetConcept;
+	
+	/** The spanish language refset concept. */
 	I_GetConceptData spanishLanguageRefsetConcept;
+	
+	/** The swedish language refset concept. */
 	I_GetConceptData swedishLanguageRefsetConcept;
+	
+	/** The preferred. */
 	I_GetConceptData preferred;
+	
+	/** The acceptable. */
 	I_GetConceptData acceptable;
+	
+	/** The fsn. */
 	I_GetConceptData fsn;
+	
+	/** The synonym. */
 	I_GetConceptData synonym;
 
+	/**
+	 * Instantiates a new puts descriptions in language refset.
+	 *
+	 * @param snomedRoot the snomed root
+	 * @param config the config
+	 * @param isaType the isa type
+	 * @param englishLanguageRefsetConcept the english language refset concept
+	 * @param spanishLanguageRefsetConcept the spanish language refset concept
+	 * @param swedishLanguageRefsetConcept the swedish language refset concept
+	 * @param preferred the preferred
+	 * @param acceptable the acceptable
+	 * @param fsn the fsn
+	 * @param synonym the synonym
+	 */
 	public PutsDescriptionsInLanguageRefset(I_GetConceptData snomedRoot, I_ConfigAceFrame config, 
 			I_IntSet isaType, I_GetConceptData englishLanguageRefsetConcept,
 			I_GetConceptData spanishLanguageRefsetConcept,I_GetConceptData swedishLanguageRefsetConcept,
@@ -41,6 +94,18 @@ public class PutsDescriptionsInLanguageRefset implements I_ProcessConcepts {
 		this.synonym = synonym;
 	}
 
+	/**
+	 * Instantiates a new puts descriptions in language refset.
+	 *
+	 * @param snomedRoot the snomed root
+	 * @param config the config
+	 * @param isaType the isa type
+	 * @param englishLanguageRefsetConcept the english language refset concept
+	 * @param preferred the preferred
+	 * @param acceptable the acceptable
+	 * @param fsn the fsn
+	 * @param synonym the synonym
+	 */
 	public PutsDescriptionsInLanguageRefset(I_GetConceptData snomedRoot,
 			I_ConfigAceFrame config, I_IntSet isaType,
 			I_GetConceptData englishLanguageRefsetConcept,
@@ -59,6 +124,9 @@ public class PutsDescriptionsInLanguageRefset implements I_ProcessConcepts {
 		this.synonym = synonym;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.api.I_ProcessConcepts#processConcept(org.dwfa.ace.api.I_GetConceptData)
+	 */
 	@Override
 	public void processConcept(I_GetConceptData loopConcept) throws Exception {
 		//System.out.println(loopConcept.toString());

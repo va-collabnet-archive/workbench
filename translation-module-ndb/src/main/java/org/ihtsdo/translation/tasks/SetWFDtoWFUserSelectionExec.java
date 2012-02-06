@@ -43,13 +43,16 @@ import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
 
 /**
- * The Class
+ * The Class.
  */
 @BeanList(specs = 
 { @Spec(directory = "tasks/translation tasks", type = BeanType.TASK_BEAN)})
 public class SetWFDtoWFUserSelectionExec extends AbstractTask {
 
+	/** The profile prop name. */
 	private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
+	
+	/** The member prop name. */
 	private String memberPropName = ProcessAttachmentKeys.WORKLIST_MEMBER.getAttachmentKey();
 
 
@@ -162,18 +165,38 @@ public class SetWFDtoWFUserSelectionExec extends AbstractTask {
 		return new int[] {  };
 	}
 
+	/**
+	 * Gets the profile prop name.
+	 *
+	 * @return the profile prop name
+	 */
 	public String getProfilePropName() {
 		return profilePropName;
 	}
 
+	/**
+	 * Sets the profile prop name.
+	 *
+	 * @param profilePropName the new profile prop name
+	 */
 	public void setProfilePropName(String profilePropName) {
 		this.profilePropName = profilePropName;
 	}
 
+	/**
+	 * Gets the member prop name.
+	 *
+	 * @return the member prop name
+	 */
 	public String getMemberPropName() {
 		return memberPropName;
 	}
 
+	/**
+	 * Sets the member prop name.
+	 *
+	 * @param memberPropName the new member prop name
+	 */
 	public void setMemberPropName(String memberPropName) {
 		this.memberPropName = memberPropName;
 	}

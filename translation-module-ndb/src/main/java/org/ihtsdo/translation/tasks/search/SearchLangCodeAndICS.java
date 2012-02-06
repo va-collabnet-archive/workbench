@@ -47,6 +47,7 @@ public class SearchLangCodeAndICS extends AbstractSearchTest {
     /** The language code. */
     private String languageCode = "en";
     
+    /** The ics. */
     private String ics = "false";
 
     /**
@@ -136,10 +137,20 @@ public class SearchLangCodeAndICS extends AbstractSearchTest {
 		this.languageCode = languageCode;
 	}
 
+	/**
+	 * Gets the ics.
+	 *
+	 * @return the ics
+	 */
 	public String getIcs() {
 		return ics;
 	}
 
+	/**
+	 * Sets the ics.
+	 *
+	 * @param ics the new ics
+	 */
 	public void setIcs(String ics) {
 		this.ics = ics;
 	}

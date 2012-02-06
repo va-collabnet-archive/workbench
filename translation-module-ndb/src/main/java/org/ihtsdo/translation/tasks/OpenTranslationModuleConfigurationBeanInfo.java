@@ -28,6 +28,9 @@ import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
  */
 public class OpenTranslationModuleConfigurationBeanInfo extends SimpleBeanInfo {
 
+    /**
+     * Instantiates a new open translation module configuration bean info.
+     */
     public OpenTranslationModuleConfigurationBeanInfo() {
         super();
     }

@@ -118,39 +118,84 @@ import org.ihtsdo.translation.LanguageUtil;
 import org.ihtsdo.translation.SimilarityMatchedItem;
 import org.ihtsdo.translation.TreeEditorObjectWrapper;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
+ 
+ /**
+  * The Class TranslationConceptEditor5.
+  */
  public class TranslationConceptEditor5 extends JPanel {
 
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
+	
+	/** The Constant HEADER_SEPARATOR. */
 	private static final String HEADER_SEPARATOR = " // ";
+	
+	/** The Constant COMMENT_HEADER_SEP. */
 	private static final String COMMENT_HEADER_SEP = ": -";
+	
+	/** The translation project. */
 	private TranslationProject translationProject;
+	
+	/** The synonym. */
 	private I_GetConceptData synonym;
+	
+	/** The fsn. */
 	private I_GetConceptData fsn;
+	
+	/** The preferred. */
 	private I_GetConceptData preferred;
+	
+	/** The source ids. */
 	private List<Integer> sourceIds;
+	
+	/** The target id. */
 	private int targetId;
+	
+	/** The not acceptable. */
 	private I_GetConceptData notAcceptable;
+	
+	/** The acceptable. */
 	private I_GetConceptData acceptable;
+	
+	/** The current. */
 	private I_GetConceptData current;
+	
+	/** The source lang refsets. */
 	private Set<LanguageMembershipRefset> sourceLangRefsets;
+	
+	/** The target lang refset. */
 	private LanguageMembershipRefset targetLangRefset;
+	
+	/** The formatter. */
 	private SimpleDateFormat formatter;
+	
+	/** The description. */
 	private I_GetConceptData description;
+	
+	/** The inactive. */
 	private I_GetConceptData inactive;
+	
+	/** The active. */
 	private I_GetConceptData active;
+	
+	/** The retired. */
 	private I_GetConceptData retired;
+	
+	/** The issue list panel. */
 	private IssuesListPanel2 issueListPanel;
+	
+	/** The transl config. */
 	private ConfigTranslationModule translConfig;
+	
+	/** The assigned mnemo. */
 	private String assignedMnemo;
+	
+	/** The read only mode. */
 	private boolean readOnlyMode;
+	
 	/**
 	 * Instantiates a new translation concept editor.
-	 * 
-	 * @param concept the concept
-	 * @param config the config
-	 * @param sourceLangCode the source lang code
-	 * @param targetLangCode the target lang code
+	 *
 	 */
 	public TranslationConceptEditor5() {
 		sourceIds=new ArrayList<Integer>();
@@ -290,34 +335,87 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 
 	}
 
+	/**
+	 * The Enum TableSourceColumn.
+	 */
 	enum TableSourceColumn{
-		  LANGUAGE("Language"), TERM_TYPE("Term type"), ACCEPTABILITY("Acceptability"), ICS("ICS"),TERM("Term");
+		  
+  		/** The LANGUAGE. */
+  		LANGUAGE("Language"), 
+ /** The TER m_ type. */
+ TERM_TYPE("Term type"), 
+ /** The ACCEPTABILITY. */
+ ACCEPTABILITY("Acceptability"), 
+ /** The ICS. */
+ ICS("ICS"),
+/** The TERM. */
+TERM("Term");
 
+		/** The column name. */
 		private final String columnName;
 	
+		/**
+		 * Instantiates a new table source column.
+		 *
+		 * @param name the name
+		 */
 		private TableSourceColumn(String name) {
 			this.columnName = name;
 		}
 	
+		/**
+		 * Gets the column name.
+		 *
+		 * @return the column name
+		 */
 		public String getColumnName() {
 			return this.columnName;
 		}
 	}
 
+	/**
+	 * The Enum TableTargetColumn.
+	 */
 	enum TableTargetColumn{
-		 LANGUAGE("Language"), TERM_TYPE("Term type"), ACCEPTABILITY("Acceptability"), ICS("ICS"),TERM("Term");
+		 
+ 		/** The LANGUAGE. */
+ 		LANGUAGE("Language"), 
+ /** The TER m_ type. */
+ TERM_TYPE("Term type"), 
+ /** The ACCEPTABILITY. */
+ ACCEPTABILITY("Acceptability"), 
+ /** The ICS. */
+ ICS("ICS"),
+/** The TERM. */
+TERM("Term");
 
+		/** The column name. */
 		private final String columnName;
 	
+		/**
+		 * Instantiates a new table target column.
+		 *
+		 * @param name the name
+		 */
 		private TableTargetColumn(String name) {
 			this.columnName = name;
 		}
 	
+		/**
+		 * Gets the column name.
+		 *
+		 * @return the column name
+		 */
 		public String getColumnName() {
 			return this.columnName;
 		}
 	}
 
+	/**
+	 * Search button action preformed.
+	 *
+	 * @param e the e
+	 */
 	private void searchButtonActionPreformed(ActionEvent e){
 		String query = searchTextField.getText();
 		if(!query.trim().equals("")){
@@ -325,6 +423,11 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 		}
 	}
 	
+	/**
+	 * Gets the translation project config.
+	 *
+	 * @return the translation project config
+	 */
 	private ConfigTranslationModule getTranslationProjectConfig(){
 		ConfigTranslationModule translProjConfig=null;
 		if (this.translationProject!=null)
@@ -340,14 +443,24 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 		return translProjConfig;
 	}
 
+	/**
+	 * Sets the mnemo init.
+	 */
 	private void setMnemoInit(){
 		assignedMnemo="FPDHIAVUMGOL";
 	}
 
+	/**
+	 * Unload data.
+	 */
 	public void unloadData(){
 		verifySavePending();
 		clearForm(true);
 	}
+	
+	/**
+	 * Verify save pending.
+	 */
 	private void verifySavePending() {
 		boolean bPendTerm=false;
 		if (descriptionInEditor!=null ){
@@ -387,6 +500,11 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 
 	}
 	
+	/**
+	 * Sets the read only mode.
+	 *
+	 * @param readOnly the new read only mode
+	 */
 	private void setReadOnlyMode(boolean readOnly){
 		this.readOnlyMode=readOnly;
 		textField1.setEnabled(!readOnly);
@@ -404,8 +522,11 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 		rbInact.setEnabled(!readOnly);
 
 	}
+	
 	/**
 	 * Clear form.
+	 *
+	 * @param clearAll the clear all
 	 */
 	synchronized
 	private void clearForm(boolean clearAll){
@@ -500,8 +621,7 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 
 	/**
 	 * Spellcheck action performed.
-	 * 
-	 * @param e the e
+	 *
 	 */
 	private void mSpellChkActionPerformed() {
 		AceFrameConfig config;
@@ -516,6 +636,9 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 
 	}
 
+	/**
+	 * M close action performed.
+	 */
 	private void mCloseActionPerformed() {
 		AceFrameConfig config;
 		try {
@@ -540,6 +663,9 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 		}
 	}
 
+	/**
+	 * M add pref action performed.
+	 */
 	private void mAddPrefActionPerformed() {
 		descriptionInEditor = null;
 		//		label4.setText("");
@@ -560,6 +686,9 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 		rbInact.setEnabled(true);
 	}
 
+	/**
+	 * M add desc action performed.
+	 */
 	private void mAddDescActionPerformed() {
 		descriptionInEditor = null;
 		//		label4.setText("");
@@ -582,6 +711,9 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 
 
 
+	/**
+	 * B keep action performed.
+	 */
 	private void bKeepActionPerformed() {
 		clearForm(true);
 
@@ -593,31 +725,57 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 		mClose.setEnabled(true);
 	}
 
+	/**
+	 * B review action performed.
+	 */
 	private void bReviewActionPerformed() {
 		//		clearAndRemove();
 	}
 
 
 
+	/**
+	 * B escalate action performed.
+	 */
 	private void bEscalateActionPerformed() {
 		//		clearAndRemove();
 	}
 
+	/**
+	 * Rb fsn action performed.
+	 *
+	 * @param e the e
+	 */
 	private void rbFSNActionPerformed(ActionEvent e) {
 		updateSimilarityTable(sourceFSN);
 		searchTextField.setText(sourceFSN);
 	}
 
+	/**
+	 * Rb pref action performed.
+	 *
+	 * @param e the e
+	 */
 	private void rbPrefActionPerformed(ActionEvent e) {
 		updateSimilarityTable(sourceFSN);
 		searchTextField.setText(sourceFSN);
 	}
 
+	/**
+	 * Radio button2 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void radioButton2ActionPerformed(ActionEvent e) {
 		updateSimilarityTable(sourceFSN);
 		searchTextField.setText(sourceFSN);
 	}
 
+	/**
+	 * Save comment.
+	 *
+	 * @param comment the comment
+	 */
 	private void saveComment(String comment) {
 		I_ConfigAceFrame config=null ;
 		try {
@@ -648,6 +806,9 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 		}
 	}
 
+	/**
+	 * Save desc action performed.
+	 */
 	private void saveDescActionPerformed() {
 
 		I_ConfigAceFrame config=null ;	
@@ -721,10 +882,16 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 		}
 	}
 
+	/**
+	 * This ancestor removed.
+	 */
 	private void thisAncestorRemoved() {
 		verifySavePending();
 	}
 
+	/**
+	 * M hist action performed.
+	 */
 	private void mHistActionPerformed() {
 		org.ihtsdo.project.panel.TranslationHelperPanel thp;
 		try {
@@ -770,10 +937,16 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 		}
 	}
 
+	/**
+	 * B add coment action performed.
+	 */
 	private void bAddComentActionPerformed() {
 		showNewCommentPanel();
 	}
 
+	/**
+	 * Show new comment panel.
+	 */
 	public void showNewCommentPanel() {
 
 		NewCommentPanel cPanel;
@@ -815,6 +988,11 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 	
 	
 
+	/**
+	 * Ref table hyperlink update.
+	 *
+	 * @param hle the hle
+	 */
 	private void refTableHyperlinkUpdate(HyperlinkEvent hle) {
 		if (HyperlinkEvent.EventType.ACTIVATED.equals(hle.getEventType())) {  
 			System.out.println("Opening: " + hle.getURL());  
@@ -841,12 +1019,20 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 		}  
 	}
 
+	/**
+	 * Tbl comm mouse clicked.
+	 *
+	 * @param e the e
+	 */
 	private void tblCommMouseClicked(MouseEvent e) {
 		if (e.getClickCount()==2){
 			viewComment();
 		}
 	}
 
+	/**
+	 * View comment.
+	 */
 	private void viewComment() {
 		int row=tblComm.getSelectedRow();
 		if (row>-1){
@@ -918,6 +1104,13 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 		
 	}
 
+	/**
+	 * Gets the text from header.
+	 *
+	 * @param header the header
+	 * @param toIndex the to index
+	 * @return the text from header
+	 */
 	private String getTextFromHeader(String header, int toIndex) {
 		
 		String tmp=header.substring(0,toIndex);
@@ -927,6 +1120,11 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 		
 	}
 
+	/**
+	 * Expand button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void expandButtonActionPerformed(ActionEvent e) {
 		JPanel similarityPanel = (JPanel)tabbedPane1.getSelectedComponent();
 		expandButton.setVisible(false);
@@ -953,6 +1151,17 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 	}
 
 
+	/**
+	 * The listener interface for receiving selection events.
+	 * The class that is interested in processing a selection
+	 * event implements this interface, and the object created
+	 * with that class is registered with a component using the
+	 * component's <code>addSelectionListener<code> method. When
+	 * the selection event occurs, that object's appropriate
+	 * method is invoked.
+	 *
+	 * @see SelectionEvent
+	 */
 	class SelectionListener implements ListSelectionListener {
 
 		/** The table. */
@@ -1832,88 +2041,253 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The menu bar1. */
 	private JMenuBar menuBar1;
+	
+	/** The menu5. */
 	private JMenu menu5;
+	
+	/** The m close. */
 	private JMenuItem mClose;
+	
+	/** The menu1. */
 	private JMenu menu1;
+	
+	/** The b add fsn. */
 	private JMenuItem bAddFSN;
+	
+	/** The m add pref. */
 	private JMenuItem mAddPref;
+	
+	/** The m add desc. */
 	private JMenuItem mAddDesc;
+	
+	/** The menu3. */
 	private JMenu menu3;
+	
+	/** The m spell chk. */
 	private JMenuItem mSpellChk;
+	
+	/** The menu2. */
 	private JMenu menu2;
+	
+	/** The m hist. */
 	private JMenuItem mHist;
+	
+	/** The panel10. */
 	private JPanel panel10;
+	
+	/** The split pane3. */
 	private JSplitPane splitPane3;
+	
+	/** The split pane2. */
 	private JSplitPane splitPane2;
+	
+	/** The panel9. */
 	private JPanel panel9;
+	
+	/** The label9. */
 	private JLabel label9;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The tab sou. */
 	private ZebraJTable tabSou;
+	
+	/** The tabbed pane3. */
 	private JTabbedPane tabbedPane3;
+	
+	/** The scroll pane7. */
 	private JScrollPane scrollPane7;
+	
+	/** The tree3. */
 	private JTree tree3;
+	
+	/** The hierarchy navigator1. */
 	private HierarchyNavigator hierarchyNavigator1;
+	
+	/** The panel8. */
 	private JPanel panel8;
+	
+	/** The label11. */
 	private JLabel label11;
+	
+	/** The scroll pane6. */
 	private JScrollPane scrollPane6;
+	
+	/** The tab tar. */
 	private ZebraJTable tabTar;
+	
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The scroll pane5. */
 	private JScrollPane scrollPane5;
+	
+	/** The text field1. */
 	private JTextArea textField1;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The panel7. */
 	private JPanel panel7;
+	
+	/** The label4. */
 	private JLabel label4;
+	
+	/** The combo box1. */
 	private JComboBox comboBox1;
+	
+	/** The panel5. */
 	private JPanel panel5;
+	
+	/** The label5. */
 	private JLabel label5;
+	
+	/** The cmb accep. */
 	private JComboBox cmbAccep;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The panel4. */
 	private JPanel panel4;
+	
+	/** The rb yes. */
 	private JRadioButton rbYes;
+	
+	/** The label6. */
 	private JLabel label6;
+	
+	/** The rb no. */
 	private JRadioButton rbNo;
+	
+	/** The panel14. */
 	private JPanel panel14;
+	
+	/** The label7. */
 	private JLabel label7;
+	
+	/** The rb act. */
 	private JRadioButton rbAct;
+	
+	/** The rb inact. */
 	private JRadioButton rbInact;
+	
+	/** The panel3. */
 	private JPanel panel3;
+	
+	/** The save desc. */
 	private JButton saveDesc;
+	
+	/** The button5. */
 	private JButton button5;
+	
+	/** The panel6. */
 	private JPanel panel6;
+	
+	/** The button panel. */
 	private JPanel buttonPanel;
+	
+	/** The label8. */
 	private JLabel label8;
+	
+	/** The b keep. */
 	private JButton bKeep;
+	
+	/** The b review. */
 	private JButton bReview;
+	
+	/** The b escalate. */
 	private JButton bEscalate;
+	
+	/** The split pane1. */
 	private JSplitPane splitPane1;
+	
+	/** The tabbed pane1. */
 	private JTabbedPane tabbedPane1;
+	
+	/** The panel12. */
 	private JPanel panel12;
+	
+	/** The refine panel. */
 	private JPanel refinePanel;
+	
+	/** The search text field. */
 	private JTextField searchTextField;
+	
+	/** The search button. */
 	private JButton searchButton;
+	
+	/** The scroll pane2. */
 	private JScrollPane scrollPane2;
+	
+	/** The table1. */
 	private ZebraJTable table1;
+	
+	/** The panel13. */
 	private JPanel panel13;
+	
+	/** The rb fsn. */
 	private JRadioButton rbFSN;
+	
+	/** The rb pref. */
 	private JRadioButton rbPref;
+	
+	/** The radio button2. */
 	private JRadioButton radioButton2;
+	
+	/** The refine check box. */
 	private JCheckBox refineCheckBox;
+	
+	/** The expand button. */
 	private JButton expandButton;
+	
+	/** The scroll pane3. */
 	private JScrollPane scrollPane3;
+	
+	/** The table2. */
 	private ZebraJTable table2;
+	
+	/** The panel15. */
 	private JPanel panel15;
+	
+	/** The scroll pane4. */
 	private JScrollPane scrollPane4;
+	
+	/** The editor pane1. */
 	private JEditorPane editorPane1;
+	
+	/** The tabbed pane2. */
 	private JTabbedPane tabbedPane2;
+	
+	/** The panel16. */
 	private JPanel panel16;
+	
+	/** The panel17. */
 	private JPanel panel17;
+	
+	/** The b add coment. */
 	private JButton bAddComent;
+	
+	/** The scroll pane9. */
 	private JScrollPane scrollPane9;
+	
+	/** The tbl comm. */
 	private ZebraJTable tblComm;
+	
+	/** The scroll pane8. */
 	private JScrollPane scrollPane8;
+	
+	/** The ref table. */
 	private JEditorPane refTable;
+	
+	/** The panel11. */
 	private JPanel panel11;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 
@@ -1938,19 +2312,47 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 
 	/** The source sem tag. */
 	private String sourceSemTag;
+	
+	/** The defining char. */
 	private int definingChar=-1;
+	
+	/** The source fsn. */
 	private String sourceFSN;
+	
+	/** The worklist member. */
 	private WorkListMember worklistMember;
+	
+	/** The set by code. */
 	private boolean setByCode;
+	
+	/** The source ics. */
 	private boolean sourceICS;
+	
+	/** The keep ii class. */
 	private I_KeepTaskInInbox keepIIClass;
+	
+	/** The unloaded. */
 	private boolean unloaded;
+	
+	/** The role. */
 	private I_GetConceptData role;
+	
+	/** The editing row. */
 	private Integer editingRow;
+	
+	/** The target preferred row. */
 	private Integer targetPreferredRow;
+	
+	/** The html footer. */
 	private String htmlFooter="</body></html>";
+	
+	/** The html header. */
 	private String htmlHeader="<html><body><font style='color:blue'>";
+	
+	/** The end p. */
 	private String endP= "</font>";
+	
+	/** The scrollp. */
 	private JScrollPane scrollp;
 
 	/**
@@ -1974,6 +2376,8 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 
 	/**
 	 * Populate tree.
+	 *
+	 * @throws Exception the exception
 	 */
 	private void populateSourceTree() throws Exception {
 //		DefaultMutableTreeNode top = null;
@@ -2210,6 +2614,11 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 	}
 
 
+	/**
+	 * Populate target tree.
+	 *
+	 * @throws Exception the exception
+	 */
 	private void populateTargetTree() throws Exception {
 		I_TermFactory tf = Terms.get();
 //		DefaultMutableTreeNode top = null;
@@ -2467,11 +2876,23 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 		textField1.setEnabled(false);
 	}
 
+	/**
+	 * Gets the max term width.
+	 *
+	 * @param font the font
+	 * @param string the string
+	 * @return the max term width
+	 */
 	private int getMaxTermWidth(Font font, String string) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
+	/**
+	 * Populate details tree.
+	 *
+	 * @throws Exception the exception
+	 */
 	@SuppressWarnings("unchecked")
 	private void populateDetailsTree() throws Exception {
 		I_TermFactory tf = Terms.get();
@@ -2629,8 +3050,14 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 		}
 	}
 
+	/**
+	 * The Class TermTypeIconRenderer.
+	 */
 	class TermTypeIconRenderer extends DefaultTableCellRenderer {
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.DefaultTableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
+		 */
 		public Component getTableCellRendererComponent(JTable table, Object value,
 				boolean isSelected, boolean hasFocus, int row, int column) {
 
@@ -2647,8 +3074,15 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 		}
 
 	}
+	
+	/**
+	 * The Class AcceptabilityIconRenderer.
+	 */
 	class AcceptabilityIconRenderer extends DefaultTableCellRenderer {
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.DefaultTableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
+		 */
 		public Component getTableCellRendererComponent(JTable table, Object value,
 				boolean isSelected, boolean hasFocus, int row, int column) {
 
@@ -2662,8 +3096,14 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 
 	}
 
+	/**
+	 * The Class TermRenderer.
+	 */
 	class TermRenderer extends DefaultTableCellRenderer {
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.DefaultTableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
+		 */
 		public Component getTableCellRendererComponent(JTable table, Object value,
 				boolean isSelected, boolean hasFocus, int row, int column) {
 
@@ -2673,8 +3113,15 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 		}
 
 	}
+	
+	/**
+	 * The Class LanguageIconRenderer.
+	 */
 	class LanguageIconRenderer extends DefaultTableCellRenderer {
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.DefaultTableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
+		 */
 		public Component getTableCellRendererComponent(JTable table, Object value,
 				boolean isSelected, boolean hasFocus, int row, int column) {
 
@@ -2689,8 +3136,14 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 
 	}
 
+	/**
+	 * The Class ICSIconRenderer.
+	 */
 	class ICSIconRenderer extends DefaultTableCellRenderer {
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.DefaultTableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
+		 */
 		public Component getTableCellRendererComponent(JTable table, Object value,
 				boolean isSelected, boolean hasFocus, int row, int column) {
 
@@ -2704,9 +3157,12 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 		}
 
 	}
+	
 	/**
 	 * Update properties panel.
-	 * @param rowModel 
+	 *
+	 * @param descrpt the descrpt
+	 * @param rowModel the row model
 	 */
 	private void updatePropertiesPanel(ContextualizedDescription descrpt, int rowModel) {
 		boolean update = false;
@@ -2935,6 +3391,13 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 		table2.revalidate();
 	}
 
+	/**
+	 * Update ui.
+	 *
+	 * @param translationProject the translation project
+	 * @param workListMember the work list member
+	 * @param role the role
+	 */
 	public void updateUI(TranslationProject translationProject,WorkListMember workListMember, I_GetConceptData role){
 	//	clearForm(true);
 		try {
@@ -3029,6 +3492,11 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 	}
 
 
+	/**
+	 * Gets the web references.
+	 *
+	 * @return the web references
+	 */
 	private void getWebReferences() {
 		I_ConfigAceFrame config;
 		try {
@@ -3076,6 +3544,9 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 	}
 
 
+	/**
+	 * Load issues.
+	 */
 	protected void loadIssues() {
 		if (issueListPanel==null){
 			createIssuePanel();
@@ -3114,6 +3585,9 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 		}
 	}
 
+	/**
+	 * Creates the issue panel.
+	 */
 	private void createIssuePanel() {
 		I_ConfigAceFrame config;
 		try {
@@ -3137,6 +3611,9 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 
 	}
 
+	/**
+	 * Clear comments.
+	 */
 	private void clearComments(){
 		String[] columnNames = {"Comment"};
 		String[][] data = null;
@@ -3152,6 +3629,10 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 		tblComm.revalidate();
 		tabbedPane2.setTitleAt(0, "<html>Comments</font></b></html>");
 	}
+	
+	/**
+	 * Clear similarities.
+	 */
 	private void clearSimilarities(){
 		String[] columnNames = {"Source Text",
 		"Target Text"};
@@ -3167,12 +3648,18 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 		table1.revalidate();
 	}
 
+	/**
+	 * Clear ling guidelines.
+	 */
 	private void clearLingGuidelines(){
 		tabbedPane1.setTitleAt(2, "<html>Linguistic Guidelines</html>");
 		editorPane1.setText("");
 		editorPane1.revalidate();
 	}
 
+	/**
+	 * Clear trans memory.
+	 */
 	private void clearTransMemory(){
 		String[] columnNames = {"Pattern Text",
 		"Translated to.."};
@@ -3190,6 +3677,11 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 		table2.revalidate();
 	}
 
+	/**
+	 * Gets the previous comments.
+	 *
+	 * @return the previous comments
+	 */
 	private void getPreviousComments() {
 		I_ConfigAceFrame config;
 		try {
@@ -3234,6 +3726,13 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 		}
 	}
 
+	/**
+	 * Format comment.
+	 *
+	 * @param comment the comment
+	 * @param source the source
+	 * @return the string
+	 */
 	private String formatComment(String comment,String source) {
 		long thickVer = Terms.get().convertToThickVersion(Integer.parseInt(comment.substring(comment.trim().lastIndexOf(" ") +1)));
 		String strDate = formatter.format(thickVer);
@@ -3247,11 +3746,21 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 
 	}
 
+	/**
+	 * Sets the workflow buttons.
+	 *
+	 * @param buttons the new workflow buttons
+	 */
 	public void setWorkflowButtons(List<Component> buttons){
 		removeWorkflowButtons();
 		addWorkflowButtons(buttons);
 	}
 
+	/**
+	 * Adds the workflow buttons.
+	 *
+	 * @param buttons the buttons
+	 */
 	private void addWorkflowButtons(List<Component> buttons) {
 		
 		int columnsCount=(buttons.size() * 2) + 3;
@@ -3318,6 +3827,11 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 		panel6.repaint();
 	}
 
+	/**
+	 * Sets the button mnemo.
+	 *
+	 * @param btton the new button mnemo
+	 */
 	private void setButtonMnemo(Component btton) {
 		if (btton instanceof JButton){
 			String buttName=((JButton)btton).getText();
@@ -3332,6 +3846,9 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 		}
 	}
 
+	/**
+	 * Removes the workflow buttons.
+	 */
 	public void removeWorkflowButtons() {
 		if (buttonPanel!=null){
 			for (int i=buttonPanel.getComponentCount()-1;i>-1;i--){
@@ -3375,10 +3892,20 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 		}
 	}
 
+	/**
+	 * Gets the source lang refsets.
+	 *
+	 * @return the source lang refsets
+	 */
 	public Set<LanguageMembershipRefset> getSourceLangRefsets() {
 		return sourceLangRefsets;
 	}
 
+	/**
+	 * Sets the source lang refsets.
+	 *
+	 * @param sourceLangRefsets the new source lang refsets
+	 */
 	public void setSourceLangRefsets(Set<LanguageMembershipRefset> sourceLangRefsets) {
 		this.sourceLangRefsets = sourceLangRefsets;
 		sourceIds=new ArrayList<Integer>();
@@ -3387,30 +3914,60 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 		}
 	}
 
+	/**
+	 * Gets the target lang refset.
+	 *
+	 * @return the target lang refset
+	 */
 	public LanguageMembershipRefset getTargetLangRefset() {
 		return targetLangRefset;
 	}
 
+	/**
+	 * Sets the target lang refset.
+	 *
+	 * @param targetLangRefset the new target lang refset
+	 */
 	public void setTargetLangRefset(LanguageMembershipRefset targetLangRefset) {
 		this.targetLangRefset = targetLangRefset;
 		targetId=targetLangRefset.getRefsetId();
 	}
+	
+	/**
+	 * Autokeep in inbox.
+	 */
 	public void AutokeepInInbox(){
 		if (this.keepIIClass!=null){
 			this.unloaded=false;
 			this.keepIIClass.KeepInInbox();
 		}
 	}
+	
+	/**
+	 * Sets the auto keep function.
+	 *
+	 * @param thisAutoKeep the new auto keep function
+	 */
 	public void setAutoKeepFunction(I_KeepTaskInInbox thisAutoKeep) {
 		this.keepIIClass=thisAutoKeep;
 
 	}
 
+	/**
+	 * Sets the unloaded.
+	 *
+	 * @param b the new unloaded
+	 */
 	public void setUnloaded(boolean b) {
 		this.unloaded=b;
 
 	}
 
+	/**
+	 * Gets the unloaded.
+	 *
+	 * @return the unloaded
+	 */
 	public boolean getUnloaded() {
 		return this.unloaded;
 	}

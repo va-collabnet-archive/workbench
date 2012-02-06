@@ -28,6 +28,9 @@ import org.dwfa.ace.prop.editor.ConceptLabelPropEditor;
  */
 public class CreateLangMembershipRefsetFromConceptBeanInfo extends SimpleBeanInfo {
 
+	/**
+	 * Instantiates a new creates the lang membership refset from concept bean info.
+	 */
 	public CreateLangMembershipRefsetFromConceptBeanInfo() {
 		super();
 	}

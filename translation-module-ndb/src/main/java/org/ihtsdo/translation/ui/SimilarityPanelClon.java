@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Tue Oct 19 20:35:00 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.translation.ui;
@@ -67,24 +80,57 @@ import org.ihtsdo.translation.SimilarityMatchedItem;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.DefaultSimilaritySearchOption;
 
 /**
+ * The Class SimilarityPanelClon.
+ *
  * @author Guillermo Reynoso
  */
 public class SimilarityPanelClon extends JPanel implements Serializable{
+	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -1458647596111502234L;
+	
+	/** The source fsn. */
 	private String sourceFSN;
+	
+	/** The fsn. */
 	private I_GetConceptData fsn;
+	
+	/** The preferred. */
 	private I_GetConceptData preferred;
+	
+	/** The source ids. */
 	private List<Integer> sourceIds;
+	
+	/** The target id. */
 	private int targetId;
+	
+	/** The config. */
 	private I_ConfigAceFrame config;
+	
+	/** The column model. */
 	private CustomTableColumnModel columnModel;
+	
+	/** The project. */
 	private TranslationProject project;
+	
+	/** The worklist member. */
 	private WorkListMember worklistMember;
+	
+	/** The similarity dialog. */
 	private JDialog similarityDialog;
+	
+	/** The similarity hits count. */
 	private int similarityHitsCount = 0;
+	
+	/** The trans memory hits count. */
 	private int transMemoryHitsCount = 0;
+	
+	/** The ling guidelines hits count. */
 	private int lingGuidelinesHitsCount = 0;
 
+	/**
+	 * Instantiates a new similarity panel clon.
+	 */
 	public SimilarityPanelClon() {
 		initComponents();
 		progressBar1.setVisible(false);
@@ -126,6 +172,16 @@ public class SimilarityPanelClon extends JPanel implements Serializable{
 		similarityTable.setRowSelectionAllowed(true);
 	}
 
+	/**
+	 * Update tabs.
+	 *
+	 * @param sourceFSN the source fsn
+	 * @param concept the concept
+	 * @param sourceIds the source ids
+	 * @param targetId the target id
+	 * @param translationProject the translation project
+	 * @param worklistMember the worklist member
+	 */
 	public void updateTabs(String sourceFSN, I_GetConceptData concept, List<Integer> sourceIds, int targetId, TranslationProject translationProject, WorkListMember worklistMember) {
 		ConfigTranslationModule confTrans = LanguageUtil.getDefaultTranslationConfig(translationProject);
 
@@ -213,6 +269,11 @@ public class SimilarityPanelClon extends JPanel implements Serializable{
 		similarityTable.revalidate();
 	}
 
+	/**
+	 * Search button action preformed.
+	 *
+	 * @param e the e
+	 */
 	private void searchButtonActionPreformed(ActionEvent e) {
 		String query = searchTextField.getText();
 		if (!query.trim().equals("")) {
@@ -220,6 +281,9 @@ public class SimilarityPanelClon extends JPanel implements Serializable{
 		}
 	}
 
+	/**
+	 * Clear similarities.
+	 */
 	private void clearSimilarities() {
 		String[] columnNames = { "Source Text", "Target Text" };
 		String[][] data = null;
@@ -237,9 +301,9 @@ public class SimilarityPanelClon extends JPanel implements Serializable{
 
 	/**
 	 * This method shows a worklist member's similarity concept, in the context
-	 * of the worklist member
-	 * 
-	 * @param e
+	 * of the worklist member.
+	 *
+	 * @param e the e
 	 */
 	private void table1MouseClicked(MouseEvent e) {
 		if (e.getClickCount() == 2) {
@@ -291,6 +355,12 @@ public class SimilarityPanelClon extends JPanel implements Serializable{
 
 	}
 
+	/**
+	 * Copy.
+	 *
+	 * @param orig the orig
+	 * @return the object
+	 */
 	public static Object copy(Object orig) {
 		Object obj = null;
 		try {
@@ -313,6 +383,11 @@ public class SimilarityPanelClon extends JPanel implements Serializable{
 		return obj;
 	}
 	
+	/**
+	 * Copy source item action performed.
+	 *
+	 * @param e the e
+	 */
 	private void copySourceItemActionPerformed(ActionEvent e) {
 		int selectedRow = similarityTable.getSelectedRow();
 		if (selectedRow >= 0) {
@@ -323,6 +398,11 @@ public class SimilarityPanelClon extends JPanel implements Serializable{
 		}
 	}
 
+	/**
+	 * Copy target item action performed.
+	 *
+	 * @param e the e
+	 */
 	private void copyTargetItemActionPerformed(ActionEvent e) {
 		int selectedRow = similarityTable.getSelectedRow();
 		if (selectedRow >= 0) {
@@ -332,6 +412,12 @@ public class SimilarityPanelClon extends JPanel implements Serializable{
 			clipboard.setContents(strSel, strSel);
 		}
 	}
+	
+	/**
+	 * Label4 mouse clicked.
+	 *
+	 * @param e the e
+	 */
 	private void label4MouseClicked(MouseEvent e) {
 		try {
 			HelpApi.openHelpForComponent("SIMILARITY");
@@ -342,6 +428,14 @@ public class SimilarityPanelClon extends JPanel implements Serializable{
 		}
 	}
 
+	/**
+	 * Hide buttons panels.
+	 *
+	 * @param fsn the fsn
+	 * @param prefered the prefered
+	 * @param both the both
+	 * @param refine the refine
+	 */
 	public void hideButtonsPanels(boolean fsn, boolean prefered, boolean both, boolean refine){
 		rbFSN.setSelected(fsn);
 		rbPref.setSelected(prefered);
@@ -350,6 +444,11 @@ public class SimilarityPanelClon extends JPanel implements Serializable{
 		updateSimilarityTable(sourceFSN);
 	}
 
+	/**
+	 * Rb fsn state changed.
+	 *
+	 * @param e the e
+	 */
 	private void rbFSNStateChanged(ChangeEvent e) {
 		if(e.getSource() instanceof JRadioButton && ((JRadioButton)e.getSource()).isSelected()){
 			updateSimilarityTable(sourceFSN);
@@ -357,6 +456,11 @@ public class SimilarityPanelClon extends JPanel implements Serializable{
 		}
 	}
 
+	/**
+	 * Rb pref state changed.
+	 *
+	 * @param e the e
+	 */
 	private void rbPrefStateChanged(ChangeEvent e) {
 		if(e.getSource() instanceof JRadioButton && ((JRadioButton)e.getSource()).isSelected()){
 			updateSimilarityTable(sourceFSN);
@@ -364,6 +468,11 @@ public class SimilarityPanelClon extends JPanel implements Serializable{
 		}
 	}
 
+	/**
+	 * Radio button2 state changed.
+	 *
+	 * @param e the e
+	 */
 	private void radioButton2StateChanged(ChangeEvent e) {
 		if(e.getSource() instanceof JRadioButton && ((JRadioButton)e.getSource()).isSelected()){
 			updateSimilarityTable(sourceFSN);
@@ -371,6 +480,9 @@ public class SimilarityPanelClon extends JPanel implements Serializable{
 		}
 	}
 	
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -589,50 +701,120 @@ public class SimilarityPanelClon extends JPanel implements Serializable{
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
+	/** The similarity panel. */
 	private JPanel similarityPanel;
+	
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The label4. */
 	private JLabel label4;
+	
+	/** The refine panel. */
 	private JPanel refinePanel;
+	
+	/** The search text field. */
 	private JTextField searchTextField;
+	
+	/** The search button. */
 	private JButton searchButton;
+	
+	/** The scroll pane2. */
 	private JScrollPane scrollPane2;
+	
+	/** The similarity table. */
 	private ZebraJTable similarityTable;
+	
+	/** The panel13. */
 	private JPanel panel13;
+	
+	/** The rb fsn. */
 	private JRadioButton rbFSN;
+	
+	/** The rb pref. */
 	private JRadioButton rbPref;
+	
+	/** The radio button2. */
 	private JRadioButton radioButton2;
+	
+	/** The refine check box. */
 	private JCheckBox refineCheckBox;
+	
+	/** The progress bar1. */
 	private JProgressBar progressBar1;
+	
+	/** The simil pop up. */
 	private JPopupMenu similPopUp;
+	
+	/** The copy source item. */
 	private JMenuItem copySourceItem;
+	
+	/** The copy target item. */
 	private JMenuItem copyTargetItem;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 
+	/**
+	 * Gets the similarity hits count.
+	 *
+	 * @return the similarity hits count
+	 */
 	public int getSimilarityHitsCount() {
 		return similarityHitsCount;
 	}
 
+	/**
+	 * Sets the similarity hits count.
+	 *
+	 * @param similarityHitsCount the new similarity hits count
+	 */
 	public void setSimilarityHitsCount(int similarityHitsCount) {
 		this.similarityHitsCount = similarityHitsCount;
 	}
 
+	/**
+	 * Gets the trans memory hits count.
+	 *
+	 * @return the trans memory hits count
+	 */
 	public int getTransMemoryHitsCount() {
 		return transMemoryHitsCount;
 	}
 
+	/**
+	 * Sets the trans memory hits count.
+	 *
+	 * @param transMemoryHitsCount the new trans memory hits count
+	 */
 	public void setTransMemoryHitsCount(int transMemoryHitsCount) {
 		this.transMemoryHitsCount = transMemoryHitsCount;
 	}
 
+	/**
+	 * Gets the ling guidelines hits count.
+	 *
+	 * @return the ling guidelines hits count
+	 */
 	public int getLingGuidelinesHitsCount() {
 		return lingGuidelinesHitsCount;
 	}
 
+	/**
+	 * Sets the ling guidelines hits count.
+	 *
+	 * @param lingGuidelinesHitsCount the new ling guidelines hits count
+	 */
 	public void setLingGuidelinesHitsCount(int lingGuidelinesHitsCount) {
 		this.lingGuidelinesHitsCount = lingGuidelinesHitsCount;
 	}
 	
+	/**
+	 * Gets the similarity table.
+	 *
+	 * @return the similarity table
+	 */
 	public ZebraJTable getSimilarityTable() {
 		return similarityTable;
 	}

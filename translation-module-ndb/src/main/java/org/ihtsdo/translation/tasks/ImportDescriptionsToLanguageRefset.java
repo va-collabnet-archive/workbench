@@ -47,8 +47,10 @@ import org.ihtsdo.translation.LanguageUtil.Language;
 { @Spec(directory = "tasks/translation tasks", type = BeanType.TASK_BEAN)})
 public class ImportDescriptionsToLanguageRefset extends AbstractTask {
 
+	/** The release. */
 	private String release;
 	
+	/** The language. */
 	private Language language;
 
 	/** The Constant serialVersionUID. */
@@ -136,18 +138,38 @@ public class ImportDescriptionsToLanguageRefset extends AbstractTask {
 		return new int[] {  };
 	}
 
+	/**
+	 * Gets the release.
+	 *
+	 * @return the release
+	 */
 	public String getRelease() {
 		return release;
 	}
 
+	/**
+	 * Sets the release.
+	 *
+	 * @param release the new release
+	 */
 	public void setRelease(String release) {
 		this.release = release;
 	}
 
+	/**
+	 * Gets the language.
+	 *
+	 * @return the language
+	 */
 	public Language getLanguage() {
 		return language;
 	}
 
+	/**
+	 * Sets the language.
+	 *
+	 * @param language the new language
+	 */
 	public void setLanguage(Language language) {
 		this.language = language;
 	}

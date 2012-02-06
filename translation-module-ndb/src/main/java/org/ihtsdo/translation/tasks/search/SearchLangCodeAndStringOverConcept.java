@@ -50,6 +50,7 @@ public class SearchLangCodeAndStringOverConcept extends AbstractSearchTest {
     /** The language code. */
     private String languageCode = "en";
     
+    /** The search string. */
     private String searchString = "";
 
     /**
@@ -145,6 +146,12 @@ public class SearchLangCodeAndStringOverConcept extends AbstractSearchTest {
 		this.languageCode = languageCode;
 	}
 	
+	/**
+	 * Wildcard to regex.
+	 *
+	 * @param wildcard the wildcard
+	 * @return the string
+	 */
 	public String wildcardToRegex(String wildcard){
 		StringBuffer s = new StringBuffer(wildcard.length());
 		s.append('^');
@@ -173,10 +180,20 @@ public class SearchLangCodeAndStringOverConcept extends AbstractSearchTest {
 		return(s.toString());
 	}
 
+	/**
+	 * Gets the search string.
+	 *
+	 * @return the search string
+	 */
 	public String getSearchString() {
 		return searchString;
 	}
 
+	/**
+	 * Sets the search string.
+	 *
+	 * @param searchString the new search string
+	 */
 	public void setSearchString(String searchString) {
 		this.searchString = searchString;
 	}

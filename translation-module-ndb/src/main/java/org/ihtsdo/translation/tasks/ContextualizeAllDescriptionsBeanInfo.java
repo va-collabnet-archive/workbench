@@ -25,6 +25,9 @@ import java.beans.SimpleBeanInfo;
  */
 public class ContextualizeAllDescriptionsBeanInfo extends SimpleBeanInfo {
 
+	/**
+	 * Instantiates a new contextualize all descriptions bean info.
+	 */
 	public ContextualizeAllDescriptionsBeanInfo() {
 		super();
 	}

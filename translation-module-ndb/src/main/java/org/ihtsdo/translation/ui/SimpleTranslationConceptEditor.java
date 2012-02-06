@@ -583,30 +583,79 @@ public class SimpleTranslationConceptEditor extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The panel3. */
 	private JPanel panel3;
+	
+	/** The label4. */
 	private JLabel label4;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The table1. */
 	private JTable table1;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The text field1. */
 	private JTextField textField1;
+	
+	/** The check box1. */
 	private JCheckBox checkBox1;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The text field2. */
 	private JTextField textField2;
+	
+	/** The check box2. */
 	private JCheckBox checkBox2;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The scroll pane2. */
 	private JScrollPane scrollPane2;
+	
+	/** The table2. */
 	private JTable table2;
+	
+	/** The panel4. */
 	private JPanel panel4;
+	
+	/** The button1. */
 	private JButton button1;
+	
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The label5. */
 	private JLabel label5;
+	
+	/** The radio button1. */
 	private JRadioButton radioButton1;
+	
+	/** The radio button2. */
 	private JRadioButton radioButton2;
+	
+	/** The radio button3. */
 	private JRadioButton radioButton3;
+	
+	/** The radio button4. */
 	private JRadioButton radioButton4;
+	
+	/** The panel5. */
 	private JPanel panel5;
+	
+	/** The button2. */
 	private JButton button2;
+	
+	/** The button3. */
 	private JButton button3;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 	/** The concept. */

@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Thu Jul 01 17:32:13 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.translation.ui.config;
@@ -36,18 +49,37 @@ import org.dwfa.ace.api.Terms;
 import org.ihtsdo.translation.ui.ConfigTranslationModule;
 
 /**
+ * The Class FileLinkConfigurationPanel.
+ *
  * @author Guillermo Reynoso
  */
 public class FileLinkConfigurationPanel extends JPanel {
 	
+	/** The config. */
 	I_ConfigAceFrame config;
+	
+	/** The top. */
 	DefaultMutableTreeNode top;
+	
+	/** The tree model. */
 	DefaultTreeModel treeModel;
+	
+	/** The file chusa. */
 	final JFileChooser fileChusa;
+	
+	/** The dynamic tree1. */
 	FileLinkDynamicTree dynamicTree1;
+	
+	/** The tf. */
 	I_TermFactory tf = Terms.get();
 	//boolean modifFileLinkPermission;
 	
+	/**
+	 * Instantiates a new file link configuration panel.
+	 *
+	 * @param config the config
+	 * @param confTrans the conf trans
+	 */
 	public FileLinkConfigurationPanel(I_ConfigAceFrame config, ConfigTranslationModule confTrans) {
 		super();
 		this.config = config;
@@ -66,6 +98,9 @@ public class FileLinkConfigurationPanel extends JPanel {
 //			}
 	}
 
+	/**
+	 * Inits the custom components.
+	 */
 	private void initCustomComponents() {
 		error.setBorder(new EmptyBorder(new Insets(5, 5, 3, 0)));
 		
@@ -132,6 +167,9 @@ public class FileLinkConfigurationPanel extends JPanel {
 		
 	}
 	
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		buttonContainer = new JPanel();
@@ -180,11 +218,22 @@ public class FileLinkConfigurationPanel extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The button container. */
 	private JPanel buttonContainer;
+	
+	/** The add file link button. */
 	private JButton addFileLinkButton;
+	
+	/** The remove button. */
 	private JButton removeButton;
+	
+	/** The error container. */
 	private JPanel errorContainer;
+	
+	/** The error. */
 	private JLabel error;
+	
+	/** The tree container. */
 	private JPanel treeContainer;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 

@@ -767,39 +767,106 @@ public class TranslationConceptEditor extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The tree1. */
 	private JTree tree1;
+	
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The panel5. */
 	private JPanel panel5;
+	
+	/** The label4. */
 	private JLabel label4;
+	
+	/** The combo box1. */
 	private JComboBox comboBox1;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The text field1. */
 	private JTextField textField1;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The check box1. */
 	private JCheckBox checkBox1;
+	
+	/** The panel7. */
 	private JPanel panel7;
+	
+	/** The b cpt issue. */
 	private JButton bCptIssue;
+	
+	/** The b desc issue. */
 	private JButton bDescIssue;
+	
+	/** The b view issue. */
 	private JButton bViewIssue;
+	
+	/** The panel6. */
 	private JPanel panel6;
+	
+	/** The tabbed pane1. */
 	private JTabbedPane tabbedPane1;
+	
+	/** The scroll pane2. */
 	private JScrollPane scrollPane2;
+	
+	/** The table1. */
 	private JTable table1;
+	
+	/** The scroll pane3. */
 	private JScrollPane scrollPane3;
+	
+	/** The table2. */
 	private JTable table2;
+	
+	/** The scroll pane4. */
 	private JScrollPane scrollPane4;
+	
+	/** The editor pane1. */
 	private JEditorPane editorPane1;
+	
+	/** The panel4. */
 	private JPanel panel4;
+	
+	/** The button6. */
 	private JButton button6;
+	
+	/** The panel3. */
 	private JPanel panel3;
+	
+	/** The b add fsn. */
 	private JButton bAddFSN;
+	
+	/** The button3. */
 	private JButton button3;
+	
+	/** The button1. */
 	private JButton button1;
+	
+	/** The button5. */
 	private JButton button5;
+	
+	/** The button4. */
 	private JButton button4;
+	
+	/** The button2. */
 	private JButton button2;
+	
+	/** The label5. */
 	private JLabel label5;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 	/** The descriptions. */

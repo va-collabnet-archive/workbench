@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Sat Dec 24 12:27:47 GMT-03:00 2011
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.translation.model;
@@ -20,26 +33,59 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
 /**
+ * The Class PagePanel.
+ *
  * @author Vahram Manukyan
  */
 public class PagePanel extends JPanel implements MouseListener {
+	
+	/** The Constant BOLD. */
 	private static final String BOLD = "<B>";
+	
+	/** The Constant BLUE_PREFIX. */
 	private static final String BLUE_PREFIX = "<HTML><font color=\"blue\">";
+	
+	/** The Constant BLACK_PREFIX. */
 	private static final String BLACK_PREFIX = "<HTML><font color=\"black\">";
+	
+	/** The Constant PAGE_CHANGED. */
 	public static final String PAGE_CHANGED = "PAGE_CHANGED";
+	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -7461559950374162592L;
+	
+	/** The new page. */
 	private JLabel newPage;
+	
+	/** The page number str. */
 	private String pageNumberStr;
+	
+	/** The layout. */
 	private GridBagLayout layout;
+	
+	/** The page size. */
 	private Integer pageSize;
+	
+	/** The total items. */
 	private Integer totalItems;
+	
+	/** The last page. */
 	private Integer lastPage;
 
+	/**
+	 * Instantiates a new page panel.
+	 */
 	public PagePanel() {
 		initComponents();
 		initCustomComponents();
 	}
 
+	/**
+	 * Instantiates a new page panel.
+	 *
+	 * @param pageSize the page size
+	 * @param totalItems the total items
+	 */
 	public PagePanel(Integer pageSize, Integer totalItems) {
 		initComponents();
 		this.totalItems = totalItems;
@@ -48,6 +94,9 @@ public class PagePanel extends JPanel implements MouseListener {
 		initCustomComponents();
 	}
 
+	/**
+	 * Inits the custom components.
+	 */
 	private void initCustomComponents() {
 		pageNumberStr = "1";
 		setNewPage(page1Label);
@@ -63,6 +112,11 @@ public class PagePanel extends JPanel implements MouseListener {
 
 	}
 
+	/**
+	 * The main method.
+	 *
+	 * @param args the arguments
+	 */
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -75,6 +129,9 @@ public class PagePanel extends JPanel implements MouseListener {
 		});
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -176,6 +233,11 @@ public class PagePanel extends JPanel implements MouseListener {
 		// //GEN-END:initComponents
 	}
 
+	/**
+	 * Sets the new page.
+	 *
+	 * @param newPage the new new page
+	 */
 	public void setNewPage(JLabel newPage) {
 		if (this.newPage != null) {
 			this.newPage.setText(this.newPage.getText().replace(BOLD, ""));
@@ -193,23 +255,48 @@ public class PagePanel extends JPanel implements MouseListener {
 		}
 	}
 
+	/**
+	 * Gets the new page.
+	 *
+	 * @return the new page
+	 */
 	public JLabel getNewPage() {
 		return newPage;
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
+	/** The page panel. */
 	private JPanel pagePanel;
+	
+	/** The previous label. */
 	private JLabel previousLabel;
+	
+	/** The page1 label. */
 	private JLabel page1Label;
+	
+	/** The page2 label. */
 	private JLabel page2Label;
+	
+	/** The page3 label. */
 	private JLabel page3Label;
+	
+	/** The page4 label. */
 	private JLabel page4Label;
+	
+	/** The page5 label. */
 	private JLabel page5Label;
+	
+	/** The etc label. */
 	private JLabel etcLabel;
+	
+	/** The next label. */
 	private JLabel nextLabel;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 
+	/* (non-Javadoc)
+	 * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
+	 */
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		Object source = e.getSource();
@@ -224,6 +311,11 @@ public class PagePanel extends JPanel implements MouseListener {
 		}
 	}
 
+	/**
+	 * Number clicked.
+	 *
+	 * @param source the source
+	 */
 	private void numberClicked(Object source) {
 		JLabel lab = (JLabel) source;
 		if (!lab.getText().contains("...")) {
@@ -274,6 +366,9 @@ public class PagePanel extends JPanel implements MouseListener {
 		}
 	}
 
+	/**
+	 * Previous button clicked.
+	 */
 	private void previousButtonClicked() {
 		pageNumberStr = newPage.getText().split(BLACK_PREFIX + BOLD)[1];
 		Integer actualNum = new Integer(pageNumberStr);
@@ -305,6 +400,9 @@ public class PagePanel extends JPanel implements MouseListener {
 		}
 	}
 
+	/**
+	 * Next button clicked.
+	 */
 	private void nextButtonClicked() {
 		pageNumberStr = newPage.getText().split(BLACK_PREFIX + BOLD)[1];
 		Integer actualNum = new Integer(pageNumberStr);
@@ -331,18 +429,30 @@ public class PagePanel extends JPanel implements MouseListener {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
+	 */
 	@Override
 	public void mouseEntered(MouseEvent e) {
 	}
 
+	/* (non-Javadoc)
+	 * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
+	 */
 	@Override
 	public void mouseExited(MouseEvent e) {
 	}
 
+	/* (non-Javadoc)
+	 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
+	 */
 	@Override
 	public void mousePressed(MouseEvent e) {
 	}
 
+	/* (non-Javadoc)
+	 * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
+	 */
 	@Override
 	public void mouseReleased(MouseEvent e) {
 	}

@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Wed Nov 03 18:55:55 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.translation;
@@ -65,16 +78,32 @@ import org.ihtsdo.translation.ui.TranslationConceptEditorRO;
 import org.ihtsdo.translation.ui.ZebraJTable;
 
 /**
+ * The Class ListComponentViewerPanel.
+ *
  * @author Guillermo Reynoso
  */
 public class ListComponentViewerPanel extends JPanel {
 
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -6140825319002970607L;
+	
+	/** The project combo model. */
 	private DefaultComboBoxModel projectComboModel;
+	
+	/** The config. */
 	private I_ConfigAceFrame config;
+	
+	/** The lst table model. */
 	private DefaultTableModel lstTableModel;
+	
+	/** The columns. */
 	private String[] columns;
 
+	/**
+	 * Instantiates a new list component viewer panel.
+	 *
+	 * @param config the config
+	 */
 	public ListComponentViewerPanel(I_ConfigAceFrame config) {
 		this.config = config;
 		initComponents();
@@ -82,10 +111,28 @@ public class ListComponentViewerPanel extends JPanel {
 
 	}
 
+	/**
+	 * The listener interface for receiving menuItem events.
+	 * The class that is interested in processing a menuItem
+	 * event implements this interface, and the object created
+	 * with that class is registered with a component using the
+	 * component's <code>addMenuItemListener<code> method. When
+	 * the menuItem event occurs, that object's appropriate
+	 * method is invoked.
+	 *
+	 * @see MenuItemEvent
+	 */
 	class MenuItemListener implements ActionListener{
 
+		/** The nodes. */
 		private HashSet<Integer> nodes;
+		
+		/** The acc event. */
 		private ActionEvent accEvent;
+		
+		/* (non-Javadoc)
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (nodes!=null){
@@ -143,11 +190,21 @@ public class ListComponentViewerPanel extends JPanel {
 			}
 
 		}
+		
+		/**
+		 * Sets the item.
+		 *
+		 * @param descSet the new item
+		 */
 		public void setItem(HashSet<Integer> descSet){
 			this.nodes=descSet;
 		}
 
 	}
+	
+	/**
+	 * Inits the custom components.
+	 */
 	private void initCustomComponents() {
 
 		columns = new String[] { "Source fsn", "Source preferred", "Target preferred", "Status" };
@@ -314,6 +371,11 @@ public class ListComponentViewerPanel extends JPanel {
 
 	}
 
+	/**
+	 * Refresh button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void refreshButtonActionPerformed(ActionEvent e) {
 		try {
 			String[][] data = null;
@@ -341,6 +403,11 @@ public class ListComponentViewerPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Close button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void closeButtonActionPerformed(ActionEvent e) {
 		TranslationHelperPanel thp;
 		try {
@@ -363,6 +430,9 @@ public class ListComponentViewerPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -452,13 +522,28 @@ public class ListComponentViewerPanel extends JPanel {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
+	/** The button cont. */
 	private JPanel buttonCont;
+	
+	/** The project combo. */
 	private JComboBox projectCombo;
+	
+	/** The refresh button. */
 	private JButton refreshButton;
+	
+	/** The table scroll. */
 	private JScrollPane tableScroll;
+	
+	/** The list table. */
 	private ZebraJTable listTable;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The message label. */
 	private JLabel messageLabel;
+	
+	/** The close button. */
 	private JButton closeButton;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 }

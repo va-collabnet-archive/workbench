@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.translation.model;
 
 import java.beans.PropertyChangeEvent;
@@ -40,25 +56,55 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.InboxColumn;
 import org.ihtsdo.translation.ui.config.event.InboxColumnsChangedEvent;
 import org.ihtsdo.translation.ui.config.event.InboxColumnsChangedEventHandler;
 
+/**
+ * The Class InboxTableModel.
+ */
 public class InboxTableModel extends DefaultTableModel {
 
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -3295746462823927132L;
 
+	/** The column count. */
 	private int columnCount = InboxColumn.values().length;
+	
+	/** The data. */
 	private LinkedList<Object[]> data = new LinkedList<Object[]>();
+	
+	/** The searcher. */
 	private WorkflowSearcher searcher;
+	
+	/** The p bar. */
 	private JProgressBar pBar;
+	
+	/** The tag cache. */
 	private HashMap<String, InboxTag> tagCache = new HashMap<String, InboxTag>();
+	
+	/** The preferred. */
 	private I_GetConceptData preferred;
+	
+	/** The synonym. */
 	private I_GetConceptData synonym;
+	
+	/** The fsn. */
 	private I_GetConceptData fsn;
+	
+	/** The inbox worker. */
 	private InboxWorker inboxWorker;
 
+	/** The tags. */
 	public List<InboxTag> tags;
+	
+	/** The columns. */
 	protected LinkedHashSet<InboxColumn> columns;
 
+	/** The config. */
 	private I_ConfigAceFrame config;
 
+	/**
+	 * Instantiates a new inbox table model.
+	 *
+	 * @param pBar the bar
+	 */
 	public InboxTableModel(JProgressBar pBar) {
 		super();
 		this.pBar = pBar;
@@ -78,7 +124,7 @@ public class InboxTableModel extends DefaultTableModel {
 	}
 
 	/**
-	 * Fire table struct changed after calling this method
+	 * Fire table struct changed after calling this method.
 	 */
 	public void refreshColumnsStruct() {
 		ConfigTranslationModule cfg = null;
@@ -92,6 +138,9 @@ public class InboxTableModel extends DefaultTableModel {
 		columns = cfg.getColumnsDisplayedInInbox();
 	}
 
+	/**
+	 * Inits the event listeners.
+	 */
 	private void initEventListeners() {
 		EventMediator.getInstance().suscribe(EventType.INBOX_COLUMNS_CHANGED, new InboxColumnsChangedEventHandler<InboxColumnsChangedEvent>(this) {
 			@Override
@@ -102,28 +151,60 @@ public class InboxTableModel extends DefaultTableModel {
 		});
 	}
 
+	/**
+	 * Gets the tag by uuid.
+	 *
+	 * @param uuid the uuid
+	 * @return the tag by uuid
+	 */
 	public InboxTag getTagByUuid(String uuid) {
 		return tagCache.get(uuid);
 	}
 
+	/**
+	 * Adds the tag to cache.
+	 *
+	 * @param uuid the uuid
+	 * @param tag the tag
+	 */
 	public void addTagToCache(String uuid, InboxTag tag) {
 		tagCache.put(uuid, tag);
 	}
 
+	/**
+	 * Removes the tag from cache.
+	 *
+	 * @param uuid the uuid
+	 */
 	public void removeTagFromCache(String uuid) {
 		tagCache.remove(uuid);
 	}
 
+	/**
+	 * Gets the row.
+	 *
+	 * @param rowNum the row num
+	 * @return the row
+	 */
 	public Object[] getRow(int rowNum) {
 		return data.get(rowNum);
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.swing.table.DefaultTableModel#addRow(java.lang.Object[])
+	 */
 	@Override
 	public void addRow(Object[] rowData) {
 		data.add(rowData);
 		fireTableDataChanged();
 	}
 
+	/**
+	 * Gets the wf instance.
+	 *
+	 * @param rowNum the row num
+	 * @return the wf instance
+	 */
 	public WfInstance getWfInstance(int rowNum) {
 		ConfigTranslationModule cfg = new ConfigTranslationModule();
 		try {
@@ -136,6 +217,11 @@ public class InboxTableModel extends DefaultTableModel {
 		return (WfInstance) data.get(rowNum)[cfg.getColumnsDisplayedInInbox().size() + 1];
 	}
 
+	/**
+	 * Update table.
+	 *
+	 * @param data the data
+	 */
 	public void updateTable(Object[][] data) {
 		int i = 0;
 		this.data = new LinkedList<Object[]>();
@@ -153,11 +239,20 @@ public class InboxTableModel extends DefaultTableModel {
 		fireTableDataChanged();
 	}
 
+	/**
+	 * Clear table.
+	 */
 	public void clearTable() {
 		data = new LinkedList<Object[]>();
 		fireTableDataChanged();
 	}
 
+	/**
+	 * Update page.
+	 *
+	 * @param filterList the filter list
+	 * @return true, if successful
+	 */
 	public boolean updatePage(HashMap<String, WfSearchFilterBI> filterList) {
 		boolean morePages = false;
 		if (inboxWorker != null && !inboxWorker.isDone()) {
@@ -170,25 +265,44 @@ public class InboxTableModel extends DefaultTableModel {
 		return morePages;
 	}
 
+	/**
+	 * Gets the real column size.
+	 *
+	 * @return the real column size
+	 */
 	public int getRealColumnSize() {
 		return InboxColumn.values().length;
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.swing.table.DefaultTableModel#getColumnCount()
+	 */
 	public int getColumnCount() {
 		this.columnCount = columns.size();
 		return columnCount;
 	}
 
+	/**
+	 * Sets the columns.
+	 *
+	 * @param columns the new columns
+	 */
 	public void setColumns(LinkedHashSet<InboxColumn> columns) {
 		this.columns = columns;
 		fireTableStructureChanged();
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.swing.table.DefaultTableModel#setColumnCount(int)
+	 */
 	@Override
 	public void setColumnCount(int columnCount) {
 		this.columnCount = columnCount;
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.swing.table.DefaultTableModel#getRowCount()
+	 */
 	public int getRowCount() {
 		if (data != null && data.size() > 0) {
 			return data.size();
@@ -197,6 +311,9 @@ public class InboxTableModel extends DefaultTableModel {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.swing.table.DefaultTableModel#getColumnName(int)
+	 */
 	public String getColumnName(int col) {
 		int i = 0;
 		for (InboxColumn inboxColumn : columns) {
@@ -208,6 +325,9 @@ public class InboxTableModel extends DefaultTableModel {
 		return "";
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.swing.table.DefaultTableModel#getValueAt(int, int)
+	 */
 	public Object getValueAt(int row, int col) {
 		int i = 0;
 		if (data != null && !data.isEmpty())
@@ -222,6 +342,9 @@ public class InboxTableModel extends DefaultTableModel {
 		return "";
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.swing.table.DefaultTableModel#removeRow(int)
+	 */
 	@Override
 	public void removeRow(int row) {
 		data.remove(row);
@@ -232,6 +355,9 @@ public class InboxTableModel extends DefaultTableModel {
 	 * JTable uses this method to determine the default renderer/ editor for
 	 * each cell. If we didn't implement this method, then the last column would
 	 * contain text ("true"/"false"), rather than a check box.
+	 */
+	/* (non-Javadoc)
+	 * @see javax.swing.table.AbstractTableModel#getColumnClass(int)
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Class getColumnClass(int c) {
@@ -245,6 +371,9 @@ public class InboxTableModel extends DefaultTableModel {
 	/*
 	 * Don't need to implement this method unless your table's editable.
 	 */
+	/* (non-Javadoc)
+	 * @see javax.swing.table.DefaultTableModel#isCellEditable(int, int)
+	 */
 	public boolean isCellEditable(int row, int col) {
 		return false;
 	}
@@ -252,20 +381,38 @@ public class InboxTableModel extends DefaultTableModel {
 	/*
 	 * Don't need to implement this method unless your table's data can change.
 	 */
+	/* (non-Javadoc)
+	 * @see javax.swing.table.DefaultTableModel#setValueAt(java.lang.Object, int, int)
+	 */
 	public void setValueAt(Object value, int row, int col) {
 		data.get(row)[col] = value;
 		fireTableCellUpdated(row, col);
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.swing.table.DefaultTableModel#setRowCount(int)
+	 */
 	@Override
 	public void setRowCount(int rowCount) {
 		super.setRowCount(data.size());
 	}
 
+	/**
+	 * The Class InboxWorker.
+	 */
 	class InboxWorker extends SwingWorker<String, Object[]> {
+		
+		/** The filter list. */
 		private HashMap<String, WfSearchFilterBI> filterList;
+		
+		/** The special tag. */
 		private boolean specialTag;
 		
+		/**
+		 * Instantiates a new inbox worker.
+		 *
+		 * @param filterList the filter list
+		 */
 		public InboxWorker(HashMap<String, WfSearchFilterBI> filterList) {
 			super();
 			this.filterList = filterList;
@@ -285,6 +432,9 @@ public class InboxTableModel extends DefaultTableModel {
 			}
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.SwingWorker#doInBackground()
+		 */
 		@Override
 		protected String doInBackground() throws Exception {
 			data = new LinkedList<Object[]>();
@@ -300,6 +450,9 @@ public class InboxTableModel extends DefaultTableModel {
 		}
 		
 
+		/* (non-Javadoc)
+		 * @see javax.swing.SwingWorker#process(java.util.List)
+		 */
 		@Override
 		protected void process(List<Object[]> rows) {
 			try {
@@ -316,6 +469,9 @@ public class InboxTableModel extends DefaultTableModel {
 			}
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.SwingWorker#done()
+		 */
 		@Override
 		public void done() {
 			try {
@@ -328,6 +484,13 @@ public class InboxTableModel extends DefaultTableModel {
 
 	}
 
+	/**
+	 * Update row.
+	 *
+	 * @param currentRow the current row
+	 * @param modelRowNum the model row num
+	 * @param specialTag the special tag
+	 */
 	public void updateRow(Object[] currentRow, int modelRowNum, boolean specialTag) {
 		Object[] rowUpdated = null;
 		WfInstance wfInstance = (WfInstance) currentRow[currentRow.length - 1];
@@ -340,6 +503,13 @@ public class InboxTableModel extends DefaultTableModel {
 		fireTableDataChanged();
 	}
 
+	/**
+	 * Creates the row.
+	 *
+	 * @param wfInstance the wf instance
+	 * @param specialTag the special tag
+	 * @return the object[]
+	 */
 	private Object[] createRow(WfInstance wfInstance, boolean specialTag) {
 		Object[] row = null;
 		String tagStr = "";

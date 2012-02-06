@@ -44,12 +44,18 @@ public class NewCommentPanel extends JPanel {
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
 	
+	/**
+	 * Instantiates a new new comment panel.
+	 */
 	public NewCommentPanel() {
 		initComponents();
 		updateCombo1();
 		txtComm.requestFocusInWindow();
 	}
 	
+	/**
+	 * Update combo1.
+	 */
 	private void updateCombo1() {
 		comboBox1.removeAllItems();
 		List<I_GetConceptData> types = CommentsRefset.getCommentTypes();
@@ -66,6 +72,9 @@ public class NewCommentPanel extends JPanel {
 		}
 	}
 	
+	/**
+	 * Update combo2.
+	 */
 	private void updateCombo2() {
 		comboBox2.removeAllItems();
 		if (comboBox1.getSelectedItem() != null) {
@@ -92,10 +101,20 @@ public class NewCommentPanel extends JPanel {
 		}
 	}
 	
+	/**
+	 * Gets the new comment.
+	 *
+	 * @return the new comment
+	 */
 	public String getNewComment(){
 		return txtComm.getText();
 	}
 	
+	/**
+	 * Gets the comment type.
+	 *
+	 * @return the comment type
+	 */
 	public I_GetConceptData getCommentType() {
 		if (comboBox1.getSelectedItem() != null) {
 			return (I_GetConceptData) comboBox1.getSelectedItem();
@@ -104,6 +123,11 @@ public class NewCommentPanel extends JPanel {
 		}
 	}
 	
+	/**
+	 * Gets the comment sub type.
+	 *
+	 * @return the comment sub type
+	 */
 	public I_GetConceptData getCommentSubType() {
 		if (comboBox2.getSelectedItem() != null) {
 			return (I_GetConceptData) comboBox2.getSelectedItem();
@@ -112,6 +136,11 @@ public class NewCommentPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Combo box1 item state changed.
+	 *
+	 * @param e the e
+	 */
 	private void comboBox1ItemStateChanged(ItemEvent e) {
 		updateCombo2();
 	}
@@ -195,13 +224,28 @@ public class NewCommentPanel extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The combo box1. */
 	private JComboBox comboBox1;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The combo box2. */
 	private JComboBox comboBox2;
+	
+	/** The scroll pane2. */
 	private JScrollPane scrollPane2;
+	
+	/** The txt comm. */
 	private JTextArea txtComm;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

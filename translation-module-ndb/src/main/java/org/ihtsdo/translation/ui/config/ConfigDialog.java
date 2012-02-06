@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Thu Jun 17 16:31:58 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.translation.ui.config;
@@ -43,30 +56,70 @@ import org.ihtsdo.project.util.IconUtilities;
 import org.ihtsdo.translation.ui.ConfigTranslationModule;
 
 /**
+ * The Class ConfigDialog.
+ *
  * @author Guillermo Reynoso
  */
 public class ConfigDialog extends JDialog {
 
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 3579653366151472214L;
 	/** The config. */
 	private EditorModePanel editorModePanel;
+	
+	/** The similarity default setting panel. */
 	private SimilarityDefaultSettingsPanel similarityDefaultSettingPanel;
+	
+	/** The fsn gen strategy panel. */
 	private FsnGenerationStrategyPanel fsnGenStrategyPanel;
+	
+	/** The source tree components panel. */
 	private SourceTreeComponentsPanel sourceTreeComponentsPanel;
+	
+	/** The target tree components panel. */
 	private TargetTreeComponentsPanel targetTreeComponentsPanel;
+	
+	/** The inbox column components panel. */
 	private InboxColumnComponentsPanel inboxColumnComponentsPanel;
+	
+	/** The ics con generation strategy panel. */
 	private IcsGenerationStrategyPanel icsConGenerationStrategyPanel;
+	
+	/** The inbox item configuration panel. */
 	private InboxItemConfigurationPanel inboxItemConfigurationPanel;
+	
+	/** The translation issues repository ids panel. */
 	private TranslationIssuesRepositoryIdsPanel translationIssuesRepositoryIdsPanel;
+	
+	/** The file link configuration panel. */
 	private FileLinkConfigurationPanel fileLinkConfigurationPanel;
+	
+	/** The translator default editor mode panel. */
 	private TranslatorDefaultEditorModePanel translatorDefaultEditorModePanel;
+	
+	/** The spell check config panel. */
 	private SpellCheckerConfigPanel spellCheckConfigPanel;
+	
+	/** The preferd term default panel. */
 	private PreferedTermDefaultPanel preferdTermDefaultPanel;
 
+	/** The is project configuration. */
 	private boolean isProjectConfiguration;
+	
+	/** The conf trans. */
 	private ConfigTranslationModule confTrans;
+	
+	/** The config. */
 	private I_ConfigAceFrame config;
 
+	/**
+	 * Instantiates a new config dialog.
+	 *
+	 * @param config the config
+	 * @param confTrans the conf trans
+	 * @param isProjectConfiguration the is project configuration
+	 * @param projectName the project name
+	 */
 	public ConfigDialog(I_ConfigAceFrame config, ConfigTranslationModule confTrans, boolean isProjectConfiguration, String projectName) {
 		super();
 		this.isProjectConfiguration = isProjectConfiguration;
@@ -97,15 +150,20 @@ public class ConfigDialog extends JDialog {
 
 	}
 
+	/**
+	 * Gets the panel.
+	 *
+	 * @return the panel
+	 */
 	public JPanel getPanel() {
 		return (JPanel) this.getContentPane();
 	}
 
 	/**
-	 * Opens the configuration dialog<br>
-	 * 
+	 * Opens the configuration dialog<br>.
+	 *
 	 * @return The ConfigTranslationModule if configuration was accepted, <br>
-	 *         else returns null
+	 * else returns null
 	 */
 	public ConfigTranslationModule showModalDialog() {
 		setModal(true);
@@ -114,11 +172,19 @@ public class ConfigDialog extends JDialog {
 		return this.confTrans;
 	}
 
+	/**
+	 * Close.
+	 *
+	 * @param canceled the canceled
+	 */
 	private void close(ConfigTranslationModule canceled) {
 		this.confTrans = canceled;
 		dispose();
 	}
 
+	/**
+	 * Inits the custom components.
+	 */
 	private void initCustomComponents() {
 
 		// =================== CONFIG TREE RENDERER CONFIGURATION
@@ -267,6 +333,11 @@ public class ConfigDialog extends JDialog {
 
 	}
 
+	/**
+	 * Label1 mouse clicked.
+	 *
+	 * @param e the e
+	 */
 	private void label1MouseClicked(MouseEvent e) {
 		try {
 			HelpApi.openHelpForComponent("TRANSLATION_CONFIG");
@@ -277,6 +348,9 @@ public class ConfigDialog extends JDialog {
 		}
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -372,19 +446,45 @@ public class ConfigDialog extends JDialog {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The accept button. */
 	private JButton acceptButton;
+	
+	/** The config cancel button. */
 	private JButton configCancelButton;
+	
+	/** The split pane1. */
 	private JSplitPane splitPane1;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The config tree. */
 	private JTree configTree;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The title panel. */
 	private JPanel titlePanel;
+	
+	/** The title. */
 	private JLabel title;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The content panel. */
 	private JPanel contentPanel;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 
+	/**
+	 * Creates the nodes.
+	 *
+	 * @param top the top
+	 */
 	private void createNodes(DefaultMutableTreeNode top) {
 		DefaultMutableTreeNode category = null;
 		if (!isProjectConfiguration) {

@@ -28,6 +28,9 @@ import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
  */
 public class GenerateWorklistFromAttachmentsBeanInfo extends SimpleBeanInfo {
 
+	/**
+	 * Instantiates a new generate worklist from attachments bean info.
+	 */
 	public GenerateWorklistFromAttachmentsBeanInfo() {
 		super();
 	}

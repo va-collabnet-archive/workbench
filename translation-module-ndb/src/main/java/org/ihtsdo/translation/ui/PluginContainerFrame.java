@@ -174,6 +174,9 @@ public class PluginContainerFrame extends JPanel implements I_ContainTermCompone
 		
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.api.I_ContainTermComponent#unlink()
+	 */
 	@Override
 	public void unlink() {
 		// TODO Auto-generated method stub

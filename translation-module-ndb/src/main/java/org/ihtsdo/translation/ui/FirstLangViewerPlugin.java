@@ -56,18 +56,21 @@ public class FirstLangViewerPlugin extends AbstractPlugin {
 	/** The config. */
 	private I_ConfigAceFrame config;
 
+	/** The language label type. */
 	private String languageLabelType;
 
+	/** The order lang viewer panel. */
 	private TOGGLES orderLangViewerPanel;
 
+	/** The sequence. */
 	private String sequence;
 
 	/**
 	 * Instantiates a new similarity plugintst.
-	 * 
+	 *
 	 * @param selectedByDefault the selected by default
 	 * @param sequence the sequence
-	 * @param orderlangviewerPanel 
+	 * @param orderLangViewerPanel the order lang viewer panel
 	 */
 	public FirstLangViewerPlugin(boolean selectedByDefault, int sequence, TOGGLES orderLangViewerPanel) {
 		super(selectedByDefault, sequence);

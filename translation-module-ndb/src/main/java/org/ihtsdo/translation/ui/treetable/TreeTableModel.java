@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.translation.ui.treetable;
 /*
 
@@ -58,36 +74,57 @@ import javax.swing.tree.TreeModel;
  */
 public interface TreeTableModel extends TreeModel
 {
+    
     /**
      * Returns the number ofs availible column.
+     *
+     * @return the column count
      */
     public int getColumnCount();
 
     /**
      * Returns the name for column number <code>column</code>.
+     *
+     * @param column the column
+     * @return the column name
      */
     public String getColumnName(int column);
 
     /**
      * Returns the type for column number <code>column</code>.
+     *
+     * @param column the column
+     * @return the column class
      */
     public Class getColumnClass(int column);
 
     /**
-     * Returns the value to be displayed for node <code>node</code>, 
+     * Returns the value to be displayed for node <code>node</code>,
      * at column number <code>column</code>.
+     *
+     * @param node the node
+     * @param column the column
+     * @return the value at
      */
     public Object getValueAt(Object node, int column);
 
     /**
-     * Indicates whether the the value for node <code>node</code>, 
+     * Indicates whether the the value for node <code>node</code>,
      * at column number <code>column</code> is editable.
+     *
+     * @param node the node
+     * @param column the column
+     * @return true, if is cell editable
      */
     public boolean isCellEditable(Object node, int column);
 
     /**
-     * Sets the value for node <code>node</code>, 
+     * Sets the value for node <code>node</code>,
      * at column number <code>column</code>.
+     *
+     * @param aValue the a value
+     * @param node the node
+     * @param column the column
      */
     public void setValueAt(Object aValue, Object node, int column);
 }

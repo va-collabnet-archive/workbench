@@ -139,48 +139,95 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.EditingPanelOpenMode;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.EditorMode;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 
+/**
+ * The Class TranslationConceptEditor6.
+ */
 public class TranslationConceptEditor6 extends JPanel {
 
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
+	
+	/** The Constant HEADER_SEPARATOR. */
 	private static final String HEADER_SEPARATOR = " // ";
+	
+	/** The Constant COMMENT_HEADER_SEP. */
 	private static final String COMMENT_HEADER_SEP = ": -";
+	
+	/** The Constant REFSET_COMMENT_NAME. */
 	private static final Object REFSET_COMMENT_NAME = "Language comment";
+	
+	/** The Constant WORKLIST_COMMENT_NAME. */
 	private static final Object WORKLIST_COMMENT_NAME = "Worklist comment";
+	
+	/** The translation project. */
 	private TranslationProject translationProject;
+	
+	/** The synonym. */
 	private I_GetConceptData synonym;
+	
+	/** The fsn. */
 	private I_GetConceptData fsn;
+	
+	/** The preferred. */
 	private I_GetConceptData preferred;
+	
+	/** The source ids. */
 	private List<Integer> sourceIds;
+	
+	/** The target id. */
 	private int targetId;
+	
+	/** The acceptable. */
 	private I_GetConceptData acceptable;
+	
+	/** The source lang refsets. */
 	private Set<LanguageMembershipRefset> sourceLangRefsets;
+	
+	/** The target lang refset. */
 	private LanguageMembershipRefset targetLangRefset;
+	
+	/** The formatter. */
 	private SimpleDateFormat formatter;
+	
+	/** The inactive. */
 	private I_GetConceptData inactive;
+	
+	/** The active. */
 	private I_GetConceptData active;
+	
+	/** The issue list panel. */
 	private IssuesListPanel2 issueListPanel;
+	
+	/** The transl config. */
 	private ConfigTranslationModule translConfig;
+	
+	/** The assigned mnemo. */
 	private String assignedMnemo;
+	
+	/** The read only mode. */
 	private boolean readOnlyMode;
+	
+	/** The save desc. */
 	private boolean saveDesc;
+	
+	/** The button5. */
 	private JButton button5;
+	
+	/** The update ui thread. */
 	private Thread updateUIThread;
+	
+	/** The already verified. */
 	private boolean alreadyVerified;
+	
+	/** The Snomed_ isa. */
 	private I_GetConceptData Snomed_Isa;
+	
+	/** The inferred. */
 	private int inferred;
 
 	/**
 	 * Instantiates a new translation concept editor.
-	 * 
-	 * @param concept
-	 *            the concept
-	 * @param config
-	 *            the config
-	 * @param sourceLangCode
-	 *            the source lang code
-	 * @param targetLangCode
-	 *            the target lang code
+	 *
 	 */
 	public TranslationConceptEditor6() {
 		sourceIds = new ArrayList<Integer>();
@@ -279,20 +326,43 @@ public class TranslationConceptEditor6 extends JPanel {
 		termZoomDialog.setSize(dimension);
 	}
 
+	/**
+	 * The Class SourceTableMouselistener.
+	 */
 	public class SourceTableMouselistener extends MouseAdapter {
+		
+		/** The menu. */
 		private JPopupMenu menu;
+		
+		/** The m item. */
 		private JMenuItem mItem;
+		
+		/** The m itema. */
 		private JMenuItem mItema;
+		
+		/** The m item listener. */
 		private MenuItemListener mItemListener;
+		
+		/** The x point. */
 		private int xPoint;
+		
+		/** The y point. */
 		private int yPoint;
 
+		/**
+		 * Instantiates a new source table mouselistener.
+		 */
 		SourceTableMouselistener() {
 			mItemListener = new MenuItemListener();
 
 			getMenu();
 		}
 
+		/**
+		 * Gets the menu.
+		 *
+		 * @return the menu
+		 */
 		private void getMenu() {
 
 			menu = new JPopupMenu();
@@ -309,6 +379,9 @@ public class TranslationConceptEditor6 extends JPanel {
 
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.event.MouseAdapter#mouseClicked(java.awt.event.MouseEvent)
+		 */
 		@Override
 		public void mouseClicked(MouseEvent e) {
 
@@ -337,11 +410,28 @@ public class TranslationConceptEditor6 extends JPanel {
 		}
 	}
 
+	/**
+	 * The listener interface for receiving menuItem events.
+	 * The class that is interested in processing a menuItem
+	 * event implements this interface, and the object created
+	 * with that class is registered with a component using the
+	 * component's <code>addMenuItemListener<code> method. When
+	 * the menuItem event occurs, that object's appropriate
+	 * method is invoked.
+	 *
+	 * @see MenuItemEvent
+	 */
 	class MenuItemListener implements ActionListener {
 
+		/** The cont description. */
 		private ContextualizedDescription contDescription;
+		
+		/** The acc event. */
 		private ActionEvent accEvent;
 
+		/* (non-Javadoc)
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (contDescription != null) {
@@ -380,40 +470,98 @@ public class TranslationConceptEditor6 extends JPanel {
 
 		}
 
+		/**
+		 * Sets the item.
+		 *
+		 * @param contDescription the new item
+		 */
 		public void setItem(ContextualizedDescription contDescription) {
 			this.contDescription = contDescription;
 		}
 
 	}
 
+	/**
+	 * The Enum TableSourceColumn.
+	 */
 	enum TableSourceColumn {
-		LANGUAGE("Language"), TERM_TYPE("Term type"), ACCEPTABILITY("Acceptability"), ICS("ICS"), TERM("Term");
+		
+		/** The LANGUAGE. */
+		LANGUAGE("Language"), 
+ /** The TER m_ type. */
+ TERM_TYPE("Term type"), 
+ /** The ACCEPTABILITY. */
+ ACCEPTABILITY("Acceptability"), 
+ /** The ICS. */
+ ICS("ICS"), 
+ /** The TERM. */
+ TERM("Term");
 
+		/** The column name. */
 		private final String columnName;
 
+		/**
+		 * Instantiates a new table source column.
+		 *
+		 * @param name the name
+		 */
 		private TableSourceColumn(String name) {
 			this.columnName = name;
 		}
 
+		/**
+		 * Gets the column name.
+		 *
+		 * @return the column name
+		 */
 		public String getColumnName() {
 			return this.columnName;
 		}
 	}
 
+	/**
+	 * The Enum TableTargetColumn.
+	 */
 	enum TableTargetColumn {
-		LANGUAGE("Language"), TERM_TYPE("Term type"), ACCEPTABILITY("Acceptability"), ICS("ICS"), TERM("Term");
+		
+		/** The LANGUAGE. */
+		LANGUAGE("Language"), 
+ /** The TER m_ type. */
+ TERM_TYPE("Term type"), 
+ /** The ACCEPTABILITY. */
+ ACCEPTABILITY("Acceptability"), 
+ /** The ICS. */
+ ICS("ICS"), 
+ /** The TERM. */
+ TERM("Term");
 
+		/** The column name. */
 		private final String columnName;
 
+		/**
+		 * Instantiates a new table target column.
+		 *
+		 * @param name the name
+		 */
 		private TableTargetColumn(String name) {
 			this.columnName = name;
 		}
 
+		/**
+		 * Gets the column name.
+		 *
+		 * @return the column name
+		 */
 		public String getColumnName() {
 			return this.columnName;
 		}
 	}
 
+	/**
+	 * Gets the translation project config.
+	 *
+	 * @return the translation project config
+	 */
 	private ConfigTranslationModule getTranslationProjectConfig() {
 		ConfigTranslationModule translProjConfig = null;
 		if (this.translationProject != null) {
@@ -430,10 +578,16 @@ public class TranslationConceptEditor6 extends JPanel {
 		return translProjConfig;
 	}
 
+	/**
+	 * Sets the mnemo init.
+	 */
 	private void setMnemoInit() {
 		assignedMnemo = "FPDYGKAXCRNLOIV";
 	}
 
+	/**
+	 * Unload data.
+	 */
 	public void unloadData() {
 		// ---- label14 ----
 		label14.setText("S:-");
@@ -458,11 +612,11 @@ public class TranslationConceptEditor6 extends JPanel {
 	}
 
 	/**
-	 * Verifies changes to target description
-	 * 
-	 * @param message
-	 *            <\T> if null
-	 * @return
+	 * Verifies changes to target description.
+	 *
+	 * @param message <\T> if null
+	 * @param doVerify the do verify
+	 * @return true, if successful
 	 */
 	synchronized public boolean verifySavePending(String message, boolean doVerify) {
 		boolean bPendTerm = true;
@@ -565,10 +719,20 @@ public class TranslationConceptEditor6 extends JPanel {
 		return bPendTerm;
 	}
 
+	/**
+	 * Gets the description in editor.
+	 *
+	 * @return the description in editor
+	 */
 	public ContextualizedDescription getDescriptionInEditor() {
 		return descriptionInEditor;
 	}
 
+	/**
+	 * Sets the read only mode.
+	 *
+	 * @param readOnly the new read only mode
+	 */
 	private void setReadOnlyMode(boolean readOnly) {
 		this.readOnlyMode = readOnly;
 		rbInact.setEnabled(true && !readOnlyMode);
@@ -577,6 +741,8 @@ public class TranslationConceptEditor6 extends JPanel {
 
 	/**
 	 * Clear form.
+	 *
+	 * @param clearAll the clear all
 	 */
 	synchronized private void clearForm(boolean clearAll) {
 		descriptionInEditor = null;
@@ -678,9 +844,7 @@ public class TranslationConceptEditor6 extends JPanel {
 
 	/**
 	 * Spellcheck action performed.
-	 * 
-	 * @param e
-	 *            the e
+	 *
 	 */
 	private void mSpellChkActionPerformed() {
 		AceFrameConfig config;
@@ -696,6 +860,9 @@ public class TranslationConceptEditor6 extends JPanel {
 	}
 
 
+	/**
+	 * M add pref action performed.
+	 */
 	private void mAddPrefActionPerformed() {
 		if (verifySavePending(null, false)) {
 			descriptionInEditor = null;
@@ -709,6 +876,9 @@ public class TranslationConceptEditor6 extends JPanel {
 		}
 	}
 
+	/**
+	 * M add desc action performed.
+	 */
 	private void mAddDescActionPerformed() {
 		if (verifySavePending(null, false)) {
 			descriptionInEditor = null;
@@ -722,6 +892,9 @@ public class TranslationConceptEditor6 extends JPanel {
 		}
 	}
 
+	/**
+	 * B keep action performed.
+	 */
 	private void bKeepActionPerformed() {
 		clearForm(true);
 
@@ -730,14 +903,27 @@ public class TranslationConceptEditor6 extends JPanel {
 		bEscalate.setEnabled(false);
 	}
 
+	/**
+	 * B review action performed.
+	 */
 	private void bReviewActionPerformed() {
 		// clearAndRemove();
 	}
 
+	/**
+	 * B escalate action performed.
+	 */
 	private void bEscalateActionPerformed() {
 		// clearAndRemove();
 	}
 
+	/**
+	 * Save comment.
+	 *
+	 * @param comment the comment
+	 * @param commentType the comment type
+	 * @param commentSubType the comment sub type
+	 */
 	private void saveComment(String comment, I_GetConceptData commentType, I_GetConceptData commentSubType) {
 		I_ConfigAceFrame config = null;
 		try {
@@ -787,6 +973,11 @@ public class TranslationConceptEditor6 extends JPanel {
 		}
 	}
 
+	/**
+	 * Save desc action performed.
+	 *
+	 * @return true, if successful
+	 */
 	private boolean saveDescActionPerformed() {
 		boolean result = true;
 		I_ConfigAceFrame config = null;
@@ -872,6 +1063,9 @@ public class TranslationConceptEditor6 extends JPanel {
 		return result;
 	}
 
+	/**
+	 * M hist action performed.
+	 */
 	private void mHistActionPerformed() {
 		org.ihtsdo.project.panel.TranslationHelperPanel thp;
 		try {
@@ -917,10 +1111,16 @@ public class TranslationConceptEditor6 extends JPanel {
 		}
 	}
 
+	/**
+	 * B add coment action performed.
+	 */
 	private void bAddComentActionPerformed() {
 		showNewCommentPanel();
 	}
 
+	/**
+	 * Show new comment panel.
+	 */
 	public void showNewCommentPanel() {
 
 		NewCommentPanel cPanel;
@@ -951,6 +1151,11 @@ public class TranslationConceptEditor6 extends JPanel {
 		JOptionPane.showOptionDialog(this, string, "Information", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, null, null);
 	}
 
+	/**
+	 * Ref table hyperlink update.
+	 *
+	 * @param hle the hle
+	 */
 	private void refTableHyperlinkUpdate(HyperlinkEvent hle) {
 		if (HyperlinkEvent.EventType.ACTIVATED.equals(hle.getEventType())) {
 			System.out.println("Opening: " + hle.getURL());
@@ -982,6 +1187,11 @@ public class TranslationConceptEditor6 extends JPanel {
 		}
 	}
 
+	/**
+	 * Tbl comm mouse clicked.
+	 *
+	 * @param e the e
+	 */
 	private void tblCommMouseClicked(MouseEvent e) {
 		if (SwingUtilities.isLeftMouseButton(e)) {
 			if (e.getClickCount() == 2) {
@@ -1006,6 +1216,9 @@ public class TranslationConceptEditor6 extends JPanel {
 		}
 	}
 
+	/**
+	 * View comment.
+	 */
 	private void viewComment() {
 		int row = tblComm.getSelectedRow();
 		if (row > -1) {
@@ -1074,6 +1287,9 @@ public class TranslationConceptEditor6 extends JPanel {
 
 	}
 
+	/**
+	 * M log action performed.
+	 */
 	private void mLogActionPerformed() {
 		try {
 			TranslationWlstMemberLogPanel panel = getTranslMemberLogPanel();
@@ -1102,6 +1318,11 @@ public class TranslationConceptEditor6 extends JPanel {
 		}
 	}
 
+	/**
+	 * Gets the transl member log panel.
+	 *
+	 * @return the transl member log panel
+	 */
 	private TranslationWlstMemberLogPanel getTranslMemberLogPanel() {
 		AceFrameConfig config;
 		try {
@@ -1130,6 +1351,11 @@ public class TranslationConceptEditor6 extends JPanel {
 
 	}
 
+	/**
+	 * Checks if is member log open.
+	 *
+	 * @return true, if is member log open
+	 */
 	private boolean isMemberLogOpen() {
 		AceFrameConfig config;
 		try {
@@ -1154,6 +1380,11 @@ public class TranslationConceptEditor6 extends JPanel {
 
 	}
 
+	/**
+	 * Label10 mouse clicked.
+	 *
+	 * @param e the e
+	 */
 	private void label10MouseClicked(MouseEvent e) {
 		try {
 			HelpApi.openHelpForComponent("TRANSLATION_UI");
@@ -1164,6 +1395,11 @@ public class TranslationConceptEditor6 extends JPanel {
 		}
 	}
 
+	/**
+	 * Label12 mouse clicked.
+	 *
+	 * @param e the e
+	 */
 	private void label12MouseClicked(MouseEvent e) {
 		try {
 			HelpApi.openHelpForComponent("WORKFLOW_BUTTONS");
@@ -1174,6 +1410,11 @@ public class TranslationConceptEditor6 extends JPanel {
 		}
 	}
 
+	/**
+	 * Label13 mouse clicked.
+	 *
+	 * @param e the e
+	 */
 	private void label13MouseClicked(MouseEvent e) {
 		try {
 			HelpApi.openHelpForComponent("TRANSLATION_EDIT");
@@ -1184,6 +1425,11 @@ public class TranslationConceptEditor6 extends JPanel {
 		}
 	}
 
+	/**
+	 * Search documents action performed.
+	 *
+	 * @param e the e
+	 */
 	private void searchDocumentsActionPerformed(ActionEvent e) {
 		try {
 			TranslationHelperPanel thp = PanelHelperFactory.getTranslationHelperPanel();
@@ -1210,6 +1456,11 @@ public class TranslationConceptEditor6 extends JPanel {
 		}
 	}
 
+	/**
+	 * Label17 mouse clicked.
+	 *
+	 * @param e the e
+	 */
 	private void label17MouseClicked(MouseEvent e) {
 		try {
 			HelpApi.openHelpForComponent("COMMENTS");
@@ -1220,6 +1471,11 @@ public class TranslationConceptEditor6 extends JPanel {
 		}
 	}
 
+	/**
+	 * Delete comment action performed.
+	 *
+	 * @param e the e
+	 */
 	private void deleteCommentActionPerformed(ActionEvent e) {
 		Comment selectedComment = (Comment) tblComm.getModel().getValueAt(tblComm.getSelectedRow(), 1);
 		if (selectedComment != null) {
@@ -1228,10 +1484,20 @@ public class TranslationConceptEditor6 extends JPanel {
 		getPreviousComments();
 	}
 
+	/**
+	 * View comment action performed.
+	 *
+	 * @param e the e
+	 */
 	private void viewCommentActionPerformed(ActionEvent e) {
 		viewComment();
 	}
 
+	/**
+	 * Target text field mouse clicked.
+	 *
+	 * @param e the e
+	 */
 	private void targetTextFieldMouseClicked(MouseEvent e) {
 		if (e.getClickCount() == 2) {
 			zoomTextArea.setText(targetTextField.getText());
@@ -1243,17 +1509,38 @@ public class TranslationConceptEditor6 extends JPanel {
 		}
 	}
 
+	/**
+	 * Save zoom button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void saveZoomButtonActionPerformed(ActionEvent e) {
 		targetTextField.setText(zoomTextArea.getText());
 		termZoomDialog.dispose();
 		zoomTextArea.setText("");
 	}
 
+	/**
+	 * Cancel zoom change action performed.
+	 *
+	 * @param e the e
+	 */
 	private void cancelZoomChangeActionPerformed(ActionEvent e) {
 		termZoomDialog.dispose();
 		zoomTextArea.setText("");
 	}
 
+	/**
+	 * The listener interface for receiving selection events.
+	 * The class that is interested in processing a selection
+	 * event implements this interface, and the object created
+	 * with that class is registered with a component using the
+	 * component's <code>addSelectionListener<code> method. When
+	 * the selection event occurs, that object's appropriate
+	 * method is invoked.
+	 *
+	 * @see SelectionEvent
+	 */
 	class SelectionListener implements ListSelectionListener {
 
 		/** The table. */
@@ -2149,88 +2436,253 @@ public class TranslationConceptEditor6 extends JPanel {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The menu bar1. */
 	private JMenuBar menuBar1;
+	
+	/** The menu1. */
 	private JMenu menu1;
+	
+	/** The b add fsn. */
 	private JMenuItem bAddFSN;
+	
+	/** The m add pref. */
 	private JMenuItem mAddPref;
+	
+	/** The m add desc. */
 	private JMenuItem mAddDesc;
+	
+	/** The menu3. */
 	private JMenu menu3;
+	
+	/** The m spell chk. */
 	private JMenuItem mSpellChk;
+	
+	/** The menu2. */
 	private JMenu menu2;
+	
+	/** The m hist. */
 	private JMenuItem mHist;
+	
+	/** The m log. */
 	private JMenuItem mLog;
+	
+	/** The menu4. */
 	private JMenu menu4;
+	
+	/** The menu item1. */
 	private JMenuItem menuItem1;
+	
+	/** The label14. */
 	private JLabel label14;
+	
+	/** The label15. */
 	private JLabel label15;
+	
+	/** The label16. */
 	private JLabel label16;
+	
+	/** The label10. */
 	private JLabel label10;
+	
+	/** The panel10. */
 	private JPanel panel10;
+	
+	/** The split pane2. */
 	private JSplitPane splitPane2;
+	
+	/** The split pane4. */
 	private JSplitPane splitPane4;
+	
+	/** The panel9. */
 	private JPanel panel9;
+	
+	/** The label9. */
 	private JLabel label9;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The tab sou. */
 	private ZebraJTable tabSou;
+	
+	/** The tabbed pane2. */
 	private JTabbedPane tabbedPane2;
+	
+	/** The panel16. */
 	private JPanel panel16;
+	
+	/** The panel17. */
 	private JPanel panel17;
+	
+	/** The b add coment. */
 	private JButton bAddComent;
+	
+	/** The cmb tar comm. */
 	private JComboBox cmbTarComm;
+	
+	/** The label17. */
 	private JLabel label17;
+	
+	/** The tabbed pane1. */
 	private JTabbedPane tabbedPane1;
+	
+	/** The scroll pane9. */
 	private JScrollPane scrollPane9;
+	
+	/** The tbl comm. */
 	private ZebraJTable tblComm;
+	
+	/** The scroll pane8. */
 	private JScrollPane scrollPane8;
+	
+	/** The ref table. */
 	private JEditorPane refTable;
+	
+	/** The panel11. */
 	private JPanel panel11;
+	
+	/** The split pane1. */
 	private JSplitPane splitPane1;
+	
+	/** The panel8. */
 	private JPanel panel8;
+	
+	/** The label11. */
 	private JLabel label11;
+	
+	/** The scroll pane6. */
 	private JScrollPane scrollPane6;
+	
+	/** The tab tar. */
 	private ZebraJTable tabTar;
+	
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The scroll pane5. */
 	private JScrollPane scrollPane5;
+	
+	/** The target text field. */
 	private JTextArea targetTextField;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The panel7. */
 	private JPanel panel7;
+	
+	/** The label4. */
 	private JLabel label4;
+	
+	/** The combo box1. */
 	private JComboBox comboBox1;
+	
+	/** The panel5. */
 	private JPanel panel5;
+	
+	/** The label5. */
 	private JLabel label5;
+	
+	/** The cmb accep. */
 	private JComboBox cmbAccep;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The panel4. */
 	private JPanel panel4;
+	
+	/** The rb yes. */
 	private JRadioButton rbYes;
+	
+	/** The label6. */
 	private JLabel label6;
+	
+	/** The rb no. */
 	private JRadioButton rbNo;
+	
+	/** The panel14. */
 	private JPanel panel14;
+	
+	/** The label7. */
 	private JLabel label7;
+	
+	/** The rb act. */
 	private JRadioButton rbAct;
+	
+	/** The rb inact. */
 	private JRadioButton rbInact;
+	
+	/** The panel3. */
 	private JPanel panel3;
+	
+	/** The label13. */
 	private JLabel label13;
+	
+	/** The panel6. */
 	private JPanel panel6;
+	
+	/** The button panel. */
 	private JPanel buttonPanel;
+	
+	/** The label12. */
 	private JLabel label12;
+	
+	/** The label8. */
 	private JLabel label8;
+	
+	/** The b keep. */
 	private JButton bKeep;
+	
+	/** The b review. */
 	private JButton bReview;
+	
+	/** The b escalate. */
 	private JButton bEscalate;
+	
+	/** The tabbed pane3. */
 	private JTabbedPane tabbedPane3;
+	
+	/** The scroll pane7. */
 	private JScrollPane scrollPane7;
+	
+	/** The tree3. */
 	private JTree tree3;
+	
+	/** The hierarchy navigator1. */
 	private HierarchyNavigator hierarchyNavigator1;
+	
+	/** The popup menu1. */
 	private JPopupMenu popupMenu1;
+	
+	/** The menu item2. */
 	private JMenuItem menuItem2;
+	
+	/** The menu item3. */
 	private JMenuItem menuItem3;
+	
+	/** The term zoom dialog. */
 	private JDialog termZoomDialog;
+	
+	/** The panel12. */
 	private JPanel panel12;
+	
+	/** The scroll pane2. */
 	private JScrollPane scrollPane2;
+	
+	/** The zoom text area. */
 	private JTextArea zoomTextArea;
+	
+	/** The save zoom button. */
 	private JButton saveZoomButton;
+	
+	/** The cancel zoom change. */
 	private JButton cancelZoomChange;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 
@@ -2249,23 +2701,54 @@ public class TranslationConceptEditor6 extends JPanel {
 
 	/** The target preferred. */
 	private String targetPreferred;
+	
+	/** The target fsn. */
 	private String targetFSN;
 
 
+	/** The defining char. */
 	private int definingChar = -1;
+	
+	/** The source fsn. */
 	private String sourceFSN;
+	
+	/** The worklist member. */
 	private WorkListMember worklistMember;
+	
+	/** The set by code. */
 	private boolean setByCode;
+	
+	/** The source ics. */
 	private boolean sourceICS;
+	
+	/** The keep ii class. */
 	private I_KeepTaskInInbox keepIIClass;
+	
+	/** The unloaded. */
 	private boolean unloaded;
+	
+	/** The role. */
 	private I_GetConceptData role;
+	
+	/** The editing row. */
 	private Integer editingRow;
+	
+	/** The target preferred row. */
 	private Integer targetPreferredRow;
+	
+	/** The target fsn row. */
 	private Integer targetFSNRow;
+	
+	/** The html footer. */
 	private String htmlFooter = "</body></html>";
+	
+	/** The html header. */
 	private String htmlHeader = "<html><body><font style='color:blue'>";
+	
+	/** The end p. */
 	private String endP = "</font>";
+	
+	/** The scrollp. */
 	private JScrollPane scrollp;
 
 	/**
@@ -2289,6 +2772,8 @@ public class TranslationConceptEditor6 extends JPanel {
 
 	/**
 	 * Populate tree.
+	 *
+	 * @throws Exception the exception
 	 */
 	private void populateSourceTree() throws Exception {
 		// DefaultMutableTreeNode top = null;
@@ -2552,6 +3037,11 @@ public class TranslationConceptEditor6 extends JPanel {
 
 	}
 
+	/**
+	 * Gets the similarity panel.
+	 *
+	 * @return the similarity panel
+	 */
 	private SimilarityPanel getSimilarityPanel() {
 
 		AceFrameConfig config;
@@ -2586,6 +3076,11 @@ public class TranslationConceptEditor6 extends JPanel {
 		return null;
 	}
 
+	/**
+	 * Populate target tree.
+	 *
+	 * @throws Exception the exception
+	 */
 	private void populateTargetTree() throws Exception {
 		I_TermFactory tf = Terms.get();
 		// DefaultMutableTreeNode top = null;
@@ -2836,6 +3331,11 @@ public class TranslationConceptEditor6 extends JPanel {
 		targetTextField.setEnabled(false);
 	}
 
+	/**
+	 * Populate details tree.
+	 *
+	 * @throws Exception the exception
+	 */
 	@SuppressWarnings("unchecked")
 	private void populateDetailsTree() throws Exception {
 		I_TermFactory tf = Terms.get();
@@ -2962,13 +3462,17 @@ public class TranslationConceptEditor6 extends JPanel {
 		}
 	}
 
+	/**
+	 * The Class TermTypeIconRenderer.
+	 */
 	class TermTypeIconRenderer extends DefaultTableCellRenderer {
 
-		/**
-		 * 
-		 */
+		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = 1L;
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.DefaultTableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
+		 */
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 
 			JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
@@ -2985,13 +3489,17 @@ public class TranslationConceptEditor6 extends JPanel {
 
 	}
 
+	/**
+	 * The Class AcceptabilityIconRenderer.
+	 */
 	class AcceptabilityIconRenderer extends DefaultTableCellRenderer {
 
-		/**
-		 * 
-		 */
+		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = 1L;
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.DefaultTableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
+		 */
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 
 			JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
@@ -3004,13 +3512,17 @@ public class TranslationConceptEditor6 extends JPanel {
 
 	}
 
+	/**
+	 * The Class TermRenderer.
+	 */
 	class TermRenderer extends DefaultTableCellRenderer {
 
-		/**
-		 * 
-		 */
+		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = 1L;
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.DefaultTableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
+		 */
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 
 			JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
@@ -3020,13 +3532,17 @@ public class TranslationConceptEditor6 extends JPanel {
 
 	}
 
+	/**
+	 * The Class LanguageIconRenderer.
+	 */
 	class LanguageIconRenderer extends DefaultTableCellRenderer {
 
-		/**
-		 * 
-		 */
+		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = 1L;
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.DefaultTableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
+		 */
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 
 			JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
@@ -3040,13 +3556,17 @@ public class TranslationConceptEditor6 extends JPanel {
 
 	}
 
+	/**
+	 * The Class ICSIconRenderer.
+	 */
 	class ICSIconRenderer extends DefaultTableCellRenderer {
 
-		/**
-		 * 
-		 */
+		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = 1L;
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.DefaultTableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
+		 */
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 
 			JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
@@ -3062,8 +3582,9 @@ public class TranslationConceptEditor6 extends JPanel {
 
 	/**
 	 * Update properties panel.
-	 * 
-	 * @param rowModel
+	 *
+	 * @param descrpt the descrpt
+	 * @param rowModel the row model
 	 */
 	private void updatePropertiesPanel(ContextualizedDescription descrpt, int rowModel) {
 		boolean update = false;
@@ -3219,6 +3740,13 @@ public class TranslationConceptEditor6 extends JPanel {
 		// }
 	}
 
+	/**
+	 * Update ui.
+	 *
+	 * @param translationProject the translation project
+	 * @param workListMember the work list member
+	 * @param role the role
+	 */
 	public void updateUI(TranslationProject translationProject, WorkListMember workListMember, I_GetConceptData role) {
 		// clearForm(true);
 		try {
@@ -3358,6 +3886,11 @@ public class TranslationConceptEditor6 extends JPanel {
 
 	}
 
+	/**
+	 * Gets the web references.
+	 *
+	 * @return the web references
+	 */
 	private void getWebReferences() {
 		I_ConfigAceFrame config;
 		try {
@@ -3404,6 +3937,9 @@ public class TranslationConceptEditor6 extends JPanel {
 
 	}
 
+	/**
+	 * Load issues.
+	 */
 	protected void loadIssues() {
 		if (issueListPanel == null) {
 			createIssuePanel();
@@ -3436,6 +3972,9 @@ public class TranslationConceptEditor6 extends JPanel {
 		}
 	}
 
+	/**
+	 * Creates the issue panel.
+	 */
 	private void createIssuePanel() {
 		I_ConfigAceFrame config;
 		try {
@@ -3456,6 +3995,9 @@ public class TranslationConceptEditor6 extends JPanel {
 
 	}
 
+	/**
+	 * Clear comments.
+	 */
 	private void clearComments() {
 		String[] columnNames = { "Comment" };
 		String[][] data = null;
@@ -3472,6 +4014,11 @@ public class TranslationConceptEditor6 extends JPanel {
 		tabbedPane1.setTitleAt(0, "<html>Comments</font></b></html>");
 	}
 
+	/**
+	 * Gets the previous comments.
+	 *
+	 * @return the previous comments
+	 */
 	private void getPreviousComments() {
 		I_ConfigAceFrame config;
 		try {
@@ -3548,6 +4095,12 @@ public class TranslationConceptEditor6 extends JPanel {
 		}
 	}
 
+	/**
+	 * Format comment.
+	 *
+	 * @param comment the comment
+	 * @return the string
+	 */
 	private String formatComment(String comment) {
 		long thickVer;
 		thickVer = Long.parseLong(comment.substring(comment.trim().lastIndexOf(" ") + 1));
@@ -3561,11 +4114,21 @@ public class TranslationConceptEditor6 extends JPanel {
 
 	}
 
+	/**
+	 * Sets the workflow buttons.
+	 *
+	 * @param buttons the new workflow buttons
+	 */
 	public void setWorkflowButtons(List<Component> buttons) {
 		removeWorkflowButtons();
 		addWorkflowButtons(buttons);
 	}
 
+	/**
+	 * Adds the workflow buttons.
+	 *
+	 * @param buttons the buttons
+	 */
 	private void addWorkflowButtons(List<Component> buttons) {
 
 		int columnsCount = (buttons.size() * 2) + 3;
@@ -3660,6 +4223,11 @@ public class TranslationConceptEditor6 extends JPanel {
 		panel6.repaint();
 	}
 
+	/**
+	 * Sets the button mnemo.
+	 *
+	 * @param btton the new button mnemo
+	 */
 	private void setButtonMnemo(Component btton) {
 		if (btton instanceof JButton) {
 			String buttName = ((JButton) btton).getText();
@@ -3674,6 +4242,9 @@ public class TranslationConceptEditor6 extends JPanel {
 		}
 	}
 
+	/**
+	 * Removes the workflow buttons.
+	 */
 	public void removeWorkflowButtons() {
 		if (buttonPanel != null) {
 			for (int i = buttonPanel.getComponentCount() - 1; i > -1; i--) {
@@ -3691,10 +4262,20 @@ public class TranslationConceptEditor6 extends JPanel {
 
 	}
 
+	/**
+	 * Gets the source lang refsets.
+	 *
+	 * @return the source lang refsets
+	 */
 	public Set<LanguageMembershipRefset> getSourceLangRefsets() {
 		return sourceLangRefsets;
 	}
 
+	/**
+	 * Sets the source lang refsets.
+	 *
+	 * @param sourceLangRefsets the new source lang refsets
+	 */
 	public void setSourceLangRefsets(Set<LanguageMembershipRefset> sourceLangRefsets) {
 		this.sourceLangRefsets = sourceLangRefsets;
 		sourceIds = new ArrayList<Integer>();
@@ -3703,15 +4284,28 @@ public class TranslationConceptEditor6 extends JPanel {
 		}
 	}
 
+	/**
+	 * Gets the target lang refset.
+	 *
+	 * @return the target lang refset
+	 */
 	public LanguageMembershipRefset getTargetLangRefset() {
 		return targetLangRefset;
 	}
 
+	/**
+	 * Sets the target lang refset.
+	 *
+	 * @param targetLangRefset the new target lang refset
+	 */
 	public void setTargetLangRefset(LanguageMembershipRefset targetLangRefset) {
 		this.targetLangRefset = targetLangRefset;
 		targetId = targetLangRefset.getRefsetId();
 	}
 
+	/**
+	 * Autokeep in inbox.
+	 */
 	public void AutokeepInInbox() {
 		if (this.keepIIClass != null) {
 			this.unloaded = false;
@@ -3719,16 +4313,31 @@ public class TranslationConceptEditor6 extends JPanel {
 		}
 	}
 
+	/**
+	 * Sets the auto keep function.
+	 *
+	 * @param thisAutoKeep the new auto keep function
+	 */
 	public void setAutoKeepFunction(I_KeepTaskInInbox thisAutoKeep) {
 		this.keepIIClass = thisAutoKeep;
 
 	}
 
+	/**
+	 * Sets the unloaded.
+	 *
+	 * @param b the new unloaded
+	 */
 	public void setUnloaded(boolean b) {
 		this.unloaded = b;
 
 	}
 
+	/**
+	 * Gets the unloaded.
+	 *
+	 * @return the unloaded
+	 */
 	public boolean getUnloaded() {
 		return this.unloaded;
 	}

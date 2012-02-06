@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Thu Feb 25 22:55:36 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.translation;
@@ -55,15 +68,28 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
  * The Class TranslationTermsPanel.
  */
 public class TranslationTermsPanel extends JPanel {
-	/**
-	 * 
-	 */
+	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
+	
+	/** The synonym. */
 	private I_GetConceptData synonym;
+	
+	/** The fsn. */
 	private I_GetConceptData fsn;
+	
+	/** The l model. */
 	private DefaultListModel lModel;
+	
+	/** The concept. */
 	private I_GetConceptData concept;
 	
+	/**
+	 * Instantiates a new translation terms panel.
+	 *
+	 * @param languageRefsetConcepts the language refset concepts
+	 * @param concept the concept
+	 */
 	public TranslationTermsPanel(List<I_GetConceptData> languageRefsetConcepts,I_GetConceptData concept) {
 		initComponents();
 		this.concept=concept;
@@ -157,7 +183,14 @@ public class TranslationTermsPanel extends JPanel {
 //		
 //	}
 
-	private DefaultTreeModel getConceptTreeModel(I_GetConceptData concept) throws Exception {
+	/**
+ * Gets the concept tree model.
+ *
+ * @param concept the concept
+ * @return the concept tree model
+ * @throws Exception the exception
+ */
+private DefaultTreeModel getConceptTreeModel(I_GetConceptData concept) throws Exception {
 		I_TermFactory tf = Terms.get();
 		DefaultMutableTreeNode top = null;
 		if (concept != null) {
@@ -233,6 +266,9 @@ public class TranslationTermsPanel extends JPanel {
 		return treeModel;
 	}
 
+	/**
+	 * Load languages.
+	 */
 	private void loadLanguages(){
 		I_IntSet allowedDestRelTypes =  Terms.get().newIntSet();
 		try {
@@ -259,25 +295,53 @@ public class TranslationTermsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Tree1 value changed.
+	 *
+	 * @param e the e
+	 */
 	private void tree1ValueChanged(TreeSelectionEvent e) {
 		// TODO add your code here
 	}
 
+	/**
+	 * The Class IconRenderer.
+	 */
 	class IconRenderer extends DefaultTreeCellRenderer {
-		/**
-		 * 
-		 */
+		
+		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = 1L;
+		
+		/** The red icon. */
 		Icon redIcon;
+		
+		/** The attribute icon. */
 		Icon attributeIcon;
+		
+		/** The orange icon. */
 		Icon orangeIcon;
+		
+		/** The description icon. */
 		Icon descriptionIcon;
+		
+		/** The fsn icon. */
 		Icon fsnIcon;
+		
+		/** The black icon. */
 		Icon blackIcon;
+		
+		/** The preferred icon. */
 		Icon preferredIcon;
+		
+		/** The role group icon. */
 		Icon roleGroupIcon;
+		
+		/** The folder. */
 		Icon folder;
 
+		/**
+		 * Instantiates a new icon renderer.
+		 */
 		public IconRenderer() {
 			redIcon = new ImageIcon("icons/91.png");
 			attributeIcon = new ImageIcon("icons/ConceptStatus.gif");
@@ -290,6 +354,9 @@ public class TranslationTermsPanel extends JPanel {
 			folder=new ImageIcon("icons/folder.png");
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.tree.DefaultTreeCellRenderer#getTreeCellRendererComponent(javax.swing.JTree, java.lang.Object, boolean, boolean, boolean, int, boolean)
+		 */
 		@Override
 		public Component getTreeCellRendererComponent(
 				JTree tree,
@@ -326,10 +393,11 @@ public class TranslationTermsPanel extends JPanel {
 		}
 
 	}
+    
     /**
      * Update.
-     * 
-     * @param query the query
+     *
+     * @param concept the concept
      */
 	synchronized
     public void update(I_GetConceptData concept){
@@ -352,10 +420,16 @@ public class TranslationTermsPanel extends JPanel {
 		}
     }
 
+	/**
+	 * List1 value changed.
+	 */
 	private void list1ValueChanged() {
 		// TODO add your code here
 	}
 
+	/**
+	 * B incl action performed.
+	 */
 	private void bInclActionPerformed() {
 		DefaultListModel lModelExc=(DefaultListModel) list1.getModel();
 		
@@ -366,6 +440,9 @@ public class TranslationTermsPanel extends JPanel {
 		
 	}
 
+	/**
+	 * B excl action performed.
+	 */
 	private void bExclActionPerformed() {
 
 		DefaultListModel lModelExc=(DefaultListModel) list1.getModel();
@@ -376,18 +453,31 @@ public class TranslationTermsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * List2 value changed.
+	 */
 	private void list2ValueChanged() {
 		// TODO add your code here
 	}
 
+	/**
+	 * Bsync action performed.
+	 */
 	private void bsyncActionPerformed() {
 		loadLanguages();
 	}
 
+	/**
+	 * Tabbed pane1 state changed.
+	 */
 	private void tabbedPane1StateChanged() {
 		if (tabbedPane1.getSelectedIndex()==0)
 			update(concept);
 	}
+	
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		tabbedPane1 = new JTabbedPane();
@@ -566,21 +656,52 @@ public class TranslationTermsPanel extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The tabbed pane1. */
 	private JTabbedPane tabbedPane1;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The tree1. */
 	private JTree tree1;
+	
+	/** The this2. */
 	private JPanel this2;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The bsync. */
 	private JButton bsync;
+	
+	/** The label4. */
 	private JLabel label4;
+	
+	/** The scroll pane2. */
 	private JScrollPane scrollPane2;
+	
+	/** The list1. */
 	private JList list1;
+	
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The b incl. */
 	private JButton bIncl;
+	
+	/** The b excl. */
 	private JButton bExcl;
+	
+	/** The scroll pane3. */
 	private JScrollPane scrollPane3;
+	
+	/** The list2. */
 	private JList list2;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 

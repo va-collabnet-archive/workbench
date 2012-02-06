@@ -341,8 +341,15 @@ public class TranslationWorkFlowStep2Outputs extends AbstractTask {
 	public int[] getDataContainerIds() {
 		return new int[] {  };
 	}
+	
+	/**
+	 * The Class ThisAutoKeep.
+	 */
 	public class ThisAutoKeep implements I_KeepTaskInInbox{
 
+		/* (non-Javadoc)
+		 * @see org.ihtsdo.translation.ui.I_KeepTaskInInbox#KeepInInbox()
+		 */
 		public void KeepInInbox(){
 			returnCondition = Condition.STOP;
 			done=true;

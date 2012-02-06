@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.translation.tasks;
 
 import java.awt.GridBagConstraints;
@@ -33,44 +49,110 @@ import org.ihtsdo.project.ProjectPermissionsAPI;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.I_TerminologyProject;
 
+/**
+ * The Class UsersSelectionForWorkflowPanel.
+ */
 public class UsersSelectionForWorkflowPanel extends JPanel {
 
-	/**
-	 * 
-	 */
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
+	
+	/** The translator combo. */
 	public JComboBox translatorCombo;
+	
+	/** The fast track translator combo. */
 	public JComboBox fastTrackTranslatorCombo;
+	
+	/** The reviewer1 combo. */
 	public JComboBox reviewer1Combo;
+	
+	/** The reviewer2 combo. */
 	public JComboBox reviewer2Combo;
+	
+	/** The sme combo. */
 	public JComboBox smeCombo;
+	
+	/** The super sme combo. */
 	public JComboBox superSmeCombo;
+	
+	/** The eb combo. */
 	public JComboBox ebCombo;
+	
+	/** The bp combo. */
 	public JComboBox bpCombo;
+	
+	/** The worklist name. */
 	public JTextField worklistName;
 
+	/** The name for work list. */
 	public Boolean nameForWorkList = false;
+	
+	/** The business process. */
 	public Boolean businessProcess = false;
+	
+	/** The translator. */
 	public Boolean translator = false;
+	
+	/** The fast track translator. */
 	public Boolean fastTrackTranslator = false;
+	
+	/** The reviewer1. */
 	public Boolean reviewer1 = false;
+	
+	/** The reviewer2. */
 	public Boolean reviewer2 = false;
+	
+	/** The sme. */
 	public Boolean sme = false;
+	
+	/** The super sme. */
 	public Boolean superSme = false;
+	
+	/** The editorial board. */
 	public Boolean editorialBoard = false;
+	
+	/** The config. */
 	public I_ConfigAceFrame config;
+	
+	/** The project. */
 	public I_TerminologyProject project;
+	
+	/** The row. */
 	private int row;
+	
+	/** The c. */
 	private GridBagConstraints c;
+	
+	/** The roles panel. */
 	private JPanel rolesPanel;
+	
+	/** The role trans. */
 	private String roleTrans;
+	
+	/** The role fast trans. */
 	private String roleFastTrans;
+	
+	/** The role rev1. */
 	private String roleRev1;
+	
+	/** The role rev2. */
 	private String roleRev2;
+	
+	/** The role sme. */
 	private String roleSme;
+	
+	/** The role super sme. */
 	private String roleSuperSme;
+	
+	/** The role ed b. */
 	private String roleEdB;
 
+	/**
+	 * Instantiates a new users selection for workflow panel.
+	 *
+	 * @param project the project
+	 * @param config the config
+	 */
 	public UsersSelectionForWorkflowPanel(I_TerminologyProject project, I_ConfigAceFrame config) {
 		super();
 		this.config = config;
@@ -154,6 +236,9 @@ public class UsersSelectionForWorkflowPanel extends JPanel {
 		}
 	}
 	
+	/**
+	 * Call update.
+	 */
 	private void callUpdate() {
 		FileLink fileLink = (FileLink)bpCombo.getSelectedItem();
 		if (fileLink != null) {
@@ -178,6 +263,17 @@ public class UsersSelectionForWorkflowPanel extends JPanel {
 		}
 	}
  
+	/**
+	 * Update roles list.
+	 *
+	 * @param bp the bp
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IntrospectionException the introspection exception
+	 * @throws IllegalArgumentException the illegal argument exception
+	 * @throws IllegalAccessException the illegal access exception
+	 * @throws InvocationTargetException the invocation target exception
+	 */
 	private void updateRolesList(BusinessProcess bp) throws TerminologyException, IOException, IntrospectionException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
 		translator = false;
 		fastTrackTranslator = false;
@@ -370,162 +466,362 @@ public class UsersSelectionForWorkflowPanel extends JPanel {
 		this.revalidate();
 	}
 
+	/**
+	 * Gets the translator combo.
+	 *
+	 * @return the translator combo
+	 */
 	public JComboBox getTranslatorCombo() {
 		return translatorCombo;
 	}
 
+	/**
+	 * Sets the translator combo.
+	 *
+	 * @param translatorCombo the new translator combo
+	 */
 	public void setTranslatorCombo(JComboBox translatorCombo) {
 		this.translatorCombo = translatorCombo;
 	}
 
+	/**
+	 * Gets the reviewer1 combo.
+	 *
+	 * @return the reviewer1 combo
+	 */
 	public JComboBox getReviewer1Combo() {
 		return reviewer1Combo;
 	}
 
+	/**
+	 * Sets the reviewer1 combo.
+	 *
+	 * @param reviewer1Combo the new reviewer1 combo
+	 */
 	public void setReviewer1Combo(JComboBox reviewer1Combo) {
 		this.reviewer1Combo = reviewer1Combo;
 	}
 
+	/**
+	 * Gets the reviewer2 combo.
+	 *
+	 * @return the reviewer2 combo
+	 */
 	public JComboBox getReviewer2Combo() {
 		return reviewer2Combo;
 	}
 
+	/**
+	 * Sets the reviewer2 combo.
+	 *
+	 * @param reviewer2Combo the new reviewer2 combo
+	 */
 	public void setReviewer2Combo(JComboBox reviewer2Combo) {
 		this.reviewer2Combo = reviewer2Combo;
 	}
 
+	/**
+	 * Gets the sme combo.
+	 *
+	 * @return the sme combo
+	 */
 	public JComboBox getSmeCombo() {
 		return smeCombo;
 	}
 
+	/**
+	 * Sets the sme combo.
+	 *
+	 * @param smeCombo the new sme combo
+	 */
 	public void setSmeCombo(JComboBox smeCombo) {
 		this.smeCombo = smeCombo;
 	}
 
+	/**
+	 * Gets the eb combo.
+	 *
+	 * @return the eb combo
+	 */
 	public JComboBox getEbCombo() {
 		return ebCombo;
 	}
 
+	/**
+	 * Sets the eb combo.
+	 *
+	 * @param ebCombo the new eb combo
+	 */
 	public void setEbCombo(JComboBox ebCombo) {
 		this.ebCombo = ebCombo;
 	}
 
+	/**
+	 * Gets the bp combo.
+	 *
+	 * @return the bp combo
+	 */
 	public JComboBox getBpCombo() {
 		return bpCombo;
 	}
 
+	/**
+	 * Sets the bp combo.
+	 *
+	 * @param bpCombo the new bp combo
+	 */
 	public void setBpCombo(JComboBox bpCombo) {
 		this.bpCombo = bpCombo;
 	}
 
+	/**
+	 * Gets the translator.
+	 *
+	 * @return the translator
+	 */
 	public Boolean getTranslator() {
 		return translator;
 	}
 
+	/**
+	 * Sets the translator.
+	 *
+	 * @param translator the new translator
+	 */
 	public void setTranslator(Boolean translator) {
 		this.translator = translator;
 	}
 
+	/**
+	 * Gets the reviewer1.
+	 *
+	 * @return the reviewer1
+	 */
 	public Boolean getReviewer1() {
 		return reviewer1;
 	}
 
+	/**
+	 * Sets the reviewer1.
+	 *
+	 * @param reviewer1 the new reviewer1
+	 */
 	public void setReviewer1(Boolean reviewer1) {
 		this.reviewer1 = reviewer1;
 	}
 
+	/**
+	 * Gets the reviewer2.
+	 *
+	 * @return the reviewer2
+	 */
 	public Boolean getReviewer2() {
 		return reviewer2;
 	}
 
+	/**
+	 * Sets the reviewer2.
+	 *
+	 * @param reviewer2 the new reviewer2
+	 */
 	public void setReviewer2(Boolean reviewer2) {
 		this.reviewer2 = reviewer2;
 	}
 
+	/**
+	 * Gets the sme.
+	 *
+	 * @return the sme
+	 */
 	public Boolean getSme() {
 		return sme;
 	}
 
+	/**
+	 * Sets the sme.
+	 *
+	 * @param sme the new sme
+	 */
 	public void setSme(Boolean sme) {
 		this.sme = sme;
 	}
 
+	/**
+	 * Gets the editorial board.
+	 *
+	 * @return the editorial board
+	 */
 	public Boolean getEditorialBoard() {
 		return editorialBoard;
 	}
 
+	/**
+	 * Sets the editorial board.
+	 *
+	 * @param editorialBoard the new editorial board
+	 */
 	public void setEditorialBoard(Boolean editorialBoard) {
 		this.editorialBoard = editorialBoard;
 	}
 
+	/**
+	 * Gets the config.
+	 *
+	 * @return the config
+	 */
 	public I_ConfigAceFrame getConfig() {
 		return config;
 	}
 
+	/**
+	 * Sets the config.
+	 *
+	 * @param config the new config
+	 */
 	public void setConfig(I_ConfigAceFrame config) {
 		this.config = config;
 	}
 
+	/**
+	 * Gets the project.
+	 *
+	 * @return the project
+	 */
 	public I_TerminologyProject getProject() {
 		return project;
 	}
 
+	/**
+	 * Sets the project.
+	 *
+	 * @param project the new project
+	 */
 	public void setProject(I_TerminologyProject project) {
 		this.project = project;
 	}
 
+	/**
+	 * Gets the worklist name.
+	 *
+	 * @return the worklist name
+	 */
 	public JTextField getWorklistName() {
 		return worklistName;
 	}
 
+	/**
+	 * Sets the worklist name.
+	 *
+	 * @param worklistName the new worklist name
+	 */
 	public void setWorklistName(JTextField worklistName) {
 		this.worklistName = worklistName;
 	}
 
+	/**
+	 * Gets the business process.
+	 *
+	 * @return the business process
+	 */
 	public Boolean getBusinessProcess() {
 		return businessProcess;
 	}
 
+	/**
+	 * Sets the business process.
+	 *
+	 * @param businessProcess the new business process
+	 */
 	public void setBusinessProcess(Boolean businessProcess) {
 		this.businessProcess = businessProcess;
 	}
 
+	/**
+	 * Gets the name for work list.
+	 *
+	 * @return the name for work list
+	 */
 	public Boolean getNameForWorkList() {
 		return nameForWorkList;
 	}
 
+	/**
+	 * Sets the name for work list.
+	 *
+	 * @param nameForWorkList the new name for work list
+	 */
 	public void setNameForWorkList(Boolean nameForWorkList) {
 		this.nameForWorkList = nameForWorkList;
 	}
 
+	/**
+	 * Gets the fast track translator.
+	 *
+	 * @return the fast track translator
+	 */
 	public Boolean getFastTrackTranslator() {
 		return fastTrackTranslator;
 	}
 
+	/**
+	 * Sets the fast track translator.
+	 *
+	 * @param fastTrackTranslator the new fast track translator
+	 */
 	public void setFastTrackTranslator(Boolean fastTrackTranslator) {
 		this.fastTrackTranslator = fastTrackTranslator;
 	}
 
+	/**
+	 * Gets the super sme.
+	 *
+	 * @return the super sme
+	 */
 	public Boolean getSuperSme() {
 		return superSme;
 	}
 
+	/**
+	 * Sets the super sme.
+	 *
+	 * @param superSme the new super sme
+	 */
 	public void setSuperSme(Boolean superSme) {
 		this.superSme = superSme;
 	}
 
+	/**
+	 * Gets the fast track translator combo.
+	 *
+	 * @return the fast track translator combo
+	 */
 	public JComboBox getFastTrackTranslatorCombo() {
 		return fastTrackTranslatorCombo;
 	}
 
+	/**
+	 * Sets the fast track translator combo.
+	 *
+	 * @param fastTrackTranslatorCombo the new fast track translator combo
+	 */
 	public void setFastTrackTranslatorCombo(JComboBox fastTrackTranslatorCombo) {
 		this.fastTrackTranslatorCombo = fastTrackTranslatorCombo;
 	}
 
+	/**
+	 * Gets the super sme combo.
+	 *
+	 * @return the super sme combo
+	 */
 	public JComboBox getSuperSmeCombo() {
 		return superSmeCombo;
 	}
 
+	/**
+	 * Sets the super sme combo.
+	 *
+	 * @param superSmeCombo the new super sme combo
+	 */
 	public void setSuperSmeCombo(JComboBox superSmeCombo) {
 		this.superSmeCombo = superSmeCombo;
 	}

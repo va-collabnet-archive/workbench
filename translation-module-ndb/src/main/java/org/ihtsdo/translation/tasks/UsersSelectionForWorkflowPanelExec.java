@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.translation.tasks;
 
 import java.awt.GridBagConstraints;
@@ -31,16 +47,26 @@ import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.refset.PromotionRefset;
 
+/**
+ * The Class UsersSelectionForWorkflowPanelExec.
+ */
 public class UsersSelectionForWorkflowPanelExec extends JPanel {
 
-	/**
-	 * 
-	 */
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
 	
+	/** The config. */
 	public I_ConfigAceFrame config;
+	
+	/** The hash map role. */
 	public HashMap<I_GetConceptData,JComboBox>hashMapRole;
 
+	/**
+	 * Instantiates a new users selection for workflow panel exec.
+	 *
+	 * @param wfProcess the wf process
+	 * @param config the config
+	 */
 	public UsersSelectionForWorkflowPanelExec(I_EncodeBusinessProcess wfProcess, I_ConfigAceFrame config) {
 		super();
 		this.config = config;		
@@ -119,6 +145,11 @@ public class UsersSelectionForWorkflowPanelExec extends JPanel {
 		}
 	}
 
+	/**
+	 * Gets the hash combo.
+	 *
+	 * @return the hash combo
+	 */
 	public HashMap<I_GetConceptData,JComboBox> getHashCombo() {
 		return hashMapRole;
 	}

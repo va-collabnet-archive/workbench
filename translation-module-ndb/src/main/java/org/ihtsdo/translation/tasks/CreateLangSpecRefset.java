@@ -41,12 +41,16 @@ import org.ihtsdo.project.refset.LanguageSpecRefset;
 { @Spec(directory = "tasks/translation tasks", type = BeanType.TASK_BEAN)})
 public class CreateLangSpecRefset extends AbstractTask {
 
+	/** The Lang spec name. */
 	private String LangSpecName;
 	
+	/** The parent concept. */
 	private TermEntry parentConcept;
 
+	/** The origin lang member refset. */
 	private TermEntry originLangMemberRefset;
 
+	/** The lang member refset. */
 	private TermEntry langMemberRefset;
 
 
@@ -141,34 +145,74 @@ public class CreateLangSpecRefset extends AbstractTask {
 		return new int[] {  };
 	}
 
+	/**
+	 * Gets the lang spec name.
+	 *
+	 * @return the lang spec name
+	 */
 	public String getLangSpecName() {
 		return LangSpecName;
 	}
 
+	/**
+	 * Sets the lang spec name.
+	 *
+	 * @param langSpecName the new lang spec name
+	 */
 	public void setLangSpecName(String langSpecName) {
 		LangSpecName = langSpecName;
 	}
 
+	/**
+	 * Gets the parent concept.
+	 *
+	 * @return the parent concept
+	 */
 	public TermEntry getParentConcept() {
 		return parentConcept;
 	}
 
+	/**
+	 * Sets the parent concept.
+	 *
+	 * @param parentConcept the new parent concept
+	 */
 	public void setParentConcept(TermEntry parentConcept) {
 		this.parentConcept = parentConcept;
 	}
 
+	/**
+	 * Gets the origin lang member refset.
+	 *
+	 * @return the origin lang member refset
+	 */
 	public TermEntry getOriginLangMemberRefset() {
 		return originLangMemberRefset;
 	}
 
+	/**
+	 * Sets the origin lang member refset.
+	 *
+	 * @param originLangMemberRefset the new origin lang member refset
+	 */
 	public void setOriginLangMemberRefset(TermEntry originLangMemberRefset) {
 		this.originLangMemberRefset = originLangMemberRefset;
 	}
 
+	/**
+	 * Gets the lang member refset.
+	 *
+	 * @return the lang member refset
+	 */
 	public TermEntry getLangMemberRefset() {
 		return langMemberRefset;
 	}
 
+	/**
+	 * Sets the lang member refset.
+	 *
+	 * @param langMemberRefset the new lang member refset
+	 */
 	public void setLangMemberRefset(TermEntry langMemberRefset) {
 		this.langMemberRefset = langMemberRefset;
 	}

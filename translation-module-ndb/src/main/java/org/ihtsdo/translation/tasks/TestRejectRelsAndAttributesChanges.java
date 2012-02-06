@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2009 International Health Terminology Standards Development
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
  * Organisation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,18 +33,37 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
+/**
+ * The Class TestRejectRelsAndAttributesChanges.
+ */
 @BeanList(specs = { @Spec(directory = "tasks/ide/commit", type = BeanType.TASK_BEAN),
 		@Spec(directory = "plugins/precommit", type = BeanType.TASK_BEAN),
 		@Spec(directory = "plugins/commit", type = BeanType.TASK_BEAN) })
 		public class TestRejectRelsAndAttributesChanges extends AbstractConceptTest {
 
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1;
+	
+	/** The Constant dataVersion. */
 	private static final int dataVersion = 1;
 
+	/**
+	 * Write object.
+	 *
+	 * @param out the out
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
 	}
 
+	/**
+	 * Read object.
+	 *
+	 * @param in the in
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws ClassNotFoundException the class not found exception
+	 */
 	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
 		int objDataVersion = in.readInt();
 		if (objDataVersion == 1) {
@@ -54,6 +73,9 @@ import org.dwfa.util.bean.Spec;
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.task.commit.AbstractConceptTest#test(org.dwfa.ace.api.I_GetConceptData, boolean)
+	 */
 	@Override
 	public List<AlertToDataConstraintFailure> test(I_GetConceptData concept, boolean forCommit)
 	throws TaskFailedException {

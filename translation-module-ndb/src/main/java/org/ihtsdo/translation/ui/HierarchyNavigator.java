@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Mon Aug 31 13:11:07 ART 2009
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.translation.ui;
@@ -79,16 +92,33 @@ import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
+ * The Class HierarchyNavigator.
+ *
  * @author Guillermo Reynoso
  */
 public class HierarchyNavigator extends JPanel {
+	
+	/** The config. */
 	public I_ConfigAceFrame config;
+	
+	/** The allowed dest rel types. */
 	private I_IntSet allowedDestRelTypes;
+	
+	/** The allowed status. */
 	private I_IntSet allowedStatus;
+	
+	/** The inactive. */
 	private I_GetConceptData inactive;
+	
+	/** The retired. */
 	private I_GetConceptData retired;
+	
+	/** The container panel. */
 	private JTabbedPane containerPanel;
 
+	/**
+	 * Instantiates a new hierarchy navigator.
+	 */
 	public HierarchyNavigator() {
 		initComponents();
 
@@ -150,6 +180,11 @@ public class HierarchyNavigator extends JPanel {
 		// applyDNDHack(tree2);
 	}
 
+	/**
+	 * Sets the focus concept.
+	 *
+	 * @param focusConcept the new focus concept
+	 */
 	public void setFocusConcept(I_GetConceptData focusConcept) {
 		DefaultMutableTreeNode tmpRoot = new DefaultMutableTreeNode();
 
@@ -163,39 +198,82 @@ public class HierarchyNavigator extends JPanel {
 
 	}
 
+	/**
+	 * Combo box1 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void comboBox1ActionPerformed(ActionEvent e) {
 		tree1.setModel(getParentsTreeModel((I_GetConceptData) comboBox1.getSelectedItem()));
 		tree2.setModel(getChildrenTreeModel((I_GetConceptData) comboBox1.getSelectedItem()));
 	}
 
+	/**
+	 * The listener interface for receiving termLabelDragSource events.
+	 * The class that is interested in processing a termLabelDragSource
+	 * event implements this interface, and the object created
+	 * with that class is registered with a component using the
+	 * component's <code>addTermLabelDragSourceListener<code> method. When
+	 * the termLabelDragSource event occurs, that object's appropriate
+	 * method is invoked.
+	 *
+	 * @see TermLabelDragSourceEvent
+	 */
 	private class TermLabelDragSourceListener implements DragSourceListener {
 
+		/* (non-Javadoc)
+		 * @see java.awt.dnd.DragSourceListener#dragDropEnd(java.awt.dnd.DragSourceDropEvent)
+		 */
 		public void dragDropEnd(DragSourceDropEvent dsde) {
 			// TODO Auto-generated method stub
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.dnd.DragSourceListener#dragEnter(java.awt.dnd.DragSourceDragEvent)
+		 */
 		public void dragEnter(DragSourceDragEvent dsde) {
 			// TODO Auto-generated method stub
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.dnd.DragSourceListener#dragExit(java.awt.dnd.DragSourceEvent)
+		 */
 		public void dragExit(DragSourceEvent dse) {
 			// TODO Auto-generated method stub
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.dnd.DragSourceListener#dragOver(java.awt.dnd.DragSourceDragEvent)
+		 */
 		public void dragOver(DragSourceDragEvent dsde) {
 			// TODO Auto-generated method stub
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.dnd.DragSourceListener#dropActionChanged(java.awt.dnd.DragSourceDragEvent)
+		 */
 		public void dropActionChanged(DragSourceDragEvent dsde) {
 			// TODO Auto-generated method stub
 		}
 	}
 
+	/**
+	 * The Class DragGestureListenerWithImage.
+	 */
 	private class DragGestureListenerWithImage implements DragGestureListener {
 
+		/** The dsl. */
 		DragSourceListener dsl;
+		
+		/** The j tree. */
 		JTree jTree;
 
+		/**
+		 * Instantiates a new drag gesture listener with image.
+		 *
+		 * @param dsl the dsl
+		 * @param jTree the j tree
+		 */
 		public DragGestureListenerWithImage(DragSourceListener dsl, JTree jTree) {
 
 			super();
@@ -203,6 +281,9 @@ public class HierarchyNavigator extends JPanel {
 			this.dsl = dsl;
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.dnd.DragGestureListener#dragGestureRecognized(java.awt.dnd.DragGestureEvent)
+		 */
 		public void dragGestureRecognized(DragGestureEvent dge) {
 			int selRow = jTree.getRowForLocation(dge.getDragOrigin().x, dge.getDragOrigin().y);
 			TreePath path = jTree.getPathForLocation(dge.getDragOrigin().x, dge.getDragOrigin().y);
@@ -225,10 +306,25 @@ public class HierarchyNavigator extends JPanel {
 			}
 		}
 
+		/**
+		 * Gets the transferable.
+		 *
+		 * @param obj the obj
+		 * @return the transferable
+		 * @throws TerminologyException the terminology exception
+		 * @throws IOException Signals that an I/O exception has occurred.
+		 */
 		private Transferable getTransferable(I_GetConceptData obj) throws TerminologyException, IOException {
 			return new ConceptTransferable(Terms.get().getConcept(obj.getConceptNid()));
 		}
 
+		/**
+		 * Gets the drag image.
+		 *
+		 * @param obj the obj
+		 * @return the drag image
+		 * @throws IOException Signals that an I/O exception has occurred.
+		 */
 		public Image getDragImage(I_GetConceptData obj) throws IOException {
 
 			I_DescriptionTuple desc = obj.getDescTuple(config.getTreeDescPreferenceList(), config);
@@ -249,7 +345,14 @@ public class HierarchyNavigator extends JPanel {
 		}
 	}
 
+	/**
+	 * The Class ObjectTransferHandler.
+	 */
 	class ObjectTransferHandler extends TransferHandler {
+		
+		/* (non-Javadoc)
+		 * @see javax.swing.TransferHandler#importData(javax.swing.JComponent, java.awt.datatransfer.Transferable)
+		 */
 		public boolean importData(JComponent c, Transferable t) {
 			if (canImport(c, t.getTransferDataFlavors())) {
 				try {
@@ -274,6 +377,9 @@ public class HierarchyNavigator extends JPanel {
 			return false;
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.TransferHandler#createTransferable(javax.swing.JComponent)
+		 */
 		protected Transferable createTransferable(JComponent c) {
 			if (c instanceof JTree) {
 				JTree tree = (JTree) c;
@@ -295,16 +401,25 @@ public class HierarchyNavigator extends JPanel {
 			return null;
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.TransferHandler#getSourceActions(javax.swing.JComponent)
+		 */
 		public int getSourceActions(JComponent c) {
 			return COPY_OR_MOVE;
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.TransferHandler#exportDone(javax.swing.JComponent, java.awt.datatransfer.Transferable, int)
+		 */
 		protected void exportDone(JComponent c, Transferable data, int action) {
 			if (action == MOVE) {
 				// not used
 			}
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.TransferHandler#canImport(javax.swing.JComponent, java.awt.datatransfer.DataFlavor[])
+		 */
 		public boolean canImport(JComponent c, DataFlavor[] flavors) {
 			if (c.isEnabled() && c instanceof JComboBox) {
 				DataFlavor conceptBeanFlavor;
@@ -317,6 +432,13 @@ public class HierarchyNavigator extends JPanel {
 			return false;
 		}
 
+		/**
+		 * Checks for concept bean flavor.
+		 *
+		 * @param flavors the flavors
+		 * @param conceptBeanFlavor the concept bean flavor
+		 * @return true, if successful
+		 */
 		private boolean hasConceptBeanFlavor(DataFlavor[] flavors, DataFlavor conceptBeanFlavor) {
 			for (int i = 0; i < flavors.length; i++) {
 				if (conceptBeanFlavor.equals(flavors[i])) {
@@ -328,6 +450,12 @@ public class HierarchyNavigator extends JPanel {
 		}
 	}
 
+	/**
+	 * Gets the children.
+	 *
+	 * @param concept the concept
+	 * @return the children
+	 */
 	private List<? extends I_RelTuple> getChildren(I_GetConceptData concept) {
 		List<? extends I_RelTuple> children = new ArrayList<I_RelTuple>();
 		try {
@@ -348,6 +476,12 @@ public class HierarchyNavigator extends JPanel {
 		return children;
 	}
 
+	/**
+	 * Gets the children tree model.
+	 *
+	 * @param concept the concept
+	 * @return the children tree model
+	 */
 	private DefaultTreeModel getChildrenTreeModel(I_GetConceptData concept) {
 		DefaultMutableTreeNode top = new DefaultMutableTreeNode("Root");
 		if (concept != null) {
@@ -384,6 +518,12 @@ public class HierarchyNavigator extends JPanel {
 		return treeModel;
 	}
 
+	/**
+	 * Gets the parents.
+	 *
+	 * @param concept the concept
+	 * @return the parents
+	 */
 	private List<? extends I_RelTuple> getParents(I_GetConceptData concept) {
 		List<? extends I_RelTuple> parents = new ArrayList<I_RelTuple>();
 		try {
@@ -404,6 +544,12 @@ public class HierarchyNavigator extends JPanel {
 		return parents;
 	}
 
+	/**
+	 * Gets the parents tree model.
+	 *
+	 * @param concept the concept
+	 * @return the parents tree model
+	 */
 	private DefaultTreeModel getParentsTreeModel(I_GetConceptData concept) {
 		DefaultMutableTreeNode top = new DefaultMutableTreeNode("Root");
 		if (concept != null) {
@@ -439,6 +585,12 @@ public class HierarchyNavigator extends JPanel {
 		return treeModel;
 	}
 
+	/**
+	 * Tree1 tree will expand.
+	 *
+	 * @param e the e
+	 * @throws ExpandVetoException the expand veto exception
+	 */
 	private void tree1TreeWillExpand(TreeExpansionEvent e) throws ExpandVetoException {
 		TreePath path = e.getPath();
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
@@ -476,6 +628,12 @@ public class HierarchyNavigator extends JPanel {
 		}
 	}
 
+	/**
+	 * Tree2 tree will expand.
+	 *
+	 * @param e the e
+	 * @throws ExpandVetoException the expand veto exception
+	 */
 	private void tree2TreeWillExpand(TreeExpansionEvent e) throws ExpandVetoException {
 		TreePath path = e.getPath();
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
@@ -514,10 +672,20 @@ public class HierarchyNavigator extends JPanel {
 		}
 	}
 
+	/**
+	 * Sets the container panel.
+	 *
+	 * @param containerPanel the new container panel
+	 */
 	public void setContainerPanel(JTabbedPane containerPanel) {
 		this.containerPanel = containerPanel;
 	}
 
+	/**
+	 * Expand button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void expandButtonActionPerformed(ActionEvent e) {
 
 		JPanel similarityPanel = (JPanel) containerPanel.getSelectedComponent();
@@ -543,6 +711,9 @@ public class HierarchyNavigator extends JPanel {
 		similarityDialog.setVisible(true);
 	}
 
+	/**
+	 * Radio button1 action performed.
+	 */
 	private void radioButton1ActionPerformed() {
 		if (comboBox1.getSelectedItem() != null) {
 			tree1.setModel(getParentsTreeModel((I_GetConceptData) comboBox1.getSelectedItem()));
@@ -550,6 +721,9 @@ public class HierarchyNavigator extends JPanel {
 		}
 	}
 
+	/**
+	 * R stat action performed.
+	 */
 	private void rStatActionPerformed() {
 		if (comboBox1.getSelectedItem() != null) {
 			tree1.setModel(getParentsTreeModel((I_GetConceptData) comboBox1.getSelectedItem()));
@@ -584,8 +758,14 @@ public class HierarchyNavigator extends JPanel {
 	// e.printStackTrace();
 	// }
 	// }
+	/**
+	 * The Class HierarchyIconRenderer.
+	 */
 	class HierarchyIconRenderer extends DefaultTreeCellRenderer {
 
+		/* (non-Javadoc)
+		 * @see javax.swing.tree.DefaultTreeCellRenderer#getTreeCellRendererComponent(javax.swing.JTree, java.lang.Object, boolean, boolean, boolean, int, boolean)
+		 */
 		@Override
 		public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
 
@@ -623,6 +803,9 @@ public class HierarchyNavigator extends JPanel {
 
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -784,15 +967,34 @@ public class HierarchyNavigator extends JPanel {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The tree1. */
 	private JTree tree1;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The combo box1. */
 	private JComboBox comboBox1;
+	
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The r infer. */
 	private JRadioButton rInfer;
+	
+	/** The r stat. */
 	private JRadioButton rStat;
+	
+	/** The expand button. */
 	private JButton expandButton;
+	
+	/** The scroll pane2. */
 	private JScrollPane scrollPane2;
+	
+	/** The tree2. */
 	private JTree tree2;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 

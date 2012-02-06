@@ -142,18 +142,38 @@ public class ListContextualizedDescriptionsToOutput extends AbstractTask {
 		return new int[] {  };
 	}
 
+	/**
+	 * Gets the concept.
+	 *
+	 * @return the concept
+	 */
 	public TermEntry getConcept() {
 		return concept;
 	}
 
+	/**
+	 * Sets the concept.
+	 *
+	 * @param concept the new concept
+	 */
 	public void setConcept(TermEntry concept) {
 		this.concept = concept;
 	}
 
+	/**
+	 * Gets the language refset.
+	 *
+	 * @return the language refset
+	 */
 	public TermEntry getLanguageRefset() {
 		return languageRefset;
 	}
 
+	/**
+	 * Sets the language refset.
+	 *
+	 * @param languageRefset the new language refset
+	 */
 	public void setLanguageRefset(TermEntry languageRefset) {
 		this.languageRefset = languageRefset;
 	}

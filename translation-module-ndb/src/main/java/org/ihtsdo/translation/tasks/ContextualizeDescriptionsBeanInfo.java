@@ -28,6 +28,9 @@ import org.dwfa.ace.prop.editor.ConceptLabelPropEditor;
  */
 public class ContextualizeDescriptionsBeanInfo extends SimpleBeanInfo {
 
+	/**
+	 * Instantiates a new contextualize descriptions bean info.
+	 */
 	public ContextualizeDescriptionsBeanInfo() {
 		super();
 	}

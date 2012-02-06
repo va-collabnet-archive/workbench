@@ -213,6 +213,9 @@ public class TestConfiguration extends TestCase {
 
 	}
 
+	/**
+	 * Test config dialog.
+	 */
 	public void testConfigDialog() {
 
 		ConfigTranslationModule confTrans = new ConfigTranslationModule();
@@ -239,6 +242,11 @@ public class TestConfiguration extends TestCase {
 
 	}
 
+	/**
+	 * Creates the configuration.
+	 *
+	 * @param confTrans the conf trans
+	 */
 	private void createConfiguration(ConfigTranslationModule confTrans) {
 		confTrans.setAutoOpenNextInboxItem(true);
 
@@ -272,6 +280,11 @@ public class TestConfiguration extends TestCase {
 
 	}
 
+	/**
+	 * Prints the config.
+	 *
+	 * @param confTrans the conf trans
+	 */
 	private void printConfig(ConfigTranslationModule confTrans) {
 		System.out.println("\nSelected editor mode.");
 		System.out.println("\t" + confTrans.getSelectedEditorMode());
@@ -311,6 +324,11 @@ public class TestConfiguration extends TestCase {
 
 	}
 
+	/**
+	 * Gets the test config.
+	 *
+	 * @return the test config
+	 */
 	private I_ConfigAceFrame getTestConfig() {
 		I_ConfigAceFrame config = null;
 		try {
@@ -346,6 +364,13 @@ public class TestConfiguration extends TestCase {
 	}
 
 	// If targetLocation does not exist, it will be created.
+	/**
+	 * Copy directory.
+	 *
+	 * @param sourceLocation the source location
+	 * @param targetLocation the target location
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public void copyDirectory(File sourceLocation, File targetLocation) throws IOException {
 
 		if (sourceLocation.isDirectory()) {
@@ -373,6 +398,12 @@ public class TestConfiguration extends TestCase {
 		}
 	}
 
+	/**
+	 * Delete directory.
+	 *
+	 * @param path the path
+	 * @return true, if successful
+	 */
 	public boolean deleteDirectory(File path) {
 		if (path.exists()) {
 			File[] files = path.listFiles();

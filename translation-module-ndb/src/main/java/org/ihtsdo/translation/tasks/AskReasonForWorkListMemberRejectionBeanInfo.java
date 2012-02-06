@@ -25,6 +25,9 @@ import java.beans.SimpleBeanInfo;
  */
 public class AskReasonForWorkListMemberRejectionBeanInfo extends SimpleBeanInfo {
 
+	/**
+	 * Instantiates a new ask reason for work list member rejection bean info.
+	 */
 	public AskReasonForWorkListMemberRejectionBeanInfo() {
 		super();
 	}

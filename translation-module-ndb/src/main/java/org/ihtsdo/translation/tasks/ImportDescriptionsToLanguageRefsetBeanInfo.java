@@ -28,6 +28,9 @@ import org.dwfa.bpa.tasks.editor.JTextFieldEditor;
  */
 public class ImportDescriptionsToLanguageRefsetBeanInfo extends SimpleBeanInfo {
 
+	/**
+	 * Instantiates a new import descriptions to language refset bean info.
+	 */
 	public ImportDescriptionsToLanguageRefsetBeanInfo() {
 		super();
 	}

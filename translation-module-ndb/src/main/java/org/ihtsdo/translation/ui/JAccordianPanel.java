@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.translation.ui;
 
 import java.awt.BorderLayout;
@@ -23,12 +39,26 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 
+/**
+ * The Class JAccordianPanel.
+ */
 public class JAccordianPanel extends JPanel {
+	
+	/** The moving components. */
 	boolean movingComponents = false;
+	
+	/** The visible index. */
 	int visibleIndex = 0;
+	
+	/** The child count. */
 	private int childCount=0;
+	
+	/** The h. */
 	private int h=0;
 	
+	/**
+	 * Instantiates a new j accordian panel.
+	 */
 	public JAccordianPanel() {
 		setLayout(null);
 //		// Add children and compute prefSize.
@@ -48,6 +78,12 @@ public class JAccordianPanel extends JPanel {
 //		// Set z-order for children.
 //		setZOrder();
 	}
+	
+	/**
+	 * Adds the inner panel.
+	 *
+	 * @param panel the panel
+	 */
 	public void addInnerPanel(MenuComponentPanel panel){
 
 		// Add children and compute prefSize.
@@ -61,6 +97,9 @@ public class JAccordianPanel extends JPanel {
 		
 	}
 	
+	/**
+	 * Sets the z order.
+	 */
 	private void setZOrder() {
 		Component[] c = getComponents();
 		for(int j = 0;j<c.length; j++) {
@@ -70,6 +109,11 @@ public class JAccordianPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Sets the components size.
+	 *
+	 * @param size the new components size
+	 */
 	public void setComponentsSize(Dimension size) {	
 		Component[] c = getComponents();
 		int y;
@@ -88,6 +132,11 @@ public class JAccordianPanel extends JPanel {
 		
 	}
 	
+	/**
+	 * Sets the child visible.
+	 *
+	 * @param indexToOpen the new child visible
+	 */
 	private void setChildVisible(int indexToOpen) {
 		// If visibleIndex < indexToOpen, components at
 		// [visibleIndex+1 down to indexToOpen] move up.
@@ -115,6 +164,12 @@ public class JAccordianPanel extends JPanel {
 		visibleIndex = indexToOpen;
 	}
 
+	/**
+	 * Move panels.
+	 *
+	 * @param indices the indices
+	 * @param travel the travel
+	 */
 	private void movePanels(final int[] indices, final int travel) {
 		movingComponents = true;
 		Thread thread = new Thread(new Runnable() {
@@ -149,6 +204,7 @@ public class JAccordianPanel extends JPanel {
 		thread.start();
 	}
 
+	/** The ml. */
 	private MouseListener ml = new MouseAdapter() {
 		public void mousePressed(MouseEvent e) {
 			int index = ((ControlPanel)e.getSource()).id;
@@ -157,6 +213,11 @@ public class JAccordianPanel extends JPanel {
 		}
 	};
 
+	/**
+	 * Gets the panel.
+	 *
+	 * @return the panel
+	 */
 	public JPanel getPanel() {
 		JPanel panel = new JPanel(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -164,6 +225,12 @@ public class JAccordianPanel extends JPanel {
 		panel.add(this, gbc);
 		return panel;
 	}
+	
+	/**
+	 * Gets the menu components.
+	 *
+	 * @return the menu components
+	 */
 	public List<MenuComponentPanel> getMenuComponents(){
 		List<MenuComponentPanel> menuComps=new ArrayList<MenuComponentPanel>();
 		Component[] c = getComponents();

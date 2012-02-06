@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Mon Jul 19 16:03:08 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.translation.ui;
@@ -56,20 +69,49 @@ import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.refset.PromotionRefset;
 
 /**
+ * The Class TranslationWlstMemberLogPanel.
+ *
  * @author Guillermo Reynoso
  */
 public class TranslationWlstMemberLogPanel extends JPanel {
+	
+	/** The member. */
 	private WorkListMember member;
+	
+	/** The formatter. */
 	private SimpleDateFormat formatter;
+	
+	/** The hash list. */
 	private TreeMap<String, List<LogObjectContainer>> hashList;
+	
+	/** The hash var col. */
 	private HashMap<Integer,Integer> hashVarCol;
+	
+	/** The translation project. */
 	private TranslationProject translationProject;
+	
+	/** The repo. */
 	private IssueRepository repo;
+	
+	/** The regis. */
 	private IssueRepoRegistration regis;
+	
+	/**
+	 * Instantiates a new translation wlst member log panel.
+	 */
 	public TranslationWlstMemberLogPanel() {
 		initComponents();
 		formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 	}
+	
+	/**
+	 * Show member changes.
+	 *
+	 * @param member the member
+	 * @param translationProject the translation project
+	 * @param repo the repo
+	 * @param regis the regis
+	 */
 	public void showMemberChanges(WorkListMember member,TranslationProject translationProject, IssueRepository repo, IssueRepoRegistration regis){
 		this.member=member;
 		this.translationProject=translationProject;
@@ -107,13 +149,29 @@ public class TranslationWlstMemberLogPanel extends JPanel {
 		completeResultTable();
 	}
 
+	/**
+	 * Gets the site user password.
+	 *
+	 * @return the site user password
+	 */
 	private String getSiteUserPassword() {
 		return regis.getPassword();
 	}
 
+	/**
+	 * Gets the site user name.
+	 *
+	 * @return the site user name
+	 */
 	private String getSiteUserName() {
 		return regis.getUserId();
 	}
+	
+	/**
+	 * Gets the issues.
+	 *
+	 * @return the issues
+	 */
 	private void getIssues() {
 		if (repo!=null && regis!=null){
 			List<Issue>issueL=new ArrayList<Issue>();
@@ -146,6 +204,14 @@ public class TranslationWlstMemberLogPanel extends JPanel {
 			}
 		}
 	}
+	
+	/**
+	 * Adds the issue tolist.
+	 *
+	 * @param userName the user name
+	 * @param version the version
+	 * @param stringIssue the string issue
+	 */
 	private void addIssueTolist(String userName,String version, String stringIssue) {
 		List<LogObjectContainer> objList;
 
@@ -159,6 +225,9 @@ public class TranslationWlstMemberLogPanel extends JPanel {
 		hashList.put(version, objList);
 	}
 	
+	/**
+	 * Complete result table.
+	 */
 	private void completeResultTable() {
 		//		String[] columnNames = {"Author","Date",
 		//				"Prom.Status","Comment", "Issue"};
@@ -420,6 +489,12 @@ public class TranslationWlstMemberLogPanel extends JPanel {
 		tblLog.revalidate();
 
 	}
+	
+	/**
+	 * Gets the comments.
+	 *
+	 * @return the comments
+	 */
 	private void getComments() {
 		I_ConfigAceFrame config;
 		try {
@@ -460,6 +535,12 @@ public class TranslationWlstMemberLogPanel extends JPanel {
 		}
 
 	}
+	
+	/**
+	 * Gets the descriptions.
+	 *
+	 * @return the descriptions
+	 */
 	private void getDescriptions() {
 		try {
 			hashVarCol=new HashMap<Integer,Integer>();
@@ -500,6 +581,12 @@ public class TranslationWlstMemberLogPanel extends JPanel {
 		}
 
 	}
+	
+	/**
+	 * Gets the promotion statuses.
+	 *
+	 * @return the promotion statuses
+	 */
 	private void getPromotionStatuses() {
 		I_ConfigAceFrame config;
 		try {
@@ -523,6 +610,13 @@ public class TranslationWlstMemberLogPanel extends JPanel {
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * Adds the string tolist.
+	 *
+	 * @param version the version
+	 * @param stringPart the string part
+	 */
 	private void addStringTolist(String version,String stringPart){
 		List<LogObjectContainer> objList;
 
@@ -536,6 +630,13 @@ public class TranslationWlstMemberLogPanel extends JPanel {
 		hashList.put(version, objList);
 	}
 
+	/**
+	 * Adds the part tolist.
+	 *
+	 * @param part the part
+	 * @param partType the part type
+	 * @param did the did
+	 */
 	private void addPartTolist(I_AmPart part,LogObjectContainer.PARTS partType, Integer did){
 		String version;
 		long thickVer;
@@ -554,7 +655,10 @@ public class TranslationWlstMemberLogPanel extends JPanel {
 		hashList.put(version, objList);
 	}
 	
-	 class LogAreaRenderer extends JTextArea implements TableCellRenderer { 
+	 /**
+ 	 * The Class LogAreaRenderer.
+ 	 */
+ 	class LogAreaRenderer extends JTextArea implements TableCellRenderer { 
 		    
 		    /** The renderer. */
 		    private final DefaultTableCellRenderer renderer = new DefaultTableCellRenderer(); 
@@ -617,10 +721,16 @@ public class TranslationWlstMemberLogPanel extends JPanel {
 				null );   
 	}
 
+	/**
+	 * Button1 action performed.
+	 */
 	private void button1ActionPerformed() {
 		showMemberChanges(this.member,this.translationProject, this.repo, this.regis);
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		panel1 = new JPanel();
@@ -675,9 +785,16 @@ public class TranslationWlstMemberLogPanel extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The button1. */
 	private JButton button1;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The tbl log. */
 	private ZebraJTable tblLog;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Wed Mar 10 16:04:51 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.translation.ui;
@@ -132,49 +145,120 @@ import org.ihtsdo.translation.LanguageUtil;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.InboxColumn;
 
 /**
+ * The Class InboxPanel.
+ *
  * @author Alejandro Rodriguez
  */
 public class InboxPanel extends JPanel {
 
-	/**
-	 * 
-	 */
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
 
+	/** The Constant CUSTOM_NODE_KEY. */
 	public static final String CUSTOM_NODE_KEY = "CUSTOM_NODE_KEY";
 
+	/** The Constant FOLDER_TAGS_SEPARATOR. */
 	private static final String FOLDER_TAGS_SEPARATOR = "/";
+	
+	/** The queue name. */
 	private String queueName;
+	
+	/** The selector. */
 	private I_SelectProcesses selector;
+	
+	/** The revision proc selector. */
 	private SelectRevisionProcess revisionProcSelector;
+	
+	/** The worker. */
 	private Worker worker;
+	
+	/** The clone worker. */
 	private Worker cloneWorker;
+	
+	/** The queue. */
 	private I_QueueProcesses queue;
+	
+	/** The fsn. */
 	private I_GetConceptData fsn;
+	
+	/** The preferred. */
 	private I_GetConceptData preferred;
+	
+	/** The inactive. */
 	private I_GetConceptData inactive;
+	
+	/** The closing. */
 	private boolean closing;
+	
+	/** The Entry id bean type. */
 	public final String EntryIDBeanType = DataFlavor.javaJVMLocalObjectMimeType + ";class=" + EntryID.class.getName();
+	
+	/** The w node. */
 	private DefaultMutableTreeNode wNode;
+	
+	/** The i node. */
 	private DefaultMutableTreeNode iNode;
+	
+	/** The s node. */
 	private DefaultMutableTreeNode sNode;
+	
+	/** The c node. */
 	private DefaultMutableTreeNode cNode;
+	
+	/** The hash folders. */
 	private HashMap<String, Set<EntryID>> hashFolders;
+	
+	/** The hash all items. */
 	private HashMap<EntryID, QueueTableObj> hashAllItems;
+	
+	/** The selected folder. */
 	private DefaultMutableTreeNode selectedFolder;
+	
+	/** The c names. */
 	private String[] cNames = { "Source Name", "Status" };
+	
+	/** The col set. */
 	private LinkedHashSet<InboxColumn> colSet;
+	
+	/** The col pos. */
 	private ArrayList<InboxColumn> colPos;
+	
+	/** The l sort keys. */
 	private List<SortKey> lSortKeys;
+	
+	/** The o node. */
 	private DefaultMutableTreeNode oNode;
+	
+	/** The outbox read worker. */
 	private I_Work outboxReadWorker;
+	
+	/** The outbox queue. */
 	private I_QueueProcesses outboxQueue;
 
+	/** The worklist hash. */
 	private HashMap<Integer, String> worklistHash;
 
+	/** The formatter. */
 	private SimpleDateFormat formatter;
+	
+	/** The revision proc cancel selector. */
 	private SelectRevisionProcessCancel revisionProcCancelSelector;
 
+	/**
+	 * Instantiates a new inbox panel.
+	 *
+	 * @param worker the worker
+	 * @param queueName the queue name
+	 * @param selector the selector
+	 * @throws RemoteException the remote exception
+	 * @throws TaskFailedException the task failed exception
+	 * @throws LeaseDeniedException the lease denied exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws InterruptedException the interrupted exception
+	 * @throws PrivilegedActionException the privileged action exception
+	 * @throws ConfigurationException the configuration exception
+	 * @throws TerminologyException the terminology exception
+	 */
 	public InboxPanel(I_Work worker, String queueName, I_SelectProcesses selector) throws RemoteException, TaskFailedException, LeaseDeniedException, IOException, InterruptedException,
 			PrivilegedActionException, ConfigurationException, TerminologyException {
 
@@ -255,8 +339,22 @@ public class InboxPanel extends JPanel {
 	// }
 	//
 	// }
+	/**
+	 * The listener interface for receiving columnHeader events.
+	 * The class that is interested in processing a columnHeader
+	 * event implements this interface, and the object created
+	 * with that class is registered with a component using the
+	 * component's <code>addColumnHeaderListener<code> method. When
+	 * the columnHeader event occurs, that object's appropriate
+	 * method is invoked.
+	 *
+	 * @see ColumnHeaderEvent
+	 */
 	class ColumnHeaderListener extends MouseAdapter {
 
+		/* (non-Javadoc)
+		 * @see java.awt.event.MouseAdapter#mouseClicked(java.awt.event.MouseEvent)
+		 */
 		public void mouseClicked(MouseEvent evt) {
 			JTable table = ((JTableHeader) evt.getSource()).getTable();
 			DefaultRowSorter rowSorter = (DefaultRowSorter) table.getRowSorter();
@@ -264,33 +362,83 @@ public class InboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * The listener interface for receiving tableConceptDragSource events.
+	 * The class that is interested in processing a tableConceptDragSource
+	 * event implements this interface, and the object created
+	 * with that class is registered with a component using the
+	 * component's <code>addTableConceptDragSourceListener<code> method. When
+	 * the tableConceptDragSource event occurs, that object's appropriate
+	 * method is invoked.
+	 *
+	 * @see TableConceptDragSourceEvent
+	 */
 	class TableConceptDragSourceListener implements DragSourceListener {
 
+		/**
+		 * Instantiates a new table concept drag source listener.
+		 */
 		public TableConceptDragSourceListener() {
 
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.dnd.DragSourceListener#dragDropEnd(java.awt.dnd.DragSourceDropEvent)
+		 */
 		public void dragDropEnd(DragSourceDropEvent dsde) {
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.dnd.DragSourceListener#dragEnter(java.awt.dnd.DragSourceDragEvent)
+		 */
 		public void dragEnter(DragSourceDragEvent dsde) {
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.dnd.DragSourceListener#dragExit(java.awt.dnd.DragSourceEvent)
+		 */
 		public void dragExit(DragSourceEvent dse) {
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.dnd.DragSourceListener#dragOver(java.awt.dnd.DragSourceDragEvent)
+		 */
 		public void dragOver(DragSourceDragEvent dsde) {
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.dnd.DragSourceListener#dropActionChanged(java.awt.dnd.DragSourceDragEvent)
+		 */
 		public void dropActionChanged(DragSourceDragEvent dsde) {
 		}
 
 	}
 
+	/**
+	 * The listener interface for receiving tableDragGesture events.
+	 * The class that is interested in processing a tableDragGesture
+	 * event implements this interface, and the object created
+	 * with that class is registered with a component using the
+	 * component's <code>addTableDragGestureListener<code> method. When
+	 * the tableDragGesture event occurs, that object's appropriate
+	 * method is invoked.
+	 *
+	 * @see TableDragGestureEvent
+	 */
 	class TableDragGestureListener implements DragGestureListener {
+		
+		/** The dsl. */
 		DragSourceListener dsl;
+		
+		/** The j table. */
 		JTable jTable;
 
+		/**
+		 * Instantiates a new table drag gesture listener.
+		 *
+		 * @param dsl the dsl
+		 * @param jTable the j table
+		 */
 		public TableDragGestureListener(DragSourceListener dsl, JTable jTable) {
 
 			super();
@@ -298,6 +446,9 @@ public class InboxPanel extends JPanel {
 			this.dsl = dsl;
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.dnd.DragGestureListener#dragGestureRecognized(java.awt.dnd.DragGestureEvent)
+		 */
 		public void dragGestureRecognized(DragGestureEvent dge) {
 
 			int[] indices = jTable.getSelectedRows();
@@ -322,19 +473,31 @@ public class InboxPanel extends JPanel {
 
 		}
 
+		/**
+		 * Gets the transferable.
+		 *
+		 * @param entries the entries
+		 * @return the transferable
+		 * @throws TerminologyException the terminology exception
+		 * @throws IOException Signals that an I/O exception has occurred.
+		 */
 		private Transferable getTransferable(EntryID[] entries) throws TerminologyException, IOException {
 			return new EntryIDTransferable(entries);
 		}
 
 	}
 
+	/**
+	 * The Class SelectRevisionProcess.
+	 */
 	class SelectRevisionProcess implements I_SelectProcesses {
 
-		/**
-		 * 
-		 */
+		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = 1L;
 
+		/* (non-Javadoc)
+		 * @see org.dwfa.bpa.process.I_SelectProcesses#select(org.dwfa.bpa.process.I_DescribeBusinessProcess)
+		 */
 		@Override
 		public boolean select(I_DescribeBusinessProcess process) {
 			String sub = process.getSubject();
@@ -344,6 +507,9 @@ public class InboxPanel extends JPanel {
 			return false;
 		}
 
+		/* (non-Javadoc)
+		 * @see org.dwfa.bpa.process.I_SelectObjects#select(org.dwfa.bpa.process.I_DescribeObject)
+		 */
 		@Override
 		public boolean select(I_DescribeObject object) {
 			I_DescribeBusinessProcess objectBP = (I_DescribeBusinessProcess) object;
@@ -356,13 +522,17 @@ public class InboxPanel extends JPanel {
 
 	}
 
+	/**
+	 * The Class SelectRevisionProcessCancel.
+	 */
 	class SelectRevisionProcessCancel implements I_SelectProcesses {
 
-		/**
-		 * 
-		 */
+		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = 1L;
 
+		/* (non-Javadoc)
+		 * @see org.dwfa.bpa.process.I_SelectProcesses#select(org.dwfa.bpa.process.I_DescribeBusinessProcess)
+		 */
 		@Override
 		public boolean select(I_DescribeBusinessProcess process) {
 			String sub = process.getSubject();
@@ -372,6 +542,9 @@ public class InboxPanel extends JPanel {
 			return false;
 		}
 
+		/* (non-Javadoc)
+		 * @see org.dwfa.bpa.process.I_SelectObjects#select(org.dwfa.bpa.process.I_DescribeObject)
+		 */
 		@Override
 		public boolean select(I_DescribeObject object) {
 			I_DescribeBusinessProcess objectBP = (I_DescribeBusinessProcess) object;
@@ -384,14 +557,25 @@ public class InboxPanel extends JPanel {
 
 	}
 
+	/**
+	 * The Class EntryIDTransferable.
+	 */
 	class EntryIDTransferable implements Transferable {
 
+		/** The entry id transferable. */
 		EntryID[] entryIDTransferable;
 
+		/** The entry id bean flavor. */
 		private DataFlavor entryIDBeanFlavor;
 
+		/** The supported flavors. */
 		DataFlavor[] supportedFlavors;
 
+		/**
+		 * Instantiates a new entry id transferable.
+		 *
+		 * @param entries the entries
+		 */
 		public EntryIDTransferable(EntryID[] entries) {
 			super();
 			this.entryIDTransferable = entries;
@@ -405,6 +589,9 @@ public class InboxPanel extends JPanel {
 			supportedFlavors = new DataFlavor[] { entryIDBeanFlavor };
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.datatransfer.Transferable#getTransferData(java.awt.datatransfer.DataFlavor)
+		 */
 		@SuppressWarnings("deprecation")
 		public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
 			if (entryIDTransferable == null) {
@@ -416,10 +603,16 @@ public class InboxPanel extends JPanel {
 			throw new UnsupportedFlavorException(flavor);
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.datatransfer.Transferable#getTransferDataFlavors()
+		 */
 		public DataFlavor[] getTransferDataFlavors() {
 			return supportedFlavors;
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.datatransfer.Transferable#isDataFlavorSupported(java.awt.datatransfer.DataFlavor)
+		 */
 		public boolean isDataFlavorSupported(DataFlavor flavor) {
 			for (DataFlavor f : supportedFlavors) {
 				if (f.equals(flavor)) {
@@ -430,11 +623,25 @@ public class InboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * The Class FolderTreeDropTarget.
+	 */
 	class FolderTreeDropTarget implements DropTargetListener {
+		
+		/** The tree. */
 		private JTree tree;
+		
+		/** The entry id bean flavor. */
 		private DataFlavor entryIDBeanFlavor;
+		
+		/** The acceptable type. */
 		private boolean acceptableType;
 
+		/**
+		 * Instantiates a new folder tree drop target.
+		 *
+		 * @param tree the tree
+		 */
 		public FolderTreeDropTarget(JTree tree) {
 			this.tree = tree;
 			new DropTarget(tree, DnDConstants.ACTION_COPY_OR_MOVE, this);
@@ -447,6 +654,9 @@ public class InboxPanel extends JPanel {
 		}
 
 		// Implementation of the DropTargetListener interface
+		/* (non-Javadoc)
+		 * @see java.awt.dnd.DropTargetListener#dragEnter(java.awt.dnd.DropTargetDragEvent)
+		 */
 		public void dragEnter(DropTargetDragEvent dtde) {
 			System.out.println("dragEnter, drop action = " + dtde.getDropAction());
 			//
@@ -458,6 +668,9 @@ public class InboxPanel extends JPanel {
 			// acceptOrRejectDrag(dtde);
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.dnd.DropTargetListener#dragOver(java.awt.dnd.DropTargetDragEvent)
+		 */
 		public void dragOver(DropTargetDragEvent dtde) {
 			System.out.println("DropTarget dragOver, drop action = " + dtde.getDropAction());
 
@@ -465,6 +678,9 @@ public class InboxPanel extends JPanel {
 			acceptOrRejectDrag(dtde);
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.dnd.DropTargetListener#dropActionChanged(java.awt.dnd.DropTargetDragEvent)
+		 */
 		public void dropActionChanged(DropTargetDragEvent dtde) {
 			System.out.println("DropTarget dropActionChanged, drop action = " + dtde.getDropAction());
 
@@ -472,10 +688,16 @@ public class InboxPanel extends JPanel {
 			acceptOrRejectDrag(dtde);
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.dnd.DropTargetListener#dragExit(java.awt.dnd.DropTargetEvent)
+		 */
 		public void dragExit(DropTargetEvent dte) {
 			System.out.println("DropTarget dragExit");
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.dnd.DropTargetListener#drop(java.awt.dnd.DropTargetDropEvent)
+		 */
 		public void drop(DropTargetDropEvent dtde) {
 			System.out.println("DropTarget drop, drop action = " + dtde.getDropAction());
 
@@ -553,6 +775,13 @@ public class InboxPanel extends JPanel {
 
 		// Internal methods start here
 
+		/**
+		 * Drop object.
+		 *
+		 * @param o the o
+		 * @param folderTarget the folder target
+		 * @return true, if successful
+		 */
 		private boolean dropObject(Object o, String folderTarget) {
 
 			if (o instanceof EntryID[]) {
@@ -572,6 +801,12 @@ public class InboxPanel extends JPanel {
 			return true;
 		}
 
+		/**
+		 * Accept or reject drag.
+		 *
+		 * @param dtde the dtde
+		 * @return true, if successful
+		 */
 		protected boolean acceptOrRejectDrag(DropTargetDragEvent dtde) {
 			int dropAction = dtde.getDropAction();
 			int sourceActions = dtde.getSourceActions();
@@ -601,12 +836,22 @@ public class InboxPanel extends JPanel {
 			return acceptedDrag;
 		}
 
+		/**
+		 * Check transfer type.
+		 *
+		 * @param dtde the dtde
+		 */
 		protected void checkTransferType(DropTargetDragEvent dtde) {
 			acceptableType = dtde.isDataFlavorSupported(entryIDBeanFlavor);
 			System.out.println("File type acceptable - " + acceptableType);
 		}
 	}
 
+	/**
+	 * Refresh items table.
+	 *
+	 * @param selectedFolder the selected folder
+	 */
 	synchronized private void refreshItemsTable(DefaultMutableTreeNode selectedFolder) {
 
 		FolderTreeObj tObj = (FolderTreeObj) selectedFolder.getUserObject();
@@ -661,6 +906,13 @@ public class InboxPanel extends JPanel {
 
 	}
 
+	/**
+	 * Copy items to folder.
+	 *
+	 * @param entries the entries
+	 * @param sourceFolder the source folder
+	 * @param folderTarget the folder target
+	 */
 	synchronized public void copyItemsToFolder(EntryID[] entries, String sourceFolder, String folderTarget) {
 		Set<EntryID> foldEntries = hashFolders.get(folderTarget);
 
@@ -671,6 +923,12 @@ public class InboxPanel extends JPanel {
 
 	}
 
+	/**
+	 * Adds the tag to process.
+	 *
+	 * @param entryID the entry id
+	 * @param folderTarget the folder target
+	 */
 	private void AddTagToProcess(EntryID entryID, String folderTarget) {
 		I_EncodeBusinessProcess process = null;
 		try {
@@ -735,6 +993,12 @@ public class InboxPanel extends JPanel {
 	//
 	// }
 
+	/**
+	 * Sets the table model data.
+	 *
+	 * @param tableModel the table model
+	 * @param queueTO the queue to
+	 */
 	private void setTableModelData(DefaultTableModel tableModel, Set<QueueTableObj> queueTO) {
 		int rowLen = cNames.length;
 		for (QueueTableObj qTO : queueTO) {
@@ -766,6 +1030,11 @@ public class InboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Gets the column headers.
+	 *
+	 * @return the column headers
+	 */
 	private String[] getColumnHeaders() {
 		ConfigTranslationModule cfg = null;
 		try {
@@ -801,13 +1070,17 @@ public class InboxPanel extends JPanel {
 		return cNames;
 	}
 
+	/**
+	 * The Class IconRenderer.
+	 */
 	class IconRenderer extends DefaultTreeCellRenderer {
 
-		/**
-		 * 
-		 */
+		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = 1L;
 
+		/* (non-Javadoc)
+		 * @see javax.swing.tree.DefaultTreeCellRenderer#getTreeCellRendererComponent(javax.swing.JTree, java.lang.Object, boolean, boolean, boolean, int, boolean)
+		 */
 		@Override
 		public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
 
@@ -833,6 +1106,19 @@ public class InboxPanel extends JPanel {
 
 	}
 
+	/**
+	 * Gets the folder tree model.
+	 *
+	 * @return the folder tree model
+	 * @throws RemoteException the remote exception
+	 * @throws TaskFailedException the task failed exception
+	 * @throws LeaseDeniedException the lease denied exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws InterruptedException the interrupted exception
+	 * @throws PrivilegedActionException the privileged action exception
+	 * @throws ConfigurationException the configuration exception
+	 * @throws TerminologyException the terminology exception
+	 */
 	synchronized private void getFolderTreeModel() throws RemoteException, TaskFailedException, LeaseDeniedException, IOException, InterruptedException, PrivilegedActionException,
 			ConfigurationException, TerminologyException {
 
@@ -905,6 +1191,11 @@ public class InboxPanel extends JPanel {
 		foldTree.repaint();
 	}
 
+	/**
+	 * Sets the selected folder.
+	 *
+	 * @param atrName the new selected folder
+	 */
 	private void setSelectedFolder(String atrName) {
 		boolean testPath = false;
 		TreePath tp = foldTree.getNextMatch(atrName, 0, Position.Bias.Forward);
@@ -923,6 +1214,13 @@ public class InboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Test node.
+	 *
+	 * @param atrName the atr name
+	 * @param node the node
+	 * @return true, if successful
+	 */
 	private boolean testNode(String atrName, DefaultMutableTreeNode node) {
 
 		FolderTreeObj foldObj1 = (FolderTreeObj) node.getUserObject();
@@ -954,7 +1252,19 @@ public class InboxPanel extends JPanel {
 //		return true;
 //	}
 
-	private void getOutboxItems() throws TerminologyException, IOException, TaskFailedException, LoginException, ConfigurationException, PrivilegedActionException, InterruptedException {
+	/**
+ * Gets the outbox items.
+ *
+ * @return the outbox items
+ * @throws TerminologyException the terminology exception
+ * @throws IOException Signals that an I/O exception has occurred.
+ * @throws TaskFailedException the task failed exception
+ * @throws LoginException the login exception
+ * @throws ConfigurationException the configuration exception
+ * @throws PrivilegedActionException the privileged action exception
+ * @throws InterruptedException the interrupted exception
+ */
+private void getOutboxItems() throws TerminologyException, IOException, TaskFailedException, LoginException, ConfigurationException, PrivilegedActionException, InterruptedException {
 
 		ConfigTranslationModule cfg = null;
 		try {
@@ -1114,14 +1424,27 @@ public class InboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * The Class RunRevisionProcess.
+	 */
 	class RunRevisionProcess implements Runnable {
+		
+		/** The processes. */
 		Collection<I_DescribeBusinessProcess> processes;
 
+		/**
+		 * Instantiates a new run revision process.
+		 *
+		 * @param processes the processes
+		 */
 		public RunRevisionProcess(Collection<I_DescribeBusinessProcess> processes) {
 			super();
 			this.processes = processes;
 		}
 
+		/* (non-Javadoc)
+		 * @see java.lang.Runnable#run()
+		 */
 		@Override
 		public void run() {
 			for (I_DescribeBusinessProcess descProcess : processes) {
@@ -1149,6 +1472,11 @@ public class InboxPanel extends JPanel {
 			// }
 		}
 
+		/**
+		 * Execute review process.
+		 *
+		 * @param entId the ent id
+		 */
 		protected void executeReviewProcess(EntryID entId) {
 			try {
 				I_EncodeBusinessProcess processToExecute = null;
@@ -1180,6 +1508,18 @@ public class InboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Load queue items.
+	 *
+	 * @throws RemoteException the remote exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TaskFailedException the task failed exception
+	 * @throws InterruptedException the interrupted exception
+	 * @throws PrivilegedActionException the privileged action exception
+	 * @throws ConfigurationException the configuration exception
+	 * @throws LeaseDeniedException the lease denied exception
+	 * @throws TerminologyException the terminology exception
+	 */
 	private void loadQueueItems() throws RemoteException, IOException, TaskFailedException, InterruptedException, PrivilegedActionException, ConfigurationException, LeaseDeniedException,
 			TerminologyException {
 
@@ -1479,7 +1819,16 @@ public class InboxPanel extends JPanel {
 //
 //	}
 
-	private String[] getTargetTerms(Integer worklistmemberId, Integer targetLang, boolean targetFSNCol, boolean targetPrefCol) {
+	/**
+ * Gets the target terms.
+ *
+ * @param worklistmemberId the worklistmember id
+ * @param targetLang the target lang
+ * @param targetFSNCol the target fsn col
+ * @param targetPrefCol the target pref col
+ * @return the target terms
+ */
+private String[] getTargetTerms(Integer worklistmemberId, Integer targetLang, boolean targetFSNCol, boolean targetPrefCol) {
 		String[] retString = { "", "" };
 		String sFsn = "";
 		String sPref = "";
@@ -1541,6 +1890,12 @@ public class InboxPanel extends JPanel {
 
 	}
 
+	/**
+	 * Adds the entry to worklist folder.
+	 *
+	 * @param worklistName the worklist name
+	 * @param entryID the entry id
+	 */
 	private void addEntryToWorklistFolder(String worklistName, EntryID entryID) {
 		Set<EntryID> foldEntries = null;
 		if (hashFolders.containsKey(worklistName))
@@ -1553,6 +1908,12 @@ public class InboxPanel extends JPanel {
 
 	}
 
+	/**
+	 * Adds the entry to status folder.
+	 *
+	 * @param statusFolder the status folder
+	 * @param entryId the entry id
+	 */
 	private void addEntryToStatusFolder(String statusFolder, EntryID entryId) {
 		Set<EntryID> foldEntries = null;
 		if (hashFolders.containsKey(statusFolder))
@@ -1565,6 +1926,12 @@ public class InboxPanel extends JPanel {
 
 	}
 
+	/**
+	 * Del entry from status folder.
+	 *
+	 * @param statusFolder the status folder
+	 * @param entryId the entry id
+	 */
 	private void delEntryFromStatusFolder(String statusFolder, EntryID entryId) {
 
 		Set<EntryID> foldEntries = null;
@@ -1575,6 +1942,12 @@ public class InboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Del entry from worklist folder.
+	 *
+	 * @param worklistName the worklist name
+	 * @param entId the ent id
+	 */
 	private void delEntryFromWorklistFolder(String worklistName, EntryID entId) {
 		Set<EntryID> foldEntries = null;
 		if (hashFolders.containsKey(worklistName)) {
@@ -1585,6 +1958,12 @@ public class InboxPanel extends JPanel {
 
 	}
 
+	/**
+	 * Adds the entry to folders.
+	 *
+	 * @param tagsArray the tags array
+	 * @param entryId the entry id
+	 */
 	private void addEntryToFolders(Set<String> tagsArray, EntryID entryId) {
 		Set<EntryID> foldEntries = null;
 		if (tagsArray == null || tagsArray.size() < 1) {
@@ -1609,6 +1988,12 @@ public class InboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Del entry from folders.
+	 *
+	 * @param tagsArray the tags array
+	 * @param entryId the entry id
+	 */
 	private void delEntryFromFolders(Set<String> tagsArray, EntryID entryId) {
 
 		for (String folderKey : tagsArray) {
@@ -1622,6 +2007,11 @@ public class InboxPanel extends JPanel {
 
 	}
 
+	/**
+	 * Gets the custom node config.
+	 *
+	 * @return the custom node config
+	 */
 	private void getCustomNodeConfig() {
 		try {
 			ThinFolderTreeStructure foldStruc = (ThinFolderTreeStructure) Terms.get().getActiveAceFrameConfig().getDbConfig().getProperty(CUSTOM_NODE_KEY);
@@ -1637,6 +2027,12 @@ public class InboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Creates the nodes for child folders.
+	 *
+	 * @param folderStruc the folder struc
+	 * @param node the node
+	 */
 	private void createNodesForChildFolders(ThinFolderTreeStructure folderStruc, DefaultMutableTreeNode node) {
 		for (ThinFolderTreeStructure child : folderStruc.getChildren()) {
 			DefaultMutableTreeNode childNode = new DefaultMutableTreeNode(new FolderTreeObj(IconUtilities.CUSTOM_NODE, child.getFolderName(), new FolderMetadata(child.getFolderName(), true)));
@@ -1646,37 +2042,74 @@ public class InboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * The Class FolderMetadata.
+	 */
 	class FolderMetadata implements Serializable {
-		/**
-		 * 
-		 */
+		
+		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = 1L;
+		
+		/** The pending refresh. */
 		private boolean pendingRefresh;
+		
+		/** The folder name. */
 		private String folderName;
 
+		/**
+		 * Instantiates a new folder metadata.
+		 *
+		 * @param folderName the folder name
+		 * @param pendingRefresh the pending refresh
+		 */
 		public FolderMetadata(String folderName, boolean pendingRefresh) {
 			this.folderName = folderName;
 			this.pendingRefresh = pendingRefresh;
 		}
 
+		/**
+		 * Checks if is pending refresh.
+		 *
+		 * @return true, if is pending refresh
+		 */
 		public boolean isPendingRefresh() {
 			return pendingRefresh;
 		}
 
+		/**
+		 * Sets the pending refresh.
+		 *
+		 * @param pendingRefresh the new pending refresh
+		 */
 		public void setPendingRefresh(boolean pendingRefresh) {
 			this.pendingRefresh = pendingRefresh;
 		}
 
+		/**
+		 * Gets the folder name.
+		 *
+		 * @return the folder name
+		 */
 		public String getFolderName() {
 			return folderName;
 		}
 
+		/**
+		 * Sets the folder name.
+		 *
+		 * @param folderName the new folder name
+		 */
 		public void setFolderName(String folderName) {
 			this.folderName = folderName;
 		}
 
 	}
 
+	/**
+	 * Sets the next entry.
+	 *
+	 * @param entryID the new next entry
+	 */
 	synchronized private void setNextEntry(EntryID entryID) {
 		EntryID nEntryID = null;
 		for (int i = 0; i < itemsTable.getRowCount(); i++) {
@@ -1692,6 +2125,15 @@ public class InboxPanel extends JPanel {
 		setNextEntryID(nEntryID);
 	}
 
+	/**
+	 * Gets the project for member.
+	 *
+	 * @param member the member
+	 * @param config the config
+	 * @return the project for member
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	private I_TerminologyProject getProjectForMember(WorkListMember member, I_ConfigAceFrame config) throws TerminologyException, IOException {
 		I_GetConceptData workListConcept = Terms.get().getConcept(member.getWorkListUUID());
 		WorkList workList = TerminologyProjectDAO.getWorkList(workListConcept, config);
@@ -1699,6 +2141,11 @@ public class InboxPanel extends JPanel {
 		return project;
 	}
 
+	/**
+	 * Button1 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button1ActionPerformed(ActionEvent e) {
 		closing = true;
 		AceFrameConfig config;
@@ -1771,34 +2218,75 @@ public class InboxPanel extends JPanel {
 		}
 	}
 
+	/** The entry id. */
 	private EntryID entryId;
 
+	/**
+	 * Gets the entry id.
+	 *
+	 * @return the entry id
+	 */
 	public EntryID getEntryID() {
 		return entryId;
 	}
 
+	/**
+	 * Sets the entry id.
+	 *
+	 * @param entryId the new entry id
+	 */
 	public void setEntryID(EntryID entryId) {
 
 		this.entryId = entryId;
 	}
 
+	/** The next entry id. */
 	private EntryID nextEntryId;
+	
+	/** The user name. */
 	private String userName;
 
+	/**
+	 * Gets the next entry id.
+	 *
+	 * @return the next entry id
+	 */
 	public EntryID getNextEntryID() {
 		return nextEntryId;
 	}
 
+	/**
+	 * Sets the next entry id.
+	 *
+	 * @param nextEntryId the new next entry id
+	 */
 	public void setNextEntryID(EntryID nextEntryId) {
 
 		this.nextEntryId = nextEntryId;
 	}
 
+	/**
+	 * The listener interface for receiving treeMenuItem events.
+	 * The class that is interested in processing a treeMenuItem
+	 * event implements this interface, and the object created
+	 * with that class is registered with a component using the
+	 * component's <code>addTreeMenuItemListener<code> method. When
+	 * the treeMenuItem event occurs, that object's appropriate
+	 * method is invoked.
+	 *
+	 * @see TreeMenuItemEvent
+	 */
 	class TreeMenuItemListener implements ActionListener {
 
+		/** The node. */
 		private DefaultMutableTreeNode node;
+		
+		/** The acc event. */
 		private ActionEvent accEvent;
 
+		/* (non-Javadoc)
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (node != null) {
@@ -1871,12 +2359,20 @@ public class InboxPanel extends JPanel {
 
 		}
 
+		/**
+		 * Sets the node.
+		 *
+		 * @param node the new node
+		 */
 		public void setNode(DefaultMutableTreeNode node) {
 			this.node = node;
 		}
 
 	}
 
+	/**
+	 * Save custom folders.
+	 */
 	private void saveCustomFolders() {
 		try {
 			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
@@ -1892,6 +2388,12 @@ public class InboxPanel extends JPanel {
 
 	}
 
+	/**
+	 * Gets the think structure.
+	 *
+	 * @param node the node
+	 * @return the think structure
+	 */
 	private ThinFolderTreeStructure getThinkStructure(DefaultMutableTreeNode node) {
 		ThinFolderTreeStructure foldStruc = new ThinFolderTreeStructure();
 
@@ -1908,6 +2410,12 @@ public class InboxPanel extends JPanel {
 		return foldStruc;
 	}
 
+	/**
+	 * Move items from outbox.
+	 *
+	 * @param entries the entries
+	 * @param folderName the folder name
+	 */
 	synchronized private void moveItemsFromOutbox(EntryID[] entries, String folderName) {
 		Set<EntryID> custFoldEntries = hashFolders.get(folderName);
 
@@ -1917,6 +2425,12 @@ public class InboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Gets the tag string.
+	 *
+	 * @param tagSet the tag set
+	 * @return the tag string
+	 */
 	private String getTagString(Set<String> tagSet) {
 		StringBuffer ret = new StringBuffer("");
 		int i = 0;
@@ -1929,6 +2443,12 @@ public class InboxPanel extends JPanel {
 		return ret.toString();
 	}
 
+	/**
+	 * Sets the tag to outbox process.
+	 *
+	 * @param entryID the entry id
+	 * @param folderName the folder name
+	 */
 	private void setTagToOutboxProcess(EntryID entryID, String folderName) {
 
 		I_EncodeBusinessProcess process = null;
@@ -2050,6 +2570,11 @@ public class InboxPanel extends JPanel {
 
 	}
 
+	/**
+	 * Move items to inbox.
+	 *
+	 * @param folderName the folder name
+	 */
 	synchronized private void moveItemsToInbox(String folderName) {
 		Set<EntryID> foldEntries = hashFolders.get(IconUtilities.INBOX_NODE);
 		Set<EntryID> custFoldEntries = hashFolders.get(folderName);
@@ -2060,6 +2585,13 @@ public class InboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Move items to folder.
+	 *
+	 * @param entries the entries
+	 * @param folderSource the folder source
+	 * @param folderTarget the folder target
+	 */
 	synchronized private void moveItemsToFolder(EntryID[] entries, String folderSource, String folderTarget) {
 		Set<EntryID> targetEntries = hashFolders.get(folderTarget);
 		Set<EntryID> sourceEntries = hashFolders.get(folderSource);
@@ -2072,6 +2604,13 @@ public class InboxPanel extends JPanel {
 
 	}
 
+	/**
+	 * Change tag from process.
+	 *
+	 * @param entryID the entry id
+	 * @param folderSource the folder source
+	 * @param folderTarget the folder target
+	 */
 	private void changeTagFromProcess(EntryID entryID, String folderSource, String folderTarget) {
 		I_EncodeBusinessProcess process = null;
 		try {
@@ -2121,6 +2660,12 @@ public class InboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Removes the tag from process.
+	 *
+	 * @param entryId the entry id
+	 * @param folderName the folder name
+	 */
 	private void removeTagFromProcess(EntryID entryId, String folderName) {
 		I_EncodeBusinessProcess process = null;
 		try {
@@ -2171,19 +2716,46 @@ public class InboxPanel extends JPanel {
 
 	}
 
+	/**
+	 * The Class InboxTreeMouselistener.
+	 */
 	public class InboxTreeMouselistener extends MouseAdapter {
+		
+		/** The tree. */
 		private JTree tree;
+		
+		/** The menu. */
 		private JPopupMenu menu;
+		
+		/** The m item. */
 		private JMenuItem mItem;
+		
+		/** The m item listener. */
 		private TreeMenuItemListener mItemListener;
+		
+		/** The x point. */
 		private int xPoint;
+		
+		/** The y point. */
 		private int yPoint;
 
+		/**
+		 * Instantiates a new inbox tree mouselistener.
+		 *
+		 * @param tree the tree
+		 */
 		InboxTreeMouselistener(JTree tree) {
 			this.tree = tree;
 			mItemListener = new TreeMenuItemListener();
 		}
 
+		/**
+		 * Gets the menu.
+		 *
+		 * @param nodeType the node type
+		 * @param hasChildren the has children
+		 * @return the menu
+		 */
 		private void getMenu(String nodeType, boolean hasChildren) {
 
 			menu = new JPopupMenu();
@@ -2212,6 +2784,9 @@ public class InboxPanel extends JPanel {
 			}
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.event.MouseAdapter#mouseClicked(java.awt.event.MouseEvent)
+		 */
 		@SuppressWarnings("static-access")
 		@Override
 		public void mouseClicked(MouseEvent e) {
@@ -2240,12 +2815,31 @@ public class InboxPanel extends JPanel {
 
 	}
 
+	/**
+	 * The listener interface for receiving menuItem events.
+	 * The class that is interested in processing a menuItem
+	 * event implements this interface, and the object created
+	 * with that class is registered with a component using the
+	 * component's <code>addMenuItemListener<code> method. When
+	 * the menuItem event occurs, that object's appropriate
+	 * method is invoked.
+	 *
+	 * @see MenuItemEvent
+	 */
 	class MenuItemListener implements ActionListener {
 
+		/** The node. */
 		private QueueTableObj node;
+		
+		/** The folder type. */
 		private String folderType;
+		
+		/** The acc event. */
 		private ActionEvent accEvent;
 
+		/* (non-Javadoc)
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (node != null) {
@@ -2320,6 +2914,12 @@ public class InboxPanel extends JPanel {
 
 		}
 
+		/**
+		 * Sets the item.
+		 *
+		 * @param node the node
+		 * @param folderType the folder type
+		 */
 		public void setItem(QueueTableObj node, String folderType) {
 			this.node = node;
 			this.folderType = folderType;
@@ -2327,19 +2927,45 @@ public class InboxPanel extends JPanel {
 
 	}
 
+	/**
+	 * The Class InboxTableMouselistener.
+	 */
 	public class InboxTableMouselistener extends MouseAdapter {
+		
+		/** The table. */
 		private JTable table;
+		
+		/** The menu. */
 		private JPopupMenu menu;
+		
+		/** The m item. */
 		private JMenuItem mItem;
+		
+		/** The m item listener. */
 		private MenuItemListener mItemListener;
+		
+		/** The x point. */
 		private int xPoint;
+		
+		/** The y point. */
 		private int yPoint;
 
+		/**
+		 * Instantiates a new inbox table mouselistener.
+		 *
+		 * @param table the table
+		 */
 		InboxTableMouselistener(JTable table) {
 			this.table = table;
 			mItemListener = new MenuItemListener();
 		}
 
+		/**
+		 * Gets the menu.
+		 *
+		 * @param nodeType the node type
+		 * @return the menu
+		 */
 		private void getMenu(String nodeType) {
 
 			menu = new JPopupMenu();
@@ -2361,6 +2987,9 @@ public class InboxPanel extends JPanel {
 
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.event.MouseAdapter#mouseClicked(java.awt.event.MouseEvent)
+		 */
 		@Override
 		public void mouseClicked(MouseEvent e) {
 
@@ -2475,10 +3104,18 @@ public class InboxPanel extends JPanel {
 		}
 	}
 
+	/** The clone list. */
 	List<I_Work> cloneList = new ArrayList<I_Work>();
+	
+	/** The process in execution. */
 	private int processInExecution;
+	
+	/** The set by code. */
 	private boolean setByCode;
 
+	/**
+	 * Execute process.
+	 */
 	protected void executeProcess() {
 		Runnable r = new Runnable() {
 
@@ -2604,6 +3241,11 @@ public class InboxPanel extends JPanel {
 
 	}
 
+	/**
+	 * Del entry from inbox folder.
+	 *
+	 * @param entId the ent id
+	 */
 	protected void delEntryFromInboxFolder(EntryID entId) {
 
 		Set<EntryID> foldEntries = hashFolders.get(IconUtilities.INBOX_NODE);
@@ -2612,6 +3254,11 @@ public class InboxPanel extends JPanel {
 
 	}
 
+	/**
+	 * Test cfg for next action.
+	 *
+	 * @param entId the ent id
+	 */
 	synchronized protected void TestCfgForNextAction(EntryID entId) {
 
 		ConfigTranslationModule cfg = null;
@@ -2629,6 +3276,11 @@ public class InboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Fold tree value changed.
+	 *
+	 * @param e the e
+	 */
 	private void foldTreeValueChanged(TreeSelectionEvent e) {
 		if (!setByCode) {
 
@@ -2638,14 +3290,23 @@ public class InboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * The Class ReloadOS.
+	 */
 	public class ReloadOS extends SwingWorker<Boolean> {
 
+		/* (non-Javadoc)
+		 * @see org.dwfa.swing.SwingWorker#construct()
+		 */
 		@Override
 		protected Boolean construct() throws Exception {
 			// ObjectServerCore.refreshServers();
 			return true;
 		}
 
+		/* (non-Javadoc)
+		 * @see org.dwfa.swing.SwingWorker#finished()
+		 */
 		@Override
 		protected void finished() {
 			try {
@@ -2694,14 +3355,23 @@ public class InboxPanel extends JPanel {
 
 	}
 
+	/**
+	 * The Class RefreshServer.
+	 */
 	public class RefreshServer extends SwingWorker<Boolean> {
 
+		/* (non-Javadoc)
+		 * @see org.dwfa.swing.SwingWorker#construct()
+		 */
 		@Override
 		protected Boolean construct() throws Exception {
 			// ObjectServerCore.refreshServers();
 			return true;
 		}
 
+		/* (non-Javadoc)
+		 * @see org.dwfa.swing.SwingWorker#finished()
+		 */
 		@Override
 		protected void finished() {
 			try {
@@ -2747,6 +3417,9 @@ public class InboxPanel extends JPanel {
 
 	}
 
+	/**
+	 * Select and exec next entry.
+	 */
 	public void selectAndExecNextEntry() {
 
 		ConfigTranslationModule cfg = null;
@@ -2785,6 +3458,9 @@ public class InboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Refresh inbox.
+	 */
 	public void refreshInbox() {
 
 		synchronized (this) {
@@ -2805,11 +3481,19 @@ public class InboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Sets the item check box.
+	 *
+	 * @param checked the new item check box
+	 */
 	public void setItemCheckBox(boolean checked) {
 		inboxItemCheckbox.setSelected(checked);
 		inboxItemCheckboxActionPerformed();
 	}
 
+	/**
+	 * Inbox item checkbox action performed.
+	 */
 	private void inboxItemCheckboxActionPerformed() {
 		if (!setByCode) {
 			ConfigTranslationModule cfg = null;
@@ -2827,6 +3511,9 @@ public class InboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * B send items action performed.
+	 */
 	private void bSendItemsActionPerformed() {
 
 		SwingUtilities.invokeLater(new Runnable() {
@@ -2838,6 +3525,9 @@ public class InboxPanel extends JPanel {
 		});
 	}
 
+	/**
+	 * Run outbox worker.
+	 */
 	private void runOutboxWorker() {
 		List<Worker> lWorker = worker.getWorkerList();
 		OnDemandOutboxQueueWorker oWorker = null;
@@ -2850,6 +3540,11 @@ public class InboxPanel extends JPanel {
 
 	}
 
+	/**
+	 * Label4 mouse clicked.
+	 *
+	 * @param e the e
+	 */
 	private void label4MouseClicked(MouseEvent e) {
 		try {
 			HelpApi.openHelpForComponent("TRANSLATION_INBOX");
@@ -2860,6 +3555,11 @@ public class InboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Refresh button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void refreshButtonActionPerformed(ActionEvent e) {
 		try {
 			setByCode = true;
@@ -2886,6 +3586,11 @@ public class InboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Open new inbox action performed.
+	 *
+	 * @param e the e
+	 */
 	private void openNewInboxActionPerformed(ActionEvent e) {
 		WfInboxPanel inboxPanel = new WfInboxPanel();
 		TranslationHelperPanel thp;
@@ -2915,10 +3620,18 @@ public class InboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Rnd modify wl members action performed.
+	 *
+	 * @param e the e
+	 */
 	private void rndModifyWlMembersActionPerformed(ActionEvent e) {
 		WorkflowSearcher.randomModifyWlMembers();
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -3142,24 +3855,61 @@ public class InboxPanel extends JPanel {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The refresh button. */
 	private JButton refreshButton;
+	
+	/** The button1. */
 	private JButton button1;
+	
+	/** The label4. */
 	private JLabel label4;
+	
+	/** The inbox item checkbox. */
 	private JCheckBox inboxItemCheckbox;
+	
+	/** The b send items. */
 	private JButton bSendItems;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The fold tree. */
 	private JTree foldTree;
+	
+	/** The panel3. */
 	private JPanel panel3;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The l viewing. */
 	private JLabel lViewing;
+	
+	/** The panel11. */
 	private JPanel panel11;
+	
+	/** The scroll pane2. */
 	private JScrollPane scrollPane2;
+	
+	/** The items table. */
 	private JTable itemsTable;
+	
+	/** The open new inbox. */
 	private JButton openNewInbox;
+	
+	/** The rnd modify wl members. */
 	private JButton rndModifyWlMembers;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 }

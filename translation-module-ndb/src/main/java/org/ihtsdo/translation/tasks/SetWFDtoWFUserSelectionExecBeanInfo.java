@@ -29,6 +29,9 @@ import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
  */
 public class SetWFDtoWFUserSelectionExecBeanInfo extends SimpleBeanInfo {
 
+	/**
+	 * Instantiates a new sets the wf dto wf user selection exec bean info.
+	 */
 	public SetWFDtoWFUserSelectionExecBeanInfo() {
 		super();
 	}

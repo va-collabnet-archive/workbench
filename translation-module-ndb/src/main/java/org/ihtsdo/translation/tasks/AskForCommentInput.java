@@ -42,13 +42,16 @@ import org.ihtsdo.project.workflow.model.WfRole;
 import org.ihtsdo.translation.CommentPopUpDialog;
 
 /**
- * The Class
+ * The Class.
  */
 @BeanList(specs = 
 { @Spec(directory = "tasks/translation tasks", type = BeanType.TASK_BEAN)})
 public class AskForCommentInput extends AbstractTask {
 
+	/** The Constant HEADER_SEPARATOR. */
 	private static final String HEADER_SEPARATOR = " // ";
+	
+	/** The Constant COMMENT_HEADER_SEP. */
 	private static final String COMMENT_HEADER_SEP = ": -";
 
 	/** The Constant serialVersionUID. */

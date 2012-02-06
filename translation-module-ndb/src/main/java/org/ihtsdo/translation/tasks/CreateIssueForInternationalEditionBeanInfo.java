@@ -28,6 +28,9 @@ import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
  */
 public class CreateIssueForInternationalEditionBeanInfo extends SimpleBeanInfo {
 
+	/**
+	 * Instantiates a new creates the issue for international edition bean info.
+	 */
 	public CreateIssueForInternationalEditionBeanInfo() {
 		super();
 	}

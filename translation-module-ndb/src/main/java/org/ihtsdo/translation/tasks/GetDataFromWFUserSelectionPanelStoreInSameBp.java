@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2009 International Health Terminology Standards Development
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
  * Organisation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -57,24 +57,45 @@ public class GetDataFromWFUserSelectionPanelStoreInSameBp extends AbstractTask {
 	 * -----------------------
 	 */
 	// Serialization Properties
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
+	
+	/** The Constant dataVersion. */
 	private static final int dataVersion = 2;
 
 	// Task Attribute Properties
+	/** The profile prop name. */
 	private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
+	
+	/** The translator inbox prop name. */
 	private String translatorInboxPropName = ProcessAttachmentKeys.TRANSLATOR_ROLE_INBOX.getAttachmentKey();
+	
+	/** The reviewer1 inbox prop name. */
 	private String reviewer1InboxPropName = ProcessAttachmentKeys.REVIEWER_1_ROLE_INBOX.getAttachmentKey();
+	
+	/** The reviewer2 inbox prop name. */
 	private String reviewer2InboxPropName = ProcessAttachmentKeys.REVIEWER_2_ROLE_INBOX.getAttachmentKey();
+	
+	/** The sme inbox prop name. */
 	private String smeInboxPropName = ProcessAttachmentKeys.SME_ROLE_INBOX.getAttachmentKey();
+	
+	/** The editorial board inbox prop name. */
 	private String editorialBoardInboxPropName = ProcessAttachmentKeys.EDITORIAL_BOARD_ROLE_INBOX.getAttachmentKey();
 
 	// Other Properties
+	/** The term factory. */
 	private I_TermFactory termFactory;
 
 	/*
 	 * -----------------------
 	 * Serialization Methods
 	 * -----------------------
+	 */
+	/**
+	 * Write object.
+	 *
+	 * @param out the out
+	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
@@ -86,6 +107,13 @@ public class GetDataFromWFUserSelectionPanelStoreInSameBp extends AbstractTask {
 		out.writeObject(editorialBoardInboxPropName);
 	}
 
+	/**
+	 * Read object.
+	 *
+	 * @param in the in
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws ClassNotFoundException the class not found exception
+	 */
 	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
 		int objDataVersion = in.readInt();
 
@@ -108,13 +136,13 @@ public class GetDataFromWFUserSelectionPanelStoreInSameBp extends AbstractTask {
 	/**
 	 * Handles actions required by the task after normal task completion (such as moving a
 	 * process to another user's input queue).
-	 * 
-	 * @return void
+	 *
 	 * @param process The currently executing Workflow process
 	 * @param worker The worker currently executing this task
-	 * @exception TaskFailedException Thrown if a task fails for any reason.
+	 * @return void
+	 * @throws TaskFailedException Thrown if a task fails for any reason.
 	 * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
-	 *      org.dwfa.bpa.process.I_Work)
+	 * org.dwfa.bpa.process.I_Work)
 	 */
 	public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 		// Nothing to do
@@ -123,13 +151,13 @@ public class GetDataFromWFUserSelectionPanelStoreInSameBp extends AbstractTask {
 	/**
 	 * Performs the primary action of the task, which in this case is to gather and
 	 * validate data that has been entered by the user on the Workflow Details Sheet.
-	 * 
-	 * @return The exit condition of the task
+	 *
 	 * @param process The currently executing Workflow process
 	 * @param worker The worker currently executing this task
-	 * @exception TaskFailedException Thrown if a task fails for any reason.
+	 * @return The exit condition of the task
+	 * @throws TaskFailedException Thrown if a task fails for any reason.
 	 * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
-	 *      org.dwfa.bpa.process.I_Work)
+	 * org.dwfa.bpa.process.I_Work)
 	 */
 	public Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
 
@@ -261,8 +289,8 @@ public class GetDataFromWFUserSelectionPanelStoreInSameBp extends AbstractTask {
 	}
 
 	/**
-	 * This method overrides: getDataContainerIds() in AbstractTask
-	 * 
+	 * This method overrides: getDataContainerIds() in AbstractTask.
+	 *
 	 * @return The data container identifiers used by this task.
 	 */
 	public int[] getDataContainerIds() {
@@ -270,8 +298,8 @@ public class GetDataFromWFUserSelectionPanelStoreInSameBp extends AbstractTask {
 	}
 
 	/**
-	 * This method implements the interface method specified by: getConditions() in I_DefineTask
-	 * 
+	 * This method implements the interface method specified by: getConditions() in I_DefineTask.
+	 *
 	 * @return The possible evaluation conditions for this task.
 	 * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
 	 */
@@ -279,50 +307,110 @@ public class GetDataFromWFUserSelectionPanelStoreInSameBp extends AbstractTask {
 		return AbstractTask.ITEM_CANCELED_OR_COMPLETE;
 	}
 
+	/**
+	 * Gets the profile prop name.
+	 *
+	 * @return the profile prop name
+	 */
 	public String getProfilePropName() {
 		return profilePropName;
 	}
 
+	/**
+	 * Sets the profile prop name.
+	 *
+	 * @param profilePropName the new profile prop name
+	 */
 	public void setProfilePropName(String profilePropName) {
 		this.profilePropName = profilePropName;
 	}
 
+	/**
+	 * Gets the translator inbox prop name.
+	 *
+	 * @return the translator inbox prop name
+	 */
 	public String getTranslatorInboxPropName() {
 		return translatorInboxPropName;
 	}
 
+	/**
+	 * Sets the translator inbox prop name.
+	 *
+	 * @param translatorInboxPropName the new translator inbox prop name
+	 */
 	public void setTranslatorInboxPropName(String translatorInboxPropName) {
 		this.translatorInboxPropName = translatorInboxPropName;
 	}
 
+	/**
+	 * Gets the reviewer1 inbox prop name.
+	 *
+	 * @return the reviewer1 inbox prop name
+	 */
 	public String getReviewer1InboxPropName() {
 		return reviewer1InboxPropName;
 	}
 
+	/**
+	 * Sets the reviewer1 inbox prop name.
+	 *
+	 * @param reviewer1InboxPropName the new reviewer1 inbox prop name
+	 */
 	public void setReviewer1InboxPropName(String reviewer1InboxPropName) {
 		this.reviewer1InboxPropName = reviewer1InboxPropName;
 	}
 
+	/**
+	 * Gets the reviewer2 inbox prop name.
+	 *
+	 * @return the reviewer2 inbox prop name
+	 */
 	public String getReviewer2InboxPropName() {
 		return reviewer2InboxPropName;
 	}
 
+	/**
+	 * Sets the reviewer2 inbox prop name.
+	 *
+	 * @param reviewer2InboxPropName the new reviewer2 inbox prop name
+	 */
 	public void setReviewer2InboxPropName(String reviewer2InboxPropName) {
 		this.reviewer2InboxPropName = reviewer2InboxPropName;
 	}
 
+	/**
+	 * Gets the sme inbox prop name.
+	 *
+	 * @return the sme inbox prop name
+	 */
 	public String getSmeInboxPropName() {
 		return smeInboxPropName;
 	}
 
+	/**
+	 * Sets the sme inbox prop name.
+	 *
+	 * @param smeInboxPropName the new sme inbox prop name
+	 */
 	public void setSmeInboxPropName(String smeInboxPropName) {
 		this.smeInboxPropName = smeInboxPropName;
 	}
 
+	/**
+	 * Gets the editorial board inbox prop name.
+	 *
+	 * @return the editorial board inbox prop name
+	 */
 	public String getEditorialBoardInboxPropName() {
 		return editorialBoardInboxPropName;
 	}
 
+	/**
+	 * Sets the editorial board inbox prop name.
+	 *
+	 * @param editorialBoardInboxPropName the new editorial board inbox prop name
+	 */
 	public void setEditorialBoardInboxPropName(String editorialBoardInboxPropName) {
 		this.editorialBoardInboxPropName = editorialBoardInboxPropName;
 	}

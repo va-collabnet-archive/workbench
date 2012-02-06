@@ -100,25 +100,64 @@ public class TranslationConceptViewer extends JPanel {
 	
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
+	
+	/** The translation project. */
 	private TranslationProject translationProject;
+	
+	/** The synonym. */
 	private I_GetConceptData synonym;
+	
+	/** The fsn. */
 	private I_GetConceptData fsn;
+	
+	/** The preferred. */
 	private I_GetConceptData preferred;
+	
+	/** The source ids. */
 	private List<Integer> sourceIds;
+	
+	/** The target id. */
 	private int targetId;
+	
+	/** The not acceptable. */
 	private I_GetConceptData notAcceptable;
+	
+	/** The acceptable. */
 	private I_GetConceptData acceptable;
+	
+	/** The current. */
 	private I_GetConceptData current;
+	
+	/** The source lang refsets. */
 	private Set<LanguageMembershipRefset> sourceLangRefsets;
+	
+	/** The target lang refset. */
 	private LanguageMembershipRefset targetLangRefset;
+	
+	/** The formatter. */
 	private SimpleDateFormat formatter;
+	
+	/** The description. */
 	private I_GetConceptData description;
+	
+	/** The inactive. */
 	private I_GetConceptData inactive;
+	
+	/** The active. */
 	private I_GetConceptData active;
+	
+	/** The retired. */
 	private I_GetConceptData retired;
+	
+	/** The issue list panel. */
 	private IssuesListPanel2 issueListPanel;
+	
+	/** The transl config. */
 	private ConfigTranslationModule translConfig;
 
+	/**
+	 * Instantiates a new translation concept viewer.
+	 */
 	public TranslationConceptViewer() {
 		sourceIds=new ArrayList<Integer>();
 //		if (sourceLangRefsets!=null)
@@ -213,15 +252,24 @@ public class TranslationConceptViewer extends JPanel {
 		clearForm(false);
 	}
 	
+	/**
+	 * Unload data.
+	 */
 	public void unloadData(){
 		verifySavePending();
 		clearForm(true);
 	}
+	
+	/**
+	 * Verify save pending.
+	 */
 	private void verifySavePending() {
 	}
 
 	/**
 	 * Clear form.
+	 *
+	 * @param clearAll the clear all
 	 */
 	private void clearForm(boolean clearAll){
 		descriptionInEditor = null;
@@ -465,12 +513,20 @@ public class TranslationConceptViewer extends JPanel {
 	}
 
 	
+	/**
+	 * M sw tsv action performed.
+	 */
 	private void mSwTSVActionPerformed() {
 //		LanguageUtil.openTranlationUI(concept, config, sourceLangCode, targetLangCode, LanguageUtil.SIMPLE_UI);
 	}
 
 
 
+	/**
+	 * Adds the listeners.
+	 *
+	 * @param table the table
+	 */
 	private void addListeners(JTable table){
 		   SelectionListener listener = new SelectionListener(table);
 		   table.getSelectionModel().addListSelectionListener(listener);
@@ -478,22 +534,51 @@ public class TranslationConceptViewer extends JPanel {
 
 
 
+	/**
+	 * Rb fsn action performed.
+	 *
+	 * @param e the e
+	 */
 	private void rbFSNActionPerformed(ActionEvent e) {
 		updateSimilarityTable(sourceFSN);
 	}
 
+	/**
+	 * Rb pref action performed.
+	 *
+	 * @param e the e
+	 */
 	private void rbPrefActionPerformed(ActionEvent e) {
 		updateSimilarityTable(sourceFSN);
 	}
 
+	/**
+	 * Radio button2 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void radioButton2ActionPerformed(ActionEvent e) {
 		updateSimilarityTable(sourceFSN);
 	}
 
+	/**
+	 * This ancestor removed.
+	 */
 	private void thisAncestorRemoved() {
 		verifySavePending();
 	}
 
+	/**
+	 * The listener interface for receiving selection events.
+	 * The class that is interested in processing a selection
+	 * event implements this interface, and the object created
+	 * with that class is registered with a component using the
+	 * component's <code>addSelectionListener<code> method. When
+	 * the selection event occurs, that object's appropriate
+	 * method is invoked.
+	 *
+	 * @see SelectionEvent
+	 */
 	class SelectionListener implements ListSelectionListener {
         
         /** The table. */
@@ -857,37 +942,100 @@ public class TranslationConceptViewer extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The panel10. */
 	private JPanel panel10;
+	
+	/** The split pane3. */
 	private JSplitPane splitPane3;
+	
+	/** The split pane2. */
 	private JSplitPane splitPane2;
+	
+	/** The panel9. */
 	private JPanel panel9;
+	
+	/** The label9. */
 	private JLabel label9;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The tree1. */
 	private JTree tree1;
+	
+	/** The label10. */
 	private JLabel label10;
+	
+	/** The scroll pane7. */
 	private JScrollPane scrollPane7;
+	
+	/** The tree3. */
 	private JTree tree3;
+	
+	/** The panel8. */
 	private JPanel panel8;
+	
+	/** The label11. */
 	private JLabel label11;
+	
+	/** The scroll pane6. */
 	private JScrollPane scrollPane6;
+	
+	/** The tree2. */
 	private JTree tree2;
+	
+	/** The split pane1. */
 	private JSplitPane splitPane1;
+	
+	/** The tabbed pane1. */
 	private JTabbedPane tabbedPane1;
+	
+	/** The panel12. */
 	private JPanel panel12;
+	
+	/** The scroll pane2. */
 	private JScrollPane scrollPane2;
+	
+	/** The table1. */
 	private ZebraJTable table1;
+	
+	/** The panel13. */
 	private JPanel panel13;
+	
+	/** The rb fsn. */
 	private JRadioButton rbFSN;
+	
+	/** The rb pref. */
 	private JRadioButton rbPref;
+	
+	/** The radio button2. */
 	private JRadioButton radioButton2;
+	
+	/** The scroll pane3. */
 	private JScrollPane scrollPane3;
+	
+	/** The table2. */
 	private JTable table2;
+	
+	/** The panel15. */
 	private JPanel panel15;
+	
+	/** The scroll pane4. */
 	private JScrollPane scrollPane4;
+	
+	/** The editor pane1. */
 	private JEditorPane editorPane1;
+	
+	/** The tabbed pane2. */
 	private JTabbedPane tabbedPane2;
+	
+	/** The scroll pane9. */
 	private JScrollPane scrollPane9;
+	
+	/** The tbl comm. */
 	private JTable tblComm;
+	
+	/** The panel11. */
 	private JPanel panel11;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 	
@@ -912,10 +1060,20 @@ public class TranslationConceptViewer extends JPanel {
 	
 	/** The source sem tag. */
 	private String sourceSemTag;
+	
+	/** The defining char. */
 	private int definingChar=-1;
+	
+	/** The source fsn. */
 	private String sourceFSN;
+	
+	/** The worklist member. */
 	private WorkListMember worklistMember;
+	
+	/** The editing path. */
 	private Object editingPath;
+	
+	/** The set by code. */
 	private boolean setByCode;
 
 	/**
@@ -939,6 +1097,8 @@ public class TranslationConceptViewer extends JPanel {
 
 	/**
 	 * Populate tree.
+	 *
+	 * @throws Exception the exception
 	 */
 	@SuppressWarnings("unchecked")
 	private void populateSourceTree() throws Exception {
@@ -1071,6 +1231,11 @@ public class TranslationConceptViewer extends JPanel {
 	}
 
 
+	/**
+	 * Populate target tree.
+	 *
+	 * @throws Exception the exception
+	 */
 	private void populateTargetTree() throws Exception {
 		I_TermFactory tf = Terms.get();
 		DefaultMutableTreeNode top = null;
@@ -1180,6 +1345,11 @@ public class TranslationConceptViewer extends JPanel {
 
 	}
 
+	/**
+	 * Populate details tree.
+	 *
+	 * @throws Exception the exception
+	 */
 	private void populateDetailsTree() throws Exception {
 		I_TermFactory tf = Terms.get();
 		DefaultMutableTreeNode top = null;
@@ -1304,23 +1474,50 @@ public class TranslationConceptViewer extends JPanel {
 		}
 	}
 	
+	/**
+	 * The Class IconRenderer.
+	 */
 	class IconRenderer extends DefaultTreeCellRenderer {
-		/**
-		 * 
-		 */
+		
+		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = 1L;
+		
+		/** The red icon. */
 		Icon redIcon;
+		
+		/** The attribute icon. */
 		Icon attributeIcon;
+		
+		/** The orange icon. */
 		Icon orangeIcon;
+		
+		/** The description icon. */
 		Icon descriptionIcon;
+		
+		/** The fsn icon. */
 		Icon fsnIcon;
+		
+		/** The black icon. */
 		Icon blackIcon;
+		
+		/** The preferred icon. */
 		Icon preferredIcon;
+		
+		/** The role group icon. */
 		Icon roleGroupIcon;
+		
+		/** The folder. */
 		Icon folder;
+		
+		/** The association icon. */
 		Icon associationIcon;
+		
+		/** The not accept icon. */
 		Icon notAcceptIcon;
 
+		/**
+		 * Instantiates a new icon renderer.
+		 */
 		public IconRenderer() {
 			redIcon = new ImageIcon("icons/91.png");
 			attributeIcon = new ImageIcon("icons/ConceptStatus.gif");
@@ -1335,6 +1532,9 @@ public class TranslationConceptViewer extends JPanel {
 			notAcceptIcon=new ImageIcon("icons/NotAccept.gif");
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.tree.DefaultTreeCellRenderer#getTreeCellRendererComponent(javax.swing.JTree, java.lang.Object, boolean, boolean, boolean, int, boolean)
+		 */
 		@Override
 		public Component getTreeCellRendererComponent(
 				JTree tree,
@@ -1450,6 +1650,12 @@ public class TranslationConceptViewer extends JPanel {
 		table2.revalidate();
 	}
 
+	/**
+	 * Update ui.
+	 *
+	 * @param translationProject the translation project
+	 * @param workListMember the work list member
+	 */
 	public void updateUI(TranslationProject translationProject,WorkListMember workListMember){
 		clearForm(true);
 		this.translationProject=translationProject;
@@ -1507,6 +1713,9 @@ public class TranslationConceptViewer extends JPanel {
 	}
 	
 
+	/**
+	 * Load issues.
+	 */
 	protected void loadIssues() {
 		if (issueListPanel==null){
 			createIssuePanel();
@@ -1535,6 +1744,9 @@ public class TranslationConceptViewer extends JPanel {
 		}
 	}
 
+	/**
+	 * Creates the issue panel.
+	 */
 	private void createIssuePanel() {
 		I_ConfigAceFrame config;
 		try {
@@ -1558,6 +1770,9 @@ public class TranslationConceptViewer extends JPanel {
 		
 	}
 	
+	/**
+	 * Clear comments.
+	 */
 	private void clearComments(){
 		String[] columnNames = {"Comment"};
 		String[][] data = null;
@@ -1573,6 +1788,10 @@ public class TranslationConceptViewer extends JPanel {
 		tblComm.revalidate();
 		tabbedPane2.setTitleAt(0, "<html>Previous Comments</font></b></html>");
 	}
+	
+	/**
+	 * Clear similarities.
+	 */
 	private void clearSimilarities(){
 		String[] columnNames = {"Source Text",
 		"Target Text"};
@@ -1588,12 +1807,18 @@ public class TranslationConceptViewer extends JPanel {
 		table1.revalidate();
 	}
 
+	/**
+	 * Clear ling guidelines.
+	 */
 	private void clearLingGuidelines(){
 		tabbedPane1.setTitleAt(2, "<html>Linguistic Guidelines</html>");
 		editorPane1.setText("");
 		editorPane1.revalidate();
 	}
 
+	/**
+	 * Clear trans memory.
+	 */
 	private void clearTransMemory(){
 		String[] columnNames = {"Pattern Text",
 		"Translated to.."};
@@ -1611,6 +1836,11 @@ public class TranslationConceptViewer extends JPanel {
 		table2.revalidate();
 	}
 
+	/**
+	 * Gets the previous comments.
+	 *
+	 * @return the previous comments
+	 */
 	private void getPreviousComments() {
 		if (targetLangRefset!=null){
 			I_ConfigAceFrame config;
@@ -1649,6 +1879,12 @@ public class TranslationConceptViewer extends JPanel {
 		}
 	}
 
+	/**
+	 * Format comment.
+	 *
+	 * @param comment the comment
+	 * @return the string
+	 */
 	private String formatComment(String comment) {
 		long thickVer = Terms.get().convertToThickVersion(Integer.parseInt(comment.substring(comment.trim().lastIndexOf(" ") +1)));
 		String strDate = formatter.format(thickVer);
@@ -1682,10 +1918,20 @@ public class TranslationConceptViewer extends JPanel {
 		}
 	}
 
+	/**
+	 * Gets the source lang refsets.
+	 *
+	 * @return the source lang refsets
+	 */
 	public Set<LanguageMembershipRefset> getSourceLangRefsets() {
 		return sourceLangRefsets;
 	}
 
+	/**
+	 * Sets the source lang refsets.
+	 *
+	 * @param sourceLangRefsets the new source lang refsets
+	 */
 	public void setSourceLangRefsets(Set<LanguageMembershipRefset> sourceLangRefsets) {
 		this.sourceLangRefsets = sourceLangRefsets;
 		sourceIds=new ArrayList<Integer>();
@@ -1694,10 +1940,20 @@ public class TranslationConceptViewer extends JPanel {
 		}
 	}
 
+	/**
+	 * Gets the target lang refset.
+	 *
+	 * @return the target lang refset
+	 */
 	public LanguageMembershipRefset getTargetLangRefset() {
 		return targetLangRefset;
 	}
 
+	/**
+	 * Sets the target lang refset.
+	 *
+	 * @param targetLangRefset the new target lang refset
+	 */
 	public void setTargetLangRefset(LanguageMembershipRefset targetLangRefset) {
 		this.targetLangRefset = targetLangRefset;
 		targetId=targetLangRefset.getRefsetId();

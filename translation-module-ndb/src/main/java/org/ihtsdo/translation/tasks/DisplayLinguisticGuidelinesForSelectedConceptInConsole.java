@@ -33,7 +33,7 @@ import org.dwfa.util.bean.Spec;
 import org.ihtsdo.translation.LanguageUtil;
 
 /**
- * The Class
+ * The Class.
  */
 @BeanList(specs = 
 { @Spec(directory = "tasks/translation tasks", type = BeanType.TASK_BEAN)})

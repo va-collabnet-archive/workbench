@@ -29,6 +29,9 @@ import org.dwfa.bpa.tasks.editor.JTextFieldEditor;
  */
 public class CreateLangSpecRefsetBeanInfo extends SimpleBeanInfo {
 
+	/**
+	 * Instantiates a new creates the lang spec refset bean info.
+	 */
 	public CreateLangSpecRefsetBeanInfo() {
 		super();
 	}

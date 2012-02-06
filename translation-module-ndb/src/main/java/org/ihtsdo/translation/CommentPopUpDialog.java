@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Wed Jun 30 23:58:33 GMT-00:03 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.translation;
@@ -34,14 +47,25 @@ import org.ihtsdo.project.refset.CommentsRefset;
 import org.ihtsdo.project.util.IconUtilities;
 
 /**
+ * The Class CommentPopUpDialog.
+ *
  * @author Guillermo Reynoso
  */
 @SuppressWarnings("serial")
 public class CommentPopUpDialog extends JDialog {
 
+	/** The response. */
 	private HashMap<I_GetConceptData, String> response = null;
+	
+	/** The comment type. */
 	private I_GetConceptData commentType;
 
+	/**
+	 * Instantiates a new comment pop up dialog.
+	 *
+	 * @param title the title
+	 * @param commentType the comment type
+	 */
 	public CommentPopUpDialog(String title, I_GetConceptData commentType) {
 		this.commentType = commentType;
 		initComponents();
@@ -60,6 +84,9 @@ public class CommentPopUpDialog extends JDialog {
 		setVisible(true);
 	}
 
+	/**
+	 * Inits the custom components.
+	 */
 	private void initCustomComponents() {
 		List<I_GetConceptData> s = new ArrayList<I_GetConceptData>();
 		CommentsRefset.getCommentSubTypes(s, commentType);
@@ -69,10 +96,20 @@ public class CommentPopUpDialog extends JDialog {
 
 	}
 
+	/**
+	 * Show dialog.
+	 *
+	 * @return the hash map
+	 */
 	public HashMap<I_GetConceptData, String> showDialog() {
 		return response;
 	}
 
+	/**
+	 * Ok button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void okButtonActionPerformed(ActionEvent e) {
 		if(textArea1.getText().trim().equals("")){
 			errorLabel.setVisible(true);
@@ -86,6 +123,9 @@ public class CommentPopUpDialog extends JDialog {
 		dispose();
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -196,16 +236,37 @@ public class CommentPopUpDialog extends JDialog {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
+	/** The dialog pane. */
 	private JPanel dialogPane;
+	
+	/** The content panel. */
 	private JPanel contentPanel;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The rejection reason combo. */
 	private JComboBox rejectionReasonCombo;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The text area1. */
 	private JTextArea textArea1;
+	
+	/** The button bar. */
 	private JPanel buttonBar;
+	
+	/** The error label. */
 	private JLabel errorLabel;
+	
+	/** The ok button. */
 	private JButton okButton;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 }

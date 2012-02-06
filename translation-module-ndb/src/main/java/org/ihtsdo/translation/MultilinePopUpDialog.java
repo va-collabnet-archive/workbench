@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Wed Jun 30 23:58:33 GMT-00:03 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.translation;
@@ -23,13 +36,21 @@ import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
 /**
+ * The Class MultilinePopUpDialog.
+ *
  * @author Guillermo Reynoso
  */
 @SuppressWarnings("serial")
 public class MultilinePopUpDialog extends JDialog {
 	
+	/** The response. */
 	private String response= "";
 	
+	/**
+	 * Instantiates a new multiline pop up dialog.
+	 *
+	 * @param title the title
+	 */
 	public MultilinePopUpDialog(String title) {
 		initComponents();
 		label1.setText(title.trim());
@@ -41,21 +62,39 @@ public class MultilinePopUpDialog extends JDialog {
 //		System.out.println(MultilinePopUpDialog.showDialog("Hola"));
 //	}
 
-	public String showDialog()
+	/**
+ * Show dialog.
+ *
+ * @return the string
+ */
+public String showDialog()
 	{
 		return response;
 	}
 	
+	/**
+	 * Ok button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void okButtonActionPerformed(ActionEvent e) {
 		if(textArea1.getText()!=null)
 		response= textArea1.getText().trim();
 		dispose();
 	}
 
+	/**
+	 * Cancel button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void cancelButtonActionPerformed(ActionEvent e) {
 		dispose();
 	}
 	
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		dialogPane = new JPanel();
@@ -144,13 +183,28 @@ public class MultilinePopUpDialog extends JDialog {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The dialog pane. */
 	private JPanel dialogPane;
+	
+	/** The content panel. */
 	private JPanel contentPanel;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The text area1. */
 	private JTextArea textArea1;
+	
+	/** The button bar. */
 	private JPanel buttonBar;
+	
+	/** The ok button. */
 	private JButton okButton;
+	
+	/** The cancel button. */
 	private JButton cancelButton;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2009 International Health Terminology Standards Development
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
  * Organisation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,28 +41,58 @@ import org.ihtsdo.project.refset.PromotionRefset;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.spec.ValidationException;
 
+/**
+ * The Class SearchLangRefsetDescTypeAcceptability.
+ */
 @BeanList(specs = { @Spec(directory = "tasks/ide/search", type = BeanType.TASK_BEAN),
 		@Spec(directory = "search", type = BeanType.TASK_BEAN) })
 		public class SearchLangRefsetDescTypeAcceptability extends AbstractSearchTest {
 
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1;
 
+	/** The Constant dataVersion. */
 	private static final int dataVersion = 1;
 
 	/**
 	 * Status concept for the term component to test.
 	 */ 
 	private TermEntry langRefsetTerm = new TermEntry(RefsetAuxiliary.Concept.LANGUAGE_REFSET_EN_US.getUids());
+	
+	/** The desc type term. */
 	private TermEntry descTypeTerm ;
+	
+	/** The acceptability term. */
 	private TermEntry acceptabilityTerm ;
 
+	/**
+	 * Write object.
+	 *
+	 * @param out the out
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
 		out.writeObject(this.descTypeTerm);
 		out.writeObject(this.acceptabilityTerm);
 	}
+	
+	/**
+	 * Instantiates a new search lang refset desc type acceptability.
+	 *
+	 * @throws ValidationException the validation exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public SearchLangRefsetDescTypeAcceptability() throws ValidationException, IOException{
 	}
+	
+	/**
+	 * Read object.
+	 *
+	 * @param in the in
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws ClassNotFoundException the class not found exception
+	 */
 	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
 		int objDataVersion = in.readInt();
 		if (objDataVersion == 1) {
@@ -73,6 +103,9 @@ import org.ihtsdo.tk.spec.ValidationException;
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.task.search.AbstractSearchTest#test(org.dwfa.ace.api.I_AmTermComponent, org.dwfa.ace.api.I_ConfigAceFrame)
+	 */
 	@Override
 	public boolean test(I_AmTermComponent component, I_ConfigAceFrame frameConfig) throws TaskFailedException {
 		try {
@@ -126,26 +159,56 @@ import org.ihtsdo.tk.spec.ValidationException;
 		}
 	}
 
+	/**
+	 * Gets the lang refset term.
+	 *
+	 * @return the lang refset term
+	 */
 	public TermEntry getLangRefsetTerm() {
 		return langRefsetTerm;
 	}
 
+	/**
+	 * Sets the lang refset term.
+	 *
+	 * @param langRefsetTerm the new lang refset term
+	 */
 	public void setLangRefsetTerm(TermEntry langRefsetTerm) {
 		this.langRefsetTerm = langRefsetTerm;
 	}
 
+	/**
+	 * Gets the desc type term.
+	 *
+	 * @return the desc type term
+	 */
 	public TermEntry getDescTypeTerm() {
 		return descTypeTerm;
 	}
 
+	/**
+	 * Sets the desc type term.
+	 *
+	 * @param descTypeTerm the new desc type term
+	 */
 	public void setDescTypeTerm(TermEntry descTypeTerm) {
 		this.descTypeTerm = descTypeTerm;
 	}
 
+	/**
+	 * Gets the acceptability term.
+	 *
+	 * @return the acceptability term
+	 */
 	public TermEntry getAcceptabilityTerm() {
 		return acceptabilityTerm;
 	}
 
+	/**
+	 * Sets the acceptability term.
+	 *
+	 * @param acceptabilityTerm the new acceptability term
+	 */
 	public void setAcceptabilityTerm(TermEntry acceptabilityTerm) {
 		this.acceptabilityTerm = acceptabilityTerm;
 	}

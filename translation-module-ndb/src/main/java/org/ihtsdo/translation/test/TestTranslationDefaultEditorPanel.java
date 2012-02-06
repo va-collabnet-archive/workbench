@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.translation.test;
 
 import java.io.File;
@@ -31,6 +47,9 @@ import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.translation.ui.ConfigTranslationModule;
 import org.ihtsdo.translation.ui.config.TranslatorDefaultEditorModePanel;
 
+/**
+ * The Class TestTranslationDefaultEditorPanel.
+ */
 public class TestTranslationDefaultEditorPanel extends TestCase {
 	/** The vodb directory. */
 	File vodbDirectory;
@@ -56,6 +75,9 @@ public class TestTranslationDefaultEditorPanel extends TestCase {
 	/** The allowed statuses with retired. */
 	I_IntSet allowedStatusesWithRetired;
 
+	/* (non-Javadoc)
+	 * @see junit.framework.TestCase#setUp()
+	 */
 	protected void setUp() throws Exception {
 		super.setUp();
 		System.out.println("Deleting test fixture");
@@ -73,6 +95,11 @@ public class TestTranslationDefaultEditorPanel extends TestCase {
 		tf.setActiveAceFrameConfig(config);
 	}
 
+	/**
+	 * Test api.
+	 *
+	 * @throws Exception the exception
+	 */
 	private void testAPI() throws Exception {
 		FileLinkAPI flApi = new FileLinkAPI(config);
 
@@ -96,6 +123,9 @@ public class TestTranslationDefaultEditorPanel extends TestCase {
 
 	}
 
+	/**
+	 * Test config dialog.
+	 */
 	public void testConfigDialog() {
 
 		JDialog dialog = new JDialog();
@@ -134,6 +164,11 @@ public class TestTranslationDefaultEditorPanel extends TestCase {
 		} 
 	}
 
+	/**
+	 * Gets the test config.
+	 *
+	 * @return the test config
+	 */
 	private I_ConfigAceFrame getTestConfig() {
 		I_ConfigAceFrame config = null;
 		try {
@@ -189,6 +224,13 @@ public class TestTranslationDefaultEditorPanel extends TestCase {
 	}
 
 	// If targetLocation does not exist, it will be created.
+	/**
+	 * Copy directory.
+	 *
+	 * @param sourceLocation the source location
+	 * @param targetLocation the target location
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public void copyDirectory(File sourceLocation, File targetLocation)
 			throws IOException {
 
@@ -218,6 +260,12 @@ public class TestTranslationDefaultEditorPanel extends TestCase {
 		}
 	}
 
+	/**
+	 * Delete directory.
+	 *
+	 * @param path the path
+	 * @return true, if successful
+	 */
 	public boolean deleteDirectory(File path) {
 		if (path.exists()) {
 			File[] files = path.listFiles();

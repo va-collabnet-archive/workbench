@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2009 International Health Terminology Standards Development
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
  * Organisation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,15 +33,17 @@ import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
  */
 public class GetDataFromWFUserSelectionPanelStoreInSameBpBeanInfo extends SimpleBeanInfo {
 
+    /**
+     * Instantiates a new gets the data from wf user selection panel store in same bp bean info.
+     */
     public GetDataFromWFUserSelectionPanelStoreInSameBpBeanInfo() {
         super();
     }
 
     /**
      * Returns a list of property descriptors for this task.
-     * 
+     *
      * @return Returns a PropertyDescriptor array containing the properties of this task
-     * @exception Error Thrown when an exception happens during Introspection
      */
     public PropertyDescriptor[] getPropertyDescriptors() {
 
@@ -106,9 +108,9 @@ public class GetDataFromWFUserSelectionPanelStoreInSameBpBeanInfo extends Simple
      * Return the descriptor for this JavaBean which contains a reference to the JavaBean
      * that implements this task as well as the display name of the task along with
      * formating information.
-     * 
-     * @see java.beans.BeanInfo#getBeanDescriptor()
+     *
      * @return Returns the BeanDescriptor for this task
+     * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(GetDataFromWFUserSelectionPanelStoreInSameBp.class);

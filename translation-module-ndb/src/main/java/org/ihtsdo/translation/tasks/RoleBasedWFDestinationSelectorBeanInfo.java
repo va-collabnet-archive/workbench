@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2009 International Health Terminology Standards Development
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
  * Organisation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,18 +28,22 @@ import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 /**
+ * The Class RoleBasedWFDestinationSelectorBeanInfo.
+ *
  * @author kec
- * 
  */
 public class RoleBasedWFDestinationSelectorBeanInfo extends SimpleBeanInfo {
 
 	/**
-	 * 
+	 * Instantiates a new role based wf destination selector bean info.
 	 */
 	public RoleBasedWFDestinationSelectorBeanInfo() {
 		super();
 	}
 
+	/* (non-Javadoc)
+	 * @see java.beans.SimpleBeanInfo#getPropertyDescriptors()
+	 */
 	public PropertyDescriptor[] getPropertyDescriptors() {
 		try {
 			PropertyDescriptor exit1PropName = new PropertyDescriptor("exit1PropName", getBeanDescriptor().getBeanClass());
@@ -62,6 +66,9 @@ public class RoleBasedWFDestinationSelectorBeanInfo extends SimpleBeanInfo {
 	}
 
 	/**
+	 * Gets the bean descriptor.
+	 *
+	 * @return the bean descriptor
 	 * @see java.beans.BeanInfo#getBeanDescriptor()
 	 */
 	public BeanDescriptor getBeanDescriptor() {

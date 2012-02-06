@@ -78,23 +78,29 @@ public class CreateNewProject extends AbstractTask {
 	/** The project name. */
 	private String projectName;
 
+	/** The sequence. */
 	private String sequence;
 	/** The Constant serialVersionUID. */
 
 	private TermEntry sourceLanguageRefset;
 	
+	/** The target language refset. */
 	private TermEntry targetLanguageRefset;
 	
 	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1;
 
 	/** The Constant dataVersion. */
 	private static final int dataVersion = 1;
 
+	/** The bp file. */
 	private File bpFile;
 
+	/** The work list2. */
 	private WorkList workList2;
 
+	/** The work list1. */
 	private WorkList workList1;
 	
 	/**
@@ -301,6 +307,12 @@ public class CreateNewProject extends AbstractTask {
 		}
 	}
 
+	/**
+	 * Gets the business process.
+	 *
+	 * @param f the f
+	 * @return the business process
+	 */
 	private static BusinessProcess getBusinessProcess(File f) {
 		ObjectInputStream in;
 		try {
@@ -319,6 +331,11 @@ public class CreateNewProject extends AbstractTask {
 		return null;
 	}
 
+	/**
+	 * Sleep.
+	 *
+	 * @param n the n
+	 */
 	public static void sleep(int n){
 		long t0, t1;
 		t0 =  System.currentTimeMillis();
@@ -399,26 +416,56 @@ public class CreateNewProject extends AbstractTask {
 		this.projectName = projectName;
 	}
 
+	/**
+	 * Gets the sequence.
+	 *
+	 * @return the sequence
+	 */
 	public String getSequence() {
 		return sequence;
 	}
 
+	/**
+	 * Sets the sequence.
+	 *
+	 * @param sequence the new sequence
+	 */
 	public void setSequence(String sequence) {
 		this.sequence = sequence;
 	}
 
+	/**
+	 * Gets the source language refset.
+	 *
+	 * @return the source language refset
+	 */
 	public TermEntry getSourceLanguageRefset() {
 		return sourceLanguageRefset;
 	}
 
+	/**
+	 * Sets the source language refset.
+	 *
+	 * @param sourceLanguageRefset the new source language refset
+	 */
 	public void setSourceLanguageRefset(TermEntry sourceLanguageRefset) {
 		this.sourceLanguageRefset = sourceLanguageRefset;
 	}
 
+	/**
+	 * Gets the target language refset.
+	 *
+	 * @return the target language refset
+	 */
 	public TermEntry getTargetLanguageRefset() {
 		return targetLanguageRefset;
 	}
 
+	/**
+	 * Sets the target language refset.
+	 *
+	 * @param targetLanguageRefset the new target language refset
+	 */
 	public void setTargetLanguageRefset(TermEntry targetLanguageRefset) {
 		this.targetLanguageRefset = targetLanguageRefset;
 	}

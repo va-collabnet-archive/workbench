@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.translation.workflow.filters;
 
 import java.util.ArrayList;
@@ -16,23 +32,48 @@ import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.translation.LanguageUtil;
 
+/**
+ * The Class WfTargetPreferredFilter.
+ */
 public class WfTargetPreferredFilter implements WfSearchFilterBI{
+	
+	/** The TYPE. */
 	private final String TYPE = "WF_TARGET_PREFERRED_FILTER";
+	
+	/** The regex. */
 	private String regex;
 
+	/**
+	 * Instantiates a new wf target preferred filter.
+	 *
+	 * @param regex the regex
+	 */
 	public WfTargetPreferredFilter(String regex) {
 		super();
 		this.regex = regex;
 	}
 
+	/**
+	 * Sets the state.
+	 *
+	 * @param regex the new state
+	 */
 	public void setState(String regex) {
 		this.regex = regex;
 	}
 
+	/**
+	 * Gets the state.
+	 *
+	 * @return the state
+	 */
 	public String getState() {
 		return regex;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.project.workflow.filters.WfSearchFilterBI#filter(org.ihtsdo.project.workflow.model.WfInstance)
+	 */
 	@Override
 	public boolean filter(WfInstance wfInstance) {
 		String targetFsn = "";
@@ -57,6 +98,9 @@ public class WfTargetPreferredFilter implements WfSearchFilterBI{
 		return targetFsn.contains(regex);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.project.workflow.filters.WfSearchFilterBI#getType()
+	 */
 	@Override
 	public String getType() {
 		return TYPE;

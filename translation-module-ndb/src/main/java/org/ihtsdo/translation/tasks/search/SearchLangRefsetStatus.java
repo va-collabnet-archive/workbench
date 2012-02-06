@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2009 International Health Terminology Standards Development
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
  * Organisation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,25 +44,45 @@ import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.refset.PromotionRefset;
 import org.ihtsdo.tk.api.Precedence;
 
+/**
+ * The Class SearchLangRefsetStatus.
+ */
 @BeanList(specs = { @Spec(directory = "tasks/ide/search", type = BeanType.TASK_BEAN),
 		@Spec(directory = "search", type = BeanType.TASK_BEAN) })
 		public class SearchLangRefsetStatus extends AbstractSearchTest {
 
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1;
 
+	/** The Constant dataVersion. */
 	private static final int dataVersion = 1;
 
 	/**
 	 * Status concept for the term component to test.
 	 */
 	private TermEntry langRefsetTerm = new TermEntry(RefsetAuxiliary.Concept.LANGUAGE_REFSET_EN.getUids());
+	
+	/** The status term. */
 	private TermEntry statusTerm = new TermEntry(ArchitectonicAuxiliary.Concept.STATUS.getUids());
 
+	/**
+	 * Write object.
+	 *
+	 * @param out the out
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
 		out.writeObject(this.statusTerm);
 	}
 
+	/**
+	 * Read object.
+	 *
+	 * @param in the in
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws ClassNotFoundException the class not found exception
+	 */
 	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
 		int objDataVersion = in.readInt();
 		if (objDataVersion == 1) {
@@ -72,6 +92,9 @@ import org.ihtsdo.tk.api.Precedence;
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.task.search.AbstractSearchTest#test(org.dwfa.ace.api.I_AmTermComponent, org.dwfa.ace.api.I_ConfigAceFrame)
+	 */
 	@Override
 	public boolean test(I_AmTermComponent component, I_ConfigAceFrame frameConfig) throws TaskFailedException {
 		try {
@@ -148,18 +171,38 @@ import org.ihtsdo.tk.api.Precedence;
 		}
 	}
 
+	/**
+	 * Gets the status term.
+	 *
+	 * @return the status term
+	 */
 	public TermEntry getStatusTerm() {
 		return statusTerm;
 	}
 
+	/**
+	 * Sets the status term.
+	 *
+	 * @param statusTerm the new status term
+	 */
 	public void setStatusTerm(TermEntry statusTerm) {
 		this.statusTerm = statusTerm;
 	}
 
+	/**
+	 * Gets the lang refset term.
+	 *
+	 * @return the lang refset term
+	 */
 	public TermEntry getLangRefsetTerm() {
 		return langRefsetTerm;
 	}
 
+	/**
+	 * Sets the lang refset term.
+	 *
+	 * @param langRefsetTerm the new lang refset term
+	 */
 	public void setLangRefsetTerm(TermEntry langRefsetTerm) {
 		this.langRefsetTerm = langRefsetTerm;
 	}

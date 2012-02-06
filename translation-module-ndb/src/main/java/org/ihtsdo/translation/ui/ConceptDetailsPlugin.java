@@ -49,14 +49,15 @@ public class ConceptDetailsPlugin extends AbstractPlugin {
 	/** The host. */
 	private transient I_HostConceptPlugins host;
 
+	/** The toogle to panel. */
 	private TOGGLES toogleToPanel;
 
 	/**
 	 * Instantiates a new similarity plugintst.
-	 * 
+	 *
 	 * @param selectedByDefault the selected by default
 	 * @param sequence the sequence
-	 * @param orderlangviewerPanel 
+	 * @param toogleToPanel the toogle to panel
 	 */
 	public ConceptDetailsPlugin(boolean selectedByDefault, int sequence, TOGGLES toogleToPanel) {
 		super(selectedByDefault, sequence);

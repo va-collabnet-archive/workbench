@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Mon Mar 01 12:02:51 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.translation;
@@ -35,17 +48,29 @@ import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
+ * The Class ConceptDetailsPanel.
+ *
  * @author Guillermo Reynoso
  */
 public class ConceptDetailsPanel extends JPanel {
 
-	/**
-	 * 
-	 */
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
+	
+	/** The concept. */
 	private I_GetConceptData concept;
+	
+	/** The inferred char. */
 	private int inferredChar=-1;
+	
+	/** The Snomed_ isa. */
 	private I_GetConceptData Snomed_Isa;
+	
+	/**
+	 * Instantiates a new concept details panel.
+	 *
+	 * @param concept the concept
+	 */
 	public ConceptDetailsPanel(I_GetConceptData concept) {
 		initComponents();	
 		this.concept=concept;
@@ -80,21 +105,45 @@ public class ConceptDetailsPanel extends JPanel {
 			tree1.repaint();
 		}
 	}
+	
+	/**
+	 * The Class IconRenderer.
+	 */
 	class IconRenderer extends DefaultTreeCellRenderer {
-		/**
-		 * 
-		 */
+		
+		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = 1L;
+		
+		/** The red icon. */
 		Icon redIcon;
+		
+		/** The attribute icon. */
 		Icon attributeIcon;
+		
+		/** The orange icon. */
 		Icon orangeIcon;
+		
+		/** The description icon. */
 		Icon descriptionIcon;
+		
+		/** The fsn icon. */
 		Icon fsnIcon;
+		
+		/** The black icon. */
 		Icon blackIcon;
+		
+		/** The preferred icon. */
 		Icon preferredIcon;
+		
+		/** The role group icon. */
 		Icon roleGroupIcon;
+		
+		/** The association icon. */
 		Icon associationIcon;
 
+		/**
+		 * Instantiates a new icon renderer.
+		 */
 		public IconRenderer() {
 			redIcon = new ImageIcon("icons/91.png");
 			attributeIcon = new ImageIcon("icons/ConceptStatus.gif");
@@ -107,6 +156,9 @@ public class ConceptDetailsPanel extends JPanel {
 			associationIcon=new ImageIcon("icons/Association.gif");
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.tree.DefaultTreeCellRenderer#getTreeCellRendererComponent(javax.swing.JTree, java.lang.Object, boolean, boolean, boolean, int, boolean)
+		 */
 		@Override
 		public Component getTreeCellRendererComponent(
 				JTree tree,
@@ -144,6 +196,13 @@ public class ConceptDetailsPanel extends JPanel {
 
 	}
 
+	/**
+	 * Gets the concept tree model.
+	 *
+	 * @param concept the concept
+	 * @return the concept tree model
+	 * @throws Exception the exception
+	 */
 	@SuppressWarnings("unchecked")
 	private DefaultTreeModel getConceptTreeModel(I_GetConceptData concept) throws Exception {
 		I_TermFactory tf = Terms.get();
@@ -265,8 +324,8 @@ public class ConceptDetailsPanel extends JPanel {
 
     /**
      * Update.
-     * 
-     * @param query the query
+     *
+     * @param concept the concept
      */
 	synchronized
     public void update(I_GetConceptData concept){
@@ -290,6 +349,9 @@ public class ConceptDetailsPanel extends JPanel {
 		}
     }
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		scrollPane1 = new JScrollPane();
@@ -316,7 +378,10 @@ public class ConceptDetailsPanel extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The tree1. */
 	private JTree tree1;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

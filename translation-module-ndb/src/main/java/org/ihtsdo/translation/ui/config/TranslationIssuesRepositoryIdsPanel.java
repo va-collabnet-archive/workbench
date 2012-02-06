@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Wed Jun 30 16:31:30 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.translation.ui.config;
@@ -29,13 +42,24 @@ import org.ihtsdo.issue.manager.IssueRepositoryDAO;
 import org.ihtsdo.translation.ui.ConfigTranslationModule;
 
 /**
+ * The Class TranslationIssuesRepositoryIdsPanel.
+ *
  * @author Guillermo Reynoso
  */
 public class TranslationIssuesRepositoryIdsPanel extends JPanel {
 
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 8201368694726535525L;
+	
+	/** The conf trans. */
 	private ConfigTranslationModule confTrans;
 	
+	/**
+	 * Instantiates a new translation issues repository ids panel.
+	 *
+	 * @param config the config
+	 * @param confTrans the conf trans
+	 */
 	public TranslationIssuesRepositoryIdsPanel(I_ConfigAceFrame config, ConfigTranslationModule confTrans) {
 		super();
 		this.confTrans = confTrans;
@@ -44,6 +68,9 @@ public class TranslationIssuesRepositoryIdsPanel extends JPanel {
 	}
 
 
+	/**
+	 * Inits the custom components.
+	 */
 	private void initCustomComponents() {
 
 		sourceRepoContainer.setMaximumSize(new Dimension(450,100));
@@ -80,6 +107,9 @@ public class TranslationIssuesRepositoryIdsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		errorContainer = new JPanel();
@@ -211,22 +241,55 @@ public class TranslationIssuesRepositoryIdsPanel extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The error container. */
 	private JPanel errorContainer;
+	
+	/** The error. */
 	private JLabel error;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The project repo container. */
 	private JPanel projectRepoContainer;
+	
+	/** The proj name label. */
 	private JLabel projNameLabel;
+	
+	/** The project repo name. */
 	private JLabel projectRepoName;
+	
+	/** The proj id label. */
 	private JLabel projIdLabel;
+	
+	/** The project repo id. */
 	private JLabel projectRepoId;
+	
+	/** The proj url label. */
 	private JLabel projUrlLabel;
+	
+	/** The project repo url. */
 	private JLabel projectRepoUrl;
+	
+	/** The source repo container. */
 	private JPanel sourceRepoContainer;
+	
+	/** The src name label. */
 	private JLabel srcNameLabel;
+	
+	/** The source repo name. */
 	private JLabel sourceRepoName;
+	
+	/** The src id label. */
 	private JLabel srcIdLabel;
+	
+	/** The source repo id. */
 	private JLabel sourceRepoId;
+	
+	/** The src url label. */
 	private JLabel srcUrlLabel;
+	
+	/** The source repo url. */
 	private JLabel sourceRepoUrl;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

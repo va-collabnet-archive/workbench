@@ -137,26 +137,56 @@ public class CreateTargetLangMembershipRefset extends AbstractTask {
 		return new int[] {  };
 	}
 
+	/**
+	 * Gets the concept.
+	 *
+	 * @return the concept
+	 */
 	public String getConcept() {
 		return concept;
 	}
 
+	/**
+	 * Sets the concept.
+	 *
+	 * @param concept the new concept
+	 */
 	public void setConcept(String concept) {
 		this.concept = concept;
 	}
 
+	/**
+	 * Gets the language refset.
+	 *
+	 * @return the language refset
+	 */
 	public TermEntry getLanguageRefset() {
 		return languageRefset;
 	}
 
+	/**
+	 * Sets the language refset.
+	 *
+	 * @param languageRefset the new language refset
+	 */
 	public void setLanguageRefset(TermEntry languageRefset) {
 		this.languageRefset = languageRefset;
 	}
 
+	/**
+	 * Gets the language code.
+	 *
+	 * @return the language code
+	 */
 	public TermEntry getLanguageCode() {
 		return languageCode;
 	}
 
+	/**
+	 * Sets the language code.
+	 *
+	 * @param languageCode the new language code
+	 */
 	public void setLanguageCode(TermEntry languageCode) {
 		this.languageCode = languageCode;
 	}

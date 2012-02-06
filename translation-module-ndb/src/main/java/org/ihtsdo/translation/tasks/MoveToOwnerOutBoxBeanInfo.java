@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2009 International Health Terminology Standards Development
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
  * Organisation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,23 +24,30 @@ import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
 /**
+ * The Class MoveToOwnerOutBoxBeanInfo.
+ *
  * @author kec
- * 
  */
 public class MoveToOwnerOutBoxBeanInfo extends SimpleBeanInfo {
 
     /**
-     * 
+     * Instantiates a new move to owner out box bean info.
      */
     public MoveToOwnerOutBoxBeanInfo() {
         super();
     }
 
+    /* (non-Javadoc)
+     * @see java.beans.SimpleBeanInfo#getPropertyDescriptors()
+     */
     public PropertyDescriptor[] getPropertyDescriptors() {
         return new PropertyDescriptor[0];
     }
 
     /**
+     * Gets the bean descriptor.
+     *
+     * @return the bean descriptor
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {

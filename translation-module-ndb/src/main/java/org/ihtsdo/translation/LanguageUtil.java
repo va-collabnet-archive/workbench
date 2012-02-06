@@ -97,10 +97,33 @@ public class LanguageUtil {
 	/** The SIMPL e_ ui. */
 	public static int SIMPLE_UI = 1;
 
+	/**
+	 * The Enum Language.
+	 */
 	public static enum Language {
-		danish, spanish, swedish, french_canadian, english_us, english_uk
+		
+		/** The danish. */
+		danish, 
+ /** The spanish. */
+ spanish, 
+ /** The swedish. */
+ swedish, 
+ /** The french_canadian. */
+ french_canadian, 
+ /** The english_us. */
+ english_us, 
+ /** The english_uk. */
+ english_uk
 	}
 
+	/**
+	 * Contextualize selected refset descriptions.
+	 *
+	 * @param englishLanguageRefsetConcept the english language refset concept
+	 * @param languagePath the language path
+	 * @param langCode the lang code
+	 * @param config the config
+	 */
 	public static void contextualizeSelectedRefsetDescriptions(I_GetConceptData englishLanguageRefsetConcept, I_GetConceptData languagePath, String langCode, I_ConfigAceFrame config) {
 		I_TermFactory tf = Terms.get();
 
@@ -134,6 +157,13 @@ public class LanguageUtil {
 
 	}
 
+	/**
+	 * Import descriptions file.
+	 *
+	 * @param descriptionsFile the descriptions file
+	 * @param release the release
+	 * @param language the language
+	 */
 	public static void importDescriptionsFile(File descriptionsFile, String release, Language language) {
 		I_TermFactory tf = Terms.get();
 
@@ -399,16 +429,12 @@ public class LanguageUtil {
 
 	/**
 	 * Gets the similarity results.
-	 * 
-	 * @param query
-	 *            the query
-	 * @param sourceLangCode
-	 *            the source lang code
-	 * @param targetLangCode
-	 *            the target lang code
-	 * @param config
-	 *            the config
-	 * 
+	 *
+	 * @param query the query
+	 * @param sourceLangRefsetIds the source lang refset ids
+	 * @param targetLangRefsetId the target lang refset id
+	 * @param descTypes the desc types
+	 * @param worker the worker
 	 * @return the similarity results
 	 */
 	public static List<SimilarityMatchedItem> getSimilarityResults(String query, List<Integer> sourceLangRefsetIds, int targetLangRefsetId, List<Integer> descTypes, SwingWorker worker) {
@@ -801,6 +827,20 @@ public class LanguageUtil {
 		}
 	}
 
+	/**
+	 * Persist edited description.
+	 *
+	 * @param concept the concept
+	 * @param descriptionTuple the description tuple
+	 * @param text the text
+	 * @param acceptabilityId the acceptability id
+	 * @param descType the desc type
+	 * @param langCode the lang code
+	 * @param languageRefsetId the language refset id
+	 * @param config the config
+	 * @param isCaseSignificant the is case significant
+	 * @param statusId the status id
+	 */
 	public static void persistEditedDescription(I_GetConceptData concept, I_DescriptionTuple descriptionTuple, String text, int acceptabilityId, int descType, String langCode,
 			int languageRefsetId, I_ConfigAceFrame config, boolean isCaseSignificant, int statusId) {
 		I_TermFactory tf = Terms.get();
@@ -889,6 +929,17 @@ public class LanguageUtil {
 		}
 	}
 
+	/**
+	 * Gets the contextualized descriptions.
+	 *
+	 * @param conceptId the concept id
+	 * @param languageRefsetId the language refset id
+	 * @param returnConflictResolvedLatestState the return conflict resolved latest state
+	 * @return the contextualized descriptions
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws Exception the exception
+	 */
 	public static List<ContextualizedDescription> getContextualizedDescriptions(int conceptId, int languageRefsetId, boolean returnConflictResolvedLatestState) throws TerminologyException,
 			IOException, Exception {
 
@@ -897,11 +948,30 @@ public class LanguageUtil {
 				returnConflictResolvedLatestState);
 	}
 
+	/**
+	 * Gets the contextualized descriptions.
+	 *
+	 * @param conceptId the concept id
+	 * @param languageRefsetId the language refset id
+	 * @param allowedStatus the allowed status
+	 * @param allowedTypes the allowed types
+	 * @param positions the positions
+	 * @param returnConflictResolvedLatestState the return conflict resolved latest state
+	 * @return the contextualized descriptions
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws Exception the exception
+	 */
 	public static List<ContextualizedDescription> getContextualizedDescriptions(int conceptId, int languageRefsetId, I_IntSet allowedStatus, I_IntSet allowedTypes,
 			PositionSetReadOnly positions, boolean returnConflictResolvedLatestState) throws TerminologyException, IOException, Exception {
 		return ContextualizedDescription.getContextualizedDescriptions(conceptId, languageRefsetId, allowedStatus, allowedTypes, positions, returnConflictResolvedLatestState);
 	}
 
+	/**
+	 * Compute language refset spec multi origin.
+	 *
+	 * @param languageSpecRefsetId the language spec refset id
+	 */
 	@Deprecated
 	public static void computeLanguageRefsetSpecMultiOrigin(int languageSpecRefsetId) {
 		I_TermFactory tf = Terms.get();
@@ -995,6 +1065,11 @@ public class LanguageUtil {
 		return;
 	}
 
+	/**
+	 * Compute language refset spec.
+	 *
+	 * @param languageSpecRefsetId the language spec refset id
+	 */
 	@Deprecated
 	public static void computeLanguageRefsetSpec(int languageSpecRefsetId) {
 		I_TermFactory tf = Terms.get();
@@ -1098,6 +1173,13 @@ public class LanguageUtil {
 		return;
 	}
 
+	/**
+	 * Gets the translation config.
+	 *
+	 * @param config the config
+	 * @return the translation config
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static ConfigTranslationModule getTranslationConfig(I_ConfigAceFrame config) throws IOException {
 		ConfigTranslationModule translationConfig = null;
 		if (config != null) {
@@ -1111,10 +1193,30 @@ public class LanguageUtil {
 		return translationConfig;
 	}
 
+	/**
+	 * Sets the translation config.
+	 *
+	 * @param config the config
+	 * @param translationConfig the translation config
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static void setTranslationConfig(I_ConfigAceFrame config, ConfigTranslationModule translationConfig) throws IOException {
 		config.getDbConfig().setProperty("TRANSLATION_CONFIG", translationConfig);
 	}
 
+	/**
+	 * Generate fsn.
+	 *
+	 * @param concept the concept
+	 * @param sourceLangRefset the source lang refset
+	 * @param targetLangRefset the target lang refset
+	 * @param project the project
+	 * @param config the config
+	 * @return the i_ contextualize description
+	 * @throws FSNGenerationException the fSN generation exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws Exception the exception
+	 */
 	public static I_ContextualizeDescription generateFSN(I_GetConceptData concept, LanguageMembershipRefset sourceLangRefset, LanguageMembershipRefset targetLangRefset,
 			TranslationProject project, I_ConfigAceFrame config) throws FSNGenerationException, IOException, Exception {
 
@@ -1199,6 +1301,16 @@ public class LanguageUtil {
 		return generatedTargetFSN;
 	}
 
+	/**
+	 * Gets the default preferred term text.
+	 *
+	 * @param concept the concept
+	 * @param sourceLangRefset the source lang refset
+	 * @param targetLangRefset the target lang refset
+	 * @param config the config
+	 * @return the default preferred term text
+	 * @throws Exception the exception
+	 */
 	public static String getDefaultPreferredTermText(I_GetConceptData concept, LanguageMembershipRefset sourceLangRefset, LanguageMembershipRefset targetLangRefset, I_ConfigAceFrame config)
 			throws Exception {
 		String defaultPreferredTerm = "";
@@ -1242,6 +1354,16 @@ public class LanguageUtil {
 		return defaultPreferredTerm;
 	}
 
+	/**
+	 * Gets the default ics.
+	 *
+	 * @param concept the concept
+	 * @param sourceLangRefset the source lang refset
+	 * @param targetLangRefset the target lang refset
+	 * @param config the config
+	 * @return the default ics
+	 * @throws Exception the exception
+	 */
 	public static Boolean getDefaultICS(I_GetConceptData concept, LanguageMembershipRefset sourceLangRefset, LanguageMembershipRefset targetLangRefset, I_ConfigAceFrame config)
 			throws Exception {
 		Boolean defaultICS = false;
@@ -1273,6 +1395,13 @@ public class LanguageUtil {
 		return defaultICS;
 	}
 
+	/**
+	 * Gets the linguistic guidelines.
+	 *
+	 * @param concept the concept
+	 * @return the linguistic guidelines
+	 * @throws Exception the exception
+	 */
 	public static String getLinguisticGuidelines(I_GetConceptData concept) throws Exception {
 		String htmlResponse = "";
 
@@ -1292,6 +1421,12 @@ public class LanguageUtil {
 		return htmlResponse;
 	}
 
+	/**
+	 * Checks if is active.
+	 *
+	 * @param statusId the status id
+	 * @return true, if is active
+	 */
 	public static boolean isActive(int statusId) {
 		List<Integer> activeStatuses = new ArrayList<Integer>();
 		I_TermFactory tf = Terms.get();
@@ -1308,6 +1443,12 @@ public class LanguageUtil {
 		return (activeStatuses.contains(statusId));
 	}
 
+	/**
+	 * Checks if is inactive.
+	 *
+	 * @param statusId the status id
+	 * @return true, if is inactive
+	 */
 	private static boolean isInactive(int statusId) {
 		List<Integer> inactiveStatuses = new ArrayList<Integer>();
 		I_TermFactory tf = Terms.get();
@@ -1323,6 +1464,12 @@ public class LanguageUtil {
 		return (inactiveStatuses.contains(statusId));
 	}
 
+	/**
+	 * Sets the default translation config.
+	 *
+	 * @param defaultConfig the default config
+	 * @param project the project
+	 */
 	public static void setDefaultTranslationConfig(ConfigTranslationModule defaultConfig, TranslationProject project) {
 		try {
 			File configFile = getTranslationProjectDefaultConfigFile(project);
@@ -1338,6 +1485,12 @@ public class LanguageUtil {
 		}
 	}
 
+	/**
+	 * Gets the default translation config.
+	 *
+	 * @param project the project
+	 * @return the default translation config
+	 */
 	public static ConfigTranslationModule getDefaultTranslationConfig(TranslationProject project) {
 		ConfigTranslationModule result = new ConfigTranslationModule();
 		try {
@@ -1363,6 +1516,12 @@ public class LanguageUtil {
 
 	}
 
+	/**
+	 * Checks if is item being sent.
+	 *
+	 * @param e the e
+	 * @return true, if is item being sent
+	 */
 	public static boolean isItemBeingSent(ActionEvent e) {
 		if (e.getSource() instanceof JButton) {
 			JButton button = (JButton) e.getSource();
@@ -1373,10 +1532,9 @@ public class LanguageUtil {
 
 	/**
 	 * This method returns the parameter projects default configuration file<br>
-	 * if the file does not exists, it creates a new default configuration file<br>
-	 * 
-	 * @param Translation
-	 *            project
+	 * if the file does not exists, it creates a new default configuration file<br>.
+	 *
+	 * @param project the project
 	 * @return The project file
 	 */
 	private static File getTranslationProjectDefaultConfigFile(TranslationProject project) {
@@ -1399,6 +1557,13 @@ public class LanguageUtil {
 		return configFile;
 	}
 
+	/**
+	 * Gets the children.
+	 *
+	 * @param concept the concept
+	 * @param config the config
+	 * @return the children
+	 */
 	public static Set<? extends I_GetConceptData> getChildren(I_GetConceptData concept, I_ConfigAceFrame config) {
 		Set<? extends I_GetConceptData> children = new HashSet<I_GetConceptData>();
 		I_TermFactory tf = Terms.get();

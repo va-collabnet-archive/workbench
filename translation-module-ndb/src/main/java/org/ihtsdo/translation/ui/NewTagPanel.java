@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Wed Dec 28 19:06:17 GMT-03:00 2011
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.translation.ui;
@@ -30,12 +43,19 @@ import org.ihtsdo.project.workflow.tag.InboxTag;
 import org.ihtsdo.project.workflow.tag.TagManager;
 
 /**
+ * The Class NewTagPanel.
+ *
  * @author Guillermo Reynoso
  */
 @SuppressWarnings("serial")
 public class NewTagPanel extends JDialog {
+	
+	/** The text. */
 	private String text = "<html><body><table><tr><td style=\"background-color: ${bg_color}; width:12px;height:12px;\" >";
 	
+	/**
+	 * Instantiates a new new tag panel.
+	 */
 	public NewTagPanel() {
 		initComponents();
 		tagNameField.getDocument().addDocumentListener(new DocumentListener() {
@@ -55,17 +75,35 @@ public class NewTagPanel extends JDialog {
 		});
 	}
 
+	/** The tag. */
 	private InboxTag tag = null;
+	
+	/** The color. */
 	private Color color;
+	
+	/** The text color. */
 	private Color textColor = Color.BLACK;
 
+	/**
+	 * Inits the custom components.
+	 */
 	private void initCustomComponents() {
 	}
 
+	/**
+	 * The main method.
+	 *
+	 * @param args the arguments
+	 */
 	public static void main(String[] args) {
 		new NewTagPanel().showModalDialog();
 	}
 
+	/**
+	 * Show modal dialog.
+	 *
+	 * @return the inbox tag
+	 */
 	public InboxTag showModalDialog() {
 		setModal(true);
 		this.setPreferredSize(new Dimension(400, 170));
@@ -74,11 +112,21 @@ public class NewTagPanel extends JDialog {
 		return tag;
 	}
 
+	/**
+	 * Close.
+	 *
+	 * @param canceled the canceled
+	 */
 	private void close(InboxTag canceled) {
 		this.tag = canceled;
 		dispose();
 	}
 
+	/**
+	 * Creates the button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void createButtonActionPerformed(ActionEvent e) {
 		String tagName = tagNameField.getText();
 		if (tagName.equals("") || color == null) {
@@ -90,10 +138,20 @@ public class NewTagPanel extends JDialog {
 		close(tag);
 	}
 
+	/**
+	 * Cancel action performed.
+	 *
+	 * @param e the e
+	 */
 	private void cancelActionPerformed(ActionEvent e) {
 		close(null);
 	}
 
+	/**
+	 * Color chooser action performed.
+	 *
+	 * @param e the e
+	 */
 	private void colorChooserActionPerformed(ActionEvent e) {
 		color = JColorChooser.showDialog(this, "TAG Color", Color.GREEN);
 		String tagName = tagNameField.getText();
@@ -102,6 +160,11 @@ public class NewTagPanel extends JDialog {
 		colorLabel.setText(TagManager.getInstance().getHeader(tagName, colorText, TagManager.getInstance().getHtmlColor(textColor)));
 	}
 
+	/**
+	 * Text color chooser action performed.
+	 *
+	 * @param e the e
+	 */
 	private void textColorChooserActionPerformed(ActionEvent e) {
 		textColor  = JColorChooser.showDialog(this, "Text Color", Color.BLACK);
 		String tagName = tagNameField.getText();
@@ -110,6 +173,9 @@ public class NewTagPanel extends JDialog {
 		colorLabel.setText(TagManager.getInstance().getHeader(tagName, TagManager.getInstance().getHtmlColor(color), colorText));
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -225,17 +291,40 @@ public class NewTagPanel extends JDialog {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The cancel. */
 	private JButton cancel;
+	
+	/** The create button. */
 	private JButton createButton;
+	
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The tag name field. */
 	private JTextField tagNameField;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The color chooser. */
 	private JButton colorChooser;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The text color chooser. */
 	private JButton textColorChooser;
+	
+	/** The separator1. */
 	private JSeparator separator1;
+	
+	/** The color label. */
 	private JLabel colorLabel;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 }

@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2009 International Health Terminology Standards Development
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
  * Organisation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,8 +23,14 @@ import java.beans.PropertyDescriptor;
 import org.dwfa.ace.prop.editor.ConceptLabelPropEditor;
 import org.dwfa.ace.task.search.AbstractSeachTestSearchInfo;
 
+/**
+ * The Class SearchLangRefsetStatusSearchInfo.
+ */
 public class SearchLangRefsetStatusSearchInfo extends AbstractSeachTestSearchInfo {
 
+    /* (non-Javadoc)
+     * @see org.dwfa.ace.task.search.AbstractSeachTestSearchInfo#getAdditionalPropertyDescriptors()
+     */
     @Override
     protected PropertyDescriptor[] getAdditionalPropertyDescriptors() {
         try {
@@ -49,6 +55,9 @@ public class SearchLangRefsetStatusSearchInfo extends AbstractSeachTestSearchInf
     }
 
     /**
+     * Gets the bean descriptor.
+     *
+     * @return the bean descriptor
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {

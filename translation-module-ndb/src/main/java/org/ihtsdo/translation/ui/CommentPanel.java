@@ -35,11 +35,19 @@ public class CommentPanel extends JPanel {
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
 	
+	/**
+	 * Instantiates a new comment panel.
+	 */
 	public CommentPanel() {
 		initComponents();
 	}
 	
 	
+	/**
+	 * Sets the comment.
+	 *
+	 * @param comment the new comment
+	 */
 	public void setComment(String comment){
 		txtComm.setText(comment);
 	}
@@ -129,38 +137,81 @@ public class CommentPanel extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The label10. */
 	private JLabel label10;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The l from. */
 	private JLabel lFrom;
+	
+	/** The label4. */
 	private JLabel label4;
+	
+	/** The l role. */
 	private JLabel lRole;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The l date. */
 	private JLabel lDate;
+	
+	/** The label5. */
 	private JLabel label5;
+	
+	/** The l source. */
 	private JLabel lSource;
+	
+	/** The scroll pane2. */
 	private JScrollPane scrollPane2;
+	
+	/** The txt comm. */
 	private JTextArea txtComm;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 
+	/**
+	 * Sets the from.
+	 *
+	 * @param from the new from
+	 */
 	public void setFrom(String from) {
 		lFrom.setText("<html><body>" + from);
 		
 	}
 
 
+	/**
+	 * Sets the role.
+	 *
+	 * @param role the new role
+	 */
 	public void setRole(String role) {
 		lRole.setText("<html><body>" + role);
 		
 	}
 
 
+	/**
+	 * Sets the date.
+	 *
+	 * @param date the new date
+	 */
 	public void setDate(String date) {
 		lDate.setText("<html><body>" + date);
 		
 	}
 
 
+	/**
+	 * Sets the source.
+	 *
+	 * @param source the new source
+	 */
 	public void setSource(String source) {
 		lSource.setText("<html><body>" + source);
 		

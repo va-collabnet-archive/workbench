@@ -36,17 +36,28 @@ import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.Partition;
 
 /**
- * The Class
+ * The Class.
  */
 @BeanList(specs = 
 { @Spec(directory = "tasks/translation tasks", type = BeanType.TASK_BEAN)})
 public class GenerateWorklistFromAttachments extends AbstractTask {
 
+	/** The profile prop name. */
 	private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
+	
+	/** The process prop name. */
 	private String processPropName = ProcessAttachmentKeys.PROCESS_TO_LAUNCH.getAttachmentKey();
+	
+	/** The worklist name prop name. */
 	private String worklistNamePropName = ProcessAttachmentKeys.PROCESS_NAME.getAttachmentKey();
+	
+	/** The translator inbox prop name. */
 	private String translatorInboxPropName = ProcessAttachmentKeys.TRANSLATOR_ROLE_INBOX.getAttachmentKey();
+	
+	/** The fast track translator inbox prop name. */
 	private String fastTrackTranslatorInboxPropName = ProcessAttachmentKeys.FAST_TRACK_TRANSLATOR_ROLE_INBOX.getAttachmentKey();
+	
+	/** The partition prop name. */
 	private String partitionPropName = ProcessAttachmentKeys.PARTITION.getAttachmentKey();
 
 	/** The Constant serialVersionUID. */
@@ -153,50 +164,110 @@ public class GenerateWorklistFromAttachments extends AbstractTask {
 		return new int[] {  };
 	}
 
+	/**
+	 * Gets the profile prop name.
+	 *
+	 * @return the profile prop name
+	 */
 	public String getProfilePropName() {
 		return profilePropName;
 	}
 
+	/**
+	 * Sets the profile prop name.
+	 *
+	 * @param profilePropName the new profile prop name
+	 */
 	public void setProfilePropName(String profilePropName) {
 		this.profilePropName = profilePropName;
 	}
 
+	/**
+	 * Gets the process prop name.
+	 *
+	 * @return the process prop name
+	 */
 	public String getProcessPropName() {
 		return processPropName;
 	}
 
+	/**
+	 * Sets the process prop name.
+	 *
+	 * @param processPropName the new process prop name
+	 */
 	public void setProcessPropName(String processPropName) {
 		this.processPropName = processPropName;
 	}
 
+	/**
+	 * Gets the worklist name prop name.
+	 *
+	 * @return the worklist name prop name
+	 */
 	public String getWorklistNamePropName() {
 		return worklistNamePropName;
 	}
 
+	/**
+	 * Sets the worklist name prop name.
+	 *
+	 * @param worklistNamePropName the new worklist name prop name
+	 */
 	public void setWorklistNamePropName(String worklistNamePropName) {
 		this.worklistNamePropName = worklistNamePropName;
 	}
 
+	/**
+	 * Gets the translator inbox prop name.
+	 *
+	 * @return the translator inbox prop name
+	 */
 	public String getTranslatorInboxPropName() {
 		return translatorInboxPropName;
 	}
 
+	/**
+	 * Sets the translator inbox prop name.
+	 *
+	 * @param translatorInboxPropName the new translator inbox prop name
+	 */
 	public void setTranslatorInboxPropName(String translatorInboxPropName) {
 		this.translatorInboxPropName = translatorInboxPropName;
 	}
 
+	/**
+	 * Gets the partition prop name.
+	 *
+	 * @return the partition prop name
+	 */
 	public String getPartitionPropName() {
 		return partitionPropName;
 	}
 
+	/**
+	 * Sets the partition prop name.
+	 *
+	 * @param partitionPropName the new partition prop name
+	 */
 	public void setPartitionPropName(String partitionPropName) {
 		this.partitionPropName = partitionPropName;
 	}
 
+	/**
+	 * Gets the fast track translator inbox prop name.
+	 *
+	 * @return the fast track translator inbox prop name
+	 */
 	public String getFastTrackTranslatorInboxPropName() {
 		return fastTrackTranslatorInboxPropName;
 	}
 
+	/**
+	 * Sets the fast track translator inbox prop name.
+	 *
+	 * @param fastTrackTranslatorInboxPropName the new fast track translator inbox prop name
+	 */
 	public void setFastTrackTranslatorInboxPropName(
 			String fastTrackTranslatorInboxPropName) {
 		this.fastTrackTranslatorInboxPropName = fastTrackTranslatorInboxPropName;

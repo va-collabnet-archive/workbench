@@ -55,6 +55,7 @@ public class CloseTranslationPanel extends AbstractTask {
 	private static final int dataVersion = 1;
 	
 
+	/** The member prop name. */
 	private String memberPropName ;
 	
 	/**

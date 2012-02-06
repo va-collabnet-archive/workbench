@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.translation.tasks;
 
 import java.io.File;
@@ -14,9 +30,14 @@ import java.io.Serializable;
  * This class defines utility routines that use Java serialization.
  */
 public class Serializer {
+  
   /**
    * Serialize the object o (and any Serializable objects it refers to) and
    * store its serialized state in File f.
+   *
+   * @param o the o
+   * @param f the f
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   static void store(Serializable o, File f) throws IOException {
     ObjectOutputStream out = // The class for serialization
@@ -26,7 +47,12 @@ public class Serializer {
   }
 
   /**
-   * Deserialize the contents of File f and return the resulting object
+   * Deserialize the contents of File f and return the resulting object.
+   *
+   * @param f the f
+   * @return the object
+   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws ClassNotFoundException the class not found exception
    */
   static Object load(File f) throws IOException, ClassNotFoundException {
     ObjectInputStream in = // The class for de-serialization
@@ -41,6 +67,11 @@ public class Serializer {
    * differs from the clone() method of an object which is usually implemented
    * to produce a "shallow" clone that copies references to other objects,
    * instead of copying all referenced objects.
+   *
+   * @param o the o
+   * @return the object
+   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws ClassNotFoundException the class not found exception
    */
   static Object deepclone(final Serializable o) throws IOException,
       ClassNotFoundException {

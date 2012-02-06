@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.translation.ui;
 
 import java.util.Enumeration;
@@ -42,9 +58,9 @@ public class CustomTableColumnModel extends DefaultTableColumnModel {
      * or its visibility status did not change.
      * <p>
      *
-     * @param aColumn        the column to show/hide
+     * @param column the column
      * @param visible its new visibility status
- */
+     */
     // listeners will receive columnAdded()/columnRemoved() event
     public void setColumnVisible(TableColumn column, boolean visible) {
         if(!visible) {
@@ -77,7 +93,7 @@ public class CustomTableColumnModel extends DefaultTableColumnModel {
     }
     
     /**
-     * Makes all columns in this model visible
+     * Makes all columns in this model visible.
      */
     public void setAllColumnsVisible() {
         int noColumns       = allTableColumns.size();
@@ -119,11 +135,12 @@ public class CustomTableColumnModel extends DefaultTableColumnModel {
         return (tableColumns.indexOf(aColumn) >= 0);
     }
     
-/** Append <code>column</code> to the right of exisiting columns.
+/**
+ * Append <code>column</code> to the right of exisiting columns.
  * Posts <code>columnAdded</code> event.
+ *
  * @param column The column to be added
  * @see #removeColumn
- * @exception IllegalArgumentException if <code>column</code> is <code>null</code>
  */    
     public void addColumn(TableColumn column) {
         allTableColumns.addElement(column);
@@ -144,15 +161,13 @@ public class CustomTableColumnModel extends DefaultTableColumnModel {
         super.removeColumn(column);
     }
     
-    /** Moves the column from <code>oldIndex</code> to <code>newIndex</code>.
+    /**
+     * Moves the column from <code>oldIndex</code> to <code>newIndex</code>.
      * Posts  <code>columnMoved</code> event.
      * Will not move any columns if <code>oldIndex</code> equals <code>newIndex</code>.
      *
-     * @param	oldIndex			index of column to be moved
-     * @param	newIndex			new index of the column
-     * @exception IllegalArgumentException	if either <code>oldIndex</code> or
-     * 						<code>newIndex</code>
-     *						are not in [0, getColumnCount() - 1]
+     * @param oldIndex 		index of column to be moved
+     * @param newIndex 		new index of the column
      */
     public void moveColumn(int oldIndex, int newIndex) {
 	if ((oldIndex < 0) || (oldIndex >= getColumnCount()) ||
@@ -176,8 +191,8 @@ public class CustomTableColumnModel extends DefaultTableColumnModel {
     /**
      * Returns the total number of columns in this model.
      *
-     * @param   onlyVisible   if set only visible columns will be counted
-     * @return	the number of columns in the <code>tableColumns</code> array
+     * @param onlyVisible the only visible
+     * @return the number of columns in the <code>tableColumns</code> array
      * @see	#getColumns
      */
     public int getColumnCount(boolean onlyVisible) {
@@ -188,7 +203,7 @@ public class CustomTableColumnModel extends DefaultTableColumnModel {
     /**
      * Returns an <code>Enumeration</code> of all the columns in the model.
      *
-     * @param   onlyVisible   if set all invisible columns will be missing from the enumeration.
+     * @param onlyVisible the only visible
      * @return an <code>Enumeration</code> of the columns in the model
      */
     public Enumeration getColumns(boolean onlyVisible) {
@@ -202,16 +217,10 @@ public class CustomTableColumnModel extends DefaultTableColumnModel {
      * Position is the the index in all visible columns if <code>onlyVisible</code> is true or
      * else the index in all columns.
      *
-     * @param	identifier   the identifier object to search for
-     * @param	onlyVisible  if set searches only visible columns
-     *
-     * @return		the index of the first column whose identifier
-     *			equals <code>identifier</code>
-     *
-     * @exception       IllegalArgumentException  if <code>identifier</code>
-     *				is <code>null</code>, or if no
-     *				<code>TableColumn</code> has this
-     *				<code>identifier</code>
+     * @param identifier   the identifier object to search for
+     * @param onlyVisible  if set searches only visible columns
+     * @return 	the index of the first column whose identifier
+     * equals <code>identifier</code>
      * @see		#getColumn
      */
     public int getColumnIndex(Object identifier, boolean onlyVisible) {

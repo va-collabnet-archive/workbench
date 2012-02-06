@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2009 International Health Terminology Standards Development
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
  * Organisation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -60,21 +60,37 @@ import org.ihtsdo.project.ProjectPermissionsAPI;
 @BeanList(specs = { @Spec(directory = "tasks/translation tasks", type = BeanType.TASK_BEAN) })
 public class RoleBasedWFDestinationSelector extends AbstractTask {
 
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1;
 
+    /** The Constant dataVersion. */
     private static final int dataVersion = 1;
     
+    /** The exit1 prop name. */
     private String exit1PropName;
     
     /** The step role. */
 	private TermEntry stepRole;
 
+    /**
+     * Write object.
+     *
+     * @param out the out
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(exit1PropName);
         out.writeObject(stepRole);
     }
 
+    /**
+     * Read object.
+     *
+     * @param in the in
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ClassNotFoundException the class not found exception
+     */
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
@@ -87,16 +103,27 @@ public class RoleBasedWFDestinationSelector extends AbstractTask {
     }
 
     /**
+     * Evaluate.
+     *
+     * @param process the process
+     * @param worker the worker
+     * @return the condition
+     * @throws TaskFailedException the task failed exception
      * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
-     *      org.dwfa.bpa.process.I_Work)
+     * org.dwfa.bpa.process.I_Work)
      */
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         return Condition.CONTINUE;
     }
 
     /**
+     * Complete.
+     *
+     * @param process the process
+     * @param worker the worker
+     * @throws TaskFailedException the task failed exception
      * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
-     *      org.dwfa.bpa.process.I_Work)
+     * org.dwfa.bpa.process.I_Work)
      */
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
     	try {
@@ -145,6 +172,9 @@ public class RoleBasedWFDestinationSelector extends AbstractTask {
     }
 
     /**
+     * Gets the conditions.
+     *
+     * @return the conditions
      * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
      */
     public Collection<Condition> getConditions() {
@@ -152,24 +182,47 @@ public class RoleBasedWFDestinationSelector extends AbstractTask {
     }
 
     /**
+     * Gets the data container ids.
+     *
+     * @return the data container ids
      * @see org.dwfa.bpa.process.I_DefineTask#getDataContainerIds()
      */
     public int[] getDataContainerIds() {
         return new int[0];
     }
 
+	/**
+	 * Gets the exit1 prop name.
+	 *
+	 * @return the exit1 prop name
+	 */
 	public String getExit1PropName() {
 		return exit1PropName;
 	}
 
+	/**
+	 * Sets the exit1 prop name.
+	 *
+	 * @param exit1PropName the new exit1 prop name
+	 */
 	public void setExit1PropName(String exit1PropName) {
 		this.exit1PropName = exit1PropName;
 	}
 
+	/**
+	 * Gets the step role.
+	 *
+	 * @return the step role
+	 */
 	public TermEntry getStepRole() {
 		return stepRole;
 	}
 
+	/**
+	 * Sets the step role.
+	 *
+	 * @param stepRole the new step role
+	 */
 	public void setStepRole(TermEntry stepRole) {
 		this.stepRole = stepRole;
 	}

@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.translation.ui.treetable;
 /*
 
@@ -48,29 +64,56 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.EventListenerList;
 
 /**
- * @version %I% %G% 
- * 
- * A base class for CellEditors, providing default implementations for all 
- * methods in the CellEditor interface and support for managing a series 
- * of listeners. 
+ * The Class AbstractCellEditor.
  *
+ * @version %I% %G%
+ * 
+ * A base class for CellEditors, providing default implementations for all
+ * methods in the CellEditor interface and support for managing a series
+ * of listeners.
  * @author Philip Milne
  */
 
 public class AbstractCellEditor implements CellEditor {
 
+    /** The listener list. */
     protected EventListenerList listenerList = new EventListenerList();
 
+    /* (non-Javadoc)
+     * @see javax.swing.CellEditor#getCellEditorValue()
+     */
     public Object getCellEditorValue() { return null; }
+    
+    /* (non-Javadoc)
+     * @see javax.swing.CellEditor#isCellEditable(java.util.EventObject)
+     */
     public boolean isCellEditable(EventObject e) { return true; }
+    
+    /* (non-Javadoc)
+     * @see javax.swing.CellEditor#shouldSelectCell(java.util.EventObject)
+     */
     public boolean shouldSelectCell(EventObject anEvent) { return false; }
+    
+    /* (non-Javadoc)
+     * @see javax.swing.CellEditor#stopCellEditing()
+     */
     public boolean stopCellEditing() { return true; }
+    
+    /* (non-Javadoc)
+     * @see javax.swing.CellEditor#cancelCellEditing()
+     */
     public void cancelCellEditing() {}
 
+    /* (non-Javadoc)
+     * @see javax.swing.CellEditor#addCellEditorListener(javax.swing.event.CellEditorListener)
+     */
     public void addCellEditorListener(CellEditorListener l) {
 	listenerList.add(CellEditorListener.class, l);
     }
 
+    /* (non-Javadoc)
+     * @see javax.swing.CellEditor#removeCellEditorListener(javax.swing.event.CellEditorListener)
+     */
     public void removeCellEditorListener(CellEditorListener l) {
 	listenerList.remove(CellEditorListener.class, l);
     }

@@ -29,6 +29,9 @@ import org.dwfa.bpa.tasks.editor.JTextFieldEditor;
  */
 public class CreateTargetLangMembershipRefsetBeanInfo extends SimpleBeanInfo {
 
+	/**
+	 * Instantiates a new creates the target lang membership refset bean info.
+	 */
 	public CreateTargetLangMembershipRefsetBeanInfo() {
 		super();
 	}

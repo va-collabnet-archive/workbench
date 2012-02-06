@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2009 International Health Terminology Standards Development
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
  * Organisation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -55,14 +55,29 @@ import org.dwfa.util.bean.Spec;
 @BeanList(specs = { @Spec(directory = "tasks/translation tasks", type = BeanType.TASK_BEAN) })
 public class MoveToOwnerOutBox extends AbstractTask {
 
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1;
 
+    /** The Constant dataVersion. */
     private static final int dataVersion = 1;
 
+    /**
+     * Write object.
+     *
+     * @param out the out
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
     }
 
+    /**
+     * Read object.
+     *
+     * @param in the in
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ClassNotFoundException the class not found exception
+     */
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
@@ -74,16 +89,27 @@ public class MoveToOwnerOutBox extends AbstractTask {
     }
 
     /**
+     * Evaluate.
+     *
+     * @param process the process
+     * @param worker the worker
+     * @return the condition
+     * @throws TaskFailedException the task failed exception
      * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
-     *      org.dwfa.bpa.process.I_Work)
+     * org.dwfa.bpa.process.I_Work)
      */
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         return Condition.STOP;
     }
 
     /**
+     * Complete.
+     *
+     * @param process the process
+     * @param worker the worker
+     * @throws TaskFailedException the task failed exception
      * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
-     *      org.dwfa.bpa.process.I_Work)
+     * org.dwfa.bpa.process.I_Work)
      */
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
     	try {
@@ -117,6 +143,9 @@ public class MoveToOwnerOutBox extends AbstractTask {
     }
 
     /**
+     * Gets the conditions.
+     *
+     * @return the conditions
      * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
      */
     public Collection<Condition> getConditions() {
@@ -124,6 +153,9 @@ public class MoveToOwnerOutBox extends AbstractTask {
     }
 
     /**
+     * Gets the data container ids.
+     *
+     * @return the data container ids
      * @see org.dwfa.bpa.process.I_DefineTask#getDataContainerIds()
      */
     public int[] getDataContainerIds() {

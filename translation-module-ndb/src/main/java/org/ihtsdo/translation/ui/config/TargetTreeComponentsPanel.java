@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Tue Jun 29 16:56:16 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.translation.ui.config;
@@ -30,17 +43,34 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 
 /**
+ * The Class TargetTreeComponentsPanel.
+ *
  * @author Guillermo Reynoso
  */
 public class TargetTreeComponentsPanel extends JPanel {
 	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 2988632000328434848L;
+	
+	/** The conf trans. */
 	private ConfigTranslationModule confTrans;
+	
+	/** The current list. */
 	DefaultListModel currentList = new DefaultListModel();
+	
+	/** The avalable list. */
 	DefaultListModel avalableList = new DefaultListModel();
+	
+	/** The tf. */
 	I_TermFactory tf = Terms.get();
 	//private boolean targetTreeComponentPermission;
 	
+	/**
+	 * Instantiates a new target tree components panel.
+	 *
+	 * @param config the config
+	 * @param confTrans the conf trans
+	 */
 	public TargetTreeComponentsPanel(I_ConfigAceFrame config, ConfigTranslationModule confTrans) {
 		this.confTrans =  confTrans;
 		initComponents();
@@ -51,6 +81,9 @@ public class TargetTreeComponentsPanel extends JPanel {
 		
 	}
 	
+	/**
+	 * Inits the cosutom components.
+	 */
 	private void initCosutomComponents() {
 		
 		configPanel.setBorder(new EmptyBorder(new Insets(5, 5, 5, 5)));
@@ -132,6 +165,9 @@ public class TargetTreeComponentsPanel extends JPanel {
 		});
 	}
 
+	/**
+	 * Initialize lists.
+	 */
 	public void initializeLists() {
 		if(confTrans != null){
 			currentList = new DefaultListModel();
@@ -160,6 +196,9 @@ public class TargetTreeComponentsPanel extends JPanel {
 		removeButton.setEnabled(!currentList.isEmpty());
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		buttonPanel = new JPanel();
@@ -259,22 +298,54 @@ public class TargetTreeComponentsPanel extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The button panel. */
 	private JPanel buttonPanel;
+	
+	/** The apply button. */
 	private JButton applyButton;
+	
+	/** The revert config. */
 	private JButton revertConfig;
+	
+	/** The config panel. */
 	private JPanel configPanel;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The avalable tree components. */
 	private JList avalableTreeComponents;
+	
+	/** The scroll pane2. */
 	private JScrollPane scrollPane2;
+	
+	/** The current tree components. */
 	private JList currentTreeComponents;
+	
+	/** The add button. */
 	private JButton addButton;
+	
+	/** The remove button. */
 	private JButton removeButton;
+	
+	/** The error container. */
 	private JPanel errorContainer;
+	
+	/** The error. */
 	private JLabel error;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 
+	/**
+	 * Sets the buttons enabled.
+	 *
+	 * @param b the new buttons enabled
+	 */
 	private void setButtonsEnabled(boolean b){
 		applyButton.setEnabled(b);
 		revertConfig.setEnabled(b);

@@ -44,8 +44,10 @@ import org.ihtsdo.project.refset.LanguageMembershipRefset;
 public class CreateLangMembershipRefsetFromConcept extends AbstractTask {
 
 
+	/** The language code. */
 	private TermEntry languageCode;
 	
+	/** The language refset. */
 	private TermEntry languageRefset;
 
 	/** The Constant serialVersionUID. */
@@ -132,18 +134,38 @@ public class CreateLangMembershipRefsetFromConcept extends AbstractTask {
 		return new int[] {  };
 	}
 
+	/**
+	 * Gets the language refset.
+	 *
+	 * @return the language refset
+	 */
 	public TermEntry getLanguageRefset() {
 		return languageRefset;
 	}
 
+	/**
+	 * Sets the language refset.
+	 *
+	 * @param languageRefset the new language refset
+	 */
 	public void setLanguageRefset(TermEntry languageRefset) {
 		this.languageRefset = languageRefset;
 	}
 
+	/**
+	 * Gets the language code.
+	 *
+	 * @return the language code
+	 */
 	public TermEntry getLanguageCode() {
 		return languageCode;
 	}
 
+	/**
+	 * Sets the language code.
+	 *
+	 * @param languageCode the new language code
+	 */
 	public void setLanguageCode(TermEntry languageCode) {
 		this.languageCode = languageCode;
 	}

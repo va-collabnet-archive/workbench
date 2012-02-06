@@ -29,6 +29,9 @@ import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
  */
 public class IndexFolderAsFileLinksBeanInfo extends SimpleBeanInfo {
 
+	/**
+	 * Instantiates a new index folder as file links bean info.
+	 */
 	public IndexFolderAsFileLinksBeanInfo() {
 		super();
 	}

@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Fri Jun 18 16:53:24 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.translation.ui.config;
@@ -34,13 +47,29 @@ import org.dwfa.ace.api.Terms;
 import org.ihtsdo.translation.ui.ConfigTranslationModule;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.DefaultSimilaritySearchOption;
 
+/**
+ * The Class SimilarityDefaultSettingsPanel.
+ */
 public class SimilarityDefaultSettingsPanel extends JPanel {
 
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1653665739753572691L;
+	
+	/** The conf trans. */
 	private ConfigTranslationModule confTrans;
+	
+	/** The group. */
 	final ButtonGroup group = new ButtonGroup();
+	
+	/** The tf. */
 	I_TermFactory tf = Terms.get();
 
+	/**
+	 * Instantiates a new similarity default settings panel.
+	 *
+	 * @param config the config
+	 * @param confTrans the conf trans
+	 */
 	public SimilarityDefaultSettingsPanel(I_ConfigAceFrame config, ConfigTranslationModule confTrans) {
 		this.confTrans = confTrans;
 		initComponents();
@@ -51,6 +80,9 @@ public class SimilarityDefaultSettingsPanel extends JPanel {
 
 	}
 
+	/**
+	 * Inits the custom components.
+	 */
 	private void initCustomComponents() {
 
 		this.setBorder(new EmptyBorder(new Insets(5, 5, 0, 5)));
@@ -124,6 +156,9 @@ public class SimilarityDefaultSettingsPanel extends JPanel {
 		});
 	}
 
+	/**
+	 * Select current conf button.
+	 */
 	public void selectCurrentConfButton() {
 		if (confTrans != null) {
 			Enumeration<AbstractButton> buttons = group.getElements();
@@ -136,6 +171,9 @@ public class SimilarityDefaultSettingsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -190,29 +228,61 @@ public class SimilarityDefaultSettingsPanel extends JPanel {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
+	/** The config container. */
 	private JPanel configContainer;
+	
+	/** The button container. */
 	private JPanel buttonContainer;
+	
+	/** The apply button. */
 	private JButton applyButton;
+	
+	/** The revert button. */
 	private JButton revertButton;
+	
+	/** The error container. */
 	private JPanel errorContainer;
+	
+	/** The error. */
 	private JLabel error;
 
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 
+	/**
+	 * Sets the buttons enabled.
+	 *
+	 * @param b the new buttons enabled
+	 */
 	private void setButtonsEnabled(boolean b) {
 		applyButton.setEnabled(b);
 		revertButton.setEnabled(b);
 	}
 
+	/**
+	 * The Class SimilaritySettingRadioButton.
+	 */
 	private class SimilaritySettingRadioButton extends JRadioButton {
 
+		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = 6624960715151454927L;
+		
+		/** The similarity default setting. */
 		private DefaultSimilaritySearchOption similarityDefaultSetting;
 
+		/**
+		 * Sets the similarity default setting.
+		 *
+		 * @param similarityDefaultSetting the new similarity default setting
+		 */
 		public void setSimilarityDefaultSetting(DefaultSimilaritySearchOption similarityDefaultSetting) {
 			this.similarityDefaultSetting = similarityDefaultSetting;
 		}
 
+		/**
+		 * Gets the similarity default setting.
+		 *
+		 * @return the similarity default setting
+		 */
 		public DefaultSimilaritySearchOption getSimilarityDefaultSetting() {
 			return similarityDefaultSetting;
 		}

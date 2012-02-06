@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Mon Mar 15 18:06:53 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.translation.ui;
@@ -70,23 +83,54 @@ import org.ihtsdo.translation.ui.event.ItemStateChangedEvent;
 import org.ihtsdo.translation.ui.event.ItemStateChangedEventHandler;
 
 /**
+ * The Class InboxTreePanel.
+ *
  * @author Vahram Manukyan
  */
 public class InboxTreePanel extends JPanel {
+	
+	/** The Constant INBOX_ITEM_SELECTED. */
 	public static final String INBOX_ITEM_SELECTED = "inboxItem";
+	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 2726469814051803842L;
+	
+	/** The model. */
 	private DefaultTreeModel model;
+	
+	/** The searcher. */
 	private WorkflowSearcher searcher;
+	
+	/** The config. */
 	private I_ConfigAceFrame config;
+	
+	/** The inbox item. */
 	private InboxTreeItem inboxItem;
+	
+	/** The worklist items worker. */
 	private WorklistItemsWorker worklistItemsWorker;
+	
+	/** The user. */
 	private I_GetConceptData user;
+	
+	/** The tag manager. */
 	TagManager tagManager;
+	
+	/** The c node. */
 	private DefaultMutableTreeNode cNode;
+	
+	/** The w node. */
 	private DefaultMutableTreeNode wNode;
+	
+	/** The s node. */
 	private DefaultMutableTreeNode sNode;
+	
+	/** The i node. */
 	private DefaultMutableTreeNode iNode;
 
+	/**
+	 * Instantiates a new inbox tree panel.
+	 */
 	public InboxTreePanel() {
 		initComponents();
 
@@ -115,6 +159,10 @@ public class InboxTreePanel extends JPanel {
 		}
 		updateTree();
 	}
+	
+	/**
+	 * Suscribe handlers.
+	 */
 	private void suscribeHandlers() {
 		EventMediator eventMediator = EventMediator.getInstance();
 		eventMediator.suscribe(EventType.OUTBOX_CONTENT_CHANGED, new OutboxContentChangedEventHandler<OutboxContentChangeEvent>(this) {
@@ -262,6 +310,9 @@ public class InboxTreePanel extends JPanel {
 		});
 	}
 
+	/**
+	 * Update tree.
+	 */
 	public void updateTree() {
 		totalSize = 0;
 		cNode = new DefaultMutableTreeNode(new FolderTreeObj(IconUtilities.CUSTOM_NODE_ROOT, IconUtilities.CUSTOM_NODE, new FolderMetadata(IconUtilities.CUSTOM_NODE, true)));
@@ -287,6 +338,13 @@ public class InboxTreePanel extends JPanel {
 		updateWorkflowNodes(wNode, sNode, cNode);
 	}
 
+	/**
+	 * Update workflow nodes.
+	 *
+	 * @param wNode the w node
+	 * @param sNode the s node
+	 * @param cNode the c node
+	 */
 	private void updateWorkflowNodes(DefaultMutableTreeNode wNode, DefaultMutableTreeNode sNode, DefaultMutableTreeNode cNode) {
 		if (worklistItemsWorker != null && !worklistItemsWorker.isDone()) {
 			worklistItemsWorker.cancel(true);
@@ -297,11 +355,21 @@ public class InboxTreePanel extends JPanel {
 		worklistItemsWorker.execute();
 	}
 
+	/**
+	 * Sets the tree model.
+	 *
+	 * @param treeModel the new tree model
+	 */
 	public void setTreeModel(DefaultTreeModel treeModel) {
 		this.inboxFolderTree.setModel(treeModel);
 		this.inboxFolderTree.revalidate();
 	}
 
+	/**
+	 * Inbox folder tree value changed.
+	 *
+	 * @param e the e
+	 */
 	private void inboxFolderTreeValueChanged(TreeSelectionEvent e) {
 		Object node = inboxFolderTree.getLastSelectedPathComponent();
 		if (node instanceof DefaultMutableTreeNode) {
@@ -323,6 +391,9 @@ public class InboxTreePanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -360,23 +431,47 @@ public class InboxTreePanel extends JPanel {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The inbox folder tree. */
 	private JTree inboxFolderTree;
+	
+	/** The progress bar. */
 	private JProgressBar progressBar;
+	
+	/** The outbox. */
 	public DefaultMutableTreeNode outbox;
+	
+	/** The todo. */
 	public DefaultMutableTreeNode todo;
+	
+	/** The total size. */
 	public Integer totalSize = 0;
 
 	// JFormDesigner - End of variables declaration //GEN-END:variables
+	/**
+	 * Gets the tree.
+	 *
+	 * @return the tree
+	 */
 	public JTree getTree() {
 		return inboxFolderTree;
 	}
 
+	/**
+	 * Sets the tree mouse listener.
+	 */
 	public void setTreeMouseListener() {
 		// InboxTreeMouselistener inboxTreeMouselistener) {
 		// this.tree1.addMouseListener(inboxTreeMouselistener);
 	}
 
+	/**
+	 * Rest from worklist node.
+	 *
+	 * @param wfInst the wf inst
+	 */
 	private void restFromWorklistNode(WfInstance wfInst) {
 		try {
 			WorkList worklist = wfInst.getWorkList();
@@ -401,6 +496,11 @@ public class InboxTreePanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Adds the to worklist node.
+	 *
+	 * @param wfInstance the wf instance
+	 */
 	protected void addToWorklistNode(WfInstance wfInstance) {
 		try {
 			WorkList worklist = wfInstance.getWorkList();
@@ -425,6 +525,9 @@ public class InboxTreePanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Adds the to inbox node.
+	 */
 	protected void addToInboxNode() {
 		InboxTreeItem childTreeItem = (InboxTreeItem) iNode.getUserObject();
 		childTreeItem.setItemSize(childTreeItem.getItemSize() + 1);
@@ -432,6 +535,9 @@ public class InboxTreePanel extends JPanel {
 		model.reload(iNode);
 	}
 	
+	/**
+	 * Rest from inbox node.
+	 */
 	protected void restFromInboxNode() {
 		InboxTreeItem childTreeItem = (InboxTreeItem) iNode.getUserObject();
 		childTreeItem.setItemSize(childTreeItem.getItemSize() - 1);
@@ -439,6 +545,11 @@ public class InboxTreePanel extends JPanel {
 		model.reload(iNode);
 	}
 
+	/**
+	 * Rest from state node.
+	 *
+	 * @param state the state
+	 */
 	private void restFromStateNode(WfState state) {
 		int statusChildCount = sNode.getChildCount();
 		for (int i = 0; i < statusChildCount; i++) {
@@ -458,6 +569,11 @@ public class InboxTreePanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Adds the to state node.
+	 *
+	 * @param state the state
+	 */
 	private void addToStateNode(WfState state) {
 		int statusChildCount = sNode.getChildCount();
 		boolean added = false;
@@ -484,24 +600,47 @@ public class InboxTreePanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Item user and state changed.
+	 *
+	 * @param oldWfInstance the old wf instance
+	 * @param newWfInstance the new wf instance
+	 */
 	public void itemUserAndStateChanged(WfInstance oldWfInstance, WfInstance newWfInstance) {
 		restFromStateNode(oldWfInstance.getState());
 		//addToStateNode(newWfInstance.getState());
 		restFromWorklistNode(newWfInstance);
 	}
 
+	/**
+	 * Item state changed.
+	 *
+	 * @param oldWfInstance the old wf instance
+	 * @param newWfInstance the new wf instance
+	 */
 	public void itemStateChanged(WfInstance oldWfInstance, WfInstance newWfInstance) {
 		restFromStateNode(oldWfInstance.getState());
 		addToStateNode(newWfInstance.getState());
 	}
 
+	/**
+	 * The Class WorklistItemsWorker.
+	 */
 	class WorklistItemsWorker extends SwingWorker<List<InboxTreeItem>, InboxTreeItem> {
+		
+		/** The tags content. */
 		private List<InboxTag> tagsContent;
 
+		/**
+		 * Instantiates a new worklist items worker.
+		 */
 		public WorklistItemsWorker() {
 			super();
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.SwingWorker#doInBackground()
+		 */
 		@Override
 		public List<InboxTreeItem> doInBackground() {
 			try {
@@ -515,6 +654,11 @@ public class InboxTreePanel extends JPanel {
 			return null;
 		}
 
+		/**
+		 * Gets the tags.
+		 *
+		 * @return the tags
+		 */
 		private void getTags() {
 			TagManager tm = TagManager.getInstance();
 			try {
@@ -530,6 +674,11 @@ public class InboxTreePanel extends JPanel {
 			}
 		}
 
+		/**
+		 * Gets the worklists statuses and size.
+		 *
+		 * @return the worklists statuses and size
+		 */
 		private void getWorklistsStatusesAndSize() {
 			try {
 				WfUser wfUser;
@@ -552,6 +701,9 @@ public class InboxTreePanel extends JPanel {
 			}
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.SwingWorker#done()
+		 */
 		@Override
 		public void done() {
 			try {
@@ -571,6 +723,9 @@ public class InboxTreePanel extends JPanel {
 			}
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.SwingWorker#process(java.util.List)
+		 */
 		@Override
 		protected void process(List<InboxTreeItem> chunks) {
 			for (InboxTreeItem inboxTreeItem : chunks) {

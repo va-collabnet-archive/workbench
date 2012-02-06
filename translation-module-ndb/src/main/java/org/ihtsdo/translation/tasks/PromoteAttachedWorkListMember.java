@@ -135,18 +135,38 @@ public class PromoteAttachedWorkListMember extends AbstractTask {
 		return new int[] {  };
 	}
 
+	/**
+	 * Gets the profile prop name.
+	 *
+	 * @return the profile prop name
+	 */
 	public String getProfilePropName() {
 		return profilePropName;
 	}
 
+	/**
+	 * Sets the profile prop name.
+	 *
+	 * @param profilePropName the new profile prop name
+	 */
 	public void setProfilePropName(String profilePropName) {
 		this.profilePropName = profilePropName;
 	}
 
+	/**
+	 * Gets the work list item prop name.
+	 *
+	 * @return the work list item prop name
+	 */
 	public String getWorkListItemPropName() {
 		return workListItemPropName;
 	}
 
+	/**
+	 * Sets the work list item prop name.
+	 *
+	 * @param workListItemPropName the new work list item prop name
+	 */
 	public void setWorkListItemPropName(String workListItemPropName) {
 		this.workListItemPropName = workListItemPropName;
 	}

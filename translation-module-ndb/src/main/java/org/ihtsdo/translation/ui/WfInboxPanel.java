@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Wed Dec 07 16:03:54 GMT-03:00 2011
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.translation.ui;
@@ -101,25 +114,65 @@ import org.ihtsdo.translation.ui.event.ItemStateChangedEvent;
 import org.ihtsdo.translation.workflow.filters.WfTargetFsnFilter;
 import org.ihtsdo.translation.workflow.filters.WfTargetPreferredFilter;
 
+/**
+ * The Class WfInboxPanel.
+ */
 public class WfInboxPanel extends JPanel {
+	
+	/** The Constant tf. */
 	private static final I_TermFactory tf = Terms.get();
+	
+	/** The config. */
 	private static I_ConfigAceFrame config;
+	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -4013056429939416545L;
+	
+	/** The model. */
 	private InboxTableModel model;
+	
+	/** The user. */
 	private WfUser user;
+	
+	/** The filter list. */
 	protected HashMap<String, WfSearchFilterBI> filterList;
+	
+	/** The sorter. */
 	private TableRowSorter<InboxTableModel> sorter;
+	
+	/** The ui panel. */
 	private TranslationPanel uiPanel;
+	
+	/** The current row. */
 	private Object[] currentRow;
+	
+	/** The tag manager. */
 	private TagManager tagManager;
+	
+	/** The menu item cache. */
 	private HashMap<String, InboxTag> menuItemCache = new HashMap<String, InboxTag>();
+	
+	/** The expanded. */
 	private boolean expanded = false;
+	
+	/** The d. */
 	private JDialog d;
+	
+	/** The cfg. */
 	private ConfigTranslationModule cfg;
+	
+	/** The current model row num. */
 	private int currentModelRowNum;
+	
+	/** The special tag. */
 	private boolean specialTag;
+	
+	/** The new inbox item. */
 	protected Object newInboxItem;
 
+	/**
+	 * Instantiates a new wf inbox panel.
+	 */
 	public WfInboxPanel() {
 		initComponents();
 		try {
@@ -163,6 +216,9 @@ public class WfInboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Refresh statuses filter.
+	 */
 	private void refreshStatusesFilter() {
 		List<WfState> states = new WfComponentProvider().getAllStates();
 		statusFilterCombo.addItem("");
@@ -171,6 +227,9 @@ public class WfInboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Suscribe to events.
+	 */
 	private void suscribeToEvents() {
 
 		EventMediator mediator = EventMediator.getInstance();
@@ -251,6 +310,9 @@ public class WfInboxPanel extends JPanel {
 
 	}
 
+	/**
+	 * Inits the tag menu.
+	 */
 	private void initTagMenu() {
 		menu2.removeAll();
 		menu2.add(createNewTag);
@@ -279,6 +341,11 @@ public class WfInboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Tag item action preformed.
+	 *
+	 * @param e the e
+	 */
 	private void tagItemActionPreformed(ActionEvent e) {
 		try {
 			int tableRowIndex = inboxTable.getSelectedRow();
@@ -300,6 +367,11 @@ public class WfInboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Removes the tag menu item action performed.
+	 *
+	 * @param e the e
+	 */
 	private void removeTagMenuItemActionPerformed(ActionEvent e) {
 		try {
 			int tableRowIndex = inboxTable.getSelectedRow();
@@ -325,10 +397,18 @@ public class WfInboxPanel extends JPanel {
 
 	}
 
+	/**
+	 * The main method.
+	 *
+	 * @param args the arguments
+	 */
 	public static void main(String[] args) {
 		createAndShowGUI();
 	}
 
+	/**
+	 * Creates the and show gui.
+	 */
 	private static void createAndShowGUI() {
 		// Create and set up the window.
 		JFrame frame = new JFrame("TableFilterDemo");
@@ -357,11 +437,21 @@ public class WfInboxPanel extends JPanel {
 		newContentPane.model.updateTable(data);
 	}
 
+	/**
+	 * Filter button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void filterButtonActionPerformed(ActionEvent e) {
 		updateFilters();
 		updateTable();
 	}
 
+	/**
+	 * Removes the filters action performed.
+	 *
+	 * @param e the e
+	 */
 	private void removeFiltersActionPerformed(ActionEvent e) {
 		componentFilter.setText("");
 		targetPreferredFilter.setText("");
@@ -371,6 +461,9 @@ public class WfInboxPanel extends JPanel {
 		updateTable();
 	}
 
+	/**
+	 * Update table.
+	 */
 	private void updateTable() {
 		Set<String> keys = filterList.keySet();
 		for (String key : keys) {
@@ -387,6 +480,9 @@ public class WfInboxPanel extends JPanel {
 		model.updatePage(filterList);
 	}
 
+	/**
+	 * Update filters.
+	 */
 	private void updateFilters() {
 		String componentFilter = this.componentFilter.getText();
 
@@ -430,6 +526,11 @@ public class WfInboxPanel extends JPanel {
 
 	}
 
+	/**
+	 * Inbox table mouse clicked.
+	 *
+	 * @param e the e
+	 */
 	private void inboxTableMouseClicked(MouseEvent e) {
 		if (e.getButton() == MouseEvent.BUTTON3) {
 			int xPoint = e.getX();
@@ -463,6 +564,9 @@ public class WfInboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Open item.
+	 */
 	private void openItem() {
 		int selectedIndex = inboxTable.getSelectedRow();
 		if (selectedIndex >= 0) {
@@ -538,7 +642,22 @@ public class WfInboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * The listener interface for receiving change events.
+	 * The class that is interested in processing a change
+	 * event implements this interface, and the object created
+	 * with that class is registered with a component using the
+	 * component's <code>addChangeListener<code> method. When
+	 * the change event occurs, that object's appropriate
+	 * method is invoked.
+	 *
+	 * @see ChangeEvent
+	 */
 	class ChangeListener implements PropertyChangeListener {
+		
+		/* (non-Javadoc)
+		 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+		 */
 		@Override
 		public void propertyChange(PropertyChangeEvent arg0) {
 			if (arg0.getPropertyName().equals(TranslationPanel.ACTION_LAUNCHED)) {
@@ -610,6 +729,11 @@ public class WfInboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Creates the new tag action performed.
+	 *
+	 * @param e the e
+	 */
 	private void createNewTagActionPerformed(ActionEvent e) {
 		NewTagPanel tagPanel = new NewTagPanel();
 		InboxTag tag = tagPanel.showModalDialog();
@@ -632,10 +756,20 @@ public class WfInboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Expand action performed.
+	 *
+	 * @param e the e
+	 */
 	private void expandActionPerformed(ActionEvent e) {
 
 	}
 
+	/**
+	 * Close inbox action performed.
+	 *
+	 * @param e the e
+	 */
 	private void closeInboxActionPerformed(ActionEvent e) {
 		try {
 			AceFrameConfig config = (AceFrameConfig) Terms.get().getActiveAceFrameConfig();
@@ -685,6 +819,11 @@ public class WfInboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Check box1 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void checkBox1ActionPerformed(ActionEvent e) {
 		ConfigTranslationModule cfg = null;
 		try {
@@ -700,6 +839,11 @@ public class WfInboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Send to outbox action performed.
+	 *
+	 * @param e the e
+	 */
 	private void sendToOutboxActionPerformed(ActionEvent e) {
 		try {
 			WorkflowSearcher searcher = new WorkflowSearcher();
@@ -720,6 +864,11 @@ public class WfInboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Back to inbox action performed.
+	 *
+	 * @param e the e
+	 */
 	private void backToInboxActionPerformed(ActionEvent e) {
 		try {
 
@@ -751,6 +900,11 @@ public class WfInboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Label5 mouse clicked.
+	 *
+	 * @param e the e
+	 */
 	private void label5MouseClicked(MouseEvent e) {
 		if (!expanded) {
 			InboxColumn[] columns = InboxColumn.values();
@@ -783,6 +937,9 @@ public class WfInboxPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Atach to inbox panel.
+	 */
 	private void atachToInboxPanel() {
 		filterPanel.setVisible(false);
 		model.refreshColumnsStruct();
@@ -795,6 +952,9 @@ public class WfInboxPanel extends JPanel {
 		model.fireTableStructureChanged();
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -1117,41 +1277,112 @@ public class WfInboxPanel extends JPanel {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The progress bar1. */
 	private JProgressBar progressBar1;
+	
+	/** The split panel. */
 	private JSplitPane splitPanel;
+	
+	/** The inbox tree panel1. */
 	private InboxTreePanel inboxTreePanel1;
+	
+	/** The inbox items. */
 	private JPanel inboxItems;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The inbox table. */
 	private JTable inboxTable;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The panel6. */
 	private JPanel panel6;
+	
+	/** The separator2. */
 	private JSeparator separator2;
+	
+	/** The label5. */
 	private JLabel label5;
+	
+	/** The separator3. */
 	private JSeparator separator3;
+	
+	/** The filter panel. */
 	private JPanel filterPanel;
+	
+	/** The panel3. */
 	private JPanel panel3;
+	
+	/** The label4. */
 	private JLabel label4;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The label6. */
 	private JLabel label6;
+	
+	/** The component filter. */
 	private JTextField componentFilter;
+	
+	/** The target preferred filter. */
 	private JTextField targetPreferredFilter;
+	
+	/** The target fsn filter. */
 	private JTextField targetFsnFilter;
+	
+	/** The status filter combo. */
 	private JComboBox statusFilterCombo;
+	
+	/** The panel5. */
 	private JPanel panel5;
+	
+	/** The filter button. */
 	private JButton filterButton;
+	
+	/** The remove filters. */
 	private JButton removeFilters;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The current translation item. */
 	private JLabel currentTranslationItem;
+	
+	/** The check box1. */
 	private JCheckBox checkBox1;
+	
+	/** The panel4. */
 	private JPanel panel4;
+	
+	/** The close inbox. */
 	private JButton closeInbox;
+	
+	/** The send to outbox. */
 	private JButton sendToOutbox;
+	
+	/** The popup menu1. */
 	private JPopupMenu popupMenu1;
+	
+	/** The menu2. */
 	private JMenu menu2;
+	
+	/** The create new tag. */
 	private JMenuItem createNewTag;
+	
+	/** The remove tag menu item. */
 	private JMenuItem removeTagMenuItem;
+	
+	/** The back to inbox. */
 	private JMenuItem backToInbox;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 

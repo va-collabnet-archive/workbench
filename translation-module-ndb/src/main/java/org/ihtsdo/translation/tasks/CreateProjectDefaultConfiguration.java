@@ -51,6 +51,7 @@ public class CreateProjectDefaultConfiguration extends AbstractTask {
 	/** The Constant dataVersion. */
 	private static final int dataVersion = 1;
 
+	/** The project prop name. */
 	private String projectPropName = ProcessAttachmentKeys.TERMINOLOGY_PROJECT.getAttachmentKey();
 
 	/**
@@ -141,10 +142,20 @@ public class CreateProjectDefaultConfiguration extends AbstractTask {
 		return new int[] {  };
 	}
 
+	/**
+	 * Sets the project prop name.
+	 *
+	 * @param projectPropName the new project prop name
+	 */
 	public void setProjectPropName(String projectPropName) {
 		this.projectPropName = projectPropName;
 	}
 
+	/**
+	 * Gets the project prop name.
+	 *
+	 * @return the project prop name
+	 */
 	public String getProjectPropName() {
 		return projectPropName;
 	}
