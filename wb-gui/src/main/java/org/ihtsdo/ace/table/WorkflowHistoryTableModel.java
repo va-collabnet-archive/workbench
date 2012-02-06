@@ -54,7 +54,7 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
     private ArrayList<WorkflowLuceneSearchResult> wfHistoryList = new ArrayList<WorkflowLuceneSearchResult>();
 
     public enum WORKFLOW_FIELD { 
-    	FSN("FSN", 5, 800, 650), EDITOR("Editor", 5, 250, 250), 
+    	FSN("FSN", 5, 800, 650), EDITOR("WorkflowUser", 5, 250, 250), 
     	STATE("State", 5, 250, 250), TIMESTAMP("TimeStamp", 5, 75, 200);
 
  /*
