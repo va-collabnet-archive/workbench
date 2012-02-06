@@ -96,6 +96,7 @@ public class DroolsExecutionManager {
         this.kbFiles = kbFiles;
         kbKey = sanatizeKey(kbKey);
         drlPkgFile = new File(ruleDirectory, kbKey + ".kpkgs");
+        int tries = 0;
         
         ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
         for (File f : this.kbFiles) {
@@ -117,10 +118,19 @@ public class DroolsExecutionManager {
             ObjectInputStream in = new ObjectInputStream(new FileInputStream(drlPkgFile));
             try {
                 kpkgs = (Collection<KnowledgePackage>) in.readObject();
-            } catch (ClassNotFoundException e) {
-                throw new IOException(e);
-            } catch (EOFException e) {
-                System.out.println("@@@@ End of file exception: " + drlPkgFile.toString());
+            } catch(Exception e){
+                if(tries < 3){
+                    lock.writeLock().lock();
+                    loadKnowledgePackages(kbFiles, extraEvaluators, drlPkgFile);
+                    lock.writeLock().unlock(); 
+                    tries++;
+                }else{
+                    if(e instanceof ClassNotFoundException){
+                    throw new IOException(e);
+                    }else if(e instanceof EOFException){
+                        System.out.println("@@@@ End of file exception: " + drlPkgFile.toString());
+                    }
+                }
             }finally {
                 in.close();
             }
