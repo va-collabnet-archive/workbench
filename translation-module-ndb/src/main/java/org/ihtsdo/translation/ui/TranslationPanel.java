@@ -17,7 +17,19 @@
 
 package org.ihtsdo.translation.ui;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Desktop;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -38,7 +50,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import javax.swing.*;
 
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -56,6 +67,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
@@ -68,7 +80,6 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
-import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
@@ -77,13 +88,11 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.plaf.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import javax.swing.text.html.StyleSheet;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
@@ -234,7 +243,7 @@ public class TranslationPanel extends JPanel {
 	private WfAction cancAction;
 	
 	/** The target text changed. */
-	private boolean targetTextChanged;
+	private boolean targetTextChanged = false;
 
 	/**
 	 * Instantiates a new translation concept editor.
@@ -303,7 +312,7 @@ public class TranslationPanel extends JPanel {
 		comboBoxModel.addElement(fsn);
 
 		comboBox1.setModel(comboBoxModel);
-		comboBox1.setSelectedIndex(1);
+		comboBox1.setSelectedItem(synonym);
 		comboBox1.setEnabled(false);
 
 		DefaultComboBoxModel comboBoxModel2 = new DefaultComboBoxModel();
@@ -1502,7 +1511,7 @@ public class TranslationPanel extends JPanel {
 	 * @param e the e
 	 */
 	private void deleteCommentActionPerformed(ActionEvent e) {
-		Comment selectedComment = (Comment) tblComm.getModel().getValueAt(tblComm.getSelectedRow(), 1);
+		Comment selectedComment = (Comment) tblComm.getModel().getValueAt(tblComm.getSelectedRow(), 2);
 		if (selectedComment != null) {
 			CommentsRefset.retireCommentsMember(selectedComment.getExtension());
 		}
@@ -3988,6 +3997,7 @@ public class TranslationPanel extends JPanel {
 			}
 			targetTextField.requestFocusInWindow();
 			targetTextField.setCaretPosition(targetTextField.getText().length());
+			targetTextChanged = false;
 			// mClose.setEnabled(false);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -4133,13 +4143,18 @@ public class TranslationPanel extends JPanel {
 		try {
 			List<Comment> commentsList = new ArrayList<Comment>();
 			config = Terms.get().getActiveAceFrameConfig();
-			String[] columnNames = { "Comment type", "Comment" };
+			String[] columnNames = { "Comment type", "Comment", "CommentObject"};
 			String[][] data = null;
 			DefaultTableModel tableModel = new DefaultTableModel(data, columnNames) {
 				private static final long serialVersionUID = 1L;
 
 				public boolean isCellEditable(int x, int y) {
 					return false;
+				}
+				
+				@Override
+				public int getColumnCount() {
+					return super.getColumnCount() - 1;
 				}
 
 				public Class getColumnClass(int column) {
@@ -4157,12 +4172,14 @@ public class TranslationPanel extends JPanel {
 				commentsList = targetLangRefset.getCommentsRefset(config).getFullComments(concept.getConceptNid());
 				for (int i = commentsList.size() - 1; i > -1; i--) {
 					if (commentsList.get(i).getTypeCid() == commentsList.get(i).getSubTypeCid()) {
-						tableModel.addRow(new Object[] { "Language refset: " + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "", formatComment(commentsList.get(i).getComment()) });
+						tableModel.addRow(new Object[] { "Language refset: " + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "", 
+								formatComment(commentsList.get(i).getComment()), commentsList.get(i) });
 					} else {
 						tableModel
 						.addRow(new Object[] {
 								"Language refset: " + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "/" + Terms.get().getConcept(commentsList.get(i).getSubTypeCid()),
-								formatComment(commentsList.get(i).getComment()) });
+								formatComment(commentsList.get(i).getComment()),
+								commentsList.get(i)});
 					}
 				}
 			}
@@ -4171,10 +4188,13 @@ public class TranslationPanel extends JPanel {
 
 			for (int i = commentsList.size() - 1; i > -1; i--) {
 				if (commentsList.get(i).getTypeCid() == commentsList.get(i).getSubTypeCid()) {
-					tableModel.addRow(new Object[] { "Worklist: " + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "", formatComment(commentsList.get(i).getComment()) });
+					tableModel.addRow(new Object[] { "Worklist: " + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "",
+							formatComment(commentsList.get(i).getComment()),
+							commentsList.get(i)});
 				} else {
 					tableModel.addRow(new Object[] { "Worklist: " + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "/" + Terms.get().getConcept(commentsList.get(i).getSubTypeCid()),
-							formatComment(commentsList.get(i).getComment()) });
+							formatComment(commentsList.get(i).getComment()),
+							commentsList.get(i)});
 				}
 			}
 
