@@ -45,6 +45,7 @@ public class PutRepoConceptInProperty extends AbstractTask {
 	/** The issue repo prop. */
 	private TermEntry issueRepoConcept;
 
+	/** The repository concept prop name. */
 	private String repositoryConceptPropName = ProcessAttachmentKeys.ISSUE_REPO_CONCEPT.getAttachmentKey();
 	
 	/** The Constant serialVersionUID. */
@@ -135,18 +136,38 @@ public class PutRepoConceptInProperty extends AbstractTask {
 		return new int[] {  };
 	}
 
+	/**
+	 * Gets the issue repo concept.
+	 *
+	 * @return the issue repo concept
+	 */
 	public TermEntry getIssueRepoConcept() {
 		return issueRepoConcept;
 	}
 
+	/**
+	 * Sets the issue repo concept.
+	 *
+	 * @param issueRepoConcept the new issue repo concept
+	 */
 	public void setIssueRepoConcept(TermEntry issueRepoConcept) {
 		this.issueRepoConcept = issueRepoConcept;
 	}
 
+	/**
+	 * Gets the repository concept prop name.
+	 *
+	 * @return the repository concept prop name
+	 */
 	public String getRepositoryConceptPropName() {
 		return repositoryConceptPropName;
 	}
 
+	/**
+	 * Sets the repository concept prop name.
+	 *
+	 * @param repositoryConceptPropName the new repository concept prop name
+	 */
 	public void setRepositoryConceptPropName(String repositoryConceptPropName) {
 		this.repositoryConceptPropName = repositoryConceptPropName;
 	}

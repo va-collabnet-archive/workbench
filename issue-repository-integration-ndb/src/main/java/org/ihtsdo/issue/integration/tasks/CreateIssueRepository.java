@@ -54,8 +54,10 @@ public class CreateIssueRepository extends AbstractTask {
 	/** The repository type. */
 	private String repositoryType;
 
+	/** The repository concept prop name. */
 	private String repositoryConceptPropName = ProcessAttachmentKeys.ISSUE_REPO_CONCEPT.getAttachmentKey();
 
+	/** The profile prop name. */
 	private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
 
 	/** The Constant serialVersionUID. */
@@ -256,18 +258,38 @@ public class CreateIssueRepository extends AbstractTask {
 		this.repositoryId = repositoryId;
 	}
 
+	/**
+	 * Gets the repository concept prop name.
+	 *
+	 * @return the repository concept prop name
+	 */
 	public String getRepositoryConceptPropName() {
 		return repositoryConceptPropName;
 	}
 
+	/**
+	 * Sets the repository concept prop name.
+	 *
+	 * @param repositoryConceptPropName the new repository concept prop name
+	 */
 	public void setRepositoryConceptPropName(String repositoryConceptPropName) {
 		this.repositoryConceptPropName = repositoryConceptPropName;
 	}
 
+	/**
+	 * Gets the profile prop name.
+	 *
+	 * @return the profile prop name
+	 */
 	public String getProfilePropName() {
 		return profilePropName;
 	}
 
+	/**
+	 * Sets the profile prop name.
+	 *
+	 * @param profilePropName the new profile prop name
+	 */
 	public void setProfilePropName(String profilePropName) {
 		this.profilePropName = profilePropName;
 	}
