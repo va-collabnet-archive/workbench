@@ -220,8 +220,8 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 				parentConcept = Ts.get().getConceptVersion(config.getViewCoordinate(), parentConceptNid);
 				subtypeConcept = Ts.get().getConceptVersion(config.getViewCoordinate(), subtypeConceptNid);
 			} catch (java.lang.AssertionError e) {
-				System.out.println("Error retrieving concepts in iParentOf: " + parent + ", " + subtype);
-				System.out.println(e.getMessage());
+				AceLog.getAppLog().info("Error retrieving concepts in iParentOf: " + parent + ", " + subtype);
+				AceLog.getAppLog().info(e.getMessage());
 			}
 			if (parentConcept ==  null || subtypeConcept == null) {
 				result = false;
@@ -229,7 +229,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 				result = subtypeConcept.isKindOf(parentConcept);
 			}
 		} else {
-			//System.out.println("Using rules library isa cache!");
+			//AceLog.getAppLog().info("Using rules library isa cache!");
 			result = RulesLibrary.myStaticIsACache.isKindOf(subtypeConceptNid, parentConceptNid);
 		}
 		return result;
@@ -289,7 +289,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 
 								DescriptionVersionBI description = (DescriptionVersionBI) 
 								Ts.get().getComponentVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), dnid);
-								//						System.out.println("Evaluating match - Description: " + description.getText() + "Concept: " + potentialMatchConcept);
+								//						AceLog.getAppLog().info("Evaluating match - Description: " + description.getText() + "Concept: " + potentialMatchConcept);
 
 								if (description != null && description.getText().toLowerCase().equals(descText.toLowerCase())) { 
 
@@ -309,7 +309,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 										if (potentialMatchSemtag != null &&
 												originalSemTag.equals(potentialMatchSemtag)) {
 											result = true;
-											//											System.out.println("Hierarchy match found: " + originalFsn + " (" + 
+											//											AceLog.getAppLog().info("Hierarchy match found: " + originalFsn + " (" + 
 											//													originalConcept.getUids().iterator().next() + ") & " + potentialMatchFsn.getText() 
 											//													+ " (" + potentialMatchConcept.getUUIDs().iterator().next() + ")");
 											break;
@@ -387,7 +387,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 			Matcher m = p.matcher(workingSearchString);
 			workingSearchString = m.replaceAll(" +");
 			String filteredDescription = "+" + QueryParser.escape(fsn);
-			//System.out.println(fsn + "  ---->  " + filteredDescription);
+			//AceLog.getAppLog().info(fsn + "  ---->  " + filteredDescription);
 			SearchResult results = tf.doLuceneSearch(filteredDescription);
 			TopDocs topDocs = results.topDocs;
 			ScoreDoc[] docs = topDocs.scoreDocs;

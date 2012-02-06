@@ -135,7 +135,7 @@ public class RulesDeploymentPackageReference {
 		buff.append("' type='PKG' basicAuthentication='enabled' username='alopez' password='snomed'/>");
 		buff.append("		</add>");
 		buff.append("</change-set>");
-		//System.out.println(buff.toString());
+		//AceLog.getAppLog().info(buff.toString());
 		return buff.toString().getBytes();
 	}
 
@@ -155,7 +155,7 @@ public class RulesDeploymentPackageReference {
 		String[] parts = url.split("/");
 		File file = new File("rules/" + parts[parts.length-2] + "_" + parts[parts.length-1] + ".guvnor");
 		if (!file.exists()) {
-			System.out.println(file.getName());
+			AceLog.getAppLog().info(file.getName());
 			throw new FileNotFoundException();
 		}
 		try {
@@ -167,7 +167,7 @@ public class RulesDeploymentPackageReference {
 		buff.append("' type='PKG' basicAuthentication='enabled' username='alopez' password='snomed'/>");
 		buff.append("		</add>");
 		buff.append("</change-set>");
-		//System.out.println(buff.toString());
+		//AceLog.getAppLog().info(buff.toString());
 		return buff.toString().getBytes();
 	}
 
@@ -202,7 +202,7 @@ public class RulesDeploymentPackageReference {
 				fileBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
 						getChangeSetXmlBytesForFile(), recreate);
 			} catch (Exception e) {
-				System.out.println("File Package not accessible: " + getName());
+				AceLog.getAppLog().info("File Package not accessible: " + getName());
 			}
 			if (fileBased != null && fileBased.getKnowledgePackages().size() > 0) {
 				return fileBased;
@@ -212,7 +212,7 @@ public class RulesDeploymentPackageReference {
 					guvnorBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
 							getChangeSetXmlBytes(), recreate);
 				} catch (Exception e1) {
-					System.out.println("Web Package not accessible: " + getName());
+					AceLog.getAppLog().info("Web Package not accessible: " + getName());
 				}
 				if (guvnorBased != null && guvnorBased.getKnowledgePackages().size() > 0) {
 					return guvnorBased;
@@ -225,7 +225,7 @@ public class RulesDeploymentPackageReference {
 				guvnorBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
 						getChangeSetXmlBytes(), recreate);
 			} catch (Exception e1) {
-				System.out.println("Web Package not accessible: " + getName());
+				AceLog.getAppLog().info("Web Package not accessible: " + getName());
 			}
 			if (guvnorBased != null && guvnorBased.getKnowledgePackages().size() > 0) {
 				return guvnorBased;
@@ -235,12 +235,12 @@ public class RulesDeploymentPackageReference {
 					fileBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
 							getChangeSetXmlBytesForFile(), recreate);
 				} catch (Exception e) {
-					System.out.println("File Package not accessible: " + getName());
+					AceLog.getAppLog().info("File Package not accessible: " + getName());
 				}
 				if (fileBased != null && fileBased.getKnowledgePackages().size() > 0) return fileBased;
 			}
 		}
-		System.out.println("WARNING: KB Recreation failed.");
+		AceLog.getAppLog().info("WARNING: KB Recreation failed.");
 		return null;
 
 	}
@@ -256,7 +256,7 @@ public class RulesDeploymentPackageReference {
 		KnowledgeBase kbase = getKnowledgeBase(false);
 		if (kbase != null) {
 			for (KnowledgePackage kpackg : kbase.getKnowledgePackages()) {
-				//System.out.println("** pkg: " + kpackg.getName());
+				//AceLog.getAppLog().info("** pkg: " + kpackg.getName());
 				for (Rule rule : kpackg.getRules()) {
 					rules.add(rule);
 				}

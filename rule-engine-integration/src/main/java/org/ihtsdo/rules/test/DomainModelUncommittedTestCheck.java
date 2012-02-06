@@ -89,18 +89,18 @@ public class DomainModelUncommittedTestCheck extends TestCase {
 	public void testStateFull() {
 		try {
 			I_GetConceptData concept = tf.getConcept(UUID.fromString("c265cf22-2a11-3488-b71e-296ec0317f96"));
-			System.out.println("Updating knowledge base...");
+			AceLog.getAppLog().info("Updating knowledge base...");
 			HashMap<Resource, ResourceType> resources = new HashMap<Resource, ResourceType>();
 			resources.put( ResourceFactory.newFileResource("rules/sample-descriptions-rules.drl"), ResourceType.DRL );
 			resources.put( ResourceFactory.newFileResource("rules/sample-relationships-rules.drl"), ResourceType.DRL );
 			RulesLibrary.getKnowledgeBase(RulesLibrary.CONCEPT_MODEL_PKG, true, resources);
-			System.out.println("Knowledge base updated");
+			AceLog.getAppLog().info("Knowledge base updated");
 			ResultsCollectorWorkBench resultsCollector = RulesLibrary.checkConcept(concept, RulesLibrary.CONCEPT_MODEL_PKG,false);
 			List<AlertToDataConstraintFailure> results = resultsCollector.getAlertList();
-			System.out.println("Done..." + results.size());
-			System.out.println("Results size: " + results.size());
+			AceLog.getAppLog().info("Done..." + results.size());
+			AceLog.getAppLog().info("Results size: " + results.size());
 			for (AlertToDataConstraintFailure alert : results) {
-				System.out.println(alert.getAlertMessage());
+				AceLog.getAppLog().info(alert.getAlertMessage());
 			}
 		} catch (TerminologyException e) {
 			AceLog.getAppLog().alertAndLogException(e);

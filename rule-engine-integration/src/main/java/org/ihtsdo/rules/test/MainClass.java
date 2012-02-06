@@ -27,6 +27,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.dwfa.ace.log.AceLog;
+
 /**
  * The Class MainClass.
  */
@@ -62,7 +64,7 @@ public class MainClass {
 			public void stateChanged(ChangeEvent changeEvent) {
 				JTabbedPane sourceTabbedPane = (JTabbedPane) changeEvent.getSource();
 				int index = sourceTabbedPane.getSelectedIndex();
-				System.out.println("Tab changed to: " + sourceTabbedPane.getTitleAt(index));
+				AceLog.getAppLog().info("Tab changed to: " + sourceTabbedPane.getTitleAt(index));
 			}
 		};
 		tabbedPane.addChangeListener(changeListener);

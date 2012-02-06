@@ -258,7 +258,7 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 			Terms.get().getActiveAceFrameConfig().setStatusMessage("Getting KnowledgeBase...");
 		}
 		long startTime = System.currentTimeMillis();
-		//System.out.println("Starting concept check...");
+		//AceLog.getAppLog().info("Starting concept check...");
 		KnowledgeBase kbase = contextHelper.getKnowledgeBaseForContext(context, config);
 		if (!noRealtimeRulesAlertShown &&
 				context.getUids().containsAll(RefsetAuxiliary.Concept.REALTIME_PRECOMMIT_QA_CONTEXT.getUids()) &&
@@ -267,7 +267,7 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 			AceLog.getAppLog().alertAndLogException(
 					new IOException("Warning! No rules in context" + context.toString() + ". QA is disabled."));
 		}
-		//System.out.println("KBase: null = " + (kbase==null) + "; Size: " + kbase.getKnowledgePackages().size());
+		//AceLog.getAppLog().info("KBase: null = " + (kbase==null) + "; Size: " + kbase.getKnowledgePackages().size());
 		ResultsCollectorWorkBench results = new ResultsCollectorWorkBench();
 		try {
 			if (kbase != null) {
@@ -296,7 +296,7 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 					}
 
 					DrConcept testConcept = DrComponentHelper.getDrConcept(conceptBi, "Last version", inferredOrigin);
-					//System.out.println("Test concept converted...");
+					//AceLog.getAppLog().info("Test concept converted...");
 					if (!DwfaEnv.isHeadless()) {
 						activity.setProgressInfoLower("Testing concept...");
 						config.setStatusMessage("Testing concept...");
@@ -308,7 +308,7 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 					ksession.fireAllRules();
 
 					//ResultsCollectorWorkBench results = (ResultsCollectorWorkBench) ksession.getGlobal("resultsCollector");
-					//System.out.println("Results size: " + results.getResultsItems().size());
+					//AceLog.getAppLog().info("Results size: " + results.getResultsItems().size());
 					for (ResultsItem resultsItem : results.getResultsItems() ) {
 						ALERT_TYPE alertType = ALERT_TYPE.ERROR;
 
@@ -444,9 +444,9 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 		}
 
 		for (KnowledgePackage kpackg : kbase.getKnowledgePackages()) {
-			//System.out.println("** " + kpackg.getName());
+			//AceLog.getAppLog().info("** " + kpackg.getName());
 			for (Rule rule : kpackg.getRules()) {
-				//System.out.println("**** " + rule.getName());
+				//AceLog.getAppLog().info("**** " + rule.getName());
 				boolean excluded = false;
 				String ruleUid = rule.getMetaAttribute("UID");
 				if (ruleUid != null) {
@@ -542,11 +542,11 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 		KnowledgeBase kbase = getKnowledgeBase(kbId);
 
 		for (KnowledgePackage kpackg : kbase.getKnowledgePackages()) {
-			System.out.println("** " + kpackg.getName());
+			AceLog.getAppLog().info("** " + kpackg.getName());
 			for (Rule rule : kpackg.getRules()) {
-				System.out.println("**** " + rule.getName());
+				AceLog.getAppLog().info("**** " + rule.getName());
 				if (rule.getName().trim().equals("Check for double spaces")) {
-					System.out.println("****** " + rule.getMetaAttribute("UID"));
+					AceLog.getAppLog().info("****** " + rule.getMetaAttribute("UID"));
 					//kbase.removeRule(kpackg.getName(), rule.getName());
 				}
 			}
@@ -671,23 +671,23 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 				AceLog.getAppLog().alertAndLogException(e);
 			}
 			if (kbase == null || kbase.getKnowledgePackages().size() == 0) {
-				System.out.println("WARNING: Agent based connection with guvnor not available, trying to load from cache...");
+				AceLog.getAppLog().info("WARNING: Agent based connection with guvnor not available, trying to load from cache...");
 				kbase = getKnowledgeBaseFromFileCache(referenceUuid);
 				if (kbase != null && kbase.getKnowledgePackages().size() > 0) {
-					System.out.println("INFO: Cache load OK.");
+					AceLog.getAppLog().info("INFO: Cache load OK.");
 				} else {
-					System.out.println("WARNING: Cache loading failed.");
+					AceLog.getAppLog().info("WARNING: Cache loading failed.");
 				}
 			}
 		} else  {
 			kbase = getKnowledgeBaseFromFileCache(referenceUuid);
 			if (kbase == null || kbase.getKnowledgePackages().size() == 0) {
-				System.out.println("INFO: Trying Guvnor...");
+				AceLog.getAppLog().info("INFO: Trying Guvnor...");
 				kbase = getKnowledgeBaseWithAgent(referenceUuid, bytes);
 				if (kbase != null && kbase.getKnowledgePackages().size() > 0) {
-					System.out.println("INFO: Guvnor load OK.");
+					AceLog.getAppLog().info("INFO: Guvnor load OK.");
 				} else {
-					System.out.println("WARNING: Guvnor loading failed, No knowledgebase.");
+					AceLog.getAppLog().info("WARNING: Guvnor loading failed, No knowledgebase.");
 				}
 			}
 		}
@@ -1155,7 +1155,7 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 				guvnorEnumerationText = guvnorEnumerationText + "',";
 			}
 			guvnorEnumerationText = guvnorEnumerationText.substring(0, guvnorEnumerationText.length()-1) + "]";
-			System.out.println(guvnorEnumerationText);
+			AceLog.getAppLog().info(guvnorEnumerationText);
 
 			Sardine sardine = SardineFactory.begin("username", "password");
 
@@ -1185,7 +1185,7 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 	 */
 	public static boolean isIncludedInRefsetSpec(I_GetConceptData refset, I_GetConceptData candidateConcept, I_ConfigAceFrame config) {
 		boolean result = false;
-		//		System.out.println("************ Starting test computation *****************");
+		//		AceLog.getAppLog().info("************ Starting test computation *****************");
 		Long start = System.currentTimeMillis();
 		try {
 			RefsetSpec refsetSpecHelper = new RefsetSpec(refset, true, config);
@@ -1232,9 +1232,9 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 
 			I_GetConceptData selectedConcept = candidateConcept;
 
-			//			System.out.println("Refset spec = " + refsetSpec.toString());
-			//			System.out.println("Refset = " + refset.toString());
-			//			System.out.println("Concept to test = " + selectedConcept.toString());
+			//			AceLog.getAppLog().info("Refset spec = " + refsetSpec.toString());
+			//			AceLog.getAppLog().info("Refset = " + refset.toString());
+			//			AceLog.getAppLog().info("Concept to test = " + selectedConcept.toString());
 
 			List<I_ShowActivity> activities = new ArrayList<I_ShowActivity>();
 			result = query.execute(selectedConcept, activities);
@@ -1253,8 +1253,8 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 			//			}
 
 
-			//			System.out.println("++++++++++++++ Result = " + result);
-			//			System.out.println("************ Finished test computation in " + (System.currentTimeMillis() - start) + " ms. *****************");
+			//			AceLog.getAppLog().info("++++++++++++++ Result = " + result);
+			//			AceLog.getAppLog().info("************ Finished test computation in " + (System.currentTimeMillis() - start) + " ms. *****************");
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
 			try {
@@ -1279,14 +1279,14 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 
 		XMLConfiguration config = new XMLConfiguration("rules/rules-documentation-config.xml");
 		String template = config.getString("urlTemplate");
-		System.out.println("Template: " + template);
+		AceLog.getAppLog().info("Template: " + template);
 		Object rules = config.getProperty("rules.rule.uuid");
 		if(rules instanceof Collection)
 		{
-			System.out.println("Number of rules: " + ((Collection) rules).size());
+			AceLog.getAppLog().info("Number of rules: " + ((Collection) rules).size());
 			for (int i = 0; i<= ((Collection) rules).size()-1; i++) {
-				System.out.println(i + "- UUID: " + config.getString("rules.rule(" + i + ").uuid"));
-				System.out.println(i + "- Address: " + config.getString("rules.rule(" + i + ").address"));
+				AceLog.getAppLog().info(i + "- UUID: " + config.getString("rules.rule(" + i + ").uuid"));
+				AceLog.getAppLog().info(i + "- Address: " + config.getString("rules.rule(" + i + ").address"));
 
 				if (ruleUuid.equals(UUID.fromString(config.getString("rules.rule(" + i + ").uuid")))) {
 					String urlString = template.replace("*", config.getString("rules.rule(" + i + ").address"));

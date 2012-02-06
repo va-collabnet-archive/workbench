@@ -23,6 +23,7 @@ import org.drools.KnowledgeBaseFactory;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
+import org.dwfa.ace.log.AceLog;
 
 /**
  * The Class TestMemoryLeak.
@@ -51,7 +52,7 @@ public class TestMemoryLeak extends TestCase {
 
            for(int i = 0; i < 1000; i++) {
 
-                  System.out.println("Run " + i);
+                  AceLog.getAppLog().info("Run " + i);
 
                   session = kbase.newStatefulKnowledgeSession();
 

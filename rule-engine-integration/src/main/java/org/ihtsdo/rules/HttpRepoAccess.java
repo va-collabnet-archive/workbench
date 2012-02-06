@@ -67,15 +67,15 @@ public class HttpRepoAccess {
 			urlConn.setUseCaches(false);
 			
 			String authString = "name:pass";
-			System.out.println("auth string: " + authString);
+			AceLog.getAppLog().info("auth string: " + authString);
 			byte[] authEncBytes = Base64.encodeBase64(authString.getBytes());
 			String authStringEnc = new String(authEncBytes);
-			System.out.println("Base64 encoded auth string: " + authStringEnc);
+			AceLog.getAppLog().info("Base64 encoded auth string: " + authStringEnc);
 			urlConn.setRequestProperty("Authorization", "Basic " + authStringEnc);
 			dis = new DataInputStream(urlConn.getInputStream()); 
 			String s; 
 			while ((s = dis.readLine()) != null) { 
-				System.out.println(s); 
+				AceLog.getAppLog().info(s); 
 			} 
 			dis.close(); 
 		} catch (MalformedURLException mue) {
@@ -94,11 +94,11 @@ public class HttpRepoAccess {
 			List<DavResource> resources = sardine.getResources("http://208.109.105.1:8080/drools-guvnor/org.drools.guvnor.Guvnor/webdav/packages/qa4/legacy%20enums.enumeration");
 			for (DavResource res : resources)
 			{
-			     System.out.println(res); // calls the .toString() method.
+			     AceLog.getAppLog().info(res.toString()); // calls the .toString() method.
 			     BufferedReader reader = new BufferedReader(new InputStreamReader(sardine.getInputStream(res.getAbsoluteUrl()), "UTF-8"));
 			     String line;
 			     while ((line = reader.readLine()) != null) {
-			    	 System.out.println(line);
+			    	 AceLog.getAppLog().info(line);
 			    	 }
 			}
 			
@@ -114,15 +114,15 @@ public class HttpRepoAccess {
 		try {
 			Sardine sardine = SardineFactory.begin("username", "password");
 			sardine.put("http://208.109.105.1:8080/drools-guvnor/org.drools.guvnor.Guvnor/webdav/packages/qa4/insertedEnum.enumeration", "prueba".getBytes());
-			System.out.println("Put finished...");
+			AceLog.getAppLog().info("Put finished...");
 			List<DavResource> resources = sardine.getResources("http://208.109.105.1:8080/drools-guvnor/org.drools.guvnor.Guvnor/webdav/packages/qa4/insertedEnum.enumeration");
 			for (DavResource res : resources)
 			{
-			     System.out.println(res); // calls the .toString() method.
+			     AceLog.getAppLog().info(res.toString()); // calls the .toString() method.
 			     BufferedReader reader = new BufferedReader(new InputStreamReader(sardine.getInputStream(res.getAbsoluteUrl()), "UTF-8"));
 			     String line;
 			     while ((line = reader.readLine()) != null) {
-			    	 System.out.println(line);
+			    	 AceLog.getAppLog().info(line);
 			    	 }
 			}
 			
@@ -143,28 +143,28 @@ public class HttpRepoAccess {
 			PrintWriter pwriter = new PrintWriter(writer);
 			for (DavResource res : resources)
 			{
-			     System.out.println(res); // calls the .toString() method.
+			     AceLog.getAppLog().info(res.toString()); // calls the .toString() method.
 			     BufferedReader reader = new BufferedReader(new InputStreamReader(sardine.getInputStream(res.getAbsoluteUrl()), "UTF-8"));
 			     String line;
 			     while ((line = reader.readLine()) != null) {
 			    	 pwriter.println(line);
-			    	 System.out.println(line);
+			    	 AceLog.getAppLog().info(line);
 			    	 current = line;
 			    	 }
 			}
 			pwriter.println("Otra linea");
 			//sardine.delete("http://208.109.105.1:8080/drools-guvnor/org.drools.guvnor.Guvnor/webdav/packages/qa4/insertedEnum.enumeration");
-			//System.out.println("Delete finished...");
+			//AceLog.getAppLog().info("Delete finished...");
 			sardine.put("http://208.109.105.1:8080/drools-guvnor/org.drools.guvnor.Guvnor/webdav/packages/qa4/insertedEnum.enumeration", writer.toString().getBytes());
-			System.out.println("Put finished...");
+			AceLog.getAppLog().info("Put finished...");
 			resources = sardine.getResources("http://208.109.105.1:8080/drools-guvnor/org.drools.guvnor.Guvnor/webdav/packages/qa4/insertedEnum.enumeration");
 			for (DavResource res : resources)
 			{
-			     System.out.println(res); // calls the .toString() method.
+			     AceLog.getAppLog().info(res.toString()); // calls the .toString() method.
 			     BufferedReader reader = new BufferedReader(new InputStreamReader(sardine.getInputStream(res.getAbsoluteUrl()), "UTF-8"));
 			     String line;
 			     while ((line = reader.readLine()) != null) {
-			    	 System.out.println(line);
+			    	 AceLog.getAppLog().info(line);
 			    	 }
 			}
 			

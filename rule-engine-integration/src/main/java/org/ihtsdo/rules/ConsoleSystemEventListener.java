@@ -17,6 +17,7 @@
 package org.ihtsdo.rules;
 
 import org.drools.SystemEventListener;
+import org.dwfa.ace.log.AceLog;
 
 /**
  * The listener interface for receiving consoleSystemEvent events.
@@ -43,7 +44,7 @@ public class ConsoleSystemEventListener implements SystemEventListener {
 	 * @see org.drools.SystemEventListener#debug(java.lang.String)
 	 */
 	public void debug(String arg0) {
-		System.out.println("DEBUG: " + arg0);
+		AceLog.getAppLog().info("DEBUG: " + arg0);
 	}
 
 	/* (non-Javadoc)
@@ -51,10 +52,10 @@ public class ConsoleSystemEventListener implements SystemEventListener {
 	 */
 	@Override
 	public void debug(String arg0, Object arg1) {
-		System.out.println("DEBUG M: " + arg0);
+		AceLog.getAppLog().info("DEBUG M: " + arg0);
 		if (arg1 instanceof Exception) {
 			Exception e = (Exception) arg1;
-			System.out.println("DEBUG EX: " + e.getMessage());
+			AceLog.getAppLog().info("DEBUG EX: " + e.getMessage());
 		}
 	}
 
@@ -65,10 +66,10 @@ public class ConsoleSystemEventListener implements SystemEventListener {
 	public void exception(Throwable arg0) {
 		if (arg0 instanceof RuntimeException) {
 			RuntimeException r = (RuntimeException) arg0;
-			System.out.println("EXCEPTION Runtime: " + arg0.getMessage());
-			System.out.println("EXCEPTION Cause: " + r.getCause().getMessage());
+			AceLog.getAppLog().info("EXCEPTION Runtime: " + arg0.getMessage());
+			AceLog.getAppLog().info("EXCEPTION Cause: " + r.getCause().getMessage());
 		}
-		System.out.println("EXCEPTION: " + arg0.getMessage());
+		AceLog.getAppLog().info("EXCEPTION: " + arg0.getMessage());
 	}
 
 	/* (non-Javadoc)
@@ -76,13 +77,13 @@ public class ConsoleSystemEventListener implements SystemEventListener {
 	 */
 	@Override
 	public void exception(String arg0, Throwable arg1) {
-		System.out.println("EXCEPTION M: " + arg0);
+		AceLog.getAppLog().info("EXCEPTION M: " + arg0);
 		if (arg1 instanceof RuntimeException) {
 			RuntimeException r = (RuntimeException) arg1;
-			System.out.println("EXCEPTION Runtime: " + arg1.getMessage());
-			System.out.println("EXCEPTION Cause: " + r.getCause().getMessage());
+			AceLog.getAppLog().info("EXCEPTION Runtime: " + arg1.getMessage());
+			AceLog.getAppLog().info("EXCEPTION Cause: " + r.getCause().getMessage());
 		}
-		System.out.println("EXCEPTION: " + arg1.getMessage());
+		AceLog.getAppLog().info("EXCEPTION: " + arg1.getMessage());
 	}
 
 	/* (non-Javadoc)
@@ -90,7 +91,7 @@ public class ConsoleSystemEventListener implements SystemEventListener {
 	 */
 	@Override
 	public void info(String arg0) {
-		System.out.println("INFO: " + arg0);
+		AceLog.getAppLog().info("INFO: " + arg0);
 	}
 
 	/* (non-Javadoc)
@@ -98,10 +99,10 @@ public class ConsoleSystemEventListener implements SystemEventListener {
 	 */
 	@Override
 	public void info(String arg0, Object arg1) {
-		System.out.println("INFO M: " + arg0);
+		AceLog.getAppLog().info("INFO M: " + arg0);
 		if (arg1 instanceof Exception) {
 			Exception e = (Exception) arg1;
-			System.out.println("INFO EX: " + e.getMessage());
+			AceLog.getAppLog().info("INFO EX: " + e.getMessage());
 		}
 	}
 
@@ -110,7 +111,7 @@ public class ConsoleSystemEventListener implements SystemEventListener {
 	 */
 	@Override
 	public void warning(String arg0) {
-		System.out.println("WARNING: " + arg0);
+		AceLog.getAppLog().info("WARNING: " + arg0);
 	}
 
 	/* (non-Javadoc)
@@ -118,10 +119,10 @@ public class ConsoleSystemEventListener implements SystemEventListener {
 	 */
 	@Override
 	public void warning(String arg0, Object arg1) {
-		System.out.println("WARNING M: " + arg0);
+		AceLog.getAppLog().info("WARNING M: " + arg0);
 		if (arg1 instanceof Exception) {
 			Exception e = (Exception) arg1;
-			System.out.println("WARNING EX: " + e.getMessage());
+			AceLog.getAppLog().info("WARNING EX: " + e.getMessage());
 		}
 	}
 

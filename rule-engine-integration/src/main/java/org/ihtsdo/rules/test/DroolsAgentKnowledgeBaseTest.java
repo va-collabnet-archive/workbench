@@ -70,10 +70,10 @@ public class DroolsAgentKnowledgeBaseTest extends TestCase {
 	 */
 	public void testStateFull() {
 		try {
-//			System.out.println("Updating knowledge base...");
+//			AceLog.getAppLog().info("Updating knowledge base...");
 //			RulesLibrary.getKnowledgeBase(RulesLibrary.CONCEPT_MODEL_PKG, 
 //					"rules/change-set.xml", true);
-//			System.out.println("Knowledge base updated");
+//			AceLog.getAppLog().info("Knowledge base updated");
 			
 //			UUID conceptUUID = UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8");
 //			Concept concept = new Concept(conceptUUID, null, true, null, false);
@@ -93,11 +93,11 @@ public class DroolsAgentKnowledgeBaseTest extends TestCase {
 //			objects.add(relationship);
 //			ResultsCollector results = RulesLibrary.checkObjectsTestModel(objects, 
 //					RulesLibrary.CONCEPT_MODEL_PKG);
-//			System.out.println("Done...");
-//			System.out.println("Results size: " + results.getResultsItems().size());
+//			AceLog.getAppLog().info("Done...");
+//			AceLog.getAppLog().info("Results size: " + results.getResultsItems().size());
 			
 //			for (int errorCode : results.getErrorCodes().keySet() ) {
-//				System.out.println(errorCode + " - " + results.getErrorCodes().get(errorCode));
+//				AceLog.getAppLog().info(errorCode + " - " + results.getErrorCodes().get(errorCode));
 //			}
 			
 		} catch (Exception e) {

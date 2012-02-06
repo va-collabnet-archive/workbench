@@ -128,7 +128,7 @@ public class RulesContextMatrixPanel extends JPanel {
 				if (isOnline) {
 					for (Rule rule : deloymentPackage.getRules()) {
 						rulesCount++;
-						//System.out.println("** rule: " + rule.getName());
+						//AceLog.getAppLog().info("** rule: " + rule.getName());
 						String ruleUid = null;
 						String description =  null;
 						String ditaUid = null;
@@ -142,7 +142,7 @@ public class RulesContextMatrixPanel extends JPanel {
 							//ditaUid = rule.getMetaAttribute("DITA_UID");
 						} catch (Exception e) {
 							// problem retrieving metadata, do nothing
-							System.out.println("Malformed metadata..");
+							AceLog.getAppLog().info("Malformed metadata..");
 						}
 						
 						if (description == null) description = "";
@@ -155,14 +155,14 @@ public class RulesContextMatrixPanel extends JPanel {
 
 						if (ruleUid != null) {
 							for (I_GetConceptData context : contexts) {
-								//System.out.println("** context: " + context.toString());
+								//AceLog.getAppLog().info("** context: " + context.toString());
 								//Look for agenda
 								String columnValue = "Included by default";
 								I_GetConceptData role = contextHelper.getRoleInContext(ruleUid, context);
 								if (role != null) {
 									columnValue = role.toString();
 								} 
-								//System.out.println("Adding: " + columnCheckBox);
+								//AceLog.getAppLog().info("Adding: " + columnCheckBox);
 								rowData.add(columnValue);
 							}
 						} else {

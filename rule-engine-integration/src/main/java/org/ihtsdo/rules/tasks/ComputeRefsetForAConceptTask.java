@@ -173,16 +173,16 @@ public class ComputeRefsetForAConceptTask extends AbstractTask {
             
             I_GetConceptData selectedConcept = configFrame.getHierarchySelection();
             
-            System.out.println("************ Starting test computation *****************");
-            System.out.println("Refset spec = " + refsetSpec.toString());
-            System.out.println("Refset = " + refset.toString());
-            System.out.println("Concept to test = " + selectedConcept.toString());
+            AceLog.getAppLog().info("************ Starting test computation *****************");
+            AceLog.getAppLog().info("Refset spec = " + refsetSpec.toString());
+            AceLog.getAppLog().info("Refset = " + refset.toString());
+            AceLog.getAppLog().info("Concept to test = " + selectedConcept.toString());
             
             List<I_ShowActivity> activities = new ArrayList<I_ShowActivity>();
             boolean result = query.execute(selectedConcept, activities);
             
-            System.out.println("++++++++++++++ Result = " + result);
-            System.out.println("************ Finished test computation *****************");
+            AceLog.getAppLog().info("++++++++++++++ Result = " + result);
+            AceLog.getAppLog().info("************ Finished test computation *****************");
             
 //            computeNestedRefsets(configFrame, showActivityPanel, query);
 //

@@ -171,7 +171,7 @@ public class RulesContextEditorPanel extends JPanel {
 						}
 					});
 					for (Rule rule : rulesList) {
-						// System.out.println("** rule: " + rule.getName());
+						// AceLog.getAppLog().info("** rule: " + rule.getName());
 						String ruleUid = null;
 						String description = null;
 						String ditaUid = null;
@@ -185,7 +185,7 @@ public class RulesContextEditorPanel extends JPanel {
 							// ditaUid = rule.getMetaAttribute("DITA_UID");
 						} catch (Exception e) {
 							// problem retrieving metadata, do nothing
-							System.out.println("Malformed metadata..");
+							AceLog.getAppLog().info("Malformed metadata..");
 						}
 
 						if (description == null)

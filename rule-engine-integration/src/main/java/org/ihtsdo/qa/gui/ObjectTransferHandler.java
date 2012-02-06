@@ -127,7 +127,7 @@ public class ObjectTransferHandler extends TransferHandler {
 							try {
 								getItem.getItemFromConcept(concept);
 							} catch (Exception e) {
-								System.out.println(e.getMessage());
+								AceLog.getAppLog().info(e.getMessage());
 								AceLog.getAppLog().alertAndLogException(e);
 								return false;
 							}
@@ -249,10 +249,10 @@ public class ObjectTransferHandler extends TransferHandler {
 				}
 				return true;
 			} catch (UnsupportedFlavorException ufe) {
-				System.out.println("importData: unsupported data flavor");
+				AceLog.getAppLog().info("importData: unsupported data flavor");
 				AceLog.getAppLog().alertAndLogException(ufe);
 			} catch (IOException ioe) {
-				System.out.println("importData: I/O exception");
+				AceLog.getAppLog().info("importData: I/O exception");
 				AceLog.getAppLog().alertAndLogException(ioe);
 			}
 		}

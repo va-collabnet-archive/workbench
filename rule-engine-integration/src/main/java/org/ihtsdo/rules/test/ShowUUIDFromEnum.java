@@ -16,6 +16,7 @@
  */
 package org.ihtsdo.rules.test;
 
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.util.id.Type3UuidFactory;
 
@@ -30,11 +31,11 @@ public class ShowUUIDFromEnum {
 	 * @param args the arguments
 	 */
 	public static void main(String[] args) {
-		System.out.println("PreCommit: " + 
+		AceLog.getAppLog().info("PreCommit: " + 
 				Type3UuidFactory.fromEnum(RefsetAuxiliary.Concept.REALTIME_PRECOMMIT_QA_CONTEXT));
-		System.out.println("Realtime: " + 
+		AceLog.getAppLog().info("Realtime: " + 
 				Type3UuidFactory.fromEnum(RefsetAuxiliary.Concept.REALTIME_QA_CONTEXT));
-		System.out.println("Batch: " + 
+		AceLog.getAppLog().info("Batch: " + 
 				Type3UuidFactory.fromEnum(RefsetAuxiliary.Concept.BATCH_QA_CONTEXT));
 
 	}

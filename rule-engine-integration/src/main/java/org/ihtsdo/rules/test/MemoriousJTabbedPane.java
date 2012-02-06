@@ -86,7 +86,7 @@ public class MemoriousJTabbedPane extends JTabbedPane {
 	public void removeTabAt(int index) {
 		boolean removedTabWasSelected = (index == getSelectedIndex());
 		// Clean references to removed tab
-		while (registeredIndexes.remove(new Integer(index)));
+		while (registeredIndexes.remove(new Integer(index))); // NOSONAR
 		// Remove tab with superclass method
 		super.removeTabAt(index);
 		// Do nothing if the first and only selected tab was removed

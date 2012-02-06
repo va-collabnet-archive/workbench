@@ -75,10 +75,10 @@ public class DroolsUncommittedAgentKnowledgeBaseTest extends TestCase {
 	 */
 	public void testStateFull() {
 		try {
-			System.out.println("Updating knowledge base...");
+			AceLog.getAppLog().info("Updating knowledge base...");
 			RulesLibrary.getKnowledgeBase(RulesLibrary.CONCEPT_MODEL_PKG, 
 					"rules/change-set.xml", true);
-			System.out.println("Knowledge base updated");
+			AceLog.getAppLog().info("Knowledge base updated");
 			tf = Terms.get();
 			
 			I_GetConceptData concept = tf.getConcept(UUID.fromString("c265cf22-2a11-3488-b71e-296ec0317f96"));
@@ -94,11 +94,11 @@ public class DroolsUncommittedAgentKnowledgeBaseTest extends TestCase {
 //			objects.add(new TransitiveClosureHelperMock());
 			ResultsCollector results = RulesLibrary.checkObjectsTestModel(objects, 
 					RulesLibrary.CONCEPT_MODEL_PKG);
-			System.out.println("Done...");
-			System.out.println("Results size: " + results.getResultsItems().size());
+			AceLog.getAppLog().info("Done...");
+			AceLog.getAppLog().info("Results size: " + results.getResultsItems().size());
 			
 //			for (int errorCode : results.getErrorCodes().keySet() ) {
-//				System.out.println(errorCode + " - " + results.getErrorCodes().get(errorCode));
+//				AceLog.getAppLog().info(errorCode + " - " + results.getErrorCodes().get(errorCode));
 //			}
 			
 		} catch (Exception e) {

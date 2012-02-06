@@ -90,31 +90,31 @@ public class DomainModelTestCheck extends TestCase {
 	public void testStateFull() {
 		try {
 			I_GetConceptData concept = tf.getConcept(UUID.fromString("5ee78031-c76d-3b01-8df7-3d5243ba7876"));
-			System.out.println("Concept: " + concept);
-			System.out.println("Updating knowledge base...");
+			AceLog.getAppLog().info("Concept: " + concept);
+			AceLog.getAppLog().info("Updating knowledge base...");
 			HashMap<Resource, ResourceType> resources = new HashMap<Resource, ResourceType>();
 			resources.put( ResourceFactory.newFileResource("rules/sample-descriptions-rules.drl"), ResourceType.DRL );
 			//resources.put( ResourceFactory.newFileResource("rules/sample-relationships-rules.drl"), ResourceType.DRL );
 			RulesLibrary.getKnowledgeBase(RulesLibrary.CONCEPT_MODEL_PKG, true, resources);
-			System.out.println("Knowledge base updated");
+			AceLog.getAppLog().info("Knowledge base updated");
 			ResultsCollectorWorkBench resultsCollector = RulesLibrary.checkConcept(concept, RulesLibrary.CONCEPT_MODEL_PKG,false);
 			List<AlertToDataConstraintFailure> results = resultsCollector.getAlertList();
-			System.out.println("Done..." + results.size());
-			System.out.println("Results size: " + results.size());
+			AceLog.getAppLog().info("Done..." + results.size());
+			AceLog.getAppLog().info("Results size: " + results.size());
 			for (AlertToDataConstraintFailure alert : results) {
-				System.out.println(alert.getAlertMessage());
+				AceLog.getAppLog().info(alert.getAlertMessage());
 			}
 			resources = new HashMap<Resource, ResourceType>();
 			resources.put( ResourceFactory.newFileResource("rules/sample-guidelines-rules.drl"), ResourceType.DRL );
 			//resources.put( ResourceFactory.newFileResource("rules/sample-relationships-rules.drl"), ResourceType.DRL );
 			RulesLibrary.getKnowledgeBase(RulesLibrary.LINGUISTIC_GUIDELINES_PKG, true, resources);
-			System.out.println("Knowledge base updated");
+			AceLog.getAppLog().info("Knowledge base updated");
 			resultsCollector = RulesLibrary.checkConcept(concept, RulesLibrary.LINGUISTIC_GUIDELINES_PKG,false);
 			results = resultsCollector.getAlertList();
-			System.out.println("Done..." + results.size());
-			System.out.println("Results size: " + results.size());
+			AceLog.getAppLog().info("Done..." + results.size());
+			AceLog.getAppLog().info("Results size: " + results.size());
 			for (AlertToDataConstraintFailure alert : results) {
-				System.out.println(alert.getAlertMessage());
+				AceLog.getAppLog().info(alert.getAlertMessage());
 			}
 		} catch (TerminologyException e) {
 			AceLog.getAppLog().alertAndLogException(e);

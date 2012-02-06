@@ -239,7 +239,7 @@ public class RulesContextHelper {
 					Terms.get().setKnowledgeBaseCache(kbCache);
 					lastCacheUpdateTime = Calendar.getInstance().getTimeInMillis();
 				} else {
-					System.out.println("ERROR: Required flow file is missing in rules folder: " + flow.getName());
+					AceLog.getAppLog().info("ERROR: Required flow file is missing in rules folder: " + flow.getName());
 				}
 				returnBase = kbase;
 			}
@@ -802,7 +802,7 @@ public class RulesContextHelper {
 		Boolean alreadyThere = false;
 		for (RulesDeploymentPackageReference loopPkg : currentPkgs) {
 			if (loopPkg.getUuids().containsAll(pkgReference.getUuids())) {
-				//System.out.println("Setting to true...");
+				//AceLog.getAppLog().info("Setting to true...");
 				alreadyThere = true;
 			}
 		}

@@ -93,9 +93,9 @@ public class RulesBrowserPanel extends JPanel {
 		}
 
 		for (KnowledgePackage kpackg : kbase.getKnowledgePackages()) {
-			//System.out.println("** " + kpackg.getName());
+			//AceLog.getAppLog().info("** " + kpackg.getName());
 			for (Rule rule : kpackg.getRules()) {
-				//System.out.println("**** " + rule.getName());
+				//AceLog.getAppLog().info("**** " + rule.getName());
 				boolean excluded = false;
 				//String ruleUid = (String) rule.getMetaData().get("UID");
 				String ruleUid = (String) rule.getMetaAttribute("UID");

@@ -16,8 +16,6 @@
  */
 package org.ihtsdo.qa.store.model.view;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 

@@ -80,13 +80,13 @@ public class TestEnums extends TestCase {
 	 */
 	protected void setUp() throws Exception {
 		super.setUp();
-		System.out.println("Deleting test fixture");
+		AceLog.getAppLog().info("Deleting test fixture");
 		deleteDirectory(new File("berkeley-db"));
-		System.out.println("Creating test fixture");
+		AceLog.getAppLog().info("Creating test fixture");
 		copyDirectory(new File("src/test/java/org/ihtsdo/rules/test/context/berkeley-db"), new File("berkeley-db"));
 		vodbDirectory = new File("berkeley-db");
 		dbSetupConfig = new DatabaseSetupConfig();
-		System.out.println("Opening database");
+		AceLog.getAppLog().info("Opening database");
 		Terms.createFactory(vodbDirectory, readOnly, cacheSize, dbSetupConfig);
 		tf = (I_ImplementTermFactory) Terms.get();
 		config = getTestConfig();
@@ -161,7 +161,7 @@ public class TestEnums extends TestCase {
 		
 		RulesLibrary.updateGuvnorEnumerations(refset, package1, config);
 		
-		System.out.println("End!");
+		AceLog.getAppLog().info("End!");
 
 	}
 

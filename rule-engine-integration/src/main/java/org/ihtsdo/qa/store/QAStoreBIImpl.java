@@ -96,11 +96,11 @@ public class QAStoreBIImpl implements QAStoreBI {
 	 * @param url the url
 	 */
 	public QAStoreBIImpl(String url) {
-		System.out.println("#######################################################");
-		System.out.println();
-		System.out.println(url);
-		System.out.println();
-		System.out.println("#######################################################");
+		AceLog.getAppLog().info("#######################################################");
+		AceLog.getAppLog().info("");
+		AceLog.getAppLog().info(url);
+		AceLog.getAppLog().info("");
+		AceLog.getAppLog().info("#######################################################");
 		if (url != null) {
 			this.url = url;
 		}

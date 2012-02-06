@@ -82,13 +82,13 @@ public class TestContexts extends TestCase {
 	 */
 	protected void setUp() throws Exception {
 		super.setUp();
-		System.out.println("Deleting test fixture");
+		AceLog.getAppLog().info("Deleting test fixture");
 		deleteDirectory(new File("berkeley-db"));
-		System.out.println("Creating test fixture");
+		AceLog.getAppLog().info("Creating test fixture");
 		copyDirectory(new File("src/test/java/org/ihtsdo/rules/test/context/berkeley-db"), new File("berkeley-db"));
 		vodbDirectory = new File("berkeley-db");
 		dbSetupConfig = new DatabaseSetupConfig();
-		System.out.println("Opening database");
+		AceLog.getAppLog().info("Opening database");
 		Terms.createFactory(vodbDirectory, readOnly, cacheSize, dbSetupConfig);
 		tf = (I_ImplementTermFactory) Terms.get();
 		config = getTestConfig();
@@ -132,7 +132,7 @@ public class TestContexts extends TestCase {
 			assertNull(contextHelper.getRoleInContext(ruleUid, context1));
 		}
 		
-		System.out.println("Checking contexts...");
+		AceLog.getAppLog().info("Checking contexts...");
 		assertEquals(null, contextHelper.getRoleInContext("f7bd3b50-9c1e-11df-981c-0800200c9a66", context2));
 		assertEquals(null, contextHelper.getRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context2));
 		assertEquals(null, contextHelper.getRoleInContext("f7bd3b50-9c1e-11df-981c-0800200c9a66", context3));
@@ -247,7 +247,7 @@ public class TestContexts extends TestCase {
 		results = RulesLibrary.checkConcept(testConcept, context1, false, config);
 		assertEquals(1,results.getResultsItems().size());
 		
-		System.out.println("End!");
+		AceLog.getAppLog().info("End!");
 
 	}
 

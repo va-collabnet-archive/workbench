@@ -77,11 +77,11 @@ public class TestObjectCheck extends TestCase {
 	 */
 	public void testStateFull() {
 		try {
-			System.out.println("Updating knowledge base...");
+			AceLog.getAppLog().info("Updating knowledge base...");
 			HashMap<Resource, ResourceType> resources = new HashMap<Resource, ResourceType>();
 			resources.put( ResourceFactory.newFileResource("rules/sample-descriptions-rules-for-objects.drl"), ResourceType.DRL );
 			RulesLibrary.getKnowledgeBase(RulesLibrary.CONCEPT_MODEL_PKG, true, resources);
-			System.out.println("Knowledge base updated");
+			AceLog.getAppLog().info("Knowledge base updated");
 			UUID conceptUUID = UUID.randomUUID();
 //			Concept concept = new Concept(conceptUUID, null, true, null, false);
 //			Description description = new Description(UUID.randomUUID(), null, true, null, conceptUUID, null, null, 
@@ -91,8 +91,8 @@ public class TestObjectCheck extends TestCase {
 //			objects.add(description);
 			ResultsCollectorWorkBench results = RulesLibrary.checkObjects(objects, 
 					RulesLibrary.CONCEPT_MODEL_PKG);
-			System.out.println("Done...");
-			System.out.println("Results size: " + results.getResultsItems().size());
+			AceLog.getAppLog().info("Done...");
+			AceLog.getAppLog().info("Results size: " + results.getResultsItems().size());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			AceLog.getAppLog().alertAndLogException(e);
