@@ -18,7 +18,6 @@ package org.ihtsdo.rules.tasks;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -29,6 +28,7 @@ import java.util.Properties;
 import javax.swing.JFrame;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -110,7 +110,7 @@ public class OpenCaseManager extends AbstractTask {
 				props.load(new FileInputStream("rules/qa_ws.properties"));
 				endpoint = props.getProperty("ws_endpoint");
 			}catch (IOException e) {
-				 e.printStackTrace();
+				 AceLog.getAppLog().alertAndLogException(e);
 			}
 			frame.getContentPane().add(new QAStorePanel(new QAStoreBIImpl(endpoint)), BorderLayout.CENTER);
 

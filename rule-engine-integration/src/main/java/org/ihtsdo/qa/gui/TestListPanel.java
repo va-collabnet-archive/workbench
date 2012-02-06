@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.qa.gui;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -29,6 +45,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.rules.CheckConceptTask;
 import org.ihtsdo.rules.RulesLibrary.INFERRED_VIEW_ORIGIN;
 import org.ihtsdo.rules.context.RulesContextHelper;
@@ -36,35 +53,83 @@ import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
 import org.ihtsdo.tk.helper.ResultsItem;
 
 /**
+ * The Class TestListPanel.
+ *
  * @author Guillermo Reynoso
  */
 public class TestListPanel extends JPanel {
+   
+   /** The context helper. */
    private RulesContextHelper contextHelper = null;
+   
+   /** The list1 model. */
    private DefaultListModel   list1Model    = new DefaultListModel();
+   
+   /** The table1 model. */
    private DefaultTableModel  table1Model   = null;
+   
+   /** The button1. */
    private JButton            button1;
+   
+   /** The button2. */
    private JButton            button2;
+   
+   /** The button3. */
    private JButton            button3;
+   
+   /** The button4. */
    private JButton            button4;
+   
+   /** The combo box1. */
    private JComboBox          comboBox1;
+   
+   /** The config. */
    private I_ConfigAceFrame   config;
+   
+   /** The label1. */
    private JLabel             label1;
+   
+   /** The label2. */
    private JLabel             label2;
+   
+   /** The label3. */
    private JLabel             label3;
+   
+   /** The label4. */
    private JLabel             label4;
+   
+   /** The list1. */
    private JList              list1;
 
    // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+   /** The panel1. */
    private JPanel      panel1;
+   
+   /** The panel2. */
    private JPanel      panel2;
+   
+   /** The panel3. */
    private JPanel      panel3;
+   
+   /** The panel4. */
    private JPanel      panel4;
+   
+   /** The scroll pane1. */
    private JScrollPane scrollPane1;
+   
+   /** The scroll pane2. */
    private JScrollPane scrollPane2;
+   
+   /** The table1. */
    private JTable      table1;
 
    //~--- constructors --------------------------------------------------------
 
+   /**
+    * Instantiates a new test list panel.
+    *
+    * @param config the config
+    */
    public TestListPanel(I_ConfigAceFrame config) {
       initComponents();
       this.config        = config;
@@ -88,20 +153,40 @@ public class TestListPanel extends JPanel {
 
    //~--- methods -------------------------------------------------------------
 
+   /**
+    * Button1 action performed.
+    *
+    * @param e the e
+    */
    private void button1ActionPerformed(ActionEvent e) {
       updateList1();
    }
 
+   /**
+    * Button2 action performed.
+    *
+    * @param e the e
+    */
    private void button2ActionPerformed(ActionEvent e) {
       testConcepts();
    }
 
+   /**
+    * Button3 action performed.
+    *
+    * @param e the e
+    */
    private void button3ActionPerformed(ActionEvent e) {
 
       // Clear Cache
       contextHelper.clearCache();
    }
 
+   /**
+    * Button4 action performed.
+    *
+    * @param e the e
+    */
    private void button4ActionPerformed(ActionEvent e) {
       try {
          for (IsaCoordinate isac :
@@ -109,10 +194,13 @@ public class TestListPanel extends JPanel {
             Terms.get().setupIsaCacheAndWait(isac);
          }
       } catch (Exception e2) {
-         e2.printStackTrace();
+    	  AceLog.getAppLog().alertAndLogException(e2);
       }
    }
 
+   /**
+    * Inits the components.
+    */
    private void initComponents() {
 
       // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -296,6 +384,9 @@ public class TestListPanel extends JPanel {
       // JFormDesigner - End of component initialization  //GEN-END:initComponents
    }
 
+   /**
+    * Test concepts.
+    */
    private void testConcepts() {
       label4.setText("");
       label4.revalidate();
@@ -342,9 +433,9 @@ public class TestListPanel extends JPanel {
                                                                 + resultsItem.getMessage() });
                            }
                         } catch (InterruptedException e) {
-                           e.printStackTrace();
+                           AceLog.getAppLog().alertAndLogException(e);
                         } catch (ExecutionException e) {
-                           e.printStackTrace();
+                           AceLog.getAppLog().alertAndLogException(e);
                         }
                      }
                   }
@@ -356,7 +447,7 @@ public class TestListPanel extends JPanel {
 
             // ResultsCollectorWorkBench results = RulesLibrary.checkConcept(loopConcept, context, false, config, contextHelper, INFERRED_VIEW_ORIGIN.FULL);
          } catch (Exception e) {
-            e.printStackTrace();
+            AceLog.getAppLog().alertAndLogException(e);
          }
       }
 
@@ -367,6 +458,9 @@ public class TestListPanel extends JPanel {
       table1.repaint();
    }
 
+   /**
+    * Update list1.
+    */
    private void updateList1() {
       list1Model.removeAllElements();
 
@@ -393,7 +487,7 @@ public class TestListPanel extends JPanel {
             comboBox1.addItem(context);
          }
       } catch (Exception e) {
-         e.printStackTrace();
+         AceLog.getAppLog().alertAndLogException(e);
       }
    }
 

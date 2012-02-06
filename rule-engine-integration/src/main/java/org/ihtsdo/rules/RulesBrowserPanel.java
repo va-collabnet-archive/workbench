@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Sun Apr 25 17:56:17 GMT-04:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.rules;
@@ -25,16 +38,34 @@ import org.drools.definition.KnowledgePackage;
 import org.drools.definition.rule.Rule;
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.log.AceLog;
 
 /**
+ * The Class RulesBrowserPanel.
+ *
  * @author Guillermo Reynoso
  */
 public class RulesBrowserPanel extends JPanel {
+	
+	/** The kbase. */
 	KnowledgeBase kbase;
+	
+	/** The table model. */
 	BooleanTableModel tableModel;
+	
+	/** The agenda. */
 	RulesAgenda agenda;
+	
+	/** The config. */
 	I_ConfigAceFrame config;
 
+	/**
+	 * Instantiates a new rules browser panel.
+	 *
+	 * @param kbase the kbase
+	 * @param config the config
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public RulesBrowserPanel(KnowledgeBase kbase, I_ConfigAceFrame config) throws IOException {
 		this.kbase = kbase;
 		this.config = config;
@@ -83,6 +114,11 @@ public class RulesBrowserPanel extends JPanel {
 		table1.validate();
 	}
 
+	/**
+	 * Button1 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button1ActionPerformed(ActionEvent e) {
 		for (int i=0; i < tableModel.getRowCount(); i++) {
 			if (tableModel.getValueAt(i, 2).equals(true)) {
@@ -98,47 +134,87 @@ public class RulesBrowserPanel extends JPanel {
 		try {
 			config.getDbConfig().setProperty("RulesAgenda", agenda);
 		} catch (IOException e1) {
-			e1.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e1);
 		}
 		config.setStatusMessage("Exclusions configuration saved...");
 	}
 
+	/**
+	 * The Class BooleanTableModel.
+	 */
 	public class BooleanTableModel extends DefaultTableModel {
 
-		/**
-		 * 
-		 */
+		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = 1L;
 
+		/**
+		 * Instantiates a new boolean table model.
+		 */
 		public BooleanTableModel() {
 			super();
 		}
 
+		/**
+		 * Instantiates a new boolean table model.
+		 *
+		 * @param rowCount the row count
+		 * @param columnCount the column count
+		 */
 		public BooleanTableModel(int rowCount, int columnCount) {
 			super(rowCount, columnCount);
 		}
 
+		/**
+		 * Instantiates a new boolean table model.
+		 *
+		 * @param columnNames the column names
+		 * @param rowCount the row count
+		 */
 		public BooleanTableModel(Object[] columnNames, int rowCount) {
 			super(columnNames, rowCount);
 		}
 
+		/**
+		 * Instantiates a new boolean table model.
+		 *
+		 * @param data the data
+		 * @param columnNames the column names
+		 */
 		public BooleanTableModel(Object[][] data, Object[] columnNames) {
 			super(data, columnNames);
 		}
 
+		/**
+		 * Instantiates a new boolean table model.
+		 *
+		 * @param columnNames the column names
+		 * @param rowCount the row count
+		 */
 		public BooleanTableModel(Vector columnNames, int rowCount) {
 			super(columnNames, rowCount);
 		}
 
+		/**
+		 * Instantiates a new boolean table model.
+		 *
+		 * @param data the data
+		 * @param columnNames the column names
+		 */
 		public BooleanTableModel(Vector data, Vector columnNames) {
 			super(data, columnNames);
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.AbstractTableModel#getColumnClass(int)
+		 */
 		public Class getColumnClass(int col) {
 			return col == 2 ? Boolean.class : super.getColumnClass(col);
 		}
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		scrollPane1 = new JScrollPane();
@@ -188,9 +264,16 @@ public class RulesBrowserPanel extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The table1. */
 	private JTable table1;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The button1. */
 	private JButton button1;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Thu Aug 06 21:45:53 GMT-03:00 2009
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.qa.gui;
@@ -44,6 +57,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.qa.gui.viewers.ui.TestFrame;
@@ -52,19 +66,35 @@ import org.ihtsdo.rules.context.RulesDeploymentPackageReference;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReferenceHelper;
 
 /**
+ * The Class RulesContextEditorPanel.
+ *
  * @author Guillermo Reynoso
  */
 public class RulesContextEditorPanel extends JPanel {
-	/**
-	 * 
-	 */
+	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
+	
+	/** The table model. */
 	private MyTableModel tableModel;
+	
+	/** The tf. */
 	private I_TermFactory tf;
+	
+	/** The config. */
 	private I_ConfigAceFrame config;
+	
+	/** The rules repo helper. */
 	private RulesDeploymentPackageReferenceHelper rulesRepoHelper = null;
+	
+	/** The context helper. */
 	private RulesContextHelper contextHelper = null;
 
+	/**
+	 * Instantiates a new rules context editor panel.
+	 *
+	 * @param config the config
+	 */
 	public RulesContextEditorPanel(I_ConfigAceFrame config) {
 		initComponents();
 		this.config = config;
@@ -83,10 +113,15 @@ public class RulesContextEditorPanel extends JPanel {
 			}
 			updateCheckBox1();
 		} catch (Exception e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 	}
 
+	/**
+	 * Update check box1.
+	 *
+	 * @throws Exception the exception
+	 */
 	private void updateCheckBox1() throws Exception {
 		I_GetConceptData selectedContext = (I_GetConceptData) contextComboBox.getSelectedItem();
 		if (selectedContext != null) {
@@ -108,6 +143,9 @@ public class RulesContextEditorPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Update table1.
+	 */
 	private void updateTable1() {
 		try {
 			// table1.setAutoCreateRowSorter(true);
@@ -198,22 +236,45 @@ public class RulesContextEditorPanel extends JPanel {
 			label4.setText("");
 			label4.repaint();
 		} catch (Exception e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 	}
 
+	/**
+	 * The Class MyTableModel.
+	 */
 	class MyTableModel extends DefaultTableModel {
 
+		/** The data. */
 		private Object[][] data = new Object[0][6];
+		
+		/** The data list. */
 		private List<Object[]> dataList = new ArrayList<Object[]>();
+		
+		/** The column names. */
 		private String[] columnNames = new String[6];
+		
+		/** The Constant NAME. */
 		private final static int NAME = 0;
+		
+		/** The Constant DESCRPTION. */
 		private final static int DESCRPTION = 1;
+		
+		/** The Constant DITA_UUID. */
 		private final static int DITA_UUID = 2;
+		
+		/** The Constant STATUS_IN_CONTEXT. */
 		private final static int STATUS_IN_CONTEXT = 3;
+		
+		/** The Constant ORIGINAL_STATUS_IN_CONTEXT. */
 		private final static int ORIGINAL_STATUS_IN_CONTEXT = 4;
+		
+		/** The Constant RULE_UID. */
 		private final static int RULE_UID = 5;
 
+		/**
+		 * Instantiates a new my table model.
+		 */
 		public MyTableModel() {
 			super();
 			dataList = new ArrayList<Object[]>();
@@ -225,10 +286,18 @@ public class RulesContextEditorPanel extends JPanel {
 			columnNames[RULE_UID] = "rule uide";
 		}
 
+		/**
+		 * Clear data.
+		 */
 		public void clearData() {
 			dataList = new ArrayList<Object[]>();
 		}
 
+		/**
+		 * Adds the data.
+		 *
+		 * @param row the row
+		 */
 		public void addData(List<Object> row) {
 			dataList.add(row.toArray());
 			data = new Object[dataList.size()][4];
@@ -237,10 +306,16 @@ public class RulesContextEditorPanel extends JPanel {
 			}
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.DefaultTableModel#getColumnCount()
+		 */
 		public int getColumnCount() {
 			return columnNames.length - 2;
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.DefaultTableModel#getRowCount()
+		 */
 		public int getRowCount() {
 			if (data == null) {
 				return 0;
@@ -248,10 +323,16 @@ public class RulesContextEditorPanel extends JPanel {
 			return data.length;
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.DefaultTableModel#getColumnName(int)
+		 */
 		public String getColumnName(int col) {
 			return columnNames[col];
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.DefaultTableModel#getValueAt(int, int)
+		 */
 		public Object getValueAt(int row, int col) {
 			return data[row][col];
 		}
@@ -260,6 +341,9 @@ public class RulesContextEditorPanel extends JPanel {
 		 * JTable uses this method to determine the default renderer/ editor for
 		 * each cell. If we didn't implement this method, then the last column
 		 * would contain text ("true"/"false"), rather than a check box.
+		 */
+		/* (non-Javadoc)
+		 * @see javax.swing.table.AbstractTableModel#getColumnClass(int)
 		 */
 		public Class getColumnClass(int c) {
 			if (getValueAt(0, c) != null) {
@@ -271,6 +355,9 @@ public class RulesContextEditorPanel extends JPanel {
 
 		/*
 		 * Don't need to implement this method unless your table's editable.
+		 */
+		/* (non-Javadoc)
+		 * @see javax.swing.table.DefaultTableModel#isCellEditable(int, int)
 		 */
 		public boolean isCellEditable(int x, int y) {
 			if (y == 3 && getValueAt(x, 5) != null) {
@@ -284,11 +371,17 @@ public class RulesContextEditorPanel extends JPanel {
 		 * Don't need to implement this method unless your table's data can
 		 * change.
 		 */
+		/* (non-Javadoc)
+		 * @see javax.swing.table.DefaultTableModel#setValueAt(java.lang.Object, int, int)
+		 */
 		public void setValueAt(Object value, int row, int col) {
 			data[row][col] = value;
 			fireTableCellUpdated(row, col);
 		}
 
+		/**
+		 * Save statuses in context.
+		 */
 		public void saveStatusesInContext() {
 			for (Object[] row : dataList) {
 				Object statusInContext = row[STATUS_IN_CONTEXT];
@@ -303,6 +396,12 @@ public class RulesContextEditorPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Sets the up sport column.
+	 *
+	 * @param table the table
+	 * @param conceptColumn the concept column
+	 */
 	public void setUpSportColumn(JTable table, TableColumn conceptColumn) {
 		I_TermFactory tf = Terms.get();
 
@@ -321,25 +420,40 @@ public class RulesContextEditorPanel extends JPanel {
 			renderer.setToolTipText("Click for combo box");
 			conceptColumn.setCellRenderer(renderer);
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 
 	}
 
+	/**
+	 * Combo box2 item state changed.
+	 *
+	 * @param e the e
+	 */
 	private void comboBox2ItemStateChanged(ItemEvent e) {
 		try {
 			updateCheckBox1();
 		} catch (Exception e1) {
-			e1.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e1);
 		}
 	}
 
+	/**
+	 * Combo box1 item state changed.
+	 *
+	 * @param e the e
+	 */
 	private void comboBox1ItemStateChanged(ItemEvent e) {
 		updateTable1();
 	}
 
+	/**
+	 * Button2 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button2ActionPerformed(ActionEvent e) {
 		try {
 
@@ -369,21 +483,36 @@ public class RulesContextEditorPanel extends JPanel {
 
 			updateTable1();
 		} catch (Exception e1) {
-			e1.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e1);
 		}
 		// updateTable1();
 	}
 
+	/**
+	 * Save button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void saveButtonActionPerformed(ActionEvent e) {
 		tableModel.saveStatusesInContext();
 		contextHelper.clearCache();
 	}
 
+	/**
+	 * Button1 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button1ActionPerformed(ActionEvent e) {
 		// search rules
 		updateTable1();
 	}
 
+	/**
+	 * Export to excel button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void exportToExcelButtonActionPerformed(ActionEvent e) {
 		if (comboBox1.getSelectedItem() != null && contextComboBox.getSelectedItem() != null) {
 			updateTable1();
@@ -402,11 +531,16 @@ public class RulesContextEditorPanel extends JPanel {
 					// showError(NO_DATA);
 				}
 			} catch (IOException ioe) {
-				ioe.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(ioe);
 			}
 		}
 	}
 
+	/**
+	 * Hidden mouse listener.
+	 *
+	 * @param e the e
+	 */
 	private void hiddenMouseListener(MouseEvent e) {
 		if(e.getClickCount() == 3){
 			JFrame frame = new TestFrame();
@@ -418,6 +552,9 @@ public class RulesContextEditorPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -574,19 +711,46 @@ public class RulesContextEditorPanel extends JPanel {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The context combo box. */
 	private JComboBox contextComboBox;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The combo box1. */
 	private JComboBox comboBox1;
+	
+	/** The button1. */
 	private JButton button1;
+	
+	/** The export to excel button. */
 	private JButton exportToExcelButton;
+	
+	/** The label4. */
 	private JLabel label4;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The table1. */
 	private JTable table1;
+	
+	/** The panel3. */
 	private JPanel panel3;
+	
+	/** The save button. */
 	private JButton saveButton;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 }

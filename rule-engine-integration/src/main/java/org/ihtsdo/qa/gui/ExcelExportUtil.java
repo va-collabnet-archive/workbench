@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.qa.gui;
 
 import java.io.File;
@@ -14,9 +30,23 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReference;
 
+/**
+ * The Class ExcelExportUtil.
+ */
 public class ExcelExportUtil {
+	
+	/**
+	 * Exort rules context.
+	 *
+	 * @param data the data
+	 * @param header the header
+	 * @param selectedPackage the selected package
+	 * @param selectedContext the selected context
+	 * @return the file
+	 */
 	public File exortRulesContext(Object[][] data, String[] header, RulesDeploymentPackageReference selectedPackage, I_GetConceptData selectedContext) {
 		File rulesExcelFile = null;
 		try {
@@ -29,13 +59,22 @@ public class ExcelExportUtil {
 			wb.write(fileOut);
 			fileOut.close();
 		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e1);
 		} catch (IOException e1) {
-			e1.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e1);
 		}
 		return rulesExcelFile;
 	}
 
+	/**
+	 * Creates the rules sheet.
+	 *
+	 * @param data the data
+	 * @param header the header
+	 * @param wb the wb
+	 * @param selectedPackage the selected package
+	 * @param selectedContext the selected context
+	 */
 	private void createRulesSheet(Object[][] data, String[] header, Workbook wb, RulesDeploymentPackageReference selectedPackage, I_GetConceptData selectedContext) {
 		Sheet rulesSheet = wb.createSheet("rules");
 
@@ -79,7 +118,7 @@ public class ExcelExportUtil {
 			try {
 				contextNameCell.setCellValue(selectedContext.getInitialText());
 			} catch (IOException e) {
-				e.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(e);
 			}
 
 			Cell contextUUIDCell = packageDataRow.createCell(4);
@@ -115,6 +154,12 @@ public class ExcelExportUtil {
 		rulesSheet.autoSizeColumn(4);
 	}
 
+	/**
+	 * Gets the header cell style.
+	 *
+	 * @param wb the wb
+	 * @return the header cell style
+	 */
 	private static CellStyle getHeaderCellStyle(Workbook wb) {
 		CellStyle headerCellStyle = wb.createCellStyle();
 		headerCellStyle.setBottomBorderColor(IndexedColors.GREY_40_PERCENT.getIndex());

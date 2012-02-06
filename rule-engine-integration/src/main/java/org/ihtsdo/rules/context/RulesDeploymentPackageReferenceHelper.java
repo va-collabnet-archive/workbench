@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.rules.context;
 
 import java.io.IOException;
@@ -22,6 +38,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
@@ -29,15 +46,31 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.Precedence;
 
+/**
+ * The Class RulesDeploymentPackageReferenceHelper.
+ */
 public class RulesDeploymentPackageReferenceHelper {
 
+	/** The config. */
 	I_ConfigAceFrame config;
 
+	/**
+	 * Instantiates a new rules deployment package reference helper.
+	 *
+	 * @param config the config
+	 */
 	public RulesDeploymentPackageReferenceHelper(I_ConfigAceFrame config) {
 		this.config = config;
 
 	}
 
+	/**
+	 * Creates the new rules deployment package.
+	 *
+	 * @param name the name
+	 * @param url the url
+	 * @return the rules deployment package reference
+	 */
 	public RulesDeploymentPackageReference createNewRulesDeploymentPackage(String name, String url) {
 		try {
 			RulesDeploymentPackageReference rulesPackage = new RulesDeploymentPackageReference();
@@ -114,16 +147,22 @@ public class RulesDeploymentPackageReferenceHelper {
 			return rulesPackage;
 
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (Exception e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 
 		return null;
 	}
 
+	/**
+	 * Gets the rules deployment package reference.
+	 *
+	 * @param rulesPackageConcept the rules package concept
+	 * @return the rules deployment package reference
+	 */
 	public RulesDeploymentPackageReference getRulesDeploymentPackageReference(I_GetConceptData rulesPackageConcept) {
 		try {
 			RulesDeploymentPackageReference rulesPackage = new RulesDeploymentPackageReference();
@@ -157,16 +196,22 @@ public class RulesDeploymentPackageReferenceHelper {
 			return rulesPackage;
 
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (Exception e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 
 		return null;
 	}
 
+	/**
+	 * Update deployment package reference.
+	 *
+	 * @param rulesPackageNewVersion the rules package new version
+	 * @return the rules deployment package reference
+	 */
 	public RulesDeploymentPackageReference updateDeploymentPackageReference(
 			RulesDeploymentPackageReference rulesPackageNewVersion) {
 		I_TermFactory termFactory = Terms.get();
@@ -229,15 +274,22 @@ public class RulesDeploymentPackageReferenceHelper {
 			return rulesPackageNewVersion;
 
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (Exception e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return null;
 
 	}
+	
+	/**
+	 * Gets the all rules deployment packages.
+	 *
+	 * @return the all rules deployment packages
+	 * @throws Exception the exception
+	 */
 	public List<RulesDeploymentPackageReference> getAllRulesDeploymentPackages() throws Exception {
 		I_TermFactory termFactory = Terms.get();
 		List<RulesDeploymentPackageReference> rulesPackages = new ArrayList<RulesDeploymentPackageReference>();
@@ -262,14 +314,21 @@ public class RulesDeploymentPackageReferenceHelper {
 			}
 
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return rulesPackages;
 
 	}
 
+	/**
+	 * Update preferred term.
+	 *
+	 * @param concept the concept
+	 * @param newString the new string
+	 * @param config the config
+	 */
 	public void updatePreferredTerm(I_GetConceptData concept, String newString,
 			I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
@@ -314,12 +373,20 @@ public class RulesDeploymentPackageReferenceHelper {
 				}
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (Exception e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 	}
 
+	/**
+	 * Gets the last extension part.
+	 *
+	 * @param extension the extension
+	 * @return the last extension part
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public I_ExtendByRefPart getLastExtensionPart(I_ExtendByRef extension) throws TerminologyException, IOException {
 		long lastVersion = Long.MIN_VALUE;
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
@@ -343,6 +410,11 @@ public class RulesDeploymentPackageReferenceHelper {
 		return lastPart;
 	}
 
+	/**
+	 * Retire rules deployment package reference.
+	 *
+	 * @param rulesPackage the rules package
+	 */
 	public void retireRulesDeploymentPackageReference(RulesDeploymentPackageReference rulesPackage) {
 		I_TermFactory termFactory = Terms.get();
 		I_GetConceptData conceptToRetireUpdatedFromDB = null;
@@ -376,14 +448,21 @@ public class RulesDeploymentPackageReferenceHelper {
 			termFactory.addUncommittedNoChecks(conceptToRetireUpdatedFromDB);
 			termFactory.commit();
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (Exception e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 	}
 
+	/**
+	 * Gets the lastest attribute part.
+	 *
+	 * @param concept the concept
+	 * @return the lastest attribute part
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	private static I_ConceptAttributePart getLastestAttributePart(final I_GetConceptData concept) throws IOException {
 		List<? extends I_ConceptAttributePart> refsetAttibuteParts = concept.getConceptAttributes().getMutableParts();
 		I_ConceptAttributePart latestAttributePart = null;

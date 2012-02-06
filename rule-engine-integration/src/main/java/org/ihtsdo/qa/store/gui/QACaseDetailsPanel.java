@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Wed Dec 29 13:29:38 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.qa.store.gui;
@@ -42,6 +55,7 @@ import javax.swing.border.EmptyBorder;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.qa.store.QAStoreBI;
 import org.ihtsdo.qa.store.model.DispositionStatus;
@@ -53,26 +67,66 @@ import org.ihtsdo.qa.store.model.TerminologyComponent;
 import org.ihtsdo.rules.RulesLibrary;
 
 /**
+ * The Class QACaseDetailsPanel.
+ *
  * @author Guillermo Reynoso
  */
 public class QACaseDetailsPanel extends JPanel {
+	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 4598159209452180160L;
 
+	/** The rule. */
 	private Rule rule;
+	
+	/** The component. */
 	private TerminologyComponent component;
+	
+	/** The selected case. */
 	private QACase selectedCase;
+	
+	/** The users. */
 	private Set<I_GetConceptData> users;
+	
+	/** The disposition statuses. */
 	private LinkedHashSet<DispositionStatus> dispositionStatuses;
+	
+	/** The comments model. */
 	private DefaultListModel commentsModel;
+	
+	/** The header component. */
 	private TerminologyComponent headerComponent;
+	
+	/** The qa database. */
 	private QADatabase qaDatabase;
+	
+	/** The sdf. */
 	private final SimpleDateFormat sdf = new SimpleDateFormat(
 			"yyyy-MMM-dd HH:mm:ss");
+	
+	/** The store. */
 	private QAStoreBI store;
+	
+	/** The current user. */
 	private String currentUser;
+	
+	/** The comments. */
 	private List<QaCaseComment> comments;
+	
+	/** The comment dialog. */
 	private CommentDialog commentDialog;
 
+	/**
+	 * Instantiates a new qA case details panel.
+	 *
+	 * @param rule the rule
+	 * @param component the component
+	 * @param selectedCase the selected case
+	 * @param dispositionStatuses the disposition statuses
+	 * @param headerComponent the header component
+	 * @param qaDatabase the qa database
+	 * @param store the store
+	 */
 	public QACaseDetailsPanel(Rule rule, TerminologyComponent component,
 			QACase selectedCase,
 			LinkedHashSet<DispositionStatus> dispositionStatuses,
@@ -90,13 +144,16 @@ public class QACaseDetailsPanel extends JPanel {
 		initCustomComponents();
 	}
 
+	/**
+	 * Inits the custom components.
+	 */
 	private void initCustomComponents() {
 		try {
 			currentUser = Terms.get().getActiveAceFrameConfig().getUsername();
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		users = RulesLibrary.getUsers();
 
@@ -140,6 +197,9 @@ public class QACaseDetailsPanel extends JPanel {
 		saveButton.setEnabled(false);
 	}
 
+	/**
+	 * Inits the fields.
+	 */
 	private void initFields() {
 		ruleNameTextArea.setText(rule.getName());
 		StringBuilder ruleDescription = new StringBuilder("Description: "
@@ -192,6 +252,9 @@ public class QACaseDetailsPanel extends JPanel {
 		resetWhiteListAllowed.setSelected(rule.isWhitelistResetAllowed());
 	}
 
+	/**
+	 * Inits the comments.
+	 */
 	private void initComments() {
 		commentsModel.clear();
 		if (comments != null && !comments.isEmpty()) {
@@ -203,6 +266,11 @@ public class QACaseDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Save button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void saveButtonActionPerformed(ActionEvent e) {
 		Object selectedAssignedTo = assignedTo.getSelectedItem();
 		String assignedStr;
@@ -276,12 +344,22 @@ public class QACaseDetailsPanel extends JPanel {
 
 	}
 
+	/**
+	 * Adds the comment button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void addCommentButtonActionPerformed(ActionEvent e) {
 		QaCaseComment comment = commentDialog.showModalDialog();
 		comments.add(comment);
 		initComments();
 	}
 
+	/**
+	 * Assigned to item state changed.
+	 *
+	 * @param e the e
+	 */
 	private void assignedToItemStateChanged(ItemEvent e) {
 		saveButton.setEnabled(true);
 		if (dispositionStatusCombo.getSelectedItem() instanceof DispositionStatus) {
@@ -289,18 +367,36 @@ public class QACaseDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Disposition status combo item state changed.
+	 *
+	 * @param e the e
+	 */
 	private void dispositionStatusComboItemStateChanged(ItemEvent e) {
 		saveButton.setEnabled(true);
 	}
 
+	/**
+	 * Annotation key pressed.
+	 *
+	 * @param e the e
+	 */
 	private void annotationKeyPressed(KeyEvent e) {
 		saveButton.setEnabled(true);
 	}
 
+	/**
+	 * Button1 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button1ActionPerformed(ActionEvent e) {
 		initCustomComponents();
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -724,60 +820,169 @@ public class QACaseDetailsPanel extends JPanel {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The tabbed pane1. */
 	private JTabbedPane tabbedPane1;
+	
+	/** The scroll pane2. */
 	private JScrollPane scrollPane2;
+	
+	/** The panel3. */
 	private JPanel panel3;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The rule name text area. */
 	private JTextArea ruleNameTextArea;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The rule description text area. */
 	private JTextArea ruleDescriptionTextArea;
+	
+	/** The separator1. */
 	private JSeparator separator1;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The component name text area. */
 	private JTextArea componentNameTextArea;
+	
+	/** The label16. */
 	private JLabel label16;
+	
+	/** The concept uuid. */
 	private JTextField conceptUUID;
+	
+	/** The label4. */
 	private JLabel label4;
+	
+	/** The scroll pane3. */
 	private JScrollPane scrollPane3;
+	
+	/** The case details. */
 	private JTextArea caseDetails;
+	
+	/** The separator2. */
 	private JSeparator separator2;
+	
+	/** The label5. */
 	private JLabel label5;
+	
+	/** The disposition status combo. */
 	private JComboBox dispositionStatusCombo;
+	
+	/** The label6. */
 	private JLabel label6;
+	
+	/** The annotation. */
 	private JTextArea annotation;
+	
+	/** The label14. */
 	private JLabel label14;
+	
+	/** The disposition status editor label. */
 	private JLabel dispositionStatusEditorLabel;
+	
+	/** The label15. */
 	private JLabel label15;
+	
+	/** The disposition status edition date. */
 	private JLabel dispositionStatusEditionDate;
+	
+	/** The separator3. */
 	private JSeparator separator3;
+	
+	/** The label7. */
 	private JLabel label7;
+	
+	/** The assigned to. */
 	private JComboBox assignedTo;
+	
+	/** The label8. */
 	private JLabel label8;
+	
+	/** The by. */
 	private JLabel by;
+	
+	/** The label9. */
 	private JLabel label9;
+	
+	/** The assigned date. */
 	private JLabel assignedDate;
+	
+	/** The case details error. */
 	private JLabel caseDetailsError;
+	
+	/** The scroll pane5. */
 	private JScrollPane scrollPane5;
+	
+	/** The panel4. */
 	private JPanel panel4;
+	
+	/** The scroll pane4. */
 	private JScrollPane scrollPane4;
+	
+	/** The comments list. */
 	private JList commentsList;
+	
+	/** The add comment button. */
 	private JButton addCommentButton;
+	
+	/** The scroll pane6. */
 	private JScrollPane scrollPane6;
+	
+	/** The panel5. */
 	private JPanel panel5;
+	
+	/** The label10. */
 	private JLabel label10;
+	
+	/** The rule uuid txt. */
 	private JTextArea ruleUuidTxt;
+	
+	/** The label11. */
 	private JLabel label11;
+	
+	/** The rule code txt. */
 	private JTextArea ruleCodeTxt;
+	
+	/** The label12. */
 	private JLabel label12;
+	
+	/** The database text a. */
 	private JTextArea databaseTextA;
+	
+	/** The label13. */
 	private JLabel label13;
+	
+	/** The path text a. */
 	private JTextArea pathTextA;
+	
+	/** The separator4. */
 	private JSeparator separator4;
+	
+	/** The white list allowed. */
 	private JCheckBox whiteListAllowed;
+	
+	/** The reset white list allowed. */
 	private JCheckBox resetWhiteListAllowed;
+	
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The button1. */
 	private JButton button1;
+	
+	/** The save button. */
 	private JButton saveButton;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 }

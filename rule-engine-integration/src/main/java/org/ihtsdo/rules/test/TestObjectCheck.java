@@ -32,6 +32,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
 
@@ -94,7 +95,7 @@ public class TestObjectCheck extends TestCase {
 			System.out.println("Results size: " + results.getResultsItems().size());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 	}
 	

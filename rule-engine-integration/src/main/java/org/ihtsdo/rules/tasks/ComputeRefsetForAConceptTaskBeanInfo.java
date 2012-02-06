@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2009 International Health Terminology Standards Development
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
  * Organisation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,15 +20,21 @@ import java.beans.BeanDescriptor;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
+/**
+ * The Class ComputeRefsetForAConceptTaskBeanInfo.
+ */
 public class ComputeRefsetForAConceptTaskBeanInfo extends SimpleBeanInfo {
 
     /**
-     *
+     * Instantiates a new compute refset for a concept task bean info.
      */
     public ComputeRefsetForAConceptTaskBeanInfo() {
         super();
     }
 
+    /* (non-Javadoc)
+     * @see java.beans.SimpleBeanInfo#getPropertyDescriptors()
+     */
     public PropertyDescriptor[] getPropertyDescriptors() {
 
         PropertyDescriptor rv[] = {};
@@ -37,6 +43,9 @@ public class ComputeRefsetForAConceptTaskBeanInfo extends SimpleBeanInfo {
     }
 
     /**
+     * Gets the bean descriptor.
+     *
+     * @return the bean descriptor
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {

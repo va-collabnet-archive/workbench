@@ -29,6 +29,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.tk.helper.ResultsCollector;
@@ -101,7 +102,7 @@ public class DroolsUncommittedAgentKnowledgeBaseTest extends TestCase {
 //			}
 			
 		} catch (Exception e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 	}
 	

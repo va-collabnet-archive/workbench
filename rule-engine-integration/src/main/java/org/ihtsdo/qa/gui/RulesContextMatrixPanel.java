@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Tue Jul 27 14:34:31 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.qa.gui;
@@ -27,21 +40,39 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReference;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReferenceHelper;
 
 /**
+ * The Class RulesContextMatrixPanel.
+ *
  * @author Guillermo Reynoso
  */
 public class RulesContextMatrixPanel extends JPanel {
+	
+	/** The table model. */
 	private DefaultTableModel tableModel;
+	
+	/** The tf. */
 	private I_TermFactory tf;
+	
+	/** The config. */
 	private I_ConfigAceFrame config;
+	
+	/** The rules package helper. */
 	private RulesDeploymentPackageReferenceHelper rulesPackageHelper = null;
+	
+	/** The context helper. */
 	private RulesContextHelper contextHelper = null;
 
+	/**
+	 * Instantiates a new rules context matrix panel.
+	 *
+	 * @param config the config
+	 */
 	public RulesContextMatrixPanel(I_ConfigAceFrame config) {
 		initComponents();
 		this.tf = Terms.get();
@@ -51,6 +82,9 @@ public class RulesContextMatrixPanel extends JPanel {
 		updateTable1();
 	}
 
+	/**
+	 * Update table1.
+	 */
 	private void updateTable1() {
 		try {
 			table1.setAutoCreateRowSorter(true);
@@ -162,14 +196,22 @@ public class RulesContextMatrixPanel extends JPanel {
 			table1.revalidate();
 			table1.repaint();
 		} catch (Exception e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} 
 	}
 
+	/**
+	 * Button2 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button2ActionPerformed(ActionEvent e) {
 		updateTable1();
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		panel2 = new JPanel();
@@ -239,11 +281,22 @@ public class RulesContextMatrixPanel extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The table1. */
 	private JTable table1;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The button2. */
 	private JButton button2;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

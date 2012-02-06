@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.rules.context;
 
 import java.io.File;
@@ -54,17 +70,30 @@ import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
-import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
+/**
+ * The Class RulesContextHelper.
+ */
 public class RulesContextHelper {
 
+	/** The config. */
 	I_ConfigAceFrame config;
+	
+	/** The kb cache. */
 	HashMap<Integer, KnowledgeBase> kbCache;
+	
+	/** The last cache update time. */
 	long lastCacheUpdateTime = 0;
+	
+	/** The no rules alert shown. */
 	static boolean noRulesAlertShown = false;
 
+	/**
+	 * Instantiates a new rules context helper.
+	 *
+	 * @param config the config
+	 */
 	public RulesContextHelper(I_ConfigAceFrame config) {
 		this.config = config;
 		if (Terms.get().getKnowledgeBaseCache() != null) {
@@ -105,9 +134,27 @@ public class RulesContextHelper {
 	//		}
 	//	}
 
+	/**
+	 * Gets the knowledge base for context.
+	 *
+	 * @param context the context
+	 * @param config the config
+	 * @return the knowledge base for context
+	 * @throws Exception the exception
+	 */
 	public KnowledgeBase getKnowledgeBaseForContext(I_GetConceptData context, I_ConfigAceFrame config) throws Exception {
 		return getKnowledgeBaseForContext(context, config, false);
 	}
+	
+	/**
+	 * Gets the knowledge base for context.
+	 *
+	 * @param context the context
+	 * @param config the config
+	 * @param recreate the recreate
+	 * @return the knowledge base for context
+	 * @throws Exception the exception
+	 */
 	public KnowledgeBase getKnowledgeBaseForContext(I_GetConceptData context, I_ConfigAceFrame config, boolean recreate) throws Exception {
 		KnowledgeBase returnBase = null;
 		HashSet<I_ShowActivity> activities = new HashSet<I_ShowActivity>();
@@ -220,11 +267,21 @@ public class RulesContextHelper {
 			} catch (ComputationCanceled e) {
 				// Nothing to do
 			}
-			e1.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e1);
 		}
 		return returnBase;
 	}
 
+	/**
+	 * Filter for context.
+	 *
+	 * @param kbase the kbase
+	 * @param context the context
+	 * @param config the config
+	 * @return the knowledge base
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public KnowledgeBase filterForContext(KnowledgeBase kbase, I_GetConceptData context, I_ConfigAceFrame config) throws TerminologyException, IOException {
 		RulesContextHelper contextHelper = new RulesContextHelper(config);
 		I_GetConceptData excludeClause = Terms.get().getConcept(RefsetAuxiliary.Concept.EXCLUDE_INDIVIDUAL.getUids());
@@ -247,6 +304,12 @@ public class RulesContextHelper {
 		return kbase;
 	}
 
+	/**
+	 * Creates the context.
+	 *
+	 * @param name the name
+	 * @return the i_ get concept data
+	 */
 	public I_GetConceptData createContext(String name) {
 		try {
 			I_TermFactory termFactory = Terms.get();
@@ -298,6 +361,12 @@ public class RulesContextHelper {
 		return null;
 	}
 
+	/**
+	 * Gets the all contexts.
+	 *
+	 * @return the all contexts
+	 * @throws Exception the exception
+	 */
 	public List<I_GetConceptData> getAllContexts() throws Exception {
 		List<I_GetConceptData> contexts = new ArrayList<I_GetConceptData>();
 		I_TermFactory tf = Terms.get();
@@ -316,6 +385,13 @@ public class RulesContextHelper {
 
 	}
 
+	/**
+	 * Sets the role in context.
+	 *
+	 * @param ruleUid the rule uid
+	 * @param context the context
+	 * @param newRole the new role
+	 */
 	public void setRoleInContext(String ruleUid, I_GetConceptData context, I_GetConceptData newRole) {
 		try {
 			I_GetConceptData currentRole = getRoleInContext(ruleUid, context);
@@ -414,6 +490,13 @@ public class RulesContextHelper {
 		}
 	}
 
+	/**
+	 * Gets the last string part for rule.
+	 *
+	 * @param ruleUid the rule uid
+	 * @param context the context
+	 * @return the last string part for rule
+	 */
 	public I_ExtendByRefPartCidString getLastStringPartForRule(String ruleUid, I_GetConceptData context) {
 		try {
 			I_ExtendByRefPartCidString lastPart = null;
@@ -451,6 +534,13 @@ public class RulesContextHelper {
 		return null;
 	}
 
+	/**
+	 * Gets the role in context.
+	 *
+	 * @param ruleUid the rule uid
+	 * @param context the context
+	 * @return the role in context
+	 */
 	public I_GetConceptData getRoleInContext(String ruleUid, I_GetConceptData context) {
 		try {
 			I_TermFactory tf = Terms.get();
@@ -471,6 +561,13 @@ public class RulesContextHelper {
 		return null;
 	}
 
+	/**
+	 * Update preferred term.
+	 *
+	 * @param concept the concept
+	 * @param newString the new string
+	 * @param config the config
+	 */
 	public void updatePreferredTerm(I_GetConceptData concept, String newString,
 			I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
@@ -513,6 +610,14 @@ public class RulesContextHelper {
 		}
 	}
 
+	/**
+	 * Gets the last extension part.
+	 *
+	 * @param extension the extension
+	 * @return the last extension part
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public I_ExtendByRefPart getLastExtensionPart(I_ExtendByRef extension) throws TerminologyException, IOException {
 		long lastVersion = Long.MIN_VALUE;
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
@@ -536,23 +641,46 @@ public class RulesContextHelper {
 		return lastPart;
 	}
 
+	/**
+	 * Gets the config.
+	 *
+	 * @return the config
+	 */
 	public I_ConfigAceFrame getConfig() {
 		return config;
 	}
 
+	/**
+	 * Sets the config.
+	 *
+	 * @param config the new config
+	 */
 	public void setConfig(I_ConfigAceFrame config) {
 		this.config = config;
 	}
 
+	/**
+	 * Gets the kb cache.
+	 *
+	 * @return the kb cache
+	 */
 	public HashMap<Integer, KnowledgeBase> getKbCache() {
 		return kbCache;
 	}
 
+	/**
+	 * Sets the kb cache.
+	 *
+	 * @param kbCache the kb cache
+	 */
 	public void setKbCache(HashMap<Integer, KnowledgeBase> kbCache) {
 		this.kbCache = kbCache;
 		Terms.get().setKnowledgeBaseCache(kbCache);
 	}
 
+	/**
+	 * Clear cache.
+	 */
 	public void clearCache() {
 		File dir = new File("rules");
 		if (!dir.exists()) {
@@ -568,6 +696,12 @@ public class RulesContextHelper {
 		//updateKbCacheFromFiles();
 	}
 
+	/**
+	 * Gets the packages for context.
+	 *
+	 * @param context the context
+	 * @return the packages for context
+	 */
 	public List<RulesDeploymentPackageReference> getPackagesForContext(I_GetConceptData context) {
 		List<? extends I_RelTuple> pkgRelTuples = null;
 		RulesDeploymentPackageReferenceHelper refHelper = new RulesDeploymentPackageReferenceHelper(config);
@@ -616,6 +750,12 @@ public class RulesContextHelper {
 		return returnData;
 	}
 
+	/**
+	 * Gets the contexts for package.
+	 *
+	 * @param refPkg the ref pkg
+	 * @return the contexts for package
+	 */
 	public List<I_GetConceptData> getContextsForPackage(RulesDeploymentPackageReference refPkg) {
 		List<? extends I_RelTuple> pkgRelTuples = null;
 		ArrayList<I_GetConceptData> returnData = new ArrayList<I_GetConceptData>();
@@ -650,6 +790,12 @@ public class RulesContextHelper {
 		return returnData;
 	}
 
+	/**
+	 * Adds the pkg reference to context.
+	 *
+	 * @param pkgReference the pkg reference
+	 * @param context the context
+	 */
 	public void addPkgReferenceToContext(RulesDeploymentPackageReference pkgReference, 
 			I_GetConceptData context) {
 		I_TermFactory termFactory = Terms.get();
@@ -718,6 +864,12 @@ public class RulesContextHelper {
 
 	}
 
+	/**
+	 * Removes the pkg reference from context.
+	 *
+	 * @param pkgReference the pkg reference
+	 * @param context the context
+	 */
 	public void removePkgReferenceFromContext(RulesDeploymentPackageReference pkgReference, 
 			I_GetConceptData context) {
 		I_TermFactory termFactory = Terms.get();
@@ -758,6 +910,12 @@ public class RulesContextHelper {
 
 	}
 
+	/**
+	 * Clean rel tuples list.
+	 *
+	 * @param tuples the tuples
+	 * @return the list<? extends i_ rel tuple>
+	 */
 	private List<? extends I_RelTuple> cleanRelTuplesList(List<? extends I_RelTuple> tuples) {
 		HashMap<Integer, I_RelTuple> cleanMap = new HashMap<Integer, I_RelTuple>();
 		for (I_RelTuple loopTuple : tuples) {
@@ -772,6 +930,12 @@ public class RulesContextHelper {
 		return cleanList;
 	}
 
+	/**
+	 * Checks if is active.
+	 *
+	 * @param statusId the status id
+	 * @return true, if is active
+	 */
 	public boolean isActive(int statusId) {
 		List<Integer> activeStatuses = new ArrayList<Integer>();
 		try {
@@ -787,6 +951,11 @@ public class RulesContextHelper {
 		return (activeStatuses.contains(statusId));
 	}
 
+	/**
+	 * Promote.
+	 *
+	 * @param concept the concept
+	 */
 	public void promote(I_GetConceptData concept) {
 		try {
 			I_IntSet allowedStatusWithRetired = Terms.get().newIntSet();

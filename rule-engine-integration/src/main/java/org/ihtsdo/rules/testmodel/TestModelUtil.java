@@ -136,9 +136,9 @@ public class TestModelUtil {
 			}
 
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 
 		return convertedComponents;
@@ -147,13 +147,7 @@ public class TestModelUtil {
 
 	*//**
 	 * Convert to test model.
-	 * 
-	 * @param concept the concept
-	 * @param convertConcept the convert concept
-	 * @param convertDescriptions the convert descriptions
-	 * @param convertRelationships the convert relationships
-	 * @param convertIds the convert ids
-	 * 
+	 *
 	 * @return the list< terminology component>
 	 *//*
 	public static List<TerminologyComponent> convertToTestModel(I_GetConceptData concept, boolean convertConcept,
@@ -260,9 +254,9 @@ public class TestModelUtil {
 			}
 
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 
 		return convertedComponents;

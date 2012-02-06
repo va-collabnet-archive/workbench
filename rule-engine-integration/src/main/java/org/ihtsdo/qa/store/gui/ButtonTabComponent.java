@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.qa.store.gui;
 
 import java.awt.BasicStroke;
@@ -21,9 +37,19 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.plaf.basic.BasicButtonUI;
 
+/**
+ * The Class ButtonTabComponent.
+ */
 public class ButtonTabComponent extends JPanel {
+    
+    /** The pane. */
     private final JTabbedPane pane;
 
+    /**
+     * Instantiates a new button tab component.
+     *
+     * @param pane the pane
+     */
     public ButtonTabComponent(final JTabbedPane pane) {
         //unset default FlowLayout' gaps
         super(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -54,7 +80,14 @@ public class ButtonTabComponent extends JPanel {
         setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 0));
     }
 
+    /**
+     * The Class TabButton.
+     */
     private class TabButton extends JButton implements ActionListener {
+        
+        /**
+         * Instantiates a new tab button.
+         */
         public TabButton() {
             int size = 17;
             setPreferredSize(new Dimension(size, size));
@@ -75,6 +108,9 @@ public class ButtonTabComponent extends JPanel {
             addActionListener(this);
         }
 
+        /* (non-Javadoc)
+         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+         */
         public void actionPerformed(ActionEvent e) {
             int i = pane.indexOfTabComponent(ButtonTabComponent.this);
             if (i != -1) {
@@ -83,10 +119,16 @@ public class ButtonTabComponent extends JPanel {
         }
 
         //we don't want to update UI for this button
+        /* (non-Javadoc)
+         * @see javax.swing.JButton#updateUI()
+         */
         public void updateUI() {
         }
 
         //paint the cross
+        /* (non-Javadoc)
+         * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
+         */
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
             Graphics2D g2 = (Graphics2D) g.create();
@@ -106,6 +148,7 @@ public class ButtonTabComponent extends JPanel {
         }
     }
 
+    /** The Constant buttonMouseListener. */
     private final static MouseListener buttonMouseListener = new MouseAdapter() {
         public void mouseEntered(MouseEvent e) {
             Component component = e.getComponent();

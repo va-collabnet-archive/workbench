@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.rules.test;
 
 import java.io.File;
@@ -19,6 +35,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
@@ -29,6 +46,9 @@ import org.ihtsdo.rules.context.RulesDeploymentPackageReference;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReferenceHelper;
 import org.ihtsdo.tk.api.Precedence;
 
+/**
+ * The Class TestEnums.
+ */
 public class TestEnums extends TestCase {
 
 	/** The vodb directory. */
@@ -73,6 +93,11 @@ public class TestEnums extends TestCase {
 		tf.setActiveAceFrameConfig(config);
 	}
 
+	/**
+	 * Test contexts.
+	 *
+	 * @throws Exception the exception
+	 */
 	public void testContexts() throws Exception {
 		RulesDeploymentPackageReferenceHelper rulesPackageHelper = new RulesDeploymentPackageReferenceHelper(config);
 		RulesContextHelper contextHelper = new RulesContextHelper(config);
@@ -140,6 +165,11 @@ public class TestEnums extends TestCase {
 
 	}
 
+	/**
+	 * Gets the test config.
+	 *
+	 * @return the test config
+	 */
 	private I_ConfigAceFrame getTestConfig() {
 		I_ConfigAceFrame config = null;
 		try {
@@ -171,15 +201,22 @@ public class TestEnums extends TestCase {
 			config.setPrecedence(Precedence.TIME);
 
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 
 		return config;
 	}
 
 	// If targetLocation does not exist, it will be created.
+	/**
+	 * Copy directory.
+	 *
+	 * @param sourceLocation the source location
+	 * @param targetLocation the target location
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public void copyDirectory(File sourceLocation , File targetLocation)
 	throws IOException {
 
@@ -209,6 +246,12 @@ public class TestEnums extends TestCase {
 		}
 	}
 
+	/**
+	 * Delete directory.
+	 *
+	 * @param path the path
+	 * @return true, if successful
+	 */
 	public boolean deleteDirectory(File path) {
 		if( path.exists() ) {
 			File[] files = path.listFiles();
@@ -224,6 +267,11 @@ public class TestEnums extends TestCase {
 		return( path.delete() );
 	}
 
+	/**
+	 * Sleep.
+	 *
+	 * @param n the n
+	 */
 	public static void sleep(int n){
 		long t0, t1;
 		t0 =  System.currentTimeMillis();

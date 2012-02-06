@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Mon Jan 24 13:55:16 GMT-03:00 2011
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.qa.store.gui;
@@ -27,26 +40,51 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 
+import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.qa.store.QAStoreBI;
 import org.ihtsdo.qa.store.model.QaCaseComment;
 
 /**
+ * The Class CommentDialog.
+ *
  * @author Guillermo Reynoso
  */
 public class CommentDialog extends JDialog {
 	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -221429705860411995L;
+	
+	/** The comment. */
 	private QaCaseComment comment;
+	
+	/** The store. */
 	private QAStoreBI store;
+	
+	/** The current user. */
 	private String currentUser;
+	
+	/** The case uuid. */
 	private UUID caseUuid;
 	
+	/**
+	 * Instantiates a new comment dialog.
+	 *
+	 * @param owner the owner
+	 */
 	public CommentDialog(Frame owner) {
 		super(owner);
 		initComponents();
 		initCustomComponents();
 	}
 
+	/**
+	 * Instantiates a new comment dialog.
+	 *
+	 * @param owner the owner
+	 * @param store the store
+	 * @param currentUser the current user
+	 * @param caseUuid the case uuid
+	 */
 	public CommentDialog(Dialog owner, QAStoreBI store, String currentUser, UUID caseUuid) {
 		super(owner);
 		this.store = store;
@@ -57,6 +95,9 @@ public class CommentDialog extends JDialog {
 	}
 	
 	
+	/**
+	 * Inits the custom components.
+	 */
 	private void initCustomComponents() {
 		comment = null;
 		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
@@ -67,6 +108,11 @@ public class CommentDialog extends JDialog {
 		});
 	}
 
+	/**
+	 * Show modal dialog.
+	 *
+	 * @return the qa case comment
+	 */
 	public QaCaseComment showModalDialog() {
 		setModal(true);
 		this.setPreferredSize(new Dimension(500,500));
@@ -75,15 +121,30 @@ public class CommentDialog extends JDialog {
 		return comment;
 	}
 
+	/**
+	 * Close.
+	 *
+	 * @param canceled the canceled
+	 */
 	private void close(QaCaseComment canceled) {
 		this.comment = canceled;
 		dispose();
 	}
 
+	/**
+	 * Cancel button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void cancelButtonActionPerformed(ActionEvent e) {
 		close(null);
 	}
 
+	/**
+	 * Ok button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void okButtonActionPerformed(ActionEvent e) {
 		if(!commentTextArea.getText().equals("")){
 			QaCaseComment qaComment = new QaCaseComment();
@@ -94,7 +155,7 @@ public class CommentDialog extends JDialog {
 			try {
 				store.persistQAComment(qaComment);
 			} catch (Exception e1) {
-				e1.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(e1);
 			}
 			close(qaComment);
 		}else{
@@ -103,6 +164,9 @@ public class CommentDialog extends JDialog {
 	}
 
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		dialogPane = new JPanel();
@@ -179,13 +243,28 @@ public class CommentDialog extends JDialog {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The dialog pane. */
 	private JPanel dialogPane;
+	
+	/** The content panel. */
 	private JPanel contentPanel;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The comment text area. */
 	private JTextArea commentTextArea;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The button bar. */
 	private JPanel buttonBar;
+	
+	/** The ok button. */
 	private JButton okButton;
+	
+	/** The cancel button. */
 	private JButton cancelButton;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

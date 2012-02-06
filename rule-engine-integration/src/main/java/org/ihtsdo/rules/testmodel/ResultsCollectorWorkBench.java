@@ -32,6 +32,8 @@ public class ResultsCollectorWorkBench extends ResultsCollector{
 	
 	/** The alert list. */
 	private List<AlertToDataConstraintFailure> alertList;
+	
+	/** The wb templates. */
 	private Map<SpecBI, Integer> wbTemplates;
 	
 	/**
@@ -61,10 +63,20 @@ public class ResultsCollectorWorkBench extends ResultsCollector{
 		this.alertList = alertList;
 	}
 
+	/**
+	 * Gets the wb templates.
+	 *
+	 * @return the wb templates
+	 */
 	public Map<SpecBI, Integer> getWbTemplates() {
 		return wbTemplates;
 	}
 
+	/**
+	 * Sets the wb templates.
+	 *
+	 * @param wbTemplates the wb templates
+	 */
 	public void setWbTemplates(Map<SpecBI, Integer> wbTemplates) {
 		this.wbTemplates = wbTemplates;
 	}

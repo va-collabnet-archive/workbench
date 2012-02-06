@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Fri Aug 05 16:22:27 GMT-03:00 2011
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.qa.gui;
@@ -32,6 +45,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.qa.inheritance.InheritedRelationships;
 import org.ihtsdo.qa.inheritance.RelationshipsDAO;
@@ -40,18 +54,39 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 /**
+ * The Class RelationshipTreeViewerPanel.
+ *
  * @author Guillermo Reynoso
  */
 public class RelationshipTreeViewerPanel extends JPanel {
 
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 2902078592415391231L;
+	
+	/** The concept. */
 	private I_GetConceptData concept;
+	
+	/** The tf. */
 	private I_TermFactory tf;
+	
+	/** The model. */
 	private DefaultTreeModel model;
+	
+	/** The fact context name. */
 	private String factContextName;
+	
+	/** The concept model. */
 	private DefaultListModel conceptModel;
+	
+	/** The top. */
 	private DefaultMutableTreeNode top;
 
+	/**
+	 * Instantiates a new relationship tree viewer panel.
+	 *
+	 * @param conceptBi the concept bi
+	 * @param factContextName the fact context name
+	 */
 	public RelationshipTreeViewerPanel(ConceptVersionBI conceptBi, String factContextName) {
 		initComponents();
 
@@ -61,12 +96,17 @@ public class RelationshipTreeViewerPanel extends JPanel {
 			this.factContextName = factContextName;
 			initCustomComponents();
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 	}
 
+	/**
+	 * Instantiates a new relationship tree viewer panel.
+	 *
+	 * @param factContextName the fact context name
+	 */
 	public RelationshipTreeViewerPanel(String factContextName) {
 		initComponents();
 
@@ -77,12 +117,18 @@ public class RelationshipTreeViewerPanel extends JPanel {
 		try {
 			initCustomComponents();
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 	}
 
+	/**
+	 * Instantiates a new relationship tree viewer panel.
+	 *
+	 * @param oldStyleConcept the old style concept
+	 * @param factContextName the fact context name
+	 */
 	public RelationshipTreeViewerPanel(I_GetConceptData oldStyleConcept, String factContextName) {
 		initComponents();
 
@@ -93,12 +139,18 @@ public class RelationshipTreeViewerPanel extends JPanel {
 		try {
 			initCustomComponents();
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 	}
 
+	/**
+	 * Inits the custom components.
+	 *
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	private void initCustomComponents() throws IOException, TerminologyException {
 		DefaultTreeCellRenderer rend = new DefaultTreeCellRenderer();
 		rend.setIconTextGap(3);
@@ -129,9 +181,9 @@ public class RelationshipTreeViewerPanel extends JPanel {
 					concept = (I_GetConceptData) conceptModel.get(0);
 					createTree(conceptNode);
 				} catch (IOException e) {
-					e.printStackTrace();
+					AceLog.getAppLog().alertAndLogException(e);
 				} catch (TerminologyException e) {
-					e.printStackTrace();
+					AceLog.getAppLog().alertAndLogException(e);
 				}
 				conceptList.setToolTipText(conceptModel.get(0).toString());
 			}
@@ -157,6 +209,13 @@ public class RelationshipTreeViewerPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Creates the tree.
+	 *
+	 * @param top the top
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	private void createTree(DefaultMutableTreeNode top) throws IOException, TerminologyException {
 		relTree.removeAll();
 		DefaultMutableTreeNode conceptNode = new DefaultMutableTreeNode(concept.getInitialText());
@@ -209,6 +268,14 @@ public class RelationshipTreeViewerPanel extends JPanel {
 
 	}
 
+	/**
+	 * Creates the generic relation properties.
+	 *
+	 * @param parentNode the parent node
+	 * @param relTuple the rel tuple
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	private void createGenericRelationProperties(DefaultMutableTreeNode parentNode, RelationshipVersionBI relTuple) throws IOException, TerminologyException {
 		DefaultMutableTreeNode relNode = createRelationNode(relTuple);
 		addNodeInSortedOrder(parentNode, relNode);
@@ -248,6 +315,14 @@ public class RelationshipTreeViewerPanel extends JPanel {
 
 	}
 
+	/**
+	 * Creates the generic relation properties.
+	 *
+	 * @param parentNode the parent node
+	 * @param relTuple the rel tuple
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	private void createGenericRelationProperties(DefaultMutableTreeNode parentNode, I_RelTuple relTuple) throws IOException, TerminologyException {
 		DefaultMutableTreeNode relNode = createRelationNode(relTuple);
 		addNodeInSortedOrder(parentNode, relNode);
@@ -283,6 +358,14 @@ public class RelationshipTreeViewerPanel extends JPanel {
 		addNodeInSortedOrder(primordialUuidNode, factContextNode);
 	}
 
+	/**
+	 * Creates the relation node.
+	 *
+	 * @param relTuple the rel tuple
+	 * @return the default mutable tree node
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	private DefaultMutableTreeNode createRelationNode(RelationshipVersionBI relTuple) throws IOException, TerminologyException {
 		String typeUuid = tf.nidToUuid(relTuple.getTypeNid()).toString();
 		I_GetConceptData type = tf.getConcept(UUID.fromString(typeUuid));
@@ -294,6 +377,14 @@ public class RelationshipTreeViewerPanel extends JPanel {
 		return relNode;
 	}
 
+	/**
+	 * Creates the relation node.
+	 *
+	 * @param relTuple the rel tuple
+	 * @return the default mutable tree node
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	private DefaultMutableTreeNode createRelationNode(I_RelTuple relTuple) throws IOException, TerminologyException {
 		String typeUuid = tf.nidToUuid(relTuple.getTypeNid()).toString();
 		I_GetConceptData type = tf.getConcept(UUID.fromString(typeUuid));
@@ -305,6 +396,14 @@ public class RelationshipTreeViewerPanel extends JPanel {
 		return relNode;
 	}
 
+	/**
+	 * Creates the rel attribute node.
+	 *
+	 * @param conceptNid the concept nid
+	 * @return the default mutable tree node
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	private DefaultMutableTreeNode createRelAttributeNode(int conceptNid) throws IOException, TerminologyException {
 		String uuid = tf.nidToUuid(conceptNid).toString();
 		I_GetConceptData concept = tf.getConcept(UUID.fromString(uuid));
@@ -313,6 +412,12 @@ public class RelationshipTreeViewerPanel extends JPanel {
 		return node;
 	}
 
+	/**
+	 * Adds the node in sorted order.
+	 *
+	 * @param parent the parent
+	 * @param child the child
+	 */
 	private void addNodeInSortedOrder(DefaultMutableTreeNode parent, DefaultMutableTreeNode child) {
 		int n = parent.getChildCount();
 		if (n == 0) {
@@ -332,6 +437,9 @@ public class RelationshipTreeViewerPanel extends JPanel {
 		return;
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -385,11 +493,22 @@ public class RelationshipTreeViewerPanel extends JPanel {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
+	/** The concept text box. */
 	private JPanel conceptTextBox;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The concept list. */
 	private JList conceptList;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The rel tree. */
 	private JTree relTree;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 

@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.qa.inheritance;
 
 import java.beans.PropertyVetoException;
@@ -14,6 +30,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.testmodel.DrRelationship;
@@ -23,24 +40,77 @@ import org.ihtsdo.tk.api.PositionSet;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
+/**
+ * The Class RelationshipsDAO.
+ */
 public class RelationshipsDAO {
 
+	/** The allowed dest rel types. */
 	private I_IntSet allowedDestRelTypes;
+	
+	/** The allowed is a types. */
 	private I_IntSet allowedIsATypes;
+	
+	/** The allowed status. */
 	private I_IntSet allowedStatus;
+	
+	/** The config. */
 	private I_ConfigAceFrame config;
+	
+	/** The term factory. */
 	private I_TermFactory termFactory;
+	
+	/** The stated. */
 	private I_GetConceptData stated;
+	
+	/** The model rel. */
 	private I_IntSet modelRel;
 
+	/** The set def char. */
 	private Set<Integer> setDefChar;
 
-	public enum TEST_RESULTS {CONCEPT1_ANCESTOROF_CONCEPT2,CONCEPT2_ANCESTOROF_CONCEPT1,CONCEPTS_DIFF_HIERARCHY,
-		CONCEPT1_SUBSUM_CONCEPT2,CONCEPT1_EQUAL_CONCEPT2,CONCEPT2_SUBSUM_CONCEPT1,THERE_IS_NO_SUBSUM,
-		ROLE1_SUBSUM_ROLE2, ROLE2_SUBSUM_ROLE1,ROLE1_EQUAL_ROLE2,ROLES_CROSSOVER,
-		ROLEGROUP1_SUBSUM_ROLEGROUP2,ROLEGROUP2_SUBSUM_ROLEGROUP1,ROLEGROUP1_EQUAL_ROLEGROUP2,ROLEGROUPS_CROSSOVER};
+	/**
+	 * The Enum TEST_RESULTS.
+	 */
+	public enum TEST_RESULTS {/** The CONCEP t1_ ancestoro f_ concep t2. */
+CONCEPT1_ANCESTOROF_CONCEPT2,/** The CONCEP t2_ ancestoro f_ concep t1. */
+CONCEPT2_ANCESTOROF_CONCEPT1,/** The CONCEPT s_ dif f_ hierarchy. */
+CONCEPTS_DIFF_HIERARCHY,
+		
+		/** The CONCEP t1_ subsu m_ concep t2. */
+		CONCEPT1_SUBSUM_CONCEPT2,
+/** The CONCEP t1_ equa l_ concep t2. */
+CONCEPT1_EQUAL_CONCEPT2,
+/** The CONCEP t2_ subsu m_ concep t1. */
+CONCEPT2_SUBSUM_CONCEPT1,
+/** The THER e_ i s_ n o_ subsum. */
+THERE_IS_NO_SUBSUM,
+		
+		/** The ROL e1_ subsu m_ rol e2. */
+		ROLE1_SUBSUM_ROLE2, 
+ /** The ROL e2_ subsu m_ rol e1. */
+ ROLE2_SUBSUM_ROLE1,
+/** The ROL e1_ equa l_ rol e2. */
+ROLE1_EQUAL_ROLE2,
+/** The ROLE s_ crossover. */
+ROLES_CROSSOVER,
+		
+		/** The ROLEGROU p1_ subsu m_ rolegrou p2. */
+		ROLEGROUP1_SUBSUM_ROLEGROUP2,
+/** The ROLEGROU p2_ subsu m_ rolegrou p1. */
+ROLEGROUP2_SUBSUM_ROLEGROUP1,
+/** The ROLEGROU p1_ equa l_ rolegrou p2. */
+ROLEGROUP1_EQUAL_ROLEGROUP2,
+/** The ROLEGROUP s_ crossover. */
+ROLEGROUPS_CROSSOVER};
 
 
+		/**
+		 * Instantiates a new relationships dao.
+		 *
+		 * @throws IOException Signals that an I/O exception has occurred.
+		 * @throws TerminologyException the terminology exception
+		 */
 		public RelationshipsDAO() throws IOException, TerminologyException{
 			termFactory = Terms.get();
 			allowedDestRelTypes =  termFactory.newIntSet();
@@ -60,6 +130,14 @@ public class RelationshipsDAO {
 		}
 
 
+		/**
+		 * Gets the parents.
+		 *
+		 * @param concept the concept
+		 * @return the parents
+		 * @throws IOException Signals that an I/O exception has occurred.
+		 * @throws TerminologyException the terminology exception
+		 */
 		public Set<? extends I_GetConceptData> getParents(I_GetConceptData concept) throws IOException, TerminologyException {
 			Set<? extends I_GetConceptData> parents = new HashSet<I_GetConceptData>();
 			parents =  concept.getSourceRelTargets(allowedStatus ,allowedIsATypes, getMockViewSet(config), config.getPrecedence(), config.getConflictResolutionStrategy());
@@ -67,6 +145,14 @@ public class RelationshipsDAO {
 			return parents;
 		}
 
+		/**
+		 * Gets the stated is a rels.
+		 *
+		 * @param concept the concept
+		 * @return the stated is a rels
+		 * @throws IOException Signals that an I/O exception has occurred.
+		 * @throws TerminologyException the terminology exception
+		 */
 		public List<? extends I_RelTuple> getStatedIsARels(I_GetConceptData concept) throws IOException, TerminologyException {
 
 			return concept.getSourceRelTuples(allowedStatus, 
@@ -76,6 +162,14 @@ public class RelationshipsDAO {
 					RelAssertionType.STATED);
 		}
 
+		/**
+		 * Gets the stated all rels.
+		 *
+		 * @param concept the concept
+		 * @return the stated all rels
+		 * @throws IOException Signals that an I/O exception has occurred.
+		 * @throws TerminologyException the terminology exception
+		 */
 		public List<? extends I_RelTuple> getStatedAllRels(I_GetConceptData concept) throws IOException, TerminologyException {
 
 			return concept.getSourceRelTuples(allowedStatus, 
@@ -85,6 +179,14 @@ public class RelationshipsDAO {
 					RelAssertionType.STATED);
 		}
 
+		/**
+		 * Gets the inferred rels.
+		 *
+		 * @param concept the concept
+		 * @return the inferred rels
+		 * @throws IOException Signals that an I/O exception has occurred.
+		 * @throws TerminologyException the terminology exception
+		 */
 		public List<? extends I_RelTuple> getInferredRels(I_GetConceptData concept) throws IOException, TerminologyException {
 
 			return concept.getSourceRelTuples(allowedStatus, 
@@ -94,6 +196,14 @@ public class RelationshipsDAO {
 					RelAssertionType.INFERRED);
 		}
 
+		/**
+		 * Gets the rel tuples.
+		 *
+		 * @param concept the concept
+		 * @return the rel tuples
+		 * @throws IOException Signals that an I/O exception has occurred.
+		 * @throws TerminologyException the terminology exception
+		 */
 		public List<I_RelTuple> getRelTuples(I_GetConceptData concept) throws IOException, TerminologyException{
 			List<I_RelTuple> result = new ArrayList<I_RelTuple>();
 			InheritedRelationships inheritedRels = getInheritedRelationships(concept);
@@ -123,6 +233,14 @@ public class RelationshipsDAO {
 		}
 
 
+		/**
+		 * Gets the children.
+		 *
+		 * @param concept the concept
+		 * @return the children
+		 * @throws IOException Signals that an I/O exception has occurred.
+		 * @throws TerminologyException the terminology exception
+		 */
 		public Set<? extends I_GetConceptData> getChildren(I_GetConceptData concept) throws IOException, TerminologyException {
 			Set<? extends I_GetConceptData> children = new HashSet<I_GetConceptData>();
 
@@ -131,6 +249,15 @@ public class RelationshipsDAO {
 			return children;
 		}
 
+		/**
+		 * Subsumption concept test.
+		 *
+		 * @param concept1 the concept1
+		 * @param concept2 the concept2
+		 * @return the tES t_ results
+		 * @throws IOException Signals that an I/O exception has occurred.
+		 * @throws TerminologyException the terminology exception
+		 */
 		public TEST_RESULTS subsumptionConceptTest(I_GetConceptData concept1, I_GetConceptData concept2) throws IOException, TerminologyException{
 			if (concept1.getConceptNid()==concept2.getConceptNid()){
 				return TEST_RESULTS.CONCEPT1_EQUAL_CONCEPT2;
@@ -145,6 +272,15 @@ public class RelationshipsDAO {
 
 		}
 
+		/**
+		 * Subsumption role test.
+		 *
+		 * @param role1 the role1
+		 * @param role2 the role2
+		 * @return the tES t_ results
+		 * @throws TerminologyException the terminology exception
+		 * @throws IOException Signals that an I/O exception has occurred.
+		 */
 		public TEST_RESULTS subsumptionRoleTest(I_RelTuple role1, I_RelTuple role2) throws TerminologyException, IOException{
 			TEST_RESULTS relTargetSubSum=subsumptionConceptTest(termFactory.getConcept( role1.getC2Id()),termFactory.getConcept(role2.getC2Id()));
 			TEST_RESULTS relTypeSubsum;
@@ -192,6 +328,16 @@ public class RelationshipsDAO {
 			return null;
 
 		}
+		
+		/**
+		 * Subsumption role group test.
+		 *
+		 * @param rolegroup1 the rolegroup1
+		 * @param rolegroup2 the rolegroup2
+		 * @return the tES t_ results
+		 * @throws TerminologyException the terminology exception
+		 * @throws IOException Signals that an I/O exception has occurred.
+		 */
 		public TEST_RESULTS subsumptionRoleGroupTest(I_RelTuple[] rolegroup1, I_RelTuple[] rolegroup2) throws TerminologyException, IOException{
 			TEST_RESULTS roleTestResult ;
 			boolean rolesCrossover=false;
@@ -292,6 +438,15 @@ public class RelationshipsDAO {
 		}
 
 
+		/**
+		 * Role group1 sub sum to role group2.
+		 *
+		 * @param rolegroup1 the rolegroup1
+		 * @param rolegroup2 the rolegroup2
+		 * @return true, if successful
+		 * @throws TerminologyException the terminology exception
+		 * @throws IOException Signals that an I/O exception has occurred.
+		 */
 		private boolean roleGroup1SubSumToRoleGroup2(
 				I_RelTuple[] rolegroup1, I_RelTuple[] rolegroup2) throws TerminologyException, IOException {
 			TEST_RESULTS roleTestResult ;
@@ -337,6 +492,15 @@ public class RelationshipsDAO {
 			return true;
 
 		}
+		
+		/**
+		 * Gets the inherited relationships.
+		 *
+		 * @param concept the concept
+		 * @return the inherited relationships
+		 * @throws IOException Signals that an I/O exception has occurred.
+		 * @throws TerminologyException the terminology exception
+		 */
 		public InheritedRelationships getInheritedRelationships (I_GetConceptData concept) throws IOException, TerminologyException{
 			List<I_RelTuple[]> allRoleGroups=new ArrayList<I_RelTuple[]>();
 			List<I_RelTuple> allSingleRoles=new ArrayList<I_RelTuple>();
@@ -351,6 +515,14 @@ public class RelationshipsDAO {
 
 		}
 
+		/**
+		 * Gets the inherited relationships.
+		 *
+		 * @param parents the parents
+		 * @return the inherited relationships
+		 * @throws TerminologyException the terminology exception
+		 * @throws IOException Signals that an I/O exception has occurred.
+		 */
 		public InheritedRelationships getInheritedRelationships (Set<I_GetConceptData> parents) throws TerminologyException, IOException{
 			List<I_RelTuple[]> allRoleGroups=new ArrayList<I_RelTuple[]>();
 			List<I_RelTuple> allSingleRoles=new ArrayList<I_RelTuple>();
@@ -369,6 +541,15 @@ public class RelationshipsDAO {
 			return inheritedRelationships;
 		}
 
+		/**
+		 * Gets the more specific roles.
+		 *
+		 * @param allRoleGroups the all role groups
+		 * @param allSingleRoles the all single roles
+		 * @return the more specific roles
+		 * @throws TerminologyException the terminology exception
+		 * @throws IOException Signals that an I/O exception has occurred.
+		 */
 		private void getMoreSpecificRoles(List<I_RelTuple[]> allRoleGroups,
 				List<I_RelTuple> allSingleRoles) throws TerminologyException, IOException {
 
@@ -418,6 +599,17 @@ public class RelationshipsDAO {
 		}
 
 
+		/**
+		 * Gets the recursive defining attributes.
+		 *
+		 * @param concept the concept
+		 * @param allRoleGroups the all role groups
+		 * @param allSingleRoles the all single roles
+		 * @param parents the parents
+		 * @return the recursive defining attributes
+		 * @throws IOException Signals that an I/O exception has occurred.
+		 * @throws TerminologyException the terminology exception
+		 */
 		@SuppressWarnings("unchecked")
 		private void getRecursiveDefiningAttributes(I_GetConceptData concept,
 				List<I_RelTuple[]> allRoleGroups,List<I_RelTuple> allSingleRoles, Set<I_GetConceptData> parents) throws IOException, TerminologyException {
@@ -466,6 +658,14 @@ public class RelationshipsDAO {
 		}
 
 
+		/**
+		 * Checks if is defining char.
+		 *
+		 * @param characteristicId the characteristic id
+		 * @return true, if is defining char
+		 * @throws IOException Signals that an I/O exception has occurred.
+		 * @throws TerminologyException the terminology exception
+		 */
 		public boolean isDefiningChar(int characteristicId) throws IOException, TerminologyException {
 
 			if (setDefChar.contains(characteristicId)){
@@ -479,6 +679,13 @@ public class RelationshipsDAO {
 			return false;
 		}
 
+		/**
+		 * Gets the constraint normal form.
+		 *
+		 * @param conceptData the concept data
+		 * @param factContextName the fact context name
+		 * @return the constraint normal form
+		 */
 		public List<DrRelationship> getConstraintNormalForm(I_GetConceptData conceptData, String factContextName){
 
 			List<DrRelationship> rels = new ArrayList<DrRelationship>();
@@ -542,14 +749,20 @@ public class RelationshipsDAO {
 					rels.add(loopRel);
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(e);
 			} catch (TerminologyException e) {
-				e.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(e);
 			}
 			return rels;
 
 		}
 
+		/**
+		 * Gets the mock view set.
+		 *
+		 * @param config the config
+		 * @return the mock view set
+		 */
 		private static PositionSet getMockViewSet(I_ConfigAceFrame config) {
 			I_TermFactory termFactory = Terms.get();
 			Set<PositionBI> viewPositions =  new HashSet<PositionBI>();
@@ -559,9 +772,9 @@ public class RelationshipsDAO {
 					viewPositions.add(pos);
 				}
 			} catch (TerminologyException e) {
-				e.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(e);
 			} catch (IOException e) {
-				e.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(e);
 			}
 			PositionSet mockViewSet = new PositionSet(viewPositions);
 			return mockViewSet;

@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.qa.gui;
 
 import java.awt.datatransfer.DataFlavor;
@@ -21,27 +37,56 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.dnd.ConceptTransferable;
 import org.dwfa.ace.dnd.DescriptionTransferable;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.modeler.tool.I_GetItemForModel;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.dnd.FixedTerminologyTransferable;
 
+/**
+ * The Class ObjectTransferHandler.
+ */
 public class ObjectTransferHandler extends TransferHandler {
-	/**
-	 * 
-	 */
+	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
+	
+	/** The Constant TARGET_LIST_NAME. */
 	public final static String TARGET_LIST_NAME = "targetLanguageList";
+	
+	/** The indices. */
 	private int[] indices = null;
+	
+	/** The add index. */
 	private int addIndex = -1; // Location where items were added
+	
+	/** The add count. */
 	private int addCount = 0; // Number of items added.
+	
+	/** The config. */
 	private I_ConfigAceFrame config;
+	
+	/** The get item. */
 	private I_GetItemForModel getItem;
+	
+	/** The concept bean flavor. */
 	public static DataFlavor conceptBeanFlavor;
+	
+	/** The thin desc versioned flavor. */
 	public static DataFlavor thinDescVersionedFlavor;
+	
+	/** The thin desc tuple flavor. */
 	public static DataFlavor thinDescTupleFlavor;
+	
+	/** The supported flavors. */
 	public static DataFlavor[] supportedFlavors;
 
 
+	/**
+	 * Instantiates a new object transfer handler.
+	 *
+	 * @param config the config
+	 * @param getItem the get item
+	 */
 	public ObjectTransferHandler(I_ConfigAceFrame config, I_GetItemForModel getItem) {
 		this.config = config;
 		this.getItem = getItem;
@@ -63,6 +108,9 @@ public class ObjectTransferHandler extends TransferHandler {
         }
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.swing.TransferHandler#importData(javax.swing.JComponent, java.awt.datatransfer.Transferable)
+	 */
 	public boolean importData(JComponent c, Transferable t) {
 		if (canImport(c, t.getTransferDataFlavors())) {
 			try {
@@ -80,7 +128,7 @@ public class ObjectTransferHandler extends TransferHandler {
 								getItem.getItemFromConcept(concept);
 							} catch (Exception e) {
 								System.out.println(e.getMessage());
-								e.printStackTrace();
+								AceLog.getAppLog().alertAndLogException(e);
 								return false;
 							}
 						}
@@ -119,7 +167,7 @@ public class ObjectTransferHandler extends TransferHandler {
 										}
 										obj = getItem.getItemFromConcept(concept);
 									} catch (Exception e) {
-										e.printStackTrace();
+										AceLog.getAppLog().alertAndLogException(e);
 									}
 								} else {
 									obj = concept;
@@ -137,7 +185,7 @@ public class ObjectTransferHandler extends TransferHandler {
 								}
 							}
 						} catch (Exception e) {
-							e.printStackTrace();
+							AceLog.getAppLog().alertAndLogException(e);
 						}
 					} else {
 						JList target = (JList) c;
@@ -171,7 +219,7 @@ public class ObjectTransferHandler extends TransferHandler {
 									}
 									obj = getItem.getItemFromConcept(concept);
 								} catch (Exception e) {
-									e.printStackTrace();
+									AceLog.getAppLog().alertAndLogException(e);
 								}
 							} else {
 								obj = concept;
@@ -195,22 +243,25 @@ public class ObjectTransferHandler extends TransferHandler {
 							}
 							// }
 						} catch (TerminologyException e) {
-							e.printStackTrace();
+							AceLog.getAppLog().alertAndLogException(e);
 						}
 					}
 				}
 				return true;
 			} catch (UnsupportedFlavorException ufe) {
 				System.out.println("importData: unsupported data flavor");
-				ufe.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(ufe);
 			} catch (IOException ioe) {
 				System.out.println("importData: I/O exception");
-				ioe.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(ioe);
 			}
 		}
 		return false;
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.swing.TransferHandler#createTransferable(javax.swing.JComponent)
+	 */
 	protected Transferable createTransferable(JComponent c) {
 		I_GetConceptData concept = null;
 		if(c instanceof JTable){
@@ -221,11 +272,11 @@ public class ObjectTransferHandler extends TransferHandler {
 			try {
 				concept = Terms.get().getConcept(conceptUuid.toString()).iterator().next();
 			} catch (TerminologyException e) {
-				e.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(e);
 			} catch (ParseException e) {
-				e.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(e);
 			} catch (IOException e) {
-				e.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(e);
 			}
 		}else{
 			JList list = (JList) c;
@@ -236,10 +287,16 @@ public class ObjectTransferHandler extends TransferHandler {
 		return new ConceptTransferable(concept);
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.swing.TransferHandler#getSourceActions(javax.swing.JComponent)
+	 */
 	public int getSourceActions(JComponent c) {
 		return COPY_OR_MOVE;
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.swing.TransferHandler#exportDone(javax.swing.JComponent, java.awt.datatransfer.Transferable, int)
+	 */
 	protected void exportDone(JComponent c, Transferable data, int action) {
 		if (action == MOVE) {
 			if (indices != null) {
@@ -269,6 +326,9 @@ public class ObjectTransferHandler extends TransferHandler {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.swing.TransferHandler#canImport(javax.swing.JComponent, java.awt.datatransfer.DataFlavor[])
+	 */
 	public boolean canImport(JComponent c, DataFlavor[] flavors) {
 		if (c.isEnabled()) {
 			DataFlavor conceptBeanFlavor;
@@ -281,6 +341,13 @@ public class ObjectTransferHandler extends TransferHandler {
 		return false;
 	}
 
+	/**
+	 * Checks for concept bean flavor.
+	 *
+	 * @param flavors the flavors
+	 * @param conceptBeanFlavor the concept bean flavor
+	 * @return true, if successful
+	 */
 	private boolean hasConceptBeanFlavor(DataFlavor[] flavors, DataFlavor conceptBeanFlavor) {
 		for (int i = 0; i < flavors.length; i++) {
 			if (conceptBeanFlavor.equals(flavors[i])) {

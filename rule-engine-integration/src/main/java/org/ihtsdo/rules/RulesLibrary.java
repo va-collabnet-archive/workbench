@@ -41,7 +41,6 @@ import org.apache.commons.configuration.XMLConfiguration;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.SystemEventListener;
-import org.drools.SystemEventListenerFactory;
 import org.drools.agent.KnowledgeAgent;
 import org.drools.agent.KnowledgeAgentConfiguration;
 import org.drools.agent.KnowledgeAgentFactory;
@@ -111,22 +110,49 @@ import com.googlecode.sardine.SardineFactory;
  */
 public class RulesLibrary {
 
-	/** The CONCEPT MODEL knowledge package identifier */
+	/** The CONCEPT MODEL knowledge package identifier. */
 	public static int CONCEPT_MODEL_PKG = 0;
+	
+	/** The LINGUISTI c_ guideline s_ pkg. */
 	public static int LINGUISTIC_GUIDELINES_PKG = 1;
 
+	/** The my static is a cache. */
 	public static KindOfCacheBI myStaticIsACache;
+	
+	/** The my static is a cache refset spec. */
 	public static KindOfCacheBI myStaticIsACacheRefsetSpec;
+	
+	/** The terminology helper cache. */
 	public static TerminologyHelperDroolsWorkbench terminologyHelperCache;
+	
+	/** The no realtime rules alert shown. */
 	public static boolean noRealtimeRulesAlertShown = false;
+	
+	/** The rules disabled. */
 	public static boolean rulesDisabled = false;
 
-	public enum INFERRED_VIEW_ORIGIN {STATED, CONSTRAINT_NORMAL_FORM, INFERRED};
+	/**
+	 * The Enum INFERRED_VIEW_ORIGIN.
+	 */
+	public enum INFERRED_VIEW_ORIGIN {/** The STATED. */
+STATED, /** The CONSTRAIN t_ norma l_ form. */
+ CONSTRAINT_NORMAL_FORM, /** The INFERRED. */
+ INFERRED};
 
+	/** The all rels. */
 	public static I_IntSet allRels;
+	
+	/** The hist rels. */
 	public static I_IntSet histRels;
+	
+	/** The Cpt model rels. */
 	public static I_IntSet CptModelRels;
 
+	/**
+	 * Gets the terminology helper.
+	 *
+	 * @return the terminology helper
+	 */
 	public static TerminologyHelperDroolsWorkbench getTerminologyHelper() {
 		if (terminologyHelperCache == null) {
 			terminologyHelperCache =  new TerminologyHelperDroolsWorkbench();
@@ -137,6 +163,13 @@ public class RulesLibrary {
 		}
 	}
 
+	/**
+	 * Setup is a cache.
+	 *
+	 * @return the kind of cache bi
+	 * @throws TerminologyException the terminology exception
+	 * @throws Exception the exception
+	 */
 	public static KindOfCacheBI setupIsACache() throws TerminologyException, Exception {
 		myStaticIsACache = Ts.get().getCache(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
 		RefsetSpecQuery.myStaticIsACache = myStaticIsACache;
@@ -144,6 +177,16 @@ public class RulesLibrary {
 		return myStaticIsACache;
 	}
 
+	/**
+	 * Check concept.
+	 *
+	 * @param concept the concept
+	 * @param context the context
+	 * @param onlyUncommittedContent the only uncommitted content
+	 * @param config the config
+	 * @return the results collector work bench
+	 * @throws Exception the exception
+	 */
 	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, 
 			boolean onlyUncommittedContent, I_ConfigAceFrame config) 
 	throws Exception {
@@ -151,12 +194,34 @@ public class RulesLibrary {
 		return checkConcept(concept, context, onlyUncommittedContent, config, contextHelper, INFERRED_VIEW_ORIGIN.STATED);
 	}
 
+	/**
+	 * Check concept.
+	 *
+	 * @param concept the concept
+	 * @param context the context
+	 * @param onlyUncommittedContent the only uncommitted content
+	 * @param config the config
+	 * @param contextHelper the context helper
+	 * @return the results collector work bench
+	 * @throws Exception the exception
+	 */
 	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, 
 			boolean onlyUncommittedContent, I_ConfigAceFrame config, RulesContextHelper contextHelper) 
 	throws Exception {
 		return checkConcept(concept, context, onlyUncommittedContent, config, contextHelper, INFERRED_VIEW_ORIGIN.STATED);
 	}
 
+	/**
+	 * Check concept.
+	 *
+	 * @param concept the concept
+	 * @param context the context
+	 * @param onlyUncommittedContent the only uncommitted content
+	 * @param config the config
+	 * @param inferredOrigin the inferred origin
+	 * @return the results collector work bench
+	 * @throws Exception the exception
+	 */
 	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, 
 			boolean onlyUncommittedContent, I_ConfigAceFrame config, INFERRED_VIEW_ORIGIN inferredOrigin) 
 	throws Exception {
@@ -164,6 +229,18 @@ public class RulesLibrary {
 		return checkConcept(concept, context, onlyUncommittedContent, config, contextHelper, inferredOrigin);
 	}
 
+	/**
+	 * Check concept.
+	 *
+	 * @param concept the concept
+	 * @param context the context
+	 * @param onlyUncommittedContent the only uncommitted content
+	 * @param config the config
+	 * @param contextHelper the context helper
+	 * @param inferredOrigin the inferred origin
+	 * @return the results collector work bench
+	 * @throws Exception the exception
+	 */
 	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, 
 			boolean onlyUncommittedContent, I_ConfigAceFrame config, RulesContextHelper contextHelper, 
 			INFERRED_VIEW_ORIGIN inferredOrigin) 
@@ -305,7 +382,7 @@ public class RulesLibrary {
 				} catch (ComputationCanceled e1) {
 					// Nothing to do
 				}
-				e.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(e);
 			}
 		}
 		long endTime = System.currentTimeMillis();
@@ -330,12 +407,12 @@ public class RulesLibrary {
 
 	/**
 	 * Check concept.
-	 * 
+	 *
 	 * @param concept the concept
-	 * @param config the config
-	 * 
+	 * @param kbId the kb id
+	 * @param onlyUncommittedContent the only uncommitted content
 	 * @return the array list< alert to data constraint failure>
-	 * @throws Exception 
+	 * @throws Exception the exception
 	 */
 	@Deprecated
 	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, int kbId, boolean onlyUncommittedContent
@@ -343,6 +420,16 @@ public class RulesLibrary {
 		return checkConcept(concept, kbId, null, onlyUncommittedContent);
 	}
 
+	/**
+	 * Check concept.
+	 *
+	 * @param concept the concept
+	 * @param kbId the kb id
+	 * @param languageRefset the language refset
+	 * @param onlyUncommittedContent the only uncommitted content
+	 * @return the results collector work bench
+	 * @throws Exception the exception
+	 */
 	@Deprecated
 	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, int kbId, 
 			I_GetConceptData languageRefset, boolean onlyUncommittedContent) 
@@ -414,6 +501,14 @@ public class RulesLibrary {
 		return results;
 	}
 
+	/**
+	 * Check objects.
+	 *
+	 * @param objects the objects
+	 * @param kbId the kb id
+	 * @return the results collector work bench
+	 * @throws Exception the exception
+	 */
 	@Deprecated
 	public static ResultsCollectorWorkBench checkObjects(List<Object> objects, int kbId) throws Exception {
 		KnowledgeBase kbase = getKnowledgeBase(kbId);
@@ -434,6 +529,14 @@ public class RulesLibrary {
 		return results;
 	}
 
+	/**
+	 * Check objects test model.
+	 *
+	 * @param objects the objects
+	 * @param kbId the kb id
+	 * @return the results collector work bench
+	 * @throws Exception the exception
+	 */
 	@Deprecated
 	public static ResultsCollectorWorkBench checkObjectsTestModel(List<Object> objects, int kbId) throws Exception {
 		KnowledgeBase kbase = getKnowledgeBase(kbId);
@@ -489,9 +592,9 @@ public class RulesLibrary {
 					descriptionTypes, tf.getActiveAceFrameConfig().getViewPositionSetReadOnly(),
 					config.getPrecedence(), config.getConflictResolutionStrategy());
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return descriptions;
 	}
@@ -525,11 +628,11 @@ public class RulesLibrary {
 				} catch (StreamCorruptedException e0) {
 					serializedKbFile.delete();
 				} catch (FileNotFoundException e) {
-					e.printStackTrace();
+					AceLog.getAppLog().alertAndLogException(e);
 				} catch (IOException e) {
-					e.printStackTrace();
+					AceLog.getAppLog().alertAndLogException(e);
 				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
+					AceLog.getAppLog().alertAndLogException(e);
 				}
 			} else {
 				KnowledgeAgent kagent = KnowledgeAgentFactory.newKnowledgeAgent( "Agent" );
@@ -540,9 +643,9 @@ public class RulesLibrary {
 					out.writeObject( kbase.getKnowledgePackages() );
 					out.close();
 				} catch (FileNotFoundException e) {
-					e.printStackTrace();
+					AceLog.getAppLog().alertAndLogException(e);
 				} catch (IOException e) {
-					e.printStackTrace();
+					AceLog.getAppLog().alertAndLogException(e);
 				}
 			}
 		}
@@ -551,13 +654,11 @@ public class RulesLibrary {
 
 	/**
 	 * Gets the knowledge base from the Guvnor deployment URL retrieved from a byteArray, not a file.
-	 * 
-	 * @param kbId the kb id
-	 * @param url the url
+	 *
+	 * @param referenceUuid the reference uuid
+	 * @param bytes the bytes
 	 * @param recreate the recreate
-	 * 
 	 * @return the knowledge base
-	 * 
 	 * @throws Exception the exception
 	 */
 	public static KnowledgeBase getKnowledgeBase(UUID referenceUuid, byte[] bytes, boolean recreate) throws Exception {
@@ -567,7 +668,7 @@ public class RulesLibrary {
 			try {
 				kbase = getKnowledgeBaseWithAgent(referenceUuid, bytes);
 			} catch (Exception e) {
-				e.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(e);
 			}
 			if (kbase == null || kbase.getKnowledgePackages().size() == 0) {
 				System.out.println("WARNING: Agent based connection with guvnor not available, trying to load from cache...");
@@ -595,15 +696,22 @@ public class RulesLibrary {
 		return kbase;
 	}
 
+	/**
+	 * Gets the knowledge base from file cache.
+	 *
+	 * @param referenceUuid the reference uuid
+	 * @return the knowledge base from file cache
+	 * @throws Exception the exception
+	 */
 	private static KnowledgeBase getKnowledgeBaseFromFileCache(UUID referenceUuid) throws Exception {
 		HashSet<I_ShowActivity> activities = new HashSet<I_ShowActivity>();
 		I_ConfigAceFrame config = null;
 		try {
 			config = Terms.get().getActiveAceFrameConfig();
 		} catch (TerminologyException e1) {
-			e1.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e1);
 		} catch (IOException e1) {
-			e1.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e1);
 		}
 		I_ShowActivity activity =
 			Terms.get().newActivityPanel(true, config, 
@@ -631,11 +739,11 @@ public class RulesLibrary {
 				} catch (StreamCorruptedException e0) {
 					serializedKbFile.delete();
 				} catch (FileNotFoundException e) {
-					e.printStackTrace();
+					AceLog.getAppLog().alertAndLogException(e);
 				} catch (IOException e) {
-					e.printStackTrace();
+					AceLog.getAppLog().alertAndLogException(e);
 				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
+					AceLog.getAppLog().alertAndLogException(e);
 				}
 			}
 
@@ -660,19 +768,28 @@ public class RulesLibrary {
 			long elapsed = endTime - startTime;
 			String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
 			activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; Error");
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return kbase;
 	}
+	
+	/**
+	 * Gets the knowledge base with agent.
+	 *
+	 * @param referenceUuid the reference uuid
+	 * @param bytes the bytes
+	 * @return the knowledge base with agent
+	 * @throws Exception the exception
+	 */
 	private static KnowledgeBase getKnowledgeBaseWithAgent(UUID referenceUuid, byte[] bytes) throws Exception {
 		HashSet<I_ShowActivity> activities = new HashSet<I_ShowActivity>();
 		I_ConfigAceFrame config = null;
 		try {
 			config = Terms.get().getActiveAceFrameConfig();
 		} catch (TerminologyException e1) {
-			e1.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e1);
 		} catch (IOException e1) {
-			e1.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e1);
 		}
 		I_ShowActivity activity =
 			Terms.get().newActivityPanel(true, config, 
@@ -702,9 +819,9 @@ public class RulesLibrary {
 				out.writeObject( kbase );
 				out.close();
 			} catch (FileNotFoundException e) {
-				e.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(e);
 			} catch (IOException e) {
-				e.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(e);
 			}
 			long endTime = System.currentTimeMillis();
 			long elapsed = endTime - startTime;
@@ -727,21 +844,34 @@ public class RulesLibrary {
 			long elapsed = endTime - startTime;
 			String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
 			activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; Error");
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return kbase;
 	}
 
+	/**
+	 * Validate deployment package.
+	 *
+	 * @param referenceUuid the reference uuid
+	 * @param bytes the bytes
+	 * @return true, if successful
+	 */
 	public static boolean validateDeploymentPackage(UUID referenceUuid, byte[] bytes) {
 		KnowledgeBase kbase= null;
 		try {
 			kbase = getKnowledgeBase(referenceUuid, bytes, false);
 		} catch (Exception e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return (kbase != null);
 	}
 
+	/**
+	 * Checks if is package on line.
+	 *
+	 * @param bytes the bytes
+	 * @return true, if is package on line
+	 */
 	public static boolean isPackageOnLine(byte[] bytes) {
 		KnowledgeBase kbase= null;
 		try {
@@ -749,24 +879,31 @@ public class RulesLibrary {
 			kagent.applyChangeSet( ResourceFactory.newByteArrayResource(bytes) );
 			kbase = kagent.getKnowledgeBase();
 		} catch (Exception e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return (kbase != null);
 	}
 
 	/**
 	 * Gets the knowledge base.
-	 * 
+	 *
 	 * @param kbId the kb id
-	 * 
 	 * @return the knowledge base
-	 * @throws Exception 
+	 * @throws Exception the exception
 	 */
 	@Deprecated
 	public static KnowledgeBase getKnowledgeBase(int kbId) throws Exception {
 		return getKnowledgeBase(kbId, false, null);
 	}
 
+	/**
+	 * Gets the knowledge base.
+	 *
+	 * @param kbId the kb id
+	 * @param resources the resources
+	 * @return the knowledge base
+	 * @throws Exception the exception
+	 */
 	@Deprecated
 	public static KnowledgeBase getKnowledgeBase(int kbId, HashMap<Resource, ResourceType> resources) throws Exception {
 		return getKnowledgeBase(kbId, false, resources);
@@ -774,12 +911,12 @@ public class RulesLibrary {
 
 	/**
 	 * Gets the knowledge base.
-	 * 
+	 *
 	 * @param kbId the kb id
 	 * @param recreate the recreate
-	 * 
+	 * @param resources the resources
 	 * @return the knowledge base
-	 * @throws Exception 
+	 * @throws Exception the exception
 	 */
 	@Deprecated
 	public static KnowledgeBase getKnowledgeBase(int kbId, boolean recreate, 
@@ -799,11 +936,11 @@ public class RulesLibrary {
 			} catch (StreamCorruptedException e0) {
 				serializedKbFile.delete();
 			} catch (FileNotFoundException e) {
-				e.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(e);
 			} catch (IOException e) {
-				e.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(e);
 			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(e);
 			}
 		} else {
 			if (resources == null || resources.isEmpty()) {
@@ -834,9 +971,9 @@ public class RulesLibrary {
 				out.writeObject( kbuilder.getKnowledgePackages() );
 				out.close();
 			} catch (FileNotFoundException e) {
-				e.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(e);
 			} catch (IOException e) {
-				e.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(e);
 			}
 
 		}
@@ -863,9 +1000,9 @@ public class RulesLibrary {
 				}
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return id;
 
@@ -885,9 +1022,9 @@ public class RulesLibrary {
 			UUID elementUuid = Type3UuidFactory.fromSNOMED(snomedConceptId);
 			concept = tf.getConcept(new UUID[] {elementUuid});
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return concept;
 	}
@@ -905,9 +1042,9 @@ public class RulesLibrary {
 		try {
 			concept = tf.getConcept(new UUID[] {uuid});
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return concept.getConceptNid();
 	}
@@ -964,14 +1101,21 @@ public class RulesLibrary {
 			targetConcept.toString() + " - CharType: " + charType.toString() + " - Group: " + rel.getGroup();
 
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 
 		return details;
 	}
 
+	/**
+	 * Update guvnor enumerations.
+	 *
+	 * @param refset the refset
+	 * @param kPack the k pack
+	 * @param config the config
+	 */
 	public static void updateGuvnorEnumerations(I_GetConceptData refset, RulesDeploymentPackageReference kPack, I_ConfigAceFrame config) {
 		try {
 			ConceptVersionBI refsetBI = Ts.get().getConceptVersion(config.getViewCoordinate(), refset.getUids());
@@ -1021,16 +1165,24 @@ public class RulesLibrary {
 			//"http://208.109.105.1:8080/drools-guvnor/org.drools.guvnor.Guvnor/package/qa4/qa4Demo"
 			sardine.put(pkgUrl, guvnorEnumerationText.getBytes());
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (ContradictionException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (Exception e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 	}
 
+	/**
+	 * Checks if is included in refset spec.
+	 *
+	 * @param refset the refset
+	 * @param candidateConcept the candidate concept
+	 * @param config the config
+	 * @return true, if is included in refset spec
+	 */
 	public static boolean isIncludedInRefsetSpec(I_GetConceptData refset, I_GetConceptData candidateConcept, I_ConfigAceFrame config) {
 		boolean result = false;
 		//		System.out.println("************ Starting test computation *****************");
@@ -1108,13 +1260,20 @@ public class RulesLibrary {
 			try {
 				Terms.get().cancel();
 			} catch (IOException ioException) {
-				ioException.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(ioException);
 			}
 		}
 
 		return result;
 	}
 
+	/**
+	 * Gets the documentation url for rule uuid.
+	 *
+	 * @param ruleUuid the rule uuid
+	 * @return the documentation url for rule uuid
+	 * @throws ConfigurationException the configuration exception
+	 */
 	public static URL getDocumentationUrlForRuleUUID(UUID ruleUuid) throws ConfigurationException {
 		URL url = null;
 
@@ -1143,6 +1302,13 @@ public class RulesLibrary {
 	}
 
 
+	/**
+	 * Gets the historical rels.
+	 *
+	 * @return the historical rels
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static I_IntSet getHistoricalRels() throws TerminologyException, IOException{
 
 		if (histRels == null) {
@@ -1157,6 +1323,13 @@ public class RulesLibrary {
 		return histRels;
 	}
 
+	/**
+	 * Gets the concept model rels.
+	 *
+	 * @return the concept model rels
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static I_IntSet getConceptModelRels() throws TerminologyException, IOException{
 
 		if (CptModelRels == null ) {
@@ -1171,6 +1344,14 @@ public class RulesLibrary {
 		}
 		return CptModelRels;
 	}
+	
+	/**
+	 * Gets the all rels.
+	 *
+	 * @return the all rels
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static I_IntSet getAllRels() throws TerminologyException, IOException{
 
 		if (allRels == null) {
@@ -1183,6 +1364,13 @@ public class RulesLibrary {
 		return allRels;
 	}
 
+	/**
+	 * Gets the descendants.
+	 *
+	 * @param descendants the descendants
+	 * @param concept the concept
+	 * @return the descendants
+	 */
 	public static Set<I_GetConceptData> getDescendants(Set<I_GetConceptData> descendants, I_GetConceptData concept) {
 		try {
 			I_TermFactory termFactory = Terms.get();
@@ -1202,9 +1390,9 @@ public class RulesLibrary {
 				descendants = getDescendants(descendants, loopConcept);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return descendants;
 	}
@@ -1221,9 +1409,9 @@ public class RulesLibrary {
 		try {
 			config = Terms.get().getActiveAceFrameConfig();
 		} catch (TerminologyException e1) {
-			e1.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e1);
 		} catch (IOException e1) {
-			e1.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e1);
 		}
 		try {
 			I_GetConceptData userParent =
@@ -1266,7 +1454,7 @@ public class RulesLibrary {
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return validUsers;
 	}

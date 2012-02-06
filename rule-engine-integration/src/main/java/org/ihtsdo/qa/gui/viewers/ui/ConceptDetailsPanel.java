@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Fri Aug 05 16:22:27 GMT-03:00 2011
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.qa.gui.viewers.ui;
@@ -36,6 +49,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.qa.gui.ObjectTransferHandler;
@@ -49,22 +63,50 @@ import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
+ * The Class ConceptDetailsPanel.
+ *
  * @author Guillermo Reynoso
  */
 public class ConceptDetailsPanel extends JPanel {
 
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 2902078592415391231L;
+	
+	/** The concept. */
 	private I_GetConceptData concept;
+	
+	/** The tf. */
 	private I_TermFactory tf;
+	
+	/** The model. */
 	private DefaultTreeModel model;
+	
+	/** The concept model. */
 	private DefaultListModel conceptModel;
+	
+	/** The top. */
 	private DefaultMutableTreeNode top;
+	
+	/** The concept node. */
 	private DefaultMutableTreeNode conceptNode;
+	
+	/** The defining char. */
 	private int definingChar = -1;
+	
+	/** The fact context name. */
 	private String factContextName = "";
+	
+	/** The inactive. */
 	private I_GetConceptData inactive;
+	
+	/** The retired. */
 	private I_GetConceptData retired;
 
+	/**
+	 * Instantiates a new concept details panel.
+	 *
+	 * @param conceptBi the concept bi
+	 */
 	public ConceptDetailsPanel(ConceptVersionBI conceptBi) {
 		initComponents();
 
@@ -73,12 +115,15 @@ public class ConceptDetailsPanel extends JPanel {
 			this.concept = tf.getConcept(conceptBi.getNid());
 			initCustomComponents();
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 	}
 
+	/**
+	 * Instantiates a new concept details panel.
+	 */
 	public ConceptDetailsPanel() {
 		initComponents();
 
@@ -88,12 +133,17 @@ public class ConceptDetailsPanel extends JPanel {
 		try {
 			initCustomComponents();
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 	}
 
+	/**
+	 * Instantiates a new concept details panel.
+	 *
+	 * @param oldStyleConcept the old style concept
+	 */
 	public ConceptDetailsPanel(I_GetConceptData oldStyleConcept) {
 		initComponents();
 
@@ -103,12 +153,18 @@ public class ConceptDetailsPanel extends JPanel {
 		try {
 			initCustomComponents();
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 	}
 
+	/**
+	 * Inits the custom components.
+	 *
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	private void initCustomComponents() throws IOException, TerminologyException {
 		definingChar = ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.localize().getNid();
 
@@ -144,7 +200,7 @@ public class ConceptDetailsPanel extends JPanel {
 				try {
 					populateDetailsTree();
 				} catch (Exception e) {
-					e.printStackTrace();
+					AceLog.getAppLog().alertAndLogException(e);
 				}
 			}
 
@@ -163,10 +219,15 @@ public class ConceptDetailsPanel extends JPanel {
 		try {
 			populateDetailsTree();
 		} catch (Exception e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 	}
 
+	/**
+	 * Populate details tree.
+	 *
+	 * @throws Exception the exception
+	 */
 	private void populateDetailsTree() throws Exception {
 		top.removeAllChildren();
 		if (concept != null) {
@@ -188,9 +249,9 @@ public class ConceptDetailsPanel extends JPanel {
 
 				model.insertNodeInto(conceptNode, top, top.getChildCount());
 			} catch (IOException e) {
-				e.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(e);
 			} catch (TerminologyException e) {
-				e.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(e);
 			}
 
 			createTree(conceptNode);
@@ -201,6 +262,13 @@ public class ConceptDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Creates the tree.
+	 *
+	 * @param top the top
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	private void createTree(DefaultMutableTreeNode top) throws IOException, TerminologyException {
 		RelationshipsDAO rDao = new RelationshipsDAO();
 		List<DrRelationship> inhRel = rDao.getConstraintNormalForm(concept, "");
@@ -297,6 +365,14 @@ public class ConceptDetailsPanel extends JPanel {
 		model.reload();
 	}
 
+	/**
+	 * Creates the generic relation properties.
+	 *
+	 * @param parentNode the parent node
+	 * @param relTuple the rel tuple
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	private void createGenericRelationProperties(DefaultMutableTreeNode parentNode, RelationshipVersionBI relTuple) throws IOException, TerminologyException {
 		DefaultMutableTreeNode relNode = createRelationNode(relTuple);
 		addNodeInSortedOrder(parentNode, relNode);
@@ -338,6 +414,14 @@ public class ConceptDetailsPanel extends JPanel {
 
 	}
 
+	/**
+	 * Creates the generic relation properties.
+	 *
+	 * @param parentNode the parent node
+	 * @param relTuple the rel tuple
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	private void createGenericRelationProperties(DefaultMutableTreeNode parentNode, I_RelTuple relTuple) throws IOException, TerminologyException {
 		DefaultMutableTreeNode relNode = createRelationNode(relTuple);
 		addNodeInSortedOrder(parentNode, relNode);
@@ -375,6 +459,14 @@ public class ConceptDetailsPanel extends JPanel {
 		addNodeInSortedOrder(relNode, factContextNode);
 	}
 	
+	/**
+	 * Creates the generic relation properties.
+	 *
+	 * @param parentNode the parent node
+	 * @param relTuple the rel tuple
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	private void createGenericRelationProperties(DefaultMutableTreeNode parentNode, DrRelationship relTuple) throws IOException, TerminologyException {
 		DefaultMutableTreeNode relNode = createRelationNode(relTuple);
 		addNodeInSortedOrder(parentNode, relNode);
@@ -412,6 +504,14 @@ public class ConceptDetailsPanel extends JPanel {
 		addNodeInSortedOrder(relNode, factContextNode);
 	}
 
+	/**
+	 * Creates the relation node.
+	 *
+	 * @param relTuple the rel tuple
+	 * @return the default mutable tree node
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	private DefaultMutableTreeNode createRelationNode(RelationshipVersionBI relTuple) throws IOException, TerminologyException {
 		String typeUuid = tf.nidToUuid(relTuple.getTypeNid()).toString();
 		I_GetConceptData type = tf.getConcept(UUID.fromString(typeUuid));
@@ -441,6 +541,14 @@ public class ConceptDetailsPanel extends JPanel {
 		return relNode;
 	}
 
+	/**
+	 * Creates the relation node.
+	 *
+	 * @param relTuple the rel tuple
+	 * @return the default mutable tree node
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	private DefaultMutableTreeNode createRelationNode(I_RelTuple relTuple) throws IOException, TerminologyException {
 		String typeUuid = tf.nidToUuid(relTuple.getTypeNid()).toString();
 		I_GetConceptData type = tf.getConcept(UUID.fromString(typeUuid));
@@ -494,6 +602,14 @@ public class ConceptDetailsPanel extends JPanel {
 		return relNode;
 	}
 	
+	/**
+	 * Creates the relation node.
+	 *
+	 * @param relTuple the rel tuple
+	 * @return the default mutable tree node
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	private DefaultMutableTreeNode createRelationNode(DrRelationship relTuple) throws IOException, TerminologyException {
 		String typeUuid = relTuple.getTypeUuid();
 		I_GetConceptData type = tf.getConcept(UUID.fromString(typeUuid));
@@ -547,6 +663,14 @@ public class ConceptDetailsPanel extends JPanel {
 		return relNode;
 	}
 
+	/**
+	 * Creates the rel attribute node.
+	 *
+	 * @param conceptNid the concept nid
+	 * @return the default mutable tree node
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	private DefaultMutableTreeNode createRelAttributeNode(int conceptNid) throws IOException, TerminologyException {
 		String uuid = tf.nidToUuid(conceptNid).toString();
 		I_GetConceptData concept = tf.getConcept(UUID.fromString(uuid));
@@ -554,6 +678,15 @@ public class ConceptDetailsPanel extends JPanel {
 		DefaultMutableTreeNode node = new DefaultMutableTreeNode(new TreeEditorObjectWrapper(concept.getInitialText() + " - (" + uuid + ")", IconUtilities.GREEN_ICON, null));
 		return node;
 	}
+	
+	/**
+	 * Creates the rel attribute node.
+	 *
+	 * @param conceptUUID the concept uuid
+	 * @return the default mutable tree node
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	private DefaultMutableTreeNode createRelAttributeNode(String conceptUUID) throws IOException, TerminologyException {
 		I_GetConceptData concept = tf.getConcept(UUID.fromString(conceptUUID));
 		
@@ -561,6 +694,12 @@ public class ConceptDetailsPanel extends JPanel {
 		return node;
 	}
 
+	/**
+	 * Adds the node in sorted order.
+	 *
+	 * @param parent the parent
+	 * @param child the child
+	 */
 	private void addNodeInSortedOrder(DefaultMutableTreeNode parent, DefaultMutableTreeNode child) {
 		int n = parent.getChildCount();
 		if (n == 0) {
@@ -580,6 +719,9 @@ public class ConceptDetailsPanel extends JPanel {
 		return;
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -633,11 +775,22 @@ public class ConceptDetailsPanel extends JPanel {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
+	/** The concept text box. */
 	private JPanel conceptTextBox;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The concept list. */
 	private JList conceptList;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The concept details tree. */
 	private JTree conceptDetailsTree;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 

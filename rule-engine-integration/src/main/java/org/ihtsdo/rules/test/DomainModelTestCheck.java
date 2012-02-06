@@ -33,6 +33,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
@@ -116,15 +117,20 @@ public class DomainModelTestCheck extends TestCase {
 				System.out.println(alert.getAlertMessage());
 			}
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 	}
 	
+	/**
+	 * Gets the test config.
+	 *
+	 * @return the test config
+	 */
 	private I_ConfigAceFrame getTestConfig() {
 		I_ConfigAceFrame config = null;
 		try {
@@ -155,9 +161,9 @@ public class DomainModelTestCheck extends TestCase {
 			config.setPrecedence(Precedence.TIME);
 	        
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		
 		return config;

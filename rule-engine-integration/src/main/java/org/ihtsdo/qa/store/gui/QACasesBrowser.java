@@ -1,6 +1,18 @@
 /*
-
- * Created by JFormDesigner on Thu Nov 25 12:27:48 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.qa.store.gui;
@@ -62,6 +74,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.qa.gui.ObjectTransferHandler;
@@ -77,66 +90,115 @@ import org.ihtsdo.qa.store.model.view.QACasesReportLine;
 import org.ihtsdo.qa.store.model.view.QACasesReportPage;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
-import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.spec.ValidationException;
 
 /**
+ * The Class QACasesBrowser.
+ *
  * @author Guillermo Reynoso
  */
 public class QACasesBrowser extends JPanel {
 
+	/** The logger. */
 	private Logger logger = Logger.getLogger(QACasesBrowser.class);
 
+	/** The config. */
 	private I_ConfigAceFrame config = null;
+	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
+	
+	/** The show filters. */
 	private boolean showFilters = false;
+	
+	/** The disposition statuses. */
 	private LinkedHashSet<DispositionStatus> dispositionStatuses;
+	
+	/** The store. */
 	private QAStoreBI store;
+	
+	/** The table model. */
 	private CaseTableModel tableModel;
+	
+	/** The coordinate. */
 	private QACoordinate coordinate;
+	
+	/** The rule. */
 	private Rule rule;
+	
+	/** The start line. */
 	private int startLine = 0;
+	
+	/** The final line. */
 	private int finalLine = 0;
+	
+	/** The total lines. */
 	private int totalLines = 0;
+	
+	/** The th. */
 	private ObjectTransferHandler th = null;
+	
+	/** The filter. */
 	private HashMap<QACasesReportColumn, Object> filter;
+	
+	/** The parent tabbed panel. */
 	private JTabbedPane parentTabbedPanel = null;
 
+	/** The results panel. */
 	private QAResultsBrowser resultsPanel;
+	
+	/** The header component. */
 	private TerminologyComponent headerComponent;
+	
+	/** The qa database. */
 	private QADatabase qaDatabase;
+	
+	/** The selected case. */
 	private QACase selectedCase;
+	
+	/** The selected case component. */
 	private TerminologyComponent selectedCaseComponent;
+	
+	/** The users. */
 	private Set<I_GetConceptData> users;
+	
+	/** The sdf. */
 	private SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy");
+	
+	/** The first load. */
 	private boolean firstLoad = true;
 
+	/** The inactive values set. */
 	private I_IntSet inactiveValuesSet;
 
+	/**
+	 * Instantiates a new qA cases browser.
+	 *
+	 * @param store the store
+	 * @param resultsPanel the results panel
+	 * @param parentTabbedPanel the parent tabbed panel
+	 */
 	public QACasesBrowser(QAStoreBI store, QAResultsBrowser resultsPanel, JTabbedPane parentTabbedPanel) {
 		try {
 			config = Terms.get().getActiveAceFrameConfig();
 			th = new ObjectTransferHandler(config, null);
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (Exception e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 
 		try {
 			users = RulesLibrary.getUsers();
 		} catch (Exception e) {
 			users = new HashSet<I_GetConceptData>();
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 
 		filter = new HashMap<QACasesReportColumn, Object>();
@@ -230,6 +292,9 @@ public class QACasesBrowser extends JPanel {
 
 	}
 
+	/**
+	 * Setup batch dispo status combo.
+	 */
 	private void setupBatchDispoStatusCombo() {
 		if (rule != null) {
 			batchDispositionStatus.removeAllItems();
@@ -246,6 +311,9 @@ public class QACasesBrowser extends JPanel {
 		}
 	}
 
+	/**
+	 * Setup page lines combo.
+	 */
 	private void setupPageLinesCombo() {
 		comboBox6.removeAllItems();
 		comboBox6.addItem("25");
@@ -256,6 +324,9 @@ public class QACasesBrowser extends JPanel {
 		comboBox6.addItem("1000");
 	}
 
+	/**
+	 * Setup assigned to filter combo.
+	 */
 	private void setupAssignedToFilterCombo() {
 		Iterator<I_GetConceptData> it = users.iterator();
 		assignedToFilterComboBox.addItem("Any");
@@ -265,6 +336,11 @@ public class QACasesBrowser extends JPanel {
 		}
 	}
 
+	/**
+	 * Sets the up panel.
+	 *
+	 * @param store the new up panel
+	 */
 	public void setupPanel(QAStoreBI store) {
 		setupBatchDispoStatusCombo();
 		this.coordinate = resultsPanel.getQACoordinate();
@@ -304,6 +380,12 @@ public class QACasesBrowser extends JPanel {
 		}
 	}
 
+	/**
+	 * Gets the qa database.
+	 *
+	 * @param databaseUuid the database uuid
+	 * @return the qa database
+	 */
 	private QADatabase getQaDatabase(UUID databaseUuid) {
 		if (qaDatabase != null && qaDatabase.getDatabaseUuid().equals(databaseUuid)) {
 			return qaDatabase;
@@ -312,6 +394,12 @@ public class QACasesBrowser extends JPanel {
 		return qaDatabase;
 	}
 
+	/**
+	 * Gets the header component.
+	 *
+	 * @param pathUuid the path uuid
+	 * @return the header component
+	 */
 	private TerminologyComponent getHeaderComponent(UUID pathUuid) {
 		if (headerComponent != null && headerComponent.getComponentUuid().equals(pathUuid)) {
 			return headerComponent;
@@ -321,6 +409,12 @@ public class QACasesBrowser extends JPanel {
 		return headerComponent;
 	}
 
+	/**
+	 * Gets the selected case component.
+	 *
+	 * @param componentUuid the component uuid
+	 * @return the selected case component
+	 */
 	public TerminologyComponent getSelectedCaseComponent(UUID componentUuid) {
 		if (selectedCaseComponent != null && selectedCaseComponent.getComponentUuid().equals(componentUuid)) {
 			return selectedCaseComponent;
@@ -330,6 +424,9 @@ public class QACasesBrowser extends JPanel {
 		return selectedCaseComponent;
 	}
 
+	/**
+	 * Update table1.
+	 */
 	private void updateTable1() {
 		clearTable1();
 
@@ -463,7 +560,7 @@ public class QACasesBrowser extends JPanel {
 
 					}
 				} catch (Exception e) {
-					e.printStackTrace();
+					AceLog.getAppLog().alertAndLogException(e);
 					row.add("");
 				}
 
@@ -474,6 +571,11 @@ public class QACasesBrowser extends JPanel {
 		caseTable.repaint();
 	}
 
+	/**
+	 * Update filters.
+	 *
+	 * @param filter the filter
+	 */
 	private void updateFilters(HashMap<QACasesReportColumn, Object> filter) {
 		filter.clear();
 		if (showFilters) {
@@ -504,6 +606,9 @@ public class QACasesBrowser extends JPanel {
 		}
 	}
 
+	/**
+	 * Clear table1.
+	 */
 	private void clearTable1() {
 		bathcSaveButton.setEnabled(false);
 		batchDispositionStatus.setEditable(false);
@@ -513,6 +618,9 @@ public class QACasesBrowser extends JPanel {
 		caseTable.repaint();
 	}
 
+	/**
+	 * Setup disposition combo.
+	 */
 	private void setupDispositionCombo() {
 		dispoStatusComboBox.removeAllItems();
 		dispoStatusComboBox.addItem("Any");
@@ -527,6 +635,9 @@ public class QACasesBrowser extends JPanel {
 		dispoStatusComboBox.repaint();
 	}
 
+	/**
+	 * Setup status combo.
+	 */
 	private void setupStatusCombo() {
 		statusComboBox.removeAllItems();
 		statusComboBox.addItem("Any");
@@ -534,6 +645,9 @@ public class QACasesBrowser extends JPanel {
 		statusComboBox.addItem("Closed");
 	}
 
+	/**
+	 * Setup sort by combo.
+	 */
 	private void setupSortByCombo() {
 		comboBox1.removeAllItems();
 		comboBox1.addItem("Concept name, status, disposition");
@@ -541,6 +655,11 @@ public class QACasesBrowser extends JPanel {
 		comboBox1.addItem("Disposition, name, status");
 	}
 
+	/**
+	 * Button2 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button2ActionPerformed(ActionEvent e) {
 		if (showFilters) {
 			filterButton.setText("Show filters");
@@ -553,6 +672,9 @@ public class QACasesBrowser extends JPanel {
 		}
 	}
 
+	/**
+	 * Update page counters.
+	 */
 	private void updatePageCounters() {
 		startLineLabel.setText(String.valueOf(startLine));
 		endLineLabel.setText(String.valueOf(finalLine));
@@ -562,16 +684,31 @@ public class QACasesBrowser extends JPanel {
 		panel3.revalidate();
 	}
 
+	/**
+	 * Button3 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button3ActionPerformed(ActionEvent e) {
 		doSearch();
 	}
 
+	/**
+	 * Button4 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button4ActionPerformed(ActionEvent e) {
 		Integer selectedPageLengh = Integer.parseInt((String) comboBox6.getSelectedItem());
 		startLine = startLine + selectedPageLengh;
 		updateTable1();
 	}
 
+	/**
+	 * Table1 mouse clicked.
+	 *
+	 * @param e the e
+	 */
 	private void table1MouseClicked(MouseEvent e) {
 		if (e.getClickCount() == 2) {
 			int tabCount = parentTabbedPanel.getTabCount();
@@ -611,10 +748,20 @@ public class QACasesBrowser extends JPanel {
 		}
 	}
 
+	/**
+	 * Inits the tab component.
+	 *
+	 * @param i the i
+	 */
 	private void initTabComponent(int i) {
 		parentTabbedPanel.setTabComponentAt(i, new ButtonTabComponent(parentTabbedPanel));
 	}
 
+	/**
+	 * Bathc save button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void bathcSaveButtonActionPerformed(ActionEvent e) {
 		List<QACase> qaCaseList = new ArrayList<QACase>();
 		for (int i = startLine - 1; i < finalLine; i++) {
@@ -669,7 +816,7 @@ public class QACasesBrowser extends JPanel {
 					}
 				}
 			} catch (Exception e1) {
-				e1.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(e1);
 				for (int i = startLine - 1; i < finalLine; i++) {
 					tableModel.setValueAt(false, i, tableModel.ROW_CHECKBOX);
 				}
@@ -679,6 +826,9 @@ public class QACasesBrowser extends JPanel {
 		}
 	}
 
+	/**
+	 * Do search.
+	 */
 	private void doSearch() {
 		firstLoad = false;
 		// previous page
@@ -691,12 +841,20 @@ public class QACasesBrowser extends JPanel {
 
 	}
 
+	/**
+	 * Combo box6 item state changed.
+	 *
+	 * @param e the e
+	 */
 	private void comboBox6ItemStateChanged(ItemEvent e) {
 		if (!firstLoad) {
 			doSearch();
 		}
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -1013,94 +1171,237 @@ public class QACasesBrowser extends JPanel {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The label6. */
 	private JLabel label6;
+	
+	/** The label12. */
 	private JLabel label12;
+	
+	/** The label7. */
 	private JLabel label7;
+	
+	/** The label8. */
 	private JLabel label8;
+	
+	/** The label9. */
 	private JLabel label9;
+	
+	/** The label10. */
 	private JLabel label10;
+	
+	/** The label13. */
 	private JLabel label13;
+	
+	/** The label14. */
 	private JLabel label14;
+	
+	/** The combo box1. */
 	private JComboBox comboBox1;
+	
+	/** The search button. */
 	private JButton searchButton;
+	
+	/** The filter button. */
 	private JButton filterButton;
+	
+	/** The separator1. */
 	private JSeparator separator1;
+	
+	/** The panel4. */
 	private JPanel panel4;
+	
+	/** The label11. */
 	private JLabel label11;
+	
+	/** The label4. */
 	private JLabel label4;
+	
+	/** The label5. */
 	private JLabel label5;
+	
+	/** The label21. */
 	private JLabel label21;
+	
+	/** The concept name text field. */
 	private JTextField conceptNameTextField;
+	
+	/** The status combo box. */
 	private JComboBox statusComboBox;
+	
+	/** The dispo status combo box. */
 	private JComboBox dispoStatusComboBox;
+	
+	/** The assigned to filter combo box. */
 	private JComboBox assignedToFilterComboBox;
+	
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The case table. */
 	private JTable caseTable;
+	
+	/** The panel3. */
 	private JPanel panel3;
+	
+	/** The label15. */
 	private JLabel label15;
+	
+	/** The combo box6. */
 	private JComboBox comboBox6;
+	
+	/** The label16. */
 	private JLabel label16;
+	
+	/** The h spacer1. */
 	private JPanel hSpacer1;
+	
+	/** The previous button. */
 	private JButton previousButton;
+	
+	/** The start line label. */
 	private JLabel startLineLabel;
+	
+	/** The label18. */
 	private JLabel label18;
+	
+	/** The end line label. */
 	private JLabel endLineLabel;
+	
+	/** The label20. */
 	private JLabel label20;
+	
+	/** The total lines label. */
 	private JLabel totalLinesLabel;
+	
+	/** The next button. */
 	private JButton nextButton;
+	
+	/** The separator2. */
 	private JSeparator separator2;
+	
+	/** The panel5. */
 	private JPanel panel5;
+	
+	/** The label17. */
 	private JLabel label17;
+	
+	/** The batch assigne to. */
 	private JComboBox batchAssigneTo;
+	
+	/** The label19. */
 	private JLabel label19;
+	
+	/** The batch disposition status. */
 	private JComboBox batchDispositionStatus;
+	
+	/** The message label. */
 	private JLabel messageLabel;
+	
+	/** The bathc save button. */
 	private JButton bathcSaveButton;
 
 	// //GEN-END:variables
 
+	/**
+	 * The Class CaseTableModel.
+	 */
 	class CaseTableModel extends AbstractTableModel {
 
+		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = -2582804161676112393L;
 
+		/** The CONCEP t_ uuid. */
 		public final Integer CONCEPT_UUID = 0;
+		
+		/** The RO w_ checkbox. */
 		public final Integer ROW_CHECKBOX = 1;
+		
+		/** The CONCEP t_ sctid. */
 		public final Integer CONCEPT_SCTID = 2;
+		
+		/** The CONCEP t_ name. */
 		public final Integer CONCEPT_NAME = 3;
+		
+		/** The STATUS. */
 		public final Integer STATUS = 4;
+		
+		/** The LAS t_ statu s_ changed. */
 		public final Integer LAST_STATUS_CHANGED = 5;
+		
+		/** The DISPOSITIO n_ status. */
 		public final Integer DISPOSITION_STATUS = 6;
+		
+		/** The ASSIGNE d_ to. */
 		public final Integer ASSIGNED_TO = 7;
+		
+		/** The TIME. */
 		public final Integer TIME = 8;
+		
+		/** The CASE. */
 		public final Integer CASE = 9;
+		
+		/** The COLOR. */
 		public final Integer COLOR = 10;
+		
+		/** The CONCEP t_ las t_ modified. */
 		public final Integer CONCEPT_LAST_MODIFIED = 11;
 
+		/** The column names. */
 		private String[] columnNames = { "Concept UUID", " ", "Concept Sctid", "Concept Name", "Status", "Last status change", "Disposition", "Assigned to", "Time", "Case", "Row Color", "Concept last modified" };
 
+		/** The data list. */
 		private List<Object[]> dataList = new ArrayList<Object[]>();
+		
+		/** The data. */
 		private Object[][] data = new Object[0][11];
 
+		/**
+		 * Instantiates a new case table model.
+		 */
 		public CaseTableModel() {
 			super();
 			setInactiveValues();
 		}
 
+		/**
+		 * Gets the row.
+		 *
+		 * @param rowNum the row num
+		 * @return the row
+		 */
 		public Object[] getRow(int rowNum) {
 			return data[rowNum];
 		}
 
+		/**
+		 * Clear data.
+		 */
 		public void clearData() {
 			dataList = new ArrayList<Object[]>();
 			data = new Object[0][11];
 			System.gc();
 		}
 
+		/**
+		 * Adds the data.
+		 *
+		 * @param row the row
+		 */
 		public void addData(List<Object> row) {
 			dataList.add(row.toArray());
 			data = new Object[dataList.size()][4];
@@ -1109,30 +1410,48 @@ public class QACasesBrowser extends JPanel {
 			}
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.AbstractTableModel#getColumnName(int)
+		 */
 		public String getColumnName(int col) {
 			return columnNames[col];
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.AbstractTableModel#setValueAt(java.lang.Object, int, int)
+		 */
 		public void setValueAt(Object value, int row, int col) {
 			data[row][col] = value;
 			fireTableCellUpdated(row, col);
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.TableModel#getColumnCount()
+		 */
 		@Override
 		public int getColumnCount() {
 			return columnNames.length;
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.TableModel#getRowCount()
+		 */
 		@Override
 		public int getRowCount() {
 			return data.length;
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.TableModel#getValueAt(int, int)
+		 */
 		@Override
 		public Object getValueAt(int row, int column) {
 			return data[row][column];
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.AbstractTableModel#getColumnClass(int)
+		 */
 		@Override
 		public Class<?> getColumnClass(int columnIndex) {
 			if (getValueAt(0, columnIndex) != null) {
@@ -1142,6 +1461,9 @@ public class QACasesBrowser extends JPanel {
 			}
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.AbstractTableModel#isCellEditable(int, int)
+		 */
 		public boolean isCellEditable(int x, int y) {
 			if (y == ROW_CHECKBOX) {
 				return true;
@@ -1149,16 +1471,30 @@ public class QACasesBrowser extends JPanel {
 			return false;
 		}
 
+		/**
+		 * Gets the row color.
+		 *
+		 * @param row the row
+		 * @return the row color
+		 */
 		public Color getRowColor(int row) {
 			return (Color) data[row][COLOR];
 		}
 
 	}
 
+	/**
+	 * Gets the inactive values set.
+	 *
+	 * @return the inactive values set
+	 */
 	public I_IntSet getInactiveValuesSet() {
 		return inactiveValuesSet;
 	}
 
+	/**
+	 * Sets the inactive values.
+	 */
 	private void setInactiveValues() {
 		try {
 			inactiveValuesSet = Terms.get().newIntSet();
@@ -1182,9 +1518,17 @@ public class QACasesBrowser extends JPanel {
 
 	}
 
+	/**
+	 * The Class CaseTableCellRenderer.
+	 */
 	static class CaseTableCellRenderer extends DefaultTableCellRenderer {
+		
+		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = -4117756700808758059L;
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.DefaultTableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
+		 */
 		@Override
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 			CaseTableModel model = (CaseTableModel) table.getModel();
@@ -1197,21 +1541,45 @@ public class QACasesBrowser extends JPanel {
 		}
 	}
 
+	/**
+	 * The Class CheckBoxHeader.
+	 */
 	class CheckBoxHeader extends JCheckBox implements TableCellRenderer, MouseListener {
+		
+		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = -5834284323210153347L;
+		
+		/** The renderer component. */
 		protected CheckBoxHeader rendererComponent;
+		
+		/** The column. */
 		protected int column;
+		
+		/** The mouse pressed. */
 		protected boolean mousePressed = false;
 
+		/**
+		 * Instantiates a new check box header.
+		 *
+		 * @param itemListener the item listener
+		 */
 		public CheckBoxHeader(ItemListener itemListener) {
 			rendererComponent = this;
 			rendererComponent.addItemListener(itemListener);
 		}
 
+		/**
+		 * Gets the comp.
+		 *
+		 * @return the comp
+		 */
 		public CheckBoxHeader getComp() {
 			return this.rendererComponent;
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.TableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
+		 */
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 			if (table != null) {
 				JTableHeader header = table.getTableHeader();
@@ -1228,14 +1596,29 @@ public class QACasesBrowser extends JPanel {
 			return rendererComponent;
 		}
 
+		/**
+		 * Sets the column.
+		 *
+		 * @param column the new column
+		 */
 		protected void setColumn(int column) {
 			this.column = column;
 		}
 
+		/**
+		 * Gets the column.
+		 *
+		 * @return the column
+		 */
 		public int getColumn() {
 			return column;
 		}
 
+		/**
+		 * Handle click event.
+		 *
+		 * @param e the e
+		 */
 		protected void handleClickEvent(MouseEvent e) {
 			if (mousePressed) {
 				mousePressed = false;
@@ -1251,26 +1634,56 @@ public class QACasesBrowser extends JPanel {
 			}
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
+		 */
 		public void mouseClicked(MouseEvent e) {
 			handleClickEvent(e);
 			((JTableHeader) e.getSource()).repaint();
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
+		 */
 		public void mousePressed(MouseEvent e) {
 			mousePressed = true;
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
+		 */
 		public void mouseReleased(MouseEvent e) {
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
+		 */
 		public void mouseEntered(MouseEvent e) {
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
+		 */
 		public void mouseExited(MouseEvent e) {
 		}
 	}
 
+	/**
+	 * The listener interface for receiving myItem events.
+	 * The class that is interested in processing a myItem
+	 * event implements this interface, and the object created
+	 * with that class is registered with a component using the
+	 * component's <code>addMyItemListener<code> method. When
+	 * the myItem event occurs, that object's appropriate
+	 * method is invoked.
+	 *
+	 * @see MyItemEvent
+	 */
 	class MyItemListener implements ItemListener {
+		
+		/* (non-Javadoc)
+		 * @see java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent)
+		 */
 		public void itemStateChanged(ItemEvent e) {
 			Object source = e.getSource();
 			if (source instanceof AbstractButton == false)

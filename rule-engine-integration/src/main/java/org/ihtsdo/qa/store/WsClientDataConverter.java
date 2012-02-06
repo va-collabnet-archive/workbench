@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.qa.store;
 
 import java.math.BigInteger;
@@ -25,7 +41,17 @@ import org.ihtsdo.qadb.ws.data.IntStrKeyValue;
 import org.ihtsdo.qadb.ws.data.QACaseComment;
 import org.ihtsdo.qadb.ws.data.WsCategory;
 
+/**
+ * The Class WsClientDataConverter.
+ */
 public class WsClientDataConverter {
+	
+	/**
+	 * Filter to ws filter.
+	 *
+	 * @param filter the filter
+	 * @return the int str key value[]
+	 */
 	public static IntStrKeyValue[] filterToWsFilter(HashMap<RulesReportColumn, Object> filter) {
 		IntStrKeyValue[] wsFilter = new IntStrKeyValue[filter.size()];
 		if(filter != null && !filter.isEmpty()){
@@ -42,6 +68,13 @@ public class WsClientDataConverter {
 		return wsFilter;
 	}
 	
+	/**
+	 * Sort by to ws sort by.
+	 *
+	 * @param sortBy the sort by
+	 * @param wsSorteBy the ws sorte by
+	 * @return the int bool key value[]
+	 */
 	public static IntBoolKeyValue[] sortByToWsSortBy(LinkedHashMap<RulesReportColumn, Boolean> sortBy, IntBoolKeyValue[] wsSorteBy) {
 		if(sortBy != null && !sortBy.isEmpty()){
 			wsSorteBy = new IntBoolKeyValue[sortBy.size()];
@@ -58,12 +91,24 @@ public class WsClientDataConverter {
 		return wsSorteBy;
 	}
 	
+	/**
+	 * Qa coordinate to ws qa coordinate.
+	 *
+	 * @param qaCoordinate the qa coordinate
+	 * @param wsCoordinate the ws coordinate
+	 */
 	public static void qaCoordinateToWsQaCoordinate(QACoordinate qaCoordinate, org.ihtsdo.qadb.ws.data.QACoordinate wsCoordinate) {
 		wsCoordinate.setDatabaseUuid(qaCoordinate.getDatabaseUuid().toString());
 		wsCoordinate.setPathUuid(qaCoordinate.getPathUuid().toString());
 		wsCoordinate.setViewPointTime(qaCoordinate.getViewPointTime());
 	}
 
+	/**
+	 * Ws rule to rule.
+	 *
+	 * @param wsRule the ws rule
+	 * @return the rule
+	 */
 	public static Rule wsRuleToRule(org.ihtsdo.qadb.ws.data.Rule wsRule) {
 		Rule result = new Rule();
 		result.setRuleCode(wsRule.getRuleCode());
@@ -101,6 +146,12 @@ public class WsClientDataConverter {
 		return result;
 	}
 
+	/**
+	 * Ws component to terminology component.
+	 *
+	 * @param component the component
+	 * @return the terminology component
+	 */
 	public static TerminologyComponent wsComponentToTerminologyComponent(Component component) {
 		TerminologyComponent result = new TerminologyComponent();
 		result.setComponentName(component.getComponentName());
@@ -111,6 +162,12 @@ public class WsClientDataConverter {
 		return result;
 	}
 
+	/**
+	 * Ws dips status to disp status.
+	 *
+	 * @param wsDispStatus the ws disp status
+	 * @return the disposition status
+	 */
 	public static DispositionStatus wsDipsStatusToDispStatus(org.ihtsdo.qadb.ws.data.DispositionStatus wsDispStatus) {
 		DispositionStatus result = new DispositionStatus();
 		result.setDispositionStatusUuid(UUID.fromString(wsDispStatus.getDispositionStatusUuid()));
@@ -118,6 +175,12 @@ public class WsClientDataConverter {
 		return result;
 	}
 
+	/**
+	 * Ws severity to severty.
+	 *
+	 * @param wsSeverity the ws severity
+	 * @return the severity
+	 */
 	public static Severity wsSeverityToSeverty(org.ihtsdo.qadb.ws.data.Severity wsSeverity) {
 		Severity result = new Severity();
 		result.setDescription(wsSeverity.getDescription());
@@ -126,6 +189,12 @@ public class WsClientDataConverter {
 		return result;
 	}
 
+	/**
+	 * Qa case filter to ws qa case filter.
+	 *
+	 * @param filter the filter
+	 * @return the int str key value[]
+	 */
 	public static IntStrKeyValue[] qaCaseFilterToWsQaCaseFilter(HashMap<QACasesReportColumn, Object> filter) {
 		IntStrKeyValue[] wsFilter = new IntStrKeyValue[filter.size()];
 		Iterable<QACasesReportColumn> keySet = filter.keySet();
@@ -140,6 +209,12 @@ public class WsClientDataConverter {
 		return wsFilter;
 	}
 
+	/**
+	 * Qa case sort to ws qa case sort.
+	 *
+	 * @param sorteBy the sorte by
+	 * @return the int bool key value[]
+	 */
 	public static IntBoolKeyValue[]  qaCaseSortToWsQaCaseSort(LinkedHashMap<QACasesReportColumn, Boolean> sorteBy) {
 		IntBoolKeyValue[] result = new IntBoolKeyValue[sorteBy.size()];
 		Set<QACasesReportColumn> keySet = sorteBy.keySet();
@@ -154,6 +229,12 @@ public class WsClientDataConverter {
 		return result;
 	}
 
+	/**
+	 * Ws case to case.
+	 *
+	 * @param qaCase the qa case
+	 * @return the qA case
+	 */
 	public static QACase wsCaseToCase(Case qaCase) {
 		QACase result = new QACase();
 		result.setCaseUuid(UUID.fromString(qaCase.getCaseUuid()));
@@ -194,6 +275,12 @@ public class WsClientDataConverter {
 		return result;
 	}
 
+	/**
+	 * Ws comment to comment.
+	 *
+	 * @param qaCaseComment the qa case comment
+	 * @return the qa case comment
+	 */
 	public static QaCaseComment wsCommentToComment(QACaseComment qaCaseComment) {
 		QaCaseComment comment = new QaCaseComment();
 		comment.setAuthor(qaCaseComment.getAuthor());
@@ -214,6 +301,12 @@ public class WsClientDataConverter {
 		return comment;
 	}
 
+	/**
+	 * Case to ws case.
+	 *
+	 * @param qaCase the qa case
+	 * @return the case
+	 */
 	public static Case caseToWsCase(QACase qaCase) {
 		Case result = new Case();
 		result.setAssignedTo(qaCase.getAssignedTo());
@@ -252,6 +345,12 @@ public class WsClientDataConverter {
 		return result;
 	}
 
+	/**
+	 * Ws category to category.
+	 *
+	 * @param wsCategory the ws category
+	 * @return the category
+	 */
 	public static Category wsCategoryToCategory(WsCategory wsCategory) {
 		Category result = new Category();
 		result.setDescription(wsCategory.getDescription());
@@ -260,6 +359,12 @@ public class WsClientDataConverter {
 		return result;
 	}
 
+	/**
+	 * Rule to wsdl rule.
+	 *
+	 * @param rule the rule
+	 * @return the org.ihtsdo.qadb.ws.data. rule
+	 */
 	public static org.ihtsdo.qadb.ws.data.Rule ruleToWsdlRule(Rule rule) {
 		org.ihtsdo.qadb.ws.data.Rule wsRule = new org.ihtsdo.qadb.ws.data.Rule();
 		wsRule.setCategory(rule.getCategory());
@@ -296,6 +401,12 @@ public class WsClientDataConverter {
 		return wsRule;
 	}
 
+	/**
+	 * Comment to ws comment.
+	 *
+	 * @param comment the comment
+	 * @return the qA case comment
+	 */
 	public static QACaseComment commentToWsComment(QaCaseComment comment) {
 		QACaseComment result = new QACaseComment();
 		result.setAuthor(comment.getAuthor());

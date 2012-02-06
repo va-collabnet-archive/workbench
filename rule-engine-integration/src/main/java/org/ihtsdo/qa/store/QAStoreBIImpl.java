@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.qa.store;
 
 import java.rmi.RemoteException;
@@ -9,6 +25,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.axis.AxisFault;
+import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.qa.store.model.Category;
 import org.ihtsdo.qa.store.model.DispositionStatus;
 import org.ihtsdo.qa.store.model.Execution;
@@ -64,10 +81,19 @@ import org.ihtsdo.qadb.ws.data.StatusCount_type0;
 import org.ihtsdo.qadb.ws.data.WsCategory;
 import org.ihtsdo.qadb.ws.data.WsQACasesReportLine;
 
+/**
+ * The Class QAStoreBIImpl.
+ */
 public class QAStoreBIImpl implements QAStoreBI {
 
+	/** The url. */
 	private String url = "http://mgr.servers.aceworkspace.net:50008/axis2/services/qadb-service";
 
+	/**
+	 * Instantiates a new qA store bi impl.
+	 *
+	 * @param url the url
+	 */
 	public QAStoreBIImpl(String url) {
 		System.out.println("#######################################################");
 		System.out.println();
@@ -79,10 +105,16 @@ public class QAStoreBIImpl implements QAStoreBI {
 		}
 	}
 
+	/**
+	 * Instantiates a new qA store bi impl.
+	 */
 	public QAStoreBIImpl() {
 		super();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getComponent(java.util.UUID)
+	 */
 	@Override
 	public TerminologyComponent getComponent(UUID componentUuid) {
 		TerminologyComponent result = null;
@@ -97,13 +129,16 @@ public class QAStoreBIImpl implements QAStoreBI {
 			result = WsClientDataConverter.wsComponentToTerminologyComponent(response.getComponentResponse());
 
 		} catch (AxisFault e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getRule(java.util.UUID)
+	 */
 	@Override
 	public Rule getRule(UUID ruleUuid) {
 		Rule result = null;
@@ -118,37 +153,52 @@ public class QAStoreBIImpl implements QAStoreBI {
 			result = WsClientDataConverter.wsRuleToRule(response.getRuleResponse());
 
 		} catch (AxisFault e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getFinding(java.util.UUID)
+	 */
 	@Override
 	public Finding getFinding(UUID findingUuid) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getExecution(java.util.UUID)
+	 */
 	@Override
 	public Execution getExecution(UUID ExecutionUuid) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getQACase(java.util.UUID)
+	 */
 	@Override
 	public QACase getQACase(UUID qaCaseUuid) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getDispositionStatus(java.util.UUID)
+	 */
 	@Override
 	public DispositionStatus getDispositionStatus(UUID dispositionStatusUuid) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getQADatabase(java.util.UUID)
+	 */
 	@Override
 	public QADatabase getQADatabase(UUID databaseUuid) {
 		QADatabase result = null;
@@ -161,14 +211,17 @@ public class QAStoreBIImpl implements QAStoreBI {
 			Database wsDatabase = response.getDatabase();
 			result = new QADatabase(UUID.fromString(wsDatabase.getDatabaseUuid()), wsDatabase.getName());
 		} catch (AxisFault e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getAllDatabases()
+	 */
 	@Override
 	public List<QADatabase> getAllDatabases() {
 		List<QADatabase> result = null;
@@ -184,19 +237,25 @@ public class QAStoreBIImpl implements QAStoreBI {
 				}
 			}
 		} catch (AxisFault e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getAllDatabasesForPath(java.util.UUID)
+	 */
 	@Override
 	public List<QADatabase> getAllDatabasesForPath(UUID pathUuid) {
 		return getAllDatabases();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getAllPaths()
+	 */
 	@Override
 	public List<TerminologyComponent> getAllPaths() {
 		List<TerminologyComponent> result = null;
@@ -213,13 +272,16 @@ public class QAStoreBIImpl implements QAStoreBI {
 				}
 			}
 		} catch (AxisFault e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getAllPathsForDatabase(java.util.UUID)
+	 */
 	@Override
 	public List<TerminologyComponent> getAllPathsForDatabase(UUID databaseUuid) {
 		List<TerminologyComponent> result = null;
@@ -238,13 +300,16 @@ public class QAStoreBIImpl implements QAStoreBI {
 				}
 			}
 		} catch (AxisFault e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getAllTimesForPath(java.util.UUID, java.util.UUID)
+	 */
 	@Override
 	public List<String> getAllTimesForPath(UUID databaseUuid, UUID pathUuid) {
 		List<String> dates = new ArrayList<String>();
@@ -252,24 +317,36 @@ public class QAStoreBIImpl implements QAStoreBI {
 		return dates;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getFindingsForExecution(java.util.UUID)
+	 */
 	@Override
 	public List<Finding> getFindingsForExecution(UUID executionUuid) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getFindingsForComponent(org.ihtsdo.qa.store.model.QACoordinate, java.util.UUID)
+	 */
 	@Override
 	public List<Finding> getFindingsForComponent(QACoordinate coordinate, UUID componentUuid) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getFindingsForPeriod(org.ihtsdo.qa.store.model.QACoordinate, java.util.Date, java.util.Date)
+	 */
 	@Override
 	public List<Finding> getFindingsForPeriod(QACoordinate coordinate, Date dateStart, Date dateEnd) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getAllSeverities()
+	 */
 	@Override
 	public List<Severity> getAllSeverities() {
 		List<Severity> result = null;
@@ -284,49 +361,70 @@ public class QAStoreBIImpl implements QAStoreBI {
 				result.add(severity);
 			}
 		} catch (AxisFault e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getSeverity(java.util.UUID)
+	 */
 	@Override
 	public Severity getSeverity(UUID severityUuid) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getAllQACases(org.ihtsdo.qa.store.model.QACoordinate)
+	 */
 	@Override
 	public List<QACase> getAllQACases(QACoordinate coordinate) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getQACasesForComponent(org.ihtsdo.qa.store.model.QACoordinate, java.util.UUID)
+	 */
 	@Override
 	public List<QACase> getQACasesForComponent(QACoordinate coordinate, UUID componentUuid) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getQACasesForStatus(org.ihtsdo.qa.store.model.QACoordinate, boolean)
+	 */
 	@Override
 	public List<QACase> getQACasesForStatus(QACoordinate coordinate, boolean isActive) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getQACasesForDispositionStatus(org.ihtsdo.qa.store.model.QACoordinate, java.util.UUID)
+	 */
 	@Override
 	public List<QACase> getQACasesForDispositionStatus(QACoordinate coordinate, UUID dispositionStatusUuid) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getQACasesForRule(org.ihtsdo.qa.store.model.QACoordinate, java.util.UUID)
+	 */
 	@Override
 	public List<QACase> getQACasesForRule(QACoordinate coordinate, UUID ruleUuid) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getAllDispositionStatus()
+	 */
 	@Override
 	public List<DispositionStatus> getAllDispositionStatus() {
 		List<DispositionStatus> result = null;
@@ -342,32 +440,44 @@ public class QAStoreBIImpl implements QAStoreBI {
 			}
 
 		} catch (AxisFault e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getQACaseVersions(org.ihtsdo.qa.store.model.QACoordinate, java.util.UUID)
+	 */
 	@Override
 	public List<QACaseVersion> getQACaseVersions(QACoordinate coordinate, UUID qaCaseUuid) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getAllExecutions(org.ihtsdo.qa.store.model.QACoordinate)
+	 */
 	@Override
 	public List<Execution> getAllExecutions(QACoordinate coordinate) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getExecutionsForPeriod(org.ihtsdo.qa.store.model.QACoordinate, java.util.Date, java.util.Date)
+	 */
 	@Override
 	public List<Execution> getExecutionsForPeriod(QACoordinate coordinate, Date dateStart, Date dateEnd) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getAllRules()
+	 */
 	@Override
 	public List<Rule> getAllRules() {
 		List<Rule> result = null;
@@ -385,37 +495,52 @@ public class QAStoreBIImpl implements QAStoreBI {
 				}
 			}
 		} catch (AxisFault e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getDispositionStatusCountsForRule(org.ihtsdo.qa.store.model.QACoordinate, java.util.UUID)
+	 */
 	@Override
 	public HashMap<UUID, Integer> getDispositionStatusCountsForRule(QACoordinate coordinate, UUID ruleUuid) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getStatusCountsForRule(org.ihtsdo.qa.store.model.QACoordinate, java.util.UUID)
+	 */
 	@Override
 	public HashMap<Boolean, Integer> getStatusCountsForRule(QACoordinate coordinate, UUID ruleUuid) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getRuleLastExecutionTime(org.ihtsdo.qa.store.model.QACoordinate)
+	 */
 	@Override
 	public Date getRuleLastExecutionTime(QACoordinate coordinate) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getRulesReportLines(org.ihtsdo.qa.store.model.QACoordinate)
+	 */
 	@Override
 	public List<RulesReportLine> getRulesReportLines(QACoordinate qaCoordinate) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getRulesReportLinesByPage(org.ihtsdo.qa.store.model.QACoordinate, java.util.LinkedHashMap, java.util.HashMap, int, int)
+	 */
 	@Override
 	public RulesReportPage getRulesReportLinesByPage(QACoordinate qaCoordinate, LinkedHashMap<RulesReportColumn, Boolean> sortBy, HashMap<RulesReportColumn, Object> filter, int startLine, int pageLenght) {
 		RulesReportPage result = null;
@@ -486,28 +611,34 @@ public class QAStoreBIImpl implements QAStoreBI {
 			result.setLines(lines);
 
 		} catch (AxisFault e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} finally {
 			if (service != null) {
 				try{
 					service._getServiceClient().cleanup();
 					service._getServiceClient().cleanupTransport();
 				}catch (Exception e) {
-					e.printStackTrace();
+					AceLog.getAppLog().alertAndLogException(e);
 				}
 			}
 		}
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getQACasesReportLines(org.ihtsdo.qa.store.model.QACoordinate, java.util.UUID)
+	 */
 	@Override
 	public List<QACasesReportLine> getQACasesReportLines(QACoordinate qaCoordinate, UUID ruleUuid) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getQACasesReportLinesByPage(org.ihtsdo.qa.store.model.QACoordinate, java.util.UUID, java.util.LinkedHashMap, java.util.HashMap, int, int)
+	 */
 	@Override
 	public QACasesReportPage getQACasesReportLinesByPage(QACoordinate qaCoordinate, UUID ruleUuid, LinkedHashMap<QACasesReportColumn, Boolean> sortBy, HashMap<QACasesReportColumn, Object> filter, int startLine,
 			int pageLenght) {
@@ -556,20 +687,23 @@ public class QAStoreBIImpl implements QAStoreBI {
 			reportPage.setLines(lines);
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}finally {
 			if (service != null) {
 				try{
 					service._getServiceClient().cleanup();
 					service._getServiceClient().cleanupTransport();
 				}catch (Exception e) {
-					e.printStackTrace();
+					AceLog.getAppLog().alertAndLogException(e);
 				}
 			}
 		}
 		return reportPage;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getAllComponents()
+	 */
 	@Override
 	public List<TerminologyComponent> getAllComponents() {
 		List<TerminologyComponent> result = null;
@@ -584,31 +718,43 @@ public class QAStoreBIImpl implements QAStoreBI {
 				result.add(component);
 			}
 		} catch (AxisFault e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getExecutionRulesDetails(java.util.UUID)
+	 */
 	@Override
 	public String getExecutionRulesDetails(UUID executionUuid) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getExecutionOutcomeDetails(java.util.UUID)
+	 */
 	@Override
 	public String getExecutionOutcomeDetails(UUID executionUuid) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#persistComponent(org.ihtsdo.qa.store.model.TerminologyComponent)
+	 */
 	@Override
 	public void persistComponent(TerminologyComponent component) {
 		// TODO Auto-generated method stub
 
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#persistRule(org.ihtsdo.qa.store.model.Rule)
+	 */
 	@Override
 	public void persistRule(Rule rule) {
 		try {
@@ -618,26 +764,35 @@ public class QAStoreBIImpl implements QAStoreBI {
 			wsRuleRequest.setRule(wsRule);
 			service.persistsQARule(wsRuleRequest);
 		} catch (AxisFault e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (PersistsQARuleFaultException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#persistFinding(org.ihtsdo.qa.store.model.Finding)
+	 */
 	@Override
 	public void persistFinding(Finding finding) {
 		// TODO Auto-generated method stub
 
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#persistExecution(org.ihtsdo.qa.store.model.Execution)
+	 */
 	@Override
 	public void persistExecution(Execution execution) {
 		// TODO Auto-generated method stub
 
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#persistQACase(org.ihtsdo.qa.store.model.QACase)
+	 */
 	@Override
 	public void persistQACase(QACase qaCase) {
 		try {
@@ -648,18 +803,24 @@ public class QAStoreBIImpl implements QAStoreBI {
 			request.setQaCase(wsQaCase);
 			service.persistQACase(request);
 		} catch (AxisFault e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#persistQADatabase(org.ihtsdo.qa.store.model.QADatabase)
+	 */
 	@Override
 	public void persistQADatabase(QADatabase database) {
 		// TODO Auto-generated method stub
 
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getAllCategories()
+	 */
 	@Override
 	public List<Category> getAllCategories() {
 		List<Category> result = null;
@@ -674,18 +835,24 @@ public class QAStoreBIImpl implements QAStoreBI {
 				result.add(category);
 			}
 		} catch (AxisFault e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#getCategory(java.util.UUID)
+	 */
 	@Override
 	public Category getCategory(UUID categoryUuid) {
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#persistQACaseList(java.util.List)
+	 */
 	@Override
 	public void persistQACaseList(List<QACase> qaCaseList) throws Exception {
 		try {
@@ -702,17 +869,20 @@ public class QAStoreBIImpl implements QAStoreBI {
 			qaListRequest.setQaCaseList(wsCaseList);
 			service.persistQACaseList(qaListRequest);
 		} catch (AxisFault e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 			throw e;
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 			throw e;
 		} catch (PersistQACaseListFaultException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 			throw new RemoteException(e.getMessage());
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.qa.store.QAStoreBI#persistQAComment(org.ihtsdo.qa.store.model.QaCaseComment)
+	 */
 	@Override
 	public void persistQAComment(QaCaseComment comment) throws Exception {
 		QACaseComment wsComment = WsClientDataConverter.commentToWsComment(comment);

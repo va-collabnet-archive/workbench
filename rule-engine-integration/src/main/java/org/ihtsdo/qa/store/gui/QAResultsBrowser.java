@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Thu Nov 25 12:27:48 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.qa.store.gui;
@@ -38,6 +51,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 
+import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.qa.store.QAStoreBI;
 import org.ihtsdo.qa.store.model.Category;
 import org.ihtsdo.qa.store.model.DispositionStatus;
@@ -51,32 +65,82 @@ import org.ihtsdo.qa.store.model.view.RulesReportLine;
 import org.ihtsdo.qa.store.model.view.RulesReportPage;
 
 /**
+ * The Class QAResultsBrowser.
+ *
  * @author Guillermo Reynoso
  */
 public class QAResultsBrowser extends JPanel {
 
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
+	
+	/** The store. */
 	private QAStoreBI store;
+	
+	/** The table model. */
 	private ResutlTableModel tableModel;
+	
+	/** The disposition statuses. */
 	private LinkedHashSet<DispositionStatus> dispositionStatuses;
+	
+	/** The severities. */
 	private List<Severity> severities;
+	
+	/** The show filters. */
 	private boolean showFilters = false;
+	
+	/** The filter changed. */
 	private boolean filterChanged = false;
+	
+	/** The coordinate. */
 	private QACoordinate coordinate;
+	
+	/** The start line. */
 	private int startLine = 0;
+	
+	/** The final line. */
 	private int finalLine = 0;
+	
+	/** The total lines. */
 	private int totalLines = 0;
+	
+	/** The sort by. */
 	LinkedHashMap<RulesReportColumn, Boolean> sortBy = null;
+	
+	/** The parent tabbed panel. */
 	private JTabbedPane parentTabbedPanel = null;
+	
+	/** The all categories. */
 	private List<Category> allCategories;
+	
+	/** The rule. */
 	private Rule rule = null;
+	
+	/** The sdf. */
 	private SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy");
+	
+	/** The first load. */
 	private boolean firstLoad = true;
+	
+	/** The qa store panel. */
 	private QAStorePanel qaStorePanel;
+	
+	/** The all paths for database. */
 	HashMap<QADatabase, List<TerminologyComponent>> allPathsForDatabase = new HashMap<QADatabase, List<TerminologyComponent>>();
+	
+	/** The all databases. */
 	List<QADatabase> allDatabases;
+	
+	/** The all times for path. */
 	HashMap<String, List<String>> allTimesForPath = new HashMap<String, List<String>>();
 
+	/**
+	 * Instantiates a new qA results browser.
+	 *
+	 * @param store the store
+	 * @param parentTabbedPane the parent tabbed pane
+	 * @param qaStorePanel the qa store panel
+	 */
 	public QAResultsBrowser(QAStoreBI store, JTabbedPane parentTabbedPane, QAStorePanel qaStorePanel) {
 		this.store = store;
 		this.qaStorePanel = qaStorePanel;
@@ -180,6 +244,11 @@ public class QAResultsBrowser extends JPanel {
 		filterChanged = false;
 	}
 
+	/**
+	 * Gets the rule.
+	 *
+	 * @return the rule
+	 */
 	public Rule getRule() {
 		int selectedRow = table1.getSelectedRow();
 		Object[] rowData = tableModel.getRow(selectedRow);
@@ -190,12 +259,18 @@ public class QAResultsBrowser extends JPanel {
 		return rule;
 	}
 
+	/**
+	 * Setup order combo.
+	 */
 	private void setupOrderCombo() {
 		orderCombo.removeAllItems();
 		orderCombo.addItem("Ascendent");
 		orderCombo.addItem("Descendent");
 	}
 
+	/**
+	 * Setup sort by combo.
+	 */
 	private void setupSortByCombo() {
 		sortByComboBox.removeAllItems();
 		sortByComboBox.addItem(RulesReportColumn.RULE_NAME);
@@ -207,6 +282,9 @@ public class QAResultsBrowser extends JPanel {
 		sortBy.put(RulesReportColumn.RULE_NAME, true);
 	}
 
+	/**
+	 * Update page counters.
+	 */
 	private void updatePageCounters() {
 		startLineLable.setText(String.valueOf(startLine));
 		endLineLabel.setText(String.valueOf(finalLine));
@@ -216,6 +294,9 @@ public class QAResultsBrowser extends JPanel {
 		panel3.revalidate();
 	}
 
+	/**
+	 * Setup page lines combo.
+	 */
 	private void setupPageLinesCombo() {
 		showItemsCombo.removeAllItems();
 		showItemsCombo.addItem("25");
@@ -224,14 +305,27 @@ public class QAResultsBrowser extends JPanel {
 		showItemsCombo.addItem("100");
 	}
 
+	/**
+	 * Gets the table.
+	 *
+	 * @return the table
+	 */
 	public JTable getTable() {
 		return table1;
 	}
 
+	/**
+	 * Gets the qA coordinate.
+	 *
+	 * @return the qA coordinate
+	 */
 	public QACoordinate getQACoordinate() {
 		return coordinate;
 	}
 
+	/**
+	 * Setup category combo.
+	 */
 	private void setupCategoryCombo() {
 		categoryComboBox.removeAllItems();
 		categoryComboBox.addItem("Any");
@@ -240,6 +334,9 @@ public class QAResultsBrowser extends JPanel {
 		}
 	}
 
+	/**
+	 * Setup severity combo.
+	 */
 	private void setupSeverityCombo() {
 		severityComboBox.removeAllItems();
 		severityComboBox.addItem("Any");
@@ -248,6 +345,9 @@ public class QAResultsBrowser extends JPanel {
 		}
 	}
 
+	/**
+	 * Setup disposition combo.
+	 */
 	private void setupDispositionCombo() {
 		dispositionComboBox.removeAllItems();
 		dispositionComboBox.addItem("Any");
@@ -256,6 +356,9 @@ public class QAResultsBrowser extends JPanel {
 		}
 	}
 
+	/**
+	 * Setup status combo.
+	 */
 	private void setupStatusCombo() {
 		statusComboBox.removeAllItems();
 		statusComboBox.addItem("Any");
@@ -265,6 +368,9 @@ public class QAResultsBrowser extends JPanel {
 		statusComboBox.addItem("No closed cases");
 	}
 
+	/**
+	 * Setup databases combo.
+	 */
 	private void setupDatabasesCombo() {
 		comboBox1.removeAllItems();
 		if (allDatabases == null) {
@@ -277,6 +383,9 @@ public class QAResultsBrowser extends JPanel {
 		}
 	}
 
+	/**
+	 * Setup paths combo.
+	 */
 	private void setupPathsCombo() {
 		comboBox2.removeAllItems();
 		if (comboBox1.getSelectedItem() != null && allPathsForDatabase != null) {
@@ -295,6 +404,9 @@ public class QAResultsBrowser extends JPanel {
 		}
 	}
 
+	/**
+	 * Setup time combo.
+	 */
 	private void setupTimeCombo() {
 		comboBox3.removeAllItems();
 		if (comboBox1.getSelectedItem() != null && comboBox2.getSelectedItem() != null && allTimesForPath != null) {
@@ -313,10 +425,18 @@ public class QAResultsBrowser extends JPanel {
 		}
 	}
 
+	/**
+	 * Search action performed.
+	 *
+	 * @param e the e
+	 */
 	private void searchActionPerformed(ActionEvent e) {
 		search();
 	}
 
+	/**
+	 * Search.
+	 */
 	private void search() {
 		firstLoad = false;
 		if (comboBox1.getSelectedItem() != null && comboBox2.getSelectedItem() != null && comboBox3.getSelectedItem() != null) {
@@ -335,12 +455,20 @@ public class QAResultsBrowser extends JPanel {
 		}
 	}
 
+	/**
+	 * Clear table1.
+	 */
 	private void clearTable1() {
 		tableModel.clearData();
 		table1.revalidate();
 		table1.repaint();
 	}
 
+	/**
+	 * Update table1.
+	 *
+	 * @param coordinate the coordinate
+	 */
 	private void updateTable1(QACoordinate coordinate) {
 		try {
 			clearTable1();
@@ -398,10 +526,16 @@ public class QAResultsBrowser extends JPanel {
 			table1.revalidate();
 			table1.repaint();
 		} catch (Exception e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 	}
 
+	/**
+	 * Gets the filter data.
+	 *
+	 * @param filter the filter
+	 * @return the filter data
+	 */
 	private void getFilterData(HashMap<RulesReportColumn, Object> filter) {
 		filter.clear();
 		if (showFilters) {
@@ -445,6 +579,11 @@ public class QAResultsBrowser extends JPanel {
 
 	}
 
+	/**
+	 * Combo box1 item state changed.
+	 *
+	 * @param e the e
+	 */
 	private void comboBox1ItemStateChanged(ItemEvent e) {
 		if (e.getStateChange() == ItemEvent.SELECTED) {
 			setupPathsCombo();
@@ -453,6 +592,11 @@ public class QAResultsBrowser extends JPanel {
 		}
 	}
 
+	/**
+	 * Combo box2 item state changed.
+	 *
+	 * @param e the e
+	 */
 	private void comboBox2ItemStateChanged(ItemEvent e) {
 		if (e.getStateChange() == ItemEvent.SELECTED) {
 			setupTimeCombo();
@@ -460,12 +604,22 @@ public class QAResultsBrowser extends JPanel {
 		}
 	}
 
+	/**
+	 * Combo box3 item state changed.
+	 *
+	 * @param e the e
+	 */
 	private void comboBox3ItemStateChanged(ItemEvent e) {
 		if (e.getStateChange() == ItemEvent.SELECTED) {
 			clearTable1();
 		}
 	}
 
+	/**
+	 * Button2 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button2ActionPerformed(ActionEvent e) {
 		if (showFilters) {
 			button2.setText("Show filters");
@@ -478,6 +632,11 @@ public class QAResultsBrowser extends JPanel {
 		}
 	}
 
+	/**
+	 * Table1 mouse clicked.
+	 *
+	 * @param e the e
+	 */
 	private void table1MouseClicked(MouseEvent e) {
 		if (e.getClickCount() == 2) {
 			int tabCount = parentTabbedPanel.getTabCount();
@@ -503,10 +662,20 @@ public class QAResultsBrowser extends JPanel {
 
 	}
 
+	/**
+	 * Inits the tab component.
+	 *
+	 * @param i the i
+	 */
 	private void initTabComponent(int i) {
 		parentTabbedPanel.setTabComponentAt(i, new ButtonTabComponent(parentTabbedPanel));
 	}
 
+	/**
+	 * Previous button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void previousButtonActionPerformed(ActionEvent e) {
 		// previous page
 		Integer selectedPageLengh = Integer.parseInt((String) showItemsCombo.getSelectedItem());
@@ -517,6 +686,11 @@ public class QAResultsBrowser extends JPanel {
 		updateTable1(coordinate);
 	}
 
+	/**
+	 * Next button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void nextButtonActionPerformed(ActionEvent e) {
 		// next page
 		Integer selectedPageLengh = Integer.parseInt((String) showItemsCombo.getSelectedItem());
@@ -524,6 +698,11 @@ public class QAResultsBrowser extends JPanel {
 		updateTable1(coordinate);
 	}
 
+	/**
+	 * Sort by combo box item state changed.
+	 *
+	 * @param e the e
+	 */
 	private void sortByComboBoxItemStateChanged(ItemEvent e) {
 		if (e.getStateChange() == ItemEvent.SELECTED) {
 			Object selectedItem = e.getItem();
@@ -535,30 +714,65 @@ public class QAResultsBrowser extends JPanel {
 		}
 	}
 
+	/**
+	 * Rule code text field key pressed.
+	 *
+	 * @param e the e
+	 */
 	private void ruleCodeTextFieldKeyPressed(KeyEvent e) {
 		filterChanged = true;
 	}
 
+	/**
+	 * Rule name text field key pressed.
+	 *
+	 * @param e the e
+	 */
 	private void ruleNameTextFieldKeyPressed(KeyEvent e) {
 		filterChanged = true;
 	}
 
+	/**
+	 * Category combo box item state changed.
+	 *
+	 * @param e the e
+	 */
 	private void categoryComboBoxItemStateChanged(ItemEvent e) {
 		filterChanged = true;
 	}
 
+	/**
+	 * Severity combo box item state changed.
+	 *
+	 * @param e the e
+	 */
 	private void severityComboBoxItemStateChanged(ItemEvent e) {
 		filterChanged = true;
 	}
 
+	/**
+	 * Status combo box item state changed.
+	 *
+	 * @param e the e
+	 */
 	private void statusComboBoxItemStateChanged(ItemEvent e) {
 		filterChanged = true;
 	}
 
+	/**
+	 * Disposition combo box item state changed.
+	 *
+	 * @param e the e
+	 */
 	private void dispositionComboBoxItemStateChanged(ItemEvent e) {
 		filterChanged = true;
 	}
 
+	/**
+	 * Order combo item state changed.
+	 *
+	 * @param e the e
+	 */
 	private void orderComboItemStateChanged(ItemEvent e) {
 		if (e.getStateChange() == ItemEvent.SELECTED) {
 			Object selectedItem = sortByComboBox.getSelectedItem();
@@ -570,12 +784,22 @@ public class QAResultsBrowser extends JPanel {
 		}
 	}
 
+	/**
+	 * Show items combo item state changed.
+	 *
+	 * @param e the e
+	 */
 	private void showItemsComboItemStateChanged(ItemEvent e) {
 		if (!firstLoad) {
 			search();
 		}
 	}
 
+	/**
+	 * Update rule.
+	 *
+	 * @param rule the rule
+	 */
 	public void updateRule(Rule rule) {
 		if (rule.getRuleUuid().toString().equals(this.rule.getRuleUuid().toString())) {
 			this.rule = rule;
@@ -600,6 +824,9 @@ public class QAResultsBrowser extends JPanel {
 		qaStorePanel.updateCasePanel();
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -945,73 +1172,185 @@ public class QAResultsBrowser extends JPanel {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The label17. */
 	private JLabel label17;
+	
+	/** The label12. */
 	private JLabel label12;
+	
+	/** The combo box1. */
 	private JComboBox comboBox1;
+	
+	/** The combo box2. */
 	private JComboBox comboBox2;
+	
+	/** The combo box3. */
 	private JComboBox comboBox3;
+	
+	/** The button1. */
 	private JButton button1;
+	
+	/** The button2. */
 	private JButton button2;
+	
+	/** The sort by combo box. */
 	private JComboBox sortByComboBox;
+	
+	/** The order combo. */
 	private JComboBox orderCombo;
+	
+	/** The panel4. */
 	private JPanel panel4;
+	
+	/** The label11. */
 	private JLabel label11;
+	
+	/** The label8. */
 	private JLabel label8;
+	
+	/** The label10. */
 	private JLabel label10;
+	
+	/** The label9. */
 	private JLabel label9;
+	
+	/** The label4. */
 	private JLabel label4;
+	
+	/** The label5. */
 	private JLabel label5;
+	
+	/** The rule code text field. */
 	private JTextField ruleCodeTextField;
+	
+	/** The rule name text field. */
 	private JTextField ruleNameTextField;
+	
+	/** The category combo box. */
 	private JComboBox categoryComboBox;
+	
+	/** The severity combo box. */
 	private JComboBox severityComboBox;
+	
+	/** The status combo box. */
 	private JComboBox statusComboBox;
+	
+	/** The disposition combo box. */
 	private JComboBox dispositionComboBox;
+	
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The table1. */
 	private JTable table1;
+	
+	/** The panel3. */
 	private JPanel panel3;
+	
+	/** The label6. */
 	private JLabel label6;
+	
+	/** The show items combo. */
 	private JComboBox showItemsCombo;
+	
+	/** The label7. */
 	private JLabel label7;
+	
+	/** The h spacer1. */
 	private JPanel hSpacer1;
+	
+	/** The previous button. */
 	private JButton previousButton;
+	
+	/** The start line lable. */
 	private JLabel startLineLable;
+	
+	/** The label16. */
 	private JLabel label16;
+	
+	/** The end line label. */
 	private JLabel endLineLabel;
+	
+	/** The label14. */
 	private JLabel label14;
+	
+	/** The total lines label. */
 	private JLabel totalLinesLabel;
+	
+	/** The next button. */
 	private JButton nextButton;
 
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 
+	/**
+	 * The Class ResutlTableModel.
+	 */
 	class ResutlTableModel extends AbstractTableModel {
+		
+		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = -2582804161676112393L;
+		
+		/** The Constant ROW_DATA_SIZE. */
 		public static final int ROW_DATA_SIZE = 14;
+		
+		/** The column names. */
 		private Object[] columnNames = { "Rule code", "Rule name", "Category", "Severity", "Open", "Cleared", "Escalated", "Deferred", "In Discussion", "Not clear", "Closed", "Rule date", "Last run", "Rule UUID" };
 
+		/**
+		 * Instantiates a new resutl table model.
+		 *
+		 * @param columnNames the column names
+		 */
 		public ResutlTableModel(Object[] columnNames) {
 			super();
 			this.columnNames = columnNames;
 		}
 
+		/** The data list. */
 		private List<Object[]> dataList = new ArrayList<Object[]>();
+		
+		/** The data. */
 		private Object[][] data = new Object[0][ROW_DATA_SIZE];
 
+		/**
+		 * Gets the row.
+		 *
+		 * @param rowNum the row num
+		 * @return the row
+		 */
 		public Object[] getRow(int rowNum) {
 			return data[rowNum];
 		}
 
+		/**
+		 * Clear data.
+		 */
 		public void clearData() {
 			dataList = new ArrayList<Object[]>();
 			data = new Object[0][ROW_DATA_SIZE];
 			System.gc();
 		}
 
+		/**
+		 * Adds the data.
+		 *
+		 * @param row the row
+		 */
 		public void addData(List<Object> row) {
 			dataList.add(row.toArray());
 			data = new Object[dataList.size()][ROW_DATA_SIZE];
@@ -1020,35 +1359,56 @@ public class QAResultsBrowser extends JPanel {
 			}
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.AbstractTableModel#getColumnName(int)
+		 */
 		public String getColumnName(int col) {
 			return columnNames[col].toString();
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.AbstractTableModel#setValueAt(java.lang.Object, int, int)
+		 */
 		public void setValueAt(Object value, int row, int col) {
 			data[row][col] = value;
 			fireTableCellUpdated(row, col);
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.TableModel#getColumnCount()
+		 */
 		@Override
 		public int getColumnCount() {
 			return columnNames.length - 1;
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.TableModel#getRowCount()
+		 */
 		@Override
 		public int getRowCount() {
 			return data.length;
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.TableModel#getValueAt(int, int)
+		 */
 		@Override
 		public Object getValueAt(int row, int column) {
 			return data[row][column];
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.AbstractTableModel#getColumnClass(int)
+		 */
 		@Override
 		public Class<?> getColumnClass(int columnIndex) {
 			return super.getColumnClass(columnIndex);
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.AbstractTableModel#isCellEditable(int, int)
+		 */
 		public boolean isCellEditable(int x, int y) {
 			return false;
 		}

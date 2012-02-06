@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Mon Jul 26 18:25:16 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.qa.gui;
@@ -36,22 +49,39 @@ import javax.swing.table.DefaultTableModel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReference;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReferenceHelper;
 
 /**
+ * The Class RulesDeploymentPkgBrowserPanel.
+ *
  * @author Guillermo Reynoso
  */
 public class RulesDeploymentPkgBrowserPanel extends JPanel {
 
+	/** The list1 model. */
 	private DefaultListModel list1Model;
+	
+	/** The table1 model. */
 	private DefaultTableModel table1Model;
+	
+	/** The rules package helper. */
 	RulesDeploymentPackageReferenceHelper rulesPackageHelper = null;
+	
+	/** The selected rules package. */
 	RulesDeploymentPackageReference selectedRulesPackage = null;
+	
+	/** The context helper. */
 	RulesContextHelper contextHelper = null;
 
+	/**
+	 * Instantiates a new rules deployment pkg browser panel.
+	 *
+	 * @param config the config
+	 */
 	public RulesDeploymentPkgBrowserPanel(I_ConfigAceFrame config) {
 		initComponents();
 		try {
@@ -69,10 +99,13 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 			updateList1();
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 	}
 
+	/**
+	 * Update table1.
+	 */
 	private void updateTable1() {
 		table1Model = new DefaultTableModel() {
 			public Class getColumnClass(int c) {
@@ -110,15 +143,24 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 			table1.validate();
 			panel1.revalidate();
 		} catch (Exception e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 
 	}
 
+	/**
+	 * Update list1.
+	 */
 	private void updateList1() {
 		DefaultListCellRenderer renderer = new DefaultListCellRenderer();
 		updateList1(renderer);
 	}
+	
+	/**
+	 * Update list1.
+	 *
+	 * @param renderer the renderer
+	 */
 	private void updateList1(DefaultListCellRenderer renderer) {
 		try {
 			list1.setCellRenderer(renderer);
@@ -130,10 +172,13 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 			list1.validate();
 			scrollPane2.setVisible(false);
 		} catch (Exception e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 	}
 
+	/**
+	 * Prepare for editing.
+	 */
 	private void prepareForEditing() {
 		// selected
 		selectedRulesPackage = (RulesDeploymentPackageReference) list1.getSelectedValue();
@@ -154,14 +199,29 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * List1 value changed.
+	 *
+	 * @param e the e
+	 */
 	private void list1ValueChanged(ListSelectionEvent e) {
 		prepareForEditing();
 	}
 
+	/**
+	 * List1 mouse clicked.
+	 *
+	 * @param e the e
+	 */
 	private void list1MouseClicked(MouseEvent e) {
 		prepareForEditing();
 	}
 
+	/**
+	 * Button1 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button1ActionPerformed(ActionEvent e) {
 		// cancel
 		textField1.setText("");
@@ -180,6 +240,11 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 		button3.setEnabled(true);
 	}
 
+	/**
+	 * Button2 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button2ActionPerformed(ActionEvent e) {
 		// save
 		if (selectedRulesPackage == null) {
@@ -206,9 +271,9 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 				
 			}
 		} catch (TerminologyException e1) {
-			e1.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e1);
 		} catch (IOException e1) {
-			e1.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e1);
 		}
 		
 		textField1.setText("");
@@ -228,6 +293,11 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 		updateList1();
 	}
 
+	/**
+	 * Button3 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button3ActionPerformed(ActionEvent e) {
 		// new
 		textField1.setText("");
@@ -248,6 +318,11 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 		button3.setEnabled(false);
 	}
 
+	/**
+	 * Button4 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button4ActionPerformed(ActionEvent e) {
 		//validate
 		RulesDeploymentPackageReference pkg = (RulesDeploymentPackageReference) list1.getSelectedValue();
@@ -262,6 +337,11 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Button5 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button5ActionPerformed(ActionEvent e) {
 		//retire
 		rulesPackageHelper.retireRulesDeploymentPackageReference(selectedRulesPackage);
@@ -282,6 +362,11 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 		updateList1();
 	}
 
+	/**
+	 * Button6 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button6ActionPerformed(ActionEvent e) {
 		//update
 		RulesDeploymentPackageReference pkg = (RulesDeploymentPackageReference) list1.getSelectedValue();
@@ -300,6 +385,9 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 	}
 
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		label1 = new JLabel();
@@ -506,24 +594,61 @@ public class RulesDeploymentPkgBrowserPanel extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The list1. */
 	private JList list1;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The text field1. */
 	private JTextField textField1;
+	
+	/** The label4. */
 	private JLabel label4;
+	
+	/** The text field2. */
 	private JTextField textField2;
+	
+	/** The scroll pane2. */
 	private JScrollPane scrollPane2;
+	
+	/** The table1. */
 	private JTable table1;
+	
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The button5. */
 	private JButton button5;
+	
+	/** The button2. */
 	private JButton button2;
+	
+	/** The button1. */
 	private JButton button1;
+	
+	/** The panel3. */
 	private JPanel panel3;
+	
+	/** The button6. */
 	private JButton button6;
+	
+	/** The button4. */
 	private JButton button4;
+	
+	/** The button3. */
 	private JButton button3;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

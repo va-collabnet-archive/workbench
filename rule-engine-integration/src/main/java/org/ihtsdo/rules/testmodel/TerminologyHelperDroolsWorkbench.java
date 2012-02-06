@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.rules.testmodel;
 
 import java.io.IOException;
@@ -11,8 +27,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.swing.JOptionPane;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.ParseException;
@@ -28,10 +42,10 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.util.LogWithAlerts;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.tk.Ts;
@@ -50,25 +64,45 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.helper.TerminologyHelperDrools;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
+/**
+ * The Class TerminologyHelperDroolsWorkbench.
+ */
 public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 
+	/** The semtags root. */
 	private I_GetConceptData semtagsRoot;
+	
+	/** The valid semtags. */
 	private Map<String,I_GetConceptData> validSemtags;
+	
+	/** The semtag parents. */
 	private Map<String,Set<String>> semtagParents;
+	
+	/** The domains. */
 	private List<String> domains;
+	
+	/** The uuids map. */
 	public static Map<String,UUID> uuidsMap = new HashMap<String,UUID>();
 
+	/**
+	 * Instantiates a new terminology helper drools workbench.
+	 */
 	public TerminologyHelperDroolsWorkbench(){
 		super();
 		try {
 			semtagsRoot = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.SEMTAGS_ROOT.getUids());
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 	}
 
+	/**
+	 * Gets the valid semtags.
+	 *
+	 * @return the valid semtags
+	 */
 	public Map<String,I_GetConceptData> getValidSemtags() {
 		if (validSemtags == null) {
 			I_TermFactory tf = Terms.get();
@@ -88,9 +122,9 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 					}
 				}
 			} catch (TerminologyException e) {
-				e.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(e);
 			} catch (IOException e) {
-				e.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(e);
 			}
 			return validSemtags;
 		} else {
@@ -99,6 +133,11 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 
 	}
 
+	/**
+	 * Gets the semtag parents.
+	 *
+	 * @return the semtag parents
+	 */
 	public Map<String,Set<String>> getSemtagParents() {
 		if (semtagParents == null) {
 			I_TermFactory tf = Terms.get();
@@ -132,9 +171,9 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 					}
 				}
 			} catch (TerminologyException e) {
-				e.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(e);
 			} catch (IOException e) {
-				e.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(e);
 			}
 			return semtagParents;
 		} else {
@@ -143,6 +182,9 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.tk.helper.TerminologyHelperDrools#isMemberOf(java.lang.String, java.lang.String)
+	 */
 	@Override
 	public boolean isMemberOf(String conceptUUID, String refsetUUID) {
 		boolean result = false;
@@ -163,6 +205,9 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.tk.helper.TerminologyHelperDrools#isParentOf(java.lang.String, java.lang.String)
+	 */
 	public boolean isParentOf(String parent, String subtype) throws Exception {
 		boolean result = false;
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
@@ -190,12 +235,18 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.tk.helper.TerminologyHelperDrools#isParentOfOrEqualTo(java.lang.String, java.lang.String)
+	 */
 	public boolean isParentOfOrEqualTo(String parent, String subtype)
 	throws Exception {
 		boolean result = (subtype.equals(parent) || isParentOf(parent, subtype));
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.tk.helper.TerminologyHelperDrools#isDescriptionTextNotUniqueInHierarchy(java.lang.String, java.lang.String)
+	 */
 	@Override
 	public boolean isDescriptionTextNotUniqueInHierarchy(String descText, String conceptUuid) throws Exception{
 		boolean result = false;
@@ -267,21 +318,24 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 								}
 							}
 						}catch(Exception e){
-							e.printStackTrace();
+							AceLog.getAppLog().alertAndLogException(e);
 						}
 					}
 				}
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (ParseException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.tk.helper.TerminologyHelperDrools#isFsnTextNotUnique(java.lang.String, java.lang.String, java.lang.String)
+	 */
 	@Override
 	public boolean isFsnTextNotUnique(String fsn, String conceptUuid, String langCode) throws Exception{
 		SearchResult result = Terms.get().doLuceneSearch(fsn);
@@ -310,6 +364,16 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
         }
         return !unique;
 	}
+	
+	/**
+	 * Checks if is fsn text not unique old.
+	 *
+	 * @param fsn the fsn
+	 * @param conceptUuid the concept uuid
+	 * @param langCode the lang code
+	 * @return true, if is fsn text not unique old
+	 * @throws Exception the exception
+	 */
 	public boolean isFsnTextNotUniqueOld(String fsn, String conceptUuid, String langCode) throws Exception{
 		boolean result = false;
 		I_TermFactory tf = Terms.get();
@@ -345,19 +409,22 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 							}
 						}
 					} catch (Exception e) {
-						e.printStackTrace();
+						AceLog.getAppLog().alertAndLogException(e);
 					}
 				}
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (ParseException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.tk.helper.TerminologyHelperDrools#isActive(java.lang.String)
+	 */
 	@Override
 	public boolean isActive(String conceptUUID) {
 		boolean result = false;
@@ -374,19 +441,25 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 			}
 
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.tk.helper.TerminologyHelperDrools#isValidSemtag(java.lang.String)
+	 */
 	@Override
 	public boolean isValidSemtag(String semtag){
 		return getValidSemtags().keySet().contains(semtag);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.tk.helper.TerminologyHelperDrools#isValidSemtagInHierarchy(java.lang.String, java.lang.String, java.lang.String)
+	 */
 	@Override
 	public boolean isValidSemtagInHierarchy(String semtag, String langCode, String conceptUuid){
 		boolean result = true;
@@ -444,14 +517,21 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 			}
 
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 
 		return result;
 	}
 
+	/**
+	 * Gets the descendants.
+	 *
+	 * @param descendants the descendants
+	 * @param concept the concept
+	 * @return the descendants
+	 */
 	public static Set<I_GetConceptData> getDescendants(Set<I_GetConceptData> descendants, I_GetConceptData concept) {
 		try {
 			I_TermFactory termFactory = Terms.get();
@@ -466,13 +546,16 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 				descendants = getDescendants(descendants, loopConcept);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return descendants;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.tk.helper.TerminologyHelperDrools#isParentOfStatedChildren(java.lang.String)
+	 */
 	@Override
 	public boolean isParentOfStatedChildren(String conceptUuid){
 		boolean result = false;
@@ -492,14 +575,17 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 					result = true;
 				}
 			} catch (TerminologyException e) {
-				e.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(e);
 			} catch (IOException e) {
-				e.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(e);
 			}
 		}
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.tk.helper.TerminologyHelperDrools#getListOfDomainsUuids(java.lang.String)
+	 */
 	@Override
 	public List<String> getListOfDomainsUuids(String conceptUuid) {
 		if (domains == null) {
@@ -515,9 +601,9 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 					}
 				}
 			} catch (TerminologyException e) {
-				e.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(e);
 			} catch (IOException e) {
-				e.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(e);
 			}
 			return domains;
 		} else {
@@ -525,6 +611,9 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.tk.helper.TerminologyHelperDrools#isTargetOfReferToLink(java.lang.String)
+	 */
 	@Override
 	public boolean isTargetOfReferToLink(String conceptUuid) {
 		boolean result = false;
@@ -547,13 +636,16 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 				}
 			}
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.tk.helper.TerminologyHelperDrools#isTargetOfHistoricalRelationships(java.lang.String)
+	 */
 	@Override
 	public boolean isTargetOfHistoricalRelationships(String conceptUuid) {
 		boolean result = false;
@@ -570,19 +662,25 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 				}
 			}
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.tk.helper.TerminologyHelperDrools#isExtensionConcept(java.lang.String)
+	 */
 	@Override
 	public boolean isExtensionConcept(String conceptUuid) {
 		//TODO implement when extensions representation is defined
 		return false;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.tk.helper.TerminologyHelperDrools#isSemanticTagEqualsInAllTerms(java.lang.String)
+	 */
 	@Override
 	public boolean isSemanticTagEqualsInAllTerms(String conceptUuid) {
 		boolean result = false;
@@ -610,13 +708,19 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 				result = true;
 			}
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return result;
 	}
 
+	/**
+	 * Uuid from string.
+	 *
+	 * @param string the string
+	 * @return the uUID
+	 */
 	private UUID uuidFromString(String string) {
 		UUID uuid = TerminologyHelperDroolsWorkbench.uuidsMap.get(string);
 
@@ -628,6 +732,12 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		return uuid;
 	}
 	
+	/**
+	 * Gets the mock view set.
+	 *
+	 * @param config the config
+	 * @return the mock view set
+	 */
 	private static PositionSet getMockViewSet(I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 		Set<PositionBI> viewPositions =  new HashSet<PositionBI>();
@@ -637,9 +747,9 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 				viewPositions.add(pos);
 			}
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		PositionSet mockViewSet = new PositionSet(viewPositions);
 		return mockViewSet;

@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Tue Aug 24 15:52:40 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.qa.gui;
@@ -46,6 +59,7 @@ import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
@@ -60,19 +74,42 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
 /**
+ * The Class DroolsEnumUpdatePanel.
+ *
  * @author Guillermo Reynoso
  */
 public class DroolsEnumUpdatePanel extends JPanel {
 
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -8346611923623504647L;
+	
+	/** The refset list model. */
 	private DefaultListModel refsetListModel;
+	
+	/** The drools enum list model. */
 	private DefaultListModel droolsEnumListModel;
+	
+	/** The Constant REFSET_VIEWER_NAME. */
 	public static final String REFSET_VIEWER_NAME = "Drools enumeration update";
+	
+	/** The concept dn d handler. */
 	private ObjectTransferHandler conceptDnDHandler;
+	
+	/** The refset. */
 	private I_GetConceptData refset;
+	
+	/** The config. */
 	private I_ConfigAceFrame config;
+	
+	/** The tf. */
 	private I_TermFactory tf;
 
+	/**
+	 * Instantiates a new drools enum update panel.
+	 *
+	 * @param config the config
+	 * @param refset the refset
+	 */
 	public DroolsEnumUpdatePanel(I_ConfigAceFrame config, I_GetConceptData refset) {
 		this.config = config;
 		this.refset = refset;
@@ -80,6 +117,13 @@ public class DroolsEnumUpdatePanel extends JPanel {
 		initCustomComponents();
 	}
 
+	/**
+	 * Instantiates a new drools enum update panel.
+	 *
+	 * @param config the config
+	 * @param refset the refset
+	 * @param tf the tf
+	 */
 	public DroolsEnumUpdatePanel(I_ConfigAceFrame config, I_GetConceptData refset, I_TermFactory tf) {
 		this.tf = tf;
 		this.config = config;
@@ -88,6 +132,9 @@ public class DroolsEnumUpdatePanel extends JPanel {
 		initCustomComponents();
 	}
 
+	/**
+	 * Inits the custom components.
+	 */
 	private void initCustomComponents() {
 		RulesDeploymentPackageReferenceHelper rulesPackageHelper = new RulesDeploymentPackageReferenceHelper(config);
 		// rulesPackageHelper.createNewRulesDeploymentPackage("Package reference one",
@@ -171,11 +218,11 @@ public class DroolsEnumUpdatePanel extends JPanel {
 
 
 					} catch (TerminologyException e) {
-						e.printStackTrace();
+						AceLog.getAppLog().alertAndLogException(e);
 					} catch (IOException e) {
-						e.printStackTrace();
+						AceLog.getAppLog().alertAndLogException(e);
 					} catch (Exception e) {
-						e.printStackTrace();
+						AceLog.getAppLog().alertAndLogException(e);
 					}
 				}
 			}
@@ -192,7 +239,7 @@ public class DroolsEnumUpdatePanel extends JPanel {
 				rulesPackageCombo.addItem(rulesDeploymentPackageReference);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 
 		refsetList.setModel(refsetListModel);
@@ -218,6 +265,9 @@ public class DroolsEnumUpdatePanel extends JPanel {
 
 	}
 
+	/**
+	 * Update refset detail table.
+	 */
 	private void updateRefsetDetailTable() {
 		if (tf == null) {
 			tf = Terms.get();
@@ -264,10 +314,15 @@ public class DroolsEnumUpdatePanel extends JPanel {
 			}
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 	}
 
+	/**
+	 * Close button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void closeButtonActionPerformed(ActionEvent e) {
 		JPanel signpostPanel = config.getSignpostPanel();
 		Component[] components = signpostPanel.getComponents();
@@ -278,6 +333,11 @@ public class DroolsEnumUpdatePanel extends JPanel {
 		signpostPanel.repaint();
 	}
 
+	/**
+	 * Export action performed.
+	 *
+	 * @param e the e
+	 */
 	private void exportActionPerformed(ActionEvent e) {
 		RulesDeploymentPackageReference package1 = (RulesDeploymentPackageReference) rulesPackageCombo.getSelectedItem();
 		I_GetConceptData selectedRefset = null;
@@ -291,6 +351,11 @@ public class DroolsEnumUpdatePanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Removes the button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void removeButtonActionPerformed(ActionEvent e) {
 
 		I_GetConceptData selectedRefset = null;
@@ -320,14 +385,17 @@ public class DroolsEnumUpdatePanel extends JPanel {
 			}
 
 		} catch (TerminologyException e1) {
-			e1.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e1);
 		} catch (IOException e1) {
-			e1.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e1);
 		} catch (Exception e1) {
-			e1.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e1);
 		}
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -456,19 +524,46 @@ public class DroolsEnumUpdatePanel extends JPanel {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
+	/** The action panel. */
 	private JPanel actionPanel;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The refset list. */
 	private JList refsetList;
+	
+	/** The rules package combo. */
 	private JComboBox rulesPackageCombo;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The export. */
 	private JButton export;
+	
+	/** The close button. */
 	private JButton closeButton;
+	
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The scroll pane2. */
 	private JScrollPane scrollPane2;
+	
+	/** The drool enum list. */
 	private JList droolEnumList;
+	
+	/** The panel3. */
 	private JPanel panel3;
+	
+	/** The remove button. */
 	private JButton removeButton;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 }

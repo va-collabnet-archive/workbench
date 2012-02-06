@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Thu Jan 13 18:51:39 GMT-03:00 2011
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.qa.store.gui;
@@ -40,17 +53,42 @@ import org.ihtsdo.qa.store.model.Rule;
 import org.ihtsdo.qa.store.model.Severity;
 
 /**
+ * The Class RulesDetailsPanel.
+ *
  * @author Guillermo Reynoso
  */
 public class RulesDetailsPanel extends JPanel {
+	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -804059589184964153L;
+	
+	/** The store. */
 	private QAStoreBI store;
+	
+	/** The rule. */
 	private Rule rule;
+	
+	/** The severyties. */
 	private List<Severity> severyties;
+	
+	/** The categories. */
 	private List<Category> categories;
+	
+	/** The menu item. */
 	private JMenuItem menuItem;
+	
+	/** The qa result browser. */
 	private QAResultsBrowser qaResultBrowser;
 
+	/**
+	 * Instantiates a new rules details panel.
+	 *
+	 * @param store the store
+	 * @param rule the rule
+	 * @param categories the categories
+	 * @param severyties the severyties
+	 * @param qaResultBrowser the qa result browser
+	 */
 	public RulesDetailsPanel(QAStoreBI store, Rule rule,
 			List<Category> categories, List<Severity> severyties, QAResultsBrowser qaResultBrowser) {
 		initComponents();
@@ -84,6 +122,9 @@ public class RulesDetailsPanel extends JPanel {
 		initializeFields();
 	}
 
+	/**
+	 * Initialize fields.
+	 */
 	private void initializeFields() {
 		// General Details
 		ruleNameTextArea.setText(rule.getName());
@@ -128,6 +169,11 @@ public class RulesDetailsPanel extends JPanel {
 
 	}
 
+	/**
+	 * Save button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void saveButtonActionPerformed(ActionEvent e) {
 		rule.setExpectedResult(erpResTextArea.getText());
 		rule.setSuggestedResolution(resolutionTextArea.getText());
@@ -154,22 +200,45 @@ public class RulesDetailsPanel extends JPanel {
 		qaResultBrowser.updateRule(rule);
 	}
 
+	/**
+	 * Enable save button.
+	 */
 	private void enableSaveButton() {
 		saveButton.setEnabled(true);
 	}
 
+	/**
+	 * Erp res text area key pressed.
+	 *
+	 * @param e the e
+	 */
 	private void erpResTextAreaKeyPressed(KeyEvent e) {
 		enableSaveButton();
 	}
 
+	/**
+	 * Resolution text area key pressed.
+	 *
+	 * @param e the e
+	 */
 	private void resolutionTextAreaKeyPressed(KeyEvent e) {
 		enableSaveButton();
 	}
 
+	/**
+	 * Example text area key pressed.
+	 *
+	 * @param e the e
+	 */
 	private void exampleTextAreaKeyPressed(KeyEvent e) {
 		enableSaveButton();
 	}
 
+	/**
+	 * Docu url text area key pressed.
+	 *
+	 * @param e the e
+	 */
 	private void docuUrlTextAreaKeyPressed(KeyEvent e) {
 		if (!docuUrlTextArea.getText().equals("")) {
 			menuItem.setEnabled(true);
@@ -179,38 +248,81 @@ public class RulesDetailsPanel extends JPanel {
 		enableSaveButton();
 	}
 
+	/**
+	 * Dita doc link uid text area key pressed.
+	 *
+	 * @param e the e
+	 */
 	private void ditaDocLinkUidTextAreaKeyPressed(KeyEvent e) {
 		enableSaveButton();
 	}
 
+	/**
+	 * Dita generated topic text area key pressed.
+	 *
+	 * @param e the e
+	 */
 	private void ditaGeneratedTopicTextAreaKeyPressed(KeyEvent e) {
 		enableSaveButton();
 	}
 
+	/**
+	 * Rule code text area key pressed.
+	 *
+	 * @param e the e
+	 */
 	private void ruleCodeTextAreaKeyPressed(KeyEvent e) {
 		enableSaveButton();
 	}
 
+	/**
+	 * Category combo box item state changed.
+	 *
+	 * @param e the e
+	 */
 	private void categoryComboBoxItemStateChanged(ItemEvent e) {
 		enableSaveButton();
 	}
 
+	/**
+	 * Severity combo box item state changed.
+	 *
+	 * @param e the e
+	 */
 	private void severityComboBoxItemStateChanged(ItemEvent e) {
 		enableSaveButton();
 	}
 
+	/**
+	 * White list allowed item state changed.
+	 *
+	 * @param e the e
+	 */
 	private void whiteListAllowedItemStateChanged(ItemEvent e) {
 		enableSaveButton();
 	}
 
+	/**
+	 * White list reset allowed item state changed.
+	 *
+	 * @param e the e
+	 */
 	private void whiteListResetAllowedItemStateChanged(ItemEvent e) {
 		enableSaveButton();
 	}
 
+	/**
+	 * White l ist when closed allowed item state changed.
+	 *
+	 * @param e the e
+	 */
 	private void whiteLIstWhenClosedAllowedItemStateChanged(ItemEvent e) {
 		enableSaveButton();
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -598,68 +710,182 @@ public class RulesDetailsPanel extends JPanel {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
+	/** The tabbed pane1. */
 	private JTabbedPane tabbedPane1;
+	
+	/** The scroll bar1. */
 	private JScrollPane scrollBar1;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The rule name text area. */
 	private JTextArea ruleNameTextArea;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The rule description text area. */
 	private JTextArea ruleDescriptionTextArea;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The erp res text area. */
 	private JTextArea erpResTextArea;
+	
+	/** The label4. */
 	private JLabel label4;
+	
+	/** The resolution text area. */
 	private JTextArea resolutionTextArea;
+	
+	/** The label5. */
 	private JLabel label5;
+	
+	/** The example text area. */
 	private JTextArea exampleTextArea;
+	
+	/** The separator1. */
 	private JSeparator separator1;
+	
+	/** The label6. */
 	private JLabel label6;
+	
+	/** The docu url text area. */
 	private JTextArea docuUrlTextArea;
+	
+	/** The label7. */
 	private JLabel label7;
+	
+	/** The dita doc link uid text area. */
 	private JTextArea ditaDocLinkUidTextArea;
+	
+	/** The label8. */
 	private JLabel label8;
+	
+	/** The dita generated topic text area. */
 	private JTextArea ditaGeneratedTopicTextArea;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The label9. */
 	private JLabel label9;
+	
+	/** The rule uuid text area. */
 	private JTextArea ruleUuidTextArea;
+	
+	/** The label14. */
 	private JLabel label14;
+	
+	/** The rule code text area. */
 	private JTextArea ruleCodeTextArea;
+	
+	/** The status label. */
 	private JLabel statusLabel;
+	
+	/** The status label text. */
 	private JLabel statusLabelText;
+	
+	/** The label11. */
 	private JLabel label11;
+	
+	/** The category combo box. */
 	private JComboBox categoryComboBox;
+	
+	/** The label12. */
 	private JLabel label12;
+	
+	/** The severity combo box. */
 	private JComboBox severityComboBox;
+	
+	/** The separator2. */
 	private JSeparator separator2;
+	
+	/** The white list allowed. */
 	private JCheckBox whiteListAllowed;
+	
+	/** The white list reset allowed. */
 	private JCheckBox whiteListResetAllowed;
+	
+	/** The white l ist when closed allowed. */
 	private JCheckBox whiteLIstWhenClosedAllowed;
+	
+	/** The separator3. */
 	private JSeparator separator3;
+	
+	/** The label13. */
 	private JLabel label13;
+	
+	/** The modified by label. */
 	private JLabel modifiedByLabel;
+	
+	/** The label10. */
 	private JLabel label10;
+	
+	/** The modified date label. */
 	private JLabel modifiedDateLabel;
+	
+	/** The panel3. */
 	private JPanel panel3;
+	
+	/** The save button. */
 	private JButton saveButton;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 
+	/**
+	 * The listener interface for receiving popup events.
+	 * The class that is interested in processing a popup
+	 * event implements this interface, and the object created
+	 * with that class is registered with a component using the
+	 * component's <code>addPopupListener<code> method. When
+	 * the popup event occurs, that object's appropriate
+	 * method is invoked.
+	 *
+	 * @see PopupEvent
+	 */
 	class PopupListener extends MouseAdapter {
+		
+		/** The popup. */
 		JPopupMenu popup;
 
+		/**
+		 * Instantiates a new popup listener.
+		 *
+		 * @param popupMenu the popup menu
+		 */
 		PopupListener(JPopupMenu popupMenu) {
 			popup = popupMenu;
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.event.MouseAdapter#mousePressed(java.awt.event.MouseEvent)
+		 */
 		@Override
 		public void mousePressed(MouseEvent e) {
 			maybeShowPopup(e);
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.event.MouseAdapter#mouseReleased(java.awt.event.MouseEvent)
+		 */
 		@Override
 		public void mouseReleased(MouseEvent e) {
 			maybeShowPopup(e);
 		}
 
+		/**
+		 * Maybe show popup.
+		 *
+		 * @param e the e
+		 */
 		private void maybeShowPopup(MouseEvent e) {
 			if (e.isPopupTrigger()) {
 				popup.show(e.getComponent(), e.getX(), e.getY());
@@ -667,6 +893,9 @@ public class RulesDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Creates the popup menu.
+	 */
 	public void createPopupMenu() {
 		// Create the popup menu.
 		JPopupMenu popup = new JPopupMenu();

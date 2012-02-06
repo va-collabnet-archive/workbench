@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.rules.test;
 
 import java.awt.BorderLayout;
@@ -11,11 +27,23 @@ import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+/**
+ * The Class MainClass.
+ */
 public class MainClass {
 
+	/** The tabbed pane. */
 	public static MemoriousJTabbedPane tabbedPane;
+	
+	/** The count. */
 	public static int count = 0;
 
+	/**
+	 * The main method.
+	 *
+	 * @param args the arguments
+	 * @throws Exception the exception
+	 */
 	public static void main(String args[]) throws Exception {
 		JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -67,6 +95,13 @@ public class MainClass {
 
 	}
 
+	/**
+	 * Adds the.
+	 *
+	 * @param tabbedPane the tabbed pane
+	 * @param label the label
+	 * @param mnemonic the mnemonic
+	 */
 	static void add(JTabbedPane tabbedPane, String label, int mnemonic) {
 		int count = tabbedPane.getTabCount();
 		JButton button = new JButton(label);

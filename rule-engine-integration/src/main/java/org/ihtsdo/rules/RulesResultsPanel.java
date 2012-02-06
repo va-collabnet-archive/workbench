@@ -36,6 +36,7 @@ import javax.swing.table.DefaultTableModel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.qa.gui.TextAreaRenderer;
@@ -65,10 +66,10 @@ public class RulesResultsPanel extends JPanel implements ActionListener {
 			config =  Terms.get().getActiveAceFrameConfig();
 		} catch (TerminologyException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		Box topContainer = new Box(BoxLayout.X_AXIS);
 		topContainer.add(new JLabel("Execution result:"));
