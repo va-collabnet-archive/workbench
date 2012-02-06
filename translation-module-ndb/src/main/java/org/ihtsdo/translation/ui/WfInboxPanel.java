@@ -478,6 +478,7 @@ public class WfInboxPanel extends JPanel {
 			}
 		}
 		model.updatePage(filterList);
+		model.fireTableDataChanged();
 	}
 
 	/**
