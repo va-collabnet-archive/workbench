@@ -5,6 +5,7 @@
 		<version>2.6.0-trek-91-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.ihtsdo.termmed.dev</groupId>
 	<artifactId>wb-release-process</artifactId>
 	<!--<packaging>jar</packaging> -->
 	<packaging>maven-plugin</packaging>
