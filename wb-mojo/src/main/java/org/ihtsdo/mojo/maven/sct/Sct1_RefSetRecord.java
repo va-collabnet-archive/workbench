@@ -219,7 +219,7 @@ public class Sct1_RefSetRecord implements Comparable<Sct1_RefSetRecord>, Seriali
         sb.append("\r\n::: status " + this.status);
 
         Date d = new Date(this.revTime);
-        String pattern = "yyyy-MM-dd hh:mm:ss";
+        String pattern = "yyyy-MM-dd HH:mm:ss";
         SimpleDateFormat formatter = new SimpleDateFormat(pattern);
         formatter.format(d);
 

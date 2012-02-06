@@ -4428,7 +4428,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     boolean inDateRange(String revDateStr) throws ParseException {
-        String pattern = "yyyy-MM-dd hh:mm:ss";
+        String pattern = "yyyy-MM-dd HH:mm:ss";
         SimpleDateFormat formatter = new SimpleDateFormat(pattern);
         Date revDate = formatter.parse(revDateStr);
 
