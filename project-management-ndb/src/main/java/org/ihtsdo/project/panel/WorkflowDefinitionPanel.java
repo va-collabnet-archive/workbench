@@ -144,7 +144,9 @@ public class WorkflowDefinitionPanel extends JPanel {
 		removeButton.setEnabled(false);
 		nameTextField.setEnabled(false);
 		businessTextField.setEnabled(false);
+		businessBrowseButton.setEnabled(false);
 		consequenceComboBox.setEnabled(true);
+		tabbedPane1.setEnabled(false);
 	}
 
 	/**
@@ -215,6 +217,10 @@ public class WorkflowDefinitionPanel extends JPanel {
 				businessTextField.setEnabled(false);
 				consequenceComboBox.setEnabled(false);
 				businessBrowseButton.setEnabled(false);
+				
+				saveButton.setText("Save");
+				saveButton.setEnabled(true);
+				cancelButton.setEnabled(true);
 			}
 			else
 				JOptionPane.showMessageDialog(this, "You must write a name for the current Action.");
@@ -245,6 +251,10 @@ public class WorkflowDefinitionPanel extends JPanel {
 				actionList.updateUI();
 				activeSelection=false;
 				selectedAction=-1;
+				
+				saveButton.setText("Save");
+				saveButton.setEnabled(true);
+				cancelButton.setEnabled(true);
 			}
 		}
 		else{																						//CANCEL
@@ -307,6 +317,9 @@ public class WorkflowDefinitionPanel extends JPanel {
 			}
 			xlsTextField.setText(files);
 		}
+		saveButton.setText("Save");
+		saveButton.setEnabled(true);
+		cancelButton.setEnabled(true);
 	}
 
 	/**
@@ -332,6 +345,9 @@ public class WorkflowDefinitionPanel extends JPanel {
 			}
 			drlTextField.setText(files);
 		}
+		saveButton.setText("Save");
+		saveButton.setEnabled(true);
+		cancelButton.setEnabled(true);
 	}
 
 	/**
@@ -358,18 +374,20 @@ public class WorkflowDefinitionPanel extends JPanel {
 	 * @param row the row
 	 */
 	protected void checkState(int row) {
+		if(actions.size()==0) return;
 		boolean value= (Boolean) statesTable.getValueAt(row, 0);
 		UUID uuid = null;
-		if(!value)
-			uuid= states.get(statesTable.getValueAt(row,1)).getId();
-			if(actions.size()==0) return;
-			for (WfAction action : actions.values()) {
-				if(action.getConsequence().getId().equals(uuid)){
-					JOptionPane.showMessageDialog(this, "This State is present in one or more actions. Remove it from the actions first.");
-					statesTable.setValueAt(true, row, 0);
-					return;
-				} 
-			}
+		if(value) return;
+		WfState state= states.get(statesTable.getValueAt(row,1));
+		if(state==null) return;
+		uuid= state.getId();
+		for (WfAction action : actions.values()) {
+			if(action.getConsequence().getId().equals(uuid)){
+				JOptionPane.showMessageDialog(this, "This State is present in one or more actions. Remove it from the actions first.");
+				statesTable.setValueAt(true, row, 0);
+				return;
+			} 
+		}
 	}
 
 	/**
@@ -410,11 +428,25 @@ public class WorkflowDefinitionPanel extends JPanel {
 	 * @param e the e
 	 */
 	private void saveButtonActionPerformed(ActionEvent e) {
+		if(cancelButton.isEnabled()){
+			if(saveFile()){
+				saveButton.setText("New");
+				cancelButton.setEnabled(false);
+			}
+		}
+		else{
+			newFile();
+			saveButton.setText("Save");
+			cancelButton.setEnabled(true);
+		}
+	}
+
+	private boolean saveFile() {
 		if(removeButton.getText().equals("Cancel")){
 			JOptionPane.showMessageDialog(this, "Before save, please finish Action edition or creation.");
-			return;
+			return false;
 		}
-		if(workflowNameTextField.getText()!=null || workflowNameTextField.getText().length()>0){
+		if(workflowNameTextField.getText()!=null && workflowNameTextField.getText().length()>0){
 			selRoles= new ArrayList<WfRole>();
 			selStates= new ArrayList<WfState>();
 			for (int i = 0; i < rolesTable.getRowCount(); i++) {
@@ -449,9 +481,13 @@ public class WorkflowDefinitionPanel extends JPanel {
 			workflowDefinition.setXlsFileName(xlsFiles);
 			WorkflowDefinitionManager.writeWfDefinition(workflowDefinition);
 			JOptionPane.showMessageDialog(this, "\""+workflowNameTextField.getText()+"\" saved.");
+			workflowDefinitionFile= new File("sampleProcesses/"+workflowDefinition.getName()+".wfd");
+			return true;
 		}
-		else
+		else{
 			JOptionPane.showMessageDialog(this, "Please write a name for the Workflow definition");
+			return false;
+		}
 	}
 
 	/**
@@ -492,61 +528,90 @@ public class WorkflowDefinitionPanel extends JPanel {
 		
 		WorkflowDefinition workflowDefinition = WorkflowDefinitionManager.readWfDefinition(workflowDefinitionFile.getName());
 		workflowNameTextField.setText(workflowDefinition.getName());
-		
+		actionList.setModel(new DefaultListModel());
 		WfComponentProvider wp= new WfComponentProvider();
 		List<WfRole> rolesList = wp.getRoles();
 		List<WfState> statesList = wp.getStates();
-		actions= (HashMap<String,WfAction>)workflowDefinition.getActions();
 		selRoles= workflowDefinition.getRoles();
 		selStates= workflowDefinition.getStates();
 		roles= new HashMap<String, WfRole>();
 		states= new HashMap<String, WfState>();
 		
+		if(selRoles!=null && selRoles.size()>0)
 		for (WfRole role : selRoles) {
 			roles.put(role.getName(), role);
 		}
+		if(selStates!=null && selStates.size()>0)
 		for (WfState state : selStates) {
 			states.put(state.getName(), state);
 		}
 		
 		DefaultTableModel model= (DefaultTableModel) rolesTable.getModel();
 		for (int i = 0; i < model.getRowCount(); i++) {
-			model.removeRow(i);
+			model.setValueAt(false, i, 0);
 		}
+		if(rolesList!=null && rolesList.size()>0)
 		for (WfRole role : rolesList) {
-			if(roles.containsKey(role.getName()))
-				model.addRow(new Object[]{new Boolean(true),role.getName()});
+			if(roles.containsKey(role.getName())){
+				for (int i = 0; i < model.getRowCount(); i++) {
+					String val= (String) model.getValueAt(i, 1);
+					if(role.getName().equalsIgnoreCase(val)){
+						model.setValueAt(true, i, 0);
+						break;
+					}
+				}
+			}
 			else{
 				roles.put(role.getName(), role);
-				model.addRow(new Object[]{new Boolean(false),role.getName()});
 			}
 		}
 		rolesTable.setModel(model);
+		rolesTable.updateUI();
 		
 		model= (DefaultTableModel) statesTable.getModel();
 		for (int i = 0; i < model.getRowCount(); i++) {
-			model.removeRow(i);
+			model.setValueAt(false, i, 0);
 		}
+		if(statesList!=null && statesList.size()>0)
 		for (WfState state : statesList) {
-			if(states.containsKey(state.getName()))
-				model.addRow(new Object[]{new Boolean(true),state.getName()});
+			if(states.containsKey(state.getName())){
+				for (int i = 0; i < model.getRowCount(); i++) {
+					String val= (String) model.getValueAt(i, 1);
+					if(state.getName().equalsIgnoreCase(val)){
+						model.setValueAt(true, i, 0);
+						break;
+					}
+				}
+			}
 			else{
 				states.put(state.getName(), state);
-				model.addRow(new Object[]{new Boolean(false),state.getName()});
 			}
 		}
+		((DefaultTableModel)rolesTable.getModel()).addTableModelListener(new TableModelListener() {
+			@Override
+			public void tableChanged(TableModelEvent e) {
+				saveButton.setText("Save");
+				saveButton.setEnabled(true);
+				cancelButton.setEnabled(true);
+			}
+		    });
 		((DefaultTableModel)statesTable.getModel()).addTableModelListener(new TableModelListener() {
 			@Override
 			public void tableChanged(TableModelEvent e) {
 				checkState(e.getFirstRow());
+				saveButton.setText("Save");
+				saveButton.setEnabled(true);
+				cancelButton.setEnabled(true);
 			}
 		    });
 		statesTable.setModel(model);
+		statesTable.updateUI();
 		consequenceComboBox.removeAllItems();
 		for (int i = 0; i < statesTable.getRowCount(); i++) {
 			if(((Boolean)statesTable.getValueAt(i, 0))==true)
 				consequenceComboBox.addItem((String)statesTable.getValueAt(i, 1));
 		}
+		actions= (HashMap<String,WfAction>)workflowDefinition.getActions();
 		DefaultListModel lmodel = new DefaultListModel();
 		if(actions.size()>0)
 			for (Object act : actions.keySet().toArray()) {
@@ -574,6 +639,8 @@ public class WorkflowDefinitionPanel extends JPanel {
 		activeSelection=false;
 		selectedAction=-1;
 		
+		tabbedPane1.setEnabled(true);
+		tabbedPane1.setSelectedIndex(0);
 		newButton.setEnabled(true);
 		editButton.setEnabled(false);
 		removeButton.setEnabled(false);
@@ -581,6 +648,85 @@ public class WorkflowDefinitionPanel extends JPanel {
 		businessTextField.setEnabled(false);
 		consequenceComboBox.setEnabled(false);
 		businessBrowseButton.setEnabled(false);
+		saveButton.setText("New");
+		cancelButton.setEnabled(false);
+	}
+	
+	private void newFile(){
+		workflowNameTextField.setText("");
+		
+		WfComponentProvider wp= new WfComponentProvider();
+		List<WfRole> rolesList = wp.getRoles();
+		List<WfState> statesList = wp.getStates();
+		actions= new HashMap<String, WfAction>();
+		roles= new HashMap<String, WfRole>();
+		states= new HashMap<String, WfState>();
+		drlFiles= new ArrayList<String>();
+		xlsFiles= new ArrayList<String>();
+		DefaultListModel lmodel = new DefaultListModel();
+		actionList.setModel(lmodel);
+		actionList.updateUI();
+		
+		DefaultTableModel model= (DefaultTableModel) rolesTable.getModel();
+		for (int i = 0; i < model.getRowCount(); i++) {
+			model.setValueAt(false, i, 0);
+		}
+		if(rolesList!=null && rolesList.size()>0)
+		for (WfRole role : rolesList) {
+				roles.put(role.getName(), role);
+		}
+		rolesTable.setModel(model);
+		rolesTable.updateUI();
+		
+		model= (DefaultTableModel) statesTable.getModel();
+		for (int i = 0; i < model.getRowCount(); i++) {
+			model.setValueAt(false, i, 0);
+		}
+		if(statesList!=null && statesList.size()>0)
+		for (WfState state : statesList) {
+				states.put(state.getName(), state);
+		}
+		((DefaultTableModel)rolesTable.getModel()).addTableModelListener(new TableModelListener() {
+			@Override
+			public void tableChanged(TableModelEvent e) {
+				saveButton.setText("Save");
+				saveButton.setEnabled(true);
+				cancelButton.setEnabled(true);
+			}
+		    });
+		((DefaultTableModel)statesTable.getModel()).addTableModelListener(new TableModelListener() {
+			@Override
+			public void tableChanged(TableModelEvent e) {
+				checkState(e.getFirstRow());
+				saveButton.setText("Save");
+				saveButton.setEnabled(true);
+				cancelButton.setEnabled(true);
+			}
+		    });
+		statesTable.setModel(model);
+		statesTable.updateUI();
+		consequenceComboBox.removeAllItems();
+		
+		xlsFiles= null;
+		xlsTextField.setText("");
+		drlFiles= null;
+		drlTextField.setText("");
+		
+		consequenceComboBox.setSelectedIndex(-1);
+		activeSelection=false;
+		selectedAction=-1;
+		
+		tabbedPane1.setEnabled(true);
+		tabbedPane1.setSelectedIndex(0);
+		newButton.setEnabled(true);
+		editButton.setEnabled(false);
+		removeButton.setEnabled(false);
+		nameTextField.setEnabled(false);
+		businessTextField.setEnabled(false);
+		consequenceComboBox.setEnabled(false);
+		businessBrowseButton.setEnabled(false);
+		saveButton.setText("New");
+		cancelButton.setEnabled(false);
 	}
 
 	/**
@@ -628,10 +774,21 @@ public class WorkflowDefinitionPanel extends JPanel {
 			businessTextField.setText("");
 			xlsTextField.setText("");
 			drlTextField.setText("");
-			rolesTable.removeAll();
+			DefaultTableModel model= (DefaultTableModel) rolesTable.getModel();
+			for (int i = 0; i < model.getRowCount(); i++) {
+				model.setValueAt(false, i, 0);
+			}
+			rolesTable.setModel(model);
+			model= (DefaultTableModel) statesTable.getModel();
+			for (int i = 0; i < model.getRowCount(); i++) {
+				model.setValueAt(false, i, 0);
+			}
+			statesTable.setModel(model);
 			roles= new HashMap<String, WfRole>();
-			statesTable.removeAll();
 			states= new  HashMap<String, WfState>();
+			cancelButton.setEnabled(false);
+			saveButton.setText("New");
+			saveButton.setEnabled(true);
 		}
 		else{
 			loadFile();
@@ -696,6 +853,10 @@ public class WorkflowDefinitionPanel extends JPanel {
 				businessTextField.setEnabled(false);
 				businessBrowseButton.setEnabled(false);
 				consequenceComboBox.setEnabled(false);
+				
+				saveButton.setText("Save");
+				saveButton.setEnabled(true);
+				cancelButton.setEnabled(true);
 			}
 			else
 				JOptionPane.showMessageDialog(this, "You must write a name for the current Action.");
@@ -1158,7 +1319,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 			((GridBagLayout)panel7.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
 			//---- saveButton ----
-			saveButton.setText("Save");
+			saveButton.setText("New");
 			saveButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -1171,6 +1332,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 
 			//---- cancelButton ----
 			cancelButton.setText("Cancel");
+			cancelButton.setEnabled(false);
 			cancelButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {

@@ -1259,7 +1259,7 @@
           <string>javax.swing.JButton</string> 
           <void method="setProperty"> 
            <string>text</string> 
-           <string>Save</string> 
+           <string>New</string> 
           </void> 
           <void property="name"> 
            <string>saveButton</string> 
@@ -1287,6 +1287,10 @@
           <void method="setProperty"> 
            <string>text</string> 
            <string>Cancel</string> 
+          </void> 
+          <void method="setProperty"> 
+           <string>enabled</string> 
+           <boolean>false</boolean> 
           </void> 
           <void property="name"> 
            <string>cancelButton</string> 
