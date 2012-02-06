@@ -1239,20 +1239,9 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 
                 if (rvList.size() == 1) {
 
-                    // :BEGIN:WORKAROUND;
-                    // SUPPRESS RETIREMENT OF EXISTING INFERRED RECORD
-                    // WHEN THE CURRENT RELATIONSHIP IS AN ADDITIONAL CHARACTERISTIC
-                    // SEE ARTF225415
-                    if (rvList.get(0).getCharacteristicNid()
-                            == SnomedMetadataRfx.getREL_CH_ADDITIONAL_CHARACTERISTIC_NID()) {
-                        return;
-                    }
-                    // :END:WORKAROUND:
-
                     // CREATE RELATIONSHIP PART W/ TermFactory
                     rvList.get(0).makeAnalog(isRETIRED, snorocketAuthorNid, writeToNid, versionTime);
-                    // :!!!:TODO: move addUncommittedNoChecks() to more efficient
-                    // location.
+                    // :!!!:TODO: move addUncommittedNoChecks() to more efficient location.
                     // more optimal to only call once per concept.
                     I_GetConceptData thisC1 = tf.getConcept(rel_A.c1Id);
                     tf.addUncommittedNoChecks(thisC1);
