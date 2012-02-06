@@ -37,6 +37,7 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -255,6 +256,21 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 				}
 			}
 			hideColumns();
+			for (int i = 1; i < model.getColumnCount(); i+=2) {
+				boolean flag=true;
+				for (int j = 0; j < model.getRowCount(); j++) {
+					if((Boolean)model.isCellEditable(j, i)==true){
+						flag=false;
+						break;
+					}
+				}
+				if(flag){
+					JOptionPane.showMessageDialog(this, "There is a role that cannot be assigned. " +
+							"You must modify Workflow Definition first.");
+				}
+			}
+					
+					
 		} catch (TerminologyException e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
