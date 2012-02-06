@@ -87,6 +87,12 @@ public class AddWorklistMemberAsAttach extends AbstractTask {
 		}
 
 	}
+	
+	/**
+	 * Instantiates a new adds the worklist member as attach.
+	 *
+	 * @throws MalformedURLException the malformed url exception
+	 */
 	public AddWorklistMemberAsAttach() throws MalformedURLException{
 		super();
 	}
@@ -137,10 +143,20 @@ public class AddWorklistMemberAsAttach extends AbstractTask {
 		return new int[] {  };
 	}
 
+	/**
+	 * Gets the concept name.
+	 *
+	 * @return the concept name
+	 */
 	public TermEntry getConceptName() {
 		return conceptName;
 	}
 
+	/**
+	 * Sets the concept name.
+	 *
+	 * @param conceptName the new concept name
+	 */
 	public void setConceptName(TermEntry conceptName) {
 		this.conceptName = conceptName;
 	}

@@ -101,6 +101,9 @@ public class TempTestSearches extends TestCase {
 	}
 
 
+	/**
+	 * Test search.
+	 */
 	public void testSearch() {
 		try {
 			I_GetConceptData rootConcept = tf.getConcept(UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8"));
@@ -338,6 +341,11 @@ public class TempTestSearches extends TestCase {
 
 	//	}
 
+	/**
+	 * Gets the test config.
+	 *
+	 * @return the test config
+	 */
 	private I_ConfigAceFrame getTestConfig() {
 		I_ConfigAceFrame config = null;
 		try {
@@ -366,6 +374,13 @@ public class TempTestSearches extends TestCase {
 	}
 
 	// If targetLocation does not exist, it will be created.
+	/**
+	 * Copy directory.
+	 *
+	 * @param sourceLocation the source location
+	 * @param targetLocation the target location
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public void copyDirectory(File sourceLocation , File targetLocation)
 	throws IOException {
 
@@ -395,6 +410,12 @@ public class TempTestSearches extends TestCase {
 		}
 	}
 
+	/**
+	 * Delete directory.
+	 *
+	 * @param path the path
+	 * @return true, if successful
+	 */
 	public boolean deleteDirectory(File path) {
 		if( path.exists() ) {
 			File[] files = path.listFiles();
@@ -410,6 +431,11 @@ public class TempTestSearches extends TestCase {
 		return( path.delete() );
 	}
 
+	/**
+	 * Sleep.
+	 *
+	 * @param n the n
+	 */
 	public static void sleep(int n){
 		long t0, t1;
 		t0 =  System.currentTimeMillis();
@@ -419,6 +445,14 @@ public class TempTestSearches extends TestCase {
 		while ((t1 - t0) < (n * 1000));
 	}
 
+	/**
+	 * Gets the last extension part.
+	 *
+	 * @param extension the extension
+	 * @return the last extension part
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	private static I_ExtendByRefPart getLastExtensionPart(I_ExtendByRef extension) throws TerminologyException, IOException {
 		long lastVersion = Long.MIN_VALUE;
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
@@ -435,6 +469,13 @@ public class TempTestSearches extends TestCase {
 		return lastPart;
 	}
 	
+	/**
+	 * Gets the spec refset concept.
+	 *
+	 * @param refset the refset
+	 * @param config the config
+	 * @return the spec refset concept
+	 */
 	public I_GetConceptData getSpecRefsetConcept(I_GetConceptData refset, I_ConfigAceFrame config) {
 		try {
 			I_GetConceptData specifiesRefsetRel =
@@ -446,6 +487,15 @@ public class TempTestSearches extends TestCase {
 		}
 	}
 	
+	/**
+	 * Gets the latest destination relationship source.
+	 *
+	 * @param concept the concept
+	 * @param relationshipType the relationship type
+	 * @param config the config
+	 * @return the latest destination relationship source
+	 * @throws Exception the exception
+	 */
 	public I_GetConceptData getLatestDestinationRelationshipSource(I_GetConceptData concept,
 			I_GetConceptData relationshipType, I_ConfigAceFrame config) throws Exception {
 			

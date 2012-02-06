@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Mon Mar 22 15:31:31 GMT-04:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.project.panel.details;
@@ -91,33 +104,71 @@ import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.util.IconUtilities;
 import org.ihtsdo.rf2.refset.dao.RefsetConceptDAO;
 import org.ihtsdo.testmodel.RefsetType;
+
 /**
+ * The Class ProjectDetailsPanel.
+ *
  * @author Guillermo Reynoso
  */
 public class ProjectDetailsPanel extends JPanel {
-	/**
-	 * 
-	 */
+	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
+	
+	/** The Constant TARGET_LIST_NAME. */
 	public final static String TARGET_LIST_NAME ="targetLanguageList";
+	
+	/** The project. */
 	private TranslationProject project;
+	
+	/** The config. */
 	private I_ConfigAceFrame config;
+	
+	/** The list1 model. */
 	private DefaultListModel list1Model;
+	
+	/** The list2 model. */
 	private DefaultListModel list2Model;
+	
+	/** The list4 model. */
 	private DefaultListModel list4Model;
+	
+	/** The list5 model. */
 	private DefaultListModel list5Model;
+	
+	/** The list6 model. */
 	private DefaultListModel list6Model;
+	
+	/** The list7 model. */
 	private DefaultListModel list7Model;
+	
+	/** The utw business process. */
 	private BusinessProcess utwBusinessProcess;
 	//	private TermComponentLabel targetLanguageLabel;
+	/** The source repo. */
 	private IssueRepository sourceRepo;
+	
+	/** The project repo. */
 	private IssueRepository projectRepo;
 
+	/** The Concept dn d handler. */
 	ObjectTransferHandler ConceptDnDHandler ;
+	
+	/** The list8 model. */
 	private DefaultListModel list8Model;
+	
+	/** The release candidate list model. */
 	private DefaultListModel releaseCandidateListModel;
+	
+	/** The module id model. */
 	private DefaultListModel moduleIdModel;
 
+	/**
+	 * Instantiates a new project details panel.
+	 *
+	 * @param project the project
+	 * @param config the config
+	 */
 	public ProjectDetailsPanel(TranslationProject project, I_ConfigAceFrame config) {
 		initComponents();
 		this.project = project;
@@ -396,6 +447,15 @@ public class ProjectDetailsPanel extends JPanel {
 		}
 	}
 	
+	/**
+	 * Validate as path refset.
+	 *
+	 * @param pathRefsetId the path refset id
+	 * @param config the config
+	 * @return true, if successful
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	public static boolean validateAsPathRefset(int pathRefsetId, I_ConfigAceFrame config) throws IOException, TerminologyException {
 		I_TermFactory tf = Terms.get();
 		I_GetConceptData languageRefsetConcept = tf.getConcept(pathRefsetId);
@@ -407,6 +467,15 @@ public class ProjectDetailsPanel extends JPanel {
 		return pathRefset.isParentOf(languageRefsetConcept, config.getAllowedStatus(), config.getDestRelTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
 	}
 	
+	/**
+	 * Validate as module refset.
+	 *
+	 * @param moduleRefsetId the module refset id
+	 * @param config the config
+	 * @return true, if successful
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	public static boolean validateAsModuleRefset(int moduleRefsetId, I_ConfigAceFrame config) throws IOException, TerminologyException {
 		return false;
 //		I_TermFactory tf = Terms.get();
@@ -424,11 +493,26 @@ public class ProjectDetailsPanel extends JPanel {
 //		return isValid;
 	}
 	
+	/**
+	 * The Class UpdateRepositoryData.
+	 */
 	public class UpdateRepositoryData implements I_UpdateRepository{
+		
+		/** The source. */
 		String source;
+		
+		/**
+		 * Instantiates a new update repository data.
+		 *
+		 * @param source the source
+		 */
 		public UpdateRepositoryData(String source){
 			this.source=source;
 		}
+		
+		/* (non-Javadoc)
+		 * @see org.ihtsdo.project.panel.dnd.I_UpdateRepository#update(org.ihtsdo.issue.issuerepository.IssueRepository)
+		 */
 		@Override
 		public void update(IssueRepository issueRepository) {
 			if (source.equals("PROJECT")){
@@ -455,6 +539,12 @@ public class ProjectDetailsPanel extends JPanel {
 		}
 		
 	}
+	
+	/**
+	 * Update source repo info.
+	 *
+	 * @throws Exception the exception
+	 */
 	private void updateSourceRepoInfo() throws Exception {
 			if (sourceRepo != null) {
 				textField3.setText(sourceRepo.getName());
@@ -469,6 +559,11 @@ public class ProjectDetailsPanel extends JPanel {
 			}
 	}
 	
+	/**
+	 * Update project repo info.
+	 *
+	 * @throws Exception the exception
+	 */
 	private void updateProjectRepoInfo() throws Exception {
 		if (projectRepo != null) {
 			textField6.setText(projectRepo.getName());
@@ -483,6 +578,9 @@ public class ProjectDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Update issue panel.
+	 */
 	private void updateIssuePanel() {
 		updateList2();
 		try {			
@@ -503,6 +601,9 @@ public class ProjectDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Update list2.
+	 */
 	private void updateList2() {
 		// List of repositories
 		list2Model = new DefaultListModel();
@@ -526,6 +627,11 @@ public class ProjectDetailsPanel extends JPanel {
 		list2.validate();
 	}
 
+	/**
+	 * Button13 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button13ActionPerformed(ActionEvent e) {
 		// save issue repo info
 		I_TermFactory tf = Terms.get();
@@ -595,6 +701,9 @@ public class ProjectDetailsPanel extends JPanel {
 				"Message", JOptionPane.INFORMATION_MESSAGE);
 	}
 
+	/**
+	 * Update list1 content.
+	 */
 	private void updateList1Content() {
 		list1Model = new DefaultListModel();
 		List<WorkList> utwWorklists = TerminologyProjectDAO.getAllNacWorkLists(
@@ -614,6 +723,9 @@ public class ProjectDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Update list7 content.
+	 */
 	private void updateList7Content() {
 		list7Model = new DefaultListModel();
 		List<WorkSet> worksets = project.getWorkSets(config);
@@ -633,6 +745,11 @@ public class ProjectDetailsPanel extends JPanel {
 		list7.validate();
 	}
 
+	/**
+	 * Text field1 key typed.
+	 *
+	 * @param e the e
+	 */
 	private void textField1KeyTyped(KeyEvent e) {
 		if (textField1.getText().equals(project.getName())) {
 			button3.setEnabled(false);
@@ -641,6 +758,11 @@ public class ProjectDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Button3 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button3ActionPerformed(ActionEvent e) {
 		try {
 			project.setName(textField1.getText());
@@ -674,6 +796,11 @@ public class ProjectDetailsPanel extends JPanel {
 		JOptionPane.showMessageDialog(this, "Project saved!", "Message", JOptionPane.INFORMATION_MESSAGE);
 	}
 
+	/**
+	 * Button4 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button4ActionPerformed(ActionEvent e) {
 		try {
 			ListModel currentModel = list4.getModel();
@@ -712,6 +839,11 @@ public class ProjectDetailsPanel extends JPanel {
 
 	}
 
+	/**
+	 * List4 key typed.
+	 *
+	 * @param e the e
+	 */
 	private void list4KeyTyped(KeyEvent e) {
 		//		System.out.println(e.getKeyCode());
 		//		System.out.println(e.getKeyChar());
@@ -724,6 +856,9 @@ public class ProjectDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Removes the selected list4 items.
+	 */
 	private void removeSelectedList4Items() {
 		if(list4.getSelectedIndices().length > 0) {
 			int[] tmp = list4.getSelectedIndices();
@@ -736,6 +871,11 @@ public class ProjectDetailsPanel extends JPanel {
 		} //
 	}
 
+	/**
+	 * List5 key typed.
+	 *
+	 * @param e the e
+	 */
 	private void list5KeyTyped(KeyEvent e) {
 		String keyChar = String.valueOf(e.getKeyChar());
 		if ("d".equals(keyChar)) {
@@ -743,6 +883,9 @@ public class ProjectDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Removes the selected list5 items.
+	 */
 	private void removeSelectedList5Items() {
 		if(list5.getSelectedIndices().length > 0) {
 			int[] tmp = list5.getSelectedIndices();
@@ -755,6 +898,11 @@ public class ProjectDetailsPanel extends JPanel {
 		} //
 	}
 
+	/**
+	 * Button5 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button5ActionPerformed(ActionEvent e) {
 		try {
 			ListModel currentModel = list5.getModel();
@@ -792,6 +940,11 @@ public class ProjectDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * List6 key typed.
+	 *
+	 * @param e the e
+	 */
 	private void list6KeyTyped(KeyEvent e) {
 		String keyChar = String.valueOf(e.getKeyChar());
 		if ("d".equals(keyChar)) {
@@ -799,6 +952,11 @@ public class ProjectDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * List8 key typed.
+	 *
+	 * @param e the e
+	 */
 	private void list8KeyTyped(KeyEvent e) {
 		String keyChar = String.valueOf(e.getKeyChar());
 		if ("d".equals(keyChar)) {
@@ -806,6 +964,9 @@ public class ProjectDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Removes the selected list6 items.
+	 */
 	private void removeSelectedList6Items() {
 		if(list6.getSelectedIndices().length > 0) {
 			int[] tmp = list6.getSelectedIndices();
@@ -817,6 +978,10 @@ public class ProjectDetailsPanel extends JPanel {
 			} // end-for
 		} //
 	}
+	
+	/**
+	 * Removes the selected list8 items.
+	 */
 	private void removeSelectedList8Items() {
 		if(list8.getSelectedIndices().length > 0) {
 			int[] tmp = list8.getSelectedIndices();
@@ -829,6 +994,11 @@ public class ProjectDetailsPanel extends JPanel {
 		} //
 	}
 
+	/**
+	 * Button6 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button6ActionPerformed(ActionEvent e) {
 		try {
 			if(list6Model.getSize() > 0 && list8Model.getSize() > 0){
@@ -909,6 +1079,11 @@ public class ProjectDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Button2 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button2ActionPerformed(ActionEvent e) {
 		// retire project
 		int n = JOptionPane.showConfirmDialog(
@@ -935,6 +1110,11 @@ public class ProjectDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Button1 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button1ActionPerformed(ActionEvent e) {
 		// create workset
 
@@ -979,127 +1159,266 @@ public class ProjectDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * The Class PopUpList4.
+	 */
 	class PopUpList4 extends JPopupMenu implements ActionListener {
+		
+		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = 1L;
+		
+		/** The an item. */
 		JMenuItem anItem;
+		
+		/**
+		 * Instantiates a new pop up list4.
+		 */
 		public PopUpList4(){
 			anItem = new JMenuItem("Remove selected items");
 			anItem.addActionListener(this);
 			add(anItem);
 		}
+		
+		/* (non-Javadoc)
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			removeSelectedList4Items();
 		}
 	}
 
+	/**
+	 * The Class PopUpList5.
+	 */
 	class PopUpList5 extends JPopupMenu implements ActionListener {
+		
+		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = 1L;
+		
+		/** The an item. */
 		JMenuItem anItem;
+		
+		/**
+		 * Instantiates a new pop up list5.
+		 */
 		public PopUpList5(){
 			anItem = new JMenuItem("Remove selected items");
 			anItem.addActionListener(this);
 			add(anItem);
 		}
+		
+		/* (non-Javadoc)
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			removeSelectedList5Items();
 		}
 	}
 
+	/**
+	 * The Class PopUpList6.
+	 */
 	class PopUpList6 extends JPopupMenu implements ActionListener {
+		
+		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = 1L;
+		
+		/** The an item. */
 		JMenuItem anItem;
+		
+		/**
+		 * Instantiates a new pop up list6.
+		 */
 		public PopUpList6(){
 			anItem = new JMenuItem("Remove selected items");
 			anItem.addActionListener(this);
 			add(anItem);
 		}
+		
+		/* (non-Javadoc)
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			removeSelectedList6Items();
 		}
 	}
+	
+	/**
+	 * The Class PopUpList8.
+	 */
 	class PopUpList8 extends JPopupMenu implements ActionListener {
+		
+		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = 1L;
+		
+		/** The an item. */
 		JMenuItem anItem;
+		
+		/**
+		 * Instantiates a new pop up list8.
+		 */
 		public PopUpList8(){
 			anItem = new JMenuItem("Remove selected items");
 			anItem.addActionListener(this);
 			add(anItem);
 		}
+		
+		/* (non-Javadoc)
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			removeSelectedList8Items();
 		}
 	}
 
+	/**
+	 * List4 mouse pressed.
+	 *
+	 * @param e the e
+	 */
 	private void list4MousePressed(MouseEvent e) {
 		if (e.isPopupTrigger())
 			doList4Pop(e);
 	}
 
+	/**
+	 * List4 mouse released.
+	 *
+	 * @param e the e
+	 */
 	private void list4MouseReleased(MouseEvent e) {
 		if (e.isPopupTrigger())
 			doList4Pop(e);
 	}
 
+	/**
+	 * Do list4 pop.
+	 *
+	 * @param e the e
+	 */
 	private void doList4Pop(MouseEvent e){
 		PopUpList4 menu = new PopUpList4();
 		menu.show(e.getComponent(), e.getX(), e.getY());
 	}
 
+	/**
+	 * List5 mouse pressed.
+	 *
+	 * @param e the e
+	 */
 	private void list5MousePressed(MouseEvent e) {
 		if (e.isPopupTrigger())
 			doList5Pop(e);
 	}
 
+	/**
+	 * List5 mouse released.
+	 *
+	 * @param e the e
+	 */
 	private void list5MouseReleased(MouseEvent e) {
 		if (e.isPopupTrigger())
 			doList5Pop(e);
 	}
 
+	/**
+	 * Do list5 pop.
+	 *
+	 * @param e the e
+	 */
 	private void doList5Pop(MouseEvent e){
 		PopUpList5 menu = new PopUpList5();
 		menu.show(e.getComponent(), e.getX(), e.getY());
 	}
 
+	/**
+	 * List6 mouse pressed.
+	 *
+	 * @param e the e
+	 */
 	private void list6MousePressed(MouseEvent e) {
 		if (e.isPopupTrigger())
 			doList6Pop(e);
 	}
+	
+	/**
+	 * List8 mouse pressed.
+	 *
+	 * @param e the e
+	 */
 	private void list8MousePressed(MouseEvent e) {
 		if (e.isPopupTrigger())
 			doList8Pop(e);
 	}
 
 
+	/**
+	 * List6 mouse released.
+	 *
+	 * @param e the e
+	 */
 	private void list6MouseReleased(MouseEvent e) {
 		if (e.isPopupTrigger())
 			doList6Pop(e);
 	}
+	
+	/**
+	 * List8 mouse released.
+	 *
+	 * @param e the e
+	 */
 	private void list8MouseReleased(MouseEvent e) {
 		if (e.isPopupTrigger())
 			doList8Pop(e);
 	}
 
+	/**
+	 * Do list6 pop.
+	 *
+	 * @param e the e
+	 */
 	private void doList6Pop(MouseEvent e){
 		PopUpList6 menu = new PopUpList6();
 		menu.show(e.getComponent(), e.getX(), e.getY());
 	}
+	
+	/**
+	 * Do list8 pop.
+	 *
+	 * @param e the e
+	 */
 	private void doList8Pop(MouseEvent e){
 		PopUpList8 menu = new PopUpList8();
 		menu.show(e.getComponent(), e.getX(), e.getY());
 	}
 
+	/**
+	 * Button8 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button8ActionPerformed(ActionEvent e) {
 		removeSelectedList4Items();
 	}
 
+	/**
+	 * Button9 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button9ActionPerformed(ActionEvent e) {
 		removeSelectedList5Items();
 	}
 
+	/**
+	 * Button10 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button10ActionPerformed(ActionEvent e) {
 		removeSelectedList6Items();
 		if (list6Model.size() == 0) {
@@ -1109,6 +1428,11 @@ public class ProjectDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Button12 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button12ActionPerformed(ActionEvent e) {
 		utwBusinessProcess = null;
 		FileLink selectedFileLink = (FileLink) comboBox1.getSelectedItem();
@@ -1152,6 +1476,9 @@ public class ProjectDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Button14 action performed.
+	 */
 	private void button14ActionPerformed() {
 		JFrame frame =  new JFrame("New Issue Repository");
 		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -1205,6 +1532,11 @@ public class ProjectDetailsPanel extends JPanel {
 		frame.setVisible(true);
 	}
 
+	/**
+	 * Label18 mouse clicked.
+	 *
+	 * @param e the e
+	 */
 	private void label18MouseClicked(MouseEvent e) {
 		try {
 			HelpApi.openHelpForComponent("PROJECT_DETAILS");
@@ -1215,6 +1547,11 @@ public class ProjectDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Issues help lbl mouse clicked.
+	 *
+	 * @param e the e
+	 */
 	private void issuesHelpLblMouseClicked(MouseEvent e) {
 		try {
 			HelpApi.openHelpForComponent("ISSUES_HELP");
@@ -1225,6 +1562,11 @@ public class ProjectDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Label38 mouse clicked.
+	 *
+	 * @param e the e
+	 */
 	private void label38MouseClicked(MouseEvent e) {
 		try {
 			HelpApi.openHelpForComponent("MAINTENANCE_WORKFLOW");
@@ -1236,6 +1578,9 @@ public class ProjectDetailsPanel extends JPanel {
 	}
 
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		tabbedPane1 = new JTabbedPane();
@@ -2389,121 +2734,352 @@ public class ProjectDetailsPanel extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The tabbed pane1. */
 	private JTabbedPane tabbedPane1;
+	
+	/** The panel0. */
 	private JPanel panel0;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The text field1. */
 	private JTextField textField1;
+	
+	/** The label41. */
 	private JLabel label41;
+	
+	/** The namespace text field. */
 	private JTextField namespaceTextField;
+	
+	/** The separator1. */
 	private JSeparator separator1;
+	
+	/** The label39. */
 	private JLabel label39;
+	
+	/** The release candidate list. */
 	private JList releaseCandidateList;
+	
+	/** The label40. */
 	private JLabel label40;
+	
+	/** The module id list. */
 	private JList moduleIdList;
+	
+	/** The panel4. */
 	private JPanel panel4;
+	
+	/** The button1. */
 	private JButton button1;
+	
+	/** The button2. */
 	private JButton button2;
+	
+	/** The panel9. */
 	private JPanel panel9;
+	
+	/** The label18. */
 	private JLabel label18;
+	
+	/** The label7. */
 	private JLabel label7;
+	
+	/** The panel12. */
 	private JPanel panel12;
+	
+	/** The button3. */
 	private JButton button3;
+	
+	/** The panel5. */
 	private JPanel panel5;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The scroll pane4. */
 	private JScrollPane scrollPane4;
+	
+	/** The list4. */
 	private JList list4;
+	
+	/** The panel8. */
 	private JPanel panel8;
+	
+	/** The label8. */
 	private JLabel label8;
+	
+	/** The panel13. */
 	private JPanel panel13;
+	
+	/** The panel19. */
 	private JPanel panel19;
+	
+	/** The button4. */
 	private JButton button4;
+	
+	/** The button8. */
 	private JButton button8;
+	
+	/** The panel6. */
 	private JPanel panel6;
+	
+	/** The label4. */
 	private JLabel label4;
+	
+	/** The scroll pane5. */
 	private JScrollPane scrollPane5;
+	
+	/** The list5. */
 	private JList list5;
+	
+	/** The panel10. */
 	private JPanel panel10;
+	
+	/** The label9. */
 	private JLabel label9;
+	
+	/** The panel14. */
 	private JPanel panel14;
+	
+	/** The panel20. */
 	private JPanel panel20;
+	
+	/** The button5. */
 	private JButton button5;
+	
+	/** The button9. */
 	private JButton button9;
+	
+	/** The panel7. */
 	private JPanel panel7;
+	
+	/** The label5. */
 	private JLabel label5;
+	
+	/** The scroll pane6. */
 	private JScrollPane scrollPane6;
+	
+	/** The panel22. */
 	private JPanel panel22;
+	
+	/** The list6. */
 	private JList list6;
+	
+	/** The panel23. */
 	private JPanel panel23;
+	
+	/** The button10. */
 	private JButton button10;
+	
+	/** The v spacer1. */
 	private JPanel vSpacer1;
+	
+	/** The label6. */
 	private JLabel label6;
+	
+	/** The list8. */
 	private JList list8;
+	
+	/** The panel24. */
 	private JPanel panel24;
+	
+	/** The panel11. */
 	private JPanel panel11;
+	
+	/** The label10. */
 	private JLabel label10;
+	
+	/** The panel15. */
 	private JPanel panel15;
+	
+	/** The button6. */
 	private JButton button6;
+	
+	/** The panel16. */
 	private JPanel panel16;
+	
+	/** The label11. */
 	private JLabel label11;
+	
+	/** The scroll pane7. */
 	private JScrollPane scrollPane7;
+	
+	/** The list7. */
 	private JList list7;
+	
+	/** The panel17. */
 	private JPanel panel17;
+	
+	/** The label12. */
 	private JLabel label12;
+	
+	/** The panel18. */
 	private JPanel panel18;
+	
+	/** The button7. */
 	private JButton button7;
+	
+	/** The panel3. */
 	private JPanel panel3;
+	
+	/** The label14. */
 	private JLabel label14;
+	
+	/** The label38. */
 	private JLabel label38;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The list1. */
 	private JList list1;
+	
+	/** The panel21. */
 	private JPanel panel21;
+	
+	/** The label13. */
 	private JLabel label13;
+	
+	/** The panel25. */
 	private JPanel panel25;
+	
+	/** The label15. */
 	private JLabel label15;
+	
+	/** The label16. */
 	private JLabel label16;
+	
+	/** The text field2. */
 	private JTextField textField2;
+	
+	/** The label17. */
 	private JLabel label17;
+	
+	/** The combo box1. */
 	private JComboBox comboBox1;
+	
+	/** The panel26. */
 	private JPanel panel26;
+	
+	/** The button12. */
 	private JButton button12;
+	
+	/** The panel27. */
 	private JPanel panel27;
+	
+	/** The issues help lbl. */
 	private JLabel issuesHelpLbl;
+	
+	/** The label19. */
 	private JLabel label19;
+	
+	/** The label20. */
 	private JLabel label20;
+	
+	/** The panel28. */
 	private JPanel panel28;
+	
+	/** The label21. */
 	private JLabel label21;
+	
+	/** The text field3. */
 	private JTextField textField3;
+	
+	/** The label22. */
 	private JLabel label22;
+	
+	/** The label24. */
 	private JLabel label24;
+	
+	/** The label23. */
 	private JLabel label23;
+	
+	/** The label25. */
 	private JLabel label25;
+	
+	/** The label26. */
 	private JLabel label26;
+	
+	/** The label27. */
 	private JLabel label27;
+	
+	/** The text field4. */
 	private JTextField textField4;
+	
+	/** The label28. */
 	private JLabel label28;
+	
+	/** The text field5. */
 	private JPasswordField textField5;
+	
+	/** The panel29. */
 	private JPanel panel29;
+	
+	/** The label29. */
 	private JLabel label29;
+	
+	/** The text field6. */
 	private JTextField textField6;
+	
+	/** The label30. */
 	private JLabel label30;
+	
+	/** The label31. */
 	private JLabel label31;
+	
+	/** The label32. */
 	private JLabel label32;
+	
+	/** The label33. */
 	private JLabel label33;
+	
+	/** The label34. */
 	private JLabel label34;
+	
+	/** The label35. */
 	private JLabel label35;
+	
+	/** The text field7. */
 	private JTextField textField7;
+	
+	/** The label36. */
 	private JLabel label36;
+	
+	/** The text field8. */
 	private JPasswordField textField8;
+	
+	/** The panel31. */
 	private JPanel panel31;
+	
+	/** The label37. */
 	private JLabel label37;
+	
+	/** The scroll pane2. */
 	private JScrollPane scrollPane2;
+	
+	/** The list2. */
 	private JList list2;
+	
+	/** The panel32. */
 	private JPanel panel32;
+	
+	/** The button14. */
 	private JButton button14;
+	
+	/** The panel30. */
 	private JPanel panel30;
+	
+	/** The button13. */
 	private JButton button13;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

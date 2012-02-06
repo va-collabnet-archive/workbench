@@ -58,7 +58,11 @@ public class IssueCommentsPanel extends JPanel {
 	
 	/** The user name. */
 	private String userName;
+	
+	/** The read only mode. */
 	private boolean readOnlyMode;
+	
+	/** The regis. */
 	private IssueRepoRegistration regis;
 	
 	/**
@@ -71,11 +75,12 @@ public class IssueCommentsPanel extends JPanel {
 	
 	/**
 	 * Sets the init.
-	 * 
+	 *
 	 * @param issue the issue
 	 * @param issueRepo the issue repo
-	 * @param regis 
+	 * @param regis the regis
 	 * @param userName the user name
+	 * @param readOnlyMode the read only mode
 	 */
 	public void setInit(Issue issue,IssueRepository issueRepo,IssueRepoRegistration regis, String userName, boolean readOnlyMode){
 		this.issue=issue;
@@ -86,6 +91,10 @@ public class IssueCommentsPanel extends JPanel {
 		loadComments();
 		bSend.setEnabled(true && !readOnlyMode);
 	}
+	
+	/**
+	 * Clear.
+	 */
 	public void clear(){
 		txtComm.setText("");
 		loadCommentTable(new ArrayList<IssueComment>());
@@ -116,10 +125,21 @@ public class IssueCommentsPanel extends JPanel {
 		}
 		
 	}
+	
+	/**
+	 * Gets the site user password.
+	 *
+	 * @return the site user password
+	 */
 	private String getSiteUserPassword() {
 		return this.regis.getPassword();
 	}
 
+	/**
+	 * Gets the site user name.
+	 *
+	 * @return the site user name
+	 */
 	private String getSiteUserName() {
 		return this.regis.getUserId();
 	}
@@ -291,12 +311,25 @@ public class IssueCommentsPanel extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The p bar. */
 	private JProgressBar pBar;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The txt comm. */
 	private JTextArea txtComm;
+	
+	/** The b send. */
 	private JButton bSend;
+	
+	/** The scroll pane2. */
 	private JScrollPane scrollPane2;
+	
+	/** The table1. */
 	private JTable table1;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

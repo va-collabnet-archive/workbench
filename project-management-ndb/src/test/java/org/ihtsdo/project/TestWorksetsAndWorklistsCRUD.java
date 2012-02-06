@@ -90,6 +90,7 @@ public class TestWorksetsAndWorklistsCRUD extends TestCase {
 	/** The allowed statuses with retired. */
 	I_IntSet allowedStatusesWithRetired;
 
+	/** The project. */
 	TranslationProject project = null;
 
 	/* (non-Javadoc)
@@ -111,6 +112,9 @@ public class TestWorksetsAndWorklistsCRUD extends TestCase {
 
 	}
 
+	/**
+	 * Test create new work set.
+	 */
 	public void testCreateNewWorkSet() {
 		try {
 
@@ -469,6 +473,11 @@ public class TestWorksetsAndWorklistsCRUD extends TestCase {
 
 	}
 
+	/**
+	 * Gets the test config.
+	 *
+	 * @return the test config
+	 */
 	private I_ConfigAceFrame getTestConfig() {
 		I_ConfigAceFrame config = null;
 		try {
@@ -513,6 +522,13 @@ public class TestWorksetsAndWorklistsCRUD extends TestCase {
 	}
 
 	// If targetLocation does not exist, it will be created.
+	/**
+	 * Copy directory.
+	 *
+	 * @param sourceLocation the source location
+	 * @param targetLocation the target location
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public void copyDirectory(File sourceLocation , File targetLocation)
 	throws IOException {
 
@@ -542,6 +558,12 @@ public class TestWorksetsAndWorklistsCRUD extends TestCase {
 		}
 	}
 
+	/**
+	 * Delete directory.
+	 *
+	 * @param path the path
+	 * @return true, if successful
+	 */
 	public boolean deleteDirectory(File path) {
 		if( path.exists() ) {
 			File[] files = path.listFiles();
@@ -557,6 +579,11 @@ public class TestWorksetsAndWorklistsCRUD extends TestCase {
 		return( path.delete() );
 	}
 
+	/**
+	 * Sleep.
+	 *
+	 * @param n the n
+	 */
 	public static void sleep(int n){
 		long t0, t1;
 		t0 =  System.currentTimeMillis();
@@ -566,6 +593,12 @@ public class TestWorksetsAndWorklistsCRUD extends TestCase {
 		while ((t1 - t0) < (n * 1000));
 	}
 
+	/**
+	 * Gets the business process.
+	 *
+	 * @param f the f
+	 * @return the business process
+	 */
 	private static BusinessProcess getBusinessProcess(File f) {
 		ObjectInputStream in;
 		try {

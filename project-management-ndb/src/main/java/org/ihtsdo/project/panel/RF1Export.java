@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Fri Mar 05 15:15:30 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.project.panel;
@@ -57,32 +70,47 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
+ * The Class RF1Export.
+ *
  * @author Alejandro Rodriguez
  */
 public class RF1Export extends JPanel {
-	/**
-	 * 
-	 */
+	
+	/** The file chooser. */
 	JFileChooser fileChooser;
 
+	/** The config. */
 	private I_ConfigAceFrame config;
 
+	/** The language refset. */
 	private I_GetConceptData languageRefset;
 
+	/** The source refset. */
 	public I_GetConceptData sourceRefset;
 
+	/** The source path concept. */
 	public I_GetConceptData sourcePathConcept;
 
+	/** The nsp nr. */
 	private Integer nspNr;
 
+	/** The new sct id. */
 	private Long newSctId;
 
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
 
+	/** The Constant REFSET_LABEL_FOREXPORT. */
 	public static final String REFSET_LABEL_FOREXPORT = "RefsetLabelForExport";
 
+	/** The Constant PATH_LABEL_FOREXPORT. */
 	public static final String PATH_LABEL_FOREXPORT = "PathLabelForExport";
 
+	/**
+	 * Instantiates a new r f1 export.
+	 *
+	 * @param project the project
+	 */
 	public RF1Export(TranslationProject project) {
 		initComponents();
 		exportTargetLangHelpLbl.setIcon(IconUtilities.helpIcon);
@@ -137,6 +165,9 @@ public class RF1Export extends JPanel {
 				null );   
 	}
 
+	/**
+	 * Brows exp file action performed.
+	 */
 	private void browsExpFileActionPerformed() {
 
 		fileChooser = new JFileChooser();
@@ -150,6 +181,9 @@ public class RF1Export extends JPanel {
 		}
 	}
 
+	/**
+	 * Brow log file action performed.
+	 */
 	private void browLogFileActionPerformed() {
 		fileChooser = new JFileChooser();
 		fileChooser.setDialogTitle("Select a File...");
@@ -162,6 +196,9 @@ public class RF1Export extends JPanel {
 		}
 	}
 
+	/**
+	 * B export action performed.
+	 */
 	private void bExportActionPerformed() {
 
 		txtERes.setText("");
@@ -313,12 +350,19 @@ public class RF1Export extends JPanel {
 	}
 
 
+	/**
+	 * Removes the export data file.
+	 */
 	private void removeExportDataFile(){
 
 		File file = new File("config/DataforExport.xml");
 		if (file.exists())
 			file.delete();
 	}
+	
+	/**
+	 * Save export data.
+	 */
 	private void saveExportData() {
 		DataforExport dfe=new DataforExport();
 		dfe.setChkIDGen(chkIDGen.isSelected()? "1":"0");
@@ -342,6 +386,10 @@ public class RF1Export extends JPanel {
 
 		writeExportData(dfe);
 	}
+	
+	/**
+	 * Load export data.
+	 */
 	private void loadExportData(){
 		DataforExport dfe=readExportData();
 		if (dfe!=null){
@@ -376,6 +424,12 @@ public class RF1Export extends JPanel {
 			txtRelDate.setText(dfe.getTxtRelDate());
 		}
 	}
+	
+	/**
+	 * Read export data.
+	 *
+	 * @return the datafor export
+	 */
 	public static DataforExport readExportData(){
 
 		File file = new File("config/DataforExport.xml");
@@ -389,6 +443,11 @@ public class RF1Export extends JPanel {
 	}
 
 
+	/**
+	 * Write export data.
+	 *
+	 * @param dataforExport the datafor export
+	 */
 	public static void writeExportData(DataforExport dataforExport){
 		File outputFile = new File("config/DataforExport.xml");
 		XStream xStream = new XStream(new DomDriver());
@@ -409,6 +468,9 @@ public class RF1Export extends JPanel {
 
 
 
+	/**
+	 * Chk not trans action performed.
+	 */
 	private void chkNotTransActionPerformed() {
 		if (chkNotTrans.isSelected()){
 			label7.setText("Drop a Refset here");
@@ -419,6 +481,11 @@ public class RF1Export extends JPanel {
 		}
 	}
 
+	/**
+	 * Export target lang help lbl mouse clicked.
+	 *
+	 * @param e the e
+	 */
 	private void exportTargetLangHelpLblMouseClicked(MouseEvent e) {
 		try {
 			HelpApi.openHelpForComponent("EXPORT_DESC_LANGUAGE");
@@ -429,6 +496,9 @@ public class RF1Export extends JPanel {
 		}
 	}
 
+	/**
+	 * Button1 action performed.
+	 */
 	private void button1ActionPerformed() {
 //		try {
 //			if (txtRelDate.getText().trim().equals("")){
@@ -467,12 +537,26 @@ public class RF1Export extends JPanel {
 
 	}
 
+	/**
+	 * The Class GetConceptForLabel.
+	 */
 	class GetConceptForLabel implements I_GetItemForModel{
 
+		/** The label target. */
 		private String labelTarget;
+		
+		/**
+		 * Instantiates a new gets the concept for label.
+		 *
+		 * @param labelTarget the label target
+		 */
 		public GetConceptForLabel(String labelTarget){
 			this.labelTarget=labelTarget;
 		}
+		
+		/* (non-Javadoc)
+		 * @see org.ihtsdo.project.panel.dnd.I_GetItemForModel#getItemFromConcept(org.dwfa.ace.api.I_GetConceptData)
+		 */
 		@Override
 		public Object getItemFromConcept(I_GetConceptData concept) throws Exception {
 			if (labelTarget.equals(REFSET_LABEL_FOREXPORT)){
@@ -491,6 +575,9 @@ public class RF1Export extends JPanel {
 
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		scrollPane2 = new JScrollPane();
@@ -835,45 +922,124 @@ public class RF1Export extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The scroll pane2. */
 	private JScrollPane scrollPane2;
+	
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The export target lang help lbl. */
 	private JLabel exportTargetLangHelpLbl;
+	
+	/** The panel5. */
 	private JPanel panel5;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The label5. */
 	private JLabel label5;
+	
+	/** The label17. */
 	private JLabel label17;
+	
+	/** The txt nsp. */
 	private JTextField txtNsp;
+	
+	/** The label6. */
 	private JLabel label6;
+	
+	/** The txt rel date. */
 	private JTextField txtRelDate;
+	
+	/** The label8. */
 	private JLabel label8;
+	
+	/** The panel6. */
 	private JPanel panel6;
+	
+	/** The rb new. */
 	private JRadioButton rbNew;
+	
+	/** The rb exist. */
 	private JRadioButton rbExist;
+	
+	/** The txt subset id. */
 	private JTextField txtSubsetID;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The txt file exp. */
 	private JTextField txtFileExp;
+	
+	/** The brows exp file. */
 	private JButton browsExpFile;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The txt explog file. */
 	private JTextField txtExplogFile;
+	
+	/** The brow log file. */
 	private JButton browLogFile;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The chk not trans. */
 	private JCheckBox chkNotTrans;
+	
+	/** The label7. */
 	private JLabel label7;
+	
+	/** The panel4. */
 	private JPanel panel4;
+	
+	/** The chk id gen. */
 	private JCheckBox chkIDGen;
+	
+	/** The label11. */
 	private JLabel label11;
+	
+	/** The label9. */
 	private JLabel label9;
+	
+	/** The txt idurl. */
 	private JTextField txtIDURL;
+	
+	/** The label10. */
 	private JLabel label10;
+	
+	/** The txt id user. */
 	private JTextField txtIDUser;
+	
+	/** The labelp. */
 	private JLabel labelp;
+	
+	/** The txt id pass. */
 	private JPasswordField txtIDPass;
+	
+	/** The panel3. */
 	private JPanel panel3;
+	
+	/** The chk id insert. */
 	private JCheckBox chkIdInsert;
+	
+	/** The label4. */
 	private JLabel label4;
+	
+	/** The p bar e. */
 	private JProgressBar pBarE;
+	
+	/** The b export. */
 	private JButton bExport;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The txt e res. */
 	private JTextPane txtERes;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

@@ -27,6 +27,9 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.TerminologyProjectDAO;
 
+/**
+ * The Class Partition.
+ */
 public class Partition implements Serializable{
 
 	/** The Constant serialVersionUID. */
@@ -44,18 +47,16 @@ public class Partition implements Serializable{
 	/** The WorkSet id. */
 	private UUID partitionSchemeUUID;
 	
+	/** The concept. */
 	private I_GetConceptData concept;
 
 	/**
 	 * Instantiates a new work set.
-	 * 
+	 *
 	 * @param name the name
 	 * @param id the id
 	 * @param uids the uids
 	 * @param partitionSchemeUUID the project id
-	 * @param creationDate the creation date
-	 * @param lastChangeDate the last change date
-	 * @param description the description
 	 */
 	public Partition(String name, int id, List<UUID> uids,
 			UUID partitionSchemeUUID) {
@@ -105,6 +106,11 @@ public class Partition implements Serializable{
 		return TerminologyProjectDAO.getPartitionScheme(concept, config);
 	}
 
+	/**
+	 * Gets the work lists.
+	 *
+	 * @return the work lists
+	 */
 	public List<WorkList> getWorkLists() {
 		I_ConfigAceFrame config = null;
 		try {
@@ -117,38 +123,83 @@ public class Partition implements Serializable{
 		return TerminologyProjectDAO.getAllWorkListsForRefset(this.getConcept(), config);
 	}
 
+	/**
+	 * Gets the name.
+	 *
+	 * @return the name
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * Sets the name.
+	 *
+	 * @param name the new name
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	/**
+	 * Gets the id.
+	 *
+	 * @return the id
+	 */
 	public int getId() {
 		return id;
 	}
 
+	/**
+	 * Sets the id.
+	 *
+	 * @param id the new id
+	 */
 	public void setId(int id) {
 		this.id = id;
 	}
 
+	/**
+	 * Gets the uids.
+	 *
+	 * @return the uids
+	 */
 	public List<UUID> getUids() {
 		return uids;
 	}
 
+	/**
+	 * Sets the uids.
+	 *
+	 * @param uids the new uids
+	 */
 	public void setUids(List<UUID> uids) {
 		this.uids = uids;
 	}
 
+	/**
+	 * Gets the partition scheme uuid.
+	 *
+	 * @return the partition scheme uuid
+	 */
 	public UUID getPartitionSchemeUUID() {
 		return partitionSchemeUUID;
 	}
 
+	/**
+	 * Sets the partition scheme uuid.
+	 *
+	 * @param partitionSchemeUUID the new partition scheme uuid
+	 */
 	public void setPartitionSchemeUUID(UUID partitionSchemeUUID) {
 		this.partitionSchemeUUID = partitionSchemeUUID;
 	}
 	
+	/**
+	 * Gets the partition members.
+	 *
+	 * @return the partition members
+	 */
 	public List<PartitionMember> getPartitionMembers() {
 		I_ConfigAceFrame config = null;
 		try {
@@ -161,19 +212,38 @@ public class Partition implements Serializable{
 		return TerminologyProjectDAO.getAllPartitionMembers(this, config);
 	}
 	
+	/**
+	 * Gets the sub partition schemes.
+	 *
+	 * @param config the config
+	 * @return the sub partition schemes
+	 */
 	public List<PartitionScheme> getSubPartitionSchemes(I_ConfigAceFrame config) {
 		return TerminologyProjectDAO.getAllPartitionSchemesForRefsetConcept(this.getConcept(), config);
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	public String toString() {
 		return name;
 	}
 	
+	/**
+	 * Gets the project.
+	 *
+	 * @return the project
+	 */
 	public I_TerminologyProject getProject() {
 		//TODO: implement
 		return null;
 	}
 
+	/**
+	 * Sets the concept.
+	 *
+	 * @param concept the new concept
+	 */
 	public void setConcept(I_GetConceptData concept) {
 		this.concept = concept;
 	}

@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.project;
 
 import java.io.File;
@@ -26,14 +42,29 @@ import org.ihtsdo.project.workflow.model.WfRole;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 
+/**
+ * The Class TestWfInterpreter.
+ */
 public class TestWfInterpreter extends TestCase {
 
+	/** The wf definition. */
 	private WorkflowDefinition wfDefinition;
+	
+	/** The kbase. */
 	private KnowledgeBase kbase;
+	
+	/** The ksession. */
 	private StatelessKnowledgeSession ksession;
+	
+	/** The actions. */
 	private List<String> actions;
+	
+	/** The prep actions. */
 	private List<String> prepActions;
 
+	/* (non-Javadoc)
+	 * @see junit.framework.TestCase#setUp()
+	 */
 	protected void setUp() throws Exception {
 	this.wfDefinition = TestXstream.readWfDefinition(new File("sampleProcesses/testWfDefinition3.wfd"));;
 
@@ -64,6 +95,10 @@ public class TestWfInterpreter extends TestCase {
 	kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
 	ksession = kbase.newStatelessKnowledgeSession();
 	}
+	
+	/**
+	 * Test next role.
+	 */
 	public void testNextRole(){
 		WfInstance instance = new WfInstance();
 		instance.setComponentId(UUID.randomUUID());

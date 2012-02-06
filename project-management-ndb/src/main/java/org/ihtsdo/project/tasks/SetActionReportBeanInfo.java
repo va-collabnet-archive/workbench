@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2009 International Health Terminology Standards Development
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
  * Organisation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,8 +24,14 @@ import java.beans.SimpleBeanInfo;
 import org.dwfa.ace.prop.editor.ConceptLabelPropEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
+/**
+ * The Class SetActionReportBeanInfo.
+ */
 public class SetActionReportBeanInfo extends SimpleBeanInfo {
 
+    /* (non-Javadoc)
+     * @see java.beans.SimpleBeanInfo#getPropertyDescriptors()
+     */
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
             
@@ -44,6 +50,9 @@ public class SetActionReportBeanInfo extends SimpleBeanInfo {
     }
 
     /**
+     * Gets the bean descriptor.
+     *
+     * @return the bean descriptor
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {

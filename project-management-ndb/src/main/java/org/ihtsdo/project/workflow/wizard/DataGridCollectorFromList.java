@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Tue Dec 06 12:25:43 GMT-03:00 2011
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.project.workflow.wizard;
@@ -50,39 +63,71 @@ import org.ihtsdo.project.workflow.wizard.DataGridCollectorFromList.RadioEditor;
 import org.ihtsdo.wizard.I_fastWizard;
 
 /**
+ * The Class DataGridCollectorFromList.
+ *
  * @author Guillermo Reynoso
  */
 public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
-	/**
-	 * 
-	 */
+	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -3557213261369154457L;
-	/**
-	 * 
-	 */
+	
+	/** The column names. */
 	private String[] columnNames;
+	
+	/** The key. */
 	private String key;
+	
+	/** The users. */
 	private List<WfUser> users;
+	
+	/** The roles. */
 	private List<WfRole> roles;
 	
 	
+	/**
+	 * Gets the users.
+	 *
+	 * @return the users
+	 */
 	public List<WfUser> getUsers() {
 		return users;
 	}
 
+	/**
+	 * Gets the roles.
+	 *
+	 * @return the roles
+	 */
 	public List<WfRole> getRoles() {
 		return roles;
 	}
 
+	/**
+	 * Sets the users.
+	 *
+	 * @param users the new users
+	 */
 	public void setUsers(List<WfUser> users) {
 		this.users = users;
 	}
 
+	/**
+	 * Sets the roles.
+	 *
+	 * @param roles the new roles
+	 */
 	public void setRoles(List<WfRole> roles) {
 		this.roles = roles;
 	}
 
 	
+	/**
+	 * Instantiates a new data grid collector from list.
+	 *
+	 * @param roles the roles
+	 * @param users the users
+	 */
 	public DataGridCollectorFromList(List<WfRole> roles, List<WfUser> users) {
 		initComponents();
 		this.roles=roles;
@@ -93,11 +138,17 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 		loadObjects();
 	}
 	
+	/**
+	 * Instantiates a new data grid collector from list.
+	 */
 	public DataGridCollectorFromList() {
 		initComponents();
 		tblObjs.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 	}
 	
+	/**
+	 * Sets the colum names.
+	 */
 	public void setColumNames(){
 		Collections.sort(roles, new Comparator<WfRole>() {
 			@Override
@@ -113,9 +164,17 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 			this.columnNames[j++]="default";
 		}
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.wizard.I_fastWizard#setKey(java.lang.String)
+	 */
 	public void setKey(String key){
 		this.key=key;
 	}
+	
+	/**
+	 * Load objects.
+	 */
 	public void loadObjects(){
 
 		try {
@@ -202,23 +261,41 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 			AceLog.getAppLog().alertAndLogException(e);
 		}
 	}
+	
+	/**
+	 * Sets the label.
+	 *
+	 * @param strLabel the new label
+	 */
 	public void setLabel(String strLabel){
 		this.label1.setText(strLabel);
 	}
 
+	/**
+	 * The Class RadioRenderer.
+	 */
 	class RadioRenderer extends JPanel implements
 	TableCellRenderer {
-		/**
-		 * 
-		 */
+		
+		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = 1L;
+		
+		/** The grid. */
 		Object[][] grid;
 
+		/**
+		 * Instantiates a new radio renderer.
+		 *
+		 * @param data the data
+		 */
 		RadioRenderer(Object[][] data) {
 			super();
 			grid=data;
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.TableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
+		 */
 		public Component getTableCellRendererComponent(JTable table,
 				Object value, boolean isSelected, boolean hasFocus, int row,
 				int column) {
@@ -241,19 +318,31 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 		}
 	}
 
+	/**
+	 * The Class CheckBoxRenderer.
+	 */
 	class CheckBoxRenderer extends JPanel implements
 	TableCellRenderer {
-		/**
-		 * 
-		 */
+		
+		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = 1L;
+		
+		/** The grid. */
 		Object[][] grid;
 		
+		/**
+		 * Instantiates a new check box renderer.
+		 *
+		 * @param data the data
+		 */
 		CheckBoxRenderer(Object[][] data) {
 			super();
 			grid= data;
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.TableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
+		 */
 		public Component getTableCellRendererComponent(JTable table,
 				Object value, boolean isSelected, boolean hasFocus, int row,
 				int column) {
@@ -276,21 +365,41 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 		}
 	}
 
+	/**
+	 * The Class RadioEditor.
+	 */
 	class RadioEditor extends DefaultCellEditor implements TableCellEditor, ActionListener {
-		/**
-		 * 
-		 */
+		
+		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = 1L;
+		
+		/** The rbutton. */
 		JRadioButton rbutton;
+		
+		/** The panel. */
 		JPanel panel;
+		
+		/** The row. */
 		int row;
+		
+		/** The column. */
 		int column;
+		
+		/**
+		 * Instantiates a new radio editor.
+		 *
+		 * @param checkBox the check box
+		 * @param button the button
+		 */
 		public RadioEditor(JCheckBox checkBox, JRadioButton button) {
 			super(checkBox);
 			this.rbutton = button;
 			this.rbutton.addActionListener(this);
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.DefaultCellEditor#getTableCellEditorComponent(javax.swing.JTable, java.lang.Object, boolean, int, int)
+		 */
 		public Component getTableCellEditorComponent(JTable table,
 				Object value, boolean isSelected, int row, int column) {
 			Boolean val=(Boolean) value;
@@ -308,6 +417,9 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 			return panel;
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.DefaultCellEditor#getCellEditorValue()
+		 */
 		public Object getCellEditorValue() {
 
 			int rowModel = tblObjs.convertRowIndexToModel(row);
@@ -315,6 +427,9 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 			return val;
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JRadioButton button = (JRadioButton)e.getSource();
@@ -327,14 +442,29 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 
 	}
 
+	/**
+	 * The Class CheckBoxEditor.
+	 */
 	class CheckBoxEditor extends DefaultCellEditor implements TableCellEditor, ActionListener {
-		/**
-		 * 
-		 */
+		
+		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = 1L;
+		
+		/** The rbutton. */
 		JCheckBox rbutton;
+		
+		/** The row. */
 		int row;
+		
+		/** The column. */
 		int column;
+		
+		/**
+		 * Instantiates a new check box editor.
+		 *
+		 * @param checkBox the check box
+		 * @param button the button
+		 */
 		public CheckBoxEditor(JCheckBox checkBox, JCheckBox button) {
 			super(checkBox);
 			this.rbutton = button;
@@ -343,6 +473,9 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 			this.rbutton.addActionListener(this);
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.DefaultCellEditor#getTableCellEditorComponent(javax.swing.JTable, java.lang.Object, boolean, int, int)
+		 */
 		public Component getTableCellEditorComponent(JTable table,
 				Object value, boolean isSelected, int row, int column) {
 			Boolean val=(Boolean) value;
@@ -361,10 +494,16 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 			return panel;
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.DefaultCellEditor#getCellEditorValue()
+		 */
 		public Object getCellEditorValue() {
 			return new Boolean(rbutton.isSelected());
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JCheckBox button = (JCheckBox)e.getSource();
@@ -377,6 +516,13 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 	}
 
 
+	/**
+	 * Item radio action performed.
+	 *
+	 * @param state the state
+	 * @param row the row
+	 * @param column the column
+	 */
 	private void itemRadioActionPerformed(int state, int row,int column) {
 		boolean othersRow;
 		boolean ownRow;
@@ -397,6 +543,14 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 		}
 
 	}
+	
+	/**
+	 * Item check box action performed.
+	 *
+	 * @param state the state
+	 * @param row the row
+	 * @param column the column
+	 */
 	private void itemCheckBoxActionPerformed(int state, int row,int column) {
 		int rowModel = tblObjs.convertRowIndexToModel(row);
 		if (state==2)
@@ -407,6 +561,9 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 	}
 
 	
+	/**
+	 * Hide columns.
+	 */
 	private void hideColumns() {
 		DefaultTableModel model= (DefaultTableModel) tblObjs.getModel();
 		for (int i = 1; i < model.getColumnCount(); i+=2) {
@@ -440,6 +597,11 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 		model.fireTableDataChanged();
 	}
 
+	/**
+	 * Button1 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button1ActionPerformed(ActionEvent e) {
 		DefaultTableModel model=(DefaultTableModel) tblObjs.getModel();
 		if(button1.getText().equals("Fill")){
@@ -471,6 +633,9 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 		hideColumns();		
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		panel1 = new JPanel();
@@ -533,12 +698,24 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The button1. */
 	private JButton button1;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The tbl objs. */
 	private ZebraJTable tblObjs;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.wizard.I_fastWizard#getData()
+	 */
 	@Override
 	public HashMap<String, Object> getData() throws Exception {
 		HashMap<String, Object> hmRes=new HashMap<String, Object>();

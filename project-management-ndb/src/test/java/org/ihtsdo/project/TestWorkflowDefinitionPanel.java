@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.project;
 
 import java.io.File;
@@ -39,6 +55,9 @@ import org.ihtsdo.tk.api.Precedence;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
+/**
+ * The Class TestWorkflowDefinitionPanel.
+ */
 public class TestWorkflowDefinitionPanel extends TestCase {
 	/** The vodb directory. */
 	File vodbDirectory;
@@ -64,6 +83,9 @@ public class TestWorkflowDefinitionPanel extends TestCase {
 	/** The allowed statuses with retired. */
 	I_IntSet allowedStatusesWithRetired;
 
+	/* (non-Javadoc)
+	 * @see junit.framework.TestCase#setUp()
+	 */
 	protected void setUp() throws Exception {
 		super.setUp();
 		System.out.println("Deleting test fixture");
@@ -79,6 +101,9 @@ public class TestWorkflowDefinitionPanel extends TestCase {
 		tf.setActiveAceFrameConfig(config);
 	}
 
+	/**
+	 * Test create workflow definition.
+	 */
 	public void testCreateWorkflowDefinition(){
 
 		WfState state0 = new WfState();
@@ -246,6 +271,11 @@ public class TestWorkflowDefinitionPanel extends TestCase {
 		
 	}
 
+	/**
+	 * Write wf definition.
+	 *
+	 * @param wfDefinition the wf definition
+	 */
 	public static void writeWfDefinition(WorkflowDefinition wfDefinition){
 
 		XStream xStream = new XStream(new DomDriver());
@@ -264,6 +294,13 @@ public class TestWorkflowDefinitionPanel extends TestCase {
 		}
 
 	}
+	
+	/**
+	 * Gets the aA preferred term.
+	 *
+	 * @param concept the concept
+	 * @return the aA preferred term
+	 */
 	@SuppressWarnings("rawtypes")
 	private String getAAPreferredTerm(I_GetConceptData concept){
 
@@ -289,6 +326,12 @@ public class TestWorkflowDefinitionPanel extends TestCase {
 		}
 		return "";
 	}
+	
+	/**
+	 * Gets the test config.
+	 *
+	 * @return the test config
+	 */
 	private I_ConfigAceFrame getTestConfig() {
 		I_ConfigAceFrame config = null;
 		try {
@@ -327,6 +370,13 @@ public class TestWorkflowDefinitionPanel extends TestCase {
 	}
 
 	// If targetLocation does not exist, it will be created.
+	/**
+	 * Copy directory.
+	 *
+	 * @param sourceLocation the source location
+	 * @param targetLocation the target location
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public void copyDirectory(File sourceLocation , File targetLocation)
 	throws IOException {
 
@@ -356,6 +406,12 @@ public class TestWorkflowDefinitionPanel extends TestCase {
 		}
 	}
 
+	/**
+	 * Delete directory.
+	 *
+	 * @param path the path
+	 * @return true, if successful
+	 */
 	public boolean deleteDirectory(File path) {
 		if( path.exists() ) {
 			File[] files = path.listFiles();
@@ -371,6 +427,11 @@ public class TestWorkflowDefinitionPanel extends TestCase {
 		return( path.delete() );
 	}
 
+	/**
+	 * Sleep.
+	 *
+	 * @param n the n
+	 */
 	public static void sleep(int n){
 		long t0, t1;
 		t0 =  System.currentTimeMillis();

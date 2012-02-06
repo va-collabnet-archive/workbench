@@ -37,15 +37,29 @@ public class NewSubsetPanel extends JPanel {
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
 	
+	/**
+	 * Instantiates a new new subset panel.
+	 */
 	public NewSubsetPanel() {
 		initComponents();
 		txtNspe.requestFocusInWindow();
 	}
+	
+	/**
+	 * Gets the namespace.
+	 *
+	 * @return the namespace
+	 */
 	public String getNamespace(){
 		return txtNspe.getText();
 	}
 	
 	
+	/**
+	 * Gets the partition.
+	 *
+	 * @return the partition
+	 */
 	public String getPartition() {
 		if (rd03.isEnabled() ) {
 			return "03";
@@ -157,14 +171,31 @@ public class NewSubsetPanel extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The txt nspe. */
 	private JTextField txtNspe;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The rd03. */
 	private JRadioButton rd03;
+	
+	/** The rd13. */
 	private JRadioButton rd13;
+	
+	/** The panel3. */
 	private JPanel panel3;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

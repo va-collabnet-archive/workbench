@@ -136,10 +136,20 @@ public class SetExternalIssuesActive extends AbstractTask {
 		return new int[] {  };
 	}
 
+	/**
+	 * Gets the active.
+	 *
+	 * @return the active
+	 */
 	public String getActive() {
 		return active;
 	}
 
+	/**
+	 * Sets the active.
+	 *
+	 * @param active the new active
+	 */
 	public void setActive(String active) {
 		this.active = active;
 	}

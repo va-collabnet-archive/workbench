@@ -139,10 +139,20 @@ public class SearchAndDeleteQueueItems extends AbstractTask {
 		return new int[] {  };
 	}
 
+	/**
+	 * Gets the queue name.
+	 *
+	 * @return the queue name
+	 */
 	public String getQueueName() {
 		return queueName;
 	}
 
+	/**
+	 * Sets the queue name.
+	 *
+	 * @param queueName the new queue name
+	 */
 	public void setQueueName(String queueName) {
 		this.queueName = queueName;
 	}

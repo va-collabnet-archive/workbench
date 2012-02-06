@@ -47,13 +47,11 @@ public class WorkSetMember implements Serializable {
 	
 	/**
 	 * Instantiates a new work set member.
-	 * 
+	 *
 	 * @param name the name
 	 * @param id the id
 	 * @param uids the uids
 	 * @param workSetUUID the work set id
-	 * @param batchTags the batch tags
-	 * @param activityStatus the activity status
 	 */
 	public WorkSetMember(String name, int id, List<UUID> uids,
 			UUID workSetUUID) {
@@ -153,6 +151,9 @@ public class WorkSetMember implements Serializable {
 		this.workSetUUID = workSetUUID;
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	public String toString() {
 		return this.name;
 	}

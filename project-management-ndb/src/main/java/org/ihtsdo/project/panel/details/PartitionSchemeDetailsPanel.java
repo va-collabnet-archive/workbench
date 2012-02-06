@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Tue Mar 23 15:14:02 GMT-04:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.project.panel.details;
@@ -44,17 +57,30 @@ import org.ihtsdo.project.panel.TranslationHelperPanel;
 import org.ihtsdo.project.util.IconUtilities;
 
 /**
+ * The Class PartitionSchemeDetailsPanel.
+ *
  * @author Guillermo Reynoso
  */
 public class PartitionSchemeDetailsPanel extends JPanel {
-	/**
-	 * 
-	 */
+	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
+	
+	/** The partition scheme. */
 	private PartitionScheme partitionScheme;
+	
+	/** The config. */
 	private I_ConfigAceFrame config;
+	
+	/** The list2 model. */
 	private DefaultListModel list2Model;
 
+	/**
+	 * Instantiates a new partition scheme details panel.
+	 *
+	 * @param partitionScheme the partition scheme
+	 * @param config the config
+	 */
 	public PartitionSchemeDetailsPanel(PartitionScheme partitionScheme, I_ConfigAceFrame config) {
 		initComponents();
 		this.partitionScheme = partitionScheme;
@@ -117,6 +143,9 @@ public class PartitionSchemeDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Update list2 content.
+	 */
 	private void updateList2Content() {
 		list2Model = new DefaultListModel();
 		List<Partition> partitions = partitionScheme.getPartitions();
@@ -135,6 +164,11 @@ public class PartitionSchemeDetailsPanel extends JPanel {
 		list2.validate();
 	}
 
+	/**
+	 * Text field1 key typed.
+	 *
+	 * @param e the e
+	 */
 	private void textField1KeyTyped(KeyEvent e) {
 		if (textField1.getText().equals(partitionScheme.getName())) {
 			button4.setEnabled(false);
@@ -143,6 +177,11 @@ public class PartitionSchemeDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Button4 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button4ActionPerformed(ActionEvent e) {
 		partitionScheme.setName(textField1.getText());
 		TerminologyProjectDAO.updatePartitionSchemeMetadata(partitionScheme, config);
@@ -158,6 +197,11 @@ public class PartitionSchemeDetailsPanel extends JPanel {
 		TranslationHelperPanel.refreshProjectPanelNode(config);
 	}
 
+	/**
+	 * Button3 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button3ActionPerformed(ActionEvent e) {
 		// retire partition scheme
 		int n = JOptionPane.showConfirmDialog(
@@ -185,6 +229,11 @@ public class PartitionSchemeDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Button1 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button1ActionPerformed(ActionEvent e) {
 		// combine partitions
 		try {
@@ -220,6 +269,11 @@ public class PartitionSchemeDetailsPanel extends JPanel {
 		} 
 	}
 
+	/**
+	 * List2 value changed.
+	 *
+	 * @param e the e
+	 */
 	private void list2ValueChanged(ListSelectionEvent e) {
 		if (list2.getSelectedIndices().length > 1) {
 			button1.setEnabled(true);
@@ -228,6 +282,11 @@ public class PartitionSchemeDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Button2 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button2ActionPerformed(ActionEvent e) {
 
 		AceFrameConfig afconfig = (AceFrameConfig)config;
@@ -251,10 +310,20 @@ public class PartitionSchemeDetailsPanel extends JPanel {
 
 	}
 
+	/**
+	 * Button5 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button5ActionPerformed(ActionEvent e) {
 		updateList2Content();
 	}
 
+	/**
+	 * Label11 mouse clicked.
+	 *
+	 * @param e the e
+	 */
 	private void label11MouseClicked(MouseEvent e) {
 		try {
 			HelpApi.openHelpForComponent("PARTITION_SCHEME_DETAILS");
@@ -265,6 +334,9 @@ public class PartitionSchemeDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		tabbedPane1 = new JTabbedPane();
@@ -600,35 +672,94 @@ public class PartitionSchemeDetailsPanel extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The tabbed pane1. */
 	private JTabbedPane tabbedPane1;
+	
+	/** The panel0. */
 	private JPanel panel0;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The panel9. */
 	private JPanel panel9;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The text field1. */
 	private JTextField textField1;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The label9. */
 	private JLabel label9;
+	
+	/** The label4. */
 	private JLabel label4;
+	
+	/** The label10. */
 	private JLabel label10;
+	
+	/** The panel6. */
 	private JPanel panel6;
+	
+	/** The label8. */
 	private JLabel label8;
+	
+	/** The panel8. */
 	private JPanel panel8;
+	
+	/** The button2. */
 	private JButton button2;
+	
+	/** The button3. */
 	private JButton button3;
+	
+	/** The button4. */
 	private JButton button4;
+	
+	/** The label11. */
 	private JLabel label11;
+	
+	/** The panel10. */
 	private JPanel panel10;
+	
+	/** The label5. */
 	private JLabel label5;
+	
+	/** The scroll pane2. */
 	private JScrollPane scrollPane2;
+	
+	/** The list2. */
 	private JList list2;
+	
+	/** The panel11. */
 	private JPanel panel11;
+	
+	/** The label7. */
 	private JLabel label7;
+	
+	/** The label6. */
 	private JLabel label6;
+	
+	/** The panel7. */
 	private JPanel panel7;
+	
+	/** The button5. */
 	private JButton button5;
+	
+	/** The button1. */
 	private JButton button1;
+	
+	/** The panel12. */
 	private JPanel panel12;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

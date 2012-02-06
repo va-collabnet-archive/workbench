@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.project.refset;
 
 import java.io.IOException;
@@ -38,12 +54,26 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
+/**
+ * The Class CommentsRefset.
+ */
 public class CommentsRefset extends Refset {
 
+	/** The HTT p_ pattern. */
 	private final Pattern HTTP_PATTERN = Pattern.compile("(http[s]?://)?(([\\w]+\\.)+[\\w]+)");
+	
+	/** The default comment type. */
 	private I_GetConceptData defaultCommentType;
+	
+	/** The comment. */
 	private I_GetConceptData comment;
 
+	/**
+	 * Instantiates a new comments refset.
+	 *
+	 * @param refsetConcept the refset concept
+	 * @throws Exception the exception
+	 */
 	public CommentsRefset(I_GetConceptData refsetConcept) throws Exception {
 		super();
 		// TODO: validate if refsetConcept is comments refset?
@@ -55,6 +85,14 @@ public class CommentsRefset extends Refset {
 		termFactory = Terms.get();
 	}
 
+	/**
+	 * Gets the comments.
+	 *
+	 * @param componentId the component id
+	 * @return the comments
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	public HashMap<I_ExtendByRef, String> getComments(int componentId) throws IOException, TerminologyException {
 		// TODO: move config to parameter
 		I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
@@ -79,6 +117,11 @@ public class CommentsRefset extends Refset {
 		return comments;
 	}
 
+	/**
+	 * Retire comments member.
+	 *
+	 * @param commentstMember the commentst member
+	 */
 	public static void retireCommentsMember(I_ExtendByRef commentstMember) {
 		try {
 			I_TermFactory termFactory = Terms.get();
@@ -107,11 +150,22 @@ public class CommentsRefset extends Refset {
 		return;
 	}
 
+	/**
+	 * Gets the comment types.
+	 *
+	 * @return the comment types
+	 */
 	public static List<I_GetConceptData> getCommentTypes() {
 		List<I_GetConceptData> descendants = new ArrayList<I_GetConceptData>();
 		return getCommentTypes(descendants);
 	}
 
+	/**
+	 * Gets the comment types.
+	 *
+	 * @param descendants the descendants
+	 * @return the comment types
+	 */
 	public static List<I_GetConceptData> getCommentTypes(List<I_GetConceptData> descendants) {
 		try {
 			I_TermFactory termFactory = Terms.get();
@@ -134,6 +188,14 @@ public class CommentsRefset extends Refset {
 		return descendants;
 	}
 
+	/**
+	 * Gets the full comments.
+	 *
+	 * @param componentId the component id
+	 * @return the full comments
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	public LinkedList<Comment> getFullComments(int componentId) throws IOException, TerminologyException {
 		// TODO: move config to parameter
 		I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
@@ -162,11 +224,24 @@ public class CommentsRefset extends Refset {
 		return comments;
 	}
 
+	/**
+	 * Gets the comment sub types.
+	 *
+	 * @param type the type
+	 * @return the comment sub types
+	 */
 	public static List<I_GetConceptData> getCommentSubTypes(I_GetConceptData type) {
 		List<I_GetConceptData> descendants = new ArrayList<I_GetConceptData>();
 		return getCommentSubTypes(descendants, type);
 	}
 
+	/**
+	 * Gets the comment sub types.
+	 *
+	 * @param descendants the descendants
+	 * @param type the type
+	 * @return the comment sub types
+	 */
 	public static List<I_GetConceptData> getCommentSubTypes(List<I_GetConceptData> descendants, I_GetConceptData type) {
 		try {
 			I_TermFactory termFactory = Terms.get();
@@ -188,14 +263,38 @@ public class CommentsRefset extends Refset {
 		return descendants;
 	}
 
+	/**
+	 * Adds the comment.
+	 *
+	 * @param componentId the component id
+	 * @param comment the comment
+	 * @throws Exception the exception
+	 */
 	public void addComment(int componentId, String comment) throws Exception {
 		addComment(componentId, defaultCommentType.getNid(), defaultCommentType.getNid(), comment);
 	}
 
+	/**
+	 * Adds the comment.
+	 *
+	 * @param componentId the component id
+	 * @param commentType the comment type
+	 * @param comment the comment
+	 * @throws Exception the exception
+	 */
 	public void addComment(int componentId, int commentType, String comment) throws Exception {
 		addComment(componentId, commentType, defaultCommentType.getNid(), comment);
 	}
 
+	/**
+	 * Adds the comment.
+	 *
+	 * @param componentId the component id
+	 * @param commentType the comment type
+	 * @param commentSubType the comment sub type
+	 * @param comment the comment
+	 * @throws Exception the exception
+	 */
 	public void addComment(int componentId, int commentType, int commentSubType, String comment) throws Exception {
 		// TODO: move config to parameter
 		I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
@@ -230,17 +329,12 @@ public class CommentsRefset extends Refset {
 
 	/**
 	 * Parses each comment for a component, and returns a list with all URLs,
-	 * using the comment as the description
-	 * 
-	 * @param componentId
-	 *            the component id
-	 * 
+	 * using the comment as the description.
+	 *
+	 * @param componentId the component id
 	 * @return the urls
-	 * 
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
-	 * @throws TerminologyException
-	 *             the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
 	 */
 	public HashMap<URL, String> getUrls(int componentId) throws IOException, TerminologyException {
 		HashMap<URL, String> urls = new HashMap<URL, String>();
@@ -259,6 +353,17 @@ public class CommentsRefset extends Refset {
 		return urls;
 	}
 
+	/**
+	 * Adds the comment.
+	 *
+	 * @param componentId the component id
+	 * @param conceptNid the concept nid
+	 * @param conceptNid2 the concept nid2
+	 * @param comment2 the comment2
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws Exception the exception
+	 */
 	public void addComment(UUID componentId, int conceptNid, int conceptNid2,
 			String comment2) throws TerminologyException, IOException, Exception {
 		addComment(termFactory.uuidToNative(componentId),conceptNid,  conceptNid2,
@@ -266,6 +371,16 @@ public class CommentsRefset extends Refset {
 		
 	}
 
+	/**
+	 * Adds the comment.
+	 *
+	 * @param componentId the component id
+	 * @param conceptNid the concept nid
+	 * @param comment2 the comment2
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws Exception the exception
+	 */
 	public void addComment(UUID componentId, int conceptNid, String comment2) throws TerminologyException, IOException, Exception {
 
 		addComment(termFactory.uuidToNative(componentId),conceptNid,

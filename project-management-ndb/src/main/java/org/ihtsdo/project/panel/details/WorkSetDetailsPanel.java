@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Tue Mar 23 14:48:37 GMT-04:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.project.panel.details;
@@ -86,28 +99,60 @@ import org.ihtsdo.project.util.IconUtilities;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
+ * The Class WorkSetDetailsPanel.
+ *
  * @author Guillermo Reynoso
  */
 public class WorkSetDetailsPanel extends JPanel {
-	/**
-	 * 
-	 */
+	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
+	
+	/** The work set. */
 	private WorkSet workSet;
+	
+	/** The config. */
 	private I_ConfigAceFrame config;
+	
+	/** The source refset label. */
 	private TermComponentLabel sourceRefsetLabel;
+	
+	/** The list3 model. */
 	private DefaultListModel list3Model;
+	
+	/** The table model. */
 	private DefaultTableModel tableModel;
+	
+	/** The list5 model. */
 	private DefaultListModel list5Model;
+	
+	/** The list2 model. */
 	private DefaultListModel list2Model;
+	
+	/** The source refset table model. */
 	private DefaultTableModel sourceRefsetTableModel;
 
+	/** The Concept dn d handler. */
 	ObjectTransferHandler ConceptDnDHandler;
+	
+	/** The partition name. */
 	private String partitionName;
+	
+	/** The workset members. */
 	private ArrayList<WorkSetMember> worksetMembers;
+	
+	/** The members worker. */
 	private MembersWorker membersWorker;
+	
+	/** The surce refset members worker. */
 	private SourceRefsetMembersWorker surceRefsetMembersWorker;
 
+	/**
+	 * Instantiates a new work set details panel.
+	 *
+	 * @param workSet the work set
+	 * @param config the config
+	 */
 	public WorkSetDetailsPanel(WorkSet workSet, I_ConfigAceFrame config) {
 		initComponents();
 		this.workSet = workSet;
@@ -231,6 +276,9 @@ public class WorkSetDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Update list4 content.
+	 */
 	private void updateList4Content() {
 		try {
 			List<WorkSetMember> members = workSet.getWorkSetMembers();
@@ -256,6 +304,9 @@ public class WorkSetDetailsPanel extends JPanel {
 		worksetMembersCounter.revalidate();
 	}
 
+	/**
+	 * Update list5 content.
+	 */
 	private void updateList5Content() {
 		list5Model = new DefaultListModel();
 
@@ -274,12 +325,20 @@ public class WorkSetDetailsPanel extends JPanel {
 		list5.validate();
 	}
 
+	/**
+	 * Update list1 content.
+	 */
 	private void updateList1Content() {
 		surceRefsetMembersWorker = new SourceRefsetMembersWorker(sourceRefsetTableModel, list2Model, workSet, config, sourceRefsetMembersTable, sourceRefsetCounter);
 		surceRefsetMembersWorker.addPropertyChangeListener(new ProgressListener(pBarS));
 		surceRefsetMembersWorker.execute();
 	}
 
+	/**
+	 * Text field1 key typed.
+	 *
+	 * @param e the e
+	 */
 	private void textField1KeyTyped(KeyEvent e) {
 		if (textField1.getText().equals(workSet.getName())) {
 			button7.setEnabled(false);
@@ -288,6 +347,11 @@ public class WorkSetDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Button5 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button5ActionPerformed(ActionEvent e) {
 		try {
 			pBarS.setVisible(true);
@@ -321,6 +385,11 @@ public class WorkSetDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Button1 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button1ActionPerformed(ActionEvent e) {
 
 		int n = JOptionPane.showConfirmDialog(this, "Would you like to synchronize the WorkSet?", "Confirmation", JOptionPane.YES_NO_OPTION);
@@ -397,6 +466,11 @@ public class WorkSetDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Button7 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button7ActionPerformed(ActionEvent e) {
 		pBarW.setVisible(true);
 		workSet.setName(textField1.getText());
@@ -413,6 +487,11 @@ public class WorkSetDetailsPanel extends JPanel {
 		TranslationHelperPanel.refreshProjectPanelNode(config);
 	}
 
+	/**
+	 * List3 key typed.
+	 *
+	 * @param e the e
+	 */
 	private void list3KeyTyped(KeyEvent e) {
 		String keyChar = String.valueOf(e.getKeyChar());
 		if ("d".equals(keyChar)) {
@@ -420,6 +499,9 @@ public class WorkSetDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Removes the selected list3 items.
+	 */
 	private void removeSelectedList3Items() {
 		if (list3.getSelectedIndices().length > 0) {
 			int[] tmp = list3.getSelectedIndices();
@@ -432,6 +514,11 @@ public class WorkSetDetailsPanel extends JPanel {
 		} //
 	}
 
+	/**
+	 * Button6 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button6ActionPerformed(ActionEvent e) {
 		try {
 			pBarE.setVisible(true);
@@ -466,6 +553,11 @@ public class WorkSetDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Button4 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button4ActionPerformed(ActionEvent e) {
 		// retire workSet
 		int n = JOptionPane.showConfirmDialog(this, "Would you like to retire the workSet?", "Confirmation", JOptionPane.YES_NO_OPTION);
@@ -487,6 +579,11 @@ public class WorkSetDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Button3 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button3ActionPerformed(ActionEvent e) {
 		// Create one click partition
 		partitionName = JOptionPane.showInputDialog(null, "Enter One-click Partition Name : ", "", 1);
@@ -562,6 +659,11 @@ public class WorkSetDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Button2 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button2ActionPerformed(ActionEvent e) {
 		// Create partition scheme
 		String partitionSchemeName = JOptionPane.showInputDialog(null, "Enter Partition Scheme Name : ", "", 1);
@@ -593,52 +695,100 @@ public class WorkSetDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Button8 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button8ActionPerformed(ActionEvent e) {
 		// update source refset list
 		updateList1Content();
 	}
 
+	/**
+	 * The Class PopUpList3.
+	 */
 	class PopUpList3 extends JPopupMenu implements ActionListener {
+		
+		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = 1L;
+		
+		/** The an item. */
 		JMenuItem anItem;
 
+		/**
+		 * Instantiates a new pop up list3.
+		 */
 		public PopUpList3() {
 			anItem = new JMenuItem("Remove selected items");
 			anItem.addActionListener(this);
 			add(anItem);
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			removeSelectedList3Items();
 		}
 	}
 
+	/**
+	 * Do list3 pop.
+	 *
+	 * @param e the e
+	 */
 	private void doList3Pop(MouseEvent e) {
 		PopUpList3 menu = new PopUpList3();
 		menu.show(e.getComponent(), e.getX(), e.getY());
 	}
 
+	/**
+	 * List3 mouse pressed.
+	 *
+	 * @param e the e
+	 */
 	private void list3MousePressed(MouseEvent e) {
 		if (e.isPopupTrigger())
 			doList3Pop(e);
 	}
 
+	/**
+	 * List3 mouse released.
+	 *
+	 * @param e the e
+	 */
 	private void list3MouseReleased(MouseEvent e) {
 		if (e.isPopupTrigger())
 			doList3Pop(e);
 	}
 
+	/**
+	 * Button10 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button10ActionPerformed(ActionEvent e) {
 		removeSelectedList3Items();
 	}
 
+	/**
+	 * List2 value changed.
+	 *
+	 * @param e the e
+	 */
 	private void list2ValueChanged(ListSelectionEvent e) {
 		pBarS.setVisible(true);
 		updateList1Content();
 		pBarS.setVisible(false);
 	}
 
+	/**
+	 * Label15 mouse clicked.
+	 *
+	 * @param e the e
+	 */
 	private void label15MouseClicked(MouseEvent e) {
 		try {
 			HelpApi.openHelpForComponent("WORKSET_DETAILS");
@@ -649,6 +799,11 @@ public class WorkSetDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * J tabbed pane1 state changed.
+	 *
+	 * @param e the e
+	 */
 	private void jTabbedPane1StateChanged(ChangeEvent e) {
 		if (e.getSource() instanceof JTabbedPane) {
 			JTabbedPane panel = (JTabbedPane) e.getSource();
@@ -664,10 +819,18 @@ public class WorkSetDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * J tabbed pane1 property change.
+	 *
+	 * @param e the e
+	 */
 	private void jTabbedPane1PropertyChange(PropertyChangeEvent e) {
 		// TODO add your code here
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -1330,69 +1493,196 @@ public class WorkSetDetailsPanel extends JPanel {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
+	/** The j tabbed pane1. */
 	private JTabbedPane jTabbedPane1;
+	
+	/** The panel0. */
 	private JPanel panel0;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The label11. */
 	private JLabel label11;
+	
+	/** The label15. */
 	private JLabel label15;
+	
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The panel17. */
 	private JPanel panel17;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The text field1. */
 	private JTextField textField1;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The label6. */
 	private JLabel label6;
+	
+	/** The panel21. */
 	private JPanel panel21;
+	
+	/** The panel16. */
 	private JPanel panel16;
+	
+	/** The panel7. */
 	private JPanel panel7;
+	
+	/** The button2. */
 	private JButton button2;
+	
+	/** The button3. */
 	private JButton button3;
+	
+	/** The button4. */
 	private JButton button4;
+	
+	/** The button7. */
 	private JButton button7;
+	
+	/** The p bar w. */
 	private JProgressBar pBarW;
+	
+	/** The panel4. */
 	private JPanel panel4;
+	
+	/** The panel8. */
 	private JPanel panel8;
+	
+	/** The panel13. */
 	private JPanel panel13;
+	
+	/** The label7. */
 	private JLabel label7;
+	
+	/** The list2. */
 	private JList list2;
+	
+	/** The panel6. */
 	private JPanel panel6;
+	
+	/** The label12. */
 	private JLabel label12;
+	
+	/** The source refset counter. */
 	private JLabel sourceRefsetCounter;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The source refset members table. */
 	private JTable sourceRefsetMembersTable;
+	
+	/** The label4. */
 	private JLabel label4;
+	
+	/** The panel11. */
 	private JPanel panel11;
+	
+	/** The button5. */
 	private JButton button5;
+	
+	/** The button8. */
 	private JButton button8;
+	
+	/** The button1. */
 	private JButton button1;
+	
+	/** The p bar s. */
 	private JProgressBar pBarS;
+	
+	/** The panel12. */
 	private JPanel panel12;
+	
+	/** The label5. */
 	private JLabel label5;
+	
+	/** The scroll pane3. */
 	private JScrollPane scrollPane3;
+	
+	/** The list3. */
 	private JList list3;
+	
+	/** The label8. */
 	private JLabel label8;
+	
+	/** The panel9. */
 	private JPanel panel9;
+	
+	/** The button6. */
 	private JButton button6;
+	
+	/** The button10. */
 	private JButton button10;
+	
+	/** The p bar e. */
 	private JProgressBar pBarE;
+	
+	/** The panel19. */
 	private JPanel panel19;
+	
+	/** The panel14. */
 	private JPanel panel14;
+	
+	/** The panel10. */
 	private JPanel panel10;
+	
+	/** The label9. */
 	private JLabel label9;
+	
+	/** The workset members counter. */
 	private JLabel worksetMembersCounter;
+	
+	/** The scroll pane4. */
 	private JScrollPane scrollPane4;
+	
+	/** The members table. */
 	private JTable membersTable;
+	
+	/** The panel15. */
 	private JPanel panel15;
+	
+	/** The label10. */
 	private JLabel label10;
+	
+	/** The progress bar1. */
 	private JProgressBar progressBar1;
+	
+	/** The panel23. */
 	private JPanel panel23;
+	
+	/** The label13. */
 	private JLabel label13;
+	
+	/** The scroll pane5. */
 	private JScrollPane scrollPane5;
+	
+	/** The list5. */
 	private JList list5;
+	
+	/** The panel24. */
 	private JPanel panel24;
+	
+	/** The label14. */
 	private JLabel label14;
+	
+	/** The panel5. */
 	private JPanel panel5;
+	
+	/** The button9. */
 	private JButton button9;
+	
+	/** The p bar p. */
 	private JProgressBar pBarP;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 }

@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.project.refset;
 
 import java.io.IOException;
@@ -15,8 +31,21 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.TerminologyProjectDAO;
 
+/**
+ * The Class LanguageMembershipRefset.
+ */
 public class LanguageMembershipRefset extends WorkflowRefset {
+	
+	/** The lang code. */
 	private String langCode;
+	
+	/**
+	 * Instantiates a new language membership refset.
+	 *
+	 * @param languageMembershipRefset the language membership refset
+	 * @param config the config
+	 * @throws Exception the exception
+	 */
 	public LanguageMembershipRefset(I_GetConceptData languageMembershipRefset,I_ConfigAceFrame config) throws Exception {
 		super();
 		validateRefsetAsMembership(languageMembershipRefset.getConceptNid(), config);
@@ -26,6 +55,16 @@ public class LanguageMembershipRefset extends WorkflowRefset {
 		termFactory = Terms.get();
 	}
 
+	/**
+	 * Creates the new language membership refset.
+	 *
+	 * @param name the name
+	 * @param parentId the parent id
+	 * @param langCode the lang code
+	 * @param config the config
+	 * @return the language membership refset
+	 * @throws Exception the exception
+	 */
 	public static LanguageMembershipRefset createNewLanguageMembershipRefset(String name, 
 			int parentId, String langCode,
 			I_ConfigAceFrame config) throws Exception {
@@ -110,6 +149,16 @@ public class LanguageMembershipRefset extends WorkflowRefset {
 		}
 		return newLanguageMembershipRerset; 
 	}
+	
+	/**
+	 * Creates the language membership refset from concept.
+	 *
+	 * @param concept the concept
+	 * @param langCode the lang code
+	 * @param config the config
+	 * @return the language membership refset
+	 * @throws Exception the exception
+	 */
 	public static LanguageMembershipRefset createLanguageMembershipRefsetFromConcept(I_GetConceptData concept, 
 			String langCode,
 			I_ConfigAceFrame config) throws Exception {
@@ -189,6 +238,12 @@ public class LanguageMembershipRefset extends WorkflowRefset {
 		return newLanguageMembershipRerset; 
 	}
 
+	/**
+	 * Gets the language spec refset concept.
+	 *
+	 * @param config the config
+	 * @return the language spec refset concept
+	 */
 	public I_GetConceptData getLanguageSpecRefsetConcept(I_ConfigAceFrame config) {
 		try {
 			I_GetConceptData specifiesRefsetRel =
@@ -200,12 +255,28 @@ public class LanguageMembershipRefset extends WorkflowRefset {
 		}
 	}
 
+	/**
+	 * Validate refset as membership.
+	 *
+	 * @param languageRefsetId the language refset id
+	 * @param config the config
+	 * @throws Exception the exception
+	 */
 	private static void validateRefsetAsMembership(int languageRefsetId, I_ConfigAceFrame config) throws Exception {
 		boolean isValid = validateAsLanguageRefset(languageRefsetId, config);
 		if (!isValid) throw new Exception("Refset type must be a language refset");
 		return;
 	}
 	
+	/**
+	 * Validate as language refset.
+	 *
+	 * @param languageRefsetId the language refset id
+	 * @param config the config
+	 * @return true, if successful
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	public static boolean validateAsLanguageRefset(int languageRefsetId, I_ConfigAceFrame config) throws IOException, TerminologyException {
 		I_TermFactory tf = Terms.get();
 		I_GetConceptData languageRefsetConcept = tf.getConcept(languageRefsetId);
@@ -222,6 +293,12 @@ public class LanguageMembershipRefset extends WorkflowRefset {
 		return isValid;
 	}
 
+	/**
+	 * Gets the lang code.
+	 *
+	 * @param config the config
+	 * @return the lang code
+	 */
 	public String getLangCode(I_ConfigAceFrame config) {
 		if (langCode== null){
 
@@ -252,6 +329,11 @@ public class LanguageMembershipRefset extends WorkflowRefset {
 		return langCode;
 	}
 
+	/**
+	 * Sets the lang code.
+	 *
+	 * @param langCode the new lang code
+	 */
 	public void setLangCode(String langCode) {
 		this.langCode = langCode;
 	}

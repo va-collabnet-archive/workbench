@@ -76,8 +76,19 @@ public interface I_TerminologyProject {
 	 */
 	public I_GetConceptData getConcept();
 
+	/**
+	 * Gets the work sets.
+	 *
+	 * @param config the config
+	 * @return the work sets
+	 */
 	public List<WorkSet> getWorkSets(I_ConfigAceFrame config);
 	
+	/**
+	 * To string.
+	 *
+	 * @return the string
+	 */
 	public String toString();
 
 }

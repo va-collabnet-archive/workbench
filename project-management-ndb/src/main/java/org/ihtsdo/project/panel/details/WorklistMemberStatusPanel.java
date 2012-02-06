@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Mon Oct 25 14:11:59 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.project.panel.details;
@@ -35,21 +48,46 @@ import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
 
 /**
+ * The Class WorklistMemberStatusPanel.
+ *
  * @author Guillermo Reynoso
  */
 public class WorklistMemberStatusPanel extends JPanel {
+	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 4054703594663442841L;
+	
+	/** The work list. */
 	private WorkList workList;
+	
+	/** The config. */
 	private I_ConfigAceFrame config;
+	
+	/** The list5 model. */
 	private DefaultListModel list5Model;
+	
+	/** The statuses. */
 	private HashMap<I_GetConceptData, Integer> statuses;
+	
+	/** The list1 model. */
 	private DefaultListModel list1Model;
+	
+	/** The members worker. */
 	private WorklistMembersStatusWorker membersWorker;
 
+	/**
+	 * Instantiates a new worklist member status panel.
+	 */
 	public WorklistMemberStatusPanel() {
 		initComponents();
 	}
 
+	/**
+	 * Instantiates a new worklist member status panel.
+	 *
+	 * @param workList the work list
+	 * @param config the config
+	 */
 	public WorklistMemberStatusPanel(WorkList workList, I_ConfigAceFrame config) {
 		initComponents();
 		this.workList = workList;
@@ -60,6 +98,9 @@ public class WorklistMemberStatusPanel extends JPanel {
 		this.revalidate();
 	}
 
+	/**
+	 * Setup list5.
+	 */
 	private void setupList5() {
 		list5Model = new DefaultListModel();
 		list5.setModel(list5Model);
@@ -68,6 +109,9 @@ public class WorklistMemberStatusPanel extends JPanel {
 		list1.setModel(list1Model);
 	}
 
+	/**
+	 * Update data.
+	 */
 	private void updateData() {
 		if (membersWorker != null && !membersWorker.isDone()) {
 			membersWorker.cancel(true);
@@ -77,6 +121,11 @@ public class WorklistMemberStatusPanel extends JPanel {
 		membersWorker.execute();
 	}
 
+	/**
+	 * List5 value changed.
+	 *
+	 * @param e the e
+	 */
 	private void list5ValueChanged(ListSelectionEvent e) {
 		// Status selected, update membersList
 		String selectedValue = (String) list5.getSelectedValue();
@@ -111,11 +160,19 @@ public class WorklistMemberStatusPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Button1 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button1ActionPerformed(ActionEvent e) {
 		// refresh
 		updateData();
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -263,28 +320,64 @@ public class WorklistMemberStatusPanel extends JPanel {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
+	/** The panel20. */
 	private JPanel panel20;
+	
+	/** The panel24. */
 	private JPanel panel24;
+	
+	/** The label19. */
 	private JLabel label19;
+	
+	/** The label13. */
 	private JLabel label13;
+	
+	/** The panel5. */
 	private JPanel panel5;
+	
+	/** The label14. */
 	private JLabel label14;
+	
+	/** The label15. */
 	private JLabel label15;
+	
+	/** The scroll pane5. */
 	private JScrollPane scrollPane5;
+	
+	/** The list5. */
 	private JList list5;
+	
+	/** The panel21. */
 	private JPanel panel21;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The list1. */
 	private JList list1;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The button1. */
 	private JButton button1;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
+	/**
+	 * The Class WorklistMembersStatusWorker.
+	 */
 	class WorklistMembersStatusWorker extends SwingWorker<String, String> {
 
+		/**
+		 * Instantiates a new worklist members status worker.
+		 */
 		public WorklistMembersStatusWorker() {
 			super();
 			list5Model.clear();
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.SwingWorker#doInBackground()
+		 */
 		@Override
 		protected String doInBackground() throws Exception {
 			try {
@@ -305,6 +398,9 @@ public class WorklistMemberStatusPanel extends JPanel {
 			return "Done";
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.SwingWorker#process(java.util.List)
+		 */
 		@Override
 		protected void process(List<String> chunks) {
 			for (String objects : chunks) {
@@ -312,6 +408,9 @@ public class WorklistMemberStatusPanel extends JPanel {
 			}
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.SwingWorker#done()
+		 */
 		@Override
 		public void done() {
 			try {

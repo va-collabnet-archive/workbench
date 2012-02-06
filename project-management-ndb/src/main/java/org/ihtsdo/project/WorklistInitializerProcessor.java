@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.project;
 
 import java.io.IOException;
@@ -40,25 +56,67 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.spec.ValidationException;
 
+/**
+ * The Class WorklistInitializerProcessor.
+ */
 public class WorklistInitializerProcessor implements ProcessUnfetchedConceptDataBI {
 
+	/** The members nid set. */
 	NidBitSetBI membersNidSet;
+	
+	/** The vc. */
 	ViewCoordinate vc;
+	
+	/** The prom ref. */
 	PromotionAndAssignmentRefset promRef;
+	
+	/** The active nid. */
 	int activeNid;
+	
+	/** The active uuid. */
 	UUID activeUuid;
+	
+	/** The inactive nid. */
 	int inactiveNid;
+	
+	/** The inactive uuid. */
 	UUID inactiveUuid;
+	
+	/** The updater. */
 	ActivityUpdater updater;
+	
+	/** The tc. */
 	TerminologyBuilderBI tc;
+	
+	/** The work list nid. */
 	int workListNid;
+	
+	/** The interpreter. */
 	WorkflowInterpreter interpreter;
+	
+	/** The user. */
 	WfUser user;
+	
+	/** The work list. */
 	WorkList workList;
+	
+	/** The user nid. */
 	int userNid;
+	
+	/** The assigned nid. */
 	int assignedNid;
+	
+	/** The ts. */
 	TerminologyStoreDI ts;
 
+	/**
+	 * Instantiates a new worklist initializer processor.
+	 *
+	 * @param partition the partition
+	 * @param workList the work list
+	 * @param config the config
+	 * @param updater the updater
+	 */
 	public WorklistInitializerProcessor(Partition partition,WorkList workList, 
 			I_ConfigAceFrame config, ActivityUpdater updater) {
 		super();
@@ -116,16 +174,25 @@ public class WorklistInitializerProcessor implements ProcessUnfetchedConceptData
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.tk.api.ContinuationTrackerBI#continueWork()
+	 */
 	@Override
 	public boolean continueWork() {
 		return true;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI#getNidSet()
+	 */
 	@Override
 	public NidBitSetBI getNidSet() throws IOException {
 		return membersNidSet;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI#processUnfetchedConceptData(int, org.ihtsdo.tk.api.ConceptFetcherBI)
+	 */
 	@Override
 	public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fetcher)
 	throws Exception {
@@ -139,6 +206,12 @@ public class WorklistInitializerProcessor implements ProcessUnfetchedConceptData
 
 	}
 
+	/**
+	 * Process concept.
+	 *
+	 * @param concept the concept
+	 * @return true, if successful
+	 */
 	private boolean processConcept(ConceptVersionBI concept) {
 		boolean update = true;
 		updater.incrementCount();

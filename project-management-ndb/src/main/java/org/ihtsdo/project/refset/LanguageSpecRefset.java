@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.project.refset;
 
 import java.io.IOException;
@@ -22,8 +38,16 @@ import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
+/**
+ * The Class LanguageSpecRefset.
+ */
 public class LanguageSpecRefset extends WorkflowRefset {
 
+	/**
+	 * Instantiates a new language spec refset.
+	 *
+	 * @param languageSpecRefset the language spec refset
+	 */
 	public LanguageSpecRefset(I_GetConceptData languageSpecRefset) {
 		super();
 		this.refsetConcept = languageSpecRefset;
@@ -32,6 +56,17 @@ public class LanguageSpecRefset extends WorkflowRefset {
 		termFactory = Terms.get();
 	}
 
+	/**
+	 * Creates the new language spec refset.
+	 *
+	 * @param name the name
+	 * @param parentId the parent id
+	 * @param membershipRefsetId the membership refset id
+	 * @param enumeratedOriginId the enumerated origin id
+	 * @param config the config
+	 * @return the language spec refset
+	 * @throws Exception the exception
+	 */
 	public static LanguageSpecRefset createNewLanguageSpecRefset(String name, int parentId, int membershipRefsetId, 
 			int enumeratedOriginId, I_ConfigAceFrame config) throws Exception {
 		LanguageSpecRefset newLanguageSpecRerset = null;
@@ -118,6 +153,12 @@ public class LanguageSpecRefset extends WorkflowRefset {
 		return newLanguageSpecRerset; 
 	}
 
+	/**
+	 * Gets the language membership refset concept.
+	 *
+	 * @param config the config
+	 * @return the language membership refset concept
+	 */
 	public I_GetConceptData getLanguageMembershipRefsetConcept(I_ConfigAceFrame config) {
 		try {
 			I_GetConceptData specifiesRefsetRel =
@@ -129,6 +170,12 @@ public class LanguageSpecRefset extends WorkflowRefset {
 		}
 	}
 
+	/**
+	 * Gets the enumerated origin refset concept.
+	 *
+	 * @param config the config
+	 * @return the enumerated origin refset concept
+	 */
 	public I_GetConceptData getEnumeratedOriginRefsetConcept(I_ConfigAceFrame config) {
 		try {
 			I_GetConceptData languageEnumeratedOriginRel =
@@ -145,6 +192,12 @@ public class LanguageSpecRefset extends WorkflowRefset {
 		}
 	}
 
+	/**
+	 * Gets the attribute value refset.
+	 *
+	 * @param config the config
+	 * @return the attribute value refset
+	 */
 	public AttributeValueRefset getAttributeValueRefset(I_ConfigAceFrame config) {
 		try {
 			I_GetConceptData attributeValueRel = termFactory.getConcept(
@@ -162,6 +215,11 @@ public class LanguageSpecRefset extends WorkflowRefset {
 		}
 	}
 
+	/**
+	 * Compute language refset spec.
+	 *
+	 * @param config the config
+	 */
 	public void computeLanguageRefsetSpec(I_ConfigAceFrame config) {
 		I_TermFactory tf = Terms.get();
 		try {

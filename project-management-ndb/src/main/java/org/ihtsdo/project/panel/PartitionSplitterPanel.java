@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Thu Mar 18 14:40:06 GMT-04:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.project.panel;
@@ -26,18 +39,34 @@ import org.ihtsdo.project.model.PartitionScheme;
 import org.ihtsdo.project.refset.partition.RefsetSplitter;
 
 /**
+ * The Class PartitionSplitterPanel.
+ *
  * @author Guillermo Reynoso
  */
 public class PartitionSplitterPanel extends JPanel {
-	/**
-	 * 
-	 */
+	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
+	
+	/** The partition scheme. */
 	private PartitionScheme partitionScheme;
+	
+	/** The config. */
 	private I_ConfigAceFrame config;
+	
+	/** The partitioner panel. */
 	private RefsetPartitionerPanel partitionerPanel;
+	
+	/** The refset splitter. */
 	private RefsetSplitter refsetSplitter;
 
+	/**
+	 * Instantiates a new partition splitter panel.
+	 *
+	 * @param partitionScheme the partition scheme
+	 * @param partitionerPanel the partitioner panel
+	 * @param config the config
+	 */
 	public PartitionSplitterPanel(PartitionScheme partitionScheme, RefsetPartitionerPanel partitionerPanel,
 			I_ConfigAceFrame config) {
 		this.partitionScheme = partitionScheme;
@@ -49,11 +78,21 @@ public class PartitionSplitterPanel extends JPanel {
 		editorPane1.setContentType("text/html");
 	}
 
+	/**
+	 * Button3 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button3ActionPerformed(ActionEvent e) {
 		partitionerPanel.updateList1Content();
 		partitionerPanel.updatePanel7Content();
 	}
 
+	/**
+	 * Gets the portions from text field.
+	 *
+	 * @return the portions from text field
+	 */
 	private List<Integer> getPortionsFromTextField() {
 		List<Integer> portions = new ArrayList<Integer>();
 		split:
@@ -72,6 +111,11 @@ public class PartitionSplitterPanel extends JPanel {
 		return portions;
 	}
 
+	/**
+	 * Button1 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button1ActionPerformed(ActionEvent e) {
 		try {
 			editorPane1.setText("");
@@ -98,6 +142,11 @@ public class PartitionSplitterPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Button2 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button2ActionPerformed(ActionEvent e) {
 		try {
 			if (textField3.getText() == null) throw new Exception("Name prefix must not be empty.");
@@ -156,6 +205,9 @@ public class PartitionSplitterPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		label1 = new JLabel();
@@ -303,20 +355,49 @@ public class PartitionSplitterPanel extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The label4. */
 	private JLabel label4;
+	
+	/** The text field3. */
 	private JTextField textField3;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The text field1. */
 	private JTextField textField1;
+	
+	/** The panel3. */
 	private JPanel panel3;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The editor pane1. */
 	private JEditorPane editorPane1;
+	
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The button1. */
 	private JButton button1;
+	
+	/** The button2. */
 	private JButton button2;
+	
+	/** The button3. */
 	private JButton button3;
+	
+	/** The p bar w. */
 	private JProgressBar pBarW;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

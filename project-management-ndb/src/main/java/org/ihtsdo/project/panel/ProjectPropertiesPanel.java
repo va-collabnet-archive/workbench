@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Tue Jan 19 15:07:16 CLST 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.project.panel;
@@ -8,13 +21,22 @@ import java.awt.*;
 import javax.swing.*;
 
 /**
+ * The Class ProjectPropertiesPanel.
+ *
  * @author Guillermo Reynoso
  */
 public class ProjectPropertiesPanel extends JPanel {
+	
+	/**
+	 * Instantiates a new project properties panel.
+	 */
 	public ProjectPropertiesPanel() {
 		initComponents();
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		label1 = new JLabel();
@@ -140,22 +162,55 @@ public class ProjectPropertiesPanel extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The text field1. */
 	private JTextField textField1;
+	
+	/** The label7. */
 	private JLabel label7;
+	
+	/** The label8. */
 	private JLabel label8;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The list1. */
 	private JList list1;
+	
+	/** The label4. */
 	private JLabel label4;
+	
+	/** The label6. */
 	private JLabel label6;
+	
+	/** The label5. */
 	private JLabel label5;
+	
+	/** The scroll pane2. */
 	private JScrollPane scrollPane2;
+	
+	/** The list2. */
 	private JList list2;
+	
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The button1. */
 	private JButton button1;
+	
+	/** The button2. */
 	private JButton button2;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.project.workflow.api;
 
 import java.io.File;
@@ -36,10 +52,15 @@ import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
+/**
+ * The Class TestInterpreter.
+ */
 public class TestInterpreter {
 
 	/**
-	 * @param args
+	 * The main method.
+	 *
+	 * @param args the arguments
 	 */
 	public static void main(String[] args) {
 		//saveKB();
@@ -95,6 +116,12 @@ public class TestInterpreter {
 
 	}
 
+	/**
+	 * Gets the workflow members.
+	 *
+	 * @param wfDef the wf def
+	 * @return the workflow members
+	 */
 	private static List<WfMembership> getWorkflowMembers(WorkflowDefinition wfDef) {
 		List<WfMembership> members = new ArrayList<WfMembership>();
 		int counter = 0;
@@ -113,6 +140,9 @@ public class TestInterpreter {
 		return members;
 	}
 
+	/**
+	 * Save kb.
+	 */
 	public static void saveKB() {
 		DecisionTableConfiguration dtableconfiguration =
 			KnowledgeBuilderFactory.newDecisionTableConfiguration();
@@ -142,6 +172,11 @@ public class TestInterpreter {
 		System.out.println("KBase saved!");
 	}
 	
+	/**
+	 * Gets the wf definition.
+	 *
+	 * @return the wf definition
+	 */
 	public static WorkflowDefinition getWfDefinition() {
 		WorkflowDefinition wfdf=new WorkflowDefinition();
 		
@@ -190,6 +225,11 @@ public class TestInterpreter {
 		return wfdf;
 	}
 	
+	/**
+	 * Write wf definition.
+	 *
+	 * @param wfDefinition the wf definition
+	 */
 	public static void writeWfDefinition(WorkflowDefinition wfDefinition){
 		XStream xStream = new XStream(new DomDriver());
 		FileOutputStream rfos;
@@ -205,6 +245,12 @@ public class TestInterpreter {
 		System.out.println("Workflow Definition saved!");
 	}
 	
+	/**
+	 * Read wf definition.
+	 *
+	 * @param file the file
+	 * @return the workflow definition
+	 */
 	public static WorkflowDefinition readWfDefinition(File file){
 		XStream xStream = new XStream(new DomDriver());
 		WorkflowDefinition wfDef=(WorkflowDefinition)xStream.fromXML(file);

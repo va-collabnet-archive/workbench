@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Tue Mar 23 16:18:51 GMT-04:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.project.panel.details;
@@ -79,23 +92,48 @@ import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 import org.ihtsdo.project.workflow.wizard.WizardLauncher;
 
 /**
+ * The Class PartitionDetailsPanel.
+ *
  * @author Guillermo Reynoso
  */
 public class PartitionDetailsPanel extends JPanel {
-	/**
-	 * 
-	 */
+	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
+	
+	/** The partition. */
 	private Partition partition;
+	
+	/** The config. */
 	private I_ConfigAceFrame config;
+	
+	/** The table model. */
 	private DefaultTableModel tableModel;
+	
+	/** The list3 model. */
 	private DefaultListModel list3Model;
+	
+	/** The destination. */
 	private String destination;
+	
+	/** The business process. */
 	private BusinessProcess businessProcess;
+	
+	/** The name. */
 	private String name;
+	
+	/** The partition member. */
 	private String partitionMember;
+	
+	/** The members worker. */
 	private MembersWorker membersWorker;
 
+	/**
+	 * Instantiates a new partition details panel.
+	 *
+	 * @param partition the partition
+	 * @param config the config
+	 */
 	public PartitionDetailsPanel(Partition partition, I_ConfigAceFrame config) {
 		initComponents();
 		label11.setIcon(IconUtilities.helpIcon);
@@ -145,6 +183,9 @@ public class PartitionDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Update list3 content.
+	 */
 	private void updateList3Content() {
 		list3Model = new DefaultListModel();
 		List<WorkList> worklists = partition.getWorkLists();
@@ -160,6 +201,9 @@ public class PartitionDetailsPanel extends JPanel {
 		list3.validate();
 	}
 
+	/**
+	 * Update list2 content.
+	 */
 	private void updateList2Content() {
 		List<PartitionMember> members = partition.getPartitionMembers();
 		label4.setText(partitionMember + " (" + members.size() + ")");
@@ -174,6 +218,11 @@ public class PartitionDetailsPanel extends JPanel {
 		membersTable.revalidate();
 	}
 
+	/**
+	 * Text field1 key typed.
+	 *
+	 * @param e the e
+	 */
 	private void textField1KeyTyped(KeyEvent e) {
 		if (textField1.getText().equals(partition.getName())) {
 			button5.setEnabled(false);
@@ -182,6 +231,11 @@ public class PartitionDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Button5 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button5ActionPerformed(ActionEvent e) {
 		partition.setName(textField1.getText());
 		TerminologyProjectDAO.updatePartitionMetadata(partition, config);
@@ -195,6 +249,11 @@ public class PartitionDetailsPanel extends JPanel {
 		TranslationHelperPanel.refreshProjectPanelNode(config);
 	}
 
+	/**
+	 * Button3 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button3ActionPerformed(ActionEvent e) {
 		// retire partition
 		int n = JOptionPane.showConfirmDialog(this, "Would you like to retire the partition?", "Confirmation", JOptionPane.YES_NO_OPTION);
@@ -213,6 +272,12 @@ public class PartitionDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Gets the business process.
+	 *
+	 * @param f the f
+	 * @return the business process
+	 */
 	private BusinessProcess getBusinessProcess(File f) {
 		ObjectInputStream in;
 		try {
@@ -231,11 +296,23 @@ public class PartitionDetailsPanel extends JPanel {
 		return null;
 	}
 
+	/** The clone list. */
 	List<I_Work> cloneList = new ArrayList<I_Work>();
+	
+	/** The workflow definition. */
 	private WorkflowDefinition workflowDefinition;
+	
+	/** The no name. */
 	private String noName;
+	
+	/** The worker. */
 	private SwingWorker<String, String> worker;
 
+	/**
+	 * Button2 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button2ActionPerformed(ActionEvent e) {
 		// generate worklist
 		WfComponentProvider wcp = new WfComponentProvider();
@@ -357,6 +434,11 @@ public class PartitionDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Sleep.
+	 *
+	 * @param n the n
+	 */
 	public static void sleep(int n) {
 		long t0, t1;
 		t0 = System.currentTimeMillis();
@@ -365,6 +447,11 @@ public class PartitionDetailsPanel extends JPanel {
 		} while ((t1 - t0) < (n * 1000));
 	}
 
+	/**
+	 * Button1 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button1ActionPerformed(ActionEvent e) {
 		// retire members
 		if (membersTable.getSelectedRowCount() > 0) {
@@ -392,6 +479,11 @@ public class PartitionDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Button4 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button4ActionPerformed(ActionEvent e) {
 		// add partition scheme
 		String partitionSchemeName = JOptionPane.showInputDialog(null, "Enter Partition Scheme Name : ", "", 1);
@@ -409,6 +501,11 @@ public class PartitionDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Label11 mouse clicked.
+	 *
+	 * @param e the e
+	 */
 	private void label11MouseClicked(MouseEvent e) {
 		try {
 			HelpApi.openHelpForComponent("PARTITION_DETAILS");
@@ -419,6 +516,11 @@ public class PartitionDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Tabbed pane1 state changed.
+	 *
+	 * @param e the e
+	 */
 	private void tabbedPane1StateChanged(ChangeEvent e) {
 		if (e.getSource() instanceof JTabbedPane) {
 			JTabbedPane panel = (JTabbedPane) e.getSource();
@@ -434,6 +536,9 @@ public class PartitionDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -777,49 +882,132 @@ public class PartitionDetailsPanel extends JPanel {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
+	/** The tabbed pane1. */
 	private JTabbedPane tabbedPane1;
+	
+	/** The panel0. */
 	private JPanel panel0;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The panel11. */
 	private JPanel panel11;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The text field1. */
 	private JTextField textField1;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The label5. */
 	private JLabel label5;
+	
+	/** The panel10. */
 	private JPanel panel10;
+	
+	/** The label8. */
 	private JLabel label8;
+	
+	/** The panel7. */
 	private JPanel panel7;
+	
+	/** The button2. */
 	private JButton button2;
+	
+	/** The button3. */
 	private JButton button3;
+	
+	/** The button4. */
 	private JButton button4;
+	
+	/** The button5. */
 	private JButton button5;
+	
+	/** The p bar w. */
 	private JProgressBar pBarW;
+	
+	/** The label11. */
 	private JLabel label11;
+	
+	/** The panel9. */
 	private JPanel panel9;
+	
+	/** The label4. */
 	private JLabel label4;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The members table. */
 	private JTable membersTable;
+	
+	/** The panel12. */
 	private JPanel panel12;
+	
+	/** The label9. */
 	private JLabel label9;
+	
+	/** The label6. */
 	private JLabel label6;
+	
+	/** The progress bar1. */
 	private JProgressBar progressBar1;
+	
+	/** The panel6. */
 	private JPanel panel6;
+	
+	/** The button1. */
 	private JButton button1;
+	
+	/** The panel13. */
 	private JPanel panel13;
+	
+	/** The panel14. */
 	private JPanel panel14;
+	
+	/** The label7. */
 	private JLabel label7;
+	
+	/** The scroll pane3. */
 	private JScrollPane scrollPane3;
+	
+	/** The list3. */
 	private JList list3;
+	
+	/** The panel15. */
 	private JPanel panel15;
+	
+	/** The label10. */
 	private JLabel label10;
+	
+	/** The panel3. */
 	private JPanel panel3;
+	
+	/** The button6. */
 	private JButton button6;
+	
+	/** The p bar w2. */
 	private JProgressBar pBarW2;
 
 	// JFormDesigner - End of variables declaration //GEN-END:variables
+	/**
+	 * The Class MembersWorker.
+	 */
 	class MembersWorker extends SwingWorker<ArrayList<PartitionMember>, PartitionMember> {
 
+		/**
+		 * Instantiates a new members worker.
+		 */
 		public MembersWorker() {
 			super();
 			while (tableModel.getRowCount() > 0) {
@@ -827,6 +1015,9 @@ public class PartitionDetailsPanel extends JPanel {
 			}
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.SwingWorker#doInBackground()
+		 */
 		@Override
 		protected ArrayList<PartitionMember> doInBackground() throws Exception {
 			I_TermFactory termFactory = Terms.get();
@@ -844,6 +1035,9 @@ public class PartitionDetailsPanel extends JPanel {
 			return result;
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.SwingWorker#process(java.util.List)
+		 */
 		protected void process(java.util.List<PartitionMember> chunks) {
 			for (PartitionMember member : chunks) {
 				tableModel.addRow(new Object[] { member });
@@ -851,6 +1045,9 @@ public class PartitionDetailsPanel extends JPanel {
 
 		};
 
+		/* (non-Javadoc)
+		 * @see javax.swing.SwingWorker#done()
+		 */
 		@Override
 		public void done() {
 			ArrayList<PartitionMember> inboxItems = null;
@@ -863,17 +1060,39 @@ public class PartitionDetailsPanel extends JPanel {
 		}
 	};
 
+	/**
+	 * The listener interface for receiving progress events.
+	 * The class that is interested in processing a progress
+	 * event implements this interface, and the object created
+	 * with that class is registered with a component using the
+	 * component's <code>addProgressListener<code> method. When
+	 * the progress event occurs, that object's appropriate
+	 * method is invoked.
+	 *
+	 * @see ProgressEvent
+	 */
 	class ProgressListener implements PropertyChangeListener {
 		// Prevent creation without providing a progress bar.
+		/**
+		 * Instantiates a new progress listener.
+		 */
 		private ProgressListener() {
 		}
 
+		/**
+		 * Instantiates a new progress listener.
+		 *
+		 * @param progressBar the progress bar
+		 */
 		public ProgressListener(JProgressBar progressBar) {
 			this.progressBar = progressBar;
 			this.progressBar.setVisible(true);
 			this.progressBar.setIndeterminate(true);
 		}
 
+		/* (non-Javadoc)
+		 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+		 */
 		public void propertyChange(PropertyChangeEvent evt) {
 			if (evt.getNewValue().equals(SwingWorker.StateValue.DONE)) {
 				progressBar.setIndeterminate(false);
@@ -881,6 +1100,7 @@ public class PartitionDetailsPanel extends JPanel {
 			}
 		}
 
+		/** The progress bar. */
 		private JProgressBar progressBar;
 	}
 }

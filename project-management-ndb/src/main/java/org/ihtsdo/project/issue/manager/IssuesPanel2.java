@@ -60,31 +60,46 @@ public class IssuesPanel2 extends JPanel {
 	/** The debug. */
 	private boolean debug=true;
 
+	/** The txt comp id. */
 	private String txtCompId;
 
+	/** The txt comp name. */
 	private String txtCompName;
 
+	/** The project id. */
 	private int projectId;
 
+	/** The ir. */
 	private IssueRepository ir;
 
+	/** The site user name. */
 	private String siteUserName;
 
+	/** The site user password. */
 	private String siteUserPassword;
 	
 	/**
 	 * Instantiates a new issues panel.
-	 * 
-	 * @throws Exception the exception
+	 *
 	 */
 	public IssuesPanel2() {
 		initComponents();
 	}
 	
+	/**
+	 * Gets the issue title.
+	 *
+	 * @return the issue title
+	 */
 	public String getIssueTitle(){
 		return txtTitle.getText();
 	}
 	
+	/**
+	 * Gets the issue description.
+	 *
+	 * @return the issue description
+	 */
 	public String getIssueDescription(){
 		return txtDesc.getText();
 	}
@@ -159,14 +174,31 @@ public class IssuesPanel2 extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The label10. */
 	private JLabel label10;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The txt title. */
 	private JTextField txtTitle;
+	
+	/** The label9. */
 	private JLabel label9;
+	
+	/** The scroll pane2. */
 	private JScrollPane scrollPane2;
+	
+	/** The txt desc. */
 	private JTextArea txtDesc;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

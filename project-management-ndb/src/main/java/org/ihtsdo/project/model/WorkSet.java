@@ -72,6 +72,12 @@ public class WorkSet extends WorkflowRefset implements Serializable{
 		this.projectUUID = projectUUID;
 	}
 
+	/**
+	 * Instantiates a new work set.
+	 *
+	 * @param name the name
+	 * @param projectUUID the project uuid
+	 */
 	public WorkSet(String name, UUID projectUUID) {
 		super();
 		this.name = name;
@@ -154,11 +160,10 @@ public class WorkSet extends WorkflowRefset implements Serializable{
 
 	/**
 	 * Gets the project.
-	 * 
+	 *
 	 * @param config the config
-	 * 
 	 * @return the project
-	 * @throws Exception 
+	 * @throws Exception the exception
 	 */
 	public I_TerminologyProject getProject(I_ConfigAceFrame config) throws Exception {
 		I_TerminologyProject project = null;
@@ -196,10 +201,10 @@ public class WorkSet extends WorkflowRefset implements Serializable{
 
 	/**
 	 * Gets the work set members.
-	 * 
+	 *
 	 * @return the work set members
-	 * @throws IOException 
-	 * @throws TerminologyException 
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	public List<WorkSetMember> getWorkSetMembers() throws TerminologyException, IOException {
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
@@ -222,14 +227,37 @@ public class WorkSet extends WorkflowRefset implements Serializable{
 		return this.name;
 	}
 
+	/**
+	 * Gets the source refset.
+	 *
+	 * @return the source refset
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws Exception the exception
+	 */
 	public I_GetConceptData getSourceRefset() throws TerminologyException, IOException, Exception {
 		return TerminologyProjectDAO.getSourceRefsetForWorkSet(this, Terms.get().getActiveAceFrameConfig());
 	}
 
+	/**
+	 * Sets the source refset.
+	 *
+	 * @param refset the new source refset
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public void setSourceRefset(I_GetConceptData refset) throws TerminologyException, IOException {
 		TerminologyProjectDAO.setSourceRefset(this, refset, Terms.get().getActiveAceFrameConfig());
 	}
 
+	/**
+	 * Checks for member.
+	 *
+	 * @param concept the concept
+	 * @return true, if successful
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public boolean hasMember(I_GetConceptData concept) throws TerminologyException, IOException {
 		boolean hasMember = false;
 		Collection<? extends RefexChronicleBI<?>> members = concept.getAnnotations();
@@ -243,22 +271,56 @@ public class WorkSet extends WorkflowRefset implements Serializable{
 		return hasMember;
 	}
 
+	/**
+	 * Gets the partition schemes.
+	 *
+	 * @param config the config
+	 * @return the partition schemes
+	 */
 	public List<PartitionScheme> getPartitionSchemes(I_ConfigAceFrame config) {
 		return TerminologyProjectDAO.getAllPartitionSchemesForRefsetConcept(this.getConcept(), config);
 	}
 
+	/**
+	 * Sync.
+	 *
+	 * @param config the config
+	 * @param activity the activity
+	 * @throws Exception the exception
+	 */
 	public void sync(I_ConfigAceFrame config, I_ShowActivity activity) throws Exception {
 		TerminologyProjectDAO.syncWorksetWithRefsetSpec(this, config, activity);
 	}
 
+	/**
+	 * Adds the refset as exclusion.
+	 *
+	 * @param refset the refset
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public void addRefsetAsExclusion(I_GetConceptData refset) throws TerminologyException, IOException {
 		TerminologyProjectDAO.addRefsetAsExclusion(this, refset, Terms.get().getActiveAceFrameConfig());
 	}
 
+	/**
+	 * Removes the refset as exclusion.
+	 *
+	 * @param refset the refset
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public void removeRefsetAsExclusion(I_GetConceptData refset) throws TerminologyException, IOException {
 		TerminologyProjectDAO.removeRefsetAsExclusion(this, refset, Terms.get().getActiveAceFrameConfig());
 	}
 
+	/**
+	 * Gets the exclusion refsets.
+	 *
+	 * @return the exclusion refsets
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public List<I_GetConceptData> getExclusionRefsets() throws TerminologyException, IOException {
 		return TerminologyProjectDAO.getExclusionRefsetsForWorkSet(this, Terms.get().getActiveAceFrameConfig());
 	}

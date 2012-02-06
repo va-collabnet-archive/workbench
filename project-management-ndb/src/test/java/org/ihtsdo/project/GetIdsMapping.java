@@ -82,12 +82,22 @@ public class GetIdsMapping extends TestCase {
 	/** The allowed statuses with retired. */
 	I_IntSet allowedStatusesWithRetired;
 
+	/** The project. */
 	TranslationProject project = null;
 
+	/** The writer. */
 	PrintWriter writer;
+	
+	/** The snomed int id. */
 	int snomedIntId;
+	
+	/** The inferred int id. */
 	int inferredIntId;
+	
+	/** The stated int id. */
 	int statedIntId;
+	
+	/** The counter. */
 	int counter;
 
 	/* (non-Javadoc)
@@ -114,6 +124,9 @@ public class GetIdsMapping extends TestCase {
 
 	}
 
+	/**
+	 * Test iterate.
+	 */
 	public void testIterate() {
 		try {
 			OutputStream outputStream = new FileOutputStream("ids-mapping.txt");
@@ -125,18 +138,30 @@ public class GetIdsMapping extends TestCase {
 		}
 	}
 
+	/**
+	 * The Class IdExtractorProcessor.
+	 */
 	private class IdExtractorProcessor implements ProcessUnfetchedConceptDataBI {
 
+		/* (non-Javadoc)
+		 * @see org.ihtsdo.tk.api.ContinuationTrackerBI#continueWork()
+		 */
 		@Override
 		public boolean continueWork() {
 			return true;
 		}
 
+		/* (non-Javadoc)
+		 * @see org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI#getNidSet()
+		 */
 		@Override
 		public NidBitSetBI getNidSet() throws IOException {
 			return Ts.get().getAllConceptNids();
 		}
 
+		/* (non-Javadoc)
+		 * @see org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI#processUnfetchedConceptData(int, org.ihtsdo.tk.api.ConceptFetcherBI)
+		 */
 		@Override
 		public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fetcher)
 		throws Exception {
@@ -152,6 +177,12 @@ public class GetIdsMapping extends TestCase {
 		}
 	}
 
+	/**
+	 * Write id.
+	 *
+	 * @param component the component
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	private void writeId (ComponentBI component) throws IOException {
 		Long sctid = null;
 		if (component.getAllIds() != null) {
@@ -186,6 +217,11 @@ public class GetIdsMapping extends TestCase {
 		}
 	}
 
+	/**
+	 * Gets the test config.
+	 *
+	 * @return the test config
+	 */
 	private I_ConfigAceFrame getTestConfig() {
 		I_ConfigAceFrame config = null;
 		try {
@@ -230,6 +266,13 @@ public class GetIdsMapping extends TestCase {
 	}
 
 	// If targetLocation does not exist, it will be created.
+	/**
+	 * Copy directory.
+	 *
+	 * @param sourceLocation the source location
+	 * @param targetLocation the target location
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public void copyDirectory(File sourceLocation , File targetLocation)
 	throws IOException {
 
@@ -259,6 +302,12 @@ public class GetIdsMapping extends TestCase {
 		}
 	}
 
+	/**
+	 * Delete directory.
+	 *
+	 * @param path the path
+	 * @return true, if successful
+	 */
 	public boolean deleteDirectory(File path) {
 		if( path.exists() ) {
 			File[] files = path.listFiles();
@@ -274,6 +323,11 @@ public class GetIdsMapping extends TestCase {
 		return( path.delete() );
 	}
 
+	/**
+	 * Sleep.
+	 *
+	 * @param n the n
+	 */
 	public static void sleep(int n){
 		long t0, t1;
 		t0 =  System.currentTimeMillis();
@@ -283,6 +337,12 @@ public class GetIdsMapping extends TestCase {
 		while ((t1 - t0) < (n * 1000));
 	}
 
+	/**
+	 * Gets the business process.
+	 *
+	 * @param f the f
+	 * @return the business process
+	 */
 	private static BusinessProcess getBusinessProcess(File f) {
 		ObjectInputStream in;
 		try {

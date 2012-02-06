@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Tue Aug 24 15:52:40 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.project.panel;
@@ -55,17 +68,35 @@ import org.ihtsdo.project.util.IconUtilities;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
+ * The Class RefsetViewerPanel.
+ *
  * @author Guillermo Reynoso
  */
 public class RefsetViewerPanel extends JPanel {
 
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -8346611923623504647L;
+	
+	/** The refset list model. */
 	private DefaultListModel refsetListModel;
+	
+	/** The concept dn d handler. */
 	private ObjectTransferHandler conceptDnDHandler;
+	
+	/** The refset. */
 	private I_GetConceptData refset;
+	
+	/** The config. */
 	private I_ConfigAceFrame config;
+	
+	/** The refset table model. */
 	private DefaultTableModel refsetTableModel;
 
+	/**
+	 * Instantiates a new refset viewer panel.
+	 *
+	 * @param config the config
+	 */
 	public RefsetViewerPanel(I_ConfigAceFrame config) {
 		initComponents();
 		initCustomComponents();
@@ -75,6 +106,9 @@ public class RefsetViewerPanel extends JPanel {
 		this.config = config;
 	}
 
+	/**
+	 * Inits the custom components.
+	 */
 	private void initCustomComponents() {
 		progressBar.setVisible(false);
 
@@ -111,6 +145,9 @@ public class RefsetViewerPanel extends JPanel {
 
 	}
 
+	/**
+	 * Update refset detail table.
+	 */
 	private void updateRefsetDetailTable() {
 		I_TermFactory tf = Terms.get();
 		try {
@@ -231,6 +268,11 @@ public class RefsetViewerPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Close button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void closeButtonActionPerformed(ActionEvent e) {
 		try {
 			TranslationHelperPanel thp = PanelHelperFactory.getTranslationHelperPanel();
@@ -250,6 +292,11 @@ public class RefsetViewerPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Label2 mouse clicked.
+	 *
+	 * @param e the e
+	 */
 	private void label2MouseClicked(MouseEvent e) {
 		try {
 			HelpApi.openHelpForComponent("REFSET_VIEWER");
@@ -260,6 +307,9 @@ public class RefsetViewerPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -354,15 +404,34 @@ public class RefsetViewerPanel extends JPanel {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
+	/** The scroll pane2. */
 	private JScrollPane scrollPane2;
+	
+	/** The refset table. */
 	private JTable refsetTable;
+	
+	/** The action panel. */
 	private JPanel actionPanel;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The refset list. */
 	private JList refsetList;
+	
+	/** The cuantity lable. */
 	private JLabel cuantityLable;
+	
+	/** The close button. */
 	private JButton closeButton;
+	
+	/** The progress bar. */
 	private JProgressBar progressBar;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 }

@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.project;
 
 import java.util.ArrayList;
@@ -14,8 +30,18 @@ import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
+/**
+ * The Class TranslationSearchHelper.
+ */
 public class TranslationSearchHelper {
 
+	/**
+	 * Gets the list items for project.
+	 *
+	 * @param project the project
+	 * @return the list items for project
+	 * @throws Exception the exception
+	 */
 	public static List<ListItemBean> getListItemsForProject(TranslationProject project) throws Exception {
 		I_TermFactory termFactory = Terms.get();
 		I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();

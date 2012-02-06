@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.project.workflow.api;
 
 import java.io.IOException;
@@ -32,14 +48,29 @@ import org.ihtsdo.project.workflow.model.WorklistPage;
 import org.ihtsdo.project.workflow.tag.InboxTag;
 import org.ihtsdo.project.workflow.tag.TagManager;
 
+/**
+ * The Class WorkflowSearcher.
+ */
 public class WorkflowSearcher {
 
+	/** The tf. */
 	private static I_TermFactory tf;
+	
+	/** The filters. */
 	private List<WfSearchFilterBI> filters;
+	
+	/** The page. */
 	private WorklistPage page;
+	
+	/** The config. */
 	private I_ConfigAceFrame config;
+	
+	/** The provider. */
 	private WfComponentProvider provider;
 
+	/**
+	 * Instantiates a new workflow searcher.
+	 */
 	public WorkflowSearcher() {
 		super();
 		try {
@@ -55,6 +86,13 @@ public class WorkflowSearcher {
 		}
 	}
 
+	/**
+	 * Gets the all worklists count.
+	 *
+	 * @return the all worklists count
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public HashMap<WorkList, Integer> getAllWorklistsCount() throws TerminologyException, IOException {
 		HashMap<WorkList, Integer> result = new HashMap<WorkList, Integer>();
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
@@ -72,6 +110,13 @@ public class WorkflowSearcher {
 		return result;
 	}
 
+	/**
+	 * Gets the worklist members count by state.
+	 *
+	 * @return the worklist members count by state
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	public HashMap<WfState, Integer> getWorklistMembersCountByState() throws IOException, TerminologyException {
 		HashMap<WfState, Integer> result = new HashMap<WfState, Integer>();
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
@@ -98,6 +143,14 @@ public class WorkflowSearcher {
 		return result;
 	}
 
+	/**
+	 * Gets the all wrokflow instances for worklist.
+	 *
+	 * @param wlUuid the wl uuid
+	 * @return the all wrokflow instances for worklist
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public List<WfInstance> getAllWrokflowInstancesForWorklist(List<UUID> wlUuid) throws TerminologyException, IOException {
 		List<WorkList> worklist = getWorklistForUUID(wlUuid);
 		List<WfInstance> result = new ArrayList<WfInstance>();
@@ -105,6 +158,14 @@ public class WorkflowSearcher {
 		return result;
 	}
 
+	/**
+	 * Gets the worklist for uuid.
+	 *
+	 * @param wlUuids the wl uuids
+	 * @return the worklist for uuid
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	private List<WorkList> getWorklistForUUID(List<UUID> wlUuids) throws TerminologyException, IOException {
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 		List<I_TerminologyProject> projects = TerminologyProjectDAO.getAllProjects(config);
@@ -126,6 +187,13 @@ public class WorkflowSearcher {
 		return worklist;
 	}
 
+	/**
+	 * Gets the all wrokflow instances.
+	 *
+	 * @return the all wrokflow instances
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public List<WfInstance> getAllWrokflowInstances() throws TerminologyException, IOException {
 		List<WfInstance> result = new ArrayList<WfInstance>();
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
@@ -140,6 +208,14 @@ public class WorkflowSearcher {
 		return result;
 	}
 
+	/**
+	 * Convert wl members.
+	 *
+	 * @param worklist the worklist
+	 * @param result the result
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	private void convertWlMembers(List<WorkList> worklist, List<WfInstance> result) throws TerminologyException, IOException {
 		for (final WorkList wl : worklist) {
 			SwingUtilities.invokeLater(new Runnable() {
@@ -160,6 +236,12 @@ public class WorkflowSearcher {
 		}
 	}
 
+	/**
+	 * Gets the user worklists.
+	 *
+	 * @param user the user
+	 * @return the user worklists
+	 */
 	public HashMap<WorkList, Integer> getUserWorklists(WfUser user) {
 		HashMap<WorkList, Integer> result = new HashMap<WorkList, Integer>();
 		I_ConfigAceFrame config;
@@ -195,10 +277,9 @@ public class WorkflowSearcher {
 	 * This is the union of getUserWorklists and getUserStatusList.. <BR>
 	 * it takes advantage of the worklist members loop to calculate wl size and
 	 * states size.
-	 * 
-	 * @param user
-	 * @param tagsContent
-	 * @return
+	 *
+	 * @param user the user
+	 * @return the count by worklist and state
 	 */
 	public HashMap<Object, Integer> getCountByWorklistAndState(WfUser user) {
 		HashMap<Object, Integer> result = new HashMap<Object, Integer>();
@@ -262,6 +343,13 @@ public class WorkflowSearcher {
 		return result;
 	}
 
+	/**
+	 * Gets the wl members size.
+	 *
+	 * @param workList the work list
+	 * @param user the user
+	 * @return the wl members size
+	 */
 	private Integer getWlMembersSize(WorkList workList, WfUser user) {
 		List<WorkListMember> allWorkListMembers = TerminologyProjectDAO.getAllWorkListMembers(workList, config);
 		int size = 0;
@@ -273,6 +361,12 @@ public class WorkflowSearcher {
 		return size;
 	}
 
+	/**
+	 * Gets the user status list.
+	 *
+	 * @param user the user
+	 * @return the user status list
+	 */
 	public HashMap<WfState, Integer> getUserStatusList(WfUser user) {
 		HashMap<WfState, Integer> result = new HashMap<WfState, Integer>();
 		I_ConfigAceFrame config;
@@ -319,6 +413,9 @@ public class WorkflowSearcher {
 		return result;
 	}
 
+	/**
+	 * Random modify wl members.
+	 */
 	public static void randomModifyWlMembers() {
 		I_ConfigAceFrame config;
 		try {
@@ -356,6 +453,14 @@ public class WorkflowSearcher {
 		}
 	}
 
+	/**
+	 * Search wf instances.
+	 *
+	 * @param collection the collection
+	 * @return the list
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public List<WfInstance> searchWfInstances(Collection<WfSearchFilterBI> collection) throws TerminologyException, IOException {
 
 		List<WfInstance> candidates = new ArrayList<WfInstance>();

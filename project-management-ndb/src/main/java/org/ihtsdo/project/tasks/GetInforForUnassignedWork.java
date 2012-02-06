@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Thu Aug 19 18:09:22 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.project.tasks;
@@ -25,19 +38,29 @@ import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
 
 /**
+ * The Class GetInforForUnassignedWork.
+ *
  * @author Guillermo Reynoso
  */
 public class GetInforForUnassignedWork extends JPanel {
 	
-	/**
-	 * 
-	 */
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
+	
+	/** The config. */
 	private I_ConfigAceFrame config;
 	
+	/** The selected project. */
 	private I_TerminologyProject selectedProject = null;
+	
+	/** The selected work list. */
 	private WorkList selectedWorkList = null;
 	
+	/**
+	 * Instantiates a new gets the infor for unassigned work.
+	 *
+	 * @param config the config
+	 */
 	public GetInforForUnassignedWork(I_ConfigAceFrame config) {
 		this.config = config;
 		initComponents();
@@ -48,6 +71,9 @@ public class GetInforForUnassignedWork extends JPanel {
 		
 	}
 	
+	/**
+	 * Update work lists combo.
+	 */
 	private void updateWorkListsCombo() {
 		nacWorkListCombo.removeAllItems();
 		if (selectedProject!=null){
@@ -90,19 +116,37 @@ public class GetInforForUnassignedWork extends JPanel {
 		}
 	}
 
+	/**
+	 * Combo box1 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void comboBox1ActionPerformed(ActionEvent e) {
 		//updateWorkListsCombo();
 	}
 
+	/**
+	 * Project combo item state changed.
+	 *
+	 * @param e the e
+	 */
 	private void projectComboItemStateChanged(ItemEvent e) {
 		selectedProject = (I_TerminologyProject) projectCombo.getSelectedItem();
 		updateWorkListsCombo();
 	}
 
+	/**
+	 * Nac work list combo item state changed.
+	 *
+	 * @param e the e
+	 */
 	private void nacWorkListComboItemStateChanged(ItemEvent e) {
 		selectedWorkList = (WorkList) nacWorkListCombo.getSelectedItem();
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		label1 = new JLabel();
@@ -164,25 +208,54 @@ public class GetInforForUnassignedWork extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The project combo. */
 	private JComboBox projectCombo;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The nac work list combo. */
 	private JComboBox nacWorkListCombo;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 
+	/**
+	 * Gets the selected project.
+	 *
+	 * @return the selected project
+	 */
 	public I_TerminologyProject getSelectedProject() {
 		return selectedProject;
 	}
 
+	/**
+	 * Sets the selected project.
+	 *
+	 * @param selectedProject the new selected project
+	 */
 	public void setSelectedProject(I_TerminologyProject selectedProject) {
 		this.selectedProject = selectedProject;
 	}
 
+	/**
+	 * Gets the selected work list.
+	 *
+	 * @return the selected work list
+	 */
 	public WorkList getSelectedWorkList() {
 		return selectedWorkList;
 	}
 
+	/**
+	 * Sets the selected work list.
+	 *
+	 * @param selectedWorkList the new selected work list
+	 */
 	public void setSelectedWorkList(WorkList selectedWorkList) {
 		this.selectedWorkList = selectedWorkList;
 	}

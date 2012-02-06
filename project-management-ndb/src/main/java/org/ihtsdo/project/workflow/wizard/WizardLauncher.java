@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.project.workflow.wizard;
 
 import java.awt.Dialog.ModalityType;
@@ -19,8 +35,16 @@ import org.ihtsdo.wizard.I_notifyPanelChange;
 import org.ihtsdo.wizard.I_wizardResult;
 import org.ihtsdo.wizard.WizardFrame;
 
+/**
+ * The Class WizardLauncher.
+ */
 public class WizardLauncher {
 
+	/**
+	 * Launch wf wizard.
+	 *
+	 * @param users the users
+	 */
 	public void launchWfWizard(List<WfUser> users){
 		Result resultWizard = new Result();
 		Notifier notifier = new Notifier(users);
@@ -49,6 +73,9 @@ public class WizardLauncher {
 
 	}
 
+	/**
+	 * Launch wf wizard.
+	 */
 	public void launchWfWizard(){
 		Result resultWizard = new Result();
 		
@@ -82,9 +109,18 @@ public class WizardLauncher {
 		ww.setVisible(true);
 
 	}
+	
+	/** The result. */
 	public HashMap<String, Object> result;
+	
+	/**
+	 * The Class Result.
+	 */
 	class Result implements I_wizardResult{
 
+		/* (non-Javadoc)
+		 * @see org.ihtsdo.wizard.I_wizardResult#setResultMap(java.util.HashMap)
+		 */
 		@Override
 		public void setResultMap(HashMap<String, Object> resultMap) {
 			result=resultMap;
@@ -92,12 +128,27 @@ public class WizardLauncher {
 		}
 
 	}
+	
+	/**
+	 * The Class Notifier.
+	 */
 	class Notifier implements I_notifyPanelChange{
 
+		/** The users. */
 		private List<WfUser> users;
+		
+		/**
+		 * Instantiates a new notifier.
+		 *
+		 * @param users the users
+		 */
 		public Notifier(List<WfUser> users){
 			this.users=users;
 		}
+		
+		/* (non-Javadoc)
+		 * @see org.ihtsdo.wizard.I_notifyPanelChange#notifyThis(org.ihtsdo.wizard.WizardFrame, int, java.util.HashMap)
+		 */
 		@Override
 		public void notifyThis(WizardFrame wizardFrame, int index,HashMap<String,Object> mapCollector) {
 			if (index==2){
@@ -121,6 +172,12 @@ public class WizardLauncher {
 		}
 
 	}
+	
+	/**
+	 * Gets the result.
+	 *
+	 * @return the result
+	 */
 	public HashMap<String, Object> getResult() {
 		return result;
 	}

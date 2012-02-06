@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Wed Sep 01 18:19:09 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.project.panel.details;
@@ -13,13 +26,24 @@ import org.ihtsdo.issue.issuerepository.IssueRepository;
 import org.ihtsdo.issue.manager.IssueRepositoryDAO;
 
 /**
+ * The Class CreateIssuerepositoryPanel.
+ *
  * @author Guillermo Reynoso
  */
 public class CreateIssuerepositoryPanel extends JPanel {
+	
+	/**
+	 * Instantiates a new creates the issuerepository panel.
+	 */
 	public CreateIssuerepositoryPanel() {
 		initComponents();
 	}
 
+	/**
+	 * Button1 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button1ActionPerformed(ActionEvent e) {
 		try {
 			if (textField1.getText() == null || textField1.getText().isEmpty()) {
@@ -52,16 +76,26 @@ public class CreateIssuerepositoryPanel extends JPanel {
 		close();
 	}
 
+	/**
+	 * Button2 action performed.
+	 */
 	private void button2ActionPerformed() {
 			close();
 	}
 	
+	/**
+	 * Close.
+	 */
 	private void close(){
 
 		Window w=SwingUtilities.getWindowAncestor(this);
 		w.setVisible(false);
 		w.dispose();
 	}
+	
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		panel1 = new JPanel();
@@ -188,19 +222,46 @@ public class CreateIssuerepositoryPanel extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The h spacer1. */
 	private JPanel hSpacer1;
+	
+	/** The panel3. */
 	private JPanel panel3;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The text field1. */
 	private JTextField textField1;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The text field2. */
 	private JTextField textField2;
+	
+	/** The label4. */
 	private JLabel label4;
+	
+	/** The text field3. */
 	private JTextField textField3;
+	
+	/** The h spacer2. */
 	private JPanel hSpacer2;
+	
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The button2. */
 	private JButton button2;
+	
+	/** The button1. */
 	private JButton button1;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

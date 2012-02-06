@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Wed Mar 24 12:49:39 GMT-04:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.project.panel;
@@ -37,18 +50,33 @@ import org.ihtsdo.project.panel.dnd.ObjectTransferHandler;
 import org.ihtsdo.project.panel.dnd.RemovePartitionMember;
 
 /**
+ * The Class MiniPartitionDetailsPanel.
+ *
  * @author Guillermo Reynoso
  */
 public class MiniPartitionDetailsPanel extends JPanel {
-	/**
-	 * 
-	 */
+	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
+	
+	/** The partition. */
 	private Partition partition;
+	
+	/** The config. */
 	private I_ConfigAceFrame config;
+	
+	/** The list1 model. */
 	private DefaultListModel list1Model;
+	
+	/** The Concept dn d handler. */
 	private ObjectTransferHandler ConceptDnDHandler;
 	
+	/**
+	 * Instantiates a new mini partition details panel.
+	 *
+	 * @param partition the partition
+	 * @param config the config
+	 */
 	public MiniPartitionDetailsPanel(Partition partition, I_ConfigAceFrame config) {
 		initComponents();
 		this.partition = partition;
@@ -68,8 +96,22 @@ public class MiniPartitionDetailsPanel extends JPanel {
 	
 	}
 	
+	/**
+	 * The listener interface for receiving listData events.
+	 * The class that is interested in processing a listData
+	 * event implements this interface, and the object created
+	 * with that class is registered with a component using the
+	 * component's <code>addlistDataListener<code> method. When
+	 * the listData event occurs, that object's appropriate
+	 * method is invoked.
+	 *
+	 * @see listDataEvent
+	 */
 	class listDataListener implements ListDataListener{
 
+		/* (non-Javadoc)
+		 * @see javax.swing.event.ListDataListener#contentsChanged(javax.swing.event.ListDataEvent)
+		 */
 		@Override
 		public void contentsChanged(ListDataEvent e) {
 			label3.setText("(" + ((DefaultListModel)e.getSource()).size() + ")");
@@ -77,6 +119,9 @@ public class MiniPartitionDetailsPanel extends JPanel {
 			
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.event.ListDataListener#intervalAdded(javax.swing.event.ListDataEvent)
+		 */
 		@Override
 		public void intervalAdded(ListDataEvent e) {
 			label3.setText("(" + ((DefaultListModel)e.getSource()).size() + ")");
@@ -84,6 +129,9 @@ public class MiniPartitionDetailsPanel extends JPanel {
 			
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.event.ListDataListener#intervalRemoved(javax.swing.event.ListDataEvent)
+		 */
 		@Override
 		public void intervalRemoved(ListDataEvent e) {
 			label3.setText("(" + ((DefaultListModel)e.getSource()).size() + ")");
@@ -91,6 +139,9 @@ public class MiniPartitionDetailsPanel extends JPanel {
 			
 		}}
 	
+	/**
+	 * Update list1 content.
+	 */
 	private void updateList1Content() {
 		list1Model = new DefaultListModel();
 		List<PartitionMember> members = partition.getPartitionMembers();
@@ -110,10 +161,18 @@ public class MiniPartitionDetailsPanel extends JPanel {
 		list1.validate();
 	}
 
+	/**
+	 * Check box1 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void checkBox1ActionPerformed(ActionEvent e) {
 		panel3.setVisible(!panel3.isVisible());
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		panel1 = new JPanel();
@@ -214,14 +273,31 @@ public class MiniPartitionDetailsPanel extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The check box1. */
 	private JCheckBox checkBox1;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The panel3. */
 	private JPanel panel3;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The list1. */
 	private JList list1;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

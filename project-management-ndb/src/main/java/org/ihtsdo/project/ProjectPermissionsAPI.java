@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.project;
 
 import java.io.IOException;
@@ -25,23 +41,50 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
+/**
+ * The Class ProjectPermissionsAPI.
+ */
 public class ProjectPermissionsAPI {
 
+	/** The config. */
 	private I_ConfigAceFrame config;
 
+	/**
+	 * Instantiates a new project permissions api.
+	 *
+	 * @param config the config
+	 */
 	public ProjectPermissionsAPI(I_ConfigAceFrame config) {
 		super();
 		this.config = config;
 	}
 
+	/**
+	 * Gets the config.
+	 *
+	 * @return the config
+	 */
 	public I_ConfigAceFrame getConfig() {
 		return config;
 	}
 
+	/**
+	 * Sets the config.
+	 *
+	 * @param config the new config
+	 */
 	public void setConfig(I_ConfigAceFrame config) {
 		this.config = config;
 	}
 
+	/**
+	 * Adds the permission.
+	 *
+	 * @param user the user
+	 * @param permission the permission
+	 * @param domain the domain
+	 * @throws Exception the exception
+	 */
 	public void addPermission(I_GetConceptData user, I_GetConceptData permission, I_GetConceptData domain
 	) throws Exception {
 		I_TermFactory tf = Terms.get();
@@ -55,6 +98,14 @@ public class ProjectPermissionsAPI {
 		tf.commit();
 	}
 
+	/**
+	 * Removes the permission.
+	 *
+	 * @param user the user
+	 * @param permission the permission
+	 * @param domain the domain
+	 * @throws Exception the exception
+	 */
 	public void removePermission(I_GetConceptData user, I_GetConceptData permission, I_GetConceptData domain
 	) throws Exception {
 		I_IntSet allowedTypes = Terms.get().newIntSet();
@@ -72,6 +123,12 @@ public class ProjectPermissionsAPI {
 
 	}
 
+	/**
+	 * Removes the permission.
+	 *
+	 * @param relationship the relationship
+	 * @throws Exception the exception
+	 */
 	public void removePermission(I_RelTuple relationship) throws Exception {
 		I_TermFactory tf = Terms.get();
 		I_GetConceptData concept = tf.getConcept(relationship.getC1Id());
@@ -88,6 +145,16 @@ public class ProjectPermissionsAPI {
 
 	}
 
+	/**
+	 * Check permission for hierarchy.
+	 *
+	 * @param user the user
+	 * @param target the target
+	 * @param permission the permission
+	 * @return true, if successful
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	public boolean checkPermissionForHierarchy(I_GetConceptData user, I_GetConceptData target, 
 			I_GetConceptData permission) throws IOException, TerminologyException {
 		boolean permisionGranted = false;
@@ -120,6 +187,16 @@ public class ProjectPermissionsAPI {
 		return permisionGranted;
 	}
 
+	/**
+	 * Check permission for project.
+	 *
+	 * @param user the user
+	 * @param target the target
+	 * @param permission the permission
+	 * @return true, if successful
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	public boolean checkPermissionForProject(I_GetConceptData user, I_GetConceptData target, 
 			I_GetConceptData permission) throws IOException, TerminologyException {
 		boolean permisionGranted = false;
@@ -235,6 +312,15 @@ public class ProjectPermissionsAPI {
 		return permisionGranted;
 	}
 
+	/**
+	 * Gets the users for role.
+	 *
+	 * @param role the role
+	 * @param project the project
+	 * @return the users for role
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	public Set<I_GetConceptData> getUsersForRole(I_GetConceptData role, I_GetConceptData project
 	) throws IOException, TerminologyException {
 
@@ -282,6 +368,15 @@ public class ProjectPermissionsAPI {
 		return descendants;
 	}
 
+	/**
+	 * Gets the roles for user.
+	 *
+	 * @param user the user
+	 * @param project the project
+	 * @return the roles for user
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	public Set<I_GetConceptData> getRolesForUser(I_GetConceptData user, I_GetConceptData project
 	) throws IOException, TerminologyException {
 
@@ -298,6 +393,14 @@ public class ProjectPermissionsAPI {
 		return returnRoles;
 	}
 	
+	/**
+	 * Gets the permissions for user.
+	 *
+	 * @param user the user
+	 * @return the permissions for user
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	public Map<I_GetConceptData,I_GetConceptData> getPermissionsForUser(I_GetConceptData user
 	) throws IOException, TerminologyException {
 		
@@ -384,6 +487,11 @@ public class ProjectPermissionsAPI {
 		return validUsers;
 	}
 
+	/**
+	 * Gets the users inbox addresses.
+	 *
+	 * @return the users inbox addresses
+	 */
 	public Set<String> getUsersInboxAddresses() {
 		HashSet<String> inboxes = new HashSet<String>();
 		try {
@@ -431,6 +539,14 @@ public class ProjectPermissionsAPI {
 		}
 		return inboxes;
 	}
+	
+	/**
+	 * Gets the users inbox addresses for role.
+	 *
+	 * @param role the role
+	 * @param project the project
+	 * @return the users inbox addresses for role
+	 */
 	public Set<String> getUsersInboxAddressesForRole(I_GetConceptData role, I_GetConceptData project) {
 		HashSet<String> inboxes = new HashSet<String>();
 		try {
@@ -480,6 +596,12 @@ public class ProjectPermissionsAPI {
 		return inboxes;
 	}
 
+	/**
+	 * Checks if is active.
+	 *
+	 * @param statusId the status id
+	 * @return true, if is active
+	 */
 	public boolean isActive(int statusId) {
 		List<Integer> activeStatuses = new ArrayList<Integer>();
 		try {
@@ -495,6 +617,12 @@ public class ProjectPermissionsAPI {
 		return (activeStatuses.contains(statusId));
 	}
 
+	/**
+	 * Checks if is inactive.
+	 *
+	 * @param statusId the status id
+	 * @return true, if is inactive
+	 */
 	public boolean isInactive(int statusId) {
 		List<Integer> inactiveStatuses = new ArrayList<Integer>();
 		try {

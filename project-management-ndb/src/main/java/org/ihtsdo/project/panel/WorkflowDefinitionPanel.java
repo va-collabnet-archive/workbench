@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Mon Dec 12 17:59:02 GMT-03:00 2011
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.project.panel;
@@ -52,24 +65,52 @@ import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 
 /**
+ * The Class WorkflowDefinitionPanel.
+ *
  * @author Cesar Zamorano
  */
 @SuppressWarnings("serial")
 public class WorkflowDefinitionPanel extends JPanel {
 	
+	/** The current action. */
 	private WfAction currentAction;
+	
+	/** The actions. */
 	private HashMap<String,WfAction> actions;
+	
+	/** The drl files. */
 	private List<String> drlFiles;
+	
+	/** The xls files. */
 	private List<String> xlsFiles;
+	
+	/** The sel roles. */
 	private List<WfRole> selRoles;
+	
+	/** The sel states. */
 	private List<WfState> selStates;
+	
+	/** The roles. */
 	private HashMap<String,WfRole> roles;
+	
+	/** The states. */
 	private HashMap<String,WfState> states;
+	
+	/** The workflow definition file. */
 	private File workflowDefinitionFile;
+	
+	/** The selected action. */
 	private int selectedAction=-1;
+	
+	/** The active selection. */
 	private boolean activeSelection= false;
+	
+	/** The action name. */
 	private String actionName;
 	
+	/**
+	 * Instantiates a new workflow definition panel.
+	 */
 	public WorkflowDefinitionPanel() {
 		initComponents();
 		WfComponentProvider wp= new WfComponentProvider();
@@ -106,6 +147,11 @@ public class WorkflowDefinitionPanel extends JPanel {
 		consequenceComboBox.setEnabled(true);
 	}
 
+	/**
+	 * New button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void newButtonActionPerformed(ActionEvent e) {
 		if(removeButton.getText().equals("Remove")){
 			newButton.setText("Save");
@@ -175,6 +221,11 @@ public class WorkflowDefinitionPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Removes the button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void removeButtonActionPerformed(ActionEvent e) {
 		if(removeButton.getText().equals("Remove")){
 			int i=actionList.getSelectedIndex();
@@ -233,6 +284,11 @@ public class WorkflowDefinitionPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Xls browse button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void xlsBrowseButtonActionPerformed(ActionEvent e) {
 		File dir= new File(xlsTextField.getText().split(";")[0]);
 		JFileChooser fc;
@@ -253,6 +309,11 @@ public class WorkflowDefinitionPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Drl browse button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void drlBrowseButtonActionPerformed(ActionEvent e) {
 		File dir= new File(drlTextField.getText().split(";")[0]);
 		JFileChooser fc;
@@ -273,6 +334,11 @@ public class WorkflowDefinitionPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Business browse button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void businessBrowseButtonActionPerformed(ActionEvent e) {
 		File dir= new File(businessTextField.getText());
 		JFileChooser fc;
@@ -286,6 +352,11 @@ public class WorkflowDefinitionPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Check state.
+	 *
+	 * @param row the row
+	 */
 	protected void checkState(int row) {
 		boolean value= (Boolean) statesTable.getValueAt(row, 0);
 		UUID uuid = null;
@@ -301,6 +372,11 @@ public class WorkflowDefinitionPanel extends JPanel {
 			}
 	}
 
+	/**
+	 * Action list value changed.
+	 *
+	 * @param e the e
+	 */
 	private void actionListValueChanged(ListSelectionEvent e) {
 		if(actionList.getSelectedIndex()==-1) return;
 		if(newButton.getText().equals("New Action") && newButton.isEnabled()){
@@ -328,6 +404,11 @@ public class WorkflowDefinitionPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Save button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void saveButtonActionPerformed(ActionEvent e) {
 		if(removeButton.getText().equals("Cancel")){
 			JOptionPane.showMessageDialog(this, "Before save, please finish Action edition or creation.");
@@ -373,6 +454,11 @@ public class WorkflowDefinitionPanel extends JPanel {
 			JOptionPane.showMessageDialog(this, "Please write a name for the Workflow definition");
 	}
 
+	/**
+	 * Open button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void openButtonActionPerformed(ActionEvent e) {
 		JFileChooser fc;
 		if(workflowDefinitionFile==null)
@@ -399,6 +485,9 @@ public class WorkflowDefinitionPanel extends JPanel {
 	}
 	
 	
+	/**
+	 * Load file.
+	 */
 	private void loadFile() {
 		
 		WorkflowDefinition workflowDefinition = WorkflowDefinitionManager.readWfDefinition(workflowDefinitionFile.getName());
@@ -494,6 +583,11 @@ public class WorkflowDefinitionPanel extends JPanel {
 		businessBrowseButton.setEnabled(false);
 	}
 
+	/**
+	 * Close button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void closeButtonActionPerformed(ActionEvent e) {					//CLOSE
 		try {
 				AceFrameConfig config;
@@ -518,6 +612,11 @@ public class WorkflowDefinitionPanel extends JPanel {
 	}
 
 
+	/**
+	 * Cancel button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void cancelButtonActionPerformed(ActionEvent e) {
 		if(workflowDefinitionFile==null){
 			actions= new HashMap<String, WfAction>();
@@ -539,6 +638,11 @@ public class WorkflowDefinitionPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Edits the button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void editButtonActionPerformed(ActionEvent e) {
 		if(editButton.getText().equals("Edit")){
 			editButton.setText("Save");
@@ -601,6 +705,9 @@ public class WorkflowDefinitionPanel extends JPanel {
 
 	
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		panel8 = new JPanel();
@@ -1093,49 +1200,136 @@ public class WorkflowDefinitionPanel extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The panel8. */
 	private JPanel panel8;
+	
+	/** The label11. */
 	private JLabel label11;
+	
+	/** The workflow name text field. */
 	private JTextField workflowNameTextField;
+	
+	/** The open button. */
 	private JButton openButton;
+	
+	/** The separator1. */
 	private JSeparator separator1;
+	
+	/** The tabbed pane1. */
 	private JTabbedPane tabbedPane1;
+	
+	/** The panel9. */
 	private JPanel panel9;
+	
+	/** The scroll pane2. */
 	private JScrollPane scrollPane2;
+	
+	/** The roles table. */
 	private JTable rolesTable;
+	
+	/** The panel12. */
 	private JPanel panel12;
+	
+	/** The scroll pane3. */
 	private JScrollPane scrollPane3;
+	
+	/** The states table. */
 	private JTable statesTable;
+	
+	/** The panel10. */
 	private JPanel panel10;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The action list. */
 	private JList actionList;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The panel5. */
 	private JPanel panel5;
+	
+	/** The new button. */
 	private JButton newButton;
+	
+	/** The edit button. */
 	private JButton editButton;
+	
+	/** The remove button. */
 	private JButton removeButton;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The id text field. */
 	private JTextField idTextField;
+	
+	/** The label4. */
 	private JLabel label4;
+	
+	/** The name text field. */
 	private JTextField nameTextField;
+	
+	/** The label5. */
 	private JLabel label5;
+	
+	/** The consequence combo box. */
 	private JComboBox consequenceComboBox;
+	
+	/** The label6. */
 	private JLabel label6;
+	
+	/** The panel6. */
 	private JPanel panel6;
+	
+	/** The business text field. */
 	private JTextField businessTextField;
+	
+	/** The business browse button. */
 	private JButton businessBrowseButton;
+	
+	/** The panel11. */
 	private JPanel panel11;
+	
+	/** The panel3. */
 	private JPanel panel3;
+	
+	/** The label9. */
 	private JLabel label9;
+	
+	/** The xls text field. */
 	private JTextField xlsTextField;
+	
+	/** The xls browse button. */
 	private JButton xlsBrowseButton;
+	
+	/** The panel4. */
 	private JPanel panel4;
+	
+	/** The label10. */
 	private JLabel label10;
+	
+	/** The drl text field. */
 	private JTextField drlTextField;
+	
+	/** The drl browse button. */
 	private JButton drlBrowseButton;
+	
+	/** The separator2. */
 	private JSeparator separator2;
+	
+	/** The panel7. */
 	private JPanel panel7;
+	
+	/** The save button. */
 	private JButton saveButton;
+	
+	/** The cancel button. */
 	private JButton cancelButton;
+	
+	/** The close button. */
 	private JButton closeButton;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

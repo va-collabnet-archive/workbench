@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Thu Mar 18 10:50:52 GMT-04:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.project.panel;
@@ -58,16 +71,36 @@ import org.ihtsdo.project.panel.dnd.ObjectTransferHandler;
 import org.ihtsdo.project.util.IconUtilities;
 
 /**
+ * The Class RefsetPartitionerPanel.
+ *
  * @author Guillermo Reynoso
  */
 public class RefsetPartitionerPanel extends JPanel {
+	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
+	
+	/** The partition scheme. */
 	private PartitionScheme partitionScheme;
+	
+	/** The config. */
 	private I_ConfigAceFrame config;
+	
+	/** The list1 model. */
 	private DefaultListModel list1Model;
+	
+	/** The list1 display all. */
 	private boolean list1DisplayAll;
+	
+	/** The Concept dn d handler. */
 	ObjectTransferHandler ConceptDnDHandler ;
 
+	/**
+	 * Instantiates a new refset partitioner panel.
+	 *
+	 * @param partitionScheme the partition scheme
+	 * @param config the config
+	 */
 	public RefsetPartitionerPanel(PartitionScheme partitionScheme, I_ConfigAceFrame config) {
 		initComponents();
 		I_TermFactory termFactory = Terms.get();
@@ -123,6 +156,9 @@ public class RefsetPartitionerPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Update panel7 content.
+	 */
 	void updatePanel7Content() {
 		for (Component component : panel7.getComponents()) {
 			panel7.remove(component);
@@ -152,8 +188,22 @@ public class RefsetPartitionerPanel extends JPanel {
 	}
 
 	
+	/**
+	 * The listener interface for receiving listData events.
+	 * The class that is interested in processing a listData
+	 * event implements this interface, and the object created
+	 * with that class is registered with a component using the
+	 * component's <code>addlistDataListener<code> method. When
+	 * the listData event occurs, that object's appropriate
+	 * method is invoked.
+	 *
+	 * @see listDataEvent
+	 */
 	class listDataListener implements ListDataListener{
 
+		/* (non-Javadoc)
+		 * @see javax.swing.event.ListDataListener#contentsChanged(javax.swing.event.ListDataEvent)
+		 */
 		@Override
 		public void contentsChanged(ListDataEvent e) {
 			label7.setText("(" + ((DefaultListModel)e.getSource()).size() + ")");
@@ -161,12 +211,18 @@ public class RefsetPartitionerPanel extends JPanel {
 			
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.event.ListDataListener#intervalAdded(javax.swing.event.ListDataEvent)
+		 */
 		@Override
 		public void intervalAdded(ListDataEvent e) {
 			label7.setText("(" + ((DefaultListModel)e.getSource()).size() + ")");
 			
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.event.ListDataListener#intervalRemoved(javax.swing.event.ListDataEvent)
+		 */
 		@Override
 		public void intervalRemoved(ListDataEvent e) {
 			label7.setText("(" + ((DefaultListModel)e.getSource()).size() + ")");
@@ -174,6 +230,9 @@ public class RefsetPartitionerPanel extends JPanel {
 		}
 	}
 	
+	/**
+	 * Update list1 content.
+	 */
 	void updateList1Content() {
 		list1Model = new DefaultListModel();
 
@@ -239,16 +298,31 @@ public class RefsetPartitionerPanel extends JPanel {
 		button3.setEnabled(areThereRemainingMembers);
 	}
 
+	/**
+	 * Radio button1 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void radioButton1ActionPerformed(ActionEvent e) {
 		list1DisplayAll = true;
 		updateList1Content();
 	}
 
+	/**
+	 * Radio button2 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void radioButton2ActionPerformed(ActionEvent e) {
 		list1DisplayAll = false;
 		updateList1Content();
 	}
 
+	/**
+	 * Button2 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button2ActionPerformed(ActionEvent e) {
 		AceFrameConfig afconfig = (AceFrameConfig)config;
 		AceFrame ace=afconfig.getAceFrame();
@@ -265,14 +339,29 @@ public class RefsetPartitionerPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Panel7 component resized.
+	 *
+	 * @param e the e
+	 */
 	private void panel7ComponentResized(ComponentEvent e) {
 		panel7.validate();
 	}
 
+	/**
+	 * Scroll pane2 component resized.
+	 *
+	 * @param e the e
+	 */
 	private void scrollPane2ComponentResized(ComponentEvent e) {
 		scrollPane2.validate();
 	}
 
+	/**
+	 * Button1 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button1ActionPerformed(ActionEvent e) {
 		JPanel newPartitionPanel =new NewPartitionPanel(partitionScheme, this, config);
 		panel7.add(newPartitionPanel);
@@ -281,6 +370,11 @@ public class RefsetPartitionerPanel extends JPanel {
 		button3.setEnabled(false);
 	}
 
+	/**
+	 * Button3 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button3ActionPerformed(ActionEvent e) {
 		JPanel partitionSpliterPanel =new PartitionSplitterPanel(partitionScheme, this, config);
 		panel7.add(partitionSpliterPanel);
@@ -289,6 +383,11 @@ public class RefsetPartitionerPanel extends JPanel {
 		button3.setEnabled(false);
 	}
 
+	/**
+	 * Label11 mouse clicked.
+	 *
+	 * @param e the e
+	 */
 	private void label11MouseClicked(MouseEvent e) {
 		try {
 			HelpApi.openHelpForComponent("REFSET_PARTITIONER");
@@ -299,6 +398,9 @@ public class RefsetPartitionerPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		panel1 = new JPanel();
@@ -642,35 +744,94 @@ public class RefsetPartitionerPanel extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The panel9. */
 	private JPanel panel9;
+	
+	/** The label4. */
 	private JLabel label4;
+	
+	/** The label8. */
 	private JLabel label8;
+	
+	/** The panel3. */
 	private JPanel panel3;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The label9. */
 	private JLabel label9;
+	
+	/** The label6. */
 	private JLabel label6;
+	
+	/** The label10. */
 	private JLabel label10;
+	
+	/** The panel4. */
 	private JPanel panel4;
+	
+	/** The panel5. */
 	private JPanel panel5;
+	
+	/** The panel11. */
 	private JPanel panel11;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The label7. */
 	private JLabel label7;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The list1. */
 	private JList list1;
+	
+	/** The panel6. */
 	private JPanel panel6;
+	
+	/** The radio button1. */
 	private JRadioButton radioButton1;
+	
+	/** The radio button2. */
 	private JRadioButton radioButton2;
+	
+	/** The panel10. */
 	private JPanel panel10;
+	
+	/** The label5. */
 	private JLabel label5;
+	
+	/** The scroll pane2. */
 	private JScrollPane scrollPane2;
+	
+	/** The panel7. */
 	private JPanel panel7;
+	
+	/** The panel8. */
 	private JPanel panel8;
+	
+	/** The button2. */
 	private JButton button2;
+	
+	/** The button1. */
 	private JButton button1;
+	
+	/** The button3. */
 	private JButton button3;
+	
+	/** The label11. */
 	private JLabel label11;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

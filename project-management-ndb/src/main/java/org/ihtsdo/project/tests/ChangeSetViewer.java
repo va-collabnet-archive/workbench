@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.project.tests;
 
 import java.io.BufferedInputStream;
@@ -22,53 +38,98 @@ import org.ihtsdo.helper.time.TimeHelper;
 
 import com.sleepycat.je.DatabaseException;
 
+/**
+ * The Class ChangeSetViewer.
+ */
 public class ChangeSetViewer {
 
+	/**
+	 * Gets the change set file.
+	 *
+	 * @return the change set file
+	 */
 	public File getChangeSetFile() {
 		return changeSetFile;
 	}
 
+	/**
+	 * Sets the change set file.
+	 *
+	 * @param changeSetFile the new change set file
+	 */
 	public void setChangeSetFile(File changeSetFile) {
 		this.changeSetFile = changeSetFile;
 	}
 
-	/**
-	 * @param args
-	 */
+	/** The Constant serialVersionUID. */
 
 	private static final long serialVersionUID = 1L;
 
+	/** The change set file. */
 	private File changeSetFile;
 
+	/** The csre file. */
 	private File csreFile;
+	
+	/** The csre out. */
 	private transient FileWriter csreOut;
+	
+	/** The csrc file. */
 	private File csrcFile;
+	
+	/** The csrc out. */
 	private transient FileWriter csrcOut;
 
+	/** The counter. */
 	private I_Count counter;
 
+	/** The data stream. */
 	private DataInputStream dataStream;
 
+	/** The count. */
 	private int count = 0;
 
+	/** The concept count. */
 	private int conceptCount = 0;
 
+	/** The unvalidated. */
 	private int unvalidated = 0;
 
+	/** The initialized. */
 	private boolean initialized = false;
 
+	/** The next commit. */
 	private Long nextCommit;
+	
+	/** The next commit str. */
 	private String nextCommitStr;
+	
+	/** The no commit. */
 	private boolean noCommit = false;
 
+	/**
+	 * Checks if is no commit.
+	 *
+	 * @return true, if is no commit
+	 */
 	public boolean isNoCommit() {
 		return noCommit;
 	}
 
+	/**
+	 * Sets the no commit.
+	 *
+	 * @param noCommit the new no commit
+	 */
 	public void setNoCommit(boolean noCommit) {
 		this.noCommit = noCommit;
 	}
 
+	/**
+	 * The main method.
+	 *
+	 * @param args the arguments
+	 */
 	public static void main(String[] args) {
 		try {
 			File dir = new File("/Users/alo/Desktop/changesets");
@@ -86,10 +147,23 @@ public class ChangeSetViewer {
 		}
 	}
 
+	/**
+	 * Read.
+	 *
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws ClassNotFoundException the class not found exception
+	 */
 	public void read() throws IOException, ClassNotFoundException {
 		readUntil(Long.MAX_VALUE);
 	}
 
+	/**
+	 * Read until.
+	 *
+	 * @param endTime the end time
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws ClassNotFoundException the class not found exception
+	 */
 	public void readUntil(long endTime) throws IOException, ClassNotFoundException {
 		HashSet<TimePathId> values = new HashSet<TimePathId>();
 		if (AceLog.getEditLog().isLoggable(Level.INFO)) {
@@ -171,6 +245,13 @@ public class ChangeSetViewer {
 
 	}
 
+	/**
+	 * Next commit time.
+	 *
+	 * @return the long
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws ClassNotFoundException the class not found exception
+	 */
 	public long nextCommitTime() throws IOException, ClassNotFoundException {
 		lazyInit();
 		if (nextCommit == null) {
@@ -187,6 +268,13 @@ public class ChangeSetViewer {
 		return nextCommit;
 	}
 
+	/**
+	 * Lazy init.
+	 *
+	 * @throws FileNotFoundException the file not found exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws ClassNotFoundException the class not found exception
+	 */
 	private void lazyInit() throws FileNotFoundException, IOException, ClassNotFoundException {
 		String lastImportSize = null;//Terms.get().getProperty(changeSetFile.getName());
 		if (lastImportSize != null) {

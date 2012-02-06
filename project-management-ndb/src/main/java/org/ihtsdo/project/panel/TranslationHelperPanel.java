@@ -44,8 +44,10 @@ public class TranslationHelperPanel {
 	/** The tabs. */
 	private static JTabbedPane tabs;
 
+	/** The Constant REFSETPARTITIONER_TAB_NAME. */
 	public static final String  REFSETPARTITIONER_TAB_NAME="Refset partitioner";
 
+	/** The Constant PROJECTS_DETAILS_TAB_NAME. */
 	public static final String PROJECTS_DETAILS_TAB_NAME="Project Properties";
 
 	/** The Constant ISSUE_REPO_PROPERTY_NAME. */
@@ -120,30 +122,43 @@ public class TranslationHelperPanel {
 	/** The Constant TRANS_REPORT. */
 	public static final String TRANS_REPORT="Report";
 	
+	/** The Constant SUBSET_IMPORT_EXPORT. */
 	public static final String SUBSET_IMPORT_EXPORT = "Import-Export";
 
+	/** The Constant TRANSLATION_LEFT_MENU. */
 	public static final String TRANSLATION_LEFT_MENU = "Inbox";
 	
+	/** The Constant ARCHIVAL_ITEMS_LEFT_MENU. */
 	public static final String ARCHIVAL_ITEMS_LEFT_MENU = "Archival Queue Viewer";
 	
+	/** The Constant QA_MANAGER. */
 	public static final String QA_MANAGER = "QA Manager";
 	
+	/** The Constant AUTO_PROCESS_WORKLIST_MEMBERS_REVIEW. */
 	public static final String AUTO_PROCESS_WORKLIST_MEMBERS_REVIEW = "Auto-Process for Worklist Members Review";
 
+	/** The Constant AUTO_PROCESS_WORKLIST_MEMBERS_REVIEW_CANCEL. */
 	public static final String AUTO_PROCESS_WORKLIST_MEMBERS_REVIEW_CANCEL = "Cancel Auto-Process for Worklist Members Review"; 
 	
+	/** The Constant EXTERNAL_ISSUES_ACTIVE_PROPERTY_FLAG. */
 	public static final String EXTERNAL_ISSUES_ACTIVE_PROPERTY_FLAG="A: EXTERNAL_ISSUES_ACTIVE";
 	
+	/** The Constant REFSET_VIEWER_NAME. */
 	public static final String REFSET_VIEWER_NAME = "Refset viewer";
 	
+	/** The Constant REPORT_PANEL_NAME. */
 	public static final String REPORT_PANEL_NAME = "Reports";
 	
+	/** The Constant STRESS_TAB_NAME. */
 	public static final String STRESS_TAB_NAME = "Stress test";
 
+	/** The Constant MEMBER_LOG_TAB_NAME. */
 	public static final String MEMBER_LOG_TAB_NAME = "Member log";
 
+	/** The Constant LIST_COMPONENT_VIEWER_NAME. */
 	public static final String LIST_COMPONENT_VIEWER_NAME = "List component viewer";
 	
+	/** The Constant WORKFLOWDEFINITION_TAB_NAME. */
 	public static final String WORKFLOWDEFINITION_TAB_NAME="Workflow Definition";
 
 
@@ -227,6 +242,11 @@ public class TranslationHelperPanel {
 		return tabs;
 	}
 	
+	/**
+	 * Close project details tab.
+	 *
+	 * @param config the config
+	 */
 	public static void closeProjectDetailsTab(I_ConfigAceFrame config){
 
 		AceFrameConfig afconfig=(AceFrameConfig)config;
@@ -249,6 +269,10 @@ public class TranslationHelperPanel {
 			}
 		}
 	}
+	
+	/**
+	 * Sets the focus to project panel.
+	 */
 	synchronized 
 	public static void setFocusToProjectPanel(){
 		
@@ -256,8 +280,15 @@ public class TranslationHelperPanel {
 		timer.setRepeats(false);
 		timer.start();
 	}
+	
+	/**
+	 * The Class setProjectPanelFocus.
+	 */
 	static class setProjectPanelFocus implements ActionListener{
 
+		/* (non-Javadoc)
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			AceFrameConfig config;
@@ -288,6 +319,12 @@ public class TranslationHelperPanel {
 			
 		}
 	}
+	
+	/**
+	 * Refresh project panel node.
+	 *
+	 * @param config the config
+	 */
 	public static void refreshProjectPanelNode(I_ConfigAceFrame config){
 
 		AceFrameConfig afconfig=(AceFrameConfig)config;
@@ -309,6 +346,11 @@ public class TranslationHelperPanel {
 		setFocusToProjectPanel();
 	}
 
+	/**
+	 * Refresh project panel parent node.
+	 *
+	 * @param config the config
+	 */
 	public static void refreshProjectPanelParentNode(I_ConfigAceFrame config){
 
 		AceFrameConfig afconfig=(AceFrameConfig)config;

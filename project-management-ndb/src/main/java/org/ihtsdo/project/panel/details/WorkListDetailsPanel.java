@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Fri Mar 19 16:57:40 GMT-04:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.project.panel.details;
@@ -64,21 +77,43 @@ import org.ihtsdo.project.workflow.model.WfMembership;
 import org.ihtsdo.project.workflow.model.WfUser;
 
 /**
+ * The Class WorkListDetailsPanel.
+ *
  * @author Guillermo Reynoso
  */
 public class WorkListDetailsPanel extends JPanel {
-	/**
-	 * 
-	 */
+	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
+	
+	/** The work list. */
 	private WorkList workList;
+	
+	/** The config. */
 	private I_ConfigAceFrame config;
+	
+	/** The worker. */
 	private I_Work worker;
+	
+	/** The business process. */
 	private BusinessProcess businessProcess;
+	
+	/** The transl project. */
 	private TranslationProject translProject;
+	
+	/** The members worker. */
 	private WorklistMembersWorker membersWorker;
+	
+	/** The members table model. */
 	private DefaultTableModel membersTableModel;
 
+	/**
+	 * Instantiates a new work list details panel.
+	 *
+	 * @param workList the work list
+	 * @param config the config
+	 * @param worker the worker
+	 */
 	public WorkListDetailsPanel(WorkList workList, I_ConfigAceFrame config, I_Work worker) {
 		initComponents();
 		this.workList = workList;
@@ -152,6 +187,9 @@ public class WorkListDetailsPanel extends JPanel {
 		loadRolesTable();
 	}
 
+	/**
+	 * Load roles table.
+	 */
 	private void loadRolesTable() {
 		List<WfMembership> wur = workList.getWorkflowUserRoles();
 		HashMap<String, String> map= new HashMap<String, String>();
@@ -175,6 +213,9 @@ public class WorkListDetailsPanel extends JPanel {
 		rolesTable.setModel(model);
 	}
 
+	/**
+	 * Config members table.
+	 */
 	private void configMembersTable() {
 		membersTableModel = new DefaultTableModel();
 		membersTableModel.addColumn("WorkList member");
@@ -192,6 +233,9 @@ public class WorkListDetailsPanel extends JPanel {
 		membersTable.setRowSorter(sorter);
 	}
 
+	/**
+	 * Update members table.
+	 */
 	private void updateMembersTable() {
 		
 		if (membersWorker != null && !membersWorker.isDone()) {
@@ -203,6 +247,11 @@ public class WorkListDetailsPanel extends JPanel {
 		membersWorker.execute();
 	}
 
+	/**
+	 * Text field1 key typed.
+	 *
+	 * @param e the e
+	 */
 	private void textField1KeyTyped(KeyEvent e) {
 		if (textField1.getText().equals(workList.getName())) {
 			button4.setEnabled(false);
@@ -211,6 +260,11 @@ public class WorkListDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Button4 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button4ActionPerformed(ActionEvent e) {
 		workList.setName(textField1.getText());
 		TerminologyProjectDAO.updateWorkListMetadata(workList, config);
@@ -224,6 +278,11 @@ public class WorkListDetailsPanel extends JPanel {
 		TranslationHelperPanel.refreshProjectPanelNode(config);
 	}
 
+	/**
+	 * Button6 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button6ActionPerformed(ActionEvent e) {
 		config.getChildrenExpandedNodes().clear();
 		pBarD.setMinimum(0);
@@ -282,6 +341,11 @@ public class WorkListDetailsPanel extends JPanel {
 		});
 	}
 
+	/**
+	 * Button1 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button1ActionPerformed(ActionEvent e) {
 		// int n = JOptionPane
 		// .showConfirmDialog(
@@ -362,6 +426,12 @@ public class WorkListDetailsPanel extends JPanel {
 		// }
 	}
 
+	/**
+	 * Gets the business process.
+	 *
+	 * @param f the f
+	 * @return the business process
+	 */
 	private BusinessProcess getBusinessProcess(File f) {
 		ObjectInputStream in;
 		try {
@@ -380,6 +450,11 @@ public class WorkListDetailsPanel extends JPanel {
 		return null;
 	}
 
+	/**
+	 * Button3 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button3ActionPerformed(ActionEvent e) {
 		// retire workList
 		int n = JOptionPane.showConfirmDialog(this, "Would you like to retire the worklist?", "Confirmation", JOptionPane.YES_NO_OPTION);
@@ -407,6 +482,11 @@ public class WorkListDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Button2 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button2ActionPerformed(ActionEvent e) {
 		// int n = JOptionPane.showConfirmDialog(this,
 		// "Would you like to deliver the worklist?", "Confirmation",
@@ -457,10 +537,16 @@ public class WorkListDetailsPanel extends JPanel {
 		// }
 	}
 
+	/**
+	 * Button5 action performed.
+	 */
 	private void button5ActionPerformed() {
 		showHistory();
 	}
 
+	/**
+	 * Show history.
+	 */
 	private void showHistory() {
 		if (membersTable.getSelectedRow() > -1) {
 			DefaultTableModel model = (DefaultTableModel) membersTable.getModel();
@@ -472,17 +558,32 @@ public class WorkListDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Members table mouse clicked.
+	 *
+	 * @param e the e
+	 */
 	private void membersTableMouseClicked(MouseEvent e) {
 		if (e.getClickCount() == 2) {
 			showHistory();
 		}
 	}
 
+	/**
+	 * Button7 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button7ActionPerformed(ActionEvent e) {
 		// refresh
 		updateMembersTable();
 	}
 
+	/**
+	 * Label13 mouse clicked.
+	 *
+	 * @param e the e
+	 */
 	private void label13MouseClicked(MouseEvent e) {
 		try {
 			HelpApi.openHelpForComponent("WORKLIST_DETAILS");
@@ -493,6 +594,11 @@ public class WorkListDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Tabbed pane1 state changed.
+	 *
+	 * @param e the e
+	 */
 	private void tabbedPane1StateChanged(ChangeEvent e) {
 		if (e.getSource() instanceof JTabbedPane) {
 			JTabbedPane panel = (JTabbedPane) e.getSource();
@@ -504,6 +610,9 @@ public class WorkListDetailsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -1134,61 +1243,172 @@ public class WorkListDetailsPanel extends JPanel {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
+	/** The tabbed pane1. */
 	private JTabbedPane tabbedPane1;
+	
+	/** The panel0. */
 	private JPanel panel0;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The panel17. */
 	private JPanel panel17;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The text field1. */
 	private JTextField textField1;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The label6. */
 	private JLabel label6;
+	
+	/** The panel16. */
 	private JPanel panel16;
+	
+	/** The label11. */
 	private JLabel label11;
+	
+	/** The panel7. */
 	private JPanel panel7;
+	
+	/** The button2. */
 	private JButton button2;
+	
+	/** The button3. */
 	private JButton button3;
+	
+	/** The p bar w. */
 	private JProgressBar pBarW;
+	
+	/** The button4. */
 	private JButton button4;
+	
+	/** The label13. */
 	private JLabel label13;
+	
+	/** The panel8. */
 	private JPanel panel8;
+	
+	/** The label7. */
 	private JLabel label7;
+	
+	/** The panel10. */
 	private JPanel panel10;
+	
+	/** The label12. */
 	private JLabel label12;
+	
+	/** The label16. */
 	private JLabel label16;
+	
+	/** The panel9. */
 	private JPanel panel9;
+	
+	/** The label4. */
 	private JLabel label4;
+	
+	/** The panel11. */
 	private JPanel panel11;
+	
+	/** The button1. */
 	private JButton button1;
+	
+	/** The p bar bp. */
 	private JProgressBar pBarBP;
+	
+	/** The panel3. */
 	private JPanel panel3;
+	
+	/** The panel12. */
 	private JPanel panel12;
+	
+	/** The label8. */
 	private JLabel label8;
+	
+	/** The panel13. */
 	private JPanel panel13;
+	
+	/** The combo box1. */
 	private JComboBox comboBox1;
+	
+	/** The panel18. */
 	private JPanel panel18;
+	
+	/** The panel22. */
 	private JPanel panel22;
+	
+	/** The label17. */
 	private JLabel label17;
+	
+	/** The label5. */
 	private JLabel label5;
+	
+	/** The panel19. */
 	private JPanel panel19;
+	
+	/** The panel4. */
 	private JPanel panel4;
+	
+	/** The button6. */
 	private JButton button6;
+	
+	/** The p bar d. */
 	private JProgressBar pBarD;
+	
+	/** The panel14. */
 	private JPanel panel14;
+	
+	/** The panel23. */
 	private JPanel panel23;
+	
+	/** The label9. */
 	private JLabel label9;
+	
+	/** The label18. */
 	private JLabel label18;
+	
+	/** The members table scroll panel. */
 	private JScrollPane membersTableScrollPanel;
+	
+	/** The members table. */
 	private JTable membersTable;
+	
+	/** The panel15. */
 	private JPanel panel15;
+	
+	/** The label10. */
 	private JLabel label10;
+	
+	/** The panel6. */
 	private JPanel panel6;
+	
+	/** The button5. */
 	private JButton button5;
+	
+	/** The button7. */
 	private JButton button7;
+	
+	/** The progress bar1. */
 	private JProgressBar progressBar1;
+	
+	/** The roles panel. */
 	private JPanel rolesPanel;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The roles table. */
 	private JTable rolesTable;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 }

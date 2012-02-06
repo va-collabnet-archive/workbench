@@ -87,6 +87,11 @@ public class TestProjectsCRUD extends TestCase {
 		tf.setActiveAceFrameConfig(config);
 	}
 
+	/**
+	 * Test create new project and update name.
+	 *
+	 * @throws Exception the exception
+	 */
 	public void testCreateNewProjectAndUpdateName() throws Exception {
 		List<TranslationProject> projects = new ArrayList<TranslationProject>();
 		projects = TerminologyProjectDAO.getAllTranslationProjects(config);
@@ -141,6 +146,11 @@ public class TestProjectsCRUD extends TestCase {
 		assertEquals(0, TerminologyProjectDAO.getAllTranslationProjects(config).size());
 	}
 	
+	/**
+	 * Gets the test config.
+	 *
+	 * @return the test config
+	 */
 	private I_ConfigAceFrame getTestConfig() {
 		I_ConfigAceFrame config = null;
 		try {
@@ -179,6 +189,13 @@ public class TestProjectsCRUD extends TestCase {
 	}
 	
 	// If targetLocation does not exist, it will be created.
+	/**
+	 * Copy directory.
+	 *
+	 * @param sourceLocation the source location
+	 * @param targetLocation the target location
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public void copyDirectory(File sourceLocation , File targetLocation)
 	throws IOException {
 
@@ -208,6 +225,12 @@ public class TestProjectsCRUD extends TestCase {
 		}
 	}
 
+	/**
+	 * Delete directory.
+	 *
+	 * @param path the path
+	 * @return true, if successful
+	 */
 	public boolean deleteDirectory(File path) {
 		if( path.exists() ) {
 			File[] files = path.listFiles();
@@ -223,6 +246,11 @@ public class TestProjectsCRUD extends TestCase {
 		return( path.delete() );
 	}
 
+	/**
+	 * Sleep.
+	 *
+	 * @param n the n
+	 */
 	public static void sleep(int n){
 		long t0, t1;
 		t0 =  System.currentTimeMillis();

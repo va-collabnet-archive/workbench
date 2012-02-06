@@ -25,9 +25,13 @@ import org.dwfa.bpa.tasks.editor.CheckboxEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 /**
+ * The Class VerifyAttachedAddressesBeanInfo.
  */
 public class VerifyAttachedAddressesBeanInfo extends SimpleBeanInfo {
 
+	/**
+	 * Instantiates a new verify attached addresses bean info.
+	 */
 	public VerifyAttachedAddressesBeanInfo() {
 		super();
 	}

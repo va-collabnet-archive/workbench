@@ -123,7 +123,10 @@ import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
  */
 public class TerminologyProjectDAO {
 
+	/** The work list cache. */
 	public static Map<UUID, WorkList> workListCache = new HashMap<UUID, WorkList>();
+	
+	/** The partition cache. */
 	public static Map<UUID, Partition> partitionCache = new HashMap<UUID, Partition>();
 
 	// I_TerminologyProjects CRUD **********************************
@@ -142,6 +145,12 @@ public class TerminologyProjectDAO {
 		return projects;
 	}
 
+	/**
+	 * Gets the all translation projects.
+	 *
+	 * @param config the config
+	 * @return the all translation projects
+	 */
 	public static List<TranslationProject> getAllTranslationProjects(I_ConfigAceFrame config) {
 
 		I_TermFactory termFactory = Terms.get();
@@ -168,6 +177,13 @@ public class TerminologyProjectDAO {
 		return projects;
 	}
 
+	/**
+	 * Creates the new translation project.
+	 *
+	 * @param name the name
+	 * @param config the config
+	 * @return the translation project
+	 */
 	public static TranslationProject createNewTranslationProject(String name, I_ConfigAceFrame config) {
 		TranslationProject project = new TranslationProject(name, 0, null);
 		return createNewTranslationProject(project, config);
@@ -235,14 +251,11 @@ public class TerminologyProjectDAO {
 
 	/**
 	 * Gets the project.
-	 * 
-	 * @param projectConcept
-	 *            the project concept
-	 * @param config
-	 *            the config
-	 * 
+	 *
+	 * @param projectConcept the project concept
+	 * @param config the config
 	 * @return the project
-	 * @throws Exception
+	 * @throws Exception the exception
 	 */
 	public static TranslationProject getTranslationProject(I_GetConceptData projectConcept, I_ConfigAceFrame config) throws Exception {
 		TranslationProject project = null;
@@ -274,6 +287,13 @@ public class TerminologyProjectDAO {
 		return project;
 	}
 
+	/**
+	 * Update preferred term.
+	 *
+	 * @param concept the concept
+	 * @param newString the new string
+	 * @param config the config
+	 */
 	public static void updatePreferredTerm(I_GetConceptData concept, String newString, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 
@@ -308,6 +328,13 @@ public class TerminologyProjectDAO {
 		}
 	}
 
+	/**
+	 * Update work set metadata.
+	 *
+	 * @param workSetWithMetadata the work set with metadata
+	 * @param config the config
+	 * @return the work set
+	 */
 	public static WorkSet updateWorkSetMetadata(WorkSet workSetWithMetadata, I_ConfigAceFrame config) {
 		WorkSet workSet = null;
 
@@ -322,6 +349,13 @@ public class TerminologyProjectDAO {
 		return workSet;
 	}
 
+	/**
+	 * Update partition scheme metadata.
+	 *
+	 * @param partitionSchemeWithMetadata the partition scheme with metadata
+	 * @param config the config
+	 * @return the partition scheme
+	 */
 	public static PartitionScheme updatePartitionSchemeMetadata(PartitionScheme partitionSchemeWithMetadata, I_ConfigAceFrame config) {
 		PartitionScheme partitionScheme = null;
 
@@ -336,6 +370,13 @@ public class TerminologyProjectDAO {
 		return partitionScheme;
 	}
 
+	/**
+	 * Update partition metadata.
+	 *
+	 * @param partitionWithMetadata the partition with metadata
+	 * @param config the config
+	 * @return the partition
+	 */
 	public static Partition updatePartitionMetadata(Partition partitionWithMetadata, I_ConfigAceFrame config) {
 		Partition partition = null;
 
@@ -407,11 +448,27 @@ public class TerminologyProjectDAO {
 		return project;
 	}
 
+	/**
+	 * Creates the new work set.
+	 *
+	 * @param name the name
+	 * @param project the project
+	 * @param config the config
+	 * @return the work set
+	 */
 	public static WorkSet createNewWorkSet(String name, I_TerminologyProject project, I_ConfigAceFrame config) {
 		WorkSet workSet = new WorkSet(name, project.getUids().iterator().next());
 		return createNewWorkSet(workSet, config);
 	}
 
+	/**
+	 * Creates the new work set.
+	 *
+	 * @param name the name
+	 * @param projectUUID the project uuid
+	 * @param config the config
+	 * @return the work set
+	 */
 	public static WorkSet createNewWorkSet(String name, UUID projectUUID, I_ConfigAceFrame config) {
 		WorkSet workSet = new WorkSet(name, projectUUID);
 		return createNewWorkSet(workSet, config);
@@ -560,6 +617,13 @@ public class TerminologyProjectDAO {
 		return workSet;
 	}
 
+	/**
+	 * Gets the all partition schemes for refset concept.
+	 *
+	 * @param workSetConcept the work set concept
+	 * @param config the config
+	 * @return the all partition schemes for refset concept
+	 */
 	public static List<PartitionScheme> getAllPartitionSchemesForRefsetConcept(I_GetConceptData workSetConcept, I_ConfigAceFrame config) {
 		List<PartitionScheme> partitionSchemes = new ArrayList<PartitionScheme>();
 		I_TermFactory termFactory = Terms.get();
@@ -586,6 +650,13 @@ public class TerminologyProjectDAO {
 		return partitionSchemes;
 	}
 
+	/**
+	 * Gets the members not partitioned.
+	 *
+	 * @param scheme the scheme
+	 * @param config the config
+	 * @return the members not partitioned
+	 */
 	public static List<I_GetConceptData> getMembersNotPartitioned(PartitionScheme scheme, I_ConfigAceFrame config) {
 		List<I_GetConceptData> refsetMembersNotPartitioned = new ArrayList<I_GetConceptData>();
 		List<PartitionMember> partitionMembersAlreadyPartitioned = new ArrayList<PartitionMember>();
@@ -623,6 +694,13 @@ public class TerminologyProjectDAO {
 		return refsetMembersNotPartitioned;
 	}
 
+	/**
+	 * Gets the all partitions for scheme.
+	 *
+	 * @param scheme the scheme
+	 * @param config the config
+	 * @return the all partitions for scheme
+	 */
 	public static List<Partition> getAllPartitionsForScheme(PartitionScheme scheme, I_ConfigAceFrame config) {
 		List<Partition> partitions = new ArrayList<Partition>();
 		I_TermFactory termFactory = Terms.get();
@@ -648,14 +726,35 @@ public class TerminologyProjectDAO {
 		return partitions;
 	}
 
+	/**
+	 * Removes the refset as exclusion.
+	 *
+	 * @param project the project
+	 * @param exclusion the exclusion
+	 * @param config the config
+	 */
 	public static void removeRefsetAsExclusion(I_TerminologyProject project, I_GetConceptData exclusion, I_ConfigAceFrame config) {
 		removeRefsetAsExclusion(project.getConcept(), exclusion, config);
 	}
 
+	/**
+	 * Removes the refset as exclusion.
+	 *
+	 * @param workSet the work set
+	 * @param exclusion the exclusion
+	 * @param config the config
+	 */
 	public static void removeRefsetAsExclusion(WorkSet workSet, I_GetConceptData exclusion, I_ConfigAceFrame config) {
 		removeRefsetAsExclusion(workSet.getConcept(), exclusion, config);
 	}
 
+	/**
+	 * Removes the refset as exclusion.
+	 *
+	 * @param refset the refset
+	 * @param exclusion the exclusion
+	 * @param config the config
+	 */
 	public static void removeRefsetAsExclusion(I_GetConceptData refset, I_GetConceptData exclusion, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 
@@ -691,6 +790,13 @@ public class TerminologyProjectDAO {
 
 	}
 
+	/**
+	 * Removes the refset as source language.
+	 *
+	 * @param project the project
+	 * @param concept the concept
+	 * @param config the config
+	 */
 	public static void removeRefsetAsSourceLanguage(I_TerminologyProject project, I_GetConceptData concept, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 
@@ -726,6 +832,13 @@ public class TerminologyProjectDAO {
 
 	}
 
+	/**
+	 * Removes the refset as common.
+	 *
+	 * @param project the project
+	 * @param concept the concept
+	 * @param config the config
+	 */
 	public static void removeRefsetAsCommon(I_TerminologyProject project, I_GetConceptData concept, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 
@@ -761,6 +874,13 @@ public class TerminologyProjectDAO {
 
 	}
 
+	/**
+	 * Adds the refset as exclusion.
+	 *
+	 * @param refset the refset
+	 * @param exclusion the exclusion
+	 * @param config the config
+	 */
 	public static void addRefsetAsExclusion(I_GetConceptData refset, I_GetConceptData exclusion, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 
@@ -794,14 +914,35 @@ public class TerminologyProjectDAO {
 
 	}
 
+	/**
+	 * Adds the refset as exclusion.
+	 *
+	 * @param project the project
+	 * @param exclusion the exclusion
+	 * @param config the config
+	 */
 	public static void addRefsetAsExclusion(I_TerminologyProject project, I_GetConceptData exclusion, I_ConfigAceFrame config) {
 		addRefsetAsExclusion(project.getConcept(), exclusion, config);
 	}
 
+	/**
+	 * Adds the refset as exclusion.
+	 *
+	 * @param workSet the work set
+	 * @param exclusion the exclusion
+	 * @param config the config
+	 */
 	public static void addRefsetAsExclusion(WorkSet workSet, I_GetConceptData exclusion, I_ConfigAceFrame config) {
 		addRefsetAsExclusion(workSet.getConcept(), exclusion, config);
 	}
 
+	/**
+	 * Adds the refset as common.
+	 *
+	 * @param project the project
+	 * @param common the common
+	 * @param config the config
+	 */
 	public static void addRefsetAsCommon(I_TerminologyProject project, I_GetConceptData common, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 
@@ -835,6 +976,13 @@ public class TerminologyProjectDAO {
 
 	}
 
+	/**
+	 * Adds the refset as source language.
+	 *
+	 * @param project the project
+	 * @param language the language
+	 * @param config the config
+	 */
 	public static void addRefsetAsSourceLanguage(I_TerminologyProject project, I_GetConceptData language, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 		List<I_GetConceptData> currentSourceLanguages = getSourceLanguageRefsetsForProject(project, config);
@@ -868,6 +1016,13 @@ public class TerminologyProjectDAO {
 
 	}
 
+	/**
+	 * Sets the source refset.
+	 *
+	 * @param workSet the work set
+	 * @param concept the concept
+	 * @param config the config
+	 */
 	public static void setSourceRefset(WorkSet workSet, I_GetConceptData concept, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 
@@ -912,6 +1067,13 @@ public class TerminologyProjectDAO {
 		}
 	}
 
+	/**
+	 * Sets the module id refset.
+	 *
+	 * @param project the project
+	 * @param concept the concept
+	 * @param config the config
+	 */
 	public static void setModuleIdRefset(TranslationProject project, I_GetConceptData concept, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 		try {
@@ -952,6 +1114,13 @@ public class TerminologyProjectDAO {
 		}
 	}
 
+	/**
+	 * Sets the namespace refset.
+	 *
+	 * @param project the project
+	 * @param namespaceText the namespace text
+	 * @param config the config
+	 */
 	public static void setNamespaceRefset(TranslationProject project, String namespaceText, I_ConfigAceFrame config) {
 		try {
 			I_TermFactory termFactory = Terms.get();
@@ -971,6 +1140,13 @@ public class TerminologyProjectDAO {
 		}
 	}
 	
+	/**
+	 * Sets the release path refset.
+	 *
+	 * @param project the project
+	 * @param concept the concept
+	 * @param config the config
+	 */
 	public static void setReleasePathRefset(TranslationProject project, I_GetConceptData concept, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 		try {
@@ -1011,6 +1187,13 @@ public class TerminologyProjectDAO {
 		}
 	}
 
+	/**
+	 * Sets the language target refset.
+	 *
+	 * @param project the project
+	 * @param concept the concept
+	 * @param config the config
+	 */
 	public static void setLanguageTargetRefset(TranslationProject project, I_GetConceptData concept, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 
@@ -1061,6 +1244,14 @@ public class TerminologyProjectDAO {
 		}
 	}
 
+	/**
+	 * Gets the source issue repo for project.
+	 *
+	 * @param project the project
+	 * @param config the config
+	 * @return the source issue repo for project
+	 * @throws Exception the exception
+	 */
 	public static I_GetConceptData getSourceIssueRepoForProject(TranslationProject project, I_ConfigAceFrame config) throws Exception {
 		List<I_RelTuple> repos = new ArrayList<I_RelTuple>();
 		List<? extends I_RelTuple> reposTuples = null;
@@ -1091,6 +1282,13 @@ public class TerminologyProjectDAO {
 			throw new Exception("Wrong number of source repos.");
 	}
 
+	/**
+	 * Sets the source issue repo.
+	 *
+	 * @param project the project
+	 * @param concept the concept
+	 * @param config the config
+	 */
 	public static void setSourceIssueRepo(TranslationProject project, I_GetConceptData concept, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 
@@ -1138,6 +1336,14 @@ public class TerminologyProjectDAO {
 		}
 	}
 
+	/**
+	 * Gets the project issue repo for project.
+	 *
+	 * @param project the project
+	 * @param config the config
+	 * @return the project issue repo for project
+	 * @throws Exception the exception
+	 */
 	public static I_GetConceptData getProjectIssueRepoForProject(TranslationProject project, I_ConfigAceFrame config) throws Exception {
 		List<I_RelTuple> repos = new ArrayList<I_RelTuple>();
 		List<? extends I_RelTuple> reposTuples = null;
@@ -1168,6 +1374,13 @@ public class TerminologyProjectDAO {
 			throw new Exception("Wrong number of source repos.");
 	}
 
+	/**
+	 * Sets the project issue repo.
+	 *
+	 * @param project the project
+	 * @param concept the concept
+	 * @param config the config
+	 */
 	public static void setProjectIssueRepo(TranslationProject project, I_GetConceptData concept, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 
@@ -1215,6 +1428,14 @@ public class TerminologyProjectDAO {
 		}
 	}
 
+	/**
+	 * Gets the source refset for work set.
+	 *
+	 * @param workSet the work set
+	 * @param config the config
+	 * @return the source refset for work set
+	 * @throws Exception the exception
+	 */
 	public static I_GetConceptData getSourceRefsetForWorkSet(WorkSet workSet, I_ConfigAceFrame config) throws Exception {
 		List<I_RelTuple> sourceRefsets = new ArrayList<I_RelTuple>();
 		List<? extends I_RelTuple> sourceRefsetsTuples = null;
@@ -1247,6 +1468,14 @@ public class TerminologyProjectDAO {
 			throw new Exception("Wrong number of source refsets.");
 	}
 
+	/**
+	 * Gets the release path refset for project.
+	 *
+	 * @param project the project
+	 * @param config the config
+	 * @return the release path refset for project
+	 * @throws Exception the exception
+	 */
 	public static I_GetConceptData getReleasePathRefsetForProject(TranslationProject project, I_ConfigAceFrame config) throws Exception {
 		List<I_RelTuple> targetRefsets = new ArrayList<I_RelTuple>();
 		List<? extends I_RelTuple> targetRefsetsTuples = null;
@@ -1280,6 +1509,14 @@ public class TerminologyProjectDAO {
 
 	}
 	
+	/**
+	 * Gets the module id refset for project.
+	 *
+	 * @param project the project
+	 * @param config the config
+	 * @return the module id refset for project
+	 * @throws Exception the exception
+	 */
 	public static I_GetConceptData getModuleIdRefsetForProject(TranslationProject project, I_ConfigAceFrame config) throws Exception {
 		List<I_RelTuple> targetRefsets = new ArrayList<I_RelTuple>();
 		List<? extends I_RelTuple> targetRefsetsTuples = null;
@@ -1312,6 +1549,14 @@ public class TerminologyProjectDAO {
 		}
 	}
 
+	/**
+	 * Gets the namespace refset for project.
+	 *
+	 * @param project the project
+	 * @param config the config
+	 * @return the namespace refset for project
+	 * @throws Exception the exception
+	 */
 	public static String getNamespaceRefsetForProject(TranslationProject project, I_ConfigAceFrame config) throws Exception{
 		List<I_RelTuple> targetRefsets = new ArrayList<I_RelTuple>();
 		List<? extends I_RelTuple> targetRefsetsTuples = null;
@@ -1337,6 +1582,14 @@ public class TerminologyProjectDAO {
 	}
 
 
+	/**
+	 * Gets the target language refset for project.
+	 *
+	 * @param project the project
+	 * @param config the config
+	 * @return the target language refset for project
+	 * @throws Exception the exception
+	 */
 	public static I_GetConceptData getTargetLanguageRefsetForProject(TranslationProject project, I_ConfigAceFrame config) throws Exception {
 		List<I_RelTuple> targetRefsets = new ArrayList<I_RelTuple>();
 		List<? extends I_RelTuple> targetRefsetsTuples = null;
@@ -1367,18 +1620,39 @@ public class TerminologyProjectDAO {
 			throw new Exception("Wrong number of target refsets.");
 	}
 
+	/**
+	 * Gets the exclusion refsets for project.
+	 *
+	 * @param project the project
+	 * @param config the config
+	 * @return the exclusion refsets for project
+	 */
 	public static List<I_GetConceptData> getExclusionRefsetsForProject(I_TerminologyProject project, I_ConfigAceFrame config) {
 
 		return getExclusionRefsetsForConcept(project.getConcept(), config);
 
 	}
 
+	/**
+	 * Gets the exclusion refsets for work set.
+	 *
+	 * @param workSet the work set
+	 * @param config the config
+	 * @return the exclusion refsets for work set
+	 */
 	public static List<I_GetConceptData> getExclusionRefsetsForWorkSet(WorkSet workSet, I_ConfigAceFrame config) {
 
 		return getExclusionRefsetsForConcept(workSet.getConcept(), config);
 
 	}
 
+	/**
+	 * Gets the exclusion refsets for concept.
+	 *
+	 * @param refset the refset
+	 * @param config the config
+	 * @return the exclusion refsets for concept
+	 */
 	public static List<I_GetConceptData> getExclusionRefsetsForConcept(I_GetConceptData refset, I_ConfigAceFrame config) {
 		List<? extends I_RelTuple> exclusionRefsets = null;
 		ArrayList<I_GetConceptData> returnData = new ArrayList<I_GetConceptData>();
@@ -1410,6 +1684,13 @@ public class TerminologyProjectDAO {
 		return returnData;
 	}
 
+	/**
+	 * Gets the source language refsets for project.
+	 *
+	 * @param project the project
+	 * @param config the config
+	 * @return the source language refsets for project
+	 */
 	public static List<I_GetConceptData> getSourceLanguageRefsetsForProject(I_TerminologyProject project, I_ConfigAceFrame config) {
 		ArrayList<I_GetConceptData> returnData = new ArrayList<I_GetConceptData>();
 		I_TermFactory termFactory = Terms.get();
@@ -1442,6 +1723,13 @@ public class TerminologyProjectDAO {
 		return returnData;
 	}
 
+	/**
+	 * Gets the common refsets for project.
+	 *
+	 * @param project the project
+	 * @param config the config
+	 * @return the common refsets for project
+	 */
 	public static List<I_GetConceptData> getCommonRefsetsForProject(I_TerminologyProject project, I_ConfigAceFrame config) {
 		List<? extends I_RelTuple> commonRefsetsRelTuples = null;
 		ArrayList<I_GetConceptData> returnData = new ArrayList<I_GetConceptData>();
@@ -1473,6 +1761,13 @@ public class TerminologyProjectDAO {
 		return returnData;
 	}
 
+	/**
+	 * Gets the partition scheme.
+	 *
+	 * @param partitionSchemeConcept the partition scheme concept
+	 * @param config the config
+	 * @return the partition scheme
+	 */
 	public static PartitionScheme getPartitionScheme(I_GetConceptData partitionSchemeConcept, I_ConfigAceFrame config) {
 		PartitionScheme partitionScheme = null;
 		I_TermFactory termFactory = Terms.get();
@@ -1510,6 +1805,13 @@ public class TerminologyProjectDAO {
 		return partitionScheme;
 	}
 
+	/**
+	 * Gets the partition.
+	 *
+	 * @param partitionConcept the partition concept
+	 * @param config the config
+	 * @return the partition
+	 */
 	public static Partition getPartition(I_GetConceptData partitionConcept, I_ConfigAceFrame config) {
 		Partition partition = TerminologyProjectDAO.partitionCache.get(partitionConcept.getPrimUuid());
 		if (partition != null) {
@@ -1602,6 +1904,13 @@ public class TerminologyProjectDAO {
 		return workSets;
 	}
 
+	/**
+	 * Adds the concept as work set member.
+	 *
+	 * @param workSetMemberConcept the work set member concept
+	 * @param workSetUUID the work set uuid
+	 * @param config the config
+	 */
 	public static void addConceptAsWorkSetMember(I_GetConceptData workSetMemberConcept, UUID workSetUUID, I_ConfigAceFrame config) {
 		try {
 			WorkSetMember member = new WorkSetMember(workSetMemberConcept.toString(), workSetMemberConcept.getConceptNid(), workSetMemberConcept.getUids(), workSetUUID);
@@ -1675,16 +1984,40 @@ public class TerminologyProjectDAO {
 		}
 	}
 
+	/**
+	 * Initialize work set.
+	 *
+	 * @param workSet the work set
+	 * @param config the config
+	 * @param updater the updater
+	 * @throws Exception the exception
+	 */
 	public static void initializeWorkSet(WorkSet workSet, I_ConfigAceFrame config, ActivityUpdater updater) throws Exception {
 		Ts.get().iterateConceptDataInParallel(new WorksetInitializerProcessor(workSet, workSet.getSourceRefset(), config, updater));
 		updater.finish();
 	}
 
+	/**
+	 * Initialize work list.
+	 *
+	 * @param partition the partition
+	 * @param workList the work list
+	 * @param config the config
+	 * @param updater the updater
+	 * @throws Exception the exception
+	 */
 	public static void initializeWorkList(Partition partition, WorkList workList, I_ConfigAceFrame config, ActivityUpdater updater) throws Exception {
 		Ts.get().iterateConceptDataInParallel(new WorklistInitializerProcessor(partition, workList, config, updater));
 		updater.finish();
 	}
 
+	/**
+	 * Update work list metadata.
+	 *
+	 * @param workListWithMetadata the work list with metadata
+	 * @param config the config
+	 * @return the work list
+	 */
 	public static WorkList updateWorkListMetadata(WorkList workListWithMetadata, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 		WorkList workList = null;
@@ -1737,6 +2070,13 @@ public class TerminologyProjectDAO {
 		return workList;
 	}
 
+	/**
+	 * Delete work set members.
+	 *
+	 * @param workSetWithMetadata the work set with metadata
+	 * @param config the config
+	 * @return the work set
+	 */
 	public static WorkSet deleteWorkSetMembers(WorkSet workSetWithMetadata, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 		WorkSet workSet = null;
@@ -1779,6 +2119,11 @@ public class TerminologyProjectDAO {
 		return workSet;
 	}
 
+	/**
+	 * Retire work set member.
+	 *
+	 * @param workSetMember the work set member
+	 */
 	public static void retireWorkSetMember(WorkSetMember workSetMember) {
 		I_TermFactory termFactory = Terms.get();
 		try {
@@ -1821,6 +2166,11 @@ public class TerminologyProjectDAO {
 		return;
 	}
 
+	/**
+	 * Retire work list member.
+	 *
+	 * @param workListMember the work list member
+	 */
 	public static void retireWorkListMember(WorkListMember workListMember) {
 		I_TermFactory termFactory = Terms.get();
 		try {
@@ -1945,6 +2295,14 @@ public class TerminologyProjectDAO {
 		return workSetMember;
 	}
 
+	/**
+	 * Gets the partition member.
+	 *
+	 * @param partitionMemberConcept the partition member concept
+	 * @param partitionId the partition id
+	 * @param config the config
+	 * @return the partition member
+	 */
 	public static PartitionMember getPartitionMember(I_GetConceptData partitionMemberConcept, int partitionId, I_ConfigAceFrame config) {
 		PartitionMember partitionMember = null;
 		I_TermFactory termFactory = Terms.get();
@@ -1996,6 +2354,13 @@ public class TerminologyProjectDAO {
 		return workSetMembers;
 	}
 
+	/**
+	 * Gets the all partition members.
+	 *
+	 * @param partition the partition
+	 * @param config the config
+	 * @return the all partition members
+	 */
 	public static List<PartitionMember> getAllPartitionMembers(Partition partition, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 		List<PartitionMember> partitionMembers = new ArrayList<PartitionMember>();
@@ -2026,12 +2391,9 @@ public class TerminologyProjectDAO {
 
 	/**
 	 * Gets the all work lists for work set.
-	 * 
-	 * @param workSet
-	 *            the work set
-	 * @param config
-	 *            the config
-	 * 
+	 *
+	 * @param refset the refset
+	 * @param config the config
 	 * @return the all work lists for work set
 	 */
 	public static List<WorkList> getAllWorkListsForRefset(I_GetConceptData refset, I_ConfigAceFrame config) {
@@ -2059,6 +2421,13 @@ public class TerminologyProjectDAO {
 		return workLists;
 	}
 
+	/**
+	 * Gets the all worklist for workset.
+	 *
+	 * @param workset the workset
+	 * @param config the config
+	 * @return the all worklist for workset
+	 */
 	public static List<WorkList> getAllWorklistForWorkset(WorkSet workset, I_ConfigAceFrame config) {
 		List<WorkList> result = new ArrayList<WorkList>();
 		List<PartitionScheme> partitionSchemes = getAllPartitionSchemesForRefsetConcept(workset.getConcept(), config);
@@ -2082,6 +2451,13 @@ public class TerminologyProjectDAO {
 		return result;
 	}
 
+	/**
+	 * Gets the all partitions recursive.
+	 *
+	 * @param partitionScheme the partition scheme
+	 * @param config the config
+	 * @return the all partitions recursive
+	 */
 	private static List<WorkList> getAllPartitionsRecursive(PartitionScheme partitionScheme, I_ConfigAceFrame config) {
 		List<WorkList> result = new ArrayList<WorkList>();
 		List<Partition> partitions = getAllPartitionsForScheme(partitionScheme, config);
@@ -2102,6 +2478,13 @@ public class TerminologyProjectDAO {
 		return result;
 	}
 
+	/**
+	 * Gets the project from parent.
+	 *
+	 * @param concept the concept
+	 * @param config the config
+	 * @return the project from parent
+	 */
 	private static I_TerminologyProject getProjectFromParent(I_GetConceptData concept, I_ConfigAceFrame config) {
 		I_TerminologyProject project = null;
 		try {
@@ -2142,6 +2525,13 @@ public class TerminologyProjectDAO {
 		return project;
 	}
 
+	/**
+	 * Gets the project for worklist.
+	 *
+	 * @param workList the work list
+	 * @param config the config
+	 * @return the project for worklist
+	 */
 	public static I_TerminologyProject getProjectForWorklist(WorkList workList, I_ConfigAceFrame config) {
 
 		return getProjectFromParent(workList.getConcept(), config);
@@ -2220,6 +2610,13 @@ public class TerminologyProjectDAO {
 		return workList;
 	}
 
+	/**
+	 * Gets the non assigned changes work set.
+	 *
+	 * @param project the project
+	 * @param config the config
+	 * @return the non assigned changes work set
+	 */
 	public static WorkSet getNonAssignedChangesWorkSet(I_TerminologyProject project, I_ConfigAceFrame config) {
 		WorkSet nacWorkSet = null;
 		String nacWorkSetName = "Maintenance - " + project.getName().replace("(translation project)", "");
@@ -2233,6 +2630,16 @@ public class TerminologyProjectDAO {
 		return nacWorkSet;
 	}
 
+	/**
+	 * Creates the new nac work list.
+	 *
+	 * @param name the name
+	 * @param bp the bp
+	 * @param project the project
+	 * @param config the config
+	 * @return the work list
+	 * @throws Exception the exception
+	 */
 	public static WorkList createNewNacWorkList(String name, BusinessProcess bp, I_TerminologyProject project, I_ConfigAceFrame config) throws Exception {
 		WorkList newNacWorkList = null;
 		WorkSet nacWorkSet = getNonAssignedChangesWorkSet(project, config);
@@ -2246,6 +2653,13 @@ public class TerminologyProjectDAO {
 		return returnWorkList;
 	}
 
+	/**
+	 * Gets the all nac work lists.
+	 *
+	 * @param project the project
+	 * @param config the config
+	 * @return the all nac work lists
+	 */
 	public static List<WorkList> getAllNacWorkLists(I_TerminologyProject project, I_ConfigAceFrame config) {
 		List<WorkList> nacWorkLists = new ArrayList<WorkList>();
 		WorkSet nacWorkSet = getNonAssignedChangesWorkSet(project, config);
@@ -2257,6 +2671,16 @@ public class TerminologyProjectDAO {
 		return nacWorkLists;
 	}
 
+	/**
+	 * Adds the concept as nac worklist member.
+	 *
+	 * @param workList the work list
+	 * @param concept the concept
+	 * @param destination the destination
+	 * @param config the config
+	 * @return the work list member
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static WorkListMember addConceptAsNacWorklistMember(WorkList workList, I_GetConceptData concept, String destination, I_ConfigAceFrame config) throws IOException {
 		try {
 			WorkSet nacWorkSet = getNonAssignedChangesWorkSet(getProjectForWorklist(workList, config), config);
@@ -2277,14 +2701,11 @@ public class TerminologyProjectDAO {
 
 	/**
 	 * Creates the new work list.
-	 * 
-	 * @param workListWithMetadata
-	 *            the work list with metadata
-	 * @param config
-	 *            the config
-	 * 
+	 *
+	 * @param workListWithMetadata the work list with metadata
+	 * @param config the config
 	 * @return the work list
-	 * @throws Exception
+	 * @throws Exception the exception
 	 */
 	public static WorkList createNewWorkList(WorkList workListWithMetadata, I_ConfigAceFrame config) throws Exception {
 		I_TermFactory termFactory = Terms.get();
@@ -2379,11 +2800,25 @@ public class TerminologyProjectDAO {
 		return workList;
 	}
 
+	/**
+	 * Creates the new partition.
+	 *
+	 * @param name the name
+	 * @param partitionSchemeUUID the partition scheme uuid
+	 * @param config the config
+	 * @return the partition
+	 */
 	public static Partition createNewPartition(String name, UUID partitionSchemeUUID, I_ConfigAceFrame config) {
 		Partition newPartition = new Partition(name, 0, null, partitionSchemeUUID);
 		return createNewPartition(newPartition, config);
 	}
 
+	/**
+	 * Gets the j son form.
+	 *
+	 * @param obj the obj
+	 * @return the j son form
+	 */
 	public static String getJSonForm(Object obj) {
 
 		XStream xstream = new XStream(new JettisonMappedXmlDriver());
@@ -2395,12 +2830,27 @@ public class TerminologyProjectDAO {
 		// System.out.println(xstream.toXML(role2));
 	}
 
+	/**
+	 * Gets the object from j son.
+	 *
+	 * @param jSon the j son
+	 * @return the object from j son
+	 */
 	public static Object getObjectFromJSon(String jSon) {
 		XStream xstream = new XStream(new JettisonMappedXmlDriver());
 		Object obj = xstream.fromXML(jSon);
 		return obj;
 	}
 
+	/**
+	 * Combine partitions.
+	 *
+	 * @param partitions the partitions
+	 * @param name the name
+	 * @param config the config
+	 * @return the partition
+	 * @throws Exception the exception
+	 */
 	public static Partition combinePartitions(List<Partition> partitions, String name, I_ConfigAceFrame config) throws Exception {
 
 		PartitionScheme partitionScheme = partitions.get(0).getPartitionScheme(config);
@@ -2446,6 +2896,12 @@ public class TerminologyProjectDAO {
 		return newPartition;
 	}
 
+	/**
+	 * Checks if is concept duplicate.
+	 *
+	 * @param description the description
+	 * @return true, if is concept duplicate
+	 */
 	private static boolean isConceptDuplicate(String description) {
 		boolean result = false;
 		I_TermFactory tf = Terms.get();
@@ -2478,6 +2934,17 @@ public class TerminologyProjectDAO {
 		return result;
 	}
 
+	/**
+	 * Creates the new partition and members from work set.
+	 *
+	 * @param name the name
+	 * @param workSet the work set
+	 * @param config the config
+	 * @param activity the activity
+	 * @return the partition
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static Partition createNewPartitionAndMembersFromWorkSet(String name, WorkSet workSet, I_ConfigAceFrame config, I_ShowActivity activity) throws TerminologyException, IOException {
 
 		Partition newPartition = null;
@@ -2508,6 +2975,13 @@ public class TerminologyProjectDAO {
 
 	}
 
+	/**
+	 * Creates the new partition.
+	 *
+	 * @param partitionWithMetadata the partition with metadata
+	 * @param config the config
+	 * @return the partition
+	 */
 	private static Partition createNewPartition(Partition partitionWithMetadata, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 		Partition partition = null;
@@ -2560,11 +3034,26 @@ public class TerminologyProjectDAO {
 		return partition;
 	}
 
+	/**
+	 * Creates the new partition scheme.
+	 *
+	 * @param name the name
+	 * @param sourceRefsetUUID the source refset uuid
+	 * @param config the config
+	 * @return the partition scheme
+	 */
 	public static PartitionScheme createNewPartitionScheme(String name, UUID sourceRefsetUUID, I_ConfigAceFrame config) {
 		PartitionScheme newPartitionScheme = new PartitionScheme(name, 0, null, sourceRefsetUUID);
 		return createNewPartitionScheme(newPartitionScheme, config);
 	}
 
+	/**
+	 * Creates the new partition scheme.
+	 *
+	 * @param partitionSchemeWithMetadata the partition scheme with metadata
+	 * @param config the config
+	 * @return the partition scheme
+	 */
 	private static PartitionScheme createNewPartitionScheme(PartitionScheme partitionSchemeWithMetadata, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 		PartitionScheme partitionScheme = null;
@@ -2622,11 +3111,10 @@ public class TerminologyProjectDAO {
 
 	/**
 	 * Adds the concept as work list member.
-	 * 
-	 * @param member
-	 *            the member
-	 * @param config
-	 *            the config
+	 *
+	 * @param member the member
+	 * @param assignedUserId the assigned user id
+	 * @param config the config
 	 */
 	public static void addConceptAsWorkListMember(WorkListMember member, int assignedUserId, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
@@ -2693,6 +3181,13 @@ public class TerminologyProjectDAO {
 		}
 	}
 
+	/**
+	 * Adds the concept as partition member.
+	 *
+	 * @param partitionMemberConcept the partition member concept
+	 * @param partition the partition
+	 * @param config the config
+	 */
 	public static void addConceptAsPartitionMember(I_GetConceptData partitionMemberConcept, Partition partition, I_ConfigAceFrame config) {
 		try {
 			PartitionMember partitionMember = new PartitionMember(partitionMemberConcept.toString(), partitionMemberConcept.getConceptNid(), partitionMemberConcept.getUids(), partition.getConcept().getPrimUuid());
@@ -2705,8 +3200,16 @@ public class TerminologyProjectDAO {
 
 	}
 
+	/** The refset helper. */
 	private static I_HelpRefsets refsetHelper = null;
 
+	/**
+	 * Adds the concept as partition member.
+	 *
+	 * @param member the member
+	 * @param partition the partition
+	 * @param config the config
+	 */
 	public static void addConceptAsPartitionMember(PartitionMember member, Partition partition, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 		try {
@@ -2750,17 +3253,12 @@ public class TerminologyProjectDAO {
 
 	/**
 	 * Execute worklist business process.
-	 * 
-	 * @param worklist
-	 *            the worklist
-	 * @param worker
-	 *            the worker
-	 * @param config
-	 *            the config
-	 * 
-	 * @throws TaskFailedException
-	 *             the task failed exception
-	 * 
+	 *
+	 * @param worklist the worklist
+	 * @param worker the worker
+	 * @param config the config
+	 * @param processToLunch the process to lunch
+	 * @throws TaskFailedException the task failed exception
 	 * @deprecated use deliverWorklistBusinessProcessToOutbox instead
 	 */
 	@SuppressWarnings("unchecked")
@@ -2779,6 +3277,20 @@ public class TerminologyProjectDAO {
 		worker.setProcessStack(ps);
 	}
 
+	/**
+	 * Deliver worklist business process to outbox.
+	 *
+	 * @param worklist the worklist
+	 * @param worker the worker
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TaskFailedException the task failed exception
+	 * @throws UnknownTransactionException the unknown transaction exception
+	 * @throws CannotCommitException the cannot commit exception
+	 * @throws LeaseDeniedException the lease denied exception
+	 * @throws InterruptedException the interrupted exception
+	 * @throws PrivilegedActionException the privileged action exception
+	 */
 	public static void deliverWorklistBusinessProcessToOutbox(WorkList worklist, I_Work worker) throws TerminologyException, IOException, TaskFailedException, UnknownTransactionException, CannotCommitException, LeaseDeniedException,
 			InterruptedException, PrivilegedActionException {
 
@@ -2873,12 +3385,48 @@ public class TerminologyProjectDAO {
 		}
 	}
 
+	/** The subject separator. */
 	private static String subjectSeparator = "-@-";
 
+	/**
+	 * The Enum subjectIndexes.
+	 */
 	public enum subjectIndexes {
-		WORKLIST_MEMBER_ID, WORKLIST_MEMBER_SOURCE_NAME, WORKLIST_ID, WORKLIST_NAME, PROJECT_ID, WORKLIST_MEMBER_SOURCE_PREF, PROMO_REFSET_ID, TAGS_ARRAY, STATUS_ID, STATUS_TIME
+		
+		/** The WORKLIS t_ membe r_ id. */
+		WORKLIST_MEMBER_ID, 
+ /** The WORKLIS t_ membe r_ sourc e_ name. */
+ WORKLIST_MEMBER_SOURCE_NAME, 
+ /** The WORKLIS t_ id. */
+ WORKLIST_ID, 
+ /** The WORKLIS t_ name. */
+ WORKLIST_NAME, 
+ /** The PROJEC t_ id. */
+ PROJECT_ID, 
+ /** The WORKLIS t_ membe r_ sourc e_ pref. */
+ WORKLIST_MEMBER_SOURCE_PREF, 
+ /** The PROM o_ refse t_ id. */
+ PROMO_REFSET_ID, 
+ /** The TAG s_ array. */
+ TAGS_ARRAY, 
+ /** The STATU s_ id. */
+ STATUS_ID, 
+ /** The STATU s_ time. */
+ STATUS_TIME
 	};
 
+	/**
+	 * Gets the item subject.
+	 *
+	 * @param workListMember the work list member
+	 * @param worklist the worklist
+	 * @param project the project
+	 * @param promotionRefset the promotion refset
+	 * @param langRefset the lang refset
+	 * @param statusId the status id
+	 * @param statusTime the status time
+	 * @return the item subject
+	 */
 	public static String getItemSubject(WorkListMember workListMember, WorkList worklist, I_TerminologyProject project, PromotionRefset promotionRefset, Integer langRefset, int statusId, Long statusTime) {
 		String[] terms = getSourceTerms(workListMember.getId(), langRefset);
 		String subject = "";
@@ -2892,11 +3440,22 @@ public class TerminologyProjectDAO {
 		return subject;
 	}
 
+	/** The fsn. */
 	private static I_GetConceptData fsn;
+	
+	/** The preferred. */
 	private static I_GetConceptData preferred;
+	
+	/** The not acceptable. */
 	private static I_GetConceptData notAcceptable;
+	
+	/** The inactive. */
 	private static I_GetConceptData inactive;
+	
+	/** The retired. */
 	private static I_GetConceptData retired;
+	
+	/** The en refset. */
 	private static I_GetConceptData enRefset;
 	static {
 
@@ -2914,6 +3473,13 @@ public class TerminologyProjectDAO {
 		}
 	}
 
+	/**
+	 * Gets the source terms.
+	 *
+	 * @param worklistmemberId the worklistmember id
+	 * @param sourceLang the source lang
+	 * @return the source terms
+	 */
 	private static String[] getSourceTerms(Integer worklistmemberId, Integer sourceLang) {
 		String[] retString = { "", "" };
 		String sFsn = "";
@@ -2975,6 +3541,12 @@ public class TerminologyProjectDAO {
 
 	}
 
+	/**
+	 * Gets the parsed item subject.
+	 *
+	 * @param subject the subject
+	 * @return the parsed item subject
+	 */
 	public static String[] getParsedItemSubject(String subject) {
 		if (subject == null) {
 			return new String[] { "" };
@@ -2982,6 +3554,13 @@ public class TerminologyProjectDAO {
 		return subject.split(subjectSeparator, -1);
 	}
 
+	/**
+	 * Gets the source language refset ids for project id.
+	 *
+	 * @param projectId the project id
+	 * @param config the config
+	 * @return the source language refset ids for project id
+	 */
 	public static List<Integer> getSourceLanguageRefsetIdsForProjectId(int projectId, I_ConfigAceFrame config) {
 		ArrayList<Integer> returnData = new ArrayList<Integer>();
 		I_TermFactory termFactory = Terms.get();
@@ -3014,6 +3593,12 @@ public class TerminologyProjectDAO {
 		return returnData;
 	}
 
+	/**
+	 * Gets the subject from array.
+	 *
+	 * @param parsedSubj the parsed subj
+	 * @return the subject from array
+	 */
 	public static String getSubjectFromArray(String[] parsedSubj) {
 		StringBuffer ret = new StringBuffer("");
 		if (parsedSubj.length == TerminologyProjectDAO.subjectIndexes.values().length) {
@@ -3026,6 +3611,16 @@ public class TerminologyProjectDAO {
 		return ret.toString();
 	}
 
+	/**
+	 * Gets the promotion status id for refset id.
+	 *
+	 * @param refsetId the refset id
+	 * @param componentId the component id
+	 * @param config the config
+	 * @return the promotion status id for refset id
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	public static Integer getPromotionStatusIdForRefsetId(int refsetId, int componentId, I_ConfigAceFrame config) throws IOException, TerminologyException {
 
 		I_TermFactory termFactory = Terms.get();
@@ -3048,6 +3643,14 @@ public class TerminologyProjectDAO {
 		return null;
 	}
 
+	/**
+	 * Gets the target language refset id for project id.
+	 *
+	 * @param projectId the project id
+	 * @param config the config
+	 * @return the target language refset id for project id
+	 * @throws Exception the exception
+	 */
 	public static Integer getTargetLanguageRefsetIdForProjectId(int projectId, I_ConfigAceFrame config) throws Exception {
 		List<I_RelTuple> targetRefsets = new ArrayList<I_RelTuple>();
 		List<? extends I_RelTuple> targetRefsetsTuples = null;
@@ -3080,14 +3683,10 @@ public class TerminologyProjectDAO {
 
 	/**
 	 * Gets the work list member.
-	 * 
-	 * @param workListMemberConcept
-	 *            the work list member concept
-	 * @param workListId
-	 *            the work list id
-	 * @param config
-	 *            the config
-	 * 
+	 *
+	 * @param workListMemberConcept the work list member concept
+	 * @param workList the work list
+	 * @param config the config
 	 * @return the work list member
 	 */
 	public static WorkListMember getWorkListMember(I_GetConceptData workListMemberConcept, WorkList workList, I_ConfigAceFrame config) {
@@ -3166,6 +3765,16 @@ public class TerminologyProjectDAO {
 		return workListMembers;
 	}
 
+	/**
+	 * Gets the work list members with status.
+	 *
+	 * @param workList the work list
+	 * @param activityStatus the activity status
+	 * @param config the config
+	 * @return the work list members with status
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static List<WorkListMember> getWorkListMembersWithStatus(WorkList workList, I_GetConceptData activityStatus, I_ConfigAceFrame config) throws TerminologyException, IOException {
 		I_TermFactory termFactory = Terms.get();
 		List<WorkListMember> workListMembers = new ArrayList<WorkListMember>();
@@ -3182,6 +3791,15 @@ public class TerminologyProjectDAO {
 		return workListMembers;
 	}
 
+	/**
+	 * Gets the work list member statuses.
+	 *
+	 * @param workList the work list
+	 * @param config the config
+	 * @return the work list member statuses
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static HashMap<I_GetConceptData, Integer> getWorkListMemberStatuses(WorkList workList, I_ConfigAceFrame config) throws TerminologyException, IOException {
 		HashMap<I_GetConceptData, Integer> workListMembersStatuses = new HashMap<I_GetConceptData, Integer>();
 		I_TermFactory tf = Terms.get();
@@ -3346,14 +3964,11 @@ public class TerminologyProjectDAO {
 
 	/**
 	 * Retire concept.
-	 * 
-	 * @param conceptToRetire
-	 *            the concept to retire
-	 * @param config
-	 *            the config
-	 * 
+	 *
+	 * @param project the project
+	 * @param config the config
 	 * @return the i_ get concept data
-	 * @throws Exception
+	 * @throws Exception the exception
 	 */
 
 	public static void retireProject(I_TerminologyProject project, I_ConfigAceFrame config) throws Exception {
@@ -3364,6 +3979,13 @@ public class TerminologyProjectDAO {
 		}
 	}
 
+	/**
+	 * Retire work set.
+	 *
+	 * @param workSet the work set
+	 * @param config the config
+	 * @throws Exception the exception
+	 */
 	public static void retireWorkSet(WorkSet workSet, I_ConfigAceFrame config) throws Exception {
 		if (!workSet.getPartitionSchemes(config).isEmpty()) {
 			throw new Exception("Not empty!, delete partition schemes first...");
@@ -3375,6 +3997,13 @@ public class TerminologyProjectDAO {
 		}
 	}
 
+	/**
+	 * Retire work list.
+	 *
+	 * @param workList the work list
+	 * @param config the config
+	 * @throws Exception the exception
+	 */
 	public static void retireWorkList(WorkList workList, I_ConfigAceFrame config) throws Exception {
 		for (WorkListMember member : workList.getWorkListMembers()) {
 			if (!ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids().contains(member.getActivityStatus()) && !ArchitectonicAuxiliary.Concept.RETIRED.getUids().contains(member.getActivityStatus())
@@ -3389,6 +4018,13 @@ public class TerminologyProjectDAO {
 		retireConcept(workList.getConcept(), config);
 	}
 
+	/**
+	 * Retire partition.
+	 *
+	 * @param partition the partition
+	 * @param config the config
+	 * @throws Exception the exception
+	 */
 	public static void retirePartition(Partition partition, I_ConfigAceFrame config) throws Exception {
 		if (!partition.getWorkLists().isEmpty()) {
 			throw new Exception("Not empty!, delete worklists first...");
@@ -3400,6 +4036,13 @@ public class TerminologyProjectDAO {
 		}
 	}
 
+	/**
+	 * Retire partition scheme.
+	 *
+	 * @param partitionScheme the partition scheme
+	 * @param config the config
+	 * @throws Exception the exception
+	 */
 	public static void retirePartitionScheme(PartitionScheme partitionScheme, I_ConfigAceFrame config) throws Exception {
 		if (!partitionScheme.getPartitions().isEmpty()) {
 			throw new Exception("Not empty!, delete partitions first...");
@@ -3408,6 +4051,14 @@ public class TerminologyProjectDAO {
 		}
 	}
 
+	/**
+	 * Retire partition member.
+	 *
+	 * @param partitionMember the partition member
+	 * @param config the config
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static void retirePartitionMember(PartitionMember partitionMember, I_ConfigAceFrame config) throws TerminologyException, IOException {
 		I_TermFactory termFactory = Terms.get();
 		try {
@@ -3442,6 +4093,13 @@ public class TerminologyProjectDAO {
 		return;
 	}
 
+	/**
+	 * Retire concept.
+	 *
+	 * @param conceptToRetire the concept to retire
+	 * @param config the config
+	 * @return the i_ get concept data
+	 */
 	public static I_GetConceptData retireConcept(I_GetConceptData conceptToRetire, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 		I_GetConceptData conceptToRetireUpdatedFromDB = null;
@@ -3531,6 +4189,14 @@ public class TerminologyProjectDAO {
 		} while ((t1 - t0) < (n * 1000));
 	}
 
+	/**
+	 * Gets the latest source relationship target.
+	 *
+	 * @param concept the concept
+	 * @param relationshipType the relationship type
+	 * @return the latest source relationship target
+	 * @throws Exception the exception
+	 */
 	public static I_GetConceptData getLatestSourceRelationshipTarget(I_GetConceptData concept, I_GetConceptData relationshipType) throws Exception {
 
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
@@ -3552,6 +4218,14 @@ public class TerminologyProjectDAO {
 		return latestTarget;
 	}
 
+	/**
+	 * Sync workset with refset spec.
+	 *
+	 * @param workSet the work set
+	 * @param config the config
+	 * @param activity the activity
+	 * @throws Exception the exception
+	 */
 	public static void syncWorksetWithRefsetSpec(WorkSet workSet, I_ConfigAceFrame config, I_ShowActivity activity) throws Exception {
 
 		ActivityUpdater updater = new ActivityUpdater(activity, "Synchronizing WorkSet");
@@ -3565,6 +4239,14 @@ public class TerminologyProjectDAO {
 		return;
 	}
 
+	/**
+	 * Gets the last extension part.
+	 *
+	 * @param extension the extension
+	 * @return the last extension part
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static I_ExtendByRefPart getLastExtensionPart(I_ExtendByRef extension) throws TerminologyException, IOException {
 		long lastVersion = Long.MIN_VALUE;
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
@@ -3588,6 +4270,13 @@ public class TerminologyProjectDAO {
 		return lastPart;
 	}
 
+	/**
+	 * Gets the lastest attribute part.
+	 *
+	 * @param concept the concept
+	 * @return the lastest attribute part
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static I_ConceptAttributePart getLastestAttributePart(final I_GetConceptData concept) throws IOException {
 		List<? extends I_ConceptAttributePart> refsetAttibuteParts = concept.getConceptAttributes().getMutableParts();
 		I_ConceptAttributePart latestAttributePart = null;
@@ -3604,6 +4293,12 @@ public class TerminologyProjectDAO {
 		return latestAttributePart;
 	}
 
+	/**
+	 * Checks if is active.
+	 *
+	 * @param statusId the status id
+	 * @return true, if is active
+	 */
 	public static boolean isActive(int statusId) {
 		List<Integer> activeStatuses = new ArrayList<Integer>();
 		try {
@@ -3619,6 +4314,12 @@ public class TerminologyProjectDAO {
 		return (activeStatuses.contains(statusId));
 	}
 
+	/**
+	 * Checks if is inactive.
+	 *
+	 * @param statusId the status id
+	 * @return true, if is inactive
+	 */
 	private static boolean isInactive(int statusId) {
 		List<Integer> inactiveStatuses = new ArrayList<Integer>();
 		try {
@@ -3688,6 +4389,12 @@ public class TerminologyProjectDAO {
 		return permissionsApi.checkPermissionForProject(user, target, permission);
 	}
 
+	/**
+	 * Gets the business process.
+	 *
+	 * @param f the f
+	 * @return the business process
+	 */
 	public static BusinessProcess getBusinessProcess(File f) {
 		ObjectInputStream in;
 		try {
@@ -3706,6 +4413,18 @@ public class TerminologyProjectDAO {
 		return null;
 	}
 
+	/**
+	 * Generate work list from partition.
+	 *
+	 * @param partition the partition
+	 * @param workflowDefinition the workflow definition
+	 * @param workflowUserRoles the workflow user roles
+	 * @param name the name
+	 * @param config the config
+	 * @param activity the activity
+	 * @return the work list
+	 * @throws Exception the exception
+	 */
 	public static WorkList generateWorkListFromPartition(Partition partition, WorkflowDefinition workflowDefinition, List<WfMembership> workflowUserRoles, String name, I_ConfigAceFrame config, I_ShowActivity activity) throws Exception {
 		WorkList workList = new WorkList(name, 0, null, partition.getUids().iterator().next());
 		workList.setWorkflowDefinition(workflowDefinition);
@@ -3723,6 +4442,12 @@ public class TerminologyProjectDAO {
 		return workList;
 	}
 
+	/**
+	 * Clean rel tuples list.
+	 *
+	 * @param tuples the tuples
+	 * @return the list<? extends i_ rel tuple>
+	 */
 	private static List<? extends I_RelTuple> cleanRelTuplesList(List<? extends I_RelTuple> tuples) {
 		HashMap<Integer, I_RelTuple> cleanMap = new HashMap<Integer, I_RelTuple>();
 		for (I_RelTuple loopTuple : tuples) {
@@ -3737,6 +4462,15 @@ public class TerminologyProjectDAO {
 		return cleanList;
 	}
 
+	/**
+	 * Validate concept as refset.
+	 *
+	 * @param concept the concept
+	 * @param config the config
+	 * @return true, if successful
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	public static boolean validateConceptAsRefset(I_GetConceptData concept, I_ConfigAceFrame config) throws IOException, TerminologyException {
 		I_TermFactory tf = Terms.get();
 		if (tf.getConcept(RefsetAuxiliary.Concept.REFSET_AUXILIARY.getUids()).isParentOf(concept)) {
@@ -3755,6 +4489,12 @@ public class TerminologyProjectDAO {
 		return false;
 	}
 
+	/**
+	 * Promote.
+	 *
+	 * @param termComponent the term component
+	 * @param config the config
+	 */
 	public static void promote(I_GetConceptData termComponent, I_ConfigAceFrame config) {
 		// PositionBI viewPosition =
 		// config.getViewPositionSetReadOnly().iterator().next();
@@ -3822,6 +4562,12 @@ public class TerminologyProjectDAO {
 
 	}
 
+	/**
+	 * Promote.
+	 *
+	 * @param termComponent the term component
+	 * @param config the config
+	 */
 	public static void promote(I_ExtendByRef termComponent, I_ConfigAceFrame config) {
 		// PositionBI viewPosition =
 		// config.getViewPositionSetReadOnly().iterator().next();
@@ -3908,9 +4654,9 @@ public class TerminologyProjectDAO {
 	 * Calculates a set of valid users - a user is valid is they are a child of
 	 * the User concept in the top hierarchy, and have a description of type
 	 * "user inbox".
-	 * 
+	 *
+	 * @param config the config
 	 * @return The set of valid users.
-	 * 
 	 * @deprecated moved to ProjectPermissionAPI
 	 */
 	public static Set<I_GetConceptData> getUsers(I_ConfigAceFrame config) {
@@ -3919,6 +4665,11 @@ public class TerminologyProjectDAO {
 		return permissionsApi.getUsers();
 	}
 
+	/**
+	 * Sleep.
+	 *
+	 * @param n the n
+	 */
 	public static void sleep(int n) {
 		try {
 			Thread.sleep(n);
@@ -3927,6 +4678,17 @@ public class TerminologyProjectDAO {
 		}
 	}
 
+	/**
+	 * Promote work list content to release candidate path.
+	 *
+	 * @param conflictResolutionPathConcept the conflict resolution path concept
+	 * @param releaseCandidatePathConcept the release candidate path concept
+	 * @param workList the work list
+	 * @param config the config
+	 * @return true, if successful
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static boolean promoteWorkListContentToReleaseCandidatePath(I_GetConceptData conflictResolutionPathConcept, I_GetConceptData releaseCandidatePathConcept, WorkList workList, I_ConfigAceFrame config) throws TerminologyException, IOException {
 		int promoted = 0;
 		I_TermFactory tf = Terms.get();
@@ -3940,6 +4702,13 @@ public class TerminologyProjectDAO {
 		return (promoted > 0);
 	}
 
+	/**
+	 * Promote language content.
+	 *
+	 * @param member the member
+	 * @param config the config
+	 * @throws Exception the exception
+	 */
 	public static void promoteLanguageContent(WorkListMember member, I_ConfigAceFrame config) throws Exception {
 		// PROMOTION REMOVED, No promotion path will be used
 		// I_TermFactory tf = Terms.get();

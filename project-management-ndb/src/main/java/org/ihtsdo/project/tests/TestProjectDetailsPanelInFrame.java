@@ -138,6 +138,11 @@ public class TestProjectDetailsPanelInFrame extends JPanel {
 		});
 	}
 	
+	/**
+	 * Gets the test config.
+	 *
+	 * @return the test config
+	 */
 	private static I_ConfigAceFrame getTestConfig() {
 		I_ConfigAceFrame config = null;
 		try {

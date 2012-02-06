@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.project.workflow.api;
 
 import java.io.File;
@@ -35,12 +51,25 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
+/**
+ * The Class WfComponentProvider.
+ */
 public class WfComponentProvider {
 
+	/** The users cache. */
 	public static Map<UUID, WfUser> usersCache = new HashMap<UUID, WfUser>();
+	
+	/** The states cache. */
 	public static Map<UUID, WfState> statesCache = new HashMap<UUID, WfState>();
+	
+	/** The roles cache. */
 	public static Map<UUID, WfRole> rolesCache = new HashMap<UUID, WfRole>();
 
+	/**
+	 * Gets the users.
+	 *
+	 * @return the users
+	 */
 	public List<WfUser> getUsers() {
 		List<WfUser> wfUsers = new ArrayList<WfUser>();
 		try {
@@ -79,6 +108,12 @@ public class WfComponentProvider {
 		return wfUsers;
 	}
 
+	/**
+	 * Gets the preferred term from auxiliary hier.
+	 *
+	 * @param concept the concept
+	 * @return the preferred term from auxiliary hier
+	 */
 	private String getPreferredTermFromAuxiliaryHier(I_GetConceptData concept) {
 
 		I_ConfigAceFrame config;
@@ -102,6 +137,12 @@ public class WfComponentProvider {
 		return "";
 	}
 
+	/**
+	 * Gets the user by uuid.
+	 *
+	 * @param id the id
+	 * @return the user by uuid
+	 */
 	public WfUser getUserByUUID(UUID id) {
 		WfUser wfUser = null;
 		try {
@@ -129,6 +170,11 @@ public class WfComponentProvider {
 		return wfUser;
 	}
 
+	/**
+	 * Gets the roles.
+	 *
+	 * @return the roles
+	 */
 	public List<WfRole> getRoles() {
 		List<WfRole> returnRoles = new ArrayList<WfRole>();
 
@@ -149,10 +195,21 @@ public class WfComponentProvider {
 
 	}
 
+	/**
+	 * Gets the all states.
+	 *
+	 * @return the all states
+	 */
 	public List<WfState> getAllStates() {
 		return getStates();
 	}
 
+	/**
+	 * Gets the wf instance.
+	 *
+	 * @param instanceUUID the instance uuid
+	 * @return the wf instance
+	 */
 	public static WfInstance getWfInstance(UUID instanceUUID) {
 		WfInstance wfInstance = null;
 		try {
@@ -184,6 +241,12 @@ public class WfComponentProvider {
 		return wfInstance;
 	}
 
+	/**
+	 * Gets the permissions for user.
+	 *
+	 * @param user the user
+	 * @return the permissions for user
+	 */
 	public List<WfPermission> getPermissionsForUser(WfUser user) {
 		List<WfPermission> wfPermissions = new ArrayList<WfPermission>();
 		I_ConfigAceFrame config;
@@ -207,6 +270,11 @@ public class WfComponentProvider {
 		return wfPermissions;
 	}
 
+	/**
+	 * Gets the permissions.
+	 *
+	 * @return the permissions
+	 */
 	public List<WfPermission> getPermissions() {
 		List<WfPermission> wfPermissions = new ArrayList<WfPermission>();
 
@@ -235,6 +303,11 @@ public class WfComponentProvider {
 		return wfPermissions;
 	}
 
+	/**
+	 * Gets the states.
+	 *
+	 * @return the states
+	 */
 	public List<WfState> getStates() {
 		List<WfState> returnStates = new ArrayList<WfState>();
 
@@ -254,6 +327,12 @@ public class WfComponentProvider {
 		return returnStates;
 	}
 
+	/**
+	 * Role concept to wf role.
+	 *
+	 * @param role the role
+	 * @return the wf role
+	 */
 	public WfRole roleConceptToWfRole(I_GetConceptData role) {
 		WfRole wfrole = WfComponentProvider.rolesCache.get(role.getPrimUuid());
 		if (wfrole != null) {
@@ -264,6 +343,12 @@ public class WfComponentProvider {
 		return wfrole;
 	}
 
+	/**
+	 * User concept to wf user.
+	 *
+	 * @param user the user
+	 * @return the wf user
+	 */
 	public WfUser userConceptToWfUser(I_GetConceptData user) {
 		WfUser wfUser = WfComponentProvider.usersCache.get(user.getPrimUuid());
 		if (wfUser != null) {
@@ -281,6 +366,12 @@ public class WfComponentProvider {
 		return wfUser;
 	}
 
+	/**
+	 * Status concept to wf state.
+	 *
+	 * @param status the status
+	 * @return the wf state
+	 */
 	public WfState statusConceptToWfState(I_GetConceptData status) {
 		WfState state = WfComponentProvider.statesCache.get(status.getPrimUuid());
 		if (state != null) {
@@ -296,14 +387,27 @@ public class WfComponentProvider {
 		return state;
 	}
 
+	/** The Constant END_FILE. */
 	private static final String END_FILE = ".wfd";
 
+	/**
+	 * Gets the workflow definition files.
+	 *
+	 * @return the workflow definition files
+	 */
 	public static List<File> getWorkflowDefinitionFiles() {
 		File folder = new File("./sampleProcesses");
 		List<File> retFiles = loadFiles(folder, END_FILE);
 		return retFiles;
 	}
 
+	/**
+	 * Load files.
+	 *
+	 * @param folder the folder
+	 * @param endFile the end file
+	 * @return the list
+	 */
 	private static List<File> loadFiles(File folder, String endFile) {
 		File[] fileList = folder.listFiles();
 		List<File> retFiles = new ArrayList<File>();

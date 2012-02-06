@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Thu Jul 15 17:35:07 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.project.panel;
@@ -35,19 +48,33 @@ import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.TranslationProject;
 
 /**
+ * The Class TranslationProjectDialog.
+ *
  * @author Guillermo Reynoso
  */
 public class TranslationProjectDialog extends JDialog {
 
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -2132747097563085391L;
 
+	/** The Constant PROJECTNODE. */
 	private static final String PROJECTNODE = "P";
 
+	/** The config. */
 	private I_ConfigAceFrame config;
+	
+	/** The root node. */
 	private DefaultMutableTreeNode rootNode;
+	
+	/** The tree model. */
 	private DefaultTreeModel treeModel;
+	
+	/** The selected project. */
 	private TranslationProject selectedProject = null;
 
+	/**
+	 * Instantiates a new translation project dialog.
+	 */
 	public TranslationProjectDialog() {
 		super();
 		initComponents();
@@ -62,6 +89,11 @@ public class TranslationProjectDialog extends JDialog {
 
 	}
 
+	/**
+	 * Show modal dialog.
+	 *
+	 * @return the translation project
+	 */
 	public TranslationProject showModalDialog() {
 		setModal(true);
 		pack();
@@ -69,11 +101,19 @@ public class TranslationProjectDialog extends JDialog {
 		return selectedProject;
 	}
 
+	/**
+	 * Close.
+	 *
+	 * @param canceled the canceled
+	 */
 	private void close(TranslationProject canceled) {
 		this.selectedProject = canceled;
 		dispose();
 	}
 
+	/**
+	 * Inits the custom components.
+	 */
 	private void initCustomComponents() {
 		try {
 
@@ -103,6 +143,11 @@ public class TranslationProjectDialog extends JDialog {
 		}
 	}
 
+	/**
+	 * Ok button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void okButtonActionPerformed(ActionEvent e) {
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode) jTree1.getLastSelectedPathComponent();
 		if (node == null) {
@@ -115,6 +160,11 @@ public class TranslationProjectDialog extends JDialog {
 		close((TranslationProject) proj.getAtrValue());
 	}
 
+	/**
+	 * J tree1 mouse clicked.
+	 *
+	 * @param e the e
+	 */
 	private void jTree1MouseClicked(MouseEvent e) {
 		if (e.getClickCount() == 2) {
 			TreePath pathForLocation = jTree1.getPathForLocation(e.getX(), e.getY());
@@ -133,6 +183,9 @@ public class TranslationProjectDialog extends JDialog {
 		}
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -196,15 +249,33 @@ public class TranslationProjectDialog extends JDialog {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The ok button. */
 	private JButton okButton;
+	
+	/** The cancel button. */
 	private JButton cancelButton;
+	
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The j tree1. */
 	private JTree jTree1;
+	
+	/** The error label. */
 	private JLabel errorLabel;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 
+	/**
+	 * Load projects.
+	 *
+	 * @throws Exception the exception
+	 */
 	private void loadProjects() throws Exception {
 		int i;
 		rootNode = new DefaultMutableTreeNode("Root Node");
@@ -225,12 +296,29 @@ public class TranslationProjectDialog extends JDialog {
 
 	}
 
+	/**
+	 * Adds the project to tree.
+	 *
+	 * @param node the node
+	 * @param project the project
+	 * @param visibleChildren the visible children
+	 * @return the default mutable tree node
+	 * @throws Exception the exception
+	 */
 	private DefaultMutableTreeNode addProjectToTree(DefaultMutableTreeNode node, TranslationProject project, boolean visibleChildren) throws Exception {
 		DefaultMutableTreeNode tNode;
 		tNode = addObject(node, new TreeObj(PROJECTNODE, project.getName(), project), visibleChildren);
 		return tNode;
 	}
 
+	/**
+	 * Adds the object.
+	 *
+	 * @param parent the parent
+	 * @param child the child
+	 * @param shouldBeVisible the should be visible
+	 * @return the default mutable tree node
+	 */
 	private DefaultMutableTreeNode addObject(DefaultMutableTreeNode parent, Object child, boolean shouldBeVisible) {
 		DefaultMutableTreeNode childNode = new DefaultMutableTreeNode(child);
 

@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.project.dataexport;
 
 import java.io.BufferedWriter;
@@ -23,23 +39,61 @@ import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.refset.ConceptMembershipRefset;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
+/**
+ * The Class ExportConceptMemberRefsetToRefset.
+ */
 public class ExportConceptMemberRefsetToRefset {
+	
+	/** The output file writer. */
 	BufferedWriter outputFileWriter;
+	
+	/** The report file writer. */
 	BufferedWriter reportFileWriter;
+	
+	/** The line count. */
 	int lineCount;
+	
+	/** The refset concept. */
 	ConceptMembershipRefset refsetConcept;
+	
+	/** The refset uuid. */
 	UUID refsetUUID;
+	
+	/** The refset helper. */
 	I_HelpRefsets refsetHelper ;
+	
+	/** The term factory. */
 	I_TermFactory termFactory;
+	
+	/** The id. */
 	I_Identify id;
+	
+	/** The formatter. */
 	SimpleDateFormat formatter;
+	
+	/** The output file writer2. */
 	private BufferedWriter outputFileWriter2;
 	
+	/**
+	 * Instantiates a new export concept member refset to refset.
+	 */
 	public ExportConceptMemberRefsetToRefset(){
 		termFactory = Terms.get();
 		formatter=new SimpleDateFormat("yyyyMMddHHmmss");
 
 	}
+	
+	/**
+	 * Export file.
+	 *
+	 * @param exportFile the export file
+	 * @param exportFile2 the export file2
+	 * @param reportFile the report file
+	 * @param refsetConcept the refset concept
+	 * @param exportToCsv the export to csv
+	 * @return the long[]
+	 * @throws Exception the exception
+	 */
 	public Long[] exportFile(File exportFile, File exportFile2, File reportFile, I_GetConceptData refsetConcept, boolean exportToCsv) throws Exception {
 
 		reportFileWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(reportFile),"UTF8"));

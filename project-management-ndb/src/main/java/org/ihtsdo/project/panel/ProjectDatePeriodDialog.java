@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Tue Aug 31 19:05:45 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.project.panel;
@@ -37,32 +50,59 @@ import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.I_TerminologyProject;
 
 /**
+ * The Class ProjectDatePeriodDialog.
+ *
  * @author Guillermo Reynoso
  */
 public class ProjectDatePeriodDialog extends JDialog {
 
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1225212384010395373L;
 
+	/** The Constant ALL_FIELDS_ARE_REQUIRED. */
 	private static final String ALL_FIELDS_ARE_REQUIRED = "All fields are required.";
 
+	/** The Constant PROJECT_KEY. */
 	public static final String PROJECT_KEY = "Project";
+	
+	/** The Constant START_DATE_KEY. */
 	public static final String START_DATE_KEY = "Start Date";
+	
+	/** The Constant END_DATE_KEY. */
 	public static final String END_DATE_KEY = "End Date";
+	
+	/** The Constant PERIOD_KEY. */
 	public static final String PERIOD_KEY = "Period";
 
+	/** The project combo model. */
 	private DefaultComboBoxModel projectComboModel;
+	
+	/** The config. */
 	private I_ConfigAceFrame config;
+	
+	/** The data. */
 	private HashMap<String, Object> data = null;
 
+	/** The start date. */
 	DatePicker startDate;
+	
+	/** The end date. */
 	DatePicker endDate;
 
+	/**
+	 * Instantiates a new project date period dialog.
+	 *
+	 * @param config the config
+	 */
 	public ProjectDatePeriodDialog(I_ConfigAceFrame config) {
 		this.config = config;
 		initComponents();
 		initCustomComponents();
 	}
 
+	/**
+	 * Inits the custom components.
+	 */
 	private void initCustomComponents() {
 		errorLabel.setForeground(Color.RED);
 
@@ -113,6 +153,11 @@ public class ProjectDatePeriodDialog extends JDialog {
 
 	}
 
+	/**
+	 * Show modal dialog.
+	 *
+	 * @return the hash map
+	 */
 	public HashMap<String, Object> showModalDialog() {
 		setModal(true);
 		this.setPreferredSize(new Dimension(440, 210));
@@ -121,11 +166,21 @@ public class ProjectDatePeriodDialog extends JDialog {
 		return data;
 	}
 
+	/**
+	 * Close.
+	 *
+	 * @param canceled the canceled
+	 */
 	private void close(HashMap<String, Object> canceled) {
 		this.data = canceled;
 		dispose();
 	}
 
+	/**
+	 * Open button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void openButtonActionPerformed(ActionEvent e) {
 		Calendar startDate;
 		Calendar endDate;
@@ -166,18 +221,36 @@ public class ProjectDatePeriodDialog extends JDialog {
 		}
 	}
 
+	/**
+	 * Cancel button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void cancelButtonActionPerformed(ActionEvent e) {
 		close(null);
 	}
 
+	/**
+	 * Gets the start date.
+	 *
+	 * @return the start date
+	 */
 	public Calendar getStartDate() {
 		return (Calendar) startDate.getSelectedDate();
 	}
 
+	/**
+	 * Gets the end date.
+	 *
+	 * @return the end date
+	 */
 	public Calendar getEndDate() {
 		return (Calendar) endDate.getSelectedDate();
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -299,18 +372,43 @@ public class ProjectDatePeriodDialog extends JDialog {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
+	/** The button panel. */
 	private JPanel buttonPanel;
+	
+	/** The open button. */
 	private JButton openButton;
+	
+	/** The cancel button. */
 	private JButton cancelButton;
+	
+	/** The panel3. */
 	private JPanel panel3;
+	
+	/** The project panel. */
 	private JPanel projectPanel;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The project combo box. */
 	private JComboBox projectComboBox;
+	
+	/** The start date label. */
 	private JLabel startDateLabel;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The period label. */
 	private JLabel periodLabel;
+	
+	/** The panel4. */
 	private JPanel panel4;
+	
+	/** The period. */
 	private JTextField period;
+	
+	/** The error label. */
 	private JLabel errorLabel;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 

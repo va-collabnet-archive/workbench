@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.project;
 
 import java.io.File;
@@ -25,6 +41,9 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.BdbTermFactory;
 import org.ihtsdo.tk.api.Precedence;
 
+/**
+ * The Class TestFileLinkAPI.
+ */
 public class TestFileLinkAPI extends TestCase {
 	/** The vodb directory. */
 	File vodbDirectory;
@@ -50,6 +69,9 @@ public class TestFileLinkAPI extends TestCase {
 	/** The allowed statuses with retired. */
 	I_IntSet allowedStatusesWithRetired;
 
+	/* (non-Javadoc)
+	 * @see junit.framework.TestCase#setUp()
+	 */
 	protected void setUp() throws Exception {
 		System.out.println("Deleting test fixture");
 		deleteDirectory(new File("berkeley-db"));
@@ -66,6 +88,11 @@ public class TestFileLinkAPI extends TestCase {
 	
 	
 
+	/**
+	 * Test api.
+	 *
+	 * @throws Exception the exception
+	 */
 	public void testAPI() throws Exception {
 		FileLinkAPI flApi = new FileLinkAPI(config);
 
@@ -159,6 +186,11 @@ public class TestFileLinkAPI extends TestCase {
 
 	}
 
+	/**
+	 * Gets the test config.
+	 *
+	 * @return the test config
+	 */
 	private I_ConfigAceFrame getTestConfig() {
 		I_ConfigAceFrame config = null;
 		try {
@@ -198,6 +230,13 @@ public class TestFileLinkAPI extends TestCase {
 	}
 
 	// If targetLocation does not exist, it will be created.
+	/**
+	 * Copy directory.
+	 *
+	 * @param sourceLocation the source location
+	 * @param targetLocation the target location
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public void copyDirectory(File sourceLocation , File targetLocation)
 	throws IOException {
 
@@ -227,6 +266,12 @@ public class TestFileLinkAPI extends TestCase {
 		}
 	}
 
+	/**
+	 * Delete directory.
+	 *
+	 * @param path the path
+	 * @return true, if successful
+	 */
 	public boolean deleteDirectory(File path) {
 		if( path.exists() ) {
 			File[] files = path.listFiles();

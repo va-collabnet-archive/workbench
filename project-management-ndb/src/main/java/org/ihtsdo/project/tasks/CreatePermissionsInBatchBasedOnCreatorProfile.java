@@ -86,6 +86,12 @@ public class CreatePermissionsInBatchBasedOnCreatorProfile extends AbstractTask 
 		}
 
 	}
+	
+	/**
+	 * Instantiates a new creates the permissions in batch based on creator profile.
+	 *
+	 * @throws MalformedURLException the malformed url exception
+	 */
 	public CreatePermissionsInBatchBasedOnCreatorProfile() throws MalformedURLException{
 		super();
 	}
@@ -125,6 +131,16 @@ public class CreatePermissionsInBatchBasedOnCreatorProfile extends AbstractTask 
 		return Condition.CONTINUE;
 	}
 
+	/**
+	 * Adds the permission.
+	 *
+	 * @param userName the user name
+	 * @param typeUid the type uid
+	 * @param typeName the type name
+	 * @param targetUid the target uid
+	 * @param targetName the target name
+	 * @throws Exception the exception
+	 */
 	private void addPermission(String userName, String typeUid, String typeName,
 			String targetUid, String targetName) throws Exception {
 		I_TermFactory tf = Terms.get();

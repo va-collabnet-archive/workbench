@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.project.dataexport;
 
 import java.io.BufferedReader;
@@ -53,56 +69,172 @@ import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
+/**
+ * The Class TranslationRF2Export.
+ */
 public class TranslationRF2Export extends RF2DataExport {
 
+	/** The language refset. */
 	private I_GetConceptData languageRefset;
+	
+	/** The source refset. */
 	private I_GetConceptData sourceRefset;
+	
+	/** The formatter. */
 	private SimpleDateFormat formatter;
+	
+	/** The CONCEP t_ retired. */
 	private int CONCEPT_RETIRED;
+	
+	/** The LIMITED. */
 	private int LIMITED;
+	
+	/** The FSN. */
 	private int FSN;
+	
+	/** The PREFERRED. */
 	private int PREFERRED;
+	
+	/** The snomed root. */
 	private I_GetConceptData snomedRoot;
+	
+	/** The report file writer. */
 	private BufferedWriter reportFileWriter;
+	
+	/** The desc file writer. */
 	private BufferedWriter descFileWriter;
+	
+	/** The lang file writer. */
 	private BufferedWriter langFileWriter;
+	
+	/** The beg end. */
 	private String begEnd;
+	
+	/** The sep. */
 	private String sep;
+	
+	/** The snomed int id. */
 	private Object snomedIntId;
+	
+	/** The r util. */
 	private RefsetUtilImpl rUtil;
+	
+	/** The module concept. */
 	private I_GetConceptData moduleConcept;
+	
+	/** The exp folder. */
 	private String expFolder;
+	
+	/** The allowed dest rel types. */
 	private I_IntSet allowedDestRelTypes;
+	
+	/** The active value. */
 	private I_GetConceptData activeValue;
+	
+	/** The inactive value. */
 	private I_GetConceptData inactiveValue;
+	
+	/** The all snomed status. */
 	private NidSetBI allSnomedStatus;
+	
+	/** The module sctid. */
 	private String moduleSCTID;
+	
+	/** The bwi. */
 	private BufferedWriter bwi;
+	
+	/** The bwl. */
 	private BufferedWriter bwl;
+	
+	/** The bwd. */
 	private BufferedWriter bwd;
+	
+	/** The refset sctid. */
 	private String refsetSCTID;
+	
+	/** The Idgenerate. */
 	private boolean Idgenerate;
+	
+	/** The b create refset concept. */
 	private boolean bCreateRefsetConcept;
+	
+	/** The b create module concept. */
 	private boolean bCreateModuleConcept;
+	
+	/** The previous r f2 folder. */
 	private String previousRF2Folder;
+	
+	/** The concept tmp file. */
 	private File conceptTmpFile;
+	
+	/** The description tmp file. */
 	private File descriptionTmpFile;
+	
+	/** The relationship tmp file. */
 	private File relationshipTmpFile;
+	
+	/** The stated relationship tmp file. */
 	private File statedRelationshipTmpFile;
+	
+	/** The language tmp file. */
 	private File languageTmpFile;
+	
+	/** The inact desc tmp file. */
 	private File inactDescTmpFile;
+	
+	/** The exp folder file. */
 	private File expFolderFile;
+	
+	/** The previous release date. */
 	private String previousReleaseDate;
+	
+	/** The endpoint url. */
 	private String endpointURL;
+	
+	/** The password. */
 	private String password;
+	
+	/** The username. */
 	private String username;
+	
+	/** The nsp nr. */
 	private Integer nspNr;
+	
+	/** The hash id map. */
 	private HashMap<String,File> hashIdMap;
+	
+	/** The id map path. */
 	private String idMapPath;
+	
+	/** The complete fsn not translated. */
 	private boolean completeFSNNotTranslated;
+	
+	/** The tgt lang code. */
 	private String tgtLangCode;
+	
+	/** The report file. */
 	private File reportFile;
 
+	/**
+	 * Instantiates a new translation r f2 export.
+	 *
+	 * @param releaseConfig the release config
+	 * @param moduleConcept the module concept
+	 * @param nspNr the nsp nr
+	 * @param expFolder the exp folder
+	 * @param reportFile the report file
+	 * @param languageRefset the language refset
+	 * @param releaseDate the release date
+	 * @param sourceRefset the source refset
+	 * @param completeFSNNotTranslated the complete fsn not translated
+	 * @param Idgenerate the idgenerate
+	 * @param previousRF2Folder the previous r f2 folder
+	 * @param previousReleaseDate the previous release date
+	 * @param endpointURL the endpoint url
+	 * @param password the password
+	 * @param username the username
+	 * @throws Exception the exception
+	 */
 	public TranslationRF2Export(I_ConfigAceFrame releaseConfig,
 			I_GetConceptData moduleConcept, Integer nspNr, String expFolder,
 			File reportFile, I_GetConceptData languageRefset,
@@ -393,6 +525,14 @@ public class TranslationRF2Export extends RF2DataExport {
 
 	}
 
+	/**
+	 * Gets the descriptions.
+	 *
+	 * @param concept the concept
+	 * @param refsetNid the refset nid
+	 * @return the descriptions
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	@SuppressWarnings("unchecked")
 	private HashMap<I_DescriptionTuple,RefexChronicleBI> getDescriptions(
 			I_GetConceptData concept, int refsetNid) throws IOException {
@@ -412,6 +552,11 @@ public class TranslationRF2Export extends RF2DataExport {
 		return descTMap ;
 	}
 
+	/**
+	 * Post export process.
+	 *
+	 * @throws Exception the exception
+	 */
 	public void postExportProcess() throws Exception{
 
 
@@ -476,6 +621,12 @@ public class TranslationRF2Export extends RF2DataExport {
 
 	}
 
+	/**
+	 * Id assignment process.
+	 *
+	 * @param idInsert the id insert
+	 * @throws Exception the exception
+	 */
 	public void idAssignmentProcess(boolean idInsert) throws Exception{
 
 		Rf2FileProvider fProv=new Rf2FileProvider();
@@ -849,6 +1000,9 @@ public class TranslationRF2Export extends RF2DataExport {
 		}
 	}
 
+	/**
+	 * Update wb.
+	 */
 	private void updateWb() {
 
 		try {
@@ -890,6 +1044,11 @@ public class TranslationRF2Export extends RF2DataExport {
 
 	}
 
+	/**
+	 * Insert relationship ids.
+	 *
+	 * @param fMap the f map
+	 */
 	private void insertRelationshipIds(File fMap) {
 		FileInputStream ifis;
 		try {
@@ -927,6 +1086,11 @@ public class TranslationRF2Export extends RF2DataExport {
 		}
 	}
 
+	/**
+	 * Insert description ids.
+	 *
+	 * @param fMap the f map
+	 */
 	private void insertDescriptionIds(File fMap) {
 
 		FileInputStream ifis;
@@ -966,6 +1130,11 @@ public class TranslationRF2Export extends RF2DataExport {
 
 	}
 
+	/**
+	 * Insert concept ids.
+	 *
+	 * @param fMap the f map
+	 */
 	private void insertConceptIds(File fMap) {
 
 		FileInputStream ifis;
@@ -996,6 +1165,12 @@ public class TranslationRF2Export extends RF2DataExport {
 		}
 	}
 
+	/**
+	 * Insert concept pair.
+	 *
+	 * @param uuid the uuid
+	 * @param sctid the sctid
+	 */
 	private void insertConceptPair(String uuid, String sctid) {
 		I_GetConceptData concept;
 		try {
@@ -1016,6 +1191,22 @@ public class TranslationRF2Export extends RF2DataExport {
 
 	}
 
+	/**
+	 * Gets the identifier file.
+	 *
+	 * @param fullPrevFile the full prev file
+	 * @param fullFinalFile the full final file
+	 * @param etOrd the et ord
+	 * @param ordin the ordin
+	 * @param execId the exec id
+	 * @param componentType the component type
+	 * @param idSaveTolist the id save tolist
+	 * @param idType the id type
+	 * @param idColumnIndex the id column index
+	 * @param idMapFile the id map file
+	 * @param partitionId the partition id
+	 * @return the identifier file
+	 */
 	private RF2IdentifierFile getIdentifierFile(File fullPrevFile, File fullFinalFile,
 			int etOrd, ArrayList<String> ordin, String execId,
 			String componentType, String idSaveTolist, String idType,
@@ -1042,12 +1233,22 @@ public class TranslationRF2Export extends RF2DataExport {
 		return ident;
 	}
 
+	/**
+	 * Write header.
+	 *
+	 * @param bw the bw
+	 * @param header the header
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	private void writeHeader(BufferedWriter bw, String header) throws IOException {
 		bw.append(header);
 		bw.append("\r\n");
 
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.project.dataexport.RF2DataExport#processUnfetchedConceptData(int, org.ihtsdo.tk.api.ConceptFetcherBI)
+	 */
 	@Override
 	public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fetcher)
 	throws Exception {
@@ -1103,6 +1304,15 @@ public class TranslationRF2Export extends RF2DataExport {
 			}
 		}
 	}
+	
+	/**
+	 * Gets the last lang extension part.
+	 *
+	 * @param extension the extension
+	 * @return the last lang extension part
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public I_ExtendByRefPartCid getLastLangExtensionPart(I_ExtendByRef extension) throws TerminologyException, IOException {
 		long lastVersion = Long.MIN_VALUE;
 		I_ExtendByRefPartCid extensionPart=null;
@@ -1116,9 +1326,17 @@ public class TranslationRF2Export extends RF2DataExport {
 		}
 		return extensionPart;
 	}
+	
+	/**
+	 * The Class Rf2FileProvider.
+	 */
 	class Rf2FileProvider extends RF2ArtifactPostExportAbst{
 
 	}
+	
+	/**
+	 * Close files.
+	 */
 	public void closeFiles(){
 
 		try {
@@ -1132,6 +1350,12 @@ public class TranslationRF2Export extends RF2DataExport {
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * Gets the log.
+	 *
+	 * @return the log
+	 */
 	public String getLog() {
 		try {
 			reportFileWriter.flush();
@@ -1145,6 +1369,13 @@ public class TranslationRF2Export extends RF2DataExport {
 		}
 		return null;
 	}
+	
+	/**
+	 * Read stream.
+	 *
+	 * @param is the is
+	 * @return the string
+	 */
 	public static String readStream(FileInputStream is) {
 		StringBuilder sb = new StringBuilder(1024);
 		try {

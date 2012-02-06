@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Wed Aug 25 14:43:06 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.project.panel.details;
@@ -50,25 +63,49 @@ import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WfUser;
 
 /**
+ * The Class WorklistMemberReAssignment.
+ *
  * @author Guillermo Reynoso
  */
 public class WorklistMemberReAssignment extends JPanel {
-	/**
-	 * 
-	 */
+	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
+	
+	/** The Constant DELETE_OPTION. */
 	private static final String DELETE_OPTION = "Delete from queue";
+	
+	/** The config. */
 	private I_ConfigAceFrame config;
+	
+	/** The contract. */
 	private HashMap<UUID, String> contract;
+	
+	/** The work list. */
 	private WorkList workList;
+	
+	/** The provider. */
 	private WfComponentProvider provider;
+	
+	/** The searcher. */
 	private WorkflowSearcher searcher;
+	
+	/** The interpreter. */
 	private WorkflowInterpreter interpreter;
 
+	/**
+	 * Instantiates a new worklist member re assignment.
+	 */
 	public WorklistMemberReAssignment() {
 
 	}
 
+	/**
+	 * Instantiates a new worklist member re assignment.
+	 *
+	 * @param workList the work list
+	 * @param config the config
+	 */
 	public WorklistMemberReAssignment(WorkList workList, I_ConfigAceFrame config) {
 		initComponents();
 		this.workList = workList;
@@ -129,6 +166,11 @@ public class WorklistMemberReAssignment extends JPanel {
 		}
 	}
 
+	/**
+	 * Gets the members table model.
+	 *
+	 * @return the members table model
+	 */
 	private DefaultTableModel getMembersTableModel() {
 		DefaultTableModel model = new DefaultTableModel();
 		model.addColumn("WorkList member");
@@ -139,6 +181,15 @@ public class WorklistMemberReAssignment extends JPanel {
 		return model;
 	}
 
+	/**
+	 * Gets the member list.
+	 *
+	 * @param workList the work list
+	 * @param model the model
+	 * @return the member list
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	private void getMemberList(WorkList workList, DefaultTableModel model) throws TerminologyException, IOException {
 		List<WorkListMember> members = workList.getWorkListMembers();
 		Collections.sort(members, new Comparator<WorkListMember>() {
@@ -152,10 +203,19 @@ public class WorklistMemberReAssignment extends JPanel {
 		}
 	}
 
+	/**
+	 * Send button action performed.
+	 */
 	private void sendButtonActionPerformed() {
 		sendWorklistMembers(destinationCombo.getSelectedItem(), statusCombo.getSelectedItem());
 	}
 
+	/**
+	 * Send worklist members.
+	 *
+	 * @param user the user
+	 * @param status the status
+	 */
 	private void sendWorklistMembers(Object user, Object status) {
 		DefaultTableModel model = (DefaultTableModel) membersTable2.getModel();
 		if (model.getRowCount() > 0) {
@@ -205,10 +265,16 @@ public class WorklistMemberReAssignment extends JPanel {
 		}
 	}
 
+	/**
+	 * B add action performed.
+	 */
 	private void bAddActionPerformed() {
 		addMembersToTargetTable();
 	}
 
+	/**
+	 * Adds the members to target table.
+	 */
 	private void addMembersToTargetTable() {
 		int[] sRows = membersTable.getSelectedRows();
 		DefaultTableModel model = (DefaultTableModel) membersTable.getModel();
@@ -226,10 +292,16 @@ public class WorklistMemberReAssignment extends JPanel {
 
 	}
 
+	/**
+	 * B del action performed.
+	 */
 	private void bDelActionPerformed() {
 		delMembersFromTargetTable();
 	}
 
+	/**
+	 * Del members from target table.
+	 */
 	private void delMembersFromTargetTable() {
 		int[] sRows = membersTable2.getSelectedRows();
 		DefaultTableModel model = (DefaultTableModel) membersTable.getModel();
@@ -247,6 +319,11 @@ public class WorklistMemberReAssignment extends JPanel {
 
 	}
 
+	/**
+	 * Refresh button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void refreshButtonActionPerformed(ActionEvent e) {
 		DefaultTableModel model = getMembersTableModel();
 		try {
@@ -259,6 +336,11 @@ public class WorklistMemberReAssignment extends JPanel {
 
 	}
 
+	/**
+	 * Destination item state changed.
+	 *
+	 * @param e the e
+	 */
 	private void destinationItemStateChanged(ItemEvent e) {
 		if (e.getStateChange() == ItemEvent.SELECTED) {
 			if (!e.getItem().toString().equals(DELETE_OPTION)) {
@@ -278,6 +360,9 @@ public class WorklistMemberReAssignment extends JPanel {
 		}
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -413,22 +498,55 @@ public class WorklistMemberReAssignment extends JPanel {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
+	/** The label9. */
 	private JLabel label9;
+	
+	/** The label10. */
 	private JLabel label10;
+	
+	/** The members table scroll panel. */
 	private JScrollPane membersTableScrollPanel;
+	
+	/** The members table. */
 	private JTable membersTable;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The b add. */
 	private JButton bAdd;
+	
+	/** The b del. */
 	private JButton bDel;
+	
+	/** The members table scroll panel2. */
 	private JScrollPane membersTableScrollPanel2;
+	
+	/** The members table2. */
 	private JTable membersTable2;
+	
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The refresh button. */
 	private JButton refreshButton;
+	
+	/** The label8. */
 	private JLabel label8;
+	
+	/** The destination combo. */
 	private JComboBox destinationCombo;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The status combo. */
 	private JComboBox statusCombo;
+	
+	/** The send button. */
 	private JButton sendButton;
+	
+	/** The p bar w. */
 	private JProgressBar pBarW;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 }

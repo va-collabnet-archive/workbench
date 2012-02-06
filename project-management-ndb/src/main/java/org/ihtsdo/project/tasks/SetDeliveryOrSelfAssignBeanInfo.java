@@ -29,6 +29,9 @@ import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
  */
 public class SetDeliveryOrSelfAssignBeanInfo extends SimpleBeanInfo {
 
+	/**
+	 * Instantiates a new sets the delivery or self assign bean info.
+	 */
 	public SetDeliveryOrSelfAssignBeanInfo() {
 		super();
 	}

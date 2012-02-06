@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2009 International Health Terminology Standards Development
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
  * Organisation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,23 +31,39 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.project.workflow.model.WfInstance;
 
+/**
+ * The Class SetActionReport.
+ */
 @BeanList(specs = { @Spec(directory = "tasks/ide/profile", type = BeanType.TASK_BEAN) })
 public class SetActionReport extends AbstractTask {
 
-    /**
-	 * 
-	 */
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
+    /** The Constant dataVersion. */
     private static final int dataVersion = 1;
 
+    /** The action report. */
     private WfInstance.ActionReport actionReport = WfInstance.ActionReport.CANCEL ;
 
+    /**
+     * Write object.
+     *
+     * @param out the out
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(actionReport);
     }
 
+    /**
+     * Read object.
+     *
+     * @param in the in
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ClassNotFoundException the class not found exception
+     */
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
@@ -57,10 +73,16 @@ public class SetActionReport extends AbstractTask {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess, org.dwfa.bpa.process.I_Work)
+     */
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do
     }
 
+    /* (non-Javadoc)
+     * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess, org.dwfa.bpa.process.I_Work)
+     */
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
 			WfInstance instance = (WfInstance) process.readAttachement("WfInstance");
@@ -75,18 +97,34 @@ public class SetActionReport extends AbstractTask {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.dwfa.bpa.tasks.AbstractTask#getDataContainerIds()
+     */
     public int[] getDataContainerIds() {
         return new int[] {};
     }
 
+    /* (non-Javadoc)
+     * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
+     */
     public Collection<Condition> getConditions() {
         return AbstractTask.CONTINUE_CONDITION;
     }
 
+	/**
+	 * Gets the action report.
+	 *
+	 * @return the action report
+	 */
 	public WfInstance.ActionReport getActionReport() {
 		return actionReport;
 	}
 
+	/**
+	 * Sets the action report.
+	 *
+	 * @param actionReport the new action report
+	 */
 	public void setActionReport(WfInstance.ActionReport actionReport) {
 		this.actionReport = actionReport;
 	}

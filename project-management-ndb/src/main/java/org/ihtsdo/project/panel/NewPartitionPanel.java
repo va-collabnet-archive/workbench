@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Thu Mar 18 11:06:42 GMT-04:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.project.panel;
@@ -46,24 +59,54 @@ import org.ihtsdo.project.refset.partition.RefsetPartitioner;
 import org.ihtsdo.project.refset.partition.StringMatchPartitioner;
 
 /**
+ * The Class NewPartitionPanel.
+ *
  * @author Guillermo Reynoso
  */
 
 public class NewPartitionPanel extends JPanel {
 
+	/** The partition scheme. */
 	private PartitionScheme partitionScheme;
+	
+	/** The config. */
 	private I_ConfigAceFrame config;
+	
+	/** The partitioner panel. */
 	private RefsetPartitionerPanel partitionerPanel;
+	
+	/** The concept list. */
 	private JList conceptList;
+	
+	/** The concept list model. */
 	private DefaultListModel conceptListModel;
+	
+	/** The concept dn d handler. */
 	private ObjectTransferHandler conceptDnDHandler;
+	
+	/** The integer field. */
 	private JTextField integerField;
+	
+	/** The string field. */
 	private JTextField stringField;
+	
+	/** The refset partitioner. */
 	private RefsetPartitioner refsetPartitioner;
+	
+	/** The list1 model. */
 	private DefaultListModel list1Model;
+	
+	/** The Concept dn d handler. */
 	private ObjectTransferHandler ConceptDnDHandler;
 
 
+	/**
+	 * Instantiates a new new partition panel.
+	 *
+	 * @param partitionScheme the partition scheme
+	 * @param partitionerPanel the partitioner panel
+	 * @param config the config
+	 */
 	public NewPartitionPanel(PartitionScheme partitionScheme, RefsetPartitionerPanel partitionerPanel,
 			I_ConfigAceFrame config) {
 		initComponents();
@@ -124,6 +167,9 @@ public class NewPartitionPanel extends JPanel {
 		
 	}
 
+	/**
+	 * Update refset partitioner data.
+	 */
 	private void updateRefsetPartitionerData() {
 		refsetPartitioner = (RefsetPartitioner) comboBox1.getSelectedItem();
 		if (comboBox1.getSelectedItem().toString().equals("Is descendant of")) {
@@ -153,6 +199,9 @@ public class NewPartitionPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Fill combo box1 options.
+	 */
 	private void fillComboBox1Options() {
 		RefsetPartitioner isDescendantOfPartitioner = new IsDescendantOfPartitioner();
 		comboBox1.addItem(isDescendantOfPartitioner);
@@ -164,11 +213,21 @@ public class NewPartitionPanel extends JPanel {
 		comboBox1.addItem(listPartitioner);
 	}
 
+	/**
+	 * Button2 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button2ActionPerformed(ActionEvent e) {
 		partitionerPanel.updateList1Content();
 		partitionerPanel.updatePanel7Content();
 	}
 
+	/**
+	 * Combo box1 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void comboBox1ActionPerformed(ActionEvent e) {
 		if (comboBox1.getSelectedItem().toString().equals("Is descendant of")) {
 			for (Component component : panel8.getComponents()) {
@@ -201,6 +260,11 @@ public class NewPartitionPanel extends JPanel {
 		panel8.repaint();
 	}
 
+	/**
+	 * Update list1 content.
+	 *
+	 * @param concepts the concepts
+	 */
 	private void updateList1Content(List<I_GetConceptData> concepts) {
 		Collections.sort(concepts,
 				new Comparator<I_GetConceptData>()
@@ -219,6 +283,11 @@ public class NewPartitionPanel extends JPanel {
 		label2.setText(String.valueOf(concepts.size()));
 	}
 
+	/**
+	 * Button3 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button3ActionPerformed(ActionEvent e) {
 		updateRefsetPartitionerData();
 		try {
@@ -233,6 +302,11 @@ public class NewPartitionPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Button1 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button1ActionPerformed(ActionEvent e) {
 		updateRefsetPartitionerData();
 		if (textField1.getText() == null) {
@@ -300,6 +374,9 @@ public class NewPartitionPanel extends JPanel {
 			}
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		panel2 = new JPanel();
@@ -512,24 +589,61 @@ public class NewPartitionPanel extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The panel5. */
 	private JPanel panel5;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The text field1. */
 	private JTextField textField1;
+	
+	/** The combo box1. */
 	private JComboBox comboBox1;
+	
+	/** The panel8. */
 	private JPanel panel8;
+	
+	/** The panel6. */
 	private JPanel panel6;
+	
+	/** The panel3. */
 	private JPanel panel3;
+	
+	/** The panel7. */
 	private JPanel panel7;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The list1. */
 	private JList list1;
+	
+	/** The panel4. */
 	private JPanel panel4;
+	
+	/** The p bar w. */
 	private JProgressBar pBarW;
+	
+	/** The button3. */
 	private JButton button3;
+	
+	/** The button1. */
 	private JButton button1;
+	
+	/** The button2. */
 	private JButton button2;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

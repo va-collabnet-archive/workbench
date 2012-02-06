@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.project.panel.dnd;
 
 import java.awt.Color;
@@ -29,11 +45,27 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.issue.issuerepository.IssueRepository;
 import org.ihtsdo.project.model.PartitionMember;
 
+/**
+ * The Class ListDragGestureListenerWithImage.
+ */
 public class ListDragGestureListenerWithImage implements DragGestureListener{
+	
+	/** The dsl. */
 	DragSourceListener dsl;
+	
+	/** The j list. */
 	JList jList;
+	
+	/** The config. */
 	private I_ConfigAceFrame config;
 
+	/**
+	 * Instantiates a new list drag gesture listener with image.
+	 *
+	 * @param dsl the dsl
+	 * @param jList the j list
+	 * @param config the config
+	 */
 	public ListDragGestureListenerWithImage(DragSourceListener dsl, JList jList,I_ConfigAceFrame config) {
 
 		super();
@@ -42,6 +74,9 @@ public class ListDragGestureListenerWithImage implements DragGestureListener{
 		this.config=config;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.awt.dnd.DragGestureListener#dragGestureRecognized(java.awt.dnd.DragGestureEvent)
+	 */
 	public void dragGestureRecognized(DragGestureEvent dge) {
 
 		Object[] values = jList.getSelectedValues();
@@ -72,10 +107,25 @@ public class ListDragGestureListenerWithImage implements DragGestureListener{
 		}
 	}
 
+	/**
+	 * Gets the transferable.
+	 *
+	 * @param obj the obj
+	 * @return the transferable
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	private Transferable getTransferable(I_GetConceptData obj) throws TerminologyException, IOException {
 		return new ConceptTransferable(obj);
 	}
 
+	/**
+	 * Gets the drag image.
+	 *
+	 * @param obj the obj
+	 * @return the drag image
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public Image getDragImage(I_GetConceptData obj) throws IOException {
 
 		I_DescriptionTuple desc = obj.getDescTuple(config.getTreeDescPreferenceList(), config);

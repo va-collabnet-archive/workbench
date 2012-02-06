@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.project.dataexport;
 
 import java.io.BufferedReader;
@@ -54,49 +70,144 @@ import org.ihtsdo.tk.api.id.IdBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
+/**
+ * The Class RF1DataExport.
+ */
 public class RF1DataExport implements I_ProcessConcepts{
+	
+	/** The output desc file writer. */
 	BufferedWriter outputDescFileWriter;
+	
+	/** The report file writer. */
 	BufferedWriter reportFileWriter;
+	
+	/** The line count. */
 	int lineCount;
+	
+	/** The refset concept. */
 	I_GetConceptData refsetConcept;
+	
+	/** The refset uuid. */
 	UUID refsetUUID;
+	
+	/** The refset helper. */
 	I_HelpRefsets refsetHelper ;
+	
+	/** The term factory. */
 	I_TermFactory termFactory;
+	
+	/** The id. */
 	I_Identify id;
+	
+	/** The formatter. */
 	SimpleDateFormat formatter;
+	
+	/** The output subs file writer. */
 	private BufferedWriter outputSubsFileWriter;
+	
+	/** The FSN. */
 	private int FSN;
+	
+	/** The PREFERRED. */
 	private int PREFERRED;
 	//	private RefsetUtilImpl rUtil;
+	/** The sep. */
 	private String sep;
+	
+	/** The beg end. */
 	private String begEnd;
+	
+	/** The desc line count. */
 	private long descLineCount;
+	
+	/** The subs line count. */
 	private long subsLineCount;
+	
+	/** The export desc file. */
 	private File exportDescFile;
+	
+	/** The export subs file. */
 	private File exportSubsFile;
+	
+	/** The complete with core tems. */
 	private boolean completeWithCoreTems;
+	
+	/** The promo refset. */
 	private I_GetConceptData promoRefset;
+	
+	/** The release config. */
 	private I_ConfigAceFrame releaseConfig;
+	
+	/** The snomed root. */
 	private I_GetConceptData snomedRoot;
+	
+	/** The source refset. */
 	private I_GetConceptData sourceRefset;
+	
+	/** The subset id. */
 	private Long subsetId;
+	
+	/** The snomed int id. */
 	private int snomedIntId;
+	
+	/** The active value. */
 	private I_GetConceptData activeValue;
+	
+	/** The inactive value. */
 	private I_GetConceptData inactiveValue;
+	
+	/** The all snomed status. */
 	private NidSetBI allSnomedStatus;
+	
+	/** The allowed dest rel types. */
 	private I_IntSet allowedDestRelTypes;
+	
+	/** The base config. */
 	private I_ConfigAceFrame baseConfig;
+	
+	/** The all desc types. */
 	private NidSetBI allDescTypes;
+	
+	/** The tgt lang code. */
 	private String tgtLangCode;
+	
+	/** The all status set. */
 	private I_IntSet allStatusSet;
+	
+	/** The hash id map. */
 	private HashMap<String, File> hashIdMap;
+	
+	/** The release date. */
 	private String releaseDate;
+	
+	/** The namespace. */
 	private String namespace;
+	
+	/** The report file. */
 	private File reportFile;
+	
+	/** The my static is a cache. */
 	public static KindOfCacheBI myStaticIsACache;
+	
+	/** The my static is a cache refset spec. */
 	public static KindOfCacheBI myStaticIsACacheRefsetSpec;
+	
+	/** The logger. */
 	private static Logger logger = Logger.getLogger(RF1DataExport.class);
 
+	/**
+	 * Instantiates a new r f1 data export.
+	 *
+	 * @param config the config
+	 * @param exportDescFile the export desc file
+	 * @param exportSubsFile the export subs file
+	 * @param reportFile the report file
+	 * @param refsetConcept the refset concept
+	 * @param newSctId the new sct id
+	 * @param sourceRefset the source refset
+	 * @param completeWithCoreTems the complete with core tems
+	 * @throws Exception the exception
+	 */
 	public RF1DataExport(I_ConfigAceFrame config ,File exportDescFile, 
 			File exportSubsFile, File reportFile, I_GetConceptData refsetConcept, 
 			Long newSctId, I_GetConceptData sourceRefset, boolean completeWithCoreTems) throws Exception{
@@ -188,6 +299,13 @@ public class RF1DataExport implements I_ProcessConcepts{
 		}
 	}
 
+	/**
+	 * Gets the all desc types.
+	 *
+	 * @return the all desc types
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public NidSetBI getAllDescTypes() throws TerminologyException, IOException {
 		NidSetBI allDescTypes = new NidSet();
 		allDescTypes.add(Terms.get().uuidToNative(UUID.fromString("00791270-77c9-32b6-b34f-d932569bd2bf")));
@@ -195,6 +313,14 @@ public class RF1DataExport implements I_ProcessConcepts{
 		allDescTypes.add(Terms.get().uuidToNative(UUID.fromString("700546a3-09c7-3fc2-9eb9-53d318659a09")));
 		return allDescTypes;
 	}
+	
+	/**
+	 * Gets the snomed statuses.
+	 *
+	 * @return the snomed statuses
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public NidSetBI getSnomedStatuses() throws TerminologyException, IOException {
 		NidSetBI allStatuses = new NidSet();
 		Set<I_GetConceptData> descendants = new HashSet<I_GetConceptData>();
@@ -211,10 +337,23 @@ public class RF1DataExport implements I_ProcessConcepts{
 		}
 		return allStatuses;
 	}
+	
+	/**
+	 * Gets the results.
+	 *
+	 * @return the results
+	 */
 	public Long[] getResults() {
 		return new Long[]{descLineCount,subsLineCount};
 	}
 
+	/**
+	 * Gets the descendants.
+	 *
+	 * @param descendants the descendants
+	 * @param concept the concept
+	 * @return the descendants
+	 */
 	public  Set<I_GetConceptData> getDescendants(Set<I_GetConceptData> descendants, I_GetConceptData concept) {
 		try {
 			Set<I_GetConceptData> childrenSet = new HashSet<I_GetConceptData>();
@@ -231,6 +370,15 @@ public class RF1DataExport implements I_ProcessConcepts{
 		}
 		return descendants;
 	}
+	
+	/**
+	 * Gets the descriptions.
+	 *
+	 * @param concept the concept
+	 * @param refsetNid the refset nid
+	 * @return the descriptions
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	@SuppressWarnings("unchecked")
 	private HashMap<I_DescriptionTuple,RefexChronicleBI> getDescriptions(
 			I_GetConceptData concept, int refsetNid) throws IOException {
@@ -249,6 +397,15 @@ public class RF1DataExport implements I_ProcessConcepts{
 		}
 		return descTMap ;
 	}
+	
+	/**
+	 * Export description and subset.
+	 *
+	 * @param description the description
+	 * @param languageExtension the language extension
+	 * @param concept the concept
+	 * @param conceptSCTID the concept sctid
+	 */
 	public void exportDescriptionAndSubset(I_DescriptionTuple description,I_ExtendByRefPartCid languageExtension, I_GetConceptData concept,
 			String conceptSCTID) {
 		String descriptionid=null ;
@@ -453,6 +610,12 @@ public class RF1DataExport implements I_ProcessConcepts{
 	//			return bwrite;
 	//		}
 
+	/**
+	 * Gets the existent concept sctid.
+	 *
+	 * @param concept the concept
+	 * @return the existent concept sctid
+	 */
 	public Long getExistentConceptSCTID(I_GetConceptData concept){
 		Long sctid = null;
 		try {
@@ -470,6 +633,14 @@ public class RF1DataExport implements I_ProcessConcepts{
 		return sctid;
 	}
 
+	/**
+	 * Gets the last lang extension part.
+	 *
+	 * @param extension the extension
+	 * @return the last lang extension part
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public I_ExtendByRefPartCid getLastLangExtensionPart(I_ExtendByRef extension) throws TerminologyException, IOException {
 		long lastVersion = Long.MIN_VALUE;
 		I_ExtendByRefPartCid extensionPart=null;
@@ -483,6 +654,10 @@ public class RF1DataExport implements I_ProcessConcepts{
 		}
 		return extensionPart;
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.api.I_ProcessConcepts#processConcept(org.dwfa.ace.api.I_GetConceptData)
+	 */
 	@Override
 	public void processConcept(I_GetConceptData concept) throws Exception {
 		Long sctid=getExistentConceptSCTID(concept);
@@ -525,6 +700,12 @@ public class RF1DataExport implements I_ProcessConcepts{
 		}
 	}
 
+	/**
+	 * Gets the existent description sctid.
+	 *
+	 * @param description the description
+	 * @return the existent description sctid
+	 */
 	public Long getExistentDescriptionSCTID(I_DescriptionTuple description){
 		Long sctid = null;
 		try {
@@ -541,6 +722,10 @@ public class RF1DataExport implements I_ProcessConcepts{
 		}
 		return sctid;
 	}
+	
+	/**
+	 * Close files.
+	 */
 	public void closeFiles(){
 		try {
 			
@@ -552,6 +737,18 @@ public class RF1DataExport implements I_ProcessConcepts{
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * Id assignment process.
+	 *
+	 * @param releaseDate the release date
+	 * @param idInsert the id insert
+	 * @param username the username
+	 * @param password the password
+	 * @param endpointURL the endpoint url
+	 * @param namespace the namespace
+	 * @throws Exception the exception
+	 */
 	public void idAssignmentProcess(String releaseDate,boolean idInsert, String username, String password, String endpointURL,String namespace) throws Exception{
 
 		this.releaseDate=releaseDate;
@@ -640,6 +837,10 @@ public class RF1DataExport implements I_ProcessConcepts{
 			updateWb();
 		}
 	}
+	
+	/**
+	 * Update wb.
+	 */
 	private void updateWb() {
 		for(String key:hashIdMap.keySet()){
 			File fMap=hashIdMap.get(key);
@@ -668,6 +869,12 @@ public class RF1DataExport implements I_ProcessConcepts{
 		}
 
 	}
+	
+	/**
+	 * Insert description ids.
+	 *
+	 * @param fMap the f map
+	 */
 	private void insertDescriptionIds(File fMap) {
 
 		FileInputStream ifis;
@@ -706,6 +913,23 @@ public class RF1DataExport implements I_ProcessConcepts{
 		}
 
 	}
+	
+	/**
+	 * Gets the identifier file.
+	 *
+	 * @param fullPrevFile the full prev file
+	 * @param fullFinalFile the full final file
+	 * @param etOrd the et ord
+	 * @param ordin the ordin
+	 * @param execId the exec id
+	 * @param componentType the component type
+	 * @param idSaveTolist the id save tolist
+	 * @param idType the id type
+	 * @param idColumnIndex the id column index
+	 * @param idMapFile the id map file
+	 * @param partitionId the partition id
+	 * @return the identifier file
+	 */
 	private RF2IdentifierFile getIdentifierFile(File fullPrevFile, File fullFinalFile,
 			int etOrd, ArrayList<String> ordin, String execId,
 			String componentType, String idSaveTolist, String idType,
@@ -732,6 +956,11 @@ public class RF1DataExport implements I_ProcessConcepts{
 		return ident;
 	}
 
+	/**
+	 * Gets the log.
+	 *
+	 * @return the log
+	 */
 	public String getLog() {
 		try {	
 			reportFileWriter.append("Exported to description file " + exportDescFile.getName()  + " : " + descLineCount + " lines" + "\r\n");
@@ -747,6 +976,13 @@ public class RF1DataExport implements I_ProcessConcepts{
 		}
 		return null;
 	}
+	
+	/**
+	 * Read stream.
+	 *
+	 * @param is the is
+	 * @return the string
+	 */
 	public static String readStream(FileInputStream is) {
 		StringBuilder sb = new StringBuilder(1024);
 		try {

@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.project.refset.partition;
 
 import java.util.ArrayList;
@@ -12,12 +28,28 @@ import org.ihtsdo.project.model.PartitionScheme;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 
+/**
+ * The Class RefsetSplitter.
+ */
 public class RefsetSplitter {
 
+	/**
+	 * Instantiates a new refset splitter.
+	 */
 	public RefsetSplitter() {
 		super();
 	}
 
+	/**
+	 * Split refset.
+	 *
+	 * @param scheme the scheme
+	 * @param portions the portions
+	 * @param namePrefix the name prefix
+	 * @param config the config
+	 * @return the list
+	 * @throws Exception the exception
+	 */
 	public List<Partition> splitRefset(PartitionScheme scheme, List<Integer> portions,
 			String namePrefix, I_ConfigAceFrame config) throws Exception {
 		List<Partition> partitions = new ArrayList<Partition>();
@@ -75,6 +107,16 @@ public class RefsetSplitter {
 		return partitions;
 	}
 
+	/**
+	 * Calculate partitions.
+	 *
+	 * @param scheme the scheme
+	 * @param portions the portions
+	 * @param namePrefix the name prefix
+	 * @param config the config
+	 * @return the list
+	 * @throws Exception the exception
+	 */
 	public List<List<I_GetConceptData>> calculatePartitions(PartitionScheme scheme, List<Integer> portions,
 			String namePrefix, I_ConfigAceFrame config) throws Exception {
 

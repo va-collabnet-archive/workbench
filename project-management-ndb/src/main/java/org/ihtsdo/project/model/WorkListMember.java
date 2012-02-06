@@ -55,21 +55,21 @@ public class WorkListMember implements Serializable {
 	/** The activity status. */
 	private I_GetConceptData activityStatus;
 	
-	/** The status last date */
+	/** The status last date. */
 	private Long statusDate;
 	
+	/** The wf instance. */
 	private WfInstance wfInstance;
 	
 	/**
 	 * Instantiates a new work list member.
-	 * 
+	 *
 	 * @param name the name
 	 * @param id the id
 	 * @param uids the uids
-	 * @param workListId the work list id
-	 * @param destination the destination
+	 * @param workListUUID the work list uuid
 	 * @param activityStatus the activity status
-	 * @param businessProcessWithAttachments the business process with attachments
+	 * @param statusDate the status date
 	 */
 	public WorkListMember(String name, int id, List<UUID> uids,
 			UUID workListUUID,
@@ -166,8 +166,8 @@ public class WorkListMember implements Serializable {
 	
 	/**
 	 * Sets the work list id.
-	 * 
-	 * @param workListId the new work list id
+	 *
+	 * @param workListUUID the new work list uuid
 	 */
 	public void setWorkListUUID(UUID workListUUID) {
 		this.workListUUID = workListUUID;
@@ -211,10 +211,20 @@ public class WorkListMember implements Serializable {
 //		this.businessProcessWithAttachments = businessProcessWithAttachments;
 //	}
 	
-	public String toString() {
+	/* (non-Javadoc)
+ * @see java.lang.Object#toString()
+ */
+public String toString() {
 		return this.name;
 	}
 	
+	/**
+	 * Gets the last author name.
+	 *
+	 * @return the last author name
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public String getLastAuthorName() throws TerminologyException, IOException {
 		String name = "";
 		I_TermFactory termFactory = Terms.get();
@@ -244,14 +254,29 @@ public class WorkListMember implements Serializable {
 		return lastAuthor.toString();
 	}
 
+	/**
+	 * Gets the status date.
+	 *
+	 * @return the status date
+	 */
 	public Long getStatusDate() {
 		return statusDate;
 	}
 
+	/**
+	 * Sets the status date.
+	 *
+	 * @param statusDate the new status date
+	 */
 	public void setStatusDate(Long statusDate) {
 		this.statusDate = statusDate;
 	}
 
+	/**
+	 * Gets the wf instance.
+	 *
+	 * @return the wf instance
+	 */
 	public WfInstance getWfInstance() {
 		WfComponentProvider provider = new WfComponentProvider();
 		wfInstance = new WfInstance();

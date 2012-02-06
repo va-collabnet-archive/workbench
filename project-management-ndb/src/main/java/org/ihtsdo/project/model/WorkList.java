@@ -55,29 +55,32 @@ public class WorkList extends WorkflowRefset implements Serializable{
 	/** The partition id. */
 	private UUID partitionUUID;
 
+	/** The workflow definition. */
 	private WorkflowDefinition workflowDefinition;
 
+	/** The workflow user roles. */
 	private List<WfMembership> workflowUserRoles;
 
+	/** The prom refset. */
 	private PromotionAndAssignmentRefset promRefset;
 
 
+	/**
+	 * Instantiates a new work list.
+	 */
 	public WorkList() {
 		super();
 	}
 
 	/**
 	 * Instantiates a new work list.
-	 * 
+	 *
 	 * @param name the name
 	 * @param id the id
 	 * @param uids the uids
-	 * @param workSetId the work set id
-	 * @param batch the batch
-	 * @param destination the destination
-	 * @param businessProcess the business process
-	 * @throws IOException 
-	 * @throws TerminologyException 
+	 * @param workSetUUID the work set uuid
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	public WorkList(String name, int id, List<UUID> uids,UUID workSetUUID) throws TerminologyException, IOException {
 		super();
@@ -91,6 +94,14 @@ public class WorkList extends WorkflowRefset implements Serializable{
 
 	}
 
+	/**
+	 * Gets the instance from metadata.
+	 *
+	 * @param worklistMetadata the worklist metadata
+	 * @return the instance from metadata
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static WorkList getInstanceFromMetadata(WorklistMetadata worklistMetadata) throws TerminologyException, IOException{
 		WorkList worklist=new WorkList(worklistMetadata.getName(),
 				Terms.get().uuidToNative(worklistMetadata.getUids())
@@ -173,10 +184,10 @@ public class WorkList extends WorkflowRefset implements Serializable{
 
 	/**
 	 * Gets the work list members.
-	 * 
+	 *
 	 * @return the work list members
-	 * @throws IOException 
-	 * @throws TerminologyException 
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	public List<WorkListMember> getWorkListMembers() throws TerminologyException, IOException {
 		return TerminologyProjectDAO.getAllWorkListMembers(this, Terms.get().getActiveAceFrameConfig());
@@ -193,17 +204,25 @@ public class WorkList extends WorkflowRefset implements Serializable{
 
 	/**
 	 * Sets the work set id.
-	 * 
-	 * @param workSetId the new work set id
+	 *
+	 * @param partitionUUID the new partition uuid
 	 */
 	public void setPartitionUUID(UUID partitionUUID) {
 		this.partitionUUID = partitionUUID;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	public String toString() {
 		return this.name;
 	}
 
+	/**
+	 * Gets the partition.
+	 *
+	 * @return the partition
+	 */
 	public Partition getPartition() {
 		Partition partition = null;
 		I_GetConceptData concept = null;
@@ -221,14 +240,27 @@ public class WorkList extends WorkflowRefset implements Serializable{
 		return partition;
 	}
 
+	/**
+	 * Gets the workflow definition.
+	 *
+	 * @return the workflow definition
+	 */
 	public WorkflowDefinition getWorkflowDefinition() {
 		return workflowDefinition;
 	}
 
+	/**
+	 * Sets the workflow definition.
+	 *
+	 * @param workflowDefinition the new workflow definition
+	 */
 	public void setWorkflowDefinition(WorkflowDefinition workflowDefinition) {
 		this.workflowDefinition = workflowDefinition;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.project.refset.WorkflowRefset#getPromotionRefset(org.dwfa.ace.api.I_ConfigAceFrame)
+	 */
 	public PromotionAndAssignmentRefset getPromotionRefset(I_ConfigAceFrame config) {
 
 		if (promRefset != null) {
@@ -249,14 +281,29 @@ public class WorkList extends WorkflowRefset implements Serializable{
 		}
 	}
 
+	/**
+	 * Gets the workflow user roles.
+	 *
+	 * @return the workflow user roles
+	 */
 	public List<WfMembership> getWorkflowUserRoles() {
 		return workflowUserRoles;
 	}
 
+	/**
+	 * Sets the workflow user roles.
+	 *
+	 * @param workflowUserRoles the new workflow user roles
+	 */
 	public void setWorkflowUserRoles(List<WfMembership> workflowUserRoles) {
 		this.workflowUserRoles = workflowUserRoles;
 	}
 
+	/**
+	 * Gets the users.
+	 *
+	 * @return the users
+	 */
 	public List<WfUser> getUsers() {
 		List<WfUser> users = new ArrayList<WfUser>();
 
@@ -267,6 +314,11 @@ public class WorkList extends WorkflowRefset implements Serializable{
 		return users;
 	}
 
+	/**
+	 * Gets the workflow definition file name.
+	 *
+	 * @return the workflow definition file name
+	 */
 	public String getWorkflowDefinitionFileName() {
 		if (workflowDefinition != null){
 			return workflowDefinition.getName() + ".wfd";

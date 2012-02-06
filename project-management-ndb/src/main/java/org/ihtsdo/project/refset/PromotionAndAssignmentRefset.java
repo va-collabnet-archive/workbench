@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.project.refset;
 
 import java.io.IOException;
@@ -24,11 +40,23 @@ import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid_cnid.RefexCnidCnidVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
+/**
+ * The Class PromotionAndAssignmentRefset.
+ */
 public class PromotionAndAssignmentRefset extends PromotionRefset {
 
+	/** The default status nid. */
 	private int defaultStatusNid;
+	
+	/** The default user nid. */
 	private int defaultUserNid;
 
+	/**
+	 * Instantiates a new promotion and assignment refset.
+	 *
+	 * @param refsetConcept the refset concept
+	 * @throws Exception the exception
+	 */
 	public PromotionAndAssignmentRefset(I_GetConceptData refsetConcept) throws Exception {
 		super(refsetConcept);
 		// TODO: validate if refsetConcept is promotion refset?
@@ -42,6 +70,9 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.project.refset.PromotionRefset#getLastPromotionTuple(int, org.dwfa.ace.api.I_ConfigAceFrame)
+	 */
 	public RefexVersionBI getLastPromotionTuple(int componentId, I_ConfigAceFrame config) throws TerminologyException, IOException {
 		I_GetConceptData component = termFactory.getConcept(componentId);
 		Collection<? extends RefexChronicleBI<?>> members = component.getAnnotations();
@@ -58,6 +89,9 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.project.refset.PromotionRefset#getPromotionStatus(int, org.dwfa.ace.api.I_ConfigAceFrame)
+	 */
 	public I_GetConceptData getPromotionStatus(int componentId, I_ConfigAceFrame config) throws IOException, TerminologyException {
 		RefexVersionBI lastTuple = getLastPromotionTuple(componentId, config);
 		if (lastTuple == null) {
@@ -68,6 +102,15 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 		}
 	}
 
+	/**
+	 * Gets the destination.
+	 *
+	 * @param componentId the component id
+	 * @param config the config
+	 * @return the destination
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	public I_GetConceptData getDestination(int componentId, I_ConfigAceFrame config) throws IOException, TerminologyException {
 		RefexVersionBI lastTuple = getLastPromotionTuple(componentId, config);
 		if (lastTuple == null) {
@@ -78,6 +121,9 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.project.refset.PromotionRefset#getLastStatusTime(int, org.dwfa.ace.api.I_ConfigAceFrame)
+	 */
 	public Long getLastStatusTime(int componentId, I_ConfigAceFrame config) throws IOException, TerminologyException {
 		RefexVersionBI lastTuple = getLastPromotionTuple(componentId, config);
 		if (lastTuple == null) {
@@ -88,6 +134,9 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.project.refset.PromotionRefset#getLastPromotionAuthor(int, org.dwfa.ace.api.I_ConfigAceFrame)
+	 */
 	public I_GetConceptData getLastPromotionAuthor(int componentId, I_ConfigAceFrame config) throws IOException, TerminologyException {
 		RefexVersionBI lastTuple = getLastPromotionTuple(componentId, config);
 		if (lastTuple == null) {
@@ -98,6 +147,9 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.project.refset.PromotionRefset#getPreviousPromotionStatus(int, org.dwfa.ace.api.I_ConfigAceFrame)
+	 */
 	public I_GetConceptData getPreviousPromotionStatus(int componentId, I_ConfigAceFrame config) throws IOException, TerminologyException {
 		I_GetConceptData component = termFactory.getConcept(componentId);
 		Collection<? extends RefexChronicleBI<?>> members = component.getAnnotations();
@@ -122,6 +174,15 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 		return null;
 	}
 
+	/**
+	 * Gets the previous user.
+	 *
+	 * @param componentId the component id
+	 * @param config the config
+	 * @return the previous user
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	public I_GetConceptData getPreviousUser(int componentId, I_ConfigAceFrame config) throws IOException, TerminologyException {
 		I_GetConceptData component = termFactory.getConcept(componentId);
 		Collection<? extends RefexChronicleBI<?>> members = component.getAnnotations();
@@ -145,6 +206,9 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.project.refset.PromotionRefset#getPreviousStatusTime(int, org.dwfa.ace.api.I_ConfigAceFrame)
+	 */
 	public Long getPreviousStatusTime(int componentId, I_ConfigAceFrame config) throws IOException, TerminologyException {
 		I_GetConceptData component = termFactory.getConcept(componentId);
 		Collection<? extends RefexChronicleBI<?>> members = component.getAnnotations();
@@ -169,6 +233,9 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.project.refset.PromotionRefset#setPromotionStatus(int, int)
+	 */
 	public void setPromotionStatus(int componentId, int statusConceptId) throws Exception {
 		I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
 		TerminologyBuilderBI tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(), config.getViewCoordinate());
@@ -248,6 +315,13 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 		return;
 	}
 
+	/**
+	 * Sets the destination.
+	 *
+	 * @param componentId the component id
+	 * @param destinationUserConceptId the destination user concept id
+	 * @throws Exception the exception
+	 */
 	public void setDestination(int componentId, int destinationUserConceptId) throws Exception {
 		I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
 		TerminologyBuilderBI tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(), config.getViewCoordinate());
@@ -317,6 +391,14 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 		return;
 	}
 
+	/**
+	 * Sets the destination and promotion status.
+	 *
+	 * @param componentId the component id
+	 * @param destinationUserConceptId the destination user concept id
+	 * @param statusConceptId the status concept id
+	 * @throws Exception the exception
+	 */
 	public void setDestinationAndPromotionStatus(int componentId, int destinationUserConceptId, int statusConceptId) throws Exception {
 		I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
 		TerminologyBuilderBI tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(), config.getViewCoordinate());

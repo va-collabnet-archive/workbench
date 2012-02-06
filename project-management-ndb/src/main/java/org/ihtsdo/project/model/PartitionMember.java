@@ -45,17 +45,16 @@ public class PartitionMember implements Serializable {
 	/** The work set id. */
 	private UUID partitionUUID;
 	
+	/** The member concept. */
 	private I_GetConceptData memberConcept;
 	
 	/**
 	 * Instantiates a new work set member.
-	 * 
+	 *
 	 * @param name the name
 	 * @param id the id
 	 * @param uids the uids
 	 * @param partitionUUID the work set id
-	 * @param batchTags the batch tags
-	 * @param activityStatus the activity status
 	 */
 	public PartitionMember(String name, int id, List<UUID> uids,
 			UUID partitionUUID) {
@@ -140,22 +139,45 @@ public class PartitionMember implements Serializable {
 		return concept;
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	public String toString() {
 		return this.name;
 	}
 
+	/**
+	 * Gets the partition uuid.
+	 *
+	 * @return the partition uuid
+	 */
 	public UUID getPartitionUUID() {
 		return partitionUUID;
 	}
 
+	/**
+	 * Sets the partition uuid.
+	 *
+	 * @param partitionUUID the new partition uuid
+	 */
 	public void setPartitionUUID(UUID partitionUUID) {
 		this.partitionUUID = partitionUUID;
 	}
 
+	/**
+	 * Gets the member concept.
+	 *
+	 * @return the member concept
+	 */
 	public I_GetConceptData getMemberConcept() {
 		return memberConcept;
 	}
 
+	/**
+	 * Sets the member concept.
+	 *
+	 * @param memberConcept the new member concept
+	 */
 	public void setMemberConcept(I_GetConceptData memberConcept) {
 		this.memberConcept = memberConcept;
 	}

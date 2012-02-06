@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.project.workflow.api;
 
 import java.io.BufferedInputStream;
@@ -32,8 +48,17 @@ import org.ihtsdo.project.workflow.model.WfRole;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 
+/**
+ * The Class WorkflowInterpreter.
+ */
 public class WorkflowInterpreter {
 
+	/**
+	 * Creates the workflow interpreter.
+	 *
+	 * @param workflowfDefinition the workflowf definition
+	 * @return the workflow interpreter
+	 */
 	public static WorkflowInterpreter createWorkflowInterpreter(
 			WorkflowDefinition workflowfDefinition) {
 		if (hWfI.containsKey(workflowfDefinition.getName())){
@@ -43,13 +68,29 @@ public class WorkflowInterpreter {
 		return new WorkflowInterpreter(workflowfDefinition);
 	}
 
+	/** The h wf i. */
 	private static HashMap<String,WorkflowInterpreter> hWfI=new HashMap<String,WorkflowInterpreter>();
 	
+	/** The wf definition. */
 	private static WorkflowDefinition wfDefinition;
+	
+	/** The kbase. */
 	private KnowledgeBase kbase;
+	
+	/** The ksession. */
 	private StatelessKnowledgeSession ksession;
+	
+	/** The actions. */
 	private List<String> actions;
+	
+	/** The prep actions. */
 	private List<String> prepActions;
+	
+	/**
+	 * Instantiates a new workflow interpreter.
+	 *
+	 * @param wfDefinition the wf definition
+	 */
 	private WorkflowInterpreter(WorkflowDefinition wfDefinition) {
 		super();
 		this.wfDefinition = wfDefinition;
@@ -89,10 +130,22 @@ public class WorkflowInterpreter {
 
 	}
 
+	/**
+	 * Gets the wf definition.
+	 *
+	 * @return the wf definition
+	 */
 	public WorkflowDefinition getWfDefinition() {
 		return wfDefinition;
 	}
 
+	/**
+	 * Gets the possible actions.
+	 *
+	 * @param instance the instance
+	 * @param user the user
+	 * @return the possible actions
+	 */
 	public List<WfAction> getPossibleActions(WfInstance instance, WfUser user) {
 		List<WfAction> possibleActions = new ArrayList<WfAction>();
 		WfComponentProvider cp=new WfComponentProvider();
@@ -122,6 +175,13 @@ public class WorkflowInterpreter {
 		return possibleActions;
 	}
 
+	/**
+	 * Gets the preparation action.
+	 *
+	 * @param instance the instance
+	 * @param user the user
+	 * @return the preparation action
+	 */
 	public WfAction getPreparationAction(WfInstance instance, WfUser user) {
 		List<WfAction> candidatePrepActions = new ArrayList<WfAction>();
 		WfComponentProvider cp=new WfComponentProvider();
@@ -161,6 +221,13 @@ public class WorkflowInterpreter {
 
 	}
 
+	/**
+	 * Gets the next role.
+	 *
+	 * @param instance the instance
+	 * @param workList the work list
+	 * @return the next role
+	 */
 	public List<WfRole> getNextRole(WfInstance instance, WorkList workList) {
 		List<WfRole> roles = new ArrayList<WfRole>();
 
@@ -190,6 +257,13 @@ public class WorkflowInterpreter {
 		return roles;
 	}
 
+	/**
+	 * Gets the next destination.
+	 *
+	 * @param instance the instance
+	 * @param workList the work list
+	 * @return the next destination
+	 */
 	public WfUser getNextDestination(WfInstance instance, WorkList workList) {
 		List<WfRole> nextRoles = getNextRole(instance, workList);
 		WfUser nextUser = null;
@@ -209,6 +283,13 @@ public class WorkflowInterpreter {
 		return nextUser;
 	}
 
+	/**
+	 * Gets the possible destinations.
+	 *
+	 * @param instance the instance
+	 * @param workList the work list
+	 * @return the possible destinations
+	 */
 	public List<WfUser> getPossibleDestinations(WfInstance instance, WorkList workList) {
 		List<WfUser> possibleUsers = new ArrayList<WfUser>();
 		List<WfRole> nextRoles = getNextRole(instance, workList);
@@ -224,6 +305,14 @@ public class WorkflowInterpreter {
 		return possibleUsers;
 	}
 
+	/**
+	 * Do action.
+	 *
+	 * @param instance the instance
+	 * @param role the role
+	 * @param action the action
+	 * @param worker the worker
+	 */
 	public void doAction(WfInstance instance, WfRole role,WfAction action, I_Work worker) {
 		// TODO: decide if should check for action is possible
 		try {

@@ -70,15 +70,20 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 	/** The issue repo. */
 	private IssueRepository issueRepo;
 	
+	/** The concept. */
 	private I_GetConceptData concept;
 
+	/** The regis. */
 	private IssueRepoRegistration regis;
+	
+	/** The read only mode. */
 	private boolean readOnlyMode;
 	
 	
 	/**
 	 * Instantiates a new issues list panel.
-	 * 
+	 *
+	 * @param readOnlyMode the read only mode
 	 * @throws Exception the exception
 	 */
 	public IssuesListPanel2(boolean readOnlyMode) throws Exception {
@@ -100,9 +105,9 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 	
 	/**
 	 * Instantiates a new issues list panel.
-	 * 
-	 * @param termFactory the term factory
-	 * 
+	 *
+	 * @param config the config
+	 * @param readOnlyMode the read only mode
 	 * @throws Exception the exception
 	 */
 	public IssuesListPanel2(I_ConfigAceFrame config,boolean readOnlyMode) throws Exception {
@@ -116,6 +121,9 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 		initComponents();
 	}
 	
+	/**
+	 * Inits the custom components.
+	 */
 	private void initCustomComponents() {
 		bCreateIssue.setEnabled(true && !readOnlyMode);
 	}
@@ -207,6 +215,8 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 	
 	/**
 	 * C repo item state changed.
+	 *
+	 * @return the issue repo
 	 */
 //	private void cRepoItemStateChanged() {		
 //		issueRepo=(IssueRepository)((ListObj)cRepo.getSelectedItem()).getAtrValue();
@@ -230,6 +240,12 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 		
 		return this.issueRepo;
 	}
+	
+	/**
+	 * Creates the issue.
+	 *
+	 * @param concept the concept
+	 */
 	public void createIssue(I_GetConceptData concept){
 		this.concept=concept;
 		showNewIssuePanel();
@@ -252,11 +268,13 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 //	}
 
 	/**
-	 * Load issues.
-	 * @param regis 
-	 * @param repo 
-	 * @param translConfig 
-	 */
+ * Load issues.
+ *
+ * @param concept the concept
+ * @param repo the repo
+ * @param regis the regis
+ * @return the integer
+ */
 	public Integer loadIssues(I_GetConceptData concept, IssueRepository repo, IssueRepoRegistration regis) {
 		this.concept=concept;
 		this.issueRepo=repo;
@@ -293,14 +311,27 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 		
 	}
 
+	/**
+	 * Gets the site user password.
+	 *
+	 * @return the site user password
+	 */
 	private String getSiteUserPassword() {
 		return regis.getPassword();
 	}
 
+	/**
+	 * Gets the site user name.
+	 *
+	 * @return the site user name
+	 */
 	private String getSiteUserName() {
 		return regis.getUserId();
 	}
 
+    /**
+     * Show new issue panel.
+     */
     public void showNewIssuePanel() {
 
     	getIssueRepo();
@@ -371,8 +402,22 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
     }
 
 
+	/**
+	 * The listener interface for receiving tableItemAction events.
+	 * The class that is interested in processing a tableItemAction
+	 * event implements this interface, and the object created
+	 * with that class is registered with a component using the
+	 * component's <code>addTableItemActionListener<code> method. When
+	 * the tableItemAction event occurs, that object's appropriate
+	 * method is invoked.
+	 *
+	 * @see TableItemActionEvent
+	 */
 	class TableItemActionListener implements ActionListener{
 
+		/* (non-Javadoc)
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
@@ -387,14 +432,35 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 			});
 		}
 	}
+	
+	/**
+	 * The Class JTableMouselistener.
+	 */
 	public class JTableMouselistener extends MouseAdapter {
+		
+		/** The j table. */
 		private JTable jTable;
+		
+		/** The menu. */
 		private JPopupMenu menu;
+		
+		/** The m item listener. */
 		private TableItemActionListener mItemListener;
+		
+		/** The m item. */
 		private JMenuItem mItem;
+		
+		/** The x point. */
 		private int xPoint;
+		
+		/** The y point. */
 		private int yPoint;
 
+		/**
+		 * Instantiates a new j table mouselistener.
+		 *
+		 * @param jTable the j table
+		 */
 		JTableMouselistener (JTable jTable){
 			this.jTable=jTable;
 			menu=new JPopupMenu();
@@ -404,6 +470,9 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 			menu.add(mItem);
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.event.MouseAdapter#mouseClicked(java.awt.event.MouseEvent)
+		 */
 		@Override
 		public void mouseClicked(MouseEvent e) {
 
@@ -474,8 +543,11 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 	
 	/**
 	 * Load repos.
-	 * 
-	 * @param issueRepository the issue repository
+	 *
+	 * @param cmb the cmb
+	 * @param object the object
+	 * @param name the name
+	 * @param selected the selected
 	 */
 //	@SuppressWarnings("unchecked")
 //	private void loadRepos(IssueRepository issueRepository) {
@@ -540,10 +612,16 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 			cmb.setSelectedItem(lo);
 	}
 
+	/**
+	 * B create issue action performed.
+	 */
 	private void bCreateIssueActionPerformed() {
 		showNewIssuePanel();
 	}
 
+	/**
+	 * Creates the ui components.
+	 */
 	private void createUIComponents() {
 	}
 
@@ -636,18 +714,38 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The split pane1. */
 	private JSplitPane splitPane1;
+	
+	/** The panel3. */
 	private JPanel panel3;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The b create issue. */
 	private JButton bCreateIssue;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The table1. */
 	private JTable table1;
+	
+	/** The panel4. */
 	private JPanel panel4;
+	
+	/** The issue comments panel1. */
 	private IssueCommentsPanel issueCommentsPanel1;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 
 
+	/* (non-Javadoc)
+	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+	 */
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		// TODO Auto-generated method stub

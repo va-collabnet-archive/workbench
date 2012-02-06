@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Tue Dec 06 12:25:43 GMT-03:00 2011
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.project.workflow.wizard;
@@ -29,30 +42,52 @@ import org.ihtsdo.project.panel.details.ZebraJTable;
 import org.ihtsdo.wizard.I_fastWizard;
 
 /**
+ * The Class DataCollectorFromList.
+ *
  * @author Guillermo Reynoso
  */
 public class DataCollectorFromList extends JPanel implements I_fastWizard{
-	/**
-	 * 
-	 */
+	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -3557213261369154457L;
-	/**
-	 * 
-	 */
+	
+	/** The column names. */
 	private String[] columnNames;
+	
+	/** The key. */
 	private String key;
+	
+	/**
+	 * Instantiates a new data collector from list.
+	 */
 	public DataCollectorFromList() {
 		initComponents();
 
 		tblObjs.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tblObjs.setModel(new DefaultTableModel());
 	}
+	
+	/**
+	 * Sets the colum names.
+	 *
+	 * @param columnNames the new colum names
+	 */
 	public void setColumNames(String[] columnNames){
 		this.columnNames=columnNames;
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.wizard.I_fastWizard#setKey(java.lang.String)
+	 */
 	public void setKey(String key){
 		this.key=key;
 	}
+	
+	/**
+	 * Load objects.
+	 *
+	 * @param objects the objects
+	 */
 	public void loadObjects(java.util.List<Object> objects){
 
 		Object[][] data = null;
@@ -80,16 +115,32 @@ public class DataCollectorFromList extends JPanel implements I_fastWizard{
 		cmodel.getColumn(1).setCellEditor(new RadioEditor(new JCheckBox(),new JRadioButton()));
 		cmodel.getColumn(2).setCellRenderer(new DefaultTableCellRenderer());
 	}
+	
+	/**
+	 * Sets the label.
+	 *
+	 * @param strLabel the new label
+	 */
 	public void setLabel(String strLabel){
 		this.label1.setText(strLabel);
 	}
 
+	/**
+	 * The Class RadioRenderer.
+	 */
 	class RadioRenderer implements
 	TableCellRenderer {
+		
+		/**
+		 * Instantiates a new radio renderer.
+		 */
 		RadioRenderer() {
 			super();
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.TableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
+		 */
 		public Component getTableCellRendererComponent(JTable table,
 				Object value, boolean isSelected, boolean hasFocus, int row,
 				int column) {
@@ -100,12 +151,22 @@ public class DataCollectorFromList extends JPanel implements I_fastWizard{
 		}
 	}
 
+	/**
+	 * The Class CheckBoxRenderer.
+	 */
 	class CheckBoxRenderer implements
 	TableCellRenderer {
+		
+		/**
+		 * Instantiates a new check box renderer.
+		 */
 		CheckBoxRenderer() {
 			super();
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.table.TableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
+		 */
 		public Component getTableCellRendererComponent(JTable table,
 				Object value, boolean isSelected, boolean hasFocus, int row,
 				int column) {
@@ -117,19 +178,35 @@ public class DataCollectorFromList extends JPanel implements I_fastWizard{
 		}
 	}
 
+	/**
+	 * The Class RadioEditor.
+	 */
 	class RadioEditor extends DefaultCellEditor implements ActionListener {
-		/**
-		 * 
-		 */
+		
+		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = 1L;
+		
+		/** The rbutton. */
 		JRadioButton rbutton;
+		
+		/** The row. */
 		int row;
+		
+		/**
+		 * Instantiates a new radio editor.
+		 *
+		 * @param checkBox the check box
+		 * @param button the button
+		 */
 		public RadioEditor(JCheckBox checkBox, JRadioButton button) {
 			super(checkBox);
 			this.rbutton = button;
 			this.rbutton.addActionListener(this);
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.DefaultCellEditor#getTableCellEditorComponent(javax.swing.JTable, java.lang.Object, boolean, int, int)
+		 */
 		public Component getTableCellEditorComponent(JTable table,
 				Object value, boolean isSelected, int row, int column) {
 			Boolean val=(Boolean) value;
@@ -138,6 +215,9 @@ public class DataCollectorFromList extends JPanel implements I_fastWizard{
 			return rbutton;
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.DefaultCellEditor#getCellEditorValue()
+		 */
 		public Object getCellEditorValue() {
 
 			int rowModel = tblObjs.convertRowIndexToModel(row);
@@ -145,6 +225,9 @@ public class DataCollectorFromList extends JPanel implements I_fastWizard{
 			return val;
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JRadioButton button = (JRadioButton)e.getSource();
@@ -157,19 +240,35 @@ public class DataCollectorFromList extends JPanel implements I_fastWizard{
 
 	}
 
+	/**
+	 * The Class CheckBoxEditor.
+	 */
 	class CheckBoxEditor extends DefaultCellEditor implements ActionListener {
-		/**
-		 * 
-		 */
+		
+		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = 1L;
+		
+		/** The rbutton. */
 		JCheckBox rbutton;
+		
+		/** The row. */
 		int row;
+		
+		/**
+		 * Instantiates a new check box editor.
+		 *
+		 * @param checkBox the check box
+		 * @param button the button
+		 */
 		public CheckBoxEditor(JCheckBox checkBox, JCheckBox button) {
 			super(checkBox);
 			this.rbutton = button;
 			this.rbutton.addActionListener(this);
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.DefaultCellEditor#getTableCellEditorComponent(javax.swing.JTable, java.lang.Object, boolean, int, int)
+		 */
 		public Component getTableCellEditorComponent(JTable table,
 				Object value, boolean isSelected, int row, int column) {
 			Boolean val=(Boolean) value;
@@ -178,10 +277,16 @@ public class DataCollectorFromList extends JPanel implements I_fastWizard{
 			return rbutton;
 		}
 
+		/* (non-Javadoc)
+		 * @see javax.swing.DefaultCellEditor#getCellEditorValue()
+		 */
 		public Object getCellEditorValue() {
 			return new Boolean(rbutton.isSelected());
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JCheckBox button = (JCheckBox)e.getSource();
@@ -194,6 +299,13 @@ public class DataCollectorFromList extends JPanel implements I_fastWizard{
 	}
 
 
+	/**
+	 * Item radio action performed.
+	 *
+	 * @param state the state
+	 * @param row the row
+	 * @param column the column
+	 */
 	private void itemRadioActionPerformed(int state, int row,int column) {
 		boolean othersRow;
 		boolean ownRow;
@@ -214,6 +326,14 @@ public class DataCollectorFromList extends JPanel implements I_fastWizard{
 		}
 
 	}
+	
+	/**
+	 * Item check box action performed.
+	 *
+	 * @param state the state
+	 * @param row the row
+	 * @param column the column
+	 */
 	private void itemCheckBoxActionPerformed(int state, int row,int column) {
 		int rowModel = tblObjs.convertRowIndexToModel(row);
 		if (state==2)
@@ -221,6 +341,10 @@ public class DataCollectorFromList extends JPanel implements I_fastWizard{
 		else
 			tblObjs.getModel().setValueAt(true,rowModel, column);
 	}
+	
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		label1 = new JLabel();
@@ -255,10 +379,18 @@ public class DataCollectorFromList extends JPanel implements I_fastWizard{
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The tbl objs. */
 	private ZebraJTable tblObjs;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.wizard.I_fastWizard#getData()
+	 */
 	@Override
 	public HashMap<String, Object> getData() throws Exception {
 		HashMap<String, Object> hmRes=new HashMap<String, Object>();

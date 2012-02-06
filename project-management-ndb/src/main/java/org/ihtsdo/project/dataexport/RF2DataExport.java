@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.project.dataexport;
 
 import java.io.BufferedWriter;
@@ -39,33 +55,81 @@ import org.ihtsdo.tk.api.coordinate.PositionSet;
 import org.ihtsdo.tk.api.id.IdBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
+/**
+ * The Class RF2DataExport.
+ */
 public abstract class RF2DataExport  implements ProcessUnfetchedConceptDataBI{
 
+	/** The Constant CONCEPT_HEADER. */
 	private static final String CONCEPT_HEADER = "id	effectiveTime	active	moduleId	definitionStatusId	" ;
+	
+	/** The Constant DESCRIPTION_HEADER. */
 	private static final String DESCRIPTION_HEADER = "id	effectiveTime	active	moduleId	conceptId	languageCode	typeId	term	caseSignificanceId";
+	
+	/** The Constant RELATIONSHIP_HEADER. */
 	private static final String RELATIONSHIP_HEADER = "id	effectiveTime	active	moduleId	sourceId	destinationId	relationshipGroup	typeId	characteristicTypeId	modifierId";
+	
+	/** The Constant LANGUAGE_HEADER. */
 	private static final String LANGUAGE_HEADER = null;
+	
+	/** The Constant INACTDESCRIPTION_HEADER. */
 	private static final String INACTDESCRIPTION_HEADER = null;
+	
+	/** The release config. */
 	public I_ConfigAceFrame releaseConfig;
+	
+	/** The snomed int id. */
 	private int snomedIntId;
+	
+	/** The allowed dest rel types. */
 	private I_IntSet allowedDestRelTypes;
+	
+	/** The active value. */
 	private I_GetConceptData activeValue;
+	
+	/** The inactive value. */
 	private I_GetConceptData inactiveValue;
+	
+	/** The base config. */
 	public I_ConfigAceFrame baseConfig;
+	
+	/** The all snomed status. */
 	private NidSetBI allSnomedStatus;
+	
+	/** The release date. */
 	protected String releaseDate;
+	
+	/** The snomed ct model component. */
 	private I_GetConceptData snomedCTModelComponent;
 
+	/** The logger. */
 	private static Logger logger = Logger.getLogger(RF2DataExport.class);
+	
+	/** The null uuid. */
 	protected String nullUuid; // null string to match with UUID.fromString("00000000-0000-0000-C000-000000000046")
+	
+	/** The all status set. */
 	protected I_IntSet allStatusSet;
+	
+	/** The ACCEPTABLE. */
 	private int ACCEPTABLE;
+	
+	/** The PREFERRED. */
 	private int PREFERRED;
+	
+	/** The all desc types. */
 	protected NidSetBI allDescTypes;
 
 
 
 
+	/**
+	 * Instantiates a new r f2 data export.
+	 *
+	 * @param releaseConfig the release config
+	 * @param releaseDate the release date
+	 * @param baseConfig the base config
+	 */
 	public RF2DataExport(I_ConfigAceFrame releaseConfig,String releaseDate,I_ConfigAceFrame baseConfig) {
 		this.releaseDate=releaseDate;
 		this.releaseConfig=releaseConfig;
@@ -97,6 +161,13 @@ public abstract class RF2DataExport  implements ProcessUnfetchedConceptDataBI{
 		}
 	}
 
+	/**
+	 * Gets the snomed statuses.
+	 *
+	 * @return the snomed statuses
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public NidSetBI getSnomedStatuses() throws TerminologyException, IOException {
 		NidSetBI allStatuses = new NidSet();
 		Set<I_GetConceptData> descendants = new HashSet<I_GetConceptData>();
@@ -114,6 +185,13 @@ public abstract class RF2DataExport  implements ProcessUnfetchedConceptDataBI{
 		return allStatuses;
 	}
 
+	/**
+	 * Gets the descendants.
+	 *
+	 * @param descendants the descendants
+	 * @param concept the concept
+	 * @return the descendants
+	 */
 	public  Set<I_GetConceptData> getDescendants(Set<I_GetConceptData> descendants, I_GetConceptData concept) {
 		try {
 			Set<I_GetConceptData> childrenSet = new HashSet<I_GetConceptData>();
@@ -131,6 +209,14 @@ public abstract class RF2DataExport  implements ProcessUnfetchedConceptDataBI{
 		return descendants;
 	}
 
+	/**
+	 * Export concept.
+	 *
+	 * @param concept the concept
+	 * @param conceptSCTID the concept sctid
+	 * @param moduleId the module id
+	 * @param bwc the bwc
+	 */
 	protected void exportConcept(I_GetConceptData concept,
 			String conceptSCTID, String moduleId, BufferedWriter bwc) {
 		String effectiveTime = "";
@@ -195,6 +281,15 @@ public abstract class RF2DataExport  implements ProcessUnfetchedConceptDataBI{
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * Compute module id.
+	 *
+	 * @param concept the concept
+	 * @return the string
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	private String computeModuleId(I_GetConceptData concept) throws IOException, TerminologyException {
 		String moduleid = I_Constants.CORE_MODULE_ID;	
 		if (snomedCTModelComponent.isParentOf(concept, 
@@ -211,16 +306,28 @@ public abstract class RF2DataExport  implements ProcessUnfetchedConceptDataBI{
 		return moduleid;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI#getNidSet()
+	 */
 	@Override
 	public NidBitSetBI getNidSet() throws IOException {
 		NidBitSetBI cons = Ts.get().getAllConceptNids();
 		return cons;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI#processUnfetchedConceptData(int, org.ihtsdo.tk.api.ConceptFetcherBI)
+	 */
 	@Override
 	public abstract void processUnfetchedConceptData(int cNid, ConceptFetcherBI fetcher)
 	throws Exception;
 
+	/**
+	 * Gets the existent description sctid.
+	 *
+	 * @param description the description
+	 * @return the existent description sctid
+	 */
 	public Long getExistentDescriptionSCTID(I_DescriptionTuple description){
 		Long sctid = null;
 		try {
@@ -237,6 +344,13 @@ public abstract class RF2DataExport  implements ProcessUnfetchedConceptDataBI{
 		}
 		return sctid;
 	}
+	
+	/**
+	 * Gets the existent concept sctid.
+	 *
+	 * @param concept the concept
+	 * @return the existent concept sctid
+	 */
 	public Long getExistentConceptSCTID(I_GetConceptData concept){
 		Long sctid = null;
 		try {
@@ -254,6 +368,17 @@ public abstract class RF2DataExport  implements ProcessUnfetchedConceptDataBI{
 		return sctid;
 	}
 
+	/**
+	 * Export description.
+	 *
+	 * @param description the description
+	 * @param concept the concept
+	 * @param conceptSCTID the concept sctid
+	 * @param moduleId the module id
+	 * @param tgtLangCode the tgt lang code
+	 * @param bwd the bwd
+	 * @param reportFileWriter the report file writer
+	 */
 	public void exportDescription(I_DescriptionTuple description, I_GetConceptData concept,
 			String conceptSCTID, String moduleId,  String tgtLangCode, BufferedWriter bwd, BufferedWriter reportFileWriter) {
 		String effectiveTime = "";
@@ -362,6 +487,13 @@ public abstract class RF2DataExport  implements ProcessUnfetchedConceptDataBI{
 		}
 	}
 
+	/**
+	 * Gets the all desc types.
+	 *
+	 * @return the all desc types
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public NidSetBI getAllDescTypes() throws TerminologyException, IOException {
 		NidSetBI allDescTypes = new NidSet();
 		allDescTypes.add(Terms.get().uuidToNative(UUID.fromString("00791270-77c9-32b6-b34f-d932569bd2bf")));
@@ -369,6 +501,17 @@ public abstract class RF2DataExport  implements ProcessUnfetchedConceptDataBI{
 		allDescTypes.add(Terms.get().uuidToNative(UUID.fromString("700546a3-09c7-3fc2-9eb9-53d318659a09")));
 		return allDescTypes;
 	}
+	
+	/**
+	 * Export relationship.
+	 *
+	 * @param concept the concept
+	 * @param conceptSCTID the concept sctid
+	 * @param moduleId the module id
+	 * @param bwr the bwr
+	 * @return true, if successful
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public boolean exportRelationship(I_GetConceptData concept,
 			String conceptSCTID, String moduleId, BufferedWriter bwr) throws IOException {
 
@@ -549,11 +692,22 @@ public abstract class RF2DataExport  implements ProcessUnfetchedConceptDataBI{
 		return bRet;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.tk.api.ContinuationTrackerBI#continueWork()
+	 */
 	@Override
 	public boolean continueWork() {
 			return true;
 	}
 
+	/**
+	 * Gets the last current visible id.
+	 *
+	 * @param parts the parts
+	 * @param viewpointSet the viewpoint set
+	 * @param relAssertionType the rel assertion type
+	 * @return the last current visible id
+	 */
 	public Object getLastCurrentVisibleId(List<? extends I_IdPart> parts, PositionSet viewpointSet,
 			RelAssertionType relAssertionType) {
 		Object data = null;
@@ -563,6 +717,14 @@ public abstract class RF2DataExport  implements ProcessUnfetchedConceptDataBI{
 		return data;
 	}
 
+	/**
+	 * Gets the last current visible id part.
+	 *
+	 * @param parts the parts
+	 * @param viewpointSet the viewpoint set
+	 * @param relAssertionType the rel assertion type
+	 * @return the last current visible id part
+	 */
 	public I_IdPart getLastCurrentVisibleIdPart(List<? extends I_IdPart> parts, PositionSet viewpointSet,
 			RelAssertionType relAssertionType) {
 		//		System.out.println("Parts Size: " + parts.size());
@@ -640,6 +802,18 @@ public abstract class RF2DataExport  implements ProcessUnfetchedConceptDataBI{
 	}
 
 
+	/**
+	 * Export language.
+	 *
+	 * @param languageExtension the language extension
+	 * @param description the description
+	 * @param concept the concept
+	 * @param moduleId the module id
+	 * @param refsetSCTID the refset sctid
+	 * @param bwl the bwl
+	 * @param reportFileWriter the report file writer
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public void exportLanguage(I_ExtendByRefPartCid languageExtension, I_DescriptionTuple description, I_GetConceptData concept,
 			String moduleId, String refsetSCTID, BufferedWriter bwl, BufferedWriter reportFileWriter) throws IOException {
 		String effectiveTime = "";
@@ -721,6 +895,16 @@ public abstract class RF2DataExport  implements ProcessUnfetchedConceptDataBI{
 			System.exit(0);
 		}
 	}
+	
+	/**
+	 * Export inact description.
+	 *
+	 * @param description the description
+	 * @param moduleId the module id
+	 * @param refsetSCTID the refset sctid
+	 * @param bwi the bwi
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public void exportInactDescription(I_DescriptionTuple description, 
 			String moduleId, String refsetSCTID, BufferedWriter bwi) throws IOException {
 		try {
@@ -778,6 +962,16 @@ public abstract class RF2DataExport  implements ProcessUnfetchedConceptDataBI{
 		}
 	}
 
+	/**
+	 * Export stated relationship.
+	 *
+	 * @param concept the concept
+	 * @param conceptSCTID the concept sctid
+	 * @param moduleId the module id
+	 * @param bws the bws
+	 * @return true, if successful
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public boolean exportStatedRelationship(I_GetConceptData concept,
 			String conceptSCTID, String moduleId, BufferedWriter bws) throws IOException {
 		boolean bRet=false;
@@ -961,22 +1155,48 @@ public abstract class RF2DataExport  implements ProcessUnfetchedConceptDataBI{
 		}
 		return bRet;
 	}
+	
+	/**
+	 * Gets the concept header.
+	 *
+	 * @return the concept header
+	 */
 	public static String getConceptHeader() {
 		return CONCEPT_HEADER;
 	}
 
+	/**
+	 * Gets the description header.
+	 *
+	 * @return the description header
+	 */
 	public static String getDescriptionHeader() {
 		return DESCRIPTION_HEADER;
 	}
 
+	/**
+	 * Gets the relationship header.
+	 *
+	 * @return the relationship header
+	 */
 	public static String getRelationshipHeader() {
 		return RELATIONSHIP_HEADER;
 	}
 
+	/**
+	 * Gets the language header.
+	 *
+	 * @return the language header
+	 */
 	public static String getLanguageHeader() {
 		return LANGUAGE_HEADER;
 	}
 
+	/**
+	 * Gets the inactdescription header.
+	 *
+	 * @return the inactdescription header
+	 */
 	public static String getInactdescriptionHeader() {
 		return INACTDESCRIPTION_HEADER;
 	}

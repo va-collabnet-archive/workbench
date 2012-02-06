@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.project.refset;
 
 
@@ -16,14 +32,32 @@ import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
+/**
+ * The Class RefsetMemberValueMgr.
+ */
 public class RefsetMemberValueMgr {
 
+	/** The term factory. */
 	private I_TermFactory termFactory;
+	
+	/** The refset id. */
 	private int refsetId;
+	
+	/** The config. */
 	private I_ConfigAceFrame config;
+	
+	/** The member type. */
 	private int memberType;
+	
+	/** The refset concept. */
 	private I_GetConceptData refsetConcept;
 
+	/**
+	 * Instantiates a new refset member value mgr.
+	 *
+	 * @param refsetConcept the refset concept
+	 * @throws Exception the exception
+	 */
 	public RefsetMemberValueMgr(I_GetConceptData refsetConcept) throws Exception {
 		this.refsetId = refsetConcept.getConceptNid();
 		this.termFactory = Terms.get();
@@ -32,6 +66,12 @@ public class RefsetMemberValueMgr {
 		this.refsetConcept=refsetConcept;
 	}
 	
+	/**
+	 * Put concept member.
+	 *
+	 * @param conceptMemberId the concept member id
+	 * @throws Exception the exception
+	 */
 	public void putConceptMember(int conceptMemberId) throws Exception {
 
 		boolean alreadyMember = false;
@@ -82,6 +122,12 @@ public class RefsetMemberValueMgr {
 		return;
 	}
 
+	/**
+	 * Del concept member.
+	 *
+	 * @param conceptMemberId the concept member id
+	 * @throws Exception the exception
+	 */
 	public void delConceptMember(int conceptMemberId) throws Exception {
 
 		Collection<? extends I_ExtendByRef> extensions = termFactory.getAllExtensionsForComponent(

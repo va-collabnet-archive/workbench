@@ -381,26 +381,67 @@ public class IssueRepoPanel extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The label8. */
 	private JLabel label8;
+	
+	/** The label9. */
 	private JLabel label9;
+	
+	/** The label4. */
 	private JLabel label4;
+	
+	/** The label5. */
 	private JLabel label5;
+	
+	/** The label6. */
 	private JLabel label6;
+	
+	/** The label7. */
 	private JLabel label7;
+	
+	/** The txt pass. */
 	private JTextField txtPass;
+	
+	/** The txt user. */
 	private JTextField txtUser;
+	
+	/** The txt url. */
 	private JTextField txtUrl;
+	
+	/** The txt ext repo id. */
 	private JTextField txtExtRepoId;
+	
+	/** The txt ext proj id. */
 	private JTextField txtExtProjId;
+	
+	/** The c proj. */
 	private JComboBox cProj;
+	
+	/** The c type. */
 	private JComboBox cType;
+	
+	/** The txt name. */
 	private JTextField txtName;
+	
+	/** The b refresh. */
 	private JButton bRefresh;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The b save. */
 	private JButton bSave;
+	
+	/** The b cancel. */
 	private JButton bCancel;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

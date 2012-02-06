@@ -49,14 +49,11 @@ public class PartitionScheme implements Serializable{
 
 	/**
 	 * Instantiates a new work set.
-	 * 
+	 *
 	 * @param name the name
 	 * @param id the id
 	 * @param uids the uids
-	 * @param sourceRefsetUUID the project id
-	 * @param creationDate the creation date
-	 * @param lastChangeDate the last change date
-	 * @param description the description
+	 * @param workSetUUID the work set uuid
 	 */
 	public PartitionScheme(String name, int id, List<UUID> uids,
 			UUID workSetUUID) {
@@ -104,38 +101,83 @@ public class PartitionScheme implements Serializable{
 		return concept;
 	}
 
+	/**
+	 * Gets the name.
+	 *
+	 * @return the name
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * Sets the name.
+	 *
+	 * @param name the new name
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	/**
+	 * Gets the id.
+	 *
+	 * @return the id
+	 */
 	public int getId() {
 		return id;
 	}
 
+	/**
+	 * Sets the id.
+	 *
+	 * @param id the new id
+	 */
 	public void setId(int id) {
 		this.id = id;
 	}
 
+	/**
+	 * Gets the uids.
+	 *
+	 * @return the uids
+	 */
 	public List<UUID> getUids() {
 		return uids;
 	}
 
+	/**
+	 * Sets the uids.
+	 *
+	 * @param uids the new uids
+	 */
 	public void setUids(List<UUID> uids) {
 		this.uids = uids;
 	}
 
+	/**
+	 * Gets the source refset uuid.
+	 *
+	 * @return the source refset uuid
+	 */
 	public UUID getSourceRefsetUUID() {
 		return sourceRefsetUUID;
 	}
 
+	/**
+	 * Sets the source refset uuid.
+	 *
+	 * @param sourceRefsetUUID the new source refset uuid
+	 */
 	public void setSourceRefsetUUID(UUID sourceRefsetUUID) {
 		this.sourceRefsetUUID = sourceRefsetUUID;
 	}
 	
+	/**
+	 * Gets the partitions.
+	 *
+	 * @return the partitions
+	 */
 	public List<Partition> getPartitions() {
 		I_ConfigAceFrame config = null;
 		try {
@@ -148,6 +190,9 @@ public class PartitionScheme implements Serializable{
 		return TerminologyProjectDAO.getAllPartitionsForScheme(this, config);
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	public String toString() {
 		return name;
 	}

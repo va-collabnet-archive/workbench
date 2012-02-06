@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Tue Aug 31 19:05:45 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.project.panel;
@@ -39,23 +52,41 @@ import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkSet;
 
 /**
+ * The Class WorkListChooser.
+ *
  * @author Guillermo Reynoso
  */
 public class WorkListChooser extends JDialog {
 	
+	/** The Constant NO_WORKLIST_SELECTED. */
 	private static final String NO_WORKLIST_SELECTED = "You have to select a worklist.";
 	
+	/** The work list model. */
 	private DefaultListModel workListModel;
+	
+	/** The project combo model. */
 	private DefaultComboBoxModel projectComboModel;
+	
+	/** The config. */
 	private I_ConfigAceFrame config;
+	
+	/** The work list. */
 	private WorkList workList =  null;
 	
+	/**
+	 * Instantiates a new work list chooser.
+	 *
+	 * @param config the config
+	 */
 	public WorkListChooser(I_ConfigAceFrame config) {
 		this.config = config;
 		initComponents();
 		initCustomComponents();
 	}
 
+	/**
+	 * Inits the custom components.
+	 */
 	private void initCustomComponents() {
 		
 		errorLabel.setForeground(Color.RED);
@@ -81,6 +112,11 @@ public class WorkListChooser extends JDialog {
 		
 	}
 	
+	/**
+	 * Show modal dialog.
+	 *
+	 * @return the work list
+	 */
 	public WorkList showModalDialog() {
 		setModal(true);
 		this.setPreferredSize(new Dimension(500,500));
@@ -89,11 +125,21 @@ public class WorkListChooser extends JDialog {
 		return workList;
 	}
 
+	/**
+	 * Close.
+	 *
+	 * @param canceled the canceled
+	 */
 	private void close(WorkList canceled) {
 		this.workList = canceled;
 		dispose();
 	}
 	
+	/**
+	 * Open button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void openButtonActionPerformed(ActionEvent e) {
 		if(workListList.getSelectedIndex() != -1){
 			close(workList);
@@ -102,10 +148,20 @@ public class WorkListChooser extends JDialog {
 		}
 	}
 
+	/**
+	 * Cancel button action performed.
+	 *
+	 * @param e the e
+	 */
 	private void cancelButtonActionPerformed(ActionEvent e) {
 		close(null);
 	}
 
+	/**
+	 * Project combo box item state changed.
+	 *
+	 * @param e the e
+	 */
 	private void projectComboBoxItemStateChanged(ItemEvent e) {
 		if(projectComboModel.getSelectedItem() instanceof I_TerminologyProject){
 			I_TerminologyProject selectedProject = (I_TerminologyProject)projectComboModel.getSelectedItem();
@@ -115,6 +171,11 @@ public class WorkListChooser extends JDialog {
 		}
 	}
 
+	/**
+	 * Update worklist list.
+	 *
+	 * @param project the project
+	 */
 	private void updateWorklistList(I_TerminologyProject project) {
 		workListModel.removeAllElements();
 		if(project != null){
@@ -130,11 +191,19 @@ public class WorkListChooser extends JDialog {
 		}
 	}
 
+	/**
+	 * Work list list value changed.
+	 *
+	 * @param e the e
+	 */
 	private void workListListValueChanged(ListSelectionEvent e) {
 		workList = (WorkList)workListList.getSelectedValue();
 		errorLabel.setText("");
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		buttonPanel = new JPanel();
@@ -233,15 +302,34 @@ public class WorkListChooser extends JDialog {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The button panel. */
 	private JPanel buttonPanel;
+	
+	/** The open button. */
 	private JButton openButton;
+	
+	/** The cancel button. */
 	private JButton cancelButton;
+	
+	/** The project panel. */
 	private JPanel projectPanel;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The project combo box. */
 	private JComboBox projectComboBox;
+	
+	/** The component panel. */
 	private JPanel componentPanel;
+	
+	/** The worklist list scroll. */
 	private JScrollPane worklistListScroll;
+	
+	/** The work list list. */
 	private JList workListList;
+	
+	/** The error label. */
 	private JLabel errorLabel;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

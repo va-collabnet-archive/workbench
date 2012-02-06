@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.project.panel.details;
 
 /**
@@ -5,42 +21,95 @@ package org.ihtsdo.project.panel.details;
  */
 public class ZebraJTable extends javax.swing.JTable
 {
+	
+	/** The row colors. */
 	private java.awt.Color rowColors[] = new java.awt.Color[2];
+	
+	/** The draw stripes. */
 	private boolean drawStripes = false;
 
+	/**
+	 * Instantiates a new zebra j table.
+	 */
 	public ZebraJTable( )
 	{
 	}
+	
+	/**
+	 * Instantiates a new zebra j table.
+	 *
+	 * @param numRows the num rows
+	 * @param numColumns the num columns
+	 */
 	public ZebraJTable( int numRows, int numColumns )
 	{
 		super( numRows, numColumns );
 	}
+	
+	/**
+	 * Instantiates a new zebra j table.
+	 *
+	 * @param rowData the row data
+	 * @param columnNames the column names
+	 */
 	public ZebraJTable( Object[][] rowData, Object[] columnNames )
 	{
 		super( rowData, columnNames );
 	}
+	
+	/**
+	 * Instantiates a new zebra j table.
+	 *
+	 * @param dataModel the data model
+	 */
 	public ZebraJTable( javax.swing.table.TableModel dataModel )
 	{
 		super( dataModel );
 	}
+	
+	/**
+	 * Instantiates a new zebra j table.
+	 *
+	 * @param dataModel the data model
+	 * @param columnModel the column model
+	 */
 	public ZebraJTable( javax.swing.table.TableModel dataModel,
 			javax.swing.table.TableColumnModel columnModel )
 	{
 		super( dataModel, columnModel );
 	}
+	
+	/**
+	 * Instantiates a new zebra j table.
+	 *
+	 * @param dataModel the data model
+	 * @param columnModel the column model
+	 * @param selectionModel the selection model
+	 */
 	public ZebraJTable( javax.swing.table.TableModel dataModel,
 			javax.swing.table.TableColumnModel columnModel,
 			javax.swing.ListSelectionModel selectionModel )
 	{
 		super( dataModel, columnModel, selectionModel );
 	}
+	
+	/**
+	 * Instantiates a new zebra j table.
+	 *
+	 * @param rowData the row data
+	 * @param columnNames the column names
+	 */
 	public ZebraJTable( java.util.Vector<?> rowData,
 			java.util.Vector<?> columnNames )
 	{
 		super( rowData, columnNames );
 	}
 
-	/** Add stripes between cells and behind non-opaque cells. */
+	/**
+	 * Add stripes between cells and behind non-opaque cells.
+	 *
+	 * @param g the g
+	 */
 	public void paintComponent( java.awt.Graphics g )
 	{
 		if ( !(drawStripes = isOpaque( )) )
@@ -84,7 +153,14 @@ public class ZebraJTable extends javax.swing.JTable
 		setOpaque( true );
 	}
 
-	/** Add background stripes behind rendered cells. */
+	/**
+	 * Add background stripes behind rendered cells.
+	 *
+	 * @param renderer the renderer
+	 * @param row the row
+	 * @param col the col
+	 * @return the java.awt. component
+	 */
 	public java.awt.Component prepareRenderer(
 			javax.swing.table.TableCellRenderer renderer, int row, int col )
 	{
@@ -94,7 +170,14 @@ public class ZebraJTable extends javax.swing.JTable
 		return c;
 	}
 
-	/** Add background stripes behind edited cells. */
+	/**
+	 * Add background stripes behind edited cells.
+	 *
+	 * @param editor the editor
+	 * @param row the row
+	 * @param col the col
+	 * @return the java.awt. component
+	 */
 	public java.awt.Component prepareEditor(
 			javax.swing.table.TableCellEditor editor, int row, int col )
 	{
@@ -104,7 +187,11 @@ public class ZebraJTable extends javax.swing.JTable
 		return c;
 	}
 
-	/** Force the table to fill the viewport's height. */
+	/**
+	 * Force the table to fill the viewport's height.
+	 *
+	 * @return the scrollable tracks viewport height
+	 */
 	public boolean getScrollableTracksViewportHeight( )
 	{
 		final java.awt.Component p = getParent( );

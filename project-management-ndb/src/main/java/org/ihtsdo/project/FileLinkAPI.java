@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.project;
 
 import java.io.File;
@@ -16,16 +32,36 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
+/**
+ * The Class FileLinkAPI.
+ */
 public class FileLinkAPI {
+	
+	/** The config. */
 	I_ConfigAceFrame config;
+	
+	/** The tf. */
 	I_TermFactory tf;
 
+	/**
+	 * Instantiates a new file link api.
+	 *
+	 * @param config the config
+	 */
 	public FileLinkAPI(I_ConfigAceFrame config) {
 		super();
 		this.config = config;
 		this.tf = Terms.get();
 	}
 	
+	/**
+	 * Gets the categories.
+	 *
+	 * @param concept the concept
+	 * @return the categories
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	public Set<I_GetConceptData> getCategories(I_GetConceptData concept) throws IOException, TerminologyException {
 		Set<I_GetConceptData> children = new HashSet<I_GetConceptData>();
 		
@@ -45,6 +81,12 @@ public class FileLinkAPI {
 		return children;
 	}
 
+	/**
+	 * Put link in config.
+	 *
+	 * @param link the link
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public void putLinkInConfig(FileLink link) throws IOException {
 		I_ConfigAceDb userConfig = config.getDbConfig();
 
@@ -65,6 +107,12 @@ public class FileLinkAPI {
 
 	}
 
+	/**
+	 * Removes the link from config.
+	 *
+	 * @param link the link
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public void removeLinkFromConfig(FileLink link) throws IOException {
 		I_ConfigAceDb userConfig = config.getDbConfig();
 
@@ -88,6 +136,12 @@ public class FileLinkAPI {
 
 	}
 
+	/**
+	 * Gets the all links.
+	 *
+	 * @return the all links
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public List<FileLink> getAllLinks() throws IOException {
 		List<FileLink> returnLinks = new ArrayList<FileLink>();
 		I_ConfigAceDb userConfig = config.getDbConfig();
@@ -107,6 +161,13 @@ public class FileLinkAPI {
 		return returnLinks;
 	}
 
+	/**
+	 * Gets the links for category.
+	 *
+	 * @param category the category
+	 * @return the links for category
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public List<FileLink> getLinksForCategory(I_GetConceptData category) throws IOException {
 		List<FileLink> returnLinks = new ArrayList<FileLink>();
 		I_ConfigAceDb userConfig = config.getDbConfig();
@@ -185,6 +246,13 @@ public class FileLinkAPI {
 
 	}
 
+	/**
+	 * Compare lists.
+	 *
+	 * @param list1 the list1
+	 * @param list2 the list2
+	 * @return the int
+	 */
 	private static int compareLists(List list1, List list2) {
 		int counter = 0;
 

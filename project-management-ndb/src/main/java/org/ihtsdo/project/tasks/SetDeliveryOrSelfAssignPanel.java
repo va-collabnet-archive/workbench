@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Thu Nov 04 19:18:09 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.project.tasks;
@@ -8,19 +21,40 @@ import java.awt.*;
 import javax.swing.*;
 
 /**
+ * The Class SetDeliveryOrSelfAssignPanel.
+ *
  * @author Guillermo Reynoso
  */
 public class SetDeliveryOrSelfAssignPanel extends JPanel {
+	
+	/**
+	 * Instantiates a new sets the delivery or self assign panel.
+	 */
 	public SetDeliveryOrSelfAssignPanel() {
 		initComponents();
 	}
 
+	/**
+	 * Checks if is delivery.
+	 *
+	 * @return true, if is delivery
+	 */
 	public boolean isDelivery(){
 		return bDeli.isSelected();
 	}
+	
+	/**
+	 * Checks if is self assign.
+	 *
+	 * @return true, if is self assign
+	 */
 	public boolean isSelfAssign(){
 		return bSelf.isSelected();
 	}
+	
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		bDeli = new JRadioButton();
@@ -54,7 +88,10 @@ public class SetDeliveryOrSelfAssignPanel extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The b deli. */
 	private JRadioButton bDeli;
+	
+	/** The b self. */
 	private JRadioButton bSelf;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Fri Mar 05 15:15:30 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.project.panel;
@@ -49,35 +62,48 @@ import org.ihtsdo.project.panel.dnd.ObjectTransferHandler;
 import org.ihtsdo.project.util.IconUtilities;
 
 /**
+ * The Class ConceptRefsetFromToSubsetPanel.
+ *
  * @author Guillermo Reynoso
  */
 public class ConceptRefsetFromToSubsetPanel extends JPanel {
-	/**
-	 * 
-	 */
+	
+	/** The file chooser. */
 	JFileChooser fileChooser;
 
 
+	/** The refset exp. */
 	public I_GetConceptData refsetExp;
 
 
+	/** The refset ed. */
 	public I_GetConceptData refsetEd;
 
+	/** The formatter. */
 	private SimpleDateFormat formatter;
 
 
+	/** The e res. */
 	private Long[] eRes;
 
 
+	/** The i res. */
 	private Integer[] iRes;
 	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
 
 
+	/** The Constant REFSET_LABEL_FOREXPORT. */
 	public static final String REFSET_LABEL_FOREXPORT = "RefsetLabelForExport";
 
 
+	/** The Constant EFFECTIVETIME_SEPARATOR. */
 	private static final String EFFECTIVETIME_SEPARATOR = "-ET ";
+	
+	/**
+	 * Instantiates a new concept refset from to subset panel.
+	 */
 	public ConceptRefsetFromToSubsetPanel() {
 		initComponents();
 		
@@ -125,6 +151,9 @@ public class ConceptRefsetFromToSubsetPanel extends JPanel {
 
 	}
 
+	/**
+	 * Brows imp file2 action performed.
+	 */
 	private void browsImpFile2ActionPerformed() {
 
 		fileChooser = new JFileChooser();
@@ -139,6 +168,11 @@ public class ConceptRefsetFromToSubsetPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Check refset from file.
+	 *
+	 * @param importFile the import file
+	 */
 	private void checkRefsetFromFile(String importFile) {
 		try {
 			BufferedReader inputFileReaderCtrl = new BufferedReader(new FileReader(importFile));
@@ -210,6 +244,9 @@ public class ConceptRefsetFromToSubsetPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Brow log file2 action performed.
+	 */
 	private void browLogFile2ActionPerformed() {
 
 		fileChooser = new JFileChooser();
@@ -222,6 +259,9 @@ public class ConceptRefsetFromToSubsetPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * B import action performed.
+	 */
 	private void bImportActionPerformed() {
 
 		txtIRes.setText("");
@@ -343,6 +383,9 @@ public class ConceptRefsetFromToSubsetPanel extends JPanel {
 				null );   
 	}
 
+	/**
+	 * Brows exp file action performed.
+	 */
 	private void browsExpFileActionPerformed() {
 
 		fileChooser = new JFileChooser();
@@ -356,6 +399,9 @@ public class ConceptRefsetFromToSubsetPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Brow log file action performed.
+	 */
 	private void browLogFileActionPerformed() {
 		fileChooser = new JFileChooser();
 		fileChooser.setDialogTitle("Select a File...");
@@ -368,6 +414,9 @@ public class ConceptRefsetFromToSubsetPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * B export action performed.
+	 */
 	private void bExportActionPerformed() {
 
 		txtERes.setText("");
@@ -468,6 +517,9 @@ public class ConceptRefsetFromToSubsetPanel extends JPanel {
 
 	}
 
+	/**
+	 * B close action performed.
+	 */
 	private void bCloseActionPerformed() {
 		AceFrameConfig config;
 		try {
@@ -494,6 +546,11 @@ public class ConceptRefsetFromToSubsetPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Import help label mouse clicked.
+	 *
+	 * @param e the e
+	 */
 	private void importHelpLabelMouseClicked(MouseEvent e) {
 		try {
 			HelpApi.openHelpForComponent("IMPORT_SUBSET_REFSET");
@@ -504,6 +561,11 @@ public class ConceptRefsetFromToSubsetPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Export help panel mouse clicked.
+	 *
+	 * @param e the e
+	 */
 	private void exportHelpPanelMouseClicked(MouseEvent e) {
 		try {
 			HelpApi.openHelpForComponent("EXPORT_SUBSET_REFSET");
@@ -513,12 +575,27 @@ public class ConceptRefsetFromToSubsetPanel extends JPanel {
 			e1.printStackTrace();
 		}
 	}
+	
+	/**
+	 * The Class GetConceptForLabel.
+	 */
 	public class GetConceptForLabel implements I_GetItemForModel{
 
+		/** The label target. */
 		private String labelTarget;
+		
+		/**
+		 * Instantiates a new gets the concept for label.
+		 *
+		 * @param labelTarget the label target
+		 */
 		public GetConceptForLabel(String labelTarget){
 			this.labelTarget=labelTarget;
 		}
+		
+		/* (non-Javadoc)
+		 * @see org.ihtsdo.project.panel.dnd.I_GetItemForModel#getItemFromConcept(org.dwfa.ace.api.I_GetConceptData)
+		 */
 		@Override
 		public Object getItemFromConcept(I_GetConceptData concept) throws Exception {
 			if (labelTarget.equals(REFSET_LABEL_FOREXPORT)){
@@ -534,6 +611,9 @@ public class ConceptRefsetFromToSubsetPanel extends JPanel {
 
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		tabbedPane1 = new JTabbedPane();
@@ -1043,58 +1123,163 @@ public class ConceptRefsetFromToSubsetPanel extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The tabbed pane1. */
 	private JTabbedPane tabbedPane1;
+	
+	/** The panel3. */
 	private JPanel panel3;
+	
+	/** The import help label. */
 	private JLabel importHelpLabel;
+	
+	/** The label7. */
 	private JLabel label7;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The rb ir f1. */
 	private JRadioButton rbIRF1;
+	
+	/** The rb ir f2. */
 	private JRadioButton rbIRF2;
+	
+	/** The label5. */
 	private JLabel label5;
+	
+	/** The txt file imp. */
 	private JTextField txtFileImp;
+	
+	/** The brows imp file2. */
 	private JButton browsImpFile2;
+	
+	/** The label6. */
 	private JLabel label6;
+	
+	/** The txt imp log file. */
 	private JTextField txtImpLogFile;
+	
+	/** The brow log file2. */
 	private JButton browLogFile2;
+	
+	/** The panel4. */
 	private JPanel panel4;
+	
+	/** The rb new. */
 	private JRadioButton rbNew;
+	
+	/** The txt new refset name. */
 	private JTextField txtNewRefsetName;
+	
+	/** The rb add. */
 	private JRadioButton rbAdd;
+	
+	/** The clabel ed. */
 	private JLabel clabelEd;
+	
+	/** The chk incr. */
 	private JCheckBox chkIncr;
+	
+	/** The panel9. */
 	private JPanel panel9;
+	
+	/** The p bar i. */
 	private JProgressBar pBarI;
+	
+	/** The b import. */
 	private JButton bImport;
+	
+	/** The b close2. */
 	private JButton bClose2;
+	
+	/** The panel11. */
 	private JPanel panel11;
+	
+	/** The label10. */
 	private JLabel label10;
+	
+	/** The scroll pane2. */
 	private JScrollPane scrollPane2;
+	
+	/** The txt i res. */
 	private JTextPane txtIRes;
+	
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The export help panel. */
 	private JLabel exportHelpPanel;
+	
+	/** The label8. */
 	private JLabel label8;
+	
+	/** The panel7. */
 	private JPanel panel7;
+	
+	/** The rb er f1. */
 	private JRadioButton rbERF1;
+	
+	/** The rb er f2. */
 	private JRadioButton rbERF2;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The txt file exp. */
 	private JTextField txtFileExp;
+	
+	/** The brows exp file. */
 	private JButton browsExpFile;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The txt explog file. */
 	private JTextField txtExplogFile;
+	
+	/** The brow log file. */
 	private JButton browLogFile;
+	
+	/** The label3. */
 	private JLabel label3;
+	
+	/** The clabel exp. */
 	private JLabel clabelExp;
+	
+	/** The label9. */
 	private JLabel label9;
+	
+	/** The panel8. */
 	private JPanel panel8;
+	
+	/** The rb txt. */
 	private JRadioButton rbTxt;
+	
+	/** The rb csv. */
 	private JRadioButton rbCsv;
+	
+	/** The panel5. */
 	private JPanel panel5;
+	
+	/** The p bar e. */
 	private JProgressBar pBarE;
+	
+	/** The b export. */
 	private JButton bExport;
+	
+	/** The b close. */
 	private JButton bClose;
+	
+	/** The panel10. */
 	private JPanel panel10;
+	
+	/** The label4. */
 	private JLabel label4;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The txt e res. */
 	private JTextPane txtERes;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

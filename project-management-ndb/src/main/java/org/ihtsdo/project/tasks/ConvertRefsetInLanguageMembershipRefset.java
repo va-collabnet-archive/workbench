@@ -47,6 +47,7 @@ public class ConvertRefsetInLanguageMembershipRefset extends AbstractTask {
 	/** The Constant dataVersion. */
 	private static final int dataVersion = 1;
 	
+	/** The lang code. */
 	private String langCode;
 
 	/**
@@ -127,10 +128,20 @@ public class ConvertRefsetInLanguageMembershipRefset extends AbstractTask {
 		return new int[] {  };
 	}
 
+	/**
+	 * Gets the lang code.
+	 *
+	 * @return the lang code
+	 */
 	public String getLangCode() {
 		return langCode;
 	}
 
+	/**
+	 * Sets the lang code.
+	 *
+	 * @param langCode the new lang code
+	 */
 	public void setLangCode(String langCode) {
 		this.langCode = langCode;
 	}

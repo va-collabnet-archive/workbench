@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Mon Dec 05 21:31:12 GMT-03:00 2011
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.project.workflow.wizard;
@@ -16,15 +29,17 @@ import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.wizard.I_fastWizard;
 
 /**
+ * The Class WorkflowDefinitionSelection.
+ *
  * @author Alejandro Rodriguez
  */
 public class WorkflowDefinitionSelection extends JPanel implements I_fastWizard  {
-	/**
-	 * 
-	 */
+	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 664645041131555989L;
+	
 	/**
-	 * 
+	 * Instantiates a new workflow definition selection.
 	 */
 	public WorkflowDefinitionSelection() {
 		initComponents();
@@ -32,6 +47,9 @@ public class WorkflowDefinitionSelection extends JPanel implements I_fastWizard 
 		
 	}
 
+	/**
+	 * Load combo.
+	 */
 	private void loadCombo() {
 		List<File> files=WfComponentProvider.getWorkflowDefinitionFiles();
 		for (File file : files) {
@@ -40,6 +58,9 @@ public class WorkflowDefinitionSelection extends JPanel implements I_fastWizard 
 	}
 
 
+	/**
+	 * Button1 action performed.
+	 */
 	private void button1ActionPerformed() {
 
 		File businessProcessFile = null;
@@ -69,6 +90,9 @@ public class WorkflowDefinitionSelection extends JPanel implements I_fastWizard 
 
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		label1 = new JLabel();
@@ -106,11 +130,21 @@ public class WorkflowDefinitionSelection extends JPanel implements I_fastWizard 
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The combo box1. */
 	private JComboBox comboBox1;
+	
+	/** The button1. */
 	private JButton button1;
+	
+	/** The key. */
 	private String key;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.wizard.I_fastWizard#getData()
+	 */
 	@Override
 	public HashMap<String, Object> getData() throws Exception {
 		HashMap<String, Object> retMap=new HashMap<String, Object>();
@@ -125,6 +159,9 @@ public class WorkflowDefinitionSelection extends JPanel implements I_fastWizard 
 		return retMap;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.wizard.I_fastWizard#setKey(java.lang.String)
+	 */
 	@Override
 	public void setKey(String key) {
 		this.key=key;

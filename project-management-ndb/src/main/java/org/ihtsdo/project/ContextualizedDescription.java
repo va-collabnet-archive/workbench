@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.project;
 
 import java.io.IOException;
@@ -30,24 +46,67 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
+/**
+ * The Class ContextualizedDescription.
+ */
 public class ContextualizedDescription implements I_ContextualizeDescription {
+	
+	/** The desc id. */
 	private int descId;
+	
+	/** The uuids. */
 	private Collection<UUID> uuids;
+	
+	/** The description status id. */
 	private int descriptionStatusId;
+	
+	/** The extension status id. */
 	private int extensionStatusId;
+	
+	/** The concept id. */
 	private int conceptId;
+	
+	/** The type id. */
 	private int typeId;
+	
+	/** The lang. */
 	private String lang;
+	
+	/** The text. */
 	private String text;
+	
+	/** The is initial case significant. */
 	private boolean isInitialCaseSignificant;
+	
+	/** The acceptability id. */
 	private int acceptabilityId;
+	
+	/** The language refset id. */
 	private int languageRefsetId;
+	
+	/** The description versioned. */
 	private I_DescriptionVersioned<?> descriptionVersioned;
+	
+	/** The description part. */
 	private I_DescriptionPart descriptionPart;
+	
+	/** The language extension. */
 	private I_ExtendByRef languageExtension;
+	
+	/** The language extension part. */
 	private I_ExtendByRefPartCid languageExtensionPart;
+	
+	/** The concept. */
 	private I_GetConceptData concept;
 
+	/**
+	 * Instantiates a new contextualized description.
+	 *
+	 * @param descId the desc id
+	 * @param conId the con id
+	 * @param languageRefsetId the language refset id
+	 * @throws Exception the exception
+	 */
 	public ContextualizedDescription(int descId, int conId, int languageRefsetId) throws Exception {
 		super();
 		I_TermFactory tf = Terms.get();
@@ -260,11 +319,27 @@ public class ContextualizedDescription implements I_ContextualizeDescription {
 		return success;
 	}
 
+	/**
+	 * Retire from this context.
+	 *
+	 * @throws Exception the exception
+	 */
 	public void retireFromThisContext() throws Exception {
 		this.extensionStatusId = SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid();
 		persistChanges();
 	}
 
+	/**
+	 * Gets the contextualized descriptions.
+	 *
+	 * @param conceptId the concept id
+	 * @param languageRefsetId the language refset id
+	 * @param returnConflictResolvedLatestState the return conflict resolved latest state
+	 * @return the contextualized descriptions
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws Exception the exception
+	 */
 	public static List<ContextualizedDescription> getContextualizedDescriptions(int conceptId, int languageRefsetId, 
 			boolean returnConflictResolvedLatestState) throws TerminologyException, IOException, Exception {
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
@@ -272,6 +347,20 @@ public class ContextualizedDescription implements I_ContextualizeDescription {
 				config.getDescTypes(), config.getViewPositionSetReadOnly(), returnConflictResolvedLatestState);
 	}
 
+	/**
+	 * Gets the contextualized descriptions.
+	 *
+	 * @param conceptId the concept id
+	 * @param languageRefsetId the language refset id
+	 * @param allowedStatus the allowed status
+	 * @param allowedTypes the allowed types
+	 * @param positions the positions
+	 * @param returnConflictResolvedLatestState the return conflict resolved latest state
+	 * @return the contextualized descriptions
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws Exception the exception
+	 */
 	public static List<ContextualizedDescription> getContextualizedDescriptions(int conceptId, int languageRefsetId, 
 			I_IntSet allowedStatus, 
 			I_IntSet allowedTypes, PositionSetReadOnly positions, boolean returnConflictResolvedLatestState) 
@@ -291,6 +380,12 @@ public class ContextualizedDescription implements I_ContextualizeDescription {
 		return contextualizedDescriptions;
 	}
 
+	/**
+	 * Clean desc tuples list.
+	 *
+	 * @param tuples the tuples
+	 * @return the list<? extends i_ description tuple>
+	 */
 	private static List<? extends I_DescriptionTuple> cleanDescTuplesList(List<? extends I_DescriptionTuple> tuples) {
 		HashMap<Integer, I_DescriptionTuple> cleanMap = new HashMap<Integer, I_DescriptionTuple>();
 		for (I_DescriptionTuple loopTuple : tuples) {
@@ -304,6 +399,16 @@ public class ContextualizedDescription implements I_ContextualizeDescription {
 		cleanList.addAll(cleanMap.values());
 		return cleanList;
 	}
+	
+	/**
+	 * Creates the new contextualized description.
+	 *
+	 * @param conceptId the concept id
+	 * @param languageRefsetId the language refset id
+	 * @param langCode the lang code
+	 * @return the i_ contextualize description
+	 * @throws Exception the exception
+	 */
 	public static I_ContextualizeDescription createNewContextualizedDescription(int conceptId, int languageRefsetId, 
 			String langCode) throws Exception {
 		I_TermFactory tf = Terms.get();
@@ -383,6 +488,11 @@ public class ContextualizedDescription implements I_ContextualizeDescription {
 		}
 	}
 
+	/**
+	 * Gets the description parts.
+	 *
+	 * @return the description parts
+	 */
 	public List<? extends I_DescriptionPart> getDescriptionParts(){
 		if (descriptionVersioned!=null)
 			return descriptionVersioned.getMutableParts();
@@ -390,12 +500,24 @@ public class ContextualizedDescription implements I_ContextualizeDescription {
 		return null;
 	}
 
+	/**
+	 * Gets the language refset parts.
+	 *
+	 * @return the language refset parts
+	 */
 	public List<? extends I_ExtendByRefPart> getLanguageRefsetParts(){
 		if (languageExtension!=null){
 			return languageExtension.getMutableParts();
 		}
 		return null;
 	}
+	
+	/**
+	 * Validate refset as spec.
+	 *
+	 * @param languageRefsetId the language refset id
+	 * @throws Exception the exception
+	 */
 	private static void validateRefsetAsSpec(int languageRefsetId) throws Exception {
 		I_TermFactory tf = Terms.get();
 		I_GetConceptData languageRefsetConcept = tf.getConcept(languageRefsetId);
@@ -414,6 +536,12 @@ public class ContextualizedDescription implements I_ContextualizeDescription {
 		return;
 	}
 
+	/**
+	 * Validate refset as language enum.
+	 *
+	 * @param languageRefsetId the language refset id
+	 * @throws Exception the exception
+	 */
 	private static void validateRefsetAsLanguageEnum(int languageRefsetId) throws Exception {
 		/*	I_TermFactory tf = Terms.get();
 		I_GetConceptData languageRefsetConcept = tf.getConcept(languageRefsetId);
@@ -432,6 +560,16 @@ public class ContextualizedDescription implements I_ContextualizeDescription {
 		return;
 	}
 
+	/**
+	 * Gets the source rel target.
+	 *
+	 * @param refsetIdentityConcept the refset identity concept
+	 * @param config the config
+	 * @param refsetIdentityNid the refset identity nid
+	 * @return the source rel target
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	private static Set<? extends I_GetConceptData> getSourceRelTarget(I_GetConceptData refsetIdentityConcept,
 			I_ConfigAceFrame config, int refsetIdentityNid) throws IOException, TerminologyException {
 		I_TermFactory tf = Terms.get();

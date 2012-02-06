@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.project.dataexport;
 
 import java.io.BufferedWriter;
@@ -30,38 +46,114 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.KindOfCacheBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
+/**
+ * The Class ExportDescriptionAndLanguageSubset.
+ */
 public class ExportDescriptionAndLanguageSubset implements I_ProcessConcepts{
+	
+	/** The output desc file writer. */
 	BufferedWriter outputDescFileWriter;
+	
+	/** The report file writer. */
 	BufferedWriter reportFileWriter;
+	
+	/** The line count. */
 	int lineCount;
+	
+	/** The refset concept. */
 	I_GetConceptData refsetConcept;
+	
+	/** The refset uuid. */
 	UUID refsetUUID;
+	
+	/** The refset helper. */
 	I_HelpRefsets refsetHelper ;
+	
+	/** The term factory. */
 	I_TermFactory termFactory;
+	
+	/** The id. */
 	I_Identify id;
+	
+	/** The formatter. */
 	SimpleDateFormat formatter;
+	
+	/** The output subs file writer. */
 	private BufferedWriter outputSubsFileWriter;
+	
+	/** The CONCEP t_ retired. */
 	private int CONCEPT_RETIRED;
+	
+	/** The LIMITED. */
 	private int LIMITED;
+	
+	/** The FSN. */
 	private int FSN;
+	
+	/** The PREFERRED. */
 	private int PREFERRED;
+	
+	/** The r util. */
 	private RefsetUtilImpl rUtil;
+	
+	/** The sep. */
 	private String sep;
+	
+	/** The beg end. */
 	private String begEnd;
+	
+	/** The desc line count. */
 	private long descLineCount;
+	
+	/** The subs line count. */
 	private long subsLineCount;
+	
+	/** The refset sctid. */
 	private String refsetSCTID;
+	
+	/** The export desc file. */
 	private File exportDescFile;
+	
+	/** The export subs file. */
 	private File exportSubsFile;
+	
+	/** The excluded status. */
 	private HashSet<Integer> excludedStatus;
+	
+	/** The complete with core tems. */
 	private boolean completeWithCoreTems;
+	
+	/** The promo refset. */
 	private I_GetConceptData promoRefset;
+	
+	/** The config. */
 	private I_ConfigAceFrame config;
+	
+	/** The snomed root. */
 	private I_GetConceptData snomedRoot;
+	
+	/** The source refset. */
 	private I_GetConceptData sourceRefset;
+	
+	/** The my static is a cache. */
 	public static KindOfCacheBI myStaticIsACache;
+	
+	/** The my static is a cache refset spec. */
 	public static KindOfCacheBI myStaticIsACacheRefsetSpec;
 
+	/**
+	 * Instantiates a new export description and language subset.
+	 *
+	 * @param config the config
+	 * @param exportDescFile the export desc file
+	 * @param exportSubsFile the export subs file
+	 * @param reportFile the report file
+	 * @param refsetConcept the refset concept
+	 * @param excludedStatus the excluded status
+	 * @param sourceRefset the source refset
+	 * @param completeWithCoreTems the complete with core tems
+	 * @throws Exception the exception
+	 */
 	public ExportDescriptionAndLanguageSubset(I_ConfigAceFrame config ,File exportDescFile, 
 			File exportSubsFile, File reportFile, I_GetConceptData refsetConcept, 
 			HashSet<Integer> excludedStatus,I_GetConceptData sourceRefset, boolean completeWithCoreTems) throws Exception{
@@ -148,9 +240,23 @@ public class ExportDescriptionAndLanguageSubset implements I_ProcessConcepts{
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * Gets the results.
+	 *
+	 * @return the results
+	 */
 	public Long[] getResults() {
 		return new Long[]{descLineCount,subsLineCount};
 	}
+	
+	/**
+	 * Write terms.
+	 *
+	 * @param concept the concept
+	 * @param refset the refset
+	 * @return true, if successful
+	 */
 	private boolean writeTerms(I_GetConceptData concept, I_GetConceptData refset) {
 		List<ContextualizedDescription> descriptions;
 		boolean bwrite=false;
@@ -233,6 +339,10 @@ public class ExportDescriptionAndLanguageSubset implements I_ProcessConcepts{
 		}
 		return bwrite;
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.api.I_ProcessConcepts#processConcept(org.dwfa.ace.api.I_GetConceptData)
+	 */
 	@Override
 	public void processConcept(I_GetConceptData concept) throws Exception {
 
@@ -255,6 +365,10 @@ public class ExportDescriptionAndLanguageSubset implements I_ProcessConcepts{
 		}
 
 	}
+	
+	/**
+	 * Close files.
+	 */
 	public void closeFiles(){
 		try {
 			reportFileWriter.append("Exported to UUID file " + exportDescFile.getName()  + " : " + descLineCount + " lines" + "\r\n");

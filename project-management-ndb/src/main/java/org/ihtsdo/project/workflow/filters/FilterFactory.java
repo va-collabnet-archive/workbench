@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.project.workflow.filters;
 
 import java.io.IOException;
@@ -10,12 +26,26 @@ import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.tag.InboxTag;
 import org.ihtsdo.project.workflow.tag.TagManager;
 
+/**
+ * A factory for creating Filter objects.
+ */
 public class FilterFactory {
+	
+	/** The instance. */
 	private static FilterFactory instance;
 
+	/**
+	 * Instantiates a new filter factory.
+	 */
 	private FilterFactory() {
 	}
 
+	/**
+	 * Creates a new Filter object.
+	 *
+	 * @param obj the obj
+	 * @return the wf search filter bi
+	 */
 	public WfSearchFilterBI createFilterFromObject(Object obj) {
 		WfSearchFilterBI filter = null;
 		if (obj instanceof WfState) {
@@ -36,24 +66,55 @@ public class FilterFactory {
 		return filter;
 	}
 
+	/**
+	 * Creates a new Filter object.
+	 *
+	 * @param wfInstanceTextFilter the wf instance text filter
+	 * @return the wf component filter
+	 */
 	public WfComponentFilter createComponentFilter(String wfInstanceTextFilter) {
 		return new WfComponentFilter(wfInstanceTextFilter);
 	}
 
+	/**
+	 * Creates a new Filter object.
+	 *
+	 * @param username the username
+	 * @param id the id
+	 * @return the wf destination filter
+	 */
 	public WfDestinationFilter createDestinationFilter(String username, UUID id) {
 		WfUser destination = new WfUser(username, id);
 		return new WfDestinationFilter(destination);
 	}
 
+	/**
+	 * Creates a new Filter object.
+	 *
+	 * @param name the name
+	 * @param id the id
+	 * @return the wf state filter
+	 */
 	public WfStateFilter createWfStateFilter(String name, UUID id) {
 		WfState state = new WfState(name, id);
 		return new WfStateFilter(state);
 	}
 
+	/**
+	 * Creates a new Filter object.
+	 *
+	 * @param worklistUUID the worklist uuid
+	 * @return the wf worklist filter
+	 */
 	public WfWorklistFilter createWorklistFilter(List<UUID> worklistUUID) {
 		return new WfWorklistFilter(worklistUUID);
 	}
 
+	/**
+	 * Gets the single instance of FilterFactory.
+	 *
+	 * @return single instance of FilterFactory
+	 */
 	public static FilterFactory getInstance() {
 		if (instance != null) {
 			return instance;

@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.project.refset;
 
 import java.io.IOException;
@@ -23,10 +39,20 @@ import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
+/**
+ * The Class PromotionRefset.
+ */
 public class PromotionRefset extends Refset {
 
+	/** The active value nid. */
 	int activeValueNid;
 
+	/**
+	 * Instantiates a new promotion refset.
+	 *
+	 * @param refsetConcept the refset concept
+	 * @throws Exception the exception
+	 */
 	public PromotionRefset(I_GetConceptData refsetConcept) throws Exception {
 		super();
 		//TODO: validate if refsetConcept is promotion refset?
@@ -37,6 +63,15 @@ public class PromotionRefset extends Refset {
 		this.activeValueNid = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid();
 	}
 
+	/**
+	 * Gets the last promotion tuple.
+	 *
+	 * @param componentId the component id
+	 * @param config the config
+	 * @return the last promotion tuple
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public RefexVersionBI getLastPromotionTuple(int componentId, I_ConfigAceFrame config) throws TerminologyException, IOException {
 		I_GetConceptData component = termFactory.getConcept(componentId);
 		Collection<? extends RefexChronicleBI<?>> members = component.getAnnotations();
@@ -52,6 +87,15 @@ public class PromotionRefset extends Refset {
 		return null;
 	}
 
+	/**
+	 * Gets the promotion status.
+	 *
+	 * @param componentId the component id
+	 * @param config the config
+	 * @return the promotion status
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	public I_GetConceptData getPromotionStatus(int componentId, I_ConfigAceFrame config) throws IOException, TerminologyException {
 		RefexVersionBI lastTuple = getLastPromotionTuple(componentId, config);
 		if (lastTuple == null) {
@@ -62,6 +106,15 @@ public class PromotionRefset extends Refset {
 		}
 	}
 
+	/**
+	 * Gets the last status time.
+	 *
+	 * @param componentId the component id
+	 * @param config the config
+	 * @return the last status time
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	public Long getLastStatusTime(int componentId, I_ConfigAceFrame config) throws IOException, TerminologyException {
 		RefexVersionBI lastTuple = getLastPromotionTuple(componentId, config);
 		if (lastTuple == null) {
@@ -72,6 +125,15 @@ public class PromotionRefset extends Refset {
 		}
 	}
 
+	/**
+	 * Gets the last promotion author.
+	 *
+	 * @param componentId the component id
+	 * @param config the config
+	 * @return the last promotion author
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	public I_GetConceptData getLastPromotionAuthor(int componentId, I_ConfigAceFrame config) throws IOException, TerminologyException {
 		RefexVersionBI lastTuple = getLastPromotionTuple(componentId, config);
 		if (lastTuple == null) {
@@ -82,6 +144,15 @@ public class PromotionRefset extends Refset {
 		}
 	}
 
+	/**
+	 * Gets the previous promotion status.
+	 *
+	 * @param componentId the component id
+	 * @param config the config
+	 * @return the previous promotion status
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	public I_GetConceptData getPreviousPromotionStatus(int componentId, I_ConfigAceFrame config) throws IOException, TerminologyException {
 		I_GetConceptData component = termFactory.getConcept(componentId);
 		Collection<? extends RefexChronicleBI<?>> members = component.getAnnotations();
@@ -98,6 +169,15 @@ public class PromotionRefset extends Refset {
 		return null;
 	}
 
+	/**
+	 * Gets the previous status time.
+	 *
+	 * @param componentId the component id
+	 * @param config the config
+	 * @return the previous status time
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	public Long getPreviousStatusTime(int componentId, I_ConfigAceFrame config) throws IOException, TerminologyException {
 		I_GetConceptData component = termFactory.getConcept(componentId);
 		Collection<? extends RefexChronicleBI<?>> members = component.getAnnotations();
@@ -124,6 +204,13 @@ public class PromotionRefset extends Refset {
 		return null;
 	}
 
+	/**
+	 * Sets the promotion status.
+	 *
+	 * @param componentId the component id
+	 * @param statusConceptId the status concept id
+	 * @throws Exception the exception
+	 */
 	public void setPromotionStatus(int componentId, int statusConceptId) throws Exception {
 		I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
 		TerminologyBuilderBI tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),

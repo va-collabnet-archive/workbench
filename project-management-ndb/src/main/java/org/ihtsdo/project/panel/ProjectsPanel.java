@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Wed Mar 10 16:04:51 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.project.panel;
@@ -92,55 +105,94 @@ import org.ihtsdo.project.panel.details.WorkSetDetailsPanel;
 import org.ihtsdo.project.util.IconUtilities;
 
 /**
+ * The Class ProjectsPanel.
+ *
  * @author Alejandro Rodriguez
  */
 public class ProjectsPanel extends JPanel {
 
-	/**
-	 * 
-	 */
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
 
+	/** The Constant PROJECTNODE. */
 	public static final String PROJECTNODE = "P";
 
+	/** The Constant WORKSETNODE. */
 	public static final String WORKSETNODE = "WS";
 
+	/** The Constant WORKLISTNODE. */
 	public static final String WORKLISTNODE = "WL";
 
+	/** The Constant PROJECTROOTNODE. */
 	public static final String PROJECTROOTNODE = "PR";
 
+	/** The Constant WORKSETROOTNODE. */
 	public static final String WORKSETROOTNODE = "WSR";
 
+	/** The Constant EXCREFSETROOTNODE. */
 	public static final String EXCREFSETROOTNODE = "ERR";
 
+	/** The Constant EXCREFSETNODE. */
 	public static final String EXCREFSETNODE = "ERN";
 
+	/** The Constant LNKREFSETROOTNODE. */
 	public static final String LNKREFSETROOTNODE = "LRR";
 
+	/** The Constant LNKREFSETNODE. */
 	public static final String LNKREFSETNODE = "LRN";
 
+	/** The Constant SRCREFSETROOTNODE. */
 	public static final String SRCREFSETROOTNODE = "SRR";
 
+	/** The Constant SRCREFSETNODE. */
 	public static final String SRCREFSETNODE = "SRN";
 
+	/** The Constant TGTREFSETROOTNODE. */
 	public static final String TGTREFSETROOTNODE = "TRR";
 
+	/** The Constant TGTREFSETNODE. */
 	public static final String TGTREFSETNODE = "TRN";
 
+	/** The Constant PARTSCHEMEROOTNODE. */
 	public static final String PARTSCHEMEROOTNODE = "PSR";
 
+	/** The Constant PARTSCHEMENODE. */
 	public static final String PARTSCHEMENODE = "PSN";
 
+	/** The Constant PARTITIONNODE. */
 	public static final String PARTITIONNODE = "PTN";
 
+	/** The tree model. */
 	private DefaultTreeModel treeModel;
+	
+	/** The root node. */
 	private DefaultMutableTreeNode rootNode;
+	
+	/** The config. */
 	private I_ConfigAceFrame config;
+	
+	/** The worker. */
 	private I_Work worker;
+	
+	/** The node opener. */
 	private DefaultMutableTreeNode nodeOpener;
 
+	/** The project root. */
 	private DefaultMutableTreeNode projectRoot;
 
+	/**
+	 * Instantiates a new projects panel.
+	 *
+	 * @param worker the worker
+	 * @throws RemoteException the remote exception
+	 * @throws TaskFailedException the task failed exception
+	 * @throws LeaseDeniedException the lease denied exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws InterruptedException the interrupted exception
+	 * @throws PrivilegedActionException the privileged action exception
+	 * @throws ConfigurationException the configuration exception
+	 * @throws TerminologyException the terminology exception
+	 */
 	public ProjectsPanel(I_Work worker) throws RemoteException, TaskFailedException, LeaseDeniedException, IOException, InterruptedException, PrivilegedActionException, ConfigurationException,
 			TerminologyException {
 
@@ -164,8 +216,14 @@ public class ProjectsPanel extends JPanel {
 
 	}
 
+	/**
+	 * The Class TreeIconCellRenderer.
+	 */
 	public class TreeIconCellRenderer extends DefaultTreeCellRenderer {
 
+		/* (non-Javadoc)
+		 * @see javax.swing.tree.DefaultTreeCellRenderer#getTreeCellRendererComponent(javax.swing.JTree, java.lang.Object, boolean, boolean, boolean, int, boolean)
+		 */
 		@Override
 		public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
 
@@ -179,34 +237,72 @@ public class ProjectsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * The listener interface for receiving termLabelDragSource events.
+	 * The class that is interested in processing a termLabelDragSource
+	 * event implements this interface, and the object created
+	 * with that class is registered with a component using the
+	 * component's <code>addTermLabelDragSourceListener<code> method. When
+	 * the termLabelDragSource event occurs, that object's appropriate
+	 * method is invoked.
+	 *
+	 * @see TermLabelDragSourceEvent
+	 */
 	private class TermLabelDragSourceListener implements DragSourceListener {
 
+		/* (non-Javadoc)
+		 * @see java.awt.dnd.DragSourceListener#dragDropEnd(java.awt.dnd.DragSourceDropEvent)
+		 */
 		public void dragDropEnd(DragSourceDropEvent dsde) {
 			// TODO Auto-generated method stub
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.dnd.DragSourceListener#dragEnter(java.awt.dnd.DragSourceDragEvent)
+		 */
 		public void dragEnter(DragSourceDragEvent dsde) {
 			// TODO Auto-generated method stub
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.dnd.DragSourceListener#dragExit(java.awt.dnd.DragSourceEvent)
+		 */
 		public void dragExit(DragSourceEvent dse) {
 			// TODO Auto-generated method stub
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.dnd.DragSourceListener#dragOver(java.awt.dnd.DragSourceDragEvent)
+		 */
 		public void dragOver(DragSourceDragEvent dsde) {
 			// TODO Auto-generated method stub
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.dnd.DragSourceListener#dropActionChanged(java.awt.dnd.DragSourceDragEvent)
+		 */
 		public void dropActionChanged(DragSourceDragEvent dsde) {
 			// TODO Auto-generated method stub
 		}
 	}
 
+	/**
+	 * The Class DragGestureListenerWithImage.
+	 */
 	private class DragGestureListenerWithImage implements DragGestureListener {
 
+		/** The dsl. */
 		DragSourceListener dsl;
+		
+		/** The j tree. */
 		JTree jTree;
 
+		/**
+		 * Instantiates a new drag gesture listener with image.
+		 *
+		 * @param dsl the dsl
+		 * @param jTree the j tree
+		 */
 		public DragGestureListenerWithImage(DragSourceListener dsl, JTree jTree) {
 
 			super();
@@ -214,6 +310,9 @@ public class ProjectsPanel extends JPanel {
 			this.dsl = dsl;
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.dnd.DragGestureListener#dragGestureRecognized(java.awt.dnd.DragGestureEvent)
+		 */
 		public void dragGestureRecognized(DragGestureEvent dge) {
 			int selRow = jTree.getRowForLocation(dge.getDragOrigin().x, dge.getDragOrigin().y);
 			TreePath path = jTree.getPathForLocation(dge.getDragOrigin().x, dge.getDragOrigin().y);
@@ -258,10 +357,25 @@ public class ProjectsPanel extends JPanel {
 			}
 		}
 
+		/**
+		 * Gets the transferable.
+		 *
+		 * @param obj the obj
+		 * @return the transferable
+		 * @throws TerminologyException the terminology exception
+		 * @throws IOException Signals that an I/O exception has occurred.
+		 */
 		private Transferable getTransferable(I_GetConceptData obj) throws TerminologyException, IOException {
 			return new ConceptTransferable(Terms.get().getConcept(obj.getConceptNid()));
 		}
 
+		/**
+		 * Gets the drag image.
+		 *
+		 * @param obj the obj
+		 * @return the drag image
+		 * @throws IOException Signals that an I/O exception has occurred.
+		 */
 		public Image getDragImage(I_GetConceptData obj) throws IOException {
 
 			I_DescriptionTuple desc = obj.getDescTuple(config.getTreeDescPreferenceList(), config);
@@ -282,6 +396,11 @@ public class ProjectsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Load projects.
+	 *
+	 * @throws Exception the exception
+	 */
 	private void loadProjects() throws Exception {
 		int i;
 		rootNode = new DefaultMutableTreeNode("Root Node");
@@ -306,6 +425,13 @@ public class ProjectsPanel extends JPanel {
 
 	}
 
+	/**
+	 * Load partition scheme root node detail.
+	 *
+	 * @param node the node
+	 * @param workset the workset
+	 * @param visibleChildren the visible children
+	 */
 	private void loadPartitionSchemeRootNodeDetail(DefaultMutableTreeNode node, WorkSet workset, boolean visibleChildren) {
 		DefaultMutableTreeNode tmpNode;
 
@@ -324,6 +450,13 @@ public class ProjectsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Load partition scheme root node detail.
+	 *
+	 * @param node the node
+	 * @param partition the partition
+	 * @param visibleChildren the visible children
+	 */
 	private void loadPartitionSchemeRootNodeDetail(DefaultMutableTreeNode node, Partition partition, boolean visibleChildren) {
 		DefaultMutableTreeNode tmpNode;
 
@@ -342,6 +475,13 @@ public class ProjectsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Load workset root node detail.
+	 *
+	 * @param node the node
+	 * @param project the project
+	 * @param visibleChildren the visible children
+	 */
 	private void loadWorksetRootNodeDetail(DefaultMutableTreeNode node, TranslationProject project, boolean visibleChildren) {
 
 		node.removeAllChildren();
@@ -361,6 +501,13 @@ public class ProjectsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Load workset node detail.
+	 *
+	 * @param node the node
+	 * @param workset the workset
+	 * @param visibleChildren the visible children
+	 */
 	private void loadWorksetNodeDetail(DefaultMutableTreeNode node, WorkSet workset, boolean visibleChildren) {
 		DefaultMutableTreeNode tmpNode;
 
@@ -409,6 +556,13 @@ public class ProjectsPanel extends JPanel {
 
 	}
 
+	/**
+	 * Load partition scheme node detail.
+	 *
+	 * @param node the node
+	 * @param ps the ps
+	 * @param visibleChildren the visible children
+	 */
 	private void loadPartitionSchemeNodeDetail(DefaultMutableTreeNode node, PartitionScheme ps, boolean visibleChildren) {
 
 		List<Partition> partitions = ps.getPartitions();
@@ -430,6 +584,13 @@ public class ProjectsPanel extends JPanel {
 
 	}
 
+	/**
+	 * Load partition node detail.
+	 *
+	 * @param node the node
+	 * @param p the p
+	 * @param visibleChildren the visible children
+	 */
 	private void loadPartitionNodeDetail(DefaultMutableTreeNode node, Partition p, boolean visibleChildren) {
 		DefaultMutableTreeNode tmpNode;
 
@@ -469,6 +630,15 @@ public class ProjectsPanel extends JPanel {
 		jTree1.revalidate();
 	}
 
+	/**
+	 * Adds the project to tree.
+	 *
+	 * @param node the node
+	 * @param project the project
+	 * @param visibleChildren the visible children
+	 * @return the default mutable tree node
+	 * @throws Exception the exception
+	 */
 	private DefaultMutableTreeNode addProjectToTree(DefaultMutableTreeNode node, TranslationProject project, boolean visibleChildren) throws Exception {
 
 		DefaultMutableTreeNode tNode;
@@ -477,6 +647,13 @@ public class ProjectsPanel extends JPanel {
 		return tNode;
 	}
 
+	/**
+	 * Load project node details.
+	 *
+	 * @param node the node
+	 * @param project the project
+	 * @param visibleChildren the visible children
+	 */
 	private void loadProjectNodeDetails(DefaultMutableTreeNode node, TranslationProject project, boolean visibleChildren) {
 		DefaultMutableTreeNode tmpNode;
 		try {
@@ -541,6 +718,12 @@ public class ProjectsPanel extends JPanel {
 		jTree1.revalidate();
 	}
 
+	/**
+	 * Adds the object.
+	 *
+	 * @param child the child
+	 * @return the default mutable tree node
+	 */
 	public DefaultMutableTreeNode addObject(Object child) {
 		DefaultMutableTreeNode parentNode = null;
 		TreePath parentPath = jTree1.getSelectionPath();
@@ -555,6 +738,14 @@ public class ProjectsPanel extends JPanel {
 		return addObject(parentNode, child, true);
 	}
 
+	/**
+	 * Adds the object.
+	 *
+	 * @param parent the parent
+	 * @param child the child
+	 * @param shouldBeVisible the should be visible
+	 * @return the default mutable tree node
+	 */
 	public DefaultMutableTreeNode addObject(DefaultMutableTreeNode parent, Object child, boolean shouldBeVisible) {
 		DefaultMutableTreeNode childNode = new DefaultMutableTreeNode(child);
 
@@ -567,6 +758,11 @@ public class ProjectsPanel extends JPanel {
 		return childNode;
 	}
 
+	/**
+	 * J tree1 value changed.
+	 *
+	 * @param e the e
+	 */
 	private void jTree1ValueChanged(TreeSelectionEvent e) {
 		DefaultMutableTreeNode node;
 		node = (DefaultMutableTreeNode) (jTree1.getLastSelectedPathComponent());
@@ -577,6 +773,11 @@ public class ProjectsPanel extends JPanel {
 		nodeAction(node, true, false);
 	}
 
+	/**
+	 * Gets the right panel.
+	 *
+	 * @return the right panel
+	 */
 	private ProjectDetailsContainer getRightPanel() {
 		ProjectDetailsContainer detPanel = null;
 		AceFrameConfig aceConfig = (AceFrameConfig) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
@@ -620,6 +821,13 @@ public class ProjectsPanel extends JPanel {
 		return detPanel;
 	}
 
+	/**
+	 * Node action.
+	 *
+	 * @param node the node
+	 * @param openEditor the open editor
+	 * @param visibleChildren the visible children
+	 */
 	private void nodeAction(DefaultMutableTreeNode node, boolean openEditor, boolean visibleChildren) {
 		TreeObj to = (TreeObj) node.getUserObject();
 
@@ -700,6 +908,11 @@ public class ProjectsPanel extends JPanel {
 
 	}
 
+	/**
+	 * Show worklist details.
+	 *
+	 * @param w the w
+	 */
 	private void showWorklistDetails(WorkList w) {
 		ProjectDetailsContainer panel = getRightPanel();
 		panel.removeContent();
@@ -709,6 +922,11 @@ public class ProjectsPanel extends JPanel {
 
 	}
 
+	/**
+	 * Show partition details.
+	 *
+	 * @param p the p
+	 */
 	private void showPartitionDetails(Partition p) {
 		ProjectDetailsContainer panel = getRightPanel();
 		panel.removeContent();
@@ -718,6 +936,11 @@ public class ProjectsPanel extends JPanel {
 
 	}
 
+	/**
+	 * Show partition sch details.
+	 *
+	 * @param ps the ps
+	 */
 	private void showPartitionSchDetails(PartitionScheme ps) {
 		ProjectDetailsContainer panel = getRightPanel();
 		panel.removeContent();
@@ -727,6 +950,11 @@ public class ProjectsPanel extends JPanel {
 
 	}
 
+	/**
+	 * Show workset details.
+	 *
+	 * @param ws the ws
+	 */
 	private void showWorksetDetails(WorkSet ws) {
 		ProjectDetailsContainer panel = getRightPanel();
 		panel.removeContent();
@@ -736,6 +964,11 @@ public class ProjectsPanel extends JPanel {
 
 	}
 
+	/**
+	 * Show project details.
+	 *
+	 * @param proj the proj
+	 */
 	private void showProjectDetails(TranslationProject proj) {
 		ProjectDetailsContainer panel = getRightPanel();
 		panel.removeContent();
@@ -745,6 +978,9 @@ public class ProjectsPanel extends JPanel {
 
 	}
 
+	/**
+	 * Refresh node.
+	 */
 	public void refreshNode() {
 		if (nodeOpener != null) {
 			for (int i = nodeOpener.getChildCount() - 1; i > -1; i--) {
@@ -757,6 +993,11 @@ public class ProjectsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Update node.
+	 *
+	 * @param node the node
+	 */
 	private void updateNode(DefaultMutableTreeNode node) {
 		TreeObj to = (TreeObj) node.getUserObject();
 
@@ -799,6 +1040,11 @@ public class ProjectsPanel extends JPanel {
 
 	}
 
+	/**
+	 * Button1 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button1ActionPerformed(ActionEvent e) {
 		AceFrameConfig config;
 		try {
@@ -838,6 +1084,11 @@ public class ProjectsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Button2 action performed.
+	 *
+	 * @param e the e
+	 */
 	private void button2ActionPerformed(ActionEvent e) {
 		// TODO duplicated code with Action Listener = Refactor
 		String projectName = JOptionPane.showInputDialog(null, "Enter new Project Name : ", "", 1);
@@ -861,6 +1112,12 @@ public class ProjectsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * J tree1 tree will expand.
+	 *
+	 * @param e the e
+	 * @throws ExpandVetoException the expand veto exception
+	 */
 	private void jTree1TreeWillExpand(TreeExpansionEvent e) throws ExpandVetoException {
 		TreePath path = e.getPath();
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
@@ -880,6 +1137,11 @@ public class ProjectsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Label2 mouse clicked.
+	 *
+	 * @param e the e
+	 */
 	private void label2MouseClicked(MouseEvent e) {
 		try {
 			HelpApi.openHelpForComponent("PROJECT_LEFT");
@@ -890,10 +1152,25 @@ public class ProjectsPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * The listener interface for receiving menuItemAction events.
+	 * The class that is interested in processing a menuItemAction
+	 * event implements this interface, and the object created
+	 * with that class is registered with a component using the
+	 * component's <code>addMenuItemActionListener<code> method. When
+	 * the menuItemAction event occurs, that object's appropriate
+	 * method is invoked.
+	 *
+	 * @see MenuItemActionEvent
+	 */
 	class MenuItemActionListener implements ActionListener {
 
+		/** The node type. */
 		private String nodeType;
 
+		/* (non-Javadoc)
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (nodeType.equals(PROJECTROOTNODE)) {
@@ -921,20 +1198,45 @@ public class ProjectsPanel extends JPanel {
 
 		}
 
+		/**
+		 * Sets the node type.
+		 *
+		 * @param nodeType the new node type
+		 */
 		public void setNodeType(String nodeType) {
 			this.nodeType = nodeType;
 		}
 
 	}
 
+	/**
+	 * The Class JTreeMouselistener.
+	 */
 	public class JTreeMouselistener extends MouseAdapter {
+		
+		/** The j tree. */
 		private JTree jTree;
+		
+		/** The menu. */
 		private JPopupMenu menu;
+		
+		/** The m item listener. */
 		private MenuItemActionListener mItemListener;
+		
+		/** The m item. */
 		private JMenuItem mItem;
+		
+		/** The x point. */
 		private int xPoint;
+		
+		/** The y point. */
 		private int yPoint;
 
+		/**
+		 * Instantiates a new j tree mouselistener.
+		 *
+		 * @param jTree the j tree
+		 */
 		JTreeMouselistener(JTree jTree) {
 			this.jTree = jTree;
 			menu = new JPopupMenu();
@@ -944,6 +1246,9 @@ public class ProjectsPanel extends JPanel {
 			menu.add(mItem);
 		}
 
+		/* (non-Javadoc)
+		 * @see java.awt.event.MouseAdapter#mouseClicked(java.awt.event.MouseEvent)
+		 */
 		@Override
 		public void mouseClicked(MouseEvent e) {
 
@@ -987,6 +1292,9 @@ public class ProjectsPanel extends JPanel {
 
 	}
 
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -1122,17 +1430,37 @@ public class ProjectsPanel extends JPanel {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
+	/** The panel2. */
 	private JPanel panel2;
+	
+	/** The panel1. */
 	private JPanel panel1;
+	
+	/** The label1. */
 	private JLabel label1;
+	
+	/** The button2. */
 	private JButton button2;
+	
+	/** The button1. */
 	private JButton button1;
+	
+	/** The label2. */
 	private JLabel label2;
+	
+	/** The panel11. */
 	private JPanel panel11;
+	
+	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
+	
+	/** The j tree1. */
 	private JTree jTree1;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 
+	/**
+	 * Refresh parent node.
+	 */
 	public void refreshParentNode() {
 		if (nodeOpener != null) {
 			DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) nodeOpener.getParent();

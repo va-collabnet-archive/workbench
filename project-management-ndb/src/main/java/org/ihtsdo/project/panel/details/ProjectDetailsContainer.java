@@ -1,5 +1,18 @@
 /*
- * Created by JFormDesigner on Wed Mar 24 16:46:20 GMT-03:00 2010
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.ihtsdo.project.panel.details;
@@ -8,18 +21,30 @@ import java.awt.*;
 import javax.swing.*;
 
 /**
+ * The Class ProjectDetailsContainer.
+ *
  * @author Alejandro Rodriguez
  */
 public class ProjectDetailsContainer extends JPanel {
-	/**
-	 * 
-	 */
+	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
 
+	/** The guest panel. */
 	private JPanel guestPanel;
+	
+	/**
+	 * Instantiates a new project details container.
+	 */
 	public ProjectDetailsContainer() {
 		initComponents();
 	}
+	
+	/**
+	 * Adds the content.
+	 *
+	 * @param panel the panel
+	 */
 	public void addContent(JPanel panel){
 		if (panel!=null){
 			this.guestPanel=panel;
@@ -29,12 +54,19 @@ public class ProjectDetailsContainer extends JPanel {
 		}
 	}
 	
+	/**
+	 * Removes the content.
+	 */
 	public void removeContent(){
 		if (this.guestPanel!=null){
 			remove(this.guestPanel);
 			this.guestPanel=null;
 		}
 	}
+	
+	/**
+	 * Inits the components.
+	 */
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 

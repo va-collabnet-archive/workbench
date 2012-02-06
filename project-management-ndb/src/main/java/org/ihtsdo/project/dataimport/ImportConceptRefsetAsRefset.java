@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.project.dataimport;
 
 import java.io.BufferedReader;
@@ -20,24 +36,65 @@ import org.dwfa.util.id.Type3UuidFactory;
 import org.ihtsdo.project.refset.ConceptMembershipRefset;
 import org.ihtsdo.project.refset.RefsetMemberValueMgr;
 
+/**
+ * The Class ImportConceptRefsetAsRefset.
+ */
 public class ImportConceptRefsetAsRefset {
+	
+	/** The output file writer. */
 	PrintWriter outputFileWriter;
+	
+	/** The input file reader. */
 	BufferedReader inputFileReader;
+	
+	/** The line count. */
 	int lineCount;
+	
+	/** The imported. */
 	int imported;
+	
+	/** The deleted. */
 	int deleted;
+	
+	/** The refset concept. */
 	ConceptMembershipRefset refsetConcept;
+	
+	/** The refset uuid. */
 	UUID refsetUUID;
+	
+	/** The refset helper. */
 	I_HelpRefsets refsetHelper;
+	
+	/** The member value mgr. */
 	private RefsetMemberValueMgr memberValueMgr;
+    
+    /** The term factory. */
     I_TermFactory termFactory;
+	
+	/** The con id hash. */
 	private HashSet<Integer> conIdHash;
+	
+	/** The incremental. */
 	private boolean incremental;
     
+    /**
+     * Instantiates a new import concept refset as refset.
+     */
     public ImportConceptRefsetAsRefset(){
 		termFactory = Terms.get();
     	
     }
+	
+	/**
+	 * Import from file.
+	 *
+	 * @param importFile the import file
+	 * @param reportFile the report file
+	 * @param refsetName the refset name
+	 * @param parentId the parent id
+	 * @return the integer[]
+	 * @throws Exception the exception
+	 */
 	public Integer[] importFromFile(File importFile, File reportFile,String refsetName,int parentId) throws Exception{
 
 		outputFileWriter = new PrintWriter(new FileWriter(reportFile));
@@ -78,6 +135,13 @@ public class ImportConceptRefsetAsRefset {
 		return new Integer[]{imported,0};
 	}
 	
+	/**
+	 * Import refset line.
+	 *
+	 * @param inputLine the input line
+	 * @return true, if successful
+	 * @throws Exception the exception
+	 */
 	private boolean importRefsetLine (String inputLine) throws Exception {
 
 		String memberId ;
@@ -107,6 +171,17 @@ public class ImportConceptRefsetAsRefset {
 			
         return true;
 	}
+	
+	/**
+	 * Import from file to exist refset.
+	 *
+	 * @param importFile the import file
+	 * @param reportFile the report file
+	 * @param refset the refset
+	 * @param incremental the incremental
+	 * @return the integer[]
+	 * @throws Exception the exception
+	 */
 	public Integer[] importFromFileToExistRefset(File importFile, File reportFile,
 			I_GetConceptData refset, boolean incremental) throws Exception {
 
@@ -154,6 +229,14 @@ public class ImportConceptRefsetAsRefset {
 		return new Integer[]{imported,deleted};
 		
 	}
+	
+	/**
+	 * File data control.
+	 *
+	 * @param importFile the import file
+	 * @return true, if successful
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	private boolean fileDataControl(File importFile) throws IOException {
 		BufferedReader inputFileReaderCtrl = new BufferedReader(new FileReader(importFile));
 		
@@ -184,6 +267,13 @@ public class ImportConceptRefsetAsRefset {
 		return ret;
 		
 	}
+	
+	/**
+	 * Inactivate not existent members.
+	 *
+	 * @param concept the concept
+	 * @throws Exception the exception
+	 */
 	private void inactivateNotExistentMembers(I_GetConceptData concept) throws Exception {
 		
 		Collection<? extends I_ExtendByRef> extensions=termFactory.getRefsetExtensionMembers(concept.getConceptNid());

@@ -165,6 +165,11 @@ public class TestWorklistAndWorkflow extends TestCase {
 		while ((t1 - t0) < (n * 1000));
 	}
 
+	/**
+	 * Gets the test config.
+	 *
+	 * @return the test config
+	 */
 	private I_ConfigAceFrame getTestConfig() {
 		I_ConfigAceFrame config = null;
 		try {
@@ -205,6 +210,13 @@ public class TestWorklistAndWorkflow extends TestCase {
 	}
 	
 	// If targetLocation does not exist, it will be created.
+	/**
+	 * Copy directory.
+	 *
+	 * @param sourceLocation the source location
+	 * @param targetLocation the target location
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public void copyDirectory(File sourceLocation , File targetLocation)
 	throws IOException {
 
@@ -234,6 +246,12 @@ public class TestWorklistAndWorkflow extends TestCase {
 		}
 	}
 
+	/**
+	 * Delete directory.
+	 *
+	 * @param path the path
+	 * @return true, if successful
+	 */
 	public boolean deleteDirectory(File path) {
 		if( path.exists() ) {
 			File[] files = path.listFiles();
@@ -248,6 +266,12 @@ public class TestWorklistAndWorkflow extends TestCase {
 		}
 		return( path.delete() );
 	}
+	
+	/**
+	 * Gets the wf definition.
+	 *
+	 * @return the wf definition
+	 */
 	public static WorkflowDefinition getWfDefinition() {
 		WorkflowDefinition wfdf=new WorkflowDefinition();
 		
@@ -292,6 +316,12 @@ public class TestWorklistAndWorkflow extends TestCase {
 		return wfdf;
 	}
 	
+	/**
+	 * Gets the workflow members.
+	 *
+	 * @param wfDef the wf def
+	 * @return the workflow members
+	 */
 	private static List<WfMembership> getWorkflowMembers(WorkflowDefinition wfDef) {
 		List<WfMembership> members = new ArrayList<WfMembership>();
 		int counter = 0;

@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.project.refset;
 
 import java.util.Set;
@@ -10,7 +26,17 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 
+/**
+ * The Class ConceptMembershipRefset.
+ */
 public class ConceptMembershipRefset extends ConceptRefset {
+	
+	/**
+	 * Instantiates a new concept membership refset.
+	 *
+	 * @param conceptMembershipRefset the concept membership refset
+	 * @throws Exception the exception
+	 */
 	public ConceptMembershipRefset(I_GetConceptData conceptMembershipRefset) throws Exception {
 		super();
 		validateRefsetAsMembership(conceptMembershipRefset.getConceptNid());
@@ -20,6 +46,14 @@ public class ConceptMembershipRefset extends ConceptRefset {
 		termFactory = Terms.get();
 	}
 
+	/**
+	 * Creates the new concept membership refset.
+	 *
+	 * @param name the name
+	 * @param parentId the parent id
+	 * @return the concept membership refset
+	 * @throws Exception the exception
+	 */
 	public static ConceptMembershipRefset createNewConceptMembershipRefset(String name, int parentId) throws Exception {
 		ConceptMembershipRefset newConceptMembershipRefset = null;
 		I_GetConceptData newMembershipConcept = null;
@@ -66,6 +100,11 @@ public class ConceptMembershipRefset extends ConceptRefset {
 		return newConceptMembershipRefset; 
 	}
 
+	/**
+	 * Gets the concept spec refset concept.
+	 *
+	 * @return the concept spec refset concept
+	 */
 	public I_GetConceptData getConceptSpecRefsetConcept() {
 		try {
 			I_GetConceptData specifiesRefsetRel =
@@ -77,6 +116,12 @@ public class ConceptMembershipRefset extends ConceptRefset {
 		}
 	}
 
+	/**
+	 * Validate refset as membership.
+	 *
+	 * @param conceptRefsetId the concept refset id
+	 * @throws Exception the exception
+	 */
 	private static void validateRefsetAsMembership(int conceptRefsetId) throws Exception {
 		I_TermFactory tf = Terms.get();
 		I_GetConceptData conceptRefsetConcept = tf.getConcept(conceptRefsetId);

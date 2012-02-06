@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2010 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.project;
 
 import java.io.IOException;
@@ -22,25 +38,52 @@ import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WfUser;
 
+/**
+ * The Class UserQueuesManager.
+ */
 public class UserQueuesManager {
 
+	/** The config. */
 	I_ConfigAceFrame config;
+	
+	/** The tf. */
 	I_TermFactory tf;
 
+	/**
+	 * Instantiates a new user queues manager.
+	 *
+	 * @param config the config
+	 */
 	public UserQueuesManager(I_ConfigAceFrame config) {
 		super();
 		this.config = config;
 		tf = Terms.get();
 	}
 
+	/**
+	 * Gets the config.
+	 *
+	 * @return the config
+	 */
 	public I_ConfigAceFrame getConfig() {
 		return config;
 	}
 
+	/**
+	 * Sets the config.
+	 *
+	 * @param config the new config
+	 */
 	public void setConfig(I_ConfigAceFrame config) {
 		this.config = config;
 	}
 
+	/**
+	 * Gets the state.
+	 *
+	 * @param promotionStatusNid the promotion status nid
+	 * @return the state
+	 */
 	public WfState getState(int promotionStatusNid) {
 		WfState state = new WfState();
 
@@ -49,6 +92,12 @@ public class UserQueuesManager {
 		return state;
 	}
 
+	/**
+	 * Gets the user.
+	 *
+	 * @param destinationNid the destination nid
+	 * @return the user
+	 */
 	public WfUser getUser(int destinationNid) {
 		WfUser user = new WfUser();
 
@@ -57,6 +106,11 @@ public class UserQueuesManager {
 		return user;
 	}
 
+	/**
+	 * Persist instance changes.
+	 *
+	 * @param instance the instance
+	 */
 	public void persistInstanceChanges(WfInstance instance) {
 		try {
 			WorkList workList = instance.getWorkList();
@@ -81,6 +135,12 @@ public class UserQueuesManager {
 		}
 	}
 
+	/**
+	 * Sets the destination.
+	 *
+	 * @param instance the instance
+	 * @param destinationUser the destination user
+	 */
 	private void setDestination(WfInstance instance, WfUser destinationUser) {
 		try {
 			WorkList workList = instance.getWorkList();
@@ -96,6 +156,12 @@ public class UserQueuesManager {
 		}
 	}
 
+	/**
+	 * Sets the status.
+	 *
+	 * @param instance the instance
+	 * @param newStatus the new status
+	 */
 	private void setStatus(WfInstance instance, WfState newStatus) {
 		try {
 			WorkList workList = instance.getWorkList();
@@ -112,6 +178,12 @@ public class UserQueuesManager {
 	}
 
 
+	/**
+	 * Gets the assignments for user.
+	 *
+	 * @param user the user
+	 * @return the assignments for user
+	 */
 	public List<WfInstance> getAssignmentsForUser(WfUser user) {
 		List<WfInstance> items = new ArrayList<WfInstance>();
 		try {
