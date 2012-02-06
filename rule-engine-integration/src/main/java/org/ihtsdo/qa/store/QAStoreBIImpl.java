@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.apache.axis.AxisFault;
@@ -542,7 +543,7 @@ public class QAStoreBIImpl implements QAStoreBI {
 	 * @see org.ihtsdo.qa.store.QAStoreBI#getRulesReportLinesByPage(org.ihtsdo.qa.store.model.QACoordinate, java.util.LinkedHashMap, java.util.HashMap, int, int)
 	 */
 	@Override
-	public RulesReportPage getRulesReportLinesByPage(QACoordinate qaCoordinate, LinkedHashMap<RulesReportColumn, Boolean> sortBy, HashMap<RulesReportColumn, Object> filter, int startLine, int pageLenght) {
+	public RulesReportPage getRulesReportLinesByPage(QACoordinate qaCoordinate, Map<RulesReportColumn, Boolean> sortBy, Map<RulesReportColumn, Object> filter, int startLine, int pageLenght) {
 		RulesReportPage result = null;
 		QadbServiceStub service = null;
 		try {

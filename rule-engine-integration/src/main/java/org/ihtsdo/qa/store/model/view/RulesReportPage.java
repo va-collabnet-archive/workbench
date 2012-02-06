@@ -19,6 +19,7 @@ package org.ihtsdo.qa.store.model.view;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The Class RulesReportPage.
@@ -29,10 +30,10 @@ public class RulesReportPage {
 	private List<RulesReportLine> lines;
 	
 	/** The sort by. */
-	private LinkedHashMap<RulesReportColumn,Boolean> sortBy;
+	private Map<RulesReportColumn,Boolean> sortBy;
 	
 	/** The filter. */
-	private HashMap<RulesReportColumn, Object> filter;
+	private Map<RulesReportColumn, Object> filter;
 	
 	/** The initial line. */
 	private int initialLine;
@@ -54,20 +55,20 @@ public class RulesReportPage {
 	 * Instantiates a new rules report page.
 	 *
 	 * @param lines the lines
-	 * @param sortBy the sort by
-	 * @param filter the filter
+	 * @param sortBy2 the sort by
+	 * @param filter2 the filter
 	 * @param initialLine the initial line
 	 * @param finalLine the final line
 	 * @param totalLines the total lines
 	 */
 	public RulesReportPage(List<RulesReportLine> lines,
-			LinkedHashMap<RulesReportColumn,Boolean> sortBy,
-			HashMap<RulesReportColumn, Object> filter, int initialLine,
+			Map<RulesReportColumn, Boolean> sortBy2,
+			Map<RulesReportColumn, Object> filter2, int initialLine,
 			int finalLine, int totalLines) {
 		super();
 		this.lines = lines;
-		this.sortBy = sortBy;
-		this.filter = filter;
+		this.sortBy = sortBy2;
+		this.filter = filter2;
 		this.initialLine = initialLine;
 		this.finalLine = finalLine;
 		this.totalLines = totalLines;
@@ -96,7 +97,7 @@ public class RulesReportPage {
 	 *
 	 * @return the sort by
 	 */
-	public LinkedHashMap<RulesReportColumn,Boolean> getSortBy() {
+	public Map<RulesReportColumn,Boolean> getSortBy() {
 		return sortBy;
 	}
 
@@ -105,7 +106,7 @@ public class RulesReportPage {
 	 *
 	 * @param sortBy the sort by
 	 */
-	public void setSortBy(LinkedHashMap<RulesReportColumn,Boolean> sortBy) {
+	public void setSortBy(Map<RulesReportColumn,Boolean> sortBy) {
 		this.sortBy = sortBy;
 	}
 
@@ -114,7 +115,7 @@ public class RulesReportPage {
 	 *
 	 * @return the filter
 	 */
-	public HashMap<RulesReportColumn, Object> getFilter() {
+	public Map<RulesReportColumn, Object> getFilter() {
 		return filter;
 	}
 
@@ -123,7 +124,7 @@ public class RulesReportPage {
 	 *
 	 * @param filter the filter
 	 */
-	public void setFilter(HashMap<RulesReportColumn, Object> filter) {
+	public void setFilter(Map<RulesReportColumn, Object> filter) {
 		this.filter = filter;
 	}
 

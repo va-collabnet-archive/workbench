@@ -95,9 +95,7 @@ public class ComputeRefsetForAConceptTask extends AbstractTask {
      */
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
-        if (objDataVersion == dataVersion) {
-            // Nothing to do
-        } else {
+        if (!(objDataVersion == dataVersion)) {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }

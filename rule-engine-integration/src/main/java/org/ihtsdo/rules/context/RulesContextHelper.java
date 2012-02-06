@@ -448,8 +448,6 @@ public class RulesContextHelper {
 							}
 						}
 					}
-				} else {
-					// same role, do nothing
 				}
 			} else if (currentRole != null && newRole == null) {
 				// retire latest version of role

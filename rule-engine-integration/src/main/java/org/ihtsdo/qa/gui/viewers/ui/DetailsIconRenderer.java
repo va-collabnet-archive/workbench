@@ -46,25 +46,18 @@ public class DetailsIconRenderer extends DefaultTreeCellRenderer {
 			TreeEditorObjectWrapper nodeObject = (TreeEditorObjectWrapper) node.getUserObject();
 			if (nodeObject != null) {
 				label.setIcon(IconUtilities.getIconForConceptDetails(nodeObject.getType()));
-				switch (nodeObject.getType()) {
-				case IconUtilities.DEFINED:
+				if (nodeObject.getType() == IconUtilities.getDefined()) {
 					label.setToolTipText("Fully defined concept");
-					break;
-				case IconUtilities.PRIMITIVE:
+				} else if (nodeObject.getType() == IconUtilities.getPrimitive()) {
 					label.setToolTipText("Primitive concept");
-					break;
-				case IconUtilities.INACTIVE:
+				} else if (nodeObject.getType() == IconUtilities.getInactive()) {
 					label.setToolTipText("Inactive concept");
-					break;
-				case IconUtilities.PRIMITIVE_PARENT:
+				} else if (nodeObject.getType() == IconUtilities.getPrimitiveParent()) {
 					label.setToolTipText("Primitive parent");
-					break;
-				case IconUtilities.DEFINED_PARENT:
+				} else if (nodeObject.getType() == IconUtilities.getDefinedParent()) {
 					label.setToolTipText("Fully defined parent");
-					break;
-				case IconUtilities.INACTIVE_PARENT:
+				} else if (nodeObject.getType() == IconUtilities.getInactiveParent()) {
 					label.setToolTipText("Inactive parent");
-					break;
 				}
 			}
 		}

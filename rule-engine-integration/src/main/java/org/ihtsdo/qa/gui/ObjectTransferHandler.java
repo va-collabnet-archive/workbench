@@ -300,9 +300,7 @@ public class ObjectTransferHandler extends TransferHandler {
 	protected void exportDone(JComponent c, Transferable data, int action) {
 		if (action == MOVE) {
 			if (indices != null) {
-				if(c instanceof JTable){
-					
-				}else{
+				if(!(c instanceof JTable)){
 					JList source = (JList) c;
 					DefaultListModel model = (DefaultListModel) source.getModel();
 					// If we are moving items around in the same list, we

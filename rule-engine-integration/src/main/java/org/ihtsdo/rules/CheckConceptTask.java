@@ -20,6 +20,7 @@ import javax.swing.SwingWorker;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.rules.RulesLibrary.INFERRED_VIEW_ORIGIN;
 import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
@@ -65,7 +66,7 @@ public class CheckConceptTask extends SwingWorker<ResultsCollectorWorkBench, Res
 		} else if (concept != null && context != null && config != null) {
 			results = RulesLibrary.checkConcept(concept, context, onlyUncommittedContent, config);
 		} else {
-			//log problem, not enough data
+			AceLog.getAppLog().warning("Check concept problem, not enough data");
 		}
 		
 		return results;

@@ -190,9 +190,7 @@ public class DroolsEnumUpdatePanel extends JPanel {
 								newMember = false;
 								//already has the extension
 								I_ExtendByRefPart lastPart = CommonUtils.getLastExtensionPart(extension);
-								if (CommonUtils.isActive(lastPart.getStatusNid())) {
-									// is already active
-								} else {
+								if (!CommonUtils.isActive(lastPart.getStatusNid())) {
 									// is retired
 									for (PathBI editPath : config.getEditingPathSet()) {
 										I_ExtendByRefPart part = (I_ExtendByRefPart) lastPart.makeAnalog(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(), editPath.getConceptNid(),

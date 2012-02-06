@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
@@ -513,8 +514,8 @@ public class QAStoreStubImpl implements QAStoreBI {
 	 */
 	@Override
 	public RulesReportPage getRulesReportLinesByPage(
-			QACoordinate qaCoordinate, LinkedHashMap<RulesReportColumn,Boolean> sortBy,
-			HashMap<RulesReportColumn, Object> filter, int startLine, int pageLenght) {
+			QACoordinate qaCoordinate, Map<RulesReportColumn,Boolean> sortBy,
+			Map<RulesReportColumn, Object> filter, int startLine, int pageLenght) {
 		List<RulesReportLine> lines = new ArrayList<RulesReportLine>();
 		for (int i = 1; i < pageLenght; i++) {
 			lines.addAll(getRulesReportLines(qaCoordinate));

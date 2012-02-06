@@ -83,8 +83,7 @@ public class TestListUsingLibrary extends AbstractTask {
 	private void readObject(java.io.ObjectInputStream in) throws IOException,
 	ClassNotFoundException {
 		int objDataVersion = in.readInt();
-		if (objDataVersion == 1) {
-		} else {
+		if (!(objDataVersion == 1)) {
 			throw new IOException("Can't handle dataversion: " + objDataVersion);   
 		}
 

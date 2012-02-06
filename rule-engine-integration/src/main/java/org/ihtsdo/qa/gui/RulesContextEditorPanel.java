@@ -527,8 +527,6 @@ public class RulesContextEditorPanel extends JPanel {
 						desktop = Desktop.getDesktop();
 						desktop.open(excelFile);
 					}
-				} else {
-					// showError(NO_DATA);
 				}
 			} catch (IOException ioe) {
 				AceLog.getAppLog().alertAndLogException(ioe);

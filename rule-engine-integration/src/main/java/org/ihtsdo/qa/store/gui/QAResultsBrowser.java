@@ -36,6 +36,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.swing.JButton;
@@ -81,7 +83,7 @@ public class QAResultsBrowser extends JPanel {
 	private ResutlTableModel tableModel;
 	
 	/** The disposition statuses. */
-	private LinkedHashSet<DispositionStatus> dispositionStatuses;
+	private Set<DispositionStatus> dispositionStatuses;
 	
 	/** The severities. */
 	private List<Severity> severities;
@@ -105,7 +107,7 @@ public class QAResultsBrowser extends JPanel {
 	private int totalLines = 0;
 	
 	/** The sort by. */
-	LinkedHashMap<RulesReportColumn, Boolean> sortBy = null;
+	Map<RulesReportColumn, Boolean> sortBy = null;
 	
 	/** The parent tabbed panel. */
 	private JTabbedPane parentTabbedPanel = null;
@@ -417,7 +419,6 @@ public class QAResultsBrowser extends JPanel {
 			if (!allTimesForPath.containsKey(key)) {
 				List<String> timeFOrPath = store.getAllTimesForPath(databaseUUID, pathUUID);
 				allTimesForPath.put(key, timeFOrPath);
-			} else {
 			}
 			for (String loopDate : allTimesForPath.get(key)) {
 				comboBox3.addItem(loopDate);
@@ -1318,7 +1319,7 @@ public class QAResultsBrowser extends JPanel {
 		 */
 		public ResutlTableModel(Object[] columnNames) {
 			super();
-			this.columnNames = columnNames;
+			this.columnNames = columnNames.clone();
 		}
 
 		/** The data list. */

@@ -366,7 +366,7 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 					ksession.dispose();
 				}
 			} else {
-				//System.out.println("QA Skipped, kbase was null...");
+				AceLog.getAppLog().info("QA Skipped, kbase was null...");
 			}
 		} catch (Exception e) {
 			long endTime = System.currentTimeMillis();

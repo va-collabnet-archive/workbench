@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -52,7 +53,7 @@ public class WsClientDataConverter {
 	 * @param filter the filter
 	 * @return the int str key value[]
 	 */
-	public static IntStrKeyValue[] filterToWsFilter(HashMap<RulesReportColumn, Object> filter) {
+	public static IntStrKeyValue[] filterToWsFilter(Map<RulesReportColumn, Object> filter) {
 		IntStrKeyValue[] wsFilter = new IntStrKeyValue[filter.size()];
 		if(filter != null && !filter.isEmpty()){
 			Set<RulesReportColumn> filterSet = filter.keySet();
@@ -75,7 +76,7 @@ public class WsClientDataConverter {
 	 * @param wsSorteBy the ws sorte by
 	 * @return the int bool key value[]
 	 */
-	public static IntBoolKeyValue[] sortByToWsSortBy(LinkedHashMap<RulesReportColumn, Boolean> sortBy, IntBoolKeyValue[] wsSorteBy) {
+	public static IntBoolKeyValue[] sortByToWsSortBy(Map<RulesReportColumn, Boolean> sortBy, IntBoolKeyValue[] wsSorteBy) {
 		if(sortBy != null && !sortBy.isEmpty()){
 			wsSorteBy = new IntBoolKeyValue[sortBy.size()];
 			Set<RulesReportColumn> sortBySet = sortBy.keySet();

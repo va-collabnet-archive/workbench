@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.ihtsdo.qa.store.model.Category;
@@ -327,7 +328,7 @@ public interface QAStoreBI {
 	 * @param pageLenght the page lenght
 	 * @return the rules report lines by page
 	 */
-	public RulesReportPage getRulesReportLinesByPage(QACoordinate qaCoordinate, LinkedHashMap<RulesReportColumn,Boolean> sortBy, HashMap<RulesReportColumn, Object> filter, int startLine, int pageLenght);
+	public RulesReportPage getRulesReportLinesByPage(QACoordinate qaCoordinate, Map<RulesReportColumn,Boolean> sortBy, Map<RulesReportColumn, Object> filter, int startLine, int pageLenght);
 	
 	/**
 	 * Gets the qA cases report lines.

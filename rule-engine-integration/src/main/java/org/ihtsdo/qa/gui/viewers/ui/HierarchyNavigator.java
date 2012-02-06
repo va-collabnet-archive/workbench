@@ -410,11 +410,11 @@ public class HierarchyNavigator extends JPanel {
 					if (!conceptAttributeTuples.isEmpty()) {
 						I_ConceptAttributeTuple attributes = conceptAttributeTuples.get(0);
 						if (attributes.getStatusNid() == retired.getNid() || attributes.getStatusNid() == inactive.getNid()) {
-							newChild = new DefaultMutableTreeNode(new TreeObj(String.valueOf(IconUtilities.INACTIVE), childCpt.toString() + " (" + getChildren(childCpt).size() + ")", childCpt));
+							newChild = new DefaultMutableTreeNode(new TreeObj(String.valueOf(IconUtilities.getInactive()), childCpt.toString() + " (" + getChildren(childCpt).size() + ")", childCpt));
 						} else if (attributes.isDefined()) {
-							newChild = new DefaultMutableTreeNode(new TreeObj(String.valueOf(IconUtilities.DEFINED), childCpt.toString() + " (" + getChildren(childCpt).size() + ")", childCpt));
+							newChild = new DefaultMutableTreeNode(new TreeObj(String.valueOf(IconUtilities.getDefined()), childCpt.toString() + " (" + getChildren(childCpt).size() + ")", childCpt));
 						} else {
-							newChild = new DefaultMutableTreeNode(new TreeObj(String.valueOf(IconUtilities.PRIMITIVE), childCpt.toString() + " (" + getChildren(childCpt).size() + ")", childCpt));
+							newChild = new DefaultMutableTreeNode(new TreeObj(String.valueOf(IconUtilities.getPrimitive()), childCpt.toString() + " (" + getChildren(childCpt).size() + ")", childCpt));
 						}
 						newChild.add(new DefaultMutableTreeNode("Loading..."));
 						top.add(newChild);
@@ -472,11 +472,11 @@ public class HierarchyNavigator extends JPanel {
 					I_GetConceptData parentCpt = Terms.get().getConcept(parent.getC2Id());
 					I_ConceptAttributeTuple attributes = parentCpt.getConceptAttributeTuples(config.getPrecedence(), config.getConflictResolutionStrategy()).get(0);
 					if (attributes.getStatusNid() == retired.getNid() || attributes.getStatusNid() == inactive.getNid()) {
-						newParent = new DefaultMutableTreeNode(new TreeObj(String.valueOf(IconUtilities.INACTIVE_PARENT), parentCpt.toString() + " (" + getParents(parentCpt).size() + ")", parentCpt));
+						newParent = new DefaultMutableTreeNode(new TreeObj(String.valueOf(IconUtilities.getInactiveParent()), parentCpt.toString() + " (" + getParents(parentCpt).size() + ")", parentCpt));
 					} else if (attributes.isDefined()) {
-						newParent = new DefaultMutableTreeNode(new TreeObj(String.valueOf(IconUtilities.DEFINED_PARENT), parentCpt.toString() + " (" + getParents(parentCpt).size() + ")", parentCpt));
+						newParent = new DefaultMutableTreeNode(new TreeObj(String.valueOf(IconUtilities.getDefinedParent()), parentCpt.toString() + " (" + getParents(parentCpt).size() + ")", parentCpt));
 					} else {
-						newParent = new DefaultMutableTreeNode(new TreeObj(String.valueOf(IconUtilities.PRIMITIVE_PARENT), parentCpt.toString() + " (" + getParents(parentCpt).size() + ")", parentCpt));
+						newParent = new DefaultMutableTreeNode(new TreeObj(String.valueOf(IconUtilities.getPrimitiveParent()), parentCpt.toString() + " (" + getParents(parentCpt).size() + ")", parentCpt));
 					}
 					newParent.add(new DefaultMutableTreeNode("Loading..."));
 					top.add(newParent);
@@ -512,11 +512,11 @@ public class HierarchyNavigator extends JPanel {
 					I_GetConceptData parentCpt = Terms.get().getConcept(ancestor.getC2Id());
 					I_ConceptAttributeTuple attributes = parentCpt.getConceptAttributeTuples(config.getPrecedence(), config.getConflictResolutionStrategy()).get(0);
 					if (attributes.getStatusNid() == retired.getNid() || attributes.getStatusNid() == inactive.getNid()) {
-						newParent = new DefaultMutableTreeNode(new TreeObj(String.valueOf(IconUtilities.INACTIVE_PARENT), parentCpt.toString() + " (" + getParents(parentCpt).size() + ")", parentCpt));
+						newParent = new DefaultMutableTreeNode(new TreeObj(String.valueOf(IconUtilities.getInactiveParent()), parentCpt.toString() + " (" + getParents(parentCpt).size() + ")", parentCpt));
 					} else if (attributes.isDefined()) {
-						newParent = new DefaultMutableTreeNode(new TreeObj(String.valueOf(IconUtilities.DEFINED_PARENT), parentCpt.toString() + " (" + getParents(parentCpt).size() + ")", parentCpt));
+						newParent = new DefaultMutableTreeNode(new TreeObj(String.valueOf(IconUtilities.getDefinedParent()), parentCpt.toString() + " (" + getParents(parentCpt).size() + ")", parentCpt));
 					} else {
-						newParent = new DefaultMutableTreeNode(new TreeObj(String.valueOf(IconUtilities.PRIMITIVE_PARENT), parentCpt.toString() + " (" + getParents(parentCpt).size() + ")", parentCpt));
+						newParent = new DefaultMutableTreeNode(new TreeObj(String.valueOf(IconUtilities.getPrimitiveParent()), parentCpt.toString() + " (" + getParents(parentCpt).size() + ")", parentCpt));
 					}
 					newParent.add(new DefaultMutableTreeNode("Loading..."));
 					node.add(newParent);
@@ -552,11 +552,11 @@ public class HierarchyNavigator extends JPanel {
 					if (!conceptAttributeTuples.isEmpty()) {
 						I_ConceptAttributeTuple attributes = conceptAttributeTuples.get(0);
 						if (attributes.getStatusNid() == retired.getNid() || attributes.getStatusNid() == inactive.getNid()) {
-							newChild = new DefaultMutableTreeNode(new TreeObj(String.valueOf(IconUtilities.INACTIVE), childCpt.toString() + " (" + getChildren(childCpt).size() + ")", childCpt));
+							newChild = new DefaultMutableTreeNode(new TreeObj(String.valueOf(IconUtilities.getInactive()), childCpt.toString() + " (" + getChildren(childCpt).size() + ")", childCpt));
 						} else if (attributes.isDefined()) {
-							newChild = new DefaultMutableTreeNode(new TreeObj(String.valueOf(IconUtilities.DEFINED), childCpt.toString() + " (" + getChildren(childCpt).size() + ")", childCpt));
+							newChild = new DefaultMutableTreeNode(new TreeObj(String.valueOf(IconUtilities.getDefined()), childCpt.toString() + " (" + getChildren(childCpt).size() + ")", childCpt));
 						} else {
-							newChild = new DefaultMutableTreeNode(new TreeObj(String.valueOf(IconUtilities.PRIMITIVE), childCpt.toString() + " (" + getChildren(childCpt).size() + ")", childCpt));
+							newChild = new DefaultMutableTreeNode(new TreeObj(String.valueOf(IconUtilities.getPrimitive()), childCpt.toString() + " (" + getChildren(childCpt).size() + ")", childCpt));
 						}
 						newChild.add(new DefaultMutableTreeNode("Loading..."));
 						node.add(newChild);
@@ -651,22 +651,19 @@ public class HierarchyNavigator extends JPanel {
 				if (nodeObject != null) {
 					Integer type = Integer.parseInt(nodeObject.getObjType());
 					label.setIcon(IconUtilities.getIconForConceptDetails(type));
-					switch (type) {
-					case IconUtilities.DEFINED:
+					
+					if (type == IconUtilities.getDefined()) {
 						label.setToolTipText("Fully defined descendant");
-						break;
-					case IconUtilities.PRIMITIVE:
+					} else if (type == IconUtilities.getPrimitive()) {
 						label.setToolTipText("Primitive descendant");
-						break;
-					case IconUtilities.INACTIVE:
+					} else if (type == IconUtilities.getInactive()) {
 						label.setToolTipText("Inactive descendant");
-						break;
-					case IconUtilities.PRIMITIVE_PARENT:
+					} else if (type == IconUtilities.getPrimitiveParent()) {
 						label.setToolTipText("Primitive ancestor");
-						break;
-					case IconUtilities.INACTIVE_PARENT:
+					} else if (type == IconUtilities.getDefinedParent()) {
+						label.setToolTipText("Fully defined ancestor");
+					} else if (type == IconUtilities.getInactiveParent()) {
 						label.setToolTipText("Inactive ancestor");
-						break;
 					}
 				}
 			}
