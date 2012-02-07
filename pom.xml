@@ -8,7 +8,7 @@
 	<groupId>org.ihtsdo.termmed.dev</groupId>
 	<artifactId>wb-mojo</artifactId>
 	<packaging>maven-plugin</packaging>
-	<name>${branch}: Workbench Mojo</name>
+	<name>${branch}: Workbench Mojo Daily Dev</name>
 	<description>Workbench Maven Java Objects (mojo)</description>
 	<scm>
 		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-mojo-termmed-dev</connection>
