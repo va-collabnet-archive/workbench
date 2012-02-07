@@ -370,6 +370,10 @@ public class ContextualizedDescription implements I_ContextualizeDescription {
 		I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
 		I_GetConceptData concept = tf.getConcept(conceptId);
 		List<ContextualizedDescription> contextualizedDescriptions = new ArrayList<ContextualizedDescription>();
+		if(allowedTypes != null && allowedTypes.size() == 0){
+			allowedTypes.add(SnomedMetadataRf2.SYNONYM_RF2.getLenient().getConceptNid());
+			allowedTypes.add(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getConceptNid());
+		}
 		List<? extends I_DescriptionTuple> tuplesList = concept.getDescriptionTuples(allowedStatus, 
 				allowedTypes, positions, Precedence.TIME, config.getConflictResolutionStrategy());
 		tuplesList = cleanDescTuplesList(tuplesList);
