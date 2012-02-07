@@ -330,6 +330,9 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 
         	 		 	    PL(new String[] {"Polish (language concept)","Polish"}, null,
               	 		 	       new I_ConceptualizeUniversally[] { LANGUAGE_SPECIFICATION }) ,
+                                            
+                                            NL(new String[] {"Dutch (language concept)","Dutch"}, null,
+              	 		 	       new I_ConceptualizeUniversally[] { LANGUAGE_SPECIFICATION }) ,
                           	 		 	    
                 	 		SV(new String[] {"Swedish (language concept)","Swedish"}, null,
                 	 		 	    new I_ConceptualizeUniversally[] { LANGUAGE_SPECIFICATION }) ,
@@ -1930,7 +1933,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
     	ES_DO, ES_EC, ES_ES, ES_GT, ES_HN, EX_MX, ES_NI, ES_PA, ES_PE,
     	ES_ER, ES_PY, ES_SV, ES_UY, ES_VE, FR, FR_BE, FR_CA, FR_FR, FR_CH,
     	FR_LU, FR_MC, DA, DA_DK, PL, SV, SV_FI, SV_SE, LT, LT_LT, ZH,
-        ZH_CN, ZH_HK, ZH_CHS, ZH_CHT, ZH_MO, ZH_SG, ZH_TW;
+        ZH_CN, ZH_HK, ZH_CHS, ZH_CHT, ZH_MO, ZH_SG, ZH_TW, NL;
     	
     	public String getFormatedLanguageCode(){
     		String result = "";
@@ -2035,6 +2038,8 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
             return ArchitectonicAuxiliary.Concept.LT;
     	case LT_LT:
             return ArchitectonicAuxiliary.Concept.LT_LT;
+        case NL:
+            return ArchitectonicAuxiliary.Concept.NL;
     	case PL:
     		return ArchitectonicAuxiliary.Concept.PL;    
     	case SV:
