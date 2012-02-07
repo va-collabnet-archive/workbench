@@ -60,36 +60,37 @@ import org.ihtsdo.project.issuerepository.manager.ListObj;
  * The Class IssuesListPanel.
  */
 public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
-	
+
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
-	
+
 	/** The config. */
 	private I_ConfigAceFrame config;
-	
+
 	/** The issue repo. */
 	private IssueRepository issueRepo;
-	
+
 	/** The concept. */
 	private I_GetConceptData concept;
 
 	/** The regis. */
 	private IssueRepoRegistration regis;
-	
+
 	/** The read only mode. */
 	private boolean readOnlyMode;
-	
-	
+
 	/**
 	 * Instantiates a new issues list panel.
-	 *
-	 * @param readOnlyMode the read only mode
-	 * @throws Exception the exception
+	 * 
+	 * @param readOnlyMode
+	 *            the read only mode
+	 * @throws Exception
+	 *             the exception
 	 */
 	public IssuesListPanel2(boolean readOnlyMode) throws Exception {
 		initComponents();
 		this.readOnlyMode = readOnlyMode;
-		config=Terms.get().getActiveAceFrameConfig();
+		config = Terms.get().getActiveAceFrameConfig();
 		Dimension minimumSize = new Dimension(3, 3);
 		Dimension maximumSize = new Dimension(350, 350);
 		splitPane1.getLeftComponent().setMinimumSize(minimumSize);
@@ -99,202 +100,175 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 		splitPane1.getRightComponent().setPreferredSize(minimumSize);
 		splitPane1.getRightComponent().setMaximumSize(maximumSize);
 		addListeners();
-		
+
 		initCustomComponents();
 	}
-	
+
 	/**
 	 * Instantiates a new issues list panel.
-	 *
-	 * @param config the config
-	 * @param readOnlyMode the read only mode
-	 * @throws Exception the exception
+	 * 
+	 * @param config
+	 *            the config
+	 * @param readOnlyMode
+	 *            the read only mode
+	 * @throws Exception
+	 *             the exception
 	 */
-	public IssuesListPanel2(I_ConfigAceFrame config,boolean readOnlyMode) throws Exception {
-		//this.termFactory=termFactory;
+	public IssuesListPanel2(I_ConfigAceFrame config, boolean readOnlyMode) throws Exception {
+		// this.termFactory=termFactory;
 		initComponents();
 		this.readOnlyMode = readOnlyMode;
-		this.config=config;
+		this.config = config;
 		this.config.addPropertyChangeListener("commit", this);
-//		loadRepos(null);
+		// loadRepos(null);
 		addListeners();
 		initComponents();
 	}
-	
+
 	/**
 	 * Inits the custom components.
 	 */
 	private void initCustomComponents() {
 		bCreateIssue.setEnabled(true && !readOnlyMode);
 	}
-	
+
 	/**
 	 * Adds the listeners.
 	 */
-	private void addListeners(){
-		   SelectionListener listener = new SelectionListener(table1);
-		    table1.getSelectionModel().addListSelectionListener(listener);
-		    table1.addMouseListener(new JTableMouselistener(table1));
-		    table1.getSelectionModel().addListSelectionListener(listener);
+	private void addListeners() {
+		SelectionListener listener = new SelectionListener(table1);
+		table1.getSelectionModel().addListSelectionListener(listener);
+		table1.addMouseListener(new JTableMouselistener(table1));
+		table1.getSelectionModel().addListSelectionListener(listener);
 	}
-    
+
 	/**
-	 * The listener interface for receiving selection events.
-	 * The class that is interested in processing a selection
-	 * event implements this interface, and the object created
-	 * with that class is registered with a component using the
-	 * component's <code>addSelectionListener<code> method. When
+	 * The listener interface for receiving selection events. The class that is
+	 * interested in processing a selection event implements this interface, and
+	 * the object created with that class is registered with a component using
+	 * the component's <code>addSelectionListener<code> method. When
 	 * the selection event occurs, that object's appropriate
 	 * method is invoked.
 	 * 
 	 * @see SelectionEvent
 	 */
 	class SelectionListener implements ListSelectionListener {
-        
-        /** The table. */
-        JTable table;
-    
-        // It is necessary to keep the table since it is not possible
-        // to determine the table from the event's source
-        /**
-         * Instantiates a new selection listener.
-         * 
-         * @param table the table
-         */
-        SelectionListener(JTable table) {
-            this.table = table;
-        }
-        
-        /* (non-Javadoc)
-         * @see javax.swing.event.ListSelectionListener#valueChanged(javax.swing.event.ListSelectionEvent)
-         */
-        public void valueChanged(ListSelectionEvent e) {
-            // If cell selection is enabled, both row and column change events are fired
-        	if (!(e.getSource() == table.getSelectionModel()
-                  && table.getRowSelectionAllowed())) {
-        		return;
-            }
-    
-            if (e.getValueIsAdjusting()) {
-                // The mouse button has not yet been released
-            	return;
-            }
-            else{
-        		int  first=table.getSelectedRow();
-        		if (first>-1){
-        			Object row=table.getModel().getValueAt(first, 0);
-            		if (row!=null){
-            			Issue issue=(Issue)((ListObj)row).getAtrValue();
-            			if (issue!=null && issueRepo!=null && regis!=null){        
-//            				try {
 
-//            					pBar.setIndeterminate(true);
-//            					pBar.setVisible(true);
-//            					pBar.repaint();
-//            					pBar.revalidate();
-            					//TODO: fix
-//								issuesPanel1.setInitEdition(issue, issueRepo);
-//							} catch (Exception e1) {
-//								// TODO Auto-generated catch block
-//								e1.printStackTrace();
-//            					pBar.setIndeterminate(false);
-//            					pBar.setVisible(false);
-//								message("Sorry, cannot set the issue on panel");
-//							}
-            				issueCommentsPanel1.setInit(issue, issueRepo, regis,config.getUsername(), readOnlyMode);
-//        					pBar.setIndeterminate(false);
-//        					pBar.setVisible(false);
-            			}
-            		}
-            	}
-            	
-            }
-        }
-    }
+		/** The table. */
+		JTable table;
 
-	
-	/**
-	 * C repo item state changed.
-	 *
-	 * @return the issue repo
-	 */
-//	private void cRepoItemStateChanged() {		
-//		issueRepo=(IssueRepository)((ListObj)cRepo.getSelectedItem()).getAtrValue();
-////		if (ir.getType()==IssueRepository.REPOSITORY_TYPE.WEB_SITE.ordinal()){
-////			loadCNIssueManager();
-////		}else{
-////			loadAceIssueManager();
-////		}
-//		if (issueRepo!=null){
-//			pBar.setIndeterminate(true);
-//			pBar.setVisible(true);
-//			loadIssues();
-//			pBar.setIndeterminate(false);
-//			pBar.setVisible(false);
-//		}
-//	}
+		// It is necessary to keep the table since it is not possible
+		// to determine the table from the event's source
+		/**
+		 * Instantiates a new selection listener.
+		 * 
+		 * @param table
+		 *            the table
+		 */
+		SelectionListener(JTable table) {
+			this.table = table;
+		}
 
-	private IssueRepository getIssueRepo(){
-//		if (this.issueRepo==null)
-//			this.issueRepo=new IssueRepository(getTrackerId(),getURL(),getRepoName(),getRepoType());
-		
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * javax.swing.event.ListSelectionListener#valueChanged(javax.swing.
+		 * event.ListSelectionEvent)
+		 */
+		public void valueChanged(ListSelectionEvent e) {
+			// If cell selection is enabled, both row and column change events
+			// are fired
+			if (!(e.getSource() == table.getSelectionModel() && table.getRowSelectionAllowed())) {
+				return;
+			}
+
+			if (e.getValueIsAdjusting()) {
+				// The mouse button has not yet been released
+				return;
+			} else {
+				int first = table.getSelectedRow();
+				if (first > -1) {
+					Object row = table.getModel().getValueAt(first, 0);
+					if (row != null) {
+						Issue issue = (Issue) ((ListObj) row).getAtrValue();
+						if (issue != null && issueRepo != null && regis != null) {
+							// try {
+
+							// pBar.setIndeterminate(true);
+							// pBar.setVisible(true);
+							// pBar.repaint();
+							// pBar.revalidate();
+							// TODO: fix
+							// issuesPanel1.setInitEdition(issue, issueRepo);
+							// } catch (Exception e1) {
+							// // TODO Auto-generated catch block
+							// e1.printStackTrace();
+							// pBar.setIndeterminate(false);
+							// pBar.setVisible(false);
+							// message("Sorry, cannot set the issue on panel");
+							// }
+							issueCommentsPanel1.setInit(issue, issueRepo, regis, config.getUsername(), readOnlyMode);
+							// pBar.setIndeterminate(false);
+							// pBar.setVisible(false);
+						}
+					}
+				}
+
+			}
+		}
+	}
+
+	private IssueRepository getIssueRepo() {
+		// if (this.issueRepo==null)
+		// this.issueRepo=new
+		// IssueRepository(getTrackerId(),getURL(),getRepoName(),getRepoType());
+
 		return this.issueRepo;
 	}
-	
-	/**
-	 * Creates the issue.
-	 *
-	 * @param concept the concept
-	 */
-	public void createIssue(I_GetConceptData concept){
-		this.concept=concept;
-		showNewIssuePanel();
-	}
-//	private int getRepoType() {
-//		return IssueRepository.REPOSITORY_TYPE.WEB_SITE.ordinal();
-//	}
-//
-//	private String getRepoName() {
-//		
-//		return "Issue Repository Test";
-//	}
-//
-//	private String getURL() {
-//		return "https://csfe.aceworkspace.net";
-//	}
-//
-//	private String getTrackerId() {
-//		return "tracker1188";
-//	}
 
 	/**
- * Load issues.
- *
- * @param concept the concept
- * @param repo the repo
- * @param regis the regis
- * @return the integer
- */
+	 * Creates the issue.
+	 * 
+	 * @param concept
+	 *            the concept
+	 */
+	public void createIssue(I_GetConceptData concept) {
+		this.concept = concept;
+		showNewIssuePanel();
+	}
+
+	/**
+	 * Load issues.
+	 * 
+	 * @param concept
+	 *            the concept
+	 * @param repo
+	 *            the repo
+	 * @param regis
+	 *            the regis
+	 * @return the integer
+	 */
 	public Integer loadIssues(I_GetConceptData concept, IssueRepository repo, IssueRepoRegistration regis) {
-		this.concept=concept;
-		this.issueRepo=repo;
-		this.regis=regis;
+		this.concept = concept;
+		this.issueRepo = repo;
+		this.regis = regis;
 		bCreateIssue.setEnabled(false);
-		List<Issue>issueL=new ArrayList<Issue>();
-		if (concept!=null){
+		List<Issue> issueL = new ArrayList<Issue>();
+		if (concept != null) {
 			getIssueRepo();
-			if (issueRepo.getType()==IssueRepository.REPOSITORY_TYPE.WEB_SITE.ordinal()){
-				CollabnetIssueManager cIM=new CollabnetIssueManager();
+			if (issueRepo.getType() == IssueRepository.REPOSITORY_TYPE.WEB_SITE.ordinal()) {
+				CollabnetIssueManager cIM = new CollabnetIssueManager();
 				bCreateIssue.setEnabled(true);
-				try{
+				try {
 					cIM.openRepository(issueRepo, getSiteUserName(), getSiteUserPassword());
-				}catch(Exception e){
+				} catch (Exception e) {
 					e.printStackTrace();
 					message("Sorry, cannot connect to repository.\n" + e.getMessage());
 					return 0;
 				}
 				try {
-					issueL=cIM.getIssuesForComponentId(this.concept.getUids().iterator().next().toString());
+					issueL = cIM.getIssuesForComponentId(this.concept.getUids().iterator().next().toString());
 				} catch (Exception e) {
 					e.printStackTrace();
 					message("Sorry, cannot retrieve comments for this issue.\n" + e.getMessage());
@@ -302,18 +276,18 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 				}
 			}
 		}
-			
-		if (issueCommentsPanel1!=null)
+
+		if (issueCommentsPanel1 != null)
 			issueCommentsPanel1.clear();
 		loadIssuesTable(issueL);
-		
+
 		return issueL.size();
-		
+
 	}
 
 	/**
 	 * Gets the site user password.
-	 *
+	 * 
 	 * @return the site user password
 	 */
 	private String getSiteUserPassword() {
@@ -322,167 +296,171 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 
 	/**
 	 * Gets the site user name.
-	 *
+	 * 
 	 * @return the site user name
 	 */
 	private String getSiteUserName() {
 		return regis.getUserId();
 	}
 
-    /**
-     * Show new issue panel.
-     */
-    public void showNewIssuePanel() {
+	/**
+	 * Show new issue panel.
+	 */
+	public void showNewIssuePanel() {
 
-    	getIssueRepo();
-    	IssuesPanel2 iPanel;
-    	iPanel = new IssuesPanel2();
+		getIssueRepo();
+		IssuesPanel2 iPanel;
+		iPanel = new IssuesPanel2();
 
+		int action = JOptionPane.showOptionDialog(null, iPanel, "Enter new Issue", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
 
-    	int action =
-    		JOptionPane.showOptionDialog(null, iPanel, "Enter new Issue",
-    				JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+		this.requestFocus();
 
-    	this.requestFocus();
+		if (action == JOptionPane.CANCEL_OPTION) {
+			return;
+		}
+		if (iPanel.getIssueTitle().trim().equals("")) {
+			message("Cannot create a Issue without title.");
+			return;
+		}
+		if (iPanel.getIssueDescription().trim().equals("")) {
+			message("Cannot create a Issue without description.");
+			return;
+		}
 
-    	if (action == JOptionPane.CANCEL_OPTION) {
-    		return ;
-    	} 
-    	if (iPanel.getIssueTitle().trim().equals("")){
-    		message("Cannot create a Issue without title.");
-    		return;
-    	} 
-    	if (iPanel.getIssueDescription().trim().equals("")){
-    		message("Cannot create a Issue without description.");
-    		return;
-    	}
+		try {
+			if (issueRepo.getType() == IssueRepository.REPOSITORY_TYPE.WEB_SITE.ordinal()) {
+				CollabnetIssueManager im = new CollabnetIssueManager();
 
-    	try {
-    		if (issueRepo.getType()==IssueRepository.REPOSITORY_TYPE.WEB_SITE.ordinal()){
-    			CollabnetIssueManager im=new CollabnetIssueManager();
+				try {
+					im.openRepository(issueRepo, getSiteUserName(), getSiteUserPassword());
+				} catch (Exception e) {
+					e.printStackTrace();
+					message("Sorry, cannot connect to repository.\n" + e.getMessage());
+					return;
+				}
+				Issue issue = new Issue();
 
-    			try{
-    				im.openRepository(issueRepo, getSiteUserName(), getSiteUserPassword());
-    			}catch(Exception e){
-    				e.printStackTrace();
-    				message("Sorry, cannot connect to repository.\n" + e.getMessage());
-    				return;
-    			}
-    			Issue issue =new Issue();
+				issue.setCategory(Issue.CATEGORY.Source_Error.name());
+				issue.setComponent(concept.getInitialText());
+				issue.setComponentId(concept.getUids().iterator().next().toString());
+				issue.setDescription(iPanel.getIssueDescription().trim());
+				// issue.setExternalId(lblExtId.getText());
+				issue.setPriority(String.valueOf(Issue.PRIORITY.DEFAULT.ordinal()));
+				issue.setProjectId(issueRepo.getExternalProjectId());
+				issue.setDownloadStatus(Issue.STATUS.Open.name());
+				issue.setTitle(iPanel.getIssueTitle().trim());
+				issue.setExternalUser(config.getUsername());
+				issue.setUser(getSiteUserName());
 
-    			issue.setCategory(Issue.CATEGORY.Source_Error.name());
-    			issue.setComponent( concept.getInitialText());
-    			issue.setComponentId(concept.getUids().iterator().next().toString());
-    			issue.setDescription(iPanel.getIssueDescription().trim());
-    			//issue.setExternalId(lblExtId.getText());
-    			issue.setPriority(String.valueOf(Issue.PRIORITY.DEFAULT.ordinal()));
-    			issue.setProjectId(issueRepo.getExternalProjectId());
-    			issue.setDownloadStatus(Issue.STATUS.Open.name());
-    			issue.setTitle(iPanel.getIssueTitle().trim());
-    			issue.setExternalUser(config.getUsername());
-    			issue.setUser(getSiteUserName());
-
-    			im.openRepository(issueRepo,getSiteUserName(),getSiteUserPassword());
-    			im.postNewIssue(issue);
-    			message("Issue posted");
-    			SwingUtilities.invokeLater(new Runnable(){
+				im.openRepository(issueRepo, getSiteUserName(), getSiteUserPassword());
+				im.postNewIssue(issue);
+				message("Issue posted");
+				SwingUtilities.invokeLater(new Runnable() {
 
 					@Override
 					public void run() {
-						loadIssues(concept,issueRepo,regis);
-						
-					}
-    				
-    			});
-    		}
-    	} catch (Exception e) {
-    		message("Error:" + e.getMessage());
-    		e.printStackTrace();
-    	}
-    }
+						loadIssues(concept, issueRepo, regis);
 
+					}
+
+				});
+			}
+		} catch (Exception e) {
+			message("Error:" + e.getMessage());
+			e.printStackTrace();
+		}
+	}
 
 	/**
-	 * The listener interface for receiving tableItemAction events.
-	 * The class that is interested in processing a tableItemAction
-	 * event implements this interface, and the object created
-	 * with that class is registered with a component using the
-	 * component's <code>addTableItemActionListener<code> method. When
+	 * The listener interface for receiving tableItemAction events. The class
+	 * that is interested in processing a tableItemAction event implements this
+	 * interface, and the object created with that class is registered with a
+	 * component using the component's
+	 * <code>addTableItemActionListener<code> method. When
 	 * the tableItemAction event occurs, that object's appropriate
 	 * method is invoked.
-	 *
+	 * 
 	 * @see TableItemActionEvent
 	 */
-	class TableItemActionListener implements ActionListener{
+	class TableItemActionListener implements ActionListener {
 
-		/* (non-Javadoc)
-		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent
+		 * )
 		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			SwingUtilities.invokeLater(new Runnable(){
+			SwingUtilities.invokeLater(new Runnable() {
 
 				@Override
 				public void run() {
 					showNewIssuePanel();
-					
+
 				}
-				
+
 			});
 		}
 	}
-	
+
 	/**
 	 * The Class JTableMouselistener.
 	 */
 	public class JTableMouselistener extends MouseAdapter {
-		
+
 		/** The j table. */
 		private JTable jTable;
-		
+
 		/** The menu. */
 		private JPopupMenu menu;
-		
+
 		/** The m item listener. */
 		private TableItemActionListener mItemListener;
-		
+
 		/** The m item. */
 		private JMenuItem mItem;
-		
+
 		/** The x point. */
 		private int xPoint;
-		
+
 		/** The y point. */
 		private int yPoint;
 
 		/**
 		 * Instantiates a new j table mouselistener.
-		 *
-		 * @param jTable the j table
+		 * 
+		 * @param jTable
+		 *            the j table
 		 */
-		JTableMouselistener (JTable jTable){
-			this.jTable=jTable;
-			menu=new JPopupMenu();
-			mItem=new JMenuItem();
-			mItemListener=new TableItemActionListener();
+		JTableMouselistener(JTable jTable) {
+			this.jTable = jTable;
+			menu = new JPopupMenu();
+			mItem = new JMenuItem();
+			mItemListener = new TableItemActionListener();
 			mItem.addActionListener(mItemListener);
 			menu.add(mItem);
 		}
 
-		/* (non-Javadoc)
-		 * @see java.awt.event.MouseAdapter#mouseClicked(java.awt.event.MouseEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * java.awt.event.MouseAdapter#mouseClicked(java.awt.event.MouseEvent)
 		 */
 		@Override
 		public void mouseClicked(MouseEvent e) {
 
-			if (e.getButton()== java.awt.event.MouseEvent.BUTTON3) {
-				if (concept!=null){
-					xPoint=e.getX();
-					yPoint=e.getY();
+			if (e.getButton() == java.awt.event.MouseEvent.BUTTON3) {
+				if (concept != null) {
+					xPoint = e.getX();
+					yPoint = e.getY();
 					SwingUtilities.invokeLater(new Runnable() {
 						public void run() {
-							menu.show(jTable,xPoint, yPoint);
+							menu.show(jTable, xPoint, yPoint);
 						}
 					});
 				}
@@ -495,11 +473,11 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 	/**
 	 * Load issues table.
 	 * 
-	 * @param issueL the issue l
+	 * @param issueL
+	 *            the issue l
 	 */
 	private void loadIssuesTable(List<Issue> issueL) {
-		String[] columnNames = {"Title","Description",
-		        "Status","User"};
+		String[] columnNames = { "Title", "Description", "Status", "User" };
 		String[][] data = null;
 		DefaultTableModel tableModel = new DefaultTableModel(data, columnNames) {
 			private static final long serialVersionUID = 1L;
@@ -508,105 +486,60 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 				return false;
 			}
 		};
-		for (int i=0;i<issueL.size();i++) {
-			tableModel.addRow(new Object[] {new ListObj("I",issueL.get(i).getTitle() ,issueL.get(i)),
-					issueL.get(i).getDescription(),
-					issueL.get(i).getDownloadStatus(),
-					issueL.get(i).getExternalUser()});
+		for (int i = 0; i < issueL.size(); i++) {
+			tableModel.addRow(new Object[] { new ListObj("I", issueL.get(i).getTitle(), issueL.get(i)), issueL.get(i).getDescription(), issueL.get(i).getDownloadStatus(), issueL.get(i).getExternalUser() });
 		}
 
 		table1.setModel(tableModel);
-		TableColumnModel cmodel = table1.getColumnModel(); 
+		TableColumnModel cmodel = table1.getColumnModel();
 		TextAreaRenderer textAreaRenderer = new TextAreaRenderer();
-		cmodel.getColumn(0).setCellRenderer(textAreaRenderer); 
-		cmodel.getColumn(1).setCellRenderer(textAreaRenderer); 
-		cmodel.getColumn(2).setCellRenderer(textAreaRenderer); 
-		cmodel.getColumn(3).setCellRenderer(textAreaRenderer); 
+		cmodel.getColumn(0).setCellRenderer(textAreaRenderer);
+		cmodel.getColumn(1).setCellRenderer(textAreaRenderer);
+		cmodel.getColumn(2).setCellRenderer(textAreaRenderer);
+		cmodel.getColumn(3).setCellRenderer(textAreaRenderer);
 		table1.revalidate();
-						
+
 	}
-	
+
 	/**
 	 * Message.
 	 * 
-	 * @param string the string
+	 * @param string
+	 *            the string
 	 */
 	private void message(String string) {
 
-         JOptionPane.showOptionDialog(   
-        		this,   
-                string,   
-                "Information", JOptionPane.DEFAULT_OPTION,   
-                JOptionPane.INFORMATION_MESSAGE, null, null,   
-                null );   
+		JOptionPane.showOptionDialog(this, string, "Information", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, null, null);
 	}
-	
+
 	/**
 	 * Load repos.
-	 *
-	 * @param cmb the cmb
-	 * @param object the object
-	 * @param name the name
-	 * @param selected the selected
+	 * 
+	 * @param cmb
+	 *            the cmb
+	 * @param object
+	 *            the object
+	 * @param name
+	 *            the name
+	 * @param selected
+	 *            the selected
 	 */
-//	@SuppressWarnings("unchecked")
-//	private void loadRepos(IssueRepository issueRepository) {
-//		// TODO Auto-generated method stub
-//		MutableComboBoxModel mutComboModel=(MutableComboBoxModel)new DefaultComboBoxModel();
-//		cRepo.setModel(mutComboModel);
-//		
-//		try{
-//			boolean selected;
-//			if (debug){
-//				addObjectToCombo(cRepo, null, "None",true);
-//				List<IssueRepository> irs=IssueRepositoryDAO.getAllIssueRepository(config);
-//				
-//				for(IssueRepository ir:irs){
-//					selected=false;
-//					if (issueRepository!=null)
-//						if(issueRepository.getId()==ir.getId())	selected=true;
-//						
-//					addObjectToCombo(cRepo, ir, ir.getName(),selected);
-//					
-//				}
-//			}
-//			else{
-//				addObjectToCombo(cRepo, null, "None",true);
-//				List<UUID>repoUUIDs=(List<UUID>) dbConfig.getProperty(TranslationHelperPanel.ISSUE_REPO_PROPERTY_NAME);
-//				if (repoUUIDs!=null){
-//					for (UUID uid:repoUUIDs){
-//						I_GetConceptData irepoConcept=termFactory.getConcept(new UUID[]{uid});
-//						IssueRepository ir=IssueRepositoryDAO.getIssueRepository(irepoConcept);
-//
-//						selected=false;
-//						if (issueRepository!=null)
-//							if(issueRepository.getId()==ir.getId())	selected=true;
-//							
-//						addObjectToCombo(cRepo, ir, ir.getName(),selected);
-//					}
-//				}
-//			}
-//		}
-//		catch(Exception e){
-//			e.printStackTrace();
-//			System.out.println( dbConfig ==null);
-//			
-//		}
-//		
-//	} 
 
 	/**
 	 * Adds the object to combo.
 	 * 
-	 * @param cmb the cmb
-	 * @param object the object
-	 * @param name the name
-	 * @param selected the selected
+	 * @param cmb
+	 *            the cmb
+	 * @param object
+	 *            the object
+	 * @param name
+	 *            the name
+	 * @param selected
+	 *            the selected
 	 */
-	private void addObjectToCombo(JComboBox cmb,
-			Object object,String name,boolean selected) {
+	private void addObjectToCombo(JComboBox cmb, Object object, String name, boolean selected) {
 		// TODO Auto-generated method stub
-		ListObj lo=new ListObj("P",name,object);
+		ListObj lo = new ListObj("P", name, object);
 		cmb.addItem(lo);
 		if (selected)
 			cmb.setSelectedItem(lo);
@@ -619,20 +552,28 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 		showNewIssuePanel();
 	}
 
-	/**
-	 * Creates the ui components.
-	 */
-	private void createUIComponents() {
+	private void table1MouseClicked(MouseEvent e) {
+		int first = table1.getSelectedRow();
+		if (first > -1) {
+			Object row = table1.getModel().getValueAt(first, 0);
+			if (row != null) {
+				Issue issue = (Issue) ((ListObj) row).getAtrValue();
+				if (issue != null && issueRepo != null && regis != null) {
+					issueCommentsPanel1.setInit(issue, issueRepo, regis, config.getUsername(), readOnlyMode);
+				}
+			}
+		}
 	}
-
 
 	/**
 	 * Inits the components.
 	 * 
-	 * @throws Exception the exception
+	 * @throws Exception
+	 *             the exception
 	 */
 	private void initComponents() throws Exception {
-		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
+		// JFormDesigner - Component initialization - DO NOT MODIFY
+		// //GEN-BEGIN:initComponents
 		splitPane1 = new JSplitPane();
 		panel3 = new JPanel();
 		panel1 = new JPanel();
@@ -643,35 +584,35 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 		panel4 = new JPanel();
 		issueCommentsPanel1 = new IssueCommentsPanel();
 
-		//======== this ========
+		// ======== this ========
 		setLayout(new BorderLayout());
 
-		//======== splitPane1 ========
+		// ======== splitPane1 ========
 		{
 			splitPane1.setOneTouchExpandable(true);
 			splitPane1.setResizeWeight(0.5);
 
-			//======== panel3 ========
+			// ======== panel3 ========
 			{
 				panel3.setLayout(new BorderLayout());
 
-				//======== panel1 ========
+				// ======== panel1 ========
 				{
 					panel1.setLayout(new GridBagLayout());
-					((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {159, 0};
-					((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0, 0};
-					((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-					((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0E-4};
+					((GridBagLayout) panel1.getLayout()).columnWidths = new int[] { 159, 0 };
+					((GridBagLayout) panel1.getLayout()).rowHeights = new int[] { 0, 0, 0 };
+					((GridBagLayout) panel1.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
+					((GridBagLayout) panel1.getLayout()).rowWeights = new double[] { 0.0, 1.0, 1.0E-4 };
 
-					//======== panel2 ========
+					// ======== panel2 ========
 					{
 						panel2.setLayout(new GridBagLayout());
-						((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {0, 0, 0};
-						((GridBagLayout)panel2.getLayout()).rowHeights = new int[] {0, 0};
-						((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {0.0, 0.0, 1.0E-4};
-						((GridBagLayout)panel2.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+						((GridBagLayout) panel2.getLayout()).columnWidths = new int[] { 0, 0, 0 };
+						((GridBagLayout) panel2.getLayout()).rowHeights = new int[] { 0, 0 };
+						((GridBagLayout) panel2.getLayout()).columnWeights = new double[] { 0.0, 0.0, 1.0E-4 };
+						((GridBagLayout) panel2.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
 
-						//---- bCreateIssue ----
+						// ---- bCreateIssue ----
 						bCreateIssue.setText("Create Issue");
 						bCreateIssue.addActionListener(new ActionListener() {
 							@Override
@@ -679,30 +620,30 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 								bCreateIssueActionPerformed();
 							}
 						});
-						panel2.add(bCreateIssue, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 0, 5), 0, 0));
+						panel2.add(bCreateIssue, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 					}
-					panel1.add(panel2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 5, 0), 0, 0));
+					panel1.add(panel2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 
-					//======== scrollPane1 ========
+					// ======== scrollPane1 ========
 					{
 
-						//---- table1 ----
+						// ---- table1 ----
 						table1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+						table1.addMouseListener(new MouseAdapter() {
+							@Override
+							public void mouseClicked(MouseEvent e) {
+								table1MouseClicked(e);
+							}
+						});
 						scrollPane1.setViewportView(table1);
 					}
-					panel1.add(scrollPane1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 0, 0), 0, 0));
+					panel1.add(scrollPane1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 				}
 				panel3.add(panel1, BorderLayout.CENTER);
 			}
 			splitPane1.setLeftComponent(panel3);
 
-			//======== panel4 ========
+			// ======== panel4 ========
 			{
 				panel4.setLayout(new BorderLayout());
 				panel4.add(issueCommentsPanel1, BorderLayout.CENTER);
@@ -710,47 +651,35 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 			splitPane1.setRightComponent(panel4);
 		}
 		add(splitPane1, BorderLayout.CENTER);
-		// JFormDesigner - End of component initialization  //GEN-END:initComponents
+		// JFormDesigner - End of component initialization
+		// //GEN-END:initComponents
 	}
 
-	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
-	/** The split pane1. */
+	// JFormDesigner - Variables declaration - DO NOT MODIFY
+	// //GEN-BEGIN:variables
 	private JSplitPane splitPane1;
-	
-	/** The panel3. */
 	private JPanel panel3;
-	
-	/** The panel1. */
 	private JPanel panel1;
-	
-	/** The panel2. */
 	private JPanel panel2;
-	
-	/** The b create issue. */
 	private JButton bCreateIssue;
-	
-	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
-	
-	/** The table1. */
 	private JTable table1;
-	
-	/** The panel4. */
 	private JPanel panel4;
-	
-	/** The issue comments panel1. */
 	private IssueCommentsPanel issueCommentsPanel1;
-	// JFormDesigner - End of variables declaration  //GEN-END:variables
 
+	// JFormDesigner - End of variables declaration //GEN-END:variables
 
-	/* (non-Javadoc)
-	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.
+	 * PropertyChangeEvent)
 	 */
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		// TODO Auto-generated method stub
-		//This is the property change listener that listens to the commit action
+		// This is the property change listener that listens to the commit
+		// action
 	}
-
 
 }
