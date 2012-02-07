@@ -134,8 +134,8 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 	private void addListeners(){
 		   SelectionListener listener = new SelectionListener(table1);
 		    table1.getSelectionModel().addListSelectionListener(listener);
-
 		    table1.addMouseListener(new JTableMouselistener(table1));
+		    table1.getSelectionModel().addListSelectionListener(listener);
 	}
     
 	/**

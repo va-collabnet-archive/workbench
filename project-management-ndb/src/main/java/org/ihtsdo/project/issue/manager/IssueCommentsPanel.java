@@ -311,25 +311,12 @@ public class IssueCommentsPanel extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
-	/** The label1. */
 	private JLabel label1;
-	
-	/** The p bar. */
 	private JProgressBar pBar;
-	
-	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
-	
-	/** The txt comm. */
 	private JTextArea txtComm;
-	
-	/** The b send. */
 	private JButton bSend;
-	
-	/** The scroll pane2. */
 	private JScrollPane scrollPane2;
-	
-	/** The table1. */
 	private JTable table1;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }
