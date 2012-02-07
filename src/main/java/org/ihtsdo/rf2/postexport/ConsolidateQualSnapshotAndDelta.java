@@ -12,7 +12,7 @@ import java.io.OutputStreamWriter;
 
 import org.ihtsdo.rf2.postexport.RF2ArtifactPostExportAbst.FILE_TYPE;
 
-public class ConsolidateSnapshotAndDelta extends AbstractTask {
+public class ConsolidateQualSnapshotAndDelta extends AbstractTask {
 
 	private File snapshotSortedPreviousfile;
 	private File snapshotSortedExportedfile;
@@ -25,9 +25,8 @@ public class ConsolidateSnapshotAndDelta extends AbstractTask {
 	private File deltaFinalFile;
 	private BufferedWriter bw;
 	private BufferedWriter dbw;
-	private int effectiveTimeColIndex;
 
-	public ConsolidateSnapshotAndDelta(FILE_TYPE fType,
+	public ConsolidateQualSnapshotAndDelta(FILE_TYPE fType,
 			File snapshotSortedPreviousfile, File snapshotSortedExportedfile,
 			File snapshotFinalFile, File deltaFinalFile, String releaseDate) {
 		this.snapshotSortedPreviousfile=snapshotSortedPreviousfile;	
@@ -36,7 +35,6 @@ public class ConsolidateSnapshotAndDelta extends AbstractTask {
 		this.deltaFinalFile=deltaFinalFile;
 		this.fieldsToCompare=fType.getColumnsToCompare();
 		this.index=fType.getSnapshotIndex();
-		this.effectiveTimeColIndex=fType.getEffectiveTimeColIndex();
 		this.releaseDate=releaseDate;
 	}
 
@@ -91,7 +89,7 @@ public class ConsolidateSnapshotAndDelta extends AbstractTask {
 					int comp = splittedLine1[index].compareTo(splittedLine2[index]);
 					if ( comp<0){
 
-						addPreviousLine(splittedLine1);
+						addPreviousLine(splittedLine1,"0",releaseDate);
 						lines++;
 					}else{
 						if (comp>0){
@@ -107,7 +105,7 @@ public class ConsolidateSnapshotAndDelta extends AbstractTask {
 								comp = splittedLine1[index].compareTo(splittedLine2[index]);
 							}
 							if ( comp<0){
-								addPreviousLine(splittedLine1);
+								addPreviousLine(splittedLine1,"0",releaseDate);
 								lines++;
 							}
 						}
@@ -116,7 +114,7 @@ public class ConsolidateSnapshotAndDelta extends AbstractTask {
 								addExportedLine(splittedLine2);
 								lines++;
 							}else{
-								addPreviousLine(splittedLine1);
+								addPreviousLine(splittedLine1,"1",null);
 								lines++;		
 							}
 							line2=br2.readLine();
@@ -129,7 +127,7 @@ public class ConsolidateSnapshotAndDelta extends AbstractTask {
 						}
 					}
 				}else{
-					addPreviousLine(splittedLine1);
+					addPreviousLine(splittedLine1,"0",releaseDate);
 					lines++;
 				}
 			}
@@ -161,7 +159,7 @@ public class ConsolidateSnapshotAndDelta extends AbstractTask {
 	private void addExportedLine( String[] splittedLine) throws Exception {
 		StringBuffer sb=new StringBuffer();
 		for (int i = 0; i < colLen; i++) {
-			if (i==this.effectiveTimeColIndex){
+			if (i==1){
 				sb.append(releaseDate);
 				
 			}else{
@@ -178,15 +176,31 @@ public class ConsolidateSnapshotAndDelta extends AbstractTask {
 		dbw.append(tmp);
 	}
 
-	private void addPreviousLine(String[] splittedLine) throws Exception {
+	private void addPreviousLine(String[] splittedLine,String status,String releaseDate) throws Exception {
+		StringBuffer sb=new StringBuffer();
 		for (int i = 0; i < splittedLine.length; i++) {
-			bw.append(splittedLine[i]);
+			if (i==1 && releaseDate!=null){
+				sb.append(releaseDate);
+			}
+			else if (i==2){
+				sb.append(status);
+			}else{
+				sb.append(splittedLine[i]);
+			}
 			if (i + 1 < splittedLine.length) {
-				bw.append('\t');
+				sb.append('\t');
 			}
 		}
-		bw.append(newLine);
+		sb.append(newLine);
+		String tmp=sb.toString();
+
+		bw.append(tmp);
+		if (releaseDate!=null){
+			dbw.append(tmp);
+			
+		}
 	}
+
 
 
 	private int fieldsCompare(String[] splittedLine1, String[] splittedLine2) {

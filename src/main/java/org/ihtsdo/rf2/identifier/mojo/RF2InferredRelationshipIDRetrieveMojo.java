@@ -86,7 +86,7 @@ public class RF2InferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 
 		File previousRelationshipFullFile;
 		try {
-			previousRelationshipFullFile = getPreviousFile(previousFullFolder,FILE_TYPE.RF2_RELATIONSHIP);
+			previousRelationshipFullFile = getPreviousFile(previousFullFolder,FILE_TYPE.RF2_STATED_ISA_RETIRED);
 
 
 			File folderTmp=new File(targetDirectory.getAbsolutePath() + "/" + getTmpPostExport() );
@@ -288,8 +288,12 @@ public class RF2InferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 		case RF2_COMPATIBILITY_IDENTIFIER:
 			AuxFileRetrieve = new AuxiliaryFilesRetrieve(rf2FullFolder);
 			retFile=AuxFileRetrieve.getAssociationAuxiliaryFile();
-			break; 
-
+		case RF2_ISA_RETIRED:
+			AuxFileRetrieve = new AuxiliaryFilesRetrieve(rf2FullFolder);
+			retFile=AuxFileRetrieve.getRelationshipAuxiliaryFile();
+		case RF2_STATED_ISA_RETIRED:
+			AuxFileRetrieve = new AuxiliaryFilesRetrieve(rf2FullFolder);
+			retFile=AuxFileRetrieve.getStatedRelationshipAuxiliaryFile();
 		}
 		if (retFile==null){
 			return null;
