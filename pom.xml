@@ -12,6 +12,11 @@
 	<name>${branch}: Workbench Release Process</name>
 	<description>Workbench Release Process Library</description>
 	<url>http://maven.apache.org</url>
+	<scm>
+		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-release-process-termmed-dev</connection>
+		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-release-process-termmed-dev</developerConnection>
+		<url>https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-release-process-termmed-dev</url>
+	</scm>
 
 	<properties>
 		<src.dir>${project.build.directory}/generated-resources</src.dir>
