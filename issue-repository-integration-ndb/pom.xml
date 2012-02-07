@@ -64,6 +64,7 @@
 				<version>2.8.1</version>
 				<configuration>
 					<!-- Default configuration for all reports -->
+					<excludePackageNames>*.test:*.tests</excludePackageNames>
 				</configuration>
 				<reportSets>
 					<reportSet>
