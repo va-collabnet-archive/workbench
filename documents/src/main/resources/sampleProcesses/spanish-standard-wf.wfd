@@ -1,0 +1,128 @@
+<org.ihtsdo.project.workflow.model.WorkflowDefinition>
+  <roles>
+    <org.ihtsdo.project.workflow.model.WfRole>
+      <name>translation editorial board role</name>
+      <id>06049358-6fbe-3e5c-8138-65d55a751418</id>
+    </org.ihtsdo.project.workflow.model.WfRole>
+    <org.ihtsdo.project.workflow.model.WfRole>
+      <name>release authority role</name>
+      <id>dc874687-1cae-3abe-9a07-079b44a7b232</id>
+    </org.ihtsdo.project.workflow.model.WfRole>
+    <org.ihtsdo.project.workflow.model.WfRole>
+      <name>translation sme role</name>
+      <id>5a112603-3fc5-3ac2-82fc-b2ab9f30c1f7</id>
+    </org.ihtsdo.project.workflow.model.WfRole>
+    <org.ihtsdo.project.workflow.model.WfRole>
+      <name>tsp translator one role</name>
+      <id>0d484e7c-58d7-3e22-96df-56bf88f10a1a</id>
+    </org.ihtsdo.project.workflow.model.WfRole>
+    <org.ihtsdo.project.workflow.model.WfRole>
+      <name>tsp reviewer role</name>
+      <id>5df6d3f2-91de-3ffd-9157-29e03bf8308f</id>
+    </org.ihtsdo.project.workflow.model.WfRole>
+  </roles>
+  <states>
+    <org.ihtsdo.project.workflow.model.WfState>
+      <name>rejected by TPO reviewer status</name>
+      <id>2734192d-21ee-30a9-b6f7-15638c64e7fb</id>
+    </org.ihtsdo.project.workflow.model.WfState>
+    <org.ihtsdo.project.workflow.model.WfState>
+      <name>escalated to editorial board status</name>
+      <id>338c5c29-d84f-3472-bb3b-53bcdc62a493</id>
+    </org.ihtsdo.project.workflow.model.WfState>
+    <org.ihtsdo.project.workflow.model.WfState>
+      <name>rejected by TSP reviewer status</name>
+      <id>cb61b6a7-e3db-39e6-b766-7c83db5fa447</id>
+    </org.ihtsdo.project.workflow.model.WfState>
+    <org.ihtsdo.project.workflow.model.WfState>
+      <name>rejected by editorial board status</name>
+      <id>edd843bc-10b1-3cb9-b4d9-c51b37bf0d1d</id>
+    </org.ihtsdo.project.workflow.model.WfState>
+    <org.ihtsdo.project.workflow.model.WfState>
+      <name>approved for publication status</name>
+      <id>df7fc5df-812d-3427-863a-09ff88926ba0</id>
+    </org.ihtsdo.project.workflow.model.WfState>
+    <org.ihtsdo.project.workflow.model.WfState>
+      <name>referred to SME status</name>
+      <id>2e16496a-f1e6-3dfd-be4e-6b99d6091914</id>
+    </org.ihtsdo.project.workflow.model.WfState>
+    <org.ihtsdo.project.workflow.model.WfState>
+      <name>translated status</name>
+      <id>df881904-1c67-3651-b0a6-fc8fa6af7e2d</id>
+    </org.ihtsdo.project.workflow.model.WfState>
+    <org.ihtsdo.project.workflow.model.WfState>
+      <name>SME feedback complete status</name>
+      <id>b8afed0d-0f52-3c07-8617-dea225a58ed1</id>
+    </org.ihtsdo.project.workflow.model.WfState>
+  </states>
+  <actions>
+    <entry>
+      <string>Respond SME consultation</string>
+      <org.ihtsdo.project.workflow.model.WfAction>
+        <name>Respond SME consultation</name>
+        <id>49838d31-dd99-49f2-8152-fb00503d38f9</id>
+        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[8]"/>
+        <businessProcess>sampleProcesses/RejectActionWithoutDestination.bp</businessProcess>
+      </org.ihtsdo.project.workflow.model.WfAction>
+    </entry>
+    <entry>
+      <string>Reject revision with stated reason</string>
+      <org.ihtsdo.project.workflow.model.WfAction>
+        <name>Reject revision with stated reason</name>
+        <id>37778573-821f-4427-bbb0-7f490eafb638</id>
+        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState"/>
+        <businessProcess>sampleProcesses/RejectActionWithoutDestination.bp</businessProcess>
+      </org.ihtsdo.project.workflow.model.WfAction>
+    </entry>
+    <entry>
+      <string>Consult to SME</string>
+      <org.ihtsdo.project.workflow.model.WfAction>
+        <name>Consult to SME</name>
+        <id>3c89c4d4-2d8c-4bc2-842d-103d2981fa76</id>
+        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[6]"/>
+        <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
+      </org.ihtsdo.project.workflow.model.WfAction>
+    </entry>
+    <entry>
+      <string>Escalate</string>
+      <org.ihtsdo.project.workflow.model.WfAction>
+        <name>Escalate</name>
+        <id>eee9494f-deea-44f3-98f6-9823bb1bfe46</id>
+        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[2]"/>
+        <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
+      </org.ihtsdo.project.workflow.model.WfAction>
+    </entry>
+    <entry>
+      <string>Approve</string>
+      <org.ihtsdo.project.workflow.model.WfAction>
+        <name>Approve</name>
+        <id>568f808c-d869-40f9-a70f-2d7f29590a76</id>
+        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[5]"/>
+        <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
+      </org.ihtsdo.project.workflow.model.WfAction>
+    </entry>
+    <entry>
+      <string>Translate</string>
+      <org.ihtsdo.project.workflow.model.WfAction>
+        <name>Translate</name>
+        <id>b2b090ea-bd72-4754-9f57-37b2d0826c7a</id>
+        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[7]"/>
+        <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
+      </org.ihtsdo.project.workflow.model.WfAction>
+    </entry>
+    <entry>
+      <string>Reject translation with stated reason</string>
+      <org.ihtsdo.project.workflow.model.WfAction>
+        <name>Reject translation with stated reason</name>
+        <id>0f3832fe-8668-483e-99cf-6b9d5691964b</id>
+        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[3]"/>
+        <businessProcess>sampleProcesses/RejectActionWithoutDestination.bp</businessProcess>
+      </org.ihtsdo.project.workflow.model.WfAction>
+    </entry>
+  </actions>
+  <xlsFileName>
+    <string>drools-rules/spanish-wf-dt.xls</string>
+  </xlsFileName>
+  <drlFileName/>
+  <name>spanish-standard-wf</name>
+</org.ihtsdo.project.workflow.model.WorkflowDefinition>
