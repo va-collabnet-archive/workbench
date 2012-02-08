@@ -33,19 +33,20 @@ public class TerminologyHelperDrools {
 	// End of DSL enum properties
 	
 	public TerminologyHelperDrools() {
-		fis=(InputStream) TerminologyHelperDrools.class.getResourceAsStream("GB-US-spellingdiffs.txt");
-		usspelling = new Hashtable<String,String>();
-		ukspelling = new Hashtable<String,String>();
-		propsLoaded=false;
-		for (int i = 2; i < 8; i++) {
-			for (int j = 0; j < 10; j++) {
-				FnF[i][j] = FnF[i - 1][FnF[1][j]];
-			}
-		}
-
-		fisW=(InputStream) TerminologyHelperDrools.class.getResourceAsStream("IcsWords.txt");
-		words = new Hashtable<String,String>();
-		wordsLoaded=false;
+		// Spelling terms data are commented out
+//		fis=(InputStream) TerminologyHelperDrools.class.getResourceAsStream("GB-US-spellingdiffs.txt");
+//		usspelling = new Hashtable<String,String>();
+//		ukspelling = new Hashtable<String,String>();
+//		propsLoaded=false;
+//		for (int i = 2; i < 8; i++) {
+//			for (int j = 0; j < 10; j++) {
+//				FnF[i][j] = FnF[i - 1][FnF[1][j]];
+//			}
+//		}
+//
+//		fisW=(InputStream) TerminologyHelperDrools.class.getResourceAsStream("IcsWords.txt");
+//		words = new Hashtable<String,String>();
+//		wordsLoaded=false;
 	}
 
 	public boolean checkSameInitialWord(String term, String term2){
