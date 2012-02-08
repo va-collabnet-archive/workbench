@@ -384,7 +384,9 @@ public class BdbCommitManager {
                                 for (AlertToDataConstraintFailure alert : warningsAndErrors) {
                                     if (alert.getAlertType().equals(ALERT_TYPE.ERROR)) {
                                         errorCount++;
-                                    } else if (alert.getAlertType().equals(ALERT_TYPE.WARNING)) {
+                                    } else if (alert.getAlertType().equals(ALERT_TYPE.OMG)) {
+                                        errorCount++;
+                                    }else if (alert.getAlertType().equals(ALERT_TYPE.WARNING)) {
                                         warningCount++;
                                     }
                                 }
@@ -587,7 +589,9 @@ public class BdbCommitManager {
             for (AlertToDataConstraintFailure alert : warningsAndErrors) {
                 if (alert.getAlertType().equals(ALERT_TYPE.ERROR)) {
                     errorCount++;
-                } else if (alert.getAlertType().equals(ALERT_TYPE.WARNING)) {
+                } else if (alert.getAlertType().equals(ALERT_TYPE.OMG)) {
+                    errorCount++;
+                }else if (alert.getAlertType().equals(ALERT_TYPE.WARNING)) {
                     warningCount++;
                 }
             }
