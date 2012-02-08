@@ -20,7 +20,7 @@ import org.ihtsdo.rf2.postexport.RF2ArtifactPostExportAbst.FILE_TYPE;
  * @goal rf2-inferred-relationships-id-reassign
  * 
  */
-public class RF2InferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
+public class RF2RelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 
 	/**
 	 * Location of the build directory.
@@ -61,6 +61,14 @@ public class RF2InferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 	 * @required
 	 */
 	private String rf2FullFolder;
+
+	/**
+	 * relationshipt File Type. 
+	 * 
+	 * @parameter
+	 * @required
+	 */
+	private String relationshiptFileType;
 	
 	/**
 	 * Location of the outputFolder. (output in this mojo)
@@ -85,7 +93,9 @@ public class RF2InferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 
 		File previousRelationshipFullFile;
 		try {
-			previousRelationshipFullFile = getPreviousFile(previousFullFolder,FILE_TYPE.RF2_RELATIONSHIP);
+			FILE_TYPE fileType=getRelFileType(relationshiptFileType);
+			previousRelationshipFullFile = getPreviousFile(previousFullFolder,fileType);
+
 
 			File folderTmp=new File(targetDirectory.getAbsolutePath() + "/" + getTmpPostExport() );
 			if (!folderTmp.exists()){
