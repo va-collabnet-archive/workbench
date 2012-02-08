@@ -3339,6 +3339,11 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                label.setIcon(AceImages.errorIcon);
                
                break;
+                
+            case OMG :
+               label.setIcon(AceImages.errorIcon);
+               
+               break;
                
             case INFORMATIONAL :
                label.setIcon(AceImages.informationalIcon);
