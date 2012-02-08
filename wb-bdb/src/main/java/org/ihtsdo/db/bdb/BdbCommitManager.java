@@ -103,9 +103,9 @@ public class BdbCommitManager {
     private static long lastCancel = Integer.MIN_VALUE;
     private static Semaphore dbWriterPermit = new Semaphore(PERMIT_COUNT);
     private static List<I_TestDataConstraints> creationTests =
-            new LinkedList<I_TestDataConstraints>();
+            new ArrayList<I_TestDataConstraints>();
     private static List<I_TestDataConstraints> commitTests =
-            new LinkedList<I_TestDataConstraints>();
+            new ArrayList<I_TestDataConstraints>();
     private static ThreadGroup commitManagerThreadGroup =
             new ThreadGroup("commit manager threads");
     private static ExecutorService changeSetWriterService;
