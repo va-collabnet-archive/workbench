@@ -117,7 +117,9 @@ public abstract class AbstractDataConstraintTest extends AbstractTask implements
                     Alerter alert = new Alerter(showAlertOnFailure, worker.getLogger(), failure);
                     alert.alert();
                 }
-                if (failure.getAlertType().equals(AlertToDataConstraintFailure.ALERT_TYPE.ERROR)) {
+                if (failure.getAlertType().equals(AlertToDataConstraintFailure.ALERT_TYPE.ERROR )) {
+                    noFailures = false;
+                }else if(failure.getAlertType().equals(AlertToDataConstraintFailure.ALERT_TYPE.OMG)){
                     noFailures = false;
                 }
             }
