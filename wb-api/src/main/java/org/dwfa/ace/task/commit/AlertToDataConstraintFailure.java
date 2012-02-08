@@ -33,7 +33,7 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 public class AlertToDataConstraintFailure {
 
     public enum ALERT_TYPE {
-        INFORMATIONAL, WARNING, ERROR, RESOLVED
+        INFORMATIONAL, WARNING, ERROR, RESOLVED, OMG
     };
 
     private ALERT_TYPE alertType;

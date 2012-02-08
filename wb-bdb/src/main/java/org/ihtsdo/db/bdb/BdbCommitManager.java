@@ -1083,6 +1083,32 @@ public class BdbCommitManager {
                 return fileName.toLowerCase().endsWith(".task");
             }
         });
+        
+        File omgDir = new File(componentPluginDir + File.separator + "priority");
+        if(omgDir.exists()){
+            File[] omg = omgDir.listFiles(new FilenameFilter() {
+
+                @Override
+                public boolean accept(File arg0, String fileName) {
+                    return fileName.toLowerCase().endsWith(".task");
+                }
+            });
+            if(omg != null){
+                for (File f : omg) {
+                try {
+                    FileInputStream fis = new FileInputStream(f);
+                    BufferedInputStream bis = new BufferedInputStream(fis);
+                    ObjectInputStream ois = new ObjectInputStream(bis);
+                    I_TestDataConstraints test = (I_TestDataConstraints) ois.readObject();
+
+                    ois.close();
+                    list.add(test);
+                } catch (Exception e) {
+                    AceLog.getAppLog().alertAndLog(Level.WARNING, "Processing: " + f.getAbsolutePath(), e);
+                }
+            }
+            }
+        }
 
         if (plugins != null) {
             for (File f : plugins) {
@@ -1461,9 +1487,12 @@ public class BdbCommitManager {
 
                     try {
                         Collection<AlertToDataConstraintFailure> result = test.test(c, true);
-
                         runnerAlerts.addAll(result);
-
+                        for(AlertToDataConstraintFailure fail : result){
+                            if(fail.getAlertType().equals(AlertToDataConstraintFailure.ALERT_TYPE.OMG)){
+                                return runnerAlerts;
+                            }
+                        }
                         if (canceled) {
                             return runnerAlerts;
                         }

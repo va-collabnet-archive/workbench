@@ -35,8 +35,8 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/commit", type = BeanType.TASK_BEAN),
-                   @Spec(directory = "plugins/precommit", type = BeanType.TASK_BEAN),
-                   @Spec(directory = "plugins/commit", type = BeanType.TASK_BEAN) })
+                   @Spec(directory = "plugins/precommit/priority", type = BeanType.TASK_BEAN),
+                   @Spec(directory = "plugins/commit/priority", type = BeanType.TASK_BEAN) })
 public class TestForIsaCycle extends AbstractConceptTest {
 
     private static final long serialVersionUID = 1;
@@ -90,7 +90,7 @@ public class TestForIsaCycle extends AbstractConceptTest {
                 }
 
                 if (foundCycle)
-                    alertList.add(new AlertToDataConstraintFailure(AlertToDataConstraintFailure.ALERT_TYPE.ERROR,
+                    alertList.add(new AlertToDataConstraintFailure(AlertToDataConstraintFailure.ALERT_TYPE.OMG,
                         "<html>Added IS_A relationship will create a cycle. ", concept));
             return alertList;
         } catch (Exception e) {
