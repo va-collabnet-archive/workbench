@@ -31,7 +31,7 @@ public class RF2InferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 	private File targetDirectory;
 
 	/**
-	 * release date. 20100731
+	 * release date. 
 	 * 
 	 * @parameter
 	 * @required
@@ -39,7 +39,7 @@ public class RF2InferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 	private String releaseDate;
 
 	/**
-	 * previuous release date. 20100731
+	 * previuous release date. 
 	 * 
 	 * @parameter
 	 * @required

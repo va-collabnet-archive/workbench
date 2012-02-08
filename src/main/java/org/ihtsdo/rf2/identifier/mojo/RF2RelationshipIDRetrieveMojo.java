@@ -17,7 +17,7 @@ import org.ihtsdo.rf2.postexport.RF2ArtifactPostExportAbst.FILE_TYPE;
 /**
  * Goal which sorts and generates delta, snapshot.
  * 
- * @goal rf2-inferred-relationships-id-reassign
+ * @goal rf2-relationships-id-reassign
  * 
  */
 public class RF2RelationshipIDRetrieveMojo extends ReleaseConfigMojo {
@@ -96,7 +96,6 @@ public class RF2RelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 			FILE_TYPE fileType=getRelFileType(relationshiptFileType);
 			previousRelationshipFullFile = getPreviousFile(previousFullFolder,fileType);
 
-
 			File folderTmp=new File(targetDirectory.getAbsolutePath() + "/" + getTmpPostExport() );
 			if (!folderTmp.exists()){
 				folderTmp.mkdir();
@@ -127,15 +126,12 @@ public class RF2RelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 			fsc=null;
 			System.gc();
 
-
 			File sortedExportedfile=new File(sortedfolderTmp,"exp_" + exportedRelationshipFile.getName());
 
 			fsc=new FileSorter(exportedRelationshipFile, sortedExportedfile, sortTmpfolderSortedTmp, FILE_TYPE.RF2_RELATIONSHIP.getColumnIndexes());
 			fsc.execute();
 			fsc=null;
 			System.gc();
-
-
 
 			File snapshotfolderTmp=new File(folderTmp.getAbsolutePath() + "/" + getTmpSnapShot() );
 			if (!snapshotfolderTmp.exists()){

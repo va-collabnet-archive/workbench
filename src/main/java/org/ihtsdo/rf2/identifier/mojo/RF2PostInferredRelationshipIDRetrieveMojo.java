@@ -25,7 +25,7 @@ import org.ihtsdo.rf2.postexport.RF2ArtifactPostExportAbst.FILE_TYPE;
 /**
  * Goal which sorts and generates delta, snapshot.
  * 
- * @goal rf2-inferred-relationships-id-reassign
+ * @goal rf2-relationships-id-reassign-previous-not-released
  * 
  */
 public class RF2PostInferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
@@ -39,7 +39,7 @@ public class RF2PostInferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo
 	private File targetDirectory;
 
 	/**
-	 * release date. 20100731
+	 * release date. 
 	 * 
 	 * @parameter
 	 * @required
@@ -47,7 +47,7 @@ public class RF2PostInferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo
 	private String releaseDate;
 
 	/**
-	 * previuous release date. 20100731
+	 * previuous release date. 
 	 * 
 	 * @parameter
 	 * @required
@@ -63,13 +63,12 @@ public class RF2PostInferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo
 	private String exportedSnapshotFile;
 
 	/**
-	 * Location of the rf2 full. (input in this mojo)
+	 * Location of the previous Id not released file. (input in this mojo)
 	 * 
 	 * @parameter
 	 * @required
 	 */
-	private String previousNotReleasedRelsFile;
-
+	private String previousIdNotReleasedFile;
 	/**
 	 * Location of the outputFolder. (output in this mojo)
 	 * 
@@ -93,8 +92,11 @@ public class RF2PostInferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo
 
 		File previousNotReleasedFile;
 		try {
-			previousNotReleasedFile = new File (previousNotReleasedRelsFile);
+			previousNotReleasedFile= new File(previousIdNotReleasedFile);
 
+			if (!previousNotReleasedFile.exists()){
+				previousNotReleasedFile.createNewFile();
+			}
 			File folderTmp=new File(targetDirectory.getAbsolutePath() + "/" + getTmpPostExport() );
 			if (!folderTmp.exists()){
 				folderTmp.mkdir();
@@ -132,8 +134,6 @@ public class RF2PostInferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo
 			fsc=null;
 			System.gc();
 
-
-
 			File snapshotfolderTmp=new File(folderTmp.getAbsolutePath() + "/" + getTmpSnapShot() );
 			if (!snapshotfolderTmp.exists()){
 				snapshotfolderTmp.mkdir();
@@ -146,13 +146,11 @@ public class RF2PostInferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo
 			sg=null;
 			System.gc();
 
-
 			File snapshotSortedExportedfile=new File(snapshotfolderTmp,"exp_" + exportedRelationshipFile.getName());
 			sg=new SnapshotGenerator(sortedExportedfile, releaseDate, FILE_TYPE.RF2_RELATIONSHIP.getSnapshotIndex(), 1, snapshotSortedExportedfile, null, null);
 			sg.execute();
 			sg=null;
 			System.gc();
-
 
 			File sortedSnapPreviousfile=new File(snapshotfolderTmp,"sortSnappre_" + previousNotReleasedFile.getName());	
 			fsc=new FileSorter(snapshotSortedPreviousfile, sortedSnapPreviousfile, sortTmpfolderSortedTmp,new int[]{4,7,5,2,1,6});
@@ -260,6 +258,8 @@ public class RF2PostInferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo
 				System.gc();
 				
 			}
+			
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
