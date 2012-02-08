@@ -50,4 +50,6 @@ public interface TerminologyTransactionDI {
    void clearInferredIsaCache();
    
    void addInferredParents(ViewCoordinate vc, IsaCoordinate isac, int cnid, int[] parentNids) throws IOException;
+   
+   void setIsaCacheAsComplete(IsaCoordinate isac) throws IOException;
 }

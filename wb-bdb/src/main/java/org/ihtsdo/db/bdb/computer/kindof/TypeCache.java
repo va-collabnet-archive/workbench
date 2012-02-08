@@ -58,6 +58,10 @@ public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnab
 	public boolean isReady() {
 		return ready;
 	}
+	
+	public void setReady(boolean ready) {
+		this.ready = ready;
+	}
 
 	public TypeCache() {
 		super();

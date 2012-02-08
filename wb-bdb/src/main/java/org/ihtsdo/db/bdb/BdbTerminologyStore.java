@@ -751,5 +751,10 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
        KindOfComputer.addToIsaCache(vc, isac, cnid, parentNids);
     }
     
+    @Override
+    public void setIsaCacheAsComplete(IsaCoordinate isac) throws IOException {
+    	KindOfComputer.setIsaCacheAsComplete(isac);
+    }
+    
    
 }

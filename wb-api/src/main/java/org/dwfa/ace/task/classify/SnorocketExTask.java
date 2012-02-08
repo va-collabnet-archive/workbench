@@ -682,6 +682,7 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
                 }
             } 
             ts.addInferredParents(vc, isac, c1Nid, parents.getSetValues()); 
+            ts.setIsaCacheAsComplete(isac);
 
             if (debugDump) {
                 dumpSnoRel(cRocketSnoRels, "SnoRelInferData_full.txt", 4);

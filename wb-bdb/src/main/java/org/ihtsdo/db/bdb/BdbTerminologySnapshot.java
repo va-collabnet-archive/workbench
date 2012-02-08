@@ -209,4 +209,9 @@ public class BdbTerminologySnapshot implements TerminologySnapshotDI {
     public void addInferredParents(ViewCoordinate vc, IsaCoordinate isac, int cnid, int[] parentNids) throws IOException {
        KindOfComputer.addToIsaCache(vc, isac, cnid, parentNids);
     }
+    
+    @Override
+    public void setIsaCacheAsComplete(IsaCoordinate isac) throws IOException {
+    	KindOfComputer.setIsaCacheAsComplete(isac);
+    }
 }

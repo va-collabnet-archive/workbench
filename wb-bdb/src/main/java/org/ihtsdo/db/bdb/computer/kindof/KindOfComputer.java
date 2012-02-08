@@ -119,6 +119,11 @@ public class KindOfComputer {
         cache.setParents(cnid, parentNids);
     }
     
+    public static void setIsaCacheAsComplete(IsaCoordinate isac) throws IOException {
+        IsaCache cache = isaCache.get(isac);
+        cache.setReady(true);
+    }
+    
     @Deprecated
     public static void updateIsaCachesUsingStatedView(ConceptChronicleBI c) throws Exception {
         updateIsaCaches(c);
