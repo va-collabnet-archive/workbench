@@ -122,6 +122,8 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.FsnGenerationStrategy;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.IcsGenerationStrategy;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.PreferredTermDefault;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
+import org.ihtsdo.translation.ui.translation.CommentPanel;
+import org.ihtsdo.translation.ui.translation.NewCommentPanel;
 
 /**
  * The Class TranslationConceptEditor.

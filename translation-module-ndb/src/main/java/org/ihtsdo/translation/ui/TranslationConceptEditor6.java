@@ -138,6 +138,8 @@ import org.ihtsdo.translation.TreeEditorObjectWrapper;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.EditingPanelOpenMode;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.EditorMode;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
+import org.ihtsdo.translation.ui.translation.CommentPanel;
+import org.ihtsdo.translation.ui.translation.NewCommentPanel;
 
 /**
  * The Class TranslationConceptEditor6.

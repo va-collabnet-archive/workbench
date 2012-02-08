@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.ihtsdo.translation.ui;
+package org.ihtsdo.translation.ui.translation;
 
 import java.awt.Font;
 import java.awt.GridBagConstraints;

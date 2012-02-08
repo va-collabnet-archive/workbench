@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.ihtsdo.translation.ui;
+package org.ihtsdo.translation.ui.translation;
 
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -198,7 +198,7 @@ public class NewCommentPanel extends JPanel {
 				new Insets(0, 0, 0, 5), 0, 0));
 
 			//---- label3 ----
-			label3.setText("Subtype");
+			label3.setText("Subtyped");
 			panel1.add(label3, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 5), 0, 0));
@@ -224,28 +224,13 @@ public class NewCommentPanel extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
-	/** The label1. */
 	private JLabel label1;
-	
-	/** The panel1. */
 	private JPanel panel1;
-	
-	/** The label2. */
 	private JLabel label2;
-	
-	/** The combo box1. */
 	private JComboBox comboBox1;
-	
-	/** The label3. */
 	private JLabel label3;
-	
-	/** The combo box2. */
 	private JComboBox comboBox2;
-	
-	/** The scroll pane2. */
 	private JScrollPane scrollPane2;
-	
-	/** The txt comm. */
 	private JTextArea txtComm;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

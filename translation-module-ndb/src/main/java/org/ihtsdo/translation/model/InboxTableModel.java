@@ -265,15 +265,6 @@ public class InboxTableModel extends DefaultTableModel {
 		return morePages;
 	}
 
-	/**
-	 * Gets the real column size.
-	 *
-	 * @return the real column size
-	 */
-	public int getRealColumnSize() {
-		return InboxColumn.values().length;
-	}
-
 	/* (non-Javadoc)
 	 * @see javax.swing.table.DefaultTableModel#getColumnCount()
 	 */

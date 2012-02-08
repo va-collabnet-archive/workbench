@@ -118,6 +118,8 @@ import org.ihtsdo.translation.LanguageUtil;
 import org.ihtsdo.translation.SimilarityMatchedItem;
 import org.ihtsdo.translation.TreeEditorObjectWrapper;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
+import org.ihtsdo.translation.ui.translation.CommentPanel;
+import org.ihtsdo.translation.ui.translation.NewCommentPanel;
  
  /**
   * The Class TranslationConceptEditor5.
