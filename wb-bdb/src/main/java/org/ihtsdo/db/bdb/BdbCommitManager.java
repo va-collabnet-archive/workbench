@@ -64,12 +64,7 @@ import java.io.ObjectInputStream;
 
 import java.lang.reflect.InvocationTargetException;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -108,9 +103,9 @@ public class BdbCommitManager {
     private static long lastCancel = Integer.MIN_VALUE;
     private static Semaphore dbWriterPermit = new Semaphore(PERMIT_COUNT);
     private static List<I_TestDataConstraints> creationTests =
-            new ArrayList<I_TestDataConstraints>();
+            new LinkedList<I_TestDataConstraints>();
     private static List<I_TestDataConstraints> commitTests =
-            new ArrayList<I_TestDataConstraints>();
+            new LinkedList<I_TestDataConstraints>();
     private static ThreadGroup commitManagerThreadGroup =
             new ThreadGroup("commit manager threads");
     private static ExecutorService changeSetWriterService;
@@ -1488,16 +1483,17 @@ public class BdbCommitManager {
                     try {
                         Collection<AlertToDataConstraintFailure> result = test.test(c, true);
                         runnerAlerts.addAll(result);
-                        for(AlertToDataConstraintFailure fail : result){
-                            if(fail.getAlertType().equals(AlertToDataConstraintFailure.ALERT_TYPE.OMG)){
-                                return runnerAlerts;
-                            }
-                        }
                         if (canceled) {
                             return runnerAlerts;
                         }
 
                         publish(result);
+                        
+                        for(AlertToDataConstraintFailure fail : result){
+                            if(fail.getAlertType().equals(AlertToDataConstraintFailure.ALERT_TYPE.OMG)){
+                                return runnerAlerts;
+                            }
+                        }
 
                         Collection<RefsetMember<?, ?>> extensions = c.getExtensions();
 
