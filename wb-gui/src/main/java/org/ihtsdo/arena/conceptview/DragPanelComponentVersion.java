@@ -138,30 +138,11 @@ public abstract class DragPanelComponentVersion<T extends ComponentVersionBI> ex
 
       Collection<? extends RefexVersionBI<?>> refexes =
          getThingToDrag().getCurrentRefexes(getSettings().getConfig().getViewCoordinate());
-      Set<Integer> refexIds         = new HashSet<Integer>();
-      Set<Integer> refexIdsWithDups = new HashSet<Integer>();
-
-      for (RefexVersionBI<?> rx : refexes) {
-         if (refexIds.contains(rx.getCollectionNid())) {
-            refexIdsWithDups.add(rx.getCollectionNid());
-         } else {
-            refexIds.add(rx.getCollectionNid());
-         }
-      }
-
+      
       Collection<? extends RefexVersionBI<?>> tempRefexList =
          getThingToDrag().getInactiveRefexes(getSettings().getConfig().getViewCoordinate());
 
-      for (RefexVersionBI<?> rx : tempRefexList) {
-         if (refexIds.contains(rx.getCollectionNid())) {
-            refexIdsWithDups.add(rx.getCollectionNid());
-         } else {
-            refexIds.add(rx.getCollectionNid());
-         }
-      }
-
       for (RefexVersionBI<?> rx : refexes) {
-         if (!refexIdsWithDups.contains(rx.getCollectionNid())) {
             DragPanelExtension dpe = new DragPanelExtension(viewLayout, getParentCollapsePanel(), rx);
 
             getSettings().getView().getSeperatorComponents().add(dpe);
@@ -171,11 +152,9 @@ public abstract class DragPanelComponentVersion<T extends ComponentVersionBI> ex
             add(dpe, gbc);
             refexSubPanels.add(dpe);
             gbc.gridy++;
-         }
       }
 
       for (RefexVersionBI<?> rx : tempRefexList) {
-         if (!refexIdsWithDups.contains(rx.getCollectionNid())) {
             DragPanelExtension dpe = new DragPanelExtension(viewLayout, getParentCollapsePanel(), rx);
 
             getSettings().getView().getSeperatorComponents().add(dpe);
@@ -186,7 +165,6 @@ public abstract class DragPanelComponentVersion<T extends ComponentVersionBI> ex
             add(dpe, gbc);
             historicalRefexSubPanels.add(dpe);
             gbc.gridy++;
-         }
       }
 
       historicalRefexSubPanelCount = 0;
@@ -194,11 +172,9 @@ public abstract class DragPanelComponentVersion<T extends ComponentVersionBI> ex
 
       // add reviesed refexes to count
       for (RefexVersionBI<?> rx : refexes) {
-         if (!refexIdsWithDups.contains(rx.getCollectionNid())) {
             if (rx.getVersions().size() > 1) {
                historicalRefexSubPanelCount++;
             }
-         }
       }
    }
 
