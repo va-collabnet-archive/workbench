@@ -56,6 +56,7 @@ public class RF2HistoricalAssociationRelationshipImpl extends RF2AbstractImpl im
 			String effectiveTime = "";
 			String relTypeId = "";
 			String active = "";
+			String releaseDate=getConfig().getReleaseDate();
 			String targetComponent = "";
 			String moduleId = I_Constants.CORE_MODULE_ID;
 			int relationshipStatusId=0;
@@ -161,7 +162,7 @@ public class RF2HistoricalAssociationRelationshipImpl extends RF2AbstractImpl im
 						}
 							
 						logger.info("==uuid== " +uuid + "  ==wbrelationshipId== " + wbrelationshipId + "  ==characteristicTypeId== " + characteristicTypeId + "   ==relationshipGroup== " + relationshipGroup);
-						writeRF2TypeLine(wbrelationshipId , "20120131", active, moduleId, referencedComponentId, wstargetComponent, 0, relTypeId, "-1", modifierId);							
+						writeRF2TypeLine(wbrelationshipId ,releaseDate , active, moduleId, referencedComponentId, wstargetComponent, 0, relTypeId, "-1", modifierId);							
 						}
 					}
 				}

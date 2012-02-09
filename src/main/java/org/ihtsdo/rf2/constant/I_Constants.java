@@ -10,7 +10,7 @@ package org.ihtsdo.rf2.constant;
 public class I_Constants {
 
 	public final static String CORE_MODULE_ID = "900000000000207008";
-	public final static String META_MOULE_ID = "900000000000012004";
+	public final static String META_MODULE_ID = "900000000000012004";
 	public final static String META_SCTID = "900000000000441003";
 
 	// set definitionStatus Id

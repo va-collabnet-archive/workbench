@@ -141,7 +141,7 @@ public class RF2PostInferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo
 				//TODO empty folder needed?
 			}
 			File snapshotSortedPreviousfile=new File(snapshotfolderTmp,"pre_" + previousNotReleasedFile.getName());
-			SnapshotGenerator sg=new SnapshotGenerator(sortedPreviousfile, previousReleaseDate, FILE_TYPE.RF2_RELATIONSHIP.getSnapshotIndex(), 1, snapshotSortedPreviousfile, null, null);
+			SnapshotGenerator sg=new SnapshotGenerator(sortedPreviousfile, releaseDate, FILE_TYPE.RF2_RELATIONSHIP.getSnapshotIndex(), 1, snapshotSortedPreviousfile, null, null);
 			sg.execute();
 			sg=null;
 			System.gc();

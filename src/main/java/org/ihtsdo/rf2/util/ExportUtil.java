@@ -477,7 +477,7 @@ public class ExportUtil {
 					    		 && effectivetime.compareTo(conEffectiveTime)<=0 
 					    		 && active.equals("1")
 					    		 && prevET.compareTo(effectivetime)<0){
-					    	 moduleId = I_Constants.META_MOULE_ID;     
+					    	 moduleId = I_Constants.META_MODULE_ID;     
 					    	 prevET=effectivetime;
 					     }
 			    	} 
@@ -755,7 +755,7 @@ public class ExportUtil {
 			    	//need to sort effectivetime issue
 			    	if(snomedIntegerId.equals(conceptid) //&& effectivetime.equals(effectivetime)
 			    	){
-			    		moduleId = I_Constants.META_MOULE_ID;
+			    		moduleId = I_Constants.META_MODULE_ID;
 			    		break;
 			    	}
 					else {
