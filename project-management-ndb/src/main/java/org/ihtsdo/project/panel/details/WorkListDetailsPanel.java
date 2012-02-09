@@ -55,7 +55,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.table.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -92,12 +95,6 @@ public class WorkListDetailsPanel extends JPanel {
 	/** The config. */
 	private I_ConfigAceFrame config;
 	
-	/** The worker. */
-	private I_Work worker;
-	
-	/** The business process. */
-	private BusinessProcess businessProcess;
-	
 	/** The transl project. */
 	private TranslationProject translProject;
 	
@@ -118,7 +115,6 @@ public class WorkListDetailsPanel extends JPanel {
 		initComponents();
 		this.workList = workList;
 		this.config = config;
-		this.worker = worker;
 		translProject = (TranslationProject) TerminologyProjectDAO.getProjectForWorklist(workList, config);
 		label13.setIcon(IconUtilities.helpIcon);
 		label13.setText("");
@@ -1475,4 +1471,4 @@ class WorklistMembersWorker extends SwingWorker<String, Object[]> {
 		}
 	}
 
-};
+}
