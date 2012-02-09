@@ -71,6 +71,32 @@ import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 /**
+ * SnorocketMojo runs the IHTSDO (Snorocket) Classifier as a maven mojo.<br><br>
+ * <i>All parameters are specified in the maven POM file.
+ * An IHTSDO Workbench database must be provided for this mojo.</i><br>
+ * <pre>
+ * maven goal: &lt;goal&gt;run-snorocket&lt;/goal&gt;
+ *
+ * maven parameters:
+ *   &lt;berkeleyDir&gt;    default = "${project.build.directory}/generated-resources/berkeley-db"
+ *
+ *   &lt;uuidRoleRoot&gt;   default = "6155818b-09ed-388e-82ce-caa143423e99" Concept model attribute
+ *
+ *   &lt;uuidEditPath&gt;   example = "8c230474-9f11-30ce-9cad-185a96fd03a2" SNOMED Core
+ *
+ *   &lt;dateTimeStr&gt;             use yyyy.MM.dd HH:mm:ss format
+ *                             sets ViewPosition time of test
+ *
+ *   &lt;enableDbWriteback&gt;       default = "false"
+ *
+ *   &lt;includeInactiveConcepts&gt; default = "false"
+ *
+ *   &lt;reportChanges&gt;         optional filename value, example = "ReportChanges"
+ *                           if no value provided, then no report is generated
+ *
+ *   &lt;reportEquivalences&gt;    optional filename value, example = "ReportEquiv"
+ *                           if no value provided, then no report is generated
+ * </pre>
  * 
  * @goal run-snorocket
  *

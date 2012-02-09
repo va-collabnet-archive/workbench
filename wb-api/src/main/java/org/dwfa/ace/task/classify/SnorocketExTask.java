@@ -78,20 +78,30 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 /**
+ * SnorocketExTask runs the IHTSDO (Snorocket) Classifier Task.
+ * SnorocketExTask is an extended version which includes inactive concepts.<br>
+ * <br>
+ * SnorocketExTask does the following:<br><ol>
+ * <li>retrieve concepts and relationships from the Stated Edit Path of the Berkeley Database</li>
+ * <li>load concepts and relationships into the classifier</li>
+ * <li>run the classifier</li>
+ * <li>retrieve and report equivalent concepts</li>
+ * <li>retrieve and compare results to the inferred relationships in the database</li>
+ * <li>report and write back inferred relationships changes to the database</li>
+ * </ol>
+ * <i>All runtime parameters are from the workbench environment preference settings.</i><br>
+ * <br>
+ * The recommended default preference settings are as follows:<br><ul>
+ * <li>Preferences > classifier > Classifier Input Mode: edit path</li>
+ * <li>Preferences > classifier > Classification Root: SNOMED CT Concept (SNOMED RT+CTV3)</li>
+ * <li>Preferences > classifier > Role root: Concept model attribute (attribute)</li>
+ * <li>Preferences > classifier > Classification 'Is a': Is a (attribute)</li>
+ * <li>Preferences > classifier > Classifier identity: IHTSDO Classifier </li>
+ * <li>Preferences > chronicler > precedence > path precedence </li>
+ * <li>Preferences > chronicler > contradiction > Identify all conflicts </li>
+ * <li>Preferences > path > configure > <i>only one</i> 'Edit on this path' <i>should be selected</i></li>
+ * </ul>
  *
- * SnorocketExTask retrieves concepts and relationship from the stated edit path and load the same to the
- * IHTSDO (Snorocket) classifier.
- *
- * Classification is run and the resulting inferred relationships is written back to the database.
- *
- * <ul> <li>The is-a relationship is unique to the classification. For example, the SNOMED is-a has a
- * different concept id than the ace-auxiliary is-a relationship. So every concept (except the concept root)
- * will have at least one is-a relationship of the proper type. <li>There is a single root concept, and that
- * root is part of the set of included concept <li>Assumes that the versions are linear, independent of path,
- * and therefore the status with the latest date on an allowable path is the latest status. <li>Only current
- * concepts and relationships are to be used and that all other statuses will can be filtered out.
- *
- * <ul> </ol> <p> <p> <ul>
  */
 @BeanList(specs = {
     @Spec(directory = "tasks/ide/classify", type = BeanType.TASK_BEAN)})
@@ -174,6 +184,11 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
         }
     }
 
+    /**
+     * actionPerformed sets an internal flag to stop the SnorocketExTask from proceeding to the next
+     * step in processing.
+     * @param arg0 
+     */
     @Override
     public void actionPerformed(ActionEvent arg0) {
         continueThisAction = false;
@@ -284,10 +299,12 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
     }
 
     /**
-     * POSSIBLE APPROACHES FOR RECIEVING DATA FROM NEW DATABASE<br> 1. Get List<SnoCon>, use List<SnoCon> as
-     * post processing filter.<br> 2. Get List<SnoCon>, use List<SnoCon> as filter in second pass.<br> 3. Get
-     * List<SnoCon>, use List<SnoCon> in individually get Rels in loop.<br> 4. Check relationship C2 while
-     * processing path.<br> 5. Modify processConcepts internal.<br>
+     * evaluate will run Snorocket based on the workbench preference settings.
+     *
+     * @param process
+     * @param worker
+     * @return
+     * @throws TaskFailedException
      */
     @Override
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
@@ -1597,11 +1614,21 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
         return s.toString();
     }
 
+    /**
+     * complete does not perform any additional processing.
+     * @param process
+     * @param worker
+     * @throws TaskFailedException 
+     */
     @Override
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // nothing to do.
     }
 
+    /**
+     * getConditions returns CONTINUE_CONDITION.
+     * @return
+     */
     @Override
     public Collection<Condition> getConditions() {
         return CONTINUE_CONDITION;
