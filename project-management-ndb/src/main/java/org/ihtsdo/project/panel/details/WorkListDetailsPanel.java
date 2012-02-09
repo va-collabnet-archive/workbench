@@ -119,7 +119,7 @@ public class WorkListDetailsPanel extends JPanel {
 		this.workList = workList;
 		this.config = config;
 		this.worker = worker;
-
+		translProject = (TranslationProject) TerminologyProjectDAO.getProjectForWorklist(workList, config);
 		label13.setIcon(IconUtilities.helpIcon);
 		label13.setText("");
 		pBarW.setVisible(false);

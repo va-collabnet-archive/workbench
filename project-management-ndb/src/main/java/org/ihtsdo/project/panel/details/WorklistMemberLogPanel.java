@@ -246,6 +246,7 @@ public class WorklistMemberLogPanel extends JPanel {
 		lstHeaders.add("Comment");
 		lstHeaders.add("Issue");
 
+		String[] lastObjectStringdata=new String[lstHeaders.size()];
 		for (Integer did:hashVarCol.keySet()){
 			hashVarCol.put(did, lstHeaders.size());
 			lstHeaders.add("Desc Id: " + did);
@@ -261,10 +262,9 @@ public class WorklistMemberLogPanel extends JPanel {
 		Rectangle2D bounds;
 		int tmpWidth;
 		int tmpHeight;
-		int rowCount=-1;
+		int rowCount=0;
 		for (String key: hashList.keySet()){
 			locList=hashList.get(key);
-			rowCount++;
 			String[] objStringdata=new String[lstHeaders.size()];
 			objStringdata[1]=key;
 			bounds = fontMetrics.getStringBounds(objStringdata[1], null);  
@@ -443,8 +443,26 @@ public class WorklistMemberLogPanel extends JPanel {
 
 				}				
 			}
-			dataVecList.add(objStringdata);
+			boolean emptyRow = true;
+			for(int i = 0; i < lastObjectStringdata.length; i++){
+				if(lastObjectStringdata[i] != null){
+					emptyRow = false;
+				}
+			}
+			if (emptyRow) {
+				lastObjectStringdata = objStringdata;
+			} else if (lastObjectStringdata[0] != null && objStringdata[0] != null && lastObjectStringdata[2] != null
+					&& objStringdata[2] != null && lastObjectStringdata[0].equals(objStringdata[0]) 
+					&& lastObjectStringdata[2].equals(objStringdata[2])) {
+				lastObjectStringdata = objStringdata;
+			} else {
+				dataVecList.add(lastObjectStringdata);
+				rowCount++;
+				lastObjectStringdata = objStringdata;
+			}
 		}
+		dataVecList.add(lastObjectStringdata);
+		rowCount++;
 
 		String[][] data = new String[dataVecList.size()][lstHeaders.size()];
 		dataVecList.toArray(data);
