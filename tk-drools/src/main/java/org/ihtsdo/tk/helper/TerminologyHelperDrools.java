@@ -91,7 +91,7 @@ public class TerminologyHelperDrools {
 				retString=(String)words.get(word);
 			}
 		}catch(Exception e){
-			System.out.println("Exception in TerminologyHelperDrools.checkWordInList: " + e);
+			//System.out.println("Exception in TerminologyHelperDrools.checkWordInList: " + e);
 		}
 		return retString;
 	}
@@ -311,7 +311,7 @@ public class TerminologyHelperDrools {
 			}
 			in.close();
 		}catch(Exception e){
-			System.out.println("Exception in TerminologyHelperDrools.LoadProperties: " + e);
+			//System.out.println("Exception in TerminologyHelperDrools.LoadProperties: " + e);
 			propsLoaded=false;
 			return false;
 		}
