@@ -1261,9 +1261,9 @@ public class ExportUtil {
 		String snomedId = "";
 		try {
 			snomedId = idGen.getSNOMEDID(uuid);
-			if(snomedId.equals("") || snomedId.equals(null)){	}
-			else
-				logger.info("=====SnomedId exist in the ID repository===" + snomedId);
+//			if(snomedId.equals("") || snomedId.equals(null)){	}
+//			else
+//				logger.info("=====SnomedId exist in the ID repository===" + snomedId);
 			
 		} catch (NullPointerException e) {
 			// there is no SCTID so we are getting NULL
@@ -1336,9 +1336,9 @@ public class ExportUtil {
 
 		try {
 			ctv3Id = idGen.getCTV3ID(uuid);
-			if(ctv3Id.equals("") || ctv3Id.equals(null) ){	}
-			else
-				logger.info("====Ctv3Id already exist in the ID repository===" + ctv3Id);
+//			if(ctv3Id.equals("") || ctv3Id.equals(null) ){	}
+//			else
+//				logger.info("====Ctv3Id already exist in the ID repository===" + ctv3Id);
 		} catch (NullPointerException e) {
 			// there is no SCTID so we are getting NULL
 			if (logger.isDebugEnabled())

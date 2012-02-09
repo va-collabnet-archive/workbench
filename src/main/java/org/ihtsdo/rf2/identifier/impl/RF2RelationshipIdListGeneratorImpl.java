@@ -240,7 +240,6 @@ public class RF2RelationshipIdListGeneratorImpl extends RF2IDImpl {
 							UUID uuid= null;
 							try {
 								uuid = Type5UuidFactory.get(part[4] + part[5] + part[7] + part[6]);	// sourceId + destinationId + typeId + relationshipGroup
-								logger.info("Inferred relationship uuid sending to webservice "  +uuid);
 
 								Long lSctId=null;
 								if (hmTmp!=null){
@@ -252,6 +251,7 @@ public class RF2RelationshipIdListGeneratorImpl extends RF2IDImpl {
 									sctid=String.valueOf(lSctId);
 								}else{
 									//sctid = getSCTId(getConfig(), UUID.fromString(uuid) , Integer.parseInt(namespaceId), partitionId , releaseId , executionId , moduleId);
+									logger.info("Inferred relationship uuid sending to webservice "  +uuid);
 									sctid = getSCTId(getConfig(), uuid , Integer.parseInt(namespaceId), partitionId , releaseId , executionId , moduleId);
 									if(sctid.equals("0")){
 										//sctid = getSCTId(getConfig(), UUID.fromString(uuid) , Integer.parseInt(namespaceId), partitionId , releaseId , executionId , moduleId);
@@ -331,7 +331,6 @@ public class RF2RelationshipIdListGeneratorImpl extends RF2IDImpl {
 								String uuid=part[colIx];
 								if(uuid.contains("-")){	
 									uuid = Type5UuidFactory.get(part[4] + part[5] + part[7] + part[6]).toString();	// sourceId + destinationId + typeId + relationshipGroup
-									logger.info("Inferred relationship uuid map "  +uuid);
 
 									list.add(UUID.fromString(uuid));
 
@@ -348,6 +347,7 @@ public class RF2RelationshipIdListGeneratorImpl extends RF2IDImpl {
 								String releaseId =  getConfig().getRf2Files().get(f).sctidparam.releaseId;
 								String executionId = getConfig().getRf2Files().get(f).sctidparam.executionId;
 								String moduleId = getConfig().getRf2Files().get(f).sctidparam.moduleId;			
+								logger.info(list.size() + " inferred relationships in list sending to web service.");
 
 								res=getSCTIdList(getConfig(),list,Integer.parseInt(namespaceId), partitionId, releaseId, executionId,"1");
 
