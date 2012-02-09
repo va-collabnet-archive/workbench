@@ -59,13 +59,13 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 @BeanList(specs = 
 { @Spec(directory = "tasks/workflow2", type = BeanType.TASK_BEAN)})
 public class PromoteTargetContentToReleasePath extends AbstractTask {
-	
+
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1;
 
 	/** The Constant dataVersion. */
 	private static final int dataVersion = 1;
-	
+
 	/**
 	 * Write object.
 	 * 
@@ -93,7 +93,7 @@ public class PromoteTargetContentToReleasePath extends AbstractTask {
 		}
 
 	}
-	
+
 	/**
 	 * Instantiates a new creates the new project.
 	 * 
@@ -112,40 +112,46 @@ public class PromoteTargetContentToReleasePath extends AbstractTask {
 			I_ConfigAceFrame config = (I_ConfigAceFrame) worker
 			.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 			TerminologyStoreDI ts = Ts.get();
-			
+
 			int activeNid = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid();
-			
+
 			WfInstance instance = (WfInstance) process.readAttachement("WfInstance");
-			
+
 			I_TerminologyProject iproject = TerminologyProjectDAO.getProjectForWorklist(instance.getWorkList(), config);
 			TranslationProject project = (TranslationProject) iproject;
 			int targetLangNid = project.getTargetLanguageRefset().getNid();
 			I_GetConceptData pathConcept = project.getReleasePath();
 			EditCoordinate ec = new EditCoordinate(config.getDbConfig().getUserConcept().getNid(), 
 					pathConcept.getNid());
-			
+
 			TerminologyBuilderBI tc = ts.getTerminologyBuilder(ec, config.getViewCoordinate());
-			
+
 			ConceptChronicleBI concept = Ts.get().getConcept(instance.getComponentId());
-			
+
 			for (DescriptionChronicleBI loopDescription : concept.getDescs()) {
 				DescriptionVersionBI lastDescVersion = loopDescription.getVersion(config.getViewCoordinate());
-				if (lastDescVersion != null && lastDescVersion.getStatusNid() == activeNid) {
+				if (lastDescVersion != null) {
 					DescCAB dcab = lastDescVersion.makeBlueprint(config.getViewCoordinate());
-					tc.construct(dcab);
-					for (RefexVersionBI<?> loopAnnot : loopDescription.getCurrentAnnotationMembers(
-							config.getViewCoordinate(), targetLangNid)) {
-						RefexCnidVersionBI loopAnnotC = (RefexCnidVersionBI) loopAnnot;
-						RefexCAB acab = loopAnnotC.makeBlueprint(config.getViewCoordinate());
-						RefexChronicleBI<?> newRefexForProm = tc.construct(acab);
-						concept.addAnnotation(newRefexForProm);
+					boolean written = false;
+					for (RefexChronicleBI<?> loopAnnotChronicle : loopDescription.getAnnotations()) {
+						if (loopAnnotChronicle.getCollectionNid() == targetLangNid) {
+							if (!written) {
+								tc.construct(dcab);
+								written = true;
+							}
+							RefexVersionBI loopAnnotV = loopAnnotChronicle.getVersion(config.getViewCoordinate());
+							RefexCnidVersionBI loopAnnotC = (RefexCnidVersionBI) loopAnnotV;
+							RefexCAB acab = loopAnnotC.makeBlueprint(config.getViewCoordinate());
+							RefexChronicleBI<?> newRefexForProm = tc.construct(acab);
+							concept.addAnnotation(newRefexForProm);
+						}
 					}
 				}
 			}
-			
+
 			Terms.get().addUncommittedNoChecks((I_GetConceptData) concept);
 			Terms.get().commit();
-			
+
 			return Condition.CONTINUE;
 		} catch (Exception e) {
 			throw new TaskFailedException(e);
@@ -173,5 +179,5 @@ public class PromoteTargetContentToReleasePath extends AbstractTask {
 	public int[] getDataContainerIds() {
 		return new int[] {  };
 	}
-	
+
 }
