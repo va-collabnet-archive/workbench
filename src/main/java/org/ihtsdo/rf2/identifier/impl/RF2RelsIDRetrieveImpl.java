@@ -109,10 +109,10 @@ public class RF2RelsIDRetrieveImpl {
 			
 			if (conceptE==null) break;
 
-			comp=conceptE.compareTo(conceptP);
-			
-			if (conceptE.equals("10042008")){
-				boolean bstop=true;
+			if (conceptP==null){
+				comp=-1;
+			}else{
+				comp=conceptE.compareTo(conceptP);
 			}
 			//			if same concept
 			if (comp==0){
