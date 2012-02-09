@@ -341,7 +341,7 @@ public class ProjectDetailsPanel extends JPanel {
 			releaseCandidateListModel = new DefaultListModel();
 			releaseCandidateList.setModel(releaseCandidateListModel);
 			releaseCandidateListModel.addListDataListener(listDataListener);
-			I_GetConceptData releaseCandidatePath = project.getReleasePathRefset();
+			I_GetConceptData releaseCandidatePath = project.getReleasePath();
 			if(releaseCandidatePath != null){
 				releaseCandidateListModel.addElement(releaseCandidatePath);
 			}

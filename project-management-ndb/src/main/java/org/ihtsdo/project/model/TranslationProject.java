@@ -253,8 +253,8 @@ public class TranslationProject implements I_TerminologyProject, Serializable {
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 * @throws Exception the exception
 	 */
-	public I_GetConceptData getReleasePathRefset() throws TerminologyException, IOException, Exception {
-		return TerminologyProjectDAO.getReleasePathRefsetForProject(this, Terms.get().getActiveAceFrameConfig());
+	public I_GetConceptData getReleasePath() throws TerminologyException, IOException, Exception {
+		return TerminologyProjectDAO.getReleasePathForProject(this, Terms.get().getActiveAceFrameConfig());
 	}
 
 	/**

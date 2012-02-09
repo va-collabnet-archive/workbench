@@ -1077,7 +1077,7 @@ public class TerminologyProjectDAO {
 	public static void setModuleIdRefset(TranslationProject project, I_GetConceptData concept, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 		try {
-			if ((concept != null) && (project.getReleasePathRefset() == null) || (concept.getConceptNid() != project.getReleasePathRefset().getConceptNid())) {
+			if ((concept != null) && (project.getReleasePath() == null) || (concept.getConceptNid() != project.getReleasePath().getConceptNid())) {
 				List<? extends I_RelTuple> targetRefsetRels = null;
 				I_IntSet allowedDestRelTypes = termFactory.newIntSet();
 //				allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.PATRICIA_HOUGHTON.localize().getNid());
@@ -1150,11 +1150,10 @@ public class TerminologyProjectDAO {
 	public static void setReleasePathRefset(TranslationProject project, I_GetConceptData concept, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 		try {
-			if ((concept != null) && (project.getReleasePathRefset() == null) || (concept.getConceptNid() != project.getReleasePathRefset().getConceptNid())) {
+			if ((concept != null) && (project.getReleasePath() == null) || (concept.getConceptNid() != project.getReleasePath().getConceptNid())) {
 				List<? extends I_RelTuple> targetRefsetRels = null;
 				I_IntSet allowedDestRelTypes = termFactory.newIntSet();
-				//allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.HAS_RELEASE_PATH_REFSET_ATTRIBUTE.localize().getNid());
-				allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.ALEJANDRO_LOPEZ.localize().getNid());
+				allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.HAS_RELEASE_PATH_REFSET_ATTRIBUTE.localize().getNid());
 				targetRefsetRels = project.getConcept().getSourceRelTuples(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
 
 				if (targetRefsetRels.size() > 0) {
@@ -1168,10 +1167,7 @@ public class TerminologyProjectDAO {
 						termFactory.commit();
 					}
 				}
-//				I_RelVersioned newRelationship = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), termFactory.getConcept(ArchitectonicAuxiliary.Concept.HAS_RELEASE_PATH_REFSET_ATTRIBUTE.getUids()), concept,
-//						termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
-//						termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
-				I_RelVersioned newRelationship = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), termFactory.getConcept(ArchitectonicAuxiliary.Concept.ALEJANDRO_LOPEZ.getUids()), concept,
+				I_RelVersioned newRelationship = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), termFactory.getConcept(ArchitectonicAuxiliary.Concept.HAS_RELEASE_PATH_REFSET_ATTRIBUTE.getUids()), concept,
 						termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
 						termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 
@@ -1476,15 +1472,14 @@ public class TerminologyProjectDAO {
 	 * @return the release path refset for project
 	 * @throws Exception the exception
 	 */
-	public static I_GetConceptData getReleasePathRefsetForProject(TranslationProject project, I_ConfigAceFrame config) throws Exception {
+	public static I_GetConceptData getReleasePathForProject(TranslationProject project, I_ConfigAceFrame config) throws Exception {
 		List<I_RelTuple> targetRefsets = new ArrayList<I_RelTuple>();
 		List<? extends I_RelTuple> targetRefsetsTuples = null;
 		I_TermFactory termFactory = Terms.get();
 
 		try {
 			I_IntSet allowedDestRelTypes = termFactory.newIntSet();
-//			allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.HAS_RELEASE_PATH_REFSET_ATTRIBUTE.localize().getNid());
-			allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.ALEJANDRO_LOPEZ.localize().getNid());
+			allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.HAS_RELEASE_PATH_REFSET_ATTRIBUTE.localize().getNid());
 			targetRefsetsTuples = project.getConcept().getSourceRelTuples(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
 
 			targetRefsetsTuples = cleanRelTuplesList(targetRefsetsTuples);
