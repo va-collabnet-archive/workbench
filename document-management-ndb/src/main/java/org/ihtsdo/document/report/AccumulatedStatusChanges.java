@@ -229,9 +229,13 @@ public class AccumulatedStatusChanges extends SwingWorker<File, String> implemen
 											if (object instanceof RefexCnidCnidVersionBI) {
 												RefexCnidCnidVersionBI version = (RefexCnidCnidVersionBI) object;
 												I_GetConceptData statusConcept = tf.getConcept(version.getCnid1());
+												boolean sameDestinationAndAuthor = version.getCnid2() != version.getAuthorNid();
+												I_GetConceptData previousStatus = wlPromRefset.getPreviousPromotionStatus(wlMemberConcept.getConceptNid(), config);
+												I_GetConceptData wlMemeberActivityStatus = member.getActivityStatus();
+												boolean sameStatus = previousStatus.getConceptNid() == wlMemeberActivityStatus.getConceptNid();
 												if (!statusConcept.getUids().iterator().next().equals(
 														ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids().iterator().next())
-														&& version.getCnid2() != version.getAuthorNid()) {
+														&& (!sameDestinationAndAuthor || !sameStatus)) {
 													dataFound = true;
 													UserStatusCount current = new UserStatusCount();
 													current.setDate(formatter.format(new Date(version.getTime())));
