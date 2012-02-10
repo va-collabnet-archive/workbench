@@ -593,7 +593,7 @@ public class WfInboxPanel extends JPanel {
 						if (tpc.getComponentAt(i) instanceof TranslationPanel) {
 							uiPanel = (TranslationPanel) tpc.getComponentAt(i);
 							tpc.setSelectedIndex(i);
-							if (!uiPanel.verifySavePending(null, false)) {
+							if (!uiPanel.verifySavePending(null, false,false)) {
 								return;
 							}
 						}
@@ -783,7 +783,7 @@ public class WfInboxPanel extends JPanel {
 					if (tpc.getTitleAt(i).equals(TranslationHelperPanel.TRANSLATION_LEFT_MENU)) {
 						if (tpc.getComponentAt(i) instanceof TranslationPanel) {
 							TranslationPanel uiPanel = (TranslationPanel) tpc.getComponentAt(i);
-							if (!uiPanel.verifySavePending(null, false)) {
+							if (!uiPanel.verifySavePending(null, false,false)) {
 								return;
 							}
 						}
