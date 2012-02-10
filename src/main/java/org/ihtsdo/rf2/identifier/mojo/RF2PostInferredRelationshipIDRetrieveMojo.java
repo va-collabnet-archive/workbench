@@ -178,7 +178,7 @@ public class RF2PostInferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo
 			OutputStreamWriter oswd = new OutputStreamWriter(fosd,"UTF-8");
 			BufferedWriter bwd = new BufferedWriter(oswd);
 
-			FileInputStream fis = new FileInputStream(snapshotSortedExportedfile	);
+			FileInputStream fis = new FileInputStream(sortedSnapExportedfile	);
 			InputStreamReader isr = new InputStreamReader(fis,"UTF-8");
 			BufferedReader brE = new BufferedReader(isr);
 
