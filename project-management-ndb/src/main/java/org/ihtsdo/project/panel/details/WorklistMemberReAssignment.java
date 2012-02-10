@@ -658,31 +658,3 @@ class WorklistMembersReassignmentWorker extends SwingWorker<String, Object[]> {
 	}
 
 }
-
-class WorkflowInterperterInitWorker extends SwingWorker<WorkflowInterpreter, Object[]> {
-
-	private WorkList workList;
-	/** The interpreter. */
-	private WorkflowInterpreter interpreter;
-
-	public WorkflowInterperterInitWorker(WorkList workList) {
-		super();
-		this.workList = workList;
-	}
-
-	@Override
-	protected WorkflowInterpreter doInBackground() throws Exception {
-		WorkflowInterpreter interpreter = WorkflowInterpreter.createWorkflowInterpreter(workList.getWorkflowDefinition());
-		return interpreter;
-	}
-
-	@Override
-	public void done() {
-		try {
-			this.interpreter = get();
-		} catch (Exception ignore) {
-			ignore.printStackTrace();
-		}
-	}
-
-}
