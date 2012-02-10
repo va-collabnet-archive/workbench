@@ -25,7 +25,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.lucene.queryParser.ParseException;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 
@@ -35,6 +38,7 @@ import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.jini.TermEntry;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -109,7 +113,8 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
             ArrayList<String> descFileList = DescriptionAdditionFileHelper.getDescFileList(file);
             Iterator<String> iterator = descFileList.iterator();
 
-            Integer conceptPosition = null;
+            Integer uuidPosition = null;
+            Integer sctPosition = null;
             Integer descPosition = null;
             Integer langPosition = null;
             Integer dialectPosition = null;
@@ -121,9 +126,11 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
 
             for (int i = 0; i < configParts.length; i++) {
                 String configPos = configParts[i];
-                if (configPos.equalsIgnoreCase("conceptId")) {
-                    conceptPosition = i;
-                } else if (configPos.equalsIgnoreCase("description")) {
+                if (configPos.equalsIgnoreCase("uuid")) {
+                    uuidPosition = i;
+                } if (configPos.equalsIgnoreCase("sctId")) {
+                    sctPosition = i;
+                }else if (configPos.equalsIgnoreCase("description")) {
                     descPosition = i;
                 } else if (configPos.equalsIgnoreCase("language")) {
                     langPosition = i;
@@ -143,20 +150,29 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
 
             line = iterator.next();
             while (line != null) {
+                
                 List<UUID> list = new ArrayList<UUID>();
                 String[] parts = line.split("\t");
                 String part = null;
-                if (conceptPosition != null) {
-                    part = parts[conceptPosition];
+                if (sctPosition != null) {
+                    part = parts[uuidPosition];
+                    Set<I_GetConceptData> concepts = Terms.get().getConcept(part);
+                    for (I_GetConceptData concept : concepts) {
+                        conceptNid = concept.getNid();
+                    }
+                }
+                if (uuidPosition != null && sctPosition == null) {
+                    part = parts[uuidPosition];
                     conceptNid = Ts.get().getNidForUuids(UUID.fromString(part));
-                } else {
-                    throw new TaskFailedException("ConceptID cannot be empty");
+                }
+                if(conceptNid == 0){
+                    throw new TaskFailedException("Must specify either UUID or SCT ID for concept.");
                 }
                 if (descPosition != null) {
                     part = parts[descPosition];
                     descText = part;
                 } else {
-                    throw new TaskFailedException("Description text cannot be empty");
+                    throw new TaskFailedException("Description text cannot be empty.");
                 }
                 if (langPosition != null) {
                     part = parts[langPosition];
@@ -233,12 +249,14 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
                 } else {
                     line = null;
                 }
-
-                System.out.println("Next Line: " + line);
             }
             process.setProperty(uuidListListPropName, uuidList);
 
             returnCondition = Condition.CONTINUE;
+        } catch (TerminologyException e) {
+            throw new TaskFailedException(e);
+        } catch (ParseException e) {
+            throw new TaskFailedException(e);
         } catch (UnsupportedDialectOrLanguage e) {
             throw new TaskFailedException(e);
         } catch (InvalidCAB e) {
