@@ -22,9 +22,15 @@ import java.net.MalformedURLException;
 import java.util.Collection;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionPart;
+import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -34,7 +40,6 @@ import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.TranslationProject;
@@ -42,15 +47,11 @@ import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
-import org.ihtsdo.tk.api.blueprint.DescCAB;
-import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
@@ -112,6 +113,7 @@ public class PromoteTargetContentToReleasePath extends AbstractTask {
 			I_ConfigAceFrame config = (I_ConfigAceFrame) worker
 			.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 			TerminologyStoreDI ts = Ts.get();
+			I_TermFactory tf = Terms.get();
 
 			int activeNid = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid();
 
@@ -121,6 +123,7 @@ public class PromoteTargetContentToReleasePath extends AbstractTask {
 			TranslationProject project = (TranslationProject) iproject;
 			int targetLangNid = project.getTargetLanguageRefset().getNid();
 			I_GetConceptData pathConcept = project.getReleasePath();
+
 			EditCoordinate ec = new EditCoordinate(config.getDbConfig().getUserConcept().getNid(), 
 					pathConcept.getNid());
 
@@ -131,19 +134,38 @@ public class PromoteTargetContentToReleasePath extends AbstractTask {
 			for (DescriptionChronicleBI loopDescription : concept.getDescs()) {
 				DescriptionVersionBI lastDescVersion = loopDescription.getVersion(config.getViewCoordinate());
 				if (lastDescVersion != null) {
-					DescCAB dcab = lastDescVersion.makeBlueprint(config.getViewCoordinate());
+					//					DescCAB dcab = lastDescVersion.makeBlueprint(config.getViewCoordinate());
+					//					dcab.setComponentUuidNoRecompute(loopDescription.getPrimUuid());
 					boolean written = false;
 					for (RefexChronicleBI<?> loopAnnotChronicle : loopDescription.getAnnotations()) {
 						if (loopAnnotChronicle.getCollectionNid() == targetLangNid) {
 							if (!written) {
-								tc.construct(dcab);
-								written = true;
+								I_DescriptionVersioned descriptionVersioned = tf.getDescription(loopDescription.getNid());
+								I_DescriptionTuple descriptionTuple = (I_DescriptionTuple) descriptionVersioned.getTuples().iterator().next();
+								I_DescriptionPart newDescriptionPart =(I_DescriptionPart) 
+								descriptionTuple.getMutablePart().makeAnalog(
+										descriptionTuple.getMutablePart().getStatusNid(),
+										descriptionTuple.getMutablePart().getAuthorNid(),
+										pathConcept.getNid(), 
+										Long.MAX_VALUE);
+								descriptionVersioned.addVersion(newDescriptionPart);
+								//								DescriptionChronicleBI desc = tc.constructIfNotCurrent(dcab);
+								//								written = true;
 							}
-							RefexVersionBI loopAnnotV = loopAnnotChronicle.getVersion(config.getViewCoordinate());
-							RefexCnidVersionBI loopAnnotC = (RefexCnidVersionBI) loopAnnotV;
-							RefexCAB acab = loopAnnotC.makeBlueprint(config.getViewCoordinate());
-							RefexChronicleBI<?> newRefexForProm = tc.construct(acab);
-							concept.addAnnotation(newRefexForProm);
+							I_ExtendByRef langExtension = tf.getExtension(loopAnnotChronicle.getNid());
+							I_ExtendByRefVersion langExtV = langExtension.getTuples().iterator().next();
+							I_ExtendByRefPart newLangExtV =(I_ExtendByRefPart) 
+							langExtV.makeAnalog(
+									langExtV.getStatusNid(), 
+									langExtV.getAuthorNid(),
+									pathConcept.getNid(), 
+									Long.MAX_VALUE);
+							langExtension.addVersion(newLangExtV);
+							//							RefexVersionBI loopAnnotV = loopAnnotChronicle.getVersion(config.getViewCoordinate());
+							//							RefexCnidVersionBI loopAnnotC = (RefexCnidVersionBI) loopAnnotV;
+							//							RefexCAB acab = loopAnnotC.makeBlueprint(config.getViewCoordinate());
+							//							RefexChronicleBI<?> newRefexForProm = tc.constructIfNotCurrent(acab);
+							//							concept.addAnnotation(newRefexForProm);
 						}
 					}
 				}
