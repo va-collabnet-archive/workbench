@@ -65,6 +65,7 @@ import org.ihtsdo.tk.example.binding.Taxonomies;
 import org.ihtsdo.tk.example.binding.TermAux;
 import org.ihtsdo.tk.example.binding.WbDescType;
 import org.ihtsdo.arena.spec.Refsets; 
+import org.ihtsdo.tk.binding.snomed.RefsetAux;
 
 
 
@@ -173,7 +174,7 @@ end
 rule "mark completed"
 	when
                 ViewFact(view == View.STATED)
- 		$c: ConceptFact(context == Context.FOCUS_CONCEPT)
+ 		$c: ConceptFact(this isMemberOf RefsetAux.GMDN_REFEX, context == Context.FOCUS_CONCEPT)
 
 	then 
                     conceptActions.add(actionFactory.make(
@@ -183,7 +184,7 @@ end
 rule "mark un-reviewed"
 	when
                 ViewFact(view == View.STATED)
- 		$c: ConceptFact(context == Context.FOCUS_CONCEPT)
+ 		$c: ConceptFact(this isMemberOf RefsetAux.GMDN_REFEX, context == Context.FOCUS_CONCEPT)
 
 	then 
                     conceptActions.add(actionFactory.make(
@@ -193,7 +194,7 @@ end
 rule "mark flagged"
 	when
                 ViewFact(view == View.STATED)
- 		$c: ConceptFact(context == Context.FOCUS_CONCEPT)
+ 		$c: ConceptFact(this isMemberOf RefsetAux.GMDN_REFEX, context == Context.FOCUS_CONCEPT)
 
 	then 
                     conceptActions.add(actionFactory.make(
