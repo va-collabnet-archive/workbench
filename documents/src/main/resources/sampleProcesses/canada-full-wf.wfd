@@ -1,28 +1,12 @@
 <org.ihtsdo.project.workflow.model.WorkflowDefinition>
   <roles>
     <org.ihtsdo.project.workflow.model.WfRole>
-      <name>translation editorial board role</name>
-      <id>06049358-6fbe-3e5c-8138-65d55a751418</id>
-    </org.ihtsdo.project.workflow.model.WfRole>
-    <org.ihtsdo.project.workflow.model.WfRole>
-      <name>release authority role</name>
-      <id>dc874687-1cae-3abe-9a07-079b44a7b232</id>
-    </org.ihtsdo.project.workflow.model.WfRole>
-    <org.ihtsdo.project.workflow.model.WfRole>
-      <name>translation sme role</name>
-      <id>5a112603-3fc5-3ac2-82fc-b2ab9f30c1f7</id>
-    </org.ihtsdo.project.workflow.model.WfRole>
-    <org.ihtsdo.project.workflow.model.WfRole>
-      <name>tsp translator one role</name>
-      <id>0d484e7c-58d7-3e22-96df-56bf88f10a1a</id>
-    </org.ihtsdo.project.workflow.model.WfRole>
-    <org.ihtsdo.project.workflow.model.WfRole>
       <name>fast track translator role</name>
       <id>99f5b372-e224-3d33-96bc-8a16fd3a801a</id>
     </org.ihtsdo.project.workflow.model.WfRole>
     <org.ihtsdo.project.workflow.model.WfRole>
-      <name>tsp reviewer role</name>
-      <id>5df6d3f2-91de-3ffd-9157-29e03bf8308f</id>
+      <name>release authority role</name>
+      <id>dc874687-1cae-3abe-9a07-079b44a7b232</id>
     </org.ihtsdo.project.workflow.model.WfRole>
     <org.ihtsdo.project.workflow.model.WfRole>
       <name>translation super sme role</name>
@@ -32,6 +16,22 @@
       <name>tpo reviewer role</name>
       <id>ee74bd84-b756-3471-9be7-d520a6a1cb84</id>
     </org.ihtsdo.project.workflow.model.WfRole>
+    <org.ihtsdo.project.workflow.model.WfRole>
+      <name>tsp translator one role</name>
+      <id>0d484e7c-58d7-3e22-96df-56bf88f10a1a</id>
+    </org.ihtsdo.project.workflow.model.WfRole>
+    <org.ihtsdo.project.workflow.model.WfRole>
+      <name>translation editorial board role</name>
+      <id>06049358-6fbe-3e5c-8138-65d55a751418</id>
+    </org.ihtsdo.project.workflow.model.WfRole>
+    <org.ihtsdo.project.workflow.model.WfRole>
+      <name>translation sme role</name>
+      <id>5a112603-3fc5-3ac2-82fc-b2ab9f30c1f7</id>
+    </org.ihtsdo.project.workflow.model.WfRole>
+    <org.ihtsdo.project.workflow.model.WfRole>
+      <name>tsp reviewer role</name>
+      <id>5df6d3f2-91de-3ffd-9157-29e03bf8308f</id>
+    </org.ihtsdo.project.workflow.model.WfRole>
   </roles>
   <states>
     <org.ihtsdo.project.workflow.model.WfState>
@@ -39,66 +39,66 @@
       <id>2734192d-21ee-30a9-b6f7-15638c64e7fb</id>
     </org.ihtsdo.project.workflow.model.WfState>
     <org.ihtsdo.project.workflow.model.WfState>
-      <name>fast track translated status</name>
-      <id>4adb86a0-eae5-36a9-a6db-462c03e1d4ca</id>
-    </org.ihtsdo.project.workflow.model.WfState>
-    <org.ihtsdo.project.workflow.model.WfState>
-      <name>escalated to editorial board status</name>
-      <id>338c5c29-d84f-3472-bb3b-53bcdc62a493</id>
-    </org.ihtsdo.project.workflow.model.WfState>
-    <org.ihtsdo.project.workflow.model.WfState>
       <name>rejected by TSP reviewer status</name>
       <id>cb61b6a7-e3db-39e6-b766-7c83db5fa447</id>
-    </org.ihtsdo.project.workflow.model.WfState>
-    <org.ihtsdo.project.workflow.model.WfState>
-      <name>rejected by editorial board status</name>
-      <id>edd843bc-10b1-3cb9-b4d9-c51b37bf0d1d</id>
-    </org.ihtsdo.project.workflow.model.WfState>
-    <org.ihtsdo.project.workflow.model.WfState>
-      <name>approved for publication status</name>
-      <id>df7fc5df-812d-3427-863a-09ff88926ba0</id>
-    </org.ihtsdo.project.workflow.model.WfState>
-    <org.ihtsdo.project.workflow.model.WfState>
-      <name>reviewed by TSP reviewer status</name>
-      <id>f21ddbe5-1b0c-3779-b465-06188ada2d43</id>
-    </org.ihtsdo.project.workflow.model.WfState>
-    <org.ihtsdo.project.workflow.model.WfState>
-      <name>referred to SME status</name>
-      <id>2e16496a-f1e6-3dfd-be4e-6b99d6091914</id>
-    </org.ihtsdo.project.workflow.model.WfState>
-    <org.ihtsdo.project.workflow.model.WfState>
-      <name>translated status</name>
-      <id>df881904-1c67-3651-b0a6-fc8fa6af7e2d</id>
     </org.ihtsdo.project.workflow.model.WfState>
     <org.ihtsdo.project.workflow.model.WfState>
       <name>referred to Super SME status</name>
       <id>b91d1c4e-46d7-38f8-a7a1-9ba77c711f06</id>
     </org.ihtsdo.project.workflow.model.WfState>
     <org.ihtsdo.project.workflow.model.WfState>
+      <name>fast track translated status</name>
+      <id>4adb86a0-eae5-36a9-a6db-462c03e1d4ca</id>
+    </org.ihtsdo.project.workflow.model.WfState>
+    <org.ihtsdo.project.workflow.model.WfState>
+      <name>approved for publication status</name>
+      <id>df7fc5df-812d-3427-863a-09ff88926ba0</id>
+    </org.ihtsdo.project.workflow.model.WfState>
+    <org.ihtsdo.project.workflow.model.WfState>
+      <name>escalated to editorial board status</name>
+      <id>338c5c29-d84f-3472-bb3b-53bcdc62a493</id>
+    </org.ihtsdo.project.workflow.model.WfState>
+    <org.ihtsdo.project.workflow.model.WfState>
       <name>Super SME feedback complete status</name>
       <id>6e035cf2-a03b-3133-96c6-dff9568e8c14</id>
+    </org.ihtsdo.project.workflow.model.WfState>
+    <org.ihtsdo.project.workflow.model.WfState>
+      <name>referred to SME status</name>
+      <id>2e16496a-f1e6-3dfd-be4e-6b99d6091914</id>
     </org.ihtsdo.project.workflow.model.WfState>
     <org.ihtsdo.project.workflow.model.WfState>
       <name>SME feedback complete status</name>
       <id>b8afed0d-0f52-3c07-8617-dea225a58ed1</id>
     </org.ihtsdo.project.workflow.model.WfState>
+    <org.ihtsdo.project.workflow.model.WfState>
+      <name>translated status</name>
+      <id>df881904-1c67-3651-b0a6-fc8fa6af7e2d</id>
+    </org.ihtsdo.project.workflow.model.WfState>
+    <org.ihtsdo.project.workflow.model.WfState>
+      <name>reviewed by TSP reviewer status</name>
+      <id>f21ddbe5-1b0c-3779-b465-06188ada2d43</id>
+    </org.ihtsdo.project.workflow.model.WfState>
+    <org.ihtsdo.project.workflow.model.WfState>
+      <name>rejected by editorial board status</name>
+      <id>edd843bc-10b1-3cb9-b4d9-c51b37bf0d1d</id>
+    </org.ihtsdo.project.workflow.model.WfState>
   </states>
   <actions>
-    <entry>
-      <string>Send for revision by TPO reviewer</string>
-      <org.ihtsdo.project.workflow.model.WfAction>
-        <name>Send for revision by TPO reviewer</name>
-        <id>bc7bb3ae-7486-46a1-88fc-f74271142ba2</id>
-        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[7]"/>
-        <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
-      </org.ihtsdo.project.workflow.model.WfAction>
-    </entry>
     <entry>
       <string>Send for revision by TSP reviewer</string>
       <org.ihtsdo.project.workflow.model.WfAction>
         <name>Send for revision by TSP reviewer</name>
         <id>3bf93fc0-a97d-442d-9f02-eaf1c3e8bb44</id>
-        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[9]"/>
+        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[10]"/>
+        <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
+      </org.ihtsdo.project.workflow.model.WfAction>
+    </entry>
+    <entry>
+      <string>Send for revision by TPO reviewer</string>
+      <org.ihtsdo.project.workflow.model.WfAction>
+        <name>Send for revision by TPO reviewer</name>
+        <id>bc7bb3ae-7486-46a1-88fc-f74271142ba2</id>
+        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[11]"/>
         <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
@@ -107,7 +107,7 @@
       <org.ihtsdo.project.workflow.model.WfAction>
         <name>Approve for publication</name>
         <id>006cac3c-4a66-46e5-b6b7-96a489b2e053</id>
-        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[6]"/>
+        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[5]"/>
         <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
@@ -116,7 +116,7 @@
       <org.ihtsdo.project.workflow.model.WfAction>
         <name>Reject and send back to translator</name>
         <id>df28aa5a-cd0b-461e-ad76-a4a86d945ece</id>
-        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[4]"/>
+        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[2]"/>
         <businessProcess>sampleProcesses/RejectActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
@@ -125,7 +125,7 @@
       <org.ihtsdo.project.workflow.model.WfAction>
         <name>Escalate to Editorial Board</name>
         <id>ad236a63-b09a-48c9-957d-a7f5ee5c33f3</id>
-        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[3]"/>
+        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[6]"/>
         <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
@@ -134,7 +134,7 @@
       <org.ihtsdo.project.workflow.model.WfAction>
         <name>Send back to TSP reviewer</name>
         <id>50cadb00-94f6-4757-a9f0-5dc27ba0e3d3</id>
-        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[5]"/>
+        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[12]"/>
         <businessProcess>sampleProcesses/RejectActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
@@ -143,7 +143,7 @@
       <org.ihtsdo.project.workflow.model.WfAction>
         <name>Request feedback from Super SME</name>
         <id>7130012e-0aba-43fb-a044-0e750b14bd25</id>
-        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[10]"/>
+        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[3]"/>
         <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
@@ -166,7 +166,9 @@
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
   </actions>
-  <xlsFileName/>
+  <xlsFileName>
+    <string>/Users/alo/Documents/TermMed/Eclipse/TranslationPhase4/translation-bundle-test-assembly-jan-16/editor/target/wb-bundle/drools-rules/canada-full-wf.xls</string>
+  </xlsFileName>
   <drlFileName/>
   <name>canada-full-wf</name>
 </org.ihtsdo.project.workflow.model.WorkflowDefinition>
