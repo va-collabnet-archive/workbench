@@ -90,7 +90,7 @@
         <name>Send for revision by TPO reviewer</name>
         <id>bc7bb3ae-7486-46a1-88fc-f74271142ba2</id>
         <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[7]"/>
-        <businessProcess>/Applications/Translation Bundle/sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
+        <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
     <entry>
@@ -99,7 +99,7 @@
         <name>Send for revision by TSP reviewer</name>
         <id>3bf93fc0-a97d-442d-9f02-eaf1c3e8bb44</id>
         <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[9]"/>
-        <businessProcess>/Applications/Translation Bundle/sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
+        <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
     <entry>
@@ -108,7 +108,7 @@
         <name>Approve for publication</name>
         <id>006cac3c-4a66-46e5-b6b7-96a489b2e053</id>
         <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[6]"/>
-        <businessProcess>/Applications/Translation Bundle/sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
+        <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
     <entry>
@@ -117,7 +117,7 @@
         <name>Reject and send back to translator</name>
         <id>df28aa5a-cd0b-461e-ad76-a4a86d945ece</id>
         <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[4]"/>
-        <businessProcess>/Applications/Translation Bundle/sampleProcesses/RejectActionWithoutDestination.bp</businessProcess>
+        <businessProcess>sampleProcesses/RejectActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
     <entry>
@@ -126,7 +126,7 @@
         <name>Escalate to Editorial Board</name>
         <id>ad236a63-b09a-48c9-957d-a7f5ee5c33f3</id>
         <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[3]"/>
-        <businessProcess>/Applications/Translation Bundle/sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
+        <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
     <entry>
@@ -135,7 +135,7 @@
         <name>Send back to TSP reviewer</name>
         <id>50cadb00-94f6-4757-a9f0-5dc27ba0e3d3</id>
         <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[5]"/>
-        <businessProcess>/Applications/Translation Bundle/sampleProcesses/RejectActionWithoutDestination.bp</businessProcess>
+        <businessProcess>sampleProcesses/RejectActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
     <entry>
@@ -144,7 +144,7 @@
         <name>Request feedback from Super SME</name>
         <id>7130012e-0aba-43fb-a044-0e750b14bd25</id>
         <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[10]"/>
-        <businessProcess>/Applications/Translation Bundle/sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
+        <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
     <entry>
@@ -153,7 +153,7 @@
         <name>Request feedback from SME</name>
         <id>18119067-d740-46f7-926c-442bd7a035ad</id>
         <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[8]"/>
-        <businessProcess>/Applications/Translation Bundle/sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
+        <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
     <entry>
@@ -162,7 +162,7 @@
         <name>Reject and send back to TSP reviewer</name>
         <id>ba00d8d0-0752-40a3-ba3e-4beb102119df</id>
         <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState"/>
-        <businessProcess>/Applications/Translation Bundle/sampleProcesses/RejectActionWithoutDestination.bp</businessProcess>
+        <businessProcess>sampleProcesses/RejectActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
   </actions>
