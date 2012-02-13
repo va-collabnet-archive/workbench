@@ -44,6 +44,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -81,6 +82,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.plaf.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
@@ -120,7 +122,6 @@ import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.panel.PanelHelperFactory;
 import org.ihtsdo.project.panel.TranslationHelperPanel;
-import org.ihtsdo.project.panel.details.WorkflowInterperterInitWorker;
 import org.ihtsdo.project.panel.details.WorklistMemberLogPanel;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.util.IconUtilities;
@@ -218,6 +219,9 @@ public class TranslationPanel extends JPanel {
 
 	/** The canc action. */
 	private WfAction cancAction;
+	
+	
+	private Set<Character> memonicKeys = new HashSet<Character>();
 
 	/** The target text changed. */
 	private boolean targetTextChanged = false;
@@ -250,7 +254,7 @@ public class TranslationPanel extends JPanel {
 		}
 
 		initComponents();
-
+		initializeMemonicKeys();
 		targetTextField.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void removeUpdate(DocumentEvent arg0) {
@@ -335,6 +339,17 @@ public class TranslationPanel extends JPanel {
 		cancAction.setName("Cancel");
 		cancAction.setConsequence(null);
 
+	}
+
+	private void initializeMemonicKeys() {
+		memonicKeys.add('G');
+		memonicKeys.add('Y');
+		memonicKeys.add('K');
+		memonicKeys.add('F');
+		memonicKeys.add('P');
+		memonicKeys.add('D');
+		memonicKeys.add('A');
+		memonicKeys.add('U');
 	}
 
 	/**
@@ -1358,6 +1373,10 @@ public class TranslationPanel extends JPanel {
 		}
 	}
 
+	private void sendMenuItemActionPerformed(ActionEvent e) {
+		bLaunchActionPerformed();
+	}
+
 	/**
 	 * The listener interface for receiving selection events. The class that is
 	 * interested in processing a selection event implements this interface, and
@@ -1440,6 +1459,8 @@ public class TranslationPanel extends JPanel {
 		mLog = new JMenuItem();
 		menu4 = new JMenu();
 		menuItem1 = new JMenuItem();
+		actionMenu = new JMenu();
+		sendMenuItem = new JMenuItem();
 		label14 = new JLabel();
 		label15 = new JLabel();
 		label16 = new JLabel();
@@ -1648,6 +1669,25 @@ public class TranslationPanel extends JPanel {
 					menu4.add(menuItem1);
 				}
 				menuBar1.add(menu4);
+
+				//======== actionMenu ========
+				{
+					actionMenu.setText("Act[i]on");
+					actionMenu.setMnemonic('I');
+
+					//---- sendMenuItem ----
+					sendMenuItem.setText("Send");
+					sendMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
+					sendMenuItem.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							sendMenuItemActionPerformed(e);
+						}
+					});
+					actionMenu.add(sendMenuItem);
+					actionMenu.addSeparator();
+				}
+				menuBar1.add(actionMenu);
 			}
 			panel1.add(menuBar1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
@@ -1805,7 +1845,7 @@ public class TranslationPanel extends JPanel {
 					//======== panel19 ========
 					{
 						panel19.setLayout(new GridBagLayout());
-						((GridBagLayout)panel19.getLayout()).columnWidths = new int[] {0, 172, 0, 0, 0, 0};
+						((GridBagLayout)panel19.getLayout()).columnWidths = new int[] {77, 172, 0, 0, 0, 0};
 						((GridBagLayout)panel19.getLayout()).rowHeights = new int[] {0, 0};
 						((GridBagLayout)panel19.getLayout()).columnWeights = new double[] {0.0, 1.0, 1.0, 0.0, 0.0, 1.0E-4};
 						((GridBagLayout)panel19.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
@@ -2168,6 +2208,8 @@ public class TranslationPanel extends JPanel {
 	private JMenuItem mLog;
 	private JMenu menu4;
 	private JMenuItem menuItem1;
+	private JMenu actionMenu;
+	private JMenuItem sendMenuItem;
 	private JLabel label14;
 	private JLabel label15;
 	private JLabel label16;
@@ -3688,11 +3730,52 @@ public class TranslationPanel extends JPanel {
 	 *            the new possible actions
 	 */
 	public void setPossibleActions(List<WfAction> actions) {
+		
+		actionMenu.removeAll();
+		actionMenu.add(sendMenuItem);
+		actionMenu.addSeparator();
 		cmbActions.removeAllItems();
+
 		for (WfAction action : actions) {
 			cmbActions.addItem(action);
+			JMenuItem actionItem = new JMenuItem();
+			//---- action menue item ----
+			actionItem.setText(action.toString());
+			actionItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					Object source = arg0.getSource();
+					if(source instanceof JMenuItem){
+						JMenuItem sourceMenuItem = (JMenuItem)source;
+						String actionText = sourceMenuItem.getText();
+						int cmbActionItemCount = cmbActions.getItemCount();
+						for (int i = 0; i < cmbActionItemCount; i++) {
+							Object cmbActionItem = cmbActions.getItemAt(i);
+							if(cmbActionItem.toString().equals(actionText)){
+								cmbActions.setSelectedIndex(i);
+								break;
+							}
+						}
+						
+					}
+				}
+			});
+			actionItem.setAccelerator(KeyStroke.getKeyStroke(getKeyEventForAction(action), Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
+			actionMenu.add(actionItem);
 		}
+		
 		addDefaultActions();
+	}
+	
+	private int getKeyEventForAction(WfAction action) {
+		String actionName = action.getName();
+		for (int i = 0; i < actionName.length(); i++) {
+			if(!memonicKeys.contains(actionName.charAt(i))){
+				memonicKeys.add(actionName.charAt(i));
+				return actionName.charAt(i);
+			}
+		}
+		return KeyEvent.VK_S;
 	}
 
 	/**
