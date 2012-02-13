@@ -125,6 +125,7 @@ import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
+import org.ihtsdo.concurrent.future.FutureHelper;
 import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
@@ -1931,8 +1932,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             @Override
             public void run() {
                 try {
-                    new PathExpander(getAceFrame().getCdePanel().getTree(), AceFrameConfig.this,
+                    PathExpander epl = new PathExpander(getAceFrame().getCdePanel().getTree(), AceFrameConfig.this,
                             getHierarchySelection());
+                    FutureHelper.addFuture(ACE.threadPool.submit(epl));
                 } catch (Exception e) {
                     AceLog.getAppLog().alertAndLogException(e);
                 }
