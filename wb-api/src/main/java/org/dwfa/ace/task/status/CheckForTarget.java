@@ -17,6 +17,8 @@
 package org.dwfa.ace.task.status;
 
 import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.IntrospectionException;
@@ -206,6 +208,7 @@ public class CheckForTarget extends AbstractTask {
                 done = true;
                 notifyTaskDone();
             } else {
+                
                 wizard.setWizardPanelVisible(true);
                 JPanel wizardPanel = wizard.getWizardPanel();
                 //make wizard panel
@@ -213,19 +216,41 @@ public class CheckForTarget extends AbstractTask {
                 for (int i = 0; i < components.length; i++) {
                     wizardPanel.remove(components[i]);
                 }
+                wizardPanel.setLayout(new GridBagLayout());
+                GridBagConstraints c = new GridBagConstraints();
+                c.fill = GridBagConstraints.BOTH;
+                c.gridx = 0;
+                c.gridy = 0;
+                c.weightx = 1.0;
+                c.weighty = 0;
+                c.anchor = GridBagConstraints.EAST;
 
                 //add concepts
-                wizardPanel.add(new JLabel("<html>The concept is a target of a relationship in another concept(s) <br>or a target in the  'refers to' refset"));
-                wizardPanel.add(new JLabel("<html>Add concepts to list view for batch editing?<br>"));
+                c.gridwidth = 2;
+                c.ipady = 20;
+                wizardPanel.add(new JLabel("<html>The concept is a target of a relationship in another concept(s) <br>or a target in the  'refers to' refset"), c);
+                c.gridy++;
+                c.ipady = 20;
+                wizardPanel.add(new JLabel("<html>Add concepts to list view for batch editing?<br>"), c);
+                c.gridy++;
+                c.gridy++;
 
                 //add buttons
-                wizardPanel.add(new JLabel(" "));
+                c.gridwidth = 1;
+                c.weightx = 0;
+                c.ipady = 0;
                 JButton updateButton = new JButton("add to list");
                 updateButton.addActionListener(new UpdateActionListener());
-                wizardPanel.add(updateButton);
+                wizardPanel.add(updateButton, c);
+                c.gridx++;
+                c.weightx = 1;
                 JButton cancelButton = new JButton("cancel");
-                wizardPanel.add(cancelButton);
                 cancelButton.addActionListener(new CancelActionListener());
+                wizardPanel.add(cancelButton, c);
+                c.gridx = 0;
+                c.gridy++;
+                c.weighty = 1;
+                wizardPanel.add(new JLabel(" "), c);
             }
         }
     }
