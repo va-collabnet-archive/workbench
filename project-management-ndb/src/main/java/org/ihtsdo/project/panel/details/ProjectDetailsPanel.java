@@ -46,9 +46,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
-
-import javax.swing.*;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -62,18 +59,19 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.ListModel;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
-import javax.swing.border.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.border.MatteBorder;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
-import org.apache.bcel.generic.IF_ACMPEQ;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
@@ -81,7 +79,6 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.issue.IssueRepoRegistration;
 import org.ihtsdo.issue.issuerepository.IssueRepository;
@@ -102,8 +99,6 @@ import org.ihtsdo.project.panel.dnd.ListDragGestureListenerWithImage;
 import org.ihtsdo.project.panel.dnd.ObjectTransferHandler;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.util.IconUtilities;
-import org.ihtsdo.rf2.refset.dao.RefsetConceptDAO;
-import org.ihtsdo.testmodel.RefsetType;
 
 /**
  * The Class ProjectDetailsPanel.
@@ -296,14 +291,38 @@ public class ProjectDetailsPanel extends JPanel {
 								JOptionPane.showMessageDialog(ProjectDetailsPanel.this,
 										"The selected refset is not a valid Path", 
 										"Warning", JOptionPane.WARNING_MESSAGE);
+							} else {
+								int releasePathNid = 0;
+								try {
+									releasePathNid = ProjectDetailsPanel.this.project.getReleasePath().getNid();
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+								if(addedRfst.getNid() != releasePathNid){
+									button3.setEnabled(true);
+								}else{
+									button3.setEnabled(false);
+								}
 							}
-						}else if(((ListModel)listDataEvent.getSource()).equals(moduleIdList)){
+						}else if(((ListModel)listDataEvent.getSource()).equals(moduleIdModel)){
 							I_GetConceptData addedRfst = (I_GetConceptData)moduleIdModel.get(index);
 							if(!validateAsModuleRefset(addedRfst.getConceptNid(), ProjectDetailsPanel.this.config)){
 								moduleIdModel.remove(index);
 								JOptionPane.showMessageDialog(ProjectDetailsPanel.this,
 										"The selected refset is not a valid Moudle", 
 										"Warning", JOptionPane.WARNING_MESSAGE);
+							}else {
+								int modulId = 0;
+								try {
+									modulId = ProjectDetailsPanel.this.project.getModuleIdRefset().getNid();
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+								if(addedRfst.getNid() != modulId){
+									button3.setEnabled(true);
+								}else{
+									button3.setEnabled(false);
+								}
 							}
 						}
 					} catch (IOException e) {
@@ -1577,6 +1596,20 @@ public class ProjectDetailsPanel extends JPanel {
 		}
 	}
 
+	private void namespaceTextFieldKeyTyped(KeyEvent e) {
+		String namespaceRefset = null;
+		try {
+			namespaceRefset = project.getNamespaceRefset();
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		if (namespaceRefset != null && namespaceTextField.getText().equals(namespaceRefset)) {
+			button3.setEnabled(false);
+		} else {
+			button3.setEnabled(true);
+		}
+	}
+
 
 	/**
 	 * Inits the components.
@@ -1764,6 +1797,14 @@ public class ProjectDetailsPanel extends JPanel {
 						panel2.add(label41, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 5, 5), 0, 0));
+
+						//---- namespaceTextField ----
+						namespaceTextField.addKeyListener(new KeyAdapter() {
+							@Override
+							public void keyTyped(KeyEvent e) {
+								namespaceTextFieldKeyTyped(e);
+							}
+						});
 						panel2.add(namespaceTextField, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 5, 0), 0, 0));
@@ -2734,352 +2775,121 @@ public class ProjectDetailsPanel extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
-	/** The tabbed pane1. */
 	private JTabbedPane tabbedPane1;
-	
-	/** The panel0. */
 	private JPanel panel0;
-	
-	/** The panel1. */
 	private JPanel panel1;
-	
-	/** The label1. */
 	private JLabel label1;
-	
-	/** The panel2. */
 	private JPanel panel2;
-	
-	/** The label2. */
 	private JLabel label2;
-	
-	/** The text field1. */
 	private JTextField textField1;
-	
-	/** The label41. */
 	private JLabel label41;
-	
-	/** The namespace text field. */
 	private JTextField namespaceTextField;
-	
-	/** The separator1. */
 	private JSeparator separator1;
-	
-	/** The label39. */
 	private JLabel label39;
-	
-	/** The release candidate list. */
 	private JList releaseCandidateList;
-	
-	/** The label40. */
 	private JLabel label40;
-	
-	/** The module id list. */
 	private JList moduleIdList;
-	
-	/** The panel4. */
 	private JPanel panel4;
-	
-	/** The button1. */
 	private JButton button1;
-	
-	/** The button2. */
 	private JButton button2;
-	
-	/** The panel9. */
 	private JPanel panel9;
-	
-	/** The label18. */
 	private JLabel label18;
-	
-	/** The label7. */
 	private JLabel label7;
-	
-	/** The panel12. */
 	private JPanel panel12;
-	
-	/** The button3. */
 	private JButton button3;
-	
-	/** The panel5. */
 	private JPanel panel5;
-	
-	/** The label3. */
 	private JLabel label3;
-	
-	/** The scroll pane4. */
 	private JScrollPane scrollPane4;
-	
-	/** The list4. */
 	private JList list4;
-	
-	/** The panel8. */
 	private JPanel panel8;
-	
-	/** The label8. */
 	private JLabel label8;
-	
-	/** The panel13. */
 	private JPanel panel13;
-	
-	/** The panel19. */
 	private JPanel panel19;
-	
-	/** The button4. */
 	private JButton button4;
-	
-	/** The button8. */
 	private JButton button8;
-	
-	/** The panel6. */
 	private JPanel panel6;
-	
-	/** The label4. */
 	private JLabel label4;
-	
-	/** The scroll pane5. */
 	private JScrollPane scrollPane5;
-	
-	/** The list5. */
 	private JList list5;
-	
-	/** The panel10. */
 	private JPanel panel10;
-	
-	/** The label9. */
 	private JLabel label9;
-	
-	/** The panel14. */
 	private JPanel panel14;
-	
-	/** The panel20. */
 	private JPanel panel20;
-	
-	/** The button5. */
 	private JButton button5;
-	
-	/** The button9. */
 	private JButton button9;
-	
-	/** The panel7. */
 	private JPanel panel7;
-	
-	/** The label5. */
 	private JLabel label5;
-	
-	/** The scroll pane6. */
 	private JScrollPane scrollPane6;
-	
-	/** The panel22. */
 	private JPanel panel22;
-	
-	/** The list6. */
 	private JList list6;
-	
-	/** The panel23. */
 	private JPanel panel23;
-	
-	/** The button10. */
 	private JButton button10;
-	
-	/** The v spacer1. */
 	private JPanel vSpacer1;
-	
-	/** The label6. */
 	private JLabel label6;
-	
-	/** The list8. */
 	private JList list8;
-	
-	/** The panel24. */
 	private JPanel panel24;
-	
-	/** The panel11. */
 	private JPanel panel11;
-	
-	/** The label10. */
 	private JLabel label10;
-	
-	/** The panel15. */
 	private JPanel panel15;
-	
-	/** The button6. */
 	private JButton button6;
-	
-	/** The panel16. */
 	private JPanel panel16;
-	
-	/** The label11. */
 	private JLabel label11;
-	
-	/** The scroll pane7. */
 	private JScrollPane scrollPane7;
-	
-	/** The list7. */
 	private JList list7;
-	
-	/** The panel17. */
 	private JPanel panel17;
-	
-	/** The label12. */
 	private JLabel label12;
-	
-	/** The panel18. */
 	private JPanel panel18;
-	
-	/** The button7. */
 	private JButton button7;
-	
-	/** The panel3. */
 	private JPanel panel3;
-	
-	/** The label14. */
 	private JLabel label14;
-	
-	/** The label38. */
 	private JLabel label38;
-	
-	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
-	
-	/** The list1. */
 	private JList list1;
-	
-	/** The panel21. */
 	private JPanel panel21;
-	
-	/** The label13. */
 	private JLabel label13;
-	
-	/** The panel25. */
 	private JPanel panel25;
-	
-	/** The label15. */
 	private JLabel label15;
-	
-	/** The label16. */
 	private JLabel label16;
-	
-	/** The text field2. */
 	private JTextField textField2;
-	
-	/** The label17. */
 	private JLabel label17;
-	
-	/** The combo box1. */
 	private JComboBox comboBox1;
-	
-	/** The panel26. */
 	private JPanel panel26;
-	
-	/** The button12. */
 	private JButton button12;
-	
-	/** The panel27. */
 	private JPanel panel27;
-	
-	/** The issues help lbl. */
 	private JLabel issuesHelpLbl;
-	
-	/** The label19. */
 	private JLabel label19;
-	
-	/** The label20. */
 	private JLabel label20;
-	
-	/** The panel28. */
 	private JPanel panel28;
-	
-	/** The label21. */
 	private JLabel label21;
-	
-	/** The text field3. */
 	private JTextField textField3;
-	
-	/** The label22. */
 	private JLabel label22;
-	
-	/** The label24. */
 	private JLabel label24;
-	
-	/** The label23. */
 	private JLabel label23;
-	
-	/** The label25. */
 	private JLabel label25;
-	
-	/** The label26. */
 	private JLabel label26;
-	
-	/** The label27. */
 	private JLabel label27;
-	
-	/** The text field4. */
 	private JTextField textField4;
-	
-	/** The label28. */
 	private JLabel label28;
-	
-	/** The text field5. */
 	private JPasswordField textField5;
-	
-	/** The panel29. */
 	private JPanel panel29;
-	
-	/** The label29. */
 	private JLabel label29;
-	
-	/** The text field6. */
 	private JTextField textField6;
-	
-	/** The label30. */
 	private JLabel label30;
-	
-	/** The label31. */
 	private JLabel label31;
-	
-	/** The label32. */
 	private JLabel label32;
-	
-	/** The label33. */
 	private JLabel label33;
-	
-	/** The label34. */
 	private JLabel label34;
-	
-	/** The label35. */
 	private JLabel label35;
-	
-	/** The text field7. */
 	private JTextField textField7;
-	
-	/** The label36. */
 	private JLabel label36;
-	
-	/** The text field8. */
 	private JPasswordField textField8;
-	
-	/** The panel31. */
 	private JPanel panel31;
-	
-	/** The label37. */
 	private JLabel label37;
-	
-	/** The scroll pane2. */
 	private JScrollPane scrollPane2;
-	
-	/** The list2. */
 	private JList list2;
-	
-	/** The panel32. */
 	private JPanel panel32;
-	
-	/** The button14. */
 	private JButton button14;
-	
-	/** The panel30. */
 	private JPanel panel30;
-	
-	/** The button13. */
 	private JButton button13;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }
