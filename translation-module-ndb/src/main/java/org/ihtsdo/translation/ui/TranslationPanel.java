@@ -3716,12 +3716,11 @@ public class TranslationPanel extends JPanel {
 		if (updateUiWorker != null && !updateUiWorker.isDone()) {
 			updateUiWorker.cancel(true);
 			updateUiWorker = null;
+			progressBar1.setEnabled(false);
 		}
 		updateUiWorker = new UpdateUIWorker(instance, readOnlyMode);
 		updateUiWorker.addPropertyChangeListener(new ProgressListener(progressBar1));
 		updateUiWorker.execute();
-		
-
 	}
 
 	/**
@@ -3800,6 +3799,8 @@ public class TranslationPanel extends JPanel {
 			this.instance = instance;
 			this.readOnlyMode = readOnlyMode;
 		}
+		
+		
 
 		@Override
 		protected String doInBackground() throws Exception {
@@ -3844,9 +3845,14 @@ public class TranslationPanel extends JPanel {
 
 			} catch (TerminologyException e) {
 				e.printStackTrace();
+				TranslationPanel.this.progressBar1.setEnabled(false);
 			} catch (IOException e) {
 				e.printStackTrace();
+				TranslationPanel.this.progressBar1.setEnabled(false);
+			}catch (Exception e) {
+				TranslationPanel.this.progressBar1.setEnabled(false);
 			}
+			TranslationPanel.this.progressBar1.setEnabled(false);
 			return "";
 		}
 		
