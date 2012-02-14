@@ -218,17 +218,7 @@ public class WorkflowSearcher {
 	 */
 	private void convertWlMembers(List<WorkList> worklist, List<WfInstance> result) throws TerminologyException, IOException {
 		for (final WorkList wl : worklist) {
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-
-					Thread appThr = new Thread() {
-						public void run() {
-							WorkflowInterpreter.createWorkflowInterpreter(wl.getWorkflowDefinition());
-						}
-					};
-					appThr.start();
-				}
-			});
+			WorkflowInterpreter.createWorkflowInterpreter(wl.getWorkflowDefinition());
 			List<WorkListMember> wlMembers = wl.getWorkListMembers();
 			for (WorkListMember workListMember : wlMembers) {
 				result.add(workListMember.getWfInstance());
