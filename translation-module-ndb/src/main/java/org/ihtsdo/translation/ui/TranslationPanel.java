@@ -3712,6 +3712,7 @@ public class TranslationPanel extends JPanel {
 	 *            the read only mode
 	 */
 	public void updateUI(WfInstance instance, boolean readOnlyMode) {
+		this.instance = instance;
 		if (updateUiWorker != null && !updateUiWorker.isDone()) {
 			updateUiWorker.cancel(true);
 			updateUiWorker = null;
