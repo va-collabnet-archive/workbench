@@ -57,6 +57,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.ProjectPermissionsAPI;
 import org.ihtsdo.project.panel.details.ZebraJTable;
 import org.ihtsdo.project.workflow.api.WfComponentProvider;
+import org.ihtsdo.project.workflow.model.WfMembership;
 import org.ihtsdo.project.workflow.model.WfRole;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.wizard.DataGridCollectorFromList.CheckBoxEditor;
@@ -84,6 +85,8 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 	
 	/** The roles. */
 	private List<WfRole> roles;
+
+	private Object[][] data;
 	
 	
 	/**
@@ -216,7 +219,7 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 				active.add(act);
 			}
 			
-			Object[][] data = new Object[active.size()][];
+			data = new Object[active.size()][];
 			for (int i = 0; i < data.length; i++) {
 				data[i]=(Object[]) active.get(i);
 			}
@@ -767,11 +770,35 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 			if (bExists==0){
 			throw new Exception(model.getColumnName(j)+" is empty.");
 			}
-			if (dExists>1){
-				throw new Exception(model.getColumnName(j-1)+" default must be only one.");
+			if (dExists!=1){
+				throw new Exception(model.getColumnName(j-1)+" default must be one.");
 			}
 		}
 		hmRes.put(key,model);	
 		return hmRes;
+	}
+
+	public void setData(HashMap<String, String> map, HashMap<String, String> def) {
+		if(map==null || map.size()<1) return;
+		
+		DefaultTableModel model = (DefaultTableModel) tblObjs.getModel();
+		for (int i = 1; i < columnNames.length; i+=2) {
+			if(map.containsKey(columnNames[i])){
+				String defUser= def.get(columnNames[i]).toString();
+				String[] users = map.get(columnNames[i]).split(", ");
+				for (String user : users) {
+					for (int j = 0; j < model.getRowCount(); j++) {
+						if(model.getValueAt(j, 0).toString().equals(user)){
+							model.setValueAt(true, j, i);
+							if(user.equals(defUser))
+								model.setValueAt(true, j, i+1);
+							break;
+						}
+					}
+				}
+			}
+		}
+		
+		tblObjs.setModel(model);
 	}
 }

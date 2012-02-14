@@ -18,10 +18,16 @@
 package org.ihtsdo.project.panel.details;
 
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.LayoutManager;
+import java.awt.Toolkit;
+import java.awt.Dialog.ModalityType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -35,13 +41,16 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -53,6 +62,7 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+import javax.swing.border.SoftBevelBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
@@ -76,8 +86,13 @@ import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.panel.TranslationHelperPanel;
 import org.ihtsdo.project.util.IconUtilities;
+import org.ihtsdo.project.workflow.api.WfComponentProvider;
+import org.ihtsdo.project.workflow.api.WorkflowDefinitionManager;
 import org.ihtsdo.project.workflow.model.WfMembership;
+import org.ihtsdo.project.workflow.model.WfRole;
 import org.ihtsdo.project.workflow.model.WfUser;
+import org.ihtsdo.project.workflow.model.WorkflowDefinition;
+import org.ihtsdo.project.workflow.wizard.DataGridCollectorFromList;
 
 /**
  * The Class WorkListDetailsPanel.
@@ -103,6 +118,10 @@ public class WorkListDetailsPanel extends JPanel {
 	
 	/** The members table model. */
 	private DefaultTableModel membersTableModel;
+
+	private HashMap<String, String> rolesMap;
+
+	private HashMap<String, String> defaultRoleUsers;
 
 	/**
 	 * Instantiates a new work list details panel.
@@ -188,25 +207,54 @@ public class WorkListDetailsPanel extends JPanel {
 	 */
 	private void loadRolesTable() {
 		List<WfMembership> wur = workList.getWorkflowUserRoles();
-		HashMap<String, String> map= new HashMap<String, String>();
-		if(wur==null || wur.size()==0) return;
+		rolesMap= new HashMap<String, String>();
+		defaultRoleUsers= new HashMap<String, String>();
+		if(wur==null || wur.size()==0){ 
+			button8.setVisible(false);
+			return;
+		}
+		button8.setVisible(true);
 		for (WfMembership wm : wur) {
-			if(map.containsKey(wm.getRole().getName())){
-				String user= map.get(wm.getRole().getName());
-				map.remove(wm.getRole().getName());
+			if(rolesMap.containsKey(wm.getRole().getName())){
+				String user= rolesMap.get(wm.getRole().getName());
+				rolesMap.remove(wm.getRole().getName());
 				user= user.concat(", "+wm.getUser().getUsername());
-				map.put(wm.getRole().getName(), user);
+				rolesMap.put(wm.getRole().getName(), user);
 			}
 			else{
-				map.put(wm.getRole().getName(), wm.getUser().getUsername());
+				rolesMap.put(wm.getRole().getName(), wm.getUser().getUsername());
 			}
+			if(wm.isDefaultAssignment())
+				defaultRoleUsers.put(wm.getRole().getName(), wm.getUser().getUsername());
 		}
-		Object[] keys= map.keySet().toArray();
-		DefaultTableModel model= (DefaultTableModel) rolesTable.getModel();
-		for (int i = 0; i < map.size(); i++) {
-			model.addRow(new Object[]{keys[i],map.get(keys[i])});
+		Object[] keys= rolesMap.keySet().toArray();
+		DefaultTableModel model= new DefaultTableModel(
+				new Object[][] {
+				},
+				new String[] {
+					"Role", "Users"
+				}
+			) {
+				Class<?>[] columnTypes = new Class<?>[] {
+					String.class, String.class
+				};
+				boolean[] columnEditable = new boolean[] {
+					false, false
+				};
+				@Override
+				public Class<?> getColumnClass(int columnIndex) {
+					return columnTypes[columnIndex];
+				}
+				@Override
+				public boolean isCellEditable(int rowIndex, int columnIndex) {
+					return columnEditable[columnIndex];
+				}
+			};
+		for (int i = 0; i < rolesMap.size(); i++) {
+			model.addRow(new Object[]{keys[i],rolesMap.get(keys[i])});
 		}
 		rolesTable.setModel(model);
+		rolesTable.updateUI();
 	}
 
 	/**
@@ -606,6 +654,82 @@ public class WorkListDetailsPanel extends JPanel {
 		}
 	}
 
+	private void button8ActionPerformed(ActionEvent e) {
+		
+		WorkflowDefinition wd= workList.getWorkflowDefinition();
+		final DataGridCollectorFromList dataGrid = new DataGridCollectorFromList(wd.getRoles(), new WfComponentProvider().getUsers());
+		dataGrid.setData(rolesMap, defaultRoleUsers);
+		dataGrid.setKey("roles");
+		final JDialog dialog= new JDialog();
+		dialog.setModalityType(ModalityType.APPLICATION_MODAL);
+		dialog.setMinimumSize(new Dimension(800,600));
+		Toolkit tk = Toolkit.getDefaultToolkit();
+	    Dimension screenSize = tk.getScreenSize();
+	    int screenHeight = screenSize.height;
+	    int screenWidth = screenSize.width;
+	    dialog.setLocation(screenWidth / 4, screenHeight / 4);
+	    
+	    JButton button= new JButton("Save");
+	    button.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				DefaultTableModel model=null;
+				try {
+					model = (DefaultTableModel)(dataGrid.getData().get("roles"));
+					if(model==null) return;
+			 		final ArrayList<WfMembership> workflowUserRoles = new ArrayList<WfMembership>();
+					WfComponentProvider wcp = new WfComponentProvider();
+					
+					for (int j=1; j<model.getColumnCount();j+=2){
+						
+						WfRole role=null;
+						for (WfRole wfRole :  wcp.getRoles()) {
+							if(wfRole.getName().equals(model.getColumnName(j))){
+								role=wfRole;
+								break;
+							}
+						}
+						for (int i = 0; i < model.getRowCount(); i++) {
+							Boolean sel = (Boolean) model.getValueAt(i, j);
+							if (sel){
+								Boolean def = (Boolean) model.getValueAt(i, j+1);
+								WfUser user= null; 
+								for (WfUser wfUser : wcp.getUsers()) {
+									if(wfUser.getId().equals(((WfUser)model.getValueAt(i, 0)).getId())){
+										user=wfUser;
+										break;
+									}
+								}
+								WfMembership workflowUserRole = new WfMembership(UUID.randomUUID(), user, role, def);
+								workflowUserRoles.add(workflowUserRole);
+							}
+						}
+					}
+					workList.setWorkflowUserRoles(workflowUserRoles);
+					TerminologyProjectDAO.updateWorklistAndMembers(workList, config);
+					dialog.dispose();
+				} catch (Exception e1) {
+					JOptionPane.showMessageDialog(dialog, e1.getMessage());
+				}
+			}
+		});
+	    dialog.getContentPane().setLayout(new GridBagLayout());
+	    GridBagConstraints gbc=new GridBagConstraints();
+	    gbc.gridwidth=GridBagConstraints.REMAINDER;
+	    gbc.fill=GridBagConstraints.BOTH;
+	    gbc.weightx=1.0;
+	    gbc.weighty=1.0;
+	    dataGrid.setMinimumSize(new Dimension(750,400));
+	    dialog.getContentPane().add(dataGrid, gbc);
+	    gbc.weightx=0.0;
+	    gbc.fill=GridBagConstraints.NONE;
+	    dialog.getContentPane().add(button, gbc);
+		dialog.setVisible(true);
+		loadRolesTable();
+		
+	}
+
 	/**
 	 * Inits the components.
 	 */
@@ -668,6 +792,8 @@ public class WorkListDetailsPanel extends JPanel {
 		rolesPanel = new JPanel();
 		scrollPane1 = new JScrollPane();
 		rolesTable = new JTable();
+		panel5 = new JPanel();
+		button8 = new JButton();
 
 		//======== this ========
 		setBackground(new Color(238, 238, 238));
@@ -1188,9 +1314,9 @@ public class WorkListDetailsPanel extends JPanel {
 			{
 				rolesPanel.setLayout(new GridBagLayout());
 				((GridBagLayout)rolesPanel.getLayout()).columnWidths = new int[] {15, 0, 10, 0};
-				((GridBagLayout)rolesPanel.getLayout()).rowHeights = new int[] {15, 0, 10, 0};
+				((GridBagLayout)rolesPanel.getLayout()).rowHeights = new int[] {15, 0, 0, 10, 0};
 				((GridBagLayout)rolesPanel.getLayout()).columnWeights = new double[] {0.0, 1.0, 0.0, 1.0E-4};
-				((GridBagLayout)rolesPanel.getLayout()).rowWeights = new double[] {0.0, 1.0, 0.0, 1.0E-4};
+				((GridBagLayout)rolesPanel.getLayout()).rowWeights = new double[] {0.0, 1.0, 0.0, 0.0, 1.0E-4};
 
 				//======== scrollPane1 ========
 				{
@@ -1227,6 +1353,30 @@ public class WorkListDetailsPanel extends JPanel {
 				rolesPanel.add(scrollPane1, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 5, 5), 0, 0));
+
+				//======== panel5 ========
+				{
+					panel5.setLayout(new GridBagLayout());
+					((GridBagLayout)panel5.getLayout()).columnWidths = new int[] {0, 0, 0};
+					((GridBagLayout)panel5.getLayout()).rowHeights = new int[] {0, 0};
+					((GridBagLayout)panel5.getLayout()).columnWeights = new double[] {0.0, 1.0, 1.0E-4};
+					((GridBagLayout)panel5.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+
+					//---- button8 ----
+					button8.setText("Edit Roles");
+					button8.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							button8ActionPerformed(e);
+						}
+					});
+					panel5.add(button8, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 5), 0, 0));
+				}
+				rolesPanel.add(panel5, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 5), 0, 0));
 			}
 			tabbedPane1.addTab("Roles", rolesPanel);
 
@@ -1239,173 +1389,64 @@ public class WorkListDetailsPanel extends JPanel {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
-	/** The tabbed pane1. */
 	private JTabbedPane tabbedPane1;
-	
-	/** The panel0. */
 	private JPanel panel0;
-	
-	/** The panel1. */
 	private JPanel panel1;
-	
-	/** The panel2. */
 	private JPanel panel2;
-	
-	/** The label1. */
 	private JLabel label1;
-	
-	/** The panel17. */
 	private JPanel panel17;
-	
-	/** The label2. */
 	private JLabel label2;
-	
-	/** The text field1. */
 	private JTextField textField1;
-	
-	/** The label3. */
 	private JLabel label3;
-	
-	/** The label6. */
 	private JLabel label6;
-	
-	/** The panel16. */
 	private JPanel panel16;
-	
-	/** The label11. */
 	private JLabel label11;
-	
-	/** The panel7. */
 	private JPanel panel7;
-	
-	/** The button2. */
 	private JButton button2;
-	
-	/** The button3. */
 	private JButton button3;
-	
-	/** The p bar w. */
 	private JProgressBar pBarW;
-	
-	/** The button4. */
 	private JButton button4;
-	
-	/** The label13. */
 	private JLabel label13;
-	
-	/** The panel8. */
 	private JPanel panel8;
-	
-	/** The label7. */
 	private JLabel label7;
-	
-	/** The panel10. */
 	private JPanel panel10;
-	
-	/** The label12. */
 	private JLabel label12;
-	
-	/** The label16. */
 	private JLabel label16;
-	
-	/** The panel9. */
 	private JPanel panel9;
-	
-	/** The label4. */
 	private JLabel label4;
-	
-	/** The panel11. */
 	private JPanel panel11;
-	
-	/** The button1. */
 	private JButton button1;
-	
-	/** The p bar bp. */
 	private JProgressBar pBarBP;
-	
-	/** The panel3. */
 	private JPanel panel3;
-	
-	/** The panel12. */
 	private JPanel panel12;
-	
-	/** The label8. */
 	private JLabel label8;
-	
-	/** The panel13. */
 	private JPanel panel13;
-	
-	/** The combo box1. */
 	private JComboBox comboBox1;
-	
-	/** The panel18. */
 	private JPanel panel18;
-	
-	/** The panel22. */
 	private JPanel panel22;
-	
-	/** The label17. */
 	private JLabel label17;
-	
-	/** The label5. */
 	private JLabel label5;
-	
-	/** The panel19. */
 	private JPanel panel19;
-	
-	/** The panel4. */
 	private JPanel panel4;
-	
-	/** The button6. */
 	private JButton button6;
-	
-	/** The p bar d. */
 	private JProgressBar pBarD;
-	
-	/** The panel14. */
 	private JPanel panel14;
-	
-	/** The panel23. */
 	private JPanel panel23;
-	
-	/** The label9. */
 	private JLabel label9;
-	
-	/** The label18. */
 	private JLabel label18;
-	
-	/** The members table scroll panel. */
 	private JScrollPane membersTableScrollPanel;
-	
-	/** The members table. */
 	private JTable membersTable;
-	
-	/** The panel15. */
 	private JPanel panel15;
-	
-	/** The label10. */
 	private JLabel label10;
-	
-	/** The panel6. */
 	private JPanel panel6;
-	
-	/** The button5. */
 	private JButton button5;
-	
-	/** The button7. */
 	private JButton button7;
-	
-	/** The progress bar1. */
 	private JProgressBar progressBar1;
-	
-	/** The roles panel. */
 	private JPanel rolesPanel;
-	
-	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
-	
-	/** The roles table. */
 	private JTable rolesTable;
+	private JPanel panel5;
+	private JButton button8;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 }
 
