@@ -860,6 +860,7 @@ public class WfInboxPanel extends JPanel {
 			Terms.get().commit();
 			TagManager.getInstance().emptyOutboxTag();
 			inboxTreePanel1.updateTree();
+			model.clearTable();
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
