@@ -139,12 +139,30 @@
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
     <entry>
+      <string>Send Super SME feedback</string>
+      <org.ihtsdo.project.workflow.model.WfAction>
+        <name>Send Super SME feedback</name>
+        <id>9ead85c4-10c8-471e-897d-c7d59d92cbe1</id>
+        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[7]"/>
+        <businessProcess>sampleProcesses/RejectActionWithoutDestination.bp</businessProcess>
+      </org.ihtsdo.project.workflow.model.WfAction>
+    </entry>
+    <entry>
       <string>Request feedback from Super SME</string>
       <org.ihtsdo.project.workflow.model.WfAction>
         <name>Request feedback from Super SME</name>
         <id>7130012e-0aba-43fb-a044-0e750b14bd25</id>
         <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[3]"/>
         <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
+      </org.ihtsdo.project.workflow.model.WfAction>
+    </entry>
+    <entry>
+      <string>Send SME feedback</string>
+      <org.ihtsdo.project.workflow.model.WfAction>
+        <name>Send SME feedback</name>
+        <id>af959143-17d6-4b68-a907-28dcd7a616b6</id>
+        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[9]"/>
+        <businessProcess>sampleProcesses/RejectActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
     <entry>
@@ -167,7 +185,7 @@
     </entry>
   </actions>
   <xlsFileName>
-    <string>/Users/alo/Documents/TermMed/Eclipse/TranslationPhase4/translation-bundle-test-assembly-jan-16/editor/target/wb-bundle/drools-rules/canada-full-wf.xls</string>
+    <string>drools-rules/canada-full-wf.xls</string>
   </xlsFileName>
   <drlFileName/>
   <name>canada-full-wf</name>
