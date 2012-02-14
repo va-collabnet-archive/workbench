@@ -87,6 +87,7 @@ import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.lang.LANG_CODE;
+import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
 import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 import org.ihtsdo.tk.binding.snomed.Language;
@@ -173,6 +174,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
     private FixedWidthJEditorPane parentUuidPane;
     private FixedWidthJEditorPane parentFsnPane;
     private ConceptSpec parent;
+    private ComponentChroncileBI parentConcept;
     private boolean hasPanel = false;
     private boolean hasSctId = false;
     private boolean hasFsnSctId = false;
@@ -890,10 +892,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
         try {
             //get parents
             UUID[] uuidArray = new UUID[1];
-            try {
-                uuidArray[0] = parent.getLenient().getPrimUuid();
-            } catch (IOException e) {
-            }
+            uuidArray[0] = parentConcept.getPrimUuid();
 
             //create concept blue print
             if (lang.equals("en-gb")) {
@@ -1162,16 +1161,22 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                     for (I_GetConceptData concept : concepts) {
                         parentUuid = concept.getPrimUuid();
                     }
+                    parentConcept = Ts.get().getComponent(parentUuid);
                     parent = new ConceptSpec(parentFsn, parentUuid);
                     parent.getLenient();
                     returnCondition = Condition.CONTINUE;
                     done = true;
                     NewConceptFromBatch.this.notifyTaskDone();
                 } catch (ValidationException ex) {
-                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                            "<html>The parent fsn and UUID do not match."
-                            + "<br>Fsn: " + parentFsn + " UUID: " + parentUuid, "",
-                            JOptionPane.ERROR_MESSAGE);
+                    int option = JOptionPane.showConfirmDialog(LogWithAlerts.getActiveFrame(null),
+                                "<html>The parent fsn and ID do not match."
+                                + "<br>Fsn: " + parentFsn + " ID: " + parentId
+                                +"<br>Do you want to continue?","", JOptionPane.YES_NO_OPTION);
+                        if (option == JOptionPane.YES_OPTION) {
+                            returnCondition = Condition.CONTINUE;
+                            done = true;
+                            NewConceptFromBatch.this.notifyTaskDone();
+                        }
                 } catch (AssertionError ex) {
                     JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
                             "<html>The parent concpet has not been created."
