@@ -841,11 +841,11 @@ public class WfInboxPanel extends JPanel {
 	}
 
 	/**
-	 * Send to outbox action performed.
+	 * Empty action performed.
 	 *
 	 * @param e the e
 	 */
-	private void sendToOutboxActionPerformed(ActionEvent e) {
+	private void emptyOutboxActionPerformed(ActionEvent e) {
 		try {
 			WorkflowSearcher searcher = new WorkflowSearcher();
 			Collection<WfSearchFilterBI> collection = new ArrayList<WfSearchFilterBI>();
@@ -1223,7 +1223,7 @@ public class WfInboxPanel extends JPanel {
 			sendToOutbox.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					sendToOutboxActionPerformed(e);
+					emptyOutboxActionPerformed(e);
 				}
 			});
 			panel4.add(sendToOutbox, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
