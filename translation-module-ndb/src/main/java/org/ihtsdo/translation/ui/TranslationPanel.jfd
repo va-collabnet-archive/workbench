@@ -1895,47 +1895,6 @@
                 </void> 
                 <void method="add"> 
                  <object class="com.jformdesigner.model.FormComponent"> 
-                  <string>javax.swing.JProgressBar</string> 
-                  <void method="setProperty"> 
-                   <string>minimumSize</string> 
-                   <object class="java.awt.Dimension"> 
-                    <int>10</int> 
-                    <int>5</int> 
-                   </object> 
-                  </void> 
-                  <void method="setProperty"> 
-                   <string>preferredSize</string> 
-                   <object class="java.awt.Dimension"> 
-                    <int>146</int> 
-                    <int>10</int> 
-                   </object> 
-                  </void> 
-                  <void method="setProperty"> 
-                   <string>opaque</string> 
-                   <boolean>true</boolean> 
-                  </void> 
-                  <void property="name"> 
-                   <string>progressBar1</string> 
-                  </void> 
-                 </object> 
-                 <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-                  <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
-                  <void method="setProperty"> 
-                   <string>gridy</string> 
-                   <int>2</int> 
-                  </void> 
-                  <void method="setProperty"> 
-                   <string>gridwidth</string> 
-                   <int>5</int> 
-                  </void> 
-                  <void method="setProperty"> 
-                   <string>vAlign</string> 
-                   <int>3</int> 
-                  </void> 
-                 </object> 
-                </void> 
-                <void method="add"> 
-                 <object class="com.jformdesigner.model.FormComponent"> 
                   <string>javax.swing.JLabel</string> 
                   <void method="setProperty"> 
                    <string>text</string> 

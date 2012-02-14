@@ -1503,7 +1503,6 @@ public class TranslationPanel extends JPanel {
 		label3 = new JLabel();
 		rbYes = new JRadioButton();
 		rbNo = new JRadioButton();
-		progressBar1 = new JProgressBar();
 		label13 = new JLabel();
 		tabbedPane3 = new JTabbedPane();
 		scrollPane7 = new JScrollPane();
@@ -2039,14 +2038,6 @@ public class TranslationPanel extends JPanel {
 								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 								new Insets(0, 0, 5, 0), 0, 0));
 
-							//---- progressBar1 ----
-							progressBar1.setMinimumSize(new Dimension(10, 5));
-							progressBar1.setPreferredSize(new Dimension(146, 10));
-							progressBar1.setOpaque(true);
-							panel18.add(progressBar1, new GridBagConstraints(0, 2, 5, 1, 0.0, 0.0,
-								GridBagConstraints.SOUTH, GridBagConstraints.HORIZONTAL,
-								new Insets(0, 0, 0, 5), 0, 0));
-
 							//---- label13 ----
 							label13.setText("text");
 							label13.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
@@ -2252,7 +2243,6 @@ public class TranslationPanel extends JPanel {
 	private JLabel label3;
 	private JRadioButton rbYes;
 	private JRadioButton rbNo;
-	private JProgressBar progressBar1;
 	private JLabel label13;
 	private JTabbedPane tabbedPane3;
 	private JScrollPane scrollPane7;
@@ -3716,10 +3706,8 @@ public class TranslationPanel extends JPanel {
 		if (updateUiWorker != null && !updateUiWorker.isDone()) {
 			updateUiWorker.cancel(true);
 			updateUiWorker = null;
-			progressBar1.setEnabled(false);
 		}
 		updateUiWorker = new UpdateUIWorker(instance, readOnlyMode);
-		updateUiWorker.addPropertyChangeListener(new ProgressListener(progressBar1));
 		updateUiWorker.execute();
 	}
 
@@ -3845,14 +3833,9 @@ public class TranslationPanel extends JPanel {
 
 			} catch (TerminologyException e) {
 				e.printStackTrace();
-				TranslationPanel.this.progressBar1.setEnabled(false);
 			} catch (IOException e) {
 				e.printStackTrace();
-				TranslationPanel.this.progressBar1.setEnabled(false);
-			}catch (Exception e) {
-				TranslationPanel.this.progressBar1.setEnabled(false);
 			}
-			TranslationPanel.this.progressBar1.setEnabled(false);
 			return "";
 		}
 		
