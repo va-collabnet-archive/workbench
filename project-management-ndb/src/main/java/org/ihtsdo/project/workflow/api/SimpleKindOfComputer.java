@@ -16,7 +16,13 @@
  */
 package org.ihtsdo.project.workflow.api;
 
+import java.io.IOException;
 import java.util.UUID;
+
+import org.dwfa.ace.api.Terms;
+import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 
 /**
  * The Class SimpleKindOfComputer.
@@ -25,18 +31,34 @@ public class SimpleKindOfComputer {
 
 	/**
 	 * Checks if is kind of.
-	 *
-	 * @param descendant the descendant
-	 * @param parent the parent
+	 * 
+	 * @param descendant
+	 *            the descendant
+	 * @param parent
+	 *            the parent
 	 * @return true, if is kind of
 	 */
 	public boolean isKindOf(UUID descendant, UUID parent) {
-//		if (descendant != null && descendant.equals(UUID.fromString("d0bdc410-1ad1-11e1-bddb-0800200c9a66"))) {
-//			return false;
-//		} else {
-//			return true;
-//		}
-		return true;
+		boolean result = false;
+		ConceptVersionBI parentConcept = null;
+		ConceptVersionBI subtypeConcept = null;
+		try {
+			parentConcept = Ts.get().getConceptVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), parent);
+			subtypeConcept = Ts.get().getConceptVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), descendant);
+			if (parentConcept == null || subtypeConcept == null) {
+				result = false;
+			} else {
+				result = subtypeConcept.isKindOf(parentConcept);
+			}
+		} catch (java.lang.AssertionError e) {
+			System.out.println("Error retrieving concepts in iParentOf: " + parent + ", " + subtypeConcept);
+			System.out.println(e.getMessage());
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		}
+		return result;
 	}
 
 }
