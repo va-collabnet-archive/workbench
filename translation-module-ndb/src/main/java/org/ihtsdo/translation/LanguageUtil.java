@@ -1402,21 +1402,31 @@ public class LanguageUtil {
 	 * @return the linguistic guidelines
 	 * @throws Exception the exception
 	 */
-	public static String getLinguisticGuidelines(I_GetConceptData concept) throws Exception {
+	public static String getLinguisticGuidelines(I_ContextualizeDescription sourcePreferredDescription, I_ContextualizeDescription sourceFsnDescription) throws Exception {
 		String htmlResponse = "";
 
-		ResultsCollectorWorkBench resultsCollector = RulesLibrary.checkConcept(concept, Terms.get().getConcept(RefsetAuxiliary.Concept.LANG_GUIDELINES_CONTEXT.getUids()), false, Terms.get()
-				.getActiveAceFrameConfig());
-
-		if (!resultsCollector.getResultsItems().isEmpty()) {
+		LinguisticGuidelinesInterpreter interpreter = LinguisticGuidelinesInterpreter.createLinguisticGuidelinesInterpreter(sourcePreferredDescription, sourceFsnDescription);
+		List<String> guidelines = interpreter.getLinguisticGuidelines();
+		
+		if (guidelines != null && !guidelines.isEmpty()) {
 			htmlResponse = "<html><body>";
-			for (ResultsItem resultsItem : resultsCollector.getResultsItems()) {
-				if (resultsItem.getErrorCode() == 1099) {
-					htmlResponse = htmlResponse + resultsItem.getMessage() + "<br><br>";
-				}
+			for (String resultsItem : guidelines) {
+				htmlResponse = htmlResponse + resultsItem + "<br><br>";
 			}
 			htmlResponse = htmlResponse + "</body></html>";
 		}
+//		ResultsCollectorWorkBench resultsCollector = RulesLibrary.checkConcept(concept, Terms.get().getConcept(RefsetAuxiliary.Concept.LANG_GUIDELINES_CONTEXT.getUids()), false, Terms.get()
+//				.getActiveAceFrameConfig());
+//
+//		if (!resultsCollector.getResultsItems().isEmpty()) {
+//			htmlResponse = "<html><body>";
+//			for (ResultsItem resultsItem : resultsCollector.getResultsItems()) {
+//				if (resultsItem.getErrorCode() == 1099) {
+//					htmlResponse = htmlResponse + resultsItem.getMessage() + "<br><br>";
+//				}
+//			}
+//			htmlResponse = htmlResponse + "</body></html>";
+//		}
 
 		return htmlResponse;
 	}

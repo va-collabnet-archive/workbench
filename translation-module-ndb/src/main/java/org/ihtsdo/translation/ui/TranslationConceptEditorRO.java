@@ -2414,22 +2414,22 @@ public class TranslationConceptEditorRO extends JPanel {
 	 */
 	private void updateGlossaryEnforcement(String query) {
 
-		try {
-			String results = LanguageUtil.getLinguisticGuidelines(concept);
-			if (!results.isEmpty()) {
-				tabbedPane1.setTitleAt(2, "<html>Linguistic Guidelines<b><font color='red'>*</font></b></html>");
-			} else {
-				tabbedPane1.setTitleAt(2, "<html>Linguistic Guidelines</html>");
-			}
-			editorPane1.setText(results);
-			editorPane1.revalidate();
-		} catch (TerminologyException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+//		try {
+//			//String results = LanguageUtil.getLinguisticGuidelines(concept);
+//			if (!results.isEmpty()) {
+//				tabbedPane1.setTitleAt(2, "<html>Linguistic Guidelines<b><font color='red'>*</font></b></html>");
+//			} else {
+//				tabbedPane1.setTitleAt(2, "<html>Linguistic Guidelines</html>");
+//			}
+//			editorPane1.setText(results);
+//			editorPane1.revalidate();
+//		} catch (TerminologyException e) {
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 	}
 
 	/**

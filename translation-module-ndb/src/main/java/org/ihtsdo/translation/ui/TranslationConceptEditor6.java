@@ -2860,7 +2860,7 @@ public class TranslationConceptEditor6 extends JPanel {
 									final SimilarityPanel similPanel = getSimilarityPanel();
 									Runnable simil = new Runnable() {
 										public void run() {
-											similPanel.updateTabs(sourceFSN, concept, sourceIds, targetId, translationProject, worklistMember);
+											//similPanel.updateTabs(sourceFSN, concept, sourceIds, targetId, translationProject, worklistMember);
 											int scount = similPanel.getSimilarityHitsCount();
 											if (scount > 0) {
 												label14.setForeground(Color.red);

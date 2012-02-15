@@ -219,8 +219,13 @@ public class TranslationPanel extends JPanel {
 
 	/** The canc action. */
 	private WfAction cancAction;
-	
-	
+
+	/** Source fsn concept */
+	private I_ContextualizeDescription sourceFsnConcept;
+
+	/** Source preferred concept */
+	private I_ContextualizeDescription sourcePreferredConcept;
+
 	private Set<Character> memonicKeys = new HashSet<Character>();
 
 	/** The target text changed. */
@@ -1346,9 +1351,7 @@ public class TranslationPanel extends JPanel {
 	private void button1ActionPerformed() {
 		I_Work worker = null;
 		try {
-
 			worker = Terms.get().getActiveAceFrameConfig().getWorker();
-
 			workflowInterpreter.doAction(instance, wfRole, cancAction, worker);
 			WfInstance newWfInstance = instance;
 			firePropertyChange(TranslationPanel.ACTION_LAUNCHED, instance, newWfInstance);
@@ -2382,19 +2385,8 @@ public class TranslationPanel extends JPanel {
 		List<Object[]> tmpRows = new ArrayList<Object[]>();
 		if (concept != null) {
 			try {
-				// top = new DefaultMutableTreeNode(new
-				// TreeEditorObjectWrapper(concept.toString(),
-				// TreeEditorObjectWrapper.CONCEPT, concept));
 				for (I_GetConceptData langRefset : this.translationProject.getSourceLanguageRefsets()) {
 					List<ContextualizedDescription> descriptions = LanguageUtil.getContextualizedDescriptions(concept.getConceptNid(), langRefset.getConceptNid(), true);
-
-					// DefaultMutableTreeNode groupLang = new
-					// DefaultMutableTreeNode(
-					// new TreeEditorObjectWrapper(langRefset.getInitialText(),
-					// TreeEditorObjectWrapper.FOLDER,langRefset ));
-
-					// List<DefaultMutableTreeNode> nodesToAdd = new
-					// ArrayList<DefaultMutableTreeNode>();
 
 					boolean bSourceFSN = false;
 					boolean bNewNode = false;
@@ -2424,6 +2416,9 @@ public class TranslationPanel extends JPanel {
 									bNewNode = true;
 								}
 							} else if (description.getTypeId() == fsn.getConceptNid()) {
+
+								sourceFsnConcept = description;
+
 								if (sourceCom.contains(ConfigTranslationModule.TreeComponent.FSN)) {
 									rowClass[0] = TreeEditorObjectWrapper.FSNDESCRIPTION;
 									row[TableSourceColumn.ACCEPTABILITY.ordinal()] = preferred;
@@ -2433,60 +2428,8 @@ public class TranslationPanel extends JPanel {
 
 									bNewNode = true;
 								}
-								int semtagLocation = description.getText().lastIndexOf("(");
-								if (semtagLocation == -1)
-									semtagLocation = description.getText().length();
-
 								if (!bSourceFSN) {
 									bSourceFSN = true;
-									sourceFSN = description.getText().substring(0, semtagLocation);
-
-									final SimilarityPanel similPanel = getSimilarityPanel();
-									Runnable simil = new Runnable() {
-										public void run() {
-											similPanel.updateTabs(sourceFSN, concept, sourceIds, targetId, translationProject, worklistMember);
-											int scount = similPanel.getSimilarityHitsCount();
-											if (scount > 0) {
-												label14.setForeground(Color.red);
-											} else {
-												label14.setForeground(Color.black);
-											}
-											label14.setText("S:" + scount);
-											label14.revalidate();
-
-											int tmcount = similPanel.getTransMemoryHitsCount();
-											if (tmcount > 0) {
-												label15.setForeground(Color.red);
-											} else {
-												label15.setForeground(Color.black);
-											}
-											label15.setText("TM:" + tmcount);
-											label15.revalidate();
-
-											int lgcount = similPanel.getLingGuidelinesHitsCount();
-											if (lgcount > 0) {
-												label16.setForeground(Color.red);
-											} else {
-												label16.setForeground(Color.black);
-											}
-											label16.setText("LG:" + lgcount);
-											label16.revalidate();
-										}
-									};
-									updateUIThread = new Thread(simil);
-									updateUIThread.start();
-									// Runnable tMemo = new Runnable() {
-									// public void run() {
-									// updateTransMemoryTable(sourceFSN);
-									// }
-									// };
-									// tMemo.run();
-									// Runnable gloss = new Runnable() {
-									// public void run() {
-									// // updateGlossaryEnforcement(sourceFSN);
-									// }
-									// };
-									// gloss.run();
 								}
 							} else if (description.getAcceptabilityId() == acceptable.getConceptNid() && sourceCom.contains(ConfigTranslationModule.TreeComponent.SYNONYM)) {
 								rowClass[0] = TreeEditorObjectWrapper.SYNONYMN;
@@ -2495,13 +2438,16 @@ public class TranslationPanel extends JPanel {
 								termType_Status[1] = active;
 								row[TableSourceColumn.TERM_TYPE.ordinal()] = termType_Status;
 								bNewNode = true;
-							} else if (description.getAcceptabilityId() == preferred.getConceptNid() && sourceCom.contains(ConfigTranslationModule.TreeComponent.PREFERRED)) {
-								rowClass[0] = TreeEditorObjectWrapper.PREFERRED;
-								row[TableSourceColumn.ACCEPTABILITY.ordinal()] = preferred;
-								termType_Status[0] = this.synonym;
-								termType_Status[1] = active;
-								row[TableSourceColumn.TERM_TYPE.ordinal()] = termType_Status;
-								bNewNode = true;
+							} else if (description.getAcceptabilityId() == preferred.getConceptNid()) {
+								sourcePreferredConcept = description;
+								if (sourceCom.contains(ConfigTranslationModule.TreeComponent.PREFERRED)) {
+									rowClass[0] = TreeEditorObjectWrapper.PREFERRED;
+									row[TableSourceColumn.ACCEPTABILITY.ordinal()] = preferred;
+									termType_Status[0] = this.synonym;
+									termType_Status[1] = active;
+									row[TableSourceColumn.TERM_TYPE.ordinal()] = termType_Status;
+									bNewNode = true;
+								}
 							} else if (sourceCom.contains(ConfigTranslationModule.TreeComponent.RETIRED)) {
 								rowClass[0] = TreeEditorObjectWrapper.SYNONYMN;
 								// row[TableSourceColumn.ACCEPTABILITY.ordinal()]
@@ -2517,6 +2463,40 @@ public class TranslationPanel extends JPanel {
 							}
 						}
 					}
+					
+					/** update similarity table*/
+					SimilarityPanel similPanel = getSimilarityPanel();
+					similPanel.updateTabs(sourceFsnConcept,sourcePreferredConcept, concept, sourceIds, targetId, translationProject, worklistMember);
+					int scount = similPanel.getSimilarityHitsCount();
+					if (scount > 0) {
+						label14.setForeground(Color.red);
+					} else {
+						label14.setForeground(Color.black);
+					}
+					label14.setText("S:" + scount);
+					label14.revalidate();
+
+					int tmcount = similPanel.getTransMemoryHitsCount();
+					if (tmcount > 0) {
+						label15.setForeground(Color.red);
+					} else {
+						label15.setForeground(Color.black);
+					}
+					label15.setText("TM:" + tmcount);
+					label15.revalidate();
+
+					int lgcount = similPanel.getLingGuidelinesHitsCount();
+					if (lgcount > 0) {
+						label16.setForeground(Color.red);
+					} else {
+						label16.setForeground(Color.black);
+					}
+					label16.setText("LG:" + lgcount);
+					label16.revalidate();
+					
+					
+					
+					
 					Font fontTmp = tabSou.getFont();
 					FontMetrics fontMetrics = new FontMetrics(fontTmp) {
 					};
@@ -3718,7 +3698,7 @@ public class TranslationPanel extends JPanel {
 	 *            the new possible actions
 	 */
 	public void setPossibleActions(List<WfAction> actions) {
-		
+
 		actionMenu.removeAll();
 		actionMenu.add(sendMenuItem);
 		actionMenu.addSeparator();
@@ -3727,38 +3707,38 @@ public class TranslationPanel extends JPanel {
 		for (WfAction action : actions) {
 			cmbActions.addItem(action);
 			JMenuItem actionItem = new JMenuItem();
-			//---- action menue item ----
+			// ---- action menue item ----
 			actionItem.setText(action.toString());
 			actionItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					Object source = arg0.getSource();
-					if(source instanceof JMenuItem){
-						JMenuItem sourceMenuItem = (JMenuItem)source;
+					if (source instanceof JMenuItem) {
+						JMenuItem sourceMenuItem = (JMenuItem) source;
 						String actionText = sourceMenuItem.getText();
 						int cmbActionItemCount = cmbActions.getItemCount();
 						for (int i = 0; i < cmbActionItemCount; i++) {
 							Object cmbActionItem = cmbActions.getItemAt(i);
-							if(cmbActionItem.toString().equals(actionText)){
+							if (cmbActionItem.toString().equals(actionText)) {
 								cmbActions.setSelectedIndex(i);
 								break;
 							}
 						}
-						
+
 					}
 				}
 			});
-			actionItem.setAccelerator(KeyStroke.getKeyStroke(getKeyEventForAction(action), Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
+			actionItem.setAccelerator(KeyStroke.getKeyStroke(getKeyEventForAction(action), Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_MASK));
 			actionMenu.add(actionItem);
 		}
-		
+
 		addDefaultActions();
 	}
-	
+
 	private int getKeyEventForAction(WfAction action) {
 		String actionName = action.getName();
 		for (int i = 0; i < actionName.length(); i++) {
-			if(!memonicKeys.contains(actionName.charAt(i))){
+			if (!memonicKeys.contains(actionName.charAt(i))) {
 				memonicKeys.add(actionName.charAt(i));
 				return actionName.charAt(i);
 			}
@@ -3777,18 +3757,16 @@ public class TranslationPanel extends JPanel {
 		satdAction.setConsequence(null);
 		cmbActions.addItem(satdAction);
 	}
-	
-	class UpdateUIWorker extends SwingWorker<String, String>{
+
+	class UpdateUIWorker extends SwingWorker<String, String> {
 		private WfInstance instance;
 		private boolean readOnlyMode;
-		
+
 		public UpdateUIWorker(WfInstance instance, boolean readOnlyMode) {
 			super();
 			this.instance = instance;
 			this.readOnlyMode = readOnlyMode;
 		}
-		
-		
 
 		@Override
 		protected String doInBackground() throws Exception {
@@ -3838,6 +3816,6 @@ public class TranslationPanel extends JPanel {
 			}
 			return "";
 		}
-		
+
 	}
 }

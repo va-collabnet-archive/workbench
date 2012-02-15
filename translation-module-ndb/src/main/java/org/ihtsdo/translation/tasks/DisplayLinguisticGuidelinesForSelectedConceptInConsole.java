@@ -81,7 +81,7 @@ public class DisplayLinguisticGuidelinesForSelectedConceptInConsole extends Abst
 	public Condition evaluate(final I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 		try {
 			I_GetConceptData concept = Terms.get().getActiveAceFrameConfig().getHierarchySelection();
-			System.out.println(LanguageUtil.getLinguisticGuidelines(concept));
+			//System.out.println(LanguageUtil.getLinguisticGuidelines(concept));
 		} catch (Exception e) {
 			throw new TaskFailedException(e.getMessage());
 		}
