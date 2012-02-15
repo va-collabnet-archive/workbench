@@ -20,19 +20,26 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.dwfa.ace.api.I_AmTermComponent;
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_HostConceptPlugins;
 
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.cs.ComponentValidator;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
+import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.Ts;
 
 /**
  * @author kec
@@ -87,12 +94,31 @@ public class ImportAllChangeSets extends AbstractTask {
      *      org.dwfa.bpa.process.I_Work)
      */
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        try {
+            Terms.get().suspendChangeSetWriters();
+            importAllChangeSets(worker.getLogger());
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+            
+            I_AmTermComponent termComponent1 = config.getConceptViewer(1).getTermComponent();
+            config.getConceptViewer(1).setTermComponent(termComponent1);
 
-        Terms.get().suspendChangeSetWriters();
-        importAllChangeSets(worker.getLogger());
-        Terms.get().resumeChangeSetWriters();
+            I_AmTermComponent termComponent2 = config.getConceptViewer(2).getTermComponent();
+            config.getConceptViewer(2).setTermComponent(termComponent2);
 
-        return Condition.CONTINUE;
+            I_AmTermComponent termComponent3 = config.getConceptViewer(3).getTermComponent();
+            config.getConceptViewer(3).setTermComponent(termComponent3);
+
+            I_AmTermComponent termComponent4 = config.getConceptViewer(4).getTermComponent();
+            config.getConceptViewer(4).setTermComponent(termComponent4);
+            
+            Terms.get().resumeChangeSetWriters();
+
+            return Condition.CONTINUE;
+        } catch (TerminologyException ex) {
+            throw new TaskFailedException(ex);
+        } catch (IOException ex) {
+            throw new TaskFailedException(ex);
+        }
     }
 
     public void importAllChangeSets(Logger log) throws TaskFailedException {
