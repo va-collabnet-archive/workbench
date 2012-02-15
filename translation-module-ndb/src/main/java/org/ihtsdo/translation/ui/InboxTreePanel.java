@@ -518,13 +518,13 @@ public class InboxTreePanel extends JPanel {
 						model.reload(child);
 					}
 				}
-				if (!wlExists) {
-					InboxTreeItem inboxTreeItem = new InboxTreeItem(worklist, 1, IconUtilities.WORKLIST_NODE);
-					DefaultMutableTreeNode chldNode = new DefaultMutableTreeNode(inboxTreeItem);
-					wNode.add(chldNode);
-					model.reload(wNode);
-					inboxFolderTree.expandPath(new TreePath(wNode.getPath()));
-				}
+			}
+			if (!wlExists) {
+				InboxTreeItem inboxTreeItem = new InboxTreeItem(worklist, 1, IconUtilities.WORKLIST_NODE);
+				DefaultMutableTreeNode chldNode = new DefaultMutableTreeNode(inboxTreeItem);
+				wNode.add(chldNode);
+				model.reload(wNode);
+				inboxFolderTree.expandPath(new TreePath(wNode.getPath()));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -347,6 +347,7 @@ public class TranslationPanel extends JPanel {
 	}
 
 	private void initializeMemonicKeys() {
+		memonicKeys = new HashSet<Character>();
 		memonicKeys.add('G');
 		memonicKeys.add('Y');
 		memonicKeys.add('K');
@@ -778,6 +779,7 @@ public class TranslationPanel extends JPanel {
 		rbYes.setEnabled(true && !readOnlyMode);
 		bLaunch.setEnabled(true);
 		cmbActions.setEnabled(true);
+		button1.setEnabled(true);
 	}
 
 	/**
@@ -1334,6 +1336,10 @@ public class TranslationPanel extends JPanel {
 				workflowInterpreter.doAction(instance, wfRole, action, worker);
 				WfInstance newWfInstance = worklistMember.getWfInstance();
 				newWfInstance.setActionReport(instance.getActionReport());
+				clearForm(true);
+				setReadOnlyMode(true);
+				bLaunch.setEnabled(false);
+				button1.setEnabled(false);
 				firePropertyChange(TranslationPanel.ACTION_LAUNCHED, prevWfInstance, newWfInstance);
 			} catch (TerminologyException e) {
 				e.printStackTrace();
@@ -1354,6 +1360,7 @@ public class TranslationPanel extends JPanel {
 			worker = Terms.get().getActiveAceFrameConfig().getWorker();
 			workflowInterpreter.doAction(instance, wfRole, cancAction, worker);
 			WfInstance newWfInstance = instance;
+			updateUI(instance, false);
 			firePropertyChange(TranslationPanel.ACTION_LAUNCHED, instance, newWfInstance);
 		} catch (TerminologyException e) {
 			e.printStackTrace();
@@ -3770,6 +3777,7 @@ public class TranslationPanel extends JPanel {
 
 		@Override
 		protected String doInBackground() throws Exception {
+			initializeMemonicKeys();
 			setReadOnlyMode(this.readOnlyMode);
 			I_ConfigAceFrame config;
 			try {
