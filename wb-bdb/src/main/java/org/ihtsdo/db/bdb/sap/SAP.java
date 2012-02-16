@@ -19,14 +19,16 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.tk.api.SapBI;
 
 /**
- *
+ *Holds information about a sap nid. A sap nid contains the information about a
+ * distinct combination of a status, author, path, time, and (eventually) module.
+ * Note that module is not currently implemented.
  * @author akf
  */
 public class SAP implements SapBI {
     int sapNid;
 
     /**
-     * 
+     * Constructor specifying the sap nid.
      * @param sapNid
      */
     public SAP(int sapNid) {
