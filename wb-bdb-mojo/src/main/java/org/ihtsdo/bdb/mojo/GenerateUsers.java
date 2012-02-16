@@ -165,7 +165,7 @@ public class GenerateUsers extends AbstractMojo {
     void executeMojo() throws MojoExecutionException {
 
         try {
-            getLog().info("****************\n Creating new users \n****************\n");
+            System.out.println("****************\n Creating new users \n****************\n");
             Bdb.selectJeProperties(berkeleyDir,
                     berkeleyDir);
 
@@ -270,7 +270,7 @@ public class GenerateUsers extends AbstractMojo {
 
                 wfLine = wfReader.readLine();
             }
-            getLog().info("Starting rels permissions creation");
+            System.out.println("Starting rels permissions creation");
             if (relPermissionsFile.exists()) {
             try {
 				FileReader     fr = new FileReader(relPermissionsFile);
@@ -279,7 +279,7 @@ public class GenerateUsers extends AbstractMojo {
 				br.readLine();
 
 				String relPermissionLine = br.readLine();
-				getLog().info("Looking at lines...");
+				System.out.println("Looking at lines...");
 				while (relPermissionLine != null) {
 					String[] parts = relPermissionLine.split("\t");
 
@@ -296,9 +296,9 @@ public class GenerateUsers extends AbstractMojo {
 
             Terms.get().commit();
 
-            getLog().info("Starting close.");
+            System.out.println("Starting close.");
             Bdb.close();
-            getLog().info("db closed");
+            System.out.println("db closed");
         } catch (Exception ex) {
             throw new MojoExecutionException(ex.getLocalizedMessage(), ex);
         } catch (Throwable ex) {
@@ -331,7 +331,7 @@ public class GenerateUsers extends AbstractMojo {
 			//skip line
 			System.out.println("Warn"+ "User not found:" + userName + " for rel permission");
 		} else {
-			getLog().info("Creating permission for user " +  user.toString() + " if not current");
+			System.out.println("Creating permission for user " +  user.toString() + " if not current");
 			RelCAB relCab = new RelCAB(user.getPrimUuid(),UUID.fromString(typeUid),
 					UUID.fromString(targetUid),0,TkRelType.STATED_ROLE);
 			Ts.get().getTerminologyBuilder(config.getEditCoordinate(), 
