@@ -290,7 +290,7 @@ public class GenerateUsers extends AbstractMojo {
 				throw new TaskFailedException(ex);
 			}
             } else {
-                getLog().warn("No relPermissionsFile: " + relPermissionsFile.getAbsolutePath());
+                System.out.println("Warn"+ "No relPermissionsFile: " + relPermissionsFile.getAbsolutePath());
             }
             }
 
@@ -329,7 +329,7 @@ public class GenerateUsers extends AbstractMojo {
 		if (user == null) {
 			//throw new Exception("User unknown");
 			//skip line
-			getLog().warn("User not found:" + userName + " for rel permission");
+			System.out.println("Warn"+ "User not found:" + userName + " for rel permission");
 		} else {
 			getLog().info("Creating permission for user " +  user.toString() + " if not current");
 			RelCAB relCab = new RelCAB(user.getPrimUuid(),UUID.fromString(typeUid),
