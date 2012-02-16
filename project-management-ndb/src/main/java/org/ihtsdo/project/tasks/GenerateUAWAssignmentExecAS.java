@@ -300,33 +300,33 @@ public class GenerateUAWAssignmentExecAS extends AbstractTask {
 			
 			for (Integer cid:conceptIds){
 				I_GetConceptData selectedConcept = Terms.get().getConcept(cid);
-				WorkListMember workListMember = TerminologyProjectDAO.addConceptAsNacWorklistMember(
-						worklist, selectedConcept,
-						queueName, config);
-
-				workListMember.setActivityStatus(
-						Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_DELIVERED_STATUS.getUids()));
-				TerminologyProjectDAO.updateWorkListMemberMetadata(workListMember, config);
-
-				termFactory.commit();
-				wfProcess.writeAttachment(ProcessAttachmentKeys.WORKLIST_MEMBER.getAttachmentKey(), workListMember);
-
-//				TerminologyProjectDAO.promoteLanguageContent(workListMember, config);
+//				WorkListMember workListMember = TerminologyProjectDAO.addConceptAsNacWorklistMember(
+//						worklist, selectedConcept,
+//						queueName, config);
+//
+//				workListMember.setActivityStatus(
+//						Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_DELIVERED_STATUS.getUids()));
+//				TerminologyProjectDAO.updateWorkListMemberMetadata(workListMember, config);
+//
 //				termFactory.commit();
-
-				Long statusTime=promoRefset.getLastStatusTime(workListMember.getId(), config);
-
-				String subj= TerminologyProjectDAO.getItemSubject(workListMember,worklist,project, promoRefset, langRefset, statusId, statusTime);
-
-				wfProcess.setSubject(subj);			
-				wfProcess.setProcessID(new ProcessID(UUID.randomUUID()));
-
-				worker.getLogger().info(
-						"Moving process " + wfProcess.getProcessID() + " to Queue named: " + queueName);
-				q.write(wfProcess, worker.getActiveTransaction());
-				worker.commitTransactionIfActive();
-				worker.getLogger()
-				.info("Moved process " + wfProcess.getProcessID() + " to queue: " + destination);
+//				wfProcess.writeAttachment(ProcessAttachmentKeys.WORKLIST_MEMBER.getAttachmentKey(), workListMember);
+//
+////				TerminologyProjectDAO.promoteLanguageContent(workListMember, config);
+////				termFactory.commit();
+//
+//				Long statusTime=promoRefset.getLastStatusTime(workListMember.getId(), config);
+//
+//				String subj= TerminologyProjectDAO.getItemSubject(workListMember,worklist,project, promoRefset, langRefset, statusId, statusTime);
+//
+//				wfProcess.setSubject(subj);			
+//				wfProcess.setProcessID(new ProcessID(UUID.randomUUID()));
+//
+//				worker.getLogger().info(
+//						"Moving process " + wfProcess.getProcessID() + " to Queue named: " + queueName);
+//				q.write(wfProcess, worker.getActiveTransaction());
+//				worker.commitTransactionIfActive();
+//				worker.getLogger()
+//				.info("Moved process " + wfProcess.getProcessID() + " to queue: " + destination);
 
 
 			}

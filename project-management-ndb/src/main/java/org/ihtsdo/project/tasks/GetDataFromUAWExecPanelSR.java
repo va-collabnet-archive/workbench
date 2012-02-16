@@ -179,12 +179,16 @@ public class GetDataFromUAWExecPanelSR extends AbstractTask {
 						JOptionPane.YES_NO_OPTION);
 				if (n == JOptionPane.YES_OPTION) {
 					// Create worklist member for unassigned work
-					WorkListMember workListMember = TerminologyProjectDAO.addConceptAsNacWorklistMember(
+					WorkListMember member= TerminologyProjectDAO.addConceptAsNacWorklistMember(
 							selectedWorkList, selectedConcept,
-							config.getUsername()+".outbox", config);
-					
-					process.setProperty(memberPropName, workListMember);
-					process.setProperty(projectPropName, selectedProject);
+							config);
+					TerminologyProjectDAO.initializeWorkflowForMember( member, selectedWorkList, config);
+					JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+							"The concept has been sent to translation.", "",
+							JOptionPane.INFORMATION_MESSAGE);
+//					
+//					process.setProperty(memberPropName, workListMember);
+//					process.setProperty(projectPropName, selectedProject);
 
 					return Condition.ITEM_COMPLETE;
 				} else {

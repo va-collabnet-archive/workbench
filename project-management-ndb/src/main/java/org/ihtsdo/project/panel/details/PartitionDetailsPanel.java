@@ -582,15 +582,15 @@ public class PartitionDetailsPanel extends JPanel {
 		button6 = new JButton();
 		pBarW2 = new JProgressBar();
 
-		// ======== this ========
+		//======== this ========
 		setBackground(new Color(238, 238, 238));
 		setLayout(new GridBagLayout());
-		((GridBagLayout) getLayout()).columnWidths = new int[] { 0, 0 };
-		((GridBagLayout) getLayout()).rowHeights = new int[] { 0, 0 };
-		((GridBagLayout) getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
-		((GridBagLayout) getLayout()).rowWeights = new double[] { 1.0, 1.0E-4 };
+		((GridBagLayout)getLayout()).columnWidths = new int[] {0, 0};
+		((GridBagLayout)getLayout()).rowHeights = new int[] {0, 0};
+		((GridBagLayout)getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+		((GridBagLayout)getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
 
-		// ======== tabbedPane1 ========
+		//======== tabbedPane1 ========
 		{
 			tabbedPane1.addChangeListener(new ChangeListener() {
 				@Override
@@ -599,93 +599,113 @@ public class PartitionDetailsPanel extends JPanel {
 				}
 			});
 
-			// ======== panel0 ========
+			//======== panel0 ========
 			{
 				panel0.setLayout(new GridBagLayout());
-				((GridBagLayout) panel0.getLayout()).columnWidths = new int[] { 0, 0 };
-				((GridBagLayout) panel0.getLayout()).rowHeights = new int[] { 0, 0, 0 };
-				((GridBagLayout) panel0.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
-				((GridBagLayout) panel0.getLayout()).rowWeights = new double[] { 1.0, 0.0, 1.0E-4 };
+				((GridBagLayout)panel0.getLayout()).columnWidths = new int[] {0, 0};
+				((GridBagLayout)panel0.getLayout()).rowHeights = new int[] {0, 0, 0};
+				((GridBagLayout)panel0.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+				((GridBagLayout)panel0.getLayout()).rowWeights = new double[] {1.0, 0.0, 1.0E-4};
 
-				// ======== panel1 ========
+				//======== panel1 ========
 				{
 					panel1.setLayout(new GridBagLayout());
-					((GridBagLayout) panel1.getLayout()).columnWidths = new int[] { 0, 0, 0 };
-					((GridBagLayout) panel1.getLayout()).rowHeights = new int[] { 0, 0 };
-					((GridBagLayout) panel1.getLayout()).columnWeights = new double[] { 1.0, 1.0, 1.0E-4 };
-					((GridBagLayout) panel1.getLayout()).rowWeights = new double[] { 1.0, 1.0E-4 };
+					((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 0, 0};
+					((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0};
+					((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {1.0, 1.0, 1.0E-4};
+					((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
 
-					// ======== panel2 ========
+					//======== panel2 ========
 					{
 						panel2.setLayout(new GridBagLayout());
-						((GridBagLayout) panel2.getLayout()).columnWidths = new int[] { 0, 0 };
-						((GridBagLayout) panel2.getLayout()).rowHeights = new int[] { 0, 0, 0 };
-						((GridBagLayout) panel2.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
-						((GridBagLayout) panel2.getLayout()).rowWeights = new double[] { 0.0, 0.0, 1.0E-4 };
+						((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {0, 0};
+						((GridBagLayout)panel2.getLayout()).rowHeights = new int[] {0, 0, 0};
+						((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+						((GridBagLayout)panel2.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0E-4};
 
-						// ---- label1 ----
+						//---- label1 ----
 						label1.setText("Partition details");
 						label1.setFont(new Font("Lucida Grande", Font.BOLD, 14));
-						panel2.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+						panel2.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 0), 0, 0));
 
-						// ======== panel11 ========
+						//======== panel11 ========
 						{
 							panel11.setLayout(new GridBagLayout());
-							((GridBagLayout) panel11.getLayout()).columnWidths = new int[] { 0, 0, 0 };
-							((GridBagLayout) panel11.getLayout()).rowHeights = new int[] { 0, 0, 0 };
-							((GridBagLayout) panel11.getLayout()).columnWeights = new double[] { 0.0, 1.0, 1.0E-4 };
-							((GridBagLayout) panel11.getLayout()).rowWeights = new double[] { 0.0, 0.0, 1.0E-4 };
+							((GridBagLayout)panel11.getLayout()).columnWidths = new int[] {0, 0, 0};
+							((GridBagLayout)panel11.getLayout()).rowHeights = new int[] {0, 0, 0};
+							((GridBagLayout)panel11.getLayout()).columnWeights = new double[] {0.0, 1.0, 1.0E-4};
+							((GridBagLayout)panel11.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0E-4};
 
-							// ---- label2 ----
+							//---- label2 ----
 							label2.setText("Name:");
-							panel11.add(label2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+							panel11.add(label2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+								new Insets(0, 0, 5, 5), 0, 0));
 
-							// ---- textField1 ----
+							//---- textField1 ----
 							textField1.addKeyListener(new KeyAdapter() {
 								@Override
 								public void keyTyped(KeyEvent e) {
 									textField1KeyTyped(e);
 								}
 							});
-							panel11.add(textField1, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+							panel11.add(textField1, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+								new Insets(0, 0, 5, 0), 0, 0));
 
-							// ---- label3 ----
+							//---- label3 ----
 							label3.setText("Partition scheme");
-							panel11.add(label3, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+							panel11.add(label3, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+								new Insets(0, 0, 0, 5), 0, 0));
 
-							// ---- label5 ----
+							//---- label5 ----
 							label5.setText("text");
-							panel11.add(label5, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+							panel11.add(label5, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
+								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+								new Insets(0, 0, 0, 0), 0, 0));
 						}
-						panel2.add(panel11, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+						panel2.add(panel11, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 0, 0), 0, 0));
 					}
-					panel1.add(panel2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+					panel1.add(panel2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 5), 0, 0));
 
-					// ======== panel10 ========
+					//======== panel10 ========
 					{
 						panel10.setLayout(new GridBagLayout());
-						((GridBagLayout) panel10.getLayout()).columnWidths = new int[] { 0, 0 };
-						((GridBagLayout) panel10.getLayout()).rowHeights = new int[] { 0, 0 };
-						((GridBagLayout) panel10.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
-						((GridBagLayout) panel10.getLayout()).rowWeights = new double[] { 1.0, 1.0E-4 };
+						((GridBagLayout)panel10.getLayout()).columnWidths = new int[] {0, 0};
+						((GridBagLayout)panel10.getLayout()).rowHeights = new int[] {0, 0};
+						((GridBagLayout)panel10.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+						((GridBagLayout)panel10.getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
 
-						// ---- label8 ----
+						//---- label8 ----
 						label8.setText("<html><body>\nClick \u2018Generate a new worklist\u2019 to create a new worklist<br><br>\n\nClick \u2018Retire partition\u2019 to retire the selected partition<br><br>\n\nCreate a new partition scheme by clicking the \u2018Add partition scheme\u2019 button\n</html>");
-						panel10.add(label8, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
+						panel10.add(label8, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+							GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
+							new Insets(0, 0, 0, 0), 0, 0));
 					}
-					panel1.add(panel10, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+					panel1.add(panel10, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 0), 0, 0));
 				}
-				panel0.add(panel1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+				panel0.add(panel1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 0), 0, 0));
 
-				// ======== panel7 ========
+				//======== panel7 ========
 				{
 					panel7.setLayout(new GridBagLayout());
-					((GridBagLayout) panel7.getLayout()).columnWidths = new int[] { 130, 112, 0, 0, 0, 0, 0, 0 };
-					((GridBagLayout) panel7.getLayout()).rowHeights = new int[] { 0, 0 };
-					((GridBagLayout) panel7.getLayout()).columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0E-4 };
-					((GridBagLayout) panel7.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
+					((GridBagLayout)panel7.getLayout()).columnWidths = new int[] {130, 112, 0, 0, 0, 0, 0, 0};
+					((GridBagLayout)panel7.getLayout()).rowHeights = new int[] {0, 0};
+					((GridBagLayout)panel7.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0E-4};
+					((GridBagLayout)panel7.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
-					// ---- button2 ----
+					//---- button2 ----
 					button2.setText("Generate WorkList");
 					button2.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 					button2.addActionListener(new ActionListener() {
@@ -694,9 +714,11 @@ public class PartitionDetailsPanel extends JPanel {
 							button2ActionPerformed(e);
 						}
 					});
-					panel7.add(button2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+					panel7.add(button2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 5), 0, 0));
 
-					// ---- button3 ----
+					//---- button3 ----
 					button3.setText("Retire partition");
 					button3.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 					button3.addActionListener(new ActionListener() {
@@ -705,9 +727,11 @@ public class PartitionDetailsPanel extends JPanel {
 							button3ActionPerformed(e);
 						}
 					});
-					panel7.add(button3, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+					panel7.add(button3, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 5), 0, 0));
 
-					// ---- button4 ----
+					//---- button4 ----
 					button4.setText("New partition scheme");
 					button4.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 					button4.addActionListener(new ActionListener() {
@@ -716,9 +740,11 @@ public class PartitionDetailsPanel extends JPanel {
 							button4ActionPerformed(e);
 						}
 					});
-					panel7.add(button4, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+					panel7.add(button4, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 5), 0, 0));
 
-					// ---- button5 ----
+					//---- button5 ----
 					button5.setText("Save");
 					button5.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 					button5.addActionListener(new ActionListener() {
@@ -727,10 +753,14 @@ public class PartitionDetailsPanel extends JPanel {
 							button5ActionPerformed(e);
 						}
 					});
-					panel7.add(button5, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
-					panel7.add(pBarW, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+					panel7.add(button5, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 5), 0, 0));
+					panel7.add(pBarW, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 5), 0, 0));
 
-					// ---- label11 ----
+					//---- label11 ----
 					label11.setText("text");
 					label11.addMouseListener(new MouseAdapter() {
 						@Override
@@ -738,63 +768,80 @@ public class PartitionDetailsPanel extends JPanel {
 							label11MouseClicked(e);
 						}
 					});
-					panel7.add(label11, new GridBagConstraints(6, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+					panel7.add(label11, new GridBagConstraints(6, 0, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 0), 0, 0));
 				}
-				panel0.add(panel7, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+				panel0.add(panel7, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 0), 0, 0));
 			}
 			tabbedPane1.addTab("Partition", panel0);
 
-			// ======== panel9 ========
+
+			//======== panel9 ========
 			{
 				panel9.setLayout(new GridBagLayout());
-				((GridBagLayout) panel9.getLayout()).columnWidths = new int[] { 363, 0, 0 };
-				((GridBagLayout) panel9.getLayout()).rowHeights = new int[] { 0, 0, 0, 0, 0 };
-				((GridBagLayout) panel9.getLayout()).columnWeights = new double[] { 1.0, 1.0, 1.0E-4 };
-				((GridBagLayout) panel9.getLayout()).rowWeights = new double[] { 0.0, 1.0, 0.0, 0.0, 1.0E-4 };
+				((GridBagLayout)panel9.getLayout()).columnWidths = new int[] {363, 0, 0};
+				((GridBagLayout)panel9.getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0};
+				((GridBagLayout)panel9.getLayout()).columnWeights = new double[] {1.0, 1.0, 1.0E-4};
+				((GridBagLayout)panel9.getLayout()).rowWeights = new double[] {0.0, 1.0, 0.0, 0.0, 1.0E-4};
 
-				// ---- label4 ----
+				//---- label4 ----
 				label4.setText("Partition members");
-				panel9.add(label4, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+				panel9.add(label4, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 5), 0, 0));
 
-				// ======== scrollPane1 ========
+				//======== scrollPane1 ========
 				{
 					scrollPane1.setViewportView(membersTable);
 				}
-				panel9.add(scrollPane1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+				panel9.add(scrollPane1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 5), 0, 0));
 
-				// ======== panel12 ========
+				//======== panel12 ========
 				{
 					panel12.setBackground(new Color(238, 238, 238));
 					panel12.setLayout(new GridBagLayout());
-					((GridBagLayout) panel12.getLayout()).columnWidths = new int[] { 0, 0 };
-					((GridBagLayout) panel12.getLayout()).rowHeights = new int[] { 0, 0 };
-					((GridBagLayout) panel12.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
-					((GridBagLayout) panel12.getLayout()).rowWeights = new double[] { 1.0, 1.0E-4 };
+					((GridBagLayout)panel12.getLayout()).columnWidths = new int[] {0, 0};
+					((GridBagLayout)panel12.getLayout()).rowHeights = new int[] {0, 0};
+					((GridBagLayout)panel12.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+					((GridBagLayout)panel12.getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
 
-					// ---- label9 ----
+					//---- label9 ----
 					label9.setText("<html><body>\nThe list of partition members is displayed\n</html>");
-					panel12.add(label9, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
+					panel12.add(label9, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+						GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
+						new Insets(0, 0, 0, 0), 0, 0));
 				}
-				panel9.add(panel12, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+				panel9.add(panel12, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 0), 0, 0));
 
-				// ---- label6 ----
+				//---- label6 ----
 				label6.setText("Control + click for selecting multiple members");
 				label6.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
-				panel9.add(label6, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+				panel9.add(label6, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 5), 0, 0));
 
-				// ---- progressBar1 ----
+				//---- progressBar1 ----
 				progressBar1.setVisible(false);
-				panel9.add(progressBar1, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+				panel9.add(progressBar1, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 0), 0, 0));
 
-				// ======== panel6 ========
+				//======== panel6 ========
 				{
 					panel6.setLayout(new GridBagLayout());
-					((GridBagLayout) panel6.getLayout()).columnWidths = new int[] { 0, 0 };
-					((GridBagLayout) panel6.getLayout()).rowHeights = new int[] { 0, 0 };
-					((GridBagLayout) panel6.getLayout()).columnWeights = new double[] { 0.0, 1.0E-4 };
-					((GridBagLayout) panel6.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
+					((GridBagLayout)panel6.getLayout()).columnWidths = new int[] {0, 0};
+					((GridBagLayout)panel6.getLayout()).rowHeights = new int[] {0, 0};
+					((GridBagLayout)panel6.getLayout()).columnWeights = new double[] {0.0, 1.0E-4};
+					((GridBagLayout)panel6.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
-					// ---- button1 ----
+					//---- button1 ----
 					button1.setText("Retire selected members");
 					button1.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 					button1.addActionListener(new ActionListener() {
@@ -803,61 +850,74 @@ public class PartitionDetailsPanel extends JPanel {
 							button1ActionPerformed(e);
 						}
 					});
-					panel6.add(button1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+					panel6.add(button1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 0), 0, 0));
 				}
-				panel9.add(panel6, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 5), 0, 0));
+				panel9.add(panel6, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
+					GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+					new Insets(0, 0, 0, 5), 0, 0));
 
-				// ======== panel13 ========
+				//======== panel13 ========
 				{
 					panel13.setLayout(new GridBagLayout());
-					((GridBagLayout) panel13.getLayout()).columnWidths = new int[] { 0, 0 };
-					((GridBagLayout) panel13.getLayout()).rowHeights = new int[] { 0, 0 };
-					((GridBagLayout) panel13.getLayout()).columnWeights = new double[] { 0.0, 1.0E-4 };
-					((GridBagLayout) panel13.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
+					((GridBagLayout)panel13.getLayout()).columnWidths = new int[] {0, 0};
+					((GridBagLayout)panel13.getLayout()).rowHeights = new int[] {0, 0};
+					((GridBagLayout)panel13.getLayout()).columnWeights = new double[] {0.0, 1.0E-4};
+					((GridBagLayout)panel13.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 				}
-				panel9.add(panel13, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 0), 0, 0));
+				panel9.add(panel13, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0,
+					GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+					new Insets(0, 0, 0, 0), 0, 0));
 			}
 			tabbedPane1.addTab("Members", panel9);
 
-			// ======== panel14 ========
+
+			//======== panel14 ========
 			{
 				panel14.setLayout(new GridBagLayout());
-				((GridBagLayout) panel14.getLayout()).columnWidths = new int[] { 419, 0, 0 };
-				((GridBagLayout) panel14.getLayout()).rowHeights = new int[] { 0, 0, 0 };
-				((GridBagLayout) panel14.getLayout()).columnWeights = new double[] { 1.0, 1.0, 1.0E-4 };
-				((GridBagLayout) panel14.getLayout()).rowWeights = new double[] { 0.0, 1.0, 1.0E-4 };
+				((GridBagLayout)panel14.getLayout()).columnWidths = new int[] {419, 0, 0};
+				((GridBagLayout)panel14.getLayout()).rowHeights = new int[] {0, 0, 0};
+				((GridBagLayout)panel14.getLayout()).columnWeights = new double[] {1.0, 1.0, 1.0E-4};
+				((GridBagLayout)panel14.getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0E-4};
 
-				// ---- label7 ----
+				//---- label7 ----
 				label7.setText("WorkLists");
-				panel14.add(label7, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+				panel14.add(label7, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 5), 0, 0));
 
-				// ======== scrollPane3 ========
+				//======== scrollPane3 ========
 				{
 					scrollPane3.setViewportView(list3);
 				}
-				panel14.add(scrollPane3, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+				panel14.add(scrollPane3, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
-				// ======== panel15 ========
+				//======== panel15 ========
 				{
 					panel15.setLayout(new GridBagLayout());
-					((GridBagLayout) panel15.getLayout()).columnWidths = new int[] { 0, 0 };
-					((GridBagLayout) panel15.getLayout()).rowHeights = new int[] { 0, 0, 0 };
-					((GridBagLayout) panel15.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
-					((GridBagLayout) panel15.getLayout()).rowWeights = new double[] { 1.0, 0.0, 1.0E-4 };
+					((GridBagLayout)panel15.getLayout()).columnWidths = new int[] {0, 0};
+					((GridBagLayout)panel15.getLayout()).rowHeights = new int[] {0, 0, 0};
+					((GridBagLayout)panel15.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+					((GridBagLayout)panel15.getLayout()).rowWeights = new double[] {1.0, 0.0, 1.0E-4};
 
-					// ---- label10 ----
+					//---- label10 ----
 					label10.setText("<html><body>\nThe list of worklists is displayed\n</html>");
-					panel15.add(label10, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 5, 0), 0, 0));
+					panel15.add(label10, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+						GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
+						new Insets(0, 0, 5, 0), 0, 0));
 
-					// ======== panel3 ========
+					//======== panel3 ========
 					{
 						panel3.setLayout(new GridBagLayout());
-						((GridBagLayout) panel3.getLayout()).columnWidths = new int[] { 0, 0, 0 };
-						((GridBagLayout) panel3.getLayout()).rowHeights = new int[] { 0, 0 };
-						((GridBagLayout) panel3.getLayout()).columnWeights = new double[] { 0.0, 1.0, 1.0E-4 };
-						((GridBagLayout) panel3.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
+						((GridBagLayout)panel3.getLayout()).columnWidths = new int[] {0, 0, 0};
+						((GridBagLayout)panel3.getLayout()).rowHeights = new int[] {0, 0};
+						((GridBagLayout)panel3.getLayout()).columnWeights = new double[] {0.0, 1.0, 1.0E-4};
+						((GridBagLayout)panel3.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
-						// ---- button6 ----
+						//---- button6 ----
 						button6.setText("Generate WorkList");
 						button6.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 						button6.addActionListener(new ActionListener() {
@@ -866,139 +926,71 @@ public class PartitionDetailsPanel extends JPanel {
 								button2ActionPerformed(e);
 							}
 						});
-						panel3.add(button6, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
-						panel3.add(pBarW2, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+						panel3.add(button6, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 0, 5), 0, 0));
+						panel3.add(pBarW2, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 0, 0), 0, 0));
 					}
-					panel15.add(panel3, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+					panel15.add(panel3, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 0), 0, 0));
 				}
-				panel14.add(panel15, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+				panel14.add(panel15, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 0), 0, 0));
 			}
 			tabbedPane1.addTab("WorkLists", panel14);
 
 		}
-		add(tabbedPane1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+		add(tabbedPane1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 0, 0), 0, 0));
 		// //GEN-END:initComponents
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
-	/** The tabbed pane1. */
 	private JTabbedPane tabbedPane1;
-	
-	/** The panel0. */
 	private JPanel panel0;
-	
-	/** The panel1. */
 	private JPanel panel1;
-	
-	/** The panel2. */
 	private JPanel panel2;
-	
-	/** The label1. */
 	private JLabel label1;
-	
-	/** The panel11. */
 	private JPanel panel11;
-	
-	/** The label2. */
 	private JLabel label2;
-	
-	/** The text field1. */
 	private JTextField textField1;
-	
-	/** The label3. */
 	private JLabel label3;
-	
-	/** The label5. */
 	private JLabel label5;
-	
-	/** The panel10. */
 	private JPanel panel10;
-	
-	/** The label8. */
 	private JLabel label8;
-	
-	/** The panel7. */
 	private JPanel panel7;
-	
-	/** The button2. */
 	private JButton button2;
-	
-	/** The button3. */
 	private JButton button3;
-	
-	/** The button4. */
 	private JButton button4;
-	
-	/** The button5. */
 	private JButton button5;
-	
-	/** The p bar w. */
 	private JProgressBar pBarW;
-	
-	/** The label11. */
 	private JLabel label11;
-	
-	/** The panel9. */
 	private JPanel panel9;
-	
-	/** The label4. */
 	private JLabel label4;
-	
-	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
-	
-	/** The members table. */
 	private JTable membersTable;
-	
-	/** The panel12. */
 	private JPanel panel12;
-	
-	/** The label9. */
 	private JLabel label9;
-	
-	/** The label6. */
 	private JLabel label6;
-	
-	/** The progress bar1. */
 	private JProgressBar progressBar1;
-	
-	/** The panel6. */
 	private JPanel panel6;
-	
-	/** The button1. */
 	private JButton button1;
-	
-	/** The panel13. */
 	private JPanel panel13;
-	
-	/** The panel14. */
 	private JPanel panel14;
-	
-	/** The label7. */
 	private JLabel label7;
-	
-	/** The scroll pane3. */
 	private JScrollPane scrollPane3;
-	
-	/** The list3. */
 	private JList list3;
-	
-	/** The panel15. */
 	private JPanel panel15;
-	
-	/** The label10. */
 	private JLabel label10;
-	
-	/** The panel3. */
 	private JPanel panel3;
-	
-	/** The button6. */
 	private JButton button6;
-	
-	/** The p bar w2. */
 	private JProgressBar pBarW2;
-
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 	/**
 	 * The Class MembersWorker.

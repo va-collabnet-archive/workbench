@@ -40,7 +40,6 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.project.TerminologyProjectDAO;
-import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
 
@@ -165,8 +164,13 @@ public class GetDataFromUAWExecPanel extends AbstractTask {
 			}
 			
 			if (panel != null) {
-				I_TerminologyProject selectedProject = panel.getSelectedProject();
 				WorkList selectedWorkList = panel.getSelectedWorkList();
+				if (selectedWorkList==null){
+					JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+							"The worklist is null.' panel. \n " + "Canceling the task. ", "",
+							JOptionPane.ERROR_MESSAGE);
+					return Condition.ITEM_CANCELED;
+				}
 				I_GetConceptData selectedConcept = config.getHierarchySelection();
 
 				int n = JOptionPane.showConfirmDialog(
@@ -178,12 +182,15 @@ public class GetDataFromUAWExecPanel extends AbstractTask {
 						JOptionPane.YES_NO_OPTION);
 				if (n == JOptionPane.YES_OPTION) {
 					// Create worklist member for unassigned work
-					WorkListMember workListMember = TerminologyProjectDAO.addConceptAsNacWorklistMember(
+					WorkListMember member= TerminologyProjectDAO.addConceptAsNacWorklistMember(
 							selectedWorkList, selectedConcept,
-							config.getUsername()+".outbox", config);
-					
-					process.setProperty(memberPropName, workListMember);
-					process.setProperty(projectPropName, selectedProject);
+							config);
+					TerminologyProjectDAO.initializeWorkflowForMember( member, selectedWorkList, config);
+					JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+							"The concept has been sent to translation.", "",
+							JOptionPane.INFORMATION_MESSAGE);
+//					process.setProperty(memberPropName, workListMember);
+//					process.setProperty(projectPropName, selectedProject);
 
 					return Condition.ITEM_COMPLETE;
 				} else {

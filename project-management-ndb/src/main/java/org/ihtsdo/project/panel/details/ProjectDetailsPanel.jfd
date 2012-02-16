@@ -1467,10 +1467,12 @@ Select a refset and type ‘d’ for removing it
                 <void method="setProperty"> 
                  <string>border</string> 
                  <object class="javax.swing.border.MatteBorder"> 
-                  <int>1</int> 
-                  <int>1</int> 
-                  <int>1</int> 
-                  <int>1</int> 
+                  <object class="java.awt.Insets"> 
+                   <int>1</int> 
+                   <int>1</int> 
+                   <int>1</int> 
+                   <int>1</int> 
+                  </object> 
                   <object class="java.awt.Color" field="black"/> 
                  </object> 
                 </void> 
@@ -2265,43 +2267,29 @@ The list of worksets is displayed as new worksets are created&lt;br&gt;
             </void> 
             <void method="add"> 
              <object class="com.jformdesigner.model.FormComponent"> 
-              <string>javax.swing.JLabel</string> 
+              <string>javax.swing.JButton</string> 
               <void method="setProperty"> 
                <string>text</string> 
-               <string>Create new WorkList for maintenance work:</string> 
+               <string>Create new WorkList for maintenance work</string> 
               </void> 
-              <void property="name"> 
-               <string>label15</string> 
-              </void> 
-             </object> 
-             <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-              <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
-             </object> 
-            </void> 
-            <void method="add"> 
-             <object class="com.jformdesigner.model.FormComponent"> 
-              <string>javax.swing.JLabel</string> 
               <void method="setProperty"> 
-               <string>text</string> 
-               <string>New WorkList name:</string> 
+               <string>font</string> 
+               <object class="java.awt.Font"> 
+                <string>Lucida Grande</string> 
+                <int>0</int> 
+                <int>11</int> 
+               </object> 
               </void> 
               <void property="name"> 
-               <string>label16</string> 
+               <string>button12</string> 
               </void> 
-             </object> 
-             <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-              <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
-              <void method="setProperty"> 
-               <string>gridy</string> 
-               <int>1</int> 
-              </void> 
-             </object> 
-            </void> 
-            <void method="add"> 
-             <object class="com.jformdesigner.model.FormComponent"> 
-              <string>javax.swing.JTextField</string> 
-              <void property="name"> 
-               <string>textField2</string> 
+              <void method="addEvent"> 
+               <object class="com.jformdesigner.model.FormEvent"> 
+                <string>java.awt.event.ActionListener</string> 
+                <string>actionPerformed</string> 
+                <string>button12ActionPerformed</string> 
+                <boolean>true</boolean> 
+               </object> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -2309,48 +2297,6 @@ The list of worksets is displayed as new worksets are created&lt;br&gt;
               <void method="setProperty"> 
                <string>gridx</string> 
                <int>1</int> 
-              </void> 
-              <void method="setProperty"> 
-               <string>gridy</string> 
-               <int>1</int> 
-              </void> 
-             </object> 
-            </void> 
-            <void method="add"> 
-             <object class="com.jformdesigner.model.FormComponent"> 
-              <string>javax.swing.JLabel</string> 
-              <void method="setProperty"> 
-               <string>text</string> 
-               <string>Workflow Business Process file:</string> 
-              </void> 
-              <void property="name"> 
-               <string>label17</string> 
-              </void> 
-             </object> 
-             <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-              <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
-              <void method="setProperty"> 
-               <string>gridy</string> 
-               <int>2</int> 
-              </void> 
-             </object> 
-            </void> 
-            <void method="add"> 
-             <object class="com.jformdesigner.model.FormComponent"> 
-              <string>javax.swing.JComboBox</string> 
-              <void property="name"> 
-               <string>comboBox1</string> 
-              </void> 
-             </object> 
-             <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-              <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
-              <void method="setProperty"> 
-               <string>gridx</string> 
-               <int>1</int> 
-              </void> 
-              <void method="setProperty"> 
-               <string>gridy</string> 
-               <int>2</int> 
               </void> 
              </object> 
             </void> 
@@ -2386,37 +2332,6 @@ The list of worksets is displayed as new worksets are created&lt;br&gt;
               </object> 
               <void property="name"> 
                <string>panel26</string> 
-              </void> 
-              <void method="add"> 
-               <object class="com.jformdesigner.model.FormComponent"> 
-                <string>javax.swing.JButton</string> 
-                <void method="setProperty"> 
-                 <string>text</string> 
-                 <string>Create new Worklist</string> 
-                </void> 
-                <void method="setProperty"> 
-                 <string>font</string> 
-                 <object class="java.awt.Font"> 
-                  <string>Lucida Grande</string> 
-                  <int>0</int> 
-                  <int>11</int> 
-                 </object> 
-                </void> 
-                <void property="name"> 
-                 <string>button12</string> 
-                </void> 
-                <void method="addEvent"> 
-                 <object class="com.jformdesigner.model.FormEvent"> 
-                  <string>java.awt.event.ActionListener</string> 
-                  <string>actionPerformed</string> 
-                  <string>button12ActionPerformed</string> 
-                  <boolean>true</boolean> 
-                 </object> 
-                </void> 
-               </object> 
-               <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-                <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
-               </object> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 

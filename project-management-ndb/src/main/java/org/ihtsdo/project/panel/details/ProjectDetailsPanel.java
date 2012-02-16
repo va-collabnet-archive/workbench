@@ -45,7 +45,10 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.CancellationException;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -65,21 +68,28 @@ import javax.swing.JTextField;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.WindowConstants;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
+import javax.swing.table.DefaultTableModel;
 
+import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.issue.IssueRepoRegistration;
 import org.ihtsdo.issue.issuerepository.IssueRepository;
 import org.ihtsdo.issue.manager.IssueRepositoryDAO;
@@ -99,6 +109,13 @@ import org.ihtsdo.project.panel.dnd.ListDragGestureListenerWithImage;
 import org.ihtsdo.project.panel.dnd.ObjectTransferHandler;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.util.IconUtilities;
+import org.ihtsdo.project.workflow.api.WfComponentProvider;
+import org.ihtsdo.project.workflow.api.WorkflowDefinitionManager;
+import org.ihtsdo.project.workflow.model.WfMembership;
+import org.ihtsdo.project.workflow.model.WfRole;
+import org.ihtsdo.project.workflow.model.WfUser;
+import org.ihtsdo.project.workflow.model.WorkflowDefinition;
+import org.ihtsdo.project.workflow.wizard.WizardLauncher;
 
 /**
  * The Class ProjectDetailsPanel.
@@ -158,6 +175,10 @@ public class ProjectDetailsPanel extends JPanel {
 	/** The module id model. */
 	private DefaultListModel moduleIdModel;
 
+	private WorkflowDefinition workflowDefinition;
+
+	private String noName;
+
 	/**
 	 * Instantiates a new project details panel.
 	 *
@@ -179,27 +200,25 @@ public class ProjectDetailsPanel extends JPanel {
 			ExportTabPanel expPanel=new ExportTabPanel(project);
 			expPanel.revalidate();
 			tabbedPane1.addTab("Export Target Language", expPanel);
-			//TODO: hardcoded test fixture, for demo purposes
-			FileLinkAPI flApi = new FileLinkAPI(config);
-			FileLink link1 = new FileLink(new File("sampleProcesses/TranslationWorkflow.bp"), 
-					tf.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_BUSINESS_PROCESS_CATEGORY.getUids()));
-			flApi.putLinkInConfig(link1);
-			FileLink link2 = new FileLink(new File("sampleProcesses/MaintenanceWorkflow.bp"), 
-					tf.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_BUSINESS_PROCESS_CATEGORY.getUids()));
-			flApi.putLinkInConfig(link2);
-			FileLink link3 = new FileLink(new File("sampleProcesses/IsolatedEdit.bp"), 
-					tf.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_BUSINESS_PROCESS_CATEGORY.getUids()));
-			flApi.putLinkInConfig(link3);
-			FileLink link4 = new FileLink(new File("sampleProcesses/TranslationWorkflowCa.bp"), 
-					tf.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_BUSINESS_PROCESS_CATEGORY.getUids()));
-			flApi.putLinkInConfig(link4);
-			FileLink link5 = new FileLink(new File("sampleProcesses/TranslationWorkflowCaFastTrack.bp"), 
-					tf.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_BUSINESS_PROCESS_CATEGORY.getUids()));
-			flApi.putLinkInConfig(link5);
-			FileLink link6 = new FileLink(new File("sampleProcesses/TranslationWorkflowDk.bp"), 
-					tf.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_BUSINESS_PROCESS_CATEGORY.getUids()));
-			flApi.putLinkInConfig(link6);
-			// end of hardcoded test fixture
+//			FileLinkAPI flApi = new FileLinkAPI(config);
+//			FileLink link1 = new FileLink(new File("sampleProcesses/TranslationWorkflow.bp"), 
+//					tf.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_BUSINESS_PROCESS_CATEGORY.getUids()));
+//			flApi.putLinkInConfig(link1);
+//			FileLink link2 = new FileLink(new File("sampleProcesses/MaintenanceWorkflow.bp"), 
+//					tf.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_BUSINESS_PROCESS_CATEGORY.getUids()));
+//			flApi.putLinkInConfig(link2);
+//			FileLink link3 = new FileLink(new File("sampleProcesses/IsolatedEdit.bp"), 
+//					tf.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_BUSINESS_PROCESS_CATEGORY.getUids()));
+//			flApi.putLinkInConfig(link3);
+//			FileLink link4 = new FileLink(new File("sampleProcesses/TranslationWorkflowCa.bp"), 
+//					tf.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_BUSINESS_PROCESS_CATEGORY.getUids()));
+//			flApi.putLinkInConfig(link4);
+//			FileLink link5 = new FileLink(new File("sampleProcesses/TranslationWorkflowCaFastTrack.bp"), 
+//					tf.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_BUSINESS_PROCESS_CATEGORY.getUids()));
+//			flApi.putLinkInConfig(link5);
+//			FileLink link6 = new FileLink(new File("sampleProcesses/TranslationWorkflowDk.bp"), 
+//					tf.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_BUSINESS_PROCESS_CATEGORY.getUids()));
+//			flApi.putLinkInConfig(link6);
 			
 			textField1.setText(project.getName());
 			button3.setEnabled(false);
@@ -384,13 +403,13 @@ public class ProjectDetailsPanel extends JPanel {
 			//			panel3.validate();
 			
 			updateIssuePanel();
-			
-			FileLinkAPI fileLinkApi = new FileLinkAPI(config);
-			List<FileLink> wfFiles = fileLinkApi.getLinksForCategory(tf.getConcept(
-					ArchitectonicAuxiliary.Concept.TRANSLATION_BUSINESS_PROCESS_CATEGORY.getUids()));
-			for (FileLink loopLink : wfFiles) {
-				comboBox1.addItem(loopLink);
-			}
+
+//			FileLinkAPI fileLinkApi = new FileLinkAPI(config);
+//			List<FileLink> wfFiles = fileLinkApi.getLinksForCategory(tf.getConcept(
+//					ArchitectonicAuxiliary.Concept.TRANSLATION_BUSINESS_PROCESS_CATEGORY.getUids()));
+//			for (FileLink loopLink : wfFiles) {
+//				comboBox1.addItem(loopLink);
+//			}
 			
 			ProjectPermissionsAPI permissionsApi = new ProjectPermissionsAPI(config);
 			boolean isProjectManager = permissionsApi.checkPermissionForProject(
@@ -1453,46 +1472,164 @@ public class ProjectDetailsPanel extends JPanel {
 	 * @param e the e
 	 */
 	private void button12ActionPerformed(ActionEvent e) {
-		utwBusinessProcess = null;
-		FileLink selectedFileLink = (FileLink) comboBox1.getSelectedItem();
+		// generate worklist
+		WfComponentProvider wcp = new WfComponentProvider();
+		List<WfUser> users = wcp.getUsers();
+		WizardLauncher wl = new WizardLauncher();
+		wl.launchWfWizard(users);
+		HashMap<String, Object> hsRes = wl.getResult();
+		List<WfRole> roles = null;
+		noName = "no name " + UUID.randomUUID().toString();
+		workflowDefinition = null;
+		final ArrayList<WfMembership> workflowUserRoles = new ArrayList<WfMembership>();
 		
-		if (selectedFileLink != null) {
-			utwBusinessProcess = TerminologyProjectDAO.getBusinessProcess(selectedFileLink.getFile());
+		for (String key : hsRes.keySet()) {
+			Object val = hsRes.get(key);
+			if (key.equals("WDS")) {
+				workflowDefinition = WorkflowDefinitionManager.readWfDefinition(((File) val).getName());
+				roles = workflowDefinition.getRoles();
+
+			}
+
+			if (key.equals("WORKLIST_NAME")) {
+				noName = (String) val;
+			}
+			if (key.equals("roles")) {
+				roles= wcp.getRoles();
+				users= wcp.getUsers();
+				DefaultTableModel model = (DefaultTableModel) hsRes.get(key);
+				for (int j=1; j<model.getColumnCount();j+=2){
+					WfRole role=null;
+					for (WfRole wfRole : roles) {
+						if(wfRole.getName().equals(model.getColumnName(j))){
+							role=wfRole;
+							break;
+						}
+					}
+					for (int i = 0; i < model.getRowCount(); i++) {
+						Boolean sel = (Boolean) model.getValueAt(i, j);
+						if (sel) {
+							Boolean def = (Boolean) model.getValueAt(i, j+1);
+							WfUser user= null; 
+							for (WfUser wfUser : users) {
+								if(wfUser.getId().equals(((WfUser)model.getValueAt(i, 0)).getId())){
+									user=wfUser;
+									break;
+								}
+							}
+							WfMembership workflowUserRole = new WfMembership(UUID.randomUUID(), user, role, def);
+							workflowUserRoles.add(workflowUserRole);
+						}
+					}
+				}
+			}
 		}
 		
-		if (textField2 == null || textField2.getText().isEmpty() || utwBusinessProcess == null) {
-			JOptionPane.showMessageDialog(this,
-					"Missing data, complete name and choose bp file...", 
-					"Error", JOptionPane.ERROR_MESSAGE);
-		} else {
-			try {
-				TerminologyProjectDAO.createNewNacWorkList(textField2.getText(), utwBusinessProcess, project, config);
-			} catch (TerminologyException e1) {
-				JOptionPane.showMessageDialog(this,
-						"Error, check logs", 
-						"Error", JOptionPane.ERROR_MESSAGE);
-				e1.printStackTrace();
-			} catch (IOException e1) {
-				JOptionPane.showMessageDialog(this,
-						"Error, check logs", 
-						"Error", JOptionPane.ERROR_MESSAGE);
-				e1.printStackTrace();
-			} catch (Exception e2) {
-				JOptionPane.showMessageDialog(this,
-						"Error, check logs", 
-						"Error", JOptionPane.ERROR_MESSAGE);
-				e2.printStackTrace();
+		final I_ShowActivity activity = Terms.get().newActivityPanel(true, config, "<html>Generating Worklist from partition", true);
+		activity.setIndeterminate(true);
+		final Long startTime = System.currentTimeMillis();
+		activity.update();
+		final SwingWorker<String, String> worker = new SwingWorker<String, String>() {
+			@Override
+			protected String doInBackground() throws Exception {
+
+				try {
+					TerminologyProjectDAO.createNewNacWorkList(project, workflowDefinition, 
+							workflowUserRoles, noName, config, activity);
+				} catch (Exception e1) {
+					e1.printStackTrace();
+					JOptionPane.showMessageDialog(ProjectDetailsPanel.this, e1.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+				}
+				TranslationHelperPanel.refreshProjectPanelNode(config);
+				return null;
 			}
+
+			@Override
+			protected void done() {
+				try {
+					get();
+					long endTime = System.currentTimeMillis();
+
+					long elapsed = endTime - startTime;
+					String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
+
+					activity.setProgressInfoUpper("Worklist created...");
+					activity.setProgressInfoLower("Elapsed: " + elapsedStr);
+					activity.complete();
+
+				} catch (CancellationException ce) {
+					activity.setProgressInfoLower("Canceled");
+					try {
+						activity.complete();
+					} catch (ComputationCanceled e) {
+						activity.setProgressInfoLower("Canceled");
+					}
+				} catch (Exception e){
+					activity.setProgressInfoLower("Canceled with error");
+					e.printStackTrace();
+				}
+			}
+
+		};
+		worker.execute();
+		activity.addStopActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				worker.cancel(true);
+			}
+		});
+		try {
+			ActivityViewer.addActivity(activity);
+		} catch (InterruptedException i1) {
+			// thread canceled, cancel db changes
+			try {
+				Terms.get().cancel();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		} catch (Exception e1) {
+			AceLog.getAppLog().alertAndLogException(e1);
+		}
+//		utwBusinessProcess = null;
+//		File selectedFileLink = (File) comboBox1.getSelectedItem();
+//		
+//		if (selectedFileLink != null) {
+//			WorkflowDefinition wDef= WorkflowDefinitionManager.readWfDefinition(selectedFileLink.getAbsolutePath());
+//		}
+//		
+//		if (textField2 == null || textField2.getText().isEmpty() || utwBusinessProcess == null) {
+//			JOptionPane.showMessageDialog(this,
+//					"Missing data, complete name and choose bp file...", 
+//					"Error", JOptionPane.ERROR_MESSAGE);
+//		} else {
+//			try {
+//				TerminologyProjectDAO.createNewNacWorkList(textField2.getText(), wDef, project, config);
+//			} catch (TerminologyException e1) {
+//				JOptionPane.showMessageDialog(this,
+//						"Error, check logs", 
+//						"Error", JOptionPane.ERROR_MESSAGE);
+//				e1.printStackTrace();
+//			} catch (IOException e1) {
+//				JOptionPane.showMessageDialog(this,
+//						"Error, check logs", 
+//						"Error", JOptionPane.ERROR_MESSAGE);
+//				e1.printStackTrace();
+//			} catch (Exception e2) {
+//				JOptionPane.showMessageDialog(this,
+//						"Error, check logs", 
+//						"Error", JOptionPane.ERROR_MESSAGE);
+//				e2.printStackTrace();
+//			}
 			updateList1Content();
-			textField2.setText("");
-			utwBusinessProcess = null;
+//			textField2.setText("");
+//			utwBusinessProcess = null;
 
 			SwingUtilities.invokeLater(new Runnable(){
 				public void run(){
 					TranslationHelperPanel.refreshProjectPanelNode(config);
 				}
 			});
-		}
+//		}
 	}
 
 	/**
@@ -1689,13 +1826,8 @@ public class ProjectDetailsPanel extends JPanel {
 		panel21 = new JPanel();
 		label13 = new JLabel();
 		panel25 = new JPanel();
-		label15 = new JLabel();
-		label16 = new JLabel();
-		textField2 = new JTextField();
-		label17 = new JLabel();
-		comboBox1 = new JComboBox();
-		panel26 = new JPanel();
 		button12 = new JButton();
+		panel26 = new JPanel();
 		panel27 = new JPanel();
 		issuesHelpLbl = new JLabel();
 		label19 = new JLabel();
@@ -2455,27 +2587,16 @@ public class ProjectDetailsPanel extends JPanel {
 					((GridBagLayout)panel25.getLayout()).columnWeights = new double[] {0.0, 1.0, 0.0, 1.0E-4};
 					((GridBagLayout)panel25.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 1.0E-4};
 
-					//---- label15 ----
-					label15.setText("Create new WorkList for maintenance work:");
-					panel25.add(label15, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 5, 5), 0, 0));
-
-					//---- label16 ----
-					label16.setText("New WorkList name:");
-					panel25.add(label16, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 5, 5), 0, 0));
-					panel25.add(textField2, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 5, 5), 0, 0));
-
-					//---- label17 ----
-					label17.setText("Workflow Business Process file:");
-					panel25.add(label17, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 5, 5), 0, 0));
-					panel25.add(comboBox1, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0,
+					//---- button12 ----
+					button12.setText("Create new WorkList for maintenance work");
+					button12.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+					button12.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							button12ActionPerformed(e);
+						}
+					});
+					panel25.add(button12, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
 						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						new Insets(0, 0, 5, 5), 0, 0));
 
@@ -2486,19 +2607,6 @@ public class ProjectDetailsPanel extends JPanel {
 						((GridBagLayout)panel26.getLayout()).rowHeights = new int[] {0, 0};
 						((GridBagLayout)panel26.getLayout()).columnWeights = new double[] {0.0, 0.0, 1.0E-4};
 						((GridBagLayout)panel26.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
-
-						//---- button12 ----
-						button12.setText("Create new Worklist");
-						button12.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-						button12.addActionListener(new ActionListener() {
-							@Override
-							public void actionPerformed(ActionEvent e) {
-								button12ActionPerformed(e);
-							}
-						});
-						panel26.add(button12, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 0, 5), 0, 0));
 					}
 					panel25.add(panel26, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
 						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
@@ -2848,13 +2956,8 @@ public class ProjectDetailsPanel extends JPanel {
 	private JPanel panel21;
 	private JLabel label13;
 	private JPanel panel25;
-	private JLabel label15;
-	private JLabel label16;
-	private JTextField textField2;
-	private JLabel label17;
-	private JComboBox comboBox1;
-	private JPanel panel26;
 	private JButton button12;
+	private JPanel panel26;
 	private JPanel panel27;
 	private JLabel issuesHelpLbl;
 	private JLabel label19;

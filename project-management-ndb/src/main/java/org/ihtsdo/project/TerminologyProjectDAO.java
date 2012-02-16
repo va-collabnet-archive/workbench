@@ -67,8 +67,8 @@ import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.RefsetPropertyMap;
-import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
@@ -82,6 +82,7 @@ import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.lucene.SearchResult;
@@ -98,20 +99,27 @@ import org.ihtsdo.project.model.WorklistMetadata;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
 import org.ihtsdo.project.refset.PromotionRefset;
+import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.api.WorkflowInterpreter;
+import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfMembership;
+import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.TerminologyBuilderBI;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid_str.RefexCnidStrVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 
@@ -2648,6 +2656,30 @@ public class TerminologyProjectDAO {
 		return returnWorkList;
 	}
 
+	public static void createNewNacWorkList(I_TerminologyProject project,
+			WorkflowDefinition workflowDefinition,
+			ArrayList<WfMembership> workflowUserRoles, String name,
+			I_ConfigAceFrame config, I_ShowActivity activity) throws Exception {
+		WorkList newNacWorkList = null;
+		WorkSet nacWorkSet = getNonAssignedChangesWorkSet(project, config);
+
+		Partition nacWorkListPartition = createNewPartition(name, nacWorkSet.getPartitionSchemes(config).iterator().next().getUids().iterator().next(), config);
+
+		newNacWorkList = new WorkList(name, 0, null, nacWorkListPartition.getUids().iterator().next());
+		newNacWorkList.setWorkflowDefinition(workflowDefinition);
+		newNacWorkList.setWorkflowUserRoles(workflowUserRoles);
+		
+		WorkList returnWorkList = createNewWorkList(newNacWorkList, config);
+		ActivityUpdater updater = new ActivityUpdater(activity, "Generating WorkList");
+		if (returnWorkList != null) {
+			initializeWorkList(nacWorkListPartition, returnWorkList, config, updater);
+		}
+		Terms.get().addUncommittedNoChecks(returnWorkList.getConcept());
+		Terms.get().commit();
+
+		TerminologyProjectDAO.workListCache.put(returnWorkList.getUids().iterator().next(), returnWorkList);
+		
+	}
 	/**
 	 * Gets the all nac work lists.
 	 *
@@ -2676,7 +2708,7 @@ public class TerminologyProjectDAO {
 	 * @return the work list member
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
-	public static WorkListMember addConceptAsNacWorklistMember(WorkList workList, I_GetConceptData concept, String destination, I_ConfigAceFrame config) throws IOException {
+	public static WorkListMember addConceptAsNacWorklistMember(WorkList workList, I_GetConceptData concept, I_ConfigAceFrame config) throws IOException {
 		try {
 			WorkSet nacWorkSet = getNonAssignedChangesWorkSet(getProjectForWorklist(workList, config), config);
 			addConceptAsWorkSetMember(concept, nacWorkSet.getUids().iterator().next(), config);
@@ -2684,7 +2716,7 @@ public class TerminologyProjectDAO {
 			Terms.get().addUncommitted(workList.getPartition().getConcept());
 			workList.getPartition().getConcept().commit(config.getDbConfig().getUserChangesChangeSetPolicy().convert(), ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 			WorkListMember workListMember = new WorkListMember(concept.toString(), concept.getConceptNid(), concept.getUids(), workList.getUids().iterator().next(), Terms.get().getConcept(
-					ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids()), new java.util.Date().getTime());
+					ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_DELIVERED_STATUS.getUids()), new java.util.Date().getTime());
 			WorkflowInterpreter interpreter = WorkflowInterpreter.createWorkflowInterpreter(workList.getWorkflowDefinition());
 			addConceptAsWorkListMember(workListMember, Terms.get().uuidToNative(interpreter.getNextDestination(workListMember.getWfInstance(), workList).getId()), config);
 			Terms.get().commit();
@@ -4902,5 +4934,50 @@ public class TerminologyProjectDAO {
 		// // // }
 		// // tf.commit();
 	}
+
+	public static void initializeWorkflowForMember(WorkListMember member, WorkList workList,
+			I_ConfigAceFrame config) throws Exception {
+			WfInstance instance = new WfInstance();
+			WfComponentProvider prov = new WfComponentProvider();
+			instance.setComponentId(SNOMED.Concept.ROOT.getPrimoridalUid());
+			instance.setState(prov.statusConceptToWfState(
+					Terms.get().getConcept(
+							ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids())));
+			instance.setWfDefinition(workList.getWorkflowDefinition());
+			instance.setWorkList(workList);
+			WorkflowInterpreter interpreter = WorkflowInterpreter.createWorkflowInterpreter(workList.getWorkflowDefinition());
+
+			WfUser user = interpreter.getNextDestination(instance, workList);
+			if (user ==null){
+				throw new Exception("Cannot set next destination\n");
+			}
+			TerminologyStoreDI ts = Ts.get();
+			int userNid = ts.getNidForUuids(user.getId());
+			ConceptVersionBI concept = ts.getConceptVersion(config.getViewCoordinate(), ts.getNidForUuids(member.getUids()));
+			RefexCAB newSpec = new RefexCAB(
+					TK_REFSET_TYPE.CID,
+					concept.getNid(),
+					ts.getNidForUuids(workList.getUids()));
+			int activeNid = SnomedMetadataRf1.CURRENT_RF1.getLenient().getNid();
+			int assignedNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids());
+		
+			newSpec.put(RefexProperty.CNID1, activeNid);
+
+			TerminologyBuilderBI tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
+					config.getViewCoordinate());
+			RefexChronicleBI<?> newRefex = tc.constructIfNotCurrent(newSpec);
+
+			PromotionAndAssignmentRefset promRef = workList.getPromotionRefset(config);
+			RefexCAB newSpecForProm = new RefexCAB(
+					TK_REFSET_TYPE.CID_CID,
+					concept.getNid(),
+					promRef.getRefsetId());
+			newSpecForProm.put(RefexProperty.CNID1, assignedNid);
+			newSpecForProm.put(RefexProperty.CNID2, userNid);
+			RefexChronicleBI<?> newRefexForProm = tc.constructIfNotCurrent(newSpecForProm);
+			concept.addAnnotation(newRefexForProm);
+		
+	}
+
 
 }

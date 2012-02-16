@@ -175,12 +175,13 @@ public class GetDataFromUAWPanelSR extends AbstractTask {
 						JOptionPane.YES_NO_OPTION);
 				if (n == JOptionPane.YES_OPTION) {
 					// Create worklist member for unassigned work
-					WorkListMember workListMember = TerminologyProjectDAO.addConceptAsNacWorklistMember(
+					WorkListMember member= TerminologyProjectDAO.addConceptAsNacWorklistMember(
 							selectedWorkList, selectedConcept,
-							config.getUsername()+".outbox", config);
-					
-					process.setProperty(memberPropName, workListMember);
-					process.setProperty(memberPropName, workListMember);
+							config);
+					TerminologyProjectDAO.initializeWorkflowForMember( member, selectedWorkList, config);
+				
+//					process.setProperty(memberPropName, workListMember);
+//					process.setProperty(memberPropName, workListMember);
 
 					return Condition.ITEM_COMPLETE;
 				} else {

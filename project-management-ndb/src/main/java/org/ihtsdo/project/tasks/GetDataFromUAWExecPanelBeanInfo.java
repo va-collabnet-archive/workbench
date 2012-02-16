@@ -83,7 +83,7 @@ public class GetDataFromUAWExecPanelBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(GetDataFromUAWExecPanel.class);
-        bd.setDisplayName("<html><font color='green'><center>Get data<br>from UAW panel<br>continue or exec");
+        bd.setDisplayName("<html><font color='green'><center>Get data<br>from UAW panel<br>for taxonomy");
         return bd;
     }
 
