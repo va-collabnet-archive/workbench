@@ -13,6 +13,7 @@ import org.dwfa.svn.Svn;
 import org.dwfa.util.io.FileIO;
 import org.ihtsdo.mojo.maven.MojoUtil;
 import org.tigris.subversion.javahl.ClientException;
+import org.tmatesoft.svn.core.javahl.SVNClientImpl;
 
 /**
  * Update with svn changes.
@@ -51,6 +52,9 @@ public class Checkout
             getLog().info("Connecting to: " + repositoryUrlStr + " as: " + username);
             svd.setUsername(username);
             svd.setPassword(password);
+            ((SVNClientImpl)svn).username(username);
+            ((SVNClientImpl)svn).password(password );
+            
             svn.svnCheckout(svd, this, false);
         } catch (NoSuchAlgorithmException e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
