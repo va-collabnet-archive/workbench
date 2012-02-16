@@ -24,7 +24,8 @@ import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 /**
- *
+ *Implements the processing of sap nids and concepts according to the
+ * specified date range and list of sap nids respectively.
  * @author akf
  */
 public class Reporter implements ProcessSapDataBI, ProcessUnfetchedConceptDataBI {
@@ -34,17 +35,17 @@ public class Reporter implements ProcessSapDataBI, ProcessUnfetchedConceptDataBI
     ConcurrentSkipListSet<Integer> resultNids = new ConcurrentSkipListSet<Integer>();
 
     /**
-     * Constructs a 
-     * @param startDate
-     * @param endDate
+     * Constructs the reporter object using the starting date and time and the
+     * ending date and time.
+     * @param startDate the time and date, in the form MM/dd/yy HH:mm:ss
+     * @param endDate the time and date, in the form MM/dd/yy HH:mm:ss
      * @throws ParseException
      */
-    public Reporter(String startDate, String endDate) throws ParseException {
+    protected Reporter(String startDate, String endDate) throws ParseException {
         this.startDate = TimeHelper.getTimeFromString(startDate, TimeHelper.getDateFormat());
         this.endDate = TimeHelper.getTimeFromString(endDate, TimeHelper.getDateFormat());
     }
 
-    
     @Override
     public void processSapData(SapBI sap) throws Exception {
         process(sap);

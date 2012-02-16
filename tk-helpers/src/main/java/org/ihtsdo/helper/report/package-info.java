@@ -15,6 +15,6 @@
  */
 
 /**
- * 
+ * Helper classes for returning concepts which meet certain criteria.
  */
 package org.ihtsdo.helper.report;

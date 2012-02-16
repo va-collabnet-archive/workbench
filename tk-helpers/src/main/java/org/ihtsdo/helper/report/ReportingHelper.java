@@ -20,7 +20,7 @@ import org.ihtsdo.tk.api.*;
 
 
 /**
- *
+ *Used to get reports for a specified date range.
  * @author akf
  */
 public class ReportingHelper {
@@ -48,8 +48,8 @@ public class ReportingHelper {
     /**
      * Returns a list of nids which changed during the given time period.
      * @param startTime the time and date, in the form MM/dd/yy HH:mm:ss
-     * @param endTime a <code>NideList</code> of the nids which changed during the given time period
-     * @return
+     * @param endTime a <code>NidList</code> of the nids which changed during the given time period
+     * @return <code>NidList</code>
      * @throws Exception
      */
     public static NidList getReport(String startTime, String endTime) throws Exception{

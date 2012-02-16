@@ -18,15 +18,17 @@ package org.ihtsdo.helper.report;
 import org.ihtsdo.tk.api.SapBI;
 
 /**
- *
+ *Possible enhancement to <code>ReportingHelper</code>. Multiple similar classes
+ * would contain the knowledge of the test criteria. <code>ReportingHelper</code>
+ * would be constructed using on of these test classes.
  * @author akf
  */
 public interface SapTest {
     
     /**
-     * 
+     * Contains the information about what should be tested.
      * @param sap
-     * @return
+     * @return <code>true</code> if sap nid meets criteria, otherwise <code>false</code
      */
     boolean test(SapBI sap);
     
