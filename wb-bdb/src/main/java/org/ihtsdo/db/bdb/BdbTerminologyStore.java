@@ -203,6 +203,11 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     public void iterateConceptDataInSequence(ProcessUnfetchedConceptDataBI processor) throws Exception {
         Bdb.getConceptDb().iterateConceptDataInSequence(processor);
     }
+    
+    @Override
+    public void iterateSapDataInSequence(ProcessSapDataBI processor) throws Exception {
+        Bdb.getSapDb().iterateSapDataInSequence(processor);
+    }
 
     
    @Override

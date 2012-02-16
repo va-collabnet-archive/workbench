@@ -34,7 +34,13 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
    void iterateConceptDataInParallel(ProcessUnfetchedConceptDataBI processor) throws Exception;
 
    void iterateConceptDataInSequence(ProcessUnfetchedConceptDataBI processor) throws Exception;
-
+   /**
+    * 
+    * @param processor
+    * @throws Exception 
+    */
+   void iterateSapDataInSequence(ProcessSapDataBI processor) throws Exception;
+   
    void removeTermChangeListener(TermChangeListener cl);
    
    PositionBI newPosition(PathBI path, long time) throws IOException;

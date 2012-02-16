@@ -38,8 +38,12 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.naming.OperationNotSupportedException;
+import org.dwfa.ace.api.IdentifierSet;
+import org.ihtsdo.tk.api.*;
 
 /**
  * @author kec
@@ -494,6 +498,16 @@ public class StatusAtPositionBdb extends ComponentBdb {
             throw new RuntimeException(e);
         } finally {
             expandPermit.release();
+        }
+    }
+    /**
+     * 
+     * @param processor
+     * @throws Exception
+     */
+    public void iterateSapDataInSequence(ProcessSapDataBI processor) throws Exception {
+        for (int sap = initialPosition; sap < sequence.get(); sap++) {
+            processor.processSapData(new SAP(sap));
         }
     }
 
