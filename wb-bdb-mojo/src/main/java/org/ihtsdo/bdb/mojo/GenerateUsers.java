@@ -270,6 +270,7 @@ public class GenerateUsers extends AbstractMojo {
 
                 wfLine = wfReader.readLine();
             }
+            getLog().info("Starting rels permissions creation");
             if (relPermissionsFile.exists()) {
             try {
 				FileReader     fr = new FileReader(relPermissionsFile);
@@ -278,7 +279,7 @@ public class GenerateUsers extends AbstractMojo {
 				br.readLine();
 
 				String relPermissionLine = br.readLine();
-
+				getLog().info("Looking at lines...");
 				while (relPermissionLine != null) {
 					String[] parts = relPermissionLine.split("\t");
 
@@ -328,14 +329,13 @@ public class GenerateUsers extends AbstractMojo {
 		if (user == null) {
 			//throw new Exception("User unknown");
 			//skip line
-			System.out.println("User not found:" + userName + " for rel permission");
+			getLog().warn("User not found:" + userName + " for rel permission");
 		} else {
+			getLog().info("Creating permission for user " +  user.toString() + " if not current");
 			RelCAB relCab = new RelCAB(user.getPrimUuid(),UUID.fromString(typeUid),
 					UUID.fromString(targetUid),0,TkRelType.STATED_ROLE);
 			Ts.get().getTerminologyBuilder(config.getEditCoordinate(), 
 					config.getViewCoordinate()).constructIfNotCurrent(relCab);
-			
-			
 //			old way
 //			tf.newRelationship(UUID.randomUUID(), user, 
 //					tf.getConcept(UUID.fromString(typeUid)), 
