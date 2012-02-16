@@ -16,12 +16,18 @@
 package org.ihtsdo.tk.api;
 
 /**
- *
+ * Allows all sap nids to be efficiently tested according to the criteria
+ * specified in each implementation. Each component of a concept
+ * contains a sap nid. By finding sap nids which meet a certain criteria, the
+ * concepts in the database can be efficiently sorted based on those concepts
+ * which contain a desired sap nid.
+ * @see SapBI
  * @author akf
  */
 public interface ProcessSapDataBI {
     /**
-     * 
+     * Implement this method to processes all sap nids according to certain criteria.
+     * All sap nids in the database will be returned but in no particular order.
      * @param sap
      * @throws Exception
      */

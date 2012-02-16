@@ -16,39 +16,39 @@
 package org.ihtsdo.tk.api;
 
 /**
- *
+ *Interface for the <code>SAP</code> class.
  * @author akf
  */
 public interface SapBI {
     
     /**
      * 
-     * @return
+     * @return <code>int</code>
      */
     int getStatusNid();
     /**
      * 
-     * @return
+     * @return <code>int</code>
      */
     int getAuthorNid();
     /**
      * 
-     * @return
+     * @return <code>int</code>
      */
     int getModuleNid();
     /**
      * 
-     * @return
+     * @return <code>int</code>
      */
     int getPathNid();
     /**
      * 
-     * @return
+     * @return <code>int</code>
      */
     long getTime();
     /**
-     * 
-     * @return
+     * Returns the sap nid with which the SAP object was constructed.
+     * @return sap nid as an <code>int</code> 
      */
     int getSapNid();
     
