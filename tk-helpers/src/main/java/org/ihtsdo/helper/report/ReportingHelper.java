@@ -40,7 +40,7 @@ public class ReportingHelper {
      * @return a <code>NideList</code> of the nids which changed during the given time period
      * @throws Exception
      */
-    public static NidList getReport(String startTime) throws Exception{
+    public static NidList getChangedConceptNids(String startTime) throws Exception{
         String endTime = "latest";
         return find(startTime, endTime);
     }
@@ -52,7 +52,7 @@ public class ReportingHelper {
      * @return <code>NidList</code>
      * @throws Exception
      */
-    public static NidList getReport(String startTime, String endTime) throws Exception{
+    public static NidList getChangedConceptNids(String startTime, String endTime) throws Exception{
         return find(startTime, endTime);
     }
     
