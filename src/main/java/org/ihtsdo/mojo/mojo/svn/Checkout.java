@@ -52,8 +52,8 @@ public class Checkout
             getLog().info("Connecting to: " + repositoryUrlStr + " as: " + username);
             svd.setUsername(username);
             svd.setPassword(password);
-            ((SVNClientImpl)svn).username(username);
-            ((SVNClientImpl)svn).password(password );
+            ((SVNClientImpl)Svn.getSvnClient()).username(username);
+            ((SVNClientImpl)Svn.getSvnClient()).password(password );
             
             svn.svnCheckout(svd, this, false);
         } catch (NoSuchAlgorithmException e) {
