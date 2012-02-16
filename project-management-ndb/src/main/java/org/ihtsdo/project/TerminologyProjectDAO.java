@@ -133,7 +133,7 @@ public class TerminologyProjectDAO {
 
 	/** The work list cache. */
 	public static Map<UUID, WorkList> workListCache = new HashMap<UUID, WorkList>();
-	
+
 	/** The partition cache. */
 	public static Map<UUID, Partition> partitionCache = new HashMap<UUID, Partition>();
 
@@ -1088,7 +1088,7 @@ public class TerminologyProjectDAO {
 			if ((concept != null) && (project.getReleasePath() == null) || (concept.getConceptNid() != project.getReleasePath().getConceptNid())) {
 				List<? extends I_RelTuple> targetRefsetRels = null;
 				I_IntSet allowedDestRelTypes = termFactory.newIntSet();
-//				allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.PATRICIA_HOUGHTON.localize().getNid());
+				//				allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.PATRICIA_HOUGHTON.localize().getNid());
 				allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.PATRICIA_HOUGHTON.localize().getNid());
 				targetRefsetRels = project.getConcept().getSourceRelTuples(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
 
@@ -1103,9 +1103,9 @@ public class TerminologyProjectDAO {
 						termFactory.commit();
 					}
 				}
-//				I_RelVersioned newRelationship = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), termFactory.getConcept(ArchitectonicAuxiliary.Concept.HAS_MODULE_ID_REFSET_ATTRIBUTE.getUids()), concept,
-//						termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
-//						termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
+				//				I_RelVersioned newRelationship = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), termFactory.getConcept(ArchitectonicAuxiliary.Concept.HAS_MODULE_ID_REFSET_ATTRIBUTE.getUids()), concept,
+				//						termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
+				//						termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 				I_RelVersioned newRelationship = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), termFactory.getConcept(ArchitectonicAuxiliary.Concept.PATRICIA_HOUGHTON.getUids()), concept,
 						termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
 						termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
@@ -1132,9 +1132,9 @@ public class TerminologyProjectDAO {
 	public static void setNamespaceRefset(TranslationProject project, String namespaceText, I_ConfigAceFrame config) {
 		try {
 			I_TermFactory termFactory = Terms.get();
-			
+
 			I_GetConceptData projectConcept = project.getConcept();
-//			I_GetConceptData namespaceRefset = termFactory.getConcept(ArchitectonicAuxiliary.Concept.PROJECT_NAMESPACE_REFSET.localize().getNid());
+			//			I_GetConceptData namespaceRefset = termFactory.getConcept(ArchitectonicAuxiliary.Concept.PROJECT_NAMESPACE_REFSET.localize().getNid());
 			I_GetConceptData namespaceRefset = termFactory.getConcept(ArchitectonicAuxiliary.Concept.ALEJANDRO_RODRIGUEZ.localize().getNid());
 
 			RefexCAB newBluePrint = new RefexCAB(TK_REFSET_TYPE.CID_STR, projectConcept.getNid(), namespaceRefset.getNid());
@@ -1147,7 +1147,7 @@ public class TerminologyProjectDAO {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Sets the release path refset.
 	 *
@@ -1511,7 +1511,7 @@ public class TerminologyProjectDAO {
 		}
 
 	}
-	
+
 	/**
 	 * Gets the module id refset for project.
 	 *
@@ -1527,7 +1527,7 @@ public class TerminologyProjectDAO {
 
 		try {
 			I_IntSet allowedDestRelTypes = termFactory.newIntSet();
-//			allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.HAS_MODULE_ID_REFSET_ATTRIBUTE.localize().getNid());
+			//			allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.HAS_MODULE_ID_REFSET_ATTRIBUTE.localize().getNid());
 			allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.PATRICIA_HOUGHTON.localize().getNid());
 			targetRefsetsTuples = project.getConcept().getSourceRelTuples(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
 
@@ -1580,7 +1580,7 @@ public class TerminologyProjectDAO {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		return namespaceStr;
 	}
 
@@ -2668,7 +2668,7 @@ public class TerminologyProjectDAO {
 		newNacWorkList = new WorkList(name, 0, null, nacWorkListPartition.getUids().iterator().next());
 		newNacWorkList.setWorkflowDefinition(workflowDefinition);
 		newNacWorkList.setWorkflowUserRoles(workflowUserRoles);
-		
+
 		WorkList returnWorkList = createNewWorkList(newNacWorkList, config);
 		ActivityUpdater updater = new ActivityUpdater(activity, "Generating WorkList");
 		if (returnWorkList != null) {
@@ -2678,7 +2678,7 @@ public class TerminologyProjectDAO {
 		Terms.get().commit();
 
 		TerminologyProjectDAO.workListCache.put(returnWorkList.getUids().iterator().next(), returnWorkList);
-		
+
 	}
 	/**
 	 * Gets the all nac work lists.
@@ -2715,10 +2715,18 @@ public class TerminologyProjectDAO {
 			addConceptAsPartitionMember(concept, workList.getPartition(), config);
 			Terms.get().addUncommitted(workList.getPartition().getConcept());
 			workList.getPartition().getConcept().commit(config.getDbConfig().getUserChangesChangeSetPolicy().convert(), ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
-			WorkListMember workListMember = new WorkListMember(concept.toString(), concept.getConceptNid(), concept.getUids(), workList.getUids().iterator().next(), Terms.get().getConcept(
-					ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_DELIVERED_STATUS.getUids()), new java.util.Date().getTime());
+			I_GetConceptData assingStatus = Terms.get().getConcept(
+					ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids());
+			WorkListMember workListMember = new WorkListMember(concept.toString(), concept.getConceptNid(), concept.getUids(), workList.getUids().iterator().next(), assingStatus, new java.util.Date().getTime());
 			WorkflowInterpreter interpreter = WorkflowInterpreter.createWorkflowInterpreter(workList.getWorkflowDefinition());
-			addConceptAsWorkListMember(workListMember, Terms.get().uuidToNative(interpreter.getNextDestination(workListMember.getWfInstance(), workList).getId()), config);
+			WfComponentProvider provider = new WfComponentProvider();
+			WfInstance wfInstance = new WfInstance();
+			wfInstance.setComponentId(Terms.get().nidToUuid(concept.getNid()));
+			wfInstance.setWfDefinition(workList.getWorkflowDefinition());
+			wfInstance.setWorkList(workList);
+			wfInstance.setComponentName(concept.toString());
+			wfInstance.setState(provider.statusConceptToWfState(assingStatus));
+			addConceptAsWorkListMember(workListMember, Terms.get().uuidToNative(interpreter.getNextDestination(wfInstance, workList).getId()), config);
 			Terms.get().commit();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -3179,11 +3187,11 @@ public class TerminologyProjectDAO {
 					refsetHelper = termFactory.getRefsetHelper(config);
 				}
 				refsetHelper.newRefsetExtension(workListConcept.getConceptNid(), newMemberConcept.getConceptNid(), EConcept.REFSET_TYPES.STR, new RefsetPropertyMap().with(REFSET_PROPERTY.STRING_VALUE, ""), // metadata
-																																																				// Removed
-																																																				// to
-																																																				// minimize
-																																																				// changeset
-																																																				// footprint
+						// Removed
+						// to
+						// minimize
+						// changeset
+						// footprint
 						config);
 				termFactory.addUncommittedNoChecks(workListConcept);
 				I_GetConceptData activityStatusConcept = member.getActivityStatus();
@@ -3319,7 +3327,7 @@ public class TerminologyProjectDAO {
 	 * @throws PrivilegedActionException the privileged action exception
 	 */
 	public static void deliverWorklistBusinessProcessToOutbox(WorkList worklist, I_Work worker) throws TerminologyException, IOException, TaskFailedException, UnknownTransactionException, CannotCommitException, LeaseDeniedException,
-			InterruptedException, PrivilegedActionException {
+	InterruptedException, PrivilegedActionException {
 
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 		List<WorkListMember> workListMembers = getAllWorkListMembers(worklist, config);
@@ -3419,27 +3427,27 @@ public class TerminologyProjectDAO {
 	 * The Enum subjectIndexes.
 	 */
 	public enum subjectIndexes {
-		
+
 		/** The WORKLIS t_ membe r_ id. */
 		WORKLIST_MEMBER_ID, 
- /** The WORKLIS t_ membe r_ sourc e_ name. */
- WORKLIST_MEMBER_SOURCE_NAME, 
- /** The WORKLIS t_ id. */
- WORKLIST_ID, 
- /** The WORKLIS t_ name. */
- WORKLIST_NAME, 
- /** The PROJEC t_ id. */
- PROJECT_ID, 
- /** The WORKLIS t_ membe r_ sourc e_ pref. */
- WORKLIST_MEMBER_SOURCE_PREF, 
- /** The PROM o_ refse t_ id. */
- PROMO_REFSET_ID, 
- /** The TAG s_ array. */
- TAGS_ARRAY, 
- /** The STATU s_ id. */
- STATUS_ID, 
- /** The STATU s_ time. */
- STATUS_TIME
+		/** The WORKLIS t_ membe r_ sourc e_ name. */
+		WORKLIST_MEMBER_SOURCE_NAME, 
+		/** The WORKLIS t_ id. */
+		WORKLIST_ID, 
+		/** The WORKLIS t_ name. */
+		WORKLIST_NAME, 
+		/** The PROJEC t_ id. */
+		PROJECT_ID, 
+		/** The WORKLIS t_ membe r_ sourc e_ pref. */
+		WORKLIST_MEMBER_SOURCE_PREF, 
+		/** The PROM o_ refse t_ id. */
+		PROMO_REFSET_ID, 
+		/** The TAG s_ array. */
+		TAGS_ARRAY, 
+		/** The STATU s_ id. */
+		STATUS_ID, 
+		/** The STATU s_ time. */
+		STATUS_TIME
 	};
 
 	/**
@@ -3459,7 +3467,7 @@ public class TerminologyProjectDAO {
 		String subject = "";
 		try {
 			subject = workListMember.getUids().iterator().next() + subjectSeparator + terms[0] + subjectSeparator + worklist.getUids().iterator().next() + subjectSeparator + worklist.getName() + subjectSeparator + project.getUids().iterator().next()
-					+ subjectSeparator + terms[1] + subjectSeparator + promotionRefset.getRefsetConcept().getUids().iterator().next() + subjectSeparator + subjectSeparator + Terms.get().nidToUuid(statusId) + subjectSeparator + statusTime;
+			+ subjectSeparator + terms[1] + subjectSeparator + promotionRefset.getRefsetConcept().getUids().iterator().next() + subjectSeparator + subjectSeparator + Terms.get().nidToUuid(statusId) + subjectSeparator + statusTime;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -3469,19 +3477,19 @@ public class TerminologyProjectDAO {
 
 	/** The fsn. */
 	private static I_GetConceptData fsn;
-	
+
 	/** The preferred. */
 	private static I_GetConceptData preferred;
-	
+
 	/** The not acceptable. */
 	private static I_GetConceptData notAcceptable;
-	
+
 	/** The inactive. */
 	private static I_GetConceptData inactive;
-	
+
 	/** The retired. */
 	private static I_GetConceptData retired;
-	
+
 	/** The en refset. */
 	private static I_GetConceptData enRefset;
 	static {
@@ -4937,46 +4945,46 @@ public class TerminologyProjectDAO {
 
 	public static void initializeWorkflowForMember(WorkListMember member, WorkList workList,
 			I_ConfigAceFrame config) throws Exception {
-			WfInstance instance = new WfInstance();
-			WfComponentProvider prov = new WfComponentProvider();
-			instance.setComponentId(SNOMED.Concept.ROOT.getPrimoridalUid());
-			instance.setState(prov.statusConceptToWfState(
-					Terms.get().getConcept(
-							ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids())));
-			instance.setWfDefinition(workList.getWorkflowDefinition());
-			instance.setWorkList(workList);
-			WorkflowInterpreter interpreter = WorkflowInterpreter.createWorkflowInterpreter(workList.getWorkflowDefinition());
+		WfInstance instance = new WfInstance();
+		WfComponentProvider prov = new WfComponentProvider();
+		instance.setComponentId(SNOMED.Concept.ROOT.getPrimoridalUid());
+		instance.setState(prov.statusConceptToWfState(
+				Terms.get().getConcept(
+						ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids())));
+		instance.setWfDefinition(workList.getWorkflowDefinition());
+		instance.setWorkList(workList);
+		WorkflowInterpreter interpreter = WorkflowInterpreter.createWorkflowInterpreter(workList.getWorkflowDefinition());
 
-			WfUser user = interpreter.getNextDestination(instance, workList);
-			if (user ==null){
-				throw new Exception("Cannot set next destination\n");
-			}
-			TerminologyStoreDI ts = Ts.get();
-			int userNid = ts.getNidForUuids(user.getId());
-			ConceptVersionBI concept = ts.getConceptVersion(config.getViewCoordinate(), ts.getNidForUuids(member.getUids()));
-			RefexCAB newSpec = new RefexCAB(
-					TK_REFSET_TYPE.CID,
-					concept.getNid(),
-					ts.getNidForUuids(workList.getUids()));
-			int activeNid = SnomedMetadataRf1.CURRENT_RF1.getLenient().getNid();
-			int assignedNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids());
-		
-			newSpec.put(RefexProperty.CNID1, activeNid);
+		WfUser user = interpreter.getNextDestination(instance, workList);
+		if (user ==null){
+			throw new Exception("Cannot set next destination\n");
+		}
+		TerminologyStoreDI ts = Ts.get();
+		int userNid = ts.getNidForUuids(user.getId());
+		ConceptVersionBI concept = ts.getConceptVersion(config.getViewCoordinate(), ts.getNidForUuids(member.getUids()));
+		RefexCAB newSpec = new RefexCAB(
+				TK_REFSET_TYPE.CID,
+				concept.getNid(),
+				ts.getNidForUuids(workList.getUids()));
+		int activeNid = SnomedMetadataRf1.CURRENT_RF1.getLenient().getNid();
+		int assignedNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids());
 
-			TerminologyBuilderBI tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
-					config.getViewCoordinate());
-			RefexChronicleBI<?> newRefex = tc.constructIfNotCurrent(newSpec);
+		newSpec.put(RefexProperty.CNID1, activeNid);
 
-			PromotionAndAssignmentRefset promRef = workList.getPromotionRefset(config);
-			RefexCAB newSpecForProm = new RefexCAB(
-					TK_REFSET_TYPE.CID_CID,
-					concept.getNid(),
-					promRef.getRefsetId());
-			newSpecForProm.put(RefexProperty.CNID1, assignedNid);
-			newSpecForProm.put(RefexProperty.CNID2, userNid);
-			RefexChronicleBI<?> newRefexForProm = tc.constructIfNotCurrent(newSpecForProm);
-			concept.addAnnotation(newRefexForProm);
-		
+		TerminologyBuilderBI tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
+				config.getViewCoordinate());
+		RefexChronicleBI<?> newRefex = tc.constructIfNotCurrent(newSpec);
+
+		PromotionAndAssignmentRefset promRef = workList.getPromotionRefset(config);
+		RefexCAB newSpecForProm = new RefexCAB(
+				TK_REFSET_TYPE.CID_CID,
+				concept.getNid(),
+				promRef.getRefsetId());
+		newSpecForProm.put(RefexProperty.CNID1, assignedNid);
+		newSpecForProm.put(RefexProperty.CNID2, userNid);
+		RefexChronicleBI<?> newRefexForProm = tc.constructIfNotCurrent(newSpecForProm);
+		concept.addAnnotation(newRefexForProm);
+
 	}
 
 

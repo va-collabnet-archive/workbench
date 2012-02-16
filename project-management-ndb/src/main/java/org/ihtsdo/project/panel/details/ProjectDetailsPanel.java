@@ -1540,7 +1540,11 @@ public class ProjectDetailsPanel extends JPanel {
 					e1.printStackTrace();
 					JOptionPane.showMessageDialog(ProjectDetailsPanel.this, e1.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 				}
+
+				updateList1Content();
+				
 				TranslationHelperPanel.refreshProjectPanelNode(config);
+				JOptionPane.showMessageDialog(ProjectDetailsPanel.this, "Worklist created...", "Project Manager", JOptionPane.INFORMATION_MESSAGE);
 				return null;
 			}
 
@@ -1620,15 +1624,9 @@ public class ProjectDetailsPanel extends JPanel {
 //						"Error", JOptionPane.ERROR_MESSAGE);
 //				e2.printStackTrace();
 //			}
-			updateList1Content();
 //			textField2.setText("");
 //			utwBusinessProcess = null;
 
-			SwingUtilities.invokeLater(new Runnable(){
-				public void run(){
-					TranslationHelperPanel.refreshProjectPanelNode(config);
-				}
-			});
 //		}
 	}
 
