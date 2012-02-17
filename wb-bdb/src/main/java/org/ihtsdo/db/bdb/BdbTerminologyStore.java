@@ -78,6 +78,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
@@ -87,6 +88,7 @@ import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 public class BdbTerminologyStore implements TerminologyStoreDI {
 
     private static ViewCoordinate metadataVC = null;
+    private static EditCoordinate metadataEC = null;
     private static boolean isReleaseFormatSetup = false;
     private static int releaseFormat = 0;
 
@@ -474,6 +476,27 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
         }
 
         return metadataVC;
+    }
+    
+    @Override
+    public EditCoordinate getMetadataEC() throws IOException {
+        if (metadataEC == null) {
+            /*
+             * public EditCoordinate(int authorNid, NidSetBI editPaths) {
+		super();
+		assert editPaths != null;
+		assert authorNid != Integer.MIN_VALUE;
+		this.authorNid = authorNid;
+		this.editPaths = editPaths.getSetValues();
+	}
+             */
+            
+            int authorNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.USER.getUids());
+            int editPathNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
+            metadataEC = new EditCoordinate(authorNid, editPathNid);
+        }
+
+        return metadataEC;
     }
 
     @Override
