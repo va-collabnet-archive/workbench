@@ -19,6 +19,14 @@ package org.ihtsdo.tk.spec;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.UUID;
+import org.ihtsdo.lang.LANG_CODE;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.TerminologyBuilderBI;
+import org.ihtsdo.tk.api.blueprint.ConceptCB;
+import org.ihtsdo.tk.api.blueprint.InvalidCAB;
+import org.ihtsdo.tk.binding.snomed.TermAux;
 
 /**
  *
@@ -33,24 +41,34 @@ public class PathSpec implements SpecBI {
         out.writeInt(dataVersion);
         out.writeObject(pathConcept);
         out.writeObject(originConcept);
+        out.writeObject(parentConcept);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException,
+            ValidationException, InvalidCAB, ContradictionException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             pathConcept = (ConceptSpec) in.readObject();
             originConcept = (ConceptSpec) in.readObject();
+            parentConcept = (ConceptSpec) in.readObject();
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
 
     }
-
+    
     private ConceptSpec pathConcept;
 
     private ConceptSpec originConcept;
+    
+    private ConceptSpec parentConcept;
 
     public PathSpec(ConceptSpec pathConcept, ConceptSpec originConcept) {
+        this.pathConcept = pathConcept;
+        this.originConcept = originConcept;
+    }
+    
+    public PathSpec(ConceptSpec pathConcept, ConceptSpec originConcept, ConceptSpec parentConcept) {
         this.pathConcept = pathConcept;
         this.originConcept = originConcept;
     }
@@ -59,7 +77,24 @@ public class PathSpec implements SpecBI {
         super();
     }
  
-
+    public boolean testPathConcept(UUID[] uuids){
+        for(UUID uuid: uuids){
+            if(Ts.get().hasUuid(uuid)){
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public ConceptCB makePathConceptBluePrint() throws ValidationException, IOException, InvalidCAB, ContradictionException{
+            ConceptCB conceptBp = new ConceptCB(pathConcept.getDescription(),
+                    pathConcept.getDescription(),
+                    LANG_CODE.EN,
+                    TermAux.IS_A.getLenient().getPrimUuid(),
+                    parentConcept.getLenient().getPrimUuid());
+            return conceptBp;
+    }
+    
     public ConceptSpec getOriginConcept() {
         return originConcept;
     }
@@ -75,11 +110,20 @@ public class PathSpec implements SpecBI {
     public void setPathConcept(ConceptSpec pathConcept) {
         this.pathConcept = pathConcept;
     }
+    
+     public ConceptSpec getParentConcept() {
+        return parentConcept;
+    }
+
+    public void setParentConcept(ConceptSpec parentConcept) {
+        this.parentConcept = parentConcept;
+    }
 
     @Override
     public String toString() {
         return "PathSpec[pathConcept: " + pathConcept +
-                " originConcept: " + originConcept + "]";
+                " originConcept: " + originConcept + 
+                " parentConcept: " + parentConcept +"]";
     }
 
 }
