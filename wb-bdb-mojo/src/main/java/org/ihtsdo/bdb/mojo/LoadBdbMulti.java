@@ -66,6 +66,7 @@ import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
@@ -275,7 +276,17 @@ public class LoadBdbMulti extends AbstractMojo {
             if (initialPaths != null) {
 
                 for (PathSpec spec : initialPaths) {
-
+                    boolean hasConcept = spec.testPathConcept(spec.getPathConcept().getUuids());
+                    
+                    if(!hasConcept){
+                        ConceptCB conceptBp = spec.makePathConceptBluePrint();
+                        ViewCoordinate vc = Ts.get().getMetadataVC();
+                        EditCoordinate ec = Ts.get().getMetadataEC();
+                        TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(ec, vc);
+                        ConceptChronicleBI concept = builder.construct(conceptBp);
+                        BdbCommitManager.addUncommitted(concept);
+                    }
+                    
                     ConceptChronicleBI path =
                             Ts.get().getConcept(spec.getPathConcept().getUuids());
                     validateSpec(path, spec.getPathConcept());
@@ -595,7 +606,6 @@ public class LoadBdbMulti extends AbstractMojo {
 
         if (newConceptsFileNames != null) {
             for (String conceptFile : newConceptsFileNames) {
-                I_ConfigAceFrame config = DefaultConfig.newProfile();
                 int authorNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.USER.getUids());
                 TerminologyStoreDI store = Ts.get();
 
@@ -618,7 +628,7 @@ public class LoadBdbMulti extends AbstractMojo {
                     UUID pathUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, path);
 
                     EditCoordinate ec = new EditCoordinate(authorNid, store.getNidForUuids(pathUuid));
-                    TerminologyBuilderBI builder = store.getTerminologyBuilder(ec, config.getViewCoordinate());
+                    TerminologyBuilderBI builder = store.getTerminologyBuilder(ec, Ts.get().getMetadataVC());
 
                     ConceptCB conceptBp = new ConceptCB(fsn,
                             pref,
