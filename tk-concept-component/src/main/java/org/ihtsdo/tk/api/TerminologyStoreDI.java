@@ -101,6 +101,8 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
    Collection<DbDependency> getLatestChangeSetDependencies() throws IOException;
 
    ViewCoordinate getMetadataVC() throws IOException;
+   
+   EditCoordinate getMetadataEC() throws IOException;
 
    int getNidForUuids(Collection<UUID> uuids) throws IOException;
 
