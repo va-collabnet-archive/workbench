@@ -276,7 +276,14 @@ public class LoadBdbMulti extends AbstractMojo {
             if (initialPaths != null) {
 
                 for (PathSpec spec : initialPaths) {
-                    boolean hasConcept = spec.testPathConcept(spec.getPathConcept().getUuids());
+                    boolean hasConcept = spec.testPathConcept();
+                    if(hasConcept){
+                        int nid = Ts.get().getNidForUuids(spec.getPathConcept().getUuids());
+                        int cNid = Bdb.getConceptNid(nid);
+                        if(cNid == Integer.MAX_VALUE){
+                            hasConcept = false;
+                        }
+                    }
                     
                     if(!hasConcept){
                         ConceptCB conceptBp = spec.makePathConceptBluePrint();
