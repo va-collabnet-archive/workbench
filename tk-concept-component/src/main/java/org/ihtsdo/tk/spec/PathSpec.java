@@ -77,8 +77,8 @@ public class PathSpec implements SpecBI {
         super();
     }
  
-    public boolean testPathConcept(UUID[] uuids){
-        for(UUID uuid: uuids){
+    public boolean testPathConcept(){
+        for(UUID uuid: pathConcept.getUuids()){
             if(Ts.get().hasUuid(uuid)){
                 return true;
             }
@@ -92,6 +92,9 @@ public class PathSpec implements SpecBI {
                     LANG_CODE.EN,
                     TermAux.IS_A.getLenient().getPrimUuid(),
                     parentConcept.getLenient().getPrimUuid());
+            for(UUID uuid: pathConcept.getUuids()){
+                conceptBp.setComponentUuid(uuid);
+            }
             return conceptBp;
     }
     
