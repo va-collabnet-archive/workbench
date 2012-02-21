@@ -112,8 +112,8 @@ public class TestWorkflowDefinition extends TestCase {
 			state1.setId(ArchitectonicAuxiliary.Concept.REFERRED_TO_SME_STATUS.getUids().iterator().next());
 			state1.setName(getAAPreferredTerm(tf.getConcept(ArchitectonicAuxiliary.Concept.REFERRED_TO_SME_STATUS.getUids())));
 			WfState state2 = new WfState();
-			state2.setId(ArchitectonicAuxiliary.Concept.REFERRED_TO_SUPER_SME_STATUS.getUids().iterator().next());
-			state2.setName(getAAPreferredTerm(tf.getConcept(ArchitectonicAuxiliary.Concept.REFERRED_TO_SUPER_SME_STATUS.getUids())));
+			state2.setId(ArchitectonicAuxiliary.Concept.REFERRED_TO_SME_STATUS.getUids().iterator().next());
+			state2.setName(getAAPreferredTerm(tf.getConcept(ArchitectonicAuxiliary.Concept.REFERRED_TO_SME_STATUS.getUids())));
 			WfState state3 = new WfState();
 			state3.setId(ArchitectonicAuxiliary.Concept.REJECTED_BY_TPO_STATUS.getUids().iterator().next());
 			state3.setName(getAAPreferredTerm(tf.getConcept(ArchitectonicAuxiliary.Concept.REJECTED_BY_TPO_STATUS.getUids())));
@@ -131,8 +131,8 @@ public class TestWorkflowDefinition extends TestCase {
 			state7.setId(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids().iterator().next());
 			state7.setName(getAAPreferredTerm(tf.getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids())));
 			WfState state8 = new WfState();
-			state8.setId(ArchitectonicAuxiliary.Concept.SUPER_SME_FEEDBACK_COMPLETE_STATUS.getUids().iterator().next());
-			state8.setName(getAAPreferredTerm(tf.getConcept(ArchitectonicAuxiliary.Concept.SUPER_SME_FEEDBACK_COMPLETE_STATUS.getUids())));
+			state8.setId(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids().iterator().next());
+			state8.setName(getAAPreferredTerm(tf.getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids())));
 
 			WfState state9 = new WfState();
 			state9.setId(ArchitectonicAuxiliary.Concept.SME_FEEDBACK_COMPLETE_STATUS.getUids().iterator().next());
@@ -145,7 +145,7 @@ public class TestWorkflowDefinition extends TestCase {
 
 			WfRole role1 = new WfRole(getAAPreferredTerm(tf.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_EDITORIAL_BOARD_ROLE.getUids())), ArchitectonicAuxiliary.Concept.TRANSLATION_EDITORIAL_BOARD_ROLE.getUids().iterator().next());
 			WfRole role2 = new WfRole(getAAPreferredTerm(tf.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_SME_ROLE.getUids())), ArchitectonicAuxiliary.Concept.TRANSLATION_SME_ROLE.getUids().iterator().next());
-			WfRole role3 = new WfRole(getAAPreferredTerm(tf.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_SUPER_SME_ROLE.getUids())), ArchitectonicAuxiliary.Concept.TRANSLATION_SUPER_SME_ROLE.getUids().iterator().next());
+			WfRole role3 = new WfRole(getAAPreferredTerm(tf.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_SME_ROLE.getUids())), ArchitectonicAuxiliary.Concept.TRANSLATION_SUPER_SME_ROLE.getUids().iterator().next());
 			WfRole role4 = new WfRole(getAAPreferredTerm(tf.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_TPO_REVIEWER_ROLE.getUids())), ArchitectonicAuxiliary.Concept.TRANSLATION_TPO_REVIEWER_ROLE.getUids().iterator().next());
 			WfRole role5 = new WfRole(getAAPreferredTerm(tf.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_TSP_REVIEWER_ROLE.getUids())), ArchitectonicAuxiliary.Concept.TRANSLATION_TSP_REVIEWER_ROLE.getUids().iterator().next());
 			WfRole role6 = new WfRole(getAAPreferredTerm(tf.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATOR_ONE_TSP_ROLE.getUids())), ArchitectonicAuxiliary.Concept.TRANSLATOR_ONE_TSP_ROLE.getUids().iterator().next());
