@@ -193,7 +193,7 @@ public class GetDataFromWFUserSelectionPanelStoreInSameBpExec extends AbstractTa
 			String roleSme = termFactory.getConcept(
 					ArchitectonicAuxiliary.Concept.TRANSLATION_SME_ROLE.getUids()).toString();
 			String roleSupSme = termFactory.getConcept(
-					ArchitectonicAuxiliary.Concept.TRANSLATION_SUPER_SME_ROLE.getUids()).toString();
+					ArchitectonicAuxiliary.Concept.TRANSLATION_SME_ROLE.getUids()).toString();
 		
 			String roleEdB = termFactory.getConcept(
 					ArchitectonicAuxiliary.Concept.TRANSLATION_EDITORIAL_BOARD_ROLE.getUids()).toString();

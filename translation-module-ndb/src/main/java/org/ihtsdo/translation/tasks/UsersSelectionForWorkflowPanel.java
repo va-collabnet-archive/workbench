@@ -173,7 +173,7 @@ public class UsersSelectionForWorkflowPanel extends JPanel {
 			roleSme = tf.getConcept(
 					ArchitectonicAuxiliary.Concept.TRANSLATION_SME_ROLE.getUids()).toString();
 			roleSuperSme = tf.getConcept(
-					ArchitectonicAuxiliary.Concept.TRANSLATION_SUPER_SME_ROLE.getUids()).toString();
+					ArchitectonicAuxiliary.Concept.TRANSLATION_SME_ROLE.getUids()).toString();
 			roleEdB = tf.getConcept(
 					ArchitectonicAuxiliary.Concept.TRANSLATION_EDITORIAL_BOARD_ROLE.getUids()).toString();
 
@@ -437,7 +437,7 @@ public class UsersSelectionForWorkflowPanel extends JPanel {
 			c2.weightx = 1;
 			superSmeCombo = new JComboBox(
 					permissionsApi.getUsersInboxAddressesForRole(tf.getConcept(
-							ArchitectonicAuxiliary.Concept.TRANSLATION_SUPER_SME_ROLE.getUids()), 
+							ArchitectonicAuxiliary.Concept.TRANSLATION_SME_ROLE.getUids()), 
 							projectsRootConcept).toArray());
 			rolesPanel.add(superSmeCombo,c2);
 		}

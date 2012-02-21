@@ -143,7 +143,7 @@ public class TranslatorDefaultEditorModePanel extends JPanel {
 				
 				if(role == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.RELEASE_AUTHORITY_ROLE.getUids())){
 					//editorMode.setEnabled(false);
-				}else if(role == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_SUPER_SME_ROLE.getUids())){
+				}else if(role == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_SME_ROLE.getUids())){
 					//editorMode.setEnabled(false);
 				}
 
