@@ -59,8 +59,6 @@ public class TestXstream {
 		state1.setId(ArchitectonicAuxiliary.Concept.REFERRED_TO_SME_STATUS.getUids().iterator().next());
 		state1.setName(ArchitectonicAuxiliary.Concept.REFERRED_TO_SME_STATUS.name());
 		WfState state2 = new WfState();
-		state2.setId(ArchitectonicAuxiliary.Concept.REFERRED_TO_SUPER_SME_STATUS.getUids().iterator().next());
-		state2.setName(ArchitectonicAuxiliary.Concept.REFERRED_TO_SUPER_SME_STATUS.name());
 		WfState state3 = new WfState();
 		state3.setId(ArchitectonicAuxiliary.Concept.REJECTED_BY_TPO_STATUS.getUids().iterator().next());
 		state3.setName(ArchitectonicAuxiliary.Concept.REJECTED_BY_TPO_STATUS.name());
@@ -78,8 +76,6 @@ public class TestXstream {
 		state7.setId(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids().iterator().next());
 		state7.setName(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.name());
 		WfState state8 = new WfState();
-		state8.setId(ArchitectonicAuxiliary.Concept.SUPER_SME_FEEDBACK_COMPLETE_STATUS.getUids().iterator().next());
-		state8.setName(ArchitectonicAuxiliary.Concept.SUPER_SME_FEEDBACK_COMPLETE_STATUS.name());
 		
 		WfState state9 = new WfState();
 		state9.setId(ArchitectonicAuxiliary.Concept.SME_FEEDBACK_COMPLETE_STATUS.getUids().iterator().next());
@@ -92,7 +88,6 @@ public class TestXstream {
 		
 		WfRole role1 = new WfRole(ArchitectonicAuxiliary.Concept.TRANSLATION_EDITORIAL_BOARD_ROLE.name(), ArchitectonicAuxiliary.Concept.TRANSLATION_EDITORIAL_BOARD_ROLE.getUids().iterator().next());
 		WfRole role2 = new WfRole(ArchitectonicAuxiliary.Concept.TRANSLATION_SME_ROLE.name(), ArchitectonicAuxiliary.Concept.TRANSLATION_SME_ROLE.getUids().iterator().next());
-		WfRole role3 = new WfRole(ArchitectonicAuxiliary.Concept.TRANSLATION_SUPER_SME_ROLE.name(), ArchitectonicAuxiliary.Concept.TRANSLATION_SUPER_SME_ROLE.getUids().iterator().next());
 		WfRole role4 = new WfRole(ArchitectonicAuxiliary.Concept.TRANSLATION_TPO_REVIEWER_ROLE.name(), ArchitectonicAuxiliary.Concept.TRANSLATION_TPO_REVIEWER_ROLE.getUids().iterator().next());
 		WfRole role5 = new WfRole(ArchitectonicAuxiliary.Concept.TRANSLATION_TSP_REVIEWER_ROLE.name(), ArchitectonicAuxiliary.Concept.TRANSLATION_TSP_REVIEWER_ROLE.getUids().iterator().next());
 		WfRole role6 = new WfRole(ArchitectonicAuxiliary.Concept.TRANSLATOR_ONE_TSP_ROLE.name(), ArchitectonicAuxiliary.Concept.TRANSLATOR_ONE_TSP_ROLE.getUids().iterator().next());
