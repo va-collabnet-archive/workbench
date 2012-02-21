@@ -148,7 +148,7 @@ public class TestWorkflowDefinitionPanel extends TestCase {
 
 			WfRole role1 = new WfRole(getAAPreferredTerm(tf.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_EDITORIAL_BOARD_ROLE.getUids())), ArchitectonicAuxiliary.Concept.TRANSLATION_EDITORIAL_BOARD_ROLE.getUids().iterator().next());
 			WfRole role2 = new WfRole(getAAPreferredTerm(tf.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_SME_ROLE.getUids())), ArchitectonicAuxiliary.Concept.TRANSLATION_SME_ROLE.getUids().iterator().next());
-			WfRole role3 = new WfRole(getAAPreferredTerm(tf.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_SME_ROLE.getUids())), ArchitectonicAuxiliary.Concept.TRANSLATION_SUPER_SME_ROLE.getUids().iterator().next());
+			WfRole role3 = new WfRole(getAAPreferredTerm(tf.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_SME_ROLE.getUids())), ArchitectonicAuxiliary.Concept.TRANSLATION_SME_ROLE.getUids().iterator().next());
 			WfRole role4 = new WfRole(getAAPreferredTerm(tf.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_TPO_REVIEWER_ROLE.getUids())), ArchitectonicAuxiliary.Concept.TRANSLATION_TPO_REVIEWER_ROLE.getUids().iterator().next());
 			WfRole role5 = new WfRole(getAAPreferredTerm(tf.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_TSP_REVIEWER_ROLE.getUids())), ArchitectonicAuxiliary.Concept.TRANSLATION_TSP_REVIEWER_ROLE.getUids().iterator().next());
 			WfRole role6 = new WfRole(getAAPreferredTerm(tf.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATOR_ONE_TSP_ROLE.getUids())), ArchitectonicAuxiliary.Concept.TRANSLATOR_ONE_TSP_ROLE.getUids().iterator().next());
