@@ -9,6 +9,10 @@
       <id>5ce00cff-e3b5-36e5-a6cc-53de840fd71a</id>
     </org.ihtsdo.project.workflow.model.WfRole>
     <org.ihtsdo.project.workflow.model.WfRole>
+      <name>fast track translator role</name>
+      <id>99f5b372-e224-3d33-96bc-8a16fd3a801a</id>
+    </org.ihtsdo.project.workflow.model.WfRole>
+    <org.ihtsdo.project.workflow.model.WfRole>
       <name>translation editorial board role</name>
       <id>06049358-6fbe-3e5c-8138-65d55a751418</id>
     </org.ihtsdo.project.workflow.model.WfRole>
@@ -49,6 +53,10 @@
     <org.ihtsdo.project.workflow.model.WfState>
       <name>escalated to editorial board by tsp status</name>
       <id>6fd81fb5-b275-3857-84e8-8110c569e507</id>
+    </org.ihtsdo.project.workflow.model.WfState>
+    <org.ihtsdo.project.workflow.model.WfState>
+      <name>translated with fast track status</name>
+      <id>533a6c75-e000-38d1-ad67-af1d490b83c5</id>
     </org.ihtsdo.project.workflow.model.WfState>
     <org.ihtsdo.project.workflow.model.WfState>
       <name>translated status</name>
@@ -114,14 +122,27 @@
       <name>canceled status</name>
       <id>5a217399-281e-34e9-a08b-fcef8b6f5b0e</id>
     </org.ihtsdo.project.workflow.model.WfState>
+    <org.ihtsdo.project.workflow.model.WfState>
+      <name>rejected fast track status</name>
+      <id>52806e02-97f2-3927-bf95-bf96c950c1b3</id>
+    </org.ihtsdo.project.workflow.model.WfState>
   </states>
   <actions>
+    <entry>
+      <string>Reject fast track translation</string>
+      <org.ihtsdo.project.workflow.model.WfAction>
+        <name>Reject fast track translation</name>
+        <id>1cb10375-2552-46cc-8273-9e29939db72c</id>
+        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[22]"/>
+        <businessProcess>sampleProcesses/RejectActionWithoutDestination.bp</businessProcess>
+      </org.ihtsdo.project.workflow.model.WfAction>
+    </entry>
     <entry>
       <string>Approve for publication (tpo rev)</string>
       <org.ihtsdo.project.workflow.model.WfAction>
         <name>Approve for publication (tpo rev)</name>
         <id>b7713f55-a516-4bce-bd22-8806969a1f08</id>
-        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[14]"/>
+        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[15]"/>
         <businessProcess>sampleProcesses/PromoteToReleaseActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
@@ -130,7 +151,7 @@
       <org.ihtsdo.project.workflow.model.WfAction>
         <name>Approve for publication (eb)</name>
         <id>a38ed72c-df4e-488e-84f7-9dee96e7a0bc</id>
-        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[13]"/>
+        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[14]"/>
         <businessProcess>sampleProcesses/PromoteToReleaseActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
@@ -148,7 +169,7 @@
       <org.ihtsdo.project.workflow.model.WfAction>
         <name>Send to parking lot</name>
         <id>b3dbfb3b-4f26-4c86-a7b7-a579829de344</id>
-        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[12]"/>
+        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[13]"/>
         <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
@@ -157,8 +178,17 @@
       <org.ihtsdo.project.workflow.model.WfAction>
         <name>Send back to TSP reviewer</name>
         <id>a5fc91eb-8fbb-40c7-bd64-9ec50bee5a8d</id>
-        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[19]"/>
+        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[20]"/>
         <businessProcess>sampleProcesses/RejectActionWithoutDestination.bp</businessProcess>
+      </org.ihtsdo.project.workflow.model.WfAction>
+    </entry>
+    <entry>
+      <string>Approve for publication fast track (tpo rev)</string>
+      <org.ihtsdo.project.workflow.model.WfAction>
+        <name>Approve for publication fast track (tpo rev)</name>
+        <id>5e2fc0d3-a7ff-4109-aafa-f17d2c31b894</id>
+        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[11]"/>
+        <businessProcess>sampleProcesses/PromoteToReleaseActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
     <entry>
@@ -166,7 +196,7 @@
       <org.ihtsdo.project.workflow.model.WfAction>
         <name>Send SME feedback</name>
         <id>d560ca8d-d7c0-4910-a1dc-67a237b0ec17</id>
-        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[6]"/>
+        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[7]"/>
         <businessProcess>sampleProcesses/CommentActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
@@ -175,7 +205,7 @@
       <org.ihtsdo.project.workflow.model.WfAction>
         <name>Request feedback from SME</name>
         <id>be15cb72-5715-45ad-96f0-a198379eaafc</id>
-        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[11]"/>
+        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[12]"/>
         <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
@@ -184,7 +214,7 @@
       <org.ihtsdo.project.workflow.model.WfAction>
         <name>Send TPO SME feedback</name>
         <id>83d1a1e6-4243-444a-8aeb-e8f371c363c1</id>
-        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[16]"/>
+        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[17]"/>
         <businessProcess>sampleProcesses/CommentActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
@@ -193,7 +223,7 @@
       <org.ihtsdo.project.workflow.model.WfAction>
         <name>Send for revision by TPO reviewer</name>
         <id>33f9a3c7-bcae-47fa-bb17-4e40de6525f0</id>
-        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[18]"/>
+        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[19]"/>
         <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
@@ -211,7 +241,7 @@
       <org.ihtsdo.project.workflow.model.WfAction>
         <name>Escalate to Editorial Board (tpo rev)</name>
         <id>00231d30-67fe-4ea0-83b6-db5baffca3bc</id>
-        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[5]"/>
+        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[6]"/>
         <businessProcess>sampleProcesses/CommentActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
@@ -220,7 +250,7 @@
       <org.ihtsdo.project.workflow.model.WfAction>
         <name>Reject and send back to translator</name>
         <id>72be9b7f-a289-4f5a-a000-eaccedda5532</id>
-        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[17]"/>
+        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[18]"/>
         <businessProcess>sampleProcesses/RejectActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
@@ -238,7 +268,7 @@
       <org.ihtsdo.project.workflow.model.WfAction>
         <name>Request feedback from TPO SME</name>
         <id>8dbcaf3b-7558-4e76-b47f-7fd598ac0f26</id>
-        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[9]"/>
+        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[10]"/>
         <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
@@ -247,8 +277,26 @@
       <org.ihtsdo.project.workflow.model.WfAction>
         <name>Send translation to TSP reviewer</name>
         <id>c7d1551c-8835-4091-9389-5c3e315f4c49</id>
+        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[6]"/>
+        <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
+      </org.ihtsdo.project.workflow.model.WfAction>
+    </entry>
+    <entry>
+      <string>Send by fast track to tpo</string>
+      <org.ihtsdo.project.workflow.model.WfAction>
+        <name>Send by fast track to tpo</name>
+        <id>b6b1e1f8-3f25-4e1f-8343-0006badea99e</id>
         <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[5]"/>
         <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
+      </org.ihtsdo.project.workflow.model.WfAction>
+    </entry>
+    <entry>
+      <string>Send CV feedback</string>
+      <org.ihtsdo.project.workflow.model.WfAction>
+        <name>Send CV feedback</name>
+        <id>dd5e9951-5d57-4a16-8a19-d6c173435479</id>
+        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[9]"/>
+        <businessProcess>sampleProcesses/CommentActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
     <entry>
@@ -258,15 +306,6 @@
         <id>6c70447a-0b00-4b3d-b2bb-1efc0e8e8856</id>
         <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[2]"/>
         <businessProcess>sampleProcesses/RejectActionWithoutDestination.bp</businessProcess>
-      </org.ihtsdo.project.workflow.model.WfAction>
-    </entry>
-    <entry>
-      <string>Send CV feedback</string>
-      <org.ihtsdo.project.workflow.model.WfAction>
-        <name>Send CV feedback</name>
-        <id>dd5e9951-5d57-4a16-8a19-d6c173435479</id>
-        <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[8]"/>
-        <businessProcess>sampleProcesses/CommentActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
   </actions>
