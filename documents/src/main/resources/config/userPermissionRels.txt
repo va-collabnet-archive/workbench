@@ -1,0 +1,71 @@
+username	typeId	typeName	targetId	targetName
+jan-pm	99f5b372-e224-3d33-96bc-8a16fd3a801a	fast track translator	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+jan-pm	dc874687-1cae-3abe-9a07-079b44a7b232	release authority	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+jan-pm	06049358-6fbe-3e5c-8138-65d55a751418	editorial board	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+jan-pm	ee74bd84-b756-3471-9be7-d520a6a1cb84	tpo reviewer	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+jan-pm	5df6d3f2-91de-3ffd-9157-29e03bf8308f	tsp reviewer	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+jan-pm	feb5aaab-cc8d-3848-82e7-97a09c5c1a2a	tsp translator role	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+jan-pm	5a112603-3fc5-3ac2-82fc-b2ab9f30c1f7	sme	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+jan-pm	6a2a121e-6952-3058-992d-a19dd45b0f6e	translation tpo	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+jan-pm	9c2ea8d2-9dfa-3e4f-a165-1dc305ee60f1	configuration role	781630aa-f89e-35e7-8a01-0892afb9cf6d	terminology project
+jan-pm	bbb2b51c-01b3-36a7-9790-87434d26753e	partitioning role	781630aa-f89e-35e7-8a01-0892afb9cf6d	terminology project
+jan-pm	3ad92ce9-f181-326d-8bbc-898cf070e5c1	project manager role	781630aa-f89e-35e7-8a01-0892afb9cf6d	terminology project
+jan-pm	c282ca21-3d5b-38b0-9bb2-e9e4221ad7b0	translation role	781630aa-f89e-35e7-8a01-0892afb9cf6d	terminology project
+jan-pm	10c460c8-48f1-3e8a-b231-592b88332dee	workset manager role	781630aa-f89e-35e7-8a01-0892afb9cf6d	terminology project
+jan-pm	5ce00cff-e3b5-36e5-a6cc-53de840fd71a	translation clinical validator role	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+steve-all	99f5b372-e224-3d33-96bc-8a16fd3a801a	fast track translator	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+steve-all	dc874687-1cae-3abe-9a07-079b44a7b232	release authority	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+steve-all	06049358-6fbe-3e5c-8138-65d55a751418	editorial board	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+steve-all	ee74bd84-b756-3471-9be7-d520a6a1cb84	tpo reviewer	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+steve-all	5df6d3f2-91de-3ffd-9157-29e03bf8308f	tsp reviewer	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+steve-all	feb5aaab-cc8d-3848-82e7-97a09c5c1a2a	tsp translator role	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+steve-all	5a112603-3fc5-3ac2-82fc-b2ab9f30c1f7	sme	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+steve-all	6a2a121e-6952-3058-992d-a19dd45b0f6e	translation tpo	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+steve-all	9c2ea8d2-9dfa-3e4f-a165-1dc305ee60f1	configuration role	781630aa-f89e-35e7-8a01-0892afb9cf6d	terminology project
+steve-all	bbb2b51c-01b3-36a7-9790-87434d26753e	partitioning role	781630aa-f89e-35e7-8a01-0892afb9cf6d	terminology project
+steve-all	3ad92ce9-f181-326d-8bbc-898cf070e5c1	project manager role	781630aa-f89e-35e7-8a01-0892afb9cf6d	terminology project
+steve-all	c282ca21-3d5b-38b0-9bb2-e9e4221ad7b0	translation role	781630aa-f89e-35e7-8a01-0892afb9cf6d	terminology project
+steve-all	10c460c8-48f1-3e8a-b231-592b88332dee	workset manager role	781630aa-f89e-35e7-8a01-0892afb9cf6d	terminology project
+steve-all	5ce00cff-e3b5-36e5-a6cc-53de840fd71a	translation clinical validator role	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+sasha-pm	99f5b372-e224-3d33-96bc-8a16fd3a801a	fast track translator	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+sasha-pm	dc874687-1cae-3abe-9a07-079b44a7b232	release authority	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+sasha-pm	06049358-6fbe-3e5c-8138-65d55a751418	editorial board	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+sasha-pm	ee74bd84-b756-3471-9be7-d520a6a1cb84	tpo reviewer	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+sasha-pm	5df6d3f2-91de-3ffd-9157-29e03bf8308f	tsp reviewer	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+sasha-pm	feb5aaab-cc8d-3848-82e7-97a09c5c1a2a	tsp translator role	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+sasha-pm	5a112603-3fc5-3ac2-82fc-b2ab9f30c1f7	sme	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+sasha-pm	6a2a121e-6952-3058-992d-a19dd45b0f6e	translation tpo	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+sasha-pm	9c2ea8d2-9dfa-3e4f-a165-1dc305ee60f1	configuration role	781630aa-f89e-35e7-8a01-0892afb9cf6d	terminology project
+sasha-pm	bbb2b51c-01b3-36a7-9790-87434d26753e	partitioning role	781630aa-f89e-35e7-8a01-0892afb9cf6d	terminology project
+sasha-pm	3ad92ce9-f181-326d-8bbc-898cf070e5c1	project manager role	781630aa-f89e-35e7-8a01-0892afb9cf6d	terminology project
+sasha-pm	c282ca21-3d5b-38b0-9bb2-e9e4221ad7b0	translation role	781630aa-f89e-35e7-8a01-0892afb9cf6d	terminology project
+sasha-pm	10c460c8-48f1-3e8a-b231-592b88332dee	workset manager role	781630aa-f89e-35e7-8a01-0892afb9cf6d	terminology project
+sasha-pm	5ce00cff-e3b5-36e5-a6cc-53de840fd71a	translation clinical validator role	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+linda-tra	feb5aaab-cc8d-3848-82e7-97a09c5c1a2a	tsp translator role	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+linda-tra	7da9b7b6-e3a9-3e33-ab0e-a1adbc9732c2	project viewer role	781630aa-f89e-35e7-8a01-0892afb9cf6d	terminology project
+rajan-tra	feb5aaab-cc8d-3848-82e7-97a09c5c1a2a	tsp translator role	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+rajan-tra	7da9b7b6-e3a9-3e33-ab0e-a1adbc9732c2	project viewer role	781630aa-f89e-35e7-8a01-0892afb9cf6d	terminology project
+adel-qa-rev	5df6d3f2-91de-3ffd-9157-29e03bf8308f	tsp reviewer	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+adel-qa-rev	7da9b7b6-e3a9-3e33-ab0e-a1adbc9732c2	project viewer role	781630aa-f89e-35e7-8a01-0892afb9cf6d	terminology project
+russ-qa-rev	5df6d3f2-91de-3ffd-9157-29e03bf8308f	tsp reviewer	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+russ-qa-rev	7da9b7b6-e3a9-3e33-ab0e-a1adbc9732c2	project viewer role	781630aa-f89e-35e7-8a01-0892afb9cf6d	terminology project
+linda-tpo-rev	ee74bd84-b756-3471-9be7-d520a6a1cb84	tpo reviewer	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+linda-tpo-rev	7da9b7b6-e3a9-3e33-ab0e-a1adbc9732c2	project viewer role	781630aa-f89e-35e7-8a01-0892afb9cf6d	terminology project
+jan-tpo-rev	ee74bd84-b756-3471-9be7-d520a6a1cb84	tpo reviewer	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+jan-tpo-rev	7da9b7b6-e3a9-3e33-ab0e-a1adbc9732c2	project viewer role	781630aa-f89e-35e7-8a01-0892afb9cf6d	terminology project
+adel-eb	06049358-6fbe-3e5c-8138-65d55a751418	editorial board	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+adel-eb	7da9b7b6-e3a9-3e33-ab0e-a1adbc9732c2	project viewer role	781630aa-f89e-35e7-8a01-0892afb9cf6d	terminology project
+steve-sme	5a112603-3fc5-3ac2-82fc-b2ab9f30c1f7	sme	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+steve-sme	7da9b7b6-e3a9-3e33-ab0e-a1adbc9732c2	project viewer role	781630aa-f89e-35e7-8a01-0892afb9cf6d	terminology project
+rajan-sme	5a112603-3fc5-3ac2-82fc-b2ab9f30c1f7	sme	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+rajan-sme	7da9b7b6-e3a9-3e33-ab0e-a1adbc9732c2	project viewer role	781630aa-f89e-35e7-8a01-0892afb9cf6d	terminology project
+russ-tpo-sme	6a2a121e-6952-3058-992d-a19dd45b0f6e	translation tpo subject matter expert role	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+russ-tpo-sme	7da9b7b6-e3a9-3e33-ab0e-a1adbc9732c2	project viewer role	781630aa-f89e-35e7-8a01-0892afb9cf6d	terminology project
+jan-relm	dc874687-1cae-3abe-9a07-079b44a7b232	release authority	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+jan-relm	7da9b7b6-e3a9-3e33-ab0e-a1adbc9732c2	project viewer role	781630aa-f89e-35e7-8a01-0892afb9cf6d	terminology project
+carol-fast-track	99f5b372-e224-3d33-96bc-8a16fd3a801a	fast track translator	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+carol-fast-track	7da9b7b6-e3a9-3e33-ab0e-a1adbc9732c2	project viewer role	781630aa-f89e-35e7-8a01-0892afb9cf6d	terminology project
+sasha-fast-track	99f5b372-e224-3d33-96bc-8a16fd3a801a	fast track translator	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+sasha-fast-track	7da9b7b6-e3a9-3e33-ab0e-a1adbc9732c2	project viewer role	781630aa-f89e-35e7-8a01-0892afb9cf6d	terminology project
+sasha-clinical-validator	5ce00cff-e3b5-36e5-a6cc-53de840fd71a	translation clinical validator role	ee9ac5d2-a07c-3981-a57a-f7f26baf38d8	sct root
+sasha-clinical-validator	7da9b7b6-e3a9-3e33-ab0e-a1adbc9732c2	project viewer role	781630aa-f89e-35e7-8a01-0892afb9cf6d	terminology project
