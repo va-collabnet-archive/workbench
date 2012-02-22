@@ -12,4 +12,7 @@ public class RefsetAux {
     public static ConceptSpec GMDN_REFEX =
             new ConceptSpec("GMDN review status reference set (foundation metadata concept)",
             UUID.fromString("c5994e33-21d3-327c-ab25-06d2356d2d68"));
+    public static ConceptSpec SV_REFEX =
+            new ConceptSpec("Swedish [International Organization for Standardization 639-1 code sv] language reference set (foundation metadata concept)",
+            UUID.fromString("e57ec728-742f-56b3-9b53-9613670fb24d"));
 }
