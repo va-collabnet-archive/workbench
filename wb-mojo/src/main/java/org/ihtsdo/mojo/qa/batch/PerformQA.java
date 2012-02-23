@@ -14,6 +14,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ProcessConcepts;
@@ -21,6 +22,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.db.bdb.computer.kindof.IsaCache;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.rules.RulesLibrary;
@@ -30,6 +32,7 @@ import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
 import org.ihtsdo.rules.testmodel.TerminologyHelperDroolsWorkbench;
 import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.helper.ResultsItem;
 
 public class PerformQA implements I_ProcessConcepts { 
@@ -47,10 +50,11 @@ public class PerformQA implements I_ProcessConcepts {
 
 	HashMap<String,Long> traceElapsedTimes;
 	HashMap<String,Integer> traceCounts;
-	HashMap<String,Integer> uniqueFsnMap;
+	HashMap<UUID,Integer> uniqueFsnMap;
 	Set<Integer> duplicatesSet;
 
 	int fsnNid;
+	int activeNid;
 	private String databaseUuid;
 	private String testPathUuid;
 	private IsaCache isaCache;
@@ -76,11 +80,11 @@ public class PerformQA implements I_ProcessConcepts {
 		this.allRules=allRules;
 		traceElapsedTimes = new HashMap<String,Long>();
 		traceCounts = new HashMap<String,Integer>();
-		uniqueFsnMap = new HashMap<String,Integer>();
+		uniqueFsnMap = new HashMap<UUID,Integer>();
 		duplicatesSet = new HashSet<Integer>();
 		rulesAlerted = new HashSet<String>();
 		monitoredUuids = new ArrayList<UUID>();
-		
+
 		monitoredUuids.add(UUID.fromString("298ce677-9986-3d03-8d55-28af02be7892"));
 		monitoredUuids.add(UUID.fromString("e98ee24f-6586-3e20-9ccb-fa36a4ea0b40"));
 		monitoredUuids.add(UUID.fromString("8003005b-e3ff-3ca6-ad4b-1cd0555fcd79"));
@@ -91,7 +95,8 @@ public class PerformQA implements I_ProcessConcepts {
 			destRels = Terms.get().newIntSet();
 			destRels.add(Terms.get().uuidToNative(UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25")));
 			snomedRoot = Terms.get().getConcept(UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8"));
-			fsnNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+			fsnNid = SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid();
+			activeNid = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid();
 			terminologyHelperCache = RulesLibrary.getTerminologyHelper(); // pointer to avoid garbage collection during qa
 		} catch (TerminologyException e) {
 			e.printStackTrace();
@@ -101,16 +106,16 @@ public class PerformQA implements I_ProcessConcepts {
 			e.printStackTrace();
 		}
 		System.out.println("Setting up Is-a cache...");
-		
+
 		if (config.getViewCoordinate().getIsaCoordinates().size() != 1) {
 			throw new Exception("wrong number of view coordinates: " + config.getViewCoordinate().getIsaCoordinates());
 		}
 		ViewCoordinate cacheViewCoordinate = new ViewCoordinate(config.getViewCoordinate());
-		
-//		cacheViewCoordinate.getPositionSet().clear();
-//		cacheViewCoordinate.getPositionSet().add(Terms.get().newPosition(
-//				Terms.get().getPath(new UUID[] { UUID.fromString("984cd50c-b05c-4824-bc38-8ab685b85b57") }), 
-//				Long.MAX_VALUE));
+
+		//		cacheViewCoordinate.getPositionSet().clear();
+		//		cacheViewCoordinate.getPositionSet().add(Terms.get().newPosition(
+		//				Terms.get().getPath(new UUID[] { UUID.fromString("984cd50c-b05c-4824-bc38-8ab685b85b57") }), 
+		//				Long.MAX_VALUE));
 		for (IsaCoordinate isac: cacheViewCoordinate.getIsaCoordinates() ) {
 			KindOfComputer.setupIsaCacheAndWait(isac);
 		}
@@ -133,22 +138,22 @@ public class PerformQA implements I_ProcessConcepts {
 			ResultsCollectorWorkBench results = RulesLibrary.checkConcept(loopConcept, context, true, config, contextHelper, INFERRED_VIEW_ORIGIN.INFERRED);
 			if (monitoredUuids.contains(loopConcept.getPrimUuid())) {
 				System.out.println("Results for Monitored concept detected: " + results.getResultsItems().size());
-				
+
 				for (ResultsItem loopItem : results.getResultsItems()) {
 					System.out.println("-- " + loopItem.getMessage() + " - " + loopItem.getRuleUuid());
 				}
-				
+
 				try {
-				    BufferedWriter out = new BufferedWriter(new FileWriter(loopConcept.getPrimUuid() + ".txt"));
-				    out.write(loopConcept.toLongString());
-				    out.close();
+					BufferedWriter out = new BufferedWriter(new FileWriter(loopConcept.getPrimUuid() + ".txt"));
+					out.write(loopConcept.toLongString());
+					out.close();
 				} catch (IOException e) {
 				}
-				
-				
+
+
 				if (results.getResultsItems().size() > 0) {
 					TerminologyHelperDroolsWorkbench thdw = new TerminologyHelperDroolsWorkbench();
-					
+
 					List<I_GetConceptData> parents = new ArrayList<I_GetConceptData>();
 					parents.add(Terms.get().getConcept(UUID.fromString("0bab48ac-3030-3568-93d8-aee0f63bf072")));
 					parents.add(Terms.get().getConcept(UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8")));
@@ -163,7 +168,7 @@ public class PerformQA implements I_ProcessConcepts {
 					parents.add(Terms.get().getConcept(UUID.fromString("d8a42cc5-05dd-3fcf-a1f7-62856e38874a")));
 					parents.add(Terms.get().getConcept(UUID.fromString("bfbced4b-ad7d-30aa-ae5c-f848ccebd45b")));
 					parents.add(Terms.get().getConcept(UUID.fromString("a0db7e17-c6b2-3acc-811d-8a523274e869")));
-					
+
 					List<I_GetConceptData> domains = new ArrayList<I_GetConceptData>();
 					domains.add(Terms.get().getConcept(UUID.fromString("0acd09e5-a5f1-4880-82b2-2a5c273dca29")));
 					domains.add(Terms.get().getConcept(UUID.fromString("a8883b08-9920-4531-9eb5-2ea578402157")));
@@ -176,7 +181,7 @@ public class PerformQA implements I_ProcessConcepts {
 					domains.add(Terms.get().getConcept(UUID.fromString("8d0f383e-fa0e-4492-843e-bc2003037dfa")));
 					domains.add(Terms.get().getConcept(UUID.fromString("aebf2ccd-181d-45b9-bea8-8511c07a7fb7")));
 					domains.add(Terms.get().getConcept(UUID.fromString("a0ff836c-bf65-4c06-a11b-f5ebe0eea5e9")));
-					
+
 					List<I_GetConceptData> ranges = new ArrayList<I_GetConceptData>();
 					ranges.add(Terms.get().getConcept(UUID.fromString("af9e9019-136e-4816-80ab-801df9c61a6b")));
 					ranges.add(Terms.get().getConcept(UUID.fromString("7785e4d0-ef89-411e-bb53-a39cb1a7dd01")));
@@ -236,7 +241,7 @@ public class PerformQA implements I_ProcessConcepts {
 					ranges.add(Terms.get().getConcept(UUID.fromString("f57ad8fc-2ca7-4632-8c9e-74b7e71914d7")));
 					ranges.add(Terms.get().getConcept(UUID.fromString("5734a7a3-3926-43d0-a005-32ee4bddc423")));
 					ranges.add(Terms.get().getConcept(UUID.fromString("9058754a-4262-4f07-9096-9b8f92fa8503")));
-					
+
 					I_GetConceptData descendant = loopConcept;
 					for (I_GetConceptData loopParent : parents) {
 						if (thdw.isParentOfOrEqualTo(loopParent.getPrimUuid().toString(), 
@@ -272,53 +277,57 @@ public class PerformQA implements I_ProcessConcepts {
 					System.out.println("");
 					System.out.println("");
 				}
-				
+
 			}
 			long individualElapsed = Calendar.getInstance().getTimeInMillis()-individualStart;
 
-//			String fsn = "";
-//			for (I_DescriptionTuple loopTuple : loopConcept.getDescriptionTuples(config.getAllowedStatus(),
-//					config.getDescTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(),
-//					config.getConflictResolutionStrategy())) {
-//				if (loopTuple.getTypeNid() == fsnNid && loopTuple.getLang().equals("en")) {
-//					fsn = loopTuple.getText();
-//				}
-//			}
-//
-//			if (uniqueFsnMap.containsKey(fsn)) {
-//				if (!duplicatesSet.contains(loopConcept.getNid())) {
-//					ResultsItem r1 = new ResultsItem();
-//					r1.setErrorCode(4);
-//					r1.setMessage("FSN Duplicated:" + fsn);
-//					r1.setRuleUuid("d4d60d70-0733-11e1-be50-0800200c9a66");
-//					r1.setSeverity("f9545a20-12cf-11e0-ac64-0800200c9a66");
-//					List<ResultsItem> r1List = new ArrayList<ResultsItem>();
-//					r1List.add(r1);
-//					ResultsCollectorWorkBench tmpResults1 = new ResultsCollectorWorkBench();
-//					tmpResults1.setAlertList(new ArrayList<AlertToDataConstraintFailure>());
-//					tmpResults1.setResultsItems(r1List);
-//					writeOutputFile(tmpResults1, loopConcept);
-//					duplicatesSet.add(loopConcept.getNid());
-//				}
-//
-//				I_GetConceptData duplicateConcept = Terms.get().getConcept(uniqueFsnMap.get(fsn));
-//				if (!duplicatesSet.contains(duplicateConcept.getNid())) {
-//					ResultsItem r2 = new ResultsItem();
-//					r2.setErrorCode(4);
-//					r2.setMessage("FSN Duplicated:" + fsn);
-//					r2.setRuleUuid("d4d60d70-0733-11e1-be50-0800200c9a66");
-//					r2.setSeverity("f9545a20-12cf-11e0-ac64-0800200c9a66");
-//					List<ResultsItem> r2List = new ArrayList<ResultsItem>();
-//					r2List.add(r2);
-//					ResultsCollectorWorkBench tmpResults2 = new ResultsCollectorWorkBench();
-//					tmpResults2.setAlertList(new ArrayList<AlertToDataConstraintFailure>());
-//					tmpResults2.setResultsItems(r2List);
-//					writeOutputFile(tmpResults2, duplicateConcept);
-//					duplicatesSet.add(duplicateConcept.getNid());
-//				}
-//			} else {
-//				uniqueFsnMap.put(fsn, loopConcept.getNid());
-//			}
+			String fsn = "";
+			int loopConceptStatusNid = loopConcept.getConceptAttributeTuples(config.getPrecedence(), config.getConflictResolutionStrategy()).iterator().next().getStatusNid();
+			if (loopConceptStatusNid == activeNid) {
+				for (I_DescriptionTuple loopTuple : loopConcept.getDescriptionTuples(config.getAllowedStatus(),
+						config.getDescTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(),
+						config.getConflictResolutionStrategy())) {
+					if (loopTuple.getTypeNid() == fsnNid && loopTuple.getLang().equals("en")) {
+						fsn = loopTuple.getText();
+					}
+				}
+
+				if (uniqueFsnMap.containsKey(Type5UuidFactory.get(fsn))) {
+					if (!duplicatesSet.contains(loopConcept.getNid())) {
+						ResultsItem r1 = new ResultsItem();
+						r1.setErrorCode(4);
+						r1.setMessage("FSN Duplicated:" + fsn);
+						r1.setRuleUuid("d4d60d70-0733-11e1-be50-0800200c9a66");
+						r1.setSeverity("f9545a20-12cf-11e0-ac64-0800200c9a66");
+						List<ResultsItem> r1List = new ArrayList<ResultsItem>();
+						r1List.add(r1);
+						ResultsCollectorWorkBench tmpResults1 = new ResultsCollectorWorkBench();
+						tmpResults1.setAlertList(new ArrayList<AlertToDataConstraintFailure>());
+						tmpResults1.setResultsItems(r1List);
+						writeOutputFile(tmpResults1, loopConcept);
+						duplicatesSet.add(loopConcept.getNid());
+					}
+
+					I_GetConceptData duplicateConcept = Terms.get().getConcept(uniqueFsnMap.get(Type5UuidFactory.get(fsn)));
+					if (!duplicatesSet.contains(duplicateConcept.getNid())) {
+						ResultsItem r2 = new ResultsItem();
+						r2.setErrorCode(4);
+						r2.setMessage("FSN Duplicated:" + fsn);
+						r2.setRuleUuid("d4d60d70-0733-11e1-be50-0800200c9a66");
+						r2.setSeverity("f9545a20-12cf-11e0-ac64-0800200c9a66");
+						List<ResultsItem> r2List = new ArrayList<ResultsItem>();
+						r2List.add(r2);
+						ResultsCollectorWorkBench tmpResults2 = new ResultsCollectorWorkBench();
+						tmpResults2.setAlertList(new ArrayList<AlertToDataConstraintFailure>());
+						tmpResults2.setResultsItems(r2List);
+						writeOutputFile(tmpResults2, duplicateConcept);
+						duplicatesSet.add(duplicateConcept.getNid());
+					}
+					System.out.println("* Found FSN duplication: " + fsn);
+				} else {
+					uniqueFsnMap.put(Type5UuidFactory.get(fsn), loopConcept.getNid());
+				}
+			}
 
 			//System.out.println("Individual loop for " + loopConcept.toString() + " in " + individualElapsed + " ms.");
 			if (individualElapsed > 6000) {
