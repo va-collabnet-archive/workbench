@@ -68,9 +68,7 @@ import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
  * 
  * @author Matthew Edwards
  */
-@BeanList(specs = { @Spec(directory = "tasks/ide/commit", type = BeanType.TASK_BEAN),
-                   @Spec(directory = "plugins/precommit", type = BeanType.TASK_BEAN),
-                   @Spec(directory = "plugins/commit", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/commit", type = BeanType.TASK_BEAN)})
 public class TestForSpecifcDate extends AbstractConceptTest {
 
     private static final long serialVersionUID = 1;
