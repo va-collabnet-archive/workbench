@@ -159,4 +159,18 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
    public enum CONCEPT_EVENT {
     PRE_COMMIT, POST_COMMIT, ADD_UNCOMMITTED;
    }
+   
+   void touchComponent(int nid);
+   
+   void touchComponentAlert(int nid);
+   
+   void touchComponentTemplate(int nid);
+
+   void touchComponents(Collection<Integer> cNidSet);
+
+   void touchRefexRC(int nid);
+   
+   void touchRelOrigin(int nid);
+
+   void touchRelTarget(int nid);
 }

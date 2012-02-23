@@ -40,7 +40,9 @@ public abstract class TermChangeListener {
                                      Set<Integer> originsOfChangedRels,
                                      Set<Integer> destinationsOfChangedRels, 
                                      Set<Integer> referencedComponentsOfChangedRefexs, 
-                                     Set<Integer> changedComponents);
+                                     Set<Integer> changedComponents,
+                                     Set<Integer> changedComponentAlerts,
+                                     Set<Integer> changedComponentTypes);
 
    //~--- get methods ---------------------------------------------------------
 
