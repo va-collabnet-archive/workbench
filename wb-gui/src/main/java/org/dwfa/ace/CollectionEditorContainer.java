@@ -16,52 +16,27 @@
  */
 package org.dwfa.ace;
 
-import java.awt.FileDialog;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Level;
-
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextPane;
-import javax.swing.JToggleButton;
-import javax.swing.ListModel;
-import javax.swing.SwingUtilities;
-
+import javax.swing.*;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
 import org.dwfa.ace.api.I_HostConceptPlugins.LINK_TYPE;
-import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.ace.file.ConceptListReader;
 import org.dwfa.ace.file.ConceptListWriter;
 import org.dwfa.ace.gui.concept.ConceptPanel;
 import org.dwfa.ace.list.TerminologyList;
 import org.dwfa.ace.list.TerminologyListModel;
+import org.dwfa.ace.list.TerminologyTable;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
@@ -71,7 +46,6 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.gui.button.Button32x32;
-import org.dwfa.gui.toggle.Toggle32x32;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.arena.Arena;
 import org.ihtsdo.batch.BatchActionEditorPanel;
@@ -245,6 +219,45 @@ public class CollectionEditorContainer extends JPanel {
         c.fill = GridBagConstraints.BOTH;
         add(getListSplit(list, ace), c);
     }
+    
+public CollectionEditorContainer(TerminologyTable table, ACE ace)
+            throws IOException, ClassNotFoundException, NoSuchAlgorithmException, TerminologyException {
+        super(new GridBagLayout());
+        this.ace = ace;
+        this.list = table.getList();
+
+
+        // SET UP BATCH ACTION PANELS
+        batchResults = new JTextPane();
+        batchResults.setEditable(false);
+        batchResults.setContentType("text/html");
+        batchResults.setText("<html>Batch Action Task results will show here.");
+        batchActionPanelMain = new BatchActionEditorPanel(ace, table.getList(), batchResults);
+
+        batchResultsScroller = new JScrollPane(batchResults);
+        conceptPanel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_LIST_VIEW, ace.aceFrameConfig,
+                LINK_TYPE.LIST_LINK, true,
+                Integer.MIN_VALUE, ace.getPluginRoot());
+        conceptPanel.setAce(ace, LINK_TYPE.LIST_LINK);
+        conceptPanel.setLinkedTable(table);
+        conceptPanel.changeLinkListener(LINK_TYPE.TABLE_LINK);
+        bottomTabs.addTab("classic view", new ImageIcon(ACE.class.getResource("/16x16/plain/component.png")), 
+                conceptPanel, "view list selection using the classic view");
+        bottomTabs.addTab("batch action results", new ImageIcon(ACE.class.getResource("/16x16/plain/navigate_check.png")), 
+                batchResultsScroller, "view batch action results");
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 0;
+        c.weightx = 1;
+        c.weighty = 0;
+        c.gridheight = 1;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        add(getListEditorTopPanel(), c);
+        c.gridy++;
+        c.weighty = 1;
+        c.fill = GridBagConstraints.BOTH;
+        add(getListSplit(table, ace), c);
+    }
 
     public void setupArena() throws IOException {
         this.listArena = new Arena(ace.getAceFrameConfig(), new File("arena/listView.mxe"));
@@ -258,6 +271,22 @@ public class CollectionEditorContainer extends JPanel {
 
         listActionSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         listActionSplit.setLeftComponent(new JScrollPane(list));
+        listActionSplit.setDividerLocation(400);
+        listActionSplit.setRightComponent(batchActionPanelMain);
+
+        listDetailSplit.setTopComponent(listActionSplit);
+        listDetailSplit.setBottomComponent(bottomTabs);
+        listDetailSplit.setDividerLocation(3000);
+        return listDetailSplit;
+    }
+    
+    private JSplitPane getListSplit(JTable table, ACE ace) throws IOException, ClassNotFoundException {
+        listDetailSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        listDetailSplit.setOneTouchExpandable(true);
+
+        listActionSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        JScrollPane scroller = new JScrollPane(table);
+        listActionSplit.setLeftComponent(scroller);
         listActionSplit.setDividerLocation(400);
         listActionSplit.setRightComponent(batchActionPanelMain);
 

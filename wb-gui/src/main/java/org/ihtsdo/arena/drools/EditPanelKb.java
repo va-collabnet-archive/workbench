@@ -2,25 +2,14 @@ package org.ihtsdo.arena.drools;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
-
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.cement.RefsetAuxiliary;
+import org.ihtsdo.arena.conceptview.ConceptTemplates;
 import org.ihtsdo.arena.conceptview.ConceptViewSettings;
-import org.ihtsdo.rules.RulesLibrary;
-import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -35,12 +24,10 @@ public class EditPanelKb {
     private CountDownLatch kbLatch = new CountDownLatch(1);
     private String kbKey = EditPanelKb.class.getCanonicalName();
     private Set<File> kbFiles = new HashSet<File>();
-    private ConceptViewSettings settings;
 
-    public EditPanelKb(I_ConfigAceFrame config, ConceptViewSettings settings) {
+    public EditPanelKb(I_ConfigAceFrame config) {
         super();
         this.config = config;
-        this.settings = settings;
         kbFiles.add(new File("drools-rules/TkApiRules.drl"));
         ACE.threadPool.execute(new KbSetkupRunner());
     }
@@ -58,7 +45,7 @@ public class EditPanelKb {
         }
     }
 
-    public Map<SpecBI, Integer> setConcept(I_GetConceptData c) {
+    public Map<SpecBI, Integer> setConcept(I_GetConceptData c, ConceptViewSettings settings) {
         Map<SpecBI, Integer> templates = new TreeMap<SpecBI, Integer>(new Comparator<Object>() {
 
             @Override
@@ -70,7 +57,7 @@ public class EditPanelKb {
         if (c == null) {
             return templates;
         }
-
+        
         try {
             kbLatch.await();
             Map<String, Object> globals = new HashMap<String, Object>();
@@ -90,6 +77,78 @@ public class EditPanelKb {
             facts.add(Ts.get().getConceptVersion(coordinate, c.getNid()));
             boolean executed = DroolsExecutionManager.fireAllRules(kbKey, kbFiles,
                     globals, facts, false);
+            
+            Map<Integer, Boolean> oldTemplates = ConceptTemplates.templates;
+            if(templates.isEmpty()){
+                ConceptTemplates.templates.put(c.getConceptNid(), false);
+            }else{
+                ConceptTemplates.templates.put(c.getConceptNid(), true);
+            }
+            Map<Integer, Boolean> newTemplates = ConceptTemplates.templates;
+            
+            if(oldTemplates.containsKey(c.getConceptNid())){
+                if(oldTemplates.get(c.getConceptNid()) !=
+                        ConceptTemplates.templates.get(c.getConceptNid())){
+                    Ts.get().touchComponentTemplate(c.getConceptNid());
+                }
+            }else{
+                Ts.get().touchComponentTemplate(c.getConceptNid());
+            }
+            
+            
+            
+            if (!executed) {
+                AceLog.getAppLog().warning("### " + kbKey
+                        + " not executed secondary to prior failure.");
+            }
+        } catch (Exception ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        }
+
+//        try {
+//            I_GetConceptData context = Terms.get().getConcept(RefsetAuxiliary.Concept.TEMPLATE_CONTEXT.getUids());
+//            ResultsCollectorWorkBench results = RulesLibrary.checkConcept(c, context, false, config);
+//            Map<SpecBI, Integer> guvnorTemplates = results.getWbTemplates();
+//            templates.putAll(guvnorTemplates);
+//        } catch (Exception e) {
+//            AceLog.getAppLog().alertAndLogException(e);
+//        }
+
+        return templates;
+    }
+    
+        public Map<SpecBI, Integer> setConcept(I_GetConceptData c) {
+        Map<SpecBI, Integer> templates = new TreeMap<SpecBI, Integer>(new Comparator<Object>() {
+
+            @Override
+            public int compare(Object o1, Object o2) {
+                return o1.toString().compareTo(o2.toString());
+            }
+        });
+
+        if (c == null) {
+            return templates;
+        }
+        
+        try {
+            kbLatch.await();
+            Map<String, Object> globals = new HashMap<String, Object>();
+            globals.put("templates", templates);
+            Collection<Object> facts = new ArrayList<Object>();
+            ViewCoordinate coordinate = config.getViewCoordinate();
+            
+            View viewType = View.STATED_AND_INFERRED;
+            facts.add(FactFactory.get(viewType));
+            facts.add(Ts.get().getConceptVersion(coordinate, c.getNid()));
+            boolean executed = DroolsExecutionManager.fireAllRules(kbKey, kbFiles,
+                    globals, facts, false);
+            if(templates.isEmpty()){
+                ConceptTemplates.templates.put(c.getConceptNid(), false);
+                Ts.get().touchComponentTemplate(c.getConceptNid());
+            }else{
+                ConceptTemplates.templates.put(c.getConceptNid(), true);
+                Ts.get().touchComponentTemplate(c.getConceptNid());
+            }
             if (!executed) {
                 AceLog.getAppLog().warning("### " + kbKey
                         + " not executed secondary to prior failure.");

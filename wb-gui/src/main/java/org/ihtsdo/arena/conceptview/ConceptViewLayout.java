@@ -427,8 +427,9 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         if (stop) {
             return null;
         }
+        Map<SpecBI, Integer> templates = cView.getKb().setConcept(layoutConcept, settings);
 
-        return cView.getKb().setConcept(layoutConcept);
+        return templates;
     }
 
     @Override

@@ -61,10 +61,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.classifier.DiffTableModel;
 import org.dwfa.ace.classifier.EquivTableModel;
-import org.dwfa.ace.list.TerminologyIntList;
-import org.dwfa.ace.list.TerminologyIntListModel;
-import org.dwfa.ace.list.TerminologyList;
-import org.dwfa.ace.list.TerminologyListModel;
+import org.dwfa.ace.list.*;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.DescriptionTableModel;
 import org.dwfa.ace.table.DescriptionsFromCollectionTableModel;
@@ -165,7 +162,11 @@ public class TerminologyTransferHandler extends TransferHandler {
             } else if (TerminologyIntList.class.isAssignableFrom(c.getClass())) {
                 TerminologyIntList list = (TerminologyIntList) c;
                 return new ConceptTransferable((I_GetConceptData) list.getSelectedValue());
-            } else if (JTable.class.isAssignableFrom(c.getClass())) {
+            } else if (TerminologyTable.class.isAssignableFrom(c.getClass())) {
+                TerminologyTable table = (TerminologyTable) c;
+                int index = table.getSelectedRow();
+                return new ConceptTransferable((I_GetConceptData) table.getModel().getValueAt(index, TerminologyTableModel.MODEL_FIELD.CONCEPT.ordinal()) );
+            }else if (JTable.class.isAssignableFrom(c.getClass())) {
                 JTable termTable = (JTable) c;
                 TableModel tableModel = termTable.getModel();
                 if (RefsetMemberTableModel.class.isAssignableFrom(tableModel.getClass())) {
@@ -557,6 +558,27 @@ public class TerminologyTransferHandler extends TransferHandler {
                 AceLog.getAppLog().log(Level.SEVERE, e.getLocalizedMessage(), e);
             }
         }
+        
+        if (TerminologyTable.class.isAssignableFrom(comp.getClass())) {
+            TerminologyTable tt = (TerminologyTable) comp;
+            TerminologyTableModel model = (TerminologyTableModel) tt.getModel();
+            try {
+                Object obj = t.getTransferData(conceptBeanFlavor);
+                I_GetConceptData cb;
+                if (ConceptBeanForTree.class.isAssignableFrom(obj.getClass())) {
+                    ConceptBeanForTree cbt = (ConceptBeanForTree) obj;
+                    cb = cbt.getCoreBean();
+                } else {
+                    cb = (I_GetConceptData) obj;
+                }
+                model.addElement(cb);
+                return true;
+            } catch (UnsupportedFlavorException e) {
+                AceLog.getAppLog().log(Level.FINE, e.getLocalizedMessage(), e);
+            } catch (IOException e) {
+                AceLog.getAppLog().log(Level.SEVERE, e.getLocalizedMessage(), e);
+            }
+        }
 
         if (JTable.class.isAssignableFrom(comp.getClass())) {
             JTable table = (JTable) comp;
@@ -690,6 +712,16 @@ public class TerminologyTransferHandler extends TransferHandler {
             }
         }
         if (TerminologyIntList.class.isAssignableFrom(comp.getClass())) {
+            for (DataFlavor f : transferFlavors) {
+                if (f.equals(conceptBeanFlavor)) {
+                    return true;
+                }
+            }
+        }
+        if (TerminologyTable.class.isAssignableFrom(comp.getClass())) {
+            if (thisComponent == transferringComponent) {
+                return false;
+            }
             for (DataFlavor f : transferFlavors) {
                 if (f.equals(conceptBeanFlavor)) {
                     return true;

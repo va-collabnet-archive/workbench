@@ -18,21 +18,13 @@ package org.dwfa.ace.list;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.JComponent;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.KeyStroke;
-import javax.swing.TransferHandler;
-
+import javax.swing.*;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 
 public class TerminologyList extends JList {
+    TerminologyListModel dataModel;
 
     private class DeleteAction extends AbstractAction {
 
@@ -90,6 +82,7 @@ public class TerminologyList extends JList {
 
     public TerminologyList(TerminologyListModel dataModel, I_ConfigAceFrame config) {
         super(dataModel);
+        this.dataModel = dataModel;
         init(true, config);
     }
 
@@ -101,6 +94,7 @@ public class TerminologyList extends JList {
     public TerminologyList(TerminologyListModel dataModel, boolean allowDelete, boolean confirmDelete,
             I_ConfigAceFrame config) {
         super(dataModel);
+        this.dataModel = dataModel;
         this.confirmDelete = confirmDelete;
         init(allowDelete, config);
     }
@@ -124,5 +118,9 @@ public class TerminologyList extends JList {
             map.put(TransferHandler.getPasteAction().getValue(Action.NAME), TransferHandler.getPasteAction());
             map.put(delete.getValue(Action.NAME), delete);
         }
+    }
+    
+    protected TerminologyListModel getTerminologyModel(){
+        return dataModel;
     }
 }

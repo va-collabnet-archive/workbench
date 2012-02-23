@@ -21,38 +21,40 @@ package org.dwfa.ace;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.awt.*;
+import java.awt.event.*;
+import java.beans.IntrospectionException;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyVetoException;
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivilegedActionException;
+import java.util.List;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import javax.security.auth.login.LoginException;
+import javax.swing.Timer;
+import javax.swing.*;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import net.jini.config.Configuration;
 import net.jini.config.ConfigurationException;
 import net.jini.lookup.ServiceItemFilter;
-
 import org.dwfa.ace.CdePalette.TOGGLE_DIRECTION;
-import org.dwfa.ace.actions.Abort;
-import org.dwfa.ace.actions.ChangeFramePassword;
-import org.dwfa.ace.actions.Commit;
-import org.dwfa.ace.actions.SaveProfile;
-import org.dwfa.ace.actions.SaveProfileAs;
+import org.dwfa.ace.actions.*;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
-import org.dwfa.ace.api.AceEditor;
-import org.dwfa.ace.api.I_AmTermComponent;
-import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ConfigAceFrame.CLASSIFIER_INPUT_MODE_PREF;
 import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
-import org.dwfa.ace.api.I_ContainTermComponent;
-import org.dwfa.ace.api.I_DescriptionTuple;
-import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
 import org.dwfa.ace.api.I_HostConceptPlugins.LINK_TYPE;
 import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
-import org.dwfa.ace.api.I_IntList;
-import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ManageContradiction;
-import org.dwfa.ace.api.I_ShowActivity;
-import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.I_Transact;
-import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.*;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
@@ -63,10 +65,7 @@ import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.config.CreatePathPanel;
 import org.dwfa.ace.gui.concept.ConceptPanel;
 import org.dwfa.ace.gui.popup.ProcessPopupUtil;
-import org.dwfa.ace.list.TerminologyIntList;
-import org.dwfa.ace.list.TerminologyIntListModel;
-import org.dwfa.ace.list.TerminologyList;
-import org.dwfa.ace.list.TerminologyListModel;
+import org.dwfa.ace.list.*;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.path.SelectPathAndPositionPanelWithCombo;
 import org.dwfa.ace.queue.AddQueueListener;
@@ -92,14 +91,12 @@ import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.tasks.editor.CheckboxEditor;
 import org.dwfa.bpa.util.I_DoQuitActions;
 import org.dwfa.bpa.worker.MasterWorker;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.queue.gui.QueueViewerPanel;
 import org.dwfa.svn.Svn;
 import org.dwfa.svn.SvnPanel;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.types.IntList;
-
 import org.ihtsdo.arena.Arena;
 import org.ihtsdo.custom.statics.CustomStatics;
 import org.ihtsdo.objectCache.ObjectCache;
@@ -114,97 +111,6 @@ import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.KeyboardFocusManager;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-
-import java.beans.IntrospectionException;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyVetoException;
-
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-
-import java.lang.reflect.InvocationTargetException;
-
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivilegedActionException;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.logging.Level;
-
-import javax.security.auth.login.LoginException;
-
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JLayeredPane;
-import javax.swing.JList;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRootPane;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextPane;
-import javax.swing.JToggleButton;
-import javax.swing.JTree;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
-import javax.swing.TransferHandler;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
 
 public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActions {
    public static final String DATA_CHECK_TAB_LABEL = "data checks";
@@ -272,6 +178,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
    private AddressPaletteActionListener   apal;
    private Arena                          arena;
    private TerminologyList                batchConceptList;
+   private TerminologyTable               batchConceptTable;
    private ConceptPanel                   c1Panel;
    private ConceptPanel                   c2Panel;
    private JButton                        cancelButton;
@@ -2054,7 +1961,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
    }
 
    public JList getBatchConceptList() {
-      return batchConceptList;
+      return batchConceptTable.getList();
    }
 
    JPanel getBottomPanel() {
@@ -2168,7 +2075,11 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             new TerminologyListModel(aceFrameConfig.getTabHistoryMap().get("batchList"));
 
          batchConceptList  = new TerminologyList(batchListModel, true, true, aceFrameConfig);
-         conceptListEditor = new CollectionEditorContainer(batchConceptList, this);
+         TerminologyTableModel tableModel = new TerminologyTableModel(batchConceptList);
+         batchConceptTable = new TerminologyTable(tableModel, aceFrameConfig);
+                 
+//         conceptListEditor = new CollectionEditorContainer(batchConceptList, this);
+         conceptListEditor = new CollectionEditorContainer(batchConceptTable, this);
          conceptListEditor.setupArena();
       }
 

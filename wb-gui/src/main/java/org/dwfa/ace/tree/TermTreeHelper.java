@@ -122,7 +122,9 @@ public class TermTreeHelper extends TermChangeListener implements PropertyChange
                             Set<Integer> originsOfChangedRels,
                             Set<Integer> destinationsOfChangedRels,
                             Set<Integer> referencedComponentsOfChangedRefexs,
-                            Set<Integer> changedComponents) {
+                            Set<Integer> changedComponents,
+                            Set<Integer> changedComponentAlerts,
+                            Set<Integer> changedComponentTemplates) {
       if (AceLog.getAppLog().isLoggable(Level.FINE)) {
          AceLog.getAppLog().info("Term change. Sequence: " + sequence + 
                                  " changed rel origins: " + originsOfChangedRels + 

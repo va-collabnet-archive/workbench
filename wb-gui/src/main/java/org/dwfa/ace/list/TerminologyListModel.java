@@ -18,11 +18,10 @@ package org.dwfa.ace.list;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-
 import javax.swing.AbstractListModel;
 import javax.swing.SwingUtilities;
-
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ModelTerminologyList;
 
@@ -34,6 +33,7 @@ public class TerminologyListModel extends AbstractListModel implements I_ModelTe
     private static final long serialVersionUID = 1L;
 
     List<I_GetConceptData> elements = new ArrayList<I_GetConceptData>();
+    HashSet<Integer> tracker = new HashSet<Integer>();
 
     public TerminologyListModel(List<I_GetConceptData> elements) {
         super();
@@ -66,43 +66,50 @@ public class TerminologyListModel extends AbstractListModel implements I_ModelTe
 
     @Override
     public boolean addElement(I_GetConceptData o) {
-        boolean rv = elements.add(o);
-        if (SwingUtilities.isEventDispatchThread()) {
-            fireIntervalAdded(this, elements.size() - 1, elements.size() - 1);
-        } else {
-            try {
-                SwingUtilities.invokeAndWait(new Runnable() {
-                    @Override
-                    public void run() {
-                        fireIntervalAdded(TerminologyListModel.this, elements.size() - 1, elements.size() - 1);
-                    }
-                });
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            } catch (InvocationTargetException e) {
-                throw new RuntimeException(e);
-            }
+        boolean rv = false;
+        if(!tracker.contains(o.getConceptNid())){
+            rv = elements.add(o);
+            tracker.add(o.getConceptNid());
+            if (SwingUtilities.isEventDispatchThread()) {
+                fireIntervalAdded(this, elements.size() - 1, elements.size() - 1);
+            } else {
+                try {
+                    SwingUtilities.invokeAndWait(new Runnable() {
+                        @Override
+                        public void run() {
+                            fireIntervalAdded(TerminologyListModel.this, elements.size() - 1, elements.size() - 1);
+                        }
+                    });
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                } catch (InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                }
+            }   
         }
         return rv;
     }
 
     @Override
     public void addElement(final int index, I_GetConceptData element) {
-        elements.add(index, element);
-        if (SwingUtilities.isEventDispatchThread()) {
-            fireIntervalAdded(this, index, index);
-        } else {
-            try {
-                SwingUtilities.invokeAndWait(new Runnable() {
-                    @Override
-                    public void run() {
-                        fireIntervalAdded(TerminologyListModel.this, index, index);
-                    }
-                });
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            } catch (InvocationTargetException e) {
-                throw new RuntimeException(e);
+        if(!tracker.contains(element.getConceptNid())){
+            elements.add(index, element);
+            tracker.add(element.getConceptNid());
+            if (SwingUtilities.isEventDispatchThread()) {
+                fireIntervalAdded(this, index, index);
+            } else {
+                try {
+                    SwingUtilities.invokeAndWait(new Runnable() {
+                        @Override
+                        public void run() {
+                            fireIntervalAdded(TerminologyListModel.this, index, index);
+                        }
+                    });
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                } catch (InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
     }
@@ -110,6 +117,7 @@ public class TerminologyListModel extends AbstractListModel implements I_ModelTe
     @Override
     public I_GetConceptData removeElement(final int index) {
         I_GetConceptData rv = elements.remove(index);
+        tracker.remove(rv.getConceptNid());
         if (SwingUtilities.isEventDispatchThread()) {
             fireIntervalRemoved(TerminologyListModel.this, index, index);
         } else {
@@ -133,6 +141,7 @@ public class TerminologyListModel extends AbstractListModel implements I_ModelTe
     public void clear() {
         final int oldSize = elements.size();
         elements.clear();
+        tracker.clear();
         if (SwingUtilities.isEventDispatchThread()) {
             fireIntervalRemoved(this, 0, oldSize);
         } else {
@@ -150,5 +159,8 @@ public class TerminologyListModel extends AbstractListModel implements I_ModelTe
             }
         }
     }
-
+    
+    protected List<I_GetConceptData> getElements(){
+        return elements;
+    }
 }

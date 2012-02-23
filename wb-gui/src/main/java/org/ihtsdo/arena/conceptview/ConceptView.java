@@ -112,7 +112,7 @@ public class ConceptView extends JPanel {
       this.settings   = settings;
       this.cvRenderer = cvRenderer;
       kbFiles.add(new File("drools-rules/ContextualDropActions.drl"));
-      kb = new EditPanelKb(config, settings);
+      kb = ConceptTemplates.getKb();
       addCommitListener(settings);
       setupPrefMap();
       dropPanelMgr = new DropPanelActionManager();
@@ -165,7 +165,9 @@ public class ConceptView extends JPanel {
             Set<Integer> originsOfChangedRels, 
             Set<Integer> destinationsOfChangedRels, 
             Set<Integer> referencedComponentsOfChangedRefexs, 
-            Set<Integer> changedComponents) {
+            Set<Integer> changedComponents,
+            Set<Integer> changedComponentAlerts,
+            Set<Integer> changedComponentTemplates) {
             ChangeListenerSwingWorker worker = new ChangeListenerSwingWorker(sequence, 
                     originsOfChangedRels, 
                     destinationsOfChangedRels, 

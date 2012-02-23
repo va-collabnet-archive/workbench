@@ -47,33 +47,11 @@ import java.util.TreeSet;
 import java.util.UUID;
 import java.util.logging.Level;
 
-import javax.swing.AbstractAction;
-import javax.swing.AbstractSpinnerModel;
-import javax.swing.BorderFactory;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
-import javax.swing.JTabbedPane;
-import javax.swing.JToggleButton;
-import javax.swing.Scrollable;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.dwfa.ace.ACE;
-import org.dwfa.ace.TermComponentDataCheckSelectionListener;
-import org.dwfa.ace.TermComponentLabel;
-import org.dwfa.ace.TermComponentListSelectionListener;
-import org.dwfa.ace.TermComponentTreeSelectionListener;
+import org.dwfa.ace.*;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
@@ -842,7 +820,9 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
     private TermComponentTreeSelectionListener treeListener;
     private TermComponentListSelectionListener listListener;
     private TermComponentDataCheckSelectionListener dataCheckListener;
+    private TermComponentTableSelectionListener tableListener;
     private JList linkedList;
+    private JTable linkedTable;
     private ACE ace;
 
     public void setAce(ACE ace, LINK_TYPE link) {
@@ -886,6 +866,13 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
                     ace.addDataCheckListener(dataCheckListener);
                     break;
                 case ARENA_LINK:
+                    
+                case TABLE_LINK:
+                    if (linkedTable != null) {
+                        tableListener = new TermComponentTableSelectionListener(this, linkedTable);
+                        linkedTable.getSelectionModel().addListSelectionListener(tableListener);
+                    }
+                    break;
             }
         }
     }
@@ -932,6 +919,14 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
 
     public void setLinkedList(JList linkedList) {
         this.linkedList = linkedList;
+    }
+    
+    public JTable getLinkedTable() {
+        return linkedTable;
+    }
+
+    public void setLinkedTable(JTable linkedTable) {
+        this.linkedTable = linkedTable;
     }
 
     @Override
