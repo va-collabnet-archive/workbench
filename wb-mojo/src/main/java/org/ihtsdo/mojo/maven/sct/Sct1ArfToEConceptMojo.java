@@ -318,6 +318,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
      * @required
      */
     private UUID uuidUser;
+    /**
+     * @parameter default-value="true"
+     */
+    private boolean reportRootConcepts;
     //    /**
     //     * Watch concepts
     //     * 
@@ -554,6 +558,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     private int zStatusUuidIdxCounter;
 
     private int lookupZStatusUuidIdx(String statusUuidStr) {
+        if (statusUuidStr.equalsIgnoreCase("FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF"))
+            return -1; // Status for "place holder" concept
         Integer tmp = zStatusUuidMap.get(statusUuidStr);
         if (tmp == null) {
             zStatusUuidIdxCounter++;
@@ -3082,41 +3088,44 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             }
 
             // Check for next sync
-            if (theCon.compareTo(theDes) != IS_EQUAL || theCon.compareTo(theRel) != IS_EQUAL /*|| theCon != theRelDest*/) {
-                getLog().info("CONFIRM: ROOT CONCEPT ");
-                UUID uuid = new UUID(conList.get(0).conUuidMsb, conList.get(0).conUuidLsb);
-                getLog().info(" -is- concept SNOMED UUID =" + uuid.toString());
-                getLog().info(" -is- concept SNOMED id =" + conList.get(0).conSnoId);
-                getLog().info(" -is- concept counter #" + countCon);
-                getLog().info(" -is- description \"" + desList.get(0).termText + "\"\r\n");
-                getLog().info(
-                        " ...prev... " + prevCon + " " + prevDes + " " + prevRel + " "
-                        + prevRelDest);
-                getLog().info(
-                        " ...-is-... " + theCon + " " + theDes + " " + theRel + " " + theRelDest);
-                String cnStr = "*null*";
-                if (conNext != null) {
-                    uuid = new UUID(conNext.conUuidMsb, conNext.conUuidLsb);
-                    cnStr = uuid.toString();
+            if (theCon.compareTo(theDes) != IS_EQUAL ||
+                    theCon.compareTo(theRel) != IS_EQUAL /*|| theCon != theRelDest*/) {
+                if (reportRootConcepts) {
+                    getLog().info("CONFIRM: ROOT CONCEPT ");
+                    UUID uuid = new UUID(conList.get(0).conUuidMsb, conList.get(0).conUuidLsb);
+                    getLog().info(" -is- concept SNOMED UUID =" + uuid.toString());
+                    getLog().info(" -is- concept SNOMED id =" + conList.get(0).conSnoId);
+                    getLog().info(" -is- concept counter #" + countCon);
+                    getLog().info(" -is- description \"" + desList.get(0).termText + "\"\r\n");
+                    getLog().info(
+                            " ...prev... " + prevCon + " " + prevDes + " " + prevRel + " "
+                            + prevRelDest);
+                    getLog().info(
+                            " ...-is-... " + theCon + " " + theDes + " " + theRel + " " + theRelDest);
+                    String cnStr = "*null*";
+                    if (conNext != null) {
+                        uuid = new UUID(conNext.conUuidMsb, conNext.conUuidLsb);
+                        cnStr = uuid.toString();
+                    }
+                    String dnStr = "*null*";
+                    if (desNext != null) {
+                        uuid = new UUID(desNext.conUuidMsb, desNext.conUuidLsb);
+                        dnStr = uuid.toString();
+                    }
+                    String rnStr = "*null*";
+                    if (relNext != null) {
+                        uuid = new UUID(relNext.c1UuidMsb, relNext.c1UuidLsb);
+                        rnStr = uuid.toString();
+                    }
+                    String rdnStr = "*null*";
+                    if (relDestNext != null) {
+                        uuid = new UUID(relDestNext.c2UuidMsb, relDestNext.c2UuidLsb);
+                        rdnStr = uuid.toString();
+                    }
+                    getLog().info(
+                            " ..\"next\".. " + cnStr + " " + dnStr + " " + rnStr + " " + rdnStr
+                            + "\r\n");
                 }
-                String dnStr = "*null*";
-                if (desNext != null) {
-                    uuid = new UUID(desNext.conUuidMsb, desNext.conUuidLsb);
-                    dnStr = uuid.toString();
-                }
-                String rnStr = "*null*";
-                if (relNext != null) {
-                    uuid = new UUID(relNext.c1UuidMsb, relNext.c1UuidLsb);
-                    rnStr = uuid.toString();
-                }
-                String rdnStr = "*null*";
-                if (relDestNext != null) {
-                    uuid = new UUID(relDestNext.c2UuidMsb, relDestNext.c2UuidLsb);
-                    rdnStr = uuid.toString();
-                }
-                getLog().info(
-                        " ..\"next\".. " + cnStr + " " + dnStr + " " + rnStr + " " + rdnStr
-                        + "\r\n");
             }
 
             ArrayList<Sct1_RefSetRecord> addRsByCon = null;
@@ -3253,82 +3262,86 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         EConcept ec = new EConcept();
         ec.setPrimordialUuid(theConUUID);
 
-        // ADD CONCEPT ATTRIBUTES        
-        EConceptAttributes ca = new EConceptAttributes();
-        ca.primordialUuid = theConUUID;
-        ca.setDefined(cRec0.isprimitive == 0 ? true : false);
-        ca.setAuthorUuid(uuidUser);
+        if (cRec0.status == -1) {
+            ec.setConceptAttributes(null);
+        } else {
+            // ADD CONCEPT ATTRIBUTES
+            EConceptAttributes ca = new EConceptAttributes();
+            ca.primordialUuid = theConUUID;
+            ca.setDefined(cRec0.isprimitive == 0 ? true : false);
+            ca.setAuthorUuid(uuidUser);
 
-        ArrayList<TkIdentifier> tmpAdditionalIds = new ArrayList<TkIdentifier>();
+            ArrayList<TkIdentifier> tmpAdditionalIds = new ArrayList<TkIdentifier>();
 
-        // SNOMED ID, if present
-        if (cRec0.conSnoId < Long.MAX_VALUE) {
-            EIdentifierLong cid = new EIdentifierLong();
-            cid.setAuthorityUuid(uuidSourceSnomedLong);
-            cid.setDenotation(cRec0.conSnoId);
-            cid.setPathUuid(zPathArray[cRec0.path]);
-            cid.setStatusUuid(uuidCurrent);
-            cid.setTime(cRec0.revTime);
-            cid.authorUuid = uuidUser;
-            tmpAdditionalIds.add(cid);
-        }
-        // CTV 3 ID, if present
-        if (cRec0.ctv3id != null) {
-            EIdentifierString cids = new EIdentifierString();
-            cids.setAuthorityUuid(uuidSourceCtv3);
-            cids.setDenotation(cRec0.ctv3id);
-            cids.setPathUuid(zPathArray[cRec0.path]);
-            cids.setStatusUuid(uuidCurrent);
-            cids.setTime(cRec0.revTime);
-            cids.authorUuid = uuidUser;
-            tmpAdditionalIds.add(cids);
-        }
-        // SNOMED RT ID, if present
-        if (cRec0.snomedrtid != null) {
-            EIdentifierString cids = new EIdentifierString();
-            cids.setAuthorityUuid(uuidSourceSnomedRt);
-            cids.setDenotation(cRec0.snomedrtid);
-            cids.setPathUuid(zPathArray[cRec0.path]);
-            cids.setStatusUuid(uuidCurrent);
-            cids.setTime(cRec0.revTime);
-            cids.authorUuid = uuidUser;
-            tmpAdditionalIds.add(cids);
-        }
-        if (cRec0.addedIds != null) {
-            for (Sct1_IdRecord eId : cRec0.addedIds) {
-                tmpAdditionalIds.add(createEIdentifier(eId));
+            // SNOMED ID, if present
+            if (cRec0.conSnoId < Long.MAX_VALUE) {
+                EIdentifierLong cid = new EIdentifierLong();
+                cid.setAuthorityUuid(uuidSourceSnomedLong);
+                cid.setDenotation(cRec0.conSnoId);
+                cid.setPathUuid(zPathArray[cRec0.path]);
+                cid.setStatusUuid(uuidCurrent);
+                cid.setTime(cRec0.revTime);
+                cid.authorUuid = uuidUser;
+                tmpAdditionalIds.add(cid);
             }
-        }
+            // CTV 3 ID, if present
+            if (cRec0.ctv3id != null) {
+                EIdentifierString cids = new EIdentifierString();
+                cids.setAuthorityUuid(uuidSourceCtv3);
+                cids.setDenotation(cRec0.ctv3id);
+                cids.setPathUuid(zPathArray[cRec0.path]);
+                cids.setStatusUuid(uuidCurrent);
+                cids.setTime(cRec0.revTime);
+                cids.authorUuid = uuidUser;
+                tmpAdditionalIds.add(cids);
+            }
+            // SNOMED RT ID, if present
+            if (cRec0.snomedrtid != null) {
+                EIdentifierString cids = new EIdentifierString();
+                cids.setAuthorityUuid(uuidSourceSnomedRt);
+                cids.setDenotation(cRec0.snomedrtid);
+                cids.setPathUuid(zPathArray[cRec0.path]);
+                cids.setStatusUuid(uuidCurrent);
+                cids.setTime(cRec0.revTime);
+                cids.authorUuid = uuidUser;
+                tmpAdditionalIds.add(cids);
+            }
+            if (cRec0.addedIds != null) {
+                for (Sct1_IdRecord eId : cRec0.addedIds) {
+                    tmpAdditionalIds.add(createEIdentifier(eId));
+                }
+            }
 
-        if (tmpAdditionalIds.size() > 0) {
-            ca.additionalIds = tmpAdditionalIds;
-        } else {
-            ca.additionalIds = null;
-        }
+            if (tmpAdditionalIds.size() > 0) {
+                ca.additionalIds = tmpAdditionalIds;
+            } else {
+                ca.additionalIds = null;
+            }
 
-        ca.setStatusUuid(zStatusUuidArray[cRec0.status]);
-        ca.setPathUuid(zPathArray[cRec0.path]);
-        ca.setTime(cRec0.revTime); // long
+            ca.setStatusUuid(zStatusUuidArray[cRec0.status]);
+            ca.setPathUuid(zPathArray[cRec0.path]);
+            ca.setTime(cRec0.revTime); // long
 
-        int max = conList.size();
-        List<TkConceptAttributesRevision> caRevisions = new ArrayList<TkConceptAttributesRevision>();
-        for (int i = 1; i < max; i++) {
-            EConceptAttributesRevision rev = new EConceptAttributesRevision();
-            Sct1_ConRecord cRec = conList.get(i);
-            rev.setDefined(cRec.isprimitive == 0 ? true : false);
-            rev.setStatusUuid(zStatusUuidArray[cRec.status]);
-            rev.setPathUuid(zPathArray[cRec.path]);
-            rev.setTime(cRec.revTime);
-            rev.authorUuid = uuidUser;
-           caRevisions.add(rev);
-        }
+            int max = conList.size();
+            List<TkConceptAttributesRevision> caRevisions = new ArrayList<TkConceptAttributesRevision>();
+            for (int i = 1; i < max; i++) {
+                EConceptAttributesRevision rev = new EConceptAttributesRevision();
+                Sct1_ConRecord cRec = conList.get(i);
+                rev.setDefined(cRec.isprimitive == 0 ? true : false);
+                rev.setStatusUuid(zStatusUuidArray[cRec.status]);
+                rev.setPathUuid(zPathArray[cRec.path]);
+                rev.setTime(cRec.revTime);
+                rev.authorUuid = uuidUser;
+                caRevisions.add(rev);
+            }
 
-        if (caRevisions.size() > 0) {
-            ca.revisions = caRevisions;
-        } else {
-            ca.revisions = null;
+            if (caRevisions.size() > 0) {
+                ca.revisions = caRevisions;
+            } else {
+                ca.revisions = null;
+            }
+            ec.setConceptAttributes(ca);
         }
-        ec.setConceptAttributes(ca);
 
         // ADD DESCRIPTIONS
         if (desList != null) {
