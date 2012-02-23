@@ -784,5 +784,39 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     	KindOfComputer.setIsaCacheAsComplete(isac);
     }
     
+    @Override
+   public void touchComponent(int nid) {
+      ChangeNotifier.touchComponent(nid);
+   }
+   
+    @Override
+   public void touchComponentAlert(int nid) {
+      ChangeNotifier.touchComponentAlert(nid);
+   }
+   
+    @Override
+   public void touchComponentTemplate(int nid) {
+      ChangeNotifier.touchComponentTemplate(nid);
+   }
+
+    @Override
+   public void touchComponents(Collection<Integer> cNidSet) {
+      ChangeNotifier.touchComponents(cNidSet);
+   }
+
+    @Override
+   public void touchRefexRC(int nid) {
+      ChangeNotifier.touchRefexRC(nid);
+   }
+   
+    @Override
+   public void touchRelOrigin(int nid) {
+      ChangeNotifier.touchRelOrigin(nid);
+   }
+
+    @Override
+   public void touchRelTarget(int nid) {
+      ChangeNotifier.touchRelTarget(nid);
+   }
    
 }

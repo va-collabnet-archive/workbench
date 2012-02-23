@@ -65,20 +65,17 @@ import java.io.ObjectInputStream;
 import java.lang.reflect.InvocationTargetException;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+import org.ihtsdo.arena.conceptview.ConceptTemplates;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
@@ -173,7 +170,22 @@ public class BdbCommitManager {
                 Set<AlertToDataConstraintFailure> warningsAndErrors = new HashSet<AlertToDataConstraintFailure>();
 
                 dataCheckMap.put(concept, warningsAndErrors);
-                DataCheckRunner.runDataChecks(concept, creationTests);
+                DataCheckRunner checkRunner = DataCheckRunner.runDataChecks(concept, creationTests);
+                
+                checkRunner.latch.await();
+                try {
+                    if(checkRunner.get().isEmpty()){
+                        ConceptTemplates.dataChecks.put(concept.getNid(), false);
+                        Ts.get().touchComponentAlert(concept.getNid());
+                    }else{
+                        ConceptTemplates.dataChecks.put(concept.getNid(), true);
+                        Ts.get().touchComponentAlert(concept.getNid());
+                    }
+                } catch (InterruptedException e) {
+                    AceLog.getAppLog().alertAndLogException(e);
+                } catch (ExecutionException e) {
+                    AceLog.getAppLog().alertAndLogException(e);
+                }
             }
 
             uncommittedCNids.setMember(concept.getNid());
@@ -286,6 +298,9 @@ public class BdbCommitManager {
                                         + Ts.get().getComponent(uncommittedCNidsItr.nid()).toUserString() + " UUID: "
                                         + Ts.get().getUuidsForNid(uncommittedCNidsItr.nid()).toString());
                             }
+                            
+                            ConceptTemplates.dataChecks.remove(uncommittedCNidsItr.nid());
+                            Ts.get().touchComponentAlert(uncommittedCNidsItr.nid());
                         }
 
                         while (uncommittedCNidsNoChecksItr.next()) {
@@ -299,6 +314,9 @@ public class BdbCommitManager {
                                         + " UUID: "
                                         + Ts.get().getUuidsForNid(uncommittedCNidsNoChecksItr.nid()).toString());
                             }
+                            
+                            ConceptTemplates.dataChecks.remove(uncommittedCNidsNoChecksItr.nid());
+                            Ts.get().touchComponentAlert(uncommittedCNidsNoChecksItr.nid());
                         }
 
                         ChangeNotifier.touchComponents(cNidSet);
@@ -380,6 +398,14 @@ public class BdbCommitManager {
 
                                 checkRunner.latch.await();
                                 warningsAndErrors.addAll(checkRunner.get());
+                                
+                                if(checkRunner.get().isEmpty()){
+                                    ConceptTemplates.dataChecks.put(uncommittedCNidItr.nid(), false);
+                                    Ts.get().touchComponentAlert(uncommittedCNidItr.nid());
+                                }else{
+                                    ConceptTemplates.dataChecks.put(uncommittedCNidItr.nid(), true);
+                                    Ts.get().touchComponentAlert(uncommittedCNidItr.nid());
+                                }
 
                                 for (AlertToDataConstraintFailure alert : warningsAndErrors) {
                                     if (alert.getAlertType().equals(ALERT_TYPE.ERROR)) {
@@ -585,6 +611,14 @@ public class BdbCommitManager {
 
             latch.await();
             warningsAndErrors.addAll(checkRunner.get());
+            
+            if(checkRunner.get().isEmpty()){
+                 ConceptTemplates.dataChecks.put(c.getNid(), false);
+                 Ts.get().touchComponentAlert(c.getNid());
+            }else{
+                 ConceptTemplates.dataChecks.put(c.getNid(), true);
+                 Ts.get().touchComponentAlert(c.getNid());
+            }
 
             for (AlertToDataConstraintFailure alert : warningsAndErrors) {
                 if (alert.getAlertType().equals(ALERT_TYPE.ERROR)) {
@@ -1306,12 +1340,19 @@ public class BdbCommitManager {
                     DataCheckRunner checkRunner = DataCheckRunner.runDataChecks(toTest, commitTests);
 
                     checkRunner.latch.await();
+                    if(checkRunner.get().isEmpty()){
+                        ConceptTemplates.dataChecks.put(cNidItr.nid(), false);
+                        Ts.get().touchComponentAlert(cNidItr.nid());
+                    }else{
+                        ConceptTemplates.dataChecks.put(cNidItr.nid(), true);
+                        Ts.get().touchComponentAlert(cNidItr.nid());
+                    }
+                } catch (InterruptedException e) {
+                    AceLog.getAppLog().alertAndLogException(e);
+                } catch (ExecutionException e) {
+                    AceLog.getAppLog().alertAndLogException(e);
                 } catch (IOException e) {
                     AceLog.getAppLog().alertAndLogException(e);
-                } catch (InterruptedException e) {
-
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
                 }
             }
         } catch (IOException e) {

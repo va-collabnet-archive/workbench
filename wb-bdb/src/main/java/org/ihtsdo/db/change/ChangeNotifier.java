@@ -52,6 +52,10 @@ public class ChangeNotifier {
       new AtomicReference<ConcurrentSkipListSet<Integer>>(new ConcurrentSkipListSet<Integer>());
    private static AtomicReference<ConcurrentSkipListSet<Integer>> changedComponents =
       new AtomicReference<ConcurrentSkipListSet<Integer>>(new ConcurrentSkipListSet<Integer>());
+   private static AtomicReference<ConcurrentSkipListSet<Integer>> changedComponentAlerts =
+      new AtomicReference<ConcurrentSkipListSet<Integer>>(new ConcurrentSkipListSet<Integer>());
+   private static AtomicReference<ConcurrentSkipListSet<Integer>> changedComponentTemplates =
+      new AtomicReference<ConcurrentSkipListSet<Integer>>(new ConcurrentSkipListSet<Integer>());
    private static ConcurrentSkipListSet<WeakReference<TermChangeListener>> changeListenerRefs =
       new ConcurrentSkipListSet<WeakReference<TermChangeListener>>();
    private static AtomicBoolean active = new AtomicBoolean(true);
@@ -64,7 +68,8 @@ public class ChangeNotifier {
 
    //~--- constant enums ------------------------------------------------------
 
-   public enum Change { COMPONENT, REL_XREF, REFEX_XREF, REL_ORIGIN }
+   public enum Change { COMPONENT, REL_XREF, REFEX_XREF, REL_ORIGIN,
+                        COMPONENT_ALERT, COMPONENT_TEMPLATE}
 
    //~--- methods -------------------------------------------------------------
 
@@ -108,6 +113,15 @@ public class ChangeNotifier {
          }
 
          break;
+      case COMPONENT_ALERT :
+         changedComponentAlerts.get().add(nid);
+
+         break;
+          
+      case COMPONENT_TEMPLATE:
+         changedComponentTemplates.get().add(nid);
+
+         break;
 
       case REL_XREF :
          destinationsOfChangedRels.get().add(nid);
@@ -127,6 +141,14 @@ public class ChangeNotifier {
 
    public static void touchComponent(int nid) {
       touch(nid, Change.COMPONENT);
+   }
+   
+   public static void touchComponentAlert(int nid) {
+      touch(nid, Change.COMPONENT_ALERT);
+   }
+   
+   public static void touchComponentTemplate(int nid) {
+      touch(nid, Change.COMPONENT_TEMPLATE);
    }
 
    public static void touchComponents(Collection<Integer> cNidSet) {
@@ -182,10 +204,15 @@ public class ChangeNotifier {
                    new ConcurrentSkipListSet<Integer>());
             ConcurrentSkipListSet<Integer> changedComponents =
                ChangeNotifier.changedComponents.getAndSet(new ConcurrentSkipListSet<Integer>());
+            ConcurrentSkipListSet<Integer> changedComponentAlerts =
+               ChangeNotifier.changedComponentAlerts.getAndSet(new ConcurrentSkipListSet<Integer>());
+            ConcurrentSkipListSet<Integer> changedComponentTemplates =
+               ChangeNotifier.changedComponentTemplates.getAndSet(new ConcurrentSkipListSet<Integer>());
             long sequence = BdbCommitSequence.nextSequence();
 
             if (!destinationsOfChangedRels.isEmpty() ||!referencedComponentsOfChangedRefexs.isEmpty()
-                    ||!changedComponents.isEmpty()) {
+                    ||!changedComponents.isEmpty() ||!changedComponentAlerts.isEmpty() 
+                    ||!changedComponentTemplates.isEmpty()) {
                List<WeakReference<TermChangeListener>> toRemove =
                   new ArrayList<WeakReference<TermChangeListener>>();
 
@@ -197,7 +224,8 @@ public class ChangeNotifier {
                   } else {
                      try {
                         cl.changeNotify(sequence, originsOfChangedRels, destinationsOfChangedRels,
-                                        referencedComponentsOfChangedRefexs, changedComponents);
+                                        referencedComponentsOfChangedRefexs, changedComponents,
+                                        changedComponentAlerts, changedComponentTemplates);
                      } catch (Throwable e) {
                         e.printStackTrace();
                         toRemove.add(clr);
