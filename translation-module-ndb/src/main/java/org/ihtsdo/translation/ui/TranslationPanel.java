@@ -788,7 +788,7 @@ public class TranslationPanel extends JPanel {
 	 * @param clearAll
 	 *            the clear all
 	 */
-	synchronized private void clearForm(boolean clearAll) {
+	synchronized public void clearForm(boolean clearAll) {
 		descriptionInEditor = null;
 		comboBox1.setEnabled(false);
 		cmbAccep.setEnabled(false);

@@ -721,7 +721,11 @@ public class WfInboxPanel extends JPanel {
 						default:
 							break;
 						}
-						openItem();
+						if(cfg.isAutoOpenNextInboxItem()){
+							openItem();
+						}else{
+							uiPanel.clearForm(true);
+						}
 					} else {
 
 					}
@@ -832,10 +836,8 @@ public class WfInboxPanel extends JPanel {
 			cfg.setAutoOpenNextInboxItem(checkBox1.isSelected());
 			LanguageUtil.setTranslationConfig(Terms.get().getActiveAceFrameConfig(), cfg);
 		} catch (IOException ex) {
-
 			ex.printStackTrace();
 		} catch (TerminologyException ex) {
-
 			ex.printStackTrace();
 		}
 	}
