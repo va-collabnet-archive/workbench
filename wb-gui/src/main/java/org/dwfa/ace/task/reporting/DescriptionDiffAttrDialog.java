@@ -4,17 +4,8 @@
 
 package org.dwfa.ace.task.reporting;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Dialog;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.HeadlessException;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.*;
+import java.awt.event.*;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -67,6 +58,8 @@ public class DescriptionDiffAttrDialog extends JDialog {
 		super();
 		initComponents();
 		try {
+			errorLabel.setText("");
+			errorLabel.setVisible(false);
 			config = Terms.get().getActiveAceFrameConfig();
 			this.createDescriptionsDiffRefsets = createDescriptionsDiffRefsets;
 			cstFormat.setTimeZone(cstTime);
@@ -82,6 +75,7 @@ public class DescriptionDiffAttrDialog extends JDialog {
 			e.printStackTrace();
 		}
 	}
+
 	public void createAndShowGui() {
 		pack();
 		setVisible(true);
@@ -172,8 +166,15 @@ public class DescriptionDiffAttrDialog extends JDialog {
 	}
 
 	private void okButtonActionPerformed(ActionEvent e) {
-		this.initTime = initTimeCombo.getSelectedItem().toString();
-		this.laterTime = laterTimeCombo.getSelectedItem().toString();
+		if (!isDatesOk()) {
+			errorLabel.setText("End date must be after start date.");
+			errorLabel.setVisible(true);
+			return;
+		}
+		TimeItem initTimeItem = (TimeItem) initTimeCombo.getSelectedItem();
+		TimeItem endTimeItem = (TimeItem) laterTimeCombo.getSelectedItem();
+		this.initTime = initTimeItem.toString();
+		this.laterTime = endTimeItem.toString();
 		I_GetConceptData pathConcept = (I_GetConceptData) pathListModel.getElementAt(0);
 		this.uuid1 = pathConcept.getPrimUuid();
 		this.uuid2 = pathConcept.getPrimUuid();
@@ -187,11 +188,37 @@ public class DescriptionDiffAttrDialog extends JDialog {
 		close();
 	}
 
+	private void laterTimeComboItemStateChanged(ItemEvent e) {
+		if (e.getStateChange() == ItemEvent.SELECTED) {
+			isDatesOk();
+		}
+	}
+
+	private boolean isDatesOk() {
+		if (initTimeCombo.getSelectedItem() != null && laterTimeCombo.getSelectedItem() != null) {
+			TimeItem initTimeItem = (TimeItem) initTimeCombo.getSelectedItem();
+			TimeItem endTimeItem = (TimeItem) laterTimeCombo.getSelectedItem();
+			if (initTimeItem.getC().after(endTimeItem.getC()) || initTimeItem.getC().equals(endTimeItem.getC())) {
+				return false;
+			}
+		}
+		errorLabel.setText("");
+		errorLabel.setVisible(false);
+		return true;
+	}
+
+	private void initTimeComboItemStateChanged(ItemEvent e) {
+		if (e.getStateChange() == ItemEvent.SELECTED) {
+			isDatesOk();
+		}
+	}
+
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
 		dialogPane = new JPanel();
 		buttonBar = new JPanel();
+		errorLabel = new JLabel();
 		okButton = new JButton();
 		cancelButton = new JButton();
 		panel1 = new JPanel();
@@ -203,24 +230,29 @@ public class DescriptionDiffAttrDialog extends JDialog {
 		scrollPane1 = new JScrollPane();
 		pathList = new JList();
 
-		//======== this ========
+		// ======== this ========
 		setAlwaysOnTop(true);
 		Container contentPane = getContentPane();
 		contentPane.setLayout(new BorderLayout());
 
-		//======== dialogPane ========
+		// ======== dialogPane ========
 		{
 			dialogPane.setBorder(new EmptyBorder(12, 12, 12, 12));
 			dialogPane.setLayout(new BorderLayout());
 
-			//======== buttonBar ========
+			// ======== buttonBar ========
 			{
 				buttonBar.setBorder(new EmptyBorder(12, 0, 0, 0));
 				buttonBar.setLayout(new GridBagLayout());
-				((GridBagLayout)buttonBar.getLayout()).columnWidths = new int[] {0, 85, 80};
-				((GridBagLayout)buttonBar.getLayout()).columnWeights = new double[] {1.0, 0.0, 0.0};
+				((GridBagLayout) buttonBar.getLayout()).columnWidths = new int[] { 0, 85, 80 };
+				((GridBagLayout) buttonBar.getLayout()).columnWeights = new double[] { 1.0, 0.0, 0.0 };
 
-				//---- okButton ----
+				// ---- errorLabel ----
+				errorLabel.setText("text");
+				errorLabel.setForeground(Color.red);
+				buttonBar.add(errorLabel, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+
+				// ---- okButton ----
 				okButton.setText("OK");
 				okButton.addActionListener(new ActionListener() {
 					@Override
@@ -228,11 +260,9 @@ public class DescriptionDiffAttrDialog extends JDialog {
 						okButtonActionPerformed(e);
 					}
 				});
-				buttonBar.add(okButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 5), 0, 0));
+				buttonBar.add(okButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-				//---- cancelButton ----
+				// ---- cancelButton ----
 				cancelButton.setText("Cancel");
 				cancelButton.addActionListener(new ActionListener() {
 					@Override
@@ -240,56 +270,58 @@ public class DescriptionDiffAttrDialog extends JDialog {
 						cancelButtonActionPerformed(e);
 					}
 				});
-				buttonBar.add(cancelButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 0), 0, 0));
+				buttonBar.add(cancelButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 			}
 			dialogPane.add(buttonBar, BorderLayout.PAGE_END);
 
-			//======== panel1 ========
+			// ======== panel1 ========
 			{
 				panel1.setLayout(new GridBagLayout());
-				((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 0, 0};
-				((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0, 0, 0};
-				((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {0.0, 1.0, 1.0E-4};
-				((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
+				((GridBagLayout) panel1.getLayout()).columnWidths = new int[] { 0, 0, 0 };
+				((GridBagLayout) panel1.getLayout()).rowHeights = new int[] { 0, 0, 0, 0 };
+				((GridBagLayout) panel1.getLayout()).columnWeights = new double[] { 0.0, 1.0, 1.0E-4 };
+				((GridBagLayout) panel1.getLayout()).rowWeights = new double[] { 0.0, 0.0, 0.0, 1.0E-4 };
 
-				//---- label1 ----
+				// ---- label1 ----
 				label1.setText("Release start date");
-				panel1.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-				panel1.add(initTimeCombo, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 0), 0, 0));
+				panel1.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 
-				//---- label2 ----
+				// ---- initTimeCombo ----
+				initTimeCombo.addItemListener(new ItemListener() {
+					@Override
+					public void itemStateChanged(ItemEvent e) {
+						initTimeComboItemStateChanged(e);
+					}
+				});
+				panel1.add(initTimeCombo, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+
+				// ---- label2 ----
 				label2.setText("Release end date");
-				panel1.add(label2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-				panel1.add(laterTimeCombo, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 0), 0, 0));
+				panel1.add(label2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 
-				//---- label3 ----
+				// ---- laterTimeCombo ----
+				laterTimeCombo.addItemListener(new ItemListener() {
+					@Override
+					public void itemStateChanged(ItemEvent e) {
+						laterTimeComboItemStateChanged(e);
+					}
+				});
+				panel1.add(laterTimeCombo, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+
+				// ---- label3 ----
 				label3.setText("Path");
-				panel1.add(label3, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 5), 0, 0));
+				panel1.add(label3, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-				//======== scrollPane1 ========
+				// ======== scrollPane1 ========
 				{
 					scrollPane1.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 					scrollPane1.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 
-					//---- pathList ----
+					// ---- pathList ----
 					pathList.setVisibleRowCount(1);
 					scrollPane1.setViewportView(pathList);
 				}
-				panel1.add(scrollPane1, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 0), 0, 0));
+				panel1.add(scrollPane1, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 			}
 			dialogPane.add(panel1, BorderLayout.CENTER);
 		}
@@ -303,6 +335,7 @@ public class DescriptionDiffAttrDialog extends JDialog {
 	// //GEN-BEGIN:variables
 	private JPanel dialogPane;
 	private JPanel buttonBar;
+	private JLabel errorLabel;
 	private JButton okButton;
 	private JButton cancelButton;
 	private JPanel panel1;
@@ -313,10 +346,19 @@ public class DescriptionDiffAttrDialog extends JDialog {
 	private JLabel label3;
 	private JScrollPane scrollPane1;
 	private JList pathList;
+
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 
 	class TimeItem {
 		Calendar c;
+
+		public Calendar getC() {
+			return c;
+		}
+
+		public void setC(Calendar c) {
+			this.c = c;
+		}
 
 		public TimeItem(Calendar c) {
 			this.c = c;
