@@ -23,7 +23,9 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -118,7 +120,7 @@ public class CommentsManagerPanel extends JPanel {
 
 		label17.setIcon(IconUtilities.helpIcon);
 		label17.setText("");
-		
+
 		getPreviousComments();
 		getWebReferences();
 	}
@@ -266,22 +268,24 @@ public class CommentsManagerPanel extends JPanel {
 			if (targetLangRefset != null) {
 				commentsList = targetLangRefset.getCommentsRefset(config).getFullComments(worklistMember.getConcept().getConceptNid());
 				for (int i = commentsList.size() - 1; i > -1; i--) {
-					if (commentsList.get(i).getTypeCid() == commentsList.get(i).getSubTypeCid()) {
-						commentsTableModel.addRow(new Object[] { "Language refset: " + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "", formatComment(commentsList.get(i).getComment()), commentsList.get(i) });
-					} else {
-						commentsTableModel.addRow(new Object[] { "Language refset: " + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "/" + Terms.get().getConcept(commentsList.get(i).getSubTypeCid()),
-								formatComment(commentsList.get(i).getComment()), commentsList.get(i) });
-					}
+					commentsList.get(i).setCommentName("Language Refset: ");
 				}
 			}
 
-			commentsList = TerminologyProjectDAO.getWorkList(Terms.get().getConcept(worklistMember.getWorkListUUID()), config).getCommentsRefset(config).getFullComments(this.worklistMember.getConcept().getConceptNid());
-
+			LinkedList<Comment> fullComments = TerminologyProjectDAO.getWorkList(Terms.get().getConcept(worklistMember.getWorkListUUID()), config).getCommentsRefset(config).getFullComments(this.worklistMember.getConcept().getConceptNid());
+			for (int i = fullComments.size() - 1; i > -1; i--) {
+				fullComments.get(i).setCommentName("Worklist: ");
+			}
+			if (fullComments != null) {
+				commentsList.addAll(fullComments);
+			}
+			Collections.sort(commentsList);
 			for (int i = commentsList.size() - 1; i > -1; i--) {
+				String commentName = commentsList.get(i).getCommentName();
 				if (commentsList.get(i).getTypeCid() == commentsList.get(i).getSubTypeCid()) {
-					commentsTableModel.addRow(new Object[] { "Worklist: " + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "", formatComment(commentsList.get(i).getComment()), commentsList.get(i) });
+					commentsTableModel.addRow(new Object[] { commentName + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "", formatComment(commentsList.get(i).getComment()), commentsList.get(i) });
 				} else {
-					commentsTableModel.addRow(new Object[] { "Worklist: " + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "/" + Terms.get().getConcept(commentsList.get(i).getSubTypeCid()),
+					commentsTableModel.addRow(new Object[] { commentName + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "/" + Terms.get().getConcept(commentsList.get(i).getSubTypeCid()),
 							formatComment(commentsList.get(i).getComment()), commentsList.get(i) });
 				}
 			}
@@ -484,22 +488,22 @@ public class CommentsManagerPanel extends JPanel {
 		menuItem2 = new JMenuItem();
 		menuItem3 = new JMenuItem();
 
-		//======== this ========
+		// ======== this ========
 		setLayout(new BorderLayout());
 
-		//======== dialogPane ========
+		// ======== dialogPane ========
 		{
 			dialogPane.setLayout(new BorderLayout());
 
-			//======== panel17 ========
+			// ======== panel17 ========
 			{
 				panel17.setLayout(new GridBagLayout());
-				((GridBagLayout)panel17.getLayout()).columnWidths = new int[] {0, 0, 0, 0};
-				((GridBagLayout)panel17.getLayout()).rowHeights = new int[] {0, 0};
-				((GridBagLayout)panel17.getLayout()).columnWeights = new double[] {0.0, 0.0, 1.0, 1.0E-4};
-				((GridBagLayout)panel17.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+				((GridBagLayout) panel17.getLayout()).columnWidths = new int[] { 0, 0, 0, 0 };
+				((GridBagLayout) panel17.getLayout()).rowHeights = new int[] { 0, 0 };
+				((GridBagLayout) panel17.getLayout()).columnWeights = new double[] { 0.0, 0.0, 1.0, 1.0E-4 };
+				((GridBagLayout) panel17.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
 
-				//---- bAddComent ----
+				// ---- bAddComent ----
 				bAddComent.setText("[A]dd Comment");
 				bAddComent.setMnemonic('A');
 				bAddComent.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
@@ -509,17 +513,13 @@ public class CommentsManagerPanel extends JPanel {
 						bAddComentActionPerformed();
 					}
 				});
-				panel17.add(bAddComent, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 5), 0, 0));
+				panel17.add(bAddComent, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-				//---- cmbTarComm ----
+				// ---- cmbTarComm ----
 				cmbTarComm.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-				panel17.add(cmbTarComm, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 5), 0, 0));
+				panel17.add(cmbTarComm, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-				//---- label17 ----
+				// ---- label17 ----
 				label17.setText("text");
 				label17.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 				label17.addMouseListener(new MouseAdapter() {
@@ -528,19 +528,17 @@ public class CommentsManagerPanel extends JPanel {
 						label17MouseClicked(e);
 					}
 				});
-				panel17.add(label17, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-					new Insets(0, 0, 0, 0), 0, 0));
+				panel17.add(label17, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 0), 0, 0));
 			}
 			dialogPane.add(panel17, BorderLayout.NORTH);
 
-			//======== tabbedPane1 ========
+			// ======== tabbedPane1 ========
 			{
 
-				//======== scrollPane3 ========
+				// ======== scrollPane3 ========
 				{
 
-					//---- tblComm ----
+					// ---- tblComm ----
 					tblComm.setRowHeight(36);
 					tblComm.addMouseListener(new MouseAdapter() {
 						@Override
@@ -552,11 +550,10 @@ public class CommentsManagerPanel extends JPanel {
 				}
 				tabbedPane1.addTab("Comments", scrollPane3);
 
-
-				//======== scrollPane8 ========
+				// ======== scrollPane8 ========
 				{
 
-					//---- refTable ----
+					// ---- refTable ----
 					refTable.setEditable(false);
 					refTable.setMinimumSize(new Dimension(10, 16));
 					refTable.setPreferredSize(new Dimension(10, 16));
@@ -575,10 +572,10 @@ public class CommentsManagerPanel extends JPanel {
 		}
 		add(dialogPane, BorderLayout.CENTER);
 
-		//======== popupMenu1 ========
+		// ======== popupMenu1 ========
 		{
 
-			//---- menuItem2 ----
+			// ---- menuItem2 ----
 			menuItem2.setText("Delete");
 			menuItem2.addActionListener(new ActionListener() {
 				@Override
@@ -588,7 +585,7 @@ public class CommentsManagerPanel extends JPanel {
 			});
 			popupMenu1.add(menuItem2);
 
-			//---- menuItem3 ----
+			// ---- menuItem3 ----
 			menuItem3.setText("View Comment");
 			menuItem3.addActionListener(new ActionListener() {
 				@Override
