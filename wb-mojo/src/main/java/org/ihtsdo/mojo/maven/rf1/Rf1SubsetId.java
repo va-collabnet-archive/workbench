@@ -119,7 +119,7 @@ public class Rf1SubsetId {
         StringBuilder sb = new StringBuilder();
 
         sb.append(subsetSctIdOriginal).append(" (SCTID), ");
-        sb.append(subsetPathUuidFromName).append(" (NAME), ");
+        sb.append(refsetFsName).append(" (NAME), ");
         sb.append(subsetPathUuid).append(" (PATH), ");
         sb.append(subsetRefsetUuid).append(" (REFSET)");
 

@@ -319,6 +319,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
      */
     private UUID uuidUser;
     /**
+     * @parameter default-value="sctSiEConcepts.jbin"
+     */
+    private String outputFileName;
+    /**
      * @parameter default-value="true"
      */
     private boolean reportRootConcepts;
@@ -863,7 +867,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             for (int i = 0; i < sct1Dirs.length; i++) {
                 sct1Dirs[i].setDirectoryName(sct1Dirs[i].getDirectoryName().replace('/',
                         File.separatorChar));
-                getLog().info("POM SCT Input Directory (" + i + ") = " + sct1Dirs[i]);
+                getLog().info("POM SCT Input Directory (" + i + ") = " + sct1Dirs[i].getDirectoryName());
                 if (!sct1Dirs[i].getDirectoryName().startsWith(FILE_SEPARATOR)) {
                     sct1Dirs[i].setDirectoryName(FILE_SEPARATOR + sct1Dirs[i].getDirectoryName());
                 }
@@ -966,7 +970,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         fNameStep6Rel = tDir + scratchDirectory + FILE_SEPARATOR + "step6_relationships.ser";
         fNameStep6RelDest = tDir + scratchDirectory + FILE_SEPARATOR + "step6_rel_dest.ser";
 
-        fNameStep7ECon = tDir + outDir + FILE_SEPARATOR + "sctSiEConcepts.jbin";
+        fNameStep7ECon = tDir + outDir + FILE_SEPARATOR + outputFileName;
 
         zAuthorMap = new HashMap<String, Integer>();
         zAuthorList = new ArrayList<String>();

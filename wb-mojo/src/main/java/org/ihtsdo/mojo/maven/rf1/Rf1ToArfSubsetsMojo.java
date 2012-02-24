@@ -214,7 +214,7 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
         }
         for (int i = 0; i < rf1Dirs.length; i++) {
             rf1Dirs[i].setDirName(rf1Dirs[i].getDirName().replace('/', File.separatorChar));
-            getLog().info("    POM: Input Directory (" + i + ") = " + rf1Dirs[i]);
+            getLog().info("    POM: Input Directory (" + i + ") = " + rf1Dirs[i].getDirName());
             if (!rf1Dirs[i].getDirName().startsWith(FILE_SEPARATOR)) {
                 rf1Dirs[i].setDirName(FILE_SEPARATOR + rf1Dirs[i].getDirName());
             }
@@ -244,7 +244,7 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
         getLog().info("::: Target Directory: " + tDir);
         getLog().info("::: Target Sub Directory:     " + tSubDir);
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.ss HH:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
         if (dateStartObj != null) {
             getLog().info("::: Start date (inclusive) = " + sdf.format(dateStartObj));
         }

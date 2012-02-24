@@ -150,14 +150,15 @@ public class Rf1CreatePlaceHoldersMojo extends AbstractMojo implements Serializa
             expectedConcepts = mergeConceptArrays(expectedConcepts, scratchConcepts);
         }
 
-        /*
-         * :NYI: history relationships not processed // PROCESS HISTORY filesIn =
-         * getRF1Files(targetDirectory, targetSubDir, rf1Dirs, "history", ".txt"); for (RF1File file
-         * : filesIn) { int COMPONENTID = 0; // Column in history file scratchConcepts =
-         * parseForConceptIds(file, COMPONENTID); scratchConcepts =
-         * findConceptsNotPresent(knownConcepts, scratchConcepts); expectedConcepts =
-         * mergeConceptArrays(expectedConcepts, scratchConcepts); }
-         */
+        // :NYI: history relationships not processed
+        // PROCESS HISTORY
+//        filesIn = getRF1Files(targetDirectory, targetSubDir, rf1Dirs, "history", ".txt");
+//        for (RF1File file : filesIn) {
+//            int COMPONENTID = 0; // Column in history file
+//            scratchConcepts = parseForConceptIds(file, COMPONENTID);
+//            scratchConcepts = findConceptsNotPresent(knownConcepts, scratchConcepts);
+//            expectedConcepts = mergeConceptArrays(expectedConcepts, scratchConcepts);
+//        }
 
         if (expectedConcepts != null && expectedConcepts.length > 0) {
             writePlaceHolderConcepts(expectedConcepts);
