@@ -35,6 +35,7 @@ public class CopyToRelGroupAction extends AbstractAction {
         super(actionName);
         this.sourceComponent = sourceFact.getComponent();
         this.targetComponent = destFact.getComponent();
+        this.config = config;
     }
 
     @Override
