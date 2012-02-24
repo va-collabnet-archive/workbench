@@ -971,6 +971,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         fNameStep6RelDest = tDir + scratchDirectory + FILE_SEPARATOR + "step6_rel_dest.ser";
 
         fNameStep7ECon = tDir + outDir + FILE_SEPARATOR + outputFileName;
+        getLog().info("::: Output File:  " + outputFileName);
 
         zAuthorMap = new HashMap<String, Integer>();
         zAuthorList = new ArrayList<String>();
