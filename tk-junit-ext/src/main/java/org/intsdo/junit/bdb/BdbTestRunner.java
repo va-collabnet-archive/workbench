@@ -51,7 +51,7 @@ public class BdbTestRunner extends BlockJUnit4ClassRunner {
       String surefireClassPath = System.getProperty("surefire.test.class.path");
 
       if (surefireClassPath != null) {
-         String[] surefireClassPathParts = surefireClassPath.split(":");
+         String[] surefireClassPathParts = surefireClassPath.split(System.getProperty( "path.separator" ));
 
          buildDirFile = new File(surefireClassPathParts[0].replaceAll("test-classes$", ""));
          System.out.println(buildDirFile.getAbsolutePath());
