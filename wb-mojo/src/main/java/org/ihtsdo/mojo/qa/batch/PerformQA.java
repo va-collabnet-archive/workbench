@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -282,7 +283,12 @@ public class PerformQA implements I_ProcessConcepts {
 			long individualElapsed = Calendar.getInstance().getTimeInMillis()-individualStart;
 
 			String fsn = "";
-			int loopConceptStatusNid = loopConcept.getConceptAttributeTuples(config.getPrecedence(), config.getConflictResolutionStrategy()).iterator().next().getStatusNid();
+			int loopConceptStatusNid = 0;
+			List<? extends I_ConceptAttributeTuple> statusTuples = loopConcept.getConceptAttributeTuples(config.getPrecedence(), config.getConflictResolutionStrategy());
+			if (statusTuples.size() > 0 ) {
+				loopConceptStatusNid = statusTuples.iterator().next().getStatusNid();
+			}
+
 			if (loopConceptStatusNid == activeNid) {
 				for (I_DescriptionTuple loopTuple : loopConcept.getDescriptionTuples(config.getAllowedStatus(),
 						config.getDescTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(),
