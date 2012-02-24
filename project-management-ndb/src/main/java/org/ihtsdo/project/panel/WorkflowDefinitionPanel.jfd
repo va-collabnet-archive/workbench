@@ -55,7 +55,7 @@
          <class>java.awt.GridBagLayout</class> 
          <void method="setProperty"> 
           <string>$columnSpecs</string> 
-          <string>20, 200, 200, 0</string> 
+          <string>20, 200, 250, 0:1.0</string> 
          </void> 
          <void method="setProperty"> 
           <string>$rowSpecs</string> 
@@ -102,34 +102,15 @@
         </void> 
         <void method="add"> 
          <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JTextField</string> 
+          <string>javax.swing.JComboBox</string> 
           <void property="name"> 
            <string>workflowNameTextField</string> 
           </void> 
-         </object> 
-         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-          <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
-          <void method="setProperty"> 
-           <string>gridx</string> 
-           <int>2</int> 
-          </void> 
-         </object> 
-        </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JButton</string> 
-          <void method="setProperty"> 
-           <string>text</string> 
-           <string>Open</string> 
-          </void> 
-          <void property="name"> 
-           <string>openButton</string> 
-          </void> 
           <void method="addEvent"> 
            <object class="com.jformdesigner.model.FormEvent"> 
-            <string>java.awt.event.ActionListener</string> 
-            <string>actionPerformed</string> 
-            <string>openButtonActionPerformed</string> 
+            <string>java.awt.event.ItemListener</string> 
+            <string>itemStateChanged</string> 
+            <string>workflowNameTextFieldItemStateChanged</string> 
             <boolean>true</boolean> 
            </object> 
           </void> 
@@ -138,7 +119,7 @@
           <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
           <void method="setProperty"> 
            <string>gridx</string> 
-           <int>3</int> 
+           <int>2</int> 
           </void> 
          </object> 
         </void> 
@@ -830,7 +811,7 @@
                <class>java.awt.GridBagLayout</class> 
                <void method="setProperty"> 
                 <string>$columnSpecs</string> 
-                <string>99:1.0, 30</string> 
+                <string>99:1.0</string> 
                </void> 
                <void method="setProperty"> 
                 <string>$rowSpecs</string> 
@@ -858,44 +839,13 @@
               </void> 
               <void method="add"> 
                <object class="com.jformdesigner.model.FormComponent"> 
-                <string>javax.swing.JTextField</string> 
+                <string>javax.swing.JComboBox</string> 
                 <void property="name"> 
                  <string>businessTextField</string> 
                 </void> 
                </object> 
                <object class="com.jformdesigner.model.FormLayoutConstraints"> 
                 <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
-               </object> 
-              </void> 
-              <void method="add"> 
-               <object class="com.jformdesigner.model.FormComponent"> 
-                <string>javax.swing.JButton</string> 
-                <void method="setProperty"> 
-                 <string>text</string> 
-                 <string>Browse</string> 
-                </void> 
-                <void method="setProperty"> 
-                 <string>enabled</string> 
-                 <boolean>false</boolean> 
-                </void> 
-                <void property="name"> 
-                 <string>businessBrowseButton</string> 
-                </void> 
-                <void method="addEvent"> 
-                 <object class="com.jformdesigner.model.FormEvent"> 
-                  <string>java.awt.event.ActionListener</string> 
-                  <string>actionPerformed</string> 
-                  <string>businessBrowseButtonActionPerformed</string> 
-                  <boolean>true</boolean> 
-                 </object> 
-                </void> 
-               </object> 
-               <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-                <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
-                <void method="setProperty"> 
-                 <string>gridx</string> 
-                 <int>1</int> 
-                </void> 
                </object> 
               </void> 
              </object> 

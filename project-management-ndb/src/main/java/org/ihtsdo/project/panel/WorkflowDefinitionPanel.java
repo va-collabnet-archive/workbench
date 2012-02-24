@@ -18,8 +18,7 @@
 package org.ihtsdo.project.panel;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.beans.*;
 import java.io.File;
 import java.io.IOException;
@@ -28,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -107,6 +107,10 @@ public class WorkflowDefinitionPanel extends JPanel {
 	
 	/** The action name. */
 	private String actionName;
+
+	private HashMap<String, File> workflowsDefinitions;
+
+	private HashMap<String, File> businessFiles;
 	
 	/**
 	 * Instantiates a new workflow definition panel.
@@ -116,11 +120,30 @@ public class WorkflowDefinitionPanel extends JPanel {
 		WfComponentProvider wp= new WfComponentProvider();
 		List<WfRole> rolesList = wp.getRoles();
 		List<WfState> statesList = wp.getStates();
-		actions= new  HashMap<String, WfAction>();
+		actions= new HashMap<String, WfAction>();
 		roles= new HashMap<String, WfRole>();
 		states= new HashMap<String, WfState>();
 		drlFiles= new ArrayList<String>();
 		xlsFiles= new ArrayList<String>();
+		
+		workflowsDefinitions= new HashMap<String, File>();
+		businessFiles= new HashMap<String, File>();
+		
+		File[] list = new File("sampleProcesses/").listFiles();
+		workflowNameTextField.setSelectedIndex(-1);
+		DefaultComboBoxModel cmodel= new DefaultComboBoxModel();
+		for (File file : list) {
+			if(file.getName().substring(file.getName().length()-4).equals(".wfd")){
+				workflowsDefinitions.put(file.getName().substring(0,file.getName().length()-4), file);
+				cmodel.addElement(file.getName().substring(0,file.getName().length()-4));
+			}
+			else
+				if(file.getName().substring(file.getName().length()-3).equals(".bp")){
+					businessFiles.put(file.getName().substring(0,file.getName().length()-3), file);
+					businessTextField.addItem(file.getName().substring(0,file.getName().length()-3));
+				}
+		}
+		workflowNameTextField.setModel(cmodel);
 		
 		DefaultTableModel model= (DefaultTableModel) rolesTable.getModel();
 		for (WfRole role : rolesList) {
@@ -144,9 +167,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 		removeButton.setEnabled(false);
 		nameTextField.setEnabled(false);
 		businessTextField.setEnabled(false);
-		businessBrowseButton.setEnabled(false);
 		consequenceComboBox.setEnabled(true);
-		tabbedPane1.setEnabled(false);
 	}
 
 	/**
@@ -163,7 +184,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 			currentAction.setId(id);
 			idTextField.setText(id.toString());
 			nameTextField.setText("");
-			businessTextField.setText("");
+			businessTextField.setSelectedIndex(-1);
 			consequenceComboBox.setSelectedIndex(-1);
 			selectedAction=-1;
 			activeSelection=false;
@@ -179,12 +200,11 @@ public class WorkflowDefinitionPanel extends JPanel {
 			nameTextField.setEnabled(true);
 			businessTextField.setEnabled(true);
 			consequenceComboBox.setEnabled(true);
-			businessBrowseButton.setEnabled(true);
 		}
 		else{
 			if(nameTextField.getText()!=null && nameTextField.getText().length()>0){
 				currentAction.setName(nameTextField.getText());
-				File aux= new File(businessTextField.getText());
+				File aux= businessFiles.get(businessTextField.getSelectedItem().toString());
 				if(aux.isFile())
 					currentAction.setBusinessProcess(aux);
 				currentAction.setConsequence((WfState) states.get(consequenceComboBox.getSelectedItem()));
@@ -207,7 +227,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 				removeButton.setText("Remove");
 				idTextField.setText("");
 				nameTextField.setText("");
-				businessTextField.setText("");
+				businessTextField.setSelectedIndex(-1);
 				consequenceComboBox.setSelectedIndex(-1);
 				
 				newButton.setEnabled(true);
@@ -216,7 +236,6 @@ public class WorkflowDefinitionPanel extends JPanel {
 				nameTextField.setEnabled(false);
 				businessTextField.setEnabled(false);
 				consequenceComboBox.setEnabled(false);
-				businessBrowseButton.setEnabled(false);
 				
 				saveButton.setText("Save");
 				saveButton.setEnabled(true);
@@ -240,7 +259,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 				actionList.setSelectedIndex(-1);
 				idTextField.setText("");
 				nameTextField.setText("");
-				businessTextField.setText("");
+				businessTextField.setSelectedIndex(-1);
 				consequenceComboBox.setSelectedIndex(-1);
 				DefaultListModel lmodel = new DefaultListModel();
 				if(actions.size()>0)
@@ -263,7 +282,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 				removeButton.setText("Remove");
 				idTextField.setText("");
 				nameTextField.setText("");
-				businessTextField.setText("");
+				businessTextField.setSelectedIndex(-1);
 				consequenceComboBox.setSelectedIndex(-1);
 
 				newButton.setEnabled(true);
@@ -280,7 +299,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 				idTextField.setText(a.getId().toString());
 				nameTextField.setText(a.getName());
 				if(a.getBusinessProcess()!=null)
-					businessTextField.setText(a.getBusinessProcess().getAbsolutePath());
+					businessTextField.setSelectedItem(a.getBusinessProcess().getName().substring(0,a.getBusinessProcess().getName().length()-3));
 				if(a.getConsequence()!=null)
 				consequenceComboBox.setSelectedItem(a.getConsequence().getName());
 				
@@ -351,30 +370,12 @@ public class WorkflowDefinitionPanel extends JPanel {
 	}
 
 	/**
-	 * Business browse button action performed.
-	 *
-	 * @param e the e
-	 */
-	private void businessBrowseButtonActionPerformed(ActionEvent e) {
-		File dir= new File(businessTextField.getText());
-		JFileChooser fc;
-		if(dir.isFile())
-			fc= new JFileChooser(dir.getParentFile());
-		else
-			fc= new JFileChooser();
-		fc.setMultiSelectionEnabled(false);
-		if(fc.showOpenDialog(this)==JFileChooser.APPROVE_OPTION){
-				businessTextField.setText(fc.getSelectedFile().getAbsolutePath());
-		}
-	}
-
-	/**
 	 * Check state.
 	 *
 	 * @param row the row
 	 */
 	protected void checkState(int row) {
-		if(actions.size()==0) return;
+		if(actions==null || actions.size()==0) return;
 		boolean value= (Boolean) statesTable.getValueAt(row, 0);
 		UUID uuid = null;
 		if(value) return;
@@ -382,6 +383,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 		if(state==null) return;
 		uuid= state.getId();
 		for (WfAction action : actions.values()) {
+			if(action.getConsequence()!=null)
 			if(action.getConsequence().getId().equals(uuid)){
 				JOptionPane.showMessageDialog(this, "This State is present in one or more actions. Remove it from the actions first.");
 				statesTable.setValueAt(true, row, 0);
@@ -403,8 +405,9 @@ public class WorkflowDefinitionPanel extends JPanel {
 			WfAction a= actions.get(actionList.getSelectedValue());
 			idTextField.setText(a.getId().toString());
 			nameTextField.setText(a.getName());
+			businessTextField.setSelectedItem(-1);
 			if(a.getBusinessProcess()!=null)
-				businessTextField.setText(a.getBusinessProcess().getAbsolutePath());
+				businessTextField.setSelectedItem(a.getBusinessProcess().getName().substring(0,a.getBusinessProcess().getName().length()-3));
 			consequenceComboBox.removeAllItems();
 			for (int i = 0; i < statesTable.getRowCount(); i++) {
 				if(((Boolean)statesTable.getValueAt(i, 0))==true)
@@ -446,7 +449,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 			JOptionPane.showMessageDialog(this, "Before save, please finish Action edition or creation.");
 			return false;
 		}
-		if(workflowNameTextField.getText()!=null && workflowNameTextField.getText().length()>0){
+		if(workflowNameTextField.getSelectedItem()!=null){
 			selRoles= new ArrayList<WfRole>();
 			selStates= new ArrayList<WfState>();
 			for (int i = 0; i < rolesTable.getRowCount(); i++) {
@@ -458,7 +461,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 					selStates.add(states.get((String)statesTable.getValueAt(i, 1)));
 			}
 			WorkflowDefinition workflowDefinition = new WorkflowDefinition(selRoles,selStates,actions);
-			workflowDefinition.setName(workflowNameTextField.getText());
+			workflowDefinition.setName(workflowNameTextField.getSelectedItem().toString());
 			drlFiles= new ArrayList<String>();
 			xlsFiles= new ArrayList<String>();
 			if(drlTextField.getText()!=null && drlTextField.getText().length()>0){
@@ -480,7 +483,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 			workflowDefinition.setDrlFileName(drlFiles);
 			workflowDefinition.setXlsFileName(xlsFiles);
 			WorkflowDefinitionManager.writeWfDefinition(workflowDefinition);
-			JOptionPane.showMessageDialog(this, "\""+workflowNameTextField.getText()+"\" saved.");
+			JOptionPane.showMessageDialog(this, "\""+workflowNameTextField.getSelectedItem().toString()+"\" saved.");
 			workflowDefinitionFile= new File("sampleProcesses/"+workflowDefinition.getName()+".wfd");
 			return true;
 		}
@@ -491,44 +494,13 @@ public class WorkflowDefinitionPanel extends JPanel {
 	}
 
 	/**
-	 * Open button action performed.
-	 *
-	 * @param e the e
-	 */
-	private void openButtonActionPerformed(ActionEvent e) {
-		JFileChooser fc;
-		if(workflowDefinitionFile==null)
-			fc= new JFileChooser("sampleProcesses/");
-		else
-			fc= new JFileChooser(workflowDefinitionFile.getParent());
-		fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		fc.setFileFilter(new FileFilter() {
-			
-			@Override
-			public String getDescription() {
-				return "*.wfd";
-			}
-			
-			@Override
-			public boolean accept(File f) {
-				if(f.getName().substring(f.getName().length()-4).equalsIgnoreCase(".wfd")) return true;
-				else return false;
-			}
-		});
-		if(fc.showOpenDialog(this)==JFileChooser.CANCEL_OPTION) return;
-		workflowDefinitionFile= fc.getSelectedFile();
-		loadFile();
-	}
-	
-	
-	/**
 	 * Load file.
 	 */
 	private void loadFile() {
 		
-		WorkflowDefinition workflowDefinition = WorkflowDefinitionManager.readWfDefinition(workflowDefinitionFile.getName());
-		workflowNameTextField.setText(workflowDefinition.getName());
+		WorkflowDefinition workflowDefinition = WorkflowDefinitionManager.readWfDefinition(workflowsDefinitions.get(workflowNameTextField.getSelectedItem()).getName());
 		actionList.setModel(new DefaultListModel());
+		actions=null;
 		WfComponentProvider wp= new WfComponentProvider();
 		List<WfRole> rolesList = wp.getRoles();
 		List<WfState> statesList = wp.getStates();
@@ -539,10 +511,12 @@ public class WorkflowDefinitionPanel extends JPanel {
 		
 		if(selRoles!=null && selRoles.size()>0)
 		for (WfRole role : selRoles) {
+			if(role!=null && role.getName()!=null)
 			roles.put(role.getName(), role);
 		}
 		if(selStates!=null && selStates.size()>0)
 		for (WfState state : selStates) {
+			if(state!=null && state.getName()!=null)
 			states.put(state.getName(), state);
 		}
 		
@@ -647,86 +621,94 @@ public class WorkflowDefinitionPanel extends JPanel {
 		nameTextField.setEnabled(false);
 		businessTextField.setEnabled(false);
 		consequenceComboBox.setEnabled(false);
-		businessBrowseButton.setEnabled(false);
 		saveButton.setText("New");
 		cancelButton.setEnabled(false);
 	}
 	
 	private void newFile(){
-		workflowNameTextField.setText("");
-		
-		WfComponentProvider wp= new WfComponentProvider();
-		List<WfRole> rolesList = wp.getRoles();
-		List<WfState> statesList = wp.getStates();
-		actions= new HashMap<String, WfAction>();
-		roles= new HashMap<String, WfRole>();
-		states= new HashMap<String, WfState>();
-		drlFiles= new ArrayList<String>();
-		xlsFiles= new ArrayList<String>();
-		DefaultListModel lmodel = new DefaultListModel();
-		actionList.setModel(lmodel);
-		actionList.updateUI();
-		
-		DefaultTableModel model= (DefaultTableModel) rolesTable.getModel();
-		for (int i = 0; i < model.getRowCount(); i++) {
-			model.setValueAt(false, i, 0);
+		String name= JOptionPane.showInputDialog("Enter new Workflow Definition's name:");
+		if(name==null || name.length()==0){
+			JOptionPane.showMessageDialog(this, "Error in name, Workflow Definition not created.");
+			return;
 		}
-		if(rolesList!=null && rolesList.size()>0)
-		for (WfRole role : rolesList) {
-				roles.put(role.getName(), role);
-		}
-		rolesTable.setModel(model);
-		rolesTable.updateUI();
+		File file= new File("sampleProcesses/"+name.concat(".wfd"));
+		WorkflowDefinition wfDefinition = new WorkflowDefinition(new ArrayList<WfRole>(), new ArrayList<WfState>(), new HashMap<String, WfAction>());
+		WorkflowDefinitionManager.writeWfDefinition(wfDefinition);
+		workflowsDefinitions.put(file.getName().substring(0,file.getName().length()-4), file);
+		workflowNameTextField.addItem(file.getName().substring(0,file.getName().length()-4));
+		workflowNameTextField.setSelectedItem(file.getName().substring(0,file.getName().length()-4));
 		
-		model= (DefaultTableModel) statesTable.getModel();
-		for (int i = 0; i < model.getRowCount(); i++) {
-			model.setValueAt(false, i, 0);
-		}
-		if(statesList!=null && statesList.size()>0)
-		for (WfState state : statesList) {
-				states.put(state.getName(), state);
-		}
-		((DefaultTableModel)rolesTable.getModel()).addTableModelListener(new TableModelListener() {
-			@Override
-			public void tableChanged(TableModelEvent e) {
-				saveButton.setText("Save");
-				saveButton.setEnabled(true);
-				cancelButton.setEnabled(true);
-			}
-		    });
-		((DefaultTableModel)statesTable.getModel()).addTableModelListener(new TableModelListener() {
-			@Override
-			public void tableChanged(TableModelEvent e) {
-				checkState(e.getFirstRow());
-				saveButton.setText("Save");
-				saveButton.setEnabled(true);
-				cancelButton.setEnabled(true);
-			}
-		    });
-		statesTable.setModel(model);
-		statesTable.updateUI();
-		consequenceComboBox.removeAllItems();
-		
-		xlsFiles= null;
-		xlsTextField.setText("");
-		drlFiles= null;
-		drlTextField.setText("");
-		
-		consequenceComboBox.setSelectedIndex(-1);
-		activeSelection=false;
-		selectedAction=-1;
-		
-		tabbedPane1.setEnabled(true);
-		tabbedPane1.setSelectedIndex(0);
-		newButton.setEnabled(true);
-		editButton.setEnabled(false);
-		removeButton.setEnabled(false);
-		nameTextField.setEnabled(false);
-		businessTextField.setEnabled(false);
-		consequenceComboBox.setEnabled(false);
-		businessBrowseButton.setEnabled(false);
-		saveButton.setText("New");
-		cancelButton.setEnabled(false);
+//		WfComponentProvider wp= new WfComponentProvider();
+//		List<WfRole> rolesList = wp.getRoles();
+//		List<WfState> statesList = wp.getStates();
+//		actions= new HashMap<String, WfAction>();
+//		roles= new HashMap<String, WfRole>();
+//		states= new HashMap<String, WfState>();
+//		drlFiles= new ArrayList<String>();
+//		xlsFiles= new ArrayList<String>();
+//		DefaultListModel lmodel = new DefaultListModel();
+//		actionList.setModel(lmodel);
+//		actionList.updateUI();
+//		
+//		DefaultTableModel model= (DefaultTableModel) rolesTable.getModel();
+//		for (int i = 0; i < model.getRowCount(); i++) {
+//			model.setValueAt(false, i, 0);
+//		}
+//		if(rolesList!=null && rolesList.size()>0)
+//		for (WfRole role : rolesList) {
+//				roles.put(role.getName(), role);
+//		}
+//		rolesTable.setModel(model);
+//		rolesTable.updateUI();
+//		
+//		model= (DefaultTableModel) statesTable.getModel();
+//		for (int i = 0; i < model.getRowCount(); i++) {
+//			model.setValueAt(false, i, 0);
+//		}
+//		if(statesList!=null && statesList.size()>0)
+//		for (WfState state : statesList) {
+//				states.put(state.getName(), state);
+//		}
+//		((DefaultTableModel)rolesTable.getModel()).addTableModelListener(new TableModelListener() {
+//			@Override
+//			public void tableChanged(TableModelEvent e) {
+//				saveButton.setText("Save");
+//				saveButton.setEnabled(true);
+//				cancelButton.setEnabled(true);
+//			}
+//		    });
+//		((DefaultTableModel)statesTable.getModel()).addTableModelListener(new TableModelListener() {
+//			@Override
+//			public void tableChanged(TableModelEvent e) {
+//				checkState(e.getFirstRow());
+//				saveButton.setText("Save");
+//				saveButton.setEnabled(true);
+//				cancelButton.setEnabled(true);
+//			}
+//		    });
+//		statesTable.setModel(model);
+//		statesTable.updateUI();
+//		consequenceComboBox.removeAllItems();
+//		
+//		xlsFiles= null;
+//		xlsTextField.setText("");
+//		drlFiles= null;
+//		drlTextField.setText("");
+//		
+//		consequenceComboBox.setSelectedIndex(-1);
+//		activeSelection=false;
+//		selectedAction=-1;
+//		
+//		tabbedPane1.setEnabled(true);
+//		tabbedPane1.setSelectedIndex(0);
+//		newButton.setEnabled(true);
+//		editButton.setEnabled(false);
+//		removeButton.setEnabled(false);
+//		nameTextField.setEnabled(false);
+//		businessTextField.setEnabled(false);
+//		consequenceComboBox.setEnabled(false);
+//		saveButton.setText("New");
+//		cancelButton.setEnabled(false);
 	}
 
 	/**
@@ -771,7 +753,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 			nameTextField.setText("");
 			consequenceComboBox.setSelectedIndex(-1);
 			consequenceComboBox.removeAllItems();
-			businessTextField.setText("");
+			businessTextField.setSelectedIndex(-1);
 			xlsTextField.setText("");
 			drlTextField.setText("");
 			DefaultTableModel model= (DefaultTableModel) rolesTable.getModel();
@@ -811,7 +793,6 @@ public class WorkflowDefinitionPanel extends JPanel {
 			removeButton.setEnabled(true);
 			nameTextField.setEnabled(true);
 			businessTextField.setEnabled(true);
-			businessBrowseButton.setEnabled(true);
 			consequenceComboBox.setEnabled(true);
 			}
 		else{
@@ -819,9 +800,10 @@ public class WorkflowDefinitionPanel extends JPanel {
 				currentAction= new WfAction();
 				currentAction.setId(UUID.fromString(idTextField.getText()));
 				currentAction.setName(nameTextField.getText());
-				File aux= new File(businessTextField.getText());
-				if(aux.isFile())
+				if(businessTextField.getSelectedIndex()!=-1){
+					File aux= businessFiles.get(businessTextField.getSelectedItem());
 					currentAction.setBusinessProcess(aux);
+				}
 				currentAction.setConsequence((WfState) states.get(consequenceComboBox.getSelectedItem()));
 				if(!currentAction.getName().equals(actionName) && actions.containsKey(currentAction.getName())){
 					JOptionPane.showMessageDialog(this, "An action with the same name already exist.");
@@ -843,7 +825,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 				removeButton.setText("Remove");
 				idTextField.setText("");
 				nameTextField.setText("");
-				businessTextField.setText("");
+				businessTextField.setSelectedIndex(-1);
 				consequenceComboBox.setSelectedIndex(-1);
 				
 				newButton.setEnabled(true);
@@ -851,7 +833,6 @@ public class WorkflowDefinitionPanel extends JPanel {
 				removeButton.setEnabled(false);
 				nameTextField.setEnabled(false);
 				businessTextField.setEnabled(false);
-				businessBrowseButton.setEnabled(false);
 				consequenceComboBox.setEnabled(false);
 				
 				saveButton.setText("Save");
@@ -864,6 +845,14 @@ public class WorkflowDefinitionPanel extends JPanel {
 		
 	}
 
+	private void workflowNameTextFieldItemStateChanged(ItemEvent e) {
+		if(((JComboBox)e.getSource()).getSelectedIndex()==-1) return;
+		File file= workflowsDefinitions.get(workflowNameTextField.getSelectedItem());
+		if(workflowDefinitionFile!=null && workflowDefinitionFile.equals(file)) return;
+		workflowDefinitionFile= file;
+		loadFile();
+	}
+
 	
 
 	/**
@@ -873,8 +862,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		panel8 = new JPanel();
 		label11 = new JLabel();
-		workflowNameTextField = new JTextField();
-		openButton = new JButton();
+		workflowNameTextField = new JComboBox();
 		separator1 = new JSeparator();
 		tabbedPane1 = new JTabbedPane();
 		panel9 = new JPanel();
@@ -899,8 +887,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 		consequenceComboBox = new JComboBox();
 		label6 = new JLabel();
 		panel6 = new JPanel();
-		businessTextField = new JTextField();
-		businessBrowseButton = new JButton();
+		businessTextField = new JComboBox();
 		panel11 = new JPanel();
 		panel3 = new JPanel();
 		label9 = new JLabel();
@@ -927,9 +914,9 @@ public class WorkflowDefinitionPanel extends JPanel {
 		//======== panel8 ========
 		{
 			panel8.setLayout(new GridBagLayout());
-			((GridBagLayout)panel8.getLayout()).columnWidths = new int[] {25, 205, 205, 0, 0};
+			((GridBagLayout)panel8.getLayout()).columnWidths = new int[] {25, 205, 255, 0, 0};
 			((GridBagLayout)panel8.getLayout()).rowHeights = new int[] {0, 0};
-			((GridBagLayout)panel8.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 1.0E-4};
+			((GridBagLayout)panel8.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 1.0, 1.0E-4};
 			((GridBagLayout)panel8.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
 			//---- label11 ----
@@ -937,21 +924,17 @@ public class WorkflowDefinitionPanel extends JPanel {
 			panel8.add(label11, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 5), 0, 0));
+
+			//---- workflowNameTextField ----
+			workflowNameTextField.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					workflowNameTextFieldItemStateChanged(e);
+				}
+			});
 			panel8.add(workflowNameTextField, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 5), 0, 0));
-
-			//---- openButton ----
-			openButton.setText("Open");
-			openButton.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					openButtonActionPerformed(e);
-				}
-			});
-			panel8.add(openButton, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 0), 0, 0));
 		}
 		add(panel8, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
@@ -1194,24 +1177,11 @@ public class WorkflowDefinitionPanel extends JPanel {
 					//======== panel6 ========
 					{
 						panel6.setLayout(new GridBagLayout());
-						((GridBagLayout)panel6.getLayout()).columnWidths = new int[] {104, 30, 0};
+						((GridBagLayout)panel6.getLayout()).columnWidths = new int[] {99, 0};
 						((GridBagLayout)panel6.getLayout()).rowHeights = new int[] {0, 0};
-						((GridBagLayout)panel6.getLayout()).columnWeights = new double[] {1.0, 0.0, 1.0E-4};
+						((GridBagLayout)panel6.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
 						((GridBagLayout)panel6.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 						panel6.add(businessTextField, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 0, 5), 0, 0));
-
-						//---- businessBrowseButton ----
-						businessBrowseButton.setText("Browse");
-						businessBrowseButton.setEnabled(false);
-						businessBrowseButton.addActionListener(new ActionListener() {
-							@Override
-							public void actionPerformed(ActionEvent e) {
-								businessBrowseButtonActionPerformed(e);
-							}
-						});
-						panel6.add(businessBrowseButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 0, 0), 0, 0));
 					}
@@ -1362,136 +1332,47 @@ public class WorkflowDefinitionPanel extends JPanel {
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
-	/** The panel8. */
 	private JPanel panel8;
-	
-	/** The label11. */
 	private JLabel label11;
-	
-	/** The workflow name text field. */
-	private JTextField workflowNameTextField;
-	
-	/** The open button. */
-	private JButton openButton;
-	
-	/** The separator1. */
+	private JComboBox workflowNameTextField;
 	private JSeparator separator1;
-	
-	/** The tabbed pane1. */
 	private JTabbedPane tabbedPane1;
-	
-	/** The panel9. */
 	private JPanel panel9;
-	
-	/** The scroll pane2. */
 	private JScrollPane scrollPane2;
-	
-	/** The roles table. */
 	private JTable rolesTable;
-	
-	/** The panel12. */
 	private JPanel panel12;
-	
-	/** The scroll pane3. */
 	private JScrollPane scrollPane3;
-	
-	/** The states table. */
 	private JTable statesTable;
-	
-	/** The panel10. */
 	private JPanel panel10;
-	
-	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
-	
-	/** The action list. */
 	private JList actionList;
-	
-	/** The panel1. */
 	private JPanel panel1;
-	
-	/** The panel5. */
 	private JPanel panel5;
-	
-	/** The new button. */
 	private JButton newButton;
-	
-	/** The edit button. */
 	private JButton editButton;
-	
-	/** The remove button. */
 	private JButton removeButton;
-	
-	/** The label3. */
 	private JLabel label3;
-	
-	/** The id text field. */
 	private JTextField idTextField;
-	
-	/** The label4. */
 	private JLabel label4;
-	
-	/** The name text field. */
 	private JTextField nameTextField;
-	
-	/** The label5. */
 	private JLabel label5;
-	
-	/** The consequence combo box. */
 	private JComboBox consequenceComboBox;
-	
-	/** The label6. */
 	private JLabel label6;
-	
-	/** The panel6. */
 	private JPanel panel6;
-	
-	/** The business text field. */
-	private JTextField businessTextField;
-	
-	/** The business browse button. */
-	private JButton businessBrowseButton;
-	
-	/** The panel11. */
+	private JComboBox businessTextField;
 	private JPanel panel11;
-	
-	/** The panel3. */
 	private JPanel panel3;
-	
-	/** The label9. */
 	private JLabel label9;
-	
-	/** The xls text field. */
 	private JTextField xlsTextField;
-	
-	/** The xls browse button. */
 	private JButton xlsBrowseButton;
-	
-	/** The panel4. */
 	private JPanel panel4;
-	
-	/** The label10. */
 	private JLabel label10;
-	
-	/** The drl text field. */
 	private JTextField drlTextField;
-	
-	/** The drl browse button. */
 	private JButton drlBrowseButton;
-	
-	/** The separator2. */
 	private JSeparator separator2;
-	
-	/** The panel7. */
 	private JPanel panel7;
-	
-	/** The save button. */
 	private JButton saveButton;
-	
-	/** The cancel button. */
 	private JButton cancelButton;
-	
-	/** The close button. */
 	private JButton closeButton;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }
