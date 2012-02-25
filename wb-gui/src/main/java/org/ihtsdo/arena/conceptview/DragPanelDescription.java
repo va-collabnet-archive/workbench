@@ -167,24 +167,31 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
             for (RefexChronicleBI<?> refex : getDesc().getAnnotations()) {
                 if (refex.getCollectionNid() == SnomedMetadataRfx.getUS_DIALECT_REFEX_NID()) {
                     for (RefexVersionBI<?> v : refex.getVersions(getSettings().getConfig().getViewCoordinate())) {
-                        RefexCnidVersionBI cv = (RefexCnidVersionBI) v;
-                        if (cv.getCnid1() == SnomedMetadataRfx.getDESC_PREFERRED_NID()) {
-                            sb.append(" <font color='red'>US</font>");
+                        if(RefexCnidVersionBI.class.isAssignableFrom(v.getClass())){
+                            RefexCnidVersionBI cv = (RefexCnidVersionBI) v;
+                            if (cv.getCnid1() == SnomedMetadataRfx.getDESC_PREFERRED_NID()) {
+                                sb.append(" <font color='red'>US</font>");
+                            } 
                         }
                     }
 
                 } else if (refex.getCollectionNid() == SnomedMetadataRfx.getGB_DIALECT_REFEX_NID()) {
                     for (RefexVersionBI<?> v : refex.getVersions(getSettings().getConfig().getViewCoordinate())) {
-                        RefexCnidVersionBI cv = (RefexCnidVersionBI) v;
-                        if (cv.getCnid1() == SnomedMetadataRfx.getDESC_PREFERRED_NID()) {
-                            sb.append(" <font color='blue'>GB</font>");
+                        if(RefexCnidVersionBI.class.isAssignableFrom(v.getClass())){
+                            RefexCnidVersionBI cv = (RefexCnidVersionBI) v;
+                            if (cv.getCnid1() == SnomedMetadataRfx.getDESC_PREFERRED_NID()) {
+                                sb.append(" <font color='blue'>GB</font>");
+                            }
                         }
+                        
                     }
                 } else {
                     for (RefexVersionBI<?> v : refex.getVersions(getSettings().getConfig().getViewCoordinate())) {
-                        RefexCnidVersionBI cv = (RefexCnidVersionBI) v;
-                        if (cv.getCnid1() == SnomedMetadataRfx.getDESC_PREFERRED_NID()) {
-                            sb.append(" <font color='blue'> </font>");
+                        if(RefexCnidVersionBI.class.isAssignableFrom(v.getClass())){
+                            RefexCnidVersionBI cv = (RefexCnidVersionBI) v;
+                            if (cv.getCnid1() == SnomedMetadataRfx.getDESC_PREFERRED_NID()) {
+                                sb.append(" <font color='blue'> </font>");
+                            }
                         }
                     }
                 }
