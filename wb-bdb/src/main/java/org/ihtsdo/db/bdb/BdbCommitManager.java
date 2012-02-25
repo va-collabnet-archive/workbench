@@ -913,7 +913,7 @@ public class BdbCommitManager {
                 AceLog.getAppLog().alertAndLog(Level.SEVERE, "Canceling cache for: " + c.toString(), e);
             }
 
-            Terms.get().addUncommittedNoChecks(c);
+            Terms.get().addUncommitted(c);
         } else {
             a.primordialSapNid = -1;
 
@@ -961,7 +961,7 @@ public class BdbCommitManager {
         }
 
         c.modified();
-        Terms.get().addUncommittedNoChecks(c);
+        Terms.get().addUncommitted(c);
     }
 
    @SuppressWarnings("unchecked")
@@ -1018,7 +1018,7 @@ public class BdbCommitManager {
         }
 
         c.modified();
-        Terms.get().addUncommittedNoChecks(c);
+        Terms.get().addUncommitted(c);
     }
 
 
@@ -1072,7 +1072,7 @@ public class BdbCommitManager {
             AceLog.getAppLog().alertAndLog(Level.SEVERE, "Canceling cache for: " + c.toString(), e);
         }
 
-        Terms.get().addUncommittedNoChecks(c);
+        Terms.get().addUncommitted(c);
     }
 
     private static void handleCanceledConcepts(I_RepresentIdSet uncommittedCNids2) throws IOException {
