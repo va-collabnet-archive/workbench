@@ -97,7 +97,6 @@ public class CancelAction extends AbstractAction {
                     Terms.get().forget(rv);
                 }
             }
-            Terms.get().addUncommitted(concept);
 
         } catch (TerminologyException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
