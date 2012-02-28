@@ -165,6 +165,8 @@ public class WfHxIndexGenerator extends IndexGenerator {
 			}
 			
 			WfHxLuceneManager.writeToLuceneNoLock(wfHxJavaBeansToWrite, lastBeanInWfMap, vc);
+			wfHxJavaBeansToWrite.clear();
+			lastBeanInWfMap.clear();
 		} catch (Exception e) {
 			e.printStackTrace();	
 		}
