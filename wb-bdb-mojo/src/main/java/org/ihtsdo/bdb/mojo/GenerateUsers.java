@@ -265,7 +265,7 @@ public class GenerateUsers extends AbstractMojo {
 						writer.setSemanticArea(columns[1]);
 
 						writer.setCategory(newCategory);
-						writer.addMember();
+						writer.addMember(true);
 					}
 
 					wfLine = wfReader.readLine();

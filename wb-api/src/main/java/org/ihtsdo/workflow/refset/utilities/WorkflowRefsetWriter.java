@@ -37,7 +37,7 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
         }
     }
 
-    public I_ExtendByRef addMember() {
+    public I_ExtendByRef addMember(boolean autoCommit) {
         I_ExtendByRef ref = null;
         try {
             if (fields.valuesExist()) {
@@ -47,18 +47,25 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
                     propMap.put(REFSET_PROPERTY.STRING_VALUE, fieldsToRefsetString());
 
                     ref = helper.makeWfMetadataMemberAndSetup(refsetNid, fields.getReferencedComponentNid(), REFSET_TYPES.STR, propMap, UUID.randomUUID());
-
-                    if (ref != null) {
-                        Terms.get().addUncommittedNoChecks(ref);
-                    }
                 }
                 ConceptChronicleBI concept = Ts.get().getConcept(fields.getReferencedComponentUid());
                 ConceptChronicleBI refset = Ts.get().getConcept(refsetNid);
+             
+                if (autoCommit) {
+	            	Terms.get().addUncommittedNoChecks(ref);
                 if (refset.isAnnotationStyleRefex()) {
                     Terms.get().addUncommittedNoChecks((I_GetConceptData) concept);
                 } else {
                     Terms.get().addUncommittedNoChecks((I_GetConceptData) refset);
                 }
+	            } else {
+	            	Terms.get().addUncommitted(ref);
+	                if (refset.isAnnotationStyleRefex()) {
+	                    Terms.get().addUncommitted((I_GetConceptData) concept);
+	                } else {
+	                    Terms.get().addUncommitted((I_GetConceptData) refset);
+	                }
+	            }
             }
         } catch (Exception io) {
             AceLog.getAppLog().log(Level.WARNING, "Failed to Add Member with error: " + io.getMessage());

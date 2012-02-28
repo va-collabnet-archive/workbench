@@ -81,7 +81,7 @@ public class InitializeEditorCategoryRefset implements I_InitializeWorkflowRefse
 	            	writer.setSemanticArea(columns[semanticAreaPosition]);
 	            	writer.setCategory(categories.get(columns[categoryPosition].toLowerCase()));
 
-	            	writer.addMember();
+	            	writer.addMember(true);
         		} else {
 	            	AceLog.getAppLog().log(Level.WARNING, "Unable to import this row into editor category refset: " + line);
     			}

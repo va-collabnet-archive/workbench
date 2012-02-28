@@ -55,7 +55,7 @@ public class InitializeSemanticHierarchyRefset implements I_InitializeWorkflowRe
 	    			writer.setChildSemanticArea(columns[childSemanticAreaPosition]);
 	    			writer.setParentSemanticArea(columns[parentSemanticAreaPosition]);
 	
-	    			writer.addMember();
+	    			writer.addMember(true);
 	    		} else {
 	            	AceLog.getAppLog().log(Level.WARNING, "Unable to import this row into semantic hierarchy refset: " + line);
 				}

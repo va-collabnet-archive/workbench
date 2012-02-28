@@ -30,7 +30,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ihtsdo.ace.task.workflow.commit;
+package org.ihtsdo.workflow.task.commit;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;

@@ -816,7 +816,7 @@ public class WorkflowHelper {
 		        writer.setWorkflowTime(today.getTime());
 
 		        // Write Member
-				writer.addMember();
+				writer.addMember(false);
         	}
     	}	
 	}

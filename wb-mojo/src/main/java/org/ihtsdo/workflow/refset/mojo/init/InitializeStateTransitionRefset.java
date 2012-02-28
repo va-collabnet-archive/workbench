@@ -89,7 +89,7 @@ public class InitializeStateTransitionRefset implements I_InitializeWorkflowRefs
 		        	writer.setAction(actions.get(columns[actionPosition].toLowerCase()));
 		        	writer.setFinalState(states.get(columns[finalStatePosition].toLowerCase()));
 
-		        	writer.addMember();
+		        	writer.addMember(true);
 	        	} else {
 	            	AceLog.getAppLog().log(Level.WARNING, "Unable to import this row into state transition refset: " + line);
 	        	}

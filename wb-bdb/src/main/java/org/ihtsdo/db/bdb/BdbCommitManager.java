@@ -538,6 +538,8 @@ public class BdbCommitManager {
                                 Set<I_ExtendByRef> wfMembersToCommit =
                                         uncommittedWfMemberIds.getClass().newInstance();
 
+                                wfMembersToCommit.addAll(uncommittedWfMemberIds);
+
                                 Runnable luceneWriter = WfHxLuceneWriterAccessor.addWfHxLuceneMembersFromExtensions(wfMembersToCommit);
 
                                 if (luceneWriter != null) {

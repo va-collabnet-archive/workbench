@@ -1366,7 +1366,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 					writer.setCategory(reader.getEditorCategoryUid(s));
 					writer.setSemanticArea(reader.getSemanticTag(s));
 
-					writer.addMember();
+					writer.addMember(true);
 				} else if (refsetId.equals(RefsetAuxiliary.Concept.STATE_TRANSITION.getPrimoridalUid())) {
 					StateTransitionRefsetWriter writer = new StateTransitionRefsetWriter();
 					writer.setReferencedComponentId(Terms.get().nidToUuid(((I_ExtendByRefVersion)version).getReferencedComponentNid()));
@@ -1379,7 +1379,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 					writer.setAction(reader.getAction(s));
 					writer.setFinalState(reader.getFinalState(s));
 
-					writer.addMember();
+					writer.addMember(true);
 				} else if (refsetId.equals(RefsetAuxiliary.Concept.SEMANTIC_HIERARCHY.getPrimoridalUid())) {
 					SemanticHierarchyRefsetWriter writer = new SemanticHierarchyRefsetWriter();
 					writer.setReferencedComponentId(Terms.get().nidToUuid(((I_ExtendByRefVersion)version).getReferencedComponentNid()));
@@ -1390,7 +1390,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 					writer.setChildSemanticArea(reader.getChildSemanticTag(s));
 					writer.setParentSemanticArea(reader.getParentSemanticTag(s));
 				
-					writer.addMember();
+					writer.addMember(true);
 				} else if (refsetId.equals(RefsetAuxiliary.Concept.SEMANTIC_TAGS.getPrimoridalUid())) {
 					SemanticTagsRefsetWriter writer = new SemanticTagsRefsetWriter();
 					writer.setReferencedComponentId(Terms.get().nidToUuid(((I_ExtendByRefVersion)version).getReferencedComponentNid()));
@@ -1400,7 +1400,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 					SemanticTagsRefsetReader reader = new SemanticTagsRefsetReader();
 					writer.setSemanticTag(reader.getSemanticTag(s));
 
-					writer.addMember();
+					writer.addMember(true);
 				}
 			}
 

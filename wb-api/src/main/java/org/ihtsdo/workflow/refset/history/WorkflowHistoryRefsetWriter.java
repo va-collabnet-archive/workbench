@@ -359,7 +359,7 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
         
         setEffectiveTime(Long.MAX_VALUE);
 
-		I_ExtendByRef ref = addMember();
+		I_ExtendByRef ref = addMember(true);
 		
 		return ref;
 	}

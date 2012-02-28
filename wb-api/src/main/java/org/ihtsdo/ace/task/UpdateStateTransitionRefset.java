@@ -149,7 +149,7 @@ public class UpdateStateTransitionRefset extends AbstractTask {
 	        	writer.setAction(WorkflowHelper.lookupAction(columns[2], vc));
 	        	writer.setFinalState(WorkflowHelper.lookupState(columns[3], vc));
 	
-	        	writer.addMember();
+	        	writer.addMember(true);
 
         	}
 

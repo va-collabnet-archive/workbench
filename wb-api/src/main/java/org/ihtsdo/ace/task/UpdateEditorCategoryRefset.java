@@ -135,7 +135,7 @@ public class UpdateEditorCategoryRefset extends AbstractTask {
 	                writer.setSemanticArea(columns[1]);
 
 	                writer.setCategory(newCategory);
-	                writer.addMember();
+	                writer.addMember(true);
 	            }
             }
 

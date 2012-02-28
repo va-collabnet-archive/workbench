@@ -60,7 +60,7 @@ public class InitializeSemanticTagsRefset implements I_InitializeWorkflowRefset 
         			writer.setSemanticTag(columns[semTagPosition]);
         			writer.setSemanticTagUUID(columns[uidPosition]);
 
-            		writer.addMember();
+            		writer.addMember(true);
         		} else  {
 	            	AceLog.getAppLog().log(Level.WARNING, "Unable to import this row into semantic tag refset: " + line);
     			}
