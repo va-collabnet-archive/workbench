@@ -300,7 +300,9 @@ public class BdbCommitManager {
                             }
                             
                             ConceptTemplates.dataChecks.remove(uncommittedCNidsItr.nid());
+                            ConceptTemplates.templates.remove(uncommittedCNidsItr.nid());
                             Ts.get().touchComponentAlert(uncommittedCNidsItr.nid());
+                            Ts.get().touchComponentTemplate(uncommittedCNidsItr.nid());
                         }
 
                         while (uncommittedCNidsNoChecksItr.next()) {
@@ -316,7 +318,9 @@ public class BdbCommitManager {
                             }
                             
                             ConceptTemplates.dataChecks.remove(uncommittedCNidsNoChecksItr.nid());
+                            ConceptTemplates.templates.remove(uncommittedCNidsItr.nid());
                             Ts.get().touchComponentAlert(uncommittedCNidsNoChecksItr.nid());
+                            Ts.get().touchComponentTemplate(uncommittedCNidsItr.nid());
                         }
 
                         ChangeNotifier.touchComponents(cNidSet);
