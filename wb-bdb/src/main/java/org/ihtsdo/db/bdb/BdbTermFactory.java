@@ -7,12 +7,14 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -1422,21 +1424,54 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             wfHxUpdater.setProgressInfo("Query complete in "
                     + Long.toString(System.currentTimeMillis() - startTime) + " ms. Hits: "
                     + returnResults.size());
-            wfHxUpdater.setHits(returnResults.size());
-            wfHxUpdater.setIndeterminate(false);
-            System.out.println("Total results to process: " + returnResults.size());
-            hitLatch = new CountDownLatch(result.topDocs.totalHits);
+            
+			// Get count of unique concepts
+            Set<String> conceptList = new HashSet<String>();            
+            for (int i = 0; i < result.topDocs.totalHits; i++) {
+                Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
+                conceptList.add(doc.getFieldable("conceptId").stringValue());
+            }
 
+            wfHxUpdater.setHits(conceptList.size());
+            wfHxUpdater.setIndeterminate(false);
+            System.out.println("Total results to process: " + conceptList.size());
+            hitLatch = new CountDownLatch(conceptList.size());
+
+			// Get map of concept to latest version of results for concept
+            Map<String, WfHxCheckAndProcessLuceneMatch> duplicateMatchesSet = new HashMap<String, WfHxCheckAndProcessLuceneMatch>();
             for (int i = 0; i < result.topDocs.totalHits; i++) {
                 float score = result.topDocs.scoreDocs[i].score;
                 Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
 
+                WfHxCheckAndProcessLuceneMatch match = new WfHxCheckAndProcessLuceneMatch(hitLatch, wfHxUpdater, doc, score,
+                        matches, checkList, config);
+                
+                if (!duplicateMatchesSet.containsKey(match.getConcept())) {
+                	duplicateMatchesSet.put(match.getConcept(), match);
+                } else {
+                	WfHxCheckAndProcessLuceneMatch dupMatch = duplicateMatchesSet.get(match.getConcept());
+                	
+                	// Don't add if dupMatch is later than match
+                	if (dupMatch.getTimestamp() < match.getTimestamp()) {
+                    	duplicateMatchesSet.remove(match.getConcept());
+                    	duplicateMatchesSet.put(match.getConcept(), match);
+                	} 
+                }
+            }
+            
+			// Sort concepts by timestamp            
+            TreeSet<WfHxCheckAndProcessLuceneMatch> sortedMatches = new TreeSet<WfHxCheckAndProcessLuceneMatch>(new WfSearchResultsComparator());
+            for (WfHxCheckAndProcessLuceneMatch match : duplicateMatchesSet.values()) {
+            	sortedMatches.add(match);
+            }
+            
+
+            for (WfHxCheckAndProcessLuceneMatch match : sortedMatches) {
                 if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-                    AceLog.getAppLog().fine("Hit: " + doc + " Score: " + score);
+                    AceLog.getAppLog().fine("Hit: " + match.getDoc() + " Score: " + match.getScore());
                 }
 
-                ACE.threadPool.execute(new WfHxCheckAndProcessLuceneMatch(hitLatch, wfHxUpdater, doc, score,
-                        matches, checkList, config));
+                ACE.threadPool.execute(match);
             }
 
             if (AceLog.getAppLog().isLoggable(Level.INFO)) {
@@ -1460,6 +1495,17 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             return new CountDownLatch(0);
         }
     }
+
+	private class WfSearchResultsComparator implements Comparator<WfHxCheckAndProcessLuceneMatch> { 
+		public int compare(WfHxCheckAndProcessLuceneMatch a, WfHxCheckAndProcessLuceneMatch b) {
+			if (a.getTimestamp() > b.getTimestamp()) {
+				return 1;
+			} else {
+				return -1;
+			}
+		}
+	}
+	
 
     @Override
     public void setup(Object envHome, boolean readOnly, Long cacheSize) throws IOException {

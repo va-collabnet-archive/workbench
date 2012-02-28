@@ -23,6 +23,22 @@ public class WfHxCheckAndProcessLuceneMatch extends CheckAndProcessLuceneMatch {
 		super(hitLatch, updater, doc, score, matches, checkList, config);
 	}
 
+	public Long getTimestamp() {
+		return Long.parseLong(doc.get("lastTime"));
+	}
+	
+	public String getConcept() {
+		return doc.get("conceptId");
+	}
+	
+	public float getScore() {
+		return score;
+	}
+
+	public Document getDoc() {
+		return doc;
+	}
+	
 	public void run() {
 		LuceneMatch match = null;
 	
