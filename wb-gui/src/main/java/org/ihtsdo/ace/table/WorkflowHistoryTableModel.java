@@ -40,6 +40,7 @@ import org.dwfa.ace.search.LuceneMatch;
 import org.dwfa.ace.search.workflow.LuceneWfHxMatch;
 import org.dwfa.ace.table.StringWithTuple;
 import org.dwfa.ace.table.ConceptAttributeTableModel.StringWithConceptTuple;
+import org.ihtsdo.ace.table.WorkflowHistoryTableModel.WorkflowStringWithConceptTuple;
 import org.ihtsdo.lucene.WorkflowLuceneSearchResult;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
@@ -54,8 +55,8 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
     private ArrayList<WorkflowLuceneSearchResult> wfHistoryList = new ArrayList<WorkflowLuceneSearchResult>();
 
     public enum WORKFLOW_FIELD { 
-    	FSN("FSN", 5, 800, 650), EDITOR("WorkflowUser", 5, 250, 250), 
-    	STATE("State", 5, 250, 250), TIMESTAMP("TimeStamp", 5, 75, 200);
+    	FSN("FSN", 0, 5, 800, 650), EDITOR("WorkflowUser", 1, 5, 250, 250), 
+    	STATE("State", 2, 5, 250, 250), TIMESTAMP("TimeStamp", 3, 5, 225, 225);
 
  /*
   *  FSN("FSN", 5, 400, 600), 	  	STATE("State", 5, 115, 150), 	ACTION("Action", 5, 115, 150), 	  
@@ -66,9 +67,11 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
         private int pref;
         private int max;
         private String columnName;
+        private int columnNumber;
 
-        private WORKFLOW_FIELD(String columnName, int min, int pref, int max) {
+        private WORKFLOW_FIELD(String columnName, int columnNumber, int min, int pref, int max) {
             this.columnName = columnName;
+            this.columnNumber = columnNumber;
             this.min = min;
             this.pref = pref;
             this.max = max;
@@ -76,6 +79,10 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
 
         public String getColumnName() {
             return columnName;
+        }
+
+        public int getColumnNumber() {
+            return columnNumber;
         }
 
         public int getMax() {
@@ -351,6 +358,10 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
         public I_ConceptAttributeTuple getTuple() {
             return tuple;
         }
+
+		public int compareTo(WorkflowStringWithConceptTuple o2) {
+			return this.getCellText().compareTo(o2.getCellText());
+		}
     }
 
 	public void clearResults() {

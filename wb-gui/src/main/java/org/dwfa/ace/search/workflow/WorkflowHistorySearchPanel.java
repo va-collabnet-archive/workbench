@@ -68,8 +68,8 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.I_HostConceptPlugins.LINK_TYPE;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.gui.concept.ConceptPanel;
 import org.dwfa.ace.log.AceLog;
@@ -81,11 +81,10 @@ import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.ace.tree.ExpandPathToNodeStateListener;
 import org.dwfa.ace.tree.JTreeWithDragImage;
-import org.dwfa.bpa.util.SortClickListener;
 import org.ihtsdo.ace.table.WorkflowHistoryTableModel;
-import org.ihtsdo.ace.table.WorkflowHistoryTableRenderer;
 import org.ihtsdo.ace.table.WorkflowHistoryTableModel.WORKFLOW_FIELD;
 import org.ihtsdo.ace.table.WorkflowHistoryTableModel.WorkflowStringWithConceptTuple;
+import org.ihtsdo.ace.table.WorkflowHistoryTableRenderer;
 import org.ihtsdo.ace.task.workflow.search.AbstractWorkflowHistorySearchTest;
 
 public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterionPanel {
@@ -570,7 +569,7 @@ public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterio
 
         wfHistoryTable = new JTableWithDragImage(model);
         wfHistoryTable.setAutoCreateColumnsFromModel(true);
-        SortClickListener.setupSorter(wfHistoryTable);
+        wfHistoryTable.setRowSorter(new WfSearchResultsSorter(model));
         wfHistoryTable.setDragEnabled(false);
         wfHistoryTable.setTransferHandler(new TerminologyTransferHandler(this));
         WorkflowHistoryTableRenderer renderer = new WorkflowHistoryTableRenderer(config, true);
