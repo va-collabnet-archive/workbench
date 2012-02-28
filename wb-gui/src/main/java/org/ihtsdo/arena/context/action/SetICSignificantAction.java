@@ -45,6 +45,7 @@ public class SetICSignificantAction extends AbstractAction {
                 initialWord = descText;
             }
             //compare to initial word of returned descriptions
+            boolean initialSignificance = desc.isInitialCaseSignificant();
             for (DescriptionVersionBI descVersion : descConcept.getDescsActive()) {
                 String otherText = descVersion.getText();
                 //if same word then add to description list
@@ -54,7 +55,8 @@ public class SetICSignificantAction extends AbstractAction {
                 } else {
                     otherInitialWord = otherText;
                 }
-                if (initialWord.equals(otherInitialWord)) {
+                if (initialWord.equals(otherInitialWord) &&
+                        initialSignificance == descVersion.isInitialCaseSignificant()) {
                     DescriptionAnalogBI analog = null;
                     if (desc.isInitialCaseSignificant()) {
                         if (descVersion.isUncommitted()) {
