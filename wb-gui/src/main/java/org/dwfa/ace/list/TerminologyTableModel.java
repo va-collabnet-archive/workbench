@@ -205,10 +205,8 @@ public class TerminologyTableModel extends AbstractTableModel implements
                 index = 0;
                 for (ConceptChronicleBI c : elements) {
                     if (changedComponentTemplates.contains(c.getConceptNid())) {
-                        System.out.println("Using index: " + index);
                         fireTableRowsUpdated(index, index);
                     }
-                    System.out.println(index);
                     index++;
                 }
             }
