@@ -211,8 +211,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 				if(actions.containsKey(currentAction.getName())){
 					JOptionPane.showMessageDialog(this, "An action with the same name already exist.");
 					return;
-				}
-				else{
+				}else{
 					actions.put(currentAction.getName(), currentAction);
 					DefaultListModel lmodel = new DefaultListModel();
 					if(actions.size()>0)

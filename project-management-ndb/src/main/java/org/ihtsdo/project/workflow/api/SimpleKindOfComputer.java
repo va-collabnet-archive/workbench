@@ -43,12 +43,16 @@ public class SimpleKindOfComputer {
 		ConceptVersionBI parentConcept = null;
 		ConceptVersionBI subtypeConcept = null;
 		try {
-			parentConcept = Ts.get().getConceptVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), parent);
-			subtypeConcept = Ts.get().getConceptVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), descendant);
-			if (parentConcept == null || subtypeConcept == null) {
-				result = false;
+			if (parent != null && descendant != null) {
+				parentConcept = Ts.get().getConceptVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), parent);
+				subtypeConcept = Ts.get().getConceptVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), descendant);
+				if (parentConcept == null || subtypeConcept == null) {
+					result = false;
+				} else {
+					result = subtypeConcept.isKindOf(parentConcept);
+				}
 			} else {
-				result = subtypeConcept.isKindOf(parentConcept);
+				return false;
 			}
 		} catch (java.lang.AssertionError e) {
 			System.out.println("Error retrieving concepts in iParentOf: " + parent + ", " + subtypeConcept);
