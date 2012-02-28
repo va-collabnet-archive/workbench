@@ -54,6 +54,7 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 public class CollectionEditorContainer extends JPanel {
     public JButton addUncommittedToListButton;
+    private TerminologyTable table;
 
     public class ImportListButtonListener implements ActionListener {
 
@@ -224,6 +225,7 @@ public CollectionEditorContainer(TerminologyTable table, ACE ace)
             throws IOException, ClassNotFoundException, NoSuchAlgorithmException, TerminologyException {
         super(new GridBagLayout());
         this.ace = ace;
+        this.table = table;
         this.list = table.getList();
 
 
@@ -413,16 +415,23 @@ public CollectionEditorContainer(TerminologyTable table, ACE ace)
                 ois.close();
                 getConfig().setStatusMessage("Executing: " + bp.getName());
                 final MasterWorker worker = getConfig().getWorker();
-                // Set concept bean
-                // Set config
-                JList conceptList = getConfig().getBatchConceptList();
-                I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
-
                 I_GetConceptData concept = null;
-                if (conceptList.getSelectedIndex() != -1) {
-                    concept = (I_GetConceptData) model.getElementAt(conceptList.getSelectedIndex());
-                }
+                if(table != null){
+                    int index = table.convertRowIndexToModel(table.getSelectedRow());
+                    JList conceptList = getConfig().getBatchConceptList();
+                    I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
+                    concept = (I_GetConceptData) model.getElementAt(index);
+                }else{
+                    // Set concept bean
+                    // Set config
+                    JList conceptList = getConfig().getBatchConceptList();
+                    I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
 
+                    if (conceptList.getSelectedIndex() != -1) {
+                        concept = (I_GetConceptData) model.getElementAt(conceptList.getSelectedIndex());
+                    }
+                }
+                
                 worker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), getConfig());
                 bp.writeAttachment(ProcessAttachmentKeys.I_GET_CONCEPT_DATA.name(), concept);
                 worker.writeAttachment(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name(), conceptPanel);

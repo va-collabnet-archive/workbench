@@ -10,6 +10,7 @@ import java.util.Set;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableColumn;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.ihtsdo.arena.conceptview.ConceptTemplates;
 import org.ihtsdo.arena.drools.EditPanelKb;
@@ -29,39 +30,22 @@ public class TerminologyTableModel extends AbstractTableModel implements
 
     public enum MODEL_FIELD {
 
-        CONCEPT("concepts", 5, 400, 2000),
-        TEMPLATE("templates", 5, 10, 55),
-        DATA_CHECK("data checks", 5, 10, 55);
+        CONCEPT("concepts"),
+        TEMPLATE("templates"),
+        DATA_CHECK("data checks");
         private String columnName;
-        private int min;
-        private int pref;
-        private int max;
 
-        private MODEL_FIELD(String columnName, int min, int pref, int max) {
+        private MODEL_FIELD(String columnName) {
             this.columnName = columnName;
-            this.min = min;
-            this.pref = pref;
-            this.max = max;
         }
 
         public String getColumnName() {
             return columnName;
         }
-
-        public int getMax() {
-            return max;
-        }
-
-        public int getMin() {
-            return min;
-        }
-
-        public int getPref() {
-            return pref;
-        }
     }
     private MODEL_FIELD[] columns;
     private TerminologyList list;
+    private EditPanelKb kb;
 
     public TerminologyTableModel() {
         super();
@@ -71,10 +55,10 @@ public class TerminologyTableModel extends AbstractTableModel implements
         super();
         this.list = list;
         this.list.getModel().addListDataListener(this);
+        kb = ConceptTemplates.getKb();
         Ts.get().addTermChangeListener(listViewChangeListener);
         for (I_GetConceptData c : list.getTerminologyModel().elements) {
             elements.add((ConceptChronicleBI) c);
-            EditPanelKb kb = ConceptTemplates.getKb();
             kb.setConcept(c);
         }
 
@@ -178,6 +162,7 @@ public class TerminologyTableModel extends AbstractTableModel implements
         I_GetConceptData newElement = list.dataModel.getElementAt(index);
         if (!elements.contains((ConceptChronicleBI) newElement)) {
             elements.add(index, (ConceptChronicleBI) newElement);
+            kb.setConcept((I_GetConceptData) newElement);
         }
         fireTableRowsInserted(index, index);
     }
@@ -188,7 +173,7 @@ public class TerminologyTableModel extends AbstractTableModel implements
         int index1 = lde.getIndex1();
         if (index1 == elements.size()) {
             elements.clear();
-            fireTableRowsDeleted(index, index1);
+            fireTableDataChanged();
         } else {
             elements.remove(index);
             fireTableRowsDeleted(index, index);
@@ -200,6 +185,7 @@ public class TerminologyTableModel extends AbstractTableModel implements
         List<I_GetConceptData> listElements = list.dataModel.getElements();
         elements.clear();
         for (I_GetConceptData c : listElements) {
+            kb.setConcept(c);
             elements.add((ConceptChronicleBI) c);
         }
         fireTableDataChanged();
@@ -216,10 +202,13 @@ public class TerminologyTableModel extends AbstractTableModel implements
                 Set<Integer> changedComponentAlerts,
                 Set<Integer> changedComponentTemplates) {
             if (!changedComponentTemplates.isEmpty()) {
+                index = 0;
                 for (ConceptChronicleBI c : elements) {
                     if (changedComponentTemplates.contains(c.getConceptNid())) {
+                        System.out.println("Using index: " + index);
                         fireTableRowsUpdated(index, index);
                     }
+                    System.out.println(index);
                     index++;
                 }
             }

@@ -164,7 +164,7 @@ public class TerminologyTransferHandler extends TransferHandler {
                 return new ConceptTransferable((I_GetConceptData) list.getSelectedValue());
             } else if (TerminologyTable.class.isAssignableFrom(c.getClass())) {
                 TerminologyTable table = (TerminologyTable) c;
-                int index = table.getSelectedRow();
+                int index = table.convertRowIndexToModel(table.getSelectedRow());
                 return new ConceptTransferable((I_GetConceptData) table.getModel().getValueAt(index, TerminologyTableModel.MODEL_FIELD.CONCEPT.ordinal()) );
             }else if (JTable.class.isAssignableFrom(c.getClass())) {
                 JTable termTable = (JTable) c;

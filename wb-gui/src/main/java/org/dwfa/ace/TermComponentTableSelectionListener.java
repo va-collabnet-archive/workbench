@@ -53,7 +53,8 @@ public class TermComponentTableSelectionListener implements ListSelectionListene
         if (index == -1) {
             linkedComponent.setTermComponent(null);
         } else {
-            linkedComponent.setTermComponent((I_GetConceptData) table.getModel().getValueAt(index, MODEL_FIELD.CONCEPT.ordinal()));
+            int tableIndex = table.convertRowIndexToModel(index);
+            linkedComponent.setTermComponent((I_GetConceptData) table.getModel().getValueAt(tableIndex, MODEL_FIELD.CONCEPT.ordinal()));
         }
     }
 
