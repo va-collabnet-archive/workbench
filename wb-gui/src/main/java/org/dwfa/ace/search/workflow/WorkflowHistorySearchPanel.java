@@ -204,7 +204,7 @@ public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterio
 				    int viewRowIndex = lsm.getMinSelectionIndex();
 	                int modelRow = wfHistoryTable.convertRowIndexToModel(viewRowIndex);
 
-	                WorkflowStringWithConceptTuple result = (WorkflowStringWithConceptTuple) wfHistoryTable.getValueAt(modelRow, 0);
+	                WorkflowStringWithConceptTuple result = (WorkflowStringWithConceptTuple) wfHistoryTable.getModel().getValueAt(modelRow, 0);
 	            	I_GetConceptData concept = Terms.get().getConcept(result.getTuple().getConceptNid());
 
 	                for (I_ContainTermComponent l : linkedComponents) {
