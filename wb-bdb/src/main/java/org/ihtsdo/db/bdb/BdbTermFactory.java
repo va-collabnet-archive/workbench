@@ -1171,6 +1171,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
    @Override
    public I_ReadChangeSet newWfHxLuceneChangeSetReader(File changeSetFile) throws IOException {
         WfRefsetChangeSetReader wfcr = new WfRefsetChangeSetReader();
+        wfcr.setChangeSetFile(changeSetFile);
         return wfcr;
     }
 

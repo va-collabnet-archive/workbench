@@ -602,6 +602,7 @@ public class Bdb {
                 BdbCommitManager.shutdown();
                 activity.setProgressInfoLower("8/11: Starting LuceneManager close.");
                 LuceneManager.close(LuceneSearchType.DESCRIPTION);
+                LuceneManager.close(LuceneSearchType.WORKFLOW_HISTORY);
 
 
                 NidDataFromBdb.close();
