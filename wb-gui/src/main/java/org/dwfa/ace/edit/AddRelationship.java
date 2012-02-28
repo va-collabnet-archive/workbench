@@ -40,20 +40,25 @@ public class AddRelationship extends AddComponent {
                 new Exception("Cannot add a relationship while the component viewer is empty..."));
         } else {
             I_GetConceptData parent = config.getHierarchySelection();
-            if (parent.getNid() == cb.getNid()) {
+            if(parent != null){
+                if (parent.getNid() == cb.getNid()) {
+                    AceLog.getAppLog().alertAndLogException(
+                        new Exception("<html>Cannot create a self-referencing relationship<br>Hierarchy selection concept and " +
+                                    "and viewer concept are the same:<br><font color='blue'>" + cb.getInitialText()));
+                } else {
+                    Terms.get().newRelationship(UUID.randomUUID(), cb, 
+                        config.getDefaultRelationshipType(),
+                        parent,
+                        config.getDefaultRelationshipCharacteristic(),
+                        config.getDefaultRelationshipRefinability(), 
+                        config.getDefaultStatus(),
+                        0, config);
+                    Terms.get().addUncommitted(cb);
+                    termContainer.setTermComponent(cb);
+                }
+            }else{
                 AceLog.getAppLog().alertAndLogException(
-                    new Exception("<html>Cannot create a self-referencing relationship<br>Hierarchy selection concept and " +
-                    		"and viewer concept are the same:<br><font color='blue'>" + cb.getInitialText()));
-            } else {
-                Terms.get().newRelationship(UUID.randomUUID(), cb, 
-                    config.getDefaultRelationshipType(),
-                    parent,
-                    config.getDefaultRelationshipCharacteristic(),
-                    config.getDefaultRelationshipRefinability(), 
-                    config.getDefaultStatus(),
-                    0, config);
-            Terms.get().addUncommitted(cb);
-            termContainer.setTermComponent(cb);
+                        new Exception("Cannot add a relationship while the component viewer is empty."));
             }
         }
     }
