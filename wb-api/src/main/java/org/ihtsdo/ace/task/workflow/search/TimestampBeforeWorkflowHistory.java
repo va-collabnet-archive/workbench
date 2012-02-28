@@ -5,6 +5,7 @@ import java.io.ObjectOutputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.SortedSet;
 
@@ -69,8 +70,12 @@ public class TimestampBeforeWorkflowHistory extends AbstractWorkflowHistorySearc
      	DateFormat dfm = new SimpleDateFormat(DEFAULT_TIME_STAMP);
 
      	try {
-			return dfm.parse(testTimestampBefore).getTime();
-		} catch (ParseException e) {
+			dfm.parse(testTimestampBefore);
+     		Calendar c = dfm.getCalendar();
+     		c.add(Calendar.DAY_OF_MONTH, 1);
+     		
+     		return c.getTimeInMillis();
+ 		} catch (ParseException e) {
 			return -1;
 		}
     }
