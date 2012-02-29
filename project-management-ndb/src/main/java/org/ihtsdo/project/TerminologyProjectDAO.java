@@ -106,6 +106,7 @@ import org.ihtsdo.project.workflow.model.WfMembership;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
@@ -2712,9 +2713,10 @@ public class TerminologyProjectDAO {
 		try {
 			WorkSet nacWorkSet = getNonAssignedChangesWorkSet(getProjectForWorklist(workList, config), config);
 			addConceptAsWorkSetMember(concept, nacWorkSet.getUids().iterator().next(), config);
-			addConceptAsPartitionMember(concept, workList.getPartition(), config);
-			Terms.get().addUncommitted(workList.getPartition().getConcept());
-			workList.getPartition().getConcept().commit(config.getDbConfig().getUserChangesChangeSetPolicy().convert(), ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
+			Partition partition = workList.getPartition();
+			addConceptAsPartitionMember(concept, partition, config);
+			Terms.get().addUncommitted(partition.getConcept());
+			partition.getConcept().commit(config.getDbConfig().getUserChangesChangeSetPolicy().convert(), ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 			I_GetConceptData assingStatus = Terms.get().getConcept(
 					ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids());
 			WorkListMember workListMember = new WorkListMember(concept.toString(), concept.getConceptNid(), concept.getUids(), workList.getUids().iterator().next(), assingStatus, new java.util.Date().getTime());
@@ -3187,25 +3189,14 @@ public class TerminologyProjectDAO {
 					refsetHelper = termFactory.getRefsetHelper(config);
 				}
 				refsetHelper.newRefsetExtension(workListConcept.getConceptNid(), newMemberConcept.getConceptNid(), EConcept.REFSET_TYPES.STR, new RefsetPropertyMap().with(REFSET_PROPERTY.STRING_VALUE, ""), // metadata
-						// Removed
-						// to
-						// minimize
-						// changeset
-						// footprint
 						config);
 				termFactory.addUncommittedNoChecks(workListConcept);
 				I_GetConceptData activityStatusConcept = member.getActivityStatus();
 				promotionRefset.setDestinationAndPromotionStatus(member.getId(), assignedUserId, activityStatusConcept.getConceptNid());
-				// promotionRefset.setPromotionStatus(member.getId(),
-				// activityStatusConcept.getConceptNid());
-				// promotionRefset.setDestination(member.getId(),
-				// assignedUserId);
-				// Translation specific concept level promotion refset
 				TranslationProject transProject = (TranslationProject) getProjectForWorklist(workList, config);
 				LanguageMembershipRefset targetLanguage = new LanguageMembershipRefset(transProject.getTargetLanguageRefset(), config);
 				PromotionRefset languagePromotionRefset = targetLanguage.getPromotionRefset(config);
 				languagePromotionRefset.setPromotionStatus(member.getId(), activityStatusConcept.getConceptNid());
-				// end
 			}
 		} catch (TerminologyException e1) {
 			e1.printStackTrace();

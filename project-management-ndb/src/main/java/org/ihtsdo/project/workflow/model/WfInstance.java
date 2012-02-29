@@ -304,12 +304,16 @@ COMPLETE};
 	public boolean equals(Object obj) {
 		if(obj instanceof WfInstance){
 			WfInstance instance = (WfInstance)obj;
-			return instance.getComponentId().equals(this.componentId) &&
-			instance.getComponentName().equals(this.componentName) &&
-			instance.getWorkList().equals(this.workList) &&
-			instance.workList.getName().equals(this.workList.getName()) &&
-			instance.getDestination().equals(this.destination) &&
-			instance.getActionReport().equals(this.actionReport);
+			try{
+				return instance.getComponentId().equals(this.componentId) &&
+				instance.getComponentName().equals(this.componentName) &&
+				instance.getWorkList().equals(this.workList) &&
+				instance.workList.getName().equals(this.workList.getName()) &&
+				instance.getDestination().equals(this.destination) &&
+				instance.getActionReport().equals(this.actionReport);
+			}catch (NullPointerException npx){
+				return false;
+			}
 		}else{
 			return false;
 		}

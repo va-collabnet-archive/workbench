@@ -25,6 +25,8 @@ import java.util.UUID;
  */
 public class WfAction implements Serializable{
 
+	public static final String SEND_TO_OUTBOX = "Send to outbox";
+
 	/** The name. */
 	private String name;
 	
