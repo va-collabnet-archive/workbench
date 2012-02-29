@@ -146,6 +146,10 @@ public class SimilarityPanel extends JPanel implements Serializable {
 	/** The similarity worker. */
 	private SimilarityWorker similarityWorker = null;
 
+	private JDialog translationMemoryDialog;
+
+	private JDialog editorialGuideDialog;
+
 	/**
 	 * Instantiates a new similarity panel.
 	 */
@@ -882,6 +886,58 @@ public class SimilarityPanel extends JPanel implements Serializable {
 		similarityClon.hideButtonsPanels(rbFSN.isSelected(), rbPref.isSelected(), radioButton2.isSelected(), refineCheckBox.isSelected());
 	}
 
+	private void expandTranslationMemoryActionPerformed(ActionEvent e) {
+		expandTranslationMemory.setVisible(false);
+		button2.setVisible(false);
+		translationMemoryDialog = new JDialog();
+		translationMemoryDialog.setContentPane(scrollPane3);
+		translationMemoryDialog.setAlwaysOnTop(true);
+		translationMemoryDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+		translationMemoryDialog.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				expandTranslationMemory.setVisible(true);
+				button2.setVisible(true);
+				translationMemoryDialog.dispose();
+				panel1.add(scrollPane3, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,GridBagConstraints.CENTER, GridBagConstraints.BOTH,new Insets(0, 0, 0, 0), 0, 0));
+			}
+		});
+		translationMemoryDialog.setSize(new Dimension(700, 550));
+		Dimension pantalla = Toolkit.getDefaultToolkit().getScreenSize();
+		Dimension ventana = translationMemoryDialog.getSize();
+		translationMemoryDialog.setLocation((pantalla.width - ventana.width) / 2, (pantalla.height - ventana.height) / 2);
+
+		translationMemoryDialog.setVisible(true);
+		this.revalidate();
+		this.repaint();
+	}
+
+	private void expandEditorialGuidelinesActionPerformed(ActionEvent e) {
+		expandEditorialGuidelines.setVisible(false);
+		button3.setVisible(false);
+		editorialGuideDialog = new JDialog();
+		editorialGuideDialog.setContentPane(scrollPane4);
+		editorialGuideDialog.setAlwaysOnTop(true);
+		editorialGuideDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+		editorialGuideDialog.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				editorialGuideDialog.setVisible(true);
+				button3.setVisible(true);
+				editorialGuideDialog.dispose();
+				panel15.add(scrollPane4, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 0), 0, 0));
+			}
+		});
+		editorialGuideDialog.setSize(new Dimension(700, 550));
+		Dimension pantalla = Toolkit.getDefaultToolkit().getScreenSize();
+		Dimension ventana = editorialGuideDialog.getSize();
+		editorialGuideDialog.setLocation((pantalla.width - ventana.width) / 2, (pantalla.height - ventana.height) / 2);
+
+		editorialGuideDialog.setVisible(true);
+		this.revalidate();
+		this.repaint();
+	}
+
 	/**
 	 * Inits the components.
 	 */
@@ -891,6 +947,7 @@ public class SimilarityPanel extends JPanel implements Serializable {
 		similarityPanel = new JPanel();
 		panel2 = new JPanel();
 		label1 = new JLabel();
+		expandButton = new JButton();
 		button1 = new JButton();
 		label4 = new JLabel();
 		refinePanel = new JPanel();
@@ -904,11 +961,11 @@ public class SimilarityPanel extends JPanel implements Serializable {
 		rbPref = new JRadioButton();
 		radioButton2 = new JRadioButton();
 		refineCheckBox = new JCheckBox();
-		expandButton = new JButton();
 		newSimilarityButton = new JButton();
 		panel1 = new JPanel();
 		panel3 = new JPanel();
 		label2 = new JLabel();
+		expandTranslationMemory = new JButton();
 		button2 = new JButton();
 		label5 = new JLabel();
 		scrollPane3 = new JScrollPane();
@@ -916,6 +973,7 @@ public class SimilarityPanel extends JPanel implements Serializable {
 		panel15 = new JPanel();
 		panel4 = new JPanel();
 		label3 = new JLabel();
+		expandEditorialGuidelines = new JButton();
 		button3 = new JButton();
 		label6 = new JLabel();
 		scrollPane4 = new JScrollPane();
@@ -924,38 +982,55 @@ public class SimilarityPanel extends JPanel implements Serializable {
 		copySourceItem = new JMenuItem();
 		copyTargetItem = new JMenuItem();
 
-		// ======== this ========
+		//======== this ========
 		setBorder(new EmptyBorder(5, 5, 5, 5));
 		setLayout(new GridBagLayout());
-		((GridBagLayout) getLayout()).columnWidths = new int[] { 0, 0 };
-		((GridBagLayout) getLayout()).rowHeights = new int[] { 0, 0, 0, 0 };
-		((GridBagLayout) getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
-		((GridBagLayout) getLayout()).rowWeights = new double[] { 1.0, 1.0, 0.0, 1.0E-4 };
+		((GridBagLayout)getLayout()).columnWidths = new int[] {0, 0};
+		((GridBagLayout)getLayout()).rowHeights = new int[] {0, 0, 0, 0};
+		((GridBagLayout)getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+		((GridBagLayout)getLayout()).rowWeights = new double[] {1.0, 1.0, 0.0, 1.0E-4};
 
-		// ======== similarityPanel ========
+		//======== similarityPanel ========
 		{
 			similarityPanel.setBackground(new Color(238, 238, 238));
-			similarityPanel.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(5, 5, 5, 5)));
+			similarityPanel.setBorder(new CompoundBorder(
+				new EtchedBorder(),
+				new EmptyBorder(5, 5, 5, 5)));
 			similarityPanel.setLayout(new GridBagLayout());
-			((GridBagLayout) similarityPanel.getLayout()).columnWidths = new int[] { 0, 0 };
-			((GridBagLayout) similarityPanel.getLayout()).rowHeights = new int[] { 0, 0, 15, 0, 0, 0 };
-			((GridBagLayout) similarityPanel.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
-			((GridBagLayout) similarityPanel.getLayout()).rowWeights = new double[] { 0.0, 0.0, 0.0, 1.0, 0.0, 1.0E-4 };
+			((GridBagLayout)similarityPanel.getLayout()).columnWidths = new int[] {0, 0};
+			((GridBagLayout)similarityPanel.getLayout()).rowHeights = new int[] {0, 0, 15, 0, 0, 0};
+			((GridBagLayout)similarityPanel.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+			((GridBagLayout)similarityPanel.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 1.0, 0.0, 1.0E-4};
 
-			// ======== panel2 ========
+			//======== panel2 ========
 			{
 				panel2.setLayout(new GridBagLayout());
-				((GridBagLayout) panel2.getLayout()).columnWidths = new int[] { 0, 0, 0, 0 };
-				((GridBagLayout) panel2.getLayout()).rowHeights = new int[] { 0, 0 };
-				((GridBagLayout) panel2.getLayout()).columnWeights = new double[] { 1.0, 0.0, 0.0, 1.0E-4 };
-				((GridBagLayout) panel2.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
+				((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {130, 0, 0, 0, 0, 0};
+				((GridBagLayout)panel2.getLayout()).rowHeights = new int[] {0, 0};
+				((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {1.0, 1.0, 1.0, 1.0, 0.0, 1.0E-4};
+				((GridBagLayout)panel2.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
-				// ---- label1 ----
+				//---- label1 ----
 				label1.setText("Similarity");
 				label1.setHorizontalAlignment(SwingConstants.LEFT);
-				panel2.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+				panel2.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
-				// ---- button1 ----
+				//---- expandButton ----
+				expandButton.setText("E[x]pand");
+				expandButton.setMnemonic('X');
+				expandButton.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						expandButtonActionPerformed(e);
+					}
+				});
+				panel2.add(expandButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
+
+				//---- button1 ----
 				button1.setText("Hide");
 				button1.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 				button1.addActionListener(new ActionListener() {
@@ -964,9 +1039,11 @@ public class SimilarityPanel extends JPanel implements Serializable {
 						button1ActionPerformed(e);
 					}
 				});
-				panel2.add(button1, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+				panel2.add(button1, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
-				// ---- label4 ----
+				//---- label4 ----
 				label4.setText("text");
 				label4.addMouseListener(new MouseAdapter() {
 					@Override
@@ -974,40 +1051,52 @@ public class SimilarityPanel extends JPanel implements Serializable {
 						label4MouseClicked(e);
 					}
 				});
-				panel2.add(label4, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+				panel2.add(label4, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 0), 0, 0));
 			}
-			similarityPanel.add(panel2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+			similarityPanel.add(panel2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 0), 0, 0));
 
-			// ======== refinePanel ========
+			//======== refinePanel ========
 			{
 				refinePanel.setBackground(new Color(238, 238, 238));
 				refinePanel.setLayout(new GridBagLayout());
-				((GridBagLayout) refinePanel.getLayout()).columnWidths = new int[] { 233, 0, 0 };
-				((GridBagLayout) refinePanel.getLayout()).rowHeights = new int[] { 0, 0 };
-				((GridBagLayout) refinePanel.getLayout()).columnWeights = new double[] { 0.0, 0.0, 1.0E-4 };
-				((GridBagLayout) refinePanel.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
+				((GridBagLayout)refinePanel.getLayout()).columnWidths = new int[] {233, 0, 0};
+				((GridBagLayout)refinePanel.getLayout()).rowHeights = new int[] {0, 0};
+				((GridBagLayout)refinePanel.getLayout()).columnWeights = new double[] {0.0, 0.0, 1.0E-4};
+				((GridBagLayout)refinePanel.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 				refinePanel.setVisible(false);
-				refinePanel.add(searchTextField, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+				refinePanel.add(searchTextField, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
-				// ---- searchButton ----
+				//---- searchButton ----
 				searchButton.setAction(null);
 				searchButton.setText("Sea[r]ch");
 				searchButton.setMnemonic('R');
-				refinePanel.add(searchButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+				refinePanel.add(searchButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 0), 0, 0));
 			}
-			similarityPanel.add(refinePanel, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+			similarityPanel.add(refinePanel, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 0), 0, 0));
 
-			// ---- progressBar1 ----
+			//---- progressBar1 ----
 			progressBar1.setMinimumSize(new Dimension(10, 10));
 			progressBar1.setMaximumSize(new Dimension(32767, 10));
 			progressBar1.setPreferredSize(new Dimension(146, 10));
 			progressBar1.setVisible(false);
-			similarityPanel.add(progressBar1, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+			similarityPanel.add(progressBar1, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 0), 0, 0));
 
-			// ======== scrollPane2 ========
+			//======== scrollPane2 ========
 			{
 
-				// ---- similarityTable ----
+				//---- similarityTable ----
 				similarityTable.setPreferredScrollableViewportSize(new Dimension(180, 200));
 				similarityTable.setFont(new Font("Verdana", Font.PLAIN, 12));
 				similarityTable.setModel(new DefaultTableModel());
@@ -1020,18 +1109,20 @@ public class SimilarityPanel extends JPanel implements Serializable {
 				});
 				scrollPane2.setViewportView(similarityTable);
 			}
-			similarityPanel.add(scrollPane2, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+			similarityPanel.add(scrollPane2, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 0), 0, 0));
 
-			// ======== panel13 ========
+			//======== panel13 ========
 			{
 				panel13.setBackground(new Color(238, 238, 238));
 				panel13.setLayout(new GridBagLayout());
-				((GridBagLayout) panel13.getLayout()).columnWidths = new int[] { 0, 0, 0, 0, 0 };
-				((GridBagLayout) panel13.getLayout()).rowHeights = new int[] { 0, 0, 10, 0 };
-				((GridBagLayout) panel13.getLayout()).columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 1.0E-4 };
-				((GridBagLayout) panel13.getLayout()).rowWeights = new double[] { 0.0, 0.0, 0.0, 1.0E-4 };
+				((GridBagLayout)panel13.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0};
+				((GridBagLayout)panel13.getLayout()).rowHeights = new int[] {0, 0, 0};
+				((GridBagLayout)panel13.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 1.0E-4};
+				((GridBagLayout)panel13.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0E-4};
 
-				// ---- rbFSN ----
+				//---- rbFSN ----
 				rbFSN.setText("FSN");
 				rbFSN.setSelected(true);
 				rbFSN.setBackground(new Color(238, 238, 238));
@@ -1041,9 +1132,11 @@ public class SimilarityPanel extends JPanel implements Serializable {
 						rbFSNActionPerformed(e);
 					}
 				});
-				panel13.add(rbFSN, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+				panel13.add(rbFSN, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 5), 0, 0));
 
-				// ---- rbPref ----
+				//---- rbPref ----
 				rbPref.setText("Preferred");
 				rbPref.setBackground(new Color(238, 238, 238));
 				rbPref.addActionListener(new ActionListener() {
@@ -1052,9 +1145,11 @@ public class SimilarityPanel extends JPanel implements Serializable {
 						rbPrefActionPerformed(e);
 					}
 				});
-				panel13.add(rbPref, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+				panel13.add(rbPref, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 5), 0, 0));
 
-				// ---- radioButton2 ----
+				//---- radioButton2 ----
 				radioButton2.setText("Both");
 				radioButton2.setBackground(new Color(238, 238, 238));
 				radioButton2.addActionListener(new ActionListener() {
@@ -1063,24 +1158,17 @@ public class SimilarityPanel extends JPanel implements Serializable {
 						radioButton2ActionPerformed(e);
 					}
 				});
-				panel13.add(radioButton2, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+				panel13.add(radioButton2, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 5), 0, 0));
 
-				// ---- refineCheckBox ----
+				//---- refineCheckBox ----
 				refineCheckBox.setText("Refine");
-				panel13.add(refineCheckBox, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+				panel13.add(refineCheckBox, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 0), 0, 0));
 
-				// ---- expandButton ----
-				expandButton.setText("E[x]pand");
-				expandButton.setMnemonic('X');
-				expandButton.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						expandButtonActionPerformed(e);
-					}
-				});
-				panel13.add(expandButton, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
-
-				// ---- newSimilarityButton ----
+				//---- newSimilarityButton ----
 				newSimilarityButton.setText("Open new similarity search");
 				newSimilarityButton.addActionListener(new ActionListener() {
 					@Override
@@ -1088,34 +1176,56 @@ public class SimilarityPanel extends JPanel implements Serializable {
 						newSimilarityButtonActionPerformed(e);
 					}
 				});
-				panel13.add(newSimilarityButton, new GridBagConstraints(1, 1, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+				panel13.add(newSimilarityButton, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 			}
-			similarityPanel.add(panel13, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+			similarityPanel.add(panel13, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 0), 0, 0));
 		}
-		add(similarityPanel, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+		add(similarityPanel, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 5, 0), 0, 0));
 
-		// ======== panel1 ========
+		//======== panel1 ========
 		{
-			panel1.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(5, 5, 5, 5)));
+			panel1.setBorder(new CompoundBorder(
+				new EtchedBorder(),
+				new EmptyBorder(5, 5, 5, 5)));
 			panel1.setLayout(new GridBagLayout());
-			((GridBagLayout) panel1.getLayout()).columnWidths = new int[] { 0, 0 };
-			((GridBagLayout) panel1.getLayout()).rowHeights = new int[] { 0, 0, 0 };
-			((GridBagLayout) panel1.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
-			((GridBagLayout) panel1.getLayout()).rowWeights = new double[] { 0.0, 1.0, 1.0E-4 };
+			((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 0};
+			((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0, 0};
+			((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+			((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0E-4};
 
-			// ======== panel3 ========
+			//======== panel3 ========
 			{
 				panel3.setLayout(new GridBagLayout());
-				((GridBagLayout) panel3.getLayout()).columnWidths = new int[] { 0, 0, 0, 0 };
-				((GridBagLayout) panel3.getLayout()).rowHeights = new int[] { 0, 0 };
-				((GridBagLayout) panel3.getLayout()).columnWeights = new double[] { 1.0, 0.0, 0.0, 1.0E-4 };
-				((GridBagLayout) panel3.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
+				((GridBagLayout)panel3.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0};
+				((GridBagLayout)panel3.getLayout()).rowHeights = new int[] {0, 0};
+				((GridBagLayout)panel3.getLayout()).columnWeights = new double[] {1.0, 0.0, 0.0, 0.0, 1.0E-4};
+				((GridBagLayout)panel3.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
-				// ---- label2 ----
+				//---- label2 ----
 				label2.setText("Translation Memory");
-				panel3.add(label2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+				panel3.add(label2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
-				// ---- button2 ----
+				//---- expandTranslationMemory ----
+				expandTranslationMemory.setText("Expand");
+				expandTranslationMemory.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						expandTranslationMemoryActionPerformed(e);
+					}
+				});
+				panel3.add(expandTranslationMemory, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
+
+				//---- button2 ----
 				button2.setText("Hide");
 				button2.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 				button2.addActionListener(new ActionListener() {
@@ -1124,9 +1234,11 @@ public class SimilarityPanel extends JPanel implements Serializable {
 						button2ActionPerformed(e);
 					}
 				});
-				panel3.add(button2, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+				panel3.add(button2, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
-				// ---- label5 ----
+				//---- label5 ----
 				label5.setText("text");
 				label5.addMouseListener(new MouseAdapter() {
 					@Override
@@ -1134,44 +1246,68 @@ public class SimilarityPanel extends JPanel implements Serializable {
 						label5MouseClicked(e);
 					}
 				});
-				panel3.add(label5, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+				panel3.add(label5, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 0), 0, 0));
 			}
-			panel1.add(panel3, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+			panel1.add(panel3, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 0), 0, 0));
 
-			// ======== scrollPane3 ========
+			//======== scrollPane3 ========
 			{
 
-				// ---- table2 ----
+				//---- table2 ----
 				table2.setPreferredScrollableViewportSize(new Dimension(180, 200));
 				table2.setFont(new Font("Verdana", Font.PLAIN, 12));
 				scrollPane3.setViewportView(table2);
 			}
-			panel1.add(scrollPane3, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+			panel1.add(scrollPane3, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 0), 0, 0));
 		}
-		add(panel1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+		add(panel1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 5, 0), 0, 0));
 
-		// ======== panel15 ========
+		//======== panel15 ========
 		{
-			panel15.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(5, 5, 5, 5)));
+			panel15.setBorder(new CompoundBorder(
+				new EtchedBorder(),
+				new EmptyBorder(5, 5, 5, 5)));
 			panel15.setLayout(new GridBagLayout());
-			((GridBagLayout) panel15.getLayout()).columnWidths = new int[] { 0, 0 };
-			((GridBagLayout) panel15.getLayout()).rowHeights = new int[] { 0, 0, 0 };
-			((GridBagLayout) panel15.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
-			((GridBagLayout) panel15.getLayout()).rowWeights = new double[] { 0.0, 1.0, 1.0E-4 };
+			((GridBagLayout)panel15.getLayout()).columnWidths = new int[] {0, 0};
+			((GridBagLayout)panel15.getLayout()).rowHeights = new int[] {0, 0, 0};
+			((GridBagLayout)panel15.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+			((GridBagLayout)panel15.getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0E-4};
 
-			// ======== panel4 ========
+			//======== panel4 ========
 			{
 				panel4.setLayout(new GridBagLayout());
-				((GridBagLayout) panel4.getLayout()).columnWidths = new int[] { 0, 0, 0, 0 };
-				((GridBagLayout) panel4.getLayout()).rowHeights = new int[] { 0, 0 };
-				((GridBagLayout) panel4.getLayout()).columnWeights = new double[] { 1.0, 0.0, 0.0, 1.0E-4 };
-				((GridBagLayout) panel4.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
+				((GridBagLayout)panel4.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0};
+				((GridBagLayout)panel4.getLayout()).rowHeights = new int[] {0, 0};
+				((GridBagLayout)panel4.getLayout()).columnWeights = new double[] {1.0, 0.0, 0.0, 0.0, 1.0E-4};
+				((GridBagLayout)panel4.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
-				// ---- label3 ----
+				//---- label3 ----
 				label3.setText("Editorial Guidelines");
-				panel4.add(label3, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+				panel4.add(label3, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
-				// ---- button3 ----
+				//---- expandEditorialGuidelines ----
+				expandEditorialGuidelines.setText("Expand");
+				expandEditorialGuidelines.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						expandEditorialGuidelinesActionPerformed(e);
+					}
+				});
+				panel4.add(expandEditorialGuidelines, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
+
+				//---- button3 ----
 				button3.setText("Hide");
 				button3.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 				button3.addActionListener(new ActionListener() {
@@ -1180,9 +1316,11 @@ public class SimilarityPanel extends JPanel implements Serializable {
 						button3ActionPerformed(e);
 					}
 				});
-				panel4.add(button3, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+				panel4.add(button3, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
-				// ---- label6 ----
+				//---- label6 ----
 				label6.setText("text");
 				label6.addMouseListener(new MouseAdapter() {
 					@Override
@@ -1190,25 +1328,33 @@ public class SimilarityPanel extends JPanel implements Serializable {
 						label6MouseClicked(e);
 					}
 				});
-				panel4.add(label6, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+				panel4.add(label6, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 0), 0, 0));
 			}
-			panel15.add(panel4, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+			panel15.add(panel4, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 0), 0, 0));
 
-			// ======== scrollPane4 ========
+			//======== scrollPane4 ========
 			{
 
-				// ---- editorPane1 ----
+				//---- editorPane1 ----
 				editorPane1.setContentType("text/html");
 				scrollPane4.setViewportView(editorPane1);
 			}
-			panel15.add(scrollPane4, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+			panel15.add(scrollPane4, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 0), 0, 0));
 		}
-		add(panel15, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+		add(panel15, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 0, 0), 0, 0));
 
-		// ======== similPopUp ========
+		//======== similPopUp ========
 		{
 
-			// ---- copySourceItem ----
+			//---- copySourceItem ----
 			copySourceItem.setText("Copy source to clipboard");
 			copySourceItem.addActionListener(new ActionListener() {
 				@Override
@@ -1218,7 +1364,7 @@ public class SimilarityPanel extends JPanel implements Serializable {
 			});
 			similPopUp.add(copySourceItem);
 
-			// ---- copyTargetItem ----
+			//---- copyTargetItem ----
 			copyTargetItem.setText("Copy target to clipboard");
 			copyTargetItem.addActionListener(new ActionListener() {
 				@Override
@@ -1229,7 +1375,7 @@ public class SimilarityPanel extends JPanel implements Serializable {
 			similPopUp.add(copyTargetItem);
 		}
 
-		// ---- buttonGroup2 ----
+		//---- buttonGroup2 ----
 		ButtonGroup buttonGroup2 = new ButtonGroup();
 		buttonGroup2.add(rbFSN);
 		buttonGroup2.add(rbPref);
@@ -1239,111 +1385,43 @@ public class SimilarityPanel extends JPanel implements Serializable {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
-	/** The similarity panel. */
 	private JPanel similarityPanel;
-
-	/** The panel2. */
 	private JPanel panel2;
-
-	/** The label1. */
 	private JLabel label1;
-
-	/** The button1. */
-	private JButton button1;
-
-	/** The label4. */
-	private JLabel label4;
-
-	/** The refine panel. */
-	private JPanel refinePanel;
-
-	/** The search text field. */
-	private JTextField searchTextField;
-
-	/** The search button. */
-	private JButton searchButton;
-
-	/** The progress bar1. */
-	private JProgressBar progressBar1;
-
-	/** The scroll pane2. */
-	private JScrollPane scrollPane2;
-
-	/** The similarity table. */
-	private ZebraJTable similarityTable;
-
-	/** The panel13. */
-	private JPanel panel13;
-
-	/** The rb fsn. */
-	private JRadioButton rbFSN;
-
-	/** The rb pref. */
-	private JRadioButton rbPref;
-
-	/** The radio button2. */
-	private JRadioButton radioButton2;
-
-	/** The refine check box. */
-	private JCheckBox refineCheckBox;
-
-	/** The expand button. */
 	private JButton expandButton;
-
-	/** The new similarity button. */
+	private JButton button1;
+	private JLabel label4;
+	private JPanel refinePanel;
+	private JTextField searchTextField;
+	private JButton searchButton;
+	private JProgressBar progressBar1;
+	private JScrollPane scrollPane2;
+	private ZebraJTable similarityTable;
+	private JPanel panel13;
+	private JRadioButton rbFSN;
+	private JRadioButton rbPref;
+	private JRadioButton radioButton2;
+	private JCheckBox refineCheckBox;
 	private JButton newSimilarityButton;
-
-	/** The panel1. */
 	private JPanel panel1;
-
-	/** The panel3. */
 	private JPanel panel3;
-
-	/** The label2. */
 	private JLabel label2;
-
-	/** The button2. */
+	private JButton expandTranslationMemory;
 	private JButton button2;
-
-	/** The label5. */
 	private JLabel label5;
-
-	/** The scroll pane3. */
 	private JScrollPane scrollPane3;
-
-	/** The table2. */
 	private ZebraJTable table2;
-
-	/** The panel15. */
 	private JPanel panel15;
-
-	/** The panel4. */
 	private JPanel panel4;
-
-	/** The label3. */
 	private JLabel label3;
-
-	/** The button3. */
+	private JButton expandEditorialGuidelines;
 	private JButton button3;
-
-	/** The label6. */
 	private JLabel label6;
-
-	/** The scroll pane4. */
 	private JScrollPane scrollPane4;
-
-	/** The editor pane1. */
 	private JEditorPane editorPane1;
-
-	/** The simil pop up. */
 	private JPopupMenu similPopUp;
-
-	/** The copy source item. */
 	private JMenuItem copySourceItem;
-
-	/** The copy target item. */
 	private JMenuItem copyTargetItem;
-
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 
 	/**
