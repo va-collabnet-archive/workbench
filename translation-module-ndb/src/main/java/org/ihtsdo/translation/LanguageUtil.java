@@ -741,6 +741,28 @@ public class LanguageUtil {
 			try {
 				// TODO add config as parameter
 				I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
+				I_IntSet allowedTypes = config.getDescTypes();
+				int synonymRF2 = SnomedMetadataRf2.SYNONYM_RF2.getLenient().getConceptNid();
+				int fsnRF2 = SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getConceptNid();
+				int fsnRF1 = tf.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+				int prefRF1 = tf.uuidToNative(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
+				int synRF1 = tf.uuidToNative(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids());
+				
+				if (!allowedTypes.contains(synonymRF2)) {
+					allowedTypes.add(synonymRF2);
+				}
+				if (!allowedTypes.contains(fsnRF2)) {
+					allowedTypes.add(fsnRF2);
+				}
+				if (!allowedTypes.contains(fsnRF1)) {
+					allowedTypes.add(fsnRF1);
+				}
+				if (!allowedTypes.contains(prefRF1)) {
+					allowedTypes.add(prefRF1);
+				}
+				if (!allowedTypes.contains(synRF1)) {
+					allowedTypes.add(synRF1);
+				}
 				I_GetConceptData semtagsRoot = tf.getConcept(ArchitectonicAuxiliary.Concept.SEMTAGS_ROOT.getUids());
 				Set<I_GetConceptData> descendants = new HashSet<I_GetConceptData>();
 				descendants = getDescendants(descendants, semtagsRoot);
@@ -752,10 +774,10 @@ public class LanguageUtil {
 					String target = "";
 					for (I_DescriptionTuple tuple : semtagConcept.getDescriptionTuples(config.getAllowedStatus(), config.getDescTypes(), config.getViewPositionSetReadOnly(),
 							config.getPrecedence(), config.getConflictResolutionStrategy())) {
-						if (tuple.getTypeNid() == SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid() && tuple.getLang().equals(sourceLangCode)) {
+						if (((tuple.getTypeNid() == prefRF1) || (tuple.getTypeNid() == synRF1)) && tuple.getLang().equals(sourceLangCode)) {
 							source = tuple.getText();
 						}
-						if (tuple.getTypeNid() == SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid() && tuple.getLang().equals(targetLangCode)) {
+						if (((tuple.getTypeNid() == prefRF1) || (tuple.getTypeNid() == synRF1)) && tuple.getLang().equals(targetLangCode)) {
 							target = tuple.getText();
 						}
 					}
@@ -1260,7 +1282,7 @@ public class LanguageUtil {
 					String targetFSNText = "";
 					if (sourceFSN.getText().lastIndexOf("(") > 0 && sourceFSN.getText().lastIndexOf(")") > sourceFSN.getText().lastIndexOf("(")) {
 						String sourceSemtag = sourceFSN.getText().substring(sourceFSN.getText().lastIndexOf("(") + 1, sourceFSN.getText().lastIndexOf(")"));
-						String targetSemtag = getTargetEquivalentSemTag(sourceSemtag, sourceLangRefset.getLangCode(config), ArchitectonicAuxiliary.LANG_CODE.valueOf(targetLangRefset.getLangCode(config)).getFormatedLanguageCode());
+						String targetSemtag = getTargetEquivalentSemTag(sourceSemtag, sourceLangRefset.getLangCode(config), ArchitectonicAuxiliary.LANG_CODE.valueOf(targetLangRefset.getLangCode(config).toUpperCase()).getFormatedLanguageCode());
 
 						targetFSNText = targetPreferred.getText().trim() + " (" + targetSemtag + ")";
 
