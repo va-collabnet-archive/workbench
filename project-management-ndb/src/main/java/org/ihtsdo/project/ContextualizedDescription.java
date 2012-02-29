@@ -39,6 +39,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept;
@@ -370,10 +371,28 @@ public class ContextualizedDescription implements I_ContextualizeDescription {
 		I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
 		I_GetConceptData concept = tf.getConcept(conceptId);
 		List<ContextualizedDescription> contextualizedDescriptions = new ArrayList<ContextualizedDescription>();
-		if(allowedTypes != null && allowedTypes.size() == 0){
-			allowedTypes.add(SnomedMetadataRf2.SYNONYM_RF2.getLenient().getConceptNid());
-			allowedTypes.add(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getConceptNid());
+		int synonymRF2 = SnomedMetadataRf2.SYNONYM_RF2.getLenient().getConceptNid();
+		int fsnRF2 = SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getConceptNid();
+		int fsnRF1 = tf.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+		int prefRF1 = tf.uuidToNative(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
+		int synRF1 = tf.uuidToNative(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids());
+		
+		if (!allowedTypes.contains(synonymRF2)) {
+			allowedTypes.add(synonymRF2);
 		}
+		if (!allowedTypes.contains(fsnRF2)) {
+			allowedTypes.add(fsnRF2);
+		}
+		if (!allowedTypes.contains(fsnRF1)) {
+			allowedTypes.add(fsnRF1);
+		}
+		if (!allowedTypes.contains(prefRF1)) {
+			allowedTypes.add(prefRF1);
+		}
+		if (!allowedTypes.contains(synRF1)) {
+			allowedTypes.add(synRF1);
+		}
+		
 		List<? extends I_DescriptionTuple> tuplesList = concept.getDescriptionTuples(allowedStatus, 
 				allowedTypes, positions, Precedence.TIME, config.getConflictResolutionStrategy());
 		tuplesList = cleanDescTuplesList(tuplesList);
