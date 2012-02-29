@@ -920,7 +920,7 @@ public class SimilarityPanel extends JPanel implements Serializable {
 		editorialGuideDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		editorialGuideDialog.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
-				editorialGuideDialog.setVisible(true);
+				expandEditorialGuidelines.setVisible(true);
 				button3.setVisible(true);
 				editorialGuideDialog.dispose();
 				panel15.add(scrollPane4, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
