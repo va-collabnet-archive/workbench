@@ -143,18 +143,18 @@ public class GlobalPropertyChange {
     }
     
     public static void firePropertyChange(CONCEPT_EVENT pce, Object oldValue, Object newValue){
-        gPcs.firePropertyChange(pce.toString(), oldValue, oldValue);
+        gPcs.firePropertyChange(pce.toString(), oldValue, newValue);
         for (PropertyChangeListener l: listenerToRemove) {
             gPcs.removePropertyChangeListener(l);
         }
     }
     
     public static void fireVetoableChange(CONCEPT_EVENT pce, Object oldValue, Object newValue) throws PropertyVetoException{
-        gVcs.fireVetoableChange(pce.toString(), oldValue, oldValue);
+        gVcs.fireVetoableChange(pce.toString(), oldValue, newValue);
         for (VetoableChangeListener l: vetoListenerToRemove) {
             gVcs.removeVetoableChangeListener(l);
         }
-        gPcs.firePropertyChange(pce.toString(), oldValue, oldValue);
+        gPcs.firePropertyChange(pce.toString(), oldValue, newValue);
         for (PropertyChangeListener l: listenerToRemove) {
             gPcs.removePropertyChangeListener(l);
         }
