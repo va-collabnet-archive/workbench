@@ -890,11 +890,11 @@
            <class>java.awt.GridBagLayout</class> 
            <void method="setProperty"> 
             <string>$columnSpecs</string> 
-            <string>10, 0, 0, 0, 0:1.0, 0, 10</string> 
+            <string>20, 0, 0, 0, 0:1.0, 20</string> 
            </void> 
            <void method="setProperty"> 
             <string>$rowSpecs</string> 
-            <string>20, 0, 20, 0, 20:1.0, 10</string> 
+            <string>5, 0, 35:1.0, 5, 0, 35:1.0, 5</string> 
            </void> 
            <void method="setProperty"> 
             <string>$hGap</string> 
@@ -923,11 +923,11 @@
              <class>java.awt.GridBagLayout</class> 
              <void method="setProperty"> 
               <string>$columnSpecs</string> 
-              <string>80, 0:1.0, 70</string> 
+              <string>80, 0:1.0</string> 
              </void> 
              <void method="setProperty"> 
               <string>$rowSpecs</string> 
-              <string>0</string> 
+              <string>0, 50:1.0</string> 
              </void> 
              <void method="setProperty"> 
               <string>$hGap</string> 
@@ -965,10 +965,29 @@
              </object> 
             </void> 
             <void method="add"> 
-             <object class="com.jformdesigner.model.FormComponent"> 
-              <string>javax.swing.JTextField</string> 
+             <object class="com.jformdesigner.model.FormContainer"> 
+              <string>javax.swing.JScrollPane</string> 
+              <object class="com.jformdesigner.model.FormLayoutManager"> 
+               <class>javax.swing.JScrollPane</class> 
+              </object> 
               <void property="name"> 
-               <string>xlsTextField</string> 
+               <string>scrollPane4</string> 
+              </void> 
+              <void method="add"> 
+               <object class="com.jformdesigner.model.FormComponent"> 
+                <string>javax.swing.JList</string> 
+                <void property="name"> 
+                 <string>xlsTextField</string> 
+                </void> 
+                <void method="addEvent"> 
+                 <object class="com.jformdesigner.model.FormEvent"> 
+                  <string>javax.swing.event.ListSelectionListener</string> 
+                  <string>valueChanged</string> 
+                  <string>xlsTextFieldValueChanged</string> 
+                  <boolean>true</boolean> 
+                 </object> 
+                </void> 
+               </object> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -977,31 +996,8 @@
                <string>gridx</string> 
                <int>1</int> 
               </void> 
-             </object> 
-            </void> 
-            <void method="add"> 
-             <object class="com.jformdesigner.model.FormComponent"> 
-              <string>javax.swing.JButton</string> 
               <void method="setProperty"> 
-               <string>text</string> 
-               <string>Browse</string> 
-              </void> 
-              <void property="name"> 
-               <string>xlsBrowseButton</string> 
-              </void> 
-              <void method="addEvent"> 
-               <object class="com.jformdesigner.model.FormEvent"> 
-                <string>java.awt.event.ActionListener</string> 
-                <string>actionPerformed</string> 
-                <string>xlsBrowseButtonActionPerformed</string> 
-                <boolean>true</boolean> 
-               </object> 
-              </void> 
-             </object> 
-             <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-              <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
-              <void method="setProperty"> 
-               <string>gridx</string> 
+               <string>gridheight</string> 
                <int>2</int> 
               </void> 
              </object> 
@@ -1019,7 +1015,11 @@
             </void> 
             <void method="setProperty"> 
              <string>gridwidth</string> 
-             <int>5</int> 
+             <int>4</int> 
+            </void> 
+            <void method="setProperty"> 
+             <string>gridheight</string> 
+             <int>2</int> 
             </void> 
            </object> 
           </void> 
@@ -1030,11 +1030,11 @@
              <class>java.awt.GridBagLayout</class> 
              <void method="setProperty"> 
               <string>$columnSpecs</string> 
-              <string>80, 0:1.0, 70</string> 
+              <string>80, 293:1.0</string> 
              </void> 
              <void method="setProperty"> 
               <string>$rowSpecs</string> 
-              <string>0</string> 
+              <string>0, 50:1.0</string> 
              </void> 
              <void method="setProperty"> 
               <string>$hGap</string> 
@@ -1072,10 +1072,29 @@
              </object> 
             </void> 
             <void method="add"> 
-             <object class="com.jformdesigner.model.FormComponent"> 
-              <string>javax.swing.JTextField</string> 
+             <object class="com.jformdesigner.model.FormContainer"> 
+              <string>javax.swing.JScrollPane</string> 
+              <object class="com.jformdesigner.model.FormLayoutManager"> 
+               <class>javax.swing.JScrollPane</class> 
+              </object> 
               <void property="name"> 
-               <string>drlTextField</string> 
+               <string>scrollPane5</string> 
+              </void> 
+              <void method="add"> 
+               <object class="com.jformdesigner.model.FormComponent"> 
+                <string>javax.swing.JList</string> 
+                <void property="name"> 
+                 <string>drlTextField</string> 
+                </void> 
+                <void method="addEvent"> 
+                 <object class="com.jformdesigner.model.FormEvent"> 
+                  <string>javax.swing.event.ListSelectionListener</string> 
+                  <string>valueChanged</string> 
+                  <string>drlTextFieldValueChanged</string> 
+                  <boolean>true</boolean> 
+                 </object> 
+                </void> 
+               </object> 
               </void> 
              </object> 
              <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -1084,31 +1103,8 @@
                <string>gridx</string> 
                <int>1</int> 
               </void> 
-             </object> 
-            </void> 
-            <void method="add"> 
-             <object class="com.jformdesigner.model.FormComponent"> 
-              <string>javax.swing.JButton</string> 
               <void method="setProperty"> 
-               <string>text</string> 
-               <string>Browse</string> 
-              </void> 
-              <void property="name"> 
-               <string>drlBrowseButton</string> 
-              </void> 
-              <void method="addEvent"> 
-               <object class="com.jformdesigner.model.FormEvent"> 
-                <string>java.awt.event.ActionListener</string> 
-                <string>actionPerformed</string> 
-                <string>drlBrowseButtonActionPerformed</string> 
-                <boolean>true</boolean> 
-               </object> 
-              </void> 
-             </object> 
-             <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-              <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
-              <void method="setProperty"> 
-               <string>gridx</string> 
+               <string>gridheight</string> 
                <int>2</int> 
               </void> 
              </object> 
@@ -1122,11 +1118,15 @@
             </void> 
             <void method="setProperty"> 
              <string>gridy</string> 
-             <int>3</int> 
+             <int>4</int> 
             </void> 
             <void method="setProperty"> 
              <string>gridwidth</string> 
-             <int>5</int> 
+             <int>4</int> 
+            </void> 
+            <void method="setProperty"> 
+             <string>gridheight</string> 
+             <int>2</int> 
             </void> 
            </object> 
           </void> 
