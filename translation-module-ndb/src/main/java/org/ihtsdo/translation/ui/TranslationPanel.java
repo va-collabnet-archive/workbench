@@ -2733,8 +2733,7 @@ public class TranslationPanel extends JPanel {
 						if (description.getExtensionStatusId() == inactive.getConceptNid() || description.getDescriptionStatusId() == inactive.getConceptNid()) {
 							if (targetCom.contains(ConfigTranslationModule.TreeComponent.RETIRED)) {
 								rowClass[0] = TreeEditorObjectWrapper.NOTACCEPTABLE;
-								// row[TableTargetColumn.ACCEPTABILITY.ordinal()]
-								// = notAcceptable;
+								row[TableTargetColumn.ACCEPTABILITY.ordinal()] = "";
 								termType_Status[1] = inactive;
 								if (description.getTypeId() == fsn.getConceptNid()) {
 									termType_Status[0] = fsn;
