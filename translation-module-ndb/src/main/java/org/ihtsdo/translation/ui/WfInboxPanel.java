@@ -661,9 +661,9 @@ public class WfInboxPanel extends JPanel {
 		 */
 		@Override
 		public void propertyChange(PropertyChangeEvent arg0) {
+			Object newValue = arg0.getNewValue();
+			Object oldValue = arg0.getOldValue();
 			if (arg0.getPropertyName().equals(TranslationPanel.ACTION_LAUNCHED)) {
-				Object newValue = arg0.getNewValue();
-				Object oldValue = arg0.getOldValue();
 				if (newValue instanceof WfInstance) {
 					WfInstance newWfInstance = (WfInstance) newValue;
 					WfInstance oldWfInstance = (WfInstance) oldValue;
@@ -728,6 +728,24 @@ public class WfInboxPanel extends JPanel {
 						}
 					} else {
 
+					}
+				}
+			}else if (arg0.getPropertyName().equals(TranslationPanel.SEND_TO_OUTBOX_LAUNCHED)) {
+				if (newValue instanceof WfInstance) {
+					WfInstance newWfInstance = (WfInstance) newValue;
+					WfInstance oldWfInstance = (WfInstance) oldValue;
+					try {
+						tagManager.sendToOutbox(((WfInstance) currentRow[InboxColumn.values().length]).getComponentId().toString());
+						EventMediator.getInstance().fireEvent(new ItemSentToSpecialFolderEvent(oldWfInstance, oldWfInstance));
+						int currentItemViewIndex = inboxTable.convertRowIndexToView(currentModelRowNum);
+						model.removeRow(currentModelRowNum);
+						if (inboxTable.getRowCount() > 0 && inboxTable.getRowCount() > currentItemViewIndex) {
+							inboxTable.setRowSelectionInterval(currentItemViewIndex, currentItemViewIndex);
+						} else if (inboxTable.getRowCount() <= currentItemViewIndex) {
+							inboxTable.setRowSelectionInterval(inboxTable.getRowCount() - 1, inboxTable.getRowCount() - 1);
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
 					}
 				}
 			}
