@@ -103,8 +103,7 @@ public class SimilarityPanel extends JPanel implements Serializable {
 
 	/** The preferred. */
 	private I_GetConceptData preferred;
-	
-	
+
 	/** Source Fsn Descrioption */
 	private I_ContextualizeDescription sourceFsnDescription;
 	/** Source Preferred Descrioption */
@@ -251,7 +250,7 @@ public class SimilarityPanel extends JPanel implements Serializable {
 				semtagLocation = sourceFsnConcept.getText().length();
 			}
 			this.sourceFSN = sourceFsnConcept.getText().substring(0, semtagLocation);
-		}else{
+		} else {
 			this.sourceFSN = "";
 		}
 		this.sourceFsnDescription = sourceFsnConcept;
@@ -898,7 +897,7 @@ public class SimilarityPanel extends JPanel implements Serializable {
 				expandTranslationMemory.setVisible(true);
 				button2.setVisible(true);
 				translationMemoryDialog.dispose();
-				panel1.add(scrollPane3, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,GridBagConstraints.CENTER, GridBagConstraints.BOTH,new Insets(0, 0, 0, 0), 0, 0));
+				panel1.add(scrollPane3, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 			}
 		});
 		translationMemoryDialog.setSize(new Dimension(700, 550));
@@ -923,9 +922,7 @@ public class SimilarityPanel extends JPanel implements Serializable {
 				expandEditorialGuidelines.setVisible(true);
 				button3.setVisible(true);
 				editorialGuideDialog.dispose();
-				panel15.add(scrollPane4, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 0, 0), 0, 0));
+				panel15.add(scrollPane4, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 			}
 		});
 		editorialGuideDialog.setSize(new Dimension(700, 550));
@@ -936,6 +933,44 @@ public class SimilarityPanel extends JPanel implements Serializable {
 		editorialGuideDialog.setVisible(true);
 		this.revalidate();
 		this.repaint();
+	}
+
+	private void table2MouseClicked(MouseEvent e) {
+		if (e.getButton() == MouseEvent.BUTTON3) {
+			int r = table2.rowAtPoint(e.getPoint());
+			if (r >= 0 && r < table2.getRowCount()) {
+				table2.setRowSelectionInterval(r, r);
+			} else {
+				table2.clearSelection();
+			}
+
+			int rowindex = table2.getSelectedRow();
+			if (rowindex < 0) {
+				return;
+			}
+			translationMemoryPopup.show(e.getComponent(), e.getX(), e.getY());
+		}
+	}
+
+	private void copyPatternTextMenuActionPerformed(ActionEvent e) {
+		int selectedRow = table2.getSelectedRow();
+		if (selectedRow >= 0) {
+			String target = table2.getValueAt(selectedRow, 0).toString();
+			String noHTMLString = target.replaceAll("\\<.*?>", "");
+			StringSelection strSel = new StringSelection(noHTMLString);
+			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+			clipboard.setContents(strSel, strSel);
+		}
+	}
+
+	private void copyTranslatedToMenuActionPerformed(ActionEvent e) {
+		int selectedRow = table2.getSelectedRow();
+		if (selectedRow >= 0) {
+			String target = table2.getValueAt(selectedRow, 1).toString();
+			StringSelection strSel = new StringSelection(target);
+			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+			clipboard.setContents(strSel, strSel);
+		}
 	}
 
 	/**
@@ -981,6 +1016,9 @@ public class SimilarityPanel extends JPanel implements Serializable {
 		similPopUp = new JPopupMenu();
 		copySourceItem = new JMenuItem();
 		copyTargetItem = new JMenuItem();
+		translationMemoryPopup = new JPopupMenu();
+		copyPatternTextMenu = new JMenuItem();
+		copyTranslatedToMenu = new JMenuItem();
 
 		//======== this ========
 		setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -1260,6 +1298,12 @@ public class SimilarityPanel extends JPanel implements Serializable {
 				//---- table2 ----
 				table2.setPreferredScrollableViewportSize(new Dimension(180, 200));
 				table2.setFont(new Font("Verdana", Font.PLAIN, 12));
+				table2.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						table2MouseClicked(e);
+					}
+				});
 				scrollPane3.setViewportView(table2);
 			}
 			panel1.add(scrollPane3, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
@@ -1375,6 +1419,30 @@ public class SimilarityPanel extends JPanel implements Serializable {
 			similPopUp.add(copyTargetItem);
 		}
 
+		//======== translationMemoryPopup ========
+		{
+
+			//---- copyPatternTextMenu ----
+			copyPatternTextMenu.setText("Copy pattern text to clipboard");
+			copyPatternTextMenu.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					copyPatternTextMenuActionPerformed(e);
+				}
+			});
+			translationMemoryPopup.add(copyPatternTextMenu);
+
+			//---- copyTranslatedToMenu ----
+			copyTranslatedToMenu.setText("Copy \"translated to..\" to clipboard");
+			copyTranslatedToMenu.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					copyTranslatedToMenuActionPerformed(e);
+				}
+			});
+			translationMemoryPopup.add(copyTranslatedToMenu);
+		}
+
 		//---- buttonGroup2 ----
 		ButtonGroup buttonGroup2 = new ButtonGroup();
 		buttonGroup2.add(rbFSN);
@@ -1422,6 +1490,9 @@ public class SimilarityPanel extends JPanel implements Serializable {
 	private JPopupMenu similPopUp;
 	private JMenuItem copySourceItem;
 	private JMenuItem copyTargetItem;
+	private JPopupMenu translationMemoryPopup;
+	private JMenuItem copyPatternTextMenu;
+	private JMenuItem copyTranslatedToMenu;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 
 	/**
