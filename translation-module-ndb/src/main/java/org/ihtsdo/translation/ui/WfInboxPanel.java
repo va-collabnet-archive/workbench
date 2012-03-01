@@ -693,11 +693,13 @@ public class WfInboxPanel extends JPanel {
 								tagManager.saveAsToDo(((WfInstance) currentRow[InboxColumn.values().length]).getComponentId().toString());
 								EventMediator.getInstance().fireEvent(new ItemSentToSpecialFolderEvent(newWfInstance, oldWfInstance));
 								int currentItemViewIndex = inboxTable.convertRowIndexToView(currentModelRowNum);
-								model.removeRow(currentModelRowNum);
-								if (inboxTable.getRowCount() > 0 && inboxTable.getRowCount() > currentItemViewIndex) {
-									inboxTable.setRowSelectionInterval(currentItemViewIndex, currentItemViewIndex);
-								} else if (inboxTable.getRowCount() <= currentItemViewIndex) {
-									inboxTable.setRowSelectionInterval(inboxTable.getRowCount() - 1, inboxTable.getRowCount() - 1);
+								if(!specialTag){
+									model.removeRow(currentModelRowNum);
+									if (inboxTable.getRowCount() > 0 && inboxTable.getRowCount() > currentItemViewIndex) {
+										inboxTable.setRowSelectionInterval(currentItemViewIndex, currentItemViewIndex);
+									} else if (inboxTable.getRowCount() <= currentItemViewIndex) {
+										inboxTable.setRowSelectionInterval(inboxTable.getRowCount() - 1, inboxTable.getRowCount() - 1);
+									}
 								}
 							} catch (IOException e) {
 								e.printStackTrace();
@@ -803,18 +805,20 @@ public class WfInboxPanel extends JPanel {
 				int tabCount = tpc.getTabCount();
 				for (int i = 0; i < tabCount; i++) {
 					if (tpc.getTitleAt(i).equals(TranslationHelperPanel.TRANSLATION_LEFT_MENU)) {
-						if (tpc.getComponentAt(i) instanceof TranslationPanel) {
-							TranslationPanel uiPanel = (TranslationPanel) tpc.getComponentAt(i);
-							if (!uiPanel.verifySavePending(null, false,false)) {
-								return;
-							}
-						}
 						tpc.remove(i);
 						tpc.repaint();
 						tpc.revalidate();
-						break;
 					}
-
+				}
+			}
+			if (tpc != null) {
+				int tabCount = tpc.getTabCount();
+				for (int i = 0; i < tabCount; i++) {
+					if (tpc.getTitleAt(i).equals(TranslationHelperPanel.SIMILARITY_TAB_NAME)) {
+						tpc.remove(i);
+						tpc.repaint();
+						tpc.revalidate();
+					}
 				}
 			}
 			if (tpc != null) {
@@ -822,12 +826,11 @@ public class WfInboxPanel extends JPanel {
 				int tabCount = tpc.getTabCount();
 				for (int i = 0; i < tabCount; i++) {
 					if (tpc.getTitleAt(i).equals(TranslationHelperPanel.TRANSLATION_TAB_NAME)) {
-						if (tpc.getComponentAt(i) instanceof TranslationConceptEditor6) {
-							TranslationConceptEditor6 uiPanel = (TranslationConceptEditor6) tpc.getComponentAt(i);
-							if (!uiPanel.verifySavePending(null, false)) {
+						if (tpc.getComponentAt(i) instanceof TranslationPanel) {
+							TranslationPanel uiPanel = (TranslationPanel) tpc.getComponentAt(i);
+							if (!uiPanel.verifySavePending(null, false, false)) {
 								return;
 							}
-							uiPanel.AutokeepInInbox();
 						}
 						tpc.remove(i);
 						tpc.repaint();
