@@ -683,7 +683,7 @@ public class TranslationPanel extends JPanel {
 				if (!(descriptionInEditor.getText().trim().equals(targetTextField.getText().trim()) && (descriptionInEditor.isInitialCaseSignificant() == rbYes.isSelected())
 						&& descriptionInEditor.getAcceptabilityId() == ((I_GetConceptData) cmbAccep.getSelectedItem()).getConceptNid()
 						&& ((descriptionInEditor.getExtensionStatusId() == active.getConceptNid() && rbAct.isSelected()) || (descriptionInEditor.getExtensionStatusId() != active.getConceptNid() && !rbAct.isSelected())) && ((descriptionInEditor
-						.getTypeId() == fsn.getConceptNid() && fsn.equals((I_GetConceptData) comboBox1.getSelectedItem())) || (descriptionInEditor.getTypeId() != fsn.getConceptNid() && !fsn.equals((I_GetConceptData) comboBox1.getSelectedItem()))))) {
+								.getTypeId() == fsn.getConceptNid() && fsn.equals((I_GetConceptData) comboBox1.getSelectedItem())) || (descriptionInEditor.getTypeId() != fsn.getConceptNid() && !fsn.equals((I_GetConceptData) comboBox1.getSelectedItem()))))) {
 					bPendTerm = false;
 				}
 			} else {
@@ -952,31 +952,44 @@ public class TranslationPanel extends JPanel {
 				descriptionInEditor = (ContextualizedDescription) ContextualizedDescription.createNewContextualizedDescription(concept.getConceptNid(), targetId, targetLangRefset.getLangCode(config));
 			}
 			if (descriptionInEditor != null) {
+
+				String targetLangCode = "";
+				try {
+					targetLangCode = targetLangRefset.getLangCode(Terms.get().getActiveAceFrameConfig());
+				} catch (TerminologyException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
 				descriptionInEditor.setText(targetTextField.getText());
 				descriptionInEditor.setInitialCaseSignificant(rbYes.isSelected());
 
 				// set description type like RF1
-				if (((I_GetConceptData) comboBox1.getSelectedItem()).equals(synonym)) {
-					if ((((I_GetConceptData) cmbAccep.getSelectedItem()).equals(preferred))) {
+				if (targetLangCode.equals(descriptionInEditor.getLang())) {
+					if (((I_GetConceptData) comboBox1.getSelectedItem()).equals(synonym)) {
 						descriptionInEditor.setTypeId(synonym.getConceptNid());
-					} else if ((((I_GetConceptData) cmbAccep.getSelectedItem()).equals(acceptable))) {
-						descriptionInEditor.setTypeId(synonym.getConceptNid());
+					} else {
+						descriptionInEditor.setTypeId(fsn.getConceptNid());
 					}
-				} else {
-					descriptionInEditor.setTypeId(fsn.getConceptNid());
 				}
 				// if some is wrong then all to retire
 				if (rbInact.isSelected()) {
-					descriptionInEditor.setExtensionStatusId(inactive.getConceptNid());
-					// descriptionInEditor.setAcceptabilityId(notAcceptable.getConceptNid());
+					if (!targetLangCode.equals(descriptionInEditor.getLang())) {
+						descriptionInEditor.setExtensionStatusId(inactive.getConceptNid());
+					}else{
+						descriptionInEditor.setExtensionStatusId(inactive.getConceptNid());
+						descriptionInEditor.setDescriptionStatusId(inactive.getConceptNid());
+					}
 				} else {
-					// TODO: Discuss how to handle retirement and re-activation
-					// in liked descriptions form source language
-					// if all current
-					descriptionInEditor.setAcceptabilityId(((I_GetConceptData) cmbAccep.getSelectedItem()).getConceptNid());
-					descriptionInEditor.setDescriptionStatusId(active.getConceptNid());
-					descriptionInEditor.setExtensionStatusId(active.getConceptNid());
+					if (!targetLangCode.equals(descriptionInEditor.getLang())) {
+						descriptionInEditor.setExtensionStatusId(active.getConceptNid());
+					}else{
+						descriptionInEditor.setExtensionStatusId(active.getConceptNid());
+						descriptionInEditor.setDescriptionStatusId(active.getConceptNid());
+					}
 				}
+				descriptionInEditor.setAcceptabilityId(((I_GetConceptData) cmbAccep.getSelectedItem()).getConceptNid());
 
 				result = descriptionInEditor.persistChanges();
 				try {
@@ -1322,7 +1335,6 @@ public class TranslationPanel extends JPanel {
 					}
 
 					if (saveDescActionPerformed()) {
-
 						descriptionInEditor = null;
 						targetTextField.setText("");
 					} else {
@@ -1452,8 +1464,9 @@ public class TranslationPanel extends JPanel {
 					if (descrpt != null && !setByCode) {
 						System.out.println("************ descrpt= " + descrpt.getText());
 						updatePropertiesPanel(descrpt, rowModel);
-					} else
+					} else {
 						System.out.println("************  descrpt null");
+					}
 				}
 
 			}
@@ -3179,8 +3192,8 @@ public class TranslationPanel extends JPanel {
 			} else {
 				Object[] options = { "Discard unsaved data", "Cancel and continue editing" };
 				int n = JOptionPane.showOptionDialog(null, "Do you want to save the change you made to the term in the editor panel?", "Unsaved data", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, // do
-																																																						// not
-																																																						// use
+						// not
+						// use
 						// a
 						// custom Icon
 						options, // the titles of buttons
