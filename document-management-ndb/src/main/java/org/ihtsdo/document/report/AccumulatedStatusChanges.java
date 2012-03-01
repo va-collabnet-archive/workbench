@@ -231,6 +231,9 @@ public class AccumulatedStatusChanges extends SwingWorker<File, String> implemen
 												I_GetConceptData statusConcept = tf.getConcept(version.getCnid1());
 												boolean sameDestinationAndAuthor = version.getCnid2() != version.getAuthorNid();
 												I_GetConceptData previousStatus = wlPromRefset.getPreviousPromotionStatus(wlMemberConcept.getConceptNid(), config);
+												if(previousStatus == null){
+													continue;
+												}
 												I_GetConceptData wlMemeberActivityStatus = member.getActivityStatus();
 												boolean sameStatus = previousStatus.getConceptNid() == wlMemeberActivityStatus.getConceptNid();
 												if (!statusConcept.getUids().iterator().next().equals(
