@@ -808,6 +808,7 @@ public class WfInboxPanel extends JPanel {
 						tpc.remove(i);
 						tpc.repaint();
 						tpc.revalidate();
+						break;
 					}
 				}
 			}
@@ -818,6 +819,7 @@ public class WfInboxPanel extends JPanel {
 						tpc.remove(i);
 						tpc.repaint();
 						tpc.revalidate();
+						break;
 					}
 				}
 			}
