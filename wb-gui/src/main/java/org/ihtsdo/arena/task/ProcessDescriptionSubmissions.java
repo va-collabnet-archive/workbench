@@ -118,7 +118,8 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
             Integer descPosition = null;
             Integer langPosition = null;
             Integer dialectPosition = null;
-            Integer acceptPosition = null;
+            Integer acceptSct = null;
+            Integer acceptUuid = null;
 
             String line = iterator.next();
             String[] configParts = line.split("\t");
@@ -136,8 +137,10 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
                     langPosition = i;
                 } else if (configPos.equalsIgnoreCase("dialect")) {
                     dialectPosition = i;
-                } else if (configPos.equalsIgnoreCase("acceptability")) {
-                    acceptPosition = i;
+                } else if (configPos.equalsIgnoreCase("acceptabilitySct")) {
+                    acceptSct = i;
+                }else if (configPos.equalsIgnoreCase("acceptabilityUuid")) {
+                    acceptUuid = i;
                 }
             }
 
@@ -186,16 +189,18 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
                 } else if (lang == LANG_CODE.EN) {
                     dialect = LANG_CODE.EN_US;
                 }
-                if (acceptPosition != null) {
-                    part = parts[acceptPosition];
-                    if (part.equalsIgnoreCase("acceptable")) {
-                        acceptabilityNid = SnomedMetadataRfx.getDESC_ACCEPTABLE_NID();
-                    } else if (part.equalsIgnoreCase("preferred")) {
-                        acceptabilityNid = SnomedMetadataRfx.getDESC_PREFERRED_NID();
-                    } else {
-                        throw new TaskFailedException("Cannot handle acceptability type.");
+                if (acceptSct != null) {
+                    part = parts[acceptSct];
+                    Set<I_GetConceptData> concepts = Terms.get().getConcept(part);
+                    for (I_GetConceptData concept : concepts) {
+                        acceptabilityNid = concept.getNid();
                     }
-                } else {
+                } 
+                if (acceptUuid != null) {
+                    part = parts[acceptSct];
+                    acceptabilityNid = Ts.get().getNidForUuids(UUID.fromString(part));
+                }
+                if(acceptabilityNid == 0){
                     acceptabilityNid = SnomedMetadataRfx.getDESC_ACCEPTABLE_NID();
                 }
 
