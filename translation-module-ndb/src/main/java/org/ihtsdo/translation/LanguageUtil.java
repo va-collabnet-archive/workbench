@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -76,15 +78,16 @@ import org.ihtsdo.project.panel.PanelHelperFactory;
 import org.ihtsdo.project.panel.TranslationHelperPanel;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.refset.LanguageSpecRefset;
-import org.ihtsdo.rules.RulesLibrary;
-import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
-import org.ihtsdo.tk.helper.ResultsItem;
 import org.ihtsdo.translation.tasks.PutsDescriptionsInLanguageRefset;
+import org.ihtsdo.translation.tasks.commit.TranslationTermChangeListener;
 import org.ihtsdo.translation.ui.ConfigTranslationModule;
 import org.ihtsdo.translation.ui.SimpleTranslationConceptEditor;
 import org.ihtsdo.translation.ui.TranslationConceptEditor;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * The Class LanguageUtil.
@@ -96,6 +99,8 @@ public class LanguageUtil {
 
 	/** The SIMPL e_ ui. */
 	public static int SIMPLE_UI = 1;
+
+	private static TranslationTermChangeListener translationTermChangeListener;
 
 	/**
 	 * The Enum Language.
@@ -1548,6 +1553,13 @@ public class LanguageUtil {
 
 	}
 
+	public static TranslationTermChangeListener getTranslationTermChangeListener(){
+		if (translationTermChangeListener!=null){
+			return translationTermChangeListener; 
+		}
+		translationTermChangeListener=new TranslationTermChangeListener();
+		return translationTermChangeListener;
+	}
 	/**
 	 * Checks if is item being sent.
 	 *
@@ -1615,4 +1627,51 @@ public class LanguageUtil {
 		return children;
 	}
 
+	/** The default project for language cache. */
+	private static DefaultProjectForLanguage defPrjForLanguage = null;
+
+	/**
+	 * Read default project.
+	 *
+	 * @return the default project for language
+	 */
+	synchronized
+	public static DefaultProjectForLanguage readDefaultProjects(){
+		if (defPrjForLanguage != null) {
+			return defPrjForLanguage;
+		} else {
+			File file = new File("sampleProcesses/DefaultProjects.pdl" );
+			if (file.exists()){
+				XStream xStream = new XStream(new DomDriver());
+				defPrjForLanguage=(DefaultProjectForLanguage)xStream.fromXML(file);
+				return defPrjForLanguage;
+			}
+			return null;
+		}
+
+	}
+
+	/**
+	 * Write default project for language.
+	 *
+	 * @param defaultProjectForLanguage the default project for language map
+	 */
+	synchronized
+	public static void writeDefaultProjects(DefaultProjectForLanguage defaultProjectForLanguage){
+		File outputFile = new File("sampleProcesses/DefaultProjects.pdl");
+		XStream xStream = new XStream(new DomDriver());
+
+		FileOutputStream rfos;
+		try {
+			rfos = new FileOutputStream(outputFile);
+			OutputStreamWriter rosw = new OutputStreamWriter(rfos,"UTF-8");
+			xStream.toXML(defaultProjectForLanguage,rosw);
+			defPrjForLanguage=defaultProjectForLanguage;
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+
+	}
 }
