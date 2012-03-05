@@ -19,6 +19,6 @@ public interface TranslationHelperBI {
 
 	boolean save(TranslationProject project, ContextualizedDescription description) throws FSNGenerationException, Exception;
 
-	boolean conceptualizeThisDescription(LanguageMembershipRefset refset, ContextualizedDescription description, I_GetConceptData acceptability) throws FSNGenerationException, Exception;
+	boolean contextualizeThisDescription(LanguageMembershipRefset refset, ContextualizedDescription description, I_GetConceptData acceptability) throws FSNGenerationException, Exception;
 
 }
