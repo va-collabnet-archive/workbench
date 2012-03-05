@@ -185,7 +185,7 @@ public class GetDataFromUAWExecPanel extends AbstractTask {
 					WorkListMember member= TerminologyProjectDAO.addConceptAsNacWorklistMember(
 							selectedWorkList, selectedConcept,
 							config);
-					TerminologyProjectDAO.initializeWorkflowForMember( member, selectedWorkList, config);
+//					TerminologyProjectDAO.initializeWorkflowForMember( member, selectedWorkList, config);
 					JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
 							"The concept has been sent to translation.", "",
 							JOptionPane.INFORMATION_MESSAGE);
