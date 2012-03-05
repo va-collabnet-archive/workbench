@@ -137,6 +137,12 @@ public class TerminologyProjectDAO {
 
 	/** The partition cache. */
 	public static Map<UUID, Partition> partitionCache = new HashMap<UUID, Partition>();
+	
+	/** The target languages cache. */
+	public static HashMap<Integer,List<TranslationProject>> targetLanguagesCache=null;
+	
+
+	public static HashMap<Integer,List<Integer>>languageWorksetsMap=null; 
 
 	// I_TerminologyProjects CRUD **********************************
 
@@ -185,6 +191,61 @@ public class TerminologyProjectDAO {
 		}
 		return projects;
 	}
+
+	/**
+	 * Gets the all workset target languages map.
+	 *
+	 * @param config the config
+	 * @return the all workset target languages map
+	 * @throws Exception 
+	 * @throws IOException 
+	 * @throws TerminologyException 
+	 */
+	public static HashMap<Integer, List<Integer>> getAllWorksetTargetLanguages(I_ConfigAceFrame config) throws TerminologyException, IOException, Exception{
+		if (languageWorksetsMap!=null){
+			return languageWorksetsMap;
+		}
+		HashMap<Integer, List<TranslationProject>> tgtLangs = getAllTranslationProjectTargetLanguages(config);
+		languageWorksetsMap=new HashMap<Integer, List<Integer>>();
+		for (Integer tgtLang:tgtLangs.keySet()){
+			List<Integer> wsetList=new ArrayList<Integer>();
+			List<TranslationProject> transPrjs=tgtLangs.get(tgtLang );
+			for (TranslationProject tPrj:transPrjs){
+				List<WorkSet> wsts = tPrj.getWorkSets(config);
+				for (WorkSet wSet:wsts){
+					PromotionRefset pRefset = wSet.getPromotionRefset(config);
+					wsetList.add(pRefset.getRefsetId());
+				}
+			}
+			languageWorksetsMap.put(tgtLang,wsetList);
+		}
+		return languageWorksetsMap;
+	}
+	
+	public static HashMap<Integer,List<TranslationProject>> getAllTranslationProjectTargetLanguages(I_ConfigAceFrame config) throws TerminologyException, IOException, Exception {
+		
+		if (targetLanguagesCache!= null) {
+			return targetLanguagesCache;
+		}
+		targetLanguagesCache=new HashMap<Integer, List<TranslationProject>>();
+		config=Terms.get().getActiveAceFrameConfig();
+		List<TranslationProject> translProjects=getAllTranslationProjects(config);
+		List<TranslationProject> tmpTransProjList=new ArrayList<TranslationProject>();
+		for (TranslationProject translationProject:translProjects ){
+			I_GetConceptData refConcept = translationProject.getTargetLanguageRefset();
+			if (targetLanguagesCache.containsKey(refConcept.getNid())){
+				tmpTransProjList=targetLanguagesCache.get(refConcept.getNid());
+			}else{
+				tmpTransProjList=new ArrayList<TranslationProject>();
+			}
+			tmpTransProjList.add(translationProject);
+			targetLanguagesCache.put(refConcept.getNid(),tmpTransProjList);
+		}
+		
+		return targetLanguagesCache;
+		
+	}
+	
 
 	/**
 	 * Creates the new translation project.

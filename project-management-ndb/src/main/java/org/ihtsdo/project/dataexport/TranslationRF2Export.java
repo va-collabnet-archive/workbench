@@ -427,7 +427,7 @@ public class TranslationRF2Export extends RF2DataExport {
 
 						if (description.getTypeNid()==FSN)
 							FSNExists=true;
-						I_ExtendByRef extension = Terms.get().getExtension(description.getNid());
+						I_ExtendByRef extension = Terms.get().getExtension(descs.get(description).getNid());
 						I_ExtendByRefPartCid lastPart = getLastLangExtensionPart(extension);
 
 						exportLanguage(lastPart, description, languageRefset, moduleSCTID, refsetSCTID, bwl,reportFileWriter);
@@ -474,7 +474,7 @@ public class TranslationRF2Export extends RF2DataExport {
 
 						if (description.getTypeNid()==FSN)
 							FSNExists=true;
-						I_ExtendByRef extension = Terms.get().getExtension(description.getNid());
+						I_ExtendByRef extension = Terms.get().getExtension(descs.get(description).getNid());
 						I_ExtendByRefPartCid lastPart = getLastLangExtensionPart(extension);
 
 						exportLanguage(lastPart, description, moduleConcept, moduleSCTID, refsetSCTID, bwl,reportFileWriter);
