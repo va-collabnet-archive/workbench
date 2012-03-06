@@ -26,7 +26,9 @@ import java.io.ObjectOutputStream;
 import java.io.StreamCorruptedException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -376,7 +378,7 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 			if (!DwfaEnv.isHeadless()) {
 				activity.setProgressInfoUpper("<html>Error in QA check on concept: " + concept.toString() + 
 						" for " + context.toString());
-				activity.setProgressInfoLower("Error: elapsed: " + elapsedStr + "; " + result + " -  Rules fired:" + results.getResultsItems().size());
+				activity.setProgressInfoLower("Error: elapsed: " + elapsed + " ms; " + result + " -  Rules fired:" + results.getResultsItems().size());
 				try {
 					activity.complete();
 				} catch (ComputationCanceled e1) {
@@ -390,9 +392,12 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 		String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
 		String result = "Done";
 		if (!DwfaEnv.isHeadless()) {
+			Calendar cal = Calendar.getInstance();
+		    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 			activity.setProgressInfoUpper("<html>Performed QA check on concept: " + concept.toString() + 
 					" for " + context.toString());
-			activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; " + result + " -  Rules fired:" + results.getResultsItems().size());
+			activity.setProgressInfoLower("Elapsed: " + elapsed + " ms; " + result + 
+					" -  Rules fired:" + results.getResultsItems().size() + " - " + sdf.format(cal.getTime()));
 
 			try {
 				activity.complete();
