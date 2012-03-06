@@ -7,7 +7,6 @@ import org.ihtsdo.project.ContextualizedDescription;
 import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.translation.FSNGenerationException;
-import org.ihtsdo.translation.ui.ConfigTranslationModule;
 
 public interface TranslationHelperBI {
 
