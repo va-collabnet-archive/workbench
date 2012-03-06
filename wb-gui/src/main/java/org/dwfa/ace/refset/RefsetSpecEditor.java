@@ -933,7 +933,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         throw new UnsupportedOperationException();
     }
 
-    public static boolean addRefsetMetadata(boolean markedParentOnly, I_GetConceptData memberRefset) {
+    public static boolean addRefsetMetadata(boolean markedParentOnly, I_GetConceptData memberRefset,I_GetConceptData refsetComputeTypeIn) {
         try {
             if (memberRefset == null) {
                 return false;
@@ -949,8 +949,12 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
             if (Ts.get().hasUuid(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()[0])) {
                 status = (I_GetConceptData) SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient();
             }
-            I_GetConceptData refsetComputeType =
+            I_GetConceptData refsetComputeType = refsetComputeTypeIn;
+            if(refsetComputeTypeIn == null){
+            refsetComputeType =
                     Terms.get().getConcept(RefsetAuxiliary.Concept.CONCEPT_COMPUTE_TYPE.getUids());
+            }
+            
             I_GetConceptData fsnConcept =
                     Terms.get().getConcept(
                     ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
@@ -1156,7 +1160,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (addRefsetMetadata(false, (I_GetConceptData) getTermComponent())) {
+            if (addRefsetMetadata(false, (I_GetConceptData) getTermComponent(),null)) {
                 return;
             }
         }
