@@ -2058,7 +2058,10 @@ public class TerminologyProjectDAO {
 	 * @throws Exception the exception
 	 */
 	public static void initializeWorkSet(WorkSet workSet, I_ConfigAceFrame config, ActivityUpdater updater) throws Exception {
-		Ts.get().iterateConceptDataInParallel(new WorksetInitializerProcessor(workSet, workSet.getSourceRefset(), config, updater));
+		WorksetInitializerProcessor initWorker = new WorksetInitializerProcessor(workSet, workSet.getSourceRefset(), config, updater);
+		Ts.get().iterateConceptDataInParallel(initWorker);
+		updater.setTaskMessage("Included: " + initWorker.getIncludedCounter() + 
+				" Excluded: " + initWorker.getExcludedByPolicyCounter());
 		updater.finish();
 	}
 

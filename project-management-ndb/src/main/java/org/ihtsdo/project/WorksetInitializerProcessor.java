@@ -26,6 +26,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.model.WorkSet;
 import org.ihtsdo.project.refset.PromotionRefset;
@@ -42,6 +43,7 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.spec.ValidationException;
@@ -53,42 +55,57 @@ public class WorksetInitializerProcessor implements ProcessUnfetchedConceptDataB
 
 	/** The members nid set. */
 	NidBitSetBI membersNidSet;
-	
+
 	/** The vc. */
 	ViewCoordinate vc;
-	
+
 	/** The prom ref. */
 	PromotionRefset promRef;
-	
+
 	/** The active nid. */
 	int activeNid;
-	
+
 	/** The active uuid. */
 	UUID activeUuid;
-	
+
 	/** The inactive nid. */
 	int inactiveNid;
-	
+
 	/** The inactive uuid. */
 	UUID inactiveUuid;
-	
+
 	/** The updater. */
 	ActivityUpdater updater;
-	
+
 	/** The tc. */
 	TerminologyBuilderBI tc;
-	
+
 	/** The work set nid. */
 	int workSetNid;
+	
+	/** The work set prom nid. */
+	int workSetPromNid;
 
 	/** The excluded concepts. */
 	NidBitSetBI excludedConcepts;
-	
+
+	/** The other worksets. */
+	NidBitSetBI otherWorksetsNids;
+
 	/** The current members concepts. */
 	NidBitSetBI currentMembersConcepts;
-	
+
 	/** The included concepts. */
 	NidBitSetBI includedConcepts;
+
+	/** The included counter. */
+	int includedCounter;
+
+	/** The excluded by policy counter. */
+	int excludedByPolicyCounter;
+	
+	/** The completed workflow nids. */
+	NidBitSetBI completedWorkflowNids;
 
 	/**
 	 * Instantiates a new workset initializer processor.
@@ -101,19 +118,31 @@ public class WorksetInitializerProcessor implements ProcessUnfetchedConceptDataB
 	public WorksetInitializerProcessor(WorkSet workSet, I_GetConceptData sourceRefset, I_ConfigAceFrame config, ActivityUpdater updater) {
 		super();
 		try {
+			includedCounter = 0;
+			excludedByPolicyCounter = 0;
 			vc = config.getViewCoordinate();
 			tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
 					config.getViewCoordinate());
 			this.updater = updater;
 			this.workSetNid = workSet.getId();
+			this.workSetPromNid = workSet.getPromotionRefset(config).getRefsetId();
 			promRef = workSet.getPromotionRefset(config);
 			TerminologyStoreDI ts = Ts.get();
 			I_TermFactory termFactory = Terms.get();
 
 			excludedConcepts = ts.getEmptyNidSet();
+			otherWorksetsNids = ts.getEmptyNidSet();
 			currentMembersConcepts = ts.getEmptyNidSet();
 			includedConcepts = ts.getEmptyNidSet();
 			membersNidSet = ts.getEmptyNidSet();
+
+			completedWorkflowNids = ts.getEmptyNidSet();
+
+			completedWorkflowNids.setMember(ArchitectonicAuxiliary.Concept.COMPLETED.localize().getNid());
+			completedWorkflowNids.setMember(ArchitectonicAuxiliary.Concept.APPROVED_FOR_PUBLICATION_EB_STATUS.localize().getNid());
+			completedWorkflowNids.setMember(ArchitectonicAuxiliary.Concept.APPROVED_FOR_PUBLICATION_FAST_TRACK_STATUS.localize().getNid());
+			completedWorkflowNids.setMember(ArchitectonicAuxiliary.Concept.APPROVED_FOR_PUBLICATION_STATUS.localize().getNid());
+			completedWorkflowNids.setMember(ArchitectonicAuxiliary.Concept.APPROVED_FOR_PUBLICATION_TPO_REV_STATUS.localize().getNid());
 
 			updater.setTaskMessage("Processing sourceMembers");
 			ConceptChronicleBI sourceRefsetChronicle = (ConceptChronicleBI) sourceRefset;
@@ -143,6 +172,14 @@ public class WorksetInitializerProcessor implements ProcessUnfetchedConceptDataB
 				}
 			}
 
+			updater.setTaskMessage("Processing other worksets");
+			List<WorkSet> otherWorkSets = TerminologyProjectDAO.getAllWorkSetsForProject(workSet.getProject(config), config);
+			for (WorkSet loopWorkSet : otherWorkSets) {
+				if (loopWorkSet.getId() != workSet.getId()) {
+					otherWorksetsNids.setMember(loopWorkSet.getPromotionRefset(config).getRefsetId());
+				}
+			}
+
 			activeNid = SnomedMetadataRf1.CURRENT_RF1.getLenient().getNid();
 			inactiveNid = SnomedMetadataRf1.RETIRED_INACTIVE_STATUS_RF1.getLenient().getNid();
 			activeUuid = SnomedMetadataRf1.CURRENT_RF1.getLenient().getPrimUuid();
@@ -154,6 +191,8 @@ public class WorksetInitializerProcessor implements ProcessUnfetchedConceptDataB
 		} catch (IOException e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		} catch (TerminologyException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
 	}
@@ -187,7 +226,6 @@ public class WorksetInitializerProcessor implements ProcessUnfetchedConceptDataB
 				Terms.get().addUncommittedNoChecks((I_GetConceptData) c.getChronicle());
 			}
 		}
-
 	}
 
 	/**
@@ -200,14 +238,35 @@ public class WorksetInitializerProcessor implements ProcessUnfetchedConceptDataB
 		boolean update = false;
 		updater.incrementCount();
 		
+		boolean excludedByPolicy = false;
+		try {
+			for (RefexVersionBI<?> loopAnnot : 
+				concept.getCurrentAnnotationMembers(Terms.get().getActiveAceFrameConfig().getViewCoordinate())) {
+				if (loopAnnot.getCollectionNid() != workSetPromNid) {
+					if (otherWorksetsNids.isMember(loopAnnot.getCollectionNid())) {
+						RefexCnidVersionBI loopCidAnnot = (RefexCnidVersionBI) loopAnnot;
+						if (!completedWorkflowNids.isMember(loopCidAnnot.getCnid1())) {
+							excludedByPolicy = true;
+						}
+					}
+				}
+			}
+		} catch (IOException e1) {
+			AceLog.getAppLog().alertAndLogException(e1);
+		} catch (TerminologyException e1) {
+			AceLog.getAppLog().alertAndLogException(e1);
+		}
+
 		if (currentMembersConcepts.isMember(concept.getNid()) && 
 				includedConcepts.isMember(concept.getNid()) && 
-				!excludedConcepts.isMember(concept.getNid())) {
+				!excludedConcepts.isMember(concept.getNid()) && !excludedByPolicy) {
 			// already a member, do nothing
+			includedCounter++;
 		} else if (!currentMembersConcepts.isMember(concept.getNid()) && 
 				includedConcepts.isMember(concept.getNid()) && 
-				!excludedConcepts.isMember(concept.getNid())) {
+				!excludedConcepts.isMember(concept.getNid()) && !excludedByPolicy) {
 			// should add
+			includedCounter++;
 			update = true;
 			try {
 				RefexCAB newSpec = new RefexCAB(
@@ -216,7 +275,7 @@ public class WorksetInitializerProcessor implements ProcessUnfetchedConceptDataB
 						workSetNid);
 				newSpec.put(RefexProperty.CNID1, activeNid);
 				RefexChronicleBI<?> newRefex = tc.constructIfNotCurrent(newSpec);
-				
+
 				RefexCAB newSpecForProm = new RefexCAB(
 						TK_REFSET_TYPE.CID,
 						concept.getNid(),
@@ -231,8 +290,9 @@ public class WorksetInitializerProcessor implements ProcessUnfetchedConceptDataB
 			}
 		} else if (currentMembersConcepts.isMember(concept.getNid()) && 
 				(!includedConcepts.isMember(concept.getNid()) || 
-				excludedConcepts.isMember(concept.getNid()))) {
+						excludedConcepts.isMember(concept.getNid()) || excludedByPolicy)) {
 			// should remove
+			excludedByPolicyCounter++;
 			update = true;
 			try {
 				RefexCAB newSpec = new RefexCAB(
@@ -242,7 +302,7 @@ public class WorksetInitializerProcessor implements ProcessUnfetchedConceptDataB
 				newSpec.put(RefexProperty.CNID1, inactiveNid);
 				newSpec.setStatusUuid(inactiveUuid);
 				RefexChronicleBI<?> newRefex = tc.constructIfNotCurrent(newSpec);
-				
+
 				RefexCAB newSpecForProm = new RefexCAB(
 						TK_REFSET_TYPE.CID,
 						concept.getNid(),
@@ -259,7 +319,21 @@ public class WorksetInitializerProcessor implements ProcessUnfetchedConceptDataB
 			// do nothing
 		}
 		return update;
-		
+
+	}
+
+	/**
+	 * @return the includedCounter
+	 */
+	public int getIncludedCounter() {
+		return includedCounter;
+	}
+
+	/**
+	 * @return the excludedByPolicyCounter
+	 */
+	public int getExcludedByPolicyCounter() {
+		return excludedByPolicyCounter;
 	}
 
 }

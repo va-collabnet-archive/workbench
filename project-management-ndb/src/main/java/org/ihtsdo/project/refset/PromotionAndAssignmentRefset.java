@@ -35,10 +35,14 @@ import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
+import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid_cnid.RefexCnidCnidAnalogBI;
 import org.ihtsdo.tk.api.refex.type_cnid_cnid.RefexCnidCnidVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 
 /**
  * The Class PromotionAndAssignmentRefset.
@@ -47,7 +51,7 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 
 	/** The default status nid. */
 	private int defaultStatusNid;
-	
+
 	/** The default user nid. */
 	private int defaultUserNid;
 
@@ -244,7 +248,21 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 		boolean statusAlreadyPresent = false;
 		RefexVersionBI oldStatus = getLastPromotionTuple(componentId, config);
 		if (oldStatus != null) {
-			I_ExtendByRef oldExtension = termFactory.getExtension(oldStatus.getNid());
+			RefexCnidCnidVersionBI oldStatusCC = (RefexCnidCnidVersionBI) oldStatus;
+			// dual revision prevention
+			if (oldStatus.getTime() == Long.MAX_VALUE) {
+				termFactory.commit();
+			}
+			RefexCAB newSpec = new RefexCAB(
+					TK_REFSET_TYPE.CID_CID,
+					componentId,
+					refsetId);
+			newSpec.put(RefexProperty.CNID1, statusConceptId);
+			newSpec.put(RefexProperty.CNID2, oldStatusCC.getCnid2());
+			RefexChronicleBI<?> newRefex = tc.constructIfNotCurrent(newSpec);
+			component.addAnnotation(newRefex);
+			termFactory.addUncommittedNoChecks(component);
+			/*I_ExtendByRef oldExtension = termFactory.getExtension(oldStatus.getNid());
 			long lastVersion = Long.MIN_VALUE;
 			I_ExtendByRefPartCidCid promotionStatusExtensionPart = null;
 			List<? extends I_ExtendByRefPart> loopParts = oldExtension.getMutableParts();
@@ -265,7 +283,7 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 				// termFactory.addUncommittedNoChecks(refsetConcept);
 				termFactory.addUncommittedNoChecks(component);
 				// termFactory.commit();
-			}
+			}*/
 
 			// new proposal by keith and aimee
 			// RefexCnidCnidVersionBI oldStatusCnid = (RefexCnidCnidVersionBI)
@@ -290,7 +308,7 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 			// termFactory.addUncommittedNoChecks(component);
 			// }
 		} else {
-			I_GetConceptData newMemberConcept = termFactory.getConcept(componentId);
+			/*I_GetConceptData newMemberConcept = termFactory.getConcept(componentId);
 			I_HelpRefsets refsetHelper = termFactory.getRefsetHelper(config);
 
 			RefsetPropertyMap propMap = new RefsetPropertyMap();
@@ -300,16 +318,17 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 			refsetHelper.newRefsetExtension(this.refsetId, componentId, EConcept.REFSET_TYPES.CID_CID, propMap, config);
 
 			// termFactory.addUncommittedNoChecks(refsetConcept);
-			termFactory.addUncommittedNoChecks(newMemberConcept);
+			termFactory.addUncommittedNoChecks(newMemberConcept);*/
 
-			// RefexCAB newSpec = new RefexCAB(
-			// TK_REFSET_TYPE.CID_CID,
-			// componentId,
-			// refsetId);
-			// newSpec.put(RefexProperty.CNID1, statusConceptId);
-			// newSpec.put(RefexProperty.CNID2, defaultUserNid);
-			// RefexChronicleBI<?> newRefex = tc.construct(newSpec);
-			// termFactory.addUncommittedNoChecks(component);
+			RefexCAB newSpec = new RefexCAB(
+					TK_REFSET_TYPE.CID_CID,
+					componentId,
+					refsetId);
+			newSpec.put(RefexProperty.CNID1, statusConceptId);
+			newSpec.put(RefexProperty.CNID2, defaultUserNid);
+			RefexChronicleBI<?> newRefex = tc.construct(newSpec);
+			component.addAnnotation(newRefex);
+			termFactory.addUncommittedNoChecks(component);
 		}
 
 		return;
@@ -330,8 +349,22 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 		boolean statusAlreadyPresent = false;
 		RefexVersionBI oldStatus = getLastPromotionTuple(componentId, config);
 		if (oldStatus != null) {
+			RefexCnidCnidVersionBI oldStatusCC = (RefexCnidCnidVersionBI) oldStatus;
 			statusAlreadyPresent = true;
-			long lastVersion = Long.MIN_VALUE;
+			// dual revision prevention
+			if (oldStatus.getTime() == Long.MAX_VALUE) {
+				termFactory.commit();
+			}
+			RefexCAB newSpec = new RefexCAB(
+					TK_REFSET_TYPE.CID_CID,
+					componentId,
+					refsetId);
+			newSpec.put(RefexProperty.CNID1, oldStatusCC.getCnid1());
+			newSpec.put(RefexProperty.CNID2, destinationUserConceptId);
+			RefexChronicleBI<?> newRefex = tc.constructIfNotCurrent(newSpec);
+			component.addAnnotation(newRefex);
+			termFactory.addUncommittedNoChecks(component);
+			/*long lastVersion = Long.MIN_VALUE;
 			I_ExtendByRef oldExtension = termFactory.getExtension(oldStatus.getNid());
 			I_ExtendByRefPartCidCid promotionStatusExtensionPart = null;
 			List<? extends I_ExtendByRefPart> loopParts = oldExtension.getMutableParts();
@@ -351,41 +384,41 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 				// termFactory.addUncommittedNoChecks(refsetConcept);
 				termFactory.addUncommittedNoChecks(component);
 				// termFactory.commit();
-			}
-			// RefexCnidCnidVersionBI oldStatusCnid = (RefexCnidCnidVersionBI)
-			// oldStatus;
-			// if (oldStatusCnid.getCnid2() != destinationUserConceptId) {
-			// for (PathBI editPath : config.getEditingPathSet()) {
-			// RefexCnidCnidAnalogBI newVersion =
-			// (RefexCnidCnidAnalogBI) oldStatusCnid.makeAnalog(activeValueNid,
-			// config.getDbConfig().getUserConcept().getNid(),
-			// editPath.getConceptNid(),
-			// Long.MAX_VALUE);
-			// newVersion.setCnid2(destinationUserConceptId);
-			// oldStatus.getChronicle().getVersions().add(newVersion);
-			// }
-			// termFactory.addUncommittedNoChecks(component);
-			// }
+			}*/
+			//			RefexCnidCnidVersionBI oldStatusCnid = (RefexCnidCnidVersionBI)
+			//			oldStatus;
+			//			if (oldStatusCnid.getCnid2() != destinationUserConceptId) {
+			//				for (PathBI editPath : config.getEditingPathSet()) {
+			//					RefexCnidCnidAnalogBI newVersion =
+			//						(RefexCnidCnidAnalogBI) oldStatusCnid.makeAnalog(activeValueNid,
+			//								config.getDbConfig().getUserConcept().getNid(),
+			//								editPath.getConceptNid(),
+			//								Long.MAX_VALUE);
+			//					newVersion.setCnid2(destinationUserConceptId);
+			//					oldStatus.getChronicle().getVersions().add(newVersion);
+			//				}
+			//				termFactory.addUncommittedNoChecks(component);
+			//			}
 		} else {
-			I_GetConceptData newMemberConcept = termFactory.getConcept(componentId);
-			I_HelpRefsets refsetHelper = termFactory.getRefsetHelper(config);
-
-			RefsetPropertyMap propMap = new RefsetPropertyMap();
-			propMap.put(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, defaultStatusNid);
-			propMap.put(RefsetPropertyMap.REFSET_PROPERTY.CID_TWO, destinationUserConceptId);
-
-			refsetHelper.newRefsetExtension(this.refsetId, componentId, EConcept.REFSET_TYPES.CID_CID, propMap, config);
+			//			I_HelpRefsets refsetHelper = termFactory.getRefsetHelper(config);
+			//
+			//			RefsetPropertyMap propMap = new RefsetPropertyMap();
+			//			propMap.put(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, defaultStatusNid);
+			//			propMap.put(RefsetPropertyMap.REFSET_PROPERTY.CID_TWO, destinationUserConceptId);
+			//
+			//			refsetHelper.newRefsetExtension(this.refsetId, componentId, EConcept.REFSET_TYPES.CID_CID, propMap, config);
 
 			// termFactory.addUncommittedNoChecks(refsetConcept);
-			termFactory.addUncommittedNoChecks(newMemberConcept);
-			// RefexCAB newSpec = new RefexCAB(
-			// TK_REFSET_TYPE.CID_CID,
-			// componentId,
-			// refsetId);
-			// newSpec.put(RefexProperty.CNID1, defaultStatusNid);
-			// newSpec.put(RefexProperty.CNID2, destinationUserConceptId);
-			// RefexChronicleBI<?> newRefex = tc.construct(newSpec);
-			// termFactory.addUncommittedNoChecks(component);
+			//			termFactory.addUncommittedNoChecks(newMemberConcept);
+			RefexCAB newSpec = new RefexCAB(
+					TK_REFSET_TYPE.CID_CID,
+					componentId,
+					refsetId);
+			newSpec.put(RefexProperty.CNID1, defaultStatusNid);
+			newSpec.put(RefexProperty.CNID2, destinationUserConceptId);
+			RefexChronicleBI<?> newRefex = tc.construct(newSpec);
+			component.addAnnotation(newRefex);
+			termFactory.addUncommittedNoChecks(component);
 		}
 
 		return;
@@ -408,7 +441,21 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 		RefexVersionBI oldStatus = getLastPromotionTuple(componentId, config);
 		if (oldStatus != null) {
 			statusAlreadyPresent = true;
-			long lastVersion = Long.MIN_VALUE;
+			RefexCnidCnidVersionBI oldStatusCC = (RefexCnidCnidVersionBI) oldStatus;
+			// dual revision prevention
+			if (oldStatus.getTime() == Long.MAX_VALUE) {
+				termFactory.commit();
+			}
+			RefexCAB newSpec = new RefexCAB(
+					TK_REFSET_TYPE.CID_CID,
+					componentId,
+					refsetId);
+			newSpec.put(RefexProperty.CNID1, statusConceptId);
+			newSpec.put(RefexProperty.CNID2, destinationUserConceptId);
+			RefexChronicleBI<?> newRefex = tc.constructIfNotCurrent(newSpec);
+			component.addAnnotation(newRefex);
+			termFactory.addUncommittedNoChecks(component);
+			/*long lastVersion = Long.MIN_VALUE;
 			I_ExtendByRef oldExtension = termFactory.getExtension(oldStatus.getNid());
 			I_ExtendByRefPartCidCid promotionStatusExtensionPart = null;
 			List<? extends I_ExtendByRefPart> loopParts = oldExtension.getMutableParts();
@@ -430,7 +477,7 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 				// termFactory.addUncommittedNoChecks(refsetConcept);
 				termFactory.addUncommittedNoChecks(component);
 				// termFactory.commit();
-			}
+			}*/
 			// RefexCnidCnidVersionBI oldStatusCnid = (RefexCnidCnidVersionBI)
 			// oldStatus;
 			// if (oldStatusCnid.getCnid2() != destinationUserConceptId) {
@@ -446,7 +493,7 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 			// termFactory.addUncommittedNoChecks(component);
 			// }
 		} else {
-			I_GetConceptData newMemberConcept = termFactory.getConcept(componentId);
+			/*I_GetConceptData newMemberConcept = termFactory.getConcept(componentId);
 			I_HelpRefsets refsetHelper = termFactory.getRefsetHelper(config);
 
 			RefsetPropertyMap propMap = new RefsetPropertyMap();
@@ -456,15 +503,17 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 			refsetHelper.newRefsetExtension(this.refsetId, componentId, EConcept.REFSET_TYPES.CID_CID, propMap, config);
 
 			// termFactory.addUncommittedNoChecks(refsetConcept);
-			termFactory.addUncommittedNoChecks(newMemberConcept);
-			// RefexCAB newSpec = new RefexCAB(
-			// TK_REFSET_TYPE.CID_CID,
-			// componentId,
-			// refsetId);
-			// newSpec.put(RefexProperty.CNID1, defaultStatusNid);
-			// newSpec.put(RefexProperty.CNID2, destinationUserConceptId);
-			// RefexChronicleBI<?> newRefex = tc.construct(newSpec);
-			// termFactory.addUncommittedNoChecks(component);
+			termFactory.addUncommittedNoChecks(newMemberConcept);*/
+			
+			RefexCAB newSpec = new RefexCAB(
+					TK_REFSET_TYPE.CID_CID,
+					componentId,
+					refsetId);
+			newSpec.put(RefexProperty.CNID1, statusConceptId);
+			newSpec.put(RefexProperty.CNID2, destinationUserConceptId);
+			RefexChronicleBI<?> newRefex = tc.construct(newSpec);
+			component.addAnnotation(newRefex);
+			termFactory.addUncommittedNoChecks(component);
 		}
 
 		return;
