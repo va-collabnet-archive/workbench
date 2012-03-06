@@ -11,9 +11,9 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule;
 
 public interface TranslationHelperBI {
 
-	List<ContextualizedDescription> getSourceTerms(I_GetConceptData concept, TranslationProject project, ConfigTranslationModule config) throws Exception;
+	List<ContextualizedDescription> getSourceTerms(I_GetConceptData concept, TranslationProject project) throws Exception;
 
-	List<ContextualizedDescription> getTargetTerms(I_GetConceptData concept, TranslationProject project, ConfigTranslationModule config) throws Exception;
+	List<ContextualizedDescription> getTargetTerms(I_GetConceptData concept, TranslationProject project) throws Exception;
 
 	boolean addFsn(TranslationProject project, I_GetConceptData concept) throws FSNGenerationException, Exception;
 
