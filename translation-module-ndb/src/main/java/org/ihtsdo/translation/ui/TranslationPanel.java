@@ -406,7 +406,7 @@ public class TranslationPanel extends JPanel {
 			mItem.setActionCommand("Send as preferred");
 			mItem.addActionListener(mItemListener);
 			menu.add(mItem);
-			
+
 			mItema = new JMenuItem();
 			mItema.setText("Send as acceptable");
 			mItema.setActionCommand("Send as acceptable");
@@ -508,7 +508,6 @@ public class TranslationPanel extends JPanel {
 									clipboard.setContents(strSel, strSel);
 								}
 							}
-							
 
 							try {
 								populateTargetTree();
@@ -705,7 +704,7 @@ public class TranslationPanel extends JPanel {
 				if (!(descriptionInEditor.getText().trim().equals(targetTextField.getText().trim()) && (descriptionInEditor.isInitialCaseSignificant() == rbYes.isSelected())
 						&& descriptionInEditor.getAcceptabilityId() == ((I_GetConceptData) cmbAccep.getSelectedItem()).getConceptNid()
 						&& ((descriptionInEditor.getExtensionStatusId() == active.getConceptNid() && rbAct.isSelected()) || (descriptionInEditor.getExtensionStatusId() != active.getConceptNid() && !rbAct.isSelected())) && ((descriptionInEditor
-								.getTypeId() == fsn.getConceptNid() && fsn.equals((I_GetConceptData) comboBox1.getSelectedItem())) || (descriptionInEditor.getTypeId() != fsn.getConceptNid() && !fsn.equals((I_GetConceptData) comboBox1.getSelectedItem()))))) {
+						.getTypeId() == fsn.getConceptNid() && fsn.equals((I_GetConceptData) comboBox1.getSelectedItem())) || (descriptionInEditor.getTypeId() != fsn.getConceptNid() && !fsn.equals((I_GetConceptData) comboBox1.getSelectedItem()))))) {
 					bPendTerm = false;
 				}
 			} else {
@@ -999,14 +998,14 @@ public class TranslationPanel extends JPanel {
 				if (rbInact.isSelected()) {
 					if (!targetLangCode.equals(descriptionInEditor.getLang())) {
 						descriptionInEditor.setExtensionStatusId(inactive.getConceptNid());
-					}else{
+					} else {
 						descriptionInEditor.setExtensionStatusId(inactive.getConceptNid());
 						descriptionInEditor.setDescriptionStatusId(inactive.getConceptNid());
 					}
 				} else {
 					if (!targetLangCode.equals(descriptionInEditor.getLang())) {
 						descriptionInEditor.setExtensionStatusId(active.getConceptNid());
-					}else{
+					} else {
 						descriptionInEditor.setExtensionStatusId(active.getConceptNid());
 						descriptionInEditor.setDescriptionStatusId(active.getConceptNid());
 					}
@@ -1024,8 +1023,9 @@ public class TranslationPanel extends JPanel {
 				}
 			}
 
-			if (result)
+			if (result) {
 				clearForm(false);
+			}
 
 		} catch (IOException e1) {
 			e1.printStackTrace();
@@ -1387,7 +1387,7 @@ public class TranslationPanel extends JPanel {
 					JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 				}
 			}
-		}else if(actionObj instanceof String && actionObj.toString().equals(WfAction.SEND_TO_OUTBOX)){
+		} else if (actionObj instanceof String && actionObj.toString().equals(WfAction.SEND_TO_OUTBOX)) {
 			clearForm(true);
 			setReadOnlyMode(true);
 			bLaunch.setEnabled(false);
@@ -1431,6 +1431,84 @@ public class TranslationPanel extends JPanel {
 
 	private void sendMenuItemActionPerformed(ActionEvent e) {
 		bLaunchActionPerformed();
+	}
+
+	private void saveSimpleActionPerformed(ActionEvent e) {
+		I_ConfigAceFrame config = null;
+		try {
+			config = Terms.get().getActiveAceFrameConfig();
+			ConfigTranslationModule confTransMod = LanguageUtil.getTranslationConfig(config);
+			System.out.println(confTransMod.isEnableSpellChecker());
+			if (confTransMod.isEnableSpellChecker() && targetTextChanged) {
+				targetTextField.setText(DocumentManager.spellcheckPhrase(targetTextField.getText(), null, targetLangRefset.getLangCode(config)));
+				targetTextChanged = false;
+			}
+
+			if (descriptionInEditor == null && !targetTextField.getText().trim().equals("") && rbAct.isSelected()) {
+				descriptionInEditor = (ContextualizedDescription) ContextualizedDescription.createNewContextualizedDescription(concept.getConceptNid(), targetId, targetLangRefset.getLangCode(config));
+			}
+			if (descriptionInEditor != null) {
+
+				String targetLangCode = "";
+				try {
+					targetLangCode = targetLangRefset.getLangCode(Terms.get().getActiveAceFrameConfig());
+				} catch (TerminologyException ex) {
+					ex.printStackTrace();
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
+
+				descriptionInEditor.setText(targetTextField.getText());
+				descriptionInEditor.setInitialCaseSignificant(rbYes.isSelected());
+
+				// set description type like RF1
+				if (targetLangCode.equals(descriptionInEditor.getLang())) {
+					if (((I_GetConceptData) comboBox1.getSelectedItem()).equals(synonym)) {
+						descriptionInEditor.setTypeId(synonym.getConceptNid());
+					} else {
+						descriptionInEditor.setTypeId(fsn.getConceptNid());
+					}
+				}
+				// if some is wrong then all to retire
+				if (rbInact.isSelected()) {
+					if (!targetLangCode.equals(descriptionInEditor.getLang())) {
+						descriptionInEditor.setExtensionStatusId(inactive.getConceptNid());
+					} else {
+						descriptionInEditor.setExtensionStatusId(inactive.getConceptNid());
+						descriptionInEditor.setDescriptionStatusId(inactive.getConceptNid());
+					}
+				} else {
+					if (!targetLangCode.equals(descriptionInEditor.getLang())) {
+						descriptionInEditor.setExtensionStatusId(active.getConceptNid());
+					} else {
+						descriptionInEditor.setExtensionStatusId(active.getConceptNid());
+						descriptionInEditor.setDescriptionStatusId(active.getConceptNid());
+					}
+				}
+				descriptionInEditor.setAcceptabilityId(((I_GetConceptData) cmbAccep.getSelectedItem()).getConceptNid());
+
+				descriptionInEditor.persistChanges();
+				try {
+					LanguageUtil.generateFSN(concept, sourceLangRefsets.iterator().next(), targetLangRefset, translationProject, config);
+
+				} catch (FSNGenerationException e1) {
+					e1.printStackTrace();
+
+					JOptionPane.showOptionDialog(this, e1.getMessage(), "Warning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
+				}
+			}
+			populateTargetTree();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			JOptionPane.showOptionDialog(this, e1.getMessage(), "Error", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+		} catch (TerminologyException e1) {
+			e1.printStackTrace();
+			JOptionPane.showOptionDialog(this, e1.getMessage(), "Error", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+		} catch (Exception e1) {
+			e1.printStackTrace();
+			JOptionPane.showOptionDialog(this, e1.getMessage(), "Error", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+		}
+
 	}
 
 	/**
@@ -1508,6 +1586,7 @@ public class TranslationPanel extends JPanel {
 		bAddFSN = new JMenuItem();
 		mAddPref = new JMenuItem();
 		mAddDesc = new JMenuItem();
+		saveSimple = new JMenuItem();
 		saveAndAdd = new JMenuItem();
 		menu3 = new JMenu();
 		mSpellChk = new JMenuItem();
@@ -1565,7 +1644,6 @@ public class TranslationPanel extends JPanel {
 		scrollPane7 = new JScrollPane();
 		tree3 = new JTree();
 		hierarchyNavigator1 = new HierarchyNavigator();
-		panel6 = new JPanel();
 		popupMenu1 = new JPopupMenu();
 		menuItem2 = new JMenuItem();
 		menuItem3 = new JMenuItem();
@@ -1576,32 +1654,32 @@ public class TranslationPanel extends JPanel {
 		saveZoomButton = new JButton();
 		cancelZoomChange = new JButton();
 
-		//======== this ========
+		// ======== this ========
 		setBackground(new Color(238, 238, 238));
 		setLayout(new BorderLayout());
 
-		//======== panel1 ========
+		// ======== panel1 ========
 		{
 			panel1.setLayout(new GridBagLayout());
-			((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0, 0};
-			((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {30, 0};
-			((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {1.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
-			((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+			((GridBagLayout) panel1.getLayout()).columnWidths = new int[] { 0, 0, 0, 0, 0, 0 };
+			((GridBagLayout) panel1.getLayout()).rowHeights = new int[] { 30, 0 };
+			((GridBagLayout) panel1.getLayout()).columnWeights = new double[] { 1.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4 };
+			((GridBagLayout) panel1.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
 
-			//======== menuBar1 ========
+			// ======== menuBar1 ========
 			{
 
-				//======== menu1 ========
+				// ======== menu1 ========
 				{
 					menu1.setText("E[d]it");
 					menu1.setFont(new Font("Lucida Grande", Font.PLAIN, 13));
 					menu1.setMnemonic('D');
 
-					//---- bAddFSN ----
+					// ---- bAddFSN ----
 					bAddFSN.setText("Add FSN");
 					bAddFSN.setFont(new Font("Lucida Grande", Font.PLAIN, 13));
 					bAddFSN.setMnemonic('F');
-					bAddFSN.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
+					bAddFSN.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_MASK));
 					bAddFSN.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
@@ -1610,11 +1688,11 @@ public class TranslationPanel extends JPanel {
 					});
 					menu1.add(bAddFSN);
 
-					//---- mAddPref ----
+					// ---- mAddPref ----
 					mAddPref.setText("Add Preferred");
 					mAddPref.setFont(new Font("Lucida Grande", Font.PLAIN, 13));
 					mAddPref.setMnemonic('P');
-					mAddPref.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
+					mAddPref.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_MASK));
 					mAddPref.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
@@ -1623,11 +1701,11 @@ public class TranslationPanel extends JPanel {
 					});
 					menu1.add(mAddPref);
 
-					//---- mAddDesc ----
+					// ---- mAddDesc ----
 					mAddDesc.setText("Add Description");
 					mAddDesc.setFont(new Font("Lucida Grande", Font.PLAIN, 13));
 					mAddDesc.setMnemonic('D');
-					mAddDesc.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
+					mAddDesc.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_MASK));
 					mAddDesc.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
@@ -1636,10 +1714,20 @@ public class TranslationPanel extends JPanel {
 					});
 					menu1.add(mAddDesc);
 
-					//---- saveAndAdd ----
+					// ---- saveSimple ----
+					saveSimple.setText("Save");
+					saveSimple.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							saveSimpleActionPerformed(e);
+						}
+					});
+					menu1.add(saveSimple);
+
+					// ---- saveAndAdd ----
 					saveAndAdd.setText("Save And Add Description");
 					saveAndAdd.setMnemonic('A');
-					saveAndAdd.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
+					saveAndAdd.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_MASK));
 					saveAndAdd.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
@@ -1650,17 +1738,17 @@ public class TranslationPanel extends JPanel {
 				}
 				menuBar1.add(menu1);
 
-				//======== menu3 ========
+				// ======== menu3 ========
 				{
 					menu3.setText("[T]ools");
 					menu3.setSelectedIcon(null);
 					menu3.setFont(new Font("Lucida Grande", Font.PLAIN, 13));
 					menu3.setMnemonic('T');
 
-					//---- mSpellChk ----
+					// ---- mSpellChk ----
 					mSpellChk.setText("Spellcheck");
 					mSpellChk.setFont(new Font("Lucida Grande", Font.PLAIN, 13));
-					mSpellChk.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
+					mSpellChk.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_MASK));
 					mSpellChk.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
@@ -1671,16 +1759,16 @@ public class TranslationPanel extends JPanel {
 				}
 				menuBar1.add(menu3);
 
-				//======== menu2 ========
+				// ======== menu2 ========
 				{
 					menu2.setText("[V]iew");
 					menu2.setFont(new Font("Lucida Grande", Font.PLAIN, 13));
 					menu2.setMnemonic('V');
 
-					//---- mHist ----
+					// ---- mHist ----
 					mHist.setText("History");
 					mHist.setMnemonic('Y');
-					mHist.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
+					mHist.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_MASK));
 					mHist.setFont(new Font("Lucida Grande", Font.PLAIN, 13));
 					mHist.addActionListener(new ActionListener() {
 						@Override
@@ -1690,11 +1778,11 @@ public class TranslationPanel extends JPanel {
 					});
 					menu2.add(mHist);
 
-					//---- mLog ----
+					// ---- mLog ----
 					mLog.setText("Log");
 					mLog.setMnemonic('G');
 					mLog.setIcon(null);
-					mLog.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
+					mLog.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_MASK));
 					mLog.setFont(new Font("Lucida Grande", Font.PLAIN, 13));
 					mLog.addActionListener(new ActionListener() {
 						@Override
@@ -1706,15 +1794,15 @@ public class TranslationPanel extends JPanel {
 				}
 				menuBar1.add(menu2);
 
-				//======== menu4 ========
+				// ======== menu4 ========
 				{
 					menu4.setText("[S]earch");
 					menu4.setFont(new Font("Lucida Grande", Font.PLAIN, 13));
 					menu4.setMnemonic('S');
 
-					//---- menuItem1 ----
+					// ---- menuItem1 ----
 					menuItem1.setText("Search Documents");
-					menuItem1.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
+					menuItem1.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_MASK));
 					menuItem1.setFont(new Font("Lucida Grande", Font.PLAIN, 13));
 					menuItem1.addActionListener(new ActionListener() {
 						@Override
@@ -1726,14 +1814,14 @@ public class TranslationPanel extends JPanel {
 				}
 				menuBar1.add(menu4);
 
-				//======== actionMenu ========
+				// ======== actionMenu ========
 				{
 					actionMenu.setText("Act[i]on");
 					actionMenu.setMnemonic('I');
 
-					//---- sendMenuItem ----
+					// ---- sendMenuItem ----
 					sendMenuItem.setText("Send");
-					sendMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
+					sendMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_MASK));
 					sendMenuItem.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
@@ -1745,32 +1833,24 @@ public class TranslationPanel extends JPanel {
 				}
 				menuBar1.add(actionMenu);
 			}
-			panel1.add(menuBar1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel1.add(menuBar1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- label14 ----
+			// ---- label14 ----
 			label14.setText("S:-");
 			label14.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel1.add(label14, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel1.add(label14, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- label15 ----
+			// ---- label15 ----
 			label15.setText("TM:-");
 			label15.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel1.add(label15, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel1.add(label15, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- label16 ----
+			// ---- label16 ----
 			label16.setText("LG:-");
 			label16.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel1.add(label16, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel1.add(label16, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- label10 ----
+			// ---- label10 ----
 			label10.setText("text");
 			label10.addMouseListener(new MouseAdapter() {
 				@Override
@@ -1778,72 +1858,65 @@ public class TranslationPanel extends JPanel {
 					label10MouseClicked(e);
 				}
 			});
-			panel1.add(label10, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 0), 0, 0));
+			panel1.add(label10, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 		}
 		add(panel1, BorderLayout.NORTH);
 
-		//======== splitPane3 ========
+		// ======== splitPane3 ========
 		{
 			splitPane3.setResizeWeight(0.2);
 
-			//======== splitPane5 ========
+			// ======== splitPane5 ========
 			{
 				splitPane5.setResizeWeight(0.5);
 				splitPane5.setOrientation(JSplitPane.VERTICAL_SPLIT);
 
-				//======== panel9 ========
+				// ======== panel9 ========
 				{
 					panel9.setBackground(new Color(238, 238, 238));
 					panel9.setMinimumSize(new Dimension(25, 25));
 					panel9.setPreferredSize(new Dimension(25, 25));
 					panel9.setLayout(new GridBagLayout());
-					((GridBagLayout)panel9.getLayout()).columnWidths = new int[] {0, 0};
-					((GridBagLayout)panel9.getLayout()).rowHeights = new int[] {20, 90, 0};
-					((GridBagLayout)panel9.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-					((GridBagLayout)panel9.getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0E-4};
+					((GridBagLayout) panel9.getLayout()).columnWidths = new int[] { 0, 0 };
+					((GridBagLayout) panel9.getLayout()).rowHeights = new int[] { 20, 90, 0 };
+					((GridBagLayout) panel9.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
+					((GridBagLayout) panel9.getLayout()).rowWeights = new double[] { 0.0, 1.0, 1.0E-4 };
 
-					//---- label9 ----
+					// ---- label9 ----
 					label9.setText("Source Language");
 					label9.setMaximumSize(new Dimension(25, 16));
 					label9.setMinimumSize(new Dimension(25, 16));
 					label9.setPreferredSize(new Dimension(25, 16));
 					label9.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-					panel9.add(label9, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 5, 0), 0, 0));
+					panel9.add(label9, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 
-					//======== scrollPane4 ========
+					// ======== scrollPane4 ========
 					{
 						scrollPane4.setPreferredSize(new Dimension(23, 27));
 
-						//---- tabSou ----
+						// ---- tabSou ----
 						tabSou.setPreferredScrollableViewportSize(new Dimension(20, 20));
 						tabSou.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 						scrollPane4.setViewportView(tabSou);
 					}
-					panel9.add(scrollPane4, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 0, 0), 0, 0));
+					panel9.add(scrollPane4, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 				}
 				splitPane5.setTopComponent(panel9);
 
-				//======== tabbedPane2 ========
+				// ======== tabbedPane2 ========
 				{
 					tabbedPane2.setMinimumSize(new Dimension(10, 10));
 					tabbedPane2.setPreferredSize(new Dimension(10, 10));
 					tabbedPane2.addTab("Comments", commentsManagerPanel);
 
-
-					//======== panel11 ========
+					// ======== panel11 ========
 					{
 						panel11.setBackground(Color.white);
 						panel11.setLayout(new GridBagLayout());
-						((GridBagLayout)panel11.getLayout()).columnWidths = new int[] {0, 0};
-						((GridBagLayout)panel11.getLayout()).rowHeights = new int[] {0, 0};
-						((GridBagLayout)panel11.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-						((GridBagLayout)panel11.getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
+						((GridBagLayout) panel11.getLayout()).columnWidths = new int[] { 0, 0 };
+						((GridBagLayout) panel11.getLayout()).rowHeights = new int[] { 0, 0 };
+						((GridBagLayout) panel11.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
+						((GridBagLayout) panel11.getLayout()).rowWeights = new double[] { 1.0, 1.0E-4 };
 					}
 					tabbedPane2.addTab("Issues", panel11);
 					tabbedPane2.setMnemonicAt(1, 'U');
@@ -1852,74 +1925,66 @@ public class TranslationPanel extends JPanel {
 			}
 			splitPane3.setLeftComponent(splitPane5);
 
-			//======== splitPane7 ========
+			// ======== splitPane7 ========
 			{
 				splitPane7.setResizeWeight(0.5);
 				splitPane7.setOrientation(JSplitPane.VERTICAL_SPLIT);
 				splitPane7.setMinimumSize(new Dimension(10, 10));
 				splitPane7.setPreferredSize(new Dimension(10, 10));
 
-				//======== panel10 ========
+				// ======== panel10 ========
 				{
 					panel10.setBorder(new EmptyBorder(5, 5, 5, 5));
 					panel10.setLayout(new BorderLayout(5, 5));
 
-					//======== panel13 ========
+					// ======== panel13 ========
 					{
 						panel13.setLayout(new GridBagLayout());
-						((GridBagLayout)panel13.getLayout()).columnWidths = new int[] {0, 0};
-						((GridBagLayout)panel13.getLayout()).rowHeights = new int[] {0, 75, 0};
-						((GridBagLayout)panel13.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-						((GridBagLayout)panel13.getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0E-4};
+						((GridBagLayout) panel13.getLayout()).columnWidths = new int[] { 0, 0 };
+						((GridBagLayout) panel13.getLayout()).rowHeights = new int[] { 0, 75, 0 };
+						((GridBagLayout) panel13.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
+						((GridBagLayout) panel13.getLayout()).rowWeights = new double[] { 0.0, 1.0, 1.0E-4 };
 
-						//---- label11 ----
+						// ---- label11 ----
 						label11.setText("Target Language");
 						label11.setBackground(new Color(238, 238, 238));
 						label11.setMaximumSize(new Dimension(10, 16));
 						label11.setMinimumSize(new Dimension(10, 16));
 						label11.setPreferredSize(new Dimension(10, 16));
 						label11.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-						panel13.add(label11, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 5, 0), 0, 0));
+						panel13.add(label11, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 
-						//======== scrollPane9 ========
+						// ======== scrollPane9 ========
 						{
 							scrollPane9.setPreferredSize(new Dimension(23, 120));
 							scrollPane9.setMinimumSize(new Dimension(23, 120));
 
-							//---- tabTar ----
+							// ---- tabTar ----
 							tabTar.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 							scrollPane9.setViewportView(tabTar);
 						}
-						panel13.add(scrollPane9, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 0, 0), 0, 0));
+						panel13.add(scrollPane9, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 					}
 					panel10.add(panel13, BorderLayout.NORTH);
 
-					//======== panel19 ========
+					// ======== panel19 ========
 					{
 						panel19.setLayout(new GridBagLayout());
-						((GridBagLayout)panel19.getLayout()).columnWidths = new int[] {77, 172, 0, 0, 0, 0};
-						((GridBagLayout)panel19.getLayout()).rowHeights = new int[] {0, 0};
-						((GridBagLayout)panel19.getLayout()).columnWeights = new double[] {0.0, 1.0, 1.0, 0.0, 0.0, 1.0E-4};
-						((GridBagLayout)panel19.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+						((GridBagLayout) panel19.getLayout()).columnWidths = new int[] { 77, 172, 0, 0, 0, 0 };
+						((GridBagLayout) panel19.getLayout()).rowHeights = new int[] { 0, 0 };
+						((GridBagLayout) panel19.getLayout()).columnWeights = new double[] { 0.0, 1.0, 1.0, 0.0, 0.0, 1.0E-4 };
+						((GridBagLayout) panel19.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
 
-						//---- label4 ----
+						// ---- label4 ----
 						label4.setText("Action");
 						label4.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-						panel19.add(label4, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 0, 5), 0, 0));
+						panel19.add(label4, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-						//---- cmbActions ----
+						// ---- cmbActions ----
 						cmbActions.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-						panel19.add(cmbActions, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 0, 5), 0, 0));
+						panel19.add(cmbActions, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-						//---- bLaunch ----
+						// ---- bLaunch ----
 						bLaunch.setText("Save");
 						bLaunch.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 						bLaunch.addActionListener(new ActionListener() {
@@ -1928,11 +1993,9 @@ public class TranslationPanel extends JPanel {
 								bLaunchActionPerformed();
 							}
 						});
-						panel19.add(bLaunch, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-							GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-							new Insets(0, 0, 0, 5), 0, 0));
+						panel19.add(bLaunch, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 5), 0, 0));
 
-						//---- button1 ----
+						// ---- button1 ----
 						button1.setText("Cancel");
 						button1.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 						button1.addActionListener(new ActionListener() {
@@ -1941,55 +2004,47 @@ public class TranslationPanel extends JPanel {
 								button1ActionPerformed();
 							}
 						});
-						panel19.add(button1, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 0, 5), 0, 0));
+						panel19.add(button1, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-						//---- label12 ----
+						// ---- label12 ----
 						label12.addMouseListener(new MouseAdapter() {
 							@Override
 							public void mouseClicked(MouseEvent e) {
 								label12MouseClicked(e);
 							}
 						});
-						panel19.add(label12, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 0, 0), 0, 0));
+						panel19.add(label12, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 					}
 					panel10.add(panel19, BorderLayout.SOUTH);
 
-					//======== panel2 ========
+					// ======== panel2 ========
 					{
 						panel2.setLayout(new GridBagLayout());
-						((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {0, 0};
-						((GridBagLayout)panel2.getLayout()).rowHeights = new int[] {0, 0, 0};
-						((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-						((GridBagLayout)panel2.getLayout()).rowWeights = new double[] {1.0, 1.0, 1.0E-4};
+						((GridBagLayout) panel2.getLayout()).columnWidths = new int[] { 0, 0 };
+						((GridBagLayout) panel2.getLayout()).rowHeights = new int[] { 0, 0, 0 };
+						((GridBagLayout) panel2.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
+						((GridBagLayout) panel2.getLayout()).rowWeights = new double[] { 1.0, 1.0, 1.0E-4 };
 
-						//======== panel15 ========
+						// ======== panel15 ========
 						{
 							panel15.setMinimumSize(new Dimension(10, 20));
 							panel15.setPreferredSize(new Dimension(10, 20));
 							panel15.setLayout(new GridBagLayout());
-							((GridBagLayout)panel15.getLayout()).columnWidths = new int[] {80, 0, 0};
-							((GridBagLayout)panel15.getLayout()).rowHeights = new int[] {18, 0, 0};
-							((GridBagLayout)panel15.getLayout()).columnWeights = new double[] {0.0, 1.0, 1.0E-4};
-							((GridBagLayout)panel15.getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0E-4};
-							panel15.add(separator1, new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 0), 0, 0));
+							((GridBagLayout) panel15.getLayout()).columnWidths = new int[] { 80, 0, 0 };
+							((GridBagLayout) panel15.getLayout()).rowHeights = new int[] { 18, 0, 0 };
+							((GridBagLayout) panel15.getLayout()).columnWeights = new double[] { 0.0, 1.0, 1.0E-4 };
+							((GridBagLayout) panel15.getLayout()).rowWeights = new double[] { 0.0, 1.0, 1.0E-4 };
+							panel15.add(separator1, new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 
-							//---- label2 ----
+							// ---- label2 ----
 							label2.setText("Term:");
 							label2.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-							panel15.add(label2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-								GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
-								new Insets(0, 0, 0, 5), 0, 0));
+							panel15.add(label2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 5), 0, 0));
 
-							//======== scrollPane5 ========
+							// ======== scrollPane5 ========
 							{
 
-								//---- targetTextField ----
+								// ---- targetTextField ----
 								targetTextField.setRows(5);
 								targetTextField.setLineWrap(true);
 								targetTextField.setPreferredSize(new Dimension(0, 32));
@@ -2003,99 +2058,75 @@ public class TranslationPanel extends JPanel {
 								});
 								scrollPane5.setViewportView(targetTextField);
 							}
-							panel15.add(scrollPane5, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-								new Insets(0, 0, 0, 0), 0, 0));
+							panel15.add(scrollPane5, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 						}
-						panel2.add(panel15, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 5, 0), 0, 0));
+						panel2.add(panel15, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 
-						//======== panel18 ========
+						// ======== panel18 ========
 						{
 							panel18.setPreferredSize(new Dimension(10, 12));
 							panel18.setMinimumSize(new Dimension(10, 12));
 							panel18.setLayout(new GridBagLayout());
-							((GridBagLayout)panel18.getLayout()).columnWidths = new int[] {0, 248, 0, 0, 0, 0, 0};
-							((GridBagLayout)panel18.getLayout()).rowHeights = new int[] {0, 0, 18, 0};
-							((GridBagLayout)panel18.getLayout()).columnWeights = new double[] {0.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0E-4};
-							((GridBagLayout)panel18.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
+							((GridBagLayout) panel18.getLayout()).columnWidths = new int[] { 0, 248, 0, 0, 0, 0, 0 };
+							((GridBagLayout) panel18.getLayout()).rowHeights = new int[] { 0, 0, 18, 0 };
+							((GridBagLayout) panel18.getLayout()).columnWeights = new double[] { 0.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0E-4 };
+							((GridBagLayout) panel18.getLayout()).rowWeights = new double[] { 0.0, 0.0, 0.0, 1.0E-4 };
 
-							//---- label1 ----
+							// ---- label1 ----
 							label1.setText("Term type");
 							label1.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-							panel18.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
+							panel18.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 
-							//---- comboBox1 ----
+							// ---- comboBox1 ----
 							comboBox1.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-							panel18.add(comboBox1, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
+							panel18.add(comboBox1, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 
-							//---- label7 ----
+							// ---- label7 ----
 							label7.setText("Status:");
 							label7.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-							panel18.add(label7, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
+							panel18.add(label7, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 
-							//---- rbAct ----
+							// ---- rbAct ----
 							rbAct.setText("Active");
 							rbAct.setSelected(true);
 							rbAct.setBackground(new Color(238, 238, 238));
 							rbAct.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-							panel18.add(rbAct, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
+							panel18.add(rbAct, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 
-							//---- rbInact ----
+							// ---- rbInact ----
 							rbInact.setText("Inactive");
 							rbInact.setBackground(new Color(238, 238, 238));
 							rbInact.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-							panel18.add(rbInact, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 0), 0, 0));
+							panel18.add(rbInact, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 
-							//---- label5 ----
+							// ---- label5 ----
 							label5.setText("Acceptability:");
 							label5.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-							panel18.add(label5, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
+							panel18.add(label5, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 
-							//---- cmbAccep ----
+							// ---- cmbAccep ----
 							cmbAccep.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-							panel18.add(cmbAccep, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
+							panel18.add(cmbAccep, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 
-							//---- label3 ----
+							// ---- label3 ----
 							label3.setText("Is case significant?");
 							label3.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-							panel18.add(label3, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
+							panel18.add(label3, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 
-							//---- rbYes ----
+							// ---- rbYes ----
 							rbYes.setText("Yes");
 							rbYes.setBackground(new Color(238, 238, 238));
 							rbYes.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-							panel18.add(rbYes, new GridBagConstraints(4, 1, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
+							panel18.add(rbYes, new GridBagConstraints(4, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 
-							//---- rbNo ----
+							// ---- rbNo ----
 							rbNo.setSelected(true);
 							rbNo.setText("No");
 							rbNo.setBackground(new Color(238, 238, 238));
 							rbNo.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-							panel18.add(rbNo, new GridBagConstraints(5, 1, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 0), 0, 0));
+							panel18.add(rbNo, new GridBagConstraints(5, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 
-							//---- label13 ----
+							// ---- label13 ----
 							label13.setText("text");
 							label13.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 							label13.addMouseListener(new MouseAdapter() {
@@ -2104,28 +2135,24 @@ public class TranslationPanel extends JPanel {
 									label13MouseClicked(e);
 								}
 							});
-							panel18.add(label13, new GridBagConstraints(5, 2, 1, 1, 0.0, 0.0,
-								GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-								new Insets(0, 0, 0, 0), 0, 0));
+							panel18.add(label13, new GridBagConstraints(5, 2, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 0), 0, 0));
 						}
-						panel2.add(panel18, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 0, 0), 0, 0));
+						panel2.add(panel18, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 					}
 					panel10.add(panel2, BorderLayout.CENTER);
 				}
 				splitPane7.setTopComponent(panel10);
 
-				//======== tabbedPane3 ========
+				// ======== tabbedPane3 ========
 				{
 					tabbedPane3.setMinimumSize(new Dimension(10, 70));
 					tabbedPane3.setPreferredSize(new Dimension(10, 70));
 
-					//======== scrollPane7 ========
+					// ======== scrollPane7 ========
 					{
 						scrollPane7.setPreferredSize(new Dimension(23, 23));
 
-						//---- tree3 ----
+						// ---- tree3 ----
 						tree3.setVisibleRowCount(4);
 						tree3.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 						scrollPane7.setViewportView(tree3);
@@ -2141,17 +2168,10 @@ public class TranslationPanel extends JPanel {
 		}
 		add(splitPane3, BorderLayout.CENTER);
 
-		//======== panel6 ========
-		{
-			panel6.setBorder(LineBorder.createBlackLineBorder());
-			panel6.setLayout(new BoxLayout(panel6, BoxLayout.Y_AXIS));
-		}
-		add(panel6, BorderLayout.WEST);
-
-		//======== popupMenu1 ========
+		// ======== popupMenu1 ========
 		{
 
-			//---- menuItem2 ----
+			// ---- menuItem2 ----
 			menuItem2.setText("Delete");
 			menuItem2.addActionListener(new ActionListener() {
 				@Override
@@ -2161,7 +2181,7 @@ public class TranslationPanel extends JPanel {
 			});
 			popupMenu1.add(menuItem2);
 
-			//---- menuItem3 ----
+			// ---- menuItem3 ----
 			menuItem3.setText("View Comment");
 			menuItem3.addActionListener(new ActionListener() {
 				@Override
@@ -2172,34 +2192,32 @@ public class TranslationPanel extends JPanel {
 			popupMenu1.add(menuItem3);
 		}
 
-		//======== termZoomDialog ========
+		// ======== termZoomDialog ========
 		{
 			termZoomDialog.setModal(true);
 			Container termZoomDialogContentPane = termZoomDialog.getContentPane();
 			termZoomDialogContentPane.setLayout(new BorderLayout());
 
-			//======== panel12 ========
+			// ======== panel12 ========
 			{
 				panel12.setBorder(new EmptyBorder(5, 5, 5, 5));
 				panel12.setLayout(new GridBagLayout());
-				((GridBagLayout)panel12.getLayout()).columnWidths = new int[] {0, 0, 0};
-				((GridBagLayout)panel12.getLayout()).rowHeights = new int[] {0, 0, 0};
-				((GridBagLayout)panel12.getLayout()).columnWeights = new double[] {1.0, 0.0, 1.0E-4};
-				((GridBagLayout)panel12.getLayout()).rowWeights = new double[] {1.0, 0.0, 1.0E-4};
+				((GridBagLayout) panel12.getLayout()).columnWidths = new int[] { 0, 0, 0 };
+				((GridBagLayout) panel12.getLayout()).rowHeights = new int[] { 0, 0, 0 };
+				((GridBagLayout) panel12.getLayout()).columnWeights = new double[] { 1.0, 0.0, 1.0E-4 };
+				((GridBagLayout) panel12.getLayout()).rowWeights = new double[] { 1.0, 0.0, 1.0E-4 };
 
-				//======== scrollPane2 ========
+				// ======== scrollPane2 ========
 				{
 					scrollPane2.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
-					//---- zoomTextArea ----
+					// ---- zoomTextArea ----
 					zoomTextArea.setLineWrap(true);
 					scrollPane2.setViewportView(zoomTextArea);
 				}
-				panel12.add(scrollPane2, new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 0), 0, 0));
+				panel12.add(scrollPane2, new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 
-				//---- saveZoomButton ----
+				// ---- saveZoomButton ----
 				saveZoomButton.setText("Save");
 				saveZoomButton.addActionListener(new ActionListener() {
 					@Override
@@ -2207,11 +2225,9 @@ public class TranslationPanel extends JPanel {
 						saveZoomButtonActionPerformed(e);
 					}
 				});
-				panel12.add(saveZoomButton, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-					GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-					new Insets(0, 0, 0, 5), 0, 0));
+				panel12.add(saveZoomButton, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 5), 0, 0));
 
-				//---- cancelZoomChange ----
+				// ---- cancelZoomChange ----
 				cancelZoomChange.setText("Cancel");
 				cancelZoomChange.addActionListener(new ActionListener() {
 					@Override
@@ -2219,21 +2235,19 @@ public class TranslationPanel extends JPanel {
 						cancelZoomChangeActionPerformed(e);
 					}
 				});
-				panel12.add(cancelZoomChange, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
-					GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-					new Insets(0, 0, 0, 0), 0, 0));
+				panel12.add(cancelZoomChange, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 0), 0, 0));
 			}
 			termZoomDialogContentPane.add(panel12, BorderLayout.CENTER);
 			termZoomDialog.pack();
 			termZoomDialog.setLocationRelativeTo(termZoomDialog.getOwner());
 		}
 
-		//---- buttonGroup3 ----
+		// ---- buttonGroup3 ----
 		ButtonGroup buttonGroup3 = new ButtonGroup();
 		buttonGroup3.add(rbAct);
 		buttonGroup3.add(rbInact);
 
-		//---- buttonGroup1 ----
+		// ---- buttonGroup1 ----
 		ButtonGroup buttonGroup1 = new ButtonGroup();
 		buttonGroup1.add(rbYes);
 		buttonGroup1.add(rbNo);
@@ -2248,6 +2262,7 @@ public class TranslationPanel extends JPanel {
 	private JMenuItem bAddFSN;
 	private JMenuItem mAddPref;
 	private JMenuItem mAddDesc;
+	private JMenuItem saveSimple;
 	private JMenuItem saveAndAdd;
 	private JMenu menu3;
 	private JMenuItem mSpellChk;
@@ -2305,7 +2320,6 @@ public class TranslationPanel extends JPanel {
 	private JScrollPane scrollPane7;
 	private JTree tree3;
 	private HierarchyNavigator hierarchyNavigator1;
-	private JPanel panel6;
 	private JPopupMenu popupMenu1;
 	private JMenuItem menuItem2;
 	private JMenuItem menuItem3;
@@ -3603,10 +3617,11 @@ public class TranslationPanel extends JPanel {
 		I_ConfigAceFrame config;
 		try {
 			config = Terms.get().getActiveAceFrameConfig();
-			if (config == null)
+			if (config == null) {
 				issueListPanel = new IssuesListPanel2(readOnlyMode);
-			else
+			} else {
 				issueListPanel = new IssuesListPanel2(config, readOnlyMode);
+			}
 
 			panel11.add(issueListPanel, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 		} catch (TerminologyException e) {

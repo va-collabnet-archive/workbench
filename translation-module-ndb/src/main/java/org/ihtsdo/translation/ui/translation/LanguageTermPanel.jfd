@@ -7,8 +7,8 @@
   <void property="root"> 
    <object class="com.jformdesigner.model.FormRoot"> 
     <void method="add"> 
-     <object class="com.jformdesigner.model.FormWindow"> 
-      <string>javax.swing.JFrame</string> 
+     <object class="com.jformdesigner.model.FormContainer"> 
+      <string>javax.swing.JPanel</string> 
       <object class="com.jformdesigner.model.FormLayoutManager"> 
        <class>java.awt.GridBagLayout</class> 
        <void method="setProperty"> 
@@ -36,12 +36,15 @@
         <boolean>true</boolean> 
        </void> 
       </object> 
+      <void property="name"> 
+       <string>this</string> 
+      </void> 
       <void method="add"> 
        <object class="com.jformdesigner.model.FormComponent"> 
         <string>javax.swing.JLabel</string> 
         <void method="setProperty"> 
          <string>text</string> 
-         <string>Source or Target</string> 
+         <string>Title</string> 
         </void> 
         <void method="setProperty"> 
          <string>maximumSize</string> 
@@ -73,7 +76,7 @@
          </object> 
         </void> 
         <void property="name"> 
-         <string>label9</string> 
+         <string>titleLabel</string> 
         </void> 
        </object> 
        <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -127,9 +130,6 @@
          <int>1</int> 
         </void> 
        </object> 
-      </void> 
-      <void property="name"> 
-       <string>this</string> 
       </void> 
      </object> 
      <object class="com.jformdesigner.model.FormLayoutConstraints"> 

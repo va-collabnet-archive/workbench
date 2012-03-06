@@ -979,6 +979,11 @@ public class WfInboxPanel extends JPanel {
 		model.fireTableStructureChanged();
 	}
 
+	private void refreshButtonActionPerformed(ActionEvent e) {
+		inboxTreePanel1.updateTree();
+		model.clearTable();
+	}
+
 	/**
 	 * Inits the components.
 	 */
@@ -1015,6 +1020,7 @@ public class WfInboxPanel extends JPanel {
 		checkBox1 = new JCheckBox();
 		panel4 = new JPanel();
 		closeInbox = new JButton();
+		refreshButton = new JButton();
 		sendToOutbox = new JButton();
 		popupMenu1 = new JPopupMenu();
 		menu2 = new JMenu();
@@ -1227,9 +1233,9 @@ public class WfInboxPanel extends JPanel {
 		//======== panel4 ========
 		{
 			panel4.setLayout(new GridBagLayout());
-			((GridBagLayout)panel4.getLayout()).columnWidths = new int[] {0, 0, 0};
+			((GridBagLayout)panel4.getLayout()).columnWidths = new int[] {0, 0, 0, 0};
 			((GridBagLayout)panel4.getLayout()).rowHeights = new int[] {0, 0};
-			((GridBagLayout)panel4.getLayout()).columnWeights = new double[] {1.0, 0.0, 1.0E-4};
+			((GridBagLayout)panel4.getLayout()).columnWeights = new double[] {1.0, 0.0, 0.0, 1.0E-4};
 			((GridBagLayout)panel4.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
 			//---- closeInbox ----
@@ -1244,6 +1250,19 @@ public class WfInboxPanel extends JPanel {
 				GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
 				new Insets(0, 0, 0, 5), 0, 0));
 
+			//---- refreshButton ----
+			refreshButton.setText("Refresh");
+			refreshButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					refreshButtonActionPerformed(e);
+					refreshButtonActionPerformed(e);
+				}
+			});
+			panel4.add(refreshButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
+
 			//---- sendToOutbox ----
 			sendToOutbox.setText("Send");
 			sendToOutbox.addActionListener(new ActionListener() {
@@ -1252,7 +1271,7 @@ public class WfInboxPanel extends JPanel {
 					emptyOutboxActionPerformed(e);
 				}
 			});
-			panel4.add(sendToOutbox, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+			panel4.add(sendToOutbox, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 0), 0, 0));
 		}
@@ -1304,112 +1323,42 @@ public class WfInboxPanel extends JPanel {
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
-	/** The panel2. */
 	private JPanel panel2;
-	
-	/** The progress bar1. */
 	private JProgressBar progressBar1;
-	
-	/** The split panel. */
 	private JSplitPane splitPanel;
-	
-	/** The inbox tree panel1. */
 	private InboxTreePanel inboxTreePanel1;
-	
-	/** The inbox items. */
 	private JPanel inboxItems;
-	
-	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
-	
-	/** The inbox table. */
 	private JTable inboxTable;
-	
-	/** The panel1. */
 	private JPanel panel1;
-	
-	/** The panel6. */
 	private JPanel panel6;
-	
-	/** The separator2. */
 	private JSeparator separator2;
-	
-	/** The label5. */
 	private JLabel label5;
-	
-	/** The separator3. */
 	private JSeparator separator3;
-	
-	/** The filter panel. */
 	private JPanel filterPanel;
-	
-	/** The panel3. */
 	private JPanel panel3;
-	
-	/** The label4. */
 	private JLabel label4;
-	
-	/** The label2. */
 	private JLabel label2;
-	
-	/** The label3. */
 	private JLabel label3;
-	
-	/** The label6. */
 	private JLabel label6;
-	
-	/** The component filter. */
 	private JTextField componentFilter;
-	
-	/** The target preferred filter. */
 	private JTextField targetPreferredFilter;
-	
-	/** The target fsn filter. */
 	private JTextField targetFsnFilter;
-	
-	/** The status filter combo. */
 	private JComboBox statusFilterCombo;
-	
-	/** The panel5. */
 	private JPanel panel5;
-	
-	/** The filter button. */
 	private JButton filterButton;
-	
-	/** The remove filters. */
 	private JButton removeFilters;
-	
-	/** The label1. */
 	private JLabel label1;
-	
-	/** The current translation item. */
 	private JLabel currentTranslationItem;
-	
-	/** The check box1. */
 	private JCheckBox checkBox1;
-	
-	/** The panel4. */
 	private JPanel panel4;
-	
-	/** The close inbox. */
 	private JButton closeInbox;
-	
-	/** The send to outbox. */
+	private JButton refreshButton;
 	private JButton sendToOutbox;
-	
-	/** The popup menu1. */
 	private JPopupMenu popupMenu1;
-	
-	/** The menu2. */
 	private JMenu menu2;
-	
-	/** The create new tag. */
 	private JMenuItem createNewTag;
-	
-	/** The remove tag menu item. */
 	private JMenuItem removeTagMenuItem;
-	
-	/** The back to inbox. */
 	private JMenuItem backToInbox;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 

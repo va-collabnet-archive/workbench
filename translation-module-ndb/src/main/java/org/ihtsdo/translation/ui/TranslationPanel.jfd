@@ -216,6 +216,26 @@
               <string>javax.swing.JMenuItem</string> 
               <void method="setProperty"> 
                <string>text</string> 
+               <string>Save</string> 
+              </void> 
+              <void property="name"> 
+               <string>saveSimple</string> 
+              </void> 
+              <void method="addEvent"> 
+               <object class="com.jformdesigner.model.FormEvent"> 
+                <string>java.awt.event.ActionListener</string> 
+                <string>actionPerformed</string> 
+                <string>saveSimpleActionPerformed</string> 
+                <boolean>true</boolean> 
+               </object> 
+              </void> 
+             </object> 
+            </void> 
+            <void method="add"> 
+             <object class="com.jformdesigner.model.FormComponent"> 
+              <string>javax.swing.JMenuItem</string> 
+              <void method="setProperty"> 
+               <string>text</string> 
                <string>Save And Add Description</string> 
               </void> 
               <void method="setProperty"> 
@@ -2070,36 +2090,6 @@
         <void method="setProperty"> 
          <string>value</string> 
          <string>Center</string> 
-        </void> 
-       </object> 
-      </void> 
-      <void method="add"> 
-       <object class="com.jformdesigner.model.FormContainer"> 
-        <string>javax.swing.JPanel</string> 
-        <object class="com.jformdesigner.model.FormLayoutManager"> 
-         <class>javax.swing.BoxLayout</class> 
-         <void method="setProperty"> 
-          <string>axis</string> 
-          <int>1</int> 
-         </void> 
-        </object> 
-        <void method="setProperty"> 
-         <string>border</string> 
-         <object class="javax.swing.border.LineBorder"> 
-          <object class="java.awt.Color" field="black"/> 
-          <int>1</int> 
-          <boolean>false</boolean> 
-         </object> 
-        </void> 
-        <void property="name"> 
-         <string>panel6</string> 
-        </void> 
-       </object> 
-       <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-        <class>java.lang.String</class> 
-        <void method="setProperty"> 
-         <string>value</string> 
-         <string>West</string> 
         </void> 
        </object> 
       </void> 

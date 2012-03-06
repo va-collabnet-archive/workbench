@@ -274,6 +274,7 @@ public class InboxTreePanel extends JPanel {
 						model.reload(child);
 					}
 				}
+				expandAll();
 			}
 
 			private void reloadNode(InboxTag newTag, DefaultMutableTreeNode child, boolean specialTag) {
@@ -309,6 +310,19 @@ public class InboxTreePanel extends JPanel {
 			}
 		});
 	}
+	
+	
+	private void expandAll(){
+		TreeNode[] path = wNode.getPath();
+		inboxFolderTree.expandPath(new TreePath(path));
+
+		path = sNode.getPath();
+		inboxFolderTree.expandPath(new TreePath(path));
+
+		path = cNode.getPath();
+		inboxFolderTree.expandPath(new TreePath(path));
+		model.reload(iNode);
+	}
 
 	/**
 	 * Update tree.
@@ -335,6 +349,9 @@ public class InboxTreePanel extends JPanel {
 		inboxFolderTree.expandRow(1);
 
 		model.reload();
+		model.nodeChanged(sNode);
+		model.nodeChanged(wNode);
+		model.nodeChanged(cNode);
 		updateWorkflowNodes(wNode, sNode, cNode);
 	}
 
