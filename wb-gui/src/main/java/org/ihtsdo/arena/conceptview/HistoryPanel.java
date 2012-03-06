@@ -128,7 +128,7 @@ public class HistoryPanel {
       this.navigator   = navigator;
       navigator.getImplementButton().addActionListener(avcl);
 
-      if (view.getSettings().isForAjudciation()) {
+      if (view.getSettings().isForAdjudication()) {
          navigator.getImplementButton().setEnabled(true);
       }
 
@@ -421,7 +421,7 @@ public class HistoryPanel {
    }
 
    private void redoLayout() {
-      if ((changedSelections.size() > 0) || view.getSettings().isForAjudciation()) {
+      if ((changedSelections.size() > 0) || view.getSettings().isForAdjudication()) {
          navigator.getImplementButton().setEnabled(true);
       } else {
          navigator.getImplementButton().setEnabled(false);
@@ -783,7 +783,7 @@ public class HistoryPanel {
                           Long.MAX_VALUE);
                }
             }
-            if (view.getSettings().isForAjudciation()) {
+            if (view.getSettings().isForAdjudication()) {
                ConceptChronicleBI cc = view.getConcept();
                ViewCoordinate adjudicateView = new ViewCoordinate(view.getConfig().getViewCoordinate());
 
@@ -924,7 +924,7 @@ public class HistoryPanel {
             SwingUtilities.invokeLater(new Runnable() {
                @Override
                public void run() {
-                  if ((changedSelections.size() > 0) || view.getSettings().isForAjudciation()) {
+                  if ((changedSelections.size() > 0) || view.getSettings().isForAdjudication()) {
                      navigator.getImplementButton().setEnabled(true);
                   } else {
                      navigator.getImplementButton().setEnabled(false);

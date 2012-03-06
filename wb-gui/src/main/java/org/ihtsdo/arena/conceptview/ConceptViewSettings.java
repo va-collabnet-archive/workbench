@@ -82,7 +82,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
    private Integer linkedTab = null;
 
    // dataVersion = 2;
-   private boolean forAjudciation = false;
+   private boolean forAdjudication = false;
 
    // dataVersion = 3
    private DescType                         descType         = DescType.PREFERRED;
@@ -111,19 +111,19 @@ public class ConceptViewSettings extends ArenaComponentSettings {
    public ConceptViewSettings() {
       super();
       this.linkedTab      = 0;
-      this.forAjudciation = false;
+      this.forAdjudication = false;
    }
 
-   public ConceptViewSettings(boolean forAjudciation) {
+   public ConceptViewSettings(boolean forAdjudication) {
       super();
       this.linkedTab      = 0;
-      this.forAjudciation = forAjudciation;
+      this.forAdjudication = forAdjudication;
    }
 
-   public ConceptViewSettings(boolean forAjudciation, Integer linkedTab) {
+   public ConceptViewSettings(boolean forAdjudication, Integer linkedTab) {
       super();
       this.linkedTab      = linkedTab;
-      this.forAjudciation = forAjudciation;
+      this.forAdjudication = forAdjudication;
    }
 
    //~--- enums ---------------------------------------------------------------
@@ -210,7 +210,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
          addHostListener(conceptChangedListener);
 
          if (config instanceof ContradictionConfig) {
-            view.getSettings().setForAjudciation(true);
+            view.getSettings().setForAdjudication(true);
          }
 
          try {
@@ -293,9 +293,9 @@ public class ConceptViewSettings extends ArenaComponentSettings {
          linkedTab = (Integer) in.readObject();
 
          if (dataVersion >= 2) {
-            forAjudciation = in.readBoolean();
+            forAdjudication = in.readBoolean();
          } else {
-            forAjudciation = false;
+            forAdjudication = false;
          }
 
          if (dataVersion >= 3) {
@@ -362,7 +362,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
    private void writeObject(ObjectOutputStream out) throws IOException {
       out.writeInt(dataVersion);
       out.writeObject(linkedTab);
-      out.writeBoolean(forAjudciation);
+      out.writeBoolean(forAdjudication);
       out.writeObject(descType);
       out.writeObject(relType);
       out.writeObject(relTarget);
@@ -640,8 +640,8 @@ public class ConceptViewSettings extends ArenaComponentSettings {
       return view;
    }
 
-   public boolean isForAjudciation() {
-      return forAjudciation;
+   public boolean isForAdjudication() {
+      return forAdjudication;
    }
 
    public boolean isNavigatorSetup() {
@@ -662,8 +662,8 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 
    //~--- set methods ---------------------------------------------------------
 
-   public void setForAjudciation(boolean forAjudciation) {
-      this.forAjudciation = forAjudciation;
+   public void setForAdjudication(boolean forAdjudication) {
+      this.forAdjudication = forAdjudication;
    }
 
    public void setLinkedTab(Integer linkedTab) {
