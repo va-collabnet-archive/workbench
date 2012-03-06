@@ -79,6 +79,15 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 	/** The read only mode. */
 	private boolean readOnlyMode;
 
+	public IssuesListPanel2(){
+		super();
+		try {
+			initComponents();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	/**
 	 * Instantiates a new issues list panel.
 	 * 
