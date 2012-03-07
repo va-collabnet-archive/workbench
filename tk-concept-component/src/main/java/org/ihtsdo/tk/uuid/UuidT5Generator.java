@@ -30,6 +30,8 @@ import java.util.UUID;
 public class UuidT5Generator {
     public static final String encoding = "8859_1";
 
+    public static UUID AUTHOR_TIME_ID = UUID.fromString("c6915290-30fc-11e1-b86c-0800200c9a66");
+
     public static UUID get(UUID namespace, String name) throws NoSuchAlgorithmException, UnsupportedEncodingException {
         MessageDigest sha1Algorithm = MessageDigest.getInstance("SHA-1");
 
