@@ -15,11 +15,6 @@
  */
 package org.ihtsdo.task.datacheck;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.Collection;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
