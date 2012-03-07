@@ -35,6 +35,7 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
     private static ConcurrentHashMap<String, ChangeSetGeneratorBI> writerMap = new ConcurrentHashMap<String, ChangeSetGeneratorBI>();
     public static AtomicInteger changeSetWriters = new AtomicInteger();
     public static boolean writeCommitRecord = false;
+    public boolean writeAdjudicationRecord = false;
     private I_RepresentIdSet cNidsToWrite;
     private long commitTime;
     private String commitTimeStr;
@@ -52,11 +53,13 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
     private List<ChangeSetGeneratorBI> writerListForHandler;
     private int commitRecordSapNid = 0;
     private int commitRecRefsetNid = 0;
+    private int adjudicationRecordSapNid = 0;
+    private int adjudicationRecRefsetNid = 0;
 
     public ChangeSetWriterHandler(I_RepresentIdSet cNidsToWrite,
             long commitTime, NidSetBI sapNidsFromCommit, ChangeSetGenerationPolicy changeSetPolicy,
             ChangeSetWriterThreading changeSetWriterThreading,
-            Semaphore permit) throws ValidationException, IOException {
+            Semaphore permit, boolean writeAdjudicationRecord) throws ValidationException, IOException {
         super();
         assert commitTime != Long.MAX_VALUE;
         assert commitTime != Long.MIN_VALUE;
@@ -71,6 +74,7 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
         this.changeSetWriterThreading = changeSetWriterThreading;
         changeSetWriters.incrementAndGet();
         this.changeSetPolicy = changeSetPolicy;
+        this.writeAdjudicationRecord = writeAdjudicationRecord;
         writerListForHandler = new ArrayList<ChangeSetGeneratorBI>(writerMap.values());
         if (writeCommitRecord) {
             commitRecRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.COMMIT_RECORD.getUids());
@@ -80,6 +84,20 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
                     int statusNid = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid();
                     this.commitRecordSapNid = Bdb.getSapNid(statusNid,
                             Bdb.getSapDb().getAuthorNid(sapNid),
+                            Bdb.getSapDb().getPathNid(sapNid),
+                            commitTime);
+                    break;
+                }
+            }
+            
+        }
+        if (writeAdjudicationRecord) {
+            adjudicationRecRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.ADJUDICATION_RECORD.getUids());
+            for (int sapNid : sapNidsFromCommit.getSetValues()) {
+                if (Bdb.getSapDb().getAuthorNid(sapNid) != Integer.MIN_VALUE
+                        && Bdb.getSapDb().getPathNid(sapNid) != Integer.MIN_VALUE) {
+                    int statusNid = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid();
+                    this.adjudicationRecordSapNid = Bdb.getSapNid(statusNid, Bdb.getSapDb().getAuthorNid(sapNid),
                             Bdb.getSapDb().getPathNid(sapNid),
                             commitTime);
                     break;
@@ -189,6 +207,40 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
                     newCommitRecord.primordialSapNid = this.commitRecordSapNid;
 
                     c.addAnnotation(newCommitRecord);
+                    Bdb.getConceptDb().writeConcept(c);
+                }
+            }
+            if (writeAdjudicationRecord && adjudicationRecordSapNid != 0) {
+                for (Integer sap : c.getAllSapNids()) {
+                if (sap > Bdb.getSapDb().getReadOnlyMax()) {
+                        Concept authorConcept = Concept.get(Bdb.getSapDb().getAuthorNid(sap));
+                        long time = Bdb.getSapDb().getTime(sap);
+                        String stringToHash = authorConcept.getPrimUuid().toString()
+                                + Long.toString(time);
+                        UUID type5Uuid = Type5UuidFactory.get(Type5UuidFactory.AUTHOR_TIME_ID,
+                                stringToHash);
+                        authorTimeHashSet.add(type5Uuid);
+                    }
+                }
+                if (!authorTimeHashSet.isEmpty()) {
+                    byte[][] arrayOfAuthorTime = new byte[authorTimeHashSet.size()][];
+                    UUID[] atUuidArray = authorTimeHashSet.toArray(new UUID[authorTimeHashSet.size()]);
+                    for (int i = 0; i < arrayOfAuthorTime.length; i++) {
+                        arrayOfAuthorTime[i] = Type5UuidFactory.getRawBytes(atUuidArray[i]);
+                    }
+
+                    ArrayOfBytearrayMember newAdjudicationRecord = new ArrayOfBytearrayMember();
+                    UUID primoridalUuid = UUID.randomUUID();
+                    newAdjudicationRecord.nid = Bdb.uuidToNid(primoridalUuid);
+                    Bdb.getNidCNidMap().setCNidForNid(c.getConceptNid(), newAdjudicationRecord.nid);
+                    newAdjudicationRecord.setPrimordialUuid(primoridalUuid);
+                    newAdjudicationRecord.refsetNid = adjudicationRecRefsetNid;
+                    newAdjudicationRecord.enclosingConceptNid = c.getConceptNid();
+                    newAdjudicationRecord.referencedComponentNid = c.getConceptNid();
+                    newAdjudicationRecord.setArrayOfByteArray(arrayOfAuthorTime);
+                    newAdjudicationRecord.primordialSapNid = this.adjudicationRecordSapNid;
+
+                    c.addAnnotation(newAdjudicationRecord);
                     Bdb.getConceptDb().writeConcept(c);
                 }
             }

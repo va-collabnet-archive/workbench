@@ -358,9 +358,14 @@ public class BdbCommitManager {
 
         return commit(ChangeSetPolicy.MUTABLE_ONLY, ChangeSetWriterThreading.SINGLE_THREAD);
     }
-
+    
     public static boolean commit(ChangeSetPolicy changeSetPolicy,
             ChangeSetWriterThreading changeSetWriterThreading) {
+        return commit(changeSetPolicy, changeSetWriterThreading, false);
+    }
+
+    public static boolean commit(ChangeSetPolicy changeSetPolicy,
+            ChangeSetWriterThreading changeSetWriterThreading, boolean writeAdjudication) {
         Svn.rwl.acquireUninterruptibly();
 
         boolean passedRelease = false;
@@ -508,7 +513,7 @@ public class BdbCommitManager {
                                             ChangeSetWriterHandler handler =
                                                     new ChangeSetWriterHandler(uncommittedCNidsNoChecks, commitTime,
                                                     sapNidsFromCommit, changeSetPolicy.convert(),
-                                                    changeSetWriterThreading, Svn.rwl);
+                                                    changeSetWriterThreading, Svn.rwl, writeAdjudication);
 
                                             changeSetWriterService.execute(handler);
                                             passedRelease = true;
@@ -577,18 +582,22 @@ public class BdbCommitManager {
 
         return false;
     }
-
+    
     public static boolean commit(Concept c, ChangeSetPolicy changeSetPolicy,
             ChangeSetWriterThreading changeSetWriterThreading) {
+        return commit(c, changeSetPolicy, changeSetWriterThreading, false);
+    }
+    public static boolean commit(Concept c, ChangeSetPolicy changeSetPolicy,
+            ChangeSetWriterThreading changeSetWriterThreading, boolean writeAdjudication) {
         if ((uncommittedCNids.cardinality() == 1) && (uncommittedCNidsNoChecks.cardinality() == 1)
                 && uncommittedCNids.isMember(c.getNid()) && uncommittedCNidsNoChecks.isMember(c.getNid())) {
-            return commit(changeSetPolicy, changeSetWriterThreading);
+            return commit(changeSetPolicy, changeSetWriterThreading, writeAdjudication);
         } else if ((uncommittedCNids.cardinality() == 1) && (uncommittedCNidsNoChecks.cardinality() == 0)
                 && uncommittedCNids.isMember(c.getNid())) {
-            return commit(changeSetPolicy, changeSetWriterThreading);
+            return commit(changeSetPolicy, changeSetWriterThreading, writeAdjudication);
         } else if ((uncommittedCNids.cardinality() == 0) && (uncommittedCNidsNoChecks.cardinality() == 1)
                 && uncommittedCNidsNoChecks.isMember(c.getNid())) {
-            return commit(changeSetPolicy, changeSetWriterThreading);
+            return commit(changeSetPolicy, changeSetWriterThreading, writeAdjudication);
         }
 
         Svn.rwl.acquireUninterruptibly();
@@ -713,7 +722,7 @@ public class BdbCommitManager {
                         case MUTABLE_ONLY:
                             ChangeSetWriterHandler handler = new ChangeSetWriterHandler(commitSet, commitTime,
                                     sapNidsFromCommit, changeSetPolicy.convert(),
-                                    changeSetWriterThreading, Svn.rwl);
+                                    changeSetWriterThreading, Svn.rwl, writeAdjudication);
 
                             changeSetWriterService.execute(handler);
 

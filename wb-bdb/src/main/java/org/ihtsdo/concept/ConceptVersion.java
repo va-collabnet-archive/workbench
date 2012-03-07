@@ -161,6 +161,14 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
             throws IOException {
         return concept.commit(changeSetPolicy, changeSetWriterThreading);
     }
+    
+    @Override
+    public boolean commit(ChangeSetGenerationPolicy changeSetPolicy,
+            ChangeSetGenerationThreadingPolicy changeSetWriterThreading,
+            boolean writeAdjudication)
+            throws IOException {
+        return concept.commit(changeSetPolicy, changeSetWriterThreading, writeAdjudication);
+    }
 
     public void commit(ChangeSetPolicy changeSetPolicy, ChangeSetWriterThreading changeSetWriterThreading)
             throws IOException {

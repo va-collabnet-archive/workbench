@@ -260,6 +260,18 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     
     @Override
     public boolean commit(ChangeSetGenerationPolicy changeSetPolicy,
+            ChangeSetGenerationThreadingPolicy changeSetWriterThreading,
+            boolean writeAdjudication)
+            throws IOException {
+        this.modified();
+        
+        return BdbCommitManager.commit(this, ChangeSetPolicy.get(changeSetPolicy),
+                ChangeSetWriterThreading.get(changeSetWriterThreading),
+                writeAdjudication);
+    }
+    
+    @Override
+    public boolean commit(ChangeSetGenerationPolicy changeSetPolicy,
             ChangeSetGenerationThreadingPolicy changeSetWriterThreading)
             throws IOException {
         this.modified();
