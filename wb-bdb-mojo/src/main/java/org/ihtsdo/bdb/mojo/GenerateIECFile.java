@@ -132,7 +132,7 @@ public class GenerateIECFile extends AbstractMojo {
                 ChangeSetWriterHandler handler = new ChangeSetWriterHandler(
                         Bdb.getConceptDb().getConceptNidSet(), System.currentTimeMillis(),
                         sapsToWrite, changeSetPolicy.convert(),
-                        ChangeSetWriterThreading.MULTI_THREAD, null);
+                        ChangeSetWriterThreading.MULTI_THREAD, null, false);
                 handler.run();
             }
         } catch (Exception e) {
