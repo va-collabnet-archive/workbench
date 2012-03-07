@@ -7,15 +7,12 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import javax.swing.Timer;
-
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.concept.Concept;
@@ -81,7 +78,8 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
                 if (Bdb.getSapDb().getAuthorNid(sapNid) != Integer.MIN_VALUE
                         && Bdb.getSapDb().getPathNid(sapNid) != Integer.MIN_VALUE) {
                     int statusNid = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid();
-                    this.commitRecordSapNid = Bdb.getSapNid(statusNid, Bdb.getSapDb().getAuthorNid(sapNid),
+                    this.commitRecordSapNid = Bdb.getSapNid(statusNid,
+                            Bdb.getSapDb().getAuthorNid(sapNid),
                             Bdb.getSapDb().getPathNid(sapNid),
                             commitTime);
                     break;
@@ -96,7 +94,8 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
         try {
             conceptCount = Bdb.getConceptDb().getCount();
 
-            activity = Terms.get().newActivityPanel(true, Terms.get().getActiveAceFrameConfig(), "CS writer: " + commitTimeStr + "...",
+            activity = Terms.get().newActivityPanel(true, Terms.get().getActiveAceFrameConfig(),
+                    "CS writer: " + commitTimeStr + "...",
                     false);
             activity.setIndeterminate(true);
             activity.setProgressInfoUpper("CS writer: " + commitTimeStr + "...");
@@ -158,22 +157,24 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
             processedChangedCount.incrementAndGet();
             Concept c = (Concept) fcfc.fetch();
 
-            Set<byte[]> authorTimeHash = new HashSet<byte[]>();
+            Set<UUID> authorTimeHashSet = new HashSet<UUID>(); // :WAS:byte[]
             if (writeCommitRecord && commitRecordSapNid != 0) {
                 for (Integer sap : c.getAllSapNids()) {
                     if (sap > Bdb.getSapDb().getReadOnlyMax()) {
                         Concept authorConcept = Concept.get(Bdb.getSapDb().getAuthorNid(sap));
                         long time = Bdb.getSapDb().getTime(sap);
-                        String stringToHash = authorConcept.getPrimUuid().toString() + Long.toString(time);
-                        UUID type5Uuid = Type5UuidFactory.get(Type5UuidFactory.AUTHOR_TIME_ID, stringToHash);
-                        authorTimeHash.add(Type5UuidFactory.getRawBytes(type5Uuid));
+                        String stringToHash = authorConcept.getPrimUuid().toString()
+                                + Long.toString(time);
+                        UUID type5Uuid = Type5UuidFactory.get(Type5UuidFactory.AUTHOR_TIME_ID,
+                                stringToHash);
+                        authorTimeHashSet.add(type5Uuid);
                     }
                 }
-                if (!authorTimeHash.isEmpty()) {
-                    byte[][] arrayOfAuthorTime = new byte[authorTimeHash.size()][];
-                    Iterator<byte[]> authorTimeHashItr = authorTimeHash.iterator();
+                if (!authorTimeHashSet.isEmpty()) {
+                    byte[][] arrayOfAuthorTime = new byte[authorTimeHashSet.size()][];
+                    UUID[] atUuidArray = authorTimeHashSet.toArray(new UUID[authorTimeHashSet.size()]);
                     for (int i = 0; i < arrayOfAuthorTime.length; i++) {
-                        arrayOfAuthorTime[i] = authorTimeHashItr.next();
+                        arrayOfAuthorTime[i] = Type5UuidFactory.getRawBytes(atUuidArray[i]);
                     }
 
                     ArrayOfBytearrayMember newCommitRecord = new ArrayOfBytearrayMember();
