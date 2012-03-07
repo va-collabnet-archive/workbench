@@ -16,11 +16,13 @@
 package org.ihtsdo.helper.bdb;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
@@ -40,6 +42,7 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
     NidBitSetBI nidSet;
     List<MultiEditorContradictionCase> contradictionCaseList;
     HashSet<Integer> watchSet;
+    final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public MultiEditorContradictionDetector(int refsetNid, ViewCoordinate vc,
             List<MultiEditorContradictionCase> cl, HashSet<Integer> ws)
@@ -69,22 +72,23 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         }
 
         if (conceptVersion.getPrimUuid() != null) {
-            Collection<? extends RefexChronicleBI<?>> rcbic = conceptVersion.getRefexMembers(refsetNid);
+            Collection<? extends RefexChronicleBI<?>> rcbic;
+            rcbic = conceptVersion.getRefexMembers(refsetNid);
             if (rcbic.size() > 1) {
 
                 // CONVERT ARRAY HASHSET OF AUTHOR_TIME_HASH_BYTES
-                ArrayList<HashSet<UUID>> authorTimeHashList = new ArrayList<HashSet<UUID>>();
+                ArrayList<HashSet<UUID>> authTimeSetsList = new ArrayList<HashSet<UUID>>();
                 for (RefexChronicleBI<?> rcbi : rcbic) {
                     RefexArrayOfBytearrayVersionBI raobvbi = (RefexArrayOfBytearrayVersionBI) rcbi;
                     byte[][] aoba = raobvbi.getArrayOfByteArray();
                     // convert array to hashset
-                    HashSet<UUID> authorTimeHash = new HashSet<UUID>();
+                    HashSet<UUID> authorTimeHashSet = new HashSet<UUID>();
                     for (byte[] bs : aoba) {
-                        authorTimeHash.add(UuidT5Generator.getUuidFromRawBytes(bs));
+                        authorTimeHashSet.add(UuidT5Generator.getUuidFromRawBytes(bs));
                     }
 
                     // add hashset to list
-                    authorTimeHashList.add(authorTimeHash);
+                    authTimeSetsList.add(authorTimeHashSet);
                 }
 
                 // SORT BY HASHSET LENGTH
@@ -92,39 +96,168 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
 
                     @Override
                     public int compare(HashSet<UUID> o1, HashSet<UUID> o2) {
-                        if (o1.size() < o2.size()) { // larger set first
+                        if (o1.size() > o2.size()) { // larger set first
                             return 1;
-                        } else if ((o1.size() > o2.size())) {
+                        } else if ((o1.size() < o2.size())) {
                             return -1;
                         }
                         return 0;
                     }
                 };
-                Collections.sort(authorTimeHashList, comp);
+                Collections.sort(authTimeSetsList, comp);
 
-                // CHECK FOR CONTRADICTION -- smaller set not contained in larger set.
-                boolean contradictionNotFound = true;
+                // CHECK FOR CONTRADICTION -- by smaller set not contained in larger set.
+                boolean contradictionByContainmentNotFound = true;
+                boolean contradictionByMonotonicNotFound = true;
                 int i = 0;
-                while (contradictionNotFound && i < authorTimeHashList.size() - 1) {
+                while (contradictionByContainmentNotFound && i < authTimeSetsList.size() - 1) {
                     int j = i + 1;
-                    while (contradictionNotFound && j < authorTimeHashList.size()) {
-                        HashSet<UUID> a = authorTimeHashList.get(i);
-                        HashSet<UUID> b = authorTimeHashList.get(j);
-                        authorTimeHashList.get(i).containsAll(rcbic);
-                        if (a.containsAll(b) == false) {
-                            contradictionNotFound = false;
+                    while (contradictionByContainmentNotFound && j < authTimeSetsList.size()) {
+                        HashSet<UUID> a = authTimeSetsList.get(i);
+                        HashSet<UUID> b = authTimeSetsList.get(j);
+                        if (b.containsAll(a) == false) {
+                            contradictionByContainmentNotFound = false;
                         }
                         j++;
                     }
                     i++;
                 }
 
+                //
+
                 // REPORT ANY CONTRADICTING CONCEPTS
-                if (contradictionNotFound == false) {
-                    contradictionCaseList.add(new MultiEditorContradictionCase(cNid));
+                if (contradictionByContainmentNotFound == false) {
+                    // CREATE HashMap of AuthorTimeUuid
+                    HashMap<UUID, String> authTimeMapComputed = new HashMap<UUID, String>();
+                    HashMap<UUID, String> authTimeMapMissing = new HashMap<UUID, String>();
+                    for (Integer sap : conceptVersion.getAllSapNids()) {
+                        // if (sap > Bdb.getSapDb().getReadOnlyMax()) { // excludes read-only db
+                        // COMPUTE AUTHOR_TIME_UUID5
+                        int authorNid = Ts.get().getAuthorNidForSapNid(sap);
+                        ConceptChronicleBI authorConcept = Ts.get().getConcept(authorNid);
+                        long time = Ts.get().getTimeForSapNid(sap);
+                        String atStr = authorConcept.getPrimUuid().toString() + Long.toString(time);
+                        UUID type5Uuid = UuidT5Generator.get(UuidT5Generator.AUTHOR_TIME_ID, atStr);
+
+                        // STORE <Key = UUID, Value= data string>
+                        String valueStr = toAuthorTimeString(time, authorConcept, type5Uuid);
+                        authTimeMapComputed.put(type5Uuid, valueStr);
+                        //}
+                    }
+
+                    // :!!!:DEBUG:BEGIN
+                    int setCounter = 0;
+                    System.out.println("\r\n!!! CONCEPT: " + conceptVersion.toUserString());
+                    for (HashSet<UUID> hs : authTimeSetsList) {
+                        System.out.println("\r\n AuthorTime HashSet #" + setCounter++);
+                        for (UUID uuid : hs) {
+                            System.out.println(" UUID Entry: " + uuid.toString());
+                        }
+
+                    }
+                    // :!!!:DEBUG:END:
+
+                    // determine which hash codes are in contradiction
+                    // ACCUMULATE CONTRADICTIONS -- smaller set not contained in larger set.
+                    HashSet<UUID> accumContradictionsHashSet = new HashSet<UUID>();
+                    i = 0;
+                    while (i < authTimeSetsList.size() - 1) {
+                        int j = i + 1;
+                        while (j < authTimeSetsList.size()) {
+                            HashSet<UUID> a = authTimeSetsList.get(i);
+                            HashSet<UUID> b = authTimeSetsList.get(j);
+                            if (b.containsAll(a) == false) {
+                                HashSet<UUID> aTemp = new HashSet<UUID>(a);
+                                aTemp.removeAll(b);
+                                accumContradictionsHashSet.addAll(aTemp);
+
+                                HashSet<UUID> bTemp = new HashSet<UUID>(b);
+                                bTemp.removeAll(a);
+                                accumContradictionsHashSet.addAll(bTemp);
+                            }
+                            j++;
+                        }
+                        i++;
+                    }
+
+                    ArrayList<String> caseList = new ArrayList<String>();
+                    for (UUID uuid : accumContradictionsHashSet) {
+                        String s = authTimeMapComputed.get(uuid);
+                        if (s != null) {
+                            caseList.add(s);
+                        } else {
+                            // not present in computed authorTimeMapComputed
+                            String valueStr = toAuthorTimeMissingString(uuid);
+                            authTimeMapMissing.put(uuid, valueStr);
+                        }
+                    }
+                    //if (testLevel > 0) {
+                    Set<UUID> authTimeSetMissing = authTimeMapMissing.keySet();
+                    HashSet<UUID> accumContraKnownHashSet = new HashSet<UUID>();
+                    i = 0;
+                    while (i < authTimeSetsList.size() - 1) {
+                        int j = i + 1;
+                        while (j < authTimeSetsList.size()) {
+                            HashSet<UUID> a = authTimeSetsList.get(i);
+                            HashSet<UUID> b = authTimeSetsList.get(j);
+                            b.removeAll(authTimeSetMissing);
+                            a.removeAll(authTimeSetMissing);
+                            if (b.containsAll(a) == false) {
+                                HashSet<UUID> aTemp = new HashSet<UUID>(a);
+                                aTemp.removeAll(b);
+                                accumContraKnownHashSet.addAll(aTemp);
+
+                                HashSet<UUID> bTemp = new HashSet<UUID>(b);
+                                bTemp.removeAll(a);
+                                accumContraKnownHashSet.addAll(bTemp);
+                            }
+                            j++;
+                        }
+                        i++;
+                    }
+
+                    //}
+
+                    // ADD TO CASE LIST
+                    MultiEditorContradictionCase caseToAdd;
+                    caseToAdd = new MultiEditorContradictionCase(cNid, caseList);
+                    caseToAdd.setAuthTimeMapComputed(authTimeMapComputed);
+                    caseToAdd.setAuthTimeMapMissing(authTimeMapMissing);
+                    contradictionCaseList.add(caseToAdd);
                 }
 
             } // if rcbic.size() > 1
         }
+    }
+
+    private String toAuthorTimeString(long time, ConceptChronicleBI author, UUID uuid) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("Time:\t");
+        Date d = new Date(time);
+        sb.append(formatter.format(d));
+        sb.append("\tAuthor:\t");
+        sb.append(author.getPrimUuid().toString());
+        sb.append("\t");
+        sb.append(author.toUserString());
+        sb.append("\tCommitRecordHash:\t");
+        sb.append(uuid);
+
+        return sb.toString();
+    }
+
+    private String toAuthorTimeMissingString(UUID uuid) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("Time:\t");
+        sb.append("????-??-?? ??:??:??");
+        sb.append("\tAuthor:\t");
+        sb.append("........-....-....-....-............");
+        sb.append("\t");
+        sb.append("UNKNOWN");
+        sb.append("\tCommitRecordHash:\t");
+        sb.append(uuid.toString());
+
+        return sb.toString();
     }
 }

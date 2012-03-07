@@ -15,19 +15,77 @@
  */
 package org.ihtsdo.helper.bdb;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
+
 /**
  *
  * @author marc
  */
 public class MultiEditorContradictionCase {
-    int cNid; // concept with contradiction
 
-    public MultiEditorContradictionCase(int cNid) {
+    private int cNid; // concept with contradiction
+    private ArrayList<String> cases; // reported cases
+    // DETAILS
+    private HashMap<UUID, String> authTimeMapComputed; // computed from getAllSapNids()
+    private HashMap<UUID, String> authTimeMapMissing; // missing from getAllSapNids()
+
+    public MultiEditorContradictionCase(int cNid, ArrayList<String> cases) {
         this.cNid = cNid;
+        this.cases = cases;
     }
 
-    public int getcNid() {
+    public int getConceptNid() {
         return cNid;
     }
 
+    public void setAuthTimeMapComputed(HashMap<UUID, String> authTimeMapComputed) {
+        this.authTimeMapComputed = authTimeMapComputed;
+    }
+
+    public void setAuthTimeMapMissing(HashMap<UUID, String> authTimeMapMissing) {
+        this.authTimeMapMissing = authTimeMapMissing;
+    }
+
+    public ArrayList<String> getCases() {
+        return cases;
+    }
+
+    @Override
+    public String toString() {
+        TerminologyStoreDI ts = Ts.get();
+        StringBuilder sb = new StringBuilder();
+        try {
+            sb.append(ts.getConcept(cNid).toUserString());
+
+
+            return sb.toString();
+        } catch (IOException ex) {
+            Logger.getLogger(MultiEditorContradictionCase.class.getName()).log(Level.SEVERE, null, ex);
+            return sb.toString();
+        }
+    }
+
+    public String toStringLong() {
+        TerminologyStoreDI ts = Ts.get();
+        StringBuilder sb = new StringBuilder();
+        try {
+            sb.append("\r\n*** CONTRADICTION CASE ***\r\n   Concept: ");
+            sb.append(ts.getConcept(cNid).getPrimUuid().toString());
+            sb.append(" ");
+            sb.append(ts.getConcept(cNid).toUserString());
+
+
+            return sb.toString();
+        } catch (IOException ex) {
+            Logger.getLogger(MultiEditorContradictionCase.class.getName()).log(Level.SEVERE, null, ex);
+            return sb.toString();
+        }
+    }
 }

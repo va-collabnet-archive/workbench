@@ -198,12 +198,17 @@ public class MultiEditorContradictionDetectorMojo extends AbstractMojo {
                 StringBuilder sb = new StringBuilder();
                 sb.append("\r\n::: [MultiEditorContradictionDetectionMojo] FOUND CONTRADICTIONS\r\n");
                 for (MultiEditorContradictionCase contradictionCase : cases) {
-                    I_GetConceptData concept = tf.getConcept(contradictionCase.getcNid());
+                    I_GetConceptData concept = tf.getConcept(contradictionCase.getConceptNid());
                     sb.append("::: CONTRADICTING COMMIT_RECORDS: ");
                     sb.append(concept.getPrimUuid().toString());
                     sb.append(" ");
                     sb.append(concept.toUserString());
                     sb.append("\r\n");
+                    ArrayList<String> authorTimeList = contradictionCase.getCases();
+                    for (String s : authorTimeList) {
+                        sb.append(s);
+                        sb.append("\r\n");
+                    }
                 }
                 logger.info(sb.toString());
             } else {
