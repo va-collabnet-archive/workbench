@@ -45,7 +45,8 @@ public class CommitActionListener implements ActionListener {
          I_GetConceptData c = settings.getConcept();
 
          return c.commit(settings.getConfig().getDbConfig().getUserChangesChangeSetPolicy().convert(),
-                         settings.getConfig().getDbConfig().getChangeSetWriterThreading().convert());
+                         settings.getConfig().getDbConfig().getChangeSetWriterThreading().convert(),
+                         settings.isForAdjudication());
       }
 
       @Override
