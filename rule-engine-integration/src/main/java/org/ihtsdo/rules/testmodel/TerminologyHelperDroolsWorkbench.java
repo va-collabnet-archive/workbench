@@ -56,6 +56,7 @@ import org.ihtsdo.tk.api.PositionSet;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
@@ -71,19 +72,25 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 
 	/** The semtags root. */
 	private I_GetConceptData semtagsRoot;
-	
+
 	/** The valid semtags. */
 	private Map<String,I_GetConceptData> validSemtags;
-	
+
 	/** The semtag parents. */
 	private Map<String,Set<String>> semtagParents;
-	
+
 	/** The domains. */
 	private List<String> domains;
-	
+
 	/** The uuids map. */
 	public static Map<String,UUID> uuidsMap = new HashMap<String,UUID>();
 
+	/** The parents cache. */
+	private static Map<String, ConceptVersionBI> parentsCache = new HashMap<String, ConceptVersionBI>();
+	
+	/** The refsets cache. */
+	private static Map<String, I_GetConceptData> refsetsCache = new HashMap<String, I_GetConceptData>();
+	
 	/**
 	 * Instantiates a new terminology helper drools workbench.
 	 */
@@ -191,7 +198,13 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		try {
 			I_TermFactory tf = Terms.get();
 			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
-			I_GetConceptData refsetConcept = tf.getConcept(uuidFromString(refsetUUID));
+			I_GetConceptData refsetConcept;
+			if (refsetsCache.containsKey(refsetUUID)) {
+				refsetConcept = refsetsCache.get(refsetUUID);
+			} else {
+				refsetConcept = tf.getConcept(uuidFromString(refsetUUID));
+				refsetsCache.put(refsetUUID, refsetConcept);
+			}
 			I_GetConceptData concept = tf.getConcept(uuidFromString(conceptUUID));
 			if (refsetConcept != null && concept != null) {
 				result = RulesLibrary.isIncludedInRefsetSpec(refsetConcept, 
@@ -211,26 +224,26 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 	public boolean isParentOf(String parent, String subtype) throws Exception {
 		boolean result = false;
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-		int parentConceptNid = Terms.get().uuidToNative(uuidFromString(parent));
-		int subtypeConceptNid = Terms.get().uuidToNative(uuidFromString(subtype));
-		if (RulesLibrary.myStaticIsACache == null) { 
-			ConceptVersionBI parentConcept = null;
-			ConceptVersionBI subtypeConcept= null;
-			try {
-				parentConcept = Ts.get().getConceptVersion(config.getViewCoordinate(), parentConceptNid);
-				subtypeConcept = Ts.get().getConceptVersion(config.getViewCoordinate(), subtypeConceptNid);
-			} catch (java.lang.AssertionError e) {
-				AceLog.getAppLog().info("Error retrieving concepts in iParentOf: " + parent + ", " + subtype);
-				AceLog.getAppLog().info(e.getMessage());
-			}
-			if (parentConcept ==  null || subtypeConcept == null) {
-				result = false;
-			} else {
-				result = subtypeConcept.isKindOf(parentConcept);
-			}
+		ConceptVersionBI parentConcept;
+		ConceptVersionBI subtypeConcept;
+		int parentConceptNid = Integer.MIN_VALUE;
+		int subtypeConceptNid = Integer.MIN_VALUE;
+		if (parentsCache.containsKey(parent)) {
+			parentConcept = parentsCache.get(parent);
+			parentConceptNid = parentConcept.getConceptNid();
 		} else {
-			//AceLog.getAppLog().info("Using rules library isa cache!");
-			result = RulesLibrary.myStaticIsACache.isKindOf(subtypeConceptNid, parentConceptNid);
+			parentConceptNid = Terms.get().uuidToNative(uuidFromString(parent));
+			parentConcept = Ts.get().getConceptVersion(config.getViewCoordinate(), parentConceptNid);
+			parentsCache.put(parent, parentConcept);
+		}
+
+		subtypeConceptNid = Terms.get().uuidToNative(uuidFromString(subtype));
+		subtypeConcept = Ts.get().getConceptVersion(config.getViewCoordinate(), subtypeConceptNid);
+		
+		if (parentConcept ==  null || subtypeConcept == null) {
+			result = false;
+		} else {
+			result = subtypeConcept.isKindOf(parentConcept);
 		}
 		return result;
 	}
@@ -340,31 +353,31 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 	public boolean isFsnTextNotUnique(String fsn, String conceptUuid, String langCode) throws Exception{
 		SearchResult result = Terms.get().doLuceneSearch(fsn);
 		boolean unique = true;
-        if (result.topDocs.totalHits == 0) {
-        	unique = true;
-        } else {
-        	NidSetBI allowedStatusNids = Terms.get().getActiveAceFrameConfig().getViewCoordinate().getAllowedStatusNids();
-            search:
-            for (int i = 0; i < result.topDocs.totalHits; i++) {
-                Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
-                int cnid = Integer.parseInt(doc.get("cnid"));
-                int dnid = Integer.parseInt(doc.get("dnid"));
+		if (result.topDocs.totalHits == 0) {
+			unique = true;
+		} else {
+			NidSetBI allowedStatusNids = Terms.get().getActiveAceFrameConfig().getViewCoordinate().getAllowedStatusNids();
+			search:
+				for (int i = 0; i < result.topDocs.totalHits; i++) {
+					Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
+					int cnid = Integer.parseInt(doc.get("cnid"));
+					int dnid = Integer.parseInt(doc.get("dnid"));
 
-                I_DescriptionVersioned<?> potential_fsn = Terms.get().getDescription(dnid, cnid);
-                if (potential_fsn != null) {
-                    for (I_DescriptionPart part_search : potential_fsn.getMutableParts()) {
-                        if (allowedStatusNids.contains(part_search.getStatusNid())
-                                && part_search.getText().equals(fsn)) {
-                            unique = false;
-                            break search;
-                        } 
-                    }
-                }
-            }
-        }
-        return !unique;
+					I_DescriptionVersioned<?> potential_fsn = Terms.get().getDescription(dnid, cnid);
+					if (potential_fsn != null) {
+						for (I_DescriptionPart part_search : potential_fsn.getMutableParts()) {
+							if (allowedStatusNids.contains(part_search.getStatusNid())
+									&& part_search.getText().equals(fsn)) {
+								unique = false;
+								break search;
+							} 
+						}
+					}
+				}
+		}
+		return !unique;
 	}
-	
+
 	/**
 	 * Checks if is fsn text not unique old.
 	 *
@@ -731,7 +744,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 
 		return uuid;
 	}
-	
+
 	/**
 	 * Gets the mock view set.
 	 *
