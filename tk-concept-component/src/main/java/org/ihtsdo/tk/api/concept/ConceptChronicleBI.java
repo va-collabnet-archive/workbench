@@ -28,6 +28,11 @@ public interface ConceptChronicleBI extends ComponentChroncileBI<ConceptVersionB
    boolean commit(ChangeSetGenerationPolicy changeSetPolicy,
                   ChangeSetGenerationThreadingPolicy changeSetWriterThreading)
            throws IOException;
+   
+   boolean commit(ChangeSetGenerationPolicy changeSetPolicy,
+            ChangeSetGenerationThreadingPolicy changeSetWriterThreading,
+            boolean writeAdjudication)
+            throws IOException;
 
    /**
     * Returns a longer - more complete - string representation of the chronicle.
