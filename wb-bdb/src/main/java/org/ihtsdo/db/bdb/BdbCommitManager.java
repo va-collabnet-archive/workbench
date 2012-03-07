@@ -1150,7 +1150,15 @@ public class BdbCommitManager {
                     I_TestDataConstraints test = (I_TestDataConstraints) ois.readObject();
 
                     ois.close();
-                    list.add(test);
+                    boolean alreadyInList = false;
+                    for (I_TestDataConstraints looptest : list) {
+                    	if (test.toString().equals(looptest.toString())) {
+                    		alreadyInList = true;
+                    	}
+                    }
+                    if (!alreadyInList) {
+                    	list.add(test);	
+                    }
                 } catch (Exception e) {
                     AceLog.getAppLog().alertAndLog(Level.WARNING, "Processing: " + f.getAbsolutePath(), e);
                 }
@@ -1167,7 +1175,15 @@ public class BdbCommitManager {
                     I_TestDataConstraints test = (I_TestDataConstraints) ois.readObject();
 
                     ois.close();
-                    list.add(test);
+                    boolean alreadyInList = false;
+                    for (I_TestDataConstraints looptest : list) {
+                    	if (test.toString().equals(looptest.toString())) {
+                    		alreadyInList = true;
+                    	}
+                    }
+                    if (!alreadyInList) {
+                    	list.add(test);	
+                    }
                 } catch (Exception e) {
                     AceLog.getAppLog().alertAndLog(Level.WARNING, "Processing: " + f.getAbsolutePath(), e);
                 }
