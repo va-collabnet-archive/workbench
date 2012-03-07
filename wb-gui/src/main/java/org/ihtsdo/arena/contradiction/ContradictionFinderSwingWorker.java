@@ -7,9 +7,7 @@ package org.ihtsdo.arena.contradiction;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
@@ -24,8 +22,11 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.list.TerminologyListModel;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.util.Stopwatch;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.ComputationCanceled;
 import org.ihtsdo.contradiction.ContradictionConceptProcessor;
+import org.ihtsdo.helper.bdb.MultiEditorContradictionCase;
+import org.ihtsdo.helper.bdb.MultiEditorContradictionDetector;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
@@ -239,13 +240,25 @@ public class ContradictionFinderSwingWorker
         continueWork = true;
 
         // Iterate in Parallel
-        Ts.get().iterateConceptDataInParallel(ccp);
+//        Ts.get().iterateConceptDataInParallel(ccp);
+        
+        //@akf TEST HERE
+        int commitRecRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.COMMIT_RECORD.getUids());
+        List<MultiEditorContradictionCase> cases = new ArrayList<MultiEditorContradictionCase>();
+        MultiEditorContradictionDetector mecd;
+        mecd = new MultiEditorContradictionDetector(commitRecRefsetNid, viewCoord,
+                    cases, null);
+        Ts.get().iterateConceptDataInParallel(mecd);
 
         // Done, get results
         Set<Integer> returnSet = new HashSet<Integer>();
-        returnSet.addAll(ccp.getResults().getConflictingNids());
-        returnSet.addAll(ccp.getResults().getDuplicateNewNids());
-        returnSet.addAll(ccp.getResults().getDuplicateEditNids());
+//        returnSet.addAll(ccp.getResults().getConflictingNids());
+//        returnSet.addAll(ccp.getResults().getDuplicateNewNids());
+//        returnSet.addAll(ccp.getResults().getDuplicateEditNids());
+        
+        for(MultiEditorContradictionCase contradictionCase : cases){
+            returnSet.add(contradictionCase.getConceptNid());
+        }
 
         // Update Listeners
         continueWork = false;
