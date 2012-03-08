@@ -80,7 +80,8 @@ public class Svn implements I_HandleSubversion {
     private static SVNClientInterface client;
     private static SvnPrompter prompter = new SvnPrompter();
     public static final int SEMAPHORE_PERMITS = 10;
-    public static Semaphore rwl = new Semaphore(SEMAPHORE_PERMITS, true);
+    
+    private static Semaphore rwl = new Semaphore(SEMAPHORE_PERMITS, true);
 
     public static SVNClientInterface getSvnClient() {
         if (!isConnectedToSvn()) {
@@ -202,7 +203,7 @@ public class Svn implements I_HandleSubversion {
         if (workingCopy.endsWith("/") == false) {
             workingCopy = workingCopy + "/";
         }
-        SvnLog.info("Acquiring svn write lock [status]");
+        SvnLog.info("Acquiring svn write lock [status] (" + rwl.availablePermits() + " permits");
         rwl.acquireUninterruptibly(SEMAPHORE_PERMITS);
         SvnLog.info("Acquired");
         long startTime = System.currentTimeMillis();
@@ -290,7 +291,7 @@ public class Svn implements I_HandleSubversion {
             }
             return;
         }
-        SvnLog.info("Acquiring svn write lock [cleanup]");
+        SvnLog.info("Acquiring svn write lock [cleanup] (" + rwl.availablePermits() + " permits");
         rwl.acquireUninterruptibly(SEMAPHORE_PERMITS);
         SvnLog.info("Acquired");
         long startTime = System.currentTimeMillis();
@@ -341,7 +342,7 @@ public class Svn implements I_HandleSubversion {
             }
             return;
         }
-        SvnLog.info("Acquiring svn write lock [commit]");
+        SvnLog.info("Acquiring svn write lock [commit] (" + rwl.availablePermits() + " permits");
         rwl.acquireUninterruptibly(SEMAPHORE_PERMITS);
         SvnLog.info("Acquired");
         long startTime = System.currentTimeMillis();
@@ -507,7 +508,7 @@ public class Svn implements I_HandleSubversion {
             }
             return;
         }
-        SvnLog.info("Acquiring svn write lock [purge]");
+        SvnLog.info("Acquiring svn write lock [purge] (" + rwl.availablePermits() + " permits");
         rwl.acquireUninterruptibly(SEMAPHORE_PERMITS);
         SvnLog.info("Acquired");
         long startTime = System.currentTimeMillis();
@@ -581,7 +582,7 @@ public class Svn implements I_HandleSubversion {
             }
             return;
         }
-        SvnLog.info("Acquiring svn write lock [revert]");
+        SvnLog.info("Acquiring svn write lock [revert] (" + rwl.availablePermits() + " permits");
         rwl.acquireUninterruptibly(SEMAPHORE_PERMITS);
         SvnLog.info("Acquired");
         long startTime = System.currentTimeMillis();
@@ -696,7 +697,7 @@ public class Svn implements I_HandleSubversion {
             }
             return;
         }
-        SvnLog.info("Acquiring svn write lock [update]");
+        SvnLog.info("Acquiring svn write lock [update] (" + rwl.availablePermits() + " permits");
         rwl.acquireUninterruptibly(SEMAPHORE_PERMITS);
         SvnLog.info("Acquired");
         long startTime = System.currentTimeMillis();
@@ -756,7 +757,7 @@ public class Svn implements I_HandleSubversion {
             }
             return;
         }
-        SvnLog.info("Acquiring svn write lock [update-database]");
+        SvnLog.info("Acquiring svn write lock [update-database] (" + rwl.availablePermits() + " permits");
         rwl.acquireUninterruptibly(SEMAPHORE_PERMITS);
         SvnLog.info("Acquired");
         long startTime = System.currentTimeMillis();
@@ -839,7 +840,7 @@ public class Svn implements I_HandleSubversion {
             }
             return;
         }
-        SvnLog.info("Acquiring svn write lock [checkout]");
+        SvnLog.info("Acquiring svn write lock [checkout] (" + rwl.availablePermits() + " permits");
         rwl.acquireUninterruptibly(SEMAPHORE_PERMITS);
         SvnLog.info("Acquired");
         long startTime = System.currentTimeMillis();
@@ -1130,7 +1131,7 @@ public class Svn implements I_HandleSubversion {
             }
             return;
         }
-        SvnLog.info("Acquiring svn write lock [unlock]");
+        SvnLog.info("Acquiring svn write lock [unlock] (" + rwl.availablePermits() + " permits");
         rwl.acquireUninterruptibly(SEMAPHORE_PERMITS);
         SvnLog.info("Acquired");
         long startTime = System.currentTimeMillis();
@@ -1251,7 +1252,7 @@ public class Svn implements I_HandleSubversion {
             }
             return;
         }
-        SvnLog.info("Acquiring svn write lock [import]");
+        SvnLog.info("Acquiring svn write lock [import] (" + rwl.availablePermits() + " permits");
         rwl.acquireUninterruptibly(SEMAPHORE_PERMITS);
         SvnLog.info("Acquired");
         long startTime = System.currentTimeMillis();
