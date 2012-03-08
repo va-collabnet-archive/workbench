@@ -732,12 +732,6 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         inner.gridheight = 2;    // make button use 2 rows
         inner.insets = new Insets(0, 0, 0, 10);
 
-        JButton addSPecMetaData =
-                new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/paperclip_new.png")));
-
-        addSPecMetaData.addActionListener(new AddSpecMetadaListener());
-        addSPecMetaData.setToolTipText("Add metadata to enable refset specification for this concept.");
-        leftTogglePane.add(addSPecMetaData, inner);
         inner.gridx = 0;
         inner.gridy = 0;
         inner.gridheight = 1;
