@@ -51,6 +51,7 @@ import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
@@ -427,9 +428,12 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
             UUID memberUuid = generateUuid(Ts.get().getConcept(refsetNid).getPrimUuid(), Ts.get().getComponent(componentNid).getPrimUuid(), Ts.get().getConcept(memberTypeNid).getPrimUuid());
             if (Ts.get().hasUuid(memberUuid)) {
                 RefexChronicleBI<?> existingMember = (RefexChronicleBI) Ts.get().getComponent(memberUuid);
-
-                RefexVersionBI<?> existingVersion = existingMember.getVersion(config.getViewCoordinate().getVcWithAllStatusValues());
-                RefexCAB bluePrint = existingVersion.makeBlueprint(config.getViewCoordinate());
+                
+                ViewCoordinate vc = config.getViewCoordinate();
+                ViewCoordinate vcStatus = vc.getVcWithAllStatusValues();
+                
+                RefexVersionBI<?> existingVersion = existingMember.getVersion(vcStatus);
+                RefexCAB bluePrint = existingVersion.makeBlueprint(vc);
                 bluePrint.setStatusUuid(SnomedMetadataRfx.getSTATUS_CURRENT().getUuids()[0]);
                 bluePrint.setMemberUuid(memberUuid);
                 builder.constructIfNotCurrent(bluePrint);
