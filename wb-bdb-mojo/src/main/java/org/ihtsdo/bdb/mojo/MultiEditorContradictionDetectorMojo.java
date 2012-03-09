@@ -142,14 +142,19 @@ public class MultiEditorContradictionDetectorMojo extends AbstractMojo {
         //86123773-4f24-31c8-8d64-6a2e7b940f92
         //397396006
         UUID debugUuidIcd7777 = UUID.fromString("86123773-4f24-31c8-8d64-6a2e7b940f92");
+        //Intracranial hemorrhage following injury without open intracranial wound
+        //b69ffd35-db9a-3ca1-8b88-6fedf697cde0
+        // CASE WITH ONE "UNKNOWN" WHICH IS COMPUTED WITH DATE 2002-01-31 12:00:00
+        UUID debugUuidIcd8888 = UUID.fromString("b69ffd35-db9a-3ca1-8b88-6fedf697cde0");
         try {
-            iSet.add(tf.getConcept(debugUuidIcd1111).getNid());
-            iSet.add(tf.getConcept(debugUuidIcd2222).getNid());
-            iSet.add(tf.getConcept(debugUuidIcd3333).getNid());
-            iSet.add(tf.getConcept(debugUuidIcd4444).getNid());
-            iSet.add(tf.getConcept(debugUuidIcd5555).getNid());
-            iSet.add(tf.getConcept(debugUuidIcd6666).getNid());
-            iSet.add(tf.getConcept(debugUuidIcd7777).getNid());
+            // iSet.add(tf.getConcept(debugUuidIcd1111).getNid());
+            // iSet.add(tf.getConcept(debugUuidIcd2222).getNid());
+            // iSet.add(tf.getConcept(debugUuidIcd3333).getNid());
+            // iSet.add(tf.getConcept(debugUuidIcd4444).getNid());
+            // iSet.add(tf.getConcept(debugUuidIcd5555).getNid());
+            // iSet.add(tf.getConcept(debugUuidIcd6666).getNid());
+            // iSet.add(tf.getConcept(debugUuidIcd7777).getNid());
+            iSet.add(tf.getConcept(debugUuidIcd8888).getNid());
         } catch (TerminologyException ex) {
             Logger.getLogger(MultiEditorContradictionDetectorMojo.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -185,34 +190,97 @@ public class MultiEditorContradictionDetectorMojo extends AbstractMojo {
 
             long startTime = System.currentTimeMillis();
             int commitRecRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.COMMIT_RECORD.getUids());
+            int adjudicationRecRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.ADJUDICATION_RECORD.getUids());
             ViewCoordinate vc = config.getViewCoordinate();
 
-            List<MultiEditorContradictionCase> cases = new ArrayList<MultiEditorContradictionCase>();
-            MultiEditorContradictionDetector mecd;
-            mecd = new MultiEditorContradictionDetector(commitRecRefsetNid, vc,
-                    cases, debugWatchNidSet());
-            // Ts.get().iterateConceptDataInSequence(mecd);
-            Ts.get().iterateConceptDataInParallel(mecd);
 
+            // *** TEST CASE 1 ***
+            List<MultiEditorContradictionCase> cases;
+            cases = new ArrayList<MultiEditorContradictionCase>();
+            MultiEditorContradictionDetector mecd;
+            mecd = new MultiEditorContradictionDetector(commitRecRefsetNid,
+                    adjudicationRecRefsetNid,
+                    vc, // ViewCoordinates
+                    cases, // Resulting Cases
+                    debugWatchNidSet(),
+                    false, // ignoreReadOnlySap ... AuthorTime from refset for given concept
+                    false); // ignoreNonVisibleAth ... AuthorTime from concept
+            Ts.get().iterateConceptDataInSequence(mecd);
+            // Ts.get().iterateConceptDataInParallel(mecd);
+
+            // REPORT RESULTS
             if (cases.size() > 0) {
                 StringBuilder sb = new StringBuilder();
-                sb.append("\r\n::: [MultiEditorContradictionDetectionMojo] FOUND CONTRADICTIONS\r\n");
+                sb.append("\r\n***** CASE 1: INGORE NOTHING *****");
+                sb.append("\r\n[MultiEditorContradictionDetectionMojo] FOUND CONTRADICTIONS\r\n");
                 for (MultiEditorContradictionCase contradictionCase : cases) {
-                    I_GetConceptData concept = tf.getConcept(contradictionCase.getConceptNid());
-                    sb.append("::: CONTRADICTING COMMIT_RECORDS: ");
-                    sb.append(concept.getPrimUuid().toString());
-                    sb.append(" ");
-                    sb.append(concept.toUserString());
+                    sb.append(contradictionCase.toStringLong());
                     sb.append("\r\n");
-                    ArrayList<String> authorTimeList = contradictionCase.getCases();
-                    for (String s : authorTimeList) {
-                        sb.append(s);
-                        sb.append("\r\n");
-                    }
                 }
                 logger.info(sb.toString());
             } else {
-                logger.info("::: [MultiEditorContradictionDetectionMojo] NO CONTRADICTIONS FOUND.");
+                StringBuilder sb = new StringBuilder();
+                sb.append("\r\n***** CASE 1: INGORE NOTHING *****");
+                sb.append("\r\n[MultiEditorContradictionDetectionMojo] NO CONTRADICTIONS FOUND");
+                logger.info(sb.toString());
+            }
+
+            // *** TEST CASE 2 ***
+            cases = new ArrayList<MultiEditorContradictionCase>();
+            mecd = new MultiEditorContradictionDetector(commitRecRefsetNid,
+                    adjudicationRecRefsetNid,
+                    vc, // ViewCoordinates
+                    cases, // Resulting Cases
+                    debugWatchNidSet(),
+                    true, // ignoreReadOnlySap ... AuthorTime from refset for given concept
+                    false); // ignoreNonVisibleAth ... AuthorTime from concept
+            Ts.get().iterateConceptDataInSequence(mecd);
+            // Ts.get().iterateConceptDataInParallel(mecd);
+
+            // report results
+            if (cases.size() > 0) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("\r\n***** CASE 2: DON'T COMPUTE READONLY *****");
+                sb.append("\r\n[MultiEditorContradictionDetectionMojo] FOUND CONTRADICTIONS\r\n");
+                for (MultiEditorContradictionCase contradictionCase : cases) {
+                    sb.append(contradictionCase.toStringLong());
+                    sb.append("\r\n");
+                }
+                logger.info(sb.toString());
+            } else {
+                StringBuilder sb = new StringBuilder();
+                sb.append("\r\n***** CASE 2: DON'T COMPUTE READONLY *****");
+                sb.append("\r\n[MultiEditorContradictionDetectionMojo] NO CONTRADICTIONS FOUND");
+                logger.info(sb.toString());
+            }
+
+            // *** TEST CASE 3 ***
+            cases = new ArrayList<MultiEditorContradictionCase>();
+            mecd = new MultiEditorContradictionDetector(commitRecRefsetNid,
+                    adjudicationRecRefsetNid,
+                    vc, // ViewCoordinates
+                    cases, // Resulting Cases
+                    debugWatchNidSet(),
+                    true, // ignoreReadOnlySap ... AuthorTime from refset for given concept
+                    true); // ignoreNonVisibleAth ... AuthorTime from concept
+            Ts.get().iterateConceptDataInSequence(mecd);
+            // Ts.get().iterateConceptDataInParallel(mecd);
+
+            // report results
+            if (cases.size() > 0) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("\r\n***** CASE 3: DON'T COMPUTE READONLY + INGORE NONCOMPUTED *****");
+                sb.append("\r\n[MultiEditorContradictionDetectionMojo] FOUND CONTRADICTIONS\r\n");
+                for (MultiEditorContradictionCase contradictionCase : cases) {
+                    sb.append(contradictionCase.toStringLong());
+                    sb.append("\r\n");
+                }
+                logger.info(sb.toString());
+            } else {
+                StringBuilder sb = new StringBuilder();
+                sb.append("\r\n***** CASE 3: DON'T COMPUTE READONLY + INGORE NONCOMPUTED *****");
+                sb.append("\r\n[MultiEditorContradictionDetectionMojo] NO CONTRADICTIONS FOUND");
+                logger.info(sb.toString());
             }
 
         } catch (Exception ex) {

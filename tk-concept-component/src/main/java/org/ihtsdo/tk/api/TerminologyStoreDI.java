@@ -108,6 +108,8 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
 
    int getNidForUuids(UUID... uuids) throws IOException;
 
+   int getReadOnlyMaxSap();
+
    List<? extends PathBI> getPathChildren(int nid);
 
    int[] getPossibleChildren(int cNid, ViewCoordinate vc) throws IOException;

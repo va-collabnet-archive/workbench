@@ -599,6 +599,11 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     }
 
     @Override
+    public int getReadOnlyMaxSap() {
+        return Bdb.getSapDb().getReadOnlyMax();
+    }
+
+    @Override
     public long getSequence() {
         return Bdb.gVersion.incrementAndGet();
     }

@@ -16,9 +16,7 @@
 package org.ihtsdo.helper.bdb;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.ihtsdo.tk.Ts;
@@ -30,19 +28,37 @@ import org.ihtsdo.tk.api.TerminologyStoreDI;
  */
 public class MultiEditorContradictionCase {
 
-    private int cNid; // concept with contradiction
+    private int conceptNid; // concept with contradiction
     private ArrayList<String> cases; // reported cases
     // DETAILS
     private HashMap<UUID, String> authTimeMapComputed; // computed from getAllSapNids()
     private HashMap<UUID, String> authTimeMapMissing; // missing from getAllSapNids()
+    private ArrayList<HashSet<UUID>> authTimeSetsList; // editor authTimeHash sets
+    private ArrayList<HashSet<UUID>> authTimeSetsTruthList; // adjudication authTimeHash sets
 
     public MultiEditorContradictionCase(int cNid, ArrayList<String> cases) {
-        this.cNid = cNid;
+        this.conceptNid = cNid;
         this.cases = cases;
     }
 
     public int getConceptNid() {
-        return cNid;
+        return conceptNid;
+    }
+
+    public HashMap<UUID, String> getAuthTimeMapComputed() {
+        return authTimeMapComputed;
+    }
+
+    public HashMap<UUID, String> getAuthTimeMapMissing() {
+        return authTimeMapMissing;
+    }
+
+    public ArrayList<HashSet<UUID>> getAuthTimeSetsList() {
+        return authTimeSetsList;
+    }
+
+    public ArrayList<HashSet<UUID>> getAuthTimeSetsTruthList() {
+        return authTimeSetsTruthList;
     }
 
     public void setAuthTimeMapComputed(HashMap<UUID, String> authTimeMapComputed) {
@@ -51,6 +67,14 @@ public class MultiEditorContradictionCase {
 
     public void setAuthTimeMapMissing(HashMap<UUID, String> authTimeMapMissing) {
         this.authTimeMapMissing = authTimeMapMissing;
+    }
+
+    public void setAuthTimeSetsList(ArrayList<HashSet<UUID>> authTimeSetsList) {
+        this.authTimeSetsList = authTimeSetsList;
+    }
+
+    public void setAuthTimeSetsTruthList(ArrayList<HashSet<UUID>> authTimeSetsTruthList) {
+        this.authTimeSetsTruthList = authTimeSetsTruthList;
     }
 
     public ArrayList<String> getCases() {
@@ -62,9 +86,7 @@ public class MultiEditorContradictionCase {
         TerminologyStoreDI ts = Ts.get();
         StringBuilder sb = new StringBuilder();
         try {
-            sb.append(ts.getConcept(cNid).toUserString());
-
-
+            sb.append(ts.getConcept(conceptNid).toUserString());
             return sb.toString();
         } catch (IOException ex) {
             Logger.getLogger(MultiEditorContradictionCase.class.getName()).log(Level.SEVERE, null, ex);
@@ -76,11 +98,49 @@ public class MultiEditorContradictionCase {
         TerminologyStoreDI ts = Ts.get();
         StringBuilder sb = new StringBuilder();
         try {
-            sb.append("\r\n*** CONTRADICTION CASE ***\r\n   Concept: ");
-            sb.append(ts.getConcept(cNid).getPrimUuid().toString());
-            sb.append(" ");
-            sb.append(ts.getConcept(cNid).toUserString());
+            sb.append("\r\n*** CONTRADICTION CASE ***\r\nCONCEPT: ");
+            sb.append(ts.getConcept(conceptNid).getPrimUuid().toString());
+            sb.append("   ");
+            sb.append(ts.getConcept(conceptNid).toUserString());
 
+            sb.append("\r\nRECOMPUTED AuthorTimeHash values");
+            ArrayList<String> values = new ArrayList<String>();
+            for (String s : authTimeMapComputed.values()) {
+                values.add(s);
+            }
+            Collections.sort(values, String.CASE_INSENSITIVE_ORDER);
+            for (String s : values) {
+                sb.append("\r\n   ");
+                sb.append(s);
+            }
+
+            sb.append("\r\nUNKNOWN AuthorTimeHash values:");
+            for (String s : authTimeMapMissing.values()) {
+                sb.append("\r\n   ");
+                sb.append(s);
+            }
+
+            sb.append("\r\nEDITOR SETS:");
+            int setCounter = 0;
+            for (HashSet<UUID> hs : authTimeSetsList) {
+                sb.append("\r\n   AuthorTime HashSet #");
+                sb.append(setCounter++);
+                for (UUID uuid : hs) {
+                    sb.append("\r\n      Value: ");
+                    sb.append(uuid.toString());
+                }
+            }
+
+            sb.append("\r\nADJUDICATION SETS:");
+            setCounter = 0;
+            for (HashSet<UUID> hs : authTimeSetsTruthList) {
+                sb.append("\r\n   AuthorTime Adjudiction HashSet #");
+                sb.append(setCounter++);
+                for (UUID uuid : hs) {
+                    sb.append("\r\n      Value: ");
+                    sb.append(uuid.toString());
+                }
+            }
 
             return sb.toString();
         } catch (IOException ex) {
