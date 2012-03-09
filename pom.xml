@@ -251,6 +251,7 @@
 		<module>tk-case-sensitive-words</module>
 		<module>tk-cern-prim</module>
 		<module>wb-schema-mojo</module>
+		<module>wb-release-process</module>
 		<!-- <module>bdb-properties</module> -->
 	</modules>
 </project>
