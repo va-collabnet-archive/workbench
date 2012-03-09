@@ -354,6 +354,9 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
         ADJUDICATION_RECORD(new String[]{"Adjudication Time and Author Record", "Adjudication Record"},
             new I_ConceptualizeUniversally[]{REFSET_IDENTITY}),
         
+        CONFLICT_RECORD(new String[]{"Concepts in Conflict Record", "Conflict Record"},
+            new I_ConceptualizeUniversally[]{REFSET_IDENTITY}),
+        
         
         GB_NON_UKTC(new String[]{"Non UKTC", "Non UKTC"},
         new I_ConceptualizeUniversally[]{GB, ANCILLARY_DATA},
