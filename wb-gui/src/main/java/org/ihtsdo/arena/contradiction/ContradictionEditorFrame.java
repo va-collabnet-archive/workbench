@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.rmi.MarshalledObject;
 import java.security.NoSuchAlgorithmException;
+import java.util.UUID;
 
 import javax.naming.ConfigurationException;
 import javax.swing.AbstractAction;
@@ -56,7 +57,10 @@ import org.dwfa.bpa.util.ComponentFrame;
 import org.dwfa.bpa.util.OpenFramesWindowListener;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.arena.Arena;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
 
 /**
  *
@@ -122,14 +126,20 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
         // Setup Left Side
         if (batchConceptList == null) {
 	        TerminologyListModel batchListModel = new TerminologyListModel();
-	        batchConceptList = new TerminologyList(batchListModel, true, true, newFrameConfig); 
+                int conflictRefsetNid = Ts.get().getNidForUuids(UUID.fromString("767e3525-ebd4-43f9-9640-952e31589e47"));
+                ConceptChronicleBI conflictRefset = Ts.get().getConceptForNid(conflictRefsetNid);
+                for(RefexVersionBI member : conflictRefset.getCurrentRefsetMembers(viewCoord)){
+                    batchListModel.addElement((I_GetConceptData)
+                            Ts.get().getConceptForNid(member.getReferencedComponentNid()));
+                }
+	        batchConceptList = new TerminologyList(batchListModel, true, true, newFrameConfig);
         }
 	     
         createLeftComponent();
 
         topSplit.setLeftComponent(resultsPane);
         topSplit.setRightComponent(conceptTabsPane);
-        topSplit.setDividerLocation(350);
+        topSplit.setDividerLocation(350); 
         resultsPane.setMinimumSize(new Dimension(350, cp.getHeight()));
         SwingUtilities.invokeLater(new Runnable() {
 

@@ -259,13 +259,8 @@ public class ContradictionFinderSwingWorker
         Ts.get().iterateConceptDataInParallel(mecd);
 
         // Done, get results
-        Set<Integer> returnSet = new HashSet<Integer>();
-        
-        //@akf additional refset stuff here
-        
-//        int conflictRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.CONFLICT_RECORD.getUids());
-        //Event (domain)
-        int conflictRefsetNid = Ts.get().getNidForUuids(UUID.fromString("767e3525-ebd4-43f9-9640-952e31589e47"));
+        Set<Integer> returnSet = new HashSet<Integer>();   
+        int conflictRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.CONFLICT_RECORD.getUids());
         ConceptChronicleBI conflictRefset = Ts.get().getConceptForNid(conflictRefsetNid);
         TerminologyBuilderBI builder = 
                     Ts.get().getTerminologyBuilder(frame.getActiveFrameConfig().getEditCoordinate(), viewCoord);
@@ -274,36 +269,33 @@ public class ContradictionFinderSwingWorker
                     conflictRefset.getCurrentRefsetMembers(viewCoord);
         NidBitSetBI currentMemberNidSet = Ts.get().getEmptyNidSet();
         for (RefexVersionBI member : currentMembers) {
-                currentMemberNidSet.setMember(member.getConceptNid());
-        }
-        
-        for(MultiEditorContradictionCase contradictionCase : cases){
-            returnSet.add(contradictionCase.getConceptNid());
+                currentMemberNidSet.setMember(member.getReferencedComponentNid());
         }
         NidBitSetBI contradictionCaseNidSet = Ts.get().getEmptyNidSet();
-        if (cases.size() > 0) {
-                for (MultiEditorContradictionCase contradictionCase : cases) {
-                    contradictionCaseNidSet.setMember(contradictionCase.getConceptNid());
-                }
+        for(MultiEditorContradictionCase contradictionCase : cases){
+            returnSet.add(contradictionCase.getConceptNid());
+            contradictionCaseNidSet.setMember(contradictionCase.getConceptNid());
         }
-        
+        NidBitSetBI currentMemberHolderSet = Ts.get().getEmptyNidSet();
+        currentMemberHolderSet.or(currentMemberNidSet);
         currentMemberNidSet.andNot(contradictionCaseNidSet); //gives concepts to be retired
-        contradictionCaseNidSet.andNot(currentMemberNidSet); //gives concepts to be added
+        contradictionCaseNidSet.andNot(currentMemberHolderSet); //gives concepts to be added
+        
         NidBitSetItrBI currentIterator = contradictionCaseNidSet.iterator();
         NidBitSetItrBI retiredIterator = currentMemberNidSet.iterator();
         while(currentIterator.next()){
             RefexCAB memberBp = new RefexCAB(TK_REFSET_TYPE.MEMBER,
                     currentIterator.nid(),
                     conflictRefsetNid);
-            builder.construct(memberBp);
+            builder.constructIfNotCurrent(memberBp);
         }
-
         while(retiredIterator.next()){
             ComponentChroncileBI<?> component = Ts.get().getComponent(retiredIterator.nid());
-            RefexVersionBI member = (RefexVersionBI) component.getVersion(viewCoord);
+            RefexVersionBI member = conflictRefset.getCurrentRefsetMemberForComponent(
+                    viewCoord, component.getConceptNid());
             RefexCAB memberBp = member.makeBlueprint(viewCoord);
             memberBp.setRetired();
-            builder.construct(memberBp);
+            builder.constructIfNotCurrent(memberBp);
         }
 
         Ts.get().addUncommitted(conflictRefset);

@@ -45,7 +45,7 @@ public class ConceptNavigator extends JPanel {
    private FocusDrop         focusDrop;
    private HistoryPanel      historyPanel;
    private JScrollPane       historyScroller;
-   private JButton           implementButton;
+//   private JButton           implementButton;
    private TaxonomyTree      navigatorTree;
    private final JPanel      topPanel;
    private JScrollPane       treeScroller;
@@ -169,14 +169,14 @@ public class ConceptNavigator extends JPanel {
       gbc.gridx++;
       gbc.weightx     = 0;
       gbc.fill        = GridBagConstraints.NONE;
-      implementButton =
-         new JButton(new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/magic-wand.png")));
-      implementButton.setBorder(BorderFactory.createEmptyBorder(2, 20, 2, 40));
-      implementButton.setToolTipText("apply selected version changes");
-      implementButton.setVisible(true);
-      implementButton.setEnabled(false);
-      thePanel.add(implementButton, gbc);
-      gbc.gridx++;
+//      implementButton =
+//         new JButton(new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/magic-wand.png")));
+//      implementButton.setBorder(BorderFactory.createEmptyBorder(2, 20, 2, 40));
+//      implementButton.setToolTipText("apply selected version changes");
+//      implementButton.setVisible(true);
+//      implementButton.setEnabled(false);
+//      thePanel.add(implementButton, gbc);
+//      gbc.gridx++;
 
       JButton taxonomyButton =
          new JButton(new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/text_tree.png")));
@@ -214,9 +214,9 @@ public class ConceptNavigator extends JPanel {
       return this.side;
    }
 
-   public JButton getImplementButton() {
-      return implementButton;
-   }
+//   public JButton getImplementButton() {
+//      return implementButton;
+//   }
 
    //~--- set methods ---------------------------------------------------------
 

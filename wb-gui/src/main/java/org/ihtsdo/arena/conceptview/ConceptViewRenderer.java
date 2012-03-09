@@ -692,7 +692,7 @@ public class ConceptViewRenderer extends JLayeredPane {
 		}
 
         gbc.gridx++;
-
+        
         gbc.weightx = 1;
         JPanel fillerPanel = new JPanel();
         fillerPanel.setBackground(footerPanel.getBackground());
@@ -700,6 +700,17 @@ public class ConceptViewRenderer extends JLayeredPane {
         footerPanel.add(fillerPanel, gbc);
 
         gbc.weightx = 0;
+        if(settings.isForAdjudication()){
+            gbc.gridx++;
+            JButton acceptButton = new JButton(new ImageIcon(
+                    ACE.class.getResource("/16x16/plain/magic-wand.png")));
+            acceptButton.setToolTipText("accept concept as is");
+            acceptButton.addActionListener(new AcceptActionListener(settings));
+            acceptButton.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 0));
+            acceptButton.setCursor(Cursor.getDefaultCursor());
+            footerPanel.add(acceptButton, gbc);
+        }
+        
         gbc.gridx++;
         cancelButton = new JButton(new ImageIcon(
                 ACE.class.getResource("/16x16/plain/delete.png")));
