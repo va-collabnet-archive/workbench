@@ -53,6 +53,22 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
             int adjudicationRecRefsetNid,
             ViewCoordinate vc,
             List<MultiEditorContradictionCase> cl,
+            HashSet<Integer> ws)
+            throws IOException {
+        this.commitRecRefsetNid = commitRecRefsetNid;
+        this.adjudicateRecRefsetNid = adjudicationRecRefsetNid;
+        this.vc = vc;
+        this.nidSet = Ts.get().getAllConceptNids();
+        this.contradictionCaseList = cl;
+        this.watchSet = ws;
+        this.ignoreNonVisibleAth = false;
+        maxSap = Integer.MIN_VALUE;
+    }
+
+    public MultiEditorContradictionDetector(int commitRecRefsetNid,
+            int adjudicationRecRefsetNid,
+            ViewCoordinate vc,
+            List<MultiEditorContradictionCase> cl,
             HashSet<Integer> ws,
             boolean ignoreReadOnlySap,
             boolean ignoreNonVisibleAth)
