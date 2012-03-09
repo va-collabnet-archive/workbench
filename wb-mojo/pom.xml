@@ -3,10 +3,9 @@
 	<parent>
 		<groupId>org.ihtsdo</groupId>
 		<artifactId>wb-mmb</artifactId>
-		<version>2.6.0-trek-96-SNAPSHOT</version>
+		<version>2.6.0-trek-96-termmed-SNAPSHOT</version>
 	</parent>
 	<artifactId>wb-mojo</artifactId>
-	<version>2.6.0-trek-96-termmed-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
 	<name>${branch}: Workbench Mojo Daily Dev</name>
 	<description>Workbench Maven Java Objects (mojo)</description>
