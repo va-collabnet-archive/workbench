@@ -18,7 +18,7 @@ import java.io.IOException;
 
 import java.util.*;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.api.refex.type_cnid_cnid_cnid.RefexCnidCnidCnidVersionBI;
+import org.ihtsdo.tk.api.refex.type_member.RefexMemberVersionBI;
 
 public class TkRefsetMember extends TkRefsetAbstractMember<TkRefsetRevision> {
    public static final long serialVersionUID = 1;
@@ -36,10 +36,10 @@ public class TkRefsetMember extends TkRefsetAbstractMember<TkRefsetRevision> {
    public TkRefsetMember(RefexChronicleBI another) throws IOException {
       super((RefexVersionBI) another.getPrimordialVersion());
 
-      Collection<? extends RefexCnidCnidCnidVersionBI> refexes   = another.getVersions();
+      Collection<? extends RefexMemberVersionBI> refexes   = another.getVersions();
       int                                              partCount = refexes.size();
-      Iterator<? extends RefexCnidCnidCnidVersionBI>   itr       = refexes.iterator();
-      RefexCnidCnidCnidVersionBI                       rv        = itr.next();
+      Iterator<? extends RefexMemberVersionBI>   itr       = refexes.iterator();
+      RefexMemberVersionBI                       rv        = itr.next();
 
       if (partCount > 1) {
          revisions = new ArrayList<TkRefsetRevision>(partCount - 1);
