@@ -31,7 +31,7 @@ public class RF2InferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 	private File targetDirectory;
 
 	/**
-	 * release date. 20100731
+	 * release date. 
 	 * 
 	 * @parameter
 	 * @required
@@ -39,7 +39,7 @@ public class RF2InferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 	private String releaseDate;
 
 	/**
-	 * previuous release date. 20100731
+	 * previuous release date. 
 	 * 
 	 * @parameter
 	 * @required
@@ -61,7 +61,7 @@ public class RF2InferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 	 * @required
 	 */
 	private String rf2FullFolder;
-
+	
 	/**
 	 * Location of the outputFolder. (output in this mojo)
 	 * 
@@ -69,8 +69,7 @@ public class RF2InferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 	 * @required
 	 */
 	private String outputFolder;
-
-
+	
 	private String tmpPostExport="tmppostexport";	
 	private String tmpSort="tmpsort";
 	private String tmpTmpSort="tmp";
@@ -88,7 +87,6 @@ public class RF2InferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 		try {
 			previousRelationshipFullFile = getPreviousFile(previousFullFolder,FILE_TYPE.RF2_RELATIONSHIP);
 
-
 			File folderTmp=new File(targetDirectory.getAbsolutePath() + "/" + getTmpPostExport() );
 			if (!folderTmp.exists()){
 				folderTmp.mkdir();
@@ -105,7 +103,6 @@ public class RF2InferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 		//	Config config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/relationship.xml");
 
 			File exportedRelationshipFile = new File(exportedSnapshotFile );
-
 
 			File sortTmpfolderSortedTmp=new File(sortedfolderTmp.getAbsolutePath() + "/" + getTmpTmpSort());
 			if (!sortTmpfolderSortedTmp.exists()){
@@ -194,6 +191,22 @@ public class RF2InferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 			e.printStackTrace();
 		}
 
+	}
+
+	private FILE_TYPE getRelFileType(String relFileType) {
+		if (relFileType.equalsIgnoreCase(FILE_TYPE.RF2_RELATIONSHIP.name())){
+			return FILE_TYPE.RF2_RELATIONSHIP;
+		}
+		if (relFileType.equalsIgnoreCase(FILE_TYPE.RF2_STATED_RELATIONSHIP.name())){
+			return FILE_TYPE.RF2_STATED_RELATIONSHIP;
+		}
+		if (relFileType.equalsIgnoreCase(FILE_TYPE.RF2_ISA_RETIRED.name())){
+			return FILE_TYPE.RF2_ISA_RETIRED;
+		}
+		if (relFileType.equalsIgnoreCase(FILE_TYPE.RF2_STATED_ISA_RETIRED.name())){
+			return FILE_TYPE.RF2_STATED_ISA_RETIRED;
+		}
+		return null;
 	}
 
 	public File getSnapshotOutputFile(String parentFolder,FILE_TYPE fType,String date){
@@ -288,8 +301,12 @@ public class RF2InferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 		case RF2_COMPATIBILITY_IDENTIFIER:
 			AuxFileRetrieve = new AuxiliaryFilesRetrieve(rf2FullFolder);
 			retFile=AuxFileRetrieve.getAssociationAuxiliaryFile();
-			break; 
-
+		case RF2_ISA_RETIRED:
+			AuxFileRetrieve = new AuxiliaryFilesRetrieve(rf2FullFolder);
+			retFile=AuxFileRetrieve.getRelationshipAuxiliaryFile();
+		case RF2_STATED_ISA_RETIRED:
+			AuxFileRetrieve = new AuxiliaryFilesRetrieve(rf2FullFolder);
+			retFile=AuxFileRetrieve.getStatedRelationshipAuxiliaryFile();
 		}
 		if (retFile==null){
 			return null;

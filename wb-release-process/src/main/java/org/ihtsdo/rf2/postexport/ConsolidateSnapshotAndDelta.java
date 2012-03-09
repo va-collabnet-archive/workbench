@@ -25,6 +25,7 @@ public class ConsolidateSnapshotAndDelta extends AbstractTask {
 	private File deltaFinalFile;
 	private BufferedWriter bw;
 	private BufferedWriter dbw;
+	private int effectiveTimeColIndex;
 
 	public ConsolidateSnapshotAndDelta(FILE_TYPE fType,
 			File snapshotSortedPreviousfile, File snapshotSortedExportedfile,
@@ -35,6 +36,7 @@ public class ConsolidateSnapshotAndDelta extends AbstractTask {
 		this.deltaFinalFile=deltaFinalFile;
 		this.fieldsToCompare=fType.getColumnsToCompare();
 		this.index=fType.getSnapshotIndex();
+		this.effectiveTimeColIndex=fType.getEffectiveTimeColIndex();
 		this.releaseDate=releaseDate;
 	}
 
@@ -159,7 +161,7 @@ public class ConsolidateSnapshotAndDelta extends AbstractTask {
 	private void addExportedLine( String[] splittedLine) throws Exception {
 		StringBuffer sb=new StringBuffer();
 		for (int i = 0; i < colLen; i++) {
-			if (i==1){
+			if (i==this.effectiveTimeColIndex){
 				sb.append(releaseDate);
 				
 			}else{
