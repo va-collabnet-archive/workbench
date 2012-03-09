@@ -35,7 +35,8 @@ public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
 			String previousReleaseDate, String releaseDate) throws IOException {
 		super();
 		this.fType = fType;
-		this.rf2FullFolder = new File(rf2FullFolder.getAbsolutePath() + "/org/ihtsdo/rf2");
+//		this.rf2FullFolder = new File(rf2FullFolder.getAbsolutePath() + "/org/ihtsdo/rf2");
+		this.rf2FullFolder = new File(rf2FullFolder.getAbsolutePath() );
 		this.rf2Exported = rf2Exported;
 		this.previousReleaseDate = previousReleaseDate;
 		this.releaseDate = releaseDate;
@@ -95,17 +96,17 @@ public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
 	public void postProcess() throws Exception{
 		File previousFile=getPreviousFile(rf2FullFolder.getAbsolutePath(),fType);
 		File sortedPreviousfile=new File(sortedfolderTmp,"pre_" + previousFile.getName());
-		File filterPreviousfile=new File(sortedfolderTmp,"ftr_" + previousFile.getName());
+//		File filterPreviousfile=new File(sortedfolderTmp,"ftr_" + previousFile.getName());
+//		
+//		ValueAnalyzer vAnl=new ValueAnalyzer(ValueAnalyzer.OPERATOR.LOWER, releaseDate);
+//		CommonUtils.FilterFile(previousFile, filterPreviousfile, 1, vAnl);
 		
-		ValueAnalyzer vAnl=new ValueAnalyzer(ValueAnalyzer.OPERATOR.LOWER, releaseDate);
-		CommonUtils.FilterFile(previousFile, filterPreviousfile, 1, vAnl);
-		
-		FileSorter fsc=new FileSorter(filterPreviousfile, sortedPreviousfile, sortTmpfolderSortedTmp, fType.getColumnIndexes());
+		FileSorter fsc=new FileSorter(previousFile, sortedPreviousfile, sortTmpfolderSortedTmp, fType.getColumnIndexes());
 		fsc.execute();
 		fsc=null;
 		System.gc();
 		
-		filterPreviousfile.delete();
+//		filterPreviousfile.delete();
 		
 		File sortedExportedfile=new File(sortedfolderTmp,"exp_" + rf2Exported.getName());
 		fsc=new FileSorter(rf2Exported, sortedExportedfile, sortTmpfolderSortedTmp, fType.getColumnIndexes());
@@ -114,13 +115,13 @@ public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
 		System.gc();
 		
 		File snapshotSortedPreviousfile=new File(snapshotfolderTmp,"pre_" + previousFile.getName());
-		SnapshotGenerator sg=new SnapshotGenerator(sortedPreviousfile, previousReleaseDate, fType.getSnapshotIndex(), 1, snapshotSortedPreviousfile, null, null);
+		SnapshotGenerator sg=new SnapshotGenerator(sortedPreviousfile, previousReleaseDate, fType.getSnapshotIndex(), fType.getEffectiveTimeColIndex(), snapshotSortedPreviousfile, null, null);
 		sg.execute();
 		sg=null;
 		System.gc();
 
 		File snapshotSortedExportedfile=new File(snapshotfolderTmp,"exp_" + rf2Exported.getName());
-		sg=new SnapshotGenerator(sortedExportedfile, releaseDate, fType.getSnapshotIndex(), 1, snapshotSortedExportedfile, null, null);
+		sg=new SnapshotGenerator(sortedExportedfile, releaseDate, fType.getSnapshotIndex(), fType.getEffectiveTimeColIndex(), snapshotSortedExportedfile, null, null);
 		sg.execute();
 		sg=null;
 		System.gc();

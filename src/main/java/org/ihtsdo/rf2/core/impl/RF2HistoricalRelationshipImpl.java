@@ -139,7 +139,7 @@ public class RF2HistoricalRelationshipImpl extends RF2AbstractImpl implements I_
 							moduleId = computeModuleId(sourceConcept);
 						}
 						
-						if(moduleId.equals(I_Constants.META_MOULE_ID)){		
+						if(moduleId.equals(I_Constants.META_MODULE_ID)){		
 							logger.info("==Meta Concept==" + sourceId + " & Name : " + sourceConcept.getInitialText());
 							incrementMetaDataCount();
 						}

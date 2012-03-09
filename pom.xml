@@ -8,7 +8,7 @@
 	<artifactId>wb-release-process</artifactId>
 	<!--<packaging>jar</packaging> -->
 	<packaging>maven-plugin</packaging>
-	<name>${branch}: Workbench Release Process</name>
+	<name>${branch}: Workbench Release Process Daily Dev</name>
 	<description>Workbench Release Process Library</description>
 	<url>http://maven.apache.org</url>
 

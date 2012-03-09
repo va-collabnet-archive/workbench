@@ -1,12 +1,20 @@
 package org.ihtsdo.rf2.identifier.mojo;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.util.HashSet;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.ihtsdo.rf2.identifier.impl.RF2RelsIDRetrieveImpl;
 import org.ihtsdo.rf2.mojo.ReleaseConfigMojo;
 import org.ihtsdo.rf2.postexport.AuxiliaryFilesRetrieve;
+import org.ihtsdo.rf2.postexport.CommonUtils;
 import org.ihtsdo.rf2.postexport.FileSorter;
 import org.ihtsdo.rf2.postexport.RF2FileRetrieve;
 import org.ihtsdo.rf2.postexport.SnapshotGenerator;
@@ -17,10 +25,10 @@ import org.ihtsdo.rf2.postexport.RF2ArtifactPostExportAbst.FILE_TYPE;
 /**
  * Goal which sorts and generates delta, snapshot.
  * 
- * @goal rf2-inferred-relationships-id-reassign
+ * @goal rf2-relationships-id-reassign-previous-not-released
  * 
  */
-public class RF2InferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
+public class RF2PostInferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 
 	/**
 	 * Location of the build directory.
@@ -55,13 +63,12 @@ public class RF2InferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 	private String exportedSnapshotFile;
 
 	/**
-	 * Location of the rf2 full. (input in this mojo)
+	 * Location of the previous Id not released file. (input in this mojo)
 	 * 
 	 * @parameter
 	 * @required
 	 */
-	private String rf2FullFolder;
-	
+	private String previousIdNotReleasedFile;
 	/**
 	 * Location of the outputFolder. (output in this mojo)
 	 * 
@@ -69,7 +76,8 @@ public class RF2InferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 	 * @required
 	 */
 	private String outputFolder;
-	
+
+
 	private String tmpPostExport="tmppostexport";	
 	private String tmpSort="tmpsort";
 	private String tmpTmpSort="tmp";
@@ -81,12 +89,14 @@ public class RF2InferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 	private String snapshotSuffix="Snapshot";
 
 	public void execute() throws MojoExecutionException {	
-		String previousFullFolder = rf2FullFolder ;
 
-		File previousRelationshipFullFile;
+		File previousNotReleasedFile;
 		try {
-			previousRelationshipFullFile = getPreviousFile(previousFullFolder,FILE_TYPE.RF2_RELATIONSHIP);
+			previousNotReleasedFile= new File(previousIdNotReleasedFile);
 
+			if (!previousNotReleasedFile.exists()){
+				previousNotReleasedFile.createNewFile();
+			}
 			File folderTmp=new File(targetDirectory.getAbsolutePath() + "/" + getTmpPostExport() );
 			if (!folderTmp.exists()){
 				folderTmp.mkdir();
@@ -111,12 +121,11 @@ public class RF2InferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 				//TODO empty folder needed?getTmpTmpSort
 			}
 
-			File sortedPreviousfile=new File(sortedfolderTmp,"pre_" + previousRelationshipFullFile.getName());
-			FileSorter fsc=new FileSorter(previousRelationshipFullFile, sortedPreviousfile, sortTmpfolderSortedTmp, FILE_TYPE.RF2_RELATIONSHIP.getColumnIndexes());
+			File sortedPreviousfile=new File(sortedfolderTmp,"pre_" + previousNotReleasedFile.getName());
+			FileSorter fsc=new FileSorter(previousNotReleasedFile, sortedPreviousfile, sortTmpfolderSortedTmp, FILE_TYPE.RF2_RELATIONSHIP.getColumnIndexes());
 			fsc.execute();
 			fsc=null;
 			System.gc();
-
 
 			File sortedExportedfile=new File(sortedfolderTmp,"exp_" + exportedRelationshipFile.getName());
 
@@ -125,20 +134,17 @@ public class RF2InferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 			fsc=null;
 			System.gc();
 
-
-
 			File snapshotfolderTmp=new File(folderTmp.getAbsolutePath() + "/" + getTmpSnapShot() );
 			if (!snapshotfolderTmp.exists()){
 				snapshotfolderTmp.mkdir();
 			}else{
 				//TODO empty folder needed?
 			}
-			File snapshotSortedPreviousfile=new File(snapshotfolderTmp,"pre_" + previousRelationshipFullFile.getName());
-			SnapshotGenerator sg=new SnapshotGenerator(sortedPreviousfile, previousReleaseDate, FILE_TYPE.RF2_RELATIONSHIP.getSnapshotIndex(), 1, snapshotSortedPreviousfile, null, null);
+			File snapshotSortedPreviousfile=new File(snapshotfolderTmp,"pre_" + previousNotReleasedFile.getName());
+			SnapshotGenerator sg=new SnapshotGenerator(sortedPreviousfile, releaseDate, FILE_TYPE.RF2_RELATIONSHIP.getSnapshotIndex(), 1, snapshotSortedPreviousfile, null, null);
 			sg.execute();
 			sg=null;
 			System.gc();
-
 
 			File snapshotSortedExportedfile=new File(snapshotfolderTmp,"exp_" + exportedRelationshipFile.getName());
 			sg=new SnapshotGenerator(sortedExportedfile, releaseDate, FILE_TYPE.RF2_RELATIONSHIP.getSnapshotIndex(), 1, snapshotSortedExportedfile, null, null);
@@ -146,8 +152,7 @@ public class RF2InferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 			sg=null;
 			System.gc();
 
-
-			File sortedSnapPreviousfile=new File(snapshotfolderTmp,"sortSnappre_" + previousRelationshipFullFile.getName());	
+			File sortedSnapPreviousfile=new File(snapshotfolderTmp,"sortSnappre_" + previousNotReleasedFile.getName());	
 			fsc=new FileSorter(snapshotSortedPreviousfile, sortedSnapPreviousfile, sortTmpfolderSortedTmp,new int[]{4,7,5,2,1,6});
 			fsc.execute();
 			fsc=null;
@@ -159,54 +164,108 @@ public class RF2InferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 			fsc.execute();
 			fsc=null;
 			System.gc();
+			
+			//split input pre assigned Ids process file in assigned and not assigned
+			File assignedIdExportedfile=new File(snapshotfolderTmp,"AssigId_" + exportedRelationshipFile.getName());
+			
+			FileOutputStream fosu = new FileOutputStream( assignedIdExportedfile);
+			OutputStreamWriter oswu = new OutputStreamWriter(fosu,"UTF-8");
+			BufferedWriter bwu = new BufferedWriter(oswu);
+			
+			File uuidExportedFile=new File(snapshotfolderTmp,"Uuid_" + exportedRelationshipFile.getName());
+			
+			FileOutputStream fosd = new FileOutputStream( uuidExportedFile);
+			OutputStreamWriter oswd = new OutputStreamWriter(fosd,"UTF-8");
+			BufferedWriter bwd = new BufferedWriter(oswd);
 
+			FileInputStream fis = new FileInputStream(sortedSnapExportedfile	);
+			InputStreamReader isr = new InputStreamReader(fis,"UTF-8");
+			BufferedReader brE = new BufferedReader(isr);
 
-//			File rf2SnapshotOutputFolder=new File(outputFolder + "/" + getSnapshotOutputFolder() );
-//			if (!rf2SnapshotOutputFolder.exists()){
-//				rf2SnapshotOutputFolder.mkdir();
-//			}else{
-//				//TODO empty folder needed?
-//			}
-//			File rf2FullOutputFolder=new File(outputFolder+ "/" + getFullOutputFolder() );
-//			File rf2OutputRelationships=getSnapshotOutputFile(rf2SnapshotOutputFolder.getAbsolutePath(),  FILE_TYPE.RF2_RELATIONSHIP,releaseDate);
-//			File rf2OutputRelationships=getFullOutputFile( rf2FullOutputFolder.getAbsolutePath(), FILE_TYPE.RF2_RELATIONSHIP,releaseDate);
-			File rf2OutputRelationshipsReassign=new File(exportedRelationshipFile.getParentFile().getAbsolutePath(),"outputRF2RelationshipReassigned.txt");
-			File outputUUIDsToAssign=new File(exportedRelationshipFile.getParentFile().getAbsolutePath(),"outputUUIDsToAssign.txt");
-			File outputDifferences=new File(exportedRelationshipFile.getParentFile().getAbsolutePath(),"outputDifferences.txt");
+			String header =brE.readLine();
+			
+			bwu.append(header);
+			bwu.append("\r\n");
+			bwd.append(header);
+			bwd.append("\r\n");
+			
+			String[] splitted;
+			String line;
+			HashSet<String> idExistent=new HashSet<String>();
+			while ((line=brE.readLine())!=null){
+				splitted=line.split("\t",-1);
+				if (splitted[0].indexOf("-")>-1 || splitted[0].equals("")){
+					bwd.append(line);
+					bwd.append("\r\n");
+				}else{
+					bwu.append(line);
+					bwu.append("\r\n");
+					idExistent.add(splitted[0]);
+				}
+			}
+			brE.close();
+			bwd.close();
+			bwu.close();
+			System.gc();
+			
+			//filter input previous id not released to get not assigned yet in this process
+			File prevNotReleasedIDFile=new File(snapshotfolderTmp,"NewIdNotAssig_" + sortedSnapPreviousfile.getName());
+			
+			fosd = new FileOutputStream( prevNotReleasedIDFile);
+			oswd = new OutputStreamWriter(fosd,"UTF-8");
+			bwd = new BufferedWriter(oswd);
 
-			RF2RelsIDRetrieveImpl rIdReassign=new RF2RelsIDRetrieveImpl(sortedSnapPreviousfile, sortedSnapExportedfile,
+			fis = new FileInputStream(sortedSnapPreviousfile	);
+			isr = new InputStreamReader(fis,"UTF-8");
+			brE = new BufferedReader(isr);
+
+			header =brE.readLine();
+			
+			bwd.append(header);
+			bwd.append("\r\n");
+			
+			while ((line=brE.readLine())!=null){
+				splitted=line.split("\t",-1);
+				if (!idExistent.contains(splitted[0])){
+					bwd.append(line);
+					bwd.append("\r\n");
+				}
+			}
+			brE.close();
+			bwd.close();
+			
+			
+			File rf2OutputRelationshipsReassign=new File(exportedRelationshipFile.getParentFile().getAbsolutePath(),"outputRF2RelationshipPrevNRIdReassigned.txt");
+			File outputUUIDsToAssign=new File(exportedRelationshipFile.getParentFile().getAbsolutePath(),"outputUUIDsToAssignPrevNotReleased.txt");
+			File outputDifferences=new File(exportedRelationshipFile.getParentFile().getAbsolutePath(),"outputDifferencesPrevNotReleased.txt");
+
+			RF2RelsIDRetrieveImpl rIdReassign=new RF2RelsIDRetrieveImpl(prevNotReleasedIDFile, uuidExportedFile,
 					rf2OutputRelationshipsReassign, outputUUIDsToAssign, outputDifferences);
 
 			rIdReassign.execute();
 			rIdReassign=null;
 
+			//build final relationships with id assigned from previous not released id
 			if (rf2OutputRelationshipsReassign.exists()){
 				String strOutput=exportedRelationshipFile.getAbsolutePath();
 				exportedRelationshipFile.renameTo(new File(strOutput + ".prevToIdRetr"));
-				rf2OutputRelationshipsReassign.renameTo(new File(strOutput));
+				
+				HashSet<File> hFile=new HashSet<File>();
+				hFile.add(rf2OutputRelationshipsReassign);
+				hFile.add(assignedIdExportedfile);
+
+				CommonUtils.MergeFile(hFile,  new File(strOutput));
+				System.gc();
+				
 			}
+			
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-	}
-
-	private FILE_TYPE getRelFileType(String relFileType) {
-		if (relFileType.equalsIgnoreCase(FILE_TYPE.RF2_RELATIONSHIP.name())){
-			return FILE_TYPE.RF2_RELATIONSHIP;
-		}
-		if (relFileType.equalsIgnoreCase(FILE_TYPE.RF2_STATED_RELATIONSHIP.name())){
-			return FILE_TYPE.RF2_STATED_RELATIONSHIP;
-		}
-		if (relFileType.equalsIgnoreCase(FILE_TYPE.RF2_ISA_RETIRED.name())){
-			return FILE_TYPE.RF2_ISA_RETIRED;
-		}
-		if (relFileType.equalsIgnoreCase(FILE_TYPE.RF2_STATED_ISA_RETIRED.name())){
-			return FILE_TYPE.RF2_STATED_ISA_RETIRED;
-		}
-		return null;
 	}
 
 	public File getSnapshotOutputFile(String parentFolder,FILE_TYPE fType,String date){
