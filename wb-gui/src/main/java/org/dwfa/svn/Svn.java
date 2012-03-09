@@ -81,7 +81,7 @@ public class Svn implements I_HandleSubversion {
     private static SvnPrompter prompter = new SvnPrompter();
     public static final int SEMAPHORE_PERMITS = 10;
     
-    private static Semaphore rwl = new Semaphore(SEMAPHORE_PERMITS, true);
+    public static Semaphore rwl = new Semaphore(SEMAPHORE_PERMITS, true);
 
     public static SVNClientInterface getSvnClient() {
         if (!isConnectedToSvn()) {

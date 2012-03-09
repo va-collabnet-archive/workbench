@@ -351,10 +351,9 @@ public class BdbCommitManager {
 
     public static boolean commit(ChangeSetPolicy changeSetPolicy,
             ChangeSetWriterThreading changeSetWriterThreading) {
-        Svn.rwl.acquireUninterruptibly();
 
-        boolean passedRelease = false;
         boolean performCommit = true;
+        Svn.rwl.acquireUninterruptibly();
 
         try {
             synchronized (uncommittedCNids) {
@@ -492,7 +491,6 @@ public class BdbCommitManager {
                                                     changeSetWriterThreading, Svn.rwl);
 
                                             changeSetWriterService.execute(handler);
-                                            passedRelease = true;
                                         }
 
                                         break;
@@ -545,9 +543,7 @@ public class BdbCommitManager {
         } catch (Exception e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         } finally {
-            if (!passedRelease) {
-                Svn.rwl.release();
-            }
+            Svn.rwl.release();
         }
 
         fireCommit();
