@@ -66,8 +66,10 @@ public class BdbTermBuilder implements TerminologyBuilderBI {
             return updateRefex(refex, blueprint);
         }
         RefexChronicleBI<?> annot = createRefex(blueprint);
-        ComponentChroncileBI<?> component = Ts.get().getComponent(annot.getReferencedComponentNid());
-        component.addAnnotation(annot);
+        if(Ts.get().getConcept(annot.getCollectionNid()).isAnnotationStyleRefex()){
+            ComponentChroncileBI<?> component = Ts.get().getComponent(annot.getReferencedComponentNid());
+            component.addAnnotation(annot);
+        }
         return annot;
     }
 
