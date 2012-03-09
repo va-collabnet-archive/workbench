@@ -66,7 +66,7 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
-import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
@@ -246,7 +246,7 @@ public class RulesContextHelper {
 
 			long endTime = System.currentTimeMillis();
 			long elapsed = endTime - startTime;
-			String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+			String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
 			String result = "Done";
 			activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; " + result);
 			try {
@@ -258,7 +258,7 @@ public class RulesContextHelper {
 		} catch (Exception e1) {
 			long endTime = System.currentTimeMillis();
 			long elapsed = endTime - startTime;
-			String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+			String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
 			String result = "Done";
 			activity.setProgressInfoLower("Error - Elapsed: " + elapsedStr + "; " + result);
 			try {
