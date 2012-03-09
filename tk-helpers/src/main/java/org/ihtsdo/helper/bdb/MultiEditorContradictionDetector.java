@@ -36,8 +36,6 @@ import org.ihtsdo.tk.uuid.UuidT5Generator;
  * @author marc
  */
 public class MultiEditorContradictionDetector implements ProcessUnfetchedConceptDataBI {
-    // I_ProcessConcepts
-    // ProcessUnfetchedConceptDataBI
 
     private int commitRecRefsetNid;
     private int adjudicateRecRefsetNid;
@@ -62,7 +60,7 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         this.contradictionCaseList = cl;
         this.watchSet = ws;
         this.ignoreNonVisibleAth = false;
-        maxSap = Integer.MIN_VALUE;
+        this.maxSap = Integer.MIN_VALUE;
     }
 
     public MultiEditorContradictionDetector(int commitRecRefsetNid,
@@ -81,9 +79,9 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         this.watchSet = ws;
         this.ignoreNonVisibleAth = ignoreNonVisibleAth;
         if (ignoreReadOnlySap) {
-            maxSap = Ts.get().getReadOnlyMaxSap(); //
+            this.maxSap = Ts.get().getReadOnlyMaxSap(); //
         } else {
-            maxSap = Integer.MIN_VALUE;
+            this.maxSap = Integer.MIN_VALUE;
         }
 
     }
@@ -127,38 +125,54 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
                 commitRefsetAthSetsList, truthRefsetAthSetsList);
 
         // TEST FOR CONTRADICTIONS
-        Set<UUID> authTimeSetMissing = conceptMissingAthMap.keySet();
-        HashSet<UUID> accumContradictedAthUuidSet = new HashSet<UUID>();
-        int i = 0;
-        while (i < commitRefsetAthSetsList.size() - 1) {
-            int j = i + 1;
-            while (j < commitRefsetAthSetsList.size()) {
-                HashSet<UUID> a = commitRefsetAthSetsList.get(i);
-                HashSet<UUID> b = commitRefsetAthSetsList.get(j);
-                if (ignoreNonVisibleAth) {
-                    b.removeAll(authTimeSetMissing);
-                    a.removeAll(authTimeSetMissing);
-                }
-                if (b.containsAll(a) == false) {
-                    HashSet<UUID> aTemp = new HashSet<UUID>(a);
-                    aTemp.removeAll(b);
-                    accumContradictedAthUuidSet.addAll(aTemp);
+        Set<UUID> authTimeSetMissing = null;
+        if (ignoreNonVisibleAth) {
+            authTimeSetMissing = conceptMissingAthMap.keySet();
+        }
 
-                    HashSet<UUID> bTemp = new HashSet<UUID>(b);
-                    bTemp.removeAll(a);
-                    accumContradictedAthUuidSet.addAll(bTemp);
+        // TEST FOR CONTRADICTIONS
+        HashSet<UUID> lesser;
+        HashSet<UUID> greater;
+        HashSet<UUID> diff;
+        HashSet<UUID> accumDiffSet = new HashSet<UUID>();
+        // Last truth supercedes all previous truth
+        HashSet<UUID> lastTruth = null;
+        if (truthRefsetAthSetsList.size() > 0) {
+            lastTruth = truthRefsetAthSetsList.get(truthRefsetAthSetsList.size() - 1);
+            if (truthRefsetAthSetsList.size() > 1) {
+                lesser = truthRefsetAthSetsList.get(truthRefsetAthSetsList.size() - 2);
+                if (lesser.size() == lastTruth.size()) {
+                    // should not have two adjudication cases of the same size
+                    accumDiffSet.add(new UUID(Long.MAX_VALUE, Long.MAX_VALUE));
                 }
-                j++;
             }
-            i++;
+        }
+        int editorIdx = 0;
+        int editorSize = commitRefsetAthSetsList.size();
+        while (editorIdx < editorSize) {
+            lesser = commitRefsetAthSetsList.get(editorIdx);
+            if (lastTruth != null && lesser.size() <= lastTruth.size()) {
+                // compare editor commits with adjudication
+                diff = lesserDiffFromGreater(lesser, lastTruth, authTimeSetMissing);
+                accumDiffSet.addAll(diff);
+                editorIdx++;
+            } else {
+                // compare editor commits with next editor commit
+                if (editorIdx + 1 < editorSize) {
+                    greater = commitRefsetAthSetsList.get(editorIdx + 1);
+                    diff = lesserDiffFromGreater(lesser, greater, authTimeSetMissing);
+                    accumDiffSet.addAll(diff);
+                }
+                editorIdx++;
+            }
         }
 
         // REPORT ANY CONTRADICTING CONCEPTS
-        if (!accumContradictedAthUuidSet.isEmpty()) {
+        if (!accumDiffSet.isEmpty()) {
 
             // List case information in time order
             ArrayList<String> caseList = new ArrayList<String>();
-            for (UUID uuid : accumContradictedAthUuidSet) {
+            for (UUID uuid : accumDiffSet) {
                 String s = conceptComputedAthMap.get(uuid);
                 if (s != null) {
                     caseList.add(s);
@@ -266,6 +280,27 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         }
 
         return conceptMissingAthMap;
+    }
+
+    private HashSet<UUID> lesserDiffFromGreater(HashSet<UUID> lesser, HashSet<UUID> greater,
+            Set<UUID> exclude) {
+        HashSet<UUID> diffSet = new HashSet<UUID>();
+        if (exclude != null) {
+            lesser.removeAll(exclude);
+            greater.removeAll(exclude);
+        }
+        if (greater.containsAll(lesser) == false) {
+            HashSet<UUID> lesserTemp = new HashSet<UUID>(lesser);
+            lesserTemp.removeAll(greater);
+            diffSet.addAll(lesserTemp);
+
+            if (greater.size() == lesser.size()) {
+                HashSet<UUID> greaterTemp = new HashSet<UUID>(greater);
+                greaterTemp.removeAll(lesser);
+                diffSet.addAll(greaterTemp);
+            }
+        }
+        return diffSet;
     }
 
     private String toStringAuthorTime(long time, ConceptChronicleBI author, UUID uuid) {
