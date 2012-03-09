@@ -650,9 +650,9 @@ public abstract class RF2AbstractImpl {
 				currenAceConfig.getViewPositionSetReadOnly(), 
 				currenAceConfig.getPrecedence(), 
 				currenAceConfig.getConflictResolutionStrategy())) {
-				moduleid = I_Constants.META_MODULE_ID;
+				moduleid = I_Constants.META_MOULE_ID;
 		}else if(snomedCTModelComponent.equals(concept)){
-				moduleid = I_Constants.META_MODULE_ID;
+				moduleid = I_Constants.META_MOULE_ID;
 		}
 		
 		/*if (foundationMetaDataConceptRoot.isParentOf(concept, 

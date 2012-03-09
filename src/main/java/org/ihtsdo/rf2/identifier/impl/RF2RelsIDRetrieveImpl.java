@@ -98,22 +98,15 @@ public class RF2RelsIDRetrieveImpl {
 		getNext_PreviousConceptRels();			
 
 		//		repeat
-		int comp=-1;
+
 		do{
 			//		
 			//	 		get next concept relationships exported
-			if (comp<=0)
-				getNext_ExportedConceptRels();
-			else
-				getNext_PreviousConceptRels();	
-			
+			getNext_ExportedConceptRels();
+
 			if (conceptE==null) break;
 
-			if (conceptP==null){
-				comp=-1;
-			}else{
-				comp=conceptE.compareTo(conceptP);
-			}
+			int comp=conceptE.compareTo(conceptP);
 			//			if same concept
 			if (comp==0){
 				//				

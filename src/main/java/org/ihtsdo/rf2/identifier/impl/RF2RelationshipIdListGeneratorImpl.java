@@ -118,71 +118,8 @@ public class RF2RelationshipIdListGeneratorImpl extends RF2IDImpl {
 
 			logger.info("Creating dirs does not existent." );
 		}
-		File sortedSnapPreviousfile=new File(getConfig().getPreviousIdNotReleasedFile());
-		if (!sortedSnapPreviousfile.exists()){
-			try {
-				sortedSnapPreviousfile.createNewFile();
-			} catch (IOException e) {
-				logger.error("Exception	" +e);
-			}
-		}
-		File newFilePrev=new File(sortedSnapPreviousfile.getParentFile().getAbsolutePath(),"tmp_" + sortedSnapPreviousfile.getName()); 
-		FileOutputStream fosd=null;
-		OutputStreamWriter oswd=null;
-		BufferedWriter bwd=null;
-		try {
-			fosd = new FileOutputStream(newFilePrev );
-			oswd = new OutputStreamWriter(fosd,"UTF-8");
-			bwd = new BufferedWriter(oswd);
 
-			FileInputStream fip = new FileInputStream(sortedSnapPreviousfile	);
-			InputStreamReader psr = new InputStreamReader(fip,"UTF-8");
-			BufferedReader brP = new BufferedReader(psr);
-
-			bwd.append("id");
-			bwd.append("\t");
-			bwd.append("effectiveTime");
-			bwd.append("\t");
-			bwd.append("active");
-			bwd.append("\t");
-			bwd.append("moduleId");
-			bwd.append("\t");
-			bwd.append("sourceId");
-			bwd.append("\t");
-			bwd.append("destinationId");
-			bwd.append("\t");
-			bwd.append("relationshipGroup");
-			bwd.append("\t");
-			bwd.append("typeId");
-			bwd.append("\t");
-			bwd.append("characteristicTypeId");
-			bwd.append("\t");
-			bwd.append("modifierId");
-			bwd.append("\r\n");
-
-			brP.readLine();
-			String line;
-			while ((line=brP.readLine())!=null){
-				bwd.append(line);
-				bwd.append("\r\n");
-			}
-			brP.close();
-			brP=null;
-
-			System.gc();
-
-		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
 		//check configuration contains files
-		catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
 		if ( getConfig().getRf2Files().size() == 0 ){
 			logger.info("No files specified in order to generate SCTID..");
@@ -196,7 +133,6 @@ public class RF2RelationshipIdListGeneratorImpl extends RF2IDImpl {
 
 		logger.info("Assign ids from list." );
 		HashMap<UUID,Long> hmTmp;
-
 		for (int f = 0; f < getConfig().getRf2Files().size(); f++) {
 
 			File file = new File( getConfig().getRf2Files().get(f).fileName);
@@ -229,10 +165,8 @@ public class RF2RelationshipIdListGeneratorImpl extends RF2IDImpl {
 
 				String lineRead = "";
 				String sctid="";
-				boolean bNewId;
 				while ((lineRead = rf2FileReader.readLine()) != null) {		
-					String[] part= lineRead.split("\t",-1);
-					bNewId=false;
+					String[] part= lineRead.split("\t");
 					for (int s = 0; s < Key.size(); s++) {
 						if(part[Integer.parseInt(Key.get(s))].contains("-")){ // contains uuid pattern
 							//String uuid = part[Integer.parseInt(Key.get(s))];
@@ -240,25 +174,24 @@ public class RF2RelationshipIdListGeneratorImpl extends RF2IDImpl {
 							UUID uuid= null;
 							try {
 								uuid = Type5UuidFactory.get(part[4] + part[5] + part[7] + part[6]);	// sourceId + destinationId + typeId + relationshipGroup
-
+								logger.info("Inferred relationship uuid sending to webservice "  +uuid);
+								
 								Long lSctId=null;
 								if (hmTmp!=null){
 									//lSctId=hmTmp.get(UUID.fromString(uuid));
 									lSctId=hmTmp.get(uuid);
 								}
-
+								
 								if (lSctId!=null){
 									sctid=String.valueOf(lSctId);
 								}else{
 									//sctid = getSCTId(getConfig(), UUID.fromString(uuid) , Integer.parseInt(namespaceId), partitionId , releaseId , executionId , moduleId);
-									logger.info("Inferred relationship uuid sending to webservice "  +uuid);
 									sctid = getSCTId(getConfig(), uuid , Integer.parseInt(namespaceId), partitionId , releaseId , executionId , moduleId);
 									if(sctid.equals("0")){
 										//sctid = getSCTId(getConfig(), UUID.fromString(uuid) , Integer.parseInt(namespaceId), partitionId , releaseId , executionId , moduleId);
 										sctid = getSCTId(getConfig(), uuid , Integer.parseInt(namespaceId), partitionId , releaseId , executionId , moduleId);
 									}
 								}
-								bNewId=true;
 							} catch (NoSuchAlgorithmException e) {
 								logger.error("NoSuchAlgorithmException	" +e);
 							} catch (NumberFormatException e) {
@@ -266,14 +199,9 @@ public class RF2RelationshipIdListGeneratorImpl extends RF2IDImpl {
 							} catch (Exception e) {
 								logger.error("Exception	" +e);
 							}
-
-							lineRead =lineRead.replace(part[Integer.parseInt(Key.get(s))], sctid);
 							
+							lineRead =lineRead.replace(part[Integer.parseInt(Key.get(s))], sctid);				    	
 						}
-					}
-					if (bNewId && bwd!=null){
-						bwd.append(lineRead);
-						bwd.append("\r\n");
 					}
 					rf2FileWriter.append(lineRead);
 					rf2FileWriter.write("\r\n");
@@ -284,22 +212,6 @@ public class RF2RelationshipIdListGeneratorImpl extends RF2IDImpl {
 				logger.error(e);
 			}
 		} 
-		try {
-			bwd.close();
-			oswd.close();
-			fosd.close();
-			bwd=null;
-			oswd=null;
-			fosd=null;
-			String strOutput=sortedSnapPreviousfile.getAbsolutePath();
-			sortedSnapPreviousfile.delete();
-			newFilePrev.renameTo(new File(strOutput));
-			
-		} catch (IOException e) {
-			logger.error("Exception	" +e);
-		}
-
-		System.gc();
 		logger.info("Done.");
 	}
 
@@ -331,7 +243,8 @@ public class RF2RelationshipIdListGeneratorImpl extends RF2IDImpl {
 								String uuid=part[colIx];
 								if(uuid.contains("-")){	
 									uuid = Type5UuidFactory.get(part[4] + part[5] + part[7] + part[6]).toString();	// sourceId + destinationId + typeId + relationshipGroup
-
+									logger.info("Inferred relationship uuid map "  +uuid);
+									
 									list.add(UUID.fromString(uuid));
 
 								}
@@ -347,7 +260,6 @@ public class RF2RelationshipIdListGeneratorImpl extends RF2IDImpl {
 								String releaseId =  getConfig().getRf2Files().get(f).sctidparam.releaseId;
 								String executionId = getConfig().getRf2Files().get(f).sctidparam.executionId;
 								String moduleId = getConfig().getRf2Files().get(f).sctidparam.moduleId;			
-								logger.info(list.size() + " inferred relationships in list sending to web service.");
 
 								res=getSCTIdList(getConfig(),list,Integer.parseInt(namespaceId), partitionId, releaseId, executionId,"1");
 

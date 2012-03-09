@@ -58,7 +58,6 @@ public class Config {
 	// for idgenerator
 	private String releaseFolder;
 	private String destinationFolder;
-	private String previousIdNotReleasedFile;
 	private ArrayList<RF2IdentifierFile> rf2Files;
 	private String updateWbSctId;
 	
@@ -350,14 +349,6 @@ public class Config {
 
 	public void setComponentType(String componentType) {
 		this.componentType = componentType;
-	}
-
-	public String getPreviousIdNotReleasedFile() {
-		return previousIdNotReleasedFile;
-	}
-
-	public void setPreviousIdNotReleasedFile(String previousIdNotReleasedFile) {
-		this.previousIdNotReleasedFile = previousIdNotReleasedFile;
 	}
 
 	

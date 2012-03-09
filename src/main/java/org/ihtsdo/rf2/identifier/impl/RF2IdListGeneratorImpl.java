@@ -167,7 +167,6 @@ public class RF2IdListGeneratorImpl extends RF2IDImpl {
 				String sctid="";
 				while ((lineRead = rf2FileReader.readLine()) != null) {		
 					String[] part= lineRead.split("\t");
-					sctid="";
 					for (int s = 0; s < Key.size(); s++) {
 						if(part[Integer.parseInt(Key.get(s))].contains("-")){	
 
@@ -191,20 +190,11 @@ public class RF2IdListGeneratorImpl extends RF2IDImpl {
 									logger.error("Exception" +e);
 								}
 							}
-							if (sctid.compareTo("")!=0)
-								part[Integer.parseInt(Key.get(s))]=sctid;
+
+							lineRead =lineRead.replace(part[Integer.parseInt(Key.get(s))], sctid);				    	
 						}
 					}
-					if (sctid.compareTo("")!=0){
-						for (int i=0;i<part.length;i++){
-							rf2FileWriter.append(part[i]);
-							if (i+1 < part.length){
-								rf2FileWriter.write("\t");
-							}
-						}
-					}else{
-						rf2FileWriter.append(lineRead);
-					}
+					rf2FileWriter.append(lineRead);
 					rf2FileWriter.write("\r\n");
 				}
 				rf2FileReader.close();

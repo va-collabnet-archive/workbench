@@ -53,61 +53,61 @@ public class RF2WorkflowHistoryImpl extends RF2AbstractImpl implements I_Process
 
 	public void export(I_GetConceptData concept, String conceptid)  {
 		try {
-
-
+			
+			
 			String refsetId  = RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getPrimoridalUid().toString();
 			//int refsetTermAuxId = getNid(I_Constants.WORKFLOW_HISTORY_REFSET_UID);	
 			int refsetTermAuxId = getNid(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getPrimoridalUid().toString());		
 			WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
-
+			
 			List<? extends I_ExtendByRef> extensions = tf.getAllExtensionsForComponent(concept.getNid(), true);
 			I_ExtendByRefPartStr<?> extensionPart;
 			int extensionStatusId = 0;
 			String active = "";
-
+			
 			if (!extensions.isEmpty()) {
 				for (I_ExtendByRef extension : extensions) {
 					if (extension.getRefsetId() == refsetTermAuxId) {
 						if (extension != null) {
-							long lastVersion = Long.MIN_VALUE;
-							extensionPart=null;
-							for (I_ExtendByRefVersion loopTuple : extension.getTuples(allStatusSet,currenAceConfig.getViewPositionSetReadOnly(),
-									Precedence.PATH,currenAceConfig.getConflictResolutionStrategy())) {
-								if (loopTuple.getTime() >= lastVersion) {
-									lastVersion = loopTuple.getTime();
-									extensionPart = (I_ExtendByRefPartStr) loopTuple.getMutablePart();
+								long lastVersion = Long.MIN_VALUE;
+								extensionPart=null;
+								for (I_ExtendByRefVersion loopTuple : extension.getTuples(allStatusSet,currenAceConfig.getViewPositionSetReadOnly(),
+										Precedence.PATH,currenAceConfig.getConflictResolutionStrategy())) {
+									if (loopTuple.getTime() >= lastVersion) {
+										lastVersion = loopTuple.getTime();
+										extensionPart = (I_ExtendByRefPartStr) loopTuple.getMutablePart();
+									}
 								}
-							}
-
-							if (extensionPart == null) {
-								if (logger.isDebugEnabled()) {
-									logger.debug("Refset extension part not found!");
-								}
-							}else{
-
-
+								
+								if (extensionPart == null) {
+									if (logger.isDebugEnabled()) {
+										logger.debug("Refset extension part not found!");
+									}
+								}else{
+							
+									
 								//System.out.println(" get Nid " + extension.getNid());
-//								String workflowMemberInfo =  searcher.getMemberWfHxForDatabaseImport(extension.getNid());
-//
-//								extensionStatusId = extensionPart.getStatusNid();
-//								if ( (extensionStatusId == activeNid) || (extensionStatusId == currentNid)) { 														
-//									active = "1";
-//								} else if (extensionStatusId == inactiveNid || (extensionStatusId == retiredNid)) {
-//									System.out.println(workflowMemberInfo);
-//									active = "0";
-//								} else {
-//									logger.error("unknown extensionStatusId =====>" + extensionStatusId);
-//								}
-//
-//								if(active.equals("1")){
-//									writeRF2TypeLine(workflowMemberInfo);
-//								}
+								String workflowMemberInfo =  searcher.getMemberWfHxForDatabaseImport(extension.getNid());
+								
+								extensionStatusId = extensionPart.getStatusNid();
+								if ( (extensionStatusId == activeNid) || (extensionStatusId == currentNid)) { 														
+									active = "1";
+								} else if (extensionStatusId == inactiveNid || (extensionStatusId == retiredNid)) {
+									System.out.println(workflowMemberInfo);
+									active = "0";
+								} else {
+									logger.error("unknown extensionStatusId =====>" + extensionStatusId);
+								}
+								
+								if(active.equals("1")){
+									writeRF2TypeLine(workflowMemberInfo);
+								}
 							}
 						}
 					}							
 				}
 			}
-
+			
 		} catch (IOException e) {
 			logger.error("IOExceptions: " + e.getMessage());
 			e.printStackTrace();
@@ -116,8 +116,8 @@ public class RF2WorkflowHistoryImpl extends RF2AbstractImpl implements I_Process
 			e.printStackTrace();
 		} 
 	}
-
-
+	
+	
 	private void writeRF2TypeLine(String workflowMemberInfo) throws IOException {		
 		WriteUtil.write(getConfig(), workflowMemberInfo);
 		WriteUtil.write(getConfig(), "\r\n");

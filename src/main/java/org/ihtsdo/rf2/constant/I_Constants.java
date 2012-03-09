@@ -10,7 +10,7 @@ package org.ihtsdo.rf2.constant;
 public class I_Constants {
 
 	public final static String CORE_MODULE_ID = "900000000000207008";
-	public final static String META_MODULE_ID = "900000000000012004";
+	public final static String META_MOULE_ID = "900000000000012004";
 	public final static String META_SCTID = "900000000000441003";
 
 	// set definitionStatus Id
@@ -163,7 +163,6 @@ public class I_Constants {
 	public final static String VMP_REFSET_UID_TERM_AUX = "c259d808-8011-3772-bece-b4fbde18d375";
 	
 	public final static String ICDO_REFSET_ID = "446608001";
-	public final static String ICDO_SUBSET_ID = "102041";
 	public final static String ICDO_REFSET_UID = "??????????????????";
 	public final static String ICDO_REFSET_UID_TERM_AUX = "5ef10e09-8f16-398e-99b5-55cff5bd820a";
 															

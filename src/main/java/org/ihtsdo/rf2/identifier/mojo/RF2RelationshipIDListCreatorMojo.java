@@ -64,14 +64,6 @@ public class RF2RelationshipIDListCreatorMojo extends ReleaseConfigMojo {
 	private File targetDirectory;
 	
 	/**
-	 * Location of the previous Id not released file. (input in this mojo)
-	 * 
-	 * @parameter
-	 * @required
-	 */
-	private String previousIdNotReleasedFile;
-	
-	/**
 	 * Files
 	 * 
 	 * @parameter
@@ -125,7 +117,6 @@ public class RF2RelationshipIDListCreatorMojo extends ReleaseConfigMojo {
 		config.setDestinationFolder(destinationFolder);
 		config.setRf2Files(rf2Files);
 		config.setUpdateWbSctId(updateWbSctId);
-		config.setPreviousIdNotReleasedFile(previousIdNotReleasedFile);
 		
 		getLog().info("Running the RF2 File ID Creation with the following ");
 		getLog().info("Destination Folder :" + destinationFolder);

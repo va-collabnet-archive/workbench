@@ -102,7 +102,7 @@ public class RF2TextDefinitionImpl extends RF2AbstractImpl implements I_ProcessC
 					
 					moduleId = computeModuleId(concept);	
 					//moduleId = getConceptMetaModuleID(concept , effectiveTime);
-					if(moduleId.equals(I_Constants.META_MODULE_ID)){		
+					if(moduleId.equals(I_Constants.META_MOULE_ID)){		
 						logger.info("==Meta Concept==" + conceptid + " & Name : " + concept.getInitialText());
 						incrementMetaDataCount();
 					}

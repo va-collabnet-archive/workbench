@@ -166,7 +166,7 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 						moduleId = computeModuleId(sourceConcept);
 					}*/
 					
-					if(moduleId.equals(I_Constants.META_MODULE_ID)){		
+					if(moduleId.equals(I_Constants.META_MOULE_ID)){		
 						//logger.info("==Meta Concept==" + sourceId + " & Name : " + sourceConcept.getInitialText());
 						incrementMetaDataCount();
 					}
