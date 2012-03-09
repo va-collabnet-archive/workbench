@@ -159,7 +159,7 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 					      }
 				     }
 				    
-					if(moduleId.equals(I_Constants.META_MODULE_ID)){		
+					if(moduleId.equals(I_Constants.META_MOULE_ID)){		
 						//logger.info("==Meta Concept==" + sourceId + " & Name : " + sourceConcept.getInitialText());
 						incrementMetaDataCount();
 					}

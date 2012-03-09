@@ -413,24 +413,16 @@ public class ExportUtil {
 				logger.error("Meta Hierarchy DAO Set is empty"); 
 			} else {  
 				Iterator iter = metaHierDAO.iterator();
-				String prevET="00000000";
 				while (iter.hasNext()) {
 					ModuleIDDAO  moduleIdDAO = ( ModuleIDDAO ) iter.next();
 					String conceptid = moduleIdDAO.getConceptid();
 					String effectivetime = moduleIdDAO.getEffectiveTime();
 					String active = moduleIdDAO.getActive();
-					if(snomedIntegerId.equals(conceptid) 
-							&& effectivetime.compareTo(conEffectiveTime)<=0 
-							&& active.equals("0")
-							&& prevET.compareTo(effectivetime)<0){
+					if(snomedIntegerId.equals(conceptid) && effectivetime.compareTo(conEffectiveTime)<=0 && active.equals("0")){
 						moduleId = I_Constants.CORE_MODULE_ID;
-						prevET=effectivetime;
-					}else if(snomedIntegerId.equals(conceptid) 
-							&& effectivetime.compareTo(conEffectiveTime)<=0 
-							&& active.equals("1")
-							&& prevET.compareTo(effectivetime)<0){
+						break;
+					}else if(snomedIntegerId.equals(conceptid) && effectivetime.compareTo(conEffectiveTime)<=0 && active.equals("1")){
 						moduleId = I_Constants.META_MOULE_ID;					
-						prevET=effectivetime;
 					}
 					
 				} 
@@ -477,7 +469,7 @@ public class ExportUtil {
 					    		 && effectivetime.compareTo(conEffectiveTime)<=0 
 					    		 && active.equals("1")
 					    		 && prevET.compareTo(effectivetime)<0){
-					    	 moduleId = I_Constants.META_MODULE_ID;     
+					    	 moduleId = I_Constants.META_MOULE_ID;     
 					    	 prevET=effectivetime;
 					     }
 			    	} 
@@ -755,7 +747,7 @@ public class ExportUtil {
 			    	//need to sort effectivetime issue
 			    	if(snomedIntegerId.equals(conceptid) //&& effectivetime.equals(effectivetime)
 			    	){
-			    		moduleId = I_Constants.META_MODULE_ID;
+			    		moduleId = I_Constants.META_MOULE_ID;
 			    		break;
 			    	}
 					else {
@@ -1261,9 +1253,9 @@ public class ExportUtil {
 		String snomedId = "";
 		try {
 			snomedId = idGen.getSNOMEDID(uuid);
-//			if(snomedId.equals("") || snomedId.equals(null)){	}
-//			else
-//				logger.info("=====SnomedId exist in the ID repository===" + snomedId);
+			if(snomedId.equals("") || snomedId.equals(null)){	}
+			else
+				logger.info("=====SnomedId exist in the ID repository===" + snomedId);
 			
 		} catch (NullPointerException e) {
 			// there is no SCTID so we are getting NULL
@@ -1336,9 +1328,9 @@ public class ExportUtil {
 
 		try {
 			ctv3Id = idGen.getCTV3ID(uuid);
-//			if(ctv3Id.equals("") || ctv3Id.equals(null) ){	}
-//			else
-//				logger.info("====Ctv3Id already exist in the ID repository===" + ctv3Id);
+			if(ctv3Id.equals("") || ctv3Id.equals(null) ){	}
+			else
+				logger.info("====Ctv3Id already exist in the ID repository===" + ctv3Id);
 		} catch (NullPointerException e) {
 			// there is no SCTID so we are getting NULL
 			if (logger.isDebugEnabled())
