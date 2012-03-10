@@ -53,7 +53,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.ihtsdo.concept.component.refsetmember.cidCid.CidCidRevision;
 import org.ihtsdo.db.change.ChangeNotifier;
 
 public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet {

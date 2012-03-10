@@ -16,7 +16,6 @@ import org.ihtsdo.concept.component.RevisionSet;
 import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
-import org.ihtsdo.etypes.ERefsetLongMember;
 import org.ihtsdo.etypes.ERefsetRevision;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
@@ -38,6 +37,7 @@ import java.util.*;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_member.RefexMemberAnalogBI;
 import org.ihtsdo.tk.api.refex.type_member.RefexMemberVersionBI;
+import org.ihtsdo.tk.dto.RevisionHandling;
 
 public class MembershipMember extends RefsetMember<MembershipRevision, MembershipMember> 
     implements RefexMemberAnalogBI<MembershipRevision>, I_ExtendByRefPart<MembershipRevision> {
@@ -280,7 +280,7 @@ public class MembershipMember extends RefsetMember<MembershipRevision, Membershi
 
       @Override
       public TkRefsetMember getERefsetMember() throws IOException {
-         return new TkRefsetMember(this);
+         return new TkRefsetMember(this, RevisionHandling.EXCLUDE_REVISIONS);
       }
 
       @Override
