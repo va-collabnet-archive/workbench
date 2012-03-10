@@ -8,17 +8,43 @@ import org.ihtsdo.tk.api.blueprint.DescCAB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
+
+/**
+ * 
+ * @author kec
+ * @param <A>
+ */
 public interface DescriptionVersionBI<A extends DescriptionAnalogBI>
 	extends TypedComponentVersionBI, 
 			DescriptionChronicleBI, 
 			AnalogGeneratorBI<A> {
 	
-	public String getText();
+    /**
+     * Get the text value of this version of this description.
+     * @return a <code>String</code> object representing the text value of this description. 
+     */
+    public String getText();
 
-    public boolean isInitialCaseSignificant();
+        /**
+         * 
+         * @return
+         */
+        public boolean isInitialCaseSignificant();
 
-    public String getLang();
+        /**
+         * 
+         * @return
+         */
+        public String getLang();
     
-    @Override
+        /**
+         * 
+         * @param vc
+         * @return
+         * @throws IOException
+         * @throws ContradictionException
+         * @throws InvalidCAB
+         */
+        @Override
     public DescCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB;
 }

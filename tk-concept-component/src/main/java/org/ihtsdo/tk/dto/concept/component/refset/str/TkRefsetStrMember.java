@@ -1,12 +1,10 @@
 package org.ihtsdo.tk.dto.concept.component.refset.str;
 
 //~--- non-JDK imports --------------------------------------------------------
-
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
 import org.ihtsdo.tk.dto.concept.UtfHelper;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
@@ -19,176 +17,194 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import java.util.*;
+import org.ihtsdo.tk.dto.RevisionHandling;
 
 public class TkRefsetStrMember extends TkRefsetAbstractMember<TkRefsetStrRevision> {
-   public static final long serialVersionUID = 1;
 
-   //~--- fields --------------------------------------------------------------
+    public static final long serialVersionUID = 1;
+    //~--- fields --------------------------------------------------------------
+    public String strValue;
 
-   public String strValue;
+    //~--- constructors --------------------------------------------------------
+    public TkRefsetStrMember() {
+        super();
+    }
 
-   //~--- constructors --------------------------------------------------------
+    public TkRefsetStrMember(RefexChronicleBI another) throws IOException {
+        this((RefexStrVersionBI) another.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
+    }
 
-   public TkRefsetStrMember() {
-      super();
-   }
+    public TkRefsetStrMember(RefexStrVersionBI another,
+            RevisionHandling revisionHandling) throws IOException {
+        super(another);
+        if (revisionHandling == RevisionHandling.EXCLUDE_REVISIONS) {
+            this.strValue = another.getStr1();
+        } else {
 
-   public TkRefsetStrMember(RefexChronicleBI another) throws IOException {
-      super((RefexVersionBI) another.getPrimordialVersion());
+            Collection<? extends RefexStrVersionBI> refexes = another.getVersions();
+            int partCount = refexes.size();
+            Iterator<? extends RefexStrVersionBI> itr = refexes.iterator();
+            RefexStrVersionBI rv = itr.next();
 
-      Collection<? extends RefexStrVersionBI> refexes   = another.getVersions();
-      int                                     partCount = refexes.size();
-      Iterator<? extends RefexStrVersionBI>   itr       = refexes.iterator();
-      RefexStrVersionBI                       rv        = itr.next();
+            this.strValue = rv.getStr1();
 
-      this.strValue = rv.getStr1();
+            if (partCount > 1) {
+                revisions = new ArrayList<TkRefsetStrRevision>(partCount - 1);
 
-      if (partCount > 1) {
-         revisions = new ArrayList<TkRefsetStrRevision>(partCount - 1);
+                while (itr.hasNext()) {
+                    rv = itr.next();
+                    TkRefsetStrRevision rev = new TkRefsetStrRevision(rv);
+                    if (rev.getTime() == this.time) {
+                        // TODO this check can be removed after trek-95 change sets are no longer in production. 
+                        this.strValue = rev.stringValue;
+                    } else {
+                        revisions.add(rev);
+                    }
+                }
+            }
+        }
+    }
 
-         while (itr.hasNext()) {
-            rv = itr.next();
-            revisions.add(new TkRefsetStrRevision(rv));
-         }
-      }
-   }
+    public TkRefsetStrMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super();
+        readExternal(in, dataVersion);
+    }
 
-   public TkRefsetStrMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
-      super();
-      readExternal(in, dataVersion);
-   }
+    public TkRefsetStrMember(TkRefsetStrMember another, Map<UUID, UUID> conversionMap, long offset,
+            boolean mapAll) {
+        super(another, conversionMap, offset, mapAll);
+        this.strValue = another.strValue;
+    }
 
-   public TkRefsetStrMember(TkRefsetStrMember another, Map<UUID, UUID> conversionMap, long offset,
-                            boolean mapAll) {
-      super(another, conversionMap, offset, mapAll);
-      this.strValue = another.strValue;
-   }
+    public TkRefsetStrMember(RefexStrVersionBI another, NidBitSetBI exclusions, Map<UUID, UUID> conversionMap,
+            long offset, boolean mapAll, ViewCoordinate vc)
+            throws IOException, ContradictionException {
+        super(another, exclusions, conversionMap, offset, mapAll, vc);
+        this.strValue = another.getStr1();
+    }
 
-   public TkRefsetStrMember(RefexStrVersionBI another, NidBitSetBI exclusions, Map<UUID, UUID> conversionMap,
-                            long offset, boolean mapAll, ViewCoordinate vc)
-           throws IOException, ContradictionException {
-      super(another, exclusions, conversionMap, offset, mapAll, vc);
-      this.strValue = another.getStr1();
-   }
-
-   //~--- methods -------------------------------------------------------------
-
-   /**
-    * Compares this object to the specified object. The result is <tt>true</tt>
-    * if and only if the argument is not <tt>null</tt>, is a
-    * <tt>ERefsetStrMember</tt> object, and contains the same values, field by field,
-    * as this <tt>ERefsetStrMember</tt>.
-    *
-    * @param obj the object to compare with.
-    * @return <code>true</code> if the objects are the same;
-    *         <code>false</code> otherwise.
-    */
-   @Override
-   public boolean equals(Object obj) {
-      if (obj == null) {
-         return false;
-      }
-
-      if (TkRefsetStrMember.class.isAssignableFrom(obj.getClass())) {
-         TkRefsetStrMember another = (TkRefsetStrMember) obj;
-
-         // =========================================================
-         // Compare properties of 'this' class to the 'another' class
-         // =========================================================
-         // Compare strValue
-         if (!this.strValue.equals(another.strValue)) {
+    //~--- methods -------------------------------------------------------------
+    /**
+     * Compares this object to the specified object. The result is <tt>true</tt> if and only if the argument
+     * is not <tt>null</tt>, is a <tt>ERefsetStrMember</tt> object, and contains the same values, field by
+     * field, as this <tt>ERefsetStrMember</tt>.
+     *
+     * @param obj the object to compare with.
+     * @return
+     * <code>true</code> if the objects are the same;
+     * <code>false</code> otherwise.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
             return false;
-         }
+        }
 
-         // Compare their parents
-         return super.equals(obj);
-      }
+        if (TkRefsetStrMember.class.isAssignableFrom(obj.getClass())) {
+            TkRefsetStrMember another = (TkRefsetStrMember) obj;
 
-      return false;
-   }
+            // =========================================================
+            // Compare properties of 'this' class to the 'another' class
+            // =========================================================
+            // Compare strValue
+            if (!this.strValue.equals(another.strValue)) {
+                return false;
+            }
 
-   /**
-    * Returns a hash code for this <code>ERefsetStrMember</code>.
-    *
-    * @return a hash code value for this <tt>ERefsetStrMember</tt>.
-    */
-   @Override
-   public int hashCode() {
-      return this.primordialUuid.hashCode();
-   }
+            // Compare their parents
+            return super.equals(obj);
+        }
 
-   @Override
-   public TkRefsetStrMember makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
-      return new TkRefsetStrMember(this, conversionMap, offset, mapAll);
-   }
+        return false;
+    }
 
-   @Override
-   public final void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
-      super.readExternal(in, dataVersion);
-      strValue = UtfHelper.readUtfV6(in, dataVersion);
+    /**
+     * Returns a hash code for this
+     * <code>ERefsetStrMember</code>.
+     *
+     * @return a hash code value for this <tt>ERefsetStrMember</tt>.
+     */
+    @Override
+    public int hashCode() {
+        return this.primordialUuid.hashCode();
+    }
 
-      int versionSize = in.readInt();
+    @Override
+    public TkRefsetStrMember makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
+        return new TkRefsetStrMember(this, conversionMap, offset, mapAll);
+    }
 
-      if (versionSize > 0) {
-         revisions = new ArrayList<TkRefsetStrRevision>(versionSize);
+    @Override
+    public final void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super.readExternal(in, dataVersion);
+        strValue = UtfHelper.readUtfV6(in, dataVersion);
 
-         for (int i = 0; i < versionSize; i++) {
-            revisions.add(new TkRefsetStrRevision(in, dataVersion));
-         }
-      }
-   }
+        int versionSize = in.readInt();
 
-   /**
-    * Returns a string representation of the object.
-    */
-   @Override
-   public String toString() {
-      StringBuilder buff = new StringBuilder();
+        if (versionSize > 0) {
+            revisions = new ArrayList<TkRefsetStrRevision>(versionSize);
 
-      buff.append(this.getClass().getSimpleName()).append(": ");
-      buff.append(" str:");
-      buff.append("'").append(this.strValue).append("'");
-      buff.append("; ");
-      buff.append(super.toString());
+            for (int i = 0; i < versionSize; i++) {
+                TkRefsetStrRevision rev = new TkRefsetStrRevision(in, dataVersion);
+                if (rev.getTime() == this.time) {
+                    // TODO this check can be removed after trek-95 change sets are no longer in production. 
+                    strValue = rev.stringValue;
+                } else {
+                    revisions.add(rev);
+                }
+            }
+        }
+    }
 
-      return buff.toString();
-   }
+    /**
+     * Returns a string representation of the object.
+     */
+    @Override
+    public String toString() {
+        StringBuilder buff = new StringBuilder();
 
-   @Override
-   public void writeExternal(DataOutput out) throws IOException {
-      super.writeExternal(out);
-      UtfHelper.writeUtf(out, strValue);
+        buff.append(this.getClass().getSimpleName()).append(": ");
+        buff.append(" str:");
+        buff.append("'").append(this.strValue).append("'");
+        buff.append("; ");
+        buff.append(super.toString());
 
-      if (revisions == null) {
-         out.writeInt(0);
-      } else {
-         out.writeInt(revisions.size());
+        return buff.toString();
+    }
 
-         for (TkRefsetStrRevision rmv : revisions) {
-            rmv.writeExternal(out);
-         }
-      }
-   }
+    @Override
+    public void writeExternal(DataOutput out) throws IOException {
+        super.writeExternal(out);
+        UtfHelper.writeUtf(out, strValue);
 
-   //~--- get methods ---------------------------------------------------------
+        if (revisions == null) {
+            out.writeInt(0);
+        } else {
+            out.writeInt(revisions.size());
 
-   @Override
-   public List<TkRefsetStrRevision> getRevisionList() {
-      return revisions;
-   }
+            for (TkRefsetStrRevision rmv : revisions) {
+                rmv.writeExternal(out);
+            }
+        }
+    }
 
-   public String getStrValue() {
-      return strValue;
-   }
+    //~--- get methods ---------------------------------------------------------
+    @Override
+    public List<TkRefsetStrRevision> getRevisionList() {
+        return revisions;
+    }
 
-   @Override
-   public TK_REFSET_TYPE getType() {
-      return TK_REFSET_TYPE.STR;
-   }
+    public String getStrValue() {
+        return strValue;
+    }
 
-   //~--- set methods ---------------------------------------------------------
+    @Override
+    public TK_REFSET_TYPE getType() {
+        return TK_REFSET_TYPE.STR;
+    }
 
-   public void setStrValue(String strValue) {
-      this.strValue = strValue;
-   }
+    //~--- set methods ---------------------------------------------------------
+    public void setStrValue(String strValue) {
+        this.strValue = strValue;
+    }
 }

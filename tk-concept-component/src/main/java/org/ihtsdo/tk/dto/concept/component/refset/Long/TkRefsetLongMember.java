@@ -1,12 +1,10 @@
 package org.ihtsdo.tk.dto.concept.component.refset.Long;
 
 //~--- non-JDK imports --------------------------------------------------------
-
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_long.RefexLongVersionBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
@@ -19,175 +17,194 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import java.util.*;
+import org.ihtsdo.tk.dto.RevisionHandling;
+import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanRevision;
 
 public class TkRefsetLongMember extends TkRefsetAbstractMember<TkRefsetLongRevision> {
-   public static final long serialVersionUID = 1;
 
-   //~--- fields --------------------------------------------------------------
+    public static final long serialVersionUID = 1;
+    //~--- fields --------------------------------------------------------------
+    public long longValue;
 
-   public long longValue;
+    //~--- constructors --------------------------------------------------------
+    public TkRefsetLongMember() {
+        super();
+    }
 
-   //~--- constructors --------------------------------------------------------
+    public TkRefsetLongMember(RefexChronicleBI another) throws IOException {
+        this((RefexLongVersionBI) another.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
+    }
 
-   public TkRefsetLongMember() {
-      super();
-   }
+    public TkRefsetLongMember(RefexLongVersionBI another,
+            RevisionHandling revisionHandling) throws IOException {
+        super(another);
+        if (revisionHandling == RevisionHandling.EXCLUDE_REVISIONS) {
+            this.longValue = another.getLong1();
+       } else {
+            Collection<? extends RefexLongVersionBI> refexes = another.getVersions();
+            int partCount = refexes.size();
+            Iterator<? extends RefexLongVersionBI> itr = refexes.iterator();
+            RefexLongVersionBI rv = itr.next();
 
-   public TkRefsetLongMember(RefexChronicleBI another) throws IOException {
-      super((RefexVersionBI) another.getPrimordialVersion());
+            this.longValue = rv.getLong1();
 
-      Collection<? extends RefexLongVersionBI> refexes   = another.getVersions();
-      int                                      partCount = refexes.size();
-      Iterator<? extends RefexLongVersionBI>   itr       = refexes.iterator();
-      RefexLongVersionBI                       rv        = itr.next();
+            if (partCount > 1) {
+                revisions = new ArrayList<TkRefsetLongRevision>(partCount - 1);
 
-      this.longValue = rv.getLong1();
+                while (itr.hasNext()) {
+                    rv = itr.next();
+                    TkRefsetLongRevision rev = new TkRefsetLongRevision(rv);
+                    if (rev.getTime() == this.time) {
+                        // TODO this check can be removed after trek-95 change sets are no longer in production. 
+                        this.longValue = rev.longValue;
+                    } else {
+                        revisions.add(rev);
+                    }
+                }
+            }
+        }
+    }
+    
 
-      if (partCount > 1) {
-         revisions = new ArrayList<TkRefsetLongRevision>(partCount - 1);
+    public TkRefsetLongMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super();
+        readExternal(in, dataVersion);
+    }
 
-         while (itr.hasNext()) {
-            rv = itr.next();
-            revisions.add(new TkRefsetLongRevision(rv));
-         }
-      }
-   }
+    public TkRefsetLongMember(TkRefsetLongMember another, Map<UUID, UUID> conversionMap, long offset,
+            boolean mapAll) {
+        super(another, conversionMap, offset, mapAll);
+        this.longValue = another.longValue;
+    }
 
-   public TkRefsetLongMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
-      super();
-      readExternal(in, dataVersion);
-   }
+    public TkRefsetLongMember(RefexLongVersionBI another, NidBitSetBI exclusions,
+            Map<UUID, UUID> conversionMap, long offset, boolean mapAll, ViewCoordinate vc)
+            throws IOException, ContradictionException {
+        super(another, exclusions, conversionMap, offset, mapAll, vc);
+        this.longValue = another.getLong1();
+    }
 
-   public TkRefsetLongMember(TkRefsetLongMember another, Map<UUID, UUID> conversionMap, long offset,
-                             boolean mapAll) {
-      super(another, conversionMap, offset, mapAll);
-      this.longValue = another.longValue;
-   }
-
-   public TkRefsetLongMember(RefexLongVersionBI another, NidBitSetBI exclusions,
-                             Map<UUID, UUID> conversionMap, long offset, boolean mapAll, ViewCoordinate vc)
-           throws IOException, ContradictionException {
-      super(another, exclusions, conversionMap, offset, mapAll, vc);
-      this.longValue = another.getLong1();
-   }
-
-   //~--- methods -------------------------------------------------------------
-
-   /**
-    * Compares this object to the specified object. The result is <tt>true</tt>
-    * if and only if the argument is not <tt>null</tt>, is a
-    * <tt>ERefsetLongMember</tt> object, and contains the same values, field by field,
-    * as this <tt>ERefsetLongMember</tt>.
-    *
-    * @param obj the object to compare with.
-    * @return <code>true</code> if the objects are the same;
-    *         <code>false</code> otherwise.
-    */
-   @Override
-   public boolean equals(Object obj) {
-      if (obj == null) {
-         return false;
-      }
-
-      if (TkRefsetLongMember.class.isAssignableFrom(obj.getClass())) {
-         TkRefsetLongMember another = (TkRefsetLongMember) obj;
-
-         // =========================================================
-         // Compare properties of 'this' class to the 'another' class
-         // =========================================================
-         // Compare longValue
-         if (this.longValue != another.longValue) {
+    //~--- methods -------------------------------------------------------------
+    /**
+     * Compares this object to the specified object. The result is <tt>true</tt> if and only if the argument
+     * is not <tt>null</tt>, is a <tt>ERefsetLongMember</tt> object, and contains the same values, field by
+     * field, as this <tt>ERefsetLongMember</tt>.
+     *
+     * @param obj the object to compare with.
+     * @return
+     * <code>true</code> if the objects are the same;
+     * <code>false</code> otherwise.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
             return false;
-         }
+        }
 
-         // Compare their parents
-         return super.equals(obj);
-      }
+        if (TkRefsetLongMember.class.isAssignableFrom(obj.getClass())) {
+            TkRefsetLongMember another = (TkRefsetLongMember) obj;
 
-      return false;
-   }
+            // =========================================================
+            // Compare properties of 'this' class to the 'another' class
+            // =========================================================
+            // Compare longValue
+            if (this.longValue != another.longValue) {
+                return false;
+            }
 
-   /**
-    * Returns a hash code for this <code>ERefsetLongMember</code>.
-    *
-    * @return a hash code value for this <tt>ERefsetLongMember</tt>.
-    */
-   @Override
-   public int hashCode() {
-      return this.primordialUuid.hashCode();
-   }
+            // Compare their parents
+            return super.equals(obj);
+        }
 
-   @Override
-   public TkRevision makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
-      return new TkRefsetLongMember(this, conversionMap, offset, mapAll);
-   }
+        return false;
+    }
 
-   @Override
-   public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
-      super.readExternal(in, dataVersion);
-      longValue = in.readLong();
+    /**
+     * Returns a hash code for this
+     * <code>ERefsetLongMember</code>.
+     *
+     * @return a hash code value for this <tt>ERefsetLongMember</tt>.
+     */
+    @Override
+    public int hashCode() {
+        return this.primordialUuid.hashCode();
+    }
 
-      int versionSize = in.readInt();
+    @Override
+    public TkRevision makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
+        return new TkRefsetLongMember(this, conversionMap, offset, mapAll);
+    }
 
-      if (versionSize > 0) {
-         revisions = new ArrayList<TkRefsetLongRevision>(versionSize);
+    @Override
+    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super.readExternal(in, dataVersion);
+        longValue = in.readLong();
 
-         for (int i = 0; i < versionSize; i++) {
-            revisions.add(new TkRefsetLongRevision(in, dataVersion));
-         }
-      }
-   }
+        int versionSize = in.readInt();
 
-   /**
-    * Returns a string representation of the object.
-    */
-   @Override
-   public String toString() {
-      StringBuilder buff = new StringBuilder();
+        if (versionSize > 0) {
+            revisions = new ArrayList<TkRefsetLongRevision>(versionSize);
 
-      buff.append(this.getClass().getSimpleName()).append(": ");
-      buff.append(" long:");
-      buff.append(this.longValue);
-      buff.append(" ");
-      buff.append(super.toString());
+            for (int i = 0; i < versionSize; i++) {
+                TkRefsetLongRevision rev = new TkRefsetLongRevision(in, dataVersion);
+                if (rev.getTime() == this.time) {
+                    // TODO this check can be removed after trek-95 change sets are no longer in production. 
+                    longValue = rev.longValue;
+                } else {
+                    revisions.add(rev);
+                }
+            }
+        }
+    }
 
-      return buff.toString();
-   }
+    /**
+     * Returns a string representation of the object.
+     */
+    @Override
+    public String toString() {
+        StringBuilder buff = new StringBuilder();
 
-   @Override
-   public void writeExternal(DataOutput out) throws IOException {
-      super.writeExternal(out);
-      out.writeLong(longValue);
+        buff.append(this.getClass().getSimpleName()).append(": ");
+        buff.append(" long:");
+        buff.append(this.longValue);
+        buff.append(" ");
+        buff.append(super.toString());
 
-      if (revisions == null) {
-         out.writeInt(0);
-      } else {
-         out.writeInt(revisions.size());
+        return buff.toString();
+    }
 
-         for (TkRefsetLongRevision rmv : revisions) {
-            rmv.writeExternal(out);
-         }
-      }
-   }
+    @Override
+    public void writeExternal(DataOutput out) throws IOException {
+        super.writeExternal(out);
+        out.writeLong(longValue);
 
-   //~--- get methods ---------------------------------------------------------
+        if (revisions == null) {
+            out.writeInt(0);
+        } else {
+            out.writeInt(revisions.size());
 
-   public long getLongValue() {
-      return longValue;
-   }
+            for (TkRefsetLongRevision rmv : revisions) {
+                rmv.writeExternal(out);
+            }
+        }
+    }
 
-   public List<TkRefsetLongRevision> getRevisionList() {
-      return revisions;
-   }
+    //~--- get methods ---------------------------------------------------------
+    public long getLongValue() {
+        return longValue;
+    }
 
-   @Override
-   public TK_REFSET_TYPE getType() {
-      return TK_REFSET_TYPE.LONG;
-   }
+    public List<TkRefsetLongRevision> getRevisionList() {
+        return revisions;
+    }
 
-   //~--- set methods ---------------------------------------------------------
+    @Override
+    public TK_REFSET_TYPE getType() {
+        return TK_REFSET_TYPE.LONG;
+    }
 
-   public void setLongValue(long longValue) {
-      this.longValue = longValue;
-   }
+    //~--- set methods ---------------------------------------------------------
+    public void setLongValue(long longValue) {
+        this.longValue = longValue;
+    }
 }

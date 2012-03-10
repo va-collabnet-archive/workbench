@@ -1,7 +1,6 @@
 package org.ihtsdo.tk.dto.concept.component.refset.cidint;
 
 //~--- non-JDK imports --------------------------------------------------------
-
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
@@ -20,213 +19,232 @@ import java.io.IOException;
 import java.util.*;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.dto.RevisionHandling;
+import org.ihtsdo.tk.dto.concept.component.refset.cidflt.TkRefsetCidFloatRevision;
 
 public class TkRefsetCidIntMember extends TkRefsetAbstractMember<TkRefsetCidIntRevision> {
-   public static final long serialVersionUID = 1;
 
-   //~--- fields --------------------------------------------------------------
+    public static final long serialVersionUID = 1;
+    //~--- fields --------------------------------------------------------------
+    public UUID c1Uuid;
+    public int intValue;
 
-   public UUID c1Uuid;
-   public int  intValue;
+    //~--- constructors --------------------------------------------------------
+    public TkRefsetCidIntMember(RefexChronicleBI another) throws IOException {
+        this((RefexCnidIntVersionBI) another.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
+    }
 
-   //~--- constructors --------------------------------------------------------
+    public TkRefsetCidIntMember(RefexCnidIntVersionBI another,
+            RevisionHandling revisionHandling) throws IOException {
+        super(another);
+        TerminologyStoreDI ts = Ts.get();
+        if (revisionHandling == RevisionHandling.EXCLUDE_REVISIONS) {
+            this.c1Uuid = ts.getUuidPrimordialForNid(another.getCnid1());
+            this.intValue = another.getInt1();
+        } else {
+            Collection<? extends RefexCnidIntVersionBI> refexes = another.getVersions();
+            int partCount = refexes.size();
+            Iterator<? extends RefexCnidIntVersionBI> relItr = refexes.iterator();
+            RefexCnidIntVersionBI rv = relItr.next();
 
-   public TkRefsetCidIntMember(RefexChronicleBI another) throws IOException {
-      super((RefexVersionBI) another.getPrimordialVersion());
+            this.c1Uuid = ts.getUuidPrimordialForNid(rv.getCnid1());
+            this.intValue = rv.getInt1();
 
-      TerminologyStoreDI                               ts        = Ts.get();
-      Collection<? extends RefexCnidIntVersionBI> refexes      = another.getVersions();
-      int                                              partCount = refexes.size();
-      Iterator<? extends RefexCnidIntVersionBI>   relItr    = refexes.iterator();
-      RefexCnidIntVersionBI                       rv        = relItr.next();
+            if (partCount > 1) {
+                revisions = new ArrayList<TkRefsetCidIntRevision>(partCount - 1);
 
-      this.c1Uuid = ts.getUuidPrimordialForNid(rv.getCnid1());
-      this.intValue = rv.getInt1();
- 
-      if (partCount > 1) {
-         revisions = new ArrayList<TkRefsetCidIntRevision>(partCount - 1);
+                while (relItr.hasNext()) {
+                    rv = relItr.next();
+                    TkRefsetCidIntRevision rev = new TkRefsetCidIntRevision(rv);
+                    if (rev.getTime() == this.time) {
+                        // TODO this check can be removed after trek-95 change sets are no longer in production. 
+                        this.c1Uuid = rev.c1Uuid;
+                        this.intValue = rev.intValue;
+                    } else {
+                        revisions.add(rev);
+                    }
+                }
+            }
+        }
+    }
 
-         while (relItr.hasNext()) {
-            rv = relItr.next();
-            revisions.add(new TkRefsetCidIntRevision(rv));
-         }
-      }
-   }
+    public TkRefsetCidIntMember() {
+        super();
+    }
 
+    public TkRefsetCidIntMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super();
+        readExternal(in, dataVersion);
+    }
 
-   public TkRefsetCidIntMember() {
-      super();
-   }
+    public TkRefsetCidIntMember(TkRefsetCidIntMember another, Map<UUID, UUID> conversionMap, long offset,
+            boolean mapAll) {
+        super(another, conversionMap, offset, mapAll);
 
-   public TkRefsetCidIntMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
-      super();
-      readExternal(in, dataVersion);
-   }
+        if (mapAll) {
+            this.c1Uuid = conversionMap.get(another.c1Uuid);
+            this.intValue = another.intValue;
+        } else {
+            this.c1Uuid = another.c1Uuid;
+            this.intValue = another.intValue;
+        }
+    }
 
-   public TkRefsetCidIntMember(TkRefsetCidIntMember another, Map<UUID, UUID> conversionMap, long offset,
-                               boolean mapAll) {
-      super(another, conversionMap, offset, mapAll);
+    public TkRefsetCidIntMember(RefexCnidIntVersionBI another, NidBitSetBI exclusions,
+            Map<UUID, UUID> conversionMap, long offset, boolean mapAll, ViewCoordinate vc)
+            throws IOException, ContradictionException {
+        super(another, exclusions, conversionMap, offset, mapAll, vc);
 
-      if (mapAll) {
-         this.c1Uuid   = conversionMap.get(another.c1Uuid);
-         this.intValue = another.intValue;
-      } else {
-         this.c1Uuid   = another.c1Uuid;
-         this.intValue = another.intValue;
-      }
-   }
+        if (mapAll) {
+            this.c1Uuid = conversionMap.get(Ts.get().getComponent(another.getCnid1()).getPrimUuid());
+        } else {
+            this.c1Uuid = Ts.get().getComponent(another.getCnid1()).getPrimUuid();
+        }
 
-   public TkRefsetCidIntMember(RefexCnidIntVersionBI another, NidBitSetBI exclusions,
-                               Map<UUID, UUID> conversionMap, long offset, boolean mapAll, ViewCoordinate vc)
-           throws IOException, ContradictionException {
-      super(another, exclusions, conversionMap, offset, mapAll, vc);
+        this.intValue = another.getInt1();
+    }
 
-      if (mapAll) {
-         this.c1Uuid = conversionMap.get(Ts.get().getComponent(another.getCnid1()).getPrimUuid());
-      } else {
-         this.c1Uuid = Ts.get().getComponent(another.getCnid1()).getPrimUuid();
-      }
-
-      this.intValue = another.getInt1();
-   }
-
-   //~--- methods -------------------------------------------------------------
-
-   /**
-    * Compares this object to the specified object. The result is <tt>true</tt>
-    * if and only if the argument is not <tt>null</tt>, is a
-    * <tt>ERefsetCidIntMember</tt> object, and contains the same values,
-    * field by field, as this <tt>ERefsetCidIntMember</tt>.
-    *
-    * @param obj the object to compare with.
-    * @return <code>true</code> if the objects are the same;
-    *         <code>false</code> otherwise.
-    */
-   @Override
-   public boolean equals(Object obj) {
-      if (obj == null) {
-         return false;
-      }
-
-      if (TkRefsetCidIntMember.class.isAssignableFrom(obj.getClass())) {
-         TkRefsetCidIntMember another = (TkRefsetCidIntMember) obj;
-
-         // =========================================================
-         // Compare properties of 'this' class to the 'another' class
-         // =========================================================
-         // Compare c1Uuid
-         if (!this.c1Uuid.equals(another.c1Uuid)) {
+    //~--- methods -------------------------------------------------------------
+    /**
+     * Compares this object to the specified object. The result is <tt>true</tt> if and only if the argument
+     * is not <tt>null</tt>, is a <tt>ERefsetCidIntMember</tt> object, and contains the same values, field by
+     * field, as this <tt>ERefsetCidIntMember</tt>.
+     *
+     * @param obj the object to compare with.
+     * @return
+     * <code>true</code> if the objects are the same;
+     * <code>false</code> otherwise.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
             return false;
-         }
+        }
 
-         // Compare intValue
-         if (this.intValue != another.intValue) {
-            return false;
-         }
+        if (TkRefsetCidIntMember.class.isAssignableFrom(obj.getClass())) {
+            TkRefsetCidIntMember another = (TkRefsetCidIntMember) obj;
 
-         // Compare their parents
-         return super.equals(obj);
-      }
+            // =========================================================
+            // Compare properties of 'this' class to the 'another' class
+            // =========================================================
+            // Compare c1Uuid
+            if (!this.c1Uuid.equals(another.c1Uuid)) {
+                return false;
+            }
 
-      return false;
-   }
+            // Compare intValue
+            if (this.intValue != another.intValue) {
+                return false;
+            }
 
-   /**
-    * Returns a hash code for this <code>ERefsetCidIntMember</code>.
-    *
-    * @return  a hash code value for this <tt>ERefsetCidIntMember</tt>.
-    */
-   @Override
-   public int hashCode() {
-      return this.primordialUuid.hashCode();
-   }
+            // Compare their parents
+            return super.equals(obj);
+        }
 
-   @Override
-   public TkRevision makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
-      return new TkRefsetCidIntMember(this, conversionMap, offset, mapAll);
-   }
+        return false;
+    }
 
-   @Override
-   public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
-      super.readExternal(in, dataVersion);
-      c1Uuid   = new UUID(in.readLong(), in.readLong());
-      intValue = in.readInt();
+    /**
+     * Returns a hash code for this
+     * <code>ERefsetCidIntMember</code>.
+     *
+     * @return a hash code value for this <tt>ERefsetCidIntMember</tt>.
+     */
+    @Override
+    public int hashCode() {
+        return this.primordialUuid.hashCode();
+    }
 
-      int versionSize = in.readInt();
+    @Override
+    public TkRevision makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
+        return new TkRefsetCidIntMember(this, conversionMap, offset, mapAll);
+    }
 
-      if (versionSize > 0) {
-         revisions = new ArrayList<TkRefsetCidIntRevision>(versionSize);
+    @Override
+    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super.readExternal(in, dataVersion);
+        c1Uuid = new UUID(in.readLong(), in.readLong());
+        intValue = in.readInt();
 
-         for (int i = 0; i < versionSize; i++) {
-            revisions.add(new TkRefsetCidIntRevision(in, dataVersion));
-         }
-      }
-   }
+        int versionSize = in.readInt();
 
-   /**
-    * Returns a string representation of the object.
-    */
-   @Override
-   public String toString() {
-      StringBuilder buff = new StringBuilder();
+        if (versionSize > 0) {
+            revisions = new ArrayList<TkRefsetCidIntRevision>(versionSize);
 
-      buff.append(this.getClass().getSimpleName()).append(": ");
-      buff.append(" c1:");
-      buff.append(informAboutUuid(this.c1Uuid));
-      buff.append(" int:");
-      buff.append(this.intValue);
-      buff.append(" ");
-      buff.append(super.toString());
+            for (int i = 0; i < versionSize; i++) {
+                TkRefsetCidIntRevision rev = new TkRefsetCidIntRevision(in, dataVersion);
+                if (rev.getTime() == this.time) {
+                    // TODO this check can be removed after trek-95 change sets are no longer in production. 
+                    c1Uuid = rev.c1Uuid;
+                    intValue = rev.intValue;
+                } else {
+                    revisions.add(rev);
+                }
+            }
+        }
+    }
 
-      return buff.toString();
-   }
+    /**
+     * Returns a string representation of the object.
+     */
+    @Override
+    public String toString() {
+        StringBuilder buff = new StringBuilder();
 
-   @Override
-   public void writeExternal(DataOutput out) throws IOException {
-      super.writeExternal(out);
-      out.writeLong(c1Uuid.getMostSignificantBits());
-      out.writeLong(c1Uuid.getLeastSignificantBits());
-      out.writeInt(intValue);
+        buff.append(this.getClass().getSimpleName()).append(": ");
+        buff.append(" c1:");
+        buff.append(informAboutUuid(this.c1Uuid));
+        buff.append(" int:");
+        buff.append(this.intValue);
+        buff.append(" ");
+        buff.append(super.toString());
 
-      if (revisions == null) {
-         out.writeInt(0);
-      } else {
-         out.writeInt(revisions.size());
+        return buff.toString();
+    }
 
-         for (TkRefsetCidIntRevision rmv : revisions) {
-            rmv.writeExternal(out);
-         }
-      }
-   }
+    @Override
+    public void writeExternal(DataOutput out) throws IOException {
+        super.writeExternal(out);
+        out.writeLong(c1Uuid.getMostSignificantBits());
+        out.writeLong(c1Uuid.getLeastSignificantBits());
+        out.writeInt(intValue);
 
-   //~--- get methods ---------------------------------------------------------
+        if (revisions == null) {
+            out.writeInt(0);
+        } else {
+            out.writeInt(revisions.size());
 
-   public UUID getC1Uuid() {
-      return c1Uuid;
-   }
+            for (TkRefsetCidIntRevision rmv : revisions) {
+                rmv.writeExternal(out);
+            }
+        }
+    }
 
-   public int getIntValue() {
-      return intValue;
-   }
+    //~--- get methods ---------------------------------------------------------
+    public UUID getC1Uuid() {
+        return c1Uuid;
+    }
 
-   @Override
-   public List<TkRefsetCidIntRevision> getRevisionList() {
-      return revisions;
-   }
+    public int getIntValue() {
+        return intValue;
+    }
 
-   @Override
-   public TK_REFSET_TYPE getType() {
-      return TK_REFSET_TYPE.CID_INT;
-   }
+    @Override
+    public List<TkRefsetCidIntRevision> getRevisionList() {
+        return revisions;
+    }
 
-   //~--- set methods ---------------------------------------------------------
+    @Override
+    public TK_REFSET_TYPE getType() {
+        return TK_REFSET_TYPE.CID_INT;
+    }
 
-   public void setC1Uuid(UUID c1Uuid) {
-      this.c1Uuid = c1Uuid;
-   }
+    //~--- set methods ---------------------------------------------------------
+    public void setC1Uuid(UUID c1Uuid) {
+        this.c1Uuid = c1Uuid;
+    }
 
-   public void setIntValue(int intValue) {
-      this.intValue = intValue;
-   }
+    public void setIntValue(int intValue) {
+        this.intValue = intValue;
+    }
 }

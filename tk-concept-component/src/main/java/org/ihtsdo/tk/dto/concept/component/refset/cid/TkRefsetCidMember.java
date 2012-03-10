@@ -1,7 +1,6 @@
 package org.ihtsdo.tk.dto.concept.component.refset.cid;
 
 //~--- non-JDK imports --------------------------------------------------------
-
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
@@ -19,188 +18,203 @@ import java.io.IOException;
 import java.util.*;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.dto.RevisionHandling;
+import org.ihtsdo.tk.dto.concept.component.refset.array.bytearray.TkRefsetArrayByteArrayRevision;
 
 public class TkRefsetCidMember extends TkRefsetAbstractMember<TkRefsetCidRevision> {
-   public static final long serialVersionUID = 1;
 
-   //~--- fields --------------------------------------------------------------
+    public static final long serialVersionUID = 1;
+    //~--- fields --------------------------------------------------------------
+    public UUID c1Uuid;
 
-   public UUID c1Uuid;
+    //~--- constructors --------------------------------------------------------
+    public TkRefsetCidMember(RefexChronicleBI another) throws IOException {
+        this((RefexCnidVersionBI) another.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
+    }
 
-   //~--- constructors --------------------------------------------------------
-   public TkRefsetCidMember(RefexChronicleBI another) throws IOException {
-      super((RefexVersionBI) another.getPrimordialVersion());
+    public TkRefsetCidMember(RefexCnidVersionBI another,
+            RevisionHandling revisionHandling) throws IOException {
+        super(another);
 
-      TerminologyStoreDI                               ts        = Ts.get();
-      Collection<? extends RefexCnidVersionBI> refexes   = another.getVersions();
-      int                                              partCount = refexes.size();
-      Iterator<? extends RefexCnidVersionBI>   itr       = refexes.iterator();
-      RefexCnidVersionBI                       rv        = itr.next();
+        TerminologyStoreDI ts = Ts.get();
+        Collection<? extends RefexCnidVersionBI> refexes = another.getVersions();
+        int partCount = refexes.size();
+        Iterator<? extends RefexCnidVersionBI> itr = refexes.iterator();
+        RefexCnidVersionBI rv = itr.next();
 
-      this.c1Uuid = ts.getUuidPrimordialForNid(rv.getCnid1());
+        this.c1Uuid = ts.getUuidPrimordialForNid(rv.getCnid1());
 
-      if (partCount > 1) {
-         revisions = new ArrayList<TkRefsetCidRevision>(partCount - 1);
+        if (partCount > 1) {
+            revisions = new ArrayList<TkRefsetCidRevision>(partCount - 1);
 
-         while (itr.hasNext()) {
-            rv = itr.next();
-            revisions.add(new TkRefsetCidRevision(rv));
-         }
-      }
-   }
+            while (itr.hasNext()) {
+                rv = itr.next();
+                TkRefsetCidRevision rev = new TkRefsetCidRevision(rv);
+                if (rev.getTime() == this.time) {
+                    // TODO this check can be removed after trek-95 change sets are no longer in production. 
+                    this.c1Uuid = rev.c1Uuid;
+                } else {
+                    revisions.add(rev);
+                }
+            }
+        }
+    }
 
-   public TkRefsetCidMember() {
-      super();
-   }
+    public TkRefsetCidMember() {
+        super();
+    }
 
-   public TkRefsetCidMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
-      super();
-      readExternal(in, dataVersion);
-   }
+    public TkRefsetCidMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super();
+        readExternal(in, dataVersion);
+    }
 
-   public TkRefsetCidMember(TkRefsetCidMember another, Map<UUID, UUID> conversionMap, long offset,
-                            boolean mapAll) {
-      super(another, conversionMap, offset, mapAll);
+    public TkRefsetCidMember(TkRefsetCidMember another, Map<UUID, UUID> conversionMap, long offset,
+            boolean mapAll) {
+        super(another, conversionMap, offset, mapAll);
 
-      if (mapAll) {
-         this.c1Uuid = conversionMap.get(another.c1Uuid);
-      } else {
-         this.c1Uuid = another.c1Uuid;
-      }
-   }
+        if (mapAll) {
+            this.c1Uuid = conversionMap.get(another.c1Uuid);
+        } else {
+            this.c1Uuid = another.c1Uuid;
+        }
+    }
 
-   public TkRefsetCidMember(RefexCnidVersionBI another, NidBitSetBI exclusions,
-                            Map<UUID, UUID> conversionMap, long offset, boolean mapAll, ViewCoordinate vc)
-           throws IOException, ContradictionException {
-      super(another, exclusions, conversionMap, offset, mapAll, vc);
+    public TkRefsetCidMember(RefexCnidVersionBI another, NidBitSetBI exclusions,
+            Map<UUID, UUID> conversionMap, long offset, boolean mapAll, ViewCoordinate vc)
+            throws IOException, ContradictionException {
+        super(another, exclusions, conversionMap, offset, mapAll, vc);
 
-      if (mapAll) {
-         this.c1Uuid = conversionMap.get(Ts.get().getComponent(another.getCnid1()).getPrimUuid());
-      } else {
-         this.c1Uuid = Ts.get().getComponent(another.getCnid1()).getPrimUuid();
-      }
-   }
+        if (mapAll) {
+            this.c1Uuid = conversionMap.get(Ts.get().getComponent(another.getCnid1()).getPrimUuid());
+        } else {
+            this.c1Uuid = Ts.get().getComponent(another.getCnid1()).getPrimUuid();
+        }
+    }
 
-   //~--- methods -------------------------------------------------------------
-
-   /**
-    * Compares this object to the specified object. The result is <tt>true</tt>
-    * if and only if the argument is not <tt>null</tt>, is a
-    * <tt>ERefsetCidMember</tt> object, and contains the same values, field by field,
-    * as this <tt>ERefsetCidMember</tt>.
-    *
-    * @param obj the object to compare with.
-    * @return <code>true</code> if the objects are the same;
-    *         <code>false</code> otherwise.
-    */
-   @Override
-   public boolean equals(Object obj) {
-      if (obj == null) {
-         return false;
-      }
-
-      if (TkRefsetCidMember.class.isAssignableFrom(obj.getClass())) {
-         TkRefsetCidMember another = (TkRefsetCidMember) obj;
-
-         // =========================================================
-         // Compare properties of 'this' class to the 'another' class
-         // =========================================================
-         // Compare c1Uuid
-         if (!this.c1Uuid.equals(another.c1Uuid)) {
+    //~--- methods -------------------------------------------------------------
+    /**
+     * Compares this object to the specified object. The result is <tt>true</tt> if and only if the argument
+     * is not <tt>null</tt>, is a <tt>ERefsetCidMember</tt> object, and contains the same values, field by
+     * field, as this <tt>ERefsetCidMember</tt>.
+     *
+     * @param obj the object to compare with.
+     * @return
+     * <code>true</code> if the objects are the same;
+     * <code>false</code> otherwise.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
             return false;
-         }
+        }
 
-         // Compare their parents
-         return super.equals(obj);
-      }
+        if (TkRefsetCidMember.class.isAssignableFrom(obj.getClass())) {
+            TkRefsetCidMember another = (TkRefsetCidMember) obj;
 
-      return false;
-   }
+            // =========================================================
+            // Compare properties of 'this' class to the 'another' class
+            // =========================================================
+            // Compare c1Uuid
+            if (!this.c1Uuid.equals(another.c1Uuid)) {
+                return false;
+            }
 
-   /**
-    * Returns a hash code for this <code>ERefsetCidMember</code>.
-    *
-    * @return a hash code value for this <tt>ERefsetCidMember</tt>.
-    */
-   @Override
-   public int hashCode() {
-      return this.primordialUuid.hashCode();
-   }
+            // Compare their parents
+            return super.equals(obj);
+        }
 
-   @Override
-   public TkRefsetCidMember makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
-      return new TkRefsetCidMember(this, conversionMap, offset, mapAll);
-   }
+        return false;
+    }
 
-   @Override
-   public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
-      super.readExternal(in, dataVersion);
-      c1Uuid = new UUID(in.readLong(), in.readLong());
+    /**
+     * Returns a hash code for this
+     * <code>ERefsetCidMember</code>.
+     *
+     * @return a hash code value for this <tt>ERefsetCidMember</tt>.
+     */
+    @Override
+    public int hashCode() {
+        return this.primordialUuid.hashCode();
+    }
 
-      int versionSize = in.readInt();
+    @Override
+    public TkRefsetCidMember makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
+        return new TkRefsetCidMember(this, conversionMap, offset, mapAll);
+    }
 
-      if (versionSize > 0) {
-         revisions = new ArrayList<TkRefsetCidRevision>(versionSize);
+    @Override
+    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super.readExternal(in, dataVersion);
+        c1Uuid = new UUID(in.readLong(), in.readLong());
 
-         for (int i = 0; i < versionSize; i++) {
-            revisions.add(new TkRefsetCidRevision(in, dataVersion));
-         }
-      }
-   }
+        int versionSize = in.readInt();
 
-   /**
-    * Returns a string representation of the object.
-    */
-   @Override
-   public String toString() {
-      StringBuilder buff = new StringBuilder();
+        if (versionSize > 0) {
+            revisions = new ArrayList<TkRefsetCidRevision>(versionSize);
 
-      buff.append(this.getClass().getSimpleName()).append(": ");
-      buff.append(" c1:");
-      buff.append(informAboutUuid(this.c1Uuid));
-      buff.append(" ");
-      buff.append(super.toString());
+            for (int i = 0; i < versionSize; i++) {
+                TkRefsetCidRevision rev = new TkRefsetCidRevision(in, dataVersion);
+                if (rev.getTime() == this.time) {
+                    // TODO this check can be removed after trek-95 change sets are no longer in production. 
+                    c1Uuid = rev.c1Uuid;
+                } else {
+                    revisions.add(rev);
+                }
+            }
+        }
+    }
 
-      return buff.toString();
-   }
+    /**
+     * Returns a string representation of the object.
+     */
+    @Override
+    public String toString() {
+        StringBuilder buff = new StringBuilder();
 
-   @Override
-   public void writeExternal(DataOutput out) throws IOException {
-      super.writeExternal(out);
-      out.writeLong(c1Uuid.getMostSignificantBits());
-      out.writeLong(c1Uuid.getLeastSignificantBits());
+        buff.append(this.getClass().getSimpleName()).append(": ");
+        buff.append(" c1:");
+        buff.append(informAboutUuid(this.c1Uuid));
+        buff.append(" ");
+        buff.append(super.toString());
 
-      if (revisions == null) {
-         out.writeInt(0);
-      } else {
-         out.writeInt(revisions.size());
+        return buff.toString();
+    }
 
-         for (TkRefsetCidRevision rmv : revisions) {
-            rmv.writeExternal(out);
-         }
-      }
-   }
+    @Override
+    public void writeExternal(DataOutput out) throws IOException {
+        super.writeExternal(out);
+        out.writeLong(c1Uuid.getMostSignificantBits());
+        out.writeLong(c1Uuid.getLeastSignificantBits());
 
-   //~--- get methods ---------------------------------------------------------
+        if (revisions == null) {
+            out.writeInt(0);
+        } else {
+            out.writeInt(revisions.size());
 
-   public UUID getC1Uuid() {
-      return c1Uuid;
-   }
+            for (TkRefsetCidRevision rmv : revisions) {
+                rmv.writeExternal(out);
+            }
+        }
+    }
 
-   @Override
-   public List<TkRefsetCidRevision> getRevisionList() {
-      return revisions;
-   }
+    //~--- get methods ---------------------------------------------------------
+    public UUID getC1Uuid() {
+        return c1Uuid;
+    }
 
-   @Override
-   public TK_REFSET_TYPE getType() {
-      return TK_REFSET_TYPE.CID;
-   }
+    @Override
+    public List<TkRefsetCidRevision> getRevisionList() {
+        return revisions;
+    }
 
-   //~--- set methods ---------------------------------------------------------
+    @Override
+    public TK_REFSET_TYPE getType() {
+        return TK_REFSET_TYPE.CID;
+    }
 
-   public void setC1Uuid(UUID c1Uuid) {
-      this.c1Uuid = c1Uuid;
-   }
+    //~--- set methods ---------------------------------------------------------
+    public void setC1Uuid(UUID c1Uuid) {
+        this.c1Uuid = c1Uuid;
+    }
 }
