@@ -468,7 +468,8 @@ public class EConcept extends TkConcept implements I_AmChangeSetObject {
             return new ERefsetCidStrMember(m);
              
          case ARRAY_OF_BYTEARRAY:
-             return new TkRefsetArrayOfBytearrayMember((RefexChronicleBI) m);
+             return new TkRefsetArrayOfBytearrayMember((RefexVersionBI) 
+                     ((RefexChronicleBI) m).getPrimordialVersion());
 
          default :
             throw new UnsupportedOperationException("Cannot handle: " + type);
