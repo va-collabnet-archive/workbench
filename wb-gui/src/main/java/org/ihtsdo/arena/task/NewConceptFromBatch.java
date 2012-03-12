@@ -328,56 +328,67 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
         }
 
         @Override
-        protected Object doInBackground() throws Exception {
+        protected Object doInBackground(){
             // check return condition for CONTINUE or ITEM_CANCELLED
             if (returnCondition == Condition.CONTINUE) {
-                createBlueprintConcept();
-                //get rf1 or rf2 versions
-                gbRefexConcept = Ts.get().getConcept(SnomedMetadataRfx.getGB_DIALECT_REFEX_NID());
-                gbUuid = gbRefexConcept.getPrimUuid();
-                usRefexConcept = Ts.get().getConcept(SnomedMetadataRfx.getUS_DIALECT_REFEX_NID());
-                usUuid = usRefexConcept.getPrimUuid();
-                acceptableConcept = Ts.get().getConcept(SnomedMetadataRfx.getDESC_ACCEPTABLE_NID());
-                preferredConcept = Ts.get().getConcept(SnomedMetadataRfx.getDESC_PREFERRED_NID());
-                fsnConcept = Ts.get().getConcept(SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID());
-                synConcept = Ts.get().getConcept(SnomedMetadataRfx.getDES_SYNONYM_NID());
+                try {
+                    createBlueprintConcept();
+                    //get rf1 or rf2 versions
+                    gbRefexConcept = Ts.get().getConcept(SnomedMetadataRfx.getGB_DIALECT_REFEX_NID());
+                    gbUuid = gbRefexConcept.getPrimUuid();
+                    usRefexConcept = Ts.get().getConcept(SnomedMetadataRfx.getUS_DIALECT_REFEX_NID());
+                    usUuid = usRefexConcept.getPrimUuid();
+                    acceptableConcept = Ts.get().getConcept(SnomedMetadataRfx.getDESC_ACCEPTABLE_NID());
+                    preferredConcept = Ts.get().getConcept(SnomedMetadataRfx.getDESC_PREFERRED_NID());
+                    fsnConcept = Ts.get().getConcept(SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID());
+                    synConcept = Ts.get().getConcept(SnomedMetadataRfx.getDES_SYNONYM_NID());
 
-                //create blueprints
-                if (lang.equals("en")) {
-                    createBlueprintUsFsnRefex(conceptSpec.makeFsnCAB().getComponentNid());
-                    createBlueprintGbFsnRefex(conceptSpec.makeFsnCAB().getComponentNid());
-                    createBlueprintUsPrefRefex(conceptSpec.makePreferredCAB().getComponentNid());
-                    createBlueprintGbPrefRefex(conceptSpec.makePreferredCAB().getComponentNid());
-                }
-                if (lang.equals("en-us")) {
-                    createBlueprintUsFsnRefex(conceptSpec.makeFsnCAB().getComponentNid());
-                    createBlueprintUsPrefRefex(conceptSpec.makePreferredCAB().getComponentNid());
-//                   createBlueprintGbAcctRefex(conceptSpec.getPreferredCAB().getComponentNid()); //removed for rf2
-                }
-                if (lang.equals("en-gb")) {
-//                    createBlueprintGbFsnRefex(conceptSpec.getFsnCAB().getComponentNid());
-                    createBlueprintGbFsnRefex(conceptSpec.makeFsnCAB().getComponentNid()); //only using one fsn
-                    createBlueprintGbPrefRefex(conceptSpec.makePreferredCAB().getComponentNid());
-//                   createBlueprintUsAcctRefex(conceptSpec.getPreferredCAB().getComponentNid()); //removed for rf2
-                }
-                if (addUsDescFsn) {
-//                    createBlueprintUsFsnDesc();
-                    createBlueprintUsFsnRefex(conceptSpec.makeFsnCAB().getComponentNid());
-                }
-                if (addGbDescFsn) {
-//                    createBlueprintGbFsnDesc();
-//                    createBlueprintGbFsnRefex(descSpecGbFsn.getComponentNid());
-                    createBlueprintGbFsnRefex(conceptSpec.makeFsnCAB().getComponentNid()); //only using one fsn (US)
-                }
-                if (addUsDescPref) {
-                    createBlueprintUsPrefDesc();
-                    createBlueprintUsPrefRefex(descSpecUsPref.getComponentNid());
-//                    createBlueprintGbAcctRefex(descSpecUsPref.getComponentNid()); //removed for rf2
-                }
-                if (addGbDescPref) {
-                    createBlueprintGbPrefDesc();
-                    createBlueprintGbPrefRefex(descSpecGbPref.getComponentNid());
-//                    createBlueprintUsAcctRefex(descSpecGbPref.getComponentNid()); //removed for rf2
+                    //create blueprints
+                    if (lang.equals("en")) {
+                        createBlueprintUsFsnRefex(conceptSpec.makeFsnCAB().getComponentNid());
+                        createBlueprintGbFsnRefex(conceptSpec.makeFsnCAB().getComponentNid());
+                        createBlueprintUsPrefRefex(conceptSpec.makePreferredCAB().getComponentNid());
+                        createBlueprintGbPrefRefex(conceptSpec.makePreferredCAB().getComponentNid());
+                    }
+                    if (lang.equals("en-us")) {
+                        createBlueprintUsFsnRefex(conceptSpec.makeFsnCAB().getComponentNid());
+                        createBlueprintUsPrefRefex(conceptSpec.makePreferredCAB().getComponentNid());
+    //                   createBlueprintGbAcctRefex(conceptSpec.getPreferredCAB().getComponentNid()); //removed for rf2
+                    }
+                    if (lang.equals("en-gb")) {
+    //                    createBlueprintGbFsnRefex(conceptSpec.getFsnCAB().getComponentNid());
+                        createBlueprintGbFsnRefex(conceptSpec.makeFsnCAB().getComponentNid()); //only using one fsn
+                        createBlueprintGbPrefRefex(conceptSpec.makePreferredCAB().getComponentNid());
+    //                   createBlueprintUsAcctRefex(conceptSpec.getPreferredCAB().getComponentNid()); //removed for rf2
+                    }
+                    if (addUsDescFsn) {
+    //                    createBlueprintUsFsnDesc();
+                        createBlueprintUsFsnRefex(conceptSpec.makeFsnCAB().getComponentNid());
+                    }
+                    if (addGbDescFsn) {
+    //                    createBlueprintGbFsnDesc();
+    //                    createBlueprintGbFsnRefex(descSpecGbFsn.getComponentNid());
+                        createBlueprintGbFsnRefex(conceptSpec.makeFsnCAB().getComponentNid()); //only using one fsn (US)
+                    }
+                    if (addUsDescPref) {
+                        createBlueprintUsPrefDesc();
+                        createBlueprintUsPrefRefex(descSpecUsPref.getComponentNid());
+    //                    createBlueprintGbAcctRefex(descSpecUsPref.getComponentNid()); //removed for rf2
+                    }
+                    if (addGbDescPref) {
+                        createBlueprintGbPrefDesc();
+                        createBlueprintGbPrefRefex(descSpecGbPref.getComponentNid());
+    //                    createBlueprintUsAcctRefex(descSpecGbPref.getComponentNid()); //removed for rf2
+                    }
+                } catch (IOException ex) {
+                    AceLog.getAppLog().alertAndLogException(ex);
+                    return null;
+                } catch (InvalidCAB ex) {
+                    AceLog.getAppLog().alertAndLogException(ex);
+                    return null;
+                } catch (ContradictionException ex) {
+                    AceLog.getAppLog().alertAndLogException(ex);
+                    return null;
                 }
 
             }
@@ -885,11 +896,9 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
 
     }
 
-    private void createBlueprintConcept() {
+    private void createBlueprintConcept() throws IOException, InvalidCAB, ContradictionException {
         tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
                 config.getViewCoordinate());
-
-        try {
             //get parents
             UUID[] uuidArray = new UUID[1];
             uuidArray[0] = parentConcept.getPrimUuid();
@@ -930,14 +939,6 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
 
                 }
             }
-
-        } catch (ContradictionException e) {
-            AceLog.getAppLog().alertAndLogException(e);
-        } catch (IOException e) {
-            AceLog.getAppLog().alertAndLogException(e);
-        } catch (InvalidCAB e) {
-            AceLog.getAppLog().alertAndLogException(e);
-        }
     }
 
     private void createBlueprintGbFsnDesc() throws ContradictionException {
