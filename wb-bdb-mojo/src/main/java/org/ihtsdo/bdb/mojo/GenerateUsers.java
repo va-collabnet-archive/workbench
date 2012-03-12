@@ -152,6 +152,7 @@ public class GenerateUsers extends AbstractMojo {
 	private String visibleRefests;
 	private String projectDevelopmentPathFsn;
 	private String projectDevelopmentViewPathFsn;
+        private String projectDevelopmentAdjPathFsn;
 	private I_ConfigAceFrame userConfig;
 	private I_ConfigAceFrame wfConfig;
 	private Boolean create = true;
@@ -192,6 +193,7 @@ public class GenerateUsers extends AbstractMojo {
 			visibleRefests = configProps.getProperty("visibleRefests");
 			projectDevelopmentPathFsn = configProps.getProperty("projectDevelopmentPathFsn");
 			projectDevelopmentViewPathFsn = configProps.getProperty("projectDevelopmentViewPathFsn");
+                        projectDevelopmentAdjPathFsn = configProps.getProperty("projectDevelopmentAdjPathFsn");
 
 			//create user based on profile config
 			BufferedReader userReader = new BufferedReader(new FileReader(usersFile));
@@ -769,6 +771,11 @@ public class GenerateUsers extends AbstractMojo {
 		Set<PositionBI> viewSet = new HashSet<PositionBI>();
 		viewSet.add(viewPosition);
 		activeConfig.setViewPositions(viewSet);
+                
+                if(this.projectDevelopmentAdjPathFsn != null){
+                    PathBI adjPath = tf.getPath(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, this.projectDevelopmentAdjPathFsn));
+                    activeConfig.addPromotionPath(adjPath);
+                }
 
 		activeConfig.setColorForPath(viewPath.getConceptNid(), new Color(255, 84, 27));
 		activeConfig.setColorForPath(ReferenceConcepts.TERM_AUXILIARY_PATH.getNid(), new Color(25, 178, 63));
