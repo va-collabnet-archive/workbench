@@ -20,22 +20,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
 import javax.naming.ConfigurationException;
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -85,13 +70,39 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
     private JProgressBar progressBar;
 
     /* FindContradictionAction */
-    private class FindContradictionAction extends AbstractAction {
+//    private class FindContradictionAction extends AbstractAction {
+//
+//        private static final long serialVersionUID = 1L;
+//        private ContradictionEditorFrame frame;
+//
+//        public FindContradictionAction(ContradictionEditorFrame contradictionEditorFrame) {
+//            super("Run Contradiction Finder");
+//
+//            this.frame = contradictionEditorFrame;
+//        }
+//
+//        @Override
+//        public void actionPerformed(ActionEvent ae) {
+//            // START SEARCH
+//            if(frame.getActiveFrameConfig().getEditingPathSet().isEmpty()){
+//                JOptionPane.showMessageDialog(new JFrame(),
+//                                                "Please set adjudication path before continuing.",
+//                                                "No adjudication path set.", JOptionPane.ERROR_MESSAGE);
+//            }else{
+//                ContradictionFinderSwingWorker worker =
+//                    new ContradictionFinderSwingWorker(frame, viewCoord);
+//                worker.execute();
+//            }
+//        }
+//    }
+    
+    private class FindContradictionMoreAction extends AbstractAction {
 
         private static final long serialVersionUID = 1L;
         private ContradictionEditorFrame frame;
 
-        public FindContradictionAction(ContradictionEditorFrame contradictionEditorFrame) {
-            super("Run Contradiction Finder");
+        public FindContradictionMoreAction(ContradictionEditorFrame contradictionEditorFrame) {
+            super("Run Contradiction Finder - More");
 
             this.frame = contradictionEditorFrame;
         }
@@ -99,9 +110,41 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
         @Override
         public void actionPerformed(ActionEvent ae) {
             // START SEARCH
-            ContradictionFinderSwingWorker worker =
-                    new ContradictionFinderSwingWorker(frame, viewCoord);
-            worker.execute();
+            if(frame.getActiveFrameConfig().getEditingPathSet().isEmpty()){
+                JOptionPane.showMessageDialog(new JFrame(),
+                                                "Please set adjudication path before continuing.",
+                                                "No adjudication path set.", JOptionPane.ERROR_MESSAGE);
+            }else{
+                ContradictionFinderMoreSwingWorker worker =
+                    new ContradictionFinderMoreSwingWorker(frame, viewCoord);
+                 worker.execute();
+            }
+        }
+    }
+    
+    private class FindContradictionLessAction extends AbstractAction {
+
+        private static final long serialVersionUID = 1L;
+        private ContradictionEditorFrame frame;
+
+        public FindContradictionLessAction(ContradictionEditorFrame contradictionEditorFrame) {
+            super("Run Contradiction Finder - Less");
+
+            this.frame = contradictionEditorFrame;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            // START SEARCH
+            if(frame.getActiveFrameConfig().getEditingPathSet().isEmpty()){
+                JOptionPane.showMessageDialog(new JFrame(),
+                                                "Please set adjudication path before continuing.",
+                                                "No adjudication path set.", JOptionPane.ERROR_MESSAGE);
+            }else{
+                ContradictionFinderLessSwingWorker worker =
+                    new ContradictionFinderLessSwingWorker(frame, viewCoord);
+                worker.execute();
+            }
         }
     }
 
@@ -253,7 +296,9 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
     @Override
     public void addAppMenus(JMenuBar mainMenuBar) throws Exception {
         mainMenuBar.add(adjudicatorMenu = new JMenu("Adjudicator"));
-        adjudicatorMenu.add(new FindContradictionAction(this));
+//        adjudicatorMenu.add(new FindContradictionAction(this));
+        adjudicatorMenu.add(new FindContradictionMoreAction(this));
+        adjudicatorMenu.add(new FindContradictionLessAction(this));
     }
 
     /**
