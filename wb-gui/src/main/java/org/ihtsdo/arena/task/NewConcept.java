@@ -637,7 +637,7 @@ public class NewConcept extends PreviousNextOrCancel {
                 prefText = fsnText;
                 pref.setText(prefText);
             } else {
-                prefText = fsnText.substring(0, paren);
+                prefText = fsnText.substring(0, paren).trim();
                 pref.setText(prefText);
             }
 
@@ -657,7 +657,7 @@ public class NewConcept extends PreviousNextOrCancel {
                 prefText = fsnText;
                 pref.setText(prefText);
             } else {
-                prefText = fsnText.substring(0, paren);
+                prefText = fsnText.substring(0, paren).trim();
                 pref.setText(prefText);
             }
 
@@ -677,7 +677,7 @@ public class NewConcept extends PreviousNextOrCancel {
                 prefText = fsnText;
                 pref.setText(prefText);
             } else {
-                prefText = fsnText.substring(0, paren);
+                prefText = fsnText.substring(0, paren).trim();
                 pref.setText(prefText);
             }
 
