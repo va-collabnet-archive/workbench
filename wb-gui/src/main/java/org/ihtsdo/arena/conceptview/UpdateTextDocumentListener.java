@@ -204,25 +204,6 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                 acceptNid = SnomedMetadataRfx.getDESC_ACCEPTABLE_NID();
                 prefNid = SnomedMetadataRfx.getDESC_PREFERRED_NID();
 
-                //set initial word case sensitivity
-                String descText = text;
-                String initialWord = null;
-                if (descText.indexOf(" ") != -1) {
-                    initialWord = descText.substring(0, descText.indexOf(" "));
-                } else {
-                    initialWord = descText;
-                }
-                if (CsWordsHelper.isIcTypeSignificant(initialWord, CaseSensitive.IC_SIGNIFICANT.getLenient().getNid()) == true
-                        && desc.isInitialCaseSignificant() == false) {
-                    desc.setInitialCaseSignificant(true);
-                } else if (CsWordsHelper.isIcTypeSignificant(initialWord, CaseSensitive.IC_SIGNIFICANT.getLenient().getNid()) == false
-                        && desc.isInitialCaseSignificant() == true) {
-                    desc.setInitialCaseSignificant(false);
-                } else if (CsWordsHelper.isIcTypeSignificant(initialWord, CaseSensitive.MAYBE_IC_SIGNIFICANT.getLenient().getNid()) == true
-                        && desc.isInitialCaseSignificant() == false) {
-                    desc.setInitialCaseSignificant(false);
-                }
-
                 if (refexes.isEmpty()) { //check for previous changes
                     if (type == fsn) {
                         doFsnUpdate();
