@@ -88,7 +88,9 @@ public class UpdateWorkflowHistoryOnCommit extends AbstractConceptTest
 		        	WorkflowHistoryJavaBean latestBean = WorkflowHelper.getLatestWfHxJavaBeanForConcept(concept);
 		    		
 		        	if (!WorkflowHelper.isAdvancingWorkflowLock() && 
-		        		(latestBean == null || !WorkflowHelper.isBeginWorkflowAction(Terms.get().getConcept(latestBean.getAction()).getVersion(vc)))) {
+		        		(latestBean == null || 
+		        		!WorkflowHelper.isBeginWorkflowAction(Terms.get().getConcept(latestBean.getAction()).getVersion(vc)) ||
+		        		Terms.get().getActiveAceFrameConfig().isAutoApproveOn())) {
 		        		WorkflowHelper.setAdvancingWorkflowLock(true);
 		        		WorkflowHelper.initializeWorkflowForConcept(concept);
 		        		WorkflowHelper.setAdvancingWorkflowLock(false);
