@@ -404,7 +404,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                 host.setTermComponent(newTerm);
                 Ts.get().addUncommitted(newConcept);
             } catch (Exception ex) {
-                ex.printStackTrace();
+                AceLog.getAppLog().alertAndLogException(ex);
                 returnCondition = Condition.ITEM_CANCELED;
             } finally {
                 latch.countDown();
@@ -600,9 +600,9 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                 initialUpdate();
                 GuiUtil.tickle(wizardPanel);
             } catch (InterruptedException ex) {
-                Logger.getLogger(NewConceptFromBatch.class.getName()).log(Level.SEVERE, null, ex);
+                AceLog.getAppLog().alertAndLogException(ex);
             } catch (ExecutionException ex) {
-                Logger.getLogger(NewConceptFromBatch.class.getName()).log(Level.SEVERE, null, ex);
+                AceLog.getAppLog().alertAndLogException(ex);
             }
         }
     }
@@ -648,7 +648,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
             prefText = fsnText;
             pref.setText(prefText);
         } else {
-            prefText = fsnText.substring(0, paren - 1);
+            prefText = fsnText.substring(0, paren).trim();
             pref.setText(prefText);
         }
 
@@ -675,7 +675,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                 prefText = fsnText;
                 pref.setText(prefText);
             } else {
-                prefText = fsnText.substring(0, paren - 1);
+                prefText = fsnText.substring(0, paren).trim();
                 pref.setText(prefText);
             }
 
@@ -695,7 +695,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                 prefText = fsnText;
                 pref.setText(prefText);
             } else {
-                prefText = fsnText.substring(0, paren - 1);
+                prefText = fsnText.substring(0, paren).trim();
                 pref.setText(prefText);
             }
 
@@ -716,7 +716,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                     prefText = fsnText;
                     pref.setText(prefText);
                 } else {
-                    prefText = fsnText.substring(0, paren - 1);
+                    prefText = fsnText.substring(0, paren).trim();
                     pref.setText(prefText);
                 }
 
@@ -889,9 +889,9 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                 addGbDescFsn = false;
             }
         } catch (UnsupportedDialectOrLanguage ex) {
-            Logger.getLogger(NewConceptFromBatch.class.getName()).log(Level.SEVERE, null, ex);
+            AceLog.getAppLog().alertAndLogException(ex);
         } catch (IOException ex) {
-            Logger.getLogger(NewConceptFromBatch.class.getName()).log(Level.SEVERE, null, ex);
+            AceLog.getAppLog().alertAndLogException(ex);
         }
 
     }
@@ -1159,15 +1159,23 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                 try {
                     Set<I_GetConceptData> concepts;
                     concepts = Terms.get().getConcept(parentId);
-                    for (I_GetConceptData concept : concepts) {
-                        parentUuid = concept.getPrimUuid();
+                    
+                    if(concepts.isEmpty()){
+                        JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                            "<html>The parent concpet has not been created."
+                            + "<br>Fsn: " + parentFsn, "",
+                            JOptionPane.ERROR_MESSAGE);
+                    }else{
+                        for (I_GetConceptData concept : concepts) {
+                            parentUuid = concept.getPrimUuid();
+                        }
+                        parentConcept = Ts.get().getComponent(parentUuid);
+                        parent = new ConceptSpec(parentFsn, parentUuid);
+                        parent.getLenient();
+                        returnCondition = Condition.CONTINUE;
+                        done = true;
+                        NewConceptFromBatch.this.notifyTaskDone();
                     }
-                    parentConcept = Ts.get().getComponent(parentUuid);
-                    parent = new ConceptSpec(parentFsn, parentUuid);
-                    parent.getLenient();
-                    returnCondition = Condition.CONTINUE;
-                    done = true;
-                    NewConceptFromBatch.this.notifyTaskDone();
                 } catch (ValidationException ex) {
                     int option = JOptionPane.showConfirmDialog(LogWithAlerts.getActiveFrame(null),
                                 "<html>The parent fsn and ID do not match."
