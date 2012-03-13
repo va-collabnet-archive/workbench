@@ -1193,10 +1193,12 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         
         RefexChronicleBI<?> member = getRefsetMemberForComponent(componentNid);
         
-        for (RefexVersionBI version : member.getVersions(vc)) {
+        if(member != null){
+            for (RefexVersionBI version : member.getVersions(vc)) {
             return version;
         }
         
+        }
         return null;
     }
     
