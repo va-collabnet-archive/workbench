@@ -9,6 +9,7 @@ import org.dwfa.ace.log.AceLog;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,6 +19,7 @@ import javax.swing.SwingWorker;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.list.TerminologyList;
 import org.dwfa.ace.list.TerminologyListModel;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.ihtsdo.arena.contradiction.ContradictionEditorFrame;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
@@ -63,9 +65,9 @@ public class CommitActionListener implements ActionListener {
              ViewCoordinate vc = config.getViewCoordinate();
              EditCoordinate ec = config.getEditCoordinate();
                 TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(ec, vc);
-             int conflictRefsetNid = Ts.get().getNidForUuids(UUID.fromString("767e3525-ebd4-43f9-9640-952e31589e47"));
+             int conflictRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.CONFLICT_RECORD.getPrimoridalUid());
              ConceptChronicleBI conflictRefset = Ts.get().getConceptForNid(conflictRefsetNid);
-             RefexVersionBI member = conflictRefset.getCurrentRefsetMemberForComponent(vc, c.getNid());
+             RefexVersionBI member = conflictRefset.getCurrentRefsetMemberForComponent(vc, c.getConceptNid());
              RefexCAB memberBp = member.makeBlueprint(vc);
              memberBp.setRetired();
              builder.construct(memberBp);
