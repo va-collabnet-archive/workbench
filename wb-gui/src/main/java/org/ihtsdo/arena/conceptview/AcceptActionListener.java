@@ -22,6 +22,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.list.TerminologyList;
 import org.dwfa.ace.list.TerminologyListModel;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.arena.contradiction.ContradictionEditorFrame;
 import org.ihtsdo.tk.Ts;
@@ -121,7 +122,7 @@ public class AcceptActionListener implements ActionListener {
                         ViewCoordinate vc = config.getViewCoordinate();
                         EditCoordinate ec = config.getEditCoordinate();
                         TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(ec, vc);
-                        int conflictRefsetNid = Ts.get().getNidForUuids(UUID.fromString("767e3525-ebd4-43f9-9640-952e31589e47"));
+                        int conflictRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.CONFLICT_RECORD.getPrimoridalUid());
                         ConceptChronicleBI conflictRefset = Ts.get().getConceptForNid(conflictRefsetNid);
                         RefexVersionBI member = conflictRefset.getCurrentRefsetMemberForComponent(vc, c.getNid());
                         RefexCAB memberBp = member.makeBlueprint(vc);
@@ -143,6 +144,8 @@ public class AcceptActionListener implements ActionListener {
                         }
                     }
                 } 
+            } catch (TerminologyException ex) {
+                Logger.getLogger(AcceptActionListener.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
                 Logger.getLogger(AcceptActionListener.class.getName()).log(Level.SEVERE, null, ex);
             } catch (InvalidCAB ex) {

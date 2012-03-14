@@ -40,6 +40,7 @@ import org.dwfa.ace.list.TerminologyListModel;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.util.ComponentFrame;
 import org.dwfa.bpa.util.OpenFramesWindowListener;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.arena.Arena;
 import org.ihtsdo.tk.Ts;
@@ -68,33 +69,6 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
     private Arena arena;
     private JSplitPane resultsPane = new JSplitPane();
     private JProgressBar progressBar;
-
-    /* FindContradictionAction */
-//    private class FindContradictionAction extends AbstractAction {
-//
-//        private static final long serialVersionUID = 1L;
-//        private ContradictionEditorFrame frame;
-//
-//        public FindContradictionAction(ContradictionEditorFrame contradictionEditorFrame) {
-//            super("Run Contradiction Finder");
-//
-//            this.frame = contradictionEditorFrame;
-//        }
-//
-//        @Override
-//        public void actionPerformed(ActionEvent ae) {
-//            // START SEARCH
-//            if(frame.getActiveFrameConfig().getEditingPathSet().isEmpty()){
-//                JOptionPane.showMessageDialog(new JFrame(),
-//                                                "Please set adjudication path before continuing.",
-//                                                "No adjudication path set.", JOptionPane.ERROR_MESSAGE);
-//            }else{
-//                ContradictionFinderSwingWorker worker =
-//                    new ContradictionFinderSwingWorker(frame, viewCoord);
-//                worker.execute();
-//            }
-//        }
-//    }
     
     private class FindContradictionMoreAction extends AbstractAction {
 
@@ -169,11 +143,13 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
         // Setup Left Side
         if (batchConceptList == null) {
 	        TerminologyListModel batchListModel = new TerminologyListModel();
-                int conflictRefsetNid = Ts.get().getNidForUuids(UUID.fromString("767e3525-ebd4-43f9-9640-952e31589e47"));
+                int conflictRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.CONFLICT_RECORD.getPrimoridalUid());
                 ConceptChronicleBI conflictRefset = Ts.get().getConceptForNid(conflictRefsetNid);
                 for(RefexVersionBI member : conflictRefset.getCurrentRefsetMembers(viewCoord)){
-                    batchListModel.addElement((I_GetConceptData)
+                    if(member.getCollectionNid() == conflictRefsetNid){
+                        batchListModel.addElement((I_GetConceptData)
                             Ts.get().getConceptForNid(member.getReferencedComponentNid()));
+                    }
                 }
 	        batchConceptList = new TerminologyList(batchListModel, true, true, newFrameConfig);
         }

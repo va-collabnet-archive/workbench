@@ -57,6 +57,7 @@ public class ContradictionFinderSwingWorker
     private ContradictionConceptProcessor ccp;
     private Locale locale;
     private double numberConceptsToProcess;
+    private int conflictRefsetNid;
     
     /* ContradictionUpdator */
     private class ContradictionUpdator implements ActionListener {
@@ -261,7 +262,7 @@ public class ContradictionFinderSwingWorker
 
         // Done, get results
         Set<Integer> returnSet = new HashSet<Integer>();   
-        int conflictRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.CONFLICT_RECORD.getUids());
+        conflictRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.CONFLICT_RECORD.getUids());
         ConceptChronicleBI conflictRefset = Ts.get().getConceptForNid(conflictRefsetNid);
         TerminologyBuilderBI builder = 
                     Ts.get().getTerminologyBuilder(frame.getActiveFrameConfig().getEditCoordinate(), viewCoord);
@@ -274,8 +275,10 @@ public class ContradictionFinderSwingWorker
         }
         NidBitSetBI contradictionCaseNidSet = Ts.get().getEmptyNidSet();
         for(MultiEditorContradictionCase contradictionCase : cases){
-            returnSet.add(contradictionCase.getConceptNid());
-            contradictionCaseNidSet.setMember(contradictionCase.getConceptNid());
+            if(contradictionCase.getConceptNid() != conflictRefsetNid){
+                returnSet.add(contradictionCase.getConceptNid());
+                contradictionCaseNidSet.setMember(contradictionCase.getConceptNid());
+            }
         }
         NidBitSetBI currentMemberHolderSet = Ts.get().getEmptyNidSet();
         currentMemberHolderSet.or(currentMemberNidSet);
