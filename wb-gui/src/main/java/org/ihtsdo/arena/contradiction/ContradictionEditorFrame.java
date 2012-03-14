@@ -102,7 +102,7 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
         private ContradictionEditorFrame frame;
 
         public FindContradictionMoreAction(ContradictionEditorFrame contradictionEditorFrame) {
-            super("Run Contradiction Finder - More");
+            super("Debug Contradiction Finder");
 
             this.frame = contradictionEditorFrame;
         }
@@ -115,8 +115,8 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
                                                 "Please set adjudication path before continuing.",
                                                 "No adjudication path set.", JOptionPane.ERROR_MESSAGE);
             }else{
-                ContradictionFinderMoreSwingWorker worker =
-                    new ContradictionFinderMoreSwingWorker(frame, viewCoord);
+                ContradictionFinderDebugSwingWorker worker =
+                    new ContradictionFinderDebugSwingWorker(frame, viewCoord);
                  worker.execute();
             }
         }
@@ -128,7 +128,7 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
         private ContradictionEditorFrame frame;
 
         public FindContradictionLessAction(ContradictionEditorFrame contradictionEditorFrame) {
-            super("Run Contradiction Finder - Less");
+            super("Run Contradiction Finder");
 
             this.frame = contradictionEditorFrame;
         }
@@ -141,8 +141,8 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
                                                 "Please set adjudication path before continuing.",
                                                 "No adjudication path set.", JOptionPane.ERROR_MESSAGE);
             }else{
-                ContradictionFinderLessSwingWorker worker =
-                    new ContradictionFinderLessSwingWorker(frame, viewCoord);
+                ContradictionFinderSwingWorker worker =
+                    new ContradictionFinderSwingWorker(frame, viewCoord);
                 worker.execute();
             }
         }

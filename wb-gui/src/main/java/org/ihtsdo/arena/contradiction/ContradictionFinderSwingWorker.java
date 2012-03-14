@@ -255,7 +255,8 @@ public class ContradictionFinderSwingWorker
         mecd = new MultiEditorContradictionDetector(commitRecRefsetNid,
                 adjRecRefsetNid,
                 viewCoord,
-                cases, null);
+                cases, null,
+                true, true);
         Ts.get().iterateConceptDataInParallel(mecd);
 
         // Done, get results

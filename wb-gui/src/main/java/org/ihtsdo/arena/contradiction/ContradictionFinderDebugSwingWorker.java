@@ -43,7 +43,7 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
  *
  * @author kec
  */
-public class ContradictionFinderMoreSwingWorker
+public class ContradictionFinderDebugSwingWorker
         extends SwingWorker<Set<Integer>, Integer> {
 
     private TerminologyListModel conflicts;
@@ -212,7 +212,7 @@ public class ContradictionFinderMoreSwingWorker
     /*
      * ContradictionFinderSwingWorker Class Methods
      */
-    public ContradictionFinderMoreSwingWorker(ContradictionEditorFrame editorFrame, ViewCoordinate vc) {
+    public ContradictionFinderDebugSwingWorker(ContradictionEditorFrame editorFrame, ViewCoordinate vc) {
         this.frame = editorFrame;
         this.conflicts = (TerminologyListModel) frame.getBatchConceptList().getModel();
         this.viewCoord = vc;
