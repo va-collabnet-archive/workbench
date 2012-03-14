@@ -139,12 +139,15 @@ public class BdbCommitManager {
         ChangeNotifier.touch(concept);
         dataCheckMap.remove(concept);
         GlobalPropertyChange.firePropertyChange(TerminologyStoreDI.CONCEPT_EVENT.ADD_UNCOMMITTED, null, concept);
-
+        
         if (concept.isUncommitted() == false) {
             if (Bdb.watchList.containsKey(concept.getNid())) {
                 AceLog.getAppLog().info("--- Removing uncommitted concept: " + concept.getNid() + " --- ");
             }
-
+            
+            ConceptTemplates.dataChecks.put(concept.getNid(), false);
+            Ts.get().touchComponentAlert(concept.getNid());
+            
             removeUncommitted(concept);
 
             try {
