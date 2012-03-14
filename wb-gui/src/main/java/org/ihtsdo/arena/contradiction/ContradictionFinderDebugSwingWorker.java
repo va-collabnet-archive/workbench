@@ -274,8 +274,10 @@ public class ContradictionFinderDebugSwingWorker
         }
         NidBitSetBI contradictionCaseNidSet = Ts.get().getEmptyNidSet();
         for(MultiEditorContradictionCase contradictionCase : cases){
-            returnSet.add(contradictionCase.getConceptNid());
-            contradictionCaseNidSet.setMember(contradictionCase.getConceptNid());
+            if(contradictionCase.getConceptNid() != conflictRefsetNid){
+                returnSet.add(contradictionCase.getConceptNid());
+                contradictionCaseNidSet.setMember(contradictionCase.getConceptNid());
+            }
         }
         NidBitSetBI currentMemberHolderSet = Ts.get().getEmptyNidSet();
         currentMemberHolderSet.or(currentMemberNidSet);
