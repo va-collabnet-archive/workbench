@@ -61,7 +61,6 @@ public class UpdateWorkflowHistoryOnCommit extends AbstractConceptTest
 
     private static final long serialVersionUID = 1;
     private static final int DATA_VERSION = 1;
-	private static boolean avoidSecondCommit = false;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(DATA_VERSION);
@@ -79,32 +78,26 @@ public class UpdateWorkflowHistoryOnCommit extends AbstractConceptTest
     {
     	try 
         {
-    		if (avoidSecondCommit) {
-    	        avoidSecondCommit = false;
-    		} else {
-	    		if (WorkflowHelper.isWorkflowCapabilityAvailable()) {
-		        	ViewCoordinate vc = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
-		
-		        	WorkflowHistoryJavaBean latestBean = WorkflowHelper.getLatestWfHxJavaBeanForConcept(concept);
-		    		
-		        	if (!WorkflowHelper.isAdvancingWorkflowLock() && 
-		        		(latestBean == null || 
-		        		!WorkflowHelper.isBeginWorkflowAction(Terms.get().getConcept(latestBean.getAction()).getVersion(vc)) ||
-		        		Terms.get().getActiveAceFrameConfig().isAutoApproveOn())) {
-		        		WorkflowHelper.setAdvancingWorkflowLock(true);
-		        		WorkflowHelper.initializeWorkflowForConcept(concept);
-		        		WorkflowHelper.setAdvancingWorkflowLock(false);
-		    		}
+    		if (WorkflowHelper.isWorkflowCapabilityAvailable()) {
+	        	ViewCoordinate vc = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
+	
+	        	WorkflowHistoryJavaBean latestBean = WorkflowHelper.getLatestWfHxJavaBeanForConcept(concept);
+	    		
+	        	if (!WorkflowHelper.isAdvancingWorkflowLock() && 
+	        		(latestBean == null || 
+	        		!WorkflowHelper.isBeginWorkflowAction(Terms.get().getConcept(latestBean.getAction()).getVersion(vc)) ||
+	        		Terms.get().getActiveAceFrameConfig().isAutoApproveOn())) {
+	        		WorkflowHelper.setAdvancingWorkflowLock(true);
+	        		WorkflowHelper.initializeWorkflowForConcept(concept);
+	        		WorkflowHelper.setAdvancingWorkflowLock(false);
 	    		}
-	        
-		        avoidSecondCommit = true;
-	        }
+    		}
         } catch (Exception e) {
     		WorkflowHelper.setAdvancingWorkflowLock(false);
             throw new TaskFailedException(e);
         }
 
-        // return empty alerts;
+        // return empty alerts; 
         return new ArrayList<AlertToDataConstraintFailure>();
     }
 }
