@@ -68,6 +68,8 @@ import org.ihtsdo.tk.hash.Hashcode;
 import java.beans.PropertyVetoException;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -85,6 +87,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.db.change.ChangeNotifier;
 
 public abstract class ConceptComponent<R extends Revision<R, C>, C extends ConceptComponent<R, C>>
@@ -1014,6 +1017,13 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                 ConceptComponent.addNidToBuffer(buf, getAuthorNid());
                 buf.append(" path:");
                 ConceptComponent.addNidToBuffer(buf, getPathNid());
+                UUID authorUuid = Ts.get().getConceptForNid(getAuthorNid()).getPrimUuid();
+                String stringToHash = authorUuid.toString()
+                                + Long.toString(getTime());
+                UUID type5Uuid = Type5UuidFactory.get(Type5UuidFactory.AUTHOR_TIME_ID,
+                                stringToHash);
+                buf.append(" authTime: ");
+                buf.append(type5Uuid);
                 buf.append(" tm: ");
                 buf.append(TimeHelper.formatDate(getTime()));
                 buf.append(" ");
@@ -2387,7 +2397,22 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public String toString() {
-            return "Version: " + cv.toString();
+            StringBuffer buf = new StringBuffer();
+            try {
+                buf.append("Version: ");
+                buf.append(cv.toString());
+                UUID authorUuid = Ts.get().getConceptForNid(getAuthorNid()).getPrimUuid();
+                String stringToHash = authorUuid.toString()
+                                    + Long.toString(getTime());
+                UUID type5Uuid = Type5UuidFactory.get(Type5UuidFactory.AUTHOR_TIME_ID,
+                                    stringToHash);
+                buf.append(" authTime: ");
+                buf.append(type5Uuid);
+            } catch (Throwable e) {
+                buf.append(" !!! Error computing author time hash !!! ");
+                buf.append(e.getLocalizedMessage());
+            }   
+            return buf.toString();
         }
 
         @Override
