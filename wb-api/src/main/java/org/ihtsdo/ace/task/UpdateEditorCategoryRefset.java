@@ -121,10 +121,16 @@ public class UpdateEditorCategoryRefset extends AbstractTask {
                 ConceptVersionBI newCategory = WorkflowHelper.lookupEditorCategory(columns[2], vc);
                 ConceptVersionBI oldCategory = identifyExistingEditorCategory(columns, vc);
                 boolean addingRequired = true;
+                boolean addAll = false;
                 
                 if (oldCategory != null) {
                 	if (!oldCategory.equals(newCategory)) {
 		                writer.retireEditorCategory(modelers.get(columns[0]), columns[1], oldCategory);
+		                if (columns[1].startsWith("SNOMED CT Concept")) {
+		                	// Retire duplicate for SnomedCT/All
+			                writer.retireEditorCategory(modelers.get(columns[0]), "all", oldCategory);
+			                addAll = true;
+		                }
 	                } else {
 	                	addingRequired = false;
 	                }
@@ -133,12 +139,18 @@ public class UpdateEditorCategoryRefset extends AbstractTask {
                 if (addingRequired) {
 	                writer.setEditor(modelers.get(columns[0]));
 	                writer.setSemanticArea(columns[1]);
+	                writer.setCategory(newCategory);
+	                writer.addMember(true);
 	                
+	                if (addAll) {
+	                	// Add duplicate for SnomedCT/All
+		                writer.setEditor(modelers.get(columns[0]));
+		                writer.setSemanticArea("all");
 		                writer.setCategory(newCategory);
 		                writer.addMember(true);
 	                }
 	            }
-
+            }
         } catch (Exception e) {
             AceLog.getAppLog().log(Level.WARNING, line, e);
         }
