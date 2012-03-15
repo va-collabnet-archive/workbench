@@ -39,6 +39,7 @@ import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refset.array.bytearray.TkRefsetArrayByteArrayRevision;
 import org.ihtsdo.tk.dto.concept.component.refset.array.bytearray.TkRefsetArrayOfBytearrayMember;
 import org.ihtsdo.tk.hash.Hashcode;
+import org.ihtsdo.tk.uuid.UuidT5Generator;
 
 /**
  *
@@ -195,7 +196,12 @@ public class ArrayOfBytearrayMember extends RefsetMember<ArrayOfBytearrayRevisio
       for (int i = 0; i < this.arrayOfByteArray.length; i++) {
         buff.append(" ").append(i);
         buff.append(": ");
-        buff.append(this.arrayOfByteArray[i]);
+        if(this.arrayOfByteArray[i].length == 16){
+            buff.append(UuidT5Generator.getUuidFromRawBytes(this.arrayOfByteArray[i]));
+        }else{
+            buff.append(this.arrayOfByteArray[i]);
+        }
+        
       }
       buff.append(" ");
       buff.append(super.toString());
