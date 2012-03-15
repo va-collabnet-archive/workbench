@@ -133,13 +133,12 @@ public class UpdateEditorCategoryRefset extends AbstractTask {
                 if (addingRequired) {
 	                writer.setEditor(modelers.get(columns[0]));
 	                writer.setSemanticArea(columns[1]);
-
-	                writer.setCategory(newCategory);
-	                writer.addMember(true);
+	                
+		                writer.setCategory(newCategory);
+		                writer.addMember(true);
+	                }
 	            }
-            }
 
-            Terms.get().commit();
         } catch (Exception e) {
             AceLog.getAppLog().log(Level.WARNING, line, e);
         }
