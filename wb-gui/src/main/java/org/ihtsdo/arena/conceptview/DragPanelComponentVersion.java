@@ -473,6 +473,10 @@ public abstract class DragPanelComponentVersion<T extends ComponentVersionBI> ex
    public List<? extends JComponent> getRefexSubpanels() {
       return refexSubPanels;
    }
+   
+   public List<DragPanelComponentVersion<?>> getExtSubpanels() {
+      return refexSubPanels;
+   }  
 
    public int getSubpanelCount() {
       return getAlertSubpanelCount() + getRefexSubpanelCount() + getTemplateSubpanelCount()

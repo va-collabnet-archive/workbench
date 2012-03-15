@@ -79,7 +79,11 @@ import javax.swing.SwingWorker;
 import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.swing.SwingTask;
+import org.ihtsdo.helper.bdb.MultiEditorContradictionCase;
+import org.ihtsdo.helper.bdb.MultiEditorContradictionDetector;
+import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
 
 /**
@@ -137,6 +141,8 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
     private Collection<RelGroupVersionBI> statedRelGroups;
     private List<? extends I_RelTuple> statedRels;
     private JPanel conceptPanel;
+    private HashSet<Integer> sapsForConflict;
+    private HashSet<Integer> nidsForConflict;
 
     //~--- constructors --------------------------------------------------------
     public ConceptViewLayout(ConceptView conceptView, I_GetConceptData layoutConcept) throws IOException {
@@ -295,7 +301,27 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             if (stop) {
                 return null;
             }
-
+            
+            //find contradictions
+            NidBitSetBI nidSet = Ts.get().getEmptyNidSet();
+            nidSet.setMember(layoutConcept.getConceptNid());
+            int commitRecRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.COMMIT_RECORD.getUids());
+            int adjRecRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.ADJUDICATION_RECORD.getUids());
+            List<MultiEditorContradictionCase> cases = new ArrayList<MultiEditorContradictionCase>();
+            HashSet<Integer> componentNidsConflict = new HashSet<Integer>();
+            MultiEditorContradictionDetector mecd;
+            mecd = new MultiEditorContradictionDetector(commitRecRefsetNid,
+                adjRecRefsetNid,
+                config.getViewCoordinate(),
+                cases, null,
+                nidSet,
+                true, true);
+            Ts.get().iterateConceptDataInParallel(mecd);
+            for(MultiEditorContradictionCase contCase : cases){
+                sapsForConflict = contCase.getSapNids();
+                nidsForConflict = contCase.getComponentNids();
+            }
+            
             activeStatedRelPanels = new ArrayList<DragPanelRel>(statedRels.size());
             setupRels(latch, statedRels, activeStatedRelPanels, cpr, false);
 
@@ -520,10 +546,6 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                         if (cv.getChronicle().getConAttrs() != null) {
                             cav = (ConAttrAnalogBI) cv.getChronicle().getConAttrs().getPrimordialVersion();
                             cac = getConAttrComponent((ConAttrAnalogBI) cav, cpe);
-                            List<Integer> sapsForConflict = new ArrayList<Integer>();
-                            for (ConAttrVersionBI v: cv.getChronicle().getConAttrs().getVersions()) {
-                                sapsForConflict.add(v.getSapNid());
-                            }
                             cac.showConflicts(sapsForConflict);
                             
                             seperatorComponents.add(cac);
@@ -577,7 +599,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
 
                                 for (I_ExtendByRefPart cr : currentRefsets) {
                                     DragPanelExtension ce = new DragPanelExtension(this, cpe, extn);
-
+                                    setShowConflicts(ce.getComponentVersion(), ce);
                                     seperatorComponents.add(ce);
                                     cpe.addToggleComponent(ce);
                                     conceptPanel.add(ce, gbc);
@@ -1446,12 +1468,18 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
 
     //~--- set methods ---------------------------------------------------------
     private void setShowConflicts(ComponentVersionBI cv, DragPanelComponentVersion cvp) {
-        if ((cv == null) || (cvp == null) || (componentCountForConflict.get(cv.getNid()) == null)) {
+        if(nidsForConflict == null || sapsForConflict == null){
             return;
         }
-
-        if (componentCountForConflict.get(cv.getNid()).size() > 1) {
-            cvp.showConflicts(componentCountForConflict.get(cv.getNid()));
+        List<DragPanelExtension> refexSubpanels = cvp.getRefexSubpanels();
+        for(DragPanelExtension rp : refexSubpanels){
+            RefexVersionBI<?> annot = rp.getThingToDrag();
+            if(sapsForConflict.contains(annot.getSapNid())){
+                                rp.showConflicts(sapsForConflict);
+            }
+        }
+        if(sapsForConflict.contains(cv.getSapNid())){
+                                cvp.showConflicts(sapsForConflict);
         }
     }
 
