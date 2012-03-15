@@ -29,6 +29,8 @@ import org.ihtsdo.tk.api.TerminologyStoreDI;
 public class MultiEditorContradictionCase {
 
     private int conceptNid; // concept with contradiction
+    private HashSet<Integer> componentNids; //components with contradicion
+    private HashSet<Integer> sapNids; //sap nids with contradicion
     private ArrayList<String> cases; // reported cases
     // DETAILS
     private HashMap<UUID, String> authTimeMapComputed; // computed from getAllSapNids()
@@ -36,13 +38,25 @@ public class MultiEditorContradictionCase {
     private ArrayList<HashSet<UUID>> authTimeSetsList; // editor authTimeHash sets
     private ArrayList<HashSet<UUID>> authTimeSetsTruthList; // adjudication authTimeHash sets
 
-    public MultiEditorContradictionCase(int cNid, ArrayList<String> cases) {
+    public MultiEditorContradictionCase(int cNid, ArrayList<String> cases,
+            HashSet<Integer> componentNids,
+            HashSet<Integer> sapNids) {
         this.conceptNid = cNid;
         this.cases = cases;
+        this.componentNids = componentNids;
+        this.sapNids = sapNids;
     }
 
     public int getConceptNid() {
         return conceptNid;
+    }
+    
+    public HashSet<Integer> getComponentNids() {
+        return componentNids;
+    }
+    
+    public HashSet<Integer> getSapNids() {
+        return sapNids;
     }
 
     public HashMap<UUID, String> getAuthTimeMapComputed() {

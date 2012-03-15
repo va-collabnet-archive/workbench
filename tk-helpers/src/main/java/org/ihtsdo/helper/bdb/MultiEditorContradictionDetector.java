@@ -43,6 +43,8 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
     private final int maxSap; // does not compute AuthorTimeHash from readonly database.
     private boolean ignoreNonVisibleAth; // ignore SAP not computeable from concept
     private NidBitSetBI nidSet;
+    private HashMap<UUID, Integer> sapNidTimeAuthMap = new HashMap<UUID, Integer>();
+    private HashSet<Integer> conlfictSaps = new HashSet<Integer>();
     List<MultiEditorContradictionCase> contradictionCaseList;
     HashSet<Integer> watchSet;
     List<MultiEditorContradictionCase> watchCaseList;
@@ -80,6 +82,34 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         this.adjudicateRecRefsetNid = adjudicationRecRefsetNid;
         this.vc = vc;
         this.nidSet = Ts.get().getAllConceptNids();
+        this.contradictionCaseList = cl;
+        this.watchSet = ws;
+        this.watchCaseList = null;
+        if (ws != null) {
+            this.watchCaseList = new ArrayList<MultiEditorContradictionCase>();
+        }
+        this.ignoreNonVisibleAth = ignoreNonVisibleAth;
+        if (ignoreReadOnlySap) {
+            this.maxSap = Ts.get().getReadOnlyMaxSap(); //
+        } else {
+            this.maxSap = Integer.MIN_VALUE;
+        }
+
+    }
+    
+    public MultiEditorContradictionDetector(int commitRecRefsetNid,
+            int adjudicationRecRefsetNid,
+            ViewCoordinate vc,
+            List<MultiEditorContradictionCase> cl,
+            HashSet<Integer> ws,
+            NidBitSetBI nidSet,
+            boolean ignoreReadOnlySap,
+            boolean ignoreNonVisibleAth)
+            throws IOException {
+        this.commitRecRefsetNid = commitRecRefsetNid;
+        this.adjudicateRecRefsetNid = adjudicationRecRefsetNid;
+        this.vc = vc;
+        this.nidSet = nidSet;
         this.contradictionCaseList = cl;
         this.watchSet = ws;
         this.watchCaseList = null;
@@ -193,10 +223,12 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
                 }
             }
             Collections.sort(caseList, String.CASE_INSENSITIVE_ORDER);
-
+            HashSet<Integer> componentNids = getComponentNidsInConflict(accumDiffSet, cNid);
+            
             // ADD TO CASE LIST
             MultiEditorContradictionCase caseToAdd;
-            caseToAdd = new MultiEditorContradictionCase(cNid, caseList);
+            caseToAdd = new MultiEditorContradictionCase(cNid, caseList,
+                    componentNids, conlfictSaps);
             caseToAdd.setAuthTimeMapComputed(conceptComputedAthMap);
             caseToAdd.setAuthTimeMapMissing(conceptMissingAthMap);
             caseToAdd.setAuthTimeSetsList(commitRefsetAthSetsList);
@@ -266,6 +298,7 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
                 // STORE <Key = UUID, Value= data string>
                 String valueStr = toStringAuthorTime(time, authorConcept, type5Uuid);
                 conceptComputedAthMap.put(type5Uuid, valueStr);
+                sapNidTimeAuthMap.put(type5Uuid, sap);
             }
         }
         return conceptComputedAthMap;
@@ -295,6 +328,16 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         }
 
         return conceptMissingAthMap;
+    }
+    
+    private HashSet<Integer> getComponentNidsInConflict(HashSet<UUID> accumDiffSet, int cNid) throws IOException{
+        HashSet<Integer> componentNids = new HashSet<Integer>();
+        for(UUID uuid : accumDiffSet){
+            conlfictSaps.add(sapNidTimeAuthMap.get(uuid));
+        }
+        ConceptChronicleBI concept = Ts.get().getConcept(cNid);
+        componentNids.addAll(concept.getAllNidsForSaps(conlfictSaps));
+        return componentNids;
     }
 
     private HashSet<UUID> lesserDiffFromGreater(HashSet<UUID> lesser, HashSet<UUID> greater,
