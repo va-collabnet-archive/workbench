@@ -200,7 +200,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                 } else {
                     addRevision((R) v.getRevision(), false);
                 }
-                
+
             }
         }
 
@@ -394,7 +394,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     public final boolean addRevision(R r) {
         return addRevision(r, true);
     }
-    
+
     @SuppressWarnings("unchecked")
     public final boolean addRevision(R r, boolean notify) {
         assert r != null;
@@ -421,9 +421,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
         return returnValue;
     }
-    
+
     protected void addRevisionHook(boolean returnValue, R r) {
-        
     }
 
     public final boolean addRevisionNoRedundancyCheck(R r) {
@@ -1019,9 +1018,9 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                 ConceptComponent.addNidToBuffer(buf, getPathNid());
                 UUID authorUuid = Ts.get().getConceptForNid(getAuthorNid()).getPrimUuid();
                 String stringToHash = authorUuid.toString()
-                                + Long.toString(getTime());
+                        + Long.toString(getTime());
                 UUID type5Uuid = Type5UuidFactory.get(Type5UuidFactory.AUTHOR_TIME_ID,
-                                stringToHash);
+                        stringToHash);
                 buf.append(" authTime: ");
                 buf.append(type5Uuid);
                 buf.append(" tm: ");
@@ -1238,7 +1237,10 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         if (annotations != null) {
             for (RefexChronicleBI<?> annotation : annotations) {
                 for (RefexVersionBI<?> av : annotation.getVersions()) {
-                    sapNids.add(av.getSapNid());
+                    int sapNid = av.getSapNid();
+                    if (sapNid > 0) {
+                        sapNids.add(sapNid);
+                    }
                 }
             }
         }
@@ -1441,7 +1443,10 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         if (additionalIdVersions != null) {
             for (IdentifierVersion id : additionalIdVersions) {
-                sapNids.add(id.getSapNid());
+                int sapNid = id.getSapNid();
+                if (sapNid > 0) {
+                    sapNids.add(id.getSapNid());
+                }
             }
         }
 
@@ -1816,13 +1821,15 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         if (revisions != null) {
             for (R r : revisions) {
-                sapNids.add(r.sapNid);
+                if (r.sapNid > 0) {
+                    sapNids.add(r.sapNid);
+                }
             }
         }
 
         return sapNids;
     }
-    
+
     public abstract List<? extends Version> getVersions();
 
     public abstract List<? extends Version> getVersions(ViewCoordinate c);
@@ -2403,15 +2410,15 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                 buf.append(cv.toString());
                 UUID authorUuid = Ts.get().getConceptForNid(getAuthorNid()).getPrimUuid();
                 String stringToHash = authorUuid.toString()
-                                    + Long.toString(getTime());
+                        + Long.toString(getTime());
                 UUID type5Uuid = Type5UuidFactory.get(Type5UuidFactory.AUTHOR_TIME_ID,
-                                    stringToHash);
+                        stringToHash);
                 buf.append(" authTime: ");
                 buf.append(type5Uuid);
             } catch (Throwable e) {
                 buf.append(" !!! Error computing author time hash !!! ");
                 buf.append(e.getLocalizedMessage());
-            }   
+            }
             return buf.toString();
         }
 
