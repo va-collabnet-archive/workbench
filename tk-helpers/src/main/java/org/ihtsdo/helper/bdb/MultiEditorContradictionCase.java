@@ -98,7 +98,7 @@ public class MultiEditorContradictionCase {
         TerminologyStoreDI ts = Ts.get();
         StringBuilder sb = new StringBuilder();
         try {
-            sb.append("\r\n*** CONTRADICTION CASE ***\r\nCONCEPT: ");
+            sb.append("\r\nCASE DETAIL\r\nCONCEPT: ");
             sb.append(ts.getConcept(conceptNid).getPrimUuid().toString());
             sb.append("   ");
             sb.append(ts.getConcept(conceptNid).toUserString());

@@ -45,6 +45,7 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
     private NidBitSetBI nidSet;
     List<MultiEditorContradictionCase> contradictionCaseList;
     HashSet<Integer> watchSet;
+    List<MultiEditorContradictionCase> watchCaseList;
     final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public MultiEditorContradictionDetector(int commitRecRefsetNid,
@@ -59,6 +60,10 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         this.nidSet = Ts.get().getAllConceptNids();
         this.contradictionCaseList = cl;
         this.watchSet = ws;
+        this.watchCaseList = null;
+        if (ws != null) {
+            this.watchCaseList = new ArrayList<MultiEditorContradictionCase>();
+        }
         this.ignoreNonVisibleAth = false;
         this.maxSap = Integer.MIN_VALUE;
     }
@@ -77,6 +82,10 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         this.nidSet = Ts.get().getAllConceptNids();
         this.contradictionCaseList = cl;
         this.watchSet = ws;
+        this.watchCaseList = null;
+        if (ws != null) {
+            this.watchCaseList = new ArrayList<MultiEditorContradictionCase>();
+        }
         this.ignoreNonVisibleAth = ignoreNonVisibleAth;
         if (ignoreReadOnlySap) {
             this.maxSap = Ts.get().getReadOnlyMaxSap(); //
@@ -96,11 +105,16 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         return nidSet;
     }
 
+    public List<MultiEditorContradictionCase> getWatchCaseList() {
+        return watchCaseList;
+    }
+
     @Override
     public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fetcher) throws Exception {
         ConceptVersionBI conceptVersion = fetcher.fetch(vc);
-        if (watchSet != null && watchSet.contains(Integer.valueOf(cNid))) { // :!!!:
-            System.out.println("\r\n::: FOUND WATCH CONCEPT: " + conceptVersion.toUserString());
+        Boolean watchConcept = false;
+        if (watchSet != null && watchSet.contains(Integer.valueOf(cNid))) {
+            watchConcept = true;
         }
 
         if (conceptVersion.getPrimUuid() == null) {
@@ -168,7 +182,7 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         }
 
         // REPORT ANY CONTRADICTING CONCEPTS
-        if (!accumDiffSet.isEmpty()) {
+        if (!accumDiffSet.isEmpty() || watchConcept) {
 
             // List case information in time order
             ArrayList<String> caseList = new ArrayList<String>();
@@ -180,17 +194,18 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
             }
             Collections.sort(caseList, String.CASE_INSENSITIVE_ORDER);
 
-            // FIND THE ADJUDICATION COMMIT RECORD VALUES
-            ArrayList<HashSet<UUID>> truthATHSetsList = new ArrayList<HashSet<UUID>>();
-
             // ADD TO CASE LIST
             MultiEditorContradictionCase caseToAdd;
             caseToAdd = new MultiEditorContradictionCase(cNid, caseList);
             caseToAdd.setAuthTimeMapComputed(conceptComputedAthMap);
             caseToAdd.setAuthTimeMapMissing(conceptMissingAthMap);
             caseToAdd.setAuthTimeSetsList(commitRefsetAthSetsList);
-            caseToAdd.setAuthTimeSetsTruthList(truthATHSetsList);
-            contradictionCaseList.add(caseToAdd);
+            caseToAdd.setAuthTimeSetsTruthList(truthRefsetAthSetsList);
+            if (!accumDiffSet.isEmpty()) {
+                contradictionCaseList.add(caseToAdd);
+            } else {
+                watchCaseList.add(caseToAdd);
+            }
         }
     }
 
