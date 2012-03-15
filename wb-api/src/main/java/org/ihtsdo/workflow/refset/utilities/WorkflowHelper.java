@@ -1173,13 +1173,14 @@ public class WorkflowHelper {
 
 							
 							// add if latestPart is active
-							if (latestPart.getStatusNid() == activeNidRf1 || latestPart.getStatusNid() == activeNidRf2) {
-								WorkflowHistoryJavaBean bean = WorkflowHelper.populateWorkflowHistoryJavaBean(latestPart);
-								retSet.add(bean);
+				            if (latestPart != null) {
+								if (latestPart.getStatusNid() == activeNidRf1 || latestPart.getStatusNid() == activeNidRf2) {
+									WorkflowHistoryJavaBean bean = WorkflowHelper.populateWorkflowHistoryJavaBean(latestPart);
+									retSet.add(bean);
+								}
 							}
 						}
-					}
-				
+					}				
 					// From WfHx Concept's Refset Members (till update Import mechanism)
 					List<? extends I_ExtendByRef> members = Terms.get().getRefsetExtensionsForComponent(getWorkflowRefsetNid(), con.getConceptNid());
 					
@@ -1191,10 +1192,12 @@ public class WorkflowHelper {
 			                }
 			            }
 
-						if (latestPart.getStatusNid() == activeNidRf1 || latestPart.getStatusNid() == activeNidRf2) {
-							WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(latestPart);
-							retSet.add(bean);
-						}
+			            if (latestPart != null) {
+			            	if (latestPart.getStatusNid() == activeNidRf1 || latestPart.getStatusNid() == activeNidRf2) {
+			            		WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(latestPart);
+			            		retSet.add(bean);
+			            	}
+			            }
 					}
 				} catch (Exception e) {
 		        	AceLog.getAppLog().log(Level.WARNING, "Error retrieving wfHx refset members/annotations: ", e);
