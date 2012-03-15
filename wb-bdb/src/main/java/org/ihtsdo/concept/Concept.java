@@ -1017,6 +1017,35 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     }
     
     @Override
+    public Set<Integer> getAllNidsForSaps(Set<Integer> sapNids) throws IOException {
+        Set<Integer> componentNids = new HashSet<Integer>();
+        
+        if (getConceptAttributes() != null) {
+            componentNids.addAll(getConceptAttributes().getComponentNidsForSaps(sapNids));
+        }
+        
+        if (getDescriptions() != null) {
+            for (Description d : getDescriptions()) {
+                componentNids.addAll(d.getComponentNidsForSaps(sapNids));
+            }
+        }
+        
+        if (getRelsOutgoing() != null) {
+            for (Relationship r : getSourceRels()) {
+                componentNids.addAll(r.getComponentNidsForSaps(sapNids));
+            }
+        }
+        
+        if (getImages() != null) {
+            for (Image i : getImages()) {
+                componentNids.addAll(i.getComponentNidsForSaps(sapNids));
+            }
+        }
+        
+        return componentNids;
+    }
+    
+    @Override
     public Collection<? extends RefexChronicleBI<?>> getAnnotations() throws IOException {
         return getConceptAttributes().getAnnotations();
     }
