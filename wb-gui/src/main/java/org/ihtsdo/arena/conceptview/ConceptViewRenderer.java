@@ -892,16 +892,28 @@ public class ConceptViewRenderer extends JLayeredPane {
             if (concept != null) {
                 TreeSet<WorkflowHistoryJavaBean> latestWfHxSet = WorkflowHelper.getLatestWfHxForConcept(concept);
 
-                if (latestWfHxSet == null || latestWfHxSet.size() <= 1) {
+                if (latestWfHxSet == null || latestWfHxSet.size() == 0) {
+                	// Only if have history
                     enableOopsButton = false;
                 } else {
+                	// Test if latest modeler action on concept is current moderl
                     UUID latestModelerUUID = latestWfHxSet.last().getModeler();
                     UUID currentModelerUUID = WorkflowHelper.getCurrentModeler().getPrimUuid();
-                    boolean islatestActionAutoApproved = latestWfHxSet.last().getAutoApproved();
 
-                    if (islatestActionAutoApproved
-                            || !currentModelerUUID.equals(latestModelerUUID)) {
+                    if (!currentModelerUUID.equals(latestModelerUUID)) {
                         enableOopsButton = false;
+                    } else {
+                    	// Test if latest action is AutoApproval
+                        boolean islatestActionAutoApproved = latestWfHxSet.last().getAutoApproved();
+                        if (islatestActionAutoApproved) {
+                        	enableOopsButton = false;
+                        } else {
+                        	// Test if single value in workflow and it is a Begin WF Action
+                        	if (latestWfHxSet.size() == 1 &&
+                        		WorkflowHelper.isBeginWorkflowState(latestWfHxSet.last().getState())) {
+                            	enableOopsButton = false;
+                        	}
+                        }
                     }
                 }
 
