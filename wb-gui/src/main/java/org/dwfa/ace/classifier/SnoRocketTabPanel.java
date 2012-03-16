@@ -93,7 +93,7 @@ public class SnoRocketTabPanel extends JPanel implements ActionListener {
         // ADD DIFF VIEW
         diffPathJPanel = new DiffPathPanel(config);
         diffPathJPanel.setBorder(BorderFactory.createTitledBorder(TAB_DIFF + ": "));
-        String tip = "All differenced between the current and previous run of the Classifer.";
+        String tip = "All differences between the current and previous run of the Classifer.";
         tabbedPane.addTab(TAB_DIFF, null, diffPathJPanel, tip);
 
         // ADD EQUIVALENCE VIEW
