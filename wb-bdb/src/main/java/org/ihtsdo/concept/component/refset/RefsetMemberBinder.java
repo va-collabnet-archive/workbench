@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class RefsetMemberBinder extends TupleBinding<Collection<RefsetMember<?, ?>>>
         implements I_BindConceptComponents {
@@ -117,7 +116,8 @@ public class RefsetMemberBinder extends TupleBinding<Collection<RefsetMember<?, 
                   if (refsetMember == null) {
                      refsetMember = factory.create(nid, typeNid, enclosingConcept.getNid(), input);
 
-                     if (refsetMember.getTime() != Long.MIN_VALUE) {
+                     if (refsetMember.getTime() != Long.MIN_VALUE &&
+                             refsetMember.getCollectionNid() == enclosingConcept.getNid()) {
                         RefsetMember<?, ?> oldMember = (RefsetMember<?,
                                                           ?>) Concept.componentsCRHM.putIfAbsent(nid,
                                                              refsetMember);
@@ -137,7 +137,8 @@ public class RefsetMemberBinder extends TupleBinding<Collection<RefsetMember<?, 
                   throw new RuntimeException(e);
                }
 
-               if (refsetMember.getTime() != Long.MIN_VALUE) {
+               if (refsetMember.getTime() != Long.MIN_VALUE &&
+                             refsetMember.getCollectionNid() == enclosingConcept.getNid()) {
                   newRefsetMemberList.add(refsetMember);
                }
             }
@@ -170,13 +171,15 @@ public class RefsetMemberBinder extends TupleBinding<Collection<RefsetMember<?, 
          assert refsetMember.primordialSapNid != Integer.MAX_VALUE;
 
          if ((refsetMember.primordialSapNid > maxReadOnlyStatusAtPositionId)
-                 && (refsetMember.getTime() != Long.MIN_VALUE)) {
+                 && (refsetMember.getTime() != Long.MIN_VALUE &&
+                             refsetMember.getCollectionNid() == enclosingConcept.getNid())) {
             refsetMembersToWrite.add(refsetMember);
          } else {
             if (refsetMember.revisions != null) {
                for (RefsetRevision<?, ?> r : refsetMember.revisions) {
                   if ((r.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionId)
-                          && (r.getTime() != Long.MIN_VALUE)) {
+                          && (r.getTime() != Long.MIN_VALUE &&
+                             refsetMember.getCollectionNid() == enclosingConcept.getNid())) {
                      refsetMembersToWrite.add(refsetMember);
 
                      break;
