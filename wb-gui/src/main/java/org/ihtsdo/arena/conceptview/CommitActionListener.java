@@ -68,11 +68,13 @@ public class CommitActionListener implements ActionListener {
              int conflictRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.CONFLICT_RECORD.getPrimoridalUid());
              ConceptChronicleBI conflictRefset = Ts.get().getConceptForNid(conflictRefsetNid);
              RefexVersionBI member = conflictRefset.getCurrentRefsetMemberForComponent(vc, c.getConceptNid());
-             RefexCAB memberBp = member.makeBlueprint(vc);
-             memberBp.setRetired();
-             builder.construct(memberBp);
-             Ts.get().addUncommitted(conflictRefset);
-             Ts.get().commit(conflictRefset);
+             if(member != null){
+                RefexCAB memberBp = member.makeBlueprint(vc);
+                memberBp.setRetired();
+                builder.construct(memberBp);
+                Ts.get().addUncommitted(conflictRefset);
+                Ts.get().commit(conflictRefset);
+             }
              
              ContradictionEditorFrame cef = (ContradictionEditorFrame) settings.getView().getRootPane().getParent();
              TerminologyList list = cef.getBatchConceptList();

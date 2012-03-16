@@ -248,8 +248,8 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
                 conceptTabsPane, 1, "plugins/contradiction");
         conceptTabsPane.add(c1Panel);
 
-        arena = new Arena(newFrameConfig, new File("arena/adjudicate.mxe"));
-        arena.getEditor().setForAjudication(true);
+        arena = new Arena(newFrameConfig, new File("arena/adjudicate.mxe"), true);
+//        arena.getEditor().setForAjudication(true);
         conceptTabsPane.addTab("arena",
                 new ImageIcon(ACE.class.getResource("/16x16/plain/eye.png")), arena);
         conceptTabsPane.setSelectedIndex(1);

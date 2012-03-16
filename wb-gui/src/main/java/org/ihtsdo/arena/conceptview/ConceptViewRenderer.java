@@ -701,7 +701,7 @@ public class ConceptViewRenderer extends JLayeredPane {
         if(settings.isForAdjudication()){
             gbc.gridx++;
             JButton acceptButton = new JButton(new ImageIcon(
-                    ACE.class.getResource("/16x16/plain/magic-wand.png")));
+                    ACE.class.getResource("/16x16/plain/stamp.png")));
             acceptButton.setToolTipText("accept concept as is");
             acceptButton.addActionListener(new AcceptActionListener(settings));
             acceptButton.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 0));

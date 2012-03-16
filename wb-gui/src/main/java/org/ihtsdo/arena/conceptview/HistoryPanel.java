@@ -126,11 +126,11 @@ public class HistoryPanel {
       versionScroller  = new JScrollPane(versionPanel);
       positionPanelMap = view.getPositionPanelMap();
       this.navigator   = navigator;
-//      navigator.getImplementButton().addActionListener(avcl);
+      navigator.getImplementButton().addActionListener(avcl);
 
-//      if (view.getSettings().isForAdjudication()) {
-//         navigator.getImplementButton().setEnabled(true);
-//      }
+      if (view.getSettings().isForAdjudication()) {
+         navigator.getImplementButton().setEnabled(true);
+      }
 
       TreeSet<PositionBI> positionOrderedSet = view.getPositionOrderedSet();
 
@@ -421,11 +421,11 @@ public class HistoryPanel {
    }
 
    private void redoLayout() {
-//      if ((changedSelections.size() > 0) || view.getSettings().isForAdjudication()) {
-//         navigator.getImplementButton().setEnabled(true);
-//      } else {
-//         navigator.getImplementButton().setEnabled(false);
-//      }
+      if ((changedSelections.size() > 0) || view.getSettings().isForAdjudication()) {
+         navigator.getImplementButton().setEnabled(true);
+      } else {
+         navigator.getImplementButton().setEnabled(false);
+      }
 
       int currentX = xStartLoc;
 
@@ -527,7 +527,7 @@ public class HistoryPanel {
    }
 
    public void removeListeners() {
-//      navigator.getImplementButton().removeActionListener(avcl);
+      navigator.getImplementButton().removeActionListener(avcl);
       topHistoryPanel.removeComponentListener(tcl);
       versionScroller.getHorizontalScrollBar().getModel().removeChangeListener(hsal);
       ((JScrollPane) view.getParent().getParent()).getVerticalScrollBar().getModel().removeChangeListener(
@@ -794,7 +794,7 @@ public class HistoryPanel {
 
             Ts.get().addUncommitted(view.getConcept());
             reset();
-//            navigator.getImplementButton().setEnabled(false);
+            navigator.getImplementButton().setEnabled(false);
          } catch (Exception ex) {
             AceLog.getAppLog().alertAndLogException(ex);
          }
@@ -920,18 +920,18 @@ public class HistoryPanel {
             view.getChangedVersionSelections().remove(version);
          }
 
-//         if (changedCount != changedSelections.size()) {
-//            SwingUtilities.invokeLater(new Runnable() {
-//               @Override
-//               public void run() {
-//                  if ((changedSelections.size() > 0) || view.getSettings().isForAdjudication()) {
-//                     navigator.getImplementButton().setEnabled(true);
-//                  } else {
-//                     navigator.getImplementButton().setEnabled(false);
-//                  }
-//               }
-//            });
-//         }
+         if (changedCount != changedSelections.size()) {
+            SwingUtilities.invokeLater(new Runnable() {
+               @Override
+               public void run() {
+                  if ((changedSelections.size() > 0) || view.getSettings().isForAdjudication()) {
+                     navigator.getImplementButton().setEnabled(true);
+                  } else {
+                     navigator.getImplementButton().setEnabled(false);
+                  }
+               }
+            });
+         }
       }
    }
 
