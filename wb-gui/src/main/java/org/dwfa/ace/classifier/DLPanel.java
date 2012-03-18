@@ -554,12 +554,17 @@ public class DLPanel extends JPanel {
             this.config = config;
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                if (config.getClassifierInputPath() == null) {
-
-                    JOptionPane.showMessageDialog(new JFrame(),
-                            "Please set the Classifier Input (Stated) Path in the preferences.");
+                if (config.getEditingPathSet() == null) {
+                    String errStr = "Error: Edit path is not set.";
+                    JOptionPane.showMessageDialog(new JFrame(), errStr);
+                    return;
+                } else if (config.getEditingPathSet().size() != 1) {
+                    String errStr = "Error: Profile must have exactly one edit path. Found: "
+                        + config.getEditingPathSet();
+                    JOptionPane.showMessageDialog(new JFrame(), errStr);
                     return;
                 }
                 doEdit(e, config);
@@ -604,12 +609,17 @@ public class DLPanel extends JPanel {
             this.config = config;
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                if (config.getClassifierInputPath() == null) {
-
-                    JOptionPane.showMessageDialog(new JFrame(),
-                            "Please set the Classifier Input (Stated) Path in the preferences.");
+                if (config.getEditingPathSet() == null) {
+                    String errStr = "Error: Edit path is not set.";
+                    JOptionPane.showMessageDialog(new JFrame(), errStr);
+                    return;
+                } else if (config.getEditingPathSet().size() != 1) {
+                    String errStr = "Error: Profile must have exactly one edit path. Found: "
+                        + config.getEditingPathSet();
+                    JOptionPane.showMessageDialog(new JFrame(), errStr);
                     return;
                 }
                 doEdit(e, config);
@@ -652,12 +662,17 @@ public class DLPanel extends JPanel {
             this.config = config;
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                if (config.getClassifierInputPath() == null) {
-
-                    JOptionPane.showMessageDialog(new JFrame(),
-                            "Please set the Classifier Input (Stated) Path in the preferences.");
+                if (config.getEditingPathSet() == null) {
+                    String errStr = "Error: Edit path is not set.";
+                    JOptionPane.showMessageDialog(new JFrame(), errStr);
+                    return;
+                } else if (config.getEditingPathSet().size() != 1) {
+                    String errStr = "Error: Profile must have exactly one edit path. Found: "
+                        + config.getEditingPathSet();
+                    JOptionPane.showMessageDialog(new JFrame(), errStr);
                     return;
                 }
                 int cNid = Integer.MAX_VALUE;
