@@ -5,6 +5,7 @@ package org.ihtsdo.db.bdb.computer.refset;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -352,7 +353,8 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
     public boolean continueWork() {
         return !canceled;
     }
-    List<ParallelConceptIterator> pcis;
+    
+    private List<ParallelConceptIterator> pcis = new ArrayList<ParallelConceptIterator>();
 
     @Override
     public void setParallelConceptIterators(List<ParallelConceptIterator> pcis) {
