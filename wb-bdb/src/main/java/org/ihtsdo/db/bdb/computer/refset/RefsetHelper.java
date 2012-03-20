@@ -355,22 +355,24 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
                 }
 
                 // Try via  activeRf1 first.  If invalid, use activeRf2 as status
-                if (!extProps.validate(latestPart)) {
-                	useRf1 = true;
-                    extProps.with(RefsetPropertyMap.REFSET_PROPERTY.STATUS, SnomedMetadataRfx.getSTATUS_CURRENT_NID());
-                }
+                if (latestPart != null) {
+                	if (!extProps.validate(latestPart)) {
+	                	useRf1 = true;
+	                    extProps.with(RefsetPropertyMap.REFSET_PROPERTY.STATUS, SnomedMetadataRfx.getSTATUS_CURRENT_NID());
+	                }
 
                 
-                if (extProps.validate(latestPart)) {
-
-                    // found a member to retire
-                	I_ExtendByRefPartStr<?> clone = (I_ExtendByRefPartStr<?>) latestPart.makeAnalog(inactiveRf2, latestPart.getPathNid(), Long.MAX_VALUE);
-                	
-                    extension.addVersion(clone);
-                    if (isAutocommitActive()) {
-                        Terms.get().addUncommittedNoChecks(extension);
-                    }
-                    return true;
+	                if (extProps.validate(latestPart)) {
+	
+	                    // found a member to retire
+	                	I_ExtendByRefPartStr<?> clone = (I_ExtendByRefPartStr<?>) latestPart.makeAnalog(inactiveRf2, latestPart.getPathNid(), Long.MAX_VALUE);
+	                	
+	                    extension.addVersion(clone);
+	                    if (isAutocommitActive()) {
+	                        Terms.get().addUncommittedNoChecks(extension);
+	                    }
+	                    return true;
+	                }
                 }
             }
         }
