@@ -48,18 +48,18 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
                 ref = helper.makeWfMetadataMemberAndSetup(refsetNid, fields.getReferencedComponentNid(), REFSET_TYPES.STR, propMap, UUID.randomUUID());
                
                 if (ref != null) {
-	                I_GetConceptData concept = Terms.get().getConcept(fields.getReferencedComponentUid());
 	                I_GetConceptData refset = Terms.get().getConcept(refsetNid);
 	
-	                Terms.get().addUncommittedNoChecks(ref);
 	                if (refset.isAnnotationStyleRefex()) {
 	                	// Workflow history refset only annotated workflow refset at this point
 		                if (autoCommit) {
 		                	// Updated via AdvanceWf, Undo, override
+			                Terms.get().addUncommittedNoChecks(ref);
+			                I_GetConceptData concept = Terms.get().getConcept(fields.getReferencedComponentUid());
 		                	Ts.get().commit(concept);
 		                } else {
 		                	// Updated via UpdateWorkflowUponCommit (includes autoApprove) 
-		                    Terms.get().addUncommitted(concept);
+		                	Terms.get().addUncommitted(ref);
 		                }
 	                } else {
 	                	// Other workflow refsets (ie editor category)
@@ -89,11 +89,11 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
 
                 if (ref != null) {
                     helper.retireRefsetStrExtension(refsetNid, fields.getReferencedComponentNid(), propMap);
-
-                    I_GetConceptData concept = Terms.get().getConcept(fields.getReferencedComponentUid());
                     I_GetConceptData refset = Terms.get().getConcept(refsetNid);
+                    
                     if (refset.isAnnotationStyleRefex()) {
 	                	// Workflow history refset only annotated workflow refset at this point
+                        I_GetConceptData concept = Terms.get().getConcept(fields.getReferencedComponentUid());
 	                    Ts.get().commit(concept);
                     } else {
 	                	// Other workflow refsets (ie editor category)
