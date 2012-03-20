@@ -186,7 +186,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                     }
 
                     DragPanelRelGroup rgc = getRelGroupComponent(rg, cpr);
-
+                    
                     seperatorComponents.add(rgc);
                     conceptPanel.add(rgc, gbc);
                     gbc.gridy++;
@@ -308,7 +308,6 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             int commitRecRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.COMMIT_RECORD.getUids());
             int adjRecRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.ADJUDICATION_RECORD.getUids());
             List<MultiEditorContradictionCase> cases = new ArrayList<MultiEditorContradictionCase>();
-            HashSet<Integer> componentNidsConflict = new HashSet<Integer>();
             MultiEditorContradictionDetector mecd;
             mecd = new MultiEditorContradictionDetector(commitRecRefsetNid,
                 adjRecRefsetNid,
@@ -626,7 +625,8 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                         if (stop) {
                             return;
                         }
-
+                        
+                        setShowConflicts(dc.getComponentVersion(), dc);
                         seperatorComponents.add(dc);
                         cpd.addToggleComponent(dc);
                         conceptPanel.add(dc, gbc);
@@ -1353,7 +1353,8 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             activeRelIds.add(rv.getNid());
 
             DragPanelRel dpr = getRelComponent(rv, parentCollapsePanel, rv.isInferred());
-
+            setShowConflicts(rv, dpr);
+            
             cprg.addToggleComponent(dpr);
             dpr.setInGroup(true);
             relGroupPanel.add(dpr, gbc);
@@ -1372,7 +1373,8 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                     !addedRels.contains(rv.getNid())) {
                 addedRels.add(rv.getNid());
                 DragPanelRel dpr = getRelComponent(rv, parentCollapsePanel, rv.isInferred());
-
+                setShowConflicts(rv, dpr);
+                
                 dpr.setVisible(relHistoryIsShown);
                 cprg.addToggleComponent(dpr);
                 dpr.setInGroup(true);
@@ -1476,6 +1478,13 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             RefexVersionBI<?> annot = rp.getThingToDrag();
             if(sapsForConflict.contains(annot.getSapNid())){
                                 rp.showConflicts(sapsForConflict);
+            }
+        }
+        List<DragPanelComponentVersion> hxSubpanels = cvp.getHistorySubpanels();
+        for(DragPanelComponentVersion panel : hxSubpanels){
+            ComponentVersionBI component = (ComponentVersionBI) panel.getThingToDrag();
+            if(sapsForConflict.contains(component.getSapNid())){
+                                panel.showConflicts(sapsForConflict);
             }
         }
         if(sapsForConflict.contains(cv.getSapNid())){
