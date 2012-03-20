@@ -1570,6 +1570,11 @@ public class BdbCommitManager {
                         
                         for(AlertToDataConstraintFailure fail : result){
                             if(fail.getAlertType().equals(AlertToDataConstraintFailure.ALERT_TYPE.OMG)){
+                                long remaining = latch.getCount();
+                                for (long i = 0; i < remaining; i++) {
+//                                    System.out.println(">>>>>>>>>>>>> Latch cancel: " + latch.getCount());
+                                    latch.countDown();
+                                }
                                 return runnerAlerts;
                             }
                         }
