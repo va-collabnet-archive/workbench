@@ -43,8 +43,8 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
     private final int maxSap; // does not compute AuthorTimeHash from readonly database.
     private boolean ignoreNonVisibleAth; // ignore SAP not computeable from concept
     private NidBitSetBI nidSet;
-    private HashMap<UUID, Integer> sapNidTimeAuthMap = new HashMap<UUID, Integer>();
-    private HashSet<Integer> conlfictSaps = new HashSet<Integer>();
+    private HashMap<UUID, Collection<Integer>> sapNidTimeAuthMap = new HashMap<UUID, Collection<Integer>>();
+    private HashSet<Integer> conflictSaps = new HashSet<Integer>();
     List<MultiEditorContradictionCase> contradictionCaseList;
     HashSet<Integer> watchSet;
     List<MultiEditorContradictionCase> watchCaseList;
@@ -228,7 +228,7 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
             // ADD TO CASE LIST
             MultiEditorContradictionCase caseToAdd;
             caseToAdd = new MultiEditorContradictionCase(cNid, caseList,
-                    componentNids, conlfictSaps);
+                    componentNids, conflictSaps);
             caseToAdd.setAuthTimeMapComputed(conceptComputedAthMap);
             caseToAdd.setAuthTimeMapMissing(conceptMissingAthMap);
             caseToAdd.setAuthTimeSetsList(commitRefsetAthSetsList);
@@ -298,7 +298,10 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
                 // STORE <Key = UUID, Value= data string>
                 String valueStr = toStringAuthorTime(time, authorConcept, type5Uuid);
                 conceptComputedAthMap.put(type5Uuid, valueStr);
-                sapNidTimeAuthMap.put(type5Uuid, sap);
+                if(!sapNidTimeAuthMap.containsKey(type5Uuid)){
+                    sapNidTimeAuthMap.put(type5Uuid, new ArrayList<Integer>());
+                }
+                sapNidTimeAuthMap.get(type5Uuid).add(sap);
             }
         }
         return conceptComputedAthMap;
@@ -332,11 +335,15 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
     
     private HashSet<Integer> getComponentNidsInConflict(HashSet<UUID> accumDiffSet, int cNid) throws IOException{
         HashSet<Integer> componentNids = new HashSet<Integer>();
-        for(UUID uuid : accumDiffSet){
-            conlfictSaps.add(sapNidTimeAuthMap.get(uuid));
+        for(UUID timeAuthHash : accumDiffSet){
+            if(sapNidTimeAuthMap.containsKey(timeAuthHash)){
+                for(int sap : sapNidTimeAuthMap.get(timeAuthHash)){
+                conflictSaps.add(sap);
+                }
+            }
         }
         ConceptChronicleBI concept = Ts.get().getConcept(cNid);
-        componentNids.addAll(concept.getAllNidsForSaps(conlfictSaps));
+        componentNids.addAll(concept.getAllNidsForSaps(conflictSaps));
         return componentNids;
     }
 
