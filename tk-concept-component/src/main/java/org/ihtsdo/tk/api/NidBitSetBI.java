@@ -12,6 +12,8 @@ public interface NidBitSetBI {
    public int cardinality();
 
    public void clear();
+   
+   public void setAll();
 
    public NidBitSetItrBI iterator();
 

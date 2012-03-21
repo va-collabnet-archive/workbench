@@ -61,19 +61,19 @@ public class KindOfSpec extends IsaCoordinate {
 
 	@Override
 	public String toString() {
-		StringBuffer buff = new StringBuffer();
-		buff.append("KindOfSpec: viewPosition: ");
-		buff.append(viewPosition);
-		buff.append("\n allowedStatus: ");
-		buff.append(allowedStatusNids);
-		buff.append("\n relTypes: ");
-		buff.append(relTypeNids);
-		buff.append("\n kind: ");
+		StringBuilder buff = new StringBuilder();
+		buff.append("KindOfSpec: ");
 		try {
 			buff.append(Ts.get().getConcept(kindNid).toString());
 		} catch (IOException e) {
 			buff.append(e.getLocalizedMessage());
 		}
+		buff.append("\n viewPosition: ");
+		buff.append(viewPosition);
+		buff.append("\n allowedStatus: ");
+		buff.append(allowedStatusNids);
+		buff.append("\n relTypes: ");
+		buff.append(relTypeNids);
 		buff.append("\n viewPositions: ");
 		buff.append(viewPositionSet);
 

@@ -316,6 +316,11 @@ public class IdentifierSet implements I_RepresentIdSet, Serializable {
       this.toStringMax = toStringMax;
    }
 
+    @Override
+    public synchronized void setAll() {
+        bitSet.set(0, bitSet.size());
+    }
+
    //~--- inner classes -------------------------------------------------------
 
    private class NidIterator implements I_IterateIds {

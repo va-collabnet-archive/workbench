@@ -285,6 +285,9 @@ public class KindOfComputer {
     
     private static boolean isKindOfWithDepth(Concept c, KindOfSpec spec, int depth)
             throws IOException, TerminologyException {
+        if (c.getNid() == spec.kindNid) {
+            return true;
+        }
         if (depth > 15) {
             AceLog.getAppLog().info("depth of: " + depth + " testing: " + c);
             if (depth > 100) {
@@ -310,6 +313,9 @@ public class KindOfComputer {
             if (c.getNid() == spec.kindNid) {
                 return true;
             }
+        }
+        if (!cache.getPossibleKindOfConcepts().isMember(c.getNid())) {
+            return false;
         }
         Set<I_GetConceptData> parents = c.getSourceRelTargets(spec.getAllowedStatusNids(),
                 spec.getRelTypeNids(), spec.getViewPositionSet(),
