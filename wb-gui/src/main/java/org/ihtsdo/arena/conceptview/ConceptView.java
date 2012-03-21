@@ -386,12 +386,14 @@ public class ConceptView extends JPanel {
 
             View viewType;
 
-            if (getSettings().relAssertionType == RelAssertionType.STATED) {
-               viewType = View.STATED;
-            } else if (getSettings().relAssertionType == RelAssertionType.INFERRED) {
-               viewType = View.INFERRED;
-            } else {
-               viewType = View.STATED_AND_INFERRED;
+            if(getSettings().getRelAssertionType() == RelAssertionType.STATED){
+                viewType = View.STATED;
+            }else if (getSettings().getRelAssertionType() == RelAssertionType.INFERRED){
+                viewType = View.INFERRED;
+            }else if (getSettings().getRelAssertionType() == RelAssertionType.INFERRED_THEN_STATED){
+                viewType = View.STATED_AND_INFERRED;
+            }else{
+                viewType = View.STATED;
             }
 
             Collection<Object> facts = new ArrayList<Object>();

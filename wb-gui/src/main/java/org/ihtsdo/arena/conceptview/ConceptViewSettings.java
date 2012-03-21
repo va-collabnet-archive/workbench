@@ -61,7 +61,7 @@ import javax.swing.SwingUtilities;
 
 public class ConceptViewSettings extends ArenaComponentSettings {
    public static final int  NAVIGATOR_WIDTH = 400;
-   private static final int dataVersion     = 3;
+   private static final int dataVersion     = 4;
 
    /**
     *
@@ -88,12 +88,16 @@ public class ConceptViewSettings extends ArenaComponentSettings {
    private DescType                         descType         = DescType.PREFERRED;
    private DescType                         relType          = DescType.PREFERRED;
    private DescType                         relTarget        = DescType.FULLY_SPECIFIED;
-   RelAssertionType                         relAssertionType = RelAssertionType.STATED;
    private DescType                         refexName        = DescType.PREFERRED;
    private DescType                         c3Refex          = DescType.FULLY_SPECIFIED;
    private DescType                         c2Refex          = DescType.FULLY_SPECIFIED;
    private DescType                         c1Refex          = DescType.FULLY_SPECIFIED;
-   private transient ConceptChangedListener conceptChangedListener;
+   
+   // dataversion = 4
+   private RelAssertionType                 relAssertionType = RelAssertionType.STATED;
+   
+   ///
+    private transient ConceptChangedListener conceptChangedListener;
    private transient JToggleButton          navButton;
    private transient ConceptNavigator       navigator;
    private transient TaxonomyTree           navigatorTree;
@@ -315,6 +319,11 @@ public class ConceptViewSettings extends ArenaComponentSettings {
             c3Refex   = DescType.PREFERRED;
             refexName = DescType.PREFERRED;
          }
+         if (dataVersion >= 4) {
+             relAssertionType = (RelAssertionType) in.readObject();
+         } else {
+             relAssertionType = RelAssertionType.STATED;
+         }
       } else {
          throw new IOException("Can't handle dataversion: " + objDataVersion);
       }
@@ -370,6 +379,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
       out.writeObject(c2Refex);
       out.writeObject(c3Refex);
       out.writeObject(refexName);
+      out.writeObject(relAssertionType);
    }
 
    //~--- get methods ---------------------------------------------------------
