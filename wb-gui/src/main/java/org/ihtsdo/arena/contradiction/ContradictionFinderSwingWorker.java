@@ -58,6 +58,7 @@ public class ContradictionFinderSwingWorker
     private Locale locale;
     private double numberConceptsToProcess;
     private int conflictRefsetNid;
+    private int numberFound;
     
     /* ContradictionUpdator */
     private class ContradictionUpdator implements ActionListener {
@@ -143,18 +144,6 @@ public class ContradictionFinderSwingWorker
                     AceLog.getAppLog().info("completeLatch is null");
                 }
 
-                int numberFound = ccp.getNumberContradictionsFound().get();
-                String percentageStr = new String(" with " + createPercentage() + " concepts processed");
-                String progressStr;
-
-                if (numberFound == 0) {
-                    progressStr = "None found" + percentageStr;
-                } else {
-                    progressStr = numberFound + " found" + percentageStr;
-                }
-
-                frame.setProgressInfo(progressStr);
-
                 if (hits != null && completeLatch.getCount() == 0) {
                     normalCompletion();
                 }
@@ -187,7 +176,7 @@ public class ContradictionFinderSwingWorker
             }
             frame.setProgressValue(0);
 
-            int numberFound = ccp.getNumberContradictionsFound().get();
+            numberFound = ccp.getNumberContradictionsFound().get();
             if (numberFound == 0) {
                 frame.setProgressInfo("No Contradictions Detected");
             } else {
@@ -233,7 +222,7 @@ public class ContradictionFinderSwingWorker
         frame.addStopActionListener(stopListener);
         frame.enableStopButton(true);
         frame.setProgressIndeterminate(true);
-        frame.setProgressInfo("Starting the Contradiction Detector");
+        frame.setProgressInfo("Running the Contradiction Detector");
         this.conflicts.clear();
         
         completeLatch = new CountDownLatch(1);
@@ -312,7 +301,8 @@ public class ContradictionFinderSwingWorker
         completeLatch = new CountDownLatch(returnSet.size());
 
         timer.stop();
-
+        frame.setProgressInfo("Finished with " + returnSet.size() + " concepts found.");
+        
         return returnSet;
     }
 
@@ -339,7 +329,7 @@ public class ContradictionFinderSwingWorker
             frame.setProgressValue(0);
 
 
-            int numberFound = ccp.getNumberContradictionsFound().get();
+            numberFound = conflicts.getSize();
             
             String displayString;
             if (numberFound == 0) {
