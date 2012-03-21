@@ -94,6 +94,7 @@ public class ConceptViewRenderer extends JLayeredPane {
     final String WORKFLOW_ACTION_SUFFIX = " workflow action";
     private final JButton cancelButton;
     private final JButton commitButton;
+    private final JButton acceptButton;
     private WfHxDetailsPanelHandler wfHxDetails;
     private final JLabel workflowStatusLabel;
     private static boolean capWorkflow = false;
@@ -698,10 +699,10 @@ public class ConceptViewRenderer extends JLayeredPane {
         footerPanel.add(fillerPanel, gbc);
 
         gbc.weightx = 0;
+        acceptButton = new JButton(new ImageIcon(
+                    ACE.class.getResource("/16x16/plain/stamp.png")));
         if(settings.isForAdjudication()){
             gbc.gridx++;
-            JButton acceptButton = new JButton(new ImageIcon(
-                    ACE.class.getResource("/16x16/plain/stamp.png")));
             acceptButton.setToolTipText("accept concept as is");
             acceptButton.addActionListener(new AcceptActionListener(settings));
             acceptButton.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 0));
@@ -826,9 +827,15 @@ public class ConceptViewRenderer extends JLayeredPane {
             if (settings.getConcept() != null && settings.getConcept().isUncommitted()) {
                 cancelButton.setVisible(true);
                 commitButton.setVisible(true);
+                if(settings.isForAdjudication()){
+                    acceptButton.setVisible(false);
+                }
             } else {
                 cancelButton.setVisible(false);
                 commitButton.setVisible(false);
+                if(settings.isForAdjudication()){
+                    acceptButton.setVisible(true);
+                }
                 
                 if (settings.getConcept() != null) {
 	                if (wfHxDetails.isWfHxDetailsCurrenltyDisplayed()) {
