@@ -249,7 +249,7 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         ArrayList<HashSet<UUID>> authTimeSetsList = new ArrayList<HashSet<UUID>>();
         Collection<? extends RefexChronicleBI<?>> rcbic;
         rcbic = concept.getRefexMembers(refset);
-        if (rcbic.size() > 1) {
+        if (!rcbic.isEmpty()) {
 
             // CONVERT ARRAY HASHSET OF AUTHOR_TIME_HASH_BYTES
             for (RefexChronicleBI<?> rcbi : rcbic) {
