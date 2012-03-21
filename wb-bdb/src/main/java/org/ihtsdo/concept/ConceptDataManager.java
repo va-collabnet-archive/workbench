@@ -215,7 +215,9 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
       ArrayList<Integer> allContainedNids = new ArrayList<Integer>(size);
 
       allContainedNids.add(enclosingConcept.getNid());
-      assert enclosingConcept.getNid() != 0;
+      if(enclosingConcept.getNid() == 0){
+          return allContainedNids;
+      }
       assert !descNids.contains(0);
       allContainedNids.addAll(descNids);
       assert !srcRelNids.contains(0);
