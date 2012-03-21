@@ -17,24 +17,10 @@ import java.io.File;
 import java.io.IOException;
 import java.rmi.MarshalledObject;
 import java.security.NoSuchAlgorithmException;
+import java.util.UUID;
 
 import javax.naming.ConfigurationException;
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -54,9 +40,13 @@ import org.dwfa.ace.list.TerminologyListModel;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.util.ComponentFrame;
 import org.dwfa.bpa.util.OpenFramesWindowListener;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.arena.Arena;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
 
 /**
  *
@@ -79,14 +69,39 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
     private Arena arena;
     private JSplitPane resultsPane = new JSplitPane();
     private JProgressBar progressBar;
-
-    /* FindContradictionAction */
-    private class FindContradictionAction extends AbstractAction {
+    
+    private class FindContradictionMoreAction extends AbstractAction {
 
         private static final long serialVersionUID = 1L;
         private ContradictionEditorFrame frame;
 
-        public FindContradictionAction(ContradictionEditorFrame contradictionEditorFrame) {
+        public FindContradictionMoreAction(ContradictionEditorFrame contradictionEditorFrame) {
+            super("Debug Contradiction Finder");
+
+            this.frame = contradictionEditorFrame;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            // START SEARCH
+            if(frame.getActiveFrameConfig().getEditingPathSet().isEmpty()){
+                JOptionPane.showMessageDialog(new JFrame(),
+                                                "Please set adjudication path before continuing.",
+                                                "No adjudication path set.", JOptionPane.ERROR_MESSAGE);
+            }else{
+                ContradictionFinderDebugSwingWorker worker =
+                    new ContradictionFinderDebugSwingWorker(frame, viewCoord);
+                 worker.execute();
+            }
+        }
+    }
+    
+    private class FindContradictionLessAction extends AbstractAction {
+
+        private static final long serialVersionUID = 1L;
+        private ContradictionEditorFrame frame;
+
+        public FindContradictionLessAction(ContradictionEditorFrame contradictionEditorFrame) {
             super("Run Contradiction Finder");
 
             this.frame = contradictionEditorFrame;
@@ -95,9 +110,15 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
         @Override
         public void actionPerformed(ActionEvent ae) {
             // START SEARCH
-            ContradictionFinderSwingWorker worker =
+            if(frame.getActiveFrameConfig().getEditingPathSet().isEmpty()){
+                JOptionPane.showMessageDialog(new JFrame(),
+                                                "Please set adjudication path before continuing.",
+                                                "No adjudication path set.", JOptionPane.ERROR_MESSAGE);
+            }else{
+                ContradictionFinderSwingWorker worker =
                     new ContradictionFinderSwingWorker(frame, viewCoord);
-            worker.execute();
+                worker.execute();
+            }
         }
     }
 
@@ -122,14 +143,22 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
         // Setup Left Side
         if (batchConceptList == null) {
 	        TerminologyListModel batchListModel = new TerminologyListModel();
-	        batchConceptList = new TerminologyList(batchListModel, true, true, newFrameConfig); 
+                int conflictRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.CONFLICT_RECORD.getPrimoridalUid());
+                ConceptChronicleBI conflictRefset = Ts.get().getConceptForNid(conflictRefsetNid);
+                for(RefexVersionBI member : conflictRefset.getCurrentRefsetMembers(viewCoord)){
+                    if(member.getCollectionNid() == conflictRefsetNid){
+                        batchListModel.addElement((I_GetConceptData)
+                            Ts.get().getConceptForNid(member.getReferencedComponentNid()));
+                    }
+                }
+	        batchConceptList = new TerminologyList(batchListModel, true, true, newFrameConfig);
         }
 	     
         createLeftComponent();
 
         topSplit.setLeftComponent(resultsPane);
         topSplit.setRightComponent(conceptTabsPane);
-        topSplit.setDividerLocation(350);
+        topSplit.setDividerLocation(350); 
         resultsPane.setMinimumSize(new Dimension(350, cp.getHeight()));
         SwingUtilities.invokeLater(new Runnable() {
 
@@ -219,8 +248,8 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
                 conceptTabsPane, 1, "plugins/contradiction");
         conceptTabsPane.add(c1Panel);
 
-        arena = new Arena(newFrameConfig, new File("arena/adjudicate.mxe"));
-        arena.getEditor().setForAjudication(true);
+        arena = new Arena(newFrameConfig, new File("arena/adjudicate.mxe"), true);
+//        arena.getEditor().setForAjudication(true);
         conceptTabsPane.addTab("arena",
                 new ImageIcon(ACE.class.getResource("/16x16/plain/eye.png")), arena);
         conceptTabsPane.setSelectedIndex(1);
@@ -243,7 +272,9 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
     @Override
     public void addAppMenus(JMenuBar mainMenuBar) throws Exception {
         mainMenuBar.add(adjudicatorMenu = new JMenu("Adjudicator"));
-        adjudicatorMenu.add(new FindContradictionAction(this));
+//        adjudicatorMenu.add(new FindContradictionAction(this));
+        adjudicatorMenu.add(new FindContradictionMoreAction(this));
+        adjudicatorMenu.add(new FindContradictionLessAction(this));
     }
 
     /**

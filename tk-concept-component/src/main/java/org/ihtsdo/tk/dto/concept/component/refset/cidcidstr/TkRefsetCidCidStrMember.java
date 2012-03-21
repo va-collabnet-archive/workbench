@@ -1,7 +1,6 @@
 package org.ihtsdo.tk.dto.concept.component.refset.cidcidstr;
 
 //~--- non-JDK imports --------------------------------------------------------
-
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
@@ -20,235 +19,257 @@ import java.io.IOException;
 import java.util.*;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.dto.RevisionHandling;
+import org.ihtsdo.tk.dto.concept.component.refset.cidcidcid.TkRefsetCidCidCidRevision;
 
 public class TkRefsetCidCidStrMember extends TkRefsetAbstractMember<TkRefsetCidCidStrRevision> {
-   public static final long serialVersionUID = 1;
 
-   //~--- fields --------------------------------------------------------------
+    public static final long serialVersionUID = 1;
+    //~--- fields --------------------------------------------------------------
+    public UUID c1Uuid;
+    public UUID c2Uuid;
+    public String strValue;
 
-   public UUID   c1Uuid;
-   public UUID   c2Uuid;
-   public String strValue;
+    //~--- constructors --------------------------------------------------------
+    public TkRefsetCidCidStrMember(RefexChronicleBI another) throws IOException {
+        this((RefexCnidCnidStrVersionBI) another.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
+    }
 
-   //~--- constructors --------------------------------------------------------
+    public TkRefsetCidCidStrMember(RefexCnidCnidStrVersionBI another,
+            RevisionHandling revisionHandling) throws IOException {
+        super(another);
+        TerminologyStoreDI ts = Ts.get();
+        if (revisionHandling == RevisionHandling.EXCLUDE_REVISIONS) {
+            this.c1Uuid = ts.getUuidPrimordialForNid(another.getCnid1());
+            this.c2Uuid = ts.getUuidPrimordialForNid(another.getCnid2());
+            this.strValue = another.getStr1();
+        } else {
+            Collection<? extends RefexCnidCnidStrVersionBI> rels = another.getVersions();
+            int partCount = rels.size();
+            Iterator<? extends RefexCnidCnidStrVersionBI> relItr = rels.iterator();
+            RefexCnidCnidStrVersionBI rv = relItr.next();
 
-   public TkRefsetCidCidStrMember(RefexChronicleBI another) throws IOException {
-      super((RefexVersionBI) another.getPrimordialVersion());
+            this.c1Uuid = ts.getUuidPrimordialForNid(rv.getCnid1());
+            this.c2Uuid = ts.getUuidPrimordialForNid(rv.getCnid2());
+            this.strValue = rv.getStr1();
 
-      TerminologyStoreDI                               ts        = Ts.get();
-      Collection<? extends RefexCnidCnidStrVersionBI> rels      = another.getVersions();
-      int                                              partCount = rels.size();
-      Iterator<? extends RefexCnidCnidStrVersionBI>   relItr    = rels.iterator();
-      RefexCnidCnidStrVersionBI                       rv        = relItr.next();
+            if (partCount > 1) {
+                revisions = new ArrayList<TkRefsetCidCidStrRevision>(partCount - 1);
 
-      this.c1Uuid = ts.getUuidPrimordialForNid(rv.getCnid1());
-      this.c2Uuid = ts.getUuidPrimordialForNid(rv.getCnid2());
-      this.strValue = rv.getStr1();
+                while (relItr.hasNext()) {
+                    rv = relItr.next();
+                    TkRefsetCidCidStrRevision rev = new TkRefsetCidCidStrRevision(rv);
+                    if (rev.getTime() == this.time) {
+                        // TODO this check can be removed after trek-95 change sets are no longer in production. 
+                        this.c1Uuid = rev.c1Uuid;
+                        this.c2Uuid = rev.c2Uuid;
+                        this.strValue = rev.stringValue;
+                    } else {
+                        revisions.add(rev);
+                    }
+                }
+            }
+        }
+    }
 
-      if (partCount > 1) {
-         revisions = new ArrayList<TkRefsetCidCidStrRevision>(partCount - 1);
+    public TkRefsetCidCidStrMember() {
+        super();
+    }
 
-         while (relItr.hasNext()) {
-            rv = relItr.next();
-            revisions.add(new TkRefsetCidCidStrRevision(rv));
-         }
-      }
-   }
+    public TkRefsetCidCidStrMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super();
+        readExternal(in, dataVersion);
+    }
 
+    public TkRefsetCidCidStrMember(TkRefsetCidCidStrMember another, Map<UUID, UUID> conversionMap,
+            long offset, boolean mapAll) {
+        super(another, conversionMap, offset, mapAll);
 
-   public TkRefsetCidCidStrMember() {
-      super();
-   }
+        if (mapAll) {
+            this.c1Uuid = conversionMap.get(another.c1Uuid);
+            this.c2Uuid = conversionMap.get(another.c2Uuid);
+            this.strValue = another.strValue;
+        } else {
+            this.c1Uuid = another.c1Uuid;
+            this.c2Uuid = another.c2Uuid;
+            this.strValue = another.strValue;
+        }
+    }
 
-   public TkRefsetCidCidStrMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
-      super();
-      readExternal(in, dataVersion);
-   }
+    public TkRefsetCidCidStrMember(RefexCnidCnidStrVersionBI another, NidBitSetBI exclusions,
+            Map<UUID, UUID> conversionMap, long offset, boolean mapAll,
+            ViewCoordinate vc)
+            throws IOException, ContradictionException {
+        super(another, exclusions, conversionMap, offset, mapAll, vc);
 
-   public TkRefsetCidCidStrMember(TkRefsetCidCidStrMember another, Map<UUID, UUID> conversionMap,
-                                  long offset, boolean mapAll) {
-      super(another, conversionMap, offset, mapAll);
+        if (mapAll) {
+            this.c1Uuid = conversionMap.get(Ts.get().getComponent(another.getCnid1()).getPrimUuid());
+            this.c2Uuid = conversionMap.get(Ts.get().getComponent(another.getCnid2()).getPrimUuid());
+        } else {
+            this.c1Uuid = Ts.get().getComponent(another.getCnid1()).getPrimUuid();
+            this.c2Uuid = Ts.get().getComponent(another.getCnid2()).getPrimUuid();
+        }
 
-      if (mapAll) {
-         this.c1Uuid   = conversionMap.get(another.c1Uuid);
-         this.c2Uuid   = conversionMap.get(another.c2Uuid);
-         this.strValue = another.strValue;
-      } else {
-         this.c1Uuid   = another.c1Uuid;
-         this.c2Uuid   = another.c2Uuid;
-         this.strValue = another.strValue;
-      }
-   }
+        this.strValue = another.getStr1();
+    }
 
-   public TkRefsetCidCidStrMember(RefexCnidCnidStrVersionBI another, NidBitSetBI exclusions,
-                                  Map<UUID, UUID> conversionMap, long offset, boolean mapAll,
-                                  ViewCoordinate vc)
-           throws IOException, ContradictionException {
-      super(another, exclusions, conversionMap, offset, mapAll, vc);
-
-      if (mapAll) {
-         this.c1Uuid = conversionMap.get(Ts.get().getComponent(another.getCnid1()).getPrimUuid());
-         this.c2Uuid = conversionMap.get(Ts.get().getComponent(another.getCnid2()).getPrimUuid());
-      } else {
-         this.c1Uuid = Ts.get().getComponent(another.getCnid1()).getPrimUuid();
-         this.c2Uuid = Ts.get().getComponent(another.getCnid2()).getPrimUuid();
-      }
-
-      this.strValue = another.getStr1();
-   }
-
-   //~--- methods -------------------------------------------------------------
-
-   /**
-    * Compares this object to the specified object. The result is <tt>true</tt>
-    * if and only if the argument is not <tt>null</tt>, is a
-    * <tt>ERefsetCidCidStrMember</tt> object, and contains the same values, field by field,
-    * as this <tt>ERefsetCidCidStrMember</tt>.
-    *
-    * @param obj the object to compare with.
-    * @return <code>true</code> if the objects are the same;
-    *         <code>false</code> otherwise.
-    */
-   public boolean equals(Object obj) {
-      if (obj == null) {
-         return false;
-      }
-
-      if (TkRefsetCidCidStrMember.class.isAssignableFrom(obj.getClass())) {
-         TkRefsetCidCidStrMember another = (TkRefsetCidCidStrMember) obj;
-
-         // =========================================================
-         // Compare properties of 'this' class to the 'another' class
-         // =========================================================
-         // Compare c1Uuid
-         if (!this.c1Uuid.equals(another.c1Uuid)) {
+    //~--- methods -------------------------------------------------------------
+    /**
+     * Compares this object to the specified object. The result is <tt>true</tt> if and only if the argument
+     * is not <tt>null</tt>, is a <tt>ERefsetCidCidStrMember</tt> object, and contains the same values, field
+     * by field, as this <tt>ERefsetCidCidStrMember</tt>.
+     *
+     * @param obj the object to compare with.
+     * @return
+     * <code>true</code> if the objects are the same;
+     * <code>false</code> otherwise.
+     */
+    public boolean equals(Object obj) {
+        if (obj == null) {
             return false;
-         }
+        }
 
-         // Compare c2Uuid
-         if (!this.c2Uuid.equals(another.c2Uuid)) {
-            return false;
-         }
+        if (TkRefsetCidCidStrMember.class.isAssignableFrom(obj.getClass())) {
+            TkRefsetCidCidStrMember another = (TkRefsetCidCidStrMember) obj;
 
-         // Compare strValue
-         if (!this.strValue.equals(another.strValue)) {
-            return false;
-         }
+            // =========================================================
+            // Compare properties of 'this' class to the 'another' class
+            // =========================================================
+            // Compare c1Uuid
+            if (!this.c1Uuid.equals(another.c1Uuid)) {
+                return false;
+            }
 
-         // Compare their parents
-         return super.equals(obj);
-      }
+            // Compare c2Uuid
+            if (!this.c2Uuid.equals(another.c2Uuid)) {
+                return false;
+            }
 
-      return false;
-   }
+            // Compare strValue
+            if (!this.strValue.equals(another.strValue)) {
+                return false;
+            }
 
-   /**
-    * Returns a hash code for this <code>ERefsetCidCidStrMember</code>.
-    *
-    * @return a hash code value for this <tt>ERefsetCidCidStrMember</tt>.
-    */
-   public int hashCode() {
-      return this.primordialUuid.hashCode();
-   }
+            // Compare their parents
+            return super.equals(obj);
+        }
 
-   @Override
-   public TkRefsetCidCidStrMember makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
-      return new TkRefsetCidCidStrMember(this, conversionMap, offset, mapAll);
-   }
+        return false;
+    }
 
-   @Override
-   public final void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
-      super.readExternal(in, dataVersion);
-      c1Uuid   = new UUID(in.readLong(), in.readLong());
-      c2Uuid   = new UUID(in.readLong(), in.readLong());
-      strValue = UtfHelper.readUtfV7(in, dataVersion);
+    /**
+     * Returns a hash code for this
+     * <code>ERefsetCidCidStrMember</code>.
+     *
+     * @return a hash code value for this <tt>ERefsetCidCidStrMember</tt>.
+     */
+    public int hashCode() {
+        return this.primordialUuid.hashCode();
+    }
 
-      int versionSize = in.readInt();
+    @Override
+    public TkRefsetCidCidStrMember makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
+        return new TkRefsetCidCidStrMember(this, conversionMap, offset, mapAll);
+    }
 
-      if (versionSize > 0) {
-         revisions = new ArrayList<TkRefsetCidCidStrRevision>(versionSize);
+    @Override
+    public final void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super.readExternal(in, dataVersion);
+        c1Uuid = new UUID(in.readLong(), in.readLong());
+        c2Uuid = new UUID(in.readLong(), in.readLong());
+        strValue = UtfHelper.readUtfV7(in, dataVersion);
 
-         for (int i = 0; i < versionSize; i++) {
-            revisions.add(new TkRefsetCidCidStrRevision(in, dataVersion));
-         }
-      }
-   }
+        int versionSize = in.readInt();
 
-   /**
-    * Returns a string representation of the object.
-    */
-   @Override
-   public String toString() {
-      StringBuilder buff = new StringBuilder();
+        if (versionSize > 0) {
+            revisions = new ArrayList<TkRefsetCidCidStrRevision>(versionSize);
 
-      buff.append(this.getClass().getSimpleName()).append(": ");
-      buff.append(" c1:");
-      buff.append(informAboutUuid(this.c1Uuid));
-      buff.append(" c2:");
-      buff.append(informAboutUuid(this.c2Uuid));
-      buff.append(" str:");
-      buff.append("'" + this.strValue + "'");
-      buff.append(" ");
-      buff.append(super.toString());
+            for (int i = 0; i < versionSize; i++) {
+                TkRefsetCidCidStrRevision rev = new TkRefsetCidCidStrRevision(in, dataVersion);
+                if (rev.getTime() == this.time) {
+                    // TODO this check can be removed after trek-95 change sets are no longer in production. 
+                    c1Uuid = rev.c1Uuid;
+                    c2Uuid = rev.c2Uuid;
+                    strValue = rev.stringValue;
+                } else {
+                    revisions.add(rev);
+                }
+            }
+        }
+    }
 
-      return buff.toString();
-   }
+    /**
+     * Returns a string representation of the object.
+     */
+    @Override
+    public String toString() {
+        StringBuilder buff = new StringBuilder();
 
-   @Override
-   public void writeExternal(DataOutput out) throws IOException {
-      super.writeExternal(out);
-      out.writeLong(c1Uuid.getMostSignificantBits());
-      out.writeLong(c1Uuid.getLeastSignificantBits());
-      out.writeLong(c2Uuid.getMostSignificantBits());
-      out.writeLong(c2Uuid.getLeastSignificantBits());
-      UtfHelper.writeUtf(out, strValue);
+        buff.append(this.getClass().getSimpleName()).append(": ");
+        buff.append(" c1:");
+        buff.append(informAboutUuid(this.c1Uuid));
+        buff.append(" c2:");
+        buff.append(informAboutUuid(this.c2Uuid));
+        buff.append(" str:");
+        buff.append("'" + this.strValue + "'");
+        buff.append(" ");
+        buff.append(super.toString());
 
-      if (revisions == null) {
-         out.writeInt(0);
-      } else {
-         out.writeInt(revisions.size());
+        return buff.toString();
+    }
 
-         for (TkRefsetCidCidStrRevision rmv : revisions) {
-            rmv.writeExternal(out);
-         }
-      }
-   }
+    @Override
+    public void writeExternal(DataOutput out) throws IOException {
+        super.writeExternal(out);
+        out.writeLong(c1Uuid.getMostSignificantBits());
+        out.writeLong(c1Uuid.getLeastSignificantBits());
+        out.writeLong(c2Uuid.getMostSignificantBits());
+        out.writeLong(c2Uuid.getLeastSignificantBits());
+        UtfHelper.writeUtf(out, strValue);
 
-   //~--- get methods ---------------------------------------------------------
+        if (revisions == null) {
+            out.writeInt(0);
+        } else {
+            out.writeInt(revisions.size());
 
-   public UUID getC1Uuid() {
-      return c1Uuid;
-   }
+            for (TkRefsetCidCidStrRevision rmv : revisions) {
+                rmv.writeExternal(out);
+            }
+        }
+    }
 
-   public UUID getC2Uuid() {
-      return c2Uuid;
-   }
+    //~--- get methods ---------------------------------------------------------
+    public UUID getC1Uuid() {
+        return c1Uuid;
+    }
 
-   public List<TkRefsetCidCidStrRevision> getRevisionList() {
-      return revisions;
-   }
+    public UUID getC2Uuid() {
+        return c2Uuid;
+    }
 
-   public String getStrValue() {
-      return strValue;
-   }
+    public List<TkRefsetCidCidStrRevision> getRevisionList() {
+        return revisions;
+    }
 
-   @Override
-   public TK_REFSET_TYPE getType() {
-      return TK_REFSET_TYPE.CID_CID_STR;
-   }
+    public String getStrValue() {
+        return strValue;
+    }
 
-   //~--- set methods ---------------------------------------------------------
+    @Override
+    public TK_REFSET_TYPE getType() {
+        return TK_REFSET_TYPE.CID_CID_STR;
+    }
 
-   public void setC1Uuid(UUID c1Uuid) {
-      this.c1Uuid = c1Uuid;
-   }
+    //~--- set methods ---------------------------------------------------------
+    public void setC1Uuid(UUID c1Uuid) {
+        this.c1Uuid = c1Uuid;
+    }
 
-   public void setC2Uuid(UUID c2Uuid) {
-      this.c2Uuid = c2Uuid;
-   }
+    public void setC2Uuid(UUID c2Uuid) {
+        this.c2Uuid = c2Uuid;
+    }
 
-   public void setStrValue(String strValue) {
-      this.strValue = strValue;
-   }
+    public void setStrValue(String strValue) {
+        this.strValue = strValue;
+    }
 }

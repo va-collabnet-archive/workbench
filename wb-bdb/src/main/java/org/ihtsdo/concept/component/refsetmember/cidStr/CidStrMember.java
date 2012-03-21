@@ -8,7 +8,6 @@ import com.sleepycat.bind.tuple.TupleOutput;
 import org.apache.commons.collections.primitives.ArrayIntList;
 
 import org.dwfa.ace.api.I_AmPart;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 
@@ -18,7 +17,6 @@ import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
-import org.ihtsdo.etypes.ERefsetCidStrMember;
 import org.ihtsdo.etypes.ERefsetCidStrRevision;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
@@ -41,6 +39,7 @@ import java.io.IOException;
 import java.util.*;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid_str.RefexCnidStrVersionBI;
+import org.ihtsdo.tk.dto.RevisionHandling;
 
 public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember>
         implements I_ExtendByRefPartCidString<CidStrRevision>, RefexCnidStrAnalogBI<CidStrRevision> {
@@ -374,8 +373,8 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember>
       }
 
       @Override
-      public ERefsetCidStrMember getERefsetMember() throws IOException {
-         return new ERefsetCidStrMember(this);
+      public TkRefsetCidStrMember getERefsetMember() throws IOException {
+         return new TkRefsetCidStrMember(this, RevisionHandling.EXCLUDE_REVISIONS);
       }
 
       @Override

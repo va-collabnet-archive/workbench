@@ -38,6 +38,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.concept.Concept;
 
 public abstract class Revision<V extends Revision<V, C>, C extends ConceptComponent<V, C>>
@@ -191,6 +192,13 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
             ConceptComponent.addNidToBuffer(buf, getAuthorNid());
             buf.append(" path:");
             ConceptComponent.addNidToBuffer(buf, getPathNid());
+            UUID authorUuid = Ts.get().getConceptForNid(getAuthorNid()).getPrimUuid();
+            String stringToHash = authorUuid.toString()
+                                + Long.toString(getTime());
+            UUID type5Uuid = Type5UuidFactory.get(Type5UuidFactory.AUTHOR_TIME_ID,
+                                stringToHash);
+            buf.append(" authTime: ");
+            buf.append(type5Uuid);
             buf.append(" tm: ");
             buf.append(TimeUtil.formatDate(getTime()));
             buf.append(" ");

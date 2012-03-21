@@ -16,7 +16,6 @@ import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
-import org.ihtsdo.etypes.ERefsetCidCidStrMember;
 import org.ihtsdo.etypes.ERefsetCidCidStrRevision;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
@@ -39,6 +38,7 @@ import java.io.IOException;
 import java.util.*;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid_cnid_str.RefexCnidCnidStrVersionBI;
+import org.ihtsdo.tk.dto.RevisionHandling;
 
 public class CidCidStrMember extends RefsetMember<CidCidStrRevision, CidCidStrMember>
         implements I_ExtendByRefPartCidCidString<CidCidStrRevision>,
@@ -438,8 +438,8 @@ public class CidCidStrMember extends RefsetMember<CidCidStrRevision, CidCidStrMe
       }
 
       @Override
-      public ERefsetCidCidStrMember getERefsetMember() throws IOException {
-         return new ERefsetCidCidStrMember(this);
+      public TkRefsetCidCidStrMember getERefsetMember() throws IOException {
+         return new TkRefsetCidCidStrMember(this, RevisionHandling.EXCLUDE_REVISIONS);
       }
 
       @Override

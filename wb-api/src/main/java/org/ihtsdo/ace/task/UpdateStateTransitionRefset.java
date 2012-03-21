@@ -153,7 +153,6 @@ public class UpdateStateTransitionRefset extends AbstractTask {
 
         	}
 
-	    	Terms.get().commit();
     	} catch (Exception e) {
     		AceLog.getAppLog().log(Level.WARNING, line, e);
         }

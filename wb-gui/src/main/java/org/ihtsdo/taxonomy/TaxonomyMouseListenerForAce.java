@@ -7,6 +7,8 @@ package org.ihtsdo.taxonomy;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.awt.Component;
+import java.awt.Insets;
 import org.ihtsdo.taxonomy.model.NodePath;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -146,7 +148,10 @@ public class TaxonomyMouseListenerForAce extends MouseAdapter {
                   makeAndShowPopup(e, selectedConcept);
                } else {
                   I_RenderAndFocusOnBean renderer = (I_RenderAndFocusOnBean) tree.getCellRenderer();
-
+                  Insets insets = new Insets(0, 0, 0, 0);
+                  if (((TaxonomyNodeRenderer) renderer).getBorder() != null) {
+                      insets = ((TaxonomyNodeRenderer) renderer).getBorder().getBorderInsets((Component) renderer);
+                  }
                   renderer = (TaxonomyNodeRenderer) renderer.getTreeCellRendererComponent(tree, node, true,
                           tree.isExpanded(selRow), node.isLeaf(), selRow, true);
 
@@ -157,7 +162,7 @@ public class TaxonomyMouseListenerForAce extends MouseAdapter {
                         Rectangle iconBounds = renderer.getIconRect(node.getParentDepth());
 
                         if ((e.getPoint().x > bounds.x + iconBounds.x)
-                                && (e.getPoint().x + 1 < bounds.x + iconBounds.x + iconBounds.width)) {
+                                && (e.getPoint().x + 1 < bounds.x + iconBounds.x + iconBounds.width + insets.left)) {
                            openOrCloseParent(tree, model, node, bounds);
                         }
                      }

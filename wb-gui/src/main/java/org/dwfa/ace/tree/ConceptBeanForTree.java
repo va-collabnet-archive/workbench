@@ -993,4 +993,9 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
    public void setParentOpened(boolean opened) {
       this.parentOpened = opened;
    }
+
+    @Override
+    public Set<Integer> getAllNidsForSaps(Set<Integer> sapNids) throws IOException {
+        return bean.getAllNidsForSaps(sapNids);
+    }
 }

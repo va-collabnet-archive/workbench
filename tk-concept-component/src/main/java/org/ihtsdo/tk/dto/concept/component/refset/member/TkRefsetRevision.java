@@ -12,7 +12,7 @@ import java.io.IOException;
 
 import java.util.Map;
 import java.util.UUID;
-import org.ihtsdo.tk.api.refex.type_cnid_cnid_cnid.RefexCnidCnidCnidVersionBI;
+import org.ihtsdo.tk.api.refex.type_member.RefexMemberVersionBI;
 
 public class TkRefsetRevision extends TkRevision {
    public static final long serialVersionUID = 1;
@@ -22,7 +22,7 @@ public class TkRefsetRevision extends TkRevision {
    public TkRefsetRevision() {
       super();
    }
-   public TkRefsetRevision(RefexCnidCnidCnidVersionBI another) throws IOException {
+   public TkRefsetRevision(RefexMemberVersionBI another) throws IOException {
       super(another);
    }
 

@@ -56,7 +56,7 @@ public class ArenaEditor extends BasicGraphEditor {
      * @throws IOException 
      * 
      */
-    public ArenaEditor(I_ConfigAceFrame config, File defaultArenaConfig) throws IOException {
+    public ArenaEditor(I_ConfigAceFrame config, File defaultArenaConfig, boolean isForAjudication) throws IOException {
         super("mxGraph for JFC/Swing", new ArenaGraphComponent(new mxGraph() {
 
             /**
@@ -81,7 +81,7 @@ public class ArenaEditor extends BasicGraphEditor {
                 return null;
             }
         });
-
+        this.forAjudication = isForAjudication;
         arenaList = (List<? extends ArenaComponentSettings>) config.getProperty(this.getClass().getCanonicalName());
         if (arenaList == null) {
             // Creates a single shapes palette
@@ -111,7 +111,7 @@ public class ArenaEditor extends BasicGraphEditor {
             }
         }
         mxCodecRegistry.addPackage("org.ihtsdo.arena.conceptview");
-        mxCodecRegistry.register(new mxObjectCodec(new ConceptViewSettings(true), 
+        mxCodecRegistry.register(new mxObjectCodec(new ConceptViewSettings(isForAjudication()), 
                 new String[] {"view", "navigator", "navigatorTree", "navButton", "statedInferredButton"}, null, null));
         
         if (defaultArenaConfig.exists()) {
@@ -127,7 +127,7 @@ public class ArenaEditor extends BasicGraphEditor {
     }
 
     private void addPaletteTemplate(EditorPalette palette, String label, String imageName, int link) {
-        addPaletteTemplate(palette, label, imageName, new ConceptViewSettings(true, link));
+        addPaletteTemplate(palette, label, imageName, new ConceptViewSettings(isForAjudication(), link));
     }
 
     private void addPaletteTemplate(EditorPalette palette, String label, String imageName, ArenaComponentSettings settings) {

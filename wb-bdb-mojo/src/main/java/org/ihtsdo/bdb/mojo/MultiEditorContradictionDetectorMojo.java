@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -81,11 +79,17 @@ public class MultiEditorContradictionDetectorMojo extends AbstractMojo {
      */
     private String dateTimeStr;
     /**
-     * Report Equivalences File Name<br> No report file generated if not provided.
+     * UUIDs to watch.
      *
      * @parameter
      */
-    private String reportEquivalences;
+    private String[] watchUuidList;
+    /**
+     * Report Contradictions File Name<br> No report file generated if not provided.
+     *
+     * @parameter
+     */
+    private String reportName;
     // CORE CONSTANTS
     private static int isaNid = Integer.MAX_VALUE;
     private static int rootNid = Integer.MAX_VALUE;
@@ -116,49 +120,17 @@ public class MultiEditorContradictionDetectorMojo extends AbstractMojo {
 
     private HashSet<Integer> debugWatchNidSet() {
         HashSet<Integer> iSet = new HashSet<Integer>();
-        //Combined core needle and aspiration biopsy
-        //c486681e-3641-3a47-b614-09ab864f47c5
-        //69902009
-        UUID debugUuidIcd1111 = UUID.fromString("c486681e-3641-3a47-b614-09ab864f47c5");
-        //Foobar Hazelnut Foobar (substance)
-        //56d78966-fdc2-3b77-bf1c-304a18488a56
-        //256353000
-        UUID debugUuidIcd2222 = UUID.fromString("56d78966-fdc2-3b77-bf1c-304a18488a56");
-        //Biopsy of lesion of lung (procedure)
-        //29999d84-6d45-4dd6-83e8-31eb09a59780
-        UUID debugUuidIcd3333 = UUID.fromString("29999d84-6d45-4dd6-83e8-31eb09a59780");
-        //Aspiration biopsy of lesion of lung
-        //0dd44b38-9048-3a79-9a05-eaf3430781c0
-        //173191000
-        UUID debugUuidIcd4444 = UUID.fromString("0dd44b38-9048-3a79-9a05-eaf3430781c0");
-        //Combined core needle and aspiration biopsy
-        //c486681e-3641-3a47-b614-09ab864f47c5
-        //69902009
-        UUID debugUuidIcd5555 = UUID.fromString("c486681e-3641-3a47-b614-09ab864f47c5");
-        //Aspiration of bronchus (procedure)
-        //e57412a1-802a-46e1-9a18-3f9f0e914d61
-        UUID debugUuidIcd6666 = UUID.fromString("e57412a1-802a-46e1-9a18-3f9f0e914d61");
-        //Aspiration of bronchus with lavage (procedure)
-        //86123773-4f24-31c8-8d64-6a2e7b940f92
-        //397396006
-        UUID debugUuidIcd7777 = UUID.fromString("86123773-4f24-31c8-8d64-6a2e7b940f92");
-        //Intracranial hemorrhage following injury without open intracranial wound
-        //b69ffd35-db9a-3ca1-8b88-6fedf697cde0
-        // CASE WITH ONE "UNKNOWN" WHICH IS COMPUTED WITH DATE 2002-01-31 12:00:00
-        UUID debugUuidIcd8888 = UUID.fromString("b69ffd35-db9a-3ca1-8b88-6fedf697cde0");
-        try {
-            // iSet.add(tf.getConcept(debugUuidIcd1111).getNid());
-            // iSet.add(tf.getConcept(debugUuidIcd2222).getNid());
-            // iSet.add(tf.getConcept(debugUuidIcd3333).getNid());
-            // iSet.add(tf.getConcept(debugUuidIcd4444).getNid());
-            // iSet.add(tf.getConcept(debugUuidIcd5555).getNid());
-            // iSet.add(tf.getConcept(debugUuidIcd6666).getNid());
-            // iSet.add(tf.getConcept(debugUuidIcd7777).getNid());
-            iSet.add(tf.getConcept(debugUuidIcd8888).getNid());
-        } catch (TerminologyException ex) {
-            Logger.getLogger(MultiEditorContradictionDetectorMojo.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(MultiEditorContradictionDetectorMojo.class.getName()).log(Level.SEVERE, null, ex);
+
+        if (watchUuidList != null) {
+            for (String uuidString : watchUuidList) {
+                try {
+                    UUID uuid = UUID.fromString(uuidString);
+                    iSet.add(tf.getConcept(uuid).getNid());
+                } catch (Exception ex) {
+                    logger.error("BAD UUID: " + uuidString, ex);
+                }
+
+            }
         }
 
         return iSet;
@@ -208,19 +180,41 @@ public class MultiEditorContradictionDetectorMojo extends AbstractMojo {
             Ts.get().iterateConceptDataInSequence(mecd);
             // Ts.get().iterateConceptDataInParallel(mecd);
 
+            // WATCH RESULTS -- NOT CONTRADICTIONS
+            List<MultiEditorContradictionCase> watchCaseList = mecd.getWatchCaseList();
+            StringBuilder sb = new StringBuilder();
+            sb.append("\r\n**** NON-CONTRADICTING WATCH CASE 1: IGNORE NOTHING ****");
+            sb.append("\r\n[MultiEditorContradictionDetectionMojo] WATCH");
+            if (watchCaseList != null) {
+                sb.append("\r\n-- WATCH LIST --");
+                for (String uuidStr : watchUuidList) {
+                    sb.append("\r\n    ");
+                    sb.append(uuidStr);
+                }
+
+                for (MultiEditorContradictionCase watchCase : watchCaseList) {
+                    sb.append("\r\n-- NON-CONTRADICTING WATCH CASE --");
+                    sb.append(watchCase.toStringLong());
+                    sb.append("\r\n");
+                }
+            }
+            logger.info(sb.toString());
+
             // REPORT RESULTS
             if (cases.size() > 0) {
-                StringBuilder sb = new StringBuilder();
-                sb.append("\r\n***** CASE 1: INGORE NOTHING *****");
+                // CONTRADICTIONS
+                sb = new StringBuilder();
+                sb.append("\r\n***** CONTRADICTION CASE 1: IGNORE NOTHING *****");
                 sb.append("\r\n[MultiEditorContradictionDetectionMojo] FOUND CONTRADICTIONS\r\n");
                 for (MultiEditorContradictionCase contradictionCase : cases) {
                     sb.append(contradictionCase.toStringLong());
                     sb.append("\r\n");
                 }
                 logger.info(sb.toString());
+
             } else {
-                StringBuilder sb = new StringBuilder();
-                sb.append("\r\n***** CASE 1: INGORE NOTHING *****");
+                sb = new StringBuilder();
+                sb.append("\r\n***** CASE 1: IGNORE NOTHING *****");
                 sb.append("\r\n[MultiEditorContradictionDetectionMojo] NO CONTRADICTIONS FOUND");
                 logger.info(sb.toString());
             }
@@ -239,7 +233,7 @@ public class MultiEditorContradictionDetectorMojo extends AbstractMojo {
 
             // report results
             if (cases.size() > 0) {
-                StringBuilder sb = new StringBuilder();
+                sb = new StringBuilder();
                 sb.append("\r\n***** CASE 2: DON'T COMPUTE READONLY *****");
                 sb.append("\r\n[MultiEditorContradictionDetectionMojo] FOUND CONTRADICTIONS\r\n");
                 for (MultiEditorContradictionCase contradictionCase : cases) {
@@ -248,7 +242,7 @@ public class MultiEditorContradictionDetectorMojo extends AbstractMojo {
                 }
                 logger.info(sb.toString());
             } else {
-                StringBuilder sb = new StringBuilder();
+                sb = new StringBuilder();
                 sb.append("\r\n***** CASE 2: DON'T COMPUTE READONLY *****");
                 sb.append("\r\n[MultiEditorContradictionDetectionMojo] NO CONTRADICTIONS FOUND");
                 logger.info(sb.toString());
@@ -268,8 +262,8 @@ public class MultiEditorContradictionDetectorMojo extends AbstractMojo {
 
             // report results
             if (cases.size() > 0) {
-                StringBuilder sb = new StringBuilder();
-                sb.append("\r\n***** CASE 3: DON'T COMPUTE READONLY + INGORE NONCOMPUTED *****");
+                sb = new StringBuilder();
+                sb.append("\r\n***** CASE 3: DON'T COMPUTE READONLY + IGNORE NONCOMPUTED *****");
                 sb.append("\r\n[MultiEditorContradictionDetectionMojo] FOUND CONTRADICTIONS\r\n");
                 for (MultiEditorContradictionCase contradictionCase : cases) {
                     sb.append(contradictionCase.toStringLong());
@@ -277,8 +271,8 @@ public class MultiEditorContradictionDetectorMojo extends AbstractMojo {
                 }
                 logger.info(sb.toString());
             } else {
-                StringBuilder sb = new StringBuilder();
-                sb.append("\r\n***** CASE 3: DON'T COMPUTE READONLY + INGORE NONCOMPUTED *****");
+                sb = new StringBuilder();
+                sb.append("\r\n***** CASE 3: DON'T COMPUTE READONLY + IGNORE NONCOMPUTED *****");
                 sb.append("\r\n[MultiEditorContradictionDetectionMojo] NO CONTRADICTIONS FOUND");
                 logger.info(sb.toString());
             }

@@ -29,13 +29,20 @@ public class KindOfCache {
         tested = Terms.get().getEmptyIdSet();
         kindOf = Terms.get().getEmptyIdSet();
         this.possiblyKindOf = possiblyKindOf;
+        tested.setAll();
+        tested.andNot(possiblyKindOf);
     }
 
     public boolean tested(int cNid) {
-        if (possiblyKindOf.isMember(cNid) == false) {
+        if (tested.isMember(cNid)) {
             return true;
         }
-        return tested.isMember(cNid);
+        if (possiblyKindOf.isMember(cNid) == false) {
+            kindOf.setNotMember(cNid);
+            tested.setMember(cNid);
+            return true;
+        }
+        return false;
     }
 
     public boolean isKindOf(int cNid) {

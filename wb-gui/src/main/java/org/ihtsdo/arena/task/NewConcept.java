@@ -632,12 +632,12 @@ public class NewConcept extends PreviousNextOrCancel {
             fsnText = fsn.extractText();
             fsnText = fsnText.replaceAll("[\\s]", " ");
             fsnText = fsnText.replaceAll("   *", " ");
-            paren = fsnText.indexOf("(");
+            paren = fsnText.lastIndexOf("(");
             if (paren == -1) {
                 prefText = fsnText;
                 pref.setText(prefText);
             } else {
-                prefText = fsnText.substring(0, paren - 1);
+                prefText = fsnText.substring(0, paren).trim();
                 pref.setText(prefText);
             }
 
@@ -652,12 +652,12 @@ public class NewConcept extends PreviousNextOrCancel {
             fsnText = fsn.extractText();
             fsnText = fsnText.replaceAll("[\\s]", " ");
             fsnText = fsnText.replaceAll("   *", " ");
-            paren = fsnText.indexOf("(");
+            paren = fsnText.lastIndexOf("(");
             if (paren == -1) {
                 prefText = fsnText;
                 pref.setText(prefText);
             } else {
-                prefText = fsnText.substring(0, paren - 1);
+                prefText = fsnText.substring(0, paren).trim();
                 pref.setText(prefText);
             }
 
@@ -672,12 +672,12 @@ public class NewConcept extends PreviousNextOrCancel {
             fsnText = fsn.extractText();
             fsnText = fsnText.replaceAll("[\\s]", " ");
             fsnText = fsnText.replaceAll("   *", " ");
-            paren = fsnText.indexOf("(");
+            paren = fsnText.lastIndexOf("(");
             if (paren == -1) {
                 prefText = fsnText;
                 pref.setText(prefText);
             } else {
-                prefText = fsnText.substring(0, paren - 1);
+                prefText = fsnText.substring(0, paren).trim();
                 pref.setText(prefText);
             }
 

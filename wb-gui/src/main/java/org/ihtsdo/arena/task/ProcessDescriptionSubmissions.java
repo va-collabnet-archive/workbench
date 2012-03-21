@@ -158,7 +158,7 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
                 String[] parts = line.split("\t");
                 String part = null;
                 if (sctPosition != null) {
-                    part = parts[uuidPosition];
+                    part = parts[sctPosition];
                     Set<I_GetConceptData> concepts = Terms.get().getConcept(part);
                     for (I_GetConceptData concept : concepts) {
                         conceptNid = concept.getNid();

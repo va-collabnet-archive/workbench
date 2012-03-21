@@ -1,6 +1,7 @@
 package org.ihtsdo.workflow.refset.utilities;
 
 import java.io.IOException;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -42,29 +43,30 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
         try {
             if (fields.valuesExist()) {
                 RefsetPropertyMap propMap = new RefsetPropertyMap();
+                propMap.put(REFSET_PROPERTY.STRING_VALUE, fieldsToRefsetString());
 
-                if (fields.valuesExist()) {
-                    propMap.put(REFSET_PROPERTY.STRING_VALUE, fieldsToRefsetString());
-
-                    ref = helper.makeWfMetadataMemberAndSetup(refsetNid, fields.getReferencedComponentNid(), REFSET_TYPES.STR, propMap, UUID.randomUUID());
-                }
-                ConceptChronicleBI concept = Ts.get().getConcept(fields.getReferencedComponentUid());
-                ConceptChronicleBI refset = Ts.get().getConcept(refsetNid);
-             
-                if (autoCommit) {
-	            	Terms.get().addUncommittedNoChecks(ref);
-                if (refset.isAnnotationStyleRefex()) {
-                    Terms.get().addUncommittedNoChecks((I_GetConceptData) concept);
-                } else {
-                    Terms.get().addUncommittedNoChecks((I_GetConceptData) refset);
-                }
-	            } else {
-	            	Terms.get().addUncommitted(ref);
+                ref = helper.makeWfMetadataMemberAndSetup(refsetNid, fields.getReferencedComponentNid(), REFSET_TYPES.STR, propMap, UUID.randomUUID());
+               
+                if (ref != null) {
+	                I_GetConceptData refset = Terms.get().getConcept(refsetNid);
+	
 	                if (refset.isAnnotationStyleRefex()) {
-	                    Terms.get().addUncommitted((I_GetConceptData) concept);
+	                	// Workflow history refset only annotated workflow refset at this point
+		                if (autoCommit) {
+		                	// Updated via AdvanceWf, Undo, override
+			                Terms.get().addUncommittedNoChecks(ref);
+			                I_GetConceptData concept = Terms.get().getConcept(fields.getReferencedComponentUid());
+		                	Ts.get().commit(concept);
+		                } else {
+		                	// Updated via UpdateWorkflowUponCommit (includes autoApprove) 
+		                	Terms.get().addUncommitted(ref);
+		                }
 	                } else {
-	                    Terms.get().addUncommitted((I_GetConceptData) refset);
+	                	// Other workflow refsets (ie editor category)
+	                    Ts.get().commit(refset);
 	                }
+	            } else {
+	                throw new NullPointerException("Null wfhx refset member created for concept: " + fields.getReferencedComponentNid()); 
 	            }
             }
         } catch (Exception io) {
@@ -87,15 +89,20 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
 
                 if (ref != null) {
                     helper.retireRefsetStrExtension(refsetNid, fields.getReferencedComponentNid(), propMap);
-
-                    ConceptChronicleBI concept = Ts.get().getConcept(fields.getReferencedComponentUid());
-                    ConceptChronicleBI refset = Ts.get().getConcept(refsetNid);
+                    I_GetConceptData refset = Terms.get().getConcept(refsetNid);
+                    
                     if (refset.isAnnotationStyleRefex()) {
-                        Terms.get().addUncommittedNoChecks((I_GetConceptData) concept);
+	                	// Workflow history refset only annotated workflow refset at this point
+                        I_GetConceptData concept = Terms.get().getConcept(fields.getReferencedComponentUid());
+	                    Ts.get().commit(concept);
                     } else {
-                        Terms.get().addUncommittedNoChecks((I_GetConceptData) refset);
+	                	// Other workflow refsets (ie editor category)
+	                    Ts.get().commit(refset);
                     }
-                }
+                } else {
+	                throw new NullPointerException("Null wfhx refset member retirement for concept: " + fields.getReferencedComponentNid()); 
+	            }
+
             }
         } catch (Exception io) {
             AceLog.getAppLog().log(Level.WARNING, "Failed to retire member with error: " + io.getMessage());

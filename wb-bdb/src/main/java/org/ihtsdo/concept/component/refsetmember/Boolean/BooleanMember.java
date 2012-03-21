@@ -16,7 +16,6 @@ import org.ihtsdo.concept.component.RevisionSet;
 import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
-import org.ihtsdo.etypes.ERefsetBooleanMember;
 import org.ihtsdo.etypes.ERefsetBooleanRevision;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
@@ -39,6 +38,7 @@ import java.io.IOException;
 import java.util.*;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanVersionBI;
+import org.ihtsdo.tk.dto.RevisionHandling;
 
 public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember>
         implements I_ExtendByRefPartBoolean<BooleanRevision>, RefexBooleanAnalogBI<BooleanRevision> {
@@ -340,7 +340,7 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember>
 
         @Override
         public TkRefsetBooleanMember getERefsetMember() throws IOException {
-            return new ERefsetBooleanMember(this);
+            return new TkRefsetBooleanMember(this, RevisionHandling.EXCLUDE_REVISIONS);
         }
 
         @Override

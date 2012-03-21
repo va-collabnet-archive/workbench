@@ -68,6 +68,8 @@ import org.ihtsdo.tk.hash.Hashcode;
 import java.beans.PropertyVetoException;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -85,6 +87,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.db.change.ChangeNotifier;
 
 public abstract class ConceptComponent<R extends Revision<R, C>, C extends ConceptComponent<R, C>>
@@ -197,7 +200,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                 } else {
                     addRevision((R) v.getRevision(), false);
                 }
-                
+
             }
         }
 
@@ -391,7 +394,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     public final boolean addRevision(R r) {
         return addRevision(r, true);
     }
-    
+
     @SuppressWarnings("unchecked")
     public final boolean addRevision(R r, boolean notify) {
         assert r != null;
@@ -418,9 +421,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
         return returnValue;
     }
-    
+
     protected void addRevisionHook(boolean returnValue, R r) {
-        
     }
 
     public final boolean addRevisionNoRedundancyCheck(R r) {
@@ -1014,6 +1016,13 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                 ConceptComponent.addNidToBuffer(buf, getAuthorNid());
                 buf.append(" path:");
                 ConceptComponent.addNidToBuffer(buf, getPathNid());
+                UUID authorUuid = Ts.get().getConceptForNid(getAuthorNid()).getPrimUuid();
+                String stringToHash = authorUuid.toString()
+                        + Long.toString(getTime());
+                UUID type5Uuid = Type5UuidFactory.get(Type5UuidFactory.AUTHOR_TIME_ID,
+                        stringToHash);
+                buf.append(" authTime: ");
+                buf.append(type5Uuid);
                 buf.append(" tm: ");
                 buf.append(TimeHelper.formatDate(getTime()));
                 buf.append(" ");
@@ -1228,12 +1237,37 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         if (annotations != null) {
             for (RefexChronicleBI<?> annotation : annotations) {
                 for (RefexVersionBI<?> av : annotation.getVersions()) {
-                    sapNids.add(av.getSapNid());
+                    int sapNid = av.getSapNid();
+                    if (sapNid > 0) {
+                        sapNids.add(sapNid);
+                    }
                 }
             }
         }
 
         return sapNids;
+    }
+    
+    public Set<Integer> getAnnotationNidsForSaps(Set<Integer> sapNids) {
+        int size = 0;
+
+        if (annotations != null) {
+            size = size + annotations.size();
+        }
+
+        HashSet<Integer> annotNids = new HashSet<Integer>(size);
+
+        if (annotations != null) {
+            for (RefexChronicleBI<?> annotation : annotations) {
+                for (RefexVersionBI<?> av : annotation.getVersions()) {
+                    if(sapNids.contains(av.getSapNid())){
+                        annotNids.add(av.getNid());
+                    }
+                }
+            }
+        }
+
+        return annotNids;
     }
 
     @Override
@@ -1292,6 +1326,30 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         sapNids.addAll(getAnnotationSapNids());
 
         return sapNids;
+    }
+    
+    public Set<Integer> getComponentNidsForSaps(Set<Integer> sapNids) throws IOException {
+        int size = 1;
+
+        if (revisions != null) {
+            size = size + revisions.size();
+        }
+
+        if (additionalIdVersions != null) {
+            size = size + additionalIdVersions.size();
+        }
+
+        if (annotations != null) {
+            size = size + annotations.size();
+        }
+
+        HashSet<Integer> componentNids = new HashSet<Integer>(size);
+
+        componentNids.addAll(getVersionNidsForSaps(sapNids));
+        componentNids.addAll(getIdNidsForSaps(sapNids));
+        componentNids.addAll(getAnnotationNidsForSaps(sapNids));
+
+        return componentNids;
     }
 
     @Override
@@ -1431,11 +1489,33 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         if (additionalIdVersions != null) {
             for (IdentifierVersion id : additionalIdVersions) {
-                sapNids.add(id.getSapNid());
+                int sapNid = id.getSapNid();
+                if (sapNid > 0) {
+                    sapNids.add(id.getSapNid());
+                }
             }
         }
 
         return sapNids;
+    }
+    
+    public Set<Integer> getIdNidsForSaps(Set<Integer> sapNids) {
+        int size = 1;
+
+        if (additionalIdVersions != null) {
+            size = size + additionalIdVersions.size();
+        }
+
+        HashSet<Integer> componentNids = new HashSet<Integer>(size);
+        if (additionalIdVersions != null) {
+            for (IdentifierVersion id : additionalIdVersions) {
+                if(sapNids.contains(id.getSapNid())){
+                    componentNids.add(this.nid);
+                }
+            }
+        }
+
+        return componentNids;
     }
 
     @Override
@@ -1806,11 +1886,33 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         if (revisions != null) {
             for (R r : revisions) {
-                sapNids.add(r.sapNid);
+                if (r.sapNid > 0) {
+                    sapNids.add(r.sapNid);
+                }
             }
         }
 
         return sapNids;
+    }
+
+    public Set<Integer> getVersionNidsForSaps(Set<Integer> sapNids) {
+        int size = 1;
+
+        if (revisions != null) {
+            size = size + revisions.size();
+        }
+
+        HashSet<Integer> componentNids = new HashSet<Integer>(size);
+
+        if (revisions != null) {
+            for (R r : revisions) {
+                if(sapNids.contains(r.sapNid)){
+                    componentNids.add(r.getNid());
+                }
+            }
+        }
+
+        return componentNids;
     }
     
     public abstract List<? extends Version> getVersions();
@@ -2387,7 +2489,22 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public String toString() {
-            return "Version: " + cv.toString();
+            StringBuffer buf = new StringBuffer();
+            try {
+                buf.append("Version: ");
+                buf.append(cv.toString());
+                UUID authorUuid = Ts.get().getConceptForNid(getAuthorNid()).getPrimUuid();
+                String stringToHash = authorUuid.toString()
+                        + Long.toString(getTime());
+                UUID type5Uuid = Type5UuidFactory.get(Type5UuidFactory.AUTHOR_TIME_ID,
+                        stringToHash);
+                buf.append(" authTime: ");
+                buf.append(type5Uuid);
+            } catch (Throwable e) {
+                buf.append(" !!! Error computing author time hash !!! ");
+                buf.append(e.getLocalizedMessage());
+            }
+            return buf.toString();
         }
 
         @Override

@@ -34,6 +34,7 @@ import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexAnalogBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_array_of_bytearray.RefexArrayOfBytearrayAnalogBI;
 import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanAnalogBI;
 import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidAnalogBI;
@@ -311,6 +312,12 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         return properties.put(RefexProperty.MEMBER_UUID,
                 value);
     }
+    
+    public Object put(RefexProperty key, byte[][] value){
+        assert key == RefexProperty.ARRAY_BYTEARRAY;
+        return properties.put(RefexProperty.ARRAY_BYTEARRAY,
+                value);
+    }
 
     @Override
     public String toString() {
@@ -451,6 +458,10 @@ public class RefexCAB extends CreateOrAmendBlueprint {
                 case STRING1:
                     RefexStrAnalogBI<?> strPart = (RefexStrAnalogBI<?>) version;
                     strPart.setStr1((String) entry.getValue());
+                    break;
+                case ARRAY_BYTEARRAY:
+                    RefexArrayOfBytearrayAnalogBI<?> arrayPart = (RefexArrayOfBytearrayAnalogBI<?>) version;
+                    arrayPart.setArrayOfByteArray((byte[][]) entry.getValue());
                     break;
                 default:
                     throw new RuntimeException("Can't handle: " + entry.getKey());

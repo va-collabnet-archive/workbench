@@ -16,7 +16,6 @@ import org.ihtsdo.concept.component.RevisionSet;
 import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
-import org.ihtsdo.etypes.ERefsetLongMember;
 import org.ihtsdo.etypes.ERefsetRevision;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
@@ -38,9 +37,10 @@ import java.util.*;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_member.RefexMemberAnalogBI;
 import org.ihtsdo.tk.api.refex.type_member.RefexMemberVersionBI;
+import org.ihtsdo.tk.dto.RevisionHandling;
 
 public class MembershipMember extends RefsetMember<MembershipRevision, MembershipMember> 
-    implements RefexMemberAnalogBI<MembershipRevision> {
+    implements RefexMemberAnalogBI<MembershipRevision>, I_ExtendByRefPart<MembershipRevision> {
    
     private static VersionComputer<RefsetMember<MembershipRevision, MembershipMember>.Version> computer =
       new VersionComputer<RefsetMember<MembershipRevision, MembershipMember>.Version>();
@@ -241,11 +241,16 @@ public class MembershipMember extends RefsetMember<MembershipRevision, Membershi
       return Collections.unmodifiableList((List<Version>) versions);
    }
 
+    @Override
+    public I_ExtendByRefPart<MembershipRevision> duplicate() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
    //~--- inner classes -------------------------------------------------------
 
    public class Version extends RefsetMember<MembershipRevision, MembershipMember>.Version
            implements I_ExtendByRefVersion<MembershipRevision>, I_ExtendByRefPart<MembershipRevision>,
-                      RefexAnalogBI<MembershipRevision> {
+                      RefexMemberAnalogBI<MembershipRevision> {
       private Version(RefexAnalogBI cv) {
          super(cv);
       }
@@ -274,8 +279,8 @@ public class MembershipMember extends RefsetMember<MembershipRevision, Membershi
       }
 
       @Override
-      public ERefsetLongMember getERefsetMember() throws IOException {
-         return new ERefsetLongMember(this);
+      public TkRefsetMember getERefsetMember() throws IOException {
+         return new TkRefsetMember(this, RevisionHandling.EXCLUDE_REVISIONS);
       }
 
       @Override

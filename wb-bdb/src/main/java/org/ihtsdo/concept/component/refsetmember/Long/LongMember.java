@@ -8,7 +8,6 @@ import com.sleepycat.bind.tuple.TupleOutput;
 import org.apache.commons.collections.primitives.ArrayIntList;
 
 import org.dwfa.ace.api.I_AmPart;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartLong;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 
@@ -17,7 +16,6 @@ import org.ihtsdo.concept.component.RevisionSet;
 import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
-import org.ihtsdo.etypes.ERefsetLongMember;
 import org.ihtsdo.etypes.ERefsetLongRevision;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
@@ -40,6 +38,7 @@ import java.io.IOException;
 import java.util.*;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_long.RefexLongVersionBI;
+import org.ihtsdo.tk.dto.RevisionHandling;
 
 public class LongMember extends RefsetMember<LongRevision, LongMember>
         implements I_ExtendByRefPartLong<LongRevision>, RefexLongAnalogBI<LongRevision> {
@@ -320,8 +319,8 @@ public class LongMember extends RefsetMember<LongRevision, LongMember>
       }
 
       @Override
-      public ERefsetLongMember getERefsetMember() throws IOException {
-         return new ERefsetLongMember(this);
+      public TkRefsetLongMember getERefsetMember() throws IOException {
+         return new TkRefsetLongMember(this, RevisionHandling.EXCLUDE_REVISIONS);
       }
 
       @Override

@@ -63,7 +63,6 @@ public class AdvanceWorkflow extends AbstractTask {
     			{
     				WorkflowHelper.setAdvancingWorkflowLock(true);
     				writer.updateWorkflowHistory(bean);
-	                Terms.get().commit();
     				WorkflowHelper.setAdvancingWorkflowLock(false);
     				
         	        return Condition.CONTINUE;

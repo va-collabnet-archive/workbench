@@ -69,6 +69,7 @@ import au.csiro.snorocket.snapi.I_Snorocket_123.I_EquivalentCallback;
 import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataConCallback;
 import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataRelCallback;
 import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataRoleCallback;
+import java.util.*;
 import javax.swing.SwingUtilities;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.ihtsdo.tk.Ts;
@@ -936,9 +937,20 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
         logger.log(Level.INFO, "\r\n::: [SnorocketExTask]"
                 + "\r\n::: snorelA.size() = \t{0}\r\n::: snorelB.size() = \t{1}",
                 new Object[]{snorelA.size(), snorelB.size()});
-
+        // :DEBUG:WATCH:
+        // 397396006	Aspiration of bronchus with lavage (procedure)
+        int watchNid = tf.getConcept(UUID.fromString("86123773-4f24-31c8-8d64-6a2e7b940f92")).getConceptNid();
+        // 75761004 Infusion of intra-arterial thrombolytic agent with percutaneous transluminal coronary angioplasty
+        int watchNid1 = tf.getConcept(UUID.fromString("65ad5b42-adb2-3837-95d3-9872a33ff45b")).getConceptNid();
+        // 431185003 Replacement of central venous catheter using fluoroscopic guidance
+        int watchNid2 = tf.getConcept(UUID.fromString("cff52355-af3a-3b1c-9573-73235abc6c41")).getConceptNid();
         // BY SORT ORDER, LOWER NUMBER ADVANCES FIRST
         while (!done_A && !done_B) {
+            // :DEBUG:WATCH
+            if (rel_A.c1Id == watchNid || rel_A.c1Id == watchNid1 || rel_A.c1Id == watchNid2) {
+                logger.log(Level.INFO, "::: [SnorocketExTask] found watch nid");
+            }
+
             if (++countConSeen % 25000 == 0) {
                 logger.log(Level.INFO, "::: [SnorocketExTask] compareAndWriteBack @ #\t{0}", countConSeen);
             }
@@ -1022,8 +1034,8 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
                         rel_A = itA.next();
                     } else {
                         done_A = true;
+                        break;
                     }
-                    break;
                 }
 
                 // REMAINDER LIST_B GROUP 0 FOR C1
@@ -1038,8 +1050,8 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
                         rel_B = itB.next();
                     } else {
                         done_B = true;
+                        break;
                     }
-                    break;
                 }
 
                 // ** SEGMENT GROUPS **
@@ -1083,12 +1095,23 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
                     }
                 }
 
+                // DETERMINE ROLE GROUP NUMBERS IN USE
+                HashSet<Integer> groupNumbersInUse = new HashSet<Integer>();
+                for (SnoGrp sg : groupList_A) {
+                    if (sg.size() > 0) {
+                        groupNumbersInUse.add(Integer.valueOf(sg.get(0).group));
+                    }
+                }
+
                 // FIND GROUPS IN GROUPLIST_A WITHOUT AN EQUAL IN GROUPLIST_B
                 // WRITE THESE GROUPED RELS AS "RETIRED"
                 SnoGrpList groupList_NotEqual;
                 if (groupList_A.size() > 0) {
                     groupList_NotEqual = groupList_A.whichNotEqual(groupList_B);
                     for (SnoGrp sg : groupList_NotEqual) {
+                        if (sg.size() > 0) {
+                            groupNumbersInUse.remove(Integer.valueOf(sg.get(0).group));
+                        }
                         for (SnoRel sr_A : sg) {
                             writeBackRetired(sr_A, classPathNid, vTime);
                         }
@@ -1099,10 +1122,17 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
 
                 // FIND GROUPS IN GROUPLIST_B WITHOUT AN EQUAL IN GROUPLIST_A
                 // WRITE THESE GROUPED RELS AS "NEW, CURRENT"
+                Integer groupNumber = 1;
                 if (groupList_B.size() > 0) {
                     groupList_NotEqual = groupList_B.whichNotEqual(groupList_A);
                     for (SnoGrp sg : groupList_NotEqual) {
+                        // find next free group number
+                        while (groupNumbersInUse.contains(groupNumber)) {
+                            groupNumber++;
+                        }
+                        groupNumbersInUse.add(groupNumber);
                         for (SnoRel sr_B : sg) {
+                            sr_B.group = groupNumber.intValue();
                             writeBackCurrent(sr_B, classPathNid, vTime);
                         }
                     }

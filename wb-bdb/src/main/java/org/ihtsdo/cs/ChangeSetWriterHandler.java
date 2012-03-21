@@ -89,7 +89,7 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
                     break;
                 }
             }
-            
+            this.sapNidsFromCommit.add(this.commitRecordSapNid);
         }
         if (writeAdjudicationRecord) {
             adjudicationRecRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.ADJUDICATION_RECORD.getUids());
@@ -103,7 +103,7 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
                     break;
                 }
             }
-            
+            this.sapNidsFromCommit.add(this.adjudicationRecordSapNid);
         }
     }
 
@@ -178,7 +178,7 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
             Set<UUID> authorTimeHashSet = new HashSet<UUID>(); // :WAS:byte[]
             if (writeCommitRecord && commitRecordSapNid != 0) {
                 for (Integer sap : c.getAllSapNids()) {
-                    if (sap > Bdb.getSapDb().getReadOnlyMax()) {
+                    if (sap > Bdb.getSapDb().getReadOnlyMax() && Bdb.getSapDb().getTime(sap) != Long.MAX_VALUE) {
                         Concept authorConcept = Concept.get(Bdb.getSapDb().getAuthorNid(sap));
                         long time = Bdb.getSapDb().getTime(sap);
                         String stringToHash = authorConcept.getPrimUuid().toString()

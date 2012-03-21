@@ -33,11 +33,13 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_array_of_bytearray.RefexArrayOfBytearrayAnalogBI;
 import org.ihtsdo.tk.api.refex.type_array_of_bytearray.RefexArrayOfBytearrayVersionBI;
+import org.ihtsdo.tk.dto.RevisionHandling;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refset.array.bytearray.TkRefsetArrayByteArrayRevision;
 import org.ihtsdo.tk.dto.concept.component.refset.array.bytearray.TkRefsetArrayOfBytearrayMember;
 import org.ihtsdo.tk.hash.Hashcode;
+import org.ihtsdo.tk.uuid.UuidT5Generator;
 
 /**
  *
@@ -194,7 +196,12 @@ public class ArrayOfBytearrayMember extends RefsetMember<ArrayOfBytearrayRevisio
       for (int i = 0; i < this.arrayOfByteArray.length; i++) {
         buff.append(" ").append(i);
         buff.append(": ");
-        buff.append(this.arrayOfByteArray[i]);
+        if(this.arrayOfByteArray[i].length == 16){
+            buff.append(UuidT5Generator.getUuidFromRawBytes(this.arrayOfByteArray[i]));
+        }else{
+            buff.append(this.arrayOfByteArray[i]);
+        }
+        
       }
       buff.append(" ");
       buff.append(super.toString());
@@ -318,7 +325,7 @@ public class ArrayOfBytearrayMember extends RefsetMember<ArrayOfBytearrayRevisio
 
         @Override
         public TkRefsetArrayOfBytearrayMember getERefsetMember() throws IOException {
-            return new TkRefsetArrayOfBytearrayMember(this);
+            return new TkRefsetArrayOfBytearrayMember(this, RevisionHandling.EXCLUDE_REVISIONS);
         }
 
         @Override

@@ -43,7 +43,7 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
  *
  * @author kec
  */
-public class ContradictionFinderSwingWorker
+public class ContradictionFinderDebugSwingWorker
         extends SwingWorker<Set<Integer>, Integer> {
 
     private TerminologyListModel conflicts;
@@ -57,8 +57,6 @@ public class ContradictionFinderSwingWorker
     private ContradictionConceptProcessor ccp;
     private Locale locale;
     private double numberConceptsToProcess;
-    private int conflictRefsetNid;
-    private int numberFound;
     
     /* ContradictionUpdator */
     private class ContradictionUpdator implements ActionListener {
@@ -144,6 +142,18 @@ public class ContradictionFinderSwingWorker
                     AceLog.getAppLog().info("completeLatch is null");
                 }
 
+                int numberFound = ccp.getNumberContradictionsFound().get();
+                String percentageStr = new String(" with " + createPercentage() + " concepts processed");
+                String progressStr;
+
+                if (numberFound == 0) {
+                    progressStr = "None found" + percentageStr;
+                } else {
+                    progressStr = numberFound + " found" + percentageStr;
+                }
+
+                frame.setProgressInfo(progressStr);
+
                 if (hits != null && completeLatch.getCount() == 0) {
                     normalCompletion();
                 }
@@ -176,7 +186,7 @@ public class ContradictionFinderSwingWorker
             }
             frame.setProgressValue(0);
 
-            numberFound = ccp.getNumberContradictionsFound().get();
+            int numberFound = ccp.getNumberContradictionsFound().get();
             if (numberFound == 0) {
                 frame.setProgressInfo("No Contradictions Detected");
             } else {
@@ -202,7 +212,7 @@ public class ContradictionFinderSwingWorker
     /*
      * ContradictionFinderSwingWorker Class Methods
      */
-    public ContradictionFinderSwingWorker(ContradictionEditorFrame editorFrame, ViewCoordinate vc) {
+    public ContradictionFinderDebugSwingWorker(ContradictionEditorFrame editorFrame, ViewCoordinate vc) {
         this.frame = editorFrame;
         this.conflicts = (TerminologyListModel) frame.getBatchConceptList().getModel();
         this.viewCoord = vc;
@@ -222,7 +232,7 @@ public class ContradictionFinderSwingWorker
         frame.addStopActionListener(stopListener);
         frame.enableStopButton(true);
         frame.setProgressIndeterminate(true);
-        frame.setProgressInfo("Running the Contradiction Detector");
+        frame.setProgressInfo("Starting the Contradiction Detector");
         this.conflicts.clear();
         
         completeLatch = new CountDownLatch(1);
@@ -246,12 +256,12 @@ public class ContradictionFinderSwingWorker
                 adjRecRefsetNid,
                 viewCoord,
                 cases, null,
-                true, true);
+                false, false);
         Ts.get().iterateConceptDataInParallel(mecd);
 
         // Done, get results
         Set<Integer> returnSet = new HashSet<Integer>();   
-        conflictRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.CONFLICT_RECORD.getUids());
+        int conflictRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.CONFLICT_RECORD.getUids());
         ConceptChronicleBI conflictRefset = Ts.get().getConceptForNid(conflictRefsetNid);
         TerminologyBuilderBI builder = 
                     Ts.get().getTerminologyBuilder(frame.getActiveFrameConfig().getEditCoordinate(), viewCoord);
@@ -286,12 +296,9 @@ public class ContradictionFinderSwingWorker
             ComponentChroncileBI<?> component = Ts.get().getComponent(retiredIterator.nid());
             RefexVersionBI member = conflictRefset.getCurrentRefsetMemberForComponent(
                     viewCoord, component.getConceptNid());
-            
-            if(member != null){
-                RefexCAB memberBp = member.makeBlueprint(viewCoord);
-                memberBp.setRetired();
-                builder.constructIfNotCurrent(memberBp);
-            }
+            RefexCAB memberBp = member.makeBlueprint(viewCoord);
+            memberBp.setRetired();
+            builder.constructIfNotCurrent(memberBp);
         }
 
         Ts.get().addUncommitted(conflictRefset);
@@ -304,8 +311,7 @@ public class ContradictionFinderSwingWorker
         completeLatch = new CountDownLatch(returnSet.size());
 
         timer.stop();
-        frame.setProgressInfo("Finished with " + returnSet.size() + " concepts found.");
-        
+
         return returnSet;
     }
 
@@ -332,7 +338,7 @@ public class ContradictionFinderSwingWorker
             frame.setProgressValue(0);
 
 
-            numberFound = conflicts.getSize();
+            int numberFound = ccp.getNumberContradictionsFound().get();
             
             String displayString;
             if (numberFound == 0) {

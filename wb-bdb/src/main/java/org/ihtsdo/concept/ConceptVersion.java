@@ -1291,4 +1291,9 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
     public boolean versionsEqual(ViewCoordinate vc1, ViewCoordinate vc2, Boolean compareAuthoring) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
+    @Override
+    public Set<Integer> getAllNidsForSaps(Set<Integer> sapNids) throws IOException {
+        return concept.getAllNidsForSaps(sapNids);
+    }
 }

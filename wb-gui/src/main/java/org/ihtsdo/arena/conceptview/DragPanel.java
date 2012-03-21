@@ -233,13 +233,16 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
                   AceLog.getAppLog().fine("thingToDrop: " + thingToDrop);
                }
                
-               View viewType; 
-               if(getSettings().relAssertionType == RelAssertionType.STATED){
+               View viewType;
+               if(getSettings().getRelAssertionType() == RelAssertionType.STATED){
                    viewType = View.STATED;
-               }else if (getSettings().relAssertionType == RelAssertionType.INFERRED){
+               }else if (getSettings().getRelAssertionType() == RelAssertionType.INFERRED){
                    viewType = View.INFERRED;
-               }else{
+               }else if (getSettings().getRelAssertionType() == RelAssertionType.INFERRED_THEN_STATED){
                    viewType = View.STATED_AND_INFERRED;
+               }else{
+                   RelAssertionType relAssertionType = getSettings().getRelAssertionType();
+                   viewType = View.STATED;
                }
 
                Collection<Object> facts = new ArrayList<Object>();

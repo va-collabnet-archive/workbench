@@ -35,10 +35,11 @@ public class TerminologyTableRenderer extends DefaultTableCellRenderer {
             boolean isSelected, boolean hasFocus, final int row, int column) {
         TerminologyTableModel model = (TerminologyTableModel) table.getModel();
         final TerminologyList list = model.getList();
-        JLabel renderComponent = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+        JLabel renderComponent = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus,
+                table.convertRowIndexToView(row), column);
 
         try {
-            I_GetConceptData testConcept = list.dataModel.getElementAt(row);
+            I_GetConceptData testConcept = list.dataModel.getElementAt(table.convertRowIndexToModel(row));
 
             boolean uncommitted = testConcept.isUncommitted();
             String text;

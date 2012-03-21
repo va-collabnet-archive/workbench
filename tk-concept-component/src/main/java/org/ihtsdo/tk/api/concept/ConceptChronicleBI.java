@@ -21,6 +21,7 @@ import org.ihtsdo.tk.contradiction.FoundContradictionVersions;
 import java.io.IOException;
 
 import java.util.Collection;
+import java.util.Set;
 
 public interface ConceptChronicleBI extends ComponentChroncileBI<ConceptVersionBI> {
    void cancel() throws IOException;
@@ -81,6 +82,8 @@ public interface ConceptChronicleBI extends ComponentChroncileBI<ConceptVersionB
    Collection<? extends RelationshipChronicleBI> getRelsOutgoing() throws IOException;
 
    FoundContradictionVersions getVersionsInContradiction(ViewCoordinate vc);
+   
+   Set<Integer> getAllNidsForSaps(Set<Integer> sapNids) throws IOException;
 
    boolean hasCurrentRefsetMemberForComponent(ViewCoordinate vc, int componentNid) throws IOException;
 
