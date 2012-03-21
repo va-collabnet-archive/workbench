@@ -286,9 +286,12 @@ public class ContradictionFinderSwingWorker
             ComponentChroncileBI<?> component = Ts.get().getComponent(retiredIterator.nid());
             RefexVersionBI member = conflictRefset.getCurrentRefsetMemberForComponent(
                     viewCoord, component.getConceptNid());
-            RefexCAB memberBp = member.makeBlueprint(viewCoord);
-            memberBp.setRetired();
-            builder.constructIfNotCurrent(memberBp);
+            
+            if(member != null){
+                RefexCAB memberBp = member.makeBlueprint(viewCoord);
+                memberBp.setRetired();
+                builder.constructIfNotCurrent(memberBp);
+            }
         }
 
         Ts.get().addUncommitted(conflictRefset);
