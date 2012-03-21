@@ -89,7 +89,7 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
                     break;
                 }
             }
-            
+            this.sapNidsFromCommit.add(this.commitRecordSapNid);
         }
         if (writeAdjudicationRecord) {
             adjudicationRecRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.ADJUDICATION_RECORD.getUids());
@@ -103,7 +103,7 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
                     break;
                 }
             }
-            
+            this.sapNidsFromCommit.add(this.adjudicationRecordSapNid);
         }
     }
 
