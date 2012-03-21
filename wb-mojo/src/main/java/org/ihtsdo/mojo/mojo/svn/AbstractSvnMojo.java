@@ -79,11 +79,7 @@ public abstract class AbstractSvnMojo
         if ( !interactive )
         {
             getLog().info( "Not prompting for username/password - non-interactive mode" );
-//            return false;
-
-            this.username = "arodriguez";
-            this.password="arodriguez";
-            return true;
+            return false;
         }
 
         try
