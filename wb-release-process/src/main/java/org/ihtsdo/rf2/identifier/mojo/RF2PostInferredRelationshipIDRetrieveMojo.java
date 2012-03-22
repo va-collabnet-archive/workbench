@@ -17,7 +17,7 @@ import org.ihtsdo.rf2.postexport.AuxiliaryFilesRetrieve;
 import org.ihtsdo.rf2.postexport.CommonUtils;
 import org.ihtsdo.rf2.postexport.FileSorter;
 import org.ihtsdo.rf2.postexport.RF2FileRetrieve;
-import org.ihtsdo.rf2.postexport.SnapshotGenerator;
+import org.ihtsdo.rf2.postexport.SnapshotGeneratorMultiColumn;
 import org.ihtsdo.rf2.postexport.RF2ArtifactPostExportAbst.FILE_TYPE;
 
 
@@ -141,13 +141,13 @@ public class RF2PostInferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo
 				//TODO empty folder needed?
 			}
 			File snapshotSortedPreviousfile=new File(snapshotfolderTmp,"pre_" + previousNotReleasedFile.getName());
-			SnapshotGenerator sg=new SnapshotGenerator(sortedPreviousfile, releaseDate, FILE_TYPE.RF2_RELATIONSHIP.getSnapshotIndex(), 1, snapshotSortedPreviousfile, null, null);
+			SnapshotGeneratorMultiColumn sg=new SnapshotGeneratorMultiColumn(sortedPreviousfile, releaseDate, FILE_TYPE.RF2_RELATIONSHIP.getSnapshotIndex(), 1, snapshotSortedPreviousfile, null, null);
 			sg.execute();
 			sg=null;
 			System.gc();
 
 			File snapshotSortedExportedfile=new File(snapshotfolderTmp,"exp_" + exportedRelationshipFile.getName());
-			sg=new SnapshotGenerator(sortedExportedfile, releaseDate, FILE_TYPE.RF2_RELATIONSHIP.getSnapshotIndex(), 1, snapshotSortedExportedfile, null, null);
+			sg=new SnapshotGeneratorMultiColumn(sortedExportedfile, releaseDate, FILE_TYPE.RF2_RELATIONSHIP.getSnapshotIndex(), 1, snapshotSortedExportedfile, null, null);
 			sg.execute();
 			sg=null;
 			System.gc();

@@ -10,7 +10,6 @@ import org.ihtsdo.rf2.identifier.impl.RF2ICDOTargetsImpl;
 import org.ihtsdo.rf2.mojo.ReleaseConfigMojo;
 import org.ihtsdo.rf2.postexport.AuxiliaryFilesRetrieve;
 import org.ihtsdo.rf2.postexport.FileSorter;
-import org.ihtsdo.rf2.postexport.SnapshotGenerator;
 import org.ihtsdo.rf2.postexport.RF2ArtifactPostExportAbst.FILE_TYPE;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.JAXBUtil;
@@ -155,7 +154,7 @@ public class RF2ICDOTargetsMojo extends ReleaseConfigMojo {
 				//TODO empty folder needed?
 			}
 			File snapshotSortedPreviousfile=new File(snapshotfolderTmp,"pre_" + previousSimpleMapFullFile.getName());
-			SnapshotGenerator sg=new SnapshotGenerator(sortedPreviousfile, previousReleaseDate, FILE_TYPE.RF2_ICDO_TARGETS.getSnapshotIndex(), 1, snapshotSortedPreviousfile, null, null);
+			SnapshotGeneratorMultiColumn sg=new SnapshotGeneratorMultiColumn(sortedPreviousfile, previousReleaseDate, FILE_TYPE.RF2_ICDO_TARGETS.getSnapshotIndex(), 1, snapshotSortedPreviousfile, null, null);
 			sg.execute();
 			sg=null;
 			System.gc();
