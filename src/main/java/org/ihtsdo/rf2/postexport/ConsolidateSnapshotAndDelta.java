@@ -18,7 +18,7 @@ public class ConsolidateSnapshotAndDelta extends AbstractTask {
 	private File snapshotSortedExportedfile;
 	private File snapshotFinalFile;
 	private Integer[] fieldsToCompare;
-	private int index;
+//	private int index;
 	private String releaseDate;
 	private String newLine="\r\n";
 	private int colLen;
@@ -26,6 +26,7 @@ public class ConsolidateSnapshotAndDelta extends AbstractTask {
 	private BufferedWriter bw;
 	private BufferedWriter dbw;
 	private int effectiveTimeColIndex;
+	private int[] indexes;
 
 	public ConsolidateSnapshotAndDelta(FILE_TYPE fType,
 			File snapshotSortedPreviousfile, File snapshotSortedExportedfile,
@@ -35,7 +36,7 @@ public class ConsolidateSnapshotAndDelta extends AbstractTask {
 		this.snapshotFinalFile=snapshotFinalFile;
 		this.deltaFinalFile=deltaFinalFile;
 		this.fieldsToCompare=fType.getColumnsToCompare();
-		this.index=fType.getSnapshotIndex();
+		this.indexes=fType.getSnapshotIndex();
 		this.effectiveTimeColIndex=fType.getEffectiveTimeColIndex();
 		this.releaseDate=releaseDate;
 	}
@@ -88,7 +89,9 @@ public class ConsolidateSnapshotAndDelta extends AbstractTask {
 				splittedLine1 = line1.split("\t",-1);
 
 				if (line2!=null){
-					int comp = splittedLine1[index].compareTo(splittedLine2[index]);
+
+					int comp = idxCompare(splittedLine1,splittedLine2);
+//					int comp = splittedLine1[index].compareTo(splittedLine2[index]);
 					if ( comp<0){
 
 						addPreviousLine(splittedLine1);
@@ -104,7 +107,8 @@ public class ConsolidateSnapshotAndDelta extends AbstractTask {
 									break;
 								}
 								splittedLine2=line2.split("\t",-1);
-								comp = splittedLine1[index].compareTo(splittedLine2[index]);
+								comp = idxCompare(splittedLine1,splittedLine2);
+//								comp = splittedLine1[index].compareTo(splittedLine2[index]);
 							}
 							if ( comp<0){
 								addPreviousLine(splittedLine1);
@@ -124,7 +128,8 @@ public class ConsolidateSnapshotAndDelta extends AbstractTask {
 								break;
 							}
 							splittedLine2=line2.split("\t",-1);
-							comp = splittedLine1[index].compareTo(splittedLine2[index]);
+							comp = idxCompare(splittedLine1,splittedLine2);
+//							comp = splittedLine1[index].compareTo(splittedLine2[index]);
 
 						}
 					}
@@ -178,6 +183,15 @@ public class ConsolidateSnapshotAndDelta extends AbstractTask {
 		dbw.append(tmp);
 	}
 
+	private int idxCompare(String[] splittedLine1, String[] splittedLine2) {
+		int iComp;
+		for (int i : indexes){
+			iComp=splittedLine1[i].compareTo(splittedLine2[i]);
+			if (iComp!=0)
+				return iComp;
+		}
+		return 0;
+	}
 	private void addPreviousLine(String[] splittedLine) throws Exception {
 		for (int i = 0; i < splittedLine.length; i++) {
 			bw.append(splittedLine[i]);

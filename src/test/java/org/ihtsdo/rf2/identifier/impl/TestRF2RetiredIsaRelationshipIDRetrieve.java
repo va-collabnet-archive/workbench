@@ -6,7 +6,7 @@ import java.io.IOException;
 import junit.framework.TestCase;
 
 import org.ihtsdo.rf2.postexport.FileSorter;
-import org.ihtsdo.rf2.postexport.SnapshotGenerator;
+import org.ihtsdo.rf2.postexport.SnapshotGeneratorMultiColumn;
 import org.ihtsdo.rf2.postexport.RF2ArtifactPostExportAbst.FILE_TYPE;
 
 
@@ -33,13 +33,13 @@ public class TestRF2RetiredIsaRelationshipIDRetrieve extends TestCase{
 		
 		
 		File snapshotSortedPreviousfile=new File("/Users/ar/Downloads/testIDReassign/snappre_" + previousFile.getName());
-		SnapshotGenerator sg=new SnapshotGenerator(sortedPreviousfile, "20110131", FILE_TYPE.RF2_RELATIONSHIP.getSnapshotIndex(), 1, snapshotSortedPreviousfile, null, null);
+		SnapshotGeneratorMultiColumn sg=new SnapshotGeneratorMultiColumn(sortedPreviousfile, "20110131", FILE_TYPE.RF2_RELATIONSHIP.getSnapshotIndex(), 1, snapshotSortedPreviousfile, null, null);
 		sg.execute();
 		sg=null;
 		System.gc();
 
 		File snapshotSortedExportedfile=new File("/Users/ar/Downloads/testIDReassign/snapexp_" + previousFile.getName());
-		sg=new SnapshotGenerator(sortedExportedfile, "20110731",FILE_TYPE.RF2_RELATIONSHIP.getSnapshotIndex(), 1, snapshotSortedExportedfile, null, null);
+		sg=new SnapshotGeneratorMultiColumn(sortedExportedfile, "20110731",FILE_TYPE.RF2_RELATIONSHIP.getSnapshotIndex(), 1, snapshotSortedExportedfile, null, null);
 		sg.execute();
 		sg=null;
 		System.gc();
@@ -98,13 +98,13 @@ public class TestRF2RetiredIsaRelationshipIDRetrieve extends TestCase{
 		
 		
 		File snapshotSortedPreviousfile=new File("/Users/ar/Downloads/testIDReassign/snappre_" + previousFile.getName());
-		SnapshotGenerator sg=new SnapshotGenerator(sortedPreviousfile, "20110131", FILE_TYPE.RF2_RELATIONSHIP.getSnapshotIndex(), 1, snapshotSortedPreviousfile, null, null);
+		SnapshotGeneratorMultiColumn sg=new SnapshotGeneratorMultiColumn(sortedPreviousfile, "20110131", FILE_TYPE.RF2_RELATIONSHIP.getSnapshotIndex(), 1, snapshotSortedPreviousfile, null, null);
 		sg.execute();
 		sg=null;
 		System.gc();
 
 		File snapshotSortedExportedfile=new File("/Users/ar/Downloads/testIDReassign/snapexp_" + previousFile.getName());
-		sg=new SnapshotGenerator(sortedExportedfile, "20110731",FILE_TYPE.RF2_RELATIONSHIP.getSnapshotIndex(), 1, snapshotSortedExportedfile, null, null);
+		sg=new SnapshotGeneratorMultiColumn(sortedExportedfile, "20110731",FILE_TYPE.RF2_RELATIONSHIP.getSnapshotIndex(), 1, snapshotSortedExportedfile, null, null);
 		sg.execute();
 		sg=null;
 		System.gc();

@@ -1261,9 +1261,9 @@ public class ExportUtil {
 		String snomedId = "";
 		try {
 			snomedId = idGen.getSNOMEDID(uuid);
-//			if(snomedId.equals("") || snomedId.equals(null)){	}
-//			else
-//				logger.info("=====SnomedId exist in the ID repository===" + snomedId);
+			if(snomedId.equals("") || snomedId.equals(null)){	}
+			else
+				logger.info("=====SnomedId exist in the ID repository===" + snomedId);
 			
 		} catch (NullPointerException e) {
 			// there is no SCTID so we are getting NULL

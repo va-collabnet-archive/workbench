@@ -25,6 +25,7 @@ public class ConsolidateQualSnapshotAndDelta extends AbstractTask {
 	private File deltaFinalFile;
 	private BufferedWriter bw;
 	private BufferedWriter dbw;
+	private int[] indexes;
 
 	public ConsolidateQualSnapshotAndDelta(FILE_TYPE fType,
 			File snapshotSortedPreviousfile, File snapshotSortedExportedfile,
@@ -34,7 +35,7 @@ public class ConsolidateQualSnapshotAndDelta extends AbstractTask {
 		this.snapshotFinalFile=snapshotFinalFile;
 		this.deltaFinalFile=deltaFinalFile;
 		this.fieldsToCompare=fType.getColumnsToCompare();
-		this.index=fType.getSnapshotIndex();
+		this.indexes=fType.getSnapshotIndex();
 		this.releaseDate=releaseDate;
 	}
 
@@ -42,7 +43,8 @@ public class ConsolidateQualSnapshotAndDelta extends AbstractTask {
 	public void execute() throws Exception {
 
 		try {
-
+			//qualifier file has just one column index
+			index=indexes[0];
 
 			FileOutputStream fos = new FileOutputStream( snapshotFinalFile);
 			OutputStreamWriter osw = new OutputStreamWriter(fos,"UTF-8");
