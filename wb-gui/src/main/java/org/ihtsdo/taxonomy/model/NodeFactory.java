@@ -33,10 +33,7 @@ import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.CountDownLatch;
@@ -98,6 +95,11 @@ public class NodeFactory {
         tree.addTreeWillExpandListener(expansionListener);
     }
     
+    public void removeNodeExpansionListener(JTree tree) {
+        tree.removeTreeExpansionListener(expansionListener);
+        tree.removeTreeWillExpandListener(expansionListener);
+    }
+    
     public static void close() {
         try {
             pathExpanderExecutors.shutdown();
@@ -128,6 +130,9 @@ public class NodeFactory {
     }
     
     public CountDownLatch makeChildNodes(TaxonomyNode parentNode) throws IOException, Exception {
+        return makeChildNodes(parentNode, null);
+    }
+    public CountDownLatch makeChildNodes(TaxonomyNode parentNode, List<SwingWorker> workers) throws IOException, Exception {
         
         if (parentNode == null || parentNode.isSecondaryParentNode()) {
             return new CountDownLatch(0);
@@ -136,7 +141,7 @@ public class NodeFactory {
         MakeChildNodesWorker mcnw = childWorkerMap.get(parentNode.nodeId);
         
         if (mcnw == null) {
-            mcnw = new MakeChildNodesWorker(parentNode, childNodeFilter);
+            mcnw = new MakeChildNodesWorker(parentNode, childNodeFilter, workers);
             childWorkerMap.put(parentNode.nodeId, mcnw);
             FutureHelper.addFuture(taxonomyExecutors.submit(mcnw));
         }
@@ -144,6 +149,7 @@ public class NodeFactory {
         return mcnw.latch;
     }
     
+     
     public TaxonomyNode makeNode(int nid, TaxonomyNode parentNode) throws IOException, Exception {
         if (model.nodeStore.containsKey(TaxonomyModel.getNodeId(nid, parentNode.getCnid()))) {
             return model.nodeStore.get(TaxonomyModel.getNodeId(nid, parentNode.getCnid()));
@@ -263,6 +269,14 @@ public class NodeFactory {
                 }
             }
         }
+    }
+
+    private Map<TreePath, List<SwingWorker>> expansionWorkers = new HashMap<TreePath, List<SwingWorker>>();
+    public void addNodeExpansionWorker(TreePath pathToExpand, SwingWorker nextSegmentWorker) {
+        if (!expansionWorkers.containsKey(pathToExpand)) {
+            expansionWorkers.put(pathToExpand, new ArrayList<SwingWorker>());
+        }
+        expansionWorkers.get(pathToExpand).add(nextSegmentWorker);
     }
 
     //~--- inner classes -------------------------------------------------------
@@ -400,12 +414,14 @@ public class NodeFactory {
         ChildNodeFilterBI childFilter;
         TaxonomyNode parentNode;
         TreePath path;
+        List<SwingWorker> endActions;
 
         //~--- constructors -----------------------------------------------------
-        public MakeChildNodesWorker(TaxonomyNode parentNode, ChildNodeFilterBI childFilter) {
+        public MakeChildNodesWorker(TaxonomyNode parentNode, ChildNodeFilterBI childFilter, List<SwingWorker> endActions) {
             this.parentNode = parentNode;
             this.childFilter = childFilter;
             this.path = NodePath.getTreePath(model, parentNode);
+            this.endActions = endActions;
         }
 
         //~--- methods ----------------------------------------------------------
@@ -465,6 +481,11 @@ public class NodeFactory {
         protected void done() {
             try {
                 get();
+                if (this.endActions != null) {
+                    for (SwingWorker w: this.endActions) {
+                        w.execute();
+                    }
+                }
             } catch (Throwable ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
             } finally {
@@ -513,7 +534,7 @@ public class NodeFactory {
         
         @Override
         public void treeExpanded(TreeExpansionEvent event) {
-            // System.out.println("expanded: " + event.getPath());
+            //System.out.println("expanded: " + event.getPath());
         }
         
         @Override
@@ -521,15 +542,18 @@ public class NodeFactory {
             // System.out.println("will collapse: " + event.getPath());
         }
         
+        
+        
         @Override
         public void treeWillExpand(TreeExpansionEvent event) throws ExpandVetoException {
             TreePath path = event.getPath();
+            List<SwingWorker> workers = expansionWorkers.remove(path);
             TaxonomyNode expansionNode = (TaxonomyNode) path.getLastPathComponent();
             TaxonomyNode latestExpansionNode = model.nodeStore.get(expansionNode.nodeId);
             
             if (!childWorkerMap.containsKey(expansionNode.nodeId)) {
                 try {
-                    makeChildNodes(latestExpansionNode);
+                    makeChildNodes(latestExpansionNode, workers);
                 } catch (Exception ex) {
                     AceLog.getAppLog().alertAndLogException(ex);
                 }
@@ -540,7 +564,7 @@ public class NodeFactory {
                     childWorkerMap.remove(expansionNode.nodeId);
                     
                     try {
-                        makeChildNodes(latestExpansionNode);
+                        makeChildNodes(latestExpansionNode, workers);
                     } catch (Exception ex) {
                         AceLog.getAppLog().alertAndLogException(ex);
                     }
