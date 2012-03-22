@@ -84,9 +84,9 @@ public class CloneRelGroupAction extends AbstractAction {
                     newRel.makeAnalog(newRel.getStatusNid(), config.getDbConfig().getUserConcept().getNid(), 
                         pathItr.next().getConceptNid(), Long.MAX_VALUE);
                 }
-                Terms.get().addUncommitted(concept);
-
+                
             }
+            Terms.get().addUncommitted(concept);
         } catch (TerminologyException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         } catch (IOException e1) {
