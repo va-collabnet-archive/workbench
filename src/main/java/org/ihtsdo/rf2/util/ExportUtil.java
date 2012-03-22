@@ -20,7 +20,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.dwfa.ace.api.DatabaseSetupConfig;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
@@ -34,12 +33,10 @@ import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.cs.ChangeSetPolicy;
 import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.commitlog.CommitLog;
-import org.dwfa.ace.config.AceConfig;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
@@ -1262,8 +1259,8 @@ public class ExportUtil {
 		try {
 			snomedId = idGen.getSNOMEDID(uuid);
 			if(snomedId.equals("") || snomedId.equals(null)){	}
-			else
-				logger.info("=====SnomedId exist in the ID repository===" + snomedId);
+//			else
+//				logger.info("=====SnomedId exist in the ID repository===" + snomedId);
 			
 		} catch (NullPointerException e) {
 			// there is no SCTID so we are getting NULL
@@ -1336,7 +1333,7 @@ public class ExportUtil {
 
 		try {
 			ctv3Id = idGen.getCTV3ID(uuid);
-//			if(ctv3Id.equals("") || ctv3Id.equals(null) ){	}
+			if(ctv3Id.equals("") || ctv3Id.equals(null) ){	}
 //			else
 //				logger.info("====Ctv3Id already exist in the ID repository===" + ctv3Id);
 		} catch (NullPointerException e) {
