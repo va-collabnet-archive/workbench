@@ -1,16 +1,11 @@
 package org.ihtsdo.rf2.refset.impl;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
-import org.dwfa.ace.api.I_ConceptAttributeTuple;
-import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ProcessConcepts;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.rf2.constant.I_Constants;
@@ -46,33 +41,33 @@ public class RF2Ctv3IdImpl extends RF2AbstractImpl implements I_ProcessConcepts 
 		try{
 			String refsetId = I_Constants.CTV3_REFSET_ID;
 			String moduleId = I_Constants.CORE_MODULE_ID;
-			
+
 			String mapTarget_Core = getCtv3Id(concept, getSnomedCorePathNid());
 			String mapTarget_Aux = getCtv3Id(concept, getNid("2faa9260-8fb2-11db-b606-0800200c9a66")); //Workbench Auxillary path
 			String mapTarget="";
-			
+
 			if(!(mapTarget_Core.equals("") && mapTarget_Core.equals(null))){
 				mapTarget = mapTarget_Core;
 			}else if(!(mapTarget_Aux.equals("") && mapTarget_Aux.equals(null))){
 				mapTarget = mapTarget_Aux;
 			}
-					
+
 			if (referencedComponentId==null || referencedComponentId.equals("")){
 				referencedComponentId=concept.getUids().iterator().next().toString();
 			}
-			
-			if(mapTarget.equals("") || mapTarget.equals(null) ){
-				if(referencedComponentId.contains("-")){
-					//get conceptId by calling web service if exist otherwise create
-					String wsConceptId = getSCTId(getConfig(), UUID.fromString(referencedComponentId));
-					if(wsConceptId.equals("0")){
-						wsConceptId = getSCTId(getConfig(), UUID.fromString(referencedComponentId));
-					}
-					mapTarget = getCTV3ID(getConfig(), UUID.fromString(referencedComponentId));
-					//referencedComponentId=wsConceptId;
+
+			if(mapTarget == null || mapTarget.equals("") ){
+				//get conceptId by calling web service if exist otherwise create
+				String wsConceptId="";
+				if (referencedComponentId.contains("-")){
+					wsConceptId=getSCTId(getConfig(),UUID.fromString(referencedComponentId));
+				}
+				mapTarget = getCTV3ID(getConfig(), UUID.fromString(referencedComponentId));
+				if (wsConceptId!=null && !wsConceptId.equals("")){
+					referencedComponentId=wsConceptId;
 				}
 			}
-			
+
 			UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId + mapTarget);
 			writeRF2TypeLine(uuid, getConfig().getReleaseDate(), I_Constants.SIMPLE_MAP_REFSET_ACTIVE, moduleId, refsetId, referencedComponentId, mapTarget);
 		} catch (TerminologyException e) {

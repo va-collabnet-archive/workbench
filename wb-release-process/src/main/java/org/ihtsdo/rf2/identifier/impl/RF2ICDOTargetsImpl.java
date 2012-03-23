@@ -12,11 +12,13 @@ import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.UUID;
 
+import org.apache.log4j.Logger;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.postexport.AbstractTask;
 import org.ihtsdo.rf2.postexport.RF2ArtifactPostExportImpl;
 import org.ihtsdo.rf2.postexport.RF2ArtifactPostExportAbst.FILE_TYPE;
+import org.ihtsdo.rf2.refset.impl.RF2SnomedIdImpl;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.ExportUtil;
 
@@ -35,11 +37,13 @@ public class RF2ICDOTargetsImpl extends AbstractTask {
 	private String outputFolder;
 	private File exportedFileName;
 
+	private static Logger logger = Logger.getLogger(RF2SnomedIdImpl.class);
 	public RF2ICDOTargetsImpl(Config config, String releaseDate,
 			File snapshotSortedPreviousfile, File snapshotSortedExportedfile,
 			String rf2FullFolder, String previousReleaseDate, File targetDirectory, 
 			String outputFolder, 
 			File ouputFile) {
+
 		this.rf2FullFolder=rf2FullFolder;
 		this.previousReleaseDate=previousReleaseDate;
 		this.targetDirectory=targetDirectory;
@@ -76,12 +80,12 @@ public class RF2ICDOTargetsImpl extends AbstractTask {
 
 			bw.append(header);
 			bw.append(newLine);
-			
+
 			String[] splittedLine1;
 			String line2;
 			String[] splittedLine2=null;
 			HashMap<String, String> expTgt=new HashMap<String, String>();
-			
+
 			while ((line2=br2.readLine()) != null) {
 				splittedLine2 = line2.split("\t",-1);
 				if (!expTgt.containsKey(splittedLine2[6])){
@@ -97,7 +101,7 @@ public class RF2ICDOTargetsImpl extends AbstractTask {
 			while ((line1= br1.readLine()) != null) {
 				splittedLine1 = line1.split("\t",-1);
 				status=expTgt.get(splittedLine1[6]);
-				
+
 				if (status!=null){
 					expTgt.remove(splittedLine1[6]);
 					if (status.compareTo(splittedLine1[2])!=0){
@@ -152,11 +156,13 @@ public class RF2ICDOTargetsImpl extends AbstractTask {
 			for (String key:expTgt.keySet()){
 				status=expTgt.get(key);
 				uuid=Type5UuidFactory.get(I_Constants.ICDO_SUBSET_ID + key );
-					
-					sctid = ExportUtil.getSCTId(config, uuid , nspce, "05" ,releaseDate ,releaseDate , I_Constants.CORE_MODULE_ID);
-					if(sctid.equals("0")){
-						sctid = ExportUtil.getSCTId(config, uuid , 0, "05" , releaseDate ,releaseDate , I_Constants.CORE_MODULE_ID);
-					}
+
+				sctid = ExportUtil.getSCTId(config, uuid , nspce, "05" ,releaseDate ,releaseDate , I_Constants.CORE_MODULE_ID);
+				if(sctid==null || sctid.equals("0") || sctid.equals("")){
+
+					logger.info("=====Error creating mapTargetId for uuid===" + uuid.toString());
+					System.out.println("=====Error creating mapTargetId for uuid===" + uuid.toString());
+				}else{				
 					id=Type5UuidFactory.get(I_Constants.ICDO_SUBSET_ID + sctid );
 					bw.append(id.toString());
 					bw.append("\t");
@@ -176,13 +182,13 @@ public class RF2ICDOTargetsImpl extends AbstractTask {
 					bw.append("\t");
 					bw.append("");
 					bw.append(newLine);
-					
+				}
 			}
 			bw.close();
-			
+
 			RF2ArtifactPostExportImpl pExp=new RF2ArtifactPostExportImpl(FILE_TYPE.RF2_ICDO_TARGETS, new File( rf2FullFolder),
 					ouputFile, new File(outputFolder), targetDirectory,
-					 previousReleaseDate, releaseDate);
+					previousReleaseDate, releaseDate);
 			pExp.postProcess();
 
 		} catch (FileNotFoundException e) {
