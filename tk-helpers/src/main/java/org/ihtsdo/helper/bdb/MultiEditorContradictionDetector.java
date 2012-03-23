@@ -378,7 +378,7 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         sb.append(author.getPrimUuid().toString());
         sb.append("\t");
         sb.append(author.toUserString());
-        sb.append("\tCommitRecordHash:\t");
+        sb.append("\tComputedHash:\t");
         sb.append(uuid);
 
         return sb.toString();
@@ -393,7 +393,7 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         sb.append("........-....-....-....-............");
         sb.append("\t");
         sb.append("UNKNOWN");
-        sb.append("\tCommitRecordHash:\t");
+        sb.append("\tComputedHash:\t");
         sb.append(uuid.toString());
 
         return sb.toString();
