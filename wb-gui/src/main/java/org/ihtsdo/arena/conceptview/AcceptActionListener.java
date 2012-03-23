@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -114,6 +115,7 @@ public class AcceptActionListener implements ActionListener {
         @Override
         protected void done() {
             try {
+                get();
                 I_GetConceptData c = settings.getConcept();
                 if (isCommitted) {
 
@@ -146,14 +148,18 @@ public class AcceptActionListener implements ActionListener {
                         }
                     }
                 } 
+            } catch (InterruptedException ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+            } catch (ExecutionException ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
             } catch (TerminologyException ex) {
-                Logger.getLogger(AcceptActionListener.class.getName()).log(Level.SEVERE, null, ex);
+                AceLog.getAppLog().alertAndLogException(ex);
             } catch (IOException ex) {
-                Logger.getLogger(AcceptActionListener.class.getName()).log(Level.SEVERE, null, ex);
+                AceLog.getAppLog().alertAndLogException(ex);
             } catch (InvalidCAB ex) {
-                Logger.getLogger(AcceptActionListener.class.getName()).log(Level.SEVERE, null, ex);
+                AceLog.getAppLog().alertAndLogException(ex);
             } catch (ContradictionException ex) {
-                Logger.getLogger(AcceptActionListener.class.getName()).log(Level.SEVERE, null, ex);
+                AceLog.getAppLog().alertAndLogException(ex);
             }
         }
     }
