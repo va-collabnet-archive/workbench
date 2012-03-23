@@ -4,8 +4,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,11 +12,6 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.KnowledgeBuilderFactory;
-import org.drools.builder.ResourceType;
-import org.drools.definition.KnowledgePackage;
-import org.drools.io.ResourceFactory;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -38,10 +31,8 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.rf2.constant.I_Constants;
-import org.ihtsdo.rf2.core.factory.RF2ConceptFactory;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.ExportUtil;
-import org.ihtsdo.rf2.util.IdUtil;
 import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
@@ -403,7 +394,7 @@ public abstract class RF2AbstractImpl {
 		return ExportUtil.getSctId(nid, pathNid);
 	}
 
-	// get the description id for the given UUID
+	// get the id for the given UUID
 	public String getSCTId(Config config, UUID uuid) throws Exception {
 		return ExportUtil.getSCTId(config, uuid);
 	}
