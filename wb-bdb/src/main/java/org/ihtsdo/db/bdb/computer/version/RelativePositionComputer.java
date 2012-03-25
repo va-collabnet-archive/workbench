@@ -58,7 +58,7 @@ public class RelativePositionComputer implements PositionMapperBI {
 
         public boolean containsPosition(int pathNid, long time) {
             if (this.pathNid == pathNid && time != Long.MIN_VALUE) {
-                return time < endTime;
+                return time <= endTime;
             }
             return false;
         }

@@ -157,12 +157,32 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         if (commitRefsetAthSetsList.isEmpty()) {
             return; // no commit records to review
         }
-        // Add all Adjudication Refset Author Time Hash (Ath) Sets in a List.
-        ArrayList<HashSet<UUID>> truthRefsetAthSetsList;
-        truthRefsetAthSetsList = getAthSetsFromRefset(conceptVersion, adjudicateRecRefsetNid);
-        // Put concept derived Author Time Hash (ATH) Sets in a Map
         HashMap<UUID, String> conceptComputedAthMap;
         conceptComputedAthMap = getComputedAthMap(conceptVersion, false);
+        // Add all Adjudication Refset Author Time Hash (Ath) Sets in a List.
+        ArrayList<HashSet<UUID>> replacementSet;
+        replacementSet = getAthSetsFromRefset(conceptVersion, adjudicateRecRefsetNid);
+        
+        for (HashSet<UUID> truthSet: replacementSet) {
+            HashSet<UUID> toRemove = new HashSet<UUID>();
+            for (UUID uuid: truthSet) {
+                if (!conceptComputedAthMap.containsKey(uuid)) {
+                    toRemove.add(uuid);
+                }
+            }
+            truthSet.removeAll(toRemove);
+        }
+        ArrayList<HashSet<UUID>> truthRefsetAthSetsList = new ArrayList<HashSet<UUID>>();
+        for (HashSet<UUID> truthSet: replacementSet) {
+            if (!truthSet.isEmpty()) {
+                truthRefsetAthSetsList.add(truthSet);
+            }
+        }
+        // SORT BY HASHSET LENGTH
+        Collections.sort(truthRefsetAthSetsList, new SizeComparator());
+
+        // Put concept derived Author Time Hash (ATH) Sets in a Map
+        
         // Put concept missing Author Time Hash (ATH) Sets in a Map
         HashMap<UUID, String> conceptMissingAthMap;
         conceptMissingAthMap = getMissingAthMap(conceptComputedAthMap,
@@ -181,16 +201,6 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         HashSet<UUID> accumDiffSet = new HashSet<UUID>();
         // Last truth supercedes all previous truth
         HashSet<UUID> lastTruth = null;
-        if (truthRefsetAthSetsList.size() > 0) {
-            lastTruth = truthRefsetAthSetsList.get(truthRefsetAthSetsList.size() - 1);
-            if (truthRefsetAthSetsList.size() > 1) {
-                lesser = truthRefsetAthSetsList.get(truthRefsetAthSetsList.size() - 2);
-                if (lesser.size() == lastTruth.size()) {
-                    // should not have two adjudication cases of the same size
-                    accumDiffSet.add(new UUID(Long.MAX_VALUE, Long.MAX_VALUE));
-                }
-            }
-        }
         int editorIdx = 0;
         int editorSize = commitRefsetAthSetsList.size();
         while (editorIdx < editorSize) {
@@ -266,7 +276,12 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
             }
 
             // SORT BY HASHSET LENGTH
-            Comparator<HashSet<UUID>> comp = new Comparator<HashSet<UUID>>() {
+            Collections.sort(authTimeSetsList, new SizeComparator());
+        }
+        return authTimeSetsList;
+    }
+
+    private static class SizeComparator implements Comparator<HashSet<UUID>> {
 
                 @Override
                 public int compare(HashSet<UUID> o1, HashSet<UUID> o2) {
@@ -277,10 +292,6 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
                     }
                     return 0;
                 }
-            };
-            Collections.sort(authTimeSetsList, comp);
-        }
-        return authTimeSetsList;
     }
 
     private HashMap<UUID, String> getComputedAthMap(ConceptVersionBI concept, boolean readOnly)
