@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
+import javax.swing.JOptionPane;
 
 
 import javax.swing.SwingWorker;
@@ -55,8 +56,12 @@ public class AcceptActionListener implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         try {
             if (settings != null) {
-                CommitTask ct = new CommitTask();
-                ct.execute();
+                if (settings.getConfig().getEditingPathSet().isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Editing path set is empty.", "Error", JOptionPane.ERROR_MESSAGE);;
+                } else {
+                    CommitTask ct = new CommitTask();
+                    ct.execute();
+                }
             }
         } catch (Exception e1) {
             AceLog.getAppLog().alertAndLogException(e1);

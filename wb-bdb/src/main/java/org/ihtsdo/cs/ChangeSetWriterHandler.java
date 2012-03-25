@@ -97,9 +97,12 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
                 if (Bdb.getSapDb().getAuthorNid(sapNid) != Integer.MIN_VALUE
                         && Bdb.getSapDb().getPathNid(sapNid) != Integer.MIN_VALUE) {
                     int statusNid = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid();
-                    this.adjudicationRecordSapNid = Bdb.getSapNid(statusNid, Bdb.getSapDb().getAuthorNid(sapNid),
-                            Bdb.getSapDb().getPathNid(sapNid),
-                            commitTime);
+                    int authorNid = Bdb.getSapDb().getAuthorNid(sapNid);
+                    int pathNid = Bdb.getSapDb().getPathNid(sapNid);
+                    if (authorNid == 0 || pathNid == 0) {
+                        System.out.println("Bad SAP: " + sapNid + " author:" + authorNid + " path: " + pathNid);
+                    }
+                    this.adjudicationRecordSapNid = Bdb.getSapNid(statusNid, authorNid, pathNid, commitTime);
                     break;
                 }
             }
