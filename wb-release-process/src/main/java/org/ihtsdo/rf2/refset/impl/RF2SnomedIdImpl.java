@@ -69,7 +69,14 @@ public class RF2SnomedIdImpl extends RF2AbstractImpl implements I_ProcessConcept
 					String wsConceptId="";
 					if (referencedComponentId.contains("-")){
 						wsConceptId=getSCTId(getConfig(),UUID.fromString(referencedComponentId));
+						
+						if(wsConceptId.equals("450598001")){
+							System.out.println("=====concept 450598001 parentSnomedId===" + parentSnomedId);
+						}
 						mapTarget = getSNOMEDID(getConfig(), UUID.fromString(referencedComponentId), parentSnomedId);
+						if(wsConceptId.equals("450598001")){
+							System.out.println("=====concept 450598001 SnomedId===" + mapTarget);
+						}
 					}else{
 						mapTarget = getSNOMEDID(getConfig(), concept.getUids().iterator().next(), parentSnomedId);
 						
