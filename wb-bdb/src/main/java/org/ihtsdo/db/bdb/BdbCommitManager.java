@@ -249,7 +249,7 @@ public class BdbCommitManager {
         }
     }
 
-    public static void addUncommittedNoChecks(I_GetConceptData concept) {
+    public static void addUncommittedNoChecks(ConceptChronicleBI concept) {
         Concept c = (Concept) concept;
 
         c.modified();

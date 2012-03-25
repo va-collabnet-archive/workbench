@@ -28,7 +28,6 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.util.HashFunction;
 
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
@@ -50,6 +49,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import org.ihtsdo.tk.hash.Hashcode;
 
 public class Position implements I_Position, Serializable {
   private static final int dataVersion = 1;
@@ -187,18 +187,28 @@ public class Position implements I_Position, Serializable {
     *
     * @see org.dwfa.vodb.types.I_Position#equals(org.dwfa.vodb.types.Position)
     */
-   public boolean equals(I_Position another) {
-      return ((time == another.getTime()) && (path.getConceptNid() == another.getPath().getConceptNid()));
-   }
+    public boolean equals(PositionBI another) {
+        return ((time == another.getTime()) && (path.getConceptNid() == another.getPath().getConceptNid()));
+    }
 
-   @Override
-   public boolean equals(Object obj) {
-      if (I_Position.class.isAssignableFrom(obj.getClass())) {
-         return equals((I_Position) obj);
-      }
+    @Override
+    public boolean equals(Object obj) {
+        if (PositionBI.class.isAssignableFrom(obj.getClass())) {
+            return equals((PositionBI) obj);
+        }
 
-      return false;
-   }
+        return false;
+    }
+
+    @Override
+    public boolean equals(long time, int pathId) {
+        return ((this.time == time) && (path.getConceptNid() == pathId));
+    }
+
+    @Override
+    public int hashCode() {
+        return Hashcode.computeLong(time, path.getConceptNid());
+    }
 
    /*
     * (non-Javadoc)
@@ -208,16 +218,6 @@ public class Position implements I_Position, Serializable {
    @Override
    public boolean equals(int version, int pathId) {
       return ((this.time == Terms.get().convertToThickVersion(version)) && (path.getConceptNid() == pathId));
-   }
-
-   @Override
-   public boolean equals(long time, int pathId) {
-      return ((this.time == time) && (path.getConceptNid() == pathId));
-   }
-
-   @Override
-   public int hashCode() {
-      return HashFunction.hashCode(new int[] { getVersion(), path.getConceptNid() });
    }
 
    @SuppressWarnings("unchecked")
@@ -342,8 +342,8 @@ public class Position implements I_Position, Serializable {
    //~--- get methods ---------------------------------------------------------
 
    @Override
-   public Collection<I_Position> getAllOrigins() {
-      throw new UnsupportedOperationException();
+   public Collection<? extends PositionBI> getAllOrigins() {
+      return path.getOrigins();
    }
 
    /*

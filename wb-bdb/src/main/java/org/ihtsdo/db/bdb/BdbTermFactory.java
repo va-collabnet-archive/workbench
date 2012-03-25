@@ -1234,7 +1234,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     @Override
     public void resetViewPositions() {
-        Bdb.getSapDb().clearMapperCache();
+        //
     }
 
     @Override

@@ -39,7 +39,7 @@ import org.ihtsdo.tk.api.coordinate.KindOfSpec;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 public class KindOfComputer {
-    
+
     public static boolean persistIsaCache = false;
     private static int cacheLimit = 10;
     private static ConcurrentHashMap<KindOfSpec, KindOfCache> caches =
@@ -48,7 +48,7 @@ public class KindOfComputer {
     protected static ExecutorService kindOfComputerService =
             Executors.newFixedThreadPool(1, new NamedThreadFactory(
             Bdb.dbdThreadGroup, "kind-of computer service"));
-    
+
     public static void reset() {
         caches.clear();
         // Removed, IsaCache reset will be partial with the updateIsaCache method
@@ -73,38 +73,33 @@ public class KindOfComputer {
                             < looser.getValue().getLastRequestTime()) {
                         looser = entry;
                     }
-                    
+
                 }
             }
             caches.remove(looser.getKey());
         }
     }
     static ReentrantLock lock = new ReentrantLock();
-    
+
     public static boolean isKindOf(Concept c, KindOfSpec spec)
             throws IOException, TerminologyException {
-        Map<IsaCoordinate, IsaCache> debugMap = isaCache;
-        IsaCache debugIsaCache = debugMap.get(spec.getIsaCoordinate());
-        if (isaCache.get(spec.getIsaCoordinate()) != null && isaCache.get(spec.getIsaCoordinate()).isReady()
-                && isaCache.get(spec.getIsaCoordinate()).isTested(c.getNid())) {
-            return cachedIsKindOfWithDepth(c, spec, 0);
+        IsaCache cache = isaCache.get(spec.getIsaCoordinate());
+        if (cache != null) {
+            if (cache.isReady()) {
+                if (cache.isTested(c.getNid())) {
+                    return cachedIsKindOfWithDepth(c, spec, 0);
+                }
+            }
         }
         return isKindOfWithDepth(c, spec, 0);
     }
-    
-    public static void resetIsaCache(IsaCoordinate isaCoordinate) {
-        if (isaCache.get(isaCoordinate) != null) {
-            isaCache.get(isaCoordinate).setCancelled(true);
-            isaCache.remove(isaCoordinate);
-        }
-    }
-    
+
     public static void updateIsaCaches(ConceptChronicleBI c) throws Exception {
         for (IsaCache isac : isaCache.values()) {
             isac.updateCache(c);
         }
     }
-    
+
     public static void addToIsaCache(ViewCoordinate vc, IsaCoordinate isac, int cnid, int[] parentNids) throws IOException {
         IsaCache cache = isaCache.get(isac);
         if (cache == null) {
@@ -118,25 +113,25 @@ public class KindOfComputer {
         }
         cache.setParents(cnid, parentNids);
     }
-    
+
     public static void setIsaCacheAsComplete(IsaCoordinate isac) throws IOException {
         IsaCache cache = isaCache.get(isac);
         cache.setReady(true);
     }
-    
+
     @Deprecated
     public static void updateIsaCachesUsingStatedView(ConceptChronicleBI c) throws Exception {
         updateIsaCaches(c);
     }
-    
+
     public static void clearIsaCache() {
         isaCache.clear();
     }
-    
+
     public static void setIsaCache(IsaCoordinate isaCoordinate, KindOfCacheBI newIsaCache) throws IOException {
         isaCache.put(isaCoordinate, (IsaCache) newIsaCache);
     }
-    
+
     public static IsaCache setupIsaCache(IsaCoordinate isaCoordinate) throws IOException {
         if (isaCache.get(isaCoordinate) != null) {
             return isaCache.get(isaCoordinate);
@@ -155,7 +150,7 @@ public class KindOfComputer {
             return tempIsaCache;
         }
     }
-    
+
     public static IsaCache setupIsaCacheAndWait(IsaCoordinate isaCoordinate)
             throws IOException, InterruptedException {
         IsaCache tempIsaCache = setupIsaCache(isaCoordinate);
@@ -163,7 +158,7 @@ public class KindOfComputer {
         isaCache.put(isaCoordinate, tempIsaCache);
         return tempIsaCache;
     }
-    
+
     public static void updateIsaCache(int cNid) throws Exception {
         I_GetConceptData concept = Terms.get().getConcept(cNid);
         for (IsaCoordinate loopCoordinate : isaCache.keySet()) {
@@ -172,30 +167,30 @@ public class KindOfComputer {
                 if (cm.getConfig() == null) {
                     cm.setConfig(ACE.getAceConfig().getActiveConfig());
                 }
-                
+
             }
-            
+
             isaCache.get(loopCoordinate).updateCache(Terms.get().getConcept(cNid));
 //                    isaCache.get(loopCoordinate).updateCacheUsingStatedView(Terms.get().getConcept(cNid));
         }
     }
-    
+
     protected static void updateIsaCache(IsaCoordinate isaCoordinate, int cNid) throws Exception {
         if (isaCache.get(isaCoordinate) != null && isaCache.get(isaCoordinate).isReady()) {
             isaCache.get(isaCoordinate).updateCache(Terms.get().getConcept(cNid));
         }
     }
-    
+
     protected static void updateIsaCacheUsingStatedView(IsaCoordinate isaCoordinate, int cNid) throws Exception {
         if (isaCache.get(isaCoordinate) != null && isaCache.get(isaCoordinate).isReady()) {
             isaCache.get(isaCoordinate).updateCacheUsingStatedView(Terms.get().getConcept(cNid));
         }
     }
-    
+
     public static void persistIsaCache() throws Exception {
         writeIsaCacheToFile(new File("berkeley-db/isa-cache.oos"));
     }
-    
+
     public static void writeIsaCacheToFile(File cacheFile) throws IOException {
         //use buffering
         AceLog.getAppLog().info("writing is-a cache to file: " + cacheFile);
@@ -209,7 +204,7 @@ public class KindOfComputer {
             output.close();
         }
     }
-    
+
     public static boolean loadIsaCacheFromFile(File cacheFile, Collection<IsaCoordinate> isaCoordinates) throws Exception {
         if (!cacheFile.exists()) {
             AceLog.getAppLog().info("Is-a cache file does not exist: " + cacheFile);
@@ -231,11 +226,11 @@ public class KindOfComputer {
             return false;
         }
     }
-    
+
     public static Map<IsaCoordinate, IsaCache> loadIsaCacheFromStream(ObjectInput ois) throws Exception {
         return (Map<IsaCoordinate, IsaCache>) ois.readObject();
     }
-    
+
     private static boolean cachedIsKindOfWithDepth(
             Concept c, KindOfSpec spec, int depth)
             throws IOException {
@@ -248,7 +243,7 @@ public class KindOfComputer {
                 return false;
             }
         }
-        
+
         try {
             boolean result = false;
             result = isaCache.get(spec.getIsaCoordinate()).isKindOf(c.getConceptNid(), spec.getKindNid());
@@ -256,7 +251,7 @@ public class KindOfComputer {
         } catch (Exception e1) {
             e1.printStackTrace();
         }
-        
+
         KindOfCache cache = caches.get(spec);
         if (cache != null && cache.tested(c.getNid())) {
             return cache.isKindOf(c.getNid());
@@ -282,7 +277,7 @@ public class KindOfComputer {
             throw new IOException(e);
         }
     }
-    
+
     private static boolean isKindOfWithDepth(Concept c, KindOfSpec spec, int depth)
             throws IOException, TerminologyException {
         if (c.getNid() == spec.kindNid) {
@@ -346,7 +341,7 @@ public class KindOfComputer {
         cache.setKindOf(c.getNid(), false);
         return false;
     }
-    
+
     public static Map<IsaCoordinate, IsaCache> getIsaCacheMap() {
         return isaCache;
     }

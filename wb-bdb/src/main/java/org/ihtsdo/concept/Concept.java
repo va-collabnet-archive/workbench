@@ -54,7 +54,6 @@ import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.bdb.BdbMemoryMonitor.LowMemoryListener;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
-import org.ihtsdo.db.bdb.computer.version.PositionMapper;
 import org.ihtsdo.db.change.ChangeNotifier;
 import org.ihtsdo.db.util.NidPair;
 import org.ihtsdo.db.util.NidPairForRefset;
@@ -86,7 +85,6 @@ import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.KindOfSpec;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate.LANGUAGE_SORT;
-import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.id.IdBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
@@ -123,9 +121,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Level;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
-import org.ihtsdo.lang.LANG_CODE;
-import org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint;
-import org.ihtsdo.tk.binding.snomed.Snomed;
 
 public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI, Comparable<Concept> {
 
@@ -1674,19 +1669,14 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         try {
             if ((AceConfig.config != null) && (AceConfig.config.aceFrames.get(0) != null)) {
                 if (AceConfig.config.aceFrames.get(0).getViewPositionSet().iterator().hasNext()) {
-                    PositionMapper mapper = Bdb.getSapDb().getMapper(
-                            AceConfig.config.aceFrames.get(
-                            0).getViewPositionSet().iterator().next());
+                    I_DescriptionTuple tuple =
+                            this.getDescTuple(AceConfig.config.aceFrames.get(0).getShortLabelDescPreferenceList(),
+                            AceConfig.config.getAceFrames().get(0));
 
-                    if (mapper.isSetup()) {
-                        I_DescriptionTuple tuple =
-                                this.getDescTuple(AceConfig.config.aceFrames.get(0).getShortLabelDescPreferenceList(),
-                                AceConfig.config.getAceFrames().get(0));
-
-                        if (tuple != null) {
-                            return tuple.getText();
-                        }
+                    if (tuple != null) {
+                        return tuple.getText();
                     }
+
                 } else {
                     throw new IndexOutOfBoundsException("No view positions set");
                 }

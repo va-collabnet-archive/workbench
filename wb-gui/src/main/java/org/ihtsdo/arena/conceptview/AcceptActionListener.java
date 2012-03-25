@@ -15,8 +15,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.SwingWorker;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -40,6 +38,9 @@ import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 
 public class AcceptActionListener implements ActionListener {
+    
+    private static int adjudicationRecRefsetNid = Integer.MAX_VALUE;
+    private static int readOnlyMaxSap = Integer.MAX_VALUE;
 
     ConceptViewSettings settings;
     Boolean isCommitted = false;
@@ -69,17 +70,17 @@ public class AcceptActionListener implements ActionListener {
         protected Boolean doInBackground() throws Exception {
             if (settings.isForAdjudication()) {
                 I_GetConceptData c = settings.getConcept();
-                int adjudicationRecRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.ADJUDICATION_RECORD.getUids());
                 Set<UUID> authorTimeHashSet = new HashSet<UUID>();
-                adjudicationRecRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.ADJUDICATION_RECORD.getUids());
+                if (adjudicationRecRefsetNid == Integer.MAX_VALUE) {
+                    readOnlyMaxSap = Ts.get().getReadOnlyMaxSap();
+                    adjudicationRecRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.ADJUDICATION_RECORD.getUids());
+                }
                 for (Integer sap : c.getAllSapNids()) {
-                    if (sap > Ts.get().getReadOnlyMaxSap()) {
-                        ConceptChronicleBI authorConcept = Ts.get().getConceptForNid(Ts.get().getAuthorNidForSapNid(sap));
+                    if (sap > readOnlyMaxSap) {
+                        UUID authorUuid = Ts.get().getUuidPrimordialForNid(Ts.get().getAuthorNidForSapNid(sap));
                         long time = Ts.get().getTimeForSapNid(sap);
-                        String stringToHash = authorConcept.getPrimUuid().toString()
-                                + Long.toString(time);
-                        UUID type5Uuid = Type5UuidFactory.get(Type5UuidFactory.AUTHOR_TIME_ID,
-                                stringToHash);
+                        String stringToHash = authorUuid.toString() + Long.toString(time);
+                        UUID type5Uuid = Type5UuidFactory.get(Type5UuidFactory.AUTHOR_TIME_ID, stringToHash);
                         authorTimeHashSet.add(type5Uuid);
                     }
                 }
@@ -131,7 +132,7 @@ public class AcceptActionListener implements ActionListener {
                             RefexCAB memberBp = member.makeBlueprint(vc);
                             memberBp.setRetired();
                             builder.constructIfNotCurrent(memberBp);
-                            Ts.get().addUncommitted(conflictRefset);
+                            Ts.get().addUncommittedNoChecks(conflictRefset);
                             Ts.get().commit(conflictRefset);
                         }
 
@@ -139,12 +140,13 @@ public class AcceptActionListener implements ActionListener {
                         TerminologyList list = cef.getBatchConceptList();
                         TerminologyListModel model = (TerminologyListModel) list.getModel();
                         List<Integer> nidsInList = model.getNidsInList();
-                        for (int i = 0; i < nidsInList.size(); i++) {
-                            int nid = nidsInList.get(i);
+                        int index = 0;
+                        for (Integer nid: nidsInList) {
                             if (nid == c.getNid()) {
-                                model.removeElement(i);
+                                model.removeElement(index);
                                 break;
                             }
+                            index++;
                         }
                     }
                 } 

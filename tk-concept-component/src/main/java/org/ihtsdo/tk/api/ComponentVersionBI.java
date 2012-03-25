@@ -12,7 +12,7 @@ import java.util.Set;
 import org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 
-public interface ComponentVersionBI extends ComponentBI {
+public interface ComponentVersionBI extends ComponentBI, VersionPointBI {
    boolean sapIsInRange(int min, int max);
 
    String toUserString(TerminologySnapshotDI snapshot) throws IOException, ContradictionException;
@@ -25,15 +25,11 @@ public interface ComponentVersionBI extends ComponentBI {
 
    ComponentChroncileBI getChronicle();
 
-   int getPathNid();
-
    PositionBI getPosition() throws IOException;
 
    int getSapNid();
 
    int getStatusNid();
-
-   long getTime();
 
    boolean isActive(NidSetBI allowedStatusNids) throws IOException;
 

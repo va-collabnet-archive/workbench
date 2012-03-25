@@ -133,6 +133,15 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     public void addUncommitted(ConceptVersionBI cv) throws IOException {
         addUncommitted(cv.getChronicle());
     }
+    @Override
+    public void addUncommittedNoChecks(ConceptChronicleBI concept) throws IOException {
+        BdbCommitManager.addUncommittedNoChecks(concept);
+    }
+
+    @Override
+    public void addUncommittedNoChecks(ConceptVersionBI cv) throws IOException {
+        addUncommittedNoChecks(cv.getChronicle());
+    }
     
     @Override
     public void forget(RelationshipVersionBI rel) throws IOException{

@@ -32,8 +32,8 @@ import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.concept.component.description.Description;
 import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.db.bdb.computer.version.PositionMapper;
-import org.ihtsdo.db.bdb.computer.version.PositionMapper.RELATIVE_POSITION;
+import org.ihtsdo.db.bdb.computer.version.PositionMapperBI;
+import org.ihtsdo.db.bdb.computer.version.PositionMapperBI.RelativePosition;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContradictionException;
@@ -63,7 +63,7 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 public class ContradictionIdentifier implements ContradictionIdentifierBI {
 
      // Class Variables
-    private AtomicReference<PositionMapper> conflictMapper;
+    private AtomicReference<PositionMapperBI> conflictMapper;
 
 	private AtomicInteger viewPathNid = null;
 	private AtomicInteger commonOriginPathNid;
@@ -383,8 +383,8 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 			if (initialVersion == null) {
 				initialVersion = version;
 			} else {
-				RELATIVE_POSITION relPosition = conflictMapper.get().fastRelativePosition((Version)initialVersion, (Version)version, Terms.get().getActiveAceFrameConfig().getPrecedence());
-				if (relPosition == RELATIVE_POSITION.CONTRADICTION) {
+				RelativePosition relPosition = conflictMapper.get().fastRelativePosition((Version)initialVersion, (Version)version, Terms.get().getActiveAceFrameConfig().getPrecedence());
+				if (relPosition == RelativePosition.CONTRADICTION) {
 					isContradiction = true;
 					
 					if (isReturnVersionsUseCase.get()) {
@@ -426,21 +426,21 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 
 				// Path preference not need as all based on adjudication path
 				// Must be after
-				RELATIVE_POSITION relPosition = conflictMapper.get().fastRelativePosition((Version)testingVersion, (Version)adjudicatorVersion, Precedence.TIME);
+				RelativePosition relPosition = conflictMapper.get().fastRelativePosition((Version)testingVersion, (Version)adjudicatorVersion, Precedence.TIME);
 				
-				if (relPosition != RELATIVE_POSITION.EQUAL) 
+				if (relPosition != RelativePosition.EQUAL) 
 				{
-					if (relPosition == RELATIVE_POSITION.CONTRADICTION) {
+					if (relPosition == RelativePosition.CONTRADICTION) {
 						throw new TerminologyException("Cannot reach here");
 						
 					}
 
-					if (relPosition == RELATIVE_POSITION.BEFORE)
+					if (relPosition == RelativePosition.BEFORE)
 					{
 						throw new TerminologyException("Must have failed in filtering pre-adjudication versions");
 					}
 
-					if (relPosition == RELATIVE_POSITION.AFTER) 
+					if (relPosition == RelativePosition.AFTER) 
 					{
 						if (isReturnVersionsUseCase.get()) {
 							returnVersionCollection.add(testingVersion);
@@ -594,7 +594,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 			
 		
 			
-    // For each version of a given component, ensure that a contradiction doesn't exist with another version of the any other component (view PositionMapper)
+    // For each version of a given component, ensure that a contradiction doesn't exist with another version of the any other component (view StaticPositionMapper)
     private ContradictionResult areFoundPositionsReachable(
             Concept concept, 
             Map<PositionForSet, 
@@ -618,9 +618,9 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 						HashMap<Integer, ComponentVersionBI> testingVersionMap = foundPositionsMap.get(testingPositionKey);
 						testingVersion = testingVersionMap.get(testingVersionMap.keySet().iterator().next());
 	
-						RELATIVE_POSITION retPosition = conflictMapper.get().fastRelativePosition((Version)currentVersion, (Version)testingVersion, Terms.get().getActiveAceFrameConfig().getPrecedence());
+						RelativePosition retPosition = conflictMapper.get().fastRelativePosition((Version)currentVersion, (Version)testingVersion, Terms.get().getActiveAceFrameConfig().getPrecedence());
 						
-						if (retPosition == RELATIVE_POSITION.CONTRADICTION)
+						if (retPosition == RelativePosition.CONTRADICTION)
 						{
 							if (isReturnVersionsUseCase.get()) {
 								returnVersionCollection.add(testingVersion);
@@ -1213,7 +1213,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 		return leastCommonAncestor;
 	}
 
-	// Initialize the PositionMapper used for identifying contradictions
+	// Initialize the StaticPositionMapper used for identifying contradictions
 	private boolean initializeViewPos(PositionBI pos) {
 		try 
 		{
@@ -1233,12 +1233,8 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 				commonOriginPathNid = new AtomicInteger(commonOriginPath.getConceptNid());
 	
 				
-	            conflictMapper = new AtomicReference<PositionMapper>(Bdb.getSapDb().getMapper(pos));
-	
-	            if (!conflictMapper.get().isSetup()) {
-	            	conflictMapper.get().queueForSetup();
-	            }
-	            
+	            conflictMapper = new AtomicReference<PositionMapperBI>(Bdb.getSapDb().getMapper(pos));
+		            
 	
 				if (isReturnVersionsUseCase.get()) {
 					returnVersionCollection.clear();
