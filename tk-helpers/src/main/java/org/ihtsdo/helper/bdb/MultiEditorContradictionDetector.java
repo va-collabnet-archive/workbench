@@ -201,6 +201,9 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         HashSet<UUID> accumDiffSet = new HashSet<UUID>();
         // Last truth supercedes all previous truth
         HashSet<UUID> lastTruth = null;
+        if (truthRefsetAthSetsList.size() > 0) {
+            lastTruth = truthRefsetAthSetsList.get(truthRefsetAthSetsList.size() - 1);
+        }
         int editorIdx = 0;
         int editorSize = commitRefsetAthSetsList.size();
         while (editorIdx < editorSize) {
