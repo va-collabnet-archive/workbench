@@ -183,10 +183,10 @@ public class MultiEditorContradictionDetectorMojo extends AbstractMojo {
             // REPORT COMPONENTS WITH MISSING COMMIT RECORDS
             StringBuilder sb = new StringBuilder();
             sb.append("\r\n**** COMPONENTS MISSING COMMITRECORDS ****");
-            sb.append("\r\n[MultiEditorContradictionDetectionMojo] MISSING COMMITRECORDS LIST");
+            sb.append("\r\n[MultiEditorContradictionDetectionMojo] MISSING COMMITRECORDS LIST\r\n");
             sb.append(mecd.toStringMissingCommitRecords());
             sb.append("\r\n");
-            logger.info(mecd.toStringMissingCommitRecords());
+            logger.info(sb.toString());
 
             // WATCH RESULTS -- NOT CONTRADICTIONS
             List<MultiEditorContradictionCase> watchCaseList = mecd.getWatchCaseList();
