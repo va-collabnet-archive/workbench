@@ -258,7 +258,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
         SOURCE_ID("origin", 5, 300, 1000),
         REL_TYPE("type", 5, 120, 500),
         DEST_ID("destination", 5, 300, 1000),
-        GROUP("group", 5, 36, 46),
+        GROUP("group", 5, 36, 140),
         REFINABILITY("refinability", 5, 80, 180),
         CHARACTERISTIC("char", 5, 70, 70),
         STATUS("status", 5, 50, 250),
