@@ -1265,18 +1265,12 @@ public class ExportUtil {
 			IdAssignmentImpl idGen = getIdGeneratorClient( config);
 			snomedId = idGen.getSNOMEDID(uuid);
 
-			if( uuid.toString().equals("1018284d-0267-4fd2-b3e0-88997de7d29a")){
-				System.out.println("=====concept 450598001 getSnomedId===" + snomedId + "****");
-			}
 			if(snomedId!=null && !snomedId.equals("") ){
 				return snomedId;
 			}
 
 			snomedId = idGen.createSNOMEDID(uuid, parentSnomedId);
 
-			if( uuid.toString().equals("1018284d-0267-4fd2-b3e0-88997de7d29a")){
-				System.out.println("=====concept 450598001 parent:" + parentSnomedId + " createSNOMEDID===" + snomedId + "****");
-			}
 			logger.info("===SnomedId Created: " + snomedId);
 		} catch (Exception cE) {
 			logger.error("Message : SnomedId creation error for UUID :" + uuid, cE);
