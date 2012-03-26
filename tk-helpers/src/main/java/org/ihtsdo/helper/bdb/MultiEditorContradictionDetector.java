@@ -40,8 +40,9 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
     private int commitRecRefsetNid;
     private int adjudicateRecRefsetNid;
     private ViewCoordinate vc;
+    private final boolean ignoreNonVisibleAth; // ignore SAP not computeable from concept
+    private final boolean ignoreReadOnlySap;
     private final int maxSap; // does not compute AuthorTimeHash from readonly database.
-    private boolean ignoreNonVisibleAth; // ignore SAP not computeable from concept
     private NidBitSetBI nidSet;
     private HashMap<UUID, Collection<Integer>> sapNidTimeAuthMap = new HashMap<UUID, Collection<Integer>>();
     private HashSet<Integer> conflictSaps = new HashSet<Integer>();
@@ -50,27 +51,9 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
     List<MultiEditorContradictionCase> watchCaseList;
     final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     List<Integer> componentsMissingCommitRecord;
+    int snorocketAuthorNid;
+    int userAuthorNid;
 
-//    public MultiEditorContradictionDetector(int commitRecRefsetNid,
-//            int adjudicationRecRefsetNid,
-//            ViewCoordinate vc,
-//            List<MultiEditorContradictionCase> cl,
-//            HashSet<Integer> ws)
-//            throws IOException {
-//        this.commitRecRefsetNid = commitRecRefsetNid;
-//        this.adjudicateRecRefsetNid = adjudicationRecRefsetNid;
-//        this.vc = vc;
-//        this.nidSet = Ts.get().getAllConceptNids();
-//        this.contradictionCaseList = cl;
-//        this.watchSet = ws;
-//        this.watchCaseList = null;
-//        if (ws != null) {
-//            this.watchCaseList = new ArrayList<MultiEditorContradictionCase>();
-//        }
-//        this.ignoreNonVisibleAth = false;
-//        this.maxSap = Integer.MIN_VALUE;
-//        this.componentsMissingCommitRecord = new ArrayList<Integer>();
-//    }
     public MultiEditorContradictionDetector(int commitRecRefsetNid,
             int adjudicationRecRefsetNid,
             ViewCoordinate vc,
@@ -82,7 +65,7 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         this.commitRecRefsetNid = commitRecRefsetNid;
         this.adjudicateRecRefsetNid = adjudicationRecRefsetNid;
         this.vc = vc;
-        this.nidSet = Ts.get().getAllConceptNids();
+        this.nidSet = Ts.get().getAllConceptNids(); //
         this.contradictionCaseList = cl;
         this.watchSet = ws;
         this.watchCaseList = null;
@@ -90,12 +73,12 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
             this.watchCaseList = new ArrayList<MultiEditorContradictionCase>();
         }
         this.ignoreNonVisibleAth = ignoreNonVisibleAth;
-        if (ignoreReadOnlySap) {
-            this.maxSap = Ts.get().getReadOnlyMaxSap(); //
-        } else {
-            this.maxSap = Integer.MIN_VALUE;
-        }
+        this.ignoreReadOnlySap = ignoreReadOnlySap;
+        this.maxSap = Ts.get().getReadOnlyMaxSap();
         this.componentsMissingCommitRecord = new ArrayList<Integer>();
+
+        snorocketAuthorNid = Ts.get().getNidForUuids(UUID.fromString("7e87cc5b-e85f-3860-99eb-7a44f2b9e6f9"));
+        userAuthorNid = Ts.get().getNidForUuids(UUID.fromString("7e87cc5b-e85f-3860-99eb-7a44f2b9e6f9"));
     }
 
     public MultiEditorContradictionDetector(int commitRecRefsetNid,
@@ -110,7 +93,7 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         this.commitRecRefsetNid = commitRecRefsetNid;
         this.adjudicateRecRefsetNid = adjudicationRecRefsetNid;
         this.vc = vc;
-        this.nidSet = nidSet;
+        this.nidSet = nidSet; //
         this.contradictionCaseList = cl;
         this.watchSet = ws;
         this.watchCaseList = null;
@@ -118,13 +101,12 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
             this.watchCaseList = new ArrayList<MultiEditorContradictionCase>();
         }
         this.ignoreNonVisibleAth = ignoreNonVisibleAth;
-        if (ignoreReadOnlySap) {
-            this.maxSap = Ts.get().getReadOnlyMaxSap(); //
-        } else {
-            this.maxSap = Integer.MIN_VALUE;
-        }
+        this.ignoreReadOnlySap = ignoreReadOnlySap;
+        this.maxSap = Ts.get().getReadOnlyMaxSap();
         this.componentsMissingCommitRecord = new ArrayList<Integer>();
 
+        snorocketAuthorNid = Ts.get().getNidForUuids(UUID.fromString("7e87cc5b-e85f-3860-99eb-7a44f2b9e6f9"));
+        userAuthorNid = Ts.get().getNidForUuids(UUID.fromString("7e87cc5b-e85f-3860-99eb-7a44f2b9e6f9"));
     }
 
     @Override
@@ -160,8 +142,7 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
             return; // no commit records to review
         }
         HashMap<UUID, String> conceptComputedAthMap = getComputedAthMap(conceptVersion, false);
-        HashMap<UUID, String> conceptComputedAthDiffMap =
-                (HashMap<UUID, String>) conceptComputedAthMap.clone();
+        HashMap<UUID, String> conceptComputedAthDiffMap = getComputedAthMap(conceptVersion, true);
         // Add all Adjudication Refset Author Time Hash (Ath) Sets in a List.
         ArrayList<HashSet<UUID>> replacementSet;
         replacementSet = getAthSetsFromRefset(conceptVersion, adjudicateRecRefsetNid);
@@ -199,7 +180,7 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
 
         // TEST FOR CONTRADICTIONS
         HashSet<UUID> lesser;
-        HashSet<UUID> greater = null;
+        HashSet<UUID> greater;
         HashSet<UUID> diff;
         HashSet<UUID> accumDiffSet = new HashSet<UUID>();
         // Last truth supercedes all previous truth
@@ -213,14 +194,14 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
             lesser = commitRefsetAthSetsList.get(editorIdx);
             if (lastTruth != null && lesser.size() <= lastTruth.size()) {
                 // compare editor commits with adjudication
-                diff = lesserDiffFromGreater(lesser, lastTruth, authTimeSetMissing);
+                diff = lesserDiffFromGreater(lesser, lastTruth, authTimeSetMissing, false);
                 accumDiffSet.addAll(diff);
                 editorIdx++;
             } else {
                 // compare editor commits with next editor commit
                 if (editorIdx + 1 < editorSize) {
                     greater = commitRefsetAthSetsList.get(editorIdx + 1);
-                    diff = lesserDiffFromGreater(lesser, greater, authTimeSetMissing);
+                    diff = lesserDiffFromGreater(lesser, greater, authTimeSetMissing, true);
                     accumDiffSet.addAll(diff);
                 }
                 editorIdx++;
@@ -228,18 +209,8 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         }
 
         // Check for computed commit without CommitRecord
-//        if (lastTruth != null) {
-//            for (UUID uuid : lastTruth) {
-//                conceptComputedAthDiffMap.remove(uuid);
-//            }
-//        }
-        if (greater != null) {
-            for (UUID uuid : greater) {
-                conceptComputedAthDiffMap.remove(uuid);
-            }
-        }
-        if (accumDiffSet != null) {
-            for (UUID uuid : accumDiffSet) {
+        for (HashSet<UUID> hs : commitRefsetAthSetsList) {
+            for (UUID uuid : hs) {
                 conceptComputedAthDiffMap.remove(uuid);
             }
         }
@@ -320,26 +291,37 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         }
     }
 
-    private HashMap<UUID, String> getComputedAthMap(ConceptVersionBI concept, boolean readOnly)
+    private HashMap<UUID, String> getComputedAthMap(ConceptVersionBI concept, boolean skipExtra)
             throws NoSuchAlgorithmException, UnsupportedEncodingException, IOException {
         HashMap<UUID, String> conceptComputedAthMap = new HashMap<UUID, String>();
         for (Integer sap : concept.getAllSapNids()) {
-            if (sap > maxSap) { // excludes read-only db
-                // COMPUTE AUTHOR_TIME_UUID5
-                int authorNid = Ts.get().getAuthorNidForSapNid(sap);
-                ConceptChronicleBI authorConcept = Ts.get().getConcept(authorNid);
-                long time = Ts.get().getTimeForSapNid(sap);
-                String str = authorConcept.getPrimUuid().toString() + Long.toString(time);
-                UUID type5Uuid = UuidT5Generator.get(UuidT5Generator.AUTHOR_TIME_ID, str);
-
-                // STORE <Key = UUID, Value= data string>
-                String valueStr = toStringAuthorTime(time, authorConcept, type5Uuid);
-                conceptComputedAthMap.put(type5Uuid, valueStr);
-                if (!sapNidTimeAuthMap.containsKey(type5Uuid)) {
-                    sapNidTimeAuthMap.put(type5Uuid, new ArrayList<Integer>());
-                }
-                sapNidTimeAuthMap.get(type5Uuid).add(sap);
+            if (sap == Integer.MIN_VALUE) {
+                continue;
             }
+            // SKIP READ ONLY DATABASE
+            if (ignoreReadOnlySap && sap <= maxSap) {
+                continue;
+            }
+            // COMPUTE AUTHOR_TIME_UUID5
+            int authorNid = Ts.get().getAuthorNidForSapNid(sap);
+            // SKIP EXTRA AUTHORS WHICH ARE NOT SYNCHRONIZED
+            if (skipExtra && (authorNid == snorocketAuthorNid 
+                    || authorNid == userAuthorNid
+                    || sap <= maxSap)) {
+                continue;
+            }
+            ConceptChronicleBI authorConcept = Ts.get().getConcept(authorNid);
+            long time = Ts.get().getTimeForSapNid(sap);
+            String str = authorConcept.getPrimUuid().toString() + Long.toString(time);
+            UUID type5Uuid = UuidT5Generator.get(UuidT5Generator.AUTHOR_TIME_ID, str);
+
+            // STORE <Key = UUID, Value= data string>
+            String valueStr = toStringAuthorTime(time, authorConcept, type5Uuid);
+            conceptComputedAthMap.put(type5Uuid, valueStr);
+            if (!sapNidTimeAuthMap.containsKey(type5Uuid)) {
+                sapNidTimeAuthMap.put(type5Uuid, new ArrayList<Integer>());
+            }
+            sapNidTimeAuthMap.get(type5Uuid).add(sap);
         }
         return conceptComputedAthMap;
     }
@@ -393,7 +375,7 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
     }
 
     private HashSet<UUID> lesserDiffFromGreater(HashSet<UUID> lesser, HashSet<UUID> greater,
-            Set<UUID> exclude) {
+            Set<UUID> exclude, boolean checkEqualSize) {
         HashSet<UUID> diffSet = new HashSet<UUID>();
         if (exclude != null) {
             lesser.removeAll(exclude);
@@ -404,7 +386,7 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
             lesserTemp.removeAll(greater);
             diffSet.addAll(lesserTemp);
 
-            if (greater.size() == lesser.size()) {
+            if (checkEqualSize && (greater.size() == lesser.size())) {
                 HashSet<UUID> greaterTemp = new HashSet<UUID>(greater);
                 greaterTemp.removeAll(lesser);
                 diffSet.addAll(greaterTemp);
