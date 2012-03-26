@@ -259,6 +259,16 @@ public class ContradictionFinderLessSwingWorker
                 true, true);
         Ts.get().iterateConceptDataInParallel(mecd);
 
+        // REPORT COMPONENTS WITH MISSING COMMIT RECORDS
+        if (mecd.hasComponentsMissingCommitRecord()) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("\r\n**** COMPONENTS MISSING COMMITRECORDS ****");
+            sb.append("\r\n[MultiEditorContradictionDetectionMojo] MISSING COMMITRECORDS LIST");
+            sb.append(mecd.toStringMissingCommitRecords());
+            sb.append("\r\n");
+            AceLog.getAppLog().log(Level.WARNING, mecd.toStringMissingCommitRecords());
+        }
+
         // Done, get results
         Set<Integer> returnSet = new HashSet<Integer>();   
         int conflictRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.CONFLICT_RECORD.getUids());
