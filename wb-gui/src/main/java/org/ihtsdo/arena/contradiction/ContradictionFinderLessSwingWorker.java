@@ -263,10 +263,10 @@ public class ContradictionFinderLessSwingWorker
         if (mecd.hasComponentsMissingCommitRecord()) {
             StringBuilder sb = new StringBuilder();
             sb.append("\r\n**** COMPONENTS MISSING COMMITRECORDS ****");
-            sb.append("\r\n[MultiEditorContradictionDetectionMojo] MISSING COMMITRECORDS LIST");
+            sb.append("\r\n[MultiEditorContradictionDetectionMojo] MISSING COMMITRECORDS LIST\r\n");
             sb.append(mecd.toStringMissingCommitRecords());
             sb.append("\r\n");
-            AceLog.getAppLog().log(Level.WARNING, mecd.toStringMissingCommitRecords());
+            AceLog.getAppLog().log(Level.WARNING, sb.toString());
         }
 
         // Done, get results
