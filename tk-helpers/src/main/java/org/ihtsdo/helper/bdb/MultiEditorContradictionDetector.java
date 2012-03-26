@@ -228,11 +228,11 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         }
 
         // Check for computed commit without CommitRecord
-        if (lastTruth != null) {
-            for (UUID uuid : lastTruth) {
-                conceptComputedAthDiffMap.remove(uuid);
-            }
-        }
+//        if (lastTruth != null) {
+//            for (UUID uuid : lastTruth) {
+//                conceptComputedAthDiffMap.remove(uuid);
+//            }
+//        }
         if (greater != null) {
             for (UUID uuid : greater) {
                 conceptComputedAthDiffMap.remove(uuid);
