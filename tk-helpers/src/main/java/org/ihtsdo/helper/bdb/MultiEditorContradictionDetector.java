@@ -78,7 +78,7 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         this.componentsMissingCommitRecord = new ArrayList<Integer>();
 
         snorocketAuthorNid = Ts.get().getNidForUuids(UUID.fromString("7e87cc5b-e85f-3860-99eb-7a44f2b9e6f9"));
-        userAuthorNid = Ts.get().getNidForUuids(UUID.fromString("7e87cc5b-e85f-3860-99eb-7a44f2b9e6f9"));
+        userAuthorNid = Ts.get().getNidForUuids(UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c"));
     }
 
     public MultiEditorContradictionDetector(int commitRecRefsetNid,
