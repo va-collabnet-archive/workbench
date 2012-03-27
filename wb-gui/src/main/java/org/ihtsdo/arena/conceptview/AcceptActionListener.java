@@ -1,6 +1,7 @@
 package org.ihtsdo.arena.conceptview;
 
 //~--- non-JDK imports --------------------------------------------------------
+import au.csiro.snorocket.snapi.SnomedMetadata;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.log.AceLog;
 
@@ -21,6 +22,7 @@ import javax.swing.SwingWorker;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.list.TerminologyList;
 import org.dwfa.ace.list.TerminologyListModel;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
@@ -36,13 +38,15 @@ import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.binding.snomed.Snomed;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 
 public class AcceptActionListener implements ActionListener {
-    
+
     private static int adjudicationRecRefsetNid = Integer.MAX_VALUE;
     private static int readOnlyMaxSap = Integer.MAX_VALUE;
-
+    private static int snorocketNid = Integer.MAX_VALUE;
     ConceptViewSettings settings;
     Boolean isCommitted = false;
 
@@ -78,15 +82,18 @@ public class AcceptActionListener implements ActionListener {
                 Set<UUID> authorTimeHashSet = new HashSet<UUID>();
                 if (adjudicationRecRefsetNid == Integer.MAX_VALUE) {
                     readOnlyMaxSap = Ts.get().getReadOnlyMaxSap();
+                    snorocketNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.SNOROCKET.getUids());
                     adjudicationRecRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.ADJUDICATION_RECORD.getUids());
                 }
                 for (Integer sap : c.getAllSapNids()) {
                     if (sap > readOnlyMaxSap) {
-                        UUID authorUuid = Ts.get().getUuidPrimordialForNid(Ts.get().getAuthorNidForSapNid(sap));
-                        long time = Ts.get().getTimeForSapNid(sap);
-                        String stringToHash = authorUuid.toString() + Long.toString(time);
-                        UUID type5Uuid = Type5UuidFactory.get(Type5UuidFactory.AUTHOR_TIME_ID, stringToHash);
-                        authorTimeHashSet.add(type5Uuid);
+                        if (Ts.get().getAuthorNidForSapNid(sap) != snorocketNid) {
+                            UUID authorUuid = Ts.get().getUuidPrimordialForNid(Ts.get().getAuthorNidForSapNid(sap));
+                            long time = Ts.get().getTimeForSapNid(sap);
+                            String stringToHash = authorUuid.toString() + Long.toString(time);
+                            UUID type5Uuid = Type5UuidFactory.get(Type5UuidFactory.AUTHOR_TIME_ID, stringToHash);
+                            authorTimeHashSet.add(type5Uuid);
+                        }
                     }
                 }
                 if (!authorTimeHashSet.isEmpty()) {
@@ -133,7 +140,7 @@ public class AcceptActionListener implements ActionListener {
                         int conflictRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.CONFLICT_RECORD.getPrimoridalUid());
                         ConceptChronicleBI conflictRefset = Ts.get().getConceptForNid(conflictRefsetNid);
                         RefexVersionBI member = conflictRefset.getCurrentRefsetMemberForComponent(vc, c.getNid());
-                        if(member != null){
+                        if (member != null) {
                             RefexCAB memberBp = member.makeBlueprint(vc);
                             memberBp.setRetired();
                             builder.constructIfNotCurrent(memberBp);
@@ -146,7 +153,7 @@ public class AcceptActionListener implements ActionListener {
                         TerminologyListModel model = (TerminologyListModel) list.getModel();
                         List<Integer> nidsInList = model.getNidsInList();
                         int index = 0;
-                        for (Integer nid: nidsInList) {
+                        for (Integer nid : nidsInList) {
                             if (nid == c.getNid()) {
                                 model.removeElement(index);
                                 break;
@@ -154,7 +161,7 @@ public class AcceptActionListener implements ActionListener {
                             index++;
                         }
                     }
-                } 
+                }
             } catch (InterruptedException ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
             } catch (ExecutionException ex) {
