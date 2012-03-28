@@ -51,8 +51,8 @@ public class SnoGrpUuidList extends ArrayList<SnoGrpUuid> {
             // verify that role groups numbers do not overlap
             boolean ok = true;
             for (SnoGrpUuid sgu : this) {
-                if (sgu.get(0).group == 0) {
-                    // zero not allowed as a logical role group number
+                if (sgu.get(0).group < 10) {
+                    // 0-9 not allowed as a computed logical role group number
                     ok = false;
                     break;
                 }
