@@ -1,25 +1,20 @@
 package org.ihtsdo.rf2.identifier.mojo;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.UUID;
 
+import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.ihtsdo.idgeneration.IdAssignmentImpl;
-import org.ihtsdo.rf2.identifier.factory.RF2IdListGeneratorFactory;
-import org.ihtsdo.rf2.mojo.ReleaseConfigMojo;
-import org.ihtsdo.rf2.util.Config;
-import org.ihtsdo.rf2.util.JAXBUtil;
 
 
 
 /**
- * Goal which sorts and generates delta, snapshot.
+ * Goal to test web service connection .
  * 
  * @goal id-generator-test-connection
  * 
  */
-public class RF2TestConnectionIDCreatorMojo extends ReleaseConfigMojo {
+public class RF2TestConnectionIDCreatorMojo extends AbstractMojo {
 
 	// for accessing the web service
 	/**
