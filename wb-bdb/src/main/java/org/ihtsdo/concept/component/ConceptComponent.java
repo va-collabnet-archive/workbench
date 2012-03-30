@@ -523,45 +523,31 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
 
         if (revisions != null) {
-            List<R> toRemove = new ArrayList<R>();
 
             for (R r : revisions) {
                 if (r.getTime() == Long.MAX_VALUE) {
-                    toRemove.add(r);
-                }
-            }
-
-            if (toRemove.size() > 0) {
-                for (R r : toRemove) {
                     revisions.remove(r);
+                    r.sapNid = -1;
                 }
             }
         }
 
         if (annotations != null) {
-            List<Object> toRemove = new ArrayList<Object>();
 
             for (RefsetMember<?, ?> a : annotations) {
                 a.clearVersions();
 
                 if (a.getTime() == Long.MAX_VALUE) {
-                    toRemove.add(a);
+                    annotations.remove(a);
+                    a.setStatusAtPositionNid(-1);
                 } else if (a.revisions != null) {
                     for (RefsetRevision rv : a.revisions) {
-                        List<RefsetRevision> revToRemove = new ArrayList<RefsetRevision>();
 
                         if (rv.getTime() == Long.MAX_VALUE) {
-                            revToRemove.add(rv);
+                            a.revisions.remove(rv);
+                            rv.sapNid = -1;
                         }
-
-                        a.revisions.removeAll(revToRemove);
                     }
-                }
-            }
-
-            if (toRemove.size() > 0) {
-                for (Object r : toRemove) {
-                    annotations.remove((RefsetMember<?, ?>) r);
                 }
             }
         }

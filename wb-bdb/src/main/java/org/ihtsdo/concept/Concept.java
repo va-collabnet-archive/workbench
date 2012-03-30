@@ -223,6 +223,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     public void cancel() throws IOException {
         ChangeNotifier.touchComponents(getConceptNidsAffectedByCommit());
         data.cancel();
+        BdbCommitManager.addUncommittedNoChecks(this);
 
         if (BdbCommitManager.forget(getConceptAttributes())) {
             Bdb.getConceptDb().forget(this);
