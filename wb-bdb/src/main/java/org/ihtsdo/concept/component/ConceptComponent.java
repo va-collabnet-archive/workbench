@@ -510,15 +510,12 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             for (IdentifierVersion idv : additionalIdVersions) {
                 if (idv.getTime() == Long.MAX_VALUE) {
                     toRemove.add(idv);
-                    idv.setTime(Long.MIN_VALUE);
-                    idv.setStatusAtPositionNid(-1);
                 }
             }
 
-            if (toRemove.size() > 0) {
-                for (IdentifierVersion idv : toRemove) {
-                    additionalIdVersions.remove(idv);
-                }
+            for (IdentifierVersion idv : toRemove) {
+                additionalIdVersions.remove(idv);
+                idv.setStatusAtPositionNid(-1);
             }
         }
 
@@ -1233,7 +1230,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         return sapNids;
     }
-    
+
     public Set<Integer> getAnnotationNidsForSaps(Set<Integer> sapNids) {
         int size = 0;
 
@@ -1246,7 +1243,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         if (annotations != null) {
             for (RefexChronicleBI<?> annotation : annotations) {
                 for (RefexVersionBI<?> av : annotation.getVersions()) {
-                    if(sapNids.contains(av.getSapNid())){
+                    if (sapNids.contains(av.getSapNid())) {
                         annotNids.add(av.getNid());
                     }
                 }
@@ -1313,7 +1310,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         return sapNids;
     }
-    
+
     public Set<Integer> getComponentNidsForSaps(Set<Integer> sapNids) throws IOException {
         int size = 1;
 
@@ -1484,7 +1481,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         return sapNids;
     }
-    
+
     public Set<Integer> getIdNidsForSaps(Set<Integer> sapNids) {
         int size = 1;
 
@@ -1495,7 +1492,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         HashSet<Integer> componentNids = new HashSet<Integer>(size);
         if (additionalIdVersions != null) {
             for (IdentifierVersion id : additionalIdVersions) {
-                if(sapNids.contains(id.getSapNid())){
+                if (sapNids.contains(id.getSapNid())) {
                     componentNids.add(this.nid);
                 }
             }
@@ -1892,7 +1889,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         if (revisions != null) {
             for (R r : revisions) {
-                if(sapNids.contains(r.sapNid)){
+                if (sapNids.contains(r.sapNid)) {
                     componentNids.add(r.getNid());
                 }
             }
@@ -1900,7 +1897,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         return componentNids;
     }
-    
+
     public abstract List<? extends Version> getVersions();
 
     public abstract List<? extends Version> getVersions(ViewCoordinate c);

@@ -244,7 +244,10 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
             }
          }
 
-         componentList.removeAll(toRemove);
+         for (ConceptComponent<?, ?> cc : toRemove) {
+             componentList.remove(cc);
+             cc.primordialSapNid = -1;
+         }
       }
    }
 
@@ -257,6 +260,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
       if (cc.getTime() == Long.MAX_VALUE) {
          cc.cancel();
          removeRefsetReferences(cc);
+         cc.primordialSapNid = -1;
 
          return true;
       }

@@ -221,13 +221,15 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
     @Override
     public void cancel() throws IOException {
-        ChangeNotifier.touchComponents(getConceptNidsAffectedByCommit());
+        Collection<Integer> nidsToTouch = getConceptNidsAffectedByCommit();
         data.cancel();
-        BdbCommitManager.addUncommittedNoChecks(this);
-
+ 
         if (BdbCommitManager.forget(getConceptAttributes())) {
             Bdb.getConceptDb().forget(this);
             canceled = true;
+        } else {
+            modified();
+            Bdb.getConceptDb().writeConcept(this);
         }
 
         try {
@@ -235,7 +237,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
         }
-
+        ChangeNotifier.touchComponents(nidsToTouch);
         BdbCommitManager.fireCancel();
     }
 
