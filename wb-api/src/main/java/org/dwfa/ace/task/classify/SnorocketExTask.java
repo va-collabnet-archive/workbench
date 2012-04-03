@@ -13,38 +13,22 @@
  */
 package org.dwfa.ace.task.classify;
 
+import au.csiro.snorocket.core.IFactory_123;
+import au.csiro.snorocket.snapi.I_Snorocket_123.I_Callback;
+import au.csiro.snorocket.snapi.I_Snorocket_123.I_EquivalentCallback;
+import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataConCallback;
+import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataRelCallback;
+import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataRoleCallback;
+import au.csiro.snorocket.snapi.Snorocket_123;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.UUID;
+import java.io.*;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.dwfa.ace.api.I_ConceptAttributePart;
-import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ManageContradiction;
-import org.dwfa.ace.api.I_RelPart;
-import org.dwfa.ace.api.I_RelTuple;
-import org.dwfa.ace.api.I_RelVersioned;
-import org.dwfa.ace.api.I_ShowActivity;
-import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.PositionSetReadOnly;
-import org.dwfa.ace.api.Terms;
+import javax.swing.SwingUtilities;
 import org.dwfa.ace.api.I_ConfigAceFrame.CLASSIFIER_INPUT_MODE_PREF;
+import org.dwfa.ace.api.*;
 import org.dwfa.ace.api.cs.ChangeSetPolicy;
 import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.log.AceLog;
@@ -59,20 +43,6 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.PositionBI;
-import org.ihtsdo.tk.api.Precedence;
-
-import au.csiro.snorocket.core.IFactory_123;
-import au.csiro.snorocket.snapi.Snorocket_123;
-import au.csiro.snorocket.snapi.I_Snorocket_123.I_Callback;
-import au.csiro.snorocket.snapi.I_Snorocket_123.I_EquivalentCallback;
-import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataConCallback;
-import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataRelCallback;
-import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataRoleCallback;
-import java.util.*;
-import javax.swing.SwingUtilities;
-import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
@@ -896,7 +866,7 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
      * @throws TerminologyException
      */
     private String compareAndWriteBack(List<SnoRel> snorelA, List<SnoRel> snorelB, int classPathNid)
-            throws TerminologyException, IOException {
+            throws TerminologyException, IOException, TaskFailedException {
         // Actual write back approximately 16,380 per minute
         // Write back dropped to approximately 1,511 per minute
         long vTime;
@@ -912,6 +882,7 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
         int countB_Diff = 0;
         int countB_DiffISA = 0;
         int countB_Total = 0;
+        int countAB_RoleGroupNumbChange = 0;
 
         // SETUP CLASSIFIER QUERY
         SnoQuery.clearDiff();
@@ -929,20 +900,22 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
         boolean done_A = false;
         boolean done_B = false;
 
+
+
         logger.log(Level.INFO, "\r\n::: [SnorocketExTask]"
                 + "\r\n::: snorelA.size() = \t{0}\r\n::: snorelB.size() = \t{1}",
                 new Object[]{snorelA.size(), snorelB.size()});
         // :DEBUG:WATCH:
-        // 397396006	Aspiration of bronchus with lavage (procedure)
-        int watchNid = tf.getConcept(UUID.fromString("86123773-4f24-31c8-8d64-6a2e7b940f92")).getConceptNid();
-        // 75761004 Infusion of intra-arterial thrombolytic agent with percutaneous transluminal coronary angioplasty
-        int watchNid1 = tf.getConcept(UUID.fromString("65ad5b42-adb2-3837-95d3-9872a33ff45b")).getConceptNid();
-        // 431185003 Replacement of central venous catheter using fluoroscopic guidance
-        int watchNid2 = tf.getConcept(UUID.fromString("cff52355-af3a-3b1c-9573-73235abc6c41")).getConceptNid();
+        // Biopsy of left external ear (procedure)
+        int watchNid = tf.getConcept(UUID.fromString("f6c5e109-cc5f-4aa6-8a53-82727e363021")).getConceptNid();
+        // Biopsy of left pinna (procedure)
+        int watchNid1 = tf.getConcept(UUID.fromString("bdc9f44d-02c1-46b2-a158-8cc39409ec99")).getConceptNid();
+        // Biopsy of left pinna cartilage (procedure)
+        int watchNid2 = tf.getConcept(UUID.fromString("8c61cf71-8712-49e1-bdca-4e791978f6b7")).getConceptNid();
         // BY SORT ORDER, LOWER NUMBER ADVANCES FIRST
         while (!done_A && !done_B) {
             // :DEBUG:WATCH
-            if (rel_A.c1Id == watchNid || rel_A.c1Id == watchNid1 || rel_A.c1Id == watchNid2) {
+            if (rel_B.c1Id == watchNid || rel_B.c1Id == watchNid1 || rel_B.c1Id == watchNid2) {
                 logger.log(Level.INFO, "::: [SnorocketExTask] found watch nid");
             }
 
@@ -1100,10 +1073,10 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
 
                 // FIND GROUPS IN GROUPLIST_A WITHOUT AN EQUAL IN GROUPLIST_B
                 // WRITE THESE GROUPED RELS AS "RETIRED"
-                SnoGrpList groupList_NotEqual;
+                SnoGrpList groupList_NotEqual_A = null;
                 if (groupList_A.size() > 0) {
-                    groupList_NotEqual = groupList_A.whichNotEqual(groupList_B);
-                    for (SnoGrp sg : groupList_NotEqual) {
+                    groupList_NotEqual_A = groupList_A.whichNotEqual(groupList_B);
+                    for (SnoGrp sg : groupList_NotEqual_A) {
                         // COMMENTED OUT SO THAT THE MOST RECENTLY RETIRED ROLE GROUP
                         // WILL NOT BE USED AGAIN BY THE LOGICALLY EQUIVALENT CURRENT ROLE GROUP.
                         // if (sg.size() > 0) {
@@ -1114,7 +1087,12 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
                         }
                     }
                     countA_Total += groupList_A.countRels();
-                    countA_Diff += groupList_NotEqual.countRels();
+                    countA_Diff += groupList_NotEqual_A.countRels();
+
+                    // KEEP ONLY THE LOGICALLY SAME GROUPS
+                    if (groupList_NotEqual_A.size() > 0) {
+                        groupList_A.removeAll(groupList_NotEqual_A);
+                    }
                 }
 
                 // COMPUTED ROLE GROUP NUMBER REPLACES :SIMPLE_ACTIVE_RETIRED_NONOVERLAP:
@@ -1125,9 +1103,10 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
                 // FIND GROUPS IN GROUPLIST_B WITHOUT AN EQUAL IN GROUPLIST_A
                 // WRITE THESE GROUPED RELS AS "NEW, CURRENT"
                 // :SIMPLE_ACTIVE_RETIRED_NONOVERLAP: Integer groupNumber = 1;
+                SnoGrpList groupList_NotEqual_B = null;
                 if (groupList_B.size() > 0) {
-                    groupList_NotEqual = groupList_B.whichNotEqual(groupList_A);
-                    for (SnoGrp sg : groupList_NotEqual) {
+                    groupList_NotEqual_B = groupList_B.whichNotEqual(groupList_A);
+                    for (SnoGrp sg : groupList_NotEqual_B) {
                         // find next free group number
                         // :SIMPLE_ACTIVE_RETIRED_NONOVERLAP:BEGIN
                         // while (groupNumbersInUse.contains(groupNumber)) {
@@ -1141,14 +1120,42 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
                             writeBackCurrent(sr_B, classPathNid, vTime);
                         }
                     }
-                    countB_Total += groupList_A.countRels();
-                    countB_Diff += groupList_NotEqual.countRels();
+                    countB_Total += groupList_B.countRels();
+                    countB_Diff += groupList_NotEqual_B.countRels();
+
+                    // KEEP ONLY THE LOGICALLY SAME GROUPS
+                    if (groupList_NotEqual_B.size() > 0) {
+                        groupList_B.removeAll(groupList_NotEqual_B);
+                    }
                 }
+
+                // CHECK FOR NEW ROLE GROUP NUMBERS ASSIGNED TO EXISTING LOGICAL ROLES
+                if (groupList_A.size() > 0 || groupList_B.size() > 0) {
+                    if (groupList_A.size() != groupList_B.size()) {
+                        logger.log(Level.SEVERE, "AB group list size not equal");
+                    }
+
+                    for (SnoGrp sgA : groupList_A) {
+                        SnoGrp sgB = sgA.findLogicalEquivalent(groupList_B);
+                        if (sgB != null) {
+                            if (sgA.get(0).group != sgB.get(0).group) {
+                                for (SnoRel snoRel : sgA) {
+                                    writeBackModifiedGroup(snoRel, sgB.get(0).group, classPathNid, vTime);
+                                    countAB_RoleGroupNumbChange++;
+                                }
+                            }
+                        } else {
+                            logger.log(Level.SEVERE, "AB logical equivalent group not found");
+                        }
+
+                    }
+                }
+
             } else if (rel_A.c1Id > rel_B.c1Id) {
                 // CASE 2: LIST_B HAS CONCEPT NOT IN LIST_A
                 // COMPLETELY *ADD* ALL THIS C1 FOR REL_B AS NEW, CURRENT
                 int thisC1 = rel_B.c1Id;
-                while (rel_B.c1Id == thisC1) {
+                while (rel_B.c1Id == thisC1 && rel_B.group == 0) {
                     countB_Diff++;
                     countB_Total++;
                     if (rel_B.typeId == isaNid) {
@@ -1162,6 +1169,39 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
                         break;
                     }
                 }
+
+                // SEGMENT GROUPS IN LIST_B
+                SnoGrpList groupList_B = new SnoGrpList();
+                SnoGrp groupB = null;
+                int prevGroup = Integer.MIN_VALUE;
+                while (rel_B.c1Id == thisC1 && !done_B) {
+                    if (rel_B.group != prevGroup) {
+                        groupB = new SnoGrp();
+                        groupList_B.add(groupB);
+                    }
+
+                    groupB.add(rel_B);
+
+                    prevGroup = rel_B.group;
+                    if (itB.hasNext()) {
+                        rel_B = itB.next();
+                    } else {
+                        done_B = true;
+                    }
+                }
+
+                // COMPUTED ROLE GROUP NUMBER REPLACES & WRITE CURRENT
+                if (groupList_B.isEmpty() == false) {
+                    calcNewRoleGroupNumbers(groupList_B, null);
+                    for (SnoGrp sg : groupList_B) {
+                        for (SnoRel sr : sg) {
+                            writeBackCurrent(sr, classPathNid, vTime);
+                            countB_Diff++;
+                            countB_Total++;
+                        }
+                    }
+                }
+
 
             } else {
                 // CASE 3: LIST_A HAS CONCEPT NOT IN LIST_B
@@ -1209,18 +1249,52 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
         }
 
         while (!done_B) {
-            countB_Diff++;
-            countB_Total++;
-            if (rel_B.typeId == isaNid) {
-                countB_DiffISA++;
+            int thisC1 = rel_B.c1Id;
+            while (rel_B.c1Id == thisC1 && rel_B.group == 0) {
+                countB_Diff++;
+                countB_Total++;
+                if (rel_B.typeId == isaNid) {
+                    countB_DiffISA++;
+                }
+                writeBackCurrent(rel_B, classPathNid, vTime);
+                if (itB.hasNext()) {
+                    rel_B = itB.next();
+                } else {
+                    done_B = true;
+                    break;
+                }
             }
-            // COMPLETELY UPDATE ALL REMAINING REL_B AS NEW, CURRENT
-            writeBackCurrent(rel_B, classPathNid, vTime);
-            if (itB.hasNext()) {
-                rel_B = itB.next();
-            } else {
-                done_B = true;
-                break;
+
+            // SEGMENT GROUPS IN LIST_B
+            SnoGrpList groupList_B = new SnoGrpList();
+            SnoGrp groupB = null;
+            int prevGroup = Integer.MIN_VALUE;
+            while (rel_B.c1Id == thisC1 && !done_B) {
+                if (rel_B.group != prevGroup) {
+                    groupB = new SnoGrp();
+                    groupList_B.add(groupB);
+                }
+
+                groupB.add(rel_B);
+
+                prevGroup = rel_B.group;
+                if (itB.hasNext()) {
+                    rel_B = itB.next();
+                } else {
+                    done_B = true;
+                }
+            }
+
+            // COMPUTED ROLE GROUP NUMBER REPLACES & WRITE CURRENT
+            if (groupList_B.isEmpty() == false) {
+                calcNewRoleGroupNumbers(groupList_B, null);
+                for (SnoGrp sg : groupList_B) {
+                    for (SnoRel sr : sg) {
+                        writeBackCurrent(sr, classPathNid, vTime);
+                        countB_Diff++;
+                        countB_Total++;
+                    }
+                }
             }
         }
 
@@ -1244,8 +1318,58 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
         s.append("\r\n::: countB_DiffISA:\t").append(countB_DiffISA);
         s.append("\r\n::: countB_Total:  \t").append(countB_Total);
         s.append("\r\n::: ");
+        s.append("\r\n::: AB group number change:  \t").append(countAB_RoleGroupNumbChange);
+        s.append("\r\n::: ");
 
         return s.toString();
+    }
+
+    private void writeBackModifiedGroup(SnoRel rel_A, int group, int writeToNid, long versionTime)
+            throws IOException {
+
+        try {
+            I_RelVersioned rBean = tf.getRelationship(rel_A.relNid);
+            if (rBean != null) {
+                List<? extends I_RelTuple> rvList = rBean.getSpecifiedVersions(statusSet,
+                        cViewPosSet, precedence, contradictionMgr);
+
+                if (rvList.size() == 1) {
+                    // CREATE RELATIONSHIP PART W/ TermFactory (RelationshipRevision)
+                    I_RelPart analog = (I_RelPart) rvList.get(0).makeAnalog(isCURRENT,
+                            snorocketAuthorNid, writeToNid, versionTime);
+                    analog.setGroup(group);
+
+                    I_GetConceptData thisC1 = tf.getConcept(rel_A.c1Id);
+
+                    ts.writeDirect(thisC1);
+
+                } else if (rvList.isEmpty()) {
+                    StringBuilder sb = new StringBuilder("::: [SnorocketExTask] WARNING: writeBackModified() ");
+                    sb.append("empty version list\trelNid=\t");
+                    sb.append(Integer.toString(rel_A.relNid));
+                    sb.append("\tc1=\t");
+                    sb.append(Integer.toString(rel_A.c1Id));
+                    sb.append("\t");
+                    sb.append(tf.getConcept(rel_A.c1Id).toUserString());
+                    logger.log(Level.INFO, sb.toString());
+                } else {
+                    StringBuilder sb = new StringBuilder("::: [SnorocketExTask] WARNING: writeBackModified() ");
+                    sb.append("multiple last versions\trelNid=\t");
+                    sb.append(Integer.toString(rel_A.relNid));
+                    sb.append("\tc1=\t");
+                    sb.append(Integer.toString(rel_A.c1Id));
+                    sb.append("\t");
+                    sb.append(tf.getConcept(rel_A.c1Id).toUserString());
+                    logger.log(Level.INFO, sb.toString());
+                }
+            } else {
+                logger.log(Level.INFO, "::: [SnorocketExTask] ERROR: writeBackModified() "
+                        + "tf.getRelationship({0}) == null", rel_A.relNid);
+            }
+
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
     }
 
     private void writeBackRetired(SnoRel rel_A, int writeToNid, long versionTime)
@@ -2165,7 +2289,7 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
 
             // Transfer role group computed from UUIDs to int SnoRelGrp
             for (int i = 0; i < sgul.size(); i++) {
-                int group = sgul.get(0).get(0).group;
+                int group = sgul.get(i).get(0).group;
                 SnoGrp g = groupList.get(i);
                 for (SnoRel snoRel : g) {
                     snoRel.group = group;

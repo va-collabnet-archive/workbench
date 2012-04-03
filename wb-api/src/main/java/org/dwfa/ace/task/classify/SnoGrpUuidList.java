@@ -39,7 +39,8 @@ public class SnoGrpUuidList extends ArrayList<SnoGrpUuid> {
 
     void calcNewRoleGroupNumbers(HashSet<Integer> inUse) throws NoSuchAlgorithmException, UnsupportedEncodingException {
         int offset = 0;
-        HashSet<Integer> numInUse = (HashSet<Integer>) inUse.clone();
+        // HashSet<Integer> numInUse = (HashSet<Integer>) inUse.clone();
+        HashSet<Integer> numInThisConcept = new HashSet<Integer>();
 
         boolean notDone = true;
         while (notDone) {
@@ -56,7 +57,7 @@ public class SnoGrpUuidList extends ArrayList<SnoGrpUuid> {
                     ok = false;
                     break;
                 }
-                if (numInUse.add(sgu.get(0).group) == false) {
+                if (numInThisConcept.add(sgu.get(0).group) == false) {
                     // no change to set
                     ok = false;
                     break;
@@ -65,10 +66,11 @@ public class SnoGrpUuidList extends ArrayList<SnoGrpUuid> {
 
             if (ok == false) {
                 offset++;
-                numInUse = (HashSet<Integer>) inUse.clone();
+                // numInUse = (HashSet<Integer>) inUse.clone();
+                numInThisConcept = new HashSet<Integer>();
                 // :!!!: change to logger
                 // logger.log(Level.INFO, "calcNewRoleGroupNumbers offset={0}", offset);
-                System.out.println("calcNewRoleGroupNumbers offset={0}" + offset);
+                System.out.println("calcNewRoleGroupNumbers offset=" + offset);
             } else {
                 notDone = false;
             }
