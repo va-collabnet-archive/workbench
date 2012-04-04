@@ -122,6 +122,11 @@ public class ChangeNotifier {
          changedComponentTemplates.get().add(nid);
 
          break;
+          
+      case REL_ORIGIN :
+          originsOfChangedRels.get().add(nid);
+          
+          break;
 
       case REL_XREF :
          destinationsOfChangedRels.get().add(nid);
