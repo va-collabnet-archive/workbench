@@ -28,6 +28,7 @@ import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.spec.ValidationException;
 
@@ -218,40 +219,53 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
                 }
             }
             if (writeAdjudicationRecord && adjudicationRecordSapNid != 0) {
-                for (Integer sap : c.getAllSapNids()) {
-                    if (sap > Bdb.getSapDb().getReadOnlyMax()) {
-                        Concept authorConcept = Concept.get(Bdb.getSapDb().getAuthorNid(sap));
-                        if (authorConcept.getNid() != ReferenceConcepts.SNOROCKET.getNid()) {
-                            long time = Bdb.getSapDb().getTime(sap);
-                            String stringToHash = authorConcept.getPrimUuid().toString()
-                                + Long.toString(time);
-                            UUID type5Uuid = Type5UuidFactory.get(Type5UuidFactory.AUTHOR_TIME_ID,
-                                stringToHash);
-                            authorTimeHashSet.add(type5Uuid);
+                boolean hasRecord = false;
+                for(RefexChronicleBI refex : c.getRefexMembers(adjudicationRecRefsetNid)){
+                    Set<Integer> allSapNids = refex.getAllSapNids();
+                    for(int sapNid : allSapNids){
+                        if(sapNid == adjudicationRecordSapNid){
+                            hasRecord = true;
+                            break;
                         }
                     }
                 }
-                if (!authorTimeHashSet.isEmpty()) {
-                    byte[][] arrayOfAuthorTime = new byte[authorTimeHashSet.size()][];
-                    UUID[] atUuidArray = authorTimeHashSet.toArray(new UUID[authorTimeHashSet.size()]);
-                    for (int i = 0; i < arrayOfAuthorTime.length; i++) {
-                        arrayOfAuthorTime[i] = Type5UuidFactory.getRawBytes(atUuidArray[i]);
+                if(!hasRecord){
+                    for (Integer sap : c.getAllSapNids()) {
+                        if (sap > Bdb.getSapDb().getReadOnlyMax()) {
+                            Concept authorConcept = Concept.get(Bdb.getSapDb().getAuthorNid(sap));
+                            if (authorConcept.getNid() != ReferenceConcepts.SNOROCKET.getNid()) {
+                                long time = Bdb.getSapDb().getTime(sap);
+                                String stringToHash = authorConcept.getPrimUuid().toString()
+                                    + Long.toString(time);
+                                UUID type5Uuid = Type5UuidFactory.get(Type5UuidFactory.AUTHOR_TIME_ID,
+                                    stringToHash);
+                                authorTimeHashSet.add(type5Uuid);
+                            }
+                        }
                     }
+                    if (!authorTimeHashSet.isEmpty()) {
+                        byte[][] arrayOfAuthorTime = new byte[authorTimeHashSet.size()][];
+                        UUID[] atUuidArray = authorTimeHashSet.toArray(new UUID[authorTimeHashSet.size()]);
+                        for (int i = 0; i < arrayOfAuthorTime.length; i++) {
+                            arrayOfAuthorTime[i] = Type5UuidFactory.getRawBytes(atUuidArray[i]);
+                        }
 
-                    ArrayOfBytearrayMember newAdjudicationRecord = new ArrayOfBytearrayMember();
-                    UUID primoridalUuid = UUID.randomUUID();
-                    newAdjudicationRecord.nid = Bdb.uuidToNid(primoridalUuid);
-                    Bdb.getNidCNidMap().setCNidForNid(c.getConceptNid(), newAdjudicationRecord.nid);
-                    newAdjudicationRecord.setPrimordialUuid(primoridalUuid);
-                    newAdjudicationRecord.refsetNid = adjudicationRecRefsetNid;
-                    newAdjudicationRecord.enclosingConceptNid = c.getConceptNid();
-                    newAdjudicationRecord.referencedComponentNid = c.getConceptNid();
-                    newAdjudicationRecord.setArrayOfByteArray(arrayOfAuthorTime);
-                    newAdjudicationRecord.primordialSapNid = this.adjudicationRecordSapNid;
+                        ArrayOfBytearrayMember newAdjudicationRecord = new ArrayOfBytearrayMember();
+                        UUID primoridalUuid = UUID.randomUUID();
+                        newAdjudicationRecord.nid = Bdb.uuidToNid(primoridalUuid);
+                        Bdb.getNidCNidMap().setCNidForNid(c.getConceptNid(), newAdjudicationRecord.nid);
+                        newAdjudicationRecord.setPrimordialUuid(primoridalUuid);
+                        newAdjudicationRecord.refsetNid = adjudicationRecRefsetNid;
+                        newAdjudicationRecord.enclosingConceptNid = c.getConceptNid();
+                        newAdjudicationRecord.referencedComponentNid = c.getConceptNid();
+                        newAdjudicationRecord.setArrayOfByteArray(arrayOfAuthorTime);
+                        newAdjudicationRecord.primordialSapNid = this.adjudicationRecordSapNid;
 
-                    c.addAnnotation(newAdjudicationRecord);
-                    Bdb.getConceptDb().writeConcept(c);
+                        c.addAnnotation(newAdjudicationRecord);
+                        Bdb.getConceptDb().writeConcept(c);
+                    }
                 }
+
             }
             for (ChangeSetGeneratorBI writer : writerListForHandler) {
                 writer.setPolicy(changeSetPolicy);
