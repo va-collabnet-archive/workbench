@@ -36,6 +36,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.SwingWorker;
+import javax.swing.tree.TreePath;
+import org.ihtsdo.taxonomy.nodes.InternalNodeMultiParent;
 
 /**
  *
@@ -74,7 +76,7 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
          int cNid = ts.getConceptNidForNid(nid);
 
          this.changedConcepts.add(cNid);
-      }
+                }
 
       for (Integer nid : referencedComponentsOfChangedRefexs) {
          int cNid = ts.getConceptNidForNid(nid);
@@ -476,14 +478,54 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
       @Override
       public void update(ConceptVersionBI cv) {
          try {
-            TaxonomyNode newNode = model.getNodeFactory().makeNode(cv, currentNode.getParentNid(),
+            TaxonomyNode parentNode = model.getNodeStore().nodeMap.get(currentNode.parentNodeId);
+            
+            boolean cycleExists = false;
+            for(Long nodeId : parentNode.getChildren()){
+                if(nodeId.equals(currentNode.getNodeId()) && nodesToChange.containsKey(parentNode.getCnid())){
+                     TerminologySnapshotDI tSnap   = ts.getSnapshot(vc);
+                     processConcept(tSnap.getConceptForNid(parentNode.getCnid()));
+                     cycleExists = true;
+                }
+            }
+            
+            parentNode = model.getNodeStore().nodeMap.get(currentNode.parentNodeId);
+            Collection<Long> children = parentNode.getChildren();
+            if(cycleExists){
+                if(children.size() == 0){
+                    model.getNodeStore().remove(currentNode.nodeId);
+                }else{
+                    TaxonomyNode newNode = model.getNodeFactory().makeNode(cv, currentNode.getParentNid(),
                                       model.getNodeStore().get(currentNode.parentNodeId));
+                    renderer.setupTaxonomyNode(newNode, cv);
+                    TreePath pathToNode = NodePath.getTreePath(model, currentNode);
+                    if(model.getNodeFactory().getTree().isExpanded(pathToNode)){
+                        if (newNode instanceof InternalNodeMultiParent) {
+                            InternalNodeMultiParent mp = (InternalNodeMultiParent) newNode;
+                            model.getNodeFactory().makeChildNodes(mp);
+                        }
+                    }
+                    PublishRecord pr = new PublishRecord(newNode, PublishRecord.UpdateType.EXTRA_PARENT_CHANGE);
 
-            renderer.setupTaxonomyNode(newNode, cv);
+                    publish(pr);
+                }
+            }else{
+                TaxonomyNode newNode = model.getNodeFactory().makeNode(cv, currentNode.getParentNid(),
+                                      model.getNodeStore().get(currentNode.parentNodeId));
+                renderer.setupTaxonomyNode(newNode, cv);
+                TreePath pathToNode = NodePath.getTreePath(model, currentNode);
+                if(model.getNodeFactory().getTree().isExpanded(pathToNode)){
+                     if (newNode instanceof InternalNodeMultiParent) {
+                        InternalNodeMultiParent mp = (InternalNodeMultiParent) newNode;
+                        model.getNodeFactory().makeChildNodes(mp);
+                     }
+                }
 
-            PublishRecord pr = new PublishRecord(newNode, PublishRecord.UpdateType.EXTRA_PARENT_CHANGE);
+                PublishRecord pr = new PublishRecord(newNode, PublishRecord.UpdateType.EXTRA_PARENT_CHANGE);
 
-            publish(pr);
+                publish(pr);
+            }
+            
          } catch (Exception ex) {
             AceLog.getAppLog().alertAndLogException(ex);
          }

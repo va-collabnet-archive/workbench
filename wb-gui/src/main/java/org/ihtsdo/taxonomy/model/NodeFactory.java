@@ -222,24 +222,37 @@ public class NodeFactory {
     
     public void removeDescendents(TaxonomyNode parent) {
         if (!parent.isLeaf()) {
+            boolean noCycle = true;
             ((InternalNode) parent).setChildrenAreSet(false);
-            
             for (Long nodeId : parent.getChildren()) {
-                MakeChildNodesWorker worker = childWorkerMap.remove(nodeId);
-                
-                if (worker != null) {
-                    worker.canceled = true;
+                if(childWorkerMap.containsKey(nodeId)){
+                    MakeChildNodesWorker worker = childWorkerMap.remove(nodeId);
+                    if (worker != null) {
+                        worker.canceled = true;
+                    }
                 }
                 
                 TaxonomyNode childNode = model.nodeStore.get(nodeId);
                 
-                if ((childNode != null) && (childNode.nodeId != parent.nodeId)) {
-                    removeDescendents(childNode);
-                    model.nodeStore.remove(nodeId);
+                if(childNode.getChildren().contains(parent.nodeId)){
+                    noCycle = false;
+                }
+                if(noCycle){
+                    if ((childNode != null) && (childNode.nodeId != parent.nodeId)) {
+                        removeDescendents(childNode);
+                        model.nodeStore.remove(nodeId);
+                    }
                 }
             }
-            
-            ((InternalNode) parent).clearChildren();
+            if(!noCycle){
+                TreePath pathToNode = NodePath.getTreePath(model, parent);
+                if(!model.getNodeFactory().getTree().isExpanded(pathToNode)){
+                    ((InternalNode) parent).clearChildren();
+                }
+            }
+            if(noCycle){
+                ((InternalNode) parent).clearChildren();
+            }
         }
     }
     
