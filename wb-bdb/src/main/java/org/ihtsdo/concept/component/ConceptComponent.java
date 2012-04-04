@@ -1635,7 +1635,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         for (RefexChronicleBI<?> rcbi : r) {
             if (rcbi.getCollectionNid() == refsetNid) {
-                returnValues.add(rcbi);
+                  returnValues.add(rcbi);
+                
             }
         }
 
@@ -1652,7 +1653,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             for (NidPairForRefset pair : pairs) {
                 RefexChronicleBI<?> ext = (RefexChronicleBI<?>) Bdb.getComponent(pair.getMemberNid());
 
-                if ((ext != null) && !addedMembers.contains(ext.getNid())) {
+                if ((ext != null) && !addedMembers.contains(ext.getNid()) && 
+                        ext.getPrimordialVersion().getSapNid() != -1) {
                     addedMembers.add(ext.getNid());
                     returnValues.add(ext);
                 }
@@ -1670,13 +1672,14 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         if (fetchedAnnotations != null) {
             for (RefexChronicleBI<?> annotation : fetchedAnnotations) {
-                if (addedMembers.contains(annotation.getNid()) == false) {
+                if (addedMembers.contains(annotation.getNid()) == false  && 
+                        annotation.getPrimordialVersion().getSapNid() != -1) {
                     returnValues.add(annotation);
                     addedMembers.add(annotation.getNid());
                 }
             }
         }
-
+                
         return Collections.unmodifiableCollection(returnValues);
     }
 
