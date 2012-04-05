@@ -369,7 +369,6 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
                for (TaxonomyNode child : children) {
                   newNode.addChild(child);
                }
-
                PublishRecord pr = new PublishRecord(newNode, PublishRecord.UpdateType.CHILD_CHANGE);
 
                publish(pr);
@@ -450,7 +449,6 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
                for (TaxonomyNode child : children) {
                   newNode.addChild(child);
                }
-
                PublishRecord pr = new PublishRecord(newNode, PublishRecord.UpdateType.EXTRA_PARENT_AND_CHILD_CHANGE);
 
                publish(pr);
@@ -488,7 +486,9 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
                      cycleExists = true;
                 }
             }
-            
+            if(parentNode.getChildren().size() == 0){
+                cycleExists = true;
+            }
             parentNode = model.getNodeStore().nodeMap.get(currentNode.parentNodeId);
             Collection<Long> children = parentNode.getChildren();
             if(cycleExists){
@@ -520,12 +520,12 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
                         model.getNodeFactory().makeChildNodes(mp);
                      }
                 }
-
+               
                 PublishRecord pr = new PublishRecord(newNode, PublishRecord.UpdateType.EXTRA_PARENT_CHANGE);
 
                 publish(pr);
             }
-            
+           
          } catch (Exception ex) {
             AceLog.getAppLog().alertAndLogException(ex);
          }
