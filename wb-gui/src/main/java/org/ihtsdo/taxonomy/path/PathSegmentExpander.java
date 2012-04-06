@@ -60,8 +60,10 @@ public class PathSegmentExpander extends SwingWorker<Integer, Object> {
         try {
             final int newIndex = get();
             if (newIndex < path.getPathCount()) {
-                factory.addNodeExpansionWorker(pathToExpand, new NextSegmentWorker());
+                NextSegmentWorker worker = new NextSegmentWorker();
+                factory.addNodeExpansionWorker(pathToExpand, worker);
                 factory.getTree().expandPath(pathToExpand);
+                worker.execute();
             } else {
                 int row = factory.getTree().getRowForPath(path);
 
