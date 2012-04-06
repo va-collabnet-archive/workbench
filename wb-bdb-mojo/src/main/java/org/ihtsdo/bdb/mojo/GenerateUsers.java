@@ -226,9 +226,10 @@ public class GenerateUsers extends AbstractMojo {
 
 			wfReader.readLine();
 			String wfLine = wfReader.readLine();
-			while (wfLine != null && wfLine != "") {
+                        NEXT_WHILE:		while (wfLine != null) {
 				if (wfLine.trim().length() == 0) {
-					continue;
+                                    wfLine = wfReader.readLine();
+				    continue NEXT_WHILE;
 				}
 
 				String[] columns = wfLine.split(",");
@@ -244,7 +245,9 @@ public class GenerateUsers extends AbstractMojo {
 					for (String c : columns) {
 						columns[i++] = c.split("=")[1].trim();
 					}
-
+                                        if(columns[0].contains("gwade")){
+                                            System.out.println("here");
+                                        }
 					ConceptVersionBI newCategory = WorkflowHelper.lookupEditorCategory(columns[2], vc);
 					ConceptVersionBI oldCategory = identifyExistingEditorCategory(columns, vc);
 					boolean addingRequired = true;
@@ -270,8 +273,8 @@ public class GenerateUsers extends AbstractMojo {
 						writer.addMember(true);
 					}
 
-					wfLine = wfReader.readLine();
 				}
+                                wfLine = wfReader.readLine();
 			}
 			getLog().info("Starting rels permissions creation");
 			if (relPermissionsFile.exists()) {
