@@ -226,7 +226,7 @@ public class GenerateUsers extends AbstractMojo {
 
 			wfReader.readLine();
 			String wfLine = wfReader.readLine();
-			while (wfLine != null) {
+			while (wfLine != null && wfLine != "") {
 				if (wfLine.trim().length() == 0) {
 					continue;
 				}
