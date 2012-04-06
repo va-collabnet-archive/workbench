@@ -245,9 +245,6 @@ public class GenerateUsers extends AbstractMojo {
 					for (String c : columns) {
 						columns[i++] = c.split("=")[1].trim();
 					}
-                                        if(columns[0].contains("gwade")){
-                                            System.out.println("here");
-                                        }
 					ConceptVersionBI newCategory = WorkflowHelper.lookupEditorCategory(columns[2], vc);
 					ConceptVersionBI oldCategory = identifyExistingEditorCategory(columns, vc);
 					boolean addingRequired = true;
