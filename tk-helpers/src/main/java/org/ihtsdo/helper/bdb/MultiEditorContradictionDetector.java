@@ -28,6 +28,7 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_array_of_bytearray.RefexArrayOfBytearrayVersionBI;
 import org.ihtsdo.tk.uuid.UuidT5Generator;
 
@@ -148,13 +149,7 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         replacementSet = getAthSetsFromRefset(conceptVersion, adjudicateRecRefsetNid);
 
         for (HashSet<UUID> truthSet : replacementSet) {
-            HashSet<UUID> toRemove = new HashSet<UUID>();
-            for (UUID uuid : truthSet) {
-                if (!conceptComputedAthMap.containsKey(uuid)) {
-                    toRemove.add(uuid);
-                }
-            }
-            truthSet.removeAll(toRemove);
+            truthSet.retainAll(conceptComputedAthMap.keySet());
         }
         ArrayList<HashSet<UUID>> truthRefsetAthSetsList = new ArrayList<HashSet<UUID>>();
         for (HashSet<UUID> truthSet : replacementSet) {
@@ -260,16 +255,18 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
 
             // CONVERT ARRAY HASHSET OF AUTHOR_TIME_HASH_BYTES
             for (RefexChronicleBI<?> rcbi : rcbic) {
-                RefexArrayOfBytearrayVersionBI raobvbi = (RefexArrayOfBytearrayVersionBI) rcbi;
-                byte[][] aoba = raobvbi.getArrayOfByteArray();
-                // convert array to hashset
-                HashSet<UUID> athSet = new HashSet<UUID>();
-                for (byte[] bs : aoba) {
-                    athSet.add(UuidT5Generator.getUuidFromRawBytes(bs));
-                }
+                for (RefexVersionBI<?> rcv : rcbi.getVersions()) {
+                    RefexArrayOfBytearrayVersionBI raobvbi = (RefexArrayOfBytearrayVersionBI) rcv;
+                    byte[][] aoba = raobvbi.getArrayOfByteArray();
+                    // convert array to hashset
+                    HashSet<UUID> athSet = new HashSet<UUID>();
+                    for (byte[] bs : aoba) {
+                        athSet.add(UuidT5Generator.getUuidFromRawBytes(bs));
+                    }
 
-                // add hashset to list
-                authTimeSetsList.add(athSet);
+                    // add hashset to list
+                    authTimeSetsList.add(athSet);
+                }
             }
 
             // SORT BY HASHSET LENGTH
@@ -305,7 +302,7 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
             // COMPUTE AUTHOR_TIME_UUID5
             int authorNid = Ts.get().getAuthorNidForSapNid(sap);
             // SKIP EXTRA AUTHORS WHICH ARE NOT SYNCHRONIZED
-            if (skipExtra && (authorNid == snorocketAuthorNid 
+            if (skipExtra && (authorNid == snorocketAuthorNid
                     || authorNid == userAuthorNid
                     || sap <= maxSap)) {
                 continue;
