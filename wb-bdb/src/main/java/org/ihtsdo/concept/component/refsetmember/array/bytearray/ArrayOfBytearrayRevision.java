@@ -197,8 +197,7 @@ public class ArrayOfBytearrayRevision extends RefsetRevision<ArrayOfBytearrayRev
       for (int i = 0; i < this.arrayOfByteArray.length; i++) {
         buff.append(" ").append(i);
         buff.append(": ");
-        buff.append(UuidT5Generator.getUuidFromRawBytes(this.arrayOfByteArray[i]));
-        if(this.arrayOfByteArray[i].length == 16){
+        if (this.arrayOfByteArray[i].length == 16){
             buff.append(UuidT5Generator.getUuidFromRawBytes(this.arrayOfByteArray[i]));
         }else{
             buff.append(this.arrayOfByteArray[i]);
