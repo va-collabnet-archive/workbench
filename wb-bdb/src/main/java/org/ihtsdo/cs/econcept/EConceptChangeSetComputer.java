@@ -52,6 +52,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import javax.swing.SwingUtilities;
+import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.db.change.ChangeNotifier;
 
 public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet {
@@ -424,7 +426,7 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
      * .Concept)
      */
     @Override
-    public EConcept getEConcept(Concept c) throws IOException {
+    public EConcept getEConcept(final Concept c) throws IOException {
         EConcept ec = new EConcept();
         AtomicBoolean changed = new AtomicBoolean(false);
 
@@ -439,6 +441,18 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
         }
 
         if (changed.get()) {
+            if (ChangeSetWriterHandler.writeCommitRecord && ec.conceptAttributes == null) {
+                ec.setConceptAttributes(new TkConceptAttributes(c.getConAttrs()));
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        AceLog.getEditLog().alertAndLogException(
+                                new Exception("Missing commit record, added: " + 
+                                c.toLongString()));
+                    }
+                });
+            }
             return ec;
         }
 
