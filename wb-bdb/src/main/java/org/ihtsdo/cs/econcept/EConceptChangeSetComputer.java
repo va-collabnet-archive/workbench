@@ -94,7 +94,6 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
                     && (v.getTime() != Long.MAX_VALUE)) {
                 changed.set(true);
 
-
                 ChangeNotifier.touch(c.getNid(), ChangeNotifier.Change.COMPONENT);
                 if (eca == null) {
                     eca = new EConceptAttributes();
