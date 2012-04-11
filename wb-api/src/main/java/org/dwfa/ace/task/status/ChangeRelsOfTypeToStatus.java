@@ -125,7 +125,7 @@ public class ChangeRelsOfTypeToStatus extends AbstractTask {
                     }
                 }
             }
-            Terms.get().addUncommitted(concept);
+            Terms.get().addUncommittedNoChecks(concept);
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
