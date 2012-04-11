@@ -449,7 +449,7 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
                     public void run() {
                         AceLog.getEditLog().alertAndLogException(
                                 new Exception("Missing commit record, added: " + 
-                                c.toLongString()));
+                                c.toString()));
                     }
                 });
             }
