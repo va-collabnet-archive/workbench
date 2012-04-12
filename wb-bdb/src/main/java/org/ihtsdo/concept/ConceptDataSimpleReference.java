@@ -1227,49 +1227,51 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
    private void setCommitTime(ConceptComponent<?, ?> cc, long time, NidSetBI sapNids) {
 
       // component
-      if (cc.getTime() == Long.MAX_VALUE) {
-         cc.setTime(time);
-         sapNids.add(cc.primordialSapNid);
-      }
+      if(cc != null){
+        if (cc.getTime() == Long.MAX_VALUE) {
+            cc.setTime(time);
+            sapNids.add(cc.primordialSapNid);
+        }
 
-      if (cc.revisions != null) {
-         for (Revision<?, ?> r : cc.revisions) {
-            if (r.getTime() == Long.MAX_VALUE) {
-               r.setTime(time);
-               sapNids.add(r.sapNid);
+        if (cc.revisions != null) {
+            for (Revision<?, ?> r : cc.revisions) {
+                if (r.getTime() == Long.MAX_VALUE) {
+                r.setTime(time);
+                sapNids.add(r.sapNid);
+                }
             }
-         }
-      }
+        }
 
-      // id
-      if (cc.getAdditionalIdentifierParts() != null) {
-         for (IdentifierVersion idv : cc.getAdditionalIdentifierParts()) {
-            if (idv.getTime() == Long.MAX_VALUE) {
-               idv.setTime(time);
-               sapNids.add(idv.getSapNid());
+        // id
+        if (cc.getAdditionalIdentifierParts() != null) {
+            for (IdentifierVersion idv : cc.getAdditionalIdentifierParts()) {
+                if (idv.getTime() == Long.MAX_VALUE) {
+                idv.setTime(time);
+                sapNids.add(idv.getSapNid());
+                }
             }
-         }
-      }
+        }
 
-      // annotation
-      if (cc.annotations != null) {
-         for (RefexChronicleBI<?> rc : cc.annotations) {
-            RefsetMember<?, ?> rm = (RefsetMember<?, ?>) rc;
+        // annotation
+        if (cc.annotations != null) {
+            for (RefexChronicleBI<?> rc : cc.annotations) {
+                RefsetMember<?, ?> rm = (RefsetMember<?, ?>) rc;
 
-            if (rm.getTime() == Long.MAX_VALUE) {
-               rm.setTime(time);
-               sapNids.add(rm.getSapNid());
+                if (rm.getTime() == Long.MAX_VALUE) {
+                rm.setTime(time);
+                sapNids.add(rm.getSapNid());
+                }
+
+                if (rm.revisions != null) {
+                for (RefsetRevision<?, ?> rr : rm.revisions) {
+                    if (rr.getTime() == Long.MAX_VALUE) {
+                        rr.setTime(time);
+                        sapNids.add(rr.getSapNid());
+                    }
+                }
+                }
             }
-
-            if (rm.revisions != null) {
-               for (RefsetRevision<?, ?> rr : rm.revisions) {
-                  if (rr.getTime() == Long.MAX_VALUE) {
-                     rr.setTime(time);
-                     sapNids.add(rr.getSapNid());
-                  }
-               }
-            }
-         }
+        }
       }
    }
 }
