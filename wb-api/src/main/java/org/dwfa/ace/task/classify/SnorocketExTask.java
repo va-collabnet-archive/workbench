@@ -26,6 +26,7 @@ import java.io.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.dwfa.ace.api.I_ConfigAceFrame.CLASSIFIER_INPUT_MODE_PREF;
 import org.dwfa.ace.api.*;
@@ -1473,6 +1474,12 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
             // :TODO: isaNid & rootNid should come from preferences config
             isaNid = tf.uuidToNative(SNOMED.Concept.IS_A.getUids());
             rootNid = tf.uuidToNative(SNOMED.Concept.ROOT.getUids());
+
+            if (Ts.get().hasUncommittedChanges()) {
+                String errStr = "Please cancel or commit changes before running classifier.";
+                AceLog.getAppLog().alertAndLog(Level.WARNING, errStr, null);
+                return Condition.STOP;
+            }
 
             if (config.getClassifierIsaType() != null) {
                 int checkIsaNid = tf.uuidToNative(config.getClassifierIsaType().getUids());
