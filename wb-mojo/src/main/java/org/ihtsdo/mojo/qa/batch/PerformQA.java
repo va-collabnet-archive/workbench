@@ -88,6 +88,7 @@ public class PerformQA implements I_ProcessConcepts {
 
                 monitoredUuids.add(UUID.fromString("48b0c96d-06a9-34f8-9479-6a278c74e87c"));
                 monitoredUuids.add(UUID.fromString("57a97fd5-5278-358c-a9d5-16deb1a587d1"));
+                monitoredUuids.add(UUID.fromString("1eb658fd-6f5c-3170-b736-56459b35490e"));
 		
 		try {
 			destRels = Terms.get().newIntSet();
@@ -125,11 +126,16 @@ public class PerformQA implements I_ProcessConcepts {
 		elapsedTotal = 0;
 		estimatedNumberOfConcepts = 400000;
 	}
+        
+        public void printConceptParents() {
+            
+        }
 
 	@Override
 	public void processConcept(I_GetConceptData loopConcept) throws Exception {
 		if (monitoredUuids.contains(loopConcept.getPrimUuid())) {
 			System.out.println("Monitored concept detected: " + loopConcept);
+                        System.out.println(loopConcept.toLongString());
 		}
 		if (isaCache.isKindOf(loopConcept.getNid(), snomedRoot.getNid())) {
 			long individualStart = Calendar.getInstance().getTimeInMillis();
