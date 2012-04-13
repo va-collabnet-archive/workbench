@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.UUID;
 import org.ihtsdo.helper.rf2.Rf2File;
+import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
@@ -44,21 +45,24 @@ public class UuidToSctIdMapper {
     Writer descriptionsWriter;
     Writer identifiersWriter;
     Writer relationshipsWriter;
-    Writer conRefsetsWriter;
-    Writer conConRefsetsWriter;
-    Writer conConConRefsetsWriter;
-    Writer conConStrRefsetsWriter;
-    Writer stringRefsetsWriter;
+    Writer relationshipsStatedWriter;
+    Writer langRefsetsWriter;
+    Writer otherLangRefsetsWriter;
+    Writer modDependWriter;
+    Writer descTypeWriter;
+    Writer refsetDescWriter;
     Writer uuidToSctMapWriter;
     BufferedReader conceptsReader;
     BufferedReader descriptionsReader;
     BufferedReader identifiersReader;
     BufferedReader relationshipsReader;
-    BufferedReader conRefsetsReader;
-    BufferedReader conConRefsetsReader;
-    BufferedReader conConConRefsetsReader;
-    BufferedReader conConStrRefsetsReader;
-    BufferedReader stringRefsetsReader;
+    BufferedReader relationshipsStatedReader;
+    BufferedReader langRefsetsReader;
+    BufferedReader otherLangRefsetsReader;
+    BufferedReader modDependReader;
+    BufferedReader descTypeReader;
+    BufferedReader refsetDescReader;
+    BufferedReader uuidSctMapReader;
     TerminologyStoreDI store;
     HashMap<UUID, String> uuidToSctMap = new HashMap<UUID, String>();
     HashMap<UUID, String> uuidToExistingSctMap = new HashMap<UUID, String>();
@@ -66,7 +70,8 @@ public class UuidToSctIdMapper {
     int descCounter = 1;
     int relCounter = 1;
 
-    public UuidToSctIdMapper(String namespace, String module, File directory) {
+    public UuidToSctIdMapper(String namespace, String module,
+            File directory) {
         this.namespace = namespace;
         this.module = module;
         this.directory = directory;
@@ -94,21 +99,21 @@ public class UuidToSctIdMapper {
             conceptCounter++;
             uuidToSctMap.put(UUID.fromString(moduleId), module);
         }
-
+        
         String conceptLine = conceptsReader.readLine();
         conceptLine = conceptsReader.readLine();
         while (conceptLine != null) {
             processConceptAttribute(conceptLine);
             conceptLine = conceptsReader.readLine();
         }
-
+        
         String descLine = descriptionsReader.readLine();
         descLine = descriptionsReader.readLine();
         while (descLine != null) {
             processDescription(descLine);
             descLine = descriptionsReader.readLine();
         }
-
+        
         String relLine = relationshipsReader.readLine();
         relLine = relationshipsReader.readLine();
         while (relLine != null) {
@@ -116,51 +121,56 @@ public class UuidToSctIdMapper {
             relLine = relationshipsReader.readLine();
         }
 
+        String statedRelLine = relationshipsStatedReader.readLine();
+        statedRelLine = relationshipsStatedReader.readLine();
+        while (statedRelLine != null) {
+            processStatedRelationship(statedRelLine);
+            statedRelLine = relationshipsStatedReader.readLine();
+        }
+
+        String langRefLine = langRefsetsReader.readLine();
+        langRefLine = langRefsetsReader.readLine();
+        while (langRefLine != null) {
+            processLangRefsets(langRefLine);
+            langRefLine = langRefsetsReader.readLine();
+        }
+        
+        String otherLangRefLine = otherLangRefsetsReader.readLine();
+        otherLangRefLine = otherLangRefsetsReader.readLine();
+        while (otherLangRefLine != null) {
+            processOtherLangRefsets(otherLangRefLine);
+            otherLangRefLine = otherLangRefsetsReader.readLine();
+        }
+
+        String modDependLine = modDependReader.readLine();
+        modDependLine = modDependReader.readLine();
+        while (modDependLine != null) {
+            processModuleDepedency(modDependLine);
+            modDependLine = modDependReader.readLine();
+        }
+
+        String descTypeLine = descTypeReader.readLine();
+        descTypeLine = descTypeReader.readLine();
+        while (descTypeLine != null) {
+            processDescType(descTypeLine);
+            descTypeLine = descTypeReader.readLine();
+        }
+
+        String refsetDescLine = refsetDescReader.readLine();
+        refsetDescLine = refsetDescReader.readLine();
+        while (refsetDescLine != null) {
+            processRefsetDesc(refsetDescLine);
+            refsetDescLine = refsetDescReader.readLine();
+        }
+        
         String idLine = identifiersReader.readLine();
         idLine = identifiersReader.readLine();
         while (idLine != null) {
             processIdentifiers(idLine);
             idLine = identifiersReader.readLine();
         }
-
-        String conRefLine = conRefsetsReader.readLine();
-        conRefLine = conRefsetsReader.readLine();
-        while (conRefLine != null) {
-            processConRefsets(conRefLine);
-            conRefLine = conRefsetsReader.readLine();
-        }
-
-        String conConRefLine = conConRefsetsReader.readLine();
-        conConRefLine = conConRefsetsReader.readLine();
-        while (conConRefLine != null) {
-            processConConRefsets(conConRefLine);
-            conConRefLine = conConRefsetsReader.readLine();
-        }
-
-        String conConConRefLine = conConConRefsetsReader.readLine();
-        conConConRefLine = conConConRefsetsReader.readLine();
-        while (conConConRefLine != null) {
-            processConConConRefsets(conConConRefLine);
-            conConConRefLine = conConConRefsetsReader.readLine();
-        }
-
-        String conConStrRefLine = conConStrRefsetsReader.readLine();
-        conConStrRefLine = conConStrRefsetsReader.readLine();
-        while (conConStrRefLine != null) {
-            processConConStrRefsets(conConStrRefLine);
-            conConStrRefLine = conConStrRefsetsReader.readLine();
-        }
-
-        String strRefLine = stringRefsetsReader.readLine();
-        strRefLine = stringRefsetsReader.readLine();
-        while (strRefLine != null) {
-            processStringRefsets(strRefLine);
-            strRefLine = stringRefsetsReader.readLine();
-        }
-
+        
         processUuidToSctMap();
-
-        close();
     }
 
     private void setup() throws IOException {
@@ -171,15 +181,17 @@ public class UuidToSctIdMapper {
                 return string.endsWith(".txt");
             }
         });
+        
         File conceptsFileUuid = null;
         File descriptionsFileUuid = null;
         File relationshipsFileUuid = null;
         File identifiersFileUuid = null;
-        File conRefsetsFileUuid = null;
-        File conConRefsetsFileUuid = null;
-        File conConConRefsetsFileUuid = null;
-        File conConStrRefsetsFileUuid = null;
-        File stringRefsetsFileUuid = null;
+        File statedRelFileUuid = null;
+        File langRefsetsFileUuid = null;
+        File otherLangRefsetsFileUuid = null;
+        File modDependFileUuid = null;
+        File descTypeFileUuid = null;
+        File refsetDescFileUuid = null;
 
         for (File inputFile : uuidFiles) {
             if (inputFile.getName().startsWith("sct2_Concept_UUID_")) {
@@ -194,24 +206,29 @@ public class UuidToSctIdMapper {
             } else if (inputFile.getName().startsWith("sct2_Identifier_UUID_")) {
                 identifiersFileUuid = inputFile;
                 identifiersReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
-            } else if (inputFile.getName().startsWith("sct2_ConceptRefset_UUID_")) {
-                conRefsetsFileUuid = inputFile;
-                conRefsetsReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
-            } else if (inputFile.getName().startsWith("sct2_ConceptConceptRefset_UUID_")) {
-                conConRefsetsFileUuid = inputFile;
-                conConRefsetsReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
-            } else if (inputFile.getName().startsWith("sct2_ConceptConceptConceptRefset_UUID_")) {
-                conConConRefsetsFileUuid = inputFile;
-                conConConRefsetsReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
-            } else if (inputFile.getName().startsWith("sct2_ConceptConceptStringRefset_UUID_")) {
-                conConStrRefsetsFileUuid = inputFile;
-                conConStrRefsetsReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
-            } else if (inputFile.getName().startsWith("sct2_StringRefset_UUID_")) {
-                stringRefsetsFileUuid = inputFile;
-                stringRefsetsReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
+            } else if (inputFile.getName().startsWith("sct2_StatedRelationships_UUID_")) {
+                statedRelFileUuid = inputFile;
+                relationshipsStatedReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
+            } else if (inputFile.getName().startsWith("sct2_LangRefset_UUID_") &&
+                    inputFile.getName().contains(LANG_CODE.EN.getFormatedLanguageCode())) {
+                langRefsetsFileUuid = inputFile;
+                langRefsetsReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
+            } else if (inputFile.getName().startsWith("sct2_LangRefset_UUID_")&&
+                    !inputFile.getName().contains(LANG_CODE.EN.getFormatedLanguageCode())) {
+                otherLangRefsetsFileUuid = inputFile;
+                otherLangRefsetsReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
+            } else if (inputFile.getName().startsWith("sct2_ModuleDependency_UUID_")) {
+                modDependFileUuid = inputFile;
+                modDependReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
+            } else if (inputFile.getName().startsWith("sct2_DescriptionType_UUID_")) {
+                descTypeFileUuid = inputFile;
+                descTypeReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
+            } else if (inputFile.getName().startsWith("sct2_RefsetDescriptor_UUID_")) {
+                refsetDescFileUuid = inputFile;
+                refsetDescReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
             }
         }
-
+        
         File conceptsFile = new File(directory,
                 conceptsFileUuid.getName().replace("sct2_Concept_UUID_", "sct2_Concept_"));
         File descriptionsFile = new File(directory,
@@ -220,30 +237,32 @@ public class UuidToSctIdMapper {
                 relationshipsFileUuid.getName().replace("sct2_Relationship_UUID_", "sct2_Relationship_"));
         File identifiersFile = new File(directory,
                 identifiersFileUuid.getName().replace("sct2_Identifier_UUID_", "sct2_Identifier_"));
-        File conRefsetsFile = new File(directory,
-                conRefsetsFileUuid.getName().replace("sct2_ConceptRefset_UUID_", "sct2_ConceptRefset_"));
-        File conConRefsetsFile = new File(directory,
-                conConRefsetsFileUuid.getName().replace("sct2_ConceptConceptRefset_UUID_", "sct2_ConceptConceptRefset_"));
-        File conConConRefsetsFile = new File(directory,
-                conConConRefsetsFileUuid.getName().replace("sct2_ConceptConceptConceptRefset_UUID_", "sct2_ConceptConceptConceptRefset_"));
-        File conConStrRefsetsFile = new File(directory,
-                conConStrRefsetsFileUuid.getName().replace("sct2_ConceptConceptStringRefset_UUID_", "sct2_ConceptConceptStringRefset_"));
-        File stringRefsetsFile = new File(directory,
-                stringRefsetsFileUuid.getName().replace("sct2_StringRefset_UUID_", "sct2_StringRefset_"));
+        File statedRelFile = new File(directory,
+                statedRelFileUuid.getName().replace("sct2_StatedRelationships_UUID_", "sct2_StatedRelationships_"));
+        File langRefsetsFile = new File(directory,
+                langRefsetsFileUuid.getName().replace("sct2_LangRefset_UUID_", "sct2_LangRefset_"));
+        File otherLangRefsetsFile = new File(directory,
+                otherLangRefsetsFileUuid.getName().replace("sct2_LangRefset_UUID_", "sct2_LangRefset_"));
+        File modDependFile = new File(directory,
+                modDependFileUuid.getName().replace("sct2_ModuleDependency_UUID_", "sct2_ModuleDependency_"));
+        File descTypeFile = new File(directory,
+                descTypeFileUuid.getName().replace("sct2_DescriptionType_UUID_", "sct2_DescriptionType_"));
+        File refsetDescFile = new File(directory,
+                refsetDescFileUuid.getName().replace("sct2_RefsetDescriptor_UUID_", "sct2_RefsetDescriptor_"));
         File uuidToSctIdsFile = new File(directory,
-                stringRefsetsFileUuid.getName().replace("sct2_StringRefset_UUID_", "sct2_to_uuid_map"));
+                refsetDescFileUuid.getName().replace("sct2_RefsetDescriptor_UUID_", "sct2_to_uuid_map"));
 
         conceptsWriter = new BufferedWriter(new FileWriter(conceptsFile));
         descriptionsWriter = new BufferedWriter(new FileWriter(descriptionsFile));
         relationshipsWriter = new BufferedWriter(new FileWriter(relationshipsFile));
         identifiersWriter = new BufferedWriter(new FileWriter(identifiersFile));
-        conRefsetsWriter = new BufferedWriter(new FileWriter(conRefsetsFile));
-        conConRefsetsWriter = new BufferedWriter(new FileWriter(conConRefsetsFile));
-        conConConRefsetsWriter = new BufferedWriter(new FileWriter(conConConRefsetsFile));
-        conConStrRefsetsWriter = new BufferedWriter(new FileWriter(conConStrRefsetsFile));
-        stringRefsetsWriter = new BufferedWriter(new FileWriter(stringRefsetsFile));
+        relationshipsStatedWriter = new BufferedWriter(new FileWriter(statedRelFile));
+        langRefsetsWriter = new BufferedWriter(new FileWriter(langRefsetsFile));
+        otherLangRefsetsWriter = new BufferedWriter(new FileWriter(otherLangRefsetsFile));
+        modDependWriter = new BufferedWriter(new FileWriter(modDependFile));
+        descTypeWriter = new BufferedWriter(new FileWriter(descTypeFile));
+        refsetDescWriter = new BufferedWriter(new FileWriter(refsetDescFile));
         uuidToSctMapWriter = new BufferedWriter(new FileWriter(uuidToSctIdsFile));
-
 
         for (Rf2File.ConceptsFileFields field : Rf2File.ConceptsFileFields.values()) {
             conceptsWriter.write(field.headerText + field.seperator);
@@ -261,24 +280,28 @@ public class UuidToSctIdMapper {
             identifiersWriter.write(field.headerText + field.seperator);
         }
 
-        for (Rf2File.ConRefsetFileFields field : Rf2File.ConRefsetFileFields.values()) {
-            conRefsetsWriter.write(field.headerText + field.seperator);
+        for (Rf2File.StatedRelationshipsFileFields field : Rf2File.StatedRelationshipsFileFields.values()) {
+            relationshipsStatedWriter.write(field.headerText + field.seperator);
         }
 
-        for (Rf2File.ConConRefsetFileFields field : Rf2File.ConConRefsetFileFields.values()) {
-            conConRefsetsWriter.write(field.headerText + field.seperator);
+        for (Rf2File.LanguageRefsetFileFields field : Rf2File.LanguageRefsetFileFields.values()) {
+            langRefsetsWriter.write(field.headerText + field.seperator);
+        }
+        
+        for (Rf2File.LanguageRefsetFileFields field : Rf2File.LanguageRefsetFileFields.values()) {
+            otherLangRefsetsWriter.write(field.headerText + field.seperator);
         }
 
-        for (Rf2File.ConConConRefsetFileFields field : Rf2File.ConConConRefsetFileFields.values()) {
-            conConConRefsetsWriter.write(field.headerText + field.seperator);
+        for (Rf2File.ModuleDependencyFileFields field : Rf2File.ModuleDependencyFileFields.values()) {
+            modDependWriter.write(field.headerText + field.seperator);
         }
 
-        for (Rf2File.ConConStrRefsetFileFields field : Rf2File.ConConStrRefsetFileFields.values()) {
-            conConStrRefsetsWriter.write(field.headerText + field.seperator);
+        for (Rf2File.DescTypeFileFields field : Rf2File.DescTypeFileFields.values()) {
+            descTypeWriter.write(field.headerText + field.seperator);
         }
 
-        for (Rf2File.StringRefsetFileFields field : Rf2File.StringRefsetFileFields.values()) {
-            stringRefsetsWriter.write(field.headerText + field.seperator);
+        for (Rf2File.RefsetDescriptorFileFields field : Rf2File.RefsetDescriptorFileFields.values()) {
+            refsetDescWriter.write(field.headerText + field.seperator);
         }
         for (Rf2File.UuidToSctMapFileFields field : Rf2File.UuidToSctMapFileFields.values()) {
             uuidToSctMapWriter.write(field.headerText + field.seperator);
@@ -535,6 +558,115 @@ public class UuidToSctIdMapper {
             }
         }
     }
+    
+    private void processStatedRelationship(String line) throws IOException {
+        if (line != null) {
+            String[] parts = line.split("\t");
+            for (Rf2File.RelationshipsFileFields field : Rf2File.RelationshipsFileFields.values()) {
+                switch (field) {
+                    case ACTIVE:
+                        String statusUuid = parts[Rf2File.RelationshipsFileFields.ACTIVE.ordinal()];
+                        relationshipsStatedWriter.write(convertStatus(statusUuid) + field.seperator);
+
+                        break;
+
+                    case EFFECTIVE_TIME:
+                        String effectiveDateString = parts[Rf2File.RelationshipsFileFields.EFFECTIVE_TIME.ordinal()];
+                        relationshipsStatedWriter.write(effectiveDateString + field.seperator);
+
+                        break;
+
+                    case ID:
+                        String rel = parts[Rf2File.RelationshipsFileFields.ID.ordinal()];
+                        String relSctId = getExistingSctId(rel);
+                        if (relSctId == null) {
+                            relSctId = SctIdGenerator.generate(
+                                    relCounter, namespace, SctIdGenerator.TYPE.RELATIONSHIP);
+                            this.uuidToSctMap.put(UUID.fromString(rel), relSctId);
+                            relCounter++;
+                        }
+                        relationshipsStatedWriter.write(relSctId + field.seperator);
+
+                        break;
+
+                    case MODULE_ID:
+                        relationshipsStatedWriter.write(module + field.seperator);
+
+                        break;
+
+                    case SOURCE_ID:
+                        String source = parts[Rf2File.RelationshipsFileFields.SOURCE_ID.ordinal()];
+                        String sourceSctId = getExistingSctId(source);
+                        if (sourceSctId == null) {
+                            sourceSctId = SctIdGenerator.generate(
+                                    conceptCounter, namespace, SctIdGenerator.TYPE.CONCEPT);
+                            this.uuidToSctMap.put(UUID.fromString(source), sourceSctId);
+                            conceptCounter++;
+                        }
+                        relationshipsStatedWriter.write(sourceSctId + field.seperator);
+
+
+                        break;
+
+                    case DESTINATION_ID:
+                        String dest = parts[Rf2File.RelationshipsFileFields.DESTINATION_ID.ordinal()];
+                        String destSctId = getExistingSctId(dest);
+                        if (destSctId == null) {
+                            destSctId = SctIdGenerator.generate(
+                                    conceptCounter, namespace, SctIdGenerator.TYPE.CONCEPT);
+                            this.uuidToSctMap.put(UUID.fromString(dest), destSctId);
+                            conceptCounter++;
+                        }
+                        relationshipsStatedWriter.write(destSctId + field.seperator);
+
+                        break;
+
+                    case RELATIONSHIP_GROUP:
+                        String group = parts[Rf2File.RelationshipsFileFields.RELATIONSHIP_GROUP.ordinal()];
+                        relationshipsStatedWriter.write(group + field.seperator);
+
+                        break;
+
+                    case TYPE_ID:
+                        String type = parts[Rf2File.RelationshipsFileFields.TYPE_ID.ordinal()];
+                        String typeSctId = getExistingSctId(type);
+                        if (typeSctId == null) {
+                            typeSctId = SctIdGenerator.generate(conceptCounter, namespace, SctIdGenerator.TYPE.CONCEPT);
+                            conceptCounter++;
+                            this.uuidToSctMap.put(UUID.fromString(type), typeSctId);
+                        }
+                        relationshipsStatedWriter.write(typeSctId + field.seperator);
+
+                        break;
+
+                    case CHARCTERISTIC_ID:
+                        String relChar = parts[Rf2File.RelationshipsFileFields.CHARCTERISTIC_ID.ordinal()];
+                        String relCharSctId = getExistingSctId(relChar);
+                        if (relCharSctId == null) {
+                            relCharSctId = SctIdGenerator.generate(conceptCounter, namespace, SctIdGenerator.TYPE.CONCEPT);
+                            conceptCounter++;
+                            this.uuidToSctMap.put(UUID.fromString(relChar), relCharSctId);
+                        }
+                        relationshipsStatedWriter.write(relCharSctId + field.seperator);
+
+                        break;
+
+                    case MODIFIER_ID:
+                        String modifier = parts[Rf2File.RelationshipsFileFields.MODIFIER_ID.ordinal()];
+                        String modifierSctId = getExistingSctId(modifier);
+                        if (modifierSctId == null) {
+                            modifierSctId = SctIdGenerator.generate(conceptCounter, namespace, SctIdGenerator.TYPE.CONCEPT);
+                            conceptCounter++;
+                            this.uuidToSctMap.put(UUID.fromString(modifier), modifierSctId);
+                        }
+                        relationshipsStatedWriter.write(modifierSctId
+                                + field.seperator);
+
+                        break;
+                }
+            }
+        }
+    }
 
     private void processIdentifiers(String line) throws IOException {
         if (line != null) {
@@ -587,67 +719,135 @@ public class UuidToSctIdMapper {
         }
     }
 
-    private void processConRefsets(String line) throws IOException {
+    private void processLangRefsets(String line) throws IOException {
         if (line != null) {
             String[] parts = line.split("\t");
-            for (Rf2File.ConRefsetFileFields field : Rf2File.ConRefsetFileFields.values()) {
+            for (Rf2File.LanguageRefsetFileFields field : Rf2File.LanguageRefsetFileFields.values()) {
                 switch (field) {
                     case ID:
-                        String memberUuid = parts[Rf2File.ConRefsetFileFields.ID.ordinal()];
-                        conRefsetsWriter.write(memberUuid + field.seperator);
+                        String memberUuid = parts[Rf2File.LanguageRefsetFileFields.ID.ordinal()];
+                        langRefsetsWriter.write(memberUuid + field.seperator);
 
                         break;
 
                     case EFFECTIVE_TIME:
-                        String effectiveDateString = parts[Rf2File.ConRefsetFileFields.EFFECTIVE_TIME.ordinal()];
-                        conRefsetsWriter.write(effectiveDateString + field.seperator);
+                        String effectiveDateString = parts[Rf2File.LanguageRefsetFileFields.EFFECTIVE_TIME.ordinal()];
+                        langRefsetsWriter.write(effectiveDateString + field.seperator);
 
                         break;
 
                     case ACTIVE:
-                        String status = parts[Rf2File.ConRefsetFileFields.ACTIVE.ordinal()];
-                        conRefsetsWriter.write(convertStatus(status) + field.seperator);
+                        String status = parts[Rf2File.LanguageRefsetFileFields.ACTIVE.ordinal()];
+                        langRefsetsWriter.write(convertStatus(status) + field.seperator);
 
                         break;
 
                     case MODULE_ID:
-                        conRefsetsWriter.write(module + field.seperator);
+                        langRefsetsWriter.write(module + field.seperator);
 
                         break;
 
                     case REFSET_ID:
-                        String refsetId = parts[Rf2File.ConRefsetFileFields.REFSET_ID.ordinal()];
+                        String refsetId = parts[Rf2File.LanguageRefsetFileFields.REFSET_ID.ordinal()];
                         String refsetSctId = getExistingSctId(refsetId);
                         if (refsetSctId == null) {
                             refsetSctId = SctIdGenerator.generate(conceptCounter, namespace, SctIdGenerator.TYPE.CONCEPT); //@afk: subset?
                             conceptCounter++;
                             this.uuidToSctMap.put(UUID.fromString(refsetId), refsetSctId);
                         }
-                        conRefsetsWriter.write(refsetSctId + field.seperator);
+                        langRefsetsWriter.write(refsetSctId + field.seperator);
 
                         break;
 
                     case REFERENCED_COMPONENT_ID:
-                        String rc = parts[Rf2File.ConRefsetFileFields.REFERENCED_COMPONENT_ID.ordinal()];
+                        String rc = parts[Rf2File.LanguageRefsetFileFields.REFERENCED_COMPONENT_ID.ordinal()];
                         String rcSctId = getExistingSctId(rc);
                         if (rcSctId == null) {
                             rcSctId = SctIdGenerator.generate(conceptCounter, namespace, SctIdGenerator.TYPE.CONCEPT);
                             conceptCounter++;
                             this.uuidToSctMap.put(UUID.fromString(rc), rcSctId);
                         }
-                        conRefsetsWriter.write(rcSctId + field.seperator);
+                        langRefsetsWriter.write(rcSctId + field.seperator);
 
                         break;
 
-                    case CONCEPT:
-                        String con1 = parts[Rf2File.ConRefsetFileFields.CONCEPT.ordinal()];
-                        String con1SctId = getExistingSctId(con1);
-                        if (con1SctId == null) {
-                            con1SctId = SctIdGenerator.generate(conceptCounter, namespace, SctIdGenerator.TYPE.CONCEPT);
-                            this.uuidToSctMap.put(UUID.fromString(con1), con1SctId);
+                    case ACCEPTABILITY:
+                        String accept = parts[Rf2File.LanguageRefsetFileFields.ACCEPTABILITY.ordinal()];
+                        String acceptSctId = getExistingSctId(accept);
+                        if (acceptSctId == null) {
+                            acceptSctId = SctIdGenerator.generate(conceptCounter, namespace, SctIdGenerator.TYPE.CONCEPT);
+                            this.uuidToSctMap.put(UUID.fromString(accept), acceptSctId);
                             conceptCounter++;
                         }
-                        conRefsetsWriter.write(con1SctId + field.seperator);
+                        langRefsetsWriter.write(acceptSctId + field.seperator);
+
+                        break;
+                }
+            }
+        }
+    }
+    
+    private void processOtherLangRefsets(String line) throws IOException {
+        if (line != null) {
+            String[] parts = line.split("\t");
+            for (Rf2File.LanguageRefsetFileFields field : Rf2File.LanguageRefsetFileFields.values()) {
+                switch (field) {
+                    case ID:
+                        String memberUuid = parts[Rf2File.LanguageRefsetFileFields.ID.ordinal()];
+                        otherLangRefsetsWriter.write(memberUuid + field.seperator);
+
+                        break;
+
+                    case EFFECTIVE_TIME:
+                        String effectiveDateString = parts[Rf2File.LanguageRefsetFileFields.EFFECTIVE_TIME.ordinal()];
+                        otherLangRefsetsWriter.write(effectiveDateString + field.seperator);
+
+                        break;
+
+                    case ACTIVE:
+                        String status = parts[Rf2File.LanguageRefsetFileFields.ACTIVE.ordinal()];
+                        otherLangRefsetsWriter.write(convertStatus(status) + field.seperator);
+
+                        break;
+
+                    case MODULE_ID:
+                        otherLangRefsetsWriter.write(module + field.seperator);
+
+                        break;
+
+                    case REFSET_ID:
+                        String refsetId = parts[Rf2File.LanguageRefsetFileFields.REFSET_ID.ordinal()];
+                        String refsetSctId = getExistingSctId(refsetId);
+                        if (refsetSctId == null) {
+                            refsetSctId = SctIdGenerator.generate(conceptCounter, namespace, SctIdGenerator.TYPE.CONCEPT); //@afk: subset?
+                            conceptCounter++;
+                            this.uuidToSctMap.put(UUID.fromString(refsetId), refsetSctId);
+                        }
+                        otherLangRefsetsWriter.write(refsetSctId + field.seperator);
+
+                        break;
+
+                    case REFERENCED_COMPONENT_ID:
+                        String rc = parts[Rf2File.LanguageRefsetFileFields.REFERENCED_COMPONENT_ID.ordinal()];
+                        String rcSctId = getExistingSctId(rc);
+                        if (rcSctId == null) {
+                            rcSctId = SctIdGenerator.generate(conceptCounter, namespace, SctIdGenerator.TYPE.CONCEPT);
+                            conceptCounter++;
+                            this.uuidToSctMap.put(UUID.fromString(rc), rcSctId);
+                        }
+                        otherLangRefsetsWriter.write(rcSctId + field.seperator);
+
+                        break;
+
+                    case ACCEPTABILITY:
+                        String accept = parts[Rf2File.LanguageRefsetFileFields.ACCEPTABILITY.ordinal()];
+                        String acceptSctId = getExistingSctId(accept);
+                        if (acceptSctId == null) {
+                            acceptSctId = SctIdGenerator.generate(conceptCounter, namespace, SctIdGenerator.TYPE.CONCEPT);
+                            this.uuidToSctMap.put(UUID.fromString(accept), acceptSctId);
+                            conceptCounter++;
+                        }
+                        otherLangRefsetsWriter.write(acceptSctId + field.seperator);
 
                         break;
                 }
@@ -655,79 +855,67 @@ public class UuidToSctIdMapper {
         }
     }
 
-    private void processConConRefsets(String line) throws IOException {
+    private void processModuleDepedency(String line) throws IOException {
         if (line != null) {
             String[] parts = line.split("\t");
-            for (Rf2File.ConConRefsetFileFields field : Rf2File.ConConRefsetFileFields.values()) {
+            for (Rf2File.ModuleDependencyFileFields field : Rf2File.ModuleDependencyFileFields.values()) {
                 switch (field) {
                     case ID:
-                        String memberUuid = parts[Rf2File.ConConRefsetFileFields.ID.ordinal()];
-                        conConRefsetsWriter.write(memberUuid + field.seperator);
+                        String memberUuid = parts[Rf2File.ModuleDependencyFileFields.ID.ordinal()];
+                        modDependWriter.write(memberUuid + field.seperator);
 
                         break;
 
                     case EFFECTIVE_TIME:
-                        String effectiveDateString = parts[Rf2File.ConConRefsetFileFields.EFFECTIVE_TIME.ordinal()];
-                        conConRefsetsWriter.write(effectiveDateString + field.seperator);
+                        String effectiveDateString = parts[Rf2File.ModuleDependencyFileFields.EFFECTIVE_TIME.ordinal()];
+                        modDependWriter.write(effectiveDateString + field.seperator);
 
                         break;
 
                     case ACTIVE:
-                        String status = parts[Rf2File.ConConRefsetFileFields.ACTIVE.ordinal()];
-                        conConRefsetsWriter.write(convertStatus(status) + field.seperator);
+                        String status = parts[Rf2File.ModuleDependencyFileFields.ACTIVE.ordinal()];
+                        modDependWriter.write(convertStatus(status) + field.seperator);
 
                         break;
 
                     case MODULE_ID:
-                        conConRefsetsWriter.write(module + field.seperator);
+                        modDependWriter.write(module + field.seperator);
 
                         break;
 
                     case REFSET_ID:
-                        String refsetId = parts[Rf2File.ConConRefsetFileFields.REFSET_ID.ordinal()];
+                        String refsetId = parts[Rf2File.ModuleDependencyFileFields.REFSET_ID.ordinal()];
                         String refsetSctId = getExistingSctId(refsetId);
                         if (refsetSctId == null) {
                             refsetSctId = SctIdGenerator.generate(conceptCounter, namespace, SctIdGenerator.TYPE.CONCEPT); //@afk: subset?
                             conceptCounter++;
                             this.uuidToSctMap.put(UUID.fromString(refsetId), refsetSctId);
                         }
-                        conConRefsetsWriter.write(refsetSctId + field.seperator);
+                        modDependWriter.write(refsetSctId + field.seperator);
 
                         break;
 
                     case REFERENCED_COMPONENT_ID:
-                        String rc = parts[Rf2File.ConConRefsetFileFields.REFERENCED_COMPONENT_ID.ordinal()];
+                        String rc = parts[Rf2File.ModuleDependencyFileFields.REFERENCED_COMPONENT_ID.ordinal()];
                         String rcSctId = getExistingSctId(rc);
                         if (rcSctId == null) {
                             rcSctId = SctIdGenerator.generate(conceptCounter, namespace, SctIdGenerator.TYPE.CONCEPT);
                             conceptCounter++;
                             this.uuidToSctMap.put(UUID.fromString(rc), rcSctId);
                         }
-                        conConRefsetsWriter.write(rcSctId + field.seperator);
+                        modDependWriter.write(rcSctId + field.seperator);
 
                         break;
 
-                    case CONCEPT1:
-                        String con1 = parts[Rf2File.ConConRefsetFileFields.CONCEPT1.ordinal()];
-                        String con1SctId = getExistingSctId(con1);
-                        if (con1SctId == null) {
-                            con1SctId = SctIdGenerator.generate(conceptCounter, namespace, SctIdGenerator.TYPE.CONCEPT);
-                            this.uuidToSctMap.put(UUID.fromString(con1), con1SctId);
-                            conceptCounter++;
-                        }
-                        conConRefsetsWriter.write(con1SctId + field.seperator);
+                    case SOURCE_TIME:
+                        String sourceTime = parts[Rf2File.ModuleDependencyFileFields.SOURCE_TIME.ordinal()];
+                        modDependWriter.write(sourceTime + field.seperator);
 
                         break;
 
-                    case CONCEPT2:
-                        String con2 = parts[Rf2File.ConConRefsetFileFields.CONCEPT2.ordinal()];
-                        String con2SctId = getExistingSctId(con2);
-                        if (con2SctId == null) {
-                            con2SctId = SctIdGenerator.generate(conceptCounter, namespace, SctIdGenerator.TYPE.CONCEPT);
-                            this.uuidToSctMap.put(UUID.fromString(con2), con2SctId);
-                            conceptCounter++;
-                        }
-                        conConRefsetsWriter.write(con2SctId + field.seperator);
+                    case TARGET_TIME:
+                        String targetTime = parts[Rf2File.ModuleDependencyFileFields.TARGET_TIME.ordinal()];
+                        modDependWriter.write(targetTime + field.seperator);
 
                         break;
                 }
@@ -735,91 +923,73 @@ public class UuidToSctIdMapper {
         }
     }
 
-    private void processConConConRefsets(String line) throws IOException {
+    private void processDescType(String line) throws IOException {
         if (line != null) {
             String[] parts = line.split("\t");
-            for (Rf2File.ConConConRefsetFileFields field : Rf2File.ConConConRefsetFileFields.values()) {
+            for (Rf2File.DescTypeFileFields field : Rf2File.DescTypeFileFields.values()) {
                 switch (field) {
                     case ID:
-                        String memberUuid = parts[Rf2File.ConConConRefsetFileFields.ID.ordinal()];
-                        conConConRefsetsWriter.write(memberUuid + field.seperator);
+                        String memberUuid = parts[Rf2File.DescTypeFileFields.ID.ordinal()];
+                        descTypeWriter.write(memberUuid + field.seperator);
 
                         break;
 
                     case EFFECTIVE_TIME:
-                        String effectiveDateString = parts[Rf2File.ConConConRefsetFileFields.EFFECTIVE_TIME.ordinal()];
-                        conConConRefsetsWriter.write(effectiveDateString + field.seperator);
+                        String effectiveDateString = parts[Rf2File.DescTypeFileFields.EFFECTIVE_TIME.ordinal()];
+                        descTypeWriter.write(effectiveDateString + field.seperator);
 
                         break;
 
                     case ACTIVE:
-                        String status = parts[Rf2File.ConConConRefsetFileFields.ACTIVE.ordinal()];
-                        conConConRefsetsWriter.write(convertStatus(status) + field.seperator);
+                        String status = parts[Rf2File.DescTypeFileFields.ACTIVE.ordinal()];
+                        descTypeWriter.write(convertStatus(status) + field.seperator);
 
                         break;
 
                     case MODULE_ID:
-                        conConConRefsetsWriter.write(module + field.seperator);
+                        descTypeWriter.write(module + field.seperator);
 
                         break;
 
                     case REFSET_ID:
-                        String refsetId = parts[Rf2File.ConConConRefsetFileFields.REFSET_ID.ordinal()];
+                        String refsetId = parts[Rf2File.DescTypeFileFields.REFSET_ID.ordinal()];
                         String refsetSctId = getExistingSctId(refsetId);
                         if (refsetSctId == null) {
                             refsetSctId = SctIdGenerator.generate(conceptCounter, namespace, SctIdGenerator.TYPE.CONCEPT); //@afk: subset?
                             conceptCounter++;
                             this.uuidToSctMap.put(UUID.fromString(refsetId), refsetSctId);
                         }
-                        conConConRefsetsWriter.write(refsetSctId + field.seperator);
+                        descTypeWriter.write(refsetSctId + field.seperator);
 
                         break;
 
                     case REFERENCED_COMPONENT_ID:
-                        String rc = parts[Rf2File.ConConConRefsetFileFields.REFERENCED_COMPONENT_ID.ordinal()];
+                        String rc = parts[Rf2File.DescTypeFileFields.REFERENCED_COMPONENT_ID.ordinal()];
                         String rcSctId = getExistingSctId(rc);
                         if (rcSctId == null) {
                             rcSctId = SctIdGenerator.generate(conceptCounter, namespace, SctIdGenerator.TYPE.CONCEPT);
                             conceptCounter++;
                             this.uuidToSctMap.put(UUID.fromString(rc), rcSctId);
                         }
-                        conConConRefsetsWriter.write(rcSctId + field.seperator);
+                        descTypeWriter.write(rcSctId + field.seperator);
 
                         break;
 
-                    case CONCEPT1:
-                        String con1 = parts[Rf2File.ConConConRefsetFileFields.CONCEPT1.ordinal()];
-                        String con1SctId = getExistingSctId(con1);
-                        if (con1SctId == null) {
-                            con1SctId = SctIdGenerator.generate(conceptCounter, namespace, SctIdGenerator.TYPE.CONCEPT);
-                            this.uuidToSctMap.put(UUID.fromString(con1), con1SctId);
+                    case DESC_FORMAT:
+                        String format = parts[Rf2File.DescTypeFileFields.DESC_FORMAT.ordinal()];
+                        String formatSctId = getExistingSctId(format);
+                        if (formatSctId == null) {
+                            formatSctId = SctIdGenerator.generate(conceptCounter, namespace, SctIdGenerator.TYPE.CONCEPT);
+                            this.uuidToSctMap.put(UUID.fromString(format), formatSctId);
                             conceptCounter++;
                         }
-                        conConConRefsetsWriter.write(con1SctId + field.seperator);
+                        descTypeWriter.write(formatSctId + field.seperator);
 
                         break;
 
-                    case CONCEPT2:
-                        String con2 = parts[Rf2File.ConConConRefsetFileFields.CONCEPT2.ordinal()];
-                        String con2SctId = getExistingSctId(con2);
-                        if (con2SctId == null) {
-                            con2SctId = SctIdGenerator.generate(conceptCounter, namespace, SctIdGenerator.TYPE.CONCEPT);
-                            this.uuidToSctMap.put(UUID.fromString(con2), con2SctId);
-                            conceptCounter++;
-                        }
-                        conConConRefsetsWriter.write(con2SctId + field.seperator);
-
-                        break;
-
-                    case CONCEPT3:
-                        String con3 = parts[Rf2File.ConConConRefsetFileFields.CONCEPT3.ordinal()];
-                        String con3SctId = getExistingSctId(con3);
-                        if (con3SctId == null) {
-                            con3SctId = SctIdGenerator.generate(conceptCounter, namespace, SctIdGenerator.TYPE.CONCEPT);
-                            this.uuidToSctMap.put(UUID.fromString(con3), con3SctId);
-                            conceptCounter++;
-                        }
-                        conConConRefsetsWriter.write(con3SctId + field.seperator);
+                    case DESC_LENGTH:
+                        String length = parts[Rf2File.DescTypeFileFields.DESC_LENGTH.ordinal()];
+                        descTypeWriter.write(length + field.seperator);
 
                         break;
                 }
@@ -827,159 +997,85 @@ public class UuidToSctIdMapper {
         }
     }
 
-    private void processConConStrRefsets(String line) throws IOException {
+    private void processRefsetDesc(String line) throws IOException {
         if (line != null) {
             String[] parts = line.split("\t");
-            for (Rf2File.ConConStrRefsetFileFields field : Rf2File.ConConStrRefsetFileFields.values()) {
+            for (Rf2File.RefsetDescriptorFileFields field : Rf2File.RefsetDescriptorFileFields.values()) {
                 switch (field) {
                     case ID:
-                        String memberUuid = parts[Rf2File.ConConStrRefsetFileFields.ID.ordinal()];
-                        conConStrRefsetsWriter.write(memberUuid + field.seperator);
+                        String memberUuid = parts[Rf2File.RefsetDescriptorFileFields.ID.ordinal()];
+                        refsetDescWriter.write(memberUuid + field.seperator);
 
                         break;
 
                     case EFFECTIVE_TIME:
-                        String effectiveDateString = parts[Rf2File.ConConStrRefsetFileFields.EFFECTIVE_TIME.ordinal()];
-                        conConStrRefsetsWriter.write(effectiveDateString + field.seperator);
+                        String effectiveDateString = parts[Rf2File.RefsetDescriptorFileFields.EFFECTIVE_TIME.ordinal()];
+                        refsetDescWriter.write(effectiveDateString + field.seperator);
 
                         break;
 
                     case ACTIVE:
-                        String status = parts[Rf2File.ConConStrRefsetFileFields.ACTIVE.ordinal()];
-                        conConStrRefsetsWriter.write(convertStatus(status) + field.seperator);
+                        String status = parts[Rf2File.RefsetDescriptorFileFields.ACTIVE.ordinal()];
+                        refsetDescWriter.write(convertStatus(status) + field.seperator);
 
                         break;
 
                     case MODULE_ID:
-                        conConStrRefsetsWriter.write(module + field.seperator);
+                        refsetDescWriter.write(module + field.seperator);
 
                         break;
 
                     case REFSET_ID:
-                        String refsetId = parts[Rf2File.ConConStrRefsetFileFields.REFSET_ID.ordinal()];
+                        String refsetId = parts[Rf2File.RefsetDescriptorFileFields.REFSET_ID.ordinal()];
                         String refsetSctId = getExistingSctId(refsetId);
                         if (refsetSctId == null) {
                             refsetSctId = SctIdGenerator.generate(conceptCounter, namespace, SctIdGenerator.TYPE.CONCEPT); //@afk: subset?
                             conceptCounter++;
                             this.uuidToSctMap.put(UUID.fromString(refsetId), refsetSctId);
                         }
-                        conConStrRefsetsWriter.write(refsetSctId + field.seperator);
+                        refsetDescWriter.write(refsetSctId + field.seperator);
 
                         break;
 
                     case REFERENCED_COMPONENT_ID:
-                        String rc = parts[Rf2File.ConConStrRefsetFileFields.REFERENCED_COMPONENT_ID.ordinal()];
+                        String rc = parts[Rf2File.RefsetDescriptorFileFields.REFERENCED_COMPONENT_ID.ordinal()];
                         String rcSctId = getExistingSctId(rc);
                         if (rcSctId == null) {
                             rcSctId = SctIdGenerator.generate(conceptCounter, namespace, SctIdGenerator.TYPE.CONCEPT);
                             conceptCounter++;
                             this.uuidToSctMap.put(UUID.fromString(rc), rcSctId);
                         }
-                        conConStrRefsetsWriter.write(rcSctId + field.seperator);
+                        refsetDescWriter.write(rcSctId + field.seperator);
 
                         break;
 
-                    case CONCEPT1:
-                        String con1 = parts[Rf2File.ConConStrRefsetFileFields.CONCEPT1.ordinal()];
-                        String con1SctId = getExistingSctId(con1);
-                        if (con1SctId == null) {
-                            con1SctId = SctIdGenerator.generate(conceptCounter, namespace, SctIdGenerator.TYPE.CONCEPT);
-                            this.uuidToSctMap.put(UUID.fromString(con1), con1SctId);
+                    case ATTRIB_DESC:
+                        String desc = parts[Rf2File.RefsetDescriptorFileFields.ATTRIB_DESC.ordinal()];
+                        String descSctId = getExistingSctId(desc);
+                        if (descSctId == null) {
+                            descSctId = SctIdGenerator.generate(conceptCounter, namespace, SctIdGenerator.TYPE.CONCEPT);
+                            this.uuidToSctMap.put(UUID.fromString(desc), descSctId);
                             conceptCounter++;
                         }
-                        conConStrRefsetsWriter.write(con1SctId + field.seperator);
+                        refsetDescWriter.write(descSctId + field.seperator);
 
                         break;
 
-                    case CONCEPT2:
-                        String con2 = parts[Rf2File.ConConStrRefsetFileFields.CONCEPT2.ordinal()];
-                        String con2SctId = getExistingSctId(con2);
-                        if (con2SctId == null) {
-                            con2SctId = SctIdGenerator.generate(conceptCounter, namespace, SctIdGenerator.TYPE.CONCEPT);
-                            this.uuidToSctMap.put(UUID.fromString(con2), con2SctId);
+                    case ATTRIB_TYPE:
+                        String type = parts[Rf2File.RefsetDescriptorFileFields.ATTRIB_TYPE.ordinal()];
+                        String typeSctId = getExistingSctId(type);
+                        if (typeSctId == null) {
+                            typeSctId = SctIdGenerator.generate(conceptCounter, namespace, SctIdGenerator.TYPE.CONCEPT);
+                            this.uuidToSctMap.put(UUID.fromString(type), typeSctId);
                             conceptCounter++;
                         }
-                        conConStrRefsetsWriter.write(con2SctId + field.seperator);
+                        refsetDescWriter.write(typeSctId + field.seperator);
 
                         break;
 
-                    case STRING:
-                        String str = parts[Rf2File.ConConStrRefsetFileFields.STRING.ordinal()];
-                        String strSctId = getExistingSctId(str);
-                        if (strSctId == null) {
-                            strSctId = SctIdGenerator.generate(conceptCounter, namespace, SctIdGenerator.TYPE.CONCEPT);
-                            this.uuidToSctMap.put(UUID.fromString(str), strSctId);
-                            conceptCounter++;
-                        }
-                        conConStrRefsetsWriter.write(strSctId + field.seperator);
-
-                        break;
-                }
-            }
-        }
-    }
-
-    private void processStringRefsets(String line) throws IOException {
-        if (line != null) {
-            String[] parts = line.split("\t");
-            for (Rf2File.StringRefsetFileFields field : Rf2File.StringRefsetFileFields.values()) {
-                switch (field) {
-                    case ID:
-                        String memberUuid = parts[Rf2File.StringRefsetFileFields.ID.ordinal()];
-                        stringRefsetsWriter.write(memberUuid + field.seperator);
-
-                        break;
-
-                    case EFFECTIVE_TIME:
-                        String effectiveDateString = parts[Rf2File.StringRefsetFileFields.EFFECTIVE_TIME.ordinal()];
-                        stringRefsetsWriter.write(effectiveDateString + field.seperator);
-
-                        break;
-
-                    case ACTIVE:
-                        String status = parts[Rf2File.StringRefsetFileFields.ACTIVE.ordinal()];
-                        stringRefsetsWriter.write(convertStatus(status) + field.seperator);
-
-                        break;
-
-                    case MODULE_ID:
-                        stringRefsetsWriter.write(module + field.seperator);
-
-                        break;
-
-                    case REFSET_ID:
-                        String refsetId = parts[Rf2File.StringRefsetFileFields.REFSET_ID.ordinal()];
-                        String refsetSctId = getExistingSctId(refsetId);
-                        if (refsetSctId == null) {
-                            refsetSctId = SctIdGenerator.generate(conceptCounter, namespace, SctIdGenerator.TYPE.CONCEPT); //@afk: subset?
-                            conceptCounter++;
-                            this.uuidToSctMap.put(UUID.fromString(refsetId), refsetSctId);
-                        }
-                        stringRefsetsWriter.write(refsetSctId + field.seperator);
-
-                        break;
-
-                    case REFERENCED_COMPONENT_ID:
-                        String rc = parts[Rf2File.StringRefsetFileFields.REFERENCED_COMPONENT_ID.ordinal()];
-                        String rcSctId = getExistingSctId(rc);
-                        if (rcSctId == null) {
-                            rcSctId = SctIdGenerator.generate(conceptCounter, namespace, SctIdGenerator.TYPE.CONCEPT);
-                            conceptCounter++;
-                            this.uuidToSctMap.put(UUID.fromString(rc), rcSctId);
-                        }
-                        stringRefsetsWriter.write(rcSctId + field.seperator);
-
-                        break;
-
-                    case STRING:
-                        String str = parts[Rf2File.StringRefsetFileFields.STRING.ordinal()];
-                        String strSctId = getExistingSctId(str);
-                        if (strSctId == null) {
-                            strSctId = SctIdGenerator.generate(conceptCounter, namespace, SctIdGenerator.TYPE.CONCEPT);
-                            this.uuidToSctMap.put(UUID.fromString(str), strSctId);
-                            conceptCounter++;
-                        }
-                        conRefsetsWriter.write(strSctId + field.seperator);
+                    case ATTRIB_ORDER:
+                        String order = parts[Rf2File.RefsetDescriptorFileFields.ATTRIB_ORDER.ordinal()];
+                        refsetDescWriter.write(order + field.seperator);
 
                         break;
                 }
@@ -1007,7 +1103,28 @@ public class UuidToSctIdMapper {
             }
         }
     }
+    
+    private void writeUuidToSctMapFile() throws IOException {
+        Set<UUID> keySet = uuidToSctMap.keySet();
+        for (UUID uuid : keySet) {
+            String sctId = uuidToSctMap.get(uuid);
+            for (Rf2File.UuidToSctMapFileFields field : Rf2File.UuidToSctMapFileFields.values()) {
 
+                switch (field) {
+                    case UUID:
+                        uuidToSctMapWriter.write(uuid + field.seperator);
+
+                        break;
+
+                    case SCT:
+                        uuidToSctMapWriter.write(sctId + field.seperator);
+
+                        break;
+                }
+            }
+        }
+    }
+    
     private Integer convertStatus(String statusString) throws ValidationException, IOException {
         UUID status = UUID.fromString(statusString);
         int inactive = 0;
@@ -1024,6 +1141,16 @@ public class UuidToSctIdMapper {
             return inactive;
         } else if (status.equals(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid())) {
             return active;
+        } else if (status.equals(SnomedMetadataRf2.ERRONEOUS_COMPONENT_RF2.getLenient().getPrimUuid())) {
+            return inactive;
+        } else if (status.equals(SnomedMetadataRf2.AMBIGUOUS_COMPONENT_RF2.getLenient().getPrimUuid())) {
+            return inactive;
+        } else if (status.equals(SnomedMetadataRf2.COMPONENT_MOVED_ELSEWHERE_RF2.getLenient().getPrimUuid())) {
+            return inactive;
+        } else if (status.equals(SnomedMetadataRf2.CONCEPT_NON_CURRENT_RF2.getLenient().getPrimUuid())) {
+            return inactive;
+        } else if (status.equals(SnomedMetadataRf2.OUTDATED_COMPONENT_RF2.getLenient().getPrimUuid())) {
+            return inactive;
         }
 
         return null;
@@ -1080,24 +1207,28 @@ public class UuidToSctIdMapper {
             identifiersWriter.close();
         }
 
-        if (conRefsetsWriter != null) {
-            conRefsetsWriter.close();
+        if (relationshipsStatedWriter != null) {
+            relationshipsStatedWriter.close();
         }
 
-        if (conConRefsetsWriter != null) {
-            conConRefsetsWriter.close();
+        if (langRefsetsWriter != null) {
+            langRefsetsWriter.close();
+        }
+        
+        if (otherLangRefsetsWriter != null) {
+            otherLangRefsetsWriter.close();
         }
 
-        if (conConConRefsetsWriter != null) {
-            conConConRefsetsWriter.close();
+        if (modDependWriter != null) {
+            modDependWriter.close();
         }
 
-        if (conConStrRefsetsWriter != null) {
-            conConStrRefsetsWriter.close();
+        if (descTypeWriter != null) {
+            descTypeWriter.close();
         }
 
-        if (stringRefsetsWriter != null) {
-            stringRefsetsWriter.close();
+        if (refsetDescWriter != null) {
+            refsetDescWriter.close();
         }
 
         if (uuidToSctMapWriter != null) {
@@ -1120,24 +1251,28 @@ public class UuidToSctIdMapper {
             identifiersReader.close();
         }
 
-        if (conRefsetsReader != null) {
-            conRefsetsReader.close();
+        if (relationshipsStatedReader != null) {
+            relationshipsStatedReader.close();
         }
 
-        if (conConRefsetsReader != null) {
-            conConRefsetsReader.close();
+        if (langRefsetsReader != null) {
+            langRefsetsReader.close();
+        }
+        
+        if (otherLangRefsetsReader != null) {
+            otherLangRefsetsReader.close();
         }
 
-        if (conConConRefsetsReader != null) {
-            conConConRefsetsReader.close();
+        if (modDependReader != null) {
+            modDependReader.close();
         }
 
-        if (conConStrRefsetsReader != null) {
-            conConStrRefsetsReader.close();
+        if (descTypeReader != null) {
+            descTypeReader.close();
         }
 
-        if (stringRefsetsReader != null) {
-            stringRefsetsReader.close();
+        if (refsetDescReader != null) {
+            refsetDescReader.close();
         }
     }
 }
