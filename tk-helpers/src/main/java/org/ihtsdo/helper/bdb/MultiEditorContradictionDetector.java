@@ -70,7 +70,7 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         this.contradictionCaseList = cl;
         this.watchSet = ws;
         this.watchCaseList = null;
-        if (ws != null) {
+        if (this.watchSet != null) {
             this.watchCaseList = new ArrayList<MultiEditorContradictionCase>();
         }
         this.ignoreNonVisibleAth = ignoreNonVisibleAth;
@@ -98,7 +98,7 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         this.contradictionCaseList = cl;
         this.watchSet = ws;
         this.watchCaseList = null;
-        if (ws != null) {
+        if (this.watchSet != null) {
             this.watchCaseList = new ArrayList<MultiEditorContradictionCase>();
         }
         this.ignoreNonVisibleAth = ignoreNonVisibleAth;
@@ -173,6 +173,24 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
             authTimeSetMissing = conceptMissingAthMap.keySet();
         }
 
+        // Check for computed commit without CommitRecord
+        for (HashSet<UUID> hs : commitRefsetAthSetsList) {
+            for (UUID uuid : hs) {
+                conceptComputedAthDiffMap.remove(uuid); // removed actual commits from computed
+            }
+        }
+        if (conceptComputedAthDiffMap.isEmpty() == false) {
+            componentsMissingCommitRecord.add(conceptVersion.getNid());
+        }
+
+        // REMOVE EXCLUDED VALUES
+        if (authTimeSetMissing != null && authTimeSetMissing.size() > 0) {
+            for (Set<UUID> uset : commitRefsetAthSetsList) {
+                uset.removeAll(authTimeSetMissing);
+            }
+            Collections.sort(commitRefsetAthSetsList, new SizeComparator());
+        }
+
         // TEST FOR CONTRADICTIONS
         HashSet<UUID> lesser;
         HashSet<UUID> greater;
@@ -189,28 +207,18 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
             lesser = commitRefsetAthSetsList.get(editorIdx);
             if (lastTruth != null && lesser.size() <= lastTruth.size()) {
                 // compare editor commits with adjudication
-                diff = lesserDiffFromGreater(lesser, lastTruth, authTimeSetMissing, false);
+                diff = lesserDiffFromGreater(lesser, lastTruth, false);
                 accumDiffSet.addAll(diff);
                 editorIdx++;
             } else {
                 // compare editor commits with next editor commit
                 if (editorIdx + 1 < editorSize) {
                     greater = commitRefsetAthSetsList.get(editorIdx + 1);
-                    diff = lesserDiffFromGreater(lesser, greater, authTimeSetMissing, true);
+                    diff = lesserDiffFromGreater(lesser, greater, true);
                     accumDiffSet.addAll(diff);
                 }
                 editorIdx++;
             }
-        }
-
-        // Check for computed commit without CommitRecord
-        for (HashSet<UUID> hs : commitRefsetAthSetsList) {
-            for (UUID uuid : hs) {
-                conceptComputedAthDiffMap.remove(uuid);
-            }
-        }
-        if (conceptComputedAthDiffMap.isEmpty() == false) {
-            componentsMissingCommitRecord.add(conceptVersion.getNid());
         }
 
         // REPORT ANY CONTRADICTING CONCEPTS
@@ -237,12 +245,13 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
             caseToAdd.setAuthTimeSetsTruthList(truthRefsetAthSetsList);
             if (!accumDiffSet.isEmpty()) {
                 contradictionCaseList.add(caseToAdd);
+                //:: System.out.println("\r\n** CONFLICT **" + caseToAdd.toStringLong());
             } else {
                 watchCaseList.add(caseToAdd);
+                //:: System.out.println("\r\n** WATCH **" + caseToAdd.toStringLong());
             }
         }
     }
-
     /**
      * get Author Time Hash (ATH) sets from refset for the provided concept
      */
@@ -372,12 +381,8 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
     }
 
     private HashSet<UUID> lesserDiffFromGreater(HashSet<UUID> lesser, HashSet<UUID> greater,
-            Set<UUID> exclude, boolean checkEqualSize) {
+            boolean checkEqualSize) {
         HashSet<UUID> diffSet = new HashSet<UUID>();
-        if (exclude != null) {
-            lesser.removeAll(exclude);
-            greater.removeAll(exclude);
-        }
         if (greater.containsAll(lesser) == false) {
             HashSet<UUID> lesserTemp = new HashSet<UUID>(lesser);
             lesserTemp.removeAll(greater);
