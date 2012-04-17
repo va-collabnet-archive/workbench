@@ -31,6 +31,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.mojo.mojo.ConceptDescriptor;
 import org.ihtsdo.tk.api.Precedence;
@@ -107,7 +108,9 @@ public class ConvertConceptInLanguageRefset extends AbstractMojo {
 
 				String name = membershipConcept.toString(); 
 
-				I_GetConceptData newCommentsConcept = tf.newConcept(UUID.randomUUID(), false, config);
+				I_GetConceptData newCommentsConcept = tf.newConcept(
+                                        Type5UuidFactory.get(name  + " - comments refset - for UUID generation"), 
+                                        false, config);
 				tf.newDescription(UUID.randomUUID(), newCommentsConcept, "en",
 						name + " - comments refset", 
 						tf.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid())
@@ -121,7 +124,9 @@ public class ConvertConceptInLanguageRefset extends AbstractMojo {
 				I_RelVersioned r1 = tf.newRelationship(UUID.randomUUID(), membershipConcept, commentsRelConcept, newCommentsConcept, defining, refinability, 
 						current, 0, config);
 
-				I_GetConceptData newPromotionConcept = tf.newConcept(UUID.randomUUID(), false, config);
+				I_GetConceptData newPromotionConcept = tf.newConcept(
+                                        Type5UuidFactory.get(name  + " - promotion refset - for UUID generation")
+                                        , false, config);
 				newPromotionConcept.setAnnotationStyleRefex(true);
 				tf.newDescription(UUID.randomUUID(), newPromotionConcept, "en",
 						name + " - promotion refset", 
