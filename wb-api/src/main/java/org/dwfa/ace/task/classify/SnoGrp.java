@@ -482,7 +482,7 @@ public class SnoGrp extends ArrayList<SnoRel> {
      * @param roleGroupB
      * @return SnoGrp iff logically equivalent role group found
      */
-    SnoGrp findLogicalEquivalent(SnoGrpList groupList_B) {
+    public SnoGrp findLogicalEquivalent(SnoGrpList groupList_B) {
         for (SnoGrp snoGrp : groupList_B) {
             if (this.equals(snoGrp)) {
                 return snoGrp;

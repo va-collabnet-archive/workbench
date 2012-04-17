@@ -28,10 +28,10 @@ import org.ihtsdo.tk.api.TerminologyStoreDI;
  */
 public class SnoRelUuid implements Comparable<SnoRelUuid> {
 
-    UUID c1;
-    UUID role;
-    UUID c2;
-    int group;
+    public UUID c1;
+    public UUID role;
+    public UUID c2;
+    public int group;
     private static final TerminologyStoreDI ts = Ts.get();
 
     public SnoRelUuid(SnoRel sr) throws Exception {

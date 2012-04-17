@@ -37,7 +37,7 @@ public class SnoGrpUuidList extends ArrayList<SnoGrpUuid> {
         }
     }
 
-    void calcNewRoleGroupNumbers(HashSet<Integer> inUse) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+    public void calcNewRoleGroupNumbers(HashSet<Integer> inUse) throws NoSuchAlgorithmException, UnsupportedEncodingException {
         int offset = 0;
         // HashSet<Integer> numInUse = (HashSet<Integer>) inUse.clone();
         HashSet<Integer> numInThisConcept = new HashSet<Integer>();
