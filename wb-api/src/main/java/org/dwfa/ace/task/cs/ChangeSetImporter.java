@@ -118,7 +118,7 @@ public abstract class ChangeSetImporter implements ActionListener {
     }
 
     private void createWfHxLuceneIndex(I_ShowActivity activity, List<File> changeSetFiles) throws IOException, ClassNotFoundException {
-        if (changeSetFiles.size() == 0) {
+        if (changeSetFiles.isEmpty()) {
             if (AceLog.getEditLog().isLoggable(Level.INFO)) {
                 AceLog.getEditLog().info("Workflow history lucene index already updated with all changes");
             }
