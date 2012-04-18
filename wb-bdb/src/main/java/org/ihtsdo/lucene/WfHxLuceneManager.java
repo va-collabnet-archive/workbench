@@ -27,7 +27,7 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 public class WfHxLuceneManager extends LuceneManager {
 	public final static int matchLimit = 10000000;
     static final String wfLuceneFileSuffix = "lucene";
-	protected static File wfHxLuceneDirFile = new File("target" + File.separatorChar + "workflow" + File.separatorChar + "lucene");
+	public static File wfHxLuceneDirFile = new File("target" + File.separatorChar + "workflow" + File.separatorChar + "lucene");
 	protected static File runningLuceneDirFile = new File("workflow" + File.separatorChar + "lucene");
 
 	private static HashSet<WorkflowHistoryJavaBean> beansToAdd;
@@ -147,12 +147,8 @@ public class WfHxLuceneManager extends LuceneManager {
 		init(LuceneSearchType.WORKFLOW_HISTORY);
 
 	    if (LuceneManager.indexExists(LuceneSearchType.WORKFLOW_HISTORY) != false) {
-	    	if (runningLuceneDirFile.exists()) {
-				writeToLuceneNoLock(beansToAdd, null, null);
-				beansToAdd.clear();
-	    	} else {
-	            AceLog.getAppLog().severe("Cannot be here unless bundle is executed");
-	    	}
+		writeToLuceneNoLock(beansToAdd, null, null);
+		beansToAdd.clear();
 	    }
 	} 
 }
