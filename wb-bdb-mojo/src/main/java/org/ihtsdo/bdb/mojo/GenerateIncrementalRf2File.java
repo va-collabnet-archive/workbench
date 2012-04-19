@@ -132,6 +132,13 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
      * @required
      */
     private File berkeleyDir;
+    /**
+     * Set to true to make private version of alternate identifiers file.
+     *
+     * @parameter 
+     * default-value="false"
+     */
+    private boolean makePrivateAltIdsFile;
     
     private IntSet sapsToWrite = new IntSet();
     private IntSet pathIds;
@@ -162,6 +169,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
                     excludedRefsetIds.add(validatedNid);
                 }
             }
+                
             UUID moduleId = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, module);
 
             int viewPathNid;
@@ -201,7 +209,8 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
                         sapsToWrite.getAsSet(),
                         vc.getVcWithAllStatusValues(),
                         excludedRefsetIds.getAsSet(),
-                        allConcepts);
+                        allConcepts,
+                        makePrivateAltIdsFile);
                 Ts.get().iterateConceptDataInSequence(exporter);
                 exporter.writeOneTimeFiles();
                 exporter.close();
