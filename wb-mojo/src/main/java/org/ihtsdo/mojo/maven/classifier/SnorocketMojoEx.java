@@ -209,7 +209,7 @@ public class SnorocketMojoEx extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         logger = getLog();
-        logger.info("\r\n::: [SnorocketMojo] execute() -- begin");
+        logger.info("\r\n::: [SnorocketMojoEx] execute() -- begin");
         SnoQuery.initAll();
 
         try {
@@ -263,7 +263,7 @@ public class SnorocketMojoEx extends AbstractMojo {
                         allowedRoleTypes, statusSet, cEditPosSet, null, config.getPrecedence(),
                         config.getConflictResolutionStrategy());
                 tf.iterateConcepts(pcEdit);
-                logger.info("\r\n::: [SnorocketMojo] GET STATED (Edit) PATH DATA : "
+                logger.info("\r\n::: [SnorocketMojoEx] GET STATED (Edit) PATH DATA : "
                         + pcEdit.getStats(startTime));
             }
 
@@ -348,7 +348,7 @@ public class SnorocketMojoEx extends AbstractMojo {
                 for (SnoDL sdl : dll) {
                     rocket_123.addRoleComposition(sdl.getLhsNids(), sdl.getRhsNid());
                 }
-                logger.info("\r\n::: [SnorocketMojo] Logic Added");
+                logger.info("\r\n::: [SnorocketMojoEx] Logic Added");
             }
 
             // NEVER_GROUPED
@@ -375,10 +375,10 @@ public class SnorocketMojoEx extends AbstractMojo {
                     rocket_123.setRoleNeverGrouped(scs.id);
                 }
 
-                logger.info("\r\n::: [SnorocketMojo] \"Never-Grouped\" Added");
+                logger.info("\r\n::: [SnorocketMojoEx] \"Never-Grouped\" Added");
             }
 
-            logger.info("\r\n::: [SnorocketMojo] SORTED & ADDED CONs, RELs *** LAPSE TIME = "
+            logger.info("\r\n::: [SnorocketMojoEx] SORTED & ADDED CONs, RELs *** LAPSE TIME = "
                     + toStringLapseSec(startTime) + " ***");
 
             cEditSnoCons = null; // :MEMORY:
@@ -399,7 +399,7 @@ public class SnorocketMojoEx extends AbstractMojo {
             startTime = System.currentTimeMillis();
             ProcessEquiv pe = new ProcessEquiv();
             rocket_123.getEquivalents(pe);
-            logger.info("\r\n::: [SnorocketMojo] ProcessEquiv() count=" + pe.countConSet
+            logger.info("\r\n::: [SnorocketMojoEx] ProcessEquiv() count=" + pe.countConSet
                     + " time= " + toStringLapseSec(startTime));
 
             // GET CLASSIFER RESULTS
@@ -408,7 +408,7 @@ public class SnorocketMojoEx extends AbstractMojo {
             startTime = System.currentTimeMillis();
             ProcessResults pr = new ProcessResults(cRocketSnoRels);
             rocket_123.getDistributionFormRelationships(pr);
-            logger.info("\r\n::: [SnorocketMojo] GET CLASSIFIER RESULTS count=" + pr.countRel
+            logger.info("\r\n::: [SnorocketMojoEx] GET CLASSIFIER RESULTS count=" + pr.countRel
                     + " time= " + toStringLapseSec(startTime));
 
             pr = null; // :MEMORY:
@@ -432,7 +432,7 @@ public class SnorocketMojoEx extends AbstractMojo {
                 pcClass = new SnoPathProcessInferred(null, cClassSnoRels, allowedRoleTypes,
                         statusSet, cViewPosSet, null, precedence, contradictionMgr);
                 tf.iterateConcepts(pcClass);
-                logger.info("\r\n::: [SnorocketMojo] GET INFERRED (View) PATH DATA : "
+                logger.info("\r\n::: [SnorocketMojoEx] GET INFERRED (View) PATH DATA : "
                         + pcClass.getStats(startTime));
             }
 
@@ -476,10 +476,10 @@ public class SnorocketMojoEx extends AbstractMojo {
                 || SnoQuery.getRoleAdded().size() > 0
                 || SnoQuery.getRoleDropped().size() > 0) {
             StringBuilder sb = new StringBuilder();
-            sb.append("\r\n::: [SnorocketMojo] ISA ADD  = ").append(SnoQuery.getIsaAdded().size());
-            sb.append("\r\n::: [SnorocketMojo] ISA DROP = ").append(SnoQuery.getIsaDropped().size());
-            sb.append("\r\n::: [SnorocketMojo] ROLE ADD = ").append(SnoQuery.getRoleAdded().size());
-            sb.append("\r\n::: [SnorocketMojo] ROLE DROP = ").append(SnoQuery.getRoleDropped().size());
+            sb.append("\r\n::: [SnorocketMojoEx] ISA ADD  = ").append(SnoQuery.getIsaAdded().size());
+            sb.append("\r\n::: [SnorocketMojoEx] ISA DROP = ").append(SnoQuery.getIsaDropped().size());
+            sb.append("\r\n::: [SnorocketMojoEx] ROLE ADD = ").append(SnoQuery.getRoleAdded().size());
+            sb.append("\r\n::: [SnorocketMojoEx] ROLE DROP = ").append(SnoQuery.getRoleDropped().size());
             sb.append(sb.toString());
             if (reportChanges != null) {
                 SnoRel.dumpToFile(SnoQuery.getIsaAdded(), reportChanges + "_ISA_ADD.txt", 2);
@@ -491,7 +491,7 @@ public class SnorocketMojoEx extends AbstractMojo {
                         reportChanges + "_ROLE_DROP.txt", 2);
             }
         } else {
-            logger.info("\r\n::: [SnorocketMojo] NO CLASSIFICATION CHANGES");
+            logger.info("\r\n::: [SnorocketMojoEx] NO CLASSIFICATION CHANGES");
             if (reportChanges != null) {
                 SnoRel.dumpToFile(SnoQuery.getIsaAdded(),
                         reportChanges + "_NO_CHANGES.txt", 2);
@@ -499,13 +499,13 @@ public class SnorocketMojoEx extends AbstractMojo {
         }
 
         if (SnoQuery.getEquiv().size() > 0) {
-            logger.info("\r\n::: [SnorocketMojo] EQUIVALENCES DETECTED = " + SnoQuery.getEquiv().size());
+            logger.info("\r\n::: [SnorocketMojoEx] EQUIVALENCES DETECTED = " + SnoQuery.getEquiv().size());
             if (reportEquivalences != null) {
                 SnoConGrpList.dumpSnoConGrpList(SnoQuery.getEquiv(),
                         reportEquivalences + "_FAIL.txt");
             }
         } else {
-            logger.info("\r\n::: [SnorocketMojo] NO EQUIVALENCES DETECTED");
+            logger.info("\r\n::: [SnorocketMojoEx] NO EQUIVALENCES DETECTED");
             if (reportEquivalences != null) {
                 SnoConGrpList.dumpSnoConGrpList(SnoQuery.getEquiv(),
                         reportEquivalences + "_PASS.txt");
@@ -514,6 +514,8 @@ public class SnorocketMojoEx extends AbstractMojo {
 
         cClassSnoRels = null; // :MEMORY:
         cRocketSnoRels = null; // :MEMORY:
+
+        // logger.info(toStringWatch());
     }
 
     private String compareAndWriteBack(List<SnoRel> snorelA, List<SnoRel> snorelB, int classPathNid)
@@ -560,14 +562,23 @@ public class SnorocketMojoEx extends AbstractMojo {
             done_B = true;
         }
 
-        logger.info("\r\n::: [SnorocketMojo]"
+        logger.info("\r\n::: [SnorocketMojoEx]"
                 + "\r\n::: snorelA.size() = \t" + snorelA.size()
                 + "\r\n::: snorelB.size() = \t" + snorelB.size());
 
+        // :DEBUG:WATCH:
+        // Algoriphagus
+//        int watchNid = tf.getConcept(UUID.fromString("1eb658fd-6f5c-3170-b736-56459b35490e")).getConceptNid();
+
         // BY SORT ORDER, LOWER NUMBER ADVANCES FIRST
         while (!done_A && !done_B) {
+            // :DEBUG:WATCH
+//            if (rel_B.c1Id == watchNid) {
+//                logger.info("::: [SnorocketMojoEx] found watch nid");
+//            }
+
             if (++countConSeen % 25000 == 0) {
-                logger.info("::: [SnorocketMojo] compareAndWriteBack @ #\t" + countConSeen);
+                logger.info("::: [SnorocketMojoEx] compareAndWriteBack @ #\t" + countConSeen);
             }
 
             if (rel_A.c1Id == rel_B.c1Id) {
@@ -947,7 +958,7 @@ public class SnorocketMojoEx extends AbstractMojo {
         // CHECKPOINT DATABASE
 
         StringBuilder s = new StringBuilder();
-        s.append("\r\n::: [SnorocketMojo] compareAndWriteBack()");
+        s.append("\r\n::: [SnorocketMojoEx] compareAndWriteBack()");
         long lapseTime = System.currentTimeMillis() - startTime;
         s.append("\r\n::: [Time] Sort/Compare Input & Output: \t").append(lapseTime);
         s.append("\t(mS)\t").append(((float) lapseTime / 1000) / 60).append("\t(min)");
@@ -1015,7 +1026,7 @@ public class SnorocketMojoEx extends AbstractMojo {
 
                     I_GetConceptData thisC1 = tf.getConcept(rel_A.c1Id);
 
-                    ts.writeDirect(thisC1);
+                    tf.addUncommittedNoChecks(thisC1);
 
                 } else if (rvList.isEmpty()) {
                     StringBuilder sb = new StringBuilder("::: [SnorocketExTask] WARNING: writeBackModified() ");
@@ -1072,19 +1083,19 @@ public class SnorocketMojoEx extends AbstractMojo {
                     }
 
                 } else if (rvList.isEmpty()) {
-                    logger.info("::: [SnorocketMojo] ERROR: writeBackRetired() "
+                    logger.info("::: [SnorocketMojoEx] ERROR: writeBackRetired() "
                             + "empty version list" + "\trelNid=\t" + rel_A.relNid
                             + "\tc1=\t" + rel_A.c1Id
                             + "\t" + tf.getConcept(rel_A.c1Id).toLongString());
                 } else {
-                    logger.info("::: [SnorocketMojo] ERROR: writeBackRetired() "
+                    logger.info("::: [SnorocketMojoEx] ERROR: writeBackRetired() "
                             + "multiple last versions"
                             + "\trelNid=\t" + rel_A.relNid
                             + "\tc1=\t" + rel_A.c1Id
                             + "\t" + tf.getConcept(rel_A.c1Id).toLongString());
                 }
             } else {
-                logger.info("::: [SnorocketMojo] ERROR: writeBackRetired() "
+                logger.info("::: [SnorocketMojoEx] ERROR: writeBackRetired() "
                         + "tf.getRelationship(" + rel_A.relNid + ") == null");
             }
 
@@ -1112,7 +1123,7 @@ public class SnorocketMojoEx extends AbstractMojo {
                 isCh_INFERRED_CHARACTERISTIC, isOPTIONAL_REFINABILITY, rel_B.group, isCURRENT,
                 snorocketAuthorNid, writeToNid, versionTime);
 
-        // :!!!:TODO: [SnorocketMojo] move addUncommittedNoChecks() to more efficient location.
+        // :!!!:TODO: [SnorocketMojoEx] move addUncommittedNoChecks() to more efficient location.
         // more optimal to only call once per concept.
         tf.addUncommittedNoChecks(thisC1);
     }
@@ -1355,7 +1366,7 @@ public class SnorocketMojoEx extends AbstractMojo {
     private String toStringPathPos(List<PositionBI> pathPos, String pStr) {
         // BUILD STRING
         StringBuilder s = new StringBuilder();
-        s.append("\r\n::: [SnorocketMojo] PATH ID -- ").append(pStr).append("\r\n");
+        s.append("\r\n::: [SnorocketMojoEx] PATH ID -- ").append(pStr).append("\r\n");
         for (PositionBI position : pathPos) {
             s.append("::: .. PATH:\t").append(toStringCNid(position.getPath().getConceptNid())).append("\r\n");
         }
@@ -1385,6 +1396,20 @@ public class SnorocketMojoEx extends AbstractMojo {
             logger.info(e.toString());
         } catch (TerminologyException e) {
             logger.info(e.toString());
+        }
+
+        return sb.toString();
+    }
+
+    private String toStringWatch() {
+        StringBuilder sb = new StringBuilder();
+        UUID pUuid = UUID.fromString("1eb658fd-6f5c-3170-b736-56459b35490e");
+        try {
+            sb.append(tf.getConcept(pUuid).toLongString());
+        } catch (TerminologyException ex) {
+            logger.debug("WATCH: 1eb658fd-6f5c-3170-b736-56459b35490e not found", ex);
+        } catch (IOException ex) {
+            logger.debug("WATCH: 1eb658fd-6f5c-3170-b736-56459b35490e not found", ex);
         }
 
         return sb.toString();

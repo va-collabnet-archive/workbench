@@ -818,6 +818,7 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
                 });
             }
 
+            // logger.info(toStringWatch());
 
             return Condition.CONTINUE;
         } finally {
@@ -1778,6 +1779,18 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
         }
 
         return s.toString();
+    }
+
+    private String toStringWatch() {
+        StringBuilder sb = new StringBuilder();
+        UUID pUuid = UUID.fromString("1eb658fd-6f5c-3170-b736-56459b35490e");
+        try {
+            sb.append(ts.getConcept(pUuid).toLongString());
+        } catch (IOException ex) {
+            logger.log(Level.WARNING, "WATCH: 1eb658fd-6f5c-3170-b736-56459b35490e not found", ex);
+        }
+
+        return sb.toString();
     }
 
     /**
