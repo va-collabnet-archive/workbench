@@ -44,6 +44,7 @@ public class UuidToSctIdMapper {
     Writer conceptsWriter;
     Writer descriptionsWriter;
     Writer identifiersWriter;
+    Writer privateIdentifiersWriter;
     Writer relationshipsWriter;
     Writer relationshipsStatedWriter;
     Writer langRefsetsWriter;
@@ -55,6 +56,7 @@ public class UuidToSctIdMapper {
     BufferedReader conceptsReader;
     BufferedReader descriptionsReader;
     BufferedReader identifiersReader;
+    BufferedReader  privateIdentifiersReader;
     BufferedReader relationshipsReader;
     BufferedReader relationshipsStatedReader;
     BufferedReader langRefsetsReader;
@@ -69,6 +71,7 @@ public class UuidToSctIdMapper {
     int conceptCounter = 1;
     int descCounter = 1;
     int relCounter = 1;
+    boolean makePrivateAltIdsFile;
 
     public UuidToSctIdMapper(String namespace, String module,
             File directory) {
@@ -166,8 +169,17 @@ public class UuidToSctIdMapper {
         String idLine = identifiersReader.readLine();
         idLine = identifiersReader.readLine();
         while (idLine != null) {
-            processIdentifiers(idLine);
+            processIdentifiers(idLine, identifiersWriter);
             idLine = identifiersReader.readLine();
+        }
+        
+        if(privateIdentifiersReader != null && privateIdentifiersWriter != null){
+            String privateIdLine = privateIdentifiersReader.readLine();
+        privateIdLine = privateIdentifiersReader.readLine();
+        while (privateIdLine != null) {
+            processIdentifiers(privateIdLine, privateIdentifiersWriter);
+            privateIdLine = privateIdentifiersReader.readLine();
+        }
         }
         
         processUuidToSctMap();
@@ -186,6 +198,7 @@ public class UuidToSctIdMapper {
         File descriptionsFileUuid = null;
         File relationshipsFileUuid = null;
         File identifiersFileUuid = null;
+        File privateIdentifiersFileUuid = null;
         File statedRelFileUuid = null;
         File langRefsetsFileUuid = null;
         File otherLangRefsetsFileUuid = null;
@@ -206,7 +219,10 @@ public class UuidToSctIdMapper {
             } else if (inputFile.getName().startsWith("sct2_Identifier_UUID_")) {
                 identifiersFileUuid = inputFile;
                 identifiersReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
-            } else if (inputFile.getName().startsWith("sct2_StatedRelationships_UUID_")) {
+            } else if (inputFile.getName().startsWith("sct2_Identifier_Auxiliary_UUID_")) {
+                privateIdentifiersFileUuid = inputFile;
+                privateIdentifiersReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
+            }else if (inputFile.getName().startsWith("sct2_StatedRelationships_UUID_")) {
                 statedRelFileUuid = inputFile;
                 relationshipsStatedReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
             } else if (inputFile.getName().startsWith("sct2_LangRefset_UUID_") &&
@@ -237,6 +253,11 @@ public class UuidToSctIdMapper {
                 relationshipsFileUuid.getName().replace("sct2_Relationship_UUID_", "sct2_Relationship_"));
         File identifiersFile = new File(directory,
                 identifiersFileUuid.getName().replace("sct2_Identifier_UUID_", "sct2_Identifier_"));
+        File privateIdentifiersFile = null;
+        if(privateIdentifiersFileUuid != null){
+            privateIdentifiersFile = new File(directory,
+                privateIdentifiersFileUuid.getName().replace("sct2_Identifier_Auxiliary_UUID_", "sct2_Identifier_Auxiliary_"));
+        }
         File statedRelFile = new File(directory,
                 statedRelFileUuid.getName().replace("sct2_StatedRelationships_UUID_", "sct2_StatedRelationships_"));
         File langRefsetsFile = new File(directory,
@@ -256,6 +277,12 @@ public class UuidToSctIdMapper {
         descriptionsWriter = new BufferedWriter(new FileWriter(descriptionsFile));
         relationshipsWriter = new BufferedWriter(new FileWriter(relationshipsFile));
         identifiersWriter = new BufferedWriter(new FileWriter(identifiersFile));
+        if(privateIdentifiersFile != null){
+            privateIdentifiersWriter = new BufferedWriter(new FileWriter(privateIdentifiersFile));
+            for (Rf2File.IdentifiersFileFields field : Rf2File.IdentifiersFileFields.values()) {
+            privateIdentifiersWriter.write(field.headerText + field.seperator);
+        }
+        }
         relationshipsStatedWriter = new BufferedWriter(new FileWriter(statedRelFile));
         langRefsetsWriter = new BufferedWriter(new FileWriter(langRefsetsFile));
         otherLangRefsetsWriter = new BufferedWriter(new FileWriter(otherLangRefsetsFile));
@@ -668,7 +695,7 @@ public class UuidToSctIdMapper {
         }
     }
 
-    private void processIdentifiers(String line) throws IOException {
+    private void processIdentifiers(String line, Writer writer) throws IOException {
         if (line != null) {
             String[] parts = line.split("\t");
             for (Rf2File.IdentifiersFileFields field : Rf2File.IdentifiersFileFields.values()) {
@@ -676,30 +703,30 @@ public class UuidToSctIdMapper {
                 switch (field) {
                     case IDENTIFIER_SCHEME_ID:
                         String schemeId = parts[Rf2File.IdentifiersFileFields.IDENTIFIER_SCHEME_ID.ordinal()];
-                        identifiersWriter.write(getExistingSctId(schemeId) + field.seperator);
+                        writer.write(getExistingSctId(schemeId) + field.seperator);
 
                         break;
 
                     case ALTERNATE_IDENTIFIER:
                         String primUuid = parts[Rf2File.IdentifiersFileFields.ALTERNATE_IDENTIFIER.ordinal()];
-                        identifiersWriter.write(primUuid + field.seperator);
+                        writer.write(primUuid + field.seperator);
 
                         break;
 
                     case EFFECTIVE_TIME:
                         String effectiveDateString = parts[Rf2File.IdentifiersFileFields.EFFECTIVE_TIME.ordinal()];
-                        identifiersWriter.write(effectiveDateString + field.seperator);
+                        writer.write(effectiveDateString + field.seperator);
 
                         break;
 
                     case ACTIVE:
                         String status = parts[Rf2File.IdentifiersFileFields.ACTIVE.ordinal()];
-                        identifiersWriter.write(convertStatus(status) + field.seperator);
+                        writer.write(convertStatus(status) + field.seperator);
 
                         break;
 
                     case MODULE_ID:
-                        identifiersWriter.write(module + field.seperator);
+                        writer.write(module + field.seperator);
 
                         break;
 
@@ -711,7 +738,7 @@ public class UuidToSctIdMapper {
                             conceptCounter++;
                             this.uuidToSctMap.put(UUID.fromString(rc), rcSctId);
                         }
-                        identifiersWriter.write(rcSctId + field.seperator);
+                        writer.write(rcSctId + field.seperator);
 
                         break;
                 }
@@ -1205,6 +1232,10 @@ public class UuidToSctIdMapper {
 
         if (identifiersWriter != null) {
             identifiersWriter.close();
+        }
+        
+        if (privateIdentifiersWriter != null) {
+            privateIdentifiersWriter.close();
         }
 
         if (relationshipsStatedWriter != null) {

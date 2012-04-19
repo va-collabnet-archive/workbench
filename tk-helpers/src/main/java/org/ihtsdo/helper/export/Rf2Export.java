@@ -64,6 +64,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
     Date effectiveDate;
     String effectiveDateString;
     Writer identifiersWriter;
+    Writer publicIdentifiersWriter;
     LANG_CODE language;
     String namespace;
     String module;
@@ -88,11 +89,12 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
     public static UUID REFSET_DESC_NAMESPACE = UUID.fromString("d1871eb0-8a47-11e1-b0c4-0800200c9a66");
     public static UUID MODULE_DEPEND_NAMESPACE = UUID.fromString("d1871eb2-8a47-11e1-b0c4-0800200c9a66");
     public static UUID DESC_TYPE_NAMESPACE = UUID.fromString("d1871eb3-8a47-11e1-b0c4-0800200c9a66");
+    boolean makePrivateIdFile;
 
     //~--- constructors --------------------------------------------------------
     public Rf2Export(File directory, ReleaseType releaseType, LANG_CODE language, COUNTRY_CODE country,
             String namespace, String module, Date effectiveDate, Set<Integer> sapNids, ViewCoordinate vc,
-            Set<Integer> excludedRefsetIds, NidBitSetBI conceptsToProcess)
+            Set<Integer> excludedRefsetIds, NidBitSetBI conceptsToProcess, boolean makePrivateIdFile)
             throws IOException {
         directory.mkdirs();
         this.releaseType = releaseType;
@@ -107,6 +109,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         this.conceptsToProcess = conceptsToProcess;
         this.effectiveDateString = TimeHelper.getShortFileDateFormat().format(effectiveDate);
         this.excludedRefsetIds = excludedRefsetIds;
+        this.makePrivateIdFile = makePrivateIdFile;
 
         File conceptsFile = new File(directory,
                 "sct2_Concept_UUID_" + releaseType.suffix + "_"
@@ -125,10 +128,23 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                 "sct2_StatedRelationships_UUID_" + releaseType.suffix + "_"
                 + country.getFormatedCountryCode() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
-        File identifiersFile = new File(directory,
+        File privateIdentifiersFile = null;
+        File identifiersFile = null;
+        if(makePrivateIdFile){
+            privateIdentifiersFile = new File(directory,
+                "sct2_Identifier_Auxiliary_UUID_" + releaseType.suffix + "_"
+                + country.getFormatedCountryCode() + namespace + "_"
+                + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
+            identifiersFile = new File(directory,
                 "sct2_Identifier_UUID_" + releaseType.suffix + "_"
                 + country.getFormatedCountryCode() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
+        }else{
+            identifiersFile = new File(directory,
+                "sct2_Identifier_UUID_" + releaseType.suffix + "_"
+                + country.getFormatedCountryCode() + namespace + "_"
+                + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
+        }
         File langRefsetsFile = new File(directory,
                 "sct2_LangRefset_UUID_" + releaseType.suffix + "_"
                 + LANG_CODE.EN.getFormatedLanguageCode() + namespace + "_"
@@ -154,7 +170,16 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         descriptionsWriter = new BufferedWriter(new FileWriter(descriptionsFile));
         relationshipsWriter = new BufferedWriter(new FileWriter(relationshipsFile));
         relationshipsStatedWriter = new BufferedWriter(new FileWriter(relationshipsStatedFile));
-        identifiersWriter = new BufferedWriter(new FileWriter(identifiersFile));
+        if(makePrivateIdFile){
+            publicIdentifiersWriter = new BufferedWriter(new FileWriter(identifiersFile));
+            identifiersWriter = new BufferedWriter(new FileWriter(privateIdentifiersFile));
+            
+            for (Rf2File.IdentifiersFileFields field : Rf2File.IdentifiersFileFields.values()) {
+                publicIdentifiersWriter.write(field.headerText + field.seperator);
+            }
+        }else{
+            identifiersWriter = new BufferedWriter(new FileWriter(identifiersFile));
+        }
         langRefsetsWriter = new BufferedWriter(new FileWriter(langRefsetsFile));
         otherLangRefsetsWriter = new BufferedWriter(new FileWriter(otherLangRefsetsFile));
         modDependWriter = new BufferedWriter(new FileWriter(modDependFile));
@@ -182,7 +207,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         for (Rf2File.IdentifiersFileFields field : Rf2File.IdentifiersFileFields.values()) {
             identifiersWriter.write(field.headerText + field.seperator);
         }
-
+        
         for (Rf2File.LanguageRefsetFileFields field : Rf2File.LanguageRefsetFileFields.values()) {
             langRefsetsWriter.write(field.headerText + field.seperator);
         }
@@ -242,6 +267,10 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         if (identifiersWriter != null) {
             identifiersWriter.close();
         }
+        
+        if (publicIdentifiersWriter != null) {
+            publicIdentifiersWriter.close();
+        }
 
         if (langRefsetsWriter != null) {
             langRefsetsWriter.close();
@@ -287,10 +316,6 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                         ConceptVersionBI cv = Ts.get().getConceptVersion(newVc, annot.getCollectionNid());
                             langRefexNids.add(annot.getCollectionNid());
                             processLangRefsets(annot);
-//                        if (cv.isKindOf(parentCv)) {
-//                            langRefexNids.add(annot.getCollectionNid());
-//                            processLangRefsets(annot);
-//                        }
                     }
                 }
             }
