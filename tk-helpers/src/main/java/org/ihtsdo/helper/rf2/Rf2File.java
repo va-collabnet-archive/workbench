@@ -24,7 +24,7 @@ public class Rf2File {
 
    public enum ConceptsFileFields {
       ID("id", "\t"), EFFECTIVE_TIME("effectiveTime", "\t"), ACTIVE("active", "\t"), MODULE_ID("moduleId", "\t"),
-      DEFINITION_STATUS_ID("definitionStatusId", "\n");
+      DEFINITION_STATUS_ID("definitionStatusId", "\r\n");
 
       public final String headerText;
       public final String seperator;
@@ -40,7 +40,7 @@ public class Rf2File {
    public enum DescriptionsFileFields {
       ID("id", "\t"), EFFECTIVE_TIME("effectiveTime", "\t"), ACTIVE("active", "\t"), MODULE_ID("moduleId", "\t"),
       CONCEPT_ID("conceptId", "\t"), LANGUAGE_CODE("languageCode", "\t"), TYPE_ID("typeId", "\t"), TERM("term", "\t"),
-      CASE_SIGNIFICANCE_ID("caseSignificanceId", "\n");
+      CASE_SIGNIFICANCE_ID("caseSignificanceId", "\r\n");
 
       public final String headerText;
       public final String seperator;
@@ -56,7 +56,7 @@ public class Rf2File {
    public enum IdentifiersFileFields {
       IDENTIFIER_SCHEME_ID("identifierSchemeId", "\t"), ALTERNATE_IDENTIFIER("alternateIdentifier", "\t"),
       EFFECTIVE_TIME("effectiveTime", "\t"), ACTIVE("active", "\t"), MODULE_ID("moduleId", "\t"),
-      REFERENCED_COMPONENT_ID("referencedComponentId", "\n");
+      REFERENCED_COMPONENT_ID("referencedComponentId", "\r\n");
 
       public final String headerText;
       public final String seperator;
@@ -72,7 +72,7 @@ public class Rf2File {
    public enum RelationshipsFileFields {
       ID("id", "\t"), EFFECTIVE_TIME("effectiveTime", "\t"), ACTIVE("active", "\t"), MODULE_ID("moduleId", "\t"),
       SOURCE_ID("sourceId", "\t"), DESTINATION_ID("destinationId", "\t"), RELATIONSHIP_GROUP("relationshipGroup", "\t"),
-      TYPE_ID("typeId", "\t"), CHARCTERISTIC_ID("characteristicTypeId", "\t"), MODIFIER_ID("modifierId", "\n");
+      TYPE_ID("typeId", "\t"), CHARCTERISTIC_ID("characteristicTypeId", "\t"), MODIFIER_ID("modifierId", "\r\n");
 
       public final String headerText;
       public final String seperator;
@@ -88,7 +88,7 @@ public class Rf2File {
    public enum StatedRelationshipsFileFields {
       ID("id", "\t"), EFFECTIVE_TIME("effectiveTime", "\t"), ACTIVE("active", "\t"), MODULE_ID("moduleId", "\t"),
       SOURCE_ID("sourceId", "\t"), DESTINATION_ID("destinationId", "\t"), RELATIONSHIP_GROUP("relationshipGroup", "\t"),
-      TYPE_ID("typeId", "\t"), CHARCTERISTIC_ID("characteristicTypeId", "\t"), MODIFIER_ID("modifierId", "\n");
+      TYPE_ID("typeId", "\t"), CHARCTERISTIC_ID("characteristicTypeId", "\t"), MODIFIER_ID("modifierId", "\r\n");
 
       public final String headerText;
       public final String seperator;
@@ -103,7 +103,7 @@ public class Rf2File {
    
    public enum LanguageRefsetFileFields {
       ID("id", "\t"), EFFECTIVE_TIME("effectiveTime", "\t"), ACTIVE("active", "\t"), MODULE_ID("moduleId", "\t"),
-      REFSET_ID("refSetId", "\t"), REFERENCED_COMPONENT_ID("referencedComponentId", "\t"), ACCEPTABILITY("acceptabilityId", "\n");
+      REFSET_ID("refSetId", "\t"), REFERENCED_COMPONENT_ID("referencedComponentId", "\t"), ACCEPTABILITY("acceptabilityId", "\r\n");
 
       public final String headerText;
       public final String seperator;
@@ -119,7 +119,7 @@ public class Rf2File {
    public enum ModuleDependencyFileFields {
       ID("id", "\t"), EFFECTIVE_TIME("effectiveTime", "\t"), ACTIVE("active", "\t"), MODULE_ID("moduleId", "\t"),
       REFSET_ID("refSetId", "\t"), REFERENCED_COMPONENT_ID("referencedComponentId", "\t"), SOURCE_TIME("sourceEffectiveTime", "\t"),
-      TARGET_TIME("targetEffectiveTime", "\n");
+      TARGET_TIME("targetEffectiveTime", "\r\n");
 
       public final String headerText;
       public final String seperator;
@@ -135,7 +135,7 @@ public class Rf2File {
    public enum DescTypeFileFields {
       ID("id", "\t"), EFFECTIVE_TIME("effectiveTime", "\t"), ACTIVE("active", "\t"), MODULE_ID("moduleId", "\t"),
       REFSET_ID("refSetId", "\t"), REFERENCED_COMPONENT_ID("referencedComponentId", "\t"), DESC_FORMAT("descriptionFormat", "\t"),
-      DESC_LENGTH("descriptionLength", "\n");
+      DESC_LENGTH("descriptionLength", "\r\n");
 
       public final String headerText;
       public final String seperator;
@@ -151,7 +151,7 @@ public class Rf2File {
    public enum RefsetDescriptorFileFields {
       ID("id", "\t"), EFFECTIVE_TIME("effectiveTime", "\t"), ACTIVE("active", "\t"), MODULE_ID("moduleId", "\t"),
       REFSET_ID("refSetId", "\t"), REFERENCED_COMPONENT_ID("referencedComponentId", "\t"), ATTRIB_DESC("attributeDescription", "\t"),
-      ATTRIB_TYPE("attributeType", "\t"), ATTRIB_ORDER("attributeOrder", "\n");
+      ATTRIB_TYPE("attributeType", "\t"), ATTRIB_ORDER("attributeOrder", "\r\n");
 
       public final String headerText;
       public final String seperator;
@@ -166,7 +166,7 @@ public class Rf2File {
    
    public enum SimpleRefsetFileFields {
       ID("id", "\t"), EFFECTIVE_TIME("effectiveTime", "\t"), ACTIVE("active", "\t"), MODULE_ID("moduleId", "\t"),
-      REFSET_ID("refSetId", "\t"), REFERENCED_COMPONENT_ID("referencedComponentId", "\n");
+      REFSET_ID("refSetId", "\t"), REFERENCED_COMPONENT_ID("referencedComponentId", "\r\n");
 
       public final String headerText;
       public final String seperator;
@@ -181,7 +181,7 @@ public class Rf2File {
    
    public enum AttribValueRefsetFileFields {
       ID("id", "\t"), EFFECTIVE_TIME("effectiveTime", "\t"), ACTIVE("active", "\t"), MODULE_ID("moduleId", "\t"),
-      REFSET_ID("refSetId", "\t"), REFERENCED_COMPONENT_ID("referencedComponentId", "\t"), VALUE_ID("valueId", "\n");
+      REFSET_ID("refSetId", "\t"), REFERENCED_COMPONENT_ID("referencedComponentId", "\t"), VALUE_ID("valueId", "\r\n");
 
       public final String headerText;
       public final String seperator;
@@ -196,7 +196,7 @@ public class Rf2File {
    
    public enum AssociationRefsetFileFields {
       ID("id", "\t"), EFFECTIVE_TIME("effectiveTime", "\t"), ACTIVE("active", "\t"), MODULE_ID("moduleId", "\t"),
-      REFSET_ID("refSetId", "\t"), REFERENCED_COMPONENT_ID("referencedComponentId", "\t"), TARGET("targetComponent", "\n");
+      REFSET_ID("refSetId", "\t"), REFERENCED_COMPONENT_ID("referencedComponentId", "\t"), TARGET("targetComponent", "\r\n");
 
       public final String headerText;
       public final String seperator;
@@ -210,7 +210,7 @@ public class Rf2File {
    }
    
    public enum UuidToSctMapFileFields {
-      SCT("sctId", "\t"), UUID("uuid", "\n");
+      SCT("sctId", "\t"), UUID("uuid", "\r\n");
 
       public final String headerText;
       public final String seperator;
