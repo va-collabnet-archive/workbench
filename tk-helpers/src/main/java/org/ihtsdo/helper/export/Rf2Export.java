@@ -38,6 +38,7 @@ import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.io.*;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -48,6 +49,7 @@ import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.spec.ConceptSpec;
+import org.ihtsdo.tk.uuid.UuidT5Generator;
 
 /**
  *
@@ -83,6 +85,9 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
     Set<ConceptSpec> descTypes = new HashSet<ConceptSpec>();
     ViewCoordinate newVc;
     ConceptVersionBI parentCv;
+    public static UUID REFSET_DESC_NAMESPACE = UUID.fromString("d1871eb0-8a47-11e1-b0c4-0800200c9a66");
+    public static UUID MODULE_DEPEND_NAMESPACE = UUID.fromString("d1871eb2-8a47-11e1-b0c4-0800200c9a66");
+    public static UUID DESC_TYPE_NAMESPACE = UUID.fromString("d1871eb3-8a47-11e1-b0c4-0800200c9a66");
 
     //~--- constructors --------------------------------------------------------
     public Rf2Export(File directory, ReleaseType releaseType, LANG_CODE language, COUNTRY_CODE country,
@@ -299,7 +304,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         }
     }
 
-    public void writeOneTimeFiles() throws IOException {
+    public void writeOneTimeFiles() throws IOException, NoSuchAlgorithmException {
 
         processModularDependency();
 
@@ -702,18 +707,22 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         }
     }
 
-    private void processRefsetDesc(int refexNid) throws IOException {
+    private void processRefsetDesc(int refexNid) throws IOException, NoSuchAlgorithmException {
         ConceptSpec refsetDescriptor = new ConceptSpec("Reference set descriptor reference set (foundation metadata concept)",
                 UUID.fromString("5ddff82f-5aee-3b16-893f-6b7aa726cc4b"));
-        ConceptSpec attribDesc = new ConceptSpec("Description in dialect (foundation metadata concept)", //@akf is this correct?
+        ConceptSpec attribDesc = new ConceptSpec("Description in dialect (foundation metadata concept)",
                 UUID.fromString("db73d522-612f-3dcd-a793-f62d4f0c41fe"));
         ConceptSpec attribType = new ConceptSpec("Description type component (foundation metadata concept)",
                 UUID.fromString("4ea66278-f8a7-37d3-90fa-88c19cc107a6"));
         for (Rf2File.RefsetDescriptorFileFields field : Rf2File.RefsetDescriptorFileFields.values()) {
             switch (field) {
                 case ID:
-                    refsetDescWriter.write(UUID.randomUUID() + field.seperator); //@akf okay to assign random UUID?
-
+                    //referenced component, attribute order
+                    UUID uuid = UuidT5Generator.get(REFSET_DESC_NAMESPACE,
+                            store.getUuidPrimordialForNid(refexNid).toString()
+                            + 0);
+                    refsetDescWriter.write(uuid + field.seperator);
+                    
                     break;
 
                 case EFFECTIVE_TIME:
@@ -759,17 +768,20 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         }
     }
     
-    private void processRefsetDescAttribute (int refexNid) throws IOException {
+    private void processRefsetDescAttribute (int refexNid) throws IOException, NoSuchAlgorithmException {
         ConceptSpec refsetDescriptor = new ConceptSpec("Reference set descriptor reference set (foundation metadata concept)",
                 UUID.fromString("5ddff82f-5aee-3b16-893f-6b7aa726cc4b"));
-        ConceptSpec attribDesc = new ConceptSpec("Acceptability (foundation metadata concept)", //@akf is this correct?
+        ConceptSpec attribDesc = new ConceptSpec("Acceptability (foundation metadata concept)",
                 UUID.fromString("26bac151-c2cf-3223-b417-c0a703cffff1"));
         ConceptSpec attribType = new ConceptSpec("Concept type component (foundation metadata concept)",
                 UUID.fromString("78f69fb6-410c-3b5a-9120-53954592a80d"));
         for (Rf2File.RefsetDescriptorFileFields field : Rf2File.RefsetDescriptorFileFields.values()) {
             switch (field) {
                 case ID:
-                    refsetDescWriter.write(UUID.randomUUID() + field.seperator); //@akf okay to assign random UUID?
+                    UUID uuid = UuidT5Generator.get(REFSET_DESC_NAMESPACE,
+                            store.getUuidPrimordialForNid(refexNid).toString()
+                            + 1);
+                    refsetDescWriter.write(uuid + field.seperator);
 
                     break;
 
@@ -816,7 +828,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         }
     }
 
-    private void processModularDependency() throws IOException {
+    private void processModularDependency() throws IOException, NoSuchAlgorithmException {
         ConceptSpec modDepenRefex = new ConceptSpec("Module dependency reference set (foundation metadata concept)",
                 UUID.fromString("19076bfe-661f-39c2-860c-8706a37073b0"));
         ConceptSpec coreModule = new ConceptSpec("SNOMED CT core module (core metadata concept)",
@@ -824,7 +836,13 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         for (Rf2File.ModuleDependencyFileFields field : Rf2File.ModuleDependencyFileFields.values()) {
             switch (field) {
                 case ID:
-                    modDependWriter.write(UUID.randomUUID() + field.seperator);//@akf okay to assign random UUID?
+            //use module, referenced component, source time, destination time
+                    UUID uuid = UuidT5Generator.get(MODULE_DEPEND_NAMESPACE,
+                               module
+                               + coreModule.getStrict(vc).getPrimUuid()
+                               + effectiveDateString
+                               + effectiveDateString);
+                    modDependWriter.write(uuid + field.seperator);
 
                     break;
 
@@ -859,14 +877,14 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     break;
 
                 case TARGET_TIME:
-                    modDependWriter.write(effectiveDateString + field.seperator); //@akf need to find correct time here
+                    modDependWriter.write(effectiveDateString + field.seperator);
 
                     break;
             }
         }
     }
 
-    private void processDescType(ConceptSpec descType) throws IOException {
+    private void processDescType(ConceptSpec descType) throws IOException, NoSuchAlgorithmException {
         ConceptSpec descFormatRefex = new ConceptSpec("Description format reference set (foundation metadata concept)",
                 UUID.fromString("c3467f1f-c0d5-3865-b169-61712ca03072"));
         ConceptSpec descFormat = new ConceptSpec("Plain text (foundation metadata concept)",
@@ -874,7 +892,10 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         for (Rf2File.DescTypeFileFields field : Rf2File.DescTypeFileFields.values()) {
             switch (field) {
                 case ID:
-                    descTypeWriter.write(UUID.randomUUID() + field.seperator); //@akf okay to use random?
+                    //each referenced component should be unique in file
+                    UUID uuid = UuidT5Generator.get(DESC_TYPE_NAMESPACE,
+                            descType.getStrict(vc).getPrimUuid().toString());
+                    descTypeWriter.write(uuid + field.seperator);
 
                     break;
 
