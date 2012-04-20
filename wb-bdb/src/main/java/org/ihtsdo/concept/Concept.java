@@ -1019,6 +1019,12 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             }
         }
 
+        if (getRefsetMembers() != null) {
+            for (ConceptComponent i : getRefsetMembers()) {
+                sapNids.addAll(i.getComponentSapNids());
+            }
+        }
+
         return sapNids;
     }
 
@@ -1044,6 +1050,12 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
         if (getImages() != null) {
             for (Image i : getImages()) {
+                componentNids.addAll(i.getComponentNidsForSaps(sapNids));
+            }
+        }
+
+        if (getRefsetMembers() != null) {
+            for (ConceptComponent i : getRefsetMembers()) {
                 componentNids.addAll(i.getComponentNidsForSaps(sapNids));
             }
         }
