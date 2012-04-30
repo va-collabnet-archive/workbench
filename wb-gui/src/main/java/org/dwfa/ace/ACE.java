@@ -82,6 +82,7 @@ import org.dwfa.ace.task.commit.I_Fixup;
 import org.dwfa.ace.task.commit.I_TestDataConstraints;
 import org.dwfa.ace.task.gui.toptoggles.TopToggleTypes;
 import org.dwfa.ace.task.search.I_TestSearchResults;
+import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.ExecutionRecord;
 import org.dwfa.bpa.gui.glue.PropertyListenerGlue;
@@ -1534,7 +1535,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
    }
 
    private TerminologyIntList makeTermList(String title, I_IntList list) {
-      TerminologyIntListModel termListModel   = new TerminologyIntListModel((IntList) list);
+      TerminologyIntListModel termListModel   = new TerminologyIntListModel((IntList) list, true, aceFrameConfig);
       TerminologyIntList      terminologyList = new TerminologyIntList(termListModel, aceFrameConfig);
 
       terminologyList.setBorder(BorderFactory.createTitledBorder(title));
