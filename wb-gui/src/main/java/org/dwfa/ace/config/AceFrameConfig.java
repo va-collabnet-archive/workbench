@@ -3227,6 +3227,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public void fireUpdateHierarchyView() {
         changeSupport.firePropertyChange("updateHierarchyView", false, true);
     }
+    
+    public void fireUpdateLangPref() {
+        changeSupport.firePropertyChange("languagePref", false, true);
+    }
 
     public boolean searchWithDescTypeFilter() {
         return searchWithDescTypeFilter;

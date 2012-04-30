@@ -16,6 +16,7 @@
  */
 package org.dwfa.ace.list;
 
+import java.beans.PropertyChangeSupport;
 import java.io.IOException;
 
 import javax.swing.event.ListDataListener;
@@ -23,8 +24,10 @@ import javax.swing.event.ListDataListener;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.bean.PropertyChangeSupportWithPropagationId;
 import org.dwfa.vodb.types.IntList;
 
 public class TerminologyIntListModel implements I_ModelTerminologyList {
@@ -35,10 +38,20 @@ public class TerminologyIntListModel implements I_ModelTerminologyList {
     private static final long serialVersionUID = 1L;
 
     private IntList elements;
+    private boolean inPreferences = false;
+    private AceFrameConfig config;
+    private transient PropertyChangeSupport changeSupport = new PropertyChangeSupportWithPropagationId(this);
 
     public TerminologyIntListModel(IntList elements) {
         super();
         this.elements = elements;
+    }
+    
+    public TerminologyIntListModel(IntList elements, boolean inPreferences, AceFrameConfig config) {
+        super();
+        this.elements = elements;
+        this.inPreferences = inPreferences;
+        this.config = config;
     }
 
     public I_GetConceptData getElementAt(int index) {
@@ -58,15 +71,24 @@ public class TerminologyIntListModel implements I_ModelTerminologyList {
 
     public boolean addElement(I_GetConceptData o) {
         boolean rv = elements.add(o.getConceptNid());
+        if(inPreferences){
+            config.fireUpdateLangPref();
+        }
         return rv;
     }
 
     public void addElement(int index, I_GetConceptData element) {
         elements.add(index, element.getConceptNid());
+        if(inPreferences){
+            config.fireUpdateLangPref();
+        }
     }
 
     public I_GetConceptData removeElement(int index) {
         int id = elements.remove(index);
+        if(inPreferences){
+            config.fireUpdateLangPref();
+        }
         try {
             return Terms.get().getConcept(id);
         } catch (TerminologyException e) {

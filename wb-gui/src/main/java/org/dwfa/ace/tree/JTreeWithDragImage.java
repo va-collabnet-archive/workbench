@@ -294,6 +294,7 @@ public class JTreeWithDragImage extends JTree {
         config.addPropertyChangeListener("showRefsetInfoInTaxonomy", rl);
         config.addPropertyChangeListener("showPathInfoInTaxonomy", rl);
         config.addPropertyChangeListener("updateHierarchyView", rl);
+        config.addPropertyChangeListener("languagePref", rl);
         addTreeSelectionListener(new SelectionListener());
     }
 

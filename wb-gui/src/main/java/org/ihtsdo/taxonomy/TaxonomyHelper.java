@@ -229,6 +229,7 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
                  || "showPathInfoInTaxonomy".equals(evt.getPropertyName())
                  || "showRefsetInfoInTaxonomy".equals(evt.getPropertyName())
                  || "showViewerImagesInTaxonomy".equals(evt.getPropertyName())
+                 || "languagePref".equals(evt.getPropertyName())
                  || "updateHierarchyView".equals(evt.getPropertyName())) {
          updateNewModel(evt.getPropertyName());
       }
