@@ -103,6 +103,7 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
     }
 
     public Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
+        int count = 0;
         try {
             uuidList = new ArrayList<List<UUID>>();
             I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(
@@ -150,9 +151,11 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
             int langRefexNid = 0;
             int secondDialectRefexNid = 0;
             int acceptabilityNid = 0;
-
+            
             line = iterator.next();
+            count++;
             while (line != null) {
+                count++;
                 
                 List<UUID> list = new ArrayList<UUID>();
                 String[] parts = line.split("\t");
@@ -258,7 +261,9 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
             process.setProperty(uuidListListPropName, uuidList);
 
             returnCondition = Condition.CONTINUE;
-        } catch (TerminologyException e) {
+        } catch (IndexOutOfBoundsException e) {
+            throw new TaskFailedException("<html>Import process is expecting data which is missing.<br>Please review import file. Line: " + count, e);
+        }catch (TerminologyException e) {
             throw new TaskFailedException(e);
         } catch (ParseException e) {
             throw new TaskFailedException(e);
