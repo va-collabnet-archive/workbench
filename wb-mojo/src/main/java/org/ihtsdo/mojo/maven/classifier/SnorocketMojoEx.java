@@ -23,22 +23,23 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.dwfa.ace.api.*;
+import org.dwfa.ace.task.classify.SnoGrpNumType.SNOGRP_NUMBER_APPROACH;
 import org.dwfa.ace.task.classify.*;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
-import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 /**
@@ -93,7 +94,7 @@ public class SnorocketMojoEx extends AbstractMojo {
      */
     private String uuidRoleRoot;
     /**
-     * The uuid for the tested path.
+     * The uuid for the edit path.
      *
      * @parameter @required
      */
@@ -127,8 +128,13 @@ public class SnorocketMojoEx extends AbstractMojo {
      *
      * @parameter
      */
-    private TerminologyStoreDI ts;
     private String reportEquivalences;
+    /**
+     * Role Group Numbering Method: rf1, rf2Computed
+     *
+     * @parameter default-value="rf1"
+     */
+    private String roleGroupNumberMethod;
     // CORE CONSTANTS
     private static int isaNid = Integer.MAX_VALUE;
     private static int rootNid = Integer.MAX_VALUE;
@@ -213,7 +219,6 @@ public class SnorocketMojoEx extends AbstractMojo {
         SnoQuery.initAll();
 
         try {
-            ts = Ts.get();
             tf = Terms.get();
             if (tf == null) {
                 Bdb.setup(berkeleyDir.getAbsolutePath());
@@ -476,11 +481,15 @@ public class SnorocketMojoEx extends AbstractMojo {
                 || SnoQuery.getRoleAdded().size() > 0
                 || SnoQuery.getRoleDropped().size() > 0) {
             StringBuilder sb = new StringBuilder();
-            sb.append("\r\n::: [SnorocketMojoEx] ISA ADD  = ").append(SnoQuery.getIsaAdded().size());
-            sb.append("\r\n::: [SnorocketMojoEx] ISA DROP = ").append(SnoQuery.getIsaDropped().size());
-            sb.append("\r\n::: [SnorocketMojoEx] ROLE ADD = ").append(SnoQuery.getRoleAdded().size());
-            sb.append("\r\n::: [SnorocketMojoEx] ROLE DROP = ").append(SnoQuery.getRoleDropped().size());
-            sb.append(sb.toString());
+            sb.append("\r\n::: [SnorocketMojoEx] ISA ADD  = ");
+            sb.append(SnoQuery.getIsaAdded().size());
+            sb.append("\r\n::: [SnorocketMojoEx] ISA DROP = ");
+            sb.append(SnoQuery.getIsaDropped().size());
+            sb.append("\r\n::: [SnorocketMojoEx] ROLE ADD = ");
+            sb.append(SnoQuery.getRoleAdded().size());
+            sb.append("\r\n::: [SnorocketMojoEx] ROLE DROP = ");
+            sb.append(SnoQuery.getRoleDropped().size());
+            logger.info(sb.toString());
             if (reportChanges != null) {
                 SnoRel.dumpToFile(SnoQuery.getIsaAdded(), reportChanges + "_ISA_ADD.txt", 2);
                 SnoRel.dumpToFile(SnoQuery.getIsaDropped(),
@@ -499,7 +508,8 @@ public class SnorocketMojoEx extends AbstractMojo {
         }
 
         if (SnoQuery.getEquiv().size() > 0) {
-            logger.info("\r\n::: [SnorocketMojoEx] EQUIVALENCES DETECTED = " + SnoQuery.getEquiv().size());
+            logger.info("\r\n::: [SnorocketMojoEx] EQUIVALENCES DETECTED = "
+                    + SnoQuery.getEquiv().size());
             if (reportEquivalences != null) {
                 SnoConGrpList.dumpSnoConGrpList(SnoQuery.getEquiv(),
                         reportEquivalences + "_FAIL.txt");
@@ -518,11 +528,14 @@ public class SnorocketMojoEx extends AbstractMojo {
         // logger.info(toStringWatch());
     }
 
-    private String compareAndWriteBack(List<SnoRel> snorelA, List<SnoRel> snorelB, int classPathNid)
+    private String compareAndWriteBack(List<SnoRel> snorelA, List<SnoRel> snorelB,
+            int classPathNid)
             throws TerminologyException, IOException {
         // Actual write back approximately 16,380 per minute
         // Write back dropped to approximately 1,511 per minute
         long vTime = System.currentTimeMillis();
+        SNOGRP_NUMBER_APPROACH groupNumApproach = getApproach(roleGroupNumberMethod);
+        logger.info("::: Group Number Approach: " + groupNumApproach.toString());
 
         // STATISTICS COUNTERS
         int countConSeen = 0;
@@ -567,13 +580,13 @@ public class SnorocketMojoEx extends AbstractMojo {
                 + "\r\n::: snorelB.size() = \t" + snorelB.size());
 
         // :DEBUG:WATCH:
-        // Algoriphagus
-//        int watchNid = tf.getConcept(UUID.fromString("1eb658fd-6f5c-3170-b736-56459b35490e")).getConceptNid();
+        // Open biopsy of lesion ...
+        // int watchNid = tf.getConcept(UUID.fromString("aa23ea32-363f-6cc8-e044-0003ba13161a")).getConceptNid();
 
         // BY SORT ORDER, LOWER NUMBER ADVANCES FIRST
         while (!done_A && !done_B) {
             // :DEBUG:WATCH
-//            if (rel_B.c1Id == watchNid) {
+//            if (rel_A.c1Id == watchNid || rel_B.c1Id == watchNid) {
 //                logger.info("::: [SnorocketMojoEx] found watch nid");
 //            }
 
@@ -735,11 +748,6 @@ public class SnorocketMojoEx extends AbstractMojo {
                 if (groupList_A.size() > 0) {
                     groupList_NotEqual_A = groupList_A.whichNotEqual(groupList_B);
                     for (SnoGrp sg : groupList_NotEqual_A) {
-                        // COMMENTED OUT SO THAT THE MOST RECENTLY RETIRED ROLE GROUP
-                        // WILL NOT BE USED AGAIN BY THE LOGICALLY EQUIVALENT CURRENT ROLE GROUP.
-                        // if (sg.size() > 0) {
-                        //    groupNumbersInUse.remove(Integer.valueOf(sg.get(0).group));
-                        //}
                         for (SnoRel sr_A : sg) {
                             writeBackRetired(sr_A, classPathNid, vTime);
                         }
@@ -755,26 +763,20 @@ public class SnorocketMojoEx extends AbstractMojo {
 
                 // COMPUTED ROLE GROUP NUMBER REPLACES :SIMPLE_ACTIVE_RETIRED_NONOVERLAP:
                 if (groupList_B.isEmpty() == false) {
-                    calcNewRoleGroupNumbers(groupList_B, groupNumbersInUse);
+                    if (groupNumApproach == SNOGRP_NUMBER_APPROACH.RF1) {
+                        groupList_B = calcNewRoleGroupNumbersRf1(groupList_A, groupList_B);
+                    } else {
+                        calcNewRoleGroupNumbersRf2Computed(groupList_B, groupNumbersInUse);
+                    }
                 }
 
                 // FIND GROUPS IN GROUPLIST_B WITHOUT AN EQUAL IN GROUPLIST_A
                 // WRITE THESE GROUPED RELS AS "NEW, CURRENT"
-                // :SIMPLE_ACTIVE_RETIRED_NONOVERLAP: Integer groupNumber = 1;
                 SnoGrpList groupList_NotEqual_B;
                 if (groupList_B.size() > 0) {
                     groupList_NotEqual_B = groupList_B.whichNotEqual(groupList_A);
                     for (SnoGrp sg : groupList_NotEqual_B) {
-                        // find next free group number
-                        // :SIMPLE_ACTIVE_RETIRED_NONOVERLAP:BEGIN
-                        // while (groupNumbersInUse.contains(groupNumber)) {
-                        //    groupNumber++;
-                        // }
-                        // groupNumbersInUse.add(groupNumber);
-                        // :SIMPLE_ACTIVE_RETIRED_NONOVERLAP:END
                         for (SnoRel sr_B : sg) {
-                            // :SIMPLE_ACTIVE_RETIRED_NONOVERLAP:
-                            // sr_B.group = groupNumber.intValue();
                             writeBackCurrent(sr_B, classPathNid, vTime);
                         }
                     }
@@ -788,9 +790,9 @@ public class SnorocketMojoEx extends AbstractMojo {
                 }
 
                 // CHECK FOR NEW ROLE GROUP NUMBERS ASSIGNED TO EXISTING LOGICAL ROLES
-                if (groupList_A.size() > 0 || groupList_B.size() > 0) {
+                if (groupList_A.size() > 0 && groupList_B.size() > 0) {
                     if (groupList_A.size() != groupList_B.size()) {
-                        logger.error("AB group list size not equal");
+                        logger.error("ERROR: AB group list size not equal");
                     }
 
                     for (SnoGrp sgA : groupList_A) {
@@ -803,7 +805,7 @@ public class SnorocketMojoEx extends AbstractMojo {
                                 }
                             }
                         } else {
-                            logger.error("AB logical equivalent group not found");
+                            logger.error("ERROR: AB logical equivalent group not found");
                         }
 
                     }
@@ -850,7 +852,12 @@ public class SnorocketMojoEx extends AbstractMojo {
 
                 // COMPUTED ROLE GROUP NUMBER REPLACES & WRITE CURRENT
                 if (groupList_B.isEmpty() == false) {
-                    calcNewRoleGroupNumbers(groupList_B, null);
+                    if (groupNumApproach == SNOGRP_NUMBER_APPROACH.RF1) {
+                        groupList_B = calcNewRoleGroupNumbersRf1(null, groupList_B);
+                    } else {
+                        calcNewRoleGroupNumbersRf2Computed(groupList_B, null);
+                    }
+
                     for (SnoGrp sg : groupList_B) {
                         for (SnoRel sr : sg) {
                             writeBackCurrent(sr, classPathNid, vTime);
@@ -944,7 +951,11 @@ public class SnorocketMojoEx extends AbstractMojo {
 
             // COMPUTED ROLE GROUP NUMBER REPLACES & WRITE CURRENT
             if (groupList_B.isEmpty() == false) {
-                calcNewRoleGroupNumbers(groupList_B, null);
+                if (groupNumApproach == SNOGRP_NUMBER_APPROACH.RF1) {
+                    groupList_B = calcNewRoleGroupNumbersRf1(null, groupList_B);
+                } else {
+                    calcNewRoleGroupNumbersRf2Computed(groupList_B, null);
+                }
                 for (SnoGrp sg : groupList_B) {
                     for (SnoRel sr : sg) {
                         writeBackCurrent(sr, classPathNid, vTime);
@@ -1295,14 +1306,15 @@ public class SnorocketMojoEx extends AbstractMojo {
                 I_RelPart rPart1 = null;
                 for (PositionBI pos : cEditPathListPositionBI) { // PATHS_IN_PRIORITY_ORDER
                     for (I_RelPart rPart : rv.getMutableParts()) {
-                        if (pos.getPath().getConceptNid() == rPart.getPathId()) {
+                        if (pos.getPath().getConceptNid() == rPart.getPathNid()
+                                && rPart.getCharacteristicId() == isCh_STATED_RELATIONSHIP) {
                             if (rPart1 == null) {
                                 rPart1 = rPart; // ... KEEP FIRST_INSTANCE
-                            } else if (rPart1.getVersion() < rPart.getVersion()) {
+                            } else if (rPart1.getTime() < rPart.getTime()) {
                                 rPart1 = rPart; // ... KEEP MORE_RECENT PART
-                            } else if (rPart1.getVersion() == rPart.getVersion()) {
+                            } else if (rPart1.getTime() == rPart.getTime()) {
                                 countRelDuplVersion++;
-                                if (rPart.getStatusId() == isCURRENT) {
+                                if (rPart.getStatusNid() == isCURRENT) {
                                     rPart1 = rPart; // KEEP CURRENT PART
                                 }
                             }
@@ -1313,8 +1325,8 @@ public class SnorocketMojoEx extends AbstractMojo {
                     }
                 }
 
-                if ((rPart1 != null) && (rPart1.getStatusId() == isCURRENT)
-                        && (rPart1.getTypeId() == isaNid)) {
+                if ((rPart1 != null) && (rPart1.getStatusNid() == isCURRENT)
+                        && (rPart1.getTypeNid() == isaNid)) {
                     // KEEP C1 AS RESULT
                     resultSet.add(rv.getC1Id());
 
@@ -1403,19 +1415,27 @@ public class SnorocketMojoEx extends AbstractMojo {
 
     private String toStringWatch() {
         StringBuilder sb = new StringBuilder();
-        UUID pUuid = UUID.fromString("1eb658fd-6f5c-3170-b736-56459b35490e");
         try {
+            UUID pUuid = UUID.fromString("aa23ea32-363f-6cc8-e044-0003ba13161a");
+            sb.append(tf.getConcept(pUuid).toLongString());
+
+            sb.append("\r\n\r\n");
+            pUuid = UUID.fromString("ac4744d3-ea2b-11e0-9572-0800200c9a66");
+            sb.append(tf.getConcept(pUuid).toLongString());
+
+            sb.append("\r\n\r\n");
+            pUuid = UUID.fromString("aa23ea32-3546-6cc8-e044-0003ba13161a");
             sb.append(tf.getConcept(pUuid).toLongString());
         } catch (TerminologyException ex) {
-            logger.debug("WATCH: 1eb658fd-6f5c-3170-b736-56459b35490e not found", ex);
+            logger.debug("WATCH: UUID string not found", ex);
         } catch (IOException ex) {
-            logger.debug("WATCH: 1eb658fd-6f5c-3170-b736-56459b35490e not found", ex);
+            logger.debug("WATCH: UUID string not found", ex);
         }
 
         return sb.toString();
     }
 
-    void calcNewRoleGroupNumbers(SnoGrpList groupList, HashSet<Integer> inUse) {
+    void calcNewRoleGroupNumbersRf2Computed(SnoGrpList groupList, HashSet<Integer> inUse) {
         try {
             // Create uuid based role group ids
             SnoGrpUuidList sgul = new SnoGrpUuidList(groupList);
@@ -1436,5 +1456,45 @@ public class SnorocketMojoEx extends AbstractMojo {
             logger.error(toString());
         }
 
+    }
+
+    SnoGrpList calcNewRoleGroupNumbersRf1(SnoGrpList logicallyEqual_A, SnoGrpList all_B) {
+
+        SnoGrpList groupList_NotEqual_B = all_B;
+
+        // Determine inferred role group numbers in use.
+        HashSet<Integer> groupNumbersInUse = new HashSet<Integer>();
+        if (logicallyEqual_A != null) {
+            for (SnoGrp sg : logicallyEqual_A) {
+                if (sg.size() > 0) {
+                    groupNumbersInUse.add(Integer.valueOf(sg.get(0).group));
+                }
+            }
+            if (all_B.size() > 0) {
+                groupList_NotEqual_B = all_B.whichNotEqual(logicallyEqual_A);
+            }
+        }
+
+        Integer groupNumber = 1;
+        for (SnoGrp sg : groupList_NotEqual_B) {
+            // find next free group number
+            while (groupNumbersInUse.contains(groupNumber)) {
+                groupNumber++;
+            }
+            groupNumbersInUse.add(groupNumber);
+            for (SnoRel sr_B : sg) {
+                // :SIMPLE_ACTIVE_RETIRED_NONOVERLAP:
+                sr_B.group = groupNumber.intValue();
+            }
+        }
+
+        return groupList_NotEqual_B;
+    }
+
+    private SNOGRP_NUMBER_APPROACH getApproach(String s) {
+        if (s.equalsIgnoreCase("RF1")) {
+            return SNOGRP_NUMBER_APPROACH.RF1;
+        }
+        return SNOGRP_NUMBER_APPROACH.RF2_COMPUTED;
     }
 }

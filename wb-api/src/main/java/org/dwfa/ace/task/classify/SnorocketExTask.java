@@ -33,6 +33,7 @@ import org.dwfa.ace.api.*;
 import org.dwfa.ace.api.cs.ChangeSetPolicy;
 import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.task.classify.SnoGrpNumType.SNOGRP_NUMBER_APPROACH;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -133,6 +134,7 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
     private static boolean debug = false; // :DEBUG:
     private static boolean debugDump = false; // :DEBUG: save to files
     private boolean usesRf2B = false;
+    private SNOGRP_NUMBER_APPROACH groupNumApproach = SNOGRP_NUMBER_APPROACH.RF1;
 
     static {
         if (System.getProperties().get("SnorocketDebug") != null
@@ -276,6 +278,7 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
         Ts.get().suspendChangeNotifications();
+        this.groupNumApproach = SNOGRP_NUMBER_APPROACH.RF1;
 
         try {
             logger = worker.getLogger();
@@ -908,18 +911,15 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
                 + "\r\n::: snorelA.size() = \t{0}\r\n::: snorelB.size() = \t{1}",
                 new Object[]{snorelA.size(), snorelB.size()});
         // :DEBUG:WATCH:
-        // Biopsy of left external ear (procedure)
-        int watchNid = tf.getConcept(UUID.fromString("f6c5e109-cc5f-4aa6-8a53-82727e363021")).getConceptNid();
+        // Algoriphagus
+//        int watchNid = tf.getConcept(UUID.fromString("1eb658fd-6f5c-3170-b736-56459b35490e")).getConceptNid();
         // Biopsy of left pinna (procedure)
-        int watchNid1 = tf.getConcept(UUID.fromString("bdc9f44d-02c1-46b2-a158-8cc39409ec99")).getConceptNid();
-        // Biopsy of left pinna cartilage (procedure)
-        int watchNid2 = tf.getConcept(UUID.fromString("8c61cf71-8712-49e1-bdca-4e791978f6b7")).getConceptNid();
         // BY SORT ORDER, LOWER NUMBER ADVANCES FIRST
         while (!done_A && !done_B) {
             // :DEBUG:WATCH
-            if (rel_B.c1Id == watchNid || rel_B.c1Id == watchNid1 || rel_B.c1Id == watchNid2) {
-                logger.log(Level.INFO, "::: [SnorocketExTask] found watch nid");
-            }
+//            if (rel_A.c1Id == watchNid || rel_B.c1Id == watchNid) {
+//                logger.log(Level.INFO, "::: [SnorocketExTask] found watch nid");
+//            }
 
             if (++countConSeen % 25000 == 0) {
                 logger.log(Level.INFO, "::: [SnorocketExTask] compareAndWriteBack @ #\t{0}", countConSeen);
@@ -1079,11 +1079,6 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
                 if (groupList_A.size() > 0) {
                     groupList_NotEqual_A = groupList_A.whichNotEqual(groupList_B);
                     for (SnoGrp sg : groupList_NotEqual_A) {
-                        // COMMENTED OUT SO THAT THE MOST RECENTLY RETIRED ROLE GROUP
-                        // WILL NOT BE USED AGAIN BY THE LOGICALLY EQUIVALENT CURRENT ROLE GROUP.
-                        // if (sg.size() > 0) {
-                        //    groupNumbersInUse.remove(Integer.valueOf(sg.get(0).group));
-                        //}
                         for (SnoRel sr_A : sg) {
                             writeBackRetired(sr_A, classPathNid, vTime);
                         }
@@ -1099,26 +1094,20 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
 
                 // COMPUTED ROLE GROUP NUMBER REPLACES :SIMPLE_ACTIVE_RETIRED_NONOVERLAP:
                 if (groupList_B.isEmpty() == false) {
-                    calcNewRoleGroupNumbers(groupList_B, groupNumbersInUse);
+                    if (groupNumApproach == SnoGrpNumType.SNOGRP_NUMBER_APPROACH.RF1) {
+                        groupList_B = calcNewRoleGroupNumbersRf1(groupList_A, groupList_B);
+                    } else {
+                        calcNewRoleGroupNumbersRf2Computed(groupList_B, groupNumbersInUse);
+                    }
                 }
 
                 // FIND GROUPS IN GROUPLIST_B WITHOUT AN EQUAL IN GROUPLIST_A
                 // WRITE THESE GROUPED RELS AS "NEW, CURRENT"
-                // :SIMPLE_ACTIVE_RETIRED_NONOVERLAP: Integer groupNumber = 1;
                 SnoGrpList groupList_NotEqual_B = null;
                 if (groupList_B.size() > 0) {
                     groupList_NotEqual_B = groupList_B.whichNotEqual(groupList_A);
                     for (SnoGrp sg : groupList_NotEqual_B) {
-                        // find next free group number
-                        // :SIMPLE_ACTIVE_RETIRED_NONOVERLAP:BEGIN
-                        // while (groupNumbersInUse.contains(groupNumber)) {
-                        //    groupNumber++;
-                        // }
-                        // groupNumbersInUse.add(groupNumber);
-                        // :SIMPLE_ACTIVE_RETIRED_NONOVERLAP:END
                         for (SnoRel sr_B : sg) {
-                            // :SIMPLE_ACTIVE_RETIRED_NONOVERLAP:
-                            // sr_B.group = groupNumber.intValue();
                             writeBackCurrent(sr_B, classPathNid, vTime);
                         }
                     }
@@ -1132,9 +1121,9 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
                 }
 
                 // CHECK FOR NEW ROLE GROUP NUMBERS ASSIGNED TO EXISTING LOGICAL ROLES
-                if (groupList_A.size() > 0 || groupList_B.size() > 0) {
+                if (groupList_A.size() > 0 && groupList_B.size() > 0) {
                     if (groupList_A.size() != groupList_B.size()) {
-                        logger.log(Level.SEVERE, "AB group list size not equal");
+                        logger.log(Level.SEVERE, "ERROR: AB group list size not equal");
                     }
 
                     for (SnoGrp sgA : groupList_A) {
@@ -1147,7 +1136,7 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
                                 }
                             }
                         } else {
-                            logger.log(Level.SEVERE, "AB logical equivalent group not found");
+                            logger.log(Level.SEVERE, "ERROR: AB logical equivalent group not found");
                         }
 
                     }
@@ -1194,7 +1183,11 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
 
                 // COMPUTED ROLE GROUP NUMBER REPLACES & WRITE CURRENT
                 if (groupList_B.isEmpty() == false) {
-                    calcNewRoleGroupNumbers(groupList_B, null);
+                    if (groupNumApproach == SNOGRP_NUMBER_APPROACH.RF1) {
+                        groupList_B = calcNewRoleGroupNumbersRf1(null, groupList_B);
+                    } else {
+                        calcNewRoleGroupNumbersRf2Computed(groupList_B, null);
+                    }
                     for (SnoGrp sg : groupList_B) {
                         for (SnoRel sr : sg) {
                             writeBackCurrent(sr, classPathNid, vTime);
@@ -1289,7 +1282,11 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
 
             // COMPUTED ROLE GROUP NUMBER REPLACES & WRITE CURRENT
             if (groupList_B.isEmpty() == false) {
-                calcNewRoleGroupNumbers(groupList_B, null);
+                if (groupNumApproach == SNOGRP_NUMBER_APPROACH.RF1) {
+                    groupList_B = calcNewRoleGroupNumbersRf1(null, groupList_B);
+                } else {
+                    calcNewRoleGroupNumbersRf2Computed(groupList_B, null);
+                }
                 for (SnoGrp sg : groupList_B) {
                     for (SnoRel sr : sg) {
                         writeBackCurrent(sr, classPathNid, vTime);
@@ -1815,6 +1812,15 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
         return CONTINUE_CONDITION;
     }
 
+    /**
+     * Set approach for generating role group numbers.
+     *
+     * @return
+     */
+    public void setGroupNumApproach(SNOGRP_NUMBER_APPROACH groupNumApproach) {
+        this.groupNumApproach = groupNumApproach;
+    }
+
     //
     private int[] setupRoleNids() throws TerminologyException, IOException {
         int countRelDuplVersion = 0;
@@ -1828,12 +1834,13 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
                 I_RelPart rPart1 = null;
                 for (PositionBI pos : cEditPathListPositionBI) { // PATHS_IN_PRIORITY_ORDER
                     for (I_RelPart rPart : rv.getMutableParts()) {
-                        if (pos.getPath().getConceptNid() == rPart.getPathNid()) {
+                        if (pos.getPath().getConceptNid() == rPart.getPathNid()
+                                && rPart.getCharacteristicId() == isCh_STATED_RELATIONSHIP) {
                             if (rPart1 == null) {
                                 rPart1 = rPart; // ... KEEP FIRST_INSTANCE
-                            } else if (rPart1.getVersion() < rPart.getVersion()) {
+                            } else if (rPart1.getTime() < rPart.getTime()) {
                                 rPart1 = rPart; // ... KEEP MORE_RECENT PART
-                            } else if (rPart1.getVersion() == rPart.getVersion()) {
+                            } else if (rPart1.getTime() == rPart.getTime()) {
                                 countRelDuplVersion++;
                                 if (rPart.getStatusNid() == isCURRENT) {
                                     rPart1 = rPart; // KEEP CURRENT PART
@@ -2298,7 +2305,7 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
         }
     }
 
-    void calcNewRoleGroupNumbers(SnoGrpList groupList, HashSet<Integer> inUse) {
+    void calcNewRoleGroupNumbersRf2Computed(SnoGrpList groupList, HashSet<Integer> inUse) {
         try {
             // Create uuid based role group ids
             SnoGrpUuidList sgul = new SnoGrpUuidList(groupList);
@@ -2319,5 +2326,38 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
             Logger.getLogger(SnorocketExTask.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+    }
+
+    SnoGrpList calcNewRoleGroupNumbersRf1(SnoGrpList logicallyEqual_A, SnoGrpList all_B) {
+
+        SnoGrpList groupList_NotEqual_B = all_B;
+
+        // Determine inferred role group numbers in use.
+        HashSet<Integer> groupNumbersInUse = new HashSet<Integer>();
+        if (logicallyEqual_A != null) {
+            for (SnoGrp sg : logicallyEqual_A) {
+                if (sg.size() > 0) {
+                    groupNumbersInUse.add(Integer.valueOf(sg.get(0).group));
+                }
+            }
+            if (all_B.size() > 0) {
+                groupList_NotEqual_B = all_B.whichNotEqual(logicallyEqual_A);
+            }
+        }
+
+        Integer groupNumber = 1;
+        for (SnoGrp sg : groupList_NotEqual_B) {
+            // find next free group number
+            while (groupNumbersInUse.contains(groupNumber)) {
+                groupNumber++;
+            }
+            groupNumbersInUse.add(groupNumber);
+            for (SnoRel sr_B : sg) {
+                // :SIMPLE_ACTIVE_RETIRED_NONOVERLAP:
+                sr_B.group = groupNumber.intValue();
+            }
+        }
+
+        return groupList_NotEqual_B;
     }
 }
