@@ -234,7 +234,9 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
                 temp.add(Ts.get().getNidForUuids(SnomedMetadataRf1.DEFINED_RF1.getUuids()));
                 temp.add(Ts.get().getNidForUuids(SnomedMetadataRf1.DEFINING_CHARACTERISTIC_TYPE_RF1.getUuids()));
                 temp.add(Ts.get().getNidForUuids(SnomedMetadataRf1.INFERRED_DEFINING_CHARACTERISTIC_TYPE_RF1.getUuids()));
+                /* KLUDGE - remove this line of code because it makes more than one thing crash in an RF1-only database
                 temp.add(SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2.getLenient().getConceptNid());
+                */
             } catch (ValidationException e) {
                 throw new RuntimeException(e);
             } catch (IOException e) {
