@@ -926,7 +926,7 @@ public class WorkbenchRunner {
                 activityIsa.setProgressInfoLower("Reading is-a cache...");
                 if (!KindOfComputer.loadIsaCacheFromFile(new File("berkeley-db/isa-cache.oos"), isaCoordinates)) {
                 	KindOfComputer.clearIsaCache();
-                    activityIsa.setProgressInfoLower("Generating is-a cache...");
+                    activityIsa.setProgressInfoLower("Failed to load, regenerating is-a cache...");
                     generateCache(isaCoordinates, latches);
                 }
             }

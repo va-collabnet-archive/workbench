@@ -218,6 +218,10 @@ public class KindOfComputer {
 		ObjectInput input = new ObjectInputStream(buffer);
 		try {
 			isaCache = loadIsaCacheFromStream(input);
+		} catch (IOException ioex) {
+		    AceLog.getAppLog().warning("IO Error loading is-a cache");
+		    isaCache = null;
+		    return false;
 		} finally {
 			input.close();
 		}
@@ -229,7 +233,7 @@ public class KindOfComputer {
 		}
 	}
 
-	public static Map<IsaCoordinate, IsaCache> loadIsaCacheFromStream(ObjectInput ois) throws Exception {
+	private static Map<IsaCoordinate, IsaCache> loadIsaCacheFromStream(ObjectInput ois) throws ClassNotFoundException, IOException {
 		return (Map<IsaCoordinate, IsaCache>) ois.readObject();
 	}
 
