@@ -24,6 +24,7 @@ import org.ihtsdo.tk.api.ext.I_ConceptualizeExternally;
 import java.util.Collection;
 import java.util.Set;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 public class ConceptAttributesRevision extends Revision<ConceptAttributesRevision, ConceptAttributes>
         implements I_ConceptAttributePart<ConceptAttributesRevision>,
@@ -31,16 +32,16 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
    private boolean defined = false;
 
    //~--- constructors --------------------------------------------------------
-
+  
    public ConceptAttributesRevision(I_ConceptAttributePart another, ConceptAttributes primoridalMember) {
-      super(another.getStatusNid(), another.getAuthorNid(), another.getPathNid(), another.getTime(),
-            primoridalMember);
+      super(another.getStatusNid(), another.getTime(), another.getAuthorNid(), another.getPathNid(),
+            another.getModuleNid(), primoridalMember);
       this.defined = another.isDefined();
    }
 
    public ConceptAttributesRevision(I_ConceptualizeExternally another, ConceptAttributes primoridalMember) {
-      super(Bdb.uuidToNid(another.getStatusUuid()), Bdb.uuidToNid(another.getAuthorUuid()),
-            Bdb.uuidToNid(another.getPathUuid()), another.getTime(), primoridalMember);
+      super(Bdb.uuidToNid(another.getStatusUuid()), another.getTime(), Bdb.uuidToNid(another.getAuthorUuid()),
+            Bdb.uuidToNid(another.getModuleUuid()), Bdb.uuidToNid(another.getPathUuid()), primoridalMember);
       this.defined = another.isDefined();
    }
 
@@ -53,14 +54,9 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
       defined = input.readBoolean();
    }
 
-   public ConceptAttributesRevision(int statusNid, int authorNid, int pathNid, long time,
-                                    ConceptAttributes primoridalMember) {
-      super(statusNid, authorNid, pathNid, time, primoridalMember);
-   }
-
-   public ConceptAttributesRevision(I_ConceptAttributePart another, int statusNid, int authorNid,
-                                    int pathNid, long time, ConceptAttributes primoridalMember) {
-      super(statusNid, authorNid, pathNid, time, primoridalMember);
+   public ConceptAttributesRevision(I_ConceptAttributePart another, int statusNid, long time, int authorNid,
+                                    int moduleNid, int pathNid,ConceptAttributes primoridalMember) {
+      super(statusNid, time, authorNid, moduleNid, pathNid, primoridalMember);
       this.defined = another.isDefined();
    }
 
@@ -94,37 +90,21 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
 
       return false;
    }
-
+   
    @Override
-   public ConceptAttributesRevision makeAnalog(int statusNid, int pathNid, long time) {
-      if ((this.getTime() == time) && (this.getPathNid() == pathNid)) {
-         this.setStatusNid(statusNid);
-
-         return this;
-      }
-
-      ConceptAttributesRevision newR;
-
-      newR = new ConceptAttributesRevision(this.primordialComponent, statusNid, Terms.get().getAuthorNid(),
-              pathNid, time, this.primordialComponent);
-      this.primordialComponent.addRevision(newR);
-
-      return newR;
-   }
-
-   @Override
-   public ConceptAttributesRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+   public ConceptAttributesRevision makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
       if ((this.getTime() == time) && (this.getPathNid() == pathNid)) {
          this.setStatusNid(statusNid);
          this.setAuthorNid(authorNid);
+         this.setModuleNid(moduleNid);
 
          return this;
       }
 
       ConceptAttributesRevision newR;
 
-      newR = new ConceptAttributesRevision(this, statusNid, authorNid, pathNid, time,
-              this.primordialComponent);
+      newR = new ConceptAttributesRevision(this, statusNid, time, authorNid, pathNid,
+              moduleNid, this.primordialComponent);
       this.primordialComponent.addRevision(newR);
 
       return newR;

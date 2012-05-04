@@ -65,7 +65,11 @@ public class BatchActionTaskRoleReplaceValue extends BatchActionTask {
         for (RelationshipVersionBI rvbi : rels) {
             if (rvbi.getTypeNid() == roleNid && rvbi.getDestinationNid() == valueOldNid) {
                 for (int editPath : ec.getEditPaths()) {
-                    rvbi.makeAnalog(RETIRED_NID, ec.getAuthorNid(), editPath, Long.MAX_VALUE);
+                    rvbi.makeAnalog(RETIRED_NID,
+                            Long.MAX_VALUE,
+                            ec.getAuthorNid(),
+                            ec.getModuleNid(),
+                            editPath);
                 }
 
                 TkRelType relChType = TkRelType.STATED_HIERARCHY;

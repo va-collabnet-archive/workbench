@@ -21,10 +21,12 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.ihtsdo.tk.binding.snomed.Snomed;
 
 public abstract class TkRevision implements I_VersionExternally {
    private static final long serialVersionUID    = 1;
    public static UUID        unspecifiedUserUuid = UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c");
+   public static UUID        unspecifiedModuleUuid = UUID.fromString("40d1c869-b509-32f8-b735-836eac577a67");
 
    //~--- fields --------------------------------------------------------------
 
@@ -32,6 +34,7 @@ public abstract class TkRevision implements I_VersionExternally {
    public UUID authorUuid;
    public UUID pathUuid;
    public UUID statusUuid;
+   public UUID moduleUuid;
 
    //~--- constructors --------------------------------------------------------
 
@@ -44,9 +47,11 @@ public abstract class TkRevision implements I_VersionExternally {
       this.statusUuid = Ts.get().getComponent(another.getStatusNid()).getPrimUuid();
       this.authorUuid = Ts.get().getComponent(another.getAuthorNid()).getPrimUuid();
       this.pathUuid   = Ts.get().getComponent(another.getPathNid()).getPrimUuid();
+      this.moduleUuid   = Ts.get().getComponent(another.getModuleNid()).getPrimUuid();
       assert pathUuid != null : another;
       assert authorUuid != null : another;
       assert statusUuid != null : another;
+      assert moduleUuid != null : another;
       this.time = another.getTime();
    }
 
@@ -55,10 +60,12 @@ public abstract class TkRevision implements I_VersionExternally {
       this.authorUuid = Ts.get().getComponent(id.getAuthorNid()).getPrimUuid();
       this.pathUuid   = Ts.get().getComponent(id.getPathNid()).getPrimUuid();
       this.statusUuid = Ts.get().getComponent(id.getStatusNid()).getPrimUuid();
+      this.moduleUuid   = Ts.get().getComponent(id.getModuleNid()).getPrimUuid();
       this.time       = id.getTime();
       assert pathUuid != null : id;
       assert authorUuid != null : id;
       assert statusUuid != null : id;
+      assert moduleUuid != null : id;
    }
 
    public TkRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -67,6 +74,7 @@ public abstract class TkRevision implements I_VersionExternally {
       assert pathUuid != null : this;
       assert authorUuid != null : this;
       assert statusUuid != null : this;
+      assert moduleUuid != null : this;
    }
 
    public TkRevision(ComponentVersionBI another, Map<UUID, UUID> conversionMap, long offset, boolean mapAll)
@@ -77,15 +85,18 @@ public abstract class TkRevision implements I_VersionExternally {
          this.statusUuid = conversionMap.get(Ts.get().getComponent(another.getStatusNid()).getPrimUuid());
          this.authorUuid = conversionMap.get(Ts.get().getComponent(another.getAuthorNid()).getPrimUuid());
          this.pathUuid   = conversionMap.get(Ts.get().getComponent(another.getPathNid()).getPrimUuid());
+         this.moduleUuid   = conversionMap.get(Ts.get().getComponent(another.getModuleNid()).getPrimUuid());
       } else {
          this.statusUuid = Ts.get().getComponent(another.getStatusNid()).getPrimUuid();
          this.authorUuid = Ts.get().getComponent(another.getAuthorNid()).getPrimUuid();
          this.pathUuid   = Ts.get().getComponent(another.getPathNid()).getPrimUuid();
+         this.moduleUuid   = Ts.get().getComponent(another.getModuleNid()).getPrimUuid();
       }
 
       assert pathUuid != null : another;
       assert authorUuid != null : another;
       assert statusUuid != null : another;
+      assert moduleUuid != null : another;
       this.time = another.getTime() + offset;
    }
 
@@ -96,15 +107,18 @@ public abstract class TkRevision implements I_VersionExternally {
          this.statusUuid = conversionMap.get(another.statusUuid);
          this.authorUuid = conversionMap.get(another.authorUuid);
          this.pathUuid   = conversionMap.get(another.pathUuid);
+         this.moduleUuid   = conversionMap.get(another.moduleUuid);
       } else {
          this.statusUuid = another.statusUuid;
          this.authorUuid = another.authorUuid;
          this.pathUuid   = another.pathUuid;
+         this.moduleUuid   = another.moduleUuid;
       }
 
       assert pathUuid != null : another;
       assert authorUuid != null : another;
       assert statusUuid != null : another;
+      assert moduleUuid != null : another;
       this.time = another.time + offset;
    }
 
@@ -145,6 +159,14 @@ public abstract class TkRevision implements I_VersionExternally {
          }
 
          if (!this.pathUuid.equals(another.pathUuid)) {
+            return false;
+         }
+         
+         if ((this.moduleUuid != null) && (another.moduleUuid != null)) {
+            if (!this.moduleUuid.equals(another.moduleUuid)) {
+               return false;
+            }
+         } else if (!((this.moduleUuid == null) && (another.moduleUuid == null))) {
             return false;
          }
 
@@ -232,6 +254,11 @@ public abstract class TkRevision implements I_VersionExternally {
       } else {
          authorUuid = unspecifiedUserUuid;
       }
+      if (dataVersion >= 8) {
+         moduleUuid = new UUID(in.readLong(), in.readLong());
+      } else {
+         moduleUuid = unspecifiedModuleUuid;
+      }
 
       time = in.readLong();
 
@@ -249,12 +276,15 @@ public abstract class TkRevision implements I_VersionExternally {
 
       buff.append(" s:");
       buff.append(informAboutUuid(this.statusUuid));
-      buff.append(" a:");
-      buff.append(informAboutUuid(this.authorUuid));
-      buff.append(" p:");
-      buff.append(informAboutUuid(this.pathUuid));
       buff.append(" t: ");
       buff.append(new Date(this.time)).append(" ").append(this.time);
+      buff.append(" a:");
+      buff.append(informAboutUuid(this.authorUuid));
+      buff.append(" m:");
+      buff.append(informAboutUuid(this.moduleUuid));
+      buff.append(" p:");
+      buff.append(informAboutUuid(this.pathUuid));
+      
 
       return buff.toString();
    }
@@ -266,6 +296,7 @@ public abstract class TkRevision implements I_VersionExternally {
       assert pathUuid != null : this;
       assert authorUuid != null : this;
       assert statusUuid != null : this;
+      assert moduleUuid != null : this;
 
       out.writeLong(pathUuid.getMostSignificantBits());
       out.writeLong(pathUuid.getLeastSignificantBits());
@@ -273,6 +304,8 @@ public abstract class TkRevision implements I_VersionExternally {
       out.writeLong(statusUuid.getLeastSignificantBits());
       out.writeLong(authorUuid.getMostSignificantBits());
       out.writeLong(authorUuid.getLeastSignificantBits());
+      out.writeLong(moduleUuid.getMostSignificantBits());
+      out.writeLong(moduleUuid.getLeastSignificantBits());
       out.writeLong(time);
    }
 
@@ -302,6 +335,10 @@ public abstract class TkRevision implements I_VersionExternally {
    public UUID getStatusUuid() {
       return statusUuid;
    }
+   
+   public UUID getModuleUuid() {
+      return moduleUuid;
+   }
 
    /*
     * (non-Javadoc)
@@ -327,8 +364,13 @@ public abstract class TkRevision implements I_VersionExternally {
    public void setStatusUuid(UUID statusUuid) {
       this.statusUuid = statusUuid;
    }
+   
+   public void setModuleUuid(UUID moduleUuid) {
+      this.moduleUuid = moduleUuid;
+   }
 
    public void setTime(long time) {
       this.time = time;
    }
+
 }

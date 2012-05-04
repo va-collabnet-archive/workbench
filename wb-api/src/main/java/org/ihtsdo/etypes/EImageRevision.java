@@ -18,10 +18,11 @@ public class EImageRevision extends TkMediaRevision {
 
     public EImageRevision(I_ImagePart part) throws TerminologyException, IOException {
         textDescription = part.getTextDescription();
-        typeUuid = Terms.get().nidToUuid(part.getTypeId());
-        pathUuid = Terms.get().nidToUuid(part.getPathId());
-        statusUuid = Terms.get().nidToUuid(part.getStatusId());
+        typeUuid = Terms.get().nidToUuid(part.getTypeNid());
+        pathUuid = Terms.get().nidToUuid(part.getPathNid());
+        statusUuid = Terms.get().nidToUuid(part.getStatusNid());
         authorUuid    = Terms.get().nidToUuid(part.getAuthorNid());
+        moduleUuid    = Terms.get().nidToUuid(part.getModuleNid());
         time = part.getTime();
     }
 

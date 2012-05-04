@@ -104,6 +104,7 @@ public class DialectListMaintenance extends AbstractTask {
             I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             vc = Ts.get().getMetadataVC();
             ec = new EditCoordinate(config.getDbConfig().getUserConcept().getNid(),
+                    config.getEditCoordinate().getModuleNid(),
                     vc.getPositionSet().getViewPathNidSet());
             String fileName = (String) process.getProperty(dialectListFileNameProp);
             File icsFile = new File(fileName);
@@ -222,9 +223,10 @@ public class DialectListMaintenance extends AbstractTask {
         for (int pathNid : ec.getEditPaths()) {
             member.makeAnalog(
                     SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid(),
+                    Long.MAX_VALUE,
                     ec.getAuthorNid(),
-                    pathNid,
-                    Long.MAX_VALUE);
+                    ec.getModuleNid(),
+                    pathNid);
         }
         Ts.get().addUncommitted(collConcept);
     }

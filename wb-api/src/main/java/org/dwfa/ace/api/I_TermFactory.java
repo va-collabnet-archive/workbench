@@ -438,7 +438,7 @@ public interface I_TermFactory {
            throws IOException;
 
    public int getAuthorNid();
-
+   
    I_Identify getAuthorityId() throws IOException;
 
    public int getCachePercent();

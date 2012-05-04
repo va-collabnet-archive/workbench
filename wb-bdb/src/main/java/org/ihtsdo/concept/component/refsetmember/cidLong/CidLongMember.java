@@ -110,23 +110,14 @@ public class CidLongMember extends RefsetMember<CidLongRevision, CidLongMember>
 
    @Override
    public CidLongRevision makeAnalog() {
-      CidLongRevision newR = new CidLongRevision(getStatusNid(), getPathNid(), getTime(), this);
+      CidLongRevision newR = new CidLongRevision(getStatusNid(), getTime(), getAuthorNid(), getModuleNid(), getPathNid(),  this);
 
       return newR;
    }
 
    @Override
-   public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-      CidLongRevision newR = new CidLongRevision(statusNid, pathNid, time, this);
-
-      addRevision(newR);
-
-      return newR;
-   }
-
-   @Override
-   public CidLongRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-      CidLongRevision newR = new CidLongRevision(statusNid, authorNid, pathNid, time, this);
+   public CidLongRevision makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
+      CidLongRevision newR = new CidLongRevision(statusNid, time, authorNid, moduleNid, pathNid, this);
 
       addRevision(newR);
 

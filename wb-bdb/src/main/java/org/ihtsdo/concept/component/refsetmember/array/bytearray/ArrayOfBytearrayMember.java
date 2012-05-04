@@ -21,6 +21,7 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.*;
 import org.apache.commons.collections.primitives.ArrayIntList;
+import org.dwfa.ace.api.Terms;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.RevisionSet;
 import org.ihtsdo.concept.component.refset.RefsetMember;
@@ -120,23 +121,16 @@ public class ArrayOfBytearrayMember extends RefsetMember<ArrayOfBytearrayRevisio
 
     @Override
     public ArrayOfBytearrayRevision makeAnalog() {
-        ArrayOfBytearrayRevision newR = new ArrayOfBytearrayRevision(getStatusNid(), getPathNid(), getTime(), this);
+        ArrayOfBytearrayRevision newR = new ArrayOfBytearrayRevision(getStatusNid(), getTime(),
+                getAuthorNid(), getMemberId(), getPathNid(), this);
 
         return newR;
     }
-
+    
     @Override
-    public ArrayOfBytearrayRevision makeAnalog(int statusNid, int pathNid, long time) {
-        ArrayOfBytearrayRevision newR = new ArrayOfBytearrayRevision(statusNid, pathNid, time, this);
-
-        addRevision(newR);
-
-        return newR;
-    }
-
-    @Override
-    public ArrayOfBytearrayRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-        ArrayOfBytearrayRevision newR = new ArrayOfBytearrayRevision(statusNid, authorNid, pathNid, time, this);
+    public ArrayOfBytearrayRevision makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
+        ArrayOfBytearrayRevision newR = new ArrayOfBytearrayRevision(statusNid, time,
+                authorNid, moduleNid, pathNid, this);
 
         addRevision(newR);
 

@@ -1232,4 +1232,9 @@ public class EditOnRootPath implements I_ConfigAceFrame {
     public void addConceptPanelPlugins(HOST_ENUM host, UUID id, I_PluginToConceptPanel plugin) {
         config.addConceptPanelPlugins(host, id, plugin);
     }
+
+    @Override
+    public void setModuleNid(int moduleNid) {
+        config.setModuleNid(moduleNid);
+    }
 }

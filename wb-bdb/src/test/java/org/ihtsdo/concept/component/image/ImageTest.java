@@ -17,6 +17,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.etypes.EConceptAttributes;
 import org.ihtsdo.etypes.EConceptAttributesRevision;
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision;
 import org.junit.After;
 import org.junit.Before;
@@ -43,6 +44,7 @@ public class ImageTest {
         eca1.setStatusUuid(UUID.randomUUID());
         eca1.setPathUuid(UUID.randomUUID());
         eca1.setAuthorUuid(UUID.randomUUID());
+        eca1.setModuleUuid(TkRevision.unspecifiedModuleUuid);
         eca1.setTime(System.currentTimeMillis());
         eca1.setDefined(true);
         
@@ -50,6 +52,7 @@ public class ImageTest {
         ecav.setDefined(false);
         ecav.setStatusUuid(eca1.getStatusUuid());
         ecav.setAuthorUuid(eca1.getAuthorUuid());
+        ecav.setModuleUuid(TkRevision.unspecifiedModuleUuid);
         ecav.setPathUuid(eca1.getPathUuid());
         ecav.setTime(eca1.getTime() + 10);
         eca1.revisions = new ArrayList<TkConceptAttributesRevision>(1);
@@ -61,6 +64,7 @@ public class ImageTest {
         eca2.primordialUuid = UUID.randomUUID();
         eca2.setStatusUuid(UUID.randomUUID());
         eca2.setAuthorUuid(UUID.randomUUID());
+        eca2.setModuleUuid(TkRevision.unspecifiedModuleUuid);
         eca2.setPathUuid(UUID.randomUUID());
         eca2.setDefined(false);
         eca2.setTime(eca1.getTime());

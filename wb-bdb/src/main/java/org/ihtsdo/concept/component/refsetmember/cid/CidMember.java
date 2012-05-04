@@ -41,6 +41,7 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 
 import java.util.*;
+import org.dwfa.ace.api.Terms;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 import org.ihtsdo.tk.dto.RevisionHandling;
@@ -117,31 +118,23 @@ public class CidMember extends RefsetMember<CidRevision, CidMember>
 
    @Override
    public CidRevision makeAnalog() {
-      CidRevision newR = new CidRevision(getStatusNid(), getPathNid(), getTime(), this);
+      CidRevision newR = new CidRevision(getStatusNid(), getTime(),
+              getAuthorNid(), getModuleNid(), getPathNid(), this);
 
       return newR;
    }
-
+   
    @Override
-   public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-      CidRevision newR = new CidRevision(statusNid, pathNid, time, this);
-
+   public CidRevision makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
+      CidRevision newR = new CidRevision(statusNid, time,
+              authorNid, moduleNid, pathNid, this);
       addRevision(newR);
 
       return newR;
    }
 
    @Override
-   public CidRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-      CidRevision newR = new CidRevision(statusNid, authorNid, pathNid, time, this);
-
-      addRevision(newR);
-
-      return newR;
-   }
-
-   @Override
-   public I_ExtendByRefPart<CidRevision> makePromotionPart(PathBI promotionPath) {
+   public I_ExtendByRefPart<CidRevision> makePromotionPart(PathBI promotionPath, int authorNid) {
       throw new UnsupportedOperationException();
    }
 

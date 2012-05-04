@@ -78,9 +78,10 @@ public class MoveRelAction extends AbstractAction {
                 for (PathBI ep : config.getEditingPathSet()) {
                     componentVersion.makeAnalog(
                             SnomedMetadataRfx.getSTATUS_RETIRED_NID(),
-                            config.getDbConfig().getUserConcept().getNid(),
-                            ep.getConceptNid(),
-                            Long.MAX_VALUE);
+                            Long.MAX_VALUE,
+                            config.getEditCoordinate().getAuthorNid(),
+                            config.getEditCoordinate().getModuleNid(), 
+                            ep.getConceptNid());
                 }
                 I_GetConceptData retireConcept = Terms.get().getConceptForNid(componentVersion.getNid());
                 Terms.get().addUncommitted(retireConcept);

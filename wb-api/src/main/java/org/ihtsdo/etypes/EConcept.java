@@ -57,6 +57,7 @@ import java.util.UUID;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_array_of_bytearray.RefexArrayOfBytearrayVersionBI;
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.tk.dto.concept.component.refset.array.bytearray.TkRefsetArrayOfBytearrayMember;
 
 public class EConcept extends TkConcept implements I_AmChangeSetObject {
@@ -133,6 +134,7 @@ public class EConcept extends TkConcept implements I_AmChangeSetObject {
       UUID currentUuid = ArchitectonicAuxiliary.Concept.CURRENT.getPrimoridalUid();
       UUID pathUuid    = ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getPrimoridalUid();
       UUID authorUuid    = ArchitectonicAuxiliary.Concept.USER.getPrimoridalUid();
+      UUID moduleUuid    = TkRevision.unspecifiedModuleUuid;
       long time        = System.currentTimeMillis();
 
       primordialUuid                   = cNoHx.getUids().iterator().next();
@@ -143,6 +145,7 @@ public class EConcept extends TkConcept implements I_AmChangeSetObject {
       conceptAttributes.authorUuid = authorUuid;
       conceptAttributes.setPathUuid(pathUuid);
       conceptAttributes.setTime(time);
+      conceptAttributes.moduleUuid = moduleUuid;
 
       if (cNoHx.getDescriptions() == null) {
          AceLog.getAppLog().warning("cNoHx has null descriptions: " + cNoHx);
@@ -159,6 +162,7 @@ public class EConcept extends TkConcept implements I_AmChangeSetObject {
             desc.primordialUuid = descNoHx.getUids().iterator().next();
             desc.statusUuid     = currentUuid;
             desc.authorUuid = authorUuid;
+            desc.moduleUuid = moduleUuid;
             desc.setPathUuid(pathUuid);
             desc.setTime(time);
             desc.conceptUuid            = conceptAttributes.primordialUuid;
@@ -181,6 +185,7 @@ public class EConcept extends TkConcept implements I_AmChangeSetObject {
             rel.primordialUuid = relNoHx.getUids().iterator().next();
             rel.statusUuid     = currentUuid;
             rel.authorUuid = authorUuid;
+            rel.moduleUuid = moduleUuid;
             rel.setPathUuid(pathUuid);
             rel.setTime(time);
             rel.c1Uuid             = conceptAttributes.primordialUuid;

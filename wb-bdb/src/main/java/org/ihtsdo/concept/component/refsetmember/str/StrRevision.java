@@ -59,23 +59,13 @@ public class StrRevision extends RefsetRevision<StrRevision, StrMember>
       stringValue = input.readString();
    }
 
-   public StrRevision(int statusNid, int pathNid, long time, StrMember another) {
-      super(statusNid, pathNid, time, another);
+   public StrRevision(int statusNid, long time, int authorNid, int moduleNid, int pathNid, StrMember another) {
+      super(statusNid, time, authorNid, moduleNid, pathNid, another);
       stringValue = another.getStringValue();
    }
 
-   protected StrRevision(int statusNid, int pathNid, long time, StrRevision another) {
-      super(statusNid, pathNid, time, another.primordialComponent);
-      stringValue = another.stringValue;
-   }
-
-   public StrRevision(int statusNid, int authorNid, int pathNid, long time, StrMember another) {
-      super(statusNid, authorNid, pathNid, time, another);
-      stringValue = another.getStringValue();
-   }
-
-   protected StrRevision(int statusNid, int authorNid, int pathNid, long time, StrRevision another) {
-      super(statusNid, authorNid, pathNid, time, another.primordialComponent);
+   protected StrRevision(int statusNid, long time, int authorNid, int moduleNid, int pathNid, StrRevision another) {
+      super(statusNid, time, authorNid, moduleNid, pathNid, another.primordialComponent);
       stringValue = another.stringValue;
    }
 
@@ -114,34 +104,20 @@ public class StrRevision extends RefsetRevision<StrRevision, StrMember>
 
    @Override
    public StrRevision makeAnalog() {
-      return new StrRevision(getStatusNid(), getPathNid(), getTime(), this);
+      return new StrRevision(getStatusNid(), getTime(), getAuthorNid(), getModuleNid(), getPathNid(), this);
    }
 
    @Override
-   public StrRevision makeAnalog(int statusNid, int pathNid, long time) {
-      if ((this.getTime() == time) && (this.getPathNid() == pathNid)) {
-         this.setStatusNid(statusNid);
-
-         return this;
-      }
-
-      StrRevision newR = new StrRevision(statusNid, pathNid, time, this);
-
-      primordialComponent.addRevision(newR);
-
-      return newR;
-   }
-
-   @Override
-   public StrRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+   public StrRevision makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
       if ((this.getTime() == time) && (this.getPathNid() == pathNid)) {
          this.setStatusNid(statusNid);
          this.setAuthorNid(authorNid);
+         this.setModuleNid(moduleNid);
 
          return this;
       }
 
-      StrRevision newR = new StrRevision(statusNid, authorNid, pathNid, time, this);
+      StrRevision newR = new StrRevision(statusNid, time, authorNid, moduleNid, pathNid, this);
 
       primordialComponent.addRevision(newR);
 
@@ -149,7 +125,7 @@ public class StrRevision extends RefsetRevision<StrRevision, StrMember>
    }
 
    @Override
-   public I_ExtendByRefPart<StrRevision> makePromotionPart(PathBI promotionPath) {
+   public I_ExtendByRefPart<StrRevision> makePromotionPart(PathBI promotionPath, int authorNid) {
 
       // TODO
       throw new UnsupportedOperationException();

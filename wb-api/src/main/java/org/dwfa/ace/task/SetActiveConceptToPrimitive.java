@@ -95,8 +95,10 @@ public class SetActiveConceptToPrimitive extends AbstractTask {
             // make analog
             for (PathBI ep : config.getEditingPathSet()) {
                AnalogBI newAnalog = cv.makeAnalog(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
-                                                  config.getDbConfig().getUserConcept().getNid(),
-                                                  ep.getConceptNid(), Long.MAX_VALUE);
+                       Long.MAX_VALUE,
+                       config.getEditCoordinate().getAuthorNid(),
+                       config.getEditCoordinate().getModuleNid(),
+                       ep.getConceptNid());
                I_ConceptAttributePart newAnalogAttr = (I_ConceptAttributePart) newAnalog;
 
                newAnalogAttr.setDefined(false);

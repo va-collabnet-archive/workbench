@@ -38,13 +38,14 @@ public class ERefsetIntMember extends TkRefsetIntMember {
       int partCount = m.getMutableParts().size();
 
       refsetUuid    = Terms.get().nidToUuid(m.getRefsetId());
-      componentUuid = Terms.get().nidToUuid(m.getComponentId());
+      componentUuid = Terms.get().nidToUuid(m.getComponentNid());
 
       I_ExtendByRefPartInt part = (I_ExtendByRefPartInt) m.getMutableParts().get(0);
 
       intValue   = part.getIntValue();
-      pathUuid   = Terms.get().nidToUuid(part.getPathId());
-      statusUuid = Terms.get().nidToUuid(part.getStatusId());
+      pathUuid   = Terms.get().nidToUuid(part.getPathNid());
+      statusUuid = Terms.get().nidToUuid(part.getStatusNid());
+      moduleUuid    = Terms.get().nidToUuid(part.getModuleNid());
       time       = part.getTime();
 
       if (partCount > 1) {

@@ -86,9 +86,10 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
                         && Bdb.getSapDb().getPathNid(sapNid) != Integer.MIN_VALUE) {
                     
                     this.commitRecordSapNid = Bdb.getSapNid(statusNid,
+                            commitTime,
                             Bdb.getSapDb().getAuthorNid(sapNid),
-                            Bdb.getSapDb().getPathNid(sapNid),
-                            commitTime);
+                            Bdb.getSapDb().getModuleNid(sapNid),
+                            Bdb.getSapDb().getPathNid(sapNid));
                     break;
                 }
             }
@@ -102,10 +103,11 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
                         && Bdb.getSapDb().getPathNid(sapNid) != Integer.MIN_VALUE) {
                     int authorNid = Bdb.getSapDb().getAuthorNid(sapNid);
                     int pathNid = Bdb.getSapDb().getPathNid(sapNid);
+                    int moduleNid = Bdb.getSapDb().getModuleNid(sapNid);
                     if (authorNid == 0 || pathNid == 0) {
                         System.out.println("Bad SAP: " + sapNid + " author:" + authorNid + " path: " + pathNid);
                     }
-                    this.adjudicationRecordSapNid = Bdb.getSapNid(statusNid, authorNid, pathNid, commitTime);
+                    this.adjudicationRecordSapNid = Bdb.getSapNid(statusNid, commitTime, authorNid, moduleNid, pathNid);
                     break;
                 }
             }

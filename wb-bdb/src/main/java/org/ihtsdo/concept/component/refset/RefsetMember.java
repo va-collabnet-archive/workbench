@@ -184,8 +184,8 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
     public abstract R makeAnalog();
 
     @SuppressWarnings("unchecked")
-    public I_ExtendByRefPart<R> makePromotionPart(PathBI promotionPath) {
-        return (I_ExtendByRefPart<R>) makeAnalog(getStatusNid(), promotionPath.getConceptNid(), Long.MAX_VALUE);
+    public I_ExtendByRefPart<R> makePromotionPart(PathBI promotionPath, int authorNid) {
+        return (I_ExtendByRefPart<R>) makeAnalog(getStatusNid(), Long.MAX_VALUE, authorNid, this.getModuleNid(), promotionPath.getConceptNid());
     }
 
     protected abstract boolean refexFieldsEqual(ConceptComponent<R, C> obj);
@@ -240,7 +240,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
 
     @Override
     public boolean promote(PositionBI viewPosition, PathSetReadOnly pomotionPaths, NidSetBI allowedStatus,
-            Precedence precedence)
+            Precedence precedence, int authorNid)
             throws IOException, TerminologyException {
         int viewPathId = viewPosition.getPath().getConceptNid();
         Collection<Version> matchingTuples = getVersionComputer().getSpecifiedVersions(allowedStatus,
@@ -250,8 +250,11 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
         for (PathBI promotionPath : pomotionPaths) {
             for (Version v : matchingTuples) {
                 if (v.getPathNid() == viewPathId) {
-                    RefsetRevision<?, ?> revision = v.makeAnalog(v.getStatusNid(), promotionPath.getConceptNid(),
-                            Long.MAX_VALUE);
+                    RefsetRevision<?, ?> revision = v.makeAnalog(v.getStatusNid(),
+                            Long.MAX_VALUE,
+                            authorNid,
+                            v.getModuleNid(),
+                            promotionPath.getConceptNid());
 
                     addVersion(revision);
                     promotedAnything = true;
@@ -681,20 +684,14 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
 
             return (R) RefsetMember.this.makeAnalog();
         }
-
+        
         @Override
-        @Deprecated
-        public RefsetRevision<?, ?> makeAnalog(int statusNid, int pathNid, long time) {
-            return getCv().makeAnalog(statusNid, getAuthorNid(), pathNid, time);
+        public R makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
+            return getCv().makeAnalog(statusNid, time, authorNid, moduleNid, pathNid);
         }
 
         @Override
-        public R makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-            return getCv().makeAnalog(statusNid, authorNid, pathNid, time);
-        }
-
-        @Override
-        public I_ExtendByRefPart<R> makePromotionPart(PathBI promotionPath) {
+        public I_ExtendByRefPart<R> makePromotionPart(PathBI promotionPath, int authorNid) {
             throw new UnsupportedOperationException();
         }
 

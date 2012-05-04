@@ -1,7 +1,7 @@
 package org.ihtsdo.concept.component.identifier;
 
 //~--- non-JDK imports --------------------------------------------------------
-
+      
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
@@ -14,6 +14,7 @@ import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierUuid;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.util.UUID;
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 public class IdentifierVersionUuid extends IdentifierVersion implements UuidIdBI {
    private long lsb;
@@ -31,19 +32,19 @@ public class IdentifierVersionUuid extends IdentifierVersion implements UuidIdBI
       lsb = idv.getDenotation().getLeastSignificantBits();
    }
 
-   public IdentifierVersionUuid(TupleInput input) {
+   public IdentifierVersionUuid(TupleInput input) { 
       super(input);
       msb = input.readLong();
       lsb = input.readLong();
    }
 
-   public IdentifierVersionUuid(int statusNid, int authorNid, int pathNid, long time) {
-      super(statusNid, authorNid, pathNid, time);
+   public IdentifierVersionUuid(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
+      super(statusNid, time, authorNid, moduleNid, pathNid);
    }
 
-   public IdentifierVersionUuid(IdentifierVersionUuid another, int statusNid, int authorNid, int pathNid,
-                                long time) {
-      super(statusNid, authorNid, pathNid, time);
+   public IdentifierVersionUuid(IdentifierVersionUuid another, int statusNid, long time, int authorNid,
+           int moduleNid, int pathNid) {
+      super(statusNid, time, authorNid, moduleNid, pathNid);
       msb = another.msb;
       lsb = another.lsb;
    }
@@ -75,8 +76,8 @@ public class IdentifierVersionUuid extends IdentifierVersion implements UuidIdBI
    }
 
    @Override
-   public I_IdPart makeIdAnalog(int statusNid, int authorNid, int pathNid, long time) {
-      return new IdentifierVersionUuid(this, statusNid, authorNid, pathNid, time);
+   public I_IdPart makeIdAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
+      return new IdentifierVersionUuid(this, statusNid, time, authorNid, moduleNid, pathNid);
    }
 
    @Override

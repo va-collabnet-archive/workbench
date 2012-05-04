@@ -24,9 +24,10 @@ public class ERefsetCidStrRevision extends TkRefsetCidStrRevision {
    public ERefsetCidStrRevision(I_ExtendByRefPartCidString part) throws IOException {
       c1Uuid     = Terms.get().nidToUuid(part.getC1id());
       strValue   = part.getStringValue();
-      pathUuid   = Terms.get().nidToUuid(part.getPathId());
-      statusUuid = Terms.get().nidToUuid(part.getStatusId());
+      pathUuid   = Terms.get().nidToUuid(part.getPathNid());
+      statusUuid = Terms.get().nidToUuid(part.getStatusNid());
       authorUuid    = Terms.get().nidToUuid(part.getAuthorNid());
+      moduleUuid    = Terms.get().nidToUuid(part.getModuleNid());
       time       = part.getTime();
    }
 

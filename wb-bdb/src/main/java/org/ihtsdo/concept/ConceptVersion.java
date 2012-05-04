@@ -1041,6 +1041,15 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
             throw new RuntimeException(e);
         }
     }
+    
+    @Override
+    public int getModuleNid() {
+         try {
+            return getConAttrs().getModuleNid();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Override
     public Collection<? extends DescriptionVersionBI> getSynonyms() throws IOException {

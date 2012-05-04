@@ -46,6 +46,7 @@ import java.util.*;
 import org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.MediaCAB;
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 public class Image extends ConceptComponent<ImageRevision, Image>
         implements I_ImageVersioned<ImageRevision>, I_ImagePart<ImageRevision>, MediaAnalogBI<ImageRevision> {
@@ -175,22 +176,12 @@ public class Image extends ConceptComponent<ImageRevision, Image>
     public int hashCode() {
         return Hashcode.compute(new int[]{this.getNid()});
     }
-
+    
     @Override
-    public ImageRevision makeAnalog(int statusNid, int pathNid, long time) {
+    public ImageRevision makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
         ImageRevision newR;
 
-        newR = new ImageRevision(this, statusNid, Terms.get().getAuthorNid(), pathNid, time, this);
-        addRevision(newR);
-
-        return newR;
-    }
-
-    @Override
-    public ImageRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-        ImageRevision newR;
-
-        newR = new ImageRevision(this, statusNid, authorNid, pathNid, time, this);
+        newR = new ImageRevision(this, statusNid, time, authorNid, moduleNid, pathNid, this);
         addRevision(newR);
 
         return newR;
@@ -198,7 +189,7 @@ public class Image extends ConceptComponent<ImageRevision, Image>
 
     @Override
     public boolean promote(PositionBI viewPosition, PathSetReadOnly pomotionPaths, NidSetBI allowedStatus,
-            Precedence precedence) {
+            Precedence precedence, int authorNid) {
         int viewPathId = viewPosition.getPath().getConceptNid();
         List<Version> matchingTuples = new ArrayList<Version>();
 
@@ -211,7 +202,10 @@ public class Image extends ConceptComponent<ImageRevision, Image>
             for (Version it : matchingTuples) {
                 if (it.getPathNid() == viewPathId) {
                     ImageRevision promotionPart = (ImageRevision) it.makeAnalog(it.getStatusNid(),
-                            promotionPath.getConceptNid(), Long.MAX_VALUE);
+                            Long.MAX_VALUE,
+                            authorNid,
+                            it.getModuleNid(),
+                            promotionPath.getConceptNid());
 
                     it.getVersioned().addVersion(promotionPart);
                     promotedAnything = true;
@@ -622,15 +616,10 @@ public class Image extends ConceptComponent<ImageRevision, Image>
 
             return new ImageRevision(Image.this);
         }
-
+        
         @Override
-        public ImageRevision makeAnalog(int statusNid, int pathNid, long time) {
-            return (ImageRevision) getCv().makeAnalog(statusNid, Terms.get().getAuthorNid(), pathNid, time);
-        }
-
-        @Override
-        public ImageRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-            return (ImageRevision) getCv().makeAnalog(statusNid, authorNid, pathNid, time);
+        public ImageRevision makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
+            return (ImageRevision) getCv().makeAnalog(statusNid, time, authorNid, moduleNid, pathNid);
         }
 
         @Override

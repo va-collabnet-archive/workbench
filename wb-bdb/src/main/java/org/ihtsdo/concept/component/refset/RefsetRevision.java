@@ -39,20 +39,16 @@ public abstract class RefsetRevision<V extends RefsetRevision<V, C>, C extends R
     }
 
     public RefsetRevision(TkRevision eVersion, C member) {
-        super(Bdb.uuidToNid(eVersion.getStatusUuid()), Bdb.uuidToNid(eVersion.getAuthorUuid()),
-                Bdb.uuidToNid(eVersion.getPathUuid()), eVersion.getTime(), member);
+        super(Bdb.uuidToNid(eVersion.getStatusUuid()), eVersion.getTime(), Bdb.uuidToNid(eVersion.getAuthorUuid()),
+                 Bdb.uuidToNid(eVersion.getModuleUuid()), Bdb.uuidToNid(eVersion.getPathUuid()),  member);
     }
 
     public RefsetRevision(TupleInput input, C primordialComponent) {
         super(input, primordialComponent);
     }
 
-    public RefsetRevision(int statusNid, int pathNid, long time, C primordialComponent) {
-        super(statusNid, Terms.get().getAuthorNid(), pathNid, time, primordialComponent);
-    }
-
-    public RefsetRevision(int statusNid, int authorNid, int pathNid, long time, C primordialComponent) {
-        super(statusNid, authorNid, pathNid, time, primordialComponent);
+    public RefsetRevision(int statusNid, long time, int authorNid, int moduleNid, int pathNid, C primordialComponent) {
+        super(statusNid, time, authorNid, moduleNid, pathNid, primordialComponent);
     }
 
     //~--- methods -------------------------------------------------------------

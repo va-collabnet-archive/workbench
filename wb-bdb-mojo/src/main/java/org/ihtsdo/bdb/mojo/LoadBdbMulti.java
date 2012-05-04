@@ -72,6 +72,7 @@ import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.example.binding.CaseSensitive;
 import org.ihtsdo.tk.spec.ConceptSpec;
@@ -324,7 +325,9 @@ public class LoadBdbMulti extends AbstractMojo {
 
                     int authorNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.USER.getUids());
                     int pathNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
-                    EditCoordinate ec = new EditCoordinate(authorNid, pathNid);
+                    EditCoordinate ec = new EditCoordinate(authorNid,
+                            Ts.get().getNidForUuids(TkRevision.unspecifiedModuleUuid),
+                            pathNid);
 
                     RefsetMemberFactory.createNoTx(newPathSpec, ec, startTime);
                     RefsetMemberFactory.createNoTx(newOriginSpec, ec, startTime);
@@ -453,7 +456,9 @@ public class LoadBdbMulti extends AbstractMojo {
 
             int authorNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.USER.getUids());
             int pathNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
-            EditCoordinate ec = new EditCoordinate(authorNid, pathNid);
+            EditCoordinate ec = new EditCoordinate(authorNid,
+                    Ts.get().getNidForUuids(TkRevision.unspecifiedModuleUuid),
+                    pathNid);
             TerminologyBuilderBI amender = Ts.get().getTerminologyBuilder(ec, config.getViewCoordinate());
 
             for (File df : dialectFiles) {
@@ -546,7 +551,9 @@ public class LoadBdbMulti extends AbstractMojo {
 
             int authorNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.USER.getUids());
             int pathNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
-            EditCoordinate ec = new EditCoordinate(authorNid, pathNid);
+            EditCoordinate ec = new EditCoordinate(authorNid,
+                    Ts.get().getNidForUuids(TkRevision.unspecifiedModuleUuid),
+                    pathNid);
             TerminologyBuilderBI amender = Ts.get().getTerminologyBuilder(ec, config.getViewCoordinate());
 
             for (File cf : caseFiles) {
@@ -634,7 +641,9 @@ public class LoadBdbMulti extends AbstractMojo {
                     UUID parentUuid = UUID.fromString(parent);
                     UUID pathUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, path);
 
-                    EditCoordinate ec = new EditCoordinate(authorNid, store.getNidForUuids(pathUuid));
+                    EditCoordinate ec = new EditCoordinate(authorNid,
+                            Snomed.CORE_MODULE.getLenient().getNid(),
+                            store.getNidForUuids(pathUuid));
                     TerminologyBuilderBI builder = store.getTerminologyBuilder(ec, Ts.get().getMetadataVC());
 
                     ConceptCB conceptBp = new ConceptCB(fsn,

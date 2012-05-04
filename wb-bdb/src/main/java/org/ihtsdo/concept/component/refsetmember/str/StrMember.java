@@ -112,23 +112,14 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
 
    @Override
    public StrRevision makeAnalog() {
-      StrRevision newR = new StrRevision(getStatusNid(), getPathNid(), getTime(), this);
+      StrRevision newR = new StrRevision(getStatusNid(), getTime(), getAuthorNid(), getModuleNid(), getPathNid(),  this);
 
       return newR;
    }
 
    @Override
-   public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-      StrRevision newR = new StrRevision(statusNid, pathNid, time, this);
-
-      addRevision(newR);
-
-      return newR;
-   }
-
-   @Override
-   public StrRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-      StrRevision newR = new StrRevision(statusNid, authorNid, pathNid, time, this);
+   public StrRevision makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
+      StrRevision newR = new StrRevision(statusNid, time, authorNid, moduleNid, pathNid, this);
 
       addRevision(newR);
 

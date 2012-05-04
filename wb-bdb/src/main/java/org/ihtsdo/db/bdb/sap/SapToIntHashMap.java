@@ -58,16 +58,16 @@ public class SapToIntHashMap {
 
    //~--- methods -------------------------------------------------------------
 
-   public boolean containsKey(int statusNid, int authorNid, int pathNid, long time) {
-      return map.containsKey(new StatusAuthorPosition(statusNid, authorNid, pathNid, time));
+   public boolean containsKey(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
+      return map.containsKey(new StatusAuthorPosition(statusNid, time, authorNid, moduleNid, pathNid));
    }
 
    public boolean put(StatusAuthorPosition tsp, int statusAtPositionNid) {
       return map.put(tsp, statusAtPositionNid) == null;
    }
 
-   public boolean put(int statusNid, int authorNid, int pathNid, long time, int statusAtPositionNid) {
-      return put(new StatusAuthorPosition(statusNid, authorNid, pathNid, time), statusAtPositionNid);
+   public boolean put(int statusNid, long time, int authorNid, int moduleNid, int pathNid, int statusAtPositionNid) {
+      return put(new StatusAuthorPosition(statusNid, time, authorNid, moduleNid, pathNid), statusAtPositionNid);
    }
 
    private void setup(int initialCapacity) {
@@ -84,7 +84,7 @@ public class SapToIntHashMap {
       return map.get(tsp);
    }
 
-   public int get(int statusNid, int authorNid, int pathNid, long time) {
-      return map.get(new StatusAuthorPosition(statusNid, authorNid, pathNid, time));
+   public int get(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
+      return map.get(new StatusAuthorPosition(statusNid, time, authorNid, moduleNid, pathNid));
    }
 }

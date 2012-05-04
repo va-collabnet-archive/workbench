@@ -61,7 +61,7 @@ import org.ihtsdo.tk.dto.concept.component.refset.array.bytearray.TkRefsetArrayO
 public class TkConcept {
 
     public static final String PADDING = "     ";
-    public static final int dataVersion = 7;
+    public static final int dataVersion = 8;
     public static final long serialVersionUID = 1;
     //~--- fields --------------------------------------------------------------
     public boolean annotationStyleRefex = false;

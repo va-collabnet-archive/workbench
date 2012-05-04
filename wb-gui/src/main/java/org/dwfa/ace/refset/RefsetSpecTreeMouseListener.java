@@ -543,7 +543,10 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
             I_ExtendByRefPart currentPart = currentExtVersion.getMutablePart();
             I_ExtendByRefPart newPart =
                     (I_ExtendByRefPart) currentPart.makeAnalog(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
-                        currentPart.getPathNid(), Long.MAX_VALUE);
+                        Long.MAX_VALUE,
+                        aceConfig.getEditCoordinate().getAuthorNid(),
+                        aceConfig.getEditCoordinate().getModuleNid(),
+                        currentPart.getPathNid());
             currentExtVersion.getCore().addVersion(newPart);
 
             I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
@@ -693,7 +696,11 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
 
             I_ExtendByRefPart current = thinExtByRefTuple.getMutablePart();
             I_ExtendByRefPart newPart =
-                    (I_ExtendByRefPart) current.makeAnalog(current.getStatusNid(), current.getPathNid(), Long.MAX_VALUE);
+                    (I_ExtendByRefPart) current.makeAnalog(current.getStatusNid(),
+                        Long.MAX_VALUE,
+                        aceConfig.getEditCoordinate().getAuthorNid(),
+                        aceConfig.getEditCoordinate().getModuleNid(),
+                        current.getPathNid());
 
             thinExtByRefTuple.getCore().addVersion(newPart);
             Terms.get().addUncommitted(thinExtByRefTuple.getCore());

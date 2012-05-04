@@ -151,11 +151,8 @@ public class LastCommitWinsConflictResolutionStrategy extends ContradictionManag
 
     /**
      * Determines if a conflict exists in the list of versions passed to this
-     * method. A conflict is determined to exist if more than one part has the
-     * same version (commit time) yet differs in data (other than pathid) and
-     * true will be returned. If the part/s with the most recent version (commit
-     * time) have the same data aside from their path (or there is only one part
-     * with the greatest version) then false will be returned.
+     * method. A conflict is determined to exist if more than one version is returned
+     * from the version computer.
      * 
      * @param <T>
      *            type of data in the list - extension of I_AmPart
@@ -167,37 +164,7 @@ public class LastCommitWinsConflictResolutionStrategy extends ContradictionManag
         if (versions.size() < 2) {
             return false;
         }
-
-        List<T> copy = getSortedPartsCopy(versions);
-
-        Iterator<T> copyIterator = copy.iterator();
-        I_AmPart firstPart = copyIterator.next();
-
-        I_AmPart firstPartDuplicate = (I_AmPart) firstPart.makeAnalog(firstPart.getStatusNid(), 0, Long.MAX_VALUE);
- 
-
-        while (copyIterator.hasNext()) {
-            T amPart = (T) copyIterator.next();
-            if (amPart.getTime() == firstPart.getTime()) {
-                I_AmPart amPartDuplicate = (I_AmPart) amPart.makeAnalog(amPart.getStatusNid(), 0, Long.MAX_VALUE);
-
-
-                if (amPartDuplicate.equals(firstPartDuplicate)) {
-                    continue; // identical, no conflict with this one, check for
-                    // more
-                } else {
-                    return true; // version the same but different data -
-                    // conflict
-                }
-            } else {
-                return false; // different version, no conflict
-            }
-        }
-
-        // this means that all parts had the same version, but also the same
-        // data
-        // no conflict
-        return false;
+        return true;
     }
 
     private <T extends I_AmPart> List<T> getSortedPartsCopy(List<T> versions) {
@@ -207,23 +174,26 @@ public class LastCommitWinsConflictResolutionStrategy extends ContradictionManag
         return copy;
     }
 
+    @Override
     public <T extends I_AmTuple> List<T> resolveTuples(List<T> tuples) {
-        if (tuples == null || tuples.size() == 0) {
+        if (tuples == null || tuples.isEmpty()) {
             return tuples;
         }
 
         return getLatestTuples(tuples);
     }
+    @Override
     public <T extends ComponentVersionBI> List<T> resolveVersions(List<T> tuples) {
-        if (tuples == null || tuples.size() == 0) {
+        if (tuples == null || tuples.isEmpty()) {
             return tuples;
         }
 
         return getLatestVersions(tuples);
     }
 
+    @Override
     public <T extends I_AmPart> List<T> resolveParts(List<T> parts) {
-        if (parts == null || parts.size() == 0) {
+        if (parts == null || parts.isEmpty()) {
             return parts;
         }
 

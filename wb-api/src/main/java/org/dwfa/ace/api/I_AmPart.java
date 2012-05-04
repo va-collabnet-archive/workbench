@@ -36,7 +36,11 @@ public interface I_AmPart<T extends AnalogBI> extends ComponentVersionBI,
     @Override
 	public int getPathNid();
 	public void setPathNid(int pathNid) throws PropertyVetoException;
-
+    
+    @Override
+	public int getModuleNid();
+	public void setModuleNid(int moduleNid) throws PropertyVetoException;
+        
     @Override
 	public long getTime();
 	public void setTime(long time) throws PropertyVetoException;
@@ -47,15 +51,13 @@ public interface I_AmPart<T extends AnalogBI> extends ComponentVersionBI,
 	 * 1. Analog, an object, concept or situation which in some way resembles a different situation
 	 * 2. Analogy, in language, a comparison between concepts
 	 * @param statusNid
-	 * @param pathNid
-	 * @param time
-	 * @return
+         * @param time
+         * @param author
+         * @param module
+         * @param pathNid
 	 */
-      @Deprecated
-	public Object makeAnalog(int statusNid, int pathNid, long time);
-
     @Override
-	public T makeAnalog(int statusNid, int authorNid, int pathNid, long time);
+	public T makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid);
 	
 	@Deprecated
 	public int getPathId();

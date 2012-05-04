@@ -1272,4 +1272,9 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
     public void setWorkflowStates(TreeSet<? extends ConceptVersionBI> states) {
         config.setWorkflowStates(states);
     }
+
+    @Override
+    public void setModuleNid(int moduleNid) {
+        config.setModuleNid(moduleNid);
+    }
 }

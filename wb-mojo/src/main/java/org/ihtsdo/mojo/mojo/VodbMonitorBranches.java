@@ -248,17 +248,29 @@ public class VodbMonitorBranches extends AbstractMojo {
                 agreedChanges++;
                 // copy latest attributes to new path/version
                 for (I_ConceptAttributeTuple tuple : allConceptAttributeTuples) {
-                    I_ConceptAttributePart newPart = (I_ConceptAttributePart) tuple.makeAnalog(updatedStatusId, copyToPath.getConceptNid(), Long.MAX_VALUE);
+                    I_ConceptAttributePart newPart = (I_ConceptAttributePart) tuple.makeAnalog(updatedStatusId,
+                            Long.MAX_VALUE,
+                            config.getEditCoordinate().getAuthorNid(),
+                            config.getEditCoordinate().getModuleNid(),
+                            copyToPath.getConceptNid());
                     tuple.getConVersioned().addVersion(newPart);
                 }
                 // copy latest descriptions to new path/version
                 for (I_DescriptionTuple tuple : allDescriptionTuples) {
-                    I_DescriptionPart newPart = (I_DescriptionPart) tuple.makeAnalog(updatedStatusId, copyToPath.getConceptNid(), Long.MAX_VALUE);
+                    I_DescriptionPart newPart = (I_DescriptionPart) tuple.makeAnalog(updatedStatusId,
+                            Long.MAX_VALUE,
+                            config.getEditCoordinate().getAuthorNid(),
+                            config.getEditCoordinate().getModuleNid(),
+                            copyToPath.getConceptNid());
                     tuple.getDescVersioned().addVersion(newPart);
                 }
                 // copy latest relationships to new path/version
                 for (I_RelTuple tuple : allRelationshipTuples) {
-                    I_RelPart newPart = (I_RelPart) tuple.makeAnalog(updatedStatusId, copyToPath.getConceptNid(), Long.MAX_VALUE);
+                    I_RelPart newPart = (I_RelPart) tuple.makeAnalog(updatedStatusId,
+                            Long.MAX_VALUE,
+                            config.getEditCoordinate().getAuthorNid(),
+                            config.getEditCoordinate().getModuleNid(),
+                            copyToPath.getConceptNid());
                     tuple.getRelVersioned().addVersion(newPart);
                 }
             } else {

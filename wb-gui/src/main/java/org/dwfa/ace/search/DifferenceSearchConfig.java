@@ -1281,4 +1281,9 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
 	public void setAllAvailableWorkflowActionUids(List<UUID> actions) {
 		frameConfig.setAllAvailableWorkflowActionUids(actions);
 	}
+
+    @Override
+    public void setModuleNid(int moduleNid) {
+        frameConfig.setModuleNid(moduleNid);
+    }
 }

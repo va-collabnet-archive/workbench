@@ -51,6 +51,7 @@ import java.util.*;
 import org.ihtsdo.tk.api.blueprint.ConAttrAB;
 import org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevision, ConceptAttributes>
         implements I_ConceptAttributeVersioned<ConceptAttributesRevision>,
@@ -180,22 +181,12 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
     public int hashCode() {
         return Hashcode.compute(new int[]{nid});
     }
-
+    
     @Override
-    public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+    public ConceptAttributesRevision makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
         ConceptAttributesRevision newR;
 
-        newR = new ConceptAttributesRevision(this, statusNid, Terms.get().getAuthorNid(), pathNid, time, this);
-        addRevision(newR);
-
-        return newR;
-    }
-
-    @Override
-    public ConceptAttributesRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-        ConceptAttributesRevision newR;
-
-        newR = new ConceptAttributesRevision(this, statusNid, authorNid, pathNid, time, this);
+        newR = new ConceptAttributesRevision(this, statusNid, time, authorNid, pathNid, moduleNid, this);
         addRevision(newR);
 
         return newR;
@@ -203,7 +194,7 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
 
     @Override
     public boolean promote(PositionBI viewPosition, PathSetReadOnly promotionPaths, NidSetBI allowedStatus,
-            Precedence precedence) {
+            Precedence precedence, int authorNid) {
         int viewPathId = viewPosition.getPath().getConceptNid();
         boolean promotedAnything = false;
 
@@ -211,7 +202,10 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
             for (Version version : getTuples(allowedStatus, viewPosition, precedence, null)) {
                 if (version.getPathNid() == viewPathId) {
                     ConceptAttributesRevision promotionPart = version.makeAnalog(version.getStatusNid(),
-                            promotionPath.getConceptNid(), Long.MAX_VALUE);
+                            Long.MAX_VALUE,
+                            authorNid,
+                            version.getModuleNid(),
+                            promotionPath.getConceptNid());
 
                     addRevision(promotionPart);
                     promotedAnything = true;
@@ -575,14 +569,8 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
         }
 
         @Override
-        @Deprecated
-        public ConceptAttributesRevision makeAnalog(int statusNid, int pathNid, long time) {
-            return getCv().makeAnalog(statusNid, Terms.get().getAuthorNid(), pathNid, time);
-        }
-
-        @Override
-        public ConceptAttributesRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-            return getCv().makeAnalog(statusNid, authorNid, pathNid, time);
+        public ConceptAttributesRevision makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
+            return getCv().makeAnalog(statusNid, time, authorNid, moduleNid, pathNid);
         }
 
         @Override

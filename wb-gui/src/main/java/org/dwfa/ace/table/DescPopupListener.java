@@ -202,8 +202,10 @@ public class DescPopupListener extends MouseAdapter {
          for (PathBI p : config.getEditingPathSet()) {
             I_DescriptionPart current = (I_DescriptionPart) selectedObject.getTuple().getMutablePart();
             I_DescriptionPart newPart = (I_DescriptionPart) current.makeAnalog(current.getStatusId(),
-                                           config.getDbConfig().getUserConcept().getNid(), p.getConceptNid(),
-                                           Long.MAX_VALUE);
+                    Long.MAX_VALUE,
+                    config.getEditCoordinate().getAuthorNid(),
+                    config.getEditCoordinate().getModuleNid(),
+                    p.getConceptNid());
 
             selectedObject.getTuple().getDescVersioned().addVersion(newPart);
          }
@@ -243,7 +245,10 @@ public class DescPopupListener extends MouseAdapter {
                      (I_DescriptionPart) selectedObject.getTuple().getMutablePart();
 
                   newPart = (I_DescriptionPart) currentPart.makeAnalog(nid,
-                          config.getDbConfig().getUserConcept().getNid(), p.getConceptNid(), Long.MAX_VALUE);
+                            Long.MAX_VALUE,
+                            config.getEditCoordinate().getAuthorNid(),
+                            config.getEditCoordinate().getModuleNid(),
+                            p.getConceptNid());
                   selectedObject.getTuple().getDescVersioned().addVersion(newPart);
                }
 

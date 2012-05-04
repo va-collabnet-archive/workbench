@@ -70,11 +70,13 @@ public abstract class RefsetUtilities extends LineageHelper implements
     public RefsetUtilities(I_ConfigAceFrame config) throws ValidationException, IOException {
         super(config);
         setup();
+        this.config = config;
     }
 
     public RefsetUtilities(I_ConfigAceFrame config, I_IntSet isARelTypes) throws ValidationException, IOException {
         super(config, isARelTypes);
         setup();
+        this.config = config;
     }
 
     private void setup() throws ValidationException, IOException {
@@ -361,7 +363,10 @@ public abstract class RefsetUtilities extends LineageHelper implements
             I_ExtendByRefPart latestVersion = getLatestVersion(extensionPart);
 
             I_ExtendByRefPart clone = (I_ExtendByRefPart) latestVersion.makeAnalog(SnomedMetadataRfx.getSTATUS_RETIRED_NID(),
-                    latestVersion.getPathNid(), Long.MAX_VALUE);
+                    Long.MAX_VALUE,
+                    config.getEditCoordinate().getAuthorNid(),
+                    config.getEditCoordinate().getModuleNid(),
+                    latestVersion.getPathNid());
             extensionPart.addVersion(clone);
 
             if (isAutocommitActive()) {
@@ -418,7 +423,10 @@ public abstract class RefsetUtilities extends LineageHelper implements
         if (ext != null) {
             I_ExtendByRefPart clone = (I_ExtendByRefPart) getLatestVersion(
                     ext).makeAnalog(SnomedMetadataRfx.getSTATUS_CURRENT_NID(),
-                    pathConcept.getConceptNid(), Long.MAX_VALUE);
+                    Long.MAX_VALUE,
+                    config.getEditCoordinate().getAuthorNid(),
+                    config.getEditCoordinate().getModuleNid(),
+                    pathConcept.getConceptNid());
             I_ExtendByRefPartCid conceptClone = (I_ExtendByRefPartCid) clone;
             conceptClone.setC1id(getMembershipType(includeTypeConceptId));
             ext.addVersion(conceptClone);
@@ -452,7 +460,10 @@ public abstract class RefsetUtilities extends LineageHelper implements
         if (ext != null) {
             I_ExtendByRefPart clone = (I_ExtendByRefPart) getLatestVersion(
                     ext).makeAnalog(SnomedMetadataRfx.getSTATUS_CURRENT_NID(),
-                    pathConcept.getConceptNid(), Long.MAX_VALUE);
+                    Long.MAX_VALUE,
+                    config.getEditCoordinate().getAuthorNid(),
+                    config.getEditCoordinate().getModuleNid(),
+                    pathConcept.getConceptNid());
             I_ExtendByRefPartCid conceptClone = (I_ExtendByRefPartCid) clone;
             conceptClone.setC1id(parentMarker);
             ext.addVersion(conceptClone);

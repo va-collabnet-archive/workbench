@@ -9,14 +9,16 @@ public class UncommittedStatusForPath {
    public int authorNid;
    public int pathNid;
    public int statusNid;
+   public int moduleNid;
 
    //~--- constructors --------------------------------------------------------
 
-   public UncommittedStatusForPath(int statusNid, int authorNid, int pathNid) {
+   public UncommittedStatusForPath(int statusNid, int authorNid, int pathNid, int moduleNid) {
       super();
       this.statusNid = statusNid;
       this.authorNid = authorNid;
       this.pathNid   = pathNid;
+      this.moduleNid = moduleNid;
    }
 
    //~--- methods -------------------------------------------------------------
@@ -26,7 +28,8 @@ public class UncommittedStatusForPath {
       if (obj instanceof UncommittedStatusForPath) {
          UncommittedStatusForPath other = (UncommittedStatusForPath) obj;
 
-         if ((statusNid == other.statusNid) && (authorNid == other.authorNid) && (pathNid == other.pathNid)) {
+         if ((statusNid == other.statusNid) && (authorNid == other.authorNid) 
+                 && (pathNid == other.pathNid) && (moduleNid == other.moduleNid)) {
             return true;
          }
       }
@@ -37,7 +40,7 @@ public class UncommittedStatusForPath {
    @Override
    public int hashCode() {
       if (hashCode == Integer.MAX_VALUE) {
-         hashCode = Hashcode.compute(new int[] { statusNid, authorNid, pathNid });
+         hashCode = Hashcode.compute(new int[] { statusNid, authorNid, pathNid, moduleNid });
       }
 
       return hashCode;

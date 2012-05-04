@@ -213,6 +213,7 @@ public class CidFloatToCidIntegerTransformer extends AbstractTransformer {
 		cidIntMember.setAdditionalIdComponents(extension.getAdditionalIdComponents());
 		cidIntMember.setAnnotations(extension.getAnnotations());
 		cidIntMember.setAuthorUuid(extension.getAuthorUuid());
+                cidIntMember.setModuleUuid(extension.getModuleUuid());
 		cidIntMember.setComponentUuid(extension.getComponentUuid());
 		cidIntMember.setPathUuid(extension.getPathUuid());
 		cidIntMember.setPrimordialComponentUuid(extension.getPrimordialComponentUuid());
@@ -248,6 +249,7 @@ public class CidFloatToCidIntegerTransformer extends AbstractTransformer {
 			for (TkRefsetCidFloatRevision cidFloatRevision : extension.getRevisions()) {
 				TkRefsetCidIntRevision cidIntRevision = new TkRefsetCidIntRevision();
 				cidIntRevision.setAuthorUuid(cidFloatRevision.getAuthorUuid());
+                                cidIntRevision.setModuleUuid(cidFloatRevision.getModuleUuid());
 				cidIntRevision.setPathUuid(cidFloatRevision.getPathUuid());
 				cidIntRevision.setStatusUuid(cidFloatRevision.getStatusUuid());
 				cidIntRevision.setTime(cidFloatRevision.getTime());

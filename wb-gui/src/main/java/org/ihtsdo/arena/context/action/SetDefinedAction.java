@@ -49,9 +49,10 @@ public class SetDefinedAction extends AbstractAction {
                         for (PathBI ep : config.getEditingPathSet()) {
                             AnalogBI newAnalog = part.makeAnalog(
                                     part.getChronicle().getPrimordialVersion().getStatusNid(),
-                                    config.getDbConfig().getUserConcept().getNid(),
-                                    ep.getConceptNid(),
-                                    Long.MAX_VALUE);
+                                    Long.MAX_VALUE,
+                                    config.getEditCoordinate().getAuthorNid(),
+                                    config.getEditCoordinate().getModuleNid(), 
+                                    ep.getConceptNid());
 
                             newAnalogAttr = (I_ConceptAttributePart) newAnalog;
                             newAnalogAttr.setDefined(false);
@@ -68,9 +69,10 @@ public class SetDefinedAction extends AbstractAction {
                         for (PathBI ep : config.getEditingPathSet()) {
                             AnalogBI newAnalog = part.makeAnalog(
                                     SnomedMetadataRfx.getSTATUS_CURRENT_NID(),
-                                    config.getDbConfig().getUserConcept().getNid(),
-                                    ep.getConceptNid(),
-                                    Long.MAX_VALUE);
+                                    Long.MAX_VALUE,
+                                    config.getEditCoordinate().getAuthorNid(),
+                                    config.getEditCoordinate().getModuleNid(), 
+                                    ep.getConceptNid());
 
                             newAnalogAttr = (I_ConceptAttributePart) newAnalog;
                             newAnalogAttr.setDefined(true);

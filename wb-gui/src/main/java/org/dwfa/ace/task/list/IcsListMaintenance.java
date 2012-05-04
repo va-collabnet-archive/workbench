@@ -104,6 +104,7 @@ public class IcsListMaintenance extends AbstractTask {
             File icsFile = new File(fileName);
             vc = Ts.get().getMetadataVC();
             ec = new EditCoordinate(config.getDbConfig().getUserConcept().getNid(),
+                    config.getEditCoordinate().getModuleNid(),
                     vc.getPositionSet().getViewPathNidSet());
             tc = Ts.get().getTerminologyBuilder(ec, vc);
             caseSensitiveRefexColl = Ts.get().getConcept(RefsetAuxiliary.Concept.CASE_SENSITIVE_WORDS.getUids());
@@ -196,9 +197,10 @@ public class IcsListMaintenance extends AbstractTask {
         for (int pathNid : ec.getEditPaths()) {
             member.makeAnalog(
                     SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid(),
+                    Long.MAX_VALUE,
                     ec.getAuthorNid(),
-                    pathNid,
-                    Long.MAX_VALUE);
+                    ec.getModuleNid(),
+                    pathNid);
         }
         Ts.get().addUncommitted(caseSensitiveRefexColl);
     }
@@ -207,9 +209,10 @@ public class IcsListMaintenance extends AbstractTask {
         for (int pathNid : ec.getEditPaths()) {
            RefexCnidStrAnalogBI analog =  (RefexCnidStrAnalogBI) member.makeAnalog(
                     SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(),
+                    Long.MAX_VALUE,
                     ec.getAuthorNid(),
-                    pathNid,
-                    Long.MAX_VALUE);
+                    ec.getModuleNid(),
+                    pathNid);
            analog.setCnid1(icsTypeNid);
         }
         Ts.get().addUncommitted(caseSensitiveRefexColl);

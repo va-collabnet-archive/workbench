@@ -40,6 +40,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.concept.Concept;
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 public abstract class Revision<V extends Revision<V, C>, C extends ConceptComponent<V, C>>
         implements I_AmPart<V>, I_HandleFutureStatusAtPositionSetup, AnalogBI {
@@ -72,8 +73,8 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
         assert sapNid != 0;
     }
 
-    public Revision(int statusNid, int authorNid, int pathNid, long time, C primordialComponent) {
-        this.sapNid = Bdb.getSapDb().getSapNid(statusNid, authorNid, pathNid, time);
+    public Revision(int statusNid, long time, int authorNid, int moduleNid, int pathNid, C primordialComponent) {
+        this.sapNid = Bdb.getSapDb().getSapNid(statusNid, time, authorNid, moduleNid, pathNid);
         assert sapNid != 0;
         this.primordialComponent = primordialComponent;
         primordialComponent.clearVersions();
@@ -143,15 +144,15 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
      *    resembles a different situation
      * 2. Analogy, in language, a comparison between concepts
      * @param statusNid
-     * @param pathNid
      * @param time
+     * @param author
+     * @param module
+     * @param pathNid
+     * 
      * @return
      */
     @Override
-    public abstract V makeAnalog(int statusNid, int pathNid, long time);
-
-    @Override
-    public abstract V makeAnalog(int statusNid, int authorNid, int pathNid, long time);
+    public abstract V makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid);
 
     protected void modified() {
         if (primordialComponent != null) {
@@ -186,21 +187,23 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
         buf.append(sapNid);
 
         try {
-            buf.append(" status:");
+            buf.append(" s:");
             ConceptComponent.addNidToBuffer(buf, getStatusNid());
-            buf.append(" author:");
+            buf.append(" t: ");
+            buf.append(TimeUtil.formatDate(getTime()));
+            buf.append(" a:");
             ConceptComponent.addNidToBuffer(buf, getAuthorNid());
-            buf.append(" path:");
+            buf.append(" m:");
+            ConceptComponent.addNidToBuffer(buf, getModuleNid());
+            buf.append(" p:");
             ConceptComponent.addNidToBuffer(buf, getPathNid());
-            UUID authorUuid = Ts.get().getConceptForNid(getAuthorNid()).getPrimUuid();
+              UUID authorUuid = Ts.get().getConceptForNid(getAuthorNid()).getPrimUuid();
             String stringToHash = authorUuid.toString()
                                 + Long.toString(getTime());
             UUID type5Uuid = Type5UuidFactory.get(Type5UuidFactory.AUTHOR_TIME_ID,
                                 stringToHash);
             buf.append(" authTime: ");
             buf.append(type5Uuid);
-            buf.append(" tm: ");
-            buf.append(TimeUtil.formatDate(getTime()));
             buf.append(" ");
             buf.append(getTime());
         } catch (Throwable e) {
@@ -424,6 +427,11 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
     public int getStatusNid() {
         return Bdb.getSapDb().getStatusNid(sapNid);
     }
+    
+    @Override
+    public int getModuleNid() {
+        return Bdb.getSapDb().getModuleNid(sapNid);
+    }
 
     @Override
     public long getTime() {
@@ -495,11 +503,11 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
         }
 
         if (authorNid != getPathNid()) {
-            this.sapNid = Bdb.getSapNid(getStatusNid(), authorNid, getPathNid(), Long.MAX_VALUE);
+            this.sapNid = Bdb.getSapNid(getStatusNid(),Long.MAX_VALUE, authorNid, getModuleNid(), getPathNid());
             modified();
         }
     }
-
+    
     @Override
     public final void setNid(int nid) throws PropertyVetoException {
         throw new PropertyVetoException("nid", null);
@@ -518,11 +526,12 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
                     + "Use makeAnalog instead.");
         }
 
-        this.sapNid = Bdb.getSapNid(getStatusNid(), Terms.get().getAuthorNid(), pathId, Long.MAX_VALUE);
+        this.sapNid = Bdb.getSapNid(getStatusNid(), Long.MAX_VALUE, getAuthorNid(), 
+                    getModuleNid(), pathId);
     }
 
-    public void setStatusAtPosition(int statusNid, int authorNid, int pathNid, long time) {
-        this.sapNid = Bdb.getSapDb().getSapNid(statusNid, authorNid, pathNid, time);
+    public void setStatusAtPosition(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
+        this.sapNid = Bdb.getSapDb().getSapNid(statusNid, time, authorNid, moduleNid, pathNid);
         modified();
     }
 
@@ -548,7 +557,25 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
         }
 
         try {
-            this.sapNid = Bdb.getSapNid(statusNid, Terms.get().getAuthorNid(), getPathNid(), Long.MAX_VALUE);
+            this.sapNid = Bdb.getSapNid(statusNid, Long.MAX_VALUE, getAuthorNid(), 
+                    getModuleNid(), getPathNid());
+        } catch (Exception e) {
+            throw new RuntimeException();
+        }
+
+        modified();
+    }
+    
+    @Override
+    public final void setModuleNid(int moduleNid) {
+        if (getTime() != Long.MAX_VALUE) {
+            throw new UnsupportedOperationException("Cannot change status if time != Long.MAX_VALUE; "
+                    + "Use makeAnalog instead.");
+        }
+
+        try {
+            this.sapNid = Bdb.getSapNid(getStatusNid(), Long.MAX_VALUE, getAuthorNid(), 
+                    moduleNid, getPathNid());
         } catch (Exception e) {
             throw new RuntimeException();
         }
@@ -565,7 +592,8 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
 
         if (time != getTime()) {
             try {
-                this.sapNid = Bdb.getSapNid(getStatusNid(), Terms.get().getAuthorNid(), getPathNid(), time);
+                this.sapNid = Bdb.getSapNid(getStatusNid(), time, getAuthorNid(), 
+                    getModuleNid(), getPathNid());
             } catch (Exception e) {
                 throw new RuntimeException();
             }

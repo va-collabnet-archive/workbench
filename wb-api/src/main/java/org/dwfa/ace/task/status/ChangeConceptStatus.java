@@ -110,7 +110,11 @@ public class ChangeConceptStatus extends AbstractTask {
                 for (I_ConceptAttributeTuple t : tuples) {
                     if (t.getStatusNid() != newStatusConcept.getConceptNid()) {
                         I_ConceptAttributePart newPart = 
-                        	(I_ConceptAttributePart) t.makeAnalog(newStatusConcept.getConceptNid(), editPath.getConceptNid(), Long.MAX_VALUE);
+                        	(I_ConceptAttributePart) t.makeAnalog(newStatusConcept.getConceptNid(),
+                                Long.MAX_VALUE,
+                                config.getEditCoordinate().getAuthorNid(),
+                                config.getEditCoordinate().getModuleNid(),
+                                editPath.getConceptNid());
                         partsToAdd.add(newPart);
                     }
                 }

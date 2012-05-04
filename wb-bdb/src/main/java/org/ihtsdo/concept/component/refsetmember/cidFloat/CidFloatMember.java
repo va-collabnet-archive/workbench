@@ -114,21 +114,12 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
 
    @Override
    public CidFloatRevision makeAnalog() {
-      return new CidFloatRevision(getStatusNid(), getPathNid(), getTime(), this);
+      return new CidFloatRevision(getStatusNid(), getTime(), getAuthorNid(), getModuleNid(), getPathNid(), this);
    }
 
    @Override
-   public CidFloatRevision makeAnalog(int statusNid, int pathNid, long time) {
-      CidFloatRevision newR = new CidFloatRevision(statusNid, pathNid, time, this);
-
-      addRevision(newR);
-
-      return newR;
-   }
-
-   @Override
-   public CidFloatRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-      CidFloatRevision newR = new CidFloatRevision(statusNid, authorNid, pathNid, time, this);
+   public CidFloatRevision makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
+      CidFloatRevision newR = new CidFloatRevision(statusNid, time, authorNid, moduleNid, pathNid, this);
 
       addRevision(newR);
 

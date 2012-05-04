@@ -59,23 +59,13 @@ public class IntRevision extends RefsetRevision<IntRevision, IntMember>
       intValue = input.readInt();
    }
 
-   public IntRevision(int statusNid, int pathNid, long time, IntMember primoridalMember) {
-      super(statusNid, pathNid, time, primoridalMember);
+   public IntRevision(int statusNid, long time, int authorNid, int moduleNid, int pathNid, IntMember primoridalMember) {
+      super(statusNid, time, authorNid, moduleNid, pathNid,primoridalMember);
       intValue = primoridalMember.getIntValue();
    }
 
-   protected IntRevision(int statusNid, int pathNid, long time, IntRevision another) {
-      super(statusNid, pathNid, time, another.primordialComponent);
-      intValue = another.intValue;
-   }
-
-   public IntRevision(int statusNid, int authorNid, int pathNid, long time, IntMember primoridalMember) {
-      super(statusNid, authorNid, pathNid, time, primoridalMember);
-      intValue = primoridalMember.getIntValue();
-   }
-
-   protected IntRevision(int statusNid, int authorNid, int pathNid, long time, IntRevision another) {
-      super(statusNid, authorNid, pathNid, time, another.primordialComponent);
+   protected IntRevision(int statusNid, long time, int authorNid, int moduleNid, int pathNid, IntRevision another) {
+      super(statusNid, time, authorNid, moduleNid, pathNid, another.primordialComponent);
       intValue = another.intValue;
    }
 
@@ -109,18 +99,20 @@ public class IntRevision extends RefsetRevision<IntRevision, IntMember>
 
    @Override
    public IntRevision makeAnalog() {
-      return new IntRevision(getStatusNid(), getPathNid(), getTime(), this);
+      return new IntRevision(getStatusNid(), getTime(), getAuthorNid(), getModuleNid(), getPathNid(), this);
    }
 
    @Override
-   public IntRevision makeAnalog(int statusNid, int pathNid, long time) {
+   public IntRevision makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
       if ((this.getTime() == time) && (this.getPathNid() == pathNid)) {
          this.setStatusNid(statusNid);
+         this.setAuthorNid(authorNid);
+         this.setModuleNid(moduleNid);
 
          return this;
       }
 
-      IntRevision newR = new IntRevision(statusNid, pathNid, time, this);
+      IntRevision newR = new IntRevision(statusNid, time, authorNid, moduleNid, pathNid, this);
 
       primordialComponent.addRevision(newR);
 
@@ -128,22 +120,7 @@ public class IntRevision extends RefsetRevision<IntRevision, IntMember>
    }
 
    @Override
-   public IntRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-      if ((this.getTime() == time) && (this.getPathNid() == pathNid)) {
-         this.setStatusNid(statusNid);
-
-         return this;
-      }
-
-      IntRevision newR = new IntRevision(statusNid, authorNid, pathNid, time, this);
-
-      primordialComponent.addRevision(newR);
-
-      return newR;
-   }
-
-   @Override
-   public I_ExtendByRefPart<IntRevision> makePromotionPart(PathBI promotionPath) {
+   public I_ExtendByRefPart<IntRevision> makePromotionPart(PathBI promotionPath, int authorNid) {
 
       // TODO
       throw new UnsupportedOperationException();

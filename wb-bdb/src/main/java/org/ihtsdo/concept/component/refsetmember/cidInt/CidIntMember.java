@@ -117,29 +117,14 @@ public class CidIntMember extends RefsetMember<CidIntRevision, CidIntMember>
 
    @Override
    public CidIntRevision makeAnalog() {
-      CidIntRevision newR = new CidIntRevision(getStatusNid(), getPathNid(), getTime(), this);
+      CidIntRevision newR = new CidIntRevision(getStatusNid(), getTime(), getAuthorNid(), getModuleNid(), getPathNid(),  this);
 
       return newR;
    }
 
    @Override
-   public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-      if ((this.getTime() == time) && (this.getPathNid() == pathNid)) {
-         this.setStatusNid(statusNid);
-
-         return this;
-      }
-
-      CidIntRevision newR = new CidIntRevision(statusNid, pathNid, time, this);
-
-      addRevision(newR);
-
-      return newR;
-   }
-
-   @Override
-   public CidIntRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-      CidIntRevision newR = new CidIntRevision(statusNid, authorNid, pathNid, time, this);
+   public CidIntRevision makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
+      CidIntRevision newR = new CidIntRevision(statusNid, time, authorNid, moduleNid, pathNid, this);
 
       addRevision(newR);
 

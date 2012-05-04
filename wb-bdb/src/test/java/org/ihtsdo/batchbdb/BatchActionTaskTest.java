@@ -39,6 +39,7 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidMember;
 import org.ihtsdo.tk.example.binding.TermAux;
@@ -65,7 +66,8 @@ public class BatchActionTaskTest {
             I_ConfigAceFrame profile = NewDefaultProfile.newProfile("", "", "", "", "");
             int pathNid = ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.localize().getNid();
             int userNid = ArchitectonicAuxiliary.Concept.USER.localize().getNid();
-            EditCoordinate ec = new EditCoordinate(userNid, pathNid);
+            int moduleNid = Snomed.UNSPECIFIED_MODULE.getLenient().getNid();
+            EditCoordinate ec = new EditCoordinate(userNid, moduleNid, pathNid);
             ViewCoordinate vc = profile.getViewCoordinate();
             I_TermFactory terms = Terms.get();
             PathBI editPath = Terms.get().getPath(pathNid); // :!!!: THROWS EXCEPTION

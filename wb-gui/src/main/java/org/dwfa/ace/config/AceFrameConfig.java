@@ -137,6 +137,7 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.taxonomy.path.PathExpander;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 import org.tigris.subversion.javahl.PromptUserPassword3;
 
@@ -314,7 +315,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      *
      */
     private static final long serialVersionUID = 1L;
-    private static final int dataVersion = 49; // keep current with
+    private static final int dataVersion = 50; // keep current with
     // objDataVersion logic
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
     private transient VetoableChangeSupport vetoSupport = new VetoableChangeSupport(this);
@@ -440,6 +441,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     private RelAssertionType relAssertionType = RelAssertionType.INFERRED_THEN_STATED;
     // 49
     private CLASSIFIER_INPUT_MODE_PREF classifierInputMode;
+    // 50
+    private int moduleNid = Ts.get().getNidForUuids(TkRevision.unspecifiedModuleUuid);
     // transient
     private transient MasterWorker worker;
     private transient String statusMessage;
@@ -647,6 +650,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
         // 49
         out.writeObject(classifierInputMode);
+        
+        // 50
+        out.writeObject(moduleNid);
 
     }
 
@@ -1139,6 +1145,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             } else {
                 classifierInputMode = CLASSIFIER_INPUT_MODE_PREF.EDIT_PATH;
             }
+            
+            if (objDataVersion >= 50) {
+                moduleNid = (Integer) in.readObject();
+            } else {
+                moduleNid = Ts.get().getNidForUuids(TkRevision.unspecifiedModuleUuid);
+            }
 
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -1150,6 +1162,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public EditCoordinate getEditCoordinate() {
         NidSet editPaths = new NidSet(editingPathSet);
         return new EditCoordinate(getDbConfig().getUserConcept().getNid(),
+                moduleNid,
                 editPaths);
     }
 
@@ -3453,5 +3466,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     @Override
     public void setAllAvailableWorkflowActionUids(List<UUID> actions) {
         availableWorkflowActions = actions;
+    }
+    
+    @Override
+    public void setModuleNid(int moduleNid) {
+        this.moduleNid = moduleNid;
     }
 }

@@ -691,7 +691,10 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
                             if (newRetiredPart == null) {
                                 newRetiredPart =
                                         (I_ExtendByRefPartCidCid) tuple.getMutablePart().makeAnalog(retiredNid,
-                                            editPath.getConceptNid(), Long.MAX_VALUE);
+                                            Long.MAX_VALUE,
+                                            config.getEditCoordinate().getAuthorNid(),
+                                            config.getEditCoordinate().getModuleNid(),
+                                            editPath.getConceptNid());
                             }
                             if (retire) {
                                 member.addVersion(newRetiredPart);
@@ -741,12 +744,15 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
                             tf.addUncommittedNoChecks(refsetSpec);
                             tf.commit();
                             if (retire) {
-                                member.promote(viewPosition, promotionPath, retiredSet, frameConfig.getPrecedence());
+                                member.promote(viewPosition, promotionPath, retiredSet, 
+                                        frameConfig.getPrecedence(), frameConfig.getEditCoordinate().getAuthorNid());
                             }
-                            newMember.promote(viewPosition, promotionPath, currentSet, frameConfig.getPrecedence());
+                            newMember.promote(viewPosition, promotionPath, currentSet, 
+                                    frameConfig.getPrecedence(),frameConfig.getEditCoordinate().getAuthorNid());
                             tf.addUncommittedNoChecks(refsetSpec);
                             if (comment != null) {
-                                comment.promote(viewPosition, promotionPath, currentSet, frameConfig.getPrecedence());
+                                comment.promote(viewPosition, promotionPath, currentSet, 
+                                        frameConfig.getPrecedence(), frameConfig.getEditCoordinate().getAuthorNid());
                                 tf.addUncommittedNoChecks(commentRefset);
                             }
                             tf.commit();
@@ -774,7 +780,10 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 
             for (I_ExtendByRefVersion tuple : tuples) {
                 tuple.addVersion((I_ExtendByRefPart) tuple.getMutablePart().makeAnalog(retiredNid,
-                    viewPosition.getPath().getConceptNid(), Long.MAX_VALUE));
+                        Long.MAX_VALUE,
+                        config.getEditCoordinate().getAuthorNid(),
+                        config.getEditCoordinate().getModuleNid(),
+                        viewPosition.getPath().getConceptNid()));
             }
             tf.addUncommittedNoChecks(refsetSpec);
             if (writeComment) {
@@ -786,10 +795,12 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
                 tf.addUncommittedNoChecks(commentRefset);
             }
             tf.commit();
-            member.promote(viewPosition, promotionPath, retiredSet, frameConfig.getPrecedence());
+            member.promote(viewPosition, promotionPath, retiredSet, 
+                    frameConfig.getPrecedence(), frameConfig.getEditCoordinate().getAuthorNid());
             tf.addUncommitted(member);
             if (comment != null) {
-                comment.promote(viewPosition, promotionPath, currentSet, frameConfig.getPrecedence());
+                comment.promote(viewPosition, promotionPath, currentSet, 
+                        frameConfig.getPrecedence(), frameConfig.getEditCoordinate().getAuthorNid());
                 tf.addUncommitted(comment);
             }
             tf.commit();

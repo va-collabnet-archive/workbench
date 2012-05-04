@@ -63,9 +63,10 @@ public class RefsetMemberFactory {
             if (i == 0) {
                 member.setStatusAtPositionNid(
                         Bdb.getSapNid(res.getInt(RefexProperty.STATUS_NID),
+                        Long.MAX_VALUE,
                         ec.getAuthorNid(),
-                        ec.getEditPaths()[i],
-                        Long.MAX_VALUE));
+                        ec.getModuleNid(),
+                        ec.getEditPaths()[i]));
                 member.setPrimordialUuid(res.getMemberUUID());
                 try {
                     res.setPropertiesExceptSap(member);
@@ -75,9 +76,10 @@ public class RefsetMemberFactory {
 
             } else {
                 member.makeAnalog(res.getInt(RefexProperty.STATUS_NID),
+                        Long.MAX_VALUE,
                         ec.getAuthorNid(),
-                        ec.getEditPaths()[i],
-                        Long.MAX_VALUE);
+                        ec.getModuleNid(),
+                        ec.getEditPaths()[i]);
             }
 
         }
@@ -187,9 +189,10 @@ public class RefsetMemberFactory {
             if (i == 0) {
                 member.setStatusAtPositionNid(
                         Bdb.getSapNid(res.getInt(RefexProperty.STATUS_NID),
+                        time,
                         ec.getAuthorNid(),
-                        ec.getEditPaths()[i],
-                        time));
+                        ec.getModuleNid(),
+                        ec.getEditPaths()[i]));
                 member.setPrimordialUuid(res.getMemberUUID());
                 try {
                     res.setPropertiesExceptSap(member);
@@ -199,9 +202,10 @@ public class RefsetMemberFactory {
 
             } else {
                 member.makeAnalog(res.getInt(RefexProperty.STATUS_NID),
+                        time,
                         ec.getAuthorNid(),
-                        ec.getEditPaths()[i],
-                        time);
+                        ec.getModuleNid(),
+                        ec.getEditPaths()[i]);
             }
 
         }

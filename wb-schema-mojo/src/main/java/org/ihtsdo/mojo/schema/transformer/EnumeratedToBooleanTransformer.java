@@ -224,6 +224,7 @@ public class EnumeratedToBooleanTransformer extends AbstractTransformer {
 				booleanMember.setAdditionalIdComponents(cid1Member.getAdditionalIdComponents());
 				booleanMember.setAnnotations(cid1Member.getAnnotations());
 				booleanMember.setAuthorUuid(cid1Member.getAuthorUuid());
+                                booleanMember.setModuleUuid(cid1Member.getModuleUuid());
 				booleanMember.setComponentUuid(cid1Member.getComponentUuid());
 				booleanMember.setPathUuid(cid1Member.getPathUuid());
 				booleanMember.setPrimordialComponentUuid(cid1Member.getPrimordialComponentUuid());
@@ -244,6 +245,7 @@ public class EnumeratedToBooleanTransformer extends AbstractTransformer {
 					for (TkRefsetCidRevision cidRevision : cid1Member.getRevisions()) {
 						TkRefsetBooleanRevision booleanRevision = new TkRefsetBooleanRevision();
 						booleanRevision.setAuthorUuid(cidRevision.getAuthorUuid());
+                                                booleanRevision.setModuleUuid(cidRevision.getModuleUuid());
 						if (valuesForTrue.contains(cidRevision.getC1Uuid())) {
 							booleanRevision.setBooleanValue(true);
 						} else if (valuesForFalse.contains(cidRevision.getC1Uuid())) {
@@ -284,6 +286,7 @@ public class EnumeratedToBooleanTransformer extends AbstractTransformer {
 			booleanMember.setAdditionalIdComponents(cid1Member.getAdditionalIdComponents());
 			booleanMember.setAnnotations(cid1Member.getAnnotations());
 			booleanMember.setAuthorUuid(cid1Member.getAuthorUuid());
+                        booleanMember.setModuleUuid(cid1Member.getModuleUuid());
 			booleanMember.setComponentUuid(cid1Member.getComponentUuid());
 			booleanMember.setPathUuid(cid1Member.getPathUuid());
 			booleanMember.setPrimordialComponentUuid(cid1Member.getPrimordialComponentUuid());
@@ -304,6 +307,7 @@ public class EnumeratedToBooleanTransformer extends AbstractTransformer {
 				for (TkRefsetCidRevision cidRevision : cid1Member.getRevisions()) {
 					TkRefsetBooleanRevision booleanRevision = new TkRefsetBooleanRevision();
 					booleanRevision.setAuthorUuid(cidRevision.getAuthorUuid());
+                                        booleanMember.setModuleUuid(cidRevision.getModuleUuid());
 					if (valuesForTrue.contains(cidRevision.getC1Uuid())) {
 						booleanRevision.setBooleanValue(true);
 					} else if (valuesForFalse.contains(cidRevision.getC1Uuid())) {

@@ -61,10 +61,8 @@ public class IdentifyAllConflictStrategy extends ContradictionManagementStrategy
 
     /**
      * Determines if there is a conflict as defined by this resolution strategy
-     * for the tuples representing an entity. Will return true if there is
-     * more than 1 tuple representing different entity states aside from
-     * version and path. Will return false if there is less than 2 tuples or
-     * the tuples passed only differ in version and path.
+     * for the tuples representing an entity. A conflict is determined to exist 
+     * if more than one version is returned from the version computer.
      * 
      * @param <T>
      *            type of the objects in the passed list - extension of
@@ -79,32 +77,8 @@ public class IdentifyAllConflictStrategy extends ContradictionManagementStrategy
         if (versions.size() < 2) {
             return false;
         }
-
-        for (Map<Integer, T> map : getLatestTuplesByEntityByPath(versions).values()) {
-            if (map.values().size() > 1) {
-                Iterator<T> tupleIterator = map.values().iterator();
-                T first = tupleIterator.next();
-
-                I_AmPart firstDuplicate = (I_AmPart) first.makeAnalog(1, 0, 0);
-
-                while (tupleIterator.hasNext()) {
-                    T tuple = (T) tupleIterator.next();
-                    I_AmPart tupleDuplicate = (I_AmPart) tuple.makeAnalog(1, 0, 0);
-
-                    if (tupleDuplicate.equals(firstDuplicate)) {
-                        continue; // identical, no conflict with this one, check
-                        // for more
-                    } else {
-                        return true; // different data - conflict, don't need to
-                        // look for more
-                    }
-                }
-            }
-        }
-        // this means that all parts had the same date aside from version and
-        // path
-        // no conflict
-        return false;
+        
+        return true;
     }
 
     <T extends I_AmPart> Map<Integer, Map<Integer, T>> getLatestTuplesByEntityByPath(List<T> tuples) {
@@ -131,6 +105,7 @@ public class IdentifyAllConflictStrategy extends ContradictionManagementStrategy
         return sortedTuples;
     }
 
+    @Override
     public <T extends I_AmTuple> List<T> resolveTuples(List<T> tuples) {
         return tuples;
     }

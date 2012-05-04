@@ -46,7 +46,8 @@ public abstract class IdentifierVersion
    protected IdentifierVersion(TkIdentifier idv) {
       super();
       this.statusAtPositionNid = Bdb.getSapDb().getSapNid(Bdb.uuidToNid(idv.getStatusUuid()),
-              Bdb.uuidToNid(idv.getAuthorUuid()), Bdb.uuidToNid(idv.getPathUuid()), idv.getTime());
+              idv.getTime(), Bdb.uuidToNid(idv.getAuthorUuid()), 
+              Bdb.uuidToNid(idv.getModuleUuid()), Bdb.uuidToNid(idv.getPathUuid()));
       this.authorityNid = Bdb.uuidToNid(idv.getAuthorityUuid());
    }
 
@@ -56,13 +57,13 @@ public abstract class IdentifierVersion
       authorityNid        = input.readInt();
    }
 
-   protected IdentifierVersion(int statusNid, int authorNid, int pathNid, long time) {
-      this.statusAtPositionNid = Bdb.getSapDb().getSapNid(statusNid, authorNid, pathNid, time);
+   protected IdentifierVersion(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
+      this.statusAtPositionNid = Bdb.getSapDb().getSapNid(statusNid, time, authorNid, moduleNid, pathNid);
    }
 
-   protected IdentifierVersion(int statusNid, int authorNid, int pathNid, long time,
+   protected IdentifierVersion(int statusNid, long time, int authorNid, int moduleNid, int pathNid,
                                IdentifierVersion idVersion) {
-      this(statusNid, authorNid, pathNid, time);
+      this(statusNid, time, authorNid, moduleNid, pathNid);
       this.authorityNid = idVersion.authorityNid;
    }
 
@@ -211,6 +212,11 @@ public abstract class IdentifierVersion
    public int getStatusNid() {
       return Bdb.getSapDb().getStatusNid(statusAtPositionNid);
    }
+ 
+   @Override
+   public int getModuleNid() {
+      return Bdb.getSapDb().getModuleNid(statusAtPositionNid);
+   }
 
    @Override
    public long getTime() {
@@ -286,7 +292,7 @@ public abstract class IdentifierVersion
          throw new UnsupportedOperationException("Time alreay committed.");
       }
 
-      this.statusAtPositionNid = Bdb.getSapDb().getSapNid(getStatusId(), getAuthorId(), getPathId(), time);
+      this.statusAtPositionNid = Bdb.getSapDb().getSapNid(getStatusId(), time, getAuthorId(), getModuleNid(), getPathId());
    }
 
    @Override

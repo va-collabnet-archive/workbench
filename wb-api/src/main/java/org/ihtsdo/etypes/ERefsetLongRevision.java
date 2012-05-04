@@ -23,9 +23,10 @@ public class ERefsetLongRevision extends TkRefsetLongRevision {
 
    public ERefsetLongRevision(I_ExtendByRefPartLong part) throws IOException {
       longValue  = part.getLongValue();
-      pathUuid   = Terms.get().nidToUuid(part.getPathId());
-      statusUuid = Terms.get().nidToUuid(part.getStatusId());
+      pathUuid   = Terms.get().nidToUuid(part.getPathNid());
+      statusUuid = Terms.get().nidToUuid(part.getStatusNid());
       authorUuid    = Terms.get().nidToUuid(part.getAuthorNid());
+      moduleUuid    = Terms.get().nidToUuid(part.getModuleNid());
       time       = part.getTime();
    }
 

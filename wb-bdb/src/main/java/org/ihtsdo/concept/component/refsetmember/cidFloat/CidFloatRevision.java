@@ -64,28 +64,16 @@ public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatM
       floatValue = input.readFloat();
    }
 
-   public CidFloatRevision(int statusNid, int pathNid, long time, CidFloatMember primoridalMember) {
-      super(statusNid, pathNid, time, primoridalMember);
-      c1Nid      = primoridalMember.getC1Nid();
-      floatValue = primoridalMember.getFloatValue();
-   }
-
-   protected CidFloatRevision(int statusNid, int pathNid, long time, CidFloatRevision another) {
-      super(statusNid, pathNid, time, another.primordialComponent);
-      c1Nid      = another.c1Nid;
-      floatValue = another.floatValue;
-   }
-
-   public CidFloatRevision(int statusNid, int authorNid, int pathNid, long time,
+   public CidFloatRevision(int statusNid, long time, int authorNid, int pathNid, int moduleNid,
                            CidFloatMember primoridalMember) {
-      super(statusNid, authorNid, pathNid, time, primoridalMember);
+      super(statusNid, time, authorNid, moduleNid, pathNid, primoridalMember);
       c1Nid      = primoridalMember.getC1Nid();
       floatValue = primoridalMember.getFloatValue();
    }
 
-   protected CidFloatRevision(int statusNid, int authorNid, int pathNid, long time,
+   protected CidFloatRevision(int statusNid, long time, int authorNid, int pathNid, int moduleNid,
                               CidFloatRevision another) {
-      super(statusNid, authorNid, pathNid, time, another.primordialComponent);
+      super(statusNid, time, authorNid, moduleNid, pathNid, another.primordialComponent);
       c1Nid      = another.c1Nid;
       floatValue = another.floatValue;
    }
@@ -119,18 +107,20 @@ public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatM
 
    @Override
    public CidFloatRevision makeAnalog() {
-      return new CidFloatRevision(getStatusNid(), getPathNid(), getTime(), this);
+      return new CidFloatRevision(getStatusNid(), getTime(), getAuthorNid(), getModuleNid(), getPathNid(),  this);
    }
 
    @Override
-   public CidFloatRevision makeAnalog(int statusNid, int pathNid, long time) {
+   public CidFloatRevision makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
       if ((this.getTime() == time) && (this.getPathNid() == pathNid)) {
          this.setStatusNid(statusNid);
+         this.setAuthorNid(authorNid);
+         this.setModuleNid(moduleNid);
 
          return this;
       }
 
-      CidFloatRevision newR = new CidFloatRevision(statusNid, pathNid, time, this);
+      CidFloatRevision newR = new CidFloatRevision(statusNid, time, authorNid, moduleNid, pathNid,this);
 
       primordialComponent.addRevision(newR);
 
@@ -138,22 +128,7 @@ public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatM
    }
 
    @Override
-   public CidFloatRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-      if ((this.getTime() == time) && (this.getPathNid() == pathNid)) {
-         this.setStatusNid(statusNid);
-
-         return this;
-      }
-
-      CidFloatRevision newR = new CidFloatRevision(statusNid, authorNid, pathNid, time, this);
-
-      primordialComponent.addRevision(newR);
-
-      return newR;
-   }
-
-   @Override
-   public I_ExtendByRefPart<CidFloatRevision> makePromotionPart(PathBI promotionPath) {
+   public I_ExtendByRefPart<CidFloatRevision> makePromotionPart(PathBI promotionPath, int authorNid) {
 
       // TODO
       throw new UnsupportedOperationException();

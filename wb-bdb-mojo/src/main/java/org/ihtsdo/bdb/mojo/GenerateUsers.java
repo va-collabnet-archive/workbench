@@ -149,6 +149,7 @@ public class GenerateUsers extends AbstractMojo {
 	private ConceptSpec defaultRelType;
 	private ConceptSpec defaultRelChar;
 	private ConceptSpec defaultRelRefinability;
+        private String moduleFsn;
 	private String visibleRefests;
 	private String projectDevelopmentPathFsn;
 	private String projectDevelopmentViewPathFsn;
@@ -194,6 +195,7 @@ public class GenerateUsers extends AbstractMojo {
 			projectDevelopmentPathFsn = configProps.getProperty("projectDevelopmentPathFsn");
 			projectDevelopmentViewPathFsn = configProps.getProperty("projectDevelopmentViewPathFsn");
                         projectDevelopmentAdjPathFsn = configProps.getProperty("projectDevelopmentAdjPathFsn");
+                        moduleFsn = configProps.getProperty("moduleFsn");
 
 			//create user based on profile config
 			BufferedReader userReader = new BufferedReader(new FileReader(usersFile));
@@ -363,6 +365,13 @@ public class GenerateUsers extends AbstractMojo {
 				userConfig = newProfile(fullname, username, password, adminUsername,
 						adminPassword);
 				userConfig.getDbConfig().setProfileFile(userProfile);
+                                UUID moduleUuid = null;
+                                if(moduleFsn.contains(Snomed.CORE_MODULE.getDescription())){
+                                    moduleUuid = Snomed.CORE_MODULE.getLenient().getPrimUuid();
+                                }else{
+                                    moduleUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, moduleFsn);
+                                }
+                                userConfig.setModuleNid(Ts.get().getNidForUuids(moduleUuid));
 
 				Terms.get().setActiveAceFrameConfig(userConfig);
 
@@ -378,6 +387,7 @@ public class GenerateUsers extends AbstractMojo {
 				if (userUuid == null || userUuid.equals("")) {
 					createUser();
 				} else {
+                                        ConceptChronicleBI concept = Ts.get().getConcept(UUID.fromString(userUuid));
 					setUserConcept(userUuid);
 					addWfRelIfDoesNotExist(userUuid);
 				}
@@ -607,6 +617,7 @@ public class GenerateUsers extends AbstractMojo {
 			ViewCoordinate vc = userConfig.getViewCoordinate();
 			EditCoordinate oldEc = userConfig.getEditCoordinate();
 			EditCoordinate ec = new EditCoordinate(oldEc.getAuthorNid(),
+                                        oldEc.getModuleNid(),
 					TermAux.WB_AUX_PATH.getLenient().getNid());
 			TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(ec, vc);
 			userConceptBp.setDescCABs(inboxDescBp);
@@ -637,6 +648,7 @@ public class GenerateUsers extends AbstractMojo {
 			ViewCoordinate vc = userConfig.getViewCoordinate();
 			EditCoordinate oldEc = userConfig.getEditCoordinate();
 			EditCoordinate ec = new EditCoordinate(oldEc.getAuthorNid(),
+                                        oldEc.getModuleNid(),
 					TermAux.WB_AUX_PATH.getLenient().getNid());
 			TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(ec, vc);
 			builder.construct(wfRelBp);
@@ -656,11 +668,11 @@ public class GenerateUsers extends AbstractMojo {
 		ViewCoordinate vc = userConfig.getViewCoordinate();
 		EditCoordinate oldEc = userConfig.getEditCoordinate();
 		EditCoordinate ec = new EditCoordinate(oldEc.getAuthorNid(),
+                                oldEc.getModuleNid(),
 				TermAux.WB_AUX_PATH.getLenient().getNid());
 		TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(ec, vc);
 		builder.construct(inboxDescBp);
 		userConfig.getDbConfig().setUserConcept(userConcept);
-		getLog().info("** 1: " + userConfig.getDbConfig().getUserConcept());
 		Ts.get().addUncommitted(userConcept);
 	}
 

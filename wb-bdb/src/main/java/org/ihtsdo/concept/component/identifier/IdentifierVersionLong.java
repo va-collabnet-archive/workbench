@@ -9,6 +9,7 @@ import org.dwfa.ace.api.I_IdPart;
 
 import org.ihtsdo.concept.component.ConceptComponent.IDENTIFIER_PART_TYPES;
 import org.ihtsdo.tk.api.id.LongIdBI;
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierLong;
 
 public class IdentifierVersionLong extends IdentifierVersion implements LongIdBI {
@@ -30,13 +31,13 @@ public class IdentifierVersionLong extends IdentifierVersion implements LongIdBI
       longDenotation = input.readLong();
    }
 
-   public IdentifierVersionLong(int statusNid, int authorNid, int pathNid, long time) {
-      super(statusNid, authorNid, pathNid, time);
+   public IdentifierVersionLong(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
+      super(statusNid, time, authorNid, moduleNid, pathNid);
    }
 
-   public IdentifierVersionLong(IdentifierVersionLong another, int statusNid, int authorNid, int pathNid,
-                                long time) {
-      super(statusNid, authorNid, pathNid, time);
+   public IdentifierVersionLong(IdentifierVersionLong another, int statusNid, long time, int authorNid,
+           int moduleNid, int pathNid) {
+      super(statusNid, time, authorNid, moduleNid, pathNid);
       longDenotation = (Long) another.getDenotation();
    }
 
@@ -61,10 +62,11 @@ public class IdentifierVersionLong extends IdentifierVersion implements LongIdBI
    public int hashCode() {
       return super.hashCode();
    }
-
+   
    @Override
-   public I_IdPart makeIdAnalog(int statusNid, int authorNid, int pathNid, long time) {
-      return new IdentifierVersionLong(this, authorNid, statusNid, pathNid, time);
+   public I_IdPart makeIdAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
+      return new IdentifierVersionLong(this, authorNid, time, 
+              statusNid, moduleNid, pathNid);
    }
 
    @Override

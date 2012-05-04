@@ -38,5 +38,6 @@ public interface IdBI extends VersionPointBI {
    int getSapNid();
 
    int getStatusNid();
-
+   
+   int getModuleNid();
 }

@@ -1257,12 +1257,15 @@ public class RefsetSpecPanel extends JPanel {
                            if (newStatus != null) {
                               I_ExtendByRefPartCid analog = (I_ExtendByRefPartCid) partToPromote.makeAnalog(
                                                                 promotionPart.getStatusNid(),
-                                                                p.getConceptNid(), Long.MAX_VALUE);
+                                                                Long.MAX_VALUE,
+                                                                aceFrameConfig.getEditCoordinate().getAuthorNid(),
+                                                                aceFrameConfig.getEditCoordinate().getModuleNid(),
+                                                                p.getConceptNid());
 
                               analog.setC1id(newStatus.getNid());
                               extForMember.addVersion(analog);
                               extForMember.promote(new Position(Long.MAX_VALUE, p), promotionPath,
-                                                   currentSet, aceFrameConfig.getPrecedence());
+                                                   currentSet, aceFrameConfig.getPrecedence(), aceFrameConfig.getEditCoordinate().getAuthorNid());
                            }
                         }
                      }

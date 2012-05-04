@@ -29,6 +29,7 @@ public class EIdentifierLong extends TkIdentifierLong {
       pathUuid      = Terms.get().nidToUuid(idp.getPathNid());
       statusUuid    = Terms.get().nidToUuid(idp.getStatusNid());
       authorUuid    = Terms.get().nidToUuid(idp.getAuthorNid());
+      moduleUuid    = Terms.get().nidToUuid(idp.getModuleNid());
       time          = idp.getTime();
    }
 

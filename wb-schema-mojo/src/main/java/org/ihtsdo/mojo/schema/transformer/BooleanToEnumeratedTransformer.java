@@ -198,6 +198,7 @@ public class BooleanToEnumeratedTransformer extends AbstractTransformer {
 			cidMember.setAdditionalIdComponents(booleanMember.getAdditionalIdComponents());
 			cidMember.setAnnotations(booleanMember.getAnnotations());
 			cidMember.setAuthorUuid(booleanMember.getAuthorUuid());
+                        cidMember.setModuleUuid(booleanMember.getModuleUuid());
 			cidMember.setComponentUuid(booleanMember.getComponentUuid());
 			cidMember.setPathUuid(booleanMember.getPathUuid());
 			cidMember.setPrimordialComponentUuid(booleanMember.getPrimordialComponentUuid());
@@ -216,6 +217,7 @@ public class BooleanToEnumeratedTransformer extends AbstractTransformer {
 				for (TkRefsetBooleanRevision booleanRevision : booleanMember.getRevisions()) {
 					TkRefsetCidRevision cidRevision = new TkRefsetCidRevision();
 					cidRevision.setAuthorUuid(booleanRevision.getAuthorUuid());
+                                        cidRevision.setModuleUuid(booleanRevision.getModuleUuid());
 					if (booleanRevision.getBooleanValue()) {
 						cidRevision.setC1Uuid(valueForTrue);
 					} else {
@@ -252,6 +254,7 @@ public class BooleanToEnumeratedTransformer extends AbstractTransformer {
 			cidMember.setAdditionalIdComponents(booleanMember.getAdditionalIdComponents());
 			cidMember.setAnnotations(booleanMember.getAnnotations());
 			cidMember.setAuthorUuid(booleanMember.getAuthorUuid());
+                        cidMember.setModuleUuid(booleanMember.getModuleUuid());
 			cidMember.setComponentUuid(booleanMember.getComponentUuid());
 			cidMember.setPathUuid(booleanMember.getPathUuid());
 			cidMember.setPrimordialComponentUuid(booleanMember.getPrimordialComponentUuid());
@@ -270,6 +273,7 @@ public class BooleanToEnumeratedTransformer extends AbstractTransformer {
 				for (TkRefsetBooleanRevision booleanRevision : booleanMember.getRevisions()) {
 					TkRefsetCidRevision cidRevision = new TkRefsetCidRevision();
 					cidRevision.setAuthorUuid(booleanRevision.getAuthorUuid());
+                                        cidRevision.setModuleUuid(booleanRevision.getModuleUuid());
 					if (booleanRevision.getBooleanValue()) {
 						cidRevision.setC1Uuid(valueForTrue);
 					} else {

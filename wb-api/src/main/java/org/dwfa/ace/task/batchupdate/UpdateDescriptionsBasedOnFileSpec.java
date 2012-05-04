@@ -175,10 +175,11 @@ public class UpdateDescriptionsBasedOnFileSpec extends AbstractTask {
 						if (tuple != null && tuple.getText().equals(oldText) && tuple.getStatusNid() == SnomedMetadataRfx.getSTATUS_CURRENT_NID()) {
 
 							I_DescriptionPart newPart= (I_DescriptionPart) tuple.makeAnalog(
-									SnomedMetadataRfx.getSTATUS_RETIRED_NID(), 
-									config.getDbConfig().getUserConcept().getNid(), 
-									config.getEditingPathSet().iterator().next().getConceptNid(), 
-									Long.MAX_VALUE);
+									SnomedMetadataRfx.getSTATUS_RETIRED_NID(),
+                                                                        Long.MAX_VALUE,
+									config.getEditCoordinate().getAuthorNid(),
+                                                                        config.getEditCoordinate().getModuleNid(),
+									config.getEditingPathSet().iterator().next().getConceptNid());
 
 							I_DescriptionVersioned newDescription = tf.newDescription(UUID.randomUUID(), 
 									concept, 
@@ -201,10 +202,12 @@ public class UpdateDescriptionsBasedOnFileSpec extends AbstractTask {
 												config.getPrecedence(), 
 												config.getConflictResolutionStrategy()).iterator().next();
 										I_ExtendByRefPartCid newExtConceptPart = (I_ExtendByRefPartCid) 
-										loopTuple.makeAnalog(SnomedMetadataRfx.getSTATUS_RETIRED_NID(), 
-												config.getDbConfig().getUserConcept().getConceptNid(), 
-												config.getEditingPathSetReadOnly().iterator().next().getConceptNid(),
-												Long.MAX_VALUE);
+										loopTuple.makeAnalog(
+                                                                                        SnomedMetadataRfx.getSTATUS_RETIRED_NID(),
+                                                                                        Long.MAX_VALUE,
+                                                                                        config.getEditCoordinate().getAuthorNid(),
+                                                                                        config.getEditCoordinate().getModuleNid(),
+                                                                                        config.getEditingPathSet().iterator().next().getConceptNid());
 
 										refsetHelper.newRefsetExtension(extension.getRefsetId(), 
 												newDescription.getDescId(), EConcept.REFSET_TYPES.CID, 
@@ -245,9 +248,10 @@ public class UpdateDescriptionsBasedOnFileSpec extends AbstractTask {
 							if (equalsSynonymExists && inactiveDescription != null) {
 								inactiveDescription.makeAnalog(
 										SnomedMetadataRfx.getSTATUS_CURRENT_NID(), 
-										config.getDbConfig().getUserConcept().getConceptNid(), 
-										config.getEditingPathSetReadOnly().iterator().next().getConceptNid(),
-										Long.MAX_VALUE);
+                                                                                Long.MAX_VALUE,
+                                                                                config.getEditCoordinate().getAuthorNid(),
+                                                                                config.getEditCoordinate().getModuleNid(),
+                                                                                config.getEditingPathSet().iterator().next().getConceptNid());
 							}
 
 							if (!equalsSynonymExists && inactiveDescription == null) {

@@ -118,21 +118,12 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
 
     @Override
     public CidCidCidRevision makeAnalog() {
-        return new CidCidCidRevision(getStatusNid(), getPathNid(), getTime(), this);
+        return new CidCidCidRevision(getStatusNid(), getTime(), getAuthorNid(), getModuleNid(), getPathNid(), this);
     }
 
     @Override
-    public CidCidCidRevision makeAnalog(int statusNid, int pathNid, long time) {
-        CidCidCidRevision newR = new CidCidCidRevision(statusNid, pathNid, time, this);
-
-        addRevision(newR);
-
-        return newR;
-    }
-
-    @Override
-    public CidCidCidRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-        CidCidCidRevision newR = new CidCidCidRevision(statusNid, authorNid, pathNid, time, this);
+    public CidCidCidRevision makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
+        CidCidCidRevision newR = new CidCidCidRevision(statusNid, time, authorNid, moduleNid, pathNid,this);
 
         addRevision(newR);
 

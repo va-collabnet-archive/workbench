@@ -41,7 +41,11 @@ public class AddConceptPart extends AddComponent {
     		getTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly());
     	I_ConceptAttributeTuple tuple = tuples.get(0);
         for (PathBI p : config.getEditingPathSet()) {
-        	tuple.makeAnalog(tuple.getStatusNid(), p.getConceptNid(), Long.MAX_VALUE);
+        	tuple.makeAnalog(tuple.getStatusNid(),
+                        Long.MAX_VALUE,
+                        config.getEditCoordinate().getAuthorNid(),
+                        config.getEditCoordinate().getModuleNid(),
+                        p.getConceptNid());
         }
         Terms.get().addUncommitted(cb);
         termContainer.setTermComponent(cb);

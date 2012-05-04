@@ -1240,7 +1240,11 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                 if (rvList.size() == 1) {
 
                     // CREATE RELATIONSHIP PART W/ TermFactory
-                    rvList.get(0).makeAnalog(isRETIRED, snorocketAuthorNid, writeToNid, versionTime);
+                    rvList.get(0).makeAnalog(isRETIRED,
+                            versionTime,
+                            snorocketAuthorNid,
+                            config.getEditCoordinate().getModuleNid(),
+                            writeToNid);
                     // :!!!:TODO: move addUncommittedNoChecks() to more efficient location.
                     // more optimal to only call once per concept.
                     I_GetConceptData thisC1 = tf.getConcept(rel_A.c1Id);

@@ -112,23 +112,14 @@ public class IntMember extends RefsetMember<IntRevision, IntMember>
 
    @Override
    public IntRevision makeAnalog() {
-      IntRevision newR = new IntRevision(getStatusNid(), getPathNid(), getTime(), this);
+      IntRevision newR = new IntRevision(getStatusNid(), getTime(), getAuthorNid(), getModuleNid(), getPathNid(), this);
 
       return newR;
    }
 
    @Override
-   public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-      IntRevision newR = new IntRevision(statusNid, pathNid, time, this);
-
-      addRevision(newR);
-
-      return newR;
-   }
-
-   @Override
-   public IntRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-      IntRevision newR = new IntRevision(statusNid, authorNid, pathNid, time, this);
+   public IntRevision makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
+      IntRevision newR = new IntRevision(statusNid, time, authorNid, moduleNid, pathNid, this);
 
       addRevision(newR);
 

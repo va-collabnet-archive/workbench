@@ -35,6 +35,8 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 
 import java.util.*;
+import org.dwfa.ace.api.Terms;
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 public class LongRevision extends RefsetRevision<LongRevision, LongMember>
         implements I_ExtendByRefPartLong<LongRevision>, RefexLongAnalogBI<LongRevision> {
@@ -61,23 +63,13 @@ public class LongRevision extends RefsetRevision<LongRevision, LongMember>
       longValue = input.readLong();
    }
 
-   public LongRevision(int statusNid, int pathNid, long time, LongMember primoridalMember) {
-      super(statusNid, pathNid, time, primoridalMember);
+   public LongRevision(int statusNid, long time, int authorNid, int moduleNid, int pathNid, LongMember primoridalMember) {
+      super(statusNid, time, authorNid, moduleNid, pathNid, primoridalMember);
       longValue = primoridalMember.getLongValue();
    }
 
-   protected LongRevision(int statusNid, int pathNid, long time, LongRevision another) {
-      super(statusNid, pathNid, time, another.primordialComponent);
-      longValue = another.longValue;
-   }
-
-   public LongRevision(int statusNid, int authorNid, int pathNid, long time, LongMember primoridalMember) {
-      super(statusNid, authorNid, pathNid, time, primoridalMember);
-      longValue = primoridalMember.getLongValue();
-   }
-
-   protected LongRevision(int statusNid, int authorNid, int pathNid, long time, LongRevision another) {
-      super(statusNid, authorNid, pathNid, time, another.primordialComponent);
+   protected LongRevision(int statusNid, long time, int authorNid, int moduleNid, int pathNid, LongRevision another) {
+      super(statusNid, time, authorNid, moduleNid, pathNid, another.primordialComponent);
       longValue = another.longValue;
    }
 
@@ -111,12 +103,20 @@ public class LongRevision extends RefsetRevision<LongRevision, LongMember>
 
    @Override
    public LongRevision makeAnalog() {
-      return new LongRevision(getStatusNid(), getPathNid(), getTime(), this);
+      return new LongRevision(getStatusNid(), getTime(), getAuthorNid(), getModuleNid(), getPathNid(), this);
    }
-
+   
    @Override
-   public LongRevision makeAnalog(int statusNid, int pathNid, long time) {
-      LongRevision newR = new LongRevision(statusNid, pathNid, time, this);
+   public LongRevision makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
+       if ((this.getTime() == time) && (this.getPathNid() == pathNid)) {
+         this.setStatusNid(statusNid);
+         this.setAuthorNid(authorNid);
+         this.setModuleNid(moduleNid);
+
+         return this;
+      }
+      LongRevision newR = new LongRevision(statusNid, time, authorNid,
+              moduleNid, pathNid, this);
 
       primordialComponent.addRevision(newR);
 
@@ -124,16 +124,7 @@ public class LongRevision extends RefsetRevision<LongRevision, LongMember>
    }
 
    @Override
-   public LongRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-      LongRevision newR = new LongRevision(statusNid, authorNid, pathNid, time, this);
-
-      primordialComponent.addRevision(newR);
-
-      return newR;
-   }
-
-   @Override
-   public I_ExtendByRefPart<LongRevision> makePromotionPart(PathBI promotionPath) {
+   public I_ExtendByRefPart<LongRevision> makePromotionPart(PathBI promotionPath, int authorNid) {
 
       // TODO
       throw new UnsupportedOperationException();

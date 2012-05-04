@@ -214,8 +214,10 @@ public class InsertIDTest extends TestCase {
 		        
 				flag = i_Identify.addLongId(Long.parseLong(wsSctId), ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid(), 
 						i_ConceptAttributeVersioned.getStatusNid(),
-						i_ConceptAttributeVersioned.getPathNid(),
-						effectiveDate);
+						effectiveDate,
+                                                _aceConfig.getEditCoordinate().getAuthorNid(),
+                                                _aceConfig.getEditCoordinate().getModuleNid(),
+                                                i_ConceptAttributeVersioned.getPathNid());
 				I_GetConceptData commitedConcept = _termfactory.getConceptForNid(componentNid);
 				System.out.println("==flag==" + flag);
 				
@@ -273,7 +275,12 @@ public class InsertIDTest extends TestCase {
 							}							
 						}
 		
-						boolean flag = i_Identify.addLongId(sctid, arcAuxSnomedIntegerNid, statusNid, pathNid, effectiveDate);
+						boolean flag = i_Identify.addLongId(sctid, arcAuxSnomedIntegerNid,
+                                                        statusNid,
+                                                        effectiveDate,
+                                                        _aceConfig.getEditCoordinate().getAuthorNid(),
+                                                        _aceConfig.getEditCoordinate().getModuleNid(),
+                                                        pathNid);
 						System.out.println("===insertion status=======" + flag);
 			
 						System.out.println("===========immediate=========");
@@ -392,7 +399,12 @@ public class InsertIDTest extends TestCase {
 			}							
 		}
 		
-		boolean flag = versioned.addLongId(sctid, arcAuxSnomedIntegerNid, _termfactory.uuidToNative(UUID.fromString("2faa9261-8fb2-11db-b606-0800200c9a66")), _termfactory.uuidToNative(UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2")), effectiveDate);
+		boolean flag = versioned.addLongId(sctid, arcAuxSnomedIntegerNid,
+                        _termfactory.uuidToNative(UUID.fromString("2faa9261-8fb2-11db-b606-0800200c9a66")),
+                        effectiveDate,
+                        _aceConfig.getEditCoordinate().getAuthorNid(),
+                        _aceConfig.getEditCoordinate().getModuleNid(),
+                        _termfactory.uuidToNative(UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2")));
 		System.out.println("===insertion status=======" + flag);
 		
 		System.out.println("===========immediate=========");
@@ -450,7 +462,12 @@ public class InsertIDTest extends TestCase {
 			}							
 		}
 		
-		boolean flag = versioned.addLongId(sctid, arcAuxSnomedIntegerNid, _termfactory.uuidToNative(UUID.fromString("2faa9261-8fb2-11db-b606-0800200c9a66")), ExportUtil.getNid(I_Constants.SNOMED_CORE_PATH_UID), effectiveDate);
+		boolean flag = versioned.addLongId(sctid, arcAuxSnomedIntegerNid,
+                        _termfactory.uuidToNative(UUID.fromString("2faa9261-8fb2-11db-b606-0800200c9a66")),
+                        effectiveDate,
+                        _aceConfig.getEditCoordinate().getAuthorNid(),
+                        _aceConfig.getEditCoordinate().getModuleNid(),
+                        ExportUtil.getNid(I_Constants.SNOMED_CORE_PATH_UID));
 		System.out.println("===insertion value=======" + flag);
 		
 		System.out.println("===========after=========");

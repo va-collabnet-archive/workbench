@@ -30,6 +30,7 @@ import org.ihtsdo.tk.api.blueprint.RelCAB;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.binding.snomed.TermAux;
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelType;
 
 public class RelationshipRevision extends Revision<RelationshipRevision, Relationship>
@@ -66,8 +67,12 @@ public class RelationshipRevision extends Revision<RelationshipRevision, Relatio
     }
 
     public RelationshipRevision(TkRelationshipRevision erv, Relationship primordialRel) {
-        super(Bdb.uuidToNid(erv.getStatusUuid()), Bdb.uuidToNid(erv.getAuthorUuid()),
-                Bdb.uuidToNid(erv.getPathUuid()), erv.getTime(), primordialRel);
+        super(Bdb.uuidToNid(erv.getStatusUuid()),
+                erv.getTime(),
+                Bdb.uuidToNid(erv.getAuthorUuid()),
+                Bdb.uuidToNid(erv.getModuleUuid()),
+                Bdb.uuidToNid(erv.getPathUuid()),  
+                primordialRel);
         this.characteristicNid = Bdb.uuidToNid(erv.getCharacteristicUuid());
         this.group = erv.getGroup();
         this.refinabilityNid = Bdb.uuidToNid(erv.getRefinabilityUuid());
@@ -83,9 +88,9 @@ public class RelationshipRevision extends Revision<RelationshipRevision, Relatio
         this.typeNid = input.readInt();
     }
 
-    public RelationshipRevision(I_RelPart another, int statusNid, int authorNid, int pathNid, long time,
+    public RelationshipRevision(I_RelPart another, int statusNid, long time, int authorNid, int moduleNid, int pathNid,
             Relationship primordialRel) {
-        super(statusNid, authorNid, pathNid, time, primordialRel);
+        super(statusNid, time, authorNid, moduleNid, pathNid, primordialRel);
         this.characteristicNid = another.getCharacteristicId();
         this.group = another.getGroup();
         this.refinabilityNid = another.getRefinabilityId();
@@ -125,35 +130,19 @@ public class RelationshipRevision extends Revision<RelationshipRevision, Relatio
 
         return false;
     }
-
     @Override
-    public RelationshipRevision makeAnalog(int statusNid, int pathNid, long time) {
-        if ((this.getTime() == time) && (this.getPathNid() == pathNid)) {
-            this.setStatusNid(statusNid);
-
-            return this;
-        }
-
-        RelationshipRevision newR = new RelationshipRevision(this.primordialComponent, statusNid,
-                Terms.get().getAuthorNid(), pathNid, time, this.primordialComponent);
-
-        this.primordialComponent.addRevision(newR);
-
-        return newR;
-    }
-
-    @Override
-    public RelationshipRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+    public RelationshipRevision makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
 
         if ((this.getTime() == time) && (this.getPathNid() == pathNid)) {
             this.setStatusNid(statusNid);
             this.setAuthorNid(authorNid);
+            this.setModuleNid(moduleNid);
 
             return this;
         }
 
-        RelationshipRevision newR = new RelationshipRevision(this,
-                statusNid, authorNid, pathNid, time, this.primordialComponent);
+        RelationshipRevision newR = new RelationshipRevision(this, statusNid,
+                time, authorNid, moduleNid, pathNid, this.primordialComponent);
 
         this.primordialComponent.addRevision(newR);
 

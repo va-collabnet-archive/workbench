@@ -9,6 +9,7 @@ import org.dwfa.ace.api.I_IdPart;
 
 import org.ihtsdo.concept.component.ConceptComponent.IDENTIFIER_PART_TYPES;
 import org.ihtsdo.tk.api.id.StringIdBI;
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierString;
 
 public class IdentifierVersionString extends IdentifierVersion implements StringIdBI {
@@ -30,19 +31,19 @@ public class IdentifierVersionString extends IdentifierVersion implements String
       stringDenotation = input.readString();
    }
 
-   public IdentifierVersionString(int statusNid, int authorNid, int pathNid, long time) {
-      super(statusNid, authorNid, pathNid, time);
+   public IdentifierVersionString(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
+      super(statusNid, time, authorNid, moduleNid, pathNid);
    }
 
-   public IdentifierVersionString(IdentifierVersionString another, int statusNid, int authorNid, int pathNid,
-                                  long time) {
-      super(statusNid, authorNid, pathNid, time);
+   public IdentifierVersionString(IdentifierVersionString another, int statusNid, long time, 
+           int authorNid, int moduleNid, int pathNid) {
+      super(statusNid, time, authorNid, moduleNid, pathNid);
       stringDenotation = (String) another.getDenotation();
    }
 
-   public IdentifierVersionString(int statusNid, int authorNid, int pathNid, long time, String denotation,
-                                  int authorityNid) {
-      super(statusNid, authorNid, pathNid, time);
+   public IdentifierVersionString(int statusNid, long time,int authorNid,
+           int moduleNid, int pathNid, String denotation, int authorityNid) {
+      super(statusNid, time, authorNid, moduleNid, pathNid);
       stringDenotation = denotation;
       this.setAuthorityNid(authorityNid);
    }
@@ -65,8 +66,8 @@ public class IdentifierVersionString extends IdentifierVersion implements String
    }
 
    @Override
-   public I_IdPart makeIdAnalog(int statusNid, int authorNid, int pathNid, long time) {
-      return new IdentifierVersionString(this, statusNid, authorNid, pathNid, time);
+   public I_IdPart makeIdAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
+      return new IdentifierVersionString(this, statusNid, time, authorNid, moduleNid, pathNid);
    }
 
    @Override

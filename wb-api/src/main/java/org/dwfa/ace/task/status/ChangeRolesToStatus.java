@@ -116,9 +116,10 @@ public class ChangeRolesToStatus extends AbstractTask {
                     		Set<I_RelPart> partsToAdd = new HashSet<I_RelPart>();
 	                    	I_RelPart newPart = (I_RelPart) relv.makeAnalog(
 	                    			newStatusConcept.getConceptNid(), 
-	                    			config.getDbConfig().getUserConcept().getNid(),
-	                    			editPath.getConceptNid(), 
-	                    			Long.MAX_VALUE);
+	                    			Long.MAX_VALUE,
+                                                config.getEditCoordinate().getAuthorNid(),
+                                                config.getEditCoordinate().getModuleNid(),
+	                    			editPath.getConceptNid());
                     	}
 
                     }

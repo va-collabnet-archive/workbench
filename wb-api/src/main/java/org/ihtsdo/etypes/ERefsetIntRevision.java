@@ -24,9 +24,10 @@ public class ERefsetIntRevision extends TkRefsetIntRevision {
 
    public ERefsetIntRevision(I_ExtendByRefPartInt part) throws IOException {
       intValue   = part.getIntValue();
-      pathUuid   = Terms.get().nidToUuid(part.getPathId());
-      statusUuid = Terms.get().nidToUuid(part.getStatusId());
+      pathUuid   = Terms.get().nidToUuid(part.getPathNid());
+      statusUuid = Terms.get().nidToUuid(part.getStatusNid());
       authorUuid    = Terms.get().nidToUuid(part.getAuthorNid());
+      moduleUuid    = Terms.get().nidToUuid(part.getModuleNid());
       time       = part.getTime();
    }
 

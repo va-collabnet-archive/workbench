@@ -202,7 +202,10 @@ public class ImagePopupListener extends MouseAdapter {
             I_ImagePart currentPart = (I_ImagePart) selectedObject.getTuple().getMutablePart();
             I_ImagePart newPart     =
                (I_ImagePart) currentPart.makeAnalog(config.getDefaultStatus().getConceptNid(),
-                  config.getDbConfig().getUserConcept().getNid(), p.getConceptNid(), Long.MAX_VALUE);
+                    Long.MAX_VALUE,
+                    config.getEditCoordinate().getAuthorNid(),
+                    config.getEditCoordinate().getModuleNid(),
+                    p.getConceptNid());
 
             selectedObject.getTuple().getVersioned().addVersion(newPart);
          }
@@ -237,9 +240,11 @@ public class ImagePopupListener extends MouseAdapter {
             for (PathBI p : config.getEditingPathSet()) {
                I_ImagePart currentPart = (I_ImagePart) selectedObject.getTuple().getMutablePart();
                I_ImagePart newPart     = (I_ImagePart) currentPart.makeAnalog(currentPart.getStatusNid(),
-                                            config.getDbConfig().getUserConcept().getNid(),
-                                            p.getConceptNid(), Integer.MAX_VALUE);
-
+                                                Long.MAX_VALUE,
+                                                config.getEditCoordinate().getAuthorNid(),
+                                                config.getEditCoordinate().getModuleNid(),
+                                                p.getConceptNid());
+               
                switch (field) {
                case STATUS :
                   newPart.setStatusNid((AceConfig.getVodb().uuidToNative(ids)));

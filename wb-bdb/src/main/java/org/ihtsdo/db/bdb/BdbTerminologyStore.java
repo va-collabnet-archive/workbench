@@ -85,6 +85,8 @@ import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
+import org.ihtsdo.tk.binding.snomed.Snomed;
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 public class BdbTerminologyStore implements TerminologyStoreDI {
 
@@ -503,7 +505,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
             
             int authorNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.USER.getUids());
             int editPathNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
-            metadataEC = new EditCoordinate(authorNid, editPathNid);
+            metadataEC = new EditCoordinate(authorNid, editPathNid, Snomed.CORE_MODULE.getLenient().getNid()); //@akf make the same as what the metadata is on
         }
 
         return metadataEC;

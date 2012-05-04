@@ -36,6 +36,7 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 
 import java.util.*;
+import org.dwfa.ace.api.Terms;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid_cnid.RefexCnidCnidVersionBI;
 import org.ihtsdo.tk.dto.RevisionHandling;
@@ -116,21 +117,14 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
 
    @Override
    public CidCidRevision makeAnalog() {
-      return new CidCidRevision(getStatusNid(), getPathNid(), getTime(), this);
+      return new CidCidRevision(getStatusNid(), getTime(),
+              getAuthorNid(), getModuleNid(), getPathNid(), this);
    }
-
+   
    @Override
-   public CidCidRevision makeAnalog(int statusNid, int pathNid, long time) {
-      CidCidRevision newR = new CidCidRevision(statusNid, pathNid, time, this);
-
-      addRevision(newR);
-
-      return newR;
-   }
-
-   @Override
-   public CidCidRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-      CidCidRevision newR = new CidCidRevision(statusNid, authorNid, pathNid, time, this);
+   public CidCidRevision makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
+      CidCidRevision newR = new CidCidRevision(statusNid, time,
+              authorNid, moduleNid, pathNid,this);
 
       addRevision(newR);
 

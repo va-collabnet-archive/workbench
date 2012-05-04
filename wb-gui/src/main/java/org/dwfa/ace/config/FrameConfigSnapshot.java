@@ -1405,4 +1405,9 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 	public void setAllAvailableWorkflowActionUids(List<UUID> actions) {
 		baseFrame.setAllAvailableWorkflowActionUids(actions);
 	}
+
+    @Override
+    public void setModuleNid(int moduleNid) {
+        baseFrame.setModuleNid(moduleNid);
+    }
 }

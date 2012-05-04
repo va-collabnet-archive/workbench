@@ -207,7 +207,11 @@ public class RelTupleFileUtil {
                 if (!found) {
                     I_RelPart newPart =
                             (I_RelPart) irv.getTuples().iterator().next().makeAnalog(
-                                termFactory.getConcept(statusUuid).getNid(), pathConcept.getNid(), effectiveDate);
+                                termFactory.getConcept(statusUuid).getNid(),
+                                effectiveDate,
+                                importConfig.getEditCoordinate().getAuthorNid(),
+                                importConfig.getEditCoordinate().getModuleNid(),
+                                pathConcept.getNid());
                     newPart.setTypeId(termFactory.getConcept(relTypeUuid).getNid());
                     newPart.setCharacteristicId(termFactory.getConcept(charUuid).getNid());
                     newPart.setRefinabilityId(termFactory.getConcept(refUuid).getNid());

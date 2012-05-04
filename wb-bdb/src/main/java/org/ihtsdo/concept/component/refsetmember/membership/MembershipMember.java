@@ -103,23 +103,14 @@ public class MembershipMember extends RefsetMember<MembershipRevision, Membershi
 
    @Override
    public MembershipRevision makeAnalog() {
-      MembershipRevision newR = new MembershipRevision(getStatusNid(), getPathNid(), getTime(), this);
+      MembershipRevision newR = new MembershipRevision(getStatusNid(), getTime(), getAuthorNid(), getModuleNid(), getPathNid(),  this);
 
       return newR;
    }
 
    @Override
-   public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-      MembershipRevision newR = new MembershipRevision(statusNid, pathNid, time, this);
-
-      addRevision(newR);
-
-      return newR;
-   }
-
-   @Override
-   public MembershipRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-      MembershipRevision newR = new MembershipRevision(statusNid, authorNid, pathNid, time, this);
+   public MembershipRevision makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
+      MembershipRevision newR = new MembershipRevision(statusNid, time, authorNid, moduleNid, pathNid, this);
 
       addRevision(newR);
 

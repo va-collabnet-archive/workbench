@@ -45,6 +45,6 @@ public interface I_ExtendByRefPart<T extends RefexAnalogBI<T>>
 
     public I_ExtendByRefPart<T> duplicate();
 
-    public I_ExtendByRefPart<T> makePromotionPart(PathBI promotionPath);
+    public I_ExtendByRefPart<T> makePromotionPart(PathBI promotionPath, int authorNid);
 
 }

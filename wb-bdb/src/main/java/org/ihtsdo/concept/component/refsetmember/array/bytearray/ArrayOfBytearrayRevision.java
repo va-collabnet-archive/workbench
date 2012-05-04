@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import org.apache.commons.collections.primitives.ArrayIntList;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
@@ -89,24 +90,15 @@ public class ArrayOfBytearrayRevision extends RefsetRevision<ArrayOfBytearrayRev
       }
    }
 
-   protected ArrayOfBytearrayRevision(int statusNid, int pathNid, long time, ArrayOfBytearrayMember primoridalMember) {
-      super(statusNid, pathNid, time, primoridalMember);
+   protected ArrayOfBytearrayRevision(int statusNid, long time, int authorNid,
+           int moduleNid, int pathNid, ArrayOfBytearrayMember primoridalMember) {
+      super(statusNid, time, authorNid, moduleNid, pathNid, primoridalMember);
       this.arrayOfByteArray = primoridalMember.getArrayOfByteArray();
    }
 
-   protected ArrayOfBytearrayRevision(int statusNid, int pathNid, long time, ArrayOfBytearrayRevision another) {
-      super(statusNid, pathNid, time, another.primordialComponent);
-      this.arrayOfByteArray = another.getArrayOfByteArray();
-   }
-
-   protected ArrayOfBytearrayRevision(int statusNid, int authorNid, int pathNid, long time,
-                             ArrayOfBytearrayMember primoridalMember) {
-      super(statusNid, authorNid, pathNid, time, primoridalMember);
-      this.arrayOfByteArray = primoridalMember.getArrayOfByteArray();
-   }
-
-   protected ArrayOfBytearrayRevision(int statusNid, int authorNid, int pathNid, long time, ArrayOfBytearrayRevision another) {
-      super(statusNid, authorNid, pathNid, time, another.primordialComponent);
+   protected ArrayOfBytearrayRevision(int statusNid, long time, int authorNid,
+           int moduleNid, int pathNid, ArrayOfBytearrayRevision another) {
+      super(statusNid, time, authorNid, moduleNid, pathNid, another.primordialComponent);
       this.arrayOfByteArray = another.getArrayOfByteArray();
    }
 
@@ -140,18 +132,22 @@ public class ArrayOfBytearrayRevision extends RefsetRevision<ArrayOfBytearrayRev
 
    @Override
    public ArrayOfBytearrayRevision makeAnalog() {
-      return new ArrayOfBytearrayRevision(getStatusNid(), getPathNid(), getTime(), this);
+      return new ArrayOfBytearrayRevision(getStatusNid(), getTime(), getAuthorNid(),
+              getModuleNid(), getPathNid(),  this);
    }
-
+   
    @Override
-   public ArrayOfBytearrayRevision makeAnalog(int statusNid, int pathNid, long time) {
+   public ArrayOfBytearrayRevision makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
       if ((this.getTime() == time) && (this.getPathNid() == pathNid)) {
          this.setStatusNid(statusNid);
+         this.setAuthorNid(authorNid);
+         this.setModuleNid(moduleNid);
 
          return this;
       }
 
-      ArrayOfBytearrayRevision newR = new ArrayOfBytearrayRevision(statusNid, pathNid, time, this);
+      ArrayOfBytearrayRevision newR = new ArrayOfBytearrayRevision(statusNid, time,
+              authorNid, moduleNid, pathNid,this);
 
       primordialComponent.addRevision(newR);
 
@@ -159,22 +155,7 @@ public class ArrayOfBytearrayRevision extends RefsetRevision<ArrayOfBytearrayRev
    }
 
    @Override
-   public ArrayOfBytearrayRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-      if ((this.getTime() == time) && (this.getPathNid() == pathNid)) {
-         this.setStatusNid(statusNid);
-
-         return this;
-      }
-
-      ArrayOfBytearrayRevision newR = new ArrayOfBytearrayRevision(statusNid, authorNid, pathNid, time, this);
-
-      primordialComponent.addRevision(newR);
-
-      return newR;
-   }
-
-   @Override
-   public I_ExtendByRefPart<ArrayOfBytearrayRevision> makePromotionPart(PathBI promotionPath) {
+   public I_ExtendByRefPart<ArrayOfBytearrayRevision> makePromotionPart(PathBI promotionPath, int authorNid) {
 
       // TODO
       throw new UnsupportedOperationException();

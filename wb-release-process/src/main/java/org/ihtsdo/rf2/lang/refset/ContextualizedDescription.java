@@ -182,7 +182,11 @@ public class ContextualizedDescription implements I_ContextualizeDescription {
 				tf.addUncommitted(concept);
 			} else {
 				for (PathBI editPath : config.getEditingPathSet()) {
-					I_DescriptionPart newDescriptionPart = (I_DescriptionPart) descriptionPart.makeAnalog(descriptionStatusId, editPath.getConceptNid(), Long.MAX_VALUE);
+					I_DescriptionPart newDescriptionPart = (I_DescriptionPart) descriptionPart.makeAnalog(descriptionStatusId,
+                                                Long.MAX_VALUE,
+                                                config.getEditCoordinate().getAuthorNid(),
+                                                config.getEditCoordinate().getModuleNid(),
+                                                editPath.getConceptNid());
 					newDescriptionPart.setText(text.trim());
 					newDescriptionPart.setLang(lang.trim());
 					newDescriptionPart.setInitialCaseSignificant(isInitialCaseSignificant);
@@ -204,7 +208,11 @@ public class ContextualizedDescription implements I_ContextualizeDescription {
 					tf.addUncommitted(languageExtension);
 				} else {
 					for (PathBI editPath : config.getEditingPathSet()) {
-						I_ExtendByRefPartCid newExtConceptPart = (I_ExtendByRefPartCid) languageExtensionPart.makeAnalog(extensionStatusId, editPath.getConceptNid(), Long.MAX_VALUE);
+						I_ExtendByRefPartCid newExtConceptPart = (I_ExtendByRefPartCid) languageExtensionPart.makeAnalog(extensionStatusId,
+                                                        Long.MAX_VALUE,
+                                                        config.getEditCoordinate().getAuthorNid(),
+                                                        config.getEditCoordinate().getModuleNid(),
+                                                        editPath.getConceptNid());
 						newExtConceptPart.setC1id(acceptabilityId);
 						languageExtension.addVersion(newExtConceptPart);
 					}
@@ -249,7 +257,11 @@ public class ContextualizedDescription implements I_ContextualizeDescription {
 				tf.addUncommittedNoChecks(concept);
 			} else {
 				for (PathBI editPath : config.getEditingPathSet()) {
-					I_DescriptionPart newDescriptionPart = (I_DescriptionPart) descriptionPart.makeAnalog(descriptionStatusId, editPath.getConceptNid(), Long.MAX_VALUE);
+					I_DescriptionPart newDescriptionPart = (I_DescriptionPart) descriptionPart.makeAnalog(descriptionStatusId,
+                                                Long.MAX_VALUE,
+                                                config.getEditCoordinate().getAuthorNid(),
+                                                config.getEditCoordinate().getModuleNid(),
+                                                editPath.getConceptNid());
 					newDescriptionPart.setText(text.trim());
 					newDescriptionPart.setLang(lang.trim());
 					newDescriptionPart.setInitialCaseSignificant(isInitialCaseSignificant);
@@ -271,7 +283,11 @@ public class ContextualizedDescription implements I_ContextualizeDescription {
 					tf.addUncommittedNoChecks(languageExtension);
 				} else {
 					for (PathBI editPath : config.getEditingPathSet()) {
-						I_ExtendByRefPartCid newExtConceptPart = (I_ExtendByRefPartCid) languageExtensionPart.makeAnalog(extensionStatusId, editPath.getConceptNid(), Long.MAX_VALUE);
+						I_ExtendByRefPartCid newExtConceptPart = (I_ExtendByRefPartCid) languageExtensionPart.makeAnalog(extensionStatusId,
+                                                        Long.MAX_VALUE,
+                                                        config.getEditCoordinate().getAuthorNid(),
+                                                        config.getEditCoordinate().getModuleNid(),
+                                                        editPath.getConceptNid());
 						newExtConceptPart.setC1id(acceptabilityId);
 						languageExtension.addVersion(newExtConceptPart);
 					}

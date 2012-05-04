@@ -39,7 +39,12 @@ public class Snomed {
     public static ConceptSpec INACTIVE_CONCEPT =
         new ConceptSpec("Inactive concept (inactive concept)",
         UUID.fromString("f267fc6f-7c4d-3a79-9f17-88b82b42709a"));
-    
+    public static ConceptSpec CORE_MODULE =
+        new ConceptSpec("SNOMED CT core",
+        UUID.fromString("1b4f1ba5-b725-390f-8c3b-33ec7096bdca"));
+    public static ConceptSpec UNSPECIFIED_MODULE =
+        new ConceptSpec("Module (core metadata concept)",
+        UUID.fromString("40d1c869-b509-32f8-b735-836eac577a67"));
     
     //Concept Specs for context sensitive role relationships
 

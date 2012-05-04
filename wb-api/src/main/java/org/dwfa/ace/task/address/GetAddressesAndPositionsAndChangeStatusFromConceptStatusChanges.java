@@ -122,7 +122,11 @@ public class GetAddressesAndPositionsAndChangeStatusFromConceptStatusChanges ext
                     tf.convertToThickVersion(t.getVersion())));
                 pathSet.add(t.getPathId());
            
-                I_ConceptAttributePart part = (I_ConceptAttributePart) t.makeAnalog(newStatus.getConceptNid(), t.getPathId(), Long.MAX_VALUE);
+                I_ConceptAttributePart part = (I_ConceptAttributePart) t.makeAnalog(newStatus.getConceptNid(),
+                        Long.MAX_VALUE,
+                        config.getEditCoordinate().getAuthorNid(),
+                        config.getEditCoordinate().getModuleNid(),
+                        t.getPathNid());
                 t.getConVersioned().addVersion(part);
                 Terms.get().addUncommitted(concept);
             }

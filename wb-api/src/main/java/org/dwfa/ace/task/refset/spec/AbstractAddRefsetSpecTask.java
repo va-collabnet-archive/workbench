@@ -173,8 +173,11 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
                      for (PathBI p : configFrame.getEditingPathSet()) {
                         I_ExtendByRefPart analog =
                            (I_ExtendByRefPart) t.makeAnalog(
-                               ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(), p.getConceptNid(),
-                               Long.MAX_VALUE);
+                               ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
+                               Long.MAX_VALUE,
+                               configFrame.getEditCoordinate().getAuthorNid(),
+                               configFrame.getEditCoordinate().getModuleNid(),
+                               p.getConceptNid());
 
                         ext.addVersion(analog);
                         tf.addUncommitted(ext);

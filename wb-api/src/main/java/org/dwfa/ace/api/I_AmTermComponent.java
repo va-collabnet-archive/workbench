@@ -43,11 +43,11 @@ public interface I_AmTermComponent extends ComponentBI {
      * @throws TerminologyException
      */
     public boolean promote(I_TestComponent test, I_Position viewPosition, PathSetReadOnly pomotionPaths, 
-            NidSetBI allowedStatus, Precedence precedence)
+            NidSetBI allowedStatus, Precedence precedence, int authorNid)
             throws IOException, TerminologyException;
 
     public boolean promote(PositionBI viewPosition, PathSetReadOnly pomotionPaths, 
-            NidSetBI allowedStatus, Precedence precedence)
+            NidSetBI allowedStatus, Precedence precedence, int authorNid)
             throws IOException, TerminologyException;
 
 }

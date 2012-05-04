@@ -115,7 +115,11 @@ public class ChangeRelsOfTypeToStatus extends AbstractTask {
                         for (I_RelTuple t : editTuples) {
                             if (t.getStatusNid() != newStatusConcept.getConceptNid() &&
                                    t.getCharacteristicNid() != SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID() ) {
-                                I_RelPart newPart = (I_RelPart) t.makeAnalog(newStatusConcept.getConceptNid(), editPath.getConceptNid(), Long.MAX_VALUE);
+                                I_RelPart newPart = (I_RelPart) t.makeAnalog(newStatusConcept.getConceptNid(),
+                                        Long.MAX_VALUE,
+                                        config.getEditCoordinate().getAuthorNid(),
+                                        config.getEditCoordinate().getModuleNid(),
+                                        editPath.getConceptNid());
                                 partsToAdd.add(newPart);
                             }
                         }

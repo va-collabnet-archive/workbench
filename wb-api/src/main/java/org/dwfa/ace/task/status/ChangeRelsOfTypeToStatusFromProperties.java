@@ -112,7 +112,11 @@ public class ChangeRelsOfTypeToStatusFromProperties extends AbstractTask {
                     Set<I_RelPart> partsToAdd = new HashSet<I_RelPart>();
                     for (I_RelTuple t : editTuples) {
                         if (t.getStatusNid() != newStatusConcept.getConceptNid()) {
-                            I_RelPart newPart = (I_RelPart) t.makeAnalog(newStatusConcept.getConceptNid(), editPath.getConceptNid(), Long.MAX_VALUE);
+                            I_RelPart newPart = (I_RelPart) t.makeAnalog(newStatusConcept.getConceptNid(),
+                                    Long.MAX_VALUE,
+                                    config.getEditCoordinate().getAuthorNid(),
+                                    config.getEditCoordinate().getModuleNid(),
+                                    editPath.getConceptNid());
                             partsToAdd.add(newPart);
                         }
                     }

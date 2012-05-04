@@ -239,8 +239,10 @@ public class RulesDeploymentPackageReferenceHelper {
 						I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) 
 						lastPart.makeAnalog(
 								ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
-								editPath.getConceptNid(),
-								Long.MAX_VALUE);
+                                                                Long.MAX_VALUE,
+                                                                config.getEditCoordinate().getAuthorNid(),
+                                                                config.getEditCoordinate().getModuleNid(),
+								editPath.getConceptNid());
 						part.setStringValue(metadata);
 						extension.addVersion(part);
 						termFactory.addUncommittedNoChecks(extension);
@@ -259,11 +261,13 @@ public class RulesDeploymentPackageReferenceHelper {
 			allowedStatusWithRetired.add(ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid());
 			
 			rulesPackageConcept.promote(config.getViewPositionSet().iterator().next(), 
-					config.getPromotionPathSetReadOnly(), allowedStatusWithRetired, Precedence.TIME);
+					config.getPromotionPathSetReadOnly(), allowedStatusWithRetired, 
+                                        Precedence.TIME, config.getEditCoordinate().getAuthorNid());
 			
 			for (I_ExtendByRef loopExtension : termFactory.getAllExtensionsForComponent(rulesPackageConcept.getConceptNid())) {
 				loopExtension.promote(config.getViewPositionSet().iterator().next(), 
-						config.getPromotionPathSetReadOnly(), allowedStatusWithRetired, Precedence.TIME);
+						config.getPromotionPathSetReadOnly(), allowedStatusWithRetired,
+                                                Precedence.TIME, config.getEditCoordinate().getAuthorNid());
 				termFactory.addUncommittedNoChecks(loopExtension);
 			}
 			termFactory.addUncommittedNoChecks(rulesPackageConcept);
@@ -353,8 +357,10 @@ public class RulesDeploymentPackageReferenceHelper {
 					for (PathBI editPath : config.getEditingPathSet()) {
 						I_DescriptionPart newPart = (I_DescriptionPart) tuple.getMutablePart().makeAnalog(
 								ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
-								editPath.getConceptNid(),
-								Long.MAX_VALUE);
+								Long.MAX_VALUE,
+                                                                config.getEditCoordinate().getAuthorNid(),
+                                                                config.getEditCoordinate().getModuleNid(),
+								editPath.getConceptNid());
 						newPart.setText(newString);
 						description.addVersion(newPart);
 					}
@@ -367,7 +373,8 @@ public class RulesDeploymentPackageReferenceHelper {
 					allowedStatusWithRetired.add(ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid());
 					
 					concept.promote(config.getViewPositionSet().iterator().next(), 
-							config.getPromotionPathSetReadOnly(), allowedStatusWithRetired, Precedence.TIME);
+							config.getPromotionPathSetReadOnly(), allowedStatusWithRetired,
+                                                        Precedence.TIME, config.getEditCoordinate().getAuthorNid());
 					termFactory.addUncommittedNoChecks(concept);
 					termFactory.commit();
 				}
@@ -425,8 +432,10 @@ public class RulesDeploymentPackageReferenceHelper {
 				I_ConceptAttributePart newAttributeVersion = 
 					(I_ConceptAttributePart) lastAttributePart.makeAnalog(
 							ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
-							editPath.getConceptNid(), 
-							Long.MAX_VALUE);
+							Long.MAX_VALUE,
+                                                        config.getEditCoordinate().getAuthorNid(),
+                                                        config.getEditCoordinate().getModuleNid(),
+							editPath.getConceptNid());
 				conceptToRetireUpdatedFromDB.getConceptAttributes().addVersion(newAttributeVersion);
 			}
 			termFactory.addUncommittedNoChecks(conceptToRetireUpdatedFromDB);
@@ -438,11 +447,13 @@ public class RulesDeploymentPackageReferenceHelper {
 			allowedStatusWithRetired.add(ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid());
 			
 			conceptToRetireUpdatedFromDB.promote(config.getViewPositionSet().iterator().next(), 
-					config.getPromotionPathSetReadOnly(), allowedStatusWithRetired, Precedence.TIME);
+					config.getPromotionPathSetReadOnly(), allowedStatusWithRetired,
+                                        Precedence.TIME, config.getEditCoordinate().getAuthorNid());
 			
 			for (I_ExtendByRef loopExtension : termFactory.getAllExtensionsForComponent(conceptToRetireUpdatedFromDB.getConceptNid())) {
 				loopExtension.promote(config.getViewPositionSet().iterator().next(), 
-						config.getPromotionPathSetReadOnly(), allowedStatusWithRetired, Precedence.TIME);
+						config.getPromotionPathSetReadOnly(), allowedStatusWithRetired,
+                                                Precedence.TIME, config.getEditCoordinate().getAuthorNid());
 				termFactory.addUncommittedNoChecks(loopExtension);
 			}
 			termFactory.addUncommittedNoChecks(conceptToRetireUpdatedFromDB);

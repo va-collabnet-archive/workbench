@@ -65,27 +65,16 @@ public class CidLongRevision extends RefsetRevision<CidLongRevision, CidLongMemb
       longValue = input.readLong();
    }
 
-   protected CidLongRevision(int statusNid, int pathNid, long time, CidLongMember primoridalMember) {
-      super(statusNid, pathNid, time, primoridalMember);
-      c1Nid     = primoridalMember.getC1Nid();
-      longValue = primoridalMember.getLongValue();
-   }
-
-   protected CidLongRevision(int statusNid, int pathNid, long time, CidLongRevision another) {
-      super(statusNid, pathNid, time, another.primordialComponent);
-      c1Nid     = another.c1Nid;
-      longValue = another.longValue;
-   }
-
-   protected CidLongRevision(int statusNid, int authorNid, int pathNid, long time,
+   protected CidLongRevision(int statusNid, long time, int authorNid, int moduleNid, int pathNid, 
                              CidLongMember primoridalMember) {
-      super(statusNid, authorNid, pathNid, time, primoridalMember);
+      super(statusNid, time, authorNid, moduleNid, pathNid, primoridalMember);
       c1Nid     = primoridalMember.getC1Nid();
       longValue = primoridalMember.getLongValue();
    }
 
-   protected CidLongRevision(int statusNid, int authorNid, int pathNid, long time, CidLongRevision another) {
-      super(statusNid, authorNid, pathNid, time, another.primordialComponent);
+   protected CidLongRevision(int statusNid, long time, int authorNid, int moduleNid, int pathNid,
+           CidLongRevision another) {
+      super(statusNid, time, authorNid, moduleNid, pathNid, another.primordialComponent);
       c1Nid     = another.c1Nid;
       longValue = another.longValue;
    }
@@ -119,18 +108,20 @@ public class CidLongRevision extends RefsetRevision<CidLongRevision, CidLongMemb
 
    @Override
    public CidLongRevision makeAnalog() {
-      return new CidLongRevision(getStatusNid(), getPathNid(), getTime(), this);
+      return new CidLongRevision(getStatusNid(), getTime(), getAuthorNid(), getModuleNid(), getPathNid(), this);
    }
 
    @Override
-   public CidLongRevision makeAnalog(int statusNid, int pathNid, long time) {
+   public CidLongRevision makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
       if ((this.getTime() == time) && (this.getPathNid() == pathNid)) {
          this.setStatusNid(statusNid);
+         this.setAuthorNid(authorNid);
+         this.setModuleNid(moduleNid);
 
          return this;
       }
 
-      CidLongRevision newR = new CidLongRevision(statusNid, pathNid, time, this);
+      CidLongRevision newR = new CidLongRevision(statusNid, time, authorNid, moduleNid, pathNid, this);
 
       primordialComponent.addRevision(newR);
 
@@ -138,22 +129,7 @@ public class CidLongRevision extends RefsetRevision<CidLongRevision, CidLongMemb
    }
 
    @Override
-   public CidLongRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-      if ((this.getTime() == time) && (this.getPathNid() == pathNid)) {
-         this.setStatusNid(statusNid);
-
-         return this;
-      }
-
-      CidLongRevision newR = new CidLongRevision(statusNid, authorNid, pathNid, time, this);
-
-      primordialComponent.addRevision(newR);
-
-      return newR;
-   }
-
-   @Override
-   public I_ExtendByRefPart<CidLongRevision> makePromotionPart(PathBI promotionPath) {
+   public I_ExtendByRefPart<CidLongRevision> makePromotionPart(PathBI promotionPath, int authorNid) {
 
       // TODO
       throw new UnsupportedOperationException();

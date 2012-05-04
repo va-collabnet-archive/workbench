@@ -581,6 +581,11 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
       return frameConfig.getEditCoordinate();
    }
 
+    @Override
+    public void setModuleNid(int moduleNid) {
+        frameConfig.setModuleNid(moduleNid);
+    }
+
     private class RefsetParentOnlyFilter implements I_FilterTaxonomyRels {
 
         public void filter(I_GetConceptData node, List<? extends I_RelTuple> srcRels, List<? extends I_RelTuple> destRels,

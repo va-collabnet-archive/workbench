@@ -213,6 +213,7 @@ public class CidIntegerToCidLongTransformer extends AbstractTransformer {
 		cidLongMember.setAdditionalIdComponents(extension.getAdditionalIdComponents());
 		cidLongMember.setAnnotations(extension.getAnnotations());
 		cidLongMember.setAuthorUuid(extension.getAuthorUuid());
+                cidLongMember.setModuleUuid(extension.getModuleUuid());
 		cidLongMember.setComponentUuid(extension.getComponentUuid());
 		cidLongMember.setPathUuid(extension.getPathUuid());
 		cidLongMember.setPrimordialComponentUuid(extension.getPrimordialComponentUuid());
@@ -248,6 +249,7 @@ public class CidIntegerToCidLongTransformer extends AbstractTransformer {
 			for (TkRefsetCidIntRevision cidIntRevision : extension.getRevisions()) {
 				TkRefsetCidLongRevision cidLongRevision = new TkRefsetCidLongRevision();
 				cidLongRevision.setAuthorUuid(cidIntRevision.getAuthorUuid());
+                                cidLongRevision.setModuleUuid(cidIntRevision.getModuleUuid());
 				cidLongRevision.setPathUuid(cidIntRevision.getPathUuid());
 				cidLongRevision.setStatusUuid(cidIntRevision.getStatusUuid());
 				cidLongRevision.setTime(cidIntRevision.getTime());

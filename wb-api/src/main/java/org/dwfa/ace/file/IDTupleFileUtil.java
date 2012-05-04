@@ -123,14 +123,24 @@ public class IDTupleFileUtil {
                     if (sourceSystemUuid.equals(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids().iterator()
                         .next())) {
                         versioned.addUuidId(UUID.fromString(sourceId), termFactory.uuidToNative(sourceSystemUuid),
-                            termFactory.uuidToNative(statusUuid), pathConcept.getNid(), effectiveDate);
+                            termFactory.uuidToNative(statusUuid), effectiveDate,
+                            importConfig.getEditCoordinate().getAuthorNid(),
+                            importConfig.getEditCoordinate().getModuleNid(), 
+                            pathConcept.getNid());
                     } else if (sourceSystemUuid.equals(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids()
                         .iterator().next())) {
                         versioned.addLongId(new Long(sourceId), termFactory.uuidToNative(sourceSystemUuid), termFactory
-                            .uuidToNative(statusUuid), pathConcept.getNid(), effectiveDate);
+                            .uuidToNative(statusUuid), effectiveDate,
+                            importConfig.getEditCoordinate().getAuthorNid(),
+                            importConfig.getEditCoordinate().getModuleNid(),
+                            pathConcept.getNid());
                     } else {
-                        versioned.addStringId(sourceId, termFactory.uuidToNative(sourceSystemUuid), termFactory
-                            .uuidToNative(statusUuid), pathConcept.getNid(), effectiveDate);
+                        versioned.addStringId(sourceId, termFactory.uuidToNative(sourceSystemUuid),
+                                termFactory.uuidToNative(statusUuid),
+                                effectiveDate,
+                                importConfig.getEditCoordinate().getAuthorNid(),
+                                importConfig.getEditCoordinate().getModuleNid(),
+                                pathConcept.getNid());
                         // use string as default
                     }
 

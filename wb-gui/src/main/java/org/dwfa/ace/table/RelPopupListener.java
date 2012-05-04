@@ -199,8 +199,10 @@ public class RelPopupListener extends MouseAdapter {
             for (PathBI p : config.getEditingPathSet()) {
                I_RelPart currentPart = (I_RelPart) selectedObject.getTuple().getMutablePart();
                I_RelPart newPart     = (I_RelPart) currentPart.makeAnalog(currentPart.getStatusNid(),
-                                          config.getDbConfig().getUserConcept().getNid(), p.getConceptNid(),
-                                          Long.MAX_VALUE);
+                                        Long.MAX_VALUE,
+                                        config.getEditCoordinate().getAuthorNid(),
+                                        config.getEditCoordinate().getModuleNid(),
+                                        p.getConceptNid());
 
                selectedObject.getTuple().getRelVersioned().addVersion(newPart);
 
@@ -257,8 +259,10 @@ public class RelPopupListener extends MouseAdapter {
                   I_RelPart currentPart = (I_RelPart) selectedObject.getTuple().getMutablePart();
 
                   newPart = (I_RelPart) currentPart.makeAnalog(currentPart.getStatusNid(),
-                          config.getDbConfig().getUserConcept().getNid(), p.getConceptNid(),
-                          Long.MAX_VALUE);
+                            Long.MAX_VALUE,
+                            config.getEditCoordinate().getAuthorNid(),
+                            config.getEditCoordinate().getModuleNid(),
+                            p.getConceptNid());
                   srcRel.addVersion(newPart);
                } else {
                   newPart.setPathNid(p.getConceptNid());

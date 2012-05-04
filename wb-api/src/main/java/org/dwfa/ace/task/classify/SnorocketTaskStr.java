@@ -65,6 +65,7 @@ import org.ihtsdo.tk.api.Precedence;
 import au.csiro.snorocket.snapi.Snorocket;
 import au.csiro.snorocket.snapi.I_Snorocket.I_Callback;
 import au.csiro.snorocket.snapi.I_Snorocket.I_EquivalentCallback;
+import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 // import au.csiro.snorocket.snapi.I_Snorocket.I_InternalDataConCallback;
@@ -974,7 +975,11 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
 				if (rvList.size() == 1) {
 					// CREATE RELATIONSHIP PART W/ TermFactory
 					rvList.get(0)
-							.makeAnalog(isRETIRED, writeToNid, versionTime);
+							.makeAnalog(isRETIRED, 
+                                                                versionTime,  
+                                                                tf.uuidToNative(Concept.SNOROCKET.getUids()), 
+                                                                config.getEditCoordinate().getModuleNid(), 
+                                                                writeToNid);
 
 				} else if (rvList.size() == 0) {
 					logger

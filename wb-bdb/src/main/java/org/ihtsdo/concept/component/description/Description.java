@@ -52,6 +52,7 @@ import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.api.blueprint.DescCAB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 public class Description extends ConceptComponent<DescriptionRevision, Description>
         implements I_DescriptionVersioned<DescriptionRevision>, I_DescriptionPart<DescriptionRevision>,
@@ -205,22 +206,13 @@ public class Description extends ConceptComponent<DescriptionRevision, Descripti
     public int hashCode() {
         return Hashcode.compute(new int[]{nid});
     }
-
+    
     @Override
-    public DescriptionRevision makeAnalog(int statusNid, int pathNid, long time) {
+    public DescriptionRevision makeAnalog(int statusNid,long time, int authorNid, int moduleNid, int pathNid) {
         DescriptionRevision newR;
 
-        newR = new DescriptionRevision(this, statusNid, Terms.get().getAuthorNid(), pathNid, time, this);
-        addRevision(newR);
-
-        return newR;
-    }
-
-    @Override
-    public DescriptionRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-        DescriptionRevision newR;
-
-        newR = new DescriptionRevision(this, statusNid, authorNid, pathNid, time, this);
+        newR = new DescriptionRevision(this, statusNid, time, Terms.get().getAuthorNid(),
+                moduleNid, pathNid, this);
         addRevision(newR);
 
         return newR;
@@ -247,7 +239,7 @@ public class Description extends ConceptComponent<DescriptionRevision, Descripti
 
     @Override
     public boolean promote(PositionBI viewPosition, PathSetReadOnly pomotionPaths, NidSetBI allowedStatus,
-            Precedence precedence)
+            Precedence precedence, int authorNid)
             throws IOException, TerminologyException {
         int viewPathId = viewPosition.getPath().getConceptNid();
         Collection<Version> matchingTuples = computer.getSpecifiedVersions(allowedStatus, viewPosition,
@@ -257,8 +249,8 @@ public class Description extends ConceptComponent<DescriptionRevision, Descripti
         for (PathBI promotionPath : pomotionPaths) {
             for (Version v : matchingTuples) {
                 if (v.getPathNid() == viewPathId) {
-                    DescriptionRevision revision = v.makeAnalog(v.getStatusNid(), promotionPath.getConceptNid(),
-                            Long.MAX_VALUE);
+                    DescriptionRevision revision = v.makeAnalog(v.getStatusNid(), Long.MAX_VALUE,
+                            authorNid, v.getModuleNid(), promotionPath.getConceptNid());
 
                     addRevision(revision);
                     promotedAnything = true;
@@ -655,16 +647,10 @@ public class Description extends ConceptComponent<DescriptionRevision, Descripti
 
             return new DescriptionRevision((DescriptionRevision) cv, Description.this);
         }
-
+        
         @Override
-        @Deprecated
-        public DescriptionRevision makeAnalog(int statusNid, int pathNid, long time) {
-            return getCv().makeAnalog(statusNid, Terms.get().getAuthorNid(), pathNid, time);
-        }
-
-        @Override
-        public DescriptionRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-            return getCv().makeAnalog(statusNid, authorNid, pathNid, time);
+        public DescriptionRevision makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
+            return getCv().makeAnalog(statusNid, time, authorNid, moduleNid, pathNid);
         }
 
         @Override

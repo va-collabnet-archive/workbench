@@ -244,18 +244,8 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     }
 
     @Override
-    public RelationshipRevision makeAnalog(int statusNid, int pathNid, long time) {
-        RelationshipRevision newR = new RelationshipRevision(this, statusNid, Terms.get().getAuthorNid(),
-                pathNid, time, this);
-
-        addRevision(newR);
-
-        return newR;
-    }
-
-    @Override
-    public RelationshipRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-        RelationshipRevision newR = new RelationshipRevision(this, statusNid, authorNid, pathNid, time, this);
+    public RelationshipRevision makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
+        RelationshipRevision newR = new RelationshipRevision(this, statusNid, time, authorNid, moduleNid, pathNid, this);
 
         addRevision(newR);
 
@@ -264,7 +254,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
     @Override
     public boolean promote(PositionBI viewPosition, PathSetReadOnly pomotionPaths, NidSetBI allowedStatus,
-            Precedence precedence)
+            Precedence precedence, int authorNid)
             throws IOException, TerminologyException {
         int viewPathId = viewPosition.getPath().getConceptNid();
         Collection<Version> matchingTuples = computer.getSpecifiedVersions(allowedStatus, viewPosition,
@@ -274,9 +264,11 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         for (PathBI promotionPath : pomotionPaths) {
             for (Version v : matchingTuples) {
                 if (v.getPathNid() == viewPathId) {
-                    RelationshipRevision revision = v.makeAnalog(v.getStatusNid(), promotionPath.getConceptNid(),
-                            Long.MAX_VALUE);
-
+                    RelationshipRevision revision = v.makeAnalog(v.getStatusNid(),
+                            Long.MAX_VALUE,
+                            authorNid,
+                            v.getModuleNid(),
+                            promotionPath.getConceptNid());
                     addRevision(revision);
                     promotedAnything = true;
                 }
@@ -846,15 +838,8 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         }
 
         @Override
-        @Deprecated
-        public RelationshipRevision makeAnalog(int statusNid, int pathNid, long time) {
-            return (RelationshipRevision) getCv().makeAnalog(statusNid, Terms.get().getAuthorNid(), pathNid,
-                    time);
-        }
-
-        @Override
-        public RelationshipRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-            return (RelationshipRevision) getCv().makeAnalog(statusNid, authorNid, pathNid, time);
+        public RelationshipRevision makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
+            return (RelationshipRevision) getCv().makeAnalog(statusNid, time, authorNid, moduleNid, pathNid);
         }
 
         @Override

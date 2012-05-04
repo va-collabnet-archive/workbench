@@ -123,7 +123,11 @@ public class VodbCopyLatestComponent extends AbstractMojo {
                 config.getPrecedence(), config.getConflictResolutionStrategy());
             // copy latest attributes to new path/version
             for (I_ConceptAttributeTuple tuple : conceptAttributeTuples) {
-                I_ConceptAttributePart newPart = (I_ConceptAttributePart) tuple.makeAnalog(tuple.getStatusId(), copyToPath.getConceptNid(), Long.MAX_VALUE);
+                I_ConceptAttributePart newPart = (I_ConceptAttributePart) tuple.makeAnalog(tuple.getStatusNid(),
+                        Long.MAX_VALUE,
+                        config.getEditCoordinate().getAuthorNid(),
+                        config.getEditCoordinate().getAuthorNid(),
+                        copyToPath.getConceptNid());
                 concept.getConceptAttributes().addVersion(newPart);
             }
 
@@ -132,7 +136,11 @@ public class VodbCopyLatestComponent extends AbstractMojo {
                 config.getPrecedence(), config.getConflictResolutionStrategy());
             // copy latest descriptions to new path/version
             for (I_DescriptionTuple tuple : descriptionTuples) {
-                I_DescriptionPart newPart = (I_DescriptionPart) tuple.makeAnalog(tuple.getStatusId(), copyToPath.getConceptNid(), Long.MAX_VALUE);
+                I_DescriptionPart newPart = (I_DescriptionPart) tuple.makeAnalog(tuple.getStatusNid(),
+                        Long.MAX_VALUE,
+                        config.getEditCoordinate().getAuthorNid(),
+                        config.getEditCoordinate().getAuthorNid(),
+                        copyToPath.getConceptNid());
                 tuple.getDescVersioned().addVersion(newPart);
             }
 
@@ -141,7 +149,11 @@ public class VodbCopyLatestComponent extends AbstractMojo {
                 config.getPrecedence(), config.getConflictResolutionStrategy());
             // copy latest relationships to new path/version
             for (I_RelTuple tuple : relationshipTuples) {
-                I_RelPart newPart = (I_RelPart) tuple.makeAnalog(tuple.getStatusId(), copyToPath.getConceptNid(), Long.MAX_VALUE);
+                I_RelPart newPart = (I_RelPart) tuple.makeAnalog(tuple.getStatusNid(),
+                        Long.MAX_VALUE,
+                        config.getEditCoordinate().getAuthorNid(),
+                        config.getEditCoordinate().getAuthorNid(),
+                        copyToPath.getConceptNid());
                 tuple.getRelVersioned().addVersion(newPart);
             }
 

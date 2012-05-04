@@ -68,9 +68,10 @@ public class SetICSignificantAction extends AbstractAction {
 							for (PathBI ep : config.getEditingPathSet()) {
 								analog = (DescriptionAnalogBI) descVersion.makeAnalog(
 										SnomedMetadataRfx.getSTATUS_CURRENT_NID(),
-										config.getDbConfig().getUserConcept().getNid(),
-										ep.getConceptNid(),
-										Long.MAX_VALUE);
+										Long.MAX_VALUE,
+                                                                                config.getEditCoordinate().getAuthorNid(),
+                                                                                config.getEditCoordinate().getModuleNid(), 
+                                                                                ep.getConceptNid());
 								analog.setInitialCaseSignificant(false);
 							}
 							changePerformed = true;
@@ -84,9 +85,10 @@ public class SetICSignificantAction extends AbstractAction {
 							for (PathBI ep : config.getEditingPathSet()) {
 								analog = (DescriptionAnalogBI) descVersion.makeAnalog(
 										SnomedMetadataRfx.getSTATUS_CURRENT_NID(),
-										config.getDbConfig().getUserConcept().getNid(),
-										ep.getConceptNid(),
-										Long.MAX_VALUE);
+										Long.MAX_VALUE,
+                                                                                config.getEditCoordinate().getAuthorNid(),
+                                                                                config.getEditCoordinate().getModuleNid(), 
+                                                                                ep.getConceptNid());
 								analog.setInitialCaseSignificant(true);
 							}
 							changePerformed = true;

@@ -206,7 +206,10 @@ public class AttributePopupListener extends MouseAdapter {
                (I_ConceptAttributePart) selectedObject.getTuple().getMutablePart();
             I_ConceptAttributePart newPart =
                (I_ConceptAttributePart) currentPart.makeAnalog(currentPart.getStatusNid(),
-                  config.getDbConfig().getUserConcept().getNid(), p.getConceptNid(), Long.MAX_VALUE);
+                    Long.MAX_VALUE,
+                    config.getEditCoordinate().getAuthorNid(),
+                    config.getEditCoordinate().getModuleNid(),
+                    p.getConceptNid());
 
             ((I_ConceptAttributeVersioned) selectedObject.getTuple().getFixedPart()).addVersion(newPart);
          }
@@ -249,15 +252,20 @@ public class AttributePopupListener extends MouseAdapter {
                      Collection<UUID> ids = (Collection<UUID>) obj;
 
                      newPart = (I_ConceptAttributePart) currentPart.makeAnalog(Terms.get().uuidToNative(ids),
-                             config.getDbConfig().getUserConcept().getNid(), p.getConceptNid(),
-                             Long.MAX_VALUE);
+                                Long.MAX_VALUE,
+                                config.getEditCoordinate().getAuthorNid(),
+                                config.getEditCoordinate().getModuleNid(),
+                                p.getConceptNid());
 
                      break;
 
                   case DEFINED :
                      newPart = (I_ConceptAttributePart) currentPart.makeAnalog(
                         config.getDefaultStatus().getConceptNid(),
-                        config.getDbConfig().getUserConcept().getNid(), p.getConceptNid(), Long.MAX_VALUE);
+                        Long.MAX_VALUE,
+                        config.getEditCoordinate().getAuthorNid(),
+                        config.getEditCoordinate().getModuleNid(),
+                    p.getConceptNid());
                      newPart.setDefined((Boolean) obj);
 
                      break;

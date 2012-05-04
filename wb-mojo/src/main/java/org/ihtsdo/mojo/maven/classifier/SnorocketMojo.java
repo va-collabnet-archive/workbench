@@ -932,7 +932,11 @@ public class SnorocketMojo extends AbstractMojo {
                 if (rvList.size() == 1) {
 
                     // CREATE RELATIONSHIP PART W/ TermFactory
-                    rvList.get(0).makeAnalog(isRETIRED, snorocketAuthorNid, writeToNid, versionTime);
+                    rvList.get(0).makeAnalog(isRETIRED, 
+                            versionTime,
+                            snorocketAuthorNid,
+                            config.getEditCoordinate().getModuleNid(),
+                            writeToNid);
                     I_GetConceptData thisC1 = tf.getConcept(rel_A.c1Id);
                     tf.addUncommittedNoChecks(thisC1);
 

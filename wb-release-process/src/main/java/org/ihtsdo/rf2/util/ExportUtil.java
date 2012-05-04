@@ -227,7 +227,12 @@ public class ExportUtil {
 						"commitLog.xls"), new File(newDbProfile.getChangeSetRoot(),
 								"." + "commitLog.xls")));	
 				  
-				flag = i_Identify.addLongId(Long.parseLong(wsSctId), ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid(), statusNid, pathNid, effectiveDate);
+				flag = i_Identify.addLongId(Long.parseLong(wsSctId), ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid(),
+                                        statusNid,
+                                        effectiveDate,
+                                        aceConfig.getEditCoordinate().getAuthorNid(),
+                                        aceConfig.getEditCoordinate().getModuleNid(),
+                                        pathNid);
 				I_GetConceptData commitedConcept = getTermFactory().getConceptForNid(componentNid);
 			
 				getTermFactory().addUncommitted(commitedConcept);
@@ -295,7 +300,12 @@ public class ExportUtil {
 			boolean flag = false;
 			try {	
 					I_Identify i_Identify = getTermFactory().getId(componentNid);
-					flag = i_Identify.addStringId(wsSnomedId, ArchitectonicAuxiliary.Concept.SNOMED_RT_ID.localize().getNid(), statusNid, pathNid, Long.MAX_VALUE);
+					flag = i_Identify.addStringId(wsSnomedId, ArchitectonicAuxiliary.Concept.SNOMED_RT_ID.localize().getNid(),
+                                                statusNid,
+                                                Long.MAX_VALUE,
+                                                aceConfig.getEditCoordinate().getAuthorNid(),
+                                                aceConfig.getEditCoordinate().getModuleNid(),
+                                                pathNid);
 					I_GetConceptData commitedConcept = getTermFactory().getConcept(componentNid);
 					
 					getTermFactory().addUncommitted(commitedConcept);
@@ -320,7 +330,11 @@ public class ExportUtil {
 					   createAceConfig();
 					}
 					  
-					flag = i_Identify.addStringId(wsCtv3Id, ArchitectonicAuxiliary.Concept.CTV3_ID.localize().getNid(), statusNid, pathNid, Long.MAX_VALUE);
+					flag = i_Identify.addStringId(wsCtv3Id, ArchitectonicAuxiliary.Concept.CTV3_ID.localize().getNid(), statusNid,
+                                                Long.MAX_VALUE,
+                                                aceConfig.getEditCoordinate().getAuthorNid(),
+                                                aceConfig.getEditCoordinate().getModuleNid(),
+                                                pathNid);
 					I_GetConceptData commitedConcept = getTermFactory().getConcept(componentNid);
 					
 					getTermFactory().addUncommitted(commitedConcept);
@@ -348,7 +362,11 @@ public class ExportUtil {
 					}
 				  
 					flag = i_Identify.addStringId(wsSnomedId, ArchitectonicAuxiliary.Concept.SNOMED_RT_ID.localize().getNid(),
-						statusNid, pathNid, effectiveDate);
+						statusNid,
+                                                effectiveDate,
+                                                aceConfig.getEditCoordinate().getAuthorNid(),
+                                                aceConfig.getEditCoordinate().getModuleNid(),
+                                                pathNid);
 					I_GetConceptData commitedConcept = getTermFactory().getConcept(componentNid);
 					//getTermFactory().addUncommitted(commitedConcept);
 					//getTermFactory().commit();
@@ -374,7 +392,11 @@ public class ExportUtil {
 					}
 					  
 					flag = i_Identify.addStringId(wsCtv3Id, ArchitectonicAuxiliary.Concept.CTV3_ID.localize().getNid(),
-							statusNid, pathNid, effectiveDate);
+						statusNid,
+                                                effectiveDate,
+                                                aceConfig.getEditCoordinate().getAuthorNid(),
+                                                aceConfig.getEditCoordinate().getModuleNid(),
+                                                pathNid);
 			
 					I_GetConceptData commitedConcept = getTermFactory().getConcept(componentNid);
 					//getTermFactory().addUncommitted(commitedConcept);
@@ -1785,7 +1807,12 @@ public class ExportUtil {
 		try {	
 				I_Identify i_Identify = getTermFactory().getId(componentNid);	
 				I_GetConceptData commitedConcept = getTermFactory().getConceptForNid(componentNid);
-				flag = i_Identify.addLongId(Long.parseLong(wsSctId), ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid(), statusNid, pathNid, Long.MAX_VALUE);
+				flag = i_Identify.addLongId(Long.parseLong(wsSctId), ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid(),
+                                        statusNid,
+                                        Long.MAX_VALUE,
+                                        aceConfig.getEditCoordinate().getAuthorNid(),
+                                        aceConfig.getEditCoordinate().getModuleNid(),
+                                        pathNid);
 				
 				getTermFactory().addUncommitted(commitedConcept);
 				

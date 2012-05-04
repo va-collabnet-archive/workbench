@@ -51,10 +51,10 @@ public interface I_Identify extends I_AmTermComponent {
 
     public UniversalAceIdentification getUniversalId() throws IOException, TerminologyException;
 
-    public boolean addStringId(String stringId, int authorityNid, int statusNid, int pathNid, long time);
+    public boolean addStringId(String stringId, int authorityNid, int statusNid, long time, int authorNid, int moduleNid, int pathNid);
 
-    public boolean addUuidId(UUID uuidId, int authorityNid, int statusNid, int pathNid, long time);
+    public boolean addUuidId(UUID uuidId, int authorityNid, int statusNid, long time, int authorNid, int moduleNid, int pathNid);
 
-    public boolean addLongId(Long longId, int authorityNid, int statusNid, int pathNid, long time);
+    public boolean addLongId(Long longId, int authorityNid, int statusNid, long time, int authorNid, int moduleNid, int pathNid);
 
 }

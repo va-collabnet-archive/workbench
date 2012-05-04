@@ -926,8 +926,10 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
                             I_ExtendByRefPartCid clone = (I_ExtendByRefPartCid) v.makeAnalog(
                                     SnomedMetadataRfx.getSTATUS_RETIRED_NID(),
-                                    editPath.getConceptNid(),
-                                    Long.MAX_VALUE);
+                                    Long.MAX_VALUE,
+                                    config.getEditCoordinate().getAuthorNid(),
+                                    config.getEditCoordinate().getModuleNid(),
+                                    editPath.getConceptNid());
                             extension.addVersion(clone);
                             Terms.get().addUncommittedNoChecks(extension);
 
@@ -1159,8 +1161,11 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                 if (config.getAllowedStatus().contains(v.getStatusNid())
                         && v.getTypeNid() == REFSET_TYPES.CID.getTypeNid()) {
                     for (PathBI editPath : getEditPaths()) {
-                        I_ExtendByRefPartCid clone = (I_ExtendByRefPartCid) v.makeAnalog(statusId, editPath.getConceptNid(),
-                                Long.MAX_VALUE);
+                        I_ExtendByRefPartCid clone = (I_ExtendByRefPartCid) v.makeAnalog(statusId,
+                                Long.MAX_VALUE,
+                                config.getEditCoordinate().getAuthorNid(),
+                                config.getEditCoordinate().getModuleNid(),
+                                editPath.getConceptNid());
                         clone.setC1id(c1Id);
                         extension.addVersion(clone);
                         Terms.get().addUncommittedNoChecks(extension);
@@ -1189,8 +1194,10 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                     // found a member to retire
                     for (PathBI editPath : getEditPaths()) {
                         I_ExtendByRefPartCid clone = (I_ExtendByRefPartCid) v.makeAnalog(SnomedMetadataRfx.getSTATUS_RETIRED_NID(),
-                                editPath.getConceptNid(),
-                                Long.MAX_VALUE);
+                                Long.MAX_VALUE,
+                                config.getEditCoordinate().getAuthorNid(),
+                                config.getEditCoordinate().getModuleNid(),
+                                editPath.getConceptNid());
                         extension.addVersion(clone);
                         Terms.get().addUncommittedNoChecks(extension);
                     }

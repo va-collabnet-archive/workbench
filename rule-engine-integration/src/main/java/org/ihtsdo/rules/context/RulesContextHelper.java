@@ -436,8 +436,10 @@ public class RulesContextHelper {
 									I_ExtendByRefPartCidString newPart = (I_ExtendByRefPartCidString) 
 									lastPart.makeAnalog(
 											ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
-											editPath.getConceptNid(),
-											Long.MAX_VALUE);
+                                                                                        Long.MAX_VALUE,
+                                                                                        config.getEditCoordinate().getAuthorNid(),
+                                                                                        config.getEditCoordinate().getAuthorNid(),
+											editPath.getConceptNid());
 									newPart.setC1id(newRole.getConceptNid());
 									extension.addVersion(newPart);
 									tf.addUncommittedNoChecks(extension);
@@ -471,8 +473,10 @@ public class RulesContextHelper {
 								I_ExtendByRefPartCidString newPart = (I_ExtendByRefPartCidString) 
 								lastPart.makeAnalog(
 										ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
-										editPath.getConceptNid(),
-										Long.MAX_VALUE);
+										Long.MAX_VALUE,
+                                                                                config.getEditCoordinate().getAuthorNid(),
+                                                                                config.getEditCoordinate().getAuthorNid(),
+										editPath.getConceptNid());
 								extension.addVersion(newPart);
 								tf.addUncommittedNoChecks(extension);
 							}
@@ -591,8 +595,10 @@ public class RulesContextHelper {
 					for (PathBI editPath : config.getEditingPathSet()) {
 						I_DescriptionPart newPart = (I_DescriptionPart) tuple.getMutablePart().makeAnalog(
 								ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
-								editPath.getConceptNid(),
-								Long.MAX_VALUE);
+								Long.MAX_VALUE,
+                                                                config.getEditCoordinate().getAuthorNid(),
+                                                                config.getEditCoordinate().getAuthorNid(),
+								editPath.getConceptNid());
 						newPart.setText(newString);
 						description.addVersion(newPart);
 					}
@@ -826,8 +832,10 @@ public class RulesContextHelper {
 								loopTuple.getC2Id() == pkgConcept.getConceptNid()) {
 							I_RelPart newPart = (I_RelPart) loopTuple.getMutablePart().makeAnalog(
 									ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
-									config.getEditingPathSetReadOnly().iterator().next().getConceptNid(),
-									Long.MAX_VALUE);
+									Long.MAX_VALUE,
+                                                                        config.getEditCoordinate().getAuthorNid(),
+                                                                        config.getEditCoordinate().getAuthorNid(),
+									config.getEditingPathSetReadOnly().iterator().next().getConceptNid());
 							loopTuple.getFixedPart().addVersion(newPart);
 							retiredAndReactivated = true;
 							termFactory.addUncommittedNoChecks(context);
@@ -888,8 +896,10 @@ public class RulesContextHelper {
 					for (PathBI editPath : config.getEditingPathSet()) {
 						I_RelPart newPart = (I_RelPart) rel.getMutablePart().makeAnalog(
 								ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
-								editPath.getConceptNid(),
-								Long.MAX_VALUE);
+								Long.MAX_VALUE,
+                                                                config.getEditCoordinate().getAuthorNid(),
+                                                                config.getEditCoordinate().getAuthorNid(),
+								editPath.getConceptNid());
 						relVersioned.addVersion(newPart);
 					}
 					termFactory.addUncommittedNoChecks(context);
@@ -965,12 +975,12 @@ public class RulesContextHelper {
 			I_TermFactory termFactory = Terms.get();
 
 			concept.promote(config.getViewPositionSet().iterator().next(), 
-					config.getPromotionPathSetReadOnly(), allowedStatusWithRetired, Precedence.TIME);
+					config.getPromotionPathSetReadOnly(), allowedStatusWithRetired, Precedence.TIME, config.getEditCoordinate().getAuthorNid());
 			termFactory.addUncommittedNoChecks(concept);
 
 			for (I_ExtendByRef loopExtension : termFactory.getAllExtensionsForComponent(concept.getConceptNid())) {
 				loopExtension.promote(config.getViewPositionSet().iterator().next(), 
-						config.getPromotionPathSetReadOnly(), allowedStatusWithRetired, Precedence.TIME);
+						config.getPromotionPathSetReadOnly(), allowedStatusWithRetired, Precedence.TIME, config.getEditCoordinate().getAuthorNid());
 				termFactory.addUncommittedNoChecks(loopExtension);
 			}
 

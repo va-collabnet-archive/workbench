@@ -449,8 +449,12 @@ public class ModifyUserRolePanel extends JPanel {
                             for (PathBI editPath : termFactory.getActiveAceFrameConfig().getEditingPathSet()) {
                                 I_RelPart oldPart = relVersioned.getLastTuple().getMutablePart();
                                 I_RelPart newPart =
-                                        (I_RelPart) oldPart.makeAnalog(ArchitectonicAuxiliary.Concept.RETIRED
-                                            .localize().getNid(), editPath.getConceptNid(), Long.MAX_VALUE);
+                                        (I_RelPart) oldPart.makeAnalog(
+                                            ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
+                                            Long.MAX_VALUE,
+                                            config.getEditCoordinate().getAuthorNid(),
+                                            config.getEditCoordinate().getModuleNid(),
+                                            editPath.getConceptNid());
                                 if (oldPart.getStatusId() != ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid()) {
                                     relVersioned.addVersion(newPart);
                                 }
@@ -472,7 +476,7 @@ public class ModifyUserRolePanel extends JPanel {
                 
                 PositionBI viewPosition = viewPositionSet.iterator().next();
                 currentUser.promote(viewPosition, config.getPromotionPathSetReadOnly(), retiredSet, config
-                    .getPrecedence());
+                    .getPrecedence(), config.getEditCoordinate().getAuthorNid());
                 termFactory.addUncommittedNoChecks(currentUser);
                 termFactory.commit();
 

@@ -471,33 +471,52 @@ public class ConflictPanel extends JPanel implements ActionListener {
 
     private void addAttrPart(HashMap<Integer, I_ConceptAttributeTuple> attrsForResolution, PathBI editPath,
             I_ConceptAttributeVersioned attr) {
-        I_ConceptAttributePart newPart = (I_ConceptAttributePart) attrsForResolution.get(attr.getConId()).makeAnalog(config.getDefaultStatus().getConceptNid(), editPath.getConceptNid(), Integer.MAX_VALUE);
+        I_ConceptAttributePart newPart = (I_ConceptAttributePart) attrsForResolution.get(attr.getConId()).makeAnalog(config.getDefaultStatus().getConceptNid(),
+                Integer.MAX_VALUE,
+                config.getEditCoordinate().getAuthorNid(),
+                config.getEditCoordinate().getModuleNid(),
+                editPath.getConceptNid());
   
         attr.addVersion(newPart);
     }
 
     private void addDescPart(HashMap<Integer, I_DescriptionTuple> descsForResolution, PathBI editPath,
             I_DescriptionVersioned desc) {
-        I_DescriptionPart newPart = (I_DescriptionPart) descsForResolution.get(desc.getDescId()).makeAnalog(config.getDefaultStatus().getConceptNid(), editPath.getConceptNid(), Integer.MAX_VALUE);
+        I_DescriptionPart newPart = (I_DescriptionPart) descsForResolution.get(desc.getDescId()).makeAnalog(config.getDefaultStatus().getConceptNid(),
+                Integer.MAX_VALUE,
+                config.getEditCoordinate().getAuthorNid(),
+                config.getEditCoordinate().getModuleNid(),
+                editPath.getConceptNid());
  
         desc.addVersion(newPart);
     }
 
     private void retireDescPart(PathBI editPath, I_DescriptionVersioned desc) throws IOException, TerminologyException {
-        I_DescriptionPart newPart = (I_DescriptionPart) desc.getLastTuple().makeAnalog(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(), editPath.getConceptNid(), Integer.MAX_VALUE);
+        I_DescriptionPart newPart = (I_DescriptionPart) desc.getLastTuple().makeAnalog(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
+                Integer.MAX_VALUE,
+                config.getEditCoordinate().getAuthorNid(),
+                config.getEditCoordinate().getModuleNid(),
+                editPath.getConceptNid());
 
         desc.addVersion(newPart);
     }
 
     private void addRelPart(HashMap<Integer, I_RelTuple> relsForResolution, PathBI editPath, I_RelVersioned rel) {
-        I_RelPart newPart = (I_RelPart) relsForResolution.get(rel.getRelId()).makeAnalog(config.getDefaultStatus().getConceptNid(), editPath.getConceptNid(), Integer.MAX_VALUE);
+        I_RelPart newPart = (I_RelPart) relsForResolution.get(rel.getRelId()).makeAnalog(config.getDefaultStatus().getConceptNid(),
+                Integer.MAX_VALUE,
+                config.getEditCoordinate().getAuthorNid(),
+                config.getEditCoordinate().getModuleNid(),
+                editPath.getConceptNid());
 
         rel.addVersion(newPart);
     }
 
     private void retireRelPart(PathBI editPath, I_RelVersioned rel) throws IOException, TerminologyException {
-        I_RelPart newPart = (I_RelPart) rel.getLastTuple().makeAnalog(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(), editPath.getConceptNid(), Integer.MAX_VALUE);
-
+        I_RelPart newPart = (I_RelPart) rel.getLastTuple().makeAnalog(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
+                Integer.MAX_VALUE,
+                config.getEditCoordinate().getAuthorNid(),
+                config.getEditCoordinate().getModuleNid(),
+                editPath.getConceptNid());
         rel.addVersion(newPart);
     }
 

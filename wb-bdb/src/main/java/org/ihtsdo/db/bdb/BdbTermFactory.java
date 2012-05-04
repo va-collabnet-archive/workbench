@@ -183,6 +183,7 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_Search {
 
     private int authorNid = Integer.MAX_VALUE;
+    private int moduleNid = Integer.MAX_VALUE;
     I_ConfigAceFrame activeAceFrameConfig;
     private File envHome;
     private Map<IsaCoordinate, ? extends KindOfCacheBI> isaCache;
@@ -772,14 +773,18 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
         for (PathBI p : aceFrameConfig.getEditingPathSet()) {
             if (a.primordialSapNid == Integer.MIN_VALUE) {
-                a.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, getUserNid(aceFrameConfig),
-                        p.getConceptNid(), time);
+                a.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, time, getUserNid(aceFrameConfig),
+                        aceFrameConfig.getEditCoordinate().getModuleNid(), p.getConceptNid());
             } else {
                 if (a.revisions == null) {
                     a.revisions = new RevisionSet(a.primordialSapNid);
                 }
 
-                a.revisions.add((ConceptAttributesRevision) a.makeAnalog(statusNid, p.getConceptNid(), time));
+                a.revisions.add((ConceptAttributesRevision) a.makeAnalog(statusNid, 
+                        time,
+                        aceFrameConfig.getEditCoordinate().getAuthorNid(),
+                        aceFrameConfig.getEditCoordinate().getModuleNid(),
+                        p.getConceptNid()));
             }
         }
 
@@ -840,14 +845,18 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
         for (PathBI p : aceFrameConfig.getEditingPathSet()) {
             if (d.primordialSapNid == Integer.MIN_VALUE) {
-                d.primordialSapNid = Bdb.getSapDb().getSapNid(status.getNid(), getUserNid(aceFrameConfig),
-                        p.getConceptNid(), effectiveDate);
+                d.primordialSapNid = Bdb.getSapDb().getSapNid(status.getNid(), effectiveDate, getUserNid(aceFrameConfig),
+                        aceFrameConfig.getEditCoordinate().getModuleNid(), p.getConceptNid());
             } else {
                 if (d.revisions == null) {
                     d.revisions = new RevisionSet(d.primordialSapNid);
                 }
 
-                d.revisions.add(d.makeAnalog(status.getNid(), p.getConceptNid(), effectiveDate));
+                d.revisions.add(d.makeAnalog(status.getNid(),
+                        effectiveDate,
+                        aceFrameConfig.getEditCoordinate().getAuthorNid(),
+                        aceFrameConfig.getEditCoordinate().getModuleNid(),
+                        p.getConceptNid()));
             }
         }
 
@@ -948,14 +957,19 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
         for (PathBI p : aceConfig.getEditingPathSet()) {
             if (img.primordialSapNid == Integer.MIN_VALUE) {
-                img.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid,
-                        aceConfig.getDbConfig().getUserConcept().getNid(), p.getConceptNid(), Long.MAX_VALUE);
+                img.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, Long.MAX_VALUE,
+                        aceConfig.getDbConfig().getUserConcept().getNid(),
+                        aceConfig.getEditCoordinate().getModuleNid(), p.getConceptNid());
             } else {
                 if (img.revisions == null) {
                     img.revisions = new RevisionSet(img.primordialSapNid);
                 }
 
-                img.revisions.add(img.makeAnalog(statusNid, p.getConceptNid(), Long.MAX_VALUE));
+                img.revisions.add(img.makeAnalog(statusNid,
+                        Long.MAX_VALUE,
+                        aceConfig.getEditCoordinate().getAuthorNid(),
+                        aceConfig.getEditCoordinate().getModuleNid(),
+                        p.getConceptNid()));
             }
         }
 
@@ -1090,14 +1104,19 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
         for (PathBI p : aceFrameConfig.getEditingPathSet()) {
             if (r.primordialSapNid == Integer.MIN_VALUE) {
-                r.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, getUserNid(aceFrameConfig),
-                        p.getConceptNid(), effectiveDate);
+                r.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid,effectiveDate,
+                        getUserNid(aceFrameConfig), aceFrameConfig.getEditCoordinate().getModuleNid(),
+                        p.getConceptNid());
             } else {
                 if (r.revisions == null) {
                     r.revisions = new RevisionSet(r.primordialSapNid);
                 }
 
-                r.revisions.add((RelationshipRevision) r.makeAnalog(statusNid, p.getConceptNid(), effectiveDate));
+                r.revisions.add((RelationshipRevision) r.makeAnalog(statusNid,
+                        effectiveDate,
+                        aceFrameConfig.getEditCoordinate().getAuthorNid(),
+                        aceFrameConfig.getEditCoordinate().getModuleNid(),
+                        p.getConceptNid()));
             }
         }
 
@@ -1131,9 +1150,9 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         r.setRefinabilityId(relRefinabilityNid);
         r.setCharacteristicId(relCharacteristicNid);
         r.setGroup(group);
-        r.primordialSapNid = Bdb.getSapDb().getSapNid(relStatusNid,
-                getActiveAceFrameConfig().getDbConfig().getUserConcept().getConceptNid(), pathNid,
-                effectiveDate);
+        r.primordialSapNid = Bdb.getSapDb().getSapNid(relStatusNid,effectiveDate,
+                getActiveAceFrameConfig().getDbConfig().getUserConcept().getConceptNid(), 
+                getActiveAceFrameConfig().getEditCoordinate().getModuleNid(), pathNid);
         c.getSourceRels().add(r);
         c.modified();
 
@@ -1160,7 +1179,10 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         r.setRefinabilityId(relRefinabilityNid);
         r.setCharacteristicId(relCharacteristicNid);
         r.setGroup(group);
-        r.primordialSapNid = Bdb.getSapDb().getSapNid(relStatusNid, authorNid, pathNid, effectiveDate);
+        r.primordialSapNid = Bdb.getSapDb().getSapNid(relStatusNid, effectiveDate,
+                authorNid, 
+                getActiveAceFrameConfig().getEditCoordinate().getModuleNid(), 
+                pathNid);
         c.getSourceRels().add(r);
         c.modified();
 
@@ -1592,8 +1614,9 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         for (PathBI p : config.getEditingPathSet()) {
             if (member.primordialSapNid == Integer.MIN_VALUE) {
                 try {
-                    member.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, getUserNid(config),
-                            p.getConceptNid(), time);
+                    member.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, time,
+                            getUserNid(config), config.getEditCoordinate().getModuleNid(),
+                            p.getConceptNid());
                     propMap.setPropertiesExceptSap((I_ExtendByRefPart) member);
                 } catch (PropertyVetoException ex) {
                     throw new IOException(ex);
@@ -1601,7 +1624,10 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             } else {
                 try {
                     I_ExtendByRefPart revision = (I_ExtendByRefPart) member.makeAnalog(statusNid,
-                            p.getConceptNid(), time);
+                            time,
+                            config.getEditCoordinate().getAuthorNid(),
+                            config.getEditCoordinate().getModuleNid(),
+                            p.getConceptNid());
 
                     propMap.setProperties(revision);
                     member.addVersion(revision);

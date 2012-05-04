@@ -44,9 +44,10 @@ public class UngroupRelGroupAction extends AbstractAction {
                     for (PathBI ep : config.getEditingPathSet()) {
                         I_AmPart part = (I_AmPart) componentVersion.makeAnalog(
                                 SnomedMetadataRfx.getSTATUS_CURRENT_NID(),
-                                config.getDbConfig().getUserConcept().getNid(),
-                                ep.getConceptNid(),
-                                Long.MAX_VALUE);
+                                Long.MAX_VALUE,
+                                config.getEditCoordinate().getAuthorNid(),
+                                config.getEditCoordinate().getModuleNid(), 
+                                ep.getConceptNid());
 
 
                         I_RelPart rel = (I_RelPart) part;

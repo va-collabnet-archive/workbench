@@ -85,9 +85,10 @@ public class GroupRelsAction extends AbstractAction {
                 for (PathBI ep : config.getEditingPathSet()) {
                     RelationshipAnalogBI targetAnalog = (RelationshipAnalogBI) targetRel.makeAnalog(
                             targetRel.getStatusNid(),
-                            config.getDbConfig().getUserConcept().getNid(),
-                            ep.getConceptNid(),
-                            Long.MAX_VALUE);
+                            Long.MAX_VALUE,
+                            config.getEditCoordinate().getAuthorNid(),
+                            config.getEditCoordinate().getModuleNid(), 
+                            ep.getConceptNid());
                     targetAnalog.setGroup(groupNumber);
                 }
             }
@@ -99,9 +100,10 @@ public class GroupRelsAction extends AbstractAction {
                 for (PathBI ep : config.getEditingPathSet()) {
                     RelationshipAnalogBI sourceAnalog = (RelationshipAnalogBI) sourceRel.makeAnalog(
                             sourceRel.getStatusNid(),
-                            config.getDbConfig().getUserConcept().getNid(),
-                            ep.getConceptNid(),
-                            Long.MAX_VALUE);
+                            Long.MAX_VALUE,
+                            config.getEditCoordinate().getAuthorNid(),
+                            config.getEditCoordinate().getModuleNid(), 
+                            ep.getConceptNid());
                     sourceAnalog.setGroup(groupNumber);
                 }
             }

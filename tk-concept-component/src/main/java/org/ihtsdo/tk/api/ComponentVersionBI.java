@@ -22,6 +22,8 @@ public interface ComponentVersionBI extends ComponentBI, VersionPointBI {
    Set<Integer> getAllNidsForVersion() throws IOException;
 
    int getAuthorNid();
+   
+   int getModuleNid();
 
    ComponentChroncileBI getChronicle();
 

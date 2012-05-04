@@ -40,6 +40,7 @@ public class RelGroupVersion implements RelGroupVersionBI {
     private int pathNid;
     private RelGroupChronicleBI rg;
     private int statusNid;
+    private int moduleNid;
 
     //~--- constructors --------------------------------------------------------
     public RelGroupVersion(RelGroupChronicleBI rg, ViewCoordinate coordinate) {
@@ -75,6 +76,7 @@ public class RelGroupVersion implements RelGroupVersionBI {
                 authorNid = relV.getAuthorNid();
                 pathNid = relV.getPathNid();
                 statusNid = relV.getStatusNid();
+                moduleNid = relV.getModuleNid();
             }
         }
 
@@ -86,6 +88,7 @@ public class RelGroupVersion implements RelGroupVersionBI {
                         authorNid = relV.getAuthorNid();
                         pathNid = relV.getPathNid();
                         statusNid = relV.getStatusNid();
+                        moduleNid = relV.getModuleNid();
                     }
                 }
             }
@@ -359,6 +362,11 @@ public class RelGroupVersion implements RelGroupVersionBI {
     @Override
     public int getStatusNid() {
         return statusNid;
+    }
+    
+    @Override
+    public int getModuleNid() {
+        return moduleNid;
     }
 
     @Override

@@ -782,8 +782,11 @@ public class HistoryPanel {
                ComponentVersionBI cv = buttonVersionMap.get(button);
 
                for (int pathNid : ec.getEditPaths()) {
-                  ((AnalogGeneratorBI) cv).makeAnalog(cv.getStatusNid(), ec.getAuthorNid(), pathNid,
-                          Long.MAX_VALUE);
+                  ((AnalogGeneratorBI) cv).makeAnalog(cv.getStatusNid(),
+                          Long.MAX_VALUE,
+                          ec.getAuthorNid(),
+                          ec.getModuleNid(),
+                          pathNid);
                }
             }
             if (view.getSettings().isForAdjudication()) {

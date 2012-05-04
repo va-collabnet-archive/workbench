@@ -76,7 +76,7 @@ public class PromoteConcept extends AbstractTask {
 
             PositionBI viewPosition = viewPositionSet.iterator().next();
             conceptToPromote.promote(viewPosition, config.getPromotionPathSetReadOnly(), 
-                config.getAllowedStatus(), config.getPrecedence());
+                config.getAllowedStatus(), config.getPrecedence(), config.getEditCoordinate().getAuthorNid());
             Terms.get().addUncommittedNoChecks(conceptToPromote);
         } catch (Exception e) {
             throw new TaskFailedException(e);

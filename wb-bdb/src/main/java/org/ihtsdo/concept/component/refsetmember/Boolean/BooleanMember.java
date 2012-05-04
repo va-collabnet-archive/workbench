@@ -36,9 +36,11 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 
 import java.util.*;
+import org.dwfa.ace.api.Terms;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanVersionBI;
 import org.ihtsdo.tk.dto.RevisionHandling;
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember>
         implements I_ExtendByRefPartBoolean<BooleanRevision>, RefexBooleanAnalogBI<BooleanRevision> {
@@ -108,14 +110,16 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember>
 
     @Override
     public BooleanRevision makeAnalog() {
-        BooleanRevision newR = new BooleanRevision(getStatusNid(), getPathNid(), getTime(), this);
+        BooleanRevision newR = new BooleanRevision(getStatusNid(), getTime(),
+                getAuthorNid(), getModuleNid(), getPathNid(), this);
 
         return newR;
     }
-
+    
     @Override
-    public BooleanRevision makeAnalog(int statusNid, int pathNid, long time) {
-        BooleanRevision newR = new BooleanRevision(statusNid, pathNid, time, this);
+    public BooleanRevision makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
+         BooleanRevision newR = new BooleanRevision(getStatusNid(), getTime(),
+                authorNid, moduleNid, getPathNid(), this);
 
         addRevision(newR);
 
@@ -123,16 +127,7 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember>
     }
 
     @Override
-    public BooleanRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-        BooleanRevision newR = new BooleanRevision(statusNid, authorNid, pathNid, time, this);
-
-        addRevision(newR);
-
-        return newR;
-    }
-
-    @Override
-    public I_ExtendByRefPart<BooleanRevision> makePromotionPart(PathBI promotionPath) {
+    public I_ExtendByRefPart<BooleanRevision> makePromotionPart(PathBI promotionPath, int authorNid) {
         throw new UnsupportedOperationException();
     }
 

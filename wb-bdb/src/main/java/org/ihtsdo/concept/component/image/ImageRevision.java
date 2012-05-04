@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.Set;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.MediaCAB;
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 public class ImageRevision extends Revision<ImageRevision, Image>
         implements I_ImagePart<ImageRevision>, MediaAnalogBI<ImageRevision> {
@@ -52,8 +53,8 @@ public class ImageRevision extends Revision<ImageRevision, Image>
    }
 
    public ImageRevision(TkMediaRevision eiv, Image primoridalMember) {
-      super(Bdb.uuidToNid(eiv.getStatusUuid()), Bdb.uuidToNid(eiv.getAuthorUuid()),
-            Bdb.uuidToNid(eiv.getPathUuid()), eiv.getTime(), primoridalMember);
+      super(Bdb.uuidToNid(eiv.getStatusUuid()), eiv.getTime(), Bdb.uuidToNid(eiv.getAuthorUuid()),
+            Bdb.uuidToNid(eiv.getModuleUuid()), Bdb.uuidToNid(eiv.getPathUuid()), primoridalMember);
       this.textDescription = eiv.getTextDescription();
       this.typeNid         = Bdb.uuidToNid(eiv.getTypeUuid());
    }
@@ -63,10 +64,10 @@ public class ImageRevision extends Revision<ImageRevision, Image>
       this.textDescription = input.readString();
       this.typeNid         = input.readInt();
    }
-
-   protected ImageRevision(I_ImagePart another, int statusNid, int authorNid, int pathNid, long time,
-                           Image primoridalMember) {
-      super(statusNid, authorNid, pathNid, time, primoridalMember);
+   
+   protected ImageRevision(I_ImagePart another, int statusNid, long time, int authorNid,
+           int moduleNid, int pathNid, Image primoridalMember) {
+      super(statusNid, time, authorNid, moduleNid, pathNid, primoridalMember);
       this.textDescription = another.getTextDescription();
       this.typeNid         = another.getTypeNid();
    }
@@ -104,37 +105,21 @@ public class ImageRevision extends Revision<ImageRevision, Image>
 
       return false;
    }
-
+   
    @Override
-   public ImageRevision makeAnalog(int statusNid, int pathNid, long time) {
-      if ((this.getTime() == time) && (this.getPathNid() == pathNid)) {
-         this.setStatusNid(statusNid);
-
-         return this;
-      }
-
-      ImageRevision newR;
-
-      newR = new ImageRevision(this.primordialComponent, statusNid, Terms.get().getAuthorNid(), pathNid,
-                               time, this.primordialComponent);
-      this.primordialComponent.addRevision(newR);
-
-      return newR;
-   }
-
-   @Override
-   public ImageRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+   public ImageRevision makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
       if ((this.getTime() == time) && (this.getPathNid() == pathNid)) {
          this.setStatusNid(statusNid);
          this.setAuthorNid(authorNid);
+         this.setModuleNid(moduleNid);
 
          return this;
       }
 
       ImageRevision newR;
 
-      newR = new ImageRevision(this, statusNid, authorNid, pathNid, time,
-                               this.primordialComponent);
+      newR = new ImageRevision(this.primordialComponent, statusNid, time, authorNid,
+              moduleNid, pathNid,this.primordialComponent);
       this.primordialComponent.addRevision(newR);
 
       return newR;

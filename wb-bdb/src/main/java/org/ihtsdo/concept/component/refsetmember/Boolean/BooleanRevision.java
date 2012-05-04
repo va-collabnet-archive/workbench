@@ -37,6 +37,7 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 
 import java.util.*;
+import org.dwfa.ace.api.Terms;
 
 public class BooleanRevision extends RefsetRevision<BooleanRevision, BooleanMember>
         implements I_ExtendByRefPartBoolean<BooleanRevision>, RefexBooleanAnalogBI<BooleanRevision> {
@@ -63,24 +64,15 @@ public class BooleanRevision extends RefsetRevision<BooleanRevision, BooleanMemb
       booleanValue = input.readBoolean();
    }
 
-   protected BooleanRevision(int statusNid, int pathNid, long time, BooleanMember primoridalMember) {
-      super(statusNid, pathNid, time, primoridalMember);
+   protected BooleanRevision(int statusNid, long time, int authorNid, int moduleNid,
+           int pathNid, BooleanMember primoridalMember) {
+      super(statusNid, time, authorNid, moduleNid, pathNid, primoridalMember);
       this.booleanValue = primoridalMember.getBooleanValue();
    }
 
-   protected BooleanRevision(int statusNid, int pathNid, long time, BooleanRevision another) {
-      super(statusNid, pathNid, time, another.primordialComponent);
-      this.booleanValue = another.getBooleanValue();
-   }
-
-   protected BooleanRevision(int statusNid, int authorNid, int pathNid, long time,
-                             BooleanMember primoridalMember) {
-      super(statusNid, authorNid, pathNid, time, primoridalMember);
-      this.booleanValue = primoridalMember.getBooleanValue();
-   }
-
-   protected BooleanRevision(int statusNid, int authorNid, int pathNid, long time, BooleanRevision another) {
-      super(statusNid, authorNid, pathNid, time, another.primordialComponent);
+   protected BooleanRevision(int statusNid, long time, int authorNid, int moduleNid,
+           int pathNid, BooleanRevision another) {
+      super(statusNid, time, authorNid, moduleNid, pathNid, another.primordialComponent);
       this.booleanValue = another.getBooleanValue();
    }
 
@@ -113,18 +105,21 @@ public class BooleanRevision extends RefsetRevision<BooleanRevision, BooleanMemb
 
    @Override
    public BooleanRevision makeAnalog() {
-      return new BooleanRevision(getStatusNid(), getPathNid(), getTime(), this);
+      return new BooleanRevision(getStatusNid(), getTime(), getAuthorNid(), getModuleNid(), getPathNid(),  this);
    }
-
+   
    @Override
-   public BooleanRevision makeAnalog(int statusNid, int pathNid, long time) {
+   public BooleanRevision makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
       if ((this.getTime() == time) && (this.getPathNid() == pathNid)) {
          this.setStatusNid(statusNid);
+         this.setAuthorNid(authorNid);
+         this.setModuleNid(moduleNid);
 
          return this;
       }
 
-      BooleanRevision newR = new BooleanRevision(statusNid, pathNid, time, this);
+      BooleanRevision newR = new BooleanRevision(statusNid, time, authorNid,
+              moduleNid, pathNid, this);
 
       primordialComponent.addRevision(newR);
 
@@ -132,22 +127,7 @@ public class BooleanRevision extends RefsetRevision<BooleanRevision, BooleanMemb
    }
 
    @Override
-   public BooleanRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-      if ((this.getTime() == time) && (this.getPathNid() == pathNid)) {
-         this.setStatusNid(statusNid);
-
-         return this;
-      }
-
-      BooleanRevision newR = new BooleanRevision(statusNid, authorNid, pathNid, time, this);
-
-      primordialComponent.addRevision(newR);
-
-      return newR;
-   }
-
-   @Override
-   public I_ExtendByRefPart<BooleanRevision> makePromotionPart(PathBI promotionPath) {
+   public I_ExtendByRefPart<BooleanRevision> makePromotionPart(PathBI promotionPath, int authorNid) {
 
       // TODO
       throw new UnsupportedOperationException();

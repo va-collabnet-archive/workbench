@@ -28,15 +28,7 @@ import java.util.UUID;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import org.dwfa.ace.api.I_ConceptAttributeTuple;
-import org.dwfa.ace.api.I_ConceptAttributeVersioned;
-import org.dwfa.ace.api.I_DescriptionPart;
-import org.dwfa.ace.api.I_DescriptionVersioned;
-import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_RelPart;
-import org.dwfa.ace.api.I_RelVersioned;
-import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.*;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
@@ -218,6 +210,7 @@ public class UpdateRefsetSpecStatusTask extends AbstractTask {
             throws Exception {
         Collection<? extends I_ExtendByRef> extensions =
                 termFactory.getRefsetExtensionMembers(extensionConcept.getConceptNid());
+        I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
 
         for (I_ExtendByRef extension : extensions) {
             // get the latest version
@@ -230,9 +223,12 @@ public class UpdateRefsetSpecStatusTask extends AbstractTask {
 
             if (latestPart != null && latestPart.getStatusId() != retiredStatusId) {
 
-                for (PathBI editPath : termFactory.getActiveAceFrameConfig().getPromotionPathSet()) {
-                    latestPart.makeAnalog(statusConcept.getConceptNid(), editPath
-                                .getConceptNid(), Long.MAX_VALUE);
+                for (PathBI editPath : config.getPromotionPathSet()) {
+                    latestPart.makeAnalog(statusConcept.getConceptNid(),
+                            Long.MAX_VALUE,
+                            config.getEditCoordinate().getAuthorNid(),
+                            config.getEditCoordinate().getModuleNid(),
+                            editPath.getConceptNid());
                     termFactory.addUncommittedNoChecks(extension);
                 }
             }
@@ -241,13 +237,18 @@ public class UpdateRefsetSpecStatusTask extends AbstractTask {
 
     private void updateStatusOfDescriptions(Set<I_GetConceptData> concepts, I_GetConceptData statusConcept)
             throws IOException, TerminologyException {
+        I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
         for (I_GetConceptData currentConcept : concepts) {
             Collection<? extends I_DescriptionVersioned> descs = currentConcept.getDescriptions();
             for (I_DescriptionVersioned descVersioned : descs) {
-                for (PathBI editPath : termFactory.getActiveAceFrameConfig().getPromotionPathSet()) {
+                for (PathBI editPath : config.getPromotionPathSet()) {
                     I_DescriptionPart templatePart = descVersioned.getLastTuple().getMutablePart();
                     if (templatePart.getStatusId() != retiredStatusId) {
-                        templatePart.makeAnalog(statusConcept.getConceptNid(), editPath.getConceptNid(), Long.MAX_VALUE);
+                        templatePart.makeAnalog(statusConcept.getConceptNid(),
+                                Long.MAX_VALUE,
+                                config.getEditCoordinate().getAuthorNid(),
+                                config.getEditCoordinate().getModuleNid(),
+                                editPath.getConceptNid());
                     }
                 }
             }
@@ -258,14 +259,18 @@ public class UpdateRefsetSpecStatusTask extends AbstractTask {
     //TODO change algorithm for finding latest parts to use version computer...
     private void updateStatusOfRelationships(Set<I_GetConceptData> concepts, I_GetConceptData statusConcept)
             throws IOException, TerminologyException {
+        I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
         for (I_GetConceptData currentConcept : concepts) {
             Collection<? extends I_RelVersioned> rels = currentConcept.getSourceRels();
             for (I_RelVersioned relVersioned : rels) {
-                for (PathBI editPath : termFactory.getActiveAceFrameConfig().getPromotionPathSet()) {
+                for (PathBI editPath : config.getPromotionPathSet()) {
                     I_RelPart newPart = relVersioned.getLastTuple().getMutablePart();
                     if (newPart.getStatusId() != retiredStatusId) {
                         relVersioned.addVersion((I_RelPart) newPart.makeAnalog(statusConcept.getConceptNid(), 
-                        		editPath.getConceptNid(), Long.MAX_VALUE));
+                                Long.MAX_VALUE,
+                                config.getEditCoordinate().getAuthorNid(),
+                                config.getEditCoordinate().getModuleNid(),
+                                editPath.getConceptNid()));
                     }
                 }
             }
@@ -276,12 +281,17 @@ public class UpdateRefsetSpecStatusTask extends AbstractTask {
     //TODO change algorithm for finding latest parts to use version computer...
    private void updateStatusOfConcepts(Set<I_GetConceptData> concepts, I_GetConceptData statusConcept)
             throws IOException, TerminologyException {
+       I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
         for (I_GetConceptData currentConcept : concepts) {
             I_ConceptAttributeVersioned v = currentConcept.getConceptAttributes();
             List<? extends I_ConceptAttributeTuple> tuples = v.getTuples();
-            for (PathBI editPath : termFactory.getActiveAceFrameConfig().getPromotionPathSet()) {
+            for (PathBI editPath : config.getPromotionPathSet()) {
                 tuples.get(tuples.size() - 1).makeAnalog(
-                                statusConcept.getConceptNid(), editPath.getConceptNid(), Long.MAX_VALUE);
+                                statusConcept.getConceptNid(),
+                                Long.MAX_VALUE,
+                                config.getEditCoordinate().getAuthorNid(),
+                                config.getEditCoordinate().getModuleNid(),
+                                editPath.getConceptNid());
             }
             termFactory.addUncommittedNoChecks(currentConcept);
         }

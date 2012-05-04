@@ -86,8 +86,11 @@ public class ReplaceAction extends AbstractAction {
                     Long.MAX_VALUE);
 
             while (pathItr.hasNext()) {
-                newRel.makeAnalog(newRel.getStatusNid(), config.getDbConfig().getUserConcept().getNid(), 
-                        pathItr.next().getConceptNid(), Long.MAX_VALUE);
+                newRel.makeAnalog(newRel.getStatusNid(),
+                        Long.MAX_VALUE,
+                        config.getEditCoordinate().getAuthorNid(),
+                        config.getEditCoordinate().getModuleNid(), 
+                        pathItr.next().getConceptNid());
             }
             Terms.get().addUncommitted(originConcept);
 
@@ -104,9 +107,10 @@ public class ReplaceAction extends AbstractAction {
             for (PathBI ep : config.getEditingPathSet()) {
                 componentVersion.makeAnalog(
                         SnomedMetadataRfx.getSTATUS_RETIRED_NID(),
-                        config.getDbConfig().getUserConcept().getNid(),
-                        ep.getConceptNid(),
-                        Long.MAX_VALUE);
+                        Long.MAX_VALUE,
+                        config.getEditCoordinate().getAuthorNid(),
+                        config.getEditCoordinate().getModuleNid(), 
+                        ep.getConceptNid());
             }
             I_GetConceptData concept = Terms.get().getConceptForNid(componentVersion.getNid());
             Terms.get().addUncommitted(concept);

@@ -28,6 +28,7 @@ import org.ihtsdo.concept.component.identifier.IdentifierVersionString;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.NidBitSetItrBI;
+import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -181,9 +182,10 @@ public class CementLoadTest {
             int statusNid = Bdb.uuidsToNid(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
             int pathNid = Bdb.uuidsToNid(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
             int authorityNID = Bdb.uuidsToNid(ArchitectonicAuxiliary.Concept.OID.getUids());
+            int moduleNid = Snomed.CORE_MODULE.getLenient().getConceptNid();
             IdentifierVersionString stringId =
-                    new IdentifierVersionString(statusNid, authorNID, pathNid,
-                    Long.MAX_VALUE, uuidOid, authorityNID);
+                    new IdentifierVersionString(statusNid, Long.MAX_VALUE, authorNID, moduleNid, pathNid,
+                     uuidOid, authorityNID);
             concept.getConceptAttributes().addIdVersion(stringId);
             Terms.get().addUncommitted(concept);
 

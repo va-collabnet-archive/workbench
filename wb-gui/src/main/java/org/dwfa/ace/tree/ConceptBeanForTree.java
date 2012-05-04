@@ -154,35 +154,35 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
    }
 
    public boolean promote(I_Position viewPosition, PathSetReadOnly pomotionPaths, I_IntSet allowedStatus,
-                          Precedence precedence)
+                          Precedence precedence, int authorNid)
            throws IOException, TerminologyException {
-      return bean.promote(viewPosition, pomotionPaths, allowedStatus, precedence);
+      return bean.promote(viewPosition, pomotionPaths, allowedStatus, precedence, authorNid);
    }
 
    public boolean promote(PositionBI viewPosition, PathSetReadOnly pomotionPaths, I_IntSet allowedStatus,
-                          Precedence precedence)
+                          Precedence precedence, int authorNid)
            throws IOException, TerminologyException {
-      return bean.promote(viewPosition, pomotionPaths, allowedStatus, precedence);
+      return bean.promote(viewPosition, pomotionPaths, allowedStatus, precedence, authorNid);
    }
 
    @Override
    public boolean promote(PositionBI viewPosition, PathSetReadOnly pomotionPaths, NidSetBI allowedStatus,
-                          Precedence precedence)
+                          Precedence precedence, int authorNid)
            throws IOException, TerminologyException {
-      return bean.promote(viewPosition, pomotionPaths, allowedStatus, precedence);
+      return bean.promote(viewPosition, pomotionPaths, allowedStatus, precedence, authorNid);
    }
 
    public boolean promote(I_TestComponent test, I_Position viewPosition, PathSetReadOnly pomotionPaths,
-                          I_IntSet allowedStatus, Precedence precedence)
+                          I_IntSet allowedStatus, Precedence precedence, int authorNid)
            throws IOException, TerminologyException {
-      return bean.promote(test, viewPosition, pomotionPaths, allowedStatus, precedence);
+      return bean.promote(test, viewPosition, pomotionPaths, allowedStatus, precedence, authorNid);
    }
 
    @Override
    public boolean promote(I_TestComponent test, I_Position viewPosition, PathSetReadOnly pomotionPaths,
-                          NidSetBI allowedStatus, Precedence precedence)
+                          NidSetBI allowedStatus, Precedence precedence, int authorNid)
            throws IOException, TerminologyException {
-      return bean.promote(test, viewPosition, pomotionPaths, allowedStatus, precedence);
+      return bean.promote(test, viewPosition, pomotionPaths, allowedStatus, precedence, authorNid);
    }
 
    @Override

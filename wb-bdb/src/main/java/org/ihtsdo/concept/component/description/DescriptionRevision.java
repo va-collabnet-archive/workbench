@@ -32,6 +32,7 @@ import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Set;
 import org.ihtsdo.lang.LANG_CODE;
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 public class DescriptionRevision extends Revision<DescriptionRevision, Description>
         implements I_DescriptionPart<DescriptionRevision>, DescriptionAnalogBI<DescriptionRevision> {
@@ -73,8 +74,8 @@ public class DescriptionRevision extends Revision<DescriptionRevision, Descripti
 
    public DescriptionRevision(TkDescriptionRevision edv, Description primoridalMember)
            throws TerminologyException, IOException {
-      super(Bdb.uuidToNid(edv.getStatusUuid()), Terms.get().getAuthorNid(), Bdb.uuidToNid(edv.getPathUuid()),
-            edv.getTime(), primoridalMember);
+      super(Bdb.uuidToNid(edv.getStatusUuid()),edv.getTime(), Terms.get().getAuthorNid(),
+              Bdb.uuidToNid(edv.getModuleUuid()), Bdb.uuidToNid(edv.getPathUuid()),primoridalMember);
       initialCaseSignificant = edv.isInitialCaseSignificant();
       lang                   = edv.getLang();
       text                   = edv.getText();
@@ -100,19 +101,18 @@ public class DescriptionRevision extends Revision<DescriptionRevision, Descripti
       typeNid                = input.readInt();
    }
 
-   public DescriptionRevision(UniversalAceDescriptionPart umPart, Description primoridalMember)
+   public DescriptionRevision(UniversalAceDescriptionPart umPart, Description primoridalMember, int authorNid, int moduleNid)
            throws TerminologyException, IOException {
-      super(Bdb.uuidsToNid(umPart.getStatusId()), Terms.get().getAuthorNid(),
-            Bdb.uuidsToNid(umPart.getPathId()), umPart.getTime(), primoridalMember);
+      super(Bdb.uuidsToNid(umPart.getStatusId()), umPart.getTime(), authorNid,
+            moduleNid, Bdb.uuidsToNid(umPart.getPathId()),primoridalMember);
       text                   = umPart.getText();
       lang                   = umPart.getLang();
       initialCaseSignificant = umPart.getInitialCaseSignificant();
       typeNid                = Bdb.uuidsToNid(umPart.getTypeId());
    }
 
-   protected DescriptionRevision(I_DescriptionPart another, int statusNid, int authorNid, int pathNid,
-                                 long time, Description primoridalMember) {
-      super(statusNid, authorNid, pathNid, time, primoridalMember);
+   protected DescriptionRevision(I_DescriptionPart another, int statusNid, long time, int authorNid, int moduleNid, int pathNid, Description primoridalMember) {
+      super(statusNid, time, authorNid, moduleNid, pathNid, primoridalMember);
       this.text                   = another.getText();
       this.typeNid                = another.getTypeNid();
       this.lang                   = another.getLang();
@@ -150,37 +150,21 @@ public class DescriptionRevision extends Revision<DescriptionRevision, Descripti
 
       return false;
    }
-
+   
    @Override
-   public DescriptionRevision makeAnalog(int statusNid, int pathNid, long time) {
-      if ((this.getTime() == time) && (this.getPathNid() == pathNid)) {
-         this.setStatusNid(statusNid);
-
-         return this;
-      }
-
-      DescriptionRevision newR;
-
-      newR = new DescriptionRevision(this.primordialComponent, statusNid, Terms.get().getAuthorNid(),
-                                     pathNid, time, this.primordialComponent);
-      this.primordialComponent.addRevision(newR);
-
-      return newR;
-   }
-
-   @Override
-   public DescriptionRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+   public DescriptionRevision makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
       if ((this.getTime() == time) && (this.getPathNid() == pathNid)) {
          this.setStatusNid(statusNid);
          this.setAuthorNid(authorNid);
+         this.setModuleNid(moduleNid);
 
          return this;
       }
 
       DescriptionRevision newR;
 
-      newR = new DescriptionRevision(this, statusNid, authorNid, pathNid, time,
-                                     this.primordialComponent);
+      newR = new DescriptionRevision(this.primordialComponent, statusNid, time, authorNid,
+                                     moduleNid, pathNid,this.primordialComponent);
       this.primordialComponent.addRevision(newR);
 
       return newR;

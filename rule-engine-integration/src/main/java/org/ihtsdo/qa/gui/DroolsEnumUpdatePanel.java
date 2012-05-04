@@ -193,8 +193,11 @@ public class DroolsEnumUpdatePanel extends JPanel {
 								if (!CommonUtils.isActive(lastPart.getStatusNid())) {
 									// is retired
 									for (PathBI editPath : config.getEditingPathSet()) {
-										I_ExtendByRefPart part = (I_ExtendByRefPart) lastPart.makeAnalog(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(), editPath.getConceptNid(),
-												Long.MAX_VALUE);
+										I_ExtendByRefPart part = (I_ExtendByRefPart) lastPart.makeAnalog(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
+                                                                                        Long.MAX_VALUE,
+                                                                                        config.getEditCoordinate().getAuthorNid(),
+                                                                                        config.getEditCoordinate().getModuleNid(),
+                                                                                        editPath.getConceptNid());
 										extension.addVersion(part);
 										tf.addUncommittedNoChecks(extension);
 									}
@@ -372,8 +375,11 @@ public class DroolsEnumUpdatePanel extends JPanel {
 				if (extension.getRefsetId() == selectedRefset.getConceptNid()) {
 					I_ExtendByRefPart lastPart = CommonUtils.getLastExtensionPart(extension);
 					for (PathBI editPath : config.getEditingPathSet()) {
-						I_ExtendByRefPart part = (I_ExtendByRefPart) lastPart.makeAnalog(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(), editPath.getConceptNid(),
-								Long.MAX_VALUE);
+						I_ExtendByRefPart part = (I_ExtendByRefPart) lastPart.makeAnalog(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
+                                                        Long.MAX_VALUE,
+                                                        config.getEditCoordinate().getAuthorNid(),
+                                                        config.getEditCoordinate().getModuleNid(),
+                                                        editPath.getConceptNid());
 						extension.addVersion(part);
 					}
 					tf.addUncommittedNoChecks(selectedRefset);

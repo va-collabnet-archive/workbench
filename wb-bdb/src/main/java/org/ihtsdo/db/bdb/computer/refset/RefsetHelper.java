@@ -310,8 +310,11 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
                     // found a member to retire
 
                     I_ExtendByRefPartCid clone =
-                            (I_ExtendByRefPartCid) latestPart.makeAnalog(SnomedMetadataRfx.getSTATUS_RETIRED_NID(), latestPart
-                                .getPathNid(), Long.MAX_VALUE);
+                            (I_ExtendByRefPartCid) latestPart.makeAnalog(SnomedMetadataRfx.getSTATUS_RETIRED_NID(),
+                                Long.MAX_VALUE,
+                                config.getEditCoordinate().getAuthorNid(),
+                                config.getEditCoordinate().getModuleNid(),
+                                latestPart.getPathNid());
                     extension.addVersion(clone);
                     if (isAutocommitActive()) {
                         Terms.get().addUncommittedNoChecks(extension);
@@ -365,7 +368,11 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
 	                if (extProps.validate(latestPart)) {
 	
 	                    // found a member to retire
-	                	I_ExtendByRefPartStr<?> clone = (I_ExtendByRefPartStr<?>) latestPart.makeAnalog(inactiveRf2, latestPart.getPathNid(), Long.MAX_VALUE);
+	                	I_ExtendByRefPartStr<?> clone = (I_ExtendByRefPartStr<?>) latestPart.makeAnalog(inactiveRf2,
+                                        Long.MAX_VALUE,
+                                        config.getEditCoordinate().getAuthorNid(),
+                                        config.getEditCoordinate().getModuleNid(),
+                                        latestPart.getPathNid());
 	                	
 	                    extension.addVersion(clone);
 	                    if (isAutocommitActive()) {

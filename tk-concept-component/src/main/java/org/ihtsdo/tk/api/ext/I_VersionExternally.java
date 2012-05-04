@@ -9,6 +9,8 @@ public interface I_VersionExternally {
 	public UUID getAuthorUuid();
 
 	public UUID getPathUuid();
+        
+        public UUID getModuleUuid();
 
 	public long getTime();
 

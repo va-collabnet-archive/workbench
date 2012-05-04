@@ -190,6 +190,7 @@ public class LongToIntegerTransformer extends AbstractTransformer {
 		intMember.setAdditionalIdComponents(extension.getAdditionalIdComponents());
 		intMember.setAnnotations(extension.getAnnotations());
 		intMember.setAuthorUuid(extension.getAuthorUuid());
+                intMember.setModuleUuid(extension.getModuleUuid());
 		intMember.setComponentUuid(extension.getComponentUuid());
 		intMember.setPathUuid(extension.getPathUuid());
 		intMember.setPrimordialComponentUuid(extension.getPrimordialComponentUuid());
@@ -208,6 +209,7 @@ public class LongToIntegerTransformer extends AbstractTransformer {
 			for (TkRefsetLongRevision LongRevision : extension.getRevisions()) {
 				TkRefsetIntRevision IntRevision = new TkRefsetIntRevision();
 				IntRevision.setAuthorUuid(LongRevision.getAuthorUuid());
+                                IntRevision.setModuleUuid(LongRevision.getModuleUuid());
 				IntRevision.setPathUuid(LongRevision.getPathUuid());
 				IntRevision.setStatusUuid(LongRevision.getStatusUuid());
 				IntRevision.setTime(LongRevision.getTime());

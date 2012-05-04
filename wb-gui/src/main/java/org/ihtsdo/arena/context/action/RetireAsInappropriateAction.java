@@ -233,9 +233,10 @@ public class RetireAsInappropriateAction extends AbstractAction {
                 for (PathBI ep : config.getEditingPathSet()) {
                     analogComponent = (ComponentVersionBI) componentVersion.makeAnalog(
                             statusNid,
-                            config.getDbConfig().getUserConcept().getNid(),
-                            ep.getConceptNid(),
-                            Long.MAX_VALUE);
+                            Long.MAX_VALUE,
+                            config.getEditCoordinate().getAuthorNid(),
+                            config.getEditCoordinate().getModuleNid(), 
+                            ep.getConceptNid());
                 }
             }
         } catch (IOException e1) {
@@ -259,9 +260,10 @@ public class RetireAsInappropriateAction extends AbstractAction {
                     for (PathBI ep : config.getEditingPathSet()) {
                         componentVersion.makeAnalog(
                                 SnomedMetadataRfx.getSTATUS_RETIRED_NID(),
-                                config.getDbConfig().getUserConcept().getNid(),
-                                ep.getConceptNid(),
-                                Long.MAX_VALUE);
+                                Long.MAX_VALUE,
+                                config.getEditCoordinate().getAuthorNid(),
+                                config.getEditCoordinate().getModuleNid(), 
+                                ep.getConceptNid());
                     }
                 }
             }

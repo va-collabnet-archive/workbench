@@ -310,7 +310,11 @@ public class VodbExecuteTallMan extends AbstractMojo {
                         modifiedUuids.add(uuids);
 
                         // update the description with the tall man alternative
-                        I_DescriptionPart newPart = (I_DescriptionPart) tuple.makeAnalog(currentUnreviewedId, copyToPath.getConceptNid(), Long.MAX_VALUE);
+                        I_DescriptionPart newPart = (I_DescriptionPart) tuple.makeAnalog(currentUnreviewedId,
+                                Long.MAX_VALUE,
+                                config.getEditCoordinate().getAuthorNid(),
+                                config.getEditCoordinate().getModuleNid(),
+                                copyToPath.getConceptNid());
                         newPart.setText(updatedCurrentDescription);
                         tuple.getDescVersioned().addVersion(newPart);
                         // termFactory.addUncommitted(concept);
@@ -322,7 +326,11 @@ public class VodbExecuteTallMan extends AbstractMojo {
                             config.getPrecedence(), config.getConflictResolutionStrategy());
                         // copy latest attributes and set status to unreviewed
                         for (I_ConceptAttributeTuple attribute : conceptAttributeTuples) {
-                            I_ConceptAttributePart newAttributePart = (I_ConceptAttributePart) attribute.makeAnalog(currentUnreviewedId, copyToPath.getConceptNid(), Long.MAX_VALUE);
+                            I_ConceptAttributePart newAttributePart = (I_ConceptAttributePart) attribute.makeAnalog(currentUnreviewedId,
+                                    Long.MAX_VALUE,
+                                    config.getEditCoordinate().getAuthorNid(),
+                                    config.getEditCoordinate().getModuleNid(),
+                                    copyToPath.getConceptNid());
                             concept.getConceptAttributes().addVersion(newAttributePart);
                         }
                         termFactory.addUncommitted(concept);

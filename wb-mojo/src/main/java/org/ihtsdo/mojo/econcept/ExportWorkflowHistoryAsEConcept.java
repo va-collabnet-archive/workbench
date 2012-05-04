@@ -27,8 +27,11 @@ import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.dwfa.tapi.impl.MemoryTermServer;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
+import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrMember;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetWriter;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
@@ -109,6 +112,7 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 	private UUID wfHxRefsetId = null;
 	private UUID snomedPathUid = null;
 	private UUID authorUuid = null;
+        private UUID moduleUuid = null;
 	private UUID currentStatus = null;
 	private UUID snomedPath = null;
 
@@ -130,7 +134,7 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
         {
         	// Initialize Loop
 	    	initializeExport();
-	    	EConcept econcept = initializeEConcept(); 
+	    	EConcept econcept = initializeEConcept();
 			
 			// Read Each Line of txt file
 	    	System.out.print("\n\n1-");
@@ -221,6 +225,9 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 
 		// Author of WfHx
 		member.authorUuid = authorUuid;
+                
+                // Module for authoring
+		member.moduleUuid = moduleUuid;
 
 		// Path writing on
 		member.pathUuid = snomedPathUid;
@@ -239,6 +246,8 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
         snomedPathUid = ArchitectonicAuxiliary.Concept.SNOMED_CORE.getPrimoridalUid();
 
         authorUuid = ArchitectonicAuxiliary.Concept.IHTSDO.getPrimoridalUid();
+        
+        moduleUuid = TkRevision.unspecifiedModuleUuid;
 
         currentStatus = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()[0];
 	}
@@ -315,7 +324,21 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
         } catch (Exception e) {
 			AceLog.getAppLog().log(Level.WARNING, "Failed creating EConcept with error: " + e.getMessage());
 		}
-
+                if(testConcept.conceptAttributes.moduleUuid == null){
+                    System.out.println("1: " + testConcept);
+                }
+                
+                for(TkDescription desc : testConcept.descriptions){
+                    if(desc.moduleUuid == null){
+                        System.out.println("2: " + testConcept);
+                    }
+                }
+                
+                for(TkRelationship rel : testConcept.relationships){
+                    if(rel.moduleUuid == null){
+                        System.out.println(": " + testConcept);
+                    }
+                }
         return testConcept;
     }
     

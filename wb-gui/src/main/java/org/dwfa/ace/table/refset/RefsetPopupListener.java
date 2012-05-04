@@ -252,7 +252,11 @@ public class RefsetPopupListener extends MouseAdapter {
                   I_ExtendByRefPart currentPart = selectedObject.getTuple();
                   I_ExtendByRefPart newPart     =
                      (I_ExtendByRefPart) selectedObject.getTuple().getMutablePart().makeAnalog(
-                         currentPart.getStatusNid(), p.getConceptNid(), Long.MAX_VALUE);
+                        currentPart.getStatusNid(),
+                        Long.MAX_VALUE,
+                        config.getEditCoordinate().getAuthorNid(),
+                        config.getEditCoordinate().getModuleNid(),
+                        p.getConceptNid());
 
                   setProperStatus(newPart);
                   model.referencedConcepts.put(newPart.getStatusNid(),
@@ -296,7 +300,11 @@ public class RefsetPopupListener extends MouseAdapter {
                   I_ExtendByRefPart currentPart = selectedObject.getTuple();
 
                   newPart = (I_ExtendByRefPart) selectedObject.getTuple().getMutablePart().makeAnalog(
-                     currentPart.getStatusNid(), currentPart.getPathNid(), Long.MAX_VALUE);
+                        currentPart.getStatusNid(),
+                        Long.MAX_VALUE,
+                        config.getEditCoordinate().getAuthorNid(),
+                        config.getEditCoordinate().getModuleNid(),
+                        currentPart.getPathNid());
                } else {
                   newPart = selectedObject.getTuple().getMutablePart();
                }
@@ -371,7 +379,11 @@ public class RefsetPopupListener extends MouseAdapter {
                   I_ExtendByRefPart currentPart = selectedObject.getTuple();
 
                   newPart = (I_ExtendByRefPart) selectedObject.getTuple().getMutablePart().makeAnalog(
-                     currentPart.getStatusNid(), currentPart.getPathNid(), Long.MAX_VALUE);
+                        currentPart.getStatusNid(),
+                        Long.MAX_VALUE,
+                        config.getEditCoordinate().getAuthorNid(),
+                        config.getEditCoordinate().getModuleNid(),
+                        currentPart.getPathNid());
                } else {
                   newPart = selectedObject.getTuple().getMutablePart();
                }
@@ -437,7 +449,11 @@ public class RefsetPopupListener extends MouseAdapter {
                   I_ExtendByRefPart currentPart = selectedObject.getTuple();
 
                   newPart = (I_ExtendByRefPart) selectedObject.getTuple().getMutablePart().makeAnalog(
-                     currentPart.getStatusNid(), p.getConceptNid(), Long.MAX_VALUE);
+                        currentPart.getStatusNid(), 
+                        Long.MAX_VALUE,
+                        config.getEditCoordinate().getAuthorNid(),
+                        config.getEditCoordinate().getModuleNid(),
+                        p.getConceptNid());
                } else {
                   newPart = selectedObject.getTuple().getMutablePart();
                }

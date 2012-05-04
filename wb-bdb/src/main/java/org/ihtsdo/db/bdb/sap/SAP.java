@@ -47,7 +47,7 @@ public class SAP implements SapBI {
 
     @Override
     public int getModuleNid() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return Bdb.getSapDb().getModuleNid(sapNid);
     }
 
     @Override

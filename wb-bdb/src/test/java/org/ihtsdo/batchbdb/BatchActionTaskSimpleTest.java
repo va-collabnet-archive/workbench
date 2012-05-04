@@ -32,6 +32,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -58,7 +59,8 @@ public class BatchActionTaskSimpleTest {
             I_ConfigAceFrame profile = NewDefaultProfile.newProfile("", "", "", "", "");
             int pathNid = ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.localize().getNid();
             int userNid = ArchitectonicAuxiliary.Concept.USER.localize().getNid();
-            EditCoordinate ec = new EditCoordinate(userNid, pathNid);
+            int moduleNid = Snomed.UNSPECIFIED_MODULE.getLenient().getNid();
+            EditCoordinate ec = new EditCoordinate(userNid, moduleNid, pathNid);
             ViewCoordinate vc = profile.getViewCoordinate();
 
             // SETUP CONCEPT LIST

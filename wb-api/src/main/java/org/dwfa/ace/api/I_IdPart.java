@@ -37,7 +37,8 @@ public interface I_IdPart extends IdBI {
     * @param time
     * @return
     */
-   public I_IdPart makeIdAnalog(int statusNid, int authorNid, int pathNid, long time);
+   
+   public I_IdPart makeIdAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid);
 
    //~--- get methods ---------------------------------------------------------
 
@@ -64,6 +65,8 @@ public interface I_IdPart extends IdBI {
    public int getStatusId();
 
    public int getStatusNid();
+   
+   public int getModuleNid(); //@afk no getAuthorNid?
 
    public long getTime();
 

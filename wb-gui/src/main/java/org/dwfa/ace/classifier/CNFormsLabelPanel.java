@@ -1290,13 +1290,8 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       }
 
       @Override
-      public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-         return (I_AmPart) part.makeAnalog(statusNid, pathNid, time);
-      }
-
-      @Override
-      public ConAttrAnalogBI makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-         return (ConAttrAnalogBI) part.makeAnalog(statusNid, authorNid, pathNid, time);
+      public ConAttrAnalogBI makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
+         return (ConAttrAnalogBI) part.makeAnalog(statusNid, time, authorNid, moduleNid, pathNid);
       }
 
       @Override
@@ -1351,7 +1346,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       public int getAuthorNid() {
          return part.getAuthorNid();
       }
-
+      
       @Override
       public ComponentChroncileBI getChronicle() {
          throw new UnsupportedOperationException("Not supported yet.");
@@ -1528,6 +1523,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       public int getStatusNid() {
          return part.getStatusNid();
       }
+      
+      @Override
+      public int getModuleNid() {
+         return part.getModuleNid();
+      }
 
       @Override
       public long getTime() {
@@ -1669,6 +1669,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       public void setStatusNid(int statusNid) throws PropertyVetoException {
          part.setStatusNid(statusNid);
       }
+      
+      @Override
+      public void setModuleNid(int moduleNid) throws PropertyVetoException {
+         part.setModuleNid(moduleNid);
+      }
 
       @Override
       public void setTime(long value) throws PropertyVetoException {
@@ -1809,15 +1814,10 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       public boolean makeAdjudicationAnalogs(EditCoordinate ec, ViewCoordinate vc) throws Exception {
          throw new UnsupportedOperationException("Not supported yet.");
       }
-
+      
       @Override
-      public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-         return (I_AmPart) part.makeAnalog(statusNid, pathNid, time);
-      }
-
-      @Override
-      public RelationshipAnalogBI makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-         return (RelationshipAnalogBI) part.makeAnalog(statusNid, authorNid, pathNid, time);
+      public RelationshipAnalogBI makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
+         return (RelationshipAnalogBI) part.makeAnalog(statusNid, time, authorNid, moduleNid, pathNid);
       }
 
       @Override
@@ -2128,6 +2128,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       public int getStatusNid() {
          return part.getStatusNid();
       }
+      
+      @Override
+      public int getModuleNid() {
+         return part.getModuleNid();
+      }
 
       @Override
       public long getTime() {
@@ -2313,6 +2318,12 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       @Override
       public void setStatusNid(int statusNid) throws PropertyVetoException {
          part.setStatusNid(statusNid);
+      }
+      
+      
+      @Override
+      public void setModuleNid(int moduleNid) throws PropertyVetoException {
+         part.setModuleNid(moduleNid);
       }
 
       @Override

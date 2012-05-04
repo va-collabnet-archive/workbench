@@ -38,7 +38,7 @@ public class ConceptTupleFileUtil {
     public static I_GetConceptData lastConcept = null;
 
     public static String exportTuple(I_GetConceptData concept) throws TerminologyException, IOException {
-
+        
         I_TermFactory termFactory = Terms.get();
         String idTuple = null;
         if (concept.getUids().size() > 0) {
@@ -162,7 +162,11 @@ public class ConceptTupleFileUtil {
                     for (PathBI p : importConfig.getEditingPathSet()) {
                         I_ConceptAttributePart newPart =
                                 (I_ConceptAttributePart) latestTuple.getMutablePart().makeAnalog(
-                                    termFactory.uuidToNative(statusUuid), p.getConceptNid(), effectiveDate);
+                                    termFactory.uuidToNative(statusUuid),
+                                    effectiveDate,
+                                    importConfig.getEditCoordinate().getAuthorNid(),
+                                    importConfig.getEditCoordinate().getModuleNid(),
+                                    p.getConceptNid());
                         newPart.setDefined(isDefined);
                     }
                     termFactory.addUncommittedNoChecks(concept);

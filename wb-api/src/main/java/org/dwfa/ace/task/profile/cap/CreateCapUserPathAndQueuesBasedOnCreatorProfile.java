@@ -726,9 +726,10 @@ public class CreateCapUserPathAndQueuesBasedOnCreatorProfile extends AbstractTas
             for (PathBI editPath : config.getEditingPathSet()) {
                 I_RelPart oldPart = relVersioned.getLastTuple().getMutablePart();
                 I_RelPart newPart =(I_RelPart) oldPart.makeAnalog(SnomedMetadataRfx.getSTATUS_RETIRED_NID(),
-									                              config.getDbConfig().getUserConcept().getNid(),
-									                              editPath.getConceptNid(),
-									                              Long.MAX_VALUE);
+                        Long.MAX_VALUE,
+			config.getEditCoordinate().getAuthorNid(),
+                        config.getEditCoordinate().getModuleNid(),
+			editPath.getConceptNid());
                 newPart.setPathNid(oldPart.getPathNid());
                 
                 if (oldPart.getStatusNid() != ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid() &&

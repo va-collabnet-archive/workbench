@@ -262,7 +262,11 @@ public class MigrateAllSpecRefsets extends AbstractTask {
         // Retire remaining current parts on the same path
         for (T subjectPart : subjects) {
 
-            T newPart = (T) subjectPart.makeAnalog(retiredStatusId, subjectPart.getPathId(), Long.MAX_VALUE);
+            T newPart = (T) subjectPart.makeAnalog(retiredStatusId, 
+                    Long.MAX_VALUE,
+                    config.getEditCoordinate().getAuthorNid(),
+                    config.getEditCoordinate().getModuleNid(),
+                    subjectPart.getPathNid());
             newRetirees.add(newPart);
         }
 

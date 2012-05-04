@@ -733,4 +733,6 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 	public List<UUID> getAllAvailableWorkflowActionUids();
 
 	public void setAllAvailableWorkflowActionUids(List<UUID> actions);
+        
+    public void setModuleNid(int moduleNid);
 }

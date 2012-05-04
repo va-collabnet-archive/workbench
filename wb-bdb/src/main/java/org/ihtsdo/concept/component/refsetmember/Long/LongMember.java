@@ -36,6 +36,7 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 
 import java.util.*;
+import org.dwfa.ace.api.Terms;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_long.RefexLongVersionBI;
 import org.ihtsdo.tk.dto.RevisionHandling;
@@ -112,23 +113,16 @@ public class LongMember extends RefsetMember<LongRevision, LongMember>
 
    @Override
    public LongRevision makeAnalog() {
-      LongRevision newR = new LongRevision(getStatusNid(), getPathNid(), getTime(), this);
+      LongRevision newR = new LongRevision(getStatusNid(), getTime(), getAuthorNid(),
+              getModuleNid(), getPathNid(), this);
 
       return newR;
    }
-
+   
    @Override
-   public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-      LongRevision newR = new LongRevision(statusNid, pathNid, time, this);
-
-      addRevision(newR);
-
-      return newR;
-   }
-
-   @Override
-   public LongRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-      LongRevision newR = new LongRevision(statusNid, authorNid, pathNid, time, this);
+   public LongRevision makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
+      LongRevision newR = new LongRevision(statusNid, time,
+              authorNid, moduleNid, pathNid, this);
 
       addRevision(newR);
 

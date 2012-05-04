@@ -72,7 +72,7 @@ public class CommitAndPromote extends AbstractTask {
             // Commit complete, now promote...
             for (I_GetConceptData concept: conceptsToPromote) {
             	concept.promote(viewPosition, config.getPromotionPathSetReadOnly(), 
-                		config.getAllowedStatus(), config.getPrecedence());
+                		config.getAllowedStatus(), config.getPrecedence(), config.getEditCoordinate().getAuthorNid());
             	Terms.get().addUncommittedNoChecks(concept);
             }
             

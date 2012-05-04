@@ -35,6 +35,7 @@ import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidRevision;
 import java.io.IOException;
 
 import java.util.*;
+import org.dwfa.ace.api.Terms;
 
 public class CidRevision extends RefsetRevision<CidRevision, CidMember>
         implements I_ExtendByRefPartCid<CidRevision>, RefexCnidAnalogBI<CidRevision> {
@@ -61,23 +62,13 @@ public class CidRevision extends RefsetRevision<CidRevision, CidMember>
       c1Nid = input.readInt();
    }
 
-   protected CidRevision(int statusNid, int pathNid, long time, CidMember primoridalMember) {
-      super(statusNid, pathNid, time, primoridalMember);
+   protected CidRevision(int statusNid, long time, int authorNid, int moduleNid, int pathNid, CidMember primoridalMember) {
+      super(statusNid, time, authorNid, moduleNid, pathNid, primoridalMember);
       c1Nid = primoridalMember.getC1Nid();
    }
 
-   protected CidRevision(int statusNid, int pathNid, long time, CidRevision another) {
-      super(statusNid, pathNid, time, another.primordialComponent);
-      c1Nid = another.c1Nid;
-   }
-
-   protected CidRevision(int statusNid, int authorNid, int pathNid, long time, CidMember primoridalMember) {
-      super(statusNid, authorNid, pathNid, time, primoridalMember);
-      c1Nid = primoridalMember.getC1Nid();
-   }
-
-   protected CidRevision(int statusNid, int authorNid, int pathNid, long time, CidRevision another) {
-      super(statusNid, authorNid, pathNid, time, another.primordialComponent);
+   protected CidRevision(int statusNid, long time, int authorNid, int moduleNid, int pathNid, CidRevision another) {
+      super(statusNid, time, authorNid, moduleNid, pathNid, another.primordialComponent);
       c1Nid = another.c1Nid;
    }
 
@@ -111,18 +102,21 @@ public class CidRevision extends RefsetRevision<CidRevision, CidMember>
 
    @Override
    public CidRevision makeAnalog() {
-      return new CidRevision(getStatusNid(), getPathNid(), getTime(), this);
+      return new CidRevision(getStatusNid(), getTime(), getAuthorNid(), getModuleNid(), getPathNid(),  this);
    }
-
+   
    @Override
-   public CidRevision makeAnalog(int statusNid, int pathNid, long time) {
+   public CidRevision makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
       if ((this.getTime() == time) && (this.getPathNid() == pathNid)) {
          this.setStatusNid(statusNid);
+         this.setAuthorNid(authorNid);
+         this.setModuleNid(moduleNid);
 
          return this;
       }
 
-      CidRevision newR = new CidRevision(statusNid, pathNid, time, this);
+      CidRevision newR = new CidRevision(statusNid, time,
+              authorNid,  moduleNid, pathNid,this);
 
       primordialComponent.addRevision(newR);
 
@@ -130,22 +124,7 @@ public class CidRevision extends RefsetRevision<CidRevision, CidMember>
    }
 
    @Override
-   public CidRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-      if ((this.getTime() == time) && (this.getPathNid() == pathNid)) {
-         this.setStatusNid(statusNid);
-
-         return this;
-      }
-
-      CidRevision newR = new CidRevision(statusNid, authorNid, pathNid, time, this);
-
-      primordialComponent.addRevision(newR);
-
-      return newR;
-   }
-
-   @Override
-   public I_ExtendByRefPart<CidRevision> makePromotionPart(PathBI promotionPath) {
+   public I_ExtendByRefPart<CidRevision> makePromotionPart(PathBI promotionPath, int authorNid) {
 
       // TODO
       throw new UnsupportedOperationException();

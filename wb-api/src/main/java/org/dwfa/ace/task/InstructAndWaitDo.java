@@ -190,7 +190,11 @@ public class InstructAndWaitDo extends AbstractTask {
 
                         newLastPart =
                                 (I_DescriptionPart) newDescr.getLastTuple().getMutablePart().makeAnalog(
-                                    newLastPart.getStatusId(), path.getConceptNid(), Long.MAX_VALUE);
+                                    newLastPart.getStatusNid(),
+                                    Long.MAX_VALUE,
+                                    config.getEditCoordinate().getAuthorNid(),
+                                    config.getEditCoordinate().getModuleNid(),
+                                    path.getConceptNid());
                     }
                     // printDescriptionPart(newLastPart);
                     // System.out.println(">>> language: " + language);

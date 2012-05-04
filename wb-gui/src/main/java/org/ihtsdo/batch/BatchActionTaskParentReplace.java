@@ -78,7 +78,11 @@ public class BatchActionTaskParentReplace extends BatchActionTask {
                     && rvbi.getTypeNid() == moveFromRoleTypeNid
                     && rvbi.isStated()) {
                 for (int editPath : ec.getEditPaths()) {
-                    rvbi.makeAnalog(RETIRED_NID, ec.getAuthorNid(), editPath, Long.MAX_VALUE);
+                    rvbi.makeAnalog(RETIRED_NID,
+                            Long.MAX_VALUE,
+                            ec.getAuthorNid(),
+                            ec.getModuleNid(),
+                            editPath);
                 }
                 changed = true;
             }

@@ -237,9 +237,17 @@ public class SearchReplaceTermsInList extends AbstractTask {
                                     I_DescriptionPart newRetiredPart;
                                     
                                     if (retireAsStatus != -1) {
-                                    	newRetiredPart = (I_DescriptionPart) description.makeAnalog(retireAsStatus, path.getConceptNid(), Long.MAX_VALUE);
+                                    	newRetiredPart = (I_DescriptionPart) description.makeAnalog(retireAsStatus,
+                                                Long.MAX_VALUE,
+                                                config.getEditCoordinate().getAuthorNid(),
+                                                config.getEditCoordinate().getModuleNid(),
+                                                path.getConceptNid());
                                     } else {
-                                    	newRetiredPart = (I_DescriptionPart) description.makeAnalog(retiredConceptId, path.getConceptNid(), Long.MAX_VALUE);
+                                    	newRetiredPart = (I_DescriptionPart) description.makeAnalog(retiredConceptId,
+                                                Long.MAX_VALUE,
+                                                config.getEditCoordinate().getAuthorNid(),
+                                                config.getEditCoordinate().getModuleNid(),
+                                                path.getConceptNid());
                                     }
                                     description.getDescVersioned().addVersion(newRetiredPart);
                                     termFactory.addUncommitted(child);

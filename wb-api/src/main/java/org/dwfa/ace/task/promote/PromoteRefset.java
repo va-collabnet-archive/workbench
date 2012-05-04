@@ -167,9 +167,9 @@ public class PromoteRefset extends AbstractTask {
         activity.setValue(completedCount);
         activity.setMaximum(extensions.size());
         activity.setIndeterminate(false);
-        refsetIdentity.promote(viewPosition, promotionPaths, null, config.getPrecedence());
+        refsetIdentity.promote(viewPosition, promotionPaths, null, config.getPrecedence(), config.getEditCoordinate().getAuthorNid());
         for (I_ExtendByRef ext : extensions) {
-            ext.promote(viewPosition, new PathSetReadOnly(promotionPaths), null, config.getPrecedence());
+            ext.promote(viewPosition, new PathSetReadOnly(promotionPaths), null, config.getPrecedence(), config.getEditCoordinate().getAuthorNid());
             if (completedCount % 50 == 0) {
                 activity.setValue(completedCount);
                 long endTime = System.currentTimeMillis();

@@ -169,7 +169,11 @@ public class DescTupleFileUtil {
                     if (!found) {
                         I_DescriptionPart newPart =
                                 (I_DescriptionPart) idv.getTuples().iterator().next().makeAnalog(
-                                    statusConcept.getNid(), pathConcept.getNid(), effectiveDate);
+                                    statusConcept.getNid(),
+                                    effectiveDate,
+                                    importConfig.getEditCoordinate().getAuthorNid(),
+                                    importConfig.getEditCoordinate().getModuleNid(),
+                                    pathConcept.getNid());
                         newPart.setLang(lang);
                         newPart.setText(text);
                         newPart.setTypeId(typeConcept.getNid());

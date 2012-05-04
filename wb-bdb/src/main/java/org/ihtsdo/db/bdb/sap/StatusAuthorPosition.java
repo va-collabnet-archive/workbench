@@ -6,6 +6,12 @@ package org.ihtsdo.db.bdb.sap;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.io.IOException;
+import java.util.List;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.hash.Hashcode;
 
 public class StatusAuthorPosition implements Comparable<StatusAuthorPosition> {
@@ -13,19 +19,25 @@ public class StatusAuthorPosition implements Comparable<StatusAuthorPosition> {
    private int  authorNid;
    private int  pathNid;
    private int  statusNid;
+   private int moduleNid;
    private long time;
 
    //~--- constructors --------------------------------------------------------
 
-   StatusAuthorPosition(int statusNid, int authorNid, int pathNid, long time) {
+   StatusAuthorPosition(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
       super();
       this.statusNid = statusNid;
       this.authorNid = authorNid;
       this.pathNid   = pathNid;
+      this.moduleNid = moduleNid;
       this.time      = time;
-      assert time != 0;
-      assert statusNid != 0;
-      assert pathNid != 0;
+      
+      assert time != 0: "s: " + statusNid + " t: " + time + " a: " + authorNid + " " + " m: " + moduleNid + " p: " + pathNid;
+      assert statusNid != 0: "s: " + statusNid + " t: " + time + " a: " + authorNid + " " + " m: " + moduleNid + " p: " + pathNid;
+      assert pathNid != 0: "s: " + statusNid + " t: " + time + " a: " + authorNid + " " + " m: " + moduleNid + " p: " + pathNid;
+      assert moduleNid != 0: "s: " + statusNid + " t: " + time + " a: " + authorNid + " " + " m: " + moduleNid + " p: " + pathNid;
+      assert authorNid != 0: "s: " + statusNid + " t: " + time + " a: " + authorNid + " " + " m: " + moduleNid + " p: " + pathNid;
+
    }
 
    //~--- methods -------------------------------------------------------------
@@ -81,6 +93,10 @@ public class StatusAuthorPosition implements Comparable<StatusAuthorPosition> {
 
    public int getStatusNid() {
       return statusNid;
+   }
+   
+   public int getModuleNid() {
+      return moduleNid;
    }
 
    public long getTime() {

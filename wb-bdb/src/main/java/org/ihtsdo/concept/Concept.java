@@ -651,28 +651,28 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
     @Override
     public boolean promote(PositionBI viewPosition, PathSetReadOnly pomotionPaths, NidSetBI allowedStatus,
-            Precedence precedence)
+            Precedence precedence, int authorNid)
             throws IOException, TerminologyException {
         boolean promotedAnything = false;
 
-        if (getConceptAttributes().promote(viewPosition, pomotionPaths, allowedStatus, precedence)) {
+        if (getConceptAttributes().promote(viewPosition, pomotionPaths, allowedStatus, precedence, authorNid)) {
             promotedAnything = true;
         }
 
         for (I_DescriptionVersioned dv : getDescriptions()) {
-            if (dv.promote(viewPosition, pomotionPaths, allowedStatus, precedence)) {
+            if (dv.promote(viewPosition, pomotionPaths, allowedStatus, precedence, authorNid)) {
                 promotedAnything = true;
             }
         }
 
         for (I_RelVersioned rv : getSourceRels()) {
-            if (rv.promote(viewPosition, pomotionPaths, allowedStatus, precedence)) {
+            if (rv.promote(viewPosition, pomotionPaths, allowedStatus, precedence, authorNid)) {
                 promotedAnything = true;
             }
         }
 
         for (I_ImageVersioned img : getImages()) {
-            if (img.promote(viewPosition, pomotionPaths, allowedStatus, precedence)) {
+            if (img.promote(viewPosition, pomotionPaths, allowedStatus, precedence, authorNid)) {
                 promotedAnything = true;
             }
         }
@@ -682,10 +682,10 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
     @Override
     public boolean promote(I_TestComponent test, I_Position viewPosition, PathSetReadOnly pomotionPaths,
-            NidSetBI allowedStatus, Precedence precedence)
+            NidSetBI allowedStatus, Precedence precedence, int authorNid)
             throws IOException, TerminologyException {
         if (test.result(this, viewPosition, pomotionPaths, allowedStatus, precedence)) {
-            return promote(viewPosition, pomotionPaths, allowedStatus, precedence);
+            return promote(viewPosition, pomotionPaths, allowedStatus, precedence, authorNid);
         }
 
         return false;

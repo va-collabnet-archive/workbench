@@ -1025,9 +1025,11 @@ public class ContradictionConfig implements I_ConfigAceFrame {
         return config.getEditDescTypePopup();
     }
 
+    @Override
     public EditCoordinate getEditCoordinate() {
       NidSet editPaths = new NidSet(getPromotionPathSet());
       return new EditCoordinate(Terms.get().getAuthorNid(),
+              config.getEditCoordinate().getModuleNid(),
               editPaths);
     }
 
@@ -1235,6 +1237,11 @@ public class ContradictionConfig implements I_ConfigAceFrame {
 
     public void addConceptPanelPlugins(HOST_ENUM host, UUID id, I_PluginToConceptPanel plugin) {
         config.addConceptPanelPlugins(host, id, plugin);
+    }
+
+    @Override
+    public void setModuleNid(int moduleNid) {
+        config.setModuleNid(moduleNid);
     }
     
     

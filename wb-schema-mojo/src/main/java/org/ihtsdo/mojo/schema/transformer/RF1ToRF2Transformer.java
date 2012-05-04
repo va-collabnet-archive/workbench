@@ -26,6 +26,7 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
@@ -143,6 +144,9 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
                 if (attributes.getAuthorUuid() == null) {
                     attributes.setAuthorUuid(authorUser);
                 }
+                if (attributes.getModuleUuid() == null) {
+                    attributes.setModuleUuid(TkRevision.unspecifiedModuleUuid);
+                }
             } catch (ValidationException e) {
                 AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
             } catch (IOException e) {
@@ -191,6 +195,9 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
                 if (description.getAuthorUuid() == null) {
                     description.setAuthorUuid(authorUser);
                 }
+                if (description.getModuleUuid() == null) {
+                    description.setModuleUuid(TkRevision.unspecifiedModuleUuid);
+                }
 
             } catch (UnsupportedDialectOrLanguage e) {
                 AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
@@ -225,6 +232,9 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
                 if (relationship.getAuthorUuid() == null) {
                     relationship.setAuthorUuid(authorUser);
                 }
+                if (relationship.getModuleUuid() == null) {
+                    relationship.setModuleUuid(TkRevision.unspecifiedModuleUuid);
+                }
             } catch (IOException e) {
                 AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
             }
@@ -248,6 +258,9 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
                 }
                 if (annotation.getAuthorUuid() == null) {
                     annotation.setAuthorUuid(authorUser);
+                }
+                if (annotation.getModuleUuid() == null) {
+                    annotation.setModuleUuid(TkRevision.unspecifiedModuleUuid);
                 }
             } catch (ValidationException e) {
                 AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
@@ -274,6 +287,9 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
                 }
                 if (member.getAuthorUuid() == null) {
                     member.setAuthorUuid(authorUser);
+                }
+                if (member.getModuleUuid() == null) {
+                    member.setModuleUuid(TkRevision.unspecifiedModuleUuid);
                 }
             } catch (ValidationException e) {
                 AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
@@ -337,6 +353,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
             TkRefsetCidMember usMember = new TkRefsetCidMember();
             usMember.setPrimordialComponentUuid(UUID.randomUUID());
             usMember.setAuthorUuid(description.getAuthorUuid());
+            usMember.setModuleUuid(TkRevision.unspecifiedModuleUuid);
             usMember.setC1Uuid(SnomedMetadataRf2.PREFERRED_RF2.getLenient().getPrimUuid());
             usMember.setComponentUuid(description.getPrimordialComponentUuid());
             usMember.setPathUuid(description.getPathUuid());
@@ -349,6 +366,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
             TkRefsetCidMember gbMember = new TkRefsetCidMember();
             gbMember.setPrimordialComponentUuid(UUID.randomUUID());
             gbMember.setAuthorUuid(description.getAuthorUuid());
+            gbMember.setModuleUuid(TkRevision.unspecifiedModuleUuid);
             gbMember.setC1Uuid(SnomedMetadataRf2.PREFERRED_RF2.getLenient().getPrimUuid());
             gbMember.setComponentUuid(description.getPrimordialComponentUuid());
             gbMember.setPathUuid(description.getPathUuid());
@@ -362,6 +380,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
             TkRefsetCidMember usMember = new TkRefsetCidMember();
             usMember.setPrimordialComponentUuid(UUID.randomUUID());
             usMember.setAuthorUuid(description.getAuthorUuid());
+            usMember.setModuleUuid(TkRevision.unspecifiedModuleUuid);
             usMember.setC1Uuid(SnomedMetadataRf2.PREFERRED_RF2.getLenient().getPrimUuid());
             usMember.setComponentUuid(description.getPrimordialComponentUuid());
             usMember.setPathUuid(description.getPathUuid());
@@ -374,6 +393,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
             TkRefsetCidMember gbMember = new TkRefsetCidMember();
             gbMember.setPrimordialComponentUuid(UUID.randomUUID());
             gbMember.setAuthorUuid(description.getAuthorUuid());
+            gbMember.setModuleUuid(TkRevision.unspecifiedModuleUuid);
             gbMember.setC1Uuid(SnomedMetadataRf2.PREFERRED_RF2.getLenient().getPrimUuid());
             gbMember.setComponentUuid(description.getPrimordialComponentUuid());
             gbMember.setPathUuid(description.getPathUuid());
@@ -388,6 +408,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
             TkRefsetCidMember usMember = new TkRefsetCidMember();
             usMember.setPrimordialComponentUuid(UUID.randomUUID());
             usMember.setAuthorUuid(description.getAuthorUuid());
+            usMember.setModuleUuid(TkRevision.unspecifiedModuleUuid);
             usMember.setC1Uuid(SnomedMetadataRf2.ACCEPTABLE_RF2.getLenient().getPrimUuid());
             usMember.setComponentUuid(description.getPrimordialComponentUuid());
             usMember.setPathUuid(description.getPathUuid());
@@ -400,6 +421,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
             TkRefsetCidMember gbMember = new TkRefsetCidMember();
             gbMember.setPrimordialComponentUuid(UUID.randomUUID());
             gbMember.setAuthorUuid(description.getAuthorUuid());
+            gbMember.setModuleUuid(TkRevision.unspecifiedModuleUuid);
             gbMember.setC1Uuid(SnomedMetadataRf2.ACCEPTABLE_RF2.getLenient().getPrimUuid());
             gbMember.setComponentUuid(description.getPrimordialComponentUuid());
             gbMember.setPathUuid(description.getPathUuid());
@@ -422,6 +444,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
             TkRefsetCidMember usMember = new TkRefsetCidMember();
             usMember.setPrimordialComponentUuid(UUID.randomUUID());
             usMember.setAuthorUuid(description.getAuthorUuid());
+            usMember.setModuleUuid(TkRevision.unspecifiedModuleUuid);
             usMember.setC1Uuid(SnomedMetadataRf2.PREFERRED_RF2.getLenient().getPrimUuid());
             usMember.setComponentUuid(description.getPrimordialComponentUuid());
             usMember.setPathUuid(description.getPathUuid());
@@ -434,6 +457,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
             TkRefsetCidMember gbMember = new TkRefsetCidMember();
             gbMember.setPrimordialComponentUuid(UUID.randomUUID());
             gbMember.setAuthorUuid(description.getAuthorUuid());
+            gbMember.setModuleUuid(TkRevision.unspecifiedModuleUuid);
             gbMember.setC1Uuid(SnomedMetadataRf2.PREFERRED_RF2.getLenient().getPrimUuid());
             gbMember.setComponentUuid(description.getPrimordialComponentUuid());
             gbMember.setPathUuid(description.getPathUuid());
@@ -447,6 +471,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
             TkRefsetCidMember usMember = new TkRefsetCidMember();
             usMember.setPrimordialComponentUuid(UUID.randomUUID());
             usMember.setAuthorUuid(description.getAuthorUuid());
+            usMember.setModuleUuid(TkRevision.unspecifiedModuleUuid);
             usMember.setC1Uuid(SnomedMetadataRf2.PREFERRED_RF2.getLenient().getPrimUuid());
             usMember.setComponentUuid(description.getPrimordialComponentUuid());
             usMember.setPathUuid(description.getPathUuid());
@@ -460,6 +485,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
             TkRefsetCidMember usMember = new TkRefsetCidMember();
             usMember.setPrimordialComponentUuid(UUID.randomUUID());
             usMember.setAuthorUuid(description.getAuthorUuid());
+            usMember.setModuleUuid(TkRevision.unspecifiedModuleUuid);
             usMember.setC1Uuid(SnomedMetadataRf2.ACCEPTABLE_RF2.getLenient().getPrimUuid());
             usMember.setComponentUuid(description.getPrimordialComponentUuid());
             usMember.setPathUuid(description.getPathUuid());
@@ -472,6 +498,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
             TkRefsetCidMember gbMember = new TkRefsetCidMember();
             gbMember.setPrimordialComponentUuid(UUID.randomUUID());
             gbMember.setAuthorUuid(description.getAuthorUuid());
+            gbMember.setModuleUuid(TkRevision.unspecifiedModuleUuid);
             gbMember.setC1Uuid(SnomedMetadataRf2.ACCEPTABLE_RF2.getLenient().getPrimUuid());
             gbMember.setComponentUuid(description.getPrimordialComponentUuid());
             gbMember.setPathUuid(description.getPathUuid());
@@ -508,6 +535,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
             TkRefsetCidMember usMember = new TkRefsetCidMember();
             usMember.setPrimordialComponentUuid(UUID.randomUUID());
             usMember.setAuthorUuid(description.getAuthorUuid());
+            usMember.setModuleUuid(TkRevision.unspecifiedModuleUuid);
             usMember.setC1Uuid(SnomedMetadataRf2.ACCEPTABLE_RF2.getLenient().getPrimUuid());
             usMember.setComponentUuid(description.getPrimordialComponentUuid());
             usMember.setPathUuid(description.getPathUuid());
@@ -520,6 +548,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
             TkRefsetCidMember gbMember = new TkRefsetCidMember();
             gbMember.setPrimordialComponentUuid(UUID.randomUUID());
             gbMember.setAuthorUuid(description.getAuthorUuid());
+            gbMember.setModuleUuid(TkRevision.unspecifiedModuleUuid);
             gbMember.setC1Uuid(SnomedMetadataRf2.ACCEPTABLE_RF2.getLenient().getPrimUuid());
             gbMember.setComponentUuid(description.getPrimordialComponentUuid());
             gbMember.setPathUuid(description.getPathUuid());
@@ -541,6 +570,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
             TkRefsetCidMember member = new TkRefsetCidMember();
             member.setPrimordialComponentUuid(UUID.randomUUID());
             member.setAuthorUuid(description.getAuthorUuid());
+            member.setModuleUuid(TkRevision.unspecifiedModuleUuid);
             member.setC1Uuid(SnomedMetadataRf2.PREFERRED_RF2.getLenient().getPrimUuid());
             member.setComponentUuid(description.getPrimordialComponentUuid());
             member.setPathUuid(description.getPathUuid());
@@ -554,6 +584,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
             TkRefsetCidMember member = new TkRefsetCidMember();
             member.setPrimordialComponentUuid(UUID.randomUUID());
             member.setAuthorUuid(description.getAuthorUuid());
+            member.setModuleUuid(TkRevision.unspecifiedModuleUuid);
             member.setC1Uuid(SnomedMetadataRf2.PREFERRED_RF2.getLenient().getPrimUuid());
             member.setComponentUuid(description.getPrimordialComponentUuid());
             member.setPathUuid(description.getPathUuid());
@@ -567,6 +598,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
             TkRefsetCidMember member = new TkRefsetCidMember();
             member.setPrimordialComponentUuid(UUID.randomUUID());
             member.setAuthorUuid(description.getAuthorUuid());
+            member.setModuleUuid(TkRevision.unspecifiedModuleUuid);
             member.setC1Uuid(SnomedMetadataRf2.ACCEPTABLE_RF2.getLenient().getPrimUuid());
             member.setComponentUuid(description.getPrimordialComponentUuid());
             member.setPathUuid(description.getPathUuid());
