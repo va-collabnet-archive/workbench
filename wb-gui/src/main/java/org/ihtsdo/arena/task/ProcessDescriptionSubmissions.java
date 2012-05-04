@@ -123,6 +123,10 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
             Integer acceptUuid = null;
 
             String line = iterator.next();
+            if(line.startsWith("<")){
+                line = iterator.next();
+                count++;
+            }
             String[] configParts = line.split("\t");
             
 
@@ -153,6 +157,10 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
             int acceptabilityNid = 0;
             
             line = iterator.next();
+            if(line.startsWith("<")){
+                line = iterator.next();
+                count++;
+            }
             count++;
             while (line != null) {
                 count++;
@@ -254,6 +262,10 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
                 uuidList.add(list);
                 if (iterator.hasNext()) {
                     line = iterator.next();
+                    if(line.startsWith("<")){
+                        line = iterator.next();
+                        count++;
+                    }
                 } else {
                     line = null;
                 }
