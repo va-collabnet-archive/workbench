@@ -92,29 +92,29 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 
 /**
  * The Class HierarchyNavigator.
- *
+ * 
  * @author Guillermo Reynoso
  */
 public class HierarchyNavigator extends JPanel {
-	
+
 	/** The config. */
 	public I_ConfigAceFrame config;
-	
+
 	/** The allowed dest rel types. */
 	private I_IntSet allowedDestRelTypes;
-	
+
 	/** The allowed status. */
 	private I_IntSet allowedStatus;
-	
+
 	/** The inactive. */
 	private I_GetConceptData inactive;
-	
+
 	/** The retired. */
 	private I_GetConceptData retired;
-	
+
 	/** The container panel. */
 	private JTabbedPane containerPanel;
-	
+
 	/** The concept model. */
 	private DefaultListModel conceptModel;
 
@@ -129,41 +129,45 @@ public class HierarchyNavigator extends JPanel {
 		tree2.setModel(new DefaultTreeModel(new DefaultMutableTreeNode()));
 		tree1.setCellRenderer(new HierarchyIconRenderer());
 		tree2.setCellRenderer(new HierarchyIconRenderer());
-		I_TermFactory termFactory = Terms.get();
-		allowedDestRelTypes = termFactory.newIntSet();
-		allowedStatus = termFactory.newIntSet();
-		try {
-			config = Terms.get().getActiveAceFrameConfig();
-			// allowedDestRelTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
-			allowedDestRelTypes = config.getDestRelTypes();
-			// allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
-			allowedStatus = config.getAllowedStatus();
+		if (Terms.get() != null) {
+			I_TermFactory termFactory = Terms.get();
+			if (termFactory != null) {
+				allowedDestRelTypes = termFactory.newIntSet();
+				allowedStatus = termFactory.newIntSet();
+			}
+			try {
+				config = Terms.get().getActiveAceFrameConfig();
+				// allowedDestRelTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
+				allowedDestRelTypes = config.getDestRelTypes();
+				// allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
+				allowedStatus = config.getAllowedStatus();
 
-			inactive = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.INACTIVE.getUids());
-			retired = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
-			// allowedStatus.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
-			// allowedStatus.add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
-			// config.setAllowedStatus(allowedStatus);
-		} catch (TerminologyException e) {
-			AceLog.getAppLog().alertAndLogException(e);
-		} catch (IOException e) {
-			AceLog.getAppLog().alertAndLogException(e);
+				inactive = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.INACTIVE.getUids());
+				retired = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
+				// allowedStatus.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
+				// allowedStatus.add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
+				// config.setAllowedStatus(allowedStatus);
+			} catch (TerminologyException e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			} catch (IOException e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			}
+			tree1.setTransferHandler(new ObjectTransferHandler(config, null));
+			tree1.setRootVisible(false);
+			tree1.setShowsRootHandles(true);
+			tree1.setDragEnabled(true);
+			tree1.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+
+			ToolTipManager.sharedInstance().registerComponent(tree1);
+
+			// applyDNDHack(tree1);
+			tree2.setTransferHandler(new ObjectTransferHandler(config, null));
+			tree2.setRootVisible(false);
+			tree2.setShowsRootHandles(true);
+			tree2.setDragEnabled(true);
+			tree2.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+
 		}
-		tree1.setTransferHandler(new ObjectTransferHandler(config, null));
-		tree1.setRootVisible(false);
-		tree1.setShowsRootHandles(true);
-		tree1.setDragEnabled(true);
-		tree1.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-
-		ToolTipManager.sharedInstance().registerComponent(tree1);
-
-		// applyDNDHack(tree1);
-		tree2.setTransferHandler(new ObjectTransferHandler(config,null));
-		tree2.setRootVisible(false);
-		tree2.setShowsRootHandles(true);
-		tree2.setDragEnabled(true);
-		tree2.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-
 		ToolTipManager.sharedInstance().registerComponent(tree2);
 
 		DragSource.getDefaultDragSource().createDefaultDragGestureRecognizer(tree1, DnDConstants.ACTION_COPY, new DragGestureListenerWithImage(new TermLabelDragSourceListener(), tree1));
@@ -175,8 +179,9 @@ public class HierarchyNavigator extends JPanel {
 
 	/**
 	 * Sets the focus concept.
-	 *
-	 * @param focusConcept the new focus concept
+	 * 
+	 * @param focusConcept
+	 *            the new focus concept
 	 */
 	public void setFocusConcept(I_GetConceptData focusConcept) {
 		comboBox1.addItem(focusConcept);
@@ -185,8 +190,9 @@ public class HierarchyNavigator extends JPanel {
 
 	/**
 	 * Sets the focus concept.
-	 *
-	 * @param focusConcept the new focus concept
+	 * 
+	 * @param focusConcept
+	 *            the new focus concept
 	 */
 	public void setFocusConcept(ConceptVersionBI focusConcept) {
 		try {
@@ -199,11 +205,12 @@ public class HierarchyNavigator extends JPanel {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
 	}
-	
+
 	/**
 	 * Combo box1 action performed.
-	 *
-	 * @param e the e
+	 * 
+	 * @param e
+	 *            the e
 	 */
 	private void comboBox1ActionPerformed(ActionEvent e) {
 		refreshTrees();
@@ -225,8 +232,9 @@ public class HierarchyNavigator extends JPanel {
 
 	/**
 	 * Combo box1 item state changed.
-	 *
-	 * @param e the e
+	 * 
+	 * @param e
+	 *            the e
 	 */
 	private void comboBox1ItemStateChanged(ItemEvent e) {
 		if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -235,44 +243,61 @@ public class HierarchyNavigator extends JPanel {
 	}
 
 	/**
-	 * The listener interface for receiving termLabelDragSource events.
-	 * The class that is interested in processing a termLabelDragSource
-	 * event implements this interface, and the object created
-	 * with that class is registered with a component using the
-	 * component's <code>addTermLabelDragSourceListener<code> method. When
+	 * The listener interface for receiving termLabelDragSource events. The
+	 * class that is interested in processing a termLabelDragSource event
+	 * implements this interface, and the object created with that class is
+	 * registered with a component using the component's
+	 * <code>addTermLabelDragSourceListener<code> method. When
 	 * the termLabelDragSource event occurs, that object's appropriate
 	 * method is invoked.
-	 *
+	 * 
 	 * @see TermLabelDragSourceEvent
 	 */
 	private class TermLabelDragSourceListener implements DragSourceListener {
 
-		/* (non-Javadoc)
-		 * @see java.awt.dnd.DragSourceListener#dragDropEnd(java.awt.dnd.DragSourceDropEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see java.awt.dnd.DragSourceListener#dragDropEnd(java.awt.dnd.
+		 * DragSourceDropEvent)
 		 */
 		public void dragDropEnd(DragSourceDropEvent dsde) {
 		}
 
-		/* (non-Javadoc)
-		 * @see java.awt.dnd.DragSourceListener#dragEnter(java.awt.dnd.DragSourceDragEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see java.awt.dnd.DragSourceListener#dragEnter(java.awt.dnd.
+		 * DragSourceDragEvent)
 		 */
 		public void dragEnter(DragSourceDragEvent dsde) {
 		}
 
-		/* (non-Javadoc)
-		 * @see java.awt.dnd.DragSourceListener#dragExit(java.awt.dnd.DragSourceEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * java.awt.dnd.DragSourceListener#dragExit(java.awt.dnd.DragSourceEvent
+		 * )
 		 */
 		public void dragExit(DragSourceEvent dse) {
 		}
 
-		/* (non-Javadoc)
-		 * @see java.awt.dnd.DragSourceListener#dragOver(java.awt.dnd.DragSourceDragEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * java.awt.dnd.DragSourceListener#dragOver(java.awt.dnd.DragSourceDragEvent
+		 * )
 		 */
 		public void dragOver(DragSourceDragEvent dsde) {
 		}
 
-		/* (non-Javadoc)
-		 * @see java.awt.dnd.DragSourceListener#dropActionChanged(java.awt.dnd.DragSourceDragEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see java.awt.dnd.DragSourceListener#dropActionChanged(java.awt.dnd.
+		 * DragSourceDragEvent)
 		 */
 		public void dropActionChanged(DragSourceDragEvent dsde) {
 		}
@@ -285,15 +310,17 @@ public class HierarchyNavigator extends JPanel {
 
 		/** The dsl. */
 		DragSourceListener dsl;
-		
+
 		/** The j tree. */
 		JTree jTree;
 
 		/**
 		 * Instantiates a new drag gesture listener with image.
-		 *
-		 * @param dsl the dsl
-		 * @param jTree the j tree
+		 * 
+		 * @param dsl
+		 *            the dsl
+		 * @param jTree
+		 *            the j tree
 		 */
 		public DragGestureListenerWithImage(DragSourceListener dsl, JTree jTree) {
 
@@ -302,8 +329,12 @@ public class HierarchyNavigator extends JPanel {
 			this.dsl = dsl;
 		}
 
-		/* (non-Javadoc)
-		 * @see java.awt.dnd.DragGestureListener#dragGestureRecognized(java.awt.dnd.DragGestureEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * java.awt.dnd.DragGestureListener#dragGestureRecognized(java.awt.dnd
+		 * .DragGestureEvent)
 		 */
 		public void dragGestureRecognized(DragGestureEvent dge) {
 			int selRow = jTree.getRowForLocation(dge.getDragOrigin().x, dge.getDragOrigin().y);
@@ -329,11 +360,14 @@ public class HierarchyNavigator extends JPanel {
 
 		/**
 		 * Gets the transferable.
-		 *
-		 * @param obj the obj
+		 * 
+		 * @param obj
+		 *            the obj
 		 * @return the transferable
-		 * @throws TerminologyException the terminology exception
-		 * @throws IOException Signals that an I/O exception has occurred.
+		 * @throws TerminologyException
+		 *             the terminology exception
+		 * @throws IOException
+		 *             Signals that an I/O exception has occurred.
 		 */
 		private Transferable getTransferable(I_GetConceptData obj) throws TerminologyException, IOException {
 			return new ConceptTransferable(Terms.get().getConcept(obj.getConceptNid()));
@@ -341,10 +375,12 @@ public class HierarchyNavigator extends JPanel {
 
 		/**
 		 * Gets the drag image.
-		 *
-		 * @param obj the obj
+		 * 
+		 * @param obj
+		 *            the obj
 		 * @return the drag image
-		 * @throws IOException Signals that an I/O exception has occurred.
+		 * @throws IOException
+		 *             Signals that an I/O exception has occurred.
 		 */
 		public Image getDragImage(I_GetConceptData obj) throws IOException {
 
@@ -366,11 +402,11 @@ public class HierarchyNavigator extends JPanel {
 		}
 	}
 
-
 	/**
 	 * Gets the children.
-	 *
-	 * @param concept the concept
+	 * 
+	 * @param concept
+	 *            the concept
 	 * @return the children
 	 */
 	private List<? extends I_RelTuple> getChildren(I_GetConceptData concept) {
@@ -379,11 +415,11 @@ public class HierarchyNavigator extends JPanel {
 			I_TermFactory termFactory = Terms.get();
 			I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
 			if (rInfer.isSelected()) {
-				children = concept.getDestRelTuples(allowedStatus, allowedDestRelTypes, config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy(), config
-						.getClassifierConcept().getNid(), RelAssertionType.INFERRED);
+				children = concept.getDestRelTuples(allowedStatus, allowedDestRelTypes, config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy(), config.getClassifierConcept().getNid(),
+						RelAssertionType.INFERRED);
 			} else {
-				children = concept.getDestRelTuples(allowedStatus, allowedDestRelTypes, config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy(), config
-						.getClassifierConcept().getNid(), RelAssertionType.STATED);
+				children = concept.getDestRelTuples(allowedStatus, allowedDestRelTypes, config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy(), config.getClassifierConcept().getNid(),
+						RelAssertionType.STATED);
 			}
 		} catch (TerminologyException e) {
 			AceLog.getAppLog().alertAndLogException(e);
@@ -395,8 +431,9 @@ public class HierarchyNavigator extends JPanel {
 
 	/**
 	 * Gets the children tree model.
-	 *
-	 * @param concept the concept
+	 * 
+	 * @param concept
+	 *            the concept
 	 * @return the children tree model
 	 */
 	private DefaultTreeModel getChildrenTreeModel(I_GetConceptData concept) {
@@ -433,8 +470,9 @@ public class HierarchyNavigator extends JPanel {
 
 	/**
 	 * Gets the parents.
-	 *
-	 * @param concept the concept
+	 * 
+	 * @param concept
+	 *            the concept
 	 * @return the parents
 	 */
 	private List<? extends I_RelTuple> getParents(I_GetConceptData concept) {
@@ -443,11 +481,11 @@ public class HierarchyNavigator extends JPanel {
 			I_TermFactory termFactory = Terms.get();
 			I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
 			if (rInfer.isSelected()) {
-				parents = concept.getSourceRelTuples(allowedStatus, allowedDestRelTypes, config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy(), config
-						.getClassifierConcept().getNid(), RelAssertionType.INFERRED);
+				parents = concept.getSourceRelTuples(allowedStatus, allowedDestRelTypes, config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy(), config.getClassifierConcept().getNid(),
+						RelAssertionType.INFERRED);
 			} else {
-				parents = concept.getSourceRelTuples(allowedStatus, allowedDestRelTypes, config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy(), config
-						.getClassifierConcept().getNid(), RelAssertionType.STATED);
+				parents = concept.getSourceRelTuples(allowedStatus, allowedDestRelTypes, config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy(), config.getClassifierConcept().getNid(),
+						RelAssertionType.STATED);
 			}
 		} catch (TerminologyException e) {
 			AceLog.getAppLog().alertAndLogException(e);
@@ -459,8 +497,9 @@ public class HierarchyNavigator extends JPanel {
 
 	/**
 	 * Gets the parents tree model.
-	 *
-	 * @param concept the concept
+	 * 
+	 * @param concept
+	 *            the concept
 	 * @return the parents tree model
 	 */
 	private DefaultTreeModel getParentsTreeModel(I_GetConceptData concept) {
@@ -494,9 +533,11 @@ public class HierarchyNavigator extends JPanel {
 
 	/**
 	 * Tree1 tree will expand.
-	 *
-	 * @param e the e
-	 * @throws ExpandVetoException the expand veto exception
+	 * 
+	 * @param e
+	 *            the e
+	 * @throws ExpandVetoException
+	 *             the expand veto exception
 	 */
 	private void tree1TreeWillExpand(TreeExpansionEvent e) throws ExpandVetoException {
 		TreePath path = e.getPath();
@@ -531,9 +572,11 @@ public class HierarchyNavigator extends JPanel {
 
 	/**
 	 * Tree2 tree will expand.
-	 *
-	 * @param e the e
-	 * @throws ExpandVetoException the expand veto exception
+	 * 
+	 * @param e
+	 *            the e
+	 * @throws ExpandVetoException
+	 *             the expand veto exception
 	 */
 	private void tree2TreeWillExpand(TreeExpansionEvent e) throws ExpandVetoException {
 		TreePath path = e.getPath();
@@ -573,8 +616,9 @@ public class HierarchyNavigator extends JPanel {
 
 	/**
 	 * Sets the container panel.
-	 *
-	 * @param containerPanel the new container panel
+	 * 
+	 * @param containerPanel
+	 *            the new container panel
 	 */
 	public void setContainerPanel(JTabbedPane containerPanel) {
 		this.containerPanel = containerPanel;
@@ -582,8 +626,9 @@ public class HierarchyNavigator extends JPanel {
 
 	/**
 	 * Expand button action performed.
-	 *
-	 * @param e the e
+	 * 
+	 * @param e
+	 *            the e
 	 */
 	private void expandButtonActionPerformed(ActionEvent e) {
 
@@ -638,8 +683,13 @@ public class HierarchyNavigator extends JPanel {
 		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = 1502464349648287786L;
 
-		/* (non-Javadoc)
-		 * @see javax.swing.tree.DefaultTreeCellRenderer#getTreeCellRendererComponent(javax.swing.JTree, java.lang.Object, boolean, boolean, boolean, int, boolean)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * javax.swing.tree.DefaultTreeCellRenderer#getTreeCellRendererComponent
+		 * (javax.swing.JTree, java.lang.Object, boolean, boolean, boolean, int,
+		 * boolean)
 		 */
 		@Override
 		public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
@@ -651,7 +701,7 @@ public class HierarchyNavigator extends JPanel {
 				if (nodeObject != null) {
 					Integer type = Integer.parseInt(nodeObject.getObjType());
 					label.setIcon(IconUtilities.getIconForConceptDetails(type));
-					
+
 					if (type == IconUtilities.getDefined()) {
 						label.setToolTipText("Fully defined descendant");
 					} else if (type == IconUtilities.getPrimitive()) {
@@ -814,31 +864,31 @@ public class HierarchyNavigator extends JPanel {
 	// //GEN-BEGIN:variables
 	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
-	
+
 	/** The tree1. */
 	private JTree tree1;
-	
+
 	/** The panel1. */
 	private JPanel panel1;
-	
+
 	/** The combo box1. */
 	private JComboBox comboBox1;
-	
+
 	/** The panel2. */
 	private JPanel panel2;
-	
+
 	/** The r infer. */
 	private JRadioButton rInfer;
-	
+
 	/** The r stat. */
 	private JRadioButton rStat;
-	
+
 	/** The expand button. */
 	private JButton expandButton;
-	
+
 	/** The scroll pane2. */
 	private JScrollPane scrollPane2;
-	
+
 	/** The tree2. */
 	private JTree tree2;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
