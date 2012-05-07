@@ -57,6 +57,7 @@ import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.rule.FactHandle;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IntSet;
@@ -93,6 +94,7 @@ import org.ihtsdo.tk.api.KindOfCacheBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.helper.ResultsItem;
 import org.ihtsdo.tk.helper.ResultsItem.Severity;
 import org.ihtsdo.tk.helper.templates.AbstractTemplate;
@@ -103,6 +105,7 @@ import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.spec.DescriptionSpec;
 import org.ihtsdo.tk.spec.RelSpec;
 import org.ihtsdo.tk.spec.SpecFactory;
+import org.mvel2.ast.IsDef;
 
 import com.googlecode.sardine.Sardine;
 import com.googlecode.sardine.SardineFactory;
@@ -114,50 +117,52 @@ public class RulesLibrary {
 
 	/** The CONCEPT MODEL knowledge package identifier. */
 	public static int CONCEPT_MODEL_PKG = 0;
-	
+
 	/** The LINGUISTI c_ guideline s_ pkg. */
 	public static int LINGUISTIC_GUIDELINES_PKG = 1;
 
 	/** The my static is a cache. */
 	public static KindOfCacheBI myStaticIsACache;
-	
+
 	/** The my static is a cache refset spec. */
 	public static KindOfCacheBI myStaticIsACacheRefsetSpec;
-	
+
 	/** The terminology helper cache. */
 	public static TerminologyHelperDroolsWorkbench terminologyHelperCache;
-	
+
 	/** The no realtime rules alert shown. */
 	public static boolean noRealtimeRulesAlertShown = false;
-	
+
 	/** The rules disabled. */
 	public static boolean rulesDisabled = false;
 
 	/**
 	 * The Enum INFERRED_VIEW_ORIGIN.
 	 */
-	public enum INFERRED_VIEW_ORIGIN {/** The STATED. */
-STATED, /** The CONSTRAIN t_ norma l_ form. */
- CONSTRAINT_NORMAL_FORM, /** The INFERRED. */
- INFERRED};
+	public enum INFERRED_VIEW_ORIGIN {
+		/** The STATED. */
+		STATED, /** The CONSTRAIN t_ norma l_ form. */
+		CONSTRAINT_NORMAL_FORM, /** The INFERRED. */
+		INFERRED
+	};
 
 	/** The all rels. */
 	public static I_IntSet allRels;
-	
+
 	/** The hist rels. */
 	public static I_IntSet histRels;
-	
+
 	/** The Cpt model rels. */
 	public static I_IntSet CptModelRels;
 
 	/**
 	 * Gets the terminology helper.
-	 *
+	 * 
 	 * @return the terminology helper
 	 */
 	public static TerminologyHelperDroolsWorkbench getTerminologyHelper() {
 		if (terminologyHelperCache == null) {
-			terminologyHelperCache =  new TerminologyHelperDroolsWorkbench();
+			terminologyHelperCache = new TerminologyHelperDroolsWorkbench();
 			terminologyHelperCache.loadProperties();
 			return terminologyHelperCache;
 		} else {
@@ -167,10 +172,12 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 
 	/**
 	 * Setup is a cache.
-	 *
+	 * 
 	 * @return the kind of cache bi
-	 * @throws TerminologyException the terminology exception
-	 * @throws Exception the exception
+	 * @throws TerminologyException
+	 *             the terminology exception
+	 * @throws Exception
+	 *             the exception
 	 */
 	public static KindOfCacheBI setupIsACache() throws TerminologyException, Exception {
 		myStaticIsACache = Ts.get().getCache(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
@@ -181,78 +188,92 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 
 	/**
 	 * Check concept.
-	 *
-	 * @param concept the concept
-	 * @param context the context
-	 * @param onlyUncommittedContent the only uncommitted content
-	 * @param config the config
+	 * 
+	 * @param concept
+	 *            the concept
+	 * @param context
+	 *            the context
+	 * @param onlyUncommittedContent
+	 *            the only uncommitted content
+	 * @param config
+	 *            the config
 	 * @return the results collector work bench
-	 * @throws Exception the exception
+	 * @throws Exception
+	 *             the exception
 	 */
-	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, 
-			boolean onlyUncommittedContent, I_ConfigAceFrame config) 
-	throws Exception {
+	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, boolean onlyUncommittedContent, I_ConfigAceFrame config) throws Exception {
 		RulesContextHelper contextHelper = new RulesContextHelper(config);
 		return checkConcept(concept, context, onlyUncommittedContent, config, contextHelper, INFERRED_VIEW_ORIGIN.STATED);
 	}
 
 	/**
 	 * Check concept.
-	 *
-	 * @param concept the concept
-	 * @param context the context
-	 * @param onlyUncommittedContent the only uncommitted content
-	 * @param config the config
-	 * @param contextHelper the context helper
+	 * 
+	 * @param concept
+	 *            the concept
+	 * @param context
+	 *            the context
+	 * @param onlyUncommittedContent
+	 *            the only uncommitted content
+	 * @param config
+	 *            the config
+	 * @param contextHelper
+	 *            the context helper
 	 * @return the results collector work bench
-	 * @throws Exception the exception
+	 * @throws Exception
+	 *             the exception
 	 */
-	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, 
-			boolean onlyUncommittedContent, I_ConfigAceFrame config, RulesContextHelper contextHelper) 
-	throws Exception {
+	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, boolean onlyUncommittedContent, I_ConfigAceFrame config, RulesContextHelper contextHelper) throws Exception {
 		return checkConcept(concept, context, onlyUncommittedContent, config, contextHelper, INFERRED_VIEW_ORIGIN.STATED);
 	}
 
 	/**
 	 * Check concept.
-	 *
-	 * @param concept the concept
-	 * @param context the context
-	 * @param onlyUncommittedContent the only uncommitted content
-	 * @param config the config
-	 * @param inferredOrigin the inferred origin
+	 * 
+	 * @param concept
+	 *            the concept
+	 * @param context
+	 *            the context
+	 * @param onlyUncommittedContent
+	 *            the only uncommitted content
+	 * @param config
+	 *            the config
+	 * @param inferredOrigin
+	 *            the inferred origin
 	 * @return the results collector work bench
-	 * @throws Exception the exception
+	 * @throws Exception
+	 *             the exception
 	 */
-	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, 
-			boolean onlyUncommittedContent, I_ConfigAceFrame config, INFERRED_VIEW_ORIGIN inferredOrigin) 
-	throws Exception {
+	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, boolean onlyUncommittedContent, I_ConfigAceFrame config, INFERRED_VIEW_ORIGIN inferredOrigin) throws Exception {
 		RulesContextHelper contextHelper = new RulesContextHelper(config);
 		return checkConcept(concept, context, onlyUncommittedContent, config, contextHelper, inferredOrigin);
 	}
 
 	/**
 	 * Check concept.
-	 *
-	 * @param concept the concept
-	 * @param context the context
-	 * @param onlyUncommittedContent the only uncommitted content
-	 * @param config the config
-	 * @param contextHelper the context helper
-	 * @param inferredOrigin the inferred origin
+	 * 
+	 * @param concept
+	 *            the concept
+	 * @param context
+	 *            the context
+	 * @param onlyUncommittedContent
+	 *            the only uncommitted content
+	 * @param config
+	 *            the config
+	 * @param contextHelper
+	 *            the context helper
+	 * @param inferredOrigin
+	 *            the inferred origin
 	 * @return the results collector work bench
-	 * @throws Exception the exception
+	 * @throws Exception
+	 *             the exception
 	 */
-	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, 
-			boolean onlyUncommittedContent, I_ConfigAceFrame config, RulesContextHelper contextHelper, 
-			INFERRED_VIEW_ORIGIN inferredOrigin) 
-	throws Exception {
+	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, boolean onlyUncommittedContent, I_ConfigAceFrame config, RulesContextHelper contextHelper, INFERRED_VIEW_ORIGIN inferredOrigin)
+			throws Exception {
 		HashSet<I_ShowActivity> activities = new HashSet<I_ShowActivity>();
 		I_ShowActivity activity = null;
 		if (!DwfaEnv.isHeadless()) {
-			activity = Terms.get().newActivityPanel(true, config, 
-					"<html>Performing QA check on concept: " + concept.toString() + 
-					" for " + context.toString(), true);
+			activity = Terms.get().newActivityPanel(true, config, "<html>Performing QA check on concept: " + concept.toString() + " for " + context.toString(), true);
 			activities.add(activity);
 			activity.setValue(0);
 			activity.setIndeterminate(true);
@@ -260,24 +281,21 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 			Terms.get().getActiveAceFrameConfig().setStatusMessage("Getting KnowledgeBase...");
 		}
 		long startTime = System.currentTimeMillis();
-		//AceLog.getAppLog().info("Starting concept check...");
+		// AceLog.getAppLog().info("Starting concept check...");
 		KnowledgeBase kbase = contextHelper.getKnowledgeBaseForContext(context, config);
-		if (!noRealtimeRulesAlertShown &&
-				context.getUids().containsAll(RefsetAuxiliary.Concept.REALTIME_PRECOMMIT_QA_CONTEXT.getUids()) &&
-				kbase.getKnowledgePackages().size() < 2) {
+		if (!noRealtimeRulesAlertShown && context.getUids().containsAll(RefsetAuxiliary.Concept.REALTIME_PRECOMMIT_QA_CONTEXT.getUids()) && kbase.getKnowledgePackages().size() < 2) {
 			noRealtimeRulesAlertShown = true;
-			AceLog.getAppLog().alertAndLogException(
-					new IOException("Warning! No rules in context" + context.toString() + ". QA is disabled."));
+			AceLog.getAppLog().alertAndLogException(new IOException("Warning! No rules in context" + context.toString() + ". QA is disabled."));
 		}
-		//AceLog.getAppLog().info("KBase: null = " + (kbase==null) + "; Size: " + kbase.getKnowledgePackages().size());
+		// AceLog.getAppLog().info("KBase: null = " + (kbase==null) + "; Size: "
+		// + kbase.getKnowledgePackages().size());
 		ResultsCollectorWorkBench results = new ResultsCollectorWorkBench();
 		try {
 			if (kbase != null) {
-				//			int a1 = kbase.getKnowledgePackages().size();
-				//			int a2 = kbase.getKnowledgePackages().iterator().next().getRules().size();
-				if (!(kbase.getKnowledgePackages().size() == 0) && 
-						!(kbase.getKnowledgePackages().size() == 1 &&
-								kbase.getKnowledgePackages().iterator().next().getRules().size() == 0)) { 
+				// int a1 = kbase.getKnowledgePackages().size();
+				// int a2 =
+				// kbase.getKnowledgePackages().iterator().next().getRules().size();
+				if (!(kbase.getKnowledgePackages().size() == 0) && !(kbase.getKnowledgePackages().size() == 1 && kbase.getKnowledgePackages().iterator().next().getRules().size() == 0)) {
 					if (!DwfaEnv.isHeadless()) {
 						activity.setProgressInfoLower("Creating session...");
 						config.setStatusMessage("Creating session...");
@@ -285,7 +303,7 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 
 					StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 
-					//KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
+					// KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
 
 					ksession.setGlobal("resultsCollector", results);
 					ksession.setGlobal("terminologyHelper", getTerminologyHelper());
@@ -298,7 +316,7 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 					}
 
 					DrConcept testConcept = DrComponentHelper.getDrConcept(conceptBi, "Last version", inferredOrigin);
-					//AceLog.getAppLog().info("Test concept converted...");
+					// AceLog.getAppLog().info("Test concept converted...");
 					if (!DwfaEnv.isHeadless()) {
 						activity.setProgressInfoLower("Testing concept...");
 						config.setStatusMessage("Testing concept...");
@@ -309,9 +327,12 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 					ksession.startProcess("org.ihtsdo.qa-execution3");
 					ksession.fireAllRules();
 
-					//ResultsCollectorWorkBench results = (ResultsCollectorWorkBench) ksession.getGlobal("resultsCollector");
-					//AceLog.getAppLog().info("Results size: " + results.getResultsItems().size());
-					for (ResultsItem resultsItem : results.getResultsItems() ) {
+					// ResultsCollectorWorkBench results =
+					// (ResultsCollectorWorkBench)
+					// ksession.getGlobal("resultsCollector");
+					// AceLog.getAppLog().info("Results size: " +
+					// results.getResultsItems().size());
+					for (ResultsItem resultsItem : results.getResultsItems()) {
 						ALERT_TYPE alertType = ALERT_TYPE.ERROR;
 
 						if (resultsItem.getSeverity() != null && !resultsItem.getSeverity().isEmpty()) {
@@ -322,10 +343,7 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 							}
 						}
 
-						results.getAlertList().add(new AlertToDataConstraintFailure(
-								alertType, 
-								resultsItem.getErrorCode() + " - " + resultsItem.getMessage(), 
-								concept));
+						results.getAlertList().add(new AlertToDataConstraintFailure(alertType, resultsItem.getErrorCode() + " - " + resultsItem.getMessage(), concept));
 					}
 
 					List<String> relTypesList = new ArrayList<String>();
@@ -335,15 +353,14 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 							DescriptionTemplate dtemplate = (DescriptionTemplate) template;
 							if (!textList.contains(dtemplate.getText())) {
 								textList.add(dtemplate.getText());
-								DescriptionVersionBI description = (DescriptionVersionBI) Ts.get().getComponentVersion(config.getViewCoordinate(),
-										UUID.fromString(dtemplate.getComponentUuid()));
+								DescriptionVersionBI description = (DescriptionVersionBI) Ts.get().getComponentVersion(config.getViewCoordinate(), UUID.fromString(dtemplate.getComponentUuid()));
 								DescriptionSpec dSpec = SpecFactory.get(description, config.getViewCoordinate());
-								if ( dSpec!= null && dtemplate.getText() != null) {
+								if (dSpec != null && dtemplate.getText() != null) {
 									dSpec.setDescText(dtemplate.getText());
-									//TODO: implement other properties
+									// TODO: implement other properties
 									results.getWbTemplates().put(dSpec, description.getNid());
 								}
-								
+
 							}
 						}
 
@@ -351,18 +368,15 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 							RelationshipTemplate rtemplate = (RelationshipTemplate) template;
 							if (!relTypesList.contains(rtemplate.getTypeUuid().trim())) {
 								relTypesList.add(rtemplate.getTypeUuid().trim());
-								ConceptSpec sourceConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getSourceUuid())).toString(),
-										UUID.fromString(rtemplate.getSourceUuid()));
-								ConceptSpec typeConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getTypeUuid())).toString(),
-										UUID.fromString(rtemplate.getTypeUuid()));
-								ConceptSpec targetConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getTargetUuid())).toString(),
-										UUID.fromString(rtemplate.getTargetUuid()));
+								ConceptSpec sourceConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getSourceUuid())).toString(), UUID.fromString(rtemplate.getSourceUuid()));
+								ConceptSpec typeConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getTypeUuid())).toString(), UUID.fromString(rtemplate.getTypeUuid()));
+								ConceptSpec targetConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getTargetUuid())).toString(), UUID.fromString(rtemplate.getTargetUuid()));
 								RelSpec relSpec = new RelSpec(sourceConceptSpec, typeConceptSpec, targetConceptSpec);
-								//TODO: implement other properties
+								// TODO: implement other properties
 								results.getWbTemplates().put(relSpec, concept.getConceptNid());
 							}
 						}
-						//TODO: implement other templates
+						// TODO: implement other templates
 					}
 
 					ksession.dispose();
@@ -376,8 +390,7 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 			String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
 			String result = "Error";
 			if (!DwfaEnv.isHeadless()) {
-				activity.setProgressInfoUpper("<html>Error in QA check on concept: " + concept.toString() + 
-						" for " + context.toString());
+				activity.setProgressInfoUpper("<html>Error in QA check on concept: " + concept.toString() + " for " + context.toString());
 				activity.setProgressInfoLower("Error: elapsed: " + elapsed + " ms; " + result + " -  Rules fired:" + results.getResultsItems().size());
 				try {
 					activity.complete();
@@ -393,11 +406,9 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 		String result = "Done";
 		if (!DwfaEnv.isHeadless()) {
 			Calendar cal = Calendar.getInstance();
-		    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-			activity.setProgressInfoUpper("<html>Performed QA check on concept: " + concept.toString() + 
-					" for " + context.toString());
-			activity.setProgressInfoLower("Elapsed: " + elapsed + " ms; " + result + 
-					" -  Rules fired:" + results.getResultsItems().size() + " - " + sdf.format(cal.getTime()));
+			SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+			activity.setProgressInfoUpper("<html>Performed QA check on concept: " + concept.toString() + " for " + context.toString());
+			activity.setProgressInfoLower("Elapsed: " + elapsed + " ms; " + result + " -  Rules fired:" + results.getResultsItems().size() + " - " + sdf.format(cal.getTime()));
 
 			try {
 				activity.complete();
@@ -412,33 +423,39 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 
 	/**
 	 * Check concept.
-	 *
-	 * @param concept the concept
-	 * @param kbId the kb id
-	 * @param onlyUncommittedContent the only uncommitted content
+	 * 
+	 * @param concept
+	 *            the concept
+	 * @param kbId
+	 *            the kb id
+	 * @param onlyUncommittedContent
+	 *            the only uncommitted content
 	 * @return the array list< alert to data constraint failure>
-	 * @throws Exception the exception
+	 * @throws Exception
+	 *             the exception
 	 */
 	@Deprecated
-	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, int kbId, boolean onlyUncommittedContent
-	) throws Exception {
+	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, int kbId, boolean onlyUncommittedContent) throws Exception {
 		return checkConcept(concept, kbId, null, onlyUncommittedContent);
 	}
 
 	/**
 	 * Check concept.
-	 *
-	 * @param concept the concept
-	 * @param kbId the kb id
-	 * @param languageRefset the language refset
-	 * @param onlyUncommittedContent the only uncommitted content
+	 * 
+	 * @param concept
+	 *            the concept
+	 * @param kbId
+	 *            the kb id
+	 * @param languageRefset
+	 *            the language refset
+	 * @param onlyUncommittedContent
+	 *            the only uncommitted content
 	 * @return the results collector work bench
-	 * @throws Exception the exception
+	 * @throws Exception
+	 *             the exception
 	 */
 	@Deprecated
-	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, int kbId, 
-			I_GetConceptData languageRefset, boolean onlyUncommittedContent) 
-	throws Exception {
+	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, int kbId, I_GetConceptData languageRefset, boolean onlyUncommittedContent) throws Exception {
 		KnowledgeBase kbase = getKnowledgeBase(kbId);
 
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
@@ -449,9 +466,9 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 		}
 
 		for (KnowledgePackage kpackg : kbase.getKnowledgePackages()) {
-			//AceLog.getAppLog().info("** " + kpackg.getName());
+			// AceLog.getAppLog().info("** " + kpackg.getName());
 			for (Rule rule : kpackg.getRules()) {
-				//AceLog.getAppLog().info("**** " + rule.getName());
+				// AceLog.getAppLog().info("**** " + rule.getName());
 				boolean excluded = false;
 				String ruleUid = rule.getMetaAttribute("UID");
 				if (ruleUid != null) {
@@ -472,34 +489,40 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 		ksession.setGlobal("resultsCollector", new ResultsCollectorWorkBench());
 		ksession.setGlobal("terminologyHelper", getTerminologyHelper());
 
-		//TODO: convert to tk model
-		//		List<TerminologyComponent> termComponents =  new ArrayList<TerminologyComponent>();
-		//		if (onlyUncommittedContent) {
-		//			termComponents.addAll(TestModelUtil.convertUncommittedToTestModel(concept, true, true, true, true));
-		//		} else {
-		//			termComponents.addAll(TestModelUtil.convertToTestModel(concept, true, true, true, true));
-		//		}
+		// TODO: convert to tk model
+		// List<TerminologyComponent> termComponents = new
+		// ArrayList<TerminologyComponent>();
+		// if (onlyUncommittedContent) {
+		// termComponents.addAll(TestModelUtil.convertUncommittedToTestModel(concept,
+		// true, true, true, true));
+		// } else {
+		// termComponents.addAll(TestModelUtil.convertToTestModel(concept, true,
+		// true, true, true));
+		// }
 		//
-		//		for (TerminologyComponent termComponent : termComponents) {
-		//			ksession.insert(termComponent);
-		//		}
+		// for (TerminologyComponent termComponent : termComponents) {
+		// ksession.insert(termComponent);
+		// }
 
-		//		if (languageRefset != null) {
-		//			termComponents = TestModelUtil.convertContextualizedDescriptionsToTestModel(concept, languageRefset);
-		//			for (TerminologyComponent termComponent : termComponents) {
-		//				ksession.insert(termComponent);
-		//			}
-		//		}
+		// if (languageRefset != null) {
+		// termComponents =
+		// TestModelUtil.convertContextualizedDescriptionsToTestModel(concept,
+		// languageRefset);
+		// for (TerminologyComponent termComponent : termComponents) {
+		// ksession.insert(termComponent);
+		// }
+		// }
 
 		ksession.fireAllRules();
 
 		ResultsCollectorWorkBench results = (ResultsCollectorWorkBench) ksession.getGlobal("resultsCollector");
 
-		//		for (int errorCode : results.getErrorCodes().keySet() ) {
-		//			results.getAlertList().add(new AlertToDataConstraintFailure(AlertToDataConstraintFailure.ALERT_TYPE.ERROR, 
-		//					results.getErrorCodes().get(errorCode), 
-		//					concept));
-		//		}
+		// for (int errorCode : results.getErrorCodes().keySet() ) {
+		// results.getAlertList().add(new
+		// AlertToDataConstraintFailure(AlertToDataConstraintFailure.ALERT_TYPE.ERROR,
+		// results.getErrorCodes().get(errorCode),
+		// concept));
+		// }
 
 		ksession.dispose();
 
@@ -508,11 +531,14 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 
 	/**
 	 * Check objects.
-	 *
-	 * @param objects the objects
-	 * @param kbId the kb id
+	 * 
+	 * @param objects
+	 *            the objects
+	 * @param kbId
+	 *            the kb id
 	 * @return the results collector work bench
-	 * @throws Exception the exception
+	 * @throws Exception
+	 *             the exception
 	 */
 	@Deprecated
 	public static ResultsCollectorWorkBench checkObjects(List<Object> objects, int kbId) throws Exception {
@@ -536,11 +562,14 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 
 	/**
 	 * Check objects test model.
-	 *
-	 * @param objects the objects
-	 * @param kbId the kb id
+	 * 
+	 * @param objects
+	 *            the objects
+	 * @param kbId
+	 *            the kb id
 	 * @return the results collector work bench
-	 * @throws Exception the exception
+	 * @throws Exception
+	 *             the exception
 	 */
 	@Deprecated
 	public static ResultsCollectorWorkBench checkObjectsTestModel(List<Object> objects, int kbId) throws Exception {
@@ -552,7 +581,7 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 				AceLog.getAppLog().info("**** " + rule.getName());
 				if (rule.getName().trim().equals("Check for double spaces")) {
 					AceLog.getAppLog().info("****** " + rule.getMetaAttribute("UID"));
-					//kbase.removeRule(kpackg.getName(), rule.getName());
+					// kbase.removeRule(kpackg.getName(), rule.getName());
 				}
 			}
 		}
@@ -561,7 +590,7 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 		ksession.setGlobal("resultsCollector", new ResultsCollectorWorkBench());
 		ksession.setGlobal("terminologyHelper", getTerminologyHelper());
 
-		//ksession.insert(new TransitiveClosureHelperMock());
+		// ksession.insert(new TransitiveClosureHelperMock());
 
 		for (Object object : objects) {
 			ksession.insert(object);
@@ -574,12 +603,13 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 		ksession.dispose();
 
 		return results;
-	}	
+	}
 
 	/**
 	 * Gets the descriptions.
 	 * 
-	 * @param concept the concept
+	 * @param concept
+	 *            the concept
 	 * 
 	 * @return the descriptions
 	 */
@@ -587,15 +617,13 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 		I_TermFactory tf = Terms.get();
 		List<? extends I_DescriptionTuple> descriptions = new ArrayList<I_DescriptionTuple>();
 		try {
-			//TODO add config as parameter
+			// TODO add config as parameter
 			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
-			I_IntSet descriptionTypes =  tf.newIntSet();
+			I_IntSet descriptionTypes = tf.newIntSet();
 			descriptionTypes.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()));
 			descriptionTypes.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()));
 			descriptionTypes.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids()));
-			descriptions = concept.getDescriptionTuples(tf.getActiveAceFrameConfig().getAllowedStatus(), 
-					descriptionTypes, tf.getActiveAceFrameConfig().getViewPositionSetReadOnly(),
-					config.getPrecedence(), config.getConflictResolutionStrategy());
+			descriptions = concept.getDescriptionTuples(tf.getActiveAceFrameConfig().getAllowedStatus(), descriptionTypes, tf.getActiveAceFrameConfig().getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
 		} catch (TerminologyException e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
@@ -607,17 +635,21 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 	/**
 	 * Gets the knowledge base from the Guvnor deployment URL.
 	 * 
-	 * @param kbId the kb id
-	 * @param url the url
-	 * @param recreate the recreate
+	 * @param kbId
+	 *            the kb id
+	 * @param url
+	 *            the url
+	 * @param recreate
+	 *            the recreate
 	 * 
 	 * @return the knowledge base
 	 * 
-	 * @throws Exception the exception
+	 * @throws Exception
+	 *             the exception
 	 */
 	@Deprecated
 	public static KnowledgeBase getKnowledgeBase(int kbId, String url, boolean recreate) throws Exception {
-		KnowledgeBase kbase= null;
+		KnowledgeBase kbase = null;
 		File serializedKbFile = new File("rules/knowledge_packages-" + kbId + ".pkg");
 		if (kbId == RulesLibrary.CONCEPT_MODEL_PKG) {
 			if (serializedKbFile.exists() && !recreate) {
@@ -625,8 +657,8 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 					ObjectInputStream in = new ObjectInputStream(new FileInputStream(serializedKbFile));
 					// The input stream might contain an individual
 					// package or a collection.
-					@SuppressWarnings( "unchecked" )
-					Collection<KnowledgePackage> kpkgs = (Collection<KnowledgePackage>)in.readObject();
+					@SuppressWarnings("unchecked")
+					Collection<KnowledgePackage> kpkgs = (Collection<KnowledgePackage>) in.readObject();
 					in.close();
 					kbase = KnowledgeBaseFactory.newKnowledgeBase();
 					kbase.addKnowledgePackages(kpkgs);
@@ -640,12 +672,12 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 					AceLog.getAppLog().alertAndLogException(e);
 				}
 			} else {
-				KnowledgeAgent kagent = KnowledgeAgentFactory.newKnowledgeAgent( "Agent" );
-				kagent.applyChangeSet( ResourceFactory.newFileResource( url ) );
+				KnowledgeAgent kagent = KnowledgeAgentFactory.newKnowledgeAgent("Agent");
+				kagent.applyChangeSet(ResourceFactory.newFileResource(url));
 				kbase = kagent.getKnowledgeBase();
 				try {
-					ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream( serializedKbFile ) );
-					out.writeObject( kbase.getKnowledgePackages() );
+					ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(serializedKbFile));
+					out.writeObject(kbase.getKnowledgePackages());
 					out.close();
 				} catch (FileNotFoundException e) {
 					AceLog.getAppLog().alertAndLogException(e);
@@ -658,16 +690,21 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 	}
 
 	/**
-	 * Gets the knowledge base from the Guvnor deployment URL retrieved from a byteArray, not a file.
-	 *
-	 * @param referenceUuid the reference uuid
-	 * @param bytes the bytes
-	 * @param recreate the recreate
+	 * Gets the knowledge base from the Guvnor deployment URL retrieved from a
+	 * byteArray, not a file.
+	 * 
+	 * @param referenceUuid
+	 *            the reference uuid
+	 * @param bytes
+	 *            the bytes
+	 * @param recreate
+	 *            the recreate
 	 * @return the knowledge base
-	 * @throws Exception the exception
+	 * @throws Exception
+	 *             the exception
 	 */
 	public static KnowledgeBase getKnowledgeBase(UUID referenceUuid, byte[] bytes, boolean recreate) throws Exception {
-		KnowledgeBase kbase= null;
+		KnowledgeBase kbase = null;
 
 		if (recreate) {
 			try {
@@ -684,7 +721,7 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 					AceLog.getAppLog().info("WARNING: Cache loading failed.");
 				}
 			}
-		} else  {
+		} else {
 			kbase = getKnowledgeBaseFromFileCache(referenceUuid);
 			if (kbase == null || kbase.getKnowledgePackages().size() == 0) {
 				AceLog.getAppLog().info("INFO: Trying Guvnor...");
@@ -697,16 +734,19 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 			}
 		}
 
-		if (kbase == null || kbase.getKnowledgePackages().size() == 0) throw new Exception("Can't retrieve database...");
+		if (kbase == null || kbase.getKnowledgePackages().size() == 0)
+			throw new Exception("Can't retrieve database...");
 		return kbase;
 	}
 
 	/**
 	 * Gets the knowledge base from file cache.
-	 *
-	 * @param referenceUuid the reference uuid
+	 * 
+	 * @param referenceUuid
+	 *            the reference uuid
 	 * @return the knowledge base from file cache
-	 * @throws Exception the exception
+	 * @throws Exception
+	 *             the exception
 	 */
 	private static KnowledgeBase getKnowledgeBaseFromFileCache(UUID referenceUuid) throws Exception {
 		HashSet<I_ShowActivity> activities = new HashSet<I_ShowActivity>();
@@ -718,18 +758,15 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 		} catch (IOException e1) {
 			AceLog.getAppLog().alertAndLogException(e1);
 		}
-		I_ShowActivity activity =
-			Terms.get().newActivityPanel(true, config, 
-					"<html>Retrieving rules data from cache", true);
+		I_ShowActivity activity = Terms.get().newActivityPanel(true, config, "<html>Retrieving rules data from cache", true);
 		activities.add(activity);
 		activity.setValue(0);
 		activity.setIndeterminate(true);
 		long startTime = System.currentTimeMillis();
-		KnowledgeBase kbase= null;
+		KnowledgeBase kbase = null;
 		try {
 			File rulesDirectory = new File("rules");
-			if (!rulesDirectory.exists())
-			{
+			if (!rulesDirectory.exists()) {
 				rulesDirectory.mkdir();
 			}
 			File serializedKbFile = new File(rulesDirectory, "knowledge_packages-" + referenceUuid.toString() + ".pkg");
@@ -739,7 +776,7 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 					ObjectInputStream in = new ObjectInputStream(new FileInputStream(serializedKbFile));
 					// The input stream might contain an individual
 					// package or a collection.
-					kbase = (KnowledgeBase)in.readObject();
+					kbase = (KnowledgeBase) in.readObject();
 					in.close();
 				} catch (StreamCorruptedException e0) {
 					serializedKbFile.delete();
@@ -777,14 +814,17 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 		}
 		return kbase;
 	}
-	
+
 	/**
 	 * Gets the knowledge base with agent.
-	 *
-	 * @param referenceUuid the reference uuid
-	 * @param bytes the bytes
+	 * 
+	 * @param referenceUuid
+	 *            the reference uuid
+	 * @param bytes
+	 *            the bytes
 	 * @return the knowledge base with agent
-	 * @throws Exception the exception
+	 * @throws Exception
+	 *             the exception
 	 */
 	private static KnowledgeBase getKnowledgeBaseWithAgent(UUID referenceUuid, byte[] bytes) throws Exception {
 		HashSet<I_ShowActivity> activities = new HashSet<I_ShowActivity>();
@@ -796,32 +836,29 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 		} catch (IOException e1) {
 			AceLog.getAppLog().alertAndLogException(e1);
 		}
-		I_ShowActivity activity =
-			Terms.get().newActivityPanel(true, config, 
-					"<html>Retrieving rules data from repository", true);
+		I_ShowActivity activity = Terms.get().newActivityPanel(true, config, "<html>Retrieving rules data from repository", true);
 		activities.add(activity);
 		activity.setValue(0);
 		activity.setIndeterminate(true);
 		long startTime = System.currentTimeMillis();
-		KnowledgeBase kbase= null;
+		KnowledgeBase kbase = null;
 		try {
 			File rulesDirectory = new File("rules");
-			if (!rulesDirectory.exists())
-			{
+			if (!rulesDirectory.exists()) {
 				rulesDirectory.mkdir();
 			}
 			File serializedKbFile = new File(rulesDirectory, "knowledge_packages-" + referenceUuid.toString() + ".pkg");
 			KnowledgeAgentConfiguration kaconf = KnowledgeAgentFactory.newKnowledgeAgentConfiguration();
-			//		kaconf.setProperty( "drools.resource.urlcache","rules" );
-			kaconf.setProperty( "drools.agent.newInstance","false" );
-			KnowledgeAgent kagent = KnowledgeAgentFactory.newKnowledgeAgent( "Agent", kaconf );
+			// kaconf.setProperty( "drools.resource.urlcache","rules" );
+			kaconf.setProperty("drools.agent.newInstance", "false");
+			KnowledgeAgent kagent = KnowledgeAgentFactory.newKnowledgeAgent("Agent", kaconf);
 			SystemEventListener sysEvenListener = new ConsoleSystemEventListener();
 			kagent.setSystemEventListener(sysEvenListener);
-			kagent.applyChangeSet( ResourceFactory.newByteArrayResource(bytes) );
+			kagent.applyChangeSet(ResourceFactory.newByteArrayResource(bytes));
 			kbase = kagent.getKnowledgeBase();
 			try {
-				ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream( serializedKbFile ) );
-				out.writeObject( kbase );
+				ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(serializedKbFile));
+				out.writeObject(kbase);
 				out.close();
 			} catch (FileNotFoundException e) {
 				AceLog.getAppLog().alertAndLogException(e);
@@ -856,13 +893,15 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 
 	/**
 	 * Validate deployment package.
-	 *
-	 * @param referenceUuid the reference uuid
-	 * @param bytes the bytes
+	 * 
+	 * @param referenceUuid
+	 *            the reference uuid
+	 * @param bytes
+	 *            the bytes
 	 * @return true, if successful
 	 */
 	public static boolean validateDeploymentPackage(UUID referenceUuid, byte[] bytes) {
-		KnowledgeBase kbase= null;
+		KnowledgeBase kbase = null;
 		try {
 			kbase = getKnowledgeBase(referenceUuid, bytes, false);
 		} catch (Exception e) {
@@ -873,15 +912,16 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 
 	/**
 	 * Checks if is package on line.
-	 *
-	 * @param bytes the bytes
+	 * 
+	 * @param bytes
+	 *            the bytes
 	 * @return true, if is package on line
 	 */
 	public static boolean isPackageOnLine(byte[] bytes) {
-		KnowledgeBase kbase= null;
+		KnowledgeBase kbase = null;
 		try {
-			KnowledgeAgent kagent = KnowledgeAgentFactory.newKnowledgeAgent( "Agent" );
-			kagent.applyChangeSet( ResourceFactory.newByteArrayResource(bytes) );
+			KnowledgeAgent kagent = KnowledgeAgentFactory.newKnowledgeAgent("Agent");
+			kagent.applyChangeSet(ResourceFactory.newByteArrayResource(bytes));
 			kbase = kagent.getKnowledgeBase();
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
@@ -891,10 +931,12 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 
 	/**
 	 * Gets the knowledge base.
-	 *
-	 * @param kbId the kb id
+	 * 
+	 * @param kbId
+	 *            the kb id
 	 * @return the knowledge base
-	 * @throws Exception the exception
+	 * @throws Exception
+	 *             the exception
 	 */
 	@Deprecated
 	public static KnowledgeBase getKnowledgeBase(int kbId) throws Exception {
@@ -903,11 +945,14 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 
 	/**
 	 * Gets the knowledge base.
-	 *
-	 * @param kbId the kb id
-	 * @param resources the resources
+	 * 
+	 * @param kbId
+	 *            the kb id
+	 * @param resources
+	 *            the resources
 	 * @return the knowledge base
-	 * @throws Exception the exception
+	 * @throws Exception
+	 *             the exception
 	 */
 	@Deprecated
 	public static KnowledgeBase getKnowledgeBase(int kbId, HashMap<Resource, ResourceType> resources) throws Exception {
@@ -916,25 +961,28 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 
 	/**
 	 * Gets the knowledge base.
-	 *
-	 * @param kbId the kb id
-	 * @param recreate the recreate
-	 * @param resources the resources
+	 * 
+	 * @param kbId
+	 *            the kb id
+	 * @param recreate
+	 *            the recreate
+	 * @param resources
+	 *            the resources
 	 * @return the knowledge base
-	 * @throws Exception the exception
+	 * @throws Exception
+	 *             the exception
 	 */
 	@Deprecated
-	public static KnowledgeBase getKnowledgeBase(int kbId, boolean recreate, 
-			HashMap<Resource, ResourceType> resources) throws Exception {
-		KnowledgeBase kbase= null;
+	public static KnowledgeBase getKnowledgeBase(int kbId, boolean recreate, HashMap<Resource, ResourceType> resources) throws Exception {
+		KnowledgeBase kbase = null;
 		File serializedKbFile = new File("rules/knowledge_packages-" + kbId + ".pkg");
 		if (serializedKbFile.exists() && !recreate) {
 			try {
 				ObjectInputStream in = new ObjectInputStream(new FileInputStream(serializedKbFile));
 				// The input stream might contain an individual
 				// package or a collection.
-				@SuppressWarnings( "unchecked" )
-				Collection<KnowledgePackage> kpkgs = (Collection<KnowledgePackage>)in.readObject();
+				@SuppressWarnings("unchecked")
+				Collection<KnowledgePackage> kpkgs = (Collection<KnowledgePackage>) in.readObject();
 				in.close();
 				kbase = KnowledgeBaseFactory.newKnowledgeBase();
 				kbase.addKnowledgePackages(kpkgs);
@@ -952,10 +1000,10 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 				//
 				if (kbId == RulesLibrary.CONCEPT_MODEL_PKG) {
 					resources = new HashMap<Resource, ResourceType>();
-					resources.put( ResourceFactory.newFileResource("rules/sample-descriptions-rules.drl"), ResourceType.DRL );
+					resources.put(ResourceFactory.newFileResource("rules/sample-descriptions-rules.drl"), ResourceType.DRL);
 				} else if (kbId == RulesLibrary.LINGUISTIC_GUIDELINES_PKG) {
 					resources = new HashMap<Resource, ResourceType>();
-					resources.put( ResourceFactory.newFileResource("rules/sample-guidelines-rules.drl"), ResourceType.DRL );
+					resources.put(ResourceFactory.newFileResource("rules/sample-guidelines-rules.drl"), ResourceType.DRL);
 				} else {
 					throw new Exception("No rules resources to process");
 				}
@@ -966,14 +1014,14 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 				kbuilder.add(resource, resources.get(resource));
 			}
 
-			if ( kbuilder.hasErrors() ) {
-				System.err.println(kbuilder.getErrors().toString() );
+			if (kbuilder.hasErrors()) {
+				System.err.println(kbuilder.getErrors().toString());
 			}
-			kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
+			kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
 
 			try {
-				ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream( serializedKbFile ) );
-				out.writeObject( kbuilder.getKnowledgePackages() );
+				ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(serializedKbFile));
+				out.writeObject(kbuilder.getKnowledgePackages());
 				out.close();
 			} catch (FileNotFoundException e) {
 				AceLog.getAppLog().alertAndLogException(e);
@@ -982,15 +1030,15 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 			}
 
 		}
-		//		}
+		// }
 		return kbase;
 	}
-
 
 	/**
 	 * Gets the snomed concept id.
 	 * 
-	 * @param concept the concept
+	 * @param concept
+	 *            the concept
 	 * 
 	 * @return the snomed concept id
 	 */
@@ -1016,7 +1064,8 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 	/**
 	 * Gets the concept.
 	 * 
-	 * @param snomedConceptId the snomed concept id
+	 * @param snomedConceptId
+	 *            the snomed concept id
 	 * 
 	 * @return the concept
 	 */
@@ -1025,7 +1074,7 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 		I_GetConceptData concept = null;
 		try {
 			UUID elementUuid = Type3UuidFactory.fromSNOMED(snomedConceptId);
-			concept = tf.getConcept(new UUID[] {elementUuid});
+			concept = tf.getConcept(new UUID[] { elementUuid });
 		} catch (IOException e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		} catch (TerminologyException e) {
@@ -1037,7 +1086,8 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 	/**
 	 * Gets the integer id for uuid.
 	 * 
-	 * @param uuid the uuid
+	 * @param uuid
+	 *            the uuid
 	 * 
 	 * @return the integer id for uuid
 	 */
@@ -1045,7 +1095,7 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 		I_TermFactory tf = Terms.get();
 		I_GetConceptData concept = null;
 		try {
-			concept = tf.getConcept(new UUID[] {uuid});
+			concept = tf.getConcept(new UUID[] { uuid });
 		} catch (IOException e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		} catch (TerminologyException e) {
@@ -1057,38 +1107,40 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 	/**
 	 * Gets the integer id for concept spec.
 	 * 
-	 * @param conceptSpec the concept spec
+	 * @param conceptSpec
+	 *            the concept spec
 	 * 
 	 * @return the integer id for concept spec
 	 */
 	public static Integer getIntegerIdForConceptSpec(String conceptSpec) {
 		UUID uuid = UUID.fromString(conceptSpec.substring(conceptSpec.indexOf("|") + 1, conceptSpec.indexOf(">")));
-		//TODO: verify text integrity
+		// TODO: verify text integrity
 		return getIntegerIdForUUID(uuid);
 	}
 
 	/**
 	 * Gets the alert with text change fix up.
 	 * 
-	 * @param concept the concept
-	 * @param description the description
-	 * @param newText the new text
+	 * @param concept
+	 *            the concept
+	 * @param description
+	 *            the description
+	 * @param newText
+	 *            the new text
 	 * 
 	 * @return the alert with text change fix up
 	 */
-	public static AlertToDataConstraintFailure getAlertWithTextChangeFixUp(I_GetConceptData concept, I_DescriptionTuple description,
-			String newText) {
-		AlertToDataConstraintFailure alert = new AlertToDataConstraintFailure(AlertToDataConstraintFailure.ALERT_TYPE.ERROR, 
-				description.getText(), concept);
-		alert.getFixOptions().add(new ChangeDescriptionTextFixUp(concept, description.getMutablePart(), newText));				  
+	public static AlertToDataConstraintFailure getAlertWithTextChangeFixUp(I_GetConceptData concept, I_DescriptionTuple description, String newText) {
+		AlertToDataConstraintFailure alert = new AlertToDataConstraintFailure(AlertToDataConstraintFailure.ALERT_TYPE.ERROR, description.getText(), concept);
+		alert.getFixOptions().add(new ChangeDescriptionTextFixUp(concept, description.getMutablePart(), newText));
 		return alert;
 	}
-
 
 	/**
 	 * Gets the rel tuple details.
 	 * 
-	 * @param rel the rel
+	 * @param rel
+	 *            the rel
 	 * 
 	 * @return the rel tuple details
 	 */
@@ -1102,8 +1154,7 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 			I_GetConceptData targetConcept = tf.getConcept(rel.getC2Id());
 			I_GetConceptData charType = tf.getConcept(rel.getCharacteristicId());
 
-			details = "Source: " + sourceConcept.toString() + " - Type: " + attributeConcept.toString() + " - Target: " +
-			targetConcept.toString() + " - CharType: " + charType.toString() + " - Group: " + rel.getGroup();
+			details = "Source: " + sourceConcept.toString() + " - Type: " + attributeConcept.toString() + " - Target: " + targetConcept.toString() + " - CharType: " + charType.toString() + " - Group: " + rel.getGroup();
 
 		} catch (TerminologyException e) {
 			AceLog.getAppLog().alertAndLogException(e);
@@ -1116,10 +1167,13 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 
 	/**
 	 * Update guvnor enumerations.
-	 *
-	 * @param refset the refset
-	 * @param kPack the k pack
-	 * @param config the config
+	 * 
+	 * @param refset
+	 *            the refset
+	 * @param kPack
+	 *            the k pack
+	 * @param config
+	 *            the config
 	 */
 	public static void updateGuvnorEnumerations(I_GetConceptData refset, RulesDeploymentPackageReference kPack, I_ConfigAceFrame config) {
 		try {
@@ -1134,32 +1188,38 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 			String guvnorEnumerationText = "'" + propertyName + "' : [";
 			for (I_ExtendByRef loopMember : Terms.get().getRefsetExtensionMembers(refset.getConceptNid())) {
 
-				//				I_ExtendByRefPartCid lastPart = (I_ExtendByRefPartCid) loopMember.getTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly(), 
-				//						config.getPrecedence(), config.getConflictResolutionStrategy()).iterator().next().getMutablePart();
-				ConceptVersionBI loopConcept = Ts.get().getConceptVersion(config.getViewCoordinate(),loopMember.getComponentNid());
+				// I_ExtendByRefPartCid lastPart = (I_ExtendByRefPartCid)
+				// loopMember.getTuples(config.getAllowedStatus(),
+				// config.getViewPositionSetReadOnly(),
+				// config.getPrecedence(),
+				// config.getConflictResolutionStrategy()).iterator().next().getMutablePart();
+				ConceptVersionBI loopConcept = Ts.get().getConceptVersion(config.getViewCoordinate(), loopMember.getComponentNid());
 
 				String name = "no description found";
 
 				for (DescriptionVersionBI loopDescription : loopConcept.getDescsActive()) {
-					if (loopDescription.getTypeNid() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()
-							&& loopDescription.getLang().toLowerCase().startsWith("en")) {
+					if (loopDescription.getTypeNid() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid() && loopDescription.getLang().toLowerCase().startsWith("en")) {
 						name = loopDescription.getText();
 					}
 				}
 
-				//				if (loopConcept.getDescsActive(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()).size() > 0) {
-				//					name = loopConcept.getDescsActive(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()).iterator().next().getText();
-				//				} else if (loopConcept.getDescsActive().size() > 0){
-				//					name = loopConcept.getDescsActive().iterator().next().getText();
-				//				} else {
-				//					name = "no description found";
-				//				}
+				// if
+				// (loopConcept.getDescsActive(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()).size()
+				// > 0) {
+				// name =
+				// loopConcept.getDescsActive(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()).iterator().next().getText();
+				// } else if (loopConcept.getDescsActive().size() > 0){
+				// name =
+				// loopConcept.getDescsActive().iterator().next().getText();
+				// } else {
+				// name = "no description found";
+				// }
 
 				guvnorEnumerationText = guvnorEnumerationText + "'" + loopConcept.getPrimUuid();
 				guvnorEnumerationText = guvnorEnumerationText + "=" + name;
 				guvnorEnumerationText = guvnorEnumerationText + "',";
 			}
-			guvnorEnumerationText = guvnorEnumerationText.substring(0, guvnorEnumerationText.length()-1) + "]";
+			guvnorEnumerationText = guvnorEnumerationText.substring(0, guvnorEnumerationText.length() - 1) + "]";
 			AceLog.getAppLog().info(guvnorEnumerationText);
 
 			Sardine sardine = SardineFactory.begin("username", "password");
@@ -1167,7 +1227,7 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 			String pkgUrl = kPack.getUrl().substring(0, kPack.getUrl().indexOf(".Guvnor") + 7) + "/webdav/packages/";
 			pkgUrl = pkgUrl + kPack.getUrl().substring(kPack.getUrl().indexOf("/package/") + 9, kPack.getUrl().indexOf("/", kPack.getUrl().indexOf("/package/") + 10));
 			pkgUrl = pkgUrl + "/" + propertyName + ".enumeration";
-			//"http://208.109.105.1:8080/drools-guvnor/org.drools.guvnor.Guvnor/package/qa4/qa4Demo"
+			// "http://208.109.105.1:8080/drools-guvnor/org.drools.guvnor.Guvnor/package/qa4/qa4Demo"
 			sardine.put(pkgUrl, guvnorEnumerationText.getBytes());
 		} catch (IOException e) {
 			AceLog.getAppLog().alertAndLogException(e);
@@ -1182,84 +1242,84 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 
 	/**
 	 * Checks if is included in refset spec.
-	 *
-	 * @param refset the refset
-	 * @param candidateConcept the candidate concept
-	 * @param config the config
+	 * 
+	 * @param refset
+	 *            the refset
+	 * @param candidateConcept
+	 *            the candidate concept
+	 * @param config
+	 *            the config
 	 * @return true, if is included in refset spec
 	 */
 	public static boolean isIncludedInRefsetSpec(I_GetConceptData refset, I_GetConceptData candidateConcept, I_ConfigAceFrame config) {
 		boolean result = false;
-		//		AceLog.getAppLog().info("************ Starting test computation *****************");
+		// AceLog.getAppLog().info("************ Starting test computation *****************");
 		Long start = System.currentTimeMillis();
 		try {
 			RefsetSpec refsetSpecHelper = new RefsetSpec(refset, true, config);
 			I_GetConceptData refsetSpec = refsetSpecHelper.getRefsetSpecConcept();
-			//			AceLog.getAppLog().info("Refset: " + refset.getInitialText() + " " + refset.getUids().get(0));
-			//			AceLog.getAppLog().info("Checking Refset spec: " + refsetSpec.getInitialText() + " " + refsetSpec.getUids().get(0));
+			// AceLog.getAppLog().info("Refset: " + refset.getInitialText() +
+			// " " + refset.getUids().get(0));
+			// AceLog.getAppLog().info("Checking Refset spec: " +
+			// refsetSpec.getInitialText() + " " + refsetSpec.getUids().get(0));
 			RefsetComputeType computeType = RefsetComputeType.CONCEPT; // default
 			if (refsetSpecHelper.isDescriptionComputeType()) {
 				computeType = RefsetComputeType.DESCRIPTION;
 			} else if (refsetSpecHelper.isRelationshipComputeType()) {
 				AceLog.getAppLog().info("Invalid refset spec to compute - relationship compute types not supported.");
 				if (!DwfaEnv.isHeadless()) {
-					JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-							"Invalid refset spec to compute - relationship compute types not supported.", "",
-							JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Invalid refset spec to compute - relationship compute types not supported.", "", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 
 			// verify a valid refset spec construction
 			if (refsetSpec == null) {
-				AceLog.getAppLog().info(
-				"Invalid refset spec to compute - unable to get spec from the refset currently in the spec panel.");
+				AceLog.getAppLog().info("Invalid refset spec to compute - unable to get spec from the refset currently in the spec panel.");
 				if (!DwfaEnv.isHeadless()) {
-					JOptionPane
-					.showMessageDialog(
-							LogWithAlerts.getActiveFrame(null),
-							"Invalid refset spec to compute - unable to get spec from the refset currently in the spec panel.",
-							"", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Invalid refset spec to compute - unable to get spec from the refset currently in the spec panel.", "", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 			// Step 1: create the query object, based on the refset spec
-			RefsetSpecQuery query =
-				RefsetQueryFactory.createQuery(config, Terms.get(), refsetSpec, refset, computeType);
+			RefsetSpecQuery query = RefsetQueryFactory.createQuery(config, Terms.get(), refsetSpec, refset, computeType);
 
 			// check validity of query
 			if (!query.isValidQuery() && query.getTotalStatementCount() != 0) {
 				AceLog.getAppLog().info("Refset spec has dangling AND/OR. These must have sub-statements.");
 				if (!DwfaEnv.isHeadless()) {
-					JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-							"Refset spec has dangling AND/OR. These must have sub-statements.", "",
-							JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Refset spec has dangling AND/OR. These must have sub-statements.", "", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 
 			I_GetConceptData selectedConcept = candidateConcept;
 
-			//			AceLog.getAppLog().info("Refset spec = " + refsetSpec.toString());
-			//			AceLog.getAppLog().info("Refset = " + refset.toString());
-			//			AceLog.getAppLog().info("Concept to test = " + selectedConcept.toString());
+			// AceLog.getAppLog().info("Refset spec = " +
+			// refsetSpec.toString());
+			// AceLog.getAppLog().info("Refset = " + refset.toString());
+			// AceLog.getAppLog().info("Concept to test = " +
+			// selectedConcept.toString());
 
 			List<I_ShowActivity> activities = new ArrayList<I_ShowActivity>();
 			result = query.execute(selectedConcept, activities);
 
-			//			ArrayList<RefsetSpecComponent> components = query.getAllComponents();
-			//			
-			//			boolean resultByComponents = false;
-			//			for (RefsetSpecComponent loopComponent : components) {
-			//				try {
-			//					ConceptStatement loopConceptStatement = (ConceptStatement) loopComponent;
-			//					//loopConceptStatement..getTokenEnum().equals(loopConceptStatement.getTokenEnum().CONCEPT_IS);
-			//				} catch (Exception e) {
-			//					// skip, unknown component
-			//				}
-			//				
-			//			}
+			// ArrayList<RefsetSpecComponent> components =
+			// query.getAllComponents();
+			//
+			// boolean resultByComponents = false;
+			// for (RefsetSpecComponent loopComponent : components) {
+			// try {
+			// ConceptStatement loopConceptStatement = (ConceptStatement)
+			// loopComponent;
+			// //loopConceptStatement..getTokenEnum().equals(loopConceptStatement.getTokenEnum().CONCEPT_IS);
+			// } catch (Exception e) {
+			// // skip, unknown component
+			// }
+			//
+			// }
 
-
-			//			AceLog.getAppLog().info("++++++++++++++ Result = " + result);
-			//			AceLog.getAppLog().info("************ Finished test computation in " + (System.currentTimeMillis() - start) + " ms. *****************");
+			// AceLog.getAppLog().info("++++++++++++++ Result = " + result);
+			// AceLog.getAppLog().info("************ Finished test computation in "
+			// + (System.currentTimeMillis() - start) +
+			// " ms. *****************");
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
 			try {
@@ -1274,10 +1334,12 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 
 	/**
 	 * Gets the documentation url for rule uuid.
-	 *
-	 * @param ruleUuid the rule uuid
+	 * 
+	 * @param ruleUuid
+	 *            the rule uuid
 	 * @return the documentation url for rule uuid
-	 * @throws ConfigurationException the configuration exception
+	 * @throws ConfigurationException
+	 *             the configuration exception
 	 */
 	public static URL getDocumentationUrlForRuleUUID(UUID ruleUuid) throws ConfigurationException {
 		URL url = null;
@@ -1286,10 +1348,9 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 		String template = config.getString("urlTemplate");
 		AceLog.getAppLog().info("Template: " + template);
 		Object rules = config.getProperty("rules.rule.uuid");
-		if(rules instanceof Collection)
-		{
+		if (rules instanceof Collection) {
 			AceLog.getAppLog().info("Number of rules: " + ((Collection) rules).size());
-			for (int i = 0; i<= ((Collection) rules).size()-1; i++) {
+			for (int i = 0; i <= ((Collection) rules).size() - 1; i++) {
 				AceLog.getAppLog().info(i + "- UUID: " + config.getString("rules.rule(" + i + ").uuid"));
 				AceLog.getAppLog().info(i + "- Address: " + config.getString("rules.rule(" + i + ").address"));
 
@@ -1298,7 +1359,7 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 					try {
 						url = new URL(urlString);
 					} catch (MalformedURLException e) {
-						//do nothing, url = null
+						// do nothing, url = null
 					}
 				}
 			}
@@ -1306,15 +1367,16 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 		return url;
 	}
 
-
 	/**
 	 * Gets the historical rels.
-	 *
+	 * 
 	 * @return the historical rels
-	 * @throws TerminologyException the terminology exception
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException
+	 *             the terminology exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
-	public static I_IntSet getHistoricalRels() throws TerminologyException, IOException{
+	public static I_IntSet getHistoricalRels() throws TerminologyException, IOException {
 
 		if (histRels == null) {
 			histRels = Terms.get().newIntSet();
@@ -1330,14 +1392,16 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 
 	/**
 	 * Gets the concept model rels.
-	 *
+	 * 
 	 * @return the concept model rels
-	 * @throws TerminologyException the terminology exception
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException
+	 *             the terminology exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
-	public static I_IntSet getConceptModelRels() throws TerminologyException, IOException{
+	public static I_IntSet getConceptModelRels() throws TerminologyException, IOException {
 
-		if (CptModelRels == null ) {
+		if (CptModelRels == null) {
 			CptModelRels = Terms.get().newIntSet();
 			CptModelRels = Terms.get().newIntSet();
 			Set<I_GetConceptData> descendants = new HashSet<I_GetConceptData>();
@@ -1349,15 +1413,17 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 		}
 		return CptModelRels;
 	}
-	
+
 	/**
 	 * Gets the all rels.
-	 *
+	 * 
 	 * @return the all rels
-	 * @throws TerminologyException the terminology exception
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException
+	 *             the terminology exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
-	public static I_IntSet getAllRels() throws TerminologyException, IOException{
+	public static I_IntSet getAllRels() throws TerminologyException, IOException {
 
 		if (allRels == null) {
 			allRels = Terms.get().newIntSet();
@@ -1371,9 +1437,11 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 
 	/**
 	 * Gets the descendants.
-	 *
-	 * @param descendants the descendants
-	 * @param concept the concept
+	 * 
+	 * @param descendants
+	 *            the descendants
+	 * @param concept
+	 *            the concept
 	 * @return the descendants
 	 */
 	public static Set<I_GetConceptData> getDescendants(Set<I_GetConceptData> descendants, I_GetConceptData concept) {
@@ -1382,9 +1450,7 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 			I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
 			Set<I_GetConceptData> childrenSet = new HashSet<I_GetConceptData>();
 			Set<I_GetConceptData> firstMetChildrenSet = new HashSet<I_GetConceptData>();
-			childrenSet.addAll(concept.getDestRelOrigins(config.getAllowedStatus(), 
-					config.getDestRelTypes(), config.getViewPositionSetReadOnly()
-					, config.getPrecedence(), config.getConflictResolutionStrategy()));
+			childrenSet.addAll(concept.getDestRelOrigins(config.getAllowedStatus(), config.getDestRelTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy()));
 			for (I_GetConceptData loopConcept : childrenSet) {
 				if (!descendants.contains(loopConcept)) {
 					firstMetChildrenSet.add(loopConcept);
@@ -1403,8 +1469,9 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 	}
 
 	/**
-	 * Calculates a set of valid users - a user is valid is they are a child of the User concept in the top hierarchy,
-	 * and have a description of type "user inbox".
+	 * Calculates a set of valid users - a user is valid is they are a child of
+	 * the User concept in the top hierarchy, and have a description of type
+	 * "user inbox".
 	 * 
 	 * @return The set of valid users.
 	 */
@@ -1419,34 +1486,39 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 			AceLog.getAppLog().alertAndLogException(e1);
 		}
 		try {
-			I_GetConceptData userParent =
-				Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
-
+			I_GetConceptData userParent = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
+			I_GetConceptData ihtsdoUserParent = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.IHTSDO.getUids());
 			I_IntSet allowedTypes = Terms.get().getActiveAceFrameConfig().getDestRelTypes();
 			I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
 			Set<Integer> currentStatuses = helper.getCurrentStatusIds();
-
-			Set<? extends I_GetConceptData> allUsers = userParent.getDestRelOrigins(config.getAllowedStatus(),
-					allowedTypes, config.getViewPositionSetReadOnly(), Precedence.TIME,
-					config.getConflictResolutionStrategy());
-			I_GetConceptData descriptionType =
-				Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER_INBOX.getUids());
+			Set<? extends I_GetConceptData> allUsers = userParent.getDestRelOrigins(config.getAllowedStatus(), allowedTypes, config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
+			Set<? extends I_GetConceptData> allIhtsdoUsrs = ihtsdoUserParent.getDestRelOrigins(config.getAllowedStatus(), allowedTypes, config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
+			I_GetConceptData descriptionType = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER_INBOX.getUids());
 			I_IntSet descAllowedTypes = Terms.get().newIntSet();
 			descAllowedTypes.add(descriptionType.getConceptNid());
 
 			for (I_GetConceptData user : allUsers) {
-
-				I_DescriptionTuple latestTuple = null;
-				long latestVersion = Long.MIN_VALUE;
-
-				List<? extends I_DescriptionTuple> descriptionResults =
-					user.getDescriptionTuples(null, descAllowedTypes, Terms.get()
-							.getActiveAceFrameConfig().getViewPositionSetReadOnly(),
-							Precedence.TIME, config.getConflictResolutionStrategy());
-				for (I_DescriptionTuple descriptionTuple : descriptionResults) {
-					if (descriptionTuple.getTime() > latestVersion) {
-						latestVersion = descriptionTuple.getTime();
-						latestTuple = descriptionTuple;
+				I_DescriptionVersioned latestTuple = null;
+				Collection<? extends I_DescriptionVersioned> descriptions = user.getDescriptions();
+				for (I_DescriptionVersioned descVersioned : descriptions) {
+					if (descVersioned.getTypeNid() == SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid()) {
+						latestTuple = descVersioned;
+					}
+				}
+				if (latestTuple != null) {
+					for (int currentStatusId : currentStatuses) {
+						if (latestTuple.getStatusNid() == currentStatusId) {
+							validUsers.add(user);
+						}
+					}
+				}
+			}
+			for (I_GetConceptData user : allIhtsdoUsrs) {
+				I_DescriptionVersioned latestTuple = null;
+				Collection<? extends I_DescriptionVersioned> descriptions = user.getDescriptions();
+				for (I_DescriptionVersioned descVersioned : descriptions) {
+					if (descVersioned.getTypeNid() == SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid() || descVersioned.getTypeNid() == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid()) {
+						latestTuple = descVersioned;
 					}
 				}
 				if (latestTuple != null) {
