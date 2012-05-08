@@ -180,7 +180,7 @@ public class SctIdGenImpl implements SctIdGen {
 					snoID = GenIdHelper.getNewSNOMEDID(parentSnomedId, session);
 					log.debug("New snomed id: " + snoID);
 					log.debug("Inserting sonmed id");
-					ConidMap newConidMap = new ConidMap(sctIdentifier.getSctId(), null, snoID, componentUuid, sctIdentifier.getArtifactId(), sctIdentifier.getNamespaceId());
+					ConidMap newConidMap = new ConidMap(sctIdentifier.getSctId(), null, snoID, componentUuid, sctIdentifier.getArtifactId(), sctIdentifier.getReleaseId());
 					int result = session.insert("com.termmed.genid.data.ConidMapMapper.insertConidMap", newConidMap);
 					log.debug(result + " rows affected");
 				}
