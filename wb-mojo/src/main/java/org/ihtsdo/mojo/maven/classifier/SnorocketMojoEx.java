@@ -98,11 +98,11 @@ public class SnorocketMojoEx extends AbstractMojo {
     /**
      * The uuid for the edit path.
      *
-     * @parameter @required
+     * @parameter
      */
     private String uuidEditPath;
     /**
-     * The time for the test in yyyy.mm.dd hh:mm:ss format
+     *  The fsn of the edit path.
      *
      * @parameter
      */
