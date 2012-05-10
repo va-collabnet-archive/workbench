@@ -66,14 +66,10 @@ public class RF2HistoricalAssociationIdentImpl extends RF2AbstractImpl implement
 
 			for (I_RelTuple rel : relationships) {
 
-				if (referencedComponentId.equals("59336008")){
-					boolean stop=true;
-
-				}
 				relTypeId = getSctId(rel.getTypeNid(), getSnomedCorePathNid());
 
-				if (relTypeId.equals(I_Constants.MAY_BE) || relTypeId.equals(I_Constants.WAS_A) || relTypeId.equals(I_Constants.SAME_AS) || relTypeId.equals(I_Constants.REPLACED_BY)
-						|| relTypeId.equals(I_Constants.MOVED_FROM) || relTypeId.equals(I_Constants.MOVED_TO)) {
+				if (relTypeId!=null && (relTypeId.equals(I_Constants.MAY_BE) || relTypeId.equals(I_Constants.WAS_A) || relTypeId.equals(I_Constants.SAME_AS) || relTypeId.equals(I_Constants.REPLACED_BY)
+						|| relTypeId.equals(I_Constants.MOVED_FROM) || relTypeId.equals(I_Constants.MOVED_TO))) {
 
 					String relationshipId = "";
 
