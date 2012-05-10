@@ -209,39 +209,40 @@ public class UuidToSctIdMapper {
         for (File inputFile : uuidFiles) {
             if (inputFile.getName().startsWith("sct2_Concept_UUID_")) {
                 conceptsFileUuid = inputFile;
-                conceptsReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
+                        
+                conceptsReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
             } else if (inputFile.getName().startsWith("sct2_Description_UUID_")) {
                 descriptionsFileUuid = inputFile;
-                descriptionsReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
+                descriptionsReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
             } else if (inputFile.getName().startsWith("sct2_Relationship_UUID_")) {
                 relationshipsFileUuid = inputFile;
-                relationshipsReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
+                relationshipsReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
             } else if (inputFile.getName().startsWith("sct2_Identifier_UUID_")) {
                 identifiersFileUuid = inputFile;
-                identifiersReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
+                identifiersReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
             } else if (inputFile.getName().startsWith("sct2_Identifier_Auxiliary_UUID_")) {
                 privateIdentifiersFileUuid = inputFile;
-                privateIdentifiersReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
+                privateIdentifiersReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
             }else if (inputFile.getName().startsWith("sct2_StatedRelationships_UUID_")) {
                 statedRelFileUuid = inputFile;
-                relationshipsStatedReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
+                relationshipsStatedReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
             } else if (inputFile.getName().startsWith("sct2_LangRefset_UUID_") &&
                     inputFile.getName().contains(LANG_CODE.EN.getFormatedLanguageCode())) {
                 langRefsetsFileUuid = inputFile;
-                langRefsetsReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
+                langRefsetsReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
             } else if (inputFile.getName().startsWith("sct2_LangRefset_UUID_")&&
                     !inputFile.getName().contains(LANG_CODE.EN.getFormatedLanguageCode())) {
                 otherLangRefsetsFileUuid = inputFile;
-                otherLangRefsetsReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
+                otherLangRefsetsReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
             } else if (inputFile.getName().startsWith("sct2_ModuleDependency_UUID_")) {
                 modDependFileUuid = inputFile;
-                modDependReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
+                modDependReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
             } else if (inputFile.getName().startsWith("sct2_DescriptionType_UUID_")) {
                 descTypeFileUuid = inputFile;
-                descTypeReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
+                descTypeReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
             } else if (inputFile.getName().startsWith("sct2_RefsetDescriptor_UUID_")) {
                 refsetDescFileUuid = inputFile;
-                refsetDescReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
+                refsetDescReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
             }
         }
         
@@ -272,24 +273,33 @@ public class UuidToSctIdMapper {
                 refsetDescFileUuid.getName().replace("sct2_RefsetDescriptor_UUID_", "sct2_RefsetDescriptor_"));
         File uuidToSctIdsFile = new File(directory,
                 refsetDescFileUuid.getName().replace("sct2_RefsetDescriptor_UUID_", "sct2_to_uuid_map"));
-
-        conceptsWriter = new BufferedWriter(new FileWriter(conceptsFile));
-        descriptionsWriter = new BufferedWriter(new FileWriter(descriptionsFile));
-        relationshipsWriter = new BufferedWriter(new FileWriter(relationshipsFile));
-        identifiersWriter = new BufferedWriter(new FileWriter(identifiersFile));
+        
+        FileOutputStream conceptOs = new FileOutputStream(conceptsFile);
+        conceptsWriter = new BufferedWriter(new OutputStreamWriter(conceptOs, "UTF8"));
+        FileOutputStream descriptionOs = new FileOutputStream(descriptionsFile);
+        descriptionsWriter = new BufferedWriter(new OutputStreamWriter(descriptionOs, "UTF8"));
+        FileOutputStream relOs = new FileOutputStream(relationshipsFile);
+        relationshipsWriter = new BufferedWriter(new OutputStreamWriter(relOs, "UTF8"));
+        FileOutputStream pubIdOs = new FileOutputStream(identifiersFile);
+            identifiersWriter = new BufferedWriter(new OutputStreamWriter(pubIdOs, "UTF8"));
         if(privateIdentifiersFile != null){
-            privateIdentifiersWriter = new BufferedWriter(new FileWriter(privateIdentifiersFile));
-            for (Rf2File.IdentifiersFileFields field : Rf2File.IdentifiersFileFields.values()) {
-            privateIdentifiersWriter.write(field.headerText + field.seperator);
+            FileOutputStream privIdOs = new FileOutputStream(privateIdentifiersFile);
+            privateIdentifiersWriter = new BufferedWriter(new OutputStreamWriter(privIdOs, "UTF8"));
         }
-        }
-        relationshipsStatedWriter = new BufferedWriter(new FileWriter(statedRelFile));
-        langRefsetsWriter = new BufferedWriter(new FileWriter(langRefsetsFile));
-        otherLangRefsetsWriter = new BufferedWriter(new FileWriter(otherLangRefsetsFile));
-        modDependWriter = new BufferedWriter(new FileWriter(modDependFile));
-        descTypeWriter = new BufferedWriter(new FileWriter(descTypeFile));
-        refsetDescWriter = new BufferedWriter(new FileWriter(refsetDescFile));
-        uuidToSctMapWriter = new BufferedWriter(new FileWriter(uuidToSctIdsFile));
+        FileOutputStream relStatedOs = new FileOutputStream(statedRelFile);
+        relationshipsStatedWriter = new BufferedWriter(new OutputStreamWriter(relStatedOs, "UTF8"));
+        FileOutputStream langRefOs = new FileOutputStream(langRefsetsFile);
+        langRefsetsWriter = new BufferedWriter(new OutputStreamWriter(langRefOs, "UTF8"));
+        FileOutputStream langOs = new FileOutputStream(otherLangRefsetsFile);
+        otherLangRefsetsWriter = new BufferedWriter(new OutputStreamWriter(langOs, "UTF8"));
+        FileOutputStream modDependOs = new FileOutputStream(modDependFile);
+        modDependWriter = new BufferedWriter(new OutputStreamWriter(modDependOs, "UTF8"));
+        FileOutputStream descTypeOs = new FileOutputStream(descTypeFile);
+        descTypeWriter = new BufferedWriter(new OutputStreamWriter(descTypeOs, "UTF8"));
+        FileOutputStream refDescOs = new FileOutputStream(refsetDescFile);
+        refsetDescWriter = new BufferedWriter(new OutputStreamWriter(refDescOs, "UTF8"));
+        FileOutputStream uuidSctMapOs = new FileOutputStream(uuidToSctIdsFile);
+        uuidToSctMapWriter = new BufferedWriter(new OutputStreamWriter(uuidSctMapOs, "UTF8"));
 
         for (Rf2File.ConceptsFileFields field : Rf2File.ConceptsFileFields.values()) {
             conceptsWriter.write(field.headerText + field.seperator);
