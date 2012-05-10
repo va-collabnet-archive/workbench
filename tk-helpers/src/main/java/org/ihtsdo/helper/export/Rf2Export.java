@@ -166,25 +166,37 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                 + country.getFormatedCountryCode() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
 
-        conceptsWriter = new BufferedWriter(new FileWriter(conceptsFile));
-        descriptionsWriter = new BufferedWriter(new FileWriter(descriptionsFile));
-        relationshipsWriter = new BufferedWriter(new FileWriter(relationshipsFile));
-        relationshipsStatedWriter = new BufferedWriter(new FileWriter(relationshipsStatedFile));
+        FileOutputStream conceptOs = new FileOutputStream(conceptsFile);
+        conceptsWriter = new BufferedWriter(new OutputStreamWriter(conceptOs, "UTF8"));
+        FileOutputStream descriptionOs = new FileOutputStream(descriptionsFile);
+        descriptionsWriter = new BufferedWriter(new OutputStreamWriter(descriptionOs, "UTF8"));
+        FileOutputStream relOs = new FileOutputStream(relationshipsFile);
+        relationshipsWriter = new BufferedWriter(new OutputStreamWriter(relOs, "UTF8"));
+        FileOutputStream relStatedOs = new FileOutputStream(relationshipsStatedFile);
+        relationshipsStatedWriter = new BufferedWriter(new OutputStreamWriter(relStatedOs, "UTF8"));
         if(makePrivateIdFile){
-            publicIdentifiersWriter = new BufferedWriter(new FileWriter(identifiersFile));
-            identifiersWriter = new BufferedWriter(new FileWriter(privateIdentifiersFile));
+            FileOutputStream idOs = new FileOutputStream(identifiersFile);
+            publicIdentifiersWriter = new BufferedWriter(new OutputStreamWriter(idOs, "UTF8"));
+            FileOutputStream privIdOs = new FileOutputStream(privateIdentifiersFile);
+            identifiersWriter = new BufferedWriter(new OutputStreamWriter(privIdOs, "UTF8"));
             
             for (Rf2File.IdentifiersFileFields field : Rf2File.IdentifiersFileFields.values()) {
                 publicIdentifiersWriter.write(field.headerText + field.seperator);
             }
         }else{
-            identifiersWriter = new BufferedWriter(new FileWriter(identifiersFile));
+            FileOutputStream pubIdOs = new FileOutputStream(identifiersFile);
+            identifiersWriter = new BufferedWriter(new OutputStreamWriter(pubIdOs, "UTF8"));
         }
-        langRefsetsWriter = new BufferedWriter(new FileWriter(langRefsetsFile));
-        otherLangRefsetsWriter = new BufferedWriter(new FileWriter(otherLangRefsetsFile));
-        modDependWriter = new BufferedWriter(new FileWriter(modDependFile));
-        descTypeWriter = new BufferedWriter(new FileWriter(descTypeFile));
-        refsetDescWriter = new BufferedWriter(new FileWriter(refsetDescFile));
+        FileOutputStream langRefOs = new FileOutputStream(langRefsetsFile);
+        langRefsetsWriter = new BufferedWriter(new OutputStreamWriter(langRefOs, "UTF8"));
+        FileOutputStream langOs = new FileOutputStream(otherLangRefsetsFile);
+        otherLangRefsetsWriter = new BufferedWriter(new OutputStreamWriter(langOs, "UTF8"));
+        FileOutputStream modDependOs = new FileOutputStream(modDependFile);
+        modDependWriter = new BufferedWriter(new OutputStreamWriter(modDependOs, "UTF8"));
+        FileOutputStream descTypeOs = new FileOutputStream(descTypeFile);
+        descTypeWriter = new BufferedWriter(new OutputStreamWriter(descTypeOs, "UTF8"));
+        FileOutputStream refDescOs = new FileOutputStream(refsetDescFile);
+        refsetDescWriter = new BufferedWriter(new OutputStreamWriter(refDescOs, "UTF8"));
 
 
         for (Rf2File.ConceptsFileFields field : Rf2File.ConceptsFileFields.values()) {
