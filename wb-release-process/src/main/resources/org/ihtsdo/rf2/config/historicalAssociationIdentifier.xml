@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <config>
-	<exportFileName>xres2_Identifier_Full_INT_</exportFileName>
+	<exportFileName>res2_Identifier_Full_INT_</exportFileName>
 	<droolsDrlFile>org/ihtsdo/rf2/drools/HistoricalReleaseRules.drl</droolsDrlFile>
 	<column>
 		<name>identifierSchemeId</name>
