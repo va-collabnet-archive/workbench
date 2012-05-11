@@ -1,13 +1,7 @@
 package org.ihtsdo.tk.api;
 
 import java.io.IOException;
-import org.ihtsdo.tk.api.blueprint.ConAttrAB;
-import org.ihtsdo.tk.api.blueprint.ConceptCB;
-import org.ihtsdo.tk.api.blueprint.DescCAB;
-import org.ihtsdo.tk.api.blueprint.InvalidCAB;
-import org.ihtsdo.tk.api.blueprint.MediaCAB;
-import org.ihtsdo.tk.api.blueprint.RefexCAB;
-import org.ihtsdo.tk.api.blueprint.RelCAB;
+import org.ihtsdo.tk.api.blueprint.*;
 import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
@@ -136,4 +130,6 @@ public interface TerminologyBuilderBI {
      * @throws InvalidAmendmentSpec
      */
     ConAttrChronicleBI constructIfNotCurrent(ConAttrAB blueprint) throws IOException, InvalidCAB, ContradictionException;
+    
+    PathBI construct(PathCB blueprint) throws IOException, InvalidCAB, ContradictionException;
 }

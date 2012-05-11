@@ -133,10 +133,6 @@ public class RefsetPopupListener extends MouseAdapter {
             changeItem.addActionListener(change);
 
             for (REFSET_FIELDS field : model.getPopupFields()) {
-               if (REFSET_FIELDS.REFSET_ID.equals(field)) {
-
-                  // Not allowed to change the refset.
-               } else {
                   JMenu changeMenu = new JMenu("Change " + field.getColumnName());
 
                   switch (field) {
@@ -185,7 +181,6 @@ public class RefsetPopupListener extends MouseAdapter {
                   default :
                      popup.add(changeMenu);
                   }
-               }
             }
          }
       } catch (Throwable e1) {

@@ -265,6 +265,9 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         CNID1,
         CNID2,
         CNID3,
+        UUID1,
+        UUID2,
+        UUID3,
         BOOLEAN1,
         INTEGER1,
         STRING1,
@@ -309,8 +312,11 @@ public class RefexCAB extends CreateOrAmendBlueprint {
     }
 
     public Object put(RefexProperty key, UUID value) {
-        assert key == RefexProperty.MEMBER_UUID;
-        return properties.put(RefexProperty.MEMBER_UUID,
+        assert key == RefexProperty.MEMBER_UUID ||
+                key == RefexProperty.UUID1 ||
+                key == RefexProperty.UUID2 ||
+                key == RefexProperty.UUID3;
+        return properties.put(key,
                 value);
     }
     
@@ -388,6 +394,18 @@ public class RefexCAB extends CreateOrAmendBlueprint {
                     RefexCnidCnidAnalogBI<?> c2part = (RefexCnidCnidAnalogBI<?>) version;
                     c2part.setCnid2((Integer) entry.getValue());
                     break;
+                case UUID1:
+                    RefexCnidAnalogBI<?> cv1part = (RefexCnidAnalogBI<?>) version;
+                    cv1part.setCnid1(Ts.get().getNidForUuids((UUID) entry.getValue()));
+                    break;
+                case UUID2:
+                    RefexCnidCnidAnalogBI<?> cv2part = (RefexCnidCnidAnalogBI<?>) version;
+                    cv2part.setCnid2(Ts.get().getNidForUuids((UUID) entry.getValue()));
+                    break;
+                case UUID3:
+                    RefexCnidCnidCnidAnalogBI<?> cv3part = (RefexCnidCnidCnidAnalogBI<?>) version;
+                    cv3part.setCnid3(Ts.get().getNidForUuids((UUID) entry.getValue()));
+                    break;
                 case INTEGER1:
                     RefexIntAnalogBI<?> intPart = (RefexIntAnalogBI<?>) version;
                     intPart.setInt1((Integer) entry.getValue());
@@ -444,6 +462,18 @@ public class RefexCAB extends CreateOrAmendBlueprint {
                 case CNID2:
                     RefexCnidCnidAnalogBI<?> c2part = (RefexCnidCnidAnalogBI<?>) version;
                     c2part.setCnid2((Integer) entry.getValue());
+                    break;
+                case UUID1:
+                    RefexCnidAnalogBI<?> c1Uuid = (RefexCnidAnalogBI<?>) version;
+                    c1Uuid.setCnid1(Ts.get().getNidForUuids((UUID) entry.getValue()));
+                    break;
+                case UUID3:
+                    RefexCnidCnidCnidAnalogBI<?> c3Uuid = (RefexCnidCnidCnidAnalogBI<?>) version;
+                    c3Uuid.setCnid3(Ts.get().getNidForUuids((UUID) entry.getValue()));
+                    break;
+                case UUID2:
+                    RefexCnidCnidAnalogBI<?> c2Uuid = (RefexCnidCnidAnalogBI<?>) version;
+                    c2Uuid.setCnid2(Ts.get().getNidForUuids((UUID) entry.getValue()));
                     break;
                 case INTEGER1:
                     RefexIntAnalogBI<?> intPart = (RefexIntAnalogBI<?>) version;
@@ -537,6 +567,45 @@ public class RefexCAB extends CreateOrAmendBlueprint {
                         return false;
                     }
                     break;
+                case UUID1:
+                    if (!RefexCnidVersionBI.class.isAssignableFrom(version.getClass())) {
+                        return false;
+                    }
+                    RefexCnidVersionBI<?> c1p = (RefexCnidVersionBI<?>) version;
+                    try {
+                        if (Ts.get().getNidForUuids((UUID) entry.getValue()) != c1p.getCnid1()) {
+                            return false;
+                        }
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    break;
+                case UUID3:
+                    if (!RefexCnidCnidCnidVersionBI.class.isAssignableFrom(version.getClass())) {
+                        return false;
+                    }
+                    RefexCnidCnidCnidVersionBI<?> c3p = (RefexCnidCnidCnidVersionBI<?>) version;
+                    try {
+                        if (Ts.get().getNidForUuids((UUID) entry.getValue()) != c3p.getCnid1()) {
+                            return false;
+                        }
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    break;
+                case UUID2:
+                    if (!RefexCnidCnidVersionBI.class.isAssignableFrom(version.getClass())) {
+                        return false;
+                    }
+                    RefexCnidCnidVersionBI<?> c2p = (RefexCnidCnidVersionBI<?>) version;
+                    try {
+                        if (Ts.get().getNidForUuids((UUID) entry.getValue()) != c2p.getCnid1()) {
+                            return false;
+                        }
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    break;
                 case INTEGER1:
                     if (!RefexIntVersionBI.class.isAssignableFrom(version.getClass())) {
                         return false;
@@ -613,9 +682,9 @@ public class RefexCAB extends CreateOrAmendBlueprint {
     }
 
     public UUID getMemberUUID() {
-        if (this.getComponentUuid() != null) {
-            return this.getComponentUuid();
-        }
+//        if (this.getComponentUuid() != null) {
+//            return this.getComponentUuid();
+//        }
         return (UUID) properties.get(RefexProperty.MEMBER_UUID);
     }
 

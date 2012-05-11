@@ -102,30 +102,36 @@ public class RefsetDefaults implements I_RefsetDefaults, Serializable {
         statusPopupIds.add(defaultStatusForRefset.getConceptNid());
     }
 
+    @Override
     public I_GetConceptData getDefaultRefset() {
         return defaultRefset;
     }
 
+    @Override
     public void setDefaultRefset(I_GetConceptData defaultRefset) {
         Object oldValue = this.defaultRefset;
         this.defaultRefset = defaultRefset;
         pcs.firePropertyChange("defaultRefset", oldValue, defaultRefset);
     }
 
+    @Override
     public I_GetConceptData getDefaultStatusForRefset() {
         return defaultStatusForRefset;
     }
 
+    @Override
     public void setDefaultStatusForRefset(I_GetConceptData defaultStatusForRefset) {
         Object oldValue = this.defaultStatusForRefset;
         this.defaultStatusForRefset = defaultStatusForRefset;
         pcs.firePropertyChange("defaultStatusForRefset", oldValue, defaultStatusForRefset);
     }
 
+    @Override
     public I_IntList getRefsetPopupIds() {
         return refsetPopupIds;
     }
 
+    @Override
     public I_IntList getStatusPopupIds() {
         return statusPopupIds;
     }

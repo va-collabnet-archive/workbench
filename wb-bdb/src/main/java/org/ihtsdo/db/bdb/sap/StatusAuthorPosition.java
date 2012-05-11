@@ -37,6 +37,7 @@ public class StatusAuthorPosition implements Comparable<StatusAuthorPosition> {
       }
 
       if (this.time < o.time) {
+          
          return -1;
       }
 

@@ -47,4 +47,7 @@ public class TermAux {
     public static ConceptSpec WB_AUX_PATH =
             new ConceptSpec("Workbench Auxiliary",
             UUID.fromString("2faa9260-8fb2-11db-b606-0800200c9a66"));
+    public static ConceptSpec PATH =
+            new ConceptSpec("path",
+            UUID.fromString("4459d8cf-5a6f-3952-9458-6d64324b27b7"));
 }
