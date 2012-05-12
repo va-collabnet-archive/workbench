@@ -202,8 +202,8 @@ public class UpdateIdProcessor implements ProcessUnfetchedConceptDataBI {
 				boolean addId = true;
 				for (IdBI id : relationship.getAllIds()) {
 					if (id.getAuthorityNid() == snomedIntIdNid) {
-						String denotation = (String) id.getDenotation();
-						if (!denotation.equals(foundId)) {
+						Long denotation = (Long) id.getDenotation();
+						if (!denotation.equals(Long.parseLong(foundId))) {
 							// Error, it has a different id!
 							AceLog.getAppLog().info(denotation + " already assigned to " + foundId);
 						}
