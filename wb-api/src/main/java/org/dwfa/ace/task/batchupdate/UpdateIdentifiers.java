@@ -21,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
@@ -49,25 +50,13 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ConceptFetcherBI;
-import org.ihtsdo.tk.api.NidBitSetBI;
-import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
-import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
-import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
-import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
-import org.ihtsdo.tk.api.id.IdBI;
-import org.ihtsdo.tk.api.relationship.RelationshipAnalogBI;
-import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/file", type = BeanType.TASK_BEAN) })
 public class UpdateIdentifiers extends AbstractTask {
@@ -145,6 +134,15 @@ public class UpdateIdentifiers extends AbstractTask {
 				Terms.get().getActiveAceFrameConfig().setStatusMessage("Loading data...");
 			}
 			startTime = System.currentTimeMillis();
+			
+			BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+			int linesCount = 0;
+			while (reader.readLine() != null) linesCount++;
+			reader.close();
+			
+			activity.setValue(0);
+			activity.setMaximum(linesCount);
+			activity.setIndeterminate(false);
 
 			FileInputStream fstream = new FileInputStream(inputFile);
 			in = new DataInputStream(fstream);
@@ -154,6 +152,7 @@ public class UpdateIdentifiers extends AbstractTask {
 			br.readLine(); // skip header
 			while ((strLine = br.readLine()) != null)   {
 				lines++;
+				activity.setValue(lines);
 				String columns[] = null;
 				String identifierSchemeId = null;
 				String alternateIdentifier = null;
@@ -232,6 +231,7 @@ public class UpdateIdentifiers extends AbstractTask {
 			File inputFile = fc.getSelectedFile();
 			//String filename = (String) process.getProperty(inputFilePropName);
 			//File inputFile = new File(filename);
+			filename = inputFile.getName();
 			I_TermFactory tf = Terms.get();
 			config = tf.getActiveAceFrameConfig();
 
@@ -245,6 +245,14 @@ public class UpdateIdentifiers extends AbstractTask {
 				Terms.get().getActiveAceFrameConfig().setStatusMessage("Loading data...");
 			}
 			startTime = System.currentTimeMillis();
+			lines = 0;
+			BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+			int linesCount = 0;
+			while (reader.readLine() != null) linesCount++;
+			reader.close();
+			activity.setValue(0);
+			activity.setMaximum(linesCount);
+			activity.setIndeterminate(false);
 
 			FileInputStream fstream = new FileInputStream(inputFile);
 			in = new DataInputStream(fstream);
@@ -254,6 +262,7 @@ public class UpdateIdentifiers extends AbstractTask {
 			br.readLine(); // skip header
 			while ((strLine = br.readLine()) != null)   {
 				lines++;
+				activity.setValue(lines);
 				String columns[] = null;
 				String id = null;
 				String effectiveTime = null;

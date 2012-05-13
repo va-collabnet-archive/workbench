@@ -165,7 +165,7 @@ public class UpdateIdProcessor implements ProcessUnfetchedConceptDataBI {
 				String foundId = sctidsMap.get(description.getPrimUuid());
 				boolean addId = true;
 				for (IdBI id : description.getAllIds()) {
-					if (id.getAuthorityNid() == snomedIntIdNid) {
+					if (id.getAuthorityNid() == snomedAuxIntId) {
 						Long denotation = (Long) id.getDenotation();
 						if (!denotation.equals(Long.parseLong(foundId))) {
 							// Error, it has a different id!
@@ -177,7 +177,7 @@ public class UpdateIdProcessor implements ProcessUnfetchedConceptDataBI {
 				if (addId) {
 					I_Identify i_Identify = Terms.get().getId(description.getNid());
 					i_Identify.addLongId(Long.parseLong(foundId), 
-							snomedIntIdNid, 
+							snomedAuxIntId, 
 							SnomedMetadataRfx.getSTATUS_CURRENT_NID(), 
 							Terms.get().getActiveAceFrameConfig().getEditingPathSet().iterator().next().getConceptNid(), 
 							Long.MAX_VALUE);
@@ -201,7 +201,7 @@ public class UpdateIdProcessor implements ProcessUnfetchedConceptDataBI {
 				String foundId = sctidsMap.get(relationship.getPrimUuid());
 				boolean addId = true;
 				for (IdBI id : relationship.getAllIds()) {
-					if (id.getAuthorityNid() == snomedIntIdNid) {
+					if (id.getAuthorityNid() == snomedAuxIntId) {
 						Long denotation = (Long) id.getDenotation();
 						if (!denotation.equals(Long.parseLong(foundId))) {
 							// Error, it has a different id!
@@ -213,7 +213,7 @@ public class UpdateIdProcessor implements ProcessUnfetchedConceptDataBI {
 				if (addId) {
 					I_Identify i_Identify = Terms.get().getId(relationship.getNid());
 					i_Identify.addLongId(Long.parseLong(foundId), 
-							snomedIntIdNid, 
+							snomedAuxIntId, 
 							SnomedMetadataRfx.getSTATUS_CURRENT_NID(), 
 							Terms.get().getActiveAceFrameConfig().getEditingPathSet().iterator().next().getConceptNid(), 
 							Long.MAX_VALUE);
