@@ -54,7 +54,7 @@ public class GenIdHelper {
 	}
 
 	public static String getNewSNOMEDID(String parentSnomedId, SqlSession session) {
-		logger.debug("#################### Get New SNOMEDID Start ############################");
+		logger.info("#################### Get New SNOMEDID Start ############################");
 		String result = "";
 
 		String tempParent = "";
@@ -66,38 +66,38 @@ public class GenIdHelper {
 
 		if (parentSnomedId != null && !parentSnomedId.trim().equals("")) {
 			if (parentSnomedId.contains("M-8") || parentSnomedId.contains("M-9")) {
-				logger.debug("M-8/9 parent " + parentSnomedId);
+				logger.info("M-8/9 parent " + parentSnomedId);
 				tempParent = "R-10000";
 				prefix = "R";
 				suffix = "100000";
 				suffixToNum = 65536;
 				pos = 2;
 				lenSuffix = 5;
-				logger.debug("Getting id form id_base.");
+				logger.info("Getting id form id_base.");
 				String idbase = (String) session.selectOne("com.termmed.genid.data.IDBaseMapper.selectSnomedIdBase");
-				logger.debug("ID_BASE result: " + idbase);
+				logger.info("ID_BASE result: " + idbase);
 				long hexValue = BaseConverterUtil.fromBase16(idbase);
 				hexValue++;
 				String incremented = BaseConverterUtil.toBase16(hexValue);
-				logger.debug("ID_BASE result incremented: " + incremented);
+				logger.info("ID_BASE result incremented: " + incremented);
 				session.update("com.termmed.genid.data.IDBaseMapper.updateSnomedIdBase", incremented);
 				return incremented;
 			} else {
-				logger.debug("Parent snomed id:" + parentSnomedId);
+				logger.info("Parent snomed id:" + parentSnomedId);
 				pos = parentSnomedId.indexOf('-');
 				tempParent = parentSnomedId;
 				prefix = parentSnomedId.split("-")[0];
 				suffix = parentSnomedId.split("-")[1];
 				suffixToNum = Integer.parseInt(suffix, 16);
-				logger.debug("Prefix: " + prefix);
-				logger.debug("Suffix: " + suffix);
-				logger.debug("suffixToNum: " + suffixToNum);
+				logger.info("Prefix: " + prefix);
+				logger.info("Suffix: " + suffix);
+				logger.info("suffixToNum: " + suffixToNum);
 				if (prefix.equals("G")) {
 					lenSuffix = 4;
 				} else {
 					lenSuffix = 5;
 				}
-				logger.debug("lenSuffix: " + lenSuffix);
+				logger.info("lenSuffix: " + lenSuffix);
 
 				int digits = 1;
 				String endId = prefix + "-";
@@ -106,29 +106,29 @@ public class GenIdHelper {
 				}
 
 				String startId = parentSnomedId;
-				logger.debug("End Id: " + endId);
+				logger.info("End Id: " + endId);
 				SnomedIdRange idRange = new SnomedIdRange(parentSnomedId, endId);
-				logger.debug("Id Range " + idRange);
+				logger.info("Id Range " + idRange);
 
 				Integer total = (Integer) session.selectOne("com.termmed.genid.data.ConidMapMapper.countBySnomedId", idRange);
-				logger.debug("REAL TOTAL: " + total);
+				logger.info("REAL TOTAL: " + total);
 				int endDecimal = Integer.parseInt(endId.split("-")[1], 16);
 				int startDecimal = Integer.parseInt(parentSnomedId.split("-")[1], 16);
-				logger.debug("Full Total: " + (startDecimal - startDecimal));
+				logger.info("Full Total: " + (endDecimal - startDecimal));
 				int k = 1;
 				while (endDecimal - startDecimal == total && k < lenSuffix) {
 					startId = parentSnomedId.substring(0, lenSuffix - k);
 					for (int j = 0; j < k; j++) {
 						startId = startId + "0";
 					}
-					logger.debug("End Id: " + endId);
+					logger.info("End Id: " + endId);
 					idRange = new SnomedIdRange(startId, endId);
-					logger.debug("Id Range " + idRange);
+					logger.info("Id Range " + idRange);
 					total = (Integer) session.selectOne("com.termmed.genid.data.ConidMapMapper.countBySnomedId", idRange);
-					logger.debug("New REAL TOTAL: " + total);
+					logger.info("New REAL TOTAL: " + total);
 					endDecimal = Integer.parseInt(endId.split("-")[1], 16);
 					startDecimal = Integer.parseInt(startId);
-					logger.debug("New Full Total: " + (startDecimal - startDecimal));
+					logger.info("New Full Total: " + (startDecimal - startDecimal));
 					k++;
 				}
 
@@ -147,9 +147,15 @@ public class GenIdHelper {
 						lista.add(startSplit[0] + "-" + Integer.toString(startNum, 16));
 						Collections.sort(lista);
 					}
-					if (lista != null && !lista.isEmpty() && lista.size() < pageLenght) {
+					String last = lista.get(lista.size()-1);
+					String first = lista.get(0);
+					int startDecimalLista = Integer.parseInt(first.split("-")[1], 16);
+					logger.info("lista decimal start: " + startDecimalLista);
+					int endDecimalLista = Integer.parseInt(last.split("-")[1], 16);
+					logger.info("lista decimal end: " + endDecimalLista);
+					if (lista != null && !lista.isEmpty() && startDecimalLista + pageLenght < endDecimalLista) {
 						int resultNum = findFirstAvailableNumber(lista, digits, lenSuffix);
-						logger.debug("First Avalable Number: " + resultNum);
+						logger.info("First Avalable Number: " + resultNum);
 
 						char[] newNumArray = new char[lenSuffix];
 						for (int i = 0; i < newNumArray.length; i++) {
@@ -164,14 +170,15 @@ public class GenIdHelper {
 							tmpLen--;
 						}
 						result = prefix + "-" + new String(newNumArray);
-						logger.debug("RESULT: " + result);
+						logger.info("RESULT: " + result);
+						break;
 					}
 					page++;
 					startLine = startLine + pageLenght;
 				}
 			}
 		}
-		logger.debug("#################### Get New SNOMEDID End ############################");
+		logger.info("#################### Get New SNOMEDID End ############################");
 		return result;
 	}
 
@@ -218,9 +225,10 @@ public class GenIdHelper {
 					for (String string : lista) {
 						actSuffix = string.split("-")[1];
 						int actNum = Integer.parseInt(actSuffix, 16);
-						logger.debug("Actual Number: " + actNum);
-						if (actNum - antNum > 1) {
-							resultNum = antNum + 1;
+						logger.info("Actual Number: " + actNum);
+						if (actNum - antNum >= 1) {
+							
+							resultNum = antNum;
 							break;
 						}
 						antNum++;
@@ -229,7 +237,7 @@ public class GenIdHelper {
 			}
 		}
 		if (resultNum == 0) {
-			resultNum = antNum + 1;
+			resultNum = antNum;
 		}
 		return resultNum;
 	}
