@@ -20,7 +20,7 @@ import org.ihtsdo.rf2.util.WriteUtil;
 import org.ihtsdo.tk.api.Precedence;
 
 /**
- * Title: RF2DescriptionImpl Description: Iterating over all the concept in workbench and fetching all the components required by RF2 Description File Copyright: Copyright (c) 2010 Company: IHTSDO
+ * Title: RF2LanguageImpl Description: Iterating over all the concept in workbench and fetching all the components required by RF2 Language File Copyright: Copyright (c) 2010 Company: IHTSDO
  * 
  * @author Varsha Parekh
  * @version 1.0
@@ -127,10 +127,15 @@ public class RF2LanguageImpl extends RF2AbstractImpl implements I_ProcessConcept
 							
 							if (!(descriptionstatus.equals("0") 
 									|| descriptionstatus.equals("6") 
-									|| descriptionstatus.equals("8")) &&
-									active.equals(1)){
+									|| descriptionstatus.equals("8"))){
+								if ((descriptionid==null || descriptionid.equals("")) && !active.equals("1")){
+									continue;
+								}else{
+//									Force member inactivation;
+									active="0";
+								}
 								logger.error("Inactive description with active language refset member: " + description.getUUIDs().iterator().next().toString());
-								continue;
+								
 							}
 							
 							if (acceptabilityNid == preferredNid) { // preferred
