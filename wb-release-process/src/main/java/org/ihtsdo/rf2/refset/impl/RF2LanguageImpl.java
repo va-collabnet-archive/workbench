@@ -123,6 +123,16 @@ public class RF2LanguageImpl extends RF2AbstractImpl implements I_ProcessConcept
 								logger.error("unknown extensionStatusId =====>" + extensionStatusId + "con : " + con.toString());
 							}
 							
+							String descriptionstatus = getStatusType(description.getStatusNid());
+							
+							if (!(descriptionstatus.equals("0") 
+									|| descriptionstatus.equals("6") 
+									|| descriptionstatus.equals("8")) &&
+									active.equals(1)){
+								logger.error("Inactive description with active language refset member: " + description.getUUIDs().iterator().next().toString());
+								continue;
+							}
+							
 							if (acceptabilityNid == preferredNid) { // preferred
 								acceptabilityId = I_Constants.PREFERRED;
 							} else if (acceptabilityNid == acceptableNid) { 
@@ -136,7 +146,7 @@ public class RF2LanguageImpl extends RF2AbstractImpl implements I_ProcessConcept
 							}
 							
 							if (descriptionid==null || descriptionid.equals("")){
-								logger.error("Unplublished Retired Concept of Lang Refset : " + concept.getUUIDs().iterator().next().toString());
+								logger.error("Unplublished Retired Description of Lang Refset : " + description.getUUIDs().iterator().next().toString());
 							}else {
 								
 								refsetuuid = extensionPart.getPrimUuid(); 
