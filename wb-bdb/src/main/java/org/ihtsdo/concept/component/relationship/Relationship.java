@@ -482,8 +482,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
                 getCharacteristicNid() == SnomedMetadataRf1.DEFINING_CHARACTERISTIC_TYPE_RF1.getLenient().getNid()
                 || getCharacteristicNid() == SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2.getLenient().getNid()) {
             throw new InvalidCAB("Inferred relationships can not be used to make blueprints");
-        } else if (getCharacteristicNid() == SnomedMetadataRf1.STATED_DEFINING_CHARACTERISTIC_TYPE_RF1.getLenient().getNid()
-                || getCharacteristicNid() == SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getLenient().getNid()) {
+        } else {
             relType = TkRelType.STATED_HIERARCHY;
         }
         RelCAB relBp = new RelCAB(getOriginNid(),
