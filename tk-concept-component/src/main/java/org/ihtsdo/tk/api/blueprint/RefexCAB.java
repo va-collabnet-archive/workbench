@@ -64,12 +64,14 @@ public class RefexCAB extends CreateOrAmendBlueprint {
             UUID.fromString("c44bc030-1166-11e0-ac64-0800200c9a66");
     private TK_REFSET_TYPE memberType;
 
-    public UUID computeMemberReferencedComponentUuid() throws IOException, InvalidCAB {
+    public UUID computeMemberComponentUuid() throws IOException, InvalidCAB {
         try {
-            return UuidT5Generator.get(refexSpecNamespace,
+            UUID memberComponentUuid = UuidT5Generator.get(refexSpecNamespace,
                     memberType.name()
                     + getPrimUuidStrForNidProp(RefexProperty.COLLECTION_NID)
                     + getRcUuid().toString());
+            properties.put(RefexProperty.MEMBER_UUID, memberComponentUuid);
+            return memberComponentUuid;
         } catch (NoSuchAlgorithmException ex) {
             throw new RuntimeException(ex);
         } catch (UnsupportedEncodingException ex) {
@@ -122,8 +124,12 @@ public class RefexCAB extends CreateOrAmendBlueprint {
     }
 
     @Override
+    /**
+     * For a refex the componentUuid methods from CreateOrAmendBlueprint
+     * refer to the member component uuid.
+     */
     public void recomputeUuid() throws InvalidCAB, IOException, ContradictionException {
-        setComponentUuid(computeMemberReferencedComponentUuid());
+        setComponentUuid(computeMemberComponentUuid());
         for (RefexCAB annotBp : getAnnotationBlueprints()) {
             annotBp.setReferencedComponentUuid(getComponentUuid());
             annotBp.recomputeUuid();
@@ -175,7 +181,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         this(memberType, Ts.get().getUuidPrimordialForNid(rcNid), collectionNid, null, null, null);
 
         this.properties.put(RefexProperty.MEMBER_UUID,
-                computeMemberReferencedComponentUuid());
+                computeMemberComponentUuid());
     }
 
     public RefexCAB(TK_REFSET_TYPE memberType,
@@ -184,7 +190,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         this(memberType, rcUuid, collectionNid, null, refex, vc);
 
         this.properties.put(RefexProperty.MEMBER_UUID,
-                computeMemberReferencedComponentUuid());
+                computeMemberComponentUuid());
     }
 
     public RefexCAB(TK_REFSET_TYPE memberType,
@@ -274,10 +280,6 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         LONG1,
         FLOAT1,
         ARRAY_BYTEARRAY,
-    }
-
-    public UUID getMemberUuid() {
-        return getComponentUuid();
     }
 
     public void setMemberUuid(UUID memberUuid) {
@@ -682,9 +684,6 @@ public class RefexCAB extends CreateOrAmendBlueprint {
     }
 
     public UUID getMemberUUID() {
-//        if (this.getComponentUuid() != null) {
-//            return this.getComponentUuid();
-//        }
         return (UUID) properties.get(RefexProperty.MEMBER_UUID);
     }
 
