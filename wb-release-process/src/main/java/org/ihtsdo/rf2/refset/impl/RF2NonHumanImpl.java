@@ -31,6 +31,7 @@ public class RF2NonHumanImpl extends RF2AbstractImpl implements I_ProcessConcept
 
 	public RF2NonHumanImpl(Config config) {
 		super(config);
+		System.out.println(currenAceConfig.getAllowedStatus());
 	}
 
 	/*
