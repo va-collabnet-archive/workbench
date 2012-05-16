@@ -151,7 +151,7 @@ public class I_Constants {
 	
 	public final static String NON_HUMAN_REFSET_ID = "447564002";
 	public final static String NON_HUMAN_REFSET_UID = "???????????????????";
-	public final static String NON_HUMAN_REFSET_UID_TERM_AUX = "0e2687b7-db28-5a01-b968-b98865648f2b";
+	public final static String NON_HUMAN_REFSET_UID_TERM_AUX = "b1b1e773-3eb6-3bcc-a6c7-52ac5d0a53be";
 	
 
 	public final static String VTM_REFSET_ID = "447565001";
@@ -212,12 +212,4 @@ public class I_Constants {
 	
 	public static final String IDENTIFIER_SCHEME_ID = "900000000000002006";
 	
-	
-	
-	
-	
-	
-	
-	
-
 }
