@@ -599,9 +599,7 @@ public abstract class RF2AbstractImpl {
 			/*int len= conceptid.length();
 			CharSequence partition = conceptid.substring(len-3, len).subSequence(0, 2);
 			if(partition.equals("00")){		*/	
-			if (conceptid.equals("416987000")){
-				System.out.println("concepto 416987000");
-			}
+			
 			String active="0"; //Default value
 			List<? extends I_ConceptAttributeTuple> conceptAttributes = concept.getConceptAttributeTuples(
 					allStatuses, 
