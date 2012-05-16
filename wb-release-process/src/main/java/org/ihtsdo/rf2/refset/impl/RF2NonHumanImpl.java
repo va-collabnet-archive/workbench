@@ -53,15 +53,33 @@ public class RF2NonHumanImpl extends RF2AbstractImpl implements I_ProcessConcept
 		I_ExtendByRefPartCid<?> extensionPart;
 		UUID refsetuuid = null;
 		int extensionStatusId = 0;
+		
+		if (conceptid.equals("416987000")){
+			System.out.println("concepto 416987000 en Non human");
+		}
 		try {
 			String refsetId = I_Constants.NON_HUMAN_REFSET_ID;
 			String moduleId = I_Constants.CORE_MODULE_ID;
 			int refsetTermAuxId = getNid(I_Constants.NON_HUMAN_REFSET_UID_TERM_AUX);		
 			List<? extends I_ExtendByRef> extensions = tf.getAllExtensionsForComponent(concept.getNid(), true);
+
 			if (!extensions.isEmpty()) {
+			if (conceptid.equals("416987000")){
+				System.out.println("concepto 416987000 en Non human 1");
+			}
 				for (I_ExtendByRef extension : extensions) {
+
+					if (conceptid.equals("416987000")){
+						System.out.println("concepto 416987000 en Non human 2");
+					}
 					if (extension.getRefsetId() == refsetTermAuxId) {
+						if (conceptid.equals("416987000")){
+							System.out.println("concepto 416987000 en Non human 3");
+						}
 						if (extension != null) {
+							if (conceptid.equals("416987000")){
+								System.out.println("concepto 416987000 en Non human 4");
+							}
 							long lastVersion = Long.MIN_VALUE;
 							extensionPart=null;
 							for (I_ExtendByRefVersion loopTuple : extension.getTuples(allStatusSet,currenAceConfig.getViewPositionSetReadOnly(),
@@ -73,6 +91,9 @@ public class RF2NonHumanImpl extends RF2AbstractImpl implements I_ProcessConcept
 								}
 							}
 							if (extensionPart == null) {
+							if (conceptid.equals("416987000")){
+								System.out.println("concepto 416987000 en Non human 5");
+							}
 								if (logger.isDebugEnabled()) {
 									logger.debug("Refset extension part not found!");
 								}
