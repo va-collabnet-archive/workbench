@@ -17,7 +17,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.ihtsdo</groupId>
 	<artifactId>wb-mmb</artifactId>
-	<version>2.6.0-rb-3-SNAPSHOT</version>
+	<version>2.6.0-rb-3</version>
 	<packaging>pom</packaging>
 	<name>${branch}: (MMP) Workbench Toolkit</name>
 	<description>The IHTSDO Workbench provides two software frameworks for
@@ -28,9 +28,9 @@
         needs of their end users.
     </description>
 	<scm>
-		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-trek-113-rb</connection>
-		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-trek-113-rb</developerConnection>
-		<url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/branches/wb-trek-113-rb?root=workbench&amp;system=exsy1002/wb-mmb-2.6.0-trek-113</url>
+		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/wb-mmb-2.6.0-rb-3</connection>
+		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/wb-mmb-2.6.0-rb-3</developerConnection>
+		<url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/tags?root=workbench&amp;system=exsy1002/wb-mmb-2.6.0-trek-113/wb-mmb-2.6.0-rb-3</url>
 	</scm>
 	<properties>
 		<branch>trek-113-rb</branch>
