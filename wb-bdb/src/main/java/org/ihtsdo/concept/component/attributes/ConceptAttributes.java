@@ -186,7 +186,7 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
     public ConceptAttributesRevision makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
         ConceptAttributesRevision newR;
 
-        newR = new ConceptAttributesRevision(this, statusNid, time, authorNid, pathNid, moduleNid, this);
+        newR = new ConceptAttributesRevision(this, statusNid, time, authorNid, moduleNid, pathNid, this);
         addRevision(newR);
 
         return newR;

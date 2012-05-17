@@ -34,8 +34,8 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
    //~--- constructors --------------------------------------------------------
   
    public ConceptAttributesRevision(I_ConceptAttributePart another, ConceptAttributes primoridalMember) {
-      super(another.getStatusNid(), another.getTime(), another.getAuthorNid(), another.getPathNid(),
-            another.getModuleNid(), primoridalMember);
+      super(another.getStatusNid(), another.getTime(), another.getAuthorNid(), another.getModuleNid(),
+              another.getPathNid(), primoridalMember);
       this.defined = another.isDefined();
    }
 
@@ -55,7 +55,7 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
    }
 
    public ConceptAttributesRevision(I_ConceptAttributePart another, int statusNid, long time, int authorNid,
-                                    int moduleNid, int pathNid,ConceptAttributes primoridalMember) {
+                                    int moduleNid, int pathNid, ConceptAttributes primoridalMember) {
       super(statusNid, time, authorNid, moduleNid, pathNid, primoridalMember);
       this.defined = another.isDefined();
    }
