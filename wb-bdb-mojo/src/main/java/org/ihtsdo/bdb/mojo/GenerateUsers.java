@@ -164,6 +164,7 @@ public class GenerateUsers extends AbstractMojo {
         private ArrayList<ConceptSpec> dIntegerRefsets;
         private ArrayList<ConceptSpec> dStringRefsets;
         private ArrayList<ConceptSpec> dConConConRefsets;
+        private ArrayList<ConceptSpec> destRelTypesList;
         private boolean displayRf2 = false;
         private ConceptSpec refsetStatus;
         private ArrayList<ConceptSpec> additionalRoots;
@@ -339,6 +340,7 @@ public class GenerateUsers extends AbstractMojo {
             dIntegerRefsets = getConceptSpecListFromPrefs(configProps.getProperty("desc.integerRefsets"));
             dStringRefsets = getConceptSpecListFromPrefs(configProps.getProperty("desc.stringRefsets"));
             dConConConRefsets = getConceptSpecListFromPrefs(configProps.getProperty("desc.conConConRefsets"));
+            destRelTypesList = getConceptSpecListFromPrefs(configProps.getProperty("parentRelationshipTypes"));
             if(configProps.getProperty("displayRf2").equals("true")) {
                 displayRf2 = true;
             }
@@ -914,7 +916,7 @@ public class GenerateUsers extends AbstractMojo {
                     }
                 }
 		activeConfig.setRoots(roots);
-
+                
 		//set up allowed statuses
 		I_IntSet allowedStatus = tf.newIntSet();
 		allowedStatus.add(SnomedMetadataRf1.CURRENT_RF1.getLenient().getNid());
@@ -925,6 +927,11 @@ public class GenerateUsers extends AbstractMojo {
 		I_IntSet destRelTypes = tf.newIntSet();
 		destRelTypes.add(Snomed.IS_A.getLenient().getNid());
 		destRelTypes.add(TermAux.IS_A.getLenient().getNid());
+                if(!destRelTypesList.isEmpty()){
+                    for(ConceptSpec relTypeSpec : destRelTypesList){
+                        destRelTypes.add(relTypeSpec.getLenient().getConceptNid());
+                    }
+                }
 		activeConfig.setDestRelTypes(destRelTypes);
 
 		//set up editing defaults
@@ -1338,6 +1345,11 @@ public class GenerateUsers extends AbstractMojo {
 		I_IntSet destRelTypes = tf.newIntSet();
 		destRelTypes.add(Snomed.IS_A.getLenient().getNid());
 		destRelTypes.add(TermAux.IS_A.getLenient().getNid());
+                if(!destRelTypesList.isEmpty()){
+                    for(ConceptSpec relTypeSpec : destRelTypesList){
+                        destRelTypes.add(relTypeSpec.getLenient().getConceptNid());
+                    }
+                }
 		userConfig.setDestRelTypes(destRelTypes);
 
 		//set up editing defaults
