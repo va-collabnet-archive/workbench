@@ -1249,6 +1249,9 @@ public class BdbCommitManager {
                 });
             }
         }
+        if (uncommittedCNidsNoChecks.isMember(concept.getNid())) {
+            uncommittedCNidsNoChecks.setNotMember(concept.getNid());
+        }
     }
 
     private static void removeUncommittedUpdateFrame(Concept concept) {
