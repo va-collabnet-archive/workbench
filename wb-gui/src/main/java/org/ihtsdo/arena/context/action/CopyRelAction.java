@@ -56,10 +56,16 @@ public class CopyRelAction extends AbstractAction {
             }
             if (RelationshipVersionBI.class.isAssignableFrom(sourceComponent.getClass())) {
                 RelationshipVersionBI rel = (RelationshipVersionBI) sourceComponent;
+                int relCharNid = 0;
+                if(rel.getCharacteristicNid() == SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID()){
+                    relCharNid = SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID();
+                }else{
+                    relCharNid = rel.getCharacteristicNid();
+                }
                 I_RelVersioned newRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(), concept,
                         rel.getTypeNid(),
                         rel.getDestinationNid(),
-                        SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID(),
+                        relCharNid,
                         rel.getRefinabilityNid(),
                         0,
                         rel.getStatusNid(),
