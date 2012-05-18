@@ -16,6 +16,7 @@ import org.ihtsdo.rf2.impl.RF2AbstractImpl;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.WriteUtil;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 
@@ -50,13 +51,10 @@ public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts
 				concept.getPrimUuid().equals(UUID.fromString("f5bb4e5f-8bcf-4c40-bccc-959c01a44754")) ||
 				concept.getPrimUuid().equals(UUID.fromString("1179c390-9702-4e79-a318-ce48ee63042c"))) {
 			System.out.println("***Found monitored concept by id:");
-			System.out.println("cv == null -> " + (cv == null));
-			System.out.println("cv.getConAttrsActive() == null -> " + (cv.getConAttrsActive() == null));
-			System.out.println(concept.toLongString());
-		}
-		
-		if (concept.toString().toLowerCase().contains("susan") || concept.toString().toLowerCase().contains("alo ")) {
-			System.out.println("***Found monitored concept by text:");
+			for (PositionBI p : Terms.get().getActiveAceFrameConfig().getViewCoordinate().getPositionSet()) {
+				System.out.println("Detected position " + 
+						Terms.get().getConcept(p.getPath().getConceptNid()).toString() + " - " + p.getTime());
+			}
 			System.out.println("cv == null -> " + (cv == null));
 			System.out.println("cv.getConAttrsActive() == null -> " + (cv.getConAttrsActive() == null));
 			System.out.println(concept.toLongString());
