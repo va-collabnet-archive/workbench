@@ -10,6 +10,9 @@ import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.tapi.TerminologyException;
+import org.dwfa.vodb.types.IntSet;
+import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.impl.RF2AbstractImpl;
@@ -31,9 +34,23 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts {
 
 	private static Logger logger = Logger.getLogger(RF2ConceptImpl.class);
+	private IntSet sapsToWrite;
 
 	public RF2ConceptImpl(Config config) {
 		super(config);
+		IntSet pathIds = new IntSet();
+		try {
+			for (PositionBI p : Terms.get().getActiveAceFrameConfig().getViewCoordinate().getPositionSet()) {
+				pathIds.add(p.getPath().getConceptNid());
+			}
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		sapsToWrite = Bdb.getSapDb().getSpecifiedSapNids(pathIds,
+                Long.MIN_VALUE,
+                Long.MAX_VALUE);
 	}
 
 	/*
@@ -46,7 +63,6 @@ public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts
 	public void processConcept(I_GetConceptData concept) throws Exception {
 
 		ConceptVersionBI cv = Ts.get().getConceptVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), concept.getConceptNid());
-		//ConceptChronicleBI cc = Ts.get().getConcept(concept.getConceptNid());
 		
 		if (concept.getPrimUuid().equals(UUID.fromString("c8ce19bf-f50c-4aac-a388-6f4cb02e89b4")) ||
 				concept.getPrimUuid().equals(UUID.fromString("db15609e-43c9-4316-993a-9ceb135281a7")) ||
@@ -65,10 +81,13 @@ public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts
 			System.out.println("cv.getConAttrsActive() == null -> " + (cv.getConAttrsActive() == null));
 			System.out.println("cv.getDescsActive() == null -> " + (cv.getDescsActive() == null));
 			System.out.println("cv.getDescsActive().size() == 0 -> " + (cv.getDescsActive().size() == 0));
+			System.out.println("cv.getDescsActive().size() == 0 -> " + (cv.getDescsActive().size() == 0));
+			System.out.println("sapsToWrite.contains(cv.getSapNid()) -> " + (sapsToWrite.contains(cv.getSapNid())));
+			System.out.println("sapsToWrite.contains(cv.getConAttrsActive().getSapNid()) -> " + (sapsToWrite.contains(cv.getConAttrsActive().getSapNid())));
 			System.out.println(concept.toLongString());
 		}
 		
-		if ( cv.getConAttrsActive() != null) {
+		if (sapsToWrite.contains(cv.getSapNid())) {
 			process(concept);
 		}
 		
