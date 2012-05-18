@@ -62,32 +62,36 @@ public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts
 	@Override
 	public void processConcept(I_GetConceptData concept) throws Exception {
 
-		ConceptVersionBI cv = Ts.get().getConceptVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), concept.getConceptNid());
-		
-		if (concept.getPrimUuid().equals(UUID.fromString("c8ce19bf-f50c-4aac-a388-6f4cb02e89b4")) ||
-				concept.getPrimUuid().equals(UUID.fromString("db15609e-43c9-4316-993a-9ceb135281a7")) ||
-				concept.getPrimUuid().equals(UUID.fromString("f5bb4e5f-8bcf-4c40-bccc-959c01a44754")) ||
-				concept.getPrimUuid().equals(UUID.fromString("1179c390-9702-4e79-a318-ce48ee63042c"))) {
-			System.out.println("***Found monitored concept by id:");
-			for (PositionBI p : Terms.get().getActiveAceFrameConfig().getViewCoordinate().getPositionSet()) {
-				System.out.println("Detected position " + 
-						Terms.get().getConcept(p.getPath().getConceptNid()).toString() + " - " +  TimeHelper.formatDate(p.getTime()));
-				for (PositionBI o : p.getPath().getOrigins()) {
-					System.out.println("----with origin " + 
-							Terms.get().getConcept(o.getPath().getConceptNid()).toString() + " - " + TimeHelper.formatDate(o.getTime()));
+		try {
+			ConceptVersionBI cv = Ts.get().getConceptVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), concept.getConceptNid());
+			
+			if (concept.getPrimUuid().equals(UUID.fromString("c8ce19bf-f50c-4aac-a388-6f4cb02e89b4")) ||
+					concept.getPrimUuid().equals(UUID.fromString("db15609e-43c9-4316-993a-9ceb135281a7")) ||
+					concept.getPrimUuid().equals(UUID.fromString("f5bb4e5f-8bcf-4c40-bccc-959c01a44754")) ||
+					concept.getPrimUuid().equals(UUID.fromString("1179c390-9702-4e79-a318-ce48ee63042c"))) {
+				System.out.println("***Found monitored concept by id:");
+				for (PositionBI p : Terms.get().getActiveAceFrameConfig().getViewCoordinate().getPositionSet()) {
+					System.out.println("Detected position " + 
+							Terms.get().getConcept(p.getPath().getConceptNid()).toString() + " - " +  TimeHelper.formatDate(p.getTime()));
+					for (PositionBI o : p.getPath().getOrigins()) {
+						System.out.println("----with origin " + 
+								Terms.get().getConcept(o.getPath().getConceptNid()).toString() + " - " + TimeHelper.formatDate(o.getTime()));
+					}
 				}
+				System.out.println("cv == null -> " + (cv == null));
+				System.out.println("cv.getConAttrsActive() == null -> " + (cv.getConAttrsActive() == null));
+				System.out.println("cv.getDescsActive() == null -> " + (cv.getDescsActive() == null));
+				System.out.println("cv.getDescsActive().size() == 0 -> " + (cv.getDescsActive().size() == 0));
+				System.out.println("cv.getDescsActive().size() == 0 -> " + (cv.getDescsActive().size() == 0));
+				System.out.println("sapsToWrite.contains(cv.getConAttrsActive().getSapNid()) -> " + (sapsToWrite.contains(cv.getConAttrsActive().getSapNid())));
+				System.out.println(concept.toLongString());
 			}
-			System.out.println("cv == null -> " + (cv == null));
-			System.out.println("cv.getConAttrsActive() == null -> " + (cv.getConAttrsActive() == null));
-			System.out.println("cv.getDescsActive() == null -> " + (cv.getDescsActive() == null));
-			System.out.println("cv.getDescsActive().size() == 0 -> " + (cv.getDescsActive().size() == 0));
-			System.out.println("cv.getDescsActive().size() == 0 -> " + (cv.getDescsActive().size() == 0));
-			System.out.println("sapsToWrite.contains(cv.getConAttrsActive().getSapNid()) -> " + (sapsToWrite.contains(cv.getConAttrsActive().getSapNid())));
-			System.out.println(concept.toLongString());
-		}
-		
-		if (sapsToWrite.contains(cv.getConAttrsActive().getSapNid())) {
-			process(concept);
+			
+			if (sapsToWrite.contains(cv.getConAttrsActive().getSapNid())) {
+				process(concept);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		
 		
