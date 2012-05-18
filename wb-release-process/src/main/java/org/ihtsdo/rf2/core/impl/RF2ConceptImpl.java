@@ -58,7 +58,7 @@ public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts
 						Terms.get().getConcept(p.getPath().getConceptNid()).toString() + " - " +  TimeHelper.formatDate(p.getTime()));
 				for (PositionBI o : p.getPath().getOrigins()) {
 					System.out.println("----with origin " + 
-							Terms.get().getConcept(p.getPath().getConceptNid()).toString() + " - " + TimeHelper.formatDate(p.getTime()));
+							Terms.get().getConcept(o.getPath().getConceptNid()).toString() + " - " + TimeHelper.formatDate(o.getTime()));
 				}
 			}
 			System.out.println("cv == null -> " + (cv == null));
