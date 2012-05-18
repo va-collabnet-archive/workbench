@@ -5,12 +5,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-
 import org.apache.log4j.Logger;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.Terms;
+import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.impl.RF2AbstractImpl;
 import org.ihtsdo.rf2.util.Config;
@@ -18,6 +18,7 @@ import org.ihtsdo.rf2.util.WriteUtil;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 
 /**
@@ -45,6 +46,7 @@ public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts
 	public void processConcept(I_GetConceptData concept) throws Exception {
 
 		ConceptVersionBI cv = Ts.get().getConceptVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), concept.getConceptNid());
+		//ConceptChronicleBI cc = Ts.get().getConcept(concept.getConceptNid());
 		
 		if (concept.getPrimUuid().equals(UUID.fromString("c8ce19bf-f50c-4aac-a388-6f4cb02e89b4")) ||
 				concept.getPrimUuid().equals(UUID.fromString("db15609e-43c9-4316-993a-9ceb135281a7")) ||
@@ -53,14 +55,20 @@ public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts
 			System.out.println("***Found monitored concept by id:");
 			for (PositionBI p : Terms.get().getActiveAceFrameConfig().getViewCoordinate().getPositionSet()) {
 				System.out.println("Detected position " + 
-						Terms.get().getConcept(p.getPath().getConceptNid()).toString() + " - " + p.getTime());
+						Terms.get().getConcept(p.getPath().getConceptNid()).toString() + " - " +  TimeHelper.formatDate(p.getTime()));
+				for (PositionBI o : p.getPath().getOrigins()) {
+					System.out.println("----with origin " + 
+							Terms.get().getConcept(p.getPath().getConceptNid()).toString() + " - " + TimeHelper.formatDate(p.getTime()));
+				}
 			}
 			System.out.println("cv == null -> " + (cv == null));
 			System.out.println("cv.getConAttrsActive() == null -> " + (cv.getConAttrsActive() == null));
+			System.out.println("cv.getDescsActive() == null -> " + (cv.getDescsActive() == null));
+			System.out.println("cv.getDescsActive().size() == 0 -> " + (cv.getDescsActive().size() == 0));
 			System.out.println(concept.toLongString());
 		}
 		
-		if (cv.getConAttrsActive() != null) {
+		if ( cv.getConAttrsActive() != null) {
 			process(concept);
 		}
 		
