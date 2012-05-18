@@ -82,12 +82,11 @@ public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts
 			System.out.println("cv.getDescsActive() == null -> " + (cv.getDescsActive() == null));
 			System.out.println("cv.getDescsActive().size() == 0 -> " + (cv.getDescsActive().size() == 0));
 			System.out.println("cv.getDescsActive().size() == 0 -> " + (cv.getDescsActive().size() == 0));
-			System.out.println("sapsToWrite.contains(cv.getSapNid()) -> " + (sapsToWrite.contains(cv.getSapNid())));
 			System.out.println("sapsToWrite.contains(cv.getConAttrsActive().getSapNid()) -> " + (sapsToWrite.contains(cv.getConAttrsActive().getSapNid())));
 			System.out.println(concept.toLongString());
 		}
 		
-		if (sapsToWrite.contains(cv.getSapNid())) {
+		if (sapsToWrite.contains(cv.getConAttrsActive().getSapNid())) {
 			process(concept);
 		}
 		
