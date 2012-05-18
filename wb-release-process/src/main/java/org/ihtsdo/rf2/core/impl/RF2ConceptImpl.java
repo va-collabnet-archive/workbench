@@ -46,10 +46,17 @@ public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts
 		ConceptVersionBI cv = Ts.get().getConceptVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), concept.getConceptNid());
 		
 		if (concept.getPrimUuid().equals(UUID.fromString("c8ce19bf-f50c-4aac-a388-6f4cb02e89b4")) ||
-				concept.getPrimUuid().equals(UUID.fromString("c8ce19bf-f50c-4aac-a388-6f4cb02e89b4")) ||
-				concept.getPrimUuid().equals(UUID.fromString("c8ce19bf-f50c-4aac-a388-6f4cb02e89b4")) ||
-				concept.getPrimUuid().equals(UUID.fromString("c8ce19bf-f50c-4aac-a388-6f4cb02e89b4"))) {
-			System.out.println("***Found monitored concept:");
+				concept.getPrimUuid().equals(UUID.fromString("db15609e-43c9-4316-993a-9ceb135281a7")) ||
+				concept.getPrimUuid().equals(UUID.fromString("f5bb4e5f-8bcf-4c40-bccc-959c01a44754")) ||
+				concept.getPrimUuid().equals(UUID.fromString("1179c390-9702-4e79-a318-ce48ee63042c"))) {
+			System.out.println("***Found monitored concept by id:");
+			System.out.println("cv == null -> " + (cv == null));
+			System.out.println("cv.getConAttrsActive() == null -> " + (cv.getConAttrsActive() == null));
+			System.out.println(concept.toLongString());
+		}
+		
+		if (concept.toString().toLowerCase().contains("susan") || concept.toString().toLowerCase().contains("alo ")) {
+			System.out.println("***Found monitored concept by text:");
 			System.out.println("cv == null -> " + (cv == null));
 			System.out.println("cv.getConAttrsActive() == null -> " + (cv.getConAttrsActive() == null));
 			System.out.println(concept.toLongString());
