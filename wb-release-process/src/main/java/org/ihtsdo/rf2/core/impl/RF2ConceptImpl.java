@@ -3,6 +3,7 @@ package org.ihtsdo.rf2.core.impl;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 
 import org.apache.log4j.Logger;
@@ -43,7 +44,18 @@ public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts
 	public void processConcept(I_GetConceptData concept) throws Exception {
 
 		ConceptVersionBI cv = Ts.get().getConceptVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), concept.getConceptNid());
-		if (cv != null) {
+		
+		if (concept.getPrimUuid().equals(UUID.fromString("c8ce19bf-f50c-4aac-a388-6f4cb02e89b4")) ||
+				concept.getPrimUuid().equals(UUID.fromString("c8ce19bf-f50c-4aac-a388-6f4cb02e89b4")) ||
+				concept.getPrimUuid().equals(UUID.fromString("c8ce19bf-f50c-4aac-a388-6f4cb02e89b4")) ||
+				concept.getPrimUuid().equals(UUID.fromString("c8ce19bf-f50c-4aac-a388-6f4cb02e89b4"))) {
+			System.out.println("***Found monitored concept:");
+			System.out.println("cv == null -> " + (cv == null));
+			System.out.println("cv.getConAttrsActive() == null -> " + (cv.getConAttrsActive() == null));
+			System.out.println(concept.toLongString());
+		}
+		
+		if (cv.getConAttrsActive() != null) {
 			process(concept);
 		}
 		
