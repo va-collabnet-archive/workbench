@@ -9,11 +9,14 @@ import org.apache.log4j.Logger;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ProcessConcepts;
+import org.dwfa.ace.api.Terms;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.impl.RF2AbstractImpl;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.WriteUtil;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 
 /**
  * Title: RF2ConceptImpl Description: Iterating over all the concept in workbench and fetching all the components required by RF2 Concept File Copyright: Copyright (c) 2010 Company: IHTSDO
@@ -39,7 +42,12 @@ public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts
 	@Override
 	public void processConcept(I_GetConceptData concept) throws Exception {
 
-		process(concept);
+		ConceptVersionBI cv = Ts.get().getConceptVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), concept.getConceptNid());
+		if (cv != null) {
+			process(concept);
+		}
+		
+		
 
 	}
 
