@@ -180,9 +180,17 @@ public class MultiEditorContradictionDetectorMojo extends AbstractMojo {
             Ts.get().iterateConceptDataInSequence(mecd);
             // Ts.get().iterateConceptDataInParallel(mecd);
 
+            // REPORT COMPONENTS WITH MISSING COMMIT RECORDS
+            StringBuilder sb = new StringBuilder();
+            sb.append("\r\n**** COMPONENTS MISSING COMMITRECORDS ****");
+            sb.append("\r\n[MultiEditorContradictionDetectionMojo] MISSING COMMITRECORDS LIST\r\n");
+            sb.append(mecd.toStringMissingCommitRecords());
+            sb.append("\r\n");
+            logger.info(sb.toString());
+
             // WATCH RESULTS -- NOT CONTRADICTIONS
             List<MultiEditorContradictionCase> watchCaseList = mecd.getWatchCaseList();
-            StringBuilder sb = new StringBuilder();
+            sb = new StringBuilder();
             sb.append("\r\n**** NON-CONTRADICTING WATCH CASE 1: IGNORE NOTHING ****");
             sb.append("\r\n[MultiEditorContradictionDetectionMojo] WATCH");
             if (watchCaseList != null) {

@@ -344,6 +344,16 @@ public class NidCNidMapBdb extends ComponentBdb {
             return Integer.MAX_VALUE;
         }
 
+        if (mapIndex < 0) {
+            AceLog.getAppLog().alertAndLogException(new Exception("Warning: mapIndex < 0. nid: " + nid + " mapIndex: " + mapIndex + " indexInMap: " + indexInMap));
+            
+            return Integer.MAX_VALUE;
+        }
+        if (indexInMap < 0) {
+            AceLog.getAppLog().alertAndLogException(new Exception("Warning: indexInMap < 0. nid: " + nid + " mapIndex: " + mapIndex + " indexInMap: " + indexInMap));
+            return Integer.MAX_VALUE;
+            
+        }
         return nidCNidMaps.get()[mapIndex][indexInMap];
     }
 

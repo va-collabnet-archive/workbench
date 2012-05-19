@@ -86,12 +86,10 @@ public class PerformQA implements I_ProcessConcepts {
 		rulesAlerted = new HashSet<String>();
 		monitoredUuids = new ArrayList<UUID>();
 
-		monitoredUuids.add(UUID.fromString("298ce677-9986-3d03-8d55-28af02be7892"));
-		monitoredUuids.add(UUID.fromString("e98ee24f-6586-3e20-9ccb-fa36a4ea0b40"));
-		monitoredUuids.add(UUID.fromString("8003005b-e3ff-3ca6-ad4b-1cd0555fcd79"));
-		monitoredUuids.add(UUID.fromString("a70da6df-e8b1-3fb6-ba87-b2bed8298121"));
-		monitoredUuids.add(UUID.fromString("1cb37872-4476-3358-aea1-800fa4d97b5f"));
-		monitoredUuids.add(UUID.fromString("813562d6-5725-3da1-9d77-0a546061242d"));
+                monitoredUuids.add(UUID.fromString("48b0c96d-06a9-34f8-9479-6a278c74e87c"));
+                monitoredUuids.add(UUID.fromString("57a97fd5-5278-358c-a9d5-16deb1a587d1"));
+                monitoredUuids.add(UUID.fromString("1eb658fd-6f5c-3170-b736-56459b35490e"));
+		
 		try {
 			destRels = Terms.get().newIntSet();
 			destRels.add(Terms.get().uuidToNative(UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25")));
@@ -128,11 +126,16 @@ public class PerformQA implements I_ProcessConcepts {
 		elapsedTotal = 0;
 		estimatedNumberOfConcepts = 400000;
 	}
+        
+        public void printConceptParents() {
+            
+        }
 
 	@Override
 	public void processConcept(I_GetConceptData loopConcept) throws Exception {
 		if (monitoredUuids.contains(loopConcept.getPrimUuid())) {
 			System.out.println("Monitored concept detected: " + loopConcept);
+                        System.out.println(loopConcept.toLongString());
 		}
 		if (isaCache.isKindOf(loopConcept.getNid(), snomedRoot.getNid())) {
 			long individualStart = Calendar.getInstance().getTimeInMillis();

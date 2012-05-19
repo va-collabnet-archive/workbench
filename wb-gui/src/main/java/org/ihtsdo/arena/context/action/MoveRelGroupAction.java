@@ -55,9 +55,19 @@ public class MoveRelGroupAction extends AbstractAction {
             int max = 0;
             for (Object groupObject : targetGroups) {
                 RelGroupVersionBI rg = (RelGroupVersionBI) groupObject;
-                int group = rg.getRelGroup();
-                if (group > max) {
-                    max = group;
+                 Collection<? extends RelationshipVersionBI> currentRels = rg.getCurrentRels();
+                boolean isStated = false;
+                for(RelationshipVersionBI rel : currentRels){
+                    if(rel.getCharacteristicNid() == SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID()){
+                        isStated = true;
+                        break;
+                    }
+                }
+                if(isStated){
+                    int group = rg.getRelGroup();
+                    if (group > max) {
+                        max = group;
+                    }
                 }
             }
 

@@ -54,6 +54,17 @@ public class BdbTerminologySnapshot implements TerminologySnapshotDI {
       BdbCommitManager.addUncommitted(cv);
    }
 
+
+   @Override
+   public void addUncommittedNoChecks(ConceptChronicleBI concept) throws IOException {
+      BdbCommitManager.addUncommittedNoChecks(concept);
+   }
+
+   @Override
+   public void addUncommittedNoChecks(ConceptVersionBI cv) throws IOException {
+      BdbCommitManager.addUncommittedNoChecks(cv);
+   }
+
    @Override
    public void cancel() throws IOException {
       BdbCommitManager.cancel();

@@ -21,7 +21,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
@@ -114,12 +113,12 @@ public class SnoRel implements Comparable<Object> {
         } catch (IOException ex) {
             // Logger.getLogger(SnoRel.class.getName()).log(Level.SEVERE, null, ex);
         }
-                sb.append(c1Id);
-                sb.append(" : ");
-                sb.append(typeId);
-                sb.append(" : ");
-                sb.append(c2Id);
-                return sb.toString();
+        sb.append(c1Id);
+        sb.append(" : ");
+        sb.append(typeId);
+        sb.append(" : ");
+        sb.append(c2Id);
+        return sb.toString();
     }
 
     public String toStringNid() {

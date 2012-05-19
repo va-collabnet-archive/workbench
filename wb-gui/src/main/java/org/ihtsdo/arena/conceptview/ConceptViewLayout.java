@@ -141,8 +141,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
     private Collection<RelGroupVersionBI> statedRelGroups;
     private List<? extends I_RelTuple> statedRels;
     private JPanel conceptPanel;
-    private HashSet<Integer> sapsForConflict;
-    private HashSet<Integer> nidsForConflict;
+    private HashSet<Integer> sapsForConflict = new HashSet<Integer>();
 
     //~--- constructors --------------------------------------------------------
     public ConceptViewLayout(ConceptView conceptView, I_GetConceptData layoutConcept) throws IOException {
@@ -318,9 +317,18 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             Ts.get().iterateConceptDataInParallel(mecd);
             for(MultiEditorContradictionCase contCase : cases){
                 sapsForConflict = contCase.getSapNids();
-                nidsForConflict = contCase.getComponentNids();
             }
-            
+
+            // REPORT COMPONENTS WITH MISSING COMMIT RECORDS
+            if (mecd.hasComponentsMissingCommitRecord()) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("\r\n**** COMPONENTS MISSING COMMITRECORDS ****");
+                sb.append("\r\n[MultiEditorContradictionDetectionMojo] MISSING COMMITRECORDS LIST\r\n");
+                sb.append(mecd.toStringMissingCommitRecords());
+                sb.append("\r\n");
+                AceLog.getAppLog().log(Level.WARNING, sb.toString());
+            }
+
             activeStatedRelPanels = new ArrayList<DragPanelRel>(statedRels.size());
             setupRels(latch, statedRels, activeStatedRelPanels, cpr, false);
 
@@ -469,6 +477,11 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             }
 
             cView.getCvRenderer().updateCancelAndCommit();
+            if(!sapsForConflict.isEmpty()){
+                cView.getCvRenderer().showConflictIcon(true);
+            }else{
+                cView.getCvRenderer().showConflictIcon(false);
+            }
 
             Map<SpecBI, Integer> templates = get();
 
@@ -1470,7 +1483,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
 
     //~--- set methods ---------------------------------------------------------
     private void setShowConflicts(ComponentVersionBI cv, DragPanelComponentVersion cvp) {
-        if(nidsForConflict == null || sapsForConflict == null){
+        if(sapsForConflict.isEmpty()){
             return;
         }
         List<DragPanelExtension> refexSubpanels = cvp.getRefexSubpanels();

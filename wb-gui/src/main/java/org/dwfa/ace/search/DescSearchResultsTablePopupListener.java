@@ -68,6 +68,10 @@ import javax.swing.JTree;
 import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
+import org.ihtsdo.taxonomy.model.NodePath;
+import org.ihtsdo.taxonomy.model.TaxonomyModel;
+import org.ihtsdo.taxonomy.nodes.RootNode;
+import org.ihtsdo.taxonomy.nodes.TaxonomyNode;
 
 public class DescSearchResultsTablePopupListener extends MouseAdapter implements ActionListener {
    private ACE                ace;
@@ -93,6 +97,13 @@ public class DescSearchResultsTablePopupListener extends MouseAdapter implements
    public void actionPerformed(ActionEvent e) {
       if (e.getActionCommand().equals("Show in taxonomy")) {
          try {
+             TaxonomyModel model = (TaxonomyModel) this.ace.getTree().getModel();
+            RootNode root = model.getRoot();
+            for (Long childNodeId: root.children) {
+                TaxonomyNode childNode = model.getNodeStore().get(childNodeId);
+                TreePath path = NodePath.getTreePath(model, childNode);
+                this.ace.getTree().collapsePath(path);
+            }
             AceFrameConfig frameConfig = (AceFrameConfig) config;
             PathExpander   epl         = new PathExpander(frameConfig.getAceFrame().getCdePanel().getTree(),
                                             config, rowConcept);

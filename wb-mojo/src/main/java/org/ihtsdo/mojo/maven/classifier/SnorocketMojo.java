@@ -21,6 +21,7 @@ import au.csiro.snorocket.snapi.I_Snorocket_123.I_EquivalentCallback;
 import au.csiro.snorocket.snapi.Snorocket_123;
 import java.io.File;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -64,6 +65,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
@@ -127,9 +129,15 @@ public class SnorocketMojo extends AbstractMojo {
      * The uuid for the tested path.
      *
      * @parameter
-     * @required
+     * 
      */
     private String uuidEditPath;
+    /**
+     * The name of the tested path.
+     *
+     * @parameter
+     */
+    private String editPathFsn;
     /**
      * The time for the test in yyyy.mm.dd hh:mm:ss format
      *
@@ -1000,15 +1008,22 @@ public class SnorocketMojo extends AbstractMojo {
     } // compareSnoRel
 
     private I_ConfigAceFrame getMojoDbConfig()
-            throws TerminologyException, IOException, ParseException {
+            throws TerminologyException, IOException, ParseException, NoSuchAlgorithmException {
         I_ConfigAceFrame tmpConfig = null;
         tmpConfig = tf.newAceFrameConfig();
         DateFormat df = new SimpleDateFormat("yyyy.MM.dd hh:mm:ss");
-        tmpConfig.addViewPosition(tf.newPosition(tf.getPath(new UUID[]{UUID.fromString(uuidEditPath)}), df.parse(dateTimeStr).getTime()));
+        UUID editPathUuid = null;
+        if (editPathFsn != null){
+            editPathUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+                        editPathFsn);
+        }else{
+            editPathUuid = UUID.fromString(uuidEditPath);
+        }
+        tmpConfig.addViewPosition(tf.newPosition(tf.getPath(editPathUuid), df.parse(dateTimeStr).getTime()));
         // Addes inferred promotion template to catch the context relationships [ testing
         //tmpConfig.addViewPosition(tf.newPosition(tf.getPath(new UUID[] { UUID.fromString("cb0f6c0d-ebf3-5d84-9e12-d09a937cbffd") }), Integer.MAX_VALUE));
         //tmpConfig.addEditingPath(tf.getPath(new UUID[] { UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2") }));
-        PathBI editPath = tf.getPath(new UUID[]{UUID.fromString(uuidEditPath)});
+        PathBI editPath = tf.getPath(editPathUuid);
         tmpConfig.addEditingPath(editPath);
         tmpConfig.getDescTypes().add(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid());
         tmpConfig.getDescTypes().add(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid());

@@ -21,90 +21,92 @@ import org.ihtsdo.tk.drools.facts.DescFact;
 
 public class SetICSignificantAction extends AbstractAction {
 
-    private static final long serialVersionUID = 1L;
-    DescriptionVersionBI desc;
-    I_ConfigAceFrame config;
+	private static final long serialVersionUID = 1L;
+	DescriptionVersionBI desc;
+	I_ConfigAceFrame config;
 
-    public SetICSignificantAction(String actionName, DescFact fact, I_ConfigAceFrame config) {
-        super(actionName);
-        this.desc = fact.getComponent();
-        this.config = config;
-    }
+	public SetICSignificantAction(String actionName, DescFact fact, I_ConfigAceFrame config) {
+		super(actionName);
+		this.desc = fact.getComponent();
+		this.config = config;
+	}
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        try {
-            //get concept
-            ConceptVersionBI descConcept = Ts.get().getConceptVersion(config.getViewCoordinate(), desc.getConceptNid());
-            //get inital word of selected description
-            String descText = desc.getText();
-            String initialWord = null;
-            if (descText.indexOf(" ") != -1) {
-                initialWord = descText.substring(0, descText.indexOf(" "));
-            } else {
-                initialWord = descText;
-            }
-            //compare to initial word of returned descriptions
-            boolean initialSignificance = desc.isInitialCaseSignificant();
-            for (DescriptionVersionBI descVersion : descConcept.getDescsActive()) {
-                String otherText = descVersion.getText();
-                //if same word then add to description list
-                String otherInitialWord = null;
-                if (otherText.indexOf(" ") != -1) {
-                    otherInitialWord = otherText.substring(0, otherText.indexOf(" "));
-                } else {
-                    otherInitialWord = otherText;
-                }
-                if (initialWord.equals(otherInitialWord) &&
-                        initialSignificance == descVersion.isInitialCaseSignificant()) {
-                    DescriptionAnalogBI analog = null;
-                    if (desc.isInitialCaseSignificant()) {
-                        if (descVersion.isUncommitted()) {
-                            DescriptionAnalogBI da = (DescriptionAnalogBI) descVersion;
-                            da.setInitialCaseSignificant(false);
-                            I_GetConceptData concept = Terms.get().getConceptForNid(descVersion.getNid());
-                            Terms.get().addUncommitted(concept);
-                        } else {
-                            for (PathBI ep : config.getEditingPathSet()) {
-                                analog = (DescriptionAnalogBI) descVersion.makeAnalog(
-                                        SnomedMetadataRfx.getSTATUS_CURRENT_NID(),
-                                        config.getDbConfig().getUserConcept().getNid(),
-                                        ep.getConceptNid(),
-                                        Long.MAX_VALUE);
-                                analog.setInitialCaseSignificant(false);
-                            }
-                            I_GetConceptData concept = Terms.get().getConceptForNid(analog.getNid());
-                            Terms.get().addUncommitted(concept);
-                        }
-                    } else {
-                        if (descVersion.isUncommitted()) {
-                            DescriptionAnalogBI da = (DescriptionAnalogBI) descVersion;
-                            da.setInitialCaseSignificant(true);
-                            I_GetConceptData concept = Terms.get().getConceptForNid(descVersion.getNid());
-                            Terms.get().addUncommitted(concept);
-                        } else {
-                            for (PathBI ep : config.getEditingPathSet()) {
-                                analog = (DescriptionAnalogBI) descVersion.makeAnalog(
-                                        SnomedMetadataRfx.getSTATUS_CURRENT_NID(),
-                                        config.getDbConfig().getUserConcept().getNid(),
-                                        ep.getConceptNid(),
-                                        Long.MAX_VALUE);
-                                analog.setInitialCaseSignificant(true);
-                            }
-                            I_GetConceptData concept = Terms.get().getConceptForNid(analog.getNid());
-                            Terms.get().addUncommitted(concept);
-                        }
-                    }
-                }
-            }
-        } catch (IOException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (PropertyVetoException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch(ContradictionException ex){
-            AceLog.getAppLog().alertAndLogException(ex);
-        }
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		try {
+			//get concept
+			ConceptVersionBI descConcept = Ts.get().getConceptVersion(config.getViewCoordinate(), desc.getConceptNid());
+			//get inital word of selected description
+			String descText = desc.getText();
+			String initialWord = null;
+			if (descText.indexOf(" ") != -1) {
+				initialWord = descText.substring(0, descText.indexOf(" "));
+			} else {
+				initialWord = descText;
+			}
+			//compare to initial word of returned descriptions
+			boolean initialSignificance = desc.isInitialCaseSignificant();
+			boolean changePerformed = false;
+			for (DescriptionVersionBI descVersion : descConcept.getDescsActive()) {
+				String otherText = descVersion.getText();
+				//if same word then add to description list
+				String otherInitialWord = null;
+				if (otherText.indexOf(" ") != -1) {
+					otherInitialWord = otherText.substring(0, otherText.indexOf(" "));
+				} else {
+					otherInitialWord = otherText;
+				}
+				if (initialWord.equals(otherInitialWord) &&
+						initialSignificance == descVersion.isInitialCaseSignificant()) {
+					DescriptionAnalogBI analog = null;
+					if (desc.isInitialCaseSignificant()) {
+						if (descVersion.isUncommitted()) {
+							DescriptionAnalogBI da = (DescriptionAnalogBI) descVersion;
+							da.setInitialCaseSignificant(false);
+							changePerformed = true;
+						} else {
+							for (PathBI ep : config.getEditingPathSet()) {
+								analog = (DescriptionAnalogBI) descVersion.makeAnalog(
+										SnomedMetadataRfx.getSTATUS_CURRENT_NID(),
+										config.getDbConfig().getUserConcept().getNid(),
+										ep.getConceptNid(),
+										Long.MAX_VALUE);
+								analog.setInitialCaseSignificant(false);
+							}
+							changePerformed = true;
+						}
+					} else {
+						if (descVersion.isUncommitted()) {
+							DescriptionAnalogBI da = (DescriptionAnalogBI) descVersion;
+							da.setInitialCaseSignificant(true);
+							changePerformed = true;
+						} else {
+							for (PathBI ep : config.getEditingPathSet()) {
+								analog = (DescriptionAnalogBI) descVersion.makeAnalog(
+										SnomedMetadataRfx.getSTATUS_CURRENT_NID(),
+										config.getDbConfig().getUserConcept().getNid(),
+										ep.getConceptNid(),
+										Long.MAX_VALUE);
+								analog.setInitialCaseSignificant(true);
+							}
+							changePerformed = true;
+						}
+					}
+				}
+			}
+			// End of loop
+			if (changePerformed) {
+				I_GetConceptData concept = Terms.get().getConceptForNid(descConcept.getNid());
+				Terms.get().addUncommitted(concept);
+			}
+		} catch (IOException ex) {
+			AceLog.getAppLog().alertAndLogException(ex);
+		} catch (PropertyVetoException ex) {
+			AceLog.getAppLog().alertAndLogException(ex);
+		} catch(ContradictionException ex){
+			AceLog.getAppLog().alertAndLogException(ex);
+		}
 
 
-    }
+	}
 }

@@ -510,58 +510,41 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             for (IdentifierVersion idv : additionalIdVersions) {
                 if (idv.getTime() == Long.MAX_VALUE) {
                     toRemove.add(idv);
-                    idv.setTime(Long.MIN_VALUE);
-                    idv.setStatusAtPositionNid(-1);
                 }
             }
 
-            if (toRemove.size() > 0) {
-                for (IdentifierVersion idv : toRemove) {
-                    additionalIdVersions.remove(idv);
-                }
+            for (IdentifierVersion idv : toRemove) {
+                additionalIdVersions.remove(idv);
+                idv.setStatusAtPositionNid(-1);
             }
         }
 
         if (revisions != null) {
-            List<R> toRemove = new ArrayList<R>();
 
             for (R r : revisions) {
                 if (r.getTime() == Long.MAX_VALUE) {
-                    toRemove.add(r);
-                }
-            }
-
-            if (toRemove.size() > 0) {
-                for (R r : toRemove) {
                     revisions.remove(r);
+                    r.sapNid = -1;
                 }
             }
         }
 
         if (annotations != null) {
-            List<Object> toRemove = new ArrayList<Object>();
 
             for (RefsetMember<?, ?> a : annotations) {
                 a.clearVersions();
 
                 if (a.getTime() == Long.MAX_VALUE) {
-                    toRemove.add(a);
+                    annotations.remove(a);
+                    a.setStatusAtPositionNid(-1);
                 } else if (a.revisions != null) {
                     for (RefsetRevision rv : a.revisions) {
-                        List<RefsetRevision> revToRemove = new ArrayList<RefsetRevision>();
 
                         if (rv.getTime() == Long.MAX_VALUE) {
-                            revToRemove.add(rv);
+                            a.revisions.remove(rv);
+                            rv.sapNid = -1;
                         }
-
-                        a.revisions.removeAll(revToRemove);
                     }
-                }
-            }
-
-            if (toRemove.size() > 0) {
-                for (Object r : toRemove) {
-                    annotations.remove((RefsetMember<?, ?>) r);
                 }
             }
         }
@@ -1247,7 +1230,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         return sapNids;
     }
-    
+
     public Set<Integer> getAnnotationNidsForSaps(Set<Integer> sapNids) {
         int size = 0;
 
@@ -1260,7 +1243,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         if (annotations != null) {
             for (RefexChronicleBI<?> annotation : annotations) {
                 for (RefexVersionBI<?> av : annotation.getVersions()) {
-                    if(sapNids.contains(av.getSapNid())){
+                    if (sapNids.contains(av.getSapNid())) {
                         annotNids.add(av.getNid());
                     }
                 }
@@ -1327,7 +1310,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         return sapNids;
     }
-    
+
     public Set<Integer> getComponentNidsForSaps(Set<Integer> sapNids) throws IOException {
         int size = 1;
 
@@ -1498,7 +1481,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         return sapNids;
     }
-    
+
     public Set<Integer> getIdNidsForSaps(Set<Integer> sapNids) {
         int size = 1;
 
@@ -1509,7 +1492,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         HashSet<Integer> componentNids = new HashSet<Integer>(size);
         if (additionalIdVersions != null) {
             for (IdentifierVersion id : additionalIdVersions) {
-                if(sapNids.contains(id.getSapNid())){
+                if (sapNids.contains(id.getSapNid())) {
                     componentNids.add(this.nid);
                 }
             }
@@ -1652,7 +1635,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         for (RefexChronicleBI<?> rcbi : r) {
             if (rcbi.getCollectionNid() == refsetNid) {
-                returnValues.add(rcbi);
+                  returnValues.add(rcbi);
+                
             }
         }
 
@@ -1669,7 +1653,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             for (NidPairForRefset pair : pairs) {
                 RefexChronicleBI<?> ext = (RefexChronicleBI<?>) Bdb.getComponent(pair.getMemberNid());
 
-                if ((ext != null) && !addedMembers.contains(ext.getNid())) {
+                if ((ext != null) && !addedMembers.contains(ext.getNid()) && 
+                        ext.getPrimordialVersion().getSapNid() != -1) {
                     addedMembers.add(ext.getNid());
                     returnValues.add(ext);
                 }
@@ -1687,13 +1672,14 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         if (fetchedAnnotations != null) {
             for (RefexChronicleBI<?> annotation : fetchedAnnotations) {
-                if (addedMembers.contains(annotation.getNid()) == false) {
+                if (addedMembers.contains(annotation.getNid()) == false  && 
+                        annotation.getPrimordialVersion().getSapNid() != -1) {
                     returnValues.add(annotation);
                     addedMembers.add(annotation.getNid());
                 }
             }
         }
-
+                
         return Collections.unmodifiableCollection(returnValues);
     }
 
@@ -1906,7 +1892,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         if (revisions != null) {
             for (R r : revisions) {
-                if(sapNids.contains(r.sapNid)){
+                if (sapNids.contains(r.sapNid)) {
                     componentNids.add(r.getNid());
                 }
             }
@@ -1914,7 +1900,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         return componentNids;
     }
-    
+
     public abstract List<? extends Version> getVersions();
 
     public abstract List<? extends Version> getVersions(ViewCoordinate c);

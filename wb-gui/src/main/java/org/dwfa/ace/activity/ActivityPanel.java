@@ -206,7 +206,7 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
                     localProgress.setIndeterminate(indeterminate);
                 }
 
-                if (stringPainted != progressBar.isStringPainted()) {
+                if (stringPainted != localProgress.isStringPainted()) {
                     localProgress.setStringPainted(stringPainted);
                 }
             }
