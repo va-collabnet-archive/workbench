@@ -26,7 +26,7 @@ public class RF2ConceptFactory extends RF2AbstractFactory {
 
 	public void export() {
 
-		logger.info("Started Concept Snapshot Export... with tests");
+		logger.info("Started Concept Snapshot Export...");
 
 		try {
 

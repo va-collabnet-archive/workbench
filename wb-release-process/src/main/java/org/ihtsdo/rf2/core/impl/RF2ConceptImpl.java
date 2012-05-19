@@ -34,23 +34,9 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts {
 
 	private static Logger logger = Logger.getLogger(RF2ConceptImpl.class);
-	private IntSet sapsToWrite;
 
 	public RF2ConceptImpl(Config config) {
 		super(config);
-		IntSet pathIds = new IntSet();
-		try {
-			for (PositionBI p : Terms.get().getActiveAceFrameConfig().getViewCoordinate().getPositionSet()) {
-				pathIds.add(p.getPath().getConceptNid());
-			}
-		} catch (TerminologyException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		sapsToWrite = Bdb.getSapDb().getSpecifiedSapNids(pathIds,
-                Long.MIN_VALUE,
-                Long.MAX_VALUE);
 	}
 
 	/*
@@ -62,7 +48,6 @@ public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts
 	@Override
 	public void processConcept(I_GetConceptData concept) throws Exception {
 				process(concept);
-
 	}
 
 	@Override
