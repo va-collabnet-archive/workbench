@@ -189,7 +189,7 @@ public class SvnHelper {
         wbProperties.setProperty("initial-svn-checkout", "true");
         
 		String pw = prompter.getPassword();
-		if(WorkbenchRunner.SSO){
+		if(WorkbenchRunner.isSSO()){
 		if(pw == null || pw.length() == 0 ){
 			connectToSubversion = false;
 		}

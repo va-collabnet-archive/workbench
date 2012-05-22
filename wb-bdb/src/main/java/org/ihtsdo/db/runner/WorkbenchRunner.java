@@ -124,7 +124,7 @@ public class WorkbenchRunner {
                 if (s.endsWith("mutable")) {
                     AceLog.getAppLog().info(
                         "svnUpdateOnStart contains a mutable setting to SSO");
-                    SSO = true;
+                    setSSO(true);
                 }
             }
 
@@ -208,7 +208,7 @@ public class WorkbenchRunner {
                     (String[]) jiniConfig.getEntry(this.getClass().getName(),
                         "svnUpdateOnStart", String[].class, null);
                 setSSO(svnUpdateOnStart);
-                System.out.println("is_SSO: " + SSO);
+                System.out.println("is_SSO: " + isSSO());
                 DroolsExecutionManager.drools_dialect_java_compiler =
                     (String) jiniConfig.getEntry(this.getClass().getName(),
                         "drools_dialect_java_compiler", String.class, null);
@@ -354,6 +354,7 @@ public class WorkbenchRunner {
                     Boolean.parseBoolean((String) wbProperties.get("initialized"));
                 if (wbProperties != null) {
                     String SSOVal = wbProperties.getProperty(SSO_Key);
+                    AceLog.getAppLog().info("SSOVal = "+SSOVal);
                     if (SSOVal != null && SSOVal.length() > 0
                         && SSOVal.equalsIgnoreCase("yes")) {
                         setSSO(true);
@@ -1220,7 +1221,7 @@ public class WorkbenchRunner {
             super.finished();
 
             try {
-                if (!SSO) {
+                if (!isSSO()) {
                     // shows the AceLoginDialog
                     userProfile = loginDialog.getUserProfile(lastProfileDir);
                     password = new String(loginDialog.getPassword());
