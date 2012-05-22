@@ -23,13 +23,11 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Hashtable;
-import java.util.logging.Level;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -45,22 +43,16 @@ import javax.swing.SwingConstants;
 
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.svn.SvnPrompter;
-import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.svn.Svn;
-import org.tigris.subversion.javahl.ClientException;
-import org.tigris.subversion.javahl.Revision;
-import org.tigris.subversion.javahl.SVNClient;
 import org.tmatesoft.svn.core.SVNAuthenticationException;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
-import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
 import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
 import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
-import org.tmatesoft.svn.core.wc.SVNWCUtil;
 
 /**
  * Login Dialog for ace.
@@ -150,7 +142,12 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     	else{
     		title = "Please choose a user and login";
     		JComboBox profileSelectionBox = new JComboBox();
-    		profileSelectionBox.setModel(new DefaultComboBoxModel(nameProf.keySet().toArray()));
+
+    		List<String> namesList = new ArrayList<String>(nameProf.keySet());
+    		Collections.sort(namesList);
+    		
+    		
+    		profileSelectionBox.setModel(new DefaultComboBoxModel(namesList.toArray()));
             profileSelectionBox.validate();
             profileSelectionBox.setSelectedItem(getDefUser());
             profileSelectionBox.setRenderer(new ProfileRenderer());

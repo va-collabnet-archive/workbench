@@ -10,7 +10,7 @@ import org.dwfa.ace.log.AceLog;
 public class AceProfileManager {
 	
     private String profileDirName = "profiles";
-    private String profileFileEnding= ".ace";
+    private String profileFileEnding= ".wb";
     private Hashtable<String,File> nameProf = new Hashtable<String,File>();
     private File profile;
     private File profileDir;
