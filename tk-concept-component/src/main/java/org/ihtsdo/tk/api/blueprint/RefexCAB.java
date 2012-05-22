@@ -35,6 +35,7 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexAnalogBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_array_of_bytearray.RefexArrayOfBytearrayAnalogBI;
+import org.ihtsdo.tk.api.refex.type_array_of_bytearray.RefexArrayOfBytearrayVersionBI;
 import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanAnalogBI;
 import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidAnalogBI;
@@ -565,6 +566,15 @@ public class RefexCAB extends CreateOrAmendBlueprint {
                     }
                     RefexStrVersionBI<?> strPart = (RefexStrVersionBI<?>) version;
                     if (!entry.getValue().equals(strPart.getStr1())) {
+                        return false;
+                    }
+                    break;
+                case ARRAY_BYTEARRAY:
+                    if(!RefexArrayOfBytearrayVersionBI.class.isAssignableFrom(version.getClass())){
+                        return false;
+                    }
+                    RefexArrayOfBytearrayVersionBI<?> arrayPart = (RefexArrayOfBytearrayVersionBI<?>) version;
+                    if (!entry.getValue().equals(arrayPart.getArrayOfByteArray())) {
                         return false;
                     }
                     break;

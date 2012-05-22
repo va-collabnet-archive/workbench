@@ -37,6 +37,7 @@ import org.dwfa.ace.gui.concept.ConceptPanel;
 import org.dwfa.ace.list.TerminologyList;
 import org.dwfa.ace.list.TerminologyListModel;
 import org.dwfa.ace.list.TerminologyTable;
+import org.dwfa.ace.list.TerminologyTableModel;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
@@ -47,6 +48,7 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.gui.button.Button32x32;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.LogWithAlerts;
 import org.ihtsdo.arena.Arena;
 import org.ihtsdo.batch.BatchActionEditorPanel;
 import org.ihtsdo.tk.Ts;
@@ -417,10 +419,12 @@ public CollectionEditorContainer(TerminologyTable table, ACE ace)
                 final MasterWorker worker = getConfig().getWorker();
                 I_GetConceptData concept = null;
                 if(table != null){
-                    int index = table.convertRowIndexToModel(table.getSelectedRow());
-                    JList conceptList = getConfig().getBatchConceptList();
-                    I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
-                    concept = (I_GetConceptData) model.getElementAt(index);
+                    if(table.getSelectedRow()!= -1){
+                        int index = table.convertRowIndexToModel(table.getSelectedRow());
+                        JList conceptList = getConfig().getBatchConceptList();
+                        I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
+                        concept = (I_GetConceptData) model.getElementAt(index);
+                    }
                 }else{
                     // Set concept bean
                     // Set config

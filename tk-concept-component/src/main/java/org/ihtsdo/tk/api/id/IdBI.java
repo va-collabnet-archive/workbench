@@ -20,12 +20,13 @@ package org.ihtsdo.tk.api.id;
 import java.io.IOException;
 
 import java.util.Set;
+import org.ihtsdo.tk.api.VersionPointBI;
 
 /**
  *
  * @author kec
  */
-public interface IdBI {
+public interface IdBI extends VersionPointBI {
    Set<Integer> getAllNidsForId() throws IOException;
 
    int getAuthorNid();
@@ -34,11 +35,8 @@ public interface IdBI {
 
    Object getDenotation();
 
-   int getPathNid();
-
    int getSapNid();
 
    int getStatusNid();
 
-   long getTime();
 }

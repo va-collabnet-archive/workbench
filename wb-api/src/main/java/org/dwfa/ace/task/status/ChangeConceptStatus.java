@@ -118,7 +118,7 @@ public class ChangeConceptStatus extends AbstractTask {
             for (I_ConceptAttributePart p : partsToAdd) {
                 concept.getConceptAttributes().addVersion(p);
             }
-            Terms.get().addUncommitted(concept);
+            Terms.get().addUncommittedNoChecks(concept);
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);

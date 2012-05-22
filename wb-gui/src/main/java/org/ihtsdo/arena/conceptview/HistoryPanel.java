@@ -567,12 +567,15 @@ public class HistoryPanel {
 
          JCheckBox rowCheck      = view.getRowToPathCheckMap().get(row);
          JCheckBox positionCheck = positionCheckMap.get(p);
-         positionCheck.setLocation(locX, rowCheck.getLocation().y);
-         positionCheck.setSize(positionCheck.getPreferredSize());
-         positionCheck.setToolTipText(p.toString());
+         Point location = rowCheck.getLocation();
+         if(location != null){
+            positionCheck.setLocation(locX, rowCheck.getLocation().y);
+            positionCheck.setSize(positionCheck.getPreferredSize());
+            positionCheck.setToolTipText(p.toString());
 
-         if (positionCheck.isVisible()) {
-            locX += positionCheck.getWidth();
+            if (positionCheck.isVisible()) {
+                locX += positionCheck.getWidth();
+            }
          }
       }
       historyHeaderPanel.revalidate();

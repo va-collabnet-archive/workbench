@@ -51,8 +51,8 @@ public class Snomed {
 		new ConceptSpec("Access (attribute)",
 		UUID.fromString("3f5a4b8c-923b-3df5-9362-67881b729394"));
     public static ConceptSpec APPROACH =
-		new ConceptSpec("Procedural approach (qualifier value)",
-		UUID.fromString("2209583c-de0b-376d-9aa0-850c37240788"));
+		new ConceptSpec("Surgical approach (attribute)",
+		UUID.fromString("6e791030-235d-3533-b72c-149fc4adac5c"));
     public static ConceptSpec ASSOCIATED_FINDING =
 		new ConceptSpec("Associated finding (attribute)",
 		UUID.fromString("b20b664d-2690-3092-a2ef-7f8013b2dad3"));

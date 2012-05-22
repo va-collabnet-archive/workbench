@@ -94,11 +94,11 @@ public enum TK_REFSET_TYPE {
         if (RefexLongVersionBI.class.isAssignableFrom(c)) {
             return LONG;
         }
-        if (RefexVersionBI.class.isAssignableFrom(c)) {
-            return MEMBER;
-        }
         if (RefexArrayOfBytearrayVersionBI.class.isAssignableFrom(c)) {
             return ARRAY_BYTEARRAY;
+        }
+        if (RefexVersionBI.class.isAssignableFrom(c)) {
+            return MEMBER;
         }
         return UNKNOWN;
     }

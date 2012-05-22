@@ -36,6 +36,7 @@ public class UngroupRelGroupAction extends AbstractAction {
             //get rels from sourceComponent 
             RelGroupVersionBI source = (RelGroupVersionBI) sourceComponent;
             Collection<?> sourceRels = source.getCurrentRels();
+            I_GetConceptData concept = Terms.get().getConceptForNid(source.getConceptNid());
             //loop through rels
             for (Object relObject : sourceRels) {
                 if (I_AmPart.class.isAssignableFrom(relObject.getClass())) {
@@ -50,13 +51,10 @@ public class UngroupRelGroupAction extends AbstractAction {
 
                         I_RelPart rel = (I_RelPart) part;
                         rel.setGroup(0);
-
-                        I_GetConceptData concept = Terms.get().getConceptForNid(componentVersion.getNid());
-
-                        Terms.get().addUncommitted(concept);
                     }
                 }
             }
+            Terms.get().addUncommitted(concept);
         } catch (Exception e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         }

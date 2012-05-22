@@ -95,6 +95,7 @@ public class ConceptViewRenderer extends JLayeredPane {
     private final JButton cancelButton;
     private final JButton commitButton;
     private final JButton acceptButton;
+    private final JButton conflictButton;
     private WfHxDetailsPanelHandler wfHxDetails;
     private final JLabel workflowStatusLabel;
     private static boolean capWorkflow = false;
@@ -699,6 +700,16 @@ public class ConceptViewRenderer extends JLayeredPane {
         footerPanel.add(fillerPanel, gbc);
 
         gbc.weightx = 0;
+        
+        gbc.gridx++;
+        conflictButton = new JButton(new ImageIcon(
+                DragPanelRel.class.getResource("/16x16/plain/warning.png")));
+        conflictButton.setToolTipText("there are conflicts on the concept");
+        conflictButton.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 0));
+        conflictButton.setVisible(false);
+        conflictButton.setCursor(Cursor.getDefaultCursor());
+        footerPanel.add(conflictButton, gbc);
+        
         acceptButton = new JButton(new ImageIcon(
                     ACE.class.getResource("/16x16/plain/stamp.png")));
         if(settings.isForAdjudication()){
@@ -845,6 +856,13 @@ public class ConceptViewRenderer extends JLayeredPane {
                     setWorkflowStatusLabel(settings.getConcept());
                }
             }
+        }
+    }
+    
+    protected void showConflictIcon(boolean isShowing){
+        conflictButton.setVisible(isShowing);
+        if(settings.isForAdjudication() && isShowing == false){
+            acceptButton.setVisible(false);
         }
     }
 

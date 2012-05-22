@@ -134,7 +134,7 @@ public class MultiEditorContradictionCase {
                 sb.append(s);
             }
 
-            sb.append("\r\nEDITOR SETS:");
+            sb.append("\r\nEDITOR SETS -- CommitRecords:");
             int setCounter = 0;
             for (HashSet<UUID> hs : authTimeSetsList) {
                 sb.append("\r\n   AuthorTime HashSet #");
@@ -145,7 +145,7 @@ public class MultiEditorContradictionCase {
                 }
             }
 
-            sb.append("\r\nADJUDICATION SETS:");
+            sb.append("\r\nADJUDICATION SETS -- AdjudicationRecords:");
             setCounter = 0;
             for (HashSet<UUID> hs : authTimeSetsTruthList) {
                 sb.append("\r\n   AuthorTime Adjudiction HashSet #");

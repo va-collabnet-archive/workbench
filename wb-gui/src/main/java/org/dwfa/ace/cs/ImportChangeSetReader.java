@@ -46,6 +46,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.fd.FileDialogUtil;
 import org.dwfa.tapi.ComputationCanceled;
+import org.ihtsdo.tk.Ts;
 
 public class ImportChangeSetReader implements ActionListener, I_Count {
 
@@ -136,8 +137,10 @@ public class ImportChangeSetReader implements ActionListener, I_Count {
             ACE.threadPool.execute(new Runnable() {
                 public void run() {
                     try {
+                        Ts.get().suspendChangeNotifications();
                         importChangeSet(csFile, riverConfig);
                         Terms.get().commit();
+                        Ts.get().resumeChangeNotifications();
                     } catch (TaskFailedException ex) {
                         AceLog.getAppLog().alertAndLogException(ex);
                     } catch (Throwable ex) {

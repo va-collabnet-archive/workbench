@@ -30,11 +30,9 @@ import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.helper.transform.UuidToSctIdMapper;
 import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.NidBitSetBI;
-import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.PositionBI;
-import org.ihtsdo.tk.api.PositionSet;
+import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
 /**
@@ -44,7 +42,7 @@ import org.ihtsdo.tk.spec.ConceptSpec;
  *
  * @phase process-sources
  */
-public class GenerateIncrementalRf2File extends AbstractMojo {
+public class GenerateIncrementalRf2File extends AbstractMojo  {
 
     /**
      * ConceptSpec for the view paths to base the export on.
@@ -121,6 +119,12 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
      */
     private File output;
     /**
+     * source directory.
+     *
+     * @parameter expression="${basedir}/src" @required
+     */
+    private File sourceDir;
+    /**
      * Directory of the berkeley database to export from.
      *
      * @parameter
@@ -128,12 +132,15 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
      * @required
      */
     private File berkeleyDir;
+    
+    private IntSet sapsToWrite = new IntSet();
+    private IntSet pathIds;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
             Bdb.setup(berkeleyDir.getAbsolutePath());
-            IntSet pathIds = new IntSet();
+            pathIds = new IntSet();
             if (pathsToExport != null) {
                 for (ConceptSpec spec : pathsToExport) {
                     pathIds.add(spec.getLenient().getNid());
@@ -169,9 +176,12 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             IntSet sapsToWrite = Bdb.getSapDb().getSpecifiedSapNids(pathIds,
                     TimeHelper.getFileDateFormat().parse(startDate).getTime(),
                     TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()));
+            
+//            Ts.get().iterateSapDataInSequence(this);
 
             ViewCoordinate vc = new ViewCoordinate(Ts.get().getMetadataVC());
-
+            NidSetBI allowedStatusNids = vc.getAllowedStatusNids();
+            System.out.println("THIS : " + allowedStatusNids);
 
             PathBI path = Ts.get().getPath(viewPathNid);
             PositionBI position = Ts.get().newPosition(path,
@@ -193,8 +203,10 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                         excludedRefsetIds.getAsSet(),
                         allConcepts);
                 Ts.get().iterateConceptDataInSequence(exporter);
+                exporter.writeOneTimeFiles();
                 exporter.close();
-                UuidToSctIdMapper mapper = new UuidToSctIdMapper(namespace, moduleId.toString(), output);
+                UuidToSctIdMapper mapper = new UuidToSctIdMapper(namespace, moduleId.toString(),
+                        output);
                 mapper.map();
                 mapper.close();
             }
@@ -205,4 +217,23 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }
     }
+
+//    @Override
+//    public void processSapData(SapBI sap) throws Exception {
+//        Long start = TimeHelper.getTimeFromString(startDate, TimeHelper.getFileDateFormat());
+//        Long end = TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat());
+//        boolean add = true;
+//        
+//        if(!pathIds.contains(sap.getPathNid())){
+//            add = false;
+//        }else if(sap.getStatusNid() != SnomedMetadataRfx.getSTATUS_CURRENT_NID()){
+//            add = false;
+//        }else if( start >= sap.getTime() && sap.getTime()>= end){
+//            add = false;
+//        }
+//        
+//        if(add){
+//            sapsToWrite.add(sap.getSapNid());
+//        }
+//    }
 }

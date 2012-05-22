@@ -191,7 +191,7 @@ public class ArrayOfBytearrayMember extends RefsetMember<ArrayOfBytearrayRevisio
     @Override
     public String toString() {
         StringBuilder buff = new StringBuilder();
-     buff.append(" size: ");
+     buff.append("AOBA size: ");
       buff.append(this.arrayOfByteArray.length);
       for (int i = 0; i < this.arrayOfByteArray.length; i++) {
         buff.append(" ").append(i);

@@ -48,6 +48,7 @@ import org.dwfa.ace.table.refset.RefsetMemberTableModel.REFSET_FIELDS;
 import org.dwfa.bpa.util.SortClickListener;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntList;
+import org.ihtsdo.arena.contradiction.ContradictionConfig;
 
 public class RefsetUtil {
 
@@ -312,9 +313,17 @@ public class RefsetUtil {
 
             Set<REFSET_TYPES> newVisibleSet = new HashSet<REFSET_TYPES>();
             for (REFSET_TYPES extType : REFSET_TYPES.values()) {
-                if (((AceFrameConfig) host.getConfig()).isRefsetInToggleVisible(extType, toggle)) {
-                    newVisibleSet.add(extType);
+                if(AceFrameConfig.class.isAssignableFrom(host.getConfig().getClass())){
+                    if (((AceFrameConfig) host.getConfig()).isRefsetInToggleVisible(extType, toggle)) {
+                        newVisibleSet.add(extType);
+                    }
                 }
+                if(ContradictionConfig.class.isAssignableFrom(host.getConfig().getClass())){
+                    if (((ContradictionConfig) host.getConfig()).isRefsetInToggleVisible(extType, toggle)) {
+                        newVisibleSet.add(extType);
+                    }
+                }
+                
             }
             if (newVisibleSet.containsAll(visibleExtensions) && visibleExtensions.containsAll(newVisibleSet)) {
                 // visible extensions did not change...

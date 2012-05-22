@@ -1,14 +1,18 @@
 /**
- * Copyright (c) 2009 International Health Terminology Standards Development Organisation
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed under the License is
- * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.dwfa.ace.gui.concept;
 
@@ -103,6 +107,10 @@ public class LineagePlugin extends AbstractPlugin implements HierarchyListener {
         }
 
         for (I_GetConceptData childBean : childrenNodes.keySet()) {
+            if (root.getUserObject() instanceof I_GetConceptData &&
+                    childBean.getNid() == ((I_GetConceptData) root.getUserObject()).getNid()) {
+                    break;
+            }
             DefaultMutableTreeNode childNode = childrenNodes.get(childBean);
 
             root.add(childNode);
@@ -137,8 +145,8 @@ public class LineagePlugin extends AbstractPlugin implements HierarchyListener {
     @Override
     public void update() throws IOException, TerminologyException {
         if (getHost() != null) {
-           UpdateLineageSwingWorker worker = new UpdateLineageSwingWorker();
-           worker.execute();
+            UpdateLineageSwingWorker worker = new UpdateLineageSwingWorker();
+            worker.execute();
         }
     }
 
@@ -289,12 +297,15 @@ public class LineagePlugin extends AbstractPlugin implements HierarchyListener {
 
         if ((sourceRelTuples.size() > 0) && (depth < 40)) {
             for (I_RelTuple rel : sourceRelTuples) {
-                I_GetConceptData parent = Terms.get().getConcept(rel.getC2Id());
-                List<List<I_GetConceptData>> parentLineage = getLineage(parent, depth + 1);
+                if (rel.getOriginNid() != rel.getDestinationNid()) {
+                    I_GetConceptData parent = Terms.get().getConcept(rel.getC2Id());
 
-                for (List<I_GetConceptData> parentLine : parentLineage) {
-                    parentLine.add(bean);
-                    lineage.add(parentLine);
+                    List<List<I_GetConceptData>> parentLineage = getLineage(parent, depth + 1);
+
+                    for (List<I_GetConceptData> parentLine : parentLineage) {
+                        parentLine.add(bean);
+                        lineage.add(parentLine);
+                    }
                 }
             }
         } else {

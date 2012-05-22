@@ -160,7 +160,7 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
                   PathExpander expander = new PathExpander(tree, aceFrameConfig,
                                              Ts.get().getConcept(selectedNode.getCnid()));
 
-                  model.getNodeFactory().pathExpanderExecutors.execute(expander);
+                  NodeFactory.pathExpanderExecutors.execute(expander);
                } catch (IOException ex) {
                   AceLog.getAppLog().alertAndLogException(ex);
                }
@@ -279,6 +279,7 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
    public void updateNewModel(String propChangeName) {
       try {
          model.unLink();
+         model.removeTreeWillExpandListener(tree);
          ViewCoordinate newVc = new ViewCoordinate(aceFrameConfig.getViewCoordinate());
          newVc.setRelAssertionType(assertionType);
          model = new TaxonomyModel(newVc,

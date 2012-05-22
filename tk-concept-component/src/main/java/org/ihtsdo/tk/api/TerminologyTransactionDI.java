@@ -16,6 +16,12 @@ public interface TerminologyTransactionDI {
    void addUncommitted(ConceptChronicleBI cc) throws IOException;
 
    void addUncommitted(ConceptVersionBI cv) throws IOException;
+   
+   void addUncommittedNoChecks(ConceptChronicleBI cc) throws IOException;
+   
+   void addUncommittedNoChecks(ConceptVersionBI cv) throws IOException;
+   
+
 
    void writeDirect(ConceptChronicleBI cc) throws IOException;
 
