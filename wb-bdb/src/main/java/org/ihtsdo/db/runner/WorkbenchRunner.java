@@ -107,6 +107,7 @@ public class WorkbenchRunner {
     // TODO Switch?
     public static boolean SSO = false;
     public static String SSO_Key = "SSO";
+    public static String LAST_PROFILE_DIR_KEY = "last-profile-dir";
 
     public static boolean isSSO() {
         return SSO;
@@ -142,10 +143,11 @@ public class WorkbenchRunner {
 
     // public static SvnPrompter prompt;
 
-    private String authenticate(SvnPrompter prompt, String baseURL) {
+    private String authenticate(SvnPrompter prompt, String baseURL,String lastUserProfile) {
         // String result = auth.authenticate(svnH);
         // SvnPrompter prompt = new SvnPrompter();
-        String result = auth.authenticate(prompt, baseURL);
+        AceLog.getAppLog().info("authenticate lastUserProfile = "+lastUserProfile);
+        String result = auth.authenticate(prompt, baseURL,lastUserProfile);
         if (result != null) {
             if (result.equals(UIAuthenticator.ERR_NO_PROFILE_S)) {
                 AceLog.getAppLog().info(
@@ -347,6 +349,7 @@ public class WorkbenchRunner {
 
             SvnPrompter prompter = new SvnPrompter();
             boolean initialized = false;
+            String lastUserprofile = "";
 
             if (acePropertiesFileExists) {
                 wbProperties.loadFromXML(new FileInputStream(wbPropertiesFile));
@@ -354,6 +357,9 @@ public class WorkbenchRunner {
                     Boolean.parseBoolean((String) wbProperties.get("initialized"));
                 if (wbProperties != null) {
                     String SSOVal = wbProperties.getProperty(SSO_Key);
+                    if(wbProperties.getProperty(LAST_PROFILE_DIR_KEY) != null){
+                    lastUserprofile = wbProperties.getProperty(LAST_PROFILE_DIR_KEY);
+                    }
                     AceLog.getAppLog().info("SSOVal = "+SSOVal);
                     if (SSOVal != null && SSOVal.length() > 0
                         && SSOVal.equalsIgnoreCase("yes")) {
@@ -370,7 +376,7 @@ public class WorkbenchRunner {
                 String testSVNURL = svnHelper.getSvnCheckoutProfileOnStart();
                 // AceLog.getAppLog().info("About to open the init svn dialog svnCheckoutProfileOnStart = "+testSVNURL);
                 // TODO throw some sort of error if url is empty or null
-                String auth_e_msg = authenticate(Svn.getPrompter(), testSVNURL);
+                String auth_e_msg = authenticate(Svn.getPrompter(), testSVNURL,lastUserprofile);
 
             }
 
@@ -417,9 +423,9 @@ public class WorkbenchRunner {
 
                 String lastProfileDirStr = "profiles";
 
-                if (wbProperties.getProperty("last-profile-dir") != null) {
+                if (wbProperties.getProperty(LAST_PROFILE_DIR_KEY) != null) {
                     lastProfileDirStr =
-                        wbProperties.getProperty("last-profile-dir");
+                        wbProperties.getProperty(LAST_PROFILE_DIR_KEY);
                 }
 
                 File lastProfileDir = new File(lastProfileDirStr);
@@ -1182,9 +1188,9 @@ public class WorkbenchRunner {
 
             lastProfileDir = profileDir;
 
-            if (wbProperties.getProperty("last-profile-dir") != null) {
+            if (wbProperties.getProperty(LAST_PROFILE_DIR_KEY) != null) {
                 lastProfileDir =
-                    new File(wbProperties.getProperty("last-profile-dir"));
+                    new File(wbProperties.getProperty(LAST_PROFILE_DIR_KEY));
             }
 
             OpenFrames.addFrameListener(fl);
@@ -1225,7 +1231,7 @@ public class WorkbenchRunner {
                     // shows the AceLoginDialog
                     userProfile = loginDialog.getUserProfile(lastProfileDir);
                     password = new String(loginDialog.getPassword());
-                    wbProperties.setProperty("last-profile-dir",
+                    wbProperties.setProperty(LAST_PROFILE_DIR_KEY,
                         FileIO.getRelativePath(userProfile));
                 }
                 if (newFrame) {

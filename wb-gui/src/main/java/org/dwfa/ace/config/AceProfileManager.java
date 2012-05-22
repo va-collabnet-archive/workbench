@@ -11,6 +11,7 @@ public class AceProfileManager {
 	
     private String profileDirName = "profiles";
     private String profileFileEnding= ".wb";
+    private String lastUserProfile;
     private Hashtable<String,File> nameProf = new Hashtable<String,File>();
     private File profile;
     private File profileDir;
@@ -127,6 +128,34 @@ public class AceProfileManager {
 	public void setProfileFolderFound(boolean profileFolderFound) {
 		this.profileFolderFound = profileFolderFound;
 	}
+
+    public String getLastUserProfile() {
+        return lastUserProfile;
+    }
+
+    public void setLastUserProfile(String lastUserProfileIn) {
+        this.lastUserProfile = lastUserProfileIn;
+    }
     
+    public String getLastUser(){
+        
+       // AceLog.getAppLog().info("getLastUser lastUserProfile = "+lastUserProfile);
+        if(lastUserProfile != null && lastUserProfile.contains(profileFileEnding)){
+
+            String[]patharr =  lastUserProfile.split("[\\\\/]");
+            if(patharr.length > 0){
+                String last = patharr[patharr.length-1];
+               // AceLog.getAppLog().info("last = "+last);
+                if(last.contains(profileFileEnding));
+                int wbI = last.indexOf(profileFileEnding);
+                String lastName = last.substring(0, wbI);
+               // AceLog.getAppLog().info("lastName = "+lastName);
+                return lastName;
+            }
+            
+        } 
+        return "";
+    }
+
 
 }

@@ -79,6 +79,7 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     private javax.swing.JCheckBox svnConnectCheckBox;
     private Hashtable<String,File> nameProf = new Hashtable<String,File>();
     private String title = "";
+    private String lastUser;
     
 	private final static String ERR_PASSWORD_S = "Authorization failed please check Username and Password";
 	private final static String ERR_NETWORK_S = "Failed to connect to to repository. \n Please check network and URL. Currently trying to use: \n ";
@@ -87,8 +88,9 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
 	
     public String svnUrl;
 
-    public AceLoginDialog2(JFrame topFrame,Hashtable<String,File> np) {
+    public AceLoginDialog2(JFrame topFrame,Hashtable<String,File> np, String lastUserIn) {
     	this.nameProf = np;
+    	this.lastUser = lastUserIn;
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         initComponents();
     }
@@ -99,7 +101,11 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     }
     
     private String getDefUser(){
-    	 String defUN = System.getProperty("user.name");
+        
+        String defUN = getLastUser();
+        if(defUN == null || defUN.length() == 0){
+            defUN = System.getProperty("user.name");
+        }
     	 if(defUN == null){
     		 defUN = ""; 
     	 }
@@ -122,11 +128,12 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     private JComponent getUserControl(){
     	int pnum = nameProf.size();
     	
+    	String userN = getDefUser();
     	if(pnum == 0){
     		//no profiles 
     		title = "No Profiles found. Download them from subversion?";
     		JTextField jtf = new JTextField();
-    		jtf.setText(getDefUser());
+    		jtf.setText(userN);
     		userControl = jtf;
     		
     		return userControl;
@@ -149,7 +156,9 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     		
     		profileSelectionBox.setModel(new DefaultComboBoxModel(namesList.toArray()));
             profileSelectionBox.validate();
-            profileSelectionBox.setSelectedItem(getDefUser());
+            if(namesList.contains(userN)){
+            profileSelectionBox.setSelectedItem(userN);
+            }
             profileSelectionBox.setRenderer(new ProfileRenderer());
             userControl = profileSelectionBox;
             return userControl;
@@ -447,4 +456,12 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
 	public void setNameProf(Hashtable<String, File> nameProf) {
 		this.nameProf = nameProf;
 	}
+
+    public String getLastUser() {
+        return lastUser;
+    }
+
+    public void setLastUser(String lastUser) {
+        this.lastUser = lastUser;
+    }
 }

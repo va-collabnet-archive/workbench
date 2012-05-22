@@ -28,6 +28,7 @@ public class UIAuthenticator {
 	public SvnPrompter prompt = new SvnPrompter();
 	
 	public String baseURL;
+	private String lastUser;
 	
 	public final static String ERR_NO_PROFILE_S = "No Profiles folder found";
 
@@ -70,11 +71,14 @@ public class UIAuthenticator {
 	}
 
 	//public String authenticate(SvnHelper svnH){
-		public String authenticate(SvnPrompter prompt, String testURL){	
+		public String authenticate(SvnPrompter prompt, String testURL,String lastUserProfile){	
 		String retVal = null;	
 		baseURL = testURL;
 		this.prompt = prompt;
 		try {
+		    if(lastUserProfile != null){
+		        apm.setLastUserProfile(lastUserProfile);
+		    }  
 			apm.processProfiles();
 			if(!apm.isProfileFolderFound()){
 				retVal = ERR_NO_PROFILE_S;
@@ -101,7 +105,7 @@ public class UIAuthenticator {
 	private void initPrompter(){
 		if(prompt.getUsername() == null || prompt.getUsername().length() == 0){
 			//AceLog.getAppLog().info("No name found so prompting");
-			AceLoginDialog2 ald = new AceLoginDialog2(getParentFrame(),apm.getNameProf());
+			AceLoginDialog2 ald = new AceLoginDialog2(getParentFrame(),apm.getNameProf(),apm.getLastUser());
 			ald.setSvnUrl(baseURL);
 			ald.setPrompt(prompt);
 			ald.setVisible(true);
@@ -152,6 +156,19 @@ public class UIAuthenticator {
 	public void setApm(AceProfileManager apm) {
 		this.apm = apm;
 	}
+
+
+    public String getLastUser() {
+        if(lastUser == null){
+            return "";
+        }
+        return lastUser;
+    }
+
+
+    public void setLastUser(String lastUser) {
+        this.lastUser = lastUser;
+    }
 
 	
 
