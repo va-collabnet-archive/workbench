@@ -106,6 +106,7 @@ public class WorkbenchRunner {
 
     // TODO Switch?
     public static boolean SSO = false;
+    public static String SSO_Key = "SSO";
 
     public static boolean isSSO() {
         return SSO;
@@ -351,6 +352,14 @@ public class WorkbenchRunner {
                 wbProperties.loadFromXML(new FileInputStream(wbPropertiesFile));
                 initialized =
                     Boolean.parseBoolean((String) wbProperties.get("initialized"));
+                if (wbProperties != null) {
+                    String SSOVal = wbProperties.getProperty(SSO_Key);
+                    if (SSOVal != null && SSOVal.length() > 0
+                        && SSOVal.equalsIgnoreCase("yes")) {
+                        setSSO(true);
+                    }
+                }
+
             }
 
             SvnHelper svnHelper =
