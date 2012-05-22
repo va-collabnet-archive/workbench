@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Level;
-
 import org.dwfa.ace.log.AceLog;
 
 public class SnoGrp extends ArrayList<SnoRel> {
@@ -450,7 +449,7 @@ public class SnoGrp extends ArrayList<SnoRel> {
      * provide overall computational efficiency.</font>
      * 
      * @param roleGroupB
-     * @return true iff RoleValuse match
+     * @return true iff RoleValues match
      */
     public boolean equals(SnoGrp roleGroupB) {
         int sizeA = this.size();
@@ -471,6 +470,25 @@ public class SnoGrp extends ArrayList<SnoRel> {
         }
 
         return isSame;
+    }
+
+    /**
+     * Find logically equivalent role group from role group list provided. <br>
+     * <br>
+     * <font color=#990099> IMPLEMENTATION NOTE: roleGroups MUST be pre-sorted
+     * in C1-Group-Type-C2 order for this routine. Pre-sorting is used to
+     * provide overall computational efficiency.</font>
+     *
+     * @param roleGroupB
+     * @return SnoGrp iff logically equivalent role group found
+     */
+    SnoGrp findLogicalEquivalent(SnoGrpList groupList_B) {
+        for (SnoGrp snoGrp : groupList_B) {
+            if (this.equals(snoGrp)) {
+                return snoGrp;
+            }
+        }
+        return null;
     }
 
     /**

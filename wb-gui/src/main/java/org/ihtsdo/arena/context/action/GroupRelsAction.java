@@ -21,6 +21,7 @@ import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
 import org.ihtsdo.tk.drools.facts.RelFact;
 import org.ihtsdo.tk.api.relationship.RelationshipAnalogBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 public class GroupRelsAction extends AbstractAction {
 
@@ -53,11 +54,20 @@ public class GroupRelsAction extends AbstractAction {
                     RelGroupChronicleBI rgc = (RelGroupChronicleBI) groupObject;
                     rg = rgc.getVersion(config.getViewCoordinate());
                 }
-
-                if (rg != null) {
-                    int group = rg.getRelGroup();
-                    if (group > max) {
-                        max = group;
+                Collection<? extends RelationshipVersionBI> currentRels = rg.getCurrentRels();
+                boolean isStated = false;
+                for(RelationshipVersionBI rel : currentRels){
+                    if(rel.getCharacteristicNid() == SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID()){
+                        isStated = true;
+                        break;
+                    }
+                }
+                if(isStated){
+                     if (rg != null) {
+                        int group = rg.getRelGroup();
+                        if (group > max) {
+                            max = group;
+                        }   
                     }
                 }
             }

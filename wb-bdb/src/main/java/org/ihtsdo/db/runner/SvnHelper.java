@@ -37,6 +37,7 @@ import org.ihtsdo.cs.econcept.workflow.WfRefsetChangeSetReader;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbPathManager;
 import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.tk.Ts;
 import org.tigris.subversion.javahl.ClientException;
 import org.tigris.subversion.javahl.Depth;
 import org.tigris.subversion.javahl.Revision;
@@ -453,6 +454,7 @@ public class SvnHelper {
         // import any change sets that may be downloaded
         // from svn...
         changeLocations = new ArrayList<File>(new HashSet<File>(changeLocations));
+        Ts.get().suspendChangeNotifications();
         try {
             Terms.get().suspendChangeSetWriters();
             AceLog.getAppLog().info("Starting eccs import: " + changeLocations);
@@ -489,6 +491,8 @@ public class SvnHelper {
             Terms.get().resumeChangeSetWriters();
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
+        } finally {
+            Ts.get().resumeChangeNotifications();
         }
     }
 }

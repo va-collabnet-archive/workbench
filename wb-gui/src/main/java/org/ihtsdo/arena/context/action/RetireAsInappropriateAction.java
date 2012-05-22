@@ -193,6 +193,15 @@ public class RetireAsInappropriateAction extends AbstractAction {
                 retireFromRefexes(component);
                 retireSynonym();
                 addToRefersToRefset(refersToNid);
+                try {
+					I_GetConceptData concept = Terms.get().getConceptForNid(component.getNid());
+					Ts.get().addUncommitted(concept);
+					if (refexConcept != null && !refexConcept.isAnnotationStyleRefex()) {
+                        Ts.get().addUncommitted(refexConcept);
+                    }
+				} catch (IOException e1) {
+					AceLog.getAppLog().alertAndLogException(e1);
+				}
             } else {
                 JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
                         "Please enter a 'refers to' concept", "",
@@ -228,9 +237,6 @@ public class RetireAsInappropriateAction extends AbstractAction {
                             ep.getConceptNid(),
                             Long.MAX_VALUE);
                 }
-
-                I_GetConceptData concept = Terms.get().getConceptForNid(analogComponent.getNid());
-                Ts.get().addUncommitted(concept);
             }
         } catch (IOException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
@@ -257,8 +263,6 @@ public class RetireAsInappropriateAction extends AbstractAction {
                                 ep.getConceptNid(),
                                 Long.MAX_VALUE);
                     }
-                    I_GetConceptData concept = Terms.get().getConceptForNid(desc.getNid());
-                    Ts.get().addUncommitted(concept);
                 }
             }
         } catch (IOException ex) {
@@ -278,11 +282,6 @@ public class RetireAsInappropriateAction extends AbstractAction {
             TerminologyBuilderBI tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
                     config.getViewCoordinate());
             tc.construct(newSpec);
-            if (!refexConcept.isAnnotationStyleRefex()) {
-                Ts.get().addUncommitted(refexConcept);
-            }
-            I_GetConceptData concept = Terms.get().getConceptForNid(analogComponent.getNid());
-            Ts.get().addUncommitted(concept);
         } catch (IOException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         } catch (InvalidCAB e1) {

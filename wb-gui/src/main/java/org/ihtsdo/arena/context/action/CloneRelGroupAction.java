@@ -20,6 +20,7 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.RelGroupFact;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 
@@ -51,9 +52,19 @@ public class CloneRelGroupAction extends AbstractAction {
             Collection<? extends RelGroupVersionBI> targetGroups = target.getRelGroups(config.getViewCoordinate());
             int max = 0;
             for (RelGroupVersionBI rg : targetGroups) {
-                int group = rg.getRelGroup();
-                if (group > max) {
-                    max = group;
+                Collection<? extends RelationshipVersionBI> currentRels = rg.getCurrentRels();
+                boolean isStated = false;
+                for(RelationshipVersionBI rel : currentRels){
+                    if(rel.getCharacteristicNid() == SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID()){
+                        isStated = true;
+                        break;
+                    }
+                }
+                if(isStated){
+                    int group = rg.getRelGroup();
+                    if (group > max) {
+                        max = group;
+                    }
                 }
             }
 
@@ -84,9 +95,9 @@ public class CloneRelGroupAction extends AbstractAction {
                     newRel.makeAnalog(newRel.getStatusNid(), config.getDbConfig().getUserConcept().getNid(), 
                         pathItr.next().getConceptNid(), Long.MAX_VALUE);
                 }
-                Terms.get().addUncommitted(concept);
-
+                
             }
+            Terms.get().addUncommitted(concept);
         } catch (TerminologyException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         } catch (IOException e1) {

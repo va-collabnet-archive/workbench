@@ -249,7 +249,7 @@ public class BdbCommitManager {
         }
     }
 
-    public static void addUncommittedNoChecks(I_GetConceptData concept) {
+    public static void addUncommittedNoChecks(ConceptChronicleBI concept) {
         Concept c = (Concept) concept;
 
         c.modified();
@@ -901,6 +901,7 @@ public class BdbCommitManager {
     public static boolean forget(ConAttrVersionBI attr) throws IOException {
         Concept c = Bdb.getConcept(attr.getConceptNid());
       ConceptAttributes a = (ConceptAttributes) attr;
+      boolean returnValue;
 
         if ((a.getTime() != Long.MAX_VALUE) && (a.getTime() != Long.MIN_VALUE)) {
 
@@ -930,15 +931,14 @@ public class BdbCommitManager {
             } catch (Exception e) {
                 AceLog.getAppLog().alertAndLog(Level.SEVERE, "Canceling cache for: " + c.toString(), e);
             }
-
-            Terms.get().addUncommitted(c);
+            returnValue = false;
         } else {
             a.primordialSapNid = -1;
-
-            return true;
+            returnValue = true;
         }
-
-        return false;
+        c.modified();
+        Terms.get().addUncommitted(c);
+        return returnValue;
     }
 
 

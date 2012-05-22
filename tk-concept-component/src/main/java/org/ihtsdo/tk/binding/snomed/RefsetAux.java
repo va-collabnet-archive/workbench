@@ -15,4 +15,10 @@ public class RefsetAux {
     public static ConceptSpec SV_REFEX =
             new ConceptSpec("Swedish [International Organization for Standardization 639-1 code sv] language reference set (foundation metadata concept)",
             UUID.fromString("e57ec728-742f-56b3-9b53-9613670fb24d"));
+    public static ConceptSpec EN_US_REFEX =
+            new ConceptSpec("United States of America English language reference set (foundation metadata concept)",
+            UUID.fromString("bca0a686-3516-3daf-8fcf-fe396d13cfad"));
+    public static ConceptSpec EN_GB_REFEX =
+            new ConceptSpec("Great Britain English language reference set",
+            UUID.fromString("eb9a5e42-3cba-356d-b623-3ed472e20b30"));
 }

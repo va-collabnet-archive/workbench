@@ -83,6 +83,7 @@ import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 public class BdbTerminologyStore implements TerminologyStoreDI {
@@ -132,6 +133,15 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     @Override
     public void addUncommitted(ConceptVersionBI cv) throws IOException {
         addUncommitted(cv.getChronicle());
+    }
+    @Override
+    public void addUncommittedNoChecks(ConceptChronicleBI concept) throws IOException {
+        BdbCommitManager.addUncommittedNoChecks(concept);
+    }
+
+    @Override
+    public void addUncommittedNoChecks(ConceptVersionBI cv) throws IOException {
+        addUncommittedNoChecks(cv.getChronicle());
     }
     
     @Override
@@ -583,8 +593,10 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
 
                 for (int childNid : allPossibleNids) {
                     try {
-                        if (cache.isKindOf(childNid, parentNid)) {
-                            viewPossibleNids.add(childNid);
+                        if(childNid != parentNid){
+                           if (cache.isKindOf(childNid, parentNid)) {
+                                viewPossibleNids.add(childNid);
+                           }
                         }
                     } catch (Exception ex) {
                         throw new IOException(ex);

@@ -78,6 +78,10 @@ public class TaxonomyModel implements TreeModel {
       nodeFactory.addNodeExpansionListener(tree);
    }
 
+   public void removeTreeWillExpandListener(JTree tree) {
+      nodeFactory.removeNodeExpansionListener(tree);
+   }
+
    protected void fireTreeNodesInserted(Object source, Object[] path, int[] childIndices, Object[] children) {
       TreeModelEvent e = new TreeModelEvent(source, path, childIndices, children);
 

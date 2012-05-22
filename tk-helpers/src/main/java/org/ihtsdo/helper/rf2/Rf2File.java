@@ -85,79 +85,125 @@ public class Rf2File {
       }
    }
    
-   public enum ConRefsetFileFields {
+   public enum StatedRelationshipsFileFields {
       ID("id", "\t"), EFFECTIVE_TIME("effectiveTime", "\t"), ACTIVE("active", "\t"), MODULE_ID("moduleId", "\t"),
-      REFSET_ID("refSetId", "\t"), REFERENCED_COMPONENT_ID("referencedComponentId", "\t"), CONCEPT("concept", "\n");
+      SOURCE_ID("sourceId", "\t"), DESTINATION_ID("destinationId", "\t"), RELATIONSHIP_GROUP("relationshipGroup", "\t"),
+      TYPE_ID("typeId", "\t"), CHARCTERISTIC_ID("characteristicTypeId", "\t"), MODIFIER_ID("modifierId", "\n");
 
       public final String headerText;
       public final String seperator;
 
       //~--- constructors -----------------------------------------------------
 
-      private ConRefsetFileFields(String headerText, String seperator) {
+      private StatedRelationshipsFileFields(String headerText, String seperator) {
          this.headerText = headerText;
          this.seperator = seperator;
       }
    }
    
-   public enum ConConRefsetFileFields {
+   public enum LanguageRefsetFileFields {
       ID("id", "\t"), EFFECTIVE_TIME("effectiveTime", "\t"), ACTIVE("active", "\t"), MODULE_ID("moduleId", "\t"),
-      REFSET_ID("refSetId", "\t"), REFERENCED_COMPONENT_ID("referencedComponentId", "\t"),
-      CONCEPT1("concept", "\t"), CONCEPT2("concept", "\n");
+      REFSET_ID("refSetId", "\t"), REFERENCED_COMPONENT_ID("referencedComponentId", "\t"), ACCEPTABILITY("acceptabilityId", "\n");
 
       public final String headerText;
       public final String seperator;
 
       //~--- constructors -----------------------------------------------------
 
-      private ConConRefsetFileFields(String headerText, String seperator) {
+      private LanguageRefsetFileFields(String headerText, String seperator) {
          this.headerText = headerText;
          this.seperator = seperator;
       }
    }
    
-   public enum ConConConRefsetFileFields {
+   public enum ModuleDependencyFileFields {
       ID("id", "\t"), EFFECTIVE_TIME("effectiveTime", "\t"), ACTIVE("active", "\t"), MODULE_ID("moduleId", "\t"),
-      REFSET_ID("refSetId", "\t"), REFERENCED_COMPONENT_ID("referencedComponentId", "\t"),
-      CONCEPT1("concept", "\t"), CONCEPT2("concept", "\t"), CONCEPT3("concept", "\n");
+      REFSET_ID("refSetId", "\t"), REFERENCED_COMPONENT_ID("referencedComponentId", "\t"), SOURCE_TIME("sourceEffectiveTime", "\t"),
+      TARGET_TIME("targetEffectiveTime", "\n");
 
       public final String headerText;
       public final String seperator;
 
       //~--- constructors -----------------------------------------------------
 
-      private ConConConRefsetFileFields(String headerText, String seperator) {
+      private ModuleDependencyFileFields(String headerText, String seperator) {
          this.headerText = headerText;
          this.seperator = seperator;
       }
    }
    
-   public enum ConConStrRefsetFileFields {
+   public enum DescTypeFileFields {
       ID("id", "\t"), EFFECTIVE_TIME("effectiveTime", "\t"), ACTIVE("active", "\t"), MODULE_ID("moduleId", "\t"),
-      REFSET_ID("refSetId", "\t"), REFERENCED_COMPONENT_ID("referencedComponentId", "\t"),
-      CONCEPT1("concept", "\t"), CONCEPT2("concept", "\t"), STRING("string", "\n");
+      REFSET_ID("refSetId", "\t"), REFERENCED_COMPONENT_ID("referencedComponentId", "\t"), DESC_FORMAT("descriptionFormat", "\t"),
+      DESC_LENGTH("descriptionLength", "\n");
 
       public final String headerText;
       public final String seperator;
 
       //~--- constructors -----------------------------------------------------
 
-      private ConConStrRefsetFileFields(String headerText, String seperator) {
+      private DescTypeFileFields(String headerText, String seperator) {
          this.headerText = headerText;
          this.seperator = seperator;
       }
    }
    
-   public enum StringRefsetFileFields {
+   public enum RefsetDescriptorFileFields {
       ID("id", "\t"), EFFECTIVE_TIME("effectiveTime", "\t"), ACTIVE("active", "\t"), MODULE_ID("moduleId", "\t"),
-      REFSET_ID("refSetId", "\t"), REFERENCED_COMPONENT_ID("referencedComponentId", "\t"), STRING("string", "\n");
+      REFSET_ID("refSetId", "\t"), REFERENCED_COMPONENT_ID("referencedComponentId", "\t"), ATTRIB_DESC("attributeDescription", "\t"),
+      ATTRIB_TYPE("attributeType", "\t"), ATTRIB_ORDER("attributeOrder", "\n");
 
       public final String headerText;
       public final String seperator;
 
       //~--- constructors -----------------------------------------------------
 
-      private StringRefsetFileFields(String headerText, String seperator) {
+      private RefsetDescriptorFileFields(String headerText, String seperator) {
+         this.headerText = headerText;
+         this.seperator = seperator;
+      }
+   }
+   
+   public enum SimpleRefsetFileFields {
+      ID("id", "\t"), EFFECTIVE_TIME("effectiveTime", "\t"), ACTIVE("active", "\t"), MODULE_ID("moduleId", "\t"),
+      REFSET_ID("refSetId", "\t"), REFERENCED_COMPONENT_ID("referencedComponentId", "\n");
+
+      public final String headerText;
+      public final String seperator;
+
+      //~--- constructors -----------------------------------------------------
+
+      private SimpleRefsetFileFields(String headerText, String seperator) {
+         this.headerText = headerText;
+         this.seperator = seperator;
+      }
+   }
+   
+   public enum AttribValueRefsetFileFields {
+      ID("id", "\t"), EFFECTIVE_TIME("effectiveTime", "\t"), ACTIVE("active", "\t"), MODULE_ID("moduleId", "\t"),
+      REFSET_ID("refSetId", "\t"), REFERENCED_COMPONENT_ID("referencedComponentId", "\t"), VALUE_ID("valueId", "\n");
+
+      public final String headerText;
+      public final String seperator;
+
+      //~--- constructors -----------------------------------------------------
+
+      private AttribValueRefsetFileFields(String headerText, String seperator) {
+         this.headerText = headerText;
+         this.seperator = seperator;
+      }
+   }
+   
+   public enum AssociationRefsetFileFields {
+      ID("id", "\t"), EFFECTIVE_TIME("effectiveTime", "\t"), ACTIVE("active", "\t"), MODULE_ID("moduleId", "\t"),
+      REFSET_ID("refSetId", "\t"), REFERENCED_COMPONENT_ID("referencedComponentId", "\t"), TARGET("targetComponent", "\n");
+
+      public final String headerText;
+      public final String seperator;
+
+      //~--- constructors -----------------------------------------------------
+
+      private AssociationRefsetFileFields(String headerText, String seperator) {
          this.headerText = headerText;
          this.seperator = seperator;
       }

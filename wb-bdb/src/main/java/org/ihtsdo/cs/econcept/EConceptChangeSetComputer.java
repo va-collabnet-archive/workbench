@@ -1,7 +1,6 @@
 package org.ihtsdo.cs.econcept;
 
 //~--- non-JDK imports --------------------------------------------------------
-
 import org.dwfa.ace.log.AceLog;
 
 import org.ihtsdo.concept.Concept;
@@ -53,410 +52,410 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import javax.swing.SwingUtilities;
+import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.db.change.ChangeNotifier;
 
 public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet {
-   private int                       minSapNid  = Integer.MIN_VALUE;
-   private int                       maxSapNid  = Integer.MAX_VALUE;
-   private int                       classifier = ReferenceConcepts.SNOROCKET.getNid();
-   private NidSetBI                  commitSapNids;
-   private ChangeSetGenerationPolicy policy;
 
-   //~--- constructors --------------------------------------------------------
+    private int minSapNid = Integer.MIN_VALUE;
+    private static final int maxSapNid = Integer.MAX_VALUE;
+    private int classifier = ReferenceConcepts.SNOROCKET.getNid();
+    private ChangeSetGenerationPolicy policy;
 
-   public EConceptChangeSetComputer(ChangeSetGenerationPolicy policy, NidSetBI commitSapNids) {
-      super();
-      this.policy = policy;
+    //~--- constructors --------------------------------------------------------
+    public EConceptChangeSetComputer(ChangeSetGenerationPolicy policy, NidSetBI commitSapNids) {
+        super();
+        this.policy = policy;
 
-      switch (policy) {
-      case COMPREHENSIVE :
-         maxSapNid = commitSapNids.getMax();
+        switch (policy) {
+            case COMPREHENSIVE:
+                break;
 
-         break;
+            case INCREMENTAL:
+                minSapNid = commitSapNids.getMin();
+                break;
 
-      case INCREMENTAL :
-         if (!commitSapNids.contiguous()) {
-            this.commitSapNids = commitSapNids;
-         }
+            case MUTABLE_ONLY:
+                minSapNid = Bdb.getSapDb().getReadOnlyMax() + 1;
+                break;
 
-         maxSapNid = commitSapNids.getMax();
-         minSapNid = commitSapNids.getMin();
+            default:
+                throw new RuntimeException("Can't handle policy: " + policy);
+        }
 
-         break;
+        assert minSapNid <= maxSapNid : "Min not <= max; min: " + minSapNid + " max: " + maxSapNid;
+    }
 
-      case MUTABLE_ONLY :
-         maxSapNid = Integer.MAX_VALUE;
-         minSapNid = Bdb.getSapDb().getReadOnlyMax() + 1;
+    //~--- methods -------------------------------------------------------------
+    private TkConceptAttributes processConceptAttributes(Concept c, AtomicBoolean changed) throws IOException {
+        TkConceptAttributes eca = null;
 
-         break;
-
-      default :
-         throw new RuntimeException("Can't handle policy: " + policy);
-      }
-
-      assert minSapNid <= maxSapNid : "Min not <= max; min: " + minSapNid + " max: " + maxSapNid;
-   }
-
-   //~--- methods -------------------------------------------------------------
-
-   private TkConceptAttributes processConceptAttributes(Concept c, AtomicBoolean changed) throws IOException {
-      TkConceptAttributes eca = null;
-
-      for (ConceptAttributes.Version v : c.getConceptAttributes().getTuples()) {
-         if (v.sapIsInRange(minSapNid, maxSapNid) && (v.getTime() != Long.MIN_VALUE)
-                 && (v.getTime() != Long.MAX_VALUE)) {
-            changed.set(true);
-
-            if ((commitSapNids == null) || commitSapNids.contains(v.getSapNid())) {
-                ChangeNotifier.touch(c.getNid(), ChangeNotifier.Change.COMPONENT);
-               if (eca == null) {
-                  eca = new EConceptAttributes();
-                  eca.setDefined(v.isDefined());
-                  setupFirstVersion(eca, v);
-               } else {
-                  TkConceptAttributesRevision ecv = new TkConceptAttributesRevision();
-
-                  ecv.setDefined(v.isDefined());
-                  setupRevision(eca, v, ecv);
-               }
-            }
-         }
-      }
-
-      return eca;
-   }
-
-   private List<TkDescription> processDescriptions(Concept c, AtomicBoolean changed) throws IOException {
-      List<TkDescription> eDescriptions = new ArrayList<TkDescription>(c.getDescriptions().size());
-
-      for (Description d : c.getDescriptions()) {
-         EDescription ecd = null;
-
-         for (Description.Version v : d.getTuples()) {
+        for (ConceptAttributes.Version v : c.getConceptAttributes().getTuples()) {
             if (v.sapIsInRange(minSapNid, maxSapNid) && (v.getTime() != Long.MIN_VALUE)
                     && (v.getTime() != Long.MAX_VALUE)) {
-               changed.set(true);
+                changed.set(true);
 
-               if ((commitSapNids == null) || commitSapNids.contains(v.getSapNid())) {
                 ChangeNotifier.touch(c.getNid(), ChangeNotifier.Change.COMPONENT);
-                  if (ecd == null) {
-                     ecd = new EDescription();
-                     eDescriptions.add(ecd);
-                     ecd.setConceptUuid(Bdb.getPrimUuidForConcept(v.getConceptNid()));
-                     ecd.setInitialCaseSignificant(v.isInitialCaseSignificant());
-                     ecd.setLang(v.getLang());
-                     ecd.setText(v.getText());
-                     ecd.setTypeUuid(Bdb.getPrimUuidForConcept(v.getTypeNid()));
-                     setupFirstVersion(ecd, v);
-                  } else {
-                     EDescriptionRevision ecv = new EDescriptionRevision();
+                if (eca == null) {
+                    eca = new EConceptAttributes();
+                    eca.setDefined(v.isDefined());
+                    setupFirstVersion(eca, v);
+                } else {
+                    TkConceptAttributesRevision ecv = new TkConceptAttributesRevision();
 
-                     ecv.setInitialCaseSignificant(v.isInitialCaseSignificant());
-                     ecv.setLang(v.getLang());
-                     ecv.setText(v.getText());
-                     ecv.setTypeUuid(Bdb.getPrimUuidForConcept(v.getTypeNid()));
-                     setupRevision(ecd, v, ecv);
-                  }
-               }
+                    ecv.setDefined(v.isDefined());
+                    setupRevision(eca, v, ecv);
+                }
+
             }
-         }
-      }
+        }
 
-      return eDescriptions;
-   }
+        return eca;
+    }
 
-   private List<TkMedia> processMedia(Concept c, AtomicBoolean changed) throws IOException {
-      List<TkMedia> eImages = new ArrayList<TkMedia>();
+    private List<TkDescription> processDescriptions(Concept c, AtomicBoolean changed) throws IOException {
+        List<TkDescription> eDescriptions = new ArrayList<TkDescription>(c.getDescriptions().size());
 
-      for (Image img : c.getImages()) {
-         EImage eImg = null;
+        for (Description d : c.getDescriptions()) {
+            EDescription ecd = null;
 
-         for (Image.Version v : img.getTuples()) {
-            if (v.sapIsInRange(minSapNid, maxSapNid) && (v.getTime() != Long.MIN_VALUE)
-                    && (v.getTime() != Long.MAX_VALUE)) {
-               if ((commitSapNids == null) || commitSapNids.contains(v.getSapNid())) {
-                  changed.set(true);
-                ChangeNotifier.touch(v.getNid(), ChangeNotifier.Change.COMPONENT);
+            for (Description.Version v : d.getTuples()) {
+                if (v.sapIsInRange(minSapNid, maxSapNid) && (v.getTime() != Long.MIN_VALUE)
+                        && (v.getTime() != Long.MAX_VALUE)) {
+                    changed.set(true);
 
-                  if (eImg == null) {
-                     eImg = new EImage();
-                     eImages.add(eImg);
-                     eImg.setConceptUuid(Bdb.getPrimUuidForConcept(v.getConceptNid()));
-                     eImg.setFormat(v.getFormat());
-                     eImg.setDataBytes(v.getImage());
-                     eImg.setTextDescription(v.getTextDescription());
-                     eImg.setTypeUuid(Bdb.getPrimUuidForConcept(v.getTypeNid()));
-                     setupFirstVersion(eImg, v);
-                  } else {
-                     EImageRevision eImgR = new EImageRevision();
 
-                     eImgR.setTextDescription(v.getTextDescription());
-                     eImgR.setTypeUuid(Bdb.getPrimUuidForConcept(v.getTypeNid()));
-                     setupRevision(eImg, v, eImgR);
-                  }
-               }
-            }
-         }
-      }
+                    ChangeNotifier.touch(c.getNid(), ChangeNotifier.Change.COMPONENT);
+                    if (ecd == null) {
+                        ecd = new EDescription();
+                        eDescriptions.add(ecd);
+                        ecd.setConceptUuid(Bdb.getPrimUuidForConcept(v.getConceptNid()));
+                        ecd.setInitialCaseSignificant(v.isInitialCaseSignificant());
+                        ecd.setLang(v.getLang());
+                        ecd.setText(v.getText());
+                        ecd.setTypeUuid(Bdb.getPrimUuidForConcept(v.getTypeNid()));
+                        setupFirstVersion(ecd, v);
+                    } else {
+                        EDescriptionRevision ecv = new EDescriptionRevision();
 
-      return eImages;
-   }
-
-   private List<TkRefsetAbstractMember<?>> processRefsetMembers(Concept c, AtomicBoolean changed)
-           throws IOException {
-      List<TkRefsetAbstractMember<?>> eRefsetMembers =
-         new ArrayList<TkRefsetAbstractMember<?>>(c.getRefsetMembers().size());
-      Collection<RefsetMember<?, ?>> membersToRemove = new ArrayList<RefsetMember<?, ?>>();
-
-      for (RefsetMember<?, ?> member : c.getRefsetMembers()) {
-         TkRefsetAbstractMember<?> eMember = null;
-         Concept                   concept = Bdb.getConceptForComponent(member.getReferencedComponentNid());
-
-         if ((concept != null) &&!concept.isCanceled()) {
-            for (RefsetMember<?, ?>.Version v : member.getTuples()) {
-               if (v.sapIsInRange(minSapNid, maxSapNid) && (v.getTime() != Long.MIN_VALUE)
-                       && (v.getTime() != Long.MAX_VALUE)) {
-                  if ((commitSapNids == null) || commitSapNids.contains(v.getSapNid())) {
-                     changed.set(true);
-                ChangeNotifier.touch(v.getNid(), ChangeNotifier.Change.COMPONENT);
-                ChangeNotifier.touch(v.getReferencedComponentNid(), ChangeNotifier.Change.REFEX_XREF);
-
-                     if (eMember == null) {
-                    	 try {
- 	                        eMember = v.getERefsetMember();
- 	
- 	                        if (eMember != null) {
- 	                           eRefsetMembers.add(eMember);
- 	                           setupFirstVersion(eMember, v);
- 	                        }
-                  		} catch (Exception e) {
-                 	        AceLog.getAppLog().info("Failed in getting Concept for: " + member.toString() + " and " + v.toString());
-                 		}
-                     } else {
-                        TkRevision eRevision = v.getERefsetRevision();
-
-                        setupRevision(eMember, v, eRevision);
-                     }
-                  }
-               }
-            }
-         } else {
-            member.primordialSapNid = -1;
-            membersToRemove.add(member);
-         }
-      }
-
-      if (!membersToRemove.isEmpty()) {
-         BdbCommitManager.writeImmediate(c);
-      }
-
-      return eRefsetMembers;
-   }
-
-   private List<TkRelationship> processRelationships(Concept c, AtomicBoolean changed) throws IOException {
-      List<TkRelationship> rels = new ArrayList<TkRelationship>(c.getSourceRels().size());
-
-      for (Relationship r : c.getSourceRels()) {
-         TkRelationship ecr = null;
-
-         for (Relationship.Version v : r.getTuples()) {
-            if (v.sapIsInRange(minSapNid, maxSapNid) && (v.getTime() != Long.MIN_VALUE)
-                    && (v.getTime() != Long.MAX_VALUE) && (v.getAuthorNid() != classifier)) {
-               if ((commitSapNids == null) || commitSapNids.contains(v.getSapNid())) {
-                  try {
-                     changed.set(true);
-                ChangeNotifier.touch(v.getNid(), ChangeNotifier.Change.COMPONENT);
-                ChangeNotifier.touch(v.getOriginNid(), ChangeNotifier.Change.REL_ORIGIN);
-                ChangeNotifier.touch(v.getDestinationNid(), ChangeNotifier.Change.REL_XREF);
-
-                     if (ecr == null) {
-                        ecr = new ERelationship();
-                        rels.add(ecr);
-                        ecr.setC1Uuid(Bdb.getPrimUuidForConcept(v.getC1Id()));
-                        ecr.setC2Uuid(Bdb.getPrimUuidForConcept(v.getC2Id()));
-                        ecr.setCharacteristicUuid(Bdb.getPrimUuidForConcept(v.getCharacteristicId()));
-                        ecr.setRefinabilityUuid(Bdb.getPrimUuidForConcept(v.getRefinabilityNid()));
-                        ecr.setRelGroup(v.getGroup());
-                        ecr.setTypeUuid(Bdb.getPrimUuidForConcept(v.getTypeNid()));
-                        setupFirstVersion(ecr, v);
-                     } else {
-                        ERelationshipRevision ecv = new ERelationshipRevision();
-
-                        ecv.setCharacteristicUuid(Bdb.getPrimUuidForConcept(v.getCharacteristicId()));
-                        ecv.setRefinabilityUuid(Bdb.getPrimUuidForConcept(v.getRefinabilityNid()));
-                        ecv.setRelGroup(v.getGroup());
+                        ecv.setInitialCaseSignificant(v.isInitialCaseSignificant());
+                        ecv.setLang(v.getLang());
+                        ecv.setText(v.getText());
                         ecv.setTypeUuid(Bdb.getPrimUuidForConcept(v.getTypeNid()));
-                        setupRevision(ecr, v, ecv);
-                     }
-                  } catch (AssertionError e) {
-                     AceLog.getAppLog().alertAndLogException(new Exception(e.getLocalizedMessage() + "\n\n"
-                             + c.toLongString(), e));
+                        setupRevision(ecd, v, ecv);
+                    }
 
-                     throw e;
-                  }
-               }
+                }
             }
-         }
-      }
+        }
 
-      return rels;
-   }
+        return eDescriptions;
+    }
 
-   @SuppressWarnings("unchecked")
-   private void setupFirstVersion(TkComponent ec, ConceptComponent<?, ?>.Version v) throws IOException {
-      ec.primordialUuid = v.getPrimUuid();
-      ec.setPathUuid(Bdb.getPrimUuidForConcept(v.getPathNid()));
-      ec.setStatusUuid(Bdb.getPrimUuidForConcept(v.getStatusNid()));
-      ec.setAuthorUuid(Bdb.getPrimUuidForConcept(v.getAuthorNid()));
-      ec.setTime(v.getTime());
+    private List<TkMedia> processMedia(Concept c, AtomicBoolean changed) throws IOException {
+        List<TkMedia> eImages = new ArrayList<TkMedia>();
 
-      if (v.getAdditionalIdentifierParts() != null) {
-         for (IdentifierVersion idv : v.getAdditionalIdentifierParts()) {
-            TkIdentifier eIdv = null;
+        for (Image img : c.getImages()) {
+            EImage eImg = null;
 
-            if ((idv.getSapNid() >= minSapNid) && (idv.getSapNid() <= maxSapNid)
-                    && (v.getTime() != Long.MIN_VALUE) && (v.getTime() != Long.MAX_VALUE)) {
-               if (IdentifierVersionLong.class.isAssignableFrom(idv.getClass())) {
-                  eIdv = new EIdentifierLong();
-               } else if (IdentifierVersionString.class.isAssignableFrom(idv.getClass())) {
-                  eIdv = new EIdentifierString();
-               } else if (IdentifierVersionUuid.class.isAssignableFrom(idv.getClass())) {
-                  eIdv = new EIdentifierUuid();
-               }
+            for (Image.Version v : img.getTuples()) {
+                if (v.sapIsInRange(minSapNid, maxSapNid) && (v.getTime() != Long.MIN_VALUE)
+                        && (v.getTime() != Long.MAX_VALUE)) {
 
-               eIdv.setDenotation(idv.getDenotation());
-               eIdv.setAuthorityUuid(Bdb.getPrimUuidForConcept(idv.getAuthorityNid()));
-               eIdv.setPathUuid(Bdb.getPrimUuidForConcept(idv.getPathNid()));
-               eIdv.setStatusUuid(Bdb.getPrimUuidForConcept(idv.getStatusNid()));
-               eIdv.setAuthorUuid(Bdb.getPrimUuidForConcept(idv.getAuthorNid()));
-               eIdv.setTime(idv.getTime());
+                    changed.set(true);
+                    ChangeNotifier.touch(v.getNid(), ChangeNotifier.Change.COMPONENT);
+
+                    if (eImg == null) {
+                        eImg = new EImage();
+                        eImages.add(eImg);
+                        eImg.setConceptUuid(Bdb.getPrimUuidForConcept(v.getConceptNid()));
+                        eImg.setFormat(v.getFormat());
+                        eImg.setDataBytes(v.getImage());
+                        eImg.setTextDescription(v.getTextDescription());
+                        eImg.setTypeUuid(Bdb.getPrimUuidForConcept(v.getTypeNid()));
+                        setupFirstVersion(eImg, v);
+                    } else {
+                        EImageRevision eImgR = new EImageRevision();
+
+                        eImgR.setTextDescription(v.getTextDescription());
+                        eImgR.setTypeUuid(Bdb.getPrimUuidForConcept(v.getTypeNid()));
+                        setupRevision(eImg, v, eImgR);
+                    }
+
+                }
             }
-         }
-      }
+        }
 
-      if (v.getAnnotations() != null) {
-         HashMap<UUID, TkRefsetAbstractMember<?>> annotationMap = new HashMap<UUID,
-                                                                     TkRefsetAbstractMember<?>>();
+        return eImages;
+    }
 
-         if (ec.getAnnotations() != null) {
-            for (TkRefsetAbstractMember<?> member :
-                    (Collection<TkRefsetAbstractMember<?>>) ec.getAnnotations()) {
-               annotationMap.put(member.getPrimordialComponentUuid(), member);
-            }
-         }
+    private List<TkRefsetAbstractMember<?>> processRefsetMembers(Concept c, AtomicBoolean changed)
+            throws IOException {
+        List<TkRefsetAbstractMember<?>> eRefsetMembers =
+                new ArrayList<TkRefsetAbstractMember<?>>(c.getRefsetMembers().size());
+        Collection<RefsetMember<?, ?>> membersToRemove = new ArrayList<RefsetMember<?, ?>>();
 
-         for (RefsetMember<?, ?> member : (Collection<RefsetMember<?, ?>>) v.getAnnotations()) {
+        for (RefsetMember<?, ?> member : c.getRefsetMembers()) {
             TkRefsetAbstractMember<?> eMember = null;
-            Concept                   concept =
-               Bdb.getConceptForComponent(member.getReferencedComponentNid());
+            Concept concept = Bdb.getConceptForComponent(member.getReferencedComponentNid());
 
-            if ((concept != null) &&!concept.isCanceled()) {
-               for (RefsetMember<?, ?>.Version mv : member.getVersions()) {
-                  if (mv.sapIsInRange(minSapNid, maxSapNid) && (mv.getTime() != Long.MIN_VALUE)
-                          && (mv.getTime() != Long.MAX_VALUE)) {
-                     if ((commitSapNids == null) || commitSapNids.contains(mv.getSapNid())) {
+            if ((concept != null) && !concept.isCanceled()) {
+                for (RefsetMember<?, ?>.Version v : member.getTuples()) {
+                    if (v.sapIsInRange(minSapNid, maxSapNid) && (v.getTime() != Long.MIN_VALUE)
+                            && (v.getTime() != Long.MAX_VALUE)) {
+
+                        changed.set(true);
+                        ChangeNotifier.touch(v.getNid(), ChangeNotifier.Change.COMPONENT);
+                        ChangeNotifier.touch(v.getReferencedComponentNid(), ChangeNotifier.Change.REFEX_XREF);
+
                         if (eMember == null) {
-                           eMember = mv.getERefsetMember();
+                            try {
+                                eMember = v.getERefsetMember();
 
-                           if (eMember != null) {
-                              if (ec.getAnnotations() == null) {
-                                 ec.setAnnotations(new ArrayList());
-                              }
-
-                              ec.getAnnotations().add(eMember);
-                              setupFirstVersion(eMember, mv);
-                           }
+                                if (eMember != null) {
+                                    eRefsetMembers.add(eMember);
+                                    setupFirstVersion(eMember, v);
+                                }
+                            } catch (Exception e) {
+                                AceLog.getAppLog().info("Failed in getting Concept for: " + member.toString() + " and " + v.toString());
+                            }
                         } else {
-                           TkRevision eRevision = mv.getERefsetRevision();
+                            TkRevision eRevision = v.getERefsetRevision();
 
-                           setupRevision(eMember, mv, eRevision);
+                            setupRevision(eMember, v, eRevision);
                         }
-                     }
-                  }
-               }
+
+                    }
+                }
+            } else {
+                member.primordialSapNid = -1;
+                membersToRemove.add(member);
             }
-         }
-      }
+        }
 
-      if (v.getAdditionalIdentifierParts() != null) {
-         for (IdentifierVersion idv : v.getAdditionalIdentifierParts()) {
-            if (idv.sapIsInRange(minSapNid, maxSapNid)) {
-               if (ec.getAdditionalIdComponents() == null) {
-                  ec.setAdditionalIdComponents(new ArrayList<TkIdentifier>());
-               }
+        if (!membersToRemove.isEmpty()) {
+            BdbCommitManager.writeImmediate(c);
+        }
 
-               Object denotation = idv.getDenotation();
+        return eRefsetMembers;
+    }
 
-               switch (IDENTIFIER_PART_TYPES.getType(denotation.getClass())) {
-               case LONG :
-                  ec.additionalIds.add(new EIdentifierLong(idv));
+    private List<TkRelationship> processRelationships(Concept c, AtomicBoolean changed) throws IOException {
+        List<TkRelationship> rels = new ArrayList<TkRelationship>(c.getSourceRels().size());
 
-                  break;
+        for (Relationship r : c.getSourceRels()) {
+            TkRelationship ecr = null;
 
-               case STRING :
-                  ec.additionalIds.add(new EIdentifierString(idv));
+            for (Relationship.Version v : r.getTuples()) {
+                if (v.sapIsInRange(minSapNid, maxSapNid) && (v.getTime() != Long.MIN_VALUE)
+                        && (v.getTime() != Long.MAX_VALUE) && (v.getAuthorNid() != classifier)) {
 
-                  break;
+                    try {
+                        changed.set(true);
+                        ChangeNotifier.touch(v.getNid(), ChangeNotifier.Change.COMPONENT);
+                        ChangeNotifier.touch(v.getOriginNid(), ChangeNotifier.Change.REL_ORIGIN);
+                        ChangeNotifier.touch(v.getDestinationNid(), ChangeNotifier.Change.REL_XREF);
 
-               case UUID :
-                  ec.additionalIds.add(new EIdentifierUuid(idv));
+                        if (ecr == null) {
+                            ecr = new ERelationship();
+                            rels.add(ecr);
+                            ecr.setC1Uuid(Bdb.getPrimUuidForConcept(v.getC1Id()));
+                            ecr.setC2Uuid(Bdb.getPrimUuidForConcept(v.getC2Id()));
+                            ecr.setCharacteristicUuid(Bdb.getPrimUuidForConcept(v.getCharacteristicId()));
+                            ecr.setRefinabilityUuid(Bdb.getPrimUuidForConcept(v.getRefinabilityNid()));
+                            ecr.setRelGroup(v.getGroup());
+                            ecr.setTypeUuid(Bdb.getPrimUuidForConcept(v.getTypeNid()));
+                            setupFirstVersion(ecr, v);
+                        } else {
+                            ERelationshipRevision ecv = new ERelationshipRevision();
 
-                  break;
+                            ecv.setCharacteristicUuid(Bdb.getPrimUuidForConcept(v.getCharacteristicId()));
+                            ecv.setRefinabilityUuid(Bdb.getPrimUuidForConcept(v.getRefinabilityNid()));
+                            ecv.setRelGroup(v.getGroup());
+                            ecv.setTypeUuid(Bdb.getPrimUuidForConcept(v.getTypeNid()));
+                            setupRevision(ecr, v, ecv);
+                        }
+                    } catch (AssertionError e) {
+                        AceLog.getAppLog().alertAndLogException(new Exception(e.getLocalizedMessage() + "\n\n"
+                                + c.toLongString(), e));
 
-               default :
-                  throw new UnsupportedOperationException();
-               }
+                        throw e;
+                    }
+                }
+
             }
-         }
-      }
-   }
+        }
 
-   @SuppressWarnings("unchecked")
-   private void setupRevision(TkComponent ec, ConceptComponent.Version v, TkRevision ev) throws IOException {
-      if (ec.revisions == null) {
-         ec.revisions = new ArrayList();
-      }
+        return rels;
+    }
 
-      ev.setPathUuid(Bdb.getPrimUuidForConcept(v.getPathNid()));
-      ev.setStatusUuid(Bdb.getPrimUuidForConcept(v.getStatusNid()));
-      ev.setAuthorUuid(Bdb.getPrimUuidForConcept(v.getAuthorNid()));
-      ev.setTime(v.getTime());
-      ec.revisions.add(ev);
-   }
+    @SuppressWarnings("unchecked")
+    private void setupFirstVersion(TkComponent ec, ConceptComponent<?, ?>.Version v) throws IOException {
+        ec.primordialUuid = v.getPrimUuid();
+        ec.setPathUuid(Bdb.getPrimUuidForConcept(v.getPathNid()));
+        ec.setStatusUuid(Bdb.getPrimUuidForConcept(v.getStatusNid()));
+        ec.setAuthorUuid(Bdb.getPrimUuidForConcept(v.getAuthorNid()));
+        ec.setTime(v.getTime());
 
-   @Override
-   public String toString() {
-      return "EConceptChangeSetComputer: minSapNid: " + minSapNid + " maxSapNid: " + maxSapNid + " policy: "
-             + policy;
-   }
+        if (v.getAdditionalIdentifierParts() != null) {
+            for (IdentifierVersion idv : v.getAdditionalIdentifierParts()) {
+                TkIdentifier eIdv = null;
 
-   //~--- get methods ---------------------------------------------------------
+                if ((idv.getSapNid() >= minSapNid) && (idv.getSapNid() <= maxSapNid)
+                        && (v.getTime() != Long.MIN_VALUE) && (v.getTime() != Long.MAX_VALUE)) {
+                    if (IdentifierVersionLong.class.isAssignableFrom(idv.getClass())) {
+                        eIdv = new EIdentifierLong();
+                    } else if (IdentifierVersionString.class.isAssignableFrom(idv.getClass())) {
+                        eIdv = new EIdentifierString();
+                    } else if (IdentifierVersionUuid.class.isAssignableFrom(idv.getClass())) {
+                        eIdv = new EIdentifierUuid();
+                    }
 
-   /*
-    * (non-Javadoc)
-    * @see
-    * org.ihtsdo.cs.I_ComputeEConceptForChangeSet#getEConcept(org.ihtsdo.concept
-    * .Concept)
-    */
-   @Override
-   public EConcept getEConcept(Concept c) throws IOException {
-      EConcept      ec      = new EConcept();
-      AtomicBoolean changed = new AtomicBoolean(false);
+                    eIdv.setDenotation(idv.getDenotation());
+                    eIdv.setAuthorityUuid(Bdb.getPrimUuidForConcept(idv.getAuthorityNid()));
+                    eIdv.setPathUuid(Bdb.getPrimUuidForConcept(idv.getPathNid()));
+                    eIdv.setStatusUuid(Bdb.getPrimUuidForConcept(idv.getStatusNid()));
+                    eIdv.setAuthorUuid(Bdb.getPrimUuidForConcept(idv.getAuthorNid()));
+                    eIdv.setTime(idv.getTime());
+                }
+            }
+        }
 
-      ec.setPrimordialUuid(c.getPrimUuid());
-      ec.setConceptAttributes(processConceptAttributes(c, changed));
-      ec.setDescriptions(processDescriptions(c, changed));
-      ec.setRelationships(processRelationships(c, changed));
-      ec.setImages(processMedia(c, changed));
+        if (v.getAnnotations() != null) {
+            HashMap<UUID, TkRefsetAbstractMember<?>> annotationMap = new HashMap<UUID, TkRefsetAbstractMember<?>>();
 
-      if (!c.isAnnotationStyleRefex()) {
-         ec.setRefsetMembers(processRefsetMembers(c, changed));
-      }
+            if (ec.getAnnotations() != null) {
+                for (TkRefsetAbstractMember<?> member :
+                        (Collection<TkRefsetAbstractMember<?>>) ec.getAnnotations()) {
+                    annotationMap.put(member.getPrimordialComponentUuid(), member);
+                }
+            }
 
-      if (changed.get()) {
-         return ec;
-      }
+            for (RefsetMember<?, ?> member : (Collection<RefsetMember<?, ?>>) v.getAnnotations()) {
+                TkRefsetAbstractMember<?> eMember = null;
+                Concept concept =
+                        Bdb.getConceptForComponent(member.getReferencedComponentNid());
 
-      return null;
-   }
+                if ((concept != null) && !concept.isCanceled()) {
+                    for (RefsetMember<?, ?>.Version mv : member.getVersions()) {
+                        if (mv.sapIsInRange(minSapNid, maxSapNid) && (mv.getTime() != Long.MIN_VALUE)
+                                && (mv.getTime() != Long.MAX_VALUE)) {
+
+                            if (eMember == null) {
+                                eMember = mv.getERefsetMember();
+
+                                if (eMember != null) {
+                                    if (ec.getAnnotations() == null) {
+                                        ec.setAnnotations(new ArrayList());
+                                    }
+
+                                    ec.getAnnotations().add(eMember);
+                                    setupFirstVersion(eMember, mv);
+                                }
+                            } else {
+                                TkRevision eRevision = mv.getERefsetRevision();
+
+                                setupRevision(eMember, mv, eRevision);
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+
+        if (v.getAdditionalIdentifierParts() != null) {
+            for (IdentifierVersion idv : v.getAdditionalIdentifierParts()) {
+                if (idv.sapIsInRange(minSapNid, maxSapNid)) {
+                    if (ec.getAdditionalIdComponents() == null) {
+                        ec.setAdditionalIdComponents(new ArrayList<TkIdentifier>());
+                    }
+
+                    Object denotation = idv.getDenotation();
+
+                    switch (IDENTIFIER_PART_TYPES.getType(denotation.getClass())) {
+                        case LONG:
+                            ec.additionalIds.add(new EIdentifierLong(idv));
+
+                            break;
+
+                        case STRING:
+                            ec.additionalIds.add(new EIdentifierString(idv));
+
+                            break;
+
+                        case UUID:
+                            ec.additionalIds.add(new EIdentifierUuid(idv));
+
+                            break;
+
+                        default:
+                            throw new UnsupportedOperationException();
+                    }
+                }
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void setupRevision(TkComponent ec, ConceptComponent.Version v, TkRevision ev) throws IOException {
+        if (ec.revisions == null) {
+            ec.revisions = new ArrayList();
+        }
+
+        ev.setPathUuid(Bdb.getPrimUuidForConcept(v.getPathNid()));
+        ev.setStatusUuid(Bdb.getPrimUuidForConcept(v.getStatusNid()));
+        ev.setAuthorUuid(Bdb.getPrimUuidForConcept(v.getAuthorNid()));
+        ev.setTime(v.getTime());
+        ec.revisions.add(ev);
+    }
+
+    @Override
+    public String toString() {
+        return "EConceptChangeSetComputer: minSapNid: " + minSapNid + " maxSapNid: " + maxSapNid + " policy: "
+                + policy;
+    }
+
+    //~--- get methods ---------------------------------------------------------
+
+    /*
+     * (non-Javadoc)
+     * @see
+     * org.ihtsdo.cs.I_ComputeEConceptForChangeSet#getEConcept(org.ihtsdo.concept
+     * .Concept)
+     */
+    @Override
+    public EConcept getEConcept(final Concept c) throws IOException {
+        EConcept ec = new EConcept();
+        AtomicBoolean changed = new AtomicBoolean(false);
+
+        ec.setPrimordialUuid(c.getPrimUuid());
+        ec.setConceptAttributes(processConceptAttributes(c, changed));
+        ec.setDescriptions(processDescriptions(c, changed));
+        ec.setRelationships(processRelationships(c, changed));
+        ec.setImages(processMedia(c, changed));
+
+        if (!c.isAnnotationStyleRefex()) {
+            ec.setRefsetMembers(processRefsetMembers(c, changed));
+        }
+
+        if (changed.get()) {
+            if (ChangeSetWriterHandler.writeCommitRecord && ec.conceptAttributes == null) {
+                ec.setConceptAttributes(new TkConceptAttributes(c.getConAttrs()));
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        AceLog.getEditLog().alertAndLogException(
+                                new Exception("Missing commit record, added: " + 
+                                c.toString()));
+                    }
+                });
+            }
+            return ec;
+        }
+
+        return null;
+    }
 }

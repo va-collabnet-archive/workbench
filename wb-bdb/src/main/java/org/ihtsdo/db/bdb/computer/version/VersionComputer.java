@@ -14,15 +14,9 @@ import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.concept.component.ConceptComponent;
-import org.ihtsdo.concept.component.attributes.ConceptAttributes;
-import org.ihtsdo.concept.component.description.Description;
-import org.ihtsdo.concept.component.refset.RefsetMember;
-import org.ihtsdo.concept.component.refsetmember.cidCid.CidCidRevision;
-import org.ihtsdo.concept.component.relationship.Relationship;
-import org.ihtsdo.concept.component.relationship.RelationshipRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
-import org.ihtsdo.db.bdb.computer.version.PositionMapper.RELATIVE_POSITION;
+import org.ihtsdo.db.bdb.computer.version.PositionMapperBI.RelativePosition;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.NidSet;
@@ -41,7 +35,7 @@ import org.ihtsdo.tk.spec.ValidationException;
 public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
 
     private void handlePart(HashSet<V> partsForPosition,
-            PositionMapper mapper, V part,
+            PositionMapperBI mapper, V part,
             Precedence precedencePolicy,
             ContradictionManagerBI contradictionManager,
             NidSetBI allowedStatus) throws RuntimeException {
@@ -80,7 +74,7 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
                     errorCount++;
                     if (errorCount < 5) {
                         AceLog.getAppLog().warning(
-                                RELATIVE_POSITION.EQUAL
+                                RelativePosition.EQUAL
                                 + " should never happen. "
                                 + "Data is malformed. sap: " + part.getSapNid()
                                 + " Part:\n"
@@ -93,7 +87,7 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
                     // Should have failed mapper.onRoute(part)
                     // above.
                     throw new RuntimeException(
-                            RELATIVE_POSITION.UNREACHABLE
+                            RelativePosition.UNREACHABLE
                             + " should never happen.");
             }
         }
@@ -160,12 +154,12 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
 
         if (positions != null && !positions.isEmpty()) {
             for (PositionBI position : positions) {
-                PositionMapper mapper = Bdb.getSapDb().getMapper(position);
+                PositionMapperBI mapper = Bdb.getSapDb().getMapper(position);
                 for (I_IdPart part : versions) {
                     if (part.getTime() > Long.MIN_VALUE
                             && (authorityNidsFilterList.isEmpty()
                             || authorityNidsFilterList.contains(part.getAuthorityNid()))) {
-                        if (mapper.idsOnRoute(part)) {
+                        if (mapper.onRoute(part)) {
                             specifiedIdParts.add(part);
                         }
                     }
@@ -364,7 +358,7 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
         HashSet<V> partsToAdd = new HashSet<V>();
         for (PositionBI p : positions) {
             HashSet<V> partsForPosition = new HashSet<V>();
-            PositionMapper mapper = Bdb.getSapDb().getMapper(p);
+            PositionMapperBI mapper = Bdb.getSapDb().getMapper(p);
             nextpart:
             for (V part : versions) {
                 if (part.getTime() == Long.MIN_VALUE) {
@@ -424,7 +418,7 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
         HashSet<V> partsToAdd = new HashSet<V>();
         for (PositionBI p : positions) {
             HashSet<V> partsForPosition = new HashSet<V>();
-            PositionMapper mapper = Bdb.getSapDb().getMapper(p);
+            PositionMapperBI mapper = Bdb.getSapDb().getMapper(p);
             nextpart:
             for (V part : versions) {
                 if (part.getTime() == Long.MIN_VALUE) {

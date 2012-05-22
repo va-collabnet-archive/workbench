@@ -36,12 +36,14 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
+import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.workflow.WorkflowHistoryJavaBeanBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
@@ -466,18 +468,56 @@ public class WorkflowHelper {
 
 		if (concept != null) {		
 			resultSet.add(concept);
-			Collection<? extends ConceptVersionBI> children = concept.getRelsIncomingOriginsActiveIsa();
+			
+			ViewCoordinate vc = concept.getViewCoordinate();
 
+			if (vc.getRelAssertionType() == RelAssertionType.STATED || vc.getRelAssertionType() == RelAssertionType.INFERRED_THEN_STATED) {
+				Collection<? extends ConceptVersionBI> children = concept.getRelsIncomingOriginsActiveIsa();
 	
-	    	if (children == null || children.size() == 0) {
-	    		return resultSet;
+		    	if (children == null || children.size() == 0) {
+		    		return resultSet;
+				}
+		    	
+		    	for (ConceptVersionBI child : children) {
+		    		 if (child.getConceptNid() != concept.getConceptNid()) {
+		    			resultSet.addAll(getChildren(child));
+		    		 }
+		    	}
+			} else {
+				vc = new ViewCoordinate(vc);
+				vc.setRelAssertionType(RelAssertionType.INFERRED_THEN_STATED);
+
+				Collection<? extends RelationshipChronicleBI> children = concept.getRelsIncoming();
+
+		    	if (children == null || children.size() == 0) {
+		    		return resultSet;
+				}
+		    	
+				try {
+					if (activeNidRf1 == 0) {
+						 activeNidRf1 = Terms.get().uuidToNative(SnomedMetadataRf1.CURRENT_RF1.getUuids()[0]);
+						 activeNidRf2 = Terms.get().uuidToNative(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()[0]);
+					}
+					
+					if (is_a_relType == 0) {
+						is_a_relType = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
+					}
+					
+			    	for (RelationshipChronicleBI child : children) {
+			    		 if (child.getConceptNid() != concept.getConceptNid()) {
+			    			 RelationshipVersionBI<?> latestVersion = child.getVersion(vc);
+			    			
+			    			 if ((latestVersion.getTypeNid() == is_a_relType) &&
+			    				 (latestVersion.getStatusNid() == activeNidRf1 || latestVersion.getStatusNid() == activeNidRf2)) {
+			    				 ConceptVersionBI childToExamine = Terms.get().getConcept(latestVersion.getOriginNid()).getVersion(vc);
+			    				 resultSet.addAll(getChildren(childToExamine));
+			    			 }
+			    		 }
+			    	}
+				} catch (Exception ee) {
+		        	AceLog.getAppLog().log(Level.WARNING, "Error in identifying workflow children" + ee.getMessage());
+				}
 			}
-	    	
-	    	for (ConceptVersionBI child : children) {
-	    		 if (child.getConceptNid() != concept.getConceptNid()) {
-	    			resultSet.addAll(getChildren(child));
-	    		 }
-	    	}
 		}
 		
     	return resultSet;
@@ -593,6 +633,12 @@ public class WorkflowHelper {
 
 	public static List<RelationshipVersionBI<?>> getWorkflowRelationship(ConceptVersionBI concept, Concept desiredRelationship) 
 	{
+		ViewCoordinate vc = concept.getViewCoordinate();
+		if (vc.getRelAssertionType() != RelAssertionType.STATED && vc.getRelAssertionType() != RelAssertionType.INFERRED_THEN_STATED) {
+			vc = new ViewCoordinate(vc);
+			vc.setRelAssertionType(RelAssertionType.INFERRED_THEN_STATED);
+		}
+
 		List<RelationshipVersionBI<?>> rels = new LinkedList<RelationshipVersionBI<?>>();
 
 		if (concept != null && desiredRelationship != null) {
@@ -605,7 +651,7 @@ public class WorkflowHelper {
 				Collection<? extends I_RelVersioned> allRels = con.getSourceRels();
 				for (I_RelVersioned<?> rel : allRels)
 				{
-					RelationshipVersionBI<?> relVersion = (RelationshipVersionBI<?>) rel.getVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+					RelationshipVersionBI<?> relVersion = (RelationshipVersionBI<?>) rel.getVersion(vc);
 					if (relVersion != null && 
 						relVersion.getTypeNid() == searchRelId &&
 						relVersion.isActive(Terms.get().getActiveAceFrameConfig().getAllowedStatus())) {

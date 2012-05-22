@@ -157,7 +157,7 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
     */
    void addVetoablePropertyChangeListener(CONCEPT_EVENT pce, VetoableChangeListener l);
    void addPropertyChangeListener(CONCEPT_EVENT pce, PropertyChangeListener l);
-   
+
    public enum CONCEPT_EVENT {
     PRE_COMMIT, POST_COMMIT, ADD_UNCOMMITTED;
    }

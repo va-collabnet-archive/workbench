@@ -7,7 +7,7 @@ package org.ihtsdo.taxonomy.model;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.ihtsdo.taxonomy.model.TaxonomyModel;
+import java.util.HashSet;
 import org.ihtsdo.taxonomy.nodes.RootNode;
 import org.ihtsdo.taxonomy.nodes.TaxonomyNode;
 
@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import javax.swing.tree.TreePath;
+import org.dwfa.ace.log.AceLog;
 
 /**
  *
@@ -34,7 +35,18 @@ public class NodePath {
 
       TaxonomyNode parentNode = model.getNodeStore().get(node.parentNodeId);
 
+      HashSet<Long> nodeIdsInPath = new HashSet<Long>();
       while (parentNode != null) {
+         if (nodeIdsInPath.contains(parentNode.nodeId)) {
+             AceLog.getAppLog().alertAndLogException(new Exception("Cycle in NodePath: " + parentNode + " " + nodeIdsInPath));
+             break;
+         } else {
+             nodeIdsInPath.add(parentNode.nodeId);
+             if (nodeIdsInPath.size() > 50) {
+                 AceLog.getAppLog().alertAndLogException(new Exception("NodePath size exceeds max: " + parentNode + " " + nodeIdsInPath));
+                 break;
+             }
+         }
          idList.addLast(parentNode.nodeId);
 
          if ((model.getNodeStore().get(parentNode.parentNodeId) != null)

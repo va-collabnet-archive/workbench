@@ -33,6 +33,10 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/commit", type = BeanType.TASK_BEAN),
                    @Spec(directory = "plugins/precommit/priority", type = BeanType.TASK_BEAN),
@@ -60,8 +64,21 @@ public class TestForIsaCycle extends AbstractConceptTest {
             throws TaskFailedException {
         try {
             ArrayList<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
-
-            Collection<? extends I_RelVersioned> usrl = (Collection<? extends I_RelVersioned>) concept.getSourceRels();
+//            THIS WAS THE OLDER VERSION
+//            Collection<? extends I_RelVersioned> usrl = (Collection<? extends I_RelVersioned>) concept.getSourceRels();
+            /*
+             * I tried to use this line:
+             *  if(rt.isActive(Terms.get().getActiveAceFrameConfig().getViewCoordinate())){
+             * to see if the rel was active. I realized that I was probably not looking at the rel as whole,
+             * but rather at only that particular version.
+             * 
+             * I changed to getting the concept version, and then getting the active rels,
+             * which seemed less complicated and gave me the right result.
+             */
+            ConceptVersionBI cv = Ts.get().getConceptVersion(
+                    Terms.get().getActiveAceFrameConfig().getViewCoordinate(), concept.getConceptNid());
+            Collection<? extends RelationshipVersionBI> activeRels = cv.getRelsOutgoingActive();
+            
             if (Terms.get().getActiveAceFrameConfig() == null || Terms.get().getActiveAceFrameConfig().getEditingPathSet().isEmpty()) {
                 return alertList;
             }
@@ -74,19 +91,35 @@ public class TestForIsaCycle extends AbstractConceptTest {
                     "<html>" + error, concept));
                 
             } else { */
-                for (I_RelVersioned rv : usrl) {
-                    List<? extends I_RelTuple> rvtl = rv.getTuples();
-                    for (I_RelTuple rt : rvtl) {
-                        try {
-                            boolean test = SnoTable.findIsaCycle(rt.getC1Id(), rt.getTypeNid(), rt.getC2Id(), true);
-                            if (test)
-                                foundCycle = true;
+            
+//                 THIS WAS THE OLDER VERSION
+//                for (I_RelVersioned rv : usrl) {
+//                    List<? extends I_RelTuple> rvtl = rv.getTuples();
+//                    for (I_RelTuple rt : rvtl) {
+//                        try {
+//                            if(rt.isActive(Terms.get().getActiveAceFrameConfig().getViewCoordinate())){
+//                                boolean test = SnoTable.findIsaCycle(rt.getC1Id(), rt.getTypeNid(), rt.getC2Id(), true);
+//                                if (test)
+//                                    foundCycle = true;
+//                            }
+//                        } catch (TerminologyException e) {
+//                            AceLog.getAppLog().alertAndLogException(e);
+//                        } catch (IOException e) {
+//                            AceLog.getAppLog().alertAndLogException(e);
+//                        }
+//                    }
+//                }
+                
+                for (RelationshipVersionBI rv : activeRels) {
+                    try{
+                          boolean test = SnoTable.findIsaCycle(rv.getOriginNid(), rv.getTypeNid(), rv.getDestinationNid(), true);
+                          if (test)
+                               foundCycle = true;
                         } catch (TerminologyException e) {
                             AceLog.getAppLog().alertAndLogException(e);
                         } catch (IOException e) {
                             AceLog.getAppLog().alertAndLogException(e);
                         }
-                    }
                 }
 
                 if (foundCycle)

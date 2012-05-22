@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.Collection;
 
 import javax.swing.AbstractAction;
+import javax.swing.JOptionPane;
 
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -38,7 +39,9 @@ public class RetireAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         try {
-            if (I_AmPart.class.isAssignableFrom(component.getClass())) {
+            if (config.getEditingPathSet().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Editing path set is empty.", "Error", JOptionPane.ERROR_MESSAGE);;
+            } else if (I_AmPart.class.isAssignableFrom(component.getClass())) {
                 I_AmPart componentVersion = (I_AmPart) component;
                 for (PathBI ep : config.getEditingPathSet()) {
                     analog = (ComponentVersionBI) componentVersion.makeAnalog(

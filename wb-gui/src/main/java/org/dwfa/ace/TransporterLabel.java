@@ -56,6 +56,8 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 import javax.swing.border.Border;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
 
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -72,6 +74,10 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 import org.ihtsdo.concurrent.future.FutureHelper;
+import org.ihtsdo.taxonomy.model.NodePath;
+import org.ihtsdo.taxonomy.model.TaxonomyModel;
+import org.ihtsdo.taxonomy.nodes.RootNode;
+import org.ihtsdo.taxonomy.nodes.TaxonomyNode;
 
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.taxonomy.path.PathExpander;
@@ -279,6 +285,14 @@ public class TransporterLabel extends JLabel implements I_ContainTermComponent, 
                             "<br>Please add root to preferences before viewing in taxonomy.", "",
                         JOptionPane.ERROR_MESSAGE);
                 } else {
+                    TaxonomyModel model = (TaxonomyModel) this.ace.getTree().getModel();
+                    RootNode root = model.getRoot();
+                    for (Long childNodeId: root.children) {
+                        TaxonomyNode childNode = model.getNodeStore().get(childNodeId);
+                        TreePath path = NodePath.getTreePath(model, childNode);
+                        this.ace.getTree().collapsePath(path);
+                    }
+                    
                     PathExpander epl = new PathExpander(this.ace.getTree(), this.ace.getAceFrameConfig(),
                             (ConceptChronicleBI) termComponent);
                     this.ace.getAceFrameConfig().setHierarchySelection((I_GetConceptData) termComponent);
