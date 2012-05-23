@@ -189,7 +189,7 @@ public class KindOfComputer {
 		}
 	}
 
-	public static void persistIsaCache() throws Exception {
+	public static void persistIsaCache() throws IOException {
 		writeIsaCacheToFile(new File("berkeley-db/isa-cache.oos"));
 	}
 
