@@ -920,6 +920,7 @@ public class GenerateUsers extends AbstractMojo {
 		//set up allowed statuses
 		I_IntSet allowedStatus = tf.newIntSet();
 		allowedStatus.add(SnomedMetadataRf1.CURRENT_RF1.getLenient().getNid());
+                allowedStatus.add(SnomedMetadataRf1.ACTIVE_RF1.getLenient().getNid());
 		allowedStatus.add(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
 		activeConfig.setAllowedStatus(allowedStatus);
 
