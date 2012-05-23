@@ -106,8 +106,8 @@ public class WorkbenchRunner {
 
     // TODO Switch?
     public static boolean SSO = false;
-    public static String SSO_Key = "SSO";
-    public static String LAST_PROFILE_DIR_KEY = "last-profile-dir";
+    public static final String SSO_Key = "SSO";
+    public static final String LAST_PROFILE_DIR_KEY = "last-profile-dir";
 
     public static boolean isSSO() {
         return SSO;
@@ -158,8 +158,12 @@ public class WorkbenchRunner {
         if (userProfile == null) {
             // AceLog.getAppLog().info("up is null "+auth.getApm().getProfile().getAbsolutePath());
             AceLog.getAppLog()
-                .info("up is null " + auth.getApm().getUserName());
+                .info("userProfile is null " + auth.getApm().getUserName());
             // here
+        }
+        if (userProfile != null) {
+            wbProperties.setProperty(LAST_PROFILE_DIR_KEY,
+                FileIO.getRelativePath(userProfile)); 
         }
 
         /*
@@ -377,7 +381,6 @@ public class WorkbenchRunner {
                 // AceLog.getAppLog().info("About to open the init svn dialog svnCheckoutProfileOnStart = "+testSVNURL);
                 // TODO throw some sort of error if url is empty or null
                 String auth_e_msg = authenticate(Svn.getPrompter(), testSVNURL,lastUserprofile);
-
             }
 
             if ((acePropertiesFileExists == false) || (initialized == false)) {
