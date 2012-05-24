@@ -121,7 +121,7 @@ import org.ihtsdo.rules.RulesLibrary.INFERRED_VIEW_ORIGIN;
 			} else {
 				alertList =  RulesLibrary.checkConcept(concept, 
 						tf.getConcept(RefsetAuxiliary.Concept.REALTIME_PRECOMMIT_QA_CONTEXT.getUids()), true, 
-						getFrameConfig(), INFERRED_VIEW_ORIGIN.CONSTRAINT_NORMAL_FORM).getAlertList();
+						getFrameConfig(), INFERRED_VIEW_ORIGIN.STATED).getAlertList();
 				return alertList;
 			}
 		} catch (Exception e) {

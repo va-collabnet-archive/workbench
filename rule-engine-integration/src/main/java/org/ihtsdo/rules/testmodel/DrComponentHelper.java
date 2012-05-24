@@ -36,6 +36,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.helper.metadata.MetadataConversor;
 import org.ihtsdo.qa.inheritance.RelationshipsDAO;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.rules.RulesLibrary.INFERRED_VIEW_ORIGIN;
@@ -62,337 +63,341 @@ import org.ihtsdo.tk.spec.ConceptSpec;
  */
 public class DrComponentHelper {
 
-	/** The all rels. */
-	public static I_IntSet allRels;
-	
-	/** The hist rels. */
-	public static I_IntSet histRels;
-	
-	/** The Cpt model rels. */
-	public static I_IntSet CptModelRels;
+    /**
+     * The all rels.
+     */
+    public static I_IntSet allRels;
+    /**
+     * The hist rels.
+     */
+    public static I_IntSet histRels;
+    /**
+     * The Cpt model rels.
+     */
+    public static I_IntSet CptModelRels;
 
-	/**
-	 * Gets the dr concept.
-	 *
-	 * @param conceptBi the concept bi
-	 * @param factContextName the fact context name
-	 * @param inferredOrigin the inferred origin
-	 * @return the dr concept
-	 */
-	public static DrConcept getDrConcept(ConceptVersionBI conceptBi, String factContextName, 
-			INFERRED_VIEW_ORIGIN inferredOrigin) {
-		I_TermFactory tf = Terms.get();
-		TerminologyStoreDI ts = Ts.get();
-		DrConcept concept = new DrConcept();
+    /**
+     * Gets the dr concept.
+     *
+     * @param conceptBi the concept bi
+     * @param factContextName the fact context name
+     * @param inferredOrigin the inferred origin
+     * @return the dr concept
+     */
+    public static DrConcept getDrConcept(ConceptVersionBI conceptBi, String factContextName,
+            INFERRED_VIEW_ORIGIN inferredOrigin) {
+        I_TermFactory tf = Terms.get();
+        TerminologyStoreDI ts = Ts.get();
+        DrConcept concept = new DrConcept();
+        MetadataConversor metadataConversor = new MetadataConversor();
 
-		try {
-			I_GetConceptData oldStyleConcept = tf.getConcept(conceptBi.getNid());
-			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
-			
-			Set<PositionBI> viewPositions =  new HashSet<PositionBI>();
-			for (PathBI loopPath : config.getEditingPathSet()) {
-				PositionBI pos = Terms.get().newPosition(loopPath, Long.MAX_VALUE);
-				viewPositions.add(pos);
-			}
-			PositionSet mockViewSet = new PositionSet(viewPositions);
+        try {
+            I_GetConceptData oldStyleConcept = tf.getConcept(conceptBi.getNid());
+            I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
 
-			List<? extends I_ConceptAttributeTuple> attributeTuples = oldStyleConcept.getConceptAttributeTuples(null, 
-					mockViewSet, config.getPrecedence(), 
-					config.getConflictResolutionStrategy());
+            Set<PositionBI> viewPositions = new HashSet<PositionBI>();
+            for (PathBI loopPath : config.getEditingPathSet()) {
+                PositionBI pos = Terms.get().newPosition(loopPath, Long.MAX_VALUE);
+                viewPositions.add(pos);
+            }
+            PositionSet mockViewSet = new PositionSet(viewPositions);
 
-			if (attributeTuples != null && !attributeTuples.isEmpty()) {
-				I_ConceptAttributeTuple attributeTuple = attributeTuples.iterator().next();
-				concept.setDefined(attributeTuple.isDefined());
-				concept.setPathUuid(tf.nidToUuid(attributeTuple.getPathNid()).toString());
-				concept.setPrimordialUuid(attributeTuple.getPrimUuid().toString());
-				concept.setStatusUuid(tf.nidToUuid(attributeTuple.getStatusNid()).toString());
-				concept.setTime(attributeTuple.getTime());
-				concept.setFactContextName(factContextName);
-			}
+            List<? extends I_ConceptAttributeTuple> attributeTuples = oldStyleConcept.getConceptAttributeTuples(null,
+                    mockViewSet, config.getPrecedence(),
+                    config.getConflictResolutionStrategy());
 
-			Collection<? extends DescriptionVersionBI> descriptionsList = oldStyleConcept.getDescriptionTuples(null, 
-					null, mockViewSet, 
-					config.getPrecedence(), config.getConflictResolutionStrategy());
+            if (attributeTuples != null && !attributeTuples.isEmpty()) {
+                I_ConceptAttributeTuple attributeTuple = attributeTuples.iterator().next();
+                concept.setDefined(attributeTuple.isDefined());
+                concept.setPathUuid(tf.nidToUuid(attributeTuple.getPathNid()).toString());
+                concept.setPrimordialUuid(attributeTuple.getPrimUuid().toString());
+                concept.setStatusUuid(tf.nidToUuid(metadataConversor.getRf2Value(attributeTuple.getStatusNid())).toString());
+                concept.setTime(attributeTuple.getTime());
+                concept.setFactContextName(factContextName);
+            }
 
-			HashMap<Integer,DrLanguageDesignationSet> languageDesignationSetsMap = new HashMap<Integer,DrLanguageDesignationSet>();
+            Collection<? extends DescriptionVersionBI> descriptionsList = oldStyleConcept.getDescriptionTuples(null,
+                    null, mockViewSet,
+                    config.getPrecedence(), config.getConflictResolutionStrategy());
 
-			ConceptSpec referToRefset = new ConceptSpec("REFERS TO concept association reference set (foundation metadata concept)", UUID.fromString("d15fde65-ed52-3a73-926b-8981e9743ee9"));
+            HashMap<Integer, DrLanguageDesignationSet> languageDesignationSetsMap = new HashMap<Integer, DrLanguageDesignationSet>();
 
-			for (DescriptionVersionBI descriptionVersion : descriptionsList) {
-				Collection<? extends RefexVersionBI<?>> currentAnnotations = descriptionVersion.getChronicle().getCurrentAnnotations(config.getViewCoordinate());
-				for (RefexVersionBI<?> annotation : currentAnnotations) {
-					RefexCnidVersionBI annotationCnid = (RefexCnidVersionBI) annotation;
-					int languageNid = annotationCnid.getCollectionNid();
-					if (!languageDesignationSetsMap.containsKey(languageNid) && annotationCnid.getCollectionNid() != referToRefset.getLenient().getNid()) {
-						DrLanguageDesignationSet langDefSet = new DrLanguageDesignationSet();
-						langDefSet.setLanguageRefsetUuid(tf.nidToUuid(annotationCnid.getCollectionNid()).toString());
-						languageDesignationSetsMap.put(languageNid, langDefSet);
-					}
-				}
-			}
+            ConceptSpec referToRefset = new ConceptSpec("REFERS TO concept association reference set (foundation metadata concept)", UUID.fromString("d15fde65-ed52-3a73-926b-8981e9743ee9"));
 
-			for (DescriptionVersionBI descriptionVersion : descriptionsList) {
-				DrDescription loopDescription = new DrDescription();
-				loopDescription.setAuthorUuid(tf.nidToUuid(descriptionVersion.getAuthorNid()).toString());
-				loopDescription.setConceptUuid(tf.nidToUuid(descriptionVersion.getConceptNid()).toString());
-				loopDescription.setInitialCaseSignificant(descriptionVersion.isInitialCaseSignificant());
-				loopDescription.setLang(descriptionVersion.getLang());
-				loopDescription.setText(descriptionVersion.getText());
-				loopDescription.setTime(descriptionVersion.getTime());
-				loopDescription.setStatusUuid(tf.nidToUuid(descriptionVersion.getStatusNid()).toString());
-				loopDescription.setPathUuid(tf.nidToUuid(descriptionVersion.getPathNid()).toString());
-				loopDescription.setPrimordialUuid(descriptionVersion.getPrimUuid().toString());
-				loopDescription.setTypeUuid(tf.nidToUuid(descriptionVersion.getTypeNid()).toString());
-				loopDescription.setPublished(!getSnomedIntId(descriptionVersion.getNid()).equals("0"));
-				loopDescription.setFactContextName(factContextName);
+            for (DescriptionVersionBI descriptionVersion : descriptionsList) {
+                Collection<? extends RefexVersionBI<?>> currentAnnotations = descriptionVersion.getChronicle().getCurrentAnnotations(config.getViewCoordinate());
+                for (RefexVersionBI<?> annotation : currentAnnotations) {
+                    if (annotation instanceof RefexCnidVersionBI) {
+                        RefexCnidVersionBI annotationCnid = (RefexCnidVersionBI) annotation;
+                        int languageNid = annotationCnid.getCollectionNid();
+                        if (!languageDesignationSetsMap.containsKey(languageNid) && annotationCnid.getCollectionNid() != referToRefset.getLenient().getNid()) {
+                            DrLanguageDesignationSet langDefSet = new DrLanguageDesignationSet();
+                            langDefSet.setLanguageRefsetUuid(tf.nidToUuid(annotationCnid.getCollectionNid()).toString());
+                            languageDesignationSetsMap.put(languageNid, langDefSet);
+                        }
+                    }
 
-				Collection<? extends RefexVersionBI<?>> currentAnnotations = descriptionVersion.getChronicle().getCurrentAnnotations(config.getViewCoordinate());
-				for (RefexVersionBI<?> annotation : currentAnnotations) {
-					try {
-						RefexCnidVersionBI annotationCnid = (RefexCnidVersionBI) annotation;
-						if (annotationCnid.getCollectionNid() == referToRefset.getLenient().getNid()) {
-							loopDescription.setReferToConceptUuid(tf.nativeToUuid(annotationCnid.getCnid1()).iterator().next().toString());
-						} else {
-							DrDescription langDescription = new DrDescription();
-							langDescription.setAuthorUuid(tf.nidToUuid(descriptionVersion.getAuthorNid()).toString());
-							langDescription.setConceptUuid(tf.nidToUuid(descriptionVersion.getConceptNid()).toString());
-							langDescription.setInitialCaseSignificant(descriptionVersion.isInitialCaseSignificant());
-							langDescription.setLang(descriptionVersion.getLang());
-							langDescription.setText(descriptionVersion.getText());
-							langDescription.setTime(descriptionVersion.getTime());
-							langDescription.setStatusUuid(tf.nidToUuid(descriptionVersion.getStatusNid()).toString());
-							langDescription.setPathUuid(tf.nidToUuid(descriptionVersion.getPathNid()).toString());
-							langDescription.setPrimordialUuid(descriptionVersion.getPrimUuid().toString());
-							langDescription.setTypeUuid(tf.nidToUuid(descriptionVersion.getTypeNid()).toString());
-							langDescription.setFactContextName(factContextName);
+                }
+            }
 
-							int languageNid = annotationCnid.getCollectionNid();
-							DrLanguageDesignationSet langDefSet = languageDesignationSetsMap.get(languageNid);
-							langDescription.setAcceptabilityUuid(tf.nidToUuid(annotationCnid.getCnid1()).toString());
-							langDescription.setLanguageRefsetUuid(tf.nidToUuid(annotationCnid.getCollectionNid()).toString());
-							langDefSet.getDescriptions().add(langDescription);
-						}
-					} catch (Exception e) {
-						// not cnid annotation, ignore
-					}
-				}
+            for (DescriptionVersionBI descriptionVersion : descriptionsList) {
+                DrDescription loopDescription = new DrDescription();
+                loopDescription.setAuthorUuid(tf.nidToUuid(descriptionVersion.getAuthorNid()).toString());
+                loopDescription.setConceptUuid(tf.nidToUuid(descriptionVersion.getConceptNid()).toString());
+                loopDescription.setInitialCaseSignificant(descriptionVersion.isInitialCaseSignificant());
+                loopDescription.setLang(descriptionVersion.getLang());
+                loopDescription.setText(descriptionVersion.getText());
+                loopDescription.setTime(descriptionVersion.getTime());
+                loopDescription.setStatusUuid(tf.nidToUuid(metadataConversor.getRf2Value(descriptionVersion.getStatusNid())).toString());
+                loopDescription.setPathUuid(tf.nidToUuid(descriptionVersion.getPathNid()).toString());
+                loopDescription.setPrimordialUuid(descriptionVersion.getPrimUuid().toString());
+                loopDescription.setTypeUuid(tf.nidToUuid(metadataConversor.getRf2Value(descriptionVersion.getTypeNid())).toString());
+                loopDescription.setPublished(!getSnomedIntId(descriptionVersion.getNid()).equals("0"));
+                loopDescription.setFactContextName(factContextName);
 
-				concept.getDescriptions().add(loopDescription);
+                Collection<? extends RefexVersionBI<?>> currentAnnotations = descriptionVersion.getChronicle().getCurrentAnnotationMembers(config.getViewCoordinate());
+                for (RefexVersionBI<?> annotation : currentAnnotations) {
+                    if (annotation instanceof RefexCnidVersionBI) {
+                        RefexCnidVersionBI annotationCnid = (RefexCnidVersionBI) annotation;
+                        if (annotationCnid.getCollectionNid() == referToRefset.getLenient().getNid()) {
+                            loopDescription.setReferToConceptUuid(tf.nativeToUuid(annotationCnid.getCnid1()).iterator().next().toString());
+                        } else {
+                            DrDescription langDescription = new DrDescription();
+                            langDescription.setAuthorUuid(tf.nidToUuid(descriptionVersion.getAuthorNid()).toString());
+                            langDescription.setConceptUuid(tf.nidToUuid(descriptionVersion.getConceptNid()).toString());
+                            langDescription.setInitialCaseSignificant(descriptionVersion.isInitialCaseSignificant());
+                            langDescription.setLang(descriptionVersion.getLang());
+                            langDescription.setText(descriptionVersion.getText());
+                            langDescription.setTime(descriptionVersion.getTime());
+                            langDescription.setStatusUuid(tf.nidToUuid(metadataConversor.getRf2Value(descriptionVersion.getStatusNid())).toString());
+                            langDescription.setPathUuid(tf.nidToUuid(descriptionVersion.getPathNid()).toString());
+                            langDescription.setPrimordialUuid(descriptionVersion.getPrimUuid().toString());
+                            langDescription.setTypeUuid(tf.nidToUuid(metadataConversor.getRf2Value(descriptionVersion.getTypeNid())).toString());
+                            langDescription.setFactContextName(factContextName);
 
-			}
+                            int languageNid = annotationCnid.getCollectionNid();
+                            DrLanguageDesignationSet langDefSet = languageDesignationSetsMap.get(languageNid);
+                            langDescription.setAcceptabilityUuid(tf.nidToUuid(metadataConversor.getRf2Value(annotationCnid.getCnid1())).toString());
+                            langDescription.setLanguageRefsetUuid(tf.nidToUuid(annotationCnid.getCollectionNid()).toString());
+                            langDefSet.getDescriptions().add(langDescription);
+                        }
+                    }
+                }
 
-			for (DrLanguageDesignationSet langSet : languageDesignationSetsMap.values()) {
-				concept.getLanguageDesignationSets().add(langSet);
-			}
+                concept.getDescriptions().add(loopDescription);
 
-			if (allRels == null) {
-				allRels =RulesLibrary.getAllRels();
-			}
+            }
 
-			int stated = SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getLenient().getNid();
-			int inferred = SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2.getLenient().getNid();
-			int historical = tf.uuidToNative(ArchitectonicAuxiliary.Concept.HISTORICAL_CHARACTERISTIC.getUids());
+            for (DrLanguageDesignationSet langSet : languageDesignationSetsMap.values()) {
+                concept.getLanguageDesignationSets().add(langSet);
+            }
 
-			if (inferredOrigin == INFERRED_VIEW_ORIGIN.STATED) {
-				for (RelationshipVersionBI<?> relTuple : oldStyleConcept.getSourceRelTuples(null, 
-						null, 
-						mockViewSet, config.getPrecedence(), 
-						config.getConflictResolutionStrategy())) {
-					if (relTuple.getCharacteristicNid() == stated) {
-						DrRelationship loopRel = new DrRelationship();
-						loopRel.setModifierUuid("someUuid");
-						loopRel.setAuthorUuid(tf.nidToUuid(relTuple.getAuthorNid()).toString());
-						loopRel.setSourceUuid(tf.nidToUuid(relTuple.getOriginNid()).toString());
-						loopRel.setTargetUuid(tf.nidToUuid(relTuple.getDestinationNid()).toString());
-						loopRel.setCharacteristicUuid(tf.nidToUuid(relTuple.getCharacteristicNid()).toString());
-						loopRel.setPathUuid(tf.nidToUuid(relTuple.getPathNid()).toString());
-						loopRel.setPrimordialUuid(relTuple.getPrimUuid().toString());
-						loopRel.setRelGroup(relTuple.getGroup());
-						loopRel.setStatusUuid(tf.nidToUuid(relTuple.getStatusNid()).toString());
-						loopRel.setTime(relTuple.getTime());
-						loopRel.setTypeUuid(tf.nidToUuid(relTuple.getTypeNid()).toString());
-						loopRel.setFactContextName(factContextName);
-						loopRel.setPublished(!getSnomedIntId(relTuple.getNid()).equals("0"));
-						concept.getOutgoingRelationships().add(loopRel);
-					}
-				}
-			} else if (inferredOrigin == INFERRED_VIEW_ORIGIN.INFERRED) {
-				for (RelationshipVersionBI<?> relTuple : oldStyleConcept.getSourceRelTuples(null, 
-						null, 
-						mockViewSet, config.getPrecedence(), 
-						config.getConflictResolutionStrategy())) {
-					if (relTuple.getCharacteristicNid() == inferred) {
-						DrRelationship loopRel = new DrRelationship();
-						loopRel.setModifierUuid("someUuid");
-						loopRel.setAuthorUuid(tf.nidToUuid(relTuple.getAuthorNid()).toString());
-						loopRel.setSourceUuid(tf.nidToUuid(relTuple.getOriginNid()).toString());
-						loopRel.setTargetUuid(tf.nidToUuid(relTuple.getDestinationNid()).toString());
-						loopRel.setCharacteristicUuid(tf.nidToUuid(relTuple.getCharacteristicNid()).toString());
-						loopRel.setPathUuid(tf.nidToUuid(relTuple.getPathNid()).toString());
-						loopRel.setPrimordialUuid(relTuple.getPrimUuid().toString());
-						loopRel.setRelGroup(relTuple.getGroup());
-						loopRel.setStatusUuid(tf.nidToUuid(relTuple.getStatusNid()).toString());
-						loopRel.setTime(relTuple.getTime());
-						loopRel.setTypeUuid(tf.nidToUuid(relTuple.getTypeNid()).toString());
-						loopRel.setFactContextName(factContextName);
-						loopRel.setPublished(!getSnomedIntId(relTuple.getNid()).equals("0"));
-						concept.getOutgoingRelationships().add(loopRel);
-					}
-				}
-			}else if (inferredOrigin == INFERRED_VIEW_ORIGIN.CONSTRAINT_NORMAL_FORM) {
-				RelationshipsDAO rDao=new RelationshipsDAO();
-				concept.getOutgoingRelationships().addAll(rDao.getConstraintNormalForm(oldStyleConcept, factContextName));
-				rDao=null;
-				System.gc();
-			}
+            if (allRels == null) {
+                allRels = RulesLibrary.getAllRels();
+            }
 
-			DrDefiningRolesSet statedRolesSet = new DrDefiningRolesSet();
-			statedRolesSet.setRolesSetType("Stated");
+            int stated = SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getLenient().getNid();
+            int inferred = SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2.getLenient().getNid();
+            int historical = tf.uuidToNative(ArchitectonicAuxiliary.Concept.HISTORICAL_CHARACTERISTIC.getUids());
 
-			DrDefiningRolesSet inferredRolesSet = new DrDefiningRolesSet();
-			inferredRolesSet.setRolesSetType("Inferred");
+            if (inferredOrigin == INFERRED_VIEW_ORIGIN.STATED) {
+                for (RelationshipVersionBI<?> relTuple : oldStyleConcept.getSourceRelTuples(null,
+                        null,
+                        mockViewSet, config.getPrecedence(),
+                        config.getConflictResolutionStrategy())) {
+                    if (metadataConversor.getRf2Value(relTuple.getCharacteristicNid()) == stated) {
+                        DrRelationship loopRel = new DrRelationship();
+                        loopRel.setModifierUuid("someUuid");
+                        loopRel.setAuthorUuid(tf.nidToUuid(relTuple.getAuthorNid()).toString());
+                        loopRel.setSourceUuid(tf.nidToUuid(relTuple.getOriginNid()).toString());
+                        loopRel.setTargetUuid(tf.nidToUuid(relTuple.getDestinationNid()).toString());
+                        loopRel.setCharacteristicUuid(tf.nidToUuid(metadataConversor.getRf2Value(relTuple.getCharacteristicNid())).toString());
+                        loopRel.setPathUuid(tf.nidToUuid(relTuple.getPathNid()).toString());
+                        loopRel.setPrimordialUuid(relTuple.getPrimUuid().toString());
+                        loopRel.setRelGroup(relTuple.getGroup());
+                        loopRel.setStatusUuid(tf.nidToUuid(metadataConversor.getRf2Value(relTuple.getStatusNid())).toString());
+                        loopRel.setTime(relTuple.getTime());
+                        loopRel.setTypeUuid(tf.nidToUuid(relTuple.getTypeNid()).toString());
+                        loopRel.setFactContextName(factContextName);
+                        loopRel.setPublished(!getSnomedIntId(relTuple.getNid()).equals("0"));
+                        concept.getOutgoingRelationships().add(loopRel);
+                    }
+                }
+            } else if (inferredOrigin == INFERRED_VIEW_ORIGIN.INFERRED) {
+                for (RelationshipVersionBI<?> relTuple : oldStyleConcept.getSourceRelTuples(null,
+                        null,
+                        mockViewSet, config.getPrecedence(),
+                        config.getConflictResolutionStrategy())) {
+                    if (metadataConversor.getRf2Value(relTuple.getCharacteristicNid()) == inferred) {
+                        DrRelationship loopRel = new DrRelationship();
+                        loopRel.setModifierUuid("someUuid");
+                        loopRel.setAuthorUuid(tf.nidToUuid(relTuple.getAuthorNid()).toString());
+                        loopRel.setSourceUuid(tf.nidToUuid(relTuple.getOriginNid()).toString());
+                        loopRel.setTargetUuid(tf.nidToUuid(relTuple.getDestinationNid()).toString());
+                        loopRel.setCharacteristicUuid(tf.nidToUuid(metadataConversor.getRf2Value(relTuple.getCharacteristicNid())).toString());
+                        loopRel.setPathUuid(tf.nidToUuid(relTuple.getPathNid()).toString());
+                        loopRel.setPrimordialUuid(relTuple.getPrimUuid().toString());
+                        loopRel.setRelGroup(relTuple.getGroup());
+                        loopRel.setStatusUuid(tf.nidToUuid(metadataConversor.getRf2Value(relTuple.getStatusNid())).toString());
+                        loopRel.setTime(relTuple.getTime());
+                        loopRel.setTypeUuid(tf.nidToUuid(relTuple.getTypeNid()).toString());
+                        loopRel.setFactContextName(factContextName);
+                        loopRel.setPublished(!getSnomedIntId(relTuple.getNid()).equals("0"));
+                        concept.getOutgoingRelationships().add(loopRel);
+                    }
+                }
+            } else if (inferredOrigin == INFERRED_VIEW_ORIGIN.CONSTRAINT_NORMAL_FORM) {
+                RelationshipsDAO rDao = new RelationshipsDAO();
+                concept.getOutgoingRelationships().addAll(rDao.getConstraintNormalForm(oldStyleConcept, factContextName));
+                rDao = null;
+                System.gc();
+            }
 
-			DrDefiningRolesSet modelersRolesSet = new DrDefiningRolesSet();
-			modelersRolesSet.setRolesSetType("Modelers");
-			
-			DrDefiningRolesSet definingFormRolesSet = new DrDefiningRolesSet();
-			definingFormRolesSet.setRolesSetType("Defining");
+            DrDefiningRolesSet statedRolesSet = new DrDefiningRolesSet();
+            statedRolesSet.setRolesSetType("Stated");
 
-			for (RelationshipVersionBI relTuple : oldStyleConcept.getSourceRelTuples(null, 
-					null, 
-					mockViewSet, config.getPrecedence(), 
-					config.getConflictResolutionStrategy())) {
-				DrRelationship loopRel = new DrRelationship();
-				loopRel.setModifierUuid("someUuid");
-				loopRel.setAuthorUuid(tf.nidToUuid(relTuple.getAuthorNid()).toString());
-				loopRel.setSourceUuid(tf.nidToUuid(relTuple.getOriginNid()).toString());
-				loopRel.setTargetUuid(tf.nidToUuid(relTuple.getDestinationNid()).toString());
-				loopRel.setCharacteristicUuid(tf.nidToUuid(relTuple.getCharacteristicNid()).toString());
-				loopRel.setPathUuid(tf.nidToUuid(relTuple.getPathNid()).toString());
-				loopRel.setPrimordialUuid(relTuple.getPrimUuid().toString());
-				loopRel.setRelGroup(relTuple.getGroup());
-				loopRel.setStatusUuid(tf.nidToUuid(relTuple.getStatusNid()).toString());
-				loopRel.setTime(relTuple.getTime());
-				loopRel.setTypeUuid(tf.nidToUuid(relTuple.getTypeNid()).toString());
-				loopRel.setFactContextName(factContextName);
-				loopRel.setPublished(!getSnomedIntId(relTuple.getNid()).equals("0"));
+            DrDefiningRolesSet inferredRolesSet = new DrDefiningRolesSet();
+            inferredRolesSet.setRolesSetType("Inferred");
 
-				if (relTuple.getCharacteristicNid() == historical && 
-						config.getAllowedStatus().contains(relTuple.getStatusNid())) {
-					concept.getOutgoingRelationships().add(loopRel);
-				}
+            DrDefiningRolesSet modelersRolesSet = new DrDefiningRolesSet();
+            modelersRolesSet.setRolesSetType("Modelers");
 
-				if (relTuple.getCharacteristicNid() == stated && 
-						config.getAllowedStatus().contains(relTuple.getStatusNid())) {
-					statedRolesSet.getRelationships().add(loopRel);
-				}
+            DrDefiningRolesSet definingFormRolesSet = new DrDefiningRolesSet();
+            definingFormRolesSet.setRolesSetType("Defining");
 
-				if (relTuple.getCharacteristicNid() != inferred) {
-					modelersRolesSet.getRelationships().add(loopRel);
-				}
+            for (RelationshipVersionBI relTuple : oldStyleConcept.getSourceRelTuples(null,
+                    null,
+                    mockViewSet, config.getPrecedence(),
+                    config.getConflictResolutionStrategy())) {
+                DrRelationship loopRel = new DrRelationship();
+                loopRel.setModifierUuid("someUuid");
+                loopRel.setAuthorUuid(tf.nidToUuid(relTuple.getAuthorNid()).toString());
+                loopRel.setSourceUuid(tf.nidToUuid(relTuple.getOriginNid()).toString());
+                loopRel.setTargetUuid(tf.nidToUuid(relTuple.getDestinationNid()).toString());
+                loopRel.setCharacteristicUuid(tf.nidToUuid(metadataConversor.getRf2Value(relTuple.getCharacteristicNid())).toString());
+                loopRel.setPathUuid(tf.nidToUuid(relTuple.getPathNid()).toString());
+                loopRel.setPrimordialUuid(relTuple.getPrimUuid().toString());
+                loopRel.setRelGroup(relTuple.getGroup());
+                loopRel.setStatusUuid(tf.nidToUuid(metadataConversor.getRf2Value(relTuple.getStatusNid())).toString());
+                loopRel.setTime(relTuple.getTime());
+                loopRel.setTypeUuid(tf.nidToUuid(relTuple.getTypeNid()).toString());
+                loopRel.setFactContextName(factContextName);
+                loopRel.setPublished(!getSnomedIntId(relTuple.getNid()).equals("0"));
 
-				if (relTuple.getCharacteristicNid() == inferred && 
-						config.getAllowedStatus().contains(relTuple.getStatusNid())) {
-					inferredRolesSet.getRelationships().add(loopRel);
-				}
-			}
-			concept.getDefiningRoleSets().add(statedRolesSet);
-			concept.getDefiningRoleSets().add(modelersRolesSet);
-			concept.getDefiningRoleSets().add(inferredRolesSet);
-			
-			definingFormRolesSet.setRelationships(new ArrayList<DrRelationship>());
-			definingFormRolesSet.getRelationships().addAll(concept.getOutgoingRelationships());
-			concept.getDefiningRoleSets().add(definingFormRolesSet);
-			//TODO: incoming rels is heavy on performance moved to helper method
-			//			for (RelationshipVersionBI relTuple :  oldStyleConcept.getDestRelTuples(config.getAllowedStatus(), 
-			//					null, 
-			//					mockViewSet, config.getPrecedence(), 
-			//					config.getConflictResolutionStrategy())) {
-			//				if (relTuple.getCharacteristicNid() == historical) {
-			//					DrRelationship loopRel = new DrRelationship();
-			//					loopRel.setModifierUuid("someUuid");
-			//					loopRel.setAuthorUuid(tf.nidToUuid(relTuple.getAuthorNid()).toString());
-			//					loopRel.setSourceUuid(tf.nidToUuid(relTuple.getOriginNid()).toString());
-			//					loopRel.setTargetUuid(tf.nidToUuid(relTuple.getDestinationNid()).toString());
-			//					loopRel.setCharacteristicUuid(tf.nidToUuid(relTuple.getCharacteristicNid()).toString());
-			//					loopRel.setPathUuid(tf.nidToUuid(relTuple.getPathNid()).toString());
-			//					loopRel.setPrimordialUuid(relTuple.getPrimUuid().toString());
-			//					loopRel.setRelGroup(relTuple.getGroup());
-			//					loopRel.setStatusUuid(tf.nidToUuid(relTuple.getStatusNid()).toString());
-			//					loopRel.setTime(relTuple.getTime());
-			//					loopRel.setTypeUuid(tf.nidToUuid(relTuple.getTypeNid()).toString());
-			//					loopRel.setFactContextName(factContextName);
-			//					concept.getIncomingRelationships().add(loopRel);
-			//				}
-			//			}
+                if (metadataConversor.getRf2Value(relTuple.getCharacteristicNid()) == historical
+                        && config.getAllowedStatus().contains(metadataConversor.getRf2Value(relTuple.getStatusNid()))) {
+                    concept.getOutgoingRelationships().add(loopRel);
+                }
 
-		} catch (IOException e) {
-			AceLog.getAppLog().alertAndLogException(e);
-		} catch (TerminologyException e) {
-			AceLog.getAppLog().alertAndLogException(e);
-		}
+                if (metadataConversor.getRf2Value(relTuple.getCharacteristicNid()) == stated
+                        && config.getAllowedStatus().contains(metadataConversor.getRf2Value(relTuple.getStatusNid()))) {
+                    statedRolesSet.getRelationships().add(loopRel);
+                }
 
-		return concept;
+                if (metadataConversor.getRf2Value(relTuple.getCharacteristicNid()) != inferred) {
+                    modelersRolesSet.getRelationships().add(loopRel);
+                }
 
-	}
+                if (metadataConversor.getRf2Value(relTuple.getCharacteristicNid()) == inferred
+                        && config.getAllowedStatus().contains(metadataConversor.getRf2Value(relTuple.getStatusNid()))) {
+                    inferredRolesSet.getRelationships().add(loopRel);
+                }
+            }
+            concept.getDefiningRoleSets().add(statedRolesSet);
+            concept.getDefiningRoleSets().add(modelersRolesSet);
+            concept.getDefiningRoleSets().add(inferredRolesSet);
 
-	/**
-	 * Gets the descendants.
-	 *
-	 * @param descendants the descendants
-	 * @param concept the concept
-	 * @return the descendants
-	 */
-	public static Set<I_GetConceptData> getDescendants(Set<I_GetConceptData> descendants, I_GetConceptData concept) {
-		try {
-			I_TermFactory termFactory = Terms.get();
-			I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
-			Set<PositionBI> viewPositions =  new HashSet<PositionBI>();
-			for (PathBI loopPath : config.getEditingPathSet()) {
-				PositionBI pos = termFactory.newPosition(loopPath, Long.MAX_VALUE);
-				viewPositions.add(pos);
-			}
-			PositionSet mockViewSet = new PositionSet(viewPositions);
-			Set<I_GetConceptData> childrenSet = new HashSet<I_GetConceptData>();
-			childrenSet.addAll(concept.getDestRelOrigins(config.getAllowedStatus(), 
-					config.getDestRelTypes(), mockViewSet
-					, config.getPrecedence(), config.getConflictResolutionStrategy()));
-			descendants.addAll(childrenSet);
-			for (I_GetConceptData loopConcept : childrenSet) {
-				descendants = getDescendants(descendants, loopConcept);
-			}
-		} catch (IOException e) {
-			AceLog.getAppLog().alertAndLogException(e);
-		} catch (TerminologyException e) {
-			AceLog.getAppLog().alertAndLogException(e);
-		}
-		return descendants;
-	}
-	
-	/**
-	 * Gets the snomed int id.
-	 *
-	 * @param nid the nid
-	 * @return the snomed int id
-	 * @throws IOException Signals that an I/O exception has occurred.
-	 * @throws TerminologyException the terminology exception
-	 */
-	public static String getSnomedIntId(int nid) throws IOException, TerminologyException {
-		Long descriptionId = 0L; //If description is new then descriptionid doesn't exist in workbench so use dummy value.
-		I_Identify desc_Identify = Terms.get().getId(nid);
-		List<? extends I_IdVersion> i_IdentifyList = desc_Identify.getIdVersions();
-		if (i_IdentifyList.size() > 0) {
-			for (int i = 0; i < i_IdentifyList.size(); i++) {
-				I_IdVersion i_IdVersion = (I_IdVersion) i_IdentifyList.get(i);
-				Object denotation = (Object) i_IdVersion.getDenotation();
-				int authorityNid = i_IdVersion.getAuthorityNid();
-				int arcAuxSnomedIntegerNid = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid();
-				if (authorityNid == arcAuxSnomedIntegerNid) {
-					descriptionId = (Long) denotation;
-				}
-			}
-		}
-		return descriptionId.toString();
-	}
-	
+            definingFormRolesSet.setRelationships(new ArrayList<DrRelationship>());
+            definingFormRolesSet.getRelationships().addAll(concept.getOutgoingRelationships());
+            concept.getDefiningRoleSets().add(definingFormRolesSet);
+            //TODO: incoming rels is heavy on performance moved to helper method
+            //			for (RelationshipVersionBI relTuple :  oldStyleConcept.getDestRelTuples(config.getAllowedStatus(), 
+            //					null, 
+            //					mockViewSet, config.getPrecedence(), 
+            //					config.getConflictResolutionStrategy())) {
+            //				if (relTuple.getCharacteristicNid() == historical) {
+            //					DrRelationship loopRel = new DrRelationship();
+            //					loopRel.setModifierUuid("someUuid");
+            //					loopRel.setAuthorUuid(tf.nidToUuid(relTuple.getAuthorNid()).toString());
+            //					loopRel.setSourceUuid(tf.nidToUuid(relTuple.getOriginNid()).toString());
+            //					loopRel.setTargetUuid(tf.nidToUuid(relTuple.getDestinationNid()).toString());
+            //					loopRel.setCharacteristicUuid(tf.nidToUuid(relTuple.getCharacteristicNid()).toString());
+            //					loopRel.setPathUuid(tf.nidToUuid(relTuple.getPathNid()).toString());
+            //					loopRel.setPrimordialUuid(relTuple.getPrimUuid().toString());
+            //					loopRel.setRelGroup(relTuple.getGroup());
+            //					loopRel.setStatusUuid(tf.nidToUuid(relTuple.getStatusNid()).toString());
+            //					loopRel.setTime(relTuple.getTime());
+            //					loopRel.setTypeUuid(tf.nidToUuid(relTuple.getTypeNid()).toString());
+            //					loopRel.setFactContextName(factContextName);
+            //					concept.getIncomingRelationships().add(loopRel);
+            //				}
+            //			}
+
+        } catch (IOException e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        } catch (TerminologyException e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        }
+
+        return concept;
+
+    }
+
+    /**
+     * Gets the descendants.
+     *
+     * @param descendants the descendants
+     * @param concept the concept
+     * @return the descendants
+     */
+    public static Set<I_GetConceptData> getDescendants(Set<I_GetConceptData> descendants, I_GetConceptData concept) {
+        try {
+            I_TermFactory termFactory = Terms.get();
+            I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
+            Set<PositionBI> viewPositions = new HashSet<PositionBI>();
+            for (PathBI loopPath : config.getEditingPathSet()) {
+                PositionBI pos = termFactory.newPosition(loopPath, Long.MAX_VALUE);
+                viewPositions.add(pos);
+            }
+            PositionSet mockViewSet = new PositionSet(viewPositions);
+            Set<I_GetConceptData> childrenSet = new HashSet<I_GetConceptData>();
+            childrenSet.addAll(concept.getDestRelOrigins(config.getAllowedStatus(),
+                    config.getDestRelTypes(), mockViewSet, config.getPrecedence(), config.getConflictResolutionStrategy()));
+            descendants.addAll(childrenSet);
+            for (I_GetConceptData loopConcept : childrenSet) {
+                descendants = getDescendants(descendants, loopConcept);
+            }
+        } catch (IOException e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        } catch (TerminologyException e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        }
+        return descendants;
+    }
+
+    /**
+     * Gets the snomed int id.
+     *
+     * @param nid the nid
+     * @return the snomed int id
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws TerminologyException the terminology exception
+     */
+    public static String getSnomedIntId(int nid) throws IOException, TerminologyException {
+        Long descriptionId = 0L; //If description is new then descriptionid doesn't exist in workbench so use dummy value.
+        I_Identify desc_Identify = Terms.get().getId(nid);
+        List<? extends I_IdVersion> i_IdentifyList = desc_Identify.getIdVersions();
+        if (i_IdentifyList.size() > 0) {
+            for (int i = 0; i < i_IdentifyList.size(); i++) {
+                I_IdVersion i_IdVersion = (I_IdVersion) i_IdentifyList.get(i);
+                Object denotation = (Object) i_IdVersion.getDenotation();
+                int authorityNid = i_IdVersion.getAuthorityNid();
+                int arcAuxSnomedIntegerNid = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid();
+                if (authorityNid == arcAuxSnomedIntegerNid) {
+                    descriptionId = (Long) denotation;
+                }
+            }
+        }
+        return descriptionId.toString();
+    }
 }
