@@ -42,7 +42,6 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.DescFact;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 public class MoveDescAction extends AbstractAction {
 
@@ -193,12 +192,10 @@ public class MoveDescAction extends AbstractAction {
             I_AmPart componentVersion;
             ViewCoordinate vc = config.getViewCoordinate();
             Collection<? extends RefexChronicleBI> refexes = desc.getCurrentRefexes(vc);
-            int usNid = SnomedMetadataRfx.getUS_DIALECT_REFEX_NID();
-            int gbNid = SnomedMetadataRfx.getGB_DIALECT_REFEX_NID();
-            int dosNid = SnomedMetadataRfx.getSYNONYMY_REFEX_NID();
+            int inappropriateRefexNid = SnomedMetadataRfx.getREFERS_TO_REFEX_NID();
             for (RefexChronicleBI refex : refexes) {
                 int refexNid = refex.getCollectionNid();
-                if (refexNid == gbNid || refexNid == usNid || refexNid == dosNid) {
+                if (refexNid != inappropriateRefexNid) {
                     componentVersion = (I_AmPart) refex;
                     for (PathBI ep : config.getEditingPathSet()) {
                         componentVersion.makeAnalog(
