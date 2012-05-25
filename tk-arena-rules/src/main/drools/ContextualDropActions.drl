@@ -49,6 +49,7 @@ import org.ihtsdo.arena.context.action.SetDefinedAction;
 import org.ihtsdo.arena.context.action.SetICSignificantAction;
 import org.ihtsdo.arena.context.action.RetireAsInappropriateAction;
 import org.ihtsdo.arena.context.action.CancelAction;
+import org.ihtsdo.arena.context.action.ToggleReviewStatusAction;
 //import org.ihtsdo.arena.context.action.ChangeRefexAction;
 
 import org.ihtsdo.tk.drools.facts.ComponentFact;
@@ -77,6 +78,7 @@ import org.ihtsdo.tk.example.binding.SnomedRelSpec;
 import org.ihtsdo.tk.example.binding.Taxonomies;
 import org.ihtsdo.tk.example.binding.TermAux;
 import org.ihtsdo.tk.example.binding.WbDescType;
+import org.ihtsdo.tk.binding.snomed.RefsetAux;
 import org.ihtsdo.arena.spec.Refsets; 
 import org.ihtsdo.arena.spec.AcceptabilityType;
 import org.ihtsdo.arena.spec.SynonymyType;
@@ -1019,4 +1021,14 @@ rule "rule 58" #retire inappropriate synonym
 		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
 	then
 		actions.add(new RetireAsInappropriateAction("retire as inappropriate", $dropTarget, cvSettings, config));
+end
+
+rule "rule 59" #Toggle SNOMED review status
+	when
+                ViewFact(getView() == View.STATED)
+		$dropTarget: DescFact(this isMemberOf RefsetAux.SNOMED_REV_STATUS, 
+							  context == Context.DROP_TARGET)
+		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);					   								   
+	then
+		actions.add(new ToggleReviewStatusAction("toggle review status", $dropTarget, config));
 end
