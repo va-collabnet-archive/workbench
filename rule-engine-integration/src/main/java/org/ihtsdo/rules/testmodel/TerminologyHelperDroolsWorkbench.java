@@ -367,7 +367,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 					if (potential_fsn != null) {
 						for (I_DescriptionPart part_search : potential_fsn.getMutableParts()) {
 							if (allowedStatusNids.contains(part_search.getStatusNid())
-									&& part_search.getText().equals(fsn)) {
+									&& part_search.getText().toLowerCase().equals(fsn.toLowerCase())) {
 								unique = false;
 								break search;
 							} 
