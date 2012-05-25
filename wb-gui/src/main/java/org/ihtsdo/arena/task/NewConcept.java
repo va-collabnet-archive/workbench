@@ -1022,49 +1022,53 @@ public class NewConcept extends PreviousNextOrCancel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-
-            TerminologyListModel model = (TerminologyListModel) tl.getModel();
-            nidList = model.getNidsInList();
-
-            if (fsn.extractText().length() == 0) {
-                //please enter the fsn
-                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                        "please enter the fsn", "",
-                        JOptionPane.ERROR_MESSAGE);
-            } else if ((fsn.extractText().length() != 0) && (fsn.extractText().indexOf("(") == -1 || fsn.extractText().indexOf(")") == -1)) {
-                //test for semantic tag
-                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                        "please enter the semantic tag", "",
-                        JOptionPane.ERROR_MESSAGE);
-            } else if (nidList.isEmpty()) {
-                //please list parents for the new concept
-                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                        "please list parents for the new concept", "",
-                        JOptionPane.ERROR_MESSAGE);
-            } else if (fsn.extractText().length() != 0 && fsn.extractText().indexOf("(") > 0
-                    && fsn.extractText().indexOf(")") > fsn.extractText().indexOf("(")) {
-                //get text parts and make query term
-                String fullFsn = fsn.extractText();
-                fullFsn = fullFsn.replaceAll("\n", "");
-                fullFsn = fullFsn.replaceAll("   *", " ");
-                String[] fsnWords = fullFsn.split("\\s");
-                HashSet<String> wordSet = new HashSet<String>();
-                for (String word : fsnWords) {
-                    if (!wordSet.contains(word) && word.length() > 1
-                            && !word.startsWith("(") && !word.endsWith(")")) {
-                        word = QueryParser.escape(word);
-                        wordSet.add(word);
-                    }
+            try {
+                TerminologyListModel model = (TerminologyListModel) tl.getModel();
+                nidList = model.getNidsInList();
+                
+                if ((fsn.extractText().length() != 0) && (fsn.extractText().indexOf("(") == -1 || fsn.extractText().indexOf(")") == -1)) {
+                    //test for semantic tag
+                    ConceptVersionBI parentConcept = Ts.get().getConceptVersion(config.getViewCoordinate(), nidList.get(0));
+                    String parentText = parentConcept.getFullySpecifiedDescription().getText();
+                    int paren = parentText.lastIndexOf("(");
+                    String semanticTag = parentText.substring(paren, parentText.length()).trim();
+                    fsnText = fsnText +  " " + semanticTag;
                 }
-                String queryTerm = null;
-                for (String word : wordSet) {
-                    if (queryTerm == null) {
-                        queryTerm = "+" + word;
-                    } else {
-                        queryTerm = queryTerm + " " + "+" + word;
+
+                if (fsn.extractText().length() == 0) {
+                    //please enter the fsn
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                            "please enter the fsn", "",
+                            JOptionPane.ERROR_MESSAGE);
+                }  else if (nidList.isEmpty()) {
+                    //please list parents for the new concept
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                            "please list parents for the new concept", "",
+                            JOptionPane.ERROR_MESSAGE);
+                } else if (fsnText.length() != 0 && fsnText.indexOf("(") > 0
+                        && fsnText.indexOf(")") > fsnText.indexOf("(")) {
+                    //get text parts and make query term
+                    String fullFsn = fsn.extractText();
+                    fullFsn = fullFsn.replaceAll("\n", "");
+                    fullFsn = fullFsn.replaceAll("   *", " ");
+                    String[] fsnWords = fullFsn.split("\\s");
+                    HashSet<String> wordSet = new HashSet<String>();
+                    for (String word : fsnWords) {
+                        if (!wordSet.contains(word) && word.length() > 1
+                                && !word.startsWith("(") && !word.endsWith(")")) {
+                            word = QueryParser.escape(word);
+                            wordSet.add(word);
+                        }
                     }
-                }
-                try {
+                    String queryTerm = null;
+                    for (String word : wordSet) {
+                        if (queryTerm == null) {
+                            queryTerm = "+" + word;
+                        } else {
+                            queryTerm = queryTerm + " " + "+" + word;
+                        }
+                    }
+                
                     SearchResult result = Terms.get().doLuceneSearch(queryTerm);
                     if (result.topDocs.totalHits == 0) {
                         returnCondition = Condition.CONTINUE;
@@ -1102,16 +1106,18 @@ public class NewConcept extends PreviousNextOrCancel {
                         done = true;
                         NewConcept.this.notifyTaskDone();
                     }
-                } catch (IOException ex) {
+                }
+                }catch (IOException ex) {
                     AceLog.getAppLog().alertAndLogException(ex);
                 } catch (TerminologyException ex) {
                     AceLog.getAppLog().alertAndLogException(ex);
                 } catch (ParseException ex) {
                     AceLog.getAppLog().alertAndLogException(ex);
+                }catch (ContradictionException ex) {
+                    AceLog.getAppLog().alertAndLogException(ex);
                 }
             }
         }
-    }
 
     public class GbDialectFsnItemListener implements ItemListener {
 
