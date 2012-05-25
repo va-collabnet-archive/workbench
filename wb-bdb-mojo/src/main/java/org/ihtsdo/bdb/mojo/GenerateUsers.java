@@ -129,6 +129,12 @@ public class GenerateUsers extends AbstractMojo {
 	 * @parameter expression="${project.build.directory}/wb-bundle/config"
 	 */
 	private File configDir;
+        /**
+	 *The name of the parent concept for new users
+	 * @parameter
+	 */
+	private String userParentConceptName;
+        
         private File userConfigFile;
 	private EditorCategoryRefsetSearcher searcher = null;
 	private HashMap<String, ConceptVersionBI> modelers = null;
@@ -152,6 +158,7 @@ public class GenerateUsers extends AbstractMojo {
 	private I_ConfigAceFrame userConfig;
 	private I_ConfigAceFrame defaultConfig;
 	private Boolean create = true;
+        private Boolean createdUsers = false;
         private ArrayList<ConceptSpec> cBooleanRefsets; 
         private ArrayList<ConceptSpec> cConceptRefsets;
         private ArrayList<ConceptSpec> cConIntRefsets;
@@ -165,10 +172,15 @@ public class GenerateUsers extends AbstractMojo {
         private ArrayList<ConceptSpec> dStringRefsets;
         private ArrayList<ConceptSpec> dConConConRefsets;
         private ArrayList<ConceptSpec> destRelTypesList;
+        private ArrayList<ConceptSpec> cConceptRefsetStatus;
+        private ArrayList<ConceptSpec> cConceptRefsetConTypes;
+        private ArrayList<ConceptSpec> dConceptRefsetStatus;
+        private ArrayList<ConceptSpec> dConceptRefsetConTypes;
         private boolean displayRf2 = false;
         private ConceptSpec refsetStatus;
         private ArrayList<ConceptSpec> additionalRoots;
         private boolean makeUserDevPath = false;
+        private ConceptChronicleBI parentConcept;
 
 
 	@Override
@@ -192,6 +204,30 @@ public class GenerateUsers extends AbstractMojo {
                         if(firstLine != null){
                             String userLine = userReader.readLine();
                             if(userLine != null){
+                                if(userParentConceptName != null){
+                                    UUID parentConceptUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, userParentConceptName);
+                                    if(Ts.get().hasUuid(parentConceptUuid)){
+                                        parentConcept = Ts.get().getConcept(parentConceptUuid);
+                                    }else{
+                                        ConceptCB parentConceptBp = new ConceptCB(
+                                                userParentConceptName,
+                                                userParentConceptName,
+                                                LANG_CODE.EN_US,
+                                                TermAux.IS_A.getLenient().getPrimUuid(),
+                                                TermAux.USER.getLenient().getPrimUuid());
+                                        TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(
+                                                Ts.get().getMetadataEC(),
+                                                Ts.get().getMetadataVC());
+                                        parentConcept = builder.construct(parentConceptBp);
+                                        Ts.get().addUncommitted(parentConcept);
+                                        Ts.get().commit();
+                                    }
+                                }else{
+                                    ConceptSpec userParent = new ConceptSpec("user",
+					UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c"));
+                                    parentConcept = Ts.get().getConcept(userParent.getLenient().getPrimUuid());
+                                }
+                                
                                 while (userLine != null) {
                                         userConfig = null;
                                         String[] parts = userLine.split("\t");
@@ -205,90 +241,92 @@ public class GenerateUsers extends AbstractMojo {
 
                                 //add users to wf permissions refset
                                 I_TermFactory tf = Terms.get();
-                                defaultConfig = newProfile(null, null, null, null, null);
-                                Set<PathBI> editingPathSet = defaultConfig.getEditingPathSet();
-                                editingPathSet.clear();
-                                editingPathSet.add(Ts.get().getPath(TermAux.WB_AUX_PATH.getLenient().getNid()));
-                                tf.setActiveAceFrameConfig(defaultConfig);
-                                ViewCoordinate vc = defaultConfig.getViewCoordinate();
-                                EditorCategoryRefsetWriter writer = new EditorCategoryRefsetWriter();
+                                if(createdUsers){
+                                    defaultConfig = newProfile(null, null, null, null, null);
+                                    Set<PathBI> editingPathSet = defaultConfig.getEditingPathSet();
+                                    editingPathSet.clear();
+                                    editingPathSet.add(Ts.get().getPath(TermAux.WB_AUX_PATH.getLenient().getNid()));
+                                    tf.setActiveAceFrameConfig(defaultConfig);
+                                    ViewCoordinate vc = defaultConfig.getViewCoordinate();
+                                    EditorCategoryRefsetWriter writer = new EditorCategoryRefsetWriter();
 
-                                BufferedReader wfReader = new BufferedReader(new FileReader(wfPermissionsFile));
+                                    BufferedReader wfReader = new BufferedReader(new FileReader(wfPermissionsFile));
 
-                                WorkflowHelper.updateModelers(vc);
-                                modelers = WorkflowHelper.getModelers();
-                                searcher = new EditorCategoryRefsetSearcher();
+                                    WorkflowHelper.updateModelers(vc);
+                                    modelers = WorkflowHelper.getModelers();
+                                    searcher = new EditorCategoryRefsetSearcher();
 
-                                wfReader.readLine();
-                                String wfLine = wfReader.readLine();
-                                NEXT_WHILE:		while (wfLine != null) {
-                                        if (wfLine.trim().length() == 0) {
+                                    wfReader.readLine();
+                                    String wfLine = wfReader.readLine();
+                                    NEXT_WHILE:		while (wfLine != null) {
+                                            if (wfLine.trim().length() == 0) {
+                                                wfLine = wfReader.readLine();
+                                                continue NEXT_WHILE;
+                                            }
+
+                                            String[] columns = wfLine.split(",");
+
+                                            if (columns.length >= 3) {
+                                                    //Get rid of "User permission"
+                                                    columns[0] = (String) columns[0].subSequence("User permission (".length(), columns[0].length());
+                                                    //remove ")"
+                                                    columns[2] = columns[2].trim();
+                                                    columns[2] = columns[2].substring(0, columns[2].length() - 1);
+
+                                                    int i = 0;
+                                                    for (String c : columns) {
+                                                            columns[i++] = c.split("=")[1].trim();
+                                                    }
+                                                    ConceptVersionBI newCategory = WorkflowHelper.lookupEditorCategory(columns[2], vc);
+                                                    ConceptVersionBI oldCategory = identifyExistingEditorCategory(columns, vc);
+                                                    boolean addingRequired = true;
+
+                                                    if (oldCategory != null) {
+                                                            if (!oldCategory.equals(newCategory)) {
+                                                                    writer.retireEditorCategory(modelers.get(columns[0]), columns[1], oldCategory);
+                                                            } else {
+                                                                    addingRequired = false;
+                                                            }
+                                                    }
+
+                                                    if (addingRequired) {
+                                                            if(modelers.get(columns[0]) == null){
+                                                                    getLog().info("null found: " + columns[0]);
+                                                                    getLog().info(modelers.toString());
+                                                                    ConceptVersionBI modeler = modelers.get(columns[0]);
+                                                            }
+                                                            writer.setEditor(modelers.get(columns[0]));
+                                                            writer.setSemanticArea(columns[1]);
+
+                                                            writer.setCategory(newCategory);
+                                                            writer.addMember(true);
+                                                    }
+
+                                            }
                                             wfLine = wfReader.readLine();
-                                            continue NEXT_WHILE;
-                                        }
+                                    }
+                                    getLog().info("Starting rels permissions creation");
+                                    if (relPermissionsFile.exists()) {
+                                            try {
+                                                    FileReader     fr = new FileReader(relPermissionsFile);
+                                                    BufferedReader br = new BufferedReader(fr);
 
-                                        String[] columns = wfLine.split(",");
+                                                    br.readLine();
 
-                                        if (columns.length >= 3) {
-                                                //Get rid of "User permission"
-                                                columns[0] = (String) columns[0].subSequence("User permission (".length(), columns[0].length());
-                                                //remove ")"
-                                                columns[2] = columns[2].trim();
-                                                columns[2] = columns[2].substring(0, columns[2].length() - 1);
+                                                    String relPermissionLine = br.readLine();
+                                                    getLog().info("Looking at lines...");
+                                                    while (relPermissionLine != null) {
+                                                            String[] parts = relPermissionLine.split("\t");
 
-                                                int i = 0;
-                                                for (String c : columns) {
-                                                        columns[i++] = c.split("=")[1].trim();
-                                                }
-                                                ConceptVersionBI newCategory = WorkflowHelper.lookupEditorCategory(columns[2], vc);
-                                                ConceptVersionBI oldCategory = identifyExistingEditorCategory(columns, vc);
-                                                boolean addingRequired = true;
-
-                                                if (oldCategory != null) {
-                                                        if (!oldCategory.equals(newCategory)) {
-                                                                writer.retireEditorCategory(modelers.get(columns[0]), columns[1], oldCategory);
-                                                        } else {
-                                                                addingRequired = false;
-                                                        }
-                                                }
-
-                                                if (addingRequired) {
-                                                        if(modelers.get(columns[0]) == null){
-                                                                getLog().info("null found: " + columns[0]);
-                                                                getLog().info(modelers.toString());
-                                                                ConceptVersionBI modeler = modelers.get(columns[0]);
-                                                        }
-                                                        writer.setEditor(modelers.get(columns[0]));
-                                                        writer.setSemanticArea(columns[1]);
-
-                                                        writer.setCategory(newCategory);
-                                                        writer.addMember(true);
-                                                }
-
-                                        }
-                                        wfLine = wfReader.readLine();
-                                }
-                                getLog().info("Starting rels permissions creation");
-                                if (relPermissionsFile.exists()) {
-                                        try {
-                                                FileReader     fr = new FileReader(relPermissionsFile);
-                                                BufferedReader br = new BufferedReader(fr);
-
-                                                br.readLine();
-
-                                                String relPermissionLine = br.readLine();
-                                                getLog().info("Looking at lines...");
-                                                while (relPermissionLine != null) {
-                                                        String[] parts = relPermissionLine.split("\t");
-
-                                                        addRelPermission(parts[0], parts[1], parts[2], parts[3], parts[4]);
-                                                        relPermissionLine = br.readLine();
-                                                }
-                                        } catch (Exception ex) {
-                                                throw new TaskFailedException(ex);
-                                        }
-                                } else {
-                                        getLog().warn("No relPermissionsFile: " + relPermissionsFile.getAbsolutePath());
+                                                            addRelPermission(parts[0], parts[1], parts[2], parts[3], parts[4]);
+                                                            relPermissionLine = br.readLine();
+                                                    }
+                                            } catch (Exception ex) {
+                                                    throw new TaskFailedException(ex);
+                                            }
+                                    } else {
+                                            getLog().warn("No relPermissionsFile: " + relPermissionsFile.getAbsolutePath());
+                                    }
                                 }
 
                                 Terms.get().commit();
@@ -341,6 +379,10 @@ public class GenerateUsers extends AbstractMojo {
             dStringRefsets = getConceptSpecListFromPrefs(configProps.getProperty("desc.stringRefsets"));
             dConConConRefsets = getConceptSpecListFromPrefs(configProps.getProperty("desc.conConConRefsets"));
             destRelTypesList = getConceptSpecListFromPrefs(configProps.getProperty("parentRelationshipTypes"));
+            cConceptRefsetStatus = getConceptSpecListFromPrefs(configProps.getProperty("concept.conceptRefsetStatus"));
+            cConceptRefsetConTypes = getConceptSpecListFromPrefs(configProps.getProperty("concept.conceptConTypes"));
+            dConceptRefsetStatus = getConceptSpecListFromPrefs(configProps.getProperty("desc.conceptRefsetStatus"));
+            dConceptRefsetConTypes = getConceptSpecListFromPrefs(configProps.getProperty("desc.conceptConTypes"));
             if(configProps.getProperty("displayRf2").equals("true")) {
                 displayRf2 = true;
             }
@@ -412,6 +454,7 @@ public class GenerateUsers extends AbstractMojo {
 			File userProfile = new File(userDir, username + ".wb");
 			create = !userProfile.exists();
 			if (create) {
+                                createdUsers = true;
                                 if(userConfigList.equals("")){
                                     userConfigFile = new File(defaultUserConfig + File.separator + "userConfig.txt");
                                     readUserConfigFile();
@@ -768,13 +811,11 @@ public class GenerateUsers extends AbstractMojo {
                     if (Ts.get().hasUuid(userUuid)) {
                         concept = Ts.get().getConcept(userUuid);
                     }
-			ConceptSpec userParent = new ConceptSpec("user",
-					UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c"));
 			userConceptBp = new ConceptCB(userConfig.getDbConfig().getFullName(),
 					userConfig.getUsername(),
 					LANG_CODE.EN,
 					TermAux.IS_A.getLenient().getPrimUuid(),
-					userParent.getLenient().getPrimUuid());
+					parentConcept.getPrimUuid());
 //                        userConceptBp.setComponentUuid(userUuid);
                         UUID componentUuid = userConceptBp.getComponentUuid();
 			// Needs a description record...
@@ -928,7 +969,7 @@ public class GenerateUsers extends AbstractMojo {
 		I_IntSet destRelTypes = tf.newIntSet();
 		destRelTypes.add(Snomed.IS_A.getLenient().getNid());
 		destRelTypes.add(TermAux.IS_A.getLenient().getNid());
-                if(!destRelTypesList.isEmpty()){
+                if(destRelTypesList != null){
                     for(ConceptSpec relTypeSpec : destRelTypesList){
                         destRelTypes.add(relTypeSpec.getLenient().getConceptNid());
                     }
@@ -967,6 +1008,16 @@ public class GenerateUsers extends AbstractMojo {
                     for(ConceptSpec spec : cConceptRefsets){
                         conceptPopupIds.add(spec.getLenient().getConceptNid());
                     }
+                }
+                I_IntList conceptStatusPopupIds = conceptPreferences.getStatusPopupIds();
+                conceptStatusPopupIds.remove(0);
+                for(ConceptSpec spec : cConceptRefsetStatus){
+                    conceptStatusPopupIds.add(spec.getLenient().getNid());
+                }
+                I_IntList conceptConceptPopupIds = conceptPreferences.getConceptPopupIds();
+                conceptConceptPopupIds.remove(0);
+                for(ConceptSpec spec : cConceptRefsetConTypes){
+                    conceptConceptPopupIds.add(spec.getLenient().getNid());
                 }
                 
                 I_RefsetDefaultsInteger integerPreferences = attribRefsetPref.getIntegerPreferences();
@@ -1035,6 +1086,16 @@ public class GenerateUsers extends AbstractMojo {
                     for(ConceptSpec spec : dConceptRefsets){
                         conceptPopupIdsDesc.add(spec.getLenient().getConceptNid());
                     }
+                }
+                I_IntList descStatusPopupIds = conceptPreferencesDesc.getStatusPopupIds();
+                descStatusPopupIds.remove(0);
+                for(ConceptSpec spec : dConceptRefsetStatus){
+                    descStatusPopupIds.add(spec.getLenient().getNid());
+                }
+                I_IntList descConceptPopupIds = conceptPreferencesDesc.getConceptPopupIds();
+                descConceptPopupIds.remove(0);
+                for(ConceptSpec spec : dConceptRefsetConTypes){
+                    descConceptPopupIds.add(spec.getLenient().getNid());
                 }
                 
                 I_RefsetDefaultsInteger integerPreferencesDesc = descRefsetPref.getIntegerPreferences();
@@ -1346,7 +1407,7 @@ public class GenerateUsers extends AbstractMojo {
 		I_IntSet destRelTypes = tf.newIntSet();
 		destRelTypes.add(Snomed.IS_A.getLenient().getNid());
 		destRelTypes.add(TermAux.IS_A.getLenient().getNid());
-                if(!destRelTypesList.isEmpty()){
+                if(destRelTypesList != null){
                     for(ConceptSpec relTypeSpec : destRelTypesList){
                         destRelTypes.add(relTypeSpec.getLenient().getConceptNid());
                     }
@@ -1383,6 +1444,14 @@ public class GenerateUsers extends AbstractMojo {
                     for(ConceptSpec spec : cConceptRefsets){
                         conceptPopupIds.add(spec.getLenient().getConceptNid());
                     }
+                }
+                I_IntList conceptStatusPopupIds = conceptPreferences.getStatusPopupIds();
+                for(ConceptSpec spec : cConceptRefsetStatus){
+                    conceptStatusPopupIds.add(spec.getLenient().getNid());
+                }
+                I_IntList conceptConceptPopupIds = conceptPreferences.getConceptPopupIds();
+                for(ConceptSpec spec : cConceptRefsetConTypes){
+                    conceptConceptPopupIds.add(spec.getLenient().getNid());
                 }
                 
                 I_RefsetDefaultsInteger integerPreferences = attribRefsetPref.getIntegerPreferences();
@@ -1445,6 +1514,14 @@ public class GenerateUsers extends AbstractMojo {
                     for(ConceptSpec spec : dConceptRefsets){
                         conceptPopupIdsDesc.add(spec.getLenient().getConceptNid());
                     }
+                }
+                I_IntList descStatusPopupIds = conceptPreferencesDesc.getStatusPopupIds();
+                for(ConceptSpec spec : dConceptRefsetStatus){
+                    descStatusPopupIds.add(spec.getLenient().getNid());
+                }
+                I_IntList descConceptPopupIds = conceptPreferencesDesc.getConceptPopupIds();
+                for(ConceptSpec spec : dConceptRefsetConTypes){
+                    descConceptPopupIds.add(spec.getLenient().getNid());
                 }
                 
                 I_RefsetDefaultsInteger integerPreferencesDesc = descRefsetPref.getIntegerPreferences();
