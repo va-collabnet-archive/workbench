@@ -1,23 +1,17 @@
 package org.ihtsdo.arena.context.action;
 
 import java.awt.event.ActionEvent;
-import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.Collection;
-
+import java.util.UUID;
 import javax.swing.AbstractAction;
-
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.arena.spec.SynonymyType;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.AnalogBI;
 import org.ihtsdo.tk.api.ContradictionException;
-import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
@@ -26,14 +20,10 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidAnalogBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 import org.ihtsdo.tk.binding.snomed.RefsetAux;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.binding.snomed.TermAux;
 import org.ihtsdo.tk.drools.facts.DescFact;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
-import org.ihtsdo.tk.spec.ConceptSpec;
 
 public class ToggleReviewStatusAction extends AbstractAction {
 
@@ -66,13 +56,15 @@ public class ToggleReviewStatusAction extends AbstractAction {
                         annotBp = cAnnot.makeBlueprint(vc);
                         annotBp.put(RefexProperty.CNID1,
                                 TermAux.FINAL.getStrict(vc).getConceptNid());
+                        annotBp.setMemberUuid(cAnnot.getPrimUuid());
                     }else{
                         annotBp = cAnnot.makeBlueprint(vc);
                         annotBp.put(RefexProperty.CNID1,
                                 TermAux.UNREVIEWED.getStrict(vc).getConceptNid());
+                        annotBp.setMemberUuid(cAnnot.getPrimUuid());
                     }
                     TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(config.getEditCoordinate(), vc);
-                    builder.construct(annotBp);
+                    RefexChronicleBI<?> refex = builder.construct(annotBp);
                     Ts.get().addUncommitted(Ts.get().getConcept(desc.getConceptNid()));
                 }
             }
