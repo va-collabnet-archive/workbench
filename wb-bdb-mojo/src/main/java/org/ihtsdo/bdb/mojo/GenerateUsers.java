@@ -1509,6 +1509,9 @@ public class GenerateUsers extends AbstractMojo {
                 I_RefsetDefaultsConcept conceptPreferencesDesc = descRefsetPref.getConceptPreferences();
                 I_IntList conceptPopupIdsDesc = conceptPreferencesDesc.getRefsetPopupIds();
                 if(!dConceptRefsets.isEmpty()){
+                    if(conceptPopupIdsDesc.get(0) == Taxonomies.REFSET_AUX.getLenient().getConceptNid()){
+                        conceptPopupIdsDesc.remove(0);
+                    }
                     conceptPreferencesDesc.setDefaultRefset((I_GetConceptData) dConceptRefsets.get(0).getLenient());
                     conceptPreferencesDesc.setDefaultStatusForRefset((I_GetConceptData) refsetStatus.getLenient());
                     for(ConceptSpec spec : dConceptRefsets){
