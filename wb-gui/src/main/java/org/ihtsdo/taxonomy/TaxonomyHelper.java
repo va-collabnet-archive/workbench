@@ -96,6 +96,7 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
    private TaxonomyNodeRenderer renderer;
    private JButton              statedInferredButton;
    private TaxonomyTree         tree;
+   private JLabel view;
 
    //~--- constant enums ------------------------------------------------------
 
@@ -281,6 +282,8 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
          model.unLink();
          ViewCoordinate newVc = new ViewCoordinate(aceFrameConfig.getViewCoordinate());
          newVc.setRelAssertionType(assertionType);
+         resetView();
+         
          model = new TaxonomyModel(newVc,
                                    new NidList(aceFrameConfig.getRoots().getSetValues()), renderer, tree,
                                    childNodeFilter);
@@ -422,10 +425,8 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
       c.gridx++;
       c.weightx = 1;
 
-      JLabel view = new JLabel(aceFrameConfig.getViewPositionSetReadOnly().toString().trim());
-
-      view.setHorizontalAlignment(SwingConstants.LEFT);
-      buttonPanel.add(view, c);
+      
+      buttonPanel.add(getView(), c);
       buttonPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(0, 0, 2, 0),
               BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 0, 1, 0,
                  Color.LIGHT_GRAY), BorderFactory.createEmptyBorder(0, 0, 2, 0))));
@@ -583,4 +584,23 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
          this.newNode = newNode;
       }
    }
+
+
+private JLabel getView() {
+    
+    if(view == null){
+        view = new JLabel(aceFrameConfig.getViewPositionSetReadOnly().toString().trim());
+        view.setHorizontalAlignment(SwingConstants.LEFT);
+    }
+    
+    return view;
+}
+
+private void resetView(){
+    getView().setText(aceFrameConfig.getViewPositionSetReadOnly().toString().trim());
+    getView().revalidate();
+    getView().repaint();
+}
+
+
 }
