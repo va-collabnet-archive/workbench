@@ -196,7 +196,6 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
                     TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()));
             vc.setPositionSet(new PositionSet(position));
             getLog().info("Criterion matches " + sapsToWrite.size() + " sapNids: " + sapsToWrite);
-            if (sapsToWrite.size() > 0) {
                 NidBitSetBI allConcepts = Ts.get().getAllConceptNids();
                 Rf2Export exporter = new Rf2Export(output,
                         Rf2File.ReleaseType.DELTA,
@@ -218,10 +217,6 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
                         output);
                 mapper.map();
                 mapper.close();
-            }
-
-
-
         } catch (Exception e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }
