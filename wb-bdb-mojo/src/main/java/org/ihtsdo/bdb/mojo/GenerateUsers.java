@@ -192,7 +192,6 @@ public class GenerateUsers extends AbstractMojo {
 	void executeMojo() throws MojoExecutionException {
 
 		try {
-			getLog().info("****************\n Creating new users \n****************\n");
 			Bdb.selectJeProperties(berkeleyDir,
 					berkeleyDir);
 
@@ -202,6 +201,7 @@ public class GenerateUsers extends AbstractMojo {
 			BufferedReader userReader = new BufferedReader(new FileReader(usersFile));
 			String firstLine = userReader.readLine();
                         if(firstLine != null){
+                            getLog().info("****************\n Creating new users \n****************\n");
                             String userLine = userReader.readLine();
                             if(userLine != null){
                                 if(userParentConceptName != null){
@@ -959,7 +959,7 @@ public class GenerateUsers extends AbstractMojo {
 		activeConfig.setRoots(roots);
                 
 		//set up allowed statuses
-		I_IntSet allowedStatus = tf.newIntSet();
+		I_IntSet allowedStatus = activeConfig.getAllowedStatus();
 		allowedStatus.add(SnomedMetadataRf1.CURRENT_RF1.getLenient().getNid());
                 allowedStatus.add(SnomedMetadataRf1.ACTIVE_RF1.getLenient().getNid());
 		allowedStatus.add(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
@@ -1396,12 +1396,6 @@ public class GenerateUsers extends AbstractMojo {
                     }
                 }
 		userConfig.setRoots(roots);
-
-		//set up allowed statuses
-		I_IntSet allowedStatus = tf.newIntSet();
-		allowedStatus.add(SnomedMetadataRf1.CURRENT_RF1.getLenient().getNid());
-		allowedStatus.add(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
-		userConfig.setAllowedStatus(allowedStatus);
 
 		//set up parent relationship rel types (view->taxonomy)
 		I_IntSet destRelTypes = tf.newIntSet();
