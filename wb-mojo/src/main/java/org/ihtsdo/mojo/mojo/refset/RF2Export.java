@@ -136,7 +136,7 @@ public class RF2Export extends AbstractMojo implements I_ProcessConcepts {
     private HashMap<Integer, RefsetType> refsetTypeMap = new HashMap<Integer, RefsetType>();
 
     private ReferenceSetExport referenceSetExport = new ReferenceSetExport();
-
+    private RefsetInclusionSpec currentSpec;
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         if (!readWriteMapDirectory.exists() || !readWriteMapDirectory.isDirectory() || !readWriteMapDirectory.canRead()) {
@@ -160,6 +160,7 @@ public class RF2Export extends AbstractMojo implements I_ProcessConcepts {
             }
 
             for (RefsetInclusionSpec spec : refsetInclusionSpecs) {
+            	currentSpec = spec;
                 processConcept(spec.refsetConcept.getVerifiedConcept());
             }
 
@@ -348,11 +349,11 @@ public class RF2Export extends AbstractMojo implements I_ProcessConcepts {
              * <Date>.<ext> e.g. der2_SCTID.Activities of daily
              * living.concept.refset_National_UK1999999_20090131.txt
              */
-            String sctIdFilePrefix = "der2_SCTID.";
-            String uuidFilePrefix = "der2_UUID.";
+           // String sctIdFilePrefix = "der2_SCTID.";
+           // String uuidFilePrefix = "der2_UUID.";
             
             String filePrefix="der2_Refset_";
-            String refsetStatus=""; 
+            String refsetStatus=currentSpec.status;
             	
            // TODO  create  function on rf2Descriptor.status(); ?
             //TODO if refset draft prepend x to der2_Refset
@@ -361,8 +362,8 @@ public class RF2Export extends AbstractMojo implements I_ProcessConcepts {
             File exportFile = getExportFile(tf.getConcept(refsetId));
             if (exportFile != null) {
                 fileName = exportFile.getName();
-                sctIdFilePrefix = "";
-                uuidFilePrefix = "";
+                //sctIdFilePrefix = "";
+                //uuidFilePrefix = "";
             }
             if (fileName == null) {
                 fileName =
