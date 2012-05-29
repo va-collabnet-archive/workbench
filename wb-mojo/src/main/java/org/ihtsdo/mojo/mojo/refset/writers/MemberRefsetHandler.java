@@ -355,7 +355,7 @@ public abstract class MemberRefsetHandler {
         }
 
         // use this new UUID in the SCT generator
-        return Long.toString(getSctGenerator(namespace, project).getWithGeneration(versionedRefsetUuid, TYPE.CONCEPT));
+        return Long.toString(getSctGenerator(namespace, project).getWithGeneration(versionedRefsetUuid, TYPE.SUBSET));
     }
 
     public String getSnomedIntegerId(I_TermFactory tf, int componentId) throws TerminologyException, IOException {
