@@ -199,9 +199,9 @@ public class TreeMouseListener extends MouseAdapter {
    private JPopupMenu makePopup(MouseEvent e, I_GetConceptData selectedConcept)
            throws FileNotFoundException, IOException, ClassNotFoundException, TerminologyException {
       JPopupMenu popup        = new JPopupMenu();
-      JMenuItem  noActionItem = new JMenuItem("");
+      //JMenuItem  noActionItem = new JMenuItem("");
 
-      popup.add(noActionItem);
+      //popup.add(noActionItem);
 
       if (ace.getRefsetSpecInSpecEditor() != null) {
          if (ace.refsetTabIsSelected()) {
@@ -275,7 +275,7 @@ public class TreeMouseListener extends MouseAdapter {
             }
          }
 
-         popup.addSeparator();
+         //popup.addSeparator();
 
          RefsetCommentPopupListener refsetCommentActionListener =
             new RefsetCommentPopupListener(ace.getAceFrameConfig(), ace.getRefsetSpecEditor());
@@ -288,15 +288,15 @@ public class TreeMouseListener extends MouseAdapter {
          popup.add(refsetCommmentItem);
       }
 
-      popup.addSeparator();
+      //popup.addSeparator();
 
-      JMenuItem searchForSimilarConcepts = new JMenuItem("Search for similar concepts...");
+      //JMenuItem searchForSimilarConcepts = new JMenuItem("Search for similar concepts...");
 
-      popup.add(searchForSimilarConcepts);
-      searchForSimilarConcepts.addActionListener(new SetSearchToSimilar());
-      popup.addSeparator();
+      //popup.add(searchForSimilarConcepts);
+      //searchForSimilarConcepts.addActionListener(new SetSearchToSimilar());
+      /*popup.addSeparator();
       ProcessPopupUtil.addSubmenMenuItems(popup, new File(AceFrame.pluginRoot, "taxonomy"),
-              ace.getAceFrameConfig().getWorker());
+              ace.getAceFrameConfig().getWorker());*/
 
       return popup;
    }

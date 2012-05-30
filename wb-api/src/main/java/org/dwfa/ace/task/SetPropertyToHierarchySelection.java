@@ -53,7 +53,7 @@ public class SetPropertyToHierarchySelection extends AbstractTask {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
             //
-            propName = (String) in.readObject();
+            setPropName((String) in.readObject());
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }

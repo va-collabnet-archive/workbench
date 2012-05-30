@@ -157,8 +157,8 @@ public class RefsetSpecPanel extends JPanel {
       bottomTabs             = new JTabbedPane();
       bottomTabs.addTab(HIERARCHICAL_VIEW, hierarchicalTreeHelper.getHierarchyPanel());
       bottomTabs.addTab(REFSET_AND_PARENT_ONLY_VIEW, refsetAndParentOnlyTreeHelper.getHierarchyPanel());
-      hierarchicalTreeHelper.addMouseListener(new TaxonomyMouseListener(hierarchicalTreeHelper));
-      refsetAndParentOnlyTreeHelper.addMouseListener(new TaxonomyMouseListener(hierarchicalTreeHelper));
+      //hierarchicalTreeHelper.addMouseListener(new TaxonomyMouseListener(hierarchicalTreeHelper));
+      //refsetAndParentOnlyTreeHelper.addMouseListener(new TaxonomyMouseListener(hierarchicalTreeHelper));
       hierarchicalTreeHelper.addMouseListener(new TreeMouseListener(ace));
       refsetAndParentOnlyTreeHelper.addMouseListener(new TreeMouseListener(ace));
       editor = new RefsetSpecEditor(ace, hierarchicalTreeHelper, refsetAndParentOnlyTreeHelper, this);
@@ -1322,7 +1322,7 @@ public class RefsetSpecPanel extends JPanel {
          hierarchicalTreeHelper = new TaxonomyHelper(new RefsetSpecFrameConfig(aceFrameConfig, new IntSet(),
                  false), "Refset hierarchy", null);
          refsetHierarcyPanel = hierarchicalTreeHelper.getHierarchyPanel();
-         hierarchicalTreeHelper.addMouseListener(new TaxonomyMouseListener(hierarchicalTreeHelper));
+         //hierarchicalTreeHelper.addMouseListener(new TaxonomyMouseListener(hierarchicalTreeHelper));
          hierarchicalTreeHelper.addMouseListener(new TreeMouseListener(ace));
 
          OrCompositeChildFilter filter   = new OrCompositeChildFilter();
@@ -1343,8 +1343,8 @@ public class RefsetSpecPanel extends JPanel {
          refsetAndParentOnlyTreeHelper = new TaxonomyHelper(rsConfig, " Refset parent-only hierarchy",
                  filter);
          refsetAndParentOnlyHierarchicalPanel = refsetAndParentOnlyTreeHelper.getHierarchyPanel();
-         refsetAndParentOnlyTreeHelper.addMouseListener(
-             new TaxonomyMouseListener(refsetAndParentOnlyTreeHelper));
+         //refsetAndParentOnlyTreeHelper.addMouseListener(
+         //    new TaxonomyMouseListener(refsetAndParentOnlyTreeHelper));
          refsetAndParentOnlyTreeHelper.addMouseListener(new TreeMouseListener(ace));
 
          return null;

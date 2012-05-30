@@ -683,7 +683,10 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         c.gridy++;
 
         for (org.dwfa.ace.api.I_PluginToConceptPanel plugin : plugins) {
+            
             if (plugin.showComponent()) {
+                AceLog.getAppLog().info("Adding plugins "+plugin.getName() +" component = "+plugin.getComponent(this));
+                
                 content.add(plugin.getComponent(this), c);
                 c.gridy++;
             }
