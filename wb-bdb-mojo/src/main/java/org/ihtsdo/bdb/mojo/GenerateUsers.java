@@ -470,7 +470,87 @@ public class GenerateUsers extends AbstractMojo {
                                                             adminPassword);
                                             userConfig.getDbConfig().setProfileFile(userProfile);
                                             Terms.get().setActiveAceFrameConfig(userConfig);
+                                            
+                                            //setup changesets
+                                            File changeSetRoot = new File(userDir, "changesets");
+                                            getLog().info("** Changeset root: " + changeSetRoot.getAbsolutePath());
+                                            changeSetRoot.mkdirs();
 
+                                            I_ConfigAceDb newDbProfile = userConfig.getDbConfig();
+                                            File absoluteChangeSetRoot = new File(wbBundleDir, "profiles/user-creation-changesets");
+
+                                            newDbProfile.setChangeSetRoot(changeSetRoot);
+                                            getLog().info("** Changeset root from db config: " + newDbProfile.getChangeSetRoot().getAbsolutePath());
+                                            getLog().info("** absoluteChangeSetRoot: " + absoluteChangeSetRoot.getAbsolutePath());
+                                            newDbProfile.setChangeSetWriterFileName(userConfig.getUsername() + "#1#"
+                                                            + UUID.randomUUID().toString() + ".eccs");
+                                            newDbProfile.setUsername(userConfig.getUsername());
+
+                                            String tempKey = UUID.randomUUID().toString();
+                                            ChangeSetGeneratorBI generator =
+                                                    Ts.get().createDtoChangeSetGenerator(new File(absoluteChangeSetRoot, newDbProfile.getChangeSetWriterFileName()), new File(absoluteChangeSetRoot, "#0#"
+                                                                    + newDbProfile.getChangeSetWriterFileName()), ChangeSetGenerationPolicy.MUTABLE_ONLY);
+                                            List<ChangeSetGeneratorBI> extraGeneratorList = new ArrayList<ChangeSetGeneratorBI>();
+
+                                            extraGeneratorList.add(generator);
+                                            Ts.get().addChangeSetGenerator(tempKey, generator);
+                                            
+                                            
+                                            //make user paths
+                                            if(makeUserDevPath){
+                                                if(!username.equals("username")){
+                                                UUID editParentPathUuid = null;
+                                                if(!projectDevelopmentParentPathUuid.equals("")){
+                                                    editParentPathUuid = UUID.fromString(projectDevelopmentParentPathUuid);
+                                                }else{
+                                                    editParentPathUuid =  Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+                                                        projectDevelopmentParentPathFsn);
+                                                }
+                                                UUID editOriginPathUuid =  Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+                                                        projectDevelopmentOriginPathFsn);
+                                                if(!hasDevPathAsOriginPathFsn.equals("")){
+
+                                                }
+                                                UUID originFromDevPathUuid =  Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+                                                        hasDevPathAsOriginPathFsn);
+                                                ConceptCB newEditPathBp =  new ConceptCB(username + " dev path",
+                                                                                    username + " dev path",
+                                                                                    LANG_CODE.EN,
+                                                                                    TermAux.IS_A.getLenient().getPrimUuid(),
+                                                                                    editParentPathUuid);
+
+                                                RefexCAB pathRefexBp = new RefexCAB(TK_REFSET_TYPE.CID,
+                                                        TermAux.PATH.getLenient().getConceptNid(),
+                                                        RefsetAux.PATH_REFSET.getLenient().getNid());
+                                                pathRefexBp.put(RefexCAB.RefexProperty.UUID1, newEditPathBp.getComponentUuid());
+                                                pathRefexBp.setMemberUuid(UUID.randomUUID());
+
+                                                RefexCAB pathOriginRefexBp = new RefexCAB(TK_REFSET_TYPE.CID_INT,
+                                                        newEditPathBp.getComponentUuid(),
+                                                        RefsetAux.PATH_ORIGIN_REFEST.getLenient().getNid(), null, null);
+                                                pathOriginRefexBp.put(RefexCAB.RefexProperty.UUID1, editOriginPathUuid);
+                                                pathOriginRefexBp.put(RefexCAB.RefexProperty.INTEGER1, Integer.MAX_VALUE);
+                                                pathRefexBp.setMemberUuid(UUID.randomUUID());
+
+                                                RefexCAB pathOriginRefexOtherBp = new RefexCAB(TK_REFSET_TYPE.CID_INT,
+                                                        originFromDevPathUuid,
+                                                        RefsetAux.PATH_ORIGIN_REFEST.getLenient().getNid(), null, null);
+                                                pathOriginRefexOtherBp.put(RefexCAB.RefexProperty.UUID1, newEditPathBp.getComponentUuid());
+                                                pathOriginRefexOtherBp.put(RefexCAB.RefexProperty.INTEGER1, Integer.MAX_VALUE);
+                                                pathOriginRefexOtherBp.setMemberUuid(UUID.randomUUID());
+
+                                                TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(Ts.get().getMetadataEC(),
+                                                        Ts.get().getMetadataVC());
+                                                PathCB pathBp = new PathCB (newEditPathBp,
+                                                        pathRefexBp,
+                                                        pathOriginRefexBp,
+                                                        pathOriginRefexOtherBp,
+                                                        Ts.get().getConcept(editOriginPathUuid));
+                                                PathBI editPath = builder.construct(pathBp);
+                                                userConfig.addEditingPath(editPath);
+                                                }
+                                            }
+                                            
                                             if (username != null) {
                                                     if (userConfig.getAddressesList().contains(username) == false) {
                                                             userConfig.getAddressesList().add(username);
@@ -496,29 +576,6 @@ public class GenerateUsers extends AbstractMojo {
 
                                                     return false;
                                             }
-
-                                            File changeSetRoot = new File(userDir, "changesets");
-                                            getLog().info("** Changeset root: " + changeSetRoot.getAbsolutePath());
-                                            changeSetRoot.mkdirs();
-
-                                            I_ConfigAceDb newDbProfile = userConfig.getDbConfig();
-                                            File absoluteChangeSetRoot = new File(wbBundleDir, "profiles/user-creation-changesets");
-
-                                            newDbProfile.setChangeSetRoot(changeSetRoot);
-                                            getLog().info("** Changeset root from db config: " + newDbProfile.getChangeSetRoot().getAbsolutePath());
-                                            getLog().info("** absoluteChangeSetRoot: " + absoluteChangeSetRoot.getAbsolutePath());
-                                            newDbProfile.setChangeSetWriterFileName(userConfig.getUsername() + "#1#"
-                                                            + UUID.randomUUID().toString() + ".eccs");
-                                            newDbProfile.setUsername(userConfig.getUsername());
-
-                                            String tempKey = UUID.randomUUID().toString();
-                                            ChangeSetGeneratorBI generator =
-                                                    Ts.get().createDtoChangeSetGenerator(new File(absoluteChangeSetRoot, newDbProfile.getChangeSetWriterFileName()), new File(absoluteChangeSetRoot, "#0#"
-                                                                    + newDbProfile.getChangeSetWriterFileName()), ChangeSetGenerationPolicy.MUTABLE_ONLY);
-                                            List<ChangeSetGeneratorBI> extraGeneratorList = new ArrayList<ChangeSetGeneratorBI>();
-
-                                            extraGeneratorList.add(generator);
-                                            Ts.get().addChangeSetGenerator(tempKey, generator);
 
                                             try {
                                                     Terms.get().commit();
@@ -1187,58 +1244,7 @@ public class GenerateUsers extends AbstractMojo {
                 
 		//set up paths
                 PathBI editPath = null;
-                if(makeUserDevPath){
-                    if(!username.equals("username")){
-                        UUID editParentPathUuid = null;
-                        if(!projectDevelopmentParentPathUuid.equals("")){
-                            editParentPathUuid = UUID.fromString(projectDevelopmentParentPathUuid);
-                        }else{
-                            editParentPathUuid =  Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
-                                projectDevelopmentParentPathFsn);
-                        }
-                        UUID editOriginPathUuid =  Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
-                                projectDevelopmentOriginPathFsn);
-                        if(!hasDevPathAsOriginPathFsn.equals("")){
-
-                        }
-                        UUID originFromDevPathUuid =  Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
-                                hasDevPathAsOriginPathFsn);
-                        ConceptCB newEditPathBp =  new ConceptCB(username + " dev path",
-                                                            username + " dev path",
-                                                            LANG_CODE.EN,
-                                                            TermAux.IS_A.getLenient().getPrimUuid(),
-                                                            editParentPathUuid);
-
-                        RefexCAB pathRefexBp = new RefexCAB(TK_REFSET_TYPE.CID,
-                                TermAux.PATH.getLenient().getConceptNid(),
-                                RefsetAux.PATH_REFSET.getLenient().getNid());
-                        pathRefexBp.put(RefexCAB.RefexProperty.UUID1, newEditPathBp.getComponentUuid());
-                        pathRefexBp.setMemberUuid(UUID.randomUUID());
-
-                        RefexCAB pathOriginRefexBp = new RefexCAB(TK_REFSET_TYPE.CID_INT,
-                                newEditPathBp.getComponentUuid(),
-                                RefsetAux.PATH_ORIGIN_REFEST.getLenient().getNid(), null, null);
-                        pathOriginRefexBp.put(RefexCAB.RefexProperty.UUID1, editOriginPathUuid);
-                        pathOriginRefexBp.put(RefexCAB.RefexProperty.INTEGER1, Integer.MAX_VALUE);
-                        pathRefexBp.setMemberUuid(UUID.randomUUID());
-
-                        RefexCAB pathOriginRefexOtherBp = new RefexCAB(TK_REFSET_TYPE.CID_INT,
-                                originFromDevPathUuid,
-                                RefsetAux.PATH_ORIGIN_REFEST.getLenient().getNid(), null, null);
-                        pathOriginRefexOtherBp.put(RefexCAB.RefexProperty.UUID1, newEditPathBp.getComponentUuid());
-                        pathOriginRefexOtherBp.put(RefexCAB.RefexProperty.INTEGER1, Integer.MAX_VALUE);
-                        pathOriginRefexOtherBp.setMemberUuid(UUID.randomUUID());
-
-                        TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(Ts.get().getMetadataEC(),
-                                Ts.get().getMetadataVC());
-                        PathCB pathBp = new PathCB (newEditPathBp,
-                                pathRefexBp,
-                                pathOriginRefexBp,
-                                pathOriginRefexOtherBp,
-                                Ts.get().getConcept(editOriginPathUuid));
-                        editPath = builder.construct(pathBp);
-                    }
-                }else{
+                if(!makeUserDevPath){
                     editPath = tf.getPath(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, this.projectDevelopmentPathFsn));
                 }
                 if(editPath != null){
