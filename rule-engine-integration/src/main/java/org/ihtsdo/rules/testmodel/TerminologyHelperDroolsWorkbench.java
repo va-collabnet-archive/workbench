@@ -368,7 +368,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
      */
     @Override
     public boolean isFsnTextNotUnique(String fsn, String conceptUuid, String langCode) throws Exception {
-        SearchResult result = Terms.get().doLuceneSearch(fsn);
+        SearchResult result = Terms.get().doLuceneSearch(QueryParser.escape(fsn));
         int conceptNid = Terms.get().uuidToNative(UUID.fromString(conceptUuid));
         boolean unique = true;
         if (result.topDocs.totalHits == 0) {
