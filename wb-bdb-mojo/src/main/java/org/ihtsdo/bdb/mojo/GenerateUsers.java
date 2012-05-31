@@ -180,7 +180,7 @@ public class GenerateUsers extends AbstractMojo {
         private ConceptSpec refsetStatus;
         private ArrayList<ConceptSpec> additionalRoots;
         private boolean makeUserDevPath = false;
-        private ConceptChronicleBI parentConcept;
+        private ConceptChronicleBI parentConcept = null;;
 
 
 	@Override
@@ -204,30 +204,6 @@ public class GenerateUsers extends AbstractMojo {
                             getLog().info("****************\n Creating new users \n****************\n");
                             String userLine = userReader.readLine();
                             if(userLine != null){
-                                if(userParentConceptName != null){
-                                    UUID parentConceptUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, userParentConceptName);
-                                    if(Ts.get().hasUuid(parentConceptUuid)){
-                                        parentConcept = Ts.get().getConcept(parentConceptUuid);
-                                    }else{
-                                        ConceptCB parentConceptBp = new ConceptCB(
-                                                userParentConceptName,
-                                                userParentConceptName,
-                                                LANG_CODE.EN_US,
-                                                TermAux.IS_A.getLenient().getPrimUuid(),
-                                                TermAux.USER.getLenient().getPrimUuid());
-                                        TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(
-                                                Ts.get().getMetadataEC(),
-                                                Ts.get().getMetadataVC());
-                                        parentConcept = builder.construct(parentConceptBp);
-                                        Ts.get().addUncommitted(parentConcept);
-                                        Ts.get().commit();
-                                    }
-                                }else{
-                                    ConceptSpec userParent = new ConceptSpec("user",
-					UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c"));
-                                    parentConcept = Ts.get().getConcept(userParent.getLenient().getPrimUuid());
-                                }
-                                
                                 while (userLine != null) {
                                         userConfig = null;
                                         String[] parts = userLine.split("\t");
@@ -558,6 +534,30 @@ public class GenerateUsers extends AbstractMojo {
                                             }
 
                                             userQueueRoot.mkdirs();
+                                            
+                                            if(userParentConceptName != null && parentConcept == null){
+                                                UUID parentConceptUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, userParentConceptName);
+                                                if(Ts.get().hasUuid(parentConceptUuid)){
+                                                    parentConcept = Ts.get().getConcept(parentConceptUuid);
+                                                }else{
+                                                    ConceptCB parentConceptBp = new ConceptCB(
+                                                            userParentConceptName,
+                                                            userParentConceptName,
+                                                            LANG_CODE.EN_US,
+                                                            TermAux.IS_A.getLenient().getPrimUuid(),
+                                                            TermAux.USER.getLenient().getPrimUuid());
+                                                    TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(
+                                                            Ts.get().getMetadataEC(),
+                                                            Ts.get().getMetadataVC());
+                                                    parentConcept = builder.construct(parentConceptBp);
+                                                    Ts.get().addUncommitted(parentConcept);
+                                                    Ts.get().commit();
+                                                }
+                                            }else if(parentConcept == null){
+                                                ConceptSpec userParent = new ConceptSpec("user",
+                                                    UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c"));
+                                                parentConcept = Ts.get().getConcept(userParent.getLenient().getPrimUuid());
+                                            }
 
                                             // Create new concept for user...
                                             if (userUuid == null || userUuid.equals("")) {
@@ -627,6 +627,53 @@ public class GenerateUsers extends AbstractMojo {
                                                 adminPassword);
                                 userConfig.getDbConfig().setProfileFile(userProfile);
                                 Terms.get().setActiveAceFrameConfig(userConfig);
+                                
+                                File changeSetRoot = new File(userDir, "changesets");
+                                getLog().info("** Changeset root: " + changeSetRoot.getAbsolutePath());
+                                changeSetRoot.mkdirs();
+
+                                I_ConfigAceDb newDbProfile = userConfig.getDbConfig();
+                                File absoluteChangeSetRoot = new File(wbBundleDir, "profiles/user-creation-changesets");
+
+                                newDbProfile.setChangeSetRoot(changeSetRoot);
+                                getLog().info("** Changeset root from db config: " + newDbProfile.getChangeSetRoot().getAbsolutePath());
+                                getLog().info("** absoluteChangeSetRoot: " + absoluteChangeSetRoot.getAbsolutePath());
+                                newDbProfile.setChangeSetWriterFileName(userConfig.getUsername() + "#1#"
+                                                + UUID.randomUUID().toString() + ".eccs");
+                                newDbProfile.setUsername(userConfig.getUsername());
+
+                                String tempKey = UUID.randomUUID().toString();
+                                ChangeSetGeneratorBI generator =
+                                        Ts.get().createDtoChangeSetGenerator(new File(absoluteChangeSetRoot, newDbProfile.getChangeSetWriterFileName()), new File(absoluteChangeSetRoot, "#0#"
+                                                        + newDbProfile.getChangeSetWriterFileName()), ChangeSetGenerationPolicy.MUTABLE_ONLY);
+                                List<ChangeSetGeneratorBI> extraGeneratorList = new ArrayList<ChangeSetGeneratorBI>();
+
+                                extraGeneratorList.add(generator);
+                                Ts.get().addChangeSetGenerator(tempKey, generator);
+                                
+                                if(userParentConceptName != null && parentConcept == null){
+                                    UUID parentConceptUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, userParentConceptName);
+                                    if(Ts.get().hasUuid(parentConceptUuid)){
+                                        parentConcept = Ts.get().getConcept(parentConceptUuid);
+                                    }else{
+                                        ConceptCB parentConceptBp = new ConceptCB(
+                                                userParentConceptName,
+                                                userParentConceptName,
+                                                LANG_CODE.EN_US,
+                                                TermAux.IS_A.getLenient().getPrimUuid(),
+                                                TermAux.USER.getLenient().getPrimUuid());
+                                        TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(
+                                                Ts.get().getMetadataEC(),
+                                                Ts.get().getMetadataVC());
+                                        parentConcept = builder.construct(parentConceptBp);
+                                        Ts.get().addUncommitted(parentConcept);
+                                        Ts.get().commit();
+                                    }
+                                }else if (parentConcept == null){
+                                    ConceptSpec userParent = new ConceptSpec("user",
+                                        UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c"));
+                                    parentConcept = Ts.get().getConcept(userParent.getLenient().getPrimUuid());
+                                }
 
                                 if (username != null) {
                                         if (userConfig.getAddressesList().contains(username) == false) {
@@ -654,28 +701,7 @@ public class GenerateUsers extends AbstractMojo {
                                         return false;
                                 }
 
-                                File changeSetRoot = new File(userDir, "changesets");
-                                getLog().info("** Changeset root: " + changeSetRoot.getAbsolutePath());
-                                changeSetRoot.mkdirs();
-
-                                I_ConfigAceDb newDbProfile = userConfig.getDbConfig();
-                                File absoluteChangeSetRoot = new File(wbBundleDir, "profiles/user-creation-changesets");
-
-                                newDbProfile.setChangeSetRoot(changeSetRoot);
-                                getLog().info("** Changeset root from db config: " + newDbProfile.getChangeSetRoot().getAbsolutePath());
-                                getLog().info("** absoluteChangeSetRoot: " + absoluteChangeSetRoot.getAbsolutePath());
-                                newDbProfile.setChangeSetWriterFileName(userConfig.getUsername() + "#1#"
-                                                + UUID.randomUUID().toString() + ".eccs");
-                                newDbProfile.setUsername(userConfig.getUsername());
-
-                                String tempKey = UUID.randomUUID().toString();
-                                ChangeSetGeneratorBI generator =
-                                        Ts.get().createDtoChangeSetGenerator(new File(absoluteChangeSetRoot, newDbProfile.getChangeSetWriterFileName()), new File(absoluteChangeSetRoot, "#0#"
-                                                        + newDbProfile.getChangeSetWriterFileName()), ChangeSetGenerationPolicy.MUTABLE_ONLY);
-                                List<ChangeSetGeneratorBI> extraGeneratorList = new ArrayList<ChangeSetGeneratorBI>();
-
-                                extraGeneratorList.add(generator);
-                                Ts.get().addChangeSetGenerator(tempKey, generator);
+                                
 
                                 try {
                                         Terms.get().commit();
