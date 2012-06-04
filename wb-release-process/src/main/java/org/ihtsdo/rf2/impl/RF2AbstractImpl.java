@@ -82,6 +82,7 @@ public abstract class RF2AbstractImpl {
 	protected NidSetBI textDefinTypes;
 
 	private I_GetConceptData snomedRoot;
+	private I_GetConceptData device;
 	
 	private I_GetConceptData snomedCTModelComponent;	
 	private I_GetConceptData coreMetaConceptRoot;
@@ -151,6 +152,7 @@ public abstract class RF2AbstractImpl {
 			this.currenAceConfig = tf.getActiveAceFrameConfig();
 			snomedIntId = tf.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids());
 			snomedRoot = tf.getConcept(UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8"));
+			device = tf.getConcept(UUID.fromString("6e8f5d95-0505-3aa8-a730-e1e9d821e4aa"));
 			
 			snomedCTModelComponent = tf.getConcept(UUID.fromString("a60bd881-9010-3260-9653-0c85716b4391"));
 			coreMetaConceptRoot = tf.getConcept(UUID.fromString("4c6d8b0b-774a-341e-b0e5-1fc2deedb5a5"));
@@ -580,7 +582,7 @@ public abstract class RF2AbstractImpl {
 
 	public void process(I_GetConceptData concept) throws IOException, TerminologyException {
 		
-		if (snomedRoot.isParentOf(concept, 
+		if (device.isParentOf(concept, 
 				currenAceConfig.getAllowedStatus(),
 				currenAceConfig.getDestRelTypes(), 
 				currenAceConfig.getViewPositionSetReadOnly(), 
@@ -597,36 +599,37 @@ public abstract class RF2AbstractImpl {
 					if (c != null)  conceptid = c.toString();
 				}
 			}
-			/*int len= conceptid.length();
+			int len= conceptid.length();
 			CharSequence partition = conceptid.substring(len-3, len).subSequence(0, 2);
-			if(partition.equals("00")){		*/	
-			
-			String active="0"; //Default value
-			List<? extends I_ConceptAttributeTuple> conceptAttributes = concept.getConceptAttributeTuples(
-					allStatuses, 
-					currenAceConfig.getViewPositionSetReadOnly(), 
-					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
+			if(partition.equals("10")){		
 
-			if (conceptAttributes != null && !conceptAttributes.isEmpty()) {
-				I_ConceptAttributeTuple attributes = conceptAttributes.iterator().next();				
-				String conceptStatus = getStatusType(attributes.getStatusNid());
-				if (conceptStatus.equals("0")) {
-					active = "1";
-				} else if (getConfig().getReleaseDate().compareTo(I_Constants.limited_policy_change)<0 && conceptStatus.equals("6")) {
-					active = "1";
-				} else {
-					active = "0";
+				String active="0"; //Default value
+				List<? extends I_ConceptAttributeTuple> conceptAttributes = concept.getConceptAttributeTuples(
+						allStatuses, 
+						currenAceConfig.getViewPositionSetReadOnly(), 
+						Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
+
+				if (conceptAttributes != null && !conceptAttributes.isEmpty()) {
+					I_ConceptAttributeTuple attributes = conceptAttributes.iterator().next();				
+					String conceptStatus = getStatusType(attributes.getStatusNid());
+					if (conceptStatus.equals("0")) {
+						active = "1";
+					} else if (getConfig().getReleaseDate().compareTo(I_Constants.limited_policy_change)<0 && conceptStatus.equals("6")) {
+						active = "1";
+					} else {
+						active = "0";
+					}
+
+					if ((conceptid==null || conceptid.equals("") || conceptid.equals("0")) && active.equals("1") ){
+						conceptid=concept.getUids().iterator().next().toString();
+					}
 				}
-				
-				if ((conceptid==null || conceptid.equals("") || conceptid.equals("0")) && active.equals("1") ){
-					conceptid=concept.getUids().iterator().next().toString();
-				}
-			}
-			
-			if (conceptid==null || conceptid.equals("") || conceptid.equals("0")){
-				logger.info("Unplublished Retired Concept: " + concept.getUUIDs().iterator().next().toString());
-			}else{
+
+				if (conceptid==null || conceptid.equals("") || conceptid.equals("0")){
+					logger.info("Unplublished Retired Concept: " + concept.getUUIDs().iterator().next().toString());
+				}else{
 					export(concept, conceptid);
+				}
 			}
 		}
 	}
@@ -634,7 +637,7 @@ public abstract class RF2AbstractImpl {
 	//all the contents resides under SNOMED CT Model Component (metadata) gets metamoduleid (900000000000012004)
 	//This returns of the content which belongs meta-module
 	public String computeModuleId(I_GetConceptData concept) throws IOException, TerminologyException {
-		String moduleid = I_Constants.CORE_MODULE_ID;	
+		String moduleid = I_Constants.GMDN_MODULE_ID;	
 		if (snomedCTModelComponent.isParentOf(concept, 
 				currenAceConfig.getAllowedStatus(),
 				currenAceConfig.getDestRelTypes(), 

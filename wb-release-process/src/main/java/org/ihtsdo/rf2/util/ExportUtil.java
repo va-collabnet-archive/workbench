@@ -756,7 +756,7 @@ public class ExportUtil {
 					break;
 				}
 				else {
-					moduleId = I_Constants.CORE_MODULE_ID; 
+					moduleId = I_Constants.GMDN_MODULE_ID; 
 				}
 			} 
 		}

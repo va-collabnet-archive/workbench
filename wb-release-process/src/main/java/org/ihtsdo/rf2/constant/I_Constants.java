@@ -10,8 +10,10 @@ package org.ihtsdo.rf2.constant;
 public class I_Constants {
 
 	public final static String CORE_MODULE_ID = "900000000000207008";
+	public final static String GMDN_MODULE_ID = "194721000142105";
 	public final static String META_MODULE_ID = "900000000000012004";
 	public final static String META_SCTID = "900000000000441003";
+	
 
 	// set definitionStatus Id
 	public final static String FULLY_DEFINED = "900000000000073002";
@@ -140,6 +142,8 @@ public class I_Constants {
 	public final static String SNOROCKET_AUTHOR_UID = "7e87cc5b-e85f-3860-99eb-7a44f2b9e6f9";
 	public final static String USER_AUTHOR_UID = "f7495b58-6630-3499-a44e-2052b5fcf06c";
 
+	public final static String GMDN_LANG_REFSET_ID = "194761000142104";
+	
 	public final static String US_LANG_REFSET_ID = "900000000000509007";
 	public final static String US_LANG_REFSET_UID = "bca0a686-3516-3daf-8fcf-fe396d13cfad";
 	public final static String USLANG_REFSET_UID_TERM_AUX = "29bf812c-7a77-595d-8b12-ea37c473a5e6";

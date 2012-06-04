@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <config>
-	<exportFileName>sct2_wfHx_Full-en_INT_</exportFileName>
+	<exportFileName>sct2_wfHx_Full-en_GMDN_</exportFileName>
 	<droolsDrlFile>org/ihtsdo/rf2/drools/NONEReleaseRules.drl</droolsDrlFile>
 	<column>
 		<name>WorkflowUUID</name>

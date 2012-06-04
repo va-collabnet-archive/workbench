@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <config>
-	<exportFileName>sct2_StatedRelationship_Full_INT_</exportFileName>
+	<exportFileName>sct2_StatedRelationship_Full_GMDN_</exportFileName>
 	<droolsDrlFile>org/ihtsdo/rf2/drools/StatedRelationshipReleaseRules.drl</droolsDrlFile>
 	<column>
 		<name>id</name>
