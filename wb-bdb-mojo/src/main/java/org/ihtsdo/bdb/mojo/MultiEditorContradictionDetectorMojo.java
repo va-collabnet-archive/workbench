@@ -165,96 +165,78 @@ public class MultiEditorContradictionDetectorMojo extends AbstractMojo {
             int adjudicationRecRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.ADJUDICATION_RECORD.getUids());
             ViewCoordinate vc = config.getViewCoordinate();
 
-
-            // *** TEST CASE 1 ***
             List<MultiEditorContradictionCase> cases;
-            cases = new ArrayList<MultiEditorContradictionCase>();
             MultiEditorContradictionDetector mecd;
-            mecd = new MultiEditorContradictionDetector(commitRecRefsetNid,
-                    adjudicationRecRefsetNid,
-                    vc, // ViewCoordinates
-                    cases, // Resulting Cases
-                    debugWatchNidSet(),
-                    false, // ignoreReadOnlySap ... AuthorTime from refset for given concept
-                    false); // ignoreNonVisibleAth ... AuthorTime from concept
-            Ts.get().iterateConceptDataInSequence(mecd);
-            // Ts.get().iterateConceptDataInParallel(mecd);
+            StringBuilder sb;
+            
+            // *** TEST CASE 1 ***
+//            cases = new ArrayList<MultiEditorContradictionCase>();
+//            mecd = new MultiEditorContradictionDetector(commitRecRefsetNid,
+//                    adjudicationRecRefsetNid,
+//                    vc, // ViewCoordinates
+//                    cases, // Resulting Cases
+//                    debugWatchNidSet(),
+//                    false, // ignoreReadOnlySap ... AuthorTime from refset for given concept
+//                    false); // ignoreNonVisibleAth ... AuthorTime from concept
+//            Ts.get().iterateConceptDataInSequence(mecd);
+//            // Ts.get().iterateConceptDataInParallel(mecd);
+//
+//            // REPORT COMPONENTS WITH MISSING COMMIT RECORDS
+//            sb = new StringBuilder();
+//            sb.append("\r\n**** COMPONENTS MISSING COMMITRECORDS ****");
+//            sb.append("\r\n[MultiEditorContradictionDetectionMojo] MISSING COMMITRECORDS LIST\r\n");
+//            sb.append(mecd.toStringMissingCommitRecords());
+//            sb.append("\r\n");
+//            logger.info(sb.toString());
 
-            // REPORT COMPONENTS WITH MISSING COMMIT RECORDS
-            StringBuilder sb = new StringBuilder();
-            sb.append("\r\n**** COMPONENTS MISSING COMMITRECORDS ****");
-            sb.append("\r\n[MultiEditorContradictionDetectionMojo] MISSING COMMITRECORDS LIST\r\n");
-            sb.append(mecd.toStringMissingCommitRecords());
-            sb.append("\r\n");
-            logger.info(sb.toString());
 
-            // WATCH RESULTS -- NOT CONTRADICTIONS
-            List<MultiEditorContradictionCase> watchCaseList = mecd.getWatchCaseList();
-            sb = new StringBuilder();
-            sb.append("\r\n**** NON-CONTRADICTING WATCH CASE 1: IGNORE NOTHING ****");
-            sb.append("\r\n[MultiEditorContradictionDetectionMojo] WATCH");
-            if (watchCaseList != null) {
-                sb.append("\r\n-- WATCH LIST --");
-                for (String uuidStr : watchUuidList) {
-                    sb.append("\r\n    ");
-                    sb.append(uuidStr);
-                }
-
-                for (MultiEditorContradictionCase watchCase : watchCaseList) {
-                    sb.append("\r\n-- NON-CONTRADICTING WATCH CASE --");
-                    sb.append(watchCase.toStringLong());
-                    sb.append("\r\n");
-                }
-            }
-            logger.info(sb.toString());
-
-            // REPORT RESULTS
-            if (cases.size() > 0) {
-                // CONTRADICTIONS
-                sb = new StringBuilder();
-                sb.append("\r\n***** CONTRADICTION CASE 1: IGNORE NOTHING *****");
-                sb.append("\r\n[MultiEditorContradictionDetectionMojo] FOUND CONTRADICTIONS\r\n");
-                for (MultiEditorContradictionCase contradictionCase : cases) {
-                    sb.append(contradictionCase.toStringLong());
-                    sb.append("\r\n");
-                }
-                logger.info(sb.toString());
-
-            } else {
-                sb = new StringBuilder();
-                sb.append("\r\n***** CASE 1: IGNORE NOTHING *****");
-                sb.append("\r\n[MultiEditorContradictionDetectionMojo] NO CONTRADICTIONS FOUND");
-                logger.info(sb.toString());
-            }
+            // REPORT CASE 1 RESULTS
+//            if (cases.size() > 0) {
+//                // CONTRADICTIONS
+//                sb = new StringBuilder();
+//                sb.append("\r\n***** CONTRADICTION CASE 1: IGNORE NOTHING *****");
+//                sb.append("\r\n[MultiEditorContradictionDetectionMojo] FOUND CONTRADICTIONS\r\n");
+//                for (MultiEditorContradictionCase contradictionCase : cases) {
+//                    sb.append(contradictionCase.toStringLong());
+//                    sb.append("\r\n");
+//                }
+//                logger.info(sb.toString());
+//
+//            } else {
+//                sb = new StringBuilder();
+//                sb.append("\r\n***** CASE 1: IGNORE NOTHING *****");
+//                sb.append("\r\n[MultiEditorContradictionDetectionMojo] NO CONTRADICTIONS FOUND");
+//                logger.info(sb.toString());
+//            }
 
             // *** TEST CASE 2 ***
-            cases = new ArrayList<MultiEditorContradictionCase>();
-            mecd = new MultiEditorContradictionDetector(commitRecRefsetNid,
-                    adjudicationRecRefsetNid,
-                    vc, // ViewCoordinates
-                    cases, // Resulting Cases
-                    debugWatchNidSet(),
-                    true, // ignoreReadOnlySap ... AuthorTime from refset for given concept
-                    false); // ignoreNonVisibleAth ... AuthorTime from concept
-            Ts.get().iterateConceptDataInSequence(mecd);
-            // Ts.get().iterateConceptDataInParallel(mecd);
-
-            // report results
-            if (cases.size() > 0) {
-                sb = new StringBuilder();
-                sb.append("\r\n***** CASE 2: DON'T COMPUTE READONLY *****");
-                sb.append("\r\n[MultiEditorContradictionDetectionMojo] FOUND CONTRADICTIONS\r\n");
-                for (MultiEditorContradictionCase contradictionCase : cases) {
-                    sb.append(contradictionCase.toStringLong());
-                    sb.append("\r\n");
-                }
-                logger.info(sb.toString());
-            } else {
-                sb = new StringBuilder();
-                sb.append("\r\n***** CASE 2: DON'T COMPUTE READONLY *****");
-                sb.append("\r\n[MultiEditorContradictionDetectionMojo] NO CONTRADICTIONS FOUND");
-                logger.info(sb.toString());
-            }
+//            cases = new ArrayList<MultiEditorContradictionCase>();
+//            mecd = new MultiEditorContradictionDetector(commitRecRefsetNid,
+//                    adjudicationRecRefsetNid,
+//                    vc, // ViewCoordinates
+//                    cases, // Resulting Cases
+//                    debugWatchNidSet(),
+//                    true, // ignoreReadOnlySap ... AuthorTime from refset for given concept
+//                    false); // ignoreNonVisibleAth ... AuthorTime from concept
+//            Ts.get().iterateConceptDataInSequence(mecd);
+//            // Ts.get().iterateConceptDataInParallel(mecd);
+//
+//            // report results
+//            if (cases.size() > 0) {
+//                sb = new StringBuilder();
+//                sb.append("\r\n***** CASE 2: DON'T COMPUTE READONLY *****");
+//                sb.append("\r\n[MultiEditorContradictionDetectionMojo] FOUND CONTRADICTIONS\r\n");
+//                for (MultiEditorContradictionCase contradictionCase : cases) {
+//                    sb.append(contradictionCase.toStringLong());
+//                    sb.append("\r\n");
+//                }
+//                logger.info(sb.toString());
+//            } else {
+//                sb = new StringBuilder();
+//                sb.append("\r\n***** CASE 2: DON'T COMPUTE READONLY *****");
+//                sb.append("\r\n[MultiEditorContradictionDetectionMojo] NO CONTRADICTIONS FOUND");
+//                logger.info(sb.toString());
+//            }
 
             // *** TEST CASE 3 ***
             cases = new ArrayList<MultiEditorContradictionCase>();
@@ -284,6 +266,26 @@ public class MultiEditorContradictionDetectorMojo extends AbstractMojo {
                 sb.append("\r\n[MultiEditorContradictionDetectionMojo] NO CONTRADICTIONS FOUND");
                 logger.info(sb.toString());
             }
+
+            // WATCH RESULTS -- NOT CONTRADICTIONS
+            List<MultiEditorContradictionCase> watchCaseList = mecd.getWatchCaseList();
+            sb = new StringBuilder();
+            sb.append("\r\n**** NON-CONTRADICTING WATCH CASE 1: IGNORE NOTHING ****");
+            sb.append("\r\n[MultiEditorContradictionDetectionMojo] WATCH");
+            if (watchCaseList != null) {
+                sb.append("\r\n-- WATCH LIST --");
+                for (String uuidStr : watchUuidList) {
+                    sb.append("\r\n    ");
+                    sb.append(uuidStr);
+                }
+
+                for (MultiEditorContradictionCase watchCase : watchCaseList) {
+                    sb.append("\r\n-- NON-CONTRADICTING WATCH CASE --");
+                    sb.append(watchCase.toStringLong());
+                    sb.append("\r\n");
+                }
+            }
+            logger.info(sb.toString());
 
         } catch (Exception ex) {
             logger.error("\r\n::: [MultiEditorContradictionDetectionMojo] TerminologyException", ex);
