@@ -51,7 +51,7 @@ public class RF2FileRetrieve {
 	private static final String ATTRIBUTEVALUE_FILENAME_PART = "_crefset_attributevaluefull_";
 	private static final String END_FILE = ".txt";
 	private static final String ASSOCIATION_FILENAME_PART = "_crefset_associationreferencefull_";
-	private static final String LANGUAGE_FILENAME_PART = "_crefset_languagefull";
+	private static final String LANGUAGE_FILENAME_PART = "_crefset_languagegmdnfull";
 	private static final String IDENTIFIER_FILENAME_PART = "_identifier_full_";
 	private static final String SIMPLEMAP_FILENAME_PART = "srefset_simplemapfull_";
 	private static final String CONCEPT_FILENAME_PART = "_concept_full_";

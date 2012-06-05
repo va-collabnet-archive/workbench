@@ -110,8 +110,11 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 					if(moduleId.equals(I_Constants.META_MODULE_ID)){			
 						//logger.info("==Meta Concept==" + conceptid + " & Name : " + concept.getInitialText());
 						incrementMetaDataCount();
+					}else if(!moduleId.equals(I_Constants.CORE_MODULE_ID)){
+						languageCode=description.getLang();
+					}else{
+						languageCode="en";
 					}
-					
 					if (conceptid==null || conceptid.equals("") || conceptid.equals("0")){
 						conceptid=concept.getUids().iterator().next().toString();
 					}

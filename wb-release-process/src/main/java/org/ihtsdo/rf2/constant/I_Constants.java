@@ -143,6 +143,8 @@ public class I_Constants {
 	public final static String USER_AUTHOR_UID = "f7495b58-6630-3499-a44e-2052b5fcf06c";
 
 	public final static String GMDN_LANG_REFSET_ID = "194761000142104";
+	public final static String GMDN_REVIEW_STATUS_REFSET_ID = "194751000142102";
+	public final static String GMDN_REVIEW_STATUS_REFSET_UID ="c5994e33-21d3-327c-ab25-06d2356d2d68";
 	
 	public final static String US_LANG_REFSET_ID = "900000000000509007";
 	public final static String US_LANG_REFSET_UID = "bca0a686-3516-3daf-8fcf-fe396d13cfad";
