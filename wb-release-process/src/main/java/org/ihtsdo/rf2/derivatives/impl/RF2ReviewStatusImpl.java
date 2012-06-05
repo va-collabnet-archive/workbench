@@ -1,4 +1,4 @@
-package org.ihtsdo.rf2.refset.impl;
+package org.ihtsdo.rf2.derivatives.impl;
 
 import java.io.IOException;
 import java.text.ParseException;
