@@ -20,12 +20,8 @@ import au.csiro.snorocket.snapi.Snorocket_123;
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -39,6 +35,7 @@ import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
@@ -95,7 +92,7 @@ public class SnorocketMojoEx extends AbstractMojo {
      * @parameter expression="6155818b-09ed-388e-82ce-caa143423e99" @required
      */
     private String uuidRoleRoot;
-    /**
+     /**
      * The uuid for the edit path.
      *
      * @parameter
@@ -1040,10 +1037,7 @@ public class SnorocketMojoEx extends AbstractMojo {
                 if (rvList.size() == 1) {
                     // CREATE RELATIONSHIP PART W/ TermFactory (RelationshipRevision)
                     I_RelPart analog = (I_RelPart) rvList.get(0).makeAnalog(isCURRENT,
-                            versionTime,
-                            snorocketAuthorNid,
-                            config.getEditCoordinate().getModuleNid(),
-                            writeToNid);
+                            snorocketAuthorNid, writeToNid, versionTime);
                     analog.setGroup(group);
 
                     I_GetConceptData thisC1 = tf.getConcept(rel_A.c1Id);
@@ -1094,11 +1088,7 @@ public class SnorocketMojoEx extends AbstractMojo {
                 if (rvList.size() == 1) {
 
                     // CREATE RELATIONSHIP PART W/ TermFactory
-                    rvList.get(0).makeAnalog(isRETIRED,
-                            versionTime,
-                            snorocketAuthorNid,
-                            config.getEditCoordinate().getModuleNid(),
-                            writeToNid);
+                    rvList.get(0).makeAnalog(isRETIRED, snorocketAuthorNid, writeToNid, versionTime);
                     I_GetConceptData thisC1 = tf.getConcept(rel_A.c1Id);
                     tf.addUncommittedNoChecks(thisC1);
 
@@ -1174,9 +1164,9 @@ public class SnorocketMojoEx extends AbstractMojo {
     } // compareSnoRel
 
     private I_ConfigAceFrame getMojoDbConfig()
-            throws TerminologyException, IOException, ParseException, NoSuchAlgorithmException {
+            throws TerminologyException, IOException, ParseException,
+            NoSuchAlgorithmException, Exception {
         I_ConfigAceFrame tmpConfig = tf.newAceFrameConfig();
-        DateFormat df = new SimpleDateFormat("yyyy.MM.dd hh:mm:ss");
         UUID editPathUuid = null;
         if (editPathFsn != null){
             editPathUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
@@ -1184,7 +1174,7 @@ public class SnorocketMojoEx extends AbstractMojo {
         }else{
             editPathUuid = UUID.fromString(uuidEditPath);
         }
-        tmpConfig.addViewPosition(tf.newPosition(tf.getPath(editPathUuid), df.parse(dateTimeStr).getTime()));
+       tmpConfig.addViewPosition(tf.newPosition(tf.getPath(editPathUuid), TimeHelper.getTimeFromString(dateTimeStr)));
         // Addes inferred promotion template to catch the context relationships [ testing
         //tmpConfig.addViewPosition(tf.newPosition(tf.getPath(new UUID[] { UUID.fromString("cb0f6c0d-ebf3-5d84-9e12-d09a937cbffd") }), Integer.MAX_VALUE));
         //tmpConfig.addEditingPath(tf.getPath(new UUID[] { UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2") }));

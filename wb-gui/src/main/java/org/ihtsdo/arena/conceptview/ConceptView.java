@@ -39,6 +39,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 
 import java.util.ArrayList;
@@ -112,6 +113,15 @@ public class ConceptView extends JPanel {
       this.settings   = settings;
       this.cvRenderer = cvRenderer;
       kbFiles.add(new File("drools-rules/ContextualDropActions.drl"));
+      if(new File("drools-rules/extras/ContextualDropActionsXtra.drl").exists()){
+          kbFiles.add(new File("drools-rules/extras/ContextualDropActionsXtra.drl"));
+      }
+      String kbKey = ConceptView.class.getCanonicalName();
+      try {
+            DroolsExecutionManager.setup(kbKey, kbFiles);
+        } catch (IOException e1) {
+            AceLog.getAppLog().alertAndLogException(e1);
+        }
       kb = ConceptTemplates.getKb();
       addCommitListener(settings);
       setupPrefMap();
