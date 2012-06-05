@@ -260,6 +260,9 @@ public class ConceptViewRenderer extends JLayeredPane {
                 ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         this.kbFiles.add(new File("drools-rules/ContextualConceptActionsPanel.drl"));
+        if(new File("drools-rules/extras/ContextualConceptActionsPanelXtra.drl").exists()){
+            kbFiles.add(new File("drools-rules/extras/ContextualConceptActionsPanelXtra.drl"));
+        }
 
         try {
             DroolsExecutionManager.setup(ConceptViewRenderer.class.getCanonicalName(), kbFiles);

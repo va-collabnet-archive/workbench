@@ -156,6 +156,9 @@ public class CollapsePanel extends JPanel {
         this.settings = settings;
 
         this.kbFiles.add(new File("drools-rules/ContextualSectionDropdown.drl"));
+        if(new File("drools-rules/extras/ContextualSectionDropdownXtra.drl").exists()){
+            kbFiles.add(new File("drools-rules/extras/ContextualSectionDropdownXtra.drl"));
+        }
         this.kbKey = labelStr + CollapsePanel.class.getCanonicalName();
 
         try {
