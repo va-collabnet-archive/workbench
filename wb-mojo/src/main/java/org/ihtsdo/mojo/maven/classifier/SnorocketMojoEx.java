@@ -1036,8 +1036,11 @@ public class SnorocketMojoEx extends AbstractMojo {
 
                 if (rvList.size() == 1) {
                     // CREATE RELATIONSHIP PART W/ TermFactory (RelationshipRevision)
-                    I_RelPart analog = (I_RelPart) rvList.get(0).makeAnalog(isCURRENT,
-                            snorocketAuthorNid, writeToNid, versionTime);
+                    I_RelPart analog = (I_RelPart) rvList.get(0).makeAnalog(isCURRENT, 
+                            versionTime, 
+                            snorocketAuthorNid, 
+                            config.getEditCoordinate().getModuleNid(), 
+                            writeToNid);
                     analog.setGroup(group);
 
                     I_GetConceptData thisC1 = tf.getConcept(rel_A.c1Id);
@@ -1088,7 +1091,11 @@ public class SnorocketMojoEx extends AbstractMojo {
                 if (rvList.size() == 1) {
 
                     // CREATE RELATIONSHIP PART W/ TermFactory
-                    rvList.get(0).makeAnalog(isRETIRED, snorocketAuthorNid, writeToNid, versionTime);
+                    rvList.get(0).makeAnalog(isRETIRED,
+                            versionTime,
+                            snorocketAuthorNid,
+                            config.getEditCoordinate().getModuleNid(),
+                            writeToNid);
                     I_GetConceptData thisC1 = tf.getConcept(rel_A.c1Id);
                     tf.addUncommittedNoChecks(thisC1);
 
