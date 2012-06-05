@@ -19,6 +19,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
+import org.apache.commons.lang.time.DateUtils;
 
 /**
  *
@@ -42,7 +43,17 @@ public class TimeHelper {
                     return new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss");
                 }
             };
+    
+    private static final ThreadLocal<SimpleDateFormat> altLongFileFormat =
+            new ThreadLocal< SimpleDateFormat>() {
 
+                @Override
+                protected SimpleDateFormat initialValue() {
+                    return new SimpleDateFormat("yyyy.MM.dd hh:mm:ss");
+                }
+            };
+
+    
     private static final ThreadLocal<SimpleDateFormat> localShortFileFormat =
             new ThreadLocal< SimpleDateFormat>() {
 
@@ -77,6 +88,10 @@ public class TimeHelper {
     public static SimpleDateFormat getFileDateFormat() {
         return localLongFileFormat.get();
     }
+    
+    public static SimpleDateFormat getAltFileDateFormat() {
+        return altLongFileFormat.get();
+    }
 
     public static SimpleDateFormat getShortFileDateFormat() {
         return localShortFileFormat.get();
@@ -91,7 +106,23 @@ public class TimeHelper {
         }
         return formatter.parse(time).getTime();
     }
-
+    
+    public static long getTimeFromString(String time) throws ParseException{
+        if (time.toLowerCase().equals("latest")) {
+            return Long.MAX_VALUE;
+        }
+        if (time.toLowerCase().equals("bot")) {
+            return Long.MIN_VALUE;
+        }
+        
+        String[] dateFormats = new String[] {
+            localDateFormat.get().toPattern(),
+            localLongFileFormat.get().toPattern(),
+            altLongFileFormat.get().toPattern(),
+            localShortFileFormat.get().toPattern()};
+        return DateUtils.parseDate(time, dateFormats).getTime();
+    }
+    
     public static String formatDateForFile(long time) {
         return FormatDateForFile(new Date(time));
     }
