@@ -1,7 +1,6 @@
 package org.ihtsdo.rf2.derivatives.impl;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -9,22 +8,16 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IdPart;
-import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_ProcessConcepts;
-import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
+import org.ihtsdo.concept.component.refsetmember.cid.CidMember;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.impl.RF2AbstractImpl;
-import org.ihtsdo.rf2.refset.dao.RefsetConceptDAO;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.WriteUtil;
 import org.ihtsdo.tk.api.Precedence;
-import org.ihtsdo.tk.api.RelAssertionType;
 
 /**
  * Title: RF2ConceptInactivationImpl Description: Iterating over all the concept in workbench and fetching all the components required by RF2 ConceptInactivation Refset File Copyright: Copyright (c)
@@ -58,7 +51,7 @@ public class RF2ReviewStatusImpl extends RF2AbstractImpl implements I_ProcessCon
 			String conceptStatus = "";
 			String valueId = "";
 			String active = "";
-			I_ExtendByRefPartCidCid<?> extensionPart;
+			CidMember extensionPart;
 			int extensionStatusId = 0;
 
 
@@ -103,7 +96,7 @@ public class RF2ReviewStatusImpl extends RF2AbstractImpl implements I_ProcessCon
 
 								if (loopTuple.getTime() >= lastVersion) {
 									lastVersion = loopTuple.getTime();
-									extensionPart = (I_ExtendByRefPartCidCid) loopTuple.getMutablePart();
+									extensionPart = (CidMember) loopTuple.getMutablePart();
 								}
 							}
 							if (extensionPart == null) {
@@ -123,7 +116,7 @@ public class RF2ReviewStatusImpl extends RF2AbstractImpl implements I_ProcessCon
 									logger.error("refset member active and concept inactive : =====>" + concept);
 								}
 
-								int conceptVal= extensionPart.getC2id();
+								int conceptVal= extensionPart.getC1Nid();
 								valueId= tf.getConcept(conceptVal).getUUIDs().iterator().next().toString();
 
 								WriteRF2TypeLine(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, valueId);
