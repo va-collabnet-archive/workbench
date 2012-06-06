@@ -35,7 +35,7 @@
 	<column>
 		<name>valueId</name>
 		<description></description>
-		<delimiter>\r\n</delimiter>
+		<delimiter>\t</delimiter>
 	</column>
 	<column>
 		<name>authorName</name>
