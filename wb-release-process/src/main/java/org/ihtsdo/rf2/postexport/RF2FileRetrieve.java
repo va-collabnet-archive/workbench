@@ -48,12 +48,15 @@ public class RF2FileRetrieve {
 	private String relationshipAuxiliaryFile = "";
 	private String statedRelationshipAuxiliaryFile = "";
 
+	private String refsetReviewStatusFile="";
+
 	private static final String ATTRIBUTEVALUE_FILENAME_PART = "_crefset_attributevaluefull_";
 	private static final String END_FILE = ".txt";
 	private static final String ASSOCIATION_FILENAME_PART = "_crefset_associationreferencefull_";
 	private static final String LANGUAGE_FILENAME_PART = "_crefset_languagegmdnfull";
 	private static final String IDENTIFIER_FILENAME_PART = "_identifier_full_";
 	private static final String SIMPLEMAP_FILENAME_PART = "srefset_simplemapfull_";
+	private static final String REVIEWSTATUS_FILENAME_PART = "crefset_gmdnreviewstatusfull_";
 	private static final String CONCEPT_FILENAME_PART = "_concept_full_";
 	private static final String DESCRIPTION_FILENAME_PART = "_description_full";
 	private static final String RELATIONSHIP_FILENAME_PART = "_relationship_full_";
@@ -88,6 +91,8 @@ public class RF2FileRetrieve {
 						identifierFile = file.getAbsolutePath();
 					}else if(file.getName().toLowerCase().contains(SIMPLEMAP_FILENAME_PART)){
 						simpleMapFile = file.getAbsolutePath();
+					}else if(file.getName().toLowerCase().contains(REVIEWSTATUS_FILENAME_PART)){
+						refsetReviewStatusFile = file.getAbsolutePath();
 					}else if(file.getName().toLowerCase().contains(CONCEPT_FILENAME_PART)){
 						conceptFile = file.getAbsolutePath();
 					}else if(file.getName().toLowerCase().contains(DESCRIPTION_FILENAME_PART)){
@@ -301,5 +306,9 @@ public class RF2FileRetrieve {
 
 	public String getStatedRelationshipAuxiliaryFile() {
 		return statedRelationshipAuxiliaryFile;
+	}
+
+	public String getRefsetReviewStatusFile() {
+		return refsetReviewStatusFile;
 	}
 }

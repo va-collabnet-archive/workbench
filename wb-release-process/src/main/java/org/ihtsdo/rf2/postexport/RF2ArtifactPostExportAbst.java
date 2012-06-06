@@ -128,6 +128,10 @@ public abstract class RF2ArtifactPostExportAbst {
 			RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
 			retFile=RF2fRetrieve.getICD9CrossMapFile();
 			break;
+		case RF2_REVIEW_STATUS:
+			RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
+			retFile=RF2fRetrieve.getRefsetReviewStatusFile();
+			break;
 		case RF2_QUALIFIER:
 			AuxFileRetrieve = new AuxiliaryFilesRetrieve(rf2FullFolder);
 			retFile=AuxFileRetrieve.getQualifierFile();
