@@ -154,9 +154,9 @@ public class RF2ReviewStatusExporterMojo extends AbstractMojo {
 			Config config;
 			
 			if(rF2Format.equals("true"))
-			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/reviewStatus.xml");
+			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/reviewStatusRefset.xml");
 			else
-			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/reviewStatusQA.xml");			
+			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/reviewStatusRefsetQA.xml");			
 			
 			
 			// set all the values passed via mojo
