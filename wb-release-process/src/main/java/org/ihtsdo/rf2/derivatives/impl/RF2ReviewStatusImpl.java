@@ -74,13 +74,12 @@ public class RF2ReviewStatusImpl extends RF2AbstractImpl implements I_ProcessCon
 					conceptStatus = getStatusType(i_ConceptAttributeTuple.getStatusNid());
 					Date et = new Date(getTermFactory().convertToThickVersion(i_ConceptAttributeTuple.getVersion()));
 					effectiveTime = getDateFormat().format(et);
-
-					if (conceptStatus.equals("0")){
-						active = "0";
-					} else if(conceptStatus.equals("1") && (et.before(PREVIOUSRELEASEDATE) || et.equals(PREVIOUSRELEASEDATE))) {
-						active = "0";
-					} else {
+					if (conceptStatus.equals("0")) {
 						active = "1";
+					} else if (getConfig().getReleaseDate().compareTo(I_Constants.limited_policy_change)<0 && conceptStatus.equals("6")) {
+						active = "1";
+					} else {
+						active = "0";
 					}
 				}
 			}
