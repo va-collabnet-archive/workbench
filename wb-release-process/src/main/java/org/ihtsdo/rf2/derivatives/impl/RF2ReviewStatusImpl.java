@@ -13,6 +13,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.concept.component.refsetmember.cid.CidMember;
+import org.ihtsdo.concept.component.refsetmember.cid.CidRevision;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.impl.RF2AbstractImpl;
 import org.ihtsdo.rf2.util.Config;
@@ -91,12 +92,21 @@ public class RF2ReviewStatusImpl extends RF2AbstractImpl implements I_ProcessCon
 						if (extension != null) {		
 							long lastVersion = Long.MIN_VALUE;
 							extensionPart=null;
+							int conceptVal=-1;
 							for (I_ExtendByRefVersion loopTuple : extension.getTuples(allStatusSet,currenAceConfig.getViewPositionSetReadOnly(),
 									Precedence.PATH,currenAceConfig.getConflictResolutionStrategy())) {
 
 								if (loopTuple.getTime() >= lastVersion) {
 									lastVersion = loopTuple.getTime();
-									extensionPart = (CidMember) loopTuple.getMutablePart();
+									if (loopTuple.getMutablePart() instanceof CidMember){
+										extensionPart = (CidMember) loopTuple.getMutablePart();
+										extensionStatusId = extensionPart.getStatusNid();
+										conceptVal= extensionPart.getC1Nid();
+									}else if (loopTuple.getMutablePart() instanceof CidRevision){
+										CidRevision extensionRevPart = (CidRevision) loopTuple.getMutablePart();
+										extensionStatusId = extensionRevPart.getStatusNid();
+										conceptVal= extensionRevPart.getC1id();
+									}
 								}
 							}
 							if (extensionPart == null) {
@@ -106,7 +116,6 @@ public class RF2ReviewStatusImpl extends RF2AbstractImpl implements I_ProcessCon
 							}else{								
 
 
-								extensionStatusId = extensionPart.getStatusNid();
 								if (extensionStatusId == activeNid && active.equals("1")) { 														
 									active = "1";
 								} else if (extensionStatusId == inactiveNid) { 														
@@ -115,11 +124,11 @@ public class RF2ReviewStatusImpl extends RF2AbstractImpl implements I_ProcessCon
 									active = "0";
 									logger.error("refset member active and concept inactive : =====>" + concept);
 								}
+								if (conceptVal!=-1){
+									valueId= tf.getConcept(conceptVal).getUUIDs().iterator().next().toString();
 
-								int conceptVal= extensionPart.getC1Nid();
-								valueId= tf.getConcept(conceptVal).getUUIDs().iterator().next().toString();
-
-								WriteRF2TypeLine(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, valueId);
+									WriteRF2TypeLine(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, valueId);
+								}
 							}
 						}
 					}
