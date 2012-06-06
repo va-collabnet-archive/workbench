@@ -84,9 +84,12 @@ public class SnapshotGeneratorMultiColumn extends AbstractTask {
 					}
 				}
 			}
+			int cont=0;
 			if ( prevCompoId[0]!=null && !prevCompoId[0].equals("") ){
 				while ((nextLine= br.readLine()) != null) {
 					splittedLine = nextLine.split("\t",-1);
+					cont++;
+					System.out.println("c:" + cont + "l:" + splittedLine.length);
 					
 					if (columnFilterIxs!=null){
 						bContinue = true;
@@ -109,7 +112,6 @@ public class SnapshotGeneratorMultiColumn extends AbstractTask {
 						if (!newId){
 							if (splittedLine[effectiveTimeColumn].compareTo(date)<=0){
 								prevLine=nextLine;
-								
 							}
 						}else{
 							if (splittedLine[effectiveTimeColumn].compareTo(date)<=0){
