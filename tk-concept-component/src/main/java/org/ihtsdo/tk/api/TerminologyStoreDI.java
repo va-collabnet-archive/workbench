@@ -4,25 +4,21 @@ package org.ihtsdo.tk.api;
 
 import java.beans.PropertyChangeListener;
 import java.beans.VetoableChangeListener;
-import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
-import org.ihtsdo.tk.api.coordinate.EditCoordinate;
-import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.contradiction.ContradictionIdentifierBI;
-import org.ihtsdo.tk.db.DbDependency;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.io.IOException;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
+import org.ihtsdo.tk.contradiction.ContradictionIdentifierBI;
+import org.ihtsdo.tk.db.DbDependency;
 
 public interface TerminologyStoreDI extends TerminologyTransactionDI {
    void addTermChangeListener(TermChangeListener cl);
@@ -148,6 +144,7 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
    int getPathNidForSapNid(int sapNid);
    int getAuthorNidForSapNid(int sapNid);
    int getStatusNidForSapNid(int sapNid);
+   int getModuleNidForSapNid(int sapNid);
    long getTimeForSapNid(int sapNid);
    
    /**

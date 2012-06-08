@@ -6,12 +6,6 @@ package org.ihtsdo.db.bdb.sap;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.io.IOException;
-import java.util.List;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.hash.Hashcode;
 
 public class StatusAuthorPosition implements Comparable<StatusAuthorPosition> {
@@ -58,6 +52,10 @@ public class StatusAuthorPosition implements Comparable<StatusAuthorPosition> {
 
       if (this.authorNid != o.authorNid) {
          return this.authorNid - o.authorNid;
+      }
+      
+      if (this.moduleNid != o.moduleNid) {
+         return this.moduleNid - o.moduleNid;
       }
 
       return this.pathNid - o.pathNid;

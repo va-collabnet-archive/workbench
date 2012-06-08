@@ -1,9 +1,12 @@
 package org.ihtsdo.db.bdb;
 
 //~--- non-JDK imports --------------------------------------------------------
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.VetoableChangeListener;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.cs.ChangeSetPolicy;
@@ -17,76 +20,33 @@ import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
 import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
-
-import org.ihtsdo.concept.Concept;
-import org.ihtsdo.concept.ConceptVersion;
-import org.ihtsdo.concept.ContradictionIdentifier;
-import org.ihtsdo.concept.I_ProcessUnfetchedConceptData;
-import org.ihtsdo.concept.ParallelConceptIterator;
+import org.ihtsdo.concept.*;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
 import org.ihtsdo.db.bdb.computer.kindof.IsaCache;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.computer.kindof.TypeCache;
 import org.ihtsdo.db.change.ChangeNotifier;
-import org.ihtsdo.tk.api.ComponentBI;
-import org.ihtsdo.tk.api.ComponentChroncileBI;
-import org.ihtsdo.tk.api.ComponentVersionBI;
-import org.ihtsdo.tk.api.ConceptFetcherBI;
-import org.ihtsdo.tk.api.ContradictionManagerBI;
-import org.ihtsdo.tk.api.ContradictionException;
-import org.ihtsdo.tk.api.KindOfCacheBI;
-import org.ihtsdo.tk.api.NidBitSetBI;
-import org.ihtsdo.tk.api.NidSet;
-import org.ihtsdo.tk.api.NidSetBI;
-import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.PositionBI;
-import org.ihtsdo.tk.api.PositionSetBI;
-import org.ihtsdo.tk.api.Precedence;
-import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
-import org.ihtsdo.tk.api.RelAssertionType;
-import org.ihtsdo.tk.api.TermChangeListener;
-import org.ihtsdo.tk.api.TerminologyBuilderBI;
-import org.ihtsdo.tk.api.TerminologySnapshotDI;
-import org.ihtsdo.tk.api.TerminologyStoreDI;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
+import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
+import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.contradiction.ContradictionIdentifierBI;
 import org.ihtsdo.tk.db.DbDependency;
 import org.ihtsdo.tk.db.EccsDependency;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.io.File;
-import java.io.IOException;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.*;
-import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
-import org.ihtsdo.tk.api.description.DescriptionVersionBI;
-import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
-import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
-import org.ihtsdo.tk.binding.snomed.Snomed;
-import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 public class BdbTerminologyStore implements TerminologyStoreDI {
 
@@ -776,6 +736,11 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     @Override
     public int getStatusNidForSapNid(int sapNid) {
          return Bdb.getStatusNidForSapNid(sapNid);
+   }
+    
+    @Override
+    public int getModuleNidForSapNid(int sapNid) {
+         return Bdb.getModuleNidForSapNid(sapNid);
    }
 
     @Override

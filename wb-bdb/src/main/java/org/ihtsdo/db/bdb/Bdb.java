@@ -3,19 +3,14 @@ package org.ihtsdo.db.bdb;
 import com.sleepycat.je.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
-
 import javax.swing.JFrame;
-
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -31,14 +26,18 @@ import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.ConceptBdb;
 import org.ihtsdo.concept.OFFSETS;
 import org.ihtsdo.db.bdb.BdbMemoryMonitor.LowMemoryListener;
+import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.computer.kindof.IsaCache;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
+import org.ihtsdo.db.bdb.nidmaps.UuidToNidMapBdb;
 import org.ihtsdo.db.bdb.sap.StatusAtPositionBdb;
 import org.ihtsdo.db.bdb.xref.Xref;
 import org.ihtsdo.db.util.NidPair;
 import org.ihtsdo.db.util.NidPairForRefset;
 import org.ihtsdo.db.util.NidPairForRel;
+import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.helper.io.FileIO;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.lucene.LuceneManager.LuceneSearchType;
 import org.ihtsdo.thread.NamedThreadFactory;
@@ -49,13 +48,6 @@ import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
-
-import java.io.InputStream;
-import java.util.concurrent.ConcurrentSkipListSet;
-import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
-import org.ihtsdo.db.bdb.nidmaps.UuidToNidMapBdb;
-import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
-import org.ihtsdo.helper.io.FileIO;
 
 public class Bdb {
 
@@ -158,6 +150,9 @@ public class Bdb {
     }
     static int getStatusNidForSapNid(int sapNid) {
         return statusAtPositionDb.getStatusNid(sapNid);
+    }
+    static int getModuleNidForSapNid(int sapNid) {
+        return statusAtPositionDb.getModuleNid(sapNid);
     }
     static long getTimeForSapNid(int sapNid) {
         return statusAtPositionDb.getTime(sapNid);
