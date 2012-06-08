@@ -124,9 +124,8 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
 
     protected String getPrimoridalUuidStr(UUID uuid)
             throws IOException, InvalidCAB {
-        ComponentBI component = Ts.get().getComponent(uuid);
-        if (component != null) {
-            return component.getPrimUuid().toString();
+        if (Ts.get().hasUuid(uuid)) {
+            return Ts.get().getComponent(uuid).getPrimUuid().toString();
         }
         return uuid.toString();
     }
