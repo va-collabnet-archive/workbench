@@ -21,7 +21,4 @@ public class RefsetAux {
     public static ConceptSpec PATH_ORIGIN_REFEST =
             new ConceptSpec("Path origin reference set",
             UUID.fromString("1239b874-41b4-32a1-981f-88b448829b4b"));
-    public static ConceptSpec SNOMED_REV_STATUS =
-            new ConceptSpec("SNOMED Review Status",
-            UUID.fromString("e37ab984-d123-5e03-ab84-8cc12110f584"));
 }
