@@ -484,46 +484,50 @@ public class GenerateUsers extends AbstractMojo {
                                                 }
                                                 UUID editOriginPathUuid =  Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
                                                         projectDevelopmentOriginPathFsn);
-                                                if(!hasDevPathAsOriginPathFsn.equals("")){
-
-                                                }
                                                 UUID originFromDevPathUuid =  Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
                                                         hasDevPathAsOriginPathFsn);
+                                                PathBI editPath = null;
                                                 ConceptCB newEditPathBp =  new ConceptCB(username + " dev path",
                                                                                     username + " dev path",
                                                                                     LANG_CODE.EN,
                                                                                     TermAux.IS_A.getLenient().getPrimUuid(),
                                                                                     editParentPathUuid);
+                                                UUID userDevPathUuid =  newEditPathBp.getComponentUuid();
+                                                if(!Ts.get().hasUuid(userDevPathUuid)){
+                                                    editPath = Ts.get().getPath(Ts.get().getNidForUuids(userDevPathUuid));
+                                                }else{
+                                                    RefexCAB pathRefexBp = new RefexCAB(TK_REFSET_TYPE.CID,
+                                                            TermAux.PATH.getLenient().getConceptNid(),
+                                                            RefsetAux.PATH_REFSET.getLenient().getNid());
+                                                    pathRefexBp.put(RefexCAB.RefexProperty.UUID1, newEditPathBp.getComponentUuid());
+                                                    pathRefexBp.setMemberUuid(UUID.randomUUID());
 
-                                                RefexCAB pathRefexBp = new RefexCAB(TK_REFSET_TYPE.CID,
-                                                        TermAux.PATH.getLenient().getConceptNid(),
-                                                        RefsetAux.PATH_REFSET.getLenient().getNid());
-                                                pathRefexBp.put(RefexCAB.RefexProperty.UUID1, newEditPathBp.getComponentUuid());
-                                                pathRefexBp.setMemberUuid(UUID.randomUUID());
+                                                    RefexCAB pathOriginRefexBp = new RefexCAB(TK_REFSET_TYPE.CID_INT,
+                                                            newEditPathBp.getComponentUuid(),
+                                                            RefsetAux.PATH_ORIGIN_REFEST.getLenient().getNid(), null, null);
+                                                    pathOriginRefexBp.put(RefexCAB.RefexProperty.UUID1, editOriginPathUuid);
+                                                    pathOriginRefexBp.put(RefexCAB.RefexProperty.INTEGER1, Integer.MAX_VALUE);
+                                                    pathRefexBp.setMemberUuid(UUID.randomUUID());
 
-                                                RefexCAB pathOriginRefexBp = new RefexCAB(TK_REFSET_TYPE.CID_INT,
-                                                        newEditPathBp.getComponentUuid(),
-                                                        RefsetAux.PATH_ORIGIN_REFEST.getLenient().getNid(), null, null);
-                                                pathOriginRefexBp.put(RefexCAB.RefexProperty.UUID1, editOriginPathUuid);
-                                                pathOriginRefexBp.put(RefexCAB.RefexProperty.INTEGER1, Integer.MAX_VALUE);
-                                                pathRefexBp.setMemberUuid(UUID.randomUUID());
+                                                    RefexCAB pathOriginRefexOtherBp = new RefexCAB(TK_REFSET_TYPE.CID_INT,
+                                                            originFromDevPathUuid,
+                                                            RefsetAux.PATH_ORIGIN_REFEST.getLenient().getNid(), null, null);
+                                                    pathOriginRefexOtherBp.put(RefexCAB.RefexProperty.UUID1, newEditPathBp.getComponentUuid());
+                                                    pathOriginRefexOtherBp.put(RefexCAB.RefexProperty.INTEGER1, Integer.MAX_VALUE);
+                                                    pathOriginRefexOtherBp.setMemberUuid(UUID.randomUUID());
 
-                                                RefexCAB pathOriginRefexOtherBp = new RefexCAB(TK_REFSET_TYPE.CID_INT,
-                                                        originFromDevPathUuid,
-                                                        RefsetAux.PATH_ORIGIN_REFEST.getLenient().getNid(), null, null);
-                                                pathOriginRefexOtherBp.put(RefexCAB.RefexProperty.UUID1, newEditPathBp.getComponentUuid());
-                                                pathOriginRefexOtherBp.put(RefexCAB.RefexProperty.INTEGER1, Integer.MAX_VALUE);
-                                                pathOriginRefexOtherBp.setMemberUuid(UUID.randomUUID());
-
-                                                TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(Ts.get().getMetadataEC(),
-                                                        Ts.get().getMetadataVC());
-                                                PathCB pathBp = new PathCB (newEditPathBp,
-                                                        pathRefexBp,
-                                                        pathOriginRefexBp,
-                                                        pathOriginRefexOtherBp,
-                                                        Ts.get().getConcept(editOriginPathUuid));
-                                                PathBI editPath = builder.construct(pathBp);
+                                                    TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(Ts.get().getMetadataEC(),
+                                                            Ts.get().getMetadataVC());
+                                                    PathCB pathBp = new PathCB (newEditPathBp,
+                                                            pathRefexBp,
+                                                            pathOriginRefexBp,
+                                                            pathOriginRefexOtherBp,
+                                                            Ts.get().getConcept(editOriginPathUuid));
+                                                    editPath = builder.construct(pathBp);
+                                                }
+                                                
                                                 userConfig.addEditingPath(editPath);
+                                                userConfig.setColorForPath(editPath.getConceptNid(), new Color(128, 128, 128));
                                                 }
                                             }
                                             
@@ -536,16 +540,16 @@ public class GenerateUsers extends AbstractMojo {
                                             userQueueRoot.mkdirs();
                                             
                                             if(userParentConceptName != null && parentConcept == null){
-                                                UUID parentConceptUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, userParentConceptName);
-                                                if(Ts.get().hasUuid(parentConceptUuid)){
-                                                    parentConcept = Ts.get().getConcept(parentConceptUuid);
-                                                }else{
-                                                    ConceptCB parentConceptBp = new ConceptCB(
+                                                ConceptCB parentConceptBp = new ConceptCB(
                                                             userParentConceptName,
                                                             userParentConceptName,
                                                             LANG_CODE.EN_US,
                                                             TermAux.IS_A.getLenient().getPrimUuid(),
                                                             TermAux.USER.getLenient().getPrimUuid());
+                                                UUID parentConceptUuid = parentConceptBp.getComponentUuid();
+                                                if(Ts.get().hasUuid(parentConceptUuid)){
+                                                    parentConcept = Ts.get().getConcept(parentConceptUuid);
+                                                }else{
                                                     TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(
                                                             Ts.get().getMetadataEC(),
                                                             Ts.get().getMetadataVC());
@@ -881,50 +885,51 @@ public class GenerateUsers extends AbstractMojo {
 		I_TermFactory tf = Terms.get();
 
 		// Needs a concept record...
-		UUID userUuid = Type5UuidFactory.get(Type5UuidFactory.USER_FULLNAME_NAMESPACE,
-				userConfig.getDbConfig().getFullName());
-		ConceptCB userConceptBp;
-
+                if (Ts.get().hasUuid(UUID.fromString("d8ebf7ea-afd7-5db8-aff0-d3028253f6bf"))) {
+                    System.out.println("FOUND IT");
+                }
+		ConceptCB userConceptBp = new ConceptCB(userConfig.getDbConfig().getFullName(),
+					userConfig.getUsername(),
+					LANG_CODE.EN,
+					TermAux.IS_A.getLenient().getPrimUuid(),
+					parentConcept.getPrimUuid());
+                if (Ts.get().hasUuid(UUID.fromString("d8ebf7ea-afd7-5db8-aff0-d3028253f6bf"))) {
+                    System.out.println("FOUND IT");
+                }
+                UUID userUuid = userConceptBp.getComponentUuid();
+                if (Ts.get().hasUuid(UUID.fromString("d8ebf7ea-afd7-5db8-aff0-d3028253f6bf"))) {
+                    System.out.println("FOUND IT");
+                }
 		if (Ts.get().hasUuid(userUuid)) {
 			setUserConcept(userUuid.toString());
 			addWfRelIfDoesNotExist(userUuid.toString());
 			return Ts.get().getConcept(userUuid);
 		} else {
-                    ConceptChronicleBI concept = null;
-                    if (Ts.get().hasUuid(userUuid)) {
-                        concept = Ts.get().getConcept(userUuid);
-                    }
-			userConceptBp = new ConceptCB(userConfig.getDbConfig().getFullName(),
-					userConfig.getUsername(),
-					LANG_CODE.EN,
-					TermAux.IS_A.getLenient().getPrimUuid(),
-					parentConcept.getPrimUuid());
 //                        userConceptBp.setComponentUuid(userUuid);
-                        UUID componentUuid = userConceptBp.getComponentUuid();
-			// Needs a description record...
-			DescCAB inboxDescBp = new DescCAB(userConceptBp.getComponentUuid(),
-					Ts.get().getUuidPrimordialForNid(SnomedMetadataRfx.getDES_SYNONYM_NID()),
-					LANG_CODE.EN,
-					userConfig.getUsername() + ".inbox",
-					false);
-			//add workflow relationship
-			RelCAB wfRelBp = new RelCAB(userConceptBp.getComponentUuid(),
-					ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS.getPrimoridalUid(),
-					ArchitectonicAuxiliary.Concept.WORKFLOW_ACTIVE_MODELER.getPrimoridalUid(),
-					0,
-					TkRelType.STATED_ROLE);
-			ViewCoordinate vc = userConfig.getViewCoordinate();
-			EditCoordinate oldEc = userConfig.getEditCoordinate();
-			EditCoordinate ec = new EditCoordinate(oldEc.getAuthorNid(),
-					TermAux.WB_AUX_PATH.getLenient().getNid());
-			TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(ec, vc);
-			userConceptBp.setDescCABs(inboxDescBp);
-			userConceptBp.setRelCABs(wfRelBp);
-			ConceptChronicleBI userConcept = builder.construct(userConceptBp);
-			userConfig.getDbConfig().setUserConcept((I_GetConceptData)userConcept);
-			Ts.get().addUncommitted(userConcept);
+                    // Needs a description record...
+                    DescCAB inboxDescBp = new DescCAB(userConceptBp.getComponentUuid(),
+                                    Ts.get().getUuidPrimordialForNid(SnomedMetadataRfx.getDES_SYNONYM_NID()),
+                                    LANG_CODE.EN,
+                                    userConfig.getUsername() + ".inbox",
+                                    false);
+                    //add workflow relationship
+                    RelCAB wfRelBp = new RelCAB(userConceptBp.getComponentUuid(),
+                                    ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS.getPrimoridalUid(),
+                                    ArchitectonicAuxiliary.Concept.WORKFLOW_ACTIVE_MODELER.getPrimoridalUid(),
+                                    0,
+                                    TkRelType.STATED_ROLE);
+                    ViewCoordinate vc = userConfig.getViewCoordinate();
+                    EditCoordinate oldEc = userConfig.getEditCoordinate();
+                    EditCoordinate ec = new EditCoordinate(oldEc.getAuthorNid(),
+                                    TermAux.WB_AUX_PATH.getLenient().getNid());
+                    TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(ec, vc);
+                    userConceptBp.setDescCABs(inboxDescBp);
+                    userConceptBp.setRelCABs(wfRelBp);
+                    ConceptChronicleBI userConcept = builder.construct(userConceptBp);
+                    userConfig.getDbConfig().setUserConcept((I_GetConceptData)userConcept);
+                    Ts.get().addUncommitted(userConcept);
 
-			return userConcept;
+                    return userConcept;
 		}
 	}
 
@@ -1269,24 +1274,26 @@ public class GenerateUsers extends AbstractMojo {
                 }
                 
 		//set up paths
-                PathBI editPath = null;
-                if(!makeUserDevPath){
-                    editPath = tf.getPath(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, this.projectDevelopmentPathFsn));
-                }
-                if(editPath != null){
-                    activeConfig.addEditingPath(editPath);
-                }
-		PathBI viewPath = tf.getPath(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, this.projectDevelopmentViewPathFsn));
+                PathBI viewPath = tf.getPath(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, this.projectDevelopmentViewPathFsn));
 		PositionBI viewPosition = tf.newPosition(viewPath, Long.MAX_VALUE);
 		Set<PositionBI> viewSet = new HashSet<PositionBI>();
 		viewSet.add(viewPosition);
 		activeConfig.setViewPositions(viewSet);
                 
+                PathBI editPath = null;
+                if(!makeUserDevPath){
+                    editPath = tf.getPath(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, this.projectDevelopmentPathFsn));
+                    activeConfig.addEditingPath(editPath);
+                    if(editPath.getConceptNid() != viewPath.getConceptNid()){
+                        activeConfig.setColorForPath(editPath.getConceptNid(), new Color(128, 128, 128));
+                    }
+                }
+                
                 if(this.projectDevelopmentAdjPathFsn != null){
                     PathBI adjPath = tf.getPath(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, this.projectDevelopmentAdjPathFsn));
                     activeConfig.addPromotionPath(adjPath);
                 }
-
+                
 		activeConfig.setColorForPath(viewPath.getConceptNid(), new Color(255, 84, 27));
 		activeConfig.setColorForPath(ReferenceConcepts.TERM_AUXILIARY_PATH.getNid(), new Color(25, 178, 63));
 		activeConfig.setColorForPath(Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids()), new Color(81, 23, 255));
