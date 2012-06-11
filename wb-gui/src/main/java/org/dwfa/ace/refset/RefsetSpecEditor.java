@@ -166,12 +166,34 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
     private JPanel topPanel;
     private TaxonomyHelper treeHelper;
     UpdateTreeSpec updater;
+    
+    public static enum EditState {
+        READONLY, EDIT, REVIEW
+    }
+    
+    private EditState localEditState = EditState.READONLY;
 
     //~--- constructors --------------------------------------------------------
+    
+    public RefsetSpecEditor(ACE ace, TaxonomyHelper treeHelper, TaxonomyHelper refsetTree,
+            RefsetSpecPanel refsetSpecPanel,EditState locES)
+            throws Exception {
+        super();
+        setLocalEditState(locES);
+        init(ace,treeHelper,refsetTree,refsetSpecPanel);
+    }
+    
+    
     public RefsetSpecEditor(ACE ace, TaxonomyHelper treeHelper, TaxonomyHelper refsetTree,
             RefsetSpecPanel refsetSpecPanel)
             throws Exception {
         super();
+        init(ace,treeHelper,refsetTree,refsetSpecPanel);
+    }
+    
+    public void init(ACE ace, TaxonomyHelper treeHelper, TaxonomyHelper refsetTree,
+            RefsetSpecPanel refsetSpecPanel)
+            throws Exception {
         this.ace = ace;
         this.treeHelper = treeHelper;
         this.refsetTree = refsetTree;
@@ -480,7 +502,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         updater.execute();
     }
 
-    private void updateToggles() {
+    public void updateToggles() {
         for (TOGGLES t : TOGGLES.values()) {
             boolean visible = ((AceFrameConfig) ace.getAceFrameConfig()).isToggleVisible(t);
 
@@ -515,7 +537,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         return ace.getAceFrameConfig();
     }
 
-    private JComponent getContentPane() throws Exception {
+    public JComponent getContentPane() throws Exception {
         JTabbedPane refsetTabs = new JTabbedPane();
 
         refsetTabs.addTab("specification", getSpecPane());
@@ -635,7 +657,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         throw new UnsupportedOperationException();
     }
 
-    private JComponent getSpecPane() throws Exception {
+    public JComponent getSpecPane() throws Exception {
         JPanel content = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
 
@@ -794,7 +816,12 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
 
             @Override
             public boolean accept(File arg0, String fileName) {
+                if(getLocalEditState().equals(EditState.EDIT)){
                 return fileName.toLowerCase().endsWith(".bp");
+                }
+                else{
+                    return fileName.toLowerCase().endsWith(".bp") && fileName.contains("compute refset from refset spec");   
+                }
             }
         });
 
@@ -820,6 +847,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                     BufferedInputStream bis = new BufferedInputStream(fis);
                     ObjectInputStream ois = new ObjectInputStream(bis);
                     BusinessProcess bp = (BusinessProcess) ois.readObject();
+                    
 
                     ois.close();
 
@@ -1507,5 +1535,13 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
 
             specUpdater.execute();
         }
+    }
+
+    public EditState getLocalEditState() {
+        return localEditState;
+    }
+
+    public void setLocalEditState(EditState localEditState) {
+        this.localEditState = localEditState;
     }
 }

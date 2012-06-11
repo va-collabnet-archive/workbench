@@ -169,7 +169,7 @@ public class RefsetSpecPanel extends JPanel {
       ace.getAceFrameConfig().addPropertyChangeListener("commit", hierarchicalTreeHelper);
       verticalBox = new Box(BoxLayout.Y_AXIS);
       bottomTabs.addTab(TABLE_VIEW, verticalBox);
-      bottomTabs.addTab(COMMENT_VIEW, new JScrollPane());
+      //bottomTabs.addTab(COMMENT_VIEW, new JScrollPane());
       bottomTabs.addChangeListener(new TabChangeListener());
       commentTableModel = setupCommentTable();
       setupRefsetMemberTable(commentTableModel);
