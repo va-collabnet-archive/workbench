@@ -172,6 +172,9 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
     }
     
     private EditState localEditState = EditState.READONLY;
+    //private EditState localEditState = EditState.EDIT;
+    //private EditState localEditState = EditState.REVIEW;
+    
 
     //~--- constructors --------------------------------------------------------
     

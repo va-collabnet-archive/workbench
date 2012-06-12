@@ -52,6 +52,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.gui.popup.ProcessPopupUtil;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.refset.RefsetSpecEditor.EditState;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.bpa.util.OpenFrames;
@@ -98,7 +99,8 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
             RefsetSpec refsetSpecHelper = new RefsetSpec(spec, aceConfig);
 
             JPopupMenu popup = null;
-            if (e.isPopupTrigger()) {
+            
+            if (e.isPopupTrigger() && !specEditor.getLocalEditState().equals(EditState.READONLY)) {
                 try {
                     JTree tree = (JTree) e.getSource();
                     int rowForLocation = tree.getRowForLocation(e.getX(), e.getY());
@@ -113,6 +115,13 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
                             if (rowForLocation != -1) {
                                 DefaultMutableTreeNode node = (DefaultMutableTreeNode) selPath.getLastPathComponent();
                                 I_ExtendByRef specPart = (I_ExtendByRef) node.getUserObject();
+                                
+                                if(specEditor.getLocalEditState().equals(EditState.REVIEW)){
+                                    popup = makeCommentOnlyPopup(specPart);
+                                }
+                                if(specEditor.getLocalEditState().equals(EditState.EDIT)){
+                                
+                                
                                 Collection<? extends I_ExtendByRef> extensions =
                                         Terms.get().getRefsetExtensionMembers(
                                             aceConfig.getRefsetSpecInSpecEditor().getConceptNid());
@@ -174,6 +183,7 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
                             popup = makePopup(e, null, true, true, true, false);
                         }
                     }
+                    }
                     if (popup != null) {
                         popup.show(e.getComponent(), e.getX(), e.getY());
                     }
@@ -230,6 +240,50 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
                 return clauseIsChildOfConceptContainsDesc(parentSpecPart, componentIdBasedExtensionMap);
             }
         }
+    }
+    
+    private JPopupMenu makeCommentOnlyPopup(I_ExtendByRef specPart) throws IOException,TerminologyException{
+        JPopupMenu popup = new JPopupMenu();
+        if (specPart != null) {
+            popup.addSeparator();
+
+            boolean uncommitted = false;
+            for (I_ExtendByRefPart part : specPart.getMutableParts()) {
+                if (part.getVersion() == Integer.MAX_VALUE) {
+                    uncommitted = true;
+                    break;
+                }
+            }
+            if (uncommitted) {
+                JMenuItem cancelActionItem = new JMenuItem("Cancel change");
+                cancelActionItem.addActionListener(new CancelChangeAction(specPart));
+                popup.add(cancelActionItem);
+            } else {
+                List<I_ExtendByRefVersion> tuples =
+                        (List<I_ExtendByRefVersion>) specPart.getTuples(aceConfig.getAllowedStatus(), aceConfig
+                            .getViewPositionSetReadOnly(), aceConfig.getPrecedence(), aceConfig
+                            .getConflictResolutionStrategy());
+
+                if (tuples.iterator().hasNext()) {
+                    I_ExtendByRefVersion firstTuple = tuples.iterator().next();
+                    I_GetConceptData refsetConcept = Terms.get().getConcept(firstTuple.getRefsetId());
+                    I_DescriptionTuple refsetDesc =
+                            refsetConcept.getDescTuple(aceConfig.getTableDescPreferenceList(), aceConfig);
+                    String prompt = "Add comment for '" + refsetDesc.getText() + "'";
+                    JMenuItem commentActionItem = new JMenuItem(prompt + "...");
+                    commentActionItem.addActionListener(new CommentSpecAction(firstTuple, prompt));
+                    popup.add(commentActionItem);
+                } else {
+                    tuples =
+                            (List<I_ExtendByRefVersion>) specPart.getTuples(null, aceConfig.getViewPositionSetReadOnly(),
+                                aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy());
+                }
+            }
+
+        }
+        
+        return popup;
+        
     }
 
     private JPopupMenu makePopup(MouseEvent e, I_ExtendByRef specPart, boolean excludesConcept, boolean excludesDesc,
