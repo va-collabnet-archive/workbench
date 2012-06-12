@@ -22,6 +22,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,7 +37,9 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_ConceptAttributePart;
+import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConcepts;
@@ -45,7 +49,9 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.mojo.mojo.refset.spec.RefsetInclusionSpec;
@@ -329,11 +335,15 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
         }
 
         BufferedWriter subsetIndexFileWriter = writerMap.get("INDEX");
-        //TODO create a refset grouping catalogue e.g. all pathology refsets ?
-       // would requier a new parameter called refsetCatalogue 
+      
         if (subsetIndexFileWriter == null) {
+        	
+        	String subsetCatalogueTrans="";
+        	if (subsetCatalogue!=""){
+        		subsetCatalogueTrans="_"+subsetCatalogue+"_";
+        	}
             subsetIndexFileWriter =
-                    new BufferedWriter(new FileWriter(new File(subsetOutputDirectory, "der1_Subsets_"+ subsetCatalogue + countryCode
+                    new BufferedWriter(new FileWriter(new File(subsetOutputDirectory, "der1_Subsets_"+ subsetCatalogueTrans + countryCode
                         + "_" + releaseVersion + ".txt")));
             subsetIndexFileWriter.write("SUBSETID" + FILE_DELIMITER + "SUBSETORIGINALID" + FILE_DELIMITER
                 + "SUBSETVERSION" + FILE_DELIMITER + "SUBSETNAME" + FILE_DELIMITER + "SUBSETTYPE" + FILE_DELIMITER
@@ -486,9 +496,13 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
                 		  subsetId =
                                   Long.parseLong(refsetType.getRefsetHandler().generateNewSctId(refsetId, 1,
                                       namespace, project));
+                		  addId(subsetId);
                 		  
 					}
+                	  
                     setSubsetId(subsetId);
+                    
+                  
                     updateStoredSubsetMemberFile(storedSubsetMemberFile, subsetId, currentSpec.subsetVersion);
                     return "" + currentSpec.subsetVersion;
                 } catch (Exception e) {
@@ -520,7 +534,31 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
         storedSubsetMemberFileWriter.flush();
         storedSubsetMemberFileWriter.close();
     }
-
+   
+    
+    private void addId(Long subsetId) {
+        try {
+          
+			boolean insertConceptId=false;
+			
+            I_GetConceptData igcd = currentSpec.refsetConcept.getVerifiedConcept();
+            I_Identify i_Identify = Terms.get().getId(igcd.getNid());
+            I_ConceptAttributeVersioned<?> i_ConceptAttributeVersioned = igcd.getConceptAttributes();
+					
+			insertConceptId =  i_Identify.addLongId(subsetId, ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid(), 
+			      	i_ConceptAttributeVersioned.getStatusNid(),
+			        i_ConceptAttributeVersioned.getPathNid(),
+			        Long.MAX_VALUE);
+			//System.out.println("==SctId insertion finish==" + wsConceptId + "	" + insertConceptId);
+			
+			Terms.get().addUncommitted(igcd);
+			Terms.get().commit();
+            
+        } catch (Exception ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        }      
+    }
+    
     private long getSubsetId() {
         return currentSubsetId;
     }
