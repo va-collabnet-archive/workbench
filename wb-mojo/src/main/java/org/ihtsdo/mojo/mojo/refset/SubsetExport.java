@@ -38,6 +38,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
+import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntSet;
@@ -46,18 +47,26 @@ import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.cs.ChangeSetPolicy;
+import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.dwfa.ace.commitlog.CommitLog;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.cs.ChangeSetWriterHandler;
+import org.ihtsdo.db.bdb.BdbTermFactory;
 import org.ihtsdo.mojo.mojo.refset.spec.RefsetInclusionSpec;
 import org.ihtsdo.mojo.mojo.refset.spec.RefsetPurposeToSubsetTypeMap;
 import org.ihtsdo.mojo.mojo.refset.writers.MemberRefsetHandler;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
+import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 
 /**
  * 
@@ -84,7 +93,14 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
      * @required
      */
     File subsetOutputDirectory;
-
+    /**
+     * Defines the directory to which the user profiles
+     * are 
+     * 
+     * @parameter
+     * @required
+     */
+    File profilesOutputDirectory;
     /**
      * Defines the directory to which the subset members are stored between
      * releases. This is used to determine the
@@ -496,8 +512,11 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
                 		  subsetId =
                                   Long.parseLong(refsetType.getRefsetHandler().generateNewSctId(refsetId, 1,
                                       namespace, project));
+                		  
+                		  setupExportProfile();
                 		  addId(subsetId);
                 		  
+                		  //TODO  need to generate a change-set for the modification to the database.
 					}
                 	  
                     setSubsetId(subsetId);
@@ -535,7 +554,41 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
         storedSubsetMemberFileWriter.close();
     }
    
-    
+    private void setupExportProfile() throws TerminologyException, IOException{
+		BdbTermFactory tfb = (BdbTermFactory) tf;
+		I_ConfigAceDb newDbProfile = tfb.newAceDbConfig();
+		newDbProfile.setUsername("export");
+		newDbProfile.setUserConcept(tf.getConcept(UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c")));
+		newDbProfile.setClassifierChangesChangeSetPolicy(ChangeSetPolicy.OFF);
+		newDbProfile.setRefsetChangesChangeSetPolicy(ChangeSetPolicy.OFF);
+		newDbProfile.setUserChangesChangeSetPolicy(ChangeSetPolicy.MUTABLE_ONLY);
+		newDbProfile.setChangeSetWriterThreading(ChangeSetWriterThreading.SINGLE_THREAD);
+		//File changeSetRoot = new File("profiles" + File.separator + newDbProfile.getUsername() + File.separator + "changesets");				
+		
+		
+		File changeSetRoot = new File(profilesOutputDirectory, "export/changesets");
+		changeSetRoot.mkdirs();
+		String changeSetWriterFileName = "export" + "." + "#" + 1 + "#" + UUID.randomUUID().toString() + ".eccs"; 
+		newDbProfile.setChangeSetRoot(changeSetRoot);
+		newDbProfile.setChangeSetWriterFileName(changeSetWriterFileName);
+		String tempKey = UUID.randomUUID().toString();
+		
+		ChangeSetGeneratorBI generator = Ts.get().createDtoChangeSetGenerator(
+					new File(newDbProfile.getChangeSetRoot(),
+							newDbProfile.getChangeSetWriterFileName()), 
+							new File(newDbProfile.getChangeSetRoot(), "#1#"
+									+ newDbProfile.getChangeSetWriterFileName()),
+									ChangeSetGenerationPolicy.MUTABLE_ONLY);
+		
+		ChangeSetWriterHandler.addWriter(newDbProfile.getUsername() + ".commitLog.xls",
+				new CommitLog(new File(newDbProfile.getChangeSetRoot(),
+				"commitLog.xls"), new File(newDbProfile.getChangeSetRoot(),
+						"." + "commitLog.xls")));	
+		
+		
+		 Ts.get().addChangeSetGenerator(tempKey, generator);
+		 Ts.get().commit();
+	}
     private void addId(Long subsetId) {
         try {
           
