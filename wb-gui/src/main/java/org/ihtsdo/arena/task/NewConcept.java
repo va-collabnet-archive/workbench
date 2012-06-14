@@ -1031,8 +1031,10 @@ public class NewConcept extends PreviousNextOrCancel {
                     ConceptVersionBI parentConcept = Ts.get().getConceptVersion(config.getViewCoordinate(), nidList.get(0));
                     String parentText = parentConcept.getFullySpecifiedDescription().getText();
                     int paren = parentText.lastIndexOf("(");
-                    String semanticTag = parentText.substring(paren, parentText.length()).trim();
-                    fsnText = fsnText +  " " + semanticTag;
+                    if(paren != -1){
+                        String semanticTag = parentText.substring(paren, parentText.length()).trim();
+                        fsnText = fsnText +  " " + semanticTag;
+                    }
                 }
 
                 if (fsn.extractText().length() == 0) {
@@ -1045,8 +1047,7 @@ public class NewConcept extends PreviousNextOrCancel {
                     JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
                             "please list parents for the new concept", "",
                             JOptionPane.ERROR_MESSAGE);
-                } else if (fsnText.length() != 0 && fsnText.indexOf("(") > 0
-                        && fsnText.indexOf(")") > fsnText.indexOf("(")) {
+                } else {
                     //get text parts and make query term
                     String fullFsn = fsn.extractText();
                     fullFsn = fullFsn.replaceAll("\n", "");
