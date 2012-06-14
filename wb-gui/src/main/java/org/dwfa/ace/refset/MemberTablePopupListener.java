@@ -39,6 +39,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.refset.RefsetSpecEditor.EditState;
 import org.dwfa.ace.table.refset.ReflexiveTableModel;
 import org.dwfa.ace.table.refset.StringWithExtTuple;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
@@ -93,17 +94,23 @@ public class MemberTablePopupListener extends MouseAdapter {
     I_ConfigAceFrame config;
 
     List<ReflexiveTableModel> commentTableModels;
+    
+    RefsetSpecEditor specEditor;
 
-    public MemberTablePopupListener(JTable table, I_ConfigAceFrame config, List<ReflexiveTableModel> commentTableModels) {
+    public MemberTablePopupListener(JTable table, I_ConfigAceFrame config, List<ReflexiveTableModel> commentTableModels,RefsetSpecEditor refsetSpecEditorIn) {
         super();
         this.table = table;
         this.config = config;
         this.commentTableModels = commentTableModels;
+        this.specEditor = refsetSpecEditorIn;
     }
 
     private void makePopup(MouseEvent e) {
+        //AceLog.getAppLog().info("MemberTablePopupListener makePopup editState = "+specEditor.getLocalEditState());
+        popup = null;
+        if(!this.specEditor.getLocalEditState().equals(EditState.READONLY)){
         try {
-            popup = null;
+            
             int column = table.columnAtPoint(e.getPoint());
             int row = table.rowAtPoint(e.getPoint());
             if ((row != -1) && (column != -1)) {
@@ -120,6 +127,7 @@ public class MemberTablePopupListener extends MouseAdapter {
             }
         } catch (IOException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
+        }
         }
     }
 

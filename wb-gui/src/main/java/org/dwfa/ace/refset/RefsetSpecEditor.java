@@ -167,6 +167,10 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
     private TaxonomyHelper treeHelper;
     UpdateTreeSpec updater;
     
+    private JPanel toggleBar;
+    
+
+
     public static enum EditState {
         READONLY, EDIT, REVIEW
     }
@@ -488,6 +492,11 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         } else {
             AceLog.getAppLog().info("treeHelper.getRenderer() == null");
         }
+        
+       // this.localEditState = EditState.READONLY;
+       // AceLog.getAppLog().info("updatePanel localEditState = "+localEditState);
+      //  reInitToggleBar();
+        
     }
 
     public synchronized void updateSpecTree(boolean clearSelection) {
@@ -735,9 +744,15 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
 
         return label.getTermComponent();
     }
+    
+    public void setToggleBar(JPanel toggleBarIn) {
+        this.toggleBar = toggleBarIn;
+    }
 
     public JComponent getToggleBar() throws IOException, ClassNotFoundException {
-        JPanel toggleBar = new JPanel(new GridBagLayout());
+        
+        if(toggleBar == null){
+        toggleBar = new JPanel(new GridBagLayout());
         GridBagConstraints outer = new GridBagConstraints();
 
         outer.anchor = GridBagConstraints.WEST;
@@ -819,12 +834,12 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
 
             @Override
             public boolean accept(File arg0, String fileName) {
-                if(getLocalEditState().equals(EditState.EDIT)){
+               /* if(getLocalEditState().equals(EditState.EDIT)){
                 return fileName.toLowerCase().endsWith(".bp");
                 }
-                else{
+                else{*/
                     return fileName.toLowerCase().endsWith(".bp") && fileName.contains("compute refset from refset spec");   
-                }
+              //  }
             }
         });
 
@@ -885,6 +900,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         }
 
         updateToggles();
+        }
 
         return toggleBar;
     }
@@ -955,6 +971,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                 AceLog.getAppLog().alertAndLogException(e);
             }
         }
+        
     }
 
     public void setToggleState(TOGGLES toggle, boolean state) {
@@ -1228,6 +1245,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             updatePanel();
+            localEditState = EditState.READONLY;
             firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
         }
     }
@@ -1544,7 +1562,9 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         return localEditState;
     }
 
-    public void setLocalEditState(EditState localEditState) {
-        this.localEditState = localEditState;
+    public void setLocalEditState(EditState localEditStateIn) {
+        this.localEditState = localEditStateIn;
     }
+    
+    
 }

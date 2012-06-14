@@ -97,7 +97,7 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
         try {
             I_GetConceptData spec = specEditor.getRefsetSpecInSpecEditor();
             RefsetSpec refsetSpecHelper = new RefsetSpec(spec, aceConfig);
-
+            AceLog.getAppLog().info("makeAndShowPopup getLocalEditState = "+specEditor.getLocalEditState());
             JPopupMenu popup = null;
             
             if (e.isPopupTrigger() && !specEditor.getLocalEditState().equals(EditState.READONLY)) {

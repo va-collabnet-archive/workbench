@@ -159,8 +159,8 @@ public class RefsetSpecPanel extends JPanel {
       bottomTabs.addTab(REFSET_AND_PARENT_ONLY_VIEW, refsetAndParentOnlyTreeHelper.getHierarchyPanel());
       //hierarchicalTreeHelper.addMouseListener(new TaxonomyMouseListener(hierarchicalTreeHelper));
       //refsetAndParentOnlyTreeHelper.addMouseListener(new TaxonomyMouseListener(hierarchicalTreeHelper));
-      hierarchicalTreeHelper.addMouseListener(new TreeMouseListener(ace));
-      refsetAndParentOnlyTreeHelper.addMouseListener(new TreeMouseListener(ace));
+      //hierarchicalTreeHelper.addMouseListener(new TreeMouseListener(ace));
+      //refsetAndParentOnlyTreeHelper.addMouseListener(new TreeMouseListener(ace));
       editor = new RefsetSpecEditor(ace, hierarchicalTreeHelper, refsetAndParentOnlyTreeHelper, this);
       split.setTopComponent(editor.getContentPanel());
       ace.getAceFrameConfig().addPropertyChangeListener("viewPositions", refsetAndParentOnlyTreeHelper);
@@ -664,7 +664,8 @@ public class RefsetSpecPanel extends JPanel {
       commentTableModels.add(editor.getCommentTableModel());
       commentTableModels.add(commentTableModel);
       refsetTable.addMouseListener(new MemberTablePopupListener(refsetTable, aceFrameConfig,
-              commentTableModels));
+              commentTableModels,getRefsetSpecEditor()));
+
    }
 
    private void updateCheckBoxes() {
@@ -1323,7 +1324,7 @@ public class RefsetSpecPanel extends JPanel {
                  false), "Refset hierarchy", null);
          refsetHierarcyPanel = hierarchicalTreeHelper.getHierarchyPanel();
          //hierarchicalTreeHelper.addMouseListener(new TaxonomyMouseListener(hierarchicalTreeHelper));
-         hierarchicalTreeHelper.addMouseListener(new TreeMouseListener(ace));
+         //hierarchicalTreeHelper.addMouseListener(new TreeMouseListener(ace));
 
          OrCompositeChildFilter filter   = new OrCompositeChildFilter();
          RefsetSpecFrameConfig  rsConfig = new RefsetSpecFrameConfig(aceFrameConfig, new IntSet(), true);
@@ -1345,7 +1346,7 @@ public class RefsetSpecPanel extends JPanel {
          refsetAndParentOnlyHierarchicalPanel = refsetAndParentOnlyTreeHelper.getHierarchyPanel();
          //refsetAndParentOnlyTreeHelper.addMouseListener(
          //    new TaxonomyMouseListener(refsetAndParentOnlyTreeHelper));
-         refsetAndParentOnlyTreeHelper.addMouseListener(new TreeMouseListener(ace));
+         //refsetAndParentOnlyTreeHelper.addMouseListener(new TreeMouseListener(ace));
 
          return null;
       }
