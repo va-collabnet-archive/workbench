@@ -29,6 +29,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentBI;
+import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -125,6 +126,10 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
     protected String getPrimoridalUuidStr(UUID uuid)
             throws IOException, InvalidCAB {
         if (Ts.get().hasUuid(uuid)) {
+            ComponentChroncileBI<?> component = Ts.get().getComponent(uuid);
+            if(component == null){
+                return uuid.toString();
+            }
             return Ts.get().getComponent(uuid).getPrimUuid().toString();
         }
         return uuid.toString();
