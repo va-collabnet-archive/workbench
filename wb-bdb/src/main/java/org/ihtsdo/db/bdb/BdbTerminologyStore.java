@@ -273,22 +273,22 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     }
 
     @Override
-    public ComponentChronicleBI<?> getComponent(Collection<UUID> uuids) throws IOException {
+    public ComponentChroncileBI<?> getComponent(Collection<UUID> uuids) throws IOException {
         return getComponent(Bdb.uuidsToNid(uuids));
     }
 
     @Override
-    public ComponentChronicleBI<?> getComponent(ComponentContainerBI cc) throws IOException {
+    public ComponentChroncileBI<?> getComponent(ComponentContainerBI cc) throws IOException {
         return getComponent(cc.getNid());
     }
 
     @Override
-    public ComponentChronicleBI<?> getComponent(int nid) throws IOException {
-        return (ComponentChronicleBI<?>) Bdb.getComponent(nid);
+    public ComponentChroncileBI<?> getComponent(int nid) throws IOException {
+        return (ComponentChroncileBI<?>) Bdb.getComponent(nid);
     }
 
     @Override
-    public ComponentChronicleBI<?> getComponent(UUID... uuids) throws IOException {
+    public ComponentChroncileBI<?> getComponent(UUID... uuids) throws IOException {
         return getComponent(Bdb.uuidToNid(uuids));
     }
 
@@ -307,7 +307,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
             return new ConceptVersion((Concept) component, coordinate);
         }
 
-        return ((ComponentChronicleBI<?>) component).getVersion(coordinate);
+        return ((ComponentChroncileBI<?>) component).getVersion(coordinate);
     }
 
     @Override
@@ -604,7 +604,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
 
     @Override
     public UUID getUuidPrimordialForNid(int nid) throws IOException {
-        ComponentChronicleBI<?> c = getComponent(nid);
+        ComponentChroncileBI<?> c = getComponent(nid);
         if (c != null) {
             return c.getPrimUuid();
         }
