@@ -493,7 +493,7 @@ public class GenerateUsers extends AbstractMojo {
                                                                                     TermAux.IS_A.getLenient().getPrimUuid(),
                                                                                     editParentPathUuid);
                                                 UUID userDevPathUuid =  newEditPathBp.getComponentUuid();
-                                                if(!Ts.get().hasUuid(userDevPathUuid)){
+                                                if(Ts.get().hasUuid(userDevPathUuid)){
                                                     editPath = Ts.get().getPath(Ts.get().getNidForUuids(userDevPathUuid));
                                                 }else{
                                                     RefexCAB pathRefexBp = new RefexCAB(TK_REFSET_TYPE.CID,
