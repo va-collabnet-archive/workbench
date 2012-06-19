@@ -85,7 +85,7 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
         this.componentUuid = componentUuid;
         this.cv = cv;
         this.vc = vc;
-        getAnnotationBlueprints();
+        getAnnotationBlueprintsFromOriginal();
         pcs.addPropertyChangeListener(this);
     }
 
@@ -152,8 +152,14 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
     public int getComponentNid() throws IOException {
         return Ts.get().getNidForUuids(componentUuid);
     }
-
-    public List<RefexCAB> getAnnotationBlueprints() throws IOException, InvalidCAB, ContradictionException {
+    /**
+     * Returns list of annotation blueprints, gets list from original component if null.
+     * @return
+     * @throws IOException
+     * @throws InvalidCAB
+     * @throws ContradictionException 
+     */
+    public List<RefexCAB> getAnnotationBlueprintsFromOriginal() throws IOException, InvalidCAB, ContradictionException {
         if (annotations.isEmpty() && cv != null) {
             if (cv.getCurrentRefexes(vc) != null) {
                 Collection<? extends RefexVersionBI<?>> originalRefexes = cv.getCurrentRefexes(vc);
@@ -164,6 +170,10 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
                 }
             }
         }
+        return annotations;
+    }
+    
+    public List<RefexCAB> getAnnotationBlueprints() throws IOException, InvalidCAB, ContradictionException {
         return annotations;
     }
     
