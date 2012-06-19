@@ -142,14 +142,14 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
             DescCAB fsnBp = dv.makeBlueprint(cv.getViewCoordinate());
             fsnCABs.add(fsnBp);
             descCABs.add(fsnBp);
-            fsnBp.getAnnotationBlueprints();
+            fsnBp.getAnnotationBlueprintsFromOriginal();
         }
         for (DescriptionVersionBI dv : cv.getPrefDescsActive()) {
             prefNames.add(dv.getText());
             DescCAB prefBp = dv.makeBlueprint(cv.getViewCoordinate());
             prefCABs.add(prefBp);
             descCABs.add(prefBp);
-            prefBp.getAnnotationBlueprints();
+            prefBp.getAnnotationBlueprintsFromOriginal();
         }
         for (DescriptionVersionBI dv : cv.getDescsActive()) {
             if (cv.getFsnDescsActive().contains(dv) || cv.getPrefDescsActive().contains(dv)) {
@@ -157,7 +157,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
             }
             DescCAB descBp = dv.makeBlueprint(cv.getViewCoordinate());
             descCABs.add(descBp);
-            descBp.getAnnotationBlueprints();
+            descBp.getAnnotationBlueprintsFromOriginal();
         }
         for (RelationshipVersionBI rv : cv.getRelsOutgoingActive()) {
             if (rv.getCharacteristicNid() == SnomedMetadataRf1.INFERRED_DEFINING_CHARACTERISTIC_TYPE_RF1.getLenient().getNid()
@@ -167,12 +167,12 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
             }
             RelCAB relBp = rv.makeBlueprint(cv.getViewCoordinate());
             relCABs.add(relBp);
-            relBp.getAnnotationBlueprints();
+            relBp.getAnnotationBlueprintsFromOriginal();
         }
         for (MediaVersionBI mv : cv.getMediaActive()) {
             MediaCAB mediaBp = mv.makeBlueprint(cv.getViewCoordinate());
             mediaCABs.add(mediaBp);
-            mediaBp.getAnnotationBlueprints();
+            mediaBp.getAnnotationBlueprintsFromOriginal();
         }
         this.setComponentUuid(newConceptUuid);
     }
