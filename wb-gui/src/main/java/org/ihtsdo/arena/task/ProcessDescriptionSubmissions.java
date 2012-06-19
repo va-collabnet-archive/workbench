@@ -208,7 +208,7 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
                     }
                 } 
                 if (acceptUuid != null) {
-                    part = parts[acceptSct];
+                    part = parts[acceptUuid];
                     acceptabilityNid = Ts.get().getNidForUuids(UUID.fromString(part));
                 }
                 if(acceptabilityNid == 0){
@@ -229,7 +229,9 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
                     }
                 } else if (lang == LANG_CODE.NL) {
                     langRefexNid = RefsetAux.NL_REFEX.getStrict(config.getViewCoordinate()).getNid();
-                } else {
+                } else if (lang == LANG_CODE.SV) {
+                    langRefexNid = RefsetAux.SV_REFEX.getStrict(config.getViewCoordinate()).getNid();
+                }else {
                     throw new TaskFailedException("Cannot determine appropriate language/dialect refset.");
                 }
 
