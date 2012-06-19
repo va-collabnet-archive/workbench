@@ -30,9 +30,12 @@ import org.drools.rule.VariableRestriction.VariableContextEntry;
 import org.drools.spi.Evaluator;
 import org.drools.spi.FieldValue;
 import org.drools.spi.InternalReadAccessor;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
+import org.ihtsdo.tk.drools.facts.DescFact;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.spec.ValidationException;
 
@@ -99,7 +102,11 @@ public class IsKindOfEvaluatorDefinition implements EvaluatorDefinition {
                     possibleKind = (ConceptVersionBI) value1;
                 } else if (ConceptFact.class.isAssignableFrom(value1.getClass())) {
                     possibleKind = ((ConceptFact) value1).getConcept();
-                } else {
+                } else if (DescFact.class.isAssignableFrom(value1.getClass())) {
+                    DescriptionVersionBI dv = ((DescFact)value1).getDesc();
+                    ViewCoordinate vc = ((DescFact)value1).getVc();
+                    possibleKind = Ts.get().getConceptVersion(vc, dv.getConceptNid());
+                }else {
                     throw new UnsupportedOperationException("Can't convert: " + value1);
                 }
                 ViewCoordinate coordinate = possibleKind.getViewCoordinate();
