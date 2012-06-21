@@ -87,6 +87,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.dwfa.util.id.Type3UuidFactory;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.db.change.ChangeNotifier;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
@@ -616,12 +617,15 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
             switch (IDENTIFIER_PART_TYPES.getType(denotation.getClass())) {
                 case LONG:
-                    additionalIdVersions.add(new IdentifierVersionLong((TkIdentifierLong) idv));
-
+                    IdentifierVersionLong idvl = new IdentifierVersionLong((TkIdentifierLong) idv);
+                    additionalIdVersions.add(idvl);
+                    Bdb.getUuidsToNidMap().put(Type3UuidFactory.fromSNOMED(idvl.getDenotation()), nid);
                     break;
 
                 case STRING:
-                    additionalIdVersions.add(new IdentifierVersionString((TkIdentifierString) idv));
+                    IdentifierVersionString idvs = new IdentifierVersionString((TkIdentifierString) idv);
+                    additionalIdVersions.add(idvs);
+                    Bdb.getUuidsToNidMap().put(Type3UuidFactory.fromSNOMED(idvs.getDenotation()), nid);
 
                     break;
 
