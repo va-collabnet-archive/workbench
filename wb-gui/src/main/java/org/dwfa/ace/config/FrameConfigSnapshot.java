@@ -67,6 +67,7 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
+import org.ihtsdo.helper.descriptionlogic.DescriptionLogic;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
@@ -259,6 +260,10 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         return baseFrame.getClassifierOutputPath();
     }
 
+    public Boolean getClassifierOwlFeatureStatus() {
+        return baseFrame.getClassifierOwlFeatureStatus();
+    }
+
     public void setClassificationRoleRoot(I_GetConceptData classificationRoleRoot) {
         baseFrame.setClassificationRoleRoot(classificationRoleRoot);
     }
@@ -281,6 +286,11 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 
     public void setClassifierOutputPath(I_GetConceptData outputPath) {
         baseFrame.setClassifierOutputPath(outputPath);
+    }
+
+    public void setClassifierOwlFeatureStatus(Boolean classifierOwlFeatureStatus) { // :SNOOWL:
+        DescriptionLogic.setVisible(classifierOwlFeatureStatus);
+        baseFrame.setClassifierOwlFeatureStatus(classifierOwlFeatureStatus);
     }
 
     public I_GetConceptData getRefsetSpecInSpecEditor() throws IOException, TerminologyException {

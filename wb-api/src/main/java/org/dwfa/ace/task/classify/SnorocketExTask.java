@@ -45,6 +45,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.helper.descriptionlogic.DescriptionLogic;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
@@ -308,9 +309,8 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
 
                 // ** GUI: 1. LOAD DATA INTO CLASSIFIER **
                 continueThisAction = true;
-                gui = tf.newActivityPanel(true, config, "Classifier 1/5: load data", true); // in
-                // activity
-                // viewer
+                // Show in Activity Viewer
+                gui = tf.newActivityPanel(true, config, "Classifier 1/5: load data", true);
                 gui.addRefreshActionListener(this);
                 gui.setProgressInfoUpper("Classifier 1/5: load data");
                 gui.setIndeterminate(false);
@@ -510,9 +510,8 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
                 Ts.get().clearInferredIsaCache();
                 System.gc();
                 // ** GUI: 2 RUN CLASSIFIER **
-                gui = tf.newActivityPanel(true, config, "Classifier 2/5: classify data", true); // in
-                // activity
-                // viewer
+                // Show in Activity Viewer
+                gui = tf.newActivityPanel(true, config, "Classifier 2/5: classify data", true);
                 gui.addRefreshActionListener(this);
                 gui.setProgressInfoUpper("Classifier 2/5: classify data");
                 gui.setProgressInfoLower("... can take 4 to 6 minutes ...");
@@ -583,7 +582,7 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
                 }
 
                 // ** GUI: * GET CLASSIFIER EQUIVALENTS **
-                // Show in activity viewer
+                // Show in Activity viewer
                 gui = tf.newActivityPanel(true, config, "Classifier */*: retrieve equivalent concepts",
                         true);
                 gui.addRefreshActionListener(this);
@@ -613,9 +612,8 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
                 }
 
                 // ** GUI: 3 GET CLASSIFIER RESULTS **
-                gui = tf.newActivityPanel(true, config, "Classifier 3/5: retrieve solution set", true); // in
-                // activity
-                // viewer
+                // Show in Activity Viewer
+                gui = tf.newActivityPanel(true, config, "Classifier 3/5: retrieve solution set", true);
                 gui.addRefreshActionListener(this);
                 gui.setProgressInfoUpper("Classifier 3/5: retrieve solution set");
                 gui.setIndeterminate(false);
@@ -646,26 +644,56 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
                     return Condition.CONTINUE;
                 }
                 System.gc();
+                
                 // add to inferred is-a cache here.
-
                 Integer c1Nid = null;
                 NidSet parents = new NidSet();
                 ViewCoordinate vc = config.getViewCoordinate();
                 IsaCoordinate isac = vc.getIsaCoordinates().iterator().next();
-                for (SnoRel r : cRocketSnoRels) {
-                    if (equivalentSet.contains(r.c1Id)) {
-                        System.out.println("EQ REL: " + r);
-                    }
-                    if (c1Nid == null) {
-                        c1Nid = r.c1Id;
-                    } else if (r.c1Id != c1Nid) {
+                if (DescriptionLogic.isVisible()) {
+                    ArrayList<SnoRel> cAllIInferredSnoRels = new ArrayList<SnoRel>();
+                    SnoPathProcessOtherInferredIsa pcOther;
+                    pcOther = new SnoPathProcessOtherInferredIsa(logger, cAllIInferredSnoRels,
+                        allowedRoleTypes, statusSet,
+                        cViewPosSet, gui, precedence, contradictionMgr,
+                        snorocketAuthorNid);
+                    tf.iterateConcepts(pcOther);
+                    logger.info(pcOther.getStats(startTime));
 
-                        ts.addInferredParents(vc, isac, c1Nid, parents.getSetValues());
-                        c1Nid = r.c1Id;
-                        parents = new NidSet();
+                    cAllIInferredSnoRels.addAll(cRocketSnoRels);
+
+                    for (SnoRel r : cAllIInferredSnoRels) {
+                        if (equivalentSet.contains(r.c1Id)) {
+                            System.out.println("EQ REL: " + r);
+                        }
+                        if (c1Nid == null) {
+                            c1Nid = r.c1Id;
+                        } else if (r.c1Id != c1Nid) {
+
+                            ts.addInferredParents(vc, isac, c1Nid, parents.getSetValues());
+                            c1Nid = r.c1Id;
+                            parents = new NidSet();
+                        }
+                        if (r.typeId == isaNid) {
+                            parents.add(r.c2Id);
+                        }
                     }
-                    if (r.typeId == isaNid) {
-                        parents.add(r.c2Id);
+                } else {
+                    for (SnoRel r : cRocketSnoRels) {
+                        if (equivalentSet.contains(r.c1Id)) {
+                            System.out.println("EQ REL: " + r);
+                        }
+                        if (c1Nid == null) {
+                            c1Nid = r.c1Id;
+                        } else if (r.c1Id != c1Nid) {
+
+                            ts.addInferredParents(vc, isac, c1Nid, parents.getSetValues());
+                            c1Nid = r.c1Id;
+                            parents = new NidSet();
+                        }
+                        if (r.typeId == isaNid) {
+                            parents.add(r.c2Id);
+                        }
                     }
                 }
                 ts.addInferredParents(vc, isac, c1Nid, parents.getSetValues());
@@ -678,9 +706,8 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
 
                 // ** GUI: 4 GET CLASSIFIER PATH DATA **
                 String tmpS = "Classifier 4/5: get previously inferred & compare";
-                gui = tf.newActivityPanel(true, config, tmpS, true); // in
-                // activity
-                // viewer
+                // Show in Activity Viewer
+                gui = tf.newActivityPanel(true, config, tmpS, true);
                 gui.addRefreshActionListener(this);
                 gui.setProgressInfoUpper(tmpS);
                 gui.setIndeterminate(false);

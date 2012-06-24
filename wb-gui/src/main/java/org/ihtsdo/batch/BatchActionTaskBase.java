@@ -17,11 +17,14 @@
 package org.ihtsdo.batch;
 
 import java.util.List;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import org.ihtsdo.batch.BatchActionTask.BatchActionTaskType;
+import org.ihtsdo.helper.descriptionlogic.DescriptionLogic;
 import org.ihtsdo.tk.api.ComponentVersionBI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
@@ -88,7 +91,7 @@ public class BatchActionTaskBase extends javax.swing.JPanel {
             }
         });
 
-        jComboTaskType.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Parent, Add New", "Parent, Replace", "Parent, Retire", "Refset, Add Member", "Refset, Move Member", "Refset, Replace Value", "Refset, Retire Member", "Role, Add", "Role, Replace Value", "Role, Retire" }));
+        jComboTaskType.setModel(newBatchActionComboBoxModel());
         jComboTaskType.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 actionSelectTaskType(evt);
@@ -115,7 +118,7 @@ public class BatchActionTaskBase extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnDeleteTask)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jComboTaskType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jComboTaskType, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
             .addComponent(jPanelTaskDetail, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
@@ -194,6 +197,36 @@ public class BatchActionTaskBase extends javax.swing.JPanel {
                     taskDetailUI = new BatchActionTaskRoleRetireUI();
                 }
                 break;
+            case 10: // LOGIC_DISJOINT_SET_ADD :SNOOWL:
+                if (actionTaskType.compareTo(BatchActionTaskType.LOGIC_DISJOINT_SET_ADD) != 0) {
+                    actionTaskType = BatchActionTaskType.LOGIC_DISJOINT_SET_ADD;
+                    taskDetailUI = new BatchActionTaskLogicDisjointAddUI(editor.ace.aceFrameConfig);
+                }
+                break;
+            case 11: // LOGIC_DISJOINT_SET_RETIRE :SNOOWL:
+                if (actionTaskType.compareTo(BatchActionTaskType.LOGIC_DISJOINT_SET_RETIRE) != 0) {
+                    actionTaskType = BatchActionTaskType.LOGIC_DISJOINT_SET_RETIRE;
+                taskDetailUI = new BatchActionTaskLogicDisjointRetireUI();
+                }
+                break;
+            case 12: // LOGIC_NEGATE_RELATIONSHIP_VALUE :SNOOWL:
+                if (actionTaskType.compareTo(BatchActionTaskType.LOGIC_NEGATE_RELATIONSHIP_VALUE) != 0) {
+                    actionTaskType = BatchActionTaskType.LOGIC_NEGATE_RELATIONSHIP_VALUE;
+                    taskDetailUI = new BatchActionTaskLogicNegateRelValueUI();
+                }
+                break;
+            case 13: // LOGIC_UNION_SET_CREATE :SNOOWL:
+                if (actionTaskType.compareTo(BatchActionTaskType.LOGIC_UNION_SET_CREATE) != 0) {
+                    actionTaskType = BatchActionTaskType.LOGIC_UNION_SET_CREATE;
+                    taskDetailUI = new BatchActionTaskLogicUnionCreateUI(editor.ace.aceFrameConfig);
+                }
+                break;
+            case 14: // LOGIC_UNION_SET_RETIRE :SNOOWL:
+                if (actionTaskType.compareTo(BatchActionTaskType.LOGIC_UNION_SET_RETIRE) != 0) {
+                    actionTaskType = BatchActionTaskType.LOGIC_UNION_SET_RETIRE;
+                taskDetailUI = new BatchActionTaskLogicUnionRetireUI();
+                }
+                break;
             default:
                 ; // NOTHING TO DO
         }
@@ -227,12 +260,50 @@ public class BatchActionTaskBase extends javax.swing.JPanel {
     private javax.swing.JPanel jPanelTaskDetail;
     // End of variables declaration//GEN-END:variables
 
-    BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc) throws Exception {
-        return taskDetailUI.getTask(ec, vc);
+    BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc, List<ConceptChronicleBI> concepts) throws Exception {
+        return taskDetailUI.getTask(ec, vc, concepts);
     }
 
     void updateExisting(List<RelationshipVersionBI> existingParents, List<ComponentVersionBI> existingRefsets,
             List<RelationshipVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages) {
         taskDetailUI.updateExisting(existingParents, existingRefsets, existingRoles, parentLinkages);
     }
+
+    private DefaultComboBoxModel newBatchActionComboBoxModel() {
+        String[] sa;
+        if (DescriptionLogic.isVisible()) {
+            sa = new String[] { "Parent, Add New",
+                "Parent, Replace",
+                "Parent, Retire",
+                "Refset, Add Member",
+                "Refset, Move Member",
+                "Refset, Replace Value",
+                "Refset, Retire Member",
+                "Role, Add",
+                "Role, Replace Value",
+                "Role, Retire",
+                "Logic, Add Disjoint Set",
+                "Logic, Retire Disjoint Set",
+                "Logic, Negate Relationship Value",
+                "Logic, Create Union Set",
+                "Logic, Retire Union Set"
+            };
+        } else {
+            sa = new String[] { "Parent, Add New",
+                "Parent, Replace",
+                "Parent, Retire",
+                "Refset, Add Member",
+                "Refset, Move Member",
+                "Refset, Replace Value",
+                "Refset, Retire Member",
+                "Role, Add",
+                "Role, Replace Value",
+                "Role, Retire",
+            };
+        }
+
+
+        return new javax.swing.DefaultComboBoxModel(sa);
+    }
+
 }

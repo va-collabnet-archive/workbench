@@ -65,6 +65,7 @@ import org.dwfa.bpa.data.SortedSetModel;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.helper.descriptionlogic.DescriptionLogic;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
@@ -263,6 +264,10 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
 
     public I_GetConceptData getClassifierOutputPath() {
         return frameConfig.getClassifierOutputPath();
+    }
+
+    public Boolean getClassifierOwlFeatureStatus() {
+        return frameConfig.getClassifierOwlFeatureStatus();
     }
 
     public Color getColorForPath(int pathNid) {
@@ -723,6 +728,11 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
 
     public void setClassifierOutputPath(I_GetConceptData outputPath) {
         frameConfig.setClassifierOutputPath(outputPath);
+    }
+
+    public void setClassifierOwlFeatureStatus(Boolean classifierOwlFeatureStatus) { // :SNOOWL:
+        DescriptionLogic.setVisible(classifierOwlFeatureStatus);
+        frameConfig.setClassifierOwlFeatureStatus(classifierOwlFeatureStatus);
     }
 
     public void setColorForPath(int pathNid, Color pathColor) {

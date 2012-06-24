@@ -1,4 +1,19 @@
-package org.dwfa.ace.task.classify;
+/*
+ * Copyright 2012 International Health Terminology Standards Development Organisation.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.ihtsdo.task.owl;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -15,13 +30,14 @@ import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
+import org.dwfa.ace.task.classify.SnoCon;
+import org.dwfa.ace.task.classify.SnoRel;
 import org.dwfa.cement.SNOMED;
 import org.ihtsdo.helper.descriptionlogic.DescriptionLogic;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
-public class SnoPathProcessExInferred implements I_ProcessConcepts {
+public class SnoPathProcessCondorInferred implements I_ProcessConcepts {
 
     private List<SnoRel> snorels;
     private List<SnoCon> snocons;
@@ -38,10 +54,10 @@ public class SnoPathProcessExInferred implements I_ProcessConcepts {
     private int rootNid;
     private int isaNid;
     private static int isCh_INFERRED_RELATIONSHIP = Integer.MIN_VALUE;
-    private static int snorocketAuthorNid = Integer.MIN_VALUE;
+    private static int condorAuthorNid = Integer.MIN_VALUE;
     private I_IntSet roleTypeSet;
     private I_IntSet statusSet;
-    private I_IntSet statusSetPlusInactive = null; // NOTE: Concept may have been retired as a stated edit
+    private I_IntSet statusSetInactive = null; // NOTE: Concept may have been retired as a stated edit
     private PositionSetReadOnly fromPathPos;
     // GUI
     I_ShowActivity gui;
@@ -50,7 +66,7 @@ public class SnoPathProcessExInferred implements I_ProcessConcepts {
     private I_ManageContradiction contradictionMgr;
     private LinkedHashMap<Integer, Integer> charMap;
 
-    public SnoPathProcessExInferred(Logger logger, List<SnoRel> snorels, I_IntSet roleSet,
+    public SnoPathProcessCondorInferred(Logger logger, List<SnoRel> snorels, I_IntSet roleSet,
             I_IntSet statSet, PositionSetReadOnly pathPos,
             I_ShowActivity gui, Precedence precedence, I_ManageContradiction contradictionMgr)
             throws Exception {
@@ -76,15 +92,8 @@ public class SnoPathProcessExInferred implements I_ProcessConcepts {
 
         charMap = new LinkedHashMap<Integer, Integer>(); // SCTID, COUNT
 
-        this.statusSetPlusInactive = Terms.get().newIntSet();
-        this.statusSetPlusInactive.add(SnomedMetadataRfx.getSTATUS_CURRENT_NID());
-        this.statusSetPlusInactive.add(SnomedMetadataRfx.getSTATUS_LIMITED_NID());
-        this.statusSetPlusInactive.add(SnomedMetadataRfx.getSTATUS_RETIRED_NID());
-        this.statusSetPlusInactive.add(SnomedMetadataRfx.getSTATUS_AMBIGUOUS_NID());
-        this.statusSetPlusInactive.add(SnomedMetadataRfx.getSTATUS_DUPLICATE_NID());
-        this.statusSetPlusInactive.add(SnomedMetadataRfx.getSTATUS_ERRONEOUS_NID());
-        this.statusSetPlusInactive.add(SnomedMetadataRfx.getSTATUS_LIMITED_NID());
-        this.statusSetPlusInactive.add(SnomedMetadataRfx.getSTATUS_OUTDATED_NID());
+        statusSetInactive = Terms.get().newIntSet();
+        statusSetInactive.add(SnomedMetadataRfx.getSTATUS_RETIRED_NID());
     }
 
     private void setupCoreNids() throws Exception {
@@ -97,7 +106,7 @@ public class SnoPathProcessExInferred implements I_ProcessConcepts {
         // Characteristic
         isCh_INFERRED_RELATIONSHIP = SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID();
 
-        snorocketAuthorNid = tf.uuidToNative(Concept.SNOROCKET.getUids());
+        condorAuthorNid = DescriptionLogic.CONDOR_REASONER.getLenient().getNid();
     }
 
     // :TODO: have concept attributes for user created concepts go on the common path.
@@ -107,7 +116,7 @@ public class SnoPathProcessExInferred implements I_ProcessConcepts {
         // processUnfetchedConceptData(int cNid, I_FetchConceptFromCursor fcfc)
         int cNid = concept.getNid();
         if (++countConSeen % 25000 == 0 && logger != null) {
-            logger.log(Level.INFO, "::: [SnoPathProcessEx] Concepts viewed:\t{0}", countConSeen);
+            logger.log(Level.INFO, "::: [SnoPathProcessCondor] Concepts viewed:\t{0}", countConSeen);
         }
         if (cNid == rootNid) {
             if (snocons != null) {
@@ -121,10 +130,16 @@ public class SnoPathProcessExInferred implements I_ProcessConcepts {
 
         boolean passToCompare = false;
         List<? extends I_ConceptAttributeTuple> attribs = concept.getConceptAttributeTuples(
-                statusSetPlusInactive, fromPathPos, precedence, contradictionMgr);
+                statusSet, fromPathPos, precedence, contradictionMgr);
 
         if (attribs.size() >= 1) {
             passToCompare = true;
+        } else {
+            attribs = concept.getConceptAttributeTuples(statusSetInactive, fromPathPos,
+                    precedence, contradictionMgr);
+            if (attribs.size() >= 1) {
+                passToCompare = true;
+            }
         }
 
         if (passToCompare) {
@@ -134,12 +149,9 @@ public class SnoPathProcessExInferred implements I_ProcessConcepts {
             countConAdded++;
 
             for (I_RelTuple rt : relTupList) {
-                // :SNOOWL: handle multiple classifier case.
-                if (DescriptionLogic.isVisible()) {
-                    int authorNid = rt.getAuthorNid();
-                    if (authorNid != snorocketAuthorNid) {
-                        continue; // SKIP IF NOT INFERRED BY SNOROCKET
-                    }
+                int authorNid = rt.getAuthorNid();
+                if (authorNid != condorAuthorNid) {
+                    continue; // SKIP IF NOT INFERRED BY THIS CLASSIFIER
                 }
                 int charId = rt.getCharacteristicId();
                 boolean keep = false;
@@ -178,7 +190,7 @@ public class SnoPathProcessExInferred implements I_ProcessConcepts {
     // STATS FROM PROCESS CONCEPTS (CLASSIFIER INPUT)
     public String getStats(long startTime) {
         StringBuilder s = new StringBuilder(1500);
-        s.append("\r\n::: [SnoPathProcessEx] ProcessPath()");
+        s.append("\r\n::: [SnoPathProcessCondor] ProcessPath()");
         if (startTime > 0) {
             long lapseTime = System.currentTimeMillis() - startTime;
             s.append("\r\n::: [Time] get vodb data: \t").append(lapseTime).append("\t(mS)\t");

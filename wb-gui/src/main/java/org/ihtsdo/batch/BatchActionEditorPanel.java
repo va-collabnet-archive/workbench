@@ -59,7 +59,7 @@ import org.ihtsdo.util.swing.GuiUtil;
 public final class BatchActionEditorPanel extends javax.swing.JPanel {
 
     public static boolean batchEditingDisabled = false;
-    private final ACE ace;
+    public final ACE ace;
     private final TerminologyStoreDI ts;
     private final TerminologyList batchConceptList;
     private List<BatchActionTaskBase> batchActionEditTaskList;
@@ -351,7 +351,7 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
 
             List<BatchActionTask> tasks = new ArrayList<BatchActionTask>();
             for (BatchActionTaskBase taskBase : batchActionEditTaskList) {
-                BatchActionTask tmpTask = taskBase.getTask(ec, vc);
+                BatchActionTask tmpTask = taskBase.getTask(ec, vc, concepts);
                 if (tmpTask != null) {
                     tasks.add(tmpTask);
                 }

@@ -65,6 +65,7 @@ import org.dwfa.bpa.data.SortedSetModel;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.helper.descriptionlogic.DescriptionLogic;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
@@ -266,6 +267,10 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
 
     public I_GetConceptData getClassifierOutputPath() {
         return config.getClassifierOutputPath();
+    }
+
+    public Boolean getClassifierOwlFeatureStatus() {
+        return config.getClassifierOwlFeatureStatus();
     }
 
     public Color getColorForPath(int pathNid) {
@@ -746,6 +751,11 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
 
     public void setClassifierOutputPath(I_GetConceptData outputPath) {
         config.setClassifierOutputPath(outputPath);
+    }
+
+    public void setClassifierOwlFeatureStatus(Boolean classifierOwlFeatureStatus) { // :SNOOWL:
+        DescriptionLogic.setVisible(classifierOwlFeatureStatus);
+        config.setClassifierOwlFeatureStatus(classifierOwlFeatureStatus);
     }
 
     public void setColorForPath(int pathNid, Color pathColor) {

@@ -50,6 +50,11 @@ public abstract class BatchActionTask {
         ROLE_ADD,
         ROLE_REPLACE_VALUE,
         ROLE_RETIRE,
+        LOGIC_DISJOINT_SET_ADD, // :SNOOWL:ADD:
+        LOGIC_DISJOINT_SET_RETIRE, // :SNOOWL:ADD:
+        LOGIC_NEGATE_RELATIONSHIP_VALUE, // :SNOOWL:ADD:
+        LOGIC_UNION_SET_CREATE, // :SNOOWL:ADD:
+        LOGIC_UNION_SET_RETIRE, // :SNOOWL:ADD:
         SIMPLE
     }
 

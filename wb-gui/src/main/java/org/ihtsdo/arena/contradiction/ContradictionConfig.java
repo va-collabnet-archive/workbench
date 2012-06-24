@@ -59,6 +59,7 @@ import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.PropertyChangeSupportWithPropagationId;
 import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
+import org.ihtsdo.helper.descriptionlogic.DescriptionLogic;
 import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
@@ -540,6 +541,11 @@ public class ContradictionConfig implements I_ConfigAceFrame {
         config.setClassifierOutputPath(outputPath);
     }
 
+    public void setClassifierOwlFeatureStatus(Boolean classifierOwlFeatureStatus) { // :SNOOWL:
+        DescriptionLogic.setVisible(classifierOwlFeatureStatus);
+        config.setClassifierOwlFeatureStatus(classifierOwlFeatureStatus);
+    }
+    
     public void setClassifierIsaType(I_GetConceptData classifierIsaType) {
         config.setClassifierIsaType(classifierIsaType);
     }
@@ -1108,6 +1114,10 @@ public class ContradictionConfig implements I_ConfigAceFrame {
 
     public I_GetConceptData getClassifierOutputPath() {
         return config.getClassifierOutputPath();
+    }
+
+    public Boolean getClassifierOwlFeatureStatus() {
+        return config.getClassifierOwlFeatureStatus();
     }
 
     public I_GetConceptData getClassifierIsaType() {

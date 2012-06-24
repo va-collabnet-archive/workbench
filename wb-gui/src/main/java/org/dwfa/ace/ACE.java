@@ -100,6 +100,7 @@ import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.types.IntList;
 import org.ihtsdo.arena.Arena;
 import org.ihtsdo.custom.statics.CustomStatics;
+import org.ihtsdo.helper.descriptionlogic.DescriptionLogic;
 import org.ihtsdo.objectCache.ObjectCache;
 import org.ihtsdo.taxonomy.TaxonomyHelper;
 import org.ihtsdo.taxonomy.TaxonomyMouseListenerForAce;
@@ -922,6 +923,16 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
       classifierConceptLabel.addTermChangeListener(new PropertyListenerGlue("setClassifierConcept",
               I_GetConceptData.class, aceFrameConfig));
       wrapAndAdd(classifierPrefPanel, classifierConceptLabel, "Classifier identity: ");
+
+      if (DescriptionLogic.isPresent()) {  // :SNOOWL:
+          JPanel owlPanel             = new JPanel(new GridLayout(1, 1));
+            Component owlCheckBox = getCheckboxEditor("Enable OWL features",
+                       "classifierOwlFeatureStatus", /* variable name */
+                       DescriptionLogic.isVisible(), /* initial value */
+                       true); /* enabled */
+          owlPanel.add(owlCheckBox);
+          classifierPrefPanel.add(owlCheckBox, BorderLayout.PAGE_START);
+      }
 
       return classifierPrefPanel;
    }

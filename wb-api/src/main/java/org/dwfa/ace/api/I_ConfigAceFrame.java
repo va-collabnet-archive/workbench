@@ -593,6 +593,10 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public void setClassifierOutputPath(I_GetConceptData outputPath);
 
+    public Boolean getClassifierOwlFeatureStatus(); // :SNOOWL:
+
+    public void setClassifierOwlFeatureStatus(Boolean classifierOwlFeatureStatus); // :SNOOWL:
+
     public I_ManageContradiction[] getAllConflictResolutionStrategies();
 
     public void setTopActivity(I_ShowActivity activity);

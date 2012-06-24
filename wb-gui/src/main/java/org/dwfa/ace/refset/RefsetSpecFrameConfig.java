@@ -75,6 +75,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.etypes.EConcept;
+import org.ihtsdo.helper.descriptionlogic.DescriptionLogic;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
@@ -335,6 +336,10 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 
     public I_GetConceptData getClassifierOutputPath() {
         return frameConfig.getClassifierOutputPath();
+    }
+
+    public Boolean getClassifierOwlFeatureStatus() {
+        return frameConfig.getClassifierOwlFeatureStatus();
     }
 
     public I_HostConceptPlugins getConceptViewer(int index) {
@@ -834,6 +839,11 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 
     public void setClassifierOutputPath(I_GetConceptData outputPath) {
         frameConfig.setClassifierOutputPath(outputPath);
+    }
+
+    public void setClassifierOwlFeatureStatus(Boolean classifierOwlFeatureStatus) { // :SNOOWL:
+        DescriptionLogic.setVisible(classifierOwlFeatureStatus);
+        frameConfig.setClassifierOwlFeatureStatus(classifierOwlFeatureStatus);
     }
 
     public void setCommitAbortButtonsVisible(boolean visible) {

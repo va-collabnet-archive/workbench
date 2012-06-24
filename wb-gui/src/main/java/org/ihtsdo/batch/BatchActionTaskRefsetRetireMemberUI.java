@@ -27,6 +27,7 @@ import javax.swing.JPanel;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
 import org.ihtsdo.batch.BatchActionTask.BatchActionTaskType;
 import org.ihtsdo.tk.api.ComponentVersionBI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
@@ -264,7 +265,7 @@ public class BatchActionTaskRefsetRetireMemberUI extends javax.swing.JPanel impl
     }
 
     @Override // I_BatchActionTask
-    public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc) {
+    public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc, List<ConceptChronicleBI> concepts) {
         // referenced component provided at execution time
 
         // SET REFSET EXITING COLLECTION NID

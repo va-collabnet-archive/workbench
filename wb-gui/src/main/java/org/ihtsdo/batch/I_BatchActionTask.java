@@ -19,6 +19,7 @@ package org.ihtsdo.batch;
 import java.util.List;
 import javax.swing.JPanel;
 import org.ihtsdo.tk.api.ComponentVersionBI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
@@ -40,7 +41,7 @@ public interface I_BatchActionTask {
      * @param vc
      * @return
      */
-    BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc) throws Exception;
+    BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc, List<ConceptChronicleBI> concepts) throws Exception;
 
     /**
      * updateExisting() updates the GUI objects based information from the current concept list.<br>

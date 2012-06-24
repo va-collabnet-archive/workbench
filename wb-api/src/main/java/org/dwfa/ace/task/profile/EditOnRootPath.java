@@ -63,6 +63,7 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.helper.descriptionlogic.DescriptionLogic;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
@@ -547,6 +548,11 @@ public class EditOnRootPath implements I_ConfigAceFrame {
 
     public void setClassifierOutputPath(I_GetConceptData outputPath) {
         config.setClassifierOutputPath(outputPath);
+    }
+
+    public void setClassifierOwlFeatureStatus(Boolean classifierOwlFeatureStatus) { // :SNOOWL:
+        DescriptionLogic.setVisible(classifierOwlFeatureStatus);
+        config.setClassifierOwlFeatureStatus(classifierOwlFeatureStatus);
     }
 
     public void setClassifierIsaType(I_GetConceptData classifierIsaType) {
@@ -1111,6 +1117,10 @@ public class EditOnRootPath implements I_ConfigAceFrame {
 
     public I_GetConceptData getClassifierOutputPath() {
         return config.getClassifierOutputPath();
+    }
+
+    public Boolean getClassifierOwlFeatureStatus() {
+        return config.getClassifierOwlFeatureStatus();
     }
 
     public I_GetConceptData getClassifierIsaType() {

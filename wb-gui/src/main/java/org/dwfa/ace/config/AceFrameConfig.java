@@ -126,6 +126,7 @@ import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
 import org.ihtsdo.concurrent.future.FutureHelper;
+import org.ihtsdo.helper.descriptionlogic.DescriptionLogic;
 import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
@@ -456,6 +457,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     private TreeSet<? extends ConceptVersionBI> workflowStates = null;
     private TreeSet<? extends ConceptVersionBI> workflowActions = null;
     private List<UUID> availableWorkflowActions = null;
+    // 51 :SNOOWL:
+    private boolean classifierOwlFeatureStatus = false; // :SNOOWL:
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -653,6 +656,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         
         // 50
         out.writeObject(moduleNid);
+
+        // 51 :SNOOWL:
+        out.writeBoolean(classifierOwlFeatureStatus); // :SNOOWL:
 
     }
 
@@ -1150,6 +1156,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                 moduleNid = (Integer) in.readObject();
             } else {
                 moduleNid = Ts.get().getNidForUuids(TkRevision.unspecifiedModuleUuid);
+            }
+
+            if (objDataVersion >= 51) { // :SNOOWL:
+                classifierOwlFeatureStatus = in.readBoolean();
+            } else {
+                classifierOwlFeatureStatus = false;
             }
 
         } else {
@@ -2966,6 +2978,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         return classifierOutputPathConcept;
     }
 
+    public Boolean getClassifierOwlFeatureStatus() { // :SNOOWL:
+        return classifierOwlFeatureStatus;
+    }
+
     public void setClassificationRoleRoot(I_GetConceptData classificationRoleRoot) {
         vc = null;
         Object old = this.classificationRoleRoot;
@@ -3006,6 +3022,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         Object old = outputPath;
         this.classifierOutputPathConcept = outputPath;
         changeSupport.firePropertyChange("classifierOutputPath", old, outputPath);
+    }
+
+    public void setClassifierOwlFeatureStatus(Boolean classifierOwlFeatureStatus) { // :SNOOWL:
+        DescriptionLogic.setVisible(classifierOwlFeatureStatus);
+        this.classifierOwlFeatureStatus = classifierOwlFeatureStatus;
     }
 
     public Color getColorForPath(int pathNid) {

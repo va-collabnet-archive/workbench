@@ -23,6 +23,7 @@ import org.dwfa.ace.api.I_AmTermComponent;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
 import org.ihtsdo.batch.BatchActionTask.BatchActionTaskType;
 import org.ihtsdo.tk.api.ComponentVersionBI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
@@ -112,7 +113,7 @@ public class BatchActionTaskRoleAddUI extends javax.swing.JPanel implements I_Ba
     }
 
     @Override
-    public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc) throws Exception {
+    public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc, List<ConceptChronicleBI> concepts) throws Exception {
         // SET ROLE TYPE
         I_AmTermComponent termRoleType = ((ValueDndNidUI) jPanelDndNewRoleType).getTermComponent();
         if (termRoleType != null) {
