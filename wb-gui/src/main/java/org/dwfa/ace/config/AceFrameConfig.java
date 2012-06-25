@@ -316,7 +316,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      *
      */
     private static final long serialVersionUID = 1L;
-    private static final int dataVersion = 50; // keep current with
+    private static final int dataVersion = 51; // keep current with
     // objDataVersion logic
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
     private transient VetoableChangeSupport vetoSupport = new VetoableChangeSupport(this);
@@ -444,6 +444,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     private CLASSIFIER_INPUT_MODE_PREF classifierInputMode;
     // 50
     private int moduleNid = Ts.get().getNidForUuids(TkRevision.unspecifiedModuleUuid);
+    // 51 :SNOOWL:
+    private boolean classifierOwlFeatureStatus = false; // :SNOOWL:
     // transient
     private transient MasterWorker worker;
     private transient String statusMessage;
@@ -457,8 +459,6 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     private TreeSet<? extends ConceptVersionBI> workflowStates = null;
     private TreeSet<? extends ConceptVersionBI> workflowActions = null;
     private List<UUID> availableWorkflowActions = null;
-    // 51 :SNOOWL:
-    private boolean classifierOwlFeatureStatus = false; // :SNOOWL:
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
