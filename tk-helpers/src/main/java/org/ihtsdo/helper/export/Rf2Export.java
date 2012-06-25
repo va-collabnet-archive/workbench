@@ -44,6 +44,7 @@ import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 import org.ihtsdo.tk.binding.snomed.RefsetAux;
 import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
@@ -658,43 +659,46 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
 
     private void processLang(RefexVersionBI rv) throws IOException {
         if (rv != null) {
-            for (Rf2File.LanguageRefsetFileFields field : Rf2File.LanguageRefsetFileFields.values()) {
-                switch (field) {
-                    case ID:
-                        langRefsetsWriter.write(rv.getPrimUuid() + field.seperator);
+            if(RefexCnidVersionBI.class.isAssignableFrom(rv.getClass())){
+                RefexCnidVersionBI rvc = (RefexCnidVersionBI) rv;
+                for (Rf2File.LanguageRefsetFileFields field : Rf2File.LanguageRefsetFileFields.values()) {
+                    switch (field) {
+                        case ID:
+                            langRefsetsWriter.write(rvc.getPrimUuid() + field.seperator);
 
-                        break;
+                            break;
 
-                    case EFFECTIVE_TIME:
-                        langRefsetsWriter.write(effectiveDateString + field.seperator);
+                        case EFFECTIVE_TIME:
+                            langRefsetsWriter.write(effectiveDateString + field.seperator);
 
-                        break;
+                            break;
 
-                    case ACTIVE:
-                        langRefsetsWriter.write(store.getComponent(rv.getStatusNid()).getPrimUuid() + field.seperator);
+                        case ACTIVE:
+                            langRefsetsWriter.write(store.getComponent(rvc.getStatusNid()).getPrimUuid() + field.seperator);
 
-                        break;
+                            break;
 
-                    case MODULE_ID:
-                        langRefsetsWriter.write(module + field.seperator);
+                        case MODULE_ID:
+                            langRefsetsWriter.write(module + field.seperator);
 
-                        break;
+                            break;
 
-                    case REFSET_ID:
-                        langRefexNids.add(rv.getCollectionNid());
-                        langRefsetsWriter.write(store.getComponent(rv.getCollectionNid()).getPrimUuid() + field.seperator);
+                        case REFSET_ID:
+                            langRefexNids.add(rv.getCollectionNid());
+                            langRefsetsWriter.write(store.getComponent(rvc.getCollectionNid()).getPrimUuid() + field.seperator);
 
-                        break;
+                            break;
 
-                    case REFERENCED_COMPONENT_ID:
-                        langRefsetsWriter.write(store.getComponent(rv.getReferencedComponentNid()).getPrimUuid() + field.seperator);
+                        case REFERENCED_COMPONENT_ID:
+                            langRefsetsWriter.write(store.getComponent(rvc.getReferencedComponentNid()).getPrimUuid() + field.seperator);
 
-                        break;
+                            break;
 
-                    case ACCEPTABILITY:
-                        langRefsetsWriter.write(store.getComponent(rv.getReferencedComponentNid()).getPrimUuid() + field.seperator);
+                        case ACCEPTABILITY:
+                            langRefsetsWriter.write(store.getComponent(rvc.getCnid1()).getPrimUuid() + field.seperator);
 
-                        break;
+                            break;
+                    }
                 }
             }
         }
@@ -702,46 +706,49 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
 
     private void processOtherLang(RefexVersionBI rv) throws IOException {
        if (rv != null) {
-            for (Rf2File.LanguageRefsetFileFields field : Rf2File.LanguageRefsetFileFields.values()) {
-                switch (field) {
-                    case ID:
-                        otherLangRefsetsWriter.write(rv.getPrimUuid() + field.seperator);
+           if(RefexCnidVersionBI.class.isAssignableFrom(rv.getClass())){
+                RefexCnidVersionBI rvc = (RefexCnidVersionBI) rv;
+                for (Rf2File.LanguageRefsetFileFields field : Rf2File.LanguageRefsetFileFields.values()) {
+                    switch (field) {
+                        case ID:
+                            otherLangRefsetsWriter.write(rvc.getPrimUuid() + field.seperator);
 
-                        break;
+                            break;
 
-                    case EFFECTIVE_TIME:
-                        otherLangRefsetsWriter.write(effectiveDateString + field.seperator);
+                        case EFFECTIVE_TIME:
+                            otherLangRefsetsWriter.write(effectiveDateString + field.seperator);
 
-                        break;
+                            break;
 
-                    case ACTIVE:
-                        otherLangRefsetsWriter.write(store.getComponent(rv.getStatusNid()).getPrimUuid() + field.seperator);
+                        case ACTIVE:
+                            otherLangRefsetsWriter.write(store.getComponent(rvc.getStatusNid()).getPrimUuid() + field.seperator);
 
-                        break;
+                            break;
 
-                    case MODULE_ID:
-                        otherLangRefsetsWriter.write(module + field.seperator);
+                        case MODULE_ID:
+                            otherLangRefsetsWriter.write(module + field.seperator);
 
-                        break;
+                            break;
 
-                    case REFSET_ID:
-                        langRefexNids.add(rv.getCollectionNid());
-                        otherLangRefsetsWriter.write(store.getComponent(rv.getCollectionNid()).getPrimUuid() + field.seperator);
+                        case REFSET_ID:
+                            langRefexNids.add(rv.getCollectionNid());
+                            otherLangRefsetsWriter.write(store.getComponent(rvc.getCollectionNid()).getPrimUuid() + field.seperator);
 
-                        break;
+                            break;
 
-                    case REFERENCED_COMPONENT_ID:
-                        otherLangRefsetsWriter.write(store.getComponent(rv.getReferencedComponentNid()).getPrimUuid() + field.seperator);
+                        case REFERENCED_COMPONENT_ID:
+                            otherLangRefsetsWriter.write(store.getComponent(rvc.getReferencedComponentNid()).getPrimUuid() + field.seperator);
 
-                        break;
+                            break;
 
-                    case ACCEPTABILITY:
-                        otherLangRefsetsWriter.write(store.getComponent(rv.getReferencedComponentNid()).getPrimUuid() + field.seperator);
+                        case ACCEPTABILITY:
+                            otherLangRefsetsWriter.write(store.getComponent(rvc.getCnid1()).getPrimUuid() + field.seperator);
 
-                        break;
-                }
-            }
+                            break;
+                    }
+               }
         }
+      }
     }
 
     private void processRefsetDesc(int refexNid) throws IOException, NoSuchAlgorithmException {
