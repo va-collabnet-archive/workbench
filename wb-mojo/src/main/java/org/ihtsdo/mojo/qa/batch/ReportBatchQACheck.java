@@ -360,12 +360,18 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 			if (line.trim() != "" && splitedLine.length >= 5 && splitedLine[4].equals(ruleLineSplit[0])) {
 				result++;
 				bw.write("<tr class=\"b\">");
+				String name = "";
+				String uuid = "";
 				for (int i = 0; i < splitedLine.length; i++) {
-					if (i == 1 || i == 7) {
-						bw.write("<td>" + splitedLine[i] + "</td>");
+					if (i == 1) {
+						uuid = splitedLine[i];
+					}else if(i == 7){
+						name = splitedLine[i];
 					}
 					bw.write("<input type=\"hidden\" name=\"" + headerSplited[i].replaceAll(" ", "").toLowerCase() + "\"" + " value=\"" + splitedLine[i] + "\"/>");
 				}
+				bw.write("<td>"+name+"</td>");
+				bw.write("<td>"+uuid+"</td>");
 				bw.write("</tr>");
 			}
 			bw.write("</table>");
