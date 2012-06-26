@@ -224,9 +224,6 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 				sink.text("Findings");
 				sink.tableHeaderCell_();
 				sink.tableRow_();
-				SinkEventAttributes linkAttr = new SinkEventAttributeSet();
-				linkAttr.addAttribute("onclick", "javascript:showRuleDetails(this);");
-				linkAttr.addAttribute("href", "javascript:linkme();");
 				while (ruleBr.ready()) {
 					String ruleLine = ruleBr.readLine();
 					String[] ruleLineSplit = ruleLine.split("\\t", -1);
@@ -234,6 +231,13 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 					if (rulesWithFindings.contains(ruleLineSplit[0])) {
 						findigSize = createFindingsReport(ruleLineSplit, sortedFindings, findingFolder);
 					}
+					SinkEventAttributes linkAttr = new SinkEventAttributeSet();
+					if(findigSize == 0){
+						linkAttr.addAttribute("onclick", "javascript:showRuleDetails(this);");
+					}else{
+						linkAttr.addAttribute("onclick", "javascript:showRuleDetails(this);javascript:showFindings(\"findings/" + ruleLineSplit[0] + ".html\"" + ")");
+					}
+					linkAttr.addAttribute("href", "javascript:linkme();");
 					sink.tableRow();
 					for (int i = 0; i < ruleLineSplit.length; i++) {
 						if (i >= 1 && i <= 3) {
