@@ -260,7 +260,7 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 					if (findigSize > 0) {
 						SinkEventAttributes findigLinkAttrs = new SinkEventAttributeSet();
 						findigLinkAttrs.addAttribute("onclick", "javascript:showRuleDetails(this);javascript:showFindings(\"findings/" + ruleLineSplit[0] + ".html\"" + ")");
-						findigLinkAttrs.addAttribute("href", "javascript:nada();");
+						findigLinkAttrs.addAttribute("href", "javascript:linkme();");
 						sink.unknown("a", new Object[] { new Integer(HtmlMarkup.TAG_TYPE_START) }, findigLinkAttrs);
 						sink.text("" + findigSize);
 						sink.unknown("a", new Object[] { new Integer(HtmlMarkup.TAG_TYPE_END) }, null);
