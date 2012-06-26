@@ -219,14 +219,14 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 						sink.tableHeaderCell_();
 					}
 				}
-				headerAttrs.addAttribute(SinkEventAttributes.CLASS, "sortable-text fd-column-" + (3));
+				headerAttrs.addAttribute(SinkEventAttributes.CLASS, "sortable-numeric fd-column-" + (3));
 				sink.tableHeaderCell(headerAttrs);
 				sink.text("Findings");
 				sink.tableHeaderCell_();
 				sink.tableRow_();
 				SinkEventAttributes linkAttr = new SinkEventAttributeSet();
 				linkAttr.addAttribute("onclick", "javascript:showRuleDetails(this);");
-				linkAttr.addAttribute("href", "javascript:nada();");
+				linkAttr.addAttribute("href", "javascript:linkme();");
 				while (ruleBr.ready()) {
 					String ruleLine = ruleBr.readLine();
 					String[] ruleLineSplit = ruleLine.split("\\t", -1);
@@ -347,7 +347,7 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 				result++;
 				bw.write("<tr class=\"b\">");
 				for (int i = 0; i < splitedLine.length; i++) {
-					if (i == 1 || i == 7) {
+					if (i == 0|| i == 7) {
 						bw.write("<td>" + splitedLine[i] + "</td>");
 					}
 					bw.write("<input type=\"hidden\" name=\"" + headerSplited[i].replaceAll(" ", "").toLowerCase() + "\"" + " value=\"" + splitedLine[i] + "\"/>");
