@@ -347,7 +347,7 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 				}
 			}
 
-			while (sortedBr.ready() && splitedLine != null && splitedLine.length >= 5 && splitedLine[4].equals(ruleLineSplit[0])) {
+			while (sortedBr.ready() && splitedLine != null && splitedLine.length >= 7 && splitedLine[4].equals(ruleLineSplit[0])) {
 				result++;
 				bw.write("<tr class=\"b\">");
 				String name = "";
@@ -367,7 +367,7 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 				splitedLine = line.split("\\t", -1);
 			}
 
-			if (line.trim() != "" && splitedLine.length >= 5 && splitedLine[4].equals(ruleLineSplit[0])) {
+			if (line.trim() != "" && splitedLine.length >= 7 && splitedLine[4].equals(ruleLineSplit[0])) {
 				result++;
 				bw.write("<tr class=\"b\">");
 				String name = "";
