@@ -353,7 +353,7 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 				String name = "";
 				String uuid = "";
 				for (int i = 0; i < splitedLine.length; i++) {
-					if (i == 0) {
+					if (i == 5) {
 						uuid = splitedLine[i];
 					}else if(i == 7){
 						name = splitedLine[i];
@@ -373,7 +373,7 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 				String name = "";
 				String uuid = "";
 				for (int i = 0; i < splitedLine.length; i++) {
-					if (i == 0) {
+					if (i == 5) {
 						uuid = splitedLine[i];
 					}else if(i == 7){
 						name = splitedLine[i];
