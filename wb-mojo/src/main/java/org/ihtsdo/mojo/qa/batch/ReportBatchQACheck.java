@@ -7,10 +7,8 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import org.apache.maven.doxia.markup.HtmlMarkup;
 import org.apache.maven.doxia.sink.Sink;
@@ -75,6 +73,16 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 	 * @parameter
 	 */
 	private String rulesOutputStr;
+
+	private static final int EXECUTION_UUID = 0;
+	private static final int EXECUTION_DATABASE_UUID = 1;
+	private static final int EXECUTION_PATH_UUID = 2;
+	private static final int EXECUTION_NAME = 3;
+	private static final int EXECUTION_VIEW_POINT = 4;
+	private static final int EXECUTION_START_TIME = 5;
+	private static final int EXECUTION_END_TIME = 6;
+	private static final int EXECUTION_CONTEXT = 7;
+	private static final int EXECUTION_PATH_NAME = 8;
 
 	@Override
 	protected void executeReport(Locale arg0) throws MavenReportException {
@@ -157,32 +165,80 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 			sink.section1();
 
 			sink.sectionTitle1();
-			sink.text("Execution");
+			sink.text("Last Batch QA Execution");
 			sink.sectionTitle1_();
 
 			sink.lineBreak();
+
+			String executionLine = br.readLine();
+			executionLine = br.readLine();
+			String[] splitedLine = executionLine.split("\\t", -1);
+
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+			SimpleDateFormat sdf1 = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss z");
+			String startTime = "";
+			try {
+				startTime = sdf1.format(sdf.parse(splitedLine[EXECUTION_START_TIME]));
+			} catch (Exception e) {
+				e.printStackTrace();
+				startTime = "{Invalid date format in execution file}";
+			}
+			String endTime = "";
+			try {
+				endTime = sdf1.format(sdf.parse(splitedLine[EXECUTION_END_TIME]));
+			} catch (Exception e) {
+				e.printStackTrace();
+				endTime = "{Invalid date format in execution file}";
+			}
+			sink.bold();
+			sink.text("Start time: ");
+			sink.bold_();
+			sink.text(startTime);
+			sink.lineBreak();
+			
+
+			sink.bold();
+			sink.text("End time: ");
+			sink.bold_();
+			sink.text(endTime);
 			sink.lineBreak();
 
-			sink.table();
-			sink.tableRow();
-			String heading = br.readLine();
-			String[] splited = heading.split("\\t", -1);
-			for (String string : splited) {
-				sink.tableHeaderCell();
-				sink.text(string);
-				sink.tableHeaderCell_();
+			sink.bold();
+			sink.text("Database Name: ");
+			sink.bold_();
+
+			sink.text(splitedLine[EXECUTION_NAME]);
+			sink.lineBreak();
+
+			sink.bold();
+			sink.text("Database UUID: ");
+			sink.bold_();
+
+			sink.text(splitedLine[EXECUTION_DATABASE_UUID]);
+			sink.lineBreak();
+
+			sink.bold();
+			sink.text("Path tested: ");
+			sink.bold_();
+			sink.text(splitedLine[EXECUTION_PATH_NAME] + " - " + splitedLine[EXECUTION_PATH_UUID]);
+			sink.lineBreak();
+			String vpt = "";
+			try {
+				Date viewPointTime = sdf.parse(splitedLine[EXECUTION_VIEW_POINT]);
+				Date oneYearAfter = new Date((new Date().getTime()) + 30000000000l);
+				if (viewPointTime.getTime() > oneYearAfter.getTime()) {
+					vpt = "latest";
+				} else {
+					vpt = sdf1.format(viewPointTime);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				vpt = "{Invalid date format in execution file}";
 			}
-			sink.tableRow_();
-			String executionLine = br.readLine();
-			String[] splitedLine = executionLine.split("\\t", -1);
-			sink.tableRow();
-			for (String string : splitedLine) {
-				sink.tableCell();
-				sink.text(string);
-				sink.tableCell_();
-			}
-			sink.tableRow_();
-			sink.table_();
+			sink.bold();
+			sink.text("View point time: ");
+			sink.bold_();
+			sink.text(vpt);
 			sink.section1_();
 
 			File rules = new File(rulesOutputStr);
@@ -200,12 +256,16 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 				sink.sectionTitle2_();
 
 				sink.lineBreak();
+
+				sink.text("This is the list of rules of the QA system, including the number of violation in each one. The list can be sorted by clicking on the headers.");
+				
+				sink.lineBreak();
 				sink.lineBreak();
 
 				SinkEventAttributes tableAttr = new SinkEventAttributeSet();
 				tableAttr.addAttribute(SinkEventAttributes.ID, "results");
 				tableAttr.addAttribute(SinkEventAttributes.CLASS,
-						"bodyTable sortable-onload-3 no-arrow rowstyle-alt colstyle-alt paginate-10 max-pages-7 paginationcallback-callbackTest-calculateTotalRating paginationcallback-callbackTest-displayTextInfo sortcompletecallback-callbackTest-calculateTotalRating");
+						"bodyTable sortable-onload-3 no-arrow rowstyle-alt colstyle-alt paginate-20 max-pages-7 paginationcallback-callbackTest-calculateTotalRating paginationcallback-callbackTest-displayTextInfo sortcompletecallback-callbackTest-calculateTotalRating");
 
 				sink.table(tableAttr);
 				sink.tableRow();
@@ -232,9 +292,9 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 						findigSize = createFindingsReport(ruleLineSplit, sortedFindings, findingFolder);
 					}
 					SinkEventAttributes linkAttr = new SinkEventAttributeSet();
-					if(findigSize == 0){
+					if (findigSize == 0) {
 						linkAttr.addAttribute("onclick", "javascript:showRuleDetails(this);");
-					}else{
+					} else {
 						linkAttr.addAttribute("onclick", "javascript:showRuleDetails(this);javascript:showFindings(\"findings/" + ruleLineSplit[0] + ".html\"" + ")");
 					}
 					linkAttr.addAttribute("href", "javascript:linkme();");
@@ -324,7 +384,7 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 			bw.write("<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">");
 			bw.write("<body>");
 
-			bw.write("<table border=\"0\" id=\"findingTable\" class=\"bodyTable sortable-onload-0 no-arrow rowstyle-alt colstyle-alt paginate-10 max-pages-7 paginationcallback-callbackTest-calculateTotalRating paginationcallback-callbackTest-displayTextInfo sortcompletecallback-callbackTest-calculateTotalRating\">");
+			bw.write("<table border=\"0\" id=\"findingTable\" class=\"bodyTable\">");
 
 			String header = sortedBr.readLine();
 			String[] headerSplited = header.split("\\t", -1);
@@ -355,13 +415,13 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 				for (int i = 0; i < splitedLine.length; i++) {
 					if (i == 5) {
 						uuid = splitedLine[i];
-					}else if(i == 7){
+					} else if (i == 7) {
 						name = splitedLine[i];
 					}
 					bw.write("<input type=\"hidden\" name=\"" + headerSplited[i].replaceAll(" ", "").toLowerCase() + "\"" + " value=\"" + splitedLine[i] + "\"/>");
 				}
-				bw.write("<td>"+name+"</td>");
-				bw.write("<td>"+uuid+"</td>");
+				bw.write("<td>" + name + "</td>");
+				bw.write("<td>" + uuid + "</td>");
 				bw.write("</tr>");
 				line = sortedBr.readLine();
 				splitedLine = line.split("\\t", -1);
@@ -375,13 +435,13 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 				for (int i = 0; i < splitedLine.length; i++) {
 					if (i == 5) {
 						uuid = splitedLine[i];
-					}else if(i == 7){
+					} else if (i == 7) {
 						name = splitedLine[i];
 					}
 					bw.write("<input type=\"hidden\" name=\"" + headerSplited[i].replaceAll(" ", "").toLowerCase() + "\"" + " value=\"" + splitedLine[i] + "\"/>");
 				}
-				bw.write("<td>"+name+"</td>");
-				bw.write("<td>"+uuid+"</td>");
+				bw.write("<td>" + name + "</td>");
+				bw.write("<td>" + uuid + "</td>");
 				bw.write("</tr>");
 			}
 			bw.write("</table>");
