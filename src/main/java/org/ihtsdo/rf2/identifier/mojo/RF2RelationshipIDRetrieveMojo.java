@@ -17,10 +17,10 @@ import org.ihtsdo.rf2.postexport.RF2ArtifactPostExportAbst.FILE_TYPE;
 /**
  * Goal which sorts and generates delta, snapshot.
  * 
- * @goal rf2-inferred-relationships-id-reassign
+ * @goal rf2-relationships-id-reassign
  * 
  */
-public class RF2InferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
+public class RF2RelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 
 	/**
 	 * Location of the build directory.
@@ -31,7 +31,7 @@ public class RF2InferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 	private File targetDirectory;
 
 	/**
-	 * release date. 
+	 * release date. 20100731
 	 * 
 	 * @parameter
 	 * @required
@@ -39,7 +39,7 @@ public class RF2InferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 	private String releaseDate;
 
 	/**
-	 * previuous release date. 
+	 * previuous release date. 20100731
 	 * 
 	 * @parameter
 	 * @required
@@ -61,6 +61,14 @@ public class RF2InferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 	 * @required
 	 */
 	private String rf2FullFolder;
+
+	/**
+	 * relationshipt File Type. 
+	 * 
+	 * @parameter
+	 * @required
+	 */
+	private String relationshiptFileType;
 	
 	/**
 	 * Location of the outputFolder. (output in this mojo)
@@ -85,7 +93,8 @@ public class RF2InferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 
 		File previousRelationshipFullFile;
 		try {
-			previousRelationshipFullFile = getPreviousFile(previousFullFolder,FILE_TYPE.RF2_RELATIONSHIP);
+			FILE_TYPE fileType=getRelFileType(relationshiptFileType);
+			previousRelationshipFullFile = getPreviousFile(previousFullFolder,fileType);
 
 			File folderTmp=new File(targetDirectory.getAbsolutePath() + "/" + getTmpPostExport() );
 			if (!folderTmp.exists()){
@@ -117,15 +126,12 @@ public class RF2InferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 			fsc=null;
 			System.gc();
 
-
 			File sortedExportedfile=new File(sortedfolderTmp,"exp_" + exportedRelationshipFile.getName());
 
 			fsc=new FileSorter(exportedRelationshipFile, sortedExportedfile, sortTmpfolderSortedTmp, FILE_TYPE.RF2_RELATIONSHIP.getColumnIndexes());
 			fsc.execute();
 			fsc=null;
 			System.gc();
-
-
 
 			File snapshotfolderTmp=new File(folderTmp.getAbsolutePath() + "/" + getTmpSnapShot() );
 			if (!snapshotfolderTmp.exists()){

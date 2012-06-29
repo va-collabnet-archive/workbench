@@ -12,22 +12,22 @@ import java.io.OutputStreamWriter;
 
 import org.ihtsdo.rf2.postexport.RF2ArtifactPostExportAbst.FILE_TYPE;
 
-public class ConsolidateInactRefsetSnapshotAndDelta extends AbstractTask {
+public class ConsolidateQualSnapshotAndDelta extends AbstractTask {
 
-	private static final int STATUS_COLUMN = 6;
 	private File snapshotSortedPreviousfile;
 	private File snapshotSortedExportedfile;
 	private File snapshotFinalFile;
 	private Integer[] fieldsToCompare;
-	private int[] indexes;
+	private int index;
 	private String releaseDate;
 	private String newLine="\r\n";
 	private int colLen;
 	private File deltaFinalFile;
 	private BufferedWriter bw;
 	private BufferedWriter dbw;
+	private int[] indexes;
 
-	public ConsolidateInactRefsetSnapshotAndDelta(FILE_TYPE fType,
+	public ConsolidateQualSnapshotAndDelta(FILE_TYPE fType,
 			File snapshotSortedPreviousfile, File snapshotSortedExportedfile,
 			File snapshotFinalFile, File deltaFinalFile, String releaseDate) {
 		this.snapshotSortedPreviousfile=snapshotSortedPreviousfile;	
@@ -43,8 +43,8 @@ public class ConsolidateInactRefsetSnapshotAndDelta extends AbstractTask {
 	public void execute() throws Exception {
 
 		try {
-			//inactive refset has just one column index
-			int index=indexes[0];
+			//qualifier file has just one column index
+			index=indexes[0];
 
 			FileOutputStream fos = new FileOutputStream( snapshotFinalFile);
 			OutputStreamWriter osw = new OutputStreamWriter(fos,"UTF-8");
@@ -90,15 +90,14 @@ public class ConsolidateInactRefsetSnapshotAndDelta extends AbstractTask {
 				if (line2!=null){
 					int comp = splittedLine1[index].compareTo(splittedLine2[index]);
 					if ( comp<0){
-							addPreviousLine(splittedLine1);
-							lines++;
+
+						addPreviousLine(splittedLine1,"0",releaseDate);
+						lines++;
 					}else{
 						if (comp>0){
 							while (comp>0){
-								if (splittedLine2[STATUS_COLUMN].compareTo("")!=0){
-									addExportedLine(splittedLine2);
-									lines++;
-								}
+								addExportedLine(splittedLine2);
+								lines++;
 								line2=br2.readLine();
 								if (line2==null){
 									comp=-1;
@@ -108,20 +107,16 @@ public class ConsolidateInactRefsetSnapshotAndDelta extends AbstractTask {
 								comp = splittedLine1[index].compareTo(splittedLine2[index]);
 							}
 							if ( comp<0){
-								addPreviousLine(splittedLine1);
+								addPreviousLine(splittedLine1,"0",releaseDate);
 								lines++;
 							}
 						}
 						while(comp==0){
-							// if status id blank then to take previous status
-							if (splittedLine2[STATUS_COLUMN].compareTo("")==0){
-								splittedLine2[STATUS_COLUMN]=splittedLine1[STATUS_COLUMN];
-							}
 							if (fieldsCompare(splittedLine1,splittedLine2)!=0){
 								addExportedLine(splittedLine2);
 								lines++;
 							}else{
-								addPreviousLine(splittedLine1);
+								addPreviousLine(splittedLine1,"1",null);
 								lines++;		
 							}
 							line2=br2.readLine();
@@ -134,23 +129,20 @@ public class ConsolidateInactRefsetSnapshotAndDelta extends AbstractTask {
 						}
 					}
 				}else{
-					addPreviousLine(splittedLine1);
+					addPreviousLine(splittedLine1,"0",releaseDate);
 					lines++;
 				}
 			}
 
 			if (line2!=null){
 
-				if (splittedLine2[STATUS_COLUMN].compareTo("")!=0){
-					addExportedLine(splittedLine2);
-					lines++;
-				}
+				addExportedLine(splittedLine2);
+				lines++;
+
 				while ((line2= br2.readLine()) != null) {
 					splittedLine2=line2.split("\t",-1);
-					if (splittedLine2[STATUS_COLUMN].compareTo("")!=0){
-						addExportedLine(splittedLine2);
-						lines++;
-					}
+					addExportedLine(splittedLine2);
+					lines++;
 				}
 			}
 			br1.close();
@@ -186,15 +178,31 @@ public class ConsolidateInactRefsetSnapshotAndDelta extends AbstractTask {
 		dbw.append(tmp);
 	}
 
-	private void addPreviousLine(String[] splittedLine) throws Exception {
+	private void addPreviousLine(String[] splittedLine,String status,String releaseDate) throws Exception {
+		StringBuffer sb=new StringBuffer();
 		for (int i = 0; i < splittedLine.length; i++) {
-			bw.append(splittedLine[i]);
+			if (i==1 && releaseDate!=null){
+				sb.append(releaseDate);
+			}
+			else if (i==2){
+				sb.append(status);
+			}else{
+				sb.append(splittedLine[i]);
+			}
 			if (i + 1 < splittedLine.length) {
-				bw.append('\t');
+				sb.append('\t');
 			}
 		}
-		bw.append(newLine);
+		sb.append(newLine);
+		String tmp=sb.toString();
+
+		bw.append(tmp);
+		if (releaseDate!=null){
+			dbw.append(tmp);
+			
+		}
 	}
+
 
 
 	private int fieldsCompare(String[] splittedLine1, String[] splittedLine2) {

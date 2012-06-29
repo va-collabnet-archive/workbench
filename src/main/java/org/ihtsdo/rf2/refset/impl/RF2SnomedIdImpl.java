@@ -46,7 +46,7 @@ public class RF2SnomedIdImpl extends RF2AbstractImpl implements I_ProcessConcept
 			String mapTarget_Core = getSnomedId(concept, getSnomedCorePathNid());
 			String mapTarget_Aux = getSnomedId(concept, getNid("2faa9260-8fb2-11db-b606-0800200c9a66")); //Workbench Auxillary path
 			String mapTarget="";
-			
+
 			if(!(mapTarget_Core.equals("") && mapTarget_Core.equals(null))){
 				mapTarget = mapTarget_Core;
 			}else if(!(mapTarget_Aux.equals("") && mapTarget_Aux.equals(null))){
@@ -55,23 +55,29 @@ public class RF2SnomedIdImpl extends RF2AbstractImpl implements I_ProcessConcept
 			if (referencedComponentId==null || referencedComponentId.equals("")){
 				referencedComponentId=concept.getUids().iterator().next().toString();
 			}
-			
-			if(mapTarget.equals("") || mapTarget.equals(null) ){	
-				if(referencedComponentId.contains("-")){	
-					String parentSnomedId = getParentSnomedId(concept);
-					
-					if(parentSnomedId.equals("")){
-						logger.info("=====No parentSnomedId===" + concept.getInitialText());
-						System.out.println("=====No parentSnomedId===" + concept.getInitialText());
-					}else{
-						//get conceptId by calling web service if exist otherwise create
-						String wsConceptId = getSCTId(getConfig(), UUID.fromString(referencedComponentId));
-						if(wsConceptId.equals("0")){
-							wsConceptId = getSCTId(getConfig(), UUID.fromString(referencedComponentId));
-						}					
+
+			if(mapTarget==null || mapTarget.equals("")  ){	
+				String parentSnomedId = getParentSnomedId(concept);
+
+				if(parentSnomedId.equals("")){
+					logger.info("=====No parentSnomedId===" + concept.getInitialText());
+					System.out.println("=====No parentSnomedId===" + concept.getInitialText());
+				}else{				
+
+
+					//get conceptId by calling web service if exist otherwise create
+					String wsConceptId="";
+					if (referencedComponentId.contains("-")){
+						wsConceptId=getSCTId(getConfig(),UUID.fromString(referencedComponentId));
+						
 						mapTarget = getSNOMEDID(getConfig(), UUID.fromString(referencedComponentId), parentSnomedId);
+					}else{
+						mapTarget = getSNOMEDID(getConfig(), concept.getUids().iterator().next(), parentSnomedId);
+						
 					}
-					//referencedComponentId=wsConceptId;
+					if (wsConceptId!=null && !wsConceptId.equals("")){
+						referencedComponentId=wsConceptId;
+					}
 				}
 			}
 			UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId + mapTarget);
@@ -87,7 +93,7 @@ public class RF2SnomedIdImpl extends RF2AbstractImpl implements I_ProcessConcept
 			e.printStackTrace();
 		}
 	}
-		
+
 
 	private void writeRF2TypeLine(UUID uuid, String effectiveTime, String active, String moduleId, String refsetId, String referencedComponentId, String mapTarget) throws IOException {
 

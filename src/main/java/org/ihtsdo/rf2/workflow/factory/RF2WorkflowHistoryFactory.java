@@ -31,9 +31,9 @@ public class RF2WorkflowHistoryFactory extends RF2AbstractFactory {
 
 		try {
 
-			RF2WorkflowHistoryImpl iterator = new RF2WorkflowHistoryImpl(getConfig());
+//			RF2WorkflowHistoryImpl iterator = new RF2WorkflowHistoryImpl(getConfig());
 
-			Terms.get().iterateConcepts(iterator);
+//			Terms.get().iterateConcepts(iterator);
 
 			closeExportFileWriter();
 			
