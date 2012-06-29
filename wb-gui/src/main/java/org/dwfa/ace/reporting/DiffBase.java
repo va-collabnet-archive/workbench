@@ -1550,6 +1550,12 @@ public class DiffBase {
                                 String m2 = member2.toUserString();
                                 deletedConceptFromRefex(c, m1, m2);
                             }
+                        }else {
+                            if (!member1.equals(member2)) {
+                                String m1 = member1.toUserString();
+                                String m2 = member2.toUserString();
+                                deletedConceptFromRefex(c, m1, m2);
+                            }
                         }
                     }
                 }
@@ -1558,13 +1564,12 @@ public class DiffBase {
         if (this.added_concepts_refex) {
 
             for (RefexVersionBI member : members2) {
-                RefexCnidStrVersionBI rv = (RefexCnidStrVersionBI) member;
-                if (changed_concept_author) {
-                    if (v1_concept_author_int.size() > 0 && member != null
-                            && !v1_concept_author_int.contains(member.getAuthorNid())) {
-                        return;
+                    if (changed_concept_author) {
+                        if (v1_concept_author_int.size() > 0 && member != null
+                                && !v1_concept_author_int.contains(member.getAuthorNid())) {
+                            return;
+                        }
                     }
-                }
                 if (!members1.contains(member)) {
                     String m = member.toUserString();
                     addedConceptToRefex(c, m);
