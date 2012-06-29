@@ -4,8 +4,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,11 +12,6 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.KnowledgeBuilderFactory;
-import org.drools.builder.ResourceType;
-import org.drools.definition.KnowledgePackage;
-import org.drools.io.ResourceFactory;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -38,10 +31,8 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.rf2.constant.I_Constants;
-import org.ihtsdo.rf2.core.factory.RF2ConceptFactory;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.ExportUtil;
-import org.ihtsdo.rf2.util.IdUtil;
 import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
@@ -218,7 +209,6 @@ public abstract class RF2AbstractImpl {
 		descTypes.add(tf.uuidToNative(UUID.fromString("00791270-77c9-32b6-b34f-d932569bd2bf")));
 		descTypes.add(tf.uuidToNative(UUID.fromString("8bfba944-3965-3946-9bcb-1e80a5da63a2")));
 		descTypes.add(tf.uuidToNative(UUID.fromString("700546a3-09c7-3fc2-9eb9-53d318659a09")));
-		descTypes.add(ArchitectonicAuxiliary.Concept.TEXT_DEFINITION_TYPE.localize().getNid());
 		return descTypes;
 	}
 
@@ -403,7 +393,7 @@ public abstract class RF2AbstractImpl {
 		return ExportUtil.getSctId(nid, pathNid);
 	}
 
-	// get the description id for the given UUID
+	// get the id for the given UUID
 	public String getSCTId(Config config, UUID uuid) throws Exception {
 		return ExportUtil.getSCTId(config, uuid);
 	}
@@ -650,9 +640,9 @@ public abstract class RF2AbstractImpl {
 				currenAceConfig.getViewPositionSetReadOnly(), 
 				currenAceConfig.getPrecedence(), 
 				currenAceConfig.getConflictResolutionStrategy())) {
-				moduleid = I_Constants.META_MOULE_ID;
+				moduleid = I_Constants.META_MODULE_ID;
 		}else if(snomedCTModelComponent.equals(concept)){
-				moduleid = I_Constants.META_MOULE_ID;
+				moduleid = I_Constants.META_MODULE_ID;
 		}
 		
 		/*if (foundationMetaDataConceptRoot.isParentOf(concept, 

@@ -80,6 +80,7 @@ public abstract class AbstractSvnMojo
         {
             getLog().info( "Not prompting for username/password - non-interactive mode" );
             return false;
+
         }
 
         try
