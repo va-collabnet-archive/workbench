@@ -261,9 +261,25 @@ public class GenerateUsers extends AbstractMojo {
 
 					if (addingRequired) {
 						if(modelers.get(columns[0]) == null){
-							getLog().info("null found: " + columns[0]);
-							getLog().info(modelers.toString());
-							ConceptVersionBI modeler = modelers.get(columns[0]);
+							getLog().info("null found, adding: " + columns[0]);
+							//getLog().info(modelers.toString());
+                            // Get User parent
+                            UUID[] uuidArray = new UUID[1];
+                            uuidArray[0] =  ArchitectonicAuxiliary.Concept.USER.getPrimoridalUid();
+                            // Create user concept
+                            String fsnText = columns[0];
+                            String prefText = columns[0];
+                            ConceptCB conceptSpec = new ConceptCB(fsnText, prefText, LANG_CODE.EN,
+                                              Snomed.IS_A.getLenient().getPrimUuid(), uuidArray);
+                            conceptSpec.setComponentUuid(Type5UuidFactory.get(
+                                    ArchitectonicAuxiliary.Concept.USER.getPrimoridalUid()
+                                    + "...added modeler..." + fsnText + prefText));
+                            TerminologyBuilderBI tc;
+                            tc = Ts.get().getTerminologyBuilder(wfConfig.getEditCoordinate(), vc);
+                            ConceptChronicleBI modeler = tc.constructIfNotCurrent(conceptSpec);
+                            tf.commit(ChangeSetPolicy.OFF, ChangeSetWriterThreading.SINGLE_THREAD);
+
+                            modelers.put(columns[0], modeler.getVersion(vc)); // add to set
 						}
 						writer.setEditor(modelers.get(columns[0]));
 						writer.setSemanticArea(columns[1]);
