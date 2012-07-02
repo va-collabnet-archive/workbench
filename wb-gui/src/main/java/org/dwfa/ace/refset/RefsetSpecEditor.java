@@ -157,7 +157,6 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
     private ArrayList<org.dwfa.ace.api.I_PluginToConceptPanel> plugins;
     public I_GetConceptData refsetSpecConcept;
     private RefsetSpecPanel refsetSpecPanel;
-    private JLabel refsetStatusValueLabel;
     private TaxonomyHelper refsetTree;
     JTree specTree;
     JScrollPane specTreeScroller;
@@ -379,7 +378,6 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         if (refset != null) {
             RefsetSpec spec = new RefsetSpec(refset, true, ace.getAceFrameConfig());
 
-            refsetStatusValueLabel.setText(spec.getOverallSpecStatusString());
             computeTypeValueLabel.setText(spec.getComputeTypeString());
 
             try {
@@ -801,9 +799,6 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         leftTogglePane.add(computeTypeLabel, inner);
         inner.gridy++;
 
-        JLabel refsetStatusLabel = new JLabel("refset status: ");
-
-        leftTogglePane.add(refsetStatusLabel, inner);
         inner.anchor = GridBagConstraints.WEST;
         inner.gridx++;
         inner.gridy--;
@@ -822,10 +817,9 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         computeTypeValueLabel = new JLabel("");
         leftTogglePane.add(computeTypeValueLabel, inner);
         inner.gridy++;
-        refsetStatusValueLabel = new JLabel("");
-        leftTogglePane.add(refsetStatusValueLabel, inner);
-        outer.gridx++;
+               
         outer.weightx = 1.0;
+        
         outer.fill = GridBagConstraints.HORIZONTAL;
         toggleBar.add(new JPanel(), outer);
 
