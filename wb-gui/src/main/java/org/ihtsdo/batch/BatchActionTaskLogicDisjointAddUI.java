@@ -88,7 +88,7 @@ public class BatchActionTaskLogicDisjointAddUI extends javax.swing.JPanel
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 125, Short.MAX_VALUE)
+            .addGap(0, 54, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -122,10 +122,12 @@ public class BatchActionTaskLogicDisjointAddUI extends javax.swing.JPanel
         }
 
         int nid;
+        UUID refsetUuid;
+        UUID refsetRelUuid;
         try {
-            UUID refsetUuid = DescriptionLogic.computeOrderedSetUuid(concepts,
+            refsetUuid = DescriptionLogic.computeOrderedSetUuid(concepts,
                     "org.ihtsdo.descriptionlogic.disjointsetconcepts:");
-            UUID refsetRelUuid = DescriptionLogic.computeOrderedSetUuid(concepts,
+            refsetRelUuid = DescriptionLogic.computeOrderedSetUuid(concepts,
                     "org.ihtsdo.descriptionlogic.disjointset.parentrel");
             nid = createOrUpdateRefexSet(refsetUuid, refsetRelUuid, concepts, vc);
         } catch (Exception ex) {
@@ -178,7 +180,7 @@ public class BatchActionTaskLogicDisjointAddUI extends javax.swing.JPanel
             StringBuilder desc = new StringBuilder();
             desc.append("Disjoint: ");
             for (ConceptChronicleBI ccbi : concepts) {
-                desc.append(ccbi.getVersion(vc).toUserString()).append("; ");
+                desc.append(ccbi.getVersion(vc).toUserString()).append(";");
             }
             I_GetConceptData fully_specified_description_type =
                     tf.getConcept(SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID());
@@ -192,11 +194,19 @@ public class BatchActionTaskLogicDisjointAddUI extends javax.swing.JPanel
                     preferred_description_type, config);
 
             // ADD RELATIONSHIP
+            I_GetConceptData roleType = tf.getConcept(
+                    TermAux.IS_A.getLenient().getNid());
             I_GetConceptData parent = tf.getConcept(
                     DescriptionLogic.DISJOINT_SETS_REFSET.getLenient().getNid());
-            I_RelVersioned rel = tf.newRelationship(parentRelUuid, newConcept, config);
-            rel.setTypeNid(TermAux.IS_A.getLenient().getNid());
-            rel.setC2Id(parent.getConceptNid());
+            I_RelVersioned rel = tf.newRelationship(parentRelUuid, // newRelUid
+                    newConcept, // concept
+                    roleType, // relType
+                    parent, // relDestination
+                    config.getDefaultRelationshipCharacteristic(), // relCharacteristic
+                    config.getDefaultStatus(), // relRefinability
+                    config.getDefaultStatus(), // relStatus
+                    0, // relGroup
+                    config);
 
             tf.addUncommitted(newConcept);
 

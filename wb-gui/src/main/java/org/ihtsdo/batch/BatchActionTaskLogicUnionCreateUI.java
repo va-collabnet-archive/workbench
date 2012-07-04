@@ -266,7 +266,7 @@ public class BatchActionTaskLogicUnionCreateUI extends javax.swing.JPanel
             StringBuilder desc = new StringBuilder();
             desc.append("Union: ");
             for (ConceptChronicleBI ccbi : concepts) {
-                desc.append(ccbi.getVersion(vc).toUserString()).append("; ");
+                desc.append(ccbi.getVersion(vc).toUserString()).append(";");
             }
             I_GetConceptData fully_specified_description_type =
                     tf.getConcept(SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID());

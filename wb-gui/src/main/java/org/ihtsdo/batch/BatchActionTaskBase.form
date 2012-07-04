@@ -45,7 +45,7 @@
                   <Component id="btnAddTask" alignment="1" min="-2" max="-2" attributes="1"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jPanelTaskDetail" max="32767" attributes="1"/>
+              <Component id="jPanelTaskDetail" min="-2" max="-2" attributes="1"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -91,7 +91,7 @@
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <EmptySpace min="0" pref="91" max="32767" attributes="0"/>
+              <EmptySpace min="0" pref="45" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
       </Layout>
