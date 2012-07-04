@@ -88,47 +88,41 @@ public class RF2ReviewStatusImpl extends RF2AbstractImpl implements I_ProcessCon
 			if (!extensions.isEmpty()) {
 				for (I_ExtendByRef extension : extensions) {
 					if (extension.getRefsetId() == reviewStatusRefsetNid) {
-						if (extension != null) {		
-							long lastVersion = Long.MIN_VALUE;
-							extensionPart=null;
-							int conceptVal=-1;
-							for (I_ExtendByRefVersion loopTuple : extension.getTuples(allStatusSet,currenAceConfig.getViewPositionSetReadOnly(),
-									Precedence.PATH,currenAceConfig.getConflictResolutionStrategy())) {
+						long lastVersion = Long.MIN_VALUE;
+						extensionPart=null;
+						int conceptVal=-1;
+						for (I_ExtendByRefVersion loopTuple : extension.getTuples(allStatusSet,currenAceConfig.getViewPositionSetReadOnly(),
+								Precedence.PATH,currenAceConfig.getConflictResolutionStrategy())) {
 
-								if (loopTuple.getTime() >= lastVersion) {
-									lastVersion = loopTuple.getTime();
-									if (loopTuple.getMutablePart() instanceof CidMember){
-										extensionPart = (CidMember) loopTuple.getMutablePart();
-										extensionStatusId = extensionPart.getStatusNid();
-										conceptVal= extensionPart.getC1Nid();
-									}else if (loopTuple.getMutablePart() instanceof CidRevision){
-										CidRevision extensionRevPart = (CidRevision) loopTuple.getMutablePart();
-										extensionStatusId = extensionRevPart.getStatusNid();
-										conceptVal= extensionRevPart.getC1id();
-									}
+							if (loopTuple.getTime() >= lastVersion) {
+								lastVersion = loopTuple.getTime();
+								if (loopTuple.getMutablePart() instanceof CidMember){
+									extensionPart = (CidMember) loopTuple.getMutablePart();
+									extensionStatusId = extensionPart.getStatusNid();
+									conceptVal= extensionPart.getC1Nid();
+								}else if (loopTuple.getMutablePart() instanceof CidRevision){
+									CidRevision extensionRevPart = (CidRevision) loopTuple.getMutablePart();
+									extensionStatusId = extensionRevPart.getStatusNid();
+									conceptVal= extensionRevPart.getC1id();
 								}
 							}
-							if (extensionPart == null) {
-								if (logger.isDebugEnabled()) {
-									logger.debug("Refset extension part not found!");
-								}
-							}else{								
-
-
-								if (extensionStatusId == activeNid && active.equals("1")) { 														
-									active = "1";
-								} else if (extensionStatusId == inactiveNid) { 														
-									active = "0";
-								} else {
-									active = "0";
-									logger.error("refset member active and concept inactive : =====>" + concept);
-								}
-								if (conceptVal!=-1){
-									valueId= tf.getConcept(conceptVal).getUUIDs().iterator().next().toString();
-
-									WriteRF2TypeLine(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, valueId);
-								}
+						}
+						if (conceptVal==-1) {
+							if (logger.isDebugEnabled()) {
+								logger.debug("Refset extension part not found!");
 							}
+						}else{								
+							if (extensionStatusId == activeNid && active.equals("1")) { 														
+								active = "1";
+							} else if (extensionStatusId == inactiveNid) { 														
+								active = "0";
+							} else {
+								active = "0";
+								logger.error("refset member active and concept inactive : =====>" + concept);
+							}
+							valueId= tf.getConcept(conceptVal).getUUIDs().iterator().next().toString();
+
+							WriteRF2TypeLine(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, valueId);
 						}
 					}
 				}

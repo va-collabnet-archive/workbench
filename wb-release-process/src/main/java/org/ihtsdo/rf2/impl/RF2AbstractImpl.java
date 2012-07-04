@@ -40,6 +40,10 @@ import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.coordinate.PositionSet;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.ihtsdo.concept.component.refsetmember.cid.CidMember;
+import org.ihtsdo.concept.component.refsetmember.cid.CidRevision;
 
 public abstract class RF2AbstractImpl {
 
@@ -87,6 +91,7 @@ public abstract class RF2AbstractImpl {
 	private I_GetConceptData snomedCTModelComponent;	
 	private I_GetConceptData coreMetaConceptRoot;
 	private I_GetConceptData foundationMetaDataConceptRoot;
+	private I_GetConceptData validStatusCpt;
 	
 	protected I_IntSet allStatusSet;
 
@@ -97,6 +102,8 @@ public abstract class RF2AbstractImpl {
 	protected int currentNid;
 
 	protected int retiredNid;	
+	
+	protected int reviewStatusRefsetNid;
 	
 	protected int activeNid ; //Active value	900000000000545005	
 	
@@ -150,6 +157,8 @@ public abstract class RF2AbstractImpl {
 		try {
 			this.tf = Terms.get();
 			this.currenAceConfig = tf.getActiveAceFrameConfig();
+			reviewStatusRefsetNid = getNid(I_Constants.GMDN_REVIEW_STATUS_REFSET_UID);
+			validStatusCpt= tf.getConcept(UUID.fromString(I_Constants.VALID_STATUS_TO_EXPORT_UUID));
 			snomedIntId = tf.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids());
 			snomedRoot = tf.getConcept(UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8"));
 			device = tf.getConcept(UUID.fromString("6e8f5d95-0505-3aa8-a730-e1e9d821e4aa"));
@@ -582,59 +591,102 @@ public abstract class RF2AbstractImpl {
 
 	public void process(I_GetConceptData concept) throws IOException, TerminologyException {
 		
-		if (device.isParentOf(concept, 
-				currenAceConfig.getAllowedStatus(),
-				currenAceConfig.getDestRelTypes(), 
-				currenAceConfig.getViewPositionSetReadOnly(), 
-				currenAceConfig.getPrecedence(), 
-				currenAceConfig.getConflictResolutionStrategy())) {
+//		if (device.isParentOf(concept, 
+//				currenAceConfig.getAllowedStatus(),
+//				currenAceConfig.getDestRelTypes(), 
+//				currenAceConfig.getViewPositionSetReadOnly(), 
+//				currenAceConfig.getPrecedence(), 
+//				currenAceConfig.getConflictResolutionStrategy())) {
 			String conceptid = "";
-			List<? extends I_IdPart> idParts = tf.getId(concept.getNid()).getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
-					snomedIntId);
-			if (idParts != null) {
-				Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), 
-						RelAssertionType.INFERRED_THEN_STATED);
-				if (denotation instanceof Long) {
-					Long c = (Long) denotation;
-					if (c != null)  conceptid = c.toString();
-				}
-			}
-			CharSequence partition="";
-			if (!conceptid.equals("")){
-				int len= conceptid.length();
-				partition = conceptid.substring(len-3, len).subSequence(0, 2);
-			}
-			if(partition.equals("10") || partition.equals("")){		
 
-				String active="0"; //Default value
-				List<? extends I_ConceptAttributeTuple> conceptAttributes = concept.getConceptAttributeTuples(
-						allStatuses, 
-						currenAceConfig.getViewPositionSetReadOnly(), 
-						Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
+			boolean toExport=false;
+			List<? extends I_ExtendByRef> extensions = tf.getAllExtensionsForComponent(concept.getNid(), true);
 
-				if (conceptAttributes != null && !conceptAttributes.isEmpty()) {
-					I_ConceptAttributeTuple attributes = conceptAttributes.iterator().next();				
-					String conceptStatus = getStatusType(attributes.getStatusNid());
-					if (conceptStatus.equals("0")) {
-						active = "1";
-					} else if (getConfig().getReleaseDate().compareTo(I_Constants.limited_policy_change)<0 && conceptStatus.equals("6")) {
-						active = "1";
-					} else {
-						active = "0";
+			CidMember extensionPart;
+
+			if (!extensions.isEmpty()) {
+				for (I_ExtendByRef extension : extensions) {
+					if (extension.getRefsetId() == reviewStatusRefsetNid) {
+
+						int extensionStatusId = 0;
+						long lastVersion = Long.MIN_VALUE;
+						extensionPart=null;
+						int conceptVal=-1;
+						for (I_ExtendByRefVersion loopTuple : extension.getTuples(allStatusSet,currenAceConfig.getViewPositionSetReadOnly(),
+								Precedence.PATH,currenAceConfig.getConflictResolutionStrategy())) {
+
+							if (loopTuple.getTime() >= lastVersion) {
+								lastVersion = loopTuple.getTime();
+								if (loopTuple.getMutablePart() instanceof CidMember){
+									extensionPart = (CidMember) loopTuple.getMutablePart();
+									extensionStatusId = extensionPart.getStatusNid();
+									conceptVal= extensionPart.getC1Nid();
+								}else if (loopTuple.getMutablePart() instanceof CidRevision){
+									CidRevision extensionRevPart = (CidRevision) loopTuple.getMutablePart();
+									extensionStatusId = extensionRevPart.getStatusNid();
+									conceptVal= extensionRevPart.getC1id();
+								}
+							}
+						}
+
+						if (extensionStatusId == activeNid) { 
+							if (conceptVal==validStatusCpt.getNid()){
+								toExport=true;
+								break;
+							}
+						}
 					}
-
-					if ((conceptid==null || conceptid.equals("") || conceptid.equals("0")) && active.equals("1") ){
-						conceptid=concept.getUids().iterator().next().toString();
-					}
-				}
-
-				if (conceptid==null || conceptid.equals("") || conceptid.equals("0")){
-					logger.info("Unplublished Retired Concept: " + concept.getUUIDs().iterator().next().toString());
-				}else{
-					export(concept, conceptid);
 				}
 			}
-		}
+			if (toExport){
+			
+				List<? extends I_IdPart> idParts = tf.getId(concept.getNid()).getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
+						snomedIntId);
+				if (idParts != null) {
+					Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), 
+							RelAssertionType.INFERRED_THEN_STATED);
+					if (denotation instanceof Long) {
+						Long c = (Long) denotation;
+						if (c != null)  conceptid = c.toString();
+					}
+				}
+				CharSequence partition="";
+				if (!conceptid.equals("")){
+					int len= conceptid.length();
+					partition = conceptid.substring(len-3, len).subSequence(0, 2);
+				}
+				if(partition.equals("10") || partition.equals("")){		
+	
+					String active="0"; //Default value
+					List<? extends I_ConceptAttributeTuple> conceptAttributes = concept.getConceptAttributeTuples(
+							allStatuses, 
+							currenAceConfig.getViewPositionSetReadOnly(), 
+							Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
+	
+					if (conceptAttributes != null && !conceptAttributes.isEmpty()) {
+						I_ConceptAttributeTuple attributes = conceptAttributes.iterator().next();				
+						String conceptStatus = getStatusType(attributes.getStatusNid());
+						if (conceptStatus.equals("0")) {
+							active = "1";
+						} else if (getConfig().getReleaseDate().compareTo(I_Constants.limited_policy_change)<0 && conceptStatus.equals("6")) {
+							active = "1";
+						} else {
+							active = "0";
+						}
+	
+						if ((conceptid==null || conceptid.equals("") || conceptid.equals("0")) && active.equals("1") ){
+							conceptid=concept.getUids().iterator().next().toString();
+						}
+					}
+	
+					if (conceptid==null || conceptid.equals("") || conceptid.equals("0")){
+						logger.info("Unplublished Retired Concept: " + concept.getUUIDs().iterator().next().toString());
+					}else{
+						export(concept, conceptid);
+					}
+				}
+			}
+//		}
 	}
 	
 	//all the contents resides under SNOMED CT Model Component (metadata) gets metamoduleid (900000000000012004)
