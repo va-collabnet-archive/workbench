@@ -1144,6 +1144,9 @@ public class DiffBase {
     protected HashMap<Integer, Integer> diff_count = new HashMap<Integer, Integer>();
 
     protected void incr(int id) {
+    	if (diff_count.isEmpty()) {
+    		this.diff_count.put(id, 1);
+    	}
         this.diff_count.put(id, this.diff_count.get(id) + 1);
     }
     protected int concepts = 0;
@@ -1232,7 +1235,7 @@ public class DiffBase {
                 && !status_filter.contains(d.getStatusNid())) {
             return false;
         }
-        if (type_filter.size() > 0 && !type_filter.contains(d.getTypeNid())) {
+        if (type_filter != null && type_filter.size() > 0 && !type_filter.contains(d.getTypeNid())) {
             return false;
         }
         if (term_filter != null && !term_filter.equals("")
@@ -1246,7 +1249,7 @@ public class DiffBase {
         if (case_filter != null && !d.isInitialCaseSignificant() == case_filter) {
             return false;
         }
-        if (author_filter.size() > 0 && !author_filter.contains(d.getAuthorNid())) {
+        if (author_filter != null && author_filter.size() > 0 && !author_filter.contains(d.getAuthorNid())) {
             return false;
         }
         return true;
@@ -1547,6 +1550,12 @@ public class DiffBase {
                                 String m2 = member2.toUserString();
                                 deletedConceptFromRefex(c, m1, m2);
                             }
+                        }else {
+                            if (!member1.equals(member2)) {
+                                String m1 = member1.toUserString();
+                                String m2 = member2.toUserString();
+                                deletedConceptFromRefex(c, m1, m2);
+                            }
                         }
                     }
                 }
@@ -1555,7 +1564,6 @@ public class DiffBase {
         if (this.added_concepts_refex) {
 
             for (RefexVersionBI member : members2) {
-                RefexCnidStrVersionBI rv = (RefexCnidStrVersionBI) member;
                 if (changed_concept_author) {
                     if (v1_concept_author_int.size() > 0 && member != null
                             && !v1_concept_author_int.contains(member.getAuthorNid())) {
