@@ -655,7 +655,7 @@ public abstract class RF2AbstractImpl {
 					int len= conceptid.length();
 					partition = conceptid.substring(len-3, len).subSequence(0, 2);
 				}
-				if(partition.equals("10") || partition.equals("")){		
+//				if(partition.equals("10") || partition.equals("")){		
 	
 					String active="0"; //Default value
 					List<? extends I_ConceptAttributeTuple> conceptAttributes = concept.getConceptAttributeTuples(
@@ -684,7 +684,7 @@ public abstract class RF2AbstractImpl {
 					}else{
 						export(concept, conceptid);
 					}
-				}
+//				}
 			}
 //		}
 	}
