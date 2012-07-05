@@ -7,7 +7,7 @@
 	</parent>
 	<artifactId>wb-schema-mojo</artifactId>
 	<packaging>maven-plugin</packaging>
-	<name>${branch}: wb-schema-mojo Maven Mojo</name>
+	<name>${branch}: Schema Transformer Maven Mojo</name>
 	<url>http://maven.apache.org</url>
 	<description>Workbench Maven Java Objects (mojo)</description>
 	
