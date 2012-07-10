@@ -195,6 +195,7 @@ public class ExportCementAsEConcepts extends AbstractMojo {
     					member.authorUuid = eC.conceptAttributes.authorUuid;
     					member.pathUuid = eC.conceptAttributes.pathUuid;
     					member.time = eC.conceptAttributes.time;
+                                        member.moduleUuid = eC.conceptAttributes.moduleUuid;
     					List<TkRefsetAbstractMember<?>> memberList = new ArrayList<TkRefsetAbstractMember<?>>();
     					memberList.add(member);
     					eC.setRefsetMembers(memberList);
@@ -265,6 +266,7 @@ public class ExportCementAsEConcepts extends AbstractMojo {
 				media.authorUuid = eC.conceptAttributes.authorUuid;
 				media.pathUuid = eC.conceptAttributes.pathUuid;
 				media.time = eC.conceptAttributes.time;
+                                media.moduleUuid = eC.conceptAttributes.moduleUuid;
 				List<TkMedia> images = new ArrayList<TkMedia>();
 				images.add(media);
 				eC.setImages(images);
