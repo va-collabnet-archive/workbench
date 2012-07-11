@@ -21,6 +21,6 @@ public interface MediaVersionBI<A extends MediaAnalogBI>
     public int getConceptNid();
     
     @Override
-    public MediaCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB;
+    public MediaCAB makeBlueprint(ViewCoordinate viewCoordinate) throws IOException, ContradictionException, InvalidCAB;
 
 }

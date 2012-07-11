@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ManageContradiction;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_ShowActivity;
@@ -47,12 +47,12 @@ public class SnoPathProcessExInferred implements I_ProcessConcepts {
     I_ShowActivity gui;
     private Logger logger;
     private Precedence precedence;
-    private I_ManageContradiction contradictionMgr;
+    private ContradictionManagerBI contradictionMgr;
     private LinkedHashMap<Integer, Integer> charMap;
 
     public SnoPathProcessExInferred(Logger logger, List<SnoRel> snorels, I_IntSet roleSet,
             I_IntSet statSet, PositionSetReadOnly pathPos,
-            I_ShowActivity gui, Precedence precedence, I_ManageContradiction contradictionMgr)
+            I_ShowActivity gui, Precedence precedence, ContradictionManagerBI contradictionMgr)
             throws Exception {
         this.logger = logger;
         this.snorels = snorels;

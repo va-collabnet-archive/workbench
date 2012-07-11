@@ -17,9 +17,9 @@
 package org.dwfa.ace.api;
 
 import java.beans.PropertyVetoException;
-import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeAnalogBI;
 
-public interface I_ConceptAttributePart<A extends ConAttrAnalogBI>
+public interface I_ConceptAttributePart<A extends ConceptAttributeAnalogBI>
         extends I_AmPart<A> {
 
     public boolean isDefined();

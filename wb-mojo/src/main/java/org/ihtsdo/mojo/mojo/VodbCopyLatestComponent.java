@@ -128,7 +128,7 @@ public class VodbCopyLatestComponent extends AbstractMojo {
                         config.getEditCoordinate().getAuthorNid(),
                         config.getEditCoordinate().getAuthorNid(),
                         copyToPath.getConceptNid());
-                concept.getConceptAttributes().addVersion(newPart);
+                concept.getConAttrs().addVersion(newPart);
             }
 
             // get latest descriptions

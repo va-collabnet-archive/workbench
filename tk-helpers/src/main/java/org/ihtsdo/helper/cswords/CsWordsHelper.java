@@ -29,7 +29,7 @@ import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.api.refex.type_cnid_str.RefexCnidStrVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid_string.RefexNidStringVersionBI;
 import org.ihtsdo.tk.binding.snomed.CaseSensitive;
 
 /**
@@ -47,7 +47,7 @@ public class CsWordsHelper {
             initLock.lock();
             try {
                 if (csWordSetMap == null) {
-                    ViewCoordinate vc = Ts.get().getMetadataVC();
+                    ViewCoordinate vc = Ts.get().getMetadataViewCoordinate();
                     TerminologySnapshotDI ts = Ts.get().getSnapshot(vc);
                     HashMap csWordSetMap = new HashMap<Integer, Set<String>>();
                     ConceptVersionBI csWordsRefsetC =
@@ -61,14 +61,14 @@ public class CsWordsHelper {
                     int maybeSigNid = CaseSensitive.MAYBE_IC_SIGNIFICANT.getLenient().getNid();
                     Set<String> maybeCsWordSet = new HashSet<String>();
                     for (RefexChronicleBI<?> refex : csWords) {
-                        RefexCnidStrVersionBI member =
-                                (RefexCnidStrVersionBI) refex.getVersion(vc);
+                        RefexNidStringVersionBI member =
+                                (RefexNidStringVersionBI) refex.getVersion(vc);
                         if (member != null) {
-                            int typeNid = member.getCnid1();
+                            int typeNid = member.getNid1();
                             if (typeNid == icSigNid) {
-                                csWordSet.add(member.getStr1());
+                                csWordSet.add(member.getString1());
                             } else {
-                                maybeCsWordSet.add(member.getStr1());
+                                maybeCsWordSet.add(member.getString1());
                             }
                         }
                     }

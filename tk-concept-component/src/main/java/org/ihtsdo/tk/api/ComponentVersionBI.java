@@ -13,9 +13,9 @@ import org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 
 public interface ComponentVersionBI extends ComponentBI, VersionPointBI {
-   boolean sapIsInRange(int min, int max);
+   boolean stampIsInRange(int minStampNid, int maxStampNid);
 
-   String toUserString(TerminologySnapshotDI snapshot) throws IOException, ContradictionException;
+   String toUserString(TerminologySnapshotDI terminologySnapshot) throws IOException, ContradictionException;
 
    //~--- get methods ---------------------------------------------------------
 
@@ -25,17 +25,17 @@ public interface ComponentVersionBI extends ComponentBI, VersionPointBI {
    
    int getModuleNid();
 
-   ComponentChroncileBI getChronicle();
+   ComponentChronicleBI getChronicle();
 
    PositionBI getPosition() throws IOException;
 
-   int getSapNid();
+   int getStampNid();
 
    int getStatusNid();
 
    boolean isActive(NidSetBI allowedStatusNids) throws IOException;
 
-   boolean isActive(ViewCoordinate vc) throws IOException;
+   boolean isActive(ViewCoordinate viewCoordinate) throws IOException;
    
    public boolean isUncommitted();
    
@@ -48,17 +48,17 @@ public interface ComponentVersionBI extends ComponentBI, VersionPointBI {
    
    /**
     *
-    * @param vc1 ViewCoordinate of the first version
+    * @param viewCoordinate1 ViewCoordinate of the first version
     * 
-    * @param vc2 ViewCoordinate of the second version
+    * @param viewCoordinate2 ViewCoordinate of the second version
     * 
     * @param compareAuthoring Set to <code>true</code> to compare the author and path of the 
     * versions. Otherwise <code>false</code> to disregard author and path.
     * 
     * @return <code>true</code> if the versions are equal. <code>false</code> otherwise.
     */
-   boolean versionsEqual(ViewCoordinate vc1, ViewCoordinate vc2, Boolean compareAuthoring);
+   boolean versionsEqual(ViewCoordinate viewCoordinate1, ViewCoordinate viewCoordinate2, Boolean compareAuthoring);
    
-   CreateOrAmendBlueprint makeBlueprint(ViewCoordinate vc) 
+   CreateOrAmendBlueprint makeBlueprint(ViewCoordinate viewCoordinate) 
            throws IOException, ContradictionException, InvalidCAB;
 }

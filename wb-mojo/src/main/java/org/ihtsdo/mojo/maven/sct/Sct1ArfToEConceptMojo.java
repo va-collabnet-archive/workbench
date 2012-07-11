@@ -33,11 +33,11 @@ import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescriptionRevision;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
-import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanRevision;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidRevision;
-import org.ihtsdo.tk.dto.concept.component.refset.integer.TkRefsetIntRevision;
-import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_boolean.TkRefexBooleanRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid.TkRefexUuidRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_int.TkRefexIntRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_string.TkRefsetStrRevision;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 
@@ -271,7 +271,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     /**
      * Default value from TkRevision.unspecifiedModuleUuid
      *
-     * @parameter default-value="f7495b58-6630-3499-a44e-2052b5fcf06c"
+     * @parameter default-value="40d1c869-b509-32f8-b735-836eac577a67"
      */
     private UUID uuidModule;
 
@@ -3531,7 +3531,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
         // ADD REFSET MEMBER VALUES
         if (rsByRsList != null && rsByRsList.size() > 0) {
-            List<TkRefsetAbstractMember<?>> listErm = new ArrayList<TkRefsetAbstractMember<?>>();
+            List<TkRefexAbstractMember<?>> listErm = new ArrayList<TkRefexAbstractMember<?>>();
             Collections.sort(rsByRsList);
 
             if (rsByRsList.size() > 100000) {
@@ -3563,7 +3563,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                     tmp.setStatusUuid(zStatusUuidArray[r.status]);
                     tmp.setTime(r.revTime);
                     tmp.setPathUuid(zPathArray[r.pathIdx]);
-                    tmp.setBooleanValue(r.valueBoolean);
+                    tmp.setBoolean1(r.valueBoolean);
                     if (r.authorIdx != -1) {
                         tmp.setAuthorUuid(zAuthorUuidArray[r.authorIdx]);
                     } else {
@@ -3578,9 +3578,9 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                         if (r.refsetMemberUuidMsb == lastRefsetMemberUuidMsb
                                 && r.refsetMemberUuidLsb == lastRefsetMemberUuidLsb) {
                             // FIRST REVISION
-                            List<TkRefsetBooleanRevision> revisionList = new ArrayList<TkRefsetBooleanRevision>();
+                            List<TkRefexBooleanRevision> revisionList = new ArrayList<TkRefexBooleanRevision>();
                             ERefsetBooleanRevision revision = new ERefsetBooleanRevision();
-                            revision.setBooleanValue(r.valueBoolean);
+                            revision.setBoolean1(r.valueBoolean);
                             revision.setStatusUuid(zStatusUuidArray[r.status]);
                             revision.setPathUuid(zPathArray[r.pathIdx]);
                             revision.setTime(r.revTime);
@@ -3602,7 +3602,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                                     if (r.refsetMemberUuidMsb == lastRefsetMemberUuidMsb
                                             && r.refsetMemberUuidLsb == lastRefsetMemberUuidLsb) {
                                         revision = new ERefsetBooleanRevision();
-                                        revision.setBooleanValue(r.valueBoolean);
+                                        revision.setBoolean1(r.valueBoolean);
                                         revision.setStatusUuid(zStatusUuidArray[r.status]);
                                         revision.setPathUuid(zPathArray[r.pathIdx]);
                                         revision.setTime(r.revTime);
@@ -3641,7 +3641,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                     tmp.setStatusUuid(zStatusUuidArray[r.status]);
                     tmp.setTime(r.revTime);
                     tmp.setPathUuid(zPathArray[r.pathIdx]);
-                    tmp.setC1Uuid(new UUID(r.valueConUuidMsb, r.valueConUuidLsb));
+                    tmp.setUuid1(new UUID(r.valueConUuidMsb, r.valueConUuidLsb));
                     if (r.authorIdx != -1) {
                         tmp.setAuthorUuid(zAuthorUuidArray[r.authorIdx]);
                     } else {
@@ -3656,9 +3656,9 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                         if (r.refsetMemberUuidMsb == lastRefsetMemberUuidMsb
                                 && r.refsetMemberUuidLsb == lastRefsetMemberUuidLsb) {
                             // FIRST REVISION
-                            List<TkRefsetCidRevision> revisionList = new ArrayList<TkRefsetCidRevision>();
+                            List<TkRefexUuidRevision> revisionList = new ArrayList<TkRefexUuidRevision>();
                             ERefsetCidRevision revision = new ERefsetCidRevision();
-                            revision.setC1Uuid(new UUID(r.valueConUuidMsb, r.valueConUuidLsb));
+                            revision.setUuid1(new UUID(r.valueConUuidMsb, r.valueConUuidLsb));
                             revision.setStatusUuid(zStatusUuidArray[r.status]);
                             revision.setPathUuid(zPathArray[r.pathIdx]);
                             revision.setTime(r.revTime);
@@ -3680,7 +3680,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                                     if (r.refsetMemberUuidMsb == lastRefsetMemberUuidMsb
                                             && r.refsetMemberUuidLsb == lastRefsetMemberUuidLsb) {
                                         revision = new ERefsetCidRevision();
-                                        revision.setC1Uuid(new UUID(r.valueConUuidMsb,
+                                        revision.setUuid1(new UUID(r.valueConUuidMsb,
                                                 r.valueConUuidLsb));
                                         revision.setStatusUuid(zStatusUuidArray[r.status]);
                                         revision.setPathUuid(zPathArray[r.pathIdx]);
@@ -3720,7 +3720,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                     tmp.setStatusUuid(zStatusUuidArray[r.status]);
                     tmp.setTime(r.revTime);
                     tmp.setPathUuid(zPathArray[r.pathIdx]);
-                    tmp.setIntValue(r.valueInt);
+                    tmp.setInt1(r.valueInt);
                     if (r.authorIdx != -1) {
                         tmp.setAuthorUuid(zAuthorUuidArray[r.authorIdx]);
                     } else {
@@ -3735,9 +3735,9 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                         if (r.refsetMemberUuidMsb == lastRefsetMemberUuidMsb
                                 && r.refsetMemberUuidLsb == lastRefsetMemberUuidLsb) {
                             // FIRST REVISION
-                            List<TkRefsetIntRevision> revisionList = new ArrayList<TkRefsetIntRevision>();
+                            List<TkRefexIntRevision> revisionList = new ArrayList<TkRefexIntRevision>();
                             ERefsetIntRevision revision = new ERefsetIntRevision();
-                            revision.setIntValue(r.valueInt);
+                            revision.setInt1(r.valueInt);
                             revision.setStatusUuid(zStatusUuidArray[r.status]);
                             revision.setPathUuid(zPathArray[r.pathIdx]);
                             revision.setTime(r.revTime);
@@ -3759,7 +3759,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                                     if (r.refsetMemberUuidMsb == lastRefsetMemberUuidMsb
                                             && r.refsetMemberUuidLsb == lastRefsetMemberUuidLsb) {
                                         revision = new ERefsetIntRevision();
-                                        revision.setIntValue(r.valueInt);
+                                        revision.setInt1(r.valueInt);
                                         revision.setStatusUuid(zStatusUuidArray[r.status]);
                                         revision.setPathUuid(zPathArray[r.pathIdx]);
                                         revision.setTime(r.revTime);
@@ -3803,7 +3803,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                     tmp.setStatusUuid(zStatusUuidArray[r.status]);
                     tmp.setTime(r.revTime);
                     tmp.setPathUuid(zPathArray[r.pathIdx]);
-                    tmp.setStrValue(r.valueString);
+                    tmp.setString1(r.valueString);
                     if (r.authorIdx != -1) {
                         tmp.setAuthorUuid(zAuthorUuidArray[r.authorIdx]);
                     } else {
@@ -3820,7 +3820,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                             // FIRST REVISION
                             List<TkRefsetStrRevision> revisionList = new ArrayList<TkRefsetStrRevision>();
                             ERefsetStrRevision revision = new ERefsetStrRevision();
-                            revision.setStringValue(r.valueString);
+                            revision.setString1(r.valueString);
                             revision.setStatusUuid(zStatusUuidArray[r.status]);
                             revision.setPathUuid(zPathArray[r.pathIdx]);
                             revision.setTime(r.revTime);
@@ -3842,7 +3842,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                                     if (r.refsetMemberUuidMsb == lastRefsetMemberUuidMsb
                                             && r.refsetMemberUuidLsb == lastRefsetMemberUuidLsb) {
                                         revision = new ERefsetStrRevision();
-                                        revision.setStringValue(r.valueString);
+                                        revision.setString1(r.valueString);
                                         revision.setStatusUuid(zStatusUuidArray[r.status]);
                                         revision.setPathUuid(zPathArray[r.pathIdx]);
                                         revision.setTime(r.revTime);

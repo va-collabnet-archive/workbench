@@ -42,17 +42,17 @@ public abstract class TkRevision implements I_VersionExternally {
       super();
    }
 
-   public TkRevision(ComponentVersionBI another) throws IOException {
+   public TkRevision(ComponentVersionBI componentVersion) throws IOException {
       super();
-      this.statusUuid = Ts.get().getComponent(another.getStatusNid()).getPrimUuid();
-      this.authorUuid = Ts.get().getComponent(another.getAuthorNid()).getPrimUuid();
-      this.pathUuid   = Ts.get().getComponent(another.getPathNid()).getPrimUuid();
-      this.moduleUuid   = Ts.get().getComponent(another.getModuleNid()).getPrimUuid();
-      assert pathUuid != null : another;
-      assert authorUuid != null : another;
-      assert statusUuid != null : another;
-      assert moduleUuid != null : another;
-      this.time = another.getTime();
+      this.statusUuid = Ts.get().getComponent(componentVersion.getStatusNid()).getPrimUuid();
+      this.authorUuid = Ts.get().getComponent(componentVersion.getAuthorNid()).getPrimUuid();
+      this.pathUuid   = Ts.get().getComponent(componentVersion.getPathNid()).getPrimUuid();
+      this.moduleUuid   = Ts.get().getComponent(componentVersion.getModuleNid()).getPrimUuid();
+      assert pathUuid != null : componentVersion;
+      assert authorUuid != null : componentVersion;
+      assert statusUuid != null : componentVersion;
+      assert moduleUuid != null : componentVersion;
+      this.time = componentVersion.getTime();
    }
 
    public TkRevision(IdBI id) throws IOException {
@@ -77,27 +77,27 @@ public abstract class TkRevision implements I_VersionExternally {
       assert moduleUuid != null : this;
    }
 
-   public TkRevision(ComponentVersionBI another, Map<UUID, UUID> conversionMap, long offset, boolean mapAll)
+   public TkRevision(ComponentVersionBI componentVersion, Map<UUID, UUID> conversionMap, long offset, boolean mapAll)
            throws IOException {
       super();
 
       if (mapAll) {
-         this.statusUuid = conversionMap.get(Ts.get().getComponent(another.getStatusNid()).getPrimUuid());
-         this.authorUuid = conversionMap.get(Ts.get().getComponent(another.getAuthorNid()).getPrimUuid());
-         this.pathUuid   = conversionMap.get(Ts.get().getComponent(another.getPathNid()).getPrimUuid());
-         this.moduleUuid   = conversionMap.get(Ts.get().getComponent(another.getModuleNid()).getPrimUuid());
+         this.statusUuid = conversionMap.get(Ts.get().getComponent(componentVersion.getStatusNid()).getPrimUuid());
+         this.authorUuid = conversionMap.get(Ts.get().getComponent(componentVersion.getAuthorNid()).getPrimUuid());
+         this.pathUuid   = conversionMap.get(Ts.get().getComponent(componentVersion.getPathNid()).getPrimUuid());
+         this.moduleUuid   = conversionMap.get(Ts.get().getComponent(componentVersion.getModuleNid()).getPrimUuid());
       } else {
-         this.statusUuid = Ts.get().getComponent(another.getStatusNid()).getPrimUuid();
-         this.authorUuid = Ts.get().getComponent(another.getAuthorNid()).getPrimUuid();
-         this.pathUuid   = Ts.get().getComponent(another.getPathNid()).getPrimUuid();
-         this.moduleUuid   = Ts.get().getComponent(another.getModuleNid()).getPrimUuid();
+         this.statusUuid = Ts.get().getComponent(componentVersion.getStatusNid()).getPrimUuid();
+         this.authorUuid = Ts.get().getComponent(componentVersion.getAuthorNid()).getPrimUuid();
+         this.pathUuid   = Ts.get().getComponent(componentVersion.getPathNid()).getPrimUuid();
+         this.moduleUuid   = Ts.get().getComponent(componentVersion.getModuleNid()).getPrimUuid();
       }
 
-      assert pathUuid != null : another;
-      assert authorUuid != null : another;
-      assert statusUuid != null : another;
-      assert moduleUuid != null : another;
-      this.time = another.getTime() + offset;
+      assert pathUuid != null : componentVersion;
+      assert authorUuid != null : componentVersion;
+      assert statusUuid != null : componentVersion;
+      assert moduleUuid != null : componentVersion;
+      this.time = componentVersion.getTime() + offset;
    }
 
    public TkRevision(TkRevision another, Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {

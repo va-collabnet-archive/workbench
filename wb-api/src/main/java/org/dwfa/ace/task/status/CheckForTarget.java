@@ -63,7 +63,7 @@ import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.WizardBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
@@ -118,7 +118,7 @@ public class CheckForTarget extends AbstractTask {
             concept = (I_GetConceptData) process.getProperty(activeConceptPropName);
             ViewCoordinate vc = config.getViewCoordinate();
             tempVc = new ViewCoordinate(vc);
-            tempVc.setRelAssertionType(RelAssertionType.STATED);
+            tempVc.setRelationshipAssertionType(RelAssertionType.STATED);
 
             DoSwing swinger = new DoSwing(process);
             swinger.start();
@@ -258,7 +258,7 @@ public class CheckForTarget extends AbstractTask {
     private void testForTarget() {
         try {
             //find roles which concept is target of
-            Collection<? extends RelationshipChronicleBI> relsIn = concept.getRelsIncoming();
+            Collection<? extends RelationshipChronicleBI> relsIn = concept.getRelationshipsTarget();
             if (relsIn != null) {
                 uuidList = new ArrayList<List<UUID>>();
                 for (RelationshipChronicleBI rel : relsIn) {
@@ -286,10 +286,10 @@ public class CheckForTarget extends AbstractTask {
         try {
             ConceptChronicleBI refexConcept = Ts.get().getConcept(SnomedMetadataRfx.getREFERS_TO_REFEX_NID());
             //find if concept is member of Refers To refset
-            Collection<? extends RefexCnidVersionBI<?>> refexMembers =
-                    (Collection<? extends RefexCnidVersionBI<?>>) refexConcept.getCurrentRefsetMembers(tempVc);
-            for (RefexCnidVersionBI member : refexMembers) {
-                if (member.getCnid1() == concept.getNid()) {
+            Collection<? extends RefexNidVersionBI<?>> refexMembers =
+                    (Collection<? extends RefexNidVersionBI<?>>) refexConcept.getRefsetMembersActive(tempVc);
+            for (RefexNidVersionBI member : refexMembers) {
+                if (member.getNid1() == concept.getNid()) {
                     List<UUID> uuids = Ts.get().getUuidsForNid(Ts.get().getConceptNidForNid(member.getReferencedComponentNid()));
                     uuidList.add(uuids);
                 }

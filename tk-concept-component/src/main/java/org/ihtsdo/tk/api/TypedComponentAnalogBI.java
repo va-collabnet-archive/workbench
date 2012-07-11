@@ -4,6 +4,6 @@ import java.beans.PropertyVetoException;
 
 public interface TypedComponentAnalogBI extends AnalogBI {
 
-	public void setTypeNid(int nid) throws PropertyVetoException;
+	public void setTypeNid(int typeNid) throws PropertyVetoException;
 
 }

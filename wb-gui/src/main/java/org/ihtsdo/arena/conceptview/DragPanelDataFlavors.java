@@ -6,10 +6,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.dwfa.ace.api.I_GetConceptData;
-import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
-import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
+import org.ihtsdo.tk.api.relationship.group.RelationshipGroupVersionBI;
 
 public class DragPanelDataFlavors {
 
@@ -25,10 +25,10 @@ public class DragPanelDataFlavors {
         try {
             conAttrVersionFlavor = new DataFlavor(
                     "application/x-java-jvm-local-objectref;class="
-                    + ConAttrVersionBI.class.getName());
+                    + ConceptAttributeVersionBI.class.getName());
             relGroupFlavor = new DataFlavor(
                     "application/x-java-jvm-local-objectref;class="
-                    + RelGroupVersionBI.class.getName());
+                    + RelationshipGroupVersionBI.class.getName());
             descVersionFlavor = new DataFlavor(
                     "application/x-java-jvm-local-objectref;class="
                     + DescriptionVersionBI.class.getName());

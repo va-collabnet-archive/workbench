@@ -32,14 +32,14 @@ public class TkRelationshipRevision extends TkRevision {
       super();
    }
 
-   public TkRelationshipRevision(RelationshipVersionBI rv) throws IOException {
-       super(rv);
+   public TkRelationshipRevision(RelationshipVersionBI relationshipVersion) throws IOException {
+       super(relationshipVersion);
       TerminologyStoreDI ts = Ts.get();
 
-      characteristicUuid = ts.getUuidPrimordialForNid(rv.getCharacteristicNid());
-      refinabilityUuid   = ts.getUuidPrimordialForNid(rv.getRefinabilityNid());
-      group              = rv.getGroup();
-      typeUuid           = ts.getUuidPrimordialForNid(rv.getTypeNid());
+      characteristicUuid = ts.getUuidPrimordialForNid(relationshipVersion.getCharacteristicNid());
+      refinabilityUuid   = ts.getUuidPrimordialForNid(relationshipVersion.getRefinabilityNid());
+      group              = relationshipVersion.getGroup();
+      typeUuid           = ts.getUuidPrimordialForNid(relationshipVersion.getTypeNid());
    }
 
    public TkRelationshipRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

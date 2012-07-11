@@ -44,8 +44,8 @@ import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.binding.snomed.TermAux;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
-import org.ihtsdo.tk.dto.concept.component.relationship.TkRelType;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipType;
 
 /**
  *
@@ -240,15 +240,15 @@ public class BatchActionTaskLogicUnionCreateUI extends javax.swing.JPanel
         if (BatchActionTask.ts.hasUuid(componentUuid) == true) {
             ConceptVersionBI refsetCB = BatchActionTask.ts.getConceptVersion(vc, componentUuid);
             // :SNOOWL: review added null, null)
-            ConAttrAB cCab = new ConAttrAB(componentUuid, false, null, null);
+            ConceptAttributeAB cCab = new ConceptAttributeAB(componentUuid, false, null, null);
             cCab.setCurrent();
             BatchActionTask.tsSnapshot.construct(cCab);
 
             // SET RELATIONSHIP TO CURRENT
             UUID roleTypeUuid = TermAux.IS_A.getLenient().getPrimUuid();
             UUID destUuid = DescriptionLogic.UNION_SETS_REFSET.getLenient().getPrimUuid();
-            RelCAB rCab = new RelCAB(refsetCB.getPrimUuid(), roleTypeUuid, destUuid, 0,
-                    TkRelType.STATED_HIERARCHY);
+            RelationshipCAB rCab = new RelationshipCAB(refsetCB.getPrimUuid(), roleTypeUuid, destUuid, 0,
+                    TkRelationshipType.STATED_HIERARCHY);
 
             BatchActionTask.tsSnapshot.construct(rCab);
             Ts.get().addUncommitted(refsetCB);
@@ -304,7 +304,7 @@ public class BatchActionTaskLogicUnionCreateUI extends javax.swing.JPanel
             ConceptVersionBI unionSetCB;
             unionSetCB = BatchActionTask.ts.getConceptVersion(vc, unionSetConceptUuid);
             // :SNOOWL: review added null, null)
-            ConAttrAB cCab = new ConAttrAB(unionSetConceptUuid, false, null, null);
+            ConceptAttributeAB cCab = new ConceptAttributeAB(unionSetConceptUuid, false, null, null);
             cCab.setCurrent();
             BatchActionTask.tsSnapshot.construct(cCab);
 
@@ -312,15 +312,15 @@ public class BatchActionTaskLogicUnionCreateUI extends javax.swing.JPanel
             UUID roleTypeUuid = Snomed.IS_A.getLenient().getPrimUuid();
             UUID destUuid;
             destUuid = parent.getPrimUuid();
-            RelCAB rCab = new RelCAB(unionSetConceptUuid, roleTypeUuid, destUuid, 0,
-                    TkRelType.STATED_HIERARCHY);
+            RelationshipCAB rCab = new RelationshipCAB(unionSetConceptUuid, roleTypeUuid, destUuid, 0,
+                    TkRelationshipType.STATED_HIERARCHY);
             rCab.setCurrent();
             BatchActionTask.tsSnapshot.construct(rCab);
 
             // SET UNION_SETS_REFSET SET RELATIONSHIP TO CURRENT
             destUuid = DescriptionLogic.UNION_SETS_REFSET.getUuids()[0];
-            RelCAB rCab2 = new RelCAB(unionSetConceptUuid, roleTypeUuid, destUuid, 0,
-                    TkRelType.STATED_HIERARCHY);
+            RelationshipCAB rCab2 = new RelationshipCAB(unionSetConceptUuid, roleTypeUuid, destUuid, 0,
+                    TkRelationshipType.STATED_HIERARCHY);
             rCab2.setCurrent();
             BatchActionTask.tsSnapshot.construct(rCab2);
 
@@ -338,7 +338,7 @@ public class BatchActionTaskLogicUnionCreateUI extends javax.swing.JPanel
 
             // FULLY SPECIFIED NAME DESCRIPTION
             String descAttribute = "";
-            for (I_DescriptionVersioned d : parent.getDescriptions()) {
+            for (I_DescriptionVersioned d : parent.getDescs()) {
                 if (d.getTypeNid() == SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID()
                         && d.getLang().equalsIgnoreCase("en")) {
                     int a = d.getText().lastIndexOf("(");
@@ -377,7 +377,7 @@ public class BatchActionTaskLogicUnionCreateUI extends javax.swing.JPanel
         // :???:!!!:SNOOWL:
         // If not already a refex member, then a member record is added.
         // Check if member already exists
-//        Collection<? extends RefexVersionBI<?>> currentRefexes = c.getCurrentRefexes(vc);
+//        Collection<? extends RefexVersionBI<?>> currentRefexes = c.getRefexesActive(vc);
 //        for (RefexVersionBI rvbi : currentRefexes) {
 //            if (rvbi.getCollectionNid() == collectionNid) {
 //                BatchActionEventReporter.add(new BatchActionEvent(c, BatchActionTaskType.REFSET_ADD_MEMBER,
@@ -385,7 +385,7 @@ public class BatchActionTaskLogicUnionCreateUI extends javax.swing.JPanel
 //                return false;
 //            }
 //        }
-        RefexCAB refexSpec = new RefexCAB(TK_REFSET_TYPE.CID, nid, nidUnionSetRefex);
+        RefexCAB refexSpec = new RefexCAB(TK_REFEX_TYPE.CID, nid, nidUnionSetRefex);
         int parentMemberTypeNid = Terms.get().getConcept(
                 RefsetAuxiliary.Concept.MARKED_PARENT.getPrimoridalUid()).getConceptNid();
         refexSpec.with(RefexCAB.RefexProperty.CNID1, parentMemberTypeNid);
@@ -417,12 +417,12 @@ public class BatchActionTaskLogicUnionCreateUI extends javax.swing.JPanel
             ConceptChronicleBI synConcept =
                     Ts.get().getConcept(SnomedMetadataRfx.getDES_SYNONYM_NID());
 
-            ComponentVersionBI fsn = cvbi.getFullySpecifiedDescription();
-            ComponentVersionBI pref = cvbi.getPreferredDescription();
+            ComponentVersionBI fsn = cvbi.getDescriptionFullySpecified();
+            ComponentVersionBI pref = cvbi.getDescriptionPreferred();
 
             // createBluePrintUsFsnRefex
             RefexCAB refexSpecUsFsn = new RefexCAB(
-                    TK_REFSET_TYPE.CID,
+                    TK_REFEX_TYPE.CID,
                     fsn.getNid(),
                     Ts.get().getNidForUuids(usUuid));
             refexSpecUsFsn.put(RefexCAB.RefexProperty.CNID1, preferredConcept.getNid());
@@ -433,7 +433,7 @@ public class BatchActionTaskLogicUnionCreateUI extends javax.swing.JPanel
             }
             // createBluePrintUsPrefRefex
             RefexCAB refexSpecUsPref = new RefexCAB(
-                    TK_REFSET_TYPE.CID,
+                    TK_REFEX_TYPE.CID,
                     pref.getNid(),
                     Ts.get().getNidForUuids(usUuid));
 
@@ -444,7 +444,7 @@ public class BatchActionTaskLogicUnionCreateUI extends javax.swing.JPanel
             }
             // createBluePrintGbFsnRefex
             RefexCAB refexSpecGbFsn = new RefexCAB(
-                    TK_REFSET_TYPE.CID,
+                    TK_REFEX_TYPE.CID,
                     fsn.getNid(),
                     Ts.get().getNidForUuids(gbUuid));
             refexSpecGbFsn.put(RefexCAB.RefexProperty.CNID1, preferredConcept.getNid());
@@ -454,7 +454,7 @@ public class BatchActionTaskLogicUnionCreateUI extends javax.swing.JPanel
             }
             // createBluePrintGbPrefRefex
             RefexCAB refexSpecGbPref = new RefexCAB(
-                    TK_REFSET_TYPE.CID,
+                    TK_REFEX_TYPE.CID,
                     pref.getNid(),
                     Ts.get().getNidForUuids(gbUuid));
             refexSpecGbPref.put(RefexCAB.RefexProperty.CNID1, preferredConcept.getNid());

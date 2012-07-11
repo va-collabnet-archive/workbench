@@ -60,7 +60,7 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 /**
@@ -122,7 +122,7 @@ public class TestForPreferredTermValue extends AbstractConceptTest {
              * Now getting the active descriptions is easy. Only the active
              * descriptions are important to test for duplicates, etc.
              */
-            Collection<? extends DescriptionVersionBI> descsActive = cv.getDescsActive();
+            Collection<? extends DescriptionVersionBI> descsActive = cv.getDescriptionsActive();
 
             GetConceptDataValidationStrategy validator = new NotEmptyConceptDataValidator(requiredConcept,
                     descsActive, concept);
@@ -183,7 +183,7 @@ public class TestForPreferredTermValue extends AbstractConceptTest {
         boolean isPreferredTerm = false;
         try {
             Collection<? extends RefexChronicleBI> refexes =
-                    desc.getCurrentRefexes(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+                    desc.getRefexesActive(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
             /*
              * Can use getNidForUuids to convert betwee nid and uuid.
              */
@@ -191,18 +191,18 @@ public class TestForPreferredTermValue extends AbstractConceptTest {
 
             if (refexes != null) {
                 for (RefexChronicleBI refex : refexes) {
-                    if (refex.getCollectionNid() == evalRefsetNid) {
+                    if (refex.getRefexNid() == evalRefsetNid) {
                         if (RefexVersionBI.class.isAssignableFrom(refex.getClass())) {
                             RefexVersionBI<?> rv = (RefexVersionBI<?>) refex;
-                            if (RefexCnidVersionBI.class.isAssignableFrom(rv.getClass())) {
+                            if (RefexNidVersionBI.class.isAssignableFrom(rv.getClass())) {
                                 /*
                                  * Synonyms are stored in the dialect refexes with either a value
                                  * of preferred, indicating a preferred term, or acceptable.
-                                 * The type of refex in this case is concept refsex (RefexCnidVersionBI), 
+                                 * The type of refex in this case is concept refsex (RefexNidVersionBI), 
                                  * and the value of preferred or acceptable is stored in cnid1.
                                  * See org.ihtsdo.tk.api.refex.type_*
                                  */
-                                int cnid = ((RefexCnidVersionBI) rv).getCnid1();
+                                int cnid = ((RefexNidVersionBI) rv).getNid1();
                                 if (cnid == SnomedMetadataRfx.getDESC_PREFERRED_NID()) {
                                     isPreferredTerm = true;
                                 }

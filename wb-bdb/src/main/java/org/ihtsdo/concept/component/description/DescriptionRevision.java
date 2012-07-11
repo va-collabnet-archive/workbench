@@ -17,7 +17,7 @@ import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.tk.api.ContradictionException;
-import org.ihtsdo.tk.api.blueprint.DescCAB;
+import org.ihtsdo.tk.api.blueprint.DescriptionCAB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
@@ -31,6 +31,8 @@ import java.nio.charset.Charset;
 
 import java.util.Collection;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
@@ -120,7 +122,26 @@ public class DescriptionRevision extends Revision<DescriptionRevision, Descripti
    }
 
    //~--- methods -------------------------------------------------------------
+   
+   @Override
+    public boolean matches(Pattern p) {
+        String lastText = null;
 
+        for (Description.Version desc : getVersions()) {
+            if (!desc.getText().equals(lastText)) {
+                lastText = desc.getText();
+
+                Matcher m = p.matcher(lastText);
+
+                if (m.find()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+   
    @Override
    protected void addComponentNids(Set<Integer> allNids) {
       allNids.add(typeNid);
@@ -276,8 +297,8 @@ public class DescriptionRevision extends Revision<DescriptionRevision, Descripti
    }
    
    @Override
-    public DescCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
-        DescCAB descBp = new DescCAB(getConceptNid(), getTypeNid(),
+    public DescriptionCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
+        DescriptionCAB descBp = new DescriptionCAB(getConceptNid(), getTypeNid(),
                 LANG_CODE.getLangCode(lang), getText(), initialCaseSignificant,
                 getVersion(vc), vc);
         return descBp;

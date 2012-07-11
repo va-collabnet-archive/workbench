@@ -8,7 +8,7 @@ import java.util.logging.Level;
 
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.log.AceLog;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
@@ -50,13 +50,13 @@ public  class WfHxLuceneWriterAccessor {
     	return null;
    	}
 
-	public static WfHxLuceneWriter addWfHxLuceneMembersFromEConcept(Set<TkRefsetAbstractMember<?>> eConceptMembers) throws InterruptedException {
+	public static WfHxLuceneWriter addWfHxLuceneMembersFromEConcept(Set<TkRefexAbstractMember<?>> eConceptMembers) throws InterruptedException {
     	try {
         	Set<UUID> wfIdsSeen = new HashSet<UUID>();
             Set<WorkflowHistoryJavaBean> beansToAddToWf = new HashSet<WorkflowHistoryJavaBean>();
 
-            for (TkRefsetAbstractMember<?> mem : eConceptMembers) {
-	        	if (mem.getRefsetUuid().equals(WorkflowHelper.getWorkflowRefsetUid())) {
+            for (TkRefexAbstractMember<?> mem : eConceptMembers) {
+	        	if (mem.getRefexUuid().equals(WorkflowHelper.getWorkflowRefsetUid())) {
             		WorkflowHistoryJavaBean bean = WorkflowHelper.populateWorkflowHistoryJavaBean(mem);
 
 					// Only add to update once per WfId

@@ -23,11 +23,11 @@ import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.api.refex.type_cnid_long.RefexCnidLongAnalogBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidlong.TkRefsetCidLongMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidlong.TkRefsetCidLongRevision;
+import org.ihtsdo.tk.api.refex.type_nid_long.RefexNidLongAnalogBI;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_long.TkRefexUuidLongMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_long.TkRefexUuidLongRevision;
 import org.ihtsdo.tk.hash.Hashcode;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -38,11 +38,11 @@ import java.io.IOException;
 
 import java.util.*;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid_long.RefexCnidLongVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid_long.RefexNidLongVersionBI;
 import org.ihtsdo.tk.dto.RevisionHandling;
 
 public class CidLongMember extends RefsetMember<CidLongRevision, CidLongMember>
-        implements RefexCnidLongAnalogBI<CidLongRevision> {
+        implements RefexNidLongAnalogBI<CidLongRevision> {
    private static VersionComputer<RefsetMember<CidLongRevision, CidLongMember>.Version> computer =
       new VersionComputer<RefsetMember<CidLongRevision, CidLongMember>.Version>();
 
@@ -61,15 +61,15 @@ public class CidLongMember extends RefsetMember<CidLongRevision, CidLongMember>
       super(enclosingConceptNid, input);
    }
 
-   public CidLongMember(TkRefsetCidLongMember refsetMember, int enclosingConceptNid) throws IOException {
+   public CidLongMember(TkRefexUuidLongMember refsetMember, int enclosingConceptNid) throws IOException {
       super(refsetMember, enclosingConceptNid);
-      c1Nid     = Bdb.uuidToNid(refsetMember.getC1Uuid());
-      longValue = refsetMember.getLongValue();
+      c1Nid     = Bdb.uuidToNid(refsetMember.getUuid1());
+      longValue = refsetMember.getLong1();
 
       if (refsetMember.getRevisionList() != null) {
          revisions = new RevisionSet<CidLongRevision, CidLongMember>(primordialSapNid);
 
-         for (TkRefsetCidLongRevision eVersion : refsetMember.getRevisionList()) {
+         for (TkRefexUuidLongRevision eVersion : refsetMember.getRevisionList()) {
             revisions.add(new CidLongRevision(eVersion, this));
          }
       }
@@ -84,7 +84,7 @@ public class CidLongMember extends RefsetMember<CidLongRevision, CidLongMember>
 
    @Override
    protected void addSpecProperties(RefexCAB rcs) {
-      rcs.with(RefexProperty.CNID1, getCnid1());
+      rcs.with(RefexProperty.CNID1, getNid1());
       rcs.with(RefexProperty.LONG1, getLong1());
    }
 
@@ -137,9 +137,9 @@ public class CidLongMember extends RefsetMember<CidLongRevision, CidLongMember>
    
    @Override
     public boolean refexFieldsEqual(RefexVersionBI another) {
-        if(RefexCnidLongVersionBI.class.isAssignableFrom(another.getClass())){
-            RefexCnidLongVersionBI cv = (RefexCnidLongVersionBI) another;
-            return (this.c1Nid == cv.getCnid1()) && (this.longValue == cv.getLong1());
+        if(RefexNidLongVersionBI.class.isAssignableFrom(another.getClass())){
+            RefexNidLongVersionBI cv = (RefexNidLongVersionBI) another;
+            return (this.c1Nid == cv.getNid1()) && (this.longValue == cv.getLong1());
         }
         return false;
     }
@@ -192,7 +192,7 @@ public class CidLongMember extends RefsetMember<CidLongRevision, CidLongMember>
    }
 
    @Override
-   public int getCnid1() {
+   public int getNid1() {
       return c1Nid;
    }
 
@@ -206,15 +206,15 @@ public class CidLongMember extends RefsetMember<CidLongRevision, CidLongMember>
    }
 
    @Override
-   public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
+   public TkRefexAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
            Map<UUID, UUID> conversionMap)
            throws ContradictionException, IOException {
-      return new TkRefsetCidLongMember(this, exclusionSet, conversionMap, 0, true, vc);
+      return new TkRefexUuidLongMember(this, exclusionSet, conversionMap, 0, true, vc);
    }
 
    @Override
-   protected TK_REFSET_TYPE getTkRefsetType() {
-      return TK_REFSET_TYPE.CID_LONG;
+   protected TK_REFEX_TYPE getTkRefsetType() {
+      return TK_REFEX_TYPE.CID_LONG;
    }
 
    @Override
@@ -274,7 +274,7 @@ public class CidLongMember extends RefsetMember<CidLongRevision, CidLongMember>
    }
 
    @Override
-   public void setCnid1(int cnid1) throws PropertyVetoException {
+   public void setNid1(int cnid1) throws PropertyVetoException {
       this.c1Nid = cnid1;
       modified();
    }
@@ -294,8 +294,8 @@ public class CidLongMember extends RefsetMember<CidLongRevision, CidLongMember>
 
    public class Version extends RefsetMember<CidLongRevision, CidLongMember>.Version
            implements I_ExtendByRefVersion<CidLongRevision>, I_ExtendByRefPartCidLong<CidLongRevision>,
-                      RefexCnidLongAnalogBI<CidLongRevision> {
-      private Version(RefexCnidLongAnalogBI cv) {
+                      RefexNidLongAnalogBI<CidLongRevision> {
+      private Version(RefexNidLongAnalogBI cv) {
          super(cv);
       }
 
@@ -331,21 +331,21 @@ public class CidLongMember extends RefsetMember<CidLongRevision, CidLongMember>
 
       @Override
       public int getC1id() {
-         return getCv().getCnid1();
+         return getCv().getNid1();
       }
 
       @Override
-      public int getCnid1() {
-         return getCv().getCnid1();
+      public int getNid1() {
+         return getCv().getNid1();
       }
 
-      RefexCnidLongAnalogBI getCv() {
-         return (RefexCnidLongAnalogBI) cv;
+      RefexNidLongAnalogBI getCv() {
+         return (RefexNidLongAnalogBI) cv;
       }
 
       @Override
-      public TkRefsetCidLongMember getERefsetMember() throws IOException {
-         return new TkRefsetCidLongMember(this, RevisionHandling.EXCLUDE_REVISIONS);
+      public TkRefexUuidLongMember getERefsetMember() throws IOException {
+         return new TkRefexUuidLongMember(this, RevisionHandling.EXCLUDE_REVISIONS);
       }
 
       @Override
@@ -367,12 +367,12 @@ public class CidLongMember extends RefsetMember<CidLongRevision, CidLongMember>
 
       @Override
       public void setC1id(int c1id) throws PropertyVetoException {
-         getCv().setCnid1(c1id);
+         getCv().setNid1(c1id);
       }
 
       @Override
-      public void setCnid1(int cnid1) throws PropertyVetoException {
-         getCv().setCnid1(cnid1);
+      public void setNid1(int cnid1) throws PropertyVetoException {
+         getCv().setNid1(cnid1);
       }
 
       @Override

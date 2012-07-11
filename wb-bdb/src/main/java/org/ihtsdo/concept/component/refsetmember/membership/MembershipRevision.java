@@ -17,10 +17,10 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
-import org.ihtsdo.tk.dto.concept.component.refset.member.TkRefsetMember;
-import org.ihtsdo.tk.dto.concept.component.refset.member.TkRefsetRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_member.TkRefexMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_member.TkRefexRevision;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -39,7 +39,7 @@ public class MembershipRevision extends RefsetRevision<MembershipRevision, Membe
       super(statusAtPositionNid, primoridalMember);
    }
 
-   public MembershipRevision(TkRefsetRevision eVersion, MembershipMember member) {
+   public MembershipRevision(TkRefexRevision eVersion, MembershipMember member) {
       super(eVersion, member);
    }
 
@@ -138,14 +138,14 @@ public class MembershipRevision extends RefsetRevision<MembershipRevision, Membe
    //~--- get methods ---------------------------------------------------------
 
    @Override
-   public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
+   public TkRefexAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
            Map<UUID, UUID> conversionMap)
            throws ContradictionException, IOException {
-      return new TkRefsetMember(this, exclusionSet, conversionMap, 0, true, vc);
+      return new TkRefexMember(this, exclusionSet, conversionMap, 0, true, vc);
    }
 
-   protected TK_REFSET_TYPE getTkRefsetType() {
-      return TK_REFSET_TYPE.MEMBER;
+   protected TK_REFEX_TYPE getTkRefsetType() {
+      return TK_REFEX_TYPE.MEMBER;
    }
 
    @Override

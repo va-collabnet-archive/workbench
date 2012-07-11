@@ -2,11 +2,11 @@ package org.ihtsdo.tk.api.refex;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.ComponentChronicleBI;
 
 public interface RefexChronicleBI<A extends RefexAnalogBI<A>>
-        extends ComponentChroncileBI<RefexVersionBI<A>> {
-   int getCollectionNid();
+        extends ComponentChronicleBI<RefexVersionBI<A>> {
+   int getRefexNid();
 
    int getReferencedComponentNid();
 }

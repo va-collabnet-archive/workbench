@@ -136,7 +136,7 @@ public class VerifyBdb extends AbstractMojo {
 
     private void validateSpec(ConceptChronicleBI toValidate, ConceptSpec spec) throws IOException {
         boolean validated = false;
-        for (DescriptionChronicleBI desc : toValidate.getDescs()) {
+        for (DescriptionChronicleBI desc : toValidate.getDescriptions()) {
             for (DescriptionVersionBI descV : desc.getVersions()) {
                 if (descV.getText().equals(
                         spec.getDescription())) {

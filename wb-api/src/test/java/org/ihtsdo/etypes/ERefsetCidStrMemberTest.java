@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
-import org.ihtsdo.tk.dto.concept.component.refset.cidstr.TkRefsetCidStrRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_string.TkRefexUuidStringRevision;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -132,8 +132,8 @@ public class ERefsetCidStrMemberTest {
         
         ERefsetCidStrMember member = new ERefsetCidStrMember();
         member.componentUuid = new UUID(64386, 75497);
-        member.c1Uuid = new UUID(111, 222);
-        member.strValue = "FIRST VALUE"; 
+        member.uuid1 = new UUID(111, 222);
+        member.string1 = "FIRST VALUE"; 
         member.refsetUuid = new UUID(14386, 65497);
         member.pathUuid = new UUID(4350, 5469);
         member.statusUuid = new UUID(5386, 4497);
@@ -149,10 +149,10 @@ public class ERefsetCidStrMemberTest {
         ac.time = this.myTime;
         member.additionalIds.add(ac);       
         // Add extraVersions 
-        member.revisions = new ArrayList<TkRefsetCidStrRevision>();
+        member.revisions = new ArrayList<TkRefexUuidStringRevision>();
         ERefsetCidStrRevision rsv = new ERefsetCidStrRevision();
-        rsv.c1Uuid = new UUID(4350, 5469);
-        rsv.strValue = "VALUE 1"; 
+        rsv.uuid1 = new UUID(4350, 5469);
+        rsv.string1 = "VALUE 1"; 
         rsv.pathUuid = new UUID(4350, 5469);
         rsv.statusUuid = new UUID(5386, 4497);
         rsv.time = this.myTime;
@@ -165,8 +165,8 @@ public class ERefsetCidStrMemberTest {
         
         ERefsetCidStrMember member = new ERefsetCidStrMember();
         member.componentUuid = new UUID(111, 75497);
-        member.c1Uuid = new UUID(222, 222);
-        member.strValue = "SECOND VALUE"; 
+        member.uuid1 = new UUID(222, 222);
+        member.string1 = "SECOND VALUE"; 
         member.refsetUuid = new UUID(333, 65497);
         member.pathUuid = new UUID(444, 5469);
         member.statusUuid = new UUID(555, 4497);
@@ -182,10 +182,10 @@ public class ERefsetCidStrMemberTest {
         ac.time = this.myTime;
         member.additionalIds.add(ac);       
         // Add extraVersions 
-        member.revisions = new ArrayList<TkRefsetCidStrRevision>();
+        member.revisions = new ArrayList<TkRefexUuidStringRevision>();
         ERefsetCidStrRevision rsv = new ERefsetCidStrRevision();
-        rsv.c1Uuid = new UUID(3333, 5469);
-        rsv.strValue = "VALUE 2"; 
+        rsv.uuid1 = new UUID(3333, 5469);
+        rsv.string1 = "VALUE 2"; 
         rsv.pathUuid = new UUID(4444, 5469);
         rsv.statusUuid = new UUID(5555, 4497);
         rsv.time = this.myTime;

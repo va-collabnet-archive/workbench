@@ -4,15 +4,15 @@ import java.util.UUID;
 
 public interface I_RelateExternally {
 
-	public UUID getC1Uuid();
+	public UUID getRelationshipSourceUuid();
 
-	public UUID getC2Uuid();
+	public UUID getRelationshipTargetUuid();
 
 	public UUID getCharacteristicUuid();
 
 	public UUID getRefinabilityUuid();
 
-	public int getRelGroup();
+	public int getRelationshipGroup();
 
 	public UUID getTypeUuid();
 

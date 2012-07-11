@@ -18,11 +18,11 @@ import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
-import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanMember;
-import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanRevision;
-import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_boolean.TkRefexBooleanMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_boolean.TkRefexBooleanRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid.TkRefexUuidMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid.TkRefexUuidRevision;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 
 /**
@@ -175,8 +175,8 @@ public class BooleanToEnumeratedTransformer extends AbstractTransformer {
 			UUID cidTypeId = RefsetAuxiliary.Concept.CONCEPT_EXTENSION.getPrimoridalUid();
 			UUID booleanTypeId = RefsetAuxiliary.Concept.BOOLEAN_EXTENSION.getPrimoridalUid();
 			if (relationship.getTypeUuid().equals(refsetTypeRelId) && 
-					relationship.getC2Uuid().equals(booleanTypeId) &&
-					relationship.getC1Uuid().equals(refsetUuid)) {
+					relationship.getRelationshipTargetUuid().equals(booleanTypeId) &&
+					relationship.getRelationshipSourceUuid().equals(refsetUuid)) {
 				relationship.setC2Uuid(cidTypeId);
 			}
 		} catch (IOException e) {
@@ -187,13 +187,13 @@ public class BooleanToEnumeratedTransformer extends AbstractTransformer {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformMember(org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember, org.ihtsdo.tk.dto.concept.TkConcept)
+	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformMember(org.ihtsdo.tk.dto.concept.component.refset.TkRefexAbstractMember, org.ihtsdo.tk.dto.concept.TkConcept)
 	 */
 	@Override
-	public void transformMember(TkRefsetAbstractMember<?> member, TkConcept concept) {
-		if (member.getRefsetUuid().equals(refsetUuid)) {
-			TkRefsetBooleanMember booleanMember = (TkRefsetBooleanMember) member;
-			TkRefsetCidMember cidMember = new TkRefsetCidMember();
+	public void transformMember(TkRefexAbstractMember<?> member, TkConcept concept) {
+		if (member.getRefexUuid().equals(refsetUuid)) {
+			TkRefexBooleanMember booleanMember = (TkRefexBooleanMember) member;
+			TkRefexUuidMember cidMember = new TkRefexUuidMember();
 
 			cidMember.setAdditionalIdComponents(booleanMember.getAdditionalIdComponents());
 			cidMember.setAnnotations(booleanMember.getAnnotations());
@@ -202,26 +202,26 @@ public class BooleanToEnumeratedTransformer extends AbstractTransformer {
 			cidMember.setComponentUuid(booleanMember.getComponentUuid());
 			cidMember.setPathUuid(booleanMember.getPathUuid());
 			cidMember.setPrimordialComponentUuid(booleanMember.getPrimordialComponentUuid());
-			cidMember.setRefsetUuid(booleanMember.getRefsetUuid());
+			cidMember.setRefsetUuid(booleanMember.getRefexUuid());
 			cidMember.setStatusUuid(booleanMember.getStatusUuid());
 			cidMember.setTime(booleanMember.getTime());
 
-			if (booleanMember.getBooleanValue()) {
-				cidMember.setC1Uuid(valueForTrue);
+			if (booleanMember.getBoolean1()) {
+				cidMember.setUuid1(valueForTrue);
 			} else {
-				cidMember.setC1Uuid(valueForFalse);
+				cidMember.setUuid1(valueForFalse);
 			}
 
-			cidMember.setRevisions(new ArrayList<TkRefsetCidRevision>());
+			cidMember.setRevisions(new ArrayList<TkRefexUuidRevision>());
 			if (booleanMember.getRevisions() != null) {
-				for (TkRefsetBooleanRevision booleanRevision : booleanMember.getRevisions()) {
-					TkRefsetCidRevision cidRevision = new TkRefsetCidRevision();
+				for (TkRefexBooleanRevision booleanRevision : booleanMember.getRevisions()) {
+					TkRefexUuidRevision cidRevision = new TkRefexUuidRevision();
 					cidRevision.setAuthorUuid(booleanRevision.getAuthorUuid());
                                         cidRevision.setModuleUuid(booleanRevision.getModuleUuid());
-					if (booleanRevision.getBooleanValue()) {
-						cidRevision.setC1Uuid(valueForTrue);
+					if (booleanRevision.getBoolean1()) {
+						cidRevision.setUuid1(valueForTrue);
 					} else {
-						cidRevision.setC1Uuid(valueForFalse);
+						cidRevision.setUuid1(valueForFalse);
 					}
 					cidRevision.setPathUuid(booleanRevision.getPathUuid());
 					cidRevision.setStatusUuid(booleanRevision.getStatusUuid());
@@ -242,14 +242,14 @@ public class BooleanToEnumeratedTransformer extends AbstractTransformer {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformAnnotation(org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember, org.ihtsdo.tk.dto.concept.component.TkComponent)
+	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformAnnotation(org.ihtsdo.tk.dto.concept.component.refset.TkRefexAbstractMember, org.ihtsdo.tk.dto.concept.component.TkComponent)
 	 */
 	@Override
-	public void transformAnnotation(TkRefsetAbstractMember<?> annotation,
+	public void transformAnnotation(TkRefexAbstractMember<?> annotation,
 			TkComponent<?> component) {
-		if (annotation.getRefsetUuid().equals(refsetUuid)) {
-			TkRefsetBooleanMember booleanMember = (TkRefsetBooleanMember) annotation;
-			TkRefsetCidMember cidMember = new TkRefsetCidMember();
+		if (annotation.getRefexUuid().equals(refsetUuid)) {
+			TkRefexBooleanMember booleanMember = (TkRefexBooleanMember) annotation;
+			TkRefexUuidMember cidMember = new TkRefexUuidMember();
 
 			cidMember.setAdditionalIdComponents(booleanMember.getAdditionalIdComponents());
 			cidMember.setAnnotations(booleanMember.getAnnotations());
@@ -258,26 +258,26 @@ public class BooleanToEnumeratedTransformer extends AbstractTransformer {
 			cidMember.setComponentUuid(booleanMember.getComponentUuid());
 			cidMember.setPathUuid(booleanMember.getPathUuid());
 			cidMember.setPrimordialComponentUuid(booleanMember.getPrimordialComponentUuid());
-			cidMember.setRefsetUuid(booleanMember.getRefsetUuid());
+			cidMember.setRefsetUuid(booleanMember.getRefexUuid());
 			cidMember.setStatusUuid(booleanMember.getStatusUuid());
 			cidMember.setTime(booleanMember.getTime());
 
-			if (booleanMember.getBooleanValue()) {
-				cidMember.setC1Uuid(valueForTrue);
+			if (booleanMember.getBoolean1()) {
+				cidMember.setUuid1(valueForTrue);
 			} else {
-				cidMember.setC1Uuid(valueForFalse);
+				cidMember.setUuid1(valueForFalse);
 			}
 
-			cidMember.setRevisions(new ArrayList<TkRefsetCidRevision>());
+			cidMember.setRevisions(new ArrayList<TkRefexUuidRevision>());
 			if (booleanMember.getRevisions() != null) {
-				for (TkRefsetBooleanRevision booleanRevision : booleanMember.getRevisions()) {
-					TkRefsetCidRevision cidRevision = new TkRefsetCidRevision();
+				for (TkRefexBooleanRevision booleanRevision : booleanMember.getRevisions()) {
+					TkRefexUuidRevision cidRevision = new TkRefexUuidRevision();
 					cidRevision.setAuthorUuid(booleanRevision.getAuthorUuid());
                                         cidRevision.setModuleUuid(booleanRevision.getModuleUuid());
-					if (booleanRevision.getBooleanValue()) {
-						cidRevision.setC1Uuid(valueForTrue);
+					if (booleanRevision.getBoolean1()) {
+						cidRevision.setUuid1(valueForTrue);
 					} else {
-						cidRevision.setC1Uuid(valueForFalse);
+						cidRevision.setUuid1(valueForFalse);
 					}
 					cidRevision.setPathUuid(booleanRevision.getPathUuid());
 					cidRevision.setStatusUuid(booleanRevision.getStatusUuid());

@@ -185,7 +185,7 @@ public class BatchActionTaskRoleReplaceValueUI extends javax.swing.JPanel implem
             int oldRoleTypeNid = oldRoleValueBI.getTypeNid();
             ((BatchActionTaskRoleReplaceValue) task).setRoleNid(oldRoleTypeNid);
             // SET OLD ROLE VALUE
-            int oldValueNid = oldRoleValueBI.getDestinationNid();
+            int oldValueNid = oldRoleValueBI.getTargetNid();
             ((BatchActionTaskRoleReplaceValue) task).setValueOldNid(oldValueNid);
         } else {
             BatchActionEventReporter.add(new BatchActionEvent(null,

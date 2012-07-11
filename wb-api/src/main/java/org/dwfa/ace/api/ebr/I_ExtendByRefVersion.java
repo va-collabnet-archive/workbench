@@ -22,6 +22,7 @@ import java.util.List;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_AmTuple;
 import org.ihtsdo.tk.api.refex.RefexAnalogBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 
 public interface I_ExtendByRefVersion<T extends RefexAnalogBI<T>> extends I_ExtendByRefPart<T>, 
 		I_AmTuple<T>, I_AmTermComponent {
@@ -51,6 +52,8 @@ public interface I_ExtendByRefVersion<T extends RefexAnalogBI<T>> extends I_Exte
     public List<? extends I_ExtendByRefPart<T>> getVersions();
 
     public I_ExtendByRef getCore();
+    
+    public RefexChronicleBI getCoreChronicle();
 
     public I_ExtendByRefPart<T> getMutablePart();
 

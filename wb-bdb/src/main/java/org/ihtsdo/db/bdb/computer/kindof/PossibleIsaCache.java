@@ -29,14 +29,14 @@ public class PossibleIsaCache extends TypeCache {
 		ConceptFetcherBI fcfc) throws Exception {
 		if (isCancelled() == false) {
 			Concept c = (Concept) fcfc.fetch();
-			Collection<? extends RelationshipChronicleBI> rels = c.getRelsOutgoing();
+			Collection<? extends RelationshipChronicleBI> rels = c.getRelationshipsSource();
 			ArrayIntList destNids = new ArrayIntList(5);
 			NidSetBI localTypes = coordinate.getIsaTypeNids();
 
 			for (RelationshipChronicleBI r: rels) {
 				for (RelationshipVersionBI rv: r.getVersions()) {
 					if (localTypes.contains(rv.getTypeNid())) {
-						destNids.add(rv.getDestinationNid());
+						destNids.add(rv.getTargetNid());
 						break;
 					}
 				}

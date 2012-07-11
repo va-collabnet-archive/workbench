@@ -29,10 +29,10 @@ public class TkMediaRevision extends TkRevision {
       super();
    }
 
-   public TkMediaRevision(MediaVersionBI another) throws IOException {
-      super(another);
-      this.textDescription = another.getTextDescription();
-      this.typeUuid        = Ts.get().getUuidPrimordialForNid(another.getTypeNid());
+   public TkMediaRevision(MediaVersionBI mediaVersion) throws IOException {
+      super(mediaVersion);
+      this.textDescription = mediaVersion.getTextDescription();
+      this.typeUuid        = Ts.get().getUuidPrimordialForNid(mediaVersion.getTypeNid());
    }
 
    public TkMediaRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

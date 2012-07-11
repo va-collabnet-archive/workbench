@@ -70,12 +70,12 @@ import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.WizardBI;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
-import org.ihtsdo.tk.api.blueprint.DescCAB;
+import org.ihtsdo.tk.api.blueprint.DescriptionCAB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 import org.ihtsdo.util.swing.GuiUtil;
 
 import org.ihtsdo.arena.spec.AcceptabilityType;
@@ -136,12 +136,12 @@ public class RedoConcept extends PreviousNextOrCancel {
     private boolean addGbDescPref = false;
     private List<Integer> nidList;
     private ConceptCB conceptSpec;
-    private DescCAB descSpecGbFsn;
-    private DescCAB descSpecUsFsn;
+    private DescriptionCAB descSpecGbFsn;
+    private DescriptionCAB descSpecUsFsn;
     private RefexCAB refexSpecGbFsn;
     private RefexCAB refexSpecUsFsn;
-    private DescCAB descSpecGbPref;
-    private DescCAB descSpecUsPref;
+    private DescriptionCAB descSpecGbPref;
+    private DescriptionCAB descSpecUsPref;
     private RefexCAB refexSpecGbPref;
     private RefexCAB refexSpecUsPref;
     private RefexCAB refexSpecUsAcct;
@@ -202,7 +202,7 @@ public class RedoConcept extends PreviousNextOrCancel {
 
             //get uncommitted info
             oldConcept = (I_GetConceptData) host.getTermComponent();
-            Collection<? extends I_DescriptionVersioned> descs = oldConcept.getDescriptions();
+            Collection<? extends I_DescriptionVersioned> descs = oldConcept.getDescs();
             for (I_DescriptionVersioned desc : descs) {
                 if (desc.getTypeNid() == SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID()) {
                     fsnText = desc.getText();
@@ -215,7 +215,7 @@ public class RedoConcept extends PreviousNextOrCancel {
             Collection<? extends I_RelVersioned> sourceRels = oldConcept.getSourceRels();
             for (I_RelVersioned sourceRel : sourceRels) {
                 if (sourceRel.getTypeNid() == Snomed.IS_A.getLenient().getNid()) {
-                    I_GetConceptData c = Terms.get().getConcept(sourceRel.getDestinationNid());
+                    I_GetConceptData c = Terms.get().getConcept(sourceRel.getTargetNid());
                     model.addElement(c);
                 }
             }
@@ -288,30 +288,30 @@ public class RedoConcept extends PreviousNextOrCancel {
 
                 //create blueprints
                 if (lang.equals("en")) {
-                    createBlueprintUsFsnRefex(conceptSpec.makeFsnCAB().getComponentNid());
-                    createBlueprintGbFsnRefex(conceptSpec.makeFsnCAB().getComponentNid());
+                    createBlueprintUsFsnRefex(conceptSpec.makeFullySpecifiedNameCAB().getComponentNid());
+                    createBlueprintGbFsnRefex(conceptSpec.makeFullySpecifiedNameCAB().getComponentNid());
                     createBlueprintUsPrefRefex(conceptSpec.makePreferredCAB().getComponentNid());
                     createBlueprintGbPrefRefex(conceptSpec.makePreferredCAB().getComponentNid());
                 }
                 if (lang.equals("en-us")) {
-                    createBlueprintUsFsnRefex(conceptSpec.makeFsnCAB().getComponentNid());
+                    createBlueprintUsFsnRefex(conceptSpec.makeFullySpecifiedNameCAB().getComponentNid());
                     createBlueprintUsPrefRefex(conceptSpec.makePreferredCAB().getComponentNid());
 //                   createBlueprintGbAcctRefex(conceptSpec.getPreferredCAB().getComponentNid()); //removed for rf2
                 }
                 if (lang.equals("en-gb")) {
 //                    createBlueprintGbFsnRefex(conceptSpec.getFsnCAB().getComponentNid());
-                    createBlueprintGbFsnRefex(conceptSpec.makeFsnCAB().getComponentNid()); //only using one fsn
+                    createBlueprintGbFsnRefex(conceptSpec.makeFullySpecifiedNameCAB().getComponentNid()); //only using one fsn
                     createBlueprintGbPrefRefex(conceptSpec.makePreferredCAB().getComponentNid());
 //                   createBlueprintUsAcctRefex(conceptSpec.getPreferredCAB().getComponentNid()); //removed for rf2
                 }
                 if (addUsDescFsn) {
 //                    createBlueprintUsFsnDesc();
-                    createBlueprintUsFsnRefex(conceptSpec.makeFsnCAB().getComponentNid());
+                    createBlueprintUsFsnRefex(conceptSpec.makeFullySpecifiedNameCAB().getComponentNid());
                 }
                 if (addGbDescFsn) {
 //                    createBlueprintGbFsnDesc();
 //                    createBlueprintGbFsnRefex(descSpecGbFsn.getComponentNid());
-                    createBlueprintGbFsnRefex(conceptSpec.makeFsnCAB().getComponentNid()); //only using one fsn (US)
+                    createBlueprintGbFsnRefex(conceptSpec.makeFullySpecifiedNameCAB().getComponentNid()); //only using one fsn (US)
                 }
                 if (addUsDescPref) {
                     createBlueprintUsPrefDesc();
@@ -853,7 +853,7 @@ public class RedoConcept extends PreviousNextOrCancel {
         text = text.replaceAll("[\\s]", " ");
         text = text.replaceAll("   *", " ");
         try {
-            descSpecGbFsn = new DescCAB(
+            descSpecGbFsn = new DescriptionCAB(
                     conceptSpec.getComponentUuid(),
                     fsnConcept.getPrimUuid(),
                     LANG_CODE.EN_GB,
@@ -871,7 +871,7 @@ public class RedoConcept extends PreviousNextOrCancel {
     private void createBlueprintGbFsnRefex(int componentNid) throws ContradictionException {
         try {
             refexSpecGbFsn = new RefexCAB(
-                    TK_REFSET_TYPE.CID,
+                    TK_REFEX_TYPE.CID,
                     componentNid,
                     Ts.get().getNidForUuids(gbUuid));
             refexSpecGbFsn.put(RefexProperty.CNID1, preferredConcept.getNid());
@@ -891,7 +891,7 @@ public class RedoConcept extends PreviousNextOrCancel {
         text = text.replaceAll("[\\s]", " ");
         text = text.replaceAll("   *", " ");
         try {
-            descSpecGbPref = new DescCAB(
+            descSpecGbPref = new DescriptionCAB(
                     conceptSpec.getComponentUuid(),
                     synConcept.getPrimUuid(),
                     LANG_CODE.EN_GB,
@@ -909,7 +909,7 @@ public class RedoConcept extends PreviousNextOrCancel {
     private void createBlueprintGbPrefRefex(int componentNid) throws ContradictionException {
         try {
             refexSpecGbPref = new RefexCAB(
-                    TK_REFSET_TYPE.CID,
+                    TK_REFEX_TYPE.CID,
                     componentNid,
                     Ts.get().getNidForUuids(gbUuid));
             refexSpecGbPref.put(RefexProperty.CNID1, preferredConcept.getNid());
@@ -928,7 +928,7 @@ public class RedoConcept extends PreviousNextOrCancel {
     private void createBlueprintGbAcctRefex(int componentNid) throws ContradictionException {
         try {
             refexSpecGbAcct = new RefexCAB(
-                    TK_REFSET_TYPE.CID,
+                    TK_REFEX_TYPE.CID,
                     componentNid,
                     Ts.get().getNidForUuids(gbUuid));
             refexSpecGbAcct.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
@@ -949,7 +949,7 @@ public class RedoConcept extends PreviousNextOrCancel {
         text = text.replaceAll("[\\s]", " ");
         text = text.replaceAll("   *", " ");
         try {
-            descSpecUsFsn = new DescCAB(
+            descSpecUsFsn = new DescriptionCAB(
                     conceptSpec.getComponentUuid(),
                     fsnConcept.getPrimUuid(),
                     LANG_CODE.EN_US,
@@ -967,7 +967,7 @@ public class RedoConcept extends PreviousNextOrCancel {
     private void createBlueprintUsFsnRefex(int componentNid) throws ContradictionException {
         try {
             refexSpecUsFsn = new RefexCAB(
-                    TK_REFSET_TYPE.CID,
+                    TK_REFEX_TYPE.CID,
                     componentNid,
                     Ts.get().getNidForUuids(usUuid));
 
@@ -989,7 +989,7 @@ public class RedoConcept extends PreviousNextOrCancel {
         text = text.replaceAll("[\\s]", " ");
         text = text.replaceAll("   *", " ");
         try {
-            descSpecUsPref = new DescCAB(
+            descSpecUsPref = new DescriptionCAB(
                     conceptSpec.getComponentUuid(),
                     synConcept.getPrimUuid(),
                     LANG_CODE.EN_US,
@@ -1007,7 +1007,7 @@ public class RedoConcept extends PreviousNextOrCancel {
     private void createBlueprintUsPrefRefex(int componentNid) throws ContradictionException {
         try {
             refexSpecUsPref = new RefexCAB(
-                    TK_REFSET_TYPE.CID,
+                    TK_REFEX_TYPE.CID,
                     componentNid,
                     Ts.get().getNidForUuids(usUuid));
 
@@ -1027,7 +1027,7 @@ public class RedoConcept extends PreviousNextOrCancel {
     private void createBlueprintUsAcctRefex(int componentNid) throws ContradictionException {
         try {
             refexSpecUsAcct = new RefexCAB(
-                    TK_REFSET_TYPE.CID,
+                    TK_REFEX_TYPE.CID,
                     componentNid,
                     Ts.get().getNidForUuids(usUuid));
 

@@ -6,18 +6,18 @@ import java.util.UUID;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 public interface WorkflowHistoryJavaBeanBI {
-	public void setConcept(UUID id);
-	public void setWorkflowId(UUID id);
-	public void setPath(UUID id);
-	public void setModeler(UUID id);
-	public void setState(UUID id);
-	public void setAction(UUID id);
-	public void setFSN(String desc);
-	public void setEffectiveTime(Long t);
-	public void setWorkflowTime(Long t);
-	public void setRxMemberId(int id);
-	public void setAutoApproved(boolean b);
-	public void setOverridden(boolean b);
+	public void setConcept(UUID conceptUuid);
+	public void setWorkflowId(UUID workflowUuid);
+	public void setPath(UUID pathUuid);
+	public void setModeler(UUID modelerUuid);
+	public void setState(UUID stateUuid);
+	public void setAction(UUID actionUuid);
+	public void setFullySpecifiedName(String text);
+	public void setEffectiveTime(Long effectiveTime);
+	public void setWorkflowTime(Long workflowTime);
+	public void setRefexMemberNid(int refexMemberNid);
+	public void setAutoApproved(boolean autoApprove);
+	public void setOverridden(boolean override);
 	
 	public UUID getConcept();
 	public UUID getWorkflowId();
@@ -25,15 +25,15 @@ public interface WorkflowHistoryJavaBeanBI {
 	public UUID getModeler();
 	public UUID getState();
 	public UUID getAction();
-	public String getFSN();
+	public String getFullySpecifiedName();
 	public Long getEffectiveTime();
 	public Long getWorkflowTime();
 	public boolean getAutoApproved();
 	public boolean getOverridden();
-	public int getRxMemberId();
+	public int getRefexMemberNid();
 	
-	public String getStateForTitleBar(ViewCoordinate coordinate) throws IOException;
-	public String getModelerForTitleBar(ViewCoordinate coordinate) throws IOException;
+	public String getStateForTitleBar(ViewCoordinate viewCoordinate) throws IOException;
+	public String getModelerForTitleBar(ViewCoordinate viewCoordinate) throws IOException;
 	
 	public String toString();
 }

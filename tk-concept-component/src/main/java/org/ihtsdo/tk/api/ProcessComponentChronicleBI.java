@@ -20,5 +20,5 @@ package org.ihtsdo.tk.api;
  * @author kec
  */
 public interface ProcessComponentChronicleBI {
-    void process(ComponentChroncileBI cc) throws Exception;
+    void process(ComponentChronicleBI componentChronicle) throws Exception;
 }

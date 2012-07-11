@@ -84,9 +84,9 @@ public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnab
         this.statedViewCoordinate = new ViewCoordinate(coordinate);
         this.inferredViewCoordinate = new ViewCoordinate(coordinate);
         this.inferredThenStatedViewCoordinate = new ViewCoordinate(coordinate);
-        this.statedViewCoordinate.setRelAssertionType(RelAssertionType.STATED);
-        this.inferredViewCoordinate.setRelAssertionType(RelAssertionType.INFERRED);
-        this.inferredThenStatedViewCoordinate.setRelAssertionType(RelAssertionType.INFERRED_THEN_STATED);
+        this.statedViewCoordinate.setRelationshipAssertionType(RelAssertionType.STATED);
+        this.inferredViewCoordinate.setRelationshipAssertionType(RelAssertionType.INFERRED);
+        this.inferredThenStatedViewCoordinate.setRelationshipAssertionType(RelAssertionType.INFERRED_THEN_STATED);
         this.types = coordinate.getIsaTypeNids();
         typeMap = new ConcurrentHashMap<Integer, int[]>(Terms.get().getConceptCount());
     }
@@ -135,9 +135,9 @@ public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnab
     protected void updateCacheUsingInferredThenStatedView(ConceptChronicleBI c) throws IOException, ContradictionException {
         ConceptVersion cv = new ConceptVersion((Concept) c, inferredThenStatedViewCoordinate);
         NidSet parentSet = new NidSet();
-        for (RelationshipVersionBI<?> relv : cv.getRelsOutgoingActive()) {
+        for (RelationshipVersionBI<?> relv : cv.getRelationshipsSourceActive()) {
             if (types.contains(relv.getTypeNid())) {
-                parentSet.add(relv.getDestinationNid());
+                parentSet.add(relv.getTargetNid());
             }
         }
         typeMap.put(c.getNid(), parentSet.getSetValues());
@@ -146,9 +146,9 @@ public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnab
     protected void updateCacheUsingStatedView(ConceptChronicleBI c) throws IOException, ContradictionException {
         ConceptVersion cv = new ConceptVersion((Concept) c, statedViewCoordinate);
         NidSet parentSet = new NidSet();
-        for (RelationshipVersionBI<?> relv : cv.getRelsOutgoingActive()) {
+        for (RelationshipVersionBI<?> relv : cv.getRelationshipsSourceActive()) {
             if (types.contains(relv.getTypeNid())) {
-                parentSet.add(relv.getDestinationNid());
+                parentSet.add(relv.getTargetNid());
             }
         }
         typeMap.put(c.getNid(), parentSet.getSetValues());

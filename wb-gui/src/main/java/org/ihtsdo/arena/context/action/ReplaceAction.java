@@ -22,7 +22,7 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.RelFact;
 import org.ihtsdo.tk.drools.facts.RelSpecFact;
 import org.ihtsdo.tk.drools.facts.SpecFact;
-import org.ihtsdo.tk.spec.RelSpec;
+import org.ihtsdo.tk.spec.RelationshipSpec;
 
 public class ReplaceAction extends AbstractAction {
 
@@ -69,14 +69,14 @@ public class ReplaceAction extends AbstractAction {
     }
 
     private void addRel() {
-        RelSpec relSpec = ((RelSpecFact) spec).getRelSpec();
+        RelationshipSpec relSpec = ((RelSpecFact) spec).getRelSpec();
         try {
             Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
             I_GetConceptData originConcept = Terms.get().getConcept(concept.getNid());
             I_RelVersioned newRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(),
                     originConcept,
-                    relSpec.getRelTypeSpec().getLenient().getNid(),
-                    relSpec.getDestinationSpec().getLenient().getNid(),
+                    relSpec.getRelationshipTypeSpec().getLenient().getNid(),
+                    relSpec.getTargetSpec().getLenient().getNid(),
                     SnomedMetadataRfx.getREL_CH_DEFINING_CHARACTERISTIC_NID(),
                     SnomedMetadataRfx.getREL_OPTIONAL_REFINABILITY_NID(),
                     0,

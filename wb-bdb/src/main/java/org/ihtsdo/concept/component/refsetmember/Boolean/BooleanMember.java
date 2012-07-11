@@ -24,10 +24,10 @@ import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanAnalogBI;
-import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanMember;
-import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanRevision;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_boolean.TkRefexBooleanMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_boolean.TkRefexBooleanRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -59,14 +59,14 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember>
         super(enclosingConceptNid, input);
     }
 
-    public BooleanMember(TkRefsetBooleanMember refsetMember, int enclosingConceptNid) throws IOException {
+    public BooleanMember(TkRefexBooleanMember refsetMember, int enclosingConceptNid) throws IOException {
         super(refsetMember, enclosingConceptNid);
-        booleanValue = refsetMember.getBooleanValue();
+        booleanValue = refsetMember.getBoolean1();
 
         if (refsetMember.getRevisionList() != null) {
             revisions = new RevisionSet(primordialSapNid);
 
-            for (TkRefsetBooleanRevision eVersion : refsetMember.getRevisionList()) {
+            for (TkRefexBooleanRevision eVersion : refsetMember.getRevisionList()) {
                 revisions.add(new BooleanRevision(eVersion, this));
             }
         }
@@ -199,15 +199,15 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember>
     }
 
     @Override
-    public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
+    public TkRefexAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
             Map<UUID, UUID> conversionMap)
             throws ContradictionException, IOException {
-        return new TkRefsetBooleanMember(this, exclusionSet, conversionMap, 0, true, vc);
+        return new TkRefexBooleanMember(this, exclusionSet, conversionMap, 0, true, vc);
     }
 
     @Override
-    protected TK_REFSET_TYPE getTkRefsetType() {
-        return TK_REFSET_TYPE.BOOLEAN;
+    protected TK_REFEX_TYPE getTkRefsetType() {
+        return TK_REFEX_TYPE.BOOLEAN;
     }
 
     @Override
@@ -334,8 +334,8 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember>
         }
 
         @Override
-        public TkRefsetBooleanMember getERefsetMember() throws IOException {
-            return new TkRefsetBooleanMember(this, RevisionHandling.EXCLUDE_REVISIONS);
+        public TkRefexBooleanMember getERefsetMember() throws IOException {
+            return new TkRefexBooleanMember(this, RevisionHandling.EXCLUDE_REVISIONS);
         }
 
         @Override

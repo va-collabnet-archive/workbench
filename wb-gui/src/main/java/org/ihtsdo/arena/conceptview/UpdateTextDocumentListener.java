@@ -35,7 +35,7 @@ import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.ihtsdo.helper.cswords.CsWordsHelper;
 import org.ihtsdo.helper.dialect.DialectHelper;
@@ -43,7 +43,7 @@ import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.thread.NamedThreadFactory;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
-import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidAnalogBI;
+import org.ihtsdo.tk.api.refex.type_nid.RefexNidAnalogBI;
 import org.ihtsdo.tk.binding.snomed.Language;
 import org.ihtsdo.tk.binding.snomed.CaseSensitive;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
@@ -194,7 +194,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
         if (update) { //create new
             if (desc.getLang().equals(LANG_CODE.EN.getFormatedLanguageCode())) {
 
-                refexes = desc.getCurrentAnnotationMembers(config.getViewCoordinate());
+                refexes = desc.getAnnotationsActive(config.getViewCoordinate());
                 int type = desc.getTypeNid();
                 int fsn = SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID();
 
@@ -212,14 +212,14 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                     }
 
                 } else { //TODO modify uncomitted version
-                    RefexCnidAnalogBI gbRefex = null;
-                    RefexCnidAnalogBI usRefex = null;
+                    RefexNidAnalogBI gbRefex = null;
+                    RefexNidAnalogBI usRefex = null;
                     for (RefexChronicleBI<?> descRefex : refexes) {
                         if (descRefex.isUncommitted()) {
-                            if (descRefex.getCollectionNid() == gbConcept.getNid()) {
-                                gbRefex = (RefexCnidAnalogBI) descRefex;;
-                            } else if (descRefex.getCollectionNid() == usConcept.getNid()) {
-                                usRefex = (RefexCnidAnalogBI) descRefex;
+                            if (descRefex.getRefexNid() == gbConcept.getNid()) {
+                                gbRefex = (RefexNidAnalogBI) descRefex;;
+                            } else if (descRefex.getRefexNid() == usConcept.getNid()) {
+                                usRefex = (RefexNidAnalogBI) descRefex;
                             }
                         }
                     }
@@ -241,14 +241,14 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
 
         desc.setText(text);
         RefexCAB refexSpecUs = new RefexCAB(
-                TK_REFSET_TYPE.CID,
+                TK_REFEX_TYPE.CID,
                 desc.getNid(),
                 usConcept.getNid());
         refexSpecUs.put(RefexProperty.CNID1, prefNid);
         RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
 
         RefexCAB refexSpecGb = new RefexCAB(
-                TK_REFSET_TYPE.CID,
+                TK_REFEX_TYPE.CID,
                 desc.getNid(),
                 gbConcept.getNid());
         refexSpecGb.put(RefexProperty.CNID1, prefNid);
@@ -266,14 +266,14 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
         if (DialectHelper.isTextForDialect(text, Language.EN_US.getLenient().getNid())
                 && DialectHelper.isTextForDialect(text, Language.EN_UK.getLenient().getNid())) { //acceptable in both 
             RefexCAB refexSpecUs = new RefexCAB(
-                    TK_REFSET_TYPE.CID,
+                    TK_REFEX_TYPE.CID,
                     desc.getNid(),
                     usConcept.getNid());
             refexSpecUs.put(RefexProperty.CNID1, acceptNid);
             RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
 
             RefexCAB refexSpecGb = new RefexCAB(
-                    TK_REFSET_TYPE.CID,
+                    TK_REFEX_TYPE.CID,
                     desc.getNid(),
                     gbConcept.getNid());
             refexSpecGb.put(RefexProperty.CNID1, acceptNid);
@@ -285,7 +285,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
             Ts.get().addUncommitted(refexUs);
         } else if (DialectHelper.isTextForDialect(text, Language.EN_UK.getLenient().getNid())) { //acceptable in US
             RefexCAB refexSpecUs = new RefexCAB(
-                    TK_REFSET_TYPE.CID,
+                    TK_REFEX_TYPE.CID,
                     desc.getNid(),
                     usConcept.getNid());
             refexSpecUs.put(RefexProperty.CNID1, acceptNid);
@@ -295,7 +295,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
             Ts.get().addUncommitted(refexUs);
         } else if (DialectHelper.isTextForDialect(text, Language.EN_US.getLenient().getNid())) { //acceptable in GB
             RefexCAB refexSpecGb = new RefexCAB(
-                    TK_REFSET_TYPE.CID,
+                    TK_REFEX_TYPE.CID,
                     desc.getNid(),
                     gbConcept.getNid());
             refexSpecGb.put(RefexProperty.CNID1, acceptNid);
@@ -307,18 +307,18 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
         }
     }
 
-    private void doFsnUpdate(RefexCnidAnalogBI gbRefex, RefexCnidAnalogBI usRefex)
+    private void doFsnUpdate(RefexNidAnalogBI gbRefex, RefexNidAnalogBI usRefex)
             throws PropertyVetoException, IOException, InvalidCAB, UnsupportedDialectOrLanguage {
         TerminologyBuilderBI tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
                 config.getViewCoordinate());
 
         desc.setText(text);
 
-        usRefex.setCnid1(prefNid);
-        gbRefex.setCnid1(prefNid);
+        usRefex.setNid1(prefNid);
+        gbRefex.setNid1(prefNid);
     }
 
-    private void doSynUpdate(RefexCnidAnalogBI gbRefex, RefexCnidAnalogBI usRefex) throws PropertyVetoException,
+    private void doSynUpdate(RefexNidAnalogBI gbRefex, RefexNidAnalogBI usRefex) throws PropertyVetoException,
             IOException, InvalidCAB, UnsupportedDialectOrLanguage, ContradictionException {
         TerminologyBuilderBI tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
                 config.getViewCoordinate());
@@ -337,7 +337,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                 }
                 doSynUpdate();
             } else {
-                usRefex.setCnid1(acceptNid);
+                usRefex.setNid1(acceptNid);
             }
             if (gbRefex == null) {
                 //forget US
@@ -349,14 +349,14 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                 }
                 doSynUpdate();
             } else {
-                gbRefex.setCnid1(acceptNid);
+                gbRefex.setNid1(acceptNid);
             }
 
         } else if (DialectHelper.isTextForDialect(text, Language.EN_UK.getLenient().getNid())) { //acceptable in US
             if (usRefex == null) {
                 doSynUpdate();
             } else {
-                usRefex.setCnid1(acceptNid);
+                usRefex.setNid1(acceptNid);
             }
             //forget GB
             List<? extends I_ExtendByRef> extensions = Terms.get().getAllExtensionsForComponent(desc.getNid(), true);
@@ -369,7 +369,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
             if (gbRefex == null) {
                 doSynUpdate();
             } else {
-                gbRefex.setCnid1(acceptNid);
+                gbRefex.setNid1(acceptNid);
             }
             //forget US
             List<? extends I_ExtendByRef> extensions = Terms.get().getAllExtensionsForComponent(desc.getNid(), true);

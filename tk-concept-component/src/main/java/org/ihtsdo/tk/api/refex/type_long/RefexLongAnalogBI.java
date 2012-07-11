@@ -27,6 +27,6 @@ import org.ihtsdo.tk.api.refex.RefexAnalogBI;
 public interface RefexLongAnalogBI<A extends RefexLongAnalogBI<A>> 
 		extends RefexAnalogBI<A>, RefexLongVersionBI<A> {
     
-     void setLong1(long l) throws PropertyVetoException;
+     void setLong1(long long1) throws PropertyVetoException;
 
 }

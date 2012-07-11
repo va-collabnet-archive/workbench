@@ -17,9 +17,9 @@ import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid.TkRefexUuidMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid.TkRefexUuidRevision;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 
 /**
@@ -132,12 +132,12 @@ public class EnumerationToEnumerationTransformer extends AbstractTransformer {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformMember(org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember, org.ihtsdo.tk.dto.concept.TkConcept)
+	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformMember(org.ihtsdo.tk.dto.concept.component.refset.TkRefexAbstractMember, org.ihtsdo.tk.dto.concept.TkConcept)
 	 */
 	@Override
-	public void transformMember(TkRefsetAbstractMember<?> member, TkConcept concept) {
-		if (member.getRefsetUuid().equals(refsetUuid)) {
-			TkRefsetCidMember cidMember = (TkRefsetCidMember) member;
+	public void transformMember(TkRefexAbstractMember<?> member, TkConcept concept) {
+		if (member.getRefexUuid().equals(refsetUuid)) {
+			TkRefexUuidMember cidMember = (TkRefexUuidMember) member;
 			transformExtension(cidMember);
 			conceptCount++;
 			if (conceptCount % 1000 == 0 || conceptCount == 1) {
@@ -149,13 +149,13 @@ public class EnumerationToEnumerationTransformer extends AbstractTransformer {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformAnnotation(org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember, org.ihtsdo.tk.dto.concept.component.TkComponent)
+	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformAnnotation(org.ihtsdo.tk.dto.concept.component.refset.TkRefexAbstractMember, org.ihtsdo.tk.dto.concept.component.TkComponent)
 	 */
 	@Override
-	public void transformAnnotation(TkRefsetAbstractMember<?> annotation,
+	public void transformAnnotation(TkRefexAbstractMember<?> annotation,
 			TkComponent<?> component) {
-		if (annotation.getRefsetUuid().equals(refsetUuid)) {
-			TkRefsetCidMember cidMember = (TkRefsetCidMember) annotation;
+		if (annotation.getRefexUuid().equals(refsetUuid)) {
+			TkRefexUuidMember cidMember = (TkRefexUuidMember) annotation;
 			transformExtension(cidMember);
 			conceptCount++;
 			if (conceptCount % 1000 == 0 || conceptCount == 1) {
@@ -198,16 +198,16 @@ public class EnumerationToEnumerationTransformer extends AbstractTransformer {
 	 * @param cidMember the cid member
 	 * @return the tk refset cid member
 	 */
-	private TkRefsetCidMember transformExtension(TkRefsetCidMember cidMember) {
+	private TkRefexUuidMember transformExtension(TkRefexUuidMember cidMember) {
 
-		if (replaceMap.get(cidMember.getC1Uuid()) != null) {
-			cidMember.setC1Uuid(replaceMap.get(cidMember.getC1Uuid()));
+		if (replaceMap.get(cidMember.getUuid1()) != null) {
+			cidMember.setUuid1(replaceMap.get(cidMember.getUuid1()));
 		}
 
 		if (cidMember.getRevisions() != null) {
-			for (TkRefsetCidRevision cidRevision : cidMember.getRevisions()) {
-				if (replaceMap.get(cidRevision.getC1Uuid()) != null) {
-					cidRevision.setC1Uuid(replaceMap.get(cidRevision.getC1Uuid()));
+			for (TkRefexUuidRevision cidRevision : cidMember.getRevisions()) {
+				if (replaceMap.get(cidRevision.getUuid1()) != null) {
+					cidRevision.setUuid1(replaceMap.get(cidRevision.getUuid1()));
 				}
 			}
 		}

@@ -36,10 +36,10 @@ import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_array_of_bytearray.RefexArrayOfBytearrayAnalogBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
-import org.ihtsdo.tk.dto.concept.component.refset.array.bytearray.TkRefsetArrayByteArrayRevision;
-import org.ihtsdo.tk.dto.concept.component.refset.array.bytearray.TkRefsetArrayOfBytearrayMember;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_arrayofbytearray.TkRefexArrayOfByteArrayRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_arrayofbytearray.TkRefexArrayOfBytearrayMember;
 import org.ihtsdo.tk.uuid.UuidT5Generator;
 
 /**
@@ -74,9 +74,9 @@ public class ArrayOfBytearrayRevision extends RefsetRevision<ArrayOfBytearrayRev
       this.arrayOfByteArray = primoridalMember.getArrayOfByteArray();
    }
 
-   public ArrayOfBytearrayRevision(TkRefsetArrayByteArrayRevision eVersion, ArrayOfBytearrayMember booleanMember) {
+   public ArrayOfBytearrayRevision(TkRefexArrayOfByteArrayRevision eVersion, ArrayOfBytearrayMember booleanMember) {
       super(eVersion, booleanMember);
-      this.arrayOfByteArray = eVersion.getArrayOfByteArray();
+      this.arrayOfByteArray = eVersion.getArrayOfByteArray1();
    }
 
    public ArrayOfBytearrayRevision(TupleInput in, ArrayOfBytearrayMember primoridalMember) {
@@ -203,15 +203,15 @@ public class ArrayOfBytearrayRevision extends RefsetRevision<ArrayOfBytearrayRev
 
 
    @Override
-   public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
+   public TkRefexAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
            Map<UUID, UUID> conversionMap)
            throws ContradictionException, IOException {
-      return new TkRefsetArrayOfBytearrayMember(this, exclusionSet, conversionMap, 0, true, vc);
+      return new TkRefexArrayOfBytearrayMember(this, exclusionSet, conversionMap, 0, true, vc);
    }
 
     @Override
-   protected TK_REFSET_TYPE getTkRefsetType() {
-      return TK_REFSET_TYPE.ARRAY_BYTEARRAY;
+   protected TK_REFEX_TYPE getTkRefsetType() {
+      return TK_REFEX_TYPE.ARRAY_BYTEARRAY;
    }
 
    @Override

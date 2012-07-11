@@ -331,7 +331,7 @@ public class VodbExecuteTallMan extends AbstractMojo {
                                     config.getEditCoordinate().getAuthorNid(),
                                     config.getEditCoordinate().getModuleNid(),
                                     copyToPath.getConceptNid());
-                            concept.getConceptAttributes().addVersion(newAttributePart);
+                            concept.getConAttrs().addVersion(newAttributePart);
                         }
                         termFactory.addUncommitted(concept);
                     }

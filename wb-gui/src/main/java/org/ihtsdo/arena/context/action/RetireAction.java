@@ -75,9 +75,9 @@ public class RetireAction extends AbstractAction {
         try {
             I_AmPart componentVersion;
             ViewCoordinate vc = config.getViewCoordinate();
-            Collection<? extends RefexChronicleBI> refexes = desc.getCurrentRefexes(vc);
+            Collection<? extends RefexChronicleBI> refexes = desc.getRefexesActive(vc);
             for (RefexChronicleBI refex : refexes) {
-                int refexNid = refex.getCollectionNid();
+                int refexNid = refex.getRefexNid();
                 componentVersion = (I_AmPart) refex;
                 for (PathBI ep : config.getEditingPathSet()) {
                     componentVersion.makeAnalog(

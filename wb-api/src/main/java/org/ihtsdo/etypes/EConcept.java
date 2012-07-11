@@ -39,7 +39,7 @@ import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.identifier.IDENTIFIER_PART_TYPES;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
 import org.ihtsdo.tk.dto.concept.component.media.TkMedia;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -58,7 +58,7 @@ import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_array_of_bytearray.RefexArrayOfBytearrayVersionBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
-import org.ihtsdo.tk.dto.concept.component.refset.array.bytearray.TkRefsetArrayOfBytearrayMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_arrayofbytearray.TkRefexArrayOfBytearrayMember;
 
 public class EConcept extends TkConcept implements I_AmChangeSetObject {
    public static final long serialVersionUID = 1;
@@ -81,7 +81,7 @@ public class EConcept extends TkConcept implements I_AmChangeSetObject {
     */
    public EConcept(I_GetConceptData c) throws IOException, TerminologyException {
       annotationStyleRefex = c.isAnnotationStyleRefex();
-      conceptAttributes = new EConceptAttributes(c.getConceptAttributes());
+      conceptAttributes = new EConceptAttributes(c.getConAttrs());
       primordialUuid = conceptAttributes.primordialUuid;
       EConcept.convertId(c.getIdentifier(), conceptAttributes);
       relationships = new ArrayList<TkRelationship>(c.getSourceRels().size());
@@ -90,9 +90,9 @@ public class EConcept extends TkConcept implements I_AmChangeSetObject {
          relationships.add(new ERelationship(rel));
       }
 
-      descriptions = new ArrayList<TkDescription>(c.getDescriptions().size());
+      descriptions = new ArrayList<TkDescription>(c.getDescs().size());
 
-      for (I_DescriptionVersioned desc : c.getDescriptions()) {
+      for (I_DescriptionVersioned desc : c.getDescs()) {
          descriptions.add(new EDescription(desc));
       }
 
@@ -114,10 +114,10 @@ public class EConcept extends TkConcept implements I_AmChangeSetObject {
          Collection<? extends I_ExtendByRef> members = getRefsetMembers(c.getNid());
 
          if (members != null) {
-            refsetMembers = new ArrayList<TkRefsetAbstractMember<?>>(members.size());
+            refsetMembers = new ArrayList<TkRefexAbstractMember<?>>(members.size());
 
             for (I_ExtendByRef m : members) {
-               TkRefsetAbstractMember<?> member = convertRefsetMember(m);
+               TkRefexAbstractMember<?> member = convertRefsetMember(m);
 
                if (member != null) {
                   refsetMembers.add(member);
@@ -430,7 +430,7 @@ public class EConcept extends TkConcept implements I_AmChangeSetObject {
       }
    }
 
-   public static TkRefsetAbstractMember<?> convertRefsetMember(I_ExtendByRef m)
+   public static TkRefexAbstractMember<?> convertRefsetMember(I_ExtendByRef m)
            throws TerminologyException, IOException {
       REFSET_TYPES type = REFSET_TYPES.nidToType(m.getTypeNid());
 
@@ -473,7 +473,7 @@ public class EConcept extends TkConcept implements I_AmChangeSetObject {
             return new ERefsetCidStrMember(m);
              
          case ARRAY_OF_BYTEARRAY:
-             return new TkRefsetArrayOfBytearrayMember((RefexVersionBI) 
+             return new TkRefexArrayOfBytearrayMember((RefexVersionBI) 
                      ((RefexChronicleBI) m).getPrimordialVersion());
 
          default :

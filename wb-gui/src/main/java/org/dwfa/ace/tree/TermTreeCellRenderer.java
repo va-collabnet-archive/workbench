@@ -322,7 +322,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer
            throws IOException, TerminologyException {
       List<I_ExtendByRef> extensions =
          (List<I_ExtendByRef>) Terms.get().getAllExtensionsForComponent(cb.getConceptNid());
-      Collection<? extends I_DescriptionVersioned> descriptions          = cb.getDescriptions();
+      Collection<? extends I_DescriptionVersioned> descriptions          = cb.getDescs();
       List<I_ExtendByRef>                          descriptionExtensions = new ArrayList<I_ExtendByRef>();
 
       for (I_DescriptionVersioned desc : descriptions) {

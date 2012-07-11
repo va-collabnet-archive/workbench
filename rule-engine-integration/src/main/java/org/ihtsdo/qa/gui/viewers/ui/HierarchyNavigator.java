@@ -386,7 +386,7 @@ public class HierarchyNavigator extends JPanel {
 
 			I_DescriptionTuple desc = obj.getDescTuple(config.getTreeDescPreferenceList(), config);
 			if (desc == null) {
-				desc = obj.getDescriptions().iterator().next().getFirstTuple();
+				desc = obj.getDescs().iterator().next().getFirstTuple();
 			}
 			JLabel dragLabel = TermLabelMaker.newLabel(desc, false, false).getLabel();
 			dragLabel.setBorder(BorderFactory.createLineBorder(Color.GRAY));

@@ -398,7 +398,7 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
 
             I_GetConceptData b = Terms.get().getConcept(id);
 
-            b.getDescriptions();
+            b.getDescs();
             concepts.put(id, b);
          }
 

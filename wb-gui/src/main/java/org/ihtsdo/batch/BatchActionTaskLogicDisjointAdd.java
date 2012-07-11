@@ -26,7 +26,7 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 
 /**
  * Sample BatchAction
@@ -52,9 +52,9 @@ public class BatchActionTaskLogicDisjointAdd extends BatchActionTask {
             throws Exception {
         int rcNid = c.getNid(); // referenced component nid
         // Check if member already exists
-        Collection<? extends RefexVersionBI<?>> currentRefexes = c.getCurrentRefexes(vc);
+        Collection<? extends RefexVersionBI<?>> currentRefexes = c.getRefexesActive(vc);
         for (RefexVersionBI rvbi : currentRefexes) {
-            if (rvbi.getCollectionNid() == collectionNid) {
+            if (rvbi.getRefexNid() == collectionNid) {
                 BatchActionEventReporter.add(new BatchActionEvent(c,
                         BatchActionTaskType.LOGIC_DISJOINT_SET_ADD,
                         BatchActionEventType.EVENT_NOOP,
@@ -64,7 +64,7 @@ public class BatchActionTaskLogicDisjointAdd extends BatchActionTask {
         }
 
         // If not already a member, then a member record is added.
-        RefexCAB refexSpec = new RefexCAB(TK_REFSET_TYPE.CID, rcNid, collectionNid);
+        RefexCAB refexSpec = new RefexCAB(TK_REFEX_TYPE.CID, rcNid, collectionNid);
 
         int normalMemberNid = ts.getConcept(
                 RefsetAuxiliary.Concept.NORMAL_MEMBER.getUids()).getConceptNid();

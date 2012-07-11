@@ -47,7 +47,7 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.vodb.bind.ThinVersionHelper;
-import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
+import org.ihtsdo.tk.api.contradiction.IdentifyAllContradictionStrategy;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
@@ -64,8 +64,8 @@ import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid_str.RefexCnidStrVersionBI;
-import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid_string.RefexNidStringVersionBI;
+import org.ihtsdo.tk.api.refex.type_string.RefexStringVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 /**
@@ -456,7 +456,7 @@ public class DiffBase {
     protected NidSetBI fsn_type;
     protected int classifier_type;
     protected Precedence precedence = Precedence.PATH;
-    protected ContradictionManagerBI contradiction_mgr = new IdentifyAllConflictStrategy();
+    protected ContradictionManagerBI contradiction_mgr = new IdentifyAllContradictionStrategy();
     protected int added_concept_change;
     protected int deleted_concept_change;
     protected int added_concept_change_refex;
@@ -862,12 +862,12 @@ public class DiffBase {
         I_TermFactory tf = Terms.get();
         I_GetConceptData c = tf.getConcept(SNOMED.Concept.ROOT.getUids());
         AceLog.getAppLog().info(c.getInitialText());
-        I_ConceptAttributeVersioned<?> cv = c.getConceptAttributes();
+        I_ConceptAttributeVersioned<?> cv = c.getConAttrs();
         for (I_ConceptAttributePart cvp : cv.getMutableParts()) {
             AceLog.getAppLog().info("Attr: " + cvp.getTime());
         }
         I_GetConceptData syn_type = tf.getConcept(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids());
-        for (I_DescriptionVersioned<?> cd : c.getDescriptions()) {
+        for (I_DescriptionVersioned<?> cd : c.getDescs()) {
             for (I_DescriptionPart cvp : cd.getMutableParts()) {
                 if (cvp.getTypeNid() == syn_type.getConceptNid() // && cvp.getText().contains("time")
                         ) {
@@ -1164,7 +1164,7 @@ public class DiffBase {
             System.out.println("P2: " + allowed_position2);
             System.out.println("A1: " + a1);
             System.out.println("A2: " + a2);
-            I_ConceptAttributeVersioned<?> attr = c.getConceptAttributes();
+            I_ConceptAttributeVersioned<?> attr = c.getConAttrs();
             for (I_ConceptAttributePart a : attr.getMutableParts()) {
                 System.out.println("A:  " + a);
             }
@@ -1495,8 +1495,8 @@ public class DiffBase {
         ViewCoordinate vc2 = new ViewCoordinate(vc);
         vc2.setPositionSet(allowed_position2);
         ConceptChronicleBI concept = Ts.get().getConcept(c.getConceptNid());
-        Collection<? extends RefexVersionBI<?>> members1 = concept.getCurrentRefsetMembers(vc1, v1_id);
-        Collection<? extends RefexVersionBI<?>> members2 = concept.getCurrentRefsetMembers(vc2, v2_id);
+        Collection<? extends RefexVersionBI<?>> members1 = concept.getRefsetMembersActive(vc1, v1_id);
+        Collection<? extends RefexVersionBI<?>> members2 = concept.getRefsetMembersActive(vc2, v2_id);
         for (RefexVersionBI member : members1) {
             if (member.getTime() > v1_id) {
                 members1.remove(member);
@@ -1530,22 +1530,22 @@ public class DiffBase {
                 }
                 for (RefexVersionBI member2 : members2) {
                     if (member1.getNid() == member2.getNid()) {
-                        if (RefexStrVersionBI.class.isAssignableFrom(member1.getClass())) {
-                            RefexStrVersionBI rsv1 = (RefexStrVersionBI) member1;
-                            RefexStrVersionBI rsv2 = (RefexStrVersionBI) member2;
-                            if (!rsv1.getStr1().equals(rsv2)) {
+                        if (RefexStringVersionBI.class.isAssignableFrom(member1.getClass())) {
+                            RefexStringVersionBI rsv1 = (RefexStringVersionBI) member1;
+                            RefexStringVersionBI rsv2 = (RefexStringVersionBI) member2;
+                            if (!rsv1.getString1().equals(rsv2)) {
                                 String m1 = member1.toUserString();
                                 String m2 = member2.toUserString();
                                 deletedConceptFromRefex(c, m1, m2);
                             }
-                        } else if (RefexCnidStrVersionBI.class.isAssignableFrom(member1.getClass())) {
-                            RefexCnidStrVersionBI rcsv1 = (RefexCnidStrVersionBI) member1;
-                            RefexCnidStrVersionBI rcsv2 = (RefexCnidStrVersionBI) member2;
-                            if (!rcsv1.getStr1().equals(rcsv2)) {
+                        } else if (RefexNidStringVersionBI.class.isAssignableFrom(member1.getClass())) {
+                            RefexNidStringVersionBI rcsv1 = (RefexNidStringVersionBI) member1;
+                            RefexNidStringVersionBI rcsv2 = (RefexNidStringVersionBI) member2;
+                            if (!rcsv1.getString1().equals(rcsv2)) {
                                 String m1 = member1.toUserString();
                                 String m2 = member2.toUserString();
                                 deletedConceptFromRefex(c, m1, m2);
-                            } else if (rcsv1.getCnid1() != rcsv2.getCnid1()) {
+                            } else if (rcsv1.getNid1() != rcsv2.getNid1()) {
                                 String m1 = member1.toUserString();
                                 String m2 = member2.toUserString();
                                 deletedConceptFromRefex(c, m1, m2);

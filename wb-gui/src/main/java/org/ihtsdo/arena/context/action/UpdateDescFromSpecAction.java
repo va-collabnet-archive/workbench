@@ -28,7 +28,7 @@ import org.ihtsdo.tk.drools.facts.DescSpecFact;
 import org.ihtsdo.tk.drools.facts.SpecFact;
 import org.ihtsdo.tk.drools.facts.RelSpecFact;
 import org.ihtsdo.tk.spec.DescriptionSpec;
-import org.ihtsdo.tk.spec.RelSpec;
+import org.ihtsdo.tk.spec.RelationshipSpec;
 
 public class UpdateDescFromSpecAction extends AbstractAction {
 
@@ -61,35 +61,35 @@ public class UpdateDescFromSpecAction extends AbstractAction {
     private void updateDesc() throws TerminologyException, IOException, ContradictionException {
         I_GetConceptData concept = Terms.get().getConceptForNid(component.getNid());
 
-        Collection descriptions = component.getDescsActive();
+        Collection descriptions = component.getDescriptionsActive();
 
         for (Object descObject : descriptions) {
             DescriptionVersionBI desc = (DescriptionVersionBI) descObject;
             DescriptionSpec descSpec = ((DescSpecFact) spec).getDescSpec();
 
-            if (desc.getTypeNid() == descSpec.getDescTypeSpec().getLenient().getNid()
-                    && !(desc.getText().equals(descSpec.getDescText()))) { //if desc type is equal and text has changed, retire and make new
+            if (desc.getTypeNid() == descSpec.getDescriptionTypeSpec().getLenient().getNid()
+                    && !(desc.getText().equals(descSpec.getDescriptionText()))) { //if desc type is equal and text has changed, retire and make new
 
                 //description
                 if (DescSpecFact.class.isAssignableFrom(spec.getClass())) {
 
                     Terms.get().newDescription(UUID.randomUUID(), Terms.get().getConcept(concept.getNid()),
                             descSpec.getLangText(),
-                            descSpec.getDescText(),
-                            Terms.get().getConcept(descSpec.getDescTypeSpec().getLenient().getNid()),
+                            descSpec.getDescriptionText(),
+                            Terms.get().getConcept(descSpec.getDescriptionTypeSpec().getLenient().getNid()),
                             config, SnomedMetadataRfx.getSTATUS_CURRENT_NID());
                     Terms.get().addUncommitted(Terms.get().getConcept(concept.getNid()));
                 }
 
                 //concept
                 if (RelSpecFact.class.isAssignableFrom(spec.getClass())) {
-                    RelSpec relSpec = ((RelSpecFact) spec).getRelSpec();
+                    RelationshipSpec relSpec = ((RelSpecFact) spec).getRelSpec();
                     Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
                     I_GetConceptData originConcept = Terms.get().getConcept(concept.getNid());
                     I_RelVersioned newRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(),
                             originConcept,
-                            relSpec.getRelTypeSpec().getLenient().getNid(),
-                            relSpec.getDestinationSpec().getLenient().getNid(),
+                            relSpec.getRelationshipTypeSpec().getLenient().getNid(),
+                            relSpec.getTargetSpec().getLenient().getNid(),
                             SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID(),
                             SnomedMetadataRfx.getREL_OPTIONAL_REFINABILITY_NID(),
                             0,
@@ -133,7 +133,7 @@ public class UpdateDescFromSpecAction extends AbstractAction {
                         config.getEditCoordinate().getModuleNid(), 
                         config.getEditingPathSet().iterator().next().getConceptNid());
                 try {
-                    newPart.setText(descSpec.getDescText());
+                    newPart.setText(descSpec.getDescriptionText());
                 } catch (PropertyVetoException ex) {
                     throw new IOException(ex);
                 }

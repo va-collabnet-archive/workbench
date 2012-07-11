@@ -34,7 +34,7 @@ public class WorkflowLuceneSearchResult {
 		modeler = bean.getModeler().toString();
 		time = bean.getWorkflowTime();
 		concept = bean.getConcept().toString();
-		fsn = bean.getFSN();
+		fsn = bean.getFullySpecifiedName();
 	}
 	
 	public WorkflowLuceneSearchResult(String[] row, ViewCoordinate vc) {

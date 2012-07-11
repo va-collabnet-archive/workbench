@@ -108,6 +108,7 @@ import org.ihtsdo.taxonomy.TaxonomyTree;
 import org.ihtsdo.taxonomy.model.NodeFactory;
 import org.ihtsdo.thread.NamedThreadFactory;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
@@ -1035,7 +1036,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
          @Override
          public void actionPerformed(ActionEvent actionevent) {
             JComboBox             cb                         = (JComboBox) actionevent.getSource();
-            I_ManageContradiction conflictResolutionStrategy = (I_ManageContradiction) cb.getSelectedItem();
+            ContradictionManagerBI conflictResolutionStrategy = (ContradictionManagerBI) cb.getSelectedItem();
 
             aceFrameConfig.setConflictResolutionStrategy(conflictResolutionStrategy);
             descriptionPanel.setText(aceFrameConfig.getConflictResolutionStrategy().getDescription());

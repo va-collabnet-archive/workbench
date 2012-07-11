@@ -158,11 +158,11 @@ public class ConceptAttributesVersionTest {
             Concept c = Concept.get(testConcept);
             
             IntSet allowedStatus = null;
-            List<Version> tuples = c.getConceptAttributes().getTuples(allowedStatus, new PositionSetReadOnly(Terms.get().newPosition(p1_1, Long.MAX_VALUE)), Precedence.PATH, config.getConflictResolutionStrategy());
+            List<Version> tuples = c.getConAttrs().getTuples(allowedStatus, new PositionSetReadOnly(Terms.get().newPosition(p1_1, Long.MAX_VALUE)), Precedence.PATH, config.getConflictResolutionStrategy());
             assertEquals(1, tuples.size());
             assertTrue(tuples.get(0).getTime() == t2);
             
-            tuples = c.getConceptAttributes().getTuples(allowedStatus, new PositionSetReadOnly(Terms.get().newPosition(p1_1, Long.MAX_VALUE)), Precedence.TIME, config.getConflictResolutionStrategy());
+            tuples = c.getConAttrs().getTuples(allowedStatus, new PositionSetReadOnly(Terms.get().newPosition(p1_1, Long.MAX_VALUE)), Precedence.TIME, config.getConflictResolutionStrategy());
             assertEquals(1, tuples.size());
             assertTrue(tuples.get(0).getTime() == t2);
             

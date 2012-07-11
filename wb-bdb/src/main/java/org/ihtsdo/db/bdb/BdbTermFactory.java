@@ -73,8 +73,8 @@ import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
-import org.dwfa.ace.api.cs.ChangeSetPolicy;
-import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
+import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
+import org.ihtsdo.tk.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
@@ -160,7 +160,7 @@ import org.ihtsdo.lucene.WfHxCheckAndProcessLuceneMatch;
 import org.ihtsdo.lucene.WfHxIndexGenerator;
 import org.ihtsdo.lucene.WfHxLuceneManager;
 import org.ihtsdo.tk.api.ComponentBI;
-import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.ComponentChronicleBI;
 import org.ihtsdo.tk.api.KindOfCacheBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.NidBitSetItrBI;
@@ -860,7 +860,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             }
         }
 
-        c.getDescriptions().add(d);
+        c.getDescs().add(d);
         c.modified();
 
         return d;
@@ -1205,7 +1205,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             return Bdb.getUuidsToNidMap().getUuidsForNid(nid).get(0);
         }
 
-        ComponentChroncileBI<?> component = c.getComponent(nid);
+        ComponentChronicleBI<?> component = c.getComponent(nid);
 
         if (component == null) {
             return null;
@@ -1649,7 +1649,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             } else {
                 Concept concept = (Concept) component;
 
-                referencedComponent = concept.getConceptAttributes();
+                referencedComponent = concept.getConAttrs();
             }
 
             referencedComponent.addAnnotation(member);
@@ -1719,7 +1719,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             component = ((Concept) component).getConceptAttributes();
         }
 
-        ComponentChroncileBI<?> cc = (ComponentChroncileBI<?>) component;
+        ComponentChronicleBI<?> cc = (ComponentChronicleBI<?>) component;
 
         if ((cc != null) && (cc.getAnnotations() != null)) {
             for (RefexChronicleBI annotation : cc.getAnnotations()) {
@@ -1898,7 +1898,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         while (iterator.next()) {
             Concept concept = Bdb.getConcept(iterator.nid());
 
-            for (Description description : concept.getDescriptions()) {
+            for (Description description : concept.getDescs()) {
                 descriptionIdSet.setMember(description.getDescId());
             }
         }
@@ -2517,7 +2517,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         @Override
         public void processConceptData(Concept concept) throws Exception {
             if (tracker.continueWork()) {
-                Collection<? extends I_DescriptionVersioned> descriptions = concept.getDescriptions();
+                Collection<? extends I_DescriptionVersioned> descriptions = concept.getDescs();
                 CountDownLatch descriptionLatch =
                         new CountDownLatch(descriptions.size());
 

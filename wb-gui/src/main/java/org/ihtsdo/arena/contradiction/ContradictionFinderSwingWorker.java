@@ -28,7 +28,7 @@ import org.ihtsdo.contradiction.ContradictionConceptProcessor;
 import org.ihtsdo.helper.bdb.MultiEditorContradictionCase;
 import org.ihtsdo.helper.bdb.MultiEditorContradictionDetector;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.ComponentChronicleBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.NidBitSetItrBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
@@ -36,7 +36,7 @@ import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 /**
@@ -267,7 +267,7 @@ public class ContradictionFinderSwingWorker
                     Ts.get().getTerminologyBuilder(frame.getActiveFrameConfig().getEditCoordinate(), viewCoord);
             
         Collection<? extends RefexVersionBI<?>> currentMembers =
-                    conflictRefset.getCurrentRefsetMembers(viewCoord);
+                    conflictRefset.getRefsetMembersActive(viewCoord);
         NidBitSetBI currentMemberNidSet = Ts.get().getEmptyNidSet();
         for (RefexVersionBI member : currentMembers) {
                 currentMemberNidSet.setMember(member.getReferencedComponentNid());
@@ -287,14 +287,14 @@ public class ContradictionFinderSwingWorker
         NidBitSetItrBI currentIterator = contradictionCaseNidSet.iterator();
         NidBitSetItrBI retiredIterator = currentMemberNidSet.iterator();
         while(currentIterator.next()){
-            RefexCAB memberBp = new RefexCAB(TK_REFSET_TYPE.MEMBER,
+            RefexCAB memberBp = new RefexCAB(TK_REFEX_TYPE.MEMBER,
                     currentIterator.nid(),
                     conflictRefsetNid);
             builder.constructIfNotCurrent(memberBp);
         }
         while(retiredIterator.next()){
-            ComponentChroncileBI<?> component = Ts.get().getComponent(retiredIterator.nid());
-            RefexVersionBI member = conflictRefset.getCurrentRefsetMemberForComponent(
+            ComponentChronicleBI<?> component = Ts.get().getComponent(retiredIterator.nid());
+            RefexVersionBI member = conflictRefset.getRefsetMemberActiveForComponent(
                     viewCoord, component.getConceptNid());
             
             if(member != null){

@@ -178,7 +178,7 @@ public class BatchActionTaskParentReplaceUI extends javax.swing.JPanel implement
         I_AmTermComponent termParentTo = ((ValueDndNidUI) jPanelDndParentReplace).getTermComponent();
 
         if (fromParentBI != null && termParentTo != null && termParentTo.getUUIDs().size() > 0) {
-            int nidOldParent = fromParentBI.getDestinationNid();
+            int nidOldParent = fromParentBI.getTargetNid();
             UUID uuidNewParent = termParentTo.getUUIDs().get(0);
             int nidLinkage = fromParentBI.getTypeNid();
             UUID uuidLinkage = Ts.get().getConcept(nidLinkage).getPrimUuid();

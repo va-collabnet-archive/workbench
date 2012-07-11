@@ -2,7 +2,7 @@ package org.ihtsdo.cs.econcept.workflow;
 
 import java.util.HashSet;
 
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 // Only import Workflow Refsets
@@ -14,10 +14,10 @@ public class WfRefsetFilter extends AbstractWfChangeSetFilter {
 	}
 	
 	@Override
-	public boolean scrubMembers(HashSet<TkRefsetAbstractMember<?>> wfMembersToCommit) {
-		wfMembersToProcess = new HashSet<TkRefsetAbstractMember<?>>();
+	public boolean scrubMembers(HashSet<TkRefexAbstractMember<?>> wfMembersToCommit) {
+		wfMembersToProcess = new HashSet<TkRefexAbstractMember<?>>();
 		
-		for (TkRefsetAbstractMember<?> member : wfMembersToCommit) {
+		for (TkRefexAbstractMember<?> member : wfMembersToCommit) {
 			if (WorkflowHelper.getRefsetUidList().contains(member.refsetUuid)) {
 				wfMembersToProcess.add(member);
 			} 
@@ -27,7 +27,7 @@ public class WfRefsetFilter extends AbstractWfChangeSetFilter {
 	}
 
 	@Override
-	public HashSet<TkRefsetAbstractMember<?>> getApprovedMembers() {
+	public HashSet<TkRefexAbstractMember<?>> getApprovedMembers() {
 		return wfMembersToProcess;
 	}
 }

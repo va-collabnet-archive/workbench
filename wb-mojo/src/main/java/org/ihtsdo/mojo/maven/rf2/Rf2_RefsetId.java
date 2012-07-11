@@ -111,7 +111,7 @@ public class Rf2_RefsetId {
             throws MojoFailureException {
 
         try {
-            String uuidCurrentStr = (SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuidStrs())[0];
+            String uuidCurrentStr = (SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuidStrings())[0];
 
             String infix = subsetIds.get(0).refsetFsName.replace(" ", "");
             infix = infix.replace("-", "");
@@ -175,7 +175,7 @@ public class Rf2_RefsetId {
                     descriptions.append("\t");
                     descriptions.append("1"); // primitive
                     descriptions.append("\t");
-                    descriptions.append((SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getUuidStrs())[0]); // description type uuid
+                    descriptions.append((SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getUuidStrings())[0]); // description type uuid
                     descriptions.append("\t");
                     descriptions.append("en"); // language code
                     descriptions.append("\t");
@@ -198,7 +198,7 @@ public class Rf2_RefsetId {
                     descriptions.append("\t");
                     descriptions.append("1"); // primitive
                     descriptions.append("\t");
-                    descriptions.append((SnomedMetadataRf2.PREFERRED_RF2.getUuidStrs())[0]); // description type uuid
+                    descriptions.append((SnomedMetadataRf2.PREFERRED_RF2.getUuidStrings())[0]); // description type uuid
                     descriptions.append("\t");
                     descriptions.append("en"); // language code
                     descriptions.append("\t");
@@ -230,9 +230,9 @@ public class Rf2_RefsetId {
                 relationships.append("\t");
                 relationships.append(sid.refsetParentUuid); // destination concept uuid
                 relationships.append("\t");
-                relationships.append((SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getUuidStrs())[0]); // characteristic type uuid
+                relationships.append((SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getUuidStrings())[0]); // characteristic type uuid
                 relationships.append("\t");
-                relationships.append((SnomedMetadataRf2.NOT_REFINABLE_RF2.getUuidStrs())[0]); // refinability uuid
+                relationships.append((SnomedMetadataRf2.NOT_REFINABLE_RF2.getUuidStrings())[0]); // refinability uuid
                 relationships.append("\t");
                 relationships.append("0"); // relationship group
                 relationships.append("\t");

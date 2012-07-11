@@ -173,7 +173,7 @@ public class VodbCreateNewPath extends AbstractMojo {
                  * we check for descriptions and create the path concept
                  * anyway... as the existing concept is not complete/usable
                  */
-                if (pathConcept.getDescriptions() == null || pathConcept.getDescriptions().isEmpty()) {
+                if (pathConcept.getDescs() == null || pathConcept.getDescs().isEmpty()) {
                 	getLog().warn("VodbCreateNewPath tf has pathUUID but no desc");
                     pathConcept = createNewPathConcept(tf, activeConfig, pathUUID);
                 }
@@ -197,7 +197,7 @@ public class VodbCreateNewPath extends AbstractMojo {
 
         I_GetConceptData pathConcept = tf.newConcept(pathUUID, false, tf.getActiveAceFrameConfig());
 
-        I_ConceptAttributeVersioned cav = pathConcept.getConceptAttributes();
+        I_ConceptAttributeVersioned cav = pathConcept.getConAttrs();
         newTuples.addAll(cav.getTuples());
 
         UUID fsDescUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, pathUUID.toString()
@@ -236,7 +236,7 @@ public class VodbCreateNewPath extends AbstractMojo {
         
         getLog().info("VodbCreateNewPath createNewPathConcept new Concept id = "+pathConcept.getConceptNid());
         //getLog().error("VodbCreateNewPath createNewPathConcept new Concept id = "+pathConcept.getConceptNid());
-        for (I_DescriptionVersioned<?> desc: pathConcept.getDescriptions()) {
+        for (I_DescriptionVersioned<?> desc: pathConcept.getDescs()) {
         	getLog().info("VodbCreateNewPath createNewPathConcept getDescriptions descID = "+desc.getDescId());
         	for (I_DescriptionPart desl : desc.getMutableParts()) {
         		getLog().info("VodbCreateNewPath createNewPathConcept dscParth text = "+desl.getText());

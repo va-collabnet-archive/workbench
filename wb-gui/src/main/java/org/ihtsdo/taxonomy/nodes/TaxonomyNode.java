@@ -52,7 +52,7 @@ public abstract class TaxonomyNode implements ConceptContainerBI, Comparable<Tax
    }
 
    public TaxonomyNode(TaxonomyNode another) {
-      this.nodeId         = TaxonomyModel.getNodeId(another.getCnid(), another.getParentNid());
+      this.nodeId         = TaxonomyModel.getNodeId(another.getConceptNid(), another.getParentNid());
       this.nodesToCompare = another.nodesToCompare;
       assert nodeId != another.parentNodeId;
       this.parentNodeId = another.parentNodeId;
@@ -106,7 +106,7 @@ public abstract class TaxonomyNode implements ConceptContainerBI, Comparable<Tax
    public abstract Collection<Long> getChildren();
 
    @Override
-   public int getCnid() {
+   public int getConceptNid() {
       return TaxonomyModel.getCnid(nodeId);
    }
 

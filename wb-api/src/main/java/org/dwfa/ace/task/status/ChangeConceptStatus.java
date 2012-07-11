@@ -120,7 +120,7 @@ public class ChangeConceptStatus extends AbstractTask {
                 }
             }
             for (I_ConceptAttributePart p : partsToAdd) {
-                concept.getConceptAttributes().addVersion(p);
+                concept.getConAttrs().addVersion(p);
             }
             Terms.get().addUncommittedNoChecks(concept);
             return Condition.CONTINUE;

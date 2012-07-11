@@ -14,7 +14,7 @@ public  class WorkflowConceptVersion {
 	@Override
 	public String toString() {
 		try {
-			return concept.getPreferredDescription().getText();
+			return concept.getDescriptionPreferred().getText();
 		} catch (Exception e) {
 			return "Not Identified";
 		}

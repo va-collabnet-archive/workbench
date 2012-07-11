@@ -239,7 +239,7 @@ public class UpdateRefsetSpecStatusTask extends AbstractTask {
             throws IOException, TerminologyException {
         I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
         for (I_GetConceptData currentConcept : concepts) {
-            Collection<? extends I_DescriptionVersioned> descs = currentConcept.getDescriptions();
+            Collection<? extends I_DescriptionVersioned> descs = currentConcept.getDescs();
             for (I_DescriptionVersioned descVersioned : descs) {
                 for (PathBI editPath : config.getPromotionPathSet()) {
                     I_DescriptionPart templatePart = descVersioned.getLastTuple().getMutablePart();
@@ -283,7 +283,7 @@ public class UpdateRefsetSpecStatusTask extends AbstractTask {
             throws IOException, TerminologyException {
        I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
         for (I_GetConceptData currentConcept : concepts) {
-            I_ConceptAttributeVersioned v = currentConcept.getConceptAttributes();
+            I_ConceptAttributeVersioned v = currentConcept.getConAttrs();
             List<? extends I_ConceptAttributeTuple> tuples = v.getTuples();
             for (PathBI editPath : config.getPromotionPathSet()) {
                 tuples.get(tuples.size() - 1).makeAnalog(

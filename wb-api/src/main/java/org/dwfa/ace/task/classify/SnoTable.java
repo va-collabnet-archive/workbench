@@ -1296,7 +1296,7 @@ public class SnoTable {
 
    private boolean isCDefined(I_GetConceptData cBean, List<PositionBI> posList) {
       try {
-         I_ConceptAttributeVersioned            cv     = cBean.getConceptAttributes();
+         I_ConceptAttributeVersioned            cv     = cBean.getConAttrs();
          List<? extends I_ConceptAttributePart> cvList = cv.getMutableParts();
          I_ConceptAttributePart                 cp1    = null;
 

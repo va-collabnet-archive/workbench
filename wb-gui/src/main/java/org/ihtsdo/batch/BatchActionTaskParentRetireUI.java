@@ -145,7 +145,7 @@ public class BatchActionTaskParentRetireUI extends javax.swing.JPanel implements
 
         if (fromParentBI != null) {
             int nidLinkage = fromParentBI.getTypeNid();
-            int nidParent = fromParentBI.getDestinationNid();
+            int nidParent = fromParentBI.getTargetNid();
 
             ((BatchActionTaskParentRetire) task).setSelectedRoleTypeNid(nidLinkage);
             ((BatchActionTaskParentRetire) task).setSelectedDestNid(nidParent);

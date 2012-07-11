@@ -53,7 +53,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 
 import org.ihtsdo.tk.api.WizardBI;
-import org.ihtsdo.tk.example.binding.Snomed;
+import org.ihtsdo.tk.binding.snomed.Snomed;
 
 //import org.ihtsdo.arena;
 @BeanList(specs = {

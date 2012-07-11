@@ -11,7 +11,7 @@ import javax.swing.Timer;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
+import org.ihtsdo.tk.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.util.id.Type5UuidFactory;
@@ -185,7 +185,7 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
 
             Set<UUID> authorTimeHashSet = new HashSet<UUID>(); // :WAS:byte[]
             if (writeCommitRecord && commitRecordSapNid != 0) {
-                for (Integer sap : c.getAllSapNids()) {
+                for (Integer sap : c.getAllStampNids()) {
                     if (sap > Bdb.getSapDb().getReadOnlyMax() && Bdb.getSapDb().getTime(sap) != Long.MAX_VALUE) {
                         Concept authorConcept = Concept.get(Bdb.getSapDb().getAuthorNid(sap));
                         if (authorConcept.getNid() != ReferenceConcepts.SNOROCKET.getNid()) {
@@ -223,7 +223,7 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
             if (writeAdjudicationRecord && adjudicationRecordSapNid != 0) {
                 boolean hasRecord = false;
                 for(RefexChronicleBI refex : c.getRefexMembers(adjudicationRecRefsetNid)){
-                    Set<Integer> allSapNids = refex.getAllSapNids();
+                    Set<Integer> allSapNids = refex.getAllStampNids();
                     for(int sapNid : allSapNids){
                         if(sapNid == adjudicationRecordSapNid){
                             hasRecord = true;
@@ -232,7 +232,7 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
                     }
                 }
                 if(!hasRecord){
-                    for (Integer sap : c.getAllSapNids()) {
+                    for (Integer sap : c.getAllStampNids()) {
                         if (sap > Bdb.getSapDb().getReadOnlyMax()) {
                             Concept authorConcept = Concept.get(Bdb.getSapDb().getAuthorNid(sap));
                             if (authorConcept.getNid() != ReferenceConcepts.SNOROCKET.getNid()) {

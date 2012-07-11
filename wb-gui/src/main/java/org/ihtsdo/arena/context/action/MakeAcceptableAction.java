@@ -19,8 +19,8 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidAnalogBI;
-import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid.RefexNidAnalogBI;
+import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.DescFact;
 
@@ -47,7 +47,7 @@ public class MakeAcceptableAction extends AbstractAction {
                     config.getViewCoordinate());
             ViewCoordinate vc = config.getViewCoordinate();
             Collection<? extends RefexChronicleBI> refexes =
-                    desc.getCurrentRefexes(vc);
+                    desc.getRefexesActive(vc);
 
             if (dialect.equals(LANG_CODE.EN_US)) {
                 int evalRefsetNid = SnomedMetadataRfx.getUS_DIALECT_REFEX_NID();
@@ -56,10 +56,10 @@ public class MakeAcceptableAction extends AbstractAction {
                 
                 if (refexes != null) {
                     for (RefexChronicleBI refex : refexes) {
-                        if (refex.getCollectionNid() == evalRefsetNid) {
+                        if (refex.getRefexNid() == evalRefsetNid) {
                             if (refex.isUncommitted()) {
-                                RefexCnidAnalogBI refexAnalog = (RefexCnidAnalogBI) refex;
-                                refexAnalog.setCnid1(acceptabilityNid);
+                                RefexNidAnalogBI refexAnalog = (RefexNidAnalogBI) refex;
+                                refexAnalog.setNid1(acceptabilityNid);
                                 I_GetConceptData concept = Terms.get().getConceptForNid(refex.getNid());
                                 Terms.get().addUncommitted(concept);
                             } else {
@@ -76,11 +76,11 @@ public class MakeAcceptableAction extends AbstractAction {
                                 }
                                 RefexVersionBI<?> newRefex = (RefexVersionBI<?>) analog;
                                 //test member type
-                                if (RefexCnidVersionBI.class.isAssignableFrom(newRefex.getClass())) {
-                                    RefexCnidVersionBI rcv = (RefexCnidVersionBI) newRefex;
-                                    RefexCnidAnalogBI rca = (RefexCnidAnalogBI) rcv;
+                                if (RefexNidVersionBI.class.isAssignableFrom(newRefex.getClass())) {
+                                    RefexNidVersionBI rcv = (RefexNidVersionBI) newRefex;
+                                    RefexNidAnalogBI rca = (RefexNidAnalogBI) rcv;
 
-                                    rca.setCnid1(acceptabilityNid);
+                                    rca.setNid1(acceptabilityNid);
 
                                     I_GetConceptData concept = Terms.get().getConceptForNid(newRefex.getNid());
                                     Terms.get().addUncommitted(concept);
@@ -98,10 +98,10 @@ public class MakeAcceptableAction extends AbstractAction {
                 
                 if (refexes != null) {
                     for (RefexChronicleBI refex : refexes) {
-                        if (refex.getCollectionNid() == evalRefsetNid) {
+                        if (refex.getRefexNid() == evalRefsetNid) {
                             if (refex.isUncommitted()) {
-                                RefexCnidAnalogBI refexAnalog = (RefexCnidAnalogBI) refex;
-                                refexAnalog.setCnid1(acceptabilityNid);
+                                RefexNidAnalogBI refexAnalog = (RefexNidAnalogBI) refex;
+                                refexAnalog.setNid1(acceptabilityNid);
                                 I_GetConceptData concept = Terms.get().getConceptForNid(refex.getNid());
                                 Terms.get().addUncommitted(concept);
                             } else {
@@ -118,11 +118,11 @@ public class MakeAcceptableAction extends AbstractAction {
                                 }
                                 RefexVersionBI<?> newRefex = (RefexVersionBI<?>) analog;
                                 //test member type
-                                if (RefexCnidVersionBI.class.isAssignableFrom(newRefex.getClass())) {
-                                    RefexCnidVersionBI rcv = (RefexCnidVersionBI) newRefex;
-                                    RefexCnidAnalogBI rca = (RefexCnidAnalogBI) rcv;
+                                if (RefexNidVersionBI.class.isAssignableFrom(newRefex.getClass())) {
+                                    RefexNidVersionBI rcv = (RefexNidVersionBI) newRefex;
+                                    RefexNidAnalogBI rca = (RefexNidAnalogBI) rcv;
 
-                                    rca.setCnid1(acceptabilityNid);
+                                    rca.setNid1(acceptabilityNid);
 
                                     I_GetConceptData concept = Terms.get().getConceptForNid(newRefex.getNid());
                                     Terms.get().addUncommitted(concept);

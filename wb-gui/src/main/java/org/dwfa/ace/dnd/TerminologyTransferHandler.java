@@ -351,7 +351,7 @@ public class TerminologyTransferHandler extends TransferHandler {
 				                //return new ConceptTransferable(Terms.get().getConcept(conField.getTuple().getConceptNid()));
 				            	
 				            	I_GetConceptData con = Terms.get().getConcept(conField.getTuple().getConceptNid());
-				            	Collection<? extends I_DescriptionVersioned> descs = con.getDescriptions();
+				            	Collection<? extends I_DescriptionVersioned> descs = con.getDescs();
 				            	for (I_DescriptionVersioned version : descs)
 				            	{
 				            		if (version.getTypeNid() == fsnPrimoridalNid)

@@ -199,7 +199,7 @@ public abstract class IdentifierVersion
    }
 
     @Override
-   public int getSapNid() {
+   public int getStampNid() {
       return statusAtPositionNid;
    }
 

@@ -17,7 +17,7 @@ package org.ihtsdo.helper.bdb;
 
 //~--- non-JDK imports --------------------------------------------------------
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.ComponentChronicleBI;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
@@ -64,7 +64,7 @@ public class UuidDupFinder implements ProcessUnfetchedConceptDataBI {
     }
 
     //~--- methods -------------------------------------------------------------
-    private void addToUuidList(ComponentChroncileBI component) throws IOException {
+    private void addToUuidList(ComponentChronicleBI component) throws IOException {
         if (component != null) {
             UUID primUuid = component.getPrimUuid();
 
@@ -74,7 +74,7 @@ public class UuidDupFinder implements ProcessUnfetchedConceptDataBI {
                 allPrimUuids.add(primUuid);
             }
 
-            for (ComponentChroncileBI annotation : component.getAnnotations()) {
+            for (ComponentChronicleBI annotation : component.getAnnotations()) {
                 addToUuidList(annotation);
             }
         }
@@ -89,15 +89,15 @@ public class UuidDupFinder implements ProcessUnfetchedConceptDataBI {
 
         // add prim uuids to list
         // concept attributtes
-        addToUuidList(concept.getConAttrs());
+        addToUuidList(concept.getConceptAttributes());
 
         // descriptions
-        for (DescriptionChronicleBI desc : concept.getDescs()) {
+        for (DescriptionChronicleBI desc : concept.getDescriptions()) {
             addToUuidList(desc);
         }
 
         // relationships
-        for (RelationshipChronicleBI rel : concept.getRelsOutgoing()) {
+        for (RelationshipChronicleBI rel : concept.getRelationshipsSource()) {
             addToUuidList(rel);
         }
 

@@ -9,8 +9,8 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.tapi.TerminologyException;
 
-import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid.TkRefexUuidMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid.TkRefexUuidRevision;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -19,7 +19,7 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 
-public class ERefsetCidMember extends TkRefsetCidMember {
+public class ERefsetCidMember extends TkRefexUuidMember {
    public static final long serialVersionUID = 1;
 
    //~--- constructors --------------------------------------------------------
@@ -42,7 +42,7 @@ public class ERefsetCidMember extends TkRefsetCidMember {
 
       I_ExtendByRefPartCid part = (I_ExtendByRefPartCid) m.getMutableParts().get(0);
 
-      c1Uuid     = Terms.get().nidToUuid(part.getC1id());
+      uuid1     = Terms.get().nidToUuid(part.getC1id());
       pathUuid   = Terms.get().nidToUuid(part.getPathNid());
       statusUuid = Terms.get().nidToUuid(part.getStatusNid());
       authorUuid    = Terms.get().nidToUuid(part.getAuthorNid());
@@ -50,7 +50,7 @@ public class ERefsetCidMember extends TkRefsetCidMember {
       time       = part.getTime();
 
       if (partCount > 1) {
-         revisions = new ArrayList<TkRefsetCidRevision>(partCount - 1);
+         revisions = new ArrayList<TkRefexUuidRevision>(partCount - 1);
 
          for (int i = 1; i < partCount; i++) {
             revisions.add(new ERefsetCidRevision((I_ExtendByRefPartCid) m.getMutableParts().get(i)));
@@ -70,7 +70,7 @@ public class ERefsetCidMember extends TkRefsetCidMember {
 
       I_ExtendByRefPartCid part = (I_ExtendByRefPartCid) m.getMutablePart();
 
-      c1Uuid     = Terms.get().nidToUuid(part.getC1id());
+      uuid1     = Terms.get().nidToUuid(part.getC1id());
       pathUuid   = Terms.get().nidToUuid(part.getPathNid());
       statusUuid = Terms.get().nidToUuid(part.getStatusNid());
       authorUuid = Terms.get().nidToUuid(part.getAuthorNid());

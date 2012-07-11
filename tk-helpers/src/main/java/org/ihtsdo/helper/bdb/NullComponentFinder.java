@@ -25,12 +25,12 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.ComponentChronicleBI;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
-import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
-import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeChronicleBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
@@ -66,11 +66,11 @@ public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
     }
 
     //~--- methods -------------------------------------------------------------
-    private void verifyComponent(ComponentChroncileBI component) throws IOException {
+    private void verifyComponent(ComponentChronicleBI component) throws IOException {
         if (component != null) {
-            if (component instanceof ConAttrChronicleBI) {
-                ConAttrChronicleBI attr = (ConAttrChronicleBI) component;
-                for (ConAttrVersionBI loopVersion : attr.getVersions()) {
+            if (component instanceof ConceptAttributeChronicleBI) {
+                ConceptAttributeChronicleBI attr = (ConceptAttributeChronicleBI) component;
+                for (ConceptAttributeVersionBI loopVersion : attr.getVersions()) {
                     verifyNids(loopVersion.getAllNidsForVersion(), component);
                 }
             } else if (component instanceof DescriptionChronicleBI) {
@@ -96,15 +96,15 @@ public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
                 }
             }
 
-            for (ComponentChroncileBI annotation : component.getAnnotations()) {
+            for (ComponentChronicleBI annotation : component.getAnnotations()) {
                 verifyComponent(annotation);
             }
         }
     }
 
-    private void verifyNids(Set<Integer> nids, ComponentChroncileBI component) {
+    private void verifyNids(Set<Integer> nids, ComponentChronicleBI component) {
         for (Integer nid : nids) {
-            ComponentChroncileBI<?> referencedComponent = null;
+            ComponentChronicleBI<?> referencedComponent = null;
             try {
                 referencedComponent = Ts.get().getComponent(nid);
             } catch (IOException e) {
@@ -134,15 +134,15 @@ public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
 
         // add prim uuids to list
         // concept attributtes
-        verifyComponent(concept.getConAttrs());
+        verifyComponent(concept.getConceptAttributes());
 
         // descriptions
-        for (DescriptionChronicleBI desc : concept.getDescs()) {
+        for (DescriptionChronicleBI desc : concept.getDescriptions()) {
             verifyComponent(desc);
         }
 
         // relationships
-        for (RelationshipChronicleBI rel : concept.getRelsOutgoing()) {
+        for (RelationshipChronicleBI rel : concept.getRelationshipsSource()) {
             verifyComponent(rel);
         }
 

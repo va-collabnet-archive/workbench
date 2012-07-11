@@ -23,10 +23,10 @@ import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_long.RefexLongAnalogBI;
-import org.ihtsdo.tk.dto.concept.component.refset.Long.TkRefsetLongMember;
-import org.ihtsdo.tk.dto.concept.component.refset.Long.TkRefsetLongRevision;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_long.TkRefexLongMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_long.TkRefexLongRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -53,9 +53,9 @@ public class LongRevision extends RefsetRevision<LongRevision, LongMember>
       longValue = primoridalMember.getLongValue();
    }
 
-   public LongRevision(TkRefsetLongRevision eVersion, LongMember member) {
+   public LongRevision(TkRefexLongRevision eVersion, LongMember member) {
       super(eVersion, member);
-      this.longValue = eVersion.getLongValue();
+      this.longValue = eVersion.getLong1();
    }
 
    public LongRevision(TupleInput input, LongMember primoridalMember) {
@@ -168,15 +168,15 @@ public class LongRevision extends RefsetRevision<LongRevision, LongMember>
    }
 
    @Override
-   public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
+   public TkRefexAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
            Map<UUID, UUID> conversionMap)
            throws ContradictionException, IOException {
-      return new TkRefsetLongMember(this, exclusionSet, conversionMap, 0, true, vc);
+      return new TkRefexLongMember(this, exclusionSet, conversionMap, 0, true, vc);
    }
 
    @Override
-   protected TK_REFSET_TYPE getTkRefsetType() {
-      return TK_REFSET_TYPE.LONG;
+   protected TK_REFEX_TYPE getTkRefsetType() {
+      return TK_REFEX_TYPE.LONG;
    }
 
    @Override

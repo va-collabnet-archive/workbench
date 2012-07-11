@@ -4,7 +4,7 @@ package org.ihtsdo.tk.api.concept;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidSetBI;
-import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.api.constraint.ConstraintBI;
 import org.ihtsdo.tk.api.constraint.ConstraintCheckType;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -13,7 +13,7 @@ import org.ihtsdo.tk.api.media.MediaVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
-import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
+import org.ihtsdo.tk.api.relationship.group.RelationshipGroupVersionBI;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -34,11 +34,11 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
     @Override
     ConceptChronicleBI getChronicle();
 
-    ConAttrVersionBI getConAttrsActive() throws IOException, ContradictionException;
+    ConceptAttributeVersionBI getConceptAttributesActive() throws IOException, ContradictionException;
 
-    Collection<? extends RefexVersionBI<?>> getCurrentRefexMembers(int refsetNid) throws IOException;
+    Collection<? extends RefexVersionBI<?>> getRefexMembersActive(int refsetNid) throws IOException;
 
-    RefexChronicleBI<?> getCurrentRefsetMemberForComponent(int componentNid) throws IOException;
+    RefexChronicleBI<?> getRefexMemberForComponentActive(int componentNid) throws IOException;
 
     /**
      *
@@ -47,113 +47,122 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * @deprecated use getRefsetMembersActive
      */
     @Deprecated
-    Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers()
+    Collection<? extends RefexVersionBI<?>> getActiveRefsetMembers()
             throws IOException, ContradictionException;
 
-    Collection<? extends DescriptionVersionBI> getDescsActive() throws IOException, ContradictionException;
+    Collection<? extends DescriptionVersionBI> getDescriptionsActive() throws IOException, ContradictionException;
 
-    Collection<? extends DescriptionVersionBI> getDescsActive(int typeNid)
+    Collection<? extends DescriptionVersionBI> getDescriptionsActive(int typeNid)
             throws IOException, ContradictionException;
 
-    Collection<? extends DescriptionVersionBI> getDescsActive(NidSetBI typeNids)
+    Collection<? extends DescriptionVersionBI> getDescriptionsActive(NidSetBI typeNids)
             throws IOException, ContradictionException;
 
-    Collection<? extends DescriptionVersionBI> getFsnDescsActive() throws IOException;
+    Collection<? extends DescriptionVersionBI> getDescriptionsFullySpecifiedActive() throws IOException;
 
-    DescriptionVersionBI getFullySpecifiedDescription() throws IOException, ContradictionException;
+    DescriptionVersionBI getDescriptionFullySpecified() throws IOException, ContradictionException;
 
     Collection<? extends MediaVersionBI> getMediaActive() throws IOException, ContradictionException;
 
     Collection<List<Integer>> getNidPathsToRoot() throws IOException;
 
-    Collection<? extends DescriptionVersionBI> getPrefDescsActive() throws IOException;
+    Collection<? extends DescriptionVersionBI> getDescriptionsPreferredActive() throws IOException;
 
-    DescriptionVersionBI getPreferredDescription() throws IOException, ContradictionException;
+    DescriptionVersionBI getDescriptionPreferred() throws IOException, ContradictionException;
 
     Collection<? extends RefexVersionBI<?>> getRefsetMembersActive() throws IOException, ContradictionException;
 
-    Collection<? extends RelGroupVersionBI> getRelGroups() throws IOException, ContradictionException;
+    Collection<? extends RelationshipGroupVersionBI> getRelationshipGroups() throws IOException, ContradictionException;
 
-    Collection<? extends RelationshipVersionBI> getRelsIncomingActive()
+    Collection<? extends RelationshipVersionBI> getRelationshipsTargetActive()
             throws IOException, ContradictionException;
 
-    Collection<? extends RelationshipVersionBI> getRelsIncomingActiveIsa()
+    Collection<? extends RelationshipVersionBI> getRelationshipsTargetActiveIsa()
             throws IOException, ContradictionException;
 
-    Collection<? extends ConceptVersionBI> getRelsIncomingOrigins() throws IOException;
+    /**
+     * Returns the concepts representing the sources of the target relationships.
+     * @return
+     * @throws IOException 
+     */
+    Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConcepts() throws IOException;
 
-    Collection<? extends ConceptVersionBI> getRelsIncomingOrigins(int typeNid) throws IOException;
+    Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConcepts(int typeNid) throws IOException;
 
-    Collection<? extends ConceptVersionBI> getRelsIncomingOrigins(NidSetBI typeNids) throws IOException;
+    Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConcepts(NidSetBI typeNids) throws IOException;
 
-    Collection<? extends ConceptVersionBI> getRelsIncomingOriginsActive()
+    Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConceptsActive()
             throws IOException, ContradictionException;
 
-    Collection<? extends ConceptVersionBI> getRelsIncomingOriginsActive(int typeNid)
+    Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConceptsActive(int typeNid)
             throws IOException, ContradictionException;
 
-    Collection<? extends ConceptVersionBI> getRelsIncomingOriginsActive(NidSetBI typeNids)
+    Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConceptsActive(NidSetBI typeNids)
             throws IOException, ContradictionException;
 
-    Collection<? extends ConceptVersionBI> getRelsIncomingOriginsActiveIsa()
+    Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConceptsActiveIsa()
             throws IOException, ContradictionException;
 
-    Collection<? extends ConceptVersionBI> getRelsIncomingOriginsIsa() throws IOException;
+    Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConceptsIsa() throws IOException;
 
-    Collection<? extends RelationshipVersionBI> getRelsOutgoingActive()
+    Collection<? extends RelationshipVersionBI> getRelationshipsSourceActive()
             throws IOException, ContradictionException;
 
-    Collection<? extends RelationshipVersionBI> getRelsOutgoingActiveIsa()
+    Collection<? extends RelationshipVersionBI> getRelationshipsSourceActiveIsa()
+            throws IOException, ContradictionException;
+    /**
+     * Returns the concepts representing the target concept of the source relationships.
+     * @return
+     * @throws IOException 
+     */
+    Collection<? extends ConceptVersionBI> getRelationshipsSourceTargetConcepts() throws IOException;
+
+    Collection<? extends ConceptVersionBI> getRelationshipsSourceTargetConcepts(int typeNid) throws IOException;
+
+    Collection<? extends ConceptVersionBI> getRelationshipsSourceTargetConcepts(NidSetBI typeNids) throws IOException;
+
+    Collection<? extends ConceptVersionBI> getRelationshipsSourceTargetConceptsActive()
             throws IOException, ContradictionException;
 
-    Collection<? extends ConceptVersionBI> getRelsOutgoingDestinations() throws IOException;
-
-    Collection<? extends ConceptVersionBI> getRelsOutgoingDestinations(int typeNid) throws IOException;
-
-    Collection<? extends ConceptVersionBI> getRelsOutgoingDestinations(NidSetBI typeNids) throws IOException;
-
-    Collection<? extends ConceptVersionBI> getRelsOutgoingDestinationsActive()
+    Collection<? extends ConceptVersionBI> getRelationshipsSourceTargetConceptsActive(int typeNid)
             throws IOException, ContradictionException;
 
-    Collection<? extends ConceptVersionBI> getRelsOutgoingDestinationsActive(int typeNid)
+    Collection<? extends ConceptVersionBI> getRelationshipsSourceTargetConceptsActive(NidSetBI typeNids)
             throws IOException, ContradictionException;
 
-    Collection<? extends ConceptVersionBI> getRelsOutgoingDestinationsActive(NidSetBI typeNids)
+    Collection<? extends ConceptVersionBI> getRelationshipsSourceTargetConceptsActiveIsa()
             throws IOException, ContradictionException;
 
-    Collection<? extends ConceptVersionBI> getRelsOutgoingDestinationsActiveIsa()
-            throws IOException, ContradictionException;
+    Collection<? extends ConceptVersionBI> getRelationshipsSourceTargetConceptsIsa() throws IOException;
 
-    Collection<? extends ConceptVersionBI> getRelsOutgoingDestinationsIsa() throws IOException;
-
-    int[] getRelsOutgoingDestinationsNidsActiveIsa() throws IOException;
+    int[] getRelationshipsSourceTargetNidsActiveIsa() throws IOException;
 
     Collection<? extends DescriptionVersionBI> getSynonyms() throws IOException;
 
     ViewCoordinate getViewCoordinate();
 
-    boolean hasAnnotationMemberActive(int refsetNid) throws IOException;
+    boolean hasAnnotationMemberActive(int refexNid) throws IOException;
 
     boolean hasChildren() throws IOException, ContradictionException;
 
-    boolean hasHistoricalRels() throws IOException, ContradictionException;
+    boolean hasHistoricalRelationships() throws IOException, ContradictionException;
 
-    boolean hasRefexMemberActive(int refsetNid) throws IOException;
+    boolean hasRefexMemberActive(int refexNid) throws IOException;
 
     boolean hasRefsetMemberForComponentActive(int componentNid) throws IOException;
 
     boolean isActive() throws IOException;
 
-    boolean isChildOf(ConceptVersionBI child) throws IOException;
+    boolean isChildOf(ConceptVersionBI childConceptVersion) throws IOException;
 
-    boolean isKindOf(ConceptVersionBI parentKind) throws IOException;
+    boolean isKindOf(ConceptVersionBI parentConceptVersion) throws IOException;
 
     boolean isLeaf() throws IOException;
 
-    boolean isMember(int evalRefsetNid) throws IOException;
+    boolean isMember(int refexCollectionNid) throws IOException;
 
     ConceptCB makeBlueprint() throws IOException, ContradictionException, InvalidCAB;
     
     @Override
-    ConceptCB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB;
+    ConceptCB makeBlueprint(ViewCoordinate viewCoordinate) throws IOException, ContradictionException, InvalidCAB;
 }

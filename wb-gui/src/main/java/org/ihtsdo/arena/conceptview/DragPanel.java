@@ -15,7 +15,7 @@ import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
-import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
+import org.ihtsdo.tk.api.relationship.group.RelationshipGroupVersionBI;
 import org.ihtsdo.tk.drools.facts.Context;
 import org.ihtsdo.tk.drools.facts.FactFactory;
 import org.ihtsdo.tk.spec.SpecBI;
@@ -509,7 +509,7 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
                thingBeingDropped = (DescriptionVersionBI) support.getTransferable().getTransferData(
                   DragPanelDataFlavors.descVersionFlavor);
             } else if (support.isDataFlavorSupported(DragPanelDataFlavors.relGroupFlavor)) {
-               thingBeingDropped = (RelGroupVersionBI) support.getTransferable().getTransferData(
+               thingBeingDropped = (RelationshipGroupVersionBI) support.getTransferable().getTransferData(
                   DragPanelDataFlavors.relGroupFlavor);
             } else if (support.isDataFlavorSupported(DragPanelDataFlavors.relVersionFlavor)) {
                thingBeingDropped = (RelationshipVersionBI) support.getTransferable().getTransferData(

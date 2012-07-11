@@ -26,11 +26,11 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidAnalogBI;
-import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid.RefexNidAnalogBI;
+import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.DescFact;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
 public class SetSynonymyAction extends AbstractAction {
@@ -61,7 +61,7 @@ public class SetSynonymyAction extends AbstractAction {
             int dosNid = SnomedMetadataRfx.getSYNONYMY_REFEX_NID();
 
             if (currentSynonymy) {
-                Collection<? extends RefexChronicleBI> refexes = desc.getCurrentRefexes(vc);
+                Collection<? extends RefexChronicleBI> refexes = desc.getRefexesActive(vc);
                 int synonymyTypeNid;
 
                 if (synonymy.equals(SynonymyType.NEAR_SYNONYMOUS)) {
@@ -74,7 +74,7 @@ public class SetSynonymyAction extends AbstractAction {
 
                 if (refexes != null) {
                     for (RefexChronicleBI refex : refexes) {
-                        if (refex.getCollectionNid() == dosNid) {
+                        if (refex.getRefexNid() == dosNid) {
                             //make analog
                             componentVersion = (I_AmPart) refex;
                             AnalogBI analog = null;
@@ -88,11 +88,11 @@ public class SetSynonymyAction extends AbstractAction {
 
                                 RefexVersionBI<?> newRefex = (RefexVersionBI<?>) analog;
                                 //test member type
-                                if (RefexCnidVersionBI.class.isAssignableFrom(newRefex.getClass())) {
-                                    RefexCnidVersionBI rcv = (RefexCnidVersionBI) newRefex;
-                                    RefexCnidAnalogBI rca = (RefexCnidAnalogBI) rcv;
+                                if (RefexNidVersionBI.class.isAssignableFrom(newRefex.getClass())) {
+                                    RefexNidVersionBI rcv = (RefexNidVersionBI) newRefex;
+                                    RefexNidAnalogBI rca = (RefexNidAnalogBI) rcv;
 
-                                    rca.setCnid1(synonymyTypeNid);
+                                    rca.setNid1(synonymyTypeNid);
 
                                     I_GetConceptData concept = Terms.get().getConceptForNid(newRefex.getNid());
                                     Terms.get().addUncommitted(concept);
@@ -106,7 +106,7 @@ public class SetSynonymyAction extends AbstractAction {
             } else {
                 if (synonymy.equals(SynonymyType.SYNONYM)) {
                     RefexCAB syn = new RefexCAB(
-                            TK_REFSET_TYPE.CID,
+                            TK_REFEX_TYPE.CID,
                             desc.getNid(),
                             dosNid);
                     syn.put(RefexProperty.CNID1, Ts.get().getNidForUuids(SynonymyType.SYNONYM.getLenient().getPrimUuid()));
@@ -115,7 +115,7 @@ public class SetSynonymyAction extends AbstractAction {
                     Ts.get().addUncommitted(refex);
                 } else if (synonymy.equals(SynonymyType.NEAR_SYNONYMOUS)) {
                     RefexCAB nearSyn = new RefexCAB(
-                            TK_REFSET_TYPE.CID,
+                            TK_REFEX_TYPE.CID,
                             desc.getNid(),
                             dosNid);
                     nearSyn.put(RefexProperty.CNID1, Ts.get().getNidForUuids(SynonymyType.NEAR_SYNONYMOUS.getLenient().getPrimUuid()));
@@ -124,7 +124,7 @@ public class SetSynonymyAction extends AbstractAction {
                     Ts.get().addUncommitted(refex);
                 } else if (synonymy.equals(SynonymyType.NON_SYNONYMOUS)) {
                     RefexCAB notSyn = new RefexCAB(
-                            TK_REFSET_TYPE.CID,
+                            TK_REFEX_TYPE.CID,
                             desc.getNid(),
                             dosNid);
                     notSyn.put(RefexProperty.CNID1, Ts.get().getNidForUuids(SynonymyType.NON_SYNONYMOUS.getLenient().getPrimUuid()));

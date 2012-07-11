@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.ihtsdo.tk.dto.concept.component.refset.cidcidstr.TkRefsetCidCidStrRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_uuid_string.TkRefexUuidUuidStringRevision;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -130,20 +130,20 @@ public class ERefsetCidCidStrMemberTest {
     private ERefsetCidCidStrMember makeTestComponent1() {
         
         ERefsetCidCidStrMember member = new ERefsetCidCidStrMember();
-        member.c1Uuid = new UUID(1234, 1111);
-        member.c2Uuid = new UUID(1234, 2222);
-        member.strValue = "First Value";
+        member.uuid1 = new UUID(1234, 1111);
+        member.uuid2 = new UUID(1234, 2222);
+        member.string1 = "First Value";
         member.componentUuid = new UUID(64386, 75497);
         member.pathUuid = new UUID(4350, 5469);
         member.primordialUuid = new UUID(320, 230);
         member.refsetUuid = new UUID(14386, 65497);
         member.statusUuid = new UUID(5386, 4497);
         member.time = this.myTime;
-        member.revisions = new ArrayList<TkRefsetCidCidStrRevision>();
+        member.revisions = new ArrayList<TkRefexUuidUuidStringRevision>();
         ERefsetCidCidStrRevision rsv = new ERefsetCidCidStrRevision();
-        rsv.c1Uuid = new UUID(4444, 4444);
-        rsv.c2Uuid = new UUID(5555, 5555);
-        rsv.stringValue = "First Value";
+        rsv.uuid1 = new UUID(4444, 4444);
+        rsv.uuid2 = new UUID(5555, 5555);
+        rsv.string1 = "First Value";
         rsv.pathUuid = new UUID(7777, 7777);
         rsv.statusUuid = new UUID(8888, 8888);
         rsv.time = this.myTime;
@@ -155,20 +155,20 @@ public class ERefsetCidCidStrMemberTest {
     private ERefsetCidCidStrMember makeTestComponent2() {
         
         ERefsetCidCidStrMember member = new ERefsetCidCidStrMember();
-        member.c1Uuid = new UUID(4321, 1111);
-        member.c2Uuid = new UUID(4321, 2222);
-        member.strValue = "Second Value";
+        member.uuid1 = new UUID(4321, 1111);
+        member.uuid2 = new UUID(4321, 2222);
+        member.string1 = "Second Value";
         member.componentUuid = new UUID(4321, 4444);
         member.pathUuid = new UUID(4321, 5555);
         member.primordialUuid = new UUID(4321, 6666);
         member.refsetUuid = new UUID(4321, 7777);
         member.statusUuid = new UUID(4321, 8888);
         member.time = this.myTime;
-        member.revisions = new ArrayList<TkRefsetCidCidStrRevision>();
+        member.revisions = new ArrayList<TkRefexUuidUuidStringRevision>();
         ERefsetCidCidStrRevision rsv = new ERefsetCidCidStrRevision();
-        rsv.c1Uuid = new UUID(555, 777);
-        rsv.c2Uuid = new UUID(444, 777);
-        rsv.stringValue = "Second Value";
+        rsv.uuid1 = new UUID(555, 777);
+        rsv.uuid2 = new UUID(444, 777);
+        rsv.string1 = "Second Value";
         rsv.pathUuid = new UUID(222, 777);
         rsv.statusUuid = new UUID(111, 777);
         rsv.time = this.myTime;

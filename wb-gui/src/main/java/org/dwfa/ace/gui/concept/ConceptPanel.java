@@ -887,7 +887,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
             if (label.getTermComponent() != null) {
                 I_GetConceptData cb = (I_GetConceptData) label.getTermComponent();
                 try {
-                    if (cb.getConceptAttributes() == null) {
+                    if (cb.getConAttrs() == null) {
                         label.setTermComponent(null);
                     }
                 } catch (IOException e) {

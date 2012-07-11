@@ -176,7 +176,7 @@ public class LineagePlugin extends AbstractPlugin implements HierarchyListener {
             }
 
             coordinate = new ViewCoordinate(getHost().getConfig().getViewCoordinate());
-            coordinate.setRelAssertionType(relAssertionType);
+            coordinate.setRelationshipAssertionType(relAssertionType);
 
             I_GetConceptData bean = (I_GetConceptData) getHost().getTermComponent();
 
@@ -293,11 +293,11 @@ public class LineagePlugin extends AbstractPlugin implements HierarchyListener {
                 getHost().getConfig().getViewPositionSetReadOnly(),
                 getHost().getConfig().getPrecedence(),
                 getHost().getConfig().getConflictResolutionStrategy(),
-                coordinate.getClassifierNid(), coordinate.getRelAssertionType());
+                coordinate.getClassifierNid(), coordinate.getRelationshipAssertionType());
 
         if ((sourceRelTuples.size() > 0) && (depth < 40)) {
             for (I_RelTuple rel : sourceRelTuples) {
-                if (rel.getOriginNid() != rel.getDestinationNid()) {
+                if (rel.getSourceNid() != rel.getTargetNid()) {
                     I_GetConceptData parent = Terms.get().getConcept(rel.getC2Id());
 
                     List<List<I_GetConceptData>> parentLineage = getLineage(parent, depth + 1);

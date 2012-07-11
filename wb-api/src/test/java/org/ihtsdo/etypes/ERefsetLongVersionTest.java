@@ -129,7 +129,7 @@ public class ERefsetLongVersionTest {
     private ERefsetLongRevision makeTestComponent1() {
         
         ERefsetLongRevision rsv = new ERefsetLongRevision();
-        rsv.longValue = 99;
+        rsv.long1 = 99;
         rsv.pathUuid = new UUID(4350, 5469);
         rsv.statusUuid = new UUID(5386, 4497);
         rsv.time = this.myTime;
@@ -140,7 +140,7 @@ public class ERefsetLongVersionTest {
     private ERefsetLongRevision makeTestComponent2() {
         
         ERefsetLongRevision rsv = new ERefsetLongRevision();
-        rsv.longValue = 23;
+        rsv.long1 = 23;
         rsv.pathUuid = new UUID(444, 555);
         rsv.statusUuid = new UUID(666, 777);
         rsv.time = this.myTime;

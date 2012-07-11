@@ -8,8 +8,8 @@ import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 
-import org.ihtsdo.tk.dto.concept.component.refset.cidstr.TkRefsetCidStrMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidstr.TkRefsetCidStrRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_string.TkRefexUuidStringMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_string.TkRefexUuidStringRevision;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -18,7 +18,7 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 
-public class ERefsetCidStrMember extends TkRefsetCidStrMember {
+public class ERefsetCidStrMember extends TkRefexUuidStringMember {
    public static final long serialVersionUID = 1;
 
    //~--- constructors --------------------------------------------------------
@@ -41,8 +41,8 @@ public class ERefsetCidStrMember extends TkRefsetCidStrMember {
 
       I_ExtendByRefPartCidString part = (I_ExtendByRefPartCidString) m.getMutableParts().get(0);
 
-      c1Uuid     = Terms.get().nidToUuid(part.getC1id());
-      strValue   = part.getStringValue();
+      uuid1     = Terms.get().nidToUuid(part.getC1id());
+      string1   = part.getStringValue();
       pathUuid   = Terms.get().nidToUuid(part.getPathNid());
       statusUuid = Terms.get().nidToUuid(part.getStatusNid());
       authorUuid    = Terms.get().nidToUuid(part.getAuthorNid());
@@ -50,7 +50,7 @@ public class ERefsetCidStrMember extends TkRefsetCidStrMember {
       time       = part.getTime();
 
       if (partCount > 1) {
-         revisions = new ArrayList<TkRefsetCidStrRevision>(partCount - 1);
+         revisions = new ArrayList<TkRefexUuidStringRevision>(partCount - 1);
 
          for (int i = 1; i < partCount; i++) {
             revisions.add(new ERefsetCidStrRevision((I_ExtendByRefPartCidString) m.getMutableParts().get(i)));

@@ -175,7 +175,7 @@ public class InstructWithApproveRejectDone extends AbstractTask {
                     } else {
                         // description extension
 
-                        Collection<? extends I_DescriptionVersioned> descriptions = concept.getDescriptions();
+                        Collection<? extends I_DescriptionVersioned> descriptions = concept.getDescs();
                         for (I_DescriptionVersioned desc : descriptions) {
                             if (refsetHelper.hasCurrentRefsetExtension(refsetId, desc.getDescId(), approveId)) {
                                 // nothing to do
@@ -242,7 +242,7 @@ public class InstructWithApproveRejectDone extends AbstractTask {
                         }
                     } else {
                         // description refset
-                        Collection<? extends I_DescriptionVersioned> descriptions = concept.getDescriptions();
+                        Collection<? extends I_DescriptionVersioned> descriptions = concept.getDescs();
                         for (I_DescriptionVersioned desc : descriptions) {
                             if (refsetHelper.hasCurrentRefsetExtension(refsetId, desc.getDescId(), rejectId)) {
                                 // nothing to do

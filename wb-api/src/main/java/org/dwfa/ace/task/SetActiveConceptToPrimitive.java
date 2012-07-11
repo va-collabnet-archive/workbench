@@ -40,9 +40,9 @@ import org.dwfa.util.bean.Spec;
 
 import org.ihtsdo.tk.api.AnalogBI;
 import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
-import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
-import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeAnalogBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeChronicleBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 
@@ -87,8 +87,8 @@ public class SetActiveConceptToPrimitive extends AbstractTask {
             (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
          I_GetConceptData   concept = (I_GetConceptData) process.getProperty(activeConceptPropName);
          ConceptChronicleBI cc      = (ConceptChronicleBI) concept;
-         ConAttrChronicleBI ca      = cc.getConAttrs();
-         ConAttrVersionBI   cv      = (ConAttrVersionBI) ca;
+         ConceptAttributeChronicleBI ca      = cc.getConceptAttributes();
+         ConceptAttributeVersionBI   cv      = (ConceptAttributeVersionBI) ca;
 
          if (cv.isDefined() == true) {
 

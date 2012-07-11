@@ -36,7 +36,7 @@ import javax.swing.SwingConstants;
 import javax.swing.TransferHandler;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 
 public class DragPanelDescription extends DragPanelComponentVersion<DescriptionAnalogBI> {
 
@@ -165,21 +165,21 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
         StringBuilder sb = new StringBuilder();
         if (getDesc().getTypeNid() == SnomedMetadataRfx.getDES_SYNONYM_NID()) {
             for (RefexChronicleBI<?> refex : getDesc().getAnnotations()) {
-                if (refex.getCollectionNid() == SnomedMetadataRfx.getUS_DIALECT_REFEX_NID()) {
+                if (refex.getRefexNid() == SnomedMetadataRfx.getUS_DIALECT_REFEX_NID()) {
                     for (RefexVersionBI<?> v : refex.getVersions(getSettings().getConfig().getViewCoordinate())) {
-                        if(RefexCnidVersionBI.class.isAssignableFrom(v.getClass())){
-                            RefexCnidVersionBI cv = (RefexCnidVersionBI) v;
-                            if (cv.getCnid1() == SnomedMetadataRfx.getDESC_PREFERRED_NID()) {
+                        if(RefexNidVersionBI.class.isAssignableFrom(v.getClass())){
+                            RefexNidVersionBI cv = (RefexNidVersionBI) v;
+                            if (cv.getNid1() == SnomedMetadataRfx.getDESC_PREFERRED_NID()) {
                                 sb.append(" <font color='red'>US</font>");
                             } 
                         }
                     }
 
-                } else if (refex.getCollectionNid() == SnomedMetadataRfx.getGB_DIALECT_REFEX_NID()) {
+                } else if (refex.getRefexNid() == SnomedMetadataRfx.getGB_DIALECT_REFEX_NID()) {
                     for (RefexVersionBI<?> v : refex.getVersions(getSettings().getConfig().getViewCoordinate())) {
-                        if(RefexCnidVersionBI.class.isAssignableFrom(v.getClass())){
-                            RefexCnidVersionBI cv = (RefexCnidVersionBI) v;
-                            if (cv.getCnid1() == SnomedMetadataRfx.getDESC_PREFERRED_NID()) {
+                        if(RefexNidVersionBI.class.isAssignableFrom(v.getClass())){
+                            RefexNidVersionBI cv = (RefexNidVersionBI) v;
+                            if (cv.getNid1() == SnomedMetadataRfx.getDESC_PREFERRED_NID()) {
                                 sb.append(" <font color='blue'>GB</font>");
                             }
                         }
@@ -187,9 +187,9 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
                     }
                 } else {
                     for (RefexVersionBI<?> v : refex.getVersions(getSettings().getConfig().getViewCoordinate())) {
-                        if(RefexCnidVersionBI.class.isAssignableFrom(v.getClass())){
-                            RefexCnidVersionBI cv = (RefexCnidVersionBI) v;
-                            if (cv.getCnid1() == SnomedMetadataRfx.getDESC_PREFERRED_NID()) {
+                        if(RefexNidVersionBI.class.isAssignableFrom(v.getClass())){
+                            RefexNidVersionBI cv = (RefexNidVersionBI) v;
+                            if (cv.getNid1() == SnomedMetadataRfx.getDESC_PREFERRED_NID()) {
                                 sb.append(" <font color='blue'> </font>");
                             }
                         }

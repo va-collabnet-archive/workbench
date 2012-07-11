@@ -26,12 +26,12 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Set;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
-import org.ihtsdo.tk.api.blueprint.RelCAB;
+import org.ihtsdo.tk.api.blueprint.RelationshipCAB;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.binding.snomed.TermAux;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
-import org.ihtsdo.tk.dto.concept.component.relationship.TkRelType;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipType;
 
 public class RelationshipRevision extends Revision<RelationshipRevision, Relationship>
         implements I_RelPart<RelationshipRevision>, RelationshipAnalogBI<RelationshipRevision> {
@@ -100,7 +100,7 @@ public class RelationshipRevision extends Revision<RelationshipRevision, Relatio
     //~--- methods -------------------------------------------------------------
     @Override
     protected void addComponentNids(Set<Integer> allNids) {
-        allNids.add(primordialComponent.getDestinationNid());
+        allNids.add(primordialComponent.getTargetNid());
         allNids.add(characteristicNid);
         allNids.add(refinabilityNid);
         allNids.add(typeNid);
@@ -150,18 +150,18 @@ public class RelationshipRevision extends Revision<RelationshipRevision, Relatio
     }
 
     @Override
-    public RelCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
-        TkRelType relType = null;
+    public RelationshipCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
+        TkRelationshipType relType = null;
         if (getCharacteristicNid() == SnomedMetadataRf1.INFERRED_DEFINING_CHARACTERISTIC_TYPE_RF1.getLenient().getNid()
                 || getCharacteristicNid() == SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2.getLenient().getNid()) {
             throw new InvalidCAB("Inferred relationships can not be used to make blueprints");
         } else if (getCharacteristicNid() == SnomedMetadataRf1.STATED_DEFINING_CHARACTERISTIC_TYPE_RF1.getLenient().getNid()
                 || getCharacteristicNid() == SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getLenient().getNid()) {
-            relType = TkRelType.STATED_HIERARCHY;
+            relType = TkRelationshipType.STATED_HIERARCHY;
         }
-        RelCAB relBp = new RelCAB(getOriginNid(),
+        RelationshipCAB relBp = new RelationshipCAB(getSourceNid(),
                 getTypeNid(),
-                getDestinationNid(),
+                getTargetNid(),
                 getGroup(),
                 relType,
                 getVersion(vc),
@@ -210,7 +210,7 @@ public class RelationshipRevision extends Revision<RelationshipRevision, Relatio
 
         ConceptComponent.addTextToBuffer(buf, typeNid);
         buf.append(": ");
-        ConceptComponent.addTextToBuffer(buf, primordialComponent.getDestinationNid());
+        ConceptComponent.addTextToBuffer(buf, primordialComponent.getTargetNid());
 
         return buf.toString();
     }
@@ -235,8 +235,8 @@ public class RelationshipRevision extends Revision<RelationshipRevision, Relatio
     }
 
     @Override
-    public int getDestinationNid() {
-        return primordialComponent.getDestinationNid();
+    public int getTargetNid() {
+        return primordialComponent.getTargetNid();
     }
 
     @Override
@@ -245,8 +245,8 @@ public class RelationshipRevision extends Revision<RelationshipRevision, Relatio
     }
 
     @Override
-    public int getOriginNid() {
-        return primordialComponent.getOriginNid();
+    public int getSourceNid() {
+        return primordialComponent.getSourceNid();
     }
 
     @Override
@@ -324,7 +324,7 @@ public class RelationshipRevision extends Revision<RelationshipRevision, Relatio
     }
 
     @Override
-    public void setDestinationNid(int nid) throws PropertyVetoException {
+    public void setTargetNid(int nid) throws PropertyVetoException {
         throw new UnsupportedOperationException();
     }
 

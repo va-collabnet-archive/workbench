@@ -26,12 +26,12 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.ComponentChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.uuid.UuidT5Generator;
 
@@ -115,19 +115,19 @@ public class DescriptionLogic { // :SNOOWL:
 //                || relNid == -2144096571 || relNid == -2144869271) {
 //            System.out.println(":!!!:DEBUG: found relationship of interest");
 //        }
-        ComponentChroncileBI<?> component = Ts.get().getComponent(relNid);
+        ComponentChronicleBI<?> component = Ts.get().getComponent(relNid);
         boolean isNegatedRel = false;
         try {
-            Collection<? extends RefexChronicleBI> refexes = component.getCurrentRefexes(vc);
+            Collection<? extends RefexChronicleBI> refexes = component.getRefexesActive(vc);
             int evalRefsetNid = getNegationRefsetNid();
 
             if (refexes != null) {
                 for (RefexChronicleBI refex : refexes) {
-                    if (refex.getCollectionNid() == evalRefsetNid) {
+                    if (refex.getRefexNid() == evalRefsetNid) {
                         if (RefexVersionBI.class.isAssignableFrom(refex.getClass())) {
                             RefexVersionBI<?> rv = (RefexVersionBI<?>) refex;
 
-                            if (RefexCnidVersionBI.class.isAssignableFrom(rv.getClass())) {
+                            if (RefexNidVersionBI.class.isAssignableFrom(rv.getClass())) {
                                 isNegatedRel = true;
                             } else {
                                 System.out.println("Can't convert: RefexCnidVersionBI:  " + rv);

@@ -30,7 +30,7 @@ public class NodeComparator implements Comparator<Long> {
         for (int i = 0; i < maxIndex; i++) {
             if (n1.nodesToCompare[i] == Long.MAX_VALUE && n2.nodesToCompare[i] == Long.MAX_VALUE) {
                 // different concepts, but identical text. Return difference of concept ids. 
-                return n1.getCnid() - n2.getCnid();
+                return n1.getConceptNid() - n2.getConceptNid();
             }
             if (n1.nodesToCompare[i] == Long.MAX_VALUE) {
                 return 1;

@@ -9,8 +9,8 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.tapi.TerminologyException;
 
-import org.ihtsdo.tk.dto.concept.component.refset.cidcidstr.TkRefsetCidCidStrMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidcidstr.TkRefsetCidCidStrRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_uuid_string.TkRefexUuidUuidStringMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_uuid_string.TkRefexUuidUuidStringRevision;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -19,7 +19,7 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 
-public class ERefsetCidCidStrMember extends TkRefsetCidCidStrMember {
+public class ERefsetCidCidStrMember extends TkRefexUuidUuidStringMember {
    public static final long serialVersionUID = 1;
 
    //~--- constructors --------------------------------------------------------
@@ -42,9 +42,9 @@ public class ERefsetCidCidStrMember extends TkRefsetCidCidStrMember {
 
       I_ExtendByRefPartCidCidString part = (I_ExtendByRefPartCidCidString) m.getMutableParts().get(0);
 
-      c1Uuid     = Terms.get().nidToUuid(part.getC1id());
-      c2Uuid     = Terms.get().nidToUuid(part.getC2id());
-      strValue   = part.getStringValue();
+      uuid1     = Terms.get().nidToUuid(part.getC1id());
+      uuid2     = Terms.get().nidToUuid(part.getC2id());
+      string1   = part.getStringValue();
       pathUuid   = Terms.get().nidToUuid(part.getPathNid());
       statusUuid = Terms.get().nidToUuid(part.getStatusNid());
       authorUuid    = Terms.get().nidToUuid(part.getAuthorNid());
@@ -52,7 +52,7 @@ public class ERefsetCidCidStrMember extends TkRefsetCidCidStrMember {
       time       = part.getTime();
 
       if (partCount > 1) {
-         revisions = new ArrayList<TkRefsetCidCidStrRevision>(partCount - 1);
+         revisions = new ArrayList<TkRefexUuidUuidStringRevision>(partCount - 1);
 
          for (int i = 1; i < partCount; i++) {
             revisions.add(

@@ -49,7 +49,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.tk.example.binding.ConceptInactivationType;
+import org.ihtsdo.tk.binding.snomed.ConceptInactivationType;
 
 import org.ihtsdo.tk.api.WizardBI;
 import javax.swing.JPanel;

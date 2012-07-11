@@ -21,7 +21,7 @@ import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 
 /**
@@ -40,7 +40,7 @@ public class RefsetToAnnotation extends AbstractTransformer {
 	private UUID refsetUuid;
 	
 	/** The members map. */
-	private Map<UUID,TkRefsetAbstractMember<?>> membersMap;
+	private Map<UUID,TkRefexAbstractMember<?>> membersMap;
 	
 	/**
 	 * Instantiates a new refset to annotation.
@@ -77,7 +77,7 @@ public class RefsetToAnnotation extends AbstractTransformer {
 	public void transformAttributes(TkConceptAttributes attributes, TkConcept concept) {
 		if (membersMap.get(attributes.getPrimordialComponentUuid()) != null) {
 			if (attributes.getAnnotations() == null)
-				attributes.setAnnotations(new ArrayList<TkRefsetAbstractMember<?>>());
+				attributes.setAnnotations(new ArrayList<TkRefexAbstractMember<?>>());
 			attributes.getAnnotations().add(membersMap.get(attributes.getPrimordialComponentUuid()));
 			count();
 		}
@@ -90,7 +90,7 @@ public class RefsetToAnnotation extends AbstractTransformer {
 	public void transformDescription(TkDescription description, TkConcept concept) {
 		if (membersMap.get(description.getPrimordialComponentUuid()) != null) {
 			if (description.getAnnotations() == null)
-				description.setAnnotations(new ArrayList<TkRefsetAbstractMember<?>>());
+				description.setAnnotations(new ArrayList<TkRefexAbstractMember<?>>());
 			description.getAnnotations().add(membersMap.get(description.getPrimordialComponentUuid()));
 			count();
 		}
@@ -103,34 +103,34 @@ public class RefsetToAnnotation extends AbstractTransformer {
 	public void transformRelationship(TkRelationship relationship, TkConcept concept) {
 		if (membersMap.get(relationship.getPrimordialComponentUuid()) != null) {
 			if (relationship.getAnnotations() == null)
-				relationship.setAnnotations(new ArrayList<TkRefsetAbstractMember<?>>());
+				relationship.setAnnotations(new ArrayList<TkRefexAbstractMember<?>>());
 			relationship.getAnnotations().add(membersMap.get(relationship.getPrimordialComponentUuid()));
 			count();
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformAnnotation(org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember, org.ihtsdo.tk.dto.concept.component.TkComponent)
+	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformAnnotation(org.ihtsdo.tk.dto.concept.component.refset.TkRefexAbstractMember, org.ihtsdo.tk.dto.concept.component.TkComponent)
 	 */
 	@Override
-	public void transformAnnotation(TkRefsetAbstractMember<?> annotation,
+	public void transformAnnotation(TkRefexAbstractMember<?> annotation,
 			TkComponent<?> component) {
 		// Not supported
 
 	}
 
 	/* (non-Javadoc)
-	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformMember(org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember, org.ihtsdo.tk.dto.concept.TkConcept)
+	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformMember(org.ihtsdo.tk.dto.concept.component.refset.TkRefexAbstractMember, org.ihtsdo.tk.dto.concept.TkConcept)
 	 */
 	@Override
-	public void transformMember(TkRefsetAbstractMember<?> member,
+	public void transformMember(TkRefexAbstractMember<?> member,
 			TkConcept concept) {
-		if (member.getRefsetUuid().equals(refsetUuid) && concept.getConceptAttributes().getPrimordialComponentUuid().equals(refsetUuid)) {
+		if (member.getRefexUuid().equals(refsetUuid) && concept.getConceptAttributes().getPrimordialComponentUuid().equals(refsetUuid)) {
 			concept.getRefsetMembers().remove(member);
 		}
 		if (membersMap.get(member.getPrimordialComponentUuid()) != null) {
 			if (member.getAnnotations() == null)
-				member.setAnnotations(new ArrayList<TkRefsetAbstractMember<?>>());
+				member.setAnnotations(new ArrayList<TkRefexAbstractMember<?>>());
 			member.getAnnotations().add(membersMap.get(member.getPrimordialComponentUuid()));
 			count();
 		}
@@ -181,8 +181,8 @@ public class RefsetToAnnotation extends AbstractTransformer {
 		try {
 			I_GetConceptData refset = Terms.get().getConcept(refsetUuid);
 			EConcept refsetEConcept = new EConcept(refset);
-			membersMap = new HashMap<UUID,TkRefsetAbstractMember<?>>();
-			for ( TkRefsetAbstractMember<?> loopMember : refsetEConcept.getRefsetMembers()) {
+			membersMap = new HashMap<UUID,TkRefexAbstractMember<?>>();
+			for ( TkRefexAbstractMember<?> loopMember : refsetEConcept.getRefsetMembers()) {
 				membersMap.put(loopMember.getComponentUuid(), loopMember);
 			}
 			

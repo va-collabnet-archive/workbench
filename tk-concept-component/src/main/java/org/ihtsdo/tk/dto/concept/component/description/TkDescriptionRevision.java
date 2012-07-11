@@ -32,12 +32,12 @@ public class TkDescriptionRevision extends TkRevision implements I_DescribeExter
       super();
    }
 
-   public TkDescriptionRevision(DescriptionVersionBI another) throws IOException {
-      super(another);
-      this.initialCaseSignificant = another.isInitialCaseSignificant();
-      this.lang                   = another.getLang();
-      this.text                   = another.getText();
-      this.typeUuid               = Ts.get().getUuidPrimordialForNid(another.getTypeNid());
+   public TkDescriptionRevision(DescriptionVersionBI descriptionVersion) throws IOException {
+      super(descriptionVersion);
+      this.initialCaseSignificant = descriptionVersion.isInitialCaseSignificant();
+      this.lang                   = descriptionVersion.getLang();
+      this.text                   = descriptionVersion.getText();
+      this.typeUuid               = Ts.get().getUuidPrimordialForNid(descriptionVersion.getTypeNid());
    }
 
    public TkDescriptionRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

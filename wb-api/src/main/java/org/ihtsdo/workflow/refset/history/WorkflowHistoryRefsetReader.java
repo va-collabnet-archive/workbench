@@ -6,8 +6,8 @@ import java.util.UUID;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
-import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrMember;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_string.TkRefsetStrMember;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetReader;
 
@@ -147,13 +147,13 @@ public  class WorkflowHistoryRefsetReader extends WorkflowRefsetReader
 */
 	
 	@Override
-	public boolean isIdenticalAutomatedAdjudication(TkRefsetAbstractMember origMember, TkRefsetAbstractMember testMember) {
+	public boolean isIdenticalAutomatedAdjudication(TkRefexAbstractMember origMember, TkRefexAbstractMember testMember) {
 		
 		if (isIdenticalSap(origMember, testMember)) {
 			return false;
 		} else {
-			String orig = ((TkRefsetStrMember)origMember).getStrValue();
-			String test = ((TkRefsetStrMember)testMember).getStrValue();
+			String orig = ((TkRefsetStrMember)origMember).getString1();
+			String test = ((TkRefsetStrMember)testMember).getString1();
 			
 			// For this Refset, IGNORE a) EffectiveTimestamp b) Modeler c) WrklfowTime d) RxMemberId
 			try {

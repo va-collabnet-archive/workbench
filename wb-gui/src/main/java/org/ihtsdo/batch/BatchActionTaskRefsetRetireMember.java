@@ -27,7 +27,7 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 
 /**
  * BatchActionTaskRefsetRetireMember
@@ -38,7 +38,7 @@ public class BatchActionTaskRefsetRetireMember extends BatchActionTask {
     // REFSET MEMBER
     private int collectionNid;
     // FILTER
-    private TK_REFSET_TYPE refsetType;
+    private TK_REFEX_TYPE refsetType;
     private Object matchValue;
 
     public BatchActionTaskRefsetRetireMember() {
@@ -50,7 +50,7 @@ public class BatchActionTaskRefsetRetireMember extends BatchActionTask {
         this.collectionNid = collectionNid;
     }
 
-    public void setRefsetType(TK_REFSET_TYPE refsetType) {
+    public void setRefsetType(TK_REFEX_TYPE refsetType) {
         this.refsetType = refsetType;
     }
 
@@ -62,12 +62,12 @@ public class BatchActionTaskRefsetRetireMember extends BatchActionTask {
     @Override
     public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc) throws IOException, InvalidCAB, ContradictionException {
 
-        Collection<? extends RefexVersionBI<?>> currentRefexes = c.getCurrentRefexes(vc);
+        Collection<? extends RefexVersionBI<?>> currentRefexes = c.getRefexesActive(vc);
         boolean changed = false;
         boolean changedReferencedConcept = false;
         ConceptChronicleBI collectionConcept = ts.getConcept(collectionNid);
         for (RefexVersionBI rvbi : currentRefexes) {
-            if (rvbi.getCollectionNid() == collectionNid) {
+            if (rvbi.getRefexNid() == collectionNid) {
                 if (matchValue == null) {
                     for (int editPath : ec.getEditPaths()) {
                         rvbi.makeAnalog(RETIRED_NID,

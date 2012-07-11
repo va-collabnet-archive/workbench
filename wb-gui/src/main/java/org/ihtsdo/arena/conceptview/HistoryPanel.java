@@ -51,7 +51,6 @@ import java.util.TreeSet;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import org.ihtsdo.arena.contradiction.InteractiveAdjudicator;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 /**
@@ -267,7 +266,7 @@ public class HistoryPanel {
       try {
          boolean      add          = false;
          PositionBI   p            = positionVersion.getPosition();
-         int          sapNid       = positionVersion.getSapNid();
+         int          sapNid       = positionVersion.getStampNid();
          NidSapNid    nidSapNidKey = new NidSapNid(viewVersion.getNid(), sapNid);
          JRadioButton button       = nidSapNidButtonMap.get(nidSapNidKey);
 
@@ -313,16 +312,16 @@ public class HistoryPanel {
                 positionVersion.toUserString(Ts.get().getSnapshot(view.getConfig().getViewCoordinate())));
             sb.append("<br>");
 
-            if (status.getPreferredDescription() != null) {
-               sb.append(status.getPreferredDescription().getText());
+            if (status.getDescriptionPreferred() != null) {
+               sb.append(status.getDescriptionPreferred().getText());
             } else {
                sb.append(status.toString());
             }
 
             sb.append("<br>");
 
-            if (author.getPreferredDescription() != null) {
-               sb.append(author.getPreferredDescription().getText());
+            if (author.getDescriptionPreferred() != null) {
+               sb.append(author.getDescriptionPreferred().getText());
             } else {
                sb.append(author.toString());
             }
@@ -793,7 +792,6 @@ public class HistoryPanel {
                ConceptChronicleBI cc = view.getConcept();
                ViewCoordinate adjudicateView = new ViewCoordinate(view.getConfig().getViewCoordinate());
 
-               adjudicateView.setContradictionManager(new InteractiveAdjudicator(nidGroupMap, buttonVersionMap));
                cc.makeAdjudicationAnalogs(view.getConfig().getEditCoordinate(),
                                           adjudicateView);
             }

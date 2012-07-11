@@ -22,11 +22,11 @@ import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid_str.RefexCnidStrAnalogBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidstr.TkRefsetCidStrMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidstr.TkRefsetCidStrRevision;
+import org.ihtsdo.tk.api.refex.type_nid_string.RefexNidStringAnalogBI;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_string.TkRefexUuidStringMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_string.TkRefexUuidStringRevision;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -37,7 +37,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class CidStrRevision extends RefsetRevision<CidStrRevision, CidStrMember>
-        implements I_ExtendByRefPartCidString<CidStrRevision>, RefexCnidStrAnalogBI<CidStrRevision> {
+        implements I_ExtendByRefPartCidString<CidStrRevision>, RefexNidStringAnalogBI<CidStrRevision> {
    private int    c1Nid;
    private String strValue;
 
@@ -53,10 +53,10 @@ public class CidStrRevision extends RefsetRevision<CidStrRevision, CidStrMember>
       strValue = primoridalMember.getStringValue();
    }
 
-   public CidStrRevision(TkRefsetCidStrRevision eVersion, CidStrMember member) {
+   public CidStrRevision(TkRefexUuidStringRevision eVersion, CidStrMember member) {
       super(eVersion, member);
-      c1Nid    = Bdb.uuidToNid(eVersion.getC1Uuid());
-      strValue = eVersion.getStrValue();
+      c1Nid    = Bdb.uuidToNid(eVersion.getUuid1());
+      strValue = eVersion.getString1();
    }
 
    public CidStrRevision(TupleInput input, CidStrMember primoridalMember) {
@@ -86,8 +86,8 @@ public class CidStrRevision extends RefsetRevision<CidStrRevision, CidStrMember>
    }
 
    protected void addSpecProperties(RefexCAB rcs) {
-      rcs.with(RefexProperty.CNID1, getCnid1());
-      rcs.with(RefexProperty.STRING1, getStr1());
+      rcs.with(RefexProperty.CNID1, getNid1());
+      rcs.with(RefexProperty.STRING1, getString1());
    }
 
    @Override
@@ -182,12 +182,12 @@ public class CidStrRevision extends RefsetRevision<CidStrRevision, CidStrMember>
    }
 
    @Override
-   public int getCnid1() {
+   public int getNid1() {
       return c1Nid;
    }
 
    @Override
-   public String getStr1() {
+   public String getString1() {
       return strValue;
    }
 
@@ -197,15 +197,15 @@ public class CidStrRevision extends RefsetRevision<CidStrRevision, CidStrMember>
    }
 
    @Override
-   public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
+   public TkRefexAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
            Map<UUID, UUID> conversionMap)
            throws ContradictionException, IOException {
-      return new TkRefsetCidStrMember(this, exclusionSet, conversionMap, 0, true, vc);
+      return new TkRefexUuidStringMember(this, exclusionSet, conversionMap, 0, true, vc);
    }
 
    @Override
-   protected TK_REFSET_TYPE getTkRefsetType() {
-      return TK_REFSET_TYPE.CID_STR;
+   protected TK_REFEX_TYPE getTkRefsetType() {
+      return TK_REFEX_TYPE.CID_STR;
    }
 
    @Override
@@ -252,13 +252,13 @@ public class CidStrRevision extends RefsetRevision<CidStrRevision, CidStrMember>
    }
 
    @Override
-   public void setCnid1(int cnid) throws PropertyVetoException {
+   public void setNid1(int cnid) throws PropertyVetoException {
       this.c1Nid = cnid;
       modified();
    }
 
    @Override
-   public void setStr1(String str) throws PropertyVetoException {
+   public void setString1(String str) throws PropertyVetoException {
       this.strValue = str;
       modified();
    }

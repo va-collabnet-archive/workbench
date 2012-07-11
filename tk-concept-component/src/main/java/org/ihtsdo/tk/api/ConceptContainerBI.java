@@ -20,5 +20,5 @@ package org.ihtsdo.tk.api;
  * @author kec
  */
 public interface ConceptContainerBI {
-   int getCnid();
+   int getConceptNid();
 }

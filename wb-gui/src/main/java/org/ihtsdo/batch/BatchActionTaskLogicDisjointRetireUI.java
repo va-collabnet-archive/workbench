@@ -174,7 +174,7 @@ public class BatchActionTaskLogicDisjointRetireUI extends javax.swing.JPanel imp
                         Terms.get().getRefsetExtensionMembers(refsetNid);
                 for (I_ExtendByRef member : rsMembers) {
                     I_GetConceptData mcb = Terms.get().getConcept(member.getComponentNid());
-                    Collection<? extends RefexVersionBI<?>> mRefexes = mcb.getCurrentRefexes(vc, refsetNid);
+                    Collection<? extends RefexVersionBI<?>> mRefexes = mcb.getActiveRefexes(vc, refsetNid);
                     for (RefexVersionBI mrvbi : mRefexes) {
                         for (int editPath : ec.getEditPaths()) {
                             mrvbi.makeAnalog(SnomedMetadataRfx.getSTATUS_RETIRED_NID(),
@@ -197,8 +197,8 @@ public class BatchActionTaskLogicDisjointRetireUI extends javax.swing.JPanel imp
                 // RETIRE OVERALL REFSET CONCEPT
                 ConceptVersionBI c = Ts.get().getConceptVersion(vc, refsetNid);
                 for (int editPath : ec.getEditPaths()) {
-                    if (c.getConAttrsActive() != null) {
-                        c.getConAttrsActive().makeAnalog(
+                    if (c.getConceptAttributesActive() != null) {
+                        c.getConceptAttributesActive().makeAnalog(
                                 SnomedMetadataRfx.getSTATUS_RETIRED_NID(),
                                 Long.MAX_VALUE,
                                 ec.getAuthorNid(), 
@@ -206,7 +206,7 @@ public class BatchActionTaskLogicDisjointRetireUI extends javax.swing.JPanel imp
                                 editPath);
                     }
                 }
-                Collection<? extends RelationshipVersionBI> outrels = c.getRelsOutgoingActive();
+                Collection<? extends RelationshipVersionBI> outrels = c.getRelationshipsSourceActive();
                 for (RelationshipVersionBI r : outrels) {
                     for (int editPath : ec.getEditPaths()) {
                         r.makeAnalog(SnomedMetadataRfx.getSTATUS_RETIRED_NID(),

@@ -37,6 +37,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.helper.bdb.MultiEditorContradictionCase;
 import org.ihtsdo.helper.bdb.MultiEditorContradictionDetector;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
@@ -116,7 +117,7 @@ public class MultiEditorContradictionDetectorMojo extends AbstractMojo {
     private I_TermFactory tf = null;
     private I_ConfigAceFrame config;
     private Precedence precedence;
-    private I_ManageContradiction contradictionMgr;
+    private ContradictionManagerBI contradictionMgr;
 
     private HashSet<Integer> debugWatchNidSet() {
         HashSet<Integer> iSet = new HashSet<Integer>();

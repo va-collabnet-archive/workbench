@@ -52,7 +52,7 @@ import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.spec.ConceptSpec;
@@ -119,13 +119,13 @@ public class DrComponentHelper {
 			ConceptSpec referToRefset = new ConceptSpec("REFERS TO concept association reference set (foundation metadata concept)", UUID.fromString("d15fde65-ed52-3a73-926b-8981e9743ee9"));
 
 			for (DescriptionVersionBI descriptionVersion : descriptionsList) {
-				Collection<? extends RefexVersionBI<?>> currentAnnotations = descriptionVersion.getChronicle().getCurrentAnnotations(config.getViewCoordinate());
+				Collection<? extends RefexVersionBI<?>> currentAnnotations = descriptionVersion.getChronicle().getActiveAnnotations(config.getViewCoordinate());
 				for (RefexVersionBI<?> annotation : currentAnnotations) {
-					RefexCnidVersionBI annotationCnid = (RefexCnidVersionBI) annotation;
-					int languageNid = annotationCnid.getCollectionNid();
-					if (!languageDesignationSetsMap.containsKey(languageNid) && annotationCnid.getCollectionNid() != referToRefset.getLenient().getNid()) {
+					RefexNidVersionBI annotationCnid = (RefexNidVersionBI) annotation;
+					int languageNid = annotationCnid.getRefexNid();
+					if (!languageDesignationSetsMap.containsKey(languageNid) && annotationCnid.getRefexNid() != referToRefset.getLenient().getNid()) {
 						DrLanguageDesignationSet langDefSet = new DrLanguageDesignationSet();
-						langDefSet.setLanguageRefsetUuid(tf.nidToUuid(annotationCnid.getCollectionNid()).toString());
+						langDefSet.setLanguageRefsetUuid(tf.nidToUuid(annotationCnid.getRefexNid()).toString());
 						languageDesignationSetsMap.put(languageNid, langDefSet);
 					}
 				}
@@ -146,12 +146,12 @@ public class DrComponentHelper {
 				loopDescription.setPublished(!getSnomedIntId(descriptionVersion.getNid()).equals("0"));
 				loopDescription.setFactContextName(factContextName);
 
-				Collection<? extends RefexVersionBI<?>> currentAnnotations = descriptionVersion.getChronicle().getCurrentAnnotations(config.getViewCoordinate());
+				Collection<? extends RefexVersionBI<?>> currentAnnotations = descriptionVersion.getChronicle().getActiveAnnotations(config.getViewCoordinate());
 				for (RefexVersionBI<?> annotation : currentAnnotations) {
 					try {
-						RefexCnidVersionBI annotationCnid = (RefexCnidVersionBI) annotation;
-						if (annotationCnid.getCollectionNid() == referToRefset.getLenient().getNid()) {
-							loopDescription.setReferToConceptUuid(tf.nativeToUuid(annotationCnid.getCnid1()).iterator().next().toString());
+						RefexNidVersionBI annotationCnid = (RefexNidVersionBI) annotation;
+						if (annotationCnid.getRefexNid() == referToRefset.getLenient().getNid()) {
+							loopDescription.setReferToConceptUuid(tf.nativeToUuid(annotationCnid.getNid1()).iterator().next().toString());
 						} else {
 							DrDescription langDescription = new DrDescription();
 							langDescription.setAuthorUuid(tf.nidToUuid(descriptionVersion.getAuthorNid()).toString());
@@ -166,10 +166,10 @@ public class DrComponentHelper {
 							langDescription.setTypeUuid(tf.nidToUuid(descriptionVersion.getTypeNid()).toString());
 							langDescription.setFactContextName(factContextName);
 
-							int languageNid = annotationCnid.getCollectionNid();
+							int languageNid = annotationCnid.getRefexNid();
 							DrLanguageDesignationSet langDefSet = languageDesignationSetsMap.get(languageNid);
-							langDescription.setAcceptabilityUuid(tf.nidToUuid(annotationCnid.getCnid1()).toString());
-							langDescription.setLanguageRefsetUuid(tf.nidToUuid(annotationCnid.getCollectionNid()).toString());
+							langDescription.setAcceptabilityUuid(tf.nidToUuid(annotationCnid.getNid1()).toString());
+							langDescription.setLanguageRefsetUuid(tf.nidToUuid(annotationCnid.getRefexNid()).toString());
 							langDefSet.getDescriptions().add(langDescription);
 						}
 					} catch (Exception e) {
@@ -202,8 +202,8 @@ public class DrComponentHelper {
 						DrRelationship loopRel = new DrRelationship();
 						loopRel.setModifierUuid("someUuid");
 						loopRel.setAuthorUuid(tf.nidToUuid(relTuple.getAuthorNid()).toString());
-						loopRel.setSourceUuid(tf.nidToUuid(relTuple.getOriginNid()).toString());
-						loopRel.setTargetUuid(tf.nidToUuid(relTuple.getDestinationNid()).toString());
+						loopRel.setSourceUuid(tf.nidToUuid(relTuple.getSourceNid()).toString());
+						loopRel.setTargetUuid(tf.nidToUuid(relTuple.getTargetNid()).toString());
 						loopRel.setCharacteristicUuid(tf.nidToUuid(relTuple.getCharacteristicNid()).toString());
 						loopRel.setPathUuid(tf.nidToUuid(relTuple.getPathNid()).toString());
 						loopRel.setPrimordialUuid(relTuple.getPrimUuid().toString());
@@ -225,8 +225,8 @@ public class DrComponentHelper {
 						DrRelationship loopRel = new DrRelationship();
 						loopRel.setModifierUuid("someUuid");
 						loopRel.setAuthorUuid(tf.nidToUuid(relTuple.getAuthorNid()).toString());
-						loopRel.setSourceUuid(tf.nidToUuid(relTuple.getOriginNid()).toString());
-						loopRel.setTargetUuid(tf.nidToUuid(relTuple.getDestinationNid()).toString());
+						loopRel.setSourceUuid(tf.nidToUuid(relTuple.getSourceNid()).toString());
+						loopRel.setTargetUuid(tf.nidToUuid(relTuple.getTargetNid()).toString());
 						loopRel.setCharacteristicUuid(tf.nidToUuid(relTuple.getCharacteristicNid()).toString());
 						loopRel.setPathUuid(tf.nidToUuid(relTuple.getPathNid()).toString());
 						loopRel.setPrimordialUuid(relTuple.getPrimUuid().toString());
@@ -265,8 +265,8 @@ public class DrComponentHelper {
 				DrRelationship loopRel = new DrRelationship();
 				loopRel.setModifierUuid("someUuid");
 				loopRel.setAuthorUuid(tf.nidToUuid(relTuple.getAuthorNid()).toString());
-				loopRel.setSourceUuid(tf.nidToUuid(relTuple.getOriginNid()).toString());
-				loopRel.setTargetUuid(tf.nidToUuid(relTuple.getDestinationNid()).toString());
+				loopRel.setSourceUuid(tf.nidToUuid(relTuple.getSourceNid()).toString());
+				loopRel.setTargetUuid(tf.nidToUuid(relTuple.getTargetNid()).toString());
 				loopRel.setCharacteristicUuid(tf.nidToUuid(relTuple.getCharacteristicNid()).toString());
 				loopRel.setPathUuid(tf.nidToUuid(relTuple.getPathNid()).toString());
 				loopRel.setPrimordialUuid(relTuple.getPrimUuid().toString());
@@ -312,8 +312,8 @@ public class DrComponentHelper {
 			//					DrRelationship loopRel = new DrRelationship();
 			//					loopRel.setModifierUuid("someUuid");
 			//					loopRel.setAuthorUuid(tf.nidToUuid(relTuple.getAuthorNid()).toString());
-			//					loopRel.setSourceUuid(tf.nidToUuid(relTuple.getOriginNid()).toString());
-			//					loopRel.setTargetUuid(tf.nidToUuid(relTuple.getDestinationNid()).toString());
+			//					loopRel.setSourceUuid(tf.nidToUuid(relTuple.getSourceNid()).toString());
+			//					loopRel.setTargetUuid(tf.nidToUuid(relTuple.getTargetNid()).toString());
 			//					loopRel.setCharacteristicUuid(tf.nidToUuid(relTuple.getCharacteristicNid()).toString());
 			//					loopRel.setPathUuid(tf.nidToUuid(relTuple.getPathNid()).toString());
 			//					loopRel.setPrimordialUuid(relTuple.getPrimUuid().toString());

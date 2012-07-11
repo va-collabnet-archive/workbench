@@ -15,14 +15,14 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
-import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
+import org.ihtsdo.tk.api.relationship.group.RelationshipGroupChronicleBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.DescSpecFact;
 import org.ihtsdo.tk.drools.facts.RelSpecFact;
 import org.ihtsdo.tk.drools.facts.SpecFact;
 import org.ihtsdo.tk.drools.facts.RelGroupFact;
 import org.ihtsdo.tk.spec.DescriptionSpec;
-import org.ihtsdo.tk.spec.RelSpec;
+import org.ihtsdo.tk.spec.RelationshipSpec;
 
 public class AddToRelGroupAction extends AbstractAction {
 
@@ -58,25 +58,25 @@ public class AddToRelGroupAction extends AbstractAction {
         DescriptionSpec descSpec = ((DescSpecFact) spec).getDescSpec();
         Terms.get().newDescription(UUID.randomUUID(), Terms.get().getConcept(component.getConceptNid()),
                 descSpec.getLangText(),
-                descSpec.getDescText(),
-                Terms.get().getConcept(descSpec.getDescTypeSpec().getLenient().getNid()),
+                descSpec.getDescriptionText(),
+                Terms.get().getConcept(descSpec.getDescriptionTypeSpec().getLenient().getNid()),
                 config, SnomedMetadataRfx.getSTATUS_CURRENT_NID());
         Terms.get().addUncommitted(Terms.get().getConcept(component.getConceptNid()));
     }
 
     private void addRel() {
-        RelSpec relSpec = ((RelSpecFact) spec).getRelSpec();
+        RelationshipSpec relSpec = ((RelSpecFact) spec).getRelSpec();
         try {
-            RelGroupChronicleBI group = (RelGroupChronicleBI) component;
+            RelationshipGroupChronicleBI group = (RelationshipGroupChronicleBI) component;
             Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
             I_GetConceptData originConcept = Terms.get().getConcept(component.getConceptNid());
             I_RelVersioned newRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(),
                     originConcept,
-                    relSpec.getRelTypeSpec().getLenient().getNid(),
-                    relSpec.getDestinationSpec().getLenient().getNid(),
+                    relSpec.getRelationshipTypeSpec().getLenient().getNid(),
+                    relSpec.getTargetSpec().getLenient().getNid(),
                     SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID(),
                     SnomedMetadataRfx.getREL_OPTIONAL_REFINABILITY_NID(),
-                    group.getRelGroup(), //set to relGroup
+                    group.getRelationshipGroupNumber(), //set to relGroup
                     SnomedMetadataRfx.getSTATUS_CURRENT_NID(),
                     config.getDbConfig().getUserConcept().getNid(),
                     pathItr.next().getConceptNid(),

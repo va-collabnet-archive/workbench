@@ -46,7 +46,7 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.vodb.bind.ThinVersionHelper;
-import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
+import org.ihtsdo.tk.api.contradiction.IdentifyAllContradictionStrategy;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
@@ -414,7 +414,7 @@ public class DiffBase extends AbstractMojo {
     protected NidSetBI fsn_type;
     protected int classifier_type;
     protected Precedence precedence = Precedence.PATH;
-    protected ContradictionManagerBI contradiction_mgr = new IdentifyAllConflictStrategy();
+    protected ContradictionManagerBI contradiction_mgr = new IdentifyAllContradictionStrategy();
     protected int added_concept_change;
     protected int deleted_concept_change;
     protected int concept_status_change;
@@ -713,12 +713,12 @@ public class DiffBase extends AbstractMojo {
         I_TermFactory tf = Terms.get();
         I_GetConceptData c = tf.getConcept(SNOMED.Concept.ROOT.getUids());
         getLog().info(c.getInitialText());
-        I_ConceptAttributeVersioned<?> cv = c.getConceptAttributes();
+        I_ConceptAttributeVersioned<?> cv = c.getConAttrs();
         for (I_ConceptAttributePart cvp : cv.getMutableParts()) {
             getLog().info("Attr: " + cvp.getTime());
         }
         I_GetConceptData syn_type = tf.getConcept(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids());
-        for (I_DescriptionVersioned<?> cd : c.getDescriptions()) {
+        for (I_DescriptionVersioned<?> cd : c.getDescs()) {
             for (I_DescriptionPart cvp : cd.getMutableParts()) {
                 if (cvp.getTypeNid() == syn_type.getConceptNid() // && cvp.getText().contains("time")
                         ) {
@@ -1006,7 +1006,7 @@ public class DiffBase extends AbstractMojo {
             System.out.println("P2: " + allowed_position2);
             System.out.println("A1: " + a1);
             System.out.println("A2: " + a2);
-            I_ConceptAttributeVersioned<?> attr = c.getConceptAttributes();
+            I_ConceptAttributeVersioned<?> attr = c.getConAttrs();
             for (I_ConceptAttributePart a : attr.getMutableParts()) {
                 System.out.println("A:  " + a);
             }

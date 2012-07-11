@@ -53,19 +53,19 @@ public class PositionForSet implements Comparable<PositionForSet> {
     }
 
 	@Override
-	public int compareTo(PositionForSet o) {
-		if (this.time == o.time && this.pathNid == o.pathNid) {
+	public int compareTo(PositionForSet another) {
+		if (this.time == another.time && this.pathNid == another.pathNid) {
 			return 0;
-		} else if (this.time == o.time) {
+		} else if (this.time == another.time) {
 			// If time same, use path Id
-			if (this.pathNid < o.pathNid) {
+			if (this.pathNid < another.pathNid) {
 				return -1;
 			} else { 
 				return 1;
 			}
 		} else {
 			// If pathNid is same or different, use the time comparison for the method's result
-			if (this.time < o.time) {
+			if (this.time < another.time) {
 				return -1;
 			} else { 
 				return 1;

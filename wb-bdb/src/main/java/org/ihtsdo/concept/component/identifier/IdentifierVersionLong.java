@@ -52,7 +52,7 @@ public class IdentifierVersionLong extends IdentifierVersion implements LongIdBI
       if (IdentifierVersionLong.class.isAssignableFrom(obj.getClass())) {
          IdentifierVersionLong another = (IdentifierVersionLong) obj;
 
-         return this.getSapNid() == another.getSapNid();
+         return this.getStampNid() == another.getStampNid();
       }
 
       return false;

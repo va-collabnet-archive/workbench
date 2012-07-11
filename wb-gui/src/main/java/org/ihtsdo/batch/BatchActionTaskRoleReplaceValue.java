@@ -21,12 +21,12 @@ import java.util.Collection;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
-import org.ihtsdo.tk.api.blueprint.RelCAB;
+import org.ihtsdo.tk.api.blueprint.RelationshipCAB;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
-import org.ihtsdo.tk.dto.concept.component.relationship.TkRelType;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipType;
 
 /**
  * BatchActionTaskRoleReplaceValue
@@ -61,9 +61,9 @@ public class BatchActionTaskRoleReplaceValue extends BatchActionTask {
     public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
         int conceptNid = c.getNid();
         boolean changed = false;
-        Collection<? extends RelationshipVersionBI> rels = c.getRelsOutgoingActive();
+        Collection<? extends RelationshipVersionBI> rels = c.getRelationshipsSourceActive();
         for (RelationshipVersionBI rvbi : rels) {
-            if (rvbi.getTypeNid() == roleNid && rvbi.getDestinationNid() == valueOldNid) {
+            if (rvbi.getTypeNid() == roleNid && rvbi.getTargetNid() == valueOldNid) {
                 for (int editPath : ec.getEditPaths()) {
                     rvbi.makeAnalog(RETIRED_NID,
                             Long.MAX_VALUE,
@@ -72,11 +72,11 @@ public class BatchActionTaskRoleReplaceValue extends BatchActionTask {
                             editPath);
                 }
 
-                TkRelType relChType = TkRelType.STATED_HIERARCHY;
+                TkRelationshipType relChType = TkRelationshipType.STATED_HIERARCHY;
                 if (HISTORIC_ROLE_TYPES.contains(rvbi.getTypeNid())) {
-                    relChType = TkRelType.HISTORIC;
+                    relChType = TkRelationshipType.HISTORIC;
                 }
-                RelCAB rc = new RelCAB(rvbi.getOriginNid(), rvbi.getTypeNid(), valueNewNid, rvbi.getGroup(),
+                RelationshipCAB rc = new RelationshipCAB(rvbi.getSourceNid(), rvbi.getTypeNid(), valueNewNid, rvbi.getGroup(),
                         relChType);
                 tsSnapshot.construct(rc);
 

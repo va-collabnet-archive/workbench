@@ -54,7 +54,7 @@ public class ConceptSpec implements SpecBI {
         if (objDataVersion == dataVersion) {
             description = in.readUTF();
             uuids = (UUID[]) in.readObject();
-            relSpecs = (RelSpec[]) in.readObject();
+            relSpecs = (RelationshipSpec[]) in.readObject();
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -62,7 +62,7 @@ public class ConceptSpec implements SpecBI {
     }
     private UUID[] uuids;
     private String description;
-    private RelSpec[] relSpecs;
+    private RelationshipSpec[] relSpecs;
 
     /**
      * added to allow JavaBeans spec use.
@@ -71,26 +71,26 @@ public class ConceptSpec implements SpecBI {
         super();
     }
 
-    public ConceptSpec(String description, String uuid) {
-        this(description, uuid, new RelSpec[]{});
+    public ConceptSpec(String descriptionText, String conceptUuid) {
+        this(descriptionText, conceptUuid, new RelationshipSpec[]{});
     }
 
-    public ConceptSpec(String description, String uuid, RelSpec... relSpecs) {
-        this(description, UUID.fromString(uuid), relSpecs);
+    public ConceptSpec(String descriptionText, String conceptUuid, RelationshipSpec... relationshipSpecs) {
+        this(descriptionText, UUID.fromString(conceptUuid), relationshipSpecs);
     }
 
-    public ConceptSpec(String description, UUID uuid) {
-        this(description, new UUID[]{uuid}, new RelSpec[]{});
+    public ConceptSpec(String descriptionText, UUID conceptUuid) {
+        this(descriptionText, new UUID[]{conceptUuid}, new RelationshipSpec[]{});
     }
 
-    public ConceptSpec(String description, UUID uuid, RelSpec... relSpecs) {
-        this(description, new UUID[]{uuid}, relSpecs);
+    public ConceptSpec(String descriptionText, UUID conceptUuid, RelationshipSpec... relationshipSpecs) {
+        this(descriptionText, new UUID[]{conceptUuid}, relationshipSpecs);
     }
 
-    public ConceptSpec(String description, UUID[] uuids, RelSpec... relSpecs) {
-        this.uuids = uuids;
-        this.description = description;
-        this.relSpecs = relSpecs;
+    public ConceptSpec(String descriptionText, UUID[] conceptUuids, RelationshipSpec... relationshipSpecs) {
+        this.uuids = conceptUuids;
+        this.description = descriptionText;
+        this.relSpecs = relationshipSpecs;
     }
 
     public ConceptChronicleBI getLenient() throws ValidationException, IOException {
@@ -114,7 +114,7 @@ public class ConceptSpec implements SpecBI {
         }
     }
 
-    public ConceptVersionBI getStrict(ViewCoordinate c) throws ValidationException, IOException {
+    public ConceptVersionBI getStrict(ViewCoordinate viewCoordinate) throws ValidationException, IOException {
         try {
             boolean found = false;
             for (UUID uuid : uuids) {
@@ -127,9 +127,9 @@ public class ConceptSpec implements SpecBI {
                throw new ValidationException("No matching ids in db: " + this.toString());
             }
 
-            ConceptVersionBI local = Ts.get().getConceptVersion(c, uuids);
-            validateDescription(local, c);
-            validateRelationships(local, c);
+            ConceptVersionBI local = Ts.get().getConceptVersion(viewCoordinate, uuids);
+            validateDescription(local, viewCoordinate);
+            validateRelationships(local, viewCoordinate);
             return local;
         } catch (ContradictionException e) {
             throw new ValidationException(e);
@@ -138,30 +138,30 @@ public class ConceptSpec implements SpecBI {
 
     /**
      * 
-     * @param c
+     * @param viewCoordinate
      * @return
      * @throws IOException
      * @deprecated Use getStrict or getLienient instead. 
      */
     @Deprecated
-    public ConceptVersionBI get(ViewCoordinate c) throws IOException {
-        return getStrict(c);
+    public ConceptVersionBI get(ViewCoordinate viewCoordinate) throws IOException {
+        return getStrict(viewCoordinate);
     }
 
-    private void validateRelationships(ConceptVersionBI local, ViewCoordinate c) throws IOException {
+    private void validateRelationships(ConceptVersionBI conceptVersion, ViewCoordinate viewCoordinate) throws IOException {
         if (relSpecs == null || relSpecs.length == 0) {
             return;
         }
 
         next:
-        for (RelSpec relSpec : relSpecs) {
+        for (RelationshipSpec relSpec : relSpecs) {
 
-            ConceptVersionBI relType = relSpec.getRelTypeSpec().getStrict(c);
-            ConceptVersionBI destination = relSpec.getDestinationSpec().getStrict(c);
+            ConceptVersionBI relType = relSpec.getRelationshipTypeSpec().getStrict(viewCoordinate);
+            ConceptVersionBI destination = relSpec.getTargetSpec().getStrict(viewCoordinate);
             NidSetBI typeNids = new NidSet();
             typeNids.add(relType.getNid());
 
-            for (ConceptVersionBI dest : local.getRelsOutgoingDestinations(typeNids)) {
+            for (ConceptVersionBI dest : conceptVersion.getRelationshipsSourceTargetConcepts(typeNids)) {
                 if (dest.equals(destination)) {
                     continue next;
                 }
@@ -170,23 +170,23 @@ public class ConceptSpec implements SpecBI {
         }
     }
 
-    private void validateRelationships(ConceptChronicleBI local) throws IOException {
+    private void validateRelationships(ConceptChronicleBI conceptChronicle) throws IOException {
         if (relSpecs == null || relSpecs.length == 0) {
             return;
         }
 
         next:
-        for (RelSpec relSpec : relSpecs) {
+        for (RelationshipSpec relSpec : relSpecs) {
 
-            ConceptChronicleBI relType = relSpec.getRelTypeSpec().getLenient();
-            ConceptChronicleBI destination = relSpec.getDestinationSpec().getLenient();
+            ConceptChronicleBI relType = relSpec.getRelationshipTypeSpec().getLenient();
+            ConceptChronicleBI destination = relSpec.getTargetSpec().getLenient();
             NidSetBI typeNids = new NidSet();
             typeNids.add(relType.getNid());
 
-            for (RelationshipChronicleBI rel : local.getRelsOutgoing()) {
+            for (RelationshipChronicleBI rel : conceptChronicle.getRelationshipsSource()) {
                 for (RelationshipVersionBI rv : rel.getVersions()) {
                     if (rv.getTypeNid() == relType.getNid()
-                            && rv.getDestinationNid() == destination.getNid()) {
+                            && rv.getTargetNid() == destination.getNid()) {
                         continue next;
                     }
                 }
@@ -195,9 +195,9 @@ public class ConceptSpec implements SpecBI {
         }
     }
 
-    private void validateDescription(ConceptChronicleBI local) throws IOException, ContradictionException {
+    private void validateDescription(ConceptChronicleBI conceptChronicle) throws IOException, ContradictionException {
         boolean found = false;
-        for (DescriptionChronicleBI desc : local.getDescs()) {
+        for (DescriptionChronicleBI desc : conceptChronicle.getDescriptions()) {
             for (DescriptionVersionBI descv : desc.getVersions()) {
                 if (descv.getText().equals(description)) {
                     found = true;
@@ -209,13 +209,13 @@ public class ConceptSpec implements SpecBI {
 
             throw new ValidationException("No description matching: '"
                     + description + "' found for:\n"
-                    + local);
+                    + conceptChronicle);
         }
     }
 
-    private void validateDescription(ConceptVersionBI local, ViewCoordinate c) throws IOException, ContradictionException {
+    private void validateDescription(ConceptVersionBI conceptVersion, ViewCoordinate viewCoordinate) throws IOException, ContradictionException {
         boolean found = false;
-        for (DescriptionVersionBI desc : local.getDescsActive()) {
+        for (DescriptionVersionBI desc : conceptVersion.getDescriptionsActive()) {
             if (desc.getText().equals(description)) {
                 found = true;
                 break;
@@ -225,7 +225,7 @@ public class ConceptSpec implements SpecBI {
 
             throw new ValidationException("No description matching: '"
                     + description + "' found for:\n"
-                    + local);
+                    + conceptVersion);
         }
     }
 
@@ -270,14 +270,14 @@ public class ConceptSpec implements SpecBI {
         this.uuids = uuids;
     }
 
-    public void setUuidStrs(String[] uuidStrs) {
-        this.uuids = new UUID[uuidStrs.length];
-        for (int i = 0; i < uuidStrs.length; i++) {
-            this.uuids[i] = UUID.fromString(uuidStrs[i]);
+    public void setUuidStrings(String[] uuidStrings) {
+        this.uuids = new UUID[uuidStrings.length];
+        for (int i = 0; i < uuidStrings.length; i++) {
+            this.uuids[i] = UUID.fromString(uuidStrings[i]);
         }
     }
 
-    public String[] getUuidStrs() {
+    public String[] getUuidStrings() {
         String[] results = new String[uuids.length];
         for (int i = 0; i < uuids.length; i++) {
             results[i] = uuids[i].toString();
@@ -293,12 +293,12 @@ public class ConceptSpec implements SpecBI {
         this.description = description;
     }
 
-    public RelSpec[] getRelSpecs() {
+    public RelationshipSpec[] getRelationshipSpecs() {
         return relSpecs;
     }
 
-    public void setRelSpecs(RelSpec[] relSpecs) {
-        this.relSpecs = relSpecs;
+    public void setRelationshipSpecs(RelationshipSpec[] relationshipSpecs) {
+        this.relSpecs = relationshipSpecs;
     }
 
     @Override

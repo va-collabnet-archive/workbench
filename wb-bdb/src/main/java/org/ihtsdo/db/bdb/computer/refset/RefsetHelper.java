@@ -179,7 +179,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
                     new Exception("Null extension in list: " + extensions + " from component: "
                         + Bdb.getConceptForComponent(componentNid).toLongString()));
             }
-            if (extension != null && extension.getCollectionNid() == refsetId) {
+            if (extension != null && extension.getRefexNid() == refsetId) {
 
                 // get the latest version
                 ComponentVersionBI latestPart = extension.getVersion(config.getViewCoordinate());

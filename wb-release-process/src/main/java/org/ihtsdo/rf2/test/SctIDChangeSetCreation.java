@@ -14,8 +14,8 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.cs.ChangeSetPolicy;
-import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
+import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
+import org.ihtsdo.tk.api.cs.ChangeSetWriterThreading;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.rf2.constant.I_Constants;
@@ -90,7 +90,7 @@ public class SctIDChangeSetCreation extends TestCase {
             //I_GetConceptData igcd = _termfactory.getConcept(UUID.fromString("aa23ea32-37cc-6cc8-e044-0003ba13161a"));
             I_GetConceptData igcd = _termfactory.getConcept(UUID.fromString("a2993d32-bf7b-3305-e044-0003ba13161a"));
             I_Identify i_Identify = Terms.get().getId(igcd.getNid());
-            I_ConceptAttributeVersioned<?> i_ConceptAttributeVersioned = igcd.getConceptAttributes();
+            I_ConceptAttributeVersioned<?> i_ConceptAttributeVersioned = igcd.getConAttrs();
             i_Identify.addLongId(Long.parseLong("797977"), ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid(), 
                     i_ConceptAttributeVersioned.getStatusNid(),
                     Long.MAX_VALUE,
@@ -111,7 +111,7 @@ public class SctIDChangeSetCreation extends TestCase {
 			
             I_GetConceptData igcd = _termfactory.getConcept(UUID.fromString("122ccc03-c72f-4969-94d5-af5a7004905f"));
             I_Identify i_Identify = Terms.get().getId(igcd.getNid());
-            I_ConceptAttributeVersioned<?> i_ConceptAttributeVersioned = igcd.getConceptAttributes();
+            I_ConceptAttributeVersioned<?> i_ConceptAttributeVersioned = igcd.getConAttrs();
             
             /*i_Identify.addLongId(Long.parseLong("797977"), ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid(), 
             		i_ConceptAttributeVersioned.getStatusNid(),

@@ -17,15 +17,15 @@ import java.util.Collection;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
-import org.ihtsdo.tk.api.blueprint.RelCAB;
+import org.ihtsdo.tk.api.blueprint.RelationshipCAB;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.binding.snomed.Snomed;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
-import org.ihtsdo.tk.dto.concept.component.relationship.TkRelType;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipType;
 
 /**
  * Sample BatchAction
@@ -52,9 +52,9 @@ public class BatchActionTaskLogicUnionCreate extends BatchActionTask {
         int rcNid = c.getNid(); // referenced component nid
 
         // Check if member already exists
-        Collection<? extends RefexVersionBI<?>> currentRefexes = c.getCurrentRefexes(vc);
+        Collection<? extends RefexVersionBI<?>> currentRefexes = c.getRefexesActive(vc);
         for (RefexVersionBI rvbi : currentRefexes) {
-            if (rvbi.getCollectionNid() == unionSetNid) {
+            if (rvbi.getRefexNid() == unionSetNid) {
                 BatchActionEventReporter.add(new BatchActionEvent(c,
                         BatchActionTaskType.LOGIC_UNION_SET_CREATE,
                         BatchActionEventType.EVENT_NOOP,
@@ -64,7 +64,7 @@ public class BatchActionTaskLogicUnionCreate extends BatchActionTask {
         }
 
         // If not already a member, then a member record is added.
-        RefexCAB refexSpec = new RefexCAB(TK_REFSET_TYPE.CID, rcNid, unionSetNid);
+        RefexCAB refexSpec = new RefexCAB(TK_REFEX_TYPE.CID, rcNid, unionSetNid);
         int normalMemberNid = ts.getConcept(
                         RefsetAuxiliary.Concept.NORMAL_MEMBER.getUids()).getConceptNid();
         refexSpec.with(RefexCAB.RefexProperty.CNID1, normalMemberNid);

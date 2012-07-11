@@ -5,14 +5,14 @@ package org.ihtsdo.etypes;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartLong;
 
-import org.ihtsdo.tk.dto.concept.component.refset.Long.TkRefsetLongRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_long.TkRefexLongRevision;
 
 //~--- JDK imports ------------------------------------------------------------
 
 import java.io.DataInput;
 import java.io.IOException;
 
-public class ERefsetLongRevision extends TkRefsetLongRevision {
+public class ERefsetLongRevision extends TkRefexLongRevision {
    public static final long serialVersionUID = 1;
 
    //~--- constructors --------------------------------------------------------
@@ -22,7 +22,7 @@ public class ERefsetLongRevision extends TkRefsetLongRevision {
    }
 
    public ERefsetLongRevision(I_ExtendByRefPartLong part) throws IOException {
-      longValue  = part.getLongValue();
+      long1  = part.getLongValue();
       pathUuid   = Terms.get().nidToUuid(part.getPathNid());
       statusUuid = Terms.get().nidToUuid(part.getStatusNid());
       authorUuid    = Terms.get().nidToUuid(part.getAuthorNid());

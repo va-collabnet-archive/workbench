@@ -19,7 +19,7 @@ import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 
 /**
@@ -96,12 +96,12 @@ public class AnnotationToRefset extends AbstractTransformer {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformAnnotation(org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember, org.ihtsdo.tk.dto.concept.component.TkComponent)
+	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformAnnotation(org.ihtsdo.tk.dto.concept.component.refset.TkRefexAbstractMember, org.ihtsdo.tk.dto.concept.component.TkComponent)
 	 */
 	@Override
-	public void transformAnnotation(TkRefsetAbstractMember<?> annotation,
+	public void transformAnnotation(TkRefexAbstractMember<?> annotation,
 			TkComponent<?> component) {
-		if (annotation.getRefsetUuid().equals(refsetUuid)) {
+		if (annotation.getRefexUuid().equals(refsetUuid)) {
 			component.getAnnotations().remove(annotation);
 			refset.getRefsetMembers().add(annotation);
 			count();
@@ -109,10 +109,10 @@ public class AnnotationToRefset extends AbstractTransformer {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformMember(org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember, org.ihtsdo.tk.dto.concept.TkConcept)
+	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformMember(org.ihtsdo.tk.dto.concept.component.refset.TkRefexAbstractMember, org.ihtsdo.tk.dto.concept.TkConcept)
 	 */
 	@Override
-	public void transformMember(TkRefsetAbstractMember<?> member,
+	public void transformMember(TkRefexAbstractMember<?> member,
 			TkConcept concept) {
 	}
 
@@ -169,7 +169,7 @@ public class AnnotationToRefset extends AbstractTransformer {
 			refset = new EConcept(refsetConcept);
 			refset.setAnnotationStyleRefex(false);
 			if (refset.getRefsetMembers() == null) {
-				refset.setRefsetMembers(new ArrayList<TkRefsetAbstractMember<?>>());
+				refset.setRefsetMembers(new ArrayList<TkRefexAbstractMember<?>>());
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -17,11 +17,11 @@
 package org.dwfa.ace.api;
 
 import java.beans.PropertyVetoException;
-import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
-import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeAnalogBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 
-public interface I_ConceptAttributeTuple<A extends ConAttrAnalogBI>
-        extends I_AmTuple<A>, ConAttrVersionBI<A> {
+public interface I_ConceptAttributeTuple<A extends ConceptAttributeAnalogBI>
+        extends I_AmTuple<A>, ConceptAttributeVersionBI<A> {
 
 
     @Override

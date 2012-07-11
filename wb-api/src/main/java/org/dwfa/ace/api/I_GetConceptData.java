@@ -41,7 +41,7 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
      *         concept
      * @throws IOException
      */
-    public I_ConceptAttributeVersioned getConceptAttributes() throws IOException;
+    public I_ConceptAttributeVersioned getConAttrs() throws IOException;
 
     public int getConceptNid();
 
@@ -398,7 +398,7 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
     public Set<? extends I_GetConceptData> getDestRelOrigins(NidSetBI allowedTypes) throws IOException,
             TerminologyException;
 
-    public Collection<? extends I_DescriptionVersioned> getDescriptions() throws IOException;
+    public Collection<? extends I_DescriptionVersioned> getDescs() throws IOException;
 
     public Collection<? extends I_RelVersioned> getDestRels() throws IOException;
 

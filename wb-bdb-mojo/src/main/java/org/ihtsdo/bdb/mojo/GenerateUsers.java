@@ -58,8 +58,8 @@ import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.cs.ChangeSetPolicy;
-import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
+import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
+import org.ihtsdo.tk.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.bpa.process.TaskFailedException;
@@ -76,9 +76,9 @@ import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
-import org.ihtsdo.tk.api.blueprint.DescCAB;
+import org.ihtsdo.tk.api.blueprint.DescriptionCAB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
-import org.ihtsdo.tk.api.blueprint.RelCAB;
+import org.ihtsdo.tk.api.blueprint.RelationshipCAB;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -87,7 +87,7 @@ import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.binding.snomed.*;
-import org.ihtsdo.tk.dto.concept.component.relationship.TkRelType;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipType;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetSearcher;
 import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetWriter;
@@ -352,8 +352,8 @@ public class GenerateUsers extends AbstractMojo {
 			getLog().warn("User not found:" + userName + " for rel permission");
 		} else {
 			getLog().info("Creating permission for user " +  user.toString() + " if not current");
-			RelCAB relCab = new RelCAB(user.getPrimUuid(),UUID.fromString(typeUid),
-					UUID.fromString(targetUid),0,TkRelType.STATED_ROLE);
+			RelationshipCAB relCab = new RelationshipCAB(user.getPrimUuid(),UUID.fromString(typeUid),
+					UUID.fromString(targetUid),0,TkRelationshipType.STATED_ROLE);
 			Ts.get().getTerminologyBuilder(config.getEditCoordinate(), 
 					config.getViewCoordinate()).constructIfNotCurrent(relCab);
 			//			old way
@@ -618,26 +618,26 @@ public class GenerateUsers extends AbstractMojo {
 					userParent.getLenient().getPrimUuid());
 
 			// Needs a description record...
-			DescCAB inboxDescBp = new DescCAB(userConceptBp.getComponentUuid(),
+			DescriptionCAB inboxDescBp = new DescriptionCAB(userConceptBp.getComponentUuid(),
 					Ts.get().getUuidPrimordialForNid(SnomedMetadataRfx.getDES_SYNONYM_NID()),
 					LANG_CODE.EN,
 					userConfig.getUsername() + ".inbox",
 					false);
 
 			//add workflow relationship
-			RelCAB wfRelBp = new RelCAB(userConceptBp.getComponentUuid(),
+			RelationshipCAB wfRelBp = new RelationshipCAB(userConceptBp.getComponentUuid(),
 					ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS.getPrimoridalUid(),
 					ArchitectonicAuxiliary.Concept.WORKFLOW_ACTIVE_MODELER.getPrimoridalUid(),
 					0,
-					TkRelType.STATED_ROLE);
+					TkRelationshipType.STATED_ROLE);
 			ViewCoordinate vc = userConfig.getViewCoordinate();
 			EditCoordinate oldEc = userConfig.getEditCoordinate();
 			EditCoordinate ec = new EditCoordinate(oldEc.getAuthorNid(),
                                         oldEc.getModuleNid(),
 					TermAux.WB_AUX_PATH.getLenient().getNid());
 			TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(ec, vc);
-			userConceptBp.setDescCABs(inboxDescBp);
-			userConceptBp.setRelCABs(wfRelBp);
+			userConceptBp.addDescriptionCAB(inboxDescBp);
+			userConceptBp.setRelationshipCAB(wfRelBp);
 			ConceptChronicleBI userConcept = builder.construct(userConceptBp);
 			userConfig.getDbConfig().setUserConcept((I_GetConceptData)userConcept);
 			Ts.get().addUncommitted(userConcept);
@@ -651,16 +651,16 @@ public class GenerateUsers extends AbstractMojo {
 		int wfNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.WORKFLOW_ACTIVE_MODELER.getUids());
 		boolean found = false;
 		for (I_RelVersioned rel : userConcept.getSourceRels()) {
-			if (rel.getDestinationNid() == wfNid) {
+			if (rel.getTargetNid() == wfNid) {
 				found = true;
 			}
 		}
 		if (!found) {
-			RelCAB wfRelBp = new RelCAB(userConcept.getPrimUuid(),
+			RelationshipCAB wfRelBp = new RelationshipCAB(userConcept.getPrimUuid(),
 					ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS.getPrimoridalUid(),
 					ArchitectonicAuxiliary.Concept.WORKFLOW_ACTIVE_MODELER.getPrimoridalUid(),
 					0,
-					TkRelType.STATED_ROLE);
+					TkRelationshipType.STATED_ROLE);
 			ViewCoordinate vc = userConfig.getViewCoordinate();
 			EditCoordinate oldEc = userConfig.getEditCoordinate();
 			EditCoordinate ec = new EditCoordinate(oldEc.getAuthorNid(),
@@ -676,7 +676,7 @@ public class GenerateUsers extends AbstractMojo {
 	private void setUserConcept(String userUuidString) throws TerminologyException, IOException, InvalidCAB, ContradictionException {
 		I_GetConceptData userConcept = Terms.get().getConcept(UUID.fromString(userUuidString));
 		I_TermFactory tf = Terms.get();
-		DescCAB inboxDescBp = new DescCAB(userConcept.getPrimUuid(),
+		DescriptionCAB inboxDescBp = new DescriptionCAB(userConcept.getPrimUuid(),
 				Ts.get().getUuidPrimordialForNid(SnomedMetadataRfx.getDES_SYNONYM_NID()),
 				LANG_CODE.EN,
 				userConfig.getUsername() + ".inbox",

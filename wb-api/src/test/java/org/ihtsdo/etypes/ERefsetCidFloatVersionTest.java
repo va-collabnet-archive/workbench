@@ -129,8 +129,8 @@ public class ERefsetCidFloatVersionTest {
     private ERefsetCidFloatRevision makeTestComponent1() {
         
         ERefsetCidFloatRevision rsv = new ERefsetCidFloatRevision();
-        rsv.c1Uuid = new UUID(4444, 4444);
-        rsv.floatValue = 2;
+        rsv.uuid1 = new UUID(4444, 4444);
+        rsv.float1 = 2;
         rsv.pathUuid = new UUID(7777, 7777);
         rsv.statusUuid = new UUID(8888, 8888);
         rsv.time = this.myTime;
@@ -141,8 +141,8 @@ public class ERefsetCidFloatVersionTest {
     private ERefsetCidFloatRevision makeTestComponent2() {
         
         ERefsetCidFloatRevision rsv = new ERefsetCidFloatRevision();
-        rsv.c1Uuid = new UUID(555, 777);
-        rsv.floatValue = 2;
+        rsv.uuid1 = new UUID(555, 777);
+        rsv.float1 = 2;
         rsv.pathUuid = new UUID(222, 777);
         rsv.statusUuid = new UUID(111, 777);
         rsv.time = this.myTime;

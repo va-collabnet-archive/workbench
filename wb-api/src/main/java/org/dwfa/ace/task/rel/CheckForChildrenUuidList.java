@@ -108,7 +108,7 @@ public class CheckForChildrenUuidList extends AbstractTask {
             config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             ViewCoordinate vc = config.getViewCoordinate();
             tempVc = new ViewCoordinate(vc);
-            tempVc.setRelAssertionType(RelAssertionType.STATED);
+            tempVc.setRelationshipAssertionType(RelAssertionType.STATED);
             I_HostConceptPlugins host = (I_HostConceptPlugins) worker.readAttachement(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name());
             concept = (I_GetConceptData) host.getTermComponent();
 
@@ -353,8 +353,8 @@ public class CheckForChildrenUuidList extends AbstractTask {
         try {
             ConceptVersionBI cv = Ts.get().getConceptVersion(tempVc, concept.getNid());
 
-            Collection<? extends ConceptVersionBI> allRelsIncoming = cv.getRelsIncomingOrigins();
-            Collection<? extends ConceptVersionBI> relsIncoming = cv.getRelsIncomingOriginsActiveIsa();
+            Collection<? extends ConceptVersionBI> allRelsIncoming = cv.getRelationshipsTargetSourceConcepts();
+            Collection<? extends ConceptVersionBI> relsIncoming = cv.getRelationshipsTargetSourceConceptsActiveIsa();
             uuidList = new ArrayList<UUID>();
             uncommittedUuidList = new ArrayList<UUID>();
             if (allRelsIncoming != null) {

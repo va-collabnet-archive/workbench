@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_boolean.TkRefexBooleanRevision;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -129,16 +129,16 @@ public class ERefsetBooleanMemberTest {
     
     private ERefsetBooleanMember makeTestComponent1() {
         ERefsetBooleanMember member = new ERefsetBooleanMember();
-        member.booleanValue = true;
+        member.boolean1 = true;
         member.componentUuid = new UUID(64386, 75497);
         member.pathUuid = new UUID(4350, 5469);
         member.primordialUuid = new UUID(320, 230);
         member.refsetUuid = new UUID(14386, 65497);
         member.statusUuid = new UUID(5386, 4497);
         member.time = this.myTime;
-        member.revisions = new ArrayList<TkRefsetBooleanRevision>();
+        member.revisions = new ArrayList<TkRefexBooleanRevision>();
         ERefsetBooleanRevision rsv = new ERefsetBooleanRevision();
-        rsv.booleanValue = true;
+        rsv.boolean1 = true;
         rsv.pathUuid = new UUID(4350, 5469);
         rsv.statusUuid = new UUID(5386, 4497);
         rsv.time = this.myTime;
@@ -149,16 +149,16 @@ public class ERefsetBooleanMemberTest {
 
     private ERefsetBooleanMember makeTestComponent2() {
         ERefsetBooleanMember member = new ERefsetBooleanMember();
-        member.booleanValue = false;
+        member.boolean1 = false;
         member.componentUuid = new UUID(324, 325);
         member.pathUuid = new UUID(326, 327);
         member.primordialUuid = new UUID(328, 329);
         member.refsetUuid = new UUID(330, 331);
         member.statusUuid = new UUID(332, 333);
         member.time = this.myTime;
-        member.revisions = new ArrayList<TkRefsetBooleanRevision>();
+        member.revisions = new ArrayList<TkRefexBooleanRevision>();
         ERefsetBooleanRevision rsv = new ERefsetBooleanRevision();
-        rsv.booleanValue = true;
+        rsv.boolean1 = true;
         rsv.pathUuid = new UUID(334, 335);
         rsv.statusUuid = new UUID(336, 337);
         rsv.time = this.myTime;

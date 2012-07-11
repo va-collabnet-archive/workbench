@@ -31,7 +31,7 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 
 /**
  *
@@ -308,7 +308,7 @@ public class BatchActionTaskRefsetReplaceValueUI extends javax.swing.JPanel impl
         // SET VALUE TYPE
         switch (jComboBoxType.getSelectedIndex()) {
             case 0:
-                ((BatchActionTaskRefsetReplaceValue) task).setRefsetType(TK_REFSET_TYPE.BOOLEAN);
+                ((BatchActionTaskRefsetReplaceValue) task).setRefsetType(TK_REFEX_TYPE.BOOLEAN);
                 Boolean valBoolean = ((ValueBooleanUI) jPanelValueReplace).getValue();
                 if (valBoolean != null) {
                     ((BatchActionTaskRefsetReplaceValue) task).setRefsetValue(valBoolean);
@@ -319,7 +319,7 @@ public class BatchActionTaskRefsetReplaceValueUI extends javax.swing.JPanel impl
                 }
                 break;
             case 1:
-                ((BatchActionTaskRefsetReplaceValue) task).setRefsetType(TK_REFSET_TYPE.CID);
+                ((BatchActionTaskRefsetReplaceValue) task).setRefsetType(TK_REFEX_TYPE.CID);
                 Integer valConcept = ((ValueDndNidUI) jPanelValueReplace).getValue();
                 if (valConcept != null) {
                     ((BatchActionTaskRefsetReplaceValue) task).setRefsetValue(valConcept);
@@ -330,7 +330,7 @@ public class BatchActionTaskRefsetReplaceValueUI extends javax.swing.JPanel impl
                 }
                 break;
             case 2:
-                ((BatchActionTaskRefsetReplaceValue) task).setRefsetType(TK_REFSET_TYPE.INT);
+                ((BatchActionTaskRefsetReplaceValue) task).setRefsetType(TK_REFEX_TYPE.INT);
                 Integer valInt = ((ValueIntUI) jPanelValueReplace).getValue();
                 if (valInt != null) {
                     ((BatchActionTaskRefsetReplaceValue) task).setMatchValue(valInt);
@@ -341,7 +341,7 @@ public class BatchActionTaskRefsetReplaceValueUI extends javax.swing.JPanel impl
                 }
                 break;
             case 3:
-                ((BatchActionTaskRefsetReplaceValue) task).setRefsetType(TK_REFSET_TYPE.STR);
+                ((BatchActionTaskRefsetReplaceValue) task).setRefsetType(TK_REFEX_TYPE.STR);
                 String valStr = ((ValueStringUI) jPanelValueReplace).getValue();
                 if (valStr != null) {
                     ((BatchActionTaskRefsetReplaceValue) task).setMatchValue(valStr);

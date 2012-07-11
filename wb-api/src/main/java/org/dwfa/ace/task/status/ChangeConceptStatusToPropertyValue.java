@@ -114,7 +114,7 @@ public class ChangeConceptStatusToPropertyValue extends AbstractTask {
                 }
             }
             for (I_ConceptAttributePart p : partsToAdd) {
-                concept.getConceptAttributes().addVersion(p);
+                concept.getConAttrs().addVersion(p);
             }
             Terms.get().addUncommitted(concept);
             return Condition.CONTINUE;

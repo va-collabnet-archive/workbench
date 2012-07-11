@@ -436,7 +436,7 @@ public class RulesDeploymentPackageReferenceHelper {
                                                         config.getEditCoordinate().getAuthorNid(),
                                                         config.getEditCoordinate().getModuleNid(),
 							editPath.getConceptNid());
-				conceptToRetireUpdatedFromDB.getConceptAttributes().addVersion(newAttributeVersion);
+				conceptToRetireUpdatedFromDB.getConAttrs().addVersion(newAttributeVersion);
 			}
 			termFactory.addUncommittedNoChecks(conceptToRetireUpdatedFromDB);
 			termFactory.commit();
@@ -475,7 +475,7 @@ public class RulesDeploymentPackageReferenceHelper {
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	private static I_ConceptAttributePart getLastestAttributePart(final I_GetConceptData concept) throws IOException {
-		List<? extends I_ConceptAttributePart> refsetAttibuteParts = concept.getConceptAttributes().getMutableParts();
+		List<? extends I_ConceptAttributePart> refsetAttibuteParts = concept.getConAttrs().getMutableParts();
 		I_ConceptAttributePart latestAttributePart = null;
 		for (I_ConceptAttributePart attributePart : refsetAttibuteParts) {
 			if (latestAttributePart == null || attributePart.getTime() >= latestAttributePart.getTime()) {

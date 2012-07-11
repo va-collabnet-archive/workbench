@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.ihtsdo.tk.dto.concept.component.refset.cidint.TkRefsetCidIntRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_int.TkRefexUuidIntRevision;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -129,18 +129,18 @@ public class ERefsetCidIntMemberTest {
     
     private ERefsetCidIntMember makeTestComponent1() {
         ERefsetCidIntMember cidIntMember = new ERefsetCidIntMember();
-        cidIntMember.c1Uuid = new UUID(4386, 5497);
-        cidIntMember.intValue = 33;
+        cidIntMember.uuid1 = new UUID(4386, 5497);
+        cidIntMember.int1 = 33;
         cidIntMember.refsetUuid = new UUID(14386, 65497);
         cidIntMember.componentUuid = new UUID(64386, 75497);
         cidIntMember.pathUuid = new UUID(4350, 5469);
         cidIntMember.statusUuid = new UUID(5386, 4497);
         cidIntMember.time = this.myTime;
         cidIntMember.primordialUuid = new UUID(320, 230);
-        cidIntMember.revisions = new ArrayList<TkRefsetCidIntRevision>();
+        cidIntMember.revisions = new ArrayList<TkRefexUuidIntRevision>();
         ERefsetCidIntRevision rciv = new ERefsetCidIntRevision();
-        rciv.c1Uuid = new UUID(114386, 656497);
-        rciv.intValue = 99;
+        rciv.uuid1 = new UUID(114386, 656497);
+        rciv.int1 = 99;
         rciv.pathUuid = new UUID(4350, 5469);
         rciv.statusUuid = new UUID(5386, 4497);
         rciv.time = this.myTime;
@@ -151,18 +151,18 @@ public class ERefsetCidIntMemberTest {
 
     private ERefsetCidIntMember makeTestComponent2() {
         ERefsetCidIntMember cidIntMember = new ERefsetCidIntMember();
-        cidIntMember.c1Uuid = new UUID(111, 5497);
-        cidIntMember.intValue = 17;
+        cidIntMember.uuid1 = new UUID(111, 5497);
+        cidIntMember.int1 = 17;
         cidIntMember.refsetUuid = new UUID(222, 65497);
         cidIntMember.componentUuid = new UUID(333, 75497);
         cidIntMember.pathUuid = new UUID(444, 5469);
         cidIntMember.statusUuid = new UUID(555, 4497);
         cidIntMember.time = this.myTime;
         cidIntMember.primordialUuid = new UUID(666, 230);
-        cidIntMember.revisions = new ArrayList<TkRefsetCidIntRevision>();
+        cidIntMember.revisions = new ArrayList<TkRefexUuidIntRevision>();
         ERefsetCidIntRevision rciv = new ERefsetCidIntRevision();
-        rciv.c1Uuid = new UUID(777, 656497);
-        rciv.intValue = 16;
+        rciv.uuid1 = new UUID(777, 656497);
+        rciv.int1 = 16;
         rciv.pathUuid = new UUID(888, 5469);
         rciv.statusUuid = new UUID(999, 4497);
         rciv.time = this.myTime;

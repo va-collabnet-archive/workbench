@@ -73,7 +73,7 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel impl
                     return false;
                 }
                 I_GetConceptData b = Terms.get().getConcept(id);
-                b.getDescriptions();
+                b.getDescs();
                 concepts.put(id, b);
 
             }
@@ -137,7 +137,7 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel impl
             if (cb == null) {
                 return true;
             }
-            Collection<? extends I_DescriptionVersioned> descs = cb.getDescriptions();
+            Collection<? extends I_DescriptionVersioned> descs = cb.getDescs();
             addToConceptsToFetch(descs);
             if (stopWork) {
                 return false;
@@ -230,7 +230,7 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel impl
             return selectedTuples;
         }
         try {
-            for (I_DescriptionVersioned desc : cb.getDescriptions()) {
+            for (I_DescriptionVersioned desc : cb.getDescs()) {
                 desc.addTuples(allowedStatus, allowedTypes, positions, selectedTuples,
                         host.getConfig().getPrecedence(), host.getConfig().getConflictResolutionStrategy());
             }

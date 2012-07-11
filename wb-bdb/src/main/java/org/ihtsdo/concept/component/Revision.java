@@ -15,7 +15,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.AnalogBI;
-import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.ComponentChronicleBI;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
@@ -171,7 +171,7 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
     public abstract boolean readyToWriteRevision();
 
     @Override
-    public boolean sapIsInRange(int min, int max) {
+    public boolean stampIsInRange(int min, int max) {
         return (sapNid >= min) && (sapNid <= max);
     }
 
@@ -282,8 +282,8 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
         return allNids;
     }
 
-    public Set<Integer> getAllSapNids() throws IOException {
-        return primordialComponent.getAllSapNids();
+    public Set<Integer> getAllStampNids() throws IOException {
+        return primordialComponent.getAllStampNids();
     }
 
     @Override
@@ -297,8 +297,8 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
     }
 
     @Override
-    public ComponentChroncileBI getChronicle() {
-        return (ComponentChroncileBI) primordialComponent;
+    public ComponentChronicleBI getChronicle() {
+        return (ComponentChronicleBI) primordialComponent;
     }
 
     @Override
@@ -307,50 +307,49 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
     }
 
     @Override
-    public Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz)
+    public Collection<? extends RefexVersionBI<?>> getAnnotationsActive(ViewCoordinate xyz)
             throws IOException {
-        return primordialComponent.getCurrentAnnotationMembers(xyz);
+        return primordialComponent.getAnnotationsActive(xyz);
     }
 
     @Override
-    public Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz,
-            int refexNid)
+    public Collection<? extends RefexVersionBI<?>> getAnnotationMembersActive(ViewCoordinate xyz, int refexNid)
             throws IOException {
-        return primordialComponent.getCurrentAnnotationMembers(xyz, refexNid);
+        return primordialComponent.getAnnotationMembersActive(xyz, refexNid);
     }
 
     @Override
-    public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz)
+    public Collection<? extends RefexVersionBI<?>> getActiveAnnotations(ViewCoordinate xyz)
             throws IOException {
-        return getCurrentAnnotationMembers(xyz);
+        return getAnnotationsActive(xyz);
     }
 
     @Override
-    public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz, int refexNid)
+    public Collection<? extends RefexVersionBI<?>> getActiveAnnotations(ViewCoordinate xyz, int refexNid)
             throws IOException {
-        return getCurrentAnnotationMembers(xyz, refexNid);
+        return getAnnotationMembersActive(xyz, refexNid);
     }
 
     @Override
-    public Collection<? extends RefexVersionBI<?>> getCurrentRefexMembers(ViewCoordinate xyz, int refsetNid)
+    public Collection<? extends RefexVersionBI<?>> getRefexMembersActive(ViewCoordinate xyz, int refsetNid)
             throws IOException {
-        return primordialComponent.getCurrentRefexMembers(xyz, refsetNid);
+        return primordialComponent.getRefexMembersActive(xyz, refsetNid);
     }
 
     @Override
-    public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz) throws IOException {
-        return primordialComponent.getCurrentRefexes(xyz);
+    public Collection<? extends RefexVersionBI<?>> getRefexesActive(ViewCoordinate xyz) throws IOException {
+        return primordialComponent.getRefexesActive(xyz);
     }
 
     @Override
-    public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz, int refsetNid)
+    public Collection<? extends RefexVersionBI<?>> getActiveRefexes(ViewCoordinate xyz, int refsetNid)
             throws IOException {
-        return primordialComponent.getCurrentRefexes(xyz, refsetNid);
+        return primordialComponent.getActiveRefexes(xyz, refsetNid);
     }
 
     @Override
-    public Collection<? extends RefexVersionBI<?>> getInactiveRefexes(ViewCoordinate xyz) throws IOException {
-        return getChronicle().getInactiveRefexes(xyz);
+    public Collection<? extends RefexVersionBI<?>> getRefexesInactive(ViewCoordinate xyz) throws IOException {
+        return getChronicle().getRefexesInactive(xyz);
     }
 
     @Override
@@ -409,7 +408,7 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
     }
 
     @Override
-    public int getSapNid() {
+    public int getStampNid() {
         return sapNid;
     }
 
@@ -461,13 +460,13 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
     }
 
     @Override
-    public boolean hasCurrentAnnotationMember(ViewCoordinate xyz, int refsetNid) throws IOException {
-        return primordialComponent.hasCurrentAnnotationMember(xyz, refsetNid);
+    public boolean hasAnnotationMemberActive(ViewCoordinate xyz, int refsetNid) throws IOException {
+        return primordialComponent.hasAnnotationMemberActive(xyz, refsetNid);
     }
 
     @Override
-    public boolean hasCurrentRefexMember(ViewCoordinate xyz, int refsetNid) throws IOException {
-        return primordialComponent.hasCurrentRefexMember(xyz, refsetNid);
+    public boolean hasRefexMemberActive(ViewCoordinate xyz, int refsetNid) throws IOException {
+        return primordialComponent.hasRefexMemberActive(xyz, refsetNid);
     }
 
     @Override

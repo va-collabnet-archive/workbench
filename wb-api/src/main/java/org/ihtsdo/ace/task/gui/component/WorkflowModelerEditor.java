@@ -67,7 +67,7 @@ public class WorkflowModelerEditor extends AbstractComboEditor {
 				for (RelationshipVersionBI<?>  rel : relList)
 				{
 					if (rel != null &&
-						rel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_DEFAULT_MODELER.getPrimoridalUid()).getConceptNid()) 
+						rel.getTargetNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_DEFAULT_MODELER.getPrimoridalUid()).getConceptNid()) 
 					{
 						foundDefaultModeler = true;
 						defaultModeler = modeler;
@@ -106,7 +106,7 @@ public class WorkflowModelerEditor extends AbstractComboEditor {
 		for (RelationshipVersionBI<?> rel : relList)
 		{
 			if (rel != null &&
-				rel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_LEAD_MODELER.getPrimoridalUid()).getConceptNid())
+				rel.getTargetNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_LEAD_MODELER.getPrimoridalUid()).getConceptNid())
 				return true;
 		}
 		

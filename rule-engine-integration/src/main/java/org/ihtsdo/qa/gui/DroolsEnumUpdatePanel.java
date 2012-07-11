@@ -280,7 +280,7 @@ public class DroolsEnumUpdatePanel extends JPanel {
 			}
 
 			ConceptVersionBI refsetBI = Ts.get().getConceptVersion(config.getViewCoordinate(), selectedRefset.getUids());
-			Collection<? extends DescriptionVersionBI> guvnorDescriptionsSize = refsetBI.getDescsActive(ArchitectonicAuxiliary.Concept.GUVNOR_ENUM_PROPERTY_DESC_TYPE.localize().getNid());
+			Collection<? extends DescriptionVersionBI> guvnorDescriptionsSize = refsetBI.getDescriptionsActive(ArchitectonicAuxiliary.Concept.GUVNOR_ENUM_PROPERTY_DESC_TYPE.localize().getNid());
 			if (guvnorDescriptionsSize.size() < 1 || guvnorDescriptionsSize.size() > 1) {
 				JOptionPane.showMessageDialog(this, "Wrong guvnor property descriptions: ", "Warning", JOptionPane.WARNING_MESSAGE);
 				refsetListModel.removeAllElements();

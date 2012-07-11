@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ManageContradiction;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_ShowActivity;
@@ -53,7 +53,7 @@ public class SnoPathProcessExStated implements I_ProcessConcepts {
     I_ShowActivity gui;
     private Logger logger;
     private Precedence precedence;
-    private I_ManageContradiction contradictionMgr;
+    private ContradictionManagerBI contradictionMgr;
     private ConcurrentHashMap<Integer, UUID> watchList = null;
 
     public void addWatchConcept(UUID uuid) throws TerminologyException, IOException {
@@ -75,7 +75,7 @@ public class SnoPathProcessExStated implements I_ProcessConcepts {
             PositionSetReadOnly pathOverridePos,
             I_ShowActivity gui,
             Precedence precedence,
-            I_ManageContradiction contradictionMgr)
+            ContradictionManagerBI contradictionMgr)
             throws Exception {
         // Has additionof PositionSetReadOnly pathOverridePos parameter
         this.fromPathPosPriority = pathOverridePos;
@@ -125,7 +125,7 @@ public class SnoPathProcessExStated implements I_ProcessConcepts {
             PositionSetReadOnly pathPos,
             I_ShowActivity gui,
             Precedence precedence,
-            I_ManageContradiction contradictionMgr)
+            ContradictionManagerBI contradictionMgr)
             throws Exception {
         this.fromPathPosPriority = null;
 

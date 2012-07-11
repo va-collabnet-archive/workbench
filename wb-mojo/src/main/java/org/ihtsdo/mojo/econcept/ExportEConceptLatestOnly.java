@@ -98,7 +98,7 @@ public class ExportEConceptLatestOnly extends AbstractMojo {
                return returnUuid;
             }
          };
-         ViewCoordinate vc           = Ts.get().getMetadataVC();
+         ViewCoordinate vc           = Ts.get().getMetadataViewCoordinate();
          ViewCoordinate conceptVc     = new ViewCoordinate(vc);
          conceptVc.getAllowedStatusNids().clear();
 

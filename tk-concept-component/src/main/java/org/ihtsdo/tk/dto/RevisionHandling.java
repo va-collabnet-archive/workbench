@@ -16,9 +16,10 @@
 package org.ihtsdo.tk.dto;
 
 /**
- *
- * @author kec
+ * 
+ * @deprecated not in TK3
  */
+@Deprecated
 public enum RevisionHandling {
     INCLUDE_REVISIONS, EXCLUDE_REVISIONS;
 }

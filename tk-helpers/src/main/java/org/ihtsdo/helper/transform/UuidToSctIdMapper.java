@@ -23,7 +23,7 @@ import java.util.UUID;
 import org.ihtsdo.helper.rf2.Rf2File;
 import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.ComponentChronicleBI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.id.IdBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
@@ -1206,7 +1206,7 @@ public class UuidToSctIdMapper {
             return conceptSctId;
         }
         if (!idExists) {
-            ComponentChroncileBI component = store.getComponent(conceptUuid);
+            ComponentChronicleBI component = store.getComponent(conceptUuid);
             if (component != null) {
                 Collection<IdBI> ids = (Collection<IdBI>) component.getAdditionalIds();
                 if (ids != null) {

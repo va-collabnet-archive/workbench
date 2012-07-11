@@ -122,7 +122,7 @@ public class DragPanelRel extends DragPanelComponentVersion<RelationshipVersionB
                getComponent().setTypeNid(newValue.getNid());
 
                if (getComponent().isUncommitted()) {
-                  Terms.get().addUncommitted(Terms.get().getConcept(getComponent().getOriginNid()));
+                  Terms.get().addUncommitted(Terms.get().getConcept(getComponent().getSourceNid()));
                }
             } catch (PropertyVetoException e) {
                AceLog.getAppLog().alertAndLogException(e);
@@ -140,7 +140,7 @@ public class DragPanelRel extends DragPanelComponentVersion<RelationshipVersionB
       gbc.weightx = 1;
       gbc.gridx++;
 
-      TermComponentLabel destLabel = getLabel(getRel().getDestinationNid(), canDrop,
+      TermComponentLabel destLabel = getLabel(getRel().getTargetNid(), canDrop,
                                         getSettings().getRelTarget());
 
       if (getRel().isUncommitted()
@@ -153,10 +153,10 @@ public class DragPanelRel extends DragPanelComponentVersion<RelationshipVersionB
          @Override
          protected void changeProperty(I_GetConceptData newValue) {
             try {
-               getComponent().setDestinationNid(newValue.getNid());
+               getComponent().setTargetNid(newValue.getNid());
 
                if (getComponent().isUncommitted()) {
-                  Terms.get().addUncommitted(Terms.get().getConcept(getComponent().getOriginNid()));
+                  Terms.get().addUncommitted(Terms.get().getConcept(getComponent().getSourceNid()));
                }
             } catch (PropertyVetoException e) {
                AceLog.getAppLog().alertAndLogException(e);

@@ -86,7 +86,7 @@ public class TermComponentTreeSelectionListener implements TreeSelectionListener
             if (node instanceof RootNode) {
                 return;
             }
-            ConceptChronicleBI cc   = Ts.get().getConcept(node.getCnid());
+            ConceptChronicleBI cc   = Ts.get().getConcept(node.getConceptNid());
 
             if (cc != null) {
                linkedComponent.setTermComponent((I_GetConceptData) cc);

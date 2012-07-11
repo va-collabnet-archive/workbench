@@ -37,13 +37,13 @@ public class IsaCache extends TypeCache {
 		// Retired concept should be setup in the isa cache by stated parents
 		
 
-		if (!cv.isActive() || cv.getRelsOutgoingActiveIsa().isEmpty()) {
+		if (!cv.isActive() || cv.getRelationshipsSourceActiveIsa().isEmpty()) {
 			cv = new ConceptVersion((Concept) concept, statedViewCoordinate);
 		}
 
-		for (RelationshipVersionBI rv : cv.getRelsOutgoingActive()) {
+		for (RelationshipVersionBI rv : cv.getRelationshipsSourceActive()) {
 			if (types.contains(rv.getTypeNid())) {
-				parentSet.add(rv.getDestinationNid());
+				parentSet.add(rv.getTargetNid());
 			}
 		}
 

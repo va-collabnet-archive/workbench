@@ -385,13 +385,13 @@ public class ConceptDetailsPanel extends JPanel {
 		DefaultMutableTreeNode typeNode = createRelAttributeNode(relTuple.getTypeNid());
 		addNodeInSortedOrder(relNode, typeNode);
 
-		DefaultMutableTreeNode targetNode = createRelAttributeNode(relTuple.getDestinationNid());
+		DefaultMutableTreeNode targetNode = createRelAttributeNode(relTuple.getTargetNid());
 		addNodeInSortedOrder(relNode, targetNode);
 
 		DefaultMutableTreeNode autorNode = createRelAttributeNode(relTuple.getAuthorNid());
 		addNodeInSortedOrder(relNode, autorNode);
 
-		DefaultMutableTreeNode originalNode = createRelAttributeNode(relTuple.getOriginNid());
+		DefaultMutableTreeNode originalNode = createRelAttributeNode(relTuple.getSourceNid());
 		addNodeInSortedOrder(relNode, originalNode);
 
 		DefaultMutableTreeNode characteristicNode = createRelAttributeNode(relTuple.getCharacteristicNid());
@@ -434,13 +434,13 @@ public class ConceptDetailsPanel extends JPanel {
 		DefaultMutableTreeNode typeNode = createRelAttributeNode(relTuple.getTypeNid());
 		addNodeInSortedOrder(relNode, typeNode);
 
-		DefaultMutableTreeNode targetNode = createRelAttributeNode(relTuple.getDestinationNid());
+		DefaultMutableTreeNode targetNode = createRelAttributeNode(relTuple.getTargetNid());
 		addNodeInSortedOrder(relNode, targetNode);
 
 		DefaultMutableTreeNode autorNode = createRelAttributeNode(relTuple.getAuthorNid());
 		addNodeInSortedOrder(relNode, autorNode);
 
-		DefaultMutableTreeNode originalNode = createRelAttributeNode(relTuple.getOriginNid());
+		DefaultMutableTreeNode originalNode = createRelAttributeNode(relTuple.getSourceNid());
 		addNodeInSortedOrder(relNode, originalNode);
 
 		DefaultMutableTreeNode characteristicNode = createRelAttributeNode(relTuple.getCharacteristicNid());
@@ -516,7 +516,7 @@ public class ConceptDetailsPanel extends JPanel {
 		String typeUuid = tf.nidToUuid(relTuple.getTypeNid()).toString();
 		I_GetConceptData type = tf.getConcept(UUID.fromString(typeUuid));
 
-		String targetUuid = tf.nidToUuid(relTuple.getDestinationNid()).toString();
+		String targetUuid = tf.nidToUuid(relTuple.getTargetNid()).toString();
 		I_GetConceptData target = tf.getConcept(UUID.fromString(targetUuid));
 
 		String uuid = tf.nidToUuid(relTuple.getCharacteristicNid()).toString();
@@ -553,7 +553,7 @@ public class ConceptDetailsPanel extends JPanel {
 		String typeUuid = tf.nidToUuid(relTuple.getTypeNid()).toString();
 		I_GetConceptData type = tf.getConcept(UUID.fromString(typeUuid));
 
-		String targetUuid = tf.nidToUuid(relTuple.getDestinationNid()).toString();
+		String targetUuid = tf.nidToUuid(relTuple.getTargetNid()).toString();
 		I_GetConceptData target = tf.getConcept(UUID.fromString(targetUuid));
 
 		String uuid = tf.nidToUuid(relTuple.getCharacteristicNid()).toString();

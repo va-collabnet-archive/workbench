@@ -33,9 +33,9 @@ import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 
 /**
  * BatchActionTaskLogicUnionRetire
@@ -46,7 +46,7 @@ public class BatchActionTaskLogicUnionRetire extends BatchActionTask {
     // REFSET MEMBER
     private int collectionNid;
     // FILTER
-    private TK_REFSET_TYPE refsetType;
+    private TK_REFEX_TYPE refsetType;
 
     public BatchActionTaskLogicUnionRetire() {
         this.collectionNid = Integer.MAX_VALUE;
@@ -56,7 +56,7 @@ public class BatchActionTaskLogicUnionRetire extends BatchActionTask {
         this.collectionNid = collectionNid;
     }
 
-    public void setRefsetType(TK_REFSET_TYPE refsetType) {
+    public void setRefsetType(TK_REFEX_TYPE refsetType) {
         this.refsetType = refsetType;
     }
 
@@ -67,17 +67,17 @@ public class BatchActionTaskLogicUnionRetire extends BatchActionTask {
         int parentMemberTypeNid = Terms.get().getConcept(
                 RefsetAuxiliary.Concept.MARKED_PARENT.getPrimoridalUid()).getConceptNid();
 
-        Collection<? extends RefexVersionBI<?>> rm = c.getCurrentRefexes(vc);
+        Collection<? extends RefexVersionBI<?>> rm = c.getRefexesActive(vc);
         for (RefexChronicleBI<?> rcbi : rm) {
             ConceptChronicleBI cb = rcbi.getEnclosingConcept();
-            Collection<? extends RelationshipChronicleBI> parents = cb.getRelsOutgoing();
+            Collection<? extends RelationshipChronicleBI> parents = cb.getRelationshipsSource();
             for (RelationshipChronicleBI parentRel : parents) {
-                if (parentRel.getDestinationNid() == DescriptionLogic.getUnionSetsRefsetNid()) {
-                    Collection<? extends RefexVersionBI<?>> ml = cb.getCurrentRefsetMembers(vc);
+                if (parentRel.getTargetNid() == DescriptionLogic.getUnionSetsRefsetNid()) {
+                    Collection<? extends RefexVersionBI<?>> ml = cb.getRefsetMembersActive(vc);
                     for (RefexVersionBI<?> member : ml) {
                         // member.
-                        if (RefexCnidVersionBI.class.isAssignableFrom(member.getClass())) {
-                            int memberTypeNid = ((RefexCnidVersionBI) member).getCnid1();
+                        if (RefexNidVersionBI.class.isAssignableFrom(member.getClass())) {
+                            int memberTypeNid = ((RefexNidVersionBI) member).getNid1();
                             if (memberTypeNid == parentMemberTypeNid) {
                                 // retire marked parent concept
                                 ConceptVersionBI cvbi = ts.getConceptVersion(vc,
@@ -102,7 +102,7 @@ public class BatchActionTaskLogicUnionRetire extends BatchActionTask {
                                         ec.getModuleNid(),
                                         editPath);
                             }
-                            ts.addUncommitted(ts.getConcept(member.getCollectionNid()));
+                            ts.addUncommitted(ts.getConcept(member.getRefexNid()));
 
                             BatchActionEventReporter.add(new BatchActionEvent(c,
                                     BatchActionTaskType.LOGIC_UNION_SET_RETIRE,

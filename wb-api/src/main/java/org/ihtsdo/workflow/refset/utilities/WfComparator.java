@@ -72,8 +72,8 @@ public class WfComparator
 		
 		public int compare(ConceptVersionBI a, ConceptVersionBI b) {
 			try {
-				return a.getFullySpecifiedDescription().getText().toLowerCase().compareTo(
-						b.getFullySpecifiedDescription().getText().toLowerCase());
+				return a.getDescriptionFullySpecified().getText().toLowerCase().compareTo(
+						b.getDescriptionFullySpecified().getText().toLowerCase());
 			} catch (Exception e) {
 				AceLog.getAppLog().log(Level.WARNING, "Couldn't Setup FSN Comparator", e);
 			}
@@ -108,8 +108,8 @@ public class WfComparator
 	public class VersionedPreferredTermComparator implements Comparator<ConceptVersionBI> { 
 		public int compare(ConceptVersionBI a, ConceptVersionBI b) {
 			try {
-				return a.getPreferredDescription().getText().toLowerCase().compareTo(
-						b.getPreferredDescription().getText().toLowerCase());
+				return a.getDescriptionPreferred().getText().toLowerCase().compareTo(
+						b.getDescriptionPreferred().getText().toLowerCase());
 			} catch (Exception e) {
 				AceLog.getAppLog().log(Level.WARNING, "Couldn't Setup PreferredTerm Comparator", e);
 			}

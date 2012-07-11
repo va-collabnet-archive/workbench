@@ -27,8 +27,8 @@ import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescriptionRevision;
 import org.ihtsdo.tk.dto.concept.component.media.TkMedia;
 import org.ihtsdo.tk.dto.concept.component.media.TkMediaRevision;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidint.TkRefsetCidIntRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_int.TkRefexUuidIntRevision;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 import org.junit.After;
@@ -333,32 +333,32 @@ public class ConceptTest {
         testConcept.setImages(imageList);
         
         // Add Refset Members  
-        List<TkRefsetAbstractMember<?>> refsetList =  new ArrayList<TkRefsetAbstractMember<?>>();
+        List<TkRefexAbstractMember<?>> refsetList =  new ArrayList<TkRefexAbstractMember<?>>();
 
         ERefsetCidIntMember cidIntMember = new ERefsetCidIntMember();
         cidIntMember.additionalIds = null; 
         cidIntMember.setAdditionalIdComponents(null);
-        cidIntMember.setC1Uuid(new UUID(4386, 5497));
+        cidIntMember.setUuid1(new UUID(4386, 5497));
         cidIntMember.setComponentUuid(new UUID(64386, 75497));
-        cidIntMember.setIntValue(33);
+        cidIntMember.setInt1(33);
         cidIntMember.setPathUuid(new UUID(4350, 5469));
         cidIntMember.setPrimordialComponentUuid(new UUID(320, 230));
         cidIntMember.setRefsetUuid(new UUID(14386, 65497));
         cidIntMember.setStatusUuid(new UUID(5386, 4497));
         cidIntMember.setTime(this.myTime);
-        cidIntMember.revisions = new ArrayList<TkRefsetCidIntRevision>(2);
+        cidIntMember.revisions = new ArrayList<TkRefexUuidIntRevision>(2);
         // Add extra Refset Members Versions 
         ERefsetCidIntRevision rciv = new ERefsetCidIntRevision();
-        rciv.setC1Uuid(new UUID(114386, 656497));
-        rciv.setIntValue(99);
+        rciv.setUuid1(new UUID(114386, 656497));
+        rciv.setInt1(99);
         rciv.setPathUuid(new UUID(4350, 5469));
         rciv.setStatusUuid(new UUID(5386, 4497));
         rciv.setTime(this.myTime); 
         cidIntMember.revisions.add(rciv);
         // add another Refset Members version 
         rciv = new ERefsetCidIntRevision();
-        rciv.setC1Uuid(new UUID(44386, 46497));
-        rciv.setIntValue(54);
+        rciv.setUuid1(new UUID(44386, 46497));
+        rciv.setInt1(54);
         rciv.setPathUuid(new UUID(4350, 4469));
         rciv.setStatusUuid(new UUID(4386, 4497));
         rciv.setTime(this.myTime); 
@@ -496,32 +496,32 @@ public class ConceptTest {
         testConcept.setImages(imageList);
         
         // Add Refset Members  
-        List<TkRefsetAbstractMember<?>> refsetList =  new ArrayList<TkRefsetAbstractMember<?>>();
+        List<TkRefexAbstractMember<?>> refsetList =  new ArrayList<TkRefexAbstractMember<?>>();
 
         ERefsetCidIntMember cidIntMember = new ERefsetCidIntMember();
         cidIntMember.additionalIds = null; 
         cidIntMember.setAdditionalIdComponents(null);
-        cidIntMember.setC1Uuid(new UUID(90, 90));
+        cidIntMember.setUuid1(new UUID(90, 90));
         cidIntMember.setComponentUuid(new UUID(91, 91));
-        cidIntMember.setIntValue(01);
+        cidIntMember.setInt1(01);
         cidIntMember.setPathUuid(new UUID(92, 92));
         cidIntMember.setPrimordialComponentUuid(new UUID(93, 93));
         cidIntMember.setRefsetUuid(new UUID(94, 94));
         cidIntMember.setStatusUuid(new UUID(95, 95));
         cidIntMember.setTime(this.myTime);
-        cidIntMember.revisions = new ArrayList<TkRefsetCidIntRevision>(2);
+        cidIntMember.revisions = new ArrayList<TkRefexUuidIntRevision>(2);
         // Add extra Refset Members Versions 
         ERefsetCidIntRevision rciv = new ERefsetCidIntRevision();
-        rciv.setC1Uuid(new UUID(96, 96));
-        rciv.setIntValue(21);
+        rciv.setUuid1(new UUID(96, 96));
+        rciv.setInt1(21);
         rciv.setPathUuid(new UUID(97, 97));
         rciv.setStatusUuid(new UUID(98, 98));
         rciv.setTime(this.myTime); 
         cidIntMember.revisions.add(rciv);
         // add another Refset Members version 
         rciv = new ERefsetCidIntRevision();
-        rciv.setC1Uuid(new UUID(99, 99));
-        rciv.setIntValue(61);
+        rciv.setUuid1(new UUID(99, 99));
+        rciv.setInt1(61);
         rciv.setPathUuid(new UUID(100, 100));
         rciv.setStatusUuid(new UUID(101, 101));
         rciv.setTime(this.myTime); 

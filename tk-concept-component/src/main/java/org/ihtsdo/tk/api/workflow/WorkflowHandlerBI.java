@@ -11,11 +11,11 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
 public interface WorkflowHandlerBI {
-	public Collection<? extends WorkflowHistoryJavaBeanBI> getAvailableWorkflowActions(ConceptVersionBI concept, ViewCoordinate vc) throws IOException, ContradictionException;
+	public Collection<? extends WorkflowHistoryJavaBeanBI> getAvailableWorkflowActions(ConceptVersionBI concept, ViewCoordinate ViewCoordinate) throws IOException, ContradictionException;
 
 	public List<UUID> getAllAvailableWorkflowActionUids(); 
 
-	public boolean hasAction(Collection<? extends WorkflowHistoryJavaBeanBI> beans, ConceptSpec action) throws IOException, ContradictionException;
+	public boolean hasAction(Collection<? extends WorkflowHistoryJavaBeanBI> beans, ConceptSpec actionSpec) throws IOException, ContradictionException;
 
-	public boolean isActiveAction(Collection<? extends WorkflowHistoryJavaBeanBI> possibleActions, UUID action);
+	public boolean isActiveAction(Collection<? extends WorkflowHistoryJavaBeanBI> possibleActions, UUID actionUuid);
 }

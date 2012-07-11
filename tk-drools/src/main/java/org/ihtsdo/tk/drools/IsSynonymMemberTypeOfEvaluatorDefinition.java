@@ -35,7 +35,7 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.drools.facts.DescFact;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
@@ -122,17 +122,17 @@ public class IsSynonymMemberTypeOfEvaluatorDefinition implements EvaluatorDefini
                 }
 
                 Collection<? extends RefexChronicleBI> refexes =
-                        desc.getCurrentRefexes(vc);
+                        desc.getRefexesActive(vc);
 
                 if (refexes != null) {
                     for (RefexChronicleBI refex : refexes) {
-                        if (refex.getCollectionNid() == evalRefsetNid) {
+                        if (refex.getRefexNid() == evalRefsetNid) {
                             //test member type
                             if (RefexVersionBI.class.isAssignableFrom(refex.getClass())) {
                                 RefexVersionBI<?> rv = (RefexVersionBI<?>) refex;
 
-                                if (RefexCnidVersionBI.class.isAssignableFrom(rv.getClass())) {
-                                    int cnid = ((RefexCnidVersionBI) rv).getCnid1();
+                                if (RefexNidVersionBI.class.isAssignableFrom(rv.getClass())) {
+                                    int cnid = ((RefexNidVersionBI) rv).getNid1();
                                     if (cnid == typeNid) {
                                         isMemberType = true;
                                     }

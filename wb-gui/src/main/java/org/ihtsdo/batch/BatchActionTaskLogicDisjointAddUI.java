@@ -30,9 +30,9 @@ import org.ihtsdo.helper.descriptionlogic.DescriptionLogic;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContradictionException;
-import org.ihtsdo.tk.api.blueprint.ConAttrAB;
+import org.ihtsdo.tk.api.blueprint.ConceptAttributeAB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
-import org.ihtsdo.tk.api.blueprint.RelCAB;
+import org.ihtsdo.tk.api.blueprint.RelationshipCAB;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
@@ -40,7 +40,7 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.binding.snomed.TermAux;
-import org.ihtsdo.tk.dto.concept.component.relationship.TkRelType;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipType;
 
 /**
  *
@@ -154,15 +154,15 @@ public class BatchActionTaskLogicDisjointAddUI extends javax.swing.JPanel
         if (BatchActionTask.ts.hasUuid(componentUuid) == true) {
             ConceptVersionBI refsetCB = BatchActionTask.ts.getConceptVersion(vc, componentUuid);
             // :SNOOWL: review added null, null)
-            ConAttrAB cCab = new ConAttrAB(componentUuid, false, null, null);
+            ConceptAttributeAB cCab = new ConceptAttributeAB(componentUuid, false, null, null);
             cCab.setCurrent();
             BatchActionTask.tsSnapshot.construct(cCab);
 
             // SET RELATIONSHIP TO CURRENT
             UUID roleTypeUuid = TermAux.IS_A.getLenient().getPrimUuid();
             UUID destUuid = DescriptionLogic.DISJOINT_SETS_REFSET.getLenient().getPrimUuid();
-            RelCAB rCab = new RelCAB(refsetCB.getPrimUuid(), roleTypeUuid, destUuid, 0,
-                    TkRelType.STATED_HIERARCHY);
+            RelationshipCAB rCab = new RelationshipCAB(refsetCB.getPrimUuid(), roleTypeUuid, destUuid, 0,
+                    TkRelationshipType.STATED_HIERARCHY);
 
             BatchActionTask.tsSnapshot.construct(rCab);
             Ts.get().addUncommitted(refsetCB);

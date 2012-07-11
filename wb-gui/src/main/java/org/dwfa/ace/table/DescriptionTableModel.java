@@ -52,9 +52,9 @@ import org.ihtsdo.arena.spec.Refsets;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
-import org.ihtsdo.tk.example.binding.WbDescType;
+import org.ihtsdo.tk.binding.snomed.WbDescType;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
 public abstract class DescriptionTableModel extends AbstractTableModel {
@@ -215,17 +215,17 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
         boolean isPreferredTerm = false;
         try {
             Collection<? extends RefexChronicleBI> refexes =
-                    desc.getCurrentRefexes(config.getViewCoordinate());
+                    desc.getRefexesActive(config.getViewCoordinate());
             int evalRefsetNid = Ts.get().getNidForUuids(evalRefset.getUuids());
 
             if (refexes != null) {
                 for (RefexChronicleBI refex : refexes) {
-                    if (refex.getCollectionNid() == evalRefsetNid) {
+                    if (refex.getRefexNid() == evalRefsetNid) {
                         if (RefexVersionBI.class.isAssignableFrom(refex.getClass())) {
                                 RefexVersionBI<?> rv = (RefexVersionBI<?>) refex;
 
-                                if (RefexCnidVersionBI.class.isAssignableFrom(rv.getClass())) {
-                                    int cnid = ((RefexCnidVersionBI) rv).getCnid1();
+                                if (RefexNidVersionBI.class.isAssignableFrom(rv.getClass())) {
+                                    int cnid = ((RefexNidVersionBI) rv).getNid1();
                                     if (cnid == SnomedMetadataRfx.getDESC_PREFERRED_NID()) {
                                         isPreferredTerm = true;
                                     }

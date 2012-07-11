@@ -20,7 +20,7 @@ import java.io.IOException;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 
 /**
  * BatchActionTaskLogicDisjoinRetire
@@ -31,7 +31,7 @@ public class BatchActionTaskLogicDisjointRetire extends BatchActionTask {
     // REFSET MEMBER
     private int collectionNid;
     // FILTER
-    private TK_REFSET_TYPE refsetType;
+    private TK_REFEX_TYPE refsetType;
 
     public BatchActionTaskLogicDisjointRetire() {
         this.collectionNid = Integer.MAX_VALUE;
@@ -41,7 +41,7 @@ public class BatchActionTaskLogicDisjointRetire extends BatchActionTask {
         this.collectionNid = collectionNid;
     }
 
-    public void setRefsetType(TK_REFSET_TYPE refsetType) {
+    public void setRefsetType(TK_REFEX_TYPE refsetType) {
         this.refsetType = refsetType;
     }
 

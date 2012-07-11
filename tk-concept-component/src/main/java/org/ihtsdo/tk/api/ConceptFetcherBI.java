@@ -26,12 +26,12 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
  */
 public interface ConceptFetcherBI {
    ConceptChronicleBI fetch() throws Exception;
-   ConceptVersionBI fetch(ViewCoordinate vc) throws Exception;
+   ConceptVersionBI fetch(ViewCoordinate viewCoordinate) throws Exception;
    /**
     * Update the currently fetched concept. Must not be used for
     * random updates. 
-    * @param cc
+    * @param conceptChronicle
     * @throws Exception 
     */
-   void update(ConceptChronicleBI cc) throws Exception;
+   void update(ConceptChronicleBI conceptChronicle) throws Exception;
 }

@@ -298,7 +298,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                 I_GetConceptData cb = (I_GetConceptData) label.getTermComponent();
 
                 try {
-                    if (cb.getConceptAttributes() == null) {
+                    if (cb.getConAttrs() == null) {
                         label.setTermComponent(null);
                     }
                 } catch (IOException e) {
@@ -940,7 +940,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
             }
             I_ConfigAceFrame aceConfig = Terms.get().getActiveAceFrameConfig();
             String name = Ts.get().getConceptVersion(aceConfig.getViewCoordinate(),
-                    memberRefset.getConceptNid()).getPreferredDescription().getText();
+                    memberRefset.getConceptNid()).getDescriptionPreferred().getText();
             if (name.endsWith(" refset")) {
                 name = name.replace(" refset", "");
             }

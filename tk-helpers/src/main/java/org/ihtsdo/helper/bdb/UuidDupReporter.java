@@ -21,7 +21,7 @@ package org.ihtsdo.helper.bdb;
 //~--- non-JDK imports --------------------------------------------------------
 
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.ComponentChronicleBI;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
@@ -73,7 +73,7 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
 
    //~--- methods -------------------------------------------------------------
 
-   private void addIfDup(ComponentChroncileBI component) throws IOException {
+   private void addIfDup(ComponentChronicleBI component) throws IOException {
       UUID primUuid = component.getPrimUuid();
 
       if (primUuid.equals(UUID.fromString("80126d25-fc16-5a9f-b182-68a01d64504b"))) {
@@ -90,7 +90,7 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
          }
       }
 
-      for (ComponentChroncileBI annotation : component.getAnnotations()) {
+      for (ComponentChronicleBI annotation : component.getAnnotations()) {
          addIfDup(annotation);
       }
    }
@@ -104,15 +104,15 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
 
       // add prim uuids to list
       // concept attributtes
-      addIfDup(concept.getConAttrs());
+      addIfDup(concept.getConceptAttributes());
 
       // descriptions
-      for (DescriptionChronicleBI desc : concept.getDescs()) {
+      for (DescriptionChronicleBI desc : concept.getDescriptions()) {
          addIfDup(desc);
       }
 
       // relationships
-      for (RelationshipChronicleBI rel : concept.getRelsOutgoing()) {
+      for (RelationshipChronicleBI rel : concept.getRelationshipsSource()) {
          addIfDup(rel);
       }
 
@@ -184,12 +184,12 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
    //~--- inner classes -------------------------------------------------------
 
    private static class DupEntry {
-      ComponentChroncileBI dup;
+      ComponentChronicleBI dup;
       ConceptChronicleBI   enclosingConcept;
 
       //~--- constructors -----------------------------------------------------
 
-      public DupEntry(ComponentChroncileBI dup, ConceptChronicleBI enclosingConcept) {
+      public DupEntry(ComponentChronicleBI dup, ConceptChronicleBI enclosingConcept) {
          this.dup              = dup;
          this.enclosingConcept = enclosingConcept;
       }

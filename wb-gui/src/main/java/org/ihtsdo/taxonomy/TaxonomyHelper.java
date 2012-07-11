@@ -158,7 +158,7 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
             public void run() {
                try {
                   PathExpander expander = new PathExpander(tree, aceFrameConfig,
-                                             Ts.get().getConcept(selectedNode.getCnid()));
+                                             Ts.get().getConcept(selectedNode.getConceptNid()));
 
                   NodeFactory.pathExpanderExecutors.execute(expander);
                } catch (IOException ex) {
@@ -193,7 +193,7 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
          assertionType = RelAssertionType.INFERRED_THEN_STATED;
          statedInferredButton.setIcon(inferredThenStatedView);
          statedInferredButton.setToolTipText("showing inferred then stated, toggle to show stated...");
-         vc.setRelAssertionType(assertionType);
+         vc.setRelationshipAssertionType(assertionType);
          model.setTs(Ts.get().getSnapshot(vc));
          updateNewModel("changed from stated to inferred then stated");
 
@@ -203,7 +203,7 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
          assertionType = RelAssertionType.STATED;
          statedInferredButton.setIcon(statedView);
          statedInferredButton.setToolTipText("showing stated, toggle to show inferred...");
-         vc.setRelAssertionType(assertionType);
+         vc.setRelationshipAssertionType(assertionType);
          model.setTs(Ts.get().getSnapshot(vc));
          updateNewModel("changed from inferred to stated");
 
@@ -213,7 +213,7 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
          assertionType = RelAssertionType.INFERRED;
          statedInferredButton.setIcon(inferredView);
          statedInferredButton.setToolTipText("showing inferred, toggle to show inferred then stated...");
-         vc.setRelAssertionType(assertionType);
+         vc.setRelationshipAssertionType(assertionType);
          model.setTs(Ts.get().getSnapshot(vc));
          updateNewModel("changed from stated to inferred");
 
@@ -250,7 +250,7 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
       if ((node != null) &&!(node instanceof RootNode)) {
          try {
             selectedNode = node;
-            aceFrameConfig.setHierarchySelection((I_GetConceptData) Ts.get().getConcept(node.getCnid()));
+            aceFrameConfig.setHierarchySelection((I_GetConceptData) Ts.get().getConcept(node.getConceptNid()));
          } catch (IOException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
          }
@@ -282,7 +282,7 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
          model.unLink();
          model.removeTreeWillExpandListener(tree);
          ViewCoordinate newVc = new ViewCoordinate(aceFrameConfig.getViewCoordinate());
-         newVc.setRelAssertionType(assertionType);
+         newVc.setRelationshipAssertionType(assertionType);
          model = new TaxonomyModel(newVc,
                                    new NidList(aceFrameConfig.getRoots().getSetValues()), renderer, tree,
                                    childNodeFilter);
@@ -467,7 +467,7 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
 
    public ViewCoordinate getViewCoordinate() {
        ViewCoordinate vc = new ViewCoordinate(this.aceFrameConfig.getViewCoordinate());
-       vc.setRelAssertionType(assertionType);
+       vc.setRelationshipAssertionType(assertionType);
        return vc;
    }
 
@@ -497,9 +497,9 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
          for (Entry<Long, TaxonomyNode> entry : model.getNodeStore().nodeMap.entrySet()) {
             TaxonomyNode oldNode = entry.getValue();
 
-            if (oldNode.getCnid() != Integer.MAX_VALUE) {
+            if (oldNode.getConceptNid() != Integer.MAX_VALUE) {
                TaxonomyNode newNode =
-                  model.getNodeFactory().makeNode(model.getTs().getConceptVersion(oldNode.getCnid()),
+                  model.getNodeFactory().makeNode(model.getTs().getConceptVersion(oldNode.getConceptNid()),
                                                   oldNode.getParentNid(),
                                                   model.getNodeStore().get(oldNode.parentNodeId));
 

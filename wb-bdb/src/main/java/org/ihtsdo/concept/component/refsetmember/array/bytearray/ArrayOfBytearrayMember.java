@@ -35,10 +35,10 @@ import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_array_of_bytearray.RefexArrayOfBytearrayAnalogBI;
 import org.ihtsdo.tk.api.refex.type_array_of_bytearray.RefexArrayOfBytearrayVersionBI;
 import org.ihtsdo.tk.dto.RevisionHandling;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
-import org.ihtsdo.tk.dto.concept.component.refset.array.bytearray.TkRefsetArrayByteArrayRevision;
-import org.ihtsdo.tk.dto.concept.component.refset.array.bytearray.TkRefsetArrayOfBytearrayMember;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_arrayofbytearray.TkRefexArrayOfByteArrayRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_arrayofbytearray.TkRefexArrayOfBytearrayMember;
 import org.ihtsdo.tk.hash.Hashcode;
 import org.ihtsdo.tk.uuid.UuidT5Generator;
 
@@ -75,14 +75,14 @@ public class ArrayOfBytearrayMember extends RefsetMember<ArrayOfBytearrayRevisio
         super(enclosingConceptNid, input);
     }
 
-    public ArrayOfBytearrayMember(TkRefsetArrayOfBytearrayMember refsetMember, int enclosingConceptNid) throws IOException {
+    public ArrayOfBytearrayMember(TkRefexArrayOfBytearrayMember refsetMember, int enclosingConceptNid) throws IOException {
         super(refsetMember, enclosingConceptNid);
-        arrayOfByteArray = refsetMember.getArrayOfByteArray();
+        arrayOfByteArray = refsetMember.getArrayOfByteArray1();
 
         if (refsetMember.getRevisionList() != null) {
             revisions = new RevisionSet(primordialSapNid);
 
-            for (TkRefsetArrayByteArrayRevision eVersion : refsetMember.getRevisionList()) {
+            for (TkRefexArrayOfByteArrayRevision eVersion : refsetMember.getRevisionList()) {
                 revisions.add(new ArrayOfBytearrayRevision(eVersion, this));
             }
         }
@@ -215,15 +215,15 @@ public class ArrayOfBytearrayMember extends RefsetMember<ArrayOfBytearrayRevisio
     //~--- get methods ---------------------------------------------------------
 
     @Override
-    public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
+    public TkRefexAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
             Map<UUID, UUID> conversionMap)
             throws ContradictionException, IOException {
-        return new TkRefsetArrayOfBytearrayMember(this, exclusionSet, conversionMap, 0, true, vc);
+        return new TkRefexArrayOfBytearrayMember(this, exclusionSet, conversionMap, 0, true, vc);
     }
 
     @Override
-    protected TK_REFSET_TYPE getTkRefsetType() {
-        return TK_REFSET_TYPE.ARRAY_BYTEARRAY;
+    protected TK_REFEX_TYPE getTkRefsetType() {
+        return TK_REFEX_TYPE.ARRAY_BYTEARRAY;
     }
 
     @Override
@@ -318,13 +318,13 @@ public class ArrayOfBytearrayMember extends RefsetMember<ArrayOfBytearrayRevisio
         }
 
         @Override
-        public TkRefsetArrayOfBytearrayMember getERefsetMember() throws IOException {
-            return new TkRefsetArrayOfBytearrayMember(this, RevisionHandling.EXCLUDE_REVISIONS);
+        public TkRefexArrayOfBytearrayMember getERefsetMember() throws IOException {
+            return new TkRefexArrayOfBytearrayMember(this, RevisionHandling.EXCLUDE_REVISIONS);
         }
 
         @Override
-        public TkRefsetArrayByteArrayRevision getERefsetRevision() throws IOException {
-            return new TkRefsetArrayByteArrayRevision(this);
+        public TkRefexArrayOfByteArrayRevision getERefsetRevision() throws IOException {
+            return new TkRefexArrayOfByteArrayRevision(this);
         }
 
         @Override

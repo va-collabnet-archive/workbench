@@ -17,9 +17,9 @@
 package org.dwfa.ace.api.ebr;
 
 import java.beans.PropertyVetoException;
-import org.ihtsdo.tk.api.refex.type_cnid_str.RefexCnidStrAnalogBI;
+import org.ihtsdo.tk.api.refex.type_nid_string.RefexNidStringAnalogBI;
 
-public interface I_ExtendByRefPartCidString<A extends RefexCnidStrAnalogBI<A>> extends I_ExtendByRefPartCid<A>,
+public interface I_ExtendByRefPartCidString<A extends RefexNidStringAnalogBI<A>> extends I_ExtendByRefPartCid<A>,
 		I_ExtendByRefPartStr<A> {
 
 	public int getC1id();

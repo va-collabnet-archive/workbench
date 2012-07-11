@@ -44,10 +44,10 @@ import org.ihtsdo.thread.NamedThreadFactory;
 import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentBI;
-import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.ComponentChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 
 public class Bdb {
 
@@ -134,7 +134,7 @@ public class Bdb {
     static ConcurrentSkipListSet<Concept> annotationConcepts = new ConcurrentSkipListSet<Concept>();
 
     public static void xrefAnnotation(RefexChronicleBI annotation) throws IOException {
-        Concept refexConcept = Concept.get(annotation.getCollectionNid());
+        Concept refexConcept = Concept.get(annotation.getRefexNid());
         if (refexConcept.isAnnotationIndex()) {
             if (refexConcept.addMemberNid(annotation.getNid())) {
                 annotationConcepts.add(refexConcept);
@@ -436,7 +436,7 @@ public class Bdb {
         return conceptDb;
     }
 
-    public static void addAsAnnotations(List<TkRefsetAbstractMember<?>> members) throws Exception {
+    public static void addAsAnnotations(List<TkRefexAbstractMember<?>> members) throws Exception {
         conceptDb.iterateConceptDataInParallel(new AnnotationAdder(members));
     }
 
@@ -738,7 +738,7 @@ public class Bdb {
         int cNid = Bdb.getConceptNid(nid);
         assert cNid != Integer.MAX_VALUE : "No cNid for nid: " + nid;
         Concept c = Concept.get(cNid);
-        ComponentChroncileBI<?> component = c.getComponent(nid);
+        ComponentChronicleBI<?> component = c.getComponent(nid);
         if (component != null) {
             return component.getPrimUuid();
         }

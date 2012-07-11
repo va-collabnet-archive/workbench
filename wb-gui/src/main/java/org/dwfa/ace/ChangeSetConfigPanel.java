@@ -11,8 +11,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.dwfa.ace.api.I_ConfigAceDb;
-import org.dwfa.ace.api.cs.ChangeSetPolicy;
-import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
+import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
+import org.ihtsdo.tk.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.config.AceFrameConfig;
 
 public class ChangeSetConfigPanel extends JPanel implements ActionListener {

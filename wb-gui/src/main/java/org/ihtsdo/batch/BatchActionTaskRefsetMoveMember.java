@@ -24,7 +24,7 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 
 /**
  * BatchActionTaskRefsetMoveMember
@@ -36,7 +36,7 @@ public class BatchActionTaskRefsetMoveMember extends BatchActionTask {
     private int collectionFromNid;
     private int collectionToNid;
     // FILTER
-    private TK_REFSET_TYPE refsetType;
+    private TK_REFEX_TYPE refsetType;
     private Object matchValue;
 
     public BatchActionTaskRefsetMoveMember() {
@@ -50,7 +50,7 @@ public class BatchActionTaskRefsetMoveMember extends BatchActionTask {
         this.collectionToNid = collectionToNid;
     }
 
-    public void setRefsetType(TK_REFSET_TYPE refsetType) {
+    public void setRefsetType(TK_REFEX_TYPE refsetType) {
         this.refsetType = refsetType;
     }
 
@@ -62,18 +62,18 @@ public class BatchActionTaskRefsetMoveMember extends BatchActionTask {
     @Override
     public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc) throws Exception {
         int rcNid = c.getNid(); // referenced component
-        Collection<? extends RefexVersionBI<?>> currentRefexes = c.getCurrentRefexes(vc);
+        Collection<? extends RefexVersionBI<?>> currentRefexes = c.getRefexesActive(vc);
 
         // CHECK FROM HAS CONCEPT
         // CHECK TO DOES NOT HAVE REFERENCED CONCEPT
         boolean isInFrom = false;
         boolean isInTo = false;
         for (RefexVersionBI rvbi : currentRefexes) {
-            if (rvbi.getCollectionNid() == collectionFromNid) {
+            if (rvbi.getRefexNid() == collectionFromNid) {
                 // :!!!:NYI: VALUE FILTER NOT IMPLEMENTED ON TASK VALIDATE CHECK
                 isInFrom = true;
             }
-            if (rvbi.getCollectionNid() == collectionToNid) {
+            if (rvbi.getRefexNid() == collectionToNid) {
                 // :!!!:NYI: VALUE FILTER NOT IMPLEMENTED ON TASK VALIDATE CHECK
                 isInTo = true;
             }
@@ -98,9 +98,9 @@ public class BatchActionTaskRefsetMoveMember extends BatchActionTask {
         ConceptChronicleBI collectionFromConcept = ts.getConcept(collectionFromNid);
         ConceptChronicleBI collectionToConcept = ts.getConcept(collectionToNid);
         for (RefexVersionBI rvbi : currentRefexes) {
-            if (rvbi.getCollectionNid() == collectionFromNid) {
+            if (rvbi.getRefexNid() == collectionFromNid) {
                 RefexCAB specFrom = rvbi.makeBlueprint(vc);
-                TK_REFSET_TYPE refsetFromType = specFrom.getMemberType();
+                TK_REFEX_TYPE refsetFromType = specFrom.getMemberType();
                 if (matchValue == null) {
 
                     // RETIRE MoveFrom
@@ -120,16 +120,16 @@ public class BatchActionTaskRefsetMoveMember extends BatchActionTask {
 
                     // ADD MoveTo
                     RefexCAB specTo = new RefexCAB(refsetFromType, rcNid, collectionToNid);
-                    if (refsetFromType == TK_REFSET_TYPE.BOOLEAN) {
+                    if (refsetFromType == TK_REFEX_TYPE.BOOLEAN) {
                         specTo.with(RefexCAB.RefexProperty.BOOLEAN1,
                                 specFrom.getBoolean(RefexCAB.RefexProperty.BOOLEAN1));
-                    } else if (refsetFromType == TK_REFSET_TYPE.CID) {
+                    } else if (refsetFromType == TK_REFEX_TYPE.CID) {
                         specTo.with(RefexCAB.RefexProperty.CNID1,
                                 specFrom.getInt(RefexCAB.RefexProperty.CNID1)); // int nid
-                    } else if (refsetFromType == TK_REFSET_TYPE.INT) {
+                    } else if (refsetFromType == TK_REFEX_TYPE.INT) {
                         specTo.with(RefexCAB.RefexProperty.INTEGER1,
                                 specFrom.getInt(RefexCAB.RefexProperty.INTEGER1));
-                    } else if (refsetFromType == TK_REFSET_TYPE.STR) {
+                    } else if (refsetFromType == TK_REFEX_TYPE.STR) {
                         specTo.with(RefexCAB.RefexProperty.STRING1,
                                 specFrom.getString(RefexCAB.RefexProperty.STRING1));
                     }
@@ -194,16 +194,16 @@ public class BatchActionTaskRefsetMoveMember extends BatchActionTask {
 
                         // ADD MoveTo
                         RefexCAB specTo = new RefexCAB(refsetFromType, rcNid, collectionToNid);
-                        if (refsetFromType == TK_REFSET_TYPE.BOOLEAN) {
+                        if (refsetFromType == TK_REFEX_TYPE.BOOLEAN) {
                             specTo.with(RefexCAB.RefexProperty.BOOLEAN1,
                                     specFrom.getBoolean(RefexCAB.RefexProperty.BOOLEAN1));
-                        } else if (refsetFromType == TK_REFSET_TYPE.CID) {
+                        } else if (refsetFromType == TK_REFEX_TYPE.CID) {
                             specTo.with(RefexCAB.RefexProperty.CNID1,
                                     specFrom.getInt(RefexCAB.RefexProperty.CNID1)); // int nid
-                        } else if (refsetFromType == TK_REFSET_TYPE.INT) {
+                        } else if (refsetFromType == TK_REFEX_TYPE.INT) {
                             specTo.with(RefexCAB.RefexProperty.INTEGER1,
                                     specFrom.getInt(RefexCAB.RefexProperty.INTEGER1));
-                        } else if (refsetFromType == TK_REFSET_TYPE.STR) {
+                        } else if (refsetFromType == TK_REFEX_TYPE.STR) {
                             specTo.with(RefexCAB.RefexProperty.STRING1,
                                     specFrom.getString(RefexCAB.RefexProperty.STRING1));
                         }

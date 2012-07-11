@@ -27,8 +27,8 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import org.dwfa.ace.api.*;
-import org.dwfa.ace.api.cs.ChangeSetPolicy;
-import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
+import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
+import org.ihtsdo.tk.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.classify.SnoCon;
 import org.dwfa.ace.task.classify.SnoGrp;
@@ -50,6 +50,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.helper.descriptionlogic.DescriptionLogic;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
@@ -126,7 +127,7 @@ public class OwlFunctionalSyntaxImport extends AbstractTask implements ActionLis
     private I_TermFactory tf = null;
     private I_ConfigAceFrame config = null;
     private Precedence precedence;
-    private I_ManageContradiction contradictionMgr;
+    private ContradictionManagerBI contradictionMgr;
     private I_ShowActivity gui = null;
     private boolean continueThisAction = true;
     // INTERNAL

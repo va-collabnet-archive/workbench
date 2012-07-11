@@ -34,38 +34,38 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
         super();
     }
 
-    public TkMedia(MediaChronicleBI another) throws IOException {
-        this(another.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
+    public TkMedia(MediaChronicleBI mediaChronicle) throws IOException {
+        this(mediaChronicle.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
     }
 
-    public TkMedia(MediaVersionBI another,
+    public TkMedia(MediaVersionBI mediaVersion,
             RevisionHandling revisionHandling) throws IOException {
-        super(another);
+        super(mediaVersion);
         TerminologyStoreDI ts = Ts.get();
         if (revisionHandling == RevisionHandling.EXCLUDE_REVISIONS) {
-            this.conceptUuid = ts.getUuidPrimordialForNid(another.getConceptNid());
-            this.typeUuid = ts.getUuidPrimordialForNid(another.getTypeNid());
-            this.dataBytes = another.getMedia();
-            this.format = another.getFormat();
-            this.textDescription = another.getTextDescription();
-        } else {
-            Collection<? extends MediaVersionBI> media = another.getVersions();
-            int partCount = media.size();
-            Iterator<? extends MediaVersionBI> itr = media.iterator();
-            MediaVersionBI mediaVersion = itr.next();
-
             this.conceptUuid = ts.getUuidPrimordialForNid(mediaVersion.getConceptNid());
             this.typeUuid = ts.getUuidPrimordialForNid(mediaVersion.getTypeNid());
             this.dataBytes = mediaVersion.getMedia();
             this.format = mediaVersion.getFormat();
             this.textDescription = mediaVersion.getTextDescription();
+        } else {
+            Collection<? extends MediaVersionBI> media = mediaVersion.getVersions();
+            int partCount = media.size();
+            Iterator<? extends MediaVersionBI> itr = media.iterator();
+            MediaVersionBI mv = itr.next();
+
+            this.conceptUuid = ts.getUuidPrimordialForNid(mv.getConceptNid());
+            this.typeUuid = ts.getUuidPrimordialForNid(mv.getTypeNid());
+            this.dataBytes = mv.getMedia();
+            this.format = mv.getFormat();
+            this.textDescription = mv.getTextDescription();
 
             if (partCount > 1) {
                 revisions = new ArrayList<TkMediaRevision>(partCount - 1);
 
                 while (itr.hasNext()) {
-                    mediaVersion = itr.next();
-                    revisions.add(new TkMediaRevision(mediaVersion));
+                    mv = itr.next();
+                    revisions.add(new TkMediaRevision(mv));
                 }
             }
         }
@@ -94,22 +94,22 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
         }
     }
 
-    public TkMedia(MediaVersionBI another, NidBitSetBI exclusions, Map<UUID, UUID> conversionMap, long offset,
-            boolean mapAll, ViewCoordinate vc)
+    public TkMedia(MediaVersionBI mediaVersion, NidBitSetBI excludedNids, Map<UUID, UUID> conversionMap, long offset,
+            boolean mapAll, ViewCoordinate viewCoordinate)
             throws IOException, ContradictionException {
-        super(another, exclusions, conversionMap, offset, mapAll, vc);
+        super(mediaVersion, excludedNids, conversionMap, offset, mapAll, viewCoordinate);
 
         if (mapAll) {
-            this.conceptUuid = conversionMap.get(Ts.get().getComponent(another.getConceptNid()).getPrimUuid());
-            this.typeUuid = conversionMap.get(Ts.get().getComponent(another.getTypeNid()).getPrimUuid());
+            this.conceptUuid = conversionMap.get(Ts.get().getComponent(mediaVersion.getConceptNid()).getPrimUuid());
+            this.typeUuid = conversionMap.get(Ts.get().getComponent(mediaVersion.getTypeNid()).getPrimUuid());
         } else {
-            this.conceptUuid = Ts.get().getComponent(another.getConceptNid()).getPrimUuid();
-            this.typeUuid = Ts.get().getComponent(another.getTypeNid()).getPrimUuid();
+            this.conceptUuid = Ts.get().getComponent(mediaVersion.getConceptNid()).getPrimUuid();
+            this.typeUuid = Ts.get().getComponent(mediaVersion.getTypeNid()).getPrimUuid();
         }
 
-        this.dataBytes = another.getMedia();
-        this.format = another.getFormat();
-        this.textDescription = another.getTextDescription();
+        this.dataBytes = mediaVersion.getMedia();
+        this.format = mediaVersion.getFormat();
+        this.textDescription = mediaVersion.getTextDescription();
     }
 
     //~--- methods -------------------------------------------------------------

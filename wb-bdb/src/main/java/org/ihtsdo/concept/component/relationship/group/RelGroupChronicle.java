@@ -14,8 +14,8 @@ import org.ihtsdo.tk.api.id.IdBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
-import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
-import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
+import org.ihtsdo.tk.api.relationship.group.RelationshipGroupChronicleBI;
+import org.ihtsdo.tk.api.relationship.group.RelationshipGroupVersionBI;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public class RelGroupChronicle implements RelGroupChronicleBI {
+public class RelGroupChronicle implements RelationshipGroupChronicleBI {
    private int                                 conceptNid;
    private int                                 nid;
    private int                                 relGroup;
@@ -96,11 +96,11 @@ public class RelGroupChronicle implements RelGroupChronicleBI {
    }
 
    @Override
-   public Set<Integer> getAllSapNids() throws IOException {
+   public Set<Integer> getAllStampNids() throws IOException {
       HashSet<Integer> sapNids = new HashSet<Integer>();
 
       for (RelationshipChronicleBI r : rels) {
-         sapNids.addAll(r.getAllSapNids());
+         sapNids.addAll(r.getAllStampNids());
       }
 
       return sapNids;
@@ -117,49 +117,48 @@ public class RelGroupChronicle implements RelGroupChronicleBI {
    }
 
    @Override
-   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz)
+   public Collection<? extends RefexVersionBI<?>> getAnnotationsActive(ViewCoordinate xyz)
            throws IOException {
       throw new UnsupportedOperationException("Not supported.");
    }
 
    @Override
-   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz,
-           int refexNid)
+   public Collection<? extends RefexVersionBI<?>> getAnnotationMembersActive(ViewCoordinate xyz, int refexNid)
            throws IOException {
       throw new UnsupportedOperationException("Not supported yet.");
    }
 
    @Override
-   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz)
+   public Collection<? extends RefexVersionBI<?>> getActiveAnnotations(ViewCoordinate xyz)
            throws IOException {
       throw new UnsupportedOperationException("Not supported yet.");
    }
 
    @Override
-   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz, int refexNid)
+   public Collection<? extends RefexVersionBI<?>> getActiveAnnotations(ViewCoordinate xyz, int refexNid)
            throws IOException {
       throw new UnsupportedOperationException("Not supported yet.");
    }
 
    @Override
-   public Collection<? extends RefexVersionBI<?>> getCurrentRefexMembers(ViewCoordinate xyz, int refsetNid)
+   public Collection<? extends RefexVersionBI<?>> getRefexMembersActive(ViewCoordinate xyz, int refsetNid)
            throws IOException {
       throw new UnsupportedOperationException("Not supported yet.");
    }
 
    @Override
-   public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz) throws IOException {
+   public Collection<? extends RefexVersionBI<?>> getRefexesActive(ViewCoordinate xyz) throws IOException {
       throw new UnsupportedOperationException("Not supported.");
    }
 
    @Override
-   public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz, int refsetNid)
+   public Collection<? extends RefexVersionBI<?>> getActiveRefexes(ViewCoordinate xyz, int refsetNid)
            throws IOException {
       throw new UnsupportedOperationException("Not supported yet.");
    }
 
    @Override
-   public Collection<? extends RefexVersionBI<?>> getInactiveRefexes(ViewCoordinate xyz) throws IOException {
+   public Collection<? extends RefexVersionBI<?>> getRefexesInactive(ViewCoordinate xyz) throws IOException {
       throw new UnsupportedOperationException("Not supported.");
    }
 
@@ -189,7 +188,7 @@ public class RelGroupChronicle implements RelGroupChronicleBI {
    }
 
    @Override
-   public RelGroupVersionBI getPrimordialVersion() {
+   public RelationshipGroupVersionBI getPrimordialVersion() {
       throw new UnsupportedOperationException("Not supported yet.");
    }
 
@@ -209,12 +208,12 @@ public class RelGroupChronicle implements RelGroupChronicleBI {
    }
 
    @Override
-   public int getRelGroup() {
+   public int getRelationshipGroupNumber() {
       return relGroup;
    }
 
    @Override
-   public Collection<? extends RelationshipChronicleBI> getRels() {
+   public Collection<? extends RelationshipChronicleBI> getRelationships() {
       return rels;
    }
 
@@ -224,27 +223,27 @@ public class RelGroupChronicle implements RelGroupChronicleBI {
    }
 
    @Override
-   public RelGroupVersionBI getVersion(ViewCoordinate c) throws ContradictionException {
+   public RelationshipGroupVersionBI getVersion(ViewCoordinate c) throws ContradictionException {
       return new RelGroupVersion(this, c);
    }
 
    @Override
-   public Collection<? extends RelGroupVersionBI> getVersions() {
-      return Arrays.asList(new RelGroupVersionBI[] { new RelGroupVersion(this, null) });
+   public Collection<? extends RelationshipGroupVersionBI> getVersions() {
+      return Arrays.asList(new RelationshipGroupVersionBI[] { new RelGroupVersion(this, null) });
    }
 
    @Override
-   public Collection<? extends RelGroupVersionBI> getVersions(ViewCoordinate c) {
-      return Arrays.asList(new RelGroupVersionBI[] { new RelGroupVersion(this, c) });
+   public Collection<? extends RelationshipGroupVersionBI> getVersions(ViewCoordinate c) {
+      return Arrays.asList(new RelationshipGroupVersionBI[] { new RelGroupVersion(this, c) });
    }
 
    @Override
-   public boolean hasCurrentAnnotationMember(ViewCoordinate xyz, int refsetNid) throws IOException {
+   public boolean hasAnnotationMemberActive(ViewCoordinate xyz, int refsetNid) throws IOException {
       throw new UnsupportedOperationException("Not supported yet.");
    }
 
    @Override
-   public boolean hasCurrentRefexMember(ViewCoordinate xyz, int refsetNid) throws IOException {
+   public boolean hasRefexMemberActive(ViewCoordinate xyz, int refsetNid) throws IOException {
       throw new UnsupportedOperationException("Not supported yet.");
    }
 

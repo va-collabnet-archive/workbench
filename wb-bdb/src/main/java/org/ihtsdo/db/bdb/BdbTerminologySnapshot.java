@@ -157,7 +157,7 @@ public class BdbTerminologySnapshot implements TerminologySnapshotDI {
 
    @Override
    public ConceptVersionBI getConceptVersion(ConceptContainerBI cc) throws IOException {
-      return getConceptVersion(cc.getCnid());
+      return getConceptVersion(cc.getConceptNid());
    }
 
    @Override
@@ -224,5 +224,10 @@ public class BdbTerminologySnapshot implements TerminologySnapshotDI {
     @Override
     public void setIsaCacheAsComplete(IsaCoordinate isac) throws IOException {
     	KindOfComputer.setIsaCacheAsComplete(isac);
+    }
+    
+    @Override
+    public int getConceptNidForNid(Integer nid) throws IOException{
+        return store.getConceptNidForNid(nid);
     }
 }

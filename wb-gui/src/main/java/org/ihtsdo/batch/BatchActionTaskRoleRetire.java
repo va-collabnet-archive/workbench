@@ -48,10 +48,10 @@ public class BatchActionTaskRoleRetire extends BatchActionTask {
     @Override
     public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc) throws Exception {
         boolean changed = false;
-        Collection<? extends RelationshipVersionBI> rels = c.getRelsOutgoingActive();
+        Collection<? extends RelationshipVersionBI> rels = c.getRelationshipsSourceActive();
         for (RelationshipVersionBI rvbi : rels) {
             if (rvbi.getTypeNid() == roleNid
-                    && rvbi.getDestinationNid() == valueNid
+                    && rvbi.getTargetNid() == valueNid
                     && rvbi.isStated()) {
 
                 for (int editPath : ec.getEditPaths()) {

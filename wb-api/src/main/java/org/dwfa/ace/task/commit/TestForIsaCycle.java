@@ -77,7 +77,7 @@ public class TestForIsaCycle extends AbstractConceptTest {
              */
             ConceptVersionBI cv = Ts.get().getConceptVersion(
                     Terms.get().getActiveAceFrameConfig().getViewCoordinate(), concept.getConceptNid());
-            Collection<? extends RelationshipVersionBI> activeRels = cv.getRelsOutgoingActive();
+            Collection<? extends RelationshipVersionBI> activeRels = cv.getRelationshipsSourceActive();
             
             if (Terms.get().getActiveAceFrameConfig() == null || Terms.get().getActiveAceFrameConfig().getEditingPathSet().isEmpty()) {
                 return alertList;
@@ -112,7 +112,7 @@ public class TestForIsaCycle extends AbstractConceptTest {
                 
                 for (RelationshipVersionBI rv : activeRels) {
                     try{
-                          boolean test = SnoTable.findIsaCycle(rv.getOriginNid(), rv.getTypeNid(), rv.getDestinationNid(), true);
+                          boolean test = SnoTable.findIsaCycle(rv.getSourceNid(), rv.getTypeNid(), rv.getTargetNid(), true);
                           if (test)
                                foundCycle = true;
                         } catch (TerminologyException e) {

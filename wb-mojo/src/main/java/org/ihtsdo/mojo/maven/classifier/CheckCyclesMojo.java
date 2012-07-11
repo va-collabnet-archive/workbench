@@ -33,7 +33,7 @@ import org.apache.maven.plugin.logging.Log;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ManageContradiction;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
@@ -143,7 +143,7 @@ public class CheckCyclesMojo extends AbstractMojo {
     private I_TermFactory tf = null;
     private I_ConfigAceFrame config;
     private Precedence precedence;
-    private I_ManageContradiction contradictionMgr;
+    private ContradictionManagerBI contradictionMgr;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {

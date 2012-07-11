@@ -17,10 +17,10 @@ import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
-import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
+import org.ihtsdo.tk.api.relationship.group.RelationshipGroupVersionBI;
 import org.ihtsdo.tk.drools.facts.RelFact;
 import org.ihtsdo.tk.api.relationship.RelationshipAnalogBI;
-import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
+import org.ihtsdo.tk.api.relationship.group.RelationshipGroupChronicleBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 public class GroupRelsAction extends AbstractAction {
@@ -44,17 +44,17 @@ public class GroupRelsAction extends AbstractAction {
 
             //get group numbers in target concept
             ConceptChronicleBI target = (ConceptChronicleBI) concept;
-            Collection targetGroups = target.getRelGroups(config.getViewCoordinate());
+            Collection targetGroups = target.getRelationshipGroups(config.getViewCoordinate());
             int max = 0;
             for (Object groupObject : targetGroups) {
-                RelGroupVersionBI rg = null;
-                if (groupObject instanceof RelGroupVersionBI) {
-                    rg = (RelGroupVersionBI) groupObject;
-                } else if (groupObject instanceof RelGroupChronicleBI) {
-                    RelGroupChronicleBI rgc = (RelGroupChronicleBI) groupObject;
+                RelationshipGroupVersionBI rg = null;
+                if (groupObject instanceof RelationshipGroupVersionBI) {
+                    rg = (RelationshipGroupVersionBI) groupObject;
+                } else if (groupObject instanceof RelationshipGroupChronicleBI) {
+                    RelationshipGroupChronicleBI rgc = (RelationshipGroupChronicleBI) groupObject;
                     rg = rgc.getVersion(config.getViewCoordinate());
                 }
-                Collection<? extends RelationshipVersionBI> currentRels = rg.getCurrentRels();
+                Collection<? extends RelationshipVersionBI> currentRels = rg.getRelationshipsActive();
                 boolean isStated = false;
                 for(RelationshipVersionBI rel : currentRels){
                     if(rel.getCharacteristicNid() == SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID()){
@@ -64,7 +64,7 @@ public class GroupRelsAction extends AbstractAction {
                 }
                 if(isStated){
                      if (rg != null) {
-                        int group = rg.getRelGroup();
+                        int group = rg.getRelationshipGroupNumber();
                         if (group > max) {
                             max = group;
                         }   

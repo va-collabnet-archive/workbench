@@ -46,7 +46,7 @@ import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ManageContradiction;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.dwfa.ace.api.I_OverrideTaxonomyRenderer;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_ShowActivity;
@@ -522,11 +522,11 @@ public class EditOnRootPath implements I_ConfigAceFrame {
         config.setContext(context);
     }
 
-    public <T extends I_ManageContradiction> void setConflictResolutionStrategy(Class<T> conflictResolutionStrategyClass) {
+    public <T extends ContradictionManagerBI> void setConflictResolutionStrategy(Class<T> conflictResolutionStrategyClass) {
         config.setConflictResolutionStrategy(conflictResolutionStrategyClass);
     }
 
-    public void setConflictResolutionStrategy(I_ManageContradiction conflictResolutionStrategy) {
+    public void setConflictResolutionStrategy(ContradictionManagerBI conflictResolutionStrategy) {
         config.setConflictResolutionStrategy(conflictResolutionStrategy);
     }
 
@@ -1091,7 +1091,7 @@ public class EditOnRootPath implements I_ConfigAceFrame {
         return config.getContext();
     }
 
-    public I_ManageContradiction getConflictResolutionStrategy() {
+    public ContradictionManagerBI getConflictResolutionStrategy() {
         return config.getConflictResolutionStrategy();
     }
 
@@ -1175,7 +1175,7 @@ public class EditOnRootPath implements I_ConfigAceFrame {
         return config.getAllowedStatus();
     }
 
-    public I_ManageContradiction[] getAllConflictResolutionStrategies() {
+    public ContradictionManagerBI[] getAllConflictResolutionStrategies() {
         return config.getAllConflictResolutionStrategies();
     }
 

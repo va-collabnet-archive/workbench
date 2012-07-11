@@ -21,8 +21,8 @@ import net.jini.config.ConfigurationProvider;
 import net.jini.core.entry.Entry;
 
 import org.dwfa.ace.api.*;
-import org.dwfa.ace.api.cs.ChangeSetPolicy;
-import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
+import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
+import org.ihtsdo.tk.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.bpa.process.Condition;
@@ -263,7 +263,7 @@ public class CreateUserAndQueuesInBatchBasedOnCreatorProfile extends AbstractTas
         int wfNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.WORKFLOW_ACTIVE_MODELER.getUids());
         boolean found = false;
         for (I_RelVersioned rel : userConcept.getSourceRels()) {
-            if (rel.getDestinationNid() == wfNid) {
+            if (rel.getTargetNid() == wfNid) {
                 found = true;
             }
         }

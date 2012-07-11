@@ -8,9 +8,9 @@ public class FoundContradictionVersions {
 	private ContradictionResult result;
 	private Collection<? extends ComponentVersionBI> versions;
 	
-	public FoundContradictionVersions(ContradictionResult r, Collection<? extends ComponentVersionBI> v) {
-		result = r;
-		versions = v;
+	public FoundContradictionVersions(ContradictionResult contradictionResult, Collection<? extends ComponentVersionBI> componentVersions) {
+		result = contradictionResult;
+		versions = componentVersions;
 	}
 	
 	public ContradictionResult getResult() {

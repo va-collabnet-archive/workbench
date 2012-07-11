@@ -138,7 +138,7 @@ public class IsMissingDescForDialectEvaluatorDefinition implements EvaluatorDefi
          int dialectNid = dialectCV.getNid();
          try {
             boolean missingDescForDialect = false;
-            for (DescriptionVersionBI desc : conceptToTest.getDescsActive()) {
+            for (DescriptionVersionBI desc : conceptToTest.getDescriptionsActive()) {
                if (DialectHelper.isMissingDescForDialect(desc, dialectNid, coordinate)) {
                   missingDescForDialect = true;
                   break;

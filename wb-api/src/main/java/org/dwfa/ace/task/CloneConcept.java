@@ -40,7 +40,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
-import org.ihtsdo.tk.api.blueprint.DescCAB;
+import org.ihtsdo.tk.api.blueprint.DescriptionCAB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -97,13 +97,13 @@ public class CloneConcept extends AbstractTask {
              * Add clone of to the text for descriptons. Update fsn or pref term will also
              * recompute UUID to match based on the new hash.
              */
-            List<DescCAB> fsnCABs = conceptBp.getFsnCABs();
-            for(DescCAB fsnBp : fsnCABs){
+            List<DescriptionCAB> fsnCABs = conceptBp.getFullySpecifiedNameCABs();
+            for(DescriptionCAB fsnBp : fsnCABs){
                 String text = fsnBp.getText();
-                conceptBp.updateFsn("Clone of " + text, fsnBp, null);
+                conceptBp.updateFullySpecifiedName("Clone of " + text, fsnBp, null);
             }
-            List<DescCAB> prefCABs = conceptBp.getPrefCABs();
-            for(DescCAB prefBp : prefCABs){
+            List<DescriptionCAB> prefCABs = conceptBp.getPreferredNameCABs();
+            for(DescriptionCAB prefBp : prefCABs){
                 String text = prefBp.getText();
                 conceptBp.updatePreferredName("Clone of " + text, prefBp, null);
             }

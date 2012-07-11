@@ -1,10 +1,11 @@
 package org.ihtsdo.tk.api.description;
 
 import java.io.IOException;
+import java.util.regex.Pattern;
 import org.ihtsdo.tk.api.AnalogGeneratorBI;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TypedComponentVersionBI;
-import org.ihtsdo.tk.api.blueprint.DescCAB;
+import org.ihtsdo.tk.api.blueprint.DescriptionCAB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
@@ -39,12 +40,14 @@ public interface DescriptionVersionBI<A extends DescriptionAnalogBI>
     
         /**
          * 
-         * @param vc
+         * @param viewCoordinate
          * @return
          * @throws IOException
          * @throws ContradictionException
          * @throws InvalidCAB
          */
         @Override
-    public DescCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB;
+    public DescriptionCAB makeBlueprint(ViewCoordinate viewCoordinate) throws IOException, ContradictionException, InvalidCAB;
+    
+    public boolean matches(Pattern pattern);
 }

@@ -9,10 +9,10 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.dto.concept.component.refset.member.TkRefsetMember;
-import org.ihtsdo.tk.dto.concept.component.refset.member.TkRefsetRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_member.TkRefexMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_member.TkRefexRevision;
 
-public class ERefsetMemberMember extends TkRefsetMember {
+public class ERefsetMemberMember extends TkRefexMember {
 
     public static final long serialVersionUID = 1;
 
@@ -41,7 +41,7 @@ public class ERefsetMemberMember extends TkRefsetMember {
         moduleUuid    = Terms.get().nidToUuid(part.getModuleNid());
         time = part.getTime();
         if (partCount > 1) {
-            revisions = new ArrayList<TkRefsetRevision>(partCount - 1);
+            revisions = new ArrayList<TkRefexRevision>(partCount - 1);
             for (int i = 1; i < partCount; i++) {
                 revisions.add(new ERefsetRevision((I_ExtendByRefPart) m.getMutableParts().get(i)));
             }

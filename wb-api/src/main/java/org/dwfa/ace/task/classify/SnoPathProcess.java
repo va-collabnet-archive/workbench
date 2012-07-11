@@ -134,7 +134,7 @@ public class SnoPathProcess implements I_ProcessConcepts {
 
         // GET LATEST CONCEPT PART
         List<? extends I_ConceptAttributePart> cParts;
-        cParts = concept.getConceptAttributes().getMutableParts();
+        cParts = concept.getConAttrs().getMutableParts();
         I_ConceptAttributePart cPart1 = null;
         for (PositionBI pos : fromPathPos) { // FOR PATHS_IN_PRIORITY_ORDER
             for (I_ConceptAttributePart cPart : cParts) {

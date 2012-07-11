@@ -21,11 +21,11 @@ import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid_float.RefexCnidFloatAnalogBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidflt.TkRefsetCidFloatMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidflt.TkRefsetCidFloatRevision;
+import org.ihtsdo.tk.api.refex.type_nid_float.RefexNidFloatAnalogBI;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_float.TkRefexUuidFloatMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_float.TkRefexUuidFloatRevision;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -36,7 +36,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatMember>
-        implements RefexCnidFloatAnalogBI<CidFloatRevision> {
+        implements RefexNidFloatAnalogBI<CidFloatRevision> {
    private int   c1Nid;
    private float floatValue;
 
@@ -52,10 +52,10 @@ public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatM
       floatValue = primoridalMember.getFloatValue();
    }
 
-   public CidFloatRevision(TkRefsetCidFloatRevision eVersion, CidFloatMember member) {
+   public CidFloatRevision(TkRefexUuidFloatRevision eVersion, CidFloatMember member) {
       super(eVersion, member);
-      c1Nid      = Bdb.uuidToNid(eVersion.getC1Uuid());
-      floatValue = eVersion.getFloatValue();
+      c1Nid      = Bdb.uuidToNid(eVersion.getUuid1());
+      floatValue = eVersion.getFloat1();
    }
 
    public CidFloatRevision(TupleInput input, CidFloatMember primoridalMember) {
@@ -86,7 +86,7 @@ public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatM
    }
 
    protected void addSpecProperties(RefexCAB rcs) {
-      rcs.with(RefexProperty.CNID1, getCnid1());
+      rcs.with(RefexProperty.CNID1, getNid1());
       rcs.with(RefexProperty.FLOAT1, getFloat1());
    }
 
@@ -171,7 +171,7 @@ public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatM
    }
 
    @Override
-   public int getCnid1() {
+   public int getNid1() {
       return c1Nid;
    }
 
@@ -185,15 +185,15 @@ public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatM
    }
 
    @Override
-   public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
+   public TkRefexAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
            Map<UUID, UUID> conversionMap)
            throws ContradictionException, IOException {
-      return new TkRefsetCidFloatMember(this, exclusionSet, conversionMap, 0, true, vc);
+      return new TkRefexUuidFloatMember(this, exclusionSet, conversionMap, 0, true, vc);
    }
 
     @Override
-   protected TK_REFSET_TYPE getTkRefsetType() {
-      return TK_REFSET_TYPE.CID_FLOAT;
+   protected TK_REFEX_TYPE getTkRefsetType() {
+      return TK_REFEX_TYPE.CID_FLOAT;
    }
 
    @Override
@@ -235,7 +235,7 @@ public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatM
    }
 
    @Override
-   public void setCnid1(int cnid) throws PropertyVetoException {
+   public void setNid1(int cnid) throws PropertyVetoException {
       this.c1Nid = cnid;
       modified();
    }

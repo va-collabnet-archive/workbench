@@ -154,27 +154,27 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
             switch (columns[columnIndex]) {
                 case FSN:
                     // Get Pref to display
-                	dragTuple = (I_ConceptAttributeTuple) concept.getConceptAttributes().getTuples().get(0);
+                	dragTuple = (I_ConceptAttributeTuple) concept.getConAttrs().getTuples().get(0);
                 	ConceptVersionBI conVersion = concept.getVersion(config.getViewCoordinate());
-                	term = conVersion.getFullySpecifiedDescription().getText();
+                	term = conVersion.getDescriptionFullySpecified().getText();
                     break;
                 case STATE:
                     // Get State to display
                     I_GetConceptData stateCon = Terms.get().getConcept(UUID.fromString(result.getState()));
-                	dragTuple = (I_ConceptAttributeTuple) stateCon.getConceptAttributes().getTuples().get(0);
+                	dragTuple = (I_ConceptAttributeTuple) stateCon.getConAttrs().getTuples().get(0);
                 	ConceptVersionBI stateVersion = stateCon.getVersion(config.getViewCoordinate());
-                	term = stateVersion.getFullySpecifiedDescription().getText();
+                	term = stateVersion.getDescriptionFullySpecified().getText();
                     break;
 
                 case EDITOR:
                     // Get State to display
                     I_GetConceptData modelerCon = Terms.get().getConcept(UUID.fromString(result.getModeler()));
-                	dragTuple = (I_ConceptAttributeTuple) modelerCon.getConceptAttributes().getTuples().get(0);
+                	dragTuple = (I_ConceptAttributeTuple) modelerCon.getConAttrs().getTuples().get(0);
                 	ConceptVersionBI modelerVersion = modelerCon.getVersion(config.getViewCoordinate());
-                	term = modelerVersion.getFullySpecifiedDescription().getText();
+                	term = modelerVersion.getDescriptionFullySpecified().getText();
                     break;
                 case TIMESTAMP:
-                	dragTuple = (I_ConceptAttributeTuple) concept.getConceptAttributes().getTuples().get(0);
+                	dragTuple = (I_ConceptAttributeTuple) concept.getConAttrs().getTuples().get(0);
                 	Date d = new Date(result.getTime());
                 	term = formatter.format(d);
                 	break;

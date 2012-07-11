@@ -195,7 +195,7 @@ public class SearchRefsetWorker extends SwingWorker<I_UpdateProgress> implements
                     if (referencedComponent != null) {
                         if (ConceptChronicleBI.class.isAssignableFrom(referencedComponent.getClass())) {
                             ConceptChronicleBI conceptChr = (ConceptChronicleBI) referencedComponent;
-                            for (DescriptionChronicleBI descChr : conceptChr.getDescs()) {
+                            for (DescriptionChronicleBI descChr : conceptChr.getDescriptions()) {
                                 for (DescriptionVersionBI descV : descChr.getVersions(config.getViewCoordinate())) {
                                     if (fsnSet.contains(descV.getTypeNid())) {
                                         refsetMatches.add((I_DescriptionVersioned) descChr);

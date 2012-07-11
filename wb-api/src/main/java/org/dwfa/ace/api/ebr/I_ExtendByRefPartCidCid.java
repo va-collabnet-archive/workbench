@@ -17,10 +17,10 @@
 package org.dwfa.ace.api.ebr;
 
 import java.beans.PropertyVetoException;
-import org.ihtsdo.tk.api.refex.type_cnid_cnid.RefexCnidCnidAnalogBI;
+import org.ihtsdo.tk.api.refex.type_nid_nid.RefexNidNidAnalogBI;
 
 
-public interface I_ExtendByRefPartCidCid<A extends RefexCnidCnidAnalogBI<A>> extends I_ExtendByRefPartCid<A> {
+public interface I_ExtendByRefPartCidCid<A extends RefexNidNidAnalogBI<A>> extends I_ExtendByRefPartCid<A> {
 
     public int getC2id();
 

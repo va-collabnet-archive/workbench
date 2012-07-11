@@ -34,9 +34,9 @@ import org.ihtsdo.tk.api.media.MediaVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 import org.ihtsdo.tk.api.refex.type_int.RefexIntVersionBI;
-import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
+import org.ihtsdo.tk.api.refex.type_string.RefexStringVersionBI;
 
 import sun.swing.DefaultLookup;
 
@@ -361,15 +361,15 @@ public class TaxonomyNodeRenderer extends JLabel
         List<String> htmlSuffixes = new ArrayList<String>();
         boolean defined = false;
         try {
-            if (cv.getConAttrsActive() != null) {
-                defined = cv.getConAttrsActive().isDefined();
+            if (cv.getConceptAttributesActive() != null) {
+                defined = cv.getConceptAttributesActive().isDefined();
             }
         } catch (ContradictionException ex) {
-            defined = cv.getConAttrs().getVersions(cv.getViewCoordinate()).iterator().next().isDefined();
+            defined = cv.getConceptAttributes().getVersions(cv.getViewCoordinate()).iterator().next().isDefined();
         }
         Set<Color> colors = new HashSet<Color>();
-        for (int sapNid : cv.getAllSapNids()) {
-            colors.add(aceConfig.getColorForPath(Ts.get().getPathNidForSapNid(sapNid)));
+        for (int sapNid : cv.getAllStampNids()) {
+            colors.add(aceConfig.getColorForPath(Ts.get().getPathNidForStampNid(sapNid)));
         }
         List<Color> pathColors = new ArrayList<Color>(colors);
         node.setPathColors(pathColors);
@@ -388,12 +388,12 @@ public class TaxonomyNodeRenderer extends JLabel
 
         if (showPathInfoInTaxonomy) {
             if ((aceConfig.getClassificationRoot() != null)
-                    && (aceConfig.getClassificationRoot().getConceptNid() == node.getCnid())) {
+                    && (aceConfig.getClassificationRoot().getConceptNid() == node.getConceptNid())) {
                 htmlSuffixes.add("<font color='#CC3300'>&nbsp;[Classification Root]</font>");
             }
 
             if ((aceConfig.getClassificationRoleRoot() != null)
-                    && (aceConfig.getClassificationRoleRoot().getConceptNid() == node.getCnid())) {
+                    && (aceConfig.getClassificationRoleRoot().getConceptNid() == node.getConceptNid())) {
                 htmlSuffixes.add("<font color='#CC3300'>&nbsp;[Classifier Role Root]</font>");
             }
 
@@ -410,7 +410,7 @@ public class TaxonomyNodeRenderer extends JLabel
         switch (typeToRender) {
             case FSN:
                 try {
-                    DescriptionVersionBI desc = cv.getFullySpecifiedDescription();
+                    DescriptionVersionBI desc = cv.getDescriptionFullySpecified();
 
                     if (desc != null) {
                         conceptDesc = desc.getText();
@@ -420,7 +420,7 @@ public class TaxonomyNodeRenderer extends JLabel
                         node.setSortComparable(conceptDesc.toLowerCase());
                     }
                 } catch (ContradictionException ex) {
-                    conceptDesc = cv.getFsnDescsActive().iterator().next().getText();
+                    conceptDesc = cv.getDescriptionsFullySpecifiedActive().iterator().next().getText();
                     node.setSortComparable(conceptDesc.toLowerCase());
                 }
 
@@ -428,7 +428,7 @@ public class TaxonomyNodeRenderer extends JLabel
 
             case PREFERRED:
                 try {
-                    DescriptionVersionBI desc = cv.getPreferredDescription();
+                    DescriptionVersionBI desc = cv.getDescriptionPreferred();
 
                     if (desc != null) {
                         conceptDesc = desc.getText();
@@ -440,7 +440,7 @@ public class TaxonomyNodeRenderer extends JLabel
 
                     node.setSortComparable(conceptDesc.toLowerCase());
                 } catch (ContradictionException ex) {
-                    conceptDesc = cv.getPrefDescsActive().iterator().next().getText();
+                    conceptDesc = cv.getDescriptionsPreferredActive().iterator().next().getText();
                     node.setSortComparable(conceptDesc.toLowerCase());
                 }
 
@@ -508,7 +508,7 @@ public class TaxonomyNodeRenderer extends JLabel
                 this.setBorder(BorderFactory.createCompoundBorder(this.getBorder(),
                         BorderFactory.createMatteBorder(0, iconRect.x, 0, 0, backgroundNonSelectionColor)));
 
-                if (cv.getRelsOutgoingDestinationsNidsActiveIsa().length == 0) {
+                if (cv.getRelationshipsSourceTargetNidsActiveIsa().length == 0) {
                     node.setIcon(NodeIcon.MULTI_PARENT_ROOT);
                 } else {
                     if (node.isSecondaryParentOpened()) {
@@ -587,9 +587,9 @@ public class TaxonomyNodeRenderer extends JLabel
         for (int i : refsetsToShow.getListArray()) {
             for (RefexChronicleBI ebr : extensions) {
                 if (!refexAlreadyHandled.contains(i)) {
-                    if ((ebr != null) && (ebr.getCollectionNid() == i)) {
+                    if ((ebr != null) && (ebr.getRefexNid() == i)) {
                         if (ebr instanceof RefexBooleanVersionBI) {
-                            for (RefexVersionBI t : ebr.getCurrentRefexes(cv.getViewCoordinate())) {
+                            for (RefexVersionBI t : ebr.getRefexesActive(cv.getViewCoordinate())) {
                                 boolean extValue = ((RefexBooleanVersionBI) t).getBoolean1();
 
                                 refexAlreadyHandled.add(i);
@@ -615,10 +615,10 @@ public class TaxonomyNodeRenderer extends JLabel
                                     AceLog.getAppLog().alertAndLogException(e);
                                 }
                             }
-                        } else if (ebr instanceof RefexCnidVersionBI) {
-                            RefexCnidVersionBI extVersion = (RefexCnidVersionBI) ebr;
+                        } else if (ebr instanceof RefexNidVersionBI) {
+                            RefexNidVersionBI extVersion = (RefexNidVersionBI) ebr;
                             ConceptVersionBI ebrCb = Ts.get().getConceptVersion(cv.getViewCoordinate(),
-                                    extVersion.getCnid1());
+                                    extVersion.getNid1());
 
                             refexAlreadyHandled.add(i);
 
@@ -637,8 +637,8 @@ public class TaxonomyNodeRenderer extends JLabel
                             int extValue = ((RefexIntVersionBI) ebr).getInt1();
 
                             htmlPrefixes.add("<font color=blue>&nbsp;" + extValue + "&nbsp;</font>");
-                        } else if (ebr instanceof RefexStrVersionBI) {
-                            String strExt = ((RefexStrVersionBI) ebr).getStr1();
+                        } else if (ebr instanceof RefexStringVersionBI) {
+                            String strExt = ((RefexStringVersionBI) ebr).getString1();
 
                             refexAlreadyHandled.add(i);
                             htmlSuffixes.add("<code><strong>" + strExt + "'</strong></code>");
@@ -683,15 +683,15 @@ public class TaxonomyNodeRenderer extends JLabel
         switch (typeToRender) {
             case FSN:
                 try {
-                    return cv.getFullySpecifiedDescription().getText() + '\u039A';
+                    return cv.getDescriptionFullySpecified().getText() + '\u039A';
                 } catch (ContradictionException ex) {
-                    return cv.getFsnDescsActive().iterator().next().getText() + '\u039A';
+                    return cv.getDescriptionsFullySpecifiedActive().iterator().next().getText() + '\u039A';
                 }
             case PREFERRED:
                 try {
-                    return cv.getPreferredDescription().getText() + '\u039A';
+                    return cv.getDescriptionPreferred().getText() + '\u039A';
                 } catch (ContradictionException ex) {
-                    return cv.getPrefDescsActive().iterator().next().getText() + '\u039A';
+                    return cv.getDescriptionsPreferredActive().iterator().next().getText() + '\u039A';
                 }
             default:
                 throw new UnsupportedOperationException("Can't handle: " + typeToRender);

@@ -137,10 +137,10 @@ public abstract class DragPanelComponentVersion<T extends ComponentVersionBI> ex
       gbc.fill      = GridBagConstraints.HORIZONTAL;
 
       Collection<? extends RefexVersionBI<?>> refexes =
-         getThingToDrag().getCurrentRefexes(getSettings().getConfig().getViewCoordinate());
+         getThingToDrag().getRefexesActive(getSettings().getConfig().getViewCoordinate());
       
       Collection<? extends RefexVersionBI<?>> tempRefexList =
-         getThingToDrag().getInactiveRefexes(getSettings().getConfig().getViewCoordinate());
+         getThingToDrag().getRefexesInactive(getSettings().getConfig().getViewCoordinate());
 
       for (RefexVersionBI<?> rx : refexes) {
             DragPanelExtension dpe = new DragPanelExtension(viewLayout, getParentCollapsePanel(), rx);
@@ -281,7 +281,7 @@ public abstract class DragPanelComponentVersion<T extends ComponentVersionBI> ex
 
    @Override
    public void showConflicts(Collection<Integer> saptCol) {
-      if (saptCol.contains(getComponentVersion().getSapNid())) {
+      if (saptCol.contains(getComponentVersion().getStampNid())) {
          conflictLabel.setVisible(true);
       }
 

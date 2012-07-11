@@ -145,8 +145,8 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
 	        TerminologyListModel batchListModel = new TerminologyListModel();
                 int conflictRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.CONFLICT_RECORD.getPrimoridalUid());
                 ConceptChronicleBI conflictRefset = Ts.get().getConceptForNid(conflictRefsetNid);
-                for(RefexVersionBI member : conflictRefset.getCurrentRefsetMembers(viewCoord)){
-                    if(member.getCollectionNid() == conflictRefsetNid){
+                for(RefexVersionBI member : conflictRefset.getRefsetMembersActive(viewCoord)){
+                    if(member.getRefexNid() == conflictRefsetNid){
                         batchListModel.addElement((I_GetConceptData)
                             Ts.get().getConceptForNid(member.getReferencedComponentNid()));
                     }

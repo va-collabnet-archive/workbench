@@ -38,10 +38,10 @@ public class DescriptionConstraint implements ConstraintBI {
     private String text;
     
 	public DescriptionConstraint(ConceptSpec conceptSpec,
-			ConceptSpec descTypeSpec, String text) {
+			ConceptSpec descriptionTypeSpec, String text) {
 		super();
 		this.conceptSpec = conceptSpec;
-		this.descTypeSpec = descTypeSpec;
+		this.descTypeSpec = descriptionTypeSpec;
 		this.text = text;
 	}
 
@@ -49,7 +49,7 @@ public class DescriptionConstraint implements ConstraintBI {
 		return conceptSpec;
 	}
 
-	public ConceptSpec getDescTypeSpec() {
+	public ConceptSpec getDescriptionTypeSpec() {
 		return descTypeSpec;
 	}
 
@@ -57,12 +57,12 @@ public class DescriptionConstraint implements ConstraintBI {
 		return text;
 	}
 
-	public ConceptVersionBI getConcept(ViewCoordinate c) throws IOException {
-		return conceptSpec.get(c);
+	public ConceptVersionBI getConcept(ViewCoordinate viewCoordinate) throws IOException {
+		return conceptSpec.get(viewCoordinate);
 	}
 
-	public ConceptVersionBI getDescType(ViewCoordinate c) throws IOException {
-		return descTypeSpec.get(c);
+	public ConceptVersionBI getDescType(ViewCoordinate viewCoordinate) throws IOException {
+		return descTypeSpec.get(viewCoordinate);
 	}
 
 
@@ -70,7 +70,7 @@ public class DescriptionConstraint implements ConstraintBI {
 		return Ts.get().getNidForUuids(conceptSpec.getUuids());
 	}
 
-	public int getDescTypeNid() throws IOException {
+	public int getDescriptionTypeNid() throws IOException {
 		return Ts.get().getNidForUuids(descTypeSpec.getUuids());
 	}
 

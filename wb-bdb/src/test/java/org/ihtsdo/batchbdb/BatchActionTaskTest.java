@@ -40,9 +40,9 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.binding.snomed.Snomed;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidMember;
-import org.ihtsdo.tk.example.binding.TermAux;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid.TkRefexUuidMember;
+import org.ihtsdo.tk.binding.snomed.TermAux;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -162,16 +162,16 @@ public class BatchActionTaskTest {
                 EConcept eC = new EConcept(localConcept, mts);
                 if (RefsetAuxiliary.Concept.REFSET_PATHS.getUids().contains(eC.getPrimordialUuid())) {
                     // Add the workbench auxiliary path...
-                    TkRefsetCidMember member = new TkRefsetCidMember();
+                    TkRefexUuidMember member = new TkRefexUuidMember();
                     member.primordialUuid = UUID.fromString("9353a710-a1c0-11df-981c-0800200c9a66");
                     member.componentUuid = ArchitectonicAuxiliary.Concept.PATH.getPrimoridalUid();
-                    member.c1Uuid = ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getPrimoridalUid();
+                    member.uuid1 = ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getPrimoridalUid();
                     member.setRefsetUuid(eC.primordialUuid);
                     member.statusUuid = eC.conceptAttributes.statusUuid;
                     member.authorUuid = eC.conceptAttributes.authorUuid;
                     member.pathUuid = eC.conceptAttributes.pathUuid;
                     member.time = eC.conceptAttributes.time;
-                    List<TkRefsetAbstractMember<?>> memberList = new ArrayList<TkRefsetAbstractMember<?>>();
+                    List<TkRefexAbstractMember<?>> memberList = new ArrayList<TkRefexAbstractMember<?>>();
                     memberList.add(member);
                     eC.setRefsetMembers(memberList);
                 }

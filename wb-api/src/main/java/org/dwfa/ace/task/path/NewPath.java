@@ -174,7 +174,7 @@ public class NewPath extends AbstractTask {
 
         I_GetConceptData statusConcept = tf.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
 
-        newTuples.addAll(newPathConcept.getConceptAttributes().getTuples());
+        newTuples.addAll(newPathConcept.getConAttrs().getTuples());
 
         I_DescriptionVersioned idvFsn = tf.newDescription(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
             parent.ids[0] + description), newPathConcept, "en", description,

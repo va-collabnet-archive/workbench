@@ -16,21 +16,21 @@ import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierLong;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierString;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierUuid;
-import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanMember;
-import org.ihtsdo.tk.dto.concept.component.refset.Long.TkRefsetLongMember;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidcid.TkRefsetCidCidMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidcidcid.TkRefsetCidCidCidMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidcidstr.TkRefsetCidCidStrMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidflt.TkRefsetCidFloatMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidint.TkRefsetCidIntMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidlong.TkRefsetCidLongMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidstr.TkRefsetCidStrMember;
-import org.ihtsdo.tk.dto.concept.component.refset.integer.TkRefsetIntMember;
-import org.ihtsdo.tk.dto.concept.component.refset.member.TkRefsetMember;
-import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_boolean.TkRefexBooleanMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_long.TkRefexLongMember;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid.TkRefexUuidMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_uuid.TkRefexUuidUuidMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_uuid_uuid.TkRefexUuidUuidUuidMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_uuid_string.TkRefexUuidUuidStringMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_float.TkRefexUuidFloatMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_int.TkRefexUuidIntMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_long.TkRefexUuidLongMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_string.TkRefexUuidStringMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_int.TkRefexIntMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_member.TkRefexMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_string.TkRefsetStrMember;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -39,7 +39,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import java.util.*;
-import org.ihtsdo.tk.dto.concept.component.refset.array.bytearray.TkRefsetArrayOfBytearrayMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_arrayofbytearray.TkRefexArrayOfBytearrayMember;
 
 public abstract class TkComponent<V extends TkRevision> extends TkRevision {
    private static final long serialVersionUID = 1;
@@ -47,7 +47,7 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
    //~--- fields --------------------------------------------------------------
 
    public List<TkIdentifier>              additionalIds;
-   public List<TkRefsetAbstractMember<?>> annotations;
+   public List<TkRefexAbstractMember<?>> annotations;
    public UUID                            primordialUuid;
    public List<V>                         revisions;
 
@@ -57,10 +57,10 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
       super();
    }
 
-   public TkComponent(ComponentVersionBI another) throws IOException {
-      super(another);
+   public TkComponent(ComponentVersionBI componentVersion) throws IOException {
+      super(componentVersion);
 
-      Collection<? extends IdBI> anotherAdditionalIds = another.getAdditionalIds();
+      Collection<? extends IdBI> anotherAdditionalIds = componentVersion.getAdditionalIds();
 
       if (anotherAdditionalIds != null) {
          this.additionalIds = new ArrayList<TkIdentifier>(anotherAdditionalIds.size());
@@ -70,10 +70,10 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
          }
       }
 
-      Collection<? extends RefexChronicleBI<?>> anotherAnnotations = another.getAnnotations();
+      Collection<? extends RefexChronicleBI<?>> anotherAnnotations = componentVersion.getAnnotations();
 
       processAnnotations(anotherAnnotations);
-      this.primordialUuid = another.getPrimUuid();
+      this.primordialUuid = componentVersion.getPrimUuid();
    }
 
    public TkComponent(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -93,10 +93,10 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
       }
 
       if (another.annotations != null) {
-         this.annotations = new ArrayList<TkRefsetAbstractMember<?>>(another.annotations.size());
+         this.annotations = new ArrayList<TkRefexAbstractMember<?>>(another.annotations.size());
 
-         for (TkRefsetAbstractMember<?> r : another.annotations) {
-            this.annotations.add((TkRefsetAbstractMember<?>) r.makeConversion(conversionMap, offset, mapAll));
+         for (TkRefexAbstractMember<?> r : another.annotations) {
+            this.annotations.add((TkRefexAbstractMember<?>) r.makeConversion(conversionMap, offset, mapAll));
          }
       }
 
@@ -111,21 +111,21 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
       }
    }
 
-   public TkComponent(ComponentVersionBI another, NidBitSetBI exclusions, Map<UUID, UUID> conversionMap,
-                      long offset, boolean mapAll, ViewCoordinate vc)
+   public TkComponent(ComponentVersionBI componentVersion, NidBitSetBI excludedNids, Map<UUID, UUID> conversionMap,
+                      long offset, boolean mapAll, ViewCoordinate viewCoordinate)
            throws IOException, ContradictionException {
-      super(another, conversionMap, offset, mapAll);
+      super(componentVersion, conversionMap, offset, mapAll);
 
-      Collection<? extends IdBI> anotherAdditionalIds = another.getAdditionalIds();
+      Collection<? extends IdBI> anotherAdditionalIds = componentVersion.getAdditionalIds();
 
       if (anotherAdditionalIds != null) {
          this.additionalIds = new ArrayList<TkIdentifier>(anotherAdditionalIds.size());
          nextId:
          for (IdBI id : anotherAdditionalIds) {
             for (int nid : id.getAllNidsForId()) {
-               if (exclusions.isMember(nid) || (Ts.get().getComponent(nid) == null)) {
+               if (excludedNids.isMember(nid) || (Ts.get().getComponent(nid) == null)) {
                   continue nextId;
-               } else if (Ts.get().getComponent(nid).getVersions(vc).isEmpty()) {
+               } else if (Ts.get().getComponent(nid).getVersions(viewCoordinate).isEmpty()) {
                    continue nextId;
                }
             }
@@ -135,10 +135,10 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
          }
       }
 
-      Collection<? extends RefexChronicleBI<?>> anotherAnnotations = another.getAnnotations();
+      Collection<? extends RefexChronicleBI<?>> anotherAnnotations = componentVersion.getAnnotations();
 
-      processAnnotations(anotherAnnotations, vc, exclusions, conversionMap);
-      this.primordialUuid = conversionMap.get(another.getPrimUuid());
+      processAnnotations(anotherAnnotations, viewCoordinate, excludedNids, conversionMap);
+      this.primordialUuid = conversionMap.get(componentVersion.getPrimUuid());
    }
 
    //~--- methods -------------------------------------------------------------
@@ -213,7 +213,7 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
 
    private void processAnnotations(Collection<? extends RefexChronicleBI<?>> annotations) throws IOException {
       if ((annotations != null) &&!annotations.isEmpty()) {
-         this.annotations = new ArrayList<TkRefsetAbstractMember<?>>(annotations.size());
+         this.annotations = new ArrayList<TkRefexAbstractMember<?>>(annotations.size());
 
          for (RefexChronicleBI<?> r : annotations) {
             this.annotations.add(TkConcept.convertRefex(r));
@@ -221,24 +221,24 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
       }
    }
 
-   private void processAnnotations(Collection<? extends RefexChronicleBI<?>> annotations, ViewCoordinate vc,
-                                   NidBitSetBI exclusions, Map<UUID, UUID> conversionMap)
+   private void processAnnotations(Collection<? extends RefexChronicleBI<?>> annotations, ViewCoordinate viewCoordinate,
+                                   NidBitSetBI excludedNids, Map<UUID, UUID> conversionMap)
            throws IOException, ContradictionException {
       if ((annotations != null) &&!annotations.isEmpty()) {
-         this.annotations = new ArrayList<TkRefsetAbstractMember<?>>(annotations.size());
+         this.annotations = new ArrayList<TkRefexAbstractMember<?>>(annotations.size());
 
          for (RefexChronicleBI<?> r : annotations) {
             nextVersion:
-            for (RefexVersionBI v : r.getVersions(vc)) {
+            for (RefexVersionBI v : r.getVersions(viewCoordinate)) {
                for (int vNid : v.getAllNidsForVersion()) {
-                  if (exclusions.isMember(vNid) || (Ts.get().getComponent(vNid) == null)) {
+                  if (excludedNids.isMember(vNid) || (Ts.get().getComponent(vNid) == null)) {
                      continue nextVersion;
-                  } else if (Ts.get().getComponent(vNid).getVersions(vc).isEmpty()) {
+                  } else if (Ts.get().getComponent(vNid).getVersions(viewCoordinate).isEmpty()) {
                       continue nextVersion;
                   }
                }
 
-               this.annotations.add(v.getTkRefsetMemberActiveOnly(vc, exclusions, conversionMap));
+               this.annotations.add(v.getTkRefsetMemberActiveOnly(viewCoordinate, excludedNids, conversionMap));
             }
          }
       }
@@ -284,39 +284,39 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
       assert annotationCount < 5000 : "annotation count is: " + annotationCount;
 
       if (annotationCount > 0) {
-         annotations = new ArrayList<TkRefsetAbstractMember<?>>(annotationCount);
+         annotations = new ArrayList<TkRefexAbstractMember<?>>(annotationCount);
 
          for (int i = 0; i < annotationCount; i++) {
-            TK_REFSET_TYPE type = TK_REFSET_TYPE.readType(in);
+            TK_REFEX_TYPE type = TK_REFEX_TYPE.readType(in);
 
             switch (type) {
             case CID :
-               annotations.add(new TkRefsetCidMember(in, dataVersion));
+               annotations.add(new TkRefexUuidMember(in, dataVersion));
 
                break;
 
             case CID_CID :
-               annotations.add(new TkRefsetCidCidMember(in, dataVersion));
+               annotations.add(new TkRefexUuidUuidMember(in, dataVersion));
 
                break;
 
             case MEMBER :
-               annotations.add(new TkRefsetMember(in, dataVersion));
+               annotations.add(new TkRefexMember(in, dataVersion));
 
                break;
 
             case CID_CID_CID :
-               annotations.add(new TkRefsetCidCidCidMember(in, dataVersion));
+               annotations.add(new TkRefexUuidUuidUuidMember(in, dataVersion));
 
                break;
 
             case CID_CID_STR :
-               annotations.add(new TkRefsetCidCidStrMember(in, dataVersion));
+               annotations.add(new TkRefexUuidUuidStringMember(in, dataVersion));
 
                break;
 
             case INT :
-               annotations.add(new TkRefsetIntMember(in, dataVersion));
+               annotations.add(new TkRefexIntMember(in, dataVersion));
 
                break;
 
@@ -326,37 +326,37 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
                break;
 
             case CID_INT :
-               annotations.add(new TkRefsetCidIntMember(in, dataVersion));
+               annotations.add(new TkRefexUuidIntMember(in, dataVersion));
 
                break;
 
             case BOOLEAN :
-               annotations.add(new TkRefsetBooleanMember(in, dataVersion));
+               annotations.add(new TkRefexBooleanMember(in, dataVersion));
 
                break;
 
             case CID_FLOAT :
-               annotations.add(new TkRefsetCidFloatMember(in, dataVersion));
+               annotations.add(new TkRefexUuidFloatMember(in, dataVersion));
 
                break;
 
             case CID_LONG :
-               annotations.add(new TkRefsetCidLongMember(in, dataVersion));
+               annotations.add(new TkRefexUuidLongMember(in, dataVersion));
 
                break;
 
             case CID_STR :
-               annotations.add(new TkRefsetCidStrMember(in, dataVersion));
+               annotations.add(new TkRefexUuidStringMember(in, dataVersion));
 
                break;
 
             case LONG :
-               annotations.add(new TkRefsetLongMember(in, dataVersion));
+               annotations.add(new TkRefexLongMember(in, dataVersion));
 
                break;
                 
             case ARRAY_BYTEARRAY:
-                annotations.add(new TkRefsetArrayOfBytearrayMember(in, dataVersion));
+                annotations.add(new TkRefexArrayOfBytearrayMember(in, dataVersion));
                 break;
             default :
                throw new UnsupportedOperationException("Can't handle refset type: " + type);
@@ -372,7 +372,7 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
    public String toString() {
       int depth = 1;
 
-      if (this instanceof TkRefsetAbstractMember) {
+      if (this instanceof TkRefexAbstractMember) {
          depth = 2;
       }
 
@@ -393,7 +393,7 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
 
          buff.append("annotations:\n");
 
-         for (TkRefsetAbstractMember m : this.annotations) {
+         for (TkRefexAbstractMember m : this.annotations) {
             buff.append(TkConcept.PADDING);
             buff.append(TkConcept.PADDING);
 
@@ -449,7 +449,7 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
          assert annotations.size() < 500 : "annotation count is: " + annotations.size();
          out.writeShort(annotations.size());
 
-         for (TkRefsetAbstractMember<?> r : annotations) {
+         for (TkRefexAbstractMember<?> r : annotations) {
             r.getType().writeType(out);
             r.writeExternal(out);
          }
@@ -462,7 +462,7 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
       return additionalIds;
    }
 
-   public List<TkRefsetAbstractMember<?>> getAnnotations() {
+   public List<TkRefexAbstractMember<?>> getAnnotations() {
       return annotations;
    }
 
@@ -531,7 +531,7 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
       this.additionalIds = additionalIdComponents;
    }
 
-   public void setAnnotations(List<TkRefsetAbstractMember<?>> annotations) {
+   public void setAnnotations(List<TkRefexAbstractMember<?>> annotations) {
       this.annotations = annotations;
    }
 

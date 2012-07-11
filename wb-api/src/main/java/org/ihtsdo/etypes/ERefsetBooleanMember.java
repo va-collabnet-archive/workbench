@@ -8,8 +8,8 @@ import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 
-import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanMember;
-import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_boolean.TkRefexBooleanMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_boolean.TkRefexBooleanRevision;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -18,7 +18,7 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 
-public class ERefsetBooleanMember extends TkRefsetBooleanMember {
+public class ERefsetBooleanMember extends TkRefexBooleanMember {
    public static final long serialVersionUID = 1;
 
    //~--- constructors --------------------------------------------------------
@@ -41,7 +41,7 @@ public class ERefsetBooleanMember extends TkRefsetBooleanMember {
 
       I_ExtendByRefPartBoolean part = (I_ExtendByRefPartBoolean) m.getMutableParts().get(0);
 
-      booleanValue = part.getBooleanValue();
+      boolean1 = part.getBooleanValue();
       pathUuid     = Terms.get().nidToUuid(part.getPathNid());
       statusUuid   = Terms.get().nidToUuid(part.getStatusNid());
       authorUuid    = Terms.get().nidToUuid(part.getAuthorNid());
@@ -49,7 +49,7 @@ public class ERefsetBooleanMember extends TkRefsetBooleanMember {
       time         = part.getTime();
 
       if (partCount > 1) {
-         revisions = new ArrayList<TkRefsetBooleanRevision>(partCount - 1);
+         revisions = new ArrayList<TkRefexBooleanRevision>(partCount - 1);
 
          for (int i = 1; i < partCount; i++) {
             revisions.add(new ERefsetBooleanRevision((I_ExtendByRefPartBoolean) m.getMutableParts().get(i)));

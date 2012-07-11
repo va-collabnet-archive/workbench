@@ -28,12 +28,12 @@ public class InvalidCAB extends Exception {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public InvalidCAB(Throwable thrwbl) {
-        super(thrwbl);
+	public InvalidCAB(Throwable throwable) {
+        super(throwable);
     }
 
-    public InvalidCAB(String string, Throwable thrwbl) {
-        super(string, thrwbl);
+    public InvalidCAB(String string, Throwable throwable) {
+        super(string, throwable);
     }
 
     public InvalidCAB(String string) {

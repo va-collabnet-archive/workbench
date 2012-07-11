@@ -347,13 +347,13 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
       @Override
       public void update(ConceptVersionBI cv) {
          try {
-            if (cv.getNid() == currentNode.getCnid()) {
+            if (cv.getNid() == currentNode.getConceptNid()) {
                newNode = model.getNodeFactory().makeNode(cv, currentNode.getParentNid(),
                        model.getNodeStore().get(currentNode.parentNodeId));
             } else {
-               for (RelationshipVersionBI rel : cv.getRelsOutgoingActiveIsa()) {
-                  if (rel.getDestinationNid() == currentNode.getCnid()) {
-                     TaxonomyNode childNode = model.getNodeFactory().makeNode(cv, currentNode.getCnid(),
+               for (RelationshipVersionBI rel : cv.getRelationshipsSourceActiveIsa()) {
+                  if (rel.getTargetNid() == currentNode.getConceptNid()) {
+                     TaxonomyNode childNode = model.getNodeFactory().makeNode(cv, currentNode.getConceptNid(),
                                                  currentNode);
 
                      children.add(childNode);
@@ -427,13 +427,13 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
       @Override
       public void update(ConceptVersionBI cv) {
          try {
-            if (cv.getNid() == currentNode.getCnid()) {
+            if (cv.getNid() == currentNode.getConceptNid()) {
                newNode = model.getNodeFactory().makeNode(cv, currentNode.getParentNid(),
                        model.getNodeStore().get(currentNode.parentNodeId));
             } else {
-               for (RelationshipVersionBI rel : cv.getRelsOutgoingActiveIsa()) {
-                  if (rel.getDestinationNid() == currentNode.getCnid()) {
-                     TaxonomyNode childNode = model.getNodeFactory().makeNode(cv, currentNode.getCnid(),
+               for (RelationshipVersionBI rel : cv.getRelationshipsSourceActiveIsa()) {
+                  if (rel.getTargetNid() == currentNode.getConceptNid()) {
+                     TaxonomyNode childNode = model.getNodeFactory().makeNode(cv, currentNode.getConceptNid(),
                                                  currentNode);
 
                      currentNode.addChild(childNode);
@@ -480,9 +480,9 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
             
             boolean cycleExists = false;
             for(Long nodeId : parentNode.getChildren()){
-                if(nodeId.equals(currentNode.getNodeId()) && nodesToChange.containsKey(parentNode.getCnid())){
+                if(nodeId.equals(currentNode.getNodeId()) && nodesToChange.containsKey(parentNode.getConceptNid())){
                      TerminologySnapshotDI tSnap   = ts.getSnapshot(vc);
-                     processConcept(tSnap.getConceptForNid(parentNode.getCnid()));
+                     processConcept(tSnap.getConceptForNid(parentNode.getConceptNid()));
                      cycleExists = true;
                 }
             }

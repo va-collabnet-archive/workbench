@@ -118,7 +118,7 @@ public class CheckForChildren extends AbstractTask implements ActionListener{
             
            ConceptVersionBI cv= Ts.get().getConceptVersion(vc, concept.getNid());
 
-           Collection<? extends ConceptVersionBI> relsIncoming = cv.getRelsIncomingOriginsActiveIsa();
+           Collection<? extends ConceptVersionBI> relsIncoming = cv.getRelationshipsTargetSourceConceptsActiveIsa();
            
             if( relsIncoming.size() > 0){
             	JPanel wizardPanel = wizard.getWizardPanel();

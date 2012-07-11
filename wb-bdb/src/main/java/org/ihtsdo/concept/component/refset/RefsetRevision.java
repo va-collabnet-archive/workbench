@@ -11,7 +11,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.refex.RefexAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -127,7 +127,7 @@ public abstract class RefsetRevision<V extends RefsetRevision<V, C>, C extends R
 
     //~--- get methods ---------------------------------------------------------
     @Override
-    public int getCollectionNid() {
+    public int getRefexNid() {
         return primordialComponent.refsetNid;
     }
 
@@ -146,7 +146,7 @@ public abstract class RefsetRevision<V extends RefsetRevision<V, C>, C extends R
             InvalidCAB, ContradictionException {
         RefexCAB rcs = new RefexCAB(getTkRefsetType(),
                 Ts.get().getUuidPrimordialForNid(getReferencedComponentNid()),
-                getCollectionNid(),
+                getRefexNid(),
                 getVersion(vc), vc);
 
         addSpecProperties(rcs);
@@ -160,7 +160,7 @@ public abstract class RefsetRevision<V extends RefsetRevision<V, C>, C extends R
         return getStatusNid();
     }
 
-    protected abstract TK_REFSET_TYPE getTkRefsetType();
+    protected abstract TK_REFEX_TYPE getTkRefsetType();
 
     //~--- set methods ---------------------------------------------------------
     @Override

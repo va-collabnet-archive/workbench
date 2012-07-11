@@ -8,7 +8,7 @@ package org.ihtsdo.arena.conceptview;
 //~--- non-JDK imports --------------------------------------------------------
 import org.dwfa.tapi.TerminologyException;
 
-import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeAnalogBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -33,7 +33,7 @@ import javax.swing.TransferHandler;
  *
  * @author kec
  */
-public class DragPanelConceptAttributes extends DragPanelComponentVersion<ConAttrAnalogBI> {
+public class DragPanelConceptAttributes extends DragPanelComponentVersion<ConceptAttributeAnalogBI> {
 
     /**
      *
@@ -42,14 +42,14 @@ public class DragPanelConceptAttributes extends DragPanelComponentVersion<ConAtt
 
     //~--- constructors --------------------------------------------------------
     public DragPanelConceptAttributes(ConceptViewLayout viewLayout, CollapsePanel parentCollapsePanel,
-            ConAttrAnalogBI attr)
+            ConceptAttributeAnalogBI attr)
             throws TerminologyException, IOException {
         super(viewLayout, parentCollapsePanel, attr);
         layoutConceptAttrs();
     }
 
     public DragPanelConceptAttributes(LayoutManager layout, ConceptViewLayout viewLayout,
-            CollapsePanel parentCollapsePanel, ConAttrAnalogBI attr)
+            CollapsePanel parentCollapsePanel, ConceptAttributeAnalogBI attr)
             throws TerminologyException, IOException {
         super(layout, viewLayout, parentCollapsePanel, attr);
         layoutConceptAttrs();
@@ -127,11 +127,11 @@ public class DragPanelConceptAttributes extends DragPanelComponentVersion<ConAtt
     }
 
     //~--- get methods ---------------------------------------------------------
-    private ConAttrAnalogBI getAttr() {
+    private ConceptAttributeAnalogBI getAttr() {
         return getComponentVersion();
     }
 
-    public ConAttrAnalogBI getDraggedThing() {
+    public ConceptAttributeAnalogBI getDraggedThing() {
         return thingToDrag;
     }
 
@@ -141,13 +141,13 @@ public class DragPanelConceptAttributes extends DragPanelComponentVersion<ConAtt
     }
 
     @Override
-    public Collection<DragPanelComponentVersion<ConAttrAnalogBI>> getOtherVersionPanels()
+    public Collection<DragPanelComponentVersion<ConceptAttributeAnalogBI>> getOtherVersionPanels()
             throws IOException, TerminologyException {
-        Collection<DragPanelComponentVersion<ConAttrAnalogBI>> panelList =
-                new ArrayList<DragPanelComponentVersion<ConAttrAnalogBI>>();
-        Collection<ConAttrAnalogBI> versions = thingToDrag.getChronicle().getVersions();
+        Collection<DragPanelComponentVersion<ConceptAttributeAnalogBI>> panelList =
+                new ArrayList<DragPanelComponentVersion<ConceptAttributeAnalogBI>>();
+        Collection<ConceptAttributeAnalogBI> versions = thingToDrag.getChronicle().getVersions();
 
-        for (ConAttrAnalogBI dav : versions) {
+        for (ConceptAttributeAnalogBI dav : versions) {
             if (!thingToDrag.equals(dav)) {
                 DragPanelConceptAttributes dpd = new DragPanelConceptAttributes(new GridBagLayout(), viewLayout,
                         null, dav);
@@ -160,7 +160,7 @@ public class DragPanelConceptAttributes extends DragPanelComponentVersion<ConAtt
     }
 
     @Override
-    public ConAttrAnalogBI getThingToDrag() {
+    public ConceptAttributeAnalogBI getThingToDrag() {
         return thingToDrag;
     }
 

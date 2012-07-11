@@ -4,7 +4,7 @@ package org.ihtsdo.concept.component.relationship.group;
 import org.dwfa.vodb.types.Position;
 
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.ComponentChronicleBI;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
@@ -18,8 +18,8 @@ import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
-import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
-import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
+import org.ihtsdo.tk.api.relationship.group.RelationshipGroupChronicleBI;
+import org.ihtsdo.tk.api.relationship.group.RelationshipGroupVersionBI;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -32,18 +32,18 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public class RelGroupVersion implements RelGroupVersionBI {
+public class RelGroupVersion implements RelationshipGroupVersionBI {
 
     private long time = Long.MIN_VALUE;
     private int authorNid;
     private ViewCoordinate coordinate;
     private int pathNid;
-    private RelGroupChronicleBI rg;
+    private RelationshipGroupChronicleBI rg;
     private int statusNid;
     private int moduleNid;
 
     //~--- constructors --------------------------------------------------------
-    public RelGroupVersion(RelGroupChronicleBI rg, ViewCoordinate coordinate) {
+    public RelGroupVersion(RelationshipGroupChronicleBI rg, ViewCoordinate coordinate) {
         assert rg != null;
         assert coordinate != null;
         this.rg = rg;
@@ -63,14 +63,14 @@ public class RelGroupVersion implements RelGroupVersionBI {
     }
 
     @Override
-    public boolean sapIsInRange(int min, int max) {
+    public boolean stampIsInRange(int min, int max) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     private void setupLatest() {
         time = Long.MIN_VALUE;
 
-        for (RelationshipVersionBI relV : getAllCurrentRelVersions()) {
+        for (RelationshipVersionBI relV : getRelationshipsActiveAllVersions()) {
             if (relV.getTime() > time) {
                 time = relV.getTime();
                 authorNid = relV.getAuthorNid();
@@ -81,7 +81,7 @@ public class RelGroupVersion implements RelGroupVersionBI {
         }
 
         if (time == Long.MIN_VALUE) {
-            for (RelationshipChronicleBI rel : getRels()) {
+            for (RelationshipChronicleBI rel : getRelationships()) {
                 for (RelationshipVersionBI relV : rel.getVersions(coordinate)) {
                     if (relV.getTime() > time) {
                         time = relV.getTime();
@@ -101,7 +101,7 @@ public class RelGroupVersion implements RelGroupVersionBI {
 
         buff.append("Group: ");
 
-        for (RelationshipChronicleBI rel : getRels()) {
+        for (RelationshipChronicleBI rel : getRelationships()) {
             buff.append(rel.toUserString());
             buff.append("; ");
         }
@@ -126,20 +126,20 @@ public class RelGroupVersion implements RelGroupVersionBI {
     }
 
     @Override
-    public Collection<? extends RelationshipVersionBI> getAllCurrentRelVersions() {
+    public Collection<? extends RelationshipVersionBI> getRelationshipsActiveAllVersions() {
         ArrayList<RelationshipVersionBI> results = new ArrayList<RelationshipVersionBI>();
 
-        for (RelationshipChronicleBI relc : rg.getRels()) {
+        for (RelationshipChronicleBI relc : rg.getRelationships()) {
             if (coordinate != null) {
                 for (RelationshipVersionBI rv : relc.getVersions(coordinate)) {
-                    if ((rv.getGroup() == rg.getRelGroup())
+                    if ((rv.getGroup() == rg.getRelationshipGroupNumber())
                             && coordinate.getAllowedStatusNids().contains(rv.getStatusNid())) {
                         results.add(rv);
                     }
                 }
             } else {
                 for (RelationshipVersionBI rv : relc.getVersions()) {
-                    if (rv.getGroup() == rg.getRelGroup()) {
+                    if (rv.getGroup() == rg.getRelationshipGroupNumber()) {
                         results.add(rv);
                     }
                 }
@@ -160,28 +160,28 @@ public class RelGroupVersion implements RelGroupVersionBI {
     }
 
     @Override
-    public Collection<? extends RelationshipVersionBI> getAllRels() throws ContradictionException {
+    public Collection<? extends RelationshipVersionBI> getRelationshipsAll() throws ContradictionException {
         ArrayList<RelationshipVersionBI> results = new ArrayList<RelationshipVersionBI>();
 
-        for (RelationshipChronicleBI relc : rg.getRels()) {
+        for (RelationshipChronicleBI relc : rg.getRelationships()) {
             if (coordinate != null) {
                 try {
-                    RelationshipVersionBI rv = relc.getVersion(coordinate.getVcWithAllStatusValues());
+                    RelationshipVersionBI rv = relc.getVersion(coordinate.getViewCoordinateWithAllStatusValues());
                     if (rv != null) {
-                        if (rv.getGroup() == rg.getRelGroup()) {
+                        if (rv.getGroup() == rg.getRelationshipGroupNumber()) {
                             results.add(rv);
                         }
                     }
                 } catch (ContradictionException ex) {
-                    for (RelationshipVersionBI rv : relc.getVersions(coordinate.getVcWithAllStatusValues())) {
-                        if (rv.getGroup() == rg.getRelGroup()) {
+                    for (RelationshipVersionBI rv : relc.getVersions(coordinate.getViewCoordinateWithAllStatusValues())) {
+                        if (rv.getGroup() == rg.getRelationshipGroupNumber()) {
                             results.add(rv);
                         }
                     }
                 }
             } else {
                 for (RelationshipVersionBI rv : relc.getVersions()) {
-                    if (rv.getGroup() == rg.getRelGroup()) {
+                    if (rv.getGroup() == rg.getRelationshipGroupNumber()) {
                         results.add(rv);
                     }
                 }
@@ -192,8 +192,8 @@ public class RelGroupVersion implements RelGroupVersionBI {
     }
 
     @Override
-    public Set<Integer> getAllSapNids() throws IOException {
-        return rg.getAllSapNids();
+    public Set<Integer> getAllStampNids() throws IOException {
+        return rg.getAllStampNids();
     }
 
     @Override
@@ -207,7 +207,7 @@ public class RelGroupVersion implements RelGroupVersionBI {
     }
 
     @Override
-    public ComponentChroncileBI getChronicle() {
+    public ComponentChronicleBI getChronicle() {
         return rg;
     }
 
@@ -217,64 +217,63 @@ public class RelGroupVersion implements RelGroupVersionBI {
     }
 
     @Override
-    public Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz)
+    public Collection<? extends RefexVersionBI<?>> getAnnotationsActive(ViewCoordinate xyz)
             throws IOException {
-        return rg.getCurrentAnnotationMembers(xyz);
+        return rg.getAnnotationsActive(xyz);
     }
 
     @Override
-    public Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz,
-            int refexNid)
-            throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz)
+    public Collection<? extends RefexVersionBI<?>> getAnnotationMembersActive(ViewCoordinate xyz, int refexNid)
             throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz, int refexNid)
+    public Collection<? extends RefexVersionBI<?>> getActiveAnnotations(ViewCoordinate xyz)
             throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public Collection<? extends RefexVersionBI<?>> getCurrentRefexMembers(ViewCoordinate xyz, int refsetNid)
-            throws IOException {
-        return rg.getCurrentRefexMembers(xyz, refsetNid);
-    }
-
-    @Override
-    public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz) throws IOException {
-        return rg.getCurrentRefexes(xyz);
-    }
-
-    @Override
-    public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz, int refsetNid)
+    public Collection<? extends RefexVersionBI<?>> getActiveAnnotations(ViewCoordinate xyz, int refexNid)
             throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public Collection<? extends RelationshipVersionBI> getCurrentRels() throws ContradictionException {
+    public Collection<? extends RefexVersionBI<?>> getRefexMembersActive(ViewCoordinate xyz, int refsetNid)
+            throws IOException {
+        return rg.getRefexMembersActive(xyz, refsetNid);
+    }
+
+    @Override
+    public Collection<? extends RefexVersionBI<?>> getRefexesActive(ViewCoordinate xyz) throws IOException {
+        return rg.getRefexesActive(xyz);
+    }
+
+    @Override
+    public Collection<? extends RefexVersionBI<?>> getActiveRefexes(ViewCoordinate xyz, int refsetNid)
+            throws IOException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Collection<? extends RelationshipVersionBI> getRelationshipsActive() throws ContradictionException {
         ArrayList<RelationshipVersionBI> results = new ArrayList<RelationshipVersionBI>();
 
-        for (RelationshipChronicleBI relc : rg.getRels()) {
+        for (RelationshipChronicleBI relc : rg.getRelationships()) {
             if (coordinate != null) {
                 RelationshipVersionBI rv = relc.getVersion(coordinate);
 
                 if (rv != null) {
-                    if ((rv.getGroup() == rg.getRelGroup())
+                    if ((rv.getGroup() == rg.getRelationshipGroupNumber())
                             && coordinate.getAllowedStatusNids().contains(rv.getStatusNid())) {
                         results.add(rv);
                     }
                 }
             } else {
                 for (RelationshipVersionBI rv : relc.getVersions()) {
-                    if (rv.getGroup() == rg.getRelGroup()) {
+                    if (rv.getGroup() == rg.getRelationshipGroupNumber()) {
                         results.add(rv);
                     }
                 }
@@ -295,8 +294,8 @@ public class RelGroupVersion implements RelGroupVersionBI {
     }
 
     @Override
-    public Collection<? extends RefexVersionBI<?>> getInactiveRefexes(ViewCoordinate xyz) throws IOException {
-        return rg.getInactiveRefexes(xyz);
+    public Collection<? extends RefexVersionBI<?>> getRefexesInactive(ViewCoordinate xyz) throws IOException {
+        return rg.getRefexesInactive(xyz);
     }
 
     @Override
@@ -325,7 +324,7 @@ public class RelGroupVersion implements RelGroupVersionBI {
     }
 
     @Override
-    public RelGroupVersionBI getPrimordialVersion() {
+    public RelationshipGroupVersionBI getPrimordialVersion() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -345,17 +344,17 @@ public class RelGroupVersion implements RelGroupVersionBI {
     }
 
     @Override
-    public int getRelGroup() {
-        return rg.getRelGroup();
+    public int getRelationshipGroupNumber() {
+        return rg.getRelationshipGroupNumber();
     }
 
     @Override
-    public Collection<? extends RelationshipChronicleBI> getRels() {
-        return rg.getRels();
+    public Collection<? extends RelationshipChronicleBI> getRelationships() {
+        return rg.getRelationships();
     }
 
     @Override
-    public int getSapNid() {
+    public int getStampNid() {
         throw new UnsupportedOperationException();
     }
 
@@ -380,7 +379,7 @@ public class RelGroupVersion implements RelGroupVersionBI {
     }
 
     @Override
-    public RelGroupVersionBI getVersion(ViewCoordinate c) throws ContradictionException {
+    public RelationshipGroupVersionBI getVersion(ViewCoordinate c) throws ContradictionException {
         return rg.getVersion(c);
     }
 
@@ -390,17 +389,17 @@ public class RelGroupVersion implements RelGroupVersionBI {
     }
 
     @Override
-    public Collection<? extends RelGroupVersionBI> getVersions(ViewCoordinate c) {
-        return Arrays.asList(new RelGroupVersionBI[]{new RelGroupVersion(this, c)});
+    public Collection<? extends RelationshipGroupVersionBI> getVersions(ViewCoordinate c) {
+        return Arrays.asList(new RelationshipGroupVersionBI[]{new RelGroupVersion(this, c)});
     }
 
     @Override
-    public boolean hasCurrentAnnotationMember(ViewCoordinate xyz, int refsetNid) throws IOException {
+    public boolean hasAnnotationMemberActive(ViewCoordinate xyz, int refsetNid) throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public boolean hasCurrentRefexMember(ViewCoordinate xyz, int refsetNid) throws IOException {
+    public boolean hasRefexMemberActive(ViewCoordinate xyz, int refsetNid) throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -420,7 +419,7 @@ public class RelGroupVersion implements RelGroupVersionBI {
 
     @Override
     public boolean isBaselineGeneration() {
-        for (RelationshipChronicleBI rc : getRels()) {
+        for (RelationshipChronicleBI rc : getRelationships()) {
             for (RelationshipVersionBI rv : rc.getVersions()) {
                 if (!rv.isBaselineGeneration()) {
                     return false;

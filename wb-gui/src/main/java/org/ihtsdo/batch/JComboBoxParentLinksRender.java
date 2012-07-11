@@ -58,10 +58,10 @@ class JComboBoxParentLinksRender extends JLabel implements ListCellRenderer {
         DefaultComboBoxModel model = (DefaultComboBoxModel) jlist.getModel();
         ConceptVersionBI cvbi = (ConceptVersionBI) model.getElementAt(index);
         try {
-            if (cvbi.getFullySpecifiedDescription() != null) {
-                setText(cvbi.getFullySpecifiedDescription().getText());
+            if (cvbi.getDescriptionFullySpecified() != null) {
+                setText(cvbi.getDescriptionFullySpecified().getText());
             } else {
-                setText(cvbi.getDescsActive().iterator().next().getText());
+                setText(cvbi.getDescriptionsActive().iterator().next().getText());
             }
         } catch (IOException ex) {
             setText(cvbi.toUserString() + " -- FSN missing");

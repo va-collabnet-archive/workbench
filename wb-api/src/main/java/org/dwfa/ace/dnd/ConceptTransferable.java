@@ -44,7 +44,7 @@ public class ConceptTransferable implements Transferable {
     public ConceptTransferable(I_GetConceptData concept) {
         super();
         try {
-            assert concept.getConceptAttributes() != null;
+            assert concept.getConAttrs() != null;
         } catch (IOException e1) {
             throw new RuntimeException(e1);
         }
@@ -70,7 +70,7 @@ public class ConceptTransferable implements Transferable {
             return conceptTransferable;
         } else if (flavor.equals(FixedTerminologyTransferable.universalFixedConceptFlavor)) {
             try {
-                return conceptTransferable.getConceptAttributes().getLocalFixedConcept().universalize();
+                return conceptTransferable.getConAttrs().getLocalFixedConcept().universalize();
             } catch (IOException e) {
                 AceLog.getAppLog().log(Level.SEVERE, e.getLocalizedMessage(), e);
             } catch (TerminologyException e) {
@@ -78,7 +78,7 @@ public class ConceptTransferable implements Transferable {
             }
         } else if (flavor.equals(FixedTerminologyTransferable.universalFixedConceptInterfaceFlavor)) {
             try {
-                return conceptTransferable.getConceptAttributes().getLocalFixedConcept().universalize();
+                return conceptTransferable.getConAttrs().getLocalFixedConcept().universalize();
             } catch (IOException e) {
                 AceLog.getAppLog().log(Level.SEVERE, e.getLocalizedMessage(), e);
             } catch (TerminologyException e) {

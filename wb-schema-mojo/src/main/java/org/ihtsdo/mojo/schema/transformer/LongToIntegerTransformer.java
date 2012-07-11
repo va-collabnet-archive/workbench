@@ -18,11 +18,11 @@ import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
-import org.ihtsdo.tk.dto.concept.component.refset.Long.TkRefsetLongMember;
-import org.ihtsdo.tk.dto.concept.component.refset.Long.TkRefsetLongRevision;
-import org.ihtsdo.tk.dto.concept.component.refset.integer.TkRefsetIntMember;
-import org.ihtsdo.tk.dto.concept.component.refset.integer.TkRefsetIntRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_long.TkRefexLongMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_long.TkRefexLongRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_int.TkRefexIntMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_int.TkRefexIntRevision;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 
 /**
@@ -127,8 +127,8 @@ public class LongToIntegerTransformer extends AbstractTransformer {
 			UUID IntTypeId = RefsetAuxiliary.Concept.INT_EXTENSION.getPrimoridalUid();
 			UUID LongTypeId = RefsetAuxiliary.Concept.LONG_EXTENSION.getPrimoridalUid();
 			if (relationship.getTypeUuid().equals(refsetTypeRelId) && 
-					relationship.getC2Uuid().equals(LongTypeId) &&
-					relationship.getC1Uuid().equals(refsetUuid)) {
+					relationship.getRelationshipTargetUuid().equals(LongTypeId) &&
+					relationship.getRelationshipSourceUuid().equals(refsetUuid)) {
 				relationship.setC2Uuid(IntTypeId);
 			}
 		} catch (IOException e) {
@@ -139,13 +139,13 @@ public class LongToIntegerTransformer extends AbstractTransformer {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformMember(org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember, org.ihtsdo.tk.dto.concept.TkConcept)
+	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformMember(org.ihtsdo.tk.dto.concept.component.refset.TkRefexAbstractMember, org.ihtsdo.tk.dto.concept.TkConcept)
 	 */
 	@Override
-	public void transformMember(TkRefsetAbstractMember<?> member, TkConcept concept) {
-		if (member.getRefsetUuid().equals(refsetUuid)) {
-			TkRefsetLongMember longMember = (TkRefsetLongMember) member;
-			TkRefsetIntMember intMember = transformExtension(longMember);
+	public void transformMember(TkRefexAbstractMember<?> member, TkConcept concept) {
+		if (member.getRefexUuid().equals(refsetUuid)) {
+			TkRefexLongMember longMember = (TkRefexLongMember) member;
+			TkRefexIntMember intMember = transformExtension(longMember);
 
 			concept.getRefsetMembers().remove(longMember);
 			concept.getRefsetMembers().add(intMember);
@@ -159,14 +159,14 @@ public class LongToIntegerTransformer extends AbstractTransformer {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformAnnotation(org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember, org.ihtsdo.tk.dto.concept.component.TkComponent)
+	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformAnnotation(org.ihtsdo.tk.dto.concept.component.refset.TkRefexAbstractMember, org.ihtsdo.tk.dto.concept.component.TkComponent)
 	 */
 	@Override
-	public void transformAnnotation(TkRefsetAbstractMember<?> annotation,
+	public void transformAnnotation(TkRefexAbstractMember<?> annotation,
 			TkComponent<?> component) {
-		if (annotation.getRefsetUuid().equals(refsetUuid)) {
-			TkRefsetLongMember longMember = (TkRefsetLongMember) annotation;
-			TkRefsetIntMember intMember = transformExtension(longMember);
+		if (annotation.getRefexUuid().equals(refsetUuid)) {
+			TkRefexLongMember longMember = (TkRefexLongMember) annotation;
+			TkRefexIntMember intMember = transformExtension(longMember);
 
 			component.getAnnotations().remove(intMember);
 			component.getAnnotations().add(longMember);
@@ -184,8 +184,8 @@ public class LongToIntegerTransformer extends AbstractTransformer {
 	 * @param extension the extension
 	 * @return the tk refset cid Long member
 	 */
-	public  TkRefsetIntMember transformExtension(TkRefsetLongMember extension) {
-		TkRefsetIntMember intMember = new TkRefsetIntMember();
+	public  TkRefexIntMember transformExtension(TkRefexLongMember extension) {
+		TkRefexIntMember intMember = new TkRefexIntMember();
 
 		intMember.setAdditionalIdComponents(extension.getAdditionalIdComponents());
 		intMember.setAnnotations(extension.getAnnotations());
@@ -194,20 +194,20 @@ public class LongToIntegerTransformer extends AbstractTransformer {
 		intMember.setComponentUuid(extension.getComponentUuid());
 		intMember.setPathUuid(extension.getPathUuid());
 		intMember.setPrimordialComponentUuid(extension.getPrimordialComponentUuid());
-		intMember.setRefsetUuid(extension.getRefsetUuid());
+		intMember.setRefsetUuid(extension.getRefexUuid());
 		intMember.setStatusUuid(extension.getStatusUuid());
 		intMember.setTime(extension.getTime());
 		
 		if (scalar != null) {
-			intMember.setIntValue(Math.round(scalar * extension.getLongValue()));
+			intMember.setInt1(Math.round(scalar * extension.getLong1()));
 		} else {
-			intMember.setIntValue(Math.round(extension.getLongValue()));
+			intMember.setInt1(Math.round(extension.getLong1()));
 		}
 
-		intMember.setRevisions(new ArrayList<TkRefsetIntRevision>());
+		intMember.setRevisions(new ArrayList<TkRefexIntRevision>());
 		if (extension.getRevisions() != null) {
-			for (TkRefsetLongRevision LongRevision : extension.getRevisions()) {
-				TkRefsetIntRevision IntRevision = new TkRefsetIntRevision();
+			for (TkRefexLongRevision LongRevision : extension.getRevisions()) {
+				TkRefexIntRevision IntRevision = new TkRefexIntRevision();
 				IntRevision.setAuthorUuid(LongRevision.getAuthorUuid());
                                 IntRevision.setModuleUuid(LongRevision.getModuleUuid());
 				IntRevision.setPathUuid(LongRevision.getPathUuid());
@@ -215,9 +215,9 @@ public class LongToIntegerTransformer extends AbstractTransformer {
 				IntRevision.setTime(LongRevision.getTime());
 				
 				if (scalar != null) {
-					IntRevision.setIntValue(Math.round(scalar * LongRevision.getLongValue()));
+					IntRevision.setInt1(Math.round(scalar * LongRevision.getLong1()));
 				} else {
-					IntRevision.setIntValue(Math.round(LongRevision.getLongValue()));
+					IntRevision.setInt1(Math.round(LongRevision.getLong1()));
 				}
 				
 				intMember.getRevisions().add(IntRevision);

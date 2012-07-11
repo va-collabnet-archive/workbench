@@ -22,11 +22,11 @@ import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.api.refex.type_cnid_cnid.RefexCnidCnidAnalogBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidcid.TkRefsetCidCidMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidcid.TkRefsetCidCidRevision;
+import org.ihtsdo.tk.api.refex.type_nid_nid.RefexNidNidAnalogBI;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_uuid.TkRefexUuidUuidMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_uuid.TkRefsetUuidUuidRevision;
 import org.ihtsdo.tk.hash.Hashcode;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -38,11 +38,11 @@ import java.io.IOException;
 import java.util.*;
 import org.dwfa.ace.api.Terms;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid_cnid.RefexCnidCnidVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid_nid.RefexNidNidVersionBI;
 import org.ihtsdo.tk.dto.RevisionHandling;
 
 public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
-        implements I_ExtendByRefPartCidCid<CidCidRevision>, RefexCnidCnidAnalogBI<CidCidRevision> {
+        implements I_ExtendByRefPartCidCid<CidCidRevision>, RefexNidNidAnalogBI<CidCidRevision> {
    private static VersionComputer<RefsetMember<CidCidRevision, CidCidMember>.Version> computer =
       new VersionComputer<RefsetMember<CidCidRevision, CidCidMember>.Version>();
 
@@ -61,15 +61,15 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
       super(enclosingConceptNid, input);
    }
 
-   public CidCidMember(TkRefsetCidCidMember refsetMember, int enclosingConceptNid) throws IOException {
+   public CidCidMember(TkRefexUuidUuidMember refsetMember, int enclosingConceptNid) throws IOException {
       super(refsetMember, enclosingConceptNid);
-      c1Nid = Bdb.uuidToNid(refsetMember.getC1Uuid());
-      c2Nid = Bdb.uuidToNid(refsetMember.getC2Uuid());
+      c1Nid = Bdb.uuidToNid(refsetMember.getUuid1());
+      c2Nid = Bdb.uuidToNid(refsetMember.getUuid2());
 
       if (refsetMember.getRevisionList() != null) {
          revisions = new RevisionSet<CidCidRevision, CidCidMember>(primordialSapNid);
 
-         for (TkRefsetCidCidRevision eVersion : refsetMember.getRevisionList()) {
+         for (TkRefsetUuidUuidRevision eVersion : refsetMember.getRevisionList()) {
             revisions.add(new CidCidRevision(eVersion, this));
          }
       }
@@ -85,8 +85,8 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
 
    @Override
    protected void addSpecProperties(RefexCAB rcs) {
-      rcs.with(RefexProperty.CNID1, getCnid1());
-      rcs.with(RefexProperty.CNID2, getCnid2());
+      rcs.with(RefexProperty.CNID1, getNid1());
+      rcs.with(RefexProperty.CNID2, getNid2());
    }
 
    @Override
@@ -144,9 +144,9 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
    
    @Override
     public boolean refexFieldsEqual(RefexVersionBI another) {
-        if(RefexCnidCnidVersionBI.class.isAssignableFrom(another.getClass())){
-            RefexCnidCnidVersionBI cv = (RefexCnidCnidVersionBI) another;
-            return (this.c1Nid == cv.getCnid1()) && (this.c2Nid == cv.getCnid2());
+        if(RefexNidNidVersionBI.class.isAssignableFrom(another.getClass())){
+            RefexNidNidVersionBI cv = (RefexNidNidVersionBI) another;
+            return (this.c1Nid == cv.getNid1()) && (this.c2Nid == cv.getNid2());
         }
         return false;
     }
@@ -215,25 +215,25 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
    }
 
    @Override
-   public int getCnid1() {
+   public int getNid1() {
       return c1Nid;
    }
 
    @Override
-   public int getCnid2() {
+   public int getNid2() {
       return c2Nid;
    }
 
    @Override
-   public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
+   public TkRefexAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
            Map<UUID, UUID> conversionMap)
            throws ContradictionException, IOException {
-      return new TkRefsetCidCidMember(this, exclusionSet, conversionMap, 0, true, vc);
+      return new TkRefexUuidUuidMember(this, exclusionSet, conversionMap, 0, true, vc);
    }
 
    @Override
-   protected TK_REFSET_TYPE getTkRefsetType() {
-      return TK_REFSET_TYPE.CID_CID;
+   protected TK_REFEX_TYPE getTkRefsetType() {
+      return TK_REFEX_TYPE.CID_CID;
    }
 
    @Override
@@ -309,13 +309,13 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
    }
 
    @Override
-   public void setCnid1(int cnid1) throws PropertyVetoException {
+   public void setNid1(int cnid1) throws PropertyVetoException {
       this.c1Nid = cnid1;
       modified();
    }
 
    @Override
-   public void setCnid2(int cnid2) throws PropertyVetoException {
+   public void setNid2(int cnid2) throws PropertyVetoException {
       this.c2Nid = cnid2;
       modified();
    }
@@ -324,8 +324,8 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
 
    public class Version extends RefsetMember<CidCidRevision, CidCidMember>.Version
            implements I_ExtendByRefVersion<CidCidRevision>, I_ExtendByRefPartCidCid<CidCidRevision>,
-                      RefexCnidCnidAnalogBI<CidCidRevision> {
-      private Version(RefexCnidCnidAnalogBI cv) {
+                      RefexNidNidAnalogBI<CidCidRevision> {
+      private Version(RefexNidNidAnalogBI cv) {
          super(cv);
       }
 
@@ -357,31 +357,31 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
 
       @Override
       public int getC1id() {
-         return getCv().getCnid1();
+         return getCv().getNid1();
       }
 
       @Override
       public int getC2id() {
-         return getCv().getCnid2();
+         return getCv().getNid2();
       }
 
       @Override
-      public int getCnid1() {
-         return getCv().getCnid1();
+      public int getNid1() {
+         return getCv().getNid1();
       }
 
       @Override
-      public int getCnid2() {
-         return getCv().getCnid2();
+      public int getNid2() {
+         return getCv().getNid2();
       }
 
-      RefexCnidCnidAnalogBI getCv() {
-         return (RefexCnidCnidAnalogBI) cv;
+      RefexNidNidAnalogBI getCv() {
+         return (RefexNidNidAnalogBI) cv;
       }
 
       @Override
-      public TkRefsetCidCidMember getERefsetMember() throws IOException {
-         return new TkRefsetCidCidMember(this, RevisionHandling.EXCLUDE_REVISIONS);
+      public TkRefexUuidUuidMember getERefsetMember() throws IOException {
+         return new TkRefexUuidUuidMember(this, RevisionHandling.EXCLUDE_REVISIONS);
       }
 
       @Override
@@ -393,22 +393,22 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
 
       @Override
       public void setC1id(int c1id) throws PropertyVetoException {
-         getCv().setCnid1(c1id);
+         getCv().setNid1(c1id);
       }
 
       @Override
       public void setC2id(int c2id) throws PropertyVetoException {
-         getCv().setCnid2(c2id);
+         getCv().setNid2(c2id);
       }
 
       @Override
-      public void setCnid1(int cnid1) throws PropertyVetoException {
-         getCv().setCnid1(cnid1);
+      public void setNid1(int cnid1) throws PropertyVetoException {
+         getCv().setNid1(cnid1);
       }
 
       @Override
-      public void setCnid2(int cnid2) throws PropertyVetoException {
-         getCv().setCnid2(cnid2);
+      public void setNid2(int cnid2) throws PropertyVetoException {
+         getCv().setNid2(cnid2);
       }
    }
 }

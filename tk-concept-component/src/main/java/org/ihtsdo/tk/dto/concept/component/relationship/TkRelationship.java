@@ -36,32 +36,32 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
         super();
     }
 
-    public TkRelationship(RelationshipChronicleBI another) throws IOException {
-        this(another.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
+    public TkRelationship(RelationshipChronicleBI relationshipChronicle) throws IOException {
+        this(relationshipChronicle.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
     }
 
-    public TkRelationship(RelationshipVersionBI rel,
+    public TkRelationship(RelationshipVersionBI relationshipVersion,
             RevisionHandling revisionHandling) throws IOException {
-        super(rel.getPrimordialVersion());
+        super(relationshipVersion.getPrimordialVersion());
         TerminologyStoreDI ts = Ts.get();
         if (revisionHandling == RevisionHandling.EXCLUDE_REVISIONS) {
-            c1Uuid = ts.getUuidPrimordialForNid(rel.getConceptNid());
-            c2Uuid = ts.getUuidPrimordialForNid(rel.getDestinationNid());
-            characteristicUuid = ts.getUuidPrimordialForNid(rel.getCharacteristicNid());
-            refinabilityUuid = ts.getUuidPrimordialForNid(rel.getRefinabilityNid());
-            relGroup = rel.getGroup();
-            typeUuid = ts.getUuidPrimordialForNid(rel.getTypeNid());
-            pathUuid = ts.getUuidPrimordialForNid(rel.getPathNid());
-            statusUuid = ts.getUuidPrimordialForNid(rel.getStatusNid());
-            time = rel.getTime();
+            c1Uuid = ts.getUuidPrimordialForNid(relationshipVersion.getConceptNid());
+            c2Uuid = ts.getUuidPrimordialForNid(relationshipVersion.getTargetNid());
+            characteristicUuid = ts.getUuidPrimordialForNid(relationshipVersion.getCharacteristicNid());
+            refinabilityUuid = ts.getUuidPrimordialForNid(relationshipVersion.getRefinabilityNid());
+            relGroup = relationshipVersion.getGroup();
+            typeUuid = ts.getUuidPrimordialForNid(relationshipVersion.getTypeNid());
+            pathUuid = ts.getUuidPrimordialForNid(relationshipVersion.getPathNid());
+            statusUuid = ts.getUuidPrimordialForNid(relationshipVersion.getStatusNid());
+            time = relationshipVersion.getTime();
         } else {
-            Collection<? extends RelationshipVersionBI> rels = rel.getVersions();
+            Collection<? extends RelationshipVersionBI> rels = relationshipVersion.getVersions();
             int partCount = rels.size();
             Iterator<? extends RelationshipVersionBI> relItr = rels.iterator();
             RelationshipVersionBI rv = relItr.next();
 
             c1Uuid = ts.getUuidPrimordialForNid(rv.getConceptNid());
-            c2Uuid = ts.getUuidPrimordialForNid(rv.getDestinationNid());
+            c2Uuid = ts.getUuidPrimordialForNid(rv.getTargetNid());
             characteristicUuid = ts.getUuidPrimordialForNid(rv.getCharacteristicNid());
             refinabilityUuid = ts.getUuidPrimordialForNid(rv.getRefinabilityNid());
             relGroup = rv.getGroup();
@@ -106,30 +106,30 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
         }
     }
 
-    public TkRelationship(RelationshipVersionBI another, NidBitSetBI exclusions,
-            Map<UUID, UUID> conversionMap, long offset, boolean mapAll, ViewCoordinate vc)
+    public TkRelationship(RelationshipVersionBI relationshipVersion, NidBitSetBI excludedNids,
+            Map<UUID, UUID> conversionMap, long offset, boolean mapAll, ViewCoordinate viewCoordinate)
             throws IOException, ContradictionException {
-        super(another, exclusions, conversionMap, offset, mapAll, vc);
+        super(relationshipVersion, excludedNids, conversionMap, offset, mapAll, viewCoordinate);
 
         if (mapAll) {
             this.c1Uuid =
-                    conversionMap.get(Ts.get().getComponent(another.getOriginNid()).getPrimUuid());
+                    conversionMap.get(Ts.get().getComponent(relationshipVersion.getSourceNid()).getPrimUuid());
             this.c2Uuid =
-                    conversionMap.get(Ts.get().getComponent(another.getDestinationNid()).getPrimUuid());
+                    conversionMap.get(Ts.get().getComponent(relationshipVersion.getTargetNid()).getPrimUuid());
             this.characteristicUuid =
-                    conversionMap.get(Ts.get().getComponent(another.getCharacteristicNid()).getPrimUuid());
+                    conversionMap.get(Ts.get().getComponent(relationshipVersion.getCharacteristicNid()).getPrimUuid());
             this.refinabilityUuid =
-                    conversionMap.get(Ts.get().getComponent(another.getRefinabilityNid()).getPrimUuid());
-            this.typeUuid = conversionMap.get(Ts.get().getComponent(another.getTypeNid()).getPrimUuid());
+                    conversionMap.get(Ts.get().getComponent(relationshipVersion.getRefinabilityNid()).getPrimUuid());
+            this.typeUuid = conversionMap.get(Ts.get().getComponent(relationshipVersion.getTypeNid()).getPrimUuid());
         } else {
-            this.c1Uuid = Ts.get().getComponent(another.getOriginNid()).getPrimUuid();
-            this.c2Uuid = Ts.get().getComponent(another.getDestinationNid()).getPrimUuid();
-            this.characteristicUuid = Ts.get().getComponent(another.getCharacteristicNid()).getPrimUuid();
-            this.refinabilityUuid = Ts.get().getComponent(another.getRefinabilityNid()).getPrimUuid();
-            this.typeUuid = Ts.get().getComponent(another.getTypeNid()).getPrimUuid();
+            this.c1Uuid = Ts.get().getComponent(relationshipVersion.getSourceNid()).getPrimUuid();
+            this.c2Uuid = Ts.get().getComponent(relationshipVersion.getTargetNid()).getPrimUuid();
+            this.characteristicUuid = Ts.get().getComponent(relationshipVersion.getCharacteristicNid()).getPrimUuid();
+            this.refinabilityUuid = Ts.get().getComponent(relationshipVersion.getRefinabilityNid()).getPrimUuid();
+            this.typeUuid = Ts.get().getComponent(relationshipVersion.getTypeNid()).getPrimUuid();
         }
 
-        this.relGroup = another.getGroup();
+        this.relGroup = relationshipVersion.getGroup();
     }
 
     //~--- methods -------------------------------------------------------------
@@ -284,18 +284,18 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
     //~--- get methods ---------------------------------------------------------
 
     /*
-     * (non-Javadoc) @see org.ihtsdo.tk.concept.component.relationship.I_RelateExternally#getC1Uuid()
+     * (non-Javadoc) @see org.ihtsdo.tk.concept.component.relationship.I_RelateExternally#getRelationshipSourceUuid()
      */
     @Override
-    public UUID getC1Uuid() {
+    public UUID getRelationshipSourceUuid() {
         return c1Uuid;
     }
 
     /*
-     * (non-Javadoc) @see org.ihtsdo.tk.concept.component.relationship.I_RelateExternally#getC2Uuid()
+     * (non-Javadoc) @see org.ihtsdo.tk.concept.component.relationship.I_RelateExternally#getRelationshipTargetUuid()
      */
     @Override
-    public UUID getC2Uuid() {
+    public UUID getRelationshipTargetUuid() {
         return c2Uuid;
     }
 
@@ -318,10 +318,10 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
     }
 
     /*
-     * (non-Javadoc) @see org.ihtsdo.tk.concept.component.relationship.I_RelateExternally#getRelGroup()
+     * (non-Javadoc) @see org.ihtsdo.tk.concept.component.relationship.I_RelateExternally#getRelationshipGroup()
      */
     @Override
-    public int getRelGroup() {
+    public int getRelationshipGroup() {
         return relGroup;
     }
 

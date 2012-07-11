@@ -28,7 +28,7 @@ import org.ihtsdo.tk.api.ContradictionException;
 /**
  *
  * An "unsorted" report will be in execution order <br>
- *  :!!!:NYI: sort by concept conceptA.getPreferredDescription().getText();
+ *  :!!!:NYI: sort by concept conceptA.getDescriptionPreferred().getText();
  *  :!!!:NYI: sort by operation
  * 
  * @author marc
@@ -72,10 +72,10 @@ public class BatchActionEventReporter {
                     // EVENT CONCEPT
                     sb.append("\t");
                     if (bae.getConceptA() != null) {
-                        if (bae.getConceptA().getPreferredDescription() != null) {
-                            sb.append(bae.getConceptA().getPreferredDescription().getText());
+                        if (bae.getConceptA().getDescriptionPreferred() != null) {
+                            sb.append(bae.getConceptA().getDescriptionPreferred().getText());
                         } else {
-                            sb.append(bae.getConceptA().getDescsActive().iterator().next().getText());
+                            sb.append(bae.getConceptA().getDescriptionsActive().iterator().next().getText());
                         }
                     }
                     // EVENT NOTE
@@ -140,10 +140,10 @@ public class BatchActionEventReporter {
                     // EVENT CONCEPT
                     sb.append("</font></td><td><font color='black' face='Dialog' size='3'>");
                     if (bae.getConceptA() != null) {
-                        if (bae.getConceptA().getPreferredDescription() != null) {
-                            sb.append(bae.getConceptA().getPreferredDescription().getText());
+                        if (bae.getConceptA().getDescriptionPreferred() != null) {
+                            sb.append(bae.getConceptA().getDescriptionPreferred().getText());
                         } else {
-                            sb.append(bae.getConceptA().getDescsActive().iterator().next().getText());
+                            sb.append(bae.getConceptA().getDescriptionsActive().iterator().next().getText());
                         }
                     }
                     // EVENT NOTE

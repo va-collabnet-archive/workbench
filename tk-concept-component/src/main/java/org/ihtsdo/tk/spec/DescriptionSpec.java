@@ -66,35 +66,33 @@ public class DescriptionSpec implements SpecBI {
 		this.conceptSpec = conceptSpec;
 	}
 
-	public void setDescTypeSpec(ConceptSpec descTypeSpec) {
-		this.descTypeSpec = descTypeSpec;
+	public void setDescriptionTypeSpec(ConceptSpec descriptionTypeSpec) {
+		this.descTypeSpec = descriptionTypeSpec;
 	}
 
 	private ConceptSpec descTypeSpec;
 
 
-	public DescriptionSpec(UUID[] descUuids, ConceptSpec concept, 
-			ConceptSpec descType, String description) {
-		this.descUuids = descUuids;
-		this.descText = description;
-		this.conceptSpec = concept;
-		this.descTypeSpec = descType;
+	public DescriptionSpec(UUID[] descriptionUuids, ConceptSpec conceptSpec, ConceptSpec descriptionType, String descriptionText) {
+		this.descUuids = descriptionUuids;
+		this.descText = descriptionText;
+		this.conceptSpec = conceptSpec;
+		this.descTypeSpec = descriptionType;
 	}
 	
 
-	public DescriptionSpec(List<UUID> descUuids, ConceptSpec concept, 
-			ConceptSpec descType, String description) {
-		UUID[] uuid = descUuids.toArray(new UUID[0]);
+	public DescriptionSpec(List<UUID> descriptionUuids, ConceptSpec conceptSpec, ConceptSpec descriptionType, String descriptionText) {
+		UUID[] uuid = descriptionUuids.toArray(new UUID[0]);
 		this.descUuids = uuid;
-		this.descText = description;
-		this.conceptSpec = concept;
-		this.descTypeSpec = descType;
+		this.descText = descriptionText;
+		this.conceptSpec = conceptSpec;
+		this.descTypeSpec = descriptionType;
 	}
 
 
 
-	public DescriptionVersionBI get(ViewCoordinate c) throws IOException {
-		ConceptVersionBI concept = conceptSpec.get(c);
+	public DescriptionVersionBI get(ViewCoordinate viewCoordinate) throws IOException {
+		ConceptVersionBI concept = conceptSpec.get(viewCoordinate);
 		DescriptionVersionBI desc = (DescriptionVersionBI) Ts.get().getComponent(descUuids);
 		if (concept.getNid() != desc.getConceptNid()) {
 			throw new RuntimeException("Concept NIDs do not match. 1: "
@@ -112,7 +110,7 @@ public class DescriptionSpec implements SpecBI {
 		return descUuids;
 	}
 
-	public String getDescText() {
+	public String getDescriptionText() {
 		return descText;
 	}
 
@@ -120,16 +118,16 @@ public class DescriptionSpec implements SpecBI {
 		return conceptSpec;
 	}
 
-	public ConceptSpec getDescTypeSpec() {
+	public ConceptSpec getDescriptionTypeSpec() {
 		return descTypeSpec;
 	}
 
-	public DescriptionSpec(String description, String uuid, ConceptSpec concept, ConceptSpec descType) {
-		this(description, UUID.fromString(uuid), concept, descType);
+	public DescriptionSpec(String descriptionText, String descriptionUuid, ConceptSpec conceptSpec, ConceptSpec descriptionType) {
+		this(descriptionText, UUID.fromString(descriptionUuid), conceptSpec, descriptionType);
 	}
 
-	public DescriptionSpec(String description, UUID uuid, ConceptSpec concept, ConceptSpec descType) {
-		this(new UUID[] { uuid }, concept, descType, description);
+	public DescriptionSpec(String descriptionText, UUID descriptionUuid, ConceptSpec conceptSpec, ConceptSpec descriptionType) {
+		this(new UUID[] { descriptionUuid }, conceptSpec, descriptionType, descriptionText);
 	}
 
 	public void setDescText(String extractText) {

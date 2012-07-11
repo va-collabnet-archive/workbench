@@ -36,7 +36,7 @@ import org.dwfa.ace.api.I_HoldRefsetPreferences;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ManageContradiction;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.dwfa.ace.api.I_OverrideTaxonomyRenderer;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_ShowActivity;
@@ -58,7 +58,7 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.PropertyChangeSupportWithPropagationId;
-import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
+import org.ihtsdo.tk.api.contradiction.IdentifyAllContradictionStrategy;
 import org.ihtsdo.helper.descriptionlogic.DescriptionLogic;
 import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.PathBI;
@@ -513,11 +513,11 @@ public class ContradictionConfig implements I_ConfigAceFrame {
         config.setContext(context);
     }
 
-    public <T extends I_ManageContradiction> void setConflictResolutionStrategy(Class<T> conflictResolutionStrategyClass) {
+    public <T extends ContradictionManagerBI> void setConflictResolutionStrategy(Class<T> conflictResolutionStrategyClass) {
         config.setConflictResolutionStrategy(conflictResolutionStrategyClass);
     }
 
-    public void setConflictResolutionStrategy(I_ManageContradiction conflictResolutionStrategy) {
+    public void setConflictResolutionStrategy(ContradictionManagerBI conflictResolutionStrategy) {
         config.setConflictResolutionStrategy(conflictResolutionStrategy);
     }
 
@@ -1087,8 +1087,8 @@ public class ContradictionConfig implements I_ConfigAceFrame {
         return config.getContext();
     }
 
-    public I_ManageContradiction getConflictResolutionStrategy() {
-        IdentifyAllConflictStrategy strategy = new IdentifyAllConflictStrategy();
+    public ContradictionManagerBI getConflictResolutionStrategy() {
+        IdentifyAllContradictionStrategy strategy = new IdentifyAllContradictionStrategy();
         return strategy;
     }
 
@@ -1172,7 +1172,7 @@ public class ContradictionConfig implements I_ConfigAceFrame {
         return config.getAllowedStatus();
     }
 
-    public I_ManageContradiction[] getAllConflictResolutionStrategies() {
+    public ContradictionManagerBI[] getAllConflictResolutionStrategies() {
         return config.getAllConflictResolutionStrategies();
     }
 

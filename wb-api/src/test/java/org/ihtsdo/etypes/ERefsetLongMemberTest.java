@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
-import org.ihtsdo.tk.dto.concept.component.refset.Long.TkRefsetLongRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_long.TkRefexLongRevision;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -132,7 +132,7 @@ public class ERefsetLongMemberTest {
         
         ERefsetLongMember member = new ERefsetLongMember();
         member.componentUuid = new UUID(64386, 75497);
-        member.longValue = 2; 
+        member.long1 = 2; 
         member.refsetUuid = new UUID(14386, 65497);
         member.pathUuid = new UUID(4350, 5469);
         member.statusUuid = new UUID(5386, 4497);
@@ -146,9 +146,9 @@ public class ERefsetLongMemberTest {
         ac.statusUuid = new UUID(5386, 4497);
         ac.time = this.myTime;
         member.additionalIds.add(ac);       
-        member.revisions = new ArrayList<TkRefsetLongRevision>();
+        member.revisions = new ArrayList<TkRefexLongRevision>();
         ERefsetLongRevision rsv = new ERefsetLongRevision();
-        rsv.longValue = 99;
+        rsv.long1 = 99;
         rsv.pathUuid = new UUID(4350, 5469);
         rsv.statusUuid = new UUID(5386, 4497);
         rsv.time = this.myTime;
@@ -161,7 +161,7 @@ public class ERefsetLongMemberTest {
         
         ERefsetLongMember member = new ERefsetLongMember();
         member.componentUuid = new UUID(11, 11);
-        member.longValue = 88; 
+        member.long1 = 88; 
         member.refsetUuid = new UUID(22, 22);
         member.pathUuid = new UUID(33, 33);
         member.statusUuid = new UUID(44, 44);
@@ -175,9 +175,9 @@ public class ERefsetLongMemberTest {
         ac.statusUuid = new UUID(111, 111);
         ac.time = this.myTime;
         member.additionalIds.add(ac);       
-        member.revisions = new ArrayList<TkRefsetLongRevision>();
+        member.revisions = new ArrayList<TkRefexLongRevision>();
         ERefsetLongRevision rsv = new ERefsetLongRevision();
-        rsv.longValue = 333;
+        rsv.long1 = 333;
         rsv.pathUuid = new UUID(222, 222);
         rsv.statusUuid = new UUID(333, 333);
         rsv.time = this.myTime;

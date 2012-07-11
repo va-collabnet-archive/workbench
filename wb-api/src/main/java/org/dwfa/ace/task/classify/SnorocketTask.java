@@ -39,7 +39,7 @@ import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ManageContradiction;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
@@ -48,8 +48,8 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.I_ConfigAceFrame.CLASSIFIER_INPUT_MODE_PREF;
-import org.dwfa.ace.api.cs.ChangeSetPolicy;
-import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
+import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
+import org.ihtsdo.tk.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -159,7 +159,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
     private I_TermFactory tf = null;
     private I_ConfigAceFrame config = null;
     private Precedence precedence;
-    private I_ManageContradiction contradictionMgr;
+    private ContradictionManagerBI contradictionMgr;
     private I_ShowActivity gui = null;
     private boolean continueThisAction = true;
     // INTERNAL
@@ -1973,7 +1973,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             sb.append(g).append("\r\n");
 
             sb.append("\tc2 status: ** ");
-            I_ConceptAttributeVersioned<?> ca = c2.getConceptAttributes();
+            I_ConceptAttributeVersioned<?> ca = c2.getConAttrs();
             for (I_ConceptAttributePart mp : ca.getMutableParts()) {
                 sb.append(toStringCNid(mp.getStatusNid())).append(" ** ");
             }

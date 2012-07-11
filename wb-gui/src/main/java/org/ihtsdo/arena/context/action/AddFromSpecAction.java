@@ -22,7 +22,7 @@ import org.ihtsdo.tk.drools.facts.DescSpecFact;
 import org.ihtsdo.tk.drools.facts.RelSpecFact;
 import org.ihtsdo.tk.drools.facts.SpecFact;
 import org.ihtsdo.tk.spec.DescriptionSpec;
-import org.ihtsdo.tk.spec.RelSpec;
+import org.ihtsdo.tk.spec.RelationshipSpec;
 
 public class AddFromSpecAction extends AbstractAction {
 
@@ -59,21 +59,21 @@ public class AddFromSpecAction extends AbstractAction {
         DescriptionSpec descSpec = ((DescSpecFact) spec).getDescSpec();
         Terms.get().newDescription(UUID.randomUUID(), Terms.get().getConcept(concept.getNid()),
                 descSpec.getLangText(),
-                descSpec.getDescText(),
-                Terms.get().getConcept(descSpec.getDescTypeSpec().getLenient().getNid()),
+                descSpec.getDescriptionText(),
+                Terms.get().getConcept(descSpec.getDescriptionTypeSpec().getLenient().getNid()),
                 config, SnomedMetadataRfx.getSTATUS_CURRENT_NID());
         Terms.get().addUncommitted(Terms.get().getConcept(concept.getNid()));
     }
 
     private void addRel() {
-        RelSpec relSpec = ((RelSpecFact) spec).getRelSpec();
+        RelationshipSpec relSpec = ((RelSpecFact) spec).getRelSpec();
         try {
             Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
             I_GetConceptData originConcept = Terms.get().getConcept(concept.getNid());
             I_RelVersioned newRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(),
                     originConcept,
-                    relSpec.getRelTypeSpec().getLenient().getNid(),
-                    relSpec.getDestinationSpec().getLenient().getNid(),
+                    relSpec.getRelationshipTypeSpec().getLenient().getNid(),
+                    relSpec.getTargetSpec().getLenient().getNid(),
                     SnomedMetadataRf1.HISTORICAL_CHARACTERISTIC_TYPE_RF1.getLenient().getNid(),
                     SnomedMetadataRfx.getREL_NOT_REFINABLE_NID(),
                     0,

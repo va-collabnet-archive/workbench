@@ -22,11 +22,11 @@ import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.api.refex.type_str.RefexStrAnalogBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
-import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrMember;
-import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrRevision;
+import org.ihtsdo.tk.api.refex.type_string.RefexStringAnalogBI;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_string.TkRefsetStrMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_string.TkRefsetStrRevision;
 import org.ihtsdo.tk.hash.Hashcode;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -37,11 +37,11 @@ import java.io.IOException;
 
 import java.util.*;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
+import org.ihtsdo.tk.api.refex.type_string.RefexStringVersionBI;
 import org.ihtsdo.tk.dto.RevisionHandling;
 
 public class StrMember extends RefsetMember<StrRevision, StrMember>
-        implements I_ExtendByRefPartStr<StrRevision>, RefexStrAnalogBI<StrRevision> {
+        implements I_ExtendByRefPartStr<StrRevision>, RefexStringAnalogBI<StrRevision> {
    private static VersionComputer<RefsetMember<StrRevision, StrMember>.Version> computer =
       new VersionComputer<RefsetMember<StrRevision, StrMember>.Version>();
 
@@ -61,7 +61,7 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
 
    public StrMember(TkRefsetStrMember refsetMember, int enclosingConceptNid) throws IOException {
       super(refsetMember, enclosingConceptNid);
-      stringValue = refsetMember.getStrValue();
+      stringValue = refsetMember.getString1();
 
       if (refsetMember.getRevisionList() != null) {
          revisions = new RevisionSet<StrRevision, StrMember>(primordialSapNid);
@@ -82,7 +82,7 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
 
    @Override
    protected void addSpecProperties(RefexCAB rcs) {
-      rcs.with(RefexProperty.STRING1, getStr1());
+      rcs.with(RefexProperty.STRING1, getString1());
    }
 
    @Override
@@ -140,9 +140,9 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
    
    @Override
     public boolean refexFieldsEqual(RefexVersionBI another) {
-        if(RefexStrVersionBI.class.isAssignableFrom(another.getClass())){
-            RefexStrVersionBI sv = (RefexStrVersionBI) another;
-            return this.stringValue.equals(sv.getStr1());
+        if(RefexStringVersionBI.class.isAssignableFrom(another.getClass())){
+            RefexStringVersionBI sv = (RefexStringVersionBI) another;
+            return this.stringValue.equals(sv.getString1());
         }
         return false;
     }
@@ -187,7 +187,7 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
    //~--- get methods ---------------------------------------------------------
 
    @Override
-   public String getStr1() {
+   public String getString1() {
       return stringValue;
    }
 
@@ -197,15 +197,15 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
    }
 
    @Override
-   public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
+   public TkRefexAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
            Map<UUID, UUID> conversionMap)
            throws ContradictionException, IOException {
       return new TkRefsetStrMember(this, exclusionSet, conversionMap, 0, true, vc);
    }
 
    @Override
-   protected TK_REFSET_TYPE getTkRefsetType() {
-      return TK_REFSET_TYPE.STR;
+   protected TK_REFEX_TYPE getTkRefsetType() {
+      return TK_REFEX_TYPE.STR;
    }
 
    @Override
@@ -256,7 +256,7 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
    //~--- set methods ---------------------------------------------------------
 
    @Override
-   public void setStr1(String str) throws PropertyVetoException {
+   public void setString1(String str) throws PropertyVetoException {
       this.stringValue = str;
       modified();
    }
@@ -271,8 +271,8 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
 
    public class Version extends RefsetMember<StrRevision, StrMember>.Version
            implements I_ExtendByRefVersion<StrRevision>, I_ExtendByRefPartStr<StrRevision>,
-                      RefexStrAnalogBI<StrRevision> {
-      private Version(RefexStrAnalogBI cv) {
+                      RefexStringAnalogBI<StrRevision> {
+      private Version(RefexStringAnalogBI cv) {
          super(cv);
       }
 
@@ -303,8 +303,8 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
 
       //~--- get methods ------------------------------------------------------
 
-      RefexStrAnalogBI getCv() {
-         return (RefexStrAnalogBI) cv;
+      RefexStringAnalogBI getCv() {
+         return (RefexStringAnalogBI) cv;
       }
 
       @Override
@@ -318,25 +318,25 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
       }
 
       @Override
-      public String getStr1() {
-         return getCv().getStr1();
+      public String getString1() {
+         return getCv().getString1();
       }
 
       @Override
       public String getStringValue() {
-         return getCv().getStr1();
+         return getCv().getString1();
       }
 
       //~--- set methods ------------------------------------------------------
 
       @Override
-      public void setStr1(String str) throws PropertyVetoException {
-         getCv().setStr1(str);
+      public void setString1(String str) throws PropertyVetoException {
+         getCv().setString1(str);
       }
 
       @Override
       public void setStringValue(String stringValue) throws PropertyVetoException {
-         getCv().setStr1(stringValue);
+         getCv().setString1(stringValue);
       }
    }
 }

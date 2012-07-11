@@ -117,7 +117,7 @@ public class RefsetMemberBinder extends TupleBinding<Collection<RefsetMember<?, 
                      refsetMember = factory.create(nid, typeNid, enclosingConcept.getNid(), input);
 
                      if (refsetMember.getTime() != Long.MIN_VALUE &&
-                             refsetMember.getCollectionNid() == enclosingConcept.getNid()) {
+                             refsetMember.getRefexNid() == enclosingConcept.getNid()) {
                         RefsetMember<?, ?> oldMember = (RefsetMember<?,
                                                           ?>) Concept.componentsCRHM.putIfAbsent(nid,
                                                              refsetMember);
@@ -138,7 +138,7 @@ public class RefsetMemberBinder extends TupleBinding<Collection<RefsetMember<?, 
                }
 
                if (refsetMember.getTime() != Long.MIN_VALUE &&
-                             refsetMember.getCollectionNid() == enclosingConcept.getNid()) {
+                             refsetMember.getRefexNid() == enclosingConcept.getNid()) {
                   newRefsetMemberList.add(refsetMember);
                }
             }
@@ -172,14 +172,14 @@ public class RefsetMemberBinder extends TupleBinding<Collection<RefsetMember<?, 
 
          if ((refsetMember.primordialSapNid > maxReadOnlyStatusAtPositionId)
                  && (refsetMember.getTime() != Long.MIN_VALUE &&
-                             refsetMember.getCollectionNid() == enclosingConcept.getNid())) {
+                             refsetMember.getRefexNid() == enclosingConcept.getNid())) {
             refsetMembersToWrite.add(refsetMember);
          } else {
             if (refsetMember.revisions != null) {
                for (RefsetRevision<?, ?> r : refsetMember.revisions) {
                   if ((r.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionId)
                           && (r.getTime() != Long.MIN_VALUE &&
-                             refsetMember.getCollectionNid() == enclosingConcept.getNid())) {
+                             refsetMember.getRefexNid() == enclosingConcept.getNid())) {
                      refsetMembersToWrite.add(refsetMember);
 
                      break;

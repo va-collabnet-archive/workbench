@@ -69,7 +69,7 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
         try {
             vc = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
             ConceptVersionBI cv = Ts.get().getConceptVersion(vc, concept.getNid());
-            Collection<? extends DescriptionVersionBI> descsActive = cv.getDescsActive();
+            Collection<? extends DescriptionVersionBI> descsActive = cv.getDescriptionsActive();
             ArrayList<DescriptionVersionBI> descriptions = new ArrayList<DescriptionVersionBI>();
             for (DescriptionVersionBI desc : descsActive) {
                 descriptions.add(desc);

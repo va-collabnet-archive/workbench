@@ -3,7 +3,7 @@ package org.ihtsdo.arena.conceptview;
 //~--- non-JDK imports --------------------------------------------------------
 
 import org.ihtsdo.arena.conceptview.DragPanelComponentVersion.SubPanelTypes;
-import org.ihtsdo.tk.spec.RelSpec;
+import org.ihtsdo.tk.spec.RelationshipSpec;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -15,7 +15,7 @@ import java.util.EnumSet;
 
 import javax.swing.TransferHandler;
 
-public class DragPanelRelTemplate extends DragPanel<RelSpec> implements I_ToggleSubPanels {
+public class DragPanelRelTemplate extends DragPanel<RelationshipSpec> implements I_ToggleSubPanels {
 
    /**
     *
@@ -24,11 +24,11 @@ public class DragPanelRelTemplate extends DragPanel<RelSpec> implements I_Toggle
 
    //~--- constructors --------------------------------------------------------
 
-   public DragPanelRelTemplate(ConceptViewLayout viewLayout, RelSpec rs) {
+   public DragPanelRelTemplate(ConceptViewLayout viewLayout, RelationshipSpec rs) {
       super(viewLayout, rs);
    }
 
-   public DragPanelRelTemplate(LayoutManager layout, ConceptViewLayout viewLayout, RelSpec rs) {
+   public DragPanelRelTemplate(LayoutManager layout, ConceptViewLayout viewLayout, RelationshipSpec rs) {
       super(layout, viewLayout, rs);
    }
 
@@ -54,7 +54,7 @@ public class DragPanelRelTemplate extends DragPanel<RelSpec> implements I_Toggle
 
    //~--- get methods ---------------------------------------------------------
 
-   public RelSpec getDraggedThing() {
+   public RelationshipSpec getDraggedThing() {
       return thingToDrag;
    }
 
@@ -64,7 +64,7 @@ public class DragPanelRelTemplate extends DragPanel<RelSpec> implements I_Toggle
    }
 
    @Override
-   public RelSpec getThingToDrag() {
+   public RelationshipSpec getThingToDrag() {
       return thingToDrag;
    }
 
@@ -79,7 +79,7 @@ public class DragPanelRelTemplate extends DragPanel<RelSpec> implements I_Toggle
    }
 
    @Override
-   public String getUserString(RelSpec obj) {
+   public String getUserString(RelationshipSpec obj) {
       return obj.toString();
    }
 

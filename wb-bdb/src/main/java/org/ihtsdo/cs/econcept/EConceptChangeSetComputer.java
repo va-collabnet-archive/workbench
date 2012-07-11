@@ -39,7 +39,7 @@ import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
 import org.ihtsdo.tk.dto.concept.component.media.TkMedia;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -91,8 +91,8 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
     private TkConceptAttributes processConceptAttributes(Concept c, AtomicBoolean changed) throws IOException {
         TkConceptAttributes eca = null;
 
-        for (ConceptAttributes.Version v : c.getConceptAttributes().getTuples()) {
-            if (v.sapIsInRange(minSapNid, maxSapNid) && (v.getTime() != Long.MIN_VALUE)
+        for (ConceptAttributes.Version v : c.getConAttrs().getTuples()) {
+            if (v.stampIsInRange(minSapNid, maxSapNid) && (v.getTime() != Long.MIN_VALUE)
                     && (v.getTime() != Long.MAX_VALUE)) {
                 changed.set(true);
 
@@ -115,13 +115,13 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
     }
 
     private List<TkDescription> processDescriptions(Concept c, AtomicBoolean changed) throws IOException {
-        List<TkDescription> eDescriptions = new ArrayList<TkDescription>(c.getDescriptions().size());
+        List<TkDescription> eDescriptions = new ArrayList<TkDescription>(c.getDescs().size());
 
-        for (Description d : c.getDescriptions()) {
+        for (Description d : c.getDescs()) {
             EDescription ecd = null;
 
             for (Description.Version v : d.getTuples()) {
-                if (v.sapIsInRange(minSapNid, maxSapNid) && (v.getTime() != Long.MIN_VALUE)
+                if (v.stampIsInRange(minSapNid, maxSapNid) && (v.getTime() != Long.MIN_VALUE)
                         && (v.getTime() != Long.MAX_VALUE)) {
                     changed.set(true);
 
@@ -160,7 +160,7 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
             EImage eImg = null;
 
             for (Image.Version v : img.getTuples()) {
-                if (v.sapIsInRange(minSapNid, maxSapNid) && (v.getTime() != Long.MIN_VALUE)
+                if (v.stampIsInRange(minSapNid, maxSapNid) && (v.getTime() != Long.MIN_VALUE)
                         && (v.getTime() != Long.MAX_VALUE)) {
 
                     changed.set(true);
@@ -190,19 +190,19 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
         return eImages;
     }
 
-    private List<TkRefsetAbstractMember<?>> processRefsetMembers(Concept c, AtomicBoolean changed)
+    private List<TkRefexAbstractMember<?>> processRefsetMembers(Concept c, AtomicBoolean changed)
             throws IOException {
-        List<TkRefsetAbstractMember<?>> eRefsetMembers =
-                new ArrayList<TkRefsetAbstractMember<?>>(c.getRefsetMembers().size());
+        List<TkRefexAbstractMember<?>> eRefsetMembers =
+                new ArrayList<TkRefexAbstractMember<?>>(c.getRefsetMembers().size());
         Collection<RefsetMember<?, ?>> membersToRemove = new ArrayList<RefsetMember<?, ?>>();
 
         for (RefsetMember<?, ?> member : c.getRefsetMembers()) {
-            TkRefsetAbstractMember<?> eMember = null;
+            TkRefexAbstractMember<?> eMember = null;
             Concept concept = Bdb.getConceptForComponent(member.getReferencedComponentNid());
 
             if ((concept != null) && !concept.isCanceled()) {
                 for (RefsetMember<?, ?>.Version v : member.getTuples()) {
-                    if (v.sapIsInRange(minSapNid, maxSapNid) && (v.getTime() != Long.MIN_VALUE)
+                    if (v.stampIsInRange(minSapNid, maxSapNid) && (v.getTime() != Long.MIN_VALUE)
                             && (v.getTime() != Long.MAX_VALUE)) {
 
                         changed.set(true);
@@ -248,14 +248,14 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
             TkRelationship ecr = null;
 
             for (Relationship.Version v : r.getTuples()) {
-                if (v.sapIsInRange(minSapNid, maxSapNid) && (v.getTime() != Long.MIN_VALUE)
+                if (v.stampIsInRange(minSapNid, maxSapNid) && (v.getTime() != Long.MIN_VALUE)
                         && (v.getTime() != Long.MAX_VALUE) && (v.getAuthorNid() != classifier)) {
 
                     try {
                         changed.set(true);
                         ChangeNotifier.touch(v.getNid(), ChangeNotifier.Change.COMPONENT);
-                        ChangeNotifier.touch(v.getOriginNid(), ChangeNotifier.Change.REL_ORIGIN);
-                        ChangeNotifier.touch(v.getDestinationNid(), ChangeNotifier.Change.REL_XREF);
+                        ChangeNotifier.touch(v.getSourceNid(), ChangeNotifier.Change.REL_ORIGIN);
+                        ChangeNotifier.touch(v.getTargetNid(), ChangeNotifier.Change.REL_XREF);
 
                         if (ecr == null) {
                             ecr = new ERelationship();
@@ -303,7 +303,7 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
             for (IdentifierVersion idv : v.getAdditionalIdentifierParts()) {
                 TkIdentifier eIdv = null;
 
-                if ((idv.getSapNid() >= minSapNid) && (idv.getSapNid() <= maxSapNid)
+                if ((idv.getStampNid() >= minSapNid) && (idv.getStampNid() <= maxSapNid)
                         && (v.getTime() != Long.MIN_VALUE) && (v.getTime() != Long.MAX_VALUE)) {
                     if (IdentifierVersionLong.class.isAssignableFrom(idv.getClass())) {
                         eIdv = new EIdentifierLong();
@@ -325,23 +325,23 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
         }
 
         if (v.getAnnotations() != null) {
-            HashMap<UUID, TkRefsetAbstractMember<?>> annotationMap = new HashMap<UUID, TkRefsetAbstractMember<?>>();
+            HashMap<UUID, TkRefexAbstractMember<?>> annotationMap = new HashMap<UUID, TkRefexAbstractMember<?>>();
 
             if (ec.getAnnotations() != null) {
-                for (TkRefsetAbstractMember<?> member :
-                        (Collection<TkRefsetAbstractMember<?>>) ec.getAnnotations()) {
+                for (TkRefexAbstractMember<?> member :
+                        (Collection<TkRefexAbstractMember<?>>) ec.getAnnotations()) {
                     annotationMap.put(member.getPrimordialComponentUuid(), member);
                 }
             }
 
             for (RefsetMember<?, ?> member : (Collection<RefsetMember<?, ?>>) v.getAnnotations()) {
-                TkRefsetAbstractMember<?> eMember = null;
+                TkRefexAbstractMember<?> eMember = null;
                 Concept concept =
                         Bdb.getConceptForComponent(member.getReferencedComponentNid());
 
                 if ((concept != null) && !concept.isCanceled()) {
                     for (RefsetMember<?, ?>.Version mv : member.getVersions()) {
-                        if (mv.sapIsInRange(minSapNid, maxSapNid) && (mv.getTime() != Long.MIN_VALUE)
+                        if (mv.stampIsInRange(minSapNid, maxSapNid) && (mv.getTime() != Long.MIN_VALUE)
                                 && (mv.getTime() != Long.MAX_VALUE)) {
 
                             if (eMember == null) {
@@ -409,7 +409,7 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
         ev.setPathUuid(Bdb.getPrimUuidForConcept(v.getPathNid()));
         ev.setStatusUuid(Bdb.getPrimUuidForConcept(v.getStatusNid()));
         ev.setAuthorUuid(Bdb.getPrimUuidForConcept(v.getAuthorNid()));
-        ec.setModuleUuid(Bdb.getPrimUuidForConcept(v.getModuleNid()));
+        ev.setModuleUuid(Bdb.getPrimUuidForConcept(v.getModuleNid()));
         ev.setTime(v.getTime());
         ec.revisions.add(ev);
     }
@@ -445,7 +445,7 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
 
         if (changed.get()) {
             if (ChangeSetWriterHandler.writeCommitRecord && ec.conceptAttributes == null) {
-                ec.setConceptAttributes(new TkConceptAttributes(c.getConAttrs()));
+                ec.setConceptAttributes(new TkConceptAttributes(c.getConceptAttributes()));
                 SwingUtilities.invokeLater(new Runnable() {
 
                     @Override

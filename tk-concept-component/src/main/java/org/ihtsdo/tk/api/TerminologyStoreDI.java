@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
@@ -19,60 +19,112 @@ import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.contradiction.ContradictionIdentifierBI;
 import org.ihtsdo.tk.db.DbDependency;
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
-public interface TerminologyStoreDI extends TerminologyTransactionDI {
-   void addTermChangeListener(TermChangeListener cl);
-   
-   void suspendChangeNotifications();
-
-   void resumeChangeNotifications();
-
-   void iterateConceptDataInParallel(ProcessUnfetchedConceptDataBI processor) throws Exception;
-
-   void iterateConceptDataInSequence(ProcessUnfetchedConceptDataBI processor) throws Exception;
+public interface TerminologyStoreDI extends TerminologyDI {
    /**
     * 
-    * @param processor
-    * @throws Exception 
+    * @param termChangeListener
+    * @deprecated not in TK3
+    */ 
+   @Deprecated
+   void addTermChangeListener(TermChangeListener termChangeListener);
+   
+   /**
+    * 
+    * @deprecated not in TK3
     */
-   void iterateSapDataInSequence(ProcessSapDataBI processor) throws Exception;
+   @Deprecated
+   void suspendChangeNotifications();
    
-   void removeTermChangeListener(TermChangeListener cl);
+   /**
+    * 
+    * @deprecated not in TK3
+    */
+   @Deprecated
+   void resumeChangeNotifications();
    
+
+   void iterateConceptDataInParallel(ProcessUnfetchedConceptDataBI processor) throws Exception;
+   
+   
+   void iterateConceptDataInSequence(ProcessUnfetchedConceptDataBI processor) throws Exception;
+
+   void iterateSapDataInSequence(ProcessStampDataBI processor) throws Exception;
+   
+   void removeTermChangeListener(TermChangeListener termChangeListener);
+   
+   /**
+    * 
+    * @param path
+    * @param time
+    * @return
+    * @throws IOException
+    * @deprecated not in TK3
+    */
+   @Deprecated
    PositionBI newPosition(PathBI path, long time) throws IOException;
-
+   
+   /**
+    * 
+    * @param dependencies
+    * @return
+    * @deprecated not in TK3
+    */
+   @Deprecated
    boolean satisfiesDependencies(Collection<DbDependency> dependencies);
-
+   
+   /**
+    * 
+    * @return
+    * @throws IOException
+    * @deprecated not in TK3
+    */
+   @Deprecated
    boolean usesRf2Metadata() throws IOException;
 
    //~--- get methods ---------------------------------------------------------
-
+   /**
+    * 
+    * @return
+    * @throws IOException
+    * @deprecated not in TK3
+    */
+   @Deprecated
    NidBitSetBI getAllConceptNids() throws IOException;
+   
+   /**
+    * 
+    * @param viewCoordinate
+    * @return
+    * @throws Exception
+    * @deprecated not in TK3
+    */
+   @Deprecated
+   KindOfCacheBI getCache(ViewCoordinate viewCoordinate) throws Exception;
 
-   KindOfCacheBI getCache(ViewCoordinate vc) throws Exception;
+   ComponentChronicleBI<?> getComponent(Collection<UUID> uuids) throws IOException;
 
-   ComponentChroncileBI<?> getComponent(Collection<UUID> uuids) throws IOException;
+   ComponentChronicleBI<?> getComponent(ComponentContainerBI componentContainer) throws IOException;
 
-   ComponentChroncileBI<?> getComponent(ComponentContainerBI cc) throws IOException;
+   ComponentChronicleBI<?> getComponent(int nid) throws IOException;
 
-   ComponentChroncileBI<?> getComponent(int nid) throws IOException;
+   ComponentChronicleBI<?> getComponent(UUID... uuids) throws IOException;
 
-   ComponentChroncileBI<?> getComponent(UUID... uuids) throws IOException;
-
-   ComponentVersionBI getComponentVersion(ViewCoordinate vc, Collection<UUID> uuids)
+   ComponentVersionBI getComponentVersion(ViewCoordinate viewCoordinate, Collection<UUID> uuids)
            throws IOException, ContradictionException;
 
-   ComponentVersionBI getComponentVersion(ViewCoordinate vc, int nid)
+   ComponentVersionBI getComponentVersion(ViewCoordinate viewCoordinate, int nid)
            throws IOException, ContradictionException;
 
-   ComponentVersionBI getComponentVersion(ViewCoordinate vc, UUID... uuids)
+   ComponentVersionBI getComponentVersion(ViewCoordinate viewCoordinate, UUID... uuids)
            throws IOException, ContradictionException;
 
    ConceptChronicleBI getConcept(Collection<UUID> uuids) throws IOException;
 
-   ConceptChronicleBI getConcept(ConceptContainerBI cc) throws IOException;
+   ConceptChronicleBI getConcept(ConceptContainerBI conceptContainer) throws IOException;
 
-   ConceptChronicleBI getConcept(int cNid) throws IOException;
+   ConceptChronicleBI getConcept(int conceptNid) throws IOException;
 
    ConceptChronicleBI getConcept(UUID... uuids) throws IOException;
 
@@ -80,41 +132,74 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
 
    int getConceptNidForNid(int nid) throws IOException;
 
-   ConceptVersionBI getConceptVersion(ViewCoordinate vc, Collection<UUID> uuids) throws IOException;
+   ConceptVersionBI getConceptVersion(ViewCoordinate viewCoordinate, Collection<UUID> uuids) throws IOException;
 
-   ConceptVersionBI getConceptVersion(ViewCoordinate vc, int cNid) throws IOException;
+   ConceptVersionBI getConceptVersion(ViewCoordinate viewCoordinate, int conceptNid) throws IOException;
 
-   ConceptVersionBI getConceptVersion(ViewCoordinate vc, UUID... uuids) throws IOException;
+   ConceptVersionBI getConceptVersion(ViewCoordinate viewCoordinate, UUID... uuids) throws IOException;
 
-   Map<Integer, ConceptVersionBI> getConceptVersions(ViewCoordinate vc, NidBitSetBI cNids) throws IOException;
+   Map<Integer, ConceptVersionBI> getConceptVersions(ViewCoordinate viewCoordinate, NidBitSetBI conceptNids) throws IOException;
 
-   Map<Integer, ConceptChronicleBI> getConcepts(NidBitSetBI cNids) throws IOException;
+   Map<Integer, ConceptChronicleBI> getConcepts(NidBitSetBI conceptNids) throws IOException;
 
-   ContradictionIdentifierBI getConflictIdentifier(ViewCoordinate viewCoord, boolean useCase);
-
+   ContradictionIdentifierBI getConflictIdentifier(ViewCoordinate viewCoordinate, boolean useCase);
+   
+   /**
+    * 
+    * @return
+    * @throws IOException
+    * @deprecated not in TK3
+    */
+   @Deprecated
    NidBitSetBI getEmptyNidSet() throws IOException;
 
    Collection<DbDependency> getLatestChangeSetDependencies() throws IOException;
 
-   ViewCoordinate getMetadataVC() throws IOException;
+   /**
+    * 
+    * @return
+    * @throws IOException
+    * @deprecated not in TK3
+    */
+   @Deprecated
+   ViewCoordinate getMetadataViewCoordinate() throws IOException;
    
-   EditCoordinate getMetadataEC() throws IOException;
+   /**
+    * 
+    * @return
+    * @throws IOException
+    * @deprecated not in TK3
+    */
+   @Deprecated
+   EditCoordinate getMetadataEditCoordinate() throws IOException;
 
    int getNidForUuids(Collection<UUID> uuids) throws IOException;
 
    int getNidForUuids(UUID... uuids) throws IOException;
 
+   /**
+    * 
+    * @return
+    * @deprecated not in TK3
+    */
+   @Deprecated
    int getReadOnlyMaxSap();
 
-   List<? extends PathBI> getPathChildren(int nid);
+   List<? extends PathBI> getPathChildren(int pathNid);
 
-   int[] getPossibleChildren(int cNid, ViewCoordinate vc) throws IOException;
+   int[] getPossibleChildren(int conceptNid, ViewCoordinate viewCoordinate) throws IOException;
 
+   /**
+    * 
+    * @return
+    * @deprecated not in TK3
+    */
+   @Deprecated
    long getSequence();
 
-   TerminologySnapshotDI getSnapshot(ViewCoordinate vc);
+   TerminologySnapshotDI getSnapshot(ViewCoordinate viewCoordinate);
 
-   TerminologyBuilderBI getTerminologyBuilder(EditCoordinate ec, ViewCoordinate vc);
+   TerminologyBuilderBI getTerminologyBuilder(EditCoordinate editCoordinate, ViewCoordinate viewCoordinate);
 
    Collection<? extends ConceptChronicleBI> getUncommittedConcepts();
    /**
@@ -129,47 +214,167 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
 
    boolean hasUncommittedChanges();
 
-   boolean hasUuid(UUID memberUUID);
+   boolean hasUuid(UUID memberUuid);
    
-   void forget(RelationshipVersionBI rel) throws IOException;
+   boolean hasUuid(List<UUID> memberUuids);
    
-   void forget(DescriptionVersionBI desc) throws IOException;
+   /**
+    * 
+    * @param relationshipVersion
+    * @throws IOException
+    * @deprecated not in TK3
+    */
+   @Deprecated
+   void forget(RelationshipVersionBI relationshipVersion) throws IOException;
    
-   void forget(RefexChronicleBI extension) throws IOException;
+   /**
+    * 
+    * @param descriptionVersion
+    * @throws IOException
+    * @deprecated not in TK3
+    */
+   @Deprecated
+   void forget(DescriptionVersionBI descriptionVersion) throws IOException;
    
-   void forget(ConAttrVersionBI attr) throws IOException;
+   /**
+    * 
+    * @param refexChronicle
+    * @throws IOException
+    * @deprecated not in TK3
+    */
+   @Deprecated
+   void forget(RefexChronicleBI refexChronicle) throws IOException;
    
-   void forget(ConceptChronicleBI concept) throws IOException;
-
-   int getPathNidForSapNid(int sapNid);
-   int getAuthorNidForSapNid(int sapNid);
-   int getStatusNidForSapNid(int sapNid);
-   int getModuleNidForSapNid(int sapNid);
-   long getTimeForSapNid(int sapNid);
+   /**
+    * 
+    * @param conceptAttributeVersion
+    * @throws IOException
+    * @deprecated not in TK3
+    */
+   @Deprecated
+   void forget(ConceptAttributeVersionBI conceptAttributeVersion) throws IOException;
+   
+   /**
+    * 
+    * @param conceptChronicle
+    * @throws IOException
+    * @deprecated not in TK3
+    */
+   @Deprecated
+   void forget(ConceptChronicleBI conceptChronicle) throws IOException;
+   
+   /**
+    * 
+    * @param stampNid
+    * @return
+    * @deprecated not in TK3
+    */
+   @Deprecated
+   int getPathNidForStampNid(int stampNid);
+   /**
+    * 
+    * @param stampNid
+    * @return
+    * @deprecated not in TK3
+    */
+   @Deprecated
+   int getAuthorNidForStampNid(int stampNid);
+   /**
+    * 
+    * @param stampNid
+    * @return
+    * @deprecated not in TK3
+    */
+   @Deprecated
+   int getStatusNidForStampNid(int stampNid);
+   /**
+    * 
+    * @param stampNid
+    * @return
+    * @deprecated not in TK3
+    */
+   @Deprecated
+   int getModuleNidForStampNid(int stampNid);
+   /**
+    * 
+    * @param stampNid
+    * @return
+    * @deprecated not in TK3
+    */
+   @Deprecated
+   long getTimeForStampNid(int stampNid);
    
    /**
     * Only CONCEPT_EVENT.PRE_COMMIT is a vetoable change
-    * @param pce
-    * @param l 
+    * @param conceptEvent
+    * @param vetoableChangeListener
+    * @deprecated not in TK3
     */
-   void addVetoablePropertyChangeListener(CONCEPT_EVENT pce, VetoableChangeListener l);
-   void addPropertyChangeListener(CONCEPT_EVENT pce, PropertyChangeListener l);
+   @Deprecated
+   void addVetoablePropertyChangeListener(CONCEPT_EVENT conceptEvent, VetoableChangeListener vetoableChangeListener);
+   
+   /**
+    * 
+    * @param conceptEvent
+    * @param propertyChangeListener
+    * @deprecated not in TK3
+    */
+   @Deprecated
+   void addPropertyChangeListener(CONCEPT_EVENT conceptEvent, PropertyChangeListener propertyChangeListener);
 
    public enum CONCEPT_EVENT {
     PRE_COMMIT, POST_COMMIT, ADD_UNCOMMITTED;
    }
    
+   /**
+    * 
+    * @param nid
+    * @deprecated not in TK3
+    */
+   @Deprecated
    void touchComponent(int nid);
-   
+   /**
+    * 
+    * @param nid
+    * @deprecated not in TK3
+    */
+   @Deprecated
    void touchComponentAlert(int nid);
-   
+   /**
+    * 
+    * @param nid
+    * @deprecated not in TK3
+    */
+   @Deprecated
    void touchComponentTemplate(int nid);
-
-   void touchComponents(Collection<Integer> cNidSet);
-
+   /**
+    * 
+    * @param conceptNids
+    * @deprecated not in TK3
+    */
+   @Deprecated
+   void touchComponents(Collection<Integer> conceptNids);
+   /**
+    * 
+    * @param nid
+    * @deprecated not in TK3
+    */
+   @Deprecated
    void touchRefexRC(int nid);
-   
+   /**
+    * 
+    * @param nid
+    * @deprecated not in TK3
+    */
+   @Deprecated
    void touchRelOrigin(int nid);
-
+   /**
+    * 
+    * @param nid
+    * @deprecated not in TK3
+    */
+   @Deprecated
    void touchRelTarget(int nid);
+   
+   int getStampNid(TkRevision version) throws IOException;
 }

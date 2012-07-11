@@ -103,7 +103,7 @@ import org.ihtsdo.tk.helper.templates.DescriptionTemplate;
 import org.ihtsdo.tk.helper.templates.RelationshipTemplate;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.spec.DescriptionSpec;
-import org.ihtsdo.tk.spec.RelSpec;
+import org.ihtsdo.tk.spec.RelationshipSpec;
 import org.ihtsdo.tk.spec.SpecFactory;
 import org.mvel2.ast.IsDef;
 
@@ -371,7 +371,7 @@ public class RulesLibrary {
 								ConceptSpec sourceConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getSourceUuid())).toString(), UUID.fromString(rtemplate.getSourceUuid()));
 								ConceptSpec typeConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getTypeUuid())).toString(), UUID.fromString(rtemplate.getTypeUuid()));
 								ConceptSpec targetConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getTargetUuid())).toString(), UUID.fromString(rtemplate.getTargetUuid()));
-								RelSpec relSpec = new RelSpec(sourceConceptSpec, typeConceptSpec, targetConceptSpec);
+								RelationshipSpec relSpec = new RelationshipSpec(sourceConceptSpec, typeConceptSpec, targetConceptSpec);
 								// TODO: implement other properties
 								results.getWbTemplates().put(relSpec, concept.getConceptNid());
 							}
@@ -1179,11 +1179,11 @@ public class RulesLibrary {
 		try {
 			ConceptVersionBI refsetBI = Ts.get().getConceptVersion(config.getViewCoordinate(), refset.getUids());
 			String propertyName = "";
-			int guvnorDescriptionsSize = refsetBI.getDescsActive(ArchitectonicAuxiliary.Concept.GUVNOR_ENUM_PROPERTY_DESC_TYPE.localize().getNid()).size();
+			int guvnorDescriptionsSize = refsetBI.getDescriptionsActive(ArchitectonicAuxiliary.Concept.GUVNOR_ENUM_PROPERTY_DESC_TYPE.localize().getNid()).size();
 			if (guvnorDescriptionsSize < 1 || guvnorDescriptionsSize > 1) {
 				throw new Exception("Wrong number of guvnor property descriptions: " + guvnorDescriptionsSize);
 			}
-			propertyName = refsetBI.getDescsActive(ArchitectonicAuxiliary.Concept.GUVNOR_ENUM_PROPERTY_DESC_TYPE.localize().getNid()).iterator().next().getText();
+			propertyName = refsetBI.getDescriptionsActive(ArchitectonicAuxiliary.Concept.GUVNOR_ENUM_PROPERTY_DESC_TYPE.localize().getNid()).iterator().next().getText();
 
 			String guvnorEnumerationText = "'" + propertyName + "' : [";
 			for (I_ExtendByRef loopMember : Terms.get().getRefsetExtensionMembers(refset.getConceptNid())) {
@@ -1197,20 +1197,20 @@ public class RulesLibrary {
 
 				String name = "no description found";
 
-				for (DescriptionVersionBI loopDescription : loopConcept.getDescsActive()) {
+				for (DescriptionVersionBI loopDescription : loopConcept.getDescriptionsActive()) {
 					if (loopDescription.getTypeNid() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid() && loopDescription.getLang().toLowerCase().startsWith("en")) {
 						name = loopDescription.getText();
 					}
 				}
 
 				// if
-				// (loopConcept.getDescsActive(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()).size()
+				// (loopConcept.getDescriptionsActive(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()).size()
 				// > 0) {
 				// name =
-				// loopConcept.getDescsActive(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()).iterator().next().getText();
-				// } else if (loopConcept.getDescsActive().size() > 0){
+				// loopConcept.getDescriptionsActive(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()).iterator().next().getText();
+				// } else if (loopConcept.getDescriptionsActive().size() > 0){
 				// name =
-				// loopConcept.getDescsActive().iterator().next().getText();
+				// loopConcept.getDescriptionsActive().iterator().next().getText();
 				// } else {
 				// name = "no description found";
 				// }
@@ -1499,7 +1499,7 @@ public class RulesLibrary {
 
 			for (I_GetConceptData user : allUsers) {
 				I_DescriptionVersioned latestTuple = null;
-				Collection<? extends I_DescriptionVersioned> descriptions = user.getDescriptions();
+				Collection<? extends I_DescriptionVersioned> descriptions = user.getDescs();
 				for (I_DescriptionVersioned descVersioned : descriptions) {
 					if (descVersioned.getTypeNid() == SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid()) {
 						latestTuple = descVersioned;
@@ -1515,7 +1515,7 @@ public class RulesLibrary {
 			}
 			for (I_GetConceptData user : allIhtsdoUsrs) {
 				I_DescriptionVersioned latestTuple = null;
-				Collection<? extends I_DescriptionVersioned> descriptions = user.getDescriptions();
+				Collection<? extends I_DescriptionVersioned> descriptions = user.getDescs();
 				for (I_DescriptionVersioned descVersioned : descriptions) {
 					if (descVersioned.getTypeNid() == SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid() || descVersioned.getTypeNid() == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid()) {
 						latestTuple = descVersioned;

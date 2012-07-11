@@ -29,8 +29,8 @@ import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
-import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrMember;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_string.TkRefsetStrMember;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetWriter;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
@@ -106,7 +106,7 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 	private String outputFileName = "wfHistory.jbin";
 
 	private BufferedReader inputFile = null;
-	private List<TkRefsetAbstractMember<?>> memberList = null;
+	private List<TkRefexAbstractMember<?>> memberList = null;
 	private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	private UUID wfHxRefsetId = null;
@@ -201,7 +201,7 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 		EConcept eC = makeEConcept(wfHxRefsetId);
 
 		TkRefsetStrMember initialMember = createTkMember(row);
-		memberList = new ArrayList<TkRefsetAbstractMember<?>>();
+		memberList = new ArrayList<TkRefexAbstractMember<?>>();
 		memberList.add(initialMember);
 
 		return eC;
@@ -234,7 +234,7 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 
 		member.time = format.parse(row[WorkflowHelper.timeStampPosition]).getTime();
 
-		member.setStrValue(toXml(row, member.time));
+		member.setString1(toXml(row, member.time));
 
 		return member;
 	}

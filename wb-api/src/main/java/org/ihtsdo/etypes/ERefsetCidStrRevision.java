@@ -5,14 +5,14 @@ package org.ihtsdo.etypes;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidString;
 
-import org.ihtsdo.tk.dto.concept.component.refset.cidstr.TkRefsetCidStrRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_string.TkRefexUuidStringRevision;
 
 //~--- JDK imports ------------------------------------------------------------
 
 import java.io.DataInput;
 import java.io.IOException;
 
-public class ERefsetCidStrRevision extends TkRefsetCidStrRevision {
+public class ERefsetCidStrRevision extends TkRefexUuidStringRevision {
    public static final long serialVersionUID = 1;
 
    //~--- constructors --------------------------------------------------------
@@ -22,8 +22,8 @@ public class ERefsetCidStrRevision extends TkRefsetCidStrRevision {
    }
 
    public ERefsetCidStrRevision(I_ExtendByRefPartCidString part) throws IOException {
-      c1Uuid     = Terms.get().nidToUuid(part.getC1id());
-      strValue   = part.getStringValue();
+      uuid1     = Terms.get().nidToUuid(part.getC1id());
+      string1   = part.getStringValue();
       pathUuid   = Terms.get().nidToUuid(part.getPathNid());
       statusUuid = Terms.get().nidToUuid(part.getStatusNid());
       authorUuid    = Terms.get().nidToUuid(part.getAuthorNid());

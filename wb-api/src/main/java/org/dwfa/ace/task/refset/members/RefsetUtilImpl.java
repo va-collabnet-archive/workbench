@@ -48,7 +48,7 @@ import org.ihtsdo.tk.spec.ValidationException;
 public final class RefsetUtilImpl implements RefsetUtil {
 
     public I_ConceptAttributePart getLastestAttributePart(final I_GetConceptData refsetConcept) throws IOException {
-        List<? extends I_ConceptAttributePart> refsetAttibuteParts = refsetConcept.getConceptAttributes().getMutableParts();
+        List<? extends I_ConceptAttributePart> refsetAttibuteParts = refsetConcept.getConAttrs().getMutableParts();
         I_ConceptAttributePart latestAttributePart = null;
         for (I_ConceptAttributePart attributePart : refsetAttibuteParts) {
             if (latestAttributePart == null || attributePart.getVersion() >= latestAttributePart.getVersion()) {

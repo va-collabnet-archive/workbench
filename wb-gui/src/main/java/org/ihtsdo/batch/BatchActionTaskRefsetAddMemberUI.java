@@ -28,7 +28,7 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 
 /**
  *
@@ -202,7 +202,7 @@ public class BatchActionTaskRefsetAddMemberUI extends javax.swing.JPanel impleme
         // SET VALUE TYPE
         switch (jComboBoxType.getSelectedIndex()) {
             case 0:
-                ((BatchActionTaskRefsetAddMember) task).setRefsetType(TK_REFSET_TYPE.BOOLEAN);
+                ((BatchActionTaskRefsetAddMember) task).setRefsetType(TK_REFEX_TYPE.BOOLEAN);
                 Boolean b = ((ValueBooleanUI) jPanelValueNew).getValue();
                 if (b != null) {
                     ((BatchActionTaskRefsetAddMember) task).setRefsetValue(b);
@@ -210,7 +210,7 @@ public class BatchActionTaskRefsetAddMemberUI extends javax.swing.JPanel impleme
                 }
                 break;
             case 1:
-                ((BatchActionTaskRefsetAddMember) task).setRefsetType(TK_REFSET_TYPE.CID);
+                ((BatchActionTaskRefsetAddMember) task).setRefsetType(TK_REFEX_TYPE.CID);
                 Integer cNid = ((ValueDndNidUI) jPanelValueNew).getValue();
                 if (cNid != null) {
                     ((BatchActionTaskRefsetAddMember) task).setRefsetValue(cNid);
@@ -218,7 +218,7 @@ public class BatchActionTaskRefsetAddMemberUI extends javax.swing.JPanel impleme
                 }
                 break;
             case 2:
-                ((BatchActionTaskRefsetAddMember) task).setRefsetType(TK_REFSET_TYPE.INT);
+                ((BatchActionTaskRefsetAddMember) task).setRefsetType(TK_REFEX_TYPE.INT);
                 Integer i = ((ValueIntUI) jPanelValueNew).getValue();
                 if (i != null) {
                     ((BatchActionTaskRefsetAddMember) task).setRefsetValue(i);
@@ -226,7 +226,7 @@ public class BatchActionTaskRefsetAddMemberUI extends javax.swing.JPanel impleme
                 }
                 break;
             case 3:
-                ((BatchActionTaskRefsetAddMember) task).setRefsetType(TK_REFSET_TYPE.STR);
+                ((BatchActionTaskRefsetAddMember) task).setRefsetType(TK_REFEX_TYPE.STR);
                 String s = ((ValueStringUI) jPanelValueNew).getValue();
                 if (s != null) {
                     ((BatchActionTaskRefsetAddMember) task).setRefsetValue(s);

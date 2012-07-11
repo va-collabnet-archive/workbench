@@ -7,7 +7,7 @@ import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -21,9 +21,9 @@ public interface RefexVersionBI<A extends RefexAnalogBI<A>>
         extends ComponentVersionBI, RefexChronicleBI<A>, AnalogGeneratorBI<A>, Comparable<RefexVersionBI<A>> {
 
     @Override
-    RefexCAB makeBlueprint(ViewCoordinate vc) throws IOException, InvalidCAB, ContradictionException;
+    RefexCAB makeBlueprint(ViewCoordinate viewCoordinate) throws IOException, InvalidCAB, ContradictionException;
 
-    TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
+    TkRefexAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate viewCoordinate, NidBitSetBI excludedNids,
             Map<UUID, UUID> conversionMap)
             throws ContradictionException, IOException;
 

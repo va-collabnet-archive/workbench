@@ -18,24 +18,24 @@ public interface NidBitSetItrBI {
 
     /**
      * Skips entries to the first beyond the current whose nid is
-     * greater than or equal to <i>target</i>.
+     * greater than or equal to <i>targetNid</i>.
      * <p>
      * Returns true iff there is such an entry.
      * <p>
      * Behaves as if written:
      * 
      * <pre>
-     * boolean skipTo(int target) {
+     * boolean skipTo(int targetNid) {
      *     do {
      *         if (!next())
      *             return false;
-     *     } while (target &gt; nid());
+     *     } while (targetNid &gt; nid());
      *     return true;
      * }
      * </pre>
      * 
      * Some implementations are considerably more efficient than that.
      */
-    public boolean skipTo(int target) throws IOException;
+    public boolean skipTo(int targetNid) throws IOException;
 
 }

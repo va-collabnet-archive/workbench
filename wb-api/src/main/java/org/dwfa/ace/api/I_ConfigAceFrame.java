@@ -45,6 +45,7 @@ import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.bpa.data.SortedSetModel;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
@@ -520,21 +521,21 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     /**
      * @return the conflict resolution strategy in use by the profile
      */
-    I_ManageContradiction getConflictResolutionStrategy();
+    ContradictionManagerBI getConflictResolutionStrategy();
 
     /**
      * Sets the conflict resolution strategy for this profile
      *
      * @param conflictResolutionStrategy
      */
-    void setConflictResolutionStrategy(I_ManageContradiction conflictResolutionStrategy);
+    void setConflictResolutionStrategy(ContradictionManagerBI conflictResolutionStrategy);
 
     /**
      * Sets the conflict resolution strategy for this profile
      *
      * @param conflictResolutionStrategy
      */
-    public <T extends I_ManageContradiction> void setConflictResolutionStrategy(Class<T> conflictResolutionStrategyClass);
+    public <T extends ContradictionManagerBI> void setConflictResolutionStrategy(Class<T> conflictResolutionStrategyClass);
 
     public Boolean getHighlightConflictsInTaxonomyView();
 
@@ -597,7 +598,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public void setClassifierOwlFeatureStatus(Boolean classifierOwlFeatureStatus); // :SNOOWL:
 
-    public I_ManageContradiction[] getAllConflictResolutionStrategies();
+    public ContradictionManagerBI[] getAllConflictResolutionStrategies();
 
     public void setTopActivity(I_ShowActivity activity);
 

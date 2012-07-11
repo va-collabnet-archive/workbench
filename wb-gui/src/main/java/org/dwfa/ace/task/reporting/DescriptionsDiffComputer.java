@@ -32,7 +32,7 @@ import org.ihtsdo.tk.api.blueprint.ConceptCB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
-import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.PositionSet;
@@ -40,9 +40,9 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 
 /**
  * Version diff computes, generates the following refsets:
@@ -139,7 +139,7 @@ public class DescriptionsDiffComputer {
 	private void addToRefset(I_GetConceptData member, I_GetConceptData refset) {
 		try {
 			RefexCAB newSpec = new RefexCAB(
-					TK_REFSET_TYPE.CID,
+					TK_REFEX_TYPE.CID,
 					member.getNid(),
 					refset.getNid());
 			newSpec.put(RefexProperty.CNID1, activeNid);
@@ -350,8 +350,8 @@ public class DescriptionsDiffComputer {
 				ConceptVersionBI version1 = concept.getVersion(v1);
 				ConceptVersionBI version2 = concept.getVersion(v2);
 
-				ConAttrVersionBI attrV1 = version1.getConAttrs().getVersion(v1);
-				ConAttrVersionBI attrV2 = version2.getConAttrs().getVersion(v2);
+				ConceptAttributeVersionBI attrV1 = version1.getConceptAttributes().getVersion(v1);
+				ConceptAttributeVersionBI attrV2 = version2.getConceptAttributes().getVersion(v2);
 
 
 				if ( attrV1 == null && attrV2 != null) {
@@ -378,12 +378,12 @@ public class DescriptionsDiffComputer {
 				String v1Pref = "";
 				String v2Pref = "";
 				HashMap<UUID, DescriptionVersionBI> v1Descs = new HashMap<UUID,DescriptionVersionBI>();
-				for (DescriptionVersionBI loopDescPre : version1.getDescsActive()) {
+				for (DescriptionVersionBI loopDescPre : version1.getDescriptionsActive()) {
 					DescriptionVersionBI loopDesc = (DescriptionVersionBI) loopDescPre.getVersion(v1);
 					v1Descs.put(loopDesc.getPrimUuid(), loopDesc);
-					for (RefexVersionBI<?> loopAnnot : loopDesc.getCurrentAnnotationMembers(v1, usLangRefNid)) {
-						RefexCnidVersionBI loopAnnotC = (RefexCnidVersionBI) loopAnnot;
-						if (loopDesc.getTypeNid() == fsnTypeNid && loopAnnotC.getCnid1() == preferredAccepabilityNid) {
+					for (RefexVersionBI<?> loopAnnot : loopDesc.getAnnotationMembersActive(v1, usLangRefNid)) {
+						RefexNidVersionBI loopAnnotC = (RefexNidVersionBI) loopAnnot;
+						if (loopDesc.getTypeNid() == fsnTypeNid && loopAnnotC.getNid1() == preferredAccepabilityNid) {
 							v1Fsn = loopDesc.getText();
 							try {
 								v1SemTag = v1Fsn.substring(v1Fsn.lastIndexOf('(')+1,v1Fsn.lastIndexOf(')'));
@@ -391,19 +391,19 @@ public class DescriptionsDiffComputer {
 								// bad semtag, will be detected in QA;
 							}
 						}
-						if (loopDesc.getTypeNid() == descriptionTypeNid && loopAnnotC.getCnid1() == preferredAccepabilityNid) {
+						if (loopDesc.getTypeNid() == descriptionTypeNid && loopAnnotC.getNid1() == preferredAccepabilityNid) {
 							v1Pref = loopDesc.getText();
 						}
 					}
 				}
 
 				HashMap<UUID, DescriptionVersionBI> v2Descs = new HashMap<UUID,DescriptionVersionBI>();
-				for (DescriptionVersionBI loopDescPre : version2.getDescsActive()) {
+				for (DescriptionVersionBI loopDescPre : version2.getDescriptionsActive()) {
 					DescriptionVersionBI loopDesc = (DescriptionVersionBI) loopDescPre.getVersion(v2);
 					v2Descs.put(loopDesc.getPrimUuid(), loopDesc);
-					for (RefexVersionBI<?> loopAnnot : loopDesc.getCurrentAnnotationMembers(v2, usLangRefNid)) {
-						RefexCnidVersionBI loopAnnotC = (RefexCnidVersionBI) loopAnnot;
-						if (loopDesc.getTypeNid() == fsnTypeNid && loopAnnotC.getCnid1() == preferredAccepabilityNid) {
+					for (RefexVersionBI<?> loopAnnot : loopDesc.getAnnotationMembersActive(v2, usLangRefNid)) {
+						RefexNidVersionBI loopAnnotC = (RefexNidVersionBI) loopAnnot;
+						if (loopDesc.getTypeNid() == fsnTypeNid && loopAnnotC.getNid1() == preferredAccepabilityNid) {
 							v2Fsn = loopDesc.getText();
 							try {
 								v2SemTag = v2Fsn.substring(v2Fsn.lastIndexOf('(')+1,v2Fsn.lastIndexOf(')'));
@@ -411,7 +411,7 @@ public class DescriptionsDiffComputer {
 								// bad semtag, will be detected in QA;
 							}
 						}
-						if (loopDesc.getTypeNid() == descriptionTypeNid && loopAnnotC.getCnid1() == preferredAccepabilityNid) {
+						if (loopDesc.getTypeNid() == descriptionTypeNid && loopAnnotC.getNid1() == preferredAccepabilityNid) {
 							v2Pref = loopDesc.getText();
 						}
 					}
@@ -468,14 +468,14 @@ public class DescriptionsDiffComputer {
 						int v1PreferenceUS = Integer.MIN_VALUE;
 						int v2PreferenceUS = Integer.MIN_VALUE;
 
-						for (RefexVersionBI<?> annot : d1.getCurrentAnnotationMembers(v1, usLangRefNid)) {
-							RefexCnidVersionBI annotCnid = (RefexCnidVersionBI) annot;
-							v1PreferenceUS = annotCnid.getCnid1();
+						for (RefexVersionBI<?> annot : d1.getAnnotationMembersActive(v1, usLangRefNid)) {
+							RefexNidVersionBI annotCnid = (RefexNidVersionBI) annot;
+							v1PreferenceUS = annotCnid.getNid1();
 						}
 
-						for (RefexVersionBI<?> annot : d2.getCurrentAnnotationMembers(v2, usLangRefNid)) {
-							RefexCnidVersionBI annotCnid = (RefexCnidVersionBI) annot;
-							v2PreferenceUS = annotCnid.getCnid1();
+						for (RefexVersionBI<?> annot : d2.getAnnotationMembersActive(v2, usLangRefNid)) {
+							RefexNidVersionBI annotCnid = (RefexNidVersionBI) annot;
+							v2PreferenceUS = annotCnid.getNid1();
 						}
 
 						if (v1PreferenceUS != v2PreferenceUS) {

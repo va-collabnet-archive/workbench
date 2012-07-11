@@ -9,9 +9,9 @@ import java.util.Collection;
 import javax.swing.TransferHandler;
 import org.dwfa.tapi.TerminologyException;
 
-import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
+import org.ihtsdo.tk.api.relationship.group.RelationshipGroupVersionBI;
 
-public class DragPanelRelGroup extends DragPanelComponentVersion<RelGroupVersionBI> {
+public class DragPanelRelGroup extends DragPanelComponentVersion<RelationshipGroupVersionBI> {
 
     /**
      * 
@@ -19,20 +19,20 @@ public class DragPanelRelGroup extends DragPanelComponentVersion<RelGroupVersion
     private static final long serialVersionUID = 1L;
 
     public DragPanelRelGroup(ConceptViewLayout viewLayout,
-            CollapsePanel parentCollapsePanel, RelGroupVersionBI rgv) {
+            CollapsePanel parentCollapsePanel, RelationshipGroupVersionBI rgv) {
         super(viewLayout, parentCollapsePanel, rgv);
     }
 
     public DragPanelRelGroup(LayoutManager layout, ConceptViewLayout viewLayout,
-            CollapsePanel parentCollapsePanel, RelGroupVersionBI rgv) {
+            CollapsePanel parentCollapsePanel, RelationshipGroupVersionBI rgv) {
         super(layout, viewLayout, parentCollapsePanel, rgv);
     }
 
     @Override
-    public Collection<DragPanelComponentVersion<RelGroupVersionBI>> getOtherVersionPanels()
+    public Collection<DragPanelComponentVersion<RelationshipGroupVersionBI>> getOtherVersionPanels()
             throws IOException, TerminologyException {
-        Collection<DragPanelComponentVersion<RelGroupVersionBI>> panelList =
-                new ArrayList<DragPanelComponentVersion<RelGroupVersionBI>>();
+        Collection<DragPanelComponentVersion<RelationshipGroupVersionBI>> panelList =
+                new ArrayList<DragPanelComponentVersion<RelationshipGroupVersionBI>>();
         return panelList;
     }
 
@@ -56,11 +56,11 @@ public class DragPanelRelGroup extends DragPanelComponentVersion<RelGroupVersion
         return TransferHandler.COPY;
     }
 
-    public RelGroupVersionBI getDraggedThing() {
+    public RelationshipGroupVersionBI getDraggedThing() {
         return thingToDrag;
     }
 
-    public void setDraggedThing(RelGroupVersionBI relGroup) {
+    public void setDraggedThing(RelationshipGroupVersionBI relGroup) {
         // TODO handle drop.
     }
 }

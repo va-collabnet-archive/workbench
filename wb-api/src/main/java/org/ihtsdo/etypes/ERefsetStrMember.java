@@ -8,8 +8,8 @@ import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 
-import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrMember;
-import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_string.TkRefsetStrMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_string.TkRefsetStrRevision;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -41,7 +41,7 @@ public class ERefsetStrMember extends TkRefsetStrMember {
 
       I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) m.getMutableParts().get(0);
 
-      strValue   = part.getStringValue();
+      string1   = part.getStringValue();
       pathUuid   = Terms.get().nidToUuid(part.getPathNid());
       statusUuid = Terms.get().nidToUuid(part.getStatusNid());
       authorUuid    = Terms.get().nidToUuid(part.getAuthorNid());

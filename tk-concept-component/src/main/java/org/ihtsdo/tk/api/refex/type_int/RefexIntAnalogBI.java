@@ -26,6 +26,6 @@ import org.ihtsdo.tk.api.refex.RefexAnalogBI;
 public interface RefexIntAnalogBI<A extends RefexIntAnalogBI<A>> extends 
 	RefexAnalogBI<A>, RefexIntVersionBI<A> {
     
-     void setInt1(int l) throws PropertyVetoException;
+     void setInt1(int int1) throws PropertyVetoException;
 
 }

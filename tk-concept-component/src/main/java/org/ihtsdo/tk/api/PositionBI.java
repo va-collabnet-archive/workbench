@@ -20,7 +20,7 @@ public interface PositionBI {
 
     public boolean isAntecedentOrEqualTo(PositionBI another);
 
-    public boolean checkAntecedentOrEqualToOrigins(Collection<? extends PositionBI> origins);
+    public boolean checkAntecedentOrEqualToOrigins(Collection<? extends PositionBI> originPositions);
 
     public boolean isSubsequentOrEqualTo(PositionBI another);
 

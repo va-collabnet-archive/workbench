@@ -37,7 +37,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
-import org.ihtsdo.tk.api.blueprint.DescCAB;
+import org.ihtsdo.tk.api.blueprint.DescriptionCAB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.binding.snomed.Snomed;
@@ -115,19 +115,19 @@ public class NewConcept extends AbstractTask {
              * Get fsn and pref blueprints. This creates the blueprints if they
              * don't already exist.
              */
-            List<DescCAB> fsnCABs = conceptBp.getFsnCABs();
-            List<DescCAB> prefCABs = conceptBp.getPrefCABs();
+            List<DescriptionCAB> fsnCABs = conceptBp.getFullySpecifiedNameCABs();
+            List<DescriptionCAB> prefCABs = conceptBp.getPreferredNameCABs();
 
             /*
              * Add fsn and add pref term. This adds them with the appropriate
              * dialect annotations.
              */
-            for (DescCAB fsn : fsnCABs) {
-                conceptBp.addFsn(fsn, LANG_CODE.EN);
+            for (DescriptionCAB fsn : fsnCABs) {
+                conceptBp.addFullySpecifiedName(fsn, LANG_CODE.EN);
             }
 
-            for (DescCAB pref : prefCABs) {
-                conceptBp.addFsn(pref, LANG_CODE.EN);
+            for (DescriptionCAB pref : prefCABs) {
+                conceptBp.addFullySpecifiedName(pref, LANG_CODE.EN);
             }
 
             /*

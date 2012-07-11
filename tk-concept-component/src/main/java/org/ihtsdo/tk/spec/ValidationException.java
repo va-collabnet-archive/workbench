@@ -16,11 +16,11 @@ public class ValidationException extends IOException {
         super(message);
     }
 
-    public ValidationException(Throwable cause) {
-        super(cause);
+    public ValidationException(Throwable throwable) {
+        super(throwable);
     }
 
-    public ValidationException(String message, Throwable cause) {
-        super(message, cause);
+    public ValidationException(String message, Throwable throwable) {
+        super(message, throwable);
     }
 }

@@ -508,7 +508,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                     break;
                 }
                 I_GetConceptData b = Terms.get().getConcept(id);
-                b.getDescriptions();
+                b.getDescs();
                 concepts.put(id, b);
             }
             return concepts;
@@ -778,7 +778,8 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
             I_ExtendByRefVersion tuple = allTuples.get(rowIndex);
 
             boolean inConflict =
-                    (host.getConfig().getHighlightConflictsInComponentPanel() && host.getConfig().getConflictResolutionStrategy().isInConflict(tuple.getCore()));
+                    (host.getConfig().getHighlightConflictsInComponentPanel() &&
+                    host.getConfig().getConflictResolutionStrategy().isInConflict(tuple.getCoreChronicle()));
 
             switch (columns[columnIndex]) {
 

@@ -26,8 +26,8 @@ public class RelationshipAttributeComparer extends AttributeComparer {
     boolean hasSameAttributes(ComponentVersionBI v) {
         RelationshipVersionBI relAttributeVersion = (RelationshipVersionBI) v;
 
-        if ((relAttributeVersion.getOriginNid() != lcaOriginNid)
-                || (relAttributeVersion.getDestinationNid() != lcaDestinationNid)
+        if ((relAttributeVersion.getSourceNid() != lcaOriginNid)
+                || (relAttributeVersion.getTargetNid() != lcaDestinationNid)
                 || (relAttributeVersion.getRefinabilityNid() != lcaRefinabilityNid)
                 || (relAttributeVersion.getCharacteristicNid() != lcaCharacteristicNid)
                 || (relAttributeVersion.getGroup() != lcaGroup)
@@ -43,8 +43,8 @@ public class RelationshipAttributeComparer extends AttributeComparer {
         RelationshipVersionBI relAttributeVersion = (RelationshipVersionBI) v;
         comparerInitialized = true;
 
-        lcaOriginNid = relAttributeVersion.getOriginNid();
-        lcaDestinationNid = relAttributeVersion.getDestinationNid();
+        lcaOriginNid = relAttributeVersion.getSourceNid();
+        lcaDestinationNid = relAttributeVersion.getTargetNid();
         lcaRefinabilityNid = relAttributeVersion.getRefinabilityNid();
         lcaCharacteristicNid = relAttributeVersion.getCharacteristicNid();
         lcaGroup = relAttributeVersion.getGroup();

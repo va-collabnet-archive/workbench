@@ -43,10 +43,10 @@ import org.dwfa.ace.task.classify.SnoTable;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
 import org.ihtsdo.tk.api.*;
-import org.ihtsdo.tk.api.blueprint.ConAttrAB;
-import org.ihtsdo.tk.api.blueprint.RelCAB;
-import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
-import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.blueprint.ConceptAttributeAB;
+import org.ihtsdo.tk.api.blueprint.RelationshipCAB;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeAnalogBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -232,7 +232,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
    private I_ConceptAttributeTuple findSelf(I_GetConceptData cBean, List<I_Position> posList) {
       try {
-         I_ConceptAttributeVersioned            cv     = cBean.getConceptAttributes();
+         I_ConceptAttributeVersioned            cv     = cBean.getConAttrs();
          List<? extends I_ConceptAttributePart> cvList = cv.getMutableParts();
          I_ConceptAttributePart                 cp1    = null;
 
@@ -1290,12 +1290,12 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       }
 
       @Override
-      public ConAttrAnalogBI makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
-         return (ConAttrAnalogBI) part.makeAnalog(statusNid, time, authorNid, moduleNid, pathNid);
+      public ConceptAttributeAnalogBI makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
+         return (ConceptAttributeAnalogBI) part.makeAnalog(statusNid, time, authorNid, moduleNid, pathNid);
       }
 
       @Override
-      public boolean sapIsInRange(int min, int max) {
+      public boolean stampIsInRange(int min, int max) {
          throw new UnsupportedOperationException("Not supported yet.");
       }
 
@@ -1333,7 +1333,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       }
 
       @Override
-      public Set getAllSapNids() throws IOException {
+      public Set getAllStampNids() throws IOException {
          throw new UnsupportedOperationException("Not supported yet.");
       }
 
@@ -1348,7 +1348,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       }
       
       @Override
-      public ComponentChroncileBI getChronicle() {
+      public ComponentChronicleBI getChronicle() {
          throw new UnsupportedOperationException("Not supported yet.");
       }
 
@@ -1389,46 +1389,45 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       }
 
       @Override
-      public Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz)
+      public Collection<? extends RefexVersionBI<?>> getAnnotationsActive(ViewCoordinate xyz)
               throws IOException {
-         return core.getCurrentAnnotationMembers(xyz);
+         return core.getAnnotationsActive(xyz);
       }
 
       @Override
-      public Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz,
-              int refexNid)
+      public Collection<? extends RefexVersionBI<?>> getAnnotationMembersActive(ViewCoordinate xyz, int refexNid)
               throws IOException {
          throw new UnsupportedOperationException("Not supported yet.");
       }
 
       @Override
-      public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz)
+      public Collection<? extends RefexVersionBI<?>> getActiveAnnotations(ViewCoordinate xyz)
               throws IOException {
          throw new UnsupportedOperationException("Not supported yet.");
       }
 
       @Override
-      public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz, int refexNid)
+      public Collection<? extends RefexVersionBI<?>> getActiveAnnotations(ViewCoordinate xyz, int refexNid)
               throws IOException {
          throw new UnsupportedOperationException("Not supported yet.");
       }
 
       @Override
-      public Collection<? extends RefexVersionBI<?>> getCurrentRefexMembers(ViewCoordinate xyz, int refsetNid)
+      public Collection<? extends RefexVersionBI<?>> getRefexMembersActive(ViewCoordinate xyz, int refsetNid)
               throws IOException {
          throw new UnsupportedOperationException("Not supported yet.");
       }
 
       @Override
-      public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz)
+      public Collection<? extends RefexVersionBI<?>> getRefexesActive(ViewCoordinate xyz)
               throws IOException {
-         return core.getCurrentRefexes(xyz);
+         return core.getRefexesActive(xyz);
       }
 
       @Override
-      public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz, int refsetNid)
+      public Collection<? extends RefexVersionBI<?>> getActiveRefexes(ViewCoordinate xyz, int refsetNid)
               throws IOException {
-         return core.getCurrentRefexes(xyz, refsetNid);
+         return core.getActiveRefexes(xyz, refsetNid);
       }
 
       @Override
@@ -1437,7 +1436,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       }
 
       @Override
-      public Collection<? extends RefexVersionBI<?>> getInactiveRefexes(ViewCoordinate xyz)
+      public Collection<? extends RefexVersionBI<?>> getRefexesInactive(ViewCoordinate xyz)
               throws IOException {
          throw new UnsupportedOperationException("Not supported yet.");
       }
@@ -1509,7 +1508,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       }
 
       @Override
-      public int getSapNid() {
+      public int getStampNid() {
          throw new UnsupportedOperationException("Not supported yet.");
       }
 
@@ -1551,27 +1550,27 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       }
 
       @Override
-      public ConAttrVersionBI getVersion(ViewCoordinate c) throws ContradictionException {
+      public ConceptAttributeVersionBI getVersion(ViewCoordinate c) throws ContradictionException {
          return core.getVersion(c);
       }
 
       @Override
-      public Collection<? extends ConAttrVersionBI> getVersions() {
+      public Collection<? extends ConceptAttributeVersionBI> getVersions() {
          return core.getVersions();
       }
 
       @Override
-      public Collection<? extends ConAttrVersionBI> getVersions(ViewCoordinate c) {
+      public Collection<? extends ConceptAttributeVersionBI> getVersions(ViewCoordinate c) {
          return core.getVersions(c);
       }
 
       @Override
-      public boolean hasCurrentAnnotationMember(ViewCoordinate xyz, int refsetNid) throws IOException {
+      public boolean hasAnnotationMemberActive(ViewCoordinate xyz, int refsetNid) throws IOException {
          throw new UnsupportedOperationException("Not supported yet.");
       }
 
       @Override
-      public boolean hasCurrentRefexMember(ViewCoordinate xyz, int refsetNid) throws IOException {
+      public boolean hasRefexMemberActive(ViewCoordinate xyz, int refsetNid) throws IOException {
          throw new UnsupportedOperationException("Not supported yet.");
       }
 
@@ -1695,7 +1694,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         }
 
         @Override
-        public ConAttrAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException {
+        public ConceptAttributeAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
    }
@@ -1821,7 +1820,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       }
 
       @Override
-      public boolean sapIsInRange(int min, int max) {
+      public boolean stampIsInRange(int min, int max) {
          throw new UnsupportedOperationException("Not supported yet.");
       }
 
@@ -1869,7 +1868,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       }
 
       @Override
-      public Set getAllSapNids() throws IOException {
+      public Set getAllStampNids() throws IOException {
          throw new UnsupportedOperationException("Not supported yet.");
       }
 
@@ -1919,61 +1918,60 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       }
 
       @Override
-      public ComponentChroncileBI getChronicle() {
+      public ComponentChronicleBI getChronicle() {
          throw new UnsupportedOperationException("Not supported yet.");
       }
 
       @Override
       public int getConceptNid() {
-         return fixedPart.getOriginNid();
+         return fixedPart.getSourceNid();
       }
 
       @Override
-      public Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz)
+      public Collection<? extends RefexVersionBI<?>> getAnnotationsActive(ViewCoordinate xyz)
               throws IOException {
          throw new UnsupportedOperationException("Not supported yet.");
       }
 
       @Override
-      public Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz,
-              int refexNid)
+      public Collection<? extends RefexVersionBI<?>> getAnnotationMembersActive(ViewCoordinate xyz, int refexNid)
               throws IOException {
          throw new UnsupportedOperationException("Not supported yet.");
       }
 
       @Override
-      public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz)
+      public Collection<? extends RefexVersionBI<?>> getActiveAnnotations(ViewCoordinate xyz)
               throws IOException {
          throw new UnsupportedOperationException("Not supported yet.");
       }
 
       @Override
-      public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz, int refexNid)
+      public Collection<? extends RefexVersionBI<?>> getActiveAnnotations(ViewCoordinate xyz, int refexNid)
               throws IOException {
          throw new UnsupportedOperationException("Not supported yet.");
       }
 
       @Override
-      public Collection<? extends RefexVersionBI<?>> getCurrentRefexMembers(ViewCoordinate xyz, int refsetNid)
+      public Collection<? extends RefexVersionBI<?>> getRefexMembersActive(ViewCoordinate xyz, int refsetNid)
               throws IOException {
          throw new UnsupportedOperationException("Not supported yet.");
       }
 
       @Override
-      public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz)
+      public Collection<? extends RefexVersionBI<?>> getRefexesActive(ViewCoordinate xyz)
               throws IOException {
          throw new UnsupportedOperationException("Not supported yet.");
       }
 
       @Override
-      public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz, int refsetNid)
+      public Collection<? extends RefexVersionBI<?>> getActiveRefexes(ViewCoordinate xyz, int refsetNid)
               throws IOException {
          throw new UnsupportedOperationException("Not supported yet.");
       }
 
       @Override
-      public int getDestinationNid() {
-         return fixedPart.getDestinationNid();
+      public int getTargetNid() {
+         return fixedPart.getTargetNid();
       }
 
       /*
@@ -1997,7 +1995,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       }
 
       @Override
-      public Collection<? extends RefexVersionBI<?>> getInactiveRefexes(ViewCoordinate xyz)
+      public Collection<? extends RefexVersionBI<?>> getRefexesInactive(ViewCoordinate xyz)
               throws IOException {
          throw new UnsupportedOperationException("Not supported yet.");
       }
@@ -2013,8 +2011,8 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       }
 
       @Override
-      public int getOriginNid() {
-         return fixedPart.getOriginNid();
+      public int getSourceNid() {
+         return fixedPart.getSourceNid();
       }
 
       @Override
@@ -2109,7 +2107,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       }
 
       @Override
-      public int getSapNid() {
+      public int getStampNid() {
          throw new UnsupportedOperationException("Not supported yet.");
       }
 
@@ -2187,12 +2185,12 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       }
 
       @Override
-      public boolean hasCurrentAnnotationMember(ViewCoordinate xyz, int refsetNid) throws IOException {
+      public boolean hasAnnotationMemberActive(ViewCoordinate xyz, int refsetNid) throws IOException {
          throw new UnsupportedOperationException("Not supported yet.");
       }
 
       @Override
-      public boolean hasCurrentRefexMember(ViewCoordinate xyz, int refsetNid) throws IOException {
+      public boolean hasRefexMemberActive(ViewCoordinate xyz, int refsetNid) throws IOException {
          throw new UnsupportedOperationException("Not supported yet.");
       }
 
@@ -2259,8 +2257,8 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       }
 
       @Override
-      public void setDestinationNid(int nid) throws PropertyVetoException {
-         fixedPart.setDestinationNid(nid);
+      public void setTargetNid(int nid) throws PropertyVetoException {
+         fixedPart.setTargetNid(nid);
       }
 
       /*
@@ -2358,7 +2356,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         }
 
         @Override
-        public RelCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException {
+        public RelationshipCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
    }

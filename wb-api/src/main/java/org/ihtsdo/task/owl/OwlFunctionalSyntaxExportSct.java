@@ -44,7 +44,7 @@ import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.binding.snomed.TermAux;
 
@@ -695,14 +695,14 @@ public class OwlFunctionalSyntaxExportSct extends AbstractTask {
 
         for (I_GetConceptData unionCollection : unionsSets) {
             Collection<? extends RefexVersionBI<?>> members;
-            members = unionCollection.getCurrentRefsetMembers(vc);
+            members = unionCollection.getRefsetMembersActive(vc);
 
             // find the parent
-            RefexCnidVersionBI union = null;
+            RefexNidVersionBI union = null;
             for (RefexVersionBI<?> rvbi : members) {
-                if (RefexCnidVersionBI.class.isAssignableFrom(rvbi.getClass()) &&
-                        parentMemberTypeNid == ((RefexCnidVersionBI)rvbi).getCnid1()) {
-                    union = (RefexCnidVersionBI) rvbi;
+                if (RefexNidVersionBI.class.isAssignableFrom(rvbi.getClass()) &&
+                        parentMemberTypeNid == ((RefexNidVersionBI)rvbi).getNid1()) {
+                    union = (RefexNidVersionBI) rvbi;
                     break;
                 }
             }
@@ -717,8 +717,8 @@ public class OwlFunctionalSyntaxExportSct extends AbstractTask {
             // add normal members
             bw.append(" ObjectUnionOf(");
             for (RefexVersionBI<?> rvbi : members) {
-                if (RefexCnidVersionBI.class.isAssignableFrom(rvbi.getClass()) &&
-                        normalMemberNid == ((RefexCnidVersionBI)rvbi).getCnid1()) {
+                if (RefexNidVersionBI.class.isAssignableFrom(rvbi.getClass()) &&
+                        normalMemberNid == ((RefexNidVersionBI)rvbi).getNid1()) {
                     bw.append(" :SCT_" + Long.toString(
                             nid2sctid(rvbi.getReferencedComponentNid())).replace("-", "n"));
                 }

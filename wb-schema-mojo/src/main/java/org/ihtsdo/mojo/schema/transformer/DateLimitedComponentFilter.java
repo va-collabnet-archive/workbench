@@ -19,7 +19,7 @@ import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescriptionRevision;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 
@@ -108,7 +108,7 @@ public class DateLimitedComponentFilter extends AbstractTransformer {
 	}
 
 	@Override
-	public void transformAnnotation(TkRefsetAbstractMember<?> annotation,
+	public void transformAnnotation(TkRefexAbstractMember<?> annotation,
 			TkComponent<?> component) {
 		if (annotation.revisions != null) {
 			List<TkRevision> annotationRevisions = new ArrayList<TkRevision>();
@@ -122,7 +122,7 @@ public class DateLimitedComponentFilter extends AbstractTransformer {
 	}
 
 	@Override
-	public void transformMember(TkRefsetAbstractMember<?> member,
+	public void transformMember(TkRefexAbstractMember<?> member,
 			TkConcept concept) {
 		if (member.revisions != null) {
 			List<TkRevision> annotationRevisions = new ArrayList<TkRevision>();

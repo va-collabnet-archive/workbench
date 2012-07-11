@@ -36,11 +36,11 @@ public class RootNode extends TaxonomyNode {
    //~--- methods -------------------------------------------------------------
    @Override
    public boolean addChild(TaxonomyNode child) {
-      int cnid = child.getCnid();
+      int cnid = child.getConceptNid();
 
       if (!this.nidNodeIdMap.containsKey(cnid)) {
          this.children.add(child.nodeId);
-         this.nidNodeIdMap.put(child.getCnid(), child.nodeId);
+         this.nidNodeIdMap.put(child.getConceptNid(), child.nodeId);
 
          return true;
       }

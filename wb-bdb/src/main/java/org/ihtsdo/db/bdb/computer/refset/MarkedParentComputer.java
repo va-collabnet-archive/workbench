@@ -40,7 +40,7 @@ import org.ihtsdo.tk.api.NidBitSetItrBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -172,15 +172,15 @@ public class MarkedParentComputer {
             KindOfComputer.getIsaCacheMap().get(viewCoordinate.getIsaCoordinates().iterator().next()).addParents(memberItr.nid(), allParents);
          }
 
-         for (RefexVersionBI<?> mpv : markedParentRefsetConcept.getCurrentRefsetMembers(viewCoordinate)) {
-            RefexCnidVersionBI<?> cnidMpv = (RefexCnidVersionBI) mpv;
-            if (!allParents.isMember(cnidMpv.getCnid1())) {
+         for (RefexVersionBI<?> mpv : markedParentRefsetConcept.getRefsetMembersActive(viewCoordinate)) {
+            RefexNidVersionBI<?> cnidMpv = (RefexNidVersionBI) mpv;
+            if (!allParents.isMember(cnidMpv.getNid1())) {
                 RefexCAB rcBp = cnidMpv.makeBlueprint(viewCoordinate);
                 rcBp.setStatusUuid(SnomedMetadataRfx.getSTATUS_RETIRED().getUuids()[0]);
                 builder.constructIfNotCurrent(rcBp);
             } else {
                 // remove existing marked parent... Already set. 
-                allParents.setNotMember(cnidMpv.getCnid1());
+                allParents.setNotMember(cnidMpv.getNid1());
             }
          }
 

@@ -59,7 +59,7 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.helper.TerminologyHelperDrools;
@@ -169,7 +169,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 									getMockViewSet(config), config.getPrecedence(), 
 									config.getConflictResolutionStrategy())) {
 								if (relTuple.getTypeNid() == isa) {
-									I_GetConceptData parent = tf.getConcept(relTuple.getDestinationNid());
+									I_GetConceptData parent = tf.getConcept(relTuple.getTargetNid());
 									parents.add(parent.toString());
 								}
 							}
@@ -638,11 +638,11 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 					config.getPrecedence(), config.getConflictResolutionStrategy());
 			ConceptSpec referToRefset = new ConceptSpec("REFERS TO concept association reference set (foundation metadata concept)", uuidFromString("d15fde65-ed52-3a73-926b-8981e9743ee9"));
 			for (DescriptionVersionBI loopDescription : descriptionsList) {
-				Collection<? extends RefexVersionBI<?>> currentAnnotations = loopDescription.getChronicle().getCurrentAnnotations(config.getViewCoordinate());
+				Collection<? extends RefexVersionBI<?>> currentAnnotations = loopDescription.getChronicle().getActiveAnnotations(config.getViewCoordinate());
 				for (RefexVersionBI<?> annotation : currentAnnotations) {
-					RefexCnidVersionBI annotationCnid = (RefexCnidVersionBI) annotation;
-					int languageNid = annotationCnid.getCollectionNid();
-					if (annotationCnid.getCollectionNid() != referToRefset.getLenient().getNid()) {
+					RefexNidVersionBI annotationCnid = (RefexNidVersionBI) annotation;
+					int languageNid = annotationCnid.getRefexNid();
+					if (annotationCnid.getRefexNid() != referToRefset.getLenient().getNid()) {
 						result = true;
 						break;
 					}

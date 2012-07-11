@@ -6,7 +6,7 @@ import java.util.logging.Level;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 
 // If concept doesn't have descriptions, ignore it
 public class WfBadConceptFilter extends AbstractWfChangeSetFilter {
@@ -15,14 +15,14 @@ public class WfBadConceptFilter extends AbstractWfChangeSetFilter {
 	}
 
 	@Override
-	public boolean scrubMembers(HashSet<TkRefsetAbstractMember<?>> wfMembersToCommit) {
+	public boolean scrubMembers(HashSet<TkRefexAbstractMember<?>> wfMembersToCommit) {
 		try {
-			wfMembersToProcess = new HashSet<TkRefsetAbstractMember<?>>();
+			wfMembersToProcess = new HashSet<TkRefexAbstractMember<?>>();
 			
-			for (TkRefsetAbstractMember<?> member : wfMembersToCommit) {
+			for (TkRefexAbstractMember<?> member : wfMembersToCommit) {
 				I_GetConceptData con = Terms.get().getConcept(member.getComponentUuid());
 				
-				if (con != null && con.getDescriptions() != null && con.getDescriptions().size() > 0) {
+				if (con != null && con.getDescs() != null && con.getDescs().size() > 0) {
 					wfMembersToProcess.add(member);
 				} else {
 					wfMembersToIgnore.add(member);
@@ -36,7 +36,7 @@ public class WfBadConceptFilter extends AbstractWfChangeSetFilter {
 	}
 
 	@Override
-	public HashSet<TkRefsetAbstractMember<?>> getApprovedMembers() {
+	public HashSet<TkRefexAbstractMember<?>> getApprovedMembers() {
 		return wfMembersToProcess;
 	}
 

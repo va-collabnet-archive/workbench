@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
-import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid.TkRefexUuidRevision;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -132,7 +132,7 @@ public class ERefsetCidMemberTest {
         
         ERefsetCidMember member = new ERefsetCidMember();
         member.componentUuid = new UUID(64386, 75497);
-        member.c1Uuid = new UUID(111, 222);
+        member.uuid1 = new UUID(111, 222);
         member.refsetUuid = new UUID(14386, 65497);
         member.pathUuid = new UUID(4350, 5469);
         member.statusUuid = new UUID(5386, 4497);
@@ -146,9 +146,9 @@ public class ERefsetCidMemberTest {
         ac.statusUuid = new UUID(5386, 4497);
         ac.time = this.myTime;
         member.additionalIds.add(ac);       
-        member.revisions = new ArrayList<TkRefsetCidRevision>();
+        member.revisions = new ArrayList<TkRefexUuidRevision>();
         ERefsetCidRevision rsv = new ERefsetCidRevision();
-        rsv.c1Uuid = new UUID(4350, 5469);
+        rsv.uuid1 = new UUID(4350, 5469);
         rsv.pathUuid = new UUID(4350, 5469);
         rsv.statusUuid = new UUID(5386, 4497);
         rsv.time = this.myTime;
@@ -161,7 +161,7 @@ public class ERefsetCidMemberTest {
         
         ERefsetCidMember member = new ERefsetCidMember();
         member.componentUuid = new UUID(11, 11);
-        member.c1Uuid = new UUID(22, 22);
+        member.uuid1 = new UUID(22, 22);
         member.refsetUuid = new UUID(33, 33);
         member.pathUuid = new UUID(44, 44);
         member.statusUuid = new UUID(55, 55);
@@ -175,9 +175,9 @@ public class ERefsetCidMemberTest {
         ac.statusUuid = new UUID(111, 111);
         ac.time = this.myTime;
         member.additionalIds.add(ac);       
-        member.revisions = new ArrayList<TkRefsetCidRevision>();
+        member.revisions = new ArrayList<TkRefexUuidRevision>();
         ERefsetCidRevision rsv = new ERefsetCidRevision();
-        rsv.c1Uuid = new UUID(222, 222);
+        rsv.uuid1 = new UUID(222, 222);
         rsv.pathUuid = new UUID(333, 333);
         rsv.statusUuid = new UUID(444, 444);
         rsv.time = this.myTime;

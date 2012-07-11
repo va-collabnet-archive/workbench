@@ -47,7 +47,7 @@ public class SetICSignificantAction extends AbstractAction {
 			//compare to initial word of returned descriptions
 			boolean initialSignificance = desc.isInitialCaseSignificant();
 			boolean changePerformed = false;
-			for (DescriptionVersionBI descVersion : descConcept.getDescsActive()) {
+			for (DescriptionVersionBI descVersion : descConcept.getDescriptionsActive()) {
 				String otherText = descVersion.getText();
 				//if same word then add to description list
 				String otherInitialWord = null;

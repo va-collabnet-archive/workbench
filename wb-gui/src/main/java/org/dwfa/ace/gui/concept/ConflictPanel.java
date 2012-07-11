@@ -434,13 +434,13 @@ public class ConflictPanel extends JPanel implements ActionListener {
         Set<I_Position> positions = new HashSet<I_Position>();
         positions.add(new Position(Long.MAX_VALUE, editPath));
         List<I_ConceptAttributeVersioned> attributeList = new ArrayList<I_ConceptAttributeVersioned>();
-        attributeList.add(cb.getConceptAttributes());
+        attributeList.add(cb.getConAttrs());
 
         for (I_ConceptAttributeVersioned attributes : attributeList) {
             processAttributesForImplementation(attributesForResolution, editPath, positions, attributes);
         }
 
-        for (I_DescriptionVersioned desc : cb.getDescriptions()) {
+        for (I_DescriptionVersioned desc : cb.getDescs()) {
             processDescriptionsForImplementation(descsForResolution, editPath, positions, desc);
         }
 

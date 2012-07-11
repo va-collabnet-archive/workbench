@@ -19,7 +19,7 @@ import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
-import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
+import org.ihtsdo.tk.api.relationship.group.RelationshipGroupVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.RelGroupFact;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
@@ -44,15 +44,15 @@ public class CloneRelGroupAction extends AbstractAction {
             I_GetConceptData concept = Terms.get().getConceptForNid(targetComponent.getNid());
 
             //get group number of sourceComponent
-            RelGroupVersionBI relGroup = (RelGroupVersionBI) sourceComponent;
-            int sourceGroup = relGroup.getRelGroup();
+            RelationshipGroupVersionBI relGroup = (RelationshipGroupVersionBI) sourceComponent;
+            int sourceGroup = relGroup.getRelationshipGroupNumber();
 
             //get group numbers in target concept
             ConceptChronicleBI target = (ConceptChronicleBI) targetComponent;
-            Collection<? extends RelGroupVersionBI> targetGroups = target.getRelGroups(config.getViewCoordinate());
+            Collection<? extends RelationshipGroupVersionBI> targetGroups = target.getRelationshipGroups(config.getViewCoordinate());
             int max = 0;
-            for (RelGroupVersionBI rg : targetGroups) {
-                Collection<? extends RelationshipVersionBI> currentRels = rg.getCurrentRels();
+            for (RelationshipGroupVersionBI rg : targetGroups) {
+                Collection<? extends RelationshipVersionBI> currentRels = rg.getRelationshipsActive();
                 boolean isStated = false;
                 for(RelationshipVersionBI rel : currentRels){
                     if(rel.getCharacteristicNid() == SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID()){
@@ -61,7 +61,7 @@ public class CloneRelGroupAction extends AbstractAction {
                     }
                 }
                 if(isStated){
-                    int group = rg.getRelGroup();
+                    int group = rg.getRelationshipGroupNumber();
                     if (group > max) {
                         max = group;
                     }
@@ -71,8 +71,8 @@ public class CloneRelGroupAction extends AbstractAction {
             int groupNumber = max + 1;
 
             //get rels with matching sourceGroup from sourceComponent 
-            RelGroupVersionBI source = (RelGroupVersionBI) sourceComponent;
-            Collection sourceRels = source.getCurrentRels(); //form getRels
+            RelationshipGroupVersionBI source = (RelationshipGroupVersionBI) sourceComponent;
+            Collection sourceRels = source.getRelationshipsActive(); //form getRelationships
             //loop through rels
             for (Object relObject : sourceRels) {
                 Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
@@ -82,7 +82,7 @@ public class CloneRelGroupAction extends AbstractAction {
                 RelationshipVersionBI rel = (RelationshipVersionBI) component;
                 I_RelVersioned newRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(), concept,
                         rel.getTypeNid(),
-                        rel.getDestinationNid(),
+                        rel.getTargetNid(),
                         rel.getCharacteristicNid(),
                         rel.getRefinabilityNid(),
                         groupNumber, //assign new group number to rels

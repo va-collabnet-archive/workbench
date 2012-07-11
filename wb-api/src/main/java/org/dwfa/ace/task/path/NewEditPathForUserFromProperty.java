@@ -150,7 +150,7 @@ public class NewEditPathForUserFromProperty extends AbstractTask {
 
         I_GetConceptData statusConcept = tf.getConcept(ArchitectonicAuxiliary.Concept.INTERNAL_USE_ONLY.getUids());
 
-        SetStatusUtil.setStatusOfConceptInfo(statusConcept, newPathConcept.getConceptAttributes().getTuples());
+        SetStatusUtil.setStatusOfConceptInfo(statusConcept, newPathConcept.getConAttrs().getTuples());
 
         I_DescriptionVersioned idv = tf.newDescription(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
             parentPathTermEntry.ids[0] + fsDescription), newPathConcept, "en", fsDescription,

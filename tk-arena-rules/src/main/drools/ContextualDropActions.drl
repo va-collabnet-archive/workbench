@@ -8,12 +8,12 @@ import org.ihtsdo.concept.Concept;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
-import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeChronicleBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
-import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
+import org.ihtsdo.tk.api.relationship.group.RelationshipGroupVersionBI;
 
 import org.ihtsdo.arena.conceptview.ConceptViewSettings;
 import org.ihtsdo.arena.context.action.AddFromSpecAction;
@@ -68,15 +68,15 @@ import org.ihtsdo.tk.drools.facts.View;
 import org.ihtsdo.tk.spec.DescriptionSpec;
 import org.ihtsdo.helper.dialect.DialectHelper;
 
-import org.ihtsdo.tk.example.binding.Language;
+import org.ihtsdo.tk.binding.snomed.Language;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
-import org.ihtsdo.tk.example.binding.Snomed;
-import org.ihtsdo.tk.example.binding.SnomedConstraints;
-import org.ihtsdo.tk.example.binding.SnomedRelType;
-import org.ihtsdo.tk.example.binding.SnomedRelSpec;
-import org.ihtsdo.tk.example.binding.Taxonomies;
-import org.ihtsdo.tk.example.binding.TermAux;
-import org.ihtsdo.tk.example.binding.WbDescType;
+import org.ihtsdo.tk.binding.snomed.Snomed;
+import org.ihtsdo.tk.binding.snomed.SnomedConstraints;
+import org.ihtsdo.tk.binding.snomed.SnomedRelationshipType;
+import org.ihtsdo.tk.binding.snomed.SnomedRelationshipSpec;
+import org.ihtsdo.tk.binding.snomed.Taxonomies;
+import org.ihtsdo.tk.binding.snomed.TermAux;
+import org.ihtsdo.tk.binding.snomed.WbDescType;
 import org.ihtsdo.arena.spec.Refsets; 
 import org.ihtsdo.arena.spec.AcceptabilityType;
 import org.ihtsdo.arena.spec.SynonymyType;
@@ -169,11 +169,11 @@ rule "rule 5" #template onto concept
       )
 
    then
-   	  if(DialectHelper.isTextForDialect($dropObject.getDescSpec().getDescText(),
+   	  if(DialectHelper.isTextForDialect($dropObject.getDescSpec().getDescriptionText(),
          		Language.EN_US.get(vc).getNid())){
          		actions.add(new AddFromDialectSpecAction("add GB dialect", $dropTarget, $dropObject,LANG_CODE.EN_GB, config));
          		}
-      if(DialectHelper.isTextForDialect($dropObject.getDescSpec().getDescText(),
+      if(DialectHelper.isTextForDialect($dropObject.getDescSpec().getDescriptionText(),
          		Language.EN_UK.get(vc).getNid())){
          		actions.add(new AddFromDialectSpecAction("add US dialect", $dropTarget, $dropObject,LANG_CODE.EN_US, config));
                         }
@@ -256,7 +256,7 @@ rule "rule 10" #rel w/group onto different rel group"
       $dropObject: RelFact(context == Context.DROP_OBJECT,
       					   getRel().getGroup() != 0,
       					   getRel().getConceptNid() != $dropTarget.getRelGroup().getConceptNid() ||
-         (getRel().getConceptNid() == $dropTarget.getRelGroup().getConceptNid() && getRel().getGroup() != $dropTarget.getRelGroup().getRelGroup()))
+         (getRel().getConceptNid() == $dropTarget.getRelGroup().getConceptNid() && getRel().getGroup() != $dropTarget.getRelGroup().getRelationshipGroupNumber()))
    then
       actions.add(new CopyToRelGroupAction("copy to rel group", $dropObject, $dropTarget, config));
 end
@@ -269,7 +269,7 @@ rule "rule 10.1" #rel w/group onto different rel group"
       					   getRel().getGroup() != 0,
                            getRel().isStated() == true,
       					   getRel().getConceptNid() != $dropTarget.getRelGroup().getConceptNid() ||
-         (getRel().getConceptNid() == $dropTarget.getRelGroup().getConceptNid() && getRel().getGroup() != $dropTarget.getRelGroup().getRelGroup()))
+         (getRel().getConceptNid() == $dropTarget.getRelGroup().getConceptNid() && getRel().getGroup() != $dropTarget.getRelGroup().getRelationshipGroupNumber()))
    then
       actions.add(new MoveToRelGroupAction("move to rel group", $dropObject, $dropTarget, config));
 end

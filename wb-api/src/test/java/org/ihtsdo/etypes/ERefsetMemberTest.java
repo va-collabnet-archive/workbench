@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
-import org.ihtsdo.tk.dto.concept.component.refset.member.TkRefsetRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_member.TkRefexRevision;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -147,7 +147,7 @@ public class ERefsetMemberTest {
         ac.time = this.myTime;
         member.additionalIds.add(ac);       
         // Add extraVersions
-        member.revisions = new ArrayList<TkRefsetRevision>();
+        member.revisions = new ArrayList<TkRefexRevision>();
         ERefsetRevision rsv = new ERefsetRevision();
         rsv.pathUuid = new UUID(4350, 5469);
         rsv.statusUuid = new UUID(5386, 4497);
@@ -176,7 +176,7 @@ public class ERefsetMemberTest {
         ac.time = this.myTime;
         member.additionalIds.add(ac);       
         // Add extraVersions
-        member.revisions = new ArrayList<TkRefsetRevision>();
+        member.revisions = new ArrayList<TkRefexRevision>();
         ERefsetRevision rsv = new ERefsetRevision();
         rsv.pathUuid = new UUID(22, 22);
         rsv.statusUuid = new UUID(33, 33);

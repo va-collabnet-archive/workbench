@@ -7,7 +7,7 @@ import com.sleepycat.bind.tuple.TupleOutput;
 import org.apache.commons.collections.primitives.ArrayIntList;
 
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ManageContradiction;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
@@ -41,8 +41,8 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexAnalogBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.tk.hash.Hashcode;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -74,7 +74,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
         super(enclosingConceptNid, input);
     }
 
-    public RefsetMember(TkRefsetAbstractMember<?> refsetMember, int enclosingConceptNid) throws IOException {
+    public RefsetMember(TkRefexAbstractMember<?> refsetMember, int enclosingConceptNid) throws IOException {
         super(refsetMember, enclosingConceptNid);
         refsetNid = Bdb.uuidToNid(refsetMember.refsetUuid);
         referencedComponentNid = Bdb.uuidToNid(refsetMember.getComponentUuid());
@@ -99,7 +99,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
     public void addTuples(List<I_ExtendByRefVersion> returnTuples, Precedence precedencePolicy,
-            I_ManageContradiction contradictionManager)
+            ContradictionManagerBI contradictionManager)
             throws TerminologyException, IOException {
         List<RefsetMember<R, C>.Version> versionsToAdd = new ArrayList<RefsetMember<R, C>.Version>();
 
@@ -113,7 +113,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
     @Override
     public void addTuples(I_IntSet allowedStatus, PositionSetReadOnly positions,
             List<I_ExtendByRefVersion> returnTuples, Precedence precedencePolicy,
-            I_ManageContradiction contradictionManager)
+            ContradictionManagerBI contradictionManager)
             throws TerminologyException, IOException {
         List<RefsetMember<R, C>.Version> versionsToAdd = new ArrayList<RefsetMember<R, C>.Version>();
 
@@ -141,7 +141,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
             return getNid() - o.getNid();
         }
 
-        return this.getSapNid() - o.getSapNid();
+        return this.getStampNid() - o.getStampNid();
     }
 
     @Override
@@ -226,7 +226,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
                 if (component instanceof ConceptComponent) {
                     ((ConceptComponent) component).getAnnotationsMod().remove(this);
                 } else if (component instanceof Concept) {
-                    ((ConceptComponent) ((Concept) component).getConAttrs()).getAnnotationsMod().remove(this);
+                    ((ConceptComponent) ((Concept) component).getConceptAttributes()).getAnnotationsMod().remove(this);
                 }
             }
 
@@ -404,7 +404,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
 
     //~--- get methods ---------------------------------------------------------
     @Override
-    public int getCollectionNid() {
+    public int getRefexNid() {
         return refsetNid;
     }
 
@@ -448,7 +448,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
         InvalidCAB, ContradictionException {
         RefexCAB rcs = new RefexCAB(getTkRefsetType(), 
                 Ts.get().getUuidPrimordialForNid(getReferencedComponentNid()),
-                getCollectionNid(),
+                getRefexNid(),
                 getVersion(vc), vc);
 
         addSpecProperties(rcs);
@@ -461,7 +461,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
         return refsetNid;
     }
 
-    protected abstract TK_REFSET_TYPE getTkRefsetType();
+    protected abstract TK_REFEX_TYPE getTkRefsetType();
 
     @Override
     public List<Version> getTuples() {
@@ -470,7 +470,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
 
     @SuppressWarnings("rawtypes")
     @Override
-    public List<? extends I_ExtendByRefVersion> getTuples(I_ManageContradiction contradictionMgr)
+    public List<? extends I_ExtendByRefVersion> getTuples(ContradictionManagerBI contradictionMgr)
             throws TerminologyException, IOException {
 
         // TODO Implement contradictionMgr part...
@@ -481,7 +481,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
     @Override
     public List<? extends I_ExtendByRefVersion> getTuples(I_IntSet allowedStatus,
             PositionSetReadOnly positions, Precedence precedencePolicy,
-            I_ManageContradiction contradictionManager)
+            ContradictionManagerBI contradictionManager)
             throws TerminologyException, IOException {
         List<RefsetMember<R, C>.Version> versionsToAdd = new ArrayList<RefsetMember<R, C>.Version>();
 
@@ -665,7 +665,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
                 return this.getNid() - o.getNid();
             }
 
-            return this.getSapNid() - o.getSapNid();
+            return this.getStampNid() - o.getStampNid();
         }
 
         @Override
@@ -723,7 +723,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
 
         //~--- get methods ------------------------------------------------------
         @Override
-        public int getCollectionNid() {
+        public int getRefexNid() {
             return refsetNid;
         }
 
@@ -736,12 +736,17 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
         public I_ExtendByRef getCore() {
             return RefsetMember.this;
         }
+        
+        @Override
+        public RefexChronicleBI getCoreChronicle() {
+            return RefsetMember.this;
+        }
 
         RefexAnalogBI<R> getCv() {
             return (RefexAnalogBI<R>) cv;
         }
 
-        public TkRefsetAbstractMember<?> getERefsetMember() throws IOException {
+        public TkRefexAbstractMember<?> getERefsetMember() throws IOException {
             throw new UnsupportedOperationException("subclass must override");
         }
 
@@ -783,11 +788,11 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
         @Override
         @Deprecated
         public int getStatus() {
-            return getCv().getSapNid();
+            return getCv().getStampNid();
         }
 
         @Override
-        public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc,
+        public TkRefexAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc,
                 NidBitSetBI exclusionSet, Map<UUID, UUID> conversionMap)
                 throws ContradictionException, IOException {
             return getCv().getTkRefsetMemberActiveOnly(vc, exclusionSet, conversionMap);

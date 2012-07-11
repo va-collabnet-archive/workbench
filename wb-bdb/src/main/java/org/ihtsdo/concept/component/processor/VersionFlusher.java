@@ -16,7 +16,7 @@
 package org.ihtsdo.concept.component.processor;
 
 import org.ihtsdo.concept.component.ConceptComponent;
-import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.ComponentChronicleBI;
 import org.ihtsdo.tk.api.ProcessComponentChronicleBI;
 
 /**
@@ -26,7 +26,7 @@ import org.ihtsdo.tk.api.ProcessComponentChronicleBI;
 public class VersionFlusher implements ProcessComponentChronicleBI {
 
     @Override
-    public void process(ComponentChroncileBI cc) throws Exception {
+    public void process(ComponentChronicleBI cc) throws Exception {
         ConceptComponent component = (ConceptComponent) cc;
         component.clearVersions();
     }

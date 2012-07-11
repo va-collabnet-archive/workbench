@@ -49,12 +49,12 @@ public  class StateTransitionRefsetSearcher extends WorkflowRefsetSearcher
 
 		for (ConceptVersionBI role : Terms.get().getActiveAceFrameConfig().getWorkflowRoles())
 		{
-			int roleIndex = role.getPreferredDescription().getText().length() - 1;
+			int roleIndex = role.getDescriptionPreferred().getText().length() - 1;
 			
 			// TODO
 			// If ALL or Last Letter of Action (A,B,C,D) is less or equal than Last Letter of CategoryNid (A,B,C,D)  
 			if (allRoleUid.equals(role.getPrimUuid()) ||
-				(role.getPreferredDescription().getText().charAt(roleIndex) <= categoryString.charAt(categoryIndex)))
+				(role.getDescriptionPreferred().getText().charAt(roleIndex) <= categoryString.charAt(categoryIndex)))
 			{
 				l = Terms.get().getRefsetExtensionsForComponent(refsetNid,  role.getConceptNid());
 				results.putAll(findPossibleActions(l, testInitialState));

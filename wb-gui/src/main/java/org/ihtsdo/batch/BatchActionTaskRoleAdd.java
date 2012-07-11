@@ -20,12 +20,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
-import org.ihtsdo.tk.api.blueprint.RelCAB;
+import org.ihtsdo.tk.api.blueprint.RelationshipCAB;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
-import org.ihtsdo.tk.dto.concept.component.relationship.TkRelType;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipType;
 
 /**
  *
@@ -52,10 +52,10 @@ public class BatchActionTaskRoleAdd extends BatchActionTask {
     @Override
     public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc) throws Exception {
         // Check if role-value already exists and is active.
-        Collection<? extends RelationshipVersionBI> checkParents = c.getRelsOutgoingActive();
+        Collection<? extends RelationshipVersionBI> checkParents = c.getRelationshipsSourceActive();
         for (RelationshipVersionBI rvbi : checkParents) {
             if (rvbi.getTypeNid() == roleNid
-                    && rvbi.getDestinationNid() == valueNid
+                    && rvbi.getTargetNid() == valueNid
                     && rvbi.isStated()) {
                 BatchActionEventReporter.add(new BatchActionEvent(c,
                         BatchActionTaskType.ROLE_ADD,
@@ -66,16 +66,16 @@ public class BatchActionTaskRoleAdd extends BatchActionTask {
             }
         }
 
-        //        RelCAB relSpec = new RelCAB(c.getNid(), roleNid, valueNid, 0, TkRelType.STATED_ROLE);
+        //        RelationshipCAB relSpec = new RelationshipCAB(c.getNid(), roleNid, valueNid, 0, TkRelationshipType.STATED_ROLE);
         List<UUID> roleUuids = ts.getUuidsForNid(roleNid);
         List<UUID> valueUuids = ts.getUuidsForNid(valueNid);
         if (roleUuids.size() > 0 && valueUuids.size() > 0) {
-            TkRelType relChType = TkRelType.STATED_ROLE;
+            TkRelationshipType relChType = TkRelationshipType.STATED_ROLE;
             if (HISTORIC_ROLE_TYPES.contains(roleNid)) {
-                relChType = TkRelType.HISTORIC;
+                relChType = TkRelationshipType.HISTORIC;
             }
 
-            RelCAB relSpec = new RelCAB(c.getPrimUuid(), roleUuids.get(0), valueUuids.get(0),
+            RelationshipCAB relSpec = new RelationshipCAB(c.getPrimUuid(), roleUuids.get(0), valueUuids.get(0),
                     0, relChType);
             tsSnapshot.construct(relSpec);
 

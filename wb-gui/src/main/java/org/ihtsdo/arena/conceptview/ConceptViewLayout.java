@@ -26,16 +26,16 @@ import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.RelAssertionType;
-import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeAnalogBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
-import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
+import org.ihtsdo.tk.api.relationship.group.RelationshipGroupVersionBI;
 import org.ihtsdo.tk.spec.DescriptionSpec;
-import org.ihtsdo.tk.spec.RelSpec;
+import org.ihtsdo.tk.spec.RelationshipSpec;
 import org.ihtsdo.tk.spec.SpecBI;
 import org.ihtsdo.tk.spec.SpecFactory;
 import org.ihtsdo.util.swing.GuiUtil;
@@ -84,7 +84,7 @@ import org.dwfa.swing.SwingTask;
 import org.ihtsdo.helper.bdb.MultiEditorContradictionCase;
 import org.ihtsdo.helper.bdb.MultiEditorContradictionDetector;
 import org.ihtsdo.tk.api.*;
-import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 
 /**
  *
@@ -128,7 +128,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
     private List<? extends I_RelTuple> inactiveInferredRels;
     private List<DragPanelRel> inactiveStatedRelPanels;
     private List<? extends I_RelTuple> inactiveStatedRels;
-    private Collection<RelGroupVersionBI> inferredRelGroups;
+    private Collection<RelationshipGroupVersionBI> inferredRelGroups;
     private List<? extends I_RelTuple> inferredRels;
     private I_GetConceptData layoutConcept;
     private Collection<? extends RefexVersionBI<?>> memberRefsets;
@@ -138,7 +138,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
     private Map<PanelSection, CollapsePanelPrefs> prefMap;
     private Set<Integer> saps;
     private ConceptViewSettings settings;
-    private Collection<RelGroupVersionBI> statedRelGroups;
+    private Collection<RelationshipGroupVersionBI> statedRelGroups;
     private List<? extends I_RelTuple> statedRels;
     private JPanel conceptPanel;
     private HashSet<Integer> sapsForConflict = new HashSet<Integer>();
@@ -163,20 +163,20 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
     }
 
     //~--- methods -------------------------------------------------------------
-    private void addRelGroups(Collection<RelGroupVersionBI> relGroups, boolean cprAdded, CollapsePanel cpr,
+    private void addRelGroups(Collection<RelationshipGroupVersionBI> relGroups, boolean cprAdded, CollapsePanel cpr,
             GridBagConstraints gbc)
             throws IOException, TerminologyException, ContradictionException {
         int currentRgRels = 0;
         boolean relHistoryIsShown = cpr.isShown(DragPanelComponentVersion.SubPanelTypes.HISTORY);
 
-        for (RelGroupVersionBI rg : relGroups) {
+        for (RelationshipGroupVersionBI rg : relGroups) {
             if (stop) {
                 return;
             }
 
-            Collection<? extends RelationshipChronicleBI> rgRels = rg.getRels();
+            Collection<? extends RelationshipChronicleBI> rgRels = rg.getRelationships();
 
-            if (rgRels.size() == rg.getAllCurrentRelVersions().size()) {
+            if (rgRels.size() == rg.getRelationshipsActiveAllVersions().size()) {
                 if (!rgRels.isEmpty()) {
                     if (!cprAdded) {
                         conceptPanel.add(cpr, gbc);
@@ -194,7 +194,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                     cpr.setHistoryCount(cpr.historyCount += rgc.getHistorySubpanelCount());
                     cpr.setTemplateCount(cpr.templateCount += rgc.getTemplateSubpanelCount());
                 }
-            } else if (rg.getAllCurrentRelVersions().isEmpty()) {
+            } else if (rg.getRelationshipsActiveAllVersions().isEmpty()) {
                 if (!rgRels.isEmpty()) {
                     if (!cprAdded) {
                         conceptPanel.add(cpr, gbc);
@@ -280,8 +280,8 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
 
             updateUncommitted();
             coordinate = new ViewCoordinate(config.getViewCoordinate());
-            coordinate.setRelAssertionType(RelAssertionType.STATED);
-            saps = layoutConcept.getAllSapNids();
+            coordinate.setRelationshipAssertionType(RelAssertionType.STATED);
+            saps = layoutConcept.getAllStampNids();
             positions = Ts.get().getPositionSet(saps);
             paths = Ts.get().getPathSetFromPositionSet(positions);
             positionOrderedSet.addAll(positions);
@@ -290,11 +290,11 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                 return null;
             }
 
-            coordinate.setRelAssertionType(RelAssertionType.STATED);
+            coordinate.setRelationshipAssertionType(RelAssertionType.STATED);
             statedRels = layoutConcept.getSourceRelTuples(config.getAllowedStatus(), null,
                     config.getViewPositionSetReadOnly(), config.getPrecedence(),
                     config.getConflictResolutionStrategy(), coordinate.getClassifierNid(),
-                    coordinate.getRelAssertionType());
+                    coordinate.getRelationshipAssertionType());
             removeContradictions(statedRels);
 
             if (stop) {
@@ -339,7 +339,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             inactiveStatedRels = layoutConcept.getSourceRelTuples(null, null,
                     config.getViewPositionSetReadOnly(), config.getPrecedence(),
                     config.getConflictResolutionStrategy(), coordinate.getClassifierNid(),
-                    coordinate.getRelAssertionType());
+                    coordinate.getRelationshipAssertionType());
 
             if (stop) {
                 return null;
@@ -354,18 +354,18 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             }
 
             setupRels(latch, inactiveStatedRels, inactiveStatedRelPanels, cpr, false);
-            statedRelGroups = (Collection<RelGroupVersionBI>) Ts.get().getConceptVersion(coordinate,
-                    layoutConcept.getNid()).getRelGroups();
+            statedRelGroups = (Collection<RelationshipGroupVersionBI>) Ts.get().getConceptVersion(coordinate,
+                    layoutConcept.getNid()).getRelationshipGroups();
 
             if (stop) {
                 return null;
             }
 
-            coordinate.setRelAssertionType(RelAssertionType.INFERRED);
+            coordinate.setRelationshipAssertionType(RelAssertionType.INFERRED);
             inferredRels = layoutConcept.getSourceRelTuples(config.getAllowedStatus(), null,
                     config.getViewPositionSetReadOnly(), config.getPrecedence(),
                     config.getConflictResolutionStrategy(), coordinate.getClassifierNid(),
-                    coordinate.getRelAssertionType());
+                    coordinate.getRelationshipAssertionType());
             List<ComponentVersionBI> extra = new ArrayList<ComponentVersionBI>();
             for(I_RelTuple inferredRel : inferredRels){
                 for(I_RelTuple statedRel : statedRels){
@@ -387,7 +387,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             inactiveInferredRels = layoutConcept.getSourceRelTuples(null, null,
                     config.getViewPositionSetReadOnly(), config.getPrecedence(),
                     config.getConflictResolutionStrategy(), coordinate.getClassifierNid(),
-                    coordinate.getRelAssertionType());
+                    coordinate.getRelationshipAssertionType());
 
             if (stop) {
                 return null;
@@ -410,8 +410,8 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                 return null;
             }
 
-            inferredRelGroups = (Collection<RelGroupVersionBI>) Ts.get().getConceptVersion(coordinate,
-                    layoutConcept.getNid()).getRelGroups();
+            inferredRelGroups = (Collection<RelationshipGroupVersionBI>) Ts.get().getConceptVersion(coordinate,
+                    layoutConcept.getNid()).getRelationshipGroups();
             cv = Ts.get().getConceptVersion(config.getViewCoordinate(), layoutConcept.getNid());
 
             // get refsets
@@ -540,33 +540,33 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                     gbc.gridy++;
 
                     I_TermFactory tf = Terms.get();
-                    ConAttrAnalogBI cav = null;
+                    ConceptAttributeAnalogBI cav = null;
                     try {
-                        cav = (ConAttrAnalogBI) cv.getConAttrsActive();
+                        cav = (ConceptAttributeAnalogBI) cv.getConceptAttributesActive();
                     } catch (ContradictionException ex) {
-                        Collection<? extends ComponentVersionBI> versions = cv.getConAttrs().getVersions(cv.getViewCoordinate());
+                        Collection<? extends ComponentVersionBI> versions = cv.getConceptAttributes().getVersions(cv.getViewCoordinate());
                         if (!versions.isEmpty()) {
                             removeContradictions(versions);
-                            cav = (ConAttrAnalogBI) versions.iterator().next();
+                            cav = (ConceptAttributeAnalogBI) versions.iterator().next();
                         }
                     }
                     if (cav == null) {
-                        cav = (ConAttrAnalogBI) cv.getConAttrs().getVersion(coordinate.getVcWithAllStatusValues());
+                        cav = (ConceptAttributeAnalogBI) cv.getConceptAttributes().getVersion(coordinate.getViewCoordinateWithAllStatusValues());
                     }
                     DragPanelConceptAttributes cac;
                     if (cav == null) {
-                        if (cv.getChronicle().getConAttrs() != null) {
-                            cav = (ConAttrAnalogBI) cv.getChronicle().getConAttrs().getPrimordialVersion();
-                            cac = getConAttrComponent((ConAttrAnalogBI) cav, cpe);
+                        if (cv.getChronicle().getConceptAttributes() != null) {
+                            cav = (ConceptAttributeAnalogBI) cv.getChronicle().getConceptAttributes().getPrimordialVersion();
+                            cac = getConAttrComponent((ConceptAttributeAnalogBI) cav, cpe);
                             cac.showConflicts(sapsForConflict);
                             
                             seperatorComponents.add(cac);
                             cpe.addToggleComponent(cac);
                         } else {
-                            cac = getConAttrComponent((ConAttrAnalogBI) cav, cpe);
+                            cac = getConAttrComponent((ConceptAttributeAnalogBI) cav, cpe);
                         }
                     } else {
-                        cac = getConAttrComponent((ConAttrAnalogBI) cav, cpe);
+                        cac = getConAttrComponent((ConceptAttributeAnalogBI) cav, cpe);
 
                         setShowConflicts(cav, cac);
                         seperatorComponents.add(cac);
@@ -580,10 +580,10 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
 
                     cpe.setAlertCount(0);
 
-                    if ((cav == null) || (cav.getCurrentRefexes(coordinate) == null)) {
+                    if ((cav == null) || (cav.getRefexesActive(coordinate) == null)) {
                         cpe.setRefexCount(0);
                     } else {
-                        cpe.setRefexCount(cav.getCurrentRefexes(coordinate).size());
+                        cpe.setRefexCount(cav.getRefexesActive(coordinate).size());
                     }
 
                     cpe.setHistoryCount(cac.getHistorySubpanelCount());
@@ -604,7 +604,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                                     return;
                                 }
 
-                                int refsetNid = extn.getCollectionNid();
+                                int refsetNid = extn.getRefexNid();
                                 List<? extends I_ExtendByRefPart> currentRefsets =
                                         tf.getRefsetHelper(config).getAllCurrentRefsetExtensions(refsetNid,
                                         layoutConcept.getConceptNid());
@@ -830,8 +830,8 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
 
                             Class<?> entryClass = entry.getKey().getClass();
 
-                            if (RelSpec.class.isAssignableFrom(entryClass)) {
-                                RelSpec spec = (RelSpec) entry.getKey();
+                            if (RelationshipSpec.class.isAssignableFrom(entryClass)) {
+                                RelationshipSpec spec = (RelationshipSpec) entry.getKey();
                                 DragPanelRelTemplate template = getRelTemplate(spec);
 
                                 cptemplate.addToggleComponent(template);
@@ -905,12 +905,12 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
 
         for (ComponentVersionBI cv : componentVersions) {
             if (componentCountForConflict.containsKey(cv.getNid())) {
-                componentCountForConflict.get(cv.getNid()).add(cv.getSapNid());
+                componentCountForConflict.get(cv.getNid()).add(cv.getStampNid());
                 extraVersions.add(cv);
             } else {
                 List<Integer> saptList = new ArrayList<Integer>();
 
-                saptList.add(cv.getSapNid());
+                saptList.add(cv.getStampNid());
                 componentCountForConflict.put(cv.getNid(), saptList);
             }
         }
@@ -1087,8 +1087,8 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                 pathCheck.setHorizontalAlignment(SwingConstants.RIGHT);
             }
 
-            if (pathVersion.getPreferredDescription() != null) {
-                pathCheck.setText(pathVersion.getPreferredDescription().getText());
+            if (pathVersion.getDescriptionPreferred() != null) {
+                pathCheck.setText(pathVersion.getDescriptionPreferred().getText());
             } else {
                 pathCheck.setText(pathVersion.toString());
             }
@@ -1151,7 +1151,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
     }
 
     //~--- get methods ---------------------------------------------------------
-    public DragPanelConceptAttributes getConAttrComponent(ConAttrAnalogBI conAttr,
+    public DragPanelConceptAttributes getConAttrComponent(ConceptAttributeAnalogBI conAttr,
             CollapsePanel parentCollapsePanel)
             throws TerminologyException, IOException {
         DragPanelConceptAttributes dragConAttrPanel = new DragPanelConceptAttributes(new GridBagLayout(), this,
@@ -1199,7 +1199,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         gbc.gridx++;
 
         TermComponentLabel typeLabel =
-                getLabel(desc.getDescTypeSpec().getStrict(config.getViewCoordinate()).getNid(), true);
+                getLabel(desc.getDescriptionTypeSpec().getStrict(config.getViewCoordinate()).getNid(), true);
 
         descPanel.add(typeLabel, gbc);
         typeLabel.addPropertyChangeListener("termComponent", new PropertyChangeListener() {
@@ -1207,7 +1207,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 try {
-                    desc.setDescTypeSpec(SpecFactory.get((I_GetConceptData) evt.getNewValue(),
+                    desc.setDescriptionTypeSpec(SpecFactory.get((I_GetConceptData) evt.getNewValue(),
                             config.getViewCoordinate()));
                 } catch (IOException ex) {
                     Logger.getLogger(ConceptView.class.getName()).log(Level.SEVERE, null, ex);
@@ -1224,7 +1224,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         textPane.setEditable(true);
         textPane.setOpaque(false);
         textPane.setFont(textPane.getFont().deriveFont(settings.getFontSize()));
-        textPane.setText(desc.getDescText());
+        textPane.setText(desc.getDescriptionText());
         descPanel.add(textPane, gbc);
         textPane.getDocument().addDocumentListener(new UpdateTextTemplateDocumentListener(textPane, desc,
                 config));
@@ -1315,7 +1315,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         return relPanel;
     }
 
-    public DragPanelRelGroup getRelGroupComponent(RelGroupVersionBI group, CollapsePanel parentCollapsePanel)
+    public DragPanelRelGroup getRelGroupComponent(RelationshipGroupVersionBI group, CollapsePanel parentCollapsePanel)
             throws TerminologyException, IOException, ContradictionException {
         DragPanelRelGroup relGroupPanel = new DragPanelRelGroup(new GridBagLayout(), this, parentCollapsePanel,
                 group);
@@ -1335,7 +1335,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         gbc.weightx = 0;
         gbc.weighty = 1;
         gbc.fill = GridBagConstraints.BOTH;
-        gbc.gridheight = group.getRels().size() + 1;
+        gbc.gridheight = group.getRelationships().size() + 1;
         gbc.gridwidth = 1;
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -1362,7 +1362,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
 
         HashSet<Integer> activeRelIds = new HashSet();
 
-        for (RelationshipVersionBI rv : group.getAllCurrentRelVersions()) {
+        for (RelationshipVersionBI rv : group.getRelationshipsActiveAllVersions()) {
             activeRelIds.add(rv.getNid());
 
             DragPanelRel dpr = getRelComponent(rv, parentCollapsePanel, rv.isInferred());
@@ -1381,7 +1381,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         boolean relHistoryIsShown = cpr.isShown(DragPanelComponentVersion.SubPanelTypes.HISTORY);
 
         HashSet<Integer> addedRels = new HashSet<Integer>();
-        for (RelationshipVersionBI rv : group.getAllRels()) {
+        for (RelationshipVersionBI rv : group.getRelationshipsAll()) {
             if (!activeRelIds.contains(rv.getNid()) &&
                     !addedRels.contains(rv.getNid())) {
                 addedRels.add(rv.getNid());
@@ -1405,7 +1405,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         return relGroupPanel;
     }
 
-    public DragPanelRelTemplate getRelTemplate(final RelSpec spec) throws TerminologyException, IOException {
+    public DragPanelRelTemplate getRelTemplate(final RelationshipSpec spec) throws TerminologyException, IOException {
         DragPanelRelTemplate relPanel = new DragPanelRelTemplate(new GridBagLayout(), this, spec);
 
         relPanel.setupDrag(spec);
@@ -1430,7 +1430,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.gridx++;
 
-        TermComponentLabel typeLabel = getLabel(spec.getRelTypeSpec().getStrict(coordinate).getNid(), true);
+        TermComponentLabel typeLabel = getLabel(spec.getRelationshipTypeSpec().getStrict(coordinate).getNid(), true);
 
         relPanel.add(typeLabel, gbc);
         typeLabel.addPropertyChangeListener("termComponent", new PropertyChangeListener() {
@@ -1438,7 +1438,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 try {
-                    spec.setRelTypeSpec(SpecFactory.get((I_GetConceptData) evt.getNewValue(),
+                    spec.setRelationshipTypeSpec(SpecFactory.get((I_GetConceptData) evt.getNewValue(),
                             config.getViewCoordinate()));
                 } catch (IOException ex) {
                     Logger.getLogger(ConceptView.class.getName()).log(Level.SEVERE, null, ex);
@@ -1450,7 +1450,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         gbc.weightx = 1;
         gbc.gridx++;
 
-        TermComponentLabel destLabel = getLabel(spec.getDestinationSpec().getStrict(coordinate).getNid(), true);
+        TermComponentLabel destLabel = getLabel(spec.getTargetSpec().getStrict(coordinate).getNid(), true);
 
         relPanel.add(destLabel, gbc);
         destLabel.addPropertyChangeListener("termComponent", new PropertyChangeListener() {
@@ -1458,7 +1458,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 try {
-                    spec.setDestinationSpec(SpecFactory.get((I_GetConceptData) evt.getNewValue(),
+                    spec.setTargetSpec(SpecFactory.get((I_GetConceptData) evt.getNewValue(),
                             config.getViewCoordinate()));
                 } catch (IOException ex) {
                     Logger.getLogger(ConceptView.class.getName()).log(Level.SEVERE, null, ex);
@@ -1489,18 +1489,18 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         List<DragPanelExtension> refexSubpanels = cvp.getRefexSubpanels();
         for(DragPanelExtension rp : refexSubpanels){
             RefexVersionBI<?> annot = rp.getThingToDrag();
-            if(sapsForConflict.contains(annot.getSapNid())){
+            if(sapsForConflict.contains(annot.getStampNid())){
                                 rp.showConflicts(sapsForConflict);
             }
         }
         List<DragPanelComponentVersion> hxSubpanels = cvp.getHistorySubpanels();
         for(DragPanelComponentVersion panel : hxSubpanels){
             ComponentVersionBI component = (ComponentVersionBI) panel.getThingToDrag();
-            if(sapsForConflict.contains(component.getSapNid())){
+            if(sapsForConflict.contains(component.getStampNid())){
                                 panel.showConflicts(sapsForConflict);
             }
         }
-        if(sapsForConflict.contains(cv.getSapNid())){
+        if(sapsForConflict.contains(cv.getStampNid())){
                                 cvp.showConflicts(sapsForConflict);
         }
     }
@@ -1509,10 +1509,10 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
     private class GetActionsSwingWorker extends SwingWorker<Collection<Action>, Collection<Action>> {
 
         JButton actionMenuButton;
-        RelGroupVersionBI group;
+        RelationshipGroupVersionBI group;
 
         //~--- constructors -----------------------------------------------------
-        public GetActionsSwingWorker(JButton actionMenuButton, RelGroupVersionBI group) {
+        public GetActionsSwingWorker(JButton actionMenuButton, RelationshipGroupVersionBI group) {
             this.actionMenuButton = actionMenuButton;
             this.group = group;
         }

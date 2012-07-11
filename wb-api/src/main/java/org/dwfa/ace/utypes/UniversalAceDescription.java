@@ -25,7 +25,7 @@ import java.util.UUID;
 
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
-import org.dwfa.ace.api.I_ManageContradiction;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 
@@ -53,7 +53,7 @@ public class UniversalAceDescription implements Serializable {
         UniversalAceDescription universal = new UniversalAceDescription(
         		Terms.get().getUids(desc.getDescId()), Terms.get().getUids(desc.getConceptNid()),
         		desc.versionCount());
-        for (I_DescriptionPart part : desc.getVersions((I_ManageContradiction) null)) {
+        for (I_DescriptionPart part : desc.getVersions((ContradictionManagerBI) null)) {
             UniversalAceDescriptionPart universalPart = new UniversalAceDescriptionPart();
             universalPart.setInitialCaseSignificant(part.isInitialCaseSignificant());
             universalPart.setLang(part.getLang());

@@ -399,7 +399,7 @@ public class BdbPathManager implements I_Manage<PathBI> {
                if (conceptExtension.getC1Nid() == nid) {
                   AceLog.getAppLog().severe(
                       "Self-referencing origin in path: "
-                      + pathConcept.getDescriptions().iterator().next().getFirstTuple());
+                      + pathConcept.getDescs().iterator().next().getFirstTuple());
                } else {
                   if (pathMap.containsKey(conceptExtension.getC1Nid())) {
                      result.add(new Position(conceptExtension.getIntValue(),

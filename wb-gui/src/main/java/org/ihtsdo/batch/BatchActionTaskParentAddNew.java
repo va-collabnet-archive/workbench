@@ -23,12 +23,12 @@ import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
-import org.ihtsdo.tk.api.blueprint.RelCAB;
+import org.ihtsdo.tk.api.blueprint.RelationshipCAB;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
-import org.ihtsdo.tk.dto.concept.component.relationship.TkRelType;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipType;
 
 /**
  * BatchActionTaskParentAddNew
@@ -68,10 +68,10 @@ public class BatchActionTaskParentAddNew extends BatchActionTask {
     @Override
     public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
         // Check if parent already exists and is active.
-        Collection<? extends RelationshipVersionBI> checkParents = c.getRelsOutgoingActive();
+        Collection<? extends RelationshipVersionBI> checkParents = c.getRelationshipsSourceActive();
         for (RelationshipVersionBI rvbi : checkParents) {
             if (rvbi.getTypeNid() == selectedRoleTypeNid
-                    && rvbi.getDestinationNid() == selectedDestNid
+                    && rvbi.getTargetNid() == selectedDestNid
                     && rvbi.isStated()) {
                 BatchActionEventReporter.add(new BatchActionEvent(c,
                         BatchActionTaskType.PARENT_ADD_NEW,
@@ -82,8 +82,8 @@ public class BatchActionTaskParentAddNew extends BatchActionTask {
         }
 
         // If parent does not already exist, than add a new parent record.
-        RelCAB rc = new RelCAB(c.getPrimUuid(), selectedRoleTypeUuid, selectedDestUuid,
-                0, TkRelType.STATED_HIERARCHY);
+        RelationshipCAB rc = new RelationshipCAB(c.getPrimUuid(), selectedRoleTypeUuid, selectedDestUuid,
+                0, TkRelationshipType.STATED_HIERARCHY);
         tsSnapshot.construct(rc);
 
         BatchActionEventReporter.add(new BatchActionEvent(c,

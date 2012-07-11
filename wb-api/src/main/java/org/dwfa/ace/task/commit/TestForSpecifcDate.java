@@ -53,7 +53,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
@@ -94,14 +94,14 @@ public class TestForSpecifcDate extends AbstractConceptTest {
             List<AlertToDataConstraintFailure> alerts = new ArrayList<AlertToDataConstraintFailure>();
             boolean found = false;
             
-            for (ConAttrVersionBI attr : concept.getConceptAttributes().getVersions()) {
+            for (ConceptAttributeVersionBI attr : concept.getConceptAttributes().getVersions()) {
             	long time = attr.getTime();
             	if (time == timeToCheck) {
             		found = true;
             	}
             }
             
-            for (I_DescriptionVersioned loopDesc : concept.getDescriptions()) {
+            for (I_DescriptionVersioned loopDesc : concept.getDescs()) {
             	for (DescriptionVersionBI dv : loopDesc.getVersions()) {
             		long time = dv.getTime();
             		if (time == timeToCheck) {
@@ -118,7 +118,7 @@ public class TestForSpecifcDate extends AbstractConceptTest {
             	}
             }
             
-            for (RelationshipChronicleBI loopRel : concept.getRelsOutgoing()) {
+            for (RelationshipChronicleBI loopRel : concept.getRelationshipsSource()) {
             	for (RelationshipVersionBI rv : loopRel.getVersions()) {
             		long time = rv.getTime();
             		if (time == timeToCheck) {

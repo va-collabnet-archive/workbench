@@ -56,9 +56,9 @@ import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
+import org.ihtsdo.tk.api.refex.type_string.RefexStringVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 
 /**
  * Updates dialect variant file based on text file.
@@ -102,7 +102,7 @@ public class DialectListMaintenance extends AbstractTask {
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-            vc = Ts.get().getMetadataVC();
+            vc = Ts.get().getMetadataViewCoordinate();
             ec = new EditCoordinate(config.getDbConfig().getUserConcept().getNid(),
                     config.getEditCoordinate().getModuleNid(),
                     vc.getPositionSet().getViewPathNidSet());
@@ -130,17 +130,17 @@ public class DialectListMaintenance extends AbstractTask {
                         + "Name should include either: AU, CA, UK, or US. ");
             }
             Collection<? extends RefexVersionBI<?>> currentDialectRefsetMembers =
-                    dialectRefexColl.getCurrentRefsetMembers(vc);
-            ArrayList<RefexStrVersionBI> dialectMemberList = new ArrayList<RefexStrVersionBI>();
+                    dialectRefexColl.getRefsetMembersActive(vc);
+            ArrayList<RefexStringVersionBI> dialectMemberList = new ArrayList<RefexStringVersionBI>();
             for (RefexVersionBI rv : currentDialectRefsetMembers) {
-                RefexStrVersionBI member = (RefexStrVersionBI) rv;
+                RefexStringVersionBI member = (RefexStringVersionBI) rv;
                 dialectMemberList.add(member);
             }
             Collection<? extends RefexVersionBI<?>> currentRefsetMembers =
-                    refexColl.getCurrentRefsetMembers(vc);
-            ArrayList<RefexStrVersionBI> memberList = new ArrayList<RefexStrVersionBI>();
+                    refexColl.getRefsetMembersActive(vc);
+            ArrayList<RefexStringVersionBI> memberList = new ArrayList<RefexStringVersionBI>();
             for (RefexVersionBI rv : currentRefsetMembers) {
-                RefexStrVersionBI member = (RefexStrVersionBI) rv;
+                RefexStringVersionBI member = (RefexStringVersionBI) rv;
                 memberList.add(member);
             }
             try {
@@ -159,8 +159,8 @@ public class DialectListMaintenance extends AbstractTask {
                     String variant = parts[variantIndex];
                     boolean found = false;
 
-                    for (RefexStrVersionBI member : dialectMemberList) {
-                        if (member.getStr1().equals(variant)) {
+                    for (RefexStringVersionBI member : dialectMemberList) {
+                        if (member.getString1().equals(variant)) {
                             found = true;
                             dialectMemberList.remove(member);
                             break;
@@ -171,7 +171,7 @@ public class DialectListMaintenance extends AbstractTask {
                     }
                     line = br.readLine();
                 }
-                for (RefexStrVersionBI member : dialectMemberList) {
+                for (RefexStringVersionBI member : dialectMemberList) {
                     retireMember(member, dialectRefexColl);
                 }
             } catch (EOFException ex) {
@@ -198,7 +198,7 @@ public class DialectListMaintenance extends AbstractTask {
     }
 
     private void addMember(String variant, String word) throws IOException, InvalidCAB, ContradictionException {
-        RefexCAB textRefexSpec = new RefexCAB(TK_REFSET_TYPE.STR,
+        RefexCAB textRefexSpec = new RefexCAB(TK_REFEX_TYPE.STR,
                 refexColl.getNid(), refexColl.getNid());
         textRefexSpec.with(RefexProperty.STRING1, word);
         textRefexSpec.with(RefexProperty.STATUS_NID,
@@ -207,7 +207,7 @@ public class DialectListMaintenance extends AbstractTask {
 
         RefexChronicleBI<?> textRefex = tc.constructIfNotCurrent(textRefexSpec);
 
-        RefexCAB variantRefexSpec = new RefexCAB(TK_REFSET_TYPE.STR,
+        RefexCAB variantRefexSpec = new RefexCAB(TK_REFEX_TYPE.STR,
                 textRefex.getNid(), dialectRefexColl.getNid());
 
         variantRefexSpec.with(RefexProperty.STRING1, variant);
@@ -219,7 +219,7 @@ public class DialectListMaintenance extends AbstractTask {
         Ts.get().addUncommitted(refexColl);
     }
 
-    private void retireMember(RefexStrVersionBI member, ConceptChronicleBI collConcept ) throws IOException {
+    private void retireMember(RefexStringVersionBI member, ConceptChronicleBI collConcept ) throws IOException {
         for (int pathNid : ec.getEditPaths()) {
             member.makeAnalog(
                     SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid(),

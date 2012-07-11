@@ -24,11 +24,11 @@ import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescriptionRevision;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidRevision;
-import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrMember;
-import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid.TkRefexUuidMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid.TkRefexUuidRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_string.TkRefsetStrMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_string.TkRefsetStrRevision;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 
@@ -189,8 +189,8 @@ public class UUIDChangeBasedOnMapTransformer extends AbstractTransformer {
 		relationship.setPathUuid(transformWithMap(relationship.getPathUuid()));
 		relationship.setPrimordialComponentUuid(transformWithMap(relationship.getPrimordialComponentUuid()));
 		relationship.setStatusUuid(transformWithMap(relationship.getStatusUuid()));
-		relationship.setC1Uuid(transformWithMap(relationship.getC1Uuid()));
-		relationship.setC2Uuid(transformWithMap(relationship.getC2Uuid()));
+		relationship.setC1Uuid(transformWithMap(relationship.getRelationshipSourceUuid()));
+		relationship.setC2Uuid(transformWithMap(relationship.getRelationshipTargetUuid()));
 		relationship.setCharacteristicUuid(transformWithMap(relationship.getCharacteristicUuid()));
 		relationship.setRefinabilityUuid(transformWithMap(relationship.getRefinabilityUuid()));
 		relationship.setTypeUuid(transformWithMap(relationship.getTypeUuid()));
@@ -208,32 +208,32 @@ public class UUIDChangeBasedOnMapTransformer extends AbstractTransformer {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformAnnotation(org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember, org.ihtsdo.tk.dto.concept.component.TkComponent)
+	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformAnnotation(org.ihtsdo.tk.dto.concept.component.refset.TkRefexAbstractMember, org.ihtsdo.tk.dto.concept.component.TkComponent)
 	 */
 	@Override
-	public void transformAnnotation(TkRefsetAbstractMember<?> annotation,
+	public void transformAnnotation(TkRefexAbstractMember<?> annotation,
 			TkComponent<?> component) {
                 assert annotation.pathUuid != null : annotation;
                 assert annotation.authorUuid != null : annotation;
                 assert annotation.statusUuid != null : annotation;
                 assert annotation.primordialUuid != null : annotation;
-		if (annotation instanceof TkRefsetCidMember) {
-			TkRefsetCidMember annotationCid = (TkRefsetCidMember) annotation;
+		if (annotation instanceof TkRefexUuidMember) {
+			TkRefexUuidMember annotationCid = (TkRefexUuidMember) annotation;
 			annotationCid.setAuthorUuid(transformWithMap(annotationCid.getAuthorUuid()));
                         annotationCid.setModuleUuid(transformWithMap(annotationCid.getModuleUuid()));
 			annotationCid.setPathUuid(transformWithMap(annotationCid.getPathUuid()));
 			annotationCid.setPrimordialComponentUuid(transformWithMap(annotationCid.getPrimordialComponentUuid()));
 			annotationCid.setStatusUuid(transformWithMap(annotationCid.getStatusUuid()));
-			annotationCid.setRefsetUuid(transformWithMap(annotationCid.getRefsetUuid()));
+			annotationCid.setRefsetUuid(transformWithMap(annotationCid.getRefexUuid()));
 			annotationCid.setComponentUuid(transformWithMap(annotationCid.getComponentUuid()));
-			annotationCid.setC1Uuid(transformWithMap(annotationCid.getC1Uuid()));
+			annotationCid.setUuid1(transformWithMap(annotationCid.getUuid1()));
 			if (annotationCid.getRevisions() != null) {
-				for (TkRefsetCidRevision revision : annotationCid.getRevisions()) {
+				for (TkRefexUuidRevision revision : annotationCid.getRevisions()) {
 					revision.setAuthorUuid(transformWithMap(revision.getAuthorUuid()));
                                         revision.setModuleUuid(transformWithMap(revision.getModuleUuid()));
 					revision.setPathUuid(transformWithMap(revision.getPathUuid()));
 					revision.setStatusUuid(transformWithMap(revision.getStatusUuid()));
-					revision.setC1Uuid(transformWithMap(revision.getC1Uuid()));
+					revision.setUuid1(transformWithMap(revision.getUuid1()));
 				}
 			}
 		} else if (annotation instanceof TkRefsetStrMember) {
@@ -243,7 +243,7 @@ public class UUIDChangeBasedOnMapTransformer extends AbstractTransformer {
 			annotationStr.setPathUuid(transformWithMap(annotationStr.getPathUuid()));
 			annotationStr.setPrimordialComponentUuid(transformWithMap(annotationStr.getPrimordialComponentUuid()));
 			annotationStr.setStatusUuid(transformWithMap(annotationStr.getStatusUuid()));
-			annotationStr.setRefsetUuid(transformWithMap(annotationStr.getRefsetUuid()));
+			annotationStr.setRefsetUuid(transformWithMap(annotationStr.getRefexUuid()));
 			annotationStr.setComponentUuid(transformWithMap(annotationStr.getComponentUuid()));
 			if (annotationStr.getRevisions() != null) {
 				for (TkRefsetStrRevision revision : annotationStr.getRevisions()) {
@@ -257,32 +257,32 @@ public class UUIDChangeBasedOnMapTransformer extends AbstractTransformer {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformMember(org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember, org.ihtsdo.tk.dto.concept.TkConcept)
+	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformMember(org.ihtsdo.tk.dto.concept.component.refset.TkRefexAbstractMember, org.ihtsdo.tk.dto.concept.TkConcept)
 	 */
 	@Override
-	public void transformMember(TkRefsetAbstractMember<?> member,
+	public void transformMember(TkRefexAbstractMember<?> member,
 			TkConcept concept) {
                 assert member.pathUuid != null : member;
                 assert member.authorUuid != null : member;
                 assert member.statusUuid != null : member;
                 assert member.primordialUuid != null : member;
-		if (member instanceof TkRefsetCidMember) {
-			TkRefsetCidMember memberCid = (TkRefsetCidMember) member;
+		if (member instanceof TkRefexUuidMember) {
+			TkRefexUuidMember memberCid = (TkRefexUuidMember) member;
 			memberCid.setAuthorUuid(transformWithMap(memberCid.getAuthorUuid()));
                         memberCid.setModuleUuid(transformWithMap(memberCid.getModuleUuid()));
 			memberCid.setPathUuid(transformWithMap(memberCid.getPathUuid()));
 			memberCid.setPrimordialComponentUuid(transformWithMap(memberCid.getPrimordialComponentUuid()));
 			memberCid.setStatusUuid(transformWithMap(memberCid.getStatusUuid()));
-			memberCid.setRefsetUuid(transformWithMap(memberCid.getRefsetUuid()));
+			memberCid.setRefsetUuid(transformWithMap(memberCid.getRefexUuid()));
 			memberCid.setComponentUuid(transformWithMap(memberCid.getComponentUuid()));
-			memberCid.setC1Uuid(transformWithMap(memberCid.getC1Uuid()));
+			memberCid.setUuid1(transformWithMap(memberCid.getUuid1()));
 			if (memberCid.getRevisions() != null) {
-				for (TkRefsetCidRevision revision : memberCid.getRevisions()) {
+				for (TkRefexUuidRevision revision : memberCid.getRevisions()) {
 					revision.setAuthorUuid(transformWithMap(revision.getAuthorUuid()));
                                         revision.setModuleUuid(transformWithMap(revision.getModuleUuid()));
 					revision.setPathUuid(transformWithMap(revision.getPathUuid()));
 					revision.setStatusUuid(transformWithMap(revision.getStatusUuid()));
-					revision.setC1Uuid(transformWithMap(revision.getC1Uuid()));
+					revision.setUuid1(transformWithMap(revision.getUuid1()));
 				}
 			}
 		} else if (member instanceof TkRefsetStrMember) {
@@ -292,7 +292,7 @@ public class UUIDChangeBasedOnMapTransformer extends AbstractTransformer {
 			memberStr.setPathUuid(transformWithMap(memberStr.getPathUuid()));
 			memberStr.setPrimordialComponentUuid(transformWithMap(memberStr.getPrimordialComponentUuid()));
 			memberStr.setStatusUuid(transformWithMap(memberStr.getStatusUuid()));
-			memberStr.setRefsetUuid(transformWithMap(memberStr.getRefsetUuid()));
+			memberStr.setRefsetUuid(transformWithMap(memberStr.getRefexUuid()));
 			memberStr.setComponentUuid(transformWithMap(memberStr.getComponentUuid()));
 			if (memberStr.getRevisions() != null) {
 				for (TkRefsetStrRevision revision : memberStr.getRevisions()) {

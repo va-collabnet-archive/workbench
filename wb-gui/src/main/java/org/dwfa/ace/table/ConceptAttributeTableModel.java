@@ -120,7 +120,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
                     return false;
                 }
                 I_GetConceptData b = Terms.get().getConcept(id);
-                b.getDescriptions();
+                b.getDescs();
                 concepts.put(id, b);
             }
             if (stopWork) {
@@ -180,7 +180,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
             if (refConWorker != null) {
                 refConWorker.stop();
             }
-            if ((cb == null) || (cb.getConceptAttributes() == null)) {
+            if ((cb == null) || (cb.getConAttrs() == null)) {
                 return true;
             }
             List<? extends I_ConceptAttributeTuple> tuples = getConceptTuples(cb);
@@ -374,7 +374,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
 
     private I_ConceptAttributeTuple getConceptTuple(int rowIndex) throws IOException {
         I_GetConceptData cb = (I_GetConceptData) host.getTermComponent();
-        if ((cb == null) || (cb.getConceptAttributes() == null)) {
+        if ((cb == null) || (cb.getConAttrs() == null)) {
             return null;
         }
         if (allTuples == null) {

@@ -14,7 +14,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
-import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeAnalogBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
@@ -83,7 +83,7 @@ public class UpdateIdProcessor implements ProcessUnfetchedConceptDataBI {
 			// verify and update
 			String foundId = sctidsMap.get(concept.getPrimUuid());
 			boolean addId = true;
-			for (IdBI id : concept.getConAttrs().getAllIds()) {
+			for (IdBI id : concept.getConceptAttributes().getAllIds()) {
 				if (id.getAuthorityNid() == snomedAuxIntId) {
 					Long denotation = (Long) id.getDenotation();
 					if (!denotation.equals(Long.parseLong(foundId))) {
@@ -94,7 +94,7 @@ public class UpdateIdProcessor implements ProcessUnfetchedConceptDataBI {
 				}
 			}
 			if (addId) {
-				ConAttrAnalogBI analog = (ConAttrAnalogBI) concept.getConAttrs();
+				ConceptAttributeAnalogBI analog = (ConceptAttributeAnalogBI) concept.getConceptAttributes();
 				analog.addLongId(Long.parseLong(foundId),
 						snomedAuxIntId,
 						SnomedMetadataRfx.getSTATUS_CURRENT_NID(),
@@ -110,7 +110,7 @@ public class UpdateIdProcessor implements ProcessUnfetchedConceptDataBI {
 			// verify and update
 			String foundId = snomedIdsMap.get(concept.getPrimUuid());
 			boolean addId = true;
-			for (IdBI id : concept.getConAttrs().getAllIds()) {
+			for (IdBI id : concept.getConceptAttributes().getAllIds()) {
 				if (id.getAuthorityNid() == snomedAuxRtId) {
 					String denotation = (String) id.getDenotation();
 					if (!denotation.equals(foundId)) {
@@ -139,7 +139,7 @@ public class UpdateIdProcessor implements ProcessUnfetchedConceptDataBI {
 			// verify and update
 			String foundId = ctv3IdsMap.get(concept.getPrimUuid());
 			boolean addId = true;
-			for (IdBI id : concept.getConAttrs().getAllIds()) {
+			for (IdBI id : concept.getConceptAttributes().getAllIds()) {
 				if (id.getAuthorityNid() == snomedAuxCtv3Id) {
 					String denotation = (String) id.getDenotation();
 					if (!denotation.equals(foundId)) {
@@ -163,7 +163,7 @@ public class UpdateIdProcessor implements ProcessUnfetchedConceptDataBI {
 			}
 		}
 
-		for (DescriptionChronicleBI description : concept.getDescs()) {
+		for (DescriptionChronicleBI description : concept.getDescriptions()) {
 			if (sctidsMap.containsKey(description.getPrimUuid())) {
 				// verify and update
 				String foundId = sctidsMap.get(description.getPrimUuid());
@@ -201,7 +201,7 @@ public class UpdateIdProcessor implements ProcessUnfetchedConceptDataBI {
 			}
 		}
 
-		for (RelationshipChronicleBI relationship : concept.getRelsOutgoing()) {
+		for (RelationshipChronicleBI relationship : concept.getRelationshipsSource()) {
 			if (sctidsMap.containsKey(relationship.getPrimUuid())) {
 				// verify and update
 				String foundId = sctidsMap.get(relationship.getPrimUuid());

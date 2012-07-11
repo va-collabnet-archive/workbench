@@ -26,6 +26,6 @@ import org.ihtsdo.tk.api.refex.RefexAnalogBI;
  */
 public interface RefexFloatAnalogBI<A extends RefexFloatAnalogBI<A>> extends RefexAnalogBI<A> {
     
-     void setFloat1(float f) throws PropertyVetoException;
+     void setFloat1(float float1) throws PropertyVetoException;
 
 }

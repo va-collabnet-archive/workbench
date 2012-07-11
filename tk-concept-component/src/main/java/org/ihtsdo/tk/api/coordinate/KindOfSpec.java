@@ -10,7 +10,7 @@ import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
-import org.ihtsdo.tk.example.binding.TermAux;
+import org.ihtsdo.tk.binding.snomed.TermAux;
 import org.ihtsdo.tk.hash.Hashcode;
 
 public class KindOfSpec extends IsaCoordinate {

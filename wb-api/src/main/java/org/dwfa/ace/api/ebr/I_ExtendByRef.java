@@ -21,12 +21,13 @@ import java.util.List;
 
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ManageContradiction;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 
-public interface I_ExtendByRef extends I_AmTermComponent {
+public interface I_ExtendByRef extends I_AmTermComponent{
 
     /**
      * @return <code><b>int</b></code> -- native identifier (nid) of this reference set member.<br>
@@ -86,7 +87,7 @@ public interface I_ExtendByRef extends I_AmTermComponent {
      * @throws TerminologyException
      */
     public void addTuples(I_IntSet allowedStatus, PositionSetReadOnly positions, List<I_ExtendByRefVersion> returnTuples,
-            Precedence precedence, I_ManageContradiction contradictionMgr) throws TerminologyException, IOException;
+            Precedence precedence, ContradictionManagerBI contradictionMgr) throws TerminologyException, IOException;
 
     /**
      * Retrieves tuples matching the specified allowedStatuses and positions
@@ -105,7 +106,7 @@ public interface I_ExtendByRef extends I_AmTermComponent {
      * @throws TerminologyException
      */
     public void addTuples(List<I_ExtendByRefVersion> returnTuples,
-            Precedence precedence, I_ManageContradiction contradictionMgr) throws TerminologyException, IOException;
+            Precedence precedence, ContradictionManagerBI contradictionMgr) throws TerminologyException, IOException;
 
     /**
      * Retrieves tuples matching the specified allowedStatuses and positions
@@ -125,7 +126,7 @@ public interface I_ExtendByRef extends I_AmTermComponent {
      * @throws TerminologyException
      */
     public List<? extends I_ExtendByRefVersion> getTuples(I_IntSet allowedStatus, PositionSetReadOnly positions,
-        Precedence precedence, I_ManageContradiction contradictionMgr) throws TerminologyException, IOException;
+        Precedence precedence, ContradictionManagerBI contradictionMgr) throws TerminologyException, IOException;
 
     /**
      * Retrieves tuples matching the specified allowedStatuses and positions
@@ -145,7 +146,7 @@ public interface I_ExtendByRef extends I_AmTermComponent {
      * @throws IOException
      * @throws TerminologyException
      */
-    public List<? extends I_ExtendByRefVersion> getTuples(I_ManageContradiction contradictionMgr)
+    public List<? extends I_ExtendByRefVersion> getTuples(ContradictionManagerBI contradictionMgr)
             throws TerminologyException, IOException;
 
 	public List<? extends I_ExtendByRefVersion> getTuples();

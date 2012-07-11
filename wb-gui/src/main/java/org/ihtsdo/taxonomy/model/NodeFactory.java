@@ -151,8 +151,8 @@ public class NodeFactory {
     
      
     public TaxonomyNode makeNode(int nid, TaxonomyNode parentNode) throws IOException, Exception {
-        if (model.nodeStore.containsKey(TaxonomyModel.getNodeId(nid, parentNode.getCnid()))) {
-            return model.nodeStore.get(TaxonomyModel.getNodeId(nid, parentNode.getCnid()));
+        if (model.nodeStore.containsKey(TaxonomyModel.getNodeId(nid, parentNode.getConceptNid()))) {
+            return model.nodeStore.get(TaxonomyModel.getNodeId(nid, parentNode.getConceptNid()));
         }
         
         ConceptVersionBI nodeConcept = model.ts.getConceptVersion(nid);
@@ -168,10 +168,10 @@ public class NodeFactory {
         if (model.ts.getPossibleChildren(nodeConcept.getNid()).length == 0) {
             boolean multiParent = false;
             
-            for (RelationshipVersionBI isaRel : nodeConcept.getRelsOutgoingActiveIsa()) {
+            for (RelationshipVersionBI isaRel : nodeConcept.getRelationshipsSourceActiveIsa()) {
                 if (isaRel == null || parentNode == null) {
                     continue;
-                } else if (isaRel.getDestinationNid() != parentNode.getCnid()) {
+                } else if (isaRel.getTargetNid() != parentNode.getConceptNid()) {
                     multiParent = true;
                     
                     break;
@@ -210,14 +210,14 @@ public class NodeFactory {
     
     private TaxonomyNode makeNodeFromScratch(ConceptVersionBI nodeConcept, TaxonomyNode parentNode)
             throws Exception, IOException, ContradictionException {
-        Long nodeId = TaxonomyModel.getNodeId(nodeConcept.getNid(), parentNode.getCnid());
+        Long nodeId = TaxonomyModel.getNodeId(nodeConcept.getNid(), parentNode.getConceptNid());
         TaxonomyNode existingNode = model.nodeStore.get(nodeId);
         
         if (existingNode != null) {
             return existingNode;
         }
         
-        return makeNode(nodeConcept, parentNode.getCnid(), parentNode);
+        return makeNode(nodeConcept, parentNode.getConceptNid(), parentNode);
     }
     
     public void removeDescendents(TaxonomyNode parent) {
@@ -274,7 +274,7 @@ public class NodeFactory {
     private void setExtraParents(ConceptVersionBI nodeConcept, TaxonomyNode node)
             throws ContradictionException, IOException {
         if (node.getParentNid() != Integer.MAX_VALUE) {    // test if root
-            for (ConceptVersionBI parent : nodeConcept.getRelsOutgoingDestinationsActiveIsa()) {
+            for (ConceptVersionBI parent : nodeConcept.getRelationshipsSourceTargetConceptsActiveIsa()) {
                 if (parent.getNid() != node.getParentNid()) {
                     node.setHasExtraParents(true);
                     
@@ -312,7 +312,7 @@ public class NodeFactory {
             this.dataSet = (IdentifierSet) Terms.get().getEmptyIdSet();
             this.childFilter = childFilter;
             
-            for (int cnid : Ts.get().getPossibleChildren(parentNode.getCnid(), model.ts.getViewCoordinate())) {
+            for (int cnid : Ts.get().getPossibleChildren(parentNode.getConceptNid(), model.ts.getViewCoordinate())) {
                 this.dataSet.setMember(cnid);
             }
         }
@@ -349,7 +349,7 @@ public class NodeFactory {
                     TaxonomyNode childNode = makeNodeFromScratch(possibleChild, parentNode);
                     if (parentNode.isLeaf()) {
                         TaxonomyNode oldParent = parentNode;
-                        parentNode = new InternalNode(parentNode.getCnid(), parentNode.getParentNid(),
+                        parentNode = new InternalNode(parentNode.getConceptNid(), parentNode.getParentNid(),
                                 parentNode.parentNodeId, nodeComparator);
                         model.nodeStore.remove(oldParent.getNodeId());
                         model.nodeStore.add(parentNode);
@@ -441,7 +441,7 @@ public class NodeFactory {
         @Override
         protected Object doInBackground() throws Exception {
             try {
-                ConceptVersionBI parent = model.ts.getConceptVersion(parentNode.getCnid());
+                ConceptVersionBI parent = model.ts.getConceptVersion(parentNode.getConceptNid());
                 ChildFinder dataFinder = new ChildFinder(parent, parentNode, this, childFilter);
                 Future<Object> finderFuture = childFinderExecutors.submit(dataFinder);
                 long lastPublish = System.currentTimeMillis();

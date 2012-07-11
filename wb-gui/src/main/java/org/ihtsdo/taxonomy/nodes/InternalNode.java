@@ -38,7 +38,7 @@ public class InternalNode extends TaxonomyNode {
 
    @Override
    public boolean addChild(TaxonomyNode child) {
-      Integer cnid = child.getCnid();
+      Integer cnid = child.getConceptNid();
 
       if (!this.nidNodeMap.containsKey(cnid)) {
          this.children.add(child.nodeId);

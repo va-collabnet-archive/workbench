@@ -231,7 +231,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
             }
 
             // export description refsets
-            for (I_DescriptionVersioned desc : concept.getDescriptions()) {
+            for (I_DescriptionVersioned desc : concept.getDescs()) {
                 processDescription(desc);
             }
 

@@ -7,6 +7,6 @@ import org.ihtsdo.tk.api.TypedComponentAnalogBI;
 public interface MediaAnalogBI<A extends MediaAnalogBI>
         extends TypedComponentAnalogBI, MediaVersionBI<A> {
 	
-    public void setTextDescription(String desc) throws PropertyVetoException;
+    public void setTextDescription(String text) throws PropertyVetoException;
     
 }

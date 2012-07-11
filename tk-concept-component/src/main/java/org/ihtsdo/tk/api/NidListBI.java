@@ -17,19 +17,19 @@ public interface NidListBI {
 
     public void clear();
 
-    public boolean contains(Object o);
+    public boolean contains(Object obj);
 
     public boolean containsAll(Collection<?> c);
 
     public Integer get(int index);
 
-    public int indexOf(Object o);
+    public int indexOf(Object obj);
 
     public boolean isEmpty();
 
     public Iterator<Integer> iterator();
 
-    public int lastIndexOf(Object o);
+    public int lastIndexOf(Object obj);
 
     public ListIterator<Integer> listIterator();
 
@@ -37,7 +37,7 @@ public interface NidListBI {
 
     public Integer remove(int index);
 
-    public boolean remove(Object o);
+    public boolean remove(Object obj);
 
     public boolean removeAll(Collection<?> c);
 

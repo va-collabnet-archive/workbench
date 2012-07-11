@@ -133,7 +133,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
                     return false;
                 }
                 I_GetConceptData b = Terms.get().getConcept(id);
-                b.getDescriptions();
+                b.getDescs();
                 referencedConcepts.put(id, b);
             }
             return true;

@@ -10,7 +10,7 @@ import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
-import org.ihtsdo.tk.api.blueprint.DescCAB;
+import org.ihtsdo.tk.api.blueprint.DescriptionCAB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
@@ -20,7 +20,7 @@ import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.DescFact;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
 public class NewLangSynonymAction extends AbstractAction {
@@ -46,7 +46,7 @@ public class NewLangSynonymAction extends AbstractAction {
             TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
                     config.getViewCoordinate());
             int prefNid = SnomedMetadataRfx.getDESC_PREFERRED_NID();
-            DescCAB descBp = new DescCAB(desc.getConceptNid(), 
+            DescriptionCAB descBp = new DescriptionCAB(desc.getConceptNid(), 
                     SnomedMetadataRfx.getDES_SYNONYM_NID(),
                     lang,
                     "Clone of " + desc.getText(),
@@ -54,7 +54,7 @@ public class NewLangSynonymAction extends AbstractAction {
             descBp.setComponentUuidNoRecompute(UUID.randomUUID());
             DescriptionChronicleBI dc = builder.construct(descBp);
             DescriptionVersionBI dv = dc.getVersion(config.getViewCoordinate());
-            RefexCAB refexBp = new RefexCAB(TK_REFSET_TYPE.CID,
+            RefexCAB refexBp = new RefexCAB(TK_REFEX_TYPE.CID,
                     dv.getNid(), 
                     refex.getStrict(config.getViewCoordinate()).getConceptNid());
             refexBp.put(RefexProperty.CNID1, SnomedMetadataRfx.getDESC_ACCEPTABLE_NID());

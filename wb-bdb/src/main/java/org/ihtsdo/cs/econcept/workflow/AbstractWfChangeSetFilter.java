@@ -10,7 +10,7 @@ import java.util.logging.Level;
 
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 
 public abstract class AbstractWfChangeSetFilter implements I_WfChangeSetScrubber {
 	// Have single Logfile set containing single collection with one log file per filter 
@@ -20,8 +20,8 @@ public abstract class AbstractWfChangeSetFilter implements I_WfChangeSetScrubber
 	private final boolean loggingOn = false;
 
 	// Not logging-specific variables
-	protected HashSet<TkRefsetAbstractMember<?>>  wfMembersToProcess = new HashSet<TkRefsetAbstractMember<?>>();
-	protected HashSet<TkRefsetAbstractMember<?>>  wfMembersToIgnore = new HashSet<TkRefsetAbstractMember<?>>();
+	protected HashSet<TkRefexAbstractMember<?>>  wfMembersToProcess = new HashSet<TkRefexAbstractMember<?>>();
+	protected HashSet<TkRefexAbstractMember<?>>  wfMembersToIgnore = new HashSet<TkRefexAbstractMember<?>>();
 
 	
 	AbstractWfChangeSetFilter(String fileName) {
@@ -48,7 +48,7 @@ public abstract class AbstractWfChangeSetFilter implements I_WfChangeSetScrubber
 	}
 		
 	// Logging methods below
-	protected void printError(TkRefsetAbstractMember<?> member) {
+	protected void printError(TkRefexAbstractMember<?> member) {
 		if (loggingOn) {
 			try {
 				logFiles.get(filePath).append("Error Member: " + member);

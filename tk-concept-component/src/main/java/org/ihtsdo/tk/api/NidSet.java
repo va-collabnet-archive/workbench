@@ -69,11 +69,11 @@ public class NidSet implements NidSetBI, Serializable {
         this.setValues = new int[0];
     }
 
-    public NidSet(Collection<PathBI> pathSet) {
+    public NidSet(Collection<PathBI> paths) {
         super();
-        setValues = new int[pathSet.size()];
+        setValues = new int[paths.size()];
         int i = 0;
-        for (PathBI p : pathSet) {
+        for (PathBI p : paths) {
             setValues[i++] = p.getConceptNid();
         }
         Arrays.sort(setValues);
@@ -171,10 +171,10 @@ public class NidSet implements NidSetBI, Serializable {
         return members;
     }
 
-    public void replaceWithSet(HashSet<Integer> members) {
-        setValues = new int[members.size()];
+    public void replaceWithSet(HashSet<Integer> nids) {
+        setValues = new int[nids.size()];
         int i = 0;
-        for (int elem : members) {
+        for (int elem : nids) {
             setValues[i++] = elem;
         }
         Arrays.sort(setValues);

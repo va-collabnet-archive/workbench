@@ -71,7 +71,7 @@ public class AskForConceptName extends JPanel {
 			String parentName="";
 			try {
 			
-				Collection<? extends I_DescriptionVersioned> descTuples = ((I_GetConceptData)parents.get(i)).getDescriptions();
+				Collection<? extends I_DescriptionVersioned> descTuples = ((I_GetConceptData)parents.get(i)).getDescs();
 				if (!descTuples.isEmpty()) {
 					for (I_DescriptionVersioned d:descTuples){
 						int pos=d.getText().lastIndexOf("(");

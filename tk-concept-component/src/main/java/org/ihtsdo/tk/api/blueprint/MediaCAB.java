@@ -58,26 +58,26 @@ public class MediaCAB extends CreateOrAmendBlueprint {
 
     public MediaCAB(
             int conceptNid, int typeNid, String format, String textDescription,
-            byte[] dataBytes, MediaVersionBI media, ViewCoordinate vc)
+            byte[] dataBytes, MediaVersionBI mediaVersion, ViewCoordinate viewCoordinate)
             throws IOException, InvalidCAB, ContradictionException {
         this(Ts.get().getComponent(conceptNid).getPrimUuid(),
                 Ts.get().getComponent(typeNid).getPrimUuid(),
-                format, textDescription, dataBytes, media, vc);
+                format, textDescription, dataBytes, mediaVersion, viewCoordinate);
     }
 
     public MediaCAB(
             UUID conceptUuid, UUID typeUuid, String format, String textDescription,
-            byte[] dataBytes, MediaVersionBI media, ViewCoordinate vc)
+            byte[] dataBytes, MediaVersionBI mediaVersion, ViewCoordinate viewCoordinate)
             throws IOException, InvalidCAB, ContradictionException {
         this(conceptUuid, typeUuid, format, textDescription, dataBytes,
-                null, media, vc);
+                null, mediaVersion, viewCoordinate);
     }
 
     public MediaCAB(
             UUID conceptUuid, UUID typeUuid, String format, String textDescription,
-            byte[] dataBytes, UUID componentUuid, MediaVersionBI media,
-            ViewCoordinate vc) throws IOException, InvalidCAB, ContradictionException {
-        super(componentUuid, media, vc);
+            byte[] dataBytes, UUID componentUuid, MediaVersionBI mediaVersion,
+            ViewCoordinate viewCoordinate) throws IOException, InvalidCAB, ContradictionException {
+        super(componentUuid, mediaVersion, viewCoordinate);
 
         this.conceptUuid = conceptUuid;
         this.typeUuid = typeUuid;
@@ -101,7 +101,7 @@ public class MediaCAB extends CreateOrAmendBlueprint {
     public void recomputeUuid() throws NoSuchAlgorithmException, IOException, InvalidCAB, ContradictionException {
         setComponentUuid(
                 UuidT5Generator.get(mediaSpecNamespace,
-                getPrimoridalUuidStr(conceptUuid)
+                getPrimoridalUuidString(conceptUuid)
                 + dataBytes));
         for(RefexCAB annotBp: getAnnotationBlueprints()){
             annotBp.setReferencedComponentUuid(getComponentUuid());
@@ -141,26 +141,26 @@ public class MediaCAB extends CreateOrAmendBlueprint {
         this.conceptUuid = conceptNewUuid;
     }
 
-    public boolean validate(MediaVersionBI version) throws IOException {
-        if (version.getStatusNid() != getStatusNid()) {
+    public boolean validate(MediaVersionBI mediaVersion) throws IOException {
+        if (mediaVersion.getStatusNid() != getStatusNid()) {
             return false;
         }
-        if (version.getNid() != getComponentNid()) {
+        if (mediaVersion.getNid() != getComponentNid()) {
             return false;
         }
-        if (version.getConceptNid() != getConceptNid()) {
+        if (mediaVersion.getConceptNid() != getConceptNid()) {
             return false;
         }
-        if (version.getTypeNid() != getTypeNid()) {
+        if (mediaVersion.getTypeNid() != getTypeNid()) {
             return false;
         }
-        if (!version.getFormat().equals(getFormat())) {
+        if (!mediaVersion.getFormat().equals(getFormat())) {
             return false;
         }
-        if (!version.getTextDescription().equals(getTextDescription())) {
+        if (!mediaVersion.getTextDescription().equals(getTextDescription())) {
             return false;
         }
-        if (!Arrays.equals(version.getMedia(), getDataBytes())) {
+        if (!Arrays.equals(mediaVersion.getMedia(), getDataBytes())) {
             return false;
         }
         return true;

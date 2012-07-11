@@ -23,11 +23,11 @@ import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.api.refex.type_cnid_str.RefexCnidStrAnalogBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidstr.TkRefsetCidStrMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidstr.TkRefsetCidStrRevision;
+import org.ihtsdo.tk.api.refex.type_nid_string.RefexNidStringAnalogBI;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_string.TkRefexUuidStringMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_string.TkRefexUuidStringRevision;
 import org.ihtsdo.tk.hash.Hashcode;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -38,11 +38,11 @@ import java.io.IOException;
 
 import java.util.*;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid_str.RefexCnidStrVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid_string.RefexNidStringVersionBI;
 import org.ihtsdo.tk.dto.RevisionHandling;
 
 public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember>
-        implements I_ExtendByRefPartCidString<CidStrRevision>, RefexCnidStrAnalogBI<CidStrRevision> {
+        implements I_ExtendByRefPartCidString<CidStrRevision>, RefexNidStringAnalogBI<CidStrRevision> {
    private static VersionComputer<RefsetMember<CidStrRevision, CidStrMember>.Version> computer =
       new VersionComputer<RefsetMember<CidStrRevision, CidStrMember>.Version>();
 
@@ -61,15 +61,15 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember>
       super(enclosingConceptNid, input);
    }
 
-   public CidStrMember(TkRefsetCidStrMember refsetMember, int enclosingConceptNid) throws IOException {
+   public CidStrMember(TkRefexUuidStringMember refsetMember, int enclosingConceptNid) throws IOException {
       super(refsetMember, enclosingConceptNid);
-      c1Nid    = Bdb.uuidToNid(refsetMember.getC1Uuid());
-      strValue = refsetMember.getStrValue();
+      c1Nid    = Bdb.uuidToNid(refsetMember.getUuid1());
+      strValue = refsetMember.getString1();
 
       if (refsetMember.getRevisionList() != null) {
          revisions = new RevisionSet<CidStrRevision, CidStrMember>(primordialSapNid);
 
-         for (TkRefsetCidStrRevision eVersion : refsetMember.getRevisionList()) {
+         for (TkRefexUuidStringRevision eVersion : refsetMember.getRevisionList()) {
             revisions.add(new CidStrRevision(eVersion, this));
          }
       }
@@ -84,8 +84,8 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember>
 
    @Override
    protected void addSpecProperties(RefexCAB rcs) {
-      rcs.with(RefexProperty.CNID1, getCnid1());
-      rcs.with(RefexProperty.STRING1, getStr1());
+      rcs.with(RefexProperty.CNID1, getNid1());
+      rcs.with(RefexProperty.STRING1, getString1());
    }
 
    @Override
@@ -142,9 +142,9 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember>
    
    @Override
     public boolean refexFieldsEqual(RefexVersionBI another) {
-        if(RefexCnidStrVersionBI.class.isAssignableFrom(another.getClass())){
-            RefexCnidStrVersionBI cv = (RefexCnidStrVersionBI) another;
-            return (this.c1Nid == cv.getCnid1()) && this.strValue.equals(cv.getStr1());
+        if(RefexNidStringVersionBI.class.isAssignableFrom(another.getClass())){
+            RefexNidStringVersionBI cv = (RefexNidStringVersionBI) another;
+            return (this.c1Nid == cv.getNid1()) && this.strValue.equals(cv.getString1());
         }
         return false;
     }
@@ -203,12 +203,12 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember>
    }
 
    @Override
-   public int getCnid1() {
+   public int getNid1() {
       return c1Nid;
    }
 
    @Override
-   public String getStr1() {
+   public String getString1() {
       return strValue;
    }
 
@@ -218,15 +218,15 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember>
    }
 
    @Override
-   public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
+   public TkRefexAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
            Map<UUID, UUID> conversionMap)
            throws ContradictionException, IOException {
-      return new TkRefsetCidStrMember(this, exclusionSet, conversionMap, 0, true, vc);
+      return new TkRefexUuidStringMember(this, exclusionSet, conversionMap, 0, true, vc);
    }
 
    @Override
-   protected TK_REFSET_TYPE getTkRefsetType() {
-      return TK_REFSET_TYPE.CID_STR;
+   protected TK_REFEX_TYPE getTkRefsetType() {
+      return TK_REFEX_TYPE.CID_STR;
    }
 
    @Override
@@ -265,7 +265,7 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember>
          }
 
          if (revisions != null) {
-            for (RefexCnidStrAnalogBI r : revisions) {
+            for (RefexNidStringAnalogBI r : revisions) {
                if (r.getTime() != Long.MIN_VALUE) {
                   list.add(new Version(r));
                }
@@ -291,13 +291,13 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember>
    }
 
    @Override
-   public void setCnid1(int cnid) throws PropertyVetoException {
+   public void setNid1(int cnid) throws PropertyVetoException {
       this.c1Nid = cnid;
       modified();
    }
 
    @Override
-   public void setStr1(String str) throws PropertyVetoException {
+   public void setString1(String str) throws PropertyVetoException {
       this.strValue = str;
       modified();
    }
@@ -312,8 +312,8 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember>
 
    public class Version extends RefsetMember<CidStrRevision, CidStrMember>.Version
            implements I_ExtendByRefVersion<CidStrRevision>, I_ExtendByRefPartCidString<CidStrRevision>,
-                      RefexCnidStrAnalogBI<CidStrRevision> {
-      private Version(RefexCnidStrAnalogBI cv) {
+                      RefexNidStringAnalogBI<CidStrRevision> {
+      private Version(RefexNidStringAnalogBI cv) {
          super(cv);
       }
 
@@ -351,21 +351,21 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember>
 
       @Override
       public int getC1id() {
-         return getCv().getCnid1();
+         return getCv().getNid1();
       }
 
       @Override
-      public int getCnid1() {
-         return getCv().getCnid1();
+      public int getNid1() {
+         return getCv().getNid1();
       }
 
-      RefexCnidStrAnalogBI getCv() {
-         return (RefexCnidStrAnalogBI) cv;
+      RefexNidStringAnalogBI getCv() {
+         return (RefexNidStringAnalogBI) cv;
       }
 
       @Override
-      public TkRefsetCidStrMember getERefsetMember() throws IOException {
-         return new TkRefsetCidStrMember(this, RevisionHandling.EXCLUDE_REVISIONS);
+      public TkRefexUuidStringMember getERefsetMember() throws IOException {
+         return new TkRefexUuidStringMember(this, RevisionHandling.EXCLUDE_REVISIONS);
       }
 
       @Override
@@ -374,35 +374,35 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember>
       }
 
       @Override
-      public String getStr1() {
-         return getCv().getStr1();
+      public String getString1() {
+         return getCv().getString1();
       }
 
       @Override
       public String getStringValue() {
-         return getCv().getStr1();
+         return getCv().getString1();
       }
 
       //~--- set methods ------------------------------------------------------
 
       @Override
       public void setC1id(int c1id) throws PropertyVetoException {
-         getCv().setCnid1(c1id);
+         getCv().setNid1(c1id);
       }
 
       @Override
-      public void setCnid1(int c1id) throws PropertyVetoException {
-         getCv().setCnid1(c1id);
+      public void setNid1(int c1id) throws PropertyVetoException {
+         getCv().setNid1(c1id);
       }
 
       @Override
-      public void setStr1(String value) throws PropertyVetoException {
-         getCv().setStr1(value);
+      public void setString1(String value) throws PropertyVetoException {
+         getCv().setString1(value);
       }
 
       @Override
       public void setStringValue(String value) throws PropertyVetoException {
-         getCv().setStr1(value);
+         getCv().setString1(value);
       }
    }
 }

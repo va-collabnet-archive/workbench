@@ -300,7 +300,7 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
     private HashMap<UUID, String> getComputedAthMap(ConceptVersionBI concept, boolean skipExtra)
             throws NoSuchAlgorithmException, UnsupportedEncodingException, IOException {
         HashMap<UUID, String> conceptComputedAthMap = new HashMap<UUID, String>();
-        for (Integer sap : concept.getAllSapNids()) {
+        for (Integer sap : concept.getAllStampNids()) {
             if (sap == Integer.MIN_VALUE) {
                 continue;
             }
@@ -309,7 +309,7 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
                 continue;
             }
             // COMPUTE AUTHOR_TIME_UUID5
-            int authorNid = Ts.get().getAuthorNidForSapNid(sap);
+            int authorNid = Ts.get().getAuthorNidForStampNid(sap);
             // SKIP EXTRA AUTHORS WHICH ARE NOT SYNCHRONIZED
             if (skipExtra && (authorNid == snorocketAuthorNid
                     || authorNid == userAuthorNid
@@ -317,7 +317,7 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
                 continue;
             }
             ConceptChronicleBI authorConcept = Ts.get().getConcept(authorNid);
-            long time = Ts.get().getTimeForSapNid(sap);
+            long time = Ts.get().getTimeForStampNid(sap);
             String str = authorConcept.getPrimUuid().toString() + Long.toString(time);
             UUID type5Uuid = UuidT5Generator.get(UuidT5Generator.AUTHOR_TIME_ID, str);
 
@@ -376,7 +376,7 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
             }
         }
         ConceptChronicleBI concept = Ts.get().getConcept(cNid);
-        componentNids.addAll(concept.getAllNidsForSaps(conflictSaps));
+        componentNids.addAll(concept.getAllNidsForStamps(conflictSaps));
         return componentNids;
     }
 

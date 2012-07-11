@@ -55,7 +55,7 @@ public class BatchActionTaskSimpleTest {
     public void batchActionTaskTest() {
         try {
             // :!!!: yank vc comment if not needed to create second type of exception.
-            // ViewCoordinate vc = Ts.get().getMetadataVC();
+            // ViewCoordinate vc = Ts.get().getMetadataViewCoordinate();
             I_ConfigAceFrame profile = NewDefaultProfile.newProfile("", "", "", "", "");
             int pathNid = ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.localize().getNid();
             int userNid = ArchitectonicAuxiliary.Concept.USER.localize().getNid();

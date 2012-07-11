@@ -25,18 +25,18 @@ import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
-import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 import org.ihtsdo.tk.api.refex.type_int.RefexIntVersionBI;
-import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
+import org.ihtsdo.tk.api.refex.type_string.RefexStringVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.drools.facts.ComponentFact;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
@@ -57,7 +57,7 @@ public class CloneAction extends AbstractAction {
         try {
             I_GetConceptData concept = Terms.get().getConceptForNid(component.getNid());
             Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
-            if (ConAttrVersionBI.class.isAssignableFrom(component.getClass())) {
+            if (ConceptAttributeVersionBI.class.isAssignableFrom(component.getClass())) {
                 throw new UnsupportedOperationException();
             }
             if (ConceptVersionBI.class.isAssignableFrom(component.getClass())) {
@@ -65,7 +65,7 @@ public class CloneAction extends AbstractAction {
             }
             if (DescriptionVersionBI.class.isAssignableFrom(component.getClass())) {
                 DescriptionVersionBI desc = (DescriptionVersionBI) component;
-                Collection<? extends RefexVersionBI<?>> oldRefexes = desc.getCurrentRefexes(config.getViewCoordinate());
+                Collection<? extends RefexVersionBI<?>> oldRefexes = desc.getRefexesActive(config.getViewCoordinate());
                 I_DescriptionVersioned newDesc = Terms.get().newDescription(UUID.randomUUID(), concept,
                         desc.getLang(), desc.getText(), Terms.get().getConcept(desc.getTypeNid()),
                         config, Terms.get().getConcept(desc.getStatusNid()), Long.MAX_VALUE);
@@ -74,40 +74,40 @@ public class CloneAction extends AbstractAction {
                         config.getViewCoordinate());
                 int dosNid = SnomedMetadataRfx.getSYNONYMY_REFEX_NID();
                 for (RefexVersionBI refex : oldRefexes) {
-                    if (refex.getCollectionNid() != dosNid) { //not cloning degree of synonymy refeset membership
+                    if (refex.getRefexNid() != dosNid) { //not cloning degree of synonymy refeset membership
                         RefexCAB newSpec;
-                        if (RefexCnidVersionBI.class.isAssignableFrom(refex.getClass())) {
+                        if (RefexNidVersionBI.class.isAssignableFrom(refex.getClass())) {
                             newSpec = new RefexCAB(
-                                TK_REFSET_TYPE.CID,
+                                TK_REFEX_TYPE.CID,
                                 newDesc.getNid(),
-                                refex.getCollectionNid());
-                            RefexCnidVersionBI cv =
-                                    (RefexCnidVersionBI) refex.getVersion(config.getViewCoordinate());
-                            int typeNid = cv.getCnid1();
+                                refex.getRefexNid());
+                            RefexNidVersionBI cv =
+                                    (RefexNidVersionBI) refex.getVersion(config.getViewCoordinate());
+                            int typeNid = cv.getNid1();
                             newSpec.put(RefexProperty.CNID1, typeNid);
                         } else if(RefexBooleanVersionBI.class.isAssignableFrom(refex.getClass())){
                             newSpec = new RefexCAB(
-                                TK_REFSET_TYPE.BOOLEAN,
+                                TK_REFEX_TYPE.BOOLEAN,
                                 newDesc.getNid(),
-                                refex.getCollectionNid());
+                                refex.getRefexNid());
                             RefexBooleanVersionBI bv =
                                     (RefexBooleanVersionBI) refex.getVersion(config.getViewCoordinate());
                             boolean boolean1 = bv.getBoolean1();
                             newSpec.put(RefexProperty.BOOLEAN1, boolean1);
-                        } else if (RefexStrVersionBI.class.isAssignableFrom(refex.getClass())){
+                        } else if (RefexStringVersionBI.class.isAssignableFrom(refex.getClass())){
                             newSpec = new RefexCAB(
-                                TK_REFSET_TYPE.STR,
+                                TK_REFEX_TYPE.STR,
                                 newDesc.getNid(),
-                                refex.getCollectionNid());
-                            RefexStrVersionBI sv =
-                                    (RefexStrVersionBI) refex.getVersion(config.getViewCoordinate());
-                            String string1 = sv.getStr1();
+                                refex.getRefexNid());
+                            RefexStringVersionBI sv =
+                                    (RefexStringVersionBI) refex.getVersion(config.getViewCoordinate());
+                            String string1 = sv.getString1();
                             newSpec.put(RefexProperty.STRING1, string1);
                         } else if(RefexIntVersionBI.class.isAssignableFrom(refex.getClass())){
                             newSpec = new RefexCAB(
-                                TK_REFSET_TYPE.INT,
+                                TK_REFEX_TYPE.INT,
                                 newDesc.getNid(),
-                                refex.getCollectionNid());
+                                refex.getRefexNid());
                             RefexIntVersionBI iv =
                                     (RefexIntVersionBI) refex.getVersion(config.getViewCoordinate());
                             int int1 = iv.getInt1();
@@ -129,7 +129,7 @@ public class CloneAction extends AbstractAction {
                 RelationshipVersionBI rel = (RelationshipVersionBI) component;
                 I_RelVersioned newRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(), concept,
                         rel.getTypeNid(),
-                        rel.getDestinationNid(),
+                        rel.getTargetNid(),
                         rel.getCharacteristicNid(),
                         rel.getRefinabilityNid(),
                         rel.getGroup(),

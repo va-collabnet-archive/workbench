@@ -18,11 +18,11 @@ import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
-import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanMember;
-import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanRevision;
-import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_boolean.TkRefexBooleanMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_boolean.TkRefexBooleanRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid.TkRefexUuidMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid.TkRefexUuidRevision;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 
 /**
@@ -199,8 +199,8 @@ public class EnumeratedToBooleanTransformer extends AbstractTransformer {
 			UUID booleanTypeId = RefsetAuxiliary.Concept.BOOLEAN_EXTENSION.getPrimoridalUid();
 
 			if (relationship.getTypeUuid().equals(refsetTypeRelId) && 
-					relationship.getC2Uuid().equals(cidTypeId) &&
-					relationship.getC1Uuid().equals(refsetUuid)) {
+					relationship.getRelationshipTargetUuid().equals(cidTypeId) &&
+					relationship.getRelationshipSourceUuid().equals(refsetUuid)) {
 				relationship.setC2Uuid(booleanTypeId);
 			}
 		} catch (IOException e) {
@@ -211,15 +211,15 @@ public class EnumeratedToBooleanTransformer extends AbstractTransformer {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformAnnotation(org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember, org.ihtsdo.tk.dto.concept.component.TkComponent)
+	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformAnnotation(org.ihtsdo.tk.dto.concept.component.refset.TkRefexAbstractMember, org.ihtsdo.tk.dto.concept.component.TkComponent)
 	 */
 	@Override
-	public void transformAnnotation(TkRefsetAbstractMember<?> annotation,
+	public void transformAnnotation(TkRefexAbstractMember<?> annotation,
 			TkComponent<?> component) {
-		if (annotation.getRefsetUuid().equals(refsetUuid)) {
-			if (annotation.getRefsetUuid().equals(refsetUuid)) {
-				TkRefsetCidMember cid1Member = (TkRefsetCidMember) annotation;
-				TkRefsetBooleanMember booleanMember = new TkRefsetBooleanMember();
+		if (annotation.getRefexUuid().equals(refsetUuid)) {
+			if (annotation.getRefexUuid().equals(refsetUuid)) {
+				TkRefexUuidMember cid1Member = (TkRefexUuidMember) annotation;
+				TkRefexBooleanMember booleanMember = new TkRefexBooleanMember();
 
 				booleanMember.setAdditionalIdComponents(cid1Member.getAdditionalIdComponents());
 				booleanMember.setAnnotations(cid1Member.getAnnotations());
@@ -228,30 +228,30 @@ public class EnumeratedToBooleanTransformer extends AbstractTransformer {
 				booleanMember.setComponentUuid(cid1Member.getComponentUuid());
 				booleanMember.setPathUuid(cid1Member.getPathUuid());
 				booleanMember.setPrimordialComponentUuid(cid1Member.getPrimordialComponentUuid());
-				booleanMember.setRefsetUuid(cid1Member.getRefsetUuid());
+				booleanMember.setRefsetUuid(cid1Member.getRefexUuid());
 				booleanMember.setStatusUuid(cid1Member.getStatusUuid());
 				booleanMember.setTime(cid1Member.getTime());
 
-				if (valuesForTrue.contains(cid1Member.getC1Uuid())) {
-					booleanMember.setBooleanValue(true);
-				} else if (valuesForFalse.contains(cid1Member.getC1Uuid())) {
-					booleanMember.setBooleanValue(false);
+				if (valuesForTrue.contains(cid1Member.getUuid1())) {
+					booleanMember.setBoolean1(true);
+				} else if (valuesForFalse.contains(cid1Member.getUuid1())) {
+					booleanMember.setBoolean1(false);
 				} else {
-					booleanMember.setBooleanValue(defaultValue);
+					booleanMember.setBoolean1(defaultValue);
 				}
 
-				booleanMember.setRevisions(new ArrayList<TkRefsetBooleanRevision>());
+				booleanMember.setRevisions(new ArrayList<TkRefexBooleanRevision>());
 				if (cid1Member.getRevisions() != null) {
-					for (TkRefsetCidRevision cidRevision : cid1Member.getRevisions()) {
-						TkRefsetBooleanRevision booleanRevision = new TkRefsetBooleanRevision();
+					for (TkRefexUuidRevision cidRevision : cid1Member.getRevisions()) {
+						TkRefexBooleanRevision booleanRevision = new TkRefexBooleanRevision();
 						booleanRevision.setAuthorUuid(cidRevision.getAuthorUuid());
                                                 booleanRevision.setModuleUuid(cidRevision.getModuleUuid());
-						if (valuesForTrue.contains(cidRevision.getC1Uuid())) {
-							booleanRevision.setBooleanValue(true);
-						} else if (valuesForFalse.contains(cidRevision.getC1Uuid())) {
-							booleanRevision.setBooleanValue(false);
+						if (valuesForTrue.contains(cidRevision.getUuid1())) {
+							booleanRevision.setBoolean1(true);
+						} else if (valuesForFalse.contains(cidRevision.getUuid1())) {
+							booleanRevision.setBoolean1(false);
 						} else {
-							booleanRevision.setBooleanValue(defaultValue);
+							booleanRevision.setBoolean1(defaultValue);
 						}
 						booleanRevision.setPathUuid(cidRevision.getPathUuid());
 						booleanRevision.setStatusUuid(cidRevision.getStatusUuid());
@@ -274,14 +274,14 @@ public class EnumeratedToBooleanTransformer extends AbstractTransformer {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformMember(org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember, org.ihtsdo.tk.dto.concept.TkConcept)
+	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformMember(org.ihtsdo.tk.dto.concept.component.refset.TkRefexAbstractMember, org.ihtsdo.tk.dto.concept.TkConcept)
 	 */
 	@Override
-	public void transformMember(TkRefsetAbstractMember<?> member,
+	public void transformMember(TkRefexAbstractMember<?> member,
 			TkConcept concept) {
-		if (member.getRefsetUuid().equals(refsetUuid)) {
-			TkRefsetCidMember cid1Member = (TkRefsetCidMember) member;
-			TkRefsetBooleanMember booleanMember = new TkRefsetBooleanMember();
+		if (member.getRefexUuid().equals(refsetUuid)) {
+			TkRefexUuidMember cid1Member = (TkRefexUuidMember) member;
+			TkRefexBooleanMember booleanMember = new TkRefexBooleanMember();
 
 			booleanMember.setAdditionalIdComponents(cid1Member.getAdditionalIdComponents());
 			booleanMember.setAnnotations(cid1Member.getAnnotations());
@@ -290,30 +290,30 @@ public class EnumeratedToBooleanTransformer extends AbstractTransformer {
 			booleanMember.setComponentUuid(cid1Member.getComponentUuid());
 			booleanMember.setPathUuid(cid1Member.getPathUuid());
 			booleanMember.setPrimordialComponentUuid(cid1Member.getPrimordialComponentUuid());
-			booleanMember.setRefsetUuid(cid1Member.getRefsetUuid());
+			booleanMember.setRefsetUuid(cid1Member.getRefexUuid());
 			booleanMember.setStatusUuid(cid1Member.getStatusUuid());
 			booleanMember.setTime(cid1Member.getTime());
 
-			if (valuesForTrue.contains(cid1Member.getC1Uuid())) {
-				booleanMember.setBooleanValue(true);
-			} else if (valuesForFalse.contains(cid1Member.getC1Uuid())) {
-				booleanMember.setBooleanValue(false);
+			if (valuesForTrue.contains(cid1Member.getUuid1())) {
+				booleanMember.setBoolean1(true);
+			} else if (valuesForFalse.contains(cid1Member.getUuid1())) {
+				booleanMember.setBoolean1(false);
 			} else {
-				booleanMember.setBooleanValue(defaultValue);
+				booleanMember.setBoolean1(defaultValue);
 			}
 
-			booleanMember.setRevisions(new ArrayList<TkRefsetBooleanRevision>());
+			booleanMember.setRevisions(new ArrayList<TkRefexBooleanRevision>());
 			if (cid1Member.getRevisions() != null) {
-				for (TkRefsetCidRevision cidRevision : cid1Member.getRevisions()) {
-					TkRefsetBooleanRevision booleanRevision = new TkRefsetBooleanRevision();
+				for (TkRefexUuidRevision cidRevision : cid1Member.getRevisions()) {
+					TkRefexBooleanRevision booleanRevision = new TkRefexBooleanRevision();
 					booleanRevision.setAuthorUuid(cidRevision.getAuthorUuid());
                                         booleanMember.setModuleUuid(cidRevision.getModuleUuid());
-					if (valuesForTrue.contains(cidRevision.getC1Uuid())) {
-						booleanRevision.setBooleanValue(true);
-					} else if (valuesForFalse.contains(cidRevision.getC1Uuid())) {
-						booleanRevision.setBooleanValue(false);
+					if (valuesForTrue.contains(cidRevision.getUuid1())) {
+						booleanRevision.setBoolean1(true);
+					} else if (valuesForFalse.contains(cidRevision.getUuid1())) {
+						booleanRevision.setBoolean1(false);
 					} else {
-						booleanRevision.setBooleanValue(defaultValue);
+						booleanRevision.setBoolean1(defaultValue);
 					}
 					booleanRevision.setPathUuid(cidRevision.getPathUuid());
 					booleanRevision.setStatusUuid(cidRevision.getStatusUuid());

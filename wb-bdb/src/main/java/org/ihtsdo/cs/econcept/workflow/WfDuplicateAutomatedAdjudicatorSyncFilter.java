@@ -10,7 +10,7 @@ import java.util.logging.Level;
 
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.workflow.refset.WorkflowRefset;
 import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetReader;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetReader;
@@ -30,7 +30,7 @@ public class WfDuplicateAutomatedAdjudicatorSyncFilter extends AbstractWfChangeS
 	}
 
 	@Override
-	public boolean scrubMembers(HashSet<TkRefsetAbstractMember<?>> wfMembersToCommit) {
+	public boolean scrubMembers(HashSet<TkRefexAbstractMember<?>> wfMembersToCommit) {
 		try {
 			wfMembersToProcess.addAll(wfMembersToCommit);
 			wfMembersToIgnore = filterMultipleAdjudications(wfMembersToCommit);
@@ -43,7 +43,7 @@ public class WfDuplicateAutomatedAdjudicatorSyncFilter extends AbstractWfChangeS
 	}
 
 	@Override
-	public HashSet<TkRefsetAbstractMember<?>> getApprovedMembers() {
+	public HashSet<TkRefexAbstractMember<?>> getApprovedMembers() {
     	try {
     		wfMembersToProcess.removeAll(wfMembersToIgnore);
 
@@ -56,24 +56,24 @@ public class WfDuplicateAutomatedAdjudicatorSyncFilter extends AbstractWfChangeS
 	}
 
 
-	private HashSet<TkRefsetAbstractMember<?>> filterMultipleAdjudications(Set<TkRefsetAbstractMember<?>> origMembers) throws Exception {
-		HashSet<TkRefsetAbstractMember<?>>  retiredMembers = new HashSet<TkRefsetAbstractMember<?>>();
+	private HashSet<TkRefexAbstractMember<?>> filterMultipleAdjudications(Set<TkRefexAbstractMember<?>> origMembers) throws Exception {
+		HashSet<TkRefexAbstractMember<?>>  retiredMembers = new HashSet<TkRefexAbstractMember<?>>();
 		
 		// Get Adj Members 
 		UUID adjPath = identifyCommonAdjudicationPath(origMembers);
 
 		if (adjPath != null) {
 			// RefsetId / Set<adjPathVersions>
-			Map<UUID, Set<TkRefsetAbstractMember<?>>> adjudicatedMembers = initializeAdjMembers(origMembers, adjPath);
+			Map<UUID, Set<TkRefexAbstractMember<?>>> adjudicatedMembers = initializeAdjMembers(origMembers, adjPath);
 
 			// Per Refset
 			for (UUID refsetId : adjudicatedMembers.keySet()) {
-	    		Set<TkRefsetAbstractMember<?>> membersToAdjudicate = adjudicatedMembers.get(refsetId);
+	    		Set<TkRefexAbstractMember<?>> membersToAdjudicate = adjudicatedMembers.get(refsetId);
 				
-	    		HashSet<HashSet<TkRefsetAbstractMember<?>>> nonLatestDups = identifyAdjudToRetire(refsetId, membersToAdjudicate);
+	    		HashSet<HashSet<TkRefexAbstractMember<?>>> nonLatestDups = identifyAdjudToRetire(refsetId, membersToAdjudicate);
 	
 	    		// Per duplicate set of adjudication (may be multiple per refset)
-	    		for (HashSet<TkRefsetAbstractMember<?>> set : nonLatestDups) {
+	    		for (HashSet<TkRefexAbstractMember<?>> set : nonLatestDups) {
 					retiredMembers.addAll(set);
 	    		}
 			}
@@ -83,32 +83,32 @@ public class WfDuplicateAutomatedAdjudicatorSyncFilter extends AbstractWfChangeS
 	}
 	
 
-	private Map<UUID, Set<TkRefsetAbstractMember<?>>> 
-			initializeAdjMembers(Set<TkRefsetAbstractMember<?>> origMembers, UUID adjPath) 
+	private Map<UUID, Set<TkRefexAbstractMember<?>>> 
+			initializeAdjMembers(Set<TkRefexAbstractMember<?>> origMembers, UUID adjPath) 
 	{
-		Map<UUID, Set<TkRefsetAbstractMember<?>>> refsetToAdjVersions = new HashMap<UUID, Set<TkRefsetAbstractMember<?>>>();
+		Map<UUID, Set<TkRefexAbstractMember<?>>> refsetToAdjVersions = new HashMap<UUID, Set<TkRefexAbstractMember<?>>>();
 		 
-		for (TkRefsetAbstractMember<?> member : origMembers) {
+		for (TkRefexAbstractMember<?> member : origMembers) {
 			if (member.getPathUuid().equals(adjPath) &&
-				WorkflowHelper.getRefsetUidList().contains(member.getRefsetUuid())) 
+				WorkflowHelper.getRefsetUidList().contains(member.getRefexUuid())) 
 			{
-				if (refsetToAdjVersions.containsKey(member.getRefsetUuid())) {
-					refsetToAdjVersions.get(member.getRefsetUuid()).add(member);
+				if (refsetToAdjVersions.containsKey(member.getRefexUuid())) {
+					refsetToAdjVersions.get(member.getRefexUuid()).add(member);
 				} else {
-					Set<TkRefsetAbstractMember<?>> newSet = new HashSet<TkRefsetAbstractMember<?>>();
+					Set<TkRefexAbstractMember<?>> newSet = new HashSet<TkRefexAbstractMember<?>>();
 					newSet.add(member);
 					 
-					refsetToAdjVersions.put(member.getRefsetUuid(), newSet);
+					refsetToAdjVersions.put(member.getRefexUuid(), newSet);
 				}
 			}
 	 	}
 		 
 		return refsetToAdjVersions;
 	}
-	private HashSet<HashSet<TkRefsetAbstractMember<?>>> identifyAdjudToRetire(UUID refsetId, Set<TkRefsetAbstractMember<?>> membersToCommit) throws IOException, TerminologyException {
-		HashSet<HashSet<TkRefsetAbstractMember<?>>> dupsSet = new HashSet<HashSet<TkRefsetAbstractMember<?>>>();
-		HashSet<HashSet<TkRefsetAbstractMember<?>>> retSet = new HashSet<HashSet<TkRefsetAbstractMember<?>>>();
-		HashSet<TkRefsetAbstractMember<?>> nonDups = new HashSet<TkRefsetAbstractMember<?>>();
+	private HashSet<HashSet<TkRefexAbstractMember<?>>> identifyAdjudToRetire(UUID refsetId, Set<TkRefexAbstractMember<?>> membersToCommit) throws IOException, TerminologyException {
+		HashSet<HashSet<TkRefexAbstractMember<?>>> dupsSet = new HashSet<HashSet<TkRefexAbstractMember<?>>>();
+		HashSet<HashSet<TkRefexAbstractMember<?>>> retSet = new HashSet<HashSet<TkRefexAbstractMember<?>>>();
+		HashSet<TkRefexAbstractMember<?>> nonDups = new HashSet<TkRefexAbstractMember<?>>();
 		WorkflowRefsetReader reader = null;
 		
 
@@ -125,11 +125,11 @@ public class WfDuplicateAutomatedAdjudicatorSyncFilter extends AbstractWfChangeS
 			reader = new StateTransitionRefsetReader();
 		} 
 		
-		for (TkRefsetAbstractMember<?> member : membersToCommit) {
+		for (TkRefexAbstractMember<?> member : membersToCommit) {
 			// Examine If already identified as duplicate, 
 			boolean dupFound = false;
-			for (HashSet<TkRefsetAbstractMember<?>> set : dupsSet) {
-				TkRefsetAbstractMember<?> dup = set.iterator().next();
+			for (HashSet<TkRefexAbstractMember<?>> set : dupsSet) {
+				TkRefexAbstractMember<?> dup = set.iterator().next();
 				
 				// If identicial to another dup, add to set and break
 				if (reader.isIdenticalAutomatedAdjudication(dup, member)) {
@@ -140,16 +140,16 @@ public class WfDuplicateAutomatedAdjudicatorSyncFilter extends AbstractWfChangeS
 			}
 			
 			if (!dupFound) {
-				TkRefsetAbstractMember<?> toRemoveFromNonDups = null;
+				TkRefexAbstractMember<?> toRemoveFromNonDups = null;
 
 				// Examine those not identified as dups (yet?)
-				for (TkRefsetAbstractMember<?> nonDup: nonDups) {
+				for (TkRefexAbstractMember<?> nonDup: nonDups) {
 					if (reader.isIdenticalAutomatedAdjudication(member, nonDup)) {
 						// Dup identified Remove from nonDup and add both to new dup set 
 						toRemoveFromNonDups = nonDup;
 						dupFound = true;
 
-						HashSet<TkRefsetAbstractMember<?>> dups = new HashSet<TkRefsetAbstractMember<?>>();
+						HashSet<TkRefexAbstractMember<?>> dups = new HashSet<TkRefexAbstractMember<?>>();
 						dups.add(member);
 						dups.add(nonDup);
 						dupsSet.add(dups);
@@ -170,11 +170,11 @@ public class WfDuplicateAutomatedAdjudicatorSyncFilter extends AbstractWfChangeS
 
 
 		// For each Dups Set, retire all but latest.  Do here and not later 
-		for (HashSet<TkRefsetAbstractMember<?>> dups : dupsSet) {
+		for (HashSet<TkRefexAbstractMember<?>> dups : dupsSet) {
 			// Identify latest Auto-Adjudicated Version
 			long latestTime = 0;
-			TkRefsetAbstractMember<?> latestDup = null;
-			for (TkRefsetAbstractMember<?> dup : dups) {
+			TkRefexAbstractMember<?> latestDup = null;
+			for (TkRefexAbstractMember<?> dup : dups) {
 				if (dup.getTime() > latestTime ) {
 					latestTime = dup.getTime();
 					latestDup = dup;
@@ -189,10 +189,10 @@ public class WfDuplicateAutomatedAdjudicatorSyncFilter extends AbstractWfChangeS
 	}
 
 
-	private UUID identifyCommonAdjudicationPath(Set<TkRefsetAbstractMember<?>> origMembers) {
+	private UUID identifyCommonAdjudicationPath(Set<TkRefexAbstractMember<?>> origMembers) {
 		HashMap<UUID, Set<UUID>> modPaths = new HashMap<UUID, Set<UUID>>();
 		
-		for (TkRefsetAbstractMember<?>  member : origMembers) {
+		for (TkRefexAbstractMember<?>  member : origMembers) {
 			UUID authId = member.getAuthorUuid();
 			UUID pathId = member.getPathUuid();
 			
@@ -255,9 +255,9 @@ public class WfDuplicateAutomatedAdjudicatorSyncFilter extends AbstractWfChangeS
 		}
 	}
 
-	private void retireInDB(HashSet<TkRefsetAbstractMember<?>> wfMembersToRetire) throws NumberFormatException, TerminologyException, IOException, Exception {
+	private void retireInDB(HashSet<TkRefexAbstractMember<?>> wfMembersToRetire) throws NumberFormatException, TerminologyException, IOException, Exception {
 		// Already be committed in DB.  Therefore retire directly (NoCheck)
-		for (TkRefsetAbstractMember<?> member : wfMembersToRetire) {
+		for (TkRefexAbstractMember<?> member : wfMembersToRetire) {
 			WorkflowHelper.retireWfHxRow(WorkflowHelper.populateWorkflowHistoryJavaBean(member));
 		}
 	}

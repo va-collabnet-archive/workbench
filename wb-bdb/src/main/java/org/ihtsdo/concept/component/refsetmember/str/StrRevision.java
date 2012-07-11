@@ -20,11 +20,11 @@ import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.api.refex.type_str.RefexStrAnalogBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
-import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrMember;
-import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrRevision;
+import org.ihtsdo.tk.api.refex.type_string.RefexStringAnalogBI;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_string.TkRefsetStrMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_string.TkRefsetStrRevision;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -35,7 +35,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class StrRevision extends RefsetRevision<StrRevision, StrMember>
-        implements I_ExtendByRefPartStr<StrRevision>, RefexStrAnalogBI<StrRevision> {
+        implements I_ExtendByRefPartStr<StrRevision>, RefexStringAnalogBI<StrRevision> {
    private String stringValue;
 
    //~--- constructors --------------------------------------------------------
@@ -51,7 +51,7 @@ public class StrRevision extends RefsetRevision<StrRevision, StrMember>
 
    public StrRevision(TkRefsetStrRevision eVersion, StrMember primoridalMember) {
       super(eVersion, primoridalMember);
-      this.stringValue = eVersion.getStringValue();
+      this.stringValue = eVersion.getString1();
    }
 
    public StrRevision(TupleInput input, StrMember primoridalMember) {
@@ -79,7 +79,7 @@ public class StrRevision extends RefsetRevision<StrRevision, StrMember>
 
    @Override
    protected void addSpecProperties(RefexCAB rcs) {
-      rcs.with(RefexProperty.STRING1, getStr1());
+      rcs.with(RefexProperty.STRING1, getString1());
    }
 
    @Override
@@ -161,7 +161,7 @@ public class StrRevision extends RefsetRevision<StrRevision, StrMember>
    //~--- get methods ---------------------------------------------------------
 
    @Override
-   public String getStr1() {
+   public String getString1() {
       return stringValue;
    }
 
@@ -171,15 +171,15 @@ public class StrRevision extends RefsetRevision<StrRevision, StrMember>
    }
 
    @Override
-   public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
+   public TkRefexAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
            Map<UUID, UUID> conversionMap)
            throws ContradictionException, IOException {
       return new TkRefsetStrMember(this, exclusionSet, conversionMap, 0, true, vc);
    }
 
    @Override
-   protected TK_REFSET_TYPE getTkRefsetType() {
-      return TK_REFSET_TYPE.STR;
+   protected TK_REFEX_TYPE getTkRefsetType() {
+      return TK_REFEX_TYPE.STR;
    }
 
    @Override
@@ -212,7 +212,7 @@ public class StrRevision extends RefsetRevision<StrRevision, StrMember>
    //~--- set methods ---------------------------------------------------------
 
    @Override
-   public void setStr1(String str) throws PropertyVetoException {
+   public void setString1(String str) throws PropertyVetoException {
       this.stringValue = str;
       modified();
    }

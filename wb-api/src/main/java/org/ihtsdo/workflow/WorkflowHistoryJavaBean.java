@@ -95,12 +95,12 @@ public class WorkflowHistoryJavaBean implements WorkflowHistoryJavaBeanBI{
 	}
 
 	@Override
-	public void setFSN(String desc) {
+	public void setFullySpecifiedName(String desc) {
 		fsn = desc;
 	}
 
 	@Override
-	public String getFSN() {
+	public String getFullySpecifiedName() {
 		return fsn;
 	}
 
@@ -130,7 +130,7 @@ public class WorkflowHistoryJavaBean implements WorkflowHistoryJavaBeanBI{
 	}
 	
 	@Override
-	public int getRxMemberId() {
+	public int getRefexMemberNid() {
 		return memberId;
 	}
 	
@@ -145,7 +145,7 @@ public class WorkflowHistoryJavaBean implements WorkflowHistoryJavaBeanBI{
 	}
 
 	@Override
-	public void setRxMemberId(int id) {
+	public void setRefexMemberNid(int id) {
 		memberId = id;
 	}
 
@@ -187,7 +187,7 @@ public class WorkflowHistoryJavaBean implements WorkflowHistoryJavaBeanBI{
 		
 		if (this.getAction().equals(o2.getAction()) &&
 			this.getConcept().equals(o2.getConcept()) &&
-			this.getFSN().equals(o2.getFSN()) &&
+			this.getFullySpecifiedName().equals(o2.getFullySpecifiedName()) &&
 			this.getModeler().equals(o2.getModeler()) &&
 			this.getPath().equals(o2.getPath()) &&
 			this.getState().equals(o2.getState()) &&
@@ -195,7 +195,7 @@ public class WorkflowHistoryJavaBean implements WorkflowHistoryJavaBeanBI{
 			this.getWorkflowTime().equals(o2.getWorkflowTime()) &&
 			this.getWorkflowId().equals(o2.getWorkflowId()) &&
 			this.getAutoApproved() == o2.getAutoApproved() && 
-			this.getRxMemberId() == o2.getRxMemberId() && 
+			this.getRefexMemberNid() == o2.getRefexMemberNid() && 
 			this.getOverridden() == o2.getOverridden()
 		) {
 			return true;

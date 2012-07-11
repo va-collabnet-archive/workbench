@@ -129,7 +129,7 @@ public class ERefsetStrVersionTest {
     private ERefsetStrRevision makeTestComponent1() {
         
         ERefsetStrRevision rsv = new ERefsetStrRevision();
-        rsv.stringValue = "VALUE 2"; 
+        rsv.string1 = "VALUE 2"; 
         rsv.pathUuid = new UUID(4350, 5469);
         rsv.statusUuid = new UUID(5386, 4497);
         rsv.time = this.myTime;
@@ -140,7 +140,7 @@ public class ERefsetStrVersionTest {
     private ERefsetStrRevision makeTestComponent2() {
         
         ERefsetStrRevision rsv = new ERefsetStrRevision();
-        rsv.stringValue = "VALUE B"; 
+        rsv.string1 = "VALUE B"; 
         rsv.pathUuid = new UUID(2222, 2222);
         rsv.statusUuid = new UUID(3333, 3333);
         rsv.time = this.myTime;

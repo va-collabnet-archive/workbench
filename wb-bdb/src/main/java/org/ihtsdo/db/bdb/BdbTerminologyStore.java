@@ -9,14 +9,14 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.cs.ChangeSetPolicy;
-import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
+import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
+import org.ihtsdo.tk.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.PathNotExistsException;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
+import org.ihtsdo.tk.api.contradiction.IdentifyAllContradictionStrategy;
 import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
@@ -31,7 +31,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
-import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
@@ -47,6 +47,7 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.contradiction.ContradictionIdentifierBI;
 import org.ihtsdo.tk.db.DbDependency;
 import org.ihtsdo.tk.db.EccsDependency;
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 public class BdbTerminologyStore implements TerminologyStoreDI {
 
@@ -122,7 +123,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     }
     
     @Override
-    public void forget(ConAttrVersionBI attr) throws IOException{
+    public void forget(ConceptAttributeVersionBI attr) throws IOException{
         BdbCommitManager.forget(attr);
     }
     
@@ -179,7 +180,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     }
     
     @Override
-    public void iterateSapDataInSequence(ProcessSapDataBI processor) throws Exception {
+    public void iterateSapDataInSequence(ProcessStampDataBI processor) throws Exception {
         Bdb.getSapDb().iterateSapDataInSequence(processor);
     }
 
@@ -226,7 +227,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
             UUID snomedRootUuid = SNOMED.Concept.ROOT.getUids().iterator().next();
             int snomedRootNid = Bdb.uuidToNid(snomedRootUuid);
             Concept cb = Bdb.getConcept(snomedRootNid);
-            int rootStatusNid = cb.getConAttrs().getVersions().iterator().next().getStatusNid();
+            int rootStatusNid = cb.getConceptAttributes().getVersions().iterator().next().getStatusNid();
             int rf1CurrentNid = Bdb.uuidToNid(SnomedMetadataRf1.CURRENT_RF1.getUuids());
             int rf2ActiveValueNid = Bdb.uuidToNid(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids());
 
@@ -273,22 +274,22 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     }
 
     @Override
-    public ComponentChroncileBI<?> getComponent(Collection<UUID> uuids) throws IOException {
+    public ComponentChronicleBI<?> getComponent(Collection<UUID> uuids) throws IOException {
         return getComponent(Bdb.uuidsToNid(uuids));
     }
 
     @Override
-    public ComponentChroncileBI<?> getComponent(ComponentContainerBI cc) throws IOException {
+    public ComponentChronicleBI<?> getComponent(ComponentContainerBI cc) throws IOException {
         return getComponent(cc.getNid());
     }
 
     @Override
-    public ComponentChroncileBI<?> getComponent(int nid) throws IOException {
-        return (ComponentChroncileBI<?>) Bdb.getComponent(nid);
+    public ComponentChronicleBI<?> getComponent(int nid) throws IOException {
+        return (ComponentChronicleBI<?>) Bdb.getComponent(nid);
     }
 
     @Override
-    public ComponentChroncileBI<?> getComponent(UUID... uuids) throws IOException {
+    public ComponentChronicleBI<?> getComponent(UUID... uuids) throws IOException {
         return getComponent(Bdb.uuidToNid(uuids));
     }
 
@@ -307,7 +308,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
             return new ConceptVersion((Concept) component, coordinate);
         }
 
-        return ((ComponentChroncileBI<?>) component).getVersion(coordinate);
+        return ((ComponentChronicleBI<?>) component).getVersion(coordinate);
     }
 
     @Override
@@ -323,7 +324,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
 
     @Override
     public ConceptChronicleBI getConcept(ConceptContainerBI cc) throws IOException {
-        return getConcept(cc.getCnid());
+        return getConcept(cc.getConceptNid());
     }
 
     @Override
@@ -419,7 +420,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     }
 
     @Override
-    public ViewCoordinate getMetadataVC() throws IOException {
+    public ViewCoordinate getMetadataViewCoordinate() throws IOException {
         if (metadataVC == null) {
             PathBI viewPath =
                     new Path(getNidForUuids(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids()), null);
@@ -435,7 +436,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
 
             isaTypeNids.add(getNidForUuids(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
 
-            ContradictionManagerBI contradictionManager = new IdentifyAllConflictStrategy();
+            ContradictionManagerBI contradictionManager = new IdentifyAllContradictionStrategy();
             int languageNid =
                     getNidForUuids(ArchitectonicAuxiliary.Concept.EN_US.getUids());
             int classifierNid =
@@ -451,7 +452,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     }
     
     @Override
-    public EditCoordinate getMetadataEC() throws IOException {
+    public EditCoordinate getMetadataEditCoordinate() throws IOException {
         if (metadataEC == null) {
             /*
              * public EditCoordinate(int authorNid, NidSetBI editPaths) {
@@ -604,7 +605,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
 
     @Override
     public UUID getUuidPrimordialForNid(int nid) throws IOException {
-        ComponentChroncileBI<?> c = getComponent(nid);
+        ComponentChronicleBI<?> c = getComponent(nid);
         if (c != null) {
             return c.getPrimUuid();
         }
@@ -630,6 +631,19 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
         assert memberUUID != null;
 
         return Bdb.hasUuid(memberUUID);
+    }
+    
+    @Override
+    public boolean hasUuid(List<UUID> memberUUIDs) {
+        assert memberUUIDs != null;
+
+        for (UUID uuid : memberUUIDs) {
+            if (Bdb.hasUuid(uuid)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
@@ -724,27 +738,27 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     }
 
     @Override
-    public int getAuthorNidForSapNid(int sapNid) {
+    public int getAuthorNidForStampNid(int sapNid) {
         return Bdb.getAuthorNidForSapNid(sapNid);
 }
 
     @Override
-    public int getPathNidForSapNid(int sapNid) {
+    public int getPathNidForStampNid(int sapNid) {
          return Bdb.getPathNidForSapNid(sapNid);
    }
 
     @Override
-    public int getStatusNidForSapNid(int sapNid) {
+    public int getStatusNidForStampNid(int sapNid) {
          return Bdb.getStatusNidForSapNid(sapNid);
    }
     
     @Override
-    public int getModuleNidForSapNid(int sapNid) {
+    public int getModuleNidForStampNid(int sapNid) {
          return Bdb.getModuleNidForSapNid(sapNid);
    }
 
     @Override
-    public long getTimeForSapNid(int sapNid) {
+    public long getTimeForStampNid(int sapNid) {
          return Bdb.getTimeForSapNid(sapNid);
    }
 
@@ -803,4 +817,8 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
       ChangeNotifier.touchRelTarget(nid);
    }
    
+    @Override
+    public int getStampNid(TkRevision version) {
+        return Bdb.getSapNid(version);
+    }
 }

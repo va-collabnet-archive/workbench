@@ -11,7 +11,7 @@ import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
-import org.ihtsdo.tk.api.blueprint.DescCAB;
+import org.ihtsdo.tk.api.blueprint.DescriptionCAB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
@@ -24,7 +24,7 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.ihtsdo.tk.drools.facts.DescSpecFact;
 import org.ihtsdo.tk.drools.facts.SpecFact;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 import org.ihtsdo.tk.spec.DescriptionSpec;
 
 public class AddFromDialectSpecAction extends AbstractAction {
@@ -66,7 +66,7 @@ public class AddFromDialectSpecAction extends AbstractAction {
         descSpec = ((DescSpecFact) spec).getDescSpec();
 
         try {
-            int type = Ts.get().getNidForUuids(descSpec.getDescTypeSpec().getLenient().getPrimUuid());
+            int type = Ts.get().getNidForUuids(descSpec.getDescriptionTypeSpec().getLenient().getPrimUuid());
             int syn = SnomedMetadataRfx.getDES_SYNONYM_NID();
             int fsn = SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID();
             int usRefexNid = SnomedMetadataRfx.getUS_DIALECT_REFEX_NID();
@@ -84,37 +84,37 @@ public class AddFromDialectSpecAction extends AbstractAction {
                     config.getViewCoordinate());
 
             if (type == syn) {
-                DescCAB descSpecPref = new DescCAB(
+                DescriptionCAB descSpecPref = new DescriptionCAB(
                         concept.getNid(),
                         SnomedMetadataRfx.getDES_SYNONYM_NID(),
                         LANG_CODE.EN,
-                        descSpec.getDescText(),
+                        descSpec.getDescriptionText(),
                         false);
                 newDesc = tc.constructIfNotCurrent(descSpecPref);
                 if (dialect.equals(LANG_CODE.EN_GB)) {
                     RefexCAB refexSpecPrefGb = new RefexCAB(
-                        TK_REFSET_TYPE.CID,
+                        TK_REFEX_TYPE.CID,
                         descSpecPref.getComponentNid(),
                         gbRefexNid);
                     refexSpecPrefGb.put(RefexProperty.CNID1, SnomedMetadataRfx.getDESC_ACCEPTABLE_NID());
                     newRefex = tc.constructIfNotCurrent(refexSpecPrefGb);
                 } else {
                     RefexCAB refexSpecPrefUs = new RefexCAB(
-                        TK_REFSET_TYPE.CID,
+                        TK_REFEX_TYPE.CID,
                         descSpecPref.getComponentNid(),
                         usRefexNid);
                     refexSpecPrefUs.put(RefexProperty.CNID1, SnomedMetadataRfx.getDESC_ACCEPTABLE_NID());
                     newRefex = tc.constructIfNotCurrent(refexSpecPrefUs);
                 }
             } else if (type == fsn) {
-                DescCAB descSpecFsn = new DescCAB(
+                DescriptionCAB descSpecFsn = new DescriptionCAB(
                         concept.getNid(),
                         SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID(),
                         dialect,
-                        descSpec.getDescText(),
+                        descSpec.getDescriptionText(),
                         false);
                 RefexCAB refexSpecFsn = new RefexCAB(
-                        TK_REFSET_TYPE.CID,
+                        TK_REFEX_TYPE.CID,
                         descSpecFsn.getComponentNid(),
                         refexNid);
                 refexSpecFsn.put(RefexProperty.CNID1, SnomedMetadataRfx.getDESC_PREFERRED_NID());

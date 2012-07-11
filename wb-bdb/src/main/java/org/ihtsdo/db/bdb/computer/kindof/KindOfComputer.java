@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_ManageContradiction;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
@@ -162,12 +162,8 @@ public class KindOfComputer {
     public static void updateIsaCache(int cNid) throws Exception {
         I_GetConceptData concept = Terms.get().getConcept(cNid);
         for (IsaCoordinate loopCoordinate : isaCache.keySet()) {
-            if (loopCoordinate.getContradictionMgr() instanceof I_ManageContradiction) {
-                I_ManageContradiction cm = (I_ManageContradiction) loopCoordinate.getContradictionMgr();
-                if (cm.getConfig() == null) {
-                    cm.setConfig(ACE.getAceConfig().getActiveConfig());
-                }
-
+            if (loopCoordinate.getContradictionMgr() instanceof ContradictionManagerBI) {
+                ContradictionManagerBI cm = (ContradictionManagerBI) loopCoordinate.getContradictionMgr();
             }
 
             isaCache.get(loopCoordinate).updateCache(Terms.get().getConcept(cNid));

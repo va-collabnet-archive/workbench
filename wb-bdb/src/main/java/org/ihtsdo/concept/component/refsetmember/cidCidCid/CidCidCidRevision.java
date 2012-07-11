@@ -22,11 +22,11 @@ import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid_cnid_cnid.RefexCnidCnidCnidAnalogBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidcidcid.TkRefsetCidCidCidMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidcidcid.TkRefsetCidCidCidRevision;
+import org.ihtsdo.tk.api.refex.type_nid_nid_nid.RefexNidNidNidAnalogBI;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_uuid_uuid.TkRefexUuidUuidUuidMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_uuid_uuid.TkRefexUuidUuidUuidRevision;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -39,7 +39,7 @@ import org.dwfa.ace.api.Terms;
 
 public class CidCidCidRevision extends RefsetRevision<CidCidCidRevision, CidCidCidMember>
         implements I_ExtendByRefPartCidCidCid<CidCidCidRevision>,
-                   RefexCnidCnidCnidAnalogBI<CidCidCidRevision> {
+                   RefexNidNidNidAnalogBI<CidCidCidRevision> {
    private int c1Nid;
    private int c2Nid;
    private int c3Nid;
@@ -57,11 +57,11 @@ public class CidCidCidRevision extends RefsetRevision<CidCidCidRevision, CidCidC
       c3Nid = primoridalMember.getC3Nid();
    }
 
-   public CidCidCidRevision(TkRefsetCidCidCidRevision eVersion, CidCidCidMember member) {
+   public CidCidCidRevision(TkRefexUuidUuidUuidRevision eVersion, CidCidCidMember member) {
       super(eVersion, member);
-      c1Nid = Bdb.uuidToNid(eVersion.getC1Uuid());
-      c2Nid = Bdb.uuidToNid(eVersion.getC2Uuid());
-      c3Nid = Bdb.uuidToNid(eVersion.getC3Uuid());
+      c1Nid = Bdb.uuidToNid(eVersion.getUuid1());
+      c2Nid = Bdb.uuidToNid(eVersion.getUuid2());
+      c3Nid = Bdb.uuidToNid(eVersion.getUuid3());
    }
 
    public CidCidCidRevision(TupleInput input, CidCidCidMember primoridalMember) {
@@ -98,9 +98,9 @@ public class CidCidCidRevision extends RefsetRevision<CidCidCidRevision, CidCidC
 
    @Override
    protected void addSpecProperties(RefexCAB rcs) {
-      rcs.with(RefexProperty.CNID1, getCnid1());
-      rcs.with(RefexProperty.CNID2, getCnid2());
-      rcs.with(RefexProperty.CNID3, getCnid3());
+      rcs.with(RefexProperty.CNID1, getNid1());
+      rcs.with(RefexProperty.CNID2, getNid2());
+      rcs.with(RefexProperty.CNID3, getNid3());
    }
 
    @Override
@@ -216,30 +216,30 @@ public class CidCidCidRevision extends RefsetRevision<CidCidCidRevision, CidCidC
    }
 
    @Override
-   public int getCnid1() {
+   public int getNid1() {
       return c1Nid;
    }
 
    @Override
-   public int getCnid2() {
+   public int getNid2() {
       return c2Nid;
    }
 
    @Override
-   public int getCnid3() {
+   public int getNid3() {
       return c3Nid;
    }
 
    @Override
-   public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
+   public TkRefexAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
            Map<UUID, UUID> conversionMap)
            throws ContradictionException, IOException {
-      return new TkRefsetCidCidCidMember(this, exclusionSet, conversionMap, 0, true, vc);
+      return new TkRefexUuidUuidUuidMember(this, exclusionSet, conversionMap, 0, true, vc);
    }
 
    @Override
-   protected TK_REFSET_TYPE getTkRefsetType() {
-      return TK_REFSET_TYPE.CID_CID_CID;
+   protected TK_REFEX_TYPE getTkRefsetType() {
+      return TK_REFEX_TYPE.CID_CID_CID;
    }
 
    @Override
@@ -311,19 +311,19 @@ public class CidCidCidRevision extends RefsetRevision<CidCidCidRevision, CidCidC
    }
 
    @Override
-   public void setCnid1(int cnid) throws PropertyVetoException {
+   public void setNid1(int cnid) throws PropertyVetoException {
       this.c1Nid = cnid;
       modified();
    }
 
    @Override
-   public void setCnid2(int cnid) throws PropertyVetoException {
+   public void setNid2(int cnid) throws PropertyVetoException {
       this.c2Nid = cnid;
       modified();
    }
 
    @Override
-   public void setCnid3(int cnid) throws PropertyVetoException {
+   public void setNid3(int cnid) throws PropertyVetoException {
       this.c3Nid = cnid;
       modified();
    }

@@ -55,7 +55,7 @@ public class TestForUneditedDefaults extends AbstractConceptTest {
             throws TaskFailedException {
         List<AlertToDataConstraintFailure> alerts = new ArrayList<AlertToDataConstraintFailure>();
         try {
-            for (I_DescriptionVersioned desc : concept.getDescriptions()) {
+            for (I_DescriptionVersioned desc : concept.getDescs()) {
                 alerts.addAll(testDescription(concept, desc, forCommit));
             }
         } catch (IOException e) {

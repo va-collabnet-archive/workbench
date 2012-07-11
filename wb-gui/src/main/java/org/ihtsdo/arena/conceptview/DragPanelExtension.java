@@ -10,11 +10,11 @@ import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid_cnid.RefexCnidCnidVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid_cnid_cnid.RefexCnidCnidCnidVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid_nid.RefexNidNidVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid_nid_nid.RefexNidNidNidVersionBI;
 import org.ihtsdo.tk.api.refex.type_int.RefexIntVersionBI;
-import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
+import org.ihtsdo.tk.api.refex.type_string.RefexStringVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -114,7 +114,7 @@ public class DragPanelExtension extends DragPanelComponentVersion<RefexVersionBI
       gbc.anchor  = GridBagConstraints.NORTHWEST;
       gbc.gridx++;
 
-      TermComponentLabel typeLabel = getLabel(getRefexV().getCollectionNid(), canDrop,
+      TermComponentLabel typeLabel = getLabel(getRefexV().getRefexNid(), canDrop,
                                         getSettings().getRefexName());
 
       typeLabel.setFrozen(canDrop);
@@ -127,8 +127,8 @@ public class DragPanelExtension extends DragPanelComponentVersion<RefexVersionBI
 
       boolean classFound = false;
 
-      if (RefexCnidVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
-         int                cnid = ((RefexCnidVersionBI) getRefexV()).getCnid1();
+      if (RefexNidVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
+         int                cnid = ((RefexNidVersionBI) getRefexV()).getNid1();
          TermComponentLabel ext  = getLabel(cnid, canDrop, getSettings().getC1Refex());
 
          ext.setFrozen(canDrop);
@@ -139,8 +139,8 @@ public class DragPanelExtension extends DragPanelComponentVersion<RefexVersionBI
          classFound = true;
       }
 
-      if (RefexCnidCnidVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
-         int                cnid = ((RefexCnidCnidVersionBI) getRefexV()).getCnid1();
+      if (RefexNidNidVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
+         int                cnid = ((RefexNidNidVersionBI) getRefexV()).getNid1();
          TermComponentLabel ext  = getLabel(cnid, canDrop, getSettings().getC2Refex());
 
          ext.setFrozen(canDrop);
@@ -151,8 +151,8 @@ public class DragPanelExtension extends DragPanelComponentVersion<RefexVersionBI
          classFound = true;
       }
 
-      if (RefexCnidCnidCnidVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
-         int                cnid = ((RefexCnidCnidCnidVersionBI) getRefexV()).getCnid1();
+      if (RefexNidNidNidVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
+         int                cnid = ((RefexNidNidNidVersionBI) getRefexV()).getNid1();
          TermComponentLabel ext  = getLabel(cnid, canDrop, getSettings().getC3Refex());
 
          ext.setFrozen(canDrop);
@@ -163,8 +163,8 @@ public class DragPanelExtension extends DragPanelComponentVersion<RefexVersionBI
          classFound = true;
       }
 
-      if (RefexStrVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
-         String                text     = ((RefexStrVersionBI) getRefexV()).getStr1();
+      if (RefexStringVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
+         String                text     = ((RefexStringVersionBI) getRefexV()).getString1();
          FixedWidthJEditorPane textPane = new FixedWidthJEditorPane();
 
          textPane.setEditable(canDrop);

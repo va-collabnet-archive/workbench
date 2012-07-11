@@ -205,13 +205,13 @@ public class MigrateAllSpecRefsets extends AbstractTask {
     private void retireSpecificationRefset(I_GetConceptData specRefsetConcept) throws Exception {
 
         // Attribute
-        I_ConceptAttributeVersioned<?> attribute = specRefsetConcept.getConceptAttributes();
+        I_ConceptAttributeVersioned<?> attribute = specRefsetConcept.getConAttrs();
         for (I_ConceptAttributePart attribPart : retireParts(attribute.getMutableParts())) {
             attribute.addVersion(attribPart);
         }
 
         // Descriptions
-        for (I_DescriptionVersioned<?> description : specRefsetConcept.getDescriptions()) {
+        for (I_DescriptionVersioned<?> description : specRefsetConcept.getDescs()) {
             for (I_DescriptionPart retiredDesc : retireParts(description.getMutableParts())) {
                 description.addVersion(retiredDesc);
             }

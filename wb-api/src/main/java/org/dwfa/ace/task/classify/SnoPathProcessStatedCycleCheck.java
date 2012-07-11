@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ManageContradiction;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
@@ -67,7 +67,7 @@ public class SnoPathProcessStatedCycleCheck implements I_ProcessConcepts {
     // WORKBENCH
     private static final Logger logger = Logger.getLogger(SnoPathProcessStatedCycleCheck.class.getName());
     private Precedence precedence;
-    private I_ManageContradiction contradictionMgr;
+    private ContradictionManagerBI contradictionMgr;
     private ConcurrentHashMap<Integer, UUID> watchList = null;
 
     public void addWatchConcept(UUID uuid) throws TerminologyException, IOException {
@@ -85,7 +85,7 @@ public class SnoPathProcessStatedCycleCheck implements I_ProcessConcepts {
             I_IntSet statSet,
             PositionSetReadOnly pathPos,
             Precedence precedence,
-            I_ManageContradiction contradictionMgr)
+            ContradictionManagerBI contradictionMgr)
             throws Exception {
         this.snocons = snocons;
         this.fromPathPosPriority = null;

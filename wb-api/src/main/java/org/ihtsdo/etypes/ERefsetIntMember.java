@@ -9,8 +9,8 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.tapi.TerminologyException;
 
-import org.ihtsdo.tk.dto.concept.component.refset.integer.TkRefsetIntMember;
-import org.ihtsdo.tk.dto.concept.component.refset.integer.TkRefsetIntRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_int.TkRefexIntMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_int.TkRefexIntRevision;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -19,7 +19,7 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 
-public class ERefsetIntMember extends TkRefsetIntMember {
+public class ERefsetIntMember extends TkRefexIntMember {
    public static final long serialVersionUID = 1;
 
    //~--- constructors --------------------------------------------------------
@@ -42,14 +42,14 @@ public class ERefsetIntMember extends TkRefsetIntMember {
 
       I_ExtendByRefPartInt part = (I_ExtendByRefPartInt) m.getMutableParts().get(0);
 
-      intValue   = part.getIntValue();
+      int1   = part.getIntValue();
       pathUuid   = Terms.get().nidToUuid(part.getPathNid());
       statusUuid = Terms.get().nidToUuid(part.getStatusNid());
       moduleUuid    = Terms.get().nidToUuid(part.getModuleNid());
       time       = part.getTime();
 
       if (partCount > 1) {
-         revisions = new ArrayList<TkRefsetIntRevision>(partCount - 1);
+         revisions = new ArrayList<TkRefexIntRevision>(partCount - 1);
 
          for (int i = 1; i < partCount; i++) {
             revisions.add(new ERefsetIntRevision((I_ExtendByRefPartInt) m.getMutableParts().get(i)));

@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.logging.Level;
 
 import org.dwfa.ace.log.AceLog;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
@@ -30,13 +30,13 @@ public class WfPostLastReleaseFilter extends AbstractWfChangeSetFilter {
 	}
 	
 	@Override
-	public boolean scrubMembers(HashSet<TkRefsetAbstractMember<?>> wfMembersToCommit) {
+	public boolean scrubMembers(HashSet<TkRefexAbstractMember<?>> wfMembersToCommit) {
 		try {
-			wfMembersToProcess = new HashSet<TkRefsetAbstractMember<?>>();
+			wfMembersToProcess = new HashSet<TkRefexAbstractMember<?>>();
 
 			// Don't print those that do not meet release date filter
-			for (TkRefsetAbstractMember<?> member : wfMembersToCommit) {
-				if (member.getRefsetUuid().equals(WorkflowHelper.getWorkflowRefsetUid())) {
+			for (TkRefexAbstractMember<?> member : wfMembersToCommit) {
+				if (member.getRefexUuid().equals(WorkflowHelper.getWorkflowRefsetUid())) {
 					WorkflowHistoryJavaBean bean = WorkflowHelper.populateWorkflowHistoryJavaBean(member);
 					
 					if (bean.getWorkflowTime() >= lastReleaseDate) {
@@ -55,7 +55,7 @@ public class WfPostLastReleaseFilter extends AbstractWfChangeSetFilter {
 	}
 
 	@Override
-	public HashSet<TkRefsetAbstractMember<?>> getApprovedMembers() {
+	public HashSet<TkRefexAbstractMember<?>> getApprovedMembers() {
 		return wfMembersToProcess;
 	}
 }

@@ -347,7 +347,7 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 		setConceptUid(update.getConcept());
     	setWorkflowUid(update.getWorkflowId());
     	setActionUid(update.getAction());
-    	setFSN(update.getFSN());
+    	setFSN(update.getFullySpecifiedName());
     	
     	// Always update on current modeler regardless of bean's request
     	setModelerUid(modeler);

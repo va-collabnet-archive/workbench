@@ -23,10 +23,10 @@ import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexAnalogBI;
 import org.ihtsdo.tk.api.refex.type_long.RefexLongAnalogBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
-import org.ihtsdo.tk.dto.concept.component.refset.member.TkRefsetMember;
-import org.ihtsdo.tk.dto.concept.component.refset.member.TkRefsetRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_member.TkRefexMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_member.TkRefexRevision;
 import org.ihtsdo.tk.hash.Hashcode;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -55,13 +55,13 @@ public class MembershipMember extends RefsetMember<MembershipRevision, Membershi
       super(enclosingConceptNid, input);
    }
 
-   public MembershipMember(TkRefsetMember refsetMember, int enclosingConceptNid) throws IOException {
+   public MembershipMember(TkRefexMember refsetMember, int enclosingConceptNid) throws IOException {
       super(refsetMember, enclosingConceptNid);
 
       if (refsetMember.getRevisionList() != null) {
          revisions = new RevisionSet<MembershipRevision, MembershipMember>(primordialSapNid);
 
-         for (TkRefsetRevision eVersion : refsetMember.getRevisionList()) {
+         for (TkRefexRevision eVersion : refsetMember.getRevisionList()) {
             revisions.add(new MembershipRevision(eVersion, this));
          }
       }
@@ -175,15 +175,15 @@ public class MembershipMember extends RefsetMember<MembershipRevision, Membershi
    //~--- get methods ---------------------------------------------------------
 
    @Override
-   public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
+   public TkRefexAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
            Map<UUID, UUID> conversionMap)
            throws ContradictionException, IOException {
-      return new TkRefsetMember(this, exclusionSet, conversionMap, 0, true, vc);
+      return new TkRefexMember(this, exclusionSet, conversionMap, 0, true, vc);
    }
 
    @Override
-   protected TK_REFSET_TYPE getTkRefsetType() {
-      return TK_REFSET_TYPE.MEMBER;
+   protected TK_REFEX_TYPE getTkRefsetType() {
+      return TK_REFEX_TYPE.MEMBER;
    }
 
    @Override
@@ -270,8 +270,8 @@ public class MembershipMember extends RefsetMember<MembershipRevision, Membershi
       }
 
       @Override
-      public TkRefsetMember getERefsetMember() throws IOException {
-         return new TkRefsetMember(this, RevisionHandling.EXCLUDE_REVISIONS);
+      public TkRefexMember getERefsetMember() throws IOException {
+         return new TkRefexMember(this, RevisionHandling.EXCLUDE_REVISIONS);
       }
 
       @Override

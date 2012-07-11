@@ -59,7 +59,7 @@ public class IdentifierVersionString extends IdentifierVersion implements String
       if (IdentifierVersionString.class.isAssignableFrom(obj.getClass())) {
          IdentifierVersionString another = (IdentifierVersionString) obj;
 
-         return this.getSapNid() == another.getSapNid();
+         return this.getStampNid() == another.getStampNid();
       }
 
       return false;

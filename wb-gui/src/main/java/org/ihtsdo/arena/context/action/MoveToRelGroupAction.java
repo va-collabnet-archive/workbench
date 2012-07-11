@@ -17,12 +17,12 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
-import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipAnalogBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
-import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
+import org.ihtsdo.tk.api.relationship.group.RelationshipGroupVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.RelFact;
 import org.ihtsdo.tk.drools.facts.RelGroupFact;
@@ -46,7 +46,7 @@ public class MoveToRelGroupAction extends AbstractAction {
         try {
             I_GetConceptData concept = Terms.get().getConceptForNid(targetComponent.getNid());
             Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
-            if (ConAttrVersionBI.class.isAssignableFrom(sourceComponent.getClass())) {
+            if (ConceptAttributeVersionBI.class.isAssignableFrom(sourceComponent.getClass())) {
                 throw new UnsupportedOperationException();
             }
             if (ConceptVersionBI.class.isAssignableFrom(sourceComponent.getClass())) {
@@ -57,10 +57,10 @@ public class MoveToRelGroupAction extends AbstractAction {
             }
             if (sourceComponent.getConceptNid() == targetComponent.getConceptNid()) {
                 RelationshipVersionBI rel = (RelationshipVersionBI) sourceComponent;
-                RelGroupVersionBI relGroup = (RelGroupVersionBI) targetComponent;
+                RelationshipGroupVersionBI relGroup = (RelationshipGroupVersionBI) targetComponent;
                 if(rel.isUncommitted()){
                     RelationshipAnalogBI relAnalog = (RelationshipAnalogBI) rel;
-                    relAnalog.setGroup(relGroup.getRelGroup());
+                    relAnalog.setGroup(relGroup.getRelationshipGroupNumber());
                 }else{
                     for (PathBI ep : config.getEditingPathSet()) {
                     RelationshipAnalogBI relAnalog = (RelationshipAnalogBI) rel.makeAnalog(
@@ -69,20 +69,20 @@ public class MoveToRelGroupAction extends AbstractAction {
                             config.getEditCoordinate().getAuthorNid(),
                             config.getEditCoordinate().getModuleNid(), 
                             ep.getConceptNid());
-                    relAnalog.setGroup(relGroup.getRelGroup());
+                    relAnalog.setGroup(relGroup.getRelationshipGroupNumber());
                 }
                 }
                 Terms.get().addUncommitted(concept);
             } else {
                 if (RelationshipVersionBI.class.isAssignableFrom(sourceComponent.getClass())) {
                     RelationshipVersionBI rel = (RelationshipVersionBI) sourceComponent;
-                    RelGroupVersionBI relGroup = (RelGroupVersionBI) targetComponent;
+                    RelationshipGroupVersionBI relGroup = (RelationshipGroupVersionBI) targetComponent;
                     I_RelVersioned newRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(), concept,
                             rel.getTypeNid(),
-                            rel.getDestinationNid(),
+                            rel.getTargetNid(),
                             rel.getCharacteristicNid(),
                             rel.getRefinabilityNid(),
-                            relGroup.getRelGroup(),
+                            relGroup.getRelationshipGroupNumber(),
                             rel.getStatusNid(),
                             config.getDbConfig().getUserConcept().getNid(),
                             pathItr.next().getConceptNid(),

@@ -27,10 +27,10 @@ import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
-import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeAnalogBI;
 
-public interface I_ConceptAttributeVersioned<A extends ConAttrAnalogBI>
-        extends I_AmTermComponent, ConAttrAnalogBI<A> {
+public interface I_ConceptAttributeVersioned<A extends ConceptAttributeAnalogBI>
+        extends I_AmTermComponent, ConceptAttributeAnalogBI<A> {
 
     public boolean addVersion(I_ConceptAttributePart part);
 

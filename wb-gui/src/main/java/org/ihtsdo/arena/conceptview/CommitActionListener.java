@@ -22,7 +22,7 @@ import org.dwfa.ace.list.TerminologyListModel;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.ihtsdo.arena.contradiction.ContradictionEditorFrame;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.ComponentChronicleBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -67,7 +67,7 @@ public class CommitActionListener implements ActionListener {
                 TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(ec, vc);
              int conflictRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.CONFLICT_RECORD.getPrimoridalUid());
              ConceptChronicleBI conflictRefset = Ts.get().getConceptForNid(conflictRefsetNid);
-             RefexVersionBI member = conflictRefset.getCurrentRefsetMemberForComponent(vc, c.getConceptNid());
+             RefexVersionBI member = conflictRefset.getRefsetMemberActiveForComponent(vc, c.getConceptNid());
              if(member != null){
                 RefexCAB memberBp = member.makeBlueprint(vc);
                 memberBp.setRetired();

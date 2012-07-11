@@ -71,7 +71,7 @@ public class ContextualizedDescription implements I_ContextualizeDescription {
 				// logger.error(descriptionVersioned.getText());
 			} catch (IOException e) {
 				if (e.getMessage().startsWith("No such description")) {
-					for (I_DescriptionVersioned uncommittedDescription : concept.getDescriptions()) {
+					for (I_DescriptionVersioned uncommittedDescription : concept.getDescs()) {
 						if (uncommittedDescription.getDescId() == descId) {
 							descriptionVersioned = uncommittedDescription;
 						}

@@ -1,10 +1,10 @@
 package org.ihtsdo.tk.api.relationship;
 
-import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.ComponentChronicleBI;
 
-public interface RelationshipChronicleBI extends ComponentChroncileBI<RelationshipVersionBI> {
+public interface RelationshipChronicleBI extends ComponentChronicleBI<RelationshipVersionBI> {
 
-    int getOriginNid();
+    int getSourceNid();
 
-    int getDestinationNid();
+    int getTargetNid();
 }

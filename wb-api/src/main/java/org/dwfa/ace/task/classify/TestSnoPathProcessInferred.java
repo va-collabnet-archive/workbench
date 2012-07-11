@@ -16,7 +16,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdVersion;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ManageContradiction;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
@@ -50,7 +50,7 @@ public class TestSnoPathProcessInferred extends AbstractTask {
     private I_TermFactory tf;
     private I_ConfigAceFrame config = null;
     private Precedence precedence;
-    private I_ManageContradiction contradictionMgr;
+    private ContradictionManagerBI contradictionMgr;
     // CORE CONSTANTS
     private static int isaNid = Integer.MIN_VALUE;
     private static int rootNid = Integer.MIN_VALUE;

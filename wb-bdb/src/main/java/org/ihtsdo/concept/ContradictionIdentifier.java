@@ -34,7 +34,7 @@ import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.PositionMapperBI;
 import org.ihtsdo.db.bdb.computer.version.PositionMapperBI.RelativePosition;
-import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.ComponentChronicleBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PathBI;
@@ -208,7 +208,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 	        	// Cycle through 4 component types
 	            if (type == ComponentType.ATTRIBUTE) {
 	            	// Concept Attribute is the only componentType with a Single CompId
-	            	result = checkSingleComponentId(concept, foundPositionsMap, concept.getConAttrs(), new ConceptAttributeComparer());
+	            	result = checkSingleComponentId(concept, foundPositionsMap, concept.getConceptAttributes(), new ConceptAttributeComparer());
 	            } else {
 	            	// Descriptions & Relationships componentTypes each have multiple CompIds 
 	                result = checkCollectionComponentTypes(concept, foundPositionsMap, type);
@@ -255,7 +255,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
         boolean isSingleEdit = false;
         boolean isDuplicateEdit = false;
         AttributeComparer comparer = null;
-        Collection<? extends ComponentChroncileBI<?>> componentTuples = null;
+        Collection<? extends ComponentChronicleBI<?>> componentTuples = null;
 
         // Capture collection of Components of this type and create proper comparator 
         if (type == ComponentType.DESCRIPTION) {
@@ -268,7 +268,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
         }
 
         // Detect for contradictions per componentId in Collection
-        for (ComponentChroncileBI<?> tuple : componentTuples) {
+        for (ComponentChronicleBI<?> tuple : componentTuples) {
             ContradictionResult result = checkSingleComponentId(concept, foundPositionsMap, tuple, comparer);
 
             if (result.equals(ContradictionResult.CONTRADICTION)) {
@@ -289,7 +289,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
      public ContradictionResult checkSingleComponentId(
             Concept concept, Map<PositionForSet, 
             HashMap<Integer, ComponentVersionBI>> foundPositionsMap, 
-            ComponentChroncileBI<?> comp, 
+            ComponentChronicleBI<?> comp, 
             AttributeComparer comparer) throws Exception
      {
         boolean isSingleEdit = false;
@@ -459,7 +459,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 			return identifyContradictionResult(isContradiction, isSingleEdit, false, false);
      	}
 
-	private ComponentVersionBI identifyLatestAdjudicationVersion(ComponentChroncileBI<?> comp) {
+	private ComponentVersionBI identifyLatestAdjudicationVersion(ComponentChronicleBI<?> comp) {
   		ComponentVersionBI latestAdjudicatedVersion = null;
  		
      	for (ComponentVersionBI part : comp.getVersions())
@@ -478,7 +478,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
  		return latestAdjudicatedVersion;
  	}
 
-     private ComponentVersionBI identifyLatestOriginVersion(ComponentChroncileBI<?> comp, PathBI originPath) throws IOException {
+     private ComponentVersionBI identifyLatestOriginVersion(ComponentChronicleBI<?> comp, PathBI originPath) throws IOException {
   		ComponentVersionBI latestOriginVersion = null;
 
      	for (ComponentVersionBI part : comp.getVersions())
@@ -494,7 +494,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
  		return latestOriginVersion;
  	}
 
-	private Map<Integer, ComponentVersionBI>  identifyLatestDeveloperVersions(ComponentChroncileBI<?> comp, PathBI originPath, ComponentVersionBI latestAdjudicatedVersion) throws IOException {
+	private Map<Integer, ComponentVersionBI>  identifyLatestDeveloperVersions(ComponentChronicleBI<?> comp, PathBI originPath, ComponentVersionBI latestAdjudicatedVersion) throws IOException {
 	    Map<Integer, ComponentVersionBI> latestDeveloperVersionMap = new HashMap<Integer, ComponentVersionBI>();
 
 	    for (ComponentVersionBI part : comp.getVersions()) {
@@ -687,7 +687,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 		{
 			if (compType == ComponentType.ATTRIBUTE)
 			{
-				ConceptAttributes attr = concept.getConceptAttributes();
+				ConceptAttributes attr = concept.getConAttrs();
 				Collection<ConceptAttributes.Version> currentAttributesVersions = attr.getVersions();
 
 				for (ConceptAttributes.Version testingVersion : currentAttributesVersions)
@@ -756,7 +756,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 		{
 			if (compType == ComponentType.ATTRIBUTE)
 			{
-				ConceptAttributes attr = concept.getConceptAttributes();
+				ConceptAttributes attr = concept.getConAttrs();
 				currentVersion = attr.getVersion(viewCoord.get());
 			}
 			else if (compType == ComponentType.DESCRIPTION)

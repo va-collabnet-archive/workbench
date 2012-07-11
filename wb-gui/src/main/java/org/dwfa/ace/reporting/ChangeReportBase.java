@@ -174,7 +174,7 @@ public abstract class ChangeReportBase extends DiffBase {
     protected String relationshipElement(I_RelTuple d) throws Exception {
         return startElement("relationship")
                 + valueElement("id", d.getUUIDs().iterator().next().toString())
-                + conceptRefElement("destination", d.getDestinationNid())
+                + conceptRefElement("destination", d.getTargetNid())
                 + conceptRefElement("status", d.getStatusNid())
                 + conceptRefElement("type", d.getTypeNid())
                 + conceptRefElement("characteristic", d.getCharacteristicNid())
@@ -303,7 +303,7 @@ public abstract class ChangeReportBase extends DiffBase {
         startChange(c);
         changes += "<tr><td>" + "Added relationship" + "</td><td>" + "" 
                 + "</td><td>" + getConceptName(d.getTypeNid()) + "<br>"
-                + getConceptName(d.getDestinationNid()) + "<br>"
+                + getConceptName(d.getTargetNid()) + "<br>"
                 + getConceptName(d.getCharacteristicNid()) + "</td></tr>";
         changes_xml += startElement("added_relationship")
                 + relationshipElement(d) + endElement("added_relationship")
@@ -317,7 +317,7 @@ public abstract class ChangeReportBase extends DiffBase {
         startChange(c);
         changes += "<tr><td>" + "Deleted relationship" + "</td><td>"
                 + getConceptName(d.getTypeNid()) + "<br>"
-                + getConceptName(d.getDestinationNid()) + "<br>"
+                + getConceptName(d.getTargetNid()) + "<br>"
                 + getConceptName(d.getCharacteristicNid()) + "</td><td>" + ""
                 + "</td></tr>";
         changes_xml += startElement("deleted_relationship")
@@ -334,10 +334,10 @@ public abstract class ChangeReportBase extends DiffBase {
         changes += "<tr><td>"
                 + "Changed relationship"
                 + "</td><td>"
-                + getConceptName(d1.getDestinationNid())
+                + getConceptName(d1.getTargetNid())
                 + "</td><td>"
-                + (d1.getDestinationNid() == d2.getDestinationNid() ? " "
-                : getConceptName(d2.getDestinationNid()))
+                + (d1.getTargetNid() == d2.getTargetNid() ? " "
+                : getConceptName(d2.getTargetNid()))
                 + "</td></tr>";
         changes += "<tr><td align = \"right\">"
                 + "status"
@@ -376,9 +376,9 @@ public abstract class ChangeReportBase extends DiffBase {
         changes_xml += startElement("changed_relationship")
                 + valueElement("id", d1.getUUIDs().iterator().next().toString())
                 + startElement("destination")
-                + conceptRefElement("v1", d1.getDestinationNid())
-                + (d1.getDestinationNid() == d2.getDestinationNid() ? ""
-                : conceptRefElement("v2", d2.getDestinationNid()))
+                + conceptRefElement("v1", d1.getTargetNid())
+                + (d1.getTargetNid() == d2.getTargetNid() ? ""
+                : conceptRefElement("v2", d2.getTargetNid()))
                 + endElement("destination")
                 + startElement("status")
                 + conceptRefElement("v1", d1.getStatusNid())

@@ -371,17 +371,17 @@ public class EConceptToRF2UuidTransformer implements EConceptTransformerBI {
                break;
 
             case SOURCE_ID :
-               relationshipsWriter.write(r.getC1Uuid() + "\t");
+               relationshipsWriter.write(r.getRelationshipSourceUuid() + "\t");
 
                break;
 
             case DESTINATION_ID :
-               relationshipsWriter.write(r.getC2Uuid() + "\t");
+               relationshipsWriter.write(r.getRelationshipTargetUuid() + "\t");
 
                break;
 
             case RELATIONSHIP_GROUP :
-               relationshipsWriter.write(r.getRelGroup() + "\t");
+               relationshipsWriter.write(r.getRelationshipGroup() + "\t");
 
                break;
 
@@ -427,12 +427,12 @@ public class EConceptToRF2UuidTransformer implements EConceptTransformerBI {
                      break;
 
                   case SOURCE_ID :
-                     relationshipsWriter.write(r.getC1Uuid() + "\t");
+                     relationshipsWriter.write(r.getRelationshipSourceUuid() + "\t");
 
                      break;
 
                   case DESTINATION_ID :
-                     relationshipsWriter.write(r.getC2Uuid() + "\t");
+                     relationshipsWriter.write(r.getRelationshipTargetUuid() + "\t");
 
                      break;
 

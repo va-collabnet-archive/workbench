@@ -34,12 +34,12 @@ public class InvalidAmendmentSpec extends InvalidCAB {
         super(string);
     }
 
-    public InvalidAmendmentSpec(String string, Throwable thrwbl) {
-        super(string, thrwbl);
+    public InvalidAmendmentSpec(String string, Throwable throwable) {
+        super(string, throwable);
     }
 
-    public InvalidAmendmentSpec(Throwable thrwbl) {
-        super(thrwbl);
+    public InvalidAmendmentSpec(Throwable throwable) {
+        super(throwable);
     }
 
 }

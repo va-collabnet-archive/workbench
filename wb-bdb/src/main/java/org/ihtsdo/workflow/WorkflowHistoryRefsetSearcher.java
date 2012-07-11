@@ -134,7 +134,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 			columns[WorkflowHelper.statePosition] = WorkflowHelper.getFsn(Terms.get().getConcept(bean.getState()));
 			
 			// FSN of concept
-			columns[WorkflowHelper.fsnPosition] = bean.getFSN().toString();
+			columns[WorkflowHelper.fsnPosition] = bean.getFullySpecifiedName().toString();
 			
 			// Timestamps in 'yyyy-mm-dd hh:mm:ss' format
 			if (devWfTime > 0) {

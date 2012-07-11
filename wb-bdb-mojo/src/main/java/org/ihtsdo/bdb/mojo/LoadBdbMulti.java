@@ -60,7 +60,7 @@ import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
-import org.ihtsdo.tk.api.blueprint.DescCAB;
+import org.ihtsdo.tk.api.blueprint.DescriptionCAB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
@@ -73,8 +73,8 @@ import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
-import org.ihtsdo.tk.example.binding.CaseSensitive;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
+import org.ihtsdo.tk.binding.snomed.CaseSensitive;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.spec.PathSpec;
 
@@ -288,8 +288,8 @@ public class LoadBdbMulti extends AbstractMojo {
                     
                     if(!hasConcept){
                         ConceptCB conceptBp = spec.makePathConceptBluePrint();
-                        ViewCoordinate vc = Ts.get().getMetadataVC();
-                        EditCoordinate ec = Ts.get().getMetadataEC();
+                        ViewCoordinate vc = Ts.get().getMetadataViewCoordinate();
+                        EditCoordinate ec = Ts.get().getMetadataEditCoordinate();
                         TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(ec, vc);
                         ConceptChronicleBI concept = builder.construct(conceptBp);
                         BdbCommitManager.addUncommitted(concept);
@@ -307,7 +307,7 @@ public class LoadBdbMulti extends AbstractMojo {
                             + " with origin: " + spec.getOriginConcept().getDescription());
 
                     RefexCAB newPathSpec =
-                            new RefexCAB(TK_REFSET_TYPE.CID,
+                            new RefexCAB(TK_REFEX_TYPE.CID,
                             ReferenceConcepts.PATH.getNid(),
                             ReferenceConcepts.REFSET_PATHS.getNid());
                     newPathSpec.with(RefexProperty.CNID1, path.getNid());
@@ -315,7 +315,7 @@ public class LoadBdbMulti extends AbstractMojo {
                     newPathSpec.setMemberContentUuid();
 
                     RefexCAB newOriginSpec =
-                            new RefexCAB(TK_REFSET_TYPE.CID_INT,
+                            new RefexCAB(TK_REFEX_TYPE.CID_INT,
                             path.getNid(),
                             ReferenceConcepts.REFSET_PATH_ORIGINS.getNid());
                     newOriginSpec.with(RefexProperty.CNID1, origin.getNid());
@@ -430,7 +430,7 @@ public class LoadBdbMulti extends AbstractMojo {
 
     private void validateSpec(ConceptChronicleBI toValidate, ConceptSpec spec) throws IOException {
         boolean validated = false;
-        for (DescriptionChronicleBI desc : toValidate.getDescs()) {
+        for (DescriptionChronicleBI desc : toValidate.getDescriptions()) {
             for (DescriptionVersionBI descV : desc.getVersions()) {
                 if (descV.getText().equals(
                         spec.getDescription())) {
@@ -508,7 +508,7 @@ public class LoadBdbMulti extends AbstractMojo {
                         String word = parts[wordIndex];
                         String variant = parts[variantIndex];
 
-                        RefexCAB textRefexSpec = new RefexCAB(TK_REFSET_TYPE.STR,
+                        RefexCAB textRefexSpec = new RefexCAB(TK_REFEX_TYPE.STR,
                                 enTextWithVariantsRefexColl.getNid(), enTextWithVariantsRefexColl.getNid());
                         textRefexSpec.with(RefexProperty.STRING1, word);
                         textRefexSpec.with(RefexProperty.STATUS_NID,
@@ -517,7 +517,7 @@ public class LoadBdbMulti extends AbstractMojo {
 
                         RefexChronicleBI<?> textRefex = amender.constructIfNotCurrent(textRefexSpec);
 
-                        RefexCAB variantRefexSpec = new RefexCAB(TK_REFSET_TYPE.STR,
+                        RefexCAB variantRefexSpec = new RefexCAB(TK_REFEX_TYPE.STR,
                                 textRefex.getNid(), dialectVariantsRefexColl.getNid());
 
                         variantRefexSpec.with(RefexProperty.STRING1, variant);
@@ -589,7 +589,7 @@ public class LoadBdbMulti extends AbstractMojo {
                             icsTypeNid = CaseSensitive.MAYBE_IC_SIGNIFICANT.getLenient().getNid();
                         }
 
-                        RefexCAB wordRefexSpec = new RefexCAB(TK_REFSET_TYPE.CID_STR,
+                        RefexCAB wordRefexSpec = new RefexCAB(TK_REFEX_TYPE.CID_STR,
                                 caseSensitiveRefexColl.getNid(), caseSensitiveRefexColl.getNid());
                         wordRefexSpec.with(RefexProperty.STRING1, word);
                         wordRefexSpec.with(RefexProperty.CNID1, icsTypeNid);
@@ -644,21 +644,21 @@ public class LoadBdbMulti extends AbstractMojo {
                     EditCoordinate ec = new EditCoordinate(authorNid,
                             Snomed.CORE_MODULE.getLenient().getNid(),
                             store.getNidForUuids(pathUuid));
-                    TerminologyBuilderBI builder = store.getTerminologyBuilder(ec, Ts.get().getMetadataVC());
+                    TerminologyBuilderBI builder = store.getTerminologyBuilder(ec, Ts.get().getMetadataViewCoordinate());
 
                     ConceptCB conceptBp = new ConceptCB(fsn,
                             pref,
                             LANG_CODE.EN,
                             Snomed.IS_A.getLenient().getPrimUuid(),
                             parentUuid);
-                    List<DescCAB> fsnCABs = conceptBp.getFsnCABs();
-                    List<DescCAB> prefCABs = conceptBp.getPrefCABs();
-                    for (DescCAB f : fsnCABs) {
-                        conceptBp.addFsn(f, LANG_CODE.EN);
+                    List<DescriptionCAB> fsnCABs = conceptBp.getFullySpecifiedNameCABs();
+                    List<DescriptionCAB> prefCABs = conceptBp.getPreferredNameCABs();
+                    for (DescriptionCAB f : fsnCABs) {
+                        conceptBp.addFullySpecifiedName(f, LANG_CODE.EN);
                     }
 
-                    for (DescCAB p : prefCABs) {
-                        conceptBp.addFsn(p, LANG_CODE.EN);
+                    for (DescriptionCAB p : prefCABs) {
+                        conceptBp.addFullySpecifiedName(p, LANG_CODE.EN);
                     }
                     ConceptChronicleBI concept = builder.constructIfNotCurrent(conceptBp);
                     if(makeAnnotation.equalsIgnoreCase("true")){

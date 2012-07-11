@@ -101,7 +101,7 @@ public class AnnotationWriter {
         for (RefexChronicleBI<?> refsetChronicle : list) {
             RefsetMember<?,?> refsetMember = (RefsetMember<?, ?>) refsetChronicle;
             encountered.incrementAndGet();
-            assert refsetMember.getSapNid() != Integer.MAX_VALUE;
+            assert refsetMember.getStampNid() != Integer.MAX_VALUE;
             if (refsetMember.primordialSapNid > maxReadOnlyStatusAtPositionId
                     && refsetMember.getTime() != Long.MIN_VALUE) {
                 refsetMembersToWrite.add(refsetMember);

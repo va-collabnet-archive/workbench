@@ -54,11 +54,11 @@ import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid_str.RefexCnidStrAnalogBI;
-import org.ihtsdo.tk.api.refex.type_cnid_str.RefexCnidStrVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid_string.RefexNidStringAnalogBI;
+import org.ihtsdo.tk.api.refex.type_nid_string.RefexNidStringVersionBI;
 import org.ihtsdo.tk.binding.snomed.CaseSensitive;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 
 /**
  * Updates initial capital status list based on text file.
@@ -102,7 +102,7 @@ public class IcsListMaintenance extends AbstractTask {
             I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             String fileName = (String) process.getProperty(icsListFileNameProp);
             File icsFile = new File(fileName);
-            vc = Ts.get().getMetadataVC();
+            vc = Ts.get().getMetadataViewCoordinate();
             ec = new EditCoordinate(config.getDbConfig().getUserConcept().getNid(),
                     config.getEditCoordinate().getModuleNid(),
                     vc.getPositionSet().getViewPathNidSet());
@@ -114,10 +114,10 @@ public class IcsListMaintenance extends AbstractTask {
                     "UTF-8");
             BufferedReader br = new BufferedReader(isr);
             Collection<? extends RefexVersionBI<?>> currentRefsetMembers =
-                    caseSensitiveRefexColl.getCurrentRefsetMembers(vc);
-            ArrayList<RefexCnidStrVersionBI> memberList = new ArrayList<RefexCnidStrVersionBI>();
+                    caseSensitiveRefexColl.getRefsetMembersActive(vc);
+            ArrayList<RefexNidStringVersionBI> memberList = new ArrayList<RefexNidStringVersionBI>();
             for (RefexVersionBI rv : currentRefsetMembers) {
-                RefexCnidStrVersionBI member = (RefexCnidStrVersionBI) rv;
+                RefexNidStringVersionBI member = (RefexNidStringVersionBI) rv;
                 memberList.add(member);
             }
             try {
@@ -140,10 +140,10 @@ public class IcsListMaintenance extends AbstractTask {
                     }
                     boolean found = false;
 
-                    for (RefexCnidStrVersionBI member : memberList) {
-                        if (member.getStr1().equals(word)) {
+                    for (RefexNidStringVersionBI member : memberList) {
+                        if (member.getString1().equals(word)) {
                             found = true;
-                            if(icsTypeNid != member.getCnid1()){
+                            if(icsTypeNid != member.getNid1()){
                                 updateMember(member, icsTypeNid);
                             }
                             memberList.remove(member);
@@ -155,7 +155,7 @@ public class IcsListMaintenance extends AbstractTask {
                     }
                     line = br.readLine();
                 }
-                for(RefexCnidStrVersionBI member : memberList){
+                for(RefexNidStringVersionBI member : memberList){
                     retireMember(member);
                 }
             } catch (EOFException ex) {
@@ -182,7 +182,7 @@ public class IcsListMaintenance extends AbstractTask {
     }
 
     private void addMember(String word, int icsTypeNid) throws IOException, InvalidCAB, ContradictionException {
-        RefexCAB wordRefexSpec = new RefexCAB(TK_REFSET_TYPE.CID_STR,
+        RefexCAB wordRefexSpec = new RefexCAB(TK_REFEX_TYPE.CID_STR,
                 caseSensitiveRefexColl.getNid(), caseSensitiveRefexColl.getNid());
         wordRefexSpec.with(RefexProperty.STRING1, word);
         wordRefexSpec.with(RefexProperty.CNID1, icsTypeNid);
@@ -193,7 +193,7 @@ public class IcsListMaintenance extends AbstractTask {
         Ts.get().addUncommitted(caseSensitiveRefexColl);
     }
 
-    private void retireMember(RefexCnidStrVersionBI member) throws IOException {
+    private void retireMember(RefexNidStringVersionBI member) throws IOException {
         for (int pathNid : ec.getEditPaths()) {
             member.makeAnalog(
                     SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid(),
@@ -205,15 +205,15 @@ public class IcsListMaintenance extends AbstractTask {
         Ts.get().addUncommitted(caseSensitiveRefexColl);
     }
     
-    private void updateMember(RefexCnidStrVersionBI member, int icsTypeNid) throws IOException, PropertyVetoException {
+    private void updateMember(RefexNidStringVersionBI member, int icsTypeNid) throws IOException, PropertyVetoException {
         for (int pathNid : ec.getEditPaths()) {
-           RefexCnidStrAnalogBI analog =  (RefexCnidStrAnalogBI) member.makeAnalog(
+           RefexNidStringAnalogBI analog =  (RefexNidStringAnalogBI) member.makeAnalog(
                     SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(),
                     Long.MAX_VALUE,
                     ec.getAuthorNid(),
                     ec.getModuleNid(),
                     pathNid);
-           analog.setCnid1(icsTypeNid);
+           analog.setNid1(icsTypeNid);
         }
         Ts.get().addUncommitted(caseSensitiveRefexColl);
     }

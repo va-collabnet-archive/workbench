@@ -114,7 +114,7 @@ public class WorkflowHandler implements WorkflowHandlerBI {
 
 	            templateBean.setConcept(latestBean.getConcept());
 	            templateBean.setWorkflowId(latestBean.getWorkflowId());
-	            templateBean.setFSN(latestBean.getFSN());
+	            templateBean.setFullySpecifiedName(latestBean.getFullySpecifiedName());
 	            templateBean.setModeler(latestBean.getModeler());
 	            templateBean.setPath(latestBean.getPath());
 	            templateBean.setAction(key);

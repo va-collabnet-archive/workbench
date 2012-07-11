@@ -467,14 +467,14 @@ public class StatusAtPositionBdb extends ComponentBdb {
     }
     /**
     * Iterates all the sap nids in the database and processes them according to
-    * the implementation of <code>ProcessSapDataBI</code>.
+    * the implementation of <code>ProcessStampDataBI</code>.
     * @param processor contains the information about how the sap nids should be
     * processed.
     * @throws Exception 
     */
-    public void iterateSapDataInSequence(ProcessSapDataBI processor) throws Exception {
+    public void iterateSapDataInSequence(ProcessStampDataBI processor) throws Exception {
         for (int sap = initialPosition; sap < sequence.get(); sap++) {
-            processor.processSapData(new SAP(sap));
+            processor.processStampData(new STAMP(sap));
         }
     }
 

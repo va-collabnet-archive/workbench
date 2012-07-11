@@ -436,7 +436,7 @@ public class CreateCapUserPathAndQueuesBasedOnCreatorProfile extends AbstractTas
 			parentUserCon = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getPrimoridalUid());
 
     		for (I_GetConceptData user : WorkflowHelper.getChildren(parentUserCon)) {
-    			Collection<? extends I_DescriptionVersioned> descs = user.getDescriptions();
+    			Collection<? extends I_DescriptionVersioned> descs = user.getDescs();
     			
     			for (I_DescriptionVersioned desc : descs) {
     				if (desc.getTypeNid() == fsnNid || desc.getTypeNid() == rf2FsnNid ||

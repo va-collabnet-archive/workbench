@@ -38,7 +38,7 @@ import java.util.logging.Logger;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ManageContradiction;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
@@ -162,7 +162,7 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
 	I_TermFactory tf = null;
 	I_ConfigAceFrame config = null;
 	private Precedence precedence;
-	private I_ManageContradiction contradictionMgr;
+	private ContradictionManagerBI contradictionMgr;
 	I_ShowActivity gui = null;
 	private boolean continueThisAction = true;
 

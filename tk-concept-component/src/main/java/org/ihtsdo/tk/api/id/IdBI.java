@@ -35,7 +35,7 @@ public interface IdBI extends VersionPointBI {
 
    Object getDenotation();
 
-   int getSapNid();
+   int getStampNid();
 
    int getStatusNid();
    

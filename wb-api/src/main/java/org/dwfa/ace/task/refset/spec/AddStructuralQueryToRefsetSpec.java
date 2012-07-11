@@ -99,7 +99,7 @@ public class AddStructuralQueryToRefsetSpec extends AbstractAddRefsetSpecTask {
                if (c3Description == null) {
                   refsetMap.put(
                       REFSET_PROPERTY.CID_THREE,
-                      configFrame.getHierarchySelection().getDescriptions().iterator().next().getDescId());
+                      configFrame.getHierarchySelection().getDescs().iterator().next().getDescId());
                } else {
                   refsetMap.put(REFSET_PROPERTY.CID_THREE, c3Description.getDescId());
                }
@@ -108,7 +108,7 @@ public class AddStructuralQueryToRefsetSpec extends AbstractAddRefsetSpecTask {
                   ConceptContainerBI node =
                      (ConceptContainerBI) configFrame.getTreeInTaxonomyPanel().getLastSelectedPathComponent();
 
-                  refsetMap.put(REFSET_PROPERTY.CID_THREE, node.getCnid());
+                  refsetMap.put(REFSET_PROPERTY.CID_THREE, node.getConceptNid());
                } else {
                   refsetMap.put(REFSET_PROPERTY.CID_THREE, c3Description.getConceptNid());
                }

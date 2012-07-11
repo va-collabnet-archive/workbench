@@ -2,7 +2,7 @@ package org.ihtsdo.tk.dto.concept.component.attribute;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.api.ext.I_ConceptualizeExternally;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
@@ -28,9 +28,9 @@ public class TkConceptAttributesRevision extends TkRevision implements I_Concept
       super();
    }
 
-   public TkConceptAttributesRevision(ConAttrVersionBI another) throws IOException {
-      super(another);
-      this.defined = another.isDefined();
+   public TkConceptAttributesRevision(ConceptAttributeVersionBI conceptAttributeVersion) throws IOException {
+      super(conceptAttributeVersion);
+      this.defined = conceptAttributeVersion.isDefined();
    }
 
    public TkConceptAttributesRevision(DataInput in, int dataVersion)

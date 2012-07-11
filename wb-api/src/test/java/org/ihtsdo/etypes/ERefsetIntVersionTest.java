@@ -129,7 +129,7 @@ public class ERefsetIntVersionTest {
     private ERefsetIntRevision makeTestComponent1() {
         
         ERefsetIntRevision rsv = new ERefsetIntRevision();
-        rsv.intValue = 3; 
+        rsv.int1 = 3; 
         rsv.pathUuid = new UUID(4350, 5469);
         rsv.statusUuid = new UUID(5386, 4497);
         rsv.time = this.myTime;
@@ -140,7 +140,7 @@ public class ERefsetIntVersionTest {
     private ERefsetIntRevision makeTestComponent2() {
         
         ERefsetIntRevision rsv = new ERefsetIntRevision();
-        rsv.intValue = 3; 
+        rsv.int1 = 3; 
         rsv.pathUuid = new UUID(222, 222);
         rsv.statusUuid = new UUID(333, 333);
         rsv.time = this.myTime;

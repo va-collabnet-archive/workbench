@@ -69,7 +69,7 @@ public class TaxonomyMouseListenerForAce extends MouseAdapter {
            throws ContradictionException, IOException {
       node.getExtraParents().clear();
       if (node.getParentNid() != Integer.MAX_VALUE) {    // test if root
-         for (ConceptVersionBI parent : nodeConcept.getRelsOutgoingDestinationsActiveIsa()) {
+         for (ConceptVersionBI parent : nodeConcept.getRelationshipsSourceTargetConceptsActiveIsa()) {
             if (parent.getNid() != node.getParentNid()) {
                TaxonomyNode extraParentNode = null;
                long[]       nodesToCompare  = new long[node.getNodesToCompare().length + 1];
@@ -78,7 +78,7 @@ public class TaxonomyMouseListenerForAce extends MouseAdapter {
                                 node.getNodesToCompare().length);
                nodesToCompare[node.getNodesToCompare().length] = Long.MAX_VALUE;
 
-               if (parent.getRelsOutgoingActiveIsa().isEmpty()) {
+               if (parent.getRelationshipsSourceActiveIsa().isEmpty()) {
                   extraParentNode = new SecondaryParentNodeRoot(parent.getNid(), nodeConcept.getNid(),
                           node.parentNodeId, nodesToCompare);
                } else {
@@ -142,7 +142,7 @@ public class TaxonomyMouseListenerForAce extends MouseAdapter {
                   return;
                }
 
-               ConceptChronicleBI selectedConcept = Ts.get().getConcept(node.getCnid());
+               ConceptChronicleBI selectedConcept = Ts.get().getConcept(node.getConceptNid());
 
                if (e.isPopupTrigger()) {
                   makeAndShowPopup(e, selectedConcept);
@@ -198,7 +198,7 @@ public class TaxonomyMouseListenerForAce extends MouseAdapter {
                   return;
                }
 
-               ConceptChronicleBI selectedConcept = Ts.get().getConcept(node.getCnid());
+               ConceptChronicleBI selectedConcept = Ts.get().getConcept(node.getConceptNid());
 
                if (e.isPopupTrigger()) {
                   makeAndShowPopup(e, selectedConcept);
@@ -216,7 +216,7 @@ public class TaxonomyMouseListenerForAce extends MouseAdapter {
 
       node.setSecondaryParentOpened(addNodes);
 
-      ConceptVersionBI nodeConcept = Ts.get().getConceptVersion(helper.getViewCoordinate(), node.getCnid());
+      ConceptVersionBI nodeConcept = Ts.get().getConceptVersion(helper.getViewCoordinate(), node.getConceptNid());
 
       helper.getRenderer().setupTaxonomyNode(node, nodeConcept);
       tree.paintImmediately(bounds);
@@ -233,7 +233,7 @@ public class TaxonomyMouseListenerForAce extends MouseAdapter {
             }
          } else {    // remove nodes
             removeAllExtraParents(model, node);
-            ace.getAceFrameConfig().getParentExpandedNodes().remove(node.getCnid());
+            ace.getAceFrameConfig().getParentExpandedNodes().remove(node.getConceptNid());
          }
 
          model.treeStructureChanged(NodePath.getTreePath(model, parentNode));

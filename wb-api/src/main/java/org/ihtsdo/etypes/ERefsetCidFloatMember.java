@@ -10,8 +10,8 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidLong;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.tapi.TerminologyException;
 
-import org.ihtsdo.tk.dto.concept.component.refset.cidflt.TkRefsetCidFloatMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidflt.TkRefsetCidFloatRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_float.TkRefexUuidFloatMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_float.TkRefexUuidFloatRevision;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -20,7 +20,7 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 
-public class ERefsetCidFloatMember extends TkRefsetCidFloatMember {
+public class ERefsetCidFloatMember extends TkRefexUuidFloatMember {
    public static final long serialVersionUID = 1;
 
    //~--- constructors --------------------------------------------------------
@@ -43,8 +43,8 @@ public class ERefsetCidFloatMember extends TkRefsetCidFloatMember {
 
       I_ExtendByRefPartCidFloat part = (I_ExtendByRefPartCidFloat) m.getMutableParts().get(0);
 
-      c1Uuid     = Terms.get().nidToUuid(part.getUnitsOfMeasureId());
-      floatValue = (float) part.getMeasurementValue();
+      uuid1     = Terms.get().nidToUuid(part.getUnitsOfMeasureId());
+      float1 = (float) part.getMeasurementValue();
       pathUuid   = Terms.get().nidToUuid(part.getPathNid());
       statusUuid = Terms.get().nidToUuid(part.getStatusNid());
       authorUuid    = Terms.get().nidToUuid(part.getAuthorNid());
@@ -52,7 +52,7 @@ public class ERefsetCidFloatMember extends TkRefsetCidFloatMember {
       time       = part.getTime();
 
       if (partCount > 1) {
-         revisions = new ArrayList<TkRefsetCidFloatRevision>(partCount - 1);
+         revisions = new ArrayList<TkRefexUuidFloatRevision>(partCount - 1);
 
          for (int i = 1; i < partCount; i++) {
             revisions.add(

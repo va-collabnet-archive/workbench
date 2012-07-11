@@ -45,10 +45,10 @@ import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 import org.ihtsdo.tk.api.refex.type_int.RefexIntVersionBI;
 import org.ihtsdo.tk.api.refex.type_long.RefexLongVersionBI;
-import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
+import org.ihtsdo.tk.api.refex.type_string.RefexStringVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.util.swing.GuiUtil;
 
@@ -118,13 +118,13 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
                 if (!cb.isCanceled()) {
                     // EXISTING PARENTS
                     for (ConceptVersionBI cvbi : cb.getVersions(vc)) {
-                        for (RelationshipVersionBI rvbi : cvbi.getRelsOutgoingActive()) {
+                        for (RelationshipVersionBI rvbi : cvbi.getRelationshipsSourceActive()) {
                             if (rvbi.isStated() && parentLinkageTypes.contains(rvbi.getTypeNid())) {
                                 // Check if role-value already exists
                                 Boolean found = false;
                                 for (RelationshipVersionBI parent : existingParents) {
                                     if (parent.getTypeNid() == rvbi.getTypeNid()
-                                            && parent.getDestinationNid() == rvbi.getDestinationNid()) {
+                                            && parent.getTargetNid() == rvbi.getTargetNid()) {
                                         found = true;
                                     }
                                 }
@@ -137,13 +137,13 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
 
                     // EXISTING ROLES
                     for (ConceptVersionBI cvbi : cb.getVersions(vc)) {
-                        for (RelationshipVersionBI rvbi : cvbi.getRelsOutgoingActive()) {
+                        for (RelationshipVersionBI rvbi : cvbi.getRelationshipsSourceActive()) {
                             if (rvbi.isStated()) {
                                 // Check if role-value already exists
                                 Boolean found = false;
                                 for (RelationshipVersionBI role : existingRoles) {
                                     if (role.getTypeNid() == rvbi.getTypeNid()
-                                            && role.getDestinationNid() == rvbi.getDestinationNid()) {
+                                            && role.getTargetNid() == rvbi.getTargetNid()) {
                                         found = true;
                                     }
                                 }
@@ -155,16 +155,16 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
                     }
 
                     // EXISTING REFSETS
-                    Collection<? extends RefexVersionBI<?>> cr = cb.getCurrentRefexes(vc);
+                    Collection<? extends RefexVersionBI<?>> cr = cb.getRefexesActive(vc);
                     for (RefexVersionBI<?> rvbi : cr) {
-                        int refexNid = rvbi.getCollectionNid();
-                        existingRefsetTypes.put(refexNid, RefexStrVersionBI.class);
-                        if (RefexStrVersionBI.class.isAssignableFrom(rvbi.getClass())) {
-                            RefexStrVersionBI r = (RefexStrVersionBI) rvbi;
+                        int refexNid = rvbi.getRefexNid();
+                        existingRefsetTypes.put(refexNid, RefexStringVersionBI.class);
+                        if (RefexStringVersionBI.class.isAssignableFrom(rvbi.getClass())) {
+                            RefexStringVersionBI r = (RefexStringVersionBI) rvbi;
                         } else if (RefexBooleanVersionBI.class.isAssignableFrom(rvbi.getClass())) {
                             RefexBooleanVersionBI r = (RefexBooleanVersionBI) rvbi;
-                        } else if (RefexCnidVersionBI.class.isAssignableFrom(rvbi.getClass())) {
-                            RefexCnidVersionBI r = (RefexCnidVersionBI) rvbi;
+                        } else if (RefexNidVersionBI.class.isAssignableFrom(rvbi.getClass())) {
+                            RefexNidVersionBI r = (RefexNidVersionBI) rvbi;
                         } else if (RefexIntVersionBI.class.isAssignableFrom(rvbi.getClass())) {
                             RefexIntVersionBI r = (RefexIntVersionBI) rvbi;
                         } else if (RefexLongVersionBI.class.isAssignableFrom(rvbi.getClass())) {
@@ -343,7 +343,7 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
             // SETUP TASK LIST
             ViewCoordinate vc = ace.aceFrameConfig.getViewCoordinate();
             vc = new ViewCoordinate(vc);
-            vc.setRelAssertionType(RelAssertionType.STATED);
+            vc.setRelationshipAssertionType(RelAssertionType.STATED);
             EditCoordinate ec = ace.aceFrameConfig.getEditCoordinate();
 
             BatchActionTask.setup(ec, vc);

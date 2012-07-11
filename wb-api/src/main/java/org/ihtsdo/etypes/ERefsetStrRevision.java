@@ -5,7 +5,7 @@ package org.ihtsdo.etypes;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 
-import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_string.TkRefsetStrRevision;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -22,7 +22,7 @@ public class ERefsetStrRevision extends TkRefsetStrRevision {
    }
 
    public ERefsetStrRevision(I_ExtendByRefPartStr part) throws IOException {
-      stringValue = part.getStringValue();
+      string1 = part.getStringValue();
       pathUuid    = Terms.get().nidToUuid(part.getPathNid());
       statusUuid  = Terms.get().nidToUuid(part.getStatusNid());
       authorUuid    = Terms.get().nidToUuid(part.getAuthorNid());

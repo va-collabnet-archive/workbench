@@ -5,14 +5,14 @@ package org.ihtsdo.etypes;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartBoolean;
 
-import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_boolean.TkRefexBooleanRevision;
 
 //~--- JDK imports ------------------------------------------------------------
 
 import java.io.DataInput;
 import java.io.IOException;
 
-public class ERefsetBooleanRevision extends TkRefsetBooleanRevision {
+public class ERefsetBooleanRevision extends TkRefexBooleanRevision {
    public static final long serialVersionUID = 1;
 
    //~--- constructors --------------------------------------------------------
@@ -22,7 +22,7 @@ public class ERefsetBooleanRevision extends TkRefsetBooleanRevision {
    }
 
    public ERefsetBooleanRevision(I_ExtendByRefPartBoolean part) throws IOException {
-      booleanValue = part.getBooleanValue();
+      boolean1 = part.getBooleanValue();
       pathUuid     = Terms.get().nidToUuid(part.getPathNid());
       statusUuid   = Terms.get().nidToUuid(part.getStatusNid());
       authorUuid    = Terms.get().nidToUuid(part.getAuthorNid());

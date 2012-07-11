@@ -7,14 +7,14 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 public interface KindOfCacheBI {
 
-	public abstract void setup(ViewCoordinate coordinate) throws Exception;
+	public abstract void setup(ViewCoordinate viewCoordinate) throws Exception;
 
 	public abstract boolean isKindOf(int childNid, int parentNid)
 			throws Exception;
 	
 	public CountDownLatch getLatch();
         
-        public void updateCache(ConceptChronicleBI c) throws Exception;
+        public void updateCache(ConceptChronicleBI conceptChronicle) throws Exception;
     
 
 }

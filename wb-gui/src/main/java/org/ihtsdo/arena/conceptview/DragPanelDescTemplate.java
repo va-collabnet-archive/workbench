@@ -80,7 +80,7 @@ public class DragPanelDescTemplate extends DragPanel<DescriptionSpec> implements
 
    @Override
    public String getUserString(DescriptionSpec obj) {
-      return obj.getDescText();
+      return obj.getDescriptionText();
    }
 
    @Override

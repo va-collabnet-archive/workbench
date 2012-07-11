@@ -193,7 +193,7 @@ public class RF2Export extends AbstractMojo implements I_ProcessConcepts {
             }
 
             // export description refsets
-            for (I_DescriptionVersioned desc : concept.getDescriptions()) {
+            for (I_DescriptionVersioned desc : concept.getDescs()) {
                 processDescription(desc);
             }
         } else {

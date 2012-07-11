@@ -24,7 +24,7 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 
 /**
  * Sample BatchAction
@@ -33,7 +33,7 @@ import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 public class BatchActionTaskRefsetAddMember extends BatchActionTask {
 
     // int rcNid; referenced component provided at execution time
-    private TK_REFSET_TYPE refsetType;
+    private TK_REFEX_TYPE refsetType;
     private int collectionNid;
     private Object refsetValue;
 
@@ -47,7 +47,7 @@ public class BatchActionTaskRefsetAddMember extends BatchActionTask {
         this.collectionNid = collectionNid;
     }
 
-    public void setRefsetType(TK_REFSET_TYPE refsetType) {
+    public void setRefsetType(TK_REFEX_TYPE refsetType) {
         this.refsetType = refsetType;
     }
 
@@ -60,9 +60,9 @@ public class BatchActionTaskRefsetAddMember extends BatchActionTask {
     public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc) throws Exception {
         int rcNid = c.getNid(); // referenced component nid
         // Check if member already exists
-        Collection<? extends RefexVersionBI<?>> currentRefexes = c.getCurrentRefexes(vc);
+        Collection<? extends RefexVersionBI<?>> currentRefexes = c.getRefexesActive(vc);
         for (RefexVersionBI rvbi : currentRefexes) {
-            if (rvbi.getCollectionNid() == collectionNid) {
+            if (rvbi.getRefexNid() == collectionNid) {
                 BatchActionEventReporter.add(new BatchActionEvent(c, BatchActionTaskType.REFSET_ADD_MEMBER,
                         BatchActionEventType.EVENT_NOOP, "already member of: " + nidToName(collectionNid)));
                 return false;
@@ -71,13 +71,13 @@ public class BatchActionTaskRefsetAddMember extends BatchActionTask {
 
         // If not already a member, then a member record is added.
         RefexCAB refexSpec = new RefexCAB(refsetType, rcNid, collectionNid);
-        if (refsetType == TK_REFSET_TYPE.BOOLEAN) {
+        if (refsetType == TK_REFEX_TYPE.BOOLEAN) {
             refexSpec.with(RefexCAB.RefexProperty.BOOLEAN1, (Boolean) refsetValue);
-        } else if (refsetType == TK_REFSET_TYPE.CID) {
+        } else if (refsetType == TK_REFEX_TYPE.CID) {
             refexSpec.with(RefexCAB.RefexProperty.CNID1, ((Integer) refsetValue).intValue()); // int nid
-        } else if (refsetType == TK_REFSET_TYPE.INT) {
+        } else if (refsetType == TK_REFEX_TYPE.INT) {
             refexSpec.with(RefexCAB.RefexProperty.INTEGER1, (Integer) refsetValue);
-        } else if (refsetType == TK_REFSET_TYPE.STR) {
+        } else if (refsetType == TK_REFEX_TYPE.STR) {
             refexSpec.with(RefexCAB.RefexProperty.STRING1, (String) refsetValue);
         }
 

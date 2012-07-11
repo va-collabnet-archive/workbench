@@ -17,25 +17,25 @@ public class TkTestFriendlyDescription extends TkDescription implements I_Descri
 	Boolean published;
 	Boolean retired;
 	
-	public TkTestFriendlyDescription(TkDescription description, UUID pathUUID, Long time) {
+	public TkTestFriendlyDescription(TkDescription tkDescription, UUID pathUUID, Long time) {
 	}
 
-	public TkTestFriendlyDescription(TkDescription description, TkDescriptionRevision revision) {
+	public TkTestFriendlyDescription(TkDescription tkDescription, TkDescriptionRevision tkDescriptionRevision) {
 		
-		this.conceptUuid = description.conceptUuid;
+		this.conceptUuid = tkDescription.conceptUuid;
 		
-		this.initialCaseSignificant = revision.isInitialCaseSignificant();
-		this.lang = revision.getLang();
-		this.text = revision.getText();
-		this.typeUuid = revision.getTypeUuid();
+		this.initialCaseSignificant = tkDescriptionRevision.isInitialCaseSignificant();
+		this.lang = tkDescriptionRevision.getLang();
+		this.text = tkDescriptionRevision.getText();
+		this.typeUuid = tkDescriptionRevision.getTypeUuid();
 		
-		this.authorUuid = revision.getAuthorUuid();
-		this.statusUuid = revision.getStatusUuid();
-		this.pathUuid = revision.getPathUuid();
-		this.time = revision.getTime();
+		this.authorUuid = tkDescriptionRevision.getAuthorUuid();
+		this.statusUuid = tkDescriptionRevision.getStatusUuid();
+		this.pathUuid = tkDescriptionRevision.getPathUuid();
+		this.time = tkDescriptionRevision.getTime();
 		
-		this.primordialUuid = description.getPrimordialComponentUuid();
-		this.additionalIds = description.getAdditionalIdComponents();
+		this.primordialUuid = tkDescription.getPrimordialComponentUuid();
+		this.additionalIds = tkDescription.getAdditionalIdComponents();
 	}
 
 	public Boolean isIcsCandidate() {

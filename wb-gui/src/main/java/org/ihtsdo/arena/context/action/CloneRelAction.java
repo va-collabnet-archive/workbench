@@ -15,7 +15,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
@@ -39,7 +39,7 @@ public class CloneRelAction extends AbstractAction {
         try {
             I_GetConceptData concept = Terms.get().getConceptForNid(component.getNid());
             Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
-            if (ConAttrVersionBI.class.isAssignableFrom(component.getClass())) {
+            if (ConceptAttributeVersionBI.class.isAssignableFrom(component.getClass())) {
                 throw new UnsupportedOperationException();
             }
             if (ConceptVersionBI.class.isAssignableFrom(component.getClass())) {
@@ -55,7 +55,7 @@ public class CloneRelAction extends AbstractAction {
                 RelationshipVersionBI rel = (RelationshipVersionBI) component;
                 I_RelVersioned newRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(), concept,
                         rel.getTypeNid(),
-                        rel.getDestinationNid(),
+                        rel.getTargetNid(),
                         rel.getCharacteristicNid(),
                         rel.getRefinabilityNid(),
                         rel.getGroup(),

@@ -88,7 +88,7 @@ public class SetEditPathFromDescription extends AbstractTask {
             I_ConfigAceFrame frameConfig = tf.getActiveAceFrameConfig();
             for (PathBI path : tf.getPaths()) {
                 worker.getLogger().info(Integer.toString(path.getConceptNid()));
-                for (I_DescriptionVersioned description : tf.getConcept(path.getConceptNid()).getDescriptions()) {
+                for (I_DescriptionVersioned description : tf.getConcept(path.getConceptNid()).getDescs()) {
                     int id = ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid();
                     if (description.getLastTuple().getTypeId() == id
                         && description.getLastTuple().getText().equals(DescriptionForExistingPath)) {

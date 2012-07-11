@@ -26,8 +26,8 @@ import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
-import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
-import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeChronicleBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
@@ -248,7 +248,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         descTypes.add(fsnDesc);
 
         //setting up view coordinate with specific active values, and adding correct Is a
-        newVc = Ts.get().getMetadataVC();
+        newVc = Ts.get().getMetadataViewCoordinate();
         newVc.setPositionSet(vc.getPositionSet());
         NidSetBI isaNids = newVc.getIsaTypeNids();
         isaNids.add(Snomed.IS_A.getLenient().getNid());
@@ -315,28 +315,28 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         if (c.getPrimUuid().equals(UUID.fromString("568cd2a4-bcac-4cf7-a6af-29587639a354"))) {
             System.out.println(c);
         }
-        ConAttrChronicleBI ca = c.getConAttrs();
+        ConceptAttributeChronicleBI ca = c.getConceptAttributes();
         processConceptAttribute(ca);
-        processIdentifiers(ca.getPrimUuid(), ca.getPrimordialVersion().getSapNid());
+        processIdentifiers(ca.getPrimUuid(), ca.getPrimordialVersion().getStampNid());
 
-        if (c.getDescs() != null) {
-            for (DescriptionChronicleBI d : c.getDescs()) {
+        if (c.getDescriptions() != null) {
+            for (DescriptionChronicleBI d : c.getDescriptions()) {
                 processDescription(d);
-                processIdentifiers(d.getPrimUuid(), d.getPrimordialVersion().getSapNid());
+                processIdentifiers(d.getPrimUuid(), d.getPrimordialVersion().getStampNid());
                 if (d.getAnnotations() != null) {
                     for (RefexChronicleBI annot : d.getAnnotations()) {
-                        ConceptVersionBI cv = Ts.get().getConceptVersion(newVc, annot.getCollectionNid());
-                            langRefexNids.add(annot.getCollectionNid());
+                        ConceptVersionBI cv = Ts.get().getConceptVersion(newVc, annot.getRefexNid());
+                            langRefexNids.add(annot.getRefexNid());
                             processLangRefsets(annot);
                     }
                 }
             }
         }
 
-        if (c.getRelsOutgoing() != null) {
-            for (RelationshipChronicleBI r : c.getRelsOutgoing()) {
+        if (c.getRelationshipsSource() != null) {
+            for (RelationshipChronicleBI r : c.getRelationshipsSource()) {
                 processRelationship(r);
-                processIdentifiers(r.getPrimUuid(), r.getPrimordialVersion().getSapNid());
+                processIdentifiers(r.getPrimUuid(), r.getPrimordialVersion().getStampNid());
             }
         }
     }
@@ -355,10 +355,10 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         }
     }
 
-    private void processConceptAttribute(ConAttrChronicleBI ca) throws IOException {
+    private void processConceptAttribute(ConceptAttributeChronicleBI ca) throws IOException {
         if (ca != null) {
-            for (ConAttrVersionBI car : ca.getVersions(vc)) {
-                if (sapNids.contains(car.getSapNid())) {
+            for (ConceptAttributeVersionBI car : ca.getVersions(vc)) {
+                if (sapNids.contains(car.getStampNid())) {
                     for (Rf2File.ConceptsFileFields field : Rf2File.ConceptsFileFields.values()) {
                         switch (field) {
                             case ACTIVE:
@@ -396,7 +396,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
     private void processDescription(DescriptionChronicleBI desc) throws IOException {
         if (desc != null) {
             for (DescriptionVersionBI descr : desc.getVersions(vc)) {
-                if (sapNids.contains(descr.getSapNid())) {
+                if (sapNids.contains(descr.getStampNid())) {
                     for (Rf2File.DescriptionsFileFields field : Rf2File.DescriptionsFileFields.values()) {
                         switch (field) {
                             case ACTIVE:
@@ -456,7 +456,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
     private void processRelationship(RelationshipChronicleBI r) throws IOException {
         if (r != null) {
             for (RelationshipVersionBI rv : r.getVersions(vc)) {
-                if (sapNids.contains(rv.getSapNid())) {
+                if (sapNids.contains(rv.getStampNid())) {
                     if (rv.getCharacteristicNid()
                             == SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID()) {
                         processInferredRelationship(rv);
@@ -494,13 +494,13 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     break;
 
                 case SOURCE_ID:
-                    relationshipsWriter.write(store.getUuidPrimordialForNid(rv.getOriginNid())
+                    relationshipsWriter.write(store.getUuidPrimordialForNid(rv.getSourceNid())
                             + field.seperator);
 
                     break;
 
                 case DESTINATION_ID:
-                    relationshipsWriter.write(store.getUuidPrimordialForNid(rv.getDestinationNid())
+                    relationshipsWriter.write(store.getUuidPrimordialForNid(rv.getTargetNid())
                             + field.seperator);
 
                     break;
@@ -556,13 +556,13 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     break;
 
                 case SOURCE_ID:
-                    relationshipsStatedWriter.write(store.getUuidPrimordialForNid(rv.getOriginNid())
+                    relationshipsStatedWriter.write(store.getUuidPrimordialForNid(rv.getSourceNid())
                             + field.seperator);
 
                     break;
 
                 case DESTINATION_ID:
-                    relationshipsStatedWriter.write(store.getUuidPrimordialForNid(rv.getDestinationNid())
+                    relationshipsStatedWriter.write(store.getUuidPrimordialForNid(rv.getTargetNid())
                             + field.seperator);
 
                     break;
@@ -636,15 +636,15 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
 
     private void processLangRefsets(RefexChronicleBI r) throws IOException {
         if (r != null) {
-            if (!excludedRefsetIds.contains(r.getCollectionNid())) {
+            if (!excludedRefsetIds.contains(r.getRefexNid())) {
                 Collection<RefexVersionBI<?>> versions = r.getVersions(vc);
                 for (RefexVersionBI rv : versions) {
-                    if (!sapNids.contains(rv.getSapNid())) {
+                    if (!sapNids.contains(rv.getStampNid())) {
                         break;
                     } else {
-                        if (r.getCollectionNid() == RefsetAux.EN_GB_REFEX.getLenient().getNid()) {
+                        if (r.getRefexNid() == RefsetAux.EN_GB_REFEX.getLenient().getNid()) {
                             processLang(rv);
-                        } else if (r.getCollectionNid() == RefsetAux.EN_US_REFEX.getLenient().getNid()) {
+                        } else if (r.getRefexNid() == RefsetAux.EN_US_REFEX.getLenient().getNid()) {
                             processLang(rv);
                         } else {
                             processOtherLang(rv);
@@ -681,8 +681,8 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                         break;
 
                     case REFSET_ID:
-                        langRefexNids.add(rv.getCollectionNid());
-                        langRefsetsWriter.write(store.getComponent(rv.getCollectionNid()).getPrimUuid() + field.seperator);
+                        langRefexNids.add(rv.getRefexNid());
+                        langRefsetsWriter.write(store.getComponent(rv.getRefexNid()).getPrimUuid() + field.seperator);
 
                         break;
 
@@ -725,8 +725,8 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                         break;
 
                     case REFSET_ID:
-                        langRefexNids.add(rv.getCollectionNid());
-                        otherLangRefsetsWriter.write(store.getComponent(rv.getCollectionNid()).getPrimUuid() + field.seperator);
+                        langRefexNids.add(rv.getRefexNid());
+                        otherLangRefsetsWriter.write(store.getComponent(rv.getRefexNid()).getPrimUuid() + field.seperator);
 
                         break;
 

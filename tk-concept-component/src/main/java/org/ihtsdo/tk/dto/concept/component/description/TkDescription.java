@@ -36,30 +36,30 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
         super();
     }
 
-    public TkDescription(DescriptionChronicleBI another) throws IOException {
-        this(another.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
+    public TkDescription(DescriptionChronicleBI descriptionChronicle) throws IOException {
+        this(descriptionChronicle.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
     }
 
-    public TkDescription(DescriptionVersionBI desc,
+    public TkDescription(DescriptionVersionBI descriptionVersion,
             RevisionHandling revisionHandling) throws IOException {
-        super(desc);
+        super(descriptionVersion);
         TerminologyStoreDI ts = Ts.get();
         if (revisionHandling == RevisionHandling.EXCLUDE_REVISIONS) {
-            conceptUuid = ts.getUuidPrimordialForNid(desc.getConceptNid());
-            initialCaseSignificant = desc.isInitialCaseSignificant();
-            lang = desc.getLang();
-            text = desc.getText();
-            typeUuid = ts.getUuidPrimordialForNid(desc.getTypeNid());
-            pathUuid = ts.getUuidPrimordialForNid(desc.getPathNid());
-            statusUuid = ts.getUuidPrimordialForNid(desc.getStatusNid());
-            time = desc.getTime();
+            conceptUuid = ts.getUuidPrimordialForNid(descriptionVersion.getConceptNid());
+            initialCaseSignificant = descriptionVersion.isInitialCaseSignificant();
+            lang = descriptionVersion.getLang();
+            text = descriptionVersion.getText();
+            typeUuid = ts.getUuidPrimordialForNid(descriptionVersion.getTypeNid());
+            pathUuid = ts.getUuidPrimordialForNid(descriptionVersion.getPathNid());
+            statusUuid = ts.getUuidPrimordialForNid(descriptionVersion.getStatusNid());
+            time = descriptionVersion.getTime();
         } else {
-            Collection<? extends DescriptionVersionBI> versions = desc.getVersions();
+            Collection<? extends DescriptionVersionBI> versions = descriptionVersion.getVersions();
             Iterator<? extends DescriptionVersionBI> itr = versions.iterator();
             int partCount = versions.size();
             DescriptionVersionBI version = itr.next();
 
-            conceptUuid = ts.getUuidPrimordialForNid(desc.getConceptNid());
+            conceptUuid = ts.getUuidPrimordialForNid(descriptionVersion.getConceptNid());
             initialCaseSignificant = version.isInitialCaseSignificant();
             lang = version.getLang();
             text = version.getText();
@@ -100,22 +100,22 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
         this.text = another.text;
     }
 
-    public TkDescription(DescriptionVersionBI another, NidBitSetBI exclusions, Map<UUID, UUID> conversionMap,
-            long offset, boolean mapAll, ViewCoordinate vc)
+    public TkDescription(DescriptionVersionBI descriptionVersion, NidBitSetBI excludedNids, Map<UUID, UUID> conversionMap,
+            long offset, boolean mapAll, ViewCoordinate viewCoordinate)
             throws IOException, ContradictionException {
-        super(another, exclusions, conversionMap, offset, mapAll, vc);
+        super(descriptionVersion, excludedNids, conversionMap, offset, mapAll, viewCoordinate);
 
         if (mapAll) {
-            this.conceptUuid = conversionMap.get(Ts.get().getComponent(another.getConceptNid()).getPrimUuid());
-            this.typeUuid = conversionMap.get(Ts.get().getComponent(another.getTypeNid()).getPrimUuid());
+            this.conceptUuid = conversionMap.get(Ts.get().getComponent(descriptionVersion.getConceptNid()).getPrimUuid());
+            this.typeUuid = conversionMap.get(Ts.get().getComponent(descriptionVersion.getTypeNid()).getPrimUuid());
         } else {
-            this.conceptUuid = Ts.get().getComponent(another.getConceptNid()).getPrimUuid();
-            this.typeUuid = Ts.get().getComponent(another.getTypeNid()).getPrimUuid();
+            this.conceptUuid = Ts.get().getComponent(descriptionVersion.getConceptNid()).getPrimUuid();
+            this.typeUuid = Ts.get().getComponent(descriptionVersion.getTypeNid()).getPrimUuid();
         }
 
-        this.initialCaseSignificant = another.isInitialCaseSignificant();
-        this.lang = another.getLang();
-        this.text = another.getText();
+        this.initialCaseSignificant = descriptionVersion.isInitialCaseSignificant();
+        this.lang = descriptionVersion.getLang();
+        this.text = descriptionVersion.getText();
     }
 
     //~--- methods -------------------------------------------------------------

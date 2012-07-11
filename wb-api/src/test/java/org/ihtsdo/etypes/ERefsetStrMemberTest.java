@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
-import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_string.TkRefsetStrRevision;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -132,7 +132,7 @@ public class ERefsetStrMemberTest {
         
         ERefsetStrMember member = new ERefsetStrMember();
         member.componentUuid = new UUID(64386, 75497);
-        member.strValue = "VALUE 1"; 
+        member.string1 = "VALUE 1"; 
         member.refsetUuid = new UUID(14386, 65497);
         member.pathUuid = new UUID(4350, 5469);
         member.statusUuid = new UUID(5386, 4497);
@@ -150,7 +150,7 @@ public class ERefsetStrMemberTest {
         // Add extraVersions
         member.revisions = new ArrayList<TkRefsetStrRevision>();
         ERefsetStrRevision rsv = new ERefsetStrRevision();
-        rsv.stringValue = "VALUE 2"; 
+        rsv.string1 = "VALUE 2"; 
         rsv.pathUuid = new UUID(4350, 5469);
         rsv.statusUuid = new UUID(5386, 4497);
         rsv.time = this.myTime;
@@ -163,7 +163,7 @@ public class ERefsetStrMemberTest {
         
         ERefsetStrMember member = new ERefsetStrMember();
         member.componentUuid = new UUID(111, 111);
-        member.strValue = "VALUE A"; 
+        member.string1 = "VALUE A"; 
         member.refsetUuid = new UUID(222, 222);
         member.pathUuid = new UUID(333, 333);
         member.statusUuid = new UUID(444, 444);
@@ -181,7 +181,7 @@ public class ERefsetStrMemberTest {
         // Add extraVersions
         member.revisions = new ArrayList<TkRefsetStrRevision>();
         ERefsetStrRevision rsv = new ERefsetStrRevision();
-        rsv.stringValue = "VALUE B"; 
+        rsv.string1 = "VALUE B"; 
         rsv.pathUuid = new UUID(2222, 2222);
         rsv.statusUuid = new UUID(3333, 3333);
         rsv.time = this.myTime;

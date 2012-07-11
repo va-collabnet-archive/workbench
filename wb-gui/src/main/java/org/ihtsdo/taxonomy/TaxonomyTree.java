@@ -192,7 +192,7 @@ public class TaxonomyTree extends JTree {
          if (selRow != -1) {
             try {
                TaxonomyNode     node        = (TaxonomyNode) path.getLastPathComponent();
-               I_GetConceptData obj         = (I_GetConceptData) Ts.get().getConcept(node.getCnid());
+               I_GetConceptData obj         = (I_GetConceptData) Ts.get().getConcept(node.getConceptNid());
                Image            dragImage   = getDragImage(obj);
                Point            imageOffset = new Point(-10, -(dragImage.getHeight(TaxonomyTree.this) + 1));
 
@@ -219,7 +219,7 @@ public class TaxonomyTree extends JTree {
          I_DescriptionTuple desc = obj.getDescTuple(config.getTreeDescPreferenceList(), config);
 
          if (desc == null) {
-            desc = obj.getDescriptions().iterator().next().getFirstTuple();
+            desc = obj.getDescs().iterator().next().getFirstTuple();
          }
 
          JLabel dragLabel = TermLabelMaker.newLabel(desc, false, false).getLabel();

@@ -71,7 +71,7 @@ import org.dwfa.ace.api.I_HoldRefsetPreferences;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ManageContradiction;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.dwfa.ace.api.I_OverrideTaxonomyRenderer;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_ShowActivity;
@@ -115,12 +115,12 @@ import org.dwfa.svn.Svn;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.PropertyChangeSupportWithPropagationId;
-import org.dwfa.vodb.conflict.EditPathLosesStrategy;
-import org.dwfa.vodb.conflict.EditPathWinsStrategy;
-import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
-import org.dwfa.vodb.conflict.LastCommitWinsConflictResolutionStrategy;
-import org.dwfa.vodb.conflict.ViewPathLosesStrategy;
-import org.dwfa.vodb.conflict.ViewPathWinsStrategy;
+import org.ihtsdo.tk.api.contradiction.EditPathLosesStrategy;
+import org.ihtsdo.tk.api.contradiction.EditPathWinsStrategy;
+import org.ihtsdo.tk.api.contradiction.IdentifyAllContradictionStrategy;
+import org.ihtsdo.tk.api.contradiction.LastCommitWinsContradictionResolutionStrategy;
+import org.ihtsdo.tk.api.contradiction.ViewPathLosesStrategy;
+import org.ihtsdo.tk.api.contradiction.ViewPathWinsStrategy;
 import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Path;
@@ -412,7 +412,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     private I_GetConceptData classifierIsaType;
     private I_GetConceptData classifierOutputPathConcept;
     // 36
-    private I_ManageContradiction contradictionStrategy;
+    private ContradictionManagerBI contradictionStrategy;
     private boolean highlightConflictsInTaxonomyView;
     private boolean highlightConflictsInComponentPanel;
     // 37
@@ -1024,11 +1024,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             }
 
             if (objDataVersion >= 36) {
-                contradictionStrategy = (I_ManageContradiction) in.readObject();
+                contradictionStrategy = (ContradictionManagerBI) in.readObject();
                 highlightConflictsInComponentPanel = in.readBoolean();
                 highlightConflictsInTaxonomyView = in.readBoolean();
             } else {
-                contradictionStrategy = new IdentifyAllConflictStrategy();
+                contradictionStrategy = new IdentifyAllContradictionStrategy();
                 highlightConflictsInComponentPanel = false;
                 highlightConflictsInTaxonomyView = false;
             }
@@ -2842,11 +2842,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     /**
      * @return the conflict resolution strategy in use by the profile
      */
-    public I_ManageContradiction getConflictResolutionStrategy() {
+    public ContradictionManagerBI getConflictResolutionStrategy() {
         if (contradictionStrategy == null) {
-            contradictionStrategy = new IdentifyAllConflictStrategy();
+            contradictionStrategy = new IdentifyAllContradictionStrategy();
         }
-        contradictionStrategy.setConfig(this);
         return contradictionStrategy;
     }
 
@@ -2855,10 +2854,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      *
      * @param conflictResolutionStrategy
      */
-    public void setConflictResolutionStrategy(I_ManageContradiction conflictResolutionStrategy) {
+    public void setConflictResolutionStrategy(ContradictionManagerBI conflictResolutionStrategy) {
 
         vc = null;
-        I_ManageContradiction old = this.contradictionStrategy;
+        ContradictionManagerBI old = this.contradictionStrategy;
 
         this.contradictionStrategy = conflictResolutionStrategy;
 
@@ -2870,7 +2869,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      *
      * @param contradictionStrategy
      */
-    public <T extends I_ManageContradiction> void setConflictResolutionStrategy(Class<T> conflictResolutionStrategyClass) {
+    public <T extends ContradictionManagerBI> void setConflictResolutionStrategy(Class<T> conflictResolutionStrategyClass) {
         vc = null;
 
         try {
@@ -2915,10 +2914,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         changeSupport.firePropertyChange("highlightConflictsInComponentPanel", old, highlightConflictsInComponentPanel);
     }
 
-    public I_ManageContradiction[] getAllConflictResolutionStrategies() {
-        I_ManageContradiction[] strategies = new I_ManageContradiction[6];
-        strategies[0] = new IdentifyAllConflictStrategy();
-        strategies[1] = new LastCommitWinsConflictResolutionStrategy();
+    public ContradictionManagerBI[] getAllConflictResolutionStrategies() {
+        ContradictionManagerBI[] strategies = new ContradictionManagerBI[6];
+        strategies[0] = new IdentifyAllContradictionStrategy();
+        strategies[1] = new LastCommitWinsContradictionResolutionStrategy();
         strategies[2] = new ViewPathLosesStrategy();
         strategies[3] = new ViewPathWinsStrategy();
         strategies[4] = new EditPathLosesStrategy();

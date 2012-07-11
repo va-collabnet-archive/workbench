@@ -70,12 +70,12 @@ import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.WizardBI;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
-import org.ihtsdo.tk.api.blueprint.DescCAB;
+import org.ihtsdo.tk.api.blueprint.DescriptionCAB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.util.swing.GuiUtil;
 
@@ -88,7 +88,7 @@ import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.api.*;
-import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeAnalogBI;
 import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 import org.ihtsdo.tk.binding.snomed.Language;
 import org.ihtsdo.tk.binding.snomed.Snomed;
@@ -140,12 +140,12 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
     private boolean addUsDescPref = false;
     private boolean addGbDescPref = false;
     private ConceptCB conceptSpec;
-    private DescCAB descSpecGbFsn;
-    private DescCAB descSpecUsFsn;
+    private DescriptionCAB descSpecGbFsn;
+    private DescriptionCAB descSpecUsFsn;
     private RefexCAB refexSpecGbFsn;
     private RefexCAB refexSpecUsFsn;
-    private DescCAB descSpecGbPref;
-    private DescCAB descSpecUsPref;
+    private DescriptionCAB descSpecGbPref;
+    private DescriptionCAB descSpecUsPref;
     private RefexCAB refexSpecGbPref;
     private RefexCAB refexSpecUsPref;
     private RefexCAB refexSpecUsAcct;
@@ -174,7 +174,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
     private FixedWidthJEditorPane parentUuidPane;
     private FixedWidthJEditorPane parentFsnPane;
     private ConceptSpec parent;
-    private ComponentChroncileBI parentConcept;
+    private ComponentChronicleBI parentConcept;
     private boolean hasPanel = false;
     private boolean hasSctId = false;
     private boolean hasFsnSctId = false;
@@ -345,30 +345,30 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
 
                     //create blueprints
                     if (lang.equals("en")) {
-                        createBlueprintUsFsnRefex(conceptSpec.makeFsnCAB().getComponentNid());
-                        createBlueprintGbFsnRefex(conceptSpec.makeFsnCAB().getComponentNid());
+                        createBlueprintUsFsnRefex(conceptSpec.makeFullySpecifiedNameCAB().getComponentNid());
+                        createBlueprintGbFsnRefex(conceptSpec.makeFullySpecifiedNameCAB().getComponentNid());
                         createBlueprintUsPrefRefex(conceptSpec.makePreferredCAB().getComponentNid());
                         createBlueprintGbPrefRefex(conceptSpec.makePreferredCAB().getComponentNid());
                     }
                     if (lang.equals("en-us")) {
-                        createBlueprintUsFsnRefex(conceptSpec.makeFsnCAB().getComponentNid());
+                        createBlueprintUsFsnRefex(conceptSpec.makeFullySpecifiedNameCAB().getComponentNid());
                         createBlueprintUsPrefRefex(conceptSpec.makePreferredCAB().getComponentNid());
     //                   createBlueprintGbAcctRefex(conceptSpec.getPreferredCAB().getComponentNid()); //removed for rf2
                     }
                     if (lang.equals("en-gb")) {
     //                    createBlueprintGbFsnRefex(conceptSpec.getFsnCAB().getComponentNid());
-                        createBlueprintGbFsnRefex(conceptSpec.makeFsnCAB().getComponentNid()); //only using one fsn
+                        createBlueprintGbFsnRefex(conceptSpec.makeFullySpecifiedNameCAB().getComponentNid()); //only using one fsn
                         createBlueprintGbPrefRefex(conceptSpec.makePreferredCAB().getComponentNid());
     //                   createBlueprintUsAcctRefex(conceptSpec.getPreferredCAB().getComponentNid()); //removed for rf2
                     }
                     if (addUsDescFsn) {
     //                    createBlueprintUsFsnDesc();
-                        createBlueprintUsFsnRefex(conceptSpec.makeFsnCAB().getComponentNid());
+                        createBlueprintUsFsnRefex(conceptSpec.makeFullySpecifiedNameCAB().getComponentNid());
                     }
                     if (addGbDescFsn) {
     //                    createBlueprintGbFsnDesc();
     //                    createBlueprintGbFsnRefex(descSpecGbFsn.getComponentNid());
-                        createBlueprintGbFsnRefex(conceptSpec.makeFsnCAB().getComponentNid()); //only using one fsn (US)
+                        createBlueprintGbFsnRefex(conceptSpec.makeFullySpecifiedNameCAB().getComponentNid()); //only using one fsn (US)
                     }
                     if (addUsDescPref) {
                         createBlueprintUsPrefDesc();
@@ -918,7 +918,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
             // add sct id of component
             if (hasSctId) {
                 Long sctId = Long.parseLong(newConceptSctId);
-                ConAttrAnalogBI analog = (ConAttrAnalogBI) newConcept.getConAttrs();
+                ConceptAttributeAnalogBI analog = (ConceptAttributeAnalogBI) newConcept.getConceptAttributes();
                 analog.addLongId(sctId,
                         Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids()),
                         SnomedMetadataRfx.getSTATUS_CURRENT_NID(),
@@ -929,7 +929,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
             if (hasFsnSctId) {
                 Long sctId = Long.parseLong(fsnSctId);
                 DescriptionAnalogBI analog = 
-                        (DescriptionAnalogBI) newConcept.getVersion(config.getViewCoordinate()).getFullySpecifiedDescription();
+                        (DescriptionAnalogBI) newConcept.getVersion(config.getViewCoordinate()).getDescriptionFullySpecified();
                 for (PathBI ep : config.getEditingPathSet()) {
                     analog.addLongId(sctId,
                             Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids()),
@@ -946,7 +946,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
         text = text.replaceAll("[\\s]", " ");
         text = text.replaceAll("   *", " ");
         try {
-            descSpecGbFsn = new DescCAB(
+            descSpecGbFsn = new DescriptionCAB(
                     conceptSpec.getComponentUuid(),
                     fsnConcept.getPrimUuid(),
                     LANG_CODE.EN_GB,
@@ -964,7 +964,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
     private void createBlueprintGbFsnRefex(int componentNid) throws ContradictionException {
         try {
             refexSpecGbFsn = new RefexCAB(
-                    TK_REFSET_TYPE.CID,
+                    TK_REFEX_TYPE.CID,
                     componentNid,
                     Ts.get().getNidForUuids(gbUuid));
             refexSpecGbFsn.put(RefexProperty.CNID1, preferredConcept.getNid());
@@ -984,7 +984,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
         text = text.replaceAll("[\\s]", " ");
         text = text.replaceAll("   *", " ");
         try {
-            descSpecGbPref = new DescCAB(
+            descSpecGbPref = new DescriptionCAB(
                     conceptSpec.getComponentUuid(),
                     synConcept.getPrimUuid(),
                     LANG_CODE.EN_GB,
@@ -1002,7 +1002,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
     private void createBlueprintGbPrefRefex(int componentNid) throws ContradictionException {
         try {
             refexSpecGbPref = new RefexCAB(
-                    TK_REFSET_TYPE.CID,
+                    TK_REFEX_TYPE.CID,
                     componentNid,
                     Ts.get().getNidForUuids(gbUuid));
             refexSpecGbPref.put(RefexProperty.CNID1, preferredConcept.getNid());
@@ -1021,7 +1021,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
     private void createBlueprintGbAcctRefex(int componentNid) throws ContradictionException {
         try {
             refexSpecGbAcct = new RefexCAB(
-                    TK_REFSET_TYPE.CID,
+                    TK_REFEX_TYPE.CID,
                     componentNid,
                     Ts.get().getNidForUuids(gbUuid));
             refexSpecGbAcct.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
@@ -1042,7 +1042,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
         text = text.replaceAll("[\\s]", " ");
         text = text.replaceAll("   *", " ");
         try {
-            descSpecUsFsn = new DescCAB(
+            descSpecUsFsn = new DescriptionCAB(
                     conceptSpec.getComponentUuid(),
                     fsnConcept.getPrimUuid(),
                     LANG_CODE.EN_US,
@@ -1060,7 +1060,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
     private void createBlueprintUsFsnRefex(int componentNid) throws ContradictionException {
         try {
             refexSpecUsFsn = new RefexCAB(
-                    TK_REFSET_TYPE.CID,
+                    TK_REFEX_TYPE.CID,
                     componentNid,
                     Ts.get().getNidForUuids(usUuid));
 
@@ -1082,7 +1082,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
         text = text.replaceAll("[\\s]", " ");
         text = text.replaceAll("   *", " ");
         try {
-            descSpecUsPref = new DescCAB(
+            descSpecUsPref = new DescriptionCAB(
                     conceptSpec.getComponentUuid(),
                     synConcept.getPrimUuid(),
                     LANG_CODE.EN_US,
@@ -1100,7 +1100,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
     private void createBlueprintUsPrefRefex(int componentNid) throws ContradictionException {
         try {
             refexSpecUsPref = new RefexCAB(
-                    TK_REFSET_TYPE.CID,
+                    TK_REFEX_TYPE.CID,
                     componentNid,
                     Ts.get().getNidForUuids(usUuid));
 
@@ -1120,7 +1120,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
     private void createBlueprintUsAcctRefex(int componentNid) throws ContradictionException {
         try {
             refexSpecUsAcct = new RefexCAB(
-                    TK_REFSET_TYPE.CID,
+                    TK_REFEX_TYPE.CID,
                     componentNid,
                     Ts.get().getNidForUuids(usUuid));
 

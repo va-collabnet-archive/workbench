@@ -15,11 +15,11 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
-import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
-import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
+import org.ihtsdo.tk.api.relationship.group.RelationshipGroupVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.RelFact;
 import org.ihtsdo.tk.drools.facts.RelGroupFact;
@@ -43,7 +43,7 @@ public class CopyToRelGroupAction extends AbstractAction {
         try {
             I_GetConceptData concept = Terms.get().getConceptForNid(targetComponent.getNid());
             Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
-            if (ConAttrVersionBI.class.isAssignableFrom(sourceComponent.getClass())) {
+            if (ConceptAttributeVersionBI.class.isAssignableFrom(sourceComponent.getClass())) {
                 throw new UnsupportedOperationException();
             }
             if (ConceptVersionBI.class.isAssignableFrom(sourceComponent.getClass())) {
@@ -57,13 +57,13 @@ public class CopyToRelGroupAction extends AbstractAction {
             }
             if (RelationshipVersionBI.class.isAssignableFrom(sourceComponent.getClass())) {
                 RelationshipVersionBI rel = (RelationshipVersionBI) sourceComponent;
-                RelGroupVersionBI relGroup = (RelGroupVersionBI) targetComponent;
+                RelationshipGroupVersionBI relGroup = (RelationshipGroupVersionBI) targetComponent;
                 I_RelVersioned newRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(), concept,
                         rel.getTypeNid(),
-                        rel.getDestinationNid(),
+                        rel.getTargetNid(),
                         SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID(),
                         rel.getRefinabilityNid(),
-                        relGroup.getRelGroup(),
+                        relGroup.getRelationshipGroupNumber(),
                         rel.getStatusNid(),
                         config.getDbConfig().getUserConcept().getNid(),
                         pathItr.next().getConceptNid(),

@@ -18,7 +18,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
@@ -52,10 +52,10 @@ public class CancelAction extends AbstractAction {
         try {
             I_GetConceptData concept = Terms.get().getConceptForNid(component.getNid());
             Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
-            if (ConAttrVersionBI.class.isAssignableFrom(component.getClass())) {
+            if (ConceptAttributeVersionBI.class.isAssignableFrom(component.getClass())) {
                 I_GetConceptData c = Terms.get().getConcept(component.getNid());
-                I_ConceptAttributeVersioned ca = c.getConceptAttributes();
-                ConAttrVersionBI attr = (ConAttrVersionBI) component;
+                I_ConceptAttributeVersioned ca = c.getConAttrs();
+                ConceptAttributeVersionBI attr = (ConceptAttributeVersionBI) component;
                 Collection<? extends RefexChronicleBI<?>> refexes = attr.getRefexes();
                 for (RefexChronicleBI refex : refexes) {
                     if (refex.isUncommitted()) {

@@ -50,7 +50,7 @@ import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
-import org.ihtsdo.tk.api.blueprint.DescCAB;
+import org.ihtsdo.tk.api.blueprint.DescriptionCAB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -59,7 +59,7 @@ import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.binding.snomed.Language;
 import org.ihtsdo.tk.binding.snomed.RefsetAux;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 
 /**
  * Processes description submission files (TDTF) and returns a list of concepts
@@ -236,21 +236,21 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
                 }
 
                 //add description to concept
-                DescCAB descBp = new DescCAB(conceptNid,
+                DescriptionCAB descBp = new DescriptionCAB(conceptNid,
                         SnomedMetadataRfx.getDES_SYNONYM_NID(),
                         lang,
                         descText,
                         false);
                 TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(config.getEditCoordinate(), config.getViewCoordinate());
                 DescriptionChronicleBI description = builder.construct(descBp);
-                RefexCAB annotBp = new RefexCAB(TK_REFSET_TYPE.CID,
+                RefexCAB annotBp = new RefexCAB(TK_REFEX_TYPE.CID,
                         description.getNid(),
                         langRefexNid);
                 annotBp.put(RefexCAB.RefexProperty.CNID1, acceptabilityNid);
                 RefexChronicleBI<?> annotation = builder.construct(annotBp);
                 description.addAnnotation(annotation);
                 if(addSecondDialectRefex){
-                    RefexCAB secondAnnotBp = new RefexCAB(TK_REFSET_TYPE.CID,
+                    RefexCAB secondAnnotBp = new RefexCAB(TK_REFEX_TYPE.CID,
                         description.getNid(),
                         secondDialectRefexNid);
                     secondAnnotBp.put(RefexCAB.RefexProperty.CNID1, acceptabilityNid);

@@ -26,7 +26,7 @@ public class DescriptionIndexGenerator extends IndexGenerator {
     @Override
     public void processConceptData(Concept concept) throws Exception {
         conceptCounter++;
-        for (Description d : concept.getDescriptions()) {
+        for (Description d : concept.getDescs()) {
             writer.addDocument(createDoc(d));
             descCounter++;
 
@@ -49,7 +49,7 @@ public class DescriptionIndexGenerator extends IndexGenerator {
 		doc.add(new Field("dnid", Integer.toString(desc.getDescId()), Field.Store.YES, Field.Index.NOT_ANALYZED));
 		doc.add(new Field("cnid", Integer.toString(desc.getConceptNid()), Field.Store.YES, Field.Index.NOT_ANALYZED));
 		addIdsToIndex(doc, desc);
-		addIdsToIndex(doc, Concept.get(desc.getConceptNid()).getConceptAttributes());
+		addIdsToIndex(doc, Concept.get(desc.getConceptNid()).getConAttrs());
 		
 		String lastDesc = null;
 		for (I_DescriptionTuple tuple : desc.getTuples()) {

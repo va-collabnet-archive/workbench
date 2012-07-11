@@ -29,52 +29,65 @@ public interface ComponentBI {
    Collection<? extends RefexChronicleBI<?>> getAnnotations() throws IOException;
 
    int getConceptNid();
+   
+   /**
+    * Returns the annotations on the component
+    * @param viewCoordinate
+    * @return
+    * @throws IOException 
+    */
+   Collection<? extends RefexVersionBI<?>> getAnnotationsActive(ViewCoordinate viewCoordinate) throws IOException;
 
-   Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz) throws IOException;
-
-   Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz, int refexNid)
+   Collection<? extends RefexVersionBI<?>> getAnnotationMembersActive(ViewCoordinate viewCoordinate, int refexNid)
            throws IOException;
 
    /**
     *
-    * @param xyz
+    * @param viewCoordinate
     * @return
     * @throws IOException
-    * @deprecated use getCurrentAnnotationMembers
+    * @deprecated use getAnnotationsActive
     */
    @Deprecated
-   Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz) throws IOException;
+   Collection<? extends RefexVersionBI<?>> getActiveAnnotations(ViewCoordinate viewCoordinate) throws IOException;
 
    /**
     *
-    * @param xyz
+    * @param viewCoordinate
     * @param refexNid
     * @return
     * @throws IOException
-    * @deprecated use getCurrentAnnotationMembers
+    * @deprecated use getAnnotationsActive
     */
    @Deprecated
-   Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz, int refexNid)
+   Collection<? extends RefexVersionBI<?>> getActiveAnnotations(ViewCoordinate viewCoordinate, int refexNid)
+           throws IOException;
+   /**
+    * Returns any annotations on the component, or any members that are a "referenced component".
+    * Refsets can only be on a concept not on a component.
+    * @param viewCoordinate
+    * @param refexNid
+    * @return
+    * @throws IOException 
+    */
+   Collection<? extends RefexVersionBI<?>> getRefexMembersActive(ViewCoordinate viewCoordinate, int refexNid)
            throws IOException;
 
-   Collection<? extends RefexVersionBI<?>> getCurrentRefexMembers(ViewCoordinate xyz, int refsetNid)
-           throws IOException;
-
-   Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz) throws IOException;
+   Collection<? extends RefexVersionBI<?>> getRefexesActive(ViewCoordinate viewCoordinate) throws IOException;
 
    /**
     *
-    * @param xyz
-    * @param refsetNid
+    * @param viewCoordinate
+    * @param refexNid
     * @return
     * @throws IOException
-    * @deprecated use getCurrentRefexMembers
+    * @deprecated use getRefexMembersActive
     */
    @Deprecated
-   Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz, int refsetNid)
+   Collection<? extends RefexVersionBI<?>> getActiveRefexes(ViewCoordinate viewCoordinate, int refexNid)
            throws IOException;
 
-   Collection<? extends RefexVersionBI<?>> getInactiveRefexes(ViewCoordinate xyz) throws IOException;
+   Collection<? extends RefexVersionBI<?>> getRefexesInactive(ViewCoordinate viewCoordinate) throws IOException;
 
    int getNid();
 
@@ -84,23 +97,23 @@ public interface ComponentBI {
     */
    UUID getPrimUuid();
 
-   Collection<? extends RefexChronicleBI<?>> getRefexMembers(int refsetNid) throws IOException;
+   Collection<? extends RefexChronicleBI<?>> getRefexMembers(int refexNid) throws IOException;
 
    Collection<? extends RefexChronicleBI<?>> getRefexes() throws IOException;
 
    /**
     *
-    * @param refsetNid
+    * @param refexNid
     * @return
     * @throws IOException
     * @deprecated use getRefexMembers
     */
    @Deprecated
-   Collection<? extends RefexChronicleBI<?>> getRefexes(int refsetNid) throws IOException;
+   Collection<? extends RefexChronicleBI<?>> getRefexes(int refexNid) throws IOException;
 
    List<UUID> getUUIDs();
 
-   boolean hasCurrentAnnotationMember(ViewCoordinate xyz, int refsetNid) throws IOException;
+   boolean hasAnnotationMemberActive(ViewCoordinate viewCoordinate, int refexNid) throws IOException;
 
-   boolean hasCurrentRefexMember(ViewCoordinate xyz, int refsetNid) throws IOException;
+   boolean hasRefexMemberActive(ViewCoordinate viewCoordinate, int refexNid) throws IOException;
 }

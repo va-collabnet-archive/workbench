@@ -6,8 +6,8 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
-import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrMember;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_string.TkRefsetStrMember;
 import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetReader;
 
 
@@ -39,12 +39,12 @@ public  class SemanticHierarchyRefsetReader extends WorkflowRefsetReader
 	 */
 	
 	@Override
-	public boolean isIdenticalAutomatedAdjudication(TkRefsetAbstractMember origMember, TkRefsetAbstractMember testMember) {
+	public boolean isIdenticalAutomatedAdjudication(TkRefexAbstractMember origMember, TkRefexAbstractMember testMember) {
 		if (isIdenticalSap(origMember, testMember)) {
 			return false;
 		} else {
-			String orig = ((TkRefsetStrMember)origMember).getStrValue();
-			String test = ((TkRefsetStrMember)testMember).getStrValue();
+			String orig = ((TkRefsetStrMember)origMember).getString1();
+			String test = ((TkRefsetStrMember)testMember).getString1();
 			
 			try {
 				if (origMember.getComponentUuid().equals(testMember.getComponentUuid()) &&

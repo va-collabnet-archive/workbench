@@ -129,8 +129,8 @@ public class ERefsetCidIntVersionTest {
     private ERefsetCidIntRevision makeTestComponent1() {
 
         ERefsetCidIntRevision rciv = new ERefsetCidIntRevision();
-        rciv.c1Uuid = new UUID(114386, 656497);
-        rciv.intValue = 99;
+        rciv.uuid1 = new UUID(114386, 656497);
+        rciv.int1 = 99;
         rciv.pathUuid = new UUID(4350, 5469);
         rciv.statusUuid = new UUID(5386, 4497);
         rciv.time = this.myTime;
@@ -141,8 +141,8 @@ public class ERefsetCidIntVersionTest {
     private ERefsetCidIntRevision makeTestComponent2() {
 
         ERefsetCidIntRevision rciv = new ERefsetCidIntRevision();
-        rciv.c1Uuid = new UUID(777, 656497);
-        rciv.intValue = 16;
+        rciv.uuid1 = new UUID(777, 656497);
+        rciv.int1 = 16;
         rciv.pathUuid = new UUID(888, 5469);
         rciv.statusUuid = new UUID(999, 4497);
         rciv.time = this.myTime;

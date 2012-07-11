@@ -426,7 +426,7 @@ public class ConceptViewRenderer extends JLayeredPane {
                                 for (ConceptVersionBI con : wfStates) {
                                 	if (!WorkflowHelper.isBeginWorkflowState(con) && 
                                 		!WorkflowHelper.isEndWorkflowState(con)) { 
-                    					possibilities.add(con.getPreferredDescription().getText());
+                    					possibilities.add(con.getDescriptionPreferred().getText());
                                 	}
                                 } 
 
@@ -472,9 +472,9 @@ public class ConceptViewRenderer extends JLayeredPane {
 
                                         bean.setConcept(selectedConcept.getUids().iterator().next());
 
-                                        bean.setPath(Terms.get().nidToUuid(selectedConcept.getConceptAttributes().getPathNid()));
+                                        bean.setPath(Terms.get().nidToUuid(selectedConcept.getConAttrs().getPathNid()));
                                         bean.setModeler(WorkflowHelper.getCurrentModeler().getPrimUuid());
-                                        bean.setFSN(WorkflowHelper.identifyFSN(selectedConcept.getConceptNid(), viewCoord));
+                                        bean.setFullySpecifiedName(WorkflowHelper.identifyFSN(selectedConcept.getConceptNid(), viewCoord));
                                         bean.setAction(selectedActionUid);
                                         bean.setState(currConcept.getPrimUuid());
                                         bean.setOverridden(true);
@@ -529,7 +529,7 @@ public class ConceptViewRenderer extends JLayeredPane {
 
                             for (RelationshipVersionBI<?> rel : relList) {
                                 if (rel != null
-                                        && rel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_USER_ACTION.getPrimoridalUid()).getConceptNid()) {
+                                        && rel.getTargetNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_USER_ACTION.getPrimoridalUid()).getConceptNid()) {
                                     JButton advanceWorkflowButton = new JButton();
 
                                     BpAction a = (BpAction) actionFactory.make(wfBpFile);

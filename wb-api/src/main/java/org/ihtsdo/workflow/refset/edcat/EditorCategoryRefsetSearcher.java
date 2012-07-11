@@ -55,7 +55,7 @@ public  class EditorCategoryRefsetSearcher extends WorkflowRefsetSearcher
 			for (RelationshipVersionBI<?> rel : relList)
 			{
 				if (rel != null &&
-					rel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_AUTOMOTAIC_APPROVAL.getPrimoridalUid()).getConceptNid())
+					rel.getTargetNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_AUTOMOTAIC_APPROVAL.getPrimoridalUid()).getConceptNid())
 						return true;
 			}
 		}

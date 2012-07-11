@@ -98,9 +98,9 @@ public class PositionSet implements PositionSetBI, Serializable {
     }
 
     @Override
-    public boolean contains(Object o) {
+    public boolean contains(Object obj) {
         for (PositionBI p : positions) {
-            if (p.equals(o)) {
+            if (p.equals(obj)) {
                 return true;
             }
         }
@@ -143,7 +143,7 @@ public class PositionSet implements PositionSetBI, Serializable {
     }
 
     @Override
-    public boolean remove(Object o) {
+    public boolean remove(Object obj) {
         throw new UnsupportedOperationException();
     }
 
@@ -179,8 +179,8 @@ public class PositionSet implements PositionSetBI, Serializable {
     }
 
     @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
+    public boolean equals(Object obj) {
+        return super.equals(obj);
     }
 
     @Override

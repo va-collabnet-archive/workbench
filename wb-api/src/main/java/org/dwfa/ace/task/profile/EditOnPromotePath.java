@@ -45,7 +45,7 @@ import org.dwfa.ace.api.I_HoldRefsetPreferences;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ManageContradiction;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.dwfa.ace.api.I_OverrideTaxonomyRenderer;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_Position;
@@ -213,7 +213,7 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
         return config.getAdminUsername();
     }
 
-    public I_ManageContradiction[] getAllConflictResolutionStrategies() {
+    public ContradictionManagerBI[] getAllConflictResolutionStrategies() {
         return config.getAllConflictResolutionStrategies();
     }
 
@@ -293,7 +293,7 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
         return config.getConceptViewer(index);
     }
 
-    public I_ManageContradiction getConflictResolutionStrategy() {
+    public ContradictionManagerBI getConflictResolutionStrategy() {
         return config.getConflictResolutionStrategy();
     }
 
@@ -774,11 +774,11 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
         config.setComponentToggleVisible(visible);
     }
 
-    public <T extends I_ManageContradiction> void setConflictResolutionStrategy(Class<T> conflictResolutionStrategyClass) {
+    public <T extends ContradictionManagerBI> void setConflictResolutionStrategy(Class<T> conflictResolutionStrategyClass) {
         config.setConflictResolutionStrategy(conflictResolutionStrategyClass);
     }
 
-    public void setConflictResolutionStrategy(I_ManageContradiction conflictResolutionStrategy) {
+    public void setConflictResolutionStrategy(ContradictionManagerBI conflictResolutionStrategy) {
         config.setConflictResolutionStrategy(conflictResolutionStrategy);
     }
 

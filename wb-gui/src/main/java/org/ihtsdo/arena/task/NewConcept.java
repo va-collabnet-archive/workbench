@@ -65,12 +65,12 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.WizardBI;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
-import org.ihtsdo.tk.api.blueprint.DescCAB;
+import org.ihtsdo.tk.api.blueprint.DescriptionCAB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 import org.ihtsdo.util.swing.GuiUtil;
 
 import org.ihtsdo.arena.spec.AcceptabilityType;
@@ -136,12 +136,12 @@ public class NewConcept extends PreviousNextOrCancel {
     private boolean addGbDescPref = false;
     private List<Integer> nidList;
     private ConceptCB conceptSpec;
-    private DescCAB descSpecGbFsn;
-    private DescCAB descSpecUsFsn;
+    private DescriptionCAB descSpecGbFsn;
+    private DescriptionCAB descSpecUsFsn;
     private RefexCAB refexSpecGbFsn;
     private RefexCAB refexSpecUsFsn;
-    private DescCAB descSpecGbPref;
-    private DescCAB descSpecUsPref;
+    private DescriptionCAB descSpecGbPref;
+    private DescriptionCAB descSpecUsPref;
     private RefexCAB refexSpecGbPref;
     private RefexCAB refexSpecUsPref;
     private RefexCAB refexSpecUsAcct;
@@ -256,8 +256,8 @@ public class NewConcept extends PreviousNextOrCancel {
                 fsnConcept = Ts.get().getConcept(SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID());
                 synConcept = Ts.get().getConcept(SnomedMetadataRfx.getDES_SYNONYM_NID());
                 ConceptVersionBI cv = Ts.get().getConceptVersion(config.getViewCoordinate(), newConcept.getConceptNid());   
-                ComponentVersionBI fsn = cv.getFullySpecifiedDescription();
-                ComponentVersionBI pref = cv.getPreferredDescription();
+                ComponentVersionBI fsn = cv.getDescriptionFullySpecified();
+                ComponentVersionBI pref = cv.getDescriptionPreferred();
                 
                 //create blueprints
                 if (addUsDescFsn) {
@@ -826,7 +826,7 @@ public class NewConcept extends PreviousNextOrCancel {
         text = text.replaceAll("[\\s]", " ");
         text = text.replaceAll("   *", " ");
         try {
-            descSpecGbFsn = new DescCAB(
+            descSpecGbFsn = new DescriptionCAB(
                     conceptSpec.getComponentUuid(),
                     fsnConcept.getPrimUuid(),
                     LANG_CODE.EN_GB,
@@ -844,7 +844,7 @@ public class NewConcept extends PreviousNextOrCancel {
     private void createBlueprintGbFsnRefex(ComponentVersionBI cv) throws ContradictionException {
         try {
             refexSpecGbFsn = new RefexCAB(
-                    TK_REFSET_TYPE.CID,
+                    TK_REFEX_TYPE.CID,
                     cv.getNid(),
                     Ts.get().getNidForUuids(gbUuid));
             refexSpecGbFsn.put(RefexProperty.CNID1, preferredConcept.getNid());
@@ -865,7 +865,7 @@ public class NewConcept extends PreviousNextOrCancel {
         text = text.replaceAll("   *", " ");
         ComponentVersionBI cv = null;
         try {
-            descSpecGbPref = new DescCAB(
+            descSpecGbPref = new DescriptionCAB(
                     conceptSpec.getComponentUuid(),
                     synConcept.getPrimUuid(),
                     LANG_CODE.EN_GB,
@@ -885,7 +885,7 @@ public class NewConcept extends PreviousNextOrCancel {
     private void createBlueprintGbPrefRefex(ComponentVersionBI cv) throws ContradictionException {
         try {
             refexSpecGbPref = new RefexCAB(
-                    TK_REFSET_TYPE.CID,
+                    TK_REFEX_TYPE.CID,
                     cv.getNid(),
                     Ts.get().getNidForUuids(gbUuid));
             refexSpecGbPref.put(RefexProperty.CNID1, preferredConcept.getNid());
@@ -903,7 +903,7 @@ public class NewConcept extends PreviousNextOrCancel {
     private void createBlueprintGbAcctRefex(ComponentVersionBI cv) throws ContradictionException {
         try {
             refexSpecGbAcct = new RefexCAB(
-                    TK_REFSET_TYPE.CID,
+                    TK_REFEX_TYPE.CID,
                     cv.getNid(),
                     Ts.get().getNidForUuids(gbUuid));
             refexSpecGbAcct.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
@@ -923,7 +923,7 @@ public class NewConcept extends PreviousNextOrCancel {
         text = text.replaceAll("[\\s]", " ");
         text = text.replaceAll("   *", " ");
         try {
-            descSpecUsFsn = new DescCAB(
+            descSpecUsFsn = new DescriptionCAB(
                     conceptSpec.getComponentUuid(),
                     fsnConcept.getPrimUuid(),
                     LANG_CODE.EN_US,
@@ -941,7 +941,7 @@ public class NewConcept extends PreviousNextOrCancel {
     private void createBlueprintUsFsnRefex(ComponentVersionBI cv) throws ContradictionException {
         try {
             refexSpecUsFsn = new RefexCAB(
-                    TK_REFSET_TYPE.CID,
+                    TK_REFEX_TYPE.CID,
                     cv.getNid(),
                     Ts.get().getNidForUuids(usUuid));
 
@@ -963,7 +963,7 @@ public class NewConcept extends PreviousNextOrCancel {
         text = text.replaceAll("   *", " ");
         ComponentVersionBI cv = null;
         try {
-            descSpecUsPref = new DescCAB(
+            descSpecUsPref = new DescriptionCAB(
                     conceptSpec.getComponentUuid(),
                     synConcept.getPrimUuid(),
                     LANG_CODE.EN_US,
@@ -983,7 +983,7 @@ public class NewConcept extends PreviousNextOrCancel {
     private void createBlueprintUsPrefRefex(ComponentVersionBI cv) throws ContradictionException {
         try {
             refexSpecUsPref = new RefexCAB(
-                    TK_REFSET_TYPE.CID,
+                    TK_REFEX_TYPE.CID,
                     cv.getNid(),
                     Ts.get().getNidForUuids(usUuid));
 
@@ -1002,7 +1002,7 @@ public class NewConcept extends PreviousNextOrCancel {
     private void createBlueprintUsAcctRefex(ComponentVersionBI cv) throws ContradictionException {
         try {
             refexSpecUsAcct = new RefexCAB(
-                    TK_REFSET_TYPE.CID,
+                    TK_REFEX_TYPE.CID,
                     cv.getNid(),
                     Ts.get().getNidForUuids(usUuid));
 

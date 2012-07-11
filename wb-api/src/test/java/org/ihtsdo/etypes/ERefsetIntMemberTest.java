@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
-import org.ihtsdo.tk.dto.concept.component.refset.integer.TkRefsetIntRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_int.TkRefexIntRevision;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -132,7 +132,7 @@ public class ERefsetIntMemberTest {
         
         ERefsetIntMember member = new ERefsetIntMember();
         member.componentUuid = new UUID(64386, 75497);
-        member.intValue = 1; 
+        member.int1 = 1; 
         member.refsetUuid = new UUID(14386, 65497);
         member.pathUuid = new UUID(4350, 5469);
         member.statusUuid = new UUID(5386, 4497);
@@ -148,9 +148,9 @@ public class ERefsetIntMemberTest {
         ac.time = this.myTime;
         member.additionalIds.add(ac);       
         // Add extraVersions
-        member.revisions = new ArrayList<TkRefsetIntRevision>();
+        member.revisions = new ArrayList<TkRefexIntRevision>();
         ERefsetIntRevision rsv = new ERefsetIntRevision();
-        rsv.intValue = 3; 
+        rsv.int1 = 3; 
         rsv.pathUuid = new UUID(4350, 5469);
         rsv.statusUuid = new UUID(5386, 4497);
         rsv.time = this.myTime;
@@ -163,7 +163,7 @@ public class ERefsetIntMemberTest {
         
         ERefsetIntMember member = new ERefsetIntMember();
         member.componentUuid = new UUID(11, 11);
-        member.intValue = 1; 
+        member.int1 = 1; 
         member.refsetUuid = new UUID(22, 22);
         member.pathUuid = new UUID(33, 33);
         member.statusUuid = new UUID(44, 44);
@@ -179,9 +179,9 @@ public class ERefsetIntMemberTest {
         ac.time = this.myTime;
         member.additionalIds.add(ac);       
         // Add extraVersions
-        member.revisions = new ArrayList<TkRefsetIntRevision>();
+        member.revisions = new ArrayList<TkRefexIntRevision>();
         ERefsetIntRevision rsv = new ERefsetIntRevision();
-        rsv.intValue = 3; 
+        rsv.int1 = 3; 
         rsv.pathUuid = new UUID(222, 222);
         rsv.statusUuid = new UUID(333, 333);
         rsv.time = this.myTime;

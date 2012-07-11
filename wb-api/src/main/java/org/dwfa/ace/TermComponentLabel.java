@@ -535,7 +535,7 @@ public class TermComponentLabel extends JLabel
                     try {
                         switch (textType) {
                             case FULLYSPECIFIED:
-                                DescriptionVersionBI fsn = cv.getFullySpecifiedDescription();
+                                DescriptionVersionBI fsn = cv.getDescriptionFullySpecified();
                                 if (fsn != null) {
                                     this.setText(fsn.getText());
                                 } else {
@@ -544,7 +544,7 @@ public class TermComponentLabel extends JLabel
                                 }
                                 break;
                             case PREFERRED:
-                                DescriptionVersionBI pt = cv.getPreferredDescription();
+                                DescriptionVersionBI pt = cv.getDescriptionPreferred();
                                 if (pt != null) {
                                     this.setText(pt.getText());
                                 } else {
@@ -560,7 +560,7 @@ public class TermComponentLabel extends JLabel
                         AceLog.getAppLog().alertAndLogException(e);
                     } catch (ContradictionException e) {
                         try {
-                            this.setText(cv.getDescsActive().iterator().next().getText());
+                            this.setText(cv.getDescriptionsActive().iterator().next().getText());
                             AceLog.getAppLog().alertAndLogException(e);
                         } catch (IOException ex) {
                             AceLog.getAppLog().alertAndLogException(e);

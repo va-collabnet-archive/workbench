@@ -33,7 +33,7 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
+import org.ihtsdo.tk.api.refex.type_string.RefexStringVersionBI;
 import org.ihtsdo.tk.binding.snomed.Language;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.spec.DescriptionSpec;
@@ -59,19 +59,19 @@ public class DialectHelper {
                     HashMap<Integer, Map<String, String>> initialVariantMap =
                             new HashMap<Integer, Map<String, String>>();
                     variantSetMap = new HashMap<Integer, Set<String>>();
-                    ViewCoordinate vc = Ts.get().getMetadataVC();
+                    ViewCoordinate vc = Ts.get().getMetadataViewCoordinate();
                     TerminologySnapshotDI ts = Ts.get().getSnapshot(vc);
 
                     ConceptVersionBI enVariantTextRefsetC =
-                            Language.EN_VARIANT_TEXT.get(Ts.get().getMetadataVC());
+                            Language.EN_VARIANT_TEXT.get(Ts.get().getMetadataViewCoordinate());
                     Collection<? extends RefexChronicleBI<?>> enVariants =
                             enVariantTextRefsetC.getRefexes();
                     Set<String> variantSet = new HashSet<String>();
                     for (RefexChronicleBI<?> refex : enVariants) {
-                        RefexStrVersionBI variantText =
-                                (RefexStrVersionBI) refex.getVersion(vc);
+                        RefexStringVersionBI variantText =
+                                (RefexStringVersionBI) refex.getVersion(vc);
                         if (variantText != null) {
-                            variantSet.add(variantText.getStr1());
+                            variantSet.add(variantText.getString1());
                         }
                     }
                     variantSetMap.put(Language.EN.get(vc).getNid(), variantSet);
@@ -109,13 +109,13 @@ public class DialectHelper {
         ConceptVersionBI variantTextRefsetC = varientsSpec.get(vc);
 
         Collection<? extends RefexChronicleBI<?>> dialectVarients =
-                variantTextRefsetC.getCurrentRefsetMembers();
+                variantTextRefsetC.getActiveRefsetMembers();
         Map<String, String> variantDialectMap = new HashMap<String, String>();
         for (RefexChronicleBI<?> refex : dialectVarients) {
-            RefexStrVersionBI dialectText = (RefexStrVersionBI) refex.getVersion(vc);
+            RefexStringVersionBI dialectText = (RefexStringVersionBI) refex.getVersion(vc);
             if (dialectText != null) {
-                RefexStrVersionBI variantText = (RefexStrVersionBI) ts.getComponentVersion(dialectText.getReferencedComponentNid());
-                variantDialectMap.put(variantText.getStr1(), dialectText.getStr1());
+                RefexStringVersionBI variantText = (RefexStringVersionBI) ts.getComponentVersion(dialectText.getReferencedComponentNid());
+                variantDialectMap.put(variantText.getString1(), dialectText.getString1());
             }
         }
         initialVariantMap.put(dialectC.getNid(), variantDialectMap);
@@ -131,7 +131,7 @@ public class DialectHelper {
         String dialectText = makeTextForDialect(desc.getText(), dialectNid);
         ConceptVersionBI concept = Ts.get().getConceptVersion(vc,
                 desc.getConceptNid());
-        for (DescriptionVersionBI d : concept.getDescsActive()) {
+        for (DescriptionVersionBI d : concept.getDescriptionsActive()) {
             if (d.getText().toLowerCase().equals(dialectText.toLowerCase())) {
                 return false;
             }

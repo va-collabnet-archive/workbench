@@ -159,11 +159,11 @@ public class IsMemberOfEvaluatorDefinition implements EvaluatorDefinition {
                 }
 
                 Collection<? extends RefexChronicleBI<?>> refexes =
-                        desc.getCurrentRefexes(vc);
+                        desc.getRefexesActive(vc);
 
                 if (refexes != null) {
                     for (RefexChronicleBI<?> refex : refexes) {
-                        if (refex.getCollectionNid() == evalRefsetNid) {
+                        if (refex.getRefexNid() == evalRefsetNid) {
                             member = true;
                         }
                     }

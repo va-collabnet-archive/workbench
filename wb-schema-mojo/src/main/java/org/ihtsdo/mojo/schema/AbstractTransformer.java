@@ -12,7 +12,7 @@ import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 
 /**
@@ -77,7 +77,7 @@ public abstract class AbstractTransformer {
 	 * @param annotation the annotation
 	 * @param component the component
 	 */
-	public abstract void transformAnnotation(TkRefsetAbstractMember<?> annotation, TkComponent<?> component);
+	public abstract void transformAnnotation(TkRefexAbstractMember<?> annotation, TkComponent<?> component);
 	
 	/**
 	 * Transforms a generic member. Called from both transformAnnotation and transformMember to avoid code duplication.
@@ -85,7 +85,7 @@ public abstract class AbstractTransformer {
 	 * @param member the member
 	 * @param concept the concept
 	 */
-	public abstract void transformMember(TkRefsetAbstractMember<?> member, TkConcept concept);
+	public abstract void transformMember(TkRefexAbstractMember<?> member, TkConcept concept);
 	
 	/**
 	 * Post process concept.
@@ -116,8 +116,8 @@ public abstract class AbstractTransformer {
 		transformAttributes(eConcept.conceptAttributes, eConcept);
 
 		if (eConcept.getConceptAttributes().getAnnotations() != null) {
-			List<TkRefsetAbstractMember<?>> annotationsReadOnly = new ArrayList<TkRefsetAbstractMember<?>>(eConcept.getConceptAttributes().getAnnotations());
-			for (TkRefsetAbstractMember<?> loopAnnotation : annotationsReadOnly) {
+			List<TkRefexAbstractMember<?>> annotationsReadOnly = new ArrayList<TkRefexAbstractMember<?>>(eConcept.getConceptAttributes().getAnnotations());
+			for (TkRefexAbstractMember<?> loopAnnotation : annotationsReadOnly) {
 				transformAnnotation(loopAnnotation, eConcept.getConceptAttributes());
 			}
 		}
@@ -126,8 +126,8 @@ public abstract class AbstractTransformer {
 		for (TkDescription loopDescription : descriptionsReadOnly) {
 			transformDescription(loopDescription, eConcept);
 			if (loopDescription.getAnnotations() != null) {
-				List<TkRefsetAbstractMember<?>> annotationsReadOnly = new ArrayList<TkRefsetAbstractMember<?>>(loopDescription.getAnnotations());
-				for (TkRefsetAbstractMember<?> loopAnnotation : annotationsReadOnly) {
+				List<TkRefexAbstractMember<?>> annotationsReadOnly = new ArrayList<TkRefexAbstractMember<?>>(loopDescription.getAnnotations());
+				for (TkRefexAbstractMember<?> loopAnnotation : annotationsReadOnly) {
 					transformAnnotation(loopAnnotation, loopDescription);
 				}
 			}
@@ -137,20 +137,20 @@ public abstract class AbstractTransformer {
 		for (TkRelationship loopRelationship : relationshipsReadOnly) {
 			transformRelationship(loopRelationship, eConcept);
 			if (loopRelationship.getAnnotations() != null) {
-				List<TkRefsetAbstractMember<?>> annotationsReadOnly = new ArrayList<TkRefsetAbstractMember<?>>(loopRelationship.getAnnotations());
-				for (TkRefsetAbstractMember<?> loopAnnotation : annotationsReadOnly) {
+				List<TkRefexAbstractMember<?>> annotationsReadOnly = new ArrayList<TkRefexAbstractMember<?>>(loopRelationship.getAnnotations());
+				for (TkRefexAbstractMember<?> loopAnnotation : annotationsReadOnly) {
 					transformAnnotation(loopAnnotation, loopRelationship);
 				}
 			}
 		}
 
 		if (eConcept.getRefsetMembers() != null) {
-		List<TkRefsetAbstractMember<?>> membersReadOnly = new ArrayList<TkRefsetAbstractMember<?>>(eConcept.getRefsetMembers());
-			for (TkRefsetAbstractMember<?> loopMember : membersReadOnly) {
+		List<TkRefexAbstractMember<?>> membersReadOnly = new ArrayList<TkRefexAbstractMember<?>>(eConcept.getRefsetMembers());
+			for (TkRefexAbstractMember<?> loopMember : membersReadOnly) {
 				transformMember(loopMember, eConcept);
 				if (loopMember.getAnnotations() != null) {
-					List<TkRefsetAbstractMember<?>> annotationsReadOnly = new ArrayList<TkRefsetAbstractMember<?>>(loopMember.getAnnotations());
-					for (TkRefsetAbstractMember<?> loopAnnotation : annotationsReadOnly) {
+					List<TkRefexAbstractMember<?>> annotationsReadOnly = new ArrayList<TkRefexAbstractMember<?>>(loopMember.getAnnotations());
+					for (TkRefexAbstractMember<?> loopAnnotation : annotationsReadOnly) {
 						transformAnnotation(loopAnnotation, loopMember);
 					}
 				}

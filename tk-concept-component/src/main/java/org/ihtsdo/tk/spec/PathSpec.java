@@ -67,7 +67,14 @@ public class PathSpec implements SpecBI {
         this.pathConcept = pathConcept;
         this.originConcept = originConcept;
     }
-    
+    /**
+     * 
+     * @param pathConcept
+     * @param originConcept
+     * @param parentConcept
+     * @deprecated not in TK3
+     */
+    @Deprecated
     public PathSpec(ConceptSpec pathConcept, ConceptSpec originConcept, ConceptSpec parentConcept) {
         this.pathConcept = pathConcept;
         this.originConcept = originConcept;
@@ -76,7 +83,12 @@ public class PathSpec implements SpecBI {
     public PathSpec() {
         super();
     }
- 
+    /**
+     * 
+     * @return
+     * @deprecated not in TK3
+     */
+    @Deprecated
     public boolean testPathConcept(){
         for(UUID uuid: pathConcept.getUuids()){
             if(Ts.get().hasUuid(uuid)){
@@ -114,10 +126,22 @@ public class PathSpec implements SpecBI {
         this.pathConcept = pathConcept;
     }
     
-     public ConceptSpec getParentConcept() {
+    /**
+     * 
+     * @return
+     * @deprecated not in TK3
+     */
+    @Deprecated
+    public ConceptSpec getParentConcept() {
         return parentConcept;
     }
-
+    
+    /**
+     * 
+     * @param parentConcept
+     * @deprecated not in TK3
+     */
+    @Deprecated
     public void setParentConcept(ConceptSpec parentConcept) {
         this.parentConcept = parentConcept;
     }

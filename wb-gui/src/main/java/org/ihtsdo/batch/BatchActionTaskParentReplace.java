@@ -19,12 +19,12 @@ package org.ihtsdo.batch;
 import java.util.UUID;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.blueprint.RelCAB;
+import org.ihtsdo.tk.api.blueprint.RelationshipCAB;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
-import org.ihtsdo.tk.dto.concept.component.relationship.TkRelType;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipType;
 
 /**
  * BatchActionTaskParentReplace
@@ -73,8 +73,8 @@ public class BatchActionTaskParentReplace extends BatchActionTask {
     public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc) throws Exception {
         // RETIRE EXISTING PARENT
         boolean changed = false;
-        for (RelationshipVersionBI rvbi : c.getRelsOutgoingActive()) {
-            if (rvbi.getDestinationNid() == moveFromDestNid
+        for (RelationshipVersionBI rvbi : c.getRelationshipsSourceActive()) {
+            if (rvbi.getTargetNid() == moveFromDestNid
                     && rvbi.getTypeNid() == moveFromRoleTypeNid
                     && rvbi.isStated()) {
                 for (int editPath : ec.getEditPaths()) {
@@ -90,7 +90,7 @@ public class BatchActionTaskParentReplace extends BatchActionTask {
 
         // IF PARENT REMOVED, THEN ADD NEW PARENT
         if (changed) {
-            RelCAB rc = new RelCAB(c.getPrimUuid(), moveToRoleTypeUuid, moveToDestUuid, 0, TkRelType.STATED_HIERARCHY);
+            RelationshipCAB rc = new RelationshipCAB(c.getPrimUuid(), moveToRoleTypeUuid, moveToDestUuid, 0, TkRelationshipType.STATED_HIERARCHY);
             tsSnapshot.construct(rc);
 
             BatchActionEventReporter.add(new BatchActionEvent(c,

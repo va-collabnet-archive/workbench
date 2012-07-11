@@ -49,7 +49,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.ihtsdo.lang.LANG_CODE;
-import org.ihtsdo.tk.api.blueprint.DescCAB;
+import org.ihtsdo.tk.api.blueprint.DescriptionCAB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
@@ -414,8 +414,8 @@ public class Description extends ConceptComponent<DescriptionRevision, Descripti
     }
 
     @Override
-    public DescCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
-        DescCAB descBp = new DescCAB(getConceptNid(), getTypeNid(),
+    public DescriptionCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
+        DescriptionCAB descBp = new DescriptionCAB(getConceptNid(), getTypeNid(),
                 LANG_CODE.getLangCode(lang), getText(), initialCaseSignificant,
                 getVersion(vc), vc);
         return descBp;
@@ -696,7 +696,7 @@ public class Description extends ConceptComponent<DescriptionRevision, Descripti
         }
 
         @Override
-        public DescCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
+        public DescriptionCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
             return getCv().makeBlueprint(vc);
         }
 
@@ -784,6 +784,11 @@ public class Description extends ConceptComponent<DescriptionRevision, Descripti
         @Override
         public void setTypeNid(int typeNid) throws PropertyVetoException {
             getCv().setTypeNid(typeNid);
+        }
+        
+        @Override
+        public boolean matches(Pattern p) {
+            return getCv().matches(p);
         }
     }
 }

@@ -56,6 +56,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
+import org.ihtsdo.tk.Ts;
 
 public class RefsetPopupListener extends MouseAdapter {
    private ActionListener         change;

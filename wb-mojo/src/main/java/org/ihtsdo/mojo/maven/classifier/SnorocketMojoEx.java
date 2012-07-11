@@ -36,6 +36,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.helper.time.TimeHelper;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
@@ -178,7 +179,7 @@ public class SnorocketMojoEx extends AbstractMojo {
     private I_TermFactory tf = null;
     private I_ConfigAceFrame config;
     private Precedence precedence;
-    private I_ManageContradiction contradictionMgr;
+    private ContradictionManagerBI contradictionMgr;
 
     private class ProcessResults implements I_Callback {
 

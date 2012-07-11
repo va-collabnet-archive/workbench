@@ -12,25 +12,25 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
 import org.ihtsdo.tk.spec.DescriptionSpec;
-import org.ihtsdo.tk.spec.RelSpec;
+import org.ihtsdo.tk.spec.RelationshipSpec;
 import org.ihtsdo.tk.spec.SpecFactory;
 
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
-import org.ihtsdo.tk.example.binding.Language;
-import org.ihtsdo.tk.example.binding.Snomed;
-import org.ihtsdo.tk.example.binding.SnomedConstraints;
-import org.ihtsdo.tk.example.binding.SnomedRelType;
-import org.ihtsdo.tk.example.binding.SnomedRelSpec;
-import org.ihtsdo.tk.example.binding.Taxonomies;
-import org.ihtsdo.tk.example.binding.WbDescType;
-import org.ihtsdo.tk.example.binding.TermAux;
-import org.ihtsdo.tk.example.binding.ConceptInactivationType;
+import org.ihtsdo.tk.binding.snomed.Language;
+import org.ihtsdo.tk.binding.snomed.Snomed;
+import org.ihtsdo.tk.binding.snomed.SnomedConstraints;
+import org.ihtsdo.tk.binding.snomed.SnomedRelationshipType;
+import org.ihtsdo.tk.binding.snomed.SnomedRelationshipSpec;
+import org.ihtsdo.tk.binding.snomed.Taxonomies;
+import org.ihtsdo.tk.binding.snomed.WbDescType;
+import org.ihtsdo.tk.binding.snomed.TermAux;
+import org.ihtsdo.tk.binding.snomed.ConceptInactivationType;
 
-import org.ihtsdo.tk.spec.RelSpec;
-import org.ihtsdo.tk.example.binding.HistoricalRelType;
+import org.ihtsdo.tk.spec.RelationshipSpec;
+import org.ihtsdo.tk.binding.snomed.HistoricalRelType;
 import java.util.ArrayList;
-import org.ihtsdo.tk.spec.RelSpecFromConcept;
+import org.ihtsdo.tk.spec.RelationshipSpecFromConcept;
 import javax.swing.JOptionPane;
 
 
@@ -51,7 +51,7 @@ rule "not satisfies FINDING_SITE_OUT constraint"
 				this isKindOf Snomed.FINDING_SITE,
 				this not satisfiesConstraint[k,e,k] SnomedConstraints.FINDING_SITE_OUT);
 	then 
-   		templates.put(SnomedRelSpec.FINDING_SITE, $c.getNid());	
+   		templates.put(SnomedRelationshipSpec.FINDING_SITE, $c.getNid());	
 end 
 */
 
@@ -64,7 +64,7 @@ rule "FSN not satisfies desc constraint"
 							  this satisfiesConstraint[x,e,x] SnomedConstraints.FS_SEMANTIC_TAG);
 	then 
 
-		   for (DescriptionVersionBI $d : $c.getDescsActive(WbDescType.FULLY_SPECIFIED.get($c.getViewCoordinate()).getNid())) {
+		   for (DescriptionVersionBI $d : $c.getgetDescriptionsActive(WbDescType.FULLY_SPECIFIED.get($c.getViewCoordinate()).getNid())) {
    		    	templates.put(new  DescriptionSpec($d.getUUIDs(), #from c
    		    									  SpecFactory.get($c), 
    		    									  WbDescType.FULLY_SPECIFIED, 
@@ -82,7 +82,7 @@ rule "no FSN"
 		$c : ConceptVersionBI(this not satisfiesConstraint[x,e,x] SnomedConstraints.FS_SEMANTIC_TAG);
 	then 
 
-		for (DescriptionVersionBI $d : $c.getDescsActive(WbDescType.PREFERRED.get($c.getViewCoordinate()).getNid())) {
+		for (DescriptionVersionBI $d : $c.getgetDescriptionsActive(WbDescType.PREFERRED.get($c.getViewCoordinate()).getNid())) {
    		    	templates.put(new DescriptionSpec($d.getUUIDs(), #from c
    		    									  SpecFactory.get($c), 
    		    									  WbDescType.FULLY_SPECIFIED, 
@@ -98,7 +98,7 @@ rule "missing Dialect description EN_UK"
 	when
 		$c : ConceptVersionBI(this isMissingDescFor Language.EN_UK);
 	then 
-		for (DescriptionVersionBI $d : $c.getDescsActive()) {
+		for (DescriptionVersionBI $d : $c.getgetDescriptionsActive()) {
          if (DialectHelper.isMissingDescForDialect($d,
               Language.EN_UK.get($c.getViewCoordinate()).getNid(), $c.getViewCoordinate())) {
    		    templates.put(DialectHelper.getDescriptionSpecForDialect($d,
@@ -114,7 +114,7 @@ rule "missing Dialect description EN_US"
 	when
 		$c : ConceptVersionBI(this isMissingDescFor Language.EN_US);
 	then 
-		for (DescriptionVersionBI $d : $c.getDescsActive()) {
+		for (DescriptionVersionBI $d : $c.getgetDescriptionsActive()) {
          if (DialectHelper.isMissingDescForDialect($d,
               Language.EN_US.get($c.getViewCoordinate()).getNid(), $c.getViewCoordinate())) {
    		    templates.put(DialectHelper.getDescriptionSpecForDialect($d,
@@ -131,16 +131,16 @@ rule "isKindOf refset concept and not satisfies FINDING_SITE_OUT constraint"
 		$c : ConceptVersionBI(this isKindOf Taxonomies.REFSET_AUX,
 							  this not satisfiesConstraint[x,e,k] SnomedConstraints.FINDING_SITE_OUT);
 	then 
-   		templates.put(SnomedRelSpec.FINDING_SITE, $c.getNid());
+   		templates.put(SnomedRelationshipSpec.FINDING_SITE, $c.getNid());
 end */
 
 rule "isKindOf duplicate"
 	when
 		$c : ConceptVersionBI(this isKindOf ConceptInactivationType.DUPLICATE_CONCEPT,
 				this not isKindOf TermAux.MOVED_TO,
-				hasHistoricalRels == false);
+				hasHistoricalRelationships == false);
 	then
-		templates.put(new RelSpec(Taxonomies.SNOMED, HistoricalRelType.SAME_AS,
+		templates.put(new RelationshipSpec(Taxonomies.SNOMED, HistoricalRelType.SAME_AS,
 									ConceptInactivationType.DUPLICATE_CONCEPT),
 									$c.getNid());
 end
@@ -150,9 +150,9 @@ rule "isKindOf ambiguous"
 	when
 		$c : ConceptVersionBI(this isKindOf ConceptInactivationType.AMBIGUOUS_CONCEPT,
 				this not isKindOf TermAux.MOVED_TO,
-				hasHistoricalRels == false);
+				hasHistoricalRelationships == false);
 	then
-			templates.put(new RelSpec(Taxonomies.SNOMED, HistoricalRelType.MAY_BE_A,
+			templates.put(new RelationshipSpec(Taxonomies.SNOMED, HistoricalRelType.MAY_BE_A,
 									ConceptInactivationType.AMBIGUOUS_CONCEPT),
 									$c.getNid());
 end
@@ -161,12 +161,12 @@ rule "isKindOf erroneous"
 	when
 		$c : ConceptVersionBI(this isKindOf ConceptInactivationType.ERRONEOUS_CONCEPT,
 				this not isKindOf TermAux.MOVED_TO,
-				hasHistoricalRels == false);
+				hasHistoricalRelationships == false);
 	then
-		templates.put(new RelSpec(Taxonomies.SNOMED, HistoricalRelType.REPLACED_BY,
+		templates.put(new RelationshipSpec(Taxonomies.SNOMED, HistoricalRelType.REPLACED_BY,
 									ConceptInactivationType.ERRONEOUS_CONCEPT),
 									$c.getNid());
-		templates.put(new RelSpec(Taxonomies.SNOMED, HistoricalRelType.WAS_A,
+		templates.put(new RelationshipSpec(Taxonomies.SNOMED, HistoricalRelType.WAS_A,
 									ConceptInactivationType.ERRONEOUS_CONCEPT),
 									$c.getNid());
 end
@@ -175,12 +175,12 @@ rule "isKindOf outdated"
 	when
 		$c : ConceptVersionBI(this isKindOf ConceptInactivationType.OUTDATED_CONCEPT,
 				this not isKindOf TermAux.MOVED_TO,
-				hasHistoricalRels == false);
+				hasHistoricalRelationships == false);
 	then
-		templates.put(new RelSpec(Taxonomies.SNOMED, HistoricalRelType.REPLACED_BY,
+		templates.put(new RelationshipSpec(Taxonomies.SNOMED, HistoricalRelType.REPLACED_BY,
 									ConceptInactivationType.OUTDATED_CONCEPT),
 									$c.getNid());
-		templates.put(new RelSpec(Taxonomies.SNOMED, HistoricalRelType.WAS_A,
+		templates.put(new RelationshipSpec(Taxonomies.SNOMED, HistoricalRelType.WAS_A,
 									ConceptInactivationType.OUTDATED_CONCEPT),
 									$c.getNid());
 end
@@ -189,12 +189,12 @@ rule "isKindOf reason not stated"
 	when
 		$c : ConceptVersionBI(this isKindOf ConceptInactivationType.REASON_NOT_STATED_CONCEPT,
 				this not isKindOf TermAux.MOVED_TO,
-				hasHistoricalRels == false);
+				hasHistoricalRelationships == false);
 	then
-		templates.put(new RelSpec(Taxonomies.SNOMED, HistoricalRelType.REPLACED_BY,
+		templates.put(new RelationshipSpec(Taxonomies.SNOMED, HistoricalRelType.REPLACED_BY,
 									ConceptInactivationType.REASON_NOT_STATED_CONCEPT),
 									$c.getNid());
-		templates.put(new RelSpec(Taxonomies.SNOMED, HistoricalRelType.WAS_A,
+		templates.put(new RelationshipSpec(Taxonomies.SNOMED, HistoricalRelType.WAS_A,
 									ConceptInactivationType.REASON_NOT_STATED_CONCEPT),
 									$c.getNid());
 end
@@ -202,9 +202,9 @@ end
 rule "isKindOf moved elswhere"
 	when
 		$c : ConceptVersionBI(this isKindOf ConceptInactivationType.MOVED_ELSEWHERE,
-				hasHistoricalRels == false);
+				hasHistoricalRelationships == false);
 	then
-		templates.put(new RelSpec(Taxonomies.SNOMED, HistoricalRelType.MOVED_TO,
+		templates.put(new RelationshipSpec(Taxonomies.SNOMED, HistoricalRelType.MOVED_TO,
 									ConceptInactivationType.MOVED_ELSEWHERE),
 									$c.getNid());
 end
@@ -213,12 +213,12 @@ rule "isKindOf limited status"
 	when
 		$c : ConceptVersionBI(this isKindOf ConceptInactivationType.LIMITED_STATUS_CONCEPT,
 				this not isKindOf TermAux.MOVED_TO,
-				hasHistoricalRels == false);
+				hasHistoricalRelationships == false);
 	then
-		templates.put(new RelSpec(Taxonomies.SNOMED, HistoricalRelType.SAME_AS,
+		templates.put(new RelationshipSpec(Taxonomies.SNOMED, HistoricalRelType.SAME_AS,
 									ConceptInactivationType.LIMITED_STATUS_CONCEPT),
 									$c.getNid());
-		templates.put(new RelSpec(Taxonomies.SNOMED, HistoricalRelType.WAS_A,
+		templates.put(new RelationshipSpec(Taxonomies.SNOMED, HistoricalRelType.WAS_A,
 									ConceptInactivationType.LIMITED_STATUS_CONCEPT),
 									$c.getNid());
 end
@@ -227,7 +227,7 @@ rule "double spaces"
 	
 	when
 		$c : ConceptVersionBI(this isKindOf Taxonomies.SNOMED);
-		$d : DescriptionVersionBI(text matches ".*garbage to disable this rule match \\s\\s.*") from $c.descsActive
+		$d : DescriptionVersionBI(text matches ".*garbage to disable this rule match \\s\\s.*") from $c.getDescriptionsActive
 	then 
    		DescriptionSpec dSpec = SpecFactory.get($d, vc);
    		dSpec.setDescText($d.getText().replace("  ", " "));
@@ -241,7 +241,7 @@ rule "missing Dialect description EN_US"
 		$c : ConceptVersionBI(this isMissingDescFor Language.EN_US);
                 $dv : DescriptionVersionBI(isUncommitted() == true, 
                             getTypeNid() != SnomedMetadataRfx.DES_FULL_SPECIFIED_NAME_NID,
-                            getStatusNid() != SnomedMetadataRfx.getSTATUS_LIMITED_NID()) from $c.descsActive
+                            getStatusNid() != SnomedMetadataRfx.getSTATUS_LIMITED_NID()) from $c.getDescriptionsActive
 	then 
                 if (DialectHelper.isMissingDescForDialect($dv,
                     Language.EN_US.get($c.getViewCoordinate()).getNid(), $c.getViewCoordinate())) {
@@ -256,7 +256,7 @@ rule "missing Dialect description EN_UK"
 		$c : ConceptVersionBI(this isMissingDescFor Language.EN_UK);
                 $dv : DescriptionVersionBI(isUncommitted() == true, 
                             getTypeNid() != SnomedMetadataRfx.DES_FULL_SPECIFIED_NAME_NID,
-                            getStatusNid() != SnomedMetadataRfx.getSTATUS_LIMITED_NID()) from $c.descsActive
+                            getStatusNid() != SnomedMetadataRfx.getSTATUS_LIMITED_NID()) from $c.getDescriptionsActive
 	then 
                 if (DialectHelper.isMissingDescForDialect($dv,
                     Language.EN_UK.get($c.getViewCoordinate()).getNid(), $c.getViewCoordinate())) {

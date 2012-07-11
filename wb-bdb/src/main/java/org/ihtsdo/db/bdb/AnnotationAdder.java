@@ -26,11 +26,11 @@ import org.ihtsdo.concept.I_ProcessUnfetchedConceptData;
 import org.ihtsdo.concept.ParallelConceptIterator;
 import org.ihtsdo.concept.component.refset.RefsetMemberFactory;
 import org.ihtsdo.db.change.ChangeNotifier;
-import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.ComponentChronicleBI;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 
 /**
  *
@@ -38,30 +38,30 @@ import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
  */
 public class AnnotationAdder implements I_ProcessUnfetchedConceptData {
 
-    static class TkRmComparator implements Comparator<TkRefsetAbstractMember<?>> {
+    static class TkRmComparator implements Comparator<TkRefexAbstractMember<?>> {
 
         @Override
-        public int compare(TkRefsetAbstractMember<?> t, TkRefsetAbstractMember<?> t1) {
+        public int compare(TkRefexAbstractMember<?> t, TkRefexAbstractMember<?> t1) {
             return t.primordialUuid.compareTo(t1.primordialUuid);
         }
     }
     NidBitSetBI conceptNids = new IdentifierSet();
-    ConcurrentHashMap<Integer, ConcurrentSkipListSet<TkRefsetAbstractMember<?>>> membersForConcept =
-            new ConcurrentHashMap<Integer, ConcurrentSkipListSet<TkRefsetAbstractMember<?>>>();
+    ConcurrentHashMap<Integer, ConcurrentSkipListSet<TkRefexAbstractMember<?>>> membersForConcept =
+            new ConcurrentHashMap<Integer, ConcurrentSkipListSet<TkRefexAbstractMember<?>>>();
 
-    AnnotationAdder(List<TkRefsetAbstractMember<?>> members) {
+    AnnotationAdder(List<TkRefexAbstractMember<?>> members) {
 
         TkRmComparator comparator = new TkRmComparator();
         int errors = 0;
         Set<UUID> errorSet = new TreeSet<UUID>();
-        for (TkRefsetAbstractMember<?> member : members) {
+        for (TkRefexAbstractMember<?> member : members) {
             UUID componentUuid = member.getComponentUuid();
             int nid = Bdb.uuidToNid(componentUuid);
             int cNid = Bdb.getConceptNid(nid);
             if (cNid + Integer.MIN_VALUE >= 0) {
                 conceptNids.setMember(cNid);
-                ConcurrentSkipListSet<TkRefsetAbstractMember<?>> set =
-                        new ConcurrentSkipListSet<TkRefsetAbstractMember<?>>(comparator);
+                ConcurrentSkipListSet<TkRefexAbstractMember<?>> set =
+                        new ConcurrentSkipListSet<TkRefexAbstractMember<?>>(comparator);
                 membersForConcept.putIfAbsent(cNid, set);
                 membersForConcept.get(cNid).add(member);
             } else {
@@ -83,10 +83,10 @@ public class AnnotationAdder implements I_ProcessUnfetchedConceptData {
     public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fcfc) throws Exception {
         if (conceptNids.isMember(cNid)) {
             Concept c = (Concept) fcfc.fetch();
-            ConcurrentSkipListSet<TkRefsetAbstractMember<?>> set =
+            ConcurrentSkipListSet<TkRefexAbstractMember<?>> set =
                     membersForConcept.get(cNid);
-            for (TkRefsetAbstractMember<?> member : set) {
-                ComponentChroncileBI<?> component = c.getComponent(Bdb.uuidToNid(member.getComponentUuid()));
+            for (TkRefexAbstractMember<?> member : set) {
+                ComponentChronicleBI<?> component = c.getComponent(Bdb.uuidToNid(member.getComponentUuid()));
                 if (component != null) {
                     RefexChronicleBI<?> mem =  RefsetMemberFactory.create(member, cNid);
                     ChangeNotifier.touchRefexRC(mem.getReferencedComponentNid());

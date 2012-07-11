@@ -40,7 +40,7 @@ public class NodeStore {
 
       nodeIdSet.add(node.nodeId);
 
-      Collection<Long> oldSet = nidToNodeIdMap.putIfAbsent(node.getCnid(), nodeIdSet);
+      Collection<Long> oldSet = nidToNodeIdMap.putIfAbsent(node.getConceptNid(), nodeIdSet);
 
       if (oldSet != null) {
          oldSet.add(node.nodeId);
@@ -55,13 +55,13 @@ public class NodeStore {
       TaxonomyNode node = nodeMap.get(nodeId);
 
       if (node != null) {
-         Collection<Long> nodeIds = nidToNodeIdMap.get(node.getCnid());
+         Collection<Long> nodeIds = nidToNodeIdMap.get(node.getConceptNid());
 
          if (nodeIds != null) {
             nodeIds.remove(nodeId);
 
             if (nodeIds.isEmpty()) {
-               nidToNodeIdMap.remove(node.getCnid());
+               nidToNodeIdMap.remove(node.getConceptNid());
             }
          }
       }

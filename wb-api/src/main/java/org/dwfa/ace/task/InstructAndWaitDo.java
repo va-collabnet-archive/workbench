@@ -464,7 +464,7 @@ public class InstructAndWaitDo extends AbstractTask {
         I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
         // for (int i = 0; i < model.getSize(); i++) {
         // I_GetConceptData concept = model.getElementAt(i);
-        // I_DescriptionVersioned d = concept.getDescriptions().get(0);
+        // I_DescriptionVersioned d = concept.getDescs().get(0);
         // System.out.println(">>>" + d + "\nStatus:"
         // + d.getLastTuple().getStatusId());
         // }

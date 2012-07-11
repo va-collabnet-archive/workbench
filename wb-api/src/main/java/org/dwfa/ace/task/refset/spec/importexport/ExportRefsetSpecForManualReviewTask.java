@@ -224,7 +224,7 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
                                 }
                                 // write to file
                                 ConceptVersionBI cv = Ts.get().getConceptVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), latestTuple.getComponentId());
-                                String description = cv.getFullySpecifiedDescription().getText();
+                                String description = cv.getDescriptionFullySpecified().getText();
                                 if (description == null) {
                                     description = "UNKNOWN";
                                 }
@@ -263,7 +263,7 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
         exportFileWriter.write("Refset Name: ");
         ConceptVersionBI cv = memberRefset.getVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
         Ts.get().getConcept(memberRefset.getConceptNid());
-        exportFileWriter.write(cv.getPreferredDescription().getText());
+        exportFileWriter.write(cv.getDescriptionPreferred().getText());
         exportFileWriter.newLine();
     }
 

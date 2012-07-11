@@ -60,7 +60,7 @@ public class VodbExampleChange extends AbstractMojo {
         I_TermFactory termFactory = Terms.get();
         try {
             I_GetConceptData architectonicRoot = termFactory.getConcept(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT.getUids());
-            I_ConceptAttributeVersioned conceptAttributes = architectonicRoot.getConceptAttributes();
+            I_ConceptAttributeVersioned conceptAttributes = architectonicRoot.getConAttrs();
             I_GetConceptData architectonicBranch = termFactory.getConcept(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
             PathBI architectonicPath = termFactory.getPath(architectonicBranch.getUids());
             PositionBI latestOnArchitectonicPath = termFactory.newPosition(architectonicPath, Long.MAX_VALUE);

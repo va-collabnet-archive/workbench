@@ -5,7 +5,7 @@ import java.awt.datatransfer.DataFlavor;
 
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
-import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
+import org.ihtsdo.tk.api.relationship.group.RelationshipGroupChronicleBI;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +21,7 @@ public class DragPanelDataFlavorsTest {
 		@SuppressWarnings("unused")
 		DataFlavor relGroupFlavor = new DataFlavor(
 				"application/x-java-jvm-local-objectref;class=" + 
-					RelGroupChronicleBI.class.getName()) ;
+					RelationshipGroupChronicleBI.class.getName()) ;
 		@SuppressWarnings("unused")
 		DataFlavor descVersionFlavor = new DataFlavor(
 				"application/x-java-jvm-local-objectref;class=" + 

@@ -129,7 +129,7 @@ public class ERefsetBooleanVersionTest {
     private ERefsetBooleanRevision makeTestComponent1() {
 
         ERefsetBooleanRevision erv = new ERefsetBooleanRevision();
-        erv.booleanValue = true; 
+        erv.boolean1 = true; 
         erv.pathUuid = new UUID(4, 5);
         erv.statusUuid = new UUID(8, 9);
         erv.time = this.myTime;
@@ -140,7 +140,7 @@ public class ERefsetBooleanVersionTest {
     private ERefsetBooleanRevision makeTestComponent2() {
         
         ERefsetBooleanRevision erv = new ERefsetBooleanRevision();
-        erv.booleanValue = true; 
+        erv.boolean1 = true; 
         erv.pathUuid = new UUID(33, 44);
         erv.statusUuid = new UUID(55, 66);
         erv.time = this.myTime;

@@ -29,7 +29,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentBI;
-import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.ComponentChronicleBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -53,23 +53,25 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
     private List<RefexCAB> annotations = new ArrayList<RefexCAB>();
     protected PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
-    public synchronized void removePropertyChangeListener(String string, PropertyChangeListener pl) {
-        pcs.removePropertyChangeListener(string, pl);
+    public synchronized void removePropertyChangeListener(String string,
+            PropertyChangeListener propertyChangeListener) {
+        pcs.removePropertyChangeListener(string, propertyChangeListener);
     }
 
-    public synchronized void removePropertyChangeListener(PropertyChangeListener pl) {
-        pcs.removePropertyChangeListener(pl);
+    public synchronized void removePropertyChangeListener(PropertyChangeListener propertyChangeListener) {
+        pcs.removePropertyChangeListener(propertyChangeListener);
     }
 
-    public synchronized void addPropertyChangeListener(String string, PropertyChangeListener pl) {
-        pcs.addPropertyChangeListener(string, pl);
+    public synchronized void addPropertyChangeListener(String string, PropertyChangeListener propertyChangeListener) {
+        pcs.addPropertyChangeListener(string, propertyChangeListener);
     }
 
-    public synchronized void addPropertyChangeListener(PropertyChangeListener pl) {
-        pcs.addPropertyChangeListener(pl);
+    public synchronized void addPropertyChangeListener(PropertyChangeListener propertyChangeListener) {
+        pcs.addPropertyChangeListener(propertyChangeListener);
     }
 
-    public CreateOrAmendBlueprint(UUID componentUuid, ComponentVersionBI cv, ViewCoordinate vc) throws IOException, InvalidCAB, ContradictionException {
+    public CreateOrAmendBlueprint(UUID componentUuid, ComponentVersionBI componentVersion,
+            ViewCoordinate viewCoordinate) throws IOException, InvalidCAB, ContradictionException {
         try {
             if (Ts.get().usesRf2Metadata()) {
                 currentStatusUuid = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid();
@@ -83,8 +85,8 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
         }
         statusUuid = currentStatusUuid;
         this.componentUuid = componentUuid;
-        this.cv = cv;
-        this.vc = vc;
+        this.cv = componentVersion;
+        this.vc = viewCoordinate;
         getAnnotationBlueprintsFromOriginal();
         pcs.addPropertyChangeListener(this);
     }
@@ -93,7 +95,7 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
             IOException, InvalidCAB, ContradictionException;
 
     @Override
-    public void propertyChange(PropertyChangeEvent pce) {
+    public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
         try {
             recomputeUuid();
         } catch (NoSuchAlgorithmException ex) {
@@ -110,7 +112,7 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
 
     }
 
-    protected String getPrimoridalUuidStr(int nid)
+    protected String getPrimoridalUuidString(int nid)
             throws IOException, InvalidCAB {
         ComponentBI component = Ts.get().getComponent(nid);
         if (component != null) {
@@ -123,10 +125,10 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
         throw new InvalidCAB("Can't find primordialUuid for: " + component);
     }
 
-    protected String getPrimoridalUuidStr(UUID uuid)
+    protected String getPrimoridalUuidString(UUID uuid)
             throws IOException, InvalidCAB {
         if (Ts.get().hasUuid(uuid)) {
-            ComponentChroncileBI<?> component = Ts.get().getComponent(uuid);
+            ComponentChronicleBI<?> component = Ts.get().getComponent(uuid);
             if(component == null){
                 return uuid.toString();
             }
@@ -161,8 +163,8 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
      */
     public List<RefexCAB> getAnnotationBlueprintsFromOriginal() throws IOException, InvalidCAB, ContradictionException {
         if (annotations.isEmpty() && cv != null) {
-            if (cv.getCurrentRefexes(vc) != null) {
-                Collection<? extends RefexVersionBI<?>> originalRefexes = cv.getCurrentRefexes(vc);
+            if (cv.getRefexesActive(vc) != null) {
+                Collection<? extends RefexVersionBI<?>> originalRefexes = cv.getRefexesActive(vc);
                 if (!originalRefexes.isEmpty()) {
                     for (RefexVersionBI refex : originalRefexes) {
                         annotations.add(refex.makeBlueprint(vc));
@@ -177,12 +179,12 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
         return annotations;
     }
     
-    public void setAnnotationBlueprint(RefexCAB annotation){
-        annotations.add(annotation);
+    public void addAnnotationBlueprint(RefexCAB annotationBlueprint){
+        annotations.add(annotationBlueprint);
     }
     
-    public void replaceAnnotationBlueprints(List<RefexCAB> annotations){
-        this.annotations = annotations;
+    public void replaceAnnotationBlueprints(List<RefexCAB> annotationBlueprints){
+        this.annotations = annotationBlueprints;
     }
 
     public UUID getStatusUuid() {

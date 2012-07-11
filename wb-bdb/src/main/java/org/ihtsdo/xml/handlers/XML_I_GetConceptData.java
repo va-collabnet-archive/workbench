@@ -200,14 +200,13 @@ public class XML_I_GetConceptData extends XML_basic implements I_Handle_XML {
 				// ConceptAttributeVersioned
 				if (concept.getConceptAttributes() != null) {
 					XML_I_ConceptAttributeVersioned icav_h = new XML_I_ConceptAttributeVersioned(
-							concept.getConceptAttributes(), parent);
+							concept.getConAttrs(), parent);
 				}
 				// Descriptions
 				Element descsE = Doc
 						.createElement(CommonXMLStatics.DESCRIPTIONS_ENAME);
 
-				for (I_DescriptionVersioned desc : concept
-						.getDescriptions()) {
+				for (I_DescriptionVersioned desc : concept.getDescs()) {
 					new XML_I_DescriptionVersioned(desc, descsE);
 				}
 				parent.appendChild(descsE);

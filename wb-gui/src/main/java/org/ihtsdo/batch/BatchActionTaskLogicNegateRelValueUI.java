@@ -166,7 +166,7 @@ public class BatchActionTaskLogicNegateRelValueUI extends javax.swing.JPanel imp
             int roleTypeNid = roleValueBI.getTypeNid();
             ((BatchActionTaskLogicNegateRelValue) task).setRoleNid(roleTypeNid);
             // SET ROLE VALUE
-            int valueNid = roleValueBI.getDestinationNid();
+            int valueNid = roleValueBI.getTargetNid();
             ((BatchActionTaskLogicNegateRelValue) task).setValueNid(valueNid);
             // SET ROLE GROUP
             ((BatchActionTaskLogicNegateRelValue) task).setRoleGroup(-1);

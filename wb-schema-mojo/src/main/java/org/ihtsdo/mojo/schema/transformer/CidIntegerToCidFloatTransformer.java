@@ -20,11 +20,11 @@ import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidflt.TkRefsetCidFloatMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidflt.TkRefsetCidFloatRevision;
-import org.ihtsdo.tk.dto.concept.component.refset.cidint.TkRefsetCidIntMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidint.TkRefsetCidIntRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_float.TkRefexUuidFloatMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_float.TkRefexUuidFloatRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_int.TkRefexUuidIntMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_int.TkRefexUuidIntRevision;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 
 /**
@@ -150,8 +150,8 @@ public class CidIntegerToCidFloatTransformer extends AbstractTransformer {
 			UUID cidIntTypeId = RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION.getPrimoridalUid();
 			UUID cidFloatTypeId = RefsetAuxiliary.Concept.CONCEPT_FLOAT_EXTENSION.getPrimoridalUid();
 			if (relationship.getTypeUuid().equals(refsetTypeRelId) && 
-					relationship.getC2Uuid().equals(cidIntTypeId) &&
-					relationship.getC1Uuid().equals(refsetUuid)) {
+					relationship.getRelationshipTargetUuid().equals(cidIntTypeId) &&
+					relationship.getRelationshipSourceUuid().equals(refsetUuid)) {
 				relationship.setC2Uuid(cidFloatTypeId);
 			}
 		} catch (IOException e) {
@@ -162,13 +162,13 @@ public class CidIntegerToCidFloatTransformer extends AbstractTransformer {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformMember(org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember, org.ihtsdo.tk.dto.concept.TkConcept)
+	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformMember(org.ihtsdo.tk.dto.concept.component.refset.TkRefexAbstractMember, org.ihtsdo.tk.dto.concept.TkConcept)
 	 */
 	@Override
-	public void transformMember(TkRefsetAbstractMember<?> member, TkConcept concept) {
-		if (member.getRefsetUuid().equals(refsetUuid)) {
-			TkRefsetCidIntMember cidIntMember = (TkRefsetCidIntMember) member;
-			TkRefsetCidFloatMember cidFloatMember = transformExtension(cidIntMember);
+	public void transformMember(TkRefexAbstractMember<?> member, TkConcept concept) {
+		if (member.getRefexUuid().equals(refsetUuid)) {
+			TkRefexUuidIntMember cidIntMember = (TkRefexUuidIntMember) member;
+			TkRefexUuidFloatMember cidFloatMember = transformExtension(cidIntMember);
 
 			concept.getRefsetMembers().remove(cidIntMember);
 			concept.getRefsetMembers().add(cidFloatMember);
@@ -182,14 +182,14 @@ public class CidIntegerToCidFloatTransformer extends AbstractTransformer {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformAnnotation(org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember, org.ihtsdo.tk.dto.concept.component.TkComponent)
+	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformAnnotation(org.ihtsdo.tk.dto.concept.component.refset.TkRefexAbstractMember, org.ihtsdo.tk.dto.concept.component.TkComponent)
 	 */
 	@Override
-	public void transformAnnotation(TkRefsetAbstractMember<?> annotation,
+	public void transformAnnotation(TkRefexAbstractMember<?> annotation,
 			TkComponent<?> component) {
-		if (annotation.getRefsetUuid().equals(refsetUuid)) {
-			TkRefsetCidIntMember cidIntMember = (TkRefsetCidIntMember) annotation;
-			TkRefsetCidFloatMember cidFloatMember = transformExtension(cidIntMember);
+		if (annotation.getRefexUuid().equals(refsetUuid)) {
+			TkRefexUuidIntMember cidIntMember = (TkRefexUuidIntMember) annotation;
+			TkRefexUuidFloatMember cidFloatMember = transformExtension(cidIntMember);
 
 			component.getAnnotations().remove(cidFloatMember);
 			component.getAnnotations().add(cidIntMember);
@@ -207,8 +207,8 @@ public class CidIntegerToCidFloatTransformer extends AbstractTransformer {
 	 * @param extension the extension
 	 * @return the tk refset cid float member
 	 */
-	public TkRefsetCidFloatMember transformExtension(TkRefsetCidIntMember extension) {
-		TkRefsetCidFloatMember cidFloatMember = new TkRefsetCidFloatMember();
+	public TkRefexUuidFloatMember transformExtension(TkRefexUuidIntMember extension) {
+		TkRefexUuidFloatMember cidFloatMember = new TkRefexUuidFloatMember();
 
 		cidFloatMember.setAdditionalIdComponents(extension.getAdditionalIdComponents());
 		cidFloatMember.setAnnotations(extension.getAnnotations());
@@ -217,37 +217,37 @@ public class CidIntegerToCidFloatTransformer extends AbstractTransformer {
 		cidFloatMember.setComponentUuid(extension.getComponentUuid());
 		cidFloatMember.setPathUuid(extension.getPathUuid());
 		cidFloatMember.setPrimordialComponentUuid(extension.getPrimordialComponentUuid());
-		cidFloatMember.setRefsetUuid(extension.getRefsetUuid());
+		cidFloatMember.setRefsetUuid(extension.getRefexUuid());
 		cidFloatMember.setStatusUuid(extension.getStatusUuid());
 		cidFloatMember.setTime(extension.getTime());
 		
 		UUID targetUnitId = null;
 		Long scalar = null;
 		
-		if (targetMeasureUnitMap.get(extension.getC1Uuid()) != null) {
-			targetUnitId = targetMeasureUnitMap.get(extension.getC1Uuid());
+		if (targetMeasureUnitMap.get(extension.getUuid1()) != null) {
+			targetUnitId = targetMeasureUnitMap.get(extension.getUuid1());
 		} 
 		
 		if (targetUnitId != null) {
-			cidFloatMember.setC1Uuid(targetUnitId);
+			cidFloatMember.setUuid1(targetUnitId);
 		} else {
-			cidFloatMember.setC1Uuid(extension.getC1Uuid());
+			cidFloatMember.setUuid1(extension.getUuid1());
 		}
 		
-		if (scalarMap.get(extension.getC1Uuid()) != null) {
-			scalar = scalarMap.get(extension.getC1Uuid());
+		if (scalarMap.get(extension.getUuid1()) != null) {
+			scalar = scalarMap.get(extension.getUuid1());
 		} 
 		
 		if (scalar != null) {
-			cidFloatMember.setFloatValue(new Float(extension.getIntValue() * scalar));
+			cidFloatMember.setFloat1(new Float(extension.getInt1() * scalar));
 		} else {
-			cidFloatMember.setFloatValue(extension.getIntValue());
+			cidFloatMember.setFloat1(extension.getInt1());
 		}
 
-		cidFloatMember.setRevisions(new ArrayList<TkRefsetCidFloatRevision>());
+		cidFloatMember.setRevisions(new ArrayList<TkRefexUuidFloatRevision>());
 		if (extension.getRevisions() != null) {
-			for (TkRefsetCidIntRevision cidIntRevision : extension.getRevisions()) {
-				TkRefsetCidFloatRevision cidFloatRevision = new TkRefsetCidFloatRevision();
+			for (TkRefexUuidIntRevision cidIntRevision : extension.getRevisions()) {
+				TkRefexUuidFloatRevision cidFloatRevision = new TkRefexUuidFloatRevision();
 				cidFloatRevision.setAuthorUuid(cidIntRevision.getAuthorUuid());
                                 cidFloatRevision.setModuleUuid(cidIntRevision.getModuleUuid());
 				cidFloatRevision.setPathUuid(cidIntRevision.getPathUuid());
@@ -255,15 +255,15 @@ public class CidIntegerToCidFloatTransformer extends AbstractTransformer {
 				cidFloatRevision.setTime(cidIntRevision.getTime());
 				
 				if (targetUnitId != null) {
-					cidFloatRevision.setC1Uuid(targetUnitId);
+					cidFloatRevision.setUuid1(targetUnitId);
 				} else {
-					cidFloatRevision.setC1Uuid(cidIntRevision.getC1Uuid());
+					cidFloatRevision.setUuid1(cidIntRevision.getUuid1());
 				}
 				
 				if (scalar != null) {
-					cidFloatRevision.setFloatValue(new Float(cidIntRevision.getIntValue() * scalar));
+					cidFloatRevision.setFloat1(new Float(cidIntRevision.getInt1() * scalar));
 				} else {
-					cidFloatRevision.setFloatValue(cidIntRevision.getIntValue());
+					cidFloatRevision.setFloat1(cidIntRevision.getInt1());
 				}
 				
 				cidFloatMember.getRevisions().add(cidFloatRevision);

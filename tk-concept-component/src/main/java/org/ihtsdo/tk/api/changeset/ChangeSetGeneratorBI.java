@@ -7,11 +7,11 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 public interface ChangeSetGeneratorBI {
 
-    public void open(NidSetBI commitSapNids) throws IOException;
+    public void open(NidSetBI commitStampNids) throws IOException;
 
-    public void writeChanges(ConceptChronicleBI concept, long time) throws IOException;
+    public void writeChanges(ConceptChronicleBI conceptChronicle, long time) throws IOException;
     
-    public void setPolicy(ChangeSetGenerationPolicy policy);
+    public void setPolicy(ChangeSetGenerationPolicy changeSetGenerationPolicy);
 
     public void commit() throws IOException;
 

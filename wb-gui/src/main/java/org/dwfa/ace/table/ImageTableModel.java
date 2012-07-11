@@ -228,7 +228,7 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
                     return false;
                 }
                 I_GetConceptData b = Terms.get().getConcept(id);
-                b.getDescriptions();
+                b.getDescs();
                 concepts.put(id, b);
 
             }

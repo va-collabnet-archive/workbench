@@ -37,7 +37,7 @@ public class AddConceptPart extends AddComponent {
     		I_ConfigAceFrame config)
             throws Exception {
     	I_GetConceptData cb = (I_GetConceptData) termContainer.getTermComponent();
-    	List<? extends I_ConceptAttributeTuple> tuples = cb.getConceptAttributes().
+    	List<? extends I_ConceptAttributeTuple> tuples = cb.getConAttrs().
     		getTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly());
     	I_ConceptAttributeTuple tuple = tuples.get(0);
         for (PathBI p : config.getEditingPathSet()) {

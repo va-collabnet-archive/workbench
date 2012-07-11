@@ -40,7 +40,7 @@ import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 
 public class AcceptActionListener implements ActionListener {
 
@@ -85,11 +85,11 @@ public class AcceptActionListener implements ActionListener {
                     snorocketNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.SNOROCKET.getUids());
                     adjudicationRecRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.ADJUDICATION_RECORD.getUids());
                 }
-                for (Integer sap : c.getAllSapNids()) {
+                for (Integer sap : c.getAllStampNids()) {
                     if (sap > readOnlyMaxSap) {
-                        if (Ts.get().getAuthorNidForSapNid(sap) != snorocketNid) {
-                            UUID authorUuid = Ts.get().getUuidPrimordialForNid(Ts.get().getAuthorNidForSapNid(sap));
-                            long time = Ts.get().getTimeForSapNid(sap);
+                        if (Ts.get().getAuthorNidForStampNid(sap) != snorocketNid) {
+                            UUID authorUuid = Ts.get().getUuidPrimordialForNid(Ts.get().getAuthorNidForStampNid(sap));
+                            long time = Ts.get().getTimeForStampNid(sap);
                             String stringToHash = authorUuid.toString() + Long.toString(time);
                             UUID type5Uuid = Type5UuidFactory.get(Type5UuidFactory.AUTHOR_TIME_ID, stringToHash);
                             authorTimeHashSet.add(type5Uuid);
@@ -103,7 +103,7 @@ public class AcceptActionListener implements ActionListener {
                         arrayOfAuthorTime[i] = Type5UuidFactory.getRawBytes(atUuidArray[i]);
                     }
 
-                    RefexCAB annotBp = new RefexCAB(TK_REFSET_TYPE.ARRAY_BYTEARRAY,
+                    RefexCAB annotBp = new RefexCAB(TK_REFEX_TYPE.ARRAY_BYTEARRAY,
                             c.getConceptNid(),
                             adjudicationRecRefsetNid);
                     annotBp.put(RefexProperty.ARRAY_BYTEARRAY, arrayOfAuthorTime);
@@ -139,7 +139,7 @@ public class AcceptActionListener implements ActionListener {
                         TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(ec, vc);
                         int conflictRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.CONFLICT_RECORD.getPrimoridalUid());
                         ConceptChronicleBI conflictRefset = Ts.get().getConceptForNid(conflictRefsetNid);
-                        RefexVersionBI member = conflictRefset.getCurrentRefsetMemberForComponent(vc, c.getNid());
+                        RefexVersionBI member = conflictRefset.getRefsetMemberActiveForComponent(vc, c.getNid());
                         if (member != null) {
                             RefexCAB memberBp = member.makeBlueprint(vc);
                             memberBp.setRetired();

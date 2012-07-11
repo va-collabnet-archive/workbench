@@ -47,7 +47,7 @@ import org.dwfa.ace.api.I_HoldRefsetPreferences;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ManageContradiction;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.dwfa.ace.api.I_OverrideTaxonomyRenderer;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_Position;
@@ -282,7 +282,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         return frameConfig.getAdminUsername();
     }
 
-    public I_ManageContradiction[] getAllConflictResolutionStrategies() {
+    public ContradictionManagerBI[] getAllConflictResolutionStrategies() {
         return frameConfig.getAllConflictResolutionStrategies();
     }
 
@@ -346,7 +346,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         return frameConfig.getConceptViewer(index);
     }
 
-    public I_ManageContradiction getConflictResolutionStrategy() {
+    public ContradictionManagerBI getConflictResolutionStrategy() {
         return frameConfig.getConflictResolutionStrategy();
     }
 
@@ -617,7 +617,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         }
 
         private boolean notMarkedParent(I_GetConceptData child) throws IOException, TerminologyException {
-            Collection<? extends I_DescriptionVersioned> descriptions = child.getDescriptions();
+            Collection<? extends I_DescriptionVersioned> descriptions = child.getDescs();
             List<I_ExtendByRef> extensions = new ArrayList<I_ExtendByRef>();
             for (I_DescriptionVersioned desc : descriptions) {
                 // extensions on the description(s)
@@ -858,11 +858,11 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.setComponentToggleVisible(visible);
     }
 
-    public <T extends I_ManageContradiction> void setConflictResolutionStrategy(Class<T> conflictResolutionStrategyClass) {
+    public <T extends ContradictionManagerBI> void setConflictResolutionStrategy(Class<T> conflictResolutionStrategyClass) {
         frameConfig.setConflictResolutionStrategy(conflictResolutionStrategyClass);
     }
 
-    public void setConflictResolutionStrategy(I_ManageContradiction conflictResolutionStrategy) {
+    public void setConflictResolutionStrategy(ContradictionManagerBI conflictResolutionStrategy) {
         frameConfig.setConflictResolutionStrategy(conflictResolutionStrategy);
     }
 

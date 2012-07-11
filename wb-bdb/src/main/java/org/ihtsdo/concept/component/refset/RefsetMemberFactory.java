@@ -18,20 +18,20 @@ import org.ihtsdo.concept.component.refsetmember.integer.IntMember;
 import org.ihtsdo.concept.component.refsetmember.membership.MembershipMember;
 import org.ihtsdo.concept.component.refsetmember.str.StrMember;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
-import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanMember;
-import org.ihtsdo.tk.dto.concept.component.refset.Long.TkRefsetLongMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidcid.TkRefsetCidCidMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidcidcid.TkRefsetCidCidCidMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidcidstr.TkRefsetCidCidStrMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidflt.TkRefsetCidFloatMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidint.TkRefsetCidIntMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidlong.TkRefsetCidLongMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidstr.TkRefsetCidStrMember;
-import org.ihtsdo.tk.dto.concept.component.refset.integer.TkRefsetIntMember;
-import org.ihtsdo.tk.dto.concept.component.refset.member.TkRefsetMember;
-import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrMember;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_boolean.TkRefexBooleanMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_long.TkRefexLongMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid.TkRefexUuidMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_uuid.TkRefexUuidUuidMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_uuid_uuid.TkRefexUuidUuidUuidMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_uuid_string.TkRefexUuidUuidStringMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_float.TkRefexUuidFloatMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_int.TkRefexUuidIntMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_long.TkRefexUuidLongMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_string.TkRefexUuidStringMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_int.TkRefexIntMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_member.TkRefexMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_string.TkRefsetStrMember;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import org.ihtsdo.concept.Concept;
@@ -42,15 +42,15 @@ import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
-import org.ihtsdo.tk.dto.concept.component.refset.array.bytearray.TkRefsetArrayOfBytearrayMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_arrayofbytearray.TkRefexArrayOfBytearrayMember;
 
 public class RefsetMemberFactory {
 
     public static RefsetMember<?, ?> reCreate(RefexCAB res, RefsetMember<?, ?> member, EditCoordinate ec) throws IOException, InvalidCAB {
-        Concept refexColCon = (Concept) Ts.get().getConcept(res.getRefexColNid());
+        Concept refexColCon = (Concept) Ts.get().getConcept(res.getRefexCollectionNid());
         member.refsetNid = refexColCon.getNid();
         member.nid = Bdb.uuidToNid(res.getMemberUUID());
-        int rcNid = Ts.get().getNidForUuids(res.getRcUuid());
+        int rcNid = Ts.get().getNidForUuids(res.getReferencedComponentUuid());
         if (refexColCon.isAnnotationStyleRefex()) {
             member.enclosingConceptNid = Ts.get().getConceptNidForNid(rcNid);
             Bdb.getNidCNidMap().setCNidForNid(member.enclosingConceptNid, member.nid);
@@ -132,36 +132,36 @@ public class RefsetMemberFactory {
         }
     }
 
-    public static RefsetMember<?, ?> create(TkRefsetAbstractMember<?> refsetMember, int enclosingConceptNid) throws IOException {
+    public static RefsetMember<?, ?> create(TkRefexAbstractMember<?> refsetMember, int enclosingConceptNid) throws IOException {
         switch (refsetMember.getType()) {
             case BOOLEAN:
-                return new BooleanMember((TkRefsetBooleanMember) refsetMember, enclosingConceptNid);
+                return new BooleanMember((TkRefexBooleanMember) refsetMember, enclosingConceptNid);
             case CID:
-                return new CidMember((TkRefsetCidMember) refsetMember, enclosingConceptNid);
+                return new CidMember((TkRefexUuidMember) refsetMember, enclosingConceptNid);
             case CID_CID:
-                return new CidCidMember((TkRefsetCidCidMember) refsetMember, enclosingConceptNid);
+                return new CidCidMember((TkRefexUuidUuidMember) refsetMember, enclosingConceptNid);
             case CID_CID_CID:
-                return new CidCidCidMember((TkRefsetCidCidCidMember) refsetMember, enclosingConceptNid);
+                return new CidCidCidMember((TkRefexUuidUuidUuidMember) refsetMember, enclosingConceptNid);
             case CID_CID_STR:
-                return new CidCidStrMember((TkRefsetCidCidStrMember) refsetMember, enclosingConceptNid);
+                return new CidCidStrMember((TkRefexUuidUuidStringMember) refsetMember, enclosingConceptNid);
             case CID_INT:
-                return new CidIntMember((TkRefsetCidIntMember) refsetMember, enclosingConceptNid);
+                return new CidIntMember((TkRefexUuidIntMember) refsetMember, enclosingConceptNid);
             case CID_STR:
-                return new CidStrMember((TkRefsetCidStrMember) refsetMember, enclosingConceptNid);
+                return new CidStrMember((TkRefexUuidStringMember) refsetMember, enclosingConceptNid);
             case INT:
-                return new IntMember((TkRefsetIntMember) refsetMember, enclosingConceptNid);
+                return new IntMember((TkRefexIntMember) refsetMember, enclosingConceptNid);
             case CID_FLOAT:
-                return new CidFloatMember((TkRefsetCidFloatMember) refsetMember, enclosingConceptNid);
+                return new CidFloatMember((TkRefexUuidFloatMember) refsetMember, enclosingConceptNid);
             case MEMBER:
-                return new MembershipMember((TkRefsetMember) refsetMember, enclosingConceptNid);
+                return new MembershipMember((TkRefexMember) refsetMember, enclosingConceptNid);
             case STR:
                 return new StrMember((TkRefsetStrMember) refsetMember, enclosingConceptNid);
             case CID_LONG:
-                return new CidLongMember((TkRefsetCidLongMember) refsetMember, enclosingConceptNid);
+                return new CidLongMember((TkRefexUuidLongMember) refsetMember, enclosingConceptNid);
             case LONG:
-                return new LongMember((TkRefsetLongMember) refsetMember, enclosingConceptNid);
+                return new LongMember((TkRefexLongMember) refsetMember, enclosingConceptNid);
             case ARRAY_BYTEARRAY:
-                return new ArrayOfBytearrayMember((TkRefsetArrayOfBytearrayMember) refsetMember, enclosingConceptNid);
+                return new ArrayOfBytearrayMember((TkRefexArrayOfBytearrayMember) refsetMember, enclosingConceptNid);
             default:
                 throw new UnsupportedOperationException(
                         "Can't handle member type: " + refsetMember.getType());
@@ -172,14 +172,14 @@ public class RefsetMemberFactory {
             EditCoordinate ec, long time)
             throws IOException, InvalidCAB {
         RefsetMember<?, ?> member = createBlank(res);
-        Concept refexColCon = (Concept) Ts.get().getConcept(res.getRefexColNid());
+        Concept refexColCon = (Concept) Ts.get().getConcept(res.getRefexCollectionNid());
         int refexNid = Bdb.uuidToNid(res.getMemberUUID());
         member.nid = refexNid;
         if (refexColCon.isAnnotationStyleRefex()) {
-            int rcNid = Ts.get().getNidForUuids(res.getRcUuid());
+            int rcNid = Ts.get().getNidForUuids(res.getReferencedComponentUuid());
             member.enclosingConceptNid = Ts.get().getConceptNidForNid(rcNid);
             Bdb.getNidCNidMap().setCNidForNid(member.enclosingConceptNid, refexNid);
-            Ts.get().getComponent(res.getRcUuid()).addAnnotation(member);
+            Ts.get().getComponent(res.getReferencedComponentUuid()).addAnnotation(member);
         } else {
             member.enclosingConceptNid = refexColCon.getNid();
             Bdb.getNidCNidMap().setCNidForNid(member.enclosingConceptNid, refexNid);
@@ -210,7 +210,7 @@ public class RefsetMemberFactory {
 
         }
         if (refexColCon.isAnnotationStyleRefex()) {
-            int rcNid = Ts.get().getNidForUuids(res.getRcUuid());
+            int rcNid = Ts.get().getNidForUuids(res.getReferencedComponentUuid());
             Bdb.getConceptDb().writeConcept(
                     Bdb.getConcept(Bdb.getNidCNidMap().getCNid(rcNid)));
         } else {

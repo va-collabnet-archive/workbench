@@ -13,12 +13,12 @@ import org.ihtsdo.arena.context.action.MoveDescAction;
 
 import org.ihtsdo.tk.spec.DescriptionSpec;
 
-import org.ihtsdo.tk.example.binding.Snomed;
-import org.ihtsdo.tk.example.binding.SnomedConstraints;
-import org.ihtsdo.tk.example.binding.SnomedRelType;
-import org.ihtsdo.tk.example.binding.SnomedRelSpec;
-import org.ihtsdo.tk.example.binding.Taxonomies;
-import org.ihtsdo.tk.example.binding.WbDescType;
+import org.ihtsdo.tk.binding.snomed.Snomed;
+import org.ihtsdo.tk.binding.snomed.SnomedConstraints;
+import org.ihtsdo.tk.binding.snomed.SnomedRelationshipType;
+import org.ihtsdo.tk.binding.snomed.SnomedRelationshipSpec;
+import org.ihtsdo.tk.binding.snomed.Taxonomies;
+import org.ihtsdo.tk.binding.snomed.WbDescType;
 
 
 

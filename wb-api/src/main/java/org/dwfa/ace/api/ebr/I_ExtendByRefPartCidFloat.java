@@ -21,9 +21,9 @@ package org.dwfa.ace.api.ebr;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.ihtsdo.tk.api.refex.type_cnid_float.RefexCnidFloatAnalogBI;
+import org.ihtsdo.tk.api.refex.type_nid_float.RefexNidFloatAnalogBI;
 
-public interface I_ExtendByRefPartCidFloat<A extends RefexCnidFloatAnalogBI<A>>
+public interface I_ExtendByRefPartCidFloat<A extends RefexNidFloatAnalogBI<A>>
         extends I_ExtendByRefPartCid<A>, I_ExtendByRefPart<A> {
    public float getMeasurementValue();
 

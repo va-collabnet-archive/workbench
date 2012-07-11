@@ -49,7 +49,7 @@ public class VodbMutableToReadOnly extends AbstractMojo {
             new File(berkeleyDir, "mutable").mkdir();
             Terms.createFactory(berkeleyDir, false, 0L, new DatabaseSetupConfig());
             LuceneManager.writeToLucene((Collection<Description>) 
-                    Ts.get().getConcept(SnomedMetadataRfx.getSTATUS_CURRENT_NID()).getDescs(), LuceneSearchType.DESCRIPTION);
+                    Ts.get().getConcept(SnomedMetadataRfx.getSTATUS_CURRENT_NID()).getDescriptions(), LuceneSearchType.DESCRIPTION);
             I_ImplementTermFactory termFactoryImpl = (I_ImplementTermFactory) Terms.get();
             termFactoryImpl.close();
 

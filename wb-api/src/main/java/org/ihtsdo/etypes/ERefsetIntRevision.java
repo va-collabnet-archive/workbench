@@ -6,14 +6,14 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
 import org.dwfa.tapi.TerminologyException;
 
-import org.ihtsdo.tk.dto.concept.component.refset.integer.TkRefsetIntRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_int.TkRefexIntRevision;
 
 //~--- JDK imports ------------------------------------------------------------
 
 import java.io.DataInput;
 import java.io.IOException;
 
-public class ERefsetIntRevision extends TkRefsetIntRevision {
+public class ERefsetIntRevision extends TkRefexIntRevision {
    public static final long serialVersionUID = 1;
 
    //~--- constructors --------------------------------------------------------
@@ -23,7 +23,7 @@ public class ERefsetIntRevision extends TkRefsetIntRevision {
    }
 
    public ERefsetIntRevision(I_ExtendByRefPartInt part) throws IOException {
-      intValue   = part.getIntValue();
+      int1   = part.getIntValue();
       pathUuid   = Terms.get().nidToUuid(part.getPathNid());
       statusUuid = Terms.get().nidToUuid(part.getStatusNid());
       authorUuid    = Terms.get().nidToUuid(part.getAuthorNid());

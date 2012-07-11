@@ -66,7 +66,7 @@ public class SemanticTagEditor extends AbstractComboEditor {
 	    	for (ConceptVersionBI con : semTagConcepts) {
 	    		if (!semTagConcepts.equals(con)) {
 		        	// Get FSN to display
-	    			String semTag = con.getFullySpecifiedDescription().getText();
+	    			String semTag = con.getDescriptionFullySpecified().getText();
 		
 		        	displayTags.add(semTag);
 		    	}

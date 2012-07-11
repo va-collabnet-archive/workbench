@@ -25,10 +25,10 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
-import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanMember;
-import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanRevision;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_boolean.TkRefexBooleanMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_boolean.TkRefexBooleanRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -54,7 +54,7 @@ public class BooleanRevision extends RefsetRevision<BooleanRevision, BooleanMemb
       this.booleanValue = primoridalMember.getBooleanValue();
    }
 
-   public BooleanRevision(TkRefsetBooleanRevision eVersion, BooleanMember booleanMember) {
+   public BooleanRevision(TkRefexBooleanRevision eVersion, BooleanMember booleanMember) {
       super(eVersion, booleanMember);
       this.booleanValue = eVersion.isBooleanValue();
    }
@@ -170,14 +170,14 @@ public class BooleanRevision extends RefsetRevision<BooleanRevision, BooleanMemb
    }
 
    @Override
-   public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
+   public TkRefexAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
            Map<UUID, UUID> conversionMap)
            throws ContradictionException, IOException {
-      return new TkRefsetBooleanMember(this, exclusionSet, conversionMap, 0, true, vc);
+      return new TkRefexBooleanMember(this, exclusionSet, conversionMap, 0, true, vc);
    }
 
-   protected TK_REFSET_TYPE getTkRefsetType() {
-      return TK_REFSET_TYPE.BOOLEAN;
+   protected TK_REFEX_TYPE getTkRefsetType() {
+      return TK_REFEX_TYPE.BOOLEAN;
    }
 
    @Override

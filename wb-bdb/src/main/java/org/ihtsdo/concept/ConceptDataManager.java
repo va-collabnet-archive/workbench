@@ -177,7 +177,7 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
              + this.enclosingConcept.toLongString() + "\ndestConcept: "
              + Concept.get(rel.getC2Id()).toLongString();
       Bdb.addXrefPair(rel.getC2Id(), NidPair.getTypeNidRelNidPair(rel.getTypeNid(), rel.getNid()));
-      ChangeNotifier.touchRelTarget(rel.getDestinationNid());
+      ChangeNotifier.touchRelTarget(rel.getTargetNid());
       getSrcRelNids().add(rel.nid);
       modified();
    }

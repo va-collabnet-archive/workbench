@@ -5,14 +5,14 @@ package org.ihtsdo.etypes;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 
-import org.ihtsdo.tk.dto.concept.component.refset.member.TkRefsetRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_member.TkRefexRevision;
 
 //~--- JDK imports ------------------------------------------------------------
 
 import java.io.DataInput;
 import java.io.IOException;
 
-public class ERefsetRevision extends TkRefsetRevision {
+public class ERefsetRevision extends TkRefexRevision {
    protected static final long serialVersionUID = 1;
 
    //~--- constructors --------------------------------------------------------

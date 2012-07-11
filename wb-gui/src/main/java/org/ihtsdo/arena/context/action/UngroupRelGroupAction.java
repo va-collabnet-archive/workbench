@@ -13,7 +13,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
+import org.ihtsdo.tk.api.relationship.group.RelationshipGroupVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.ihtsdo.tk.drools.facts.RelGroupFact;
@@ -34,8 +34,8 @@ public class UngroupRelGroupAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         try {
             //get rels from sourceComponent 
-            RelGroupVersionBI source = (RelGroupVersionBI) sourceComponent;
-            Collection<?> sourceRels = source.getCurrentRels();
+            RelationshipGroupVersionBI source = (RelationshipGroupVersionBI) sourceComponent;
+            Collection<?> sourceRels = source.getRelationshipsActive();
             I_GetConceptData concept = Terms.get().getConceptForNid(source.getConceptNid());
             //loop through rels
             for (Object relObject : sourceRels) {

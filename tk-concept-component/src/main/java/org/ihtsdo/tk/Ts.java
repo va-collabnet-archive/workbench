@@ -13,8 +13,8 @@ public class Ts {
 
     private static TerminologyStoreDI store;
 
-    public static void set(TerminologyStoreDI store) {
-        Ts.store = store;
+    public static void set(TerminologyStoreDI terminologyStore) {
+        Ts.store = terminologyStore;
     }
 
     public static TerminologyStoreDI get() {

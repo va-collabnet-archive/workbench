@@ -17,9 +17,9 @@
 package org.dwfa.ace.api.ebr;
 
 import java.beans.PropertyVetoException;
-import org.ihtsdo.tk.api.refex.type_str.RefexStrAnalogBI;
+import org.ihtsdo.tk.api.refex.type_string.RefexStringAnalogBI;
 
-public interface I_ExtendByRefPartStr<A extends RefexStrAnalogBI<A>> extends I_ExtendByRefPart<A> {
+public interface I_ExtendByRefPartStr<A extends RefexStringAnalogBI<A>> extends I_ExtendByRefPart<A> {
 
     public I_ExtendByRefPartStr<A> duplicate();
 

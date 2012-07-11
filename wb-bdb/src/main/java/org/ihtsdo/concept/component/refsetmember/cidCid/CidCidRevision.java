@@ -24,11 +24,11 @@ import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid_cnid.RefexCnidCnidAnalogBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidcid.TkRefsetCidCidMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidcid.TkRefsetCidCidRevision;
+import org.ihtsdo.tk.api.refex.type_nid_nid.RefexNidNidAnalogBI;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_uuid.TkRefexUuidUuidMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_uuid.TkRefsetUuidUuidRevision;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -40,7 +40,7 @@ import java.util.*;
 import org.dwfa.ace.api.Terms;
 
 public class CidCidRevision extends RefsetRevision<CidCidRevision, CidCidMember>
-        implements I_ExtendByRefPartCidCid<CidCidRevision>, RefexCnidCnidAnalogBI<CidCidRevision> {
+        implements I_ExtendByRefPartCidCid<CidCidRevision>, RefexNidNidAnalogBI<CidCidRevision> {
    private int c1Nid;
    private int c2Nid;
 
@@ -56,10 +56,10 @@ public class CidCidRevision extends RefsetRevision<CidCidRevision, CidCidMember>
       c2Nid = primoridalMember.getC2Nid();
    }
 
-   public CidCidRevision(TkRefsetCidCidRevision eVersion, CidCidMember member) {
+   public CidCidRevision(TkRefsetUuidUuidRevision eVersion, CidCidMember member) {
       super(eVersion, member);
-      c1Nid = Bdb.uuidToNid(eVersion.getC1Uuid());
-      c2Nid = Bdb.uuidToNid(eVersion.getC2Uuid());
+      c1Nid = Bdb.uuidToNid(eVersion.getUuid1());
+      c2Nid = Bdb.uuidToNid(eVersion.getUuid2());
    }
 
    public CidCidRevision(TupleInput input, CidCidMember primoridalMember) {
@@ -92,8 +92,8 @@ public class CidCidRevision extends RefsetRevision<CidCidRevision, CidCidMember>
 
    @Override
    protected void addSpecProperties(RefexCAB rcs) {
-      rcs.with(RefexProperty.CNID1, getCnid1());
-      rcs.with(RefexProperty.CNID2, getCnid2());
+      rcs.with(RefexProperty.CNID1, getNid1());
+      rcs.with(RefexProperty.CNID2, getNid2());
    }
 
    @Override
@@ -196,23 +196,23 @@ public class CidCidRevision extends RefsetRevision<CidCidRevision, CidCidMember>
       return c2Nid;
    }
 
-   public int getCnid1() {
+   public int getNid1() {
       return c1Nid;
    }
 
-   public int getCnid2() {
+   public int getNid2() {
       return c2Nid;
    }
 
    @Override
-   public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
+   public TkRefexAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
            Map<UUID, UUID> conversionMap)
            throws ContradictionException, IOException {
-      return new TkRefsetCidCidMember(this, exclusionSet, conversionMap, 0, true, vc);
+      return new TkRefexUuidUuidMember(this, exclusionSet, conversionMap, 0, true, vc);
    }
 
-   protected TK_REFSET_TYPE getTkRefsetType() {
-      return TK_REFSET_TYPE.CID_CID;
+   protected TK_REFEX_TYPE getTkRefsetType() {
+      return TK_REFEX_TYPE.CID_CID;
    }
 
    @Override
@@ -272,13 +272,13 @@ public class CidCidRevision extends RefsetRevision<CidCidRevision, CidCidMember>
    }
 
    @Override
-   public void setCnid1(int cnid) throws PropertyVetoException {
+   public void setNid1(int cnid) throws PropertyVetoException {
       this.c1Nid = cnid;
       modified();
    }
 
    @Override
-   public void setCnid2(int cnid) throws PropertyVetoException {
+   public void setNid2(int cnid) throws PropertyVetoException {
       this.c2Nid = cnid;
       modified();
    }

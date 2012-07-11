@@ -14,21 +14,21 @@ import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.media.TkMedia;
-import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanMember;
-import org.ihtsdo.tk.dto.concept.component.refset.Long.TkRefsetLongMember;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidcid.TkRefsetCidCidMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidcidcid.TkRefsetCidCidCidMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidcidstr.TkRefsetCidCidStrMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidflt.TkRefsetCidFloatMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidint.TkRefsetCidIntMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidlong.TkRefsetCidLongMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidstr.TkRefsetCidStrMember;
-import org.ihtsdo.tk.dto.concept.component.refset.integer.TkRefsetIntMember;
-import org.ihtsdo.tk.dto.concept.component.refset.member.TkRefsetMember;
-import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_boolean.TkRefexBooleanMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_long.TkRefexLongMember;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid.TkRefexUuidMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_uuid.TkRefexUuidUuidMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_uuid_uuid.TkRefexUuidUuidUuidMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_uuid_string.TkRefexUuidUuidStringMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_float.TkRefexUuidFloatMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_int.TkRefexUuidIntMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_long.TkRefexUuidLongMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_string.TkRefexUuidStringMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_int.TkRefexIntMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_member.TkRefexMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_string.TkRefsetStrMember;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -43,20 +43,20 @@ import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.media.MediaChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid_cnid.RefexCnidCnidVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid_cnid_cnid.RefexCnidCnidCnidVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid_cnid_str.RefexCnidCnidStrVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid_float.RefexCnidFloatVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid_int.RefexCnidIntVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid_long.RefexCnidLongVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid_str.RefexCnidStrVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid_nid.RefexNidNidVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid_nid_nid.RefexNidNidNidVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid_nid_string.RefexNidNidStringVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid_float.RefexNidFloatVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid_int.RefexNidIntVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid_long.RefexNidLongVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid_string.RefexNidStringVersionBI;
 import org.ihtsdo.tk.api.refex.type_int.RefexIntVersionBI;
 import org.ihtsdo.tk.api.refex.type_long.RefexLongVersionBI;
 import org.ihtsdo.tk.api.refex.type_member.RefexMemberVersionBI;
-import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
+import org.ihtsdo.tk.api.refex.type_string.RefexStringVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
-import org.ihtsdo.tk.dto.concept.component.refset.array.bytearray.TkRefsetArrayOfBytearrayMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_arrayofbytearray.TkRefexArrayOfBytearrayMember;
 
 public class TkConcept {
 
@@ -69,7 +69,7 @@ public class TkConcept {
     public List<TkDescription> descriptions;
     public List<TkMedia> media;
     public UUID primordialUuid;
-    public List<TkRefsetAbstractMember<?>> refsetMembers;
+    public List<TkRefexAbstractMember<?>> refsetMembers;
     public List<TkRelationship> relationships;
 
     //~--- constructors --------------------------------------------------------
@@ -82,77 +82,77 @@ public class TkConcept {
         readExternal(in);
     }
 
-    public TkConcept(ConceptChronicleBI c) throws IOException {
-        annotationStyleRefex = c.isAnnotationStyleRefex();
-        conceptAttributes = new TkConceptAttributes(c.getConAttrs());
+    public TkConcept(ConceptChronicleBI conceptChronicle) throws IOException {
+        annotationStyleRefex = conceptChronicle.isAnnotationStyleRefex();
+        conceptAttributes = new TkConceptAttributes(conceptChronicle.getConceptAttributes());
         primordialUuid = conceptAttributes.primordialUuid;
-        relationships = new ArrayList<TkRelationship>(c.getRelsOutgoing().size());
+        relationships = new ArrayList<TkRelationship>(conceptChronicle.getRelationshipsSource().size());
 
-        for (RelationshipChronicleBI rel : c.getRelsOutgoing()) {
+        for (RelationshipChronicleBI rel : conceptChronicle.getRelationshipsSource()) {
             relationships.add(new TkRelationship(rel));
         }
 
-        descriptions = new ArrayList<TkDescription>(c.getDescs().size());
+        descriptions = new ArrayList<TkDescription>(conceptChronicle.getDescriptions().size());
 
-        for (DescriptionChronicleBI desc : c.getDescs()) {
+        for (DescriptionChronicleBI desc : conceptChronicle.getDescriptions()) {
             descriptions.add(new TkDescription(desc));
         }
 
-        media = new ArrayList<TkMedia>(c.getMedia().size());
+        media = new ArrayList<TkMedia>(conceptChronicle.getMedia().size());
 
-        for (MediaChronicleBI mediaChronicle : c.getMedia()) {
+        for (MediaChronicleBI mediaChronicle : conceptChronicle.getMedia()) {
             TkMedia tkMedia = new TkMedia(mediaChronicle);
             media.add(tkMedia);
         }
 
-        if (!c.isAnnotationStyleRefex()) {
-            Collection<? extends RefexChronicleBI> members = c.getRefsetMembers();
+        if (!conceptChronicle.isAnnotationStyleRefex()) {
+            Collection<? extends RefexChronicleBI> members = conceptChronicle.getRefsetMembers();
 
             if (members != null) {
-                refsetMembers = new ArrayList<TkRefsetAbstractMember<?>>(members.size());
+                refsetMembers = new ArrayList<TkRefexAbstractMember<?>>(members.size());
 
                 for (RefexChronicleBI m : members) {
-                    TkRefsetAbstractMember<?> member = convertRefex(m);
+                    TkRefexAbstractMember<?> member = convertRefex(m);
 
                     if (member != null) {
                         refsetMembers.add(member);
                     } else {
-                        throw new IOException("Could not convert refset member: " + m + "\nfrom refset: " + c);
+                        throw new IOException("Could not convert refset member: " + m + "\nfrom refset: " + conceptChronicle);
                     }
                 }
             }
         }
     }
 
-    public static TkRefsetAbstractMember<?> convertRefex(RefexChronicleBI<?> m) throws IOException {
-        if (m.getPrimordialVersion() instanceof RefexCnidCnidCnidVersionBI) {
-            return new TkRefsetCidCidCidMember((RefexCnidCnidCnidVersionBI) m);
-        } else if (m.getPrimordialVersion() instanceof RefexCnidCnidStrVersionBI) {
-            return new TkRefsetCidCidStrMember(m);
-        } else if (m.getPrimordialVersion() instanceof RefexCnidCnidVersionBI) {
-            return new TkRefsetCidCidMember(m);
-        } else if (m.getPrimordialVersion() instanceof RefexCnidFloatVersionBI) {
-            return new TkRefsetCidFloatMember(m);
-        } else if (m.getPrimordialVersion() instanceof RefexCnidIntVersionBI) {
-            return new TkRefsetCidIntMember(m);
-        } else if (m.getPrimordialVersion() instanceof RefexCnidLongVersionBI) {
-            return new TkRefsetCidLongMember(m);
-        } else if (m.getPrimordialVersion() instanceof RefexCnidStrVersionBI) {
-            return new TkRefsetCidStrMember(m);
-        } else if (m.getPrimordialVersion() instanceof RefexCnidVersionBI) {
-            return new TkRefsetCidMember(m);
-        } else if (m.getPrimordialVersion() instanceof RefexIntVersionBI) {
-            return new TkRefsetIntMember(m);
-        } else if (m.getPrimordialVersion() instanceof RefexStrVersionBI) {
-            return new TkRefsetStrMember(m);
-        } else if (m.getPrimordialVersion() instanceof RefexLongVersionBI) {
-            return new TkRefsetLongMember(m);
-        } else if (m.getPrimordialVersion() instanceof RefexBooleanVersionBI) {
-            return new TkRefsetBooleanMember(m);
-        } else if (m.getPrimordialVersion() instanceof RefexMemberVersionBI) {
-            return new TkRefsetMember(m);
+    public static TkRefexAbstractMember<?> convertRefex(RefexChronicleBI<?> refexChronicle) throws IOException {
+        if (refexChronicle.getPrimordialVersion() instanceof RefexNidNidNidVersionBI) {
+            return new TkRefexUuidUuidUuidMember((RefexNidNidNidVersionBI) refexChronicle);
+        } else if (refexChronicle.getPrimordialVersion() instanceof RefexNidNidStringVersionBI) {
+            return new TkRefexUuidUuidStringMember(refexChronicle);
+        } else if (refexChronicle.getPrimordialVersion() instanceof RefexNidNidVersionBI) {
+            return new TkRefexUuidUuidMember(refexChronicle);
+        } else if (refexChronicle.getPrimordialVersion() instanceof RefexNidFloatVersionBI) {
+            return new TkRefexUuidFloatMember(refexChronicle);
+        } else if (refexChronicle.getPrimordialVersion() instanceof RefexNidIntVersionBI) {
+            return new TkRefexUuidIntMember(refexChronicle);
+        } else if (refexChronicle.getPrimordialVersion() instanceof RefexNidLongVersionBI) {
+            return new TkRefexUuidLongMember(refexChronicle);
+        } else if (refexChronicle.getPrimordialVersion() instanceof RefexNidStringVersionBI) {
+            return new TkRefexUuidStringMember(refexChronicle);
+        } else if (refexChronicle.getPrimordialVersion() instanceof RefexNidVersionBI) {
+            return new TkRefexUuidMember(refexChronicle);
+        } else if (refexChronicle.getPrimordialVersion() instanceof RefexIntVersionBI) {
+            return new TkRefexIntMember(refexChronicle);
+        } else if (refexChronicle.getPrimordialVersion() instanceof RefexStringVersionBI) {
+            return new TkRefsetStrMember(refexChronicle);
+        } else if (refexChronicle.getPrimordialVersion() instanceof RefexLongVersionBI) {
+            return new TkRefexLongMember(refexChronicle);
+        } else if (refexChronicle.getPrimordialVersion() instanceof RefexBooleanVersionBI) {
+            return new TkRefexBooleanMember(refexChronicle);
+        } else if (refexChronicle.getPrimordialVersion() instanceof RefexMemberVersionBI) {
+            return new TkRefexMember(refexChronicle);
         } else {
-            throw new UnsupportedOperationException("Cannot handle: " + m);
+            throw new UnsupportedOperationException("Cannot handle: " + refexChronicle);
         }
     }
 
@@ -183,10 +183,10 @@ public class TkConcept {
         this.primordialUuid = conversionMap.get(another.primordialUuid);
 
         if (another.refsetMembers != null) {
-            this.refsetMembers = new ArrayList<TkRefsetAbstractMember<?>>(another.refsetMembers.size());
+            this.refsetMembers = new ArrayList<TkRefexAbstractMember<?>>(another.refsetMembers.size());
 
-            for (TkRefsetAbstractMember<?> d : another.refsetMembers) {
-                this.refsetMembers.add((TkRefsetAbstractMember<?>) d.makeConversion(conversionMap, offset,
+            for (TkRefexAbstractMember<?> d : another.refsetMembers) {
+                this.refsetMembers.add((TkRefexAbstractMember<?>) d.makeConversion(conversionMap, offset,
                         mapAll));
             }
         }
@@ -200,89 +200,89 @@ public class TkConcept {
         }
     }
 
-    public TkConcept(ConceptVersionBI another, NidBitSetBI exclusions, Map<UUID, UUID> conversionMap,
-            long offset, boolean mapAll, ViewCoordinate vc)
+    public TkConcept(ConceptVersionBI conceptVersion, NidBitSetBI excludedNids, Map<UUID, UUID> conversionMap,
+            long offset, boolean mapAll, ViewCoordinate viewCoordinate)
             throws IOException, ContradictionException {
-        this(another, exclusions, conversionMap,
-                offset, mapAll, vc, vc, vc);
+        this(conceptVersion, excludedNids, conversionMap,
+                offset, mapAll, viewCoordinate, viewCoordinate, viewCoordinate);
     }
 
-    public TkConcept(ConceptVersionBI another, NidBitSetBI exclusions, Map<UUID, UUID> conversionMap,
+    public TkConcept(ConceptVersionBI conceptVersion, NidBitSetBI excludedNids, Map<UUID, UUID> conversionMap,
             long offset, boolean mapAll,
             ViewCoordinate conceptVc,
             ViewCoordinate descVc,
             ViewCoordinate relVc)
             throws IOException, ContradictionException {
         super();
-        this.primordialUuid = conversionMap.get(another.getPrimUuid());
-        this.annotationStyleRefex = another.isAnnotationStyleRefex();
-        this.conceptAttributes = new TkConceptAttributes(another.getConAttrsActive(), exclusions,
+        this.primordialUuid = conversionMap.get(conceptVersion.getPrimUuid());
+        this.annotationStyleRefex = conceptVersion.isAnnotationStyleRefex();
+        this.conceptAttributes = new TkConceptAttributes(conceptVersion.getConceptAttributesActive(), excludedNids,
                 conversionMap, offset, mapAll, conceptVc);
 
         Collection<? extends DescriptionVersionBI> activeDescriptions =
-                another.getChronicle().getVersion(descVc).getDescsActive();
+                conceptVersion.getChronicle().getVersion(descVc).getDescriptionsActive();
 
         if (activeDescriptions != null) {
             this.descriptions = new ArrayList<TkDescription>(activeDescriptions.size());
             nextDescription:
             for (DescriptionVersionBI d : activeDescriptions) {
                 for (int nid : d.getAllNidsForVersion()) {
-                    if (exclusions.isMember(nid) || (Ts.get().getComponent(nid) == null)) {
+                    if (excludedNids.isMember(nid) || (Ts.get().getComponent(nid) == null)) {
                         continue nextDescription;
                     } else if (Ts.get().getComponent(nid).getVersions(descVc).isEmpty()) {
                         continue nextDescription;
                     }
                 }
 
-                this.descriptions.add(new TkDescription(d, exclusions, conversionMap, offset, mapAll, descVc));
+                this.descriptions.add(new TkDescription(d, excludedNids, conversionMap, offset, mapAll, descVc));
             }
         }
 
-        Collection<? extends MediaVersionBI> activeMedia = another.getMediaActive();
+        Collection<? extends MediaVersionBI> activeMedia = conceptVersion.getMediaActive();
 
         if (activeMedia != null) {
             this.media = new ArrayList<TkMedia>(activeMedia.size());
             nextMedia:
             for (MediaVersionBI m : activeMedia) {
                 for (int nid : m.getAllNidsForVersion()) {
-                    if (exclusions.isMember(nid) || (Ts.get().getComponent(nid) == null)) {
+                    if (excludedNids.isMember(nid) || (Ts.get().getComponent(nid) == null)) {
                         continue nextMedia;
                     } else if (Ts.get().getComponent(nid).getVersions(conceptVc).isEmpty()) {
                         continue nextMedia;
                     }
                 }
 
-                this.media.add(new TkMedia(m, exclusions, conversionMap, offset, mapAll, conceptVc));
+                this.media.add(new TkMedia(m, excludedNids, conversionMap, offset, mapAll, conceptVc));
             }
         }
 
-        Collection<? extends RefexVersionBI<?>> activeRefsetMembers = another.getRefsetMembersActive();
+        Collection<? extends RefexVersionBI<?>> activeRefsetMembers = conceptVersion.getRefsetMembersActive();
 
         if (activeRefsetMembers != null) {
-            this.refsetMembers = new ArrayList<TkRefsetAbstractMember<?>>(activeRefsetMembers.size());
+            this.refsetMembers = new ArrayList<TkRefexAbstractMember<?>>(activeRefsetMembers.size());
             nextRefsetMember:
             for (RefexVersionBI rxm : activeRefsetMembers) {
                 for (int nid : rxm.getAllNidsForVersion()) {
-                    if (exclusions.isMember(nid) || (Ts.get().getComponent(nid) == null)) {
+                    if (excludedNids.isMember(nid) || (Ts.get().getComponent(nid) == null)) {
                         continue nextRefsetMember;
                     } else if (Ts.get().getComponent(nid).getVersions(conceptVc).isEmpty()) {
                         continue nextRefsetMember;
                     }
                 }
 
-                this.refsetMembers.add(rxm.getTkRefsetMemberActiveOnly(conceptVc, exclusions, conversionMap));
+                this.refsetMembers.add(rxm.getTkRefsetMemberActiveOnly(conceptVc, excludedNids, conversionMap));
             }
         }
 
-        Collection<? extends RelationshipVersionBI> rels = another.getChronicle().getVersion(relVc).getRelsOutgoingActive();
+        Collection<? extends RelationshipVersionBI> rels = conceptVersion.getChronicle().getVersion(relVc).getRelationshipsSourceActive();
 
         if (rels != null) {
             this.relationships = new ArrayList<TkRelationship>(rels.size());
             nextRel:
             for (RelationshipVersionBI rel : rels) {
-                int destNid = rel.getDestinationNid();
+                int destNid = rel.getTargetNid();
                 for (int nid : rel.getAllNidsForVersion()) {
-                   if (exclusions.isMember(nid) || (Ts.get().getComponent(nid) == null)) {
+                   if (excludedNids.isMember(nid) || (Ts.get().getComponent(nid) == null)) {
                         continue nextRel;
                     } else if (Ts.get().getComponent(nid).getVersions(relVc).isEmpty()) {
                         if (nid == destNid) {
@@ -294,7 +294,7 @@ public class TkConcept {
                         }
                     }
                 }
-                this.relationships.add(new TkRelationship(rel, exclusions, conversionMap, offset, mapAll, relVc));
+                this.relationships.add(new TkRelationship(rel, excludedNids, conversionMap, offset, mapAll, relVc));
             }
         }
     }
@@ -446,39 +446,39 @@ public class TkConcept {
         int refsetMemberCount = in.readInt();
 
         if (refsetMemberCount > 0) {
-            refsetMembers = new ArrayList<TkRefsetAbstractMember<?>>(refsetMemberCount);
+            refsetMembers = new ArrayList<TkRefexAbstractMember<?>>(refsetMemberCount);
 
             for (int i = 0; i < refsetMemberCount; i++) {
-                TK_REFSET_TYPE type = TK_REFSET_TYPE.readType(in);
+                TK_REFEX_TYPE type = TK_REFEX_TYPE.readType(in);
 
                 switch (type) {
                     case CID:
-                        refsetMembers.add(new TkRefsetCidMember(in, readDataVersion));
+                        refsetMembers.add(new TkRefexUuidMember(in, readDataVersion));
 
                         break;
 
                     case CID_CID:
-                        refsetMembers.add(new TkRefsetCidCidMember(in, readDataVersion));
+                        refsetMembers.add(new TkRefexUuidUuidMember(in, readDataVersion));
 
                         break;
 
                     case MEMBER:
-                        refsetMembers.add(new TkRefsetMember(in, readDataVersion));
+                        refsetMembers.add(new TkRefexMember(in, readDataVersion));
 
                         break;
 
                     case CID_CID_CID:
-                        refsetMembers.add(new TkRefsetCidCidCidMember(in, readDataVersion));
+                        refsetMembers.add(new TkRefexUuidUuidUuidMember(in, readDataVersion));
 
                         break;
 
                     case CID_CID_STR:
-                        refsetMembers.add(new TkRefsetCidCidStrMember(in, readDataVersion));
+                        refsetMembers.add(new TkRefexUuidUuidStringMember(in, readDataVersion));
 
                         break;
 
                     case INT:
-                        refsetMembers.add(new TkRefsetIntMember(in, readDataVersion));
+                        refsetMembers.add(new TkRefexIntMember(in, readDataVersion));
 
                         break;
 
@@ -488,36 +488,36 @@ public class TkConcept {
                         break;
 
                     case CID_INT:
-                        refsetMembers.add(new TkRefsetCidIntMember(in, readDataVersion));
+                        refsetMembers.add(new TkRefexUuidIntMember(in, readDataVersion));
 
                         break;
 
                     case BOOLEAN:
-                        refsetMembers.add(new TkRefsetBooleanMember(in, readDataVersion));
+                        refsetMembers.add(new TkRefexBooleanMember(in, readDataVersion));
 
                         break;
 
                     case CID_FLOAT:
-                        refsetMembers.add(new TkRefsetCidFloatMember(in, readDataVersion));
+                        refsetMembers.add(new TkRefexUuidFloatMember(in, readDataVersion));
 
                         break;
 
                     case CID_LONG:
-                        refsetMembers.add(new TkRefsetCidLongMember(in, readDataVersion));
+                        refsetMembers.add(new TkRefexUuidLongMember(in, readDataVersion));
 
                         break;
 
                     case CID_STR:
-                        refsetMembers.add(new TkRefsetCidStrMember(in, readDataVersion));
+                        refsetMembers.add(new TkRefexUuidStringMember(in, readDataVersion));
 
                         break;
 
                     case LONG:
-                        refsetMembers.add(new TkRefsetLongMember(in, readDataVersion));
+                        refsetMembers.add(new TkRefexLongMember(in, readDataVersion));
 
                         break;
                     case ARRAY_BYTEARRAY:
-                        refsetMembers.add(new TkRefsetArrayOfBytearrayMember(in, dataVersion));
+                        refsetMembers.add(new TkRefexArrayOfBytearrayMember(in, dataVersion));
                         break;
                     default:
                         throw new UnsupportedOperationException("Can't handle refset type: " + type);
@@ -590,7 +590,7 @@ public class TkConcept {
         if (this.refsetMembers == null) {
             buff.append(PADDING + "none\n");
         } else {
-            for (TkRefsetAbstractMember<?> r : this.refsetMembers) {
+            for (TkRefexAbstractMember<?> r : this.refsetMembers) {
                 buff.append(PADDING);
                 buff.append(r);
                 buff.append("\n");
@@ -664,7 +664,7 @@ public class TkConcept {
         } else {
             out.writeInt(refsetMembers.size());
 
-            for (TkRefsetAbstractMember<?> r : refsetMembers) {
+            for (TkRefexAbstractMember<?> r : refsetMembers) {
                 r.getType().writeType(out);
                 r.writeExternal(out);
             }
@@ -690,7 +690,7 @@ public class TkConcept {
         return primordialUuid;
     }
 
-    public List<TkRefsetAbstractMember<?>> getRefsetMembers() {
+    public List<TkRefexAbstractMember<?>> getRefsetMembers() {
         return refsetMembers;
     }
 
@@ -723,7 +723,7 @@ public class TkConcept {
         this.primordialUuid = primordialUuid;
     }
 
-    public void setRefsetMembers(List<TkRefsetAbstractMember<?>> refsetMembers) {
+    public void setRefsetMembers(List<TkRefexAbstractMember<?>> refsetMembers) {
         this.refsetMembers = refsetMembers;
     }
 

@@ -48,11 +48,11 @@ import java.util.*;
 import org.ihtsdo.db.change.ChangeNotifier;
 import org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
-import org.ihtsdo.tk.api.blueprint.RelCAB;
+import org.ihtsdo.tk.api.blueprint.RelationshipCAB;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.binding.snomed.TermAux;
-import org.ihtsdo.tk.dto.concept.component.relationship.TkRelType;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipType;
 
 public class Relationship extends ConceptComponent<RelationshipRevision, Relationship>
         implements I_RelVersioned<RelationshipRevision>, I_RelPart<RelationshipRevision>,
@@ -80,9 +80,9 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
     public Relationship(TkRelationship eRel, Concept enclosingConcept) throws IOException {
         super(eRel, enclosingConcept.getNid());
-        c2Nid = Bdb.uuidToNid(eRel.getC2Uuid());
+        c2Nid = Bdb.uuidToNid(eRel.getRelationshipTargetUuid());
         setCharacteristicNid(Bdb.uuidToNid(eRel.getCharacteristicUuid()));
-        group = eRel.getRelGroup();
+        group = eRel.getRelationshipGroup();
         setRefinabilityNid(Bdb.uuidToNid(eRel.getRefinabilityUuid()));
         setTypeNid(Bdb.uuidToNid(eRel.getTypeUuid()));
         primordialSapNid = Bdb.getSapNid(eRel);
@@ -153,7 +153,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     }
     @Override
     protected void addRevisionHook(boolean returnValue, RelationshipRevision r) {
-        ChangeNotifier.touchRelTarget(getDestinationNid());
+        ChangeNotifier.touchRelTarget(getTargetNid());
     }
     @Override
     public boolean addVersionNoRedundancyCheck(I_RelPart rel) {
@@ -471,23 +471,23 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     }
 
     @Override
-    public int getDestinationNid() {
+    public int getTargetNid() {
         return c2Nid;
     }
 
     @Override
-    public RelCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
-        TkRelType relType = null;
+    public RelationshipCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
+        TkRelationshipType relType = null;
         if (getCharacteristicNid() == SnomedMetadataRf1.INFERRED_DEFINING_CHARACTERISTIC_TYPE_RF1.getLenient().getNid() ||
                 getCharacteristicNid() == SnomedMetadataRf1.DEFINING_CHARACTERISTIC_TYPE_RF1.getLenient().getNid()
                 || getCharacteristicNid() == SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2.getLenient().getNid()) {
             throw new InvalidCAB("Inferred relationships can not be used to make blueprints");
         } else {
-            relType = TkRelType.STATED_HIERARCHY;
+            relType = TkRelationshipType.STATED_HIERARCHY;
         }
-        RelCAB relBp = new RelCAB(getOriginNid(),
+        RelationshipCAB relBp = new RelationshipCAB(getSourceNid(),
                 getTypeNid(),
-                getDestinationNid(),
+                getTargetNid(),
                 getGroup(),
                 relType,
                 getVersion(vc),
@@ -528,7 +528,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     }
 
     @Override
-    public int getOriginNid() {
+    public int getSourceNid() {
         return enclosingConceptNid;
     }
 
@@ -732,7 +732,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     @Deprecated
     public void setC2Id(int destNid) {
         try {
-            this.setDestinationNid(destNid);
+            this.setTargetNid(destNid);
         } catch (PropertyVetoException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
@@ -752,7 +752,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     }
 
     @Override
-    public void setDestinationNid(int dNid) throws PropertyVetoException {
+    public void setTargetNid(int dNid) throws PropertyVetoException {
         if (this.c2Nid != dNid) {
             if ((this.typeNid != 0) && (this.nid != 0)) {
                 NidPairForRel oldNpr = NidPair.getTypeNidRelNidPair(this.typeNid, this.nid);
@@ -901,12 +901,12 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         }
 
         @Override
-        public int getDestinationNid() {
+        public int getTargetNid() {
             return Relationship.this.c2Nid;
         }
 
         @Override
-        public RelCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
+        public RelationshipCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
             return getCv().makeBlueprint(vc);
         }
 
@@ -926,7 +926,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         }
 
         @Override
-        public int getOriginNid() {
+        public int getSourceNid() {
             return Relationship.this.enclosingConceptNid;
         }
 
@@ -1026,8 +1026,8 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         }
 
         @Override
-        public void setDestinationNid(int destNid) throws PropertyVetoException {
-            getCv().setDestinationNid(destNid);
+        public void setTargetNid(int destNid) throws PropertyVetoException {
+            getCv().setTargetNid(destNid);
         }
 
         @Override

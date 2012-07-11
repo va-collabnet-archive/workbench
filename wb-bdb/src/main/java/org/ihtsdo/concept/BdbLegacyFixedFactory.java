@@ -17,7 +17,7 @@ import org.dwfa.tapi.I_RelateConceptsLocally;
 import org.dwfa.tapi.I_StoreLocalFixedTerminology;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.ComponentChronicleBI;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -94,7 +94,7 @@ public class BdbLegacyFixedFactory implements I_StoreLocalFixedTerminology {
         List<I_DescribeConceptLocally> descList = new ArrayList<I_DescribeConceptLocally>();
         Concept c = Bdb.getConceptDb().getConcept(concept.getNid());
         try {
-            for (I_DescriptionVersioned desc : c.getDescriptions()) {
+            for (I_DescriptionVersioned desc : c.getDescs()) {
                 descList.add(desc.toLocalFixedDesc());
             }
         } catch (DatabaseException e) {
@@ -104,7 +104,7 @@ public class BdbLegacyFixedFactory implements I_StoreLocalFixedTerminology {
     }
 
     public I_ConceptualizeLocally getConcept(int cNid) throws IOException, TerminologyException {
-        I_ConceptAttributeVersioned vCon = Bdb.getConceptDb().getConcept(cNid).getConceptAttributes();
+        I_ConceptAttributeVersioned vCon = Bdb.getConceptDb().getConcept(cNid).getConAttrs();
         return vCon.getLocalFixedConcept();
     }
 
@@ -123,7 +123,7 @@ public class BdbLegacyFixedFactory implements I_StoreLocalFixedTerminology {
         	if (cNid == nid) {
         		return c.getUUIDs();
         	}
-        	ComponentChroncileBI<?> cc = c.getComponent(nid);
+        	ComponentChronicleBI<?> cc = c.getComponent(nid);
             return cc.getUUIDs();
         } catch (DatabaseException e) {
             throw new ToIoException(e);

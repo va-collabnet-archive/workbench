@@ -64,20 +64,20 @@ public class UuidT5Generator {
 
     
    public static UUID getDescUuid(String text, 
-           UUID langPrimUuid, 
-           UUID conceptPrimUuid) throws NoSuchAlgorithmException, UnsupportedEncodingException {
-      return get(langPrimUuid, text + conceptPrimUuid.toString());
+           UUID langPrimoridalUuid, 
+           UUID conceptPrimordialUuid) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+      return get(langPrimoridalUuid, text + conceptPrimordialUuid.toString());
    }
 
     /**
      * This routine adapted from org.safehaus.uuid.UUID,
      * which is licensed under Apache 2.
      *
-     * @param uid
+     * @param uuid
      * @return
      */
-    public static byte[] getRawBytes(UUID uid) {
-        String id = uid.toString();
+    public static byte[] getRawBytes(UUID uuid) {
+        String id = uuid.toString();
         if (id.length() != 36) {
             throw new NumberFormatException("UUID has to be represented by the standard 36-char representation");
         }

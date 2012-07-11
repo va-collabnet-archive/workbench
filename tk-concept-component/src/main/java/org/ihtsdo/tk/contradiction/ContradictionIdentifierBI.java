@@ -29,7 +29,7 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
  */
 public interface ContradictionIdentifierBI {
 
-    ContradictionResult isConceptInConflict(ConceptChronicleBI concept) throws Exception;
+    ContradictionResult isConceptInConflict(ConceptChronicleBI conceptChronicle) throws Exception;
 
 	Collection<? extends ComponentVersionBI> getReturnVersions();
 }

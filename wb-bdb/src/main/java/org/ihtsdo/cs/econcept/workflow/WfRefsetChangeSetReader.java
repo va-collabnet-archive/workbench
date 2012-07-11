@@ -35,7 +35,7 @@ import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.lucene.WfHxLuceneWriterAccessor;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 /**
@@ -63,8 +63,8 @@ public class WfRefsetChangeSetReader implements I_ReadChangeSet {
     private final String wfPropertySuffix = "-WF";
     private static File firstFileRead = null;
     private transient List<I_ValidateChangeSetChanges> validators = new ArrayList<I_ValidateChangeSetChanges>();
-    private static HashSet<TkRefsetAbstractMember<?>> wfMembersToCommit = new HashSet<TkRefsetAbstractMember<?>>();
-    private static List<TkRefsetAbstractMember<?>> unresolvedAnnotations = new ArrayList<TkRefsetAbstractMember<?>>();
+    private static HashSet<TkRefexAbstractMember<?>> wfMembersToCommit = new HashSet<TkRefexAbstractMember<?>>();
+    private static List<TkRefexAbstractMember<?>> unresolvedAnnotations = new ArrayList<TkRefexAbstractMember<?>>();
     private static WfConceptToRefsetMembersMap membersMap = new WfConceptToRefsetMembersMap();
 
     @Override
@@ -107,7 +107,7 @@ public class WfRefsetChangeSetReader implements I_ReadChangeSet {
             }
 
             // Get All Refset Members found in all Change Set files
-            HashSet<TkRefsetAbstractMember<?>> membersToScrub = new HashSet<TkRefsetAbstractMember<?>>();
+            HashSet<TkRefexAbstractMember<?>> membersToScrub = new HashSet<TkRefexAbstractMember<?>>();
             membersToScrub.addAll(membersMap.getAllMembers());
 
             // Filter out based on across-all-changesets filters
@@ -207,7 +207,7 @@ public class WfRefsetChangeSetReader implements I_ReadChangeSet {
     private void importWfRefsetMembers() {
         // reconstitute now scrubbed members into membersMap to assist in sorting for alg
         membersMap.clear();
-        for (TkRefsetAbstractMember<?> member : wfMembersToCommit) {
+        for (TkRefexAbstractMember<?> member : wfMembersToCommit) {
             membersMap.addNewMember(member);
         }
 
@@ -219,14 +219,14 @@ public class WfRefsetChangeSetReader implements I_ReadChangeSet {
                 Concept c = Concept.get(conceptNid);
 
                 if (c.isAnnotationStyleRefex()) {
-                    for (TkRefsetAbstractMember<?> er : membersMap.getMembers(eConUid)) {
+                    for (TkRefexAbstractMember<?> er : membersMap.getMembers(eConUid)) {
                         ConceptComponent<?, ?> cc;
                         Object referencedComponent = Ts.get().getComponent(
                                 er.getComponentUuid());
 
                         if (referencedComponent != null) {
                             if (referencedComponent instanceof Concept) {
-                                cc = ((Concept) referencedComponent).getConceptAttributes();
+                                cc = ((Concept) referencedComponent).getConAttrs();
                             } else {
                                 cc = (ConceptComponent<?, ?>) referencedComponent;
                             }
@@ -248,7 +248,7 @@ public class WfRefsetChangeSetReader implements I_ReadChangeSet {
                 } else {
                     if ((c.getRefsetMembers() == null)
                             || c.getRefsetMembers().isEmpty()) {
-                        for (TkRefsetAbstractMember<?> er : membersMap.getMembers(eConUid)) {
+                        for (TkRefexAbstractMember<?> er : membersMap.getMembers(eConUid)) {
                             if (!WorkflowHelper.getRefsetUidList().contains(
                                     er.refsetUuid)) {
                                 continue;
@@ -262,7 +262,7 @@ public class WfRefsetChangeSetReader implements I_ReadChangeSet {
                     } else {
                         Set<Integer> currentMemberNids = c.getData().getMemberNids();
 
-                        for (TkRefsetAbstractMember<?> er : membersMap.getMembers(eConUid)) {
+                        for (TkRefexAbstractMember<?> er : membersMap.getMembers(eConUid)) {
                             if (!WorkflowHelper.getRefsetUidList().contains(
                                     er.refsetUuid)) {
                                 continue;
@@ -295,7 +295,7 @@ public class WfRefsetChangeSetReader implements I_ReadChangeSet {
             throws IOException, ClassNotFoundException {
         try {
             assert time != Long.MAX_VALUE;
-            ArrayList<TkRefsetAbstractMember<?>> discoveredMembers = new ArrayList<TkRefsetAbstractMember<?>>();
+            ArrayList<TkRefexAbstractMember<?>> discoveredMembers = new ArrayList<TkRefexAbstractMember<?>>();
 
             // Identify the annotations associated with this concept 
             if (eConcept.getConceptAttributes() != null && eConcept.getConceptAttributes().getAnnotations() != null) {
@@ -309,7 +309,7 @@ public class WfRefsetChangeSetReader implements I_ReadChangeSet {
 
             // Process all annotation & non-annotation members
             if (discoveredMembers.size() > 0) {
-                HashSet<TkRefsetAbstractMember<?>> membersToScrub = new HashSet<TkRefsetAbstractMember<?>>();
+                HashSet<TkRefexAbstractMember<?>> membersToScrub = new HashSet<TkRefexAbstractMember<?>>();
                 membersToScrub.addAll(discoveredMembers);
 
                 // Filter out based on Single CS Filters
@@ -321,7 +321,7 @@ public class WfRefsetChangeSetReader implements I_ReadChangeSet {
                     }
                 }
 
-                for (TkRefsetAbstractMember<?> member : membersToScrub) {
+                for (TkRefexAbstractMember<?> member : membersToScrub) {
                     if (!membersMap.alreadyProcessed(member)) {
                         membersMap.addNewMember(member);
                     }

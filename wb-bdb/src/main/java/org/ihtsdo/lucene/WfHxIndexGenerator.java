@@ -128,7 +128,7 @@ public class WfHxIndexGenerator extends IndexGenerator {
 					Set<ConceptVersionBI> semTagConcepts = WorkflowHelper.getChildren(parentSemTagConcept.getVersion(vc));
 
 			    	for (ConceptVersionBI con : semTagConcepts) {
-			    		String semTag = con.getFullySpecifiedDescription().getText();
+			    		String semTag = con.getDescriptionFullySpecified().getText();
 			    		
 			    		semTag = WorkflowHelper.parseSpaces(semTag);
 			
@@ -176,7 +176,7 @@ public class WfHxIndexGenerator extends IndexGenerator {
 		Document doc = new Document();
 		
 		// Refset Member Id (nid) for Index
-		doc.add(new Field("memberId", Integer.toString(bean.getRxMemberId()), Field.Store.YES, Field.Index.NO));
+		doc.add(new Field("memberId", Integer.toString(bean.getRefexMemberNid()), Field.Store.YES, Field.Index.NO));
 
 		// ConceptId (UUID) so don't need to reference DB for Terms.get().getRefsetExtensionsForComponent() ... Therfore, analyzed
 		doc.add(new Field("conceptId", bean.getConcept().toString(), Field.Store.YES, Field.Index.NO));
@@ -192,7 +192,7 @@ public class WfHxIndexGenerator extends IndexGenerator {
 		doc.add(new Field("modeler", bean.getModeler().toString(), Field.Store.YES, Field.Index.NOT_ANALYZED));
 		
 		// Calculate from Sem-Tag
-		doc.add(new Field("semTag", parsePotentialSemTag(bean.getFSN()), Field.Store.YES, Field.Index.NOT_ANALYZED));
+		doc.add(new Field("semTag", parsePotentialSemTag(bean.getFullySpecifiedName()), Field.Store.YES, Field.Index.NOT_ANALYZED));
 		
 		// Keep Time
 		doc.add(new NumericField("time").setLongValue(bean.getWorkflowTime()));

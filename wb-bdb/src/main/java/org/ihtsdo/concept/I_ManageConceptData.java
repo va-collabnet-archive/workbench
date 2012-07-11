@@ -15,7 +15,7 @@ import org.ihtsdo.concept.component.description.Description;
 import org.ihtsdo.concept.component.image.Image;
 import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.concept.component.relationship.Relationship;
-import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.ComponentChronicleBI;
 import org.ihtsdo.tk.api.NidListBI;
 import org.ihtsdo.tk.api.NidSetBI;
 
@@ -56,7 +56,7 @@ public interface I_ManageConceptData {
 
    Collection<Integer> getAllNids() throws IOException;
 
-   ComponentChroncileBI<?> getComponent(int nid) throws IOException;
+   ComponentChronicleBI<?> getComponent(int nid) throws IOException;
 
    ConceptAttributes getConceptAttributes() throws IOException;
 

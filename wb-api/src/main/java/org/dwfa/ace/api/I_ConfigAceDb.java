@@ -22,8 +22,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.dwfa.ace.api.cs.ChangeSetPolicy;
-import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
+import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
+import org.ihtsdo.tk.api.cs.ChangeSetWriterThreading;
 
 public interface I_ConfigAceDb {
 

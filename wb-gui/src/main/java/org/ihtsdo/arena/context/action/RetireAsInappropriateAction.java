@@ -46,7 +46,7 @@ import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.DescFact;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 
 public class RetireAsInappropriateAction extends AbstractAction {
 
@@ -249,12 +249,12 @@ public class RetireAsInappropriateAction extends AbstractAction {
         try {
             I_AmPart componentVersion;
             ViewCoordinate vc = config.getViewCoordinate();
-            Collection<? extends RefexChronicleBI> refexes = desc.getCurrentRefexes(vc);
+            Collection<? extends RefexChronicleBI> refexes = desc.getRefexesActive(vc);
             int usNid = SnomedMetadataRfx.getUS_DIALECT_REFEX_NID();
             int gbNid = SnomedMetadataRfx.getGB_DIALECT_REFEX_NID();
             int dosNid = SnomedMetadataRfx.getSYNONYMY_REFEX_NID();
             for (RefexChronicleBI refex : refexes) {
-                int refexNid = refex.getCollectionNid();
+                int refexNid = refex.getRefexNid();
                 if (refexNid == gbNid || refexNid == usNid || refexNid == dosNid) {
                     componentVersion = (I_AmPart) refex;
                     for (PathBI ep : config.getEditingPathSet()) {
@@ -277,7 +277,7 @@ public class RetireAsInappropriateAction extends AbstractAction {
             refexConcept = Ts.get().getConcept(SnomedMetadataRfx.getREFERS_TO_REFEX_NID());
 
             RefexCAB newSpec = new RefexCAB(
-                    TK_REFSET_TYPE.CID,
+                    TK_REFEX_TYPE.CID,
                     analogComponent.getNid(),
                     refexConcept.getNid());
             newSpec.put(RefexProperty.CNID1, nid);

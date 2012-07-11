@@ -11,7 +11,7 @@ import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_ManageContradiction;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.Terms;
@@ -33,7 +33,7 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
-import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeAnalogBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
@@ -48,7 +48,7 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 
 import java.util.*;
-import org.ihtsdo.tk.api.blueprint.ConAttrAB;
+import org.ihtsdo.tk.api.blueprint.ConceptAttributeAB;
 import org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
@@ -56,7 +56,7 @@ import org.ihtsdo.tk.dto.concept.component.TkRevision;
 public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevision, ConceptAttributes>
         implements I_ConceptAttributeVersioned<ConceptAttributesRevision>,
         I_ConceptAttributePart<ConceptAttributesRevision>,
-        ConAttrAnalogBI<ConceptAttributesRevision> {
+        ConceptAttributeAnalogBI<ConceptAttributesRevision> {
 
     private static VersionComputer<ConceptAttributes.Version> computer =
             new VersionComputer<ConceptAttributes.Version>();
@@ -93,7 +93,7 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
     }
 
     public void addTuples(NidSetBI allowedStatus, PositionBI viewPosition, List<Version> returnTuples,
-            Precedence precedencePolicy, I_ManageContradiction contradictionManager) {
+            Precedence precedencePolicy, ContradictionManagerBI contradictionManager) {
         computer.addSpecifiedVersions(allowedStatus, viewPosition, returnTuples, getVersions(),
                 precedencePolicy, contradictionManager);
     }
@@ -339,8 +339,8 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
     }
 
     @Override
-    public ConAttrAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
-        ConAttrAB conAttrBp = new ConAttrAB(getConId(), defined,
+    public ConceptAttributeAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
+        ConceptAttributeAB conAttrBp = new ConceptAttributeAB(getConId(), defined,
                 getVersion(vc), vc);
         return conAttrBp;
     }
@@ -392,7 +392,7 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
     }
 
     public List<Version> getTuples(NidSetBI allowedStatus, PositionBI viewPosition,
-            Precedence precedencePolicy, I_ManageContradiction contradictionManager) {
+            Precedence precedencePolicy, ContradictionManagerBI contradictionManager) {
         List<Version> returnList = new ArrayList<Version>();
 
         addTuples(allowedStatus, viewPosition, returnList, precedencePolicy, contradictionManager);
@@ -401,7 +401,7 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
     }
 
     public List<Version> getTuples(NidSetBI allowedStatus, PositionSetBI viewPositionSet,
-            Precedence precedencePolicy, I_ManageContradiction contradictionManager) {
+            Precedence precedencePolicy, ContradictionManagerBI contradictionManager) {
         List<Version> returnList = new ArrayList<Version>();
 
         computer.addSpecifiedVersions(allowedStatus, viewPositionSet, returnList, getVersions(),
@@ -547,9 +547,9 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
     public class Version extends ConceptComponent<ConceptAttributesRevision, ConceptAttributes>.Version
             implements I_ConceptAttributeTuple<ConceptAttributesRevision>,
             I_ConceptAttributePart<ConceptAttributesRevision>,
-            ConAttrAnalogBI<ConceptAttributesRevision> {
+            ConceptAttributeAnalogBI<ConceptAttributesRevision> {
 
-        public Version(ConAttrAnalogBI<ConceptAttributesRevision> cv) {
+        public Version(ConceptAttributeAnalogBI<ConceptAttributesRevision> cv) {
             super(cv);
         }
 
@@ -600,17 +600,17 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
         }
 
         @Override
-        public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz, int refsetNid)
+        public Collection<? extends RefexVersionBI<?>> getActiveRefexes(ViewCoordinate xyz, int refsetNid)
                 throws IOException {
-            return ConceptAttributes.this.getCurrentRefexMembers(xyz, refsetNid);
+            return ConceptAttributes.this.getRefexMembersActive(xyz, refsetNid);
         }
 
-        public ConAttrAnalogBI<ConceptAttributesRevision> getCv() {
-            return (ConAttrAnalogBI<ConceptAttributesRevision>) cv;
+        public ConceptAttributeAnalogBI<ConceptAttributesRevision> getCv() {
+            return (ConceptAttributeAnalogBI<ConceptAttributesRevision>) cv;
         }
 
         @Override
-        public ConAttrAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB{
+        public ConceptAttributeAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB{
             return getCv().makeBlueprint(vc);
         }
 
@@ -650,7 +650,7 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
         }
 
         @Override
-        public boolean hasCurrentRefexMember(ViewCoordinate xyz, int refsetNid) throws IOException {
+        public boolean hasRefexMemberActive(ViewCoordinate xyz, int refsetNid) throws IOException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 

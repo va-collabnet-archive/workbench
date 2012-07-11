@@ -15,24 +15,24 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 
-public interface TerminologySnapshotDI extends TerminologyTransactionDI {
+public interface TerminologySnapshotDI extends TerminologyDI {
     
    PositionBI newPosition(PathBI path, long time) throws IOException;
 
    /**
     * 
-    * @param ec
+    * @param editCoordinate
     * @return
     * @deprecated use getBuilder
     */
    @Deprecated
-   TerminologyBuilderBI getAmender(EditCoordinate ec);
+   TerminologyBuilderBI getAmender(EditCoordinate editCoordinate);
 
-   TerminologyBuilderBI getBuilder(EditCoordinate ec);
+   TerminologyBuilderBI getBuilder(EditCoordinate editCoordinate);
 
    ComponentVersionBI getComponentVersion(Collection<UUID> uuids) throws IOException, ContradictionException;
 
-   ComponentVersionBI getComponentVersion(ComponentContainerBI cc) throws IOException, ContradictionException;
+   ComponentVersionBI getComponentVersion(ComponentContainerBI componentContainer) throws IOException, ContradictionException;
 
    ComponentVersionBI getComponentVersion(int nid) throws IOException, ContradictionException;
 
@@ -42,15 +42,17 @@ public interface TerminologySnapshotDI extends TerminologyTransactionDI {
 
    ConceptVersionBI getConceptVersion(Collection<UUID> uuids) throws IOException;
 
-   ConceptVersionBI getConceptVersion(ConceptContainerBI cc) throws IOException;
+   ConceptVersionBI getConceptVersion(ConceptContainerBI conceptContainer) throws IOException;
 
-   ConceptVersionBI getConceptVersion(int cNid) throws IOException;
+   ConceptVersionBI getConceptVersion(int conceptNid) throws IOException;
 
    ConceptVersionBI getConceptVersion(UUID... uuids) throws IOException;
 
-   Map<Integer, ConceptVersionBI> getConceptVersions(NidBitSetBI cNids) throws IOException;
+   Map<Integer, ConceptVersionBI> getConceptVersions(NidBitSetBI conceptNids) throws IOException;
 
-   int[] getPossibleChildren(int cNid) throws IOException;
+   int[] getPossibleChildren(int conceptNid) throws IOException;
 
    ViewCoordinate getViewCoordinate();
+   
+   int getConceptNidForNid(Integer nid) throws IOException;
 }

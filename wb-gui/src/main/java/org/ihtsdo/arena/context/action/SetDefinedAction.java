@@ -13,8 +13,8 @@ import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.tk.api.AnalogBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
-import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeAnalogBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.ComponentFact;
 
@@ -26,7 +26,7 @@ public class SetDefinedAction extends AbstractAction {
     I_ConceptAttributePart newAnalogAttr;
     I_ConfigAceFrame config;
 
-    public SetDefinedAction(String actionName, ComponentFact<ConAttrVersionBI> fact, I_ConfigAceFrame config) {
+    public SetDefinedAction(String actionName, ComponentFact<ConceptAttributeVersionBI> fact, I_ConfigAceFrame config) {
         super(actionName);
         this.component = fact.getComponent();
         this.config = config;
@@ -42,7 +42,7 @@ public class SetDefinedAction extends AbstractAction {
 
                 if (cPart.isDefined() == true) {
                     if (component.getChronicle().isUncommitted()) {
-                        ConAttrAnalogBI analog = (ConAttrAnalogBI) component;
+                        ConceptAttributeAnalogBI analog = (ConceptAttributeAnalogBI) component;
                         analog.setDefined(false);
                     } else {
                         //make analog
@@ -62,7 +62,7 @@ public class SetDefinedAction extends AbstractAction {
                     Terms.get().addUncommitted(concept);
                 } else {
                     if (component.getChronicle().isUncommitted()) {
-                        ConAttrAnalogBI analog = (ConAttrAnalogBI) component;
+                        ConceptAttributeAnalogBI analog = (ConceptAttributeAnalogBI) component;
                         analog.setDefined(true);
                     } else {
                         //make analog

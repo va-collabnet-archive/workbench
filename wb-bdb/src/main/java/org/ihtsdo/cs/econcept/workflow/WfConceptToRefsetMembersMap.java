@@ -5,12 +5,12 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
-import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrMember;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_string.TkRefsetStrMember;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 public class WfConceptToRefsetMembersMap {
-	private static HashMap<UUID, HashSet<TkRefsetAbstractMember<?>>> membersAnnotationMap = new HashMap<UUID, HashSet<TkRefsetAbstractMember<?>>>();
+	private static HashMap<UUID, HashSet<TkRefexAbstractMember<?>>> membersAnnotationMap = new HashMap<UUID, HashSet<TkRefexAbstractMember<?>>>();
 
 	public int getConceptSize() {
 		return membersAnnotationMap.size();
@@ -30,15 +30,15 @@ public class WfConceptToRefsetMembersMap {
 		return membersAnnotationMap.keySet();
 	}
 
-	public Set<TkRefsetAbstractMember<?>> getMembers(UUID conUid) {
+	public Set<TkRefexAbstractMember<?>> getMembers(UUID conUid) {
 		return membersAnnotationMap.get(conUid);
 	}
 
-	public Set<TkRefsetAbstractMember<?>> getAllMembers() {
-		Set<TkRefsetAbstractMember<?>> retSet = new HashSet<TkRefsetAbstractMember<?>>();
+	public Set<TkRefexAbstractMember<?>> getAllMembers() {
+		Set<TkRefexAbstractMember<?>> retSet = new HashSet<TkRefexAbstractMember<?>>();
 		
 		for (UUID id : getKeySet()) {
-			Set<TkRefsetAbstractMember<?>> conceptMembers = membersAnnotationMap.get(id);
+			Set<TkRefexAbstractMember<?>> conceptMembers = membersAnnotationMap.get(id);
 			retSet.addAll(conceptMembers);
 		}
 		
@@ -49,10 +49,10 @@ public class WfConceptToRefsetMembersMap {
 		membersAnnotationMap.clear();
 	}
 
-	public boolean alreadyProcessed(TkRefsetAbstractMember<?> member) {
+	public boolean alreadyProcessed(TkRefexAbstractMember<?> member) {
 		// Have already processed?
 		if (membersAnnotationMap.containsKey(member.getComponentUuid())) {
-			Set<TkRefsetAbstractMember<?>> members = membersAnnotationMap.get(member.getComponentUuid());
+			Set<TkRefexAbstractMember<?>> members = membersAnnotationMap.get(member.getComponentUuid());
 
 			if (members.contains(member)) {
 				return true;
@@ -66,9 +66,9 @@ public class WfConceptToRefsetMembersMap {
 		return membersAnnotationMap.containsKey(concept);
 	}
 
-	public void addNewMember(TkRefsetAbstractMember<?> member) {
+	public void addNewMember(TkRefexAbstractMember<?> member) {
 		if (!membersAnnotationMap.containsKey(member.getComponentUuid())) {
-			HashSet<TkRefsetAbstractMember<?>> newListOfMembers = new HashSet<TkRefsetAbstractMember<?>>();
+			HashSet<TkRefexAbstractMember<?>> newListOfMembers = new HashSet<TkRefexAbstractMember<?>>();
 			newListOfMembers.add(member);
 			membersAnnotationMap.put(member.getComponentUuid(), newListOfMembers);
 		} else {
@@ -76,18 +76,18 @@ public class WfConceptToRefsetMembersMap {
 		}
 	}
 
-	public Set<TkRefsetAbstractMember<?>> getDuplicateMembers(TkRefsetAbstractMember<?> member) {
-		Set<TkRefsetAbstractMember<?>> currentMembers = membersAnnotationMap.get(member.getComponentUuid());
-		Set<TkRefsetAbstractMember<?>> duplicates = new HashSet<TkRefsetAbstractMember<?>>();
+	public Set<TkRefexAbstractMember<?>> getDuplicateMembers(TkRefexAbstractMember<?> member) {
+		Set<TkRefexAbstractMember<?>> currentMembers = membersAnnotationMap.get(member.getComponentUuid());
+		Set<TkRefexAbstractMember<?>> duplicates = new HashSet<TkRefexAbstractMember<?>>();
 		
-		for (TkRefsetAbstractMember<?> m : currentMembers) {
+		for (TkRefexAbstractMember<?> m : currentMembers) {
 			if (member.getStatusUuid().equals(m.getStatusUuid()) && 
 				member.getAuthorUuid().equals(m.getAuthorUuid()) && 
 				member.getPathUuid().equals(m.getPathUuid())&& 
 				member.getTime() == m.getTime()) 
 			{
-				String newMemberVal = ((TkRefsetStrMember)member).getStrValue();
-				String existingMemberVal = ((TkRefsetStrMember)m).getStrValue();
+				String newMemberVal = ((TkRefsetStrMember)member).getString1();
+				String existingMemberVal = ((TkRefsetStrMember)m).getString1();
 				
 				if (newMemberVal.equals(existingMemberVal)) {
 					duplicates.add(m);
@@ -103,10 +103,10 @@ public class WfConceptToRefsetMembersMap {
 		
 		for (UUID id : getKeySet()) {
 			boolean conceptInWfHxRefset = false;
-			Set<TkRefsetAbstractMember<?>> conceptMembers = membersAnnotationMap.get(id);
+			Set<TkRefexAbstractMember<?>> conceptMembers = membersAnnotationMap.get(id);
 
-			for (TkRefsetAbstractMember<?> m : conceptMembers) {
-				if (m.getRefsetUuid().equals(WorkflowHelper.getWorkflowRefsetUid())) {
+			for (TkRefexAbstractMember<?> m : conceptMembers) {
+				if (m.getRefexUuid().equals(WorkflowHelper.getWorkflowRefsetUid())) {
 					conceptInWfHxRefset = true;
 					break;
 				}
@@ -120,14 +120,14 @@ public class WfConceptToRefsetMembersMap {
 		return retSet;
 	}
 
-	public Set<TkRefsetAbstractMember<?>> getAllWfHxMembers() {
-		Set<TkRefsetAbstractMember<?>> retSet = new HashSet<TkRefsetAbstractMember<?>>();
+	public Set<TkRefexAbstractMember<?>> getAllWfHxMembers() {
+		Set<TkRefexAbstractMember<?>> retSet = new HashSet<TkRefexAbstractMember<?>>();
 		
 		for (UUID id : getKeySet()) {
-			Set<TkRefsetAbstractMember<?>> conceptMembers = membersAnnotationMap.get(id);
+			Set<TkRefexAbstractMember<?>> conceptMembers = membersAnnotationMap.get(id);
 
-			for (TkRefsetAbstractMember<?> m : conceptMembers) {
-				if (m.getRefsetUuid().equals(WorkflowHelper.getWorkflowRefsetUid())) {
+			for (TkRefexAbstractMember<?> m : conceptMembers) {
+				if (m.getRefexUuid().equals(WorkflowHelper.getWorkflowRefsetUid())) {
 					retSet.add(m);
 				}
 			}

@@ -31,7 +31,7 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 
 /**
  *
@@ -290,7 +290,7 @@ public class BatchActionTaskRefsetRetireMemberUI extends javax.swing.JPanel impl
         // SET MATCH TYPE AND VALUE
         switch (jComboBoxType.getSelectedIndex()) {
             case 0:
-                ((BatchActionTaskRefsetRetireMember) task).setRefsetType(TK_REFSET_TYPE.BOOLEAN);
+                ((BatchActionTaskRefsetRetireMember) task).setRefsetType(TK_REFEX_TYPE.BOOLEAN);
                 Boolean valBoolean = ((ValueBooleanUI) jPanelValueMatch).getValue();
                 if (valBoolean != null) {
                     ((BatchActionTaskRefsetRetireMember) task).setMatchValue(valBoolean);
@@ -298,7 +298,7 @@ public class BatchActionTaskRefsetRetireMemberUI extends javax.swing.JPanel impl
                 }
                 break;
             case 1:
-                ((BatchActionTaskRefsetRetireMember) task).setRefsetType(TK_REFSET_TYPE.CID);
+                ((BatchActionTaskRefsetRetireMember) task).setRefsetType(TK_REFEX_TYPE.CID);
                 Integer valConcept = ((ValueDndNidUI) jPanelValueMatch).getValue();
                 if (valConcept != null) {
                     ((BatchActionTaskRefsetRetireMember) task).setMatchValue(valConcept);
@@ -306,7 +306,7 @@ public class BatchActionTaskRefsetRetireMemberUI extends javax.swing.JPanel impl
                 }
                 break;
             case 2:
-                ((BatchActionTaskRefsetRetireMember) task).setRefsetType(TK_REFSET_TYPE.INT);
+                ((BatchActionTaskRefsetRetireMember) task).setRefsetType(TK_REFEX_TYPE.INT);
                 Integer valInt = ((ValueIntUI) jPanelValueMatch).getValue();
                 if (valInt != null) {
                     ((BatchActionTaskRefsetRetireMember) task).setMatchValue(valInt);
@@ -314,7 +314,7 @@ public class BatchActionTaskRefsetRetireMemberUI extends javax.swing.JPanel impl
                 }
                 break;
             case 3:
-                ((BatchActionTaskRefsetRetireMember) task).setRefsetType(TK_REFSET_TYPE.STR);
+                ((BatchActionTaskRefsetRetireMember) task).setRefsetType(TK_REFEX_TYPE.STR);
                 String valStr = ((ValueStringUI) jPanelValueMatch).getValue();
                 if (valStr != null) {
                     ((BatchActionTaskRefsetRetireMember) task).setMatchValue(valStr);

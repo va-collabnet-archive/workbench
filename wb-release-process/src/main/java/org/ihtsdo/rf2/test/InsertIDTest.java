@@ -25,8 +25,8 @@ import org.dwfa.ace.api.I_IdVersion;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.cs.ChangeSetPolicy;
-import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
+import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
+import org.ihtsdo.tk.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
@@ -163,7 +163,7 @@ public class InsertIDTest extends TestCase {
 				I_GetConceptData testConcept = _termfactory.getConcept(UUID.fromString("5c37c3f6-22f4-4631-b0a1-95bee7f8b825"));
 				System.out.println(testConcept.getInitialText());
 		
-				I_ConceptAttributeVersioned<?> i_ConceptAttributeVersioned = testConcept.getConceptAttributes();
+				I_ConceptAttributeVersioned<?> i_ConceptAttributeVersioned = testConcept.getConAttrs();
 				List<?> conceptAttributeTupleList = i_ConceptAttributeVersioned.getTuples();
 				
 				I_Identify i_Identify = _termfactory.getId(componentNid);	
@@ -254,7 +254,7 @@ public class InsertIDTest extends TestCase {
 			int arcAuxSnomedIntegerNid = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid();
 			Long sctid = new Long("12345");
 				
-			I_ConceptAttributeVersioned<?> i_ConceptAttributeVersioned = testConcept.getConceptAttributes();
+			I_ConceptAttributeVersioned<?> i_ConceptAttributeVersioned = testConcept.getConAttrs();
 			List<?> conceptAttributeTupleList = i_ConceptAttributeVersioned.getTuples();
 				
 				if (conceptAttributeTupleList.size() > 0 && conceptAttributeTupleList != null) {
@@ -340,7 +340,7 @@ public class InsertIDTest extends TestCase {
 		System.out.println(testConcept1.getInitialText());
 		
 
-		Collection<? extends I_DescriptionVersioned> descs1 = testConcept1.getDescriptions();
+		Collection<? extends I_DescriptionVersioned> descs1 = testConcept1.getDescs();
 		if (!descs1.isEmpty() && descs1.size() > 0) {
 			for (I_DescriptionVersioned<?> desc : descs1) {
 				for (I_DescriptionPart<?> descPart : desc.getMutableParts()) {
@@ -366,7 +366,7 @@ public class InsertIDTest extends TestCase {
             _termfactory.commit();
         }
 		
-		Collection<? extends I_DescriptionVersioned> descs = testConcept1.getDescriptions();
+		Collection<? extends I_DescriptionVersioned> descs = testConcept1.getDescs();
 		if (!descs.isEmpty() && descs.size() > 0) {
 			for (I_DescriptionVersioned<?> desc : descs) {
 				for (I_DescriptionPart<?> descPart : desc.getMutableParts()) {

@@ -3,8 +3,8 @@ package org.ihtsdo.tk.dto.concept.component.attribute;
 //~--- non-JDK imports --------------------------------------------------------
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
-import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
-import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeChronicleBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.ext.I_ConceptualizeExternally;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
@@ -30,19 +30,19 @@ public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision
         super();
     }
 
-    public TkConceptAttributes(ConAttrChronicleBI another) throws IOException {
-        this(another.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
+    public TkConceptAttributes(ConceptAttributeChronicleBI conceptAttributeChronicle) throws IOException {
+        this(conceptAttributeChronicle.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
     }
 
-    public TkConceptAttributes(ConAttrVersionBI another,
+    public TkConceptAttributes(ConceptAttributeVersionBI conceptAttributeVersion,
             RevisionHandling revisionHandling) throws IOException {
-        super(another);
+        super(conceptAttributeVersion);
         if (revisionHandling == RevisionHandling.EXCLUDE_REVISIONS) {
-            this.defined = another.isDefined();
+            this.defined = conceptAttributeVersion.isDefined();
         } else {
-            Collection<? extends ConAttrVersionBI> versions = another.getVersions();
-            Iterator<? extends ConAttrVersionBI> itr = versions.iterator();
-            ConAttrVersionBI vers = itr.next();
+            Collection<? extends ConceptAttributeVersionBI> versions = conceptAttributeVersion.getVersions();
+            Iterator<? extends ConceptAttributeVersionBI> itr = versions.iterator();
+            ConceptAttributeVersionBI vers = itr.next();
             this.defined = vers.isDefined();
 
             if (versions.size() > 1) {
@@ -68,11 +68,11 @@ public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision
         this.defined = another.defined;
     }
 
-    public TkConceptAttributes(ConAttrVersionBI another, NidBitSetBI exclusions,
-            Map<UUID, UUID> conversionMap, long offset, boolean mapAll, ViewCoordinate vc)
+    public TkConceptAttributes(ConceptAttributeVersionBI conceptAttributeVersion, NidBitSetBI excludedNids,
+            Map<UUID, UUID> conversionMap, long offset, boolean mapAll, ViewCoordinate viewCoordinate)
             throws IOException, ContradictionException {
-        super(another, exclusions, conversionMap, offset, mapAll, vc);
-        this.defined = another.isDefined();
+        super(conceptAttributeVersion, excludedNids, conversionMap, offset, mapAll, viewCoordinate);
+        this.defined = conceptAttributeVersion.isDefined();
     }
 
     //~--- methods -------------------------------------------------------------

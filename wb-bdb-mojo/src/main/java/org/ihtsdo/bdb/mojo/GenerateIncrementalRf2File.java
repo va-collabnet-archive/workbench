@@ -187,7 +187,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
             
 //            Ts.get().iterateSapDataInSequence(this);
 
-            ViewCoordinate vc = new ViewCoordinate(Ts.get().getMetadataVC());
+            ViewCoordinate vc = new ViewCoordinate(Ts.get().getMetadataViewCoordinate());
             NidSetBI allowedStatusNids = vc.getAllowedStatusNids();
             System.out.println("THIS : " + allowedStatusNids);
 
@@ -206,7 +206,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
                         new Date(TimeHelper.getTimeFromString(effectiveDate,
                         TimeHelper.getFileDateFormat())),
                         sapsToWrite.getAsSet(),
-                        vc.getVcWithAllStatusValues(),
+                        vc.getViewCoordinateWithAllStatusValues(),
                         excludedRefsetIds.getAsSet(),
                         allConcepts,
                         makePrivateAltIdsFile);

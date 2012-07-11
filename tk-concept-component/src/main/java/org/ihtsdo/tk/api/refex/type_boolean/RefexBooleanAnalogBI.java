@@ -27,6 +27,6 @@ import org.ihtsdo.tk.api.refex.RefexAnalogBI;
 public interface RefexBooleanAnalogBI<A extends RefexBooleanAnalogBI<A>> 
 	extends RefexAnalogBI<A>, RefexBooleanVersionBI<A> {
     
-     void setBoolean1(boolean b) throws PropertyVetoException;
+     void setBoolean1(boolean boolean1) throws PropertyVetoException;
 
 }

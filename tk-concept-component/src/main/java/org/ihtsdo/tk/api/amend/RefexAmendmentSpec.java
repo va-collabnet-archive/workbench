@@ -22,7 +22,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 
 /**
  *
@@ -32,14 +32,14 @@ import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 @Deprecated
 public class RefexAmendmentSpec extends RefexCAB {
 
-    public RefexAmendmentSpec(TK_REFSET_TYPE memberType, UUID rcUuid, int collectionNid, UUID memberUuid) 
+    public RefexAmendmentSpec(TK_REFEX_TYPE memberType, UUID referencedComponentUuid, int collectionNid, UUID memberUuid) 
             throws IOException, InvalidCAB, ContradictionException {
-        super(memberType, rcUuid, collectionNid, memberUuid, null, null);
+        super(memberType, referencedComponentUuid, collectionNid, memberUuid, null, null);
     }
 
-    public RefexAmendmentSpec(TK_REFSET_TYPE memberType, int rcNid, int collectionNid) 
+    public RefexAmendmentSpec(TK_REFEX_TYPE memberType, int referencedComponentNid, int collectionNid) 
             throws IOException, InvalidCAB, ContradictionException {
-        super(memberType, rcNid, collectionNid);
+        super(memberType, referencedComponentNid, collectionNid);
     }
 
 }

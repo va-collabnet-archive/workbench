@@ -19,7 +19,7 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ManageContradiction;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
@@ -70,7 +70,7 @@ public abstract class RF2AbstractImpl {
 	// GUI
 	I_ShowActivity gui;
 	private Precedence precedence;
-	private I_ManageContradiction contradictionMgr;
+	private ContradictionManagerBI contradictionMgr;
 
 	// new fields
 	protected I_TermFactory tf;
@@ -569,11 +569,11 @@ public abstract class RF2AbstractImpl {
 		this.precedence = precedence;
 	}
 
-	public I_ManageContradiction getContradictionMgr() {
+	public ContradictionManagerBI getContradictionMgr() {
 		return contradictionMgr;
 	}
 
-	public void setContradictionMgr(I_ManageContradiction contradictionMgr) {
+	public void setContradictionMgr(ContradictionManagerBI contradictionMgr) {
 		this.contradictionMgr = contradictionMgr;
 	}
 

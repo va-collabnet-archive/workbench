@@ -186,7 +186,7 @@ public class CementLoadTest {
             IdentifierVersionString stringId =
                     new IdentifierVersionString(statusNid, Long.MAX_VALUE, authorNID, moduleNid, pathNid,
                      uuidOid, authorityNID);
-            concept.getConceptAttributes().addIdVersion(stringId);
+            concept.getConAttrs().addIdVersion(stringId);
             Terms.get().addUncommitted(concept);
 
         }
@@ -223,7 +223,7 @@ public class CementLoadTest {
         @Override
         public void processConceptData(Concept concept) throws Exception {
             String uuidOid = "2.25." + concept.getConceptAttributes().getPrimUuid();
-            ArrayList<IdentifierVersion> ids = concept.getConceptAttributes().getAdditionalIdentifierParts();
+            ArrayList<IdentifierVersion> ids = concept.getConAttrs().getAdditionalIdentifierParts();
             if (ids != null) {
                 for (IdentifierVersion id : ids) {
                     if (id.getDenotation().equals(uuidOid)) {

@@ -2,18 +2,18 @@ package org.ihtsdo.tk.api.concept;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.ComponentChronicleBI;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
-import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.media.MediaChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
-import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
+import org.ihtsdo.tk.api.relationship.group.RelationshipGroupVersionBI;
 import org.ihtsdo.tk.contradiction.FoundContradictionVersions;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -23,15 +23,15 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Set;
 
-public interface ConceptChronicleBI extends ComponentChroncileBI<ConceptVersionBI> {
+public interface ConceptChronicleBI extends ComponentChronicleBI<ConceptVersionBI> {
    void cancel() throws IOException;
 
-   boolean commit(ChangeSetGenerationPolicy changeSetPolicy,
-                  ChangeSetGenerationThreadingPolicy changeSetWriterThreading)
+   boolean commit(ChangeSetGenerationPolicy changeSetGenerationPolicy,
+                  ChangeSetGenerationThreadingPolicy changeSetGenerationThreadingPolicy)
            throws IOException;
    
-   boolean commit(ChangeSetGenerationPolicy changeSetPolicy,
-            ChangeSetGenerationThreadingPolicy changeSetWriterThreading,
+   boolean commit(ChangeSetGenerationPolicy changeSetGenerationPolicy,
+            ChangeSetGenerationThreadingPolicy changeSetGenerationThreadingPolicy,
             boolean writeAdjudication)
             throws IOException;
 
@@ -45,12 +45,12 @@ public interface ConceptChronicleBI extends ComponentChroncileBI<ConceptVersionB
 
    //~--- get methods ---------------------------------------------------------
 
-   ConAttrChronicleBI getConAttrs() throws IOException;
+   ConceptAttributeChronicleBI getConceptAttributes() throws IOException;
 
-   RefexVersionBI<?> getCurrentRefsetMemberForComponent(ViewCoordinate vc, int componentNid)
+   RefexVersionBI<?> getRefsetMemberActiveForComponent(ViewCoordinate viewCoordinate, int componentNid)
            throws IOException;
 
-   Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc) throws IOException;
+   Collection<? extends RefexVersionBI<?>> getRefsetMembersActive(ViewCoordinate viewCoordinate) throws IOException;
 
    /**
      * Retrieves tuples matching the specified view coordinate
@@ -61,31 +61,35 @@ public interface ConceptChronicleBI extends ComponentChroncileBI<ConceptVersionB
      * @return List of matching tuples
      * @throws TerminologyException
      */
-   public Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc, Long cutoffTime)
+   public Collection<? extends RefexVersionBI<?>> getRefsetMembersActive(ViewCoordinate viewCoordinate, Long cutoffTime)
            throws IOException;
 
-   Collection<? extends DescriptionChronicleBI> getDescs() throws IOException;
+   Collection<? extends DescriptionChronicleBI> getDescriptions() throws IOException;
 
    long getLastModificationSequence();
 
    Collection<? extends MediaChronicleBI> getMedia() throws IOException;
 
    RefexChronicleBI<?> getRefsetMemberForComponent(int componentNid) throws IOException;
-
+   /**
+    * Returns refset members identified by this concept.
+    * @return
+    * @throws IOException 
+    */
    Collection<? extends RefexChronicleBI<?>> getRefsetMembers() throws IOException;
 
-   Collection<? extends RelGroupVersionBI> getRelGroups(ViewCoordinate vc)
+   Collection<? extends RelationshipGroupVersionBI> getRelationshipGroups(ViewCoordinate viewCoordinate)
            throws IOException, ContradictionException;
 
-   Collection<? extends RelationshipChronicleBI> getRelsIncoming() throws IOException;
+   Collection<? extends RelationshipChronicleBI> getRelationshipsTarget() throws IOException;
 
-   Collection<? extends RelationshipChronicleBI> getRelsOutgoing() throws IOException;
+   Collection<? extends RelationshipChronicleBI> getRelationshipsSource() throws IOException;
 
-   FoundContradictionVersions getVersionsInContradiction(ViewCoordinate vc);
+   FoundContradictionVersions getVersionsInContradiction(ViewCoordinate viewCoordinate);
    
-   Set<Integer> getAllNidsForSaps(Set<Integer> sapNids) throws IOException;
+   Set<Integer> getAllNidsForStamps(Set<Integer> stampNids) throws IOException;
 
-   boolean hasCurrentRefsetMemberForComponent(ViewCoordinate vc, int componentNid) throws IOException;
+   boolean hasRefsetMemberActiveForComponent(ViewCoordinate viewCoordinate, int componentNid) throws IOException;
 
    boolean isAnnotationStyleRefex() throws IOException;
 

@@ -51,7 +51,7 @@ public class EquivTableRenderer extends AceTableRenderer {
          ConceptChronicleBI cc = (ConceptChronicleBI) value;
 
          try {
-            this.setText(cc.getVersion(vc).getFullySpecifiedDescription().getText());
+            this.setText(cc.getVersion(vc).getDescriptionFullySpecified().getText());
          } catch (IOException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
          } catch (ContradictionException ex) {

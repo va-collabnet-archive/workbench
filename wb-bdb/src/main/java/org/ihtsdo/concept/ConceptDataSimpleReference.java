@@ -31,14 +31,14 @@ import org.ihtsdo.db.bdb.NidDataFromBdb;
 import org.ihtsdo.db.bdb.NidDataInMemory;
 import org.ihtsdo.db.util.NidPairForRel;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.ComponentChronicleBI;
 import org.ihtsdo.tk.api.NidList;
 import org.ihtsdo.tk.api.NidListBI;
 import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
-import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
+import org.ihtsdo.tk.api.relationship.group.RelationshipGroupChronicleBI;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -139,15 +139,15 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
             if (cc instanceof RelationshipChronicleBI) {
                RelationshipChronicleBI r = (RelationshipChronicleBI) cc;
 
-               affectedConceptNids.add(r.getOriginNid());
-               affectedConceptNids.add(r.getDestinationNid());
-               ChangeNotifier.touchRelTarget(r.getDestinationNid());
-               ChangeNotifier.touchRelOrigin(r.getOriginNid());
+               affectedConceptNids.add(r.getSourceNid());
+               affectedConceptNids.add(r.getTargetNid());
+               ChangeNotifier.touchRelTarget(r.getTargetNid());
+               ChangeNotifier.touchRelOrigin(r.getSourceNid());
             } else if (cc instanceof RefexChronicleBI) {
                RefexChronicleBI r = (RefexChronicleBI) cc;
 
                affectedConceptNids.add(Ts.get().getConceptNidForNid(r.getReferencedComponentNid()));
-               affectedConceptNids.add(r.getCollectionNid());
+               affectedConceptNids.add(r.getRefexNid());
                ChangeNotifier.touchRefexRC(r.getReferencedComponentNid());
             } else {
                affectedConceptNids.add(getNid());
@@ -419,7 +419,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
 
    private void removeRefsetReferences(ConceptComponent<?, ?> cc) throws IOException {
       for (RefexChronicleBI<?> rc : cc.getRefsetMembers()) {
-         Concept      refsetCon = Concept.get(rc.getCollectionNid());
+         Concept      refsetCon = Concept.get(rc.getRefexNid());
          RefsetMember rm        = (RefsetMember) rc;
 
          rm.primordialSapNid = -1;
@@ -534,7 +534,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
    }
 
    @Override
-   public ComponentChroncileBI<?> getComponent(int nid) throws IOException {
+   public ComponentChronicleBI<?> getComponent(int nid) throws IOException {
       if ((getConceptAttributes() != null) && (getConceptAttributes().nid == nid)) {
          return getConceptAttributes();
       }
@@ -567,7 +567,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
          return getRefsetMember(nid);
       }
 
-      for (RelGroupChronicleBI group : enclosingConcept.getAllRelGroups()) {
+      for (RelationshipGroupChronicleBI group : enclosingConcept.getAllRelGroups()) {
          if (group.getNid() == nid) {
             return group;
          }
@@ -1247,7 +1247,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
             for (IdentifierVersion idv : cc.getAdditionalIdentifierParts()) {
                 if (idv.getTime() == Long.MAX_VALUE) {
                 idv.setTime(time);
-                sapNids.add(idv.getSapNid());
+                sapNids.add(idv.getStampNid());
                 }
             }
         }
@@ -1259,14 +1259,14 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
 
                 if (rm.getTime() == Long.MAX_VALUE) {
                 rm.setTime(time);
-                sapNids.add(rm.getSapNid());
+                sapNids.add(rm.getStampNid());
                 }
 
                 if (rm.revisions != null) {
                 for (RefsetRevision<?, ?> rr : rm.revisions) {
                     if (rr.getTime() == Long.MAX_VALUE) {
                         rr.setTime(time);
-                        sapNids.add(rr.getSapNid());
+                        sapNids.add(rr.getStampNid());
                     }
                 }
                 }

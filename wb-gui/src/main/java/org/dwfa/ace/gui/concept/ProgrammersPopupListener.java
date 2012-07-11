@@ -49,7 +49,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.dto.concept.TkConcept;
-import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 public class ProgrammersPopupListener extends MouseAdapter implements ActionListener, ClipboardOwner {
@@ -684,7 +684,7 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
 
                         if (eConcept.getPrimordialUuid().equals(
                                 UUID.fromString("629a6c24-1f0a-3941-90df-8a7103a98ec7"))) {
-                            for (TkRefsetAbstractMember member : eConcept.getRefsetMembers()) {
+                            for (TkRefexAbstractMember member : eConcept.getRefsetMembers()) {
                                 if (member.getPrimordialComponentUuid().equals(
                                         UUID.fromString("bbde54c9-fc58-41e7-90b2-52f7029068e1"))) {
                                     member.setPrimordialComponentUuid(UUID.randomUUID());
@@ -809,7 +809,7 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
         try {
             I_GetConceptData igcd =
                     (I_GetConceptData) this.conceptPanel.getTermComponent();
-            I_ConceptAttributeVersioned attr = igcd.getConceptAttributes();
+            I_ConceptAttributeVersioned attr = igcd.getConAttrs();
             List<? extends I_ConceptAttributeTuple> tuples = attr.getTuples();
             List<? extends I_ConceptAttributeTuple> tuples2 =
                     attr.getTuples(conceptPanel.getConfig().getAllowedStatus(),

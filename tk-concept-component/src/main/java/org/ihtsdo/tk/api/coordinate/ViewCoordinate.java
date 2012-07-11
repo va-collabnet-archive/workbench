@@ -73,7 +73,7 @@ public class ViewCoordinate implements Serializable {
 
    public ViewCoordinate(Precedence precedence, PositionSetBI positionSet, NidSetBI allowedStatusNids,
                          NidSetBI isaTypeNids, ContradictionManagerBI contradictionManager, int languageNid,
-                         int classifierNid, RelAssertionType relAssertionType, NidListBI langPrefList,
+                         int classifierNid, RelAssertionType relAssertionType, NidListBI langPrefListNids,
                          LANGUAGE_SORT langSort) {
       super();
       assert precedence != null;
@@ -97,8 +97,8 @@ public class ViewCoordinate implements Serializable {
       this.classifierNid        = classifierNid;
       this.relAssertionType     = relAssertionType;
 
-      if (langPrefList != null) {
-         this.langPrefList = new NidList(langPrefList.getListArray());
+      if (langPrefListNids != null) {
+         this.langPrefList = new NidList(langPrefListNids.getListArray());
       }
 
       this.langSort = langSort;
@@ -114,8 +114,8 @@ public class ViewCoordinate implements Serializable {
 
       //~--- constructors -----------------------------------------------------
 
-      private LANGUAGE_SORT(String desc) {
-         this.desc = desc;
+      private LANGUAGE_SORT(String sortDescription) {
+         this.desc = sortDescription;
       }
 
       //~--- methods ----------------------------------------------------------
@@ -129,13 +129,13 @@ public class ViewCoordinate implements Serializable {
    //~--- methods -------------------------------------------------------------
 
    @Override
-   public boolean equals(Object o) {
-      if (this == o) {
+   public boolean equals(Object obj) {
+      if (this == obj) {
          return true;
       }
 
-      if (o instanceof ViewCoordinate) {
-         ViewCoordinate another = (ViewCoordinate) o;
+      if (obj instanceof ViewCoordinate) {
+         ViewCoordinate another = (ViewCoordinate) obj;
 
          if (!testEquals(precedence, another.precedence)) {
             return false;
@@ -194,32 +194,32 @@ public class ViewCoordinate implements Serializable {
       return hashCode;
    }
 
-   private static boolean testEquals(Object o1, Object o2) {
-      if ((o1 == null) && (o2 == null)) {
+   private static boolean testEquals(Object obj1, Object obj2) {
+      if ((obj1 == null) && (obj2 == null)) {
          return true;
       }
 
-      if (o1 == o2) {
+      if (obj1 == obj2) {
          return true;
       }
 
-      if (o1 instanceof NidSetBI) {
-         NidSetBI ns1 = (NidSetBI) o1;
-         NidSetBI ns2 = (NidSetBI) o2;
+      if (obj1 instanceof NidSetBI) {
+         NidSetBI ns1 = (NidSetBI) obj1;
+         NidSetBI ns2 = (NidSetBI) obj2;
 
          return Arrays.equals(ns1.getSetValues(), ns2.getSetValues());
       }
 
-      if (o1 instanceof NidListBI) {
-         NidListBI ns1 = (NidListBI) o1;
-         NidListBI ns2 = (NidListBI) o2;
+      if (obj1 instanceof NidListBI) {
+         NidListBI ns1 = (NidListBI) obj1;
+         NidListBI ns2 = (NidListBI) obj2;
 
          return Arrays.equals(ns1.getListArray(), ns2.getListArray());
       }
 
-      if (o1 instanceof PositionSetBI) {
-         PositionSetBI ns1 = (PositionSetBI) o1;
-         PositionSetBI ns2 = (PositionSetBI) o2;
+      if (obj1 instanceof PositionSetBI) {
+         PositionSetBI ns1 = (PositionSetBI) obj1;
+         PositionSetBI ns2 = (PositionSetBI) obj2;
 
          if (ns1.size() == 1) {
             if (ns2.size() == 1) {
@@ -230,7 +230,7 @@ public class ViewCoordinate implements Serializable {
          return Arrays.equals(ns1.getPositionArray(), ns2.getPositionArray());
       }
 
-      if (o1.equals(o2)) {
+      if (obj1.equals(obj2)) {
          return true;
       }
 
@@ -278,30 +278,31 @@ public class ViewCoordinate implements Serializable {
       return classifierNid;
    }
 
-   private void getConceptText(StringBuilder sb, TerminologySnapshotDI snap, int nid) {
-      if (nid == Integer.MAX_VALUE) {
-         sb.append("Integer.MAX_VALUE");
+   private void getConceptText(StringBuilder stringBuilder,
+           TerminologySnapshotDI terminologySnapshot, int conceptNid) {
+      if (conceptNid == Integer.MAX_VALUE) {
+         stringBuilder.append("Integer.MAX_VALUE");
 
          return;
       }
 
-      if (nid == Integer.MIN_VALUE) {
-         sb.append("Integer.MIN_VALUE");
+      if (conceptNid == Integer.MIN_VALUE) {
+         stringBuilder.append("Integer.MIN_VALUE");
 
          return;
       }
 
       try {
-         if ((snap.getConceptVersion(nid) != null)
-                 && (snap.getConceptVersion(nid).getPreferredDescription() != null)) {
-            sb.append(snap.getConceptVersion(nid).getPreferredDescription().getText());
+         if ((terminologySnapshot.getConceptVersion(conceptNid) != null)
+                 && (terminologySnapshot.getConceptVersion(conceptNid).getDescriptionPreferred() != null)) {
+            stringBuilder.append(terminologySnapshot.getConceptVersion(conceptNid).getDescriptionPreferred().getText());
          } else {
-            sb.append(Integer.toString(nid));
+            stringBuilder.append(Integer.toString(conceptNid));
          }
       } catch (IOException ex) {
-         sb.append(ex.getLocalizedMessage());
+         stringBuilder.append(ex.getLocalizedMessage());
       } catch (ContradictionException ex) {
-         sb.append(ex.getLocalizedMessage());
+         stringBuilder.append(ex.getLocalizedMessage());
       }
    }
 
@@ -348,11 +349,11 @@ public class ViewCoordinate implements Serializable {
       return precedence;
    }
 
-   public RelAssertionType getRelAssertionType() {
+   public RelAssertionType getRelationshipAssertionType() {
       return relAssertionType;
    }
 
-   public ViewCoordinate getVcWithAllStatusValues() {
+   public ViewCoordinate getViewCoordinateWithAllStatusValues() {
       if (vcWithAllStatusValues == null) {
          vcWithAllStatusValues                   = new ViewCoordinate(this);
          vcWithAllStatusValues.allowedStatusNids = null;
@@ -389,7 +390,7 @@ public class ViewCoordinate implements Serializable {
       this.precedence = precedence;
    }
 
-   public void setRelAssertionType(RelAssertionType relAssertionType) {
+   public void setRelationshipAssertionType(RelAssertionType relAssertionType) {
       this.lastModSequence       = Ts.get().getSequence();
       this.vcWithAllStatusValues = null;
       this.relAssertionType      = relAssertionType;

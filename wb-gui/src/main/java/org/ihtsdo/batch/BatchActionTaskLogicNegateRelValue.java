@@ -31,7 +31,7 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 
 /**
  * BatchActionTaskLogicNegateRelValue
@@ -73,17 +73,17 @@ public class BatchActionTaskLogicNegateRelValue extends BatchActionTask {
             throws IOException, ContradictionException, InvalidCAB {
         int cNid = c.getNid(); // referenced component
         boolean changed = false;
-        Collection<? extends RelationshipVersionBI> rels = c.getRelsOutgoingActive();
+        Collection<? extends RelationshipVersionBI> rels = c.getRelationshipsSourceActive();
         Collection<? extends RefexVersionBI<?>> negationRefex = null;
         for (RelationshipVersionBI rvbi : rels) {
 
-            if (rvbi.getTypeNid() == roleNid && rvbi.getDestinationNid() == valueNid
+            if (rvbi.getTypeNid() == roleNid && rvbi.getTargetNid() == valueNid
                     && (roleGroup == -1 || rvbi.getGroup() == roleGroup)
                     && rvbi.getCharacteristicNid() == SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID()) {
                 // :!!!:???:
 
                 int statusNid = SnomedMetadataRfx.getSTATUS_CURRENT_NID();
-                negationRefex = rvbi.getCurrentRefexes(vc, collectionNid);
+                negationRefex = rvbi.getActiveRefexes(vc, collectionNid);
                 if (negationRefex.size() > 0) {
                     if (negationRefex.iterator().next().getStatusNid()
                             == SnomedMetadataRfx.getSTATUS_CURRENT_NID()) {
@@ -92,7 +92,7 @@ public class BatchActionTaskLogicNegateRelValue extends BatchActionTask {
                 }
 
                 // If not already a member, then a member record is added.
-                RefexCAB refexSpec = new RefexCAB(TK_REFSET_TYPE.CID, rvbi.getNid(), collectionNid);
+                RefexCAB refexSpec = new RefexCAB(TK_REFEX_TYPE.CID, rvbi.getNid(), collectionNid);
 
                 int normalMemberNid = ts.getConcept(
                         RefsetAuxiliary.Concept.NORMAL_MEMBER.getUids()).getConceptNid();

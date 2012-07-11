@@ -9,8 +9,8 @@ import org.dwfa.ace.api.I_IterateIds;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.cs.ChangeSetPolicy;
-import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
+import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
+import org.ihtsdo.tk.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.log.AceLog;
@@ -76,7 +76,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import org.ihtsdo.arena.conceptview.ConceptTemplates;
-import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
@@ -898,7 +898,7 @@ public class BdbCommitManager {
         });
     }
 
-    public static boolean forget(ConAttrVersionBI attr) throws IOException {
+    public static boolean forget(ConceptAttributeVersionBI attr) throws IOException {
         Concept c = Bdb.getConcept(attr.getConceptNid());
       ConceptAttributes a = (ConceptAttributes) attr;
       boolean returnValue;
@@ -973,7 +973,7 @@ public class BdbCommitManager {
         } else {
 
             // have to forget "all" references to component...
-            c.getDescriptions().remove(d);
+            c.getDescs().remove(d);
             c.getData().getDescNids().remove(d.getNid());
             d.primordialSapNid = -1;
         }
@@ -989,7 +989,7 @@ public class BdbCommitManager {
       ComponentBI  component = Bdb.getComponent(m.getComponentNid());
 
         if (component instanceof Concept) {
-            component = ((Concept) component).getConAttrs();
+            component = ((Concept) component).getConceptAttributes();
         }
 
         ConceptComponent comp = (ConceptComponent) component;
@@ -1031,7 +1031,7 @@ public class BdbCommitManager {
             m.setStatusAtPositionNid(-1);
         }
 
-        if (WorkflowHelper.isWorkflowCapabilityAvailable() && (WorkflowHelper.getWorkflowRefsetNid() == extension.getCollectionNid())) {
+        if (WorkflowHelper.isWorkflowCapabilityAvailable() && (WorkflowHelper.getWorkflowRefsetNid() == extension.getRefexNid())) {
             uncommittedWfMemberIds.remove(extension);
         }
 
@@ -1048,7 +1048,7 @@ public class BdbCommitManager {
 
 
    public static void forget(RelationshipVersionBI rel) throws IOException {
-      Concept      c = Bdb.getConcept(rel.getOriginNid());
+      Concept      c = Bdb.getConcept(rel.getSourceNid());
       Relationship r = (Relationship) rel;
 
         if (r.getTime() != Long.MAX_VALUE) {

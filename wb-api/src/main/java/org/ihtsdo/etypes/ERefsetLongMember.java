@@ -8,8 +8,8 @@ import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartLong;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 
-import org.ihtsdo.tk.dto.concept.component.refset.Long.TkRefsetLongMember;
-import org.ihtsdo.tk.dto.concept.component.refset.Long.TkRefsetLongRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_long.TkRefexLongMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_long.TkRefexLongRevision;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -18,7 +18,7 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 
-public class ERefsetLongMember extends TkRefsetLongMember {
+public class ERefsetLongMember extends TkRefexLongMember {
    public static final long serialVersionUID = 1;
 
    //~--- constructors --------------------------------------------------------
@@ -41,7 +41,7 @@ public class ERefsetLongMember extends TkRefsetLongMember {
 
       I_ExtendByRefPartLong part = (I_ExtendByRefPartLong) m.getMutableParts().get(0);
 
-      longValue  = part.getLongValue();
+      long1  = part.getLongValue();
       pathUuid   = Terms.get().nidToUuid(part.getPathNid());
       statusUuid = Terms.get().nidToUuid(part.getStatusNid());
       authorUuid    = Terms.get().nidToUuid(part.getAuthorNid());
@@ -49,7 +49,7 @@ public class ERefsetLongMember extends TkRefsetLongMember {
       time       = part.getTime();
 
       if (partCount > 1) {
-         revisions = new ArrayList<TkRefsetLongRevision>(partCount - 1);
+         revisions = new ArrayList<TkRefexLongRevision>(partCount - 1);
 
          for (int i = 1; i < partCount; i++) {
             revisions.add(new ERefsetLongRevision((I_ExtendByRefPartLong) m.getMutableParts().get(i)));

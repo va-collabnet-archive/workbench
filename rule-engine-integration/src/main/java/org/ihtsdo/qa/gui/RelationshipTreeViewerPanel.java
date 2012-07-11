@@ -286,13 +286,13 @@ public class RelationshipTreeViewerPanel extends JPanel {
 		DefaultMutableTreeNode typeNode = createRelAttributeNode(relTuple.getTypeNid());
 		addNodeInSortedOrder(parentNode, typeNode);
 
-		DefaultMutableTreeNode targetNode = createRelAttributeNode(relTuple.getDestinationNid());
+		DefaultMutableTreeNode targetNode = createRelAttributeNode(relTuple.getTargetNid());
 		addNodeInSortedOrder(parentNode, targetNode);
 
 		DefaultMutableTreeNode autorNode = createRelAttributeNode(relTuple.getAuthorNid());
 		addNodeInSortedOrder(parentNode, autorNode);
 
-		DefaultMutableTreeNode originalNode = createRelAttributeNode(relTuple.getOriginNid());
+		DefaultMutableTreeNode originalNode = createRelAttributeNode(relTuple.getSourceNid());
 		addNodeInSortedOrder(parentNode, originalNode);
 
 		DefaultMutableTreeNode characteristicNode = createRelAttributeNode(relTuple.getCharacteristicNid());
@@ -333,13 +333,13 @@ public class RelationshipTreeViewerPanel extends JPanel {
 		DefaultMutableTreeNode typeNode = createRelAttributeNode(relTuple.getTypeNid());
 		addNodeInSortedOrder(primordialUuidNode, typeNode);
 
-		DefaultMutableTreeNode targetNode = createRelAttributeNode(relTuple.getDestinationNid());
+		DefaultMutableTreeNode targetNode = createRelAttributeNode(relTuple.getTargetNid());
 		addNodeInSortedOrder(primordialUuidNode, targetNode);
 
 		DefaultMutableTreeNode autorNode = createRelAttributeNode(relTuple.getAuthorNid());
 		addNodeInSortedOrder(primordialUuidNode, autorNode);
 
-		DefaultMutableTreeNode originalNode = createRelAttributeNode(relTuple.getOriginNid());
+		DefaultMutableTreeNode originalNode = createRelAttributeNode(relTuple.getSourceNid());
 		addNodeInSortedOrder(primordialUuidNode, originalNode);
 
 		DefaultMutableTreeNode characteristicNode = createRelAttributeNode(relTuple.getCharacteristicNid());
@@ -370,7 +370,7 @@ public class RelationshipTreeViewerPanel extends JPanel {
 		String typeUuid = tf.nidToUuid(relTuple.getTypeNid()).toString();
 		I_GetConceptData type = tf.getConcept(UUID.fromString(typeUuid));
 
-		String targetUuid = tf.nidToUuid(relTuple.getDestinationNid()).toString();
+		String targetUuid = tf.nidToUuid(relTuple.getTargetNid()).toString();
 		I_GetConceptData target = tf.getConcept(UUID.fromString(targetUuid));
 
 		DefaultMutableTreeNode relNode = new DefaultMutableTreeNode(type.getInitialText() + " - " + target.getInitialText());
@@ -389,7 +389,7 @@ public class RelationshipTreeViewerPanel extends JPanel {
 		String typeUuid = tf.nidToUuid(relTuple.getTypeNid()).toString();
 		I_GetConceptData type = tf.getConcept(UUID.fromString(typeUuid));
 
-		String targetUuid = tf.nidToUuid(relTuple.getDestinationNid()).toString();
+		String targetUuid = tf.nidToUuid(relTuple.getTargetNid()).toString();
 		I_GetConceptData target = tf.getConcept(UUID.fromString(targetUuid));
 
 		DefaultMutableTreeNode relNode = new DefaultMutableTreeNode(type.getInitialText() + " - " + target.getInitialText());

@@ -49,14 +49,14 @@ public class NidList implements NidListBI, Serializable {
       super();
    }
 
-   public static void writeIntList(ObjectOutputStream out, NidList list) throws IOException {
-      if (list == null) {
+   public static void writeIntList(ObjectOutputStream out, NidList nidList) throws IOException {
+      if (nidList == null) {
          out.writeInt(Integer.MIN_VALUE);
          return;
       }
 
       ArrayList<List<UUID>> outList = new ArrayList<List<UUID>>();
-      for (int i : list.getListValues()) {
+      for (int i : nidList.getListValues()) {
          if (i != 0 && i != Integer.MAX_VALUE) {
             outList.add(Ts.get().getUuidsForNid(i));
          }
@@ -133,8 +133,8 @@ public class NidList implements NidListBI, Serializable {
     * @see org.dwfa.vodb.types.I_IntList#add(java.lang.Integer)
     */
    @Override
-   public boolean add(Integer o) {
-      boolean returnValue = listValues.add(o);
+   public boolean add(Integer nid) {
+      boolean returnValue = listValues.add(nid);
       return returnValue;
    }
 
@@ -177,8 +177,8 @@ public class NidList implements NidListBI, Serializable {
     * @see org.dwfa.vodb.types.I_IntList#contains(java.lang.Object)
     */
    @Override
-   public boolean contains(Object o) {
-      return listValues.contains(o);
+   public boolean contains(Object obj) {
+      return listValues.contains(obj);
    }
 
    /*
@@ -207,8 +207,8 @@ public class NidList implements NidListBI, Serializable {
     * @see org.dwfa.vodb.types.I_IntList#indexOf(java.lang.Object)
     */
    @Override
-   public int indexOf(Object o) {
-      return listValues.indexOf(o);
+   public int indexOf(Object obj) {
+      return listValues.indexOf(obj);
    }
 
    /*
@@ -237,8 +237,8 @@ public class NidList implements NidListBI, Serializable {
     * @see org.dwfa.vodb.types.I_IntList#lastIndexOf(java.lang.Object)
     */
    @Override
-   public int lastIndexOf(Object o) {
-      return listValues.lastIndexOf(o);
+   public int lastIndexOf(Object obj) {
+      return listValues.lastIndexOf(obj);
    }
 
    /*
@@ -279,9 +279,9 @@ public class NidList implements NidListBI, Serializable {
     * @see org.dwfa.vodb.types.I_IntList#remove(java.lang.Object)
     */
    @Override
-   public boolean remove(Object o) {
+   public boolean remove(Object obj) {
       int oldSize = listValues.size();
-      boolean returnValue = listValues.remove(o);
+      boolean returnValue = listValues.remove(obj);
       return returnValue;
    }
 

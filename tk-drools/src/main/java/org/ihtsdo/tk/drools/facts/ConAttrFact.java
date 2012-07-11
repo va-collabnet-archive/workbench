@@ -1,15 +1,15 @@
 package org.ihtsdo.tk.drools.facts;
 
-import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
-public class ConAttrFact extends ComponentFact<ConAttrVersionBI>{
+public class ConAttrFact extends ComponentFact<ConceptAttributeVersionBI>{
 
-	public ConAttrFact(Context context, ConAttrVersionBI component, ViewCoordinate vc) {
+	public ConAttrFact(Context context, ConceptAttributeVersionBI component, ViewCoordinate vc) {
 		super(context, component, vc);
 	}
 
-	public ConAttrVersionBI getConAttr() {
+	public ConceptAttributeVersionBI getConAttr() {
 		return component;
 	}
 

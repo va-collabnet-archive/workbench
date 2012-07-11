@@ -32,7 +32,7 @@ import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ManageContradiction;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
@@ -56,7 +56,7 @@ import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
-import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
@@ -67,7 +67,7 @@ import org.ihtsdo.tk.api.media.MediaChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
-import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
+import org.ihtsdo.tk.api.relationship.group.RelationshipGroupVersionBI;
 import org.ihtsdo.tk.contradiction.FoundContradictionVersions;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -219,8 +219,8 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
    }
 
    @Override
-   public Set<Integer> getAllSapNids() throws IOException {
-      return bean.getAllSapNids();
+   public Set<Integer> getAllStampNids() throws IOException {
+      return bean.getAllStampNids();
    }
 
    @Override
@@ -246,7 +246,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
    }
 
    @Override
-   public ConAttrChronicleBI getConAttrs() throws IOException {
+   public ConceptAttributeChronicleBI getConceptAttributes() throws IOException {
       return bean.getConAttrs();
    }
 
@@ -257,15 +257,9 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
       return bean.getConceptAttributeTuples(precedencePolicy, contradictionManager);
    }
 
-   public List<? extends I_ConceptAttributeTuple> getConceptAttributeTuples(Precedence precedencePolicy,
-           I_ManageContradiction contradictionManager)
-           throws IOException, TerminologyException {
-      return bean.getConceptAttributeTuples(precedencePolicy, contradictionManager);
-   }
-
    public List<? extends I_ConceptAttributeTuple> getConceptAttributeTuples(I_IntSet allowedStatus,
            PositionSetReadOnly positions, Precedence precedencePolicy,
-           I_ManageContradiction contradictionManager)
+           ContradictionManagerBI contradictionManager)
            throws IOException, TerminologyException {
       return bean.getConceptAttributeTuples(allowedStatus, positions, precedencePolicy, contradictionManager);
    }
@@ -273,12 +267,6 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
    @Override
    public List<? extends I_ConceptAttributeTuple> getConceptAttributeTuples(NidSetBI allowedStatus,
            PositionSetBI positions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
-           throws IOException, TerminologyException {
-      return bean.getConceptAttributeTuples(allowedStatus, positions, precedencePolicy, contradictionManager);
-   }
-
-   public List<? extends I_ConceptAttributeTuple> getConceptAttributeTuples(NidSetBI allowedStatus,
-           PositionSetBI positions, Precedence precedencePolicy, I_ManageContradiction contradictionManager)
            throws IOException, TerminologyException {
       return bean.getConceptAttributeTuples(allowedStatus, positions, precedencePolicy, contradictionManager);
    }
@@ -293,8 +281,8 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
    }
 
    @Override
-   public I_ConceptAttributeVersioned getConceptAttributes() throws IOException {
-      return bean.getConceptAttributes();
+   public I_ConceptAttributeVersioned getConAttrs() throws IOException {
+      return bean.getConAttrs();
    }
 
    @Override
@@ -308,59 +296,58 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
    }
 
    @Override
-   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz)
+   public Collection<? extends RefexVersionBI<?>> getAnnotationsActive(ViewCoordinate xyz)
            throws IOException {
-      return bean.getCurrentAnnotationMembers(xyz);
+      return bean.getAnnotationsActive(xyz);
    }
 
-   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz,
-           int refexNid)
+   public Collection<? extends RefexVersionBI<?>> getAnnotationMembersActive(ViewCoordinate xyz, int refexNid)
            throws IOException {
-      return bean.getCurrentAnnotationMembers(xyz, refexNid);
+      return bean.getAnnotationMembersActive(xyz, refexNid);
    }
 
-   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz)
+   public Collection<? extends RefexVersionBI<?>> getActiveAnnotations(ViewCoordinate xyz)
            throws IOException {
-      return bean.getCurrentAnnotations(xyz);
+      return bean.getActiveAnnotations(xyz);
    }
 
-   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz, int refexNid)
+   public Collection<? extends RefexVersionBI<?>> getActiveAnnotations(ViewCoordinate xyz, int refexNid)
            throws IOException {
-      return bean.getCurrentAnnotations(xyz, refexNid);
+      return bean.getActiveAnnotations(xyz, refexNid);
    }
 
-   public Collection<? extends RefexVersionBI<?>> getCurrentRefexMembers(ViewCoordinate xyz, int refsetNid)
+   public Collection<? extends RefexVersionBI<?>> getRefexMembersActive(ViewCoordinate xyz, int refsetNid)
            throws IOException {
-      return bean.getCurrentRefexMembers(xyz, refsetNid);
+      return bean.getRefexMembersActive(xyz, refsetNid);
    }
 
    @Override
-   public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz) throws IOException {
-      return bean.getCurrentRefexes(xyz);
+   public Collection<? extends RefexVersionBI<?>> getRefexesActive(ViewCoordinate xyz) throws IOException {
+      return bean.getRefexesActive(xyz);
    }
 
    @Override
-   public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz, int refsetNid)
+   public Collection<? extends RefexVersionBI<?>> getActiveRefexes(ViewCoordinate xyz, int refsetNid)
            throws IOException {
-      return bean.getCurrentRefexes(xyz, refsetNid);
+      return bean.getActiveRefexes(xyz, refsetNid);
    }
 
    @Override
-   public RefexVersionBI<?> getCurrentRefsetMemberForComponent(ViewCoordinate vc, int componentNid)
+   public RefexVersionBI<?> getRefsetMemberActiveForComponent(ViewCoordinate vc, int componentNid)
            throws IOException {
       throw new UnsupportedOperationException("Not supported yet.");
    }
 
    @Override
-   public Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc)
+   public Collection<? extends RefexVersionBI<?>> getRefsetMembersActive(ViewCoordinate vc)
            throws IOException {
-      return bean.getCurrentRefsetMembers(vc);
+      return bean.getRefsetMembersActive(vc);
    }
 
    @Override
-   public Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc, Long cutoffTime)
+   public Collection<? extends RefexVersionBI<?>> getRefsetMembersActive(ViewCoordinate vc, Long cutoffTime)
            throws IOException {
-      return bean.getCurrentRefsetMembers(vc, cutoffTime);
+      return bean.getRefsetMembersActive(vc, cutoffTime);
    }
 
    @Override
@@ -380,7 +367,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 
    public I_DescriptionTuple getDescTuple(NidListBI typePrefOrder, NidListBI langPrefOrder,
            I_IntSet allowedStatus, PositionSetReadOnly positionSet, LANGUAGE_SORT_PREF sortPref,
-           Precedence precedencePolicy, I_ManageContradiction contradictionManager)
+           Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
            throws IOException {
       return bean.getDescTuple(typePrefOrder, langPrefOrder, allowedStatus, positionSet, sortPref,
                                precedencePolicy, contradictionManager);
@@ -390,14 +377,6 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
    public I_DescriptionTuple getDescTuple(NidListBI typePrefOrder, NidListBI langPrefOrder,
            NidSetBI allowedStatus, PositionSetBI positionSet, LANGUAGE_SORT_PREF sortPref,
            Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
-           throws IOException {
-      return bean.getDescTuple(typePrefOrder, langPrefOrder, allowedStatus, positionSet, sortPref,
-                               precedencePolicy, contradictionManager);
-   }
-
-   public I_DescriptionTuple getDescTuple(NidListBI typePrefOrder, NidListBI langPrefOrder,
-           NidSetBI allowedStatus, PositionSetBI positionSet, LANGUAGE_SORT_PREF sortPref,
-           Precedence precedencePolicy, I_ManageContradiction contradictionManager)
            throws IOException {
       return bean.getDescTuple(typePrefOrder, langPrefOrder, allowedStatus, positionSet, sortPref,
                                precedencePolicy, contradictionManager);
@@ -416,7 +395,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 
    public List<? extends I_DescriptionTuple> getDescriptionTuples(I_IntSet allowedStatus,
            I_IntSet allowedTypes, PositionSetReadOnly positionSet, Precedence precedencePolicy,
-           I_ManageContradiction contradictionManager)
+           ContradictionManagerBI contradictionManager)
            throws IOException {
       return bean.getDescriptionTuples(allowedStatus, allowedTypes, positionSet, precedencePolicy,
                                        contradictionManager);
@@ -426,14 +405,6 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
    public List<? extends I_DescriptionTuple> getDescriptionTuples(NidSetBI allowedStatus,
            NidSetBI allowedTypes, PositionSetBI positionSet, Precedence precedencePolicy,
            ContradictionManagerBI contradictionManager)
-           throws IOException {
-      return bean.getDescriptionTuples(allowedStatus, allowedTypes, positionSet, precedencePolicy,
-                                       contradictionManager);
-   }
-
-   public List<? extends I_DescriptionTuple> getDescriptionTuples(NidSetBI allowedStatus,
-           NidSetBI allowedTypes, PositionSetBI positionSet, Precedence precedencePolicy,
-           I_ManageContradiction contradictionManager)
            throws IOException {
       return bean.getDescriptionTuples(allowedStatus, allowedTypes, positionSet, precedencePolicy,
                                        contradictionManager);
@@ -449,12 +420,12 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
    }
 
    @Override
-   public Collection<? extends I_DescriptionVersioned> getDescriptions() throws IOException {
-      return bean.getDescriptions();
+   public Collection<? extends I_DescriptionVersioned> getDescs() throws IOException {
+      return bean.getDescs();
    }
 
    @Override
-   public Collection<? extends DescriptionChronicleBI> getDescs() throws IOException {
+   public Collection<? extends DescriptionChronicleBI> getDescriptions() throws IOException {
       return bean.getDescs();
    }
 
@@ -475,14 +446,14 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
    }
 
    public Set<? extends I_GetConceptData> getDestRelOrigins(I_IntSet allowedTypes,
-           Precedence precedencePolicy, I_ManageContradiction contradictionManager)
+           Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
            throws IOException, TerminologyException {
       return bean.getDestRelOrigins(allowedTypes);
    }
 
    public Set<? extends I_GetConceptData> getDestRelOrigins(I_IntSet allowedStatus, I_IntSet allowedTypes,
            PositionSetReadOnly positions, Precedence precedencePolicy,
-           I_ManageContradiction contradictionManager)
+           ContradictionManagerBI contradictionManager)
            throws IOException, TerminologyException {
       return bean.getDestRelOrigins(allowedStatus, allowedTypes, positions, precedencePolicy,
                                     contradictionManager);
@@ -496,15 +467,8 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
                                     contradictionManager);
    }
 
-   public Set<? extends I_GetConceptData> getDestRelOrigins(NidSetBI allowedStatus, NidSetBI allowedTypes,
-           PositionSetBI positions, Precedence precedencePolicy, I_ManageContradiction contradictionManager)
-           throws IOException, TerminologyException {
-      return bean.getDestRelOrigins(allowedStatus, allowedTypes, positions, precedencePolicy,
-                                    contradictionManager);
-   }
-
    public List<? extends I_RelTuple> getDestRelTuples(I_IntSet allowedTypes, Precedence precedencePolicy,
-           I_ManageContradiction contradictionManager)
+           ContradictionManagerBI contradictionManager)
            throws IOException, TerminologyException {
       return bean.getDestRelTuples(allowedTypes, precedencePolicy, contradictionManager);
    }
@@ -516,15 +480,9 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
       return bean.getDestRelTuples(allowedTypes, precedencePolicy, contradictionManager);
    }
 
-   public List<? extends I_RelTuple> getDestRelTuples(NidSetBI allowedTypes, Precedence precedencePolicy,
-           I_ManageContradiction contradictionManager)
-           throws IOException, TerminologyException {
-      return bean.getDestRelTuples(allowedTypes, precedencePolicy, contradictionManager);
-   }
-
    public List<? extends I_RelTuple> getDestRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
            PositionSetReadOnly positions, Precedence precedencePolicy,
-           I_ManageContradiction contradictionManager)
+           ContradictionManagerBI contradictionManager)
            throws IOException, TerminologyException {
       return bean.getDestRelTuples(allowedStatus, allowedTypes, positions, precedencePolicy,
                                    contradictionManager);
@@ -533,13 +491,6 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
    @Override
    public List<? extends I_RelTuple> getDestRelTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
            PositionSetBI positions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
-           throws IOException, TerminologyException {
-      return bean.getDestRelTuples(allowedStatus, allowedTypes, positions, precedencePolicy,
-                                   contradictionManager);
-   }
-
-   public List<? extends I_RelTuple> getDestRelTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
-           PositionSetBI positions, Precedence precedencePolicy, I_ManageContradiction contradictionManager)
            throws IOException, TerminologyException {
       return bean.getDestRelTuples(allowedStatus, allowedTypes, positions, precedencePolicy,
                                    contradictionManager);
@@ -585,7 +536,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 
    public List<? extends I_ImageTuple> getImageTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
            PositionSetReadOnly positions, Precedence precedencePolicy,
-           I_ManageContradiction contradictionManager)
+           ContradictionManagerBI contradictionManager)
            throws IOException, TerminologyException {
       return bean.getImageTuples(allowedStatus, allowedTypes, positions, precedencePolicy,
                                  contradictionManager);
@@ -599,21 +550,14 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
                                  contradictionManager);
    }
 
-   public List<? extends I_ImageTuple> getImageTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
-           PositionSetBI positions, Precedence precedencePolicy, I_ManageContradiction contradictionManager)
-           throws IOException, TerminologyException {
-      return bean.getImageTuples(allowedStatus, allowedTypes, positions, precedencePolicy,
-                                 contradictionManager);
-   }
-
    @Override
    public Collection<? extends I_ImageVersioned> getImages() throws IOException {
       return bean.getImages();
    }
 
    @Override
-   public Collection<? extends RefexVersionBI<?>> getInactiveRefexes(ViewCoordinate xyz) throws IOException {
-      return bean.getInactiveRefexes(xyz);
+   public Collection<? extends RefexVersionBI<?>> getRefexesInactive(ViewCoordinate xyz) throws IOException {
+      return bean.getRefexesInactive(xyz);
    }
 
    @Override
@@ -705,9 +649,9 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
    }
 
    @Override
-   public Collection<? extends RelGroupVersionBI> getRelGroups(ViewCoordinate vc)
+   public Collection<? extends RelationshipGroupVersionBI> getRelationshipGroups(ViewCoordinate vc)
            throws IOException, ContradictionException {
-      return bean.getRelGroups(vc);
+      return bean.getRelationshipGroups(vc);
    }
 
    @Override
@@ -716,13 +660,13 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
    }
 
    @Override
-   public Collection<? extends RelationshipChronicleBI> getRelsIncoming() throws IOException {
-      return bean.getRelsIncoming();
+   public Collection<? extends RelationshipChronicleBI> getRelationshipsTarget() throws IOException {
+      return bean.getRelationshipsTarget();
    }
 
    @Override
-   public Collection<? extends RelationshipChronicleBI> getRelsOutgoing() throws IOException {
-      return bean.getRelsOutgoing();
+   public Collection<? extends RelationshipChronicleBI> getRelationshipsSource() throws IOException {
+      return bean.getRelationshipsSource();
    }
 
    @Override
@@ -731,7 +675,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
    }
 
    public Set<? extends I_GetConceptData> getSourceRelTargets(I_IntSet allowedTypes,
-           Precedence precedencePolicy, I_ManageContradiction contradictionManager)
+           Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
            throws IOException, TerminologyException {
       return bean.getSourceRelTargets(allowedTypes, precedencePolicy, contradictionManager);
    }
@@ -743,15 +687,9 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
       return bean.getSourceRelTargets(allowedTypes, precedencePolicy, contradictionManager);
    }
 
-   public Set<? extends I_GetConceptData> getSourceRelTargets(NidSetBI allowedTypes,
-           Precedence precedencePolicy, I_ManageContradiction contradictionManager)
-           throws IOException, TerminologyException {
-      return bean.getSourceRelTargets(allowedTypes, precedencePolicy, contradictionManager);
-   }
-
    public Set<? extends I_GetConceptData> getSourceRelTargets(I_IntSet allowedStatus, I_IntSet allowedTypes,
            PositionSetReadOnly positions, Precedence precedencePolicy,
-           I_ManageContradiction contradictionManager)
+           ContradictionManagerBI contradictionManager)
            throws IOException, TerminologyException {
       return bean.getSourceRelTargets(allowedStatus, allowedTypes, positions, precedencePolicy,
                                       contradictionManager);
@@ -764,17 +702,10 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
       return bean.getSourceRelTargets(allowedStatus, allowedTypes, positions, precedencePolicy,
                                       contradictionManager);
    }
-
-   public Set<? extends I_GetConceptData> getSourceRelTargets(NidSetBI allowedStatus, NidSetBI allowedTypes,
-           PositionSetBI positions, Precedence precedencePolicy, I_ManageContradiction contradictionManager)
-           throws IOException, TerminologyException {
-      return bean.getSourceRelTargets(allowedStatus, allowedTypes, positions, precedencePolicy,
-                                      contradictionManager);
-   }
-
+   
    public List<? extends I_RelTuple> getSourceRelTuples(I_IntSet allowedStatus, I_IntSet allowedTypes,
            PositionSetReadOnly positions, Precedence precedencePolicy,
-           I_ManageContradiction contradictionManager)
+           ContradictionManagerBI contradictionManager)
            throws IOException, TerminologyException {
       return bean.getSourceRelTuples(allowedStatus, allowedTypes, positions, precedencePolicy,
                                      contradictionManager);
@@ -783,13 +714,6 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
    @Override
    public List<? extends I_RelTuple> getSourceRelTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
            PositionSetBI positions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
-           throws IOException, TerminologyException {
-      return bean.getSourceRelTuples(allowedStatus, allowedTypes, positions, precedencePolicy,
-                                     contradictionManager);
-   }
-
-   public List<? extends I_RelTuple> getSourceRelTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
-           PositionSetBI positions, Precedence precedencePolicy, I_ManageContradiction contradictionManager)
            throws IOException, TerminologyException {
       return bean.getSourceRelTuples(allowedStatus, allowedTypes, positions, precedencePolicy,
                                      contradictionManager);
@@ -875,16 +799,16 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
       throw new UnsupportedOperationException("Not supported yet.");
    }
 
-   public boolean hasCurrentAnnotationMember(ViewCoordinate xyz, int refsetNid) throws IOException {
-      return bean.hasCurrentAnnotationMember(xyz, refsetNid);
+   public boolean hasAnnotationMemberActive(ViewCoordinate xyz, int refsetNid) throws IOException {
+      return bean.hasAnnotationMemberActive(xyz, refsetNid);
    }
 
-   public boolean hasCurrentRefexMember(ViewCoordinate xyz, int refsetNid) throws IOException {
-      return bean.hasCurrentRefexMember(xyz, refsetNid);
+   public boolean hasRefexMemberActive(ViewCoordinate xyz, int refsetNid) throws IOException {
+      return bean.hasRefexMemberActive(xyz, refsetNid);
    }
 
    @Override
-   public boolean hasCurrentRefsetMemberForComponent(ViewCoordinate vc, int componentNid) throws IOException {
+   public boolean hasRefsetMemberActiveForComponent(ViewCoordinate vc, int componentNid) throws IOException {
       throw new UnsupportedOperationException("Not supported yet.");
    }
 
@@ -914,7 +838,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 
    public boolean isParentOf(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes,
                              PositionSetReadOnly positions, Precedence precedencePolicy,
-                             I_ManageContradiction contradictionManager)
+                             ContradictionManagerBI contradictionManager)
            throws IOException, TerminologyException {
       return bean.isParentOf(child, allowedStatus, allowedTypes, positions, precedencePolicy,
                              contradictionManager);
@@ -929,14 +853,6 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
                              contradictionManager);
    }
 
-   public boolean isParentOf(I_GetConceptData child, NidSetBI allowedStatus, NidSetBI allowedTypes,
-                             PositionSetBI positions, Precedence precedencePolicy,
-                             I_ManageContradiction contradictionManager)
-           throws IOException, TerminologyException {
-      return bean.isParentOf(child, allowedStatus, allowedTypes, positions, precedencePolicy,
-                             contradictionManager);
-   }
-
    @Override
    public boolean isParentOfOrEqualTo(I_GetConceptData child) throws IOException, TerminologyException {
       return bean.isParentOfOrEqualTo(child);
@@ -944,7 +860,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 
    public boolean isParentOfOrEqualTo(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes,
                                       PositionSetReadOnly positions, Precedence precedencePolicy,
-                                      I_ManageContradiction contradictionManager)
+                                      ContradictionManagerBI contradictionManager)
            throws IOException, TerminologyException {
       return bean.isParentOfOrEqualTo(child, allowedStatus, allowedTypes, positions, precedencePolicy,
                                       contradictionManager);
@@ -954,14 +870,6 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
    public boolean isParentOfOrEqualTo(I_GetConceptData child, NidSetBI allowedStatus, NidSetBI allowedTypes,
                                       PositionSetBI positions, Precedence precedencePolicy,
                                       ContradictionManagerBI contradictionManager)
-           throws IOException, TerminologyException {
-      return bean.isParentOfOrEqualTo(child, allowedStatus, allowedTypes, positions, precedencePolicy,
-                                      contradictionManager);
-   }
-
-   public boolean isParentOfOrEqualTo(I_GetConceptData child, NidSetBI allowedStatus, NidSetBI allowedTypes,
-                                      PositionSetBI positions, Precedence precedencePolicy,
-                                      I_ManageContradiction contradictionManager)
            throws IOException, TerminologyException {
       return bean.isParentOfOrEqualTo(child, allowedStatus, allowedTypes, positions, precedencePolicy,
                                       contradictionManager);
@@ -995,7 +903,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
    }
 
     @Override
-    public Set<Integer> getAllNidsForSaps(Set<Integer> sapNids) throws IOException {
-        return bean.getAllNidsForSaps(sapNids);
+    public Set<Integer> getAllNidsForStamps(Set<Integer> sapNids) throws IOException {
+        return bean.getAllNidsForStamps(sapNids);
     }
 }
