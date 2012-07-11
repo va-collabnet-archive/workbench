@@ -27,7 +27,7 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ManageContradiction;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_ShowActivity;

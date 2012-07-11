@@ -34,8 +34,8 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.cs.ChangeSetPolicy;
-import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
+import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
+import org.ihtsdo.tk.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.commitlog.CommitLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
@@ -1398,7 +1398,7 @@ public class ExportUtil {
 		boolean isInActive = false;
 		Date LIMITED = ExportUtil.DATEFORMAT.parse(I_Constants.limited_policy_change); // 20100131T000100Z
 		// set time when Limited concept is no longer current/active
-		I_ConceptAttributeVersioned<?> i_ConceptAttributeVersioned = concept.getConceptAttributes();
+		I_ConceptAttributeVersioned<?> i_ConceptAttributeVersioned = concept.getConAttrs();
 		List<? extends I_ConceptAttributeTuple> conceptAttributeTupleList = i_ConceptAttributeVersioned.getTuples();
 		String conceptPriorStatus="";
 		if (conceptAttributeTupleList.size() > 0 && conceptAttributeTupleList != null) {
@@ -1539,7 +1539,7 @@ public class ExportUtil {
 		boolean snomedPathFlag = false;
 		int pathId = 0;
 		I_GetConceptData con = getTermFactory().getConcept(nid);
-		I_ConceptAttributeVersioned<?> i_ConceptAttributeVersioned = con.getConceptAttributes();
+		I_ConceptAttributeVersioned<?> i_ConceptAttributeVersioned = con.getConAttrs();
 		List<? extends I_ConceptAttributeTuple> conceptAttributeTupleList = i_ConceptAttributeVersioned.getTuples();
 		for (int i = 0; i < conceptAttributeTupleList.size(); i++) {
 			I_ConceptAttributeTuple<?> i_ConceptAttributeTuple = (I_ConceptAttributeTuple<?>) conceptAttributeTupleList.get(i);

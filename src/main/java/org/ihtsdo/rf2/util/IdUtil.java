@@ -182,7 +182,7 @@ public class IdUtil {
 		boolean snomedPathFlag = false;
 		int pathId = 0;
 		I_GetConceptData con = getTermFactory().getConcept(nid);
-		I_ConceptAttributeVersioned<?> i_ConceptAttributeVersioned = con.getConceptAttributes();
+		I_ConceptAttributeVersioned<?> i_ConceptAttributeVersioned = con.getConAttrs();
 		List<? extends I_ConceptAttributeTuple> conceptAttributeTupleList = i_ConceptAttributeVersioned.getTuples();
 		for (int i = 0; i < conceptAttributeTupleList.size(); i++) {
 			I_ConceptAttributeTuple<?> i_ConceptAttributeTuple = (I_ConceptAttributeTuple<?>) conceptAttributeTupleList.get(i);
