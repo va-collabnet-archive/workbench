@@ -6,14 +6,14 @@ public class SctIdBase implements Serializable {
 
 	private static final long serialVersionUID = -7789907291971002041L;
 	private String partitionNum;
-	private Integer value;
+	private Long value;
 	private String namespace;
 
 	public SctIdBase() {
 		super();
 	}
 
-	public SctIdBase(String partitionNum, Integer value, String namespace) {
+	public SctIdBase(String partitionNum, Long value, String namespace) {
 		super();
 		this.partitionNum = partitionNum;
 		this.value = value;
@@ -28,11 +28,11 @@ public class SctIdBase implements Serializable {
 		this.partitionNum = partitionNum;
 	}
 
-	public Integer getValue() {
+	public Long getValue() {
 		return value;
 	}
 
-	public void setValue(Integer value) {
+	public void setValue(Long value) {
 		this.value = value;
 	}
 

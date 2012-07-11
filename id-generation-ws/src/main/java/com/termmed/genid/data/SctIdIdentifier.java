@@ -10,7 +10,7 @@ public class SctIdIdentifier implements Serializable {
 	private String namespaceId;
     private String artifactId;
     private String releaseId;
-    private Integer itemId;
+    private Long itemId;
     private String sctId;
     private String code;
     
@@ -18,7 +18,7 @@ public class SctIdIdentifier implements Serializable {
     	super();
     }
 
-	public SctIdIdentifier(String partitionId, String namespaceId, String artifactId, String releaseId, Integer itemId, String sctId, String code) {
+	public SctIdIdentifier(String partitionId, String namespaceId, String artifactId, String releaseId, Long itemId, String sctId, String code) {
 		super();
 		this.partitionId = partitionId;
 		this.namespaceId = namespaceId;
@@ -45,11 +45,11 @@ public class SctIdIdentifier implements Serializable {
 		this.releaseId = releaseId;
 	}
 
-	public Integer getItemId() {
+	public Long getItemId() {
 		return itemId;
 	}
 
-	public void setItemId(Integer itemId) {
+	public void setItemId(Long itemId) {
 		this.itemId = itemId;
 	}
 

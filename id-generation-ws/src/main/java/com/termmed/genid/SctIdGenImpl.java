@@ -70,9 +70,9 @@ public class SctIdGenImpl implements SctIdGen {
 
 		Long result = null;
 
-		int num;
-		int numTmp;
-		int multip = 100;
+		long num;
+		long numTmp;
+		long multip = 100;
 		String nameSpaceChar;
 
 		if (namespaceId > 0) {
@@ -232,11 +232,11 @@ public class SctIdGenImpl implements SctIdGen {
 		SctIdIdentifier sctID = null;
 		Long longSctId = null;
 
-		int num;
-		int numTmp;
-		int multip = 100;
+		long num;
+		long numTmp;
+		long multip = 100;
 		String nameSpaceChar;
-		int numPart = Integer.parseInt(partitionId);
+		long numPart = Integer.parseInt(partitionId);
 
 		if (namespaceId > 0) {
 			String nc = "0000000" + namespaceId;

@@ -65,7 +65,7 @@ public class GenIdHelper {
 		int suffixToNum = 0;
 
 		if (parentSnomedId != null && !parentSnomedId.trim().equals("")) {
-			if (parentSnomedId.contains("M-8") || parentSnomedId.contains("M-9")) {
+			if (parentSnomedId.contains("M-8") || parentSnomedId.contains("M-9") || parentSnomedId.contains("R-") ) {
 				logger.info("M-8/9 parent " + parentSnomedId);
 				tempParent = "R-10000";
 				prefix = "R";
@@ -76,12 +76,13 @@ public class GenIdHelper {
 				logger.info("Getting id form id_base.");
 				String idbase = (String) session.selectOne("com.termmed.genid.data.IDBaseMapper.selectSnomedIdBase");
 				logger.info("ID_BASE result: " + idbase);
-				long hexValue = BaseConverterUtil.fromBase16(idbase);
-				hexValue++;
-				String incremented = BaseConverterUtil.toBase16(hexValue);
-				logger.info("ID_BASE result incremented: " + incremented);
-				session.update("com.termmed.genid.data.IDBaseMapper.updateSnomedIdBase", incremented);
-				return incremented;
+				Integer valueOfIdBaseInInteger = Integer.valueOf(idbase, 16);
+				valueOfIdBaseInInteger++;
+				String incremented = Integer.toHexString(valueOfIdBaseInInteger);
+				logger.info("ID_BASE result incremented: " + incremented.toUpperCase());
+				session.update("com.termmed.genid.data.IDBaseMapper.updateSnomedIdBase", incremented.toUpperCase());
+				String resultStr = prefix + "-"+incremented;
+				return resultStr.toUpperCase();
 			} else {
 				logger.info("Parent snomed id:" + parentSnomedId);
 				pos = parentSnomedId.indexOf('-');
