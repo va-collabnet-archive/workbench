@@ -116,7 +116,7 @@ public class CommonUtils {
 				}
 				bw.close();
 				br.close();
-
+				obr.close();
 
 				if (outputfile.exists())
 					outputfile.delete();
