@@ -118,7 +118,7 @@ public class CloneAction extends AbstractAction {
                         }
 
                         tc.construct(newSpec);
-                        ConceptChronicleBI refexConcept = Ts.get().getConcept(refex.getConceptNid());
+                        ConceptChronicleBI refexConcept = Ts.get().getConcept(refex.getRefexNid());
                         if (!refexConcept.isAnnotationStyleRefex()) {
                             Ts.get().addUncommitted(refexConcept);
                         }
