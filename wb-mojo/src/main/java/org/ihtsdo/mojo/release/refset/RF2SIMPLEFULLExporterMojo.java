@@ -2,7 +2,6 @@ package org.ihtsdo.mojo.release.refset;
 
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
-import java.util.Map;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
