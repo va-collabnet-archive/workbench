@@ -4,9 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 
+import org.apache.log4j.Logger;
+
 
 public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
 
+	private static final Logger logger = Logger.getLogger(RF2ArtifactPostExportImpl.class);
+	
 	FILE_TYPE fType;
 
 	private File rf2FullFolder;
@@ -34,6 +38,14 @@ public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
 			File rf2Exported, File rf2OutputFolder, File buildDirectory,
 			String previousReleaseDate, String releaseDate) throws IOException {
 		super();
+		
+		logger.debug("FILE TYPE: " + fType);
+		logger.debug("RF2 Full Folder: " + rf2FullFolder);
+		logger.debug("RF2 Exported: " + rf2Exported);
+		logger.debug("Previous Release Date: " + previousReleaseDate);
+		logger.debug("Release Date: " + releaseDate);
+		
+		
 		this.fType = fType;
 //		this.rf2FullFolder = new File(rf2FullFolder.getAbsolutePath() + "/org/ihtsdo/rf2");
 		this.rf2FullFolder = new File(rf2FullFolder.getAbsolutePath() );
@@ -41,25 +53,32 @@ public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
 		this.previousReleaseDate = previousReleaseDate;
 		this.releaseDate = releaseDate;
 		
+		
+		
 		folderTmp=new File(buildDirectory.getAbsolutePath() + "/" + getTmpPostExport() );
+		logger.debug("Folder TEmp: " + folderTmp.getAbsolutePath());
+		
 		if (!folderTmp.exists()){
 			folderTmp.mkdir();
 		}else{
 			//TODO empty folder needed?
 		}
 		sortedfolderTmp=new File(folderTmp.getAbsolutePath() + "/" + getTmpSort());
+		logger.debug("Sorted Temp: " + sortedfolderTmp.getAbsolutePath());
 		if (!sortedfolderTmp.exists()){
 			sortedfolderTmp.mkdir();
 		}else{
 			//TODO empty folder needed?
 		}
 		sortTmpfolderSortedTmp=new File(sortedfolderTmp.getAbsolutePath() + "/" + getTmpTmpSort());
+		logger.debug("sortTmpfolderSortedTmp: " + sortTmpfolderSortedTmp.getAbsolutePath());
 		if (!sortTmpfolderSortedTmp.exists()){
 			sortTmpfolderSortedTmp.mkdir();
 		}else{
 			//TODO empty folder needed?getTmpTmpSort
 		}
 		snapshotfolderTmp=new File(folderTmp.getAbsolutePath() + "/" + getTmpSnapShot() );
+		logger.debug("snapshotfolderTmp: " + snapshotfolderTmp.getAbsolutePath());
 		if (!snapshotfolderTmp.exists()){
 			snapshotfolderTmp.mkdir();
 		}else{
@@ -72,30 +91,38 @@ public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
 		}
 
 		rf2FullOutputFolder=new File(rf2OutputFolder.getAbsolutePath() + "/" + getFullOutputFolder() );
+		logger.debug("rf2FullOutputFolder: " + rf2FullOutputFolder.getAbsolutePath());
 		if (!rf2FullOutputFolder.exists()){
 			rf2FullOutputFolder.mkdir();
 		}else{
 			//TODO empty folder needed?
 		}
 		rf2DeltaOutputFolder=new File(rf2OutputFolder.getAbsolutePath() + "/" + getDeltaOutputFolder() );
+		logger.debug("rf2DeltaOutputFolder: " + rf2DeltaOutputFolder.getAbsolutePath());
 		if (!rf2DeltaOutputFolder.exists()){
 			rf2DeltaOutputFolder.mkdir();
 		}else{
 			//TODO empty folder needed?
 		}
 		rf2SnapshotOutputFolder=new File(rf2OutputFolder.getAbsolutePath() + "/" + getSnapshotOutputFolder() );
+		logger.debug("rf2SnapshotOutputFolder: " + rf2SnapshotOutputFolder.getAbsolutePath());
 		if (!rf2SnapshotOutputFolder.exists()){
 			rf2SnapshotOutputFolder.mkdir();
 		}else{
 			//TODO empty folder needed?
 		}
 		fullFinalFile=getFullOutputFile(rf2FullOutputFolder.getAbsolutePath(), fType,releaseDate);
+		logger.debug("fullFinalFile: " + fullFinalFile.getAbsolutePath());
 		deltaFinalFile=getDeltaOutputFile(rf2DeltaOutputFolder.getAbsolutePath(), fType,releaseDate, previousReleaseDate);
+		logger.debug("deltaFinalFile: " + deltaFinalFile.getAbsolutePath());
 		snapshotFinalFile=getSnapshotOutputFile(rf2SnapshotOutputFolder.getAbsolutePath(), fType,releaseDate);
+		logger.debug("snapshotFinalFile: " + snapshotFinalFile.getAbsolutePath());
 	}
 	public void postProcess() throws Exception{
 		File previousFile=getPreviousFile(rf2FullFolder.getAbsolutePath(),fType);
+		logger.debug("previousFile: " + previousFile.getAbsolutePath());
 		File sortedPreviousfile=new File(sortedfolderTmp,"pre_" + previousFile.getName());
+		logger.debug("sortedPreviousfile: " + sortedPreviousfile.getAbsolutePath());
 //		File filterPreviousfile=new File(sortedfolderTmp,"ftr_" + previousFile.getName());
 //		
 //		ValueAnalyzer vAnl=new ValueAnalyzer(ValueAnalyzer.OPERATOR.LOWER, releaseDate);
@@ -109,6 +136,7 @@ public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
 //		filterPreviousfile.delete();
 		
 		File sortedExportedfile=new File(sortedfolderTmp,"exp_" + rf2Exported.getName());
+		logger.debug("sortedExportedfile: " + sortedExportedfile.getAbsolutePath());
 		fsc=new FileSorter(rf2Exported, sortedExportedfile, sortTmpfolderSortedTmp, fType.getColumnIndexes());
 		fsc.execute();
 		fsc=null;
@@ -116,12 +144,14 @@ public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
 		
 		File snapshotSortedPreviousfile=new File(snapshotfolderTmp,"pre_" + previousFile.getName());
 		SnapshotGeneratorMultiColumn sg=new SnapshotGeneratorMultiColumn(sortedPreviousfile, previousReleaseDate, fType.getSnapshotIndex(), fType.getEffectiveTimeColIndex(), snapshotSortedPreviousfile, null, null);
+		logger.debug("snapshotSortedPreviousfile: " + snapshotSortedPreviousfile.getAbsolutePath());
 		sg.execute();
 		sg=null;
 		System.gc();
 
 		File snapshotSortedExportedfile=new File(snapshotfolderTmp,"exp_" + rf2Exported.getName());
 		sg=new SnapshotGeneratorMultiColumn(sortedExportedfile, releaseDate, fType.getSnapshotIndex(), fType.getEffectiveTimeColIndex(), snapshotSortedExportedfile, null, null);
+		logger.debug("snapshotSortedExportedfile: " + snapshotSortedExportedfile.getAbsolutePath());
 		sg.execute();
 		sg=null;
 		System.gc();
@@ -142,6 +172,7 @@ public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
 		hFile.add(sortedPreviousfile);
 		hFile.add(deltaFinalFile);
 
+		logger.debug("merging full final file: ");
 		CommonUtils.MergeFile(hFile,  fullFinalFile);
 		System.gc();
 		
