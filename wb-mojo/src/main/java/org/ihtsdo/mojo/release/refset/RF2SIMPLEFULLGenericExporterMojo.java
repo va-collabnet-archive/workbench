@@ -2,13 +2,14 @@ package org.ihtsdo.mojo.release.refset;
 
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
-import java.util.Map;
+import java.util.List;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.ihtsdo.mojo.maven.MojoUtil;
-import org.ihtsdo.rf2.refset.factory.RF2SimpleFullRefsetFactory;
+import org.ihtsdo.rf2.refset.factory.RF2SimpleFullRefsetGenericFactory;
+import org.ihtsdo.rf2.refset.factory.SctidUuid;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.ExportUtil;
 import org.ihtsdo.rf2.util.JAXBUtil;
@@ -16,11 +17,11 @@ import org.ihtsdo.rf2.util.JAXBUtil;
 /**
  * @author Varsha Parekh
  * 
- * @goal export-simple-full-refset
+ * @goal export-simple-full-generic-refset
  * @requiresDependencyResolution compile
  */
 
-public class RF2SIMPLEFULLExporterMojo extends AbstractMojo {
+public class RF2SIMPLEFULLGenericExporterMojo extends AbstractMojo {
 
 	/**
 	 * Location of the build directory.
@@ -45,7 +46,22 @@ public class RF2SIMPLEFULLExporterMojo extends AbstractMojo {
 	 * @required
 	 */
 	private String exportFolder;
-	
+
+	/**
+	 * Location of the exportFoler.
+	 * 
+	 * @parameter
+	 * @required
+	 */
+	private String moduleid;
+
+	/**
+	 * List of refset sctid and uuid objects
+	 * 
+	 * @parameter
+	 */
+	private List<SctidUuid> sctidUuidList;
+
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		System.setProperty("java.awt.headless", "true");
 		try {
@@ -65,12 +81,12 @@ public class RF2SIMPLEFULLExporterMojo extends AbstractMojo {
 			config.setFlushCount(10000);
 			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");
-			
+
 			// initialize ace framwork and meta hierarchy
 			ExportUtil.init();
-			
-			//Exports VTM , VMP and Non-Human
-			RF2SimpleFullRefsetFactory factory = new RF2SimpleFullRefsetFactory(config);
+
+			// Exports VTM , VMP and Non-Human
+			RF2SimpleFullRefsetGenericFactory factory = new RF2SimpleFullRefsetGenericFactory(sctidUuidList, config, moduleid);
 			factory.export();
 
 		} catch (Exception e) {
