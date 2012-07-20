@@ -16,6 +16,7 @@ import org.ihtsdo.rf2.impl.RF2AbstractImpl;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.WriteUtil;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 
 /**
  * Title: RF2DescriptionImpl Description: Iterating over all the concept in workbench and fetching all the components required by RF2 Description File Copyright: Copyright (c) 2010 Company: IHTSDO
@@ -85,14 +86,14 @@ public class RF2GenericRefsetImpl extends RF2AbstractImpl implements I_ProcessCo
 							}else{
 
 								extensionStatusId = extensionPart.getStatusNid();
-								if (extensionStatusId == activeNid) { 														
+								if (extensionStatusId == activeNid || extensionStatusId == currentNid) { 														
 									active = "1";
-								} else if (extensionStatusId == inactiveNid) { 														
+								} else if (extensionStatusId == inactiveNid || extensionStatusId == retiredNid) { 														
 									active = "0";								
 								} else {
 									System.out.println("unknown extensionStatusId =====>" + extensionStatusId);
 									logger.error("unknown extensionStatusId =====>" + extensionStatusId);
-									System.exit(0);
+									continue;
 								}
 								
 								if ((conceptid==null || conceptid.equals("")) && active.equals("1")){
