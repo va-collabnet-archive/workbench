@@ -86,8 +86,10 @@ public class RF2SIMPLEFULLGenericExporterMojo extends AbstractMojo {
 			ExportUtil.init();
 
 			// Exports VTM , VMP and Non-Human
-			RF2SimpleFullRefsetGenericFactory factory = new RF2SimpleFullRefsetGenericFactory(sctidUuidList, config, moduleid);
-			factory.export();
+			for (SctidUuid sctidUuid : sctidUuidList) {
+				RF2SimpleFullRefsetGenericFactory factory = new RF2SimpleFullRefsetGenericFactory(sctidUuid, config, moduleid);
+				factory.export();
+			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
