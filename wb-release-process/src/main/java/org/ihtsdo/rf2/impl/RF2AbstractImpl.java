@@ -39,6 +39,7 @@ import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.coordinate.PositionSet;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
@@ -108,6 +109,8 @@ public abstract class RF2AbstractImpl {
 	protected int activeNid ; //Active value	900000000000545005	
 	
 	protected int inactiveNid; //Inactive value	900000000000546006	
+	protected int inactiveRf1;
+	protected int currentRf1;
 	
 	protected String nullUuid; // null string to match with UUID.fromString("00000000-0000-0000-C000-000000000046")
 
@@ -172,7 +175,8 @@ public abstract class RF2AbstractImpl {
 			this.currentNid=tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
 			this.retiredNid=tf.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
 			this.activeNid = getNid("d12702ee-c37f-385f-a070-61d56d4d0f1f"); //Active value	900000000000545005	
-			this.inactiveNid = getNid("a5daba09-7feb-37f0-8d6d-c3cadfc7f724"); //Inactive value	900000000000546006	
+			this.inactiveNid = getNid("a5daba09-7feb-37f0-8d6d-c3cadfc7f724"); //Inactive value	900000000000546006
+			this.inactiveRf1= SnomedMetadataRf1.RETIRED_INACTIVE_STATUS_RF1.getLenient().getNid();
 			this.nullUuid="00000000-0000-0000-c000-000000000046";
 			allStatuses = getAllStatuses();
 			this.allStatusSet=tf.newIntSet();

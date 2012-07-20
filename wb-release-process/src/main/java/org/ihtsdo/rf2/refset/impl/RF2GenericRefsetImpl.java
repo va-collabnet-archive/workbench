@@ -19,7 +19,9 @@ import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 
 /**
- * Title: RF2DescriptionImpl Description: Iterating over all the concept in workbench and fetching all the components required by RF2 Description File Copyright: Copyright (c) 2010 Company: IHTSDO
+ * Title: RF2DescriptionImpl Description: Iterating over all the concept in
+ * workbench and fetching all the components required by RF2 Description File
+ * Copyright: Copyright (c) 2010 Company: IHTSDO
  * 
  * @author Varsha Parekh
  * @version 1.0
@@ -31,18 +33,20 @@ public class RF2GenericRefsetImpl extends RF2AbstractImpl implements I_ProcessCo
 	private String sctid;
 	private String uuid;
 	private String moduleid;
+
 	public RF2GenericRefsetImpl(Config config, String sctid, String uuid, String moduleid) {
 		super(config);
 		this.sctid = sctid;
 		this.uuid = uuid;
 		this.moduleid = moduleid;
-		
+
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @seeorg.dwfa.ace.api.I_ProcessConcepts#processConcept(org.dwfa.ace.api. I_GetConceptData)
+	 * @seeorg.dwfa.ace.api.I_ProcessConcepts#processConcept(org.dwfa.ace.api.
+	 * I_GetConceptData)
 	 */
 	@Override
 	public void processConcept(I_GetConceptData concept) throws Exception {
@@ -60,19 +64,18 @@ public class RF2GenericRefsetImpl extends RF2AbstractImpl implements I_ProcessCo
 
 		try {
 			String refsetId = sctid;
-			
+
 			int refsetTermAuxId = getNid(uuid);
-			
+
 			List<? extends I_ExtendByRef> extensions = tf.getAllExtensionsForComponent(concept.getNid(), true);
 
 			if (!extensions.isEmpty()) {
 				for (I_ExtendByRef extension : extensions) {
 					if (extension.getRefsetId() == refsetTermAuxId) {
-							if (extension != null) {	
+						if (extension != null) {
 							long lastVersion = Long.MIN_VALUE;
-							extensionPart=null;
-							for (I_ExtendByRefVersion loopTuple : extension.getTuples(allStatusSet,currenAceConfig.getViewPositionSetReadOnly(),
-									Precedence.PATH,currenAceConfig.getConflictResolutionStrategy())) {
+							extensionPart = null;
+							for (I_ExtendByRefVersion loopTuple : extension.getTuples(allStatusSet, currenAceConfig.getViewPositionSetReadOnly(), Precedence.PATH, currenAceConfig.getConflictResolutionStrategy())) {
 
 								if (loopTuple.getTime() >= lastVersion) {
 									lastVersion = loopTuple.getTime();
@@ -83,26 +86,25 @@ public class RF2GenericRefsetImpl extends RF2AbstractImpl implements I_ProcessCo
 								if (logger.isDebugEnabled()) {
 									logger.debug("Refset extension part not found!");
 								}
-							}else{
-
+							} else {
 								extensionStatusId = extensionPart.getStatusNid();
-								if (extensionStatusId == activeNid || extensionStatusId == currentNid) { 														
+								if (extensionStatusId == activeNid || extensionStatusId == currentNid) {
 									active = "1";
-								} else if (extensionStatusId == inactiveNid || extensionStatusId == retiredNid) { 														
-									active = "0";								
+								} else if (extensionStatusId == inactiveNid || extensionStatusId == retiredNid) {
+									active = "0";
 								} else {
 									System.out.println("unknown extensionStatusId =====>" + extensionStatusId);
 									logger.error("unknown extensionStatusId =====>" + extensionStatusId);
 									continue;
 								}
-								
-								if ((conceptid==null || conceptid.equals("")) && active.equals("1")){
-									conceptid=concept.getUids().iterator().next().toString();
+
+								if ((conceptid == null || conceptid.equals("")) && active.equals("1")) {
+									conceptid = concept.getUids().iterator().next().toString();
 								}
-								
-								if (conceptid==null || conceptid.equals("")){
+
+								if (conceptid == null || conceptid.equals("")) {
 									logger.error("Unplublished Retired Concept of Simple refset : " + concept.getUUIDs().iterator().next().toString());
-								}else {
+								} else {
 									refsetuuid = Type5UuidFactory.get(refsetId + conceptid);
 									effectiveTime = getDateFormat().format(new Date(extensionPart.getTime()));
 									writeRF2TypeLine(refsetuuid, effectiveTime, active, moduleid, refsetId, conceptid);

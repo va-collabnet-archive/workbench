@@ -22,25 +22,25 @@ import org.ihtsdo.rf2.util.Config;
 public class RF2SimpleFullRefsetGenericFactory extends RF2AbstractFactory {
 
 	private static Logger logger = Logger.getLogger(RF2SimpleFullRefsetGenericFactory.class);
-	private List<SctidUuid> sctidUuidMap;
+	private String sctid;
+	private String uuid;
 	private String moduleid;
 
-	public RF2SimpleFullRefsetGenericFactory(List<SctidUuid> sctidUuid, Config config, String moduleid) {
+	public RF2SimpleFullRefsetGenericFactory(SctidUuid sctidUuid, Config config, String moduleid) {
 		super(config);
-		this.sctidUuidMap = sctidUuid;
+		this.sctid = sctidUuid.getSctid();
+		this.uuid = sctidUuid.getUuid();
 		this.moduleid = moduleid;
 	}
 
 	public void export() {
 
 		try {
-			for (SctidUuid sctid : sctidUuidMap) {
-				logger.info("Started Simple Refset Export ...");
-				RF2GenericRefsetImpl vtmUSIterator = new RF2GenericRefsetImpl(getConfig(), sctid.getSctid(), sctid.getUuid(), moduleid);
-				Terms.get().iterateConcepts(vtmUSIterator);
-				logger.info("Finished Simple Refset Export.");
-				closeExportFileWriter();
-			}
+			logger.info("Started Simple Refset Export ...");
+			RF2GenericRefsetImpl vtmUSIterator = new RF2GenericRefsetImpl(getConfig(), sctid, uuid, moduleid);
+			Terms.get().iterateConcepts(vtmUSIterator);
+			logger.info("Finished Simple Refset Export.");
+			closeExportFileWriter();
 		} catch (IOException e) {
 			logger.error(e.getMessage());
 		} catch (Exception e) {
