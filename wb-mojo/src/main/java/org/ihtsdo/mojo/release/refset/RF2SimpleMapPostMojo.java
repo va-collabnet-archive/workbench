@@ -79,8 +79,7 @@ public class RF2SimpleMapPostMojo extends AbstractMojo {
 			// set all the values passed via mojo
 			config.setOutputFolderName(exportFolder);
 			config.setFileExtension("txt");
-			File simpleMapFileName = new File(exportFolder, 
-					config.getExportFileName() + releaseDate + "." + config.getFileExtension());
+			File simpleMapFileName = new File(exportFolder, config.getExportFileName() + releaseDate + "." + config.getFileExtension());
 			
 			RF2ArtifactPostExportImpl pExp=new RF2ArtifactPostExportImpl(FILE_TYPE.RF2_SIMPLE_MAP, new File( rf2FullFolder),
 					simpleMapFileName, new File(outputFolder), targetDirectory,
