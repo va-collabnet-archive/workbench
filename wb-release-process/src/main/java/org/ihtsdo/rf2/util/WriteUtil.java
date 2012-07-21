@@ -21,7 +21,7 @@ public class WriteUtil {
 	}
 
 	public static BufferedWriter createWriter(String fileName) throws UnsupportedEncodingException, FileNotFoundException {
-
+		logger.info("WRITER UTIL FILE NAME: " + fileName);
 		FileOutputStream os = new FileOutputStream(new File(fileName));
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os, "UTF8"), (1 * 1024));
 

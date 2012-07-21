@@ -48,7 +48,7 @@ public class RF2FileRetrieve {
 	private String relationshipAuxiliaryFile = "";
 	private String statedRelationshipAuxiliaryFile = "";
 
-	private String refsetReviewStatusFile="";
+	private String refsetReviewStatusFile = "";
 
 	private static final String ATTRIBUTEVALUE_FILENAME_PART = "_crefset_attributevaluefull_";
 	private static final String END_FILE = ".txt";
@@ -67,6 +67,7 @@ public class RF2FileRetrieve {
 	private static final String REFSETDESCRIPTOR_FILENAME_PART = "_ccirefset_refsetdescriptorfull_";
 	private static final String MODULEDEPENDENCY_FILENAME_PART = "_ssrefset_moduledependencyfull_";
 	private static final String ICD9_CROSSMAP_FILENAME_PART = "_iissscrefset_complexmapfull_";
+
 	public RF2FileRetrieve(String releaseFolder) throws Exception {
 		super();
 		this.releaseFolder = releaseFolder;
@@ -80,45 +81,44 @@ public class RF2FileRetrieve {
 			if (file.isDirectory()) {
 				getFiles(file);
 			} else {
-				if(!file.isHidden() && file.getName().endsWith(END_FILE)){
-					if(file.getName().toLowerCase().contains(ATTRIBUTEVALUE_FILENAME_PART)){
+				if (!file.isHidden() && file.getName().endsWith(END_FILE)) {
+					if (file.getName().toLowerCase().contains(ATTRIBUTEVALUE_FILENAME_PART)) {
 						attributeValueFile = file.getAbsolutePath();
-					}else if(file.getName().toLowerCase().contains(ASSOCIATION_FILENAME_PART)){
+					} else if (file.getName().toLowerCase().contains(ASSOCIATION_FILENAME_PART)) {
 						associationFile = file.getAbsolutePath();
-					}else if(file.getName().toLowerCase().contains(LANGUAGE_FILENAME_PART)){
+					} else if (file.getName().toLowerCase().contains(LANGUAGE_FILENAME_PART)) {
 						languageFile = file.getAbsolutePath();
-					}else if(file.getName().toLowerCase().contains(IDENTIFIER_FILENAME_PART)){
+					} else if (file.getName().toLowerCase().contains(IDENTIFIER_FILENAME_PART)) {
 						identifierFile = file.getAbsolutePath();
-					}else if(file.getName().toLowerCase().contains(SIMPLEMAP_FILENAME_PART)){
+					} else if (file.getName().toLowerCase().contains(SIMPLEMAP_FILENAME_PART)) {
 						simpleMapFile = file.getAbsolutePath();
-					}else if(file.getName().toLowerCase().contains(REVIEWSTATUS_FILENAME_PART)){
+					} else if (file.getName().toLowerCase().contains(REVIEWSTATUS_FILENAME_PART)) {
 						refsetReviewStatusFile = file.getAbsolutePath();
-					}else if(file.getName().toLowerCase().contains(CONCEPT_FILENAME_PART)){
+					} else if (file.getName().toLowerCase().contains(CONCEPT_FILENAME_PART)) {
 						conceptFile = file.getAbsolutePath();
-					}else if(file.getName().toLowerCase().contains(DESCRIPTION_FILENAME_PART)){
+					} else if (file.getName().toLowerCase().contains(DESCRIPTION_FILENAME_PART)) {
 						descriptionFile = file.getAbsolutePath();
-					}else if(file.getName().toLowerCase().contains(RELATIONSHIP_FILENAME_PART)){
+					} else if (file.getName().toLowerCase().contains(RELATIONSHIP_FILENAME_PART)) {
 						relationshipFile = file.getAbsolutePath();
-					}else if(file.getName().toLowerCase().contains(STATEDRELATIONSHIP_FILENAME_PART)){
+					} else if (file.getName().toLowerCase().contains(STATEDRELATIONSHIP_FILENAME_PART)) {
 						statedRelationshipFile = file.getAbsolutePath();
-					}else if(file.getName().toLowerCase().contains(REFSETSIMPLE_FILENAME_PART)){
+					} else if (file.getName().toLowerCase().contains(REFSETSIMPLE_FILENAME_PART)) {
 						refsetSimpleFile = file.getAbsolutePath();
-					}else if(file.getName().toLowerCase().contains(TEXTDEFINITION_FILENAME_PART)){
+					} else if (file.getName().toLowerCase().contains(TEXTDEFINITION_FILENAME_PART)) {
 						textDefinitionFile = file.getAbsolutePath();
-					}else if(file.getName().toLowerCase().contains(DESCRIPTIONTYPE_FILENAME_PART)){
+					} else if (file.getName().toLowerCase().contains(DESCRIPTIONTYPE_FILENAME_PART)) {
 						descriptionTypeFile = file.getAbsolutePath();
-					}else if(file.getName().toLowerCase().contains(REFSETDESCRIPTOR_FILENAME_PART)){
+					} else if (file.getName().toLowerCase().contains(REFSETDESCRIPTOR_FILENAME_PART)) {
 						refsetDescriptorFile = file.getAbsolutePath();
-					}else if(file.getName().toLowerCase().contains(MODULEDEPENDENCY_FILENAME_PART)){
+					} else if (file.getName().toLowerCase().contains(MODULEDEPENDENCY_FILENAME_PART)) {
 						moduleDependencyFile = file.getAbsolutePath();
-					}else if(file.getName().toLowerCase().contains(ICD9_CROSSMAP_FILENAME_PART)){
+					} else if (file.getName().toLowerCase().contains(ICD9_CROSSMAP_FILENAME_PART)) {
 						ICD9CrossMapFile = file.getAbsolutePath();
 					}
 				}
 			}
 		}
 	}
-
 
 	/**
 	 * @return the releaseFolder
