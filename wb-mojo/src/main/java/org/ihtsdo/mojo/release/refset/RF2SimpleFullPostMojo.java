@@ -1,19 +1,16 @@
 package org.ihtsdo.mojo.release.refset;
 
 import java.io.File;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
+import org.apache.log4j.Logger;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.ihtsdo.rf2.core.factory.RF2ConceptFactory;
-import org.ihtsdo.rf2.postexport.RF2ArtifactPostExportImpl;
 import org.ihtsdo.rf2.postexport.RF2ArtifactPostExportAbst.FILE_TYPE;
+import org.ihtsdo.rf2.postexport.RF2ArtifactPostExportImpl;
 import org.ihtsdo.rf2.util.Config;
-import org.ihtsdo.rf2.util.ExportUtil;
 import org.ihtsdo.rf2.util.JAXBUtil;
+
 
 /**
  * @author Alo
@@ -23,7 +20,7 @@ import org.ihtsdo.rf2.util.JAXBUtil;
  */
 
 public class RF2SimpleFullPostMojo extends AbstractMojo {
-
+	private static final Logger logger = Logger.getLogger(RF2SimpleFullPostMojo.class);
 	/**
 	 * Location of the build directory.
 	 * 
@@ -76,13 +73,14 @@ public class RF2SimpleFullPostMojo extends AbstractMojo {
 
 		try {
 			Config config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/simpleFullRefset.xml");
-
+			logger.info("\n\nExecuting simple full refset export");
 			// set all the values passed via mojo
 			config.setOutputFolderName(exportFolder);
+			logger.info("Output folder "  + exportFolder);
 			config.setFileExtension("txt");
 			File simpleFileName = new File(exportFolder, 
 					config.getExportFileName() + releaseDate + "." + config.getFileExtension());
-			
+			logger.info("Simple file name: " + simpleFileName.getAbsolutePath());
 			RF2ArtifactPostExportImpl pExp=new RF2ArtifactPostExportImpl(FILE_TYPE.RF2_SIMPLE, new File( rf2FullFolder),
 					simpleFileName, new File(outputFolder), targetDirectory,
 					 previousReleaseDate, releaseDate);
