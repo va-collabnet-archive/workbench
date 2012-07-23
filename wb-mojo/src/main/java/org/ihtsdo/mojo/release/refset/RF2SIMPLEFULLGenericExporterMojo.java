@@ -4,10 +4,12 @@ import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.ihtsdo.mojo.maven.MojoUtil;
+import org.ihtsdo.rf2.factory.RF2AbstractFactory;
 import org.ihtsdo.rf2.refset.factory.RF2SimpleFullRefsetGenericFactory;
 import org.ihtsdo.rf2.refset.factory.SctidUuid;
 import org.ihtsdo.rf2.util.Config;
@@ -62,6 +64,8 @@ public class RF2SIMPLEFULLGenericExporterMojo extends AbstractMojo {
 	 */
 	private List<SctidUuid> sctidUuidList;
 
+	private static Logger logger = Logger.getLogger(RF2SIMPLEFULLGenericExporterMojo.class);
+	
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		System.setProperty("java.awt.headless", "true");
 		try {
@@ -73,11 +77,14 @@ public class RF2SIMPLEFULLGenericExporterMojo extends AbstractMojo {
 				throw new MojoExecutionException(e.getLocalizedMessage(), e);
 			}
 
+			logger.info("\n\nExecuting Generic export rf2 simple full");
 			Config config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/simpleFullRefset.xml");
 
 			// set all the values passed via mojo
 			config.setOutputFolderName(exportFolder);
+			logger.info("Export Folder: " + exportFolder);
 			config.setReleaseDate(releaseDate);
+			logger.info("Release Date: " + releaseDate);
 			config.setFlushCount(10000);
 			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");
@@ -87,9 +94,11 @@ public class RF2SIMPLEFULLGenericExporterMojo extends AbstractMojo {
 
 			// Exports VTM , VMP and Non-Human
 			for (SctidUuid sctidUuid : sctidUuidList) {
+				logger.info("Generating rf2SimpleFull refset: ");
 				RF2SimpleFullRefsetGenericFactory factory = new RF2SimpleFullRefsetGenericFactory(sctidUuid, config, moduleid);
 				factory.export();
 			}
+			RF2AbstractFactory.closeExportFileWriter();
 
 		} catch (Exception e) {
 			e.printStackTrace();
