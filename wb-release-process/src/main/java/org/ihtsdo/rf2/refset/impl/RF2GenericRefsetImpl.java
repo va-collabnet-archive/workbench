@@ -13,6 +13,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.rf2.impl.RF2AbstractImpl;
+import org.ihtsdo.rf2.refset.factory.SctidUuid;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.WriteUtil;
 import org.ihtsdo.tk.api.Precedence;
@@ -30,14 +31,12 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 public class RF2GenericRefsetImpl extends RF2AbstractImpl implements I_ProcessConcepts {
 
 	private static Logger logger = Logger.getLogger(RF2GenericRefsetImpl.class);
-	private String sctid;
-	private String uuid;
+	private List<SctidUuid> sctidUuidList;
 	private String moduleid;
 
-	public RF2GenericRefsetImpl(Config config, String sctid, String uuid, String moduleid) {
+	public RF2GenericRefsetImpl(Config config, List<SctidUuid> sctidUuidList, String moduleid) {
 		super(config);
-		this.sctid = sctid;
-		this.uuid = uuid;
+		this.sctidUuidList = sctidUuidList;
 		this.moduleid = moduleid;
 
 	}
@@ -62,67 +61,70 @@ public class RF2GenericRefsetImpl extends RF2AbstractImpl implements I_ProcessCo
 		UUID refsetuuid = null;
 		int extensionStatusId = 0;
 
-		try {
-			String refsetId = sctid;
+		for (SctidUuid sctIdUuid : sctidUuidList) {
+			try {
 
-			int refsetTermAuxId = getNid(uuid);
+				String refsetId = sctIdUuid.getSctid();
 
-			List<? extends I_ExtendByRef> extensions = tf.getAllExtensionsForComponent(concept.getNid(), true);
-			logger.info("CONCEPT: " + concept.getInitialText());
-			logger.info("Extensions Size: " + extensions.size());
-			if (!extensions.isEmpty()) {
-				for (I_ExtendByRef extension : extensions) {
-					if (extension.getRefsetId() == refsetTermAuxId) {
-						if (extension != null) {
-							long lastVersion = Long.MIN_VALUE;
-							extensionPart = null;
-							for (I_ExtendByRefVersion loopTuple : extension.getTuples(allStatusSet, currenAceConfig.getViewPositionSetReadOnly(), Precedence.PATH, currenAceConfig.getConflictResolutionStrategy())) {
+				int refsetTermAuxId = getNid(sctIdUuid.getUuid());
 
-								if (loopTuple.getTime() >= lastVersion) {
-									lastVersion = loopTuple.getTime();
-									extensionPart = (I_ExtendByRefPartCid) loopTuple.getMutablePart();
+				List<? extends I_ExtendByRef> extensions = tf.getAllExtensionsForComponent(concept.getNid(), true);
+				logger.info("CONCEPT: " + concept.getInitialText());
+				logger.info("Extensions Size: " + extensions.size());
+				if (!extensions.isEmpty()) {
+					for (I_ExtendByRef extension : extensions) {
+						if (extension.getRefsetId() == refsetTermAuxId) {
+							if (extension != null) {
+								long lastVersion = Long.MIN_VALUE;
+								extensionPart = null;
+								for (I_ExtendByRefVersion loopTuple : extension.getTuples(allStatusSet, currenAceConfig.getViewPositionSetReadOnly(), Precedence.PATH, currenAceConfig.getConflictResolutionStrategy())) {
+
+									if (loopTuple.getTime() >= lastVersion) {
+										lastVersion = loopTuple.getTime();
+										extensionPart = (I_ExtendByRefPartCid) loopTuple.getMutablePart();
+									}
 								}
-							}
-							if (extensionPart == null) {
-								if (logger.isDebugEnabled()) {
-									logger.debug("Refset extension part not found!");
-								}
-							} else {
-								extensionStatusId = extensionPart.getStatusNid();
-								if (extensionStatusId == activeNid || extensionStatusId == currentNid) {
-									active = "1";
-								} else if (extensionStatusId == inactiveNid || extensionStatusId == retiredNid) {
-									active = "0";
+								if (extensionPart == null) {
+									if (logger.isDebugEnabled()) {
+										logger.debug("Refset extension part not found!");
+									}
 								} else {
-									System.out.println("unknown extensionStatusId =====>" + extensionStatusId);
-									logger.error("unknown extensionStatusId =====>" + extensionStatusId);
-									continue;
-								}
+									extensionStatusId = extensionPart.getStatusNid();
+									if (extensionStatusId == activeNid || extensionStatusId == currentNid) {
+										active = "1";
+									} else if (extensionStatusId == inactiveNid || extensionStatusId == retiredNid) {
+										active = "0";
+									} else {
+										System.out.println("unknown extensionStatusId =====>" + extensionStatusId);
+										logger.error("unknown extensionStatusId =====>" + extensionStatusId);
+										continue;
+									}
 
-								if ((conceptid == null || conceptid.equals("")) && active.equals("1")) {
-									conceptid = concept.getUids().iterator().next().toString();
-								}
+									if ((conceptid == null || conceptid.equals("")) && active.equals("1")) {
+										conceptid = concept.getUids().iterator().next().toString();
+									}
 
-								if (conceptid == null || conceptid.equals("")) {
-									logger.error("Unplublished Retired Concept of Simple refset : " + concept.getUUIDs().iterator().next().toString());
-								} else {
-									refsetuuid = Type5UuidFactory.get(refsetId + conceptid);
-									effectiveTime = getDateFormat().format(new Date(extensionPart.getTime()));
-									writeRF2TypeLine(refsetuuid, effectiveTime, active, moduleid, refsetId, conceptid);
+									if (conceptid == null || conceptid.equals("")) {
+										logger.error("Unplublished Retired Concept of Simple refset : " + concept.getUUIDs().iterator().next().toString());
+									} else {
+										refsetuuid = Type5UuidFactory.get(refsetId + conceptid);
+										effectiveTime = getDateFormat().format(new Date(extensionPart.getTime()));
+										writeRF2TypeLine(refsetuuid, effectiveTime, active, moduleid, refsetId, conceptid);
+									}
 								}
 							}
 						}
 					}
 				}
+			} catch (IOException e) {
+				logger.error("IOExceptions: " + e.getMessage());
+				e.printStackTrace();
+			} catch (Exception e) {
+				logger.error("Exceptions in exportDescription: " + e.getMessage());
+				logger.error(conceptid);
+				e.printStackTrace();
+				System.exit(0);
 			}
-		} catch (IOException e) {
-			logger.error("IOExceptions: " + e.getMessage());
-			e.printStackTrace();
-		} catch (Exception e) {
-			logger.error("Exceptions in exportDescription: " + e.getMessage());
-			logger.error(conceptid);
-			e.printStackTrace();
-			System.exit(0);
 		}
 	}
 
