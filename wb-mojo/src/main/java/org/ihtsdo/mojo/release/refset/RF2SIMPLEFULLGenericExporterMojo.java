@@ -65,7 +65,7 @@ public class RF2SIMPLEFULLGenericExporterMojo extends AbstractMojo {
 	private List<SctidUuid> sctidUuidList;
 
 	private static Logger logger = Logger.getLogger(RF2SIMPLEFULLGenericExporterMojo.class);
-	
+
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		System.setProperty("java.awt.headless", "true");
 		try {
@@ -93,13 +93,9 @@ public class RF2SIMPLEFULLGenericExporterMojo extends AbstractMojo {
 			ExportUtil.init();
 
 			// Exports VTM , VMP and Non-Human
-			for (SctidUuid sctidUuid : sctidUuidList) {
-				logger.info("Generating rf2SimpleFull refset: ");
-				RF2SimpleFullRefsetGenericFactory factory = new RF2SimpleFullRefsetGenericFactory(sctidUuid, config, moduleid);
-				factory.export();
-			}
-			RF2AbstractFactory.closeExportFileWriter();
-
+			logger.info("Generating rf2SimpleFull refset: ");
+			RF2SimpleFullRefsetGenericFactory factory = new RF2SimpleFullRefsetGenericFactory(sctidUuidList, config, moduleid);
+			factory.export();
 		} catch (Exception e) {
 			e.printStackTrace();
 			e.getMessage();
