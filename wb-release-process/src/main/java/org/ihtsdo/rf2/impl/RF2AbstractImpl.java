@@ -27,9 +27,13 @@ import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.concept.component.refsetmember.cid.CidMember;
+import org.ihtsdo.concept.component.refsetmember.cid.CidRevision;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.ExportUtil;
@@ -38,13 +42,10 @@ import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.PositionSet;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
-import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.ihtsdo.concept.component.refsetmember.cid.CidMember;
-import org.ihtsdo.concept.component.refsetmember.cid.CidRevision;
 
 public abstract class RF2AbstractImpl {
 
@@ -57,7 +58,7 @@ public abstract class RF2AbstractImpl {
 	private static Logger logger = Logger.getLogger(RF2AbstractImpl.class);
 
 	private int dupRecord;
-	private int metadataCount=0;
+	private int metadataCount = 0;
 	// CORE CONSTANTS
 	private int rootNid;
 	private int isaNid;
@@ -88,12 +89,12 @@ public abstract class RF2AbstractImpl {
 
 	private I_GetConceptData snomedRoot;
 	private I_GetConceptData device;
-	
-	private I_GetConceptData snomedCTModelComponent;	
+
+	private I_GetConceptData snomedCTModelComponent;
 	private I_GetConceptData coreMetaConceptRoot;
 	private I_GetConceptData foundationMetaDataConceptRoot;
 	private I_GetConceptData validStatusCpt;
-	
+
 	protected I_IntSet allStatusSet;
 
 	protected int preferredNid;
@@ -102,17 +103,18 @@ public abstract class RF2AbstractImpl {
 
 	protected int currentNid;
 
-	protected int retiredNid;	
-	
+	protected int retiredNid;
+
 	protected int reviewStatusRefsetNid;
-	
-	protected int activeNid ; //Active value	900000000000545005	
-	
-	protected int inactiveNid; //Inactive value	900000000000546006	
+
+	protected int activeNid; // Active value 900000000000545005
+
+	protected int inactiveNid; // Inactive value 900000000000546006
 	protected int inactiveRf1;
 	protected int currentRf1;
-	
-	protected String nullUuid; // null string to match with UUID.fromString("00000000-0000-0000-C000-000000000046")
+
+	protected String nullUuid; // null string to match with
+								// UUID.fromString("00000000-0000-0000-C000-000000000046")
 
 	private int activeStatus;
 
@@ -133,7 +135,7 @@ public abstract class RF2AbstractImpl {
 	public void incrementDupRecord() {
 		dupRecord++;
 	}
-	
+
 	public void incrementMetaDataCount() {
 		metadataCount++;
 	}
@@ -145,11 +147,10 @@ public abstract class RF2AbstractImpl {
 	public int getMetaDataCount() {
 		return metadataCount;
 	}
-	
+
 	public KnowledgeBase getKbase() {
 		return kbase;
 	}
-
 
 	public RF2AbstractImpl(Config config) {
 
@@ -161,35 +162,39 @@ public abstract class RF2AbstractImpl {
 			this.tf = Terms.get();
 			this.currenAceConfig = tf.getActiveAceFrameConfig();
 			reviewStatusRefsetNid = getNid(I_Constants.GMDN_REVIEW_STATUS_REFSET_UID);
-			validStatusCpt= tf.getConcept(UUID.fromString(I_Constants.VALID_STATUS_TO_EXPORT_UUID));
+			validStatusCpt = tf.getConcept(UUID.fromString(I_Constants.VALID_STATUS_TO_EXPORT_UUID));
 			snomedIntId = tf.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids());
 			snomedRoot = tf.getConcept(UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8"));
 			device = tf.getConcept(UUID.fromString("6e8f5d95-0505-3aa8-a730-e1e9d821e4aa"));
-			
+
 			snomedCTModelComponent = tf.getConcept(UUID.fromString("a60bd881-9010-3260-9653-0c85716b4391"));
 			coreMetaConceptRoot = tf.getConcept(UUID.fromString("4c6d8b0b-774a-341e-b0e5-1fc2deedb5a5"));
 			foundationMetaDataConceptRoot = tf.getConcept(UUID.fromString("f328cdec-6198-36c4-9c55-d7f4f5b30922"));
-			
-			this.preferredNid=tf.uuidToNative(UUID.fromString("266f1bc3-3361-39f3-bffe-69db9daea56e"));
-			this.acceptableNid=tf.uuidToNative(UUID.fromString("12b9e103-060e-3256-9982-18c1191af60e"));
-			this.currentNid=tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
-			this.retiredNid=tf.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
-			this.activeNid = getNid("d12702ee-c37f-385f-a070-61d56d4d0f1f"); //Active value	900000000000545005	
-			this.inactiveNid = getNid("a5daba09-7feb-37f0-8d6d-c3cadfc7f724"); //Inactive value	900000000000546006
-			this.inactiveRf1= SnomedMetadataRf1.RETIRED_INACTIVE_STATUS_RF1.getLenient().getNid();
-			this.nullUuid="00000000-0000-0000-c000-000000000046";
+
+			this.preferredNid = tf.uuidToNative(UUID.fromString("266f1bc3-3361-39f3-bffe-69db9daea56e"));
+			this.acceptableNid = tf.uuidToNative(UUID.fromString("12b9e103-060e-3256-9982-18c1191af60e"));
+			this.currentNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+			this.retiredNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
+			this.activeNid = getNid("d12702ee-c37f-385f-a070-61d56d4d0f1f"); // Active
+																				// value
+																				// 900000000000545005
+			this.inactiveNid = getNid("a5daba09-7feb-37f0-8d6d-c3cadfc7f724"); // Inactive
+																				// value
+																				// 900000000000546006
+			this.inactiveRf1 = SnomedMetadataRf1.RETIRED_INACTIVE_STATUS_RF1.getLenient().getNid();
+			this.nullUuid = "00000000-0000-0000-c000-000000000046";
 			allStatuses = getAllStatuses();
-			this.allStatusSet=tf.newIntSet();
+			this.allStatusSet = tf.newIntSet();
 			this.allStatusSet.addAll(allStatuses.getSetValues());
 
-			this.activeStatus=tf.uuidToNative(UUID.fromString("d12702ee-c37f-385f-a070-61d56d4d0f1f"));
-			this.activeStatusSet=tf.newIntSet();
+			this.activeStatus = tf.uuidToNative(UUID.fromString("d12702ee-c37f-385f-a070-61d56d4d0f1f"));
+			this.activeStatusSet = tf.newIntSet();
 			this.activeStatusSet.add(activeStatus);
-			
+
 			allDescTypes = getAllDescTypes();
-			descTypes=tf.newIntSet();
-			descTypes=getDescTypes();
-			textDefinTypes=tf.newIntSet();
+			descTypes = tf.newIntSet();
+			descTypes = getDescTypes();
+			textDefinTypes = tf.newIntSet();
 			textDefinTypes.add(tf.uuidToNative(UUID.fromString("700546a3-09c7-3fc2-9eb9-53d318659a09")));
 			setupCoreNids();
 		} catch (TerminologyException e) {
@@ -198,25 +203,30 @@ public abstract class RF2AbstractImpl {
 			e.printStackTrace();
 		}
 
-		//		if (config.getInvokeDroolRules().equals("true")) {
-		//			// drools knowlegebase
-		//			final KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
+		// if (config.getInvokeDroolRules().equals("true")) {
+		// // drools knowlegebase
+		// final KnowledgeBuilder kbuilder =
+		// KnowledgeBuilderFactory.newKnowledgeBuilder();
 		//
-		//			// this will parse and compile in one step
-		//			kbuilder.add(ResourceFactory.newClassPathResource(getConfig().getDroolsDrlFile(), RF2ConceptFactory.class), ResourceType.DRL);
+		// // this will parse and compile in one step
+		// kbuilder.add(ResourceFactory.newClassPathResource(getConfig().getDroolsDrlFile(),
+		// RF2ConceptFactory.class), ResourceType.DRL);
 		//
-		//			// Check the builder for errors
-		//			if (kbuilder.hasErrors()) {
-		//				logger.error(kbuilder.getErrors().toString());
-		//				throw new RuntimeException("Unable to compile \"" + getConfig().getDroolsDrlFile() + " \".");
-		//			}
+		// // Check the builder for errors
+		// if (kbuilder.hasErrors()) {
+		// logger.error(kbuilder.getErrors().toString());
+		// throw new RuntimeException("Unable to compile \"" +
+		// getConfig().getDroolsDrlFile() + " \".");
+		// }
 		//
-		//			// get the compiled packages (which are serializable)
-		//			final Collection<KnowledgePackage> pkgs = kbuilder.getKnowledgePackages();
+		// // get the compiled packages (which are serializable)
+		// final Collection<KnowledgePackage> pkgs =
+		// kbuilder.getKnowledgePackages();
 		//
-		//			// add the packages to a knowledgebase (deploy the knowledge // packages).
-		//			kbase.addKnowledgePackages(pkgs);
-		//		}
+		// // add the packages to a knowledgebase (deploy the knowledge //
+		// packages).
+		// kbase.addKnowledgePackages(pkgs);
+		// }
 	}
 
 	private NidSetBI getDescTypes() throws TerminologyException, IOException {
@@ -255,7 +265,8 @@ public abstract class RF2AbstractImpl {
 	}
 
 	/*
-	 * public static String getModuleID(String snomedIntegerId) { return ExportUtil.getModuleID(snomedIntegerId); }
+	 * public static String getModuleID(String snomedIntegerId) { return
+	 * ExportUtil.getModuleID(snomedIntegerId); }
 	 */
 	public void closeFileWriter(BufferedWriter bw) throws IOException {
 		if (bw != null)
@@ -265,41 +276,39 @@ public abstract class RF2AbstractImpl {
 	public String getMetaModuleID(I_GetConceptData concept) throws TerminologyException, IOException {
 		return ExportUtil.getMetaModuleID(concept);
 	}
-	
+
 	public Long getLatestActivePart(List<I_RelPart> parts) throws Exception {
 		return ExportUtil.getLatestActivePart(parts);
 	}
-	
 
 	public String getRefinabilityStatusType(int status) throws TerminologyException, IOException {
 		return ExportUtil.getRefinabilityStatusType(status);
 	}
-	
-	public boolean insertSctId(int componentNid  ,Config config, String wbSctId, int pathNid, int statusNid, long effectiveDate) throws Exception {
-		return ExportUtil.insertSctId(componentNid , getConfig(), wbSctId , pathNid , statusNid , effectiveDate);
+
+	public boolean insertSctId(int componentNid, Config config, String wbSctId, int pathNid, int statusNid, long effectiveDate) throws Exception {
+		return ExportUtil.insertSctId(componentNid, getConfig(), wbSctId, pathNid, statusNid, effectiveDate);
 	}
-	
-	
-	public boolean insertSnomedId(int componentNid  ,Config config, String wbSctId, int pathNid, int statusNid, long effectiveDate) throws Exception {
-		return ExportUtil.insertSnomedId(componentNid , getConfig(), wbSctId , pathNid , statusNid , effectiveDate);
-	}	
-	
-	public boolean insertCtv3Id(int componentNid  ,Config config, String wbSctId, int pathNid, int statusNid, long effectiveDate) throws Exception {
-		return ExportUtil.insertCtv3Id(componentNid , getConfig(), wbSctId , pathNid , statusNid , effectiveDate);
+
+	public boolean insertSnomedId(int componentNid, Config config, String wbSctId, int pathNid, int statusNid, long effectiveDate) throws Exception {
+		return ExportUtil.insertSnomedId(componentNid, getConfig(), wbSctId, pathNid, statusNid, effectiveDate);
 	}
-		
-	public boolean insertSctId(int componentNid  ,Config config, String wbSctId, int pathNid, int statusNid) throws Exception {
-		return ExportUtil.insertSctId(componentNid , getConfig(), wbSctId , pathNid , statusNid);
-	}	
-	
-	public boolean insertSnomedId(int componentNid  ,Config config, String wbSctId, int pathNid, int statusNid) throws Exception {
-		return ExportUtil.insertSnomedId(componentNid , getConfig(), wbSctId , pathNid , statusNid );
-	}	
-	
-	public boolean insertCtv3Id(int componentNid  ,Config config, String wbSctId, int pathNid, int statusNid) throws Exception {
-		return ExportUtil.insertCtv3Id(componentNid , getConfig(), wbSctId , pathNid , statusNid );
+
+	public boolean insertCtv3Id(int componentNid, Config config, String wbSctId, int pathNid, int statusNid, long effectiveDate) throws Exception {
+		return ExportUtil.insertCtv3Id(componentNid, getConfig(), wbSctId, pathNid, statusNid, effectiveDate);
 	}
-	
+
+	public boolean insertSctId(int componentNid, Config config, String wbSctId, int pathNid, int statusNid) throws Exception {
+		return ExportUtil.insertSctId(componentNid, getConfig(), wbSctId, pathNid, statusNid);
+	}
+
+	public boolean insertSnomedId(int componentNid, Config config, String wbSctId, int pathNid, int statusNid) throws Exception {
+		return ExportUtil.insertSnomedId(componentNid, getConfig(), wbSctId, pathNid, statusNid);
+	}
+
+	public boolean insertCtv3Id(int componentNid, Config config, String wbSctId, int pathNid, int statusNid) throws Exception {
+		return ExportUtil.insertCtv3Id(componentNid, getConfig(), wbSctId, pathNid, statusNid);
+	}
+
 	public String getConceptInactivationStatusType(int status) throws TerminologyException, IOException {
 		return ExportUtil.getConceptInactivationStatusType(status);
 	}
@@ -349,18 +358,16 @@ public abstract class RF2AbstractImpl {
 	}
 
 	public String getSNOMEDID(Config config, UUID componentUuid, String parentSnomedId) throws Exception {
-		return ExportUtil.getSNOMEDID(config ,componentUuid, parentSnomedId);
+		return ExportUtil.getSNOMEDID(config, componentUuid, parentSnomedId);
 	}
-	
+
 	public String getCTV3ID(Config config, UUID componentUuid) throws Exception {
-		return ExportUtil.getCTV3ID(config ,componentUuid);
+		return ExportUtil.getCTV3ID(config, componentUuid);
 	}
-	
-	public  Set<I_GetConceptData>  getParentLocal(Set<I_GetConceptData> parents, I_GetConceptData concept) throws Exception {
-		return ExportUtil.getParentLocal(parents ,concept);
+
+	public Set<I_GetConceptData> getParentLocal(Set<I_GetConceptData> parents, I_GetConceptData concept) throws Exception {
+		return ExportUtil.getParentLocal(parents, concept);
 	}
-	
-	
 
 	public int getNid(String struuid) throws TerminologyException, IOException {
 		return ExportUtil.getNid(struuid);
@@ -377,7 +384,7 @@ public abstract class RF2AbstractImpl {
 	public int getSnorocketAuthorNid() {
 		return ExportUtil.getSnorocketAuthorNid();
 	}
-	
+
 	public int getUserAuthorNid() {
 		return ExportUtil.getUserAuthorNid();
 	}
@@ -394,16 +401,14 @@ public abstract class RF2AbstractImpl {
 		return ExportUtil.isOnPath(onPath, nid);
 	}
 
-	
 	public String getParentSnomedId(I_GetConceptData concept) throws Exception {
 		return ExportUtil.getParentSnomedId(concept);
 	}
-	
-	//Get the sctid for the given UUID
-	public String getSCTId(Config config, UUID componentUuid, Integer namespaceId, String partitionId, String releaseId, String executionId, String moduleId) throws IOException, TerminologyException {
-		return ExportUtil.getSCTId( config,  componentUuid,  namespaceId,  partitionId,  releaseId,  executionId,  moduleId);
-	}
 
+	// Get the sctid for the given UUID
+	public String getSCTId(Config config, UUID componentUuid, Integer namespaceId, String partitionId, String releaseId, String executionId, String moduleId) throws IOException, TerminologyException {
+		return ExportUtil.getSCTId(config, componentUuid, namespaceId, partitionId, releaseId, executionId, moduleId);
+	}
 
 	public String getSctId(int nid, int pathNid) throws IOException, TerminologyException {
 		return ExportUtil.getSctId(nid, pathNid);
@@ -413,12 +418,16 @@ public abstract class RF2AbstractImpl {
 	public String getSCTId(Config config, UUID uuid) throws Exception {
 		return ExportUtil.getSCTId(config, uuid);
 	}
-	
+
 	// get the conceptid for the given UUID
 	public String getConceptId(Config config, UUID uuid) throws Exception {
 		return ExportUtil.getConceptId(config, uuid);
 	}
-	
+
+	public String getConceptId(ConceptChronicleBI concept) throws Exception {
+		return ExportUtil.getConceptId(concept);
+	}
+
 	public String getConceptId(I_GetConceptData concept, int snomedCorePathNid) throws IOException, TerminologyException {
 		return ExportUtil.getConceptId(concept, snomedCorePathNid);
 	}
@@ -434,13 +443,12 @@ public abstract class RF2AbstractImpl {
 	public String getDescriptionId(int descriptionNid, int snomedCorePathNid) throws IOException, TerminologyException {
 		return ExportUtil.getDescriptionId(descriptionNid, snomedCorePathNid);
 	}
-	
-	
+
 	// get the descriptionid for the given UUID
 	public String getDescriptionId(Config config, UUID uuid) throws Exception {
 		return ExportUtil.getDescriptionId(config, uuid);
 	}
-	
+
 	// get the relationshipid for the given UUID
 	public String getRelationshipId(Config config, UUID uuid) throws Exception {
 		return ExportUtil.getRelationshipId(config, uuid);
@@ -449,7 +457,7 @@ public abstract class RF2AbstractImpl {
 	public static void setupProfile(Config config) throws TerminologyException, IOException {
 		ExportUtil.setupProfile(config);
 	}
-	
+
 	public Set<I_GetConceptData> getDescendants(Set<I_GetConceptData> descendants, I_GetConceptData concept) {
 		return ExportUtil.getDescendants(descendants, concept);
 	}
@@ -457,7 +465,6 @@ public abstract class RF2AbstractImpl {
 	public String getCharacteristicType(int type) throws IOException, TerminologyException {
 		return ExportUtil.getCharacteristicType(type);
 	}
-
 
 	public String getSNOMEDrelationshipType(int type) throws TerminologyException, IOException {
 		return ExportUtil.getSNOMEDrelationshipType(type);
@@ -478,12 +485,10 @@ public abstract class RF2AbstractImpl {
 	public boolean isIsaFound(I_GetConceptData concept) throws IOException, TerminologyException {
 		boolean isaFound = false;
 
-		List<? extends I_ConceptAttributeTuple> attribs = concept.getConceptAttributeTuples(getAceConfig().getAllowedStatus(), getAceConfig().getViewPositionSetReadOnly(), getAceConfig()
-				.getPrecedence(), getAceConfig().getConflictResolutionStrategy());
+		List<? extends I_ConceptAttributeTuple> attribs = concept.getConceptAttributeTuples(getAceConfig().getAllowedStatus(), getAceConfig().getViewPositionSetReadOnly(), getAceConfig().getPrecedence(), getAceConfig().getConflictResolutionStrategy());
 
 		if (attribs.size() == 1) {
-			List<? extends I_RelTuple> relTupList = concept.getSourceRelTuples(getAceConfig().getAllowedStatus(), getAceConfig().getDestRelTypes(), getAceConfig().getViewPositionSetReadOnly(),
-					getAceConfig().getPrecedence(), getAceConfig().getConflictResolutionStrategy());
+			List<? extends I_RelTuple> relTupList = concept.getSourceRelTuples(getAceConfig().getAllowedStatus(), getAceConfig().getDestRelTypes(), getAceConfig().getViewPositionSetReadOnly(), getAceConfig().getPrecedence(), getAceConfig().getConflictResolutionStrategy());
 			for (I_RelTuple rt : relTupList) {
 				if (rt.getTypeNid() == getIsaNid() && rt.getAuthorNid() != getSnorocketAuthorNid())
 					isaFound = true;
@@ -594,159 +599,148 @@ public abstract class RF2AbstractImpl {
 	}
 
 	public void process(I_GetConceptData concept) throws IOException, TerminologyException {
-		
-//		if (device.isParentOf(concept, 
-//				currenAceConfig.getAllowedStatus(),
-//				currenAceConfig.getDestRelTypes(), 
-//				currenAceConfig.getViewPositionSetReadOnly(), 
-//				currenAceConfig.getPrecedence(), 
-//				currenAceConfig.getConflictResolutionStrategy())) {
-			String conceptid = "";
 
-			boolean toExport=false;
-			List<? extends I_ExtendByRef> extensions = tf.getAllExtensionsForComponent(concept.getNid(), true);
+		// if (device.isParentOf(concept,
+		// currenAceConfig.getAllowedStatus(),
+		// currenAceConfig.getDestRelTypes(),
+		// currenAceConfig.getViewPositionSetReadOnly(),
+		// currenAceConfig.getPrecedence(),
+		// currenAceConfig.getConflictResolutionStrategy())) {
+		String conceptid = "";
 
-			CidMember extensionPart;
+		boolean toExport = false;
+		List<? extends I_ExtendByRef> extensions = tf.getAllExtensionsForComponent(concept.getNid(), true);
 
-			if (!extensions.isEmpty()) {
-				for (I_ExtendByRef extension : extensions) {
-					if (extension.getRefsetId() == reviewStatusRefsetNid) {
+		CidMember extensionPart;
 
-						int extensionStatusId = 0;
-						long lastVersion = Long.MIN_VALUE;
-						extensionPart=null;
-						int conceptVal=-1;
-						for (I_ExtendByRefVersion loopTuple : extension.getTuples(allStatusSet,currenAceConfig.getViewPositionSetReadOnly(),
-								Precedence.PATH,currenAceConfig.getConflictResolutionStrategy())) {
+		if (!extensions.isEmpty()) {
+			for (I_ExtendByRef extension : extensions) {
+				if (extension.getRefsetId() == reviewStatusRefsetNid) {
 
-							if (loopTuple.getTime() >= lastVersion) {
-								lastVersion = loopTuple.getTime();
-								if (loopTuple.getMutablePart() instanceof CidMember){
-									extensionPart = (CidMember) loopTuple.getMutablePart();
-									extensionStatusId = extensionPart.getStatusNid();
-									conceptVal= extensionPart.getC1Nid();
-								}else if (loopTuple.getMutablePart() instanceof CidRevision){
-									CidRevision extensionRevPart = (CidRevision) loopTuple.getMutablePart();
-									extensionStatusId = extensionRevPart.getStatusNid();
-									conceptVal= extensionRevPart.getC1id();
-								}
+					int extensionStatusId = 0;
+					long lastVersion = Long.MIN_VALUE;
+					extensionPart = null;
+					int conceptVal = -1;
+					for (I_ExtendByRefVersion loopTuple : extension.getTuples(allStatusSet, currenAceConfig.getViewPositionSetReadOnly(), Precedence.PATH, currenAceConfig.getConflictResolutionStrategy())) {
+
+						if (loopTuple.getTime() >= lastVersion) {
+							lastVersion = loopTuple.getTime();
+							if (loopTuple.getMutablePart() instanceof CidMember) {
+								extensionPart = (CidMember) loopTuple.getMutablePart();
+								extensionStatusId = extensionPart.getStatusNid();
+								conceptVal = extensionPart.getC1Nid();
+							} else if (loopTuple.getMutablePart() instanceof CidRevision) {
+								CidRevision extensionRevPart = (CidRevision) loopTuple.getMutablePart();
+								extensionStatusId = extensionRevPart.getStatusNid();
+								conceptVal = extensionRevPart.getC1id();
 							}
 						}
+					}
 
-						if (extensionStatusId == activeNid) { 
-							if (conceptVal==validStatusCpt.getNid()){
-								toExport=true;
-								break;
-							}
+					if (extensionStatusId == activeNid) {
+						if (conceptVal == validStatusCpt.getNid()) {
+							toExport = true;
+							break;
 						}
 					}
 				}
 			}
-			if (toExport){
-			
-				List<? extends I_IdPart> idParts = tf.getId(concept.getNid()).getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
-						snomedIntId);
-				if (idParts != null) {
-					Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), 
-							RelAssertionType.INFERRED_THEN_STATED);
-					if (denotation instanceof Long) {
-						Long c = (Long) denotation;
-						if (c != null)  conceptid = c.toString();
-					}
-				}
-				CharSequence partition="";
-				if (!conceptid.equals("")){
-					int len= conceptid.length();
-					partition = conceptid.substring(len-3, len).subSequence(0, 2);
-				}
-//				if(partition.equals("10") || partition.equals("")){		
-	
-					String active="0"; //Default value
-					List<? extends I_ConceptAttributeTuple> conceptAttributes = concept.getConceptAttributeTuples(
-							allStatuses, 
-							currenAceConfig.getViewPositionSetReadOnly(), 
-							Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
-	
-					if (conceptAttributes != null && !conceptAttributes.isEmpty()) {
-						I_ConceptAttributeTuple attributes = conceptAttributes.iterator().next();				
-						String conceptStatus = getStatusType(attributes.getStatusNid());
-						if (conceptStatus.equals("0")) {
-							active = "1";
-						} else if (getConfig().getReleaseDate().compareTo(I_Constants.limited_policy_change)<0 && conceptStatus.equals("6")) {
-							active = "1";
-						} else {
-							active = "0";
-						}
-	
-						if ((conceptid==null || conceptid.equals("") || conceptid.equals("0")) && active.equals("1") ){
-							conceptid=concept.getUids().iterator().next().toString();
-						}
-					}
-	
-					if (conceptid==null || conceptid.equals("") || conceptid.equals("0")){
-						logger.info("Unplublished Retired Concept: " + concept.getUUIDs().iterator().next().toString());
-					}else{
-						export(concept, conceptid);
-					}
-//				}
-			}
-//		}
-	}
-	
-	//all the contents resides under SNOMED CT Model Component (metadata) gets metamoduleid (900000000000012004)
-	//This returns of the content which belongs meta-module
-	public String computeModuleId(I_GetConceptData concept) throws IOException, TerminologyException {
-		String moduleid = I_Constants.GMDN_MODULE_ID;	
-		if (snomedCTModelComponent.isParentOf(concept, 
-				currenAceConfig.getAllowedStatus(),
-				currenAceConfig.getDestRelTypes(), 
-				currenAceConfig.getViewPositionSetReadOnly(), 
-				currenAceConfig.getPrecedence(), 
-				currenAceConfig.getConflictResolutionStrategy())) {
-				moduleid = I_Constants.META_MODULE_ID;
-		}else if(snomedCTModelComponent.equals(concept)){
-				moduleid = I_Constants.META_MODULE_ID;
 		}
-		
-		/*if (foundationMetaDataConceptRoot.isParentOf(concept, 
-				currenAceConfig.getAllowedStatus(),
-				currenAceConfig.getDestRelTypes(), 
-				currenAceConfig.getViewPositionSetReadOnly(), 
-				currenAceConfig.getPrecedence(), 
-				currenAceConfig.getConflictResolutionStrategy())) {
-				isMetaConcept=true;
-		}else if(coreMetaConceptRoot.isParentOf(concept, 
-				currenAceConfig.getAllowedStatus(),
-				currenAceConfig.getDestRelTypes(), 
-				currenAceConfig.getViewPositionSetReadOnly(), 
-				currenAceConfig.getPrecedence(), 
-				currenAceConfig.getConflictResolutionStrategy())) {
-				isMetaConcept=true;
-		}else if(snomedCTModelComponent.equals(concept)){
-				isMetaConcept=true;
-		}*/
-		
-		
+		if (toExport) {
+
+			List<? extends I_IdPart> idParts = tf.getId(concept.getNid()).getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), snomedIntId);
+			if (idParts != null) {
+				Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), RelAssertionType.INFERRED_THEN_STATED);
+				if (denotation instanceof Long) {
+					Long c = (Long) denotation;
+					if (c != null)
+						conceptid = c.toString();
+				}
+			}
+			CharSequence partition = "";
+			if (!conceptid.equals("")) {
+				int len = conceptid.length();
+				partition = conceptid.substring(len - 3, len).subSequence(0, 2);
+			}
+			// if(partition.equals("10") || partition.equals("")){
+
+			String active = "0"; // Default value
+			List<? extends I_ConceptAttributeTuple> conceptAttributes = concept.getConceptAttributeTuples(allStatuses, currenAceConfig.getViewPositionSetReadOnly(), Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
+
+			if (conceptAttributes != null && !conceptAttributes.isEmpty()) {
+				I_ConceptAttributeTuple attributes = conceptAttributes.iterator().next();
+				String conceptStatus = getStatusType(attributes.getStatusNid());
+				if (conceptStatus.equals("0")) {
+					active = "1";
+				} else if (getConfig().getReleaseDate().compareTo(I_Constants.limited_policy_change) < 0 && conceptStatus.equals("6")) {
+					active = "1";
+				} else {
+					active = "0";
+				}
+
+				if ((conceptid == null || conceptid.equals("") || conceptid.equals("0")) && active.equals("1")) {
+					conceptid = concept.getUids().iterator().next().toString();
+				}
+			}
+
+			if (conceptid == null || conceptid.equals("") || conceptid.equals("0")) {
+				logger.info("Unplublished Retired Concept: " + concept.getUUIDs().iterator().next().toString());
+			} else {
+				export(concept, conceptid);
+			}
+			// }
+		}
+		// }
+	}
+
+	// all the contents resides under SNOMED CT Model Component (metadata) gets
+	// metamoduleid (900000000000012004)
+	// This returns of the content which belongs meta-module
+	public String computeModuleId(I_GetConceptData concept) throws IOException, TerminologyException {
+		String moduleid = I_Constants.GMDN_MODULE_ID;
+		if (snomedCTModelComponent.isParentOf(concept, currenAceConfig.getAllowedStatus(), currenAceConfig.getDestRelTypes(), currenAceConfig.getViewPositionSetReadOnly(), currenAceConfig.getPrecedence(), currenAceConfig.getConflictResolutionStrategy())) {
+			moduleid = I_Constants.META_MODULE_ID;
+		} else if (snomedCTModelComponent.equals(concept)) {
+			moduleid = I_Constants.META_MODULE_ID;
+		}
+
+		/*
+		 * if (foundationMetaDataConceptRoot.isParentOf(concept,
+		 * currenAceConfig.getAllowedStatus(),
+		 * currenAceConfig.getDestRelTypes(),
+		 * currenAceConfig.getViewPositionSetReadOnly(),
+		 * currenAceConfig.getPrecedence(),
+		 * currenAceConfig.getConflictResolutionStrategy())) {
+		 * isMetaConcept=true; }else if(coreMetaConceptRoot.isParentOf(concept,
+		 * currenAceConfig.getAllowedStatus(),
+		 * currenAceConfig.getDestRelTypes(),
+		 * currenAceConfig.getViewPositionSetReadOnly(),
+		 * currenAceConfig.getPrecedence(),
+		 * currenAceConfig.getConflictResolutionStrategy())) {
+		 * isMetaConcept=true; }else if(snomedCTModelComponent.equals(concept)){
+		 * isMetaConcept=true; }
+		 */
+
 		return moduleid;
 	}
-	
+
 	public NidSetBI getAllStatuses() throws TerminologyException, IOException {
 		NidSetBI allStatuses = new NidSet();
 		Set<I_GetConceptData> descendants = new HashSet<I_GetConceptData>();
 		I_GetConceptData statusRoot = tf.getConcept(UUID.fromString("d944af55-86d9-33f4-bebd-a10bf3f4712c"));
-		descendants = getDescendantsLocal(descendants, statusRoot );
+		descendants = getDescendantsLocal(descendants, statusRoot);
 		for (I_GetConceptData loopConcept : descendants) {
 			allStatuses.add(loopConcept.getNid());
 		}
 		I_GetConceptData activeValue = tf.getConcept(UUID.fromString("d12702ee-c37f-385f-a070-61d56d4d0f1f"));
 		allStatuses.add(activeValue.getNid());
-		descendants = getDescendantsLocal(descendants, activeValue );
+		descendants = getDescendantsLocal(descendants, activeValue);
 		for (I_GetConceptData loopConcept : descendants) {
 			allStatuses.add(loopConcept.getNid());
-		}		
+		}
 		I_GetConceptData inactiveValue = tf.getConcept(UUID.fromString("a5daba09-7feb-37f0-8d6d-c3cadfc7f724"));
 		allStatuses.add(inactiveValue.getNid());
-		descendants = getDescendantsLocal(descendants, inactiveValue );
+		descendants = getDescendantsLocal(descendants, inactiveValue);
 		for (I_GetConceptData loopConcept : descendants) {
 			allStatuses.add(loopConcept.getNid());
 		}
@@ -761,21 +755,20 @@ public abstract class RF2AbstractImpl {
 		return allDescTypes;
 	}
 
-	public String getConceptMetaModuleID(I_GetConceptData concept , String effectiveTime) throws TerminologyException, IOException {
-		return ExportUtil.getConceptMetaModuleID(concept , effectiveTime);
+	public String getConceptMetaModuleID(I_GetConceptData concept, String effectiveTime) throws TerminologyException, IOException {
+		return ExportUtil.getConceptMetaModuleID(concept, effectiveTime);
 	}
-	
-	public  Set<I_GetConceptData> getDescendantsLocal(Set<I_GetConceptData> descendants, I_GetConceptData concept) {
+
+	public Set<I_GetConceptData> getDescendantsLocal(Set<I_GetConceptData> descendants, I_GetConceptData concept) {
 		try {
 			I_TermFactory termFactory = Terms.get();
 			I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
-			I_IntSet allowedDestRelTypes =  termFactory.newIntSet();
+			I_IntSet allowedDestRelTypes = termFactory.newIntSet();
 			allowedDestRelTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
 			allowedDestRelTypes.add(termFactory.uuidToNative(UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25")));
-			
+
 			Set<I_GetConceptData> childrenSet = new HashSet<I_GetConceptData>();
-			childrenSet.addAll(concept.getDestRelOrigins(config.getAllowedStatus(), allowedDestRelTypes, 
-					config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy()));
+			childrenSet.addAll(concept.getDestRelOrigins(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy()));
 			descendants.addAll(childrenSet);
 			for (I_GetConceptData loopConcept : childrenSet) {
 				descendants = getDescendantsLocal(descendants, loopConcept);
@@ -788,8 +781,7 @@ public abstract class RF2AbstractImpl {
 		return descendants;
 	}
 
-	public Object getLastCurrentVisibleId(List<? extends I_IdPart> parts, PositionSet viewpointSet,
-			RelAssertionType relAssertionType) {
+	public Object getLastCurrentVisibleId(List<? extends I_IdPart> parts, PositionSet viewpointSet, RelAssertionType relAssertionType) {
 		Object data = null;
 		if (getLastCurrentVisibleIdPart(parts, viewpointSet, relAssertionType) != null) {
 			data = getLastCurrentVisibleIdPart(parts, viewpointSet, relAssertionType).getDenotation();
@@ -797,9 +789,8 @@ public abstract class RF2AbstractImpl {
 		return data;
 	}
 
-	public I_IdPart getLastCurrentVisibleIdPart(List<? extends I_IdPart> parts, PositionSet viewpointSet,
-			RelAssertionType relAssertionType) {
-		//		System.out.println("Parts Size: " + parts.size());
+	public I_IdPart getLastCurrentVisibleIdPart(List<? extends I_IdPart> parts, PositionSet viewpointSet, RelAssertionType relAssertionType) {
+		// System.out.println("Parts Size: " + parts.size());
 		I_ConfigAceFrame config = null;
 		int currentId = Integer.MIN_VALUE;
 		int activeId = Integer.MIN_VALUE;
@@ -807,7 +798,7 @@ public abstract class RF2AbstractImpl {
 			config = Terms.get().getActiveAceFrameConfig();
 			currentId = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
 			activeId = Terms.get().uuidToNative(UUID.fromString("d12702ee-c37f-385f-a070-61d56d4d0f1f"));
-			
+
 		} catch (TerminologyException e) {
 			//
 		} catch (IOException e) {
@@ -825,15 +816,17 @@ public abstract class RF2AbstractImpl {
 		}
 		RelAssertionType lastAssertionType = null;
 		int classifierNid = config.getClassifierConcept().getNid();
-		//		System.out.println("Current: " + currentId + " ClassifierNid: " + currentId);
+		// System.out.println("Current: " + currentId + " ClassifierNid: " +
+		// currentId);
 		for (I_IdPart loopPart : parts) {
 			I_IdPart loopTempPart = null;
 			RelAssertionType loopAssertionType = null;
-			//			System.out.println(loopPart.getTime() + "|" + loopPart.getStatusNid() + "|" + String.valueOf(loopPart.getDenotation())
-			//					+ "|" + loopPart.getAuthorNid());
+			// System.out.println(loopPart.getTime() + "|" +
+			// loopPart.getStatusNid() + "|" +
+			// String.valueOf(loopPart.getDenotation())
+			// + "|" + loopPart.getAuthorNid());
 			if (loopPart.getTime() > lastTime && loopPart.getTime() <= maxTime) {
-				if (relAssertionType == RelAssertionType.INFERRED && 
-						loopPart.getAuthorNid() == classifierNid) {
+				if (relAssertionType == RelAssertionType.INFERRED && loopPart.getAuthorNid() == classifierNid) {
 					loopTempPart = loopPart;
 					loopAssertionType = RelAssertionType.INFERRED;
 				} else if (relAssertionType == RelAssertionType.INFERRED_THEN_STATED) {
@@ -844,20 +837,17 @@ public abstract class RF2AbstractImpl {
 						loopTempPart = loopPart;
 						loopAssertionType = RelAssertionType.STATED;
 					}
-				} else if (relAssertionType == RelAssertionType.STATED && 
-						loopPart.getAuthorNid() != classifierNid) {
+				} else if (relAssertionType == RelAssertionType.STATED && loopPart.getAuthorNid() != classifierNid) {
 					loopTempPart = loopPart;
 					loopAssertionType = RelAssertionType.STATED;
 				}
 
 				if (loopTempPart != null) {
-					if (loopTempPart.getStatusNid() == currentId || loopTempPart.getStatusNid()== activeId) {
+					if (loopTempPart.getStatusNid() == currentId || loopTempPart.getStatusNid() == activeId) {
 						currentVisiblePart = loopTempPart;
 						lastTime = loopPart.getTime();
 						lastAssertionType = loopAssertionType;
-					} else if (loopTempPart.getStatusNid() != currentId  
-							&& loopTempPart.getStatusNid()!= activeId 
-							&& currentVisiblePart != null) {
+					} else if (loopTempPart.getStatusNid() != currentId && loopTempPart.getStatusNid() != activeId && currentVisiblePart != null) {
 						if (loopTempPart.getDenotation().equals(currentVisiblePart.getDenotation())) {
 							currentVisiblePart = null;
 							lastTime = Long.MIN_VALUE;

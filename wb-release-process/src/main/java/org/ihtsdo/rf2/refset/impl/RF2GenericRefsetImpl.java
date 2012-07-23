@@ -17,7 +17,6 @@ import org.ihtsdo.rf2.refset.factory.SctidUuid;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.WriteUtil;
 import org.ihtsdo.tk.api.Precedence;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 
 /**
  * Title: RF2DescriptionImpl Description: Iterating over all the concept in
@@ -49,9 +48,7 @@ public class RF2GenericRefsetImpl extends RF2AbstractImpl implements I_ProcessCo
 	 */
 	@Override
 	public void processConcept(I_GetConceptData concept) throws Exception {
-
 		process(concept);
-
 	}
 
 	public void export(I_GetConceptData concept, String conceptid) throws IOException {
@@ -69,8 +66,6 @@ public class RF2GenericRefsetImpl extends RF2AbstractImpl implements I_ProcessCo
 				int refsetTermAuxId = getNid(sctIdUuid.getUuid());
 
 				List<? extends I_ExtendByRef> extensions = tf.getAllExtensionsForComponent(concept.getNid(), true);
-				logger.info("CONCEPT: " + concept.getInitialText());
-				logger.info("Extensions Size: " + extensions.size());
 				if (!extensions.isEmpty()) {
 					for (I_ExtendByRef extension : extensions) {
 						if (extension.getRefsetId() == refsetTermAuxId) {
