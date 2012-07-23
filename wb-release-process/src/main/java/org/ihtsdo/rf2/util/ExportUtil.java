@@ -1438,10 +1438,10 @@ public class ExportUtil {
 		Collection<? extends IdBI> allids = concept.getAllIds();
 		for (IdBI idBI : allids) {
 			if(idBI.getAuthorityNid() == ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid()){
-				snomedId = (String) idBI.getDenotation();
+				snomedId = idBI.getDenotation().toString();
 			}
 		}
-		return snomedId.toString();
+		return snomedId;
 	}
 
 	public static String getCtv3Id(I_GetConceptData concept, int snomedCorePathNid) throws IOException, TerminologyException {
