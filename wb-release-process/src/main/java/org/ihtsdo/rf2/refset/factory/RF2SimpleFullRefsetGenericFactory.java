@@ -40,7 +40,6 @@ public class RF2SimpleFullRefsetGenericFactory extends RF2AbstractFactory {
 			RF2GenericRefsetImpl vtmUSIterator = new RF2GenericRefsetImpl(getConfig(), sctid, uuid, moduleid);
 			Terms.get().iterateConcepts(vtmUSIterator);
 			logger.info("Finished Simple Refset Export.");
-			closeExportFileWriter();
 		} catch (IOException e) {
 			logger.error(e.getMessage());
 		} catch (Exception e) {

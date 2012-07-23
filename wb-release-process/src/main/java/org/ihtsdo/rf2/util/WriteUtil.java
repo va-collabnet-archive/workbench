@@ -39,12 +39,13 @@ public class WriteUtil {
 
 	public static void write(Config config, String str) throws IOException {
 
-		if (str.equals("\\r\\n"))
+		if (str.equals("\\r\\n")) {
 			writeNewLine(config, str);
-		else if (str.equals("\\t"))
+		} else if (str.equals("\\t")) {
 			writeTab(config, str);
-		else
+		} else {
 			config.getBw().write(str);
+		}
 	}
 
 	public static void writeTab(Config config, String str) throws IOException {

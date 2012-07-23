@@ -22,7 +22,6 @@ public abstract class RF2AbstractFactory {
 		super();
 
 		RF2AbstractFactory.config = config;
-
 		setBufferedWriter();
 	}
 
@@ -46,17 +45,21 @@ public abstract class RF2AbstractFactory {
 	public static void setBufferedWriter() {
 
 		try {
-
+			logger.info("Setting buffered writer");
 			String outputFolderName = config.getOutputFolderName();
-
+			
 			File folder = new File(outputFolderName);
+			logger.info("Folder: " + folder);
 
-			if (!folder.exists())
+			if (!folder.exists()){
 				folder.mkdir();
+			}
 
 			String exportFileName = config.getExportFileName();
+			logger.info("Export File Name: " + exportFileName);
 
 			exportFileName += config.getReleaseDate() + "." + config.getFileExtension();
+			logger.info("Export File Name: " + exportFileName);
 
 			BufferedWriter bw = WriteUtil.createWriter(outputFolderName + "/" + exportFileName);
 

@@ -68,7 +68,8 @@ public class RF2GenericRefsetImpl extends RF2AbstractImpl implements I_ProcessCo
 			int refsetTermAuxId = getNid(uuid);
 
 			List<? extends I_ExtendByRef> extensions = tf.getAllExtensionsForComponent(concept.getNid(), true);
-
+			logger.info("CONCEPT: " + concept.getInitialText());
+			logger.info("Extensions Size: " + extensions.size());
 			if (!extensions.isEmpty()) {
 				for (I_ExtendByRef extension : extensions) {
 					if (extension.getRefsetId() == refsetTermAuxId) {
