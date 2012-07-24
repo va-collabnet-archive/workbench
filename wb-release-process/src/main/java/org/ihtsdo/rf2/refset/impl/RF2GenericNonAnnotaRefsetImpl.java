@@ -57,7 +57,7 @@ public class RF2GenericNonAnnotaRefsetImpl extends RF2AbstractImpl {
 				logger.info("Enclosing concept " + refexVersionBI.getEnclosingConcept().getConceptNid());
 				ConceptChronicleBI concept2 = null;
 				try {
-					concept2 = refexVersionBI.getEnclosingConcept();
+					concept2 = Ts.get().getConceptForNid(refexVersionBI.getReferencedComponentNid());
 				} catch (Exception e) {
 				}
 				if (concept2 == null) {
@@ -66,7 +66,7 @@ public class RF2GenericNonAnnotaRefsetImpl extends RF2AbstractImpl {
 						logger.info("Description: " + desc.getConceptNid());
 						logger.info("Description: " + desc.getDescId());
 					}
-					concept2 = desc.getEnclosingConcept();
+					concept2 = Ts.get().getConceptForNid(desc.getDescId());
 				}
 				if (concept2 != null) {
 					String conceptid = getConceptId(concept2);
