@@ -51,8 +51,12 @@ public class RF2GenericNonAnnotaRefsetImpl extends RF2AbstractImpl {
 			ConceptVersionBI concept = Ts.get().getConceptVersion(tf.getActiveAceFrameConfig().getViewCoordinate(), UUID.fromString(sctidUuid.getUuid()));
 			Collection<? extends RefexVersionBI<?>> refsetMembers = concept.getCurrentRefsetMembers(tf.getActiveAceFrameConfig().getViewCoordinate());
 			for (RefexVersionBI<?> refexVersionBI : refsetMembers) {
-				ConceptChronicleBI concept2 = Ts.get().getConcept(refexVersionBI.getReferencedComponentNid());
-				if(concept2 == null){
+				ConceptChronicleBI concept2 = null;
+				try {
+					concept2 = Ts.get().getConcept(refexVersionBI.getReferencedComponentNid());
+				} catch (Exception e) {
+				}
+				if (concept2 == null) {
 					I_DescriptionVersioned desc = tf.getDescription(refexVersionBI.getReferencedComponentNid());
 					concept2 = desc.getEnclosingConcept();
 				}
