@@ -51,19 +51,31 @@ public class RF2GenericNonAnnotaRefsetImpl extends RF2AbstractImpl {
 			ConceptVersionBI concept = Ts.get().getConceptVersion(tf.getActiveAceFrameConfig().getViewCoordinate(), UUID.fromString(sctidUuid.getUuid()));
 			Collection<? extends RefexVersionBI<?>> refsetMembers = concept.getCurrentRefsetMembers(tf.getActiveAceFrameConfig().getViewCoordinate());
 			for (RefexVersionBI<?> refexVersionBI : refsetMembers) {
+				logger.info("Enclosing concept " + refexVersionBI.getEnclosingConcept());
+				logger.info("Enclosing concept " + refexVersionBI.getConceptNid());
+				logger.info("Enclosing concept " + refexVersionBI.getNid());
+				logger.info("Enclosing concept " + refexVersionBI.getEnclosingConcept().getConceptNid());
 				ConceptChronicleBI concept2 = null;
 				try {
-					concept2 = Ts.get().getConcept(refexVersionBI.getReferencedComponentNid());
+					concept2 = refexVersionBI.getEnclosingConcept();
 				} catch (Exception e) {
 				}
 				if (concept2 == null) {
 					I_DescriptionVersioned desc = tf.getDescription(refexVersionBI.getReferencedComponentNid());
+					if (desc != null) {
+						logger.info("Description: " + desc.getConceptNid());
+						logger.info("Description: " + desc.getDescId());
+					}
 					concept2 = desc.getEnclosingConcept();
 				}
-				String conceptid = getConceptId(concept2);
-				refsetuuid = Type5UuidFactory.get(sctidUuid.getSctid() + conceptid);
-				effectiveTime = getDateFormat().format(new Date(refexVersionBI.getTime()));
-				writeRF2TypeLine(refsetuuid, effectiveTime, "1", moduleid, sctidUuid.getUuid(), conceptid);
+				if (concept2 != null) {
+					String conceptid = getConceptId(concept2);
+					refsetuuid = Type5UuidFactory.get(sctidUuid.getSctid() + conceptid);
+					effectiveTime = getDateFormat().format(new Date(refexVersionBI.getTime()));
+					writeRF2TypeLine(refsetuuid, effectiveTime, "1", moduleid, sctidUuid.getUuid(), conceptid);
+				}else{
+					logger.info("CONCEPT NOT FOUND");
+				}
 			}
 		} catch (IOException e) {
 			logger.error("IOExceptions: " + e.getMessage());
