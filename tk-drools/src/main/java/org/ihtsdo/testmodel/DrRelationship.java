@@ -137,4 +137,59 @@ public class DrRelationship extends DrComponent {
 		this.targetUuid = targetUuid;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime
+				* result
+				+ ((characteristicUuid == null) ? 0 : characteristicUuid
+						.hashCode());
+		result = prime * result
+				+ ((sourceUuid == null) ? 0 : sourceUuid.hashCode());
+		result = prime * result
+				+ ((targetUuid == null) ? 0 : targetUuid.hashCode());
+		result = prime * result
+				+ ((typeUuid == null) ? 0 : typeUuid.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DrRelationship other = (DrRelationship) obj;
+		if (characteristicUuid == null) {
+			if (other.characteristicUuid != null)
+				return false;
+		} else if (!characteristicUuid.equals(other.characteristicUuid))
+			return false;
+		if (sourceUuid == null) {
+			if (other.sourceUuid != null)
+				return false;
+		} else if (!sourceUuid.equals(other.sourceUuid))
+			return false;
+		if (targetUuid == null) {
+			if (other.targetUuid != null)
+				return false;
+		} else if (!targetUuid.equals(other.targetUuid))
+			return false;
+		if (typeUuid == null) {
+			if (other.typeUuid != null)
+				return false;
+		} else if (!typeUuid.equals(other.typeUuid))
+			return false;
+		return true;
+	}
+
 }

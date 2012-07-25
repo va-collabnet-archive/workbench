@@ -108,4 +108,43 @@ public class DrDefiningRolesSet {
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((relationships == null) ? 0 : relationships.hashCode());
+		result = prime * result
+				+ ((rolesSetType == null) ? 0 : rolesSetType.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DrDefiningRolesSet other = (DrDefiningRolesSet) obj;
+		if (relationships == null) {
+			if (other.relationships != null)
+				return false;
+		} else if (!relationships.equals(other.relationships))
+			return false;
+		if (rolesSetType == null) {
+			if (other.rolesSetType != null)
+				return false;
+		} else if (!rolesSetType.equals(other.rolesSetType))
+			return false;
+		return true;
+	}
+
 }
