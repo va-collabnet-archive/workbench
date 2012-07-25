@@ -54,6 +54,7 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
+import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
@@ -101,7 +102,7 @@ public class TestForSpecifcDate extends AbstractConceptTest {
             	}
             }
             
-            for (I_DescriptionVersioned loopDesc : concept.getDescs()) {
+            for (DescriptionChronicleBI loopDesc : concept.getDescs()) {
             	for (DescriptionVersionBI dv : loopDesc.getVersions()) {
             		long time = dv.getTime();
             		if (time == timeToCheck) {
