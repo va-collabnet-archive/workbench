@@ -69,6 +69,7 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
@@ -726,10 +727,10 @@ public class RulesContextHelper {
 			if (pkgRelTuples != null) {
 				for (I_RelTuple loopTuple : pkgRelTuples) {
 					if (isActive(loopTuple.getStatusNid())) {
-						I_GetConceptData targetPackage = termFactory.getConcept(loopTuple.getC2Id());
+						ConceptChronicleBI targetPackage = termFactory.getConcept(loopTuple.getC2Id());
 						Long time = Long.MIN_VALUE;
 						int statusId = Integer.MIN_VALUE;
-						for (ConceptAttributeVersionBI loopAttr : targetPackage.getConAttrs().getVersions()) {
+						for (ConceptAttributeVersionBI loopAttr : targetPackage.getConceptAttributes().getVersions()) {
 							if (loopAttr.getTime() > time) {
 								time = loopAttr.getTime();
 								statusId = loopAttr.getStatusNid();

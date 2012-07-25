@@ -45,6 +45,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 /**
  * The Class RulesDeploymentPackageReferenceHelper.
@@ -163,11 +164,11 @@ public class RulesDeploymentPackageReferenceHelper {
 	 * @param rulesPackageConcept the rules package concept
 	 * @return the rules deployment package reference
 	 */
-	public RulesDeploymentPackageReference getRulesDeploymentPackageReference(I_GetConceptData rulesPackageConcept) {
+	public RulesDeploymentPackageReference getRulesDeploymentPackageReference(ConceptChronicleBI rulesPackageConcept) {
 		try {
 			RulesDeploymentPackageReference rulesPackage = new RulesDeploymentPackageReference();
 			rulesPackage.setName(rulesPackageConcept.toString());
-			rulesPackage.setUuids(rulesPackageConcept.getUids());
+			rulesPackage.setUuids(rulesPackageConcept.getUUIDs());
 
 			I_TermFactory termFactory = Terms.get();
 			I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
