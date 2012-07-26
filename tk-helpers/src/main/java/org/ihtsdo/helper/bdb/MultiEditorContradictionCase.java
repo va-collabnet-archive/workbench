@@ -30,7 +30,7 @@ public class MultiEditorContradictionCase {
 
     private int conceptNid; // concept with contradiction
     private HashSet<Integer> componentNids; //components with contradicion
-    private HashSet<Integer> sapNids; //sap nids with contradicion
+    private Set<Integer> sapNids; //sap nids with contradicion
     private ArrayList<String> cases; // reported cases
     // DETAILS
     private HashMap<UUID, String> authTimeMapComputed; // computed from getAllSapNids()
@@ -40,7 +40,7 @@ public class MultiEditorContradictionCase {
 
     public MultiEditorContradictionCase(int cNid, ArrayList<String> cases,
             HashSet<Integer> componentNids,
-            HashSet<Integer> sapNids) {
+            Set<Integer> sapNids) {
         this.conceptNid = cNid;
         this.cases = cases;
         this.componentNids = componentNids;
@@ -55,7 +55,7 @@ public class MultiEditorContradictionCase {
         return componentNids;
     }
     
-    public HashSet<Integer> getSapNids() {
+    public Set<Integer> getSapNids() {
         return sapNids;
     }
 

@@ -17,7 +17,6 @@ import java.io.File;
 import java.io.IOException;
 import java.rmi.MarshalledObject;
 import java.security.NoSuchAlgorithmException;
-import java.util.UUID;
 
 import javax.naming.ConfigurationException;
 import javax.swing.*;

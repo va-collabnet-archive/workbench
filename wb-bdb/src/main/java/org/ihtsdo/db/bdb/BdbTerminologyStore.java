@@ -26,6 +26,7 @@ import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
 import org.ihtsdo.db.bdb.computer.kindof.IsaCache;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.computer.kindof.TypeCache;
+import org.ihtsdo.db.bdb.computer.version.PositionMapperBI;
 import org.ihtsdo.db.change.ChangeNotifier;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.*;
@@ -155,6 +156,12 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     @Override
     public void commit(ConceptChronicleBI cc) throws IOException {
         BdbCommitManager.commit((Concept) cc, ChangeSetPolicy.MUTABLE_ONLY,
+                ChangeSetWriterThreading.SINGLE_THREAD);
+    }
+    
+    @Override
+    public void commit(ConceptChronicleBI cc, ChangeSetPolicy changeSetPolicy) throws IOException {
+        BdbCommitManager.commit((Concept) cc, changeSetPolicy,
                 ChangeSetWriterThreading.SINGLE_THREAD);
     }
 
@@ -821,4 +828,4 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     public int getStampNid(TkRevision version) {
         return Bdb.getSapNid(version);
     }
-}
+    }

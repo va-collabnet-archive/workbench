@@ -68,8 +68,6 @@ import org.ihtsdo.tk.hash.Hashcode;
 import java.beans.PropertyVetoException;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -90,7 +88,6 @@ import java.util.logging.Logger;
 import org.dwfa.util.id.Type3UuidFactory;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.db.change.ChangeNotifier;
-import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 public abstract class ConceptComponent<R extends Revision<R, C>, C extends ConceptComponent<R, C>>
         implements I_AmTermComponent, I_AmPart<R>, I_AmTuple<R>, I_Identify, IdBI, I_IdPart, I_IdVersion,
@@ -191,7 +188,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
     }
 
-    public ConceptComponent<R, C> merge(C another, boolean notify) {
+    public ConceptComponent<R, C> merge(C another, boolean notify) throws IOException {
         Set<Integer> versionSapNids = getVersionSapNids();
 
         // merge versions
@@ -248,6 +245,13 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                 }
 
                 this.annotations.addAll(anotherAnnotationMap.values());
+                
+                for(RefsetMember refsetMember : anotherAnnotationMap.values()){
+                    Concept refsetConcept = (Concept)Ts.get().getConceptForNid(refsetMember.getRefsetId());
+                    if(refsetConcept.isAnnotationIndex()){
+                        refsetConcept.getData().add(refsetMember);
+                    }
+                }
             }
         }
 

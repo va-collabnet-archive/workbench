@@ -70,6 +70,11 @@ public class BdbTermBuilder implements TerminologyBuilderBI {
                 && annot.getReferencedComponentNid() != Integer.MAX_VALUE){
             ComponentChronicleBI<?> component = Ts.get().getComponent(annot.getReferencedComponentNid());
             component.addAnnotation(annot);
+            if(annot.getReferencedComponentNid() ==
+                    Ts.get().getConceptNidForNid(annot.getReferencedComponentNid())){
+                ConceptChronicleBI concept = Ts.get().getConcept(annot.getReferencedComponentNid());
+                concept.addAnnotation(annot);
+            }
         }
         return annot;
     }

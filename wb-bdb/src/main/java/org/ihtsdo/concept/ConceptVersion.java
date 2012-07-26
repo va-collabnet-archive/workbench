@@ -1227,6 +1227,11 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
     public boolean isAnnotationStyleRefex() throws IOException {
         return concept.isAnnotationStyleRefex();
     }
+    
+    @Override
+    public boolean isAnnotationIndex() throws IOException {
+        return concept.isAnnotationIndex();
+    }
 
     @Override
     public boolean isBaselineGeneration() {
@@ -1293,6 +1298,11 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
     @Override
     public void setAnnotationStyleRefex(boolean annotationStyleRefset) {
         concept.setAnnotationStyleRefex(annotationStyleRefset);
+    }
+    
+    @Override
+    public void setAnnotationIndex(boolean annotationIndex) throws IOException {
+        concept.setAnnotationIndex(annotationIndex);
     }
 
     @Override

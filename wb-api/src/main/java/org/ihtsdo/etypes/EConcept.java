@@ -2,6 +2,15 @@ package org.ihtsdo.etypes;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
@@ -32,33 +41,19 @@ import org.dwfa.tapi.I_DescribeConceptLocally;
 import org.dwfa.tapi.I_RelateConceptsLocally;
 import org.dwfa.tapi.I_StoreLocalFixedTerminology;
 import org.dwfa.tapi.TerminologyException;
-
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_array_of_bytearray.RefexArrayOfBytearrayVersionBI;
 import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.identifier.IDENTIFIER_PART_TYPES;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
 import org.ihtsdo.tk.dto.concept.component.media.TkMedia;
 import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
-import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.api.refex.type_array_of_bytearray.RefexArrayOfBytearrayVersionBI;
-import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.tk.dto.concept.component.refex.type_arrayofbytearray.TkRefexArrayOfBytearrayMember;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 
 public class EConcept extends TkConcept implements I_AmChangeSetObject {
    public static final long serialVersionUID = 1;
@@ -81,6 +76,7 @@ public class EConcept extends TkConcept implements I_AmChangeSetObject {
     */
    public EConcept(I_GetConceptData c) throws IOException, TerminologyException {
       annotationStyleRefex = c.isAnnotationStyleRefex();
+      annotationIndexStyleRefex = c.isAnnotationIndex();
       conceptAttributes = new EConceptAttributes(c.getConAttrs());
       primordialUuid = conceptAttributes.primordialUuid;
       EConcept.convertId(c.getIdentifier(), conceptAttributes);
@@ -525,6 +521,10 @@ public class EConcept extends TkConcept implements I_AmChangeSetObject {
       buff.append(this.getClass().getSimpleName()).append(": ");
       buff.append("\n   primordial UUID: ");
       buff.append(this.primordialUuid);
+      buff.append("\n   annotation: ");
+      buff.append(this.annotationStyleRefex);
+      buff.append("\n   annotation index: ");
+      buff.append(this.annotationIndexStyleRefex);
       buff.append("\n   ConceptAttributes: \n\t");
       buff.append(this.conceptAttributes);
       buff.append("\n   Descriptions: \n\t");

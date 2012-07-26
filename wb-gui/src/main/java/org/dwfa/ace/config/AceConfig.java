@@ -37,8 +37,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 
@@ -66,7 +64,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
      *
      */
     private static final long serialVersionUID = 1L;
-    private static final int dataVersion = 10;
+    private static final int dataVersion = 11;
     private static String DEFAULT_LOGGER_CONFIG_FILE = "logViewer.config";
     private static String DEFAULT_ACE_CONFIG_FILE = "ace.config";
     private transient VetoableChangeSupport vetoSupport = new VetoableChangeSupport(this);
@@ -96,6 +94,8 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
     private ChangeSetPolicy classifierChangesChangeSetPolicy;
     private ChangeSetPolicy refsetChangesChangeSetPolicy;
     private ChangeSetWriterThreading changeSetWriterThreading;
+    //11
+    private ChangeSetPolicy adjudicationWorkListChangeSetPolicy;
     // transient
     private transient File profileFile;
     //The List of User concept UUIDs
@@ -159,6 +159,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
         out.writeObject(classifierChangesChangeSetPolicy);
         out.writeObject(refsetChangesChangeSetPolicy);
         out.writeObject(changeSetWriterThreading);
+        out.writeObject(adjudicationWorkListChangeSetPolicy);
     }
 
     @SuppressWarnings("unchecked")
@@ -275,6 +276,15 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
                 classifierChangesChangeSetPolicy = ChangeSetPolicy.OFF;
                 refsetChangesChangeSetPolicy = ChangeSetPolicy.OFF;
                 changeSetWriterThreading = ChangeSetWriterThreading.SINGLE_THREAD;
+            }
+            
+            if (objDataVersion >= 11) {
+                adjudicationWorkListChangeSetPolicy = (ChangeSetPolicy) in.readObject();
+                if (adjudicationWorkListChangeSetPolicy == null) {
+                    adjudicationWorkListChangeSetPolicy = ChangeSetPolicy.INCREMENTAL;
+                }
+            } else {
+                adjudicationWorkListChangeSetPolicy = ChangeSetPolicy.OFF;
             }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -591,6 +601,11 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
     public ChangeSetPolicy getClassifierChangesChangeSetPolicy() {
         return classifierChangesChangeSetPolicy;
     }
+    
+    @Override
+    public ChangeSetPolicy getAdjudicationWorkListChangeSetPolicy() {
+        return adjudicationWorkListChangeSetPolicy;
+    }
 
     @Override
     public ChangeSetPolicy getRefsetChangesChangeSetPolicy() {
@@ -611,6 +626,11 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
     public void setClassifierChangesChangeSetPolicy(ChangeSetPolicy policy) {
         this.classifierChangesChangeSetPolicy = policy;
     }
+    
+    @Override
+    public void setAdjudicationWorkListChangeSetPolicy(ChangeSetPolicy policy) {
+        this.adjudicationWorkListChangeSetPolicy = policy;
+    }      
 
     @Override
     public void setRefsetChangesChangeSetPolicy(ChangeSetPolicy policy) {

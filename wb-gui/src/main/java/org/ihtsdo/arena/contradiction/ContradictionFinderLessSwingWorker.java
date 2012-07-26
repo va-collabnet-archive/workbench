@@ -35,6 +35,8 @@ import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
@@ -294,23 +296,45 @@ public class ContradictionFinderLessSwingWorker
         
         NidBitSetItrBI currentIterator = contradictionCaseNidSet.iterator();
         NidBitSetItrBI retiredIterator = currentMemberNidSet.iterator();
+        ChangeSetPolicy adjudicationWorkListChangeSetPolicy = Terms.get().getActiveAceFrameConfig().getDbConfig().getAdjudicationWorkListChangeSetPolicy();
         while(currentIterator.next()){
-            RefexCAB memberBp = new RefexCAB(TK_REFEX_TYPE.MEMBER,
+           RefexCAB memberBp = new RefexCAB(TK_REFEX_TYPE.CID,
                     currentIterator.nid(),
                     conflictRefsetNid);
-            builder.constructIfNotCurrent(memberBp);
+            memberBp.put(RefexCAB.RefexProperty.CNID1, currentIterator.nid());
+            RefexChronicleBI member = builder.constructIfNotCurrent(memberBp);
+            if(conflictRefset.isAnnotationStyleRefex()){
+                ConceptChronicleBI conceptToAdjudicate = 
+                        Ts.get().getConceptForNid(currentIterator.nid());
+                Ts.get().addUncommitted(conceptToAdjudicate);
+                Ts.get().commit(conceptToAdjudicate,
+                        adjudicationWorkListChangeSetPolicy);
+            }
         }
         while(retiredIterator.next()){
-            ComponentChronicleBI<?> component = Ts.get().getComponent(retiredIterator.nid());
+             ComponentChronicleBI component = Ts.get().getComponent(retiredIterator.nid());
             RefexVersionBI member = conflictRefset.getRefsetMemberActiveForComponent(
                     viewCoord, component.getConceptNid());
-            RefexCAB memberBp = member.makeBlueprint(viewCoord);
-            memberBp.setRetired();
-            builder.constructIfNotCurrent(memberBp);
+            
+            if(member != null){
+                RefexCAB memberBp = member.makeBlueprint(viewCoord);
+                memberBp.setRetired();
+                builder.constructIfNotCurrent(memberBp);
+            }
+            
+            if(conflictRefset.isAnnotationStyleRefex()){
+                ConceptChronicleBI memberToRetire = Ts.get().getConcept(component.getConceptNid());
+                Ts.get().addUncommitted(memberToRetire);
+                Ts.get().commit(memberToRetire,
+                        adjudicationWorkListChangeSetPolicy);
+            }
+                   
         }
-
-        Ts.get().addUncommitted(conflictRefset);
-        Ts.get().commit(conflictRefset);
+        if(!conflictRefset.isAnnotationStyleRefex() || conflictRefset.isAnnotationIndex()){
+            Ts.get().addUncommitted(conflictRefset);
+            Ts.get().commit(conflictRefset,
+                adjudicationWorkListChangeSetPolicy);
+        }
 
         // Update Listeners
         continueWork = false;

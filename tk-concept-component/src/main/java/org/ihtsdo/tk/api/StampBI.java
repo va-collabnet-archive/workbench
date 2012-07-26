@@ -18,7 +18,7 @@ package org.ihtsdo.tk.api;
 /**
  *Interface for the <code>STAMP</code> class.
  */
-public interface StampBI {
+public interface StampBI extends VersionPointBI {
     
     /**
      * 
@@ -35,16 +35,7 @@ public interface StampBI {
      * @return <code>int</code>
      */
     int getModuleNid();
-    /**
-     * 
-     * @return <code>int</code>
-     */
-    int getPathNid();
-    /**
-     * 
-     * @return <code>int</code>
-     */
-    long getTime();
+
     /**
      * Returns the stamp nid with which the SAP object was constructed.
      * @return stamp nid as an <code>int</code> 

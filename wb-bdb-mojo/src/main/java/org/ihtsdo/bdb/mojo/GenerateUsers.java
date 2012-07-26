@@ -85,7 +85,6 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.binding.snomed.*;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipType;
 import org.ihtsdo.tk.spec.ConceptSpec;
@@ -157,6 +156,7 @@ public class GenerateUsers extends AbstractMojo {
 	private I_ConfigAceFrame userConfig;
 	private I_ConfigAceFrame wfConfig;
 	private Boolean create = true;
+        private String generateAdjCs;
 
 	@Override
 	public void execute() throws MojoExecutionException {
@@ -196,6 +196,7 @@ public class GenerateUsers extends AbstractMojo {
 			projectDevelopmentViewPathFsn = configProps.getProperty("projectDevelopmentViewPathFsn");
                         projectDevelopmentAdjPathFsn = configProps.getProperty("projectDevelopmentAdjPathFsn");
                         moduleFsn = configProps.getProperty("moduleFsn");
+                        generateAdjCs = configProps.getProperty("generateAdjCs");
 
 			//create user based on profile config
 			BufferedReader userReader = new BufferedReader(new FileReader(usersFile));
@@ -710,6 +711,11 @@ public class GenerateUsers extends AbstractMojo {
 		newDbProfile.setRefsetChangesChangeSetPolicy(ChangeSetPolicy.OFF);
 		newDbProfile.setUserChangesChangeSetPolicy(ChangeSetPolicy.INCREMENTAL);
 		newDbProfile.setChangeSetWriterThreading(ChangeSetWriterThreading.SINGLE_THREAD);
+                if(generateAdjCs.equalsIgnoreCase("true")){
+                    newDbProfile.setAdjudicationWorkListChangeSetPolicy(ChangeSetPolicy.INCREMENTAL);
+                }else{
+                    newDbProfile.setAdjudicationWorkListChangeSetPolicy(ChangeSetPolicy.OFF);
+                }
 		activeConfig.setDbConfig(newDbProfile);
 		newDbProfile.getAceFrames().add(activeConfig);
 

@@ -84,7 +84,6 @@ import org.dwfa.swing.SwingTask;
 import org.ihtsdo.helper.bdb.MultiEditorContradictionCase;
 import org.ihtsdo.helper.bdb.MultiEditorContradictionDetector;
 import org.ihtsdo.tk.api.*;
-import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 
 /**
  *
@@ -141,7 +140,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
     private Collection<RelationshipGroupVersionBI> statedRelGroups;
     private List<? extends I_RelTuple> statedRels;
     private JPanel conceptPanel;
-    private HashSet<Integer> sapsForConflict = new HashSet<Integer>();
+    private Set<Integer> sapsForConflict = new HashSet<Integer>();
 
     //~--- constructors --------------------------------------------------------
     public ConceptViewLayout(ConceptView conceptView, I_GetConceptData layoutConcept) throws IOException {

@@ -4,16 +4,14 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-
 import org.dwfa.ace.api.I_ConfigAceDb;
+import org.dwfa.ace.config.AceFrameConfig;
 import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
 import org.ihtsdo.tk.api.cs.ChangeSetWriterThreading;
-import org.dwfa.ace.config.AceFrameConfig;
 
 public class ChangeSetConfigPanel extends JPanel implements ActionListener {
 
@@ -27,6 +25,7 @@ public class ChangeSetConfigPanel extends JPanel implements ActionListener {
     private JComboBox classifierPolicy;
     private JComboBox refsetPolicy;
     private JComboBox writerPerformance;
+    private JComboBox adjudicationListPolicy;
 
     public ChangeSetConfigPanel(AceFrameConfig aceFrameConfig) {
         super(new GridBagLayout());
@@ -41,6 +40,8 @@ public class ChangeSetConfigPanel extends JPanel implements ActionListener {
         classifierPolicy = setupCombo(gbc, "classifier changes: ", ChangeSetPolicy.values(), this, dbConfig.getClassifierChangesChangeSetPolicy());
         refsetPolicy = setupCombo(gbc, "refset computer changes: ", ChangeSetPolicy.values(), this, dbConfig.getRefsetChangesChangeSetPolicy());
         writerPerformance = setupCombo(gbc, "writer performance: ", ChangeSetWriterThreading.values(), this, dbConfig.getChangeSetWriterThreading());
+        adjudicationListPolicy = setupCombo(gbc, "adjudication work list: ", ChangeSetPolicy.values(),
+                   this, dbConfig.getAdjudicationWorkListChangeSetPolicy());
         
         gbc.gridx = 0;
         gbc.gridwidth = 2;
@@ -87,6 +88,10 @@ public class ChangeSetConfigPanel extends JPanel implements ActionListener {
         if (e.getSource() == writerPerformance) {
             dbConfig.setChangeSetWriterThreading((ChangeSetWriterThreading) writerPerformance.getSelectedItem());
             return;
-        }   
+        } 
+        if (e.getSource() == adjudicationListPolicy) {
+            dbConfig.setAdjudicationWorkListChangeSetPolicy((ChangeSetPolicy) adjudicationListPolicy.getSelectedItem());
+            return;
+        }
     }
 }

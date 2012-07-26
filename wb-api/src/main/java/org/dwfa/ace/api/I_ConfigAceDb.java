@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
 import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
 import org.ihtsdo.tk.api.cs.ChangeSetWriterThreading;
 
@@ -110,10 +109,12 @@ public interface I_ConfigAceDb {
     public void setUserChangesChangeSetPolicy(ChangeSetPolicy policy);
     public void setClassifierChangesChangeSetPolicy(ChangeSetPolicy policy);
     public void setRefsetChangesChangeSetPolicy(ChangeSetPolicy policy);
+    public void setAdjudicationWorkListChangeSetPolicy(ChangeSetPolicy policy);
 
     public ChangeSetPolicy getUserChangesChangeSetPolicy();
     public ChangeSetPolicy getClassifierChangesChangeSetPolicy();
     public ChangeSetPolicy getRefsetChangesChangeSetPolicy();
+    public ChangeSetPolicy getAdjudicationWorkListChangeSetPolicy();
     
     public void setChangeSetWriterThreading(ChangeSetWriterThreading threading);
     public ChangeSetWriterThreading getChangeSetWriterThreading();

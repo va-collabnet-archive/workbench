@@ -92,10 +92,12 @@ public interface ConceptChronicleBI extends ComponentChronicleBI<ConceptVersionB
    boolean hasRefsetMemberActiveForComponent(ViewCoordinate viewCoordinate, int componentNid) throws IOException;
 
    boolean isAnnotationStyleRefex() throws IOException;
+   boolean isAnnotationIndex() throws IOException;
 
    //~--- set methods ---------------------------------------------------------
 
    void setAnnotationStyleRefex(boolean annotationSyleRefex);
+   void setAnnotationIndex(boolean annotationIndex) throws IOException;
    
    Collection<Integer> getAllNids() throws IOException;
 }

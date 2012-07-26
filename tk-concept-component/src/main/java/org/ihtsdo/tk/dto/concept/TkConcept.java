@@ -42,6 +42,7 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.media.MediaChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.type_array_of_bytearray.RefexArrayOfBytearrayVersionBI;
 import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanVersionBI;
 import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 import org.ihtsdo.tk.api.refex.type_nid_nid.RefexNidNidVersionBI;
@@ -61,10 +62,11 @@ import org.ihtsdo.tk.dto.concept.component.refex.type_arrayofbytearray.TkRefexAr
 public class TkConcept {
 
     public static final String PADDING = "     ";
-    public static final int dataVersion = 8;
+    public static final int dataVersion = 9;
     public static final long serialVersionUID = 1;
     //~--- fields --------------------------------------------------------------
     public boolean annotationStyleRefex = false;
+    public boolean annotationIndexStyleRefex = false;
     public TkConceptAttributes conceptAttributes;
     public List<TkDescription> descriptions;
     public List<TkMedia> media;
@@ -84,6 +86,7 @@ public class TkConcept {
 
     public TkConcept(ConceptChronicleBI conceptChronicle) throws IOException {
         annotationStyleRefex = conceptChronicle.isAnnotationStyleRefex();
+        annotationIndexStyleRefex = conceptChronicle.isAnnotationIndex();
         conceptAttributes = new TkConceptAttributes(conceptChronicle.getConceptAttributes());
         primordialUuid = conceptAttributes.primordialUuid;
         relationships = new ArrayList<TkRelationship>(conceptChronicle.getRelationshipsSource().size());
@@ -149,6 +152,8 @@ public class TkConcept {
             return new TkRefexLongMember(refexChronicle);
         } else if (refexChronicle.getPrimordialVersion() instanceof RefexBooleanVersionBI) {
             return new TkRefexBooleanMember(refexChronicle);
+        } else if (refexChronicle.getPrimordialVersion() instanceof RefexArrayOfBytearrayVersionBI) {
+            return new TkRefexArrayOfBytearrayMember(refexChronicle);
         } else if (refexChronicle.getPrimordialVersion() instanceof RefexMemberVersionBI) {
             return new TkRefexMember(refexChronicle);
         } else {
@@ -159,6 +164,7 @@ public class TkConcept {
     public TkConcept(TkConcept another, Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
         super();
         this.annotationStyleRefex = another.annotationStyleRefex;
+        this.annotationIndexStyleRefex = another.annotationIndexStyleRefex;
 
         if (another.conceptAttributes != null) {
             this.conceptAttributes = another.conceptAttributes.makeConversion(conversionMap, offset, mapAll);
@@ -216,6 +222,7 @@ public class TkConcept {
         super();
         this.primordialUuid = conversionMap.get(conceptVersion.getPrimUuid());
         this.annotationStyleRefex = conceptVersion.isAnnotationStyleRefex();
+        this.annotationIndexStyleRefex = conceptVersion.isAnnotationIndex();
         this.conceptAttributes = new TkConceptAttributes(conceptVersion.getConceptAttributesActive(), excludedNids,
                 conversionMap, offset, mapAll, conceptVc);
 
@@ -539,6 +546,12 @@ public class TkConcept {
         } else {
             annotationStyleRefex = false;
         }
+        
+        if (readDataVersion >= 9) {
+            annotationIndexStyleRefex = in.readBoolean();
+        } else {
+            annotationIndexStyleRefex = false;
+        }
     }
 
     /**
@@ -671,6 +684,7 @@ public class TkConcept {
         }
 
         out.writeBoolean(annotationStyleRefex);
+        out.writeBoolean(annotationIndexStyleRefex);
     }
 
     //~--- get methods ---------------------------------------------------------
@@ -701,10 +715,18 @@ public class TkConcept {
     public boolean isAnnotationStyleRefex() {
         return annotationStyleRefex;
     }
+    
+    public boolean isAnnotationIndexStyleRefex() {
+        return annotationIndexStyleRefex;
+    }
 
     //~--- set methods ---------------------------------------------------------
     public void setAnnotationStyleRefex(boolean annotationStyleRefex) {
         this.annotationStyleRefex = annotationStyleRefex;
+    }
+    
+    public void setAnnotationIndexStyleRefex(boolean annotationIndexStyleRefex) {
+        this.annotationIndexStyleRefex = annotationIndexStyleRefex;
     }
 
     public void setConceptAttributes(TkConceptAttributes conceptAttributes) {

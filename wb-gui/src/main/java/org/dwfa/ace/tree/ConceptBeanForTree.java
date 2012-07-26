@@ -816,6 +816,11 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
    public boolean isAnnotationStyleRefex() throws IOException {
       return bean.isAnnotationStyleRefex();
    }
+   
+   @Override
+   public boolean isAnnotationIndex() throws IOException {
+      return bean.isAnnotationIndex();
+   }
 
    @Override
    public boolean isCanceled() throws IOException {
@@ -895,6 +900,11 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
    @Override
    public void setAnnotationStyleRefex(boolean annotationSyleRefex) {
       bean.setAnnotationStyleRefex(annotationSyleRefex);
+   }
+   
+   @Override
+   public void setAnnotationIndex(boolean annotationIndex) throws IOException {
+      bean.setAnnotationIndex(annotationIndex);
    }
 
    @Override

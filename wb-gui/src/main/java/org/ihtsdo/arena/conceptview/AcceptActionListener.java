@@ -1,7 +1,6 @@
 package org.ihtsdo.arena.conceptview;
 
 //~--- non-JDK imports --------------------------------------------------------
-import au.csiro.snorocket.snapi.SnomedMetadata;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.log.AceLog;
 
@@ -29,6 +28,7 @@ import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.arena.contradiction.ContradictionEditorFrame;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
@@ -38,8 +38,6 @@ import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.binding.snomed.Snomed;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 
 public class AcceptActionListener implements ActionListener {
@@ -85,38 +83,48 @@ public class AcceptActionListener implements ActionListener {
                     snorocketNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.SNOROCKET.getUids());
                     adjudicationRecRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.ADJUDICATION_RECORD.getUids());
                 }
-                for (Integer sap : c.getAllStampNids()) {
-                    if (sap > readOnlyMaxSap) {
-                        if (Ts.get().getAuthorNidForStampNid(sap) != snorocketNid) {
-                            UUID authorUuid = Ts.get().getUuidPrimordialForNid(Ts.get().getAuthorNidForStampNid(sap));
-                            long time = Ts.get().getTimeForStampNid(sap);
-                            String stringToHash = authorUuid.toString() + Long.toString(time);
-                            UUID type5Uuid = Type5UuidFactory.get(Type5UuidFactory.AUTHOR_TIME_ID, stringToHash);
-                            authorTimeHashSet.add(type5Uuid);
+                //get ajudication path
+                int[] editPathNids = settings.getConfig().getEditCoordinate().getEditPaths();
+                for(int editPathNid : editPathNids){
+                    PositionBI projectPosition = Ts.get().newPosition(Ts.get().getPath(editPathNid), System.currentTimeMillis()); //latest on path
+                    for (Integer stamp : c.getAllStampNids()) {
+                        PositionBI stampPosition = Ts.get().newPosition(Ts.get().getPath(Ts.get().getPathNidForStampNid(stamp)),
+                                Ts.get().getTimeForStampNid(stamp));
+                        if(stampPosition.isAntecedentOrEqualTo(projectPosition)){
+                            if (stamp > readOnlyMaxSap) {
+                                if (Ts.get().getAuthorNidForStampNid(stamp) != snorocketNid) {
+                                    UUID authorUuid = Ts.get().getUuidPrimordialForNid(Ts.get().getAuthorNidForStampNid(stamp));
+                                    long time = Ts.get().getTimeForStampNid(stamp);
+                                    String stringToHash = authorUuid.toString() + Long.toString(time);
+                                    UUID type5Uuid = Type5UuidFactory.get(Type5UuidFactory.AUTHOR_TIME_ID, stringToHash);
+                                    authorTimeHashSet.add(type5Uuid);
+                                }
+                            }
                         }
                     }
-                }
-                if (!authorTimeHashSet.isEmpty()) {
-                    byte[][] arrayOfAuthorTime = new byte[authorTimeHashSet.size()][];
-                    UUID[] atUuidArray = authorTimeHashSet.toArray(new UUID[authorTimeHashSet.size()]);
-                    for (int i = 0; i < arrayOfAuthorTime.length; i++) {
-                        arrayOfAuthorTime[i] = Type5UuidFactory.getRawBytes(atUuidArray[i]);
+                    if (!authorTimeHashSet.isEmpty()) {
+                        byte[][] arrayOfAuthorTime = new byte[authorTimeHashSet.size()][];
+                        UUID[] atUuidArray = authorTimeHashSet.toArray(new UUID[authorTimeHashSet.size()]);
+                        for (int i = 0; i < arrayOfAuthorTime.length; i++) {
+                            arrayOfAuthorTime[i] = Type5UuidFactory.getRawBytes(atUuidArray[i]);
+                        }
+
+                        RefexCAB annotBp = new RefexCAB(TK_REFEX_TYPE.ARRAY_BYTEARRAY,
+                                c.getConceptNid(),
+                                adjudicationRecRefsetNid);
+                        annotBp.put(RefexProperty.ARRAY_BYTEARRAY, arrayOfAuthorTime);
+                        annotBp.setMemberUuid(UUID.randomUUID());
+                        I_ConfigAceFrame config = settings.getView().getConfig();
+                        ViewCoordinate vc = config.getViewCoordinate();
+                        EditCoordinate ec = config.getEditCoordinate();
+                        TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(ec, vc);
+                        RefexChronicleBI<?> newAdjudicationRecord = builder.constructIfNotCurrent(annotBp);
+
+                        c.addAnnotation(newAdjudicationRecord);
+                        Ts.get().addUncommitted(c);
                     }
-
-                    RefexCAB annotBp = new RefexCAB(TK_REFEX_TYPE.ARRAY_BYTEARRAY,
-                            c.getConceptNid(),
-                            adjudicationRecRefsetNid);
-                    annotBp.put(RefexProperty.ARRAY_BYTEARRAY, arrayOfAuthorTime);
-
-                    I_ConfigAceFrame config = settings.getView().getConfig();
-                    ViewCoordinate vc = config.getViewCoordinate();
-                    EditCoordinate ec = config.getEditCoordinate();
-                    TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(ec, vc);
-                    RefexChronicleBI<?> newAdjudicationRecord = builder.constructIfNotCurrent(annotBp);
-
-                    c.addAnnotation(newAdjudicationRecord);
-                    Ts.get().addUncommitted(c);
-                }
+            }
+                
                 isCommitted = c.commit(settings.getConfig().getDbConfig().getUserChangesChangeSetPolicy().convert(),
                         settings.getConfig().getDbConfig().getChangeSetWriterThreading().convert(),
                         settings.isForAdjudication());

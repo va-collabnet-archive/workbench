@@ -10,6 +10,7 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
 
 public interface TerminologyDI {
 
@@ -35,6 +36,8 @@ public interface TerminologyDI {
    void cancel() throws IOException;
 
    void commit(ConceptChronicleBI conceptChronicle) throws IOException;
+   
+   void commit(ConceptChronicleBI cc, ChangeSetPolicy changeSetPolicy) throws IOException;
 
    void cancel(ConceptChronicleBI conceptChronicle) throws IOException;
 

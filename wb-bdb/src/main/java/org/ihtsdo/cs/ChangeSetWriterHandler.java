@@ -11,7 +11,6 @@ import javax.swing.Timer;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
-import org.ihtsdo.tk.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.util.id.Type5UuidFactory;
@@ -21,13 +20,17 @@ import org.ihtsdo.concept.ParallelConceptIterator;
 import org.ihtsdo.concept.component.refsetmember.array.bytearray.ArrayOfBytearrayMember;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
+import org.ihtsdo.db.bdb.computer.version.PositionMapperBI;
+import org.ihtsdo.db.bdb.sap.STAMP;
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.NidSetBI;
+import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
+import org.ihtsdo.tk.api.cs.ChangeSetWriterThreading;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.spec.ValidationException;
@@ -182,22 +185,46 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
         if (cNidsToWrite.isMember(cNid)) {
             processedChangedCount.incrementAndGet();
             Concept c = (Concept) fcfc.fetch();
-
+            
+            Set<Integer> editPathNids = new HashSet<Integer>(); //used by both commit and adj
             Set<UUID> authorTimeHashSet = new HashSet<UUID>(); // :WAS:byte[]
             if (writeCommitRecord && commitRecordSapNid != 0) {
-                for (Integer sap : c.getAllStampNids()) {
-                    if (sap > Bdb.getSapDb().getReadOnlyMax() && Bdb.getSapDb().getTime(sap) != Long.MAX_VALUE) {
-                        Concept authorConcept = Concept.get(Bdb.getSapDb().getAuthorNid(sap));
-                        if (authorConcept.getNid() != ReferenceConcepts.SNOROCKET.getNid()) {
-                            long time = Bdb.getSapDb().getTime(sap);
-                            String stringToHash = authorConcept.getPrimUuid().toString()
-                                    + Long.toString(time);
-                            UUID type5Uuid = Type5UuidFactory.get(Type5UuidFactory.AUTHOR_TIME_ID,
-                                    stringToHash);
-                            authorTimeHashSet.add(type5Uuid);
+                
+                Set<Integer> allConceptStampNids = c.getAllStampNids();
+                Set<Integer> conceptStampNids = new HashSet<Integer>();
+                for(int stampNid : sapNidsFromCommit.getSetValues()){
+                    if(allConceptStampNids.contains(stampNid)){
+                        conceptStampNids.add(stampNid);
+                    }
+                }
+                
+                for(int stamp : conceptStampNids){
+                    int editPathNid = Bdb.getSapDb().getPathNid(stamp);
+                    editPathNids.add(editPathNid);
+                }
+                
+                for(int editPathNid : editPathNids){
+                    PositionBI viewPosition = Ts.get().newPosition(Ts.get().getPath(editPathNid),
+                    Bdb.getSapDb().getTime(commitRecordSapNid));
+                    PositionMapperBI mapper = Bdb.getSapDb().getMapper(viewPosition);
+                    
+                    for (Integer stamp : c.getAllStampNids()) {
+                        if (stamp > Bdb.getSapDb().getReadOnlyMax() && Bdb.getSapDb().getTime(stamp) != Long.MAX_VALUE) {
+                            if(mapper.onRoute(new STAMP(stamp))){
+                                Concept authorConcept = Concept.get(Bdb.getSapDb().getAuthorNid(stamp));
+                                if (authorConcept.getNid() != ReferenceConcepts.SNOROCKET.getNid()) {
+                                    long time = Bdb.getSapDb().getTime(stamp);
+                                    String stringToHash = authorConcept.getPrimUuid().toString()
+                                            + Long.toString(time);
+                                    UUID type5Uuid = Type5UuidFactory.get(Type5UuidFactory.AUTHOR_TIME_ID,
+                                            stringToHash);
+                                    authorTimeHashSet.add(type5Uuid);
+                                }
+                            }
                         }
                     }
                 }
+                
                 if (!authorTimeHashSet.isEmpty()) {
                     byte[][] arrayOfAuthorTime = new byte[authorTimeHashSet.size()][];
                     UUID[] atUuidArray = authorTimeHashSet.toArray(new UUID[authorTimeHashSet.size()]);
@@ -232,19 +259,27 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
                     }
                 }
                 if(!hasRecord){
-                    for (Integer sap : c.getAllStampNids()) {
-                        if (sap > Bdb.getSapDb().getReadOnlyMax()) {
-                            Concept authorConcept = Concept.get(Bdb.getSapDb().getAuthorNid(sap));
-                            if (authorConcept.getNid() != ReferenceConcepts.SNOROCKET.getNid()) {
-                                long time = Bdb.getSapDb().getTime(sap);
-                                String stringToHash = authorConcept.getPrimUuid().toString()
-                                    + Long.toString(time);
-                                UUID type5Uuid = Type5UuidFactory.get(Type5UuidFactory.AUTHOR_TIME_ID,
-                                    stringToHash);
-                                authorTimeHashSet.add(type5Uuid);
+                    for(int editPathNid : editPathNids){
+                        PositionBI viewPosition = Ts.get().newPosition(Ts.get().getPath(editPathNid),
+                        Bdb.getSapDb().getTime(commitRecordSapNid));
+                        PositionMapperBI mapper = Bdb.getSapDb().getMapper(viewPosition);
+                        for (Integer stamp : c.getAllStampNids()) {
+                            if (stamp > Bdb.getSapDb().getReadOnlyMax()) {
+                                if(mapper.onRoute(new STAMP(stamp))){
+                                    Concept authorConcept = Concept.get(Bdb.getSapDb().getAuthorNid(stamp));
+                                    if (authorConcept.getNid() != ReferenceConcepts.SNOROCKET.getNid()) {
+                                        long time = Bdb.getSapDb().getTime(stamp);
+                                        String stringToHash = authorConcept.getPrimUuid().toString()
+                                            + Long.toString(time);
+                                        UUID type5Uuid = Type5UuidFactory.get(Type5UuidFactory.AUTHOR_TIME_ID,
+                                            stringToHash);
+                                        authorTimeHashSet.add(type5Uuid);
+                                    }
+                                }
                             }
                         }
                     }
+                    
                     if (!authorTimeHashSet.isEmpty()) {
                         byte[][] arrayOfAuthorTime = new byte[authorTimeHashSet.size()][];
                         UUID[] atUuidArray = authorTimeHashSet.toArray(new UUID[authorTimeHashSet.size()]);

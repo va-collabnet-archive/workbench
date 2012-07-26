@@ -54,6 +54,9 @@ public class RefsetMemberFactory {
         if (refexColCon.isAnnotationStyleRefex()) {
             member.enclosingConceptNid = Ts.get().getConceptNidForNid(rcNid);
             Bdb.getNidCNidMap().setCNidForNid(member.enclosingConceptNid, member.nid);
+            if (refexColCon.isAnnotationIndex()) {
+                refexColCon.getData().add(member);
+            }
         } else {
             member.enclosingConceptNid = refexColCon.getNid();
             Bdb.getNidCNidMap().setCNidForNid(member.enclosingConceptNid, member.nid);

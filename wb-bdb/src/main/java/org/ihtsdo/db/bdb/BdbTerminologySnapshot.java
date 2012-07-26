@@ -23,6 +23,7 @@ import java.util.UUID;
 import org.dwfa.vodb.types.Position;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
+import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
 
 public class BdbTerminologySnapshot implements TerminologySnapshotDI {
    private BdbTerminologyStore store;
@@ -89,6 +90,11 @@ public class BdbTerminologySnapshot implements TerminologySnapshotDI {
    public void commit(ConceptChronicleBI cc) throws IOException {
       throw new UnsupportedOperationException();
    }
+   
+   @Override
+    public void commit(ConceptChronicleBI cc, ChangeSetPolicy changeSetPolicy) throws IOException {
+        throw new UnsupportedOperationException();
+    }
 
    @Override
    public void commit(ConceptVersionBI cv) throws IOException {

@@ -434,6 +434,10 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         if (c.isAnnotationStyleRefex() == false) {
             c.setAnnotationStyleRefex(eConcept.isAnnotationStyleRefex());
         }
+        
+        if (c.isAnnotationIndex() == false) {
+            c.setAnnotationIndex(eConcept.isAnnotationIndexStyleRefex());
+        }
 
         TkConceptAttributes eAttr = eConcept.getConceptAttributes();
 
@@ -2518,7 +2522,8 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
         return false;
     }
-
+    
+    @Override
     public boolean isAnnotationIndex() throws IOException {
         return data.isAnnotationIndex();
     }
@@ -2619,6 +2624,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     }
 
     //~--- set methods ---------------------------------------------------------
+    @Override
     public void setAnnotationIndex(boolean annotationIndex) throws IOException {
         data.setAnnotationIndex(annotationIndex);
     }
