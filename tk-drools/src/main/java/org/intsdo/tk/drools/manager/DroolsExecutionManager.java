@@ -235,7 +235,9 @@ public class DroolsExecutionManager {
         kbase = KnowledgeBaseFactory.newKnowledgeBase(kBaseConfig);
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder(kbase, builderConfig);
         for (Resource resource : resources.keySet()) {
-            kbuilder.add(resource, resources.get(resource));
+            synchronized (this) {
+                kbuilder.add(resource, resources.get(resource)); 
+            }
         }
         if (kbuilder.hasErrors()) {
             throw new RuntimeException(kbuilder.getErrors().toString());

@@ -270,6 +270,40 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
         boolean result = (subtype.equals(parent) || isParentOf(parent, subtype));
         return result;
     }
+    
+    @Override
+    public boolean isDescriptionTextNotUniqueInProvidedHierarchy(String descText, String conceptUuid, 
+            String hierarchyConceptUuid) throws Exception {
+        I_TermFactory tf = Terms.get();
+        SearchResult result = Terms.get().doLuceneSearch(QueryParser.escape(descText));
+        int conceptNid = Terms.get().uuidToNative(UUID.fromString(conceptUuid));
+        boolean unique = true;
+        if (result.topDocs.totalHits == 0) {
+            unique = true;
+        } else {
+            NidSetBI allowedStatusNids = Terms.get().getActiveAceFrameConfig().getViewCoordinate().getAllowedStatusNids();
+            search:
+            for (int i = 0; i < result.topDocs.totalHits && i <= 10; i++) {
+                Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
+                int cnid = Integer.parseInt(doc.get("cnid"));
+                int dnid = Integer.parseInt(doc.get("dnid"));
+                if (cnid != conceptNid) {
+                    I_DescriptionVersioned<?> potential_match = Terms.get().getDescription(dnid, cnid);
+                    if (potential_match != null) {
+                        for (I_DescriptionPart part_search : potential_match.getMutableParts()) {
+                            if (allowedStatusNids.contains(part_search.getStatusNid())
+                                    && part_search.getText().toLowerCase().equals(descText.toLowerCase())
+                                    && isParentOf(hierarchyConceptUuid, tf.nidToUuid(cnid).toString())) {
+                                unique = false;
+                                break search;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return !unique;
+    }
 
     /*
      * (non-Javadoc) @see

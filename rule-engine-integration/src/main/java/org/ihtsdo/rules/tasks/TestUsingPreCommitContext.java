@@ -88,14 +88,14 @@ import org.ihtsdo.rules.RulesLibrary.INFERRED_VIEW_ORIGIN;
 		List<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
 		try {
 			I_TermFactory tf = Terms.get();
-			I_GetConceptData snomedRoot = getConceptSafe(Terms.get(), SNOMED.Concept.ROOT.getUids());
-			I_GetConceptData auxRoot = getConceptSafe(Terms.get(), ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT.getUids());
-			I_GetConceptData refsetRoot = getConceptSafe(Terms.get(), RefsetAuxiliary.Concept.REFSET_AUXILIARY.getUids());
-			I_GetConceptData projectRoot = getConceptSafe(Terms.get(), ArchitectonicAuxiliary.Concept.PROJECTS_ROOT_HIERARCHY.getUids());
+//			I_GetConceptData snomedRoot = getConceptSafe(Terms.get(), SNOMED.Concept.ROOT.getUids());
+//			I_GetConceptData auxRoot = getConceptSafe(Terms.get(), ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT.getUids());
+//			I_GetConceptData refsetRoot = getConceptSafe(Terms.get(), RefsetAuxiliary.Concept.REFSET_AUXILIARY.getUids());
+//			I_GetConceptData projectRoot = getConceptSafe(Terms.get(), ArchitectonicAuxiliary.Concept.PROJECTS_ROOT_HIERARCHY.getUids());
 
-			if (snomedRoot == null || auxRoot == null || refsetRoot == null || projectRoot == null) {
-				return alertList;
-			}
+//			if (snomedRoot == null || auxRoot == null || refsetRoot == null || projectRoot == null) {
+//				return alertList;
+//			}
 
 			if (RulesLibrary.rulesDisabled ||
 					RefsetAuxiliary.Concept.COMMIT_RECORD.getUids().contains(concept.getPrimUuid()) ||
@@ -103,27 +103,27 @@ import org.ihtsdo.rules.RulesLibrary.INFERRED_VIEW_ORIGIN;
 				return alertList;
 			}
 
-			boolean isDescSnomedRoot = snomedRoot.isParentOfOrEqualTo(concept, getFrameConfig().getAllowedStatus(), getFrameConfig()
-					.getDestRelTypes(), getFrameConfig().getViewPositionSetReadOnly(), getFrameConfig().getPrecedence(),
-					getFrameConfig().getConflictResolutionStrategy());
-			boolean isDescAuxRoot = auxRoot.isParentOfOrEqualTo(concept, getFrameConfig().getAllowedStatus(), getFrameConfig()
-					.getDestRelTypes(), getFrameConfig().getViewPositionSetReadOnly(), getFrameConfig().getPrecedence(),
-					getFrameConfig().getConflictResolutionStrategy());
-			boolean isDescRefsetRoot = refsetRoot.isParentOfOrEqualTo(concept, getFrameConfig().getAllowedStatus(), getFrameConfig()
-					.getDestRelTypes(), getFrameConfig().getViewPositionSetReadOnly(), getFrameConfig().getPrecedence(),
-					getFrameConfig().getConflictResolutionStrategy());
-			boolean isDescProjRoot = projectRoot.isParentOfOrEqualTo(concept, getFrameConfig().getAllowedStatus(), getFrameConfig()
-					.getDestRelTypes(), getFrameConfig().getViewPositionSetReadOnly(), getFrameConfig().getPrecedence(),
-					getFrameConfig().getConflictResolutionStrategy());
+//			boolean isDescSnomedRoot = snomedRoot.isParentOfOrEqualTo(concept, getFrameConfig().getAllowedStatus(), getFrameConfig()
+//					.getDestRelTypes(), getFrameConfig().getViewPositionSetReadOnly(), getFrameConfig().getPrecedence(),
+//					getFrameConfig().getConflictResolutionStrategy());
+//			boolean isDescAuxRoot = auxRoot.isParentOfOrEqualTo(concept, getFrameConfig().getAllowedStatus(), getFrameConfig()
+//					.getDestRelTypes(), getFrameConfig().getViewPositionSetReadOnly(), getFrameConfig().getPrecedence(),
+//					getFrameConfig().getConflictResolutionStrategy());
+//			boolean isDescRefsetRoot = refsetRoot.isParentOfOrEqualTo(concept, getFrameConfig().getAllowedStatus(), getFrameConfig()
+//					.getDestRelTypes(), getFrameConfig().getViewPositionSetReadOnly(), getFrameConfig().getPrecedence(),
+//					getFrameConfig().getConflictResolutionStrategy());
+//			boolean isDescProjRoot = projectRoot.isParentOfOrEqualTo(concept, getFrameConfig().getAllowedStatus(), getFrameConfig()
+//					.getDestRelTypes(), getFrameConfig().getViewPositionSetReadOnly(), getFrameConfig().getPrecedence(),
+//					getFrameConfig().getConflictResolutionStrategy());
 
-			if ((isDescAuxRoot || isDescRefsetRoot || isDescProjRoot) && !isDescSnomedRoot)  {
-				return alertList;
-			} else {
+//			if ((isDescAuxRoot || isDescRefsetRoot || isDescProjRoot) && !isDescSnomedRoot)  {
+//				return alertList;
+//			} else {
 				alertList =  RulesLibrary.checkConcept(concept, 
 						tf.getConcept(RefsetAuxiliary.Concept.REALTIME_PRECOMMIT_QA_CONTEXT.getUids()), true, 
 						getFrameConfig(), INFERRED_VIEW_ORIGIN.STATED).getAlertList();
 				return alertList;
-			}
+//			}
 		} catch (Exception e) {
 			throw new TaskFailedException(e);
 		}
