@@ -427,6 +427,10 @@ public abstract class RF2AbstractImpl {
 	public String getConceptId(ConceptChronicleBI concept) throws Exception {
 		return ExportUtil.getConceptId(concept);
 	}
+	
+	public String getConceptId(I_GetConceptData concept) throws Exception {
+		return ExportUtil.getConceptId(concept);
+	}
 
 	public String getConceptId(I_GetConceptData concept, int snomedCorePathNid) throws IOException, TerminologyException {
 		return ExportUtil.getConceptId(concept, snomedCorePathNid);

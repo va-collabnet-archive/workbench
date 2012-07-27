@@ -1443,6 +1443,16 @@ public class ExportUtil {
 		}
 		return snomedId;
 	}
+	public static String getConceptId(I_GetConceptData concept) throws IOException, TerminologyException {
+		String snomedId = "";
+		Collection<? extends IdBI> allids = concept.getAllIds();
+		for (IdBI idBI : allids) {
+			if(idBI.getAuthorityNid() == ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid()){
+				snomedId = idBI.getDenotation().toString();
+			}
+		}
+		return snomedId;
+	}
 
 	public static String getCtv3Id(I_GetConceptData concept, int snomedCorePathNid) throws IOException, TerminologyException {
 		String ctv3Id = ""; // ConceptId

@@ -20,7 +20,9 @@ import org.ihtsdo.rf2.util.WriteUtil;
 import org.ihtsdo.tk.api.Precedence;
 
 /**
- * Title: RF2DescriptionImpl Description: Iterating over all the concept in workbench and fetching all the components required by RF2 Description File Copyright: Copyright (c) 2010 Company: IHTSDO
+ * Title: RF2DescriptionImpl Description: Iterating over all the concept in
+ * workbench and fetching all the components required by RF2 Description File
+ * Copyright: Copyright (c) 2010 Company: IHTSDO
  * 
  * @author Varsha Parekh
  * @version 1.0
@@ -38,15 +40,16 @@ public class RF2LanguageImpl extends RF2AbstractImpl implements I_ProcessConcept
 
 	public RF2LanguageImpl(Config config, int langRefsetId, String refsetSCTId, String moduleId) {
 		super(config);
-		this.langRefsetId=langRefsetId;
-		this.refsetSCTId=refsetSCTId;
-		this.moduleId=moduleId;
+		this.langRefsetId = langRefsetId;
+		this.refsetSCTId = refsetSCTId;
+		this.moduleId = moduleId;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @seeorg.dwfa.ace.api.I_ProcessConcepts#processConcept(org.dwfa.ace.api. I_GetConceptData)
+	 * @seeorg.dwfa.ace.api.I_ProcessConcepts#processConcept(org.dwfa.ace.api.
+	 * I_GetConceptData)
 	 */
 	@Override
 	public void processConcept(I_GetConceptData concept) throws Exception {
@@ -66,9 +69,7 @@ public class RF2LanguageImpl extends RF2AbstractImpl implements I_ProcessConcept
 
 		try {
 
-			List<? extends I_DescriptionTuple> descriptions = concept.getDescriptionTuples(allStatuses, 
-					descTypes, currenAceConfig.getViewPositionSetReadOnly(), 
-					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
+			List<? extends I_DescriptionTuple> descriptions = concept.getDescriptionTuples(allStatuses, descTypes, currenAceConfig.getViewPositionSetReadOnly(), Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
 
 			if (logger.isDebugEnabled()) {
 				logger.info("Concept : " + conceptid);
@@ -80,11 +81,10 @@ public class RF2LanguageImpl extends RF2AbstractImpl implements I_ProcessConcept
 				if (logger.isDebugEnabled()) {
 					logger.debug("!descs.isEmpty() && descs.size() > 0 :" + (!descriptions.isEmpty() && descriptions.size() > 0));
 				}
-				for (I_DescriptionTuple description: descriptions) {
+				for (I_DescriptionTuple description : descriptions) {
 
-					List<? extends I_ExtendByRef> extensions = tf.getAllExtensionsForComponent(
-							description.getDescId(), true);
-					I_ExtendByRef languageExtension=null;
+					List<? extends I_ExtendByRef> extensions = tf.getAllExtensionsForComponent(description.getDescId(), true);
+					I_ExtendByRef languageExtension = null;
 					for (I_ExtendByRef extension : extensions) {
 						if (extension.getRefsetId() == langRefsetId) {
 							languageExtension = extension;
@@ -94,9 +94,8 @@ public class RF2LanguageImpl extends RF2AbstractImpl implements I_ProcessConcept
 					if (languageExtension != null) {
 
 						long lastVersion = Long.MIN_VALUE;
-						I_ExtendByRefPartCid extensionPart=null;
-						for (I_ExtendByRefVersion loopTuple : languageExtension.getTuples(allStatusSet,currenAceConfig.getViewPositionSetReadOnly(),
-								Precedence.PATH,currenAceConfig.getConflictResolutionStrategy())) {
+						I_ExtendByRefPartCid extensionPart = null;
+						for (I_ExtendByRefVersion loopTuple : languageExtension.getTuples(allStatusSet, currenAceConfig.getViewPositionSetReadOnly(), Precedence.PATH, currenAceConfig.getConflictResolutionStrategy())) {
 
 							if (loopTuple.getTime() >= lastVersion) {
 								lastVersion = loopTuple.getTime();
@@ -107,46 +106,46 @@ public class RF2LanguageImpl extends RF2AbstractImpl implements I_ProcessConcept
 							if (logger.isDebugEnabled()) {
 								logger.debug("Language refset extension part not found!");
 							}
-						}else{
+						} else {
 
 							extensionStatusId = extensionPart.getStatusNid();
 							int acceptabilityNid = extensionPart.getC1id();
 							descriptionid = getDescriptionId(description.getDescId(), ExportUtil.getSnomedCorePathNid());
 
 							String status = getStatusType(extensionStatusId);
-							if (status.equals("0")){ 
+							if (status.equals("0")) {
 								active = "1";
 							} else if (status.equals("1")) {
 								active = "0";
 							} else {
-								I_GetConceptData con=tf.getConcept(extensionStatusId);
+								I_GetConceptData con = tf.getConcept(extensionStatusId);
 								logger.error("unknown extensionStatusId =====>" + extensionStatusId + "con : " + con.toString());
 							}
-							
+
 							if (acceptabilityNid == preferredNid) { // preferred
 								acceptabilityId = I_Constants.PREFERRED;
-							} else if (acceptabilityNid == acceptableNid) { 
+							} else if (acceptabilityNid == acceptableNid) {
 								acceptabilityId = I_Constants.ACCEPTABLE;
 							} else {
 								logger.error("unknown acceptabilityId =====>" + acceptabilityNid + "conceptid  =====>" + conceptid + " descriptionid ===>" + descriptionid);
 							}
 
-							if ((descriptionid==null || descriptionid.equals("")) && active.equals("1")){
-								descriptionid=description.getUUIDs().iterator().next().toString();
+							if ((descriptionid == null || descriptionid.equals("")) && active.equals("1")) {
+								descriptionid = description.getUUIDs().iterator().next().toString();
 							}
-							
-							if (descriptionid==null || descriptionid.equals("")){
+
+							if (descriptionid == null || descriptionid.equals("")) {
 								logger.error("Unplublished Retired Concept of Lang Refset : " + concept.getUUIDs().iterator().next().toString());
-							}else {
-								
-								refsetuuid = extensionPart.getPrimUuid(); 
-								
+							} else {
+
+								refsetuuid = extensionPart.getPrimUuid();
+
 								effectiveTime = getDateFormat().format(new Date(extensionPart.getTime()));
-	
+
 								writeRF2TypeLine(refsetuuid, effectiveTime, active, moduleId, refsetSCTId, descriptionid, acceptabilityId);
 							}
 						}
-					} 
+					}
 				}
 			}
 		} catch (IOException e) {
@@ -159,7 +158,6 @@ public class RF2LanguageImpl extends RF2AbstractImpl implements I_ProcessConcept
 			System.exit(0);
 		}
 	}
-
 
 	private void writeRF2TypeLine(UUID refsetuuid, String langEffectiveTime, String active, String moduleId, String refsetId, String descriptionid, String acceptabilityId) throws IOException {
 		WriteUtil.write(getConfig(), refsetuuid + "\t" + langEffectiveTime + "\t" + active + "\t" + moduleId + "\t" + refsetId + "\t" + descriptionid + "\t" + acceptabilityId);
