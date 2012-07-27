@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import net.jini.id.Uuid;
-
 import org.apache.lucene.document.Document;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -31,6 +29,31 @@ import org.ihtsdo.rf2.util.ExportUtil;
  * @goal create-sctids
  */
 public class TestMyTest extends AbstractMojo {
+
+	/**
+	 * Location of the build directory.
+	 * 
+	 * @parameter expression="${project.build.directory}"
+	 * @required
+	 */
+	private File targetDirectory;
+
+	/**
+	 * Location of the build directory.
+	 * 
+	 * @parameter expression="${project.build.directory}"
+	 * @required
+	 */
+	private String conceptFilePath;
+
+	/**
+	 * Location of the build directory.
+	 * 
+	 * @parameter expression="${project.build.directory}"
+	 * @required
+	 */
+	private String releaseFolder;
+
 	private static final I_TermFactory tf = Terms.get();
 	public static int[] idCol = { -1 };
 	public static HashMap<String, String> conceptIds = new HashMap<String, String>();
@@ -44,7 +67,7 @@ public class TestMyTest extends AbstractMojo {
 
 			BufferedWriter bw = null;
 			try {
-				File outputFile = new File("Mapping.txt");
+				File outputFile = new File(targetDirectory, "Mapping.txt");
 				FileOutputStream fos = new FileOutputStream(outputFile);
 				OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
 				bw = new BufferedWriter(osw);
@@ -52,7 +75,7 @@ public class TestMyTest extends AbstractMojo {
 				bw.newLine();
 				createConceptsSctId(bw);
 
-				File folder = new File("RF2_20120731_7");
+				File folder = new File(releaseFolder);
 
 				recursiveUpdateIds(folder, bw);
 			} catch (Exception e) {
@@ -68,8 +91,8 @@ public class TestMyTest extends AbstractMojo {
 		}
 	}
 
-	private static void createConceptsSctId(BufferedWriter bw) {
-		File f = new File("sct2_Concept_Full_GMDN_20120731.txt");
+	private void createConceptsSctId(BufferedWriter bw) {
+		File f = new File(conceptFilePath);
 		BufferedReader br = null;
 		try {
 			InputStreamReader fis = new InputStreamReader(new FileInputStream(f), "UTF-8");
