@@ -175,7 +175,7 @@ public class TestMyTest extends AbstractMojo {
 				InputStreamReader fis = new InputStreamReader(new FileInputStream(currentFile), "UTF-8");
 				br = new BufferedReader(fis);
 
-				File outputFolder = new File(currentFile.getParent().replace("RF2_20120731_7", "RF2_20120731_7_IDRESULT"));
+				File outputFolder = new File(currentFile.getParent().replace("output", "output_idresult"));
 				outputFolder.mkdirs();
 
 				File outputFile = new File(outputFolder, currentFile.getName());
