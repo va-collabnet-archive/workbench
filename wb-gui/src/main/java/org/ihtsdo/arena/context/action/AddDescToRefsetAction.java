@@ -2,6 +2,7 @@ package org.ihtsdo.arena.context.action;
 
 import java.awt.event.ActionEvent;
 import java.io.IOException;
+import java.util.UUID;
 import javax.swing.AbstractAction;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.log.AceLog;
@@ -14,8 +15,6 @@ import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
-import org.ihtsdo.tk.binding.snomed.TermAux;
 import org.ihtsdo.tk.drools.facts.DescFact;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.spec.ConceptSpec;
@@ -26,13 +25,19 @@ public class AddDescToRefsetAction extends AbstractAction {
     ConceptSpec refex;
     I_ConfigAceFrame config;
     DescriptionVersionBI desc;
+    ConceptSpec conceptValue;
+    boolean randomUuid;
 
     public AddDescToRefsetAction(String actionName, ConceptSpec refex,
-            DescFact desc, I_ConfigAceFrame config) {
+            ConceptSpec conceptValue,
+            DescFact desc, I_ConfigAceFrame config,
+            boolean randomUuid) {
         super(actionName);
         this.refex = refex;
+        this.conceptValue = conceptValue;
         this.config = config;
         this.desc = desc.getComponent();
+        this.randomUuid = randomUuid;
     }
 
     @Override
@@ -40,14 +45,15 @@ public class AddDescToRefsetAction extends AbstractAction {
         try {
             TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
                     config.getViewCoordinate());
-            int prefNid = SnomedMetadataRfx.getDESC_PREFERRED_NID();
             RefexCAB refexBp = new RefexCAB(TK_REFSET_TYPE.CID,
                     desc.getNid(), 
                     refex.getStrict(config.getViewCoordinate()).getConceptNid());
-            refexBp.put(RefexProperty.CNID1, TermAux.UNREVIEWED.getLenient().getNid());
+            refexBp.put(RefexProperty.CNID1, conceptValue.getLenient().getNid());
+            if(randomUuid){
+                refexBp.setMemberUuid(UUID.randomUUID());
+            }
             RefexChronicleBI<?> newRefex = builder.construct(refexBp);
             ConceptVersionBI cv = Ts.get().getConceptVersion(config.getViewCoordinate(), desc.getConceptNid());
-            cv.addAnnotation(newRefex);
             Ts.get().addUncommitted(cv);
 
         } catch (IOException e1) {

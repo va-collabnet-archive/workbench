@@ -17,18 +17,18 @@ import org.ihtsdo.tk.spec.SpecFactory;
 
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
-import org.ihtsdo.tk.example.binding.Language;
-import org.ihtsdo.tk.example.binding.Snomed;
-import org.ihtsdo.tk.example.binding.SnomedConstraints;
-import org.ihtsdo.tk.example.binding.SnomedRelType;
-import org.ihtsdo.tk.example.binding.SnomedRelSpec;
-import org.ihtsdo.tk.example.binding.Taxonomies;
-import org.ihtsdo.tk.example.binding.WbDescType;
-import org.ihtsdo.tk.example.binding.TermAux;
-import org.ihtsdo.tk.example.binding.ConceptInactivationType;
+import org.ihtsdo.tk.binding.snomed.Language;
+import org.ihtsdo.tk.binding.snomed.Snomed;
+import org.ihtsdo.tk.binding.snomed.SnomedConstraints;
+import org.ihtsdo.tk.binding.snomed.SnomedRelType;
+import org.ihtsdo.tk.binding.snomed.SnomedRelSpec;
+import org.ihtsdo.tk.binding.snomed.Taxonomies;
+import org.ihtsdo.tk.binding.snomed.WbDescType;
+import org.ihtsdo.tk.binding.snomed.TermAux;
+import org.ihtsdo.tk.binding.snomed.ConceptInactivationType;
 
 import org.ihtsdo.tk.spec.RelSpec;
-import org.ihtsdo.tk.example.binding.HistoricalRelType;
+import org.ihtsdo.tk.binding.snomed.HistoricalRelType;
 import java.util.ArrayList;
 import org.ihtsdo.tk.spec.RelSpecFromConcept;
 import javax.swing.JOptionPane;
