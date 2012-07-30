@@ -61,9 +61,15 @@ public class TemporaryTest {
 				}
 			}
 
+			BufferedWriter bw = null;
+			File report = new File("descriptions-change-report.txt");
+			FileOutputStream dfos = new FileOutputStream(report);
+			OutputStreamWriter dosw = new OutputStreamWriter(dfos, "UTF-8");
+			bw = new BufferedWriter(dosw);
+
 			File folder = new File("/Users/vahram/Documents/workspaces/2012-05-28-TRANSLATION-BUNDLE/wb-gmdn-release-process-dev/RF2_20120731_7_IDRESULT/rf2");
 
-			processDescriptionsRecursivly(folder);
+			processDescriptionsRecursivly(folder, bw);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -75,12 +81,12 @@ public class TemporaryTest {
 		}
 	}
 
-	private static void processDescriptionsRecursivly(File file) {
+	private static void processDescriptionsRecursivly(File file, BufferedWriter bw) {
 		try {
 			if (file.isDirectory()) {
 				File[] subfiles = file.listFiles();
 				for (File file2 : subfiles) {
-					processDescriptionsRecursivly(file2);
+					processDescriptionsRecursivly(file2, bw);
 				}
 			} else {
 				if (file.getName().contains("Description")) {
@@ -149,9 +155,19 @@ public class TemporaryTest {
 									Pattern p = Pattern.compile("\\b" + string + "\\b");
 									Matcher m = p.matcher(usDesk);
 									if (m.find()) {
+										try {
+											bw.write("FSN contains uk text : " + usDesk);
+											bw.newLine();
+										} catch (Exception e) {
+										}
 										System.out.println("FSN contains uk text : " + usDesk);
 										usDesk = m.replaceAll(ukset.get(string));
 										System.out.println("FSN converted us form: " + usDesk);
+										try {
+											bw.write("FSN converted us form: " + usDesk);
+											bw.newLine();
+										} catch (Exception e) {
+										}
 									}
 								}
 								newDescriptions.write(line.replaceAll(part[7], usDesk));
@@ -173,6 +189,11 @@ public class TemporaryTest {
 										found = true;
 										// DESCRIPTION CONTAINS US WORD
 										System.out.println("\nDescription contains us word");
+										try {
+											bw.write("ORIGINAL DESCRIPTION: " + ukDesk);
+											bw.newLine();
+										} catch (Exception e) {
+										}
 										ukDesk = m.replaceAll(usset.get(string));
 										System.out.println("writing original line: " + line + "\t" + US_REFSET_ID);
 										newDescriptions.write(line + "\t" + US_REFSET_ID);
@@ -180,6 +201,11 @@ public class TemporaryTest {
 										if (!ukDesk.equals(line)) {
 											String newLine = line.replaceAll(part[7], ukDesk);
 											System.out.println("writing new line     : " + newLine.replaceAll(part[0], UUID.randomUUID().toString()) + "\t" + GB_REFSET_ID);
+											try {
+												bw.write("REPLACED DESCRIPTION: " + ukDesk);
+												bw.newLine();
+											} catch (Exception e) {
+											}
 											newDescriptions.write(newLine.replaceAll(part[0], UUID.randomUUID().toString()) + "\t" + GB_REFSET_ID);
 											newDescriptions.newLine();
 										}
@@ -191,15 +217,26 @@ public class TemporaryTest {
 									Pattern p = Pattern.compile("\\b" + string + "\\b");
 									Matcher m = p.matcher(usDesk);
 									if (m.find()) {
+										found = true;
 										// DESCRIPTION CONTAINS UK WORD
 										System.out.println("\n Description contains UK word");
 										System.out.println("writing original line: " + line + "\t" + GB_REFSET_ID);
 										newDescriptions.write(line + "\t" + GB_REFSET_ID);
 										newDescriptions.newLine();
+										try {
+											bw.write("ORIGINAL DESCRIPTION: " + usDesk);
+											bw.newLine();
+										} catch (Exception e) {
+										}
 										usDesk = m.replaceAll(ukset.get(string));
 										if (!usDesk.equals(line)) {
 											String newLine = line.replaceAll(part[7], usDesk);
 											newDescriptions.write(newLine.replaceAll(part[0], UUID.randomUUID().toString()) + "\t" + US_REFSET_ID);
+											try {
+												bw.write("REPLACED DESCRIPTION: " + usDesk);
+												bw.newLine();
+											} catch (Exception e) {
+											}
 											System.out.println("writing new line     : " + newLine.replaceAll(part[0], UUID.randomUUID().toString()) + "\t" + US_REFSET_ID);
 											newDescriptions.newLine();
 										}
@@ -214,7 +251,7 @@ public class TemporaryTest {
 						}
 						Set<String> concepts = conceptIdCount.keySet();
 						for (String string : concepts) {
-							if(conceptIdCount.get(string).intValue() != 2){
+							if (conceptIdCount.get(string).intValue() != 2) {
 								System.out.println(string);
 							}
 						}
@@ -222,6 +259,7 @@ public class TemporaryTest {
 						e.printStackTrace();
 					} finally {
 						try {
+							bw.close();
 							br.close();
 							newDescriptions.close();
 						} catch (Exception e) {
