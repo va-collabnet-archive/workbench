@@ -12,6 +12,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.util.id.Type5UuidFactory;
+import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.impl.RF2AbstractImpl;
 import org.ihtsdo.rf2.refset.factory.SctidUuid;
 import org.ihtsdo.rf2.util.Config;
@@ -104,7 +105,7 @@ public class RF2GenericRefsetImpl extends RF2AbstractImpl implements I_ProcessCo
 									} else {
 										refsetuuid = Type5UuidFactory.get(refsetId + conceptid);
 										effectiveTime = getDateFormat().format(new Date(extensionPart.getTime()));
-										writeRF2TypeLine(refsetuuid, effectiveTime, active, moduleid, refsetId, conceptid);
+										writeRF2TypeLine(refsetuuid, effectiveTime, active, I_Constants.GMDN_MODULE_ID, refsetId, conceptid);
 									}
 								}
 							}
