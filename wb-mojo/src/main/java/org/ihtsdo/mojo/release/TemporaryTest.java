@@ -195,6 +195,8 @@ public class TemporaryTest  extends AbstractMojo {
 								Set<String> uskeyset = usset.keySet();
 
 								boolean found = false;
+								UUID generatedUuid = Type5UuidFactory.get(part[0] + part[4]);
+								Long sctid = idGen.createSCTID(generatedUuid, 0, "1", "20120731", "Whatever", "194721000142105");
 								for (String string : uskeyset) {
 									Pattern p = Pattern.compile("\\b" + string + "\\b");
 									Matcher m = p.matcher(ukDesk);
@@ -208,8 +210,8 @@ public class TemporaryTest  extends AbstractMojo {
 										newDescriptions.newLine();
 										if (!ukDesk.equals(line)) {
 											String newLine = line.replaceAll(part[7], ukDesk);
-											System.out.println("writing new line     : " + newLine.replaceAll(part[0], UUID.randomUUID().toString()) + "\t" + GB_REFSET_ID);
-											newDescriptions.write(newLine.replaceAll(part[0], UUID.randomUUID().toString()) + "\t" + GB_REFSET_ID);
+											System.out.println("writing new line     : " + newLine.replaceAll(part[0], sctid.toString()) + "\t" + GB_REFSET_ID);
+											newDescriptions.write(newLine.replaceAll(part[0], sctid.toString()) + "\t" + GB_REFSET_ID);
 											newDescriptions.newLine();
 										}
 									}
@@ -229,8 +231,8 @@ public class TemporaryTest  extends AbstractMojo {
 										usDesk = m.replaceAll(ukset.get(string));
 										if (!usDesk.equals(line)) {
 											String newLine = line.replaceAll(part[7], usDesk);
-											newDescriptions.write(newLine.replaceAll(part[0], UUID.randomUUID().toString()) + "\t" + US_REFSET_ID);
-											System.out.println("writing new line     : " + newLine.replaceAll(part[0], UUID.randomUUID().toString()) + "\t" + US_REFSET_ID);
+											newDescriptions.write(newLine.replaceAll(part[0], sctid.toString()) + "\t" + US_REFSET_ID);
+											System.out.println("writing new line     : " + newLine.replaceAll(part[0],sctid.toString()) + "\t" + US_REFSET_ID);
 											newDescriptions.newLine();
 										}
 									}
