@@ -421,27 +421,27 @@ public class ExportUtil {
 	public static String getConceptMetaModuleID(I_GetConceptData snomedConcept, String conEffectiveTime) throws IOException, TerminologyException {
 		String snomedIntegerId = getConceptId(snomedConcept, getSnomedCorePathNid());
 		moduleId = I_Constants.GMDN_MODULE_ID;
-		if (snomedIntegerId != null) {
-			if (metaHierDAO.isEmpty()) {
-				logger.error("Meta Hierarchy DAO Set is empty");
-			} else {
-				Iterator iter = metaHierDAO.iterator();
-				String prevET = "00000000";
-				while (iter.hasNext()) {
-					ModuleIDDAO moduleIdDAO = (ModuleIDDAO) iter.next();
-					String conceptid = moduleIdDAO.getConceptid();
-					String effectivetime = moduleIdDAO.getEffectiveTime();
-					String active = moduleIdDAO.getActive();
-					if (snomedIntegerId.equals(conceptid) && effectivetime.compareTo(conEffectiveTime) <= 0 && active.equals("0") && prevET.compareTo(effectivetime) < 0) {
-						moduleId = I_Constants.GMDN_MODULE_ID;
-						prevET = effectivetime;
-					} else if (snomedIntegerId.equals(conceptid) && effectivetime.compareTo(conEffectiveTime) <= 0 && active.equals("1") && prevET.compareTo(effectivetime) < 0) {
-						moduleId = I_Constants.META_MODULE_ID;
-						prevET = effectivetime;
-					}
-				}
-			}
-		}
+//		if (snomedIntegerId != null) {
+//			if (metaHierDAO.isEmpty()) {
+//				logger.error("Meta Hierarchy DAO Set is empty");
+//			} else {
+//				Iterator iter = metaHierDAO.iterator();
+//				String prevET = "00000000";
+//				while (iter.hasNext()) {
+//					ModuleIDDAO moduleIdDAO = (ModuleIDDAO) iter.next();
+//					String conceptid = moduleIdDAO.getConceptid();
+//					String effectivetime = moduleIdDAO.getEffectiveTime();
+//					String active = moduleIdDAO.getActive();
+//					if (snomedIntegerId.equals(conceptid) && effectivetime.compareTo(conEffectiveTime) <= 0 && active.equals("0") && prevET.compareTo(effectivetime) < 0) {
+//						moduleId = I_Constants.GMDN_MODULE_ID;
+//						prevET = effectivetime;
+//					} else if (snomedIntegerId.equals(conceptid) && effectivetime.compareTo(conEffectiveTime) <= 0 && active.equals("1") && prevET.compareTo(effectivetime) < 0) {
+//						moduleId = I_Constants.META_MODULE_ID;
+//						prevET = effectivetime;
+//					}
+//				}
+//			}
+//		}
 		return moduleId;
 	}
 

@@ -702,11 +702,11 @@ public abstract class RF2AbstractImpl {
 	// This returns of the content which belongs meta-module
 	public String computeModuleId(I_GetConceptData concept) throws IOException, TerminologyException {
 		String moduleid = I_Constants.GMDN_MODULE_ID;
-		if (snomedCTModelComponent.isParentOf(concept, currenAceConfig.getAllowedStatus(), currenAceConfig.getDestRelTypes(), currenAceConfig.getViewPositionSetReadOnly(), currenAceConfig.getPrecedence(), currenAceConfig.getConflictResolutionStrategy())) {
-			moduleid = I_Constants.META_MODULE_ID;
-		} else if (snomedCTModelComponent.equals(concept)) {
-			moduleid = I_Constants.META_MODULE_ID;
-		}
+//		if (snomedCTModelComponent.isParentOf(concept, currenAceConfig.getAllowedStatus(), currenAceConfig.getDestRelTypes(), currenAceConfig.getViewPositionSetReadOnly(), currenAceConfig.getPrecedence(), currenAceConfig.getConflictResolutionStrategy())) {
+//			moduleid = I_Constants.META_MODULE_ID;
+//		} else if (snomedCTModelComponent.equals(concept)) {
+//			moduleid = I_Constants.META_MODULE_ID;
+//		}
 
 		/*
 		 * if (foundationMetaDataConceptRoot.isParentOf(concept,

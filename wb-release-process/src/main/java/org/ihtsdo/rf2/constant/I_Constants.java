@@ -13,7 +13,7 @@ public class I_Constants {
 	public final static String VALID_STATUS_TO_EXPORT_UUID = "573a2008-9893-3989-b635-0c1800129e94";
 	
 	public final static String CORE_MODULE_ID = "900000000000207008";
-	public final static String GMDN_MODULE_ID = "194721000142105";
+	public final static String GMDN_MODULE_ID = "466707005";
 	public final static String META_MODULE_ID = "900000000000012004";
 	public final static String META_SCTID = "900000000000441003";
 	
