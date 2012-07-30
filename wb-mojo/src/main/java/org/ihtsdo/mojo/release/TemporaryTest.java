@@ -4,9 +4,12 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,11 +21,12 @@ import java.util.regex.Pattern;
 import org.apache.maven.plugin.AbstractMojo;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.idgeneration.IdAssignmentImpl;
+
 /**
  * @goal create-relids-check-descriptions
  */
-public class TemporaryTest  extends AbstractMojo {
-	
+public class TemporaryTest extends AbstractMojo {
+
 	/**
 	 * Location of the build directory.
 	 * 
@@ -46,7 +50,9 @@ public class TemporaryTest  extends AbstractMojo {
 	 * @required
 	 */
 	private String releaseFolder;
-	
+
+	private BufferedWriter mappingBw;
+
 	private static IdAssignmentImpl idGen;
 	private static HashMap<String, UUID> extSctidUUID = new HashMap<String, UUID>();
 	private static HashMap<String, String> ukset;
@@ -67,6 +73,108 @@ public class TemporaryTest  extends AbstractMojo {
 		processRecursivly(folder);
 		processDescriptions();
 
+		File mappingFile = new File(targetDirectory, "new_descriptions_sctid_uudi_mapping.txt");
+		OutputStreamWriter mappingOsw;
+		try {
+			mappingOsw = new OutputStreamWriter(new FileOutputStream(mappingFile));
+			mappingBw = new BufferedWriter(mappingOsw);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		createLanguageRefset(folder);
+
+	}
+
+	private void createLanguageRefset(File file) {
+		try {
+			if (file.isDirectory()) {
+				File[] subfiles = file.listFiles();
+				for (File file2 : subfiles) {
+					createLanguageRefset(file2);
+				}
+			} else {
+				if (file.getName().contains("Description")) {
+					BufferedReader br = null;
+					BufferedWriter langRefsetWriter = null;
+
+					File outputFolder = new File(file.getParent());
+					outputFolder.mkdirs();
+
+					// NEW LANGUAGE REFSET FILE
+					File outputFile = new File(outputFolder, "new_" + "langrefset.txt");
+					System.out.println("Creating " + outputFile.getName());
+
+					FileOutputStream lfos = new FileOutputStream(outputFile);
+
+					// NEW DESCRIPTION FILE REMOVING LAST COLUMN
+					File descFile = new File(outputFolder, "new_" + file.getName());
+					System.out.println("Creating " + descFile.getName());
+
+					FileOutputStream newDescFos = new FileOutputStream(descFile);
+					BufferedWriter descBw = null;
+
+					try {
+						System.out.println();
+						System.out.println();
+						System.out.println("PROCESING " + file.getName());
+						System.out.println();
+						InputStreamReader fis = new InputStreamReader(new FileInputStream(file), "UTF-8");
+						br = new BufferedReader(fis);
+
+						OutputStreamWriter ukOsw = new OutputStreamWriter(newDescFos, "UTF-8");
+						descBw = new BufferedWriter(ukOsw);
+
+						descBw.write("id	effectiveTime	active	moduleId	conceptId	languageCode	typeId	term	caseSignificanceId");
+						descBw.newLine();
+
+						OutputStreamWriter dosw = new OutputStreamWriter(lfos, "UTF-8");
+						langRefsetWriter = new BufferedWriter(dosw);
+
+						String firstLine = br.readLine();
+						langRefsetWriter.write("id	effectiveTime	active	moduleId	refsetId	referencedComponentId	acceptabilityId");
+						langRefsetWriter.newLine();
+						// ukBw.write("id	effectiveTime	active	moduleId	refsetId	referencedComponentId	acceptabilityId");
+						// ukBw.newLine();
+						while (br.ready()) {
+							// Increment concept id count
+							String line = br.readLine();
+							String[] part = line.split("\\t", -1);
+
+							// Writing new description file without the last
+							// column
+							for (int i = 0; i < part.length; i++) {
+								if (i <= part.length - 2) {
+									if (i < part.length - 2) {
+										descBw.write(part[i] + "\t");
+									} else if (i == part.length - 2) {
+										descBw.write(part[i]);
+									}
+								}
+							}
+
+							String[] langRefsetLine = convertDescLineToLangLine(part);
+							for (String string : langRefsetLine) {
+								langRefsetWriter.write(string);
+								langRefsetWriter.newLine();
+							}
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					} finally {
+						try {
+							br.close();
+							langRefsetWriter.close();
+							file.delete();
+							descFile.renameTo(new File(outputFile.getName().replaceAll("new_", "")));
+						} catch (Exception e) {
+						}
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void processDescriptions() {
@@ -101,7 +209,7 @@ public class TemporaryTest  extends AbstractMojo {
 		}
 	}
 
-	private static void processDescriptionsRecursivly(File file) {
+	private void processDescriptionsRecursivly(File file) {
 		try {
 			if (file.isDirectory()) {
 				File[] subfiles = file.listFiles();
@@ -111,10 +219,8 @@ public class TemporaryTest  extends AbstractMojo {
 			} else {
 				if (file.getName().contains("Description")) {
 					BufferedReader br = null;
-					BufferedWriter ukBw = null;
-					BufferedWriter usBw = null;
 					BufferedWriter newDescriptions = null;
-					
+
 					File outputFolder = new File(file.getParent());
 					outputFolder.mkdirs();
 
@@ -123,7 +229,7 @@ public class TemporaryTest  extends AbstractMojo {
 					System.out.println("Creating " + outputFile.getName());
 
 					FileOutputStream dfos = new FileOutputStream(outputFile);
-					
+
 					try {
 						System.out.println();
 						System.out.println();
@@ -132,26 +238,12 @@ public class TemporaryTest  extends AbstractMojo {
 						InputStreamReader fis = new InputStreamReader(new FileInputStream(file), "UTF-8");
 						br = new BufferedReader(fis);
 
-
-						// File ukOutputFile = new File(outputFolder,
-						// "new_uk_language.txt");
-						// System.out.println("Creating " +
-						// ukOutputFile.getName());
-
-						// FileOutputStream ukfos = new
-						// FileOutputStream(ukOutputFile);
-						// OutputStreamWriter ukOsw = new
-						// OutputStreamWriter(ukfos, "UTF-8");
-						// ukBw = new BufferedWriter(ukOsw);
-
 						OutputStreamWriter dosw = new OutputStreamWriter(dfos, "UTF-8");
 						newDescriptions = new BufferedWriter(dosw);
 
 						String firstLine = br.readLine();
 						newDescriptions.write(firstLine + "\tnewlagrefset");
 						newDescriptions.newLine();
-						// ukBw.write("id	effectiveTime	active	moduleId	refsetId	referencedComponentId	acceptabilityId");
-						// ukBw.newLine();
 						HashMap<String, Integer> conceptIdCount = new HashMap<String, Integer>();
 						while (br.ready()) {
 							// Increment concept id count
@@ -167,10 +259,6 @@ public class TemporaryTest  extends AbstractMojo {
 							}
 
 							if (part[6].equals(FSN)) {
-								// Fsn Description
-								// String langLine =
-								// convertDescLineToLangLine(part,
-								// US_REFSET_ID);
 								Set<String> ukkeyset = ukset.keySet();
 								String description = part[7];
 								String usDesk = description;
@@ -197,6 +285,8 @@ public class TemporaryTest  extends AbstractMojo {
 								boolean found = false;
 								UUID generatedUuid = Type5UuidFactory.get(part[0] + part[4]);
 								Long sctid = idGen.createSCTID(generatedUuid, 0, "1", "20120731", "Whatever", "194721000142105");
+								mappingBw.write(generatedUuid + "\t" + sctid.toString());
+								mappingBw.newLine();
 								for (String string : uskeyset) {
 									Pattern p = Pattern.compile("\\b" + string + "\\b");
 									Matcher m = p.matcher(ukDesk);
@@ -232,7 +322,7 @@ public class TemporaryTest  extends AbstractMojo {
 										if (!usDesk.equals(line)) {
 											String newLine = line.replaceAll(part[7], usDesk);
 											newDescriptions.write(newLine.replaceAll(part[0], sctid.toString()) + "\t" + US_REFSET_ID);
-											System.out.println("writing new line     : " + newLine.replaceAll(part[0],sctid.toString()) + "\t" + US_REFSET_ID);
+											System.out.println("writing new line     : " + newLine.replaceAll(part[0], sctid.toString()) + "\t" + US_REFSET_ID);
 											newDescriptions.newLine();
 										}
 									}
@@ -268,13 +358,24 @@ public class TemporaryTest  extends AbstractMojo {
 		}
 	}
 
-	private static String convertDescLineToLangLine(String[] part, String usRefsetId) {
-		// id effectiveTime active moduleId conceptId languageCode typeId term
-		// caseSignificanceId
-		// id effectiveTime active moduleId refsetId referencedComponentId
-		// acceptabilityId
-		// String result = UUid
-		// TODO Auto-generated method stub
+	private static String[] convertDescLineToLangLine(String[] part) {
+		try {
+			UUID langId = Type5UuidFactory.get(part[9] + part[0]);
+			if (part[6].equals(FSN)) {
+				return new String[] { langId.toString() + "\t" + part[1] + "\t" + "1" + "\t" + part[3] + "\t" + part[9] + "\t" + part[4] + "\t" + "900000000000548007",
+						langId.toString() + "\t" + part[1] + "\t" + "1" + "\t" + part[3] + "\t" + GB_REFSET_ID + "\t" + part[4] + "\t" + "900000000000548007" };
+
+			} else {
+				return new String[] { langId.toString() + "\t" + part[1] + "\t" + "1" + "\t" + part[3] + "\t" + part[9] + "\t" + part[4] + "\t" + "900000000000548007" };
+			}
+
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return null;
 	}
 
@@ -293,14 +394,13 @@ public class TemporaryTest  extends AbstractMojo {
 
 					File outputFolder = new File(file.getParent());
 					outputFolder.mkdirs();
-					
+
 					File outputFile = new File(outputFolder, "new_" + file.getName());
 					System.out.println("Creating " + outputFile.getName());
-					
+
 					try {
 						InputStreamReader fis = new InputStreamReader(new FileInputStream(file), "UTF-8");
 						br = new BufferedReader(fis);
-
 
 						FileOutputStream fos = new FileOutputStream(outputFile);
 						OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
