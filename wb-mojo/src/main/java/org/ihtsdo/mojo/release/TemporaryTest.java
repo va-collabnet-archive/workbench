@@ -62,7 +62,7 @@ public class TemporaryTest extends AbstractMojo {
 	private static final String US_REFSET_ID = "900000000000509007";
 
 	public void execute() {
-		String endpointURL = "http://mgr.servers.aceworkspace.net:50002/axis2/services/id_generator";
+		String endpointURL = "http://mgr.servers.aceworkspace.net:50042/axis2/services/id_generator";
 		String username = "termmed";
 		String password = "termmed";
 		//
