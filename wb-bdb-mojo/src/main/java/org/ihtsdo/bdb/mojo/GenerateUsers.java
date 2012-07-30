@@ -745,7 +745,7 @@ public class GenerateUsers extends AbstractMojo {
 	}
 
 	private ConceptSpec getConceptSpecFromPrefs(String configString) {
-            if(!configString.equals("")){
+            if (configString != null && !configString.equals("")) {
                 String prefTerm = configString.substring(configString.indexOf("(") + 1, configString.indexOf(","));
 		String uuidString = configString.substring(configString.indexOf(",") + 1, configString.lastIndexOf(")"));
 
@@ -758,7 +758,7 @@ public class GenerateUsers extends AbstractMojo {
         
         private ArrayList<ConceptSpec> getConceptSpecListFromPrefs(String configString) {
                 ArrayList<ConceptSpec> conceptSpecList = new ArrayList<ConceptSpec>();
-                if(!configString.equals("")){
+                if (configString != null && !configString.equals("")) {
                     String[] conceptSpecs = configString.split(";");
                     if(conceptSpecs.length > 0){
                     for(String spec : conceptSpecs){

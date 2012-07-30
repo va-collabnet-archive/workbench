@@ -54,6 +54,8 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
@@ -94,14 +96,14 @@ public class TestForSpecifcDate extends AbstractConceptTest {
             List<AlertToDataConstraintFailure> alerts = new ArrayList<AlertToDataConstraintFailure>();
             boolean found = false;
             
-            for (ConAttrVersionBI attr : concept.getConceptAttributes().getVersions()) {
+            for (ConAttrVersionBI attr : concept.getConAttrs().getVersions()) {
             	long time = attr.getTime();
             	if (time == timeToCheck) {
             		found = true;
             	}
             }
             
-            for (I_DescriptionVersioned loopDesc : concept.getDescriptions()) {
+            for (DescriptionChronicleBI loopDesc : concept.getDescs()) {
             	for (DescriptionVersionBI dv : loopDesc.getVersions()) {
             		long time = dv.getTime();
             		if (time == timeToCheck) {
