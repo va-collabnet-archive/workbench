@@ -171,17 +171,16 @@ public class TestMyTest extends AbstractMojo {
 		} else {
 			BufferedReader br = null;
 			BufferedWriter bw = null;
+			File outputFile = new File(currentFile.getParent(), "new_" + currentFile.getName());
+
+			FileOutputStream fos = null;
+			OutputStreamWriter osw = null;
 			try {
 				InputStreamReader fis = new InputStreamReader(new FileInputStream(currentFile), "UTF-8");
 				br = new BufferedReader(fis);
-
-				File outputFolder = new File(currentFile.getParent().replace("output", "output_idresult"));
-				outputFolder.mkdirs();
-
-				File outputFile = new File(outputFolder, currentFile.getName());
-
-				FileOutputStream fos = new FileOutputStream(outputFile);
-				OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
+				
+				fos = new FileOutputStream(outputFile);
+				osw = new OutputStreamWriter(fos);
 				bw = new BufferedWriter(osw);
 
 				String firstLine = br.readLine();
@@ -200,6 +199,8 @@ public class TestMyTest extends AbstractMojo {
 				e.printStackTrace();
 			} finally {
 				try {
+					currentFile.delete();
+					outputFile.renameTo(new File(outputFile.getName().replaceAll("new_", "")));
 					br.close();
 					bw.close();
 				} catch (Exception e) {

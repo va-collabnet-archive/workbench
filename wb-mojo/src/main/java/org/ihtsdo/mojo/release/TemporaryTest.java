@@ -114,6 +114,16 @@ public class TemporaryTest  extends AbstractMojo {
 					BufferedWriter ukBw = null;
 					BufferedWriter usBw = null;
 					BufferedWriter newDescriptions = null;
+					
+					File outputFolder = new File(file.getParent());
+					outputFolder.mkdirs();
+
+					// NEW DESCRIPTIONS FILE
+					File outputFile = new File(outputFolder, "new_" + file.getName());
+					System.out.println("Creating " + outputFile.getName());
+
+					FileOutputStream dfos = new FileOutputStream(outputFile);
+					
 					try {
 						System.out.println();
 						System.out.println();
@@ -122,8 +132,6 @@ public class TemporaryTest  extends AbstractMojo {
 						InputStreamReader fis = new InputStreamReader(new FileInputStream(file), "UTF-8");
 						br = new BufferedReader(fis);
 
-						File outputFolder = new File(file.getParent());
-						outputFolder.mkdirs();
 
 						// File ukOutputFile = new File(outputFolder,
 						// "new_uk_language.txt");
@@ -136,11 +144,6 @@ public class TemporaryTest  extends AbstractMojo {
 						// OutputStreamWriter(ukfos, "UTF-8");
 						// ukBw = new BufferedWriter(ukOsw);
 
-						// NEW DESCRIPTIONS FILE
-						File outputFile = new File(outputFolder, "new_" + file.getName());
-						System.out.println("Creating " + outputFile.getName());
-
-						FileOutputStream dfos = new FileOutputStream(outputFile);
 						OutputStreamWriter dosw = new OutputStreamWriter(dfos, "UTF-8");
 						newDescriptions = new BufferedWriter(dosw);
 
@@ -251,6 +254,8 @@ public class TemporaryTest  extends AbstractMojo {
 						try {
 							br.close();
 							newDescriptions.close();
+							file.delete();
+							outputFile.renameTo(new File(outputFile.getName().replaceAll("new_", "")));
 						} catch (Exception e) {
 						}
 					}
@@ -283,15 +288,17 @@ public class TemporaryTest  extends AbstractMojo {
 					BufferedReader br = null;
 					BufferedWriter bw = null;
 					BufferedWriter mapperBw = null;
+
+					File outputFolder = new File(file.getParent());
+					outputFolder.mkdirs();
+					
+					File outputFile = new File(outputFolder, "new_" + file.getName());
+					System.out.println("Creating " + outputFile.getName());
+					
 					try {
 						InputStreamReader fis = new InputStreamReader(new FileInputStream(file), "UTF-8");
 						br = new BufferedReader(fis);
 
-						File outputFolder = new File(file.getParent());
-						outputFolder.mkdirs();
-
-						File outputFile = new File(outputFolder, "new_" + file.getName());
-						System.out.println("Creating " + outputFile.getName());
 
 						FileOutputStream fos = new FileOutputStream(outputFile);
 						OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
@@ -376,6 +383,8 @@ public class TemporaryTest  extends AbstractMojo {
 						try {
 							br.close();
 							bw.close();
+							file.delete();
+							outputFile.renameTo(new File(outputFile.getName().replaceAll("new_", "")));
 						} catch (Exception e) {
 						}
 					}
