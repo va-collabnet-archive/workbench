@@ -81,7 +81,7 @@ public class TestMyTest extends AbstractMojo {
 
 				recursiveUpdateIds(folder, bw);
 			} catch (Exception e) {
-				e.printStackTrace();
+				log.error(e);
 			} finally {
 				try {
 					bw.close();
@@ -89,7 +89,7 @@ public class TestMyTest extends AbstractMojo {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e);
 		}
 	}
 
@@ -114,7 +114,7 @@ public class TestMyTest extends AbstractMojo {
 				processMilConcepts(bw, snomediduuid);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e);
 		} finally {
 			try {
 				br.close();
@@ -154,7 +154,7 @@ public class TestMyTest extends AbstractMojo {
 				snomediduuid.put(concept.getUUIDs().get(0), conceptid.toString());
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e);
 		}
 	}
 
@@ -198,7 +198,7 @@ public class TestMyTest extends AbstractMojo {
 				br.close();
 				bw.close();
 			} catch (Exception e) {
-				e.printStackTrace();
+				log.error(e);
 			} finally {
 				try {
 					currentFile.delete();
@@ -262,7 +262,7 @@ public class TestMyTest extends AbstractMojo {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e);
 		}
 	}
 

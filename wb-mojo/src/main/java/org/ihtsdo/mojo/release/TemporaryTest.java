@@ -80,7 +80,7 @@ public class TemporaryTest extends AbstractMojo {
 			mappingOsw = new OutputStreamWriter(new FileOutputStream(mappingFile));
 			mappingBw = new BufferedWriter(mappingOsw);
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			log.error(e);
 		}
 		
 		createLanguageRefset(folder);
@@ -161,7 +161,7 @@ public class TemporaryTest extends AbstractMojo {
 							}
 						}
 					} catch (Exception e) {
-						e.printStackTrace();
+						log.error(e);
 					} finally {
 						try {
 							br.close();
@@ -174,7 +174,7 @@ public class TemporaryTest extends AbstractMojo {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e);
 		}
 	}
 
@@ -201,7 +201,7 @@ public class TemporaryTest extends AbstractMojo {
 			processDescriptionsRecursivly(folder);
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e);
 		} finally {
 			try {
 				br.close();
@@ -342,7 +342,7 @@ public class TemporaryTest extends AbstractMojo {
 							}
 						}
 					} catch (Exception e) {
-						e.printStackTrace();
+						log.error(e);
 					} finally {
 						try {
 							br.close();
@@ -355,7 +355,7 @@ public class TemporaryTest extends AbstractMojo {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e);
 		}
 	}
 
@@ -372,10 +372,10 @@ public class TemporaryTest extends AbstractMojo {
 
 		} catch (NoSuchAlgorithmException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error(e);
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error(e);
 		}
 		return null;
 	}
@@ -481,7 +481,7 @@ public class TemporaryTest extends AbstractMojo {
 						mapperBw.close();
 						bw.close();
 					} catch (Exception e) {
-						e.printStackTrace();
+						log.error(e);
 					} finally {
 						try {
 							br.close();
@@ -494,7 +494,7 @@ public class TemporaryTest extends AbstractMojo {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e);
 		}
 
 	}
