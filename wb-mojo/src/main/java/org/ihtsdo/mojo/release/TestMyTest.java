@@ -173,7 +173,9 @@ public class TestMyTest extends AbstractMojo {
 		} else {
 			BufferedReader br = null;
 			BufferedWriter bw = null;
+			log.info("processing: " + currentFile);
 			File outputFile = new File(currentFile.getParent(), "new_" + currentFile.getName());
+			log.info("writing new file: " + outputFile.getAbsolutePath());
 
 			FileOutputStream fos = null;
 			OutputStreamWriter osw = null;
@@ -201,8 +203,8 @@ public class TestMyTest extends AbstractMojo {
 				log.error(e);
 			} finally {
 				try {
-					currentFile.delete();
-					outputFile.renameTo(new File(outputFile.getName().replaceAll("new_", "")));
+					log.info("deleting currentfile " + currentFile.getName() + " " + currentFile.delete());
+					outputFile.renameTo(new File(outputFile.getParentFile(), outputFile.getName().replaceAll("new_", "")));
 					br.close();
 					bw.close();
 				} catch (Exception e) {

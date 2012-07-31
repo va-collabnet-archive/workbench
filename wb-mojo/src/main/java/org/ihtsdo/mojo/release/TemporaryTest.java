@@ -167,7 +167,7 @@ public class TemporaryTest extends AbstractMojo {
 							br.close();
 							langRefsetWriter.close();
 							file.delete();
-							descFile.renameTo(new File(outputFile.getName().replaceAll("new_", "")));
+							descFile.renameTo(new File(outputFile.getParentFile(),outputFile.getName().replaceAll("new_", "")));
 						} catch (Exception e) {
 						}
 					}
@@ -348,7 +348,7 @@ public class TemporaryTest extends AbstractMojo {
 							br.close();
 							newDescriptions.close();
 							file.delete();
-							outputFile.renameTo(new File(outputFile.getName().replaceAll("new_", "")));
+							outputFile.renameTo(new File(outputFile.getParentFile(), outputFile.getName().replaceAll("new_", "")));
 						} catch (Exception e) {
 						}
 					}
