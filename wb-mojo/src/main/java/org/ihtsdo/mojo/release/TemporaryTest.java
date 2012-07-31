@@ -18,6 +18,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
 import org.apache.maven.plugin.AbstractMojo;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.idgeneration.IdAssignmentImpl;
@@ -26,7 +27,7 @@ import org.ihtsdo.idgeneration.IdAssignmentImpl;
  * @goal create-relids-check-descriptions
  */
 public class TemporaryTest extends AbstractMojo {
-
+	private static final Logger log = Logger.getLogger(TemporaryTest.class);
 	/**
 	 * Location of the build directory.
 	 * 
@@ -103,22 +104,22 @@ public class TemporaryTest extends AbstractMojo {
 
 					// NEW LANGUAGE REFSET FILE
 					File outputFile = new File(outputFolder, "new_" + "langrefset.txt");
-					System.out.println("Creating " + outputFile.getName());
+					log.info("Creating " + outputFile.getName());
 
 					FileOutputStream lfos = new FileOutputStream(outputFile);
 
 					// NEW DESCRIPTION FILE REMOVING LAST COLUMN
 					File descFile = new File(outputFolder, "new_" + file.getName());
-					System.out.println("Creating " + descFile.getName());
+					log.info("Creating " + descFile.getName());
 
 					FileOutputStream newDescFos = new FileOutputStream(descFile);
 					BufferedWriter descBw = null;
 
 					try {
-						System.out.println();
-						System.out.println();
-						System.out.println("PROCESING " + file.getName());
-						System.out.println();
+						log.info("");
+						log.info("");
+						log.info("PROCESING " + file.getName());
+						log.info("");
 						InputStreamReader fis = new InputStreamReader(new FileInputStream(file), "UTF-8");
 						br = new BufferedReader(fis);
 
@@ -226,15 +227,15 @@ public class TemporaryTest extends AbstractMojo {
 
 					// NEW DESCRIPTIONS FILE
 					File outputFile = new File(outputFolder, "new_" + file.getName());
-					System.out.println("Creating " + outputFile.getName());
+					log.info("Creating " + outputFile.getName());
 
 					FileOutputStream dfos = new FileOutputStream(outputFile);
 
 					try {
-						System.out.println();
-						System.out.println();
-						System.out.println("PROCESING " + file.getName());
-						System.out.println();
+						log.info("");
+						log.info("");
+						log.info("PROCESING " + file.getName());
+						log.info("");
 						InputStreamReader fis = new InputStreamReader(new FileInputStream(file), "UTF-8");
 						br = new BufferedReader(fis);
 
@@ -266,9 +267,9 @@ public class TemporaryTest extends AbstractMojo {
 									Pattern p = Pattern.compile("\\b" + string + "\\b");
 									Matcher m = p.matcher(usDesk);
 									if (m.find()) {
-										System.out.println("FSN contains uk text : " + usDesk);
+										log.info("FSN contains uk text : " + usDesk);
 										usDesk = m.replaceAll(ukset.get(string));
-										System.out.println("FSN converted us form: " + usDesk);
+										log.info("FSN converted us form: " + usDesk);
 									}
 								}
 								newDescriptions.write(line.replaceAll(part[7], usDesk));
@@ -293,14 +294,14 @@ public class TemporaryTest extends AbstractMojo {
 									if (m.find()) {
 										found = true;
 										// DESCRIPTION CONTAINS US WORD
-										System.out.println("\nDescription contains us word");
+										log.info("\nDescription contains us word");
 										ukDesk = m.replaceAll(usset.get(string));
-										System.out.println("writing original line: " + line + "\t" + US_REFSET_ID);
+										log.info("writing original line: " + line + "\t" + US_REFSET_ID);
 										newDescriptions.write(line + "\t" + US_REFSET_ID);
 										newDescriptions.newLine();
 										if (!ukDesk.equals(line)) {
 											String newLine = line.replaceAll(part[7], ukDesk);
-											System.out.println("writing new line     : " + newLine.replaceAll(part[0], sctid.toString()) + "\t" + GB_REFSET_ID);
+											log.info("writing new line     : " + newLine.replaceAll(part[0], sctid.toString()) + "\t" + GB_REFSET_ID);
 											newDescriptions.write(newLine.replaceAll(part[0], sctid.toString()) + "\t" + GB_REFSET_ID);
 											newDescriptions.newLine();
 										}
@@ -314,15 +315,15 @@ public class TemporaryTest extends AbstractMojo {
 									if (m.find()) {
 										found = true;
 										// DESCRIPTION CONTAINS UK WORD
-										System.out.println("\n Description contains UK word");
-										System.out.println("writing original line: " + line + "\t" + GB_REFSET_ID);
+										log.info("\n Description contains UK word");
+										log.info("writing original line: " + line + "\t" + GB_REFSET_ID);
 										newDescriptions.write(line + "\t" + GB_REFSET_ID);
 										newDescriptions.newLine();
 										usDesk = m.replaceAll(ukset.get(string));
 										if (!usDesk.equals(line)) {
 											String newLine = line.replaceAll(part[7], usDesk);
 											newDescriptions.write(newLine.replaceAll(part[0], sctid.toString()) + "\t" + US_REFSET_ID);
-											System.out.println("writing new line     : " + newLine.replaceAll(part[0], sctid.toString()) + "\t" + US_REFSET_ID);
+											log.info("writing new line     : " + newLine.replaceAll(part[0], sctid.toString()) + "\t" + US_REFSET_ID);
 											newDescriptions.newLine();
 										}
 									}
@@ -337,7 +338,7 @@ public class TemporaryTest extends AbstractMojo {
 						Set<String> concepts = conceptIdCount.keySet();
 						for (String string : concepts) {
 							if (conceptIdCount.get(string).intValue() != 2) {
-								System.out.println(string);
+								log.info(string);
 							}
 						}
 					} catch (Exception e) {
@@ -396,7 +397,7 @@ public class TemporaryTest extends AbstractMojo {
 					outputFolder.mkdirs();
 
 					File outputFile = new File(outputFolder, "new_" + file.getName());
-					System.out.println("Creating " + outputFile.getName());
+					log.info("Creating " + outputFile.getName());
 
 					try {
 						InputStreamReader fis = new InputStreamReader(new FileInputStream(file), "UTF-8");
@@ -424,14 +425,14 @@ public class TemporaryTest extends AbstractMojo {
 						bw.write(firstLine);
 						bw.newLine();
 
-						System.out.println("creating all uuids ");
+						log.info("creating all uuids ");
 						while (br.ready()) {
 							String line = br.readLine();
 							String[] part = line.split("\\t", -1);
 							UUID uuid = Type5UuidFactory.get(part[4] + part[5] + part[7] + part[6]);
 							extSctidUUID.put(part[0], uuid);
 						}
-						System.out.println("Created " + extSctidUUID.size() + " UUIDS");
+						log.info("Created " + extSctidUUID.size() + " UUIDS");
 						br.close();
 
 						HashMap<UUID, Long> uuidNewSctids = new HashMap<UUID, Long>();
@@ -443,7 +444,7 @@ public class TemporaryTest extends AbstractMojo {
 							partition = extSctid.substring(extSctid.length() - 2, extSctid.length() - 1);
 							uuidList.add(extSctidUUID.get(extSctid));
 							if (uuidList.size() > 1000) {
-								System.out.println("Getting 1000 sctids");
+								log.info("Getting 1000 sctids");
 								HashMap<UUID, Long> sctids = idGen.createSCTIDList(uuidList, 0, partition, "20120731", "Whatever", "194721000142105");
 								uuidNewSctids.putAll(sctids);
 								uuidList = null;
@@ -451,7 +452,7 @@ public class TemporaryTest extends AbstractMojo {
 							}
 						}
 						if (uuidList.size() <= 1000) {
-							System.out.println("Getting 1000 sctids");
+							log.info("Getting 1000 sctids");
 							HashMap<UUID, Long> sctids = idGen.createSCTIDList(uuidList, 0, partition, "20120731", "Whatever", "194721000142105");
 							uuidNewSctids.putAll(sctids);
 							uuidList = null;
@@ -463,7 +464,7 @@ public class TemporaryTest extends AbstractMojo {
 						fis = new InputStreamReader(new FileInputStream(file), "UTF-8");
 						br = new BufferedReader(fis);
 						br.readLine();
-						System.out.println("Processing original file again to enerate the new result and mapping");
+						log.info("Processing original file again to enerate the new result and mapping");
 						while (br.ready()) {
 							String line = br.readLine();
 							String[] part = line.split("\\t", -1);

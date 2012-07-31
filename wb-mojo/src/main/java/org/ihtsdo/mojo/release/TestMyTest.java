@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.apache.log4j.Logger;
 import org.apache.lucene.document.Document;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -29,6 +30,7 @@ import org.ihtsdo.rf2.util.ExportUtil;
  * @goal create-sctids
  */
 public class TestMyTest extends AbstractMojo {
+	private static final Logger log = Logger.getLogger(TestMyTest.class);
 
 	/**
 	 * Location of the build directory.
@@ -74,7 +76,7 @@ public class TestMyTest extends AbstractMojo {
 				bw.write("UUID\textension id\tnew sctid");
 				bw.newLine();
 				createConceptsSctId(bw);
-
+				log.info("RELEASE FOLDER " + releaseFolder);
 				File folder = new File(releaseFolder);
 
 				recursiveUpdateIds(folder, bw);
@@ -134,7 +136,7 @@ public class TestMyTest extends AbstractMojo {
 		for (UUID uuid : keyset) {
 			conceptIds.put(snomediduuid.get(uuid), newSctId.get(uuid).toString());
 			bw.write(uuid + "\t" + snomediduuid.get(uuid) + "\t" + newSctId.get(uuid).toString());
-			System.out.println(uuid + "\t" + snomediduuid.get(uuid) + "\t" + newSctId.get(uuid).toString());
+			log.info(uuid + "\t" + snomediduuid.get(uuid) + "\t" + newSctId.get(uuid).toString());
 			bw.newLine();
 		}
 	}
@@ -159,7 +161,7 @@ public class TestMyTest extends AbstractMojo {
 	public static void main(String[] args) {
 		String extensionId = "100161000142123";
 		String partition = extensionId.substring(extensionId.length() - 3, extensionId.length() - 1);
-		System.out.println(partition);
+		log.info(partition);
 	}
 
 	private static void recursiveUpdateIds(File currentFile, BufferedWriter mappingBr) {
