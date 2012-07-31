@@ -82,7 +82,7 @@ public class TemporaryTest extends AbstractMojo {
 		} catch (FileNotFoundException e) {
 			log.error(e);
 		}
-		
+
 		createLanguageRefset(folder);
 
 	}
@@ -167,7 +167,8 @@ public class TemporaryTest extends AbstractMojo {
 							br.close();
 							langRefsetWriter.close();
 							log.info("deleting currentfile " + file.getName() + " " + file.delete());
-							descFile.renameTo(new File(outputFile.getParentFile(),outputFile.getName().replaceAll("new_", "")));
+							log.info("parent file  " + outputFile.getParentFile().getAbsolutePath());
+							descFile.renameTo(new File(outputFile.getParentFile(), outputFile.getName().replaceAll("new_", "")));
 						} catch (Exception e) {
 						}
 					}
@@ -371,10 +372,8 @@ public class TemporaryTest extends AbstractMojo {
 			}
 
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
 			log.error(e);
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			log.error(e);
 		}
 		return null;
@@ -487,7 +486,8 @@ public class TemporaryTest extends AbstractMojo {
 							br.close();
 							bw.close();
 							file.delete();
-							outputFile.renameTo(new File(outputFile.getName().replaceAll("new_", "")));
+							log.info("parent file  " + outputFile.getParentFile().getAbsolutePath());
+							outputFile.renameTo(new File(outputFile.getParentFile(), outputFile.getName().replaceAll("new_", "")));
 						} catch (Exception e) {
 						}
 					}

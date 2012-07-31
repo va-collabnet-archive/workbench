@@ -204,6 +204,7 @@ public class TestMyTest extends AbstractMojo {
 			} finally {
 				try {
 					log.info("deleting currentfile " + currentFile.getName() + " " + currentFile.delete());
+					log.info("parent file  " + outputFile.getParentFile().getAbsolutePath());
 					outputFile.renameTo(new File(outputFile.getParentFile(), outputFile.getName().replaceAll("new_", "")));
 					br.close();
 					bw.close();
