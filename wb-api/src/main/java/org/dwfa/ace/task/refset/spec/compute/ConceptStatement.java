@@ -34,6 +34,7 @@ import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery.GROUPING_TYPE;
 import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
 
@@ -136,7 +137,7 @@ public class ConceptStatement extends RefsetSpecStatement {
                 if (isNegated()) {
                     possibleConcepts.or(parentPossibleConcepts);
                 } else {
-                    I_RepresentIdSet results = queryConstraintConcept.getPossibleKindOfConcepts(config, activity);
+                    I_RepresentIdSet results = (I_RepresentIdSet) queryConstraintConcept.getPossibleKindOfConcepts(config);
                     possibleConcepts.or(results);
                 }
                 break;
@@ -201,7 +202,7 @@ public class ConceptStatement extends RefsetSpecStatement {
 
     @Override
     public boolean getStatementResult(I_AmTermComponent component, GROUPING_TYPE version, PositionSetBI v1_is,
-            PositionSetBI v2_is) throws IOException {
+            PositionSetBI v2_is) throws IOException, ContradictionException{
         I_GetConceptData concept = (I_GetConceptData) component;
 
         if (version != null || v1_is != null || v2_is != null) {
@@ -351,7 +352,7 @@ public class ConceptStatement extends RefsetSpecStatement {
 	 * @throws IOException
 	 * @throws TerminologyException
 	 */
-    private boolean conceptIsDescendantOf(I_GetConceptData conceptBeingTested) throws IOException {
+    private boolean conceptIsDescendantOf(I_GetConceptData conceptBeingTested) throws IOException, ContradictionException {
         try {
             if (conceptBeingTested.getNid() == queryConstraintConcept.getNid()) {
                 return false;
@@ -359,7 +360,9 @@ public class ConceptStatement extends RefsetSpecStatement {
             
             if (RefsetSpecQuery.myStaticIsACache == null) {
                 //System.out.print("n");
-                return queryConstraintConcept.isParentOf(conceptBeingTested, currentStatuses, allowedTypes, termFactory.getActiveAceFrameConfig().getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
+                return queryConstraintConcept.isParentOf(conceptBeingTested, currentStatuses,
+                        allowedTypes, termFactory.getActiveAceFrameConfig().getViewPositionSetReadOnly(),
+                        config.getPrecedence(), config.getConflictResolutionStrategy());
             } else {
                 try {
                     //System.out.print("c");
@@ -384,10 +387,11 @@ public class ConceptStatement extends RefsetSpecStatement {
 	 * @throws IOException
 	 * @throws TerminologyException
 	 */
-    private boolean conceptIsKindOf(I_GetConceptData conceptBeingTested) throws IOException {
+    private boolean conceptIsKindOf(I_GetConceptData conceptBeingTested) throws IOException, ContradictionException {
         try {
             return queryConstraintConcept.isParentOfOrEqualTo(conceptBeingTested, currentStatuses, allowedTypes,
-                    termFactory.getActiveAceFrameConfig().getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
+                    termFactory.getActiveAceFrameConfig().getViewPositionSetReadOnly(),
+                    config.getPrecedence(), config.getConflictResolutionStrategy());
         } catch (TerminologyException ex) {
             throw new IOException(ex);
         }

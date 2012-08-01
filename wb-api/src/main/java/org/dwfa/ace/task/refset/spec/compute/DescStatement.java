@@ -44,6 +44,7 @@ import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
 
@@ -125,7 +126,7 @@ public class DescStatement extends RefsetSpecStatement {
 
     @Override
     public boolean getStatementResult(I_AmTermComponent component, GROUPING_TYPE version, PositionSetBI v1_is,
-            PositionSetBI v2_is) throws IOException {
+            PositionSetBI v2_is) throws IOException, ContradictionException {
         if (I_DescriptionVersioned.class.isAssignableFrom(component.getClass())) {
             I_DescriptionVersioned descriptionVersioned = (I_DescriptionVersioned) component;
             I_DescriptionTuple descriptionTuple = descriptionVersioned.getLastTuple();
@@ -442,7 +443,7 @@ public class DescStatement extends RefsetSpecStatement {
      * the query constraint. This also checks for the description type's
      * children (depth >= 1);
      */
-    private boolean descriptionTypeIsKindOf(I_DescriptionTuple descriptionBeingChecked) throws IOException {
+    private boolean descriptionTypeIsKindOf(I_DescriptionTuple descriptionBeingChecked) throws IOException, ContradictionException {
 
         try {
             I_GetConceptData descTypeBeingChecked = termFactory.getConcept(descriptionBeingChecked.getTypeNid());
@@ -464,7 +465,7 @@ public class DescStatement extends RefsetSpecStatement {
      * @throws TerminologyException
      */
     private boolean descriptionTypeIsDescendentOf(I_GetConceptData requiredType, I_DescriptionTuple descriptionBeingChecked)
-            throws IOException {
+            throws IOException, ContradictionException {
 
         try {
             I_GetConceptData descTypeBeingChecked = termFactory.getConcept(descriptionBeingChecked.getTypeNid());
@@ -475,7 +476,7 @@ public class DescStatement extends RefsetSpecStatement {
         } 
     }
 
-    private boolean descriptionTypeIsDescendentOf(I_DescriptionTuple descriptionBeingChecked) throws IOException {
+    private boolean descriptionTypeIsDescendentOf(I_DescriptionTuple descriptionBeingChecked) throws IOException, ContradictionException {
         return descriptionTypeIsDescendentOf((I_GetConceptData) queryConstraint, descriptionBeingChecked);
     }
 
@@ -527,12 +528,12 @@ public class DescStatement extends RefsetSpecStatement {
         }
     }
 
-    private boolean descriptionStatusIsDescendentOf(I_DescriptionTuple descriptionBeingChecked) throws IOException {
+    private boolean descriptionStatusIsDescendentOf(I_DescriptionTuple descriptionBeingChecked) throws IOException, ContradictionException {
         return descriptionStatusIsDescendentOf((I_GetConceptData) queryConstraint, descriptionBeingChecked);
     }
 
     private boolean descriptionStatusIsDescendentOf(I_GetConceptData requiredStatus,
-            I_DescriptionTuple descriptionBeingChecked) throws IOException {
+            I_DescriptionTuple descriptionBeingChecked) throws IOException, ContradictionException {
 
         try {
             I_GetConceptData statusBeingChecked = termFactory.getConcept(descriptionBeingChecked.getStatusNid());
@@ -543,7 +544,7 @@ public class DescStatement extends RefsetSpecStatement {
         } 
     }
 
-    private boolean descriptionStatusIsKindOf(I_DescriptionTuple descriptionBeingChecked) throws IOException {
+    private boolean descriptionStatusIsKindOf(I_DescriptionTuple descriptionBeingChecked) throws IOException, ContradictionException {
         try {
             I_GetConceptData statusBeingChecked = termFactory.getConcept(descriptionBeingChecked.getStatusNid());
             

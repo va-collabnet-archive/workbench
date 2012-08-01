@@ -56,7 +56,7 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
-import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
+//TODO -- ISA CACHE CHANGE: Marc import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
@@ -195,7 +195,7 @@ public class OwlFunctionalSyntaxImport extends AbstractTask implements ActionLis
                 logger.info(pcClass.getStats(startTime));
 
                 // UPDATE ISA CACHE
-                Ts.get().clearInferredIsaCache();
+//TODO -- ISA CACHE CHANGE: Marc              Ts.get().clearInferredIsaCache();
                 ArrayList<SnoRel> cAllIInferredSnoRels;
                 cAllIInferredSnoRels = new ArrayList<SnoRel>();
                 SnoPathProcessOtherInferredIsa pcOther;
@@ -222,7 +222,7 @@ public class OwlFunctionalSyntaxImport extends AbstractTask implements ActionLis
                 Integer c1Nid = null;
                 NidSet parents = new NidSet();
                 ViewCoordinate vc = config.getViewCoordinate();
-                IsaCoordinate isac = vc.getIsaCoordinates().iterator().next();
+//TODO -- ISA CACHE CHANGE: Marc                IsaCoordinate isac = vc.getIsaCoordinates().iterator().next();
 
                 for (SnoRel r : cAllIInferredSnoRels) {
 
@@ -231,7 +231,7 @@ public class OwlFunctionalSyntaxImport extends AbstractTask implements ActionLis
 
                     } else if (r.c1Id != c1Nid) {
 
-                        ts.addInferredParents(vc, isac, c1Nid, parents.getSetValues());
+//TODO -- ISA CACHE CHANGE: Marc                        ts.addInferredParents(vc, isac, c1Nid, parents.getSetValues());
                         c1Nid = r.c1Id;
                         parents = new NidSet();
                     }
@@ -241,8 +241,8 @@ public class OwlFunctionalSyntaxImport extends AbstractTask implements ActionLis
                     }
                 }
 
-                ts.addInferredParents(vc, isac, c1Nid, parents.getSetValues());
-                ts.setIsaCacheAsComplete(isac);
+//TODO -- ISA CACHE CHANGE: Marc                ts.addInferredParents(vc, isac, c1Nid, parents.getSetValues());
+//TODO -- ISA CACHE CHANGE: Marc                ts.setIsaCacheAsComplete(isac);
                 logger.info("ISA cache update done");
 
                 gui.setProgressInfoLower("complete, time = " + toStringLapseSec(startTime));

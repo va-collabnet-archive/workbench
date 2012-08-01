@@ -139,8 +139,6 @@ public interface I_ManageConceptData {
    @Deprecated
    boolean isAnnotationStyleSet() throws IOException;
 
-   boolean isLeafByDestRels(I_ConfigAceFrame aceConfig) throws IOException;
-
    boolean isPrimordial() throws IOException;
 
    boolean isUncommitted();

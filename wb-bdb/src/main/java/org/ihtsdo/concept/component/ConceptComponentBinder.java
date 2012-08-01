@@ -143,7 +143,12 @@ public class ConceptComponentBinder<V extends Revision<V, C>, C extends ConceptC
         output.writeInt(componentListToWrite.size()); // List size
         for (C conceptComponent : componentListToWrite) {
             componentsWritten.incrementAndGet();
-            conceptComponent.writeComponentToBdb(output, maxReadOnlyStatusAtPositionId);
+            try{
+                conceptComponent.writeComponentToBdb(output, maxReadOnlyStatusAtPositionId);
+            }catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            
         }
     }
 

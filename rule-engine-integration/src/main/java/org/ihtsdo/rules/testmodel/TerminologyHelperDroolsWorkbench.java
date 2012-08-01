@@ -56,7 +56,6 @@ import org.ihtsdo.tk.api.PositionSet;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
-import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;

@@ -49,6 +49,7 @@ import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.thread.NamedThreadFactory;
 import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.KindOfCacheBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 
@@ -520,7 +521,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
 
     public boolean execute(I_AmTermComponent component,
             Collection<I_ShowActivity> activities) throws IOException,
-            TerminologyException, ComputationCanceled {
+            TerminologyException, ComputationCanceled, ContradictionException {
         return execute(component, null, null, null, activities);
     }
 
@@ -535,7 +536,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     public boolean execute(I_AmTermComponent component, GROUPING_TYPE version,
             PositionSetBI v1_is, PositionSetBI v2_is,
             Collection<I_ShowActivity> activities) throws IOException,
-            TerminologyException, ComputationCanceled {
+            TerminologyException, ComputationCanceled, ContradictionException {
 
         if (!continueComputation) {
             throw new ComputationCanceled("Compute cancelled");
@@ -628,7 +629,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     private boolean executeConceptContainsDesc(I_AmTermComponent component,
             GROUPING_TYPE version, PositionSetBI v1_is, PositionSetBI v2_is,
             Collection<I_ShowActivity> activities)
-            throws TerminologyException, IOException, ComputationCanceled {
+            throws TerminologyException, IOException, ComputationCanceled, ContradictionException {
         if (!continueComputation) {
             throw new ComputationCanceled("Compute cancelled");
         }
@@ -685,7 +686,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     private boolean executeConceptContainsRel(I_AmTermComponent component,
             GROUPING_TYPE version, PositionSetBI v1_is,
             PositionSetBI v2_is, Collection<I_ShowActivity> activities)
-            throws TerminologyException, IOException, ComputationCanceled {
+            throws TerminologyException, IOException, ComputationCanceled, ContradictionException {
         if (!continueComputation) {
             throw new ComputationCanceled("Compute cancelled");
         }

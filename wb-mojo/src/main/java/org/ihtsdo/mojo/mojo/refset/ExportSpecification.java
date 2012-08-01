@@ -30,6 +30,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.mojo.mojo.ConceptDescriptor;
 import org.ihtsdo.mojo.mojo.PositionDescriptor;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PositionBI;
 
 public class ExportSpecification {
@@ -112,7 +113,7 @@ public class ExportSpecification {
                 + ", root:" + checkSpecRoot;
         }
 
-        public boolean test(I_GetConceptData testConcept) throws IOException, TerminologyException {
+        public boolean test(I_GetConceptData testConcept) throws IOException, TerminologyException, ContradictionException {
             boolean allowed = false;
             if (checkSpecRoot.equals(testConcept)) {
                 return true;

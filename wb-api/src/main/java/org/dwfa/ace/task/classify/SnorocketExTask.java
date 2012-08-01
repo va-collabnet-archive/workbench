@@ -48,7 +48,7 @@ import org.dwfa.util.bean.Spec;
 import org.ihtsdo.helper.descriptionlogic.DescriptionLogic;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.*;
-import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
+//TODO -- ISA CACHE CHANGE: Marc import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
@@ -507,7 +507,7 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
                 cEditSnoCons = null; // :MEMORY:
                 cEditSnoRels = null; // :MEMORY:
                 pcEdit = null; // :MEMORY:
-                Ts.get().clearInferredIsaCache();
+//                Ts.get().clearInferredIsaCache();
                 System.gc();
                 // ** GUI: 2 RUN CLASSIFIER **
                 // Show in Activity Viewer
@@ -649,7 +649,7 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
                 Integer c1Nid = null;
                 NidSet parents = new NidSet();
                 ViewCoordinate vc = config.getViewCoordinate();
-                IsaCoordinate isac = vc.getIsaCoordinates().iterator().next();
+//TODO -- ISA CACHE CHANGE: Marc                IsaCoordinate isac = vc.getIsaCoordinates().iterator().next();
                 if (DescriptionLogic.isVisible()) {
                     ArrayList<SnoRel> cAllIInferredSnoRels = new ArrayList<SnoRel>();
                     SnoPathProcessOtherInferredIsa pcOther;
@@ -670,7 +670,7 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
                             c1Nid = r.c1Id;
                         } else if (r.c1Id != c1Nid) {
 
-                            ts.addInferredParents(vc, isac, c1Nid, parents.getSetValues());
+//TODO -- ISA CACHE CHANGE: Marc                            ts.addInferredParents(vc, isac, c1Nid, parents.getSetValues());
                             c1Nid = r.c1Id;
                             parents = new NidSet();
                         }
@@ -687,7 +687,7 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
                             c1Nid = r.c1Id;
                         } else if (r.c1Id != c1Nid) {
 
-                            ts.addInferredParents(vc, isac, c1Nid, parents.getSetValues());
+//TODO -- ISA CACHE CHANGE: Marc                            ts.addInferredParents(vc, isac, c1Nid, parents.getSetValues());
                             c1Nid = r.c1Id;
                             parents = new NidSet();
                         }
@@ -696,8 +696,8 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
                         }
                     }
                 }
-                ts.addInferredParents(vc, isac, c1Nid, parents.getSetValues());
-                ts.setIsaCacheAsComplete(isac);
+//TODO -- ISA CACHE CHANGE: Marc                ts.addInferredParents(vc, isac, c1Nid, parents.getSetValues());
+//TODO -- ISA CACHE CHANGE: Marc                ts.setIsaCacheAsComplete(isac);
 
                 if (debugDump) {
                     dumpSnoRel(cRocketSnoRels, "SnoRelInferData_full.txt", 4);

@@ -3,13 +3,10 @@ package org.ihtsdo.tk.api;
 import java.io.File;
 import java.io.IOException;
 import java.util.Set;
-
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
-import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
-import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
 
 public interface TerminologyDI {
@@ -60,26 +57,4 @@ public interface TerminologyDI {
    Set<PathBI> getPathSetFromPositionSet(Set<PositionBI> positions) throws IOException;
    
    PathBI getPath(int pathNid) throws IOException;
-   
-   /**
-    * 
-    * @deprecated not in TK3
-    */
-   @Deprecated
-   void clearInferredIsaCache();
-   
-   /**
-    * 
-    * @deprecated not in TK3
-    */
-   @Deprecated
-   void addInferredParents(ViewCoordinate viewCoordinate, IsaCoordinate isaCoordinate,
-    int conceptNid, int[] parentNids) throws IOException;
-   
-   /**
-    * 
-    * @deprecated not in TK3
-    */
-   @Deprecated
-   void setIsaCacheAsComplete(IsaCoordinate isaCoordinate) throws IOException;
 }

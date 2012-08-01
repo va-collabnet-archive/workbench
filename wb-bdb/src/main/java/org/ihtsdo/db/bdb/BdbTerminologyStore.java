@@ -21,12 +21,9 @@ import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
 import org.ihtsdo.concept.*;
+import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
-import org.ihtsdo.db.bdb.computer.kindof.IsaCache;
-import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
-import org.ihtsdo.db.bdb.computer.kindof.TypeCache;
-import org.ihtsdo.db.bdb.computer.version.PositionMapperBI;
 import org.ihtsdo.db.change.ChangeNotifier;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.*;
@@ -36,7 +33,6 @@ import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
-import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
@@ -124,8 +120,9 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     }
     
     @Override
-    public void forget(ConceptAttributeVersionBI attr) throws IOException{
-        BdbCommitManager.forget(attr);
+    public boolean forget(ConceptAttributeVersionBI attr) throws IOException{
+        boolean forgotten = BdbCommitManager.forget(attr);
+        return forgotten;
     }
     
     @Override
@@ -268,16 +265,6 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     @Override
     public NidBitSetBI getAllConceptNids() throws IOException {
         return Bdb.getConceptDb().getReadOnlyConceptIdSet();
-    }
-
-    @Override
-    public KindOfCacheBI getCache(ViewCoordinate coordinate) throws Exception {
-        TypeCache c = new IsaCache(Bdb.getConceptDb().getConceptNidSet());
-
-        c.setup(coordinate);
-        c.getLatch().await();
-
-        return c;
     }
 
     @Override
@@ -553,31 +540,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
 
     @Override
     public int[] getPossibleChildren(int parentNid, ViewCoordinate vc) throws IOException {
-        if (vc.getIsaCoordinates().size() == 1) {
-            IsaCoordinate isaCoordinate = vc.getIsaCoordinates().iterator().next();
-            IsaCache cache = KindOfComputer.getIsaCacheMap().get(isaCoordinate);
-
-            if ((cache != null) && cache.isReady()) {
-                int[] allPossibleNids = Bdb.xref.getDestRelOrigins(parentNid, vc.getIsaTypeNids());
-                IntList viewPossibleNids = new IntList();
-
-                for (int childNid : allPossibleNids) {
-                    try {
-                        if(childNid != parentNid){
-                           if (cache.isKindOf(childNid, parentNid)) {
-                                viewPossibleNids.add(childNid);
-                           }
-                        }
-                    } catch (Exception ex) {
-                        throw new IOException(ex);
-                    }
-                }
-
-                return viewPossibleNids.getListArray();
-            }
-        }
-
-        return Bdb.xref.getDestRelOrigins(parentNid, vc.getIsaTypeNids());
+        return Bdb.getNidCNidMap().getDestRelNids(parentNid, vc);
     }
 
     @Override
@@ -775,21 +738,6 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     }
 
     @Override
-    public void clearInferredIsaCache() {
-        KindOfComputer.clearIsaCache();
-    }
-
-    @Override
-    public void addInferredParents(ViewCoordinate vc, IsaCoordinate isac, int cnid, int[] parentNids) throws IOException {
-       KindOfComputer.addToIsaCache(vc, isac, cnid, parentNids);
-    }
-    
-    @Override
-    public void setIsaCacheAsComplete(IsaCoordinate isac) throws IOException {
-    	KindOfComputer.setIsaCacheAsComplete(isac);
-    }
-    
-    @Override
    public void touchComponent(int nid) {
       ChangeNotifier.touchComponent(nid);
    }
@@ -828,4 +776,15 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     public int getStampNid(TkRevision version) {
         return Bdb.getSapNid(version);
     }
+    
+    @Override
+    public boolean isKindOf(int childNid, int parentNid, ViewCoordinate vc) throws IOException, ContradictionException {
+        return Bdb.getNidCNidMap().isKindOf(childNid, parentNid, vc);
+    }
+    
+   @Override
+   public int[] getIncomingRelationshipsSourceNids(int cNid, NidSetBI relTypes) throws IOException {
+      return Bdb.getNidCNidMap().getDestRelNids(cNid, relTypes);
+   }
+  
     }

@@ -18,7 +18,6 @@ import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_RepresentIdSet;
-import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TestComponent;
 import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.PathSetReadOnly;
@@ -46,18 +45,15 @@ import org.ihtsdo.concept.component.processor.VersionFlusher;
 import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.concept.component.refset.RefsetMemberFactory;
 import org.ihtsdo.concept.component.relationship.Relationship;
-import org.ihtsdo.concept.component.relationship.RelationshipRevision;
 import org.ihtsdo.concept.component.relationship.group.RelGroupChronicle;
 import org.ihtsdo.concept.component.relationship.group.RelGroupVersion;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.bdb.BdbMemoryMonitor.LowMemoryListener;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
-import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.change.ChangeNotifier;
 import org.ihtsdo.db.util.NidPair;
-import org.ihtsdo.db.util.NidPairForRefset;
-import org.ihtsdo.db.util.NidPairForRel;
+import org.ihtsdo.db.util.NidPairForRefex;
 import org.ihtsdo.db.util.ReferenceType;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.lucene.LuceneManager;
@@ -82,7 +78,6 @@ import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
-import org.ihtsdo.tk.api.coordinate.KindOfSpec;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate.LANGUAGE_SORT;
 import org.ihtsdo.tk.api.id.IdBI;
@@ -109,6 +104,7 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 import java.io.IOException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -120,6 +116,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Level;
+import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
 
 public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI, Comparable<Concept> {
@@ -221,40 +218,14 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
     @Override
     public void cancel() throws IOException {
-        Collection<Integer> nidsToTouch = getConceptNidsAffectedByCommit();
-        data.cancel();
- 
+      ChangeNotifier.touchComponents(getConceptNidsAffectedByCommit());
+      data.cancel();
+
         if (BdbCommitManager.forget(getConAttrs())) {
             Bdb.getConceptDb().forget(this);
-            canceled = true;
-        } else {
-            modified();
-            Bdb.getConceptDb().writeConcept(this);
-        }
-
-        try {
-            KindOfComputer.updateIsaCache(this.getNid());
-        } catch (Exception e) {
-            AceLog.getAppLog().alertAndLogException(e);
-        }
-        ChangeNotifier.touchComponents(nidsToTouch);
-        BdbCommitManager.fireCancel();
-    }
-
-    private void collectPossibleKindOf(I_ShowActivity activity, NidSetBI isATypes,
-            I_RepresentIdSet possibleKindOfConcepts, int cNid)
-            throws IOException {
-        for (int cNidForOrigin : Bdb.xref.getDestRelOrigins(cNid, isATypes)) {
-            if ((activity != null) && activity.isCanceled()) {
-                return;
-            }
-
-            if (possibleKindOfConcepts.isMember(cNidForOrigin) == false) {
-                possibleKindOfConcepts.setMember(cNidForOrigin);
-                collectPossibleKindOf(activity, isATypes, possibleKindOfConcepts, cNidForOrigin);
-            }
-        }
-    }
+         canceled = true;
+      }
+   }
 
     @Override
     public boolean commit(ChangeSetGenerationPolicy changeSetPolicy,
@@ -548,11 +519,11 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
                         if (r == null) {
                             r = RefsetMemberFactory.create(er,
-                                    Ts.get().getConceptNidForNid(cc.getNid()));
+                                    Bdb.getConceptNid(cc.getNid()));
                             cc.addAnnotation(r);
                         } else {
                             r.merge((RefsetMember) RefsetMemberFactory.create(er,
-                                    Ts.get().getConceptNidForNid(cc.getNid())));
+                                    Bdb.getConceptNid(cc.getNid())));
                         }
                         ChangeNotifier.touchRefexRC(r.getReferencedComponentNid());
 
@@ -580,12 +551,6 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                     }
                 }
             }
-        }
-
-        try {
-            KindOfComputer.updateIsaCache(c.getNid());
-        } catch (Exception ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
         }
 
         return c;
@@ -852,26 +817,10 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     }
 
     public void updateXrefs() throws IOException {
-        for (Relationship r : getSourceRels()) {
-            NidPairForRel npr = NidPair.getTypeNidRelNidPair(r.getTypeNid(), r.getNid());
-
-            Bdb.addXrefPair(r.getC2Id(), npr);
-
-            if (r.revisions != null) {
-                for (RelationshipRevision p : r.revisions) {
-                    if (p.getTypeNid() != r.getTypeNid()) {
-                        npr = NidPair.getTypeNidRelNidPair(p.getTypeNid(), r.getNid());
-                        Bdb.addXrefPair(r.getC2Id(), npr);
-                    }
-                }
-            }
-        }
-
         for (RefsetMember<?, ?> m : getRefsetMembers()) {
-            NidPairForRefset npr = NidPair.getRefsetNidMemberNidPair(m.getRefsetId(), m.getNid());
-
+         NidPairForRefex npr = NidPair.getRefexNidMemberNidPair(m.getRefexNid(), m.getNid());
             Bdb.addXrefPair(m.referencedComponentNid, npr);
-        }
+      }
     }
 
     //~--- get methods ---------------------------------------------------------
@@ -1514,41 +1463,8 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     public List<I_RelTuple> getDestRelTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
             PositionSetBI positions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
             throws IOException {
-        List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
-        List<NidPairForRel> invalidPairs = new ArrayList<NidPairForRel>();
-        List<NidPairForRel> pairs;
-
-        if ((allowedTypes != null) && (allowedTypes.size() > 0)) {
-            pairs = Bdb.xref.getDestRelPairs(nid, allowedTypes);
-        } else {
-            pairs = Bdb.xref.getDestRelPairs(nid);
-        }
-
-        for (NidPairForRel pair : pairs) {
-            int relNid = pair.getRelNid();
-            Concept relSource = Bdb.getConceptForComponent(relNid);
-
-            if (relSource != null) {
-                Relationship r = relSource.getRelationship(relNid);
-
-                if (r != null) {
-                    r.addTuples(allowedStatus, allowedTypes, positions, returnRels, precedencePolicy,
-                            contradictionManager);
-                } else {
-                    invalidPairs.add(pair);
-                }
-            } else {
-                invalidPairs.add(pair);
-            }
-        }
-
-        if (removeInvalidXrefs && (invalidPairs.size() > 0)) {
-            for (NidPair pair : invalidPairs) {
-                Bdb.forgetXrefPair(nid, pair);
-            }
-        }
-
-        return returnRels;
+//TODO -- ISA CACHE CHANGE: could upgrade to use rel version and cast to rel tuple if this is too problematic
+        throw new UnsupportedOperationException("Ugrade to using RelationshipVersion.");
     }
 
     @Override
@@ -1810,48 +1726,48 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
     @Override
     public I_RepresentIdSet getPossibleChildOfConcepts(I_ConfigAceFrame config) throws IOException {
-        NidSetBI isATypes = config.getDestRelTypes();
-        I_RepresentIdSet possibleChildOfConcepts = Bdb.getConceptDb().getEmptyIdSet();
-
-        for (int cNid : Bdb.xref.getDestRelOrigins(nid, isATypes)) {
-            possibleChildOfConcepts.setMember(cNid);
-        }
-
-        return possibleChildOfConcepts;
+//        TODO -- ISA CACHE CHANGE: Need to re-implement
+        throw new UnsupportedOperationException("Need to re-implement after isa chache changes.");
     }
-
+    /**
+     * 
+     * @param relTypes
+     * @return
+     * @throws IOException
+     * @deprecated -- use get dest rel nids instead
+     */
+    @Deprecated 
     public Set<Integer> getPossibleDestRelsOfTypes(NidSetBI relTypes) throws IOException {
-        Set<Integer> possibleRelNids = new HashSet<Integer>();
-
-        for (NidPairForRel pair : Bdb.xref.getDestRelPairs(nid, relTypes)) {
-            possibleRelNids.add(pair.getRelNid());
-        }
-
-        return possibleRelNids;
+        return  new HashSet(Arrays.asList(Bdb.nidCidMapDb.getDestRelNids(nid, relTypes)));
     }
 
     @Override
-    public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config) throws IOException {
-        return getPossibleKindOfConcepts(config, null);
-    }
-
-    @Override
-    public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config, I_ShowActivity activity)
+    public NidBitSetBI getPossibleKindOfConcepts(I_ConfigAceFrame config)
             throws IOException {
         NidSetBI isATypes = config.getDestRelTypes();
 
-        return getPossibleKindOfConcepts(isATypes, activity);
+        return getPossibleKindOfConcepts(isATypes);
     }
 
-    public I_RepresentIdSet getPossibleKindOfConcepts(NidSetBI isATypes, I_ShowActivity activity)
+    public NidBitSetBI getPossibleKindOfConcepts(NidSetBI isATypes)
             throws IOException {
-        I_RepresentIdSet possibleKindOfConcepts = Bdb.getConceptDb().getEmptyIdSet();
+        NidBitSetBI possibleKindOfConcepts = Ts.get().getEmptyNidSet();
 
-        possibleKindOfConcepts.setMember(getNid());
-        collectPossibleKindOf(activity, isATypes, possibleKindOfConcepts, nid);
+      possibleKindOfConcepts.setMember(getNid());
+      collectPossibleKindOf(isATypes, possibleKindOfConcepts, nid);
 
-        return possibleKindOfConcepts;
+      return possibleKindOfConcepts;
     }
+    
+    private void collectPossibleKindOf(NidSetBI isATypes, NidBitSetBI possibleKindOfConcepts, int cNid)
+           throws IOException {
+      for (int cNidForOrigin : Bdb.getNidCNidMap().getDestRelNids(cNid, isATypes)) {
+         if (possibleKindOfConcepts.isMember(cNidForOrigin) == false) {
+            possibleKindOfConcepts.setMember(cNidForOrigin);
+            collectPossibleKindOf(isATypes, possibleKindOfConcepts, cNidForOrigin);
+         }
+      }
+   }
 
     private I_DescriptionTuple getPreferredAcceptability(
             Collection<I_DescriptionTuple<DescriptionRevision>> descriptions, int typePrefNid,
@@ -2500,7 +2416,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     }
 
     public boolean hasExtensionsForComponent(int nid) throws IOException {
-        List<NidPairForRefset> refsetPairs = Bdb.getRefsetPairs(nid);
+        List<NidPairForRefex> refsetPairs = Bdb.getRefsetPairs(nid);
 
         if ((refsetPairs != null) && (refsetPairs.size() > 0)) {
             return true;
@@ -2561,39 +2477,56 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                 }
             }
         }
-
-        return data.isLeafByDestRels(aceConfig);
+        if(Bdb.getNidCNidMap().getDestRelNids(this.nid, srcRelTypes).length == 0){
+            return true;
+        }
+        return false;
     }
 
     @Override
-    public boolean isParentOf(I_GetConceptData child) throws IOException, TerminologyException {
+    public boolean isParentOf(I_GetConceptData child) throws IOException, TerminologyException, ContradictionException {
         I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
         return isParentOf(child, config.getAllowedStatus(), config.getDestRelTypes(),
                 config.getViewPositionSetReadOnly(), config.getPrecedence(),
                 config.getConflictResolutionStrategy());
     }
-
+    /**
+     * 
+     * @param child
+     * @param allowedStatus
+     * @param allowedTypes
+     * @param positions
+     * @param precedencePolicy
+     * @param contradictionManager
+     * @return
+     * @throws IOException
+     * @throws TerminologyException
+     * @deprecated -- use Ts.get().isKindOf(childNid, parentNid, viewCoordinate)
+     */
+    @Deprecated
     @Override
     public boolean isParentOf(I_GetConceptData child, NidSetBI allowedStatus, NidSetBI allowedTypes,
             PositionSetBI positions, Precedence precedencePolicy,
             ContradictionManagerBI contradictionManager)
-            throws IOException, TerminologyException {
+            throws IOException, TerminologyException, ContradictionException {
+        ViewCoordinate originalViewCoordinate = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
+        ViewCoordinate viewCoordinate = new ViewCoordinate(originalViewCoordinate);
+        viewCoordinate.setAllowedStatusNids(allowedStatus);
+//        TODO -- ISA CACHE CHANGE: kec how to do allowedTypes
+//        viewCoordinate.setRelationshipAssertionType(allowedTypes);
+        viewCoordinate.setPositionSet(positions);
+        viewCoordinate.setContradictionManager(contradictionManager);
         for (PositionBI p : positions) {
-            KindOfSpec kindOfSpec = new KindOfSpec(p, allowedStatus, allowedTypes, getNid(), precedencePolicy,
-                    contradictionManager, ReferenceConcepts.SNOROCKET.getNid(),
-                    RelAssertionType.INFERRED_THEN_STATED);
-
-            if (KindOfComputer.isKindOf((Concept) child, kindOfSpec)) {
-                return true;
-            }
+            return Bdb.getNidCNidMap().isKindOf(child.getConceptNid(),
+                    this.nid, viewCoordinate);
         }
-
         return false;
     }
 
     @Override
-    public boolean isParentOfOrEqualTo(I_GetConceptData child) throws IOException, TerminologyException {
+    public boolean isParentOfOrEqualTo(I_GetConceptData child) throws
+            IOException, TerminologyException, ContradictionException {
         if (child == this) {
             return true;
         }
@@ -2605,7 +2538,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     public boolean isParentOfOrEqualTo(I_GetConceptData child, NidSetBI allowedStatus, NidSetBI allowedTypes,
             PositionSetBI positions, Precedence precedencePolicy,
             ContradictionManagerBI contradictionManager)
-            throws IOException, TerminologyException {
+            throws IOException, TerminologyException, ContradictionException {
         if (child == this) {
             return true;
         }
@@ -2739,7 +2672,6 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                 percentageUsed = ((double) usedMemory) / maxMemory;
 
                 if (percentageUsed > 0.85) {
-                    KindOfComputer.trimCache();
                     usedMemory = maxMemory - Runtime.getRuntime().freeMemory();
                     percentageUsed = ((double) usedMemory) / maxMemory;
                     AceLog.getAppLog().info("Concept Diet + KindOfComputer.trimCache() finished recover memory. "

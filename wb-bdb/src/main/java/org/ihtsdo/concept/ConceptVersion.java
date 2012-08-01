@@ -120,7 +120,7 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
 
     private boolean checkConceptVersionConstraint(int cNid, ConceptSpec constraint,
             ConstraintCheckType checkType)
-            throws IOException {
+            throws IOException, ContradictionException {
         switch (checkType) {
             case EQUALS:
                 return Ts.get().getConceptVersion(vc, cNid).getNid() == constraint.get(vc).getNid();
@@ -284,7 +284,7 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
     private boolean testRels(ConstraintBI constraint, ConstraintCheckType subjectCheck,
             ConstraintCheckType propertyCheck, ConstraintCheckType valueCheck,
             Collection<? extends RelationshipVersionBI> rels)
-            throws IOException {
+            throws IOException, ContradictionException {
         RelationshipConstraint rc = (RelationshipConstraint) constraint;
 
         for (RelationshipVersionBI rel : rels) {
@@ -1250,15 +1250,8 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
     }
 
     @Override
-    public boolean isKindOf(ConceptVersionBI possibleKind) throws IOException {
-        Concept possibleParent = ((ConceptVersion) possibleKind).concept;
-
-        try {
-            return possibleParent.isParentOfOrEqualTo(concept, vc.getAllowedStatusNids(), vc.getIsaTypeNids(),
-                    vc.getPositionSet(), vc.getPrecedence(), vc.getContradictionManager());
-        } catch (TerminologyException e) {
-            throw new IOException(e);
-        }
+    public boolean isKindOf(ConceptVersionBI possibleKind) throws IOException, ContradictionException {
+        return Ts.get().isKindOf(getNid(), possibleKind.getNid(), vc);
     }
 
     @Override

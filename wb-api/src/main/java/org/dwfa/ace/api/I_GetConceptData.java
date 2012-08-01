@@ -26,7 +26,9 @@ import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
+import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.NidListBI;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionSetBI;
@@ -437,17 +439,17 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
 
     public boolean isParentOf(I_GetConceptData child, NidSetBI allowedStatus, NidSetBI allowedTypes,
             PositionSetBI positions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
-            throws IOException, TerminologyException;
+            throws IOException, TerminologyException, ContradictionException;
 
     @Deprecated
-    public boolean isParentOf(I_GetConceptData child) throws IOException, TerminologyException;
+    public boolean isParentOf(I_GetConceptData child) throws IOException, TerminologyException, ContradictionException;
 
     public boolean isParentOfOrEqualTo(I_GetConceptData child, NidSetBI allowedStatus, NidSetBI allowedTypes,
             PositionSetBI positions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
-            throws IOException, TerminologyException;
+            throws IOException, TerminologyException, ContradictionException;
 
     @Deprecated
-    public boolean isParentOfOrEqualTo(I_GetConceptData child) throws IOException, TerminologyException;
+    public boolean isParentOfOrEqualTo(I_GetConceptData child) throws IOException, TerminologyException, ContradictionException;
 
     /**
      * Denotation: the act of pointing out by name. Used as an 
@@ -472,7 +474,7 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
      *         according to the relationships specified in the config.
      * @throws IOException
      */
-    public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config) throws IOException;
+    public NidBitSetBI getPossibleKindOfConcepts(I_ConfigAceFrame config) throws IOException;
 
     /**
      * Child of = only immediate children, not grand-children, etc. 
@@ -496,7 +498,4 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
 
     public Set<? extends I_RelTuple> getCommonRelTuples(I_ConfigAceFrame config) throws IOException,
             TerminologyException;
-
-    I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config, I_ShowActivity activity) throws IOException;
-
 }

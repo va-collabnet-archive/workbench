@@ -50,6 +50,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.qa.inheritance.InheritedRelationships;
 import org.ihtsdo.qa.inheritance.RelationshipsDAO;
 import org.ihtsdo.rules.RulesLibrary;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
@@ -99,6 +100,8 @@ public class RelationshipTreeViewerPanel extends JPanel {
 			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
 			AceLog.getAppLog().alertAndLogException(e);
+		} catch (ContradictionException e) {
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 	}
 
@@ -119,6 +122,8 @@ public class RelationshipTreeViewerPanel extends JPanel {
 		} catch (IOException e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		} catch (TerminologyException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		} catch (ContradictionException e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
 	}
@@ -142,6 +147,8 @@ public class RelationshipTreeViewerPanel extends JPanel {
 			AceLog.getAppLog().alertAndLogException(e);
 		} catch (TerminologyException e) {
 			AceLog.getAppLog().alertAndLogException(e);
+		} catch (ContradictionException e) {
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 	}
 
@@ -151,7 +158,7 @@ public class RelationshipTreeViewerPanel extends JPanel {
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 * @throws TerminologyException the terminology exception
 	 */
-	private void initCustomComponents() throws IOException, TerminologyException {
+	private void initCustomComponents() throws IOException, TerminologyException, ContradictionException {
 		DefaultTreeCellRenderer rend = new DefaultTreeCellRenderer();
 		rend.setIconTextGap(3);
 
@@ -183,6 +190,8 @@ public class RelationshipTreeViewerPanel extends JPanel {
 				} catch (IOException e) {
 					AceLog.getAppLog().alertAndLogException(e);
 				} catch (TerminologyException e) {
+					AceLog.getAppLog().alertAndLogException(e);
+				} catch (ContradictionException e) {
 					AceLog.getAppLog().alertAndLogException(e);
 				}
 				conceptList.setToolTipText(conceptModel.get(0).toString());
@@ -216,7 +225,7 @@ public class RelationshipTreeViewerPanel extends JPanel {
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 * @throws TerminologyException the terminology exception
 	 */
-	private void createTree(DefaultMutableTreeNode top) throws IOException, TerminologyException {
+	private void createTree(DefaultMutableTreeNode top) throws IOException, TerminologyException, ContradictionException {
 		relTree.removeAll();
 		DefaultMutableTreeNode conceptNode = new DefaultMutableTreeNode(concept.getInitialText());
 		addNodeInSortedOrder(top, conceptNode);

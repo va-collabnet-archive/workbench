@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_AmTypedPart;
 import org.dwfa.ace.api.I_IdPart;
@@ -16,7 +18,9 @@ import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
-import org.ihtsdo.db.bdb.computer.version.PositionMapperBI.RelativePosition;
+import org.ihtsdo.helper.version.RelativePositionComputer;
+import org.ihtsdo.helper.version.RelativePositionComputerBI;
+import org.ihtsdo.helper.version.RelativePositionComputerBI.RelativePosition;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.NidSet;
@@ -33,9 +37,12 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.spec.ValidationException;
 
 public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
+    
+    protected static final Logger logger = Logger.getLogger(VersionComputer.class.getName());
+
 
     private void handlePart(HashSet<V> partsForPosition,
-            PositionMapperBI mapper, V part,
+            RelativePositionComputerBI mapper, V part,
             Precedence precedencePolicy,
             ContradictionManagerBI contradictionManager,
             NidSetBI allowedStatus) throws RuntimeException {
@@ -73,14 +80,14 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
                     // Duplicate values encountered.
                     errorCount++;
                     if (errorCount < 5) {
-                        AceLog.getAppLog().warning(
-                                RelativePosition.EQUAL
+                        logger.log(
+                                Level.WARNING, "{0}"
                                 + " should never happen. "
-                                + "Data is malformed. sap: " + part.getStampNid()
-                                + " Part:\n"
-                                + part
-                                + " \n  Part to test: \n"
-                                + prevPartToTest);
+                                + "Data is malformed. sap: {1} Part:\n{2} \n  Part to test: \n{3}",
+                                new Object[]{RelativePositionComputerBI.RelativePosition.EQUAL,
+                                    part.getStampNid(),
+                                    part,
+                                    prevPartToTest});
                     }
                     break;
                 case UNREACHABLE:
@@ -154,7 +161,7 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
 
         if (positions != null && !positions.isEmpty()) {
             for (PositionBI position : positions) {
-                PositionMapperBI mapper = Bdb.getSapDb().getMapper(position);
+                RelativePositionComputerBI mapper = RelativePositionComputer.getComputer(position);
                 for (I_IdPart part : versions) {
                     if (part.getTime() > Long.MIN_VALUE
                             && (authorityNidsFilterList.isEmpty()
@@ -358,7 +365,7 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
         HashSet<V> partsToAdd = new HashSet<V>();
         for (PositionBI p : positions) {
             HashSet<V> partsForPosition = new HashSet<V>();
-            PositionMapperBI mapper = Bdb.getSapDb().getMapper(p);
+            RelativePositionComputerBI mapper = RelativePositionComputer.getComputer(p);
             nextpart:
             for (V part : versions) {
                 if (part.getTime() == Long.MIN_VALUE) {
@@ -418,7 +425,7 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
         HashSet<V> partsToAdd = new HashSet<V>();
         for (PositionBI p : positions) {
             HashSet<V> partsForPosition = new HashSet<V>();
-            PositionMapperBI mapper = Bdb.getSapDb().getMapper(p);
+            RelativePositionComputerBI mapper = RelativePositionComputer.getComputer(p);
             nextpart:
             for (V part : versions) {
                 if (part.getTime() == Long.MIN_VALUE) {

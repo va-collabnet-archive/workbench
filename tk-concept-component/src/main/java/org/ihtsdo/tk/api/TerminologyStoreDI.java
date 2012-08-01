@@ -92,16 +92,6 @@ public interface TerminologyStoreDI extends TerminologyDI {
     */
    @Deprecated
    NidBitSetBI getAllConceptNids() throws IOException;
-   
-   /**
-    * 
-    * @param viewCoordinate
-    * @return
-    * @throws Exception
-    * @deprecated not in TK3
-    */
-   @Deprecated
-   KindOfCacheBI getCache(ViewCoordinate viewCoordinate) throws Exception;
 
    ComponentChronicleBI<?> getComponent(Collection<UUID> uuids) throws IOException;
 
@@ -143,14 +133,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
    Map<Integer, ConceptChronicleBI> getConcepts(NidBitSetBI conceptNids) throws IOException;
 
    ContradictionIdentifierBI getConflictIdentifier(ViewCoordinate viewCoordinate, boolean useCase);
-   
-   /**
-    * 
-    * @return
-    * @throws IOException
-    * @deprecated not in TK3
-    */
-   @Deprecated
+  
    NidBitSetBI getEmptyNidSet() throws IOException;
 
    Collection<DbDependency> getLatestChangeSetDependencies() throws IOException;
@@ -252,7 +235,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
     * @deprecated not in TK3
     */
    @Deprecated
-   void forget(ConceptAttributeVersionBI conceptAttributeVersion) throws IOException;
+   boolean forget(ConceptAttributeVersionBI conceptAttributeVersion) throws IOException;
    
    /**
     * 
@@ -377,4 +360,9 @@ public interface TerminologyStoreDI extends TerminologyDI {
    void touchRelTarget(int nid);
    
    int getStampNid(TkRevision version) throws IOException;
+   
+   boolean isKindOf(int childNid, int parentNid, ViewCoordinate vc)
+           throws IOException, ContradictionException;
+   
+   int[] getIncomingRelationshipsSourceNids(int cNid, NidSetBI relTypes) throws IOException;
 }

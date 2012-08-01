@@ -1,12 +1,12 @@
 package org.ihtsdo.db.util;
 
-public class NidPairForRefset extends NidPair {
+public class NidPairForRefex extends NidPair {
 
-	protected NidPairForRefset(int rNid, int typeNid) {
+	protected NidPairForRefex(int rNid, int typeNid) {
 		super(rNid, typeNid);
 	}
 
-	protected NidPairForRefset(long nids) {
+	protected NidPairForRefex(long nids) {
 		super(nids);
 	}
 
@@ -14,7 +14,7 @@ public class NidPairForRefset extends NidPair {
 		return false;
 	}
 
-	public int getRefsetNid() {
+	public int getRefexNid() {
 		return nid1;
 	}
 

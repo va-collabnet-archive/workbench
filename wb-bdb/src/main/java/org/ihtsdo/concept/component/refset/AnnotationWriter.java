@@ -92,7 +92,7 @@ public class AnnotationWriter {
     }
 
     public void objectToEntry(Collection<RefsetMember<?,?>> list,
-            TupleOutput output, int maxReadOnlyStatusAtPositionId) {
+            TupleOutput output, int maxReadOnlyStatusAtPositionId) throws IOException{
         if (list == null) {
             output.writeShort(0); // List size
             return;

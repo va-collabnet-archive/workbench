@@ -31,6 +31,7 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.ihtsdo.tk.api.ContradictionException;
 
 public abstract class AbstractSearchTest extends AbstractTask implements I_TestSearchResults {
 
@@ -69,11 +70,13 @@ public abstract class AbstractSearchTest extends AbstractTask implements I_TestS
         }
     }
 
+    @Override
     public final void complete(I_EncodeBusinessProcess bp, I_Work worker) throws TaskFailedException {
         // nothing to do..
     }
 
-    public final Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+    @Override
+    public final Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException, ContradictionException {
 
         try {
             I_AmTermComponent component = (I_AmTermComponent) process.getProperty(componentPropName);
@@ -102,11 +105,13 @@ public abstract class AbstractSearchTest extends AbstractTask implements I_TestS
      * @seeorg.dwfa.ace.task.search.I_TestSearchResults#test(org.dwfa.ace.api.
      * I_AmTermComponent)
      */
-    public abstract boolean test(I_AmTermComponent component, I_ConfigAceFrame frameConfig) throws TaskFailedException;
+    @Override
+    public abstract boolean test(I_AmTermComponent component, I_ConfigAceFrame frameConfig) throws TaskFailedException, ContradictionException;
 
     /**
      * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
      */
+    @Override
     public Collection<Condition> getConditions() {
         return CONDITIONAL_TEST_CONDITIONS_REVERSE;
     }
@@ -114,6 +119,7 @@ public abstract class AbstractSearchTest extends AbstractTask implements I_TestS
     /**
      * @see org.dwfa.bpa.process.I_DefineTask#getDataContainerIds()
      */
+    @Override
     public int[] getDataContainerIds() {
         return new int[] {};
     }

@@ -311,13 +311,13 @@ public class ContradictionTest {
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(ContradictionTest.class.getName()).log(Level.SEVERE, null, ex);
         }
-        System.out.println("AccumDiffSet: " + accumDiffSet);
-        System.out.println("ATH 1: " + ath1);
-        System.out.println("ATH 2: " + ath2);
-        System.out.println("ATH 3: " + ath3);
-        System.out.println("ATH 4: " + ath4);
-        System.out.println("ATH 5: " + ath5);
-        System.out.println("ATH 6: " + ath6);
+//        System.out.println("AccumDiffSet: " + accumDiffSet);
+//        System.out.println("ATH 1: " + ath1);
+//        System.out.println("ATH 2: " + ath2);
+//        System.out.println("ATH 3: " + ath3);
+//        System.out.println("ATH 4: " + ath4);
+//        System.out.println("ATH 5: " + ath5);
+//        System.out.println("ATH 6: " + ath6);
         Assert.assertTrue("ConceptB doesn't have the correct contradictions.",accumDiffSet.contains(ath1) && accumDiffSet.contains(ath2));
     }
     
@@ -368,15 +368,15 @@ public class ContradictionTest {
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(ContradictionTest.class.getName()).log(Level.SEVERE, null, ex);
         }
-        System.out.println("AccumDiffSet: " + accumDiffSet);
-        System.out.println("ATH 1: " + ath1);
-        System.out.println("ATH 2: " + ath2);
-        System.out.println("ATH 3: " + ath3);
-        System.out.println("ATH 4: " + ath4);
-        System.out.println("ATH 5: " + ath5);
-        System.out.println("ATH 6: " + ath6);
-        System.out.println("ATH 7: " + ath7);
-        System.out.println("ATH 8: " + ath8);
+//        System.out.println("AccumDiffSet: " + accumDiffSet);
+//        System.out.println("ATH 1: " + ath1);
+//        System.out.println("ATH 2: " + ath2);
+//        System.out.println("ATH 3: " + ath3);
+//        System.out.println("ATH 4: " + ath4);
+//        System.out.println("ATH 5: " + ath5);
+//        System.out.println("ATH 6: " + ath6);
+//        System.out.println("ATH 7: " + ath7);
+//        System.out.println("ATH 8: " + ath8);
         Assert.assertTrue("ConceptB doesn't have the correct contradictions.",
                 accumDiffSet.contains(ath7) && accumDiffSet.contains(ath8));
     }
@@ -427,13 +427,13 @@ public class ContradictionTest {
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(ContradictionTest.class.getName()).log(Level.SEVERE, null, ex);
         }
-        System.out.println("AccumDiffSet: " + accumDiffSet);
-        System.out.println("ATH 1: " + ath1);
-        System.out.println("ATH 2: " + ath2);
-        System.out.println("ATH 3: " + ath3);
-        System.out.println("ATH 4: " + ath4);
-        System.out.println("ATH 5: " + ath5);
-        System.out.println("ATH 6: " + ath6);
+//        System.out.println("AccumDiffSet: " + accumDiffSet);
+//        System.out.println("ATH 1: " + ath1);
+//        System.out.println("ATH 2: " + ath2);
+//        System.out.println("ATH 3: " + ath3);
+//        System.out.println("ATH 4: " + ath4);
+//        System.out.println("ATH 5: " + ath5);
+//        System.out.println("ATH 6: " + ath6);
         Assert.assertTrue("ConceptC doesn't have the correct contradictions.", accumDiffSet.contains(ath5) && accumDiffSet.contains(ath6));
     }
     

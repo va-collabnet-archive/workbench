@@ -194,7 +194,12 @@ public class RefsetMemberBinder extends TupleBinding<Collection<RefsetMember<?, 
       for (RefsetMember<?, ?> refsetMember : refsetMembersToWrite) {
          written.incrementAndGet();
          output.writeInt(refsetMember.getTypeNid());
-         refsetMember.writeComponentToBdb(output, maxReadOnlyStatusAtPositionId);
+         try{
+             refsetMember.writeComponentToBdb(output, maxReadOnlyStatusAtPositionId);
+         }catch (IOException ex) {
+                    throw new RuntimeException(ex);
+         }
+         
       }
    }
 

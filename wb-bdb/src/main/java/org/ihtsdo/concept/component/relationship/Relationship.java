@@ -25,7 +25,6 @@ import org.ihtsdo.concept.component.RevisionSet;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.db.util.NidPair;
-import org.ihtsdo.db.util.NidPairForRel;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidSetBI;
@@ -397,41 +396,30 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     }
 
     @Override
-    public void writeToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
+    public void writeToBdb(TupleOutput output, int maxReadOnlyStampNid) {
+      List<RelationshipRevision> revisionsToWrite = new ArrayList<>();
 
-        //
-        List<RelationshipRevision> partsToWrite = new ArrayList<RelationshipRevision>();
-
-        if (revisions != null) {
-            for (RelationshipRevision p : revisions) {
-                if ((p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid)
-                        && (p.getTime() != Long.MIN_VALUE)) {
-                    partsToWrite.add(p);
-                }
+      if (revisions != null) {
+         for (RelationshipRevision p : revisions) {
+            if ((p.getStampNid() > maxReadOnlyStampNid) && (p.getTime() != Long.MIN_VALUE)) {
+               revisionsToWrite.add(p);
             }
-        }
+         }
+      }
 
-        // Start writing
-        // c1Nid is the enclosing concept, does not need to be written.
-        output.writeInt(c2Nid);
-        output.writeInt(getCharacteristicNid());
-        output.writeInt(group);
-        output.writeInt(getRefinabilityNid());
-        output.writeInt(getTypeNid());
-        output.writeShort(partsToWrite.size());
+      // Start writing
+      // c1Nid is the enclosing concept, does not need to be written.
+      output.writeInt(c2Nid);
+      output.writeInt(getCharacteristicNid());
+      output.writeSortedPackedInt(group);
+      output.writeInt(getRefinabilityNid());
+      output.writeInt(getTypeNid());
+      output.writeSortedPackedInt(revisionsToWrite.size());
 
-        NidPairForRel npr = NidPair.getTypeNidRelNidPair(typeNid, nid);
-
-        Bdb.addXrefPair(c2Nid, npr);
-
-        for (RelationshipRevision p : partsToWrite) {
-            if (p.getTypeNid() != typeNid) {
-                npr = NidPair.getTypeNidRelNidPair(p.getTypeNid(), nid);
-                Bdb.addXrefPair(c2Nid, npr);
-            }
-
-            p.writePartToBdb(output);
-        }
+      for (RelationshipRevision p : revisionsToWrite) {
+         p.writePartToBdb(output);
+      }
+      
     }
 
     //~--- get methods ---------------------------------------------------------
@@ -754,12 +742,6 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     @Override
     public void setTargetNid(int dNid) throws PropertyVetoException {
         if (this.c2Nid != dNid) {
-            if ((this.typeNid != 0) && (this.nid != 0)) {
-                NidPairForRel oldNpr = NidPair.getTypeNidRelNidPair(this.typeNid, this.nid);
-
-                Bdb.forgetXrefPair(this.c2Nid, oldNpr);
-            }
-
             // new xref is added on the dbWrite.
             this.c2Nid = dNid;
             modified();
@@ -793,12 +775,6 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     @Override
     public void setTypeNid(int typeNid) {
         if (this.typeNid != typeNid) {
-            if ((this.typeNid != 0) && (this.nid != 0)) {
-                NidPairForRel oldNpr = NidPair.getTypeNidRelNidPair(this.typeNid, this.nid);
-
-                Bdb.forgetXrefPair(this.c2Nid, oldNpr);
-            }
-
             // new xref is added on the dbWrite.
             this.typeNid = typeNid;
             modified();

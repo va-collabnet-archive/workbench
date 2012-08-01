@@ -34,6 +34,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.testmodel.DrRelationship;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSet;
@@ -206,9 +207,9 @@ ROLEGROUPS_CROSSOVER};
 		 */
 		public List<I_RelTuple> getRelTuples(I_GetConceptData concept) throws IOException, TerminologyException{
 			List<I_RelTuple> result = new ArrayList<I_RelTuple>();
-			InheritedRelationships inheritedRels = getInheritedRelationships(concept);
-
-			try {
+                        try {
+                                InheritedRelationships inheritedRels = getInheritedRelationships(concept);
+                                
 				List<I_RelTuple[]> roleGroups = inheritedRels.getRoleGroups();
 				int relGroup = 1;
 				for (I_RelTuple[] i_RelTuples : roleGroups) {
@@ -225,6 +226,8 @@ ROLEGROUPS_CROSSOVER};
 					result.add(i_RelTuple);
 				}
 			} catch (PropertyVetoException e) {
+				throw new TerminologyException(e);
+			} catch (ContradictionException e) {
 				throw new TerminologyException(e);
 			}
 
@@ -258,7 +261,7 @@ ROLEGROUPS_CROSSOVER};
 		 * @throws IOException Signals that an I/O exception has occurred.
 		 * @throws TerminologyException the terminology exception
 		 */
-		public TEST_RESULTS subsumptionConceptTest(I_GetConceptData concept1, I_GetConceptData concept2) throws IOException, TerminologyException{
+		public TEST_RESULTS subsumptionConceptTest(I_GetConceptData concept1, I_GetConceptData concept2) throws IOException, TerminologyException, ContradictionException{
 			if (concept1.getConceptNid()==concept2.getConceptNid()){
 				return TEST_RESULTS.CONCEPT1_EQUAL_CONCEPT2;
 			}
@@ -281,7 +284,7 @@ ROLEGROUPS_CROSSOVER};
 		 * @throws TerminologyException the terminology exception
 		 * @throws IOException Signals that an I/O exception has occurred.
 		 */
-		public TEST_RESULTS subsumptionRoleTest(I_RelTuple role1, I_RelTuple role2) throws TerminologyException, IOException{
+		public TEST_RESULTS subsumptionRoleTest(I_RelTuple role1, I_RelTuple role2) throws TerminologyException, IOException, ContradictionException{
 			TEST_RESULTS relTargetSubSum=subsumptionConceptTest(termFactory.getConcept( role1.getC2Id()),termFactory.getConcept(role2.getC2Id()));
 			TEST_RESULTS relTypeSubsum;
 			switch(relTargetSubSum){
@@ -338,7 +341,7 @@ ROLEGROUPS_CROSSOVER};
 		 * @throws TerminologyException the terminology exception
 		 * @throws IOException Signals that an I/O exception has occurred.
 		 */
-		public TEST_RESULTS subsumptionRoleGroupTest(I_RelTuple[] rolegroup1, I_RelTuple[] rolegroup2) throws TerminologyException, IOException{
+		public TEST_RESULTS subsumptionRoleGroupTest(I_RelTuple[] rolegroup1, I_RelTuple[] rolegroup2) throws TerminologyException, IOException, ContradictionException{
 			TEST_RESULTS roleTestResult ;
 			boolean rolesCrossover=false;
 			boolean equalRoles=false;
@@ -448,7 +451,8 @@ ROLEGROUPS_CROSSOVER};
 		 * @throws IOException Signals that an I/O exception has occurred.
 		 */
 		private boolean roleGroup1SubSumToRoleGroup2(
-				I_RelTuple[] rolegroup1, I_RelTuple[] rolegroup2) throws TerminologyException, IOException {
+				I_RelTuple[] rolegroup1, I_RelTuple[] rolegroup2) throws
+                        TerminologyException, IOException, ContradictionException {
 			TEST_RESULTS roleTestResult ;
 			boolean equal=false;
 			boolean oneSubsTwo=false;
@@ -501,7 +505,8 @@ ROLEGROUPS_CROSSOVER};
 		 * @throws IOException Signals that an I/O exception has occurred.
 		 * @throws TerminologyException the terminology exception
 		 */
-		public InheritedRelationships getInheritedRelationships (I_GetConceptData concept) throws IOException, TerminologyException{
+		public InheritedRelationships getInheritedRelationships (I_GetConceptData concept) throws
+                        IOException, TerminologyException, ContradictionException{
 			List<I_RelTuple[]> allRoleGroups=new ArrayList<I_RelTuple[]>();
 			List<I_RelTuple> allSingleRoles=new ArrayList<I_RelTuple>();
 			Set<I_GetConceptData> parents=new HashSet<I_GetConceptData>();
@@ -523,7 +528,8 @@ ROLEGROUPS_CROSSOVER};
 		 * @throws TerminologyException the terminology exception
 		 * @throws IOException Signals that an I/O exception has occurred.
 		 */
-		public InheritedRelationships getInheritedRelationships (Set<I_GetConceptData> parents) throws TerminologyException, IOException{
+		public InheritedRelationships getInheritedRelationships (Set<I_GetConceptData> parents) throws 
+                        TerminologyException, IOException, ContradictionException{
 			List<I_RelTuple[]> allRoleGroups=new ArrayList<I_RelTuple[]>();
 			List<I_RelTuple> allSingleRoles=new ArrayList<I_RelTuple>();
 			Set<I_GetConceptData> recParents=new HashSet<I_GetConceptData>();
@@ -551,7 +557,7 @@ ROLEGROUPS_CROSSOVER};
 		 * @throws IOException Signals that an I/O exception has occurred.
 		 */
 		private void getMoreSpecificRoles(List<I_RelTuple[]> allRoleGroups,
-				List<I_RelTuple> allSingleRoles) throws TerminologyException, IOException {
+				List<I_RelTuple> allSingleRoles) throws TerminologyException, IOException, ContradictionException {
 
 			for (int i=allSingleRoles.size()-1;i>-1;i--){
 				for (int j=allSingleRoles.size()-1;j>-1;j--){
@@ -612,7 +618,8 @@ ROLEGROUPS_CROSSOVER};
 		 */
 		@SuppressWarnings("unchecked")
 		private void getRecursiveDefiningAttributes(I_GetConceptData concept,
-				List<I_RelTuple[]> allRoleGroups,List<I_RelTuple> allSingleRoles, Set<I_GetConceptData> parents) throws IOException, TerminologyException {
+				List<I_RelTuple[]> allRoleGroups,List<I_RelTuple> allSingleRoles, Set<I_GetConceptData> parents) throws
+                        IOException, TerminologyException, ContradictionException {
 
 			List<I_RelTuple> relationships = (List<I_RelTuple>) concept.getSourceRelTuples(allowedStatus, allowedDestRelTypes, getMockViewSet(config),
 					config.getPrecedence(), config.getConflictResolutionStrategy(),config.getClassifierConcept().getNid(),RelAssertionType.STATED);
@@ -666,7 +673,7 @@ ROLEGROUPS_CROSSOVER};
 		 * @throws IOException Signals that an I/O exception has occurred.
 		 * @throws TerminologyException the terminology exception
 		 */
-		public boolean isDefiningChar(int characteristicId) throws IOException, TerminologyException {
+		public boolean isDefiningChar(int characteristicId) throws IOException, TerminologyException, ContradictionException {
 
 			if (setDefChar.contains(characteristicId)){
 				return true;
@@ -751,6 +758,8 @@ ROLEGROUPS_CROSSOVER};
 			} catch (IOException e) {
 				AceLog.getAppLog().alertAndLogException(e);
 			} catch (TerminologyException e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			} catch (ContradictionException e) {
 				AceLog.getAppLog().alertAndLogException(e);
 			}
 			return rels;

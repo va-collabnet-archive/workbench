@@ -39,8 +39,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.ihtsdo.db.bdb.computer.version.PositionMapperBI;
-import org.ihtsdo.db.bdb.computer.version.RelativePositionComputer;
 import org.ihtsdo.tk.api.*;
 
 /**
@@ -53,8 +51,6 @@ public class StatusAtPositionBdb extends ComponentBdb {
     private static int initialPosition = -1;
     private static PositionArrayBinder positionArrayBinder =
             new PositionArrayBinder();
-    private static ConcurrentHashMap<PositionBI, PositionMapperBI> mapperCache =
-            new ConcurrentHashMap<PositionBI, PositionMapperBI>();
     private static final Map<UncommittedStatusForPath, Integer> uncomittedStatusPathEntries =
             new ConcurrentHashMap<UncommittedStatusForPath, Integer>();
     private static CountDownLatch setupLatch = new CountDownLatch(1);
@@ -129,8 +125,6 @@ public class StatusAtPositionBdb extends ComponentBdb {
         initialPosition = -1;
         positionArrayBinder =
                 new PositionArrayBinder();
-        mapperCache =
-                new ConcurrentHashMap<PositionBI, PositionMapperBI>();
         uncomittedStatusPathEntries.clear();
         setupLatch = new CountDownLatch(1);
         misses = new AtomicInteger(0);
@@ -322,24 +316,6 @@ public class StatusAtPositionBdb extends ComponentBdb {
         }
 
         return initialPosition;
-    }
-
-    public PositionMapperBI getMapper(PositionBI position) {
-        PositionMapperBI pm = mapperCache.get(position);
-
-        if (pm != null) {
-            return pm;
-        }
-
-        pm = new RelativePositionComputer(position);
-
-        PositionMapperBI existing = mapperCache.putIfAbsent(position, pm);
-
-        if (existing != null) {
-            pm = existing;
-        } 
-
-        return pm;
     }
 
     public int getPathNid(int index) {

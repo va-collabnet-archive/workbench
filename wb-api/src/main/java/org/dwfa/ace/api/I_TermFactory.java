@@ -47,7 +47,6 @@ import org.ihtsdo.tk.api.KindOfCacheBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
-import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -388,15 +387,6 @@ public interface I_TermFactory {
                               I_ConfigAceFrame differenceSearchConfig)
            throws IOException, ParseException;
 
-   public void setIsaCache(IsaCoordinate isaCoordinate, KindOfCacheBI isaCache) throws IOException;
-   
-   public void clearIsaCache();
-
-   public KindOfCacheBI setupIsaCache(IsaCoordinate isaCoordinate) throws IOException;
-
-   public KindOfCacheBI setupIsaCacheAndWait(IsaCoordinate isaCoordinate)
-           throws IOException, InterruptedException;
-
    void startTransaction() throws IOException;
 
    /**
@@ -406,8 +396,6 @@ public interface I_TermFactory {
     *
     */
    void suspendChangeSetWriters();
-
-   public void updateIsaCache(int cNid) throws Exception;
 
    int uuidToNative(Collection<UUID> uids) throws TerminologyException, IOException;
 

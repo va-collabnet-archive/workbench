@@ -35,7 +35,6 @@ import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.concept.component.relationship.RelationshipRevision;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
-import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.db.change.BdbCommitSequence;
 import org.ihtsdo.db.change.ChangeNotifier;
@@ -127,13 +126,7 @@ public class BdbCommitManager {
         if (igcd == null) {
             return;
         }
-
-        try {
-            KindOfComputer.updateIsaCache(igcd.getNid());
-        } catch (Exception ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        }
-
+        
         Concept concept = (Concept) igcd;
 
         ChangeNotifier.touch(concept);
@@ -254,11 +247,6 @@ public class BdbCommitManager {
 
         c.modified();
 
-        try {
-            KindOfComputer.updateIsaCache(c.getNid());
-        } catch (Exception ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        }
         ChangeNotifier.touch(c);
 
         if (Bdb.watchList.containsKey(concept.getNid())) {
@@ -329,7 +317,6 @@ public class BdbCommitManager {
                         ChangeNotifier.touchComponents(cNidSet);
                         Bdb.getSapDb().commit(Long.MIN_VALUE);
                         Bdb.getSapDb().commit(Long.MIN_VALUE);
-                        KindOfComputer.reset();
                         handleCanceledConcepts(uncommittedCNids);
                         handleCanceledConcepts(uncommittedCNidsNoChecks);
                         uncommittedCNidsNoChecks.clear();
@@ -367,6 +354,7 @@ public class BdbCommitManager {
         return commit(changeSetPolicy, changeSetWriterThreading, false);
     }
 
+//TODO -- ISA CACHE CHANGE: kec  look at method below
     public static boolean commit(ChangeSetPolicy changeSetPolicy,
             ChangeSetWriterThreading changeSetWriterThreading, boolean writeAdjudication) {
         Svn.rwl.acquireUninterruptibly();
@@ -472,15 +460,12 @@ public class BdbCommitManager {
                                 }
                                 Bdb.annotationConcepts.clear();
                             }
-                            KindOfComputer.reset();
 
                             NidBitSetItrBI uncommittedCNidItr = uncommittedCNids.iterator();
 
                             while (uncommittedCNidItr.next()) {
                                 if (getActiveFrame() != null) {
                                     int cnid = uncommittedCNidItr.nid();
-
-                                    KindOfComputer.updateIsaCache(cnid);
 
                                     Concept c = Concept.get(cnid);
 
@@ -489,10 +474,6 @@ public class BdbCommitManager {
                             }
 
                             NidBitSetItrBI uncommittedCNidItrNoChecks = uncommittedCNidsNoChecks.iterator();
-
-                            while (uncommittedCNidItrNoChecks.next()) {
-                                KindOfComputer.updateIsaCache(uncommittedCNidItrNoChecks.nid());
-                            }
 
                             long commitTime = System.currentTimeMillis();
                             IntSet sapNidsFromCommit = Bdb.getSapDb().commit(commitTime);
@@ -688,9 +669,6 @@ public class BdbCommitManager {
                 }
 
                 Bdb.annotationConcepts.clear();
-                KindOfComputer.reset();
-
-                KindOfComputer.updateIsaCache(c.getNid());
 
                 long commitTime = System.currentTimeMillis();
                 NidSetBI sapNidsFromCommit = c.setCommitTime(commitTime);
@@ -925,12 +903,6 @@ public class BdbCommitManager {
                     }
                 }
             }
-
-            try {
-                KindOfComputer.updateIsaCaches((Concept) c);
-            } catch (Exception e) {
-                AceLog.getAppLog().alertAndLog(Level.SEVERE, "Canceling cache for: " + c.toString(), e);
-            }
             returnValue = false;
         } else {
             a.primordialSapNid = -1;
@@ -1084,12 +1056,6 @@ public class BdbCommitManager {
 
         c.modified();
 
-        try {
-            KindOfComputer.updateIsaCaches((Concept) c);
-        } catch (Exception e) {
-            AceLog.getAppLog().alertAndLog(Level.SEVERE, "Canceling cache for: " + c.toString(), e);
-        }
-
         Terms.get().addUncommitted(c);
     }
 
@@ -1108,11 +1074,6 @@ public class BdbCommitManager {
                 c.modified();
                 c.setLastWrite(Bdb.gVersion.incrementAndGet());
 
-                try {
-                    KindOfComputer.updateIsaCaches((Concept) c);
-                } catch (Exception e) {
-                    AceLog.getAppLog().alertAndLog(Level.SEVERE, "Canceling cache for: " + c.toString(), e);
-                }
             } catch (Exception ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
             }

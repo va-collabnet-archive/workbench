@@ -70,18 +70,15 @@ import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
 import org.ihtsdo.custom.statics.CustomStatics;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.db.bdb.computer.kindof.IsaCache;
 import org.ihtsdo.objectCache.ObjectCache;
 import org.ihtsdo.objectCache.ObjectCacheClassHandler;
 import org.ihtsdo.taxonomy.model.NodeFactory;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
-import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
 import org.intsdo.tk.drools.manager.DroolsExecutionManager;
 
 import com.sun.jini.start.LifeCycle;
 import org.ihtsdo.batch.BatchActionEditorPanel;
-import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.helper.time.TimeHelper;
 
 public class WorkbenchRunner {
@@ -626,19 +623,6 @@ public class WorkbenchRunner {
         }
     }
 
-    private void generateCache(Collection<IsaCoordinate> isaCoordinates, List<CountDownLatch> latches) throws InterruptedException, IOException {
-        // not persisted
-        for (IsaCoordinate isac : isaCoordinates) {
-            IsaCache loopCache = (IsaCache) Terms.get().setupIsaCache(isac);
-            latches.add(loopCache.getLatch());
-        }
-
-        // Await isa cache finalization
-        for (CountDownLatch latch : latches) {
-            latch.await();
-        }
-    }
-
     private void handleAdministrativeFrame(SvnPrompter prompter, final I_ConfigAceFrame ace) {
         String username = prompter.getUsername();
         String password = prompter.getPassword();
@@ -710,53 +694,6 @@ public class WorkbenchRunner {
                     processFile(f, lc);
                 }
             }
-        }
-    }
-
-    private void setupIsaCache(Collection<IsaCoordinate> isaCoordinates)
-            throws Exception, ComputationCanceled, InterruptedException, IOException {
-
-        // Startup queues in profile sub-directories here...
-        // Isa Cache Setup start
-        long isaStartTime = System.currentTimeMillis();
-        ActivityPanel activityIsa = new ActivityPanel(null, true);
-
-        activityIsa.setIndeterminate(true);
-        activityIsa.setStopButtonVisible(false);
-        activityIsa.setProgressInfoUpper("Isa Cache preparation");
-        activityIsa.setProgressInfoLower("Setting up is-a cache...");
-        ActivityViewer.addActivity(activityIsa);
-
-        List<CountDownLatch> latches = new ArrayList<CountDownLatch>();
-
-        if (isaCacheCreateOnStartUp) {
-            if (!persistIsaCache) {
-            	File cacheFile = new File("berkeley-db/isa-cache.oos");
-            	if (cacheFile.exists()) {
-            		cacheFile.delete();
-            	}
-                activityIsa.setProgressInfoLower("Generating is-a cache...");
-                generateCache(isaCoordinates, latches);
-            } else {
-                KindOfComputer.persistIsaCache = true;
-                // persisted
-                activityIsa.setProgressInfoLower("Reading is-a cache...");
-                if (!KindOfComputer.loadIsaCacheFromFile(new File("berkeley-db/isa-cache.oos"), isaCoordinates)) {
-                	KindOfComputer.clearIsaCache();
-                    activityIsa.setProgressInfoLower("Generating is-a cache...");
-                    generateCache(isaCoordinates, latches);
-                }
-            }
-
-
-            long isaLoadTime = System.currentTimeMillis() - isaStartTime;
-            String elapsedStr = TimeHelper.getElapsedTimeString(isaLoadTime);
-
-            activityIsa.setProgressInfoLower("Elapsed: " + elapsedStr);
-            activityIsa.complete();
-        } else {
-            activityIsa.setProgressInfoLower("Configured to not generate Isa Cache on startup");
-            activityIsa.complete();
         }
     }
 
@@ -942,8 +879,6 @@ public class WorkbenchRunner {
                         ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.localize().getNid())));
                 ace.setViewPositions(viewPositions);
             }
-
-            setupIsaCache(ace.getViewCoordinate().getIsaCoordinates());
 
             return null;
         }

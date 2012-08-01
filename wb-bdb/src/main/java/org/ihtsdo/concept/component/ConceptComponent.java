@@ -37,7 +37,7 @@ import org.ihtsdo.concept.component.refset.RefsetMemberFactory;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
-import org.ihtsdo.db.util.NidPairForRefset;
+import org.ihtsdo.db.util.NidPairForRefex;
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.AnalogBI;
@@ -128,7 +128,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         if (cNid == Integer.MAX_VALUE) {
             Bdb.getNidCNidMap().setCNidForNid(this.enclosingConceptNid, this.nid);
         } else if (cNid != this.enclosingConceptNid) {
-            Bdb.getNidCNidMap().resetCidForNid(this.enclosingConceptNid, this.nid);
+            Bdb.getNidCNidMap().resetCNidForNid(this.enclosingConceptNid, this.nid);
 
             if (fixAlert.compareAndSet(true, false)) {
                 AceLog.getAppLog().alertAndLogException(new Exception("a. Datafix warning. See log for details."));
@@ -158,7 +158,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         if (cNid == Integer.MAX_VALUE) {
             Bdb.getNidCNidMap().setCNidForNid(this.enclosingConceptNid, this.nid);
         } else if (cNid != this.enclosingConceptNid) {
-            Bdb.getNidCNidMap().resetCidForNid(this.enclosingConceptNid, this.nid);
+            Bdb.getNidCNidMap().resetCNidForNid(this.enclosingConceptNid, this.nid);
             if (fixAlert.compareAndSet(true, false)) {
                 AceLog.getAppLog().alertAndLogException(new Exception("b. Datafix warning. See log for details."));
                 System.out.println("b-Datafix: cNid " + cNid + " "
@@ -1115,11 +1115,12 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         return revisions.size() + 1;
     }
 
-    private void writeAnnotationsToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
+    private void writeAnnotationsToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) throws IOException {
         annotationWriter.objectToEntry(annotations, output, maxReadOnlyStatusAtPositionNid);
     }
 
-    public final void writeComponentToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
+    public final void writeComponentToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid)
+    throws IOException{
         assert nid != 0;
         assert primordialSapNid != 0 : "Processing nid: " + enclosingConceptNid;;
         assert primordialSapNid != Integer.MAX_VALUE;
@@ -1152,7 +1153,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
     }
 
-    public abstract void writeToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid);
+    public abstract void writeToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) throws IOException;
 
     //~--- get methods ---------------------------------------------------------
     public ArrayList<IdentifierVersion> getAdditionalIdentifierParts() {
@@ -1639,12 +1640,12 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
     @Override
     public Collection<? extends RefexChronicleBI<?>> getRefexes() throws IOException {
-        List<NidPairForRefset> pairs = Bdb.getRefsetPairs(nid);
+        List<NidPairForRefex> pairs = Bdb.getRefsetPairs(nid);
         List<RefexChronicleBI<?>> returnValues = new ArrayList<RefexChronicleBI<?>>(pairs.size());
         HashSet<Integer> addedMembers = new HashSet<Integer>();
 
         if ((pairs != null) && !pairs.isEmpty()) {
-            for (NidPairForRefset pair : pairs) {
+            for (NidPairForRefex pair : pairs) {
                 RefexChronicleBI<?> ext = (RefexChronicleBI<?>) Bdb.getComponent(pair.getMemberNid());
 
                 if ((ext != null) && !addedMembers.contains(ext.getNid()) && 
@@ -1684,7 +1685,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     }
 
     public Set<Integer> getRefsetMemberSapNids() throws IOException {
-        List<NidPairForRefset> pairs = Bdb.getRefsetPairs(nid);
+        List<NidPairForRefex> pairs = Bdb.getRefsetPairs(nid);
 
         if ((pairs == null) || pairs.isEmpty()) {
             return new HashSet<Integer>(0);
@@ -1692,7 +1693,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         HashSet<Integer> returnValues = new HashSet<Integer>(pairs.size());
 
-        for (NidPairForRefset pair : pairs) {
+        for (NidPairForRefex pair : pairs) {
             RefexChronicleBI<?> ext = (RefexChronicleBI<?>) Bdb.getComponent(pair.getMemberNid());
 
             if (ext != null) {
@@ -1708,7 +1709,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     }
 
     public Collection<? extends RefexChronicleBI<?>> getRefsetMembers() throws IOException {
-        List<NidPairForRefset> pairs = Bdb.getRefsetPairs(nid);
+        List<NidPairForRefex> pairs = Bdb.getRefsetPairs(nid);
 
         if ((pairs == null) || pairs.isEmpty()) {
             return new ArrayList<RefexChronicleBI<?>>(0);
@@ -1717,7 +1718,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         List<RefexChronicleBI<?>> returnValues = new ArrayList<RefexChronicleBI<?>>(pairs.size());
         HashSet<Integer> addedMembers = new HashSet<Integer>();
 
-        for (NidPairForRefset pair : pairs) {
+        for (NidPairForRefex pair : pairs) {
             RefexChronicleBI<?> ext = (RefexChronicleBI<?>) Bdb.getComponent(pair.getMemberNid());
 
             if ((ext != null) && !addedMembers.contains(ext.getNid())) {

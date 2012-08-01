@@ -179,12 +179,12 @@ public class RulesLibrary {
 	 * @throws Exception
 	 *             the exception
 	 */
-	public static KindOfCacheBI setupIsACache() throws TerminologyException, Exception {
-		myStaticIsACache = Ts.get().getCache(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
-		RefsetSpecQuery.myStaticIsACache = myStaticIsACache;
-		myStaticIsACacheRefsetSpec = RefsetSpecQuery.myStaticIsACache;
-		return myStaticIsACache;
-	}
+//	public static KindOfCacheBI setupIsACache() throws TerminologyException, Exception {
+//		myStaticIsACache = Ts.get().getCache(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+//		RefsetSpecQuery.myStaticIsACache = myStaticIsACache;
+//		myStaticIsACacheRefsetSpec = RefsetSpecQuery.myStaticIsACache;
+//		return myStaticIsACache;
+//	}
 
 	/**
 	 * Check concept.

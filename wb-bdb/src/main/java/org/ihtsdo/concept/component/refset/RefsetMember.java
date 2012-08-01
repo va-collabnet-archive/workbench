@@ -25,7 +25,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.db.util.NidPair;
-import org.ihtsdo.db.util.NidPairForRefset;
+import org.ihtsdo.db.util.NidPairForRefex;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.ComponentBI;
@@ -214,7 +214,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
                 // nothing to move.
             } else {
                 Bdb.getComponent(this.referencedComponentNid).addAnnotation(this);
-                Bdb.getNidCNidMap().resetCidForNid(Bdb.getNidCNidMap().getCNid(this.referencedComponentNid), nid);
+                Bdb.getNidCNidMap().resetCNidForNid(Bdb.getNidCNidMap().getCNid(this.referencedComponentNid), nid);
                 this.enclosingConceptNid = Bdb.getNidCNidMap().getCNid(this.referencedComponentNid);
                 to.modified();
                 BdbCommitManager.addUncommitted(to);
@@ -231,7 +231,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
             }
 
             to.getRefsetMembers().add(this);
-            Bdb.getNidCNidMap().resetCidForNid(to.getNid(), nid);
+            Bdb.getNidCNidMap().resetCNidForNid(to.getNid(), nid);
             this.enclosingConceptNid = to.getNid();
             to.modified();
             BdbCommitManager.addUncommitted(to);
@@ -374,7 +374,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
     protected abstract void writeMember(TupleOutput output);
 
     @Override
-    public void writeToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
+    public void writeToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) throws IOException{
         List<RefsetRevision<R, C>> additionalVersionsToWrite = new ArrayList<RefsetRevision<R, C>>();
 
         if (revisions != null) {
@@ -393,7 +393,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
         writeMember(output);
         output.writeShort(additionalVersionsToWrite.size());
 
-        NidPairForRefset npr = NidPair.getRefsetNidMemberNidPair(refsetNid, nid);
+        NidPairForRefex npr = NidPair.getRefexNidMemberNidPair(refsetNid, nid);
 
         Bdb.addXrefPair(referencedComponentNid, npr);
 
@@ -584,7 +584,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
                 || (getTime() == Long.MAX_VALUE)) {
             if (this.refsetNid != collectionNid) {
                 if ((this.refsetNid != 0) && (this.nid != 0)) {
-                    NidPairForRefset oldNpr = NidPair.getRefsetNidMemberNidPair(this.refsetNid, this.nid);
+                    NidPairForRefex oldNpr = NidPair.getRefexNidMemberNidPair(this.refsetNid, this.nid);
 
                     Bdb.forgetXrefPair(this.referencedComponentNid, oldNpr);
                 }
@@ -602,7 +602,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
     public void setReferencedComponentNid(int referencedComponentNid) {
         if (this.referencedComponentNid != referencedComponentNid) {
             if ((this.refsetNid != 0) && (this.nid != 0)) {
-                NidPairForRefset oldNpr = NidPair.getRefsetNidMemberNidPair(this.refsetNid, this.nid);
+                NidPairForRefex oldNpr = NidPair.getRefexNidMemberNidPair(this.refsetNid, this.nid);
 
                 Bdb.forgetXrefPair(this.referencedComponentNid, oldNpr);
             }
@@ -618,7 +618,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
         if (getTime() == Long.MAX_VALUE) {
             if (this.refsetNid != refsetNid) {
                 if ((this.refsetNid != 0) && (this.nid != 0)) {
-                    NidPairForRefset oldNpr = NidPair.getRefsetNidMemberNidPair(this.refsetNid, this.nid);
+                    NidPairForRefex oldNpr = NidPair.getRefexNidMemberNidPair(this.refsetNid, this.nid);
 
                     Bdb.forgetXrefPair(this.referencedComponentNid, oldNpr);
                 }

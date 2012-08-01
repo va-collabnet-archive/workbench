@@ -155,7 +155,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
 
     boolean isChildOf(ConceptVersionBI childConceptVersion) throws IOException;
 
-    boolean isKindOf(ConceptVersionBI parentConceptVersion) throws IOException;
+    boolean isKindOf(ConceptVersionBI parentConceptVersion) throws IOException, ContradictionException;
 
     boolean isLeaf() throws IOException;
 

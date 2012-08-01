@@ -140,7 +140,6 @@ import org.ihtsdo.cs.econcept.EConceptChangeSetReader;
 import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
 import org.ihtsdo.cs.econcept.workflow.WfRefsetChangeSetReader;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
-import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.computer.refset.MarkedParentComputer;
 import org.ihtsdo.db.bdb.computer.refset.MarkedParentRefsetHelper;
 import org.ihtsdo.db.bdb.computer.refset.MemberRefsetConflictCalculator;
@@ -149,7 +148,7 @@ import org.ihtsdo.db.bdb.computer.refset.RefsetComputer;
 import org.ihtsdo.db.bdb.computer.refset.RefsetHelper;
 import org.ihtsdo.db.bdb.computer.refset.SpecRefsetHelper;
 import org.ihtsdo.db.runner.WorkbenchRunner;
-import org.ihtsdo.db.util.NidPairForRefset;
+import org.ihtsdo.db.util.NidPairForRefex;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.lucene.DescriptionCheckAndProcessLuceneMatch;
@@ -169,7 +168,6 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
-import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
@@ -186,7 +184,6 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     private int moduleNid = Integer.MAX_VALUE;
     I_ConfigAceFrame activeAceFrameConfig;
     private File envHome;
-    private Map<IsaCoordinate, ? extends KindOfCacheBI> isaCache;
     private HashMap<Integer, KnowledgeBase> knowledgeBaseCache;
     private BdbPathManager pathManager;
     SpecRefsetHelper specRefsetHelper;
@@ -1546,35 +1543,6 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         Bdb.setup(homeFile.getAbsolutePath());
     }
 
-    //TODO: remove comment after full commit @Override
-    public void clearIsaCache() {
-        KindOfComputer.clearIsaCache();
-    }
-
-    //TODO: remove comment after full commit @Override
-    public void setIsaCache(IsaCoordinate isaCoordinate, KindOfCacheBI isaCache) throws IOException {
-        KindOfComputer.setIsaCache(isaCoordinate, isaCache);
-    }
-
-    @Override
-    public KindOfCacheBI setupIsaCache(IsaCoordinate isaCoordinate) throws IOException {
-        KindOfCacheBI tmpIsaCache = KindOfComputer.setupIsaCache(isaCoordinate);
-
-        isaCache = KindOfComputer.getIsaCacheMap();
-
-        return tmpIsaCache;
-    }
-
-    @Override
-    public KindOfCacheBI setupIsaCacheAndWait(IsaCoordinate isaCoordinate)
-            throws IOException, InterruptedException {
-        KindOfCacheBI tmpIsaCache = KindOfComputer.setupIsaCacheAndWait(isaCoordinate);
-
-        isaCache = KindOfComputer.getIsaCacheMap();
-
-        return tmpIsaCache;
-    }
-
     private static RefsetMember<?, ?> setupNewMember(UUID primordialUuid, int referencedComponentNid,
             Concept refsetConcept, I_ConfigAceFrame config, RefsetMember<?, ?> member,
             RefsetPropertyMap propMap)
@@ -1654,7 +1622,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
             referencedComponent.addAnnotation(member);
             member.enclosingConceptNid = Bdb.getConceptNid(referencedComponentNid);
-            Bdb.getNidCNidMap().resetCidForNid(member.enclosingConceptNid, member.nid);
+            Bdb.getNidCNidMap().resetCNidForNid(member.enclosingConceptNid, member.nid);
         } else {
             refsetConcept.getExtensions().add(member);
         }
@@ -1670,11 +1638,6 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     @Override
     public void suspendChangeSetWriters() {
         BdbCommitManager.suspendChangeSetWriters();
-    }
-
-    @Override
-    public void updateIsaCache(int cNid) throws Exception {
-        KindOfComputer.updateIsaCache(cNid);
     }
 
     @Override
@@ -1733,10 +1696,10 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         // Need to make sure there are no pending db writes prior calling this method.
         BdbCommitManager.waitTillWritesFinished();
 
-        List<NidPairForRefset> pairs = Bdb.getRefsetPairs(nid);
+        List<NidPairForRefex> pairs = Bdb.getRefsetPairs(nid);
 
         if (pairs != null) {
-            for (NidPairForRefset pair : pairs) {
+            for (NidPairForRefex pair : pairs) {
                 I_ExtendByRef ext = (I_ExtendByRef) Bdb.getComponent(pair.getMemberNid());
 
                 if ((ext != null) && !addedMembers.contains(ext.getNid())) {
@@ -2063,7 +2026,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     @Override
     public List<? extends I_ExtendByRef> getRefsetExtensionsForComponent(int refsetNid, int nid)
             throws IOException {
-        List<NidPairForRefset> pairs = Bdb.getRefsetPairs(nid);
+        List<NidPairForRefex> pairs = Bdb.getRefsetPairs(nid);
 
         if ((pairs == null) || pairs.isEmpty()) {
             return new ArrayList<I_ExtendByRef>(0);
@@ -2072,8 +2035,8 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         List<I_ExtendByRef> returnValues = new ArrayList<I_ExtendByRef>(pairs.size());
         HashSet<Integer> addedMembers = new HashSet<Integer>();
 
-        for (NidPairForRefset pair : pairs) {
-            if (pair.getRefsetNid() == refsetNid) {
+        for (NidPairForRefex pair : pairs) {
+            if (pair.getRefexNid() == refsetNid) {
                 I_ExtendByRef ext = (I_ExtendByRef) Bdb.getComponent(pair.getMemberNid());
 
                 if ((ext != null) && !addedMembers.contains(ext.getNid())) {

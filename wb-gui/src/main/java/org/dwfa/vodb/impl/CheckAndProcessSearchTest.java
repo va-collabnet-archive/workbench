@@ -28,6 +28,7 @@ import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.bpa.process.TaskFailedException;
+import org.ihtsdo.tk.api.ContradictionException;
 
 public class CheckAndProcessSearchTest implements Runnable {
 
@@ -71,7 +72,7 @@ public class CheckAndProcessSearchTest implements Runnable {
                 if (failed == false) {
                     matches.setMember(conceptToTest.getConceptNid());
                 }
-            } catch (TaskFailedException e) {
+            } catch (TaskFailedException | ContradictionException e) {
                 if (ACE.editMode) {
                     AceLog.getAppLog().alertAndLogException(e);
                 } else {

@@ -41,6 +41,7 @@ import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.cement.RefsetAuxiliary.Concept;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PositionSetBI;
 
 /**
@@ -210,7 +211,7 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
     @Override
     public boolean execute(I_AmTermComponent component,
             GROUPING_TYPE version, PositionSetBI v1_is,
-            PositionSetBI v2_is, Collection<I_ShowActivity> activities) throws IOException {
+            PositionSetBI v2_is, Collection<I_ShowActivity> activities) throws IOException, ContradictionException {
 
         boolean statementResult = getStatementResult(component,
                 version, v1_is, v2_is);
@@ -226,7 +227,7 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
 
     public abstract boolean getStatementResult(I_AmTermComponent component,
             GROUPING_TYPE version, PositionSetBI v1Is,
-            PositionSetBI v2Is) throws IOException;
+            PositionSetBI v2Is) throws IOException, ContradictionException;
 
     protected boolean isComponentStatus(I_GetConceptData requiredStatus, List<I_AmTuple> tuples) {
 

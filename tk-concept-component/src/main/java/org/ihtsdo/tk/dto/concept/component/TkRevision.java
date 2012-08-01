@@ -293,6 +293,9 @@ public abstract class TkRevision implements I_VersionExternally {
       if (time == Long.MAX_VALUE) {
          time = Long.MIN_VALUE;
       }
+      if(moduleUuid == null){
+          System.out.println("HERE");
+      }
       assert pathUuid != null : this;
       assert authorUuid != null : this;
       assert statusUuid != null : this;

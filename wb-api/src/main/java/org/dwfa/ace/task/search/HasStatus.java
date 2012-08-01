@@ -36,6 +36,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.ContradictionException;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/search", type = BeanType.TASK_BEAN),
                    @Spec(directory = "search", type = BeanType.TASK_BEAN) })
@@ -65,7 +66,7 @@ public class HasStatus extends AbstractSearchTest {
     }
 
     @Override
-    public boolean test(I_AmTermComponent component, I_ConfigAceFrame frameConfig) throws TaskFailedException {
+    public boolean test(I_AmTermComponent component, I_ConfigAceFrame frameConfig) throws TaskFailedException, ContradictionException {
         try {
             I_GetConceptData statusToMatch = AceTaskUtil.getConceptFromObject(statusTerm);
 

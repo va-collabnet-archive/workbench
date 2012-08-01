@@ -17,36 +17,7 @@ public abstract class NidPair implements Comparable<NidPair> {
     public static NidPair getNidPair(long nids) {
         int nid1 = (int) nids;
         int nid2 = (int) (nids >>> 32);
-        if (Bdb.getConceptNid(nid2) == nid2) {
-            return getTypeNidRelNidPair(nid2, nid1);
-        }
-        return getRefsetNidMemberNidPair(nid1, nid2);
-    }
-
-    
-    public static List<NidPairForRel> getNidPairsForRel(long[] nidPairArray) {
-        List<NidPairForRel> returnValues = new ArrayList<NidPairForRel>(nidPairArray.length);
-        for (long nids: nidPairArray) {
-            int nid1 = (int) nids;
-            int nid2 = (int) (nids >>> 32);
-            if (Bdb.nidCidMapDb.getCNid(nid2) == nid2) {
-                returnValues.add(new NidPairForRel(nid1, nid2));
-            }
-        }
-        return returnValues;
-    }
-
-    public static List<NidPairForRel> getNidPairsForRel(long[] nidPairArray, 
-            NidSetBI relTypes) {
-        List<NidPairForRel> returnValues = new ArrayList<NidPairForRel>(nidPairArray.length);
-        for (long nids: nidPairArray) {
-            int nid1 = (int) nids;
-            int nid2 = (int) (nids >>> 32);
-            if (relTypes.contains(nid2)) {
-                returnValues.add(new NidPairForRel(nid1, nid2));
-            }
-        }
-        return returnValues;
+        return getRefexNidMemberNidPair(nid1, nid2);
     }
 
     public static int[] getOriginsForRels(long[] nidPairArray, 
@@ -63,27 +34,21 @@ public abstract class NidPair implements Comparable<NidPair> {
         return returnValues.elements();
     }
 
-   public static List<NidPairForRefset> getNidPairsForRefset(long[] nidPairArray) {
-        List<NidPairForRefset> returnValues = new ArrayList<NidPairForRefset>(nidPairArray.length);
+   public static List<NidPairForRefex> getNidPairsForRefset(long[] nidPairArray) {
+        List<NidPairForRefex> returnValues = new ArrayList<NidPairForRefex>(nidPairArray.length);
         for (long nids: nidPairArray) {
             int nid1 = (int) nids;
             int nid2 = (int) (nids >>> 32);
             if (Bdb.nidCidMapDb.getCNid(nid2) != nid2) {
-                returnValues.add(new NidPairForRefset(nid1, nid2));
+                returnValues.add(new NidPairForRefex(nid1, nid2));
             }
         }
         return returnValues;
     }
 
-
-    public static NidPairForRel getTypeNidRelNidPair(int typeNid, int rNid) {
-        // the type (nid2) is a concept, the rNid is not. 
-        return new NidPairForRel(rNid, typeNid);
-    }
-
-    public static NidPairForRefset getRefsetNidMemberNidPair(int refsetNid, int memberNid) {
+    public static NidPairForRefex getRefexNidMemberNidPair(int refsetNid, int memberNid) {
         // the refset (nid1) is a concept, the memberNid is not. 
-        return new NidPairForRefset(refsetNid, memberNid);
+        return new NidPairForRefex(refsetNid, memberNid);
     }
 
     public abstract boolean isRelPair();

@@ -36,6 +36,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.qa.gui.ObjectTransferHandler;
+import org.ihtsdo.tk.api.ContradictionException;
 
 /**
  * @author Guillermo Reynoso
@@ -121,6 +122,8 @@ public class DescriptionDiffAttrDialog extends JDialog {
 						e.printStackTrace();
 					} catch (TerminologyException e) {
 						e.printStackTrace();
+					} catch (ContradictionException e) {
+						e.printStackTrace();
 					}
 				}
 
@@ -138,7 +141,7 @@ public class DescriptionDiffAttrDialog extends JDialog {
 		}
 	}
 
-	public static boolean validateAsPathRefset(int pathRefsetId, I_ConfigAceFrame config) throws IOException, TerminologyException {
+	public static boolean validateAsPathRefset(int pathRefsetId, I_ConfigAceFrame config) throws IOException, TerminologyException, ContradictionException {
 		I_TermFactory tf = Terms.get();
 		I_GetConceptData languageRefsetConcept = tf.getConcept(pathRefsetId);
 		I_GetConceptData pathRefset = tf.getConcept(ArchitectonicAuxiliary.Concept.PATH.localize().getNid());

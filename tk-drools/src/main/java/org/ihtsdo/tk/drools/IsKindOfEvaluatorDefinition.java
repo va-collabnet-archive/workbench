@@ -31,6 +31,7 @@ import org.drools.spi.Evaluator;
 import org.drools.spi.FieldValue;
 import org.drools.spi.InternalReadAccessor;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
@@ -126,6 +127,8 @@ public class IsKindOfEvaluatorDefinition implements EvaluatorDefinition {
                 }
                 return this.getOperator().isNegated() ^ (possibleKind.isKindOf(parentKind));
             } catch (IOException e) {
+                return false;
+            }catch (ContradictionException e) {
                 return false;
             }
         }

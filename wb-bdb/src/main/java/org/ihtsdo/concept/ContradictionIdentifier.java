@@ -31,9 +31,9 @@ import org.ihtsdo.concept.component.ConceptComponent.Version;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.concept.component.description.Description;
 import org.ihtsdo.concept.component.relationship.Relationship;
-import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.db.bdb.computer.version.PositionMapperBI;
-import org.ihtsdo.db.bdb.computer.version.PositionMapperBI.RelativePosition;
+import org.ihtsdo.helper.version.RelativePositionComputer;
+import org.ihtsdo.helper.version.RelativePositionComputerBI;
+import org.ihtsdo.helper.version.RelativePositionComputerBI.RelativePosition;
 import org.ihtsdo.tk.api.ComponentChronicleBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContradictionException;
@@ -63,7 +63,7 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 public class ContradictionIdentifier implements ContradictionIdentifierBI {
 
      // Class Variables
-    private AtomicReference<PositionMapperBI> conflictMapper;
+private AtomicReference<RelativePositionComputerBI> conflictMapper;
 
 	private AtomicInteger viewPathNid = null;
 	private AtomicInteger commonOriginPathNid;
@@ -618,7 +618,8 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 						HashMap<Integer, ComponentVersionBI> testingVersionMap = foundPositionsMap.get(testingPositionKey);
 						testingVersion = testingVersionMap.get(testingVersionMap.keySet().iterator().next());
 	
-						RelativePosition retPosition = conflictMapper.get().fastRelativePosition((Version)currentVersion, (Version)testingVersion, Terms.get().getActiveAceFrameConfig().getPrecedence());
+						RelativePosition retPosition = conflictMapper.get().fastRelativePosition((Version)currentVersion,
+                                                        (Version)testingVersion, Terms.get().getActiveAceFrameConfig().getPrecedence());
 						
 						if (retPosition == RelativePosition.CONTRADICTION)
 						{
@@ -1233,7 +1234,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 				commonOriginPathNid = new AtomicInteger(commonOriginPath.getConceptNid());
 	
 				
-	            conflictMapper = new AtomicReference<PositionMapperBI>(Bdb.getSapDb().getMapper(pos));
+	            conflictMapper = new AtomicReference<RelativePositionComputerBI>(RelativePositionComputer.getComputer(pos));
 		            
 	
 				if (isReturnVersionsUseCase.get()) {

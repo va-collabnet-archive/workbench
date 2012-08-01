@@ -21,7 +21,6 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.bdb.I_GetNidData;
 import org.ihtsdo.db.util.NidPair;
-import org.ihtsdo.db.util.NidPairForRel;
 import org.ihtsdo.tk.api.NidSetBI;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -36,6 +35,8 @@ import java.util.List;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutionException;
 import org.ihtsdo.db.change.ChangeNotifier;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 /**
  * File format:<br>
@@ -163,7 +164,7 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
          addToMemberMap(refsetMember);
          modified();
          Bdb.addXrefPair(refsetMember.getReferencedComponentNid(),
-                         NidPair.getRefsetNidMemberNidPair(refsetMember.getRefsetId(),
+                         NidPair.getRefexNidMemberNidPair(refsetMember.getRefsetId(),
                             refsetMember.getNid()));
       }
    }
@@ -176,8 +177,7 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
              "No concept for component: " + rel.nid + "\nsourceConcept: "
              + this.enclosingConcept.toLongString() + "\ndestConcept: "
              + Concept.get(rel.getC2Id()).toLongString();
-      Bdb.addXrefPair(rel.getC2Id(), NidPair.getTypeNidRelNidPair(rel.getTypeNid(), rel.getNid()));
-      ChangeNotifier.touchRelTarget(rel.getTargetNid());
+      Bdb.addRelOrigin(rel.getTargetNid(), rel.getSourceNid());
       getSrcRelNids().add(rel.nid);
       modified();
    }
@@ -257,24 +257,7 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 
       // Need to make sure there are no pending db writes prior calling this method.
       BdbCommitManager.waitTillWritesFinished();
-
-      List<Relationship> destRels = new ArrayList<Relationship>();
-
-      for (NidPairForRel pair : Bdb.getDestRelPairs(enclosingConcept.getNid())) {
-         int     relNid     = pair.getRelNid();
-         int     conceptNid = Bdb.getNidCNidMap().getCNid(relNid);
-         Concept c          = Bdb.getConceptForComponent(conceptNid);
-
-         if (c != null) {
-            Relationship r = c.getRelationship(relNid);
-
-            if (r != null) {
-               destRels.add(r);
-            }
-         }
-      }
-
-      return destRels;
+      return new ArrayList(Bdb.getDestRels(enclosingConcept.getNid()));
    }
 
    /*
@@ -290,17 +273,23 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 
       List<Relationship> destRels = new ArrayList<Relationship>();
 
-      for (NidPairForRel pair : Bdb.getDestRelPairs(enclosingConcept.getNid())) {
-         if (allowedTypes.contains(pair.getTypeNid())) {
-            int     relNid     = pair.getRelNid();
-            int     conceptNid = Bdb.getNidCNidMap().getCNid(relNid);
-            Concept c          = Bdb.getConceptForComponent(conceptNid);
+      for (int originNid : Ts.get().getIncomingRelationshipsSourceNids(enclosingConcept.getNid(), allowedTypes)) {
+         Concept c = (Concept) Ts.get().getConceptForNid(originNid);
 
-            if (c != null) {
-               Relationship r = c.getRelationship(relNid);
-
-               if (r != null) {
-                  destRels.add(r);
+         if (c != null) {
+            for (Relationship r : c.getSourceRels()) {
+               if (r != null && r.getTargetNid() == enclosingConcept.getNid()) {
+                   if (allowedTypes.contains(r.getTypeNid())) {
+                       destRels.add(r);
+                   } else {
+                       for (RelationshipVersionBI rv: r.getVersions()) {
+                           if (allowedTypes.contains(rv.getTypeNid())) {
+                               destRels.add(r);
+                               break;
+                           }
+                       }
+                   }
+                  
                }
             }
          }

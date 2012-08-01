@@ -20,9 +20,10 @@ import org.ihtsdo.concept.ParallelConceptIterator;
 import org.ihtsdo.concept.component.refsetmember.array.bytearray.ArrayOfBytearrayMember;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
-import org.ihtsdo.db.bdb.computer.version.PositionMapperBI;
 import org.ihtsdo.db.bdb.sap.STAMP;
 import org.ihtsdo.helper.time.TimeHelper;
+import org.ihtsdo.helper.version.RelativePositionComputer;
+import org.ihtsdo.helper.version.RelativePositionComputerBI;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
@@ -206,7 +207,7 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
                 for(int editPathNid : editPathNids){
                     PositionBI viewPosition = Ts.get().newPosition(Ts.get().getPath(editPathNid),
                     Bdb.getSapDb().getTime(commitRecordSapNid));
-                    PositionMapperBI mapper = Bdb.getSapDb().getMapper(viewPosition);
+                    RelativePositionComputerBI mapper = RelativePositionComputer.getComputer(viewPosition);
                     
                     for (Integer stamp : c.getAllStampNids()) {
                         if (stamp > Bdb.getSapDb().getReadOnlyMax() && Bdb.getSapDb().getTime(stamp) != Long.MAX_VALUE) {
@@ -262,7 +263,7 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
                     for(int editPathNid : editPathNids){
                         PositionBI viewPosition = Ts.get().newPosition(Ts.get().getPath(editPathNid),
                         Bdb.getSapDb().getTime(commitRecordSapNid));
-                        PositionMapperBI mapper = Bdb.getSapDb().getMapper(viewPosition);
+                        RelativePositionComputerBI mapper = RelativePositionComputer.getComputer(viewPosition);
                         for (Integer stamp : c.getAllStampNids()) {
                             if (stamp > Bdb.getSapDb().getReadOnlyMax()) {
                                 if(mapper.onRoute(new STAMP(stamp))){

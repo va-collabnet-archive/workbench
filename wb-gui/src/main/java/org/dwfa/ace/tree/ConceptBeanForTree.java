@@ -605,13 +605,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 
    @Override
    public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config) throws IOException {
-      return bean.getPossibleKindOfConcepts(config);
-   }
-
-   @Override
-   public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config, I_ShowActivity activity)
-           throws IOException {
-      return bean.getPossibleKindOfConcepts(config, activity);
+      return (I_RepresentIdSet) bean.getPossibleKindOfConcepts(config);
    }
 
    @Override
@@ -837,14 +831,14 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
    }
 
    @Override
-   public boolean isParentOf(I_GetConceptData child) throws IOException, TerminologyException {
+   public boolean isParentOf(I_GetConceptData child) throws IOException, TerminologyException, ContradictionException {
       return bean.isParentOf(child);
    }
 
    public boolean isParentOf(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes,
                              PositionSetReadOnly positions, Precedence precedencePolicy,
                              ContradictionManagerBI contradictionManager)
-           throws IOException, TerminologyException {
+           throws IOException, TerminologyException, ContradictionException {
       return bean.isParentOf(child, allowedStatus, allowedTypes, positions, precedencePolicy,
                              contradictionManager);
    }
@@ -853,20 +847,20 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
    public boolean isParentOf(I_GetConceptData child, NidSetBI allowedStatus, NidSetBI allowedTypes,
                              PositionSetBI positions, Precedence precedencePolicy,
                              ContradictionManagerBI contradictionManager)
-           throws IOException, TerminologyException {
+           throws IOException, TerminologyException, ContradictionException {
       return bean.isParentOf(child, allowedStatus, allowedTypes, positions, precedencePolicy,
                              contradictionManager);
    }
 
    @Override
-   public boolean isParentOfOrEqualTo(I_GetConceptData child) throws IOException, TerminologyException {
+   public boolean isParentOfOrEqualTo(I_GetConceptData child) throws IOException, TerminologyException, ContradictionException {
       return bean.isParentOfOrEqualTo(child);
    }
 
    public boolean isParentOfOrEqualTo(I_GetConceptData child, I_IntSet allowedStatus, I_IntSet allowedTypes,
                                       PositionSetReadOnly positions, Precedence precedencePolicy,
                                       ContradictionManagerBI contradictionManager)
-           throws IOException, TerminologyException {
+           throws IOException, TerminologyException, ContradictionException{
       return bean.isParentOfOrEqualTo(child, allowedStatus, allowedTypes, positions, precedencePolicy,
                                       contradictionManager);
    }
@@ -875,7 +869,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
    public boolean isParentOfOrEqualTo(I_GetConceptData child, NidSetBI allowedStatus, NidSetBI allowedTypes,
                                       PositionSetBI positions, Precedence precedencePolicy,
                                       ContradictionManagerBI contradictionManager)
-           throws IOException, TerminologyException {
+           throws IOException, TerminologyException, ContradictionException {
       return bean.isParentOfOrEqualTo(child, allowedStatus, allowedTypes, positions, precedencePolicy,
                                       contradictionManager);
    }

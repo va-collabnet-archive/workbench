@@ -49,7 +49,7 @@ import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.rules.CheckConceptTask;
 import org.ihtsdo.rules.RulesLibrary.INFERRED_VIEW_ORIGIN;
 import org.ihtsdo.rules.context.RulesContextHelper;
-import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
+//TODO -- ISA CACHE CHANGE: alo import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
 import org.ihtsdo.tk.helper.ResultsItem;
 
 /**
@@ -189,10 +189,12 @@ public class TestListPanel extends JPanel {
     */
    private void button4ActionPerformed(ActionEvent e) {
       try {
-         for (IsaCoordinate isac :
-                 Terms.get().getActiveAceFrameConfig().getViewCoordinate().getIsaCoordinates()) {
-            Terms.get().setupIsaCacheAndWait(isac);
-         }
+//TODO -- ISA CACHE CHANGE: alo          
+//         for (IsaCoordinate isac :
+//                 Terms.get().getActiveAceFrameConfig().getViewCoordinate().getIsaCoordinates()) {
+//            Terms.get().setupIsaCacheAndWait(isac);
+//         }
+//TODO -- ISA CACHE CHANGE: alo
       } catch (Exception e2) {
     	  AceLog.getAppLog().alertAndLogException(e2);
       }

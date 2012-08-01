@@ -33,7 +33,6 @@ import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
-import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.change.ChangeNotifier;
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.tk.api.NidBitSetItrBI;
@@ -166,11 +165,6 @@ public class MarkedParentComputer {
                                        + members.get());
 
          I_RepresentIdSet allParents = Bdb.getConceptDb().getEmptyIdSet();
-         NidBitSetItrBI   memberItr  = currentRefsetMemberComponentNids.iterator();
-
-         while (memberItr.next()) {
-            KindOfComputer.getIsaCacheMap().get(viewCoordinate.getIsaCoordinates().iterator().next()).addParents(memberItr.nid(), allParents);
-         }
 
          for (RefexVersionBI<?> mpv : markedParentRefsetConcept.getRefsetMembersActive(viewCoordinate)) {
             RefexNidVersionBI<?> cnidMpv = (RefexNidVersionBI) mpv;

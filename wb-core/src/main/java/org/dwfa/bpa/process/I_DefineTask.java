@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.ihtsdo.tk.api.ContradictionException;
 
 /**
  * Interface for tasks which are contained within business processes. Execution
@@ -94,7 +95,7 @@ public interface I_DefineTask extends I_ManageProperties, I_ManageVetoableProper
      * @throws TaskFailedException
      * @model
      */
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException;
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException, ContradictionException;
 
     /**
      * Part 2 of a two step command pattern for task execution.

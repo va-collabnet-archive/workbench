@@ -19,7 +19,6 @@ import com.sleepycat.je.OperationStatus;
 import java.util.Collection;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbCommitManager;
-import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.db.change.ChangeNotifier;
 import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
@@ -81,11 +80,6 @@ public class ParallelConceptIterator implements Callable<Boolean>, I_FetchConcep
         concept.modified();
         ChangeNotifier.touch(concept);
 
-        try {
-            KindOfComputer.updateIsaCache(concept.getNid());
-        } catch (Exception ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        }
         synchronized (cc) {
             long writeVersion = Bdb.gVersion.incrementAndGet();
             if (writeVersion < concept.getDataVersion()) {

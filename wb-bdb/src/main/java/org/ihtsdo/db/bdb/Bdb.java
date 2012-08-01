@@ -25,17 +25,15 @@ import org.ihtsdo.concept.BdbLegacyFixedFactory;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.ConceptBdb;
 import org.ihtsdo.concept.OFFSETS;
+import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.db.bdb.BdbMemoryMonitor.LowMemoryListener;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
-import org.ihtsdo.db.bdb.computer.kindof.IsaCache;
-import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.db.bdb.nidmaps.UuidToNidMapBdb;
 import org.ihtsdo.db.bdb.sap.StatusAtPositionBdb;
-import org.ihtsdo.db.bdb.xref.Xref;
+import org.ihtsdo.db.util.ConsoleActivityViewer;
 import org.ihtsdo.db.util.NidPair;
-import org.ihtsdo.db.util.NidPairForRefset;
-import org.ihtsdo.db.util.NidPairForRel;
+import org.ihtsdo.db.util.NidPairForRefex;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.helper.io.FileIO;
 import org.ihtsdo.lucene.LuceneManager;
@@ -60,7 +58,6 @@ public class Bdb {
     private static StatusAtPositionBdb statusAtPositionDb;
     private static ConceptBdb conceptDb;
     private static PropertiesBdb propDb;
-    public static Xref xref;
     public static ThreadGroup dbdThreadGroup =
             new ThreadGroup("db threads");
     private static ExecutorService syncService;
@@ -316,9 +313,6 @@ public class Bdb {
             }
             LocalFixedTerminology.setStore(new BdbLegacyFixedFactory());
 
-
-             inform(activity, "loading cross references...");
-            xref = new Xref(readOnly, mutable);
             //watchList.put(ReferenceConcepts.REFSET_PATH_ORIGINS.getNid(), ReferenceConcepts.REFSET_PATH_ORIGINS.getNid());
 
             inform(activity, "Loading paths...");
@@ -507,7 +501,6 @@ public class Bdb {
                 conceptDb.sync();
                 activity.setValue(5);
                 activity.setProgressInfoLower("Writing xref... ");
-                xref.sync();
                 activity.setValue(6);
                 activity.setProgressInfoLower("Writing propDb... ");
                 propDb.sync();
@@ -564,20 +557,8 @@ public class Bdb {
                     }
                 }
                 ActivityViewer.toFront();
-                I_ShowActivity activity = Terms.get().newActivityPanel(true,
-                        Terms.get().getActiveAceFrameConfig(), "Executing shutdown sequence", false);
+                I_ShowActivity activity = new ConsoleActivityViewer();
                 activity.setStopButtonVisible(false);
-
-                activity.setProgressInfoLower("1-a/11: Stopping Isa Cache generation.");
-                for (IsaCache loopCache : KindOfComputer.getIsaCacheMap().values()) {
-                    loopCache.getLatch().await();
-                }
-                
-                if (KindOfComputer.persistIsaCache) {
-                	activity.setProgressInfoLower("1-b/11: Persisting Isa Cache.");
-                    KindOfComputer.persistIsaCache();
-                }
-
                 activity.setProgressInfoLower("2/11: Starting sync using service.");
                 assert conceptDb != null : "conceptDb is null...";
                 new Sync().run();
@@ -607,7 +588,6 @@ public class Bdb {
                 statusAtPositionDb.close();
                 conceptDb.close();
                 propDb.close();
-                xref.close();
                 mutable.bdbEnv.sync();
                 mutable.bdbEnv.close();
                 sapNidCache.clear();
@@ -632,7 +612,6 @@ public class Bdb {
         statusAtPositionDb = null;
         uuidsToNidMapDb = null;
         watchList = null;
-        xref = null;
        
         Concept.reset();
         AceLog.getAppLog().info("bdb close finished.");
@@ -773,20 +752,24 @@ public class Bdb {
 
         return statBuff.toString().replace("\n", "<br>");
     }
-
-    public static void addXrefPair(int nid, NidPair pair) {
-        xref.addPair(nid, pair);
+    
+    public static List<NidPairForRefex> getRefsetPairs(int nid) {
+        return Bdb.getRefsetPairs(nid);
     }
-
-    public static void forgetXrefPair(int nid, NidPair pair) {
-        xref.forgetPair(nid, pair);
+    
+    public static void addXrefPair(int nid, NidPairForRefex pair) throws IOException {
+        Bdb.getNidCNidMap().addNidPairForRefex(nid, pair);
     }
-
-    public static List<NidPairForRel> getDestRelPairs(int cNid) {
-        return xref.getDestRelPairs(cNid);
+    
+    public static void forgetXrefPair(int nid, NidPairForRefex pair) {
+        Bdb.getNidCNidMap().forgetNidPairForRefex(nid, pair);
     }
-
-    public static List<NidPairForRefset> getRefsetPairs(int nid) {
-        return xref.getRefsetPairs(nid);
+    
+    public static void addRelOrigin(int destinationCNid, int originCNid) throws IOException {
+        nidCidMapDb.addRelOrigin(destinationCNid, originCNid);
     }
+    
+    public static Collection<Relationship> getDestRels(int cNid) throws IOException {
+      return getNidCNidMap().getDestRels(cNid);
+   }
 }
