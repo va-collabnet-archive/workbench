@@ -44,7 +44,7 @@ import org.ihtsdo.rules.RulesLibrary.INFERRED_VIEW_ORIGIN;
 		@Spec(directory = "tasks/rules tasks", type = BeanType.TASK_BEAN),
 		@Spec(directory = "plugins/commit", type = BeanType.TASK_BEAN) })
 
-		public class TestUsingRealtimeContext extends AbstractConceptTest {
+public class TestUsingRealtimeContext extends AbstractConceptTest {
 
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1;
@@ -88,42 +88,10 @@ import org.ihtsdo.rules.RulesLibrary.INFERRED_VIEW_ORIGIN;
 		List<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
 		try {
 			I_TermFactory tf = Terms.get();
-			I_GetConceptData snomedRoot = getConceptSafe(Terms.get(), SNOMED.Concept.ROOT.getUids());
-			I_GetConceptData auxRoot = getConceptSafe(Terms.get(), ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT.getUids());
-			I_GetConceptData refsetRoot = getConceptSafe(Terms.get(), RefsetAuxiliary.Concept.REFSET_AUXILIARY.getUids());
-			I_GetConceptData projectRoot = getConceptSafe(Terms.get(), ArchitectonicAuxiliary.Concept.PROJECTS_ROOT_HIERARCHY.getUids());
-			
-			if (snomedRoot == null || auxRoot == null || refsetRoot == null || projectRoot == null) {
-				return alertList;
-			}
-
-			if (RulesLibrary.rulesDisabled ||
-					RefsetAuxiliary.Concept.COMMIT_RECORD.getUids().contains(concept.getPrimUuid()) ||
-					RefsetAuxiliary.Concept.CONFLICT_RECORD.getUids().contains(concept.getPrimUuid())) {
-				return alertList;
-			}
-
-			boolean isDescSnomedRoot = snomedRoot.isParentOfOrEqualTo(concept, getFrameConfig().getAllowedStatus(), getFrameConfig()
-					.getDestRelTypes(), getFrameConfig().getViewPositionSetReadOnly(), getFrameConfig().getPrecedence(),
-					getFrameConfig().getConflictResolutionStrategy());
-			boolean isDescAuxRoot = auxRoot.isParentOfOrEqualTo(concept, getFrameConfig().getAllowedStatus(), getFrameConfig()
-					.getDestRelTypes(), getFrameConfig().getViewPositionSetReadOnly(), getFrameConfig().getPrecedence(),
-					getFrameConfig().getConflictResolutionStrategy());
-			boolean isDescRefsetRoot = refsetRoot.isParentOfOrEqualTo(concept, getFrameConfig().getAllowedStatus(), getFrameConfig()
-					.getDestRelTypes(), getFrameConfig().getViewPositionSetReadOnly(), getFrameConfig().getPrecedence(),
-					getFrameConfig().getConflictResolutionStrategy());
-			boolean isDescProjRoot = projectRoot.isParentOfOrEqualTo(concept, getFrameConfig().getAllowedStatus(), getFrameConfig()
-					.getDestRelTypes(), getFrameConfig().getViewPositionSetReadOnly(), getFrameConfig().getPrecedence(),
-					getFrameConfig().getConflictResolutionStrategy());
-
-			if ((isDescAuxRoot || isDescRefsetRoot || isDescProjRoot) && !isDescSnomedRoot)  {
-				return alertList;
-			} else {
-				alertList =  RulesLibrary.checkConcept(concept, 
-						tf.getConcept(RefsetAuxiliary.Concept.REALTIME_PRECOMMIT_QA_CONTEXT.getUids()), true, 
-						getFrameConfig(), INFERRED_VIEW_ORIGIN.CONSTRAINT_NORMAL_FORM).getAlertList();
-				return alertList;
-			}
+			alertList =  RulesLibrary.checkConcept(concept, 
+					tf.getConcept(RefsetAuxiliary.Concept.REALTIME_QA_CONTEXT.getUids()), true, 
+					getFrameConfig(), INFERRED_VIEW_ORIGIN.CONSTRAINT_NORMAL_FORM).getAlertList();
+			return alertList;
 		} catch (Exception e) {
 			throw new TaskFailedException(e);
 		}
