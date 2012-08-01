@@ -223,12 +223,12 @@ public class TemporaryTest extends AbstractMojo {
 					BufferedReader br = null;
 					BufferedWriter newDescriptions = null;
 
-					File outputFolder = new File(file.getParent());
+					File outputFolder =file.getParentFile();
 					outputFolder.mkdirs();
 
 					// NEW DESCRIPTIONS FILE
 					File outputFile = new File(outputFolder, "new_" + file.getName());
-					log.info("Creating " + outputFile.getName());
+					log.info("Creating " + outputFile.getAbsolutePath());
 
 					FileOutputStream dfos = new FileOutputStream(outputFile);
 
@@ -274,7 +274,7 @@ public class TemporaryTest extends AbstractMojo {
 									}
 								}
 								newDescriptions.write(line.replaceAll(part[7], usDesk));
-								newDescriptions.write(US_REFSET_ID);
+								newDescriptions.write("\t"+US_REFSET_ID);
 								newDescriptions.newLine();
 							} else {
 
@@ -342,14 +342,16 @@ public class TemporaryTest extends AbstractMojo {
 								log.info(string);
 							}
 						}
+						br.close();
+						newDescriptions.close();
+						log.info("deleting currentfile " + file.getName() + " " + file.delete());
+						outputFile.renameTo(new File(outputFile.getParentFile(), outputFile.getName().replaceAll("new_", "")));
 					} catch (Exception e) {
-						log.error(e);
+						log.error(e.fillInStackTrace());
 					} finally {
 						try {
 							br.close();
 							newDescriptions.close();
-							log.info("deleting currentfile " + file.getName() + " " + file.delete());
-							outputFile.renameTo(new File(outputFile.getParentFile(), outputFile.getName().replaceAll("new_", "")));
 						} catch (Exception e) {
 						}
 					}
