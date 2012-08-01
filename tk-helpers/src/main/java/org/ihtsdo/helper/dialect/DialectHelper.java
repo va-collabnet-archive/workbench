@@ -68,10 +68,12 @@ public class DialectHelper {
                             enVariantTextRefsetC.getRefexes();
                     Set<String> variantSet = new HashSet<String>();
                     for (RefexChronicleBI<?> refex : enVariants) {
-                        RefexStringVersionBI variantText =
+                        if(RefexStringVersionBI.class.isAssignableFrom(refex.getClass())){
+                            RefexStringVersionBI variantText =
                                 (RefexStringVersionBI) refex.getVersion(vc);
-                        if (variantText != null) {
-                            variantSet.add(variantText.getString1());
+                            if (variantText != null) {
+                                variantSet.add(variantText.getString1());
+                            }
                         }
                     }
                     variantSetMap.put(Language.EN.get(vc).getNid(), variantSet);
@@ -112,10 +114,12 @@ public class DialectHelper {
                 variantTextRefsetC.getActiveRefsetMembers();
         Map<String, String> variantDialectMap = new HashMap<String, String>();
         for (RefexChronicleBI<?> refex : dialectVarients) {
-            RefexStringVersionBI dialectText = (RefexStringVersionBI) refex.getVersion(vc);
-            if (dialectText != null) {
-                RefexStringVersionBI variantText = (RefexStringVersionBI) ts.getComponentVersion(dialectText.getReferencedComponentNid());
-                variantDialectMap.put(variantText.getString1(), dialectText.getString1());
+            if(RefexStringVersionBI.class.isAssignableFrom(refex.getClass())){
+                RefexStringVersionBI dialectText = (RefexStringVersionBI) refex.getVersion(vc);
+                if (dialectText != null) {
+                    RefexStringVersionBI variantText = (RefexStringVersionBI) ts.getComponentVersion(dialectText.getReferencedComponentNid());
+                    variantDialectMap.put(variantText.getString1(), dialectText.getString1());
+                }
             }
         }
         initialVariantMap.put(dialectC.getNid(), variantDialectMap);
