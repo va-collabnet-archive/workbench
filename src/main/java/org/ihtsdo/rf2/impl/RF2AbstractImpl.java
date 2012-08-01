@@ -33,6 +33,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.ExportUtil;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
@@ -577,7 +578,7 @@ public abstract class RF2AbstractImpl {
 		this.contradictionMgr = contradictionMgr;
 	}
 
-	public void process(I_GetConceptData concept) throws IOException, TerminologyException {
+	public void process(I_GetConceptData concept) throws IOException, TerminologyException, ContradictionException {
 		
 		if (snomedRoot.isParentOf(concept, 
 				currenAceConfig.getAllowedStatus(),
@@ -632,7 +633,7 @@ public abstract class RF2AbstractImpl {
 	
 	//all the contents resides under SNOMED CT Model Component (metadata) gets metamoduleid (900000000000012004)
 	//This returns of the content which belongs meta-module
-	public String computeModuleId(I_GetConceptData concept) throws IOException, TerminologyException {
+	public String computeModuleId(I_GetConceptData concept) throws IOException, TerminologyException, ContradictionException {
 		String moduleid = I_Constants.CORE_MODULE_ID;	
 		if (snomedCTModelComponent.isParentOf(concept, 
 				currenAceConfig.getAllowedStatus(),
