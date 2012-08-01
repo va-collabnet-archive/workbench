@@ -14,6 +14,7 @@ import org.ihtsdo.rf2.impl.RF2AbstractImpl;
 import org.ihtsdo.rf2.refset.factory.SctidUuid;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.WriteUtil;
+import org.ihtsdo.rf2.util.ExportUtil;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
