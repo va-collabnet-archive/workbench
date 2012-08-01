@@ -943,7 +943,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
     @Override
     public Collection<? extends IdBI> getAllIds() throws IOException {
-        return getConceptAttributes().getAdditionalIds();
+        return getConceptAttributes().getAllIds();
     }
 
     public Collection<Integer> getAllNids() throws IOException {
