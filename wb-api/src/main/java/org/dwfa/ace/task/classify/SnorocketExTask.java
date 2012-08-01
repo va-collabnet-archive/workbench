@@ -26,7 +26,6 @@ import java.io.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.dwfa.ace.api.I_ConfigAceFrame.CLASSIFIER_INPUT_MODE_PREF;
 import org.dwfa.ace.api.*;
@@ -45,11 +44,8 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.helper.descriptionlogic.DescriptionLogic;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.*;
-//TODO -- ISA CACHE CHANGE: Marc import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
-import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 /**
@@ -644,60 +640,6 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
                     return Condition.CONTINUE;
                 }
                 System.gc();
-                
-                // add to inferred is-a cache here.
-                Integer c1Nid = null;
-                NidSet parents = new NidSet();
-                ViewCoordinate vc = config.getViewCoordinate();
-//TODO -- ISA CACHE CHANGE: Marc                IsaCoordinate isac = vc.getIsaCoordinates().iterator().next();
-                if (DescriptionLogic.isVisible()) {
-                    ArrayList<SnoRel> cAllIInferredSnoRels = new ArrayList<SnoRel>();
-                    SnoPathProcessOtherInferredIsa pcOther;
-                    pcOther = new SnoPathProcessOtherInferredIsa(logger, cAllIInferredSnoRels,
-                        allowedRoleTypes, statusSet,
-                        cViewPosSet, gui, precedence, contradictionMgr,
-                        snorocketAuthorNid);
-                    tf.iterateConcepts(pcOther);
-                    logger.info(pcOther.getStats(startTime));
-
-                    cAllIInferredSnoRels.addAll(cRocketSnoRels);
-
-                    for (SnoRel r : cAllIInferredSnoRels) {
-                        if (equivalentSet.contains(r.c1Id)) {
-                            System.out.println("EQ REL: " + r);
-                        }
-                        if (c1Nid == null) {
-                            c1Nid = r.c1Id;
-                        } else if (r.c1Id != c1Nid) {
-
-//TODO -- ISA CACHE CHANGE: Marc                            ts.addInferredParents(vc, isac, c1Nid, parents.getSetValues());
-                            c1Nid = r.c1Id;
-                            parents = new NidSet();
-                        }
-                        if (r.typeId == isaNid) {
-                            parents.add(r.c2Id);
-                        }
-                    }
-                } else {
-                    for (SnoRel r : cRocketSnoRels) {
-                        if (equivalentSet.contains(r.c1Id)) {
-                            System.out.println("EQ REL: " + r);
-                        }
-                        if (c1Nid == null) {
-                            c1Nid = r.c1Id;
-                        } else if (r.c1Id != c1Nid) {
-
-//TODO -- ISA CACHE CHANGE: Marc                            ts.addInferredParents(vc, isac, c1Nid, parents.getSetValues());
-                            c1Nid = r.c1Id;
-                            parents = new NidSet();
-                        }
-                        if (r.typeId == isaNid) {
-                            parents.add(r.c2Id);
-                        }
-                    }
-                }
-//TODO -- ISA CACHE CHANGE: Marc                ts.addInferredParents(vc, isac, c1Nid, parents.getSetValues());
-//TODO -- ISA CACHE CHANGE: Marc                ts.setIsaCacheAsComplete(isac);
 
                 if (debugDump) {
                     dumpSnoRel(cRocketSnoRels, "SnoRelInferData_full.txt", 4);

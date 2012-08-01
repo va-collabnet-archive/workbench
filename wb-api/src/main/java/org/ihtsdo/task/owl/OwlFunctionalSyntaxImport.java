@@ -35,7 +35,6 @@ import org.dwfa.ace.task.classify.SnoGrp;
 import org.dwfa.ace.task.classify.SnoGrpList;
 import org.dwfa.ace.task.classify.SnoGrpNumType;
 import org.dwfa.ace.task.classify.SnoGrpUuidList;
-import org.dwfa.ace.task.classify.SnoPathProcessOtherInferredIsa;
 import org.dwfa.ace.task.classify.SnoRel;
 import org.dwfa.ace.task.classify.SnorocketExTask;
 import org.dwfa.bpa.process.Condition;
@@ -51,13 +50,10 @@ import org.dwfa.util.bean.Spec;
 import org.ihtsdo.helper.descriptionlogic.DescriptionLogic;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
-import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
-//TODO -- ISA CACHE CHANGE: Marc import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
-import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 /**
@@ -193,57 +189,6 @@ public class OwlFunctionalSyntaxImport extends AbstractTask implements ActionLis
                 gui.setProgressInfoLower("complete, time = " + toStringLapseSec(startTime));
                 gui.complete();
                 logger.info(pcClass.getStats(startTime));
-
-                // UPDATE ISA CACHE
-//TODO -- ISA CACHE CHANGE: Marc              Ts.get().clearInferredIsaCache();
-                ArrayList<SnoRel> cAllIInferredSnoRels;
-                cAllIInferredSnoRels = new ArrayList<SnoRel>();
-                SnoPathProcessOtherInferredIsa pcOther;
-                // show in Activity Viewer window
-                gui = tf.newActivityPanel(true, config, "Import OWL: update ISA cache data", false);
-                gui.addRefreshActionListener(this);
-                gui.setProgressInfoUpper("Import OWL: get ISA cache data");
-                gui.setIndeterminate(false);
-                gui.setMaximum(1500000);
-                gui.setValue(0);
-                startTime = System.currentTimeMillis();
-
-                pcOther = new SnoPathProcessOtherInferredIsa(logger, cAllIInferredSnoRels,
-                        allowedRoleTypes, statusSet,
-                        cViewPosSet, gui, precedence, contradictionMgr,
-                        condorAuthorNid);
-                tf.iterateConcepts(pcOther);
-                logger.info(pcOther.getStats(startTime));
-
-                cAllIInferredSnoRels.addAll(cCondorSnoRels);
-                Collections.sort(cAllIInferredSnoRels);
-                //cAllIInferredSnoRels = removeDuplciates(cAllIInferredSnoRels);
-
-                Integer c1Nid = null;
-                NidSet parents = new NidSet();
-                ViewCoordinate vc = config.getViewCoordinate();
-//TODO -- ISA CACHE CHANGE: Marc                IsaCoordinate isac = vc.getIsaCoordinates().iterator().next();
-
-                for (SnoRel r : cAllIInferredSnoRels) {
-
-                    if (c1Nid == null) {
-                        c1Nid = r.c1Id;
-
-                    } else if (r.c1Id != c1Nid) {
-
-//TODO -- ISA CACHE CHANGE: Marc                        ts.addInferredParents(vc, isac, c1Nid, parents.getSetValues());
-                        c1Nid = r.c1Id;
-                        parents = new NidSet();
-                    }
-
-                    if (r.typeId == isaNid) {
-                        parents.add(r.c2Id);
-                    }
-                }
-
-//TODO -- ISA CACHE CHANGE: Marc                ts.addInferredParents(vc, isac, c1Nid, parents.getSetValues());
-//TODO -- ISA CACHE CHANGE: Marc                ts.setIsaCacheAsComplete(isac);
-                logger.info("ISA cache update done");
 
                 gui.setProgressInfoLower("complete, time = " + toStringLapseSec(startTime));
                 gui.complete();
