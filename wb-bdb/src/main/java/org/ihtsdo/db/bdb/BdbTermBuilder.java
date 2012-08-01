@@ -502,7 +502,9 @@ public class BdbTermBuilder implements TerminologyBuilderBI {
             return construct(blueprint);
         } else {
             I_GetConceptData concept = Terms.get().getConceptForNid(cc.getNid());
-            if (concept.isCanceled() || concept.getPrimUuid().toString().length() == 0
+            ConceptAttributeChronicleBI conceptAttributes = concept.getConceptAttributes();
+            if (conceptAttributes == null || concept.isCanceled() 
+                    || concept.getPrimUuid().toString().length() == 0
                     || concept.getConceptAttributes().getVersions().isEmpty()) {
                 return construct(blueprint);
             } else {
@@ -572,23 +574,23 @@ public class BdbTermBuilder implements TerminologyBuilderBI {
         }
 
         for (DescriptionCAB fsnBp : fsnBps) {
-            this.construct(fsnBp);
+            this.constructIfNotCurrent(fsnBp);
         }
         for (DescriptionCAB prefBp : prefBps) {
-            this.construct(prefBp);
+            this.constructIfNotCurrent(prefBp);
         }
         for (DescriptionCAB descBp : descBps) {
             if (fsnBps.contains(descBp) || prefBps.contains(descBp)) {
                 continue;
             } else {
-                this.construct(descBp);
+                this.constructIfNotCurrent(descBp);
             }
         }
         for (RelationshipCAB relBp : relBps) {
-            this.construct(relBp);
+            this.constructIfNotCurrent(relBp);
         }
         for (MediaCAB mediaBp : mediaBps) {
-            this.construct(mediaBp);
+            this.constructIfNotCurrent(mediaBp);
         }
         return newC;
     }
