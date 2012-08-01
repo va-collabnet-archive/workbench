@@ -157,18 +157,32 @@ public class BatchQACheck extends AbstractMojo {
 	private String rulesOutputStr;
 
 	/**
-	 * delpoyment package reference name.
+	 * deployment package reference name.
 	 * 
 	 * @parameter
 	 */
 	private String pkgName;
 
 	/**
-	 * delpoyment package reference url.
+	 * deployment package reference url.
 	 * 
 	 * @parameter
 	 */
 	private String pkgUrl;
+	
+	/**
+	 * extension deployment package reference name.
+	 * 
+	 * @parameter
+	 */
+	private String extPkgName;
+
+	/**
+	 * extension deployment package reference url.
+	 * 
+	 * @parameter
+	 */
+	private String extPkgUrl;
 
 	/**
 	 * UUIDs of rules to ignore.
@@ -228,6 +242,13 @@ public class BatchQACheck extends AbstractMojo {
 				RulesDeploymentPackageReference pkgReference = pkgHelper.createNewRulesDeploymentPackage(pkgName, pkgUrl);
 				contextHelper.addPkgReferenceToContext(pkgReference, context);
 			}
+			
+			if ((extPkgName != null && !extPkgName.isEmpty()) && ((extPkgUrl != null && !extPkgUrl.isEmpty()))) {
+				RulesDeploymentPackageReferenceHelper pkgHelper = new RulesDeploymentPackageReferenceHelper(config);
+				RulesDeploymentPackageReference pkgReference = pkgHelper.createNewRulesDeploymentPackage(extPkgName, extPkgUrl);
+				contextHelper.addPkgReferenceToContext(pkgReference, context);
+			}
+			
 			contextHelper.clearCache();
 			cleanKbFileCache();
 			allRules=new HashMap<String,String>();
