@@ -153,22 +153,25 @@ public class DialectListMaintenance extends AbstractTask {
                     variantIndex = 0;
                 }
                 line = br.readLine();
-                while (line != null && line.length() > 3) {
-                    parts = line.split("\\|");
-                    String word = parts[wordIndex];
-                    String variant = parts[variantIndex];
-                    boolean found = false;
-
-                    for (RefexStringVersionBI member : dialectMemberList) {
-                        if (member.getString1().equals(variant)) {
-                            found = true;
-                            dialectMemberList.remove(member);
-                            break;
+                while (line != null) {
+                    if(line.length() > 3){
+                        parts = line.split("\\|");
+                        String word = parts[wordIndex];
+                        String variant = parts[variantIndex];
+                        boolean found = false;
+                        
+                        for (RefexStringVersionBI member : dialectMemberList) {
+                            if (member.getString1().equals(variant)) {
+                                found = true;
+                                dialectMemberList.remove(member);
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            addMember(variant, word);
                         }
                     }
-                    if (!found) {
-                        addMember(variant, word);
-                    }
+                    
                     line = br.readLine();
                 }
                 for (RefexStringVersionBI member : dialectMemberList) {
