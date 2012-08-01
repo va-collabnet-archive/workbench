@@ -2482,6 +2482,19 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         }
         return false;
     }
+    
+    public boolean isParentOf(Concept child, ViewCoordinate vc) throws IOException, ContradictionException {
+      return Ts.get().isKindOf(child.nid, nid, vc);
+   }
+
+   public boolean isParentOfOrEqualTo(Concept child, ViewCoordinate vc)
+           throws IOException, ContradictionException {
+      if (child == this) {
+         return true;
+      }
+
+      return isParentOf(child, vc);
+   }
 
     @Override
     public boolean isParentOf(I_GetConceptData child) throws IOException, TerminologyException, ContradictionException {
@@ -2513,8 +2526,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         ViewCoordinate originalViewCoordinate = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
         ViewCoordinate viewCoordinate = new ViewCoordinate(originalViewCoordinate);
         viewCoordinate.setAllowedStatusNids(allowedStatus);
-//        TODO -- ISA CACHE CHANGE: kec how to do allowedTypes
-//        viewCoordinate.setRelationshipAssertionType(allowedTypes);
+        viewCoordinate.setIsaTypeNids(allowedTypes);
         viewCoordinate.setPositionSet(positions);
         viewCoordinate.setContradictionManager(contradictionManager);
         for (PositionBI p : positions) {

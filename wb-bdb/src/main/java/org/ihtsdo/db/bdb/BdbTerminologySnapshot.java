@@ -218,4 +218,9 @@ public class BdbTerminologySnapshot implements TerminologySnapshotDI {
     public int getConceptNidForNid(Integer nid) throws IOException{
         return store.getConceptNidForNid(nid);
     }
+    
+    @Override
+    public boolean isKindOf(int childNid, int parentNid) throws IOException, ContradictionException {
+        return store.isKindOf(childNid, parentNid, vc);
+    }
 }

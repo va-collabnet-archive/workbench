@@ -1136,43 +1136,6 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
    public boolean isAnnotationStyleSet() throws IOException {
       return isAnnotationStyleRefex();
    }
-//TODO -- ISA CACHE CHANGE: kec should remove? replace is isLeaf?
-//   @Override
-//   public boolean isLeafByDestRels(I_ConfigAceFrame aceConfig) throws IOException {
-//      boolean             isLeaf       = true;
-//      I_IntSet            destRelTypes = aceConfig.getDestRelTypes();
-//      List<NidPairForRel> relPairs     = Bdb.xref.getDestRelPairs(enclosingConcept.getNid(), destRelTypes);
-//
-//      if (relPairs != null) {
-//         for (NidPairForRel pair : relPairs) {
-//            int relNid = pair.getRelNid();
-//
-//            try {
-//               Concept c = Bdb.getConceptForComponent(relNid);
-//
-//               if (c != null) {
-//                  Relationship r = c.getSourceRel(relNid);
-//
-//                  if (r != null) {
-//                     List<I_RelTuple> currentVersions = new ArrayList<I_RelTuple>();
-//
-//                     r.addTuples(aceConfig.getAllowedStatus(), destRelTypes,
-//                                 aceConfig.getViewPositionSetReadOnly(), currentVersions,
-//                                 aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy());
-//
-//                     if (currentVersions.size() > 0) {
-//                        return false;
-//                     }
-//                  }
-//               }
-//            } catch (IOException e) {
-//               AceLog.getAppLog().alertAndLogException(e);
-//            }
-//         }
-//      }
-//
-//      return isLeaf;
-//   }
 
    //~--- set methods ---------------------------------------------------------
 

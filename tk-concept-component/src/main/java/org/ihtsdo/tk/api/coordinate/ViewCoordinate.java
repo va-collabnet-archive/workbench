@@ -357,7 +357,7 @@ public class ViewCoordinate implements Serializable {
       this.lastModSequence   = Ts.get().getSequence();
       this.allowedStatusNids = allowedStatusNids;
    }
-
+   
    public void setClassifierNid(int classifierNid) {
       this.lastModSequence       = Ts.get().getSequence();
       this.vcWithAllStatusValues = null;
@@ -384,4 +384,10 @@ public class ViewCoordinate implements Serializable {
       this.vcWithAllStatusValues = null;
       this.relAssertionType      = relAssertionType;
    }
+
+    public void setIsaTypeNids(NidSetBI isaTypeNids) {
+        this.isaTypeNids = isaTypeNids;
+    }
+   
+   
 }

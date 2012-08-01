@@ -97,6 +97,7 @@ public class ConceptBdb extends ComponentBdb {
             concept.resetNidData();
             mutable.put(null, key, value);
             concept.setLastWrite(writeVersion);
+            Bdb.getNidCNidMap().updateOutgoingRelationshipData(concept);
         }
         Collection<Integer> nids = concept.getAllNids();
         NidCNidMapBdb nidCidMap = Bdb.getNidCNidMap();

@@ -354,7 +354,6 @@ public class BdbCommitManager {
         return commit(changeSetPolicy, changeSetWriterThreading, false);
     }
 
-//TODO -- ISA CACHE CHANGE: kec  look at method below
     public static boolean commit(ChangeSetPolicy changeSetPolicy,
             ChangeSetWriterThreading changeSetWriterThreading, boolean writeAdjudication) {
         Svn.rwl.acquireUninterruptibly();

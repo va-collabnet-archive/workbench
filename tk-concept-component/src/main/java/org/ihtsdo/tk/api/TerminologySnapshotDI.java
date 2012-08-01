@@ -55,4 +55,6 @@ public interface TerminologySnapshotDI extends TerminologyDI {
    ViewCoordinate getViewCoordinate();
    
    int getConceptNidForNid(Integer nid) throws IOException;
+   
+   boolean isKindOf(int childNid, int parentNid) throws IOException, ContradictionException;
 }
