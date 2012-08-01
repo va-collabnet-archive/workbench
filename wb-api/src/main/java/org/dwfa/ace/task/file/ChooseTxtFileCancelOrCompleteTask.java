@@ -25,9 +25,12 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JFileChooser;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
+import org.dwfa.ace.log.AceLog;
 
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
@@ -67,6 +70,8 @@ public class ChooseTxtFileCancelOrCompleteTask extends AbstractTask {
     private String fileKey = ProcessAttachmentKeys.DEFAULT_FILE.getAttachmentKey();
 
     private String message = "Please select a file";
+    protected transient boolean done;
+    protected transient Condition returnCondition;
 
     public String getMessage() {
         return message;
@@ -98,10 +103,50 @@ public class ChooseTxtFileCancelOrCompleteTask extends AbstractTask {
         // Nothing to do
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+    public Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
         try {
+            if (SwingUtilities.isEventDispatchThread()) {
+                doRun(process, worker);
+            } else {
+            SwingUtilities.invokeAndWait(new Runnable() {
 
-            JFileChooser fileChooser = new JFileChooser();
+                public void run() {
+                    try {
+                        doRun(process, worker);
+                    } catch (IntrospectionException ex) {
+                        AceLog.getAppLog().alertAndLogException(ex);
+                    } catch (IllegalAccessException ex) {
+                        AceLog.getAppLog().alertAndLogException(ex);
+                    } catch (InvocationTargetException ex) {
+                         AceLog.getAppLog().alertAndLogException(ex);
+                    }
+                    
+                }
+            });
+            }
+            synchronized (this) {
+                this.waitTillDone(worker.getLogger());
+            }
+
+            return returnCondition;
+
+            
+        } catch (IllegalArgumentException e) {
+            throw new TaskFailedException(e);
+        } catch (InvocationTargetException e) {
+            throw new TaskFailedException(e);
+        } catch (IntrospectionException e) {
+            throw new TaskFailedException(e);
+        } catch (IllegalAccessException e) {
+            throw new TaskFailedException(e);
+        } catch(InterruptedException e){
+            throw new TaskFailedException(e);
+        }
+    }
+    
+    private void doRun(I_EncodeBusinessProcess process, I_Work worker) 
+            throws IntrospectionException, IllegalAccessException, InvocationTargetException{
+        JFileChooser fileChooser = new JFileChooser();
             fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
             fileChooser.setDialogTitle(message);
             fileChooser.setFileFilter(new TxtFileFilter());
@@ -115,22 +160,20 @@ public class ChooseTxtFileCancelOrCompleteTask extends AbstractTask {
                 if (worker.getLogger().isLoggable(Level.INFO)) {
                     worker.getLogger().info(("Selected file: " + fileName));
                 }
+                process.setProperty(this.fileKey, fileName);
+
+                returnCondition =  Condition.ITEM_COMPLETE;
+                done = true;
+                synchronized (ChooseTxtFileCancelOrCompleteTask.this) {
+                    ChooseTxtFileCancelOrCompleteTask.this.notifyAll();
+                }
             } else {
-                return Condition.ITEM_CANCELED;
+                returnCondition =  Condition.ITEM_CANCELED;
+                done = true;
+                synchronized (ChooseTxtFileCancelOrCompleteTask.this) {
+                    ChooseTxtFileCancelOrCompleteTask.this.notifyAll();
+                }
             }
-
-            process.setProperty(this.fileKey, fileName);
-
-            return Condition.ITEM_COMPLETE;
-        } catch (IllegalArgumentException e) {
-            throw new TaskFailedException(e);
-        } catch (InvocationTargetException e) {
-            throw new TaskFailedException(e);
-        } catch (IntrospectionException e) {
-            throw new TaskFailedException(e);
-        } catch (IllegalAccessException e) {
-            throw new TaskFailedException(e);
-        }
     }
 
     private class TxtFileFilter extends FileFilter {
@@ -167,5 +210,25 @@ public class ChooseTxtFileCancelOrCompleteTask extends AbstractTask {
 
     public void setFileKey(String fileKey) {
         this.fileKey = fileKey;
+    }
+    
+    protected void waitTillDone(Logger l) {
+        while (!this.isDone()) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                l.log(Level.SEVERE, e.getMessage(), e);
+            }
+        }
+    }
+
+    protected void notifyTaskDone() {
+        synchronized (ChooseTxtFileCancelOrCompleteTask.this) {
+            ChooseTxtFileCancelOrCompleteTask.this.notifyAll();
+        }
+    }
+    
+    public boolean isDone() {
+        return this.done;
     }
 }

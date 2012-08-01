@@ -16,6 +16,7 @@
  */
 package org.dwfa.ace.task.file;
 
+import java.awt.EventQueue;
 import java.awt.Frame;
 import java.beans.IntrospectionException;
 import java.io.File;
@@ -25,11 +26,15 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JFileChooser;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
+import org.dwfa.ace.log.AceLog;
 
 import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.ace.task.wfpanel.PreviousNextOrCancel;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -66,6 +71,7 @@ public class ChooseTxtFileTask extends AbstractTask {
     private String fileKey = ProcessAttachmentKeys.DEFAULT_FILE.getAttachmentKey();
 
     private String message = "Please select a file";
+    protected transient boolean done;
 
     public String getMessage() {
         return message;
@@ -97,24 +103,26 @@ public class ChooseTxtFileTask extends AbstractTask {
         // Nothing to do
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
         try {
-
-            JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-            fileChooser.setDialogTitle(message);
-            fileChooser.setFileFilter(new TxtFileFilter());
-            int returnValue = fileChooser.showDialog(new Frame(), "Choose file");
-            if (returnValue == JFileChooser.APPROVE_OPTION) {
-                fileName = fileChooser.getSelectedFile().getPath();
-                System.out.println(fileName);
-                if (worker.getLogger().isLoggable(Level.INFO)) {
-                    worker.getLogger().info(("Selected file: " + fileName));
-                }
+            if (SwingUtilities.isEventDispatchThread()) {
+                createGUI(worker);
             } else {
-                throw new TaskFailedException("User failed to select a file.");
-            }
+            SwingUtilities.invokeAndWait(new Runnable() {
 
+                public void run() {
+                    try{
+                        createGUI(worker);
+                    }catch(TaskFailedException e){
+                        AceLog.getAppLog().alertAndLogException(e);
+                    }
+                    
+                }
+            });
+            }
+            synchronized (this) {
+                this.waitTillDone(worker.getLogger());
+            }
             process.setProperty(this.fileKey, fileName);
 
             return Condition.CONTINUE;
@@ -126,6 +134,29 @@ public class ChooseTxtFileTask extends AbstractTask {
             throw new TaskFailedException(e);
         } catch (IllegalAccessException e) {
             throw new TaskFailedException(e);
+        } catch(InterruptedException e){
+            throw new TaskFailedException(e);
+        }
+    }
+    
+    private void createGUI(I_Work worker) throws TaskFailedException{
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fileChooser.setDialogTitle(message);
+        fileChooser.setFileFilter(new TxtFileFilter());
+        int returnValue = fileChooser.showDialog(new Frame(), "Choose file");
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            fileName = fileChooser.getSelectedFile().getPath();
+            System.out.println(fileName);
+            if (worker.getLogger().isLoggable(Level.INFO)) {
+                worker.getLogger().info(("Selected file: " + fileName));
+            }
+            done = true;
+            synchronized (ChooseTxtFileTask.this) {
+                ChooseTxtFileTask.this.notifyAll();
+            }
+        } else {
+            throw new TaskFailedException("User failed to select a file.");
         }
     }
 
@@ -163,5 +194,25 @@ public class ChooseTxtFileTask extends AbstractTask {
 
     public void setFileKey(String fileKey) {
         this.fileKey = fileKey;
+    }
+    
+    protected void waitTillDone(Logger l) {
+        while (!this.isDone()) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                l.log(Level.SEVERE, e.getMessage(), e);
+            }
+        }
+    }
+
+    protected void notifyTaskDone() {
+        synchronized (ChooseTxtFileTask.this) {
+            ChooseTxtFileTask.this.notifyAll();
+        }
+    }
+    
+    public boolean isDone() {
+        return this.done;
     }
 }
