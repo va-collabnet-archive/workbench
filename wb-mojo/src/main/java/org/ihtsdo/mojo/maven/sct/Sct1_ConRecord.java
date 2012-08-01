@@ -37,35 +37,41 @@ class Sct1_ConRecord implements Comparable<Object>, Serializable {
     String ctv3id; // CTV3ID
     String snomedrtid; // SNOMEDID (SNOMED RT ID)
     int isprimitive; // ISPRIMITIVE
-    int path;
+    int pathIdx;
+    int authorIdx;
+    int moduleIdx;
     long revTime;
 
     public Sct1_ConRecord(long csId, int s, String ctv, String rt, int p) {
         conSnoId = csId;
         UUID tmpUUID = Type3UuidFactory.fromSNOMED(conSnoId);
-        conUuidMsb = tmpUUID.getMostSignificantBits();
-        conUuidLsb = tmpUUID.getLeastSignificantBits();
-        status = s;
+        this.conUuidMsb = tmpUUID.getMostSignificantBits();
+        this.conUuidLsb = tmpUUID.getLeastSignificantBits();
+        this.status = s;
         // additionalIds = null;
-        addedIds = null;
-        ctv3id = ctv;
-        snomedrtid = rt;
-        isprimitive = p;
+        this.addedIds = null;
+        this.ctv3id = ctv;
+        this.snomedrtid = rt;
+        this.isprimitive = p;
+        this.authorIdx = -1;
+        this.moduleIdx = -1;
     }
     
     public Sct1_ConRecord(UUID cUuid, int s, int p,
-            long revDate, int pathIdx) {
-        conSnoId = Long.MAX_VALUE;
-        conUuidMsb = cUuid.getMostSignificantBits();
-        conUuidLsb = cUuid.getLeastSignificantBits();
-        status = s;
+            long revDate, int pathIdx, int authorIdx, int moduleIdx) {
+        this.conSnoId = Long.MAX_VALUE;
+        this.conUuidMsb = cUuid.getMostSignificantBits();
+        this.conUuidLsb = cUuid.getLeastSignificantBits();
+        this.status = s;
         // additionalIds = null;
-        addedIds = null;
-        ctv3id = null;
-        snomedrtid = null;
-        isprimitive = p;
-        revTime = revDate;
-        path = pathIdx;
+        this.addedIds = null;
+        this.ctv3id = null;
+        this.snomedrtid = null;
+        this.isprimitive = p;
+        this.revTime = revDate;
+        this.pathIdx = pathIdx;
+        this.authorIdx = authorIdx;
+        this.moduleIdx = moduleIdx;
     }
 
     // method required for object to be sortable (comparable) in arrays
@@ -84,9 +90,9 @@ class Sct1_ConRecord implements Comparable<Object>, Serializable {
             } else if (conUuidLsb > tmp.conUuidLsb) {
                 return thisMore;
             } else {
-                if (this.path < tmp.path) {
+                if (this.pathIdx < tmp.pathIdx) {
                     return thisLess; // instance less than received
-                } else if (this.path > tmp.path) {
+                } else if (this.pathIdx > tmp.pathIdx) {
                     return thisMore; // instance greater than received
                 } else {
                     if (this.revTime < tmp.revTime) {

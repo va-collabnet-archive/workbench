@@ -78,9 +78,9 @@ public class Sct2_IdRecord implements Serializable {
         // Header row
         br.readLine();
 
-        int idx = 0;
         while (br.ready()) {
-            String[] line = br.readLine().split(TAB_CHARACTER);
+            String[] line;
+            line = br.readLine().split(TAB_CHARACTER);
 
             throw new UnsupportedOperationException("Sct2_IdRecord.parseIds Not supported yet.");
             // :NYI:

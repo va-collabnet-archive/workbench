@@ -33,24 +33,29 @@ public class Rf2_RefsetCUuidRecord implements Comparable<Rf2_RefsetCUuidRecord> 
     final String effDateStr;
     final long timeL;
     final boolean isActive;
-    final String pathStr;
     final long refsetIdL;
     final long referencedComponentIdL;
     final String valueUuid; // SCT_ID. For Language refset valueIdL is acceptibilityId
 
-    public Rf2_RefsetCUuidRecord(String id, String dateStr, boolean active, String path,
+    String pathUuidStr; // SNOMED Core default
+    // String authorUuidStr; // saved as user
+    String moduleUuidStr;
+
+    public Rf2_RefsetCUuidRecord(String id, String dateStr, boolean active, String moduleUuidStr,
             long refsetIdL, long referencedComponentIdL, String valueUuid) throws ParseException {
         this.id = id;
         this.effDateStr = dateStr;
         this.timeL = Rf2x.convertDateToTime(dateStr);
         this.isActive = active;
 
-        /* this.pathStr = path; */
-        this.pathStr = "8c230474-9f11-30ce-9cad-185a96fd03a2"; // SNOMED Core
-
         this.refsetIdL = refsetIdL;
         this.referencedComponentIdL = referencedComponentIdL;
         this.valueUuid = valueUuid;
+
+        // SNOMED Core :NYI: setup path as a POM parameter.
+        this.pathUuidStr = Rf2Defaults.getPathSnomedCoreUuidStr();
+        // this.authorUuidStr = Rf2Defaults.getAuthorUuidStr();
+        this.moduleUuidStr = moduleUuidStr;
     }
 
     static Rf2_RefsetCUuidRecord[] parseRefset(Rf2File f, Long[] exclusions)
@@ -59,7 +64,7 @@ public class Rf2_RefsetCUuidRecord implements Comparable<Rf2_RefsetCUuidRecord> 
         int count = Rf2File.countFileLines(f);
         int countExludedMembers = 0;
         int currentCount = 0;
-        ArrayList<Rf2_RefsetCUuidRecord> a = new ArrayList<Rf2_RefsetCUuidRecord>();
+        ArrayList<Rf2_RefsetCUuidRecord> a = new ArrayList<>();
 
         // DATA COLUMNS
         int ID = 0;// id
@@ -72,7 +77,7 @@ public class Rf2_RefsetCUuidRecord implements Comparable<Rf2_RefsetCUuidRecord> 
 
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f.file),
                 "UTF-8"));
-        Set idSet = new HashSet<Long>();
+        Set<Long> idSet = new HashSet<>();
 
         br.readLine(); // Header row
         currentCount++;
@@ -186,10 +191,16 @@ public class Rf2_RefsetCUuidRecord implements Comparable<Rf2_RefsetCUuidRecord> 
         writer.append(effDateStr + TAB_CHARACTER);
 
         // Path UUID
-        writer.append(pathStr + TAB_CHARACTER);
+        writer.append(pathUuidStr + TAB_CHARACTER);
 
         // Concept Extension Value UUID
-        writer.append(valueUuid + LINE_TERMINATOR);
+        writer.append(valueUuid + TAB_CHARACTER);
+
+        // Author UUID String --> user
+        writer.append(Rf2Defaults.getAuthorUuidStr() + TAB_CHARACTER);
+
+        // Module UUID String
+        writer.append(this.moduleUuidStr + LINE_TERMINATOR);
     }
 
     @Override

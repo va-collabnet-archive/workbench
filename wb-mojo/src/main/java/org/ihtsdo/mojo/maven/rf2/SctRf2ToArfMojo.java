@@ -106,7 +106,7 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
             // :NYI: extended status implementation does not support multiple version years
             filesInStatus = Rf2File.getFiles(wDir, targetSubDir, statusDir, "AttributeValue", ".txt");
 
-            ArrayList<Rf2_RefsetCRecord[]> rf2_RefsetCRecordArray = new ArrayList<Rf2_RefsetCRecord[]>();
+            ArrayList<Rf2_RefsetCRecord[]> rf2_RefsetCRecordArray = new ArrayList<>();
             int arrayCont = 0;
             for (Rf2File rf2File : filesInStatus) {
                 rf2_RefsetCRecordArray.add(Rf2_RefsetCRecord.parseRefset(rf2File, null));
@@ -137,7 +137,7 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
                 concepts = Sct2_ConRecord.attachStatus(concepts, statusRecords);
                 for (Sct2_ConRecord c : concepts) {
                     c.writeArf(bw);
-                    writeSctSnomedLongId(bwIds, c.conSnoIdL, c.effDateStr, c.pathStr);
+                    writeSctSnomedLongId(bwIds, c.conSnoIdL, c.effDateStr, c.pathUuidStr);
                 }
             }
             bw.flush();
@@ -154,7 +154,7 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
                 descriptions = Sct2_DesRecord.attachStatus(descriptions, statusRecords);
                 for (Sct2_DesRecord d : descriptions) {
                     d.writeArf(bw);
-                    writeSctSnomedLongId(bwIds, d.desSnoIdL, d.effDateStr, d.pathStr);
+                    writeSctSnomedLongId(bwIds, d.desSnoIdL, d.effDateStr, d.pathUuidStr);
                 }
             }
             bw.flush();
@@ -172,7 +172,7 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
                 rels = Sct2_RelRecord.attachStatus(rels, statusRecords);
                 for (Sct2_RelRecord r : rels) {
                     r.writeArf(bw);
-                    writeSctSnomedLongId(bwIds, r.relSnoId, r.effDateStr, r.pathStr);
+                    writeSctSnomedLongId(bwIds, r.relSnoId, r.effDateStr, r.pathUuidStr);
                 }
             }
 
@@ -183,7 +183,7 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
                 Sct2_RelRecord[] rels = Sct2_RelRecord.parseRelationships(rf2File, false);
                 for (Sct2_RelRecord r : rels) {
                     r.writeArf(bw);
-                    writeSctSnomedLongId(bwIds, r.relSnoId, r.effDateStr, r.pathStr);
+                    writeSctSnomedLongId(bwIds, r.relSnoId, r.effDateStr, r.pathUuidStr);
                 }
             }
             bw.flush();

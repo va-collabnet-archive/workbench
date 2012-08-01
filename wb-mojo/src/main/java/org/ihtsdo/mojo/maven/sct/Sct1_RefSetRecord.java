@@ -6,43 +6,42 @@ import java.util.Date;
 import java.util.UUID;
 
 public class Sct1_RefSetRecord implements Comparable<Sct1_RefSetRecord>, Serializable {
+
     enum ComponentType {
+
         CONCEPT, DESCRIPTION, IMAGE, MEMBER, RELATIONSHIP, UNKNOWN
     };
 
     enum ValueType {
+
         BOOLEAN, CONCEPT, INTEGER, STRING
     };
-
     private static final long serialVersionUID = 1L;
-
     long conUuidMsb; // ENVELOP CONCEPTID (eConcept to which this concept belongs)
     long conUuidLsb; // ENVELOP CONCEPTID
     long referencedComponentUuidMsb;
     long referencedComponentUuidLsb;
     ComponentType componentType;
-
     long refsetUuidMsb;
     long refsetUuidLsb;
     long refsetMemberUuidMsb; // aka primordialComponentUuidMsb
     long refsetMemberUuidLsb; // aka primordialComponentUuidLsb
-
     boolean valueBoolean;
     long valueConUuidMsb;
     long valueConUuidLsb;
     int valueInt;
     String valueString;
     ValueType valueType;
-
     int status; // CONCEPTSTATUS
     long revTime;
-
     int pathIdx;
     int authorIdx;
+    int moduleIdx;
 
     // BOOLEAN
     public Sct1_RefSetRecord(UUID refsetUuid, UUID memberUuid, UUID componentUuid, int status,
-            long zRevTime, int zPathIdx, boolean valueBoolean, int zAuthIdx) {
+            long zRevTime, int zPathIdx, int zAuthIdx, int zModuleIdx,
+            boolean valueBoolean) {
         super();
         this.conUuidMsb = Long.MAX_VALUE;
         this.conUuidLsb = Long.MAX_VALUE;
@@ -65,11 +64,13 @@ public class Sct1_RefSetRecord implements Comparable<Sct1_RefSetRecord>, Seriali
         this.revTime = zRevTime;
         this.pathIdx = zPathIdx;
         this.authorIdx = zAuthIdx;
+        this.moduleIdx = zModuleIdx;
     }
 
     // CONCEPT
     public Sct1_RefSetRecord(UUID refsetUuid, UUID memberUuid, UUID componentUuid, int status,
-            long zRevTime, int zPathIdx, UUID vConcept, int zAuthIdx) {
+            long zRevTime, int zPathIdx, int zAuthIdx, int zModuleIdx,
+            UUID vConcept) {
         super();
         this.conUuidMsb = Long.MAX_VALUE;
         this.conUuidLsb = Long.MAX_VALUE;
@@ -92,11 +93,13 @@ public class Sct1_RefSetRecord implements Comparable<Sct1_RefSetRecord>, Seriali
         this.revTime = zRevTime;
         this.pathIdx = zPathIdx;
         this.authorIdx = zAuthIdx;
+        this.moduleIdx = zModuleIdx;
     }
 
     // INTEGER
     public Sct1_RefSetRecord(UUID refsetUuid, UUID memberUuid, UUID componentUuid, int status,
-            long zRevTime, int zPathIdx, int vInteger, int zAuthIdx) {
+            long zRevTime, int zPathIdx, int zAuthIdx, int zModuleIdx,
+            int vInteger) {
         super();
         this.conUuidMsb = Long.MAX_VALUE;
         this.conUuidLsb = Long.MAX_VALUE;
@@ -119,11 +122,13 @@ public class Sct1_RefSetRecord implements Comparable<Sct1_RefSetRecord>, Seriali
         this.revTime = zRevTime;
         this.pathIdx = zPathIdx;
         this.authorIdx = zAuthIdx;
+        this.moduleIdx = zModuleIdx;
     }
 
     // STRING
     public Sct1_RefSetRecord(UUID refsetUuid, UUID memberUuid, UUID componentUuid, int status,
-            long zRevTime, int zPathIdx, String vString, int zAuthIdx) {
+            long zRevTime, int zPathIdx, int zAuthIdx, int zModuleIdx,
+            String vString) {
         super();
         this.conUuidMsb = Long.MAX_VALUE;
         this.conUuidLsb = Long.MAX_VALUE;
@@ -146,6 +151,7 @@ public class Sct1_RefSetRecord implements Comparable<Sct1_RefSetRecord>, Seriali
         this.revTime = zRevTime;
         this.pathIdx = zPathIdx;
         this.authorIdx = zAuthIdx;
+        this.moduleIdx = zModuleIdx;
     }
 
     public void setEnvelopConUuid(UUID conUuid, ComponentType cType) {
@@ -188,54 +194,58 @@ public class Sct1_RefSetRecord implements Comparable<Sct1_RefSetRecord>, Seriali
                             } else if (this.refsetMemberUuidLsb > o.refsetMemberUuidLsb) {
                                 return thisMore;
                             } else {
-                                if (this.revTime < o.revTime)
+                                if (this.revTime < o.revTime) {
                                     return thisLess;
-                                else if (this.revTime > o.revTime)
+                                } else if (this.revTime > o.revTime) {
                                     return thisMore;
-                                else
+                                } else {
                                     return 0; // instance == received
+                                }
                             }
                         }
                     }
                 }
-           }
+            }
         }
     }
-        
+
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("::: REFSET MEMBER RECORD :::");
-        sb.append("\r\n::: referencedComponentUuid "
-                + new UUID(this.referencedComponentUuidMsb, this.referencedComponentUuidLsb));
+        sb.append("\r\n::: referencedComponentUuid ");
+        sb.append(new UUID(this.referencedComponentUuidMsb, this.referencedComponentUuidLsb));
 
-        sb.append("\r\n::: (envelop) conUuid " + new UUID(this.conUuidMsb, this.conUuidLsb));
+        sb.append("\r\n::: (envelop) conUuid ");
+        sb.append(new UUID(this.conUuidMsb, this.conUuidLsb));
 
-        sb.append("\r\n::: referencedComponentUuid "
-                + new UUID(this.referencedComponentUuidMsb, this.referencedComponentUuidLsb));
+        sb.append("\r\n::: referencedComponentUuid ");
+        sb.append(new UUID(this.referencedComponentUuidMsb, this.referencedComponentUuidLsb));
 
-        sb.append("\r\n::: refsetMemberUuid "
-                + new UUID(this.refsetMemberUuidMsb, this.refsetMemberUuidLsb));
+        sb.append("\r\n::: refsetMemberUuid ");
+        sb.append(new UUID(this.refsetMemberUuidMsb, this.refsetMemberUuidLsb));
 
-        sb.append("\r\n::: status " + this.status);
+        sb.append("\r\n::: status ").append(this.status);
 
         Date d = new Date(this.revTime);
         String pattern = "yyyy-MM-dd HH:mm:ss";
         SimpleDateFormat formatter = new SimpleDateFormat(pattern);
         formatter.format(d);
 
-        sb.append("\r\n::: revision date " + formatter.format(d).toString());
-        
-        if (this.valueType == Sct1_RefSetRecord.ValueType.STRING)
-            sb.append("\r\n::: value string " + this.valueString);
-        else if (this.valueType == Sct1_RefSetRecord.ValueType.BOOLEAN)
-            sb.append("\r\n::: value boolean " + this.valueBoolean);
-        else if (this.valueType == Sct1_RefSetRecord.ValueType.INTEGER)
-            sb.append("\r\n::: value integer " + this.valueInt);
-        else if (this.valueType == Sct1_RefSetRecord.ValueType.CONCEPT)
-            sb.append("\r\n::: value concept " + new UUID(this.valueConUuidMsb, this.valueConUuidLsb));
+        sb.append("\r\n::: revision date ").append(formatter.format(d).toString());
+
+        if (this.valueType == Sct1_RefSetRecord.ValueType.STRING) {
+            sb.append("\r\n::: value string ").append(this.valueString);
+        } else if (this.valueType == Sct1_RefSetRecord.ValueType.BOOLEAN) {
+            sb.append("\r\n::: value boolean ").append(this.valueBoolean);
+        } else if (this.valueType == Sct1_RefSetRecord.ValueType.INTEGER) {
+            sb.append("\r\n::: value integer ").append(this.valueInt);
+        } else if (this.valueType == Sct1_RefSetRecord.ValueType.CONCEPT) {
+            sb.append("\r\n::: value concept ");
+            sb.append(new UUID(this.valueConUuidMsb, this.valueConUuidLsb));
+        }
         sb.append("\r\n:::\r\n");
 
         return sb.toString();
     }
-    
 }

@@ -39,6 +39,7 @@ public class Sct1_RelDestRecord implements Comparable<Object>, Serializable {
     }
 
     // method required for object to be sortable (comparable) in arrays
+    @Override
     public int compareTo(Object obj) {
         Sct1_RelDestRecord tmp = (Sct1_RelDestRecord) obj;
         int thisMore = 1;

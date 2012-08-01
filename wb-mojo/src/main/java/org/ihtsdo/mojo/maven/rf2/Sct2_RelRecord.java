@@ -41,7 +41,6 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
     long timeL;
     boolean isActive; // status is computed for relationships
     long statusConceptL; // extended from AttributeValue file
-    String pathStr;
     long c1SnoId; // CONCEPTID1
     long roleTypeSnoId; // RELATIONSHIPTYPE .. SNOMED ID
     long c2SnoId; // CONCEPTID2
@@ -50,19 +49,22 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
     long refinabilityL; // REFINABILITY
     boolean isInferred;
 
-    public Sct2_RelRecord(long relID, String dateStr, boolean active, String path,
+    String pathUuidStr; // SNOMED Core default
+    // String authorUuidStr; // saved as user
+    String moduleUuidStr;
+
+    public Sct2_RelRecord(long relID, String dateStr, boolean active, String moduleUuidStr,
             long cOneID, long roleTypeSnoId, long cTwoID, int grp,
             long characterType, long refinibility,
             boolean inferredB,
-            long statusConceptL) throws ParseException {
+            long statusConceptL)
+            throws ParseException {
 
         this.relSnoId = relID; // RELATIONSHIPID
 
         this.effDateStr = dateStr;
         this.timeL = Rf2x.convertDateToTime(dateStr);
         this.isActive = active;
-        /* this.pathStr = path; */
-        this.pathStr = "8c230474-9f11-30ce-9cad-185a96fd03a2";
 
         this.c1SnoId = cOneID; // CONCEPTID1
         this.roleTypeSnoId = roleTypeSnoId; // RELATIONSHIPTYPE (SNOMED ID)
@@ -75,16 +77,21 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
         this.isInferred = inferredB;
 
         this.statusConceptL = statusConceptL;
+
+        // SNOMED Core :NYI: setup path as a POM parameter.
+        this.pathUuidStr = Rf2Defaults.getPathSnomedCoreUuidStr();
+        // this.authorUuidStr = Rf2Defaults.getAuthorUuidStr();
+        this.moduleUuidStr = moduleUuidStr;
     }
 
-    public Sct2_RelRecord(Sct2_RelRecord in, long time, long status) throws ParseException {
+    public Sct2_RelRecord(Sct2_RelRecord in, long time, long status)
+            throws ParseException {
 
         this.relSnoId = in.relSnoId; // RELATIONSHIPID
 
         this.effDateStr = in.effDateStr;
         this.timeL = time;
         this.isActive = in.isActive;
-        this.pathStr = in.pathStr;
 
         this.c1SnoId = in.c1SnoId; // CONCEPTID1
         this.roleTypeSnoId = in.roleTypeSnoId; // RELATIONSHIPTYPE (SNOMED ID)
@@ -97,10 +104,15 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
         this.isInferred = in.isInferred;
 
         this.statusConceptL = status;
+
+        this.pathUuidStr = in.pathUuidStr;
+        // this.authorUuidStr = in.authorUuidStr;
+        this.moduleUuidStr = in.moduleUuidStr;
     }
 
-    static Sct2_RelRecord[] attachStatus(Sct2_RelRecord[] a, Rf2_RefsetCRecord[] b) throws ParseException, MojoFailureException {
-        ArrayList<Sct2_RelRecord> addedRecords = new ArrayList<Sct2_RelRecord>();
+    static Sct2_RelRecord[] attachStatus(Sct2_RelRecord[] a, Rf2_RefsetCRecord[] b)
+            throws ParseException, MojoFailureException {
+        ArrayList<Sct2_RelRecord> addedRecords = new ArrayList<>();
         Rf2_RefsetCRecord zeroB = new Rf2_RefsetCRecord("ZERO", "2000-01-01 00:00:00", false,
                 null, Long.MAX_VALUE, Long.MAX_VALUE, Long.MAX_VALUE);
 
@@ -111,8 +123,8 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
         int idxB = 0;
         long currentId = a[0].relSnoId;
         while (idxA < a.length) {
-            ArrayList<Sct2_RelRecord> listA = new ArrayList<Sct2_RelRecord>();
-            ArrayList<Rf2_RefsetCRecord> listB = new ArrayList<Rf2_RefsetCRecord>();
+            ArrayList<Sct2_RelRecord> listA = new ArrayList<>();
+            ArrayList<Rf2_RefsetCRecord> listB = new ArrayList<>();
             while (idxA < a.length && a[idxA].relSnoId == currentId) {
                 listA.add(a[idxA]);
                 idxA++;
@@ -199,12 +211,13 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
         return a;
     }
 
-    static private Sct2_RelRecord[] removeDuplicates(Sct2_RelRecord[] a) throws MojoFailureException {
+    static private Sct2_RelRecord[] removeDuplicates(Sct2_RelRecord[] a)
+            throws MojoFailureException {
         Arrays.sort(a);
 
         // REMOVE DUPLICATES
         int lenA = a.length;
-        ArrayList<Integer> duplIdxList = new ArrayList<Integer>();
+        ArrayList<Integer> duplIdxList = new ArrayList<>();
         for (int idx = 0; idx < lenA - 2; idx++) {
             if ((a[idx].relSnoId == a[idx + 1].relSnoId)
                     && (a[idx].c1SnoId == a[idx + 1].c1SnoId)
@@ -243,7 +256,8 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
         }
     }
 
-    public static Sct2_RelRecord[] parseRelationships(Rf2File f, boolean inferredB) throws IOException, ParseException {
+    public static Sct2_RelRecord[] parseRelationships(Rf2File f, boolean inferredB)
+            throws IOException, ParseException {
 
         int count = Rf2File.countFileLines(f);
         Sct2_RelRecord[] a = new Sct2_RelRecord[count];
@@ -301,18 +315,20 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
             // Set Historical relationships refinibility to 'not refinable'
             long thisRefinabilityId = refinibilityOptionalId;
             // Historical have thisCharacteristicId of -1
-            if (thisCharacteristicId == -1L)
+            if (thisCharacteristicId == -1L) {
                 thisRefinabilityId = refinibilityNotRefinableId;
+            }
 
             // Set ISA relationships refinibility to 'not refinable'
-            if (thisRoleTypeSctId == isaRelSctId)
+            if (thisRoleTypeSctId == isaRelSctId) {
                 thisRefinabilityId = refinibilityNotRefinableId;
+            }
 
             // Set Qualifier relationships refinibility to 'mandatory'
-            if (thisCharacteristicId == qualifierRelSctId)
+            if (thisCharacteristicId == qualifierRelSctId) {
                 thisRefinabilityId = refinibilityMandatoryId;
+            }
             
-
             a[idx] = new Sct2_RelRecord(Long.parseLong(line[ID]),
                     Rf2x.convertEffectiveTimeToDate(line[EFFECTIVE_TIME]),
                     Rf2x.convertStringToBoolean(line[ACTIVE]),
@@ -338,7 +354,8 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
                 + c1SnoId + TAB_CHARACTER + roleTypeSnoId + TAB_CHARACTER + c2SnoId + TAB_CHARACTER + group;
     }
 
-    public void writeArf(BufferedWriter writer) throws IOException, TerminologyException, ParseException {
+    public void writeArf(BufferedWriter writer)
+            throws IOException, TerminologyException, ParseException {
         // Relationship UUID
         writer.append(Rf2x.convertIdToUuidStr(relSnoId) + TAB_CHARACTER);
 
@@ -378,17 +395,19 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
         // Effective Date
         writer.append(Rf2x.convertTimeToDate(timeL) + TAB_CHARACTER);
 
-        // Path UUID
-        writer.append(pathStr + TAB_CHARACTER);
+        // Path UUID String
+        writer.append(pathUuidStr + TAB_CHARACTER);
 
-        // Author UUID
+        // Author UUID String
         // SCT ID Is-a == 116680003L
         if (isInferred) {
-            writer.append(uuidUserSnorocketStr + LINE_TERMINATOR);
+            writer.append(uuidUserSnorocketStr + TAB_CHARACTER);
         } else {
-            writer.append(uuidUserStr + LINE_TERMINATOR);
+            writer.append(uuidUserStr + TAB_CHARACTER);
         }
 
+        // Module UUID String
+        writer.append(this.moduleUuidStr + LINE_TERMINATOR);
     }
 
     @Override

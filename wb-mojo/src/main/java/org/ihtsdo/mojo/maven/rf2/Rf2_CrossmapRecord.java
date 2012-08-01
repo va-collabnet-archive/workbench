@@ -39,7 +39,6 @@ public class Rf2_CrossmapRecord {
     final String effDateStr;
     final long timeL;
     final boolean isActive;
-    final String pathStr;
     final long refsetIdL;
     final long referencedComponentIdL;
     final String mapValueStr;
@@ -47,19 +46,26 @@ public class Rf2_CrossmapRecord {
     static String uuidSourceSnomedRtStr = null;
     static String uuidSourceCtv3Str = null;
 
-    public Rf2_CrossmapRecord(String id, String dateStr, boolean active, String path,
-            long refsetIdL, long referencedComponentIdL, String valueIdL) throws ParseException {
+    String pathUuidStr; // SNOMED Core default
+    // String authorUuidStr; // saved as user
+    String moduleUuidStr;
+
+    public Rf2_CrossmapRecord(String id, String dateStr, boolean active, String moduleUuidStr,
+            long refsetIdL, long referencedComponentIdL, String valueIdL)
+            throws ParseException {
         this.id = id;
         this.effDateStr = dateStr;
         this.timeL = Rf2x.convertDateToTime(dateStr);
         this.isActive = active;
 
-        /* this.pathStr = path; // This would be the ModuleID. */
-        this.pathStr = "8c230474-9f11-30ce-9cad-185a96fd03a2"; // SNOMED Core for now.
-
         this.refsetIdL = refsetIdL;
         this.referencedComponentIdL = referencedComponentIdL;
         this.mapValueStr = valueIdL;
+
+        // SNOMED Core :NYI: setup path as a POM parameter.
+        this.pathUuidStr = Rf2Defaults.getPathSnomedCoreUuidStr();
+        // this.authorUuidStr = Rf2Defaults.getAuthorUuidStr();
+        this.moduleUuidStr = moduleUuidStr;
     }
 
     static Rf2_CrossmapRecord[] parseCrossmapFile(Rf2File f)
@@ -79,7 +85,7 @@ public class Rf2_CrossmapRecord {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f.file),
                 "UTF-8"));
-        Set idSet = new HashSet<Long>();
+        Set<Long> idSet = new HashSet<>();
 
         int idx = 0;
         br.readLine(); // Header row
@@ -115,7 +121,8 @@ public class Rf2_CrossmapRecord {
         return a;
     }
 
-    public void writeArfRefset(BufferedWriter writer) throws IOException, TerminologyException {
+    public void writeArfRefset(BufferedWriter writer)
+            throws IOException, TerminologyException {
         // Refset UUID
         writer.append(Rf2x.convertIdToUuidStr(refsetIdL) + TAB_CHARACTER);
 
@@ -132,13 +139,20 @@ public class Rf2_CrossmapRecord {
         writer.append(effDateStr + TAB_CHARACTER);
 
         // Path UUID
-        writer.append(pathStr + TAB_CHARACTER);
+        writer.append(pathUuidStr + TAB_CHARACTER);
 
         // Concept Extension Value UUID
-        writer.append(mapValueStr + LINE_TERMINATOR);
+        writer.append(mapValueStr + TAB_CHARACTER);
+
+        // Author UUID String --> user
+        writer.append(Rf2Defaults.getAuthorUuidStr() + TAB_CHARACTER);
+
+        // Module UUID String
+        writer.append(this.moduleUuidStr + LINE_TERMINATOR);
     }
 
-    public void writeArfId(BufferedWriter writer) throws IOException, TerminologyException {
+    public void writeArfId(BufferedWriter writer)
+            throws IOException, TerminologyException {
         // REFERENCED_COMPONENT_ID = 5;
         writer.append(Rf2x.convertIdToUuidStr(referencedComponentIdL) + TAB_CHARACTER);
         // SOURCE_SYSTEM_UUID = 1;
@@ -159,6 +173,10 @@ public class Rf2_CrossmapRecord {
         // EFFECTIVE_DATE = 4; // yyyy-MM-dd HH:mm:ss
         writer.append(effDateStr + TAB_CHARACTER);
         // PATH_UUID = 5;
-        writer.append(pathStr + LINE_TERMINATOR);
+        writer.append(pathUuidStr + TAB_CHARACTER);
+        // Author UUID String --> user
+        writer.append(Rf2Defaults.getAuthorUuidStr() + TAB_CHARACTER);
+        // Module UUID String
+        writer.append(this.moduleUuidStr + LINE_TERMINATOR);
     }
 }

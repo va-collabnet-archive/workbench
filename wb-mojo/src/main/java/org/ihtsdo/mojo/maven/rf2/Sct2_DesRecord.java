@@ -40,17 +40,20 @@ class Sct2_DesRecord implements Comparable<Sct2_DesRecord>, Serializable {
     long timeL;
     boolean isActive; // STATUS
     long statusConceptL; // extended from AttributeValue file
-    String pathStr;
     String conUuidStr; // CONCEPTID
     String termText; // TERM
     boolean capStatus; // INITIALCAPITALSTATUS -- capitalization
     String descriptionTypeStr; // DESCRIPTIONTYPE
     String languageCodeStr; // LANGUAGECODE
+    String pathUuidStr; // SNOMED Core default
+    // String authorUuidStr; // saved as user
+    String moduleUuidStr;
 
-    public Sct2_DesRecord(long dId, String dateStr, boolean activeB, String path,
+    public Sct2_DesRecord(long dId, String dateStr, boolean activeB, String moduleUuidStr,
             String conUuidStr, String termStr,
             boolean capitalization, String desTypeStr, String langCodeStr,
-            long statusConceptL) throws ParseException {
+            long statusConceptL)
+            throws ParseException {
         desSnoIdL = dId;
         UUID tmpUUID = Type3UuidFactory.fromSNOMED(desSnoIdL);
         this.desUuidStr = tmpUUID.toString();
@@ -65,13 +68,16 @@ class Sct2_DesRecord implements Comparable<Sct2_DesRecord>, Serializable {
         this.descriptionTypeStr = desTypeStr; // DESCRIPTIONTYPE
         this.languageCodeStr = langCodeStr; // LANGUAGECODE
 
-        /* this.pathStr = path; */
-        this.pathStr = "8c230474-9f11-30ce-9cad-185a96fd03a2";
-
         this.statusConceptL = statusConceptL;
+
+        // SNOMED Core :NYI: setup path as a POM parameter.
+        this.pathUuidStr = Rf2Defaults.getPathSnomedCoreUuidStr();
+        // this.authorUuidStr = Rf2Defaults.getAuthorUuidStr();
+        this.moduleUuidStr = moduleUuidStr;
     }
 
-    public Sct2_DesRecord(Sct2_DesRecord in, long time, long status) throws ParseException {
+    public Sct2_DesRecord(Sct2_DesRecord in, long time, long status)
+            throws ParseException {
         this.desSnoIdL = in.desSnoIdL;
         this.desUuidStr = in.desUuidStr;
         this.effDateStr = in.effDateStr;
@@ -85,14 +91,16 @@ class Sct2_DesRecord implements Comparable<Sct2_DesRecord>, Serializable {
         this.descriptionTypeStr = in.descriptionTypeStr; // DESCRIPTIONTYPE
         this.languageCodeStr = in.languageCodeStr; // LANGUAGECODE
 
-        this.pathStr = in.pathStr;
+        this.pathUuidStr = in.pathUuidStr;
+        // this.authorUuidStr = in.authorUuidStr;
+        this.moduleUuidStr = in.moduleUuidStr;
 
         this.statusConceptL = status;
     }
 
     static Sct2_DesRecord[] attachStatus(Sct2_DesRecord[] a, Rf2_RefsetCRecord[] b)
             throws ParseException, MojoFailureException {
-        ArrayList<Sct2_DesRecord> addedRecords = new ArrayList<Sct2_DesRecord>();
+        ArrayList<Sct2_DesRecord> addedRecords = new ArrayList<>();
         Rf2_RefsetCRecord zeroB = new Rf2_RefsetCRecord("ZERO", "2000-01-01 00:00:00", false,
                 null, Long.MAX_VALUE, Long.MAX_VALUE, Long.MAX_VALUE);
 
@@ -103,8 +111,8 @@ class Sct2_DesRecord implements Comparable<Sct2_DesRecord>, Serializable {
         int idxB = 0;
         long currentId = a[0].desSnoIdL;
         while (idxA < a.length) {
-            ArrayList<Sct2_DesRecord> listA = new ArrayList<Sct2_DesRecord>();
-            ArrayList<Rf2_RefsetCRecord> listB = new ArrayList<Rf2_RefsetCRecord>();
+            ArrayList<Sct2_DesRecord> listA = new ArrayList<>();
+            ArrayList<Rf2_RefsetCRecord> listB = new ArrayList<>();
             while (idxA < a.length && a[idxA].desSnoIdL == currentId) {
                 listA.add(a[idxA]);
                 idxA++;
@@ -191,12 +199,13 @@ class Sct2_DesRecord implements Comparable<Sct2_DesRecord>, Serializable {
         return a;
     }
 
-    static private Sct2_DesRecord[] removeDuplicates(Sct2_DesRecord[] a) throws MojoFailureException {
+    static private Sct2_DesRecord[] removeDuplicates(Sct2_DesRecord[] a)
+            throws MojoFailureException {
         Arrays.sort(a);
 
         // REMOVE DUPLICATES
         int lenA = a.length;
-        ArrayList<Integer> duplIdxList = new ArrayList<Integer>();
+        ArrayList<Integer> duplIdxList = new ArrayList<>();
         for (int idx = 0; idx < lenA - 2; idx++) {
             if ((a[idx].desSnoIdL == a[idx + 1].desSnoIdL)
                     && (a[idx].statusConceptL == a[idx + 1].statusConceptL)
@@ -233,7 +242,8 @@ class Sct2_DesRecord implements Comparable<Sct2_DesRecord>, Serializable {
         }
     }
 
-    public static Sct2_DesRecord[] parseDescriptions(Rf2File f) throws IOException, ParseException {
+    public static Sct2_DesRecord[] parseDescriptions(Rf2File f)
+            throws IOException, ParseException {
 
         int count = Rf2File.countFileLines(f);
         Sct2_DesRecord[] a = new Sct2_DesRecord[count];
@@ -275,20 +285,29 @@ class Sct2_DesRecord implements Comparable<Sct2_DesRecord>, Serializable {
     // Create string to show some input fields for exception reporting
     // DESCRIPTIONID DESCRIPTIONSTATUS CONCEPTID TERM INITIALCAPITALSTATUS DESCRIPTIONTYPE LANGUAGECODE
     public static String toStringHeader() {
-        return "DESCRIPTIONID" + TAB_CHARACTER + "DESCRIPTIONSTATUS" + TAB_CHARACTER + "CONCEPTID"
-                + TAB_CHARACTER + "TERM" + TAB_CHARACTER + "INITIALCAPITALSTATUS" + TAB_CHARACTER
-                + "DESCRIPTIONTYPE" + TAB_CHARACTER + "LANGUAGECODE";
+        return "DESCRIPTIONID" + TAB_CHARACTER
+                + "DESCRIPTIONSTATUS" + TAB_CHARACTER
+                + "CONCEPTID" + TAB_CHARACTER
+                + "TERM" + TAB_CHARACTER
+                + "INITIALCAPITALSTATUS" + TAB_CHARACTER
+                + "DESCRIPTIONTYPE" + TAB_CHARACTER
+                + "LANGUAGECODE";
     }
 
     // Create string to show some input fields for exception reporting
     @Override
     public String toString() {
-        return desUuidStr + TAB_CHARACTER + isActive + TAB_CHARACTER + conUuidStr + TAB_CHARACTER
-                + termText + TAB_CHARACTER + capStatus + TAB_CHARACTER + descriptionTypeStr
-                + TAB_CHARACTER + languageCodeStr;
+        return desUuidStr + TAB_CHARACTER 
+                + isActive + TAB_CHARACTER
+                + conUuidStr + TAB_CHARACTER
+                + termText + TAB_CHARACTER
+                + capStatus + TAB_CHARACTER
+                + descriptionTypeStr + TAB_CHARACTER
+                + languageCodeStr;
     }
 
-    public void writeArf(BufferedWriter writer) throws IOException, TerminologyException, ParseException {
+    public void writeArf(BufferedWriter writer)
+            throws IOException, TerminologyException, ParseException {
         // Description UUID
         writer.append(desUuidStr + TAB_CHARACTER);
 
@@ -321,8 +340,14 @@ class Sct2_DesRecord implements Comparable<Sct2_DesRecord>, Serializable {
         // Effective Date   yyyy-MM-dd HH:mm:ss
         writer.append(Rf2x.convertTimeToDate(timeL) + TAB_CHARACTER);
 
-        // Path UUID
-        writer.append(pathStr + LINE_TERMINATOR);
+        // Path UUID String
+        writer.append(this.pathUuidStr + TAB_CHARACTER);
+
+        // Author UUID String --> user
+        writer.append(Rf2Defaults.getAuthorUuidStr() + TAB_CHARACTER);
+
+        // Module UUID String
+        writer.append(this.moduleUuidStr + LINE_TERMINATOR);
     }
 
     @Override

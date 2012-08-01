@@ -33,16 +33,14 @@ public class Sct1_IdRecord implements Comparable<Sct1_IdRecord>, Serializable {
     // STATUS UUID
     // ArchitectonicAuxiliary.Concept.CURRENT.getUids().get(0)
     int status;
-    // EFFECTIVE DATE
-    long revTime;
-    // PATH
-    int pathIdx;
-    // USER
-    int userIdx;
+    long revTime; // EFFECTIVE DATE
+    int pathIdx; // PATH
+    int userIdx; // USER
+    int moduleIdx; // MODULE
 
     // Each non-String must be conditionally added.
     public Sct1_IdRecord(UUID uuidPrimaryId, int sourceSystemIdx, String idFromSourceSystem,
-            int status, long revDateTime, int pathIdx, int userIdx) {
+            int status, long revDateTime, int pathIdx, int userIdx, int moduleIdx) {
         this.primaryUuidMsb = uuidPrimaryId.getMostSignificantBits(); // CONCEPTID/PRIMARYID
         this.primaryUuidLsb = uuidPrimaryId.getLeastSignificantBits(); // CONCEPTID/PRIMARYID
         this.srcSystemIdx = sourceSystemIdx;
@@ -57,6 +55,7 @@ public class Sct1_IdRecord implements Comparable<Sct1_IdRecord>, Serializable {
         this.revTime = revDateTime;
         this.pathIdx = pathIdx;
         this.userIdx = userIdx;
+        this.moduleIdx = moduleIdx;
     }
 
     // :NYI:HACK:
@@ -73,6 +72,7 @@ public class Sct1_IdRecord implements Comparable<Sct1_IdRecord>, Serializable {
         this.revTime = revDateTime;
         this.pathIdx = pathIdx;
         this.userIdx = uIdx;
+        this.moduleIdx = -1;
     }
 
     @Override

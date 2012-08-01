@@ -121,7 +121,7 @@ public class SctRf2TextDefToArfMojo extends AbstractMojo implements Serializable
                 textdefinitions = Sct2_DesRecord.attachStatus(textdefinitions, statusRecords);
                 for (Sct2_DesRecord d : textdefinitions) {
                     d.writeArf(bw);
-                    writeSctSnomedLongId(bwIds, d.desSnoIdL, d.effDateStr, d.pathStr);
+                    writeSctSnomedLongId(bwIds, d.desSnoIdL, d.effDateStr, d.pathUuidStr);
                 }
             }
             bw.flush();

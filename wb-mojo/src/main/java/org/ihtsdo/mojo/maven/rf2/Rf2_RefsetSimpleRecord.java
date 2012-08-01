@@ -36,24 +36,30 @@ public class Rf2_RefsetSimpleRecord implements Comparable<Rf2_RefsetSimpleRecord
     final String effDateStr;
     final long timeL;
     final boolean isActive;
-    final String pathStr;
     final long refsetIdL;
     final long referencedComponentIdL;
     final String uuidNormalMember; // For Language refset uuidNormalMember is acceptibilityId
 
-    public Rf2_RefsetSimpleRecord(String id, String dateStr, boolean active, String path,
-            long refsetIdL, long referencedComponentIdL, String uuid) throws ParseException {
+    String pathUuidStr; // SNOMED Core default
+    // String authorUuidStr; // saved as user
+    String moduleUuidStr;
+
+    public Rf2_RefsetSimpleRecord(String id, String dateStr, boolean active, String moduleUuidStr,
+            long refsetIdL, long referencedComponentIdL, String uuid)
+            throws ParseException {
         this.id = id;
         this.effDateStr = dateStr;
         this.timeL = Rf2x.convertDateToTime(dateStr);
         this.isActive = active;
 
-        /* this.pathStr = path; */
-        this.pathStr = "8c230474-9f11-30ce-9cad-185a96fd03a2"; // SNOMED Core
-
         this.refsetIdL = refsetIdL;
         this.referencedComponentIdL = referencedComponentIdL;
         this.uuidNormalMember = uuid;
+
+        // SNOMED Core :NYI: setup path as a POM parameter.
+        this.pathUuidStr = Rf2Defaults.getPathSnomedCoreUuidStr();
+        // this.authorUuidStr = Rf2Defaults.getAuthorUuidStr();
+        this.moduleUuidStr = moduleUuidStr;
     }
 
     static Rf2_RefsetSimpleRecord[] parseRefset(Rf2File f)
@@ -73,7 +79,7 @@ public class Rf2_RefsetSimpleRecord implements Comparable<Rf2_RefsetSimpleRecord
 
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f.file),
                 "UTF-8"));
-        Set idSet = new HashSet<Long>();
+        Set<Long> idSet = new HashSet<>();
 
         int idx = 0;
         br.readLine(); // Header row
@@ -135,10 +141,16 @@ public class Rf2_RefsetSimpleRecord implements Comparable<Rf2_RefsetSimpleRecord
         writer.append(effDateStr + TAB_CHARACTER);
 
         // Path UUID
-        writer.append(pathStr + TAB_CHARACTER);
+        writer.append(pathUuidStr + TAB_CHARACTER);
 
         // Concept Extension Value UUID
-        writer.append(uuidNormalMember + LINE_TERMINATOR);
+        writer.append(uuidNormalMember + TAB_CHARACTER);
+
+        // Author UUID String --> user
+        writer.append(Rf2Defaults.getAuthorUuidStr() + TAB_CHARACTER);
+
+        // Module UUID String
+        writer.append(this.moduleUuidStr + LINE_TERMINATOR);
     }
 
     @Override

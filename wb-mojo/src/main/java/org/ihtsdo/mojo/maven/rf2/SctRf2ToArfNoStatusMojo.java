@@ -109,7 +109,7 @@ public class SctRf2ToArfNoStatusMojo extends AbstractMojo implements Serializabl
                 Sct2_ConRecord[] concepts = Sct2_ConRecord.parseConcepts(rf2File);
                 for (Sct2_ConRecord c : concepts) {
                     c.writeArf(bw);
-                    writeSctSnomedLongId(bwIds, c.conSnoIdL, c.effDateStr, c.pathStr);
+                    writeSctSnomedLongId(bwIds, c.conSnoIdL, c.effDateStr, c.pathUuidStr);
                 }
             }
             bw.flush();
@@ -125,7 +125,7 @@ public class SctRf2ToArfNoStatusMojo extends AbstractMojo implements Serializabl
                 Sct2_DesRecord[] descriptions = Sct2_DesRecord.parseDescriptions(rf2File);
                 for (Sct2_DesRecord d : descriptions) {
                     d.writeArf(bw);
-                    writeSctSnomedLongId(bwIds, d.desSnoIdL, d.effDateStr, d.pathStr);
+                    writeSctSnomedLongId(bwIds, d.desSnoIdL, d.effDateStr, d.pathUuidStr);
                 }
             }
             bw.flush();
@@ -142,7 +142,7 @@ public class SctRf2ToArfNoStatusMojo extends AbstractMojo implements Serializabl
                 Sct2_RelRecord[] rels = Sct2_RelRecord.parseRelationships(rf2File, true);
                 for (Sct2_RelRecord r : rels) {
                     r.writeArf(bw);
-                    writeSctSnomedLongId(bwIds, r.relSnoId, r.effDateStr, r.pathStr);
+                    writeSctSnomedLongId(bwIds, r.relSnoId, r.effDateStr, r.pathUuidStr);
                 }
             }
 
@@ -153,7 +153,7 @@ public class SctRf2ToArfNoStatusMojo extends AbstractMojo implements Serializabl
                 Sct2_RelRecord[] rels = Sct2_RelRecord.parseRelationships(rf2File, false);
                 for (Sct2_RelRecord r : rels) {
                     r.writeArf(bw);
-                    writeSctSnomedLongId(bwIds, r.relSnoId, r.effDateStr, r.pathStr);
+                    writeSctSnomedLongId(bwIds, r.relSnoId, r.effDateStr, r.pathUuidStr);
                 }
             }
             bw.flush();

@@ -19,7 +19,6 @@ package org.ihtsdo.mojo.maven.sct;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.UUID;
-
 import org.dwfa.util.id.Type3UuidFactory;
 
 class Sct1_RelRecord implements Comparable<Object>, Serializable {
@@ -45,13 +44,14 @@ class Sct1_RelRecord implements Comparable<Object>, Serializable {
     int refinability; // REFINABILITY
     int group; // RELATIONSHIPGROUP
     boolean exceptionFlag; // to handle Concept ID change exception
-    int pathIdx; // index
     long revTime;
+    int pathIdx; // index
+    int userIdx; // user: 0=unassigned, 1=inferred/classifier
+    int moduleIdx;
     
-    /** user: 0=unassigned, 1=inferred/classifier */
-    int userIdx; 
 
-    public Sct1_RelRecord(long relID, int st, long cOneID, long roleTypeSnoId, int roleTypeIdx, long cTwoID,
+    public Sct1_RelRecord(long relID, int st,
+            long cOneID, long roleTypeSnoId, int roleTypeIdx, long cTwoID,
             int characterType, int r, int grp) {
         this.relSnoId = relID; // RELATIONSHIPID
         UUID tmpUUID = Type3UuidFactory.fromSNOMED(relSnoId);
@@ -80,9 +80,11 @@ class Sct1_RelRecord implements Comparable<Object>, Serializable {
         this.group = grp; // RELATIONSHIPGROUP
         this.exceptionFlag = false;
         this.userIdx = 0;
+        this.moduleIdx = -1;
     }
 
-    public Sct1_RelRecord(long relID, int st, long cOneID, long roleTypeSnoId, int roleTypeIdx, long cTwoID,
+    public Sct1_RelRecord(long relID, int st,
+            long cOneID, long roleTypeSnoId, int roleTypeIdx, long cTwoID,
             int characterType, int r, int grp, int pathIdx, int userIdx) {
     
         this.relSnoId = relID; // RELATIONSHIPID
@@ -114,10 +116,13 @@ class Sct1_RelRecord implements Comparable<Object>, Serializable {
         
         this.pathIdx = pathIdx;
         this.userIdx = userIdx;
+        this.moduleIdx = -1;
     }
     
-    public Sct1_RelRecord(UUID uuidRelId, int status, UUID uuidC1, int roleTypeIdx, UUID uuidC2,
-            int characteristic, int refinability, int group, long revTime, int pathIdx, int userIdx) {
+    public Sct1_RelRecord(UUID uuidRelId, int status,
+            UUID uuidC1, int roleTypeIdx, UUID uuidC2,
+            int characteristic, int refinability, int group, long revTime,
+            int pathIdx, int userIdx, int moduleIdx) {
         
         this.relSnoId = Long.MAX_VALUE; // SNOMED RELATIONSHIPID, if applicable
         this.relUuidMsb = uuidRelId.getMostSignificantBits();
@@ -140,6 +145,7 @@ class Sct1_RelRecord implements Comparable<Object>, Serializable {
         this.pathIdx = pathIdx;
         this.revTime = revTime;
         this.userIdx = userIdx; // ARF user id.
+        this.moduleIdx = moduleIdx;
     }
 
     // method required for object to be sortable (comparable) in arrays

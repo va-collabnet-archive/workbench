@@ -24,7 +24,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.UUID;
-
 import org.dwfa.util.id.Type3UuidFactory;
 
 class Sct1_DesRecord implements Comparable<Object>, Serializable {
@@ -44,32 +43,38 @@ class Sct1_DesRecord implements Comparable<Object>, Serializable {
     int capStatus; // INITIALCAPITALSTATUS -- capitalization
     int descriptionType; // DESCRIPTIONTYPE
     String languageCode; // LANGUAGECODE
-    int pathIdx;
     long revTime;
+    int pathIdx;
+    int authorIdx;
+    int moduleIdx;
 
     public Sct1_DesRecord(long dId, int s, long cId, String text, int cStat, int typeInt, String lang) {
-        desSnoId = dId;
-        UUID tmpUUID = Type3UuidFactory.fromSNOMED(desSnoId);
-        desUuidMsb = tmpUUID.getMostSignificantBits();
-        desUuidLsb = tmpUUID.getLeastSignificantBits();
+        this.desSnoId = dId;
+        UUID tmpUUID = Type3UuidFactory.fromSNOMED(this.desSnoId);
+        this.desUuidMsb = tmpUUID.getMostSignificantBits();
+        this.desUuidLsb = tmpUUID.getLeastSignificantBits();
 
-        status = s;
+        this.status = s;
         // additionalIds = null;
-        addedIds = null;
+        this.addedIds = null;
 
-        conSnoId = cId;
-        tmpUUID = Type3UuidFactory.fromSNOMED(conSnoId);
-        conUuidMsb = tmpUUID.getMostSignificantBits();
-        conUuidLsb = tmpUUID.getLeastSignificantBits();
+        this.conSnoId = cId;
+        tmpUUID = Type3UuidFactory.fromSNOMED(this.conSnoId);
+        this.conUuidMsb = tmpUUID.getMostSignificantBits();
+        this.conUuidLsb = tmpUUID.getLeastSignificantBits();
 
-        termText = new String(text);
-        capStatus = cStat;
-        descriptionType = typeInt;
-        languageCode = new String(lang);
+        this.termText = new String(text);
+        this.capStatus = cStat;
+        this.descriptionType = typeInt;
+        this.languageCode = new String(lang);
+        this.pathIdx = -1;
+        this.authorIdx = -1;
+        this.moduleIdx = -1;
     }
 
     public Sct1_DesRecord(UUID desUuid, int status, UUID uuidCon, String termStr,
-            int capitalization, int desTypeIdx, String langCodeStr, long revTime, int pathIdx) {
+            int capitalization, int desTypeIdx, String langCodeStr, long revTime,
+            int pathIdx, int authorIdx, int moduleIdx) {
         this.desSnoId = Long.MAX_VALUE; // DESCRIPTIONID
         this.desUuidMsb = desUuid.getMostSignificantBits();
         this.desUuidLsb = desUuid.getLeastSignificantBits();
@@ -83,8 +88,10 @@ class Sct1_DesRecord implements Comparable<Object>, Serializable {
         this.capStatus = capitalization; // INITIALCAPITALSTATUS -- capitalization
         this.descriptionType = desTypeIdx; // DESCRIPTIONTYPE
         this.languageCode = langCodeStr; // LANGUAGECODE
-        this.pathIdx = pathIdx;
         this.revTime = revTime;
+        this.pathIdx = pathIdx;
+        this.authorIdx = authorIdx;
+        this.moduleIdx = moduleIdx;
     }
 
     // method required for object to be sortable (comparable) in arrays

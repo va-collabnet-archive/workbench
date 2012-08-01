@@ -39,21 +39,30 @@ class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
     String effDateStr; // effectiveTime
     long timeL;
     boolean isActive; // CONCEPTSTATUS
-    long statusConceptL; // extended from AttributeValue file
-    String pathStr; // Module ID
     boolean isPrimitiveB; // ISPRIMITIVE
+    long statusConceptL; // extended from AttributeValue file
 
-    public Sct2_ConRecord(long conIdL, String dateStr, boolean active, String path, boolean isPrim, long statusConceptL) throws ParseException {
-        this.conSnoIdL = conIdL;
-        this.effDateStr = dateStr;
+    String pathUuidStr; // SNOMED Core default
+    // String authorUuidStr; // saved as user
+    String moduleUuidStr;
+
+    public Sct2_ConRecord(long conIdL, String dateStr, boolean active, String moduleUuidStr,
+            boolean isPrim, long statusConceptL) throws ParseException {
+        this.conSnoIdL = conIdL; // column 0 - id
+        this.effDateStr = dateStr; // column 1 - effectiveTime
         this.timeL = Rf2x.convertDateToTime(dateStr);
-        this.isActive = active;
+        this.isActive = active; // column 2 - active
 
-        /* this.pathStr = path; */
-        this.pathStr = "8c230474-9f11-30ce-9cad-185a96fd03a2";
+
+        // column 4 - defintionStatusId converted to isPrimative
         this.isPrimitiveB = isPrim;
 
         this.statusConceptL = statusConceptL;
+
+        // SNOMED Core :NYI: setup path as a POM parameter.
+        this.pathUuidStr = Rf2Defaults.getPathSnomedCoreUuidStr();
+        // this.authorUuidStr = Rf2Defaults.getAuthorUuidStr();
+        this.moduleUuidStr = moduleUuidStr;
     }
 
     public Sct2_ConRecord(Sct2_ConRecord in, long time, long status) throws ParseException {
@@ -61,16 +70,18 @@ class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
         this.effDateStr = in.effDateStr;
         this.timeL = time;
         this.isActive = in.isActive;
-
-        this.pathStr = in.pathStr;
         this.isPrimitiveB = in.isPrimitiveB;
 
         this.statusConceptL = status;
+
+        this.pathUuidStr = in.pathUuidStr;
+        // this.authorUuidStr = in.authorUuidStr;
+        this.moduleUuidStr = in.moduleUuidStr;
     }
 
     static Sct2_ConRecord[] attachStatus(Sct2_ConRecord[] a, Rf2_RefsetCRecord[] b)
             throws ParseException, MojoFailureException {
-        ArrayList<Sct2_ConRecord> addedRecords = new ArrayList<Sct2_ConRecord>();
+        ArrayList<Sct2_ConRecord> addedRecords = new ArrayList<>();
         Rf2_RefsetCRecord zeroB = new Rf2_RefsetCRecord("ZERO", "2000-01-01 00:00:00", false,
                 null, Long.MAX_VALUE, Long.MAX_VALUE, Long.MAX_VALUE);
 
@@ -81,8 +92,8 @@ class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
         int idxB = 0;
         long currentId = a[0].conSnoIdL;
         while (idxA < a.length) {
-            ArrayList<Sct2_ConRecord> listA = new ArrayList<Sct2_ConRecord>();
-            ArrayList<Rf2_RefsetCRecord> listB = new ArrayList<Rf2_RefsetCRecord>();
+            ArrayList<Sct2_ConRecord> listA = new ArrayList<>();
+            ArrayList<Rf2_RefsetCRecord> listB = new ArrayList<>();
             while (idxA < a.length && a[idxA].conSnoIdL == currentId) {
                 listA.add(a[idxA]);
                 idxA++;
@@ -174,7 +185,7 @@ class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
 
         // REMOVE DUPLICATES
         int lenA = a.length;
-        ArrayList<Integer> duplIdxList = new ArrayList<Integer>();
+        ArrayList<Integer> duplIdxList = new ArrayList<>();
         for (int idx = 0; idx < lenA - 2; idx++) {
             if ((a[idx].conSnoIdL == a[idx + 1].conSnoIdL)
                     && (a[idx].isPrimitiveB == a[idx + 1].isPrimitiveB)
@@ -240,23 +251,8 @@ class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
 
             return a;
 
-
-
-
-        } catch (ParseException ex) {
+        } catch (ParseException | IOException ex) {
             Logger.getLogger(Sct2_ConRecord.class.getName()).log(Level.SEVERE, null, ex);
-
-
-
-
-            throw new MojoFailureException(
-                    "error parsing rf2 concepts", ex);
-        } catch (IOException ex) {
-            Logger.getLogger(Sct2_ConRecord.class.getName()).log(Level.SEVERE, null, ex);
-
-
-
-
             throw new MojoFailureException(
                     "error parsing rf2 concepts", ex);
         }
@@ -268,7 +264,8 @@ class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
         return conSnoIdL + TAB_CHARACTER + isActive + TAB_CHARACTER + isPrimitiveB;
     }
 
-    public void writeArf(BufferedWriter writer) throws IOException, TerminologyException, ParseException {
+    public void writeArf(BufferedWriter writer)
+            throws IOException, TerminologyException, ParseException {
         // Concept UUID
         writer.append(Rf2x.convertIdToUuidStr(conSnoIdL) + TAB_CHARACTER);
 
@@ -289,8 +286,14 @@ class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
         // Effective Date yyyy-MM-dd HH:mm:ss
         writer.append(Rf2x.convertTimeToDate(timeL) + TAB_CHARACTER);
 
-        // Path UUID
-        writer.append(pathStr + LINE_TERMINATOR);
+        // Path UUID String
+        writer.append(this.pathUuidStr + TAB_CHARACTER);
+
+        // Author UUID String --> user
+        writer.append(Rf2Defaults.getAuthorUuidStr() + TAB_CHARACTER);
+
+        // Module UUID String
+        writer.append(this.moduleUuidStr + LINE_TERMINATOR);
     }
 
     @Override
