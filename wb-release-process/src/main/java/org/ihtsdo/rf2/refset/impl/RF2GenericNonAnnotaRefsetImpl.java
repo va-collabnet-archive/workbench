@@ -56,26 +56,31 @@ public class RF2GenericNonAnnotaRefsetImpl extends RF2AbstractImpl {
 				logger.info("Enclosing concept " + refexVersionBI.getNid());
 				logger.info("Enclosing concept " + refexVersionBI.getEnclosingConcept().getConceptNid());
 				ConceptChronicleBI concept2 = null;
-				try {
-					concept2 = Ts.get().getConceptForNid(refexVersionBI.getReferencedComponentNid());
-				} catch (Exception e) {
-				}
-				if (concept2 == null) {
+//				try {
+//					concept2 = Ts.get().getConceptForNid(refexVersionBI.getReferencedComponentNid());
+//				} catch (Exception e) {
+//				}
+//				if (concept2 == null) {
 					I_DescriptionVersioned desc = tf.getDescription(refexVersionBI.getReferencedComponentNid());
 					if (desc != null) {
 						logger.info("Description: " + desc.getConceptNid());
 						logger.info("Description: " + desc.getDescId());
 					}
-					concept2 = Ts.get().getConceptForNid(desc.getDescId());
-				}
-				if (concept2 != null) {
-					String conceptid = getConceptId(concept2);
-					refsetuuid = Type5UuidFactory.get(sctidUuid.getSctid() + conceptid);
+
+					String descrID = getDescriptionId(desc.getDescId(),ExportUtil.getSnomedCorePathNid());
+					refsetuuid = Type5UuidFactory.get(sctidUuid.getSctid() + descrID);
 					effectiveTime = getDateFormat().format(new Date(refexVersionBI.getTime()));
-					writeRF2TypeLine(refsetuuid, effectiveTime, "1", moduleid, sctidUuid.getUuid(), conceptid);
-				}else{
-					logger.info("CONCEPT NOT FOUND");
-				}
+					
+					writeRF2TypeLine(refsetuuid, "20120810", "1", moduleid, sctidUuid.getUuid(), descrID);
+//				}
+//				if (concept2 != null) {
+//					String conceptid = getConceptId(concept2);
+//					refsetuuid = Type5UuidFactory.get(sctidUuid.getSctid() + conceptid);
+//					effectiveTime = getDateFormat().format(new Date(refexVersionBI.getTime()));
+//					writeRF2TypeLine(refsetuuid, effectiveTime, "1", moduleid, sctidUuid.getUuid(), conceptid);
+//				}else{
+//					logger.info("CONCEPT NOT FOUND");
+//				}
 			}
 		} catch (IOException e) {
 			logger.error("IOExceptions: " + e.getMessage());
