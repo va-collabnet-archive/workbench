@@ -56,9 +56,9 @@ public class ConcurrentReentrantLocks extends ConcurrencyLocks {
    }
 
    private void setupLocks() {
-      locks = new ReentrantLock[getConcurrencyLevel()];
+      locks = new ReentrantLock[concurrencyLevel];
 
-      for (int i = 0; i < getConcurrencyLevel(); i++) {
+      for (int i = 0; i < concurrencyLevel; i++) {
          locks[i] = new ReentrantLock();
       }
    }

@@ -25,7 +25,7 @@ package org.ihtsdo.concurrency;
  * @author kec
  */
 public abstract class ConcurrencyLocks {
-   private final int   concurrencyLevel;
+   protected final int   concurrencyLevel;
    private int   sshift           = 0;
    private int   ssize            = 1;
    protected int segmentMask;
