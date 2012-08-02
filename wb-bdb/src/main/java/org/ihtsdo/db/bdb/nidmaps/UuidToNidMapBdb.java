@@ -39,6 +39,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.ihtsdo.concurrency.ConcurrentReentrantReadWriteLocks;
 
 /**
  *
@@ -50,7 +51,7 @@ public class UuidToNidMapBdb extends ComponentBdb {
 
    //~--- fields --------------------------------------------------------------
 
-   private ConcurrencyLocks                             locks                     = new ConcurrencyLocks();
+   private ConcurrentReentrantReadWriteLocks            locks                     = new ConcurrentReentrantReadWriteLocks();
    private int                                          maxGenOneSize             = 10000;
    private int                                          maxGenTwoSize             = maxGenOneSize * 10;
    private ConcurrentSkipListSet<Short>                 loadedDbKeys              =

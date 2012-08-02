@@ -83,7 +83,7 @@ public class RelationshipRevision extends Revision<RelationshipRevision, Relatio
     public RelationshipRevision(TupleInput input, Relationship primordialRel) {
         super(input.readInt(), primordialRel);
         this.characteristicNid = input.readInt();
-        this.group = input.readInt();
+        this.group = input.readSortedPackedInt();
         this.refinabilityNid = input.readInt();
         this.typeNid = input.readInt();
     }
@@ -218,7 +218,7 @@ public class RelationshipRevision extends Revision<RelationshipRevision, Relatio
     @Override
     public void writeFieldsToBdb(TupleOutput output) {
         output.writeInt(characteristicNid);
-        output.writeInt(group);
+        output.writeSortedPackedInt(group);
         output.writeInt(refinabilityNid);
         output.writeInt(typeNid);
     }

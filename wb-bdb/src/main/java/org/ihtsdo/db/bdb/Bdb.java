@@ -4,6 +4,7 @@ import com.sleepycat.je.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -754,7 +755,7 @@ public class Bdb {
     }
     
     public static List<NidPairForRefex> getRefsetPairs(int nid) {
-        return Bdb.getRefsetPairs(nid);
+        return Arrays.asList(Bdb.getNidCNidMap().getRefsetPairs(nid));
     }
     
     public static void addXrefPair(int nid, NidPairForRefex pair) throws IOException {

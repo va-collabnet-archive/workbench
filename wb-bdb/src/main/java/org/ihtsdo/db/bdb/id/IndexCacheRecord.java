@@ -19,14 +19,17 @@
 package org.ihtsdo.db.bdb.id;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.util.NidPairForRefex;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.cern.colt.list.IntArrayList;
+import org.ihtsdo.concept.component.relationship.Relationship.Version;
 import org.ihtsdo.helper.version.RelativePositionComputerBI;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
@@ -222,13 +225,26 @@ public class IndexCacheRecord {
     * @param vc
     * @return int[] of relationship nids that point to this component
     */
-   public int[] getDestRelNids(int cNid, ViewCoordinate vc) {
-      throw new UnsupportedOperationException("Not yet implemented");
+   public int[] getDestRelNids(int cNid, ViewCoordinate vc) throws IOException {
+        Collection<Relationship> destinationRels = getDestRels(cNid);
+        ArrayList destRelNids = new ArrayList();
+        for(Relationship rel : destinationRels){
+           List<Version> versions = rel.getVersions(vc);
+           if(versions != null){
+               destRelNids.add(rel.getNid());
+           }
+        }
+        int[] destRelNidsArray = new int[destRelNids.size()];
+        for(int i = 0; i < destRelNids.size(); i++ ){
+            destRelNidsArray[i] = destRelNids.indexOf(i);
+        }
+        
+        return destRelNidsArray;
    }
 
    public Collection<Relationship> getDestRels(int cNid) throws IOException {
       HashSet<Relationship> returnValues = new HashSet<>();
-      int[]                 originCNids  = getDestinationOriginNids();
+      int[]                 originCNids  = getDestinationOriginNids(); //is 0
 
       for (int originCNid : originCNids) {
          Concept c = Concept.get(originCNid);
