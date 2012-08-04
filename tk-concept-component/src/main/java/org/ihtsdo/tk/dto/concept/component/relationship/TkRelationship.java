@@ -44,9 +44,6 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
             RevisionHandling revisionHandling) throws IOException {
         super(relationshipVersion.getPrimordialVersion());
         TerminologyStoreDI ts = Ts.get();
-        if(relationshipVersion.getConceptNid() == -2147483638){
-            System.out.println("** Found it");
-        }
         if (revisionHandling == RevisionHandling.EXCLUDE_REVISIONS) {
             c1Uuid = ts.getUuidPrimordialForNid(relationshipVersion.getConceptNid());
             c2Uuid = ts.getUuidPrimordialForNid(relationshipVersion.getTargetNid());
