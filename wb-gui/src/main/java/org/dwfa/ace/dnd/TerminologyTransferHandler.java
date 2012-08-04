@@ -289,7 +289,7 @@ public class TerminologyTransferHandler extends TransferHandler {
                                 return new DescriptionTransferable(desc);
                             case PATH:
                                 return new ConceptTransferable(Terms.get().getConcept(desc.getPathNid()));
-                            case DESC_NID:
+                            case DESC_ID:
                                 return new StringSelection(desc.toString());
                             case VERSION:
                                 return new StringSelection(new Date(desc.getTime()).toString());
