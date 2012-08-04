@@ -536,9 +536,6 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
       @Override
       public boolean add(Relationship e) {
          try {
-            if (e == null) {
-               AceLog.getAppLog().info("found it");
-            }
 
             assert e != null : "Relationship is null processing:\n" + this;
 
