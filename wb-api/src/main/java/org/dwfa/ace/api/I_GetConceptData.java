@@ -483,7 +483,7 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
      * @return
      * @throws IOException
      */
-    public I_RepresentIdSet getPossibleChildOfConcepts(I_ConfigAceFrame configFrame) throws IOException;
+    public I_RepresentIdSet getPossibleChildOfConcepts(I_ConfigAceFrame configFrame) throws IOException, ContradictionException;
 
     public List<I_Identify> getUncommittedIdVersioned();
 

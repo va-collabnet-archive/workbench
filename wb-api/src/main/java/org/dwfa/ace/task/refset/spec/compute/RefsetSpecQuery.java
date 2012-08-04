@@ -296,7 +296,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     @Override
     public I_RepresentIdSet getPossibleConcepts(final I_RepresentIdSet parentPossibleConcepts,
             Collection<I_ShowActivity> activities)
-            throws IOException, ComputationCanceled {
+            throws IOException, ComputationCanceled, ContradictionException {
         if (!continueComputation) {
             throw new ComputationCanceled("Compute cancelled");
         }

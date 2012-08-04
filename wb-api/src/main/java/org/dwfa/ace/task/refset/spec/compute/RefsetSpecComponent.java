@@ -74,7 +74,7 @@ public abstract class RefsetSpecComponent {
 			TerminologyException, ContradictionException;
 
     public abstract I_RepresentIdSet getPossibleConcepts(I_RepresentIdSet parentPossibleConcepts,
-            Collection<I_ShowActivity> activities) throws IOException, ComputationCanceled;
+            Collection<I_ShowActivity> activities) throws IOException, ComputationCanceled, ContradictionException;
 
     public abstract I_RepresentIdSet getPossibleDescriptions(I_RepresentIdSet parentPossibleConcepts,
             Collection<I_ShowActivity> activities) throws IOException, ComputationCanceled;

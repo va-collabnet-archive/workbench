@@ -99,7 +99,7 @@ public class ConceptStatement extends RefsetSpecStatement {
 
     @Override
     public I_RepresentIdSet getPossibleConcepts(I_RepresentIdSet parentPossibleConcepts,
-            Collection<I_ShowActivity> activities) throws IOException, ComputationCanceled {
+            Collection<I_ShowActivity> activities) throws IOException, ComputationCanceled, ContradictionException {
         I_ShowActivity activity = null;
         long startTime = System.currentTimeMillis();
         this.activities = activities;
