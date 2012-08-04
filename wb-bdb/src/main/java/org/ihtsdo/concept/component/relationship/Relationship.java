@@ -290,7 +290,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         int additionalVersionCount = input.readSortedPackedInt();
 
         if (additionalVersionCount > 0) {
-            revisions = new RevisionSet<RelationshipRevision, Relationship>(primordialSapNid);
+            revisions = new RevisionSet<>(primordialSapNid);
 
             for (int i = 0; i < additionalVersionCount; i++) {
                 revisions.add(new RelationshipRevision(input, this));
