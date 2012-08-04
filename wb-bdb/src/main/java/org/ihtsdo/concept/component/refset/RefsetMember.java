@@ -563,7 +563,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
     }
 
     public List<RefsetMember<R, C>.Version> getVersions(ViewCoordinate c, long time) {
-        List<RefsetMember<R, C>.Version> returnTuples = new ArrayList<RefsetMember<R, C>.Version>(2);
+        List<RefsetMember<R, C>.Version> returnTuples = new ArrayList<>(2);
 
         getVersionComputer().addSpecifiedVersions(c.getAllowedStatusNids(), (NidSetBI) null,
                 c.getPositionSet(), returnTuples, getVersions(), c.getPrecedence(),
@@ -583,7 +583,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
         if ((this.refsetNid == Integer.MAX_VALUE) || (this.refsetNid == collectionNid)
                 || (getTime() == Long.MAX_VALUE)) {
             if (this.refsetNid != collectionNid) {
-                if ((this.refsetNid != 0) && (this.nid != 0)) {
+                if (this.refsetNid != 0 && this.refsetNid != Integer.MAX_VALUE && this.nid != 0) {
                     NidPairForRefex oldNpr = NidPair.getRefexNidMemberNidPair(this.refsetNid, this.nid);
 
                     Bdb.forgetXrefPair(this.referencedComponentNid, oldNpr);
@@ -601,7 +601,10 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
     @Override
     public void setReferencedComponentNid(int referencedComponentNid) {
         if (this.referencedComponentNid != referencedComponentNid) {
-            if ((this.refsetNid != 0) && (this.nid != 0)) {
+            if (this.referencedComponentNid != Integer.MAX_VALUE && 
+                    this.refsetNid != 0 && 
+                    this.refsetNid != Integer.MAX_VALUE && 
+                    this.nid != 0) {
                 NidPairForRefex oldNpr = NidPair.getRefexNidMemberNidPair(this.refsetNid, this.nid);
 
                 Bdb.forgetXrefPair(this.referencedComponentNid, oldNpr);
