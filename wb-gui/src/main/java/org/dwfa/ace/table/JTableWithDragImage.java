@@ -146,10 +146,10 @@ public class JTableWithDragImage extends JTable {
          DESC_FIELD          field = (DESC_FIELD) getColumnModel().getColumn(column).getIdentifier();
 
          switch (field) {
-         case DESC_ID :
+         case DESC_NID :
             throw new UnsupportedOperationException();
 
-         case CON_ID :
+         case CON_NID :
             return new ConceptTransferable(Terms.get().getConcept(swdt.getTuple().getConceptNid()));
 
          case TEXT :

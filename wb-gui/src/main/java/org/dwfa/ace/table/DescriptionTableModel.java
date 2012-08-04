@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.EventObject;
 import java.util.TimerTask;
+import java.util.UUID;
 import java.util.logging.Level;
 
 import javax.swing.DefaultCellEditor;
@@ -45,11 +46,17 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.timer.UpdateAlertsTimer;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.ihtsdo.arena.spec.AcceptabilityType;
 import org.ihtsdo.arena.spec.Refsets;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
+import org.ihtsdo.tk.api.id.IdBI;
+import org.ihtsdo.tk.api.id.LongIdBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
@@ -67,8 +74,8 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
     public enum DESC_FIELD {
 
         SCORE("score", 5, 75, 75),
-        DESC_ID("did", 5, 100, 100),
-        CON_ID("cid", 5, 100, 100),
+        DESC_NID("dnid", 5, 100, 100),
+        CON_NID("cnid", 5, 100, 100),
         TEXT("text", 5, 300, 2000),
         LANG("lang", 5, 35, 55),
         CASE_FIXED("case", 5, 35, 55),
@@ -76,7 +83,9 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
         AUTHOR("author", 5, 90, 150),
         TYPE("type", 5, 85, 450),
         VERSION("time", 5, 140, 140),
-        PATH("path", 5, 90, 150);
+        PATH("path", 5, 90, 150),
+        DESC_ID("id", 5, 100, 300),
+        DESC_FSN("fsn", 5, 100, 2000);
         private String columnName;
         private int min;
         private int pref;
@@ -160,9 +169,9 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
             switch (columns[columnIndex]) {
                 case SCORE:
                     return new StringWithDescTuple(getScore(rowIndex), desc, false, inConflict);
-                case DESC_ID:
+                case DESC_NID:
                     return new StringWithDescTuple(Integer.toString(desc.getDescId()), desc, false, inConflict);
-                case CON_ID:
+                case CON_NID:
                     return new StringWithDescTuple(Integer.toString(desc.getConceptNid()), desc, false, inConflict);
                 case TEXT:
                     if (BasicHTML.isHTMLString(desc.getText())) {
@@ -204,6 +213,22 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
                         return new StringWithDescTuple(Integer.toString(desc.getPathNid()) + " no pref desc...", desc,
                                 false, inConflict);
                     }
+                case DESC_FSN:
+                    ConceptChronicleBI conceptChronicle = Ts.get().getConceptForNid(desc.getNid());
+                    ConceptVersionBI conceptVersion = conceptChronicle.getVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+                    return new StringWithDescTuple(conceptVersion.getDescriptionFullySpecified().getText(), desc, false, inConflict);
+                case DESC_ID:
+                    Long sctId = null;
+                    for(IdBI id : desc.getAllIds()){
+                        if(id.getAuthorityNid() == Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids())){
+                            sctId = ((LongIdBI)id).getDenotation();
+                            break;
+                        }
+                    }
+                    if(sctId != null){
+                        return new StringWithDescTuple(Long.toString(sctId), desc, false, inConflict);
+                    }
+                    return new StringWithDescTuple(desc.getPrimUuid().toString(), desc, false, inConflict);
             }
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
@@ -277,9 +302,9 @@ protected abstract I_DescriptionTuple getDescription(int rowIndex) throws IOExce
             boolean changed = false;
             if (desc.getTime() == Long.MAX_VALUE) {
                 switch (columns[col]) {
-                    case DESC_ID:
+                    case DESC_NID:
                         break;
-                    case CON_ID:
+                    case CON_NID:
                         break;
                     case TEXT:
                         desc.setText(value.toString());
@@ -374,13 +399,13 @@ UpdateDataAlertsTimerTask alertUpdater;
 
 <?> getColumnClass(int c) {
         switch (columns[c]) {
-            case DESC_ID:
+            case DESC_NID:
                 return Number.class  
 
     ;
             
     
-    case CON_ID
+    case CON_NID
     
     :
                 return Number.

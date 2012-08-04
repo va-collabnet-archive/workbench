@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -162,6 +163,38 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
                         conceptListModel.addElement(cb);
                     }
                 }
+            } catch (Exception ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+            }
+        }
+    }
+    public class ShowFsn implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+                DESC_FIELD[] oldColumns = model.getColumnEnums();
+                DESC_FIELD[] newColumns = Arrays.copyOf(oldColumns, oldColumns.length + 1);
+                newColumns[oldColumns.length] = DESC_FIELD.DESC_FSN;
+                model.setColumns(newColumns);
+        }
+    }
+    
+    public class ShowConceptId implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            DESC_FIELD[] oldColumns = model.getColumnEnums();
+                DESC_FIELD[] newColumns = Arrays.copyOf(oldColumns, oldColumns.length + 1);
+                newColumns[oldColumns.length] = DESC_FIELD.CON_NID;
+                model.setColumns(newColumns);
+        }
+    }
+    
+    public class ShowLineageView implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
             } catch (Exception ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
             }
@@ -625,6 +658,24 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         addToList.addActionListener(new AddToList());
         addToList.setToolTipText("add concepts from search results to list view");
         add(addToList, gbc);
+        
+//        gbc.gridx++;
+////        addToList = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/trunk-red.png")));
+//        addToList.addActionListener(new ShowFsn());
+//        addToList.setToolTipText("show fsn for concept that contains description");
+//        add(addToList, gbc);
+//        
+//        gbc.gridx++;
+////        addToList = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/id_card.png")));
+//        addToList.addActionListener(new ShowConceptId());
+//        addToList.setToolTipText("show concept SCTID (UUID)");
+//        add(addToList, gbc);
+//        
+//        gbc.gridx++;
+////        addToList = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/nav_up_right_green.png")));
+//        addToList.addActionListener(new ShowLineageView());
+//        addToList.setToolTipText("show linage for conept that contains description");
+//        add(addToList, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -645,7 +696,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
 
         model =
                 new DescriptionsFromCollectionTableModel(new DESC_FIELD[]{DESC_FIELD.SCORE, DESC_FIELD.STATUS,
-                    DESC_FIELD.TEXT, DESC_FIELD.TYPE}, config);
+                    DESC_FIELD.TEXT, DESC_FIELD.DESC_ID, DESC_FIELD.DESC_FSN, DESC_FIELD.TYPE}, config);
         descTable = new JTableWithDragImage(model);
         descTable.setAutoCreateColumnsFromModel(true);
         
