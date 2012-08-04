@@ -58,12 +58,6 @@ public class BinaryLoad {
 		            while (true) {
 		            	conceptsRead.incrementAndGet();
 		            	EConcept eConcept = new EConcept(in);
-		            	if (eConcept.getConceptAttributes().getUuids().contains(
-		            		UUID.fromString("181e45e8-b05a-33da-8b52-7027cbee6856")) ||
-		            		eConcept.getConceptAttributes().primordialUuid.getMostSignificantBits() ==
-		            			1737903371905020890L) {
-		            		System.out.println("Found it...");
-		            	}
 		            	for (TkDescription d: eConcept.getDescriptions()) {
 		            		if (d.revisions != null) {
 		            			if (d.getText().startsWith("concept retired")) {
