@@ -52,6 +52,8 @@ import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.ExpandVetoException;
 import javax.swing.tree.TreePath;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 /**
  *
@@ -165,6 +167,9 @@ public class NodeFactory {
     
     public TaxonomyNode makeNode(ConceptVersionBI nodeConcept, int parentCnid, TaxonomyNode parentNode)
             throws ContradictionException, IOException {
+        if(nodeConcept.getPrimUuid().equals(UUID.fromString("68ce08de-83c2-3ab3-999b-5cd165b29566"))){
+            System.out.println("oops");
+        }
         if (model.ts.getPossibleChildren(nodeConcept.getNid()).length == 0) {
             boolean multiParent = false;
             
@@ -305,7 +310,7 @@ public class NodeFactory {
         //~--- constructors -----------------------------------------------------
         public ChildFinder(ConceptVersionBI parent, TaxonomyNode parentNode, CancelableBI worker,
                 ChildNodeFilterBI childFilter)
-                throws IOException {
+                throws IOException, ContradictionException {
             this.worker = worker;
             this.parent = parent;
             this.parentNode = parentNode;

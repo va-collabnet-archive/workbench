@@ -275,7 +275,7 @@ public class TerminologyTransferHandler extends TransferHandler {
                             DESC_FIELD columnDesc = (DESC_FIELD) column.getIdentifier();
                             switch (columnDesc) {
 
-                            case CON_ID:
+                            case CON_NID:
                                 return new ConceptTransferable(Terms.get().getConcept(desc.getConceptNid()));
                             case STATUS:
                                 return new ConceptTransferable(Terms.get().getConcept(desc.getStatusNid()));
@@ -289,7 +289,7 @@ public class TerminologyTransferHandler extends TransferHandler {
                                 return new DescriptionTransferable(desc);
                             case PATH:
                                 return new ConceptTransferable(Terms.get().getConcept(desc.getPathNid()));
-                            case DESC_ID:
+                            case DESC_NID:
                                 return new StringSelection(desc.toString());
                             case VERSION:
                                 return new StringSelection(new Date(desc.getTime()).toString());

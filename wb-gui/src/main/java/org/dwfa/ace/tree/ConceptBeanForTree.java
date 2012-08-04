@@ -599,7 +599,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
    }
 
    @Override
-   public I_RepresentIdSet getPossibleChildOfConcepts(I_ConfigAceFrame configFrame) throws IOException {
+   public I_RepresentIdSet getPossibleChildOfConcepts(I_ConfigAceFrame configFrame) throws IOException, ContradictionException {
       return bean.getPossibleChildOfConcepts(configFrame);
    }
 

@@ -30,6 +30,10 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.SwingWorker;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.util.swing.GuiUtil;
 
 class UpdateTreeSpec extends SwingWorker<RefsetSpecTreeNode, Object> {
@@ -50,7 +54,7 @@ class UpdateTreeSpec extends SwingWorker<RefsetSpecTreeNode, Object> {
    private I_GetConceptData    localRefsetSpecConcept;
    private RefsetSpecTreeNode  newSelectedNode;
    private RefsetSpecTreeNode  oldRoot;
-   private I_GetConceptData    refsetConcept;
+   private ConceptChronicleBI    refsetConcept;
 
    /**
     *
@@ -126,8 +130,6 @@ class UpdateTreeSpec extends SwingWorker<RefsetSpecTreeNode, Object> {
          }
       }
 
-      IntSet relTypes = new IntSet();
-
       this.refsetSpecEditor.refsetSpecConcept = null;
 
       if (cancel) {
@@ -135,19 +137,13 @@ class UpdateTreeSpec extends SwingWorker<RefsetSpecTreeNode, Object> {
       }
 
       if (refsetConcept != null) {
-         relTypes.add(RefsetAuxiliary.Concept.SPECIFIES_REFSET.localize().getNid());
-
-         List<? extends I_RelTuple> refsetSpecTuples =
-            refsetConcept.getDestRelTuples(
-                this.refsetSpecEditor.ace.getAceFrameConfig().getAllowedStatus(), relTypes,
-                this.refsetSpecEditor.ace.getAceFrameConfig().getViewPositionSetReadOnly(),
-                this.refsetSpecEditor.ace.aceFrameConfig.getPrecedence(),
-                this.refsetSpecEditor.ace.aceFrameConfig.getConflictResolutionStrategy());
-
-         if ((refsetSpecTuples != null) && (refsetSpecTuples.size() > 0)) {
+           ConceptVersionBI refsetConceptVersion = refsetConcept.getVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+           Collection<? extends ConceptVersionBI> relationshipsTargetSourceConcepts = 
+                    refsetConceptVersion.getRelationshipsTargetSourceConcepts(RefsetAuxiliary.Concept.SPECIFIES_REFSET.localize().getNid());
+           if ((relationshipsTargetSourceConcepts != null) && (relationshipsTargetSourceConcepts.size() > 0)) {
             this.refsetSpecEditor.refsetSpecConcept =
-               Terms.get().getConcept(refsetSpecTuples.get(0).getC1Id());
-            localRefsetSpecConcept = Terms.get().getConcept(refsetSpecTuples.get(0).getC1Id());
+               (I_GetConceptData) relationshipsTargetSourceConcepts.iterator().next().getChronicle();
+            localRefsetSpecConcept = this.refsetSpecEditor.refsetSpecConcept;
          }
       }
 
