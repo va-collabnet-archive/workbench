@@ -22,6 +22,7 @@ import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
 import org.ihtsdo.concept.*;
 import org.ihtsdo.concept.component.relationship.Relationship;
+import org.ihtsdo.concept.component.relationship.Relationship.Version;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
 import org.ihtsdo.db.change.ChangeNotifier;
@@ -540,9 +541,27 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
 
     @Override
     public int[] getPossibleChildren(int parentNid, ViewCoordinate vc) throws IOException {
-        return Bdb.getNidCNidMap().getDestRelNids(parentNid, vc);
+        Collection<Relationship> destinationRels = Bdb.getNidCNidMap().getDestRels(parentNid);
+        ArrayList<Integer> relNids = new ArrayList<>();
+        NidSetBI relTypeNids = vc.getIsaTypeNids();
+        for(Relationship rel : destinationRels){
+           List<Version> versions = rel.getVersions(vc);
+           for(Version v: versions){
+               if(relTypeNids.contains(v.getTypeNid())){
+                   relNids.add(rel.getConceptNid());
+                   break;
+               }
+           }
+        }
+        int[] destNidsArray = new int[relNids.size()];
+        for(int i = 0; i < relNids.size(); i++ ){
+            destNidsArray[i] = relNids.get(i);
+        }
+        
+        return destNidsArray;
     }
-
+    
+    
     @Override
     public int getReadOnlyMaxSap() {
         return Bdb.getSapDb().getReadOnlyMax();

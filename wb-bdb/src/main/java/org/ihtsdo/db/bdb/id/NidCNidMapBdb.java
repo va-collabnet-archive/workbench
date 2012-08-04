@@ -12,8 +12,10 @@ import com.sleepycat.je.OperationStatus;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
@@ -360,6 +362,22 @@ public class NidCNidMapBdb extends ComponentBdb {
          locks.unlock(concept.getNid());
       }
    }
+   
+   public int[] getChildrenConceptNids(int conceptNid, ViewCoordinate viewCoordinate) throws IOException, ContradictionException {
+       Set<Integer> nidList = new HashSet<>();
+      for (int cNid: getIndexCacheRecord(conceptNid).getDestinationOriginNids()) {
+          if (isChildOf(cNid, conceptNid, viewCoordinate)) {
+              nidList.add(cNid);
+          }
+      }
+      int[] childrenConceptNids = new int[nidList.size()];
+      int i = 0;
+      for (Integer cNid: nidList) {
+          childrenConceptNids[i++] = cNid;
+      }
+      
+      return childrenConceptNids;
+   }
 
    private void writeChangedMaps() throws IOException {
       rwl.writeLock().lock();
@@ -501,6 +519,26 @@ public class NidCNidMapBdb extends ComponentBdb {
       }
 
       return false;
+   }
+   
+   
+   public boolean isChildOf(int childNid, int parentNid, ViewCoordinate vc)
+           throws IOException, ContradictionException {
+       if (childNid == parentNid) {
+           return false;
+       }
+      IndexCacheRecord     indexCacheRecord = getIndexCacheRecord(childNid);
+      Iterator<PositionBI> viewPositionItr  = vc.getPositionSet().iterator();
+      PositionBI           position         = viewPositionItr.next();
+
+      if (viewPositionItr.hasNext()) {
+         throw new UnsupportedOperationException(
+             "Can only determine is kind of with a single view position. " + vc);
+      }
+
+      RelativePositionComputerBI computer = RelativePositionComputer.getComputer(position);
+
+      return indexCacheRecord.isChildOf(parentNid, vc, computer);
    }
 
    public boolean isKindOf(int childNid, int parentNid, ViewCoordinate vc)

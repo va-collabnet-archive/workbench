@@ -425,7 +425,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
             AceLog.getAppLog().info("Nid has null component: " + componentNid);
         } else {
             UUID memberUuid = generateUuid(Ts.get().getConcept(refsetNid).getPrimUuid(), Ts.get().getComponent(componentNid).getPrimUuid(), Ts.get().getConcept(memberTypeNid).getPrimUuid());
-            if (Ts.get().hasUuid(memberUuid)) {
+            if (Ts.get().hasUuid(memberUuid) && Ts.get().getComponent(memberUuid) != null) {
                 RefexChronicleBI<?> existingMember = (RefexChronicleBI) Ts.get().getComponent(memberUuid);
 
                 RefexVersionBI<?> existingVersion = existingMember.getVersion(config.getViewCoordinate().getViewCoordinateWithAllStatusValues());

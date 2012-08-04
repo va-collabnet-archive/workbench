@@ -1437,7 +1437,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     @Deprecated
     public Set<Concept> getDestRelOrigins(NidSetBI allowedStatus, NidSetBI allowedTypes,
             PositionSetBI positions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
-            throws IOException {
+            throws IOException, TerminologyException {
         Set<Concept> returnValues = new HashSet<Concept>();
 
         for (I_RelTuple rel :
@@ -1462,9 +1462,23 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     @Override
     public List<I_RelTuple> getDestRelTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
             PositionSetBI positions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
-            throws IOException {
-//TODO -- ISA CACHE CHANGE: could upgrade to use rel version and cast to rel tuple if this is too problematic
-        throw new UnsupportedOperationException("Ugrade to using RelationshipVersion.");
+            throws IOException, TerminologyException {
+            ViewCoordinate coordinate = new ViewCoordinate(precedencePolicy, positions, allowedStatus,
+                allowedTypes, contradictionManager, Integer.MIN_VALUE,
+                Terms.get().getActiveAceFrameConfig().getViewCoordinate().getClassifierNid(),
+                Terms.get().getActiveAceFrameConfig().getViewCoordinate().getRelationshipAssertionType(),
+                null, null);
+        List<I_RelTuple> actualValues = new ArrayList<I_RelTuple>();
+
+        for (Relationship rel : getDestRels(coordinate.getIsaTypeNids())) {
+            for (Relationship.Version relv : rel.getVersions(coordinate)) {
+                if (coordinate.getIsaTypeNids().contains(relv.getTypeNid())) {
+                    actualValues.addAll(rel.getVersions(coordinate));
+                }
+            }
+        }
+
+        return actualValues;
     }
 
     @Override
@@ -1725,9 +1739,13 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     }
 
     @Override
-    public I_RepresentIdSet getPossibleChildOfConcepts(I_ConfigAceFrame config) throws IOException {
-//        TODO -- ISA CACHE CHANGE: Need to re-implement
-        throw new UnsupportedOperationException("Need to re-implement after isa chache changes.");
+    public I_RepresentIdSet getPossibleChildOfConcepts(I_ConfigAceFrame config) throws IOException, ContradictionException {
+        NidBitSetBI childNidSet = Ts.get().getEmptyNidSet();
+        int[] childrenConceptNids = Bdb.getNidCNidMap().getChildrenConceptNids(nid, config.getViewCoordinate());
+        for(int childNid : childrenConceptNids){
+            childNidSet.setMember(childNid);
+        }
+        return (I_RepresentIdSet) childNidSet;
     }
     /**
      * 
@@ -1761,7 +1779,8 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     
     private void collectPossibleKindOf(NidSetBI isATypes, NidBitSetBI possibleKindOfConcepts, int cNid)
            throws IOException {
-      for (int cNidForOrigin : Bdb.getNidCNidMap().getDestRelNids(cNid, isATypes)) {
+      for (int relNid : Bdb.getNidCNidMap().getDestRelNids(cNid, isATypes)) {
+         int cNidForOrigin = Bdb.getConceptNid(relNid);
          if (possibleKindOfConcepts.isMember(cNidForOrigin) == false) {
             possibleKindOfConcepts.setMember(cNidForOrigin);
             collectPossibleKindOf(isATypes, possibleKindOfConcepts, cNidForOrigin);

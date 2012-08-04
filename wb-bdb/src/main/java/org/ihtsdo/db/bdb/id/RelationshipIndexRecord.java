@@ -223,6 +223,7 @@ public class RelationshipIndexRecord implements Iterable<RelationshipIndexRecord
 
                         break;
 
+                     case EQUAL:
                      case BEFORE :
                         break;
 
