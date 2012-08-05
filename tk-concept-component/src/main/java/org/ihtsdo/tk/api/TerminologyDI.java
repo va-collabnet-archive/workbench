@@ -2,6 +2,8 @@ package org.ihtsdo.tk.api;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
+import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
@@ -9,8 +11,11 @@ import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
+import org.ihtsdo.tk.api.search.ScoredComponentReference;
 
 public interface TerminologyDI {
+    
+   Collection<ScoredComponentReference> doTextSearch(String query) throws IOException, ParseException;;
 
    void addUncommitted(ConceptChronicleBI conceptChronicle) throws IOException;
 
