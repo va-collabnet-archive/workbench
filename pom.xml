@@ -244,7 +244,6 @@
 		<module>tk-drools</module>
 		<module>tk-arena-spec</module>
 		<module>tk-arena-rules</module>
-		<module>tk-helpers</module>
 		<module>tk-qa-ws-client</module>
 		<module>rule-engine-integration</module>
 		<module>tk-spelling-variants</module>
