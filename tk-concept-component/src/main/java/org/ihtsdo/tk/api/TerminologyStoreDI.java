@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -305,6 +306,8 @@ public interface TerminologyStoreDI extends TerminologyDI {
    @Deprecated
    void addPropertyChangeListener(CONCEPT_EVENT conceptEvent, PropertyChangeListener propertyChangeListener);
 
+   boolean hasExtension(int refsetNid, int componentNid);
+
    public enum CONCEPT_EVENT {
     PRE_COMMIT, POST_COMMIT, ADD_UNCOMMITTED;
    }
@@ -363,6 +366,10 @@ public interface TerminologyStoreDI extends TerminologyDI {
    
    boolean isKindOf(int childNid, int parentNid, ViewCoordinate vc)
            throws IOException, ContradictionException;
+   boolean isChildOf(int childNid, int parentNid, ViewCoordinate vc)
+            throws IOException, ContradictionException;
    
+   Set<Integer> getAncestors(int childNid, ViewCoordinate vc) throws IOException, ContradictionException;
+       
    int[] getIncomingRelationshipsSourceNids(int cNid, NidSetBI relTypes) throws IOException;
 }
