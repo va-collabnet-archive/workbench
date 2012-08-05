@@ -217,7 +217,7 @@ public class RelationshipIndexRecord implements Iterable<RelationshipIndexRecord
                   if (latestStamp == null) {
                      latestStamp = stampPoint;
                   } else {
-                     switch (computer.relativePosition(latestStamp, stampPoint)) {
+                     switch (computer.relativePosition(stampPoint, latestStamp)) {
                      case AFTER :
                         latestStamp = stampPoint;
 
