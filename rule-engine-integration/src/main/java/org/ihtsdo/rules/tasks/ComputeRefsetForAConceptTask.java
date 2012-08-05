@@ -179,7 +179,7 @@ public class ComputeRefsetForAConceptTask extends AbstractTask {
             AceLog.getAppLog().info("Concept to test = " + selectedConcept.toString());
             
             List<I_ShowActivity> activities = new ArrayList<I_ShowActivity>();
-            boolean result = query.execute(selectedConcept, activities);
+            boolean result = query.execute(selectedConcept.getNid(), selectedConcept, activities);
             
             AceLog.getAppLog().info("++++++++++++++ Result = " + result);
             AceLog.getAppLog().info("************ Finished test computation *****************");

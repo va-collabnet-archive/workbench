@@ -109,6 +109,7 @@ import org.mvel2.ast.IsDef;
 
 import com.googlecode.sardine.Sardine;
 import com.googlecode.sardine.SardineFactory;
+import org.ihtsdo.tk.api.ConceptFetcherSimple;
 
 /**
  * The Class RulesLibrary.
@@ -1299,7 +1300,7 @@ public class RulesLibrary {
 			// selectedConcept.toString());
 
 			List<I_ShowActivity> activities = new ArrayList<I_ShowActivity>();
-			result = query.execute(selectedConcept, activities);
+			result = query.execute(selectedConcept.getNid(), selectedConcept, activities);
 
 			// ArrayList<RefsetSpecComponent> components =
 			// query.getAllComponents();
