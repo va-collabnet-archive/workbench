@@ -5,8 +5,12 @@ import java.beans.PropertyChangeListener;
 import java.beans.VetoableChangeListener;
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.lucene.document.Document;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
@@ -25,6 +29,7 @@ import org.ihtsdo.concept.component.relationship.Relationship.Version;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
 import org.ihtsdo.db.change.ChangeNotifier;
+import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
@@ -37,6 +42,7 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
+import org.ihtsdo.tk.api.search.ScoredComponentReference;
 import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
@@ -95,7 +101,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     public void addUncommitted(ConceptVersionBI cv) throws IOException {
         addUncommitted(cv.getChronicle());
     }
-
+    
     @Override
     public void addUncommittedNoChecks(ConceptChronicleBI concept) throws IOException {
         BdbCommitManager.addUncommittedNoChecks(concept);
@@ -648,10 +654,26 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     public boolean isChildOf(int childNid, int parentNid, ViewCoordinate vc) throws IOException, ContradictionException {
         return Bdb.getNidCNidMap().isChildOf(childNid, parentNid, vc);
     }
-
+    
     @Override
     public int getNidFromAlternateId(UUID authorityUuid, String altId) throws IOException {
         return getNidForUuids(UuidFactory.getUuidFromAlternateId(authorityUuid, altId));
+    }
+    
+    @Override
+    public Collection<ScoredComponentReference> doTextSearch(String query) throws IOException, ParseException {
+        try {
+            SearchResult results = Terms.get().doLuceneSearch(query);
+            ArrayList<ScoredComponentReference> scoredResults = new ArrayList<>(results.topDocs.totalHits);
+            for (int i = 0; i < results.topDocs.totalHits; i++) {
+                Document doc = results.searcher.doc(results.topDocs.scoreDocs[i].doc);
+                ScoredComponentReference scr = new ScoredComponentReference(Integer.parseInt(doc.get("dnid")), results.topDocs.scoreDocs[i].score);
+                scoredResults.add(scr);
+            }
+            return scoredResults;
+        } catch (org.apache.lucene.queryParser.ParseException ex) {
+            throw new ParseException(query, 0);
+        }
     }
 
     //~--- inner classes -------------------------------------------------------
@@ -819,11 +841,9 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     public Set<Integer> getAncestors(int childNid, ViewCoordinate vc) throws IOException, ContradictionException {
         return Bdb.getNidCNidMap().getAncestorNids(childNid, vc);
     }
-
+    
     @Override
     public boolean hasExtension(int refsetNid, int componentNid) {
         return Bdb.getNidCNidMap().hasExtension(refsetNid, componentNid);
     }
-    
-    
 }

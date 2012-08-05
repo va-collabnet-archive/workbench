@@ -15,6 +15,7 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 
 import java.util.Collection;
 import java.util.Map;
@@ -22,6 +23,7 @@ import java.util.Set;
 import java.util.UUID;
 import org.dwfa.vodb.types.Position;
 import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
+import org.ihtsdo.tk.api.search.ScoredComponentReference;
 import org.ihtsdo.tk.uuid.UuidFactory;
 
 public class BdbTerminologySnapshot implements TerminologySnapshotDI {
@@ -228,5 +230,10 @@ public class BdbTerminologySnapshot implements TerminologySnapshotDI {
     @Override
     public int getNidFromAlternateId(UUID authorityUuid, String altId) throws IOException {
         return store.getNidForUuids(UuidFactory.getUuidFromAlternateId(authorityUuid, altId));
+    }
+
+    @Override
+    public Collection<ScoredComponentReference> doTextSearch(String query) throws IOException, ParseException {
+        return store.doTextSearch(query);
     }
 }
