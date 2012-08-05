@@ -398,7 +398,7 @@ public class DescStatement extends RefsetSpecStatement {
                         possibleLuceneDescMatches = Terms.get().getEmptyIdSet();
                         for (int i = 0; i < results.topDocs.totalHits; i++) {
                             Document doc = results.searcher.doc(results.topDocs.scoreDocs[i].doc);
-
+                            
                             int cnid = Integer.parseInt(doc.get("cnid"));
                             int dnid = Integer.parseInt(doc.get("dnid"));
                             possibleLuceneDescMatches.setMember(dnid);
