@@ -22,8 +22,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -75,7 +73,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
         }
     }
 
-    public boolean getStatementResult(I_AmTermComponent component, GROUPING_TYPE version, PositionSetBI v1_is,
+    public boolean getStatementResult(int componentNid, Object component, GROUPING_TYPE version, PositionSetBI v1_is,
 			PositionSetBI v2_is) throws IOException {
 
         I_RelVersioned relVersioned = (I_RelVersioned) component;

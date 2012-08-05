@@ -125,7 +125,7 @@ public class DescStatement extends RefsetSpecStatement {
     }
 
     @Override
-    public boolean getStatementResult(I_AmTermComponent component, GROUPING_TYPE version, PositionSetBI v1_is,
+    public boolean getStatementResult(int componentNid, Object component, GROUPING_TYPE version, PositionSetBI v1_is,
             PositionSetBI v2_is) throws IOException, ContradictionException {
         if (I_DescriptionVersioned.class.isAssignableFrom(component.getClass())) {
             I_DescriptionVersioned descriptionVersioned = (I_DescriptionVersioned) component;

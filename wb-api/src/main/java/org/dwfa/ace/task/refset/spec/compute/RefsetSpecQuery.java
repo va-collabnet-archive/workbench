@@ -1,18 +1,14 @@
 /**
- * Copyright (c) 2009 International Health Terminology Standards Development
- * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ * Copyright (c) 2009 International Health Terminology Standards Development Organisation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and limitations under the License.
  */
 package org.dwfa.ace.task.refset.spec.compute;
 
@@ -30,6 +26,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -49,28 +47,26 @@ import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.thread.NamedThreadFactory;
 import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.KindOfCacheBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 
 /**
- * Represents the data provided by a refset spec. It can hold 0 or more
- * subqueries, and 0 or more statements. The query can be executed by passing in
- * a concept to test.
- * 
- * This class provides a preliminary optimization by providing a function to
- * return the possible concepts that should be tested based on the concepts in
- * the spec.
- * 
+ * Represents the data provided by a refset spec. It can hold 0 or more subqueries, and 0 or more statements.
+ * The query can be executed by passing in a concept to test.
+ *
+ * This class provides a preliminary optimization by providing a function to return the possible concepts that
+ * should be tested based on the concepts in the spec.
+ *
  * @author Chrissy Hill, Keith Campbell
- * 
+ *
  */
 public class RefsetSpecQuery extends RefsetSpecComponent {
 
     private static Executor refsetExecutorPool =
             Executors.newCachedThreadPool(
             new NamedThreadFactory(new ThreadGroup("RefsetSpecQuery "), "pool "));
-    public static KindOfCacheBI myStaticIsACache;
     private ArrayList<RefsetSpecQuery> subqueries;
     private ArrayList<RefsetSpecStatement> statements;
     private ArrayList<RefsetSpecComponent> allComponents;
@@ -246,7 +242,6 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             throws TerminologyException, IOException, ComputationCanceled {
 
         FutureTask task = new FutureTask(new Callable<I_RepresentIdSet>() {
-
             @Override
             public I_RepresentIdSet call() throws Exception {
                 return getPossibleConcepts(parentPossibleConcepts, activities);
@@ -519,21 +514,21 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         }
     }
 
-    public boolean execute(I_AmTermComponent component,
+    public boolean execute(int componentNid, I_AmTermComponent component,
             Collection<I_ShowActivity> activities) throws IOException,
             TerminologyException, ComputationCanceled, ContradictionException {
-        return execute(component, null, null, null, activities);
+        return execute(componentNid, component, null, null, null, activities);
     }
 
     /**
      * Executes the specified query.
-     * 
+     *
      * @return True if query conditions are met, false otherwise.
      * @throws TerminologyException
      * @throws IOException
      */
     @Override
-    public boolean execute(I_AmTermComponent component, GROUPING_TYPE version,
+    public boolean execute(int componentNid, Object component, GROUPING_TYPE version,
             PositionSetBI v1_is, PositionSetBI v2_is,
             Collection<I_ShowActivity> activities) throws IOException,
             TerminologyException, ComputationCanceled, ContradictionException {
@@ -559,7 +554,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
                     if (!continueComputation) {
                         throw new ComputationCanceled("Compute cancelled");
                     }
-                    if (!specComponent.execute(component, version, v1_is, v2_is, activities)) {
+                    if (!specComponent.execute(componentNid, component, version, v1_is, v2_is, activities)) {
                         // can exit the AND early, as at least one statement is
                         // returning false
                         return false;
@@ -580,7 +575,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
                     if (!continueComputation) {
                         throw new ComputationCanceled("Compute cancelled");
                     }
-                    if (specComponent.execute(component, version, v1_is, v2_is, activities)) {
+                    if (specComponent.execute(componentNid, component, version, v1_is, v2_is, activities)) {
                         // exit the OR statement early, as at least one statement
                         // has returned true
                         return true;
@@ -610,7 +605,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
                     if (!continueComputation) {
                         throw new ComputationCanceled("Compute cancelled");
                     }
-                    if (specComponent.execute(component, groupingType, v1_is,
+                    if (specComponent.execute(componentNid, component, groupingType, v1_is,
                             v2_is, activities)) {
                         // exit the OR statement early, as at least one statement
                         // has returned true
@@ -626,7 +621,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
 
     }
 
-    private boolean executeConceptContainsDesc(I_AmTermComponent component,
+    private boolean executeConceptContainsDesc(Object component,
             GROUPING_TYPE version, PositionSetBI v1_is, PositionSetBI v2_is,
             Collection<I_ShowActivity> activities)
             throws TerminologyException, IOException, ComputationCanceled, ContradictionException {
@@ -637,7 +632,16 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             //throw new TerminologyException("Spec is invalid - dangling concept-contains-desc.");
         }
 
-        I_GetConceptData descriptionConcept = (I_GetConceptData) component;
+        I_GetConceptData descriptionConcept;
+        if (component instanceof ConceptFetcherBI) {
+            try {
+                descriptionConcept = (I_GetConceptData) ((ConceptFetcherBI) component).fetch();
+            } catch (Exception ex) {
+                throw new IOException(ex);
+            }
+        } else {
+            descriptionConcept = (I_GetConceptData) component;
+        }
         List<? extends I_DescriptionTuple> descriptionTuples =
                 descriptionConcept.getDescriptionTuples(null, null,
                 termFactory.getActiveAceFrameConfig().getViewPositionSetReadOnly(),
@@ -651,7 +655,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
                 if (!continueComputation) {
                     throw new ComputationCanceled("Compute cancelled");
                 }
-                if (!statement.execute(descVersioned, version, v1_is, v2_is, activities)) {
+                if (!statement.execute(descVersioned.getNid(), descVersioned, version, v1_is, v2_is, activities)) {
                     // can exit the execution early, as at least one statement
                     // is returning false
                     valid = false;
@@ -665,7 +669,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
                 if (!continueComputation) {
                     throw new ComputationCanceled("Compute cancelled");
                 }
-                if (!subquery.execute(descVersioned, version, v1_is, v2_is, activities)) {
+                if (!subquery.execute(descVersioned.getNid(), descVersioned, version, v1_is, v2_is, activities)) {
                     // can exit the execution early, as at least one query is
                     // returning false
                     valid = false;
@@ -683,7 +687,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         return false; // no descriptions met criteria
     }
 
-    private boolean executeConceptContainsRel(I_AmTermComponent component,
+    private boolean executeConceptContainsRel(Object component,
             GROUPING_TYPE version, PositionSetBI v1_is,
             PositionSetBI v2_is, Collection<I_ShowActivity> activities)
             throws TerminologyException, IOException, ComputationCanceled, ContradictionException {
@@ -694,7 +698,16 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             //throw new TerminologyException("Spec is invalid - dangling concept-contains-rel.");
         }
 
-        I_GetConceptData relQueryConcept = (I_GetConceptData) component;
+        I_GetConceptData relQueryConcept;
+        if (component instanceof ConceptFetcherBI) {
+            try {
+                relQueryConcept = (I_GetConceptData) ((ConceptFetcherBI) component).fetch();
+            } catch (Exception ex) {
+                throw new IOException(ex);
+            }
+        } else {
+            relQueryConcept = (I_GetConceptData) component;
+        }
         Collection<? extends I_RelVersioned> relTuples = relQueryConcept.getSourceRels();
 
         for (I_RelVersioned versionedTuple : relTuples) {
@@ -704,7 +717,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
                 if (!continueComputation) {
                     throw new ComputationCanceled("Compute cancelled");
                 }
-                if (!statement.execute(versionedTuple, version, v1_is, v2_is, activities)) {
+                if (!statement.execute(versionedTuple.getNid(), versionedTuple, version, v1_is, v2_is, activities)) {
                     // can exit the execution early, as at least one statement
                     // is returning false
                     valid = false;
@@ -718,7 +731,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
                 if (!continueComputation) {
                     throw new ComputationCanceled("Compute cancelled");
                 }
-                if (!subquery.execute(versionedTuple, version, v1_is, v2_is, activities)) {
+                if (!subquery.execute(versionedTuple.getNid(), versionedTuple, version, v1_is, v2_is, activities)) {
                     // can exit the execution early, as at least one query is
                     // returning false
                     valid = false;
@@ -838,7 +851,6 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             throws TerminologyException, IOException, ComputationCanceled {
 
         FutureTask task = new FutureTask(new Callable<I_RepresentIdSet>() {
-
             @Override
             public I_RepresentIdSet call() throws Exception {
                 return getPossibleDescriptions(parentPossibleDescriptions, activities);

@@ -474,7 +474,7 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
      *         according to the relationships specified in the config.
      * @throws IOException
      */
-    public NidBitSetBI getPossibleKindOfConcepts(I_ConfigAceFrame config) throws IOException;
+    public NidBitSetBI getPossibleKindOfConcepts(I_ConfigAceFrame config) throws IOException, ContradictionException;
 
     /**
      * Child of = only immediate children, not grand-children, etc. 

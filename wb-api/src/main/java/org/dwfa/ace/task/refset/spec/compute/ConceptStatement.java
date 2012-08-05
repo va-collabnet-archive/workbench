@@ -34,9 +34,14 @@ import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery.GROUPING_TYPE;
 import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ConceptFetcherBI;
+import org.ihtsdo.tk.api.ConceptFetcherSimple;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 /**
  * Represents partial information contained in a refset spec. An example of a statement is : "NOT: Concept is
@@ -50,6 +55,7 @@ public class ConceptStatement extends RefsetSpecStatement {
     I_GetConceptData queryConstraintConcept;
     private Collection<I_ShowActivity> activities;
     private StopActionListener stopListener = new StopActionListener();
+    private TerminologyStoreDI ts;
 
     private class StopActionListener implements ActionListener {
 
@@ -62,17 +68,17 @@ public class ConceptStatement extends RefsetSpecStatement {
     }
 
     /**
-	 * Constructor for refset spec statement.
-	 * 
-	 * @param useNotQualifier Whether to use the NOT qualifier.
-	 * @param queryToken The query type to use (e.g. "concept is")
-	 * @param queryConstraint The destination concept (e.g. "paracetamol")
-	 * @throws Exception
-	 */
+     * Constructor for refset spec statement.
+     *
+     * @param useNotQualifier Whether to use the NOT qualifier.
+     * @param queryToken The query type to use (e.g. "concept is")
+     * @param queryConstraint The destination concept (e.g. "paracetamol")
+     * @throws Exception
+     */
     public ConceptStatement(boolean useNotQualifier, I_GetConceptData queryToken, I_AmTermComponent queryConstraint,
             int refsetSpecNid, I_ConfigAceFrame config) throws Exception {
         super(useNotQualifier, queryToken, queryConstraint, refsetSpecNid, config);
-
+        ts = Ts.get();
         for (QUERY_TOKENS token : QUERY_TOKENS.values()) {
             if (queryToken.getConceptNid() == token.nid) {
                 tokenEnum = token;
@@ -148,11 +154,11 @@ public class ConceptStatement extends RefsetSpecStatement {
                         termFactory.getRefsetExtensionMembers(queryConstraintConcept.getConceptNid());
                 Set<I_GetConceptData> refsetMembers = new HashSet<I_GetConceptData>();
                 for (I_ExtendByRef ext : refsetExtensions) {
-            try {
-                refsetMembers.add(termFactory.getConcept(ext.getComponentNid()));
-            } catch (TerminologyException ex) {
-                throw new IOException(ex);
-            }
+                    try {
+                        refsetMembers.add(termFactory.getConcept(ext.getComponentNid()));
+                    } catch (TerminologyException ex) {
+                        throw new IOException(ex);
+                    }
                 }
                 I_RepresentIdSet refsetMemberSet = termFactory.getIdSetfromTermCollection(refsetMembers);
                 if (isNegated()) {
@@ -201,233 +207,216 @@ public class ConceptStatement extends RefsetSpecStatement {
     }
 
     @Override
-    public boolean getStatementResult(I_AmTermComponent component, GROUPING_TYPE version, PositionSetBI v1_is,
-            PositionSetBI v2_is) throws IOException, ContradictionException{
-        I_GetConceptData concept = (I_GetConceptData) component;
+    public boolean getStatementResult(int componentNid, Object component, GROUPING_TYPE version, PositionSetBI v1_is,
+            PositionSetBI v2_is) throws IOException, ContradictionException {
+        ConceptFetcherBI fetcher;
+        if (component instanceof ConceptFetcherBI) {
+            fetcher = (ConceptFetcherBI) component;
+        } else {
+            fetcher = new ConceptFetcherSimple((ConceptChronicleBI) component);
+        }
 
         if (version != null || v1_is != null || v2_is != null) {
             if (version == null) {
-                throw new IOException("Not in scope of V1 or V2: "
-                        + tokenEnum + " " + concept.getInitialText());
+                try {
+                    throw new IOException("Not in scope of V1 or V2: "
+                            + tokenEnum + " " + fetcher.fetch().toString());
+                } catch (Exception ex) {
+                    throw new IOException(ex);
+                }
             }
             if (v1_is == null) {
-                throw new IOException("Need to set V1 IS: "
-                        + tokenEnum + " " + concept.getInitialText());
+                try {
+                    throw new IOException("Need to set V1 IS: "
+                            + tokenEnum + " " + fetcher.fetch().toString());
+                } catch (Exception ex) {
+                    throw new IOException(ex);
+                }
             }
             if (v2_is == null) {
-                throw new IOException("Need to set V2 IS: "
-                        + tokenEnum + " " + concept.getInitialText());
+                try {
+                    throw new IOException("Need to set V2 IS: "
+                            + tokenEnum + " " + fetcher.fetch().toString());
+                } catch (Exception ex) {
+                    throw new IOException(ex);
+                }
             }
         }
 
         switch (tokenEnum) {
             case CONCEPT_IS:
                 if (version == null) {
-                    return conceptIs(concept);
+                    return conceptIs(componentNid, fetcher);
                 } else {
-                    return conceptIs(concept, getVersion(version, v1_is, v2_is));
+                    return conceptIs(componentNid, fetcher, getVersion(version, v1_is, v2_is));
                 }
             case CONCEPT_IS_CHILD_OF:
                 if (version == null) {
-                    return conceptIsChildOf(concept);
+                    return conceptIsChildOf(componentNid, fetcher);
                 } else {
-                    return conceptIsChildOf(concept, getVersion(version, v1_is,
+                    return conceptIsChildOf(componentNid, fetcher, getVersion(version, v1_is,
                             v2_is));
                 }
             case CONCEPT_IS_DESCENDENT_OF:
                 if (version == null) {
-                    return conceptIsDescendantOf(concept);
+                    return conceptIsDescendantOf(componentNid, fetcher);
                 } else {
-                    return conceptIsDescendantOf(concept, getVersion(version,
+                    return conceptIsDescendantOf(componentNid, fetcher, getVersion(version,
                             v1_is, v2_is));
                 }
             case CONCEPT_IS_KIND_OF:
                 if (version == null) {
-                    return conceptIsKindOf(concept);
+                    return conceptIsKindOf(componentNid, fetcher);
                 } else {
-                    return conceptIsKindOf(concept, getVersion(version, v1_is,
+                    return conceptIsKindOf(componentNid, fetcher, getVersion(version, v1_is,
                             v2_is));
                 }
             case CONCEPT_IS_MEMBER_OF:
                 if (version == null) {
-                    return conceptIsMemberOf(concept);
+                    return conceptIsMemberOf(componentNid, fetcher);
                 } else {
                     throw new IOException(tokenEnum
                             + ": Unsupported operation for version scope.");
                 }
             case CONCEPT_STATUS_IS:
                 if (version == null) {
-                    return conceptStatusIs(concept);
+                    return conceptStatusIs(componentNid, fetcher);
                 } else {
-                    return conceptStatusIs(concept, getVersion(version, v1_is,
+                    return conceptStatusIs(componentNid, fetcher, getVersion(version, v1_is,
                             v2_is));
                 }
             case CONCEPT_STATUS_IS_CHILD_OF:
                 if (version == null) {
-                    return conceptStatusIsChildOf(concept);
+                    return conceptStatusIsChildOf(componentNid, fetcher);
                 } else {
-                    return conceptStatusIsChildOf(concept, getVersion(version,
+                    return conceptStatusIsChildOf(componentNid, fetcher, getVersion(version,
                             v1_is, v2_is));
                 }
             case CONCEPT_STATUS_IS_DESCENDENT_OF:
                 if (version == null) {
-                    return conceptStatusIsDescendantOf(concept);
+                    return conceptStatusIsDescendantOf(componentNid, fetcher);
                 } else {
-                    return conceptStatusIsDescendantOf(concept, getVersion(version,
+                    return conceptStatusIsDescendantOf(componentNid, fetcher, getVersion(version,
                             v1_is, v2_is));
                 }
             case CONCEPT_STATUS_IS_KIND_OF:
                 if (version == null) {
-                    return conceptStatusIsKindOf(concept);
+                    return conceptStatusIsKindOf(componentNid, fetcher);
                 } else {
-                    return conceptStatusIsKindOf(concept, getVersion(version,
+                    return conceptStatusIsKindOf(componentNid, fetcher, getVersion(version,
                             v1_is, v2_is));
                 }
             case ADDED_CONCEPT:
-                return addedConcept(concept, version, v1_is, v2_is);
+                return addedConcept(componentNid, fetcher, version, v1_is, v2_is);
             case CHANGED_CONCEPT_STATUS:
-                return changedConceptStatus(concept, version, v1_is, v2_is);
+                return changedConceptStatus(componentNid, fetcher, version, v1_is, v2_is);
             case CHANGED_CONCEPT_DEFINED:
-                return changedConceptDefined(concept, version, v1_is, v2_is);
+                return changedConceptDefined(componentNid, fetcher, version, v1_is, v2_is);
             default:
                 throw new RuntimeException("Can't handle queryToken: " + queryToken);
         }
     }
 
     /**
-	 * Tests if the concept being tested is an immediate child of the query
-	 * constraint.
-	 * 
-	 * @param conceptBeingTested
-	 * @return
-	 * @throws TerminologyException
-	 * @throws IOException
-	 */
-    private boolean conceptIsChildOf(I_GetConceptData conceptBeingTested) throws IOException {
+     * Tests if the concept being tested is an immediate child of the query constraint.
+     *
+     * @param conceptBeingTested
+     * @return
+     * @throws TerminologyException
+     * @throws IOException
+     */
+    private boolean conceptIsChildOf(int conceptNid, ConceptFetcherBI fetcher) throws IOException {
         try {
 
-            Set<? extends I_GetConceptData> children =
-                    queryConstraintConcept.getDestRelOrigins(currentStatuses, allowedTypes, termFactory.getActiveAceFrameConfig().getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
-
-            for (I_GetConceptData child : children) {
-                if (conceptBeingTested.equals(child)) {
-                    return true;
-                }
-            }
-            return false;
+            return Ts.get().isChildOf(conceptNid, queryConstraintConcept.getConceptNid(), config.getViewCoordinate());
         } catch (Exception e) {
             throw new IOException(e.getMessage());
         }
     }
 
     /**
-	 * Tests of the concept being tested is a member of the specified refset.
-	 * 
-	 * @param concept
-	 * @return
-	 * @throws IOException
-	 * @throws TerminologyException
-	 */
-    private boolean conceptIsMemberOf(I_GetConceptData conceptBeingTested) throws IOException {
-        return componentIsMemberOf(conceptBeingTested.getConceptNid());
+     * Tests of the concept being tested is a member of the specified refset.
+     *
+     * @param concept
+     * @return
+     * @throws IOException
+     * @throws TerminologyException
+     */
+    private boolean conceptIsMemberOf(int conceptNid, ConceptFetcherBI fetcher) throws IOException {
+        return componentIsMemberOf(conceptNid);
     }
 
     /**
-	 * Tests of the current concept is the same as the query constraint.
-	 * 
-	 * @param concept
-	 * @return
-	 */
-    private boolean conceptIs(I_GetConceptData conceptBeingTested) {
-        return conceptBeingTested.equals(queryConstraint);
+     * Tests of the current concept is the same as the query constraint.
+     *
+     * @param concept
+     * @return
+     */
+    private boolean conceptIs(int conceptNid, ConceptFetcherBI fetcher) {
+        return conceptNid == queryConstraintConcept.getConceptNid();
     }
 
     /**
-	 * Tests if the current concept is a child of the query constraint. This
-	 * does not return true if they are the same concept. This will check depth
-	 * >= 1 to find children.
-	 * 
-	 * @param concept
-	 * @return
-	 * @throws IOException
-	 * @throws TerminologyException
-	 */
-    private boolean conceptIsDescendantOf(I_GetConceptData conceptBeingTested) throws IOException, ContradictionException {
+     * Tests if the current concept is a child of the query constraint. This does not return true if they are
+     * the same concept. This will check depth >= 1 to find children.
+     *
+     * @param concept
+     * @return
+     * @throws IOException
+     * @throws TerminologyException
+     */
+    private boolean conceptIsDescendantOf(int conceptNid, ConceptFetcherBI fetcher) throws IOException, ContradictionException {
+        int parentNid = queryConstraintConcept.getNid();
+        if (conceptNid == parentNid) {
+            return false;
+        }
+
+        return ts.isKindOf(conceptNid, parentNid, viewCoordinate);
+    }
+
+    /**
+     * Tests if the current concept is a child of the query constraint. This will return true if they are the
+     * same concept. This will check depth >= 1 to find children.
+     *
+     * @param concept
+     * @return
+     * @throws IOException
+     * @throws TerminologyException
+     */
+    private boolean conceptIsKindOf(int conceptNid, ConceptFetcherBI fetcher) throws IOException, ContradictionException {
+        return Ts.get().isKindOf(conceptNid, queryConstraintConcept.getNid(), config.getViewCoordinate());
+    }
+
+    private boolean conceptIs(int conceptNid, ConceptFetcherBI fetcher, PositionSetBI pos)
+            throws IOException {
+        return conceptNid == queryConstraintConcept.getConceptNid();
+    }
+
+    /**
+     * Tests if the current concept has a status the same as the query constraint.
+     *
+     * @param concept
+     * @return
+     * @throws IOException
+     * @throws TerminologyException
+     */
+    private boolean conceptStatusIs(int conceptNid, ConceptFetcherBI fetcher) throws IOException {
         try {
-            if (conceptBeingTested.getNid() == queryConstraintConcept.getNid()) {
-                return false;
-            }
-            
-            if (RefsetSpecQuery.myStaticIsACache == null) {
-                //System.out.print("n");
-                return queryConstraintConcept.isParentOf(conceptBeingTested, currentStatuses,
-                        allowedTypes, termFactory.getActiveAceFrameConfig().getViewPositionSetReadOnly(),
-                        config.getPrecedence(), config.getConflictResolutionStrategy());
-            } else {
-                try {
-                    //System.out.print("c");
-                    return RefsetSpecQuery.myStaticIsACache.isKindOf(conceptBeingTested.getConceptNid(),
-                            queryConstraintConcept.getConceptNid());
-                } catch (Exception e) {
-                    throw new IOException(e);
-                }
-            }
-         } catch (TerminologyException terminologyException) {
-            throw new IOException(terminologyException);
-        } 
-    }
-
-    /**
-	 * Tests if the current concept is a child of the query constraint. This
-	 * will return true if they are the same concept. This will check depth
-	 * >= 1 to find children.
-	 * 
-	 * @param concept
-	 * @return
-	 * @throws IOException
-	 * @throws TerminologyException
-	 */
-    private boolean conceptIsKindOf(I_GetConceptData conceptBeingTested) throws IOException, ContradictionException {
-        try {
-            return queryConstraintConcept.isParentOfOrEqualTo(conceptBeingTested, currentStatuses, allowedTypes,
-                    termFactory.getActiveAceFrameConfig().getViewPositionSetReadOnly(),
-                    config.getPrecedence(), config.getConflictResolutionStrategy());
-        } catch (TerminologyException ex) {
+            return conceptStatusIs((I_GetConceptData) fetcher.fetch(), queryConstraintConcept);
+        } catch (Exception ex) {
             throw new IOException(ex);
         }
     }
 
-    private boolean conceptIs(I_GetConceptData concept, PositionSetBI pos)
-            throws IOException {
-        I_ConceptAttributeTuple<?> a;
-        
-            a = getVersion(concept, pos);
-            return (a != null && concept.getConceptNid() == queryConstraintConcept.getConceptNid());
-        
-    }
-
     /**
-	 * Tests if the current concept has a status the same as the query
-	 * constraint.
-	 * 
-	 * @param concept
-	 * @return
-	 * @throws IOException
-	 * @throws TerminologyException
-	 */
-    private boolean conceptStatusIs(I_GetConceptData conceptBeingTested) throws IOException {
-        return conceptStatusIs(conceptBeingTested, queryConstraintConcept);
-    }
-
-    /**
-	 * Tests if the current concept has a status matching the inputted status.
-	 * 
-	 * @param requiredStatusConcept
-	 * @param conceptBeingTested
-	 * @return
-	 * @throws IOException
-	 * @throws TerminologyException
-	 */
+     * Tests if the current concept has a status matching the inputted status.
+     *
+     * @param requiredStatusConcept
+     * @param conceptBeingTested
+     * @return
+     * @throws IOException
+     * @throws TerminologyException
+     */
     private boolean conceptStatusIs(I_GetConceptData conceptBeingTested, I_GetConceptData requiredStatusConcept)
             throws IOException {
         try {
@@ -453,18 +442,22 @@ public class ConceptStatement extends RefsetSpecStatement {
             throw new IOException(ex);
         }
     }
-    private boolean conceptStatusIs(I_GetConceptData concept, PositionSetBI pos)
-            throws IOException {
-        
-            I_ConceptAttributeTuple<?> a = getVersion(concept, pos);
-            return (a != null && a.getStatusNid() == queryConstraintConcept.getConceptNid());
-        
-   }
 
-    private boolean conceptStatusIsChildOf(I_GetConceptData concept,
+    private boolean conceptStatusIs(int conceptNid, ConceptFetcherBI fetcher, PositionSetBI pos)
+            throws IOException {
+        try {
+            I_ConceptAttributeTuple<?> a = getVersion(conceptNid, fetcher, pos);
+            return (a != null && a.getStatusNid() == queryConstraintConcept.getConceptNid());
+        } catch (Exception ex) {
+            throw new IOException(ex);
+        }
+
+    }
+
+    private boolean conceptStatusIsChildOf(int conceptNid, ConceptFetcherBI fetcher,
             PositionSetBI pos) throws IOException {
         try {
-            I_ConceptAttributeTuple<?> a = getVersion(concept, pos);
+            I_ConceptAttributeTuple<?> a = getVersion(conceptNid, fetcher, pos);
             if (a == null) {
                 return false;
             }
@@ -475,9 +468,9 @@ public class ConceptStatement extends RefsetSpecStatement {
         }
     }
 
-    private boolean conceptStatusIsDescendantOf(I_GetConceptData concept,
+    private boolean conceptStatusIsDescendantOf(int conceptNid, ConceptFetcherBI fetcher,
             PositionSetBI pos) throws IOException {
-        I_ConceptAttributeTuple<?> a = getVersion(concept, pos);
+        I_ConceptAttributeTuple<?> a = getVersion(conceptNid, fetcher, pos);
         if (a == null) {
             return false;
         }
@@ -489,56 +482,66 @@ public class ConceptStatement extends RefsetSpecStatement {
         }
     }
 
-    private boolean conceptStatusIsKindOf(I_GetConceptData concept,
+    private boolean conceptStatusIsKindOf(int conceptNid, ConceptFetcherBI fetcher,
             PositionSetBI pos) throws IOException {
-        return conceptStatusIs(concept, pos)
-                || conceptStatusIsDescendantOf(concept, pos);
+        return conceptStatusIs(conceptNid, fetcher, pos)
+                || conceptStatusIsDescendantOf(conceptNid, fetcher, pos);
     }
 
-    private boolean conceptIsChildOf(I_GetConceptData c1, PositionSetBI pos)
+    private boolean conceptIsChildOf(int conceptNid, ConceptFetcherBI fetcher, PositionSetBI pos)
             throws IOException {
-        return conceptIsChildOf(c1, queryConstraintConcept, pos);
+        try {
+            return Ts.get().isChildOf(conceptNid, queryConstraintConcept.getConceptNid(), config.getViewCoordinate());
+        } catch (Exception ex) {
+           throw new IOException(ex);
+        }
     }
 
-    private boolean conceptIsDescendantOf(I_GetConceptData c1, PositionSetBI pos)
+    private boolean conceptIsDescendantOf(int conceptNid, ConceptFetcherBI fetcher, PositionSetBI pos)
             throws IOException {
-        return conceptIsDescendantOf(c1, queryConstraintConcept, pos);
+        if (conceptNid == queryConstraintConcept.getConceptNid()) {
+            return false;
+        }
+        try {
+            return Ts.get().isKindOf(conceptNid, queryConstraintConcept.getConceptNid(), config.getViewCoordinate());
+        } catch (Exception ex) {
+           throw new IOException(ex);
+         }
     }
 
-    private boolean conceptIsKindOf(I_GetConceptData concept, PositionSetBI pos)
-            throws IOException {
-        return conceptIs(concept, pos) || conceptIsDescendantOf(concept, pos);
+    private boolean conceptIsKindOf(int conceptNid, ConceptFetcherBI fetcher, PositionSetBI pos)
+            throws IOException, ContradictionException {
+        return Ts.get().isKindOf(conceptNid, queryConstraintConcept.getConceptNid(), config.getViewCoordinate());
     }
 
     /**
-	 * Tests if the current concept has a status matching the query constraint,
-	 * or any of its children (depth >=1).
-	 * 
-	 * @param conceptBeingTested
-	 * @return
-	 * @throws IOException
-	 * @throws TerminologyException
-	 */
-    private boolean conceptStatusIsKindOf(I_GetConceptData conceptBeingTested) throws IOException {
+     * Tests if the current concept has a status matching the query constraint, or any of its children (depth
+     * >=1).
+     *
+     * @param conceptBeingTested
+     * @return
+     * @throws IOException
+     * @throws TerminologyException
+     */
+    private boolean conceptStatusIsKindOf(int conceptNid, ConceptFetcherBI fetcher) throws IOException {
 
         // check if the concept's status matches the specified status
-        if (conceptStatusIs(conceptBeingTested)) {
+        if (conceptStatusIs(conceptNid, fetcher)) {
             return true;
         }
 
-        return conceptStatusIsDescendantOf(conceptBeingTested);
+        return conceptStatusIsDescendantOf(conceptNid, fetcher);
     }
 
     /**
-	 * Tests if the current concept has a status matching the query constraint's
-	 * immediate children.
-	 * 
-	 * @param conceptBeingTested
-	 * @return
-	 * @throws IOException
-	 * @throws TerminologyException
-	 */
-    private boolean conceptStatusIsChildOf(I_GetConceptData conceptBeingTested) throws IOException {
+     * Tests if the current concept has a status matching the query constraint's immediate children.
+     *
+     * @param conceptBeingTested
+     * @return
+     * @throws IOException
+     * @throws TerminologyException
+     */
+    private boolean conceptStatusIsChildOf(int conceptNid, ConceptFetcherBI fetcher) throws IOException {
 
         try {
 
@@ -548,7 +551,7 @@ public class ConceptStatement extends RefsetSpecStatement {
 
             // call conceptStatusIs on each
             for (I_GetConceptData childStatus : childStatuses) {
-                if (conceptStatusIs(conceptBeingTested, childStatus)) {
+                if (conceptStatusIs((I_GetConceptData) fetcher.fetch(), childStatus)) {
                     return true;
                 }
 
@@ -561,29 +564,27 @@ public class ConceptStatement extends RefsetSpecStatement {
     }
 
     /**
-	 * Tests if the current concept has a status matching the query constraint's
-	 * children to depth >= 1.
-	 * 
-	 * @param conceptBeingTested
-	 * @return
-	 * @throws IOException
-	 * @throws TerminologyException
-	 */
-    private boolean conceptStatusIsDescendantOf(I_GetConceptData conceptBeingTested) throws IOException {
+     * Tests if the current concept has a status matching the query constraint's children to depth >= 1.
+     *
+     * @param conceptBeingTested
+     * @return
+     * @throws IOException
+     * @throws TerminologyException
+     */
+    private boolean conceptStatusIsDescendantOf(int conceptNid, ConceptFetcherBI fetcher) throws IOException {
 
-        return conceptStatusIsDescendantOf(conceptBeingTested, queryConstraintConcept);
+        return conceptStatusIsDescendantOf(conceptNid, fetcher, queryConstraintConcept);
     }
 
     /**
-	 * Tests if the current concept has a status matching the specified status'
-	 * children to depth >= 1.
-	 * 
-	 * @param conceptBeingTested
-	 * @return
-	 * @throws IOException
-	 * @throws TerminologyException
-	 */
-    private boolean conceptStatusIsDescendantOf(I_GetConceptData conceptBeingTested, I_GetConceptData status)
+     * Tests if the current concept has a status matching the specified status' children to depth >= 1.
+     *
+     * @param conceptBeingTested
+     * @return
+     * @throws IOException
+     * @throws TerminologyException
+     */
+    private boolean conceptStatusIsDescendantOf(int conceptNid, ConceptFetcherBI fetcher, I_GetConceptData status)
             throws IOException {
 
         try {
@@ -592,9 +593,9 @@ public class ConceptStatement extends RefsetSpecStatement {
                     status.getDestRelOrigins(currentStatuses, allowedTypes, termFactory.getActiveAceFrameConfig().getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
 
             for (I_GetConceptData childStatus : childStatuses) {
-                if (conceptStatusIs(conceptBeingTested, childStatus)) {
+                if (conceptStatusIs((I_GetConceptData) fetcher.fetch(), childStatus)) {
                     return true;
-                } else if (conceptStatusIsDescendantOf(conceptBeingTested, childStatus)) {
+                } else if (conceptStatusIsDescendantOf(conceptNid, fetcher, childStatus)) {
                     return true;
                 }
             }
@@ -604,15 +605,14 @@ public class ConceptStatement extends RefsetSpecStatement {
         }
     }
 
-    private I_ConceptAttributeTuple<?> getVersion(
-            I_GetConceptData conceptBeingTested, PositionSetBI vn_is)
+    private I_ConceptAttributeTuple<?> getVersion(int conceptNid, ConceptFetcherBI fetcher, PositionSetBI vn_is)
             throws IOException {
         try {
             // ArrayList<I_AmPart> parts = new ArrayList<I_AmPart>(
             // conceptBeingTested.getConceptAttributes().getMutableParts());
             // I_AmPart part = getVersion(parts, vn_is, false);
             // return (I_ConceptAttributePart) part;
-            List<? extends I_ConceptAttributeTuple> a1s = conceptBeingTested.getConceptAttributeTuples(null, vn_is, Precedence.PATH,
+            List<? extends I_ConceptAttributeTuple> a1s = ((I_GetConceptData) fetcher.fetch()).getConceptAttributeTuples(null, vn_is, Precedence.PATH,
                     config.getConflictResolutionStrategy());
             I_ConceptAttributeTuple<?> a1 = (a1s != null && a1s.size() > 0 ? a1s.get(0) : null);
             return a1;
@@ -621,40 +621,39 @@ public class ConceptStatement extends RefsetSpecStatement {
         }
     }
 
-    private I_ConceptAttributeTuple<?> getVersion(
-            I_GetConceptData conceptBeingTested, GROUPING_TYPE version,
+    private I_ConceptAttributeTuple<?> getVersion(int conceptNid, ConceptFetcherBI fetcher, GROUPING_TYPE version,
             PositionSetBI v1_is, PositionSetBI v2_is) throws IOException {
-        return getVersion(conceptBeingTested, getVersion(version, v1_is, v2_is));
+        return getVersion(conceptNid, fetcher, getVersion(version, v1_is, v2_is));
     }
 
     /**
-	 * Tests if the concept being tested has been added from v1 to v2
-	 * 
-	 * @param conceptBeingTested
-	 * @return
-	 * @throws TerminologyException
-	 * @throws IOException
-	 */
-    private boolean addedConcept(I_GetConceptData conceptBeingTested,
+     * Tests if the concept being tested has been added from v1 to v2
+     *
+     * @param conceptBeingTested
+     * @return
+     * @throws TerminologyException
+     * @throws IOException
+     */
+    private boolean addedConcept(int conceptNid, ConceptFetcherBI fetcher,
             GROUPING_TYPE version, PositionSetBI v1_is, PositionSetBI v2_is)
             throws IOException {
         try {
             // TODO version must be v2
-            I_ConceptAttributeTuple<?> a1 = getVersion(conceptBeingTested, v1_is);
-            I_ConceptAttributeTuple<?> a2 = getVersion(conceptBeingTested, v2_is);
+            I_ConceptAttributeTuple<?> a1 = getVersion(conceptNid, fetcher, v1_is);
+            I_ConceptAttributeTuple<?> a2 = getVersion(conceptNid, fetcher, v2_is);
             return (a1 == null && a2 != null);
         } catch (Exception e) {
             throw new IOException(e.getMessage());
         }
     }
 
-    private boolean changedConceptStatus(I_GetConceptData conceptBeingTested,
+    private boolean changedConceptStatus(int conceptNid, ConceptFetcherBI fetcher,
             GROUPING_TYPE version, PositionSetBI v1_is, PositionSetBI v2_is)
             throws IOException {
         try {
-            I_ConceptAttributeTuple<?> a1 = getVersion(conceptBeingTested,
+            I_ConceptAttributeTuple<?> a1 = getVersion(conceptNid, fetcher,
                     v1_is);
-            I_ConceptAttributeTuple<?> a2 = getVersion(conceptBeingTested,
+            I_ConceptAttributeTuple<?> a2 = getVersion(conceptNid, fetcher,
                     v2_is);
             return (a1 != null
                     && a2 != null
@@ -664,13 +663,13 @@ public class ConceptStatement extends RefsetSpecStatement {
         }
     }
 
-    private boolean changedConceptDefined(I_GetConceptData conceptBeingTested,
+    private boolean changedConceptDefined(int conceptNid, ConceptFetcherBI fetcher,
             GROUPING_TYPE version, PositionSetBI v1_is, PositionSetBI v2_is)
             throws IOException {
         try {
-            I_ConceptAttributeTuple<?> a1 = getVersion(conceptBeingTested,
+            I_ConceptAttributeTuple<?> a1 = getVersion(conceptNid, fetcher,
                     v1_is);
-            I_ConceptAttributeTuple<?> a2 = getVersion(conceptBeingTested,
+            I_ConceptAttributeTuple<?> a2 = getVersion(conceptNid, fetcher,
                     v2_is);
             return (a1 != null
                     && a2 != null

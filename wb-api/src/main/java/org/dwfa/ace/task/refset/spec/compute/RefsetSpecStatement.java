@@ -209,11 +209,11 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
     }
 
     @Override
-    public boolean execute(I_AmTermComponent component,
+    public boolean execute(int componentNid, Object component,
             GROUPING_TYPE version, PositionSetBI v1_is,
             PositionSetBI v2_is, Collection<I_ShowActivity> activities) throws IOException, ContradictionException {
 
-        boolean statementResult = getStatementResult(component,
+        boolean statementResult = getStatementResult(componentNid, component,
                 version, v1_is, v2_is);
 
         if (useNotQualifier) {
@@ -225,7 +225,7 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
         }
     }
 
-    public abstract boolean getStatementResult(I_AmTermComponent component,
+    public abstract boolean getStatementResult(int componentNid, Object component,
             GROUPING_TYPE version, PositionSetBI v1Is,
             PositionSetBI v2Is) throws IOException, ContradictionException;
 

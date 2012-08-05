@@ -32,16 +32,19 @@ import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PositionSetBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 public abstract class RefsetSpecComponent {
     private int possibleConceptsCount;
     protected int refsetSpecNid;
     protected I_HelpSpecRefset helper;
     protected I_ConfigAceFrame config;
+    protected ViewCoordinate viewCoordinate;
 
     protected RefsetSpecComponent(int refsetSpecNid, I_ConfigAceFrame config) throws Exception {
         super();
         this.config = config;
+        this.viewCoordinate = config.getViewCoordinate();
         helper = Terms.get().getSpecRefsetHelper(this.config);
 
         this.refsetSpecNid = refsetSpecNid;
@@ -68,7 +71,7 @@ public abstract class RefsetSpecComponent {
         return null;
     }
 
-	public abstract boolean execute(I_AmTermComponent component,
+	public abstract boolean execute(int componentNid, Object component,
 			GROUPING_TYPE version, PositionSetBI v1Is, PositionSetBI v2Is,
 			Collection<I_ShowActivity> activities) throws IOException,
 			TerminologyException, ContradictionException;
