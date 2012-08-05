@@ -17,7 +17,6 @@ import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.PathNotExistsException;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.contradiction.IdentifyAllContradictionStrategy;
-import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
 import org.ihtsdo.concept.*;
@@ -48,7 +47,7 @@ import org.ihtsdo.tk.db.EccsDependency;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 public class BdbTerminologyStore implements TerminologyStoreDI {
-
+    
     private static ViewCoordinate metadataVC = null;
     private static EditCoordinate metadataEC = null;
     private static boolean isReleaseFormatSetup = false;
@@ -59,98 +58,99 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     public void addChangeSetGenerator(String key, ChangeSetGeneratorBI writer) {
         ChangeSetWriterHandler.addWriter(key, writer);
     }
-
+    
     private void addOrigins(Set<PathBI> paths, Collection<? extends PositionBI> origins) {
         if (origins == null) {
             return;
         }
-
+        
         for (PositionBI o : origins) {
             paths.add(o.getPath());
             addOrigins(paths, o.getPath().getOrigins());
         }
     }
-
+    
     @Override
     public void suspendChangeNotifications() {
         ChangeNotifier.suspendNotifications();
     }
-
+    
     @Override
     public void resumeChangeNotifications() {
         ChangeNotifier.resumeNotifications();
     }
-
+    
     @Override
     public void addTermChangeListener(TermChangeListener cl) {
         ChangeNotifier.addTermChangeListener(cl);
     }
-
+    
     @Override
     public void addUncommitted(ConceptChronicleBI concept) throws IOException {
         BdbCommitManager.addUncommitted(concept);
     }
-
+    
     @Override
     public void addUncommitted(ConceptVersionBI cv) throws IOException {
         addUncommitted(cv.getChronicle());
     }
+
     @Override
     public void addUncommittedNoChecks(ConceptChronicleBI concept) throws IOException {
         BdbCommitManager.addUncommittedNoChecks(concept);
     }
-
+    
     @Override
     public void addUncommittedNoChecks(ConceptVersionBI cv) throws IOException {
         addUncommittedNoChecks(cv.getChronicle());
     }
     
     @Override
-    public void forget(RelationshipVersionBI rel) throws IOException{
+    public void forget(RelationshipVersionBI rel) throws IOException {
         BdbCommitManager.forget(rel);
     }
     
     @Override
-    public void forget(DescriptionVersionBI desc) throws IOException{
+    public void forget(DescriptionVersionBI desc) throws IOException {
         BdbCommitManager.forget(desc);
     }
     
     @Override
-    public void forget(RefexChronicleBI extension) throws IOException{
+    public void forget(RefexChronicleBI extension) throws IOException {
         BdbCommitManager.forget(extension);
     }
     
     @Override
-    public boolean forget(ConceptAttributeVersionBI attr) throws IOException{
+    public boolean forget(ConceptAttributeVersionBI attr) throws IOException {
         boolean forgotten = BdbCommitManager.forget(attr);
         return forgotten;
     }
     
     @Override
-    public void forget(ConceptChronicleBI concept) throws IOException{
+    public void forget(ConceptChronicleBI concept) throws IOException {
         BdbCommitManager.forget(concept);
     }
-
+    
     @Override
     public void cancel() {
         BdbCommitManager.cancel();
     }
-
+    
     @Override
     public void cancel(ConceptChronicleBI concept) {
         throw new UnsupportedOperationException();
     }
-
+    
     @Override
     public void cancel(ConceptVersionBI concept) {
         throw new UnsupportedOperationException();
     }
-
+    
     @Override
     public void commit() throws IOException {
         BdbCommitManager.commit();
     }
-
+    
     @Override
     public void commit(ConceptChronicleBI cc) throws IOException {
         BdbCommitManager.commit((Concept) cc, ChangeSetPolicy.MUTABLE_ONLY,
@@ -162,23 +162,23 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
         BdbCommitManager.commit((Concept) cc, changeSetPolicy,
                 ChangeSetWriterThreading.SINGLE_THREAD);
     }
-
+    
     @Override
     public void commit(ConceptVersionBI concept) throws IOException {
         this.commit(concept.getChronicle());
     }
-
+    
     @Override
     public ChangeSetGeneratorBI createDtoChangeSetGenerator(File changeSetFileName,
             File changeSetTempFileName, ChangeSetGenerationPolicy policy) {
         return new EConceptChangeSetWriter(changeSetFileName, changeSetTempFileName, policy, true);
     }
-
+    
     @Override
     public void iterateConceptDataInParallel(ProcessUnfetchedConceptDataBI processor) throws Exception {
         Bdb.getConceptDb().iterateConceptDataInParallel(processor);
     }
-
+    
     @Override
     public void iterateConceptDataInSequence(ProcessUnfetchedConceptDataBI processor) throws Exception {
         Bdb.getConceptDb().iterateConceptDataInSequence(processor);
@@ -188,44 +188,43 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     public void iterateSapDataInSequence(ProcessStampDataBI processor) throws Exception {
         Bdb.getSapDb().iterateSapDataInSequence(processor);
     }
-
     
-   @Override
-   public Position newPosition(PathBI path, long time) throws IOException {
-      return new Position(time, path);
-   }
-
+    @Override
+    public Position newPosition(PathBI path, long time) throws IOException {
+        return new Position(time, path);
+    }
+    
     @Override
     public void removeChangeSetGenerator(String key) {
         ChangeSetWriterHandler.removeWriter(key);
     }
-
+    
     @Override
     public void removeTermChangeListener(TermChangeListener cl) {
         ChangeNotifier.removeTermChangeListener(cl);
     }
-
+    
     @Override
     public boolean satisfiesDependencies(Collection<DbDependency> dependencies) {
         if (dependencies != null) {
             try {
                 for (DbDependency d : dependencies) {
                     String value = Bdb.getProperty(d.getKey());
-
+                    
                     if (d.satisfactoryValue(value) == false) {
                         return false;
                     }
                 }
             } catch (Throwable e) {
                 AceLog.getAppLog().alertAndLogException(e);
-
+                
                 return false;
             }
         }
-
+        
         return true;
     }
-
+    
     @Override
     public boolean usesRf2Metadata() throws IOException {
         if (isReleaseFormatSetup == false) {
@@ -235,7 +234,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
             int rootStatusNid = cb.getConceptAttributes().getVersions().iterator().next().getStatusNid();
             int rf1CurrentNid = Bdb.uuidToNid(SnomedMetadataRf1.CURRENT_RF1.getUuids());
             int rf2ActiveValueNid = Bdb.uuidToNid(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids());
-
+            
             if (rootStatusNid == rf1CurrentNid) {
                 releaseFormat = 1;
                 isReleaseFormatSetup = true;
@@ -246,18 +245,18 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
                 throw new IOException("usesRf2Metadata current/active status did not match Rf1 or Rf2.");
             }
         }
-
+        
         if (releaseFormat == 2) {
             return true;
         } else {
             return false;
         }
     }
-
+    
     public int uuidsToNid(Collection<UUID> uuids) throws IOException {
         return Bdb.uuidsToNid(uuids);
     }
-
+    
     public int uuidsToNid(UUID... uuids) throws IOException {
         return Bdb.uuidToNid(uuids);
     }
@@ -267,153 +266,153 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     public NidBitSetBI getAllConceptNids() throws IOException {
         return Bdb.getConceptDb().getReadOnlyConceptIdSet();
     }
-
+    
     @Override
     public ComponentChronicleBI<?> getComponent(Collection<UUID> uuids) throws IOException {
         return getComponent(Bdb.uuidsToNid(uuids));
     }
-
+    
     @Override
     public ComponentChronicleBI<?> getComponent(ComponentContainerBI cc) throws IOException {
         return getComponent(cc.getNid());
     }
-
+    
     @Override
     public ComponentChronicleBI<?> getComponent(int nid) throws IOException {
         return (ComponentChronicleBI<?>) Bdb.getComponent(nid);
     }
-
+    
     @Override
     public ComponentChronicleBI<?> getComponent(UUID... uuids) throws IOException {
         return getComponent(Bdb.uuidToNid(uuids));
     }
-
+    
     @Override
     public ComponentVersionBI getComponentVersion(ViewCoordinate c, Collection<UUID> uuids)
             throws IOException, ContradictionException {
         return getComponentVersion(c, Bdb.uuidsToNid(uuids));
     }
-
+    
     @Override
     public ComponentVersionBI getComponentVersion(ViewCoordinate coordinate, int nid)
             throws IOException, ContradictionException {
         ComponentBI component = getComponent(nid);
-
+        
         if (Concept.class.isAssignableFrom(component.getClass())) {
             return new ConceptVersion((Concept) component, coordinate);
         }
-
+        
         return ((ComponentChronicleBI<?>) component).getVersion(coordinate);
     }
-
+    
     @Override
     public ComponentVersionBI getComponentVersion(ViewCoordinate c, UUID... uuids)
             throws IOException, ContradictionException {
         return getComponentVersion(c, Bdb.uuidToNid(uuids));
     }
-
+    
     @Override
     public ConceptChronicleBI getConcept(Collection<UUID> uuids) throws IOException {
         return getConcept(Bdb.uuidsToNid(uuids));
     }
-
+    
     @Override
     public ConceptChronicleBI getConcept(ConceptContainerBI cc) throws IOException {
         return getConcept(cc.getConceptNid());
     }
-
+    
     @Override
     public ConceptChronicleBI getConcept(int cNid) throws IOException {
         return Bdb.getConcept(cNid);
     }
-
+    
     @Override
     public ConceptChronicleBI getConcept(UUID... uuids) throws IOException {
         return getConcept(Bdb.uuidToNid(uuids));
     }
-
+    
     @Override
     public ConceptChronicleBI getConceptForNid(int nid) throws IOException {
         return getConcept(getConceptNidForNid(nid));
     }
-
+    
     @Override
     public int getConceptNidForNid(int nid) throws IOException {
         return Bdb.getConceptNid(nid);
     }
-
+    
     @Override
     public ConceptVersionBI getConceptVersion(ViewCoordinate c, Collection<UUID> uuids) throws IOException {
         return getConceptVersion(c, Bdb.uuidsToNid(uuids));
     }
-
+    
     @Override
     public ConceptVersionBI getConceptVersion(ViewCoordinate c, int cNid) throws IOException {
         return new ConceptVersion(Bdb.getConcept(cNid), c);
     }
-
+    
     @Override
     public ConceptVersionBI getConceptVersion(ViewCoordinate c, UUID... uuids) throws IOException {
         return getConceptVersion(c, Bdb.uuidToNid(uuids));
     }
-
+    
     @Override
     public Map<Integer, ConceptVersionBI> getConceptVersions(ViewCoordinate c, NidBitSetBI cNids)
             throws IOException {
         ConceptVersionGetter processor = new ConceptVersionGetter(cNids, c);
-
+        
         try {
             Bdb.getConceptDb().iterateConceptDataInParallel(processor);
         } catch (Exception e) {
             throw new IOException(e);
         }
-
+        
         return Collections.unmodifiableMap(new HashMap<Integer, ConceptVersionBI>(processor.conceptMap));
     }
-
+    
     @Override
     public Map<Integer, ConceptChronicleBI> getConcepts(NidBitSetBI cNids) throws IOException {
         ConceptGetter processor = new ConceptGetter(cNids);
-
+        
         try {
             Bdb.getConceptDb().iterateConceptDataInParallel(processor);
         } catch (Exception e) {
             throw new IOException(e);
         }
-
+        
         return Collections.unmodifiableMap(new HashMap<Integer, ConceptChronicleBI>(processor.conceptMap));
     }
-
+    
     @Override
     public ContradictionIdentifierBI getConflictIdentifier(ViewCoordinate vc, boolean useCase) {
         return new ContradictionIdentifier(vc, useCase);
     }
-
+    
     @Override
     public NidBitSetBI getEmptyNidSet() throws IOException {
         return Bdb.getConceptDb().getEmptyIdSet();
     }
-
+    
     @Override
     public Collection<DbDependency> getLatestChangeSetDependencies() throws IOException {
         BdbProperty[] keysToCheck = new BdbProperty[]{BdbProperty.LAST_CHANGE_SET_WRITTEN,
             BdbProperty.LAST_CHANGE_SET_READ};
         List<DbDependency> latestDependencies = new ArrayList<DbDependency>(2);
-
+        
         for (BdbProperty prop : keysToCheck) {
             String value = Bdb.getProperty(prop.toString());
-
+            
             if (value != null) {
                 String changeSetName = value;
                 String changeSetSize = Bdb.getProperty(changeSetName);
-
+                
                 latestDependencies.add(new EccsDependency(changeSetName, changeSetSize));
             }
         }
-
+        
         return latestDependencies;
     }
-
+    
     @Override
     public ViewCoordinate getMetadataViewCoordinate() throws IOException {
         if (metadataVC == null) {
@@ -422,27 +421,27 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
             PositionBI viewPosition = new Position(Long.MAX_VALUE, viewPath);
             PositionSetBI positionSet = new PositionSetReadOnly(viewPosition);
             NidSet allowedStatusNids = new NidSet();
-
+            
             allowedStatusNids.add(getNidForUuids(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
             allowedStatusNids.add(getNidForUuids(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()));
             allowedStatusNids.add(SnomedMetadataRfx.getSTATUS_CURRENT_NID());
-
+            
             NidSetBI isaTypeNids = new NidSet();
-
+            
             isaTypeNids.add(getNidForUuids(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
-
+            
             ContradictionManagerBI contradictionManager = new IdentifyAllContradictionStrategy();
             int languageNid =
                     getNidForUuids(ArchitectonicAuxiliary.Concept.EN_US.getUids());
             int classifierNid =
                     getNidForUuids(ArchitectonicAuxiliary.Concept.SNOROCKET.getUids());
-
+            
             metadataVC = new ViewCoordinate(Precedence.PATH, positionSet, allowedStatusNids, isaTypeNids,
                     contradictionManager, languageNid, classifierNid,
                     RelAssertionType.INFERRED_THEN_STATED, null,
                     ViewCoordinate.LANGUAGE_SORT.TYPE_BEFORE_LANG);
         }
-
+        
         return metadataVC;
     }
     
@@ -451,63 +450,63 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
         if (metadataEC == null) {
             /*
              * public EditCoordinate(int authorNid, NidSetBI editPaths) {
-		super();
-		assert editPaths != null;
-		assert authorNid != Integer.MIN_VALUE;
-		this.authorNid = authorNid;
-		this.editPaths = editPaths.getSetValues();
-	}
+             super();
+             assert editPaths != null;
+             assert authorNid != Integer.MIN_VALUE;
+             this.authorNid = authorNid;
+             this.editPaths = editPaths.getSetValues();
+             }
              */
             
             int authorNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.USER.getUids());
             int editPathNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
             metadataEC = new EditCoordinate(authorNid, editPathNid, Snomed.CORE_MODULE.getLenient().getNid()); //@akf make the same as what the metadata is on
         }
-
+        
         return metadataEC;
     }
-
+    
     @Override
     public int getNidForUuids(Collection<UUID> uuids) throws IOException {
         return Bdb.uuidsToNid(uuids);
     }
-
+    
     @Override
     public int getNidForUuids(UUID... uuids) throws IOException {
         return Bdb.uuidToNid(uuids);
     }
-
+    
     @Override
     public PathBI getPath(int pathNid) throws IOException {
         return BdbPathManager.get().get(pathNid);
     }
-
+    
     @Override
     public List<? extends PathBI> getPathChildren(int nid) {
         return BdbPathManager.get().getPathChildren(nid);
     }
-
+    
     @Override
     public Set<PathBI> getPathSetFromPositionSet(Set<PositionBI> positions) throws IOException {
         HashSet<PathBI> paths = new HashSet<PathBI>(positions.size());
-
+        
         for (PositionBI position : positions) {
             paths.add(position.getPath());
 
             // addOrigins(paths, position.getPath().getInheritedOrigins());
         }
-
+        
         return paths;
     }
-
+    
     @Override
     public Set<PathBI> getPathSetFromSapSet(Set<Integer> sapNids) throws IOException {
         HashSet<PathBI> paths = new HashSet<PathBI>(sapNids.size());
-
+        
         for (int sap : sapNids) {
             try {
                 PathBI path = Bdb.getSapDb().getPosition(sap).getPath();
-
+                
                 paths.add(path);
                 addOrigins(paths, path.getOrigins());
             } catch (PathNotExistsException ex) {
@@ -516,14 +515,14 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
                 throw new IOException(ex);
             }
         }
-
+        
         return paths;
     }
-
+    
     @Override
     public Set<PositionBI> getPositionSet(Set<Integer> sapNids) throws IOException {
         HashSet<PositionBI> positions = new HashSet<PositionBI>(sapNids.size());
-
+        
         for (int sap : sapNids) {
             try {
                 if (sap >= 0) {
@@ -535,63 +534,62 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
                 throw new IOException(ex);
             }
         }
-
+        
         return positions;
     }
-
+    
     @Override
     public int[] getPossibleChildren(int parentNid, ViewCoordinate vc) throws IOException {
         Collection<Relationship> destinationRels = Bdb.getNidCNidMap().getDestRels(parentNid);
         ArrayList<Integer> relNids = new ArrayList<>();
         NidSetBI relTypeNids = vc.getIsaTypeNids();
-        for(Relationship rel : destinationRels){
-           List<Version> versions = rel.getVersions(vc);
-           for(Version v: versions){
-               if(relTypeNids.contains(v.getTypeNid())){
-                   relNids.add(rel.getConceptNid());
-                   break;
-               }
-           }
+        for (Relationship rel : destinationRels) {
+            List<Version> versions = rel.getVersions(vc);
+            for (Version v : versions) {
+                if (relTypeNids.contains(v.getTypeNid())) {
+                    relNids.add(rel.getConceptNid());
+                    break;
+                }
+            }
         }
         int[] destNidsArray = new int[relNids.size()];
-        for(int i = 0; i < relNids.size(); i++ ){
+        for (int i = 0; i < relNids.size(); i++) {
             destNidsArray[i] = relNids.get(i);
         }
         
         return destNidsArray;
     }
     
-    
     @Override
     public int getReadOnlyMaxSap() {
         return Bdb.getSapDb().getReadOnlyMax();
     }
-
+    
     @Override
     public long getSequence() {
         return Bdb.gVersion.incrementAndGet();
     }
-
+    
     @Override
     public TerminologySnapshotDI getSnapshot(ViewCoordinate c) {
         return new BdbTerminologySnapshot(this, c);
     }
-
+    
     @Override
     public TerminologyBuilderBI getTerminologyBuilder(EditCoordinate ec, ViewCoordinate vc) {
         return new BdbTermBuilder(ec, vc);
     }
-
+    
     @Override
     public Collection<? extends ConceptChronicleBI> getUncommittedConcepts() {
         return BdbCommitManager.getUncommitted();
     }
-
+    
     @Override
     public List<UUID> getUuidsForNid(int nid) throws IOException {
         return Bdb.getUuidsToNidMap().getUuidsForNid(nid);
     }
-
+    
     @Override
     public UUID getUuidPrimordialForNid(int nid) throws IOException {
         ComponentChronicleBI<?> c = getComponent(nid);
@@ -600,54 +598,59 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
         }
         return UUID.fromString("00000000-0000-0000-C000-000000000046");
     }
-
+    
     @Override
     public boolean hasPath(int nid) throws IOException {
         return BdbPathManager.get().hasPath(nid);
     }
-
+    
     @Override
     public boolean hasUncommittedChanges() {
         if (Terms.get().getUncommitted().size() > 0) {
             return true;
         }
-
+        
         return false;
     }
-
+    
     @Override
     public boolean hasUuid(UUID memberUUID) {
         assert memberUUID != null;
-
+        
         return Bdb.hasUuid(memberUUID);
     }
     
     @Override
     public boolean hasUuid(List<UUID> memberUUIDs) {
         assert memberUUIDs != null;
-
+        
         for (UUID uuid : memberUUIDs) {
             if (Bdb.hasUuid(uuid)) {
                 return true;
             }
         }
-
+        
         return false;
     }
-
+    
     @Override
     public void addVetoablePropertyChangeListener(CONCEPT_EVENT pce, VetoableChangeListener l) {
         GlobalPropertyChange.addVetoableChangeListener(pce, l);
-    } 
-
+    }    
+    
     @Override
     public void addPropertyChangeListener(CONCEPT_EVENT pce, PropertyChangeListener l) {
         GlobalPropertyChange.addPropertyChangeListener(pce, l);
     }
+    
+    @Override
+    public boolean isChildOf(int childNid, int parentNid, ViewCoordinate vc) throws IOException, ContradictionException {
+        return Bdb.getNidCNidMap().isChildOf(childNid, parentNid, vc);
+    }
 
     //~--- inner classes -------------------------------------------------------
     private class ConceptGetter implements I_ProcessUnfetchedConceptData {
-
+        
         Map<Integer, ConceptChronicleBI> conceptMap = new ConcurrentHashMap<Integer, ConceptChronicleBI>();
         NidBitSetBI cNids;
 
@@ -662,12 +665,12 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
         public boolean continueWork() {
             return true;
         }
-
+        
         @Override
         public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fcfc) throws Exception {
             if (cNids.isMember(cNid)) {
                 Concept c = (Concept) fcfc.fetch();
-
+                
                 conceptMap.put(cNid, c);
             }
         }
@@ -684,9 +687,9 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
             // TODO Auto-generated method stub
         }
     }
-
+    
     private class ConceptVersionGetter implements I_ProcessUnfetchedConceptData {
-
+        
         Map<Integer, ConceptVersionBI> conceptMap = new ConcurrentHashMap<Integer, ConceptVersionBI>();
         NidBitSetBI cNids;
         ViewCoordinate coordinate;
@@ -703,12 +706,12 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
         public boolean continueWork() {
             return true;
         }
-
+        
         @Override
         public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fcfc) throws Exception {
             if (cNids.isMember(cNid)) {
                 Concept c = (Concept) fcfc.fetch();
-
+                
                 conceptMap.put(cNid, new ConceptVersion(c, coordinate));
             }
         }
@@ -725,72 +728,72 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
             // TODO Auto-generated method stub
         }
     }
-
+    
     @Override
     public int getAuthorNidForStampNid(int sapNid) {
         return Bdb.getAuthorNidForSapNid(sapNid);
-}
-
+    }
+    
     @Override
     public int getPathNidForStampNid(int sapNid) {
-         return Bdb.getPathNidForSapNid(sapNid);
-   }
-
+        return Bdb.getPathNidForSapNid(sapNid);
+    }
+    
     @Override
     public int getStatusNidForStampNid(int sapNid) {
-         return Bdb.getStatusNidForSapNid(sapNid);
-   }
+        return Bdb.getStatusNidForSapNid(sapNid);
+    }
     
     @Override
     public int getModuleNidForStampNid(int sapNid) {
-         return Bdb.getModuleNidForSapNid(sapNid);
-   }
-
+        return Bdb.getModuleNidForSapNid(sapNid);
+    }
+    
     @Override
     public long getTimeForStampNid(int sapNid) {
-         return Bdb.getTimeForSapNid(sapNid);
-   }
-
+        return Bdb.getTimeForSapNid(sapNid);
+    }
+    
     @Override
     public void writeDirect(ConceptChronicleBI cc) throws IOException {
         BdbCommitManager.writeDirect(cc);
     }
-
+    
     @Override
-   public void touchComponent(int nid) {
-      ChangeNotifier.touchComponent(nid);
-   }
-   
+    public void touchComponent(int nid) {
+        ChangeNotifier.touchComponent(nid);
+    }
+    
     @Override
-   public void touchComponentAlert(int nid) {
-      ChangeNotifier.touchComponentAlert(nid);
-   }
-   
+    public void touchComponentAlert(int nid) {
+        ChangeNotifier.touchComponentAlert(nid);
+    }
+    
     @Override
-   public void touchComponentTemplate(int nid) {
-      ChangeNotifier.touchComponentTemplate(nid);
-   }
-
+    public void touchComponentTemplate(int nid) {
+        ChangeNotifier.touchComponentTemplate(nid);
+    }
+    
     @Override
-   public void touchComponents(Collection<Integer> cNidSet) {
-      ChangeNotifier.touchComponents(cNidSet);
-   }
-
+    public void touchComponents(Collection<Integer> cNidSet) {
+        ChangeNotifier.touchComponents(cNidSet);
+    }
+    
     @Override
-   public void touchRefexRC(int nid) {
-      ChangeNotifier.touchRefexRC(nid);
-   }
-   
+    public void touchRefexRC(int nid) {
+        ChangeNotifier.touchRefexRC(nid);
+    }
+    
     @Override
-   public void touchRelOrigin(int nid) {
-      ChangeNotifier.touchRelOrigin(nid);
-   }
-
+    public void touchRelOrigin(int nid) {
+        ChangeNotifier.touchRelOrigin(nid);
+    }
+    
     @Override
-   public void touchRelTarget(int nid) {
-      ChangeNotifier.touchRelTarget(nid);
-   }
-   
+    public void touchRelTarget(int nid) {
+        ChangeNotifier.touchRelTarget(nid);
+    }
+    
     @Override
     public int getStampNid(TkRevision version) {
         return Bdb.getSapNid(version);
@@ -801,9 +804,20 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
         return Bdb.getNidCNidMap().isKindOf(childNid, parentNid, vc);
     }
     
-   @Override
-   public int[] getIncomingRelationshipsSourceNids(int cNid, NidSetBI relTypes) throws IOException {
-      return Bdb.getNidCNidMap().getDestRelNids(cNid, relTypes);
-   }
-  
+    @Override
+    public int[] getIncomingRelationshipsSourceNids(int cNid, NidSetBI relTypes) throws IOException {
+        return Bdb.getNidCNidMap().getDestRelNids(cNid, relTypes);
     }
+    
+    @Override
+    public Set<Integer> getAncestors(int childNid, ViewCoordinate vc) throws IOException, ContradictionException {
+        return Bdb.getNidCNidMap().getAncestorNids(childNid, vc);
+    }
+
+    @Override
+    public boolean hasExtension(int refsetNid, int componentNid) {
+        return Bdb.getNidCNidMap().hasExtension(refsetNid, componentNid);
+    }
+    
+    
+}

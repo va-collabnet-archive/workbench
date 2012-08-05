@@ -1761,31 +1761,18 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
     @Override
     public NidBitSetBI getPossibleKindOfConcepts(I_ConfigAceFrame config)
-            throws IOException {
-        NidSetBI isATypes = config.getDestRelTypes();
-
-        return getPossibleKindOfConcepts(isATypes);
+            throws IOException, ContradictionException {
+        return getPossibleKindOfConcepts(config.getViewCoordinate());
     }
 
-    public NidBitSetBI getPossibleKindOfConcepts(NidSetBI isATypes)
-            throws IOException {
-        NidBitSetBI possibleKindOfConcepts = Ts.get().getEmptyNidSet();
-
-      possibleKindOfConcepts.setMember(getNid());
-      collectPossibleKindOf(isATypes, possibleKindOfConcepts, nid);
-
-      return possibleKindOfConcepts;
+    public NidBitSetBI getPossibleKindOfConcepts(ViewCoordinate vc)
+            throws IOException, ContradictionException {
+      return collectPossibleKindOf(vc, nid);
     }
     
-    private void collectPossibleKindOf(NidSetBI isATypes, NidBitSetBI possibleKindOfConcepts, int cNid)
-           throws IOException {
-      for (int relNid : Bdb.getNidCNidMap().getDestRelNids(cNid, isATypes)) {
-         int cNidForOrigin = Bdb.getConceptNid(relNid);
-         if (possibleKindOfConcepts.isMember(cNidForOrigin) == false) {
-            possibleKindOfConcepts.setMember(cNidForOrigin);
-            collectPossibleKindOf(isATypes, possibleKindOfConcepts, cNidForOrigin);
-         }
-      }
+    private NidBitSetBI collectPossibleKindOf(ViewCoordinate vc, int cNid)
+           throws IOException, ContradictionException {
+        return Bdb.getNidCNidMap().getKindOfNids(cNid, vc);
    }
 
     private I_DescriptionTuple getPreferredAcceptability(
