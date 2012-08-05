@@ -59,4 +59,7 @@ public class TermAux {
     public static ConceptSpec USER =
             new ConceptSpec("user",
             UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c"));
+    public static ConceptSpec SNOMED_IDENTIFIER  =
+            new ConceptSpec("SNOMED integer id",
+            UUID.fromString("0418a591-f75b-39ad-be2c-3ab849326da9"));
 }

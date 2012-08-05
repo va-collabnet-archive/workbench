@@ -3,6 +3,7 @@ package org.ihtsdo.tk.api;
 import java.io.File;
 import java.io.IOException;
 import java.util.Set;
+import java.util.UUID;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -57,4 +58,8 @@ public interface TerminologyDI {
    Set<PathBI> getPathSetFromPositionSet(Set<PositionBI> positions) throws IOException;
    
    PathBI getPath(int pathNid) throws IOException;
+   
+     
+   int getNidFromAlternateId(UUID authorityUuid, String altId) throws IOException;
+
 }
