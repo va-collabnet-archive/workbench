@@ -405,8 +405,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                     memberTypeNid)) {
                 if (logger.isLoggable(Level.FINE)) {
                     String extValueDesc = Terms.get().getConcept(memberTypeNid).getInitialText();
-                    logger.fine("Concept is already a '" + extValueDesc
-                            + "' of the refset. Skipping.");
+                    logger.log(Level.FINE, "Concept is already a ''{0}'' of the refset. Skipping.", extValueDesc);
                 }
                 return false;
             }
@@ -425,7 +424,9 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
             AceLog.getAppLog().info("Nid has null component: " + componentNid);
         } else {
             UUID memberUuid = generateUuid(Ts.get().getConcept(refsetNid).getPrimUuid(), Ts.get().getComponent(componentNid).getPrimUuid(), Ts.get().getConcept(memberTypeNid).getPrimUuid());
-            if (Ts.get().hasUuid(memberUuid) && Ts.get().getComponent(memberUuid) != null) {
+            
+            
+            if (Ts.get().hasExtension(refsetNid, componentNid) && Ts.get().getComponent(memberUuid) != null) {
                 RefexChronicleBI<?> existingMember = (RefexChronicleBI) Ts.get().getComponent(memberUuid);
 
                 RefexVersionBI<?> existingVersion = existingMember.getVersion(config.getViewCoordinate().getViewCoordinateWithAllStatusValues());

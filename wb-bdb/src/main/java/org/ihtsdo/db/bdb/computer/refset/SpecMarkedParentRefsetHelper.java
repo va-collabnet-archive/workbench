@@ -58,13 +58,14 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
 
     	LineageCondition[] traversingConditions = new LineageCondition[] { new NotAlreadyVisited() };
 
-        Set<I_GetConceptData> ancestors = new HashSet<I_GetConceptData>();
-        for (Integer conceptId : conceptIds) {
-            ancestors.addAll(getAllAncestors(Terms.get().getConcept(conceptId), traversingConditions));
-        }
+//        Set<I_GetConceptData> ancestors = new HashSet<I_GetConceptData>();
+//        for (Integer conceptId : conceptIds) {
+//            ancestors.addAll(getAllAncestors(Terms.get().getConcept(conceptId), traversingConditions));
+//        }
 
-        for (I_GetConceptData concept : ancestors) {
-            newRefsetExtension(parentRefsetId, concept.getConceptNid(), parentMemberTypeId);
+        Set<Integer> ancestors = new HashSet<>();
+        for (int parentNid : ancestors) {
+            newRefsetExtension(parentRefsetId, parentNid, parentMemberTypeId);
         }
     }
 
