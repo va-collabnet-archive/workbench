@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.UUID;
 import org.dwfa.vodb.types.Position;
 import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
+import org.ihtsdo.tk.uuid.UuidFactory;
 
 public class BdbTerminologySnapshot implements TerminologySnapshotDI {
    private BdbTerminologyStore store;
@@ -222,5 +223,10 @@ public class BdbTerminologySnapshot implements TerminologySnapshotDI {
     @Override
     public boolean isKindOf(int childNid, int parentNid) throws IOException, ContradictionException {
         return store.isKindOf(childNid, parentNid, vc);
+    }
+
+    @Override
+    public int getNidFromAlternateId(UUID authorityUuid, String altId) throws IOException {
+        return store.getNidForUuids(UuidFactory.getUuidFromAlternateId(authorityUuid, altId));
     }
 }

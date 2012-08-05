@@ -45,6 +45,7 @@ import org.ihtsdo.tk.contradiction.ContradictionIdentifierBI;
 import org.ihtsdo.tk.db.DbDependency;
 import org.ihtsdo.tk.db.EccsDependency;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
+import org.ihtsdo.tk.uuid.UuidFactory;
 
 public class BdbTerminologyStore implements TerminologyStoreDI {
     
@@ -646,6 +647,11 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     @Override
     public boolean isChildOf(int childNid, int parentNid, ViewCoordinate vc) throws IOException, ContradictionException {
         return Bdb.getNidCNidMap().isChildOf(childNid, parentNid, vc);
+    }
+
+    @Override
+    public int getNidFromAlternateId(UUID authorityUuid, String altId) throws IOException {
+        return getNidForUuids(UuidFactory.getUuidFromAlternateId(authorityUuid, altId));
     }
 
     //~--- inner classes -------------------------------------------------------

@@ -68,6 +68,8 @@ import org.ihtsdo.tk.hash.Hashcode;
 import java.beans.PropertyVetoException;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -88,6 +90,7 @@ import java.util.logging.Logger;
 import org.dwfa.util.id.Type3UuidFactory;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.db.change.ChangeNotifier;
+import org.ihtsdo.tk.binding.snomed.TermAux;
 
 public abstract class ConceptComponent<R extends Revision<R, C>, C extends ConceptComponent<R, C>>
         implements I_AmTermComponent, I_AmPart<R>, I_AmTuple<R>, I_Identify, IdBI, I_IdPart, I_IdVersion,
@@ -177,7 +180,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         assert nid != Integer.MAX_VALUE : "Processing nid: " + enclosingConceptNid;
 
         if (eComponent.getAnnotations() != null) {
-            this.annotations = new ConcurrentSkipListSet<RefsetMember<?, ?>>();
+            this.annotations = new ConcurrentSkipListSet<>();
 
             for (TkRefexAbstractMember<?> eAnnot : eComponent.getAnnotations()) {
                 RefsetMember<?, ?> annot = RefsetMemberFactory.create(eAnnot, enclosingConceptNid);
@@ -608,39 +611,51 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         return false;
     }
+    
+    private static final UUID snomedAuthorityUuid = TermAux.SCT_ID_AUTHORITY.getUuids()[0];
 
-    public final void convertId(List<TkIdentifier> list) {
+    public final void convertId(List<TkIdentifier> list) throws IOException {
         if ((list == null) || list.isEmpty()) {
             return;
         }
 
-        additionalIdVersions = new ArrayList<IdentifierVersion>(list.size());
+        additionalIdVersions = new ArrayList<>(list.size());
 
         for (TkIdentifier idv : list) {
-            Object denotation = idv.getDenotation();
+            try {
+                Object denotation = idv.getDenotation();
 
-            switch (IDENTIFIER_PART_TYPES.getType(denotation.getClass())) {
-                case LONG:
-                    IdentifierVersionLong idvl = new IdentifierVersionLong((TkIdentifierLong) idv);
-                    additionalIdVersions.add(idvl);
-                    Bdb.getUuidsToNidMap().put(Type3UuidFactory.fromSNOMED(idvl.getDenotation()), nid);
-                    break;
+                switch (IDENTIFIER_PART_TYPES.getType(denotation.getClass())) {
+                    case LONG:
+                        IdentifierVersionLong idvl = new IdentifierVersionLong((TkIdentifierLong) idv);
+                        additionalIdVersions.add(idvl);
+                      if (idv.authorityUuid.equals(snomedAuthorityUuid)) {
+                          Bdb.getUuidsToNidMap().put(Type3UuidFactory.fromSNOMED(idv.getDenotation().toString()), nid);
+                      } else {
+                          Bdb.getUuidsToNidMap().put(Type5UuidFactory.get(idv.getAuthorityUuid(), idv.getDenotation().toString()), nid);
+                          
+                      }
+                        break;
 
-                case STRING:
-                    IdentifierVersionString idvs = new IdentifierVersionString((TkIdentifierString) idv);
-                    additionalIdVersions.add(idvs);
-                    Bdb.getUuidsToNidMap().put(Type3UuidFactory.fromSNOMED(idvs.getDenotation()), nid);
+                    case STRING:
+                        IdentifierVersionString idvs = new IdentifierVersionString((TkIdentifierString) idv);
+                        additionalIdVersions.add(idvs);
+                      Bdb.getUuidsToNidMap().put(Type5UuidFactory.get(idv.getAuthorityUuid(), idv.getDenotation().toString()), nid);
 
-                    break;
+                        break;
 
-                case UUID:
-                    Bdb.getUuidsToNidMap().put((UUID) denotation, nid);
-                    additionalIdVersions.add(new IdentifierVersionUuid((TkIdentifierUuid) idv));
+                    case UUID:
+                        Bdb.getUuidsToNidMap().put((UUID) denotation, nid);
+                        additionalIdVersions.add(new IdentifierVersionUuid((TkIdentifierUuid) idv));
+                      Bdb.getUuidsToNidMap().put(Type5UuidFactory.get(idv.getAuthorityUuid(), idv.getDenotation().toString()), nid);
 
-                    break;
+                        break;
 
-                default:
-                    throw new UnsupportedOperationException();
+                    default:
+                        throw new UnsupportedOperationException();
+                }
+            } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {
+                throw new IOException(ex);
             }
         }
 
