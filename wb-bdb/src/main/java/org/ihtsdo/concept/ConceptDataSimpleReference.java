@@ -955,7 +955,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
             if (srcRels.get() == null) {
                srcRels.compareAndSet(null,
                                      new AddSrcRelSet(getList(new RelationshipBinder(), OFFSETS.SOURCE_RELS,
-                                        enclosingConcept)));
+                                        enclosingConcept), true));
             }
          } finally {
             sourceRelLock.unlock();
