@@ -73,7 +73,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-        <dependency>
             <groupId>commons-primitives</groupId>
             <artifactId>commons-primitives</artifactId>
             <version>1.0</version>
