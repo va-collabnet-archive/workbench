@@ -130,7 +130,7 @@ public class EConcept extends TkConcept implements I_AmChangeSetObject {
       UUID currentUuid = ArchitectonicAuxiliary.Concept.CURRENT.getPrimoridalUid();
       UUID pathUuid    = ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getPrimoridalUid();
       UUID authorUuid    = ArchitectonicAuxiliary.Concept.USER.getPrimoridalUid();
-      UUID moduleUuid    = TkRevision.unspecifiedModuleUuid;
+      UUID moduleUuid    = ArchitectonicAuxiliary.Concept.AUXILIARY_MODULE.getPrimoridalUid();
       long time        = System.currentTimeMillis();
 
       primordialUuid                   = cNoHx.getUids().iterator().next();
