@@ -73,10 +73,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-        <groupId>org.ihtsdo</groupId>
-            <artifactId>tk-helpers</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <dependency>
             <groupId>commons-primitives</groupId>
             <artifactId>commons-primitives</artifactId>
