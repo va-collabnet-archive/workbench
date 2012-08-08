@@ -57,6 +57,7 @@ public class RF2HistoricalAssociationRelationshipImpl extends RF2AbstractImpl im
 			String relTypeId = "";
 			String active = "";
 			String releaseDate=getConfig().getReleaseDate();
+			Date prevReleaseDate= getDateFormat().parse(getConfig().getPreviousReleaseDate());
 			String targetComponent = "";
 			String moduleId = I_Constants.CORE_MODULE_ID;
 			int relationshipStatusId=0;
@@ -128,41 +129,43 @@ public class RF2HistoricalAssociationRelationshipImpl extends RF2AbstractImpl im
 						
 						//writeRF2TypeLine(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, targetComponent);
 						if(et.equals(PREVIOUSRELEASEDATE) || et.after(PREVIOUSRELEASEDATE)) {
-						effectiveTime = getDateFormat().format(new Date(rel.getTime()));
-						int relationshipGroup = rel.getGroup();
-						String refsetId = getRefsetId(relTypeId);
-	
-						if (referencedComponentId==null || referencedComponentId.equals("")){
-							referencedComponentId=concept.getUids().iterator().next().toString();
-						}
-						if (targetComponent==null || targetComponent.equals("")){
-							Collection<UUID> Uids=tf.getUids(rel.getC2Id());
-							if (Uids==null  ){
-								continue;
-							}
-							targetComponent=Uids.iterator().next().toString();
-							if (targetComponent.equals(nullUuid)){
-								continue;
-							}
-						}
-						String	wbrelationshipId="wbrelationshipId";
-						UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId + targetComponent);
-						
-						if(active.equals("0"))
-							wbrelationshipId= relationshipId;
-						else
-							wbrelationshipId = getRelationshipId(getConfig(), uuid);
+							if(et.after(prevReleaseDate)) {
+								effectiveTime = getDateFormat().format(new Date(rel.getTime()));
+								int relationshipGroup = rel.getGroup();
+								String refsetId = getRefsetId(relTypeId);
+			
+								if (referencedComponentId==null || referencedComponentId.equals("")){
+									referencedComponentId=concept.getUids().iterator().next().toString();
+								}
+								if (targetComponent==null || targetComponent.equals("")){
+									Collection<UUID> Uids=tf.getUids(rel.getC2Id());
+									if (Uids==null  ){
+										continue;
+									}
+									targetComponent=Uids.iterator().next().toString();
+									if (targetComponent.equals(nullUuid)){
+										continue;
+									}
+								}
+								String	wbrelationshipId="wbrelationshipId";
+								UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId + targetComponent);
+								
+								if(active.equals("0"))
+									wbrelationshipId= relationshipId;
+								else
+									wbrelationshipId = getRelationshipId(getConfig(), uuid);
+											
+								if (targetComponent.contains("-")){
+									//get conceptId by calling webservice 
+									wstargetComponent = getConceptId(getConfig(), UUID.fromString(targetComponent));
+									logger.info("targetComponent " + targetComponent + " & wstargetComponent " +wstargetComponent);
+								}else{
+									wstargetComponent = targetComponent;
+								}
 									
-						if (targetComponent.contains("-")){
-							//get conceptId by calling webservice 
-							wstargetComponent = getConceptId(getConfig(), UUID.fromString(targetComponent));
-							logger.info("targetComponent " + targetComponent + " & wstargetComponent " +wstargetComponent);
-						}else{
-							wstargetComponent = targetComponent;
-						}
-							
-						logger.info("==uuid== " +uuid + "  ==wbrelationshipId== " + wbrelationshipId + "  ==characteristicTypeId== " + characteristicTypeId + "   ==relationshipGroup== " + relationshipGroup);
-						writeRF2TypeLine(wbrelationshipId ,releaseDate , active, moduleId, referencedComponentId, wstargetComponent, 0, relTypeId, "-1", modifierId);							
+								logger.info("==uuid== " +uuid + "  ==wbrelationshipId== " + wbrelationshipId + "  ==characteristicTypeId== " + characteristicTypeId + "   ==relationshipGroup== " + relationshipGroup);
+								writeRF2TypeLine(wbrelationshipId ,releaseDate , active, moduleId, referencedComponentId, wstargetComponent, 0, relTypeId, "-1", modifierId);							
+							}
 						}
 					}
 				}
