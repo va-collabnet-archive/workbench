@@ -129,7 +129,11 @@ public class RF2HistoricalAssociationRelationshipImpl extends RF2AbstractImpl im
 						
 						//writeRF2TypeLine(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, targetComponent);
 						if(et.equals(PREVIOUSRELEASEDATE) || et.after(PREVIOUSRELEASEDATE)) {
+							logger.info("PREVIOUSRELEASEDATE " + PREVIOUSRELEASEDATE + " & et " +et);
+							
 							if(et.after(prevReleaseDate)) {
+								logger.info("prevReleaseDate " + prevReleaseDate + " & et " +et);
+								
 								effectiveTime = getDateFormat().format(new Date(rel.getTime()));
 								int relationshipGroup = rel.getGroup();
 								String refsetId = getRefsetId(relTypeId);
@@ -150,10 +154,12 @@ public class RF2HistoricalAssociationRelationshipImpl extends RF2AbstractImpl im
 								String	wbrelationshipId="wbrelationshipId";
 								UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId + targetComponent);
 								
-								if(active.equals("0"))
+								if(active.equals("0")){
 									wbrelationshipId= relationshipId;
-								else
+								}else{
 									wbrelationshipId = getRelationshipId(getConfig(), uuid);
+									logger.info("Config wbrelationshipId" +wbrelationshipId)
+								}
 											
 								if (targetComponent.contains("-")){
 									//get conceptId by calling webservice 
