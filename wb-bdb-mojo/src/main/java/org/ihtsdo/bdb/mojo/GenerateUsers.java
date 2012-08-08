@@ -212,93 +212,93 @@ public class GenerateUsers extends AbstractMojo {
 			}
 
 			//add users to wf permissions refset
-//			I_TermFactory tf = Terms.get();
-//			wfConfig = newProfile(null, null, null, null, null);
-//			Set<PathBI> editingPathSet = wfConfig.getEditingPathSet();
-//			editingPathSet.clear();
-//			editingPathSet.add(Ts.get().getPath(TermAux.WB_AUX_PATH.getLenient().getNid()));
-//			tf.setActiveAceFrameConfig(wfConfig);
-//			ViewCoordinate vc = wfConfig.getViewCoordinate();
-//			EditorCategoryRefsetWriter writer = new EditorCategoryRefsetWriter();
-//
-//			BufferedReader wfReader = new BufferedReader(new FileReader(wfPermissionsFile));
-//
-//			WorkflowHelper.updateModelers(vc);
-//			modelers = WorkflowHelper.getModelers();
-//			searcher = new EditorCategoryRefsetSearcher();
-//
-//			wfReader.readLine();
-//			String wfLine = wfReader.readLine();
-//                        NEXT_WHILE:		while (wfLine != null) {
-//				if (wfLine.trim().length() == 0) {
-//                                    wfLine = wfReader.readLine();
-//				    continue NEXT_WHILE;
-//				}
-//
-//				String[] columns = wfLine.split(",");
-//
-//				if (columns.length >= 3) {
-//					//Get rid of "User permission"
-//					columns[0] = (String) columns[0].subSequence("User permission (".length(), columns[0].length());
-//					//remove ")"
-//					columns[2] = columns[2].trim();
-//					columns[2] = columns[2].substring(0, columns[2].length() - 1);
-//
-//					int i = 0;
-//					for (String c : columns) {
-//						columns[i++] = c.split("=")[1].trim();
-//					}
-//					ConceptVersionBI newCategory = WorkflowHelper.lookupEditorCategory(columns[2], vc);
-//					ConceptVersionBI oldCategory = identifyExistingEditorCategory(columns, vc);
-//					boolean addingRequired = true;
-//
-//					if (oldCategory != null) {
-//						if (!oldCategory.equals(newCategory)) {
-//							writer.retireEditorCategory(modelers.get(columns[0]), columns[1], oldCategory);
-//						} else {
-//							addingRequired = false;
-//						}
-//					}
-//
-//					if (addingRequired) {
-//						if(modelers.get(columns[0]) == null){
-//							getLog().info("null found, adding: " + columns[0]);
-//						}
-//						writer.setEditor(modelers.get(columns[0]));
-//						writer.setSemanticArea(columns[1]);
-//
-//						writer.setCategory(newCategory);
-//						writer.addMember(true);
-//					}
-//
-//				}
-//                                wfLine = wfReader.readLine();
-//			}
-//			getLog().info("Starting rels permissions creation");
-//			if (relPermissionsFile.exists()) {
-//				try {
-//					FileReader     fr = new FileReader(relPermissionsFile);
-//					BufferedReader br = new BufferedReader(fr);
-//
-//					br.readLine();
-//
-//					String relPermissionLine = br.readLine();
-//					getLog().info("Looking at lines...");
-//					while (relPermissionLine != null) {
-//						String[] parts = relPermissionLine.split("\t");
-//
-//						addRelPermission(parts[0], parts[1], parts[2], parts[3], parts[4]);
-//						relPermissionLine = br.readLine();
-//					}
-//				} catch (Exception ex) {
-//					throw new TaskFailedException(ex);
-//				}
-//			} else {
-//				getLog().warn("No relPermissionsFile: " + relPermissionsFile.getAbsolutePath());
-//			}
-//
-//			Terms.get().commit();
-//
+			I_TermFactory tf = Terms.get();
+			wfConfig = newProfile(null, null, null, null, null);
+			Set<PathBI> editingPathSet = wfConfig.getEditingPathSet();
+			editingPathSet.clear();
+			editingPathSet.add(Ts.get().getPath(TermAux.WB_AUX_PATH.getLenient().getNid()));
+			tf.setActiveAceFrameConfig(wfConfig);
+			ViewCoordinate vc = wfConfig.getViewCoordinate();
+			EditorCategoryRefsetWriter writer = new EditorCategoryRefsetWriter();
+
+			BufferedReader wfReader = new BufferedReader(new FileReader(wfPermissionsFile));
+
+			WorkflowHelper.updateModelers(vc);
+			modelers = WorkflowHelper.getModelers();
+			searcher = new EditorCategoryRefsetSearcher();
+
+			wfReader.readLine();
+			String wfLine = wfReader.readLine();
+                        NEXT_WHILE:		while (wfLine != null) {
+				if (wfLine.trim().length() == 0) {
+                                    wfLine = wfReader.readLine();
+				    continue NEXT_WHILE;
+				}
+
+				String[] columns = wfLine.split(",");
+
+				if (columns.length >= 3) {
+					//Get rid of "User permission"
+					columns[0] = (String) columns[0].subSequence("User permission (".length(), columns[0].length());
+					//remove ")"
+					columns[2] = columns[2].trim();
+					columns[2] = columns[2].substring(0, columns[2].length() - 1);
+
+					int i = 0;
+					for (String c : columns) {
+						columns[i++] = c.split("=")[1].trim();
+					}
+					ConceptVersionBI newCategory = WorkflowHelper.lookupEditorCategory(columns[2], vc);
+					ConceptVersionBI oldCategory = identifyExistingEditorCategory(columns, vc);
+					boolean addingRequired = true;
+
+					if (oldCategory != null) {
+						if (!oldCategory.equals(newCategory)) {
+							writer.retireEditorCategory(modelers.get(columns[0]), columns[1], oldCategory);
+						} else {
+							addingRequired = false;
+						}
+					}
+
+					if (addingRequired) {
+						if(modelers.get(columns[0]) == null){
+							getLog().info("null found, adding: " + columns[0]);
+						}
+						writer.setEditor(modelers.get(columns[0]));
+						writer.setSemanticArea(columns[1]);
+
+						writer.setCategory(newCategory);
+						writer.addMember(true);
+					}
+
+				}
+                                wfLine = wfReader.readLine();
+			}
+			getLog().info("Starting rels permissions creation");
+			if (relPermissionsFile.exists()) {
+				try {
+					FileReader     fr = new FileReader(relPermissionsFile);
+					BufferedReader br = new BufferedReader(fr);
+
+					br.readLine();
+
+					String relPermissionLine = br.readLine();
+					getLog().info("Looking at lines...");
+					while (relPermissionLine != null) {
+						String[] parts = relPermissionLine.split("\t");
+
+						addRelPermission(parts[0], parts[1], parts[2], parts[3], parts[4]);
+						relPermissionLine = br.readLine();
+					}
+				} catch (Exception ex) {
+					throw new TaskFailedException(ex);
+				}
+			} else {
+				getLog().warn("No relPermissionsFile: " + relPermissionsFile.getAbsolutePath());
+			}
+
+			Terms.get().commit();
+
 			getLog().info("Starting close.");
 			Bdb.close();
 			getLog().info("db closed");
