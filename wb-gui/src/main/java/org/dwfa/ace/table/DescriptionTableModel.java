@@ -84,7 +84,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
         TYPE("type", 5, 85, 450),
         VERSION("time", 5, 140, 140),
         PATH("path", 5, 90, 150),
-        DESC_ID("id", 5, 100, 300),
+        CONCEPT_ID("id", 5, 100, 300),
         DESC_FSN("fsn", 5, 100, 2000);
         private String columnName;
         private int min;
@@ -139,6 +139,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
         }
     }
 
+    @Override
     public int getColumnCount() {
         return columns.length;
     }
@@ -152,6 +153,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
         return cb.getInitialText() + " null pref desc";
     }
 
+    @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         try {
             if (rowIndex >= getRowCount() || rowIndex < 0 || columnIndex < 0) {
@@ -217,9 +219,10 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
                     ConceptChronicleBI conceptChronicle = Ts.get().getConceptForNid(desc.getNid());
                     ConceptVersionBI conceptVersion = conceptChronicle.getVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
                     return new StringWithDescTuple(conceptVersion.getDescriptionFullySpecified().getText(), desc, false, inConflict);
-                case DESC_ID:
+                case CONCEPT_ID:
                     Long sctId = null;
-                    for(IdBI id : desc.getAllIds()){
+                    conceptChronicle = Ts.get().getConceptForNid(desc.getNid());
+                    for(IdBI id : conceptChronicle.getAllIds()){
                         if(id.getAuthorityNid() == Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids())){
                             sctId = ((LongIdBI)id).getDenotation();
                             break;
@@ -272,10 +275,12 @@ protected abstract I_DescriptionTuple getDescription(int rowIndex) throws IOExce
 
     protected abstract int getDescriptionCount() throws IOException;
 
+    @Override
     public String getColumnName(int col) {
         return columns[col].getColumnName();
     }
 
+    @Override
     public boolean isCellEditable(int row, int col) {
         if (ACE.editMode == false) {
             return false;
@@ -296,6 +301,7 @@ protected abstract I_DescriptionTuple getDescription(int rowIndex) throws IOExce
         return false;
     }
 
+    @Override
     public void setValueAt(Object value, int row, int col) {
         try {
             I_DescriptionTuple desc = getDescription(row);
@@ -393,6 +399,7 @@ UpdateDataAlertsTimerTask alertUpdater;
 
     }
 
+    @Override
     public Class
 
 
@@ -591,6 +598,7 @@ UpdateDataAlertsTimerTask alertUpdater;
                                                     }
                                                 }
 
+                                                @Override
                                                 public Object getCellEditorValue() {
                                                     return textField.getText();
                                                 }
@@ -598,6 +606,7 @@ UpdateDataAlertsTimerTask alertUpdater;
                                             textField.addActionListener(delegate);
                                         }
 
+                                        @Override
                                         public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
                                             this.row = row;
                                             this.column = column;

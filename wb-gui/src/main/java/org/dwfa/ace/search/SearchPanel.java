@@ -36,9 +36,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractSpinnerModel;
@@ -55,6 +58,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
+import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
@@ -69,20 +73,24 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.TermComponentLabel;
+import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_HostConceptPlugins.LINK_TYPE;
 import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.gui.concept.ConceptPanel;
+import org.dwfa.ace.gui.concept.LineagePlugin;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.DescriptionTableModel.DESC_FIELD;
 import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
@@ -93,8 +101,70 @@ import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.ace.tree.ExpandPathToNodeStateListener;
 import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.util.swing.GuiUtil;
 
-public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
+public class SearchPanel extends JPanel implements I_MakeCriterionPanel, I_HostConceptPlugins {
+
+    @Override
+    public boolean getShowHistory() {
+        throw new UnsupportedOperationException("Not supported yet. 1");
+    }
+
+    @Override
+    public boolean getShowRefsets() {
+        throw new UnsupportedOperationException("Not supported yet. 2");
+    }
+
+    @Override
+    public boolean getUsePrefs() {
+        throw new UnsupportedOperationException("Not supported yet. 3");
+    }
+
+    @Override
+    public I_GetConceptData getHierarchySelection() {
+       return config.getHierarchySelection();
+    }
+
+    @Override
+    public void unlink() {
+        throw new UnsupportedOperationException("Not supported yet. 5");
+    }
+
+    @Override
+    public void setToggleState(TOGGLES toggle, boolean state) {
+        throw new UnsupportedOperationException("Not supported yet. 6");
+    }
+
+    @Override
+    public boolean getToggleState(TOGGLES toggle) {
+        throw new UnsupportedOperationException("Not supported yet. 7");
+    }
+
+    @Override
+    public void setAllTogglesToState(boolean state) {
+        throw new UnsupportedOperationException("Not supported yet. 8");
+    }
+
+    @Override
+    public void setLinkType(LINK_TYPE link) {
+        throw new UnsupportedOperationException("Not supported yet. 9");
+    }
+
+    @Override
+    public I_AmTermComponent getTermComponent() {
+       return termComponent;
+    }
+
+    @Override
+    public void setTermComponent(I_AmTermComponent termComponent) {
+        this.termComponent = (I_GetConceptData) termComponent;
+    }
+
+    @Override
+    public I_ConfigAceFrame getConfig() {
+        return config;
+    }
 
     public class EraseListener implements ActionListener {
 
@@ -121,6 +191,9 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
             JToggleButton toggle = (JToggleButton) e.getSource();
             criterion.setVisible(!toggle.isSelected());
             addToList.setVisible(!toggle.isSelected());
+            showFsn.setVisible(!toggle.isSelected());
+            showId.setVisible(!toggle.isSelected());
+            showLineage.setVisible(!toggle.isSelected());
             loadButton.setVisible(!toggle.isSelected());
             progressBar.setVisible(!toggle.isSelected());
             saveButton.setVisible(!toggle.isSelected());
@@ -172,10 +245,41 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-                DESC_FIELD[] oldColumns = model.getColumnEnums();
-                DESC_FIELD[] newColumns = Arrays.copyOf(oldColumns, oldColumns.length + 1);
-                newColumns[oldColumns.length] = DESC_FIELD.DESC_FSN;
-                model.setColumns(newColumns);
+            TableColumnModel columnModel = descTable.getColumnModel();
+            boolean remove = false;
+            Enumeration<TableColumn> columns = columnModel.getColumns();
+            TableColumn col = columns.nextElement();
+            int columnIndex = 0;
+            int i = 0;
+            while(col != null){
+                if(col.getModelIndex() == fsnModelIndex){
+                    remove = true;
+                    columnIndex = i;
+                }
+                if(columns.hasMoreElements()){
+                    col = columns.nextElement();
+                }else{
+                    col = null;
+                }
+                
+                i++;
+            }
+            if(remove){
+                TableColumn column = columnModel.getColumn(columnIndex);
+                columnModel.removeColumn(columnModel.getColumn(columnIndex));
+            }else{
+                TableColumn column = new TableColumn(fsnModelIndex);
+
+                DESC_FIELD[] columnEnums = model.getColumnEnums();
+                DESC_FIELD columnDesc = columnEnums[fsnModelIndex];
+                column.setIdentifier(columnDesc);
+                column.setHeaderValue(columnDesc.getColumnName());
+                column.setPreferredWidth(columnDesc.getPref());
+                column.setMaxWidth(columnDesc.getMax());
+                column.setMinWidth(columnDesc.getMin());
+
+                columnModel.addColumn(column);
+            }
         }
     }
     
@@ -183,10 +287,41 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            DESC_FIELD[] oldColumns = model.getColumnEnums();
-                DESC_FIELD[] newColumns = Arrays.copyOf(oldColumns, oldColumns.length + 1);
-                newColumns[oldColumns.length] = DESC_FIELD.CON_NID;
-                model.setColumns(newColumns);
+            TableColumnModel columnModel = descTable.getColumnModel();
+            boolean remove = false;
+            Enumeration<TableColumn> columns = columnModel.getColumns();
+            TableColumn col = columns.nextElement();
+            int columnIndex = 0;
+            int i = 0;
+            while(col != null){
+                if(col.getModelIndex() == idModelIndex){
+                    remove = true;
+                    columnIndex = i;
+                }
+                if(columns.hasMoreElements()){
+                    col = columns.nextElement();
+                }else{
+                    col = null;
+                }
+                
+                i++;
+            }
+            if(remove){
+                TableColumn column = columnModel.getColumn(columnIndex);
+                columnModel.removeColumn(columnModel.getColumn(columnIndex));
+            }else{
+                TableColumn column = new TableColumn(idModelIndex);
+
+                DESC_FIELD[] columnEnums = model.getColumnEnums();
+                DESC_FIELD columnDesc = columnEnums[idModelIndex];
+                column.setIdentifier(columnDesc);
+                column.setHeaderValue(columnDesc.getColumnName());
+                column.setPreferredWidth(columnDesc.getPref());
+                column.setMaxWidth(columnDesc.getMax());
+                column.setMinWidth(columnDesc.getMin());
+
+                columnModel.addColumn(column);
+            }
         }
     }
     
@@ -195,6 +330,9 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
+                boolean visible = lineageScrollPane.isVisible();
+                lineageScrollPane.setVisible(!visible);
+                GuiUtil.tickle(SearchPanel.this);
             } catch (Exception ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
             }
@@ -279,6 +417,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
 
                 ListSelectionModel lsm = (ListSelectionModel) e.getSource();
                 if (lsm.isSelectionEmpty()) {
+                    lineageScrollPane.setVisible(false);
                     // no rows are selected
                 } else {
                     int viewRowIndex = lsm.getMinSelectionIndex();
@@ -298,7 +437,9 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
                             AceLog.getAppLog().alertAndLogException(e1);
                         }
                     }
+                    setTermComponent(cb);
                 }
+                lineagePlugin.update();
             } catch (TerminologyException e1) {
                 AceLog.getAppLog().alertAndLogException(e1);
             } catch (IOException e1) {
@@ -437,9 +578,14 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
     private JButton saveButton;
     private JToggleButton showHistory;
     private JToggleButton searchWithDescTypeFilter;
-    ;
+    private int fsnModelIndex;
+    private int idModelIndex;
+    private I_GetConceptData termComponent;
 
     private List<I_TestSearchResults> extraCriterion;
+    private JButton showId;
+    private JButton showFsn;
+    private JButton showLineage;
     private JButton addToList;
     private JButton addButton;
     private JButton removeButton;
@@ -447,6 +593,8 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
     private LINK_TYPE linkType = LINK_TYPE.UNLINKED;
     private JSpinner linkSpinner;
     private int lastSelectedRow = -1;
+    private LineagePlugin lineagePlugin = new LineagePlugin(true, 0);
+    private JScrollPane lineageScrollPane;
 
     public SearchPanel(I_ConfigAceFrame config, ACE ace) throws TerminologyException, IOException {
         super(new GridBagLayout());
@@ -659,23 +807,23 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         addToList.setToolTipText("add concepts from search results to list view");
         add(addToList, gbc);
         
-//        gbc.gridx++;
-////        addToList = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/trunk-red.png")));
-//        addToList.addActionListener(new ShowFsn());
-//        addToList.setToolTipText("show fsn for concept that contains description");
-//        add(addToList, gbc);
-//        
-//        gbc.gridx++;
-////        addToList = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/id_card.png")));
-//        addToList.addActionListener(new ShowConceptId());
-//        addToList.setToolTipText("show concept SCTID (UUID)");
-//        add(addToList, gbc);
-//        
-//        gbc.gridx++;
-////        addToList = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/nav_up_right_green.png")));
-//        addToList.addActionListener(new ShowLineageView());
-//        addToList.setToolTipText("show linage for conept that contains description");
-//        add(addToList, gbc);
+        gbc.gridx++;
+        showFsn = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/truck_red.png")));
+        showFsn.addActionListener(new ShowFsn());
+        showFsn.setToolTipText("show fsn for concept that contains description");
+        add(showFsn, gbc);
+        
+        gbc.gridx++;
+        showId = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/id_card.png")));
+        showId.addActionListener(new ShowConceptId());
+        showId.setToolTipText("show concept SCTID (UUID)");
+        add(showId, gbc);
+        
+        gbc.gridx++;
+        showLineage = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/nav_up_right_green.png")));
+        showLineage.addActionListener(new ShowLineageView());
+        showLineage.setToolTipText("show lineage for conept that contains description");
+        add(showLineage, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -693,12 +841,25 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.gridheight = 1;
-
+        
         model =
                 new DescriptionsFromCollectionTableModel(new DESC_FIELD[]{DESC_FIELD.SCORE, DESC_FIELD.STATUS,
-                    DESC_FIELD.TEXT, DESC_FIELD.DESC_ID, DESC_FIELD.DESC_FSN, DESC_FIELD.TYPE}, config);
+                    DESC_FIELD.TEXT, DESC_FIELD.TYPE, DESC_FIELD.DESC_FSN, DESC_FIELD.CONCEPT_ID}, config);
         descTable = new JTableWithDragImage(model);
         descTable.setAutoCreateColumnsFromModel(true);
+        DESC_FIELD[] columns = model.getColumnEnums();
+        int modelIndex = 0;
+        for(DESC_FIELD column : columns){
+            if(column.equals(DESC_FIELD.DESC_FSN)){
+                fsnModelIndex = modelIndex;
+            }
+            if(column.equals(DESC_FIELD.CONCEPT_ID)){
+                idModelIndex = modelIndex;
+            }
+            modelIndex++;
+        }
+        descTable.getColumnModel().removeColumn(descTable.getColumnModel().getColumn(5));
+        descTable.getColumnModel().removeColumn(descTable.getColumnModel().getColumn(4));
         
         //SortClickListener.setupSorter(descTable); //replaced by auto sort capable sorter below
         TableRowSorter<DescriptionsFromCollectionTableModel> trs = new TableRowSorter<DescriptionsFromCollectionTableModel>(model);
@@ -731,9 +892,10 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         // Set up tool tips for column headers.
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.BOTH;
-        gbc.gridwidth = 14;
+        gbc.gridwidth = 17;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
+        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         JScrollPane scrollPane = new JScrollPane(descTable);
         JToggleButton maximizeTable =
                 new JToggleButton(new ImageIcon(ACE.class.getResource("/16x16/plain/fit_to_size.png")));
@@ -743,8 +905,14 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
 
         scrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER, maximizeTable);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        add(scrollPane, gbc);
+        splitPane.setTopComponent(scrollPane);
         descTable.getSelectionModel().addListSelectionListener(new SearchSelectionListener());
+        JComponent lineageComponent = lineagePlugin.getComponent(this);
+        lineageScrollPane = new JScrollPane(lineageComponent);
+        lineageScrollPane.setVisible(false);
+        lineageScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        splitPane.setBottomComponent(lineageScrollPane);
+        add(splitPane, gbc);
 
     }
 
