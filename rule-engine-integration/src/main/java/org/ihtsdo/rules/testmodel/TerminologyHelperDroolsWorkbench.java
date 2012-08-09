@@ -512,7 +512,10 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 						Precedence.PATH, config.getConflictResolutionStrategy())) {
 					if (loopDescription.getStatusNid() == activeNid &&
 							loopDescription.getTypeNid() == fsnTypeNid && 
-							loopDescription.getLang().equals(langCode)) {
+							loopDescription.getLang().equals(langCode) &&
+							loopDescription.getText().contains("(") &&
+							loopDescription.getText().contains(")") &&
+							loopDescription.getText().lastIndexOf("(") < loopDescription.getText().lastIndexOf(")")) {
 						parentSemtags.add(loopDescription.getText().substring(loopDescription.getText().lastIndexOf('(')+1,loopDescription.getText().lastIndexOf(')')));
 					}
 				}
