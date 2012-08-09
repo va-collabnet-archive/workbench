@@ -247,10 +247,12 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         
         HashMap<UUID, String> conceptComputedAthDiffMap = new HashMap<UUID, String> ();
         
-        for(UUID authTime : authTimeForProjectPath){
-            if(conceptComputedAthAllMap.containsKey(authTime)){
-                conceptComputedAthMap.put(authTime, conceptComputedAthAllMap.get(authTime));
-                conceptComputedAthDiffMap.put(authTime, conceptComputedAthDiffAllMap.get(authTime));
+        if(authTimeForProjectPath != null){
+            for(UUID authTime : authTimeForProjectPath){
+                if(conceptComputedAthAllMap.containsKey(authTime)){
+                    conceptComputedAthMap.put(authTime, conceptComputedAthAllMap.get(authTime));
+                    conceptComputedAthDiffMap.put(authTime, conceptComputedAthDiffAllMap.get(authTime));
+                }
             }
         }
         
