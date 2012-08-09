@@ -142,6 +142,10 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
     @Override
     public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fetcher) throws Exception {
         ConceptVersionBI conceptVersion = fetcher.fetch(vc);
+        if(conceptVersion.getPrimUuid().equals(UUID.fromString(
+            "850a9fe0-7ca6-4bcc-af87-fdb4b5bd27ea"))){
+            System.out.println("Found it");
+        }
         Boolean watchConcept = false;
         
         //SET UP DATA FOR CONTRADICTION DETECTION
@@ -251,7 +255,9 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
             for(UUID authTime : authTimeForProjectPath){
                 if(conceptComputedAthAllMap.containsKey(authTime)){
                     conceptComputedAthMap.put(authTime, conceptComputedAthAllMap.get(authTime));
-                    conceptComputedAthDiffMap.put(authTime, conceptComputedAthDiffAllMap.get(authTime));
+                    if(conceptComputedAthDiffAllMap.containsKey(authTime)){
+                        conceptComputedAthDiffMap.put(authTime, conceptComputedAthDiffAllMap.get(authTime));
+                    }
                 }
             }
         }
