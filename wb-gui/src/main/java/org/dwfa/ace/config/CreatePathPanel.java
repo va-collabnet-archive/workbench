@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.swing.BorderFactory;
@@ -39,7 +40,9 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.path.SelectPathAndPositionPanelWithCombo;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.util.id.Type5UuidFactory;
+import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 
 public class CreatePathPanel extends JPanel implements ActionListener {
     /**
@@ -123,11 +126,11 @@ public class CreatePathPanel extends JPanel implements ActionListener {
                 JOptionPane.showMessageDialog(this.getTopLevelAncestor(), "Path description cannot be empty.");
                 return;
             }
-            HashSet<PositionBI> origins = new HashSet<PositionBI>();
+            HashSet<PositionBI> origins = new HashSet<>();
             origins.addAll(this.sppp.getSelectedPositions());
 
             AceLog.getAppLog().info(origins.toString());
-            if (origins.size() == 0) {
+            if (origins.isEmpty()) {
                 JOptionPane.showMessageDialog(this.getTopLevelAncestor(),
                     "You must select at least one origin for path.");
                 return;
@@ -140,10 +143,13 @@ public class CreatePathPanel extends JPanel implements ActionListener {
 
             // Create a concept for the path
             I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-            
+            Set<PathBI> editPathSet = new HashSet<>(config.getEditingPathSet());
+            config.getEditingPathSet().clear();
+            config.getEditingPathSet().add(Terms.get().getPath(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids()));
             UUID pathUUID = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, desc.getText());
 
             I_GetConceptData cb = Terms.get().newConcept(pathUUID,  false, config);
+            
 
             // Needs a description record...
             Terms.get().newDescription(UUID.randomUUID(), cb, "en", desc.getText(),
@@ -174,6 +180,8 @@ public class CreatePathPanel extends JPanel implements ActionListener {
             this.desc.setText("");
             this.parent.setTermComponent(null);
             Terms.get().commit();
+            config.getEditingPathSet().clear();
+            config.getEditingPathSet().addAll(editPathSet);
             AceLog.getAppLog().info("Paths after commit: " + Terms.get().getPaths());
             
             
