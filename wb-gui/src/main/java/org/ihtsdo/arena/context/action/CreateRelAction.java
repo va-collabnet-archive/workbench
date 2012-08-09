@@ -66,14 +66,6 @@ public class CreateRelAction extends AbstractAction implements Runnable{
                     config.getDbConfig().getUserConcept().getNid(),
                     pathItr.next().getConceptNid(),
                     Long.MAX_VALUE);
-
-            while (pathItr.hasNext()) {
-                newRel.makeAnalog(newRel.getStatusNid(),
-                        Long.MAX_VALUE,
-                        config.getEditCoordinate().getAuthorNid(),
-                        config.getEditCoordinate().getModuleNid(), 
-                        pathItr.next().getConceptNid());
-            }
             Terms.get().addUncommitted(originConcept);
 
         } catch (TerminologyException e1) {
