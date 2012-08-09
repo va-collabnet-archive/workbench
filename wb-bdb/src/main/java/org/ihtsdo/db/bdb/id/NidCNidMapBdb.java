@@ -545,10 +545,9 @@ public class NidCNidMapBdb extends ComponentBdb {
     public boolean hasMap(int nid) {
         int mapIndex = (nid - Integer.MIN_VALUE) / NID_CNID_MAP_SIZE;
         int nidIndexInMap = ((nid - Integer.MIN_VALUE) % NID_CNID_MAP_SIZE);
-        int sequenceIndexInMap = nidIndexInMap + 1;
 
         if ((mapIndex < nidCNidMaps.get().length) && (nidIndexInMap < NID_CNID_MAP_SIZE)) {
-            if (nidCNidMaps.get()[mapIndex][sequenceIndexInMap] < Integer.MAX_VALUE) {
+            if (nidCNidMaps.get()[mapIndex][nidIndexInMap] < Integer.MAX_VALUE) {
                 return true;
             }
         }
@@ -622,7 +621,7 @@ public class NidCNidMapBdb extends ComponentBdb {
 
         if ((nidCNidMapArrays != null) && (nidCNidMapArrays[mapIndex] != null)) {
             if (nidCNidMapArrays[mapIndex][nidIndexInMap] != cNid) {
-                nidCNidMapArrays[mapIndex][nidIndexInMap] = cNid;
+                nidCNidMapArrays[mapIndex][nidIndexInMap] = cNid; //doesn't go in here
                 mapChanged[mapIndex] = true;
             }
         } else {
