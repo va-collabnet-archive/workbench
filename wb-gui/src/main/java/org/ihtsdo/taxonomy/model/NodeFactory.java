@@ -87,7 +87,7 @@ public class NodeFactory {
         this.renderer = renderer;
         this.tree = tree;
         this.childNodeFilter = childNodeFilter;
-        this.nodeComparator = new NodeComparator(model.nodeStore);
+        this.nodeComparator = new NodeComparator(model.nodeStore); 
         expansionListener = new NodeExpansionListener(tree);
     }
 
@@ -167,9 +167,6 @@ public class NodeFactory {
     
     public TaxonomyNode makeNode(ConceptVersionBI nodeConcept, int parentCnid, TaxonomyNode parentNode)
             throws ContradictionException, IOException {
-        if(nodeConcept.getPrimUuid().equals(UUID.fromString("68ce08de-83c2-3ab3-999b-5cd165b29566"))){
-            System.out.println("oops");
-        }
         if (model.ts.getPossibleChildren(nodeConcept.getNid()).length == 0) {
             boolean multiParent = false;
             

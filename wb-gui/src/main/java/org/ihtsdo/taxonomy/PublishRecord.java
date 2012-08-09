@@ -15,7 +15,7 @@ import org.ihtsdo.taxonomy.nodes.TaxonomyNode;
  */
 public class PublishRecord {
    TaxonomyNode publishedNode;
-   UpdateType   updateType;
+   UpdateType   updateType; 
 
    //~--- constant enums ------------------------------------------------------
 

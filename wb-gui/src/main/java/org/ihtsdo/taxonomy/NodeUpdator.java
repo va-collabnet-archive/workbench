@@ -64,7 +64,7 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
                       Set<Integer> destinationsOfChangedRels,
                       Set<Integer> referencedComponentsOfChangedRefexs, Set<Integer> changedComponents,
                       TaxonomyNodeRenderer renderer)
-           throws IOException {
+           throws IOException, ContradictionException {
       this.ts                 = Ts.get();
       this.model              = model;
       this.sequence           = sequence;
@@ -196,7 +196,7 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
 
                   int[]                          possibleChildren     = ts.getPossibleChildren(cNid,
                                                                            renderer.getViewCoordinate());
-                  ConcurrentSkipListSet<Integer> possibleChildrenCSLS = new ConcurrentSkipListSet<Integer>();
+                  ConcurrentSkipListSet<Integer> possibleChildrenCSLS = new ConcurrentSkipListSet<>();
 
                   for (int pcNid : possibleChildren) {
                      possibleChildrenCSLS.add(pcNid);
@@ -330,7 +330,7 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
 
    private class ChildChangeNodeUpdate extends UpdateNode implements UpdateNodeBI {
       TaxonomyNode                        newNode  = null;
-      ConcurrentSkipListSet<TaxonomyNode> children = new ConcurrentSkipListSet<TaxonomyNode>();
+      ConcurrentSkipListSet<TaxonomyNode> children = new ConcurrentSkipListSet<>();
       TaxonomyNode                        currentNode;
       ConcurrentSkipListSet<Integer>      possibleChildren;
 
@@ -373,9 +373,7 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
 
                publish(pr);
             }
-         } catch (ContradictionException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-         } catch (IOException ex) {
+         } catch (   ContradictionException | IOException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
          }
       }
@@ -410,7 +408,7 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
 
    private class ParentAndChildChangeNodeUpdate extends UpdateNode implements UpdateNodeBI {
      TaxonomyNode                        newNode  = null;
-      ConcurrentSkipListSet<TaxonomyNode> children = new ConcurrentSkipListSet<TaxonomyNode>();
+      ConcurrentSkipListSet<TaxonomyNode> children = new ConcurrentSkipListSet<>();
       TaxonomyNode                        currentNode;
       ConcurrentSkipListSet<Integer>      possibleChildren;
 
@@ -453,9 +451,7 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
 
                publish(pr);
             }
-         } catch (ContradictionException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-         } catch (IOException ex) {
+         } catch (   ContradictionException | IOException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
          }
       }
@@ -486,13 +482,13 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
                      cycleExists = true;
                 }
             }
-            if(parentNode.getChildren().size() == 0){
+            if(parentNode.getChildren().isEmpty()){
                 cycleExists = true;
             }
             parentNode = model.getNodeStore().nodeMap.get(currentNode.parentNodeId);
             Collection<Long> children = parentNode.getChildren();
             if(cycleExists){
-                if(children.size() == 0){
+                if(children.isEmpty()){
                     model.getNodeStore().remove(currentNode.nodeId);
                 }else{
                     TaxonomyNode newNode = model.getNodeFactory().makeNode(cv, currentNode.getParentNid(),

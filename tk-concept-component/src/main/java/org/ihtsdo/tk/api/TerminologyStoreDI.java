@@ -171,7 +171,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
 
    List<? extends PathBI> getPathChildren(int pathNid);
 
-   int[] getPossibleChildren(int conceptNid, ViewCoordinate viewCoordinate) throws IOException;
+   int[] getPossibleChildren(int conceptNid, ViewCoordinate viewCoordinate) throws IOException, ContradictionException;
 
    /**
     * 

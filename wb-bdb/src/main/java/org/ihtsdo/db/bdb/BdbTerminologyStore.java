@@ -546,25 +546,8 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     }
     
     @Override
-    public int[] getPossibleChildren(int parentNid, ViewCoordinate vc) throws IOException {
-        Collection<Relationship> destinationRels = Bdb.getNidCNidMap().getDestRels(parentNid);
-        ArrayList<Integer> relNids = new ArrayList<>();
-        NidSetBI relTypeNids = vc.getIsaTypeNids();
-        for (Relationship rel : destinationRels) {
-            List<Version> versions = rel.getVersions(vc);
-            for (Version v : versions) {
-                if (relTypeNids.contains(v.getTypeNid())) {
-                    relNids.add(rel.getConceptNid());
-                    break;
-                }
-            }
-        }
-        int[] destNidsArray = new int[relNids.size()];
-        for (int i = 0; i < relNids.size(); i++) {
-            destNidsArray[i] = relNids.get(i);
-        }
-        
-        return destNidsArray;
+    public int[] getPossibleChildren(int parentNid, ViewCoordinate vc) throws IOException, ContradictionException {
+        return Bdb.getNidCNidMap().getChildrenConceptNids(parentNid, vc);
     }
     
     @Override

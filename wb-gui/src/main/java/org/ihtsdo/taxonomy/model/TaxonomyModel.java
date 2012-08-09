@@ -41,7 +41,7 @@ import javax.swing.tree.TreePath;
 public class TaxonomyModel implements TreeModel {
    private int                                      nextChildIndex = 0;
    protected CopyOnWriteArraySet<TreeModelListener> listeners      =
-      new CopyOnWriteArraySet<TreeModelListener>();
+      new CopyOnWriteArraySet<>();
    protected NodeStore                              nodeStore      = new NodeStore();
    private Iterator<Long>                           childItr;
    private TaxonomyNode                             lastParentNode;

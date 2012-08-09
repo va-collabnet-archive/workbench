@@ -21,6 +21,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.dwfa.vodb.types.Position;
 import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
 import org.ihtsdo.tk.api.search.ScoredComponentReference;
@@ -204,7 +206,11 @@ public class BdbTerminologySnapshot implements TerminologySnapshotDI {
 
    @Override
    public int[] getPossibleChildren(int cNid) throws IOException {
-      return store.getPossibleChildren(cNid, vc);
+        try {
+            return store.getPossibleChildren(cNid, vc);
+        } catch (ContradictionException ex) {
+            throw new IOException(ex);
+        }
    }
 
    @Override

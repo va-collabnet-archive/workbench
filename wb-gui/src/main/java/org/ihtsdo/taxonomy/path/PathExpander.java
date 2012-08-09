@@ -30,7 +30,7 @@ import java.util.List;
  *
  * @author kec
  */
-public class PathExpander implements Runnable {
+public class PathExpander implements Runnable { 
    I_ConfigAceFrame config;
    ConceptVersionBI focus;
    TaxonomyModel    model;

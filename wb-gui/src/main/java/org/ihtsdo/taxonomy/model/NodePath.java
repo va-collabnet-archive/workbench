@@ -29,13 +29,13 @@ public class NodePath {
          return new TreePath(node);
       }
 
-      LinkedList<Long> idList = new LinkedList<Long>();
+      LinkedList<Long> idList = new LinkedList<>();
 
       idList.addLast(node.nodeId);
 
       TaxonomyNode parentNode = model.getNodeStore().get(node.parentNodeId);
 
-      HashSet<Long> nodeIdsInPath = new HashSet<Long>();
+      HashSet<Long> nodeIdsInPath = new HashSet<>();
       while (parentNode != null) {
          if (nodeIdsInPath.contains(parentNode.nodeId)) {
              AceLog.getAppLog().alertAndLogException(new Exception("Cycle in NodePath: " + parentNode + " " + nodeIdsInPath));

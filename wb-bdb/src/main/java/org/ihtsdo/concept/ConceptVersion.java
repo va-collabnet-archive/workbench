@@ -63,6 +63,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
@@ -1256,7 +1258,11 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
 
     @Override
     public boolean isLeaf() throws IOException {
-        return Ts.get().getPossibleChildren(concept.nid, vc).length == 0;
+        try {
+            return Ts.get().getPossibleChildren(concept.nid, vc).length == 0;
+        } catch (ContradictionException ex) {
+           throw new IOException(ex);
+        }
     }
 
     // TODO

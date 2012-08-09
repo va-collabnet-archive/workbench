@@ -53,6 +53,8 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.*;
 import javax.swing.event.TreeExpansionEvent;
@@ -61,6 +63,7 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.TreePath;
+import org.ihtsdo.tk.api.ContradictionException;
 
 /**
  *
@@ -141,8 +144,8 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
 
             FutureHelper.addFuture(ACE.threadPool.submit(changeWorker));
             }
-        } catch (IOException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
+        } catch (ContradictionException | IOException ex) {
+           AceLog.getAppLog().alertAndLogException(ex);
         }
       
    }
