@@ -40,8 +40,13 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.path.SelectPathAndPositionPanelWithCombo;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.util.id.Type5UuidFactory;
+import org.ihtsdo.lang.LANG_CODE;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.TerminologyBuilderBI;
+import org.ihtsdo.tk.api.blueprint.ConceptCB;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 
 public class CreatePathPanel extends JPanel implements ActionListener {
@@ -147,28 +152,17 @@ public class CreatePathPanel extends JPanel implements ActionListener {
             config.getEditingPathSet().clear();
             config.getEditingPathSet().add(Terms.get().getPath(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids()));
             UUID pathUUID = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, desc.getText());
-
-            I_GetConceptData cb = Terms.get().newConcept(pathUUID,  false, config);
             
-
-            // Needs a description record...
-            Terms.get().newDescription(UUID.randomUUID(), cb, "en", desc.getText(),
-            		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()), 
-            		config);
-            Terms.get().newDescription(UUID.randomUUID(), cb, "en", desc.getText(),
-            		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()), 
-            		config);
- 
-
-            // Needs a relationship record...
-            Terms.get().newRelationship(UUID.randomUUID(), cb,
-            		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()),
-            		selectedParent,
-            		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()),
-            		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
-            		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 
-            		0, config);
-
+            ConceptCB conceptBlueprint = new ConceptCB(
+                    desc.getText(),
+                    desc.getText(),
+                    LANG_CODE.EN,
+                    ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid(),
+                    selectedParent.getPrimUuid());
+            conceptBlueprint.setComponentUuid(pathUUID);
+            TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(config.getEditCoordinate(), config.getViewCoordinate());
+            I_GetConceptData cb = (I_GetConceptData) builder.construct(conceptBlueprint);
+            
             Terms.get().addUncommitted(cb);
             Terms.get().commit();
 
