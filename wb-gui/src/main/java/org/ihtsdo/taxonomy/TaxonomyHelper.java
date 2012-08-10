@@ -70,7 +70,7 @@ import org.ihtsdo.tk.api.ContradictionException;
  * @author kec
  */
 public class TaxonomyHelper extends TermChangeListener implements PropertyChangeListener {
-   private static ImageIcon statedView =
+   private static ImageIcon statedView = 
       new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/graph_edge.png"));
    private static ImageIcon preferredDisplay =
       new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/car_compact_green.png"));
@@ -223,12 +223,17 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
          break;
       }
    }
-
+   Object lastPropigationId = Long.MIN_VALUE;
    @Override
    public void propertyChange(PropertyChangeEvent evt) {
-      if (evt.getPropertyName().equals("roots")) {
-         updateNewModel(evt.getPropertyName());
-      } else if ("viewPositions".equals(evt.getPropertyName())
+       if (evt.getPropagationId() != null && 
+               evt.getPropagationId().equals(lastPropigationId)) {
+           return;
+       }
+       lastPropigationId = evt.getPropagationId();
+      if ("roots".equals(evt.getPropertyName())
+//                 || "termComponent".equals(evt.getPropertyName())
+                 || "viewPositions".equals(evt.getPropertyName())
                  || "showPathInfoInTaxonomy".equals(evt.getPropertyName())
                  || "showRefsetInfoInTaxonomy".equals(evt.getPropertyName())
                  || "showViewerImagesInTaxonomy".equals(evt.getPropertyName())
