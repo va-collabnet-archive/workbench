@@ -56,7 +56,7 @@ public class ConceptNavigator extends JPanel {
         super(new GridBagLayout());
         this.treeScroller = treeScroller;
         this.historyScroller = new JScrollPane(new JLabel("History panel"));
-        this.historyScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        this.historyScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         this.historyScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
         this.historyScroller.setVisible(false);
         this.view = view;
@@ -205,7 +205,6 @@ public class ConceptNavigator extends JPanel {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    updateHistoryPanel();
                     historyScroller.revalidate();
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
@@ -266,7 +265,6 @@ public class ConceptNavigator extends JPanel {
             focusDrop.setVisible(false);
             historyScroller.setVisible(true);
             historyScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-            historyScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
