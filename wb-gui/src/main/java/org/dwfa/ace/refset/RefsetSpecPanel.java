@@ -80,6 +80,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import java.io.IOException;
 
@@ -175,6 +177,13 @@ public class RefsetSpecPanel extends JPanel {
       setupRefsetMemberTable(commentTableModel);
       editor.getLabel().setTermComponent(editor.getTermComponent());
       editor.addHistoryActionListener(new HistoryActionListener());
+      editor.getLabel().addTermChangeListener(new PropertyChangeListener() {
+
+           @Override
+           public void propertyChange(PropertyChangeEvent evt) {
+               refresh();
+           }
+       });
       bottomPanelVerticalBox.add(bottomTabs);
       refreshSnomedIdPanel();
       bottomPanelVerticalBox.add(snomedIdPanel);
