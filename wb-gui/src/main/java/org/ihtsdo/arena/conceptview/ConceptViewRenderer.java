@@ -758,7 +758,7 @@ public class ConceptViewRenderer extends JLayeredPane {
         this.settings.addHostListener(new HostListener());
     }
 
-    private void updateLabel() {
+    protected void updateLabel() {
         showConceptPanel();
         title.updateTitle();
     }

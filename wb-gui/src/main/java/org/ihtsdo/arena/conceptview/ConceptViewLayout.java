@@ -474,7 +474,8 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             if (stop) {
                 return;
             }
-
+            
+            cView.getCvRenderer().updateLabel();
             cView.getCvRenderer().updateCancelAndCommit();
             if(!sapsForConflict.isEmpty()){
                 cView.getCvRenderer().showConflictIcon(true);
