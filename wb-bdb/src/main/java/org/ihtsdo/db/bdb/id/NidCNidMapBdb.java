@@ -83,7 +83,7 @@ public class NidCNidMapBdb extends ComponentBdb {
 
             record.addNidPairForRefex(pair.getRefexNid(), pair.getMemberNid());
             indexCacheRecords.get()[mapIndex][nidIndexInMap] = record.getData();
-            mapChanged[mapIndex]                      = true;
+            mapChanged[mapIndex] = true;
         } finally {
             locks.unlock(nid);
         }
@@ -108,7 +108,7 @@ public class NidCNidMapBdb extends ComponentBdb {
 
             record.addDestinationOriginNid(originCNid);
             indexCacheRecords.get()[mapIndex][nidIndexInMap] = record.getData();
-            mapChanged[mapIndex]                      = true;
+            mapChanged[mapIndex] = true;
         } finally {
             locks.unlock(destinationCNid);
         }
@@ -197,7 +197,7 @@ public class NidCNidMapBdb extends ComponentBdb {
 
             record.forgetNidPairForRefex(pair.getRefexNid(), pair.getMemberNid());
             indexCacheRecords.get()[mapIndex][nidIndexInMap] = record.getData();
-            mapChanged[mapIndex]                      = true;
+            mapChanged[mapIndex] = true;
         } finally {
             locks.unlock(nid);
         }
@@ -359,7 +359,7 @@ public class NidCNidMapBdb extends ComponentBdb {
             record.updateData(indexCacheRecordRelationshipArray, record.getDestinationOriginNids(),
                     record.getRefexIndexArray());
             indexCacheRecords.get()[mapIndex][nidIndexInMap] = record.getData();
-            mapChanged[mapIndex]                      = true;
+            mapChanged[mapIndex] = true;
         } finally {
             locks.unlock(concept.getNid());
         }
@@ -635,17 +635,26 @@ public class NidCNidMapBdb extends ComponentBdb {
 
     public NidBitSetBI getKindOfNids(int conceptNid, ViewCoordinate vc) throws IOException, ContradictionException {
         NidBitSetBI kindOfSet = Bdb.getConceptDb().getEmptyIdSet();
-        NidBitSetBI testedSet = Bdb.getConceptDb().getEmptyIdSet();
+        HashSet<Long> testedSet = new HashSet<>();
         kindOfSet.setMember(conceptNid);
         getKindOfNids(conceptNid, vc, kindOfSet, testedSet);
 
         return kindOfSet;
     }
 
-    private void getKindOfNids(int conceptNid, ViewCoordinate vc, NidBitSetBI kindOfSet, NidBitSetBI testedSet) throws IOException, ContradictionException {
+    private void getKindOfNids(int conceptNid, ViewCoordinate vc, NidBitSetBI kindOfSet, HashSet<Long> testedSet) throws IOException, ContradictionException {
         for (int cNid : getIndexCacheRecord(conceptNid).getDestinationOriginNids()) {
-            if (!testedSet.isMember(cNid)) {
-                testedSet.setMember(cNid);
+            long testedKey = conceptNid;
+
+            testedKey = testedKey & 0x00000000FFFFFFFFL;
+
+            long nid1Long = cNid;
+
+            nid1Long = nid1Long & 0x00000000FFFFFFFFL;
+            testedKey = testedKey << 32;
+            testedKey = testedKey | nid1Long;
+            if (!testedSet.contains(testedKey)) {
+                testedSet.add(testedKey);
                 if (isChildOf(cNid, conceptNid, vc)) {
                     kindOfSet.setMember(cNid);
                     getKindOfNids(cNid, vc, kindOfSet, testedSet);
@@ -673,35 +682,39 @@ public class NidCNidMapBdb extends ComponentBdb {
 
     private void getAncestorNids(int childNid, ViewCoordinate vc, Set<Integer> ancestorSet,
             Set<Long> testedSet, RelativePositionComputerBI computer) throws IOException, ContradictionException {
-        for (RelationshipIndexRecord r : getIndexCacheRecord(childNid).getRelationshipsRecord()) {
-            if (!ancestorSet.contains(r.getDestinationNid())) {
-                long testedKey = childNid;
+        try {
+            for (RelationshipIndexRecord r : getIndexCacheRecord(childNid).getRelationshipsRecord()) {
+                if (!ancestorSet.contains(r.getDestinationNid())) {
+                    long testedKey = childNid;
 
-                testedKey = testedKey & 0x00000000FFFFFFFFL;
+                    testedKey = testedKey & 0x00000000FFFFFFFFL;
 
-                long nid1Long = r.getDestinationNid();
+                    long nid1Long = r.getDestinationNid();
 
-                nid1Long = nid1Long & 0x00000000FFFFFFFFL;
-                testedKey = testedKey << 32;
-                testedKey = testedKey | nid1Long;
+                    nid1Long = nid1Long & 0x00000000FFFFFFFFL;
+                    testedKey = testedKey << 32;
+                    testedKey = testedKey | nid1Long;
 
-                if (!testedSet.contains(testedKey)) {
-                    testedSet.add(testedKey);
-                    if (r.isActiveTaxonomyRelationship(vc, computer)) {
-                        ancestorSet.add(r.getDestinationNid());
-                        getAncestorNids(r.getDestinationNid(), vc);
+                    if (!testedSet.contains(testedKey)) {
+                        testedSet.add(testedKey);
+                        if (r.isActiveTaxonomyRelationship(vc, computer)) {
+                            ancestorSet.add(r.getDestinationNid());
+                            getAncestorNids(r.getDestinationNid(), vc, ancestorSet, testedSet, computer);
+                        }
                     }
                 }
             }
+        } catch (NoSuchElementException noSuchElementException) {
+            // nothing to do...
         }
     }
 
     public boolean hasExtension(int refsetNid, int componentNid) {
-       for (NidPairForRefex npr: getRefsetPairs(componentNid)) {
-           if (npr.getRefexNid() == refsetNid) {
-               return true;
-           }
-       }
-       return false;
+        for (NidPairForRefex npr : getRefsetPairs(componentNid)) {
+            if (npr.getRefexNid() == refsetNid) {
+                return true;
+            }
+        }
+        return false;
     }
 }
