@@ -316,7 +316,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      *
      */
     private static final long serialVersionUID = 1L;
-    private static final int dataVersion = 51; // keep current with
+    private static final int dataVersion = 52; // keep current with
     // objDataVersion logic
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
     private transient VetoableChangeSupport vetoSupport = new VetoableChangeSupport(this);
@@ -446,6 +446,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     private int moduleNid = Ts.get().getNidForUuids(TkRevision.unspecifiedModuleUuid);
     // 51 :SNOOWL:
     private boolean classifierOwlFeatureStatus = false; // :SNOOWL:
+    // 52 fixing writing of module nid. 
+    
     // transient
     private transient MasterWorker worker;
     private transient String statusMessage;
@@ -655,7 +657,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         out.writeObject(classifierInputMode);
         
         // 50
-        out.writeObject(moduleNid);
+        out.writeObject(Ts.get().getUuidsForNid(moduleNid));
 
         // 51 :SNOOWL:
         out.writeBoolean(classifierOwlFeatureStatus); // :SNOOWL:
@@ -1152,10 +1154,13 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                 classifierInputMode = CLASSIFIER_INPUT_MODE_PREF.EDIT_PATH;
             }
             
-            if (objDataVersion >= 50) {
-                moduleNid = (Integer) in.readObject();
-            } else {
-                moduleNid = Ts.get().getNidForUuids(TkRevision.unspecifiedModuleUuid);
+            if (objDataVersion < 50) {
+               moduleNid = Ts.get().getNidForUuids(TkRevision.unspecifiedModuleUuid);
+            } else if (objDataVersion == 50 || objDataVersion == 51 ) {
+               throw new IOException("Bad dataversion: " + objDataVersion);
+            } else if (objDataVersion  > 51) {
+                Collection<UUID> moduleUuids = (Collection<UUID>) in.readObject(); //52
+                moduleNid = Ts.get().getNidForUuids(moduleUuids);
             }
 
             if (objDataVersion >= 51) { // :SNOOWL:
@@ -1163,7 +1168,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             } else {
                 classifierOwlFeatureStatus = false;
             }
-
+            //52 see above
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
