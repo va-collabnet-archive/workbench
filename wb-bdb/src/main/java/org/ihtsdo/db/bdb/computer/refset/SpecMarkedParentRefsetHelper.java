@@ -1,18 +1,14 @@
 /**
- * Copyright (c) 2009 International Health Terminology Standards Development
- * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ * Copyright (c) 2009 International Health Terminology Standards Development Organisation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and limitations under the License.
  */
 package org.ihtsdo.db.bdb.computer.refset;
 
@@ -30,12 +26,11 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.Ts;
 
 public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_HelpMarkedParentRefset {
 
-
     private static final Logger logger = Logger.getLogger(SpecMarkedParentRefsetHelper.class.getName());
-
     private int refsetId;
     private int memberTypeId;
     private int parentRefsetId;
@@ -51,31 +46,24 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
     }
 
     /* (non-Javadoc)
-	 * @see org.dwfa.ace.refset.spec.I_HelpMarkedParentRefset#addParentMembers(java.lang.Integer)
-	 */
+     * @see org.dwfa.ace.refset.spec.I_HelpMarkedParentRefset#addParentMembers(java.lang.Integer)
+     */
     @Override
     public void addParentMembers(Integer... conceptIds) throws Exception {
-
-    	LineageCondition[] traversingConditions = new LineageCondition[] { new NotAlreadyVisited() };
-
-//        Set<I_GetConceptData> ancestors = new HashSet<I_GetConceptData>();
-//        for (Integer conceptId : conceptIds) {
-//            ancestors.addAll(getAllAncestors(Terms.get().getConcept(conceptId), traversingConditions));
-//        }
-
-        Set<Integer> ancestors = new HashSet<>();
-        for (int parentNid : ancestors) {
-            newRefsetExtension(parentRefsetId, parentNid, parentMemberTypeId);
+        for (int conceptId : conceptIds) {
+            for (int parentNid : Ts.get().getAncestors(conceptId, config.getViewCoordinate())) {
+                newRefsetExtension(parentRefsetId, parentNid, parentMemberTypeId);
+            }
         }
     }
 
     /* (non-Javadoc)
-	 * @see org.dwfa.ace.refset.spec.I_HelpMarkedParentRefset#addDescriptionParentMembers(java.lang.Integer)
-	 */
+     * @see org.dwfa.ace.refset.spec.I_HelpMarkedParentRefset#addDescriptionParentMembers(java.lang.Integer)
+     */
     @Override
     public void addDescriptionParentMembers(Integer... descriptionIds) throws Exception {
 
-    	LineageCondition[] traversingConditions = new LineageCondition[] { new NotAlreadyVisited() };
+        LineageCondition[] traversingConditions = new LineageCondition[]{new NotAlreadyVisited()};
 
         Set<I_GetConceptData> ancestors = new HashSet<I_GetConceptData>();
         for (Integer descriptionId : descriptionIds) {
@@ -91,12 +79,12 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
     }
 
     /* (non-Javadoc)
-	 * @see org.dwfa.ace.refset.spec.I_HelpMarkedParentRefset#removeParentMembers(java.lang.Integer)
-	 */
+     * @see org.dwfa.ace.refset.spec.I_HelpMarkedParentRefset#removeParentMembers(java.lang.Integer)
+     */
     @Override
     public void removeParentMembers(Integer... conceptIds) throws Exception {
-    	LineageCondition[] traversingConditions =
-                new LineageCondition[] { new HasExtension(parentRefsetId, parentMemberTypeId), new NotAlreadyVisited() };
+        LineageCondition[] traversingConditions =
+                new LineageCondition[]{new HasExtension(parentRefsetId, parentMemberTypeId), new NotAlreadyVisited()};
 
         // Get all ancestors
         Set<Integer> toBeRetired = new HashSet<Integer>();
@@ -124,7 +112,7 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
 
         // Reset memory of visited concepts
         traversingConditions =
-                new LineageCondition[] { new HasExtension(parentRefsetId, parentMemberTypeId), new NotAlreadyVisited() };
+                new LineageCondition[]{new HasExtension(parentRefsetId, parentMemberTypeId), new NotAlreadyVisited()};
 
         // Find all ancestors of the lineages not to be modified
         Set<Integer> ancestorIdsToExclude = new HashSet<Integer>();
@@ -144,12 +132,12 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
     }
 
     /* (non-Javadoc)
-	 * @see org.dwfa.ace.refset.spec.I_HelpMarkedParentRefset#removeDescriptionParentMembers(java.lang.Integer)
-	 */
+     * @see org.dwfa.ace.refset.spec.I_HelpMarkedParentRefset#removeDescriptionParentMembers(java.lang.Integer)
+     */
     @Override
     public void removeDescriptionParentMembers(Integer... descriptionIds) throws Exception {
-    	LineageCondition[] traversingConditions =
-                new LineageCondition[] { new HasExtension(parentRefsetId, parentMemberTypeId), new NotAlreadyVisited() };
+        LineageCondition[] traversingConditions =
+                new LineageCondition[]{new HasExtension(parentRefsetId, parentMemberTypeId), new NotAlreadyVisited()};
 
         // Get all ancestors
         Set<Integer> toBeRetired = new HashSet<Integer>();
@@ -160,7 +148,7 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
                 toBeRetired.add(concept.getConceptNid());
             }
             for (I_GetConceptData ancestor : getAllAncestors(Terms.get().getConcept(concept.getConceptNid()),
-                traversingConditions)) {
+                    traversingConditions)) {
                 toBeRetired.add(ancestor.getConceptNid());
             }
         }
@@ -180,7 +168,7 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
 
         // Reset memory of visited concepts
         traversingConditions =
-                new LineageCondition[] { new HasExtension(parentRefsetId, parentMemberTypeId), new NotAlreadyVisited() };
+                new LineageCondition[]{new HasExtension(parentRefsetId, parentMemberTypeId), new NotAlreadyVisited()};
 
         // Find all ancestors of the lineages not to be modified
         Set<Integer> ancestorIdsToExclude = new HashSet<Integer>();
@@ -200,8 +188,8 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
     }
 
     /* (non-Javadoc)
-	 * @see org.dwfa.ace.refset.spec.I_HelpMarkedParentRefset#isMarkedParent(int)
-	 */
+     * @see org.dwfa.ace.refset.spec.I_HelpMarkedParentRefset#isMarkedParent(int)
+     */
     @Override
     public boolean isMarkedParent(int conceptId) throws Exception {
         return hasCurrentRefsetExtension(parentRefsetId, conceptId, parentMemberTypeId);
@@ -212,8 +200,8 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
     }
 
     /* (non-Javadoc)
-	 * @see org.dwfa.ace.refset.spec.I_HelpMarkedParentRefset#getParentRefset()
-	 */
+     * @see org.dwfa.ace.refset.spec.I_HelpMarkedParentRefset#getParentRefset()
+     */
     @Override
     public int getParentRefset() throws Exception {
 
@@ -224,23 +212,22 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
 
         Set<? extends I_GetConceptData> targetParentRefsets =
                 memberRefset.getSourceRelTargets(getAllowedStatuses(), allowedType, getViewPositions(),
-                    getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy());
+                getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy());
 
         if (targetParentRefsets == null || targetParentRefsets.isEmpty()) {
             throw new TerminologyException("Unable to locate parent member refset for '"
-                + memberRefset.getInitialText() + "'");
+                    + memberRefset.getInitialText() + "'");
         }
         if (targetParentRefsets.size() > 1) {
-            logger.log(Level.WARNING,"More than one parent member refset found for ''{0}" + "''"
-                + "Defaulting to the first one found!", memberRefset.getInitialText());
+            logger.log(Level.WARNING, "More than one parent member refset found for ''{0}" + "''"
+                    + "Defaulting to the first one found!", memberRefset.getInitialText());
         }
         I_GetConceptData parentRefset = targetParentRefsets.iterator().next();
         return parentRefset.getConceptNid();
     }
 
     /**
-     * Check for a is_a relationship type defined on the member refset concept
-     * otherwise default to just using
+     * Check for a is_a relationship type defined on the member refset concept otherwise default to just using
      * either a SNOMED or ArchitectonicAuxiliary is_a relationship type
      */
     @Override
@@ -249,11 +236,11 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
             try {
                 I_IntSet isATypes = Terms.get().newIntSet();
                 isATypes.add(Terms.get().getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_IS_A_TYPE.getUids())
-                    .getConceptNid());
+                        .getConceptNid());
                 I_GetConceptData memberRefset = Terms.get().getConcept(this.refsetId);
                 Set<? extends I_GetConceptData> requiredIsAType =
                         memberRefset.getSourceRelTargets(getAllowedStatuses(), isATypes, null,
-                            getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy());
+                        getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy());
 
                 if (requiredIsAType != null && requiredIsAType.size() > 0) {
                     // relationship exists so use the is-a specified by the
@@ -285,15 +272,15 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
     }
 
     /* (non-Javadoc)
-	 * @see org.dwfa.ace.refset.spec.I_HelpMarkedParentRefset#hasCurrentMarkedParentExtension(int)
-	 */
+     * @see org.dwfa.ace.refset.spec.I_HelpMarkedParentRefset#hasCurrentMarkedParentExtension(int)
+     */
     @Override
     public boolean hasCurrentMarkedParentExtension(int conceptId) throws Exception {
         return super.hasCurrentRefsetExtension(parentRefsetId, conceptId, parentMemberTypeId);
     }
 
-
     private class HasExtension implements LineageCondition {
+
         private int refsetId;
         private int memberTypeId;
 
@@ -309,6 +296,7 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper implements I_
     }
 
     private class NotAlreadyVisited implements LineageCondition {
+
         private HashSet<Integer> visited = new HashSet<Integer>();
 
         @Override
