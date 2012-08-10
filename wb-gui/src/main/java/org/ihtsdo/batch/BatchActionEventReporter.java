@@ -41,7 +41,7 @@ public class BatchActionEventReporter {
     }
 
     public static void reset() {
-        batchActionEventList = new ArrayList<BatchActionEvent>();
+        batchActionEventList = new ArrayList<>();
     }
 
     public static void add(BatchActionEvent bae) {
@@ -77,6 +77,8 @@ public class BatchActionEventReporter {
                         } else {
                             sb.append(bae.getConceptA().getDescriptionsActive().iterator().next().getText());
                         }
+                    } else {
+                        sb.append("...");
                     }
                     // EVENT NOTE
                     sb.append("\t");
@@ -89,9 +91,7 @@ public class BatchActionEventReporter {
                 }
 
             }
-        } catch (IOException ex) {
-            Logger.getLogger(BatchActionEvent.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ContradictionException ex) {
+        } catch (IOException | ContradictionException ex) {
             Logger.getLogger(BatchActionEvent.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -145,6 +145,8 @@ public class BatchActionEventReporter {
                         } else {
                             sb.append(bae.getConceptA().getDescriptionsActive().iterator().next().getText());
                         }
+                    } else {
+                        sb.append("...");
                     }
                     // EVENT NOTE
                     sb.append("</font></td><td><font color='black' face='Dialog' size='3'>");
@@ -157,9 +159,7 @@ public class BatchActionEventReporter {
                 }
             }
             sb.append("</table></html>");
-        } catch (IOException ex) {
-            Logger.getLogger(BatchActionEvent.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ContradictionException ex) {
+        } catch (IOException | ContradictionException ex) {
             Logger.getLogger(BatchActionEvent.class.getName()).log(Level.SEVERE, null, ex);
         }
 

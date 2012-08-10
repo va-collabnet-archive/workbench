@@ -14,11 +14,11 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.SwingWorker;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.profile.NewDefaultProfile;
-
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.I_ConceptualizeLocally;
@@ -40,9 +40,9 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.binding.snomed.Snomed;
+import org.ihtsdo.tk.binding.snomed.TermAux;
 import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refex.type_uuid.TkRefexUuidMember;
-import org.ihtsdo.tk.binding.snomed.TermAux;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -58,6 +58,21 @@ public class BatchActionTaskTest {
 
     String dbTarget;
     DataOutputStream eConceptDOS;
+
+    private class BatchActionSwingWorker extends SwingWorker<Object, Object> {
+        BatchActionProcessor bap;
+
+        public void setBap(BatchActionProcessor bap) {
+            this.bap = bap;
+        }
+
+        @Override
+        protected Object doInBackground() throws Exception {
+            // EXERCISE BATCH ACTION TEST
+            Ts.get().iterateConceptDataInParallel(bap);
+            return null;
+        }
+    }
 
     @Ignore
     @Test
@@ -82,7 +97,7 @@ public class BatchActionTaskTest {
             UUID parentMoveToUuid = UUID.fromString("26a6e5fd-2f6e-3c53-a4f0-532dbb49b9e1");
 
             // SETUP CONCEPT LIST
-            List<ConceptChronicleBI> concepts = new ArrayList<ConceptChronicleBI>();
+            List<ConceptChronicleBI> concepts = new ArrayList<>();
 
             // 'defining'
             UUID parentToAddUuid = UUID.fromString("a4c6bf72-8fb6-11db-b606-0800200c9a66");
@@ -111,7 +126,7 @@ public class BatchActionTaskTest {
             concepts.add(c4);
 
             // SETUP BatchActionTaskList
-            List<BatchActionTask> batl = new ArrayList<BatchActionTask>();
+            List<BatchActionTask> batl = new ArrayList<>();
             batl.add(new BatchActionTaskParentAddNew(isaUuid, parentToAddUuid));
             batl.add(new BatchActionTaskParentRetire(isaUuid, parentToDelUuid));
             batl.add(new BatchActionTaskParentReplace(isaUuid, parentMoveFromUuid, isaUuid, parentMoveToUuid));
@@ -119,7 +134,10 @@ public class BatchActionTaskTest {
 
             // EXERCISE BATCH ACTION TEST
             BatchActionProcessor bap = new BatchActionProcessor(concepts, batl, ec, vc);
-            Ts.get().iterateConceptDataInParallel(bap);
+            BatchActionSwingWorker basw = new BatchActionSwingWorker();
+            basw.setBap(bap);
+            basw.execute();
+            // Ts.get().iterateConceptDataInParallel(bap);
 
             System.out.print(BatchActionEventReporter.createReportTSV());
 
@@ -129,9 +147,7 @@ public class BatchActionTaskTest {
         } catch (Exception e) {
             try {
                 Bdb.close();
-            } catch (InterruptedException ex) {
-                Logger.getLogger(BatchActionTaskTest.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ExecutionException ex) {
+            } catch (InterruptedException | ExecutionException ex) {
                 Logger.getLogger(BatchActionTaskTest.class.getName()).log(Level.SEVERE, null, ex);
             }
             throw new RuntimeException(e);
@@ -171,7 +187,7 @@ public class BatchActionTaskTest {
                     member.authorUuid = eC.conceptAttributes.authorUuid;
                     member.pathUuid = eC.conceptAttributes.pathUuid;
                     member.time = eC.conceptAttributes.time;
-                    List<TkRefexAbstractMember<?>> memberList = new ArrayList<TkRefexAbstractMember<?>>();
+                    List<TkRefexAbstractMember<?>> memberList = new ArrayList<>();
                     memberList.add(member);
                     eC.setRefsetMembers(memberList);
                 }
@@ -209,9 +225,7 @@ public class BatchActionTaskTest {
             // ... delete created diretory/files
             System.out.println("Finished BatchActionTest");
             Bdb.close();
-        } catch (InterruptedException ex) {
-            Logger.getLogger(BatchActionTaskTest.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ExecutionException ex) {
+        } catch (InterruptedException | ExecutionException ex) {
             Logger.getLogger(BatchActionTaskTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

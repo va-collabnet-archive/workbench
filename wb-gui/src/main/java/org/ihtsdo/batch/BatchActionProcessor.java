@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
@@ -35,6 +34,11 @@ public class BatchActionProcessor implements ProcessUnfetchedConceptDataBI {
     // WORKBENCH INTERNALS
     EditCoordinate ec;
     ViewCoordinate vc;
+    private boolean continueWorkB;
+
+    public void setContinueWorkB(boolean continueWorkB) {
+        this.continueWorkB = continueWorkB;
+    }
 
     // ACTION and CONCEPTS
     List<BatchActionTask> batchActionList;
@@ -50,10 +54,12 @@ public class BatchActionProcessor implements ProcessUnfetchedConceptDataBI {
      * @throws IOException
      * @throws Exception
      */
-    public BatchActionProcessor(Collection<ConceptChronicleBI> concepts, List<BatchActionTask> actions, EditCoordinate ec, ViewCoordinate vc) throws IOException, Exception {
+    public BatchActionProcessor(Collection<ConceptChronicleBI> concepts, List<BatchActionTask> actions, EditCoordinate ec, ViewCoordinate vc)
+            throws IOException, Exception {
         // SETUP WORKBENCH CONTEXT
         this.ec = ec;
         this.vc = vc;
+        this.continueWorkB = true;
  
         // SETUP CONCEPTS SET FOR PROCESSING
         this.conceptSet = Ts.get().getEmptyNidSet();
@@ -62,14 +68,15 @@ public class BatchActionProcessor implements ProcessUnfetchedConceptDataBI {
         }
 
         // SETUP LIST OF CONCEPTS TO BE APPLIED TO EACH CONCEPT
-        this.batchActionList = new ArrayList<BatchActionTask>();
+        this.batchActionList = new ArrayList<>();
         for (BatchActionTask bat : actions) {
             this.batchActionList.add(bat);
         }
     }
 
     @Override
-    public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fetcher) throws Exception {
+    public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fetcher)
+            throws Exception {
         if (conceptSet.isMember(cNid)) {
             ConceptVersionBI c = fetcher.fetch(vc);
 
@@ -92,7 +99,6 @@ public class BatchActionProcessor implements ProcessUnfetchedConceptDataBI {
 
     @Override
     public boolean continueWork() {
-        // :!!!:NYI: BatchActionProcessor Future user cancel button would set this return value to false.
-        return true;
+        return this.continueWorkB;
     }
 }

@@ -14,9 +14,9 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.SwingWorker;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.task.profile.NewDefaultProfile;
-
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
@@ -50,6 +50,21 @@ public class BatchActionTaskSimpleTest {
     String dbTarget;
     DataOutputStream eConceptDOS;
 
+    private class BatchActionSwingWorker extends SwingWorker<Object, Object> {
+        BatchActionProcessor bap;
+
+        public void setBap(BatchActionProcessor bap) {
+            this.bap = bap;
+        }
+
+        @Override
+        protected Object doInBackground() throws Exception {
+            // EXERCISE BATCH ACTION TEST
+            Ts.get().iterateConceptDataInParallel(bap);
+            return null;
+        }
+    }
+
     @Ignore
     @Test
     public void batchActionTaskTest() {
@@ -64,7 +79,7 @@ public class BatchActionTaskSimpleTest {
             ViewCoordinate vc = profile.getViewCoordinate();
 
             // SETUP CONCEPT LIST
-            List<ConceptChronicleBI> concepts = new ArrayList<ConceptChronicleBI>();
+            List<ConceptChronicleBI> concepts = new ArrayList<>();
 
             // 'characteristic type'
             UUID u1 = UUID.fromString("f88e2a66-3a5b-3358-92f0-5b3f5e82b270");
@@ -78,21 +93,22 @@ public class BatchActionTaskSimpleTest {
             concepts.add(c2);
 
             // SETUP BatchActionTaskList
-            List<BatchActionTask> batl = new ArrayList<BatchActionTask>();
+            List<BatchActionTask> batl = new ArrayList<>();
             batl.add(new BatchActionTaskSimple());
 
             // EXERCISE BATCH ACTION TEST
             BatchActionProcessor bap = new BatchActionProcessor(concepts, batl, ec, vc);
-            Ts.get().iterateConceptDataInParallel(bap);
+            BatchActionSwingWorker basw = new BatchActionSwingWorker();
+            basw.setBap(bap);
+            basw.execute();
+            // Ts.get().iterateConceptDataInParallel(bap);
 
             Logger.getLogger(BatchActionTaskSimpleTest.class.getName()).log(Level.INFO, BatchActionEventReporter.createReportTSV());
 
         } catch (Exception e) {
             try {
                 Bdb.close();
-            } catch (InterruptedException ex) {
-                Logger.getLogger(BatchActionTaskSimpleTest.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ExecutionException ex) {
+            } catch (    InterruptedException | ExecutionException ex) {
                 Logger.getLogger(BatchActionTaskSimpleTest.class.getName()).log(Level.SEVERE, null, ex);
             }
             throw new RuntimeException(e);
@@ -152,9 +168,7 @@ public class BatchActionTaskSimpleTest {
             // ... delete created diretory/files
             System.out.println("Finished BatchActionTest");
             Bdb.close();
-        } catch (InterruptedException ex) {
-            Logger.getLogger(BatchActionTaskSimpleTest.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ExecutionException ex) {
+        } catch (InterruptedException | ExecutionException ex) {
             Logger.getLogger(BatchActionTaskSimpleTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

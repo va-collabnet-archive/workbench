@@ -82,7 +82,9 @@ public class BatchActionEvent implements Comparable<BatchActionEvent> {
 
             sb.append(actionTaskType.toString());
             sb.append("\t");
-            if (conceptA.getDescriptionPreferred() != null) {
+            if (conceptA == null) {
+                sb.append("...");
+            } else if (conceptA.getDescriptionPreferred() != null) {
                 sb.append(conceptA.getDescriptionPreferred().getText());
             } else {
                 sb.append(conceptA.getDescriptionsActive().iterator().next().getText());
@@ -94,9 +96,7 @@ public class BatchActionEvent implements Comparable<BatchActionEvent> {
                 sb.append(eventNote);
             }
 
-        } catch (IOException ex) {
-            Logger.getLogger(BatchActionEvent.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ContradictionException ex) {
+        } catch (IOException | ContradictionException ex) {
             Logger.getLogger(BatchActionEvent.class.getName()).log(Level.SEVERE, null, ex);
         }
 

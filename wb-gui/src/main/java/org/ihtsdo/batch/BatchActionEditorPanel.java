@@ -15,6 +15,8 @@ package org.ihtsdo.batch;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
@@ -32,9 +34,13 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_ShowActivity;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.list.TerminologyList;
 import org.dwfa.ace.list.TerminologyListModel;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.tapi.ComputationCanceled;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContradictionException;
@@ -59,9 +65,11 @@ import org.ihtsdo.util.swing.GuiUtil;
  */
 public final class BatchActionEditorPanel extends javax.swing.JPanel {
 
-    private class BatchActionSwingWorker extends SwingWorker<Object, Object> {
+    private class BatchActionSwingWorker extends SwingWorker<Object, Object>
+            implements ActionListener {
 
-        BatchActionProcessor bap;
+        private BatchActionProcessor bap;
+        private I_ShowActivity gui;
 
         public void setBap(BatchActionProcessor bap) {
             this.bap = bap;
@@ -69,6 +77,13 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
 
         @Override
         protected Object doInBackground() throws Exception {
+            AceFrameConfig config = ace.aceFrameConfig;
+            gui = Terms.get().newActivityPanel(true, config, "Apply Batch Edits", true);
+            gui.addRefreshActionListener(this);
+            gui.addStopActionListener(this);
+            gui.setProgressInfoUpper("Batch Edits");
+            gui.setIndeterminate(true);
+
             // EXERCISE BATCH ACTION TEST
             Ts.get().iterateConceptDataInParallel(bap);
             return null;
@@ -79,13 +94,40 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
             StringBuilder sb = new StringBuilder("\r\n!!! BATCH ACTION TASK REPORT\r\n");
             if (isCancelled()) {
                 sb.append("!!! BATCH ACTION TASK CANCEL OCCURED\r\n");
+                try {
+                    Ts.get().cancel();
+                } catch (IOException ex) {
+                    Logger.getLogger(BatchActionEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                Logger.getLogger(
+                        BatchActionEditorPanel.class.getName()).log(Level.INFO, sb.toString());
+                gui.setProgressInfoLower("canceled by user");
+                BatchActionEventReporter.reset();
+                BatchActionEventReporter.add(new BatchActionEvent(null,
+                        BatchActionTask.BatchActionTaskType.SIMPLE,
+                        BatchActionEvent.BatchActionEventType.EVENT_NOOP,
+                        "ALL BATCH EDITS CANCELED BY USER"));
+                resultsTextArea.setText(BatchActionEventReporter.createReportHTML());
+
+            } else {
+                sb.append(BatchActionEventReporter.createReportTSV());
+                Logger.getLogger(
+                        BatchActionEditorPanel.class.getName()).log(Level.INFO, sb.toString());
+                resultsTextArea.setText(BatchActionEventReporter.createReportHTML());
+                gui.setProgressInfoLower("batch edits completed");
             }
+            try {
+                gui.complete();
+            } catch (ComputationCanceled ex) {
+                Logger.getLogger(
+                        BatchActionEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
 
-            sb.append(BatchActionEventReporter.createReportTSV());
-            Logger.getLogger(
-                    BatchActionEditorPanel.class.getName()).log(Level.INFO, sb.toString());
-
-            resultsTextArea.setText(BatchActionEventReporter.createReportHTML());
+        // ActionListener
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            bap.setContinueWorkB(false);
         }
     }
     public static boolean batchEditingDisabled = false;
