@@ -202,6 +202,22 @@ public class ConceptNavigator extends JPanel {
             @Override
             public void run() {
                 privateHxPanelUpdate();
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    updateHistoryPanel();
+                    historyScroller.revalidate();
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            historyScroller.revalidate();
+                            int width = historyPanel.hxWidth;
+                            historyScroller.getViewport().scrollRectToVisible(
+                                    new Rectangle(width - 1, 0, 2, 4));
+                        }
+                    });
+                }
+            });
             }
         });
     }

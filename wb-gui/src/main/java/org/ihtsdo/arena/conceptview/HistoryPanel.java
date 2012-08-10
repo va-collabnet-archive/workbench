@@ -567,7 +567,7 @@ public class HistoryPanel {
          JCheckBox rowCheck      = view.getRowToPathCheckMap().get(row);
          JCheckBox positionCheck = positionCheckMap.get(p);
          Point location = rowCheck.getLocation();
-         if(location != null){
+         if(positionCheck != null && location != null){
             positionCheck.setLocation(locX, rowCheck.getLocation().y);
             positionCheck.setSize(positionCheck.getPreferredSize());
             positionCheck.setToolTipText(p.toString());
