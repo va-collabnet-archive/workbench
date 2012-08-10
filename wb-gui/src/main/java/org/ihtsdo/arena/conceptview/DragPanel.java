@@ -454,7 +454,10 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
       @Override
       public void dragGestureRecognized(DragGestureEvent dge) {
          Image dragImage   = getDragImage();
-         Point imageOffset = new Point(0, 0);
+         // TODO patch put in for change in behaviour with Java 7u6... Not sure the change is permanent.
+         int x = 0;
+         int y = -DragPanel.this.getHeight();
+         Point imageOffset = new Point(x, y);
 
          try {
             dge.startDrag(DragSource.DefaultCopyDrop, dragImage, imageOffset,
