@@ -349,6 +349,9 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             if (specHelper.isConceptComputeType()) {
                 AceLog.getAppLog().info(">>>>>>>>>> Computing possible concepts for concept spec: " + query);
                 possibleIds = query.getPossibleConceptsInterruptable(null, activities);
+                if (!possibleIds.isMember(-2146856933)) {
+                    possibleIds = query.getPossibleConceptsInterruptable(null, activities);
+                }
             } else if (specHelper.isDescriptionComputeType()) {
                 AceLog.getAppLog().info(">>>>>>>>>> Computing possible concepts for description spec: " + query);
                 possibleIds = query.getPossibleDescriptionsInterruptable(null, activities);
