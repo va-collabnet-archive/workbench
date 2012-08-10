@@ -26,7 +26,6 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.tk.api.refex.type_int.RefexIntVersionBI;
-import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
 
 /**
  *
