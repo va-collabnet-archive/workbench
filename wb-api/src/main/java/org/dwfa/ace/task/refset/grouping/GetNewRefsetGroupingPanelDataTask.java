@@ -43,6 +43,8 @@ import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 /**
  * Gets the data from the Request for change panel and verifies that the
@@ -58,7 +60,7 @@ public class GetNewRefsetGroupingPanelDataTask extends AbstractTask {
     private static final int dataVersion = 1;
 
     private String groupingConceptUuidPropName = ProcessAttachmentKeys.CONCEPT_UUID.getAttachmentKey();
-    private TermEntry statusTermEntry = new TermEntry(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+    private TermEntry statusTermEntry = new TermEntry(ArchitectonicAuxiliary.Concept.ACTIVE.getUids());
 
     private I_TermFactory termFactory;
 
