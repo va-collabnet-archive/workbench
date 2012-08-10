@@ -88,7 +88,7 @@ import org.tigris.subversion.javahl.PromptUserPassword3;
 
 public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 
-    I_ConfigAceFrame frameConfig;
+    I_ConfigAceFrame frameConfig; 
 
     @Override
     public void setRelAssertionType(RelAssertionType relAssertionType) {
