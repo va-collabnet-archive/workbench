@@ -104,7 +104,7 @@ public class SearchRefsetWorker extends SwingWorker<I_UpdateProgress> implements
                 if (firstUpdate) {
                     searchPanel.setProgressInfo("   Starting refset search   ");
                     if (extensionCount != Integer.MAX_VALUE) {
-                        searchPanel.setProgressIndeterminate(false);
+                        //searchPanel.setProgressIndeterminate(false);
                         searchPanel.setProgressMaximum(extensionCount);
                         firstUpdate = false;
                     }
