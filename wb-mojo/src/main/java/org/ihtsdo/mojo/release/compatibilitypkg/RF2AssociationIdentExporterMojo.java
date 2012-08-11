@@ -47,12 +47,12 @@ public class RF2AssociationIdentExporterMojo extends AbstractMojo {
 	private String exportFolder;
 
 	/**
-	 * Location of the WBAssociationId_SCTIDMapFactory.
+	 * Location of the wbAssociationId_SCTIDMapFactory.
 	 * 
 	 * @parameter
 	 * @optional
 	 */
-	private String WBAssociationId_SCTIDMapFactory;
+	private String wbAssociationId_SCTIDMapFactory;
 	
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		System.setProperty("java.awt.headless", "true");
@@ -76,7 +76,7 @@ public class RF2AssociationIdentExporterMojo extends AbstractMojo {
 
 			// initialize ace framwork and meta hierarchy
 			ExportUtil.init();
-			if (WBAssociationId_SCTIDMapFactory!=null){
+			if (wbAssociationId_SCTIDMapFactory!=null){
 				RF2AssociationId_SCTIDMapFactory factory=new RF2AssociationId_SCTIDMapFactory(config);
 				factory.export();
 			}else{
@@ -97,5 +97,13 @@ public class RF2AssociationIdentExporterMojo extends AbstractMojo {
 
 	public void setTargetDirectory(File targetDirectory) {
 		this.targetDirectory = targetDirectory;
+	}
+
+	public String getWbAssociationId_SCTIDMapFactory() {
+		return wbAssociationId_SCTIDMapFactory;
+	}
+
+	public void setWbAssociationId_SCTIDMapFactory(String wbAssociationId_SCTIDMapFactory) {
+		this.wbAssociationId_SCTIDMapFactory = wbAssociationId_SCTIDMapFactory;
 	}
 }
