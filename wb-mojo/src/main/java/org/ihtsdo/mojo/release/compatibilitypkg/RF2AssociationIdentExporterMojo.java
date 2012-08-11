@@ -7,6 +7,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.ihtsdo.mojo.maven.MojoUtil;
+import org.ihtsdo.rf2.compatibilitypkg.factory.RF2AssociationId_SCTIDMapFactory;
 import org.ihtsdo.rf2.compatibilitypkg.factory.RF2HistoricalAssociationIdentFactory;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.ExportUtil;
@@ -44,6 +45,14 @@ public class RF2AssociationIdentExporterMojo extends AbstractMojo {
 	 * @required
 	 */
 	private String exportFolder;
+
+	/**
+	 * Location of the WBAssociationId_SCTIDMapFactory.
+	 * 
+	 * @parameter
+	 * @optional
+	 */
+	private String WBAssociationId_SCTIDMapFactory;
 	
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		System.setProperty("java.awt.headless", "true");
@@ -55,7 +64,7 @@ public class RF2AssociationIdentExporterMojo extends AbstractMojo {
 			} catch (NoSuchAlgorithmException e) {
 				throw new MojoExecutionException(e.getLocalizedMessage(), e);
 			}
-
+			
 			Config config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/historicalAssociationIdentifier.xml");
 
 			// set all the values passed via mojo
@@ -67,9 +76,13 @@ public class RF2AssociationIdentExporterMojo extends AbstractMojo {
 
 			// initialize ace framwork and meta hierarchy
 			ExportUtil.init();
-
-			RF2HistoricalAssociationIdentFactory factory = new RF2HistoricalAssociationIdentFactory(config);
-			factory.export();
+			if (WBAssociationId_SCTIDMapFactory!=null){
+				RF2AssociationId_SCTIDMapFactory factory=new RF2AssociationId_SCTIDMapFactory(config);
+				factory.export();
+			}else{
+				RF2HistoricalAssociationIdentFactory factory = new RF2HistoricalAssociationIdentFactory(config);
+				factory.export();
+			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
