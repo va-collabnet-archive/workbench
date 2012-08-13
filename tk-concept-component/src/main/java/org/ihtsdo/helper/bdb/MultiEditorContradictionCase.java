@@ -30,7 +30,7 @@ public class MultiEditorContradictionCase {
 
     private int conceptNid; // concept with contradiction
     private HashSet<Integer> componentNids; //components with contradicion
-    private Set<Integer> sapNids; //sap nids with contradicion
+    private Set<Integer> stamps; //sap nids with contradicion
     private ArrayList<String> cases; // reported cases
     // DETAILS
     private HashMap<UUID, String> authTimeMapComputed; // computed from getAllSapNids()
@@ -40,11 +40,11 @@ public class MultiEditorContradictionCase {
 
     public MultiEditorContradictionCase(int cNid, ArrayList<String> cases,
             HashSet<Integer> componentNids,
-            Set<Integer> sapNids) {
+            Set<Integer> stamps) {
         this.conceptNid = cNid;
         this.cases = cases;
         this.componentNids = componentNids;
-        this.sapNids = sapNids;
+        this.stamps = stamps;
     }
 
     public int getConceptNid() {
@@ -55,8 +55,8 @@ public class MultiEditorContradictionCase {
         return componentNids;
     }
     
-    public Set<Integer> getSapNids() {
-        return sapNids;
+    public Set<Integer> getStamps() {
+        return stamps;
     }
 
     public HashMap<UUID, String> getAuthTimeMapComputed() {
@@ -118,7 +118,7 @@ public class MultiEditorContradictionCase {
             sb.append(ts.getConcept(conceptNid).toUserString());
 
             sb.append("\r\nRECOMPUTED AuthorTimeHash values");
-            ArrayList<String> values = new ArrayList<String>();
+            ArrayList<String> values = new ArrayList<>();
             for (String s : authTimeMapComputed.values()) {
                 values.add(s);
             }
