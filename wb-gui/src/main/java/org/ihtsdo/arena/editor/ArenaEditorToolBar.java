@@ -34,6 +34,7 @@ import com.mxgraph.util.mxEventObject;
 import com.mxgraph.util.mxResources;
 import com.mxgraph.util.mxEventSource.mxIEventListener;
 import com.mxgraph.view.mxGraphView;
+import javax.swing.JButton;
 
 public class ArenaEditorToolBar extends JToolBar
 {
@@ -58,39 +59,48 @@ public class ArenaEditorToolBar extends JToolBar
         setBorder(BorderFactory.createCompoundBorder(BorderFactory
                 .createEmptyBorder(3, 3, 3, 3), getBorder()));
         setFloatable(false);
-
-        add(editor.bind("New", new NewAction(),
-                "/com/mxgraph/examples/swing/images/new.gif"));
-        add(editor.bind("Open", new OpenAction(),
-                "/com/mxgraph/examples/swing/images/open.gif"));
-        add(editor.bind("Save", new SaveAction(false),
-                "/com/mxgraph/examples/swing/images/save.gif"));
+        JButton newButton = add(editor.bind("New", new NewAction(),
+                              "/com/mxgraph/examples/swing/images/new.gif"));
+        newButton.setToolTipText("new layout");
+        JButton openButton = add(editor.bind("Open", new OpenAction(),
+                              "/com/mxgraph/examples/swing/images/open.gif"));
+        openButton.setToolTipText("open layout");
+        JButton saveButton = add(editor.bind("Save", new SaveAction(false),
+                              "/com/mxgraph/examples/swing/images/save.gif"));
+        saveButton.setToolTipText("save layout");
 
         addSeparator();
 
-        add(editor.bind("Print", new PrintAction(),
+        JButton printButton = add(editor.bind("Print", new PrintAction(),
                 "/com/mxgraph/examples/swing/images/print.gif"));
+        printButton.setToolTipText("print");
 
         addSeparator();
 
-        add(editor.bind("Cut", TransferHandler.getCutAction(),
+        JButton cutButton = add(editor.bind("Cut", TransferHandler.getCutAction(),
                 "/com/mxgraph/examples/swing/images/cut.gif"));
-        add(editor.bind("Copy", TransferHandler.getCopyAction(),
+        cutButton.setToolTipText("cut panel");
+        JButton copyButton = add(editor.bind("Copy", TransferHandler.getCopyAction(),
                 "/com/mxgraph/examples/swing/images/copy.gif"));
-        add(editor.bind("Paste", TransferHandler.getPasteAction(),
+        copyButton.setToolTipText("copy panel");
+        JButton pasteButton = add(editor.bind("Paste", TransferHandler.getPasteAction(),
                 "/com/mxgraph/examples/swing/images/paste.gif"));
+        pasteButton.setToolTipText("paste panel");
 
         addSeparator();
 
-        add(editor.bind("Delete", mxGraphActions.getDeleteAction(),
+        JButton deleteButton = add(editor.bind("Delete", mxGraphActions.getDeleteAction(),
                 "/com/mxgraph/examples/swing/images/delete.gif"));
+        deleteButton.setToolTipText("delete panel");
 
         addSeparator();
 
-        add(editor.bind("Undo", new HistoryAction(true),
+        JButton undoButton = add(editor.bind("Undo", new HistoryAction(true),
                 "/com/mxgraph/examples/swing/images/undo.gif"));
-        add(editor.bind("Redo", new HistoryAction(false),
+        undoButton.setToolTipText("undo layout action");
+        JButton redoButton = add(editor.bind("Redo", new HistoryAction(false),
                 "/com/mxgraph/examples/swing/images/redo.gif"));
+        redoButton.setToolTipText("redo layout action");
 
         addSeparator();
 
