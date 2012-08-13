@@ -93,23 +93,22 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
 
     public boolean stop = false;
     private Collection<DragPanel> seperatorComponents =
-            new ConcurrentSkipListSet<DragPanel>(new Comparator<DragPanel>() {
-
+            new ConcurrentSkipListSet<>(new Comparator<DragPanel>() {
         @Override
         public int compare(DragPanel o1, DragPanel o2) {
             return o1.getId() - o2.getId();
         }
     });
-    private Map<Integer, JCheckBox> rowToPathCheckMap = new ConcurrentHashMap<Integer, JCheckBox>();
+    private Map<Integer, JCheckBox> rowToPathCheckMap = new ConcurrentHashMap<>();
     //
     private Map<PositionBI, Collection<DragPanelComponentVersion<?>>> positionPanelMap =
-            new ConcurrentHashMap<PositionBI, Collection<DragPanelComponentVersion<?>>>();
+            new ConcurrentHashMap<>();
     private TreeSet<PositionBI> positionOrderedSet =
             new TreeSet(new PositionComparator());
-    private Map<PathBI, Integer> pathRowMap = new ConcurrentHashMap<PathBI, Integer>();
+    private Map<PathBI, Integer> pathRowMap = new ConcurrentHashMap<>();
     private CountDownLatch latch = new CountDownLatch(6);
     private Lock dramsLock = new ReentrantLock();
-    private Map<Integer, Collection<Integer>> componentCountForConflict = new TreeMap<Integer, Collection<Integer>>();
+    private Map<Integer, Collection<Integer>> componentCountForConflict = new TreeMap<>();
     private List<DragPanelDescription> activeDescriptionPanels;
     private List<DragPanelRel> activeInferredRelPanels;
     private List<DragPanelRel> activeStatedRelPanels;
@@ -135,12 +134,12 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
     private PanelsChangedActionListener pcal;
     private Set<PositionBI> positions;
     private Map<PanelSection, CollapsePanelPrefs> prefMap;
-    private Set<Integer> saps;
+    private Set<Integer> stamps;
     private ConceptViewSettings settings;
     private Collection<RelationshipGroupVersionBI> statedRelGroups;
     private List<? extends I_RelTuple> statedRels;
     private JPanel conceptPanel;
-    private Set<Integer> sapsForConflict = new HashSet<Integer>();
+    private Set<Integer> sapsForConflict = new HashSet<>();
 
     //~--- constructors --------------------------------------------------------
     public ConceptViewLayout(ConceptView conceptView, I_GetConceptData layoutConcept) throws IOException {
@@ -184,7 +183,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                     }
 
                     DragPanelRelGroup rgc = getRelGroupComponent(rg, cpr);
-                    
+
                     seperatorComponents.add(rgc);
                     conceptPanel.add(rgc, gbc);
                     gbc.gridy++;
@@ -246,9 +245,8 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         Collection<DragPanelComponentVersion<?>> panels = positionPanelMap.get(position);
 
         if (panels == null) {
-            panels = new ConcurrentSkipListSet<DragPanelComponentVersion<?>>(
+            panels = new ConcurrentSkipListSet<>(
                     new Comparator<DragPanelComponentVersion<?>>() {
-
                         @Override
                         public int compare(DragPanelComponentVersion<?> o1, DragPanelComponentVersion<?> o2) {
                             return o1.getId() - o2.getId();
@@ -280,8 +278,8 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             updateUncommitted();
             coordinate = new ViewCoordinate(config.getViewCoordinate());
             coordinate.setRelationshipAssertionType(RelAssertionType.STATED);
-            saps = layoutConcept.getAllStampNids();
-            positions = Ts.get().getPositionSet(saps);
+            stamps = layoutConcept.getAllStampNids();
+            positions = Ts.get().getPositionSet(stamps);
             paths = Ts.get().getPathSetFromPositionSet(positions);
             positionOrderedSet.addAll(positions);
 
@@ -299,23 +297,23 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             if (stop) {
                 return null;
             }
-            
+
             //find contradictions
             NidBitSetBI nidSet = Ts.get().getEmptyNidSet();
             nidSet.setMember(layoutConcept.getConceptNid());
             int commitRecRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.COMMIT_RECORD.getUids());
             int adjRecRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.ADJUDICATION_RECORD.getUids());
-            List<MultiEditorContradictionCase> cases = new ArrayList<MultiEditorContradictionCase>();
+            List<MultiEditorContradictionCase> cases = new ArrayList<>();
             MultiEditorContradictionDetector mecd;
             mecd = new MultiEditorContradictionDetector(commitRecRefsetNid,
-                adjRecRefsetNid,
-                config.getViewCoordinate(),
-                cases, null,
-                nidSet,
-                true, true);
+                    adjRecRefsetNid,
+                    config.getViewCoordinate(),
+                    cases, null,
+                    nidSet,
+                    true, true);
             Ts.get().iterateConceptDataInParallel(mecd);
-            for(MultiEditorContradictionCase contCase : cases){
-                sapsForConflict = contCase.getSapNids();
+            for (MultiEditorContradictionCase contCase : cases) {
+                sapsForConflict = contCase.getStamps();
             }
 
             // REPORT COMPONENTS WITH MISSING COMMIT RECORDS
@@ -328,7 +326,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                 AceLog.getAppLog().log(Level.WARNING, sb.toString());
             }
 
-            activeStatedRelPanels = new ArrayList<DragPanelRel>(statedRels.size());
+            activeStatedRelPanels = new ArrayList<>(statedRels.size());
             setupRels(latch, statedRels, activeStatedRelPanels, cpr, false);
 
             if (stop) {
@@ -346,7 +344,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
 
             inactiveStatedRels.removeAll(statedRels);
             removeContradictions(inactiveStatedRels);
-            inactiveStatedRelPanels = new ArrayList<DragPanelRel>(inactiveStatedRels.size());
+            inactiveStatedRelPanels = new ArrayList<>(inactiveStatedRels.size());
 
             if (stop) {
                 return null;
@@ -365,10 +363,10 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                     config.getViewPositionSetReadOnly(), config.getPrecedence(),
                     config.getConflictResolutionStrategy(), coordinate.getClassifierNid(),
                     coordinate.getRelationshipAssertionType());
-            List<ComponentVersionBI> extra = new ArrayList<ComponentVersionBI>();
-            for(I_RelTuple inferredRel : inferredRels){
-                for(I_RelTuple statedRel : statedRels){
-                    if(inferredRel.getPrimUuid().equals(statedRel.getPrimUuid())){
+            List<ComponentVersionBI> extra = new ArrayList<>();
+            for (I_RelTuple inferredRel : inferredRels) {
+                for (I_RelTuple statedRel : statedRels) {
+                    if (inferredRel.getPrimUuid().equals(statedRel.getPrimUuid())) {
                         extra.add(inferredRel);
                     }
                 }
@@ -376,7 +374,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             inferredRels.removeAll(extra);
             extra.clear();
             removeContradictions(inferredRels);
-            activeInferredRelPanels = new ArrayList<DragPanelRel>(inferredRels.size());
+            activeInferredRelPanels = new ArrayList<>(inferredRels.size());
 
             if (stop) {
                 return null;
@@ -391,18 +389,18 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             if (stop) {
                 return null;
             }
-            
+
             inactiveInferredRels.removeAll(inferredRels);
-            for(I_RelTuple inferredRel : inactiveInferredRels){
-                for(I_RelTuple statedRel : statedRels){
-                    if(inferredRel.getPrimUuid().equals(statedRel.getPrimUuid())){
+            for (I_RelTuple inferredRel : inactiveInferredRels) {
+                for (I_RelTuple statedRel : statedRels) {
+                    if (inferredRel.getPrimUuid().equals(statedRel.getPrimUuid())) {
                         extra.add(inferredRel);
                     }
                 }
             }
             inactiveInferredRels.removeAll(extra);
             removeContradictions(inactiveInferredRels);
-            inactiveInferredRelPanels = new ArrayList<DragPanelRel>(inactiveInferredRels.size());
+            inactiveInferredRelPanels = new ArrayList<>(inactiveInferredRels.size());
             setupRels(latch, inactiveInferredRels, inactiveInferredRelPanels, cpr, true);
 
             if (stop) {
@@ -425,7 +423,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                     config.getViewPositionSetReadOnly(), config.getPrecedence(),
                     config.getConflictResolutionStrategy());
             removeContradictions(descriptions);
-            activeDescriptionPanels = new ArrayList<DragPanelDescription>(descriptions.size());
+            activeDescriptionPanels = new ArrayList<>(descriptions.size());
 
             if (stop) {
                 return null;
@@ -444,9 +442,9 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             }
 
             tempDescList.removeAll(descriptions);
-            inactiveDescriptions = new ArrayList<I_DescriptionTuple>(tempDescList);
+            inactiveDescriptions = new ArrayList<>(tempDescList);
             removeContradictions(inactiveDescriptions);
-            inactiveDescriptionPanels = new ArrayList<DragPanelDescription>(inactiveDescriptions.size());
+            inactiveDescriptionPanels = new ArrayList<>(inactiveDescriptions.size());
             setupDescriptions(latch, inactiveDescriptions, inactiveDescriptionPanels, cpd);
 
             if (stop) {
@@ -477,9 +475,9 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             
             cView.getCvRenderer().updateLabel();
             cView.getCvRenderer().updateCancelAndCommit();
-            if(!sapsForConflict.isEmpty()){
+            if (!sapsForConflict.isEmpty()) {
                 cView.getCvRenderer().showConflictIcon(true);
-            }else{
+            } else {
                 cView.getCvRenderer().showConflictIcon(false);
             }
 
@@ -493,7 +491,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                     return;
                 }
 
-                
+
                 try {
                     GridBagConstraints topGbc = new GridBagConstraints();
 
@@ -513,11 +511,14 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                     topGbc.fill = GridBagConstraints.BOTH;
                     conceptPanel = new JPanel(new GridBagLayout());
                     cView.add(conceptPanel, topGbc);
-                    
+
                     topGbc.gridy++;
                     topGbc.weighty = 1;
-                    cView.add(new JPanel(), topGbc);
-                    
+                    JPanel filler = new JPanel();
+                    filler.setBackground(Color.LIGHT_GRAY);
+
+                    cView.add(filler, topGbc);
+
                     if (stop) {
                         return;
                     }
@@ -531,7 +532,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                     gbc.gridwidth = 1;
                     gbc.gridx = 0;
                     gbc.gridy = 0;
-                    
+
                     CollapsePanel cpe = new CollapsePanel("concept:", settings, prefMap.get(PanelSection.CONCEPT),
                             PanelSection.CONCEPT);
 
@@ -559,7 +560,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                             cav = (ConceptAttributeAnalogBI) cv.getChronicle().getConceptAttributes().getPrimordialVersion();
                             cac = getConAttrComponent((ConceptAttributeAnalogBI) cav, cpe);
                             cac.showConflicts(sapsForConflict);
-                            
+
                             seperatorComponents.add(cac);
                             cpe.addToggleComponent(cac);
                         } else {
@@ -638,7 +639,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                         if (stop) {
                             return;
                         }
-                        
+
                         setShowConflicts(dc.getComponentVersion(), dc);
                         seperatorComponents.add(dc);
                         cpd.addToggleComponent(dc);
@@ -853,10 +854,10 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                     }
 
                     gbc.weighty = 1;
-                    conceptPanel.add(new JPanel(), gbc);
-                } catch (IOException e) {
-                    AceLog.getAppLog().alertAndLogException(e);
-                } catch (TerminologyException e) {
+                    JPanel filler2 = new JPanel();
+                    filler2.setBackground(Color.LIGHT_GRAY);
+                    conceptPanel.add(filler2, gbc);
+                } catch (IOException | TerminologyException e) {
                     AceLog.getAppLog().alertAndLogException(e);
                 }
             } else {
@@ -881,37 +882,46 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         }
 
         settings.getConfig().addPropertyChangeListener("commit", pcal);
-        GuiUtil.tickle(cView);
-
-        if (settings.isNavigatorSetup()) {
-            SwingUtilities.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    if (stop) {
-                        return;
+        System.out.println("Finished 1");
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+        System.out.println("Finished 2");
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+        System.out.println("Finished 3");
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+        System.out.println("Finished 4");
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+        System.out.println("Finished 5");
+                                        settings.getNavigator().updateHistoryPanel();
+                                    }
+                                });
+                            }
+                        });
                     }
-
-                    if (settings.isNavigatorSetup()) {
-                        settings.getNavigator().updateHistoryPanel();
-                    }
-                }
-            });
-        }
+                });
+            }
+        });
     }
 
     private void removeContradictions(Collection<? extends ComponentVersionBI> componentVersions) {
-        List<ComponentVersionBI> extraVersions = new ArrayList<ComponentVersionBI>();
+        List<ComponentVersionBI> extraVersions = new ArrayList<>();
 
-        for (ComponentVersionBI cv : componentVersions) {
-            if (componentCountForConflict.containsKey(cv.getNid())) {
-                componentCountForConflict.get(cv.getNid()).add(cv.getStampNid());
-                extraVersions.add(cv);
+        for (ComponentVersionBI componentVersion : componentVersions) {
+            if (componentCountForConflict.containsKey(componentVersion.getNid())) {
+                componentCountForConflict.get(componentVersion.getNid()).add(componentVersion.getStampNid());
+                extraVersions.add(componentVersion);
             } else {
-                List<Integer> saptList = new ArrayList<Integer>();
+                List<Integer> stamp = new ArrayList<>();
 
-                saptList.add(cv.getStampNid());
-                componentCountForConflict.put(cv.getNid(), saptList);
+                stamp.add(componentVersion.getStampNid());
+                componentCountForConflict.put(componentVersion.getNid(), stamp);
             }
         }
 
@@ -1064,7 +1074,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         gbc.gridwidth = 1;
         gbc.gridx = 1;
         gbc.gridy = 0;
-
+        // Construct check box panel that lists the different paths, just above the main concept view
         for (PathBI path : paths) {
             if (stop) {
                 return;
@@ -1103,15 +1113,14 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         t.schedule(new TickleTask(), 1000);
         t.schedule(new UpdateHxPanelTask(), 1500);
     }
-
     java.util.Timer t = new java.util.Timer();
-      private class TickleTask extends SwingTask {
+
+    private class TickleTask extends SwingTask {
 
         @Override
         public void doRun() {
             GuiUtil.tickle(cView.getHistoryPanel());
         }
-        
     }
 
     private class UpdateHxPanelTask extends SwingTask {
@@ -1120,7 +1129,6 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         public void doRun() {
             settings.getNavigator().refreshHistory();
         }
-        
     }
 
     private void setupRels(CountDownLatch latch, Collection<? extends I_RelTuple> rels,
@@ -1203,7 +1211,6 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
 
         descPanel.add(typeLabel, gbc);
         typeLabel.addPropertyChangeListener("termComponent", new PropertyChangeListener() {
-
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 try {
@@ -1239,7 +1246,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             try {
                 if (dpamsRef == null) {
                     AtomicReference<Collection<DragPanel.DropPanelActionManager>> tempRef =
-                            new AtomicReference<Collection<DragPanel.DropPanelActionManager>>();
+                            new AtomicReference<>();
 
                     tempRef.compareAndSet(null, new ConcurrentSkipListSet<DragPanel.DropPanelActionManager>());
                     dpamsRef = tempRef;
@@ -1367,7 +1374,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
 
             DragPanelRel dpr = getRelComponent(rv, parentCollapsePanel, rv.isInferred());
             setShowConflicts(rv, dpr);
-            
+
             cprg.addToggleComponent(dpr);
             dpr.setInGroup(true);
             relGroupPanel.add(dpr, gbc);
@@ -1380,14 +1387,14 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
 
         boolean relHistoryIsShown = cpr.isShown(DragPanelComponentVersion.SubPanelTypes.HISTORY);
 
-        HashSet<Integer> addedRels = new HashSet<Integer>();
+        HashSet<Integer> addedRels = new HashSet<>();
         for (RelationshipVersionBI rv : group.getRelationshipsAll()) {
-            if (!activeRelIds.contains(rv.getNid()) &&
-                    !addedRels.contains(rv.getNid())) {
+            if (!activeRelIds.contains(rv.getNid())
+                    && !addedRels.contains(rv.getNid())) {
                 addedRels.add(rv.getNid());
                 DragPanelRel dpr = getRelComponent(rv, parentCollapsePanel, rv.isInferred());
                 setShowConflicts(rv, dpr);
-                
+
                 dpr.setVisible(relHistoryIsShown);
                 cprg.addToggleComponent(dpr);
                 dpr.setInGroup(true);
@@ -1434,7 +1441,6 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
 
         relPanel.add(typeLabel, gbc);
         typeLabel.addPropertyChangeListener("termComponent", new PropertyChangeListener() {
-
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 try {
@@ -1454,7 +1460,6 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
 
         relPanel.add(destLabel, gbc);
         destLabel.addPropertyChangeListener("termComponent", new PropertyChangeListener() {
-
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 try {
@@ -1483,25 +1488,25 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
 
     //~--- set methods ---------------------------------------------------------
     private void setShowConflicts(ComponentVersionBI cv, DragPanelComponentVersion cvp) {
-        if(sapsForConflict.isEmpty()){
+        if (sapsForConflict.isEmpty()) {
             return;
         }
         List<DragPanelExtension> refexSubpanels = cvp.getRefexSubpanels();
-        for(DragPanelExtension rp : refexSubpanels){
+        for (DragPanelExtension rp : refexSubpanels) {
             RefexVersionBI<?> annot = rp.getThingToDrag();
-            if(sapsForConflict.contains(annot.getStampNid())){
-                                rp.showConflicts(sapsForConflict);
+            if (sapsForConflict.contains(annot.getStampNid())) {
+                rp.showConflicts(sapsForConflict);
             }
         }
         List<DragPanelComponentVersion> hxSubpanels = cvp.getHistorySubpanels();
-        for(DragPanelComponentVersion panel : hxSubpanels){
+        for (DragPanelComponentVersion panel : hxSubpanels) {
             ComponentVersionBI component = (ComponentVersionBI) panel.getThingToDrag();
-            if(sapsForConflict.contains(component.getStampNid())){
-                                panel.showConflicts(sapsForConflict);
+            if (sapsForConflict.contains(component.getStampNid())) {
+                panel.showConflicts(sapsForConflict);
             }
         }
-        if(sapsForConflict.contains(cv.getStampNid())){
-                                cvp.showConflicts(sapsForConflict);
+        if (sapsForConflict.contains(cv.getStampNid())) {
+            cvp.showConflicts(sapsForConflict);
         }
     }
 
@@ -1541,9 +1546,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                 if ((actions == null) || actions.isEmpty()) {
                     actionMenuButton.setVisible(false);
                 }
-            } catch (InterruptedException ex) {
-                AceLog.getAppLog().alertAndLogException(ex);
-            } catch (ExecutionException ex) {
+            } catch (InterruptedException | ExecutionException ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
             }
         }
@@ -1592,9 +1595,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                 try {
                     dc = getDescComponent(desc, cp);
                     panels.add(dc);
-                } catch (TerminologyException ex) {
-                    AceLog.getAppLog().alertAndLogException(ex);
-                } catch (IOException ex) {
+                } catch (TerminologyException | IOException ex) {
                     AceLog.getAppLog().alertAndLogException(ex);
                 }
             }
@@ -1636,9 +1637,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                         rc = getRelComponent(r, cp, inferred);
                         panels.add(rc);
                     }
-                } catch (TerminologyException ex) {
-                    AceLog.getAppLog().alertAndLogException(ex);
-                } catch (IOException ex) {
+                } catch (TerminologyException | IOException ex) {
                     AceLog.getAppLog().alertAndLogException(ex);
                 }
             }

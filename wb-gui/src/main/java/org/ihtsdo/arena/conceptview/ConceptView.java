@@ -39,7 +39,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 
 import java.util.ArrayList;
@@ -81,15 +80,14 @@ public class ConceptView extends JPanel {
 
    private Collection<Action>                    actionList =
       Collections.synchronizedCollection(new ArrayList<Action>());
-   private Map<PanelSection, CollapsePanelPrefs> prefMap    = new EnumMap<PanelSection,
-                                                                 CollapsePanelPrefs>(PanelSection.class);
+   private Map<PanelSection, CollapsePanelPrefs> prefMap    = new EnumMap<>(PanelSection.class);
    long                                  lastChangeModificationLayoutSequence       = Long.MIN_VALUE;
-   private Set<File>                     kbFiles                  = new HashSet<File>();
+   private Set<File>                     kbFiles                  = new HashSet<>();
    private boolean                       historyShown             = false;
    private JPanel                        historyPanel             = new JPanel(new GridBagLayout());
    private Collection<JComponent>        dropComponents           =
       Collections.synchronizedList(new ArrayList<JComponent>());
-   private final Set<ComponentVersionBI> changedVersionSelections = new HashSet<ComponentVersionBI>();
+   private final Set<ComponentVersionBI> changedVersionSelections = new HashSet<>();
    private I_GetConceptData              concept;
    private I_ConfigAceFrame              config;
    ConceptViewLayout                     cvLayout;
@@ -109,6 +107,7 @@ public class ConceptView extends JPanel {
 
    public ConceptView(I_ConfigAceFrame config, ConceptViewSettings settings, ConceptViewRenderer cvRenderer) {
       super();
+
       this.config     = config;
       this.settings   = settings;
       this.cvRenderer = cvRenderer;
@@ -281,10 +280,6 @@ public class ConceptView extends JPanel {
          cvLayout.stop();
       }
 
-      if (this.settings.isNavigatorSetup()) {
-         this.settings.getNavigator().resetHistoryPanel();
-      }
-
       cvLayout = new ConceptViewLayout(this, concept);
       cvLayout.execute();
       getCvRenderer().updateCancelAndCommit();
@@ -353,7 +348,7 @@ public class ConceptView extends JPanel {
       return historyPanel;
    }
 
-   JCheckBox getJCheckBox() {
+   public JCheckBox makeJCheckBox() {
       JCheckBox check = new JCheckBox();
 
       check.setFont(check.getFont().deriveFont(settings.getFontSize()));

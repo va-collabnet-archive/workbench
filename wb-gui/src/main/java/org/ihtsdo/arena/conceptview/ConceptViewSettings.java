@@ -710,13 +710,6 @@ public class ConceptViewSettings extends ArenaComponentSettings {
          if (view != null && getHost() != null) {
             try {
                view.layoutConcept((I_GetConceptData) getHost().getTermComponent());
-               SwingUtilities.invokeLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            view.refreshHistory();
-                        }
-                    });
             } catch (IOException iOException) {
                AceLog.getAppLog().alertAndLogException(iOException);
             }

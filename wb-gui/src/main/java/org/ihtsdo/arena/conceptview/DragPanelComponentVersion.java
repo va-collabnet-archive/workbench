@@ -404,7 +404,7 @@ public abstract class DragPanelComponentVersion<T extends ComponentVersionBI> ex
       return actionButton;
    }
 
-   protected T getComponentVersion() {
+   public T getComponentVersion() {
       return getThingToDrag();
    }
 
