@@ -702,6 +702,7 @@ remodelled|remodeled
 remodelling|remodeling
 renegue|renege
 retrocaecal|retrocecal
+retrooesophageal|retroesophageal
 retroflexion|retroflection
 revascularisation|revascularization
 rhinorrhoea|rhinorrhea
