@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <config>
-	<exportFileName>xres2_RetiredIsaRelationship_Full_INT_</exportFileName>
+	<exportFileName>res2_RetiredIsaRelationship_Full_INT_</exportFileName>
 	<droolsDrlFile>org/ihtsdo/rf2/drools/RelationshipReleaseRules.drl</droolsDrlFile>
 	<column>
 		<name>id</name>

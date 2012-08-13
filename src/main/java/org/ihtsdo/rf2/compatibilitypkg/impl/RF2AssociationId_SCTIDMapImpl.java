@@ -20,26 +20,15 @@ import org.ihtsdo.rf2.util.WriteUtil;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
 
-/**
- * Title: RF2RelationshipImpl Description: Iterating over all the concept in workbench and fetching all the components required by RF2 Relationship File Copyright: Copyright (c) 2010 Company: IHTSDO
- * 
- * @author Varsha Parekh
- * @version 1.0
- */
 
-public class RF2HistoricalAssociationIdentImpl extends RF2AbstractImpl implements I_ProcessConcepts {
+public class RF2AssociationId_SCTIDMapImpl extends RF2AbstractImpl implements I_ProcessConcepts {
 
-	private static Logger logger = Logger.getLogger(RF2HistoricalAssociationIdentImpl.class);
+	private static Logger logger = Logger.getLogger(RF2AssociationId_SCTIDMapImpl.class);
 
-	public RF2HistoricalAssociationIdentImpl(Config config) {
+	public RF2AssociationId_SCTIDMapImpl(Config config) {
 		super(config);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @seeorg.dwfa.ace.api.I_ProcessConcepts#processConcept(org.dwfa.ace.api. I_GetConceptData)
-	 */
 	@Override
 	public void processConcept(I_GetConceptData concept) throws Exception {
 
@@ -87,30 +76,30 @@ public class RF2HistoricalAssociationIdentImpl extends RF2AbstractImpl implement
 						}
 					}
 
-
-					targetComponent = getSctId(rel.getC2Id(), getSnomedCorePathNid());
-
-
-					if (targetComponent==null || targetComponent.equals("")){
-						Collection<UUID> Uids=tf.getUids(rel.getC2Id());
-						if (Uids==null  ){
-							continue;
-						}
-						targetComponent=Uids.iterator().next().toString();
-						if (targetComponent.equals(nullUuid)){
-							continue;
-						}
-					}
-
-					String refsetId = getRefsetId(relTypeId);
-					UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId + targetComponent);
-					String relationshipUuid = uuid.toString();
-
 					if (relationshipId==null || relationshipId.equals("")){
-						relationshipId=relationshipUuid;
+
+						targetComponent = getSctId(rel.getC2Id(), getSnomedCorePathNid());
+	
+	
+						if (targetComponent==null || targetComponent.equals("")){
+							Collection<UUID> Uids=tf.getUids(rel.getC2Id());
+							if (Uids==null  ){
+								continue;
+							}
+							targetComponent=Uids.iterator().next().toString();
+							if (targetComponent.equals(nullUuid)){
+								continue;
+							}
+						}
+	
+						String refsetId = getRefsetId(relTypeId);
+						UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId + targetComponent);
+						String relationshipUuidT5 = uuid.toString();
+	
+						relationshipId=relationshipUuidT5;
 					}
 					effectiveTime = getDateFormat().format(new Date(rel.getTime()));
-
+					String relationshipUuid=rel.getUUIDs().iterator().next().toString();
 					writeRF2TypeLine(relationshipUuid, effectiveTime, active, moduleId, identifierSchemeId, relationshipId);
 
 				}
