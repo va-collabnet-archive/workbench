@@ -117,7 +117,7 @@ public class BatchActionTaskRefsetRetireMemberUI extends javax.swing.JPanel impl
         );
         jPanelValueMatchLayout.setVerticalGroup(
             jPanelValueMatchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGap(0, 34, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);

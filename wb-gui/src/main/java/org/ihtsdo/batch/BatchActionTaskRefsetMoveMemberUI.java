@@ -90,7 +90,7 @@ public class BatchActionTaskRefsetMoveMemberUI extends javax.swing.JPanel implem
 
         setPreferredSize(new java.awt.Dimension(218, 67));
 
-        jLabel1.setText("Move From:");
+        jLabel1.setText("Move Fr0m:");
 
         jComboBoxExistingRefsets.setModel(jComboBoxExistingRefsets.getModel());
         jComboBoxExistingRefsets.setRenderer(new org.ihtsdo.batch.JComboBoxExistingRefsetsRender());
@@ -106,7 +106,7 @@ public class BatchActionTaskRefsetMoveMemberUI extends javax.swing.JPanel implem
             .addGap(0, 28, Short.MAX_VALUE)
         );
 
-        jCheckBoxMatch.setText("If Matches Value:");
+        jCheckBoxMatch.setText("If Matches Value 2:");
         jCheckBoxMatch.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jCheckBoxMatchActionPerformed(evt);
@@ -130,7 +130,7 @@ public class BatchActionTaskRefsetMoveMemberUI extends javax.swing.JPanel implem
         );
         jPanelValueMatchLayout.setVerticalGroup(
             jPanelValueMatchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGap(0, 32, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -142,13 +142,12 @@ public class BatchActionTaskRefsetMoveMemberUI extends javax.swing.JPanel implem
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jComboBoxExistingRefsets, 0, 140, Short.MAX_VALUE))
             .addComponent(jPanelDndRefsetMoveTo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jCheckBoxMatch)
-                .addContainerGap())
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jComboBoxType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
             .addComponent(jPanelValueMatch, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jCheckBoxMatch)
+                    .addComponent(jComboBoxType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
