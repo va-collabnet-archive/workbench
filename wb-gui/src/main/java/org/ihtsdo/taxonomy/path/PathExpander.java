@@ -25,6 +25,7 @@ import java.io.IOException;
 
 import java.util.Collection;
 import java.util.List;
+import org.ihtsdo.tk.Ts;
 
 /**
  *
@@ -72,7 +73,9 @@ public class PathExpander implements Runnable {
             parent = node;
          }
 
-         TaxonomyNode        focusNode = model.getNodeFactory().makeNode(focus.getNid(), parent);
+         TaxonomyNode        focusNode = model.getNodeFactory().makeNode(Ts.get().getConceptVersion(config.getViewCoordinate(), focus.getNid()),
+                 parent.getConceptNid(),
+                 parent);
          PathSegmentExpander expander  = new PathSegmentExpander(tree.getNodeFactory(),
                                             NodePath.getTreePath(model, focusNode), 1);
 
