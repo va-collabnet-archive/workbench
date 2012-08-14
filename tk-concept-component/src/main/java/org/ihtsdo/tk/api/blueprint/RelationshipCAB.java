@@ -152,6 +152,20 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
             annotBp.recomputeUuid();
         }
     }
+    
+    @Override
+    public boolean equals(Object o){
+        if(RelationshipCAB.class.isAssignableFrom(o.getClass())){
+            RelationshipCAB another = (RelationshipCAB) o;
+            if(this.sourceUuid.equals(another.sourceUuid) &&
+              this.typeUuid.equals(another.typeUuid) &&
+              this.destUuid.equals(another.destUuid) &&
+              this.group == another.group){
+                return true;
+            }
+        }
+        return false;
+    }
 
     public UUID getCharacteristicUuid() {
         return characteristicUuid;
