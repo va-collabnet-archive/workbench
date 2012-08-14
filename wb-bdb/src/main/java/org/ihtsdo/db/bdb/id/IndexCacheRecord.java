@@ -113,9 +113,17 @@ public class IndexCacheRecord {
         for (int i = start; i < data.length; i++) {
             if (data[i] == memberNid) {
                 int[] nidPairForRefexArray = new int[arrayLength - 2];
+                int partOneLength = i - 1 - start;
+                if (partOneLength > 0) {
+                    System.arraycopy(data, data[REFEX_OFFSET_INDEX], nidPairForRefexArray, 0, partOneLength);
+                }
                 
-                System.arraycopy(data, data[REFEX_OFFSET_INDEX], nidPairForRefexArray, 0, i);
-                System.arraycopy(data, i + 2, nidPairForRefexArray, 0, arrayLength - i);
+                int partTwoLength = nidPairForRefexArray.length - partOneLength;
+                if (partTwoLength > partOneLength) {
+                    System.arraycopy(data, i + 1, nidPairForRefexArray, partOneLength, partTwoLength);
+                }
+                
+                
                 updateData(getRelationshipOutgoingArray(), getDestinationOriginNids(), nidPairForRefexArray);
                 
                 return;
