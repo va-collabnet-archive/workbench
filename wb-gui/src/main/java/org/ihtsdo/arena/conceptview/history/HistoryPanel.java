@@ -294,7 +294,7 @@ public class HistoryPanel {
                 SwingUtilities.convertPointToScreen(location, comp.getParent());
                 SwingUtilities.convertPointFromScreen(location, versionPanel.getParent());
                 seperators.add(new Rectangle(0, location.y,
-                        Math.max(versionPanel.getWidth(), ConceptViewSettings.NAVIGATOR_WIDTH - 3),
+                        Math.max(versionPanel.getWidth() + 120, ConceptViewSettings.NAVIGATOR_WIDTH - 3),
                         comp.getHeight()));
             }
         }
@@ -310,7 +310,6 @@ public class HistoryPanel {
 
         int currentX = xStartLoc;
 
-        // int yAdjust = -historyHeaderPanel.getHeight();
         next:
         for (PositionBI p : view.getPositionOrderedSet()) {
             JCheckBox positionCheck = header.positionCheckMap.get(p);
@@ -372,14 +371,15 @@ public class HistoryPanel {
             }
         }
 
-
+        currentX = currentX + 120;
         header.hxWidth = currentX;
         header.historyHeaderPanel.setSize(Math.max(header.hxWidth, ConceptViewSettings.NAVIGATOR_WIDTH - 6),
                 view.getHistoryPanel().getHeight());
         header.historyHeaderPanel.setMinimumSize(header.historyHeaderPanel.getSize());
         header.historyHeaderPanel.setPreferredSize(header.historyHeaderPanel.getSize());
         header.historyHeaderPanel.setMaximumSize(header.historyHeaderPanel.getSize());
-        versionPanel.setSize(Math.max(header.hxWidth, ConceptViewSettings.NAVIGATOR_WIDTH - 6) + 20, versionPanel.getHeight());
+        versionPanel.setSize(Math.max(header.hxWidth + 120, ConceptViewSettings.NAVIGATOR_WIDTH - 6) + 20,
+                versionPanel.getHeight());
         if (currentX > 5) {
             redoGrid();
         }
@@ -394,7 +394,12 @@ public class HistoryPanel {
 
     private void scrollRightIfChanged() {
         if (conceptChanged()) {
-            conceptNid = view.getConcept().getConceptNid();
+            if (view.getConcept() != null) {
+                conceptNid = view.getConcept().getConceptNid();
+            } else {
+                conceptNid = Integer.MAX_VALUE;
+            }
+            
             scrollRight();
         }
     }
@@ -561,7 +566,8 @@ public class HistoryPanel {
     }
 
     private void sizeVersionPanel() {
-        versionPanel.setSize(Math.max(header.hxWidth, ConceptViewSettings.NAVIGATOR_WIDTH) + 20, view.getHeight() + 20);
+        versionPanel.setSize(Math.max(header.hxWidth + 120, ConceptViewSettings.NAVIGATOR_WIDTH) + 20, 
+                view.getHeight() + 20);
         versionPanel.setPreferredSize(versionPanel.getSize());
         versionPanel.setMinimumSize(versionPanel.getSize());
         versionPanel.setMaximumSize(versionPanel.getSize());
