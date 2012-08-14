@@ -7,6 +7,7 @@ package org.ihtsdo.arena.conceptview.history;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,23 +27,14 @@ import org.ihtsdo.tk.api.PositionBI;
  *
  * @author kec
  */
-public class VersionCheckHeader {
+public class VersionCheckHeader implements ActionListener {
 
     /**
      * JPanel that contains the position check box versionPanelScroller, and the version versionPanelScroller with the radio buttons for all
      * the versions of the components in the concept.
      */
     private JPanel parentHistoryPanel = new JPanel(new GridBagLayout());
-    /**
-     * A map that links check boxes to a label that will become visible in the version versionPanelScroller when the check
-     * box is selected.
-     */
-    protected Map<JCheckBox, JLabel> positionVersionPanelCheckLabelMap = new HashMap<>();
-    /**
-     * A map that links check boxes to a label that will become visible in the history header versionPanelScroller when the
-     * check box is selected.
-     */
-    protected Map<JCheckBox, JLabel> positionHeaderCheckLabelMap = new HashMap<>();
+
     /**
      * A map that links the collection of positions that are part of the history of a concept with the check
      * box that determines the vertical alignment of component version radio buttons that show the history of
@@ -115,14 +107,6 @@ public class VersionCheckHeader {
         return parentHistoryPanel;
     }
 
-    public Map<JCheckBox, JLabel> getPositionVersionPanelCheckLabelMap() {
-        return positionVersionPanelCheckLabelMap;
-    }
-
-    public Map<JCheckBox, JLabel> getPositionHeaderCheckLabelMap() {
-        return positionHeaderCheckLabelMap;
-    }
-
     public Map<PositionBI, JCheckBox> getPositionCheckMap() {
         return positionCheckMap;
     }
@@ -144,16 +128,8 @@ public class VersionCheckHeader {
         for (JCheckBox positionCheck : positionCheckMap.values()) {
             historyHeaderPanel.remove(positionCheck);
         }
-        for (JLabel historyLabel : positionHeaderCheckLabelMap.values()) {
-            historyHeaderPanel.remove(historyLabel);
-        }
-        for (JLabel historyLabel : positionVersionPanelCheckLabelMap.values()) {
-            hxPanel.versionPanel.remove(historyLabel);
-        }
         if (resetPositions) {
             positionCheckMap.clear();
-            positionHeaderCheckLabelMap.clear();
-            positionVersionPanelCheckLabelMap.clear();
         }
 
         checkComponentMap.clear();
@@ -187,6 +163,7 @@ public class VersionCheckHeader {
             JCheckBox positionCheck = positionCheckMap.get(p);
             if (positionCheck == null) {
                 positionCheck = hxPanel.view.makeJCheckBox();
+                positionCheck.addActionListener(this);
                 positionCheckMap.put(p, positionCheck);
             }
             positionCheck.setVisible(positionCheckVisible);
@@ -198,32 +175,15 @@ public class VersionCheckHeader {
                 historyHeaderPanel.add(positionCheck);
                 positionCheck.setLocation(locX, rowCheck.getLocation().y);
                 locX += positionCheck.getWidth();
-                JLabel historyLabel = positionHeaderCheckLabelMap.get(positionCheck);
-                if (historyLabel == null) {
-                    historyLabel = HistoryPanel.setupLabel("", locX);
-                    positionHeaderCheckLabelMap.put(positionCheck, historyLabel);
-                }
-                historyHeaderPanel.add(historyLabel);
-                JLabel versionHistoryLabel = positionVersionPanelCheckLabelMap.get(positionCheck);
-                if (versionHistoryLabel == null) {
-                    versionHistoryLabel = HistoryPanel.setupLabel(p.toString(), locX);
-                    positionVersionPanelCheckLabelMap.put(positionCheck, versionHistoryLabel);
-                    
-                    for (ActionListener al: positionCheck.getActionListeners()) {
-                        if (al instanceof HistoryPanel.UpdateHistoryBorder) {
-                            positionCheck.removeActionListener(al);
-                        }
-                    }      
-                    positionCheck.addActionListener(
-                        hxPanel.getUpdateHistoryBorderActionListener(historyLabel, versionHistoryLabel));
-                }
-                hxPanel.versionPanel.add(versionHistoryLabel);
-                historyLabel.setLocation(locX, 0);
-                versionHistoryLabel.setLocation(locX, 0);
-            }
+             }
         }
 
         hxWidth = locX;
         historyHeaderPanel.revalidate();
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        hxPanel.versionPanel.repaint(hxPanel.versionPanel.getBounds());
     }
 }
