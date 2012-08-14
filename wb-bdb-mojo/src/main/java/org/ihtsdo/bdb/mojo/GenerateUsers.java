@@ -763,18 +763,26 @@ public class GenerateUsers extends AbstractMojo {
 
 		//set up label display prefs
 		I_IntList treeDescPrefList = activeConfig.getTreeDescPreferenceList();
+                treeDescPrefList.add(SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid());
+		treeDescPrefList.add(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
 		treeDescPrefList.add(SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1.getLenient().getNid());
 		treeDescPrefList.add(SnomedMetadataRf1.FULLY_SPECIFIED_DESCRIPTION_TYPE.getLenient().getNid());
 
 		I_IntList shortLabelDescPrefList = activeConfig.getShortLabelDescPreferenceList();
+                shortLabelDescPrefList.add(SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid());
+		shortLabelDescPrefList.add(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
 		shortLabelDescPrefList.add(SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1.getLenient().getNid());
 		shortLabelDescPrefList.add(SnomedMetadataRf1.FULLY_SPECIFIED_DESCRIPTION_TYPE.getLenient().getNid());
 
 		I_IntList longLabelDescPrefList = activeConfig.getLongLabelDescPreferenceList();
+                longLabelDescPrefList.add(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
+		longLabelDescPrefList.add(SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid());
 		longLabelDescPrefList.add(SnomedMetadataRf1.FULLY_SPECIFIED_DESCRIPTION_TYPE.getLenient().getNid());
 		longLabelDescPrefList.add(SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1.getLenient().getNid());
 
 		I_IntList tableDescPrefList = activeConfig.getTableDescPreferenceList();
+                tableDescPrefList.add(SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid());
+		tableDescPrefList.add(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
 		tableDescPrefList.add(SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1.getLenient().getNid());
 		tableDescPrefList.add(SnomedMetadataRf1.FULLY_SPECIFIED_DESCRIPTION_TYPE.getLenient().getNid());
 
