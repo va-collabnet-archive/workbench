@@ -39,6 +39,7 @@ public class SearchRefsetWorker extends SwingWorker<I_UpdateProgress> implements
     StopActionListener stopListener = new StopActionListener();
     CountDownLatch completeLatch;
     private int extensionCount;
+    private int actualExtensionCount = 0;
     private Collection<I_DescriptionVersioned<?>> refsetMatches;
     private DescriptionsFromCollectionTableModel model;
     I_ConfigAceFrame config;
@@ -120,6 +121,9 @@ public class SearchRefsetWorker extends SwingWorker<I_UpdateProgress> implements
                 }
             } else {
                 updateProgress();
+                searchPanel.setProgressIndeterminate(false);
+                searchPanel.setProgressValue(1);
+                searchPanel.setProgressMaximum(1);
                 updateTimer.stop();
             }
         }
@@ -129,7 +133,8 @@ public class SearchRefsetWorker extends SwingWorker<I_UpdateProgress> implements
             if (searchPanel.getProgressMaximum() == Integer.MAX_VALUE) {
                 max = "unknown";
             }
-            searchPanel.setProgressInfo("   " + refsetMatches.size() + " matches out of " + max + " members   ");
+            searchPanel.setProgressInfo("   " + refsetMatches.size() + " matches out of " + 
+                    Integer.toString(Math.max(actualExtensionCount, searchPanel.getProgressMaximum())) + " members   ");
         }
 
         public void normalCompletion() {
@@ -139,7 +144,8 @@ public class SearchRefsetWorker extends SwingWorker<I_UpdateProgress> implements
                 searchPanel.setProgressMaximum(extensionCount);
                 firstUpdate = false;
             }
-            searchPanel.setProgressValue(0);
+            searchPanel.setProgressValue(1);
+            searchPanel.setProgressMaximum(1);
         }
     }
 
@@ -184,6 +190,7 @@ public class SearchRefsetWorker extends SwingWorker<I_UpdateProgress> implements
                 int errorCount = 0;
                 for (I_ExtendByRefVersion extVer : versions) {
                     for (I_TestSearchResults test : criterion) {
+                        actualExtensionCount++;
                         if (!(test instanceof ActiveConceptAndDescTest)) {
                         if (!test.test(extVer, config)) {
                             continue nextExt;
@@ -256,7 +263,9 @@ public class SearchRefsetWorker extends SwingWorker<I_UpdateProgress> implements
         }
         searchPanel.removeStopActionListener(stopListener);
         searchPanel.setShowProgress(false);
-        searchPanel.setProgressValue(0);
+        searchPanel.setProgressIndeterminate(false);
+        searchPanel.setProgressValue(Math.max(actualExtensionCount, searchPanel.getProgressMaximum()));
+        searchPanel.setProgressMaximum(Math.max(actualExtensionCount, searchPanel.getProgressMaximum()));
     }
 
     @Override
