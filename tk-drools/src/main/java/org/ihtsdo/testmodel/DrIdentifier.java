@@ -16,6 +16,13 @@ public class DrIdentifier extends DrComponent {
 
 	// Inferred properties
 	// none yet
+	
+	public DrIdentifier() {
+		this.primordialUuid = "";
+		this.componentUuid = "";
+		this.authorityUuid = "";
+		this.denotation = "";
+	}
 
 	@Override
 	public String toString() {
@@ -41,10 +48,6 @@ public class DrIdentifier extends DrComponent {
 			e.printStackTrace();
 		}
 		return sb.toString();
-	}
-
-	public DrIdentifier() {
-		// TODO Auto-generated constructor stub
 	}
 
 	public String getPrimordialUuid() {
