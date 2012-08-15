@@ -1,7 +1,6 @@
 package org.ihtsdo.arena.conceptview;
 
 //~--- non-JDK imports --------------------------------------------------------
-
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.dnd.DragMonitor;
@@ -71,135 +70,134 @@ import org.ihtsdo.tk.api.*;
 
 public class ConceptView extends JPanel {
 
-   /**
-    *
-    */
-   private static final long serialVersionUID = 1L;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+    //~--- fields --------------------------------------------------------------
+    private Collection<Action> actionList =
+            Collections.synchronizedCollection(new ArrayList<Action>());
+    private Map<PanelSection, CollapsePanelPrefs> prefMap = new EnumMap<>(PanelSection.class);
+    long lastChangeModificationLayoutSequence = Long.MIN_VALUE;
+    private Set<File> kbFiles = new HashSet<>();
+    private boolean historyShown = false;
+    private JPanel historyPanel = new JPanel(new GridBagLayout());
+    private Collection<JComponent> dropComponents =
+            Collections.synchronizedList(new ArrayList<JComponent>());
+    private final Set<ComponentVersionBI> changedVersionSelections = new HashSet<>();
+    private I_GetConceptData concept;
+    private I_ConfigAceFrame config;
+    ConceptViewLayout cvLayout;
+    private final ConceptViewRenderer cvRenderer;
+    private I_DispatchDragStatus dropPanelMgr;
+    private EditPanelKb kb;
+    private Object lastThingBeingDropped;
+    private ConceptViewSettings settings;
+    private CVChangeListener cvChangeListener = new CVChangeListener();
 
-   //~--- fields --------------------------------------------------------------
+    //~--- constant enums ------------------------------------------------------
+    public enum PanelSection {
 
-   private Collection<Action>                    actionList =
-      Collections.synchronizedCollection(new ArrayList<Action>());
-   private Map<PanelSection, CollapsePanelPrefs> prefMap    = new EnumMap<>(PanelSection.class);
-   long                                  lastChangeModificationLayoutSequence       = Long.MIN_VALUE;
-   private Set<File>                     kbFiles                  = new HashSet<>();
-   private boolean                       historyShown             = false;
-   private JPanel                        historyPanel             = new JPanel(new GridBagLayout());
-   private Collection<JComponent>        dropComponents           =
-      Collections.synchronizedList(new ArrayList<JComponent>());
-   private final Set<ComponentVersionBI> changedVersionSelections = new HashSet<>();
-   private I_GetConceptData              concept;
-   private I_ConfigAceFrame              config;
-   ConceptViewLayout                     cvLayout;
-   private final ConceptViewRenderer     cvRenderer;
-   private I_DispatchDragStatus          dropPanelMgr;
-   private EditPanelKb                   kb;
-   private Object                        lastThingBeingDropped;
-   private ConceptViewSettings           settings;
-   private CVChangeListener cvChangeListener = new CVChangeListener();
+        CONCEPT, DESC, REL, REL_GRP, EXTRAS
+    }
 
+    //~--- constructors --------------------------------------------------------
+    public ConceptView(I_ConfigAceFrame config, ConceptViewSettings settings, ConceptViewRenderer cvRenderer) {
+        super();
 
-   //~--- constant enums ------------------------------------------------------
-
-   public enum PanelSection { CONCEPT, DESC, REL, REL_GRP, EXTRAS }
-
-   //~--- constructors --------------------------------------------------------
-
-   public ConceptView(I_ConfigAceFrame config, ConceptViewSettings settings, ConceptViewRenderer cvRenderer) {
-      super();
-
-      this.config     = config;
-      this.settings   = settings;
-      this.cvRenderer = cvRenderer;
-      kbFiles.add(new File("drools-rules/ContextualDropActions.drl"));
-      if(new File("drools-rules/extras/ContextualDropActionsXtra.drl").exists()){
-          kbFiles.add(new File("drools-rules/extras/ContextualDropActionsXtra.drl"));
-      }
-      String kbKey = ConceptView.class.getCanonicalName();
-      try {
+        this.config = config;
+        this.settings = settings;
+        this.cvRenderer = cvRenderer;
+        kbFiles.add(new File("drools-rules/ContextualDropActions.drl"));
+        if (new File("drools-rules/extras/ContextualDropActionsXtra.drl").exists()) {
+            kbFiles.add(new File("drools-rules/extras/ContextualDropActionsXtra.drl"));
+        }
+        String kbKey = ConceptView.class.getCanonicalName();
+        try {
             DroolsExecutionManager.setup(kbKey, kbFiles);
         } catch (IOException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         }
-      kb = ConceptTemplates.getKb();
-      addCommitListener(settings);
-      setupPrefMap();
-      dropPanelMgr = new DropPanelActionManager();
-      Ts.get().addTermChangeListener(cvChangeListener);
-   }
+        kb = ConceptTemplates.getKb();
+        addCommitListener(settings);
+        setupPrefMap();
+        dropPanelMgr = new DropPanelActionManager();
+        Ts.get().addTermChangeListener(cvChangeListener);
+    }
 
-   //~--- methods -------------------------------------------------------------
+    //~--- methods -------------------------------------------------------------
+    private void addCommitListener(ConceptViewSettings settings) {
+        settings.getConfig().addPropertyChangeListener("commit", new PropertyChangeListener() {
+            Long lastPropId = Long.MIN_VALUE;
 
-   private void addCommitListener(ConceptViewSettings settings) {
-      settings.getConfig().addPropertyChangeListener("commit", new PropertyChangeListener() {
-         Long lastPropId = Long.MIN_VALUE;
-         @Override
-         public void propertyChange(PropertyChangeEvent evt) {
-            if ((evt.getPropagationId() == null) || (Long) evt.getPropagationId() > lastPropId) {
-               try {
-                  if (ConceptView.this.concept == null) {
-                      if (evt.getOldValue() != null || evt.getNewValue() != null) {
-                          layoutConcept(ConceptView.this.concept);
-                      }
-                     
-                  } else {
-                     if (ConceptView.this.concept.isCanceled()) {
-                        getSettings().getHost().setTermComponent(null);
-                     } else {
-                        layoutConcept(ConceptView.this.concept);
-                     }
-                  }
-               } catch (IOException ex) {
-                  AceLog.getAppLog().alertAndLogException(ex);
-               }
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ((evt.getPropagationId() == null) || (Long) evt.getPropagationId() > lastPropId) {
+                    try {
+                        if (ConceptView.this.concept == null) {
+                            if (evt.getOldValue() != null || evt.getNewValue() != null) {
+                                layoutConcept(ConceptView.this.concept);
+                            }
 
-               if (evt.getPropagationId() != null) {
-                  lastPropId = (Long) evt.getPropagationId();
-               }
+                        } else {
+                            if (ConceptView.this.concept.isCanceled()) {
+                                getSettings().getHost().setTermComponent(null);
+                            } else {
+                                layoutConcept(ConceptView.this.concept);
+                            }
+                        }
+                    } catch (IOException ex) {
+                        AceLog.getAppLog().alertAndLogException(ex);
+                    }
+
+                    if (evt.getPropagationId() != null) {
+                        lastPropId = (Long) evt.getPropagationId();
+                    }
+                }
             }
-         }
-      });
-   }
+        });
+    }
 
-   public void addHostListener(PropertyChangeListener l) {
-      if ((settings != null) && (settings.getHost() != null)) {
-         settings.getHost().addPropertyChangeListener("termComponent", l);
-      }
-   }
+    public void addHostListener(PropertyChangeListener l) {
+        if ((settings != null) && (settings.getHost() != null)) {
+            settings.getHost().addPropertyChangeListener("termComponent", l);
+        }
+    }
 
-   private class CVChangeListener extends TermChangeListener {
+    private class CVChangeListener extends TermChangeListener {
 
         @Override
-        public void changeNotify(long sequence, 
-            Set<Integer> originsOfChangedRels, 
-            Set<Integer> destinationsOfChangedRels, 
-            Set<Integer> referencedComponentsOfChangedRefexs, 
-            Set<Integer> changedComponents,
-            Set<Integer> changedComponentAlerts,
-            Set<Integer> changedComponentTemplates) {
-            ChangeListenerSwingWorker worker = new ChangeListenerSwingWorker(sequence, 
-                    originsOfChangedRels, 
-                    destinationsOfChangedRels, 
-                    referencedComponentsOfChangedRefexs, 
-                    changedComponents, 
+        public void changeNotify(long sequence,
+                Set<Integer> originsOfChangedRels,
+                Set<Integer> destinationsOfChangedRels,
+                Set<Integer> referencedComponentsOfChangedRefexs,
+                Set<Integer> changedComponents,
+                Set<Integer> changedComponentAlerts,
+                Set<Integer> changedComponentTemplates) {
+            ChangeListenerSwingWorker worker = new ChangeListenerSwingWorker(sequence,
+                    originsOfChangedRels,
+                    destinationsOfChangedRels,
+                    referencedComponentsOfChangedRefexs,
+                    changedComponents,
                     concept);
             worker.execute();
         }
-   }
-   
-   private class ChangeListenerSwingWorker extends SwingWorker<Boolean, Boolean> {
-       long sequence; 
-       Set<Integer> originsOfChangedRels; 
-       Set<Integer> destinationsOfChangedRels; 
-       Set<Integer> referencedComponentsOfChangedRefexs; 
-       Set<Integer> changedComponents;
-       I_GetConceptData validConcept;
+    }
 
-        public ChangeListenerSwingWorker(long sequence, 
-                Set<Integer> originsOfChangedRels, 
-                Set<Integer> destinationsOfChangedRels, 
-                Set<Integer> referencedComponentsOfChangedRefexs, 
-                Set<Integer> changedComponents, 
+    private class ChangeListenerSwingWorker extends SwingWorker<Boolean, Boolean> {
+
+        long sequence;
+        Set<Integer> originsOfChangedRels;
+        Set<Integer> destinationsOfChangedRels;
+        Set<Integer> referencedComponentsOfChangedRefexs;
+        Set<Integer> changedComponents;
+        I_GetConceptData validConcept;
+
+        public ChangeListenerSwingWorker(long sequence,
+                Set<Integer> originsOfChangedRels,
+                Set<Integer> destinationsOfChangedRels,
+                Set<Integer> referencedComponentsOfChangedRefexs,
+                Set<Integer> changedComponents,
                 I_GetConceptData validConcept) {
             this.sequence = sequence;
             this.originsOfChangedRels = originsOfChangedRels;
@@ -208,22 +206,21 @@ public class ConceptView extends JPanel {
             this.changedComponents = changedComponents;
             this.validConcept = validConcept;
         }
-       
-       
-       @Override
-       protected Boolean doInBackground() throws Exception {
-           if (validConcept != null) {
-               Collection<Integer> allNids = ConceptView.this.concept.getAllNids();
-               if (setContainsCollectionMember(originsOfChangedRels, allNids)
-                       || setContainsCollectionMember(destinationsOfChangedRels, allNids)
-                       || setContainsCollectionMember(referencedComponentsOfChangedRefexs, allNids)
-                       || setContainsCollectionMember(changedComponents, allNids)) {
-                   lastTouchSequence++;
-                   return true;
-               }
-           }
-           return false;
-       }
+
+        @Override
+        protected Boolean doInBackground() throws Exception {
+            if (validConcept != null) {
+                Collection<Integer> allNids = ConceptView.this.concept.getAllNids();
+                if (setContainsCollectionMember(originsOfChangedRels, allNids)
+                        || setContainsCollectionMember(destinationsOfChangedRels, allNids)
+                        || setContainsCollectionMember(referencedComponentsOfChangedRefexs, allNids)
+                        || setContainsCollectionMember(changedComponents, allNids)) {
+                    lastTouchSequence++;
+                    return true;
+                }
+            }
+            return false;
+        }
 
         @Override
         protected void done() {
@@ -236,477 +233,479 @@ public class ConceptView extends JPanel {
                 AceLog.getAppLog().alertAndLogException(ex);
             }
         }
-       
-   }
-   
-   private static boolean setContainsCollectionMember(Set<Integer> set, Collection<Integer> collection) {
-       for (Integer member: collection) {
-           if (set.contains(member)) {
-               return true;
-           }
-       }
-       return false;
-   }
-   
-   private long lastTouchSequence = Long.MIN_VALUE;
-   private long lastTouchLayoutSequence = Long.MIN_VALUE;
-   
-   public void layoutConcept(I_GetConceptData concept) throws IOException {
-      if (concept != null) {
-         if ((lastChangeModificationLayoutSequence == concept.getLastModificationSequence()) && (concept == this.concept) &&
-                 lastTouchLayoutSequence == lastTouchSequence) {
-            if (this.settings.isNavigatorSetup()) {
-               this.settings.getNavigator().resetHistoryPanel();
+    }
+
+    private static boolean setContainsCollectionMember(Set<Integer> set, Collection<Integer> collection) {
+        for (Integer member : collection) {
+            if (set.contains(member)) {
+                return true;
             }
+        }
+        return false;
+    }
+    private long lastTouchSequence = Long.MIN_VALUE;
+    private long lastTouchLayoutSequence = Long.MIN_VALUE;
 
-            return;
-         }
+    public void layoutConcept(I_GetConceptData concept) throws IOException {
+        boolean conceptChanged = true;
+        if (concept != null) {
+            if (concept == this.concept) {
+                conceptChanged = false;
+                if ((lastChangeModificationLayoutSequence == concept.getLastModificationSequence())
+                        && lastTouchLayoutSequence == lastTouchSequence) {
+                    if (this.settings.isNavigatorSetup()) {
+                        this.settings.getNavigator().resetHistoryPanel();
+                    }
 
-         lastChangeModificationLayoutSequence = concept.getLastModificationSequence();
-      }
+                    return;
+                }
+            }
+            lastChangeModificationLayoutSequence = concept.getLastModificationSequence();
+        }
 
-      lastTouchLayoutSequence = lastTouchSequence;
-      
-      removeAll();
+        lastTouchLayoutSequence = lastTouchSequence;
 
-      if ((concept == null) || (this.concept == null) || (this.concept.equals(concept) == false)
-              || this.concept.isCanceled()) {
-         changedVersionSelections.clear();
-      }
+        removeAll();
 
-      this.concept = concept;
+        if ((concept == null) || (this.concept == null) || (this.concept.equals(concept) == false)
+                || this.concept.isCanceled()) {
+            changedVersionSelections.clear();
+        }
 
-      if (cvLayout != null) {
-         cvLayout.stop();
-      }
+        this.concept = concept;
 
-      cvLayout = new ConceptViewLayout(this, concept);
-      cvLayout.execute();
-      getCvRenderer().updateCancelAndCommit();
-   }
+        if (cvLayout != null) {
+            cvLayout.stop();
+        }
+        if (conceptChanged) {
+            if (getParent() != null) { 
+                if (getParent() != null) {
+                    ((JScrollPane) getParent().getParent()).getVerticalScrollBar().getModel().setValue(0);
+                }
+            }
+        }
+        cvLayout = new ConceptViewLayout(this, concept);
+        cvLayout.execute();
+        getCvRenderer().updateCancelAndCommit();
+    }
 
-   public void resetLastLayoutSequence() {
-      lastChangeModificationLayoutSequence = Long.MIN_VALUE;
-   }
+    public void resetLastLayoutSequence() {
+        lastChangeModificationLayoutSequence = Long.MIN_VALUE;
+    }
 
-   public void setupDrop(Object thingBeingDropped) {
-      if (thingBeingDropped != null) {
-         if ((lastThingBeingDropped == null) || (thingBeingDropped.equals(lastThingBeingDropped) == false)) {
-            lastThingBeingDropped = thingBeingDropped;
+    public void setupDrop(Object thingBeingDropped) {
+        if (thingBeingDropped != null) {
+            if ((lastThingBeingDropped == null) || (thingBeingDropped.equals(lastThingBeingDropped) == false)) {
+                lastThingBeingDropped = thingBeingDropped;
+                actionList.clear();
+                actionList.addAll(getKbActions(thingBeingDropped));
+                dropComponents.clear();
+
+                if (actionList.size() > -1) {
+                    for (Action a : actionList) {
+                        try {
+                            dropComponents.add(new DropActionPanel(a));
+                        } catch (TooManyListenersException e) {
+                            AceLog.getAppLog().alertAndLogException(e);
+                        }
+                    }
+                }
+            }
+        } else {
+            System.out.println("Changing to null");
             actionList.clear();
-            actionList.addAll(getKbActions(thingBeingDropped));
             dropComponents.clear();
+        }
+    }
 
-            if (actionList.size() > -1) {
-               for (Action a : actionList) {
-                  try {
-                     dropComponents.add(new DropActionPanel(a));
-                  } catch (TooManyListenersException e) {
-                     AceLog.getAppLog().alertAndLogException(e);
-                  }
-               }
-            }
-         }
-      } else {
-         System.out.println("Changing to null");
-         actionList.clear();
-         dropComponents.clear();
-      }
-   }
+    private void setupPrefMap() {
+        prefMap.put(PanelSection.CONCEPT, new CollapsePanelPrefs());
+        prefMap.put(PanelSection.DESC, new CollapsePanelPrefs());
+        prefMap.put(PanelSection.REL, new CollapsePanelPrefs());
+        prefMap.put(PanelSection.REL_GRP, new CollapsePanelPrefs());
+        prefMap.put(PanelSection.EXTRAS, new CollapsePanelPrefs());
+    }
 
-   private void setupPrefMap() {
-      prefMap.put(PanelSection.CONCEPT, new CollapsePanelPrefs());
-      prefMap.put(PanelSection.DESC, new CollapsePanelPrefs());
-      prefMap.put(PanelSection.REL, new CollapsePanelPrefs());
-      prefMap.put(PanelSection.REL_GRP, new CollapsePanelPrefs());
-      prefMap.put(PanelSection.EXTRAS, new CollapsePanelPrefs());
-   }
+    //~--- get methods ---------------------------------------------------------
+    public Set<ComponentVersionBI> getChangedVersionSelections() {
+        return changedVersionSelections;
+    }
 
-   //~--- get methods ---------------------------------------------------------
+    public I_GetConceptData getConcept() {
+        return concept;
+    }
 
-   public Set<ComponentVersionBI> getChangedVersionSelections() {
-      return changedVersionSelections;
-   }
+    public I_ConfigAceFrame getConfig() {
+        return config;
+    }
 
-   public I_GetConceptData getConcept() {
-      return concept;
-   }
+    public ConceptViewLayout getCvLayout() {
+        return cvLayout;
+    }
 
-   public I_ConfigAceFrame getConfig() {
-      return config;
-   }
+    public ConceptViewRenderer getCvRenderer() {
+        return cvRenderer;
+    }
 
-   public ConceptViewLayout getCvLayout() {
-      return cvLayout;
-   }
+    public JPanel getHistoryPanel() {
+        return historyPanel;
+    }
 
-   public ConceptViewRenderer getCvRenderer() {
-      return cvRenderer;
-   }
+    public JCheckBox makeJCheckBox() {
+        JCheckBox check = new JCheckBox();
 
-   public JPanel getHistoryPanel() {
-      return historyPanel;
-   }
+        check.setFont(check.getFont().deriveFont(settings.getFontSize()));
+        check.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
 
-   public JCheckBox makeJCheckBox() {
-      JCheckBox check = new JCheckBox();
+        return check;
+    }
 
-      check.setFont(check.getFont().deriveFont(settings.getFontSize()));
-      check.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
+    public JLabel getJLabel(String text) {
+        JLabel l = new JLabel(text);
 
-      return check;
-   }
+        l.setFont(l.getFont().deriveFont(settings.getFontSize()));
+        l.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
 
-   public JLabel getJLabel(String text) {
-      JLabel l = new JLabel(text);
+        return l;
+    }
 
-      l.setFont(l.getFont().deriveFont(settings.getFontSize()));
-      l.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
+    public EditPanelKb getKb() {
+        return kb;
+    }
 
-      return l;
-   }
+    protected Collection<Action> getKbActions(Object thingToDrop) {
+        ArrayList<Action> actions = new ArrayList<Action>();
 
-   public EditPanelKb getKb() {
-      return kb;
-   }
+        try {
+            if (I_GetConceptData.class.isAssignableFrom(thingToDrop.getClass())) {
+                I_GetConceptData conceptToDrop = (I_GetConceptData) thingToDrop;
 
-   protected Collection<Action> getKbActions(Object thingToDrop) {
-      ArrayList<Action> actions = new ArrayList<Action>();
-
-      try {
-         if (I_GetConceptData.class.isAssignableFrom(thingToDrop.getClass())) {
-            I_GetConceptData conceptToDrop = (I_GetConceptData) thingToDrop;
-
-            thingToDrop = Ts.get().getConceptVersion(config.getViewCoordinate(),
-                    conceptToDrop.getConceptNid());
-         }
-
-         if (ComponentVersionBI.class.isAssignableFrom(thingToDrop.getClass())
-                 || SpecBI.class.isAssignableFrom(thingToDrop.getClass())) {
-            Map<String, Object> globals = new HashMap<String, Object>();
-
-            globals.put("actions", actions);
-            globals.put("vc", config.getViewCoordinate());
-            globals.put("config", config);
-
-            View viewType;
-
-            if(getSettings().getRelAssertionType() == RelAssertionType.STATED){
-                viewType = View.STATED;
-            }else if (getSettings().getRelAssertionType() == RelAssertionType.INFERRED){
-                viewType = View.INFERRED;
-            }else if (getSettings().getRelAssertionType() == RelAssertionType.INFERRED_THEN_STATED){
-                viewType = View.STATED_AND_INFERRED;
-            }else{
-                viewType = View.STATED;
+                thingToDrop = Ts.get().getConceptVersion(config.getViewCoordinate(),
+                        conceptToDrop.getConceptNid());
             }
 
-            Collection<Object> facts = new ArrayList<Object>();
+            if (ComponentVersionBI.class.isAssignableFrom(thingToDrop.getClass())
+                    || SpecBI.class.isAssignableFrom(thingToDrop.getClass())) {
+                Map<String, Object> globals = new HashMap<String, Object>();
 
-            facts.add(FactFactory.get(Context.DROP_OBJECT, thingToDrop, config.getViewCoordinate()));
-            facts.add(FactFactory.get(Context.DROP_TARGET,
-                                      Ts.get().getConceptVersion(config.getViewCoordinate(),
-                                         concept.getNid()), config.getViewCoordinate()));
-            facts.add(FactFactory.get(viewType));
+                globals.put("actions", actions);
+                globals.put("vc", config.getViewCoordinate());
+                globals.put("config", config);
 
-            if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-               AceLog.getAppLog().fine("dropTarget: " + concept);
-               AceLog.getAppLog().fine("thingToDrop: " + thingToDrop);
+                View viewType;
+
+                if (getSettings().getRelAssertionType() == RelAssertionType.STATED) {
+                    viewType = View.STATED;
+                } else if (getSettings().getRelAssertionType() == RelAssertionType.INFERRED) {
+                    viewType = View.INFERRED;
+                } else if (getSettings().getRelAssertionType() == RelAssertionType.INFERRED_THEN_STATED) {
+                    viewType = View.STATED_AND_INFERRED;
+                } else {
+                    viewType = View.STATED;
+                }
+
+                Collection<Object> facts = new ArrayList<Object>();
+
+                facts.add(FactFactory.get(Context.DROP_OBJECT, thingToDrop, config.getViewCoordinate()));
+                facts.add(FactFactory.get(Context.DROP_TARGET,
+                        Ts.get().getConceptVersion(config.getViewCoordinate(),
+                        concept.getNid()), config.getViewCoordinate()));
+                facts.add(FactFactory.get(viewType));
+
+                if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                    AceLog.getAppLog().fine("dropTarget: " + concept);
+                    AceLog.getAppLog().fine("thingToDrop: " + thingToDrop);
+                }
+
+                DroolsExecutionManager.fireAllRules(ConceptView.class.getCanonicalName(), kbFiles, globals,
+                        facts, false);
             }
+        } catch (Throwable e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        }
 
-            DroolsExecutionManager.fireAllRules(ConceptView.class.getCanonicalName(), kbFiles, globals,
-                    facts, false);
-         }
-      } catch (Throwable e) {
-         AceLog.getAppLog().alertAndLogException(e);
-      }
+        return actions;
+    }
 
-      return actions;
-   }
+    public ActionListener getPanelsChangedActionListener() {
+        return cvLayout.getPanelsChangedActionListener();
+    }
 
-   public ActionListener getPanelsChangedActionListener() {
-      return cvLayout.getPanelsChangedActionListener();
-   }
+    public Map<PathBI, Integer> getPathRowMap() {
+        return cvLayout.getPathRowMap();
+    }
 
-   public Map<PathBI, Integer> getPathRowMap() {
-      return cvLayout.getPathRowMap();
-   }
+    public TreeSet<PositionBI> getPositionOrderedSet() {
+        return cvLayout.getPositionOrderedSet();
+    }
 
-   public TreeSet<PositionBI> getPositionOrderedSet() {
-      return cvLayout.getPositionOrderedSet();
-   }
+    public Map<PositionBI, Collection<DragPanelComponentVersion<?>>> getPositionPanelMap() {
+        return cvLayout.getPositionPanelMap();
+    }
 
-   public Map<PositionBI, Collection<DragPanelComponentVersion<?>>> getPositionPanelMap() {
-      return cvLayout.getPositionPanelMap();
-   }
+    public Map<PanelSection, CollapsePanelPrefs> getPrefMap() {
+        return prefMap;
+    }
 
-   public Map<PanelSection, CollapsePanelPrefs> getPrefMap() {
-      return prefMap;
-   }
+    public Map<Integer, JCheckBox> getRowToPathCheckMap() {
+        return cvLayout.getRowToPathCheckMap();
+    }
 
-   public Map<Integer, JCheckBox> getRowToPathCheckMap() {
-      return cvLayout.getRowToPathCheckMap();
-   }
+    public Collection<DragPanel> getSeperatorComponents() {
+        return cvLayout.getSeperatorComponents();
+    }
 
-   public Collection<DragPanel> getSeperatorComponents() {
-      return cvLayout.getSeperatorComponents();
-   }
+    public ConceptViewSettings getSettings() {
+        return settings;
+    }
 
-   public ConceptViewSettings getSettings() {
-      return settings;
-   }
+    public boolean isHistoryShown() {
+        return historyShown;
+    }
 
-   public boolean isHistoryShown() {
-      return historyShown;
-   }
     void refreshHistory() {
         if (historyShown) {
             settings.getNavigator().refreshHistory();
         }
     }
 
-   //~--- set methods ---------------------------------------------------------
+    //~--- set methods ---------------------------------------------------------
+    public void setHistoryShown(boolean historyShown) {
+        this.historyShown = historyShown;
 
-   public void setHistoryShown(boolean historyShown) {
-      this.historyShown = historyShown;
+        for (JComponent hc : getRowToPathCheckMap().values()) {
+            hc.setVisible(historyShown);
+        }
 
-      for (JComponent hc : getRowToPathCheckMap().values()) {
-         hc.setVisible(historyShown);
-      }
-
-      if (historyShown) {
-         if (settings.isNavigatorSetup()) {
-            SwingUtilities.invokeLater(new Runnable() {
-               @Override
-               public void run() {
-                  if (settings.isNavigatorSetup()) {
-                     settings.getNavigator().updateHistoryPanel();
-                  }
-               }
-            });
-         }
-      }
-   }
-
-   //~--- inner classes -------------------------------------------------------
-
-   public class DropPanelActionManager implements ActionListener, I_DispatchDragStatus {
-      private boolean                dragging            = false;
-      private JComponent             dropPanel           = null;
-      private boolean                panelAdded          = false;
-      private boolean                gridLayout          = true;
-      private Collection<JComponent> addedDropComponents = new ArrayList<JComponent>();
-      private DropPanelProxy         dpp;
-      private JPanel                 sfp;
-      private JScrollPane            sfpScroller;
-      private Timer                  timer;
-
-      //~--- constructors -----------------------------------------------------
-
-      public DropPanelActionManager() {
-         super();
-         dpp = new DropPanelProxy(this);
-         ConceptView.this.addHierarchyListener(this.dpp);
-         timer = new Timer(250, this);
-      }
-
-      //~--- methods ----------------------------------------------------------
-
-      /*
-       *  (non-Javadoc)
-       * @see org.ihtsdo.arena.conceptview.I_DispatchDragStatus#dragStarted()
-       */
-      @Override
-      public void actionPerformed(ActionEvent e) {
-         if (dragging) {
-            if (addedDropComponents.equals(dropComponents) == false) {
-               sfp.removeAll();
-               System.out.println("Concept changing drop components.");
-               addedDropComponents = new ArrayList<JComponent>();
-
-               for (JComponent c : dropComponents) {
-                  addedDropComponents.add(c);
-                  sfp.add(c);
-               }
+        if (historyShown) {
+            if (settings.isNavigatorSetup()) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (settings.isNavigatorSetup()) {
+                            settings.getNavigator().updateHistoryPanel();
+                        }
+                    }
+                });
             }
+        }
+    }
 
-            if (addedDropComponents.isEmpty()) {
-               return;
-            }
+    //~--- inner classes -------------------------------------------------------
+    public class DropPanelActionManager implements ActionListener, I_DispatchDragStatus {
 
-            Point mouseLocation               = MouseInfo.getPointerInfo().getLocation();
-            Point mouseLocationForConceptView = mouseLocation.getLocation();
+        private boolean dragging = false;
+        private JComponent dropPanel = null;
+        private boolean panelAdded = false;
+        private boolean gridLayout = true;
+        private Collection<JComponent> addedDropComponents = new ArrayList<JComponent>();
+        private DropPanelProxy dpp;
+        private JPanel sfp;
+        private JScrollPane sfpScroller;
+        private Timer timer;
 
-            SwingUtilities.convertPointFromScreen(mouseLocationForConceptView, ConceptView.this.getParent());
+        //~--- constructors -----------------------------------------------------
+        public DropPanelActionManager() {
+            super();
+            dpp = new DropPanelProxy(this);
+            ConceptView.this.addHierarchyListener(this.dpp);
+            timer = new Timer(250, this);
+        }
 
-            if (ConceptView.this.getParent().contains(mouseLocationForConceptView)) {
-               setDragPanelVisible(true);
+        //~--- methods ----------------------------------------------------------
+
+        /*
+         *  (non-Javadoc)
+         * @see org.ihtsdo.arena.conceptview.I_DispatchDragStatus#dragStarted()
+         */
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (dragging) {
+                if (addedDropComponents.equals(dropComponents) == false) {
+                    sfp.removeAll();
+                    System.out.println("Concept changing drop components.");
+                    addedDropComponents = new ArrayList<JComponent>();
+
+                    for (JComponent c : dropComponents) {
+                        addedDropComponents.add(c);
+                        sfp.add(c);
+                    }
+                }
+
+                if (addedDropComponents.isEmpty()) {
+                    return;
+                }
+
+                Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
+                Point mouseLocationForConceptView = mouseLocation.getLocation();
+
+                SwingUtilities.convertPointFromScreen(mouseLocationForConceptView, ConceptView.this.getParent());
+
+                if (ConceptView.this.getParent().contains(mouseLocationForConceptView)) {
+                    setDragPanelVisible(true);
+                } else {
+                    Point mouseLocationForDropPanel = mouseLocation.getLocation();
+
+                    SwingUtilities.convertPointFromScreen(mouseLocationForDropPanel, dropPanel);
+
+                    if (mouseLocationForDropPanel.y <= 0) {
+                        mouseLocationForDropPanel.y = mouseLocationForDropPanel.y + 10;
+                    } else if (mouseLocationForDropPanel.y >= dropPanel.getHeight()) {
+                        mouseLocationForDropPanel.y = mouseLocationForDropPanel.y - 10;
+                    }
+
+                    if (dropPanel.contains(mouseLocationForDropPanel) && panelAdded) {
+                        if (mouseLocationForDropPanel.y < 10) {
+                            BoundedRangeModel scrollerModel = sfpScroller.getVerticalScrollBar().getModel();
+
+                            scrollerModel.setExtent(1);
+
+                            if (scrollerModel.getValue() < scrollerModel.getMaximum()) {
+                                scrollerModel.setValue(scrollerModel.getValue() - 20);
+                            }
+                        } else if (dropPanel.getHeight() - mouseLocationForDropPanel.y < 10) {
+                            BoundedRangeModel scrollerModel = sfpScroller.getVerticalScrollBar().getModel();
+
+                            scrollerModel.setExtent(1);
+
+                            if (scrollerModel.getValue() < scrollerModel.getMaximum()) {
+                                scrollerModel.setValue(scrollerModel.getValue() + 20);
+                            }
+                        }
+                    } else {
+                        setDragPanelVisible(false);
+                    }
+                }
             } else {
-               Point mouseLocationForDropPanel = mouseLocation.getLocation();
-
-               SwingUtilities.convertPointFromScreen(mouseLocationForDropPanel, dropPanel);
-
-               if (mouseLocationForDropPanel.y <= 0) {
-                  mouseLocationForDropPanel.y = mouseLocationForDropPanel.y + 10;
-               } else if (mouseLocationForDropPanel.y >= dropPanel.getHeight()) {
-                  mouseLocationForDropPanel.y = mouseLocationForDropPanel.y - 10;
-               }
-
-               if (dropPanel.contains(mouseLocationForDropPanel) && panelAdded) {
-                  if (mouseLocationForDropPanel.y < 10) {
-                     BoundedRangeModel scrollerModel = sfpScroller.getVerticalScrollBar().getModel();
-
-                     scrollerModel.setExtent(1);
-
-                     if (scrollerModel.getValue() < scrollerModel.getMaximum()) {
-                        scrollerModel.setValue(scrollerModel.getValue() - 20);
-                     }
-                  } else if (dropPanel.getHeight() - mouseLocationForDropPanel.y < 10) {
-                     BoundedRangeModel scrollerModel = sfpScroller.getVerticalScrollBar().getModel();
-
-                     scrollerModel.setExtent(1);
-
-                     if (scrollerModel.getValue() < scrollerModel.getMaximum()) {
-                        scrollerModel.setValue(scrollerModel.getValue() + 20);
-                     }
-                  }
-               } else {
-                  setDragPanelVisible(false);
-               }
+                setDragPanelVisible(false);
             }
-         } else {
+        }
+
+        @Override
+        public void dragFinished() {
+            timer.stop();
+            dragging = false;
             setDragPanelVisible(false);
-         }
-      }
 
-      @Override
-      public void dragFinished() {
-         timer.stop();
-         dragging = false;
-         setDragPanelVisible(false);
+            if (dropPanel != null) {
+                JLayeredPane rootLayers = ConceptView.this.getRootPane().getLayeredPane();
 
-         if (dropPanel != null) {
-            JLayeredPane rootLayers = ConceptView.this.getRootPane().getLayeredPane();
-
-            rootLayers.remove(dropPanel);
-            dropPanel = null;
-         }
-
-         addedDropComponents.clear();
-         actionList.clear();
-         dropComponents.clear();
-         lastThingBeingDropped = null;
-      }
-
-      /*
-       *  (non-Javadoc)
-       * @see org.ihtsdo.arena.conceptview.I_DispatchDragStatus#actionPerformed(java.awt.event.ActionEvent)
-       */
-      @Override
-      public void dragStarted() {
-         (new DragStarter()).execute();
-      }
-
-      //~--- set methods ------------------------------------------------------
-
-      /*
-       *  (non-Javadoc)
-       * @see org.ihtsdo.arena.conceptview.I_DispatchDragStatus#dragFinished()
-       */
-      private void setDragPanelVisible(boolean visible) {
-         if (visible) {
-            if (ConceptView.this.isVisible()) {
-               if (!panelAdded) {
-                  panelAdded = true;
-
-                  Point        loc        = ConceptView.this.getParent().getLocation();
-                  JLayeredPane rootLayers = ConceptView.this.getRootPane().getLayeredPane();
-
-                  rootLayers.add(dropPanel, JLayeredPane.PALETTE_LAYER);
-                  loc = SwingUtilities.convertPoint(ConceptView.this.getParent(), loc, rootLayers);
-                  dropPanel.setSize(sfp.getPreferredSize().width + 4,
-                                    ConceptView.this.getParent().getHeight());
-                  dropPanel.setLocation(loc.x - dropPanel.getWidth(), loc.y);
-                  dropPanel.setVisible(true);
-                  dropPanel.setBorder(BorderFactory.createLineBorder(Color.gray));
-               }
-            }
-         } else {
-            if (panelAdded) {
-               panelAdded = false;
-               dropPanel.setVisible(false);
-            }
-         }
-      }
-
-      //~--- inner classes ----------------------------------------------------
-
-      private class DragStarter extends SwingWorker<Object, Object> {
-         @Override
-         protected Object doInBackground() throws Exception {
-            LayoutManager layout = new FlowLayout(FlowLayout.LEADING, 5, 5);
-            JPanel        sfp    = new ScrollablePanel(layout);
-
-            if (gridLayout) {
-               layout = new GridLayout(0, 1, 5, 5);
-               sfp    = new JPanel(layout);
+                rootLayers.remove(dropPanel);
+                dropPanel = null;
             }
 
-            sfp.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+            addedDropComponents.clear();
+            actionList.clear();
+            dropComponents.clear();
+            lastThingBeingDropped = null;
+        }
 
-            JPanel      dropPanel   = new JPanel(new GridLayout(1, 1));
-            JScrollPane sfpScroller = new JScrollPane(sfp);
+        /*
+         *  (non-Javadoc)
+         * @see org.ihtsdo.arena.conceptview.I_DispatchDragStatus#actionPerformed(java.awt.event.ActionEvent)
+         */
+        @Override
+        public void dragStarted() {
+            (new DragStarter()).execute();
+        }
 
-            sfpScroller.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-            sfpScroller.setAutoscrolls(true);
-            sfpScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
-            sfpScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        //~--- set methods ------------------------------------------------------
 
-            if (dropPanel == null) {
-               return null;
+        /*
+         *  (non-Javadoc)
+         * @see org.ihtsdo.arena.conceptview.I_DispatchDragStatus#dragFinished()
+         */
+        private void setDragPanelVisible(boolean visible) {
+            if (visible) {
+                if (ConceptView.this.isVisible()) {
+                    if (!panelAdded) {
+                        panelAdded = true;
+
+                        Point loc = ConceptView.this.getParent().getLocation();
+                        JLayeredPane rootLayers = ConceptView.this.getRootPane().getLayeredPane();
+
+                        rootLayers.add(dropPanel, JLayeredPane.PALETTE_LAYER);
+                        loc = SwingUtilities.convertPoint(ConceptView.this.getParent(), loc, rootLayers);
+                        dropPanel.setSize(sfp.getPreferredSize().width + 4,
+                                ConceptView.this.getParent().getHeight());
+                        dropPanel.setLocation(loc.x - dropPanel.getWidth(), loc.y);
+                        dropPanel.setVisible(true);
+                        dropPanel.setBorder(BorderFactory.createLineBorder(Color.gray));
+                    }
+                }
+            } else {
+                if (panelAdded) {
+                    panelAdded = false;
+                    dropPanel.setVisible(false);
+                }
+            }
+        }
+
+        //~--- inner classes ----------------------------------------------------
+        private class DragStarter extends SwingWorker<Object, Object> {
+
+            @Override
+            protected Object doInBackground() throws Exception {
+                LayoutManager layout = new FlowLayout(FlowLayout.LEADING, 5, 5);
+                JPanel sfp = new ScrollablePanel(layout);
+
+                if (gridLayout) {
+                    layout = new GridLayout(0, 1, 5, 5);
+                    sfp = new JPanel(layout);
+                }
+
+                sfp.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+
+                JPanel dropPanel = new JPanel(new GridLayout(1, 1));
+                JScrollPane sfpScroller = new JScrollPane(sfp);
+
+                sfpScroller.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+                sfpScroller.setAutoscrolls(true);
+                sfpScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+                sfpScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+                if (dropPanel == null) {
+                    return null;
+                }
+
+                dropPanel.add(sfpScroller);
+                DropPanelActionManager.this.dropPanel = dropPanel;
+                DropPanelActionManager.this.sfpScroller = sfpScroller;
+                DropPanelActionManager.this.sfp = sfp;
+                dragging = true;
+                timer.start();
+
+                return null;
             }
 
-            dropPanel.add(sfpScroller);
-            DropPanelActionManager.this.dropPanel   = dropPanel;
-            DropPanelActionManager.this.sfpScroller = sfpScroller;
-            DropPanelActionManager.this.sfp         = sfp;
-            dragging                                = true;
-            timer.start();
+            @Override
+            protected void done() {
+                try {
+                    get();
 
-            return null;
-         }
+                    if (!DragMonitor.isDragging()) {
+                        timer.stop();
+                        dragging = false;
+                        panelAdded = false;
 
-         @Override
-         protected void done() {
-            try {
-               get();
+                        if (dropPanel != null) {
+                            dropPanel.setVisible(false);
 
-               if (!DragMonitor.isDragging()) {
-                  timer.stop();
-                  dragging   = false;
-                  panelAdded = false;
+                            JLayeredPane rootLayers = ConceptView.this.getRootPane().getLayeredPane();
 
-                  if (dropPanel != null) {
-                     dropPanel.setVisible(false);
+                            if (rootLayers != null) {
+                                rootLayers.remove(dropPanel);
+                            }
+                        }
 
-                     JLayeredPane rootLayers = ConceptView.this.getRootPane().getLayeredPane();
-
-                     if (rootLayers != null) {
-                        rootLayers.remove(dropPanel);
-                     }
-                  }
-
-                  dropPanel = null;
-               }
-            } catch (InterruptedException ex) {
-               AceLog.getAppLog().alertAndLogException(ex);
-            } catch (ExecutionException ex) {
-               AceLog.getAppLog().alertAndLogException(ex);
+                        dropPanel = null;
+                    }
+                } catch (InterruptedException ex) {
+                    AceLog.getAppLog().alertAndLogException(ex);
+                } catch (ExecutionException ex) {
+                    AceLog.getAppLog().alertAndLogException(ex);
+                }
             }
-         }
-      }
-   }
-
-
-   ;
+        }
+    };
 }

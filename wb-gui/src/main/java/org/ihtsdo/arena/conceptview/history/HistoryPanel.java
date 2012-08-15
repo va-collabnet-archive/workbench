@@ -21,6 +21,7 @@ import org.ihtsdo.tk.hash.Hashcode;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -35,8 +36,6 @@ import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
 
 import java.io.IOException;
 
@@ -286,16 +285,21 @@ public class HistoryPanel {
         //initializeVersionPanel();
 
         seperators.clear();
-
         for (JComponent comp : view.getSeperatorComponents()) {
             if (comp.isVisible() && comp.getParent() != null) {
                 Point location = comp.getLocation();
-                location.y = location.y - comp.getInsets().top;
-                SwingUtilities.convertPointToScreen(location, comp.getParent());
-                SwingUtilities.convertPointFromScreen(location, versionPanel.getParent());
-                seperators.add(new Rectangle(0, location.y,
-                        Math.max(versionPanel.getWidth() + 120, ConceptViewSettings.NAVIGATOR_WIDTH - 3),
-                        comp.getHeight()));
+                location.y = location.y - comp.getInsets().top - 1;
+
+                Container parent = comp.getParent();
+                while (view != parent) {
+                    location.y = location.y + parent.getY();
+                    parent = parent.getParent();
+                }
+
+                Rectangle sep = new Rectangle(0, location.y,
+                        Math.max(versionPanel.getWidth() + 240, ConceptViewSettings.NAVIGATOR_WIDTH - 3),
+                        comp.getHeight());
+                seperators.add(sep);
             }
         }
         scrollRightIfChanged();
@@ -345,15 +349,18 @@ public class HistoryPanel {
                             for (JComponent panel : buttonPanelSetMap.get(radioButton)) {
                                 if ((panel.getParent() != null) && panel.isVisible()) {
                                     location = panel.getLocation();
-                                    SwingUtilities.convertPointToScreen(location, panel.getParent());
+                                    location.y = location.y - 2;
+                                    Container parent = panel.getParent();
+                                    while (view != parent) {
+                                        location.y = location.y + parent.getY();
+                                        parent = parent.getParent();
+                                    }
+
                                     maxY = Math.max(maxY, location.y);
                                 }
                             }
 
                             location.y = maxY;
-                            if (componentInColumn.getParent() != null) {
-                                SwingUtilities.convertPointFromScreen(location, componentInColumn.getParent());
-                            }
                             componentInColumn.setLocation(currentX, location.y);
                         } else {
                             componentInColumn.setVisible(false);
@@ -371,14 +378,14 @@ public class HistoryPanel {
             }
         }
 
-        currentX = currentX + 120;
+        currentX = currentX + 240;
         header.hxWidth = currentX;
         header.historyHeaderPanel.setSize(Math.max(header.hxWidth, ConceptViewSettings.NAVIGATOR_WIDTH - 6),
                 view.getHistoryPanel().getHeight());
         header.historyHeaderPanel.setMinimumSize(header.historyHeaderPanel.getSize());
         header.historyHeaderPanel.setPreferredSize(header.historyHeaderPanel.getSize());
         header.historyHeaderPanel.setMaximumSize(header.historyHeaderPanel.getSize());
-        versionPanel.setSize(Math.max(header.hxWidth + 120, ConceptViewSettings.NAVIGATOR_WIDTH - 6) + 20,
+        versionPanel.setSize(Math.max(header.hxWidth + 240, ConceptViewSettings.NAVIGATOR_WIDTH - 6) + 20,
                 versionPanel.getHeight());
         if (currentX > 5) {
             redoGrid();
@@ -399,7 +406,7 @@ public class HistoryPanel {
             } else {
                 conceptNid = Integer.MAX_VALUE;
             }
-            
+
             scrollRight();
         }
     }
@@ -560,13 +567,13 @@ public class HistoryPanel {
                 historyScroller.revalidate();
 
                 historyScroller.getViewport().scrollRectToVisible(
-                        new Rectangle(header.hxWidth - 1, 0, 2, 4));
+                        new Rectangle(header.hxWidth - 200, 0, 2, 4));
             }
         });
     }
 
     private void sizeVersionPanel() {
-        versionPanel.setSize(Math.max(header.hxWidth + 120, ConceptViewSettings.NAVIGATOR_WIDTH) + 20, 
+        versionPanel.setSize(Math.max(header.hxWidth + 240, ConceptViewSettings.NAVIGATOR_WIDTH) + 20,
                 view.getHeight() + 20);
         versionPanel.setPreferredSize(versionPanel.getSize());
         versionPanel.setMinimumSize(versionPanel.getSize());
@@ -739,18 +746,17 @@ public class HistoryPanel {
             }
 
             FontRenderContext frc = g2d.getFontRenderContext();
-            Font f = new Font("Helvetica", Font.PLAIN, 10);
             
+            Font f = new Font("Lucidia Sans", Font.PLAIN, 12);
+
             List<Rectangle> textRects = new ArrayList<>();
 // Draw lines first
             g2d.setColor(Color.WHITE);
             SortedSet<JCheckBox> checkSet = new TreeSet<>(new Comparator<JCheckBox>() {
-
                 @Override
                 public int compare(JCheckBox o1, JCheckBox o2) {
                     return o1.getX() - o2.getX();
                 }
-                
             });
             for (JCheckBox positionCheck : header.checkPositionMap.keySet()) {
                 if (positionCheck.isVisible()
@@ -761,26 +767,26 @@ public class HistoryPanel {
                     checkSet.add(positionCheck);
                 }
             }
-            
-            
-            
+
+
+
             for (JCheckBox positionCheck : checkSet) {
                 if (positionCheck.isVisible()
                         && positionCheck.getParent() != null
                         && positionCheck.isSelected()) {
-                    int x = positionCheck.getX();
+                    int x = positionCheck.getX() + 2;
 
                     PositionBI p = header.checkPositionMap.get(positionCheck);
                     TextLayout tl = new TextLayout(p.toString(), f, frc);
                     float incrementHeight = tl.getAscent();
 
-                    float y = - versionPanel.getY();
+                    float y = -versionPanel.getY();
                     boolean found = false;
                     while (found == false) {
                         boolean drawOK = true;
                         y = y + incrementHeight;
                         g2d.setColor(Color.BLACK);
-                         Rectangle tlRect = tl.getPixelBounds(frc, x, y);
+                        Rectangle tlRect = tl.getPixelBounds(frc, x, y);
                         tlRect.grow(2, 2);
                         for (Rectangle r : textRects) {
                             if (r.intersects(tlRect)) {

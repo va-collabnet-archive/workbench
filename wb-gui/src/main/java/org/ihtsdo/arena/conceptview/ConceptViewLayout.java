@@ -882,30 +882,10 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         }
 
         settings.getConfig().addPropertyChangeListener("commit", pcal);
-        System.out.println("Finished 1");
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-        System.out.println("Finished 2");
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-        System.out.println("Finished 3");
-                        SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-        System.out.println("Finished 4");
-                                SwingUtilities.invokeLater(new Runnable() {
-                                    @Override
-                                    public void run() {
-        System.out.println("Finished 5");
-                                        settings.getNavigator().updateHistoryPanel();
-                                    }
-                                });
-                            }
-                        });
-                    }
-                });
+               settings.getNavigator().updateHistoryPanel();
             }
         });
     }
@@ -1110,8 +1090,8 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             gbc.gridy++;
             row++;
         }
-        t.schedule(new TickleTask(), 1000);
-        t.schedule(new UpdateHxPanelTask(), 1500);
+//        t.schedule(new TickleTask(), 1000);
+//        t.schedule(new UpdateHxPanelTask(), 1500);
     }
     java.util.Timer t = new java.util.Timer();
 

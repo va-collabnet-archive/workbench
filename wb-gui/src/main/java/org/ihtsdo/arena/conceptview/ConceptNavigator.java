@@ -270,7 +270,7 @@ public class ConceptNavigator extends JPanel {
                             historyScroller.revalidate();
                             int width = historyPanel.getHxWidth();
                             historyScroller.getViewport().scrollRectToVisible(
-                                    new Rectangle(width - 1, 0, 2, 4));
+                                    new Rectangle(width - 200, 0, 2, 4));
                         }
                     });
                 }
