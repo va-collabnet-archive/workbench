@@ -388,6 +388,9 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
             if (sap == Integer.MIN_VALUE) {
                 continue;
             }
+            if(Ts.get().getTimeForStampNid(sap) == Long.MIN_VALUE){
+                continue;
+            }
             // SKIP READ ONLY DATABASE
             if (ignoreReadOnlySap && sap <= maxSap) {
                 continue;
