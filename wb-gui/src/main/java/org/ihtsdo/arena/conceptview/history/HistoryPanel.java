@@ -291,7 +291,7 @@ public class HistoryPanel {
                 location.y = location.y - comp.getInsets().top - 1;
 
                 Container parent = comp.getParent();
-                while (view != parent) {
+                while (view != parent && parent != null) {
                     location.y = location.y + parent.getY();
                     parent = parent.getParent();
                 }
@@ -351,7 +351,7 @@ public class HistoryPanel {
                                     location = panel.getLocation();
                                     location.y = location.y - 2;
                                     Container parent = panel.getParent();
-                                    while (view != parent) {
+                                    while (view != parent && parent != null) {
                                         location.y = location.y + parent.getY();
                                         parent = parent.getParent();
                                     }
