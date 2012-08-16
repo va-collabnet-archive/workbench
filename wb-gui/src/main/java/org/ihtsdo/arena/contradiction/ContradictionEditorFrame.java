@@ -271,8 +271,7 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
     @Override
     public void addAppMenus(JMenuBar mainMenuBar) throws Exception {
         mainMenuBar.add(adjudicatorMenu = new JMenu("Adjudicator"));
-//        adjudicatorMenu.add(new FindContradictionAction(this));
-        adjudicatorMenu.add(new FindContradictionMoreAction(this));
+//        adjudicatorMenu.add(new FindContradictionMoreAction(this)); //DEBUG
         adjudicatorMenu.add(new FindContradictionLessAction(this));
     }
 
