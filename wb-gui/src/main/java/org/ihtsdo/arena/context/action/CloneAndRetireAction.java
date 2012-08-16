@@ -129,7 +129,8 @@ public class CloneAndRetireAction extends AbstractAction {
             }
             if (RelationshipVersionBI.class.isAssignableFrom(component.getClass())) {
                 RelationshipVersionBI rel = (RelationshipVersionBI) component;
-                I_RelVersioned newRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(), concept,
+                for (PathBI ep : config.getEditingPathSet()) {
+                    I_RelVersioned newRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(), concept,
                         rel.getTypeNid(),
                         rel.getTargetNid(),
                         rel.getCharacteristicNid(),
@@ -137,15 +138,8 @@ public class CloneAndRetireAction extends AbstractAction {
                         rel.getGroup(),
                         rel.getStatusNid(),
                         config.getDbConfig().getUserConcept().getNid(),
-                        pathItr.next().getConceptNid(),
+                        ep.getConceptNid(),
                         Long.MAX_VALUE);
-
-                while (pathItr.hasNext()) {
-                    newRel.makeAnalog(newRel.getStatusNid(),
-                        Long.MAX_VALUE,
-                        config.getEditCoordinate().getAuthorNid(),
-                        config.getEditCoordinate().getModuleNid(), 
-                        pathItr.next().getConceptNid());
                 }
             }
 
@@ -158,7 +152,7 @@ public class CloneAndRetireAction extends AbstractAction {
                             Long.MAX_VALUE,
                             config.getEditCoordinate().getAuthorNid(),
                             config.getEditCoordinate().getModuleNid(), 
-                            pathItr.next().getConceptNid());
+                            ep.getConceptNid());
                 }
                 if (DescriptionVersionBI.class.isAssignableFrom(component.getClass())) {
                     retireFromRefexes(analog);
