@@ -298,6 +298,7 @@ public class ContradictionFinderSwingWorker
             if(conflictRefset.isAnnotationStyleRefex()){
                 ConceptChronicleBI conceptToAdjudicate = 
                         Ts.get().getConceptForNid(currentIterator.nid());
+                conceptToAdjudicate.addAnnotation(member);
                 Ts.get().addUncommitted(conceptToAdjudicate);
                 Ts.get().commit(conceptToAdjudicate,
                         adjudicationWorkListChangeSetPolicy);
