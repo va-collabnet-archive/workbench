@@ -59,6 +59,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
 public class ConceptViewSettings extends ArenaComponentSettings {
 
@@ -190,6 +193,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 
     @Override
     public ConceptView makeComponent(I_ConfigAceFrame config) {
+        this.config = config;
         if (view == null) {
             this.conceptChangedListener = new ConceptChangedListener();
             view = new ConceptView(config, this, (ConceptViewRenderer) this.renderer);
@@ -621,6 +625,15 @@ public class ConceptViewSettings extends ArenaComponentSettings {
     public String getTitle() {
         if (getHost() != null) {
             if (getHost().getTermComponent() != null) {
+                try {
+                    ConceptChronicleBI cc = (ConceptChronicleBI) getHost().getTermComponent();
+                    ConceptVersionBI cv = Ts.get().getConceptVersion(config.getViewCoordinate(), 
+                            cc.getConceptNid());
+                    DescriptionVersionBI fsn = cv.getDescriptionsFullySpecifiedActive().iterator().next();
+                    return fsn.getText();
+                } catch (IOException ex) {
+                    AceLog.getAppLog().alertAndLogException(ex);
+                }
                 return getHost().getTermComponent().toString();
             }
         }
