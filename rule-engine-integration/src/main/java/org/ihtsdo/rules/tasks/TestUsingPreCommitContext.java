@@ -87,6 +87,13 @@ public class TestUsingPreCommitContext extends AbstractConceptTest {
 			boolean forCommit) throws TaskFailedException {
 		List<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
 		try {
+			
+			if (RulesLibrary.rulesDisabled ||
+					RefsetAuxiliary.Concept.COMMIT_RECORD.getUids().contains(concept.getPrimUuid()) ||
+					RefsetAuxiliary.Concept.CONFLICT_RECORD.getUids().contains(concept.getPrimUuid())) {
+				return alertList;
+			}
+			
 			I_TermFactory tf = Terms.get();
 			alertList =  RulesLibrary.checkConcept(concept, 
 					tf.getConcept(RefsetAuxiliary.Concept.REALTIME_PRECOMMIT_QA_CONTEXT.getUids()), true, 
