@@ -25,7 +25,7 @@
 		<dependency>
 			<groupId>org.drools</groupId>
 			<artifactId>drools-core</artifactId>
-			<version>5.2.0.Final.IHTSDO</version>
+			<!--  <version>5.2.0.Final.IHTSDO</version> -->
 		</dependency>
 		<dependency>
 			<groupId>org.drools</groupId>

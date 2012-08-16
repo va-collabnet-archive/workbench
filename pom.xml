@@ -37,11 +37,12 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 <!--		<drools.version>5.3.0.Final</drools.version>
 		<jbpm.version>5.1.0.Final</jbpm.version>
-		<mvel2.version>2.1.0.drools4</mvel2.version>-->
-		<drools.version>5.2.0.Final</drools.version>
-		<jbpm.version>5.1.0.Final</jbpm.version>
-		<mvel2.version>2.1.0.drools2</mvel2.version>		
-                <org.apache.lucene.version>3.5.0</org.apache.lucene.version>
+		<mvel2.version>2.1.0.drools4</mvel2.version>
+		<mvel2.version>2.1.0.drools2</mvel2.version>-->
+		<drools.version>5.4.0.Final</drools.version>
+		<jbpm.version>5.3.0.Final</jbpm.version>
+		<mvel2.version>2.1.0.drools16</mvel2.version>		
+        <org.apache.lucene.version>3.5.0</org.apache.lucene.version>
 		<wb-icons.version>1.0.9</wb-icons.version>
 		<je.version>4.1.17</je.version>
 		<svnusername>${relusername}</svnusername>
@@ -75,7 +76,8 @@
 			<dependency>
 				<groupId>org.drools</groupId>
 				<artifactId>drools-core</artifactId>
-				<version>5.2.0.Final.IHTSDO</version>
+				<version>${drools.version}</version>
+				<!-- <version>5.2.0.Final.IHTSDO</version> -->
 			</dependency>
 			<dependency>
 				<groupId>org.drools</groupId>
