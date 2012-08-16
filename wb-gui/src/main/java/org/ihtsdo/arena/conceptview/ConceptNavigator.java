@@ -23,8 +23,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -46,7 +44,10 @@ public class ConceptNavigator extends JPanel {
     private FocusDrop focusDrop;
     private HistoryPanel historyPanel;
 
-    public HistoryPanel getHistoryPanel() {
+    public HistoryPanel getHistoryPanel() throws IOException {
+        if (historyPanel == null) {
+            historyPanel = new HistoryPanel(view, historyScroller, this);
+        }
         return historyPanel;
     }
     private final JScrollPane historyScroller;
@@ -113,9 +114,7 @@ public class ConceptNavigator extends JPanel {
     }
 
     private void privateHxPanelUpdate() throws IOException {
-        if (historyPanel == null) {
-            historyPanel = new HistoryPanel(view, historyScroller, this);
-        }
+        getHistoryPanel();
         if (view.isHistoryShown()) {
             treeScroller.setVisible(false);
             focusDrop.setVisible(false);
@@ -138,11 +137,8 @@ public class ConceptNavigator extends JPanel {
     }
 
     protected void resetHistoryPanel() throws IOException {
-        if (historyPanel == null) {
-            historyPanel = new HistoryPanel(view, historyScroller, this);
-        } else {
-            historyPanel.updateHistoryLayout();
-        }
+        getHistoryPanel().updateHistoryLayout();
+       
     }
 
     private JPanel setupTopPanel() {
