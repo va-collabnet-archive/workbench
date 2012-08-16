@@ -781,10 +781,10 @@ public class GenerateUsers extends AbstractMojo {
 		longLabelDescPrefList.add(SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1.getLenient().getNid());
 
 		I_IntList tableDescPrefList = activeConfig.getTableDescPreferenceList();
-                tableDescPrefList.add(SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid());
-		tableDescPrefList.add(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
 		tableDescPrefList.add(SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1.getLenient().getNid());
 		tableDescPrefList.add(SnomedMetadataRf1.FULLY_SPECIFIED_DESCRIPTION_TYPE.getLenient().getNid());
+                tableDescPrefList.add(SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid());
+		tableDescPrefList.add(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
 
 		//set up paths
 		PathBI editPath = tf.getPath(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, this.projectDevelopmentPathFsn));
