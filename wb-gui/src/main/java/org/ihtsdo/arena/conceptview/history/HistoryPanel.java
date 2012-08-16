@@ -58,6 +58,7 @@ import org.ihtsdo.arena.conceptview.ConceptView;
 import org.ihtsdo.arena.conceptview.ConceptViewSettings;
 import org.ihtsdo.arena.conceptview.DragPanelComponentVersion;
 import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 /**
@@ -118,15 +119,15 @@ public class HistoryPanel {
             header.setup();
             combineHistoryPanels();
             setupVersionPanel(positionPanelMap);
-            header.historyHeaderPanel.addComponentListener(new TopChangeListener());
+            header.versionCheckHeaderPanel.addComponentListener(new TopChangeListener());
         }
 
         otherWidth = ConceptViewSettings.NAVIGATOR_WIDTH - 6;
-        header.historyHeaderPanel.setSize(Math.max(header.hxWidth, ConceptViewSettings.NAVIGATOR_WIDTH - 6),
-                view.getHistoryPanel().getHeight());
-        header.historyHeaderPanel.setMinimumSize(header.historyHeaderPanel.getSize());
-        header.historyHeaderPanel.setPreferredSize(header.historyHeaderPanel.getSize());
-        header.historyHeaderPanel.setMaximumSize(header.historyHeaderPanel.getSize());
+        header.versionCheckHeaderPanel.setSize(Math.max(header.hxWidth, ConceptViewSettings.NAVIGATOR_WIDTH - 6),
+                view.getPathCheckboxPanel().getHeight());
+        header.versionCheckHeaderPanel.setMinimumSize(header.versionCheckHeaderPanel.getSize());
+        header.versionCheckHeaderPanel.setPreferredSize(header.versionCheckHeaderPanel.getSize());
+        header.versionCheckHeaderPanel.setMaximumSize(header.versionCheckHeaderPanel.getSize());
 
 
         ((JScrollPane) view.getParent().getParent()).getVerticalScrollBar().getModel().addChangeListener(vsal);
@@ -137,6 +138,10 @@ public class HistoryPanel {
                 scrollRight();
             }
         });
+    }
+
+    public Map<PathBI, Boolean> getPathCheckMap() {
+        return header.getPathCheckMap();
     }
 
     //~--- methods -------------------------------------------------------------
@@ -380,11 +385,11 @@ public class HistoryPanel {
 
         currentX = currentX + 240;
         header.hxWidth = currentX;
-        header.historyHeaderPanel.setSize(Math.max(header.hxWidth, ConceptViewSettings.NAVIGATOR_WIDTH - 6),
-                view.getHistoryPanel().getHeight());
-        header.historyHeaderPanel.setMinimumSize(header.historyHeaderPanel.getSize());
-        header.historyHeaderPanel.setPreferredSize(header.historyHeaderPanel.getSize());
-        header.historyHeaderPanel.setMaximumSize(header.historyHeaderPanel.getSize());
+        header.versionCheckHeaderPanel.setSize(Math.max(header.hxWidth, ConceptViewSettings.NAVIGATOR_WIDTH - 6),
+                view.getPathCheckboxPanel().getHeight());
+        header.versionCheckHeaderPanel.setMinimumSize(header.versionCheckHeaderPanel.getSize());
+        header.versionCheckHeaderPanel.setPreferredSize(header.versionCheckHeaderPanel.getSize());
+        header.versionCheckHeaderPanel.setMaximumSize(header.versionCheckHeaderPanel.getSize());
         versionPanel.setSize(Math.max(header.hxWidth + 240, ConceptViewSettings.NAVIGATOR_WIDTH - 6) + 20,
                 versionPanel.getHeight());
         if (currentX > 5) {
@@ -415,19 +420,6 @@ public class HistoryPanel {
         return header.getHxWidth();
     }
 
-    public void resetAll() {
-        reset();
-        for (List<JRadioButton> radioButtonList : header.checkComponentMap.values()) {
-            for (JRadioButton versionRadioButton : radioButtonList) {
-                versionPanel.remove(versionRadioButton);
-            }
-        }
-        buttonVersionMap.clear();
-        positionPanelMap.clear();
-        header.setupHeader();
-
-    }
-
     private void reset() {
         nidGroupMap.clear();
         nidStampNidButtonMap.clear();
@@ -437,12 +429,21 @@ public class HistoryPanel {
         changedSelections.clear();
 
         view.getChangedVersionSelections().clear();
+        for (List<JRadioButton> radioButtonList : header.checkComponentMap.values()) {
+            for (JRadioButton versionRadioButton : radioButtonList) {
+                versionPanel.remove(versionRadioButton);
+            }
+        }
+        buttonVersionMap.clear();
+        positionPanelMap.clear();
+
     }
 
     public void updateHistoryLayout() {
         try {
+            reset();
             positionPanelMap = view.getPositionPanelMap();
-            header.setupHeader();
+            header.setupVersionCheckHeader();
             combineHistoryPanels();
             setupVersionPanel(positionPanelMap);
             sizeVersionPanel();
@@ -513,7 +514,7 @@ public class HistoryPanel {
 
     private int getVersionPanelHeight() {
         return view.getParent().getParent().getHeight()
-                + (view.getHistoryPanel().getHeight() + view.getHistoryPanel().getY() + 24);
+                + (view.getPathCheckboxPanel().getHeight() + view.getPathCheckboxPanel().getY() + 24);
     }
 
     private List<DragPanelComponentVersion<?>> getVersionPanels(DragPanelComponentVersion<?> dragPanel)
@@ -546,7 +547,7 @@ public class HistoryPanel {
         boolean visible = false;
 
         for (JComponent panel : panels) {
-            if (panel.isVisible()) {
+            if (panel.isVisible() && panel.getWidth() > 0 && panel.getHeight() > 0) {
                 return true;
             }
         }
@@ -637,7 +638,7 @@ public class HistoryPanel {
                 }
 
                 Ts.get().addUncommitted(view.getConcept());
-                reset();
+                updateHistoryLayout();
                 navigator.getImplementButton().setEnabled(false);
             } catch (Exception ex) {
                 AceLog.getAppLog().alertAndLogException(ex);

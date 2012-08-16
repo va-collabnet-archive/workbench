@@ -503,7 +503,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                     topGbc.gridwidth = 1;
                     topGbc.gridx = 1;
                     topGbc.gridy = 0;
-                    //cView.add(historyPanel, topGbc);
+                    //cView.add(pathCheckboxPanel, topGbc);
                     topGbc.gridy++;
                     topGbc.anchor = GridBagConstraints.NORTHWEST;
                     topGbc.weightx = 1;
@@ -870,9 +870,10 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
 
             updateUncommitted();
 
-            if (settings.isNavigatorSetup()) {
-                setupHistoryPane();
+            if (!settings.isNavigatorSetup()) {
+                settings.getNavigator();
             }
+            setupPathCheckboxPane();
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
         }
@@ -885,8 +886,10 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-               settings.getNavigator().updateHistoryPanel();
-            }
+                if (settings.getNavigator().getHistoryPanel() != null) {
+                    settings.getNavigator().getHistoryPanel().updateHistoryLayout();
+                }
+        }
         });
     }
 
@@ -1035,10 +1038,10 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         }
     }
 
-    protected void setupHistoryPane() throws IOException, ContradictionException {
-        JPanel historyPanel = cView.getHistoryPanel();
-        historyPanel.removeAll();
-        historyPanel.setLayout(new GridBagLayout());
+    protected void setupPathCheckboxPane() throws IOException, ContradictionException {
+        JPanel pathCheckboxPanel = cView.getPathCheckboxPanel();
+        pathCheckboxPanel.removeAll();
+        pathCheckboxPanel.setLayout(new GridBagLayout());
         if (paths == null) {
             return;
         }
@@ -1055,6 +1058,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         gbc.gridx = 1;
         gbc.gridy = 0;
         // Construct check box panel that lists the different paths, just above the main concept view
+        Map<PathBI, Boolean> pathShowCheckMap = cView.getSettings().getNavigator().getHistoryPanel().getPathCheckMap();
         for (PathBI path : paths) {
             if (stop) {
                 return;
@@ -1065,7 +1069,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             ConceptVersionBI pathVersion = Ts.get().getConceptVersion(coordinate, path.getConceptNid());
             JCheckBox pathCheck = getJCheckBox();
 
-            pathCheck.addActionListener(new RefreshHistoryViewListener());
+            pathCheck.addActionListener(new RefreshHistoryViewListener(path, pathShowCheckMap));
 
             if (settings.getNavigator().getDropSide() == ConceptViewSettings.SIDE.LEFT) {
                 gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -1082,34 +1086,26 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             } else {
                 pathCheck.setText(pathVersion.toString());
             }
-
-            pathCheck.setSelected(true);
+            Boolean select = pathShowCheckMap.get(path);
+            if (select == null) {
+                select = true;
+                pathShowCheckMap.put(path, select);
+            }
+            if (select) {
+                pathCheck.setSelected(true);
+            }
+            else {
+                pathCheck.setSelected(false);
+            }
             rowToPathCheckMap.put(row, pathCheck);
             pathCheck.setVisible(cView.isHistoryShown());
-            historyPanel.add(pathCheck, gbc);
+            pathCheckboxPanel.add(pathCheck, gbc);
             gbc.gridy++;
             row++;
         }
-//        t.schedule(new TickleTask(), 1000);
-//        t.schedule(new UpdateHxPanelTask(), 1500);
+        GuiUtil.tickle(pathCheckboxPanel);
     }
     java.util.Timer t = new java.util.Timer();
-
-    private class TickleTask extends SwingTask {
-
-        @Override
-        public void doRun() {
-            GuiUtil.tickle(cView.getHistoryPanel());
-        }
-    }
-
-    private class UpdateHxPanelTask extends SwingTask {
-
-        @Override
-        public void doRun() {
-            settings.getNavigator().refreshHistory();
-        }
-    }
 
     private void setupRels(CountDownLatch latch, Collection<? extends I_RelTuple> rels,
             Collection<DragPanelRel> panels, CollapsePanel cp, boolean inferred)
@@ -1533,9 +1529,25 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
     }
 
     public class RefreshHistoryViewListener implements ActionListener {
+        PathBI path;
+        Map<PathBI, Boolean> pathShowCheckMap;
+        private RefreshHistoryViewListener(PathBI path) {
+            this.path = path;
+        }
+
+        private RefreshHistoryViewListener(PathBI path, Map<PathBI, Boolean> pathShowCheckMap) {
+            this.path = path;
+            this.pathShowCheckMap = pathShowCheckMap;
+        }
 
         @Override
         public void actionPerformed(ActionEvent ae) {
+            JCheckBox checkBox = (JCheckBox) ae.getSource();
+            if (checkBox.isSelected()) {
+                pathShowCheckMap.put(path, true);
+            } else {
+                pathShowCheckMap.put(path, false);
+            }
             if (stop) {
                 return;
             }

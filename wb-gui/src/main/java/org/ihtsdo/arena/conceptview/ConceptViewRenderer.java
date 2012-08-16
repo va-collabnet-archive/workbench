@@ -293,7 +293,7 @@ public class ConceptViewRenderer extends JLayeredPane {
         }
 
         if (conceptScrollPane != null) {
-            historyPanel = renderedComponent.getHistoryPanel();
+            historyPanel = renderedComponent.getPathCheckboxPanel();
             
             
             conceptViewPanel.add(historyPanel, BorderLayout.NORTH);

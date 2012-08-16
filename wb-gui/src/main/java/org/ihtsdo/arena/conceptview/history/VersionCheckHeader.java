@@ -20,7 +20,9 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
+import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.util.swing.GuiUtil;
 
 /**
  *
@@ -42,6 +44,12 @@ public class VersionCheckHeader implements ActionListener {
      */
     protected Map<PositionBI, JCheckBox> positionCheckMap = new HashMap<>();
     /**
+     * A map that links the collection of paths to a boolean that determines if versions on this path
+     * should be displayed in the history panel.
+     * <code>checkPositionMap</code>
+     */
+    protected Map<PathBI, Boolean> pathCheckMap = new HashMap<>();
+    /**
      * A map that links the check box that determines the vertical alignment of component version radio
      * buttons that show the history of that component with the collection of positions that are part of the
      * history of a concept. The reverse of the
@@ -57,8 +65,8 @@ public class VersionCheckHeader implements ActionListener {
      * Panel at the top of the history versionPanelScroller that holds the check boxes that provide vertical alignment for
      * position radio buttons.
      */
-    protected JPanel historyHeaderPanel = new JPanel(null);
-    JScrollPane historyHeaderPanelScroller = new JScrollPane(historyHeaderPanel);
+    protected JPanel versionCheckHeaderPanel = new JPanel(null);
+    JScrollPane historyHeaderPanelScroller = new JScrollPane(versionCheckHeaderPanel);
     int hxWidth = 0;
     private HistoryPanel hxPanel;
 
@@ -70,14 +78,14 @@ public class VersionCheckHeader implements ActionListener {
         return hxWidth;
     }
 
-    public void setup() {
+    protected void setup() {
         parentHistoryPanel.removeAll();
 
-        historyHeaderPanel.setSize(hxPanel.otherWidth, hxPanel.view.getHistoryPanel().getHeight() - HistoryPanel.insetAdjustment);
-        historyHeaderPanel.setMaximumSize(historyHeaderPanel.getSize());
-        historyHeaderPanel.setMinimumSize(historyHeaderPanel.getSize());
-        historyHeaderPanel.setPreferredSize(historyHeaderPanel.getSize());
-        historyHeaderPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
+        versionCheckHeaderPanel.setSize(hxPanel.otherWidth, hxPanel.view.getPathCheckboxPanel().getHeight() - HistoryPanel.insetAdjustment);
+        versionCheckHeaderPanel.setMaximumSize(versionCheckHeaderPanel.getSize());
+        versionCheckHeaderPanel.setMinimumSize(versionCheckHeaderPanel.getSize());
+        versionCheckHeaderPanel.setPreferredSize(versionCheckHeaderPanel.getSize());
+        versionCheckHeaderPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
 
         GridBagConstraints gbc = new GridBagConstraints();
 
@@ -92,7 +100,7 @@ public class VersionCheckHeader implements ActionListener {
         historyHeaderPanelScroller.setBorder(BorderFactory.createEmptyBorder());
         historyHeaderPanelScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
         historyHeaderPanelScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        historyHeaderPanelScroller.setSize(hxPanel.otherWidth, hxPanel.view.getHistoryPanel().getHeight());
+        historyHeaderPanelScroller.setSize(hxPanel.otherWidth, hxPanel.view.getPathCheckboxPanel().getHeight());
         historyHeaderPanelScroller.setLocation(0, 0);
         gbc.gridy++;
         gbc.weighty = 1.0;
@@ -125,7 +133,7 @@ public class VersionCheckHeader implements ActionListener {
             }
         }
         for (JCheckBox positionCheck : positionCheckMap.values()) {
-            historyHeaderPanel.remove(positionCheck);
+            versionCheckHeaderPanel.remove(positionCheck);
         }
         if (resetPositions) {
             positionCheckMap.clear();
@@ -134,7 +142,7 @@ public class VersionCheckHeader implements ActionListener {
         checkComponentMap.clear();
     }
 
-    public void setupHeader() {
+    protected void setupVersionCheckHeader() {
         reset(hxPanel.conceptChanged());
         TreeSet<PositionBI> positionOrderedSet = hxPanel.view.getPositionOrderedSet();
 
@@ -171,18 +179,24 @@ public class VersionCheckHeader implements ActionListener {
             positionCheck.setSize(positionCheck.getPreferredSize());
             positionCheck.setToolTipText(p.toString());
             if (positionCheckVisible) {
-                historyHeaderPanel.add(positionCheck);
+                versionCheckHeaderPanel.add(positionCheck);
                 positionCheck.setLocation(locX, rowCheck.getLocation().y);
                 locX += positionCheck.getWidth();
              }
         }
 
         hxWidth = locX;
-        historyHeaderPanel.revalidate();
+        versionCheckHeaderPanel.revalidate();
+        versionCheckHeaderPanel.getParent().revalidate();
+        GuiUtil.tickle(versionCheckHeaderPanel.getParent());
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         hxPanel.versionPanel.repaint(hxPanel.versionPanel.getBounds());
+    }
+
+    public Map<PathBI, Boolean> getPathCheckMap() {
+        return pathCheckMap;
     }
 }

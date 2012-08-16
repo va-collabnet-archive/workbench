@@ -81,7 +81,7 @@ public class ConceptView extends JPanel {
     long lastChangeModificationLayoutSequence = Long.MIN_VALUE;
     private Set<File> kbFiles = new HashSet<>();
     private boolean historyShown = false;
-    private JPanel historyPanel = new JPanel(new GridBagLayout());
+    private JPanel pathCheckboxPanel = new JPanel(new GridBagLayout());
     private Collection<JComponent> dropComponents =
             Collections.synchronizedList(new ArrayList<JComponent>());
     private final Set<ComponentVersionBI> changedVersionSelections = new HashSet<>();
@@ -94,6 +94,16 @@ public class ConceptView extends JPanel {
     private Object lastThingBeingDropped;
     private ConceptViewSettings settings;
     private CVChangeListener cvChangeListener = new CVChangeListener();
+
+    protected void redoConceptViewLayout() throws IOException {
+        if (concept != null) {
+            if (cvLayout != null) {
+                cvLayout.stop();
+            }
+            cvLayout = new ConceptViewLayout(this, concept);
+            cvLayout.execute();
+        }
+    }
 
     //~--- constant enums ------------------------------------------------------
     public enum PanelSection {
@@ -284,8 +294,7 @@ public class ConceptView extends JPanel {
                 }
             }
         }
-        cvLayout = new ConceptViewLayout(this, concept);
-        cvLayout.execute();
+        redoConceptViewLayout();
         getCvRenderer().updateCancelAndCommit();
     }
 
@@ -347,8 +356,8 @@ public class ConceptView extends JPanel {
         return cvRenderer;
     }
 
-    public JPanel getHistoryPanel() {
-        return historyPanel;
+    public JPanel getPathCheckboxPanel() {
+        return pathCheckboxPanel;
     }
 
     public JCheckBox makeJCheckBox() {
@@ -461,12 +470,6 @@ public class ConceptView extends JPanel {
 
     public boolean isHistoryShown() {
         return historyShown;
-    }
-
-    void refreshHistory() {
-        if (historyShown) {
-            settings.getNavigator().refreshHistory();
-        }
     }
 
     //~--- set methods ---------------------------------------------------------

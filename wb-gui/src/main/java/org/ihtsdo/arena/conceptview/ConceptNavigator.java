@@ -23,6 +23,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -43,6 +45,10 @@ public class ConceptNavigator extends JPanel {
     private SIDE side = SIDE.RIGHT;
     private FocusDrop focusDrop;
     private HistoryPanel historyPanel;
+
+    public HistoryPanel getHistoryPanel() {
+        return historyPanel;
+    }
     private final JScrollPane historyScroller;
     private JButton implementButton;
     private TaxonomyTree navigatorTree;
@@ -59,9 +65,9 @@ public class ConceptNavigator extends JPanel {
         this.historyScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
         this.historyScroller.setVisible(false);
         this.view = view;
-        
+
         ConceptChangeListener ccl = new ConceptChangeListener();
-        
+
         this.view.addHostListener(ccl);
         navigatorTree = (TaxonomyTree) treeScroller.getViewport().getView();
         focusDrop = new FocusDrop(new ImageIcon(ACE.class.getResource("/16x16/plain/flash.png")),
@@ -73,7 +79,7 @@ public class ConceptNavigator extends JPanel {
     //~--- methods -------------------------------------------------------------
     private void layoutNavigator() {
         GridBagConstraints gbc = new GridBagConstraints();
-        
+
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridy = 0;
@@ -90,22 +96,22 @@ public class ConceptNavigator extends JPanel {
         add(treeScroller, gbc);
         add(historyScroller, gbc);
         gbc.weightx = 0;
-        
+
         switch (side) {
             case LEFT:
                 gbc.gridx = 2;
-                
+
                 break;
-            
+
             case RIGHT:
                 gbc.gridx = 0;
-                
+
                 break;
         }
-        
+
         add(focusDrop, gbc);
     }
-    
+
     private void privateHxPanelUpdate() throws IOException {
         if (historyPanel == null) {
             historyPanel = new HistoryPanel(view, historyScroller, this);
@@ -117,47 +123,45 @@ public class ConceptNavigator extends JPanel {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    historyPanel.updateHistoryLayout();
+                    try {
+                        view.resetLastLayoutSequence();
+                        view.redoConceptViewLayout();
+                    } catch (IOException ex) {
+                        AceLog.getAppLog().alertAndLogException(ex);
+                    }
                 }
             });
         } else {
-            historyPanel.updateHistoryLayout();
+            view.resetLastLayoutSequence();
+            view.redoConceptViewLayout();
         }
     }
-    
-    void refreshHistory() {
-        if (historyPanel != null) {
-            historyPanel.updateHistoryLayout();
-        }
-        ;
-    }
-    
+
     protected void resetHistoryPanel() throws IOException {
         if (historyPanel == null) {
             historyPanel = new HistoryPanel(view, historyScroller, this);
         } else {
-            historyPanel.resetAll();
             historyPanel.updateHistoryLayout();
         }
     }
-    
+
     private JPanel setupTopPanel() {
         JPanel thePanel = new JPanel(new GridBagLayout());
-        
+
         thePanel.setCursor(Cursor.getDefaultCursor());
-        
+
         GridBagConstraints gbc = new GridBagConstraints();
-        
+
         gbc.weightx = 0;
         gbc.weighty = 0;
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.NONE;
-        
+
         JLabel navIcon =
                 new JLabel(new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/compass.png")));
-        
+
         thePanel.add(navIcon, gbc);
         navIcon.setVisible(false);
         gbc.weightx = 1;
@@ -175,30 +179,30 @@ public class ConceptNavigator extends JPanel {
         implementButton.setEnabled(false);
         thePanel.add(implementButton, gbc);
         gbc.gridx++;
-        
+
         JButton taxonomyButton =
                 new JButton(new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/text_tree.png")));
-        
+
         taxonomyButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 5));
         taxonomyButton.addActionListener(new TaxonomyAction());
         thePanel.add(taxonomyButton, gbc);
         gbc.gridx++;
-        
+
         JButton historyButton =
                 new JButton(new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/radar-chart.png")));
-        
+
         historyButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 20));
         historyButton.addActionListener(new HistoryAction());
         thePanel.add(historyButton, gbc);
         thePanel.setBackground(ConceptViewTitle.TITLE_COLOR);
         thePanel.setOpaque(true);
         thePanel.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.LIGHT_GRAY));
-        
+
         return thePanel;
     }
-    
+
     protected void updateHistoryPanel() {
-        
+
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -221,7 +225,7 @@ public class ConceptNavigator extends JPanel {
     public SIDE getDropSide() {
         return this.side;
     }
-    
+
     public JButton getImplementButton() {
         return implementButton;
     }
@@ -236,22 +240,20 @@ public class ConceptNavigator extends JPanel {
 
     //~--- inner classes -------------------------------------------------------
     public class ConceptChangeListener implements PropertyChangeListener {
-        
+
         @Override
         public void propertyChange(PropertyChangeEvent pce) {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    if (historyPanel != null) {
-                        historyPanel.resetAll();
-                    }
+                    refreshHistory();
                 }
             });
         }
     }
-    
+
     public class HistoryAction implements ActionListener {
-        
+
         @Override
         public void actionPerformed(ActionEvent e) {
             view.setHistoryShown(true);
@@ -259,27 +261,38 @@ public class ConceptNavigator extends JPanel {
             focusDrop.setVisible(false);
             historyScroller.setVisible(true);
             historyScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+            refreshHistory();
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    updateHistoryPanel();
-                    historyScroller.revalidate();
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            historyScroller.revalidate();
-                            int width = historyPanel.getHxWidth();
-                            historyScroller.getViewport().scrollRectToVisible(
-                                    new Rectangle(width - 200, 0, 2, 4));
-                        }
-                    });
+                    refreshHistory();
                 }
             });
         }
     }
-    
+
+    private void refreshHistory() {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                updateHistoryPanel();
+                view.getSettings().fireConceptChanged();
+                historyScroller.revalidate();
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        historyScroller.revalidate();
+                        int width = historyPanel.getHxWidth();
+                        historyScroller.getViewport().scrollRectToVisible(
+                                new Rectangle(width - 200, 0, 2, 4));
+                    }
+                });
+            }
+        });
+    }
+
     public class StatedInferredAction implements ActionListener {
-        
+
         @Override
         public void actionPerformed(ActionEvent e) {
             treeScroller.setVisible(false);
@@ -294,9 +307,9 @@ public class ConceptNavigator extends JPanel {
             });
         }
     }
-    
+
     public class TaxonomyAction implements ActionListener {
-        
+
         @Override
         public void actionPerformed(ActionEvent e) {
             treeScroller.setVisible(true);
