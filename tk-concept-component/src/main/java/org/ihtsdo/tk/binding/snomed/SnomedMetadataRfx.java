@@ -77,11 +77,16 @@ public class SnomedMetadataRfx {
     private static ConceptSpec REFEX_VTM;
     private static ConceptSpec REFEX_VMP;
     private static ConceptSpec REFEX_SYNONYMY;
+    
+    private static TerminologyStoreDI tf;
 
     // DESCRIPTION CONCEPTS
     public static int getDES_FULL_SPECIFIED_NAME_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
+        }
+        if(DES_FULL_SPECIFIED_NAME_NID == 0){
+            return tf.getNidForUuids(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getUuids());
         }
         return DES_FULL_SPECIFIED_NAME_NID;
     }
@@ -90,12 +95,18 @@ public class SnomedMetadataRfx {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
+        if(DES_SYNONYM_PREFERRED_NAME_NID == 0){
+            return tf.getNidForUuids(SnomedMetadataRf2.SYNONYM_RF2.getUuids());
+        }
         return DES_SYNONYM_PREFERRED_NAME_NID;
     }
 
     public static int getDES_SYNONYM_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
+        }
+        if(DES_SYNONYM_NID == 0){
+            return tf.getNidForUuids(SnomedMetadataRf2.SYNONYM_RF2.getUuids());
         }
         return DES_SYNONYM_NID;
     }
@@ -104,12 +115,18 @@ public class SnomedMetadataRfx {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
+        if(DESC_ACCEPTABLE == null){
+            return SnomedMetadataRf2.ACCEPTABLE_RF2;
+        }
         return DESC_ACCEPTABLE;
     }
 
     public static int getDESC_ACCEPTABLE_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
+        }
+        if(ACCEPTABLE_NID == 0){
+            return tf.getNidForUuids(SnomedMetadataRf2.ACCEPTABLE_RF2.getUuids());
         }
         return ACCEPTABLE_NID;
     }
@@ -118,12 +135,18 @@ public class SnomedMetadataRfx {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
+        if(DESC_PREFERRED == null){
+            return SnomedMetadataRf2.PREFERRED_RF2;
+        }
         return DESC_PREFERRED;
     }
 
     public static int getDESC_PREFERRED_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
+        }
+        if(PREFERRED_NID == 0){
+            return tf.getNidForUuids(SnomedMetadataRf2.PREFERRED_RF2.getUuids());
         }
         return PREFERRED_NID;
     }
@@ -132,12 +155,18 @@ public class SnomedMetadataRfx {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
+        if(REL_CH_ADDITIONAL_CHARACTERISTIC_NID == 0){
+            return tf.getNidForUuids(SnomedMetadataRf2.ADDITIONAL_RELATIONSHIP_RF2.getUuids());
+        }
         return REL_CH_ADDITIONAL_CHARACTERISTIC_NID;
     }
 
     public static int getREL_CH_DEFINING_CHARACTERISTIC_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
+        }
+        if(REL_CH_DEFINING_CHARACTERISTIC_NID == 0){
+            return tf.getNidForUuids(SnomedMetadataRf2.DEFINING_RELATIONSHIP_RF2.getUuids());
         }
         return REL_CH_DEFINING_CHARACTERISTIC_NID;
     }
@@ -146,12 +175,18 @@ public class SnomedMetadataRfx {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
+        if(REL_CH_INFERRED_RELATIONSHIP_NID == 0){
+            return tf.getNidForUuids(SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2.getUuids());
+        }
         return REL_CH_INFERRED_RELATIONSHIP_NID;
     }
 
     public static int getREL_CH_QUALIFIER_CHARACTERISTIC_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
+        }
+        if(REL_CH_QUALIFIER_CHARACTERISTIC_NID == 0){
+            return tf.getNidForUuids(SnomedMetadataRf2.QUALIFYING_RELATIONSSHIP_RF2.getUuids());
         }
         return REL_CH_QUALIFIER_CHARACTERISTIC_NID;
     }
@@ -160,12 +195,18 @@ public class SnomedMetadataRfx {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
+        if(REL_CH_STATED_RELATIONSHIP_NID == 0){
+            return tf.getNidForUuids(SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getUuids());
+        }
         return REL_CH_STATED_RELATIONSHIP_NID;
     }
 
     public static int getREL_HISTORY_HISTORIC_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
+        }
+        if(REL_HISTORY_HISTORIC_NID == 0){
+            return tf.getNidForUuids(SnomedMetadataRf2.HISTORICAL_RELATIONSSHIP_RF2.getUuids());
         }
         return REL_HISTORY_HISTORIC_NID;
     }
@@ -174,12 +215,18 @@ public class SnomedMetadataRfx {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
+        if(REL_HISTORY_MOVED_TO_NID == 0){
+            return tf.getNidForUuids(SnomedMetadataRf2.MOVED_TO_REFSET_RF2.getUuids());
+        }
         return REL_HISTORY_MOVED_TO_NID;
     }
 
     public static int getREL_MANDATORY_REFINABILITY_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
+        }
+        if(REL_MANDATORY_REFINABILITY_NID == 0){
+            return tf.getNidForUuids(SnomedMetadataRf2.MANDATORY_REFINIBILITY_RF2.getUuids());
         }
         return REL_MANDATORY_REFINABILITY_NID;
     }
@@ -188,12 +235,18 @@ public class SnomedMetadataRfx {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
+        if(REL_NOT_REFINABLE_NID == 0){
+            return tf.getNidForUuids(SnomedMetadataRf2.NOT_REFINABLE_RF2.getUuids());
+        }
         return REL_NOT_REFINABLE_NID;
     }
 
     public static int getREL_OPTIONAL_REFINABILITY_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
+        }
+        if(REL_OPTIONAL_REFINABILITY_NID == 0){
+            return tf.getNidForUuids(SnomedMetadataRf2.OPTIONAL_REFINIBILITY_RF2.getUuids());
         }
         return REL_OPTIONAL_REFINABILITY_NID;
     }
@@ -210,12 +263,18 @@ public class SnomedMetadataRfx {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
+        if(STATUS_CURRENT == null){
+            return SnomedMetadataRf2.ACTIVE_VALUE_RF2;
+        }
         return STATUS_CURRENT;
     }
 
     public static int getSTATUS_CURRENT_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
+        }
+        if(STATUS_CURRENT_NID == 0){
+            return tf.getNidForUuids(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids());
         }
         return STATUS_CURRENT_NID;
     }
@@ -224,12 +283,18 @@ public class SnomedMetadataRfx {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
+        if(STATUS_LIMITED == null){
+            return SnomedMetadataRf2.LIMITED_COMPONENT_RF2;
+        }
         return STATUS_LIMITED;
     }
 
     public static int getSTATUS_LIMITED_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
+        }
+        if(STATUS_LIMITED_NID == 0){
+            return tf.getNidForUuids(SnomedMetadataRf2.LIMITED_COMPONENT_RF2.getUuids());
         }
         return STATUS_LIMITED_NID;
     }
@@ -238,12 +303,18 @@ public class SnomedMetadataRfx {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
+        if(STATUS_RETIRED == null){
+            return SnomedMetadataRf2.INACTIVE_VALUE_RF2;
+        }
         return STATUS_RETIRED;
     }
 
     public static int getSTATUS_RETIRED_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
+        }
+        if(STATUS_RETIRED_NID == 0){
+            return tf.getNidForUuids(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getUuids());
         }
         return STATUS_RETIRED_NID;
     }
@@ -252,12 +323,18 @@ public class SnomedMetadataRfx {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
+        if(STATUS_INAPPROPRIATE == null){
+            return SnomedMetadataRf2.INAPPROPRIATE_COMPONENT_RF2;
+        }
         return STATUS_INAPPROPRIATE;
     }
 
     public static int getSTATUS_INAPPROPRIATE_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
+        }
+        if(STATUS_INAPPROPRIATE_NID == 0){
+            return tf.getNidForUuids(SnomedMetadataRf2.INAPPROPRIATE_COMPONENT_RF2.getUuids());
         }
         return STATUS_INAPPROPRIATE_NID;
     }
@@ -266,12 +343,18 @@ public class SnomedMetadataRfx {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
+        if(STATUS_AMBIGUOUS == null){
+            return SnomedMetadataRf2.AMBIGUOUS_COMPONENT_RF2;
+        }
         return STATUS_AMBIGUOUS;
     }
 
     public static int getSTATUS_AMBIGUOUS_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
+        }
+        if(STATUS_AMBIGUOUS_NID == 0){
+            return tf.getNidForUuids(SnomedMetadataRf2.AMBIGUOUS_COMPONENT_RF2.getUuids());
         }
         return STATUS_AMBIGUOUS_NID;
     }
@@ -280,12 +363,18 @@ public class SnomedMetadataRfx {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
+        if(STATUS_DUPLICATE == null){
+            return SnomedMetadataRf2.DUPLICATE_COMPONENT_RF2;
+        }
         return STATUS_DUPLICATE;
     }
 
     public static int getSTATUS_DUPLICATE_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
+        }
+        if(STATUS_DUPLICATE_NID == 0){
+            return tf.getNidForUuids(SnomedMetadataRf2.DUPLICATE_COMPONENT_RF2.getUuids());
         }
         return STATUS_DUPLICATE_NID;
     }
@@ -294,12 +383,18 @@ public class SnomedMetadataRfx {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
+        if(STATUS_ERRONEOUS == null){
+            return SnomedMetadataRf2.ERRONEOUS_COMPONENT_RF2;
+        }
         return STATUS_ERRONEOUS;
     }
 
     public static int getSTATUS_ERRONEOUS_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
+        }
+        if(STATUS_ERRONEOUS_NID == 0){
+            return tf.getNidForUuids(SnomedMetadataRf2.ERRONEOUS_COMPONENT_RF2.getUuids());
         }
         return STATUS_ERRONEOUS_NID;
     }
@@ -308,12 +403,18 @@ public class SnomedMetadataRfx {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
+        if(STATUS_OUTDATED == null){
+            return SnomedMetadataRf2.OUTDATED_COMPONENT_RF2;
+        }
         return STATUS_OUTDATED;
     }
 
     public static int getSTATUS_OUTDATED_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
+        }
+        if(STATUS_OUTDATED_NID == 0){
+            return tf.getNidForUuids(SnomedMetadataRf2.OUTDATED_COMPONENT_RF2.getUuids());
         }
         return STATUS_OUTDATED_NID;
     }
@@ -322,12 +423,18 @@ public class SnomedMetadataRfx {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
+        if(US_DIALECT_REFEX_NID == 0){
+            return tf.getNidForUuids(SnomedMetadataRf2.US_ENGLISH_REFSET_RF2.getUuids());
+        }
         return US_DIALECT_REFEX_NID;
     }
 
     public static int getGB_DIALECT_REFEX_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
+        }
+        if(GB_DIALECT_REFEX_NID == 0){
+            return tf.getNidForUuids(SnomedMetadataRf2.GB_ENGLISH_REFSET_RF2.getUuids());
         }
         return GB_DIALECT_REFEX_NID;
     }
@@ -336,12 +443,18 @@ public class SnomedMetadataRfx {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
+        if(SYNONYMY_REFEX_NID == 0){
+            return tf.getNidForUuids(SnomedMetadataRf2.DEGREE_OF_SYNONYMY_RF2.getUuids());
+        }
         return SYNONYMY_REFEX_NID;
     }
 
     public static int getREFERS_TO_REFEX_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
+        }
+        if(REFERS_TO_REFEX_NID == 0){
+            return tf.getNidForUuids(SnomedMetadataRf2.REFERS_TO_REFSET_RF2.getUuids());
         }
         return REFERS_TO_REFEX_NID;
     }
@@ -351,12 +464,18 @@ public class SnomedMetadataRfx {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
+        if(REFEX_NON_HUMAN == null){
+            return SnomedMetadataRf2.NON_HUMAN_RF2;
+        }
         return REFEX_NON_HUMAN;
     }
 
     public static ConceptSpec getREFEX_VTM() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
+        }
+        if(REFEX_VTM == null){
+            return SnomedMetadataRf2.VTM_RF2;
         }
         return REFEX_VTM;
     }
@@ -365,12 +484,18 @@ public class SnomedMetadataRfx {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
+        if(REFEX_VMP == null){
+            return SnomedMetadataRf2.VMP_RF2;
+        }
         return REFEX_VMP;
     }
 
     public static ConceptSpec getREFEX_SYNONYMY() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
+        }
+        if(REFEX_SYNONYMY == null){
+            return SnomedMetadataRf2.DEGREE_OF_SYNONYMY_RF2;
         }
         return REFEX_SYNONYMY;
     }
@@ -386,7 +511,7 @@ public class SnomedMetadataRfx {
     }
 
     private static void setupSnoRf1Rf2() throws IOException {
-        TerminologyStoreDI tf = Ts.get();
+        tf = Ts.get();
 
         if (tf.usesRf2Metadata()) {
             isReleaseFormatSetupB = true;
