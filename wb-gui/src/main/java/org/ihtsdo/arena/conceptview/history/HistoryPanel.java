@@ -36,6 +36,8 @@ import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import java.io.IOException;
 
@@ -74,6 +76,10 @@ public class HistoryPanel {
     int otherWidth = 150;
     private final SelectedVersionChangedListener svcl = new SelectedVersionChangedListener();
     VersionCheckHeader header = new VersionCheckHeader(this);
+
+    public JPanel getParentHistoryPanel() {
+        return header.getParentHistoryPanel();
+    }
     private final Set<JRadioButton> originalButtonSelections = new HashSet<>();
     private final Map<NidSapNid, JRadioButton> nidStampNidButtonMap = new HashMap<>();
     /**
@@ -98,12 +104,22 @@ public class HistoryPanel {
     int conceptNid = Integer.MAX_VALUE;
     JScrollPane versionPanelScroller;
     private final JScrollPane historyScroller;
+    private int scrollerXLocation = Integer.MIN_VALUE;
+
+    public int getScrollerXLocation() {
+        return scrollerXLocation;
+    }
+
+    public void setScrollerXLocation(int scrollerXLocation) {
+        this.scrollerXLocation = scrollerXLocation;
+    }
 
     //~--- constructors --------------------------------------------------------
     public HistoryPanel(ConceptView view, JScrollPane historyScroller, ConceptNavigator navigator)
             throws IOException {
         this.view = view;
         this.historyScroller = historyScroller;
+        this.historyScroller.getHorizontalScrollBar().getModel().addChangeListener(new HorizontalScrollActionListener());
         positionPanelMap = view.getPositionPanelMap();
         this.navigator = navigator;
         navigator.getImplementButton().addActionListener(avcl);
@@ -111,7 +127,7 @@ public class HistoryPanel {
         if (view.getSettings().isForAdjudication()) {
             navigator.getImplementButton().setEnabled(true);
         }
-        historyScroller.setViewportView(header.getTopHistoryPanel());
+        historyScroller.setViewportView(header.getParentHistoryPanel());
         TreeSet<PositionBI> positionOrderedSet = view.getPositionOrderedSet();
         initializeVersionPanel();
 
@@ -135,7 +151,7 @@ public class HistoryPanel {
             @Override
             public void run() {
                 redoLayout();
-                scrollRight();
+                scrollRightIfChanged();
             }
         });
     }
@@ -382,7 +398,6 @@ public class HistoryPanel {
                 currentX += positionCheck.getWidth();
             }
         }
-
         currentX = currentX + 240;
         header.hxWidth = currentX;
         header.versionCheckHeaderPanel.setSize(Math.max(header.hxWidth, ConceptViewSettings.NAVIGATOR_WIDTH - 6),
@@ -398,9 +413,10 @@ public class HistoryPanel {
     }
 
     boolean conceptChanged() {
-        if (view.getConcept() != null) {
-            return conceptNid != view.getConcept().getConceptNid();
+        if (view.getConcept() != null && conceptNid == view.getConcept().getConceptNid()) {
+            return false;
         }
+        maxX = Integer.MIN_VALUE;
         return true;
     }
 
@@ -411,8 +427,6 @@ public class HistoryPanel {
             } else {
                 conceptNid = Integer.MAX_VALUE;
             }
-
-            scrollRight();
         }
     }
 
@@ -560,19 +574,7 @@ public class HistoryPanel {
         versionPanel.setSize(Integer.MAX_VALUE, Integer.MAX_VALUE);
         versionPanel.addHierarchyListener(new HistoryHierarchyListener());
     }
-
-    public void scrollRight() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                historyScroller.revalidate();
-
-                historyScroller.getViewport().scrollRectToVisible(
-                        new Rectangle(header.hxWidth - 200, 0, 2, 4));
-            }
-        });
-    }
-
+    
     private void sizeVersionPanel() {
         versionPanel.setSize(Math.max(header.hxWidth + 240, ConceptViewSettings.NAVIGATOR_WIDTH) + 20,
                 view.getHeight() + 20);
@@ -608,6 +610,10 @@ public class HistoryPanel {
         }
         sb.append("</html>");
         return sb;
+    }
+
+    PropertyChangeListener getMaxXListener() {
+        return new MaxXPropChangeListener();
     }
 
     //~--- inner classes -------------------------------------------------------
@@ -747,7 +753,7 @@ public class HistoryPanel {
             }
 
             FontRenderContext frc = g2d.getFontRenderContext();
-            
+
             Font f = new Font("Lucidia Sans", Font.PLAIN, 12);
 
             List<Rectangle> textRects = new ArrayList<>();
@@ -952,6 +958,36 @@ public class HistoryPanel {
             BoundedRangeModel eventModel = (BoundedRangeModel) ce.getSource();
             y = -eventModel.getValue();
             versionPanel.setLocation(0, -eventModel.getValue());
+        }
+    }
+
+    private class HorizontalScrollActionListener implements ChangeListener {
+
+        @Override
+        public void stateChanged(ChangeEvent ce) {
+            BoundedRangeModel eventModel = (BoundedRangeModel) ce.getSource();
+            scrollerXLocation = eventModel.getValue();
+        }
+    }
+    int maxX = Integer.MIN_VALUE;
+
+    private class MaxXPropChangeListener implements PropertyChangeListener {
+
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            int newMaxX = ((Integer) evt.getNewValue());
+            if (newMaxX > maxX) {
+                maxX = newMaxX;
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        historyScroller.revalidate();
+                        historyScroller.getHorizontalScrollBar().setValue(maxX);
+                        historyScroller.getViewport().scrollRectToVisible(
+                                new Rectangle(maxX, 0, 2, 4));
+                    }
+                });
+            }
         }
     }
 }

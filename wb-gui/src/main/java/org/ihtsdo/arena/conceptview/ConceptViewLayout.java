@@ -1500,7 +1500,17 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             gbc.gridy++;
             row++;
         }
-        GuiUtil.tickle(pathCheckboxPanel.getParent());
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    GuiUtil.tickle(cView.getSettings().getNavigator().getHistoryPanel().getParentHistoryPanel());
+                } catch (IOException ex) {
+                    AceLog.getAppLog().alertAndLogException(ex);
+                }
+            }
+        });
     }
 
     //~--- inner classes -------------------------------------------------------

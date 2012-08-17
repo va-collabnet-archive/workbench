@@ -9,6 +9,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +30,7 @@ import org.ihtsdo.util.swing.GuiUtil;
  * @author kec
  */
 public class VersionCheckHeader implements ActionListener {
+    public static final String PROP_LASTPOSITIONXLOCATION = "PROP_LASTPOSITIONXLOCATION";
 
     /**
      * JPanel that contains the position check box versionPanelScroller, and the version versionPanelScroller with the radio buttons for all
@@ -65,6 +67,13 @@ public class VersionCheckHeader implements ActionListener {
      * Panel at the top of the history versionPanelScroller that holds the check boxes that provide vertical alignment for
      * position radio buttons.
      */
+    
+    private int lastPositionXLocation = Integer.MIN_VALUE;
+    private final transient PropertyChangeSupport propertyChangeSupport = new java.beans.PropertyChangeSupport(this);
+    public int getLastPositionXLocation() {
+        return lastPositionXLocation;
+    }
+
     protected JPanel versionCheckHeaderPanel = new JPanel(null);
     JScrollPane historyHeaderPanelScroller = new JScrollPane(versionCheckHeaderPanel);
     int hxWidth = 0;
@@ -72,6 +81,7 @@ public class VersionCheckHeader implements ActionListener {
 
     public VersionCheckHeader(HistoryPanel hxPanel) {
         this.hxPanel = hxPanel;
+        propertyChangeSupport.addPropertyChangeListener(hxPanel.getMaxXListener());
     }
 
     public int getHxWidth() {
@@ -110,7 +120,7 @@ public class VersionCheckHeader implements ActionListener {
         parentHistoryPanel.add(hxPanel.versionPanelScroller, gbc);
     }
 
-    public JPanel getTopHistoryPanel() {
+    public JPanel getParentHistoryPanel() {
         return parentHistoryPanel;
     }
 
@@ -184,7 +194,7 @@ public class VersionCheckHeader implements ActionListener {
                 locX += positionCheck.getWidth();
              }
         }
-
+        setLastPositionXLocation(locX);
         hxWidth = locX;
         versionCheckHeaderPanel.revalidate();
         versionCheckHeaderPanel.getParent().revalidate();
@@ -198,5 +208,15 @@ public class VersionCheckHeader implements ActionListener {
 
     public Map<PathBI, Boolean> getPathCheckMap() {
         return pathCheckMap;
+    }
+
+    /**
+     * @param lastPositionXLocation the lastPositionXLocation to set
+     */
+    public void setLastPositionXLocation(int lastPositionXLocation) {
+        int oldLastPositionXLocation = this.lastPositionXLocation;
+        this.lastPositionXLocation = lastPositionXLocation;
+        propertyChangeSupport.firePropertyChange(PROP_LASTPOSITIONXLOCATION, 
+                oldLastPositionXLocation, lastPositionXLocation);
     }
 }
