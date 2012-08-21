@@ -489,6 +489,7 @@ public class NodeFactory {
                 return null;
             } finally {
                 childWorkerMap.remove(parentNode.nodeId, this);
+                latch.countDown();
             }
         }
         
@@ -503,9 +504,6 @@ public class NodeFactory {
                 }
             } catch (Throwable ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
-            } finally {
-                childWorkerMap.remove(parentNode.nodeId, this);
-                latch.countDown();
             }
         }
         
