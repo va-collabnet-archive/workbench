@@ -33,7 +33,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
@@ -52,7 +51,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
     private static PositionArrayBinder positionArrayBinder =
             new PositionArrayBinder();
     private static final Map<UncommittedStatusForPath, Integer> uncomittedStatusPathEntries =
-            new ConcurrentHashMap<UncommittedStatusForPath, Integer>();
+            new ConcurrentHashMap<>();
     private static CountDownLatch setupLatch = new CountDownLatch(1);
     private static AtomicInteger misses = new AtomicInteger(0);
     private static AtomicInteger hits = new AtomicInteger(0);
@@ -332,10 +331,10 @@ public class StatusAtPositionBdb extends ComponentBdb {
 
     public PositionBI getPosition(int sapNid)
             throws IOException, PathNotExistsException, TerminologyException {
-        int status = -1;
-        int author = -1;
-        int pathNid = -1;
-        long time = -1;
+        int status;
+        int author;
+        int pathNid;
+        long time;
 
         if (sapNid < readOnlyArraySize) {
             pathNid = readOnlyArray.pathNids[sapNid];
@@ -502,14 +501,14 @@ public class StatusAtPositionBdb extends ComponentBdb {
     }
 
     public List<TimePathId> getTimePathList() {
-        HashSet<TimePathId> returnValues = new HashSet<TimePathId>();
+        HashSet<TimePathId> returnValues = new HashSet<>();
         Collection<Integer> values = sapToIntMap.values();
 
         for (int sapNid : values) {
             returnValues.add(new TimePathId(getVersion(sapNid), getPathNid(sapNid)));
         }
 
-        return new ArrayList<TimePathId>(returnValues);
+        return new ArrayList<>(returnValues);
     }
 
     public int getVersion(int index) {

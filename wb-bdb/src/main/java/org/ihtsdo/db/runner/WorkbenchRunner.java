@@ -265,6 +265,7 @@ public class WorkbenchRunner {
                     svnHelper.initialSubversionOperationsAndChangeSetImport(wbPropertiesFile, prompter);
                 } catch (Exception ex) {
                     AceLog.getAppLog().alertAndLogException(ex);
+                    AceLog.getAppLog().info("### exit from WorkbenchRunner.");
                     System.exit(0);
                 }
             }
@@ -415,6 +416,7 @@ public class WorkbenchRunner {
                     JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
                             "Unable to open user file. Is it corrupt?");
                     AceLog.getAppLog().log(Level.SEVERE, ex.getLocalizedMessage(), ex);
+                    AceLog.getAppLog().info("### exit from WorkbenchRunner 2.");
                     System.exit(-1);
                 } finally {
                     ois.close();
@@ -527,6 +529,7 @@ public class WorkbenchRunner {
                 JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
                         "No frames where opened. Now exiting.", "No successful logins...",
                         JOptionPane.ERROR_MESSAGE);
+                    AceLog.getAppLog().info("### exit from WorkbenchRunner 3.");
                 System.exit(0);
             }
 
@@ -582,6 +585,7 @@ public class WorkbenchRunner {
             }
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
+                    AceLog.getAppLog().info("### exit from WorkbenchRunner 4.");
             System.exit(0);
         }
     }

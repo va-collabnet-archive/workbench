@@ -164,6 +164,7 @@ public class SvnHelper {
                             "No profiles", JOptionPane.INFORMATION_MESSAGE);
                     connectToSubversion = false;
                     Svn.setConnectedToSvn(connectToSubversion);
+                    System.out.println("Exiting from initialSubversionOperationsAndChangeSetImport");
                     System.exit(0);
                 }
             }
@@ -233,6 +234,7 @@ public class SvnHelper {
                                 "No profiles", JOptionPane.INFORMATION_MESSAGE);
                         connectToSubversion = false;
                         Svn.setConnectedToSvn(connectToSubversion);
+                        AceLog.getAppLog().info("### User cancelled Subversion log in.");
                         System.exit(0);
                     }
                 }
@@ -247,7 +249,7 @@ public class SvnHelper {
                             "### Unable to connect to Subversion - please check network connection and try again.");
                     System.exit(0);
                 } else {
-                    AceLog.getAppLog().info("### User cancelled Subversion log in.");
+                    AceLog.getAppLog().info("### exit from initialSubversionOperationsAndChangeSetImport.");
                     System.exit(0);
                 }
             }
@@ -294,6 +296,7 @@ public class SvnHelper {
                     AceLog.getAppLog().info("### No profile selected - shutting down.");
                     connectToSubversion = false;
                     Svn.setConnectedToSvn(connectToSubversion);
+                    AceLog.getAppLog().info("### exit from handleSvnProfileCheckout.");
                     System.exit(0);
                 }
                 if (selectedPath.startsWith("/")) {
