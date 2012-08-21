@@ -603,6 +603,7 @@ public class LocalTransactionManager implements TxnManager, LeaseExpirationMgr.E
             trec.recover(tmt);
         } catch (CannotRecoverException e) {
             e.printStackTrace();
+             System.out.println("### exit from " + this.getClass().getCanonicalName());
             System.exit(0);
         }
         if (operationsLogger.isLoggable(Level.FINER)) {
