@@ -221,6 +221,7 @@ public class PromptUsernameAndPassword extends AbstractTask {
         } catch (TaskFailedException e) {
             e.printStackTrace();
         }
+        System.out.println("Exiting from PromptUsernameAndPassword");
         System.exit(0);
     }
 
