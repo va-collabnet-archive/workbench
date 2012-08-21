@@ -451,7 +451,7 @@ public abstract class DragPanelComponentVersion<T extends ComponentVersionBI> ex
          termLabel.setFixedWidth(150);
          termLabel.setFont(termLabel.getFont().deriveFont(getSettings().getFontSize()));
          termLabel.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
-         termLabel.setTermComponent(Terms.get().getConcept(nid));
+         termLabel.setTermComponent(Terms.get().getConcept(nid), true);
 
          return termLabel;
       } catch (TerminologyException terminologyException) {
