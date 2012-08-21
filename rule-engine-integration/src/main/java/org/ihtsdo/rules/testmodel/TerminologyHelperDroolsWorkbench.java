@@ -282,8 +282,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
             unique = true;
         } else {
             NidSetBI allowedStatusNids = Terms.get().getActiveAceFrameConfig().getViewCoordinate().getAllowedStatusNids();
-            search:
-            for (int i = 0; i < result.topDocs.totalHits && i <= 10; i++) {
+            search: for (int i = 0; i < result.topDocs.totalHits; i++) {
                 Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
                 int cnid = Integer.parseInt(doc.get("cnid"));
                 int dnid = Integer.parseInt(doc.get("dnid"));
