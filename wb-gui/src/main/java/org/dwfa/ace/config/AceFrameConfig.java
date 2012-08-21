@@ -1,18 +1,14 @@
 /**
- * Copyright (c) 2009 International Health Terminology Standards Development
- * Organisation
+ * Copyright (c) 2009 International Health Terminology Standards Development Organisation
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and limitations under the License.
  */
 package org.dwfa.ace.config;
 
@@ -143,6 +139,7 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 import org.tigris.subversion.javahl.PromptUserPassword3;
 
 public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
+
     private class ViewResetSet<T extends Object> extends HashSet<T> {
 
         public ViewResetSet(int initialCapacity) {
@@ -189,9 +186,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             vc = null;
             return super.retainAll(c);
         }
-        
     }
-    
+
     private class ViewResetIntList extends IntList {
 
         public ViewResetIntList() {
@@ -260,8 +256,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             vc = null;
             return super.set(index, element);
         }
-        
     }
+
     private class ViewResetIntSet extends IntSet {
 
         public ViewResetIntSet(Collection<PathBI> pathSet) {
@@ -277,8 +273,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
         @Override
         public void add(int key) {
-             vc = null;
-           super.add(key);
+            vc = null;
+            super.add(key);
         }
 
         @Override
@@ -309,9 +305,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         public void replaceWithSet(HashSet<Integer> members) {
             vc = null;
             super.replaceWithSet(members);
-        }        
+        }
     }
-
     /**
      *
      */
@@ -447,7 +442,6 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     // 51 :SNOOWL:
     private boolean classifierOwlFeatureStatus = false; // :SNOOWL:
     // 52 fixing writing of module nid. 
-    
     // transient
     private transient MasterWorker worker;
     private transient String statusMessage;
@@ -575,7 +569,13 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
         // 31
         out.writeInt(tabHistoryMap.size());
-        for (String keyStr : tabHistoryMap.keySet()) {
+        HashMap<String, List<I_GetConceptData>> tempMap = new HashMap<>();
+        synchronized (tabHistoryMap) {
+            for (Map.Entry<String, List<I_GetConceptData>> entry : tabHistoryMap.entrySet()) {
+                tempMap.put(entry.getKey(), new ArrayList<>(entry.getValue()));
+            }
+        }
+        for (String keyStr : tempMap.keySet()) {
             out.writeObject(keyStr);
             IntList il = new IntList();
             for (I_GetConceptData concept : tabHistoryMap.get(keyStr)) {
@@ -585,86 +585,103 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             }
             IntList.writeIntList(out, il);
         }
+   
 
-        // 32
-        out.writeBoolean(isAdministrative);
+    // 32
+    out.writeBoolean (isAdministrative);
 
-        // 33
-        out.writeObject(hiddenTopToggles);
+    // 33
+    out.writeObject (hiddenTopToggles);
+    // 34
+    IntList contextIntList = new IntList();
+    if (context
 
-        // 34
-        IntList contextIntList = new IntList();
-        if (context != null) {
+    
+        != null) {
             contextIntList.add(context.getConceptNid());
-        }
-        IntList.writeIntList(out, contextIntList);
-
-        // 35
-        writeConceptAsId(classificationRoot, out);
-        writeConceptAsId(classifierIsaType, out);
-        writeConceptAsId(classifierInputPathConcept, out);
-        writeConceptAsId(classifierOutputPathConcept, out);
-
-        // 36
-        out.writeObject(contradictionStrategy);
-        out.writeBoolean(highlightConflictsInComponentPanel);
-        out.writeBoolean(highlightConflictsInTaxonomyView);
-
-        // 37
-        IntList pathColorMapKeyIntList = new IntList();
-        for (Integer key : pathColorMap.keySet()) {
-            pathColorMapKeyIntList.add(key);
-        }
-        IntList.writeIntList(out, pathColorMapKeyIntList);
-        for (Integer key : pathColorMapKeyIntList.getListValues()) {
-            Color pathColor = pathColorMap.get(key);
-            out.writeObject(pathColor);
-        }
-        IntList.writeIntList(out, languagePreferenceList);
-
-        // 38
-        out.writeObject(properties);
-
-        // 39
-        out.writeObject(conceptPanelPlugins);
-
-        // 40
-        out.writeObject(langSortPref);
-
-        // 41
-        IntSet.writeIntSet(out, prefFilterTypesForRel);
-
-        // 42
-        out.writeObject(showPathInfoInTaxonomy);
-
-        // 43
-        out.writeBoolean(searchWithDescTypeFilter);
-
-        // 44
-        Path.writePathSet(out, promotionPathSet);
-
-        // 45
-        writeConceptAsId(classificationRoleRoot, out);
-
-        // 46; 47 changed implementation class
-        out.writeObject(precedence);
-
-        // 48
-        writeConceptAsId(classifierConcept, out);
-        out.writeObject(relAssertionType);
-
-        // 49
-        out.writeObject(classifierInputMode);
-        
-        // 50
-        out.writeObject(Ts.get().getUuidsForNid(moduleNid));
-
-        // 51 :SNOOWL:
-        out.writeBoolean(classifierOwlFeatureStatus); // :SNOOWL:
-
     }
 
-    private void writeConceptAsId(I_GetConceptData concept, ObjectOutputStream out) throws IOException {
+    IntList.writeIntList (out, contextIntList);
+
+    // 35
+    writeConceptAsId(classificationRoot, out);
+
+    writeConceptAsId(classifierIsaType, out);
+
+    writeConceptAsId(classifierInputPathConcept, out);
+
+    writeConceptAsId(classifierOutputPathConcept, out);
+
+    // 36
+    out.writeObject (contradictionStrategy);
+
+    out.writeBoolean (highlightConflictsInComponentPanel);
+
+    out.writeBoolean (highlightConflictsInTaxonomyView);
+    // 37
+    IntList pathColorMapKeyIntList = new IntList();
+    for (Integer key
+
+    : pathColorMap.keySet () 
+        ) {
+            pathColorMapKeyIntList.add(key);
+    }
+
+    IntList.writeIntList (out, pathColorMapKeyIntList);
+    for (Integer key
+
+    : pathColorMapKeyIntList.getListValues () 
+        ) {
+            Color pathColor = pathColorMap.get(key);
+        out.writeObject(pathColor);
+    }
+
+    IntList.writeIntList (out, languagePreferenceList);
+
+    // 38
+    out.writeObject (properties);
+
+    // 39
+    out.writeObject (conceptPanelPlugins);
+
+    // 40
+    out.writeObject (langSortPref);
+
+    // 41
+    IntSet.writeIntSet (out, prefFilterTypesForRel);
+
+    // 42
+    out.writeObject (showPathInfoInTaxonomy);
+
+    // 43
+    out.writeBoolean (searchWithDescTypeFilter);
+
+    // 44
+    Path.writePathSet (out, promotionPathSet);
+
+    // 45
+    writeConceptAsId(classificationRoleRoot, out);
+
+    // 46; 47 changed implementation class
+    out.writeObject (precedence);
+
+    // 48
+    writeConceptAsId(classifierConcept, out);
+
+    out.writeObject (relAssertionType);
+
+    // 49
+    out.writeObject (classifierInputMode);
+
+    // 50
+    out.writeObject (Ts.get
+
+    ().getUuidsForNid(moduleNid));
+
+        // 51 :SNOOWL:
+        out.writeBoolean (classifierOwlFeatureStatus); // :SNOOWL:
+}
+private void writeConceptAsId(I_GetConceptData concept, ObjectOutputStream out) throws IOException {
         if (concept == null) {
             out.writeObject(null);
         } else {
@@ -681,7 +698,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     @SuppressWarnings("unchecked")
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         commitEnabled = false;
         int objDataVersion = in.readInt();
         if (objDataVersion >= 1) {
@@ -1153,12 +1170,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             } else {
                 classifierInputMode = CLASSIFIER_INPUT_MODE_PREF.EDIT_PATH;
             }
-            
+
             if (objDataVersion < 50) {
-               moduleNid = Ts.get().getNidForUuids(TkRevision.unspecifiedModuleUuid);
-            } else if (objDataVersion == 50 || objDataVersion == 51 ) {
-               throw new IOException("Bad dataversion: " + objDataVersion);
-            } else if (objDataVersion  > 51) {
+                moduleNid = Ts.get().getNidForUuids(TkRevision.unspecifiedModuleUuid);
+            } else if (objDataVersion == 50 || objDataVersion == 51) {
+                throw new IOException("Bad dataversion: " + objDataVersion);
+            } else if (objDataVersion > 51) {
                 Collection<UUID> moduleUuids = (Collection<UUID>) in.readObject(); //52
                 moduleNid = Ts.get().getNidForUuids(moduleUuids);
             }
@@ -1176,7 +1193,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     @Override
-    public EditCoordinate getEditCoordinate() {
+        public EditCoordinate getEditCoordinate() {
         NidSet editPaths = new NidSet(editingPathSet);
         return new EditCoordinate(getDbConfig().getUserConcept().getNid(),
                 moduleNid,
@@ -1184,12 +1201,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     @Override
-    public I_GetConceptData getClassifierConcept() {
+        public I_GetConceptData getClassifierConcept() {
         return classifierConcept;
     }
 
     @Override
-    public void setClassifierConcept(I_GetConceptData classifierConcept) {
+        public void setClassifierConcept(I_GetConceptData classifierConcept) {
         vc = null;
         if (classifierConcept != null) {
             Object old = this.classifierConcept;
@@ -1199,7 +1216,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     @SuppressWarnings("unchecked")
-    private I_GetConceptData readConceptFromSerializedUuids(java.io.ObjectInputStream in) throws TerminologyException,
+        private I_GetConceptData readConceptFromSerializedUuids(java.io.ObjectInputStream in) throws TerminologyException,
             IOException, ClassNotFoundException {
         Object obj = in.readObject();
         if (obj == null) {
@@ -1264,7 +1281,6 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     private void addRootListener() {
         this.roots.addListDataListener(new ListDataListener() {
-
             public void contentsChanged(ListDataEvent e) {
                 changeSupport.firePropertyChange("roots", null, roots);
             }
@@ -1374,9 +1390,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         vc = null;
         if (this.viewPositions.size() > 2 && aceFrame != null) {
             SwingUtilities.invokeLater(new Runnable() {
-
                 @Override
-                public void run() {
+        public void run() {
                     JOptionPane.showMessageDialog(aceFrame, "<html>Selecting too many view positions may <br>"
                             + "cause the application to run out of memory.",
                             "warning",
@@ -1862,12 +1877,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getDefaultRelationshipType()
      */
     @Override
-    public I_GetConceptData getDefaultRelationshipType() {
+        public I_GetConceptData getDefaultRelationshipType() {
         return defaultRelationshipType;
     }
 
     @Override
-    public void setDefaultRelationshipType(I_GetConceptData defaultRelationshipType) {
+        public void setDefaultRelationshipType(I_GetConceptData defaultRelationshipType) {
         Object old = this.defaultRelationshipType;
         this.defaultRelationshipType = defaultRelationshipType;
         changeSupport.firePropertyChange("defaultRelationshipType", old, defaultRelationshipType);
@@ -1934,7 +1949,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      * @see org.dwfa.ace.config.I_ConfigAceFrame#setTreeTermDividerLoc(int)
      */
     @Override
-    public void setTreeTermDividerLoc(int termTreeDividerLoc) {
+        public void setTreeTermDividerLoc(int termTreeDividerLoc) {
         this.termTreeDividerLoc = termTreeDividerLoc;
     }
 
@@ -1943,24 +1958,23 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getHierarchySelection()
      */
     @Override
-    public I_GetConceptData getHierarchySelection() {
+        public I_GetConceptData getHierarchySelection() {
         return hierarchySelection;
     }
 
     @Override
-    public void setHierarchySelection(I_GetConceptData hierarchySelection) {
+        public void setHierarchySelection(I_GetConceptData hierarchySelection) {
         Object old = this.hierarchySelection;
         this.hierarchySelection = hierarchySelection;
         this.changeSupport.firePropertyChange("hierarchySelection", old, hierarchySelection);
     }
 
     @Override
-    public void setHierarchySelectionAndExpand(I_GetConceptData hierarchySelection) throws IOException {
+        public void setHierarchySelectionAndExpand(I_GetConceptData hierarchySelection) throws IOException {
         setHierarchySelection(hierarchySelection);
         SwingUtilities.invokeLater(new Runnable() {
-
             @Override
-            public void run() {
+        public void run() {
                 try {
                     PathExpander epl = new PathExpander(getAceFrame().getCdePanel().getTree(), AceFrameConfig.this,
                             getHierarchySelection());
@@ -2361,26 +2375,27 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public void svnUnlock(SubversionData svd, File toUnlock) throws TaskFailedException {
         aceFrame.setupSvn();
         Svn.unlock(svd, toUnlock, getAuthenticator(svd), true);
-    }
+    
+
+}
 
     public class QueueFilter implements ServiceItemFilter {
 
-        public boolean check(ServiceItem item) {
-            if (showAllQueues) {
+    public boolean check(ServiceItem item) {
+        if (showAllQueues) {
+            return true;
+        }
+        HashSet<Entry> itemAttributes = new HashSet<Entry>(Arrays.asList(item.attributeSets));
+        for (String address : queueAddressesToShow) {
+            if (itemAttributes.contains(new ElectronicAddress(address))) {
+                AceLog.getAppLog().info(" true");
                 return true;
             }
-            HashSet<Entry> itemAttributes = new HashSet<Entry>(Arrays.asList(item.attributeSets));
-            for (String address : queueAddressesToShow) {
-                if (itemAttributes.contains(new ElectronicAddress(address))) {
-                    AceLog.getAppLog().info(" true");
-                    return true;
-                }
-            }
-            return false;
         }
+        return false;
     }
-
-    public ServiceItemFilter getInboxQueueFilter() {
+}
+public ServiceItemFilter getInboxQueueFilter() {
         return new QueueFilter();
     }
 
@@ -2467,7 +2482,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     @Override
-    public I_HostConceptPlugins getListConceptViewer() {
+        public I_HostConceptPlugins getListConceptViewer() {
         if (aceFrame == null) {
             return null;
         }
@@ -2633,7 +2648,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     @Override
-    public boolean isRefsetInToggleVisible(REFSET_TYPES refsetType, TOGGLES toggle) {
+        public boolean isRefsetInToggleVisible(REFSET_TYPES refsetType, TOGGLES toggle) {
         return visibleRefsets.contains(refsetType.name() + toggle.toString());
     }
 
@@ -2785,7 +2800,6 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public void closeFrame() {
         try {
             SwingUtilities.invokeAndWait(new Runnable() {
-
                 public void run() {
                     if (aceFrame != null) {
                         aceFrame.setVisible(false);
@@ -2803,7 +2817,6 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     public void setFrameVisible(final boolean visible) throws Exception {
         SwingUtilities.invokeAndWait(new Runnable() {
-
             public void run() {
                 if (aceFrame != null) {
                     aceFrame.setVisible(visible);
@@ -3265,7 +3278,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public void fireUpdateHierarchyView() {
         changeSupport.firePropertyChange("updateHierarchyView", false, true);
     }
-    
+
     public void fireUpdateLangPref() {
         changeSupport.firePropertyChange("languagePref", false, true);
     }
@@ -3297,78 +3310,78 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     @Override
-    public PositionSetReadOnly getViewPositionSetReadOnly() {
+        public PositionSetReadOnly getViewPositionSetReadOnly() {
         return new PositionSetReadOnly(getViewPositionSet());
     }
 
     @Override
-    public PathSetReadOnly getEditingPathSetReadOnly() {
+        public PathSetReadOnly getEditingPathSetReadOnly() {
         return new PathSetReadOnly(getEditingPathSet());
     }
 
     @Override
-    public PathSetReadOnly getPromotionPathSetReadOnly() {
+        public PathSetReadOnly getPromotionPathSetReadOnly() {
         return new PathSetReadOnly(getPromotionPathSet());
     }
 
     @Override
-    public Boolean getShowPromotionCheckBoxes() {
+        public Boolean getShowPromotionCheckBoxes() {
         return aceFrame.getCdePanel().getShowPromotionCheckBoxes();
     }
 
     @Override
-    public void setShowPromotionCheckBoxes(Boolean show) {
+        public void setShowPromotionCheckBoxes(Boolean show) {
         aceFrame.getCdePanel().setShowPromotionCheckBoxes(show);
     }
 
     @Override
-    public void refreshRefsetTab() {
+        public void refreshRefsetTab() {
         aceFrame.getCdePanel().refreshRefsetTab();
     }
 
     @Override
-    public Boolean getShowPromotionFilters() {
+        public Boolean getShowPromotionFilters() {
         return aceFrame.getCdePanel().getShowPromotionFilters();
     }
 
     @Override
-    public Boolean getShowPromotionTab() {
+        public Boolean getShowPromotionTab() {
         return aceFrame.getCdePanel().getShowPromotionTab();
     }
 
     @Override
-    public void setEnabledAllQueuesButton(boolean enable) {
+        public void setEnabledAllQueuesButton(boolean enable) {
         aceFrame.getCdePanel().setEnabledAllQueuesButton(enable);
     }
 
     @Override
-    public void setEnabledExistingInboxButton(boolean enable) {
+        public void setEnabledExistingInboxButton(boolean enable) {
         aceFrame.getCdePanel().setEnabledExistingInboxButton(enable);
     }
 
     @Override
-    public void setEnabledMoveListenerButton(boolean enable) {
+        public void setEnabledMoveListenerButton(boolean enable) {
         aceFrame.getCdePanel().setEnabledMoveListenerButton(enable);
     }
 
     @Override
-    public void setEnabledNewInboxButton(boolean enable) {
+        public void setEnabledNewInboxButton(boolean enable) {
         aceFrame.getCdePanel().setEnabledNewInboxButton(enable);
     }
 
     @Override
-    public void setShowPromotionFilters(Boolean show) {
+        public void setShowPromotionFilters(Boolean show) {
         aceFrame.getCdePanel().setShowPromotionFilters(show);
     }
 
     @Override
-    public void setShowPromotionTab(Boolean show) {
+        public void setShowPromotionTab(Boolean show) {
         aceFrame.getCdePanel().setShowPromotionTab(show);
     }
     ViewCoordinate vc = null;
 
     @Override
-    public ViewCoordinate getViewCoordinate() {
+        public ViewCoordinate getViewCoordinate() {
         if (vc == null) {
             if (languagePreferenceList != null && languagePreferenceList.size() > 1) {
                 vc = new ViewCoordinate(getPrecedence(), getViewPositionSetReadOnly(),
@@ -3394,17 +3407,17 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     @Override
-    public void quit() {
+        public void quit() {
         aceFrame.getCdePanel().quit();
     }
 
     @Override
-    public RelAssertionType getRelAssertionType() {
+        public RelAssertionType getRelAssertionType() {
         return relAssertionType;
     }
 
     @Override
-    public void setRelAssertionType(RelAssertionType relAssertionType) {
+        public void setRelAssertionType(RelAssertionType relAssertionType) {
 
         vc = null;
         Object old = this.relAssertionType;
@@ -3414,31 +3427,31 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     @Override
-    public boolean isAutoApproveOn() {
+        public boolean isAutoApproveOn() {
 
         return autoApprovedOn;
     }
 
     @Override
-    public void setAutoApprove(boolean b) {
+        public void setAutoApprove(boolean b) {
 
         this.autoApprovedOn = b;
     }
 
     @Override
-    public boolean isOverrideOn() {
+        public boolean isOverrideOn() {
 
         return overrideOn;
     }
 
     @Override
-    public void setOverride(boolean b) {
+        public void setOverride(boolean b) {
 
         this.overrideOn = b;
     }
 
     @Override
-    public TreeSet<? extends ConceptVersionBI> getWorkflowRoles() {
+        public TreeSet<? extends ConceptVersionBI> getWorkflowRoles() {
         if (workflowRoles == null) {
             WorkflowHelper.updateWorkflowUserRoles(getViewCoordinate());
         }
@@ -3447,12 +3460,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     @Override
-    public void setWorkflowRoles(TreeSet<? extends ConceptVersionBI> roles) {
+        public void setWorkflowRoles(TreeSet<? extends ConceptVersionBI> roles) {
         workflowRoles = roles;
     }
 
     @Override
-    public TreeSet<? extends ConceptVersionBI> getWorkflowStates() {
+        public TreeSet<? extends ConceptVersionBI> getWorkflowStates() {
         if (workflowStates == null) {
             WorkflowHelper.updateWorkflowStates(getViewCoordinate());
         }
@@ -3461,12 +3474,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     @Override
-    public void setWorkflowStates(TreeSet<? extends ConceptVersionBI> states) {
+        public void setWorkflowStates(TreeSet<? extends ConceptVersionBI> states) {
         workflowStates = states;
     }
 
     @Override
-    public TreeSet<? extends ConceptVersionBI> getWorkflowActions() {
+        public TreeSet<? extends ConceptVersionBI> getWorkflowActions() {
         if (workflowActions == null) {
             WorkflowHelper.updateWorkflowActions(getViewCoordinate());
         }
@@ -3475,12 +3488,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     @Override
-    public void setWorkflowActions(TreeSet<? extends ConceptVersionBI> actions) {
+        public void setWorkflowActions(TreeSet<? extends ConceptVersionBI> actions) {
         workflowActions = actions;
     }
 
     @Override
-    public List<UUID> getAllAvailableWorkflowActionUids() {
+        public List<UUID> getAllAvailableWorkflowActionUids() {
         if (availableWorkflowActions == null) {
             WorkflowHelper.updateWorkflowActions(getViewCoordinate());
         }
@@ -3489,12 +3502,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     @Override
-    public void setAllAvailableWorkflowActionUids(List<UUID> actions) {
+        public void setAllAvailableWorkflowActionUids(List<UUID> actions) {
         availableWorkflowActions = actions;
     }
-    
+
     @Override
-    public void setModuleNid(int moduleNid) {
+        public void setModuleNid(int moduleNid) {
         this.moduleNid = moduleNid;
     }
 }
