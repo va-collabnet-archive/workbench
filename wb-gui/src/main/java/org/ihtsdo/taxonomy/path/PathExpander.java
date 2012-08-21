@@ -73,7 +73,9 @@ public class PathExpander implements Runnable {
             parent = node;
          }
 
-         TaxonomyNode        focusNode = model.getNodeFactory().makeNode(Ts.get().getConceptVersion(config.getViewCoordinate(), focus.getNid()),
+         TaxonomyNode        focusNode = model.getNodeFactory().makeNode(
+                 Ts.get().getConceptVersion(model.getTs().getViewCoordinate(),
+                 focus.getNid()),
                  parent.getConceptNid(),
                  parent);
          PathSegmentExpander expander  = new PathSegmentExpander(tree.getNodeFactory(),
