@@ -157,6 +157,7 @@ public class AceRunner {
                     new AceSvn(AceRunner.class, jiniConfig).initialSubversionOperationsAndChangeSetImport(acePropertiesFile);
                 } catch (Exception ex) {
                     AceLog.getAppLog().alertAndLogException(ex);
+             AceLog.getAppLog().info("### exit from " + this.getClass().getCanonicalName());
                     System.exit(0);
                 }
             }
@@ -293,6 +294,7 @@ public class AceRunner {
             if (successCount == 0) {
                 JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
                     "No frames where opened. Now exiting.", "No successful logins...", JOptionPane.ERROR_MESSAGE);
+             AceLog.getAppLog().info("### exit from " + this.getClass().getCanonicalName());
                 System.exit(0);
             }
 
@@ -338,6 +340,7 @@ public class AceRunner {
             }
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
+             AceLog.getAppLog().info("### exit from " + this.getClass().getCanonicalName());
             System.exit(0);
         }
     }
@@ -450,6 +453,7 @@ public class AceRunner {
                 OpenFrames.removeFrameListener(fl);
             } catch (TaskFailedException e) {
                 AceLog.getAppLog().alertAndLogException(e);
+             AceLog.getAppLog().info("### exit from " + this.getClass().getCanonicalName());
                 System.exit(0);
             }
         }

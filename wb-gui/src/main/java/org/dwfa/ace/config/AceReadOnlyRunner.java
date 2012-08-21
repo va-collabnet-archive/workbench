@@ -145,6 +145,7 @@ public class AceReadOnlyRunner {
             }
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
+             AceLog.getAppLog().info("### exit from " + this.getClass().getCanonicalName());
             System.exit(0);
         }
     }

@@ -430,6 +430,7 @@ public class AceFrame extends ComponentFrame {
             }
             if (cfb.quit()) {
                 this.setVisible(false);
+             AceLog.getAppLog().info("### exit from " + this.getClass().getCanonicalName());
                 System.exit(0);
             } 
             return false;
