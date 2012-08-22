@@ -140,7 +140,8 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
                             destinationsOfChangedRels,
                             referencedComponentsOfChangedRefexs, 
                             changedComponents,
-                            renderer);
+                            renderer,
+                            helperName);
 
             FutureHelper.addFuture(ACE.threadPool.submit(changeWorker));
             }
