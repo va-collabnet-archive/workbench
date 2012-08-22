@@ -85,6 +85,7 @@ import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.binding.snomed.CaseSensitive;
 import org.ihtsdo.tk.binding.snomed.Language;
 import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
@@ -812,6 +813,16 @@ public class NewConcept extends PreviousNextOrCancel {
                 conceptSpec = new ConceptCB(fsnText, prefText, LANG_CODE.EN, isa, uuidArray);
             }
             conceptSpec.setComponentUuid(UUID.randomUUID());
+            List<DescriptionCAB> fullySpecifiedNameCABs = conceptSpec.getFullySpecifiedNameCABs();
+            for(DescriptionCAB fsnBp: fullySpecifiedNameCABs){
+                fsnBp.initialCaseSignificant = CsWordsHelper.isIcTypeSignificant(fsnBp.getText(),
+                        CaseSensitive.IC_SIGNIFICANT.getLenient().getNid());
+            }
+            List<DescriptionCAB> preferredNameCABs = conceptSpec.getPreferredNameCABs();
+            for(DescriptionCAB prefBp: preferredNameCABs){
+                prefBp.initialCaseSignificant = CsWordsHelper.isIcTypeSignificant(prefBp.getText(),
+                        CaseSensitive.IC_SIGNIFICANT.getLenient().getNid());
+            }
             newConcept = tc.constructIfNotCurrent(conceptSpec);
             
         } catch (IOException e) {
@@ -831,7 +842,8 @@ public class NewConcept extends PreviousNextOrCancel {
                     fsnConcept.getPrimUuid(),
                     LANG_CODE.EN_GB,
                     text,
-                    false);
+                    CsWordsHelper.isIcTypeSignificant(text,
+                        CaseSensitive.IC_SIGNIFICANT.getLenient().getNid()));
 
             tc.construct(descSpecGbFsn);
         } catch (IOException ex) {
@@ -870,7 +882,8 @@ public class NewConcept extends PreviousNextOrCancel {
                     synConcept.getPrimUuid(),
                     LANG_CODE.EN_GB,
                     text,
-                    false);
+                    CsWordsHelper.isIcTypeSignificant(text,
+                        CaseSensitive.IC_SIGNIFICANT.getLenient().getNid()));
 
             DescriptionChronicleBI dc = tc.construct(descSpecGbPref);
             cv = Ts.get().getComponentVersion(config.getViewCoordinate(), dc.getNid());
@@ -928,7 +941,8 @@ public class NewConcept extends PreviousNextOrCancel {
                     fsnConcept.getPrimUuid(),
                     LANG_CODE.EN_US,
                     text,
-                    false);
+                    CsWordsHelper.isIcTypeSignificant(text,
+                        CaseSensitive.IC_SIGNIFICANT.getLenient().getNid()));
 
             tc.construct(descSpecUsFsn);
         } catch (IOException ex) {
@@ -968,7 +982,8 @@ public class NewConcept extends PreviousNextOrCancel {
                     synConcept.getPrimUuid(),
                     LANG_CODE.EN_US,
                     text,
-                    false);
+                    CsWordsHelper.isIcTypeSignificant(text,
+                        CaseSensitive.IC_SIGNIFICANT.getLenient().getNid()));
 
             DescriptionChronicleBI dc = tc.construct(descSpecUsPref);
             cv = Ts.get().getComponentVersion(config.getViewCoordinate(), dc.getNid());
