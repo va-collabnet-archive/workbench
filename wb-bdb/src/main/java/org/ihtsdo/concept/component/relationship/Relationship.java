@@ -12,7 +12,6 @@ import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.PathSetReadOnly;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAceRelationship;
 import org.dwfa.ace.utypes.UniversalAceRelationshipPart;
@@ -24,7 +23,6 @@ import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.RevisionSet;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
-import org.ihtsdo.db.util.NidPair;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidSetBI;
@@ -45,12 +43,10 @@ import java.io.IOException;
 
 import java.util.*;
 import org.ihtsdo.db.change.ChangeNotifier;
-import org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RelationshipCAB;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
-import org.ihtsdo.tk.binding.snomed.TermAux;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipType;
 
 public class Relationship extends ConceptComponent<RelationshipRevision, Relationship>
@@ -59,7 +55,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
     private static int classifierAuthorNid = Integer.MIN_VALUE;
     private static VersionComputer<Relationship.Version> computer =
-            new VersionComputer<Relationship.Version>();
+            new VersionComputer<>();
     //~--- fields --------------------------------------------------------------
     private int c2Nid;
     private int characteristicNid;
@@ -80,14 +76,14 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     public Relationship(TkRelationship eRel, Concept enclosingConcept) throws IOException {
         super(eRel, enclosingConcept.getNid());
         c2Nid = Bdb.uuidToNid(eRel.getRelationshipTargetUuid());
-        setCharacteristicNid(Bdb.uuidToNid(eRel.getCharacteristicUuid()));
+        characteristicNid = Bdb.uuidToNid(eRel.getCharacteristicUuid());
         group = eRel.getRelationshipGroup();
-        setRefinabilityNid(Bdb.uuidToNid(eRel.getRefinabilityUuid()));
-        setTypeNid(Bdb.uuidToNid(eRel.getTypeUuid()));
+        refinabilityNid = Bdb.uuidToNid(eRel.getRefinabilityUuid());
+        typeNid = Bdb.uuidToNid(eRel.getTypeUuid());
         primordialSapNid = Bdb.getSapNid(eRel);
 
         if (eRel.getRevisionList() != null) {
-            revisions = new RevisionSet<RelationshipRevision, Relationship>(primordialSapNid);
+            revisions = new RevisionSet<>(primordialSapNid);
 
             for (TkRelationshipRevision erv : eRel.getRevisionList()) {
                 revisions.add(new RelationshipRevision(erv, this));
