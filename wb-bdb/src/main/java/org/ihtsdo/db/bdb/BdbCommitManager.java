@@ -98,6 +98,7 @@ public class BdbCommitManager {
     private static long lastCommit = Bdb.gVersion.incrementAndGet();
     private static long lastCancel = Integer.MIN_VALUE;
     private static Semaphore dbWriterPermit = new Semaphore(PERMIT_COUNT);
+    private static Semaphore dbCheckerPermit = new Semaphore(PERMIT_COUNT);
     private static List<I_TestDataConstraints> creationTests =
             new ArrayList<I_TestDataConstraints>();
     private static List<I_TestDataConstraints> commitTests =
@@ -106,6 +107,7 @@ public class BdbCommitManager {
             new ThreadGroup("commit manager threads");
     private static ExecutorService changeSetWriterService;
     private static ExecutorService dbWriterService;
+    private static ExecutorService dbCheckerService;
     private static ExecutorService luceneWriterService;
     /**
      * <p> listeners </p>
@@ -160,16 +162,38 @@ public class BdbCommitManager {
         if (Bdb.watchList.containsKey(concept.getNid())) {
             AceLog.getAppLog().info("---@@@ Adding uncommitted concept: " + concept.getNid() + " ---@@@ ");
         }
-
+       
         try {
-            if (performCreationTests) {
+            uncommittedCNids.setMember(concept.getNid());
+            dbWriterPermit.acquire();
+            dbWriterService.execute(new SetNidsForCid(concept));
+            dbWriterService.execute(new ConceptWriter(concept));
+            dbCheckerPermit.acquire();
+            dbCheckerService.execute(new DataChecker(concept));
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    private static class DataChecker extends SwingWorker<Boolean, Object>{
+       Concept concept;
+       
+       public DataChecker(Concept concept){
+           this.concept = concept;
+       }
+       
+       @Override
+       public Boolean doInBackground() {
+           Boolean testsDone = false;
+           if (performCreationTests) {
+                waitTillWritesFinished();
                 Set<AlertToDataConstraintFailure> warningsAndErrors = new HashSet<AlertToDataConstraintFailure>();
 
                 dataCheckMap.put(concept, warningsAndErrors);
                 DataCheckRunner checkRunner = DataCheckRunner.runDataChecks(concept, creationTests);
-                
-                checkRunner.latch.await();
                 try {
+                    checkRunner.latch.await();
+                
                     if(checkRunner.get().isEmpty()){
                         ConceptTemplates.dataChecks.put(concept.getNid(), false);
                         Ts.get().touchComponentAlert(concept.getNid());
@@ -177,22 +201,23 @@ public class BdbCommitManager {
                         ConceptTemplates.dataChecks.put(concept.getNid(), true);
                         Ts.get().touchComponentAlert(concept.getNid());
                     }
+                    testsDone = true;
                 } catch (InterruptedException e) {
-                    AceLog.getAppLog().alertAndLogException(e);
+                    throw new RuntimeException(e);
                 } catch (ExecutionException e) {
-                    AceLog.getAppLog().alertAndLogException(e);
+                    throw new RuntimeException(e);
                 }
             }
+           dbCheckerPermit.release();
+           return testsDone;
+       }
 
-            uncommittedCNids.setMember(concept.getNid());
-            dbWriterPermit.acquire();
-            dbWriterService.execute(new SetNidsForCid(concept));
-            dbWriterService.execute(new ConceptWriter(concept));
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
-        SwingUtilities.invokeLater(new UpdateFrames(concept));
+       @Override
+       protected void done() {
+            UpdateFrames updateFrames = new UpdateFrames(concept);
+            updateFrames.run();
+       }
+        
     }
 
     public static void addUncommitted(I_ExtendByRef extension) {
@@ -1234,6 +1259,8 @@ public class BdbCommitManager {
                 new NamedThreadFactory(commitManagerThreadGroup, "Change set writer"));
         dbWriterService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(),
                 new NamedThreadFactory(commitManagerThreadGroup, "Db writer"));
+        dbCheckerService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(),
+                new NamedThreadFactory(commitManagerThreadGroup, "Data checker"));
         luceneWriterService = Executors.newFixedThreadPool(1,
                 new NamedThreadFactory(commitManagerThreadGroup, "Lucene writer"));
         loadTests("commit", commitTests);
@@ -1250,6 +1277,10 @@ public class BdbCommitManager {
         dbWriterService.shutdown();
         AceLog.getAppLog().info("Awaiting termination of dbWriterService.");
         dbWriterService.awaitTermination(90, TimeUnit.MINUTES);
+        AceLog.getAppLog().info("Shutting down dbCheckerService.");
+        dbCheckerService.shutdown();
+        AceLog.getAppLog().info("Awaiting termination of dbCheckerService.");
+        dbCheckerService.awaitTermination(90, TimeUnit.MINUTES);
         AceLog.getAppLog().info("Shutting down luceneWriterService.");
         luceneWriterService.shutdown();
         AceLog.getAppLog().info("Awaiting termination of luceneWriterService.");
