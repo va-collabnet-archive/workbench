@@ -145,10 +145,11 @@ public class LoadBdbMulti extends AbstractMojo {
     private ThreadGroup loadBdbMultiDbThreadGroup = new ThreadGroup("LoadBdbMulti threads");
     ExecutorService executors = Executors.newCachedThreadPool(
             new NamedThreadFactory(loadBdbMultiDbThreadGroup, "converter "));
-    LinkedBlockingQueue<I_ProcessEConcept> converters = new LinkedBlockingQueue<I_ProcessEConcept>();
+    LinkedBlockingQueue<I_ProcessEConcept> converters = new LinkedBlockingQueue<>();
     private int runtimeConverterSize = Runtime.getRuntime().availableProcessors() * 2;
     private int converterSize = runtimeConverterSize;
-    ConcurrentSkipListSet<Object> watchSet = new ConcurrentSkipListSet<Object>();
+    ConcurrentSkipListSet<Object> watchSet = new ConcurrentSkipListSet<>();
+    ConcurrentSkipListSet<ConceptChronicleBI> indexedAnnotations = new ConcurrentSkipListSet<>();
 
     @Override
     public void execute() throws MojoExecutionException {
@@ -211,6 +212,9 @@ public class LoadBdbMulti extends AbstractMojo {
                     in.close();
                 }
                 System.out.println('.');
+                for (ConceptChronicleBI concept: indexedAnnotations) {
+                    Ts.get().addUncommittedNoChecks(concept);
+                }
                 getLog().info("Processed concept count: " + conceptsRead);
             }
 
@@ -694,7 +698,7 @@ public class LoadBdbMulti extends AbstractMojo {
                 AceLog.getAppLog().info("Watch found: " + eConcept);
             }
             try {
-                newConcept = Concept.get(eConcept);
+                newConcept = Concept.get(eConcept, indexedAnnotations);
                 if (newConcept != null) {
                     assert newConcept.readyToWrite();
                     Bdb.getConceptDb().writeConcept(newConcept);
