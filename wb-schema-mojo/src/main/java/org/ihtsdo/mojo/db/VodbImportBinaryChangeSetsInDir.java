@@ -20,6 +20,9 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashSet;
+import java.util.Set;
+import org.apache.derby.impl.sql.execute.HashScanResultSet;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -27,6 +30,8 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_ImplementTermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 /**
  * 
@@ -83,10 +88,14 @@ public class VodbImportBinaryChangeSetsInDir extends AbstractMojo {
 
             });
             if (changeSets != null) {
+                Set<ConceptChronicleBI> indexedAnnotations = new HashSet<>();
                 for (File csf : changeSets) {
                     getLog().info("Importing: " + csf.getName());
                     I_ReadChangeSet reader = termFactoryImpl.newBinaryChangeSetReader(csf);
-                    reader.read();
+                    reader.read(indexedAnnotations);
+                }
+                for (ConceptChronicleBI concept: indexedAnnotations) {
+                    Ts.get().addUncommittedNoChecks(concept);
                 }
             } else {
                 getLog().info("No change sets found.");
