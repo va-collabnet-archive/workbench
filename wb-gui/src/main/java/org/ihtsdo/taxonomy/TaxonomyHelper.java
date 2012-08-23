@@ -103,7 +103,7 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
    //~--- constructors --------------------------------------------------------
 
    public TaxonomyHelper(I_ConfigAceFrame config, String helperName, ChildNodeFilterBI childNodeFilter) {
-      super();
+      super(); 
       this.aceFrameConfig = config;
       this.assertionType  = config.getRelAssertionType();
       Ts.get().addTermChangeListener(this);

@@ -14,7 +14,7 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
  * @author kec
  */
 public class RefsetMemberChildFilter implements ChildNodeFilterBI {
-   ConceptVersionBI refsetConcept;
+   ConceptVersionBI refsetConcept; 
 
    //~--- constructors --------------------------------------------------------
 

@@ -19,7 +19,7 @@ import java.util.List;
  * @author kec
  */
 public class OrCompositeChildFilter implements ChildNodeFilterBI {
-   List<ChildNodeFilterBI> filterList = new ArrayList<ChildNodeFilterBI>();
+   List<ChildNodeFilterBI> filterList = new ArrayList<>();
 
    //~--- methods -------------------------------------------------------------
 
