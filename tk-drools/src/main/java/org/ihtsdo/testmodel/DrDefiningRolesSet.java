@@ -52,6 +52,14 @@ public class DrDefiningRolesSet {
 	}
 
 	public int getNumberOfIsas() {
+		numberOfIsas = 0;
+		for (DrRelationship loopRel : relationships) {
+			if (loopRel.getCharacteristicUuid().equals("3b0dbd3b-2e53-3a30-8576-6c7fa7773060") &&
+					loopRel.getTypeUuid().equals("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25") &&
+					loopRel.getStatusUuid().equals("d12702ee-c37f-385f-a070-61d56d4d0f1f")) {
+				numberOfIsas++;
+			}
+		}
 		return numberOfIsas;
 	}
 
