@@ -950,37 +950,38 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
     @Override
     public Set<Integer> getAllStampNids() throws IOException {
-        Set<Integer> sapNids = new HashSet<Integer>();
+        Set<Integer> stamps = new HashSet<Integer>();
 
         if (getConAttrs() != null) {
-            sapNids.addAll(getConAttrs().getComponentSapNids());
+            stamps.addAll(getConAttrs().getComponentSapNids());
         }
 
         if (getDescs() != null) {
             for (Description d : getDescs()) {
-                sapNids.addAll(d.getComponentSapNids());
+                stamps.addAll(d.getComponentSapNids());
             }
         }
 
         if (getRelationshipsSource() != null) {
             for (Relationship r : getSourceRels()) {
-                sapNids.addAll(r.getComponentSapNids());
+                stamps.addAll(r.getComponentSapNids());
             }
         }
 
         if (getImages() != null) {
             for (Image i : getImages()) {
-                sapNids.addAll(i.getComponentSapNids());
+                stamps.addAll(i.getComponentSapNids());
             }
         }
 
-        if (getRefsetMembers() != null) {
+        
+        if (!isAnnotationStyleRefex() && getRefsetMembers() != null) {
             for (ConceptComponent i : getRefsetMembers()) {
-                sapNids.addAll(i.getComponentSapNids());
+                stamps.addAll(i.getComponentSapNids());
             }
         }
 
-        return sapNids;
+        return stamps;
     }
 
     @Override

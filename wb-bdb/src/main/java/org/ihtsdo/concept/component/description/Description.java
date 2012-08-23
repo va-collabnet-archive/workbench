@@ -272,7 +272,7 @@ public class Description extends ConceptComponent<DescriptionRevision, Descripti
         int additionalVersionCount = input.readShort();
 
         if (additionalVersionCount > 0) {
-            revisions = new RevisionSet<DescriptionRevision, Description>(primordialSapNid);
+            revisions = new RevisionSet<>(primordialSapNid);
 
             for (int i = 0; i < additionalVersionCount; i++) {
                 DescriptionRevision dr = new DescriptionRevision(input, this);

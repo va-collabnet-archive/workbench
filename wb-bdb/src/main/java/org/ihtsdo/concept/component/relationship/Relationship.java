@@ -282,10 +282,10 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
         // nid, list size, and conceptNid are read already by the binder...
         c2Nid = input.readInt();
-        setCharacteristicNid(input.readInt());
+        characteristicNid = input.readInt();
         group = input.readSortedPackedInt();
-        setRefinabilityNid(input.readInt());
-        setTypeNid(input.readInt());
+        refinabilityNid = input.readInt();
+        typeNid = input.readInt();
 
         int additionalVersionCount = input.readSortedPackedInt();
 
