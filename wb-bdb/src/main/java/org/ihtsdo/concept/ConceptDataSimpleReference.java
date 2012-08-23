@@ -4,10 +4,6 @@ package org.ihtsdo.concept;
 
 import com.sleepycat.bind.tuple.TupleInput;
 
-import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_RelTuple;
-import org.dwfa.ace.log.AceLog;
 
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.ConceptComponentBinder;
@@ -37,7 +33,6 @@ import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
-import org.ihtsdo.tk.api.relationship.group.RelationshipGroupChronicleBI;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -54,6 +49,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 import org.ihtsdo.db.change.ChangeNotifier;
+import org.ihtsdo.tk.api.relationship.group.RelationshipGroupChronicleBI;
 
 public class ConceptDataSimpleReference extends ConceptDataManager {
    private AtomicReference<ConceptAttributes>              attributes =
@@ -565,8 +561,19 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
       if (getMemberNids().contains(nid)) {
          return getRefsetMember(nid);
       }
+      
+      ComponentChronicleBI<?> component = getAnnotation(nid);
+      
+      if (component != null) {
+          return component;
+      }
 
-      return getAnnotation(nid);
+      for (RelationshipGroupChronicleBI group : enclosingConcept.getAllRelGroups()) {
+         if (group.getNid() == nid) {
+            return group;
+         }
+      }
+      return null;
    }
 
    @Override
