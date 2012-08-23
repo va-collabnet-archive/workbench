@@ -23,6 +23,7 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +41,8 @@ import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/change sets", type = BeanType.TASK_BEAN) })
 public class ConvertEditPaths extends AbstractTask {
@@ -94,8 +97,12 @@ public class ConvertEditPaths extends AbstractTask {
             processors.add(writer);
 
             UniversalChangeSetReader csr = new UniversalChangeSetReader(processors, inputFile);
-            csr.read();
+            HashSet<ConceptChronicleBI> annotationIndexes = new HashSet<ConceptChronicleBI>();
+            csr.read(annotationIndexes);
             writer.close();
+            for (ConceptChronicleBI concept: annotationIndexes) {
+                Ts.get().addUncommittedNoChecks(concept);
+            }
         } catch (IllegalArgumentException e1) {
             throw new TaskFailedException(e1);
         } catch (IntrospectionException e1) {

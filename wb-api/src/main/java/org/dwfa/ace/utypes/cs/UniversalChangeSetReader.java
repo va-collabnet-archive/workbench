@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 
 import org.dwfa.ace.api.cs.I_Count;
@@ -36,6 +37,7 @@ import org.dwfa.ace.utypes.UniversalAceExtByRefBean;
 import org.dwfa.ace.utypes.UniversalAcePath;
 import org.dwfa.ace.utypes.UniversalIdList;
 import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 public class UniversalChangeSetReader implements I_ReadChangeSet {
 
@@ -93,7 +95,7 @@ public class UniversalChangeSetReader implements I_ReadChangeSet {
     }
 
     @Override
-    public void readUntil(long endTime) throws IOException, ClassNotFoundException {
+    public void readUntil(long endTime, Set<ConceptChronicleBI> annotationIndexes) throws IOException, ClassNotFoundException {
         if (AceLog.getEditLog().isLoggable(Level.INFO)) {
             
             AceLog.getEditLog().info(
@@ -164,8 +166,8 @@ public class UniversalChangeSetReader implements I_ReadChangeSet {
     }
 
     @Override
-    public void read() throws IOException, ClassNotFoundException {
-        readUntil(Long.MAX_VALUE);
+    public void read(Set<ConceptChronicleBI> annotationIndexes) throws IOException, ClassNotFoundException {
+        readUntil(Long.MAX_VALUE, annotationIndexes);
     }
 
     @SuppressWarnings("unchecked")

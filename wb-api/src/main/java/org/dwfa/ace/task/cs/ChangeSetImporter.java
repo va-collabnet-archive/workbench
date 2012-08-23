@@ -21,8 +21,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,6 +37,8 @@ import org.dwfa.ace.api.cs.I_ValidateChangeSetChanges;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 public abstract class ChangeSetImporter implements ActionListener {
@@ -89,23 +93,36 @@ public abstract class ChangeSetImporter implements ActionListener {
             activity.setMaximum(max);
             activity.setValue(0);
             activity.setIndeterminate(false);
+            Set<ConceptChronicleBI> annotationIndexes = new HashSet<ConceptChronicleBI>();
             while (readerSet.size() > 0 && continueImport) {
                 activity.setValue(max - avaibleBytes(readerSet));
                 activity.setProgressInfoLower(readerSet.first().getChangeSetFile().getName());
 
                 File potentialImportCSFile = readerSet.first().getChangeSetFile();
-                if (readNext(readerSet)) {
+                if (readNext(readerSet, annotationIndexes)) {
                     importedFileList.add(potentialImportCSFile);
                 }
             }
-
+            
+            for (ConceptChronicleBI annotatedIndex: annotationIndexes) {
+                Ts.get().addUncommittedNoChecks(annotatedIndex);
+            }
             if (commitAfterImport) {
                 Terms.get().commit();
             }
 
+            annotationIndexes.clear();
+            
             if (WorkflowHelper.isWorkflowCapabilityAvailable()) {
-                createWfHxLuceneIndex(activity, importedFileList);
+                createWfHxLuceneIndex(activity, importedFileList, annotationIndexes);
             }
+            for (ConceptChronicleBI annotatedIndex: annotationIndexes) {
+                Ts.get().addUncommittedNoChecks(annotatedIndex);
+            }
+            if (commitAfterImport) {
+                Terms.get().commit();
+            }
+
 
             activity.setIndeterminate(false);
             long elapsed = System.currentTimeMillis() - start;
@@ -117,7 +134,8 @@ public abstract class ChangeSetImporter implements ActionListener {
         }
     }
 
-    private void createWfHxLuceneIndex(I_ShowActivity activity, List<File> changeSetFiles) throws IOException, ClassNotFoundException {
+    private void createWfHxLuceneIndex(I_ShowActivity activity, List<File> changeSetFiles, 
+            Set<ConceptChronicleBI> indexedAnnotations) throws IOException, ClassNotFoundException {
         if (changeSetFiles.isEmpty()) {
             if (AceLog.getEditLog().isLoggable(Level.INFO)) {
                 AceLog.getEditLog().info("Workflow history lucene index already updated with all changes");
@@ -141,7 +159,7 @@ public abstract class ChangeSetImporter implements ActionListener {
             int counter = 0;
             while (wfHxReaderSet.size() > 0 && continueImport) {
                 activity.setValue(filesToImport - counter++);
-                readNext(wfHxReaderSet);
+                readNext(wfHxReaderSet, indexedAnnotations);
             }
 
             if (AceLog.getEditLog().isLoggable(Level.INFO)) {
@@ -153,7 +171,7 @@ public abstract class ChangeSetImporter implements ActionListener {
                 TreeSet<I_ReadChangeSet> finalizeWfHxLuceneIndexReaderSet = getSortedReaderSet();
                 finalizeWfHxLuceneIndexReaderSet.add(firstFile);
 
-                readNext(finalizeWfHxLuceneIndexReaderSet);
+                readNext(finalizeWfHxLuceneIndexReaderSet, indexedAnnotations);
             }
 
             if (AceLog.getEditLog().isLoggable(Level.INFO)) {
@@ -208,7 +226,7 @@ public abstract class ChangeSetImporter implements ActionListener {
         return readerSet;
     }
 
-    public static boolean readNext(TreeSet<I_ReadChangeSet> readerSet) throws IOException, ClassNotFoundException {
+    public static boolean readNext(TreeSet<I_ReadChangeSet> readerSet, Set<ConceptChronicleBI> indexedAnnotations) throws IOException, ClassNotFoundException {
         if (readerSet.isEmpty()) {
             return false;
         }
@@ -235,9 +253,9 @@ public abstract class ChangeSetImporter implements ActionListener {
         }
 
         if (nextCommitTime == null) {
-            first.readUntil(Long.MAX_VALUE);
+            first.readUntil(Long.MAX_VALUE, indexedAnnotations);
         } else {
-            first.readUntil(nextCommitTime);
+            first.readUntil(nextCommitTime, indexedAnnotations);
         }
         if (first.nextCommitTime() == Long.MAX_VALUE) {
             if (first.getChangeSetFile() != null) {

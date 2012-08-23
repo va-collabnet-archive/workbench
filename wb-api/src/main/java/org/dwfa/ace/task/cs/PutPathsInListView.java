@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -45,6 +46,8 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/change sets", type = BeanType.TASK_BEAN) })
 public class PutPathsInListView extends AbstractTask {
@@ -86,7 +89,11 @@ public class PutPathsInListView extends AbstractTask {
             CollectEditPaths editPaths = new CollectEditPaths();
 
             UniversalChangeSetReader csr = new UniversalChangeSetReader(editPaths, csFile);
-            csr.read();
+            Set<ConceptChronicleBI> annotationIndexes = new HashSet<ConceptChronicleBI>();
+            csr.read(annotationIndexes);
+            for (ConceptChronicleBI concept: annotationIndexes) {
+                Ts.get().addUncommittedNoChecks(concept);
+            }
 
             I_ConfigAceFrame profile = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             JList conceptList = profile.getBatchConceptList();
