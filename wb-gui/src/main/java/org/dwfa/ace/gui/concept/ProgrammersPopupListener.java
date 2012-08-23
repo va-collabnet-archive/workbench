@@ -47,6 +47,7 @@ import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.rules.testmodel.TerminologyHelperDroolsWorkbench;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
@@ -610,13 +611,17 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
                     Terms.get().suspendChangeSetWriters();
 
                     I_ReadChangeSet csr = Terms.get().newBinaryChangeSetReader(csf);
+                    HashSet<ConceptChronicleBI> annotatedIndexes = new HashSet<>();
 
-                    csr.read();
+                    csr.read(annotatedIndexes);
 
                     if (WorkflowHelper.isWorkflowCapabilityAvailable()) {
                         I_ReadChangeSet wcsr = Terms.get().newWfHxLuceneChangeSetReader(csf);
 
-                        wcsr.read();
+                        wcsr.read(annotatedIndexes);
+                    }
+                    for (ConceptChronicleBI concept: annotatedIndexes) {
+                        Ts.get().addUncommittedNoChecks(concept);
                     }
                 } finally {
                     Terms.get().resumeChangeSetWriters();

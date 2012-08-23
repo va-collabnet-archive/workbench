@@ -1,18 +1,14 @@
 /**
- * Copyright (c) 2009 International Health Terminology Standards Development
- * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ * Copyright (c) 2009 International Health Terminology Standards Development Organisation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and limitations under the License.
  */
 package org.dwfa.ace.cs;
 
@@ -23,6 +19,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.ObjectInputStream;
+import java.util.HashSet;
 import java.util.concurrent.CountDownLatch;
 import java.util.jar.JarInputStream;
 import java.util.logging.Level;
@@ -47,42 +44,29 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.fd.FileDialogUtil;
 import org.dwfa.tapi.ComputationCanceled;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 public class ImportChangeSetReader implements ActionListener, I_Count {
 
     JarInputStream input;
-
     boolean continueWork = true;
-
     String upperProgressMessage = "Reading Java Change Set";
-
     String lowerProgressMessage = "counting";
-
     int max = -1;
-
     int concepts = -1;
-
     int descriptions = -1;
-
     int relationships = -1;
-
     int ids = -1;
-
     int images = -1;
-
     int total = -1;
-
     int processed = 0;
-
     private CountDownLatch latch;
-
     private AceConfig config;
 
     private class ProgressUpdator implements I_UpdateProgress {
+
         Timer updateTimer;
-
         boolean firstUpdate = true;
-
         ActivityPanel activity = null;
 
         public ProgressUpdator() {
@@ -125,12 +109,11 @@ public class ImportChangeSetReader implements ActionListener, I_Count {
         this.config = config;
         try {
             final File csFile = FileDialogUtil.getExistingFile("Select Java Change Set to Import...",
-                new FilenameFilter() {
-
-                    public boolean accept(File dir, String name) {
-                        return name.toLowerCase().endsWith(".eccs");
-                    }
-                }, null, parentFrame);
+                    new FilenameFilter() {
+                        public boolean accept(File dir, String name) {
+                            return name.toLowerCase().endsWith(".eccs");
+                        }
+                    }, null, parentFrame);
 
             ProgressUpdator updater = new ProgressUpdator();
             updater.activity.addRefreshActionListener(this);
@@ -145,9 +128,8 @@ public class ImportChangeSetReader implements ActionListener, I_Count {
                         AceLog.getAppLog().alertAndLogException(ex);
                     } catch (Throwable ex) {
                         AceLog.getAppLog().alertAndLogException(ex);
-					}
+                    }
                 }
-
             });
         } catch (TaskFailedException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
@@ -167,7 +149,12 @@ public class ImportChangeSetReader implements ActionListener, I_Count {
             processed = 0;
             reader.setCounter(this);
             reader.setChangeSetFile(csFile);
-            reader.read();
+            HashSet<ConceptChronicleBI> annotatedIndexes = new HashSet<>();
+            reader.read(annotatedIndexes);
+
+            for (ConceptChronicleBI concept : annotatedIndexes) {
+                Ts.get().addUncommittedNoChecks(concept);
+            }
 
             lowerProgressMessage = "Starting sync ";
             Terms.get().commit();
@@ -196,7 +183,6 @@ public class ImportChangeSetReader implements ActionListener, I_Count {
                             }
                         }
                     }
-
                 });
             }
         } catch (Exception e) {
@@ -214,5 +200,4 @@ public class ImportChangeSetReader implements ActionListener, I_Count {
     public void increment() {
         processed++;
     }
-
 }
