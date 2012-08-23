@@ -566,12 +566,6 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
          return getRefsetMember(nid);
       }
 
-      for (RelationshipGroupChronicleBI group : enclosingConcept.getAllRelGroups()) {
-         if (group.getNid() == nid) {
-            return group;
-         }
-      }
-
       return getAnnotation(nid);
    }
 

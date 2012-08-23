@@ -138,9 +138,6 @@ public class WorkbenchRunner {
                 EConceptChangeSetWriter.writeDebugFiles =
                         (Boolean) jiniConfig.getEntry(this.getClass().getName(), "writeDebugFiles", Boolean.class,
                         Boolean.FALSE);
-                EConceptChangeSetWriter.validateAfterWrite =
-                        (Boolean) jiniConfig.getEntry(this.getClass().getName(), "validateAfterWrite", Boolean.class,
-                        Boolean.FALSE);
                 
                 BatchActionEditorPanel.batchEditingDisabled = 
                         (Boolean) jiniConfig.getEntry(this.getClass().getName(), "batchEditingDisabled", Boolean.class,

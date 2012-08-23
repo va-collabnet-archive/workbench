@@ -35,6 +35,7 @@ import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.lucene.WfHxLuceneWriterAccessor;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
@@ -96,7 +97,7 @@ public class WfRefsetChangeSetReader implements I_ReadChangeSet {
     }
 
     @Override
-    public void readUntil(long endTime) throws IOException,
+    public void readUntil(long endTime, Set<ConceptChronicleBI> annotationIndexes) throws IOException,
             ClassNotFoundException {
         HashSet<TimePathId> values = new HashSet<TimePathId>();
 
@@ -122,7 +123,7 @@ public class WfRefsetChangeSetReader implements I_ReadChangeSet {
             wfMembersToCommit.addAll(membersToScrub);
 
             // Done Scrubbing, now commit wfMembersToCommit into the workflow refsets
-            importWfRefsetMembers();
+            importWfRefsetMembers(annotationIndexes);
 
             // Update the WfHx Refset based on wfMembersToCommit as well
             updateWfHxLuceneIndex();
@@ -204,7 +205,7 @@ public class WfRefsetChangeSetReader implements I_ReadChangeSet {
         }
     }
 
-    private void importWfRefsetMembers() {
+    private void importWfRefsetMembers(Set<ConceptChronicleBI> annotationIndexes) {
         // reconstitute now scrubbed members into membersMap to assist in sorting for alg
         membersMap.clear();
         for (TkRefexAbstractMember<?> member : wfMembersToCommit) {
@@ -239,7 +240,8 @@ public class WfRefsetChangeSetReader implements I_ReadChangeSet {
                             } else {
                                 r.merge((RefsetMember) RefsetMemberFactory.create(
                                         er,
-                                        Ts.get().getConceptNidForNid(cc.getNid())));
+                                        Ts.get().getConceptNidForNid(cc.getNid())), 
+                                        annotationIndexes);
                             }
                         } else {
                             unresolvedAnnotations.add(er);
@@ -272,7 +274,7 @@ public class WfRefsetChangeSetReader implements I_ReadChangeSet {
 
                             if (currentMemberNids.contains(rNid) && (r != null)) {
                                 r.merge((RefsetMember) RefsetMemberFactory.create(
-                                        er, c.getNid()));
+                                        er, c.getNid()), annotationIndexes);
                             } else {
                                 c.getRefsetMembers().add(
                                         RefsetMemberFactory.create(er, c.getNid()));
@@ -285,7 +287,7 @@ public class WfRefsetChangeSetReader implements I_ReadChangeSet {
                 BdbCommitManager.addUncommittedNoChecks(c);
             }
 
-            Concept.resolveUnresolvedAnnotations(unresolvedAnnotations);
+            Concept.resolveUnresolvedAnnotations(unresolvedAnnotations, annotationIndexes);
         } catch (Exception e) {
             AceLog.getEditLog().severe("Failed importing wfMembersToCommit");
         }
@@ -336,8 +338,8 @@ public class WfRefsetChangeSetReader implements I_ReadChangeSet {
     }
 
     @Override
-    public void read() throws IOException, ClassNotFoundException {
-        readUntil(Long.MAX_VALUE);
+    public void read(Set<ConceptChronicleBI> annotationIndexes) throws IOException, ClassNotFoundException {
+        readUntil(Long.MAX_VALUE, annotationIndexes);
     }
 
     private void lazyInit() throws FileNotFoundException, IOException,

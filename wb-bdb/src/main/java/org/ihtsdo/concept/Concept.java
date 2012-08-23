@@ -386,21 +386,21 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         return aac.isComponentChanged();
     }
 
-    public static Concept mergeAndWrite(EConcept eConcept) throws IOException {
+    public static Concept mergeAndWrite(EConcept eConcept, Set<ConceptChronicleBI> indexedAnnotationConcepts) throws IOException {
         int conceptNid = Bdb.uuidToNid(eConcept.getPrimordialUuid());
 
         assert conceptNid != Integer.MAX_VALUE : "no conceptNid for uuids";
 
         Concept c = get(conceptNid);
 
-        mergeWithEConcept(eConcept, c, true);
+        mergeWithEConcept(eConcept, c, true, indexedAnnotationConcepts);
         BdbCommitManager.addUncommittedNoChecks(c);
 
         return c;
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private static Concept mergeWithEConcept(EConcept eConcept, Concept c, boolean updateLucene)
+    private static Concept mergeWithEConcept(EConcept eConcept, Concept c, boolean updateLucene, Set<ConceptChronicleBI> indexedAnnotationConcepts)
             throws IOException {
         if (c.isAnnotationStyleRefex() == false) {
             c.setAnnotationStyleRefex(eConcept.isAnnotationStyleRefex());
@@ -417,7 +417,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                 setAttributesFromEConcept(c, eAttr);
             } else {
                 ConceptAttributes ca = c.getConAttrs();
-                ca.merge(new ConceptAttributes(eAttr, c));
+                ca.merge(new ConceptAttributes(eAttr, c), indexedAnnotationConcepts);
             }
             ChangeNotifier.touch(c.nid, ChangeNotifier.Change.COMPONENT);
         }
@@ -434,7 +434,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                     if (currentDNids.contains(dNid)) {
                         Description d = c.getDescription(dNid);
                         ChangeNotifier.touch(d.nid, ChangeNotifier.Change.COMPONENT);
-                        d.merge(new Description(ed, c));
+                        d.merge(new Description(ed, c), indexedAnnotationConcepts);
                     } else {
                         Description d = new Description(ed, c);
                         ChangeNotifier.touch(d.nid, ChangeNotifier.Change.COMPONENT);
@@ -462,7 +462,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                         Relationship r = c.getSourceRel(rNid);
                         ChangeNotifier.touch(r.getSourceNid(), ChangeNotifier.Change.REL_ORIGIN);
                         ChangeNotifier.touch(r.getTargetNid(), ChangeNotifier.Change.REL_XREF);
-                        r.merge(new Relationship(er, c));
+                        r.merge(new Relationship(er, c), indexedAnnotationConcepts);
                     } else {
                         Relationship r = new Relationship(er, c);
                         ChangeNotifier.touch(r.getSourceNid(), ChangeNotifier.Change.REL_ORIGIN);
@@ -487,7 +487,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                     if (currentImageNids.contains(iNid)) {
                         Image img = c.getImage(iNid);
 
-                        img.merge(new Image(eImg, c));
+                        img.merge(new Image(eImg, c), indexedAnnotationConcepts);
                     } else {
                         c.getImages().add(new Image(eImg, c));
                     }
@@ -523,7 +523,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                             cc.addAnnotation(r);
                         } else {
                             r.merge((RefsetMember) RefsetMemberFactory.create(er,
-                                    Bdb.getConceptNid(cc.getNid())));
+                                    Bdb.getConceptNid(cc.getNid())), indexedAnnotationConcepts);
                         }
                         ChangeNotifier.touchRefexRC(r.getReferencedComponentNid());
 
@@ -542,7 +542,8 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                         RefsetMember<?, ?> r = c.getRefsetMember(rNid);
 
                         if (currentMemberNids.contains(rNid) && (r != null)) {
-                            r.merge((RefsetMember) RefsetMemberFactory.create(er, c.getNid()));
+                            r.mergeNoReturn(RefsetMemberFactory.create(er, c.getNid()),
+                                    indexedAnnotationConcepts);
                         } else {
                             r = RefsetMemberFactory.create(er, c.getNid());
                             c.getRefsetMembers().add(r);
@@ -675,14 +676,15 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         data.resetNidData();
     }
 
-    public static void resolveUnresolvedAnnotations(List<TkRefexAbstractMember<?>> annotations) throws IOException {
+    public static void resolveUnresolvedAnnotations(List<TkRefexAbstractMember<?>> annotations,
+            Set<ConceptChronicleBI> annotatedIndexes) throws IOException {
         unresolvedAnnotations = annotations;
 
-        resolveUnresolvedAnnotations();
+        resolveUnresolvedAnnotations(annotatedIndexes);
     }
 
-    public static void resolveUnresolvedAnnotations() throws IOException {
-        List<TkRefexAbstractMember<?>> cantResolve = new ArrayList<TkRefexAbstractMember<?>>();
+    public static void resolveUnresolvedAnnotations(Set<ConceptChronicleBI> annotatedIndexes) throws IOException {
+        List<TkRefexAbstractMember<?>> cantResolve = new ArrayList<>();
 
         for (TkRefexAbstractMember<?> er : unresolvedAnnotations) {
             ConceptComponent cc;
@@ -702,7 +704,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                     cc.addAnnotation(r);
                 } else {
                     r.merge((RefsetMember) RefsetMemberFactory.create(er,
-                            Ts.get().getConceptNidForNid(cc.getNid())));
+                            Ts.get().getConceptNidForNid(cc.getNid())), annotatedIndexes);
                 }
                 ChangeNotifier.touchRefexRC(r.getReferencedComponentNid());
 
@@ -824,7 +826,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     }
 
     //~--- get methods ---------------------------------------------------------
-    public static Concept get(EConcept eConcept) throws IOException {
+    public static Concept get(EConcept eConcept, Set<ConceptChronicleBI> indexedAnnotationConcepts) throws IOException {
         int conceptNid = Bdb.uuidToNid(eConcept.getPrimordialUuid());
 
         Bdb.getNidCNidMap().setCNidForNid(conceptNid, conceptNid);
@@ -834,7 +836,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
         // return populateFromEConcept(eConcept, c);
         try {
-            return mergeWithEConcept(eConcept, c, false);
+            return mergeWithEConcept(eConcept, c, false, indexedAnnotationConcepts);
         } catch (Throwable t) {
             AceLog.getAppLog().severe("Cannot merge with eConcept: \n" + eConcept, t);
         }

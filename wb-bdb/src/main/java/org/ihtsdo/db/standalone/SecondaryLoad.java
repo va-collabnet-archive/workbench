@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.HashSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -15,6 +16,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.thread.NamedThreadFactory;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 public class SecondaryLoad {
 	static AtomicInteger conceptsRead = new AtomicInteger();
@@ -54,7 +56,7 @@ public class SecondaryLoad {
 	            while (fis.available() > 0) {
 	            	conceptsReread++;
 	            	EConcept eConcept = new EConcept(in);
-	            	Concept newConcept = Concept.get(eConcept);
+	            	Concept newConcept = Concept.get(eConcept, new HashSet<ConceptChronicleBI>());
 
 	            	Bdb.getConceptDb().getConcept(newConcept.getConceptNid());
 	            
@@ -97,7 +99,7 @@ public class SecondaryLoad {
 				nidCnidMap = Bdb.getNidCNidMap();
 			}
 			try {
-				newConcept = Concept.get(eConcept);
+				newConcept = Concept.get(eConcept, new HashSet<ConceptChronicleBI>());
 				Bdb.getConceptDb().writeConcept(newConcept);
 				conceptsProcessed.incrementAndGet();
 			} catch (Throwable e) {

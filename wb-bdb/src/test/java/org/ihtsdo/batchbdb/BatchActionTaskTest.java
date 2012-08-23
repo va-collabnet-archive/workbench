@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -203,7 +204,7 @@ public class BatchActionTaskTest {
             try {
                 while (true) {
                     EConcept eConcept = new EConcept(in);
-                    Concept newConcept = Concept.get(eConcept);
+                    Concept newConcept = Concept.get(eConcept, new HashSet<ConceptChronicleBI>());
                     Bdb.getConceptDb().writeConcept(newConcept);
                 }
             } catch (EOFException e) {

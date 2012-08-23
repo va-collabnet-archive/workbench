@@ -54,6 +54,7 @@ import java.io.IOException;
 import java.util.*;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 
 public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends RefsetMember<R, C>>
@@ -191,8 +192,12 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
     protected abstract boolean refexFieldsEqual(ConceptComponent<R, C> obj);
 
     @SuppressWarnings("unchecked")
-    public RefsetMember<R, C> merge(RefsetMember<R, C> component) throws IOException {
-        return (RefsetMember<R, C>) super.merge((C) component);
+    public RefsetMember<R, C> merge(RefsetMember<R, C> component, Set<ConceptChronicleBI> annotationConcepts) throws IOException {
+        return (RefsetMember<R, C>) super.merge((C) component, annotationConcepts);
+    }
+
+    public void mergeNoReturn(RefsetMember<?, ?> component, Set<ConceptChronicleBI> annotationConcepts) throws IOException {
+        super.merge((C) component, annotationConcepts);
     }
 
     private void moveRefset(Concept from, Concept to) throws IOException {

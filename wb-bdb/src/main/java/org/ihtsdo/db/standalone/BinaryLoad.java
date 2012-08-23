@@ -9,6 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -28,6 +29,7 @@ import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.thread.NamedThreadFactory;
 import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescriptionRevision;
 
@@ -232,7 +234,7 @@ public class BinaryLoad {
 				nidCnidMap = Bdb.getNidCNidMap();
 			}
 			try {
-				newConcept = Concept.get(eConcept);
+				newConcept = Concept.get(eConcept, new HashSet<ConceptChronicleBI>());
 				Bdb.getConceptDb().writeConcept(newConcept);
 				conceptsProcessed.incrementAndGet();
 			} catch (Throwable e) {

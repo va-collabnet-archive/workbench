@@ -90,6 +90,7 @@ import java.util.logging.Logger;
 import org.dwfa.util.id.Type3UuidFactory;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.db.change.ChangeNotifier;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.binding.snomed.TermAux;
 
 public abstract class ConceptComponent<R extends Revision<R, C>, C extends ConceptComponent<R, C>>
@@ -191,7 +192,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
     }
 
-    public ConceptComponent<R, C> merge(C another, boolean notify) throws IOException {
+    public ConceptComponent<R, C> merge(C another, boolean notify, Set<ConceptChronicleBI> indexedAnnotationConcepts) throws IOException {
         Set<Integer> versionSapNids = getVersionSapNids();
 
         // merge versions
@@ -252,7 +253,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                 for(RefsetMember refsetMember : anotherAnnotationMap.values()){
                     Concept refsetConcept = (Concept)Ts.get().getConceptForNid(refsetMember.getRefsetId());
                     if(refsetConcept.isAnnotationIndex()){
-                        refsetConcept.getData().add(refsetMember);
+                        refsetConcept.getData().getMemberNids().add(refsetMember.getNid());
+                        indexedAnnotationConcepts.add(refsetConcept);
                     }
                 }
             }
@@ -799,9 +801,9 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         throw new UnsupportedOperationException();
     }
 
-    public ConceptComponent<R, C> merge(C another) throws IOException {
+    public ConceptComponent<R, C> merge(C another, Set<ConceptChronicleBI> indexedAnnotationConcepts) throws IOException {
 
-        return merge(another, true);
+        return merge(another, true, indexedAnnotationConcepts);
     }
 
     /**

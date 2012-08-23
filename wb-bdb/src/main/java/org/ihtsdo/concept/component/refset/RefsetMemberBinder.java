@@ -20,9 +20,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 public class RefsetMemberBinder extends TupleBinding<Collection<RefsetMember<?, ?>>>
         implements I_BindConceptComponents {
@@ -131,7 +133,8 @@ public class RefsetMemberBinder extends TupleBinding<Collection<RefsetMember<?, 
                         }
                      }
                   } else {
-                     refsetMember.merge(factory.create(nid, typeNid, enclosingConcept.getNid(), input));
+                     refsetMember.merge(factory.create(nid, typeNid, enclosingConcept.getNid(), input), 
+                             new HashSet<ConceptChronicleBI>());
                   }
                } catch (IOException e) {
                   throw new RuntimeException(e);

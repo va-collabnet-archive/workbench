@@ -31,6 +31,7 @@ import org.ihtsdo.etypes.EConcept;
 
 import com.sleepycat.je.DatabaseException;
 import org.ihtsdo.helper.time.TimeHelper;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 public class EConceptChangeSetReader implements I_ReadChangeSet {
 
@@ -70,7 +71,7 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
         this.noCommit = noCommit;
     }
 
-    private transient List<I_ValidateChangeSetChanges> validators = new ArrayList<I_ValidateChangeSetChanges>();
+    private transient List<I_ValidateChangeSetChanges> validators = new ArrayList<>();
 
 	private boolean fileContentMerged = false;
 
@@ -96,8 +97,8 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
     }
 
    @Override
-    public void readUntil(long endTime) throws IOException, ClassNotFoundException {
-        HashSet<TimePathId> values = new HashSet<TimePathId>();
+    public void readUntil(long endTime, Set<ConceptChronicleBI> annotatedIndexes) throws IOException, ClassNotFoundException {
+        HashSet<TimePathId> values = new HashSet<>();
         if (AceLog.getEditLog().isLoggable(Level.INFO)) {
             AceLog.getEditLog().info(
                 "Reading from log " + changeSetFile.getName() + " until " +
@@ -131,7 +132,7 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
                             AceLog.getEditLog().fine("Read eConcept... " + eConcept);
                         }
                         if (!noCommit) {
-                            commitEConcept(eConcept, nextCommit, values);
+                            commitEConcept(eConcept, nextCommit, values, annotatedIndexes);
                         }
                 } else {
                     unvalidated++;
@@ -164,7 +165,7 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
                 throw new IOException(e);
             }
         }
-        Concept.resolveUnresolvedAnnotations();
+        Concept.resolveUnresolvedAnnotations(annotatedIndexes);
         try {
             if (AceLog.getEditLog().isLoggable(Level.FINE)) {
                 AceLog.getEditLog().fine("Committing time branches: " + values);
@@ -179,12 +180,12 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
     }
 
    @Override
-    public void read() throws IOException, ClassNotFoundException {
-        readUntil(Long.MAX_VALUE);
+    public void read(Set<ConceptChronicleBI> annotatedIndexes) throws IOException, ClassNotFoundException {
+        readUntil(Long.MAX_VALUE, annotatedIndexes);
     }
 
 
-    private Concept commitEConcept(EConcept eConcept, long time, Set<TimePathId> values) throws IOException,
+    private Concept commitEConcept(EConcept eConcept, long time, Set<TimePathId> values, Set<ConceptChronicleBI> annotatedIndexes) throws IOException,
             ClassNotFoundException {
         if (noCommit) {
             return null;
@@ -199,7 +200,7 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
                 Concept before = Concept.get(Bdb.uuidToNid(eConcept.getPrimordialUuid()));
                 csrcOut.append(before.toLongString());
                 csrcOut.flush();
-                Concept after = Concept.mergeAndWrite(eConcept);
+                Concept after = Concept.mergeAndWrite(eConcept, annotatedIndexes);
                 csrcOut.append("\n----------- after  -----------\n");
                 csrcOut.append(after.toLongString());
                 return after;
@@ -208,7 +209,7 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
 	                int conceptNid = Bdb.uuidToNid(eConcept.getPrimordialUuid());
 	                long lastChange = Concept.get(conceptNid).getData().getLastChange();
 
-	                Concept mergedConcept =  Concept.mergeAndWrite(eConcept);
+	                Concept mergedConcept =  Concept.mergeAndWrite(eConcept, annotatedIndexes);
 	                
 	                if (mergedConcept.getData().getLastChange() != lastChange) {
 	                	fileContentMerged = true;
@@ -216,7 +217,7 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
 	                
 	                return mergedConcept;
             	} else {
-            		return Concept.mergeAndWrite(eConcept);
+            		return Concept.mergeAndWrite(eConcept, annotatedIndexes);
             	}
             }
         } catch (Exception e) {

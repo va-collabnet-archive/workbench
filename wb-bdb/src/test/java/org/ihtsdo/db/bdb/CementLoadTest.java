@@ -10,6 +10,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -28,6 +29,7 @@ import org.ihtsdo.concept.component.identifier.IdentifierVersionString;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.NidBitSetItrBI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -71,7 +73,7 @@ public class CementLoadTest {
             try {
                 while (true) {
                     EConcept eConcept = new EConcept(in);
-                    Concept newConcept = Concept.get(eConcept);
+                    Concept newConcept = Concept.get(eConcept, new HashSet<ConceptChronicleBI>());
                     Bdb.getConceptDb().writeConcept(newConcept);
                 }
             } catch (EOFException e) {

@@ -28,7 +28,6 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 public class EConceptChangeSetWriter implements I_WriteChangeSet {
 
     public static boolean writeDebugFiles = false;
-    public static boolean validateAfterWrite = false;
     /**
      *
      */
@@ -132,24 +131,6 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
                     if (tempFile.renameTo(changeSetFile) == false) {
                         AceLog.getAppLog().warning("tempFile.renameTo failed. Attempting FileIO.copyFile...");
                         FileIO.copyFile(tempFile.getCanonicalPath(), changeSetFile.getCanonicalPath());
-                    }
-                    if (validateAfterWrite) {
-                        try {
-                            AceLog.getAppLog().info("validating " + changeSetFile + " after write.");
-                            EConceptChangeSetReader reader = new EConceptChangeSetReader();
-                            reader.setChangeSetFile(changeSetFile);
-                            reader.setNoCommit(true);
-                            reader.read();
-                            // if no exception is thrown...
-                            if (writeDebugFiles) {
-                                cswcFile.delete();
-                                csweFile.delete();
-                            }
-                        } catch (IOException ex) {
-                            AceLog.getAppLog().alertAndLogException(new Exception("Change set write did not validate " + changeSetFile, ex));
-                        } catch (ClassNotFoundException ex) {
-                            AceLog.getAppLog().alertAndLogException(new Exception("Change set write did not validate" + changeSetFile, ex));
-                        }
                     }
                     tempFile = new File(canonicalFileString);
                 }

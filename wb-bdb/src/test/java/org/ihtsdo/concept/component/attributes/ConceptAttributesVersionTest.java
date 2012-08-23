@@ -36,6 +36,7 @@ import org.ihtsdo.etypes.EConceptAttributesRevision;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -68,7 +69,7 @@ public class ConceptAttributesVersionTest {
         try {
             while (true) {
                 EConcept eConcept = new EConcept(in);
-                Bdb.getConceptDb().writeConcept(Concept.get(eConcept));
+                Bdb.getConceptDb().writeConcept(Concept.get(eConcept, new HashSet<ConceptChronicleBI>()));
             }
         } catch (EOFException e) {
             in.close();
@@ -155,7 +156,7 @@ public class ConceptAttributesVersionTest {
             
             setUp();
             
-            Concept c = Concept.get(testConcept);
+            Concept c = Concept.get(testConcept, new HashSet<ConceptChronicleBI>());
             
             IntSet allowedStatus = null;
             List<Version> tuples = c.getConAttrs().getTuples(allowedStatus, new PositionSetReadOnly(Terms.get().newPosition(p1_1, Long.MAX_VALUE)), Precedence.PATH, config.getConflictResolutionStrategy());
