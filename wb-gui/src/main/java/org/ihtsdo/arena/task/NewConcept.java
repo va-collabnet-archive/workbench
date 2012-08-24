@@ -1048,73 +1048,13 @@ public class NewConcept extends PreviousNextOrCancel {
                             "please list parents for the new concept", "",
                             JOptionPane.ERROR_MESSAGE);
                 } else {
-                    //get text parts and make query term
-                    String fullFsn = fsn.extractText();
-                    fullFsn = fullFsn.replaceAll("\n", "");
-                    fullFsn = fullFsn.replaceAll("   *", " ");
-                    String[] fsnWords = fullFsn.split("\\s");
-                    HashSet<String> wordSet = new HashSet<String>();
-                    for (String word : fsnWords) {
-                        if (!wordSet.contains(word) && word.length() > 1
-                                && !word.startsWith("(") && !word.endsWith(")")) {
-                            word = QueryParser.escape(word);
-                            wordSet.add(word);
-                        }
-                    }
-                    String queryTerm = null;
-                    for (String word : wordSet) {
-                        if (queryTerm == null) {
-                            queryTerm = "+" + word;
-                        } else {
-                            queryTerm = queryTerm + " " + "+" + word;
-                        }
-                    }
-                
-                    SearchResult result = Terms.get().doLuceneSearch(queryTerm);
-                    if (result.topDocs.totalHits == 0) {
                         returnCondition = Condition.CONTINUE;
                         done = true;
                         NewConcept.this.notifyTaskDone();
                     }
-                    NidSetBI allowedStatusNids = config.getViewCoordinate().getAllowedStatusNids();
-                    Boolean found = false;
-                    search:
-                    for (int i = 0; i < result.topDocs.totalHits; i++) {
-                        Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
-                        int cnid = Integer.parseInt(doc.get("cnid"));
-                        int dnid = Integer.parseInt(doc.get("dnid"));
-
-                        I_DescriptionVersioned<?> potential_fsn = Terms.get().getDescription(dnid, cnid);
-                        if (potential_fsn != null) {
-                            for (I_DescriptionPart part_search : potential_fsn.getMutableParts()) {
-                                String test = part_search.getText();
-                                if (allowedStatusNids.contains(part_search.getStatusNid())
-                                        && part_search.getText().equals(fullFsn)) {
-                                    found = true;
-                                    break search;
-                                } else {
-                                    found = false;
-                                }
-                            }
-                        }
-                    }
-                    if (found) {
-                        JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                                "<html>FSN already used: " + fullFsn, "",
-                                JOptionPane.ERROR_MESSAGE);
-                    } else {
-                        returnCondition = Condition.CONTINUE;
-                        done = true;
-                        NewConcept.this.notifyTaskDone();
-                    }
-                }
                 }catch (IOException ex) {
                     AceLog.getAppLog().alertAndLogException(ex);
-                } catch (TerminologyException ex) {
-                    AceLog.getAppLog().alertAndLogException(ex);
-                } catch (ParseException ex) {
-                    AceLog.getAppLog().alertAndLogException(ex);
-                }catch (ContradictionException ex) {
+                } catch (ContradictionException ex) {
                     AceLog.getAppLog().alertAndLogException(ex);
                 }
             }
