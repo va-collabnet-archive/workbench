@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
-
 public class DrDefiningRolesSet {
 	
 	private String rolesSetType;
@@ -112,6 +110,39 @@ public class DrDefiningRolesSet {
 				result = true;
 			}
 		} 
+		
+		return result;
+	}
+	
+	public boolean hasDuplicatedRoleGroups() {
+		boolean result = false;
+		
+		Map<Integer, List<DrRelationship>> groups = new HashMap<Integer, List<DrRelationship>>();
+		Map<Integer, List<DrRelationship>> groups2 = new HashMap<Integer, List<DrRelationship>>();
+		
+		for (DrRelationship loopRel : relationships) {
+			if (loopRel.getRelGroup() != 0 && !groups.containsKey(loopRel.getRelGroup())) {
+				List<DrRelationship> rels = new ArrayList<DrRelationship>();
+				rels.add(loopRel);
+				groups.put(loopRel.getRelGroup(), rels);
+				groups2.put(loopRel.getRelGroup(), rels);
+			} else if (loopRel.getRelGroup() != 0 && groups.containsKey(loopRel.getRelGroup())) {
+				List<DrRelationship> rels = groups.get(loopRel.getRelGroup());
+				rels.add(loopRel);
+				groups.put(loopRel.getRelGroup(), rels);
+				groups2.put(loopRel.getRelGroup(), rels);
+			}
+		}
+		
+		for (int groupId : groups.keySet()) {
+			List<DrRelationship> group = groups.get(groupId);
+			for (int group2Id : groups2.keySet()) {
+				List<DrRelationship> group2 = groups2.get(group2Id);
+				if (groupId != group2Id && group.containsAll(group2) && group2.containsAll(group)) {
+					result = true;
+				}
+			}
+		}
 		
 		return result;
 	}
