@@ -24,6 +24,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -70,14 +71,10 @@ public class SetPropertyToHierarchySelection extends AbstractTask {
      */
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             process.setProperty(propName, config.getHierarchySelection());
             return Condition.CONTINUE;
-        } catch (IntrospectionException e) {
-            throw new TaskFailedException(e);
-        } catch (IllegalAccessException e) {
-            throw new TaskFailedException(e);
-        } catch (InvocationTargetException e) {
+        } catch (Exception e) {
             throw new TaskFailedException(e);
         }
     }
