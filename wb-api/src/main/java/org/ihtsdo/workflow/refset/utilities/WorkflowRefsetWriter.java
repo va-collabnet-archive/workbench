@@ -59,7 +59,7 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
 		                	Ts.get().commit(concept);
 		                } else {
 		                	// Updated via UpdateWorkflowUponCommit (includes autoApprove) 
-		                	Terms.get().addUncommitted(ref);
+		                	Terms.get().addUncommittedNoChecks(ref);
 		                }
 	                } else {
 	                	// Other workflow refsets (ie editor category)
