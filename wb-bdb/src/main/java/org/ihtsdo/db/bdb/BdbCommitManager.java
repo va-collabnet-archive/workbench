@@ -67,6 +67,9 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -99,6 +102,7 @@ public class BdbCommitManager {
     private static long lastCancel = Integer.MIN_VALUE;
     private static Semaphore dbWriterPermit = new Semaphore(PERMIT_COUNT);
     private static Semaphore dbCheckerPermit = new Semaphore(PERMIT_COUNT);
+    private static ReentrantReadWriteLock dataCheckLock = new ReentrantReadWriteLock();
     private static List<I_TestDataConstraints> creationTests =
             new ArrayList<I_TestDataConstraints>();
     private static List<I_TestDataConstraints> commitTests =
@@ -162,8 +166,9 @@ public class BdbCommitManager {
         if (Bdb.watchList.containsKey(concept.getNid())) {
             AceLog.getAppLog().info("---@@@ Adding uncommitted concept: " + concept.getNid() + " ---@@@ ");
         }
-       
+       ReadLock readLock = dataCheckLock.readLock();
         try {
+            readLock.lock();
             uncommittedCNids.setMember(concept.getNid());
             dbWriterPermit.acquire();
             dbWriterService.execute(new SetNidsForCid(concept));
@@ -172,6 +177,8 @@ public class BdbCommitManager {
             dbCheckerService.execute(new DataChecker(concept));
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
+        }finally{
+            readLock.unlock();
         }
     }
     
@@ -191,6 +198,7 @@ public class BdbCommitManager {
 
                 dataCheckMap.put(concept, warningsAndErrors);
                 DataCheckRunner checkRunner = DataCheckRunner.runDataChecks(concept, creationTests);
+                
                 try {
                     checkRunner.latch.await();
                 
@@ -385,8 +393,9 @@ public class BdbCommitManager {
 
         boolean passedRelease = false;
         boolean performCommit = true;
-
+        WriteLock datacheckWriteLock = dataCheckLock.writeLock();
         try {
+            
             synchronized (uncommittedCNids) {
                 synchronized (uncommittedCNidsNoChecks) {
                     synchronized (uncommittedWfMemberIds) {
@@ -406,6 +415,9 @@ public class BdbCommitManager {
                         int warningCount = 0;
 
                         if (performCreationTests) {
+                            System.out.println("WRITE LOCK ATTEMPT");
+                            datacheckWriteLock.lock();
+                            System.out.println("WRITE LOCK");
                             NidBitSetItrBI uncommittedCNidItr = uncommittedCNids.iterator();
 
                             DataCheckRunner.cancelAll();
@@ -417,12 +429,10 @@ public class BdbCommitManager {
                                 Concept concept = Concept.get(uncommittedCNidItr.nid());
 
                                 dataCheckMap.put(concept, warningsAndErrors);
-
                                 DataCheckRunner checkRunner = DataCheckRunner.runDataChecks(concept, commitTests);
-
                                 checkRunner.latch.await();
-                                warningsAndErrors.addAll(checkRunner.get());
                                 
+                                warningsAndErrors.addAll(checkRunner.get());
                                 if(checkRunner.get().isEmpty()){
                                     ConceptTemplates.dataChecks.put(uncommittedCNidItr.nid(), false);
                                     Ts.get().touchComponentAlert(uncommittedCNidItr.nid());
@@ -430,7 +440,6 @@ public class BdbCommitManager {
                                     ConceptTemplates.dataChecks.put(uncommittedCNidItr.nid(), true);
                                     Ts.get().touchComponentAlert(uncommittedCNidItr.nid());
                                 }
-
                                 for (AlertToDataConstraintFailure alert : warningsAndErrors) {
                                     if (alert.getAlertType().equals(ALERT_TYPE.ERROR)) {
                                         errorCount++;
@@ -442,7 +451,6 @@ public class BdbCommitManager {
                                 }
                             }
                         }
-
                         if (errorCount + warningCount != 0) {
                             if (errorCount > 0) {
                                 performCommit = false;
@@ -565,7 +573,6 @@ public class BdbCommitManager {
                             dataCheckMap.clear();
                         }
                         GlobalPropertyChange.firePropertyChange(TerminologyStoreDI.CONCEPT_EVENT.POST_COMMIT, null, allUncommitted);
-
                     }
                 }
             }
@@ -577,6 +584,8 @@ public class BdbCommitManager {
         } catch (Exception e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         } finally {
+            datacheckWriteLock.unlock();
+            System.out.println("WRITE UNLOCK");
             if (!passedRelease) {
                 Svn.rwl.release();
             }
@@ -618,7 +627,7 @@ public class BdbCommitManager {
         }
 
         boolean performCommit = true;
-
+        WriteLock datacheckWriteLock = dataCheckLock.writeLock();
         try {
             AceLog.getAppLog().info("Committing concept: " + c.toUserString() + " UUID: "
                     + Ts.get().getUuidsForNid(c.getNid()).toString());
@@ -628,7 +637,9 @@ public class BdbCommitManager {
             Set<AlertToDataConstraintFailure> warningsAndErrors = new HashSet<AlertToDataConstraintFailure>();
 
             dataCheckMap.put(c, warningsAndErrors);
-
+            System.out.println("WRITE LOCK ATTEMPT");
+            datacheckWriteLock.lock();
+            System.out.println("WRITE LOCK");
             DataCheckRunner checkRunner = DataCheckRunner.runDataChecks(c, commitTests);
             CountDownLatch latch = checkRunner.latch;
 
@@ -652,7 +663,6 @@ public class BdbCommitManager {
                     warningCount++;
                 }
             }
-
             if (errorCount + warningCount != 0) {
                 if (errorCount > 0) {
                     performCommit = false;
@@ -774,6 +784,8 @@ public class BdbCommitManager {
             AceLog.getAppLog().alertAndLogException(e1);
         } finally {
             Svn.rwl.release();
+            datacheckWriteLock.unlock();
+            System.out.println("WRITE UNLOCK");
         }
 
         GlobalPropertyChange.firePropertyChange(TerminologyStoreDI.CONCEPT_EVENT.POST_COMMIT, null, allUncommitted);
@@ -1358,16 +1370,20 @@ public class BdbCommitManager {
 
     public static List<AlertToDataConstraintFailure> getCommitErrorsAndWarnings() {
         Set<AlertToDataConstraintFailure> warningsAndErrors = new HashSet<AlertToDataConstraintFailure>();
-
+        WriteLock datacheckWriteLock = dataCheckLock.writeLock();
         try {
             NidBitSetItrBI cNidItr = uncommittedCNids.iterator();
 
             while (cNidItr.next()) {
                 try {
                     Concept toTest = Concept.get(cNidItr.nid());
+                    System.out.println("WRITE LOCK ATTEMPT");
+                    datacheckWriteLock.lock();
+                    System.out.println("WRITE LOCK");
                     DataCheckRunner checkRunner = DataCheckRunner.runDataChecks(toTest, commitTests);
 
                     checkRunner.latch.await();
+                    
                     if(checkRunner.get().isEmpty()){
                         ConceptTemplates.dataChecks.put(cNidItr.nid(), false);
                         Ts.get().touchComponentAlert(cNidItr.nid());
@@ -1385,6 +1401,9 @@ public class BdbCommitManager {
             }
         } catch (IOException e) {
             AceLog.getAppLog().alertAndLogException(e);
+        }finally{
+            datacheckWriteLock.unlock();
+            System.out.println("WRITE UNLOCK");
         }
 
         List<AlertToDataConstraintFailure> warningsAndErrorsList =
@@ -1511,7 +1530,7 @@ public class BdbCommitManager {
             this.c = c;
             this.tests = tests;
             latch = new CountDownLatch(tests.size());
-
+            
             DataCheckRunner oldRunner = runners.put(c, this);
 
             if (oldRunner != null) {
@@ -1643,9 +1662,7 @@ public class BdbCommitManager {
 
         public static DataCheckRunner runDataChecks(Concept c, List<I_TestDataConstraints> tests) {
             DataCheckRunner runner = new DataCheckRunner(c, tests);
-
             runner.execute();
-
             return runner;
         }
 
