@@ -38,6 +38,7 @@ public class RF2ICDOTargetsImpl extends RF2IDImpl {
 	private File exportedFileName;
 
 	private static Logger logger = Logger.getLogger(RF2SnomedIdImpl.class);
+	
 	public RF2ICDOTargetsImpl(Config config, String releaseDate,
 			File snapshotSortedPreviousfile, File snapshotSortedExportedfile,
 			String rf2FullFolder, String previousReleaseDate, File targetDirectory, 
@@ -73,10 +74,26 @@ public class RF2ICDOTargetsImpl extends RF2IDImpl {
 
 
 			String line1;
-			String header=br1.readLine();
 			br2.readLine();
-
-			bw.append(header);
+			br2.readLine();
+			
+			bw.append("id");
+			bw.append("\t");
+			bw.append("effectiveTime");
+			bw.append("\t");
+			bw.append("active");
+			bw.append("\t");
+			bw.append("moduleId");
+			bw.append("\t");
+			bw.append("MAPSETID");
+			bw.append("\t");
+			bw.append("TARGETID");
+			bw.append("\t");
+			bw.append("TARGETCODES");
+			bw.append("\t");
+			bw.append("TARGETRULE");
+			bw.append("\t");
+			bw.append("TARGETADVICE");
 			bw.append(newLine);
 
 			String[] splittedLine1;
