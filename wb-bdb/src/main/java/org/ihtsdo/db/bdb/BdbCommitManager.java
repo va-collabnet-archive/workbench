@@ -415,9 +415,7 @@ public class BdbCommitManager {
                         int warningCount = 0;
 
                         if (performCreationTests) {
-                            System.out.println("WRITE LOCK ATTEMPT");
                             datacheckWriteLock.lock();
-                            System.out.println("WRITE LOCK");
                             NidBitSetItrBI uncommittedCNidItr = uncommittedCNids.iterator();
 
                             DataCheckRunner.cancelAll();
@@ -585,7 +583,6 @@ public class BdbCommitManager {
             AceLog.getAppLog().alertAndLogException(e1);
         } finally {
             datacheckWriteLock.unlock();
-            System.out.println("WRITE UNLOCK");
             if (!passedRelease) {
                 Svn.rwl.release();
             }
@@ -637,9 +634,7 @@ public class BdbCommitManager {
             Set<AlertToDataConstraintFailure> warningsAndErrors = new HashSet<AlertToDataConstraintFailure>();
 
             dataCheckMap.put(c, warningsAndErrors);
-            System.out.println("WRITE LOCK ATTEMPT");
             datacheckWriteLock.lock();
-            System.out.println("WRITE LOCK");
             DataCheckRunner checkRunner = DataCheckRunner.runDataChecks(c, commitTests);
             CountDownLatch latch = checkRunner.latch;
 
@@ -785,7 +780,6 @@ public class BdbCommitManager {
         } finally {
             Svn.rwl.release();
             datacheckWriteLock.unlock();
-            System.out.println("WRITE UNLOCK");
         }
 
         GlobalPropertyChange.firePropertyChange(TerminologyStoreDI.CONCEPT_EVENT.POST_COMMIT, null, allUncommitted);
@@ -1377,9 +1371,7 @@ public class BdbCommitManager {
             while (cNidItr.next()) {
                 try {
                     Concept toTest = Concept.get(cNidItr.nid());
-                    System.out.println("WRITE LOCK ATTEMPT");
                     datacheckWriteLock.lock();
-                    System.out.println("WRITE LOCK");
                     DataCheckRunner checkRunner = DataCheckRunner.runDataChecks(toTest, commitTests);
 
                     checkRunner.latch.await();
@@ -1403,7 +1395,6 @@ public class BdbCommitManager {
             AceLog.getAppLog().alertAndLogException(e);
         }finally{
             datacheckWriteLock.unlock();
-            System.out.println("WRITE UNLOCK");
         }
 
         List<AlertToDataConstraintFailure> warningsAndErrorsList =
