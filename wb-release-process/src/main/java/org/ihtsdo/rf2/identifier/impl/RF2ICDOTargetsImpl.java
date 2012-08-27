@@ -15,14 +15,14 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.rf2.constant.I_Constants;
-import org.ihtsdo.rf2.postexport.AbstractTask;
+import org.ihtsdo.rf2.impl.RF2IDImpl;
 import org.ihtsdo.rf2.postexport.RF2ArtifactPostExportImpl;
 import org.ihtsdo.rf2.postexport.RF2ArtifactPostExportAbst.FILE_TYPE;
 import org.ihtsdo.rf2.refset.impl.RF2SnomedIdImpl;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.ExportUtil;
 
-public class RF2ICDOTargetsImpl extends AbstractTask {
+public class RF2ICDOTargetsImpl extends RF2IDImpl {
 
 	private File snapshotSortedPreviousfile;
 	private File snapshotSortedExportedfile;
@@ -43,7 +43,7 @@ public class RF2ICDOTargetsImpl extends AbstractTask {
 			String rf2FullFolder, String previousReleaseDate, File targetDirectory, 
 			String outputFolder, 
 			File ouputFile) {
-
+		super(config);
 		this.rf2FullFolder=rf2FullFolder;
 		this.previousReleaseDate=previousReleaseDate;
 		this.targetDirectory=targetDirectory;
@@ -55,9 +55,7 @@ public class RF2ICDOTargetsImpl extends AbstractTask {
 		this.releaseDate=releaseDate;
 		this.config=config;
 	}
-
-	@Override
-	public void execute() throws Exception {
+	public void generateIdentifier() {
 
 		try {
 
@@ -157,7 +155,7 @@ public class RF2ICDOTargetsImpl extends AbstractTask {
 				status=expTgt.get(key);
 				uuid=Type5UuidFactory.get(I_Constants.ICDO_SUBSET_ID + key );
 
-				sctid = ExportUtil.getSCTId(config, uuid , nspce, "05" ,releaseDate ,releaseDate , I_Constants.CORE_MODULE_ID);
+				sctid = getSCTId(config, uuid , nspce, "05" ,releaseDate ,releaseDate , I_Constants.CORE_MODULE_ID);
 				if(sctid==null || sctid.equals("0") || sctid.equals("")){
 
 					logger.info("=====Error creating mapTargetId for uuid===" + uuid.toString());
@@ -193,7 +191,7 @@ public class RF2ICDOTargetsImpl extends AbstractTask {
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
