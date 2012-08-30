@@ -93,39 +93,39 @@ public class TestForSpecifcDate extends AbstractConceptTest {
             I_TermFactory termFactory = getTermFactory();
             List<AlertToDataConstraintFailure> alerts = new ArrayList<AlertToDataConstraintFailure>();
             boolean found = false;
-            
-            for (ConAttrVersionBI attr : concept.getConceptAttributes().getVersions()) {
-            	long time = attr.getTime();
-            	if (time == timeToCheck) {
-            		found = true;
-            	}
-            }
-            
-            for (I_DescriptionVersioned loopDesc : concept.getDescriptions()) {
-            	for (DescriptionVersionBI dv : loopDesc.getVersions()) {
-            		long time = dv.getTime();
-            		if (time == timeToCheck) {
-                		found = true;
-                	}
-            	}
-            	for (RefexChronicleBI<?> annot : loopDesc.getAnnotations()) {
-            		for (RefexVersionBI<?> av : annot.getVersions()) {
-            			long time = av.getTime();
-            			if (time == timeToCheck) {
-                    		found = true;
-                    	}
-            		}
-            	}
-            }
-            
-            for (RelationshipChronicleBI loopRel : concept.getRelsOutgoing()) {
-            	for (RelationshipVersionBI rv : loopRel.getVersions()) {
-            		long time = rv.getTime();
-            		if (time == timeToCheck) {
-                		found = true;
-                	}
-            	}
-            }
+//            
+//            for (ConAttrVersionBI attr : concept.getConceptAttributes().getVersions()) {
+//            	long time = attr.getTime();
+//            	if (time == timeToCheck) {
+//            		found = true;
+//            	}
+//            }
+//            
+//            for (I_DescriptionVersioned loopDesc : concept.getDescriptions()) {
+//            	for (DescriptionVersionBI dv : loopDesc.getVersions()) {
+//            		long time = dv.getTime();
+//            		if (time == timeToCheck) {
+//                		found = true;
+//                	}
+//            	}
+//            	for (RefexChronicleBI<?> annot : loopDesc.getAnnotations()) {
+//            		for (RefexVersionBI<?> av : annot.getVersions()) {
+//            			long time = av.getTime();
+//            			if (time == timeToCheck) {
+//                    		found = true;
+//                    	}
+//            		}
+//            	}
+//            }
+//            
+//            for (RelationshipChronicleBI loopRel : concept.getRelsOutgoing()) {
+//            	for (RelationshipVersionBI rv : loopRel.getVersions()) {
+//            		long time = rv.getTime();
+//            		if (time == timeToCheck) {
+//                		found = true;
+//                	}
+//            	}
+//            }
             
             if (found) {
             	AlertToDataConstraintFailure alert = new AlertToDataConstraintFailure(ALERT_TYPE.WARNING, 

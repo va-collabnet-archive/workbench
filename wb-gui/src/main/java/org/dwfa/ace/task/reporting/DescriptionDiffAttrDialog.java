@@ -90,13 +90,22 @@ public class DescriptionDiffAttrDialog extends JDialog {
 			// Set release dates
 			for (int i = 2002; i <= 2012; i++) {
 				Calendar c0 = new GregorianCalendar(cstTime);
+				Calendar c3 = new GregorianCalendar(cstTime);
 				Calendar c6 = new GregorianCalendar(cstTime);
+				Calendar c9 = new GregorianCalendar(cstTime);
 				c0.set(i, 0, 31, 23, 59, 59);
+				c3.set(i, 3, 30, 23, 59, 59);
 				c6.set(i, 6, 31, 23, 59, 59);
+				c9.set(i, 9, 31, 23, 59, 59);
+				
 				initTimeCombo.addItem(new TimeItem(c0));
+				initTimeCombo.addItem(new TimeItem(c3));
 				initTimeCombo.addItem(new TimeItem(c6));
+				initTimeCombo.addItem(new TimeItem(c9));
 				laterTimeCombo.addItem(new TimeItem(c0));
+				laterTimeCombo.addItem(new TimeItem(c3));
 				laterTimeCombo.addItem(new TimeItem(c6));
+				laterTimeCombo.addItem(new TimeItem(c9));
 			}
 
 			ObjectTransferHandler oth = new ObjectTransferHandler(config, null);

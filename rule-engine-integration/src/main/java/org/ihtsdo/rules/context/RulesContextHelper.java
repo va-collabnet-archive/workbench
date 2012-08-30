@@ -33,6 +33,7 @@ import java.util.UUID;
 
 import javax.swing.JOptionPane;
 
+import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.builder.KnowledgeBuilder;
@@ -721,14 +722,9 @@ public class RulesContextHelper {
 				for (I_RelTuple loopTuple : pkgRelTuples) {
 					if (isActive(loopTuple.getStatusNid())) {
 						I_GetConceptData targetPackage = termFactory.getConcept(loopTuple.getC2Id());
-						Long time = Long.MIN_VALUE;
-						int statusId = Integer.MIN_VALUE;
-						for (ConAttrVersionBI loopAttr : targetPackage.getConceptAttributes().getVersions()) {
-							if (loopAttr.getTime() > time) {
-								time = loopAttr.getTime();
-								statusId = loopAttr.getStatusNid();
-							}
-						}
+						I_ConceptAttributeTuple att = targetPackage.getConceptAttributeTuples(config.getPrecedence(), config.getConflictResolutionStrategy()).iterator().next();
+						int statusId = att.getStatusNid();
+						
 						if (isActive(statusId) && 
 								!targetPackage.getPrimUuid().equals(UUID.fromString("00000000-0000-0000-C000-000000000046"))) {
 							returnData.add(refHelper.getRulesDeploymentPackageReference(targetPackage));

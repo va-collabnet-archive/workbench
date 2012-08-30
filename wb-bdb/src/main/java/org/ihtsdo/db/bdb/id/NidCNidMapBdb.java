@@ -332,7 +332,7 @@ public class NidCNidMapBdb extends ComponentBdb {
 
     //~--- get methods ---------------------------------------------------------
     public int getCNid(int nid) {
-        assert nid != Integer.MAX_VALUE;
+        //assert nid != Integer.MAX_VALUE;
 
         int mapIndex = (nid - Integer.MIN_VALUE) / NID_CNID_MAP_SIZE;
         int indexInMap = (nid - Integer.MIN_VALUE) % NID_CNID_MAP_SIZE;
