@@ -155,14 +155,15 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 				memberList.add(member);
 				conceptCounter++;
 			} 
-				
+			System.out.println("Total rows imported: " + counter);	
 			System.out.print("\n\n");
 
 	        econcept.setRefsetMembers(memberList);
 	    	econcept.writeExternal(eConceptDOS);
 	    	eConceptDOS.close();
         } catch (Exception e) {
-			AceLog.getAppLog().log(Level.WARNING, "Failure to import: " + currentRow + " at row# " + counter + "\nwith error: " + e.getMessage());
+                        e.printStackTrace();
+			AceLog.getAppLog().log(Level.WARNING, "Failure to import: " + currentRow + " at row# " + counter + "\nwith error: " + e);
         }
 	}
 
@@ -232,7 +233,11 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 		// Path writing on
 		member.pathUuid = snomedPathUid;
 
-		member.time = format.parse(row[WorkflowHelper.timeStampPosition]).getTime();
+                try{
+                    member.time = format.parse(row[WorkflowHelper.timeStampPosition]).getTime();
+                }catch(IndexOutOfBoundsException e){
+                    System.out.println("WFID: " + row[WorkflowHelper.workflowIdPosition]);
+                }
 
 		member.setString1(toXml(row, member.time));
 
@@ -269,7 +274,7 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 			writer.setModelerUid(modeler);
 			writer.setActionUid(action);
 			writer.setStateUid(state);
-        	writer.setWorkflowTime(wfTimestamp);
+                        writer.setWorkflowTime(wfTimestamp);
 			writer.setEffectiveTime(effectiveTimestamp);
 			writer.setAutoApproved(false);
 			writer.setOverride(false);
@@ -401,8 +406,33 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
     		return ArchitectonicAuxiliary.Concept.NHS.getPrimoridalUid();
     	} else if (modeler.equalsIgnoreCase("phernan")) {
     		return ArchitectonicAuxiliary.Concept.PENNI_HERNANDEZ.getPrimoridalUid();
+    	}else if (modeler.equalsIgnoreCase("jrogers")) {
+    		return ArchitectonicAuxiliary.Concept.JEREMY_ROGERS.getPrimoridalUid();
+    	}else if (modeler.equalsIgnoreCase("edcheetham")) {
+    		return ArchitectonicAuxiliary.Concept.ED_CHEETHAME.getPrimoridalUid();
+    	}else if (modeler.equalsIgnoreCase("bgoldberg")) {
+    		return ArchitectonicAuxiliary.Concept.BRUCE_GOLDBERG.getPrimoridalUid();
+    	}else if (modeler.equalsIgnoreCase("jcase")) {
+    		return ArchitectonicAuxiliary.Concept.JAMES_CASE.getPrimoridalUid();
+    	}else if (modeler.equalsIgnoreCase("crichardson")) {
+    		return ArchitectonicAuxiliary.Concept.CATHY_RICHARDSON.getPrimoridalUid();
+    	}else if (modeler.equalsIgnoreCase("kfung")) {
+    		return ArchitectonicAuxiliary.Concept.KIN_WAH_FUNGA.getPrimoridalUid();
+    	}else if (modeler.equalsIgnoreCase("rhausam")) {
+    		return ArchitectonicAuxiliary.Concept.ROBERT_HAUSAM.getPrimoridalUid();
+    	}else if (modeler.equalsIgnoreCase("sshayegani")) {
+    		return ArchitectonicAuxiliary.Concept.SHAPOOR_SHAYEGANI.getPrimoridalUid();
+    	}else if (modeler.equalsIgnoreCase("igreen")) {
+    		return ArchitectonicAuxiliary.Concept.IAN_GREEN.getPrimoridalUid();
+    	}else if (modeler.equalsIgnoreCase("hmuys")) {
+    		return ArchitectonicAuxiliary.Concept.HERMAN_MUYS.getPrimoridalUid();
+    	}else if (modeler.equalsIgnoreCase("gwade")) {
+    		return ArchitectonicAuxiliary.Concept.GERALDINE_WADE.getPrimoridalUid();
+    	}else if (modeler.equalsIgnoreCase("jhowarth")) {
+    		return ArchitectonicAuxiliary.Concept.JANE_HOWARTH.getPrimoridalUid();
+    	}else if (modeler.equalsIgnoreCase("pamos")) {
+    		return ArchitectonicAuxiliary.Concept.PAUL_AMOS.getPrimoridalUid();
     	}
-
     	
     	return null;
     }
