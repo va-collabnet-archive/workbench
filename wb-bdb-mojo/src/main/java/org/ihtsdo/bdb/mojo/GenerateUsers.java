@@ -157,6 +157,7 @@ public class GenerateUsers extends AbstractMojo {
 	private I_ConfigAceFrame wfConfig;
 	private Boolean create = true;
         private String generateAdjCs;
+        private ConceptSpec queueDescriptionType = new ConceptSpec("user inbox", UUID.fromString("f7e96652-a844-31a3-96b4-7ba3b0807233"));
 
 	@Override
 	public void execute() throws MojoExecutionException {
@@ -602,7 +603,7 @@ public class GenerateUsers extends AbstractMojo {
 
 			// Needs a description record...
 			DescriptionCAB inboxDescBp = new DescriptionCAB(userConceptBp.getComponentUuid(),
-					Ts.get().getUuidPrimordialForNid(SnomedMetadataRfx.getDES_SYNONYM_NID()),
+					queueDescriptionType.getLenient().getPrimUuid(),
 					LANG_CODE.EN,
 					userConfig.getUsername() + ".inbox",
 					false);
@@ -659,11 +660,11 @@ public class GenerateUsers extends AbstractMojo {
 	private void setUserConcept(String userUuidString) throws TerminologyException, IOException, InvalidCAB, ContradictionException {
 		I_GetConceptData userConcept = Terms.get().getConcept(UUID.fromString(userUuidString));
 		I_TermFactory tf = Terms.get();
-		DescriptionCAB inboxDescBp = new DescriptionCAB(userConcept.getPrimUuid(),
-				Ts.get().getUuidPrimordialForNid(SnomedMetadataRfx.getDES_SYNONYM_NID()),
-				LANG_CODE.EN,
-				userConfig.getUsername() + ".inbox",
-				false);
+                DescriptionCAB inboxDescBp = new DescriptionCAB(userConcept.getPrimUuid(),
+					queueDescriptionType.getLenient().getPrimUuid(),
+					LANG_CODE.EN,
+					userConfig.getUsername() + ".inbox",
+					false);
 		ViewCoordinate vc = userConfig.getViewCoordinate();
 		EditCoordinate oldEc = userConfig.getEditCoordinate();
 		EditCoordinate ec = new EditCoordinate(oldEc.getAuthorNid(),
