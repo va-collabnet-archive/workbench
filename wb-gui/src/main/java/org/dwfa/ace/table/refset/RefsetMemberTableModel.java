@@ -38,6 +38,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
@@ -90,6 +91,10 @@ import org.dwfa.swing.SwingWorker;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.IntList;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.id.IdBI;
 
 public class RefsetMemberTableModel extends AbstractTableModel implements PropertyChangeListener, I_HoldRefsetData,
         ActionListener {
@@ -828,10 +833,26 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                             tuple.getMemberId(), inConflict);
 
                 case CONCEPT_ID:
+                    String prependIdString = "";
+                    I_ExtendByRefPartCid member = (I_ExtendByRefPartCid) tuple.getMutablePart();
+                    if (member != null) {
+                        int c1Nid = member.getC1id();
+                        ConceptChronicleBI c1Concept = Ts.get().getConcept(c1Nid);
+                        if (c1Concept != null && c1Concept.getAdditionalIds() != null) {
+                            for (IdBI idBI : c1Concept.getAdditionalIds()) {
+                                if (testIdPrependAuthSet(idBI.getAuthorityNid())) {
+                                    prependIdString = idBI.getDenotation() + ": ";
+                                }
+                            }
+                        }
+                    }
+
                     if (referencedConcepts.containsKey(((I_ExtendByRefPartCid) tuple.getMutablePart()).getC1id())) {
                         return new StringWithExtTuple(
-                                getPrefText(((I_ExtendByRefPartCid) tuple.getMutablePart()).getC1id()), tuple,
-                                ((I_ExtendByRefPartCid) tuple.getMutablePart()).getC1id(), inConflict);
+                                prependIdString + getPrefText(((I_ExtendByRefPartCid) tuple.getMutablePart()).getC1id()),
+                                tuple,
+                                ((I_ExtendByRefPartCid) tuple.getMutablePart()).getC1id(),
+                                inConflict);
                     }
                     return new StringWithExtTuple(Integer.toString(((I_ExtendByRefPartCid) tuple.getMutablePart()).getC1id()), tuple, ((I_ExtendByRefPartCid) tuple.getMutablePart()).getC1id(), inConflict);
 
@@ -1152,4 +1173,29 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
 
         return returnValues;
     }
+
+    // Test for Indentification Source Authority
+    private Set<Integer> idPrependAuthSet = null;
+    private boolean testIdPrependAuthSet(int authorityNid) {
+        if (idPrependAuthSet == null) {
+            idPrependAuthSet = new HashSet<Integer>();
+            TerminologyStoreDI ts = Ts.get();
+            try {
+                // Terminology Auxiliary concept/identifier source/ICD9
+                UUID uuid = UUID.fromString("a8160cc4-c49c-3a56-aa82-ea51e6c538ba");
+                if (ts.hasUuid(uuid)) {
+                    idPrependAuthSet.add(ts.getNidForUuids(uuid));
+                }
+                // Terminology Auxiliary concept/identifier source/ICD10
+                uuid = UUID.fromString("9228d285-e625-33f9-bf46-9cfba3beee6d");
+                if (ts.hasUuid(uuid)) {
+                    idPrependAuthSet.add(ts.getNidForUuids(uuid));
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(RefsetMemberTableModel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return idPrependAuthSet.contains(authorityNid);
+    }
+
 }
