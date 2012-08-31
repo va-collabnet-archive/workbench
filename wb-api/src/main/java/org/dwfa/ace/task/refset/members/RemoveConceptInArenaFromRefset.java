@@ -44,6 +44,7 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 
@@ -123,12 +124,11 @@ public class RemoveConceptInArenaFromRefset extends AbstractTask {
             RefexCAB refexSpec = 
                     new RefexCAB(TK_REFEX_TYPE.CID, 
                     conceptToAdd.getNid(), refsetConcept.getNid());
-            refexSpec.with(RefexCAB.RefexProperty.CNID1, 
+            refexSpec.put(RefexCAB.RefexProperty.CNID1, 
                     member.getConceptNid());
-            refexSpec.with(RefexCAB.RefexProperty.STATUS_NID, 
-                    SnomedMetadataRfx.getSTATUS_RETIRED_NID());
-            
-            ammender.constructIfNotCurrent(refexSpec); 
+            refexSpec.setRetired();
+            RefexChronicleBI<?> newMember = ammender.constructIfNotCurrent(refexSpec);
+            conceptToAdd.addAnnotation(newMember);
 
             if (refsetConcept.isAnnotationStyleRefex()) {
                  Terms.get().addUncommitted(conceptToAdd);
