@@ -1043,6 +1043,8 @@ public class SnorocketMojo extends AbstractMojo {
         tmpConfig.setClassifierIsaType(tf.getConcept(SNOMED.Concept.IS_A.getPrimoridalUid()));
         
         tmpConfig.setModuleNid(ArchitectonicAuxiliary.Concept.AUXILIARY_MODULE.localize().getNid());
+        
+        tmpConfig.getDbConfig().setUserConcept(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.SNOROCKET.getUids()));
 
         // :!!!: config.setClassificationRoot(null);
         // :!!!: config.setClassificationRoleRoot(null);
