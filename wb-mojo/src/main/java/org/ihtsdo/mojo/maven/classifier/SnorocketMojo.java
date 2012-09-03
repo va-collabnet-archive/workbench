@@ -63,6 +63,7 @@ import org.dwfa.ace.task.classify.SnoQuery;
 import org.dwfa.ace.task.classify.SnoRel;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
@@ -1040,6 +1041,8 @@ public class SnorocketMojo extends AbstractMojo {
         tmpConfig.getAllowedStatus().add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
 
         tmpConfig.setClassifierIsaType(tf.getConcept(SNOMED.Concept.IS_A.getPrimoridalUid()));
+        
+        tmpConfig.setModuleNid(ArchitectonicAuxiliary.Concept.AUXILIARY_MODULE.localize().getNid());
 
         // :!!!: config.setClassificationRoot(null);
         // :!!!: config.setClassificationRoleRoot(null);
