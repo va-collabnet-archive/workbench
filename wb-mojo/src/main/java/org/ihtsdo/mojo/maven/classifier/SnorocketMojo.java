@@ -15,10 +15,6 @@
  */
 package org.ihtsdo.mojo.maven.classifier;
 
-import au.csiro.snorocket.core.IFactory_123;
-import au.csiro.snorocket.snapi.I_Snorocket_123.I_Callback;
-import au.csiro.snorocket.snapi.I_Snorocket_123.I_EquivalentCallback;
-import au.csiro.snorocket.snapi.Snorocket_123;
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -33,14 +29,16 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.UUID;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
+import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_ImplementTermFactory;
 import org.dwfa.ace.api.I_IntSet;
-import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
@@ -55,23 +53,30 @@ import org.dwfa.ace.task.classify.SnoDL;
 import org.dwfa.ace.task.classify.SnoDLSet;
 import org.dwfa.ace.task.classify.SnoGrp;
 import org.dwfa.ace.task.classify.SnoGrpList;
-import org.dwfa.ace.task.classify.SnoPathProcessInferred;
-import org.dwfa.ace.task.classify.SnoPathProcessStated;
 import org.dwfa.ace.task.classify.SnoPathProcessExInferred;
 import org.dwfa.ace.task.classify.SnoPathProcessExStated;
+import org.dwfa.ace.task.classify.SnoPathProcessInferred;
+import org.dwfa.ace.task.classify.SnoPathProcessStated;
 import org.dwfa.ace.task.classify.SnoQuery;
 import org.dwfa.ace.task.classify.SnoRel;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
-import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
+import org.ihtsdo.tk.api.cs.ChangeSetWriterThreading;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
+
+import au.csiro.snorocket.core.IFactory_123;
+import au.csiro.snorocket.snapi.I_Snorocket_123.I_Callback;
+import au.csiro.snorocket.snapi.I_Snorocket_123.I_EquivalentCallback;
+import au.csiro.snorocket.snapi.Snorocket_123;
 
 /**
  * SnorocketMojo runs the IHTSDO (Snorocket) Classifier as a maven mojo.<br><br>
@@ -1046,6 +1051,15 @@ public class SnorocketMojo extends AbstractMojo {
         
         tmpConfig.getDbConfig().setUserConcept(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.SNOROCKET.getUids()));
 
+        I_ImplementTermFactory tf2 = (I_ImplementTermFactory) Terms.get();
+        I_ConfigAceDb newDbProfile = tf2.newAceDbConfig();
+        newDbProfile.setUsername("Classifier");
+        newDbProfile.setClassifierChangesChangeSetPolicy(ChangeSetPolicy.OFF);
+        newDbProfile.setRefsetChangesChangeSetPolicy(ChangeSetPolicy.OFF);
+        newDbProfile.setUserChangesChangeSetPolicy(ChangeSetPolicy.INCREMENTAL);
+        newDbProfile.setChangeSetWriterThreading(ChangeSetWriterThreading.SINGLE_THREAD);
+        tmpConfig.setDbConfig(newDbProfile);
+        
         // :!!!: config.setClassificationRoot(null);
         // :!!!: config.setClassificationRoleRoot(null);
         // :!!!: config.setClassifierIsaType(null);
