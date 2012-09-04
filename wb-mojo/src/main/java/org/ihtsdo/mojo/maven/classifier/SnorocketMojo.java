@@ -1049,7 +1049,6 @@ public class SnorocketMojo extends AbstractMojo {
         
         tmpConfig.setModuleNid(ArchitectonicAuxiliary.Concept.AUXILIARY_MODULE.localize().getNid());
         
-        tmpConfig.getDbConfig().setUserConcept(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.SNOROCKET.getUids()));
 
         I_ImplementTermFactory tf2 = (I_ImplementTermFactory) Terms.get();
         I_ConfigAceDb newDbProfile = tf2.newAceDbConfig();
@@ -1058,7 +1057,10 @@ public class SnorocketMojo extends AbstractMojo {
         newDbProfile.setRefsetChangesChangeSetPolicy(ChangeSetPolicy.OFF);
         newDbProfile.setUserChangesChangeSetPolicy(ChangeSetPolicy.INCREMENTAL);
         newDbProfile.setChangeSetWriterThreading(ChangeSetWriterThreading.SINGLE_THREAD);
+        newDbProfile.setUserConcept(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.SNOROCKET.getUids()));
+
         tmpConfig.setDbConfig(newDbProfile);
+        
         
         // :!!!: config.setClassificationRoot(null);
         // :!!!: config.setClassificationRoleRoot(null);
