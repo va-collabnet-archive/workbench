@@ -638,9 +638,13 @@ public class LoadBdbMulti extends AbstractMojo {
                     String path = parts[3];
                     String makeAnnotation = parts[4];
                     String author = null;
+                    UUID conceptUuid = null;
                     if (parts.length == 6) {
                         author = parts[5];
                         authorNid = store.getNidForUuids(UUID.fromString(author));
+                    }if (parts.length == 7) {
+                        String uuidString = parts[6];
+                         conceptUuid = UUID.fromString(uuidString);
                     }
                     UUID parentUuid = UUID.fromString(parent);
                     UUID pathUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, path);
@@ -655,6 +659,9 @@ public class LoadBdbMulti extends AbstractMojo {
                             LANG_CODE.EN,
                             Snomed.IS_A.getLenient().getPrimUuid(),
                             parentUuid);
+                    if(conceptUuid != null){
+                        conceptBp.setComponentUuid(conceptUuid);
+                    }
                     List<DescriptionCAB> fsnCABs = conceptBp.getFullySpecifiedNameCABs();
                     List<DescriptionCAB> prefCABs = conceptBp.getPreferredNameCABs();
                     for (DescriptionCAB f : fsnCABs) {
@@ -669,7 +676,7 @@ public class LoadBdbMulti extends AbstractMojo {
                         concept.setAnnotationStyleRefex(true);
                     }
                     BdbCommitManager.addUncommitted(concept);
-
+                    System.out.println("**CREATED NEW CONCEPT: " + concept + " " + concept.getPrimUuid());
                     line = conceptsReader.readLine();
                 }
             }

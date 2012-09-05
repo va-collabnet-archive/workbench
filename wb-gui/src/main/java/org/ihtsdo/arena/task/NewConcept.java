@@ -1051,6 +1051,14 @@ public class NewConcept extends PreviousNextOrCancel {
                 JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
                         "please enter the semantic tag", "",
                         JOptionPane.ERROR_MESSAGE);
+            } else if(fsn.extractText().split("\\s").length == 1){
+                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "the fsn and semantic tag should be separated by a space", "",
+                        JOptionPane.ERROR_MESSAGE);
+            }else if (fsn.extractText().indexOf("(") == fsn.extractText().lastIndexOf(")") - 1) {
+                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "the semantic tag should not be empty", "",
+                        JOptionPane.ERROR_MESSAGE);
             } else if (nidList.isEmpty()) {
                 //please list parents for the new concept
                 JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),

@@ -27,6 +27,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.profile.NewDefaultProfile;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.mojo.maven.MojoUtil;
 
@@ -52,6 +53,8 @@ public class VodbSetDefaultActivateConfig extends AbstractMojo {
         try {
             I_TermFactory tf = Terms.get();
             I_ConfigAceFrame activeConfig = NewDefaultProfile.newProfile(null, null, null, null, null);
+            
+            activeConfig.setModuleNid(ArchitectonicAuxiliary.Concept.AUXILIARY_MODULE.localize().getNid());
 
             tf.setActiveAceFrameConfig(activeConfig);
         } catch (IOException e) {

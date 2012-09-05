@@ -1322,12 +1322,12 @@ public class RulesLibrary {
 			// + (System.currentTimeMillis() - start) +
 			// " ms. *****************");
 		} catch (Exception e) {
-			AceLog.getAppLog().alertAndLogException(e);
-			try {
-				Terms.get().cancel();
-			} catch (IOException ioException) {
-				AceLog.getAppLog().alertAndLogException(ioException);
-			}
+//			AceLog.getAppLog().alertAndLogException(e);
+//			try {
+//				Terms.get().cancel();
+//			} catch (IOException ioException) {
+//				AceLog.getAppLog().alertAndLogException(ioException);
+//			}
 		}
 
 		return result;
