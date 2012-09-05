@@ -176,6 +176,7 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
         SortClickListener.setupSorter(relTable);
         relTable.setDefaultRenderer(StringWithRelTuple.class, renderer);
         relTable.getTableHeader().setToolTipText("Click to specify sorting");
+        
         REL_FIELD[] columnEnums = srcRelTableModel.getColumnEnums();
         for (int i = 0; i < relTable.getColumnCount(); i++) {
             TableColumn column = relTable.getColumnModel().getColumn(i);
@@ -217,205 +218,79 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
         return fields.toArray(new REL_FIELD[fields.size()]);
     }
 
-    @SuppressWarnings("unchecked")
     private void layoutRefreshSpecClausePanel() throws IOException, TerminologyException {
         this.removeAll();
         JPanel replacementConceptsPanel = new JPanel();
         replacementConceptsPanel.setLayout(new GridBagLayout());
         setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
+        GridBagConstraints gbc = null; 
+        
+        createRefexLabel();
+
+        createClauseToUpdateLabel();
+
+        createRefexVersionLabel();
+
+        createTerminologyVersionLabel();
+
+        int indentSize = createConceptUnderReviewLabel();
+
+        createConceptRelationsPane(indentSize);
+
+        createRefreshActionPicker(indentSize);
+
+        createConceptReplacementDropTarget(replacementConceptsPanel, indentSize);
+
+        createEditorCommentsBox(indentSize);
 
         // -------------------------------------------------
-        // refset spec...
+        // Refresh The Panel...
         // -------------------------------------------------
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.weighty = 0.0;
-        gbc.insets = new Insets(5, 10, 5, 5);
-        gbc.anchor = GridBagConstraints.LINE_START;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        add(new JLabel("Refset Spec:"), gbc);
-
-        gbc = new GridBagConstraints();
-        gbc.gridx = 3;
-        gbc.gridy = 0;
-        gbc.weighty = 0.0;
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.anchor = GridBagConstraints.LINE_START;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        TermComponentLabel refsetSpecLabel = new TermComponentLabel(frameConfig);
-        refsetSpecLabel.setTermComponent(refsetSpec);
-        refsetSpecLabel.setFrozen(true);
-        add(refsetSpecLabel, gbc);
-
-        // -------------------------------------------------
-        // Clause to update...
-        // -------------------------------------------------
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.weighty = 0.0;
-        gbc.insets = new Insets(5, 10, 5, 5);
-        gbc.anchor = GridBagConstraints.LINE_START;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        add(new JLabel("Clause to Update:"), gbc);
-
-        gbc = new GridBagConstraints();
-        gbc.gridx = 3;
-        gbc.gridy = 1;
-        gbc.weighty = 0.0;
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.anchor = GridBagConstraints.LINE_START;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        StringBuffer buff = new StringBuffer();
-
-        I_TermFactory tf = Terms.get();
-        Collection<UUID> clauseIds = clausesToUpdate.get(0);
-        I_ExtendByRef member = tf.getExtension(Terms.get().uuidToNative(clauseIds));
-
-        List<I_ExtendByRefVersion> tuples =
-                (List<I_ExtendByRefVersion>) member.getTuples(frameConfig.getAllowedStatus(), frameConfig
-                    .getViewPositionSetReadOnly(), frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());
-
-        I_ExtendByRefVersion tuple = tuples.iterator().next();
-        if (tuple.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.localize().getNid()) {
-            I_ExtendByRefPartCidCid ccPart = (I_ExtendByRefPartCidCid) tuple.getMutablePart();
-            buff.append(tf.getConcept(ccPart.getC1id()).toString());
-            buff.append(" ");
-            buff.append(tf.getConcept(ccPart.getC2id()).toString());
-        } else if (tuple.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION.localize().getNid()) {
-            I_ExtendByRefPartCidCidCid cccPart = (I_ExtendByRefPartCidCidCid) tuple.getMutablePart();
-            buff.append(tf.getConcept(cccPart.getC1id()).toString());
-            buff.append(" ");
-            buff.append(tf.getConcept(cccPart.getC2id()).toString());
-            buff.append(" ");
-            buff.append(tf.getConcept(cccPart.getC3id()).toString());
+        if (getRootPane() != null) {
+            getRootPane().validate();
         }
-        add(new JLabel(buff.toString()), gbc);
+        if (this.getParent() != null) {
+            this.getParent().validate();
+            this.getParent().repaint();
+        }
+    }
 
+    private void createEditorCommentsBox(int indentSize) {
+        GridBagConstraints gbc;
         // -------------------------------------------------
-        // Specification Version ....
+        // Editor Comments...
         // -------------------------------------------------
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.weighty = 0.0;
-        gbc.insets = new Insets(5, 10, 5, 5);
-        gbc.anchor = GridBagConstraints.LINE_START;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        add(new JLabel("Specification Version:"), gbc);
+        if (updateOptions.equals(SKIP_OPTION) == false) {
 
-        gbc = new GridBagConstraints();
-        gbc.gridx = 3;
-        gbc.gridy = 2;
-        gbc.weighty = 0.0;
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.anchor = GridBagConstraints.LINE_START;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        add(new JLabel(refsetSpecVersionSet.toString()), gbc);
+            gbc = new GridBagConstraints();
+            gbc.gridx = 0;
+            gbc.gridy = 9 + replacementConceptLabel.size();
+            gbc.weighty = 0.0;
+            gbc.insets = new Insets(5, indentSize, 5, 5);
+            gbc.anchor = GridBagConstraints.LINE_START;
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            add(new JLabel("Comments:"), gbc);
 
-        // -------------------------------------------------
-        // Terminology Version ....
-        // -------------------------------------------------
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.weighty = 0.0;
-        gbc.insets = new Insets(5, 10, 5, 5);
-        gbc.anchor = GridBagConstraints.LINE_START;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        add(new JLabel("Terminology Version:"), gbc);
+            gbc = new GridBagConstraints();
+            gbc.gridx = 3;
+            gbc.gridy = 9 + replacementConceptLabel.size();
+            gbc.weightx = 1;
+            gbc.weighty = 1;
+            gbc.gridheight = 3;
+            gbc.insets = new Insets(5, 5, 5, 5);
+            gbc.anchor = GridBagConstraints.LINE_START;
+            gbc.fill = GridBagConstraints.BOTH;
+            editorComments.setLineWrap(true);
+            editorComments.setWrapStyleWord(true);
+            JScrollPane commentsScrollPane = new JScrollPane(editorComments);
+            commentsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+            add(commentsScrollPane, gbc);
+        }
+    }
 
-        gbc = new GridBagConstraints();
-        gbc.gridx = 3;
-        gbc.gridy = 3;
-        gbc.weighty = 0.0;
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.anchor = GridBagConstraints.LINE_START;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        add(new JLabel(sourceTerminologyVersionSet.toString()), gbc);
-
-        // -------------------------------------------------
-        // Concept Under Review
-        // -------------------------------------------------
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        gbc.weighty = 0.0;
-        gbc.gridwidth = 1;
-        gbc.insets = new Insets(25, 10, 5, 5);
-        gbc.anchor = GridBagConstraints.CENTER;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        Font sansSerifFontBold14 = new Font(Font.SANS_SERIF, Font.BOLD, 14);
-        JLabel curLabel = new JLabel("Concept Under Review:");
-        curLabel.setFont(sansSerifFontBold14);
-        add(curLabel, gbc);
-
-        int indentSize = 30;
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 5;
-        gbc.weighty = 0.0;
-        gbc.gridwidth = 4;
-        gbc.insets = new Insets(0, indentSize, 5, 5);
-        gbc.anchor = GridBagConstraints.CENTER;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        Font sansSerifFontBold12 = new Font(Font.SANS_SERIF, Font.BOLD, 12);
-        TermComponentLabel conceptUnderReviewLabel = new TermComponentLabel(frameConfig);
-        conceptUnderReviewLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 20, 5));
-        conceptUnderReviewLabel.setTermComponent(conceptUnderReview);
-        conceptUnderReviewLabel.setFrozen(true);
-        conceptUnderReviewLabel.setFont(sansSerifFontBold12);
-        conceptUnderReviewLabel.setForeground(Color.blue);
-        conceptUnderReviewLabel.setBorder(BorderFactory.createLineBorder(Color.black, 3));
-        add(conceptUnderReviewLabel, gbc);
-
-        // -------------------------------------------------
-        // Concept Relations....
-        // -------------------------------------------------
-        GridBagConstraints scrollPaneGbc = new GridBagConstraints();
-        scrollPaneGbc = new GridBagConstraints();
-        scrollPaneGbc.gridx = 0;
-        scrollPaneGbc.gridy = 6;
-        scrollPaneGbc.weighty = 0.0;
-        scrollPaneGbc.insets = new Insets(5, indentSize, 5, 5);
-        scrollPaneGbc.anchor = GridBagConstraints.LINE_START;
-        scrollPaneGbc.fill = GridBagConstraints.HORIZONTAL;
-        add(new JLabel("Concept Relations:"), scrollPaneGbc);
-
-        scrollPaneGbc = new GridBagConstraints();
-        scrollPaneGbc.gridx = 0;
-        scrollPaneGbc.gridy = 7;
-        scrollPaneGbc.weightx = 1;
-        scrollPaneGbc.weighty = 1;
-        scrollPaneGbc.gridwidth = 4;
-        scrollPaneGbc.gridheight = 1;
-        scrollPaneGbc.insets = new Insets(5, indentSize + 15, 5, 5);
-        scrollPaneGbc.anchor = GridBagConstraints.FIRST_LINE_START;
-        scrollPaneGbc.fill = GridBagConstraints.BOTH;
-        add(new JScrollPane(relTable), scrollPaneGbc);
-
-        // -------------------------------------------------
-        // Refresh Action....
-        // -------------------------------------------------
-        scrollPaneGbc = new GridBagConstraints();
-        scrollPaneGbc.gridx = 0;
-        scrollPaneGbc.gridy = 8;
-        scrollPaneGbc.weighty = 0.0;
-        scrollPaneGbc.insets = new Insets(5, indentSize, 5, 5);
-        scrollPaneGbc.anchor = GridBagConstraints.LINE_START;
-        scrollPaneGbc.fill = GridBagConstraints.HORIZONTAL;
-        add(new JLabel("Refresh Action:"), scrollPaneGbc);
-
-        scrollPaneGbc = new GridBagConstraints();
-        scrollPaneGbc.gridx = 3;
-        scrollPaneGbc.gridy = 8;
-        scrollPaneGbc.weighty = 0.0;
-        scrollPaneGbc.insets = new Insets(5, 5, 5, 5);
-        scrollPaneGbc.anchor = GridBagConstraints.LINE_START;
-        scrollPaneGbc.fill = GridBagConstraints.HORIZONTAL;
-        add(updateOptions, scrollPaneGbc);
-
+    private void createConceptReplacementDropTarget(
+            JPanel replacementConceptsPanel, int indentSize) {
+        GridBagConstraints scrollPaneGbc;
         // -------------------------------------------------
         // Concept Drop Zone...
         // -------------------------------------------------
@@ -499,57 +374,220 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
             //scrollPane.setVerticalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
             add(scrollPane, scrollPaneGbc);
         }
-        //gbc = new GridBagConstraints();
-        // gbc.gridx = 0;
-        // gbc.gridy = 9;
-        //  gbc.weighty = 0.0;
-        //  gbc.insets = new Insets(5, indentSize, 5, 5);
-        //  gbc.anchor = GridBagConstraints.LINE_START;
-        //  gbc.fill = GridBagConstraints.HORIZONTAL;
-        //  JScrollPane scrollPane = new JScrollPane(replacementConceptsPanel);
-        //  scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        //   add(scrollPane, gbc);
+    }
 
+    private void createRefreshActionPicker(int indentSize) {
+        GridBagConstraints scrollPaneGbc;
         // -------------------------------------------------
-        // Editor Comments...
+        // Refresh Action....
         // -------------------------------------------------
-        if (updateOptions.equals(SKIP_OPTION) == false) {
+        scrollPaneGbc = new GridBagConstraints();
+        scrollPaneGbc.gridx = 0;
+        scrollPaneGbc.gridy = 8;
+        scrollPaneGbc.weighty = 0.0;
+        scrollPaneGbc.insets = new Insets(5, indentSize, 5, 5);
+        scrollPaneGbc.anchor = GridBagConstraints.LINE_START;
+        scrollPaneGbc.fill = GridBagConstraints.HORIZONTAL;
+        add(new JLabel("Refresh Action:"), scrollPaneGbc);
 
-            gbc = new GridBagConstraints();
-            gbc.gridx = 0;
-            gbc.gridy = 9 + replacementConceptLabel.size();
-            gbc.weighty = 0.0;
-            gbc.insets = new Insets(5, indentSize, 5, 5);
-            gbc.anchor = GridBagConstraints.LINE_START;
-            gbc.fill = GridBagConstraints.HORIZONTAL;
-            add(new JLabel("Comments:"), gbc);
+        scrollPaneGbc = new GridBagConstraints();
+        scrollPaneGbc.gridx = 3;
+        scrollPaneGbc.gridy = 8;
+        scrollPaneGbc.weighty = 0.0;
+        scrollPaneGbc.insets = new Insets(5, 5, 5, 5);
+        scrollPaneGbc.anchor = GridBagConstraints.LINE_START;
+        scrollPaneGbc.fill = GridBagConstraints.HORIZONTAL;
+        add(updateOptions, scrollPaneGbc);
+    }
 
-            gbc = new GridBagConstraints();
-            gbc.gridx = 3;
-            gbc.gridy = 9 + replacementConceptLabel.size();
-            gbc.weightx = 1;
-            gbc.weighty = 1;
-            gbc.gridheight = 3;
-            gbc.insets = new Insets(5, 5, 5, 5);
-            gbc.anchor = GridBagConstraints.LINE_START;
-            gbc.fill = GridBagConstraints.BOTH;
-            editorComments.setLineWrap(true);
-            editorComments.setWrapStyleWord(true);
-            JScrollPane commentsScrollPane = new JScrollPane(editorComments);
-            commentsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-            add(commentsScrollPane, gbc);
+    private void createConceptRelationsPane(int indentSize) {
+        // -------------------------------------------------
+        // Concept Relations....
+        // -------------------------------------------------
+        GridBagConstraints scrollPaneGbc = new GridBagConstraints();
+        scrollPaneGbc = new GridBagConstraints();
+        scrollPaneGbc.gridx = 0;
+        scrollPaneGbc.gridy = 6;
+        scrollPaneGbc.weighty = 0.0;
+        scrollPaneGbc.insets = new Insets(5, indentSize, 5, 5);
+        scrollPaneGbc.anchor = GridBagConstraints.LINE_START;
+        scrollPaneGbc.fill = GridBagConstraints.HORIZONTAL;
+        add(new JLabel("Concept Relations:"), scrollPaneGbc);
+
+        scrollPaneGbc = new GridBagConstraints();
+        scrollPaneGbc.gridx = 0;
+        scrollPaneGbc.gridy = 7;
+        scrollPaneGbc.weightx = 1;
+        scrollPaneGbc.weighty = 1;
+        scrollPaneGbc.gridwidth = 4;
+        scrollPaneGbc.gridheight = 1;
+        scrollPaneGbc.insets = new Insets(5, indentSize + 15, 5, 5);
+        scrollPaneGbc.anchor = GridBagConstraints.FIRST_LINE_START;
+        scrollPaneGbc.fill = GridBagConstraints.BOTH;
+        add(new JScrollPane(relTable), scrollPaneGbc);
+    }
+
+    private int createConceptUnderReviewLabel() {
+        GridBagConstraints gbc;
+        // -------------------------------------------------
+        // Concept Under Review
+        // -------------------------------------------------
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.weighty = 0.0;
+        gbc.gridwidth = 1;
+        gbc.insets = new Insets(25, 10, 5, 5);
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        Font sansSerifFontBold14 = new Font(Font.SANS_SERIF, Font.BOLD, 14);
+        JLabel curLabel = new JLabel("Concept Under Review:");
+        curLabel.setFont(sansSerifFontBold14);
+        add(curLabel, gbc);
+
+        int indentSize = 30;
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        gbc.weighty = 0.0;
+        gbc.gridwidth = 4;
+        gbc.insets = new Insets(0, indentSize, 5, 5);
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        Font sansSerifFontBold12 = new Font(Font.SANS_SERIF, Font.BOLD, 12);
+        TermComponentLabel conceptUnderReviewLabel = new TermComponentLabel(frameConfig);
+        conceptUnderReviewLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 20, 5));
+        conceptUnderReviewLabel.setTermComponent(conceptUnderReview);
+        conceptUnderReviewLabel.setFrozen(true);
+        conceptUnderReviewLabel.setFont(sansSerifFontBold12);
+        conceptUnderReviewLabel.setForeground(Color.blue);
+        conceptUnderReviewLabel.setBorder(BorderFactory.createLineBorder(Color.black, 3));
+        add(conceptUnderReviewLabel, gbc);
+        return indentSize;
+    }
+
+    private void createTerminologyVersionLabel() {
+        GridBagConstraints gbc;
+        // -------------------------------------------------
+        // Terminology Version ....
+        // -------------------------------------------------
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.weighty = 0.0;
+        gbc.insets = new Insets(5, 10, 5, 5);
+        gbc.anchor = GridBagConstraints.LINE_START;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        add(new JLabel("Terminology Version:"), gbc);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 3;
+        gbc.gridy = 3;
+        gbc.weighty = 0.0;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.LINE_START;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        add(new JLabel(sourceTerminologyVersionSet.toString()), gbc);
+    }
+
+    private void createRefexVersionLabel() {
+        GridBagConstraints gbc;
+        // -------------------------------------------------
+        // Specification Version ....
+        // -------------------------------------------------
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.weighty = 0.0;
+        gbc.insets = new Insets(5, 10, 5, 5);
+        gbc.anchor = GridBagConstraints.LINE_START;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        add(new JLabel("Specification Version:"), gbc);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 3;
+        gbc.gridy = 2;
+        gbc.weighty = 0.0;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.LINE_START;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        add(new JLabel(refsetSpecVersionSet.toString()), gbc);
+    }
+
+    private void createClauseToUpdateLabel() throws IOException,
+            TerminologyException {
+        GridBagConstraints gbc;
+        // -------------------------------------------------
+        // Clause to update...
+        // -------------------------------------------------
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.weighty = 0.0;
+        gbc.insets = new Insets(5, 10, 5, 5);
+        gbc.anchor = GridBagConstraints.LINE_START;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        add(new JLabel("Clause to Update:"), gbc);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 3;
+        gbc.gridy = 1;
+        gbc.weighty = 0.0;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.LINE_START;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        StringBuffer buff = new StringBuffer();
+
+        I_TermFactory tf = Terms.get();
+        Collection<UUID> clauseIds = clausesToUpdate.get(0);
+        I_ExtendByRef member = tf.getExtension(Terms.get().uuidToNative(clauseIds));
+
+        List<I_ExtendByRefVersion> tuples =
+                (List<I_ExtendByRefVersion>) member.getTuples(frameConfig.getAllowedStatus(), frameConfig
+                    .getViewPositionSetReadOnly(), frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());
+
+        I_ExtendByRefVersion tuple = tuples.iterator().next();
+        if (tuple.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.localize().getNid()) {
+            I_ExtendByRefPartCidCid ccPart = (I_ExtendByRefPartCidCid) tuple.getMutablePart();
+            buff.append(tf.getConcept(ccPart.getC1id()).toString());
+            buff.append(" ");
+            buff.append(tf.getConcept(ccPart.getC2id()).toString());
+        } else if (tuple.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION.localize().getNid()) {
+            I_ExtendByRefPartCidCidCid cccPart = (I_ExtendByRefPartCidCidCid) tuple.getMutablePart();
+            buff.append(tf.getConcept(cccPart.getC1id()).toString());
+            buff.append(" ");
+            buff.append(tf.getConcept(cccPart.getC2id()).toString());
+            buff.append(" ");
+            buff.append(tf.getConcept(cccPart.getC3id()).toString());
         }
+        add(new JLabel(buff.toString()), gbc);
+    }
 
+    private void createRefexLabel() {
+        GridBagConstraints gbc;
         // -------------------------------------------------
-        // Refresh The Panel...
+        // refset spec...
         // -------------------------------------------------
-        if (getRootPane() != null) {
-            getRootPane().validate();
-        }
-        if (this.getParent() != null) {
-            this.getParent().validate();
-            this.getParent().repaint();
-        }
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weighty = 0.0;
+        gbc.insets = new Insets(5, 10, 5, 5);
+        gbc.anchor = GridBagConstraints.LINE_START;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        add(new JLabel("Refset Spec:"), gbc);
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 3;
+        gbc.gridy = 0;
+        gbc.weighty = 0.0;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.LINE_START;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        TermComponentLabel refsetSpecLabel = new TermComponentLabel(frameConfig);
+        refsetSpecLabel.setTermComponent(refsetSpec);
+        refsetSpecLabel.setFrozen(true);
+        add(refsetSpecLabel, gbc);
     }
 
     // @Override
