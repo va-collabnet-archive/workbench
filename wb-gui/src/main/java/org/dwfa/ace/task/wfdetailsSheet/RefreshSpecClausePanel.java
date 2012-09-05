@@ -131,20 +131,8 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
         updateOptions.setSelectedItem(REPLACE_OPTION);
         Collection<UUID> clauseIds = clausesToUpdate.get(0);
         I_TermFactory tf = Terms.get();
-        I_IntSet notCurrentStatus = tf.newIntSet();
-        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid());
-        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.CONFLICTING.localize().getNid());
-        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.NOT_YET_CREATED.localize().getNid());
-        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
-        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.RETIRED_MISSPELLED.localize().getNid());
-        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.DUPLICATE.localize().getNid());
-        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.OUTDATED.localize().getNid());
-        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.AMBIGUOUS.localize().getNid());
-        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.ERRONEOUS.localize().getNid());
-        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.INAPPROPRIATE.localize().getNid());
-        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.IMPLIED_RELATIONSHIP.localize().getNid());
-        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.MOVED_ELSEWHERE.localize().getNid());
-        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.EXTINCT.localize().getNid());
+        
+        I_IntSet notCurrentStatus = getNonCurrentStatusSet(tf);
 
         I_ExtendByRef member = tf.getExtension(Terms.get().uuidToNative(clauseIds));
         List<I_ExtendByRefVersion> tuples =
@@ -206,6 +194,25 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
         layoutRefreshSpecClausePanel();
         this.updateOptions.addActionListener(this);
         host.setTermComponent(conceptUnderReview);
+    }
+
+    private I_IntSet getNonCurrentStatusSet(I_TermFactory tf)
+            throws IOException, TerminologyException {
+        I_IntSet notCurrentStatus = tf.newIntSet();
+        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid());
+        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.CONFLICTING.localize().getNid());
+        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.NOT_YET_CREATED.localize().getNid());
+        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
+        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.RETIRED_MISSPELLED.localize().getNid());
+        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.DUPLICATE.localize().getNid());
+        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.OUTDATED.localize().getNid());
+        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.AMBIGUOUS.localize().getNid());
+        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.ERRONEOUS.localize().getNid());
+        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.INAPPROPRIATE.localize().getNid());
+        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.IMPLIED_RELATIONSHIP.localize().getNid());
+        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.MOVED_ELSEWHERE.localize().getNid());
+        notCurrentStatus.add(ArchitectonicAuxiliary.Concept.EXTINCT.localize().getNid());
+        return notCurrentStatus;
     }
 
     private REL_FIELD[] getSrcRelColumns() {
