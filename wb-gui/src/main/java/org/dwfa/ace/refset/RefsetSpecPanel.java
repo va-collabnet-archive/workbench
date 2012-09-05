@@ -57,10 +57,10 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Position;
 
+import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.taxonomy.TaxonomyHelper;
 import org.ihtsdo.taxonomy.model.childfilters.OrCompositeChildFilter;
 import org.ihtsdo.taxonomy.model.childfilters.RefsetMemberChildFilter;
-import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.NidListBI;
 import org.ihtsdo.tk.api.PathBI;
@@ -1202,8 +1202,8 @@ public class RefsetSpecPanel extends JPanel {
 
                long   endTime      = System.currentTimeMillis();
                long   elapsed      = endTime - startTime;
-               String elapsedStr   = TimeUtil.getElapsedTimeString(elapsed);
-               String remainingStr = TimeUtil.getRemainingTimeString(processed, tupleMemberIds.size(),
+               String elapsedStr   = TimeHelper.getElapsedTimeString(elapsed);
+               String remainingStr = TimeHelper.getRemainingTimeString(processed, tupleMemberIds.size(),
                                         elapsed);
 
                activity.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Remaining: " + remainingStr);
@@ -1268,7 +1268,7 @@ public class RefsetSpecPanel extends JPanel {
       @Override
       public void done() {
          long   elapsed    = System.currentTimeMillis() - startTime;
-         String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+         String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
 
          if (!isCancelled()) {
             activity.setProgressInfoLower("Complete. Time: " + elapsedStr);
