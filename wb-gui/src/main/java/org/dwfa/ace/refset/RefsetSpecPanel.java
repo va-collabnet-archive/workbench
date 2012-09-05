@@ -793,10 +793,6 @@ public class RefsetSpecPanel extends JPanel {
       }
    }
 
-   public I_ExtendByRef getSelectedRefsetClauseInSpecEditor() {
-      return getSelectedRefsetClauseInSpecEditor();
-   }
-
    public boolean getShowPromotionCheckBoxes() {
       return showPromotionCheckBoxes;
    }

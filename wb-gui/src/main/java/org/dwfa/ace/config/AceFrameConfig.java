@@ -2913,13 +2913,6 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         return null;
     }
 
-    public I_ExtendByRef getSelectedRefsetClauseInSpecEditor() {
-        if (aceFrame != null && aceFrame.getCdePanel() != null) {
-            return aceFrame.getCdePanel().getSelectedRefsetClauseInSpecEditor();
-        }
-        return null;
-    }
-
     public JTree getTreeInSpecEditor() {
         if (aceFrame != null && aceFrame.getCdePanel() != null) {
             return aceFrame.getCdePanel().getTreeInSpecEditor();

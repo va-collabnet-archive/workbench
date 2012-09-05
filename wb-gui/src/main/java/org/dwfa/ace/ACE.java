@@ -2694,10 +2694,6 @@ public class ACE extends JPanel implements PropertyChangeListener,
         return searchPanel.getSearchResultsSelection();
     }
 
-    public I_ExtendByRef getSelectedRefsetClauseInSpecEditor() {
-        return refsetSpecPanel.getSelectedRefsetClauseInSpecEditor();
-    }
-
     public Boolean getShowPromotionCheckBoxes() {
         return refsetSpecPanel.getShowPromotionCheckBoxes();
     }

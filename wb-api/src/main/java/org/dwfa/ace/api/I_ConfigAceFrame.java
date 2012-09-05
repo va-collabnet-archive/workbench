@@ -564,8 +564,6 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public JTree getTreeInSpecEditor();
 
-    public I_ExtendByRef getSelectedRefsetClauseInSpecEditor();
-
     public JTree getTreeInTaxonomyPanel();
 
     // Configuration items to support the classifier.

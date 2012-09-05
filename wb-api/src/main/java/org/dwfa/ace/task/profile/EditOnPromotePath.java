@@ -476,10 +476,6 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
         return config.getSelectedAddresses();
     }
 
-    public I_ExtendByRef getSelectedRefsetClauseInSpecEditor() {
-        return config.getSelectedRefsetClauseInSpecEditor();
-    }
-
     public I_IntList getShortLabelDescPreferenceList() {
         return config.getShortLabelDescPreferenceList();
     }

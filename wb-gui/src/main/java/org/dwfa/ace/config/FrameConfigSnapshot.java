@@ -295,10 +295,6 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
         return baseFrame.getRefsetInSpecEditor();
     }
 
-    public I_ExtendByRef getSelectedRefsetClauseInSpecEditor() {
-        return baseFrame.getSelectedRefsetClauseInSpecEditor();
-    }
-
     public void svnRevert(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
             throws TaskFailedException {
         baseFrame.svnRevert(svd, authenticator, interactive);

@@ -532,10 +532,6 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         return frameConfig.getSelectedAddresses();
     }
 
-    public I_ExtendByRef getSelectedRefsetClauseInSpecEditor() {
-        return frameConfig.getSelectedRefsetClauseInSpecEditor();
-    }
-
     public I_IntList getShortLabelDescPreferenceList() {
         return frameConfig.getShortLabelDescPreferenceList();
     }

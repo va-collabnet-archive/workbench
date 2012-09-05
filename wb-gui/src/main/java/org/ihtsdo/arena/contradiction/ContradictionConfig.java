@@ -867,10 +867,6 @@ public class ContradictionConfig implements I_ConfigAceFrame {
         return config.getShortLabelDescPreferenceList();
     }
 
-    public I_ExtendByRef getSelectedRefsetClauseInSpecEditor() {
-        return config.getSelectedRefsetClauseInSpecEditor();
-    }
-
     public List<String> getSelectedAddresses() {
         return config.getSelectedAddresses();
     }
