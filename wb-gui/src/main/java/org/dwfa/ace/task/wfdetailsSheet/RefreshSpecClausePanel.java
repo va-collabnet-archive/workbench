@@ -135,44 +135,39 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
         I_IntSet notCurrentStatus = getNonCurrentStatusSet(tf);
 
         I_ExtendByRef member = tf.getExtension(Terms.get().uuidToNative(clauseIds));
+        
         List<I_ExtendByRefVersion> tuples =
                 (List<I_ExtendByRefVersion>) member.getTuples(frameConfig.getAllowedStatus(), new PositionSetReadOnly(
                     refsetSpecVersionSet), frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());
+        
         for (I_ExtendByRefVersion tuple : tuples) {
+            
+            List<I_GetConceptData> parts = new ArrayList<I_GetConceptData>();
+            
+            boolean hit = false;
+            
             if (tuple.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION.localize().getNid()) {
                 I_ExtendByRefPartCidCid ccPart = (I_ExtendByRefPartCidCid) tuple.getMutablePart();
-                I_GetConceptData part1 = tf.getConcept(ccPart.getC1id());
-                I_GetConceptData part2 = tf.getConcept(ccPart.getC2id());
-
-                if (part1.getConceptAttributeTuples(notCurrentStatus, sourceTerminologyVersionSet,
-                    frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy()).size() > 0) {
-                    this.conceptUnderReview = part1;
-                }
-                if (part2.getConceptAttributeTuples(notCurrentStatus, sourceTerminologyVersionSet,
-                    frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy()).size() > 0) {
-                    this.conceptUnderReview = part2;
-                }
-                break;
+                parts.add(tf.getConcept(ccPart.getC1id()));
+                parts.add(tf.getConcept(ccPart.getC2id()));
+                hit = true;
             } else if (tuple.getTypeId() == RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION.localize().getNid()) {
                 I_ExtendByRefPartCidCidCid cccPart = (I_ExtendByRefPartCidCidCid) tuple.getMutablePart();
-                I_GetConceptData part1 = tf.getConcept(cccPart.getC1id());
-                I_GetConceptData part2 = tf.getConcept(cccPart.getC2id());
-                I_GetConceptData part3 = tf.getConcept(cccPart.getC3id());
-
-                if (part1.getConceptAttributeTuples(notCurrentStatus, sourceTerminologyVersionSet,
-                    frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy()).size() > 0) {
-                    this.conceptUnderReview = part1;
-                }
-                if (part2.getConceptAttributeTuples(notCurrentStatus, sourceTerminologyVersionSet,
-                    frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy()).size() > 0) {
-                    this.conceptUnderReview = part2;
-                }
-                if (part3.getConceptAttributeTuples(notCurrentStatus, sourceTerminologyVersionSet,
-                    frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy()).size() > 0) {
-                    this.conceptUnderReview = part3;
-                }
-                break;
+                parts.add(tf.getConcept(cccPart.getC1id()));
+                parts.add(tf.getConcept(cccPart.getC2id()));
+                parts.add(tf.getConcept(cccPart.getC3id()));
+                hit = true;
             }
+            
+            for(I_GetConceptData part : parts) {
+                if(part.getConceptAttributeTuples(notCurrentStatus, sourceTerminologyVersionSet,
+                frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy()).size() > 0) {
+                    this.conceptUnderReview = part;
+                }
+            }
+            
+            if (hit) break;
+                
         }
 
         srcRelTableModel = new SrcRelTableModel(host, getSrcRelColumns(), frameConfig);
