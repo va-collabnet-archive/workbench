@@ -17,7 +17,6 @@
 package org.ihtsdo.arena.task;
 
 import java.awt.Component;
-import java.awt.ComponentOrientation;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -56,7 +55,6 @@ import org.dwfa.ace.list.TerminologyListModel;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.reporting.ChangeReport;
 import org.dwfa.ace.task.InstructAndWait;
-import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 
 import org.dwfa.bpa.process.Condition;
@@ -86,8 +84,6 @@ public class CreateReport extends AbstractTask {
 
     private static final long serialVersionUID = 1L;
     private static final int dataVersion = 1;
-    private String begDateProp = ProcessAttachmentKeys.START_DATE.getAttachmentKey();
-    private String endDateProp = ProcessAttachmentKeys.END_DATE.getAttachmentKey();
     private transient Condition returnCondition;
     protected transient boolean done;
     private I_ConfigAceFrame config;
@@ -96,6 +92,7 @@ public class CreateReport extends AbstractTask {
     protected String path2_uuid;
     protected String v1;
     protected String v2;
+
     protected boolean added_concepts = false;
     protected boolean deleted_concepts = false;
     protected boolean added_concepts_refex = false;
@@ -116,6 +113,7 @@ public class CreateReport extends AbstractTask {
     protected boolean added_relationships = false;
     protected boolean deleted_relationships = false;
     protected boolean changed_relationship_status = false;
+
     protected List<Integer> v1_relationship_characteristic_filter_int;
     protected List<Integer> v2_relationship_characteristic_filter_int;
     protected List<Integer> v1_concept_status_filter_int;
@@ -320,11 +318,9 @@ public class CreateReport extends AbstractTask {
 
     private class DoSwing extends SwingWorker<Boolean, Boolean> {
 
-        I_EncodeBusinessProcess process;
 
         public DoSwing(I_EncodeBusinessProcess process) {
             super();
-            this.process = process;
         }
 
         @Override
@@ -818,13 +814,7 @@ public class CreateReport extends AbstractTask {
         @Override
         public void itemStateChanged(ItemEvent e) {
             AbstractButton abstractButton = (AbstractButton) e.getSource();
-            boolean selected = abstractButton.getModel().isSelected();
-
-            if (selected) {
-                added_concepts = true;
-            } else {
-                added_concepts = false;
-            }
+            added_concepts = abstractButton.isSelected();
         }
     }
 
@@ -833,13 +823,7 @@ public class CreateReport extends AbstractTask {
         @Override
         public void itemStateChanged(ItemEvent e) {
             AbstractButton abstractButton = (AbstractButton) e.getSource();
-            boolean selected = abstractButton.getModel().isSelected();
-
-            if (selected) {
-                deleted_concepts = true;
-            } else {
-                deleted_concepts = false;
-            }
+            deleted_concepts = abstractButton.isSelected();
         }
     }
 
@@ -848,13 +832,7 @@ public class CreateReport extends AbstractTask {
         @Override
         public void itemStateChanged(ItemEvent e) {
             AbstractButton abstractButton = (AbstractButton) e.getSource();
-            boolean selected = abstractButton.getModel().isSelected();
-
-            if (selected) {
-                added_concepts_refex = true;
-            } else {
-                added_concepts_refex = false;
-            }
+            added_concepts_refex = abstractButton.isSelected();
         }
     }
 
@@ -863,13 +841,7 @@ public class CreateReport extends AbstractTask {
         @Override
         public void itemStateChanged(ItemEvent e) {
             AbstractButton abstractButton = (AbstractButton) e.getSource();
-            boolean selected = abstractButton.getModel().isSelected();
-
-            if (selected) {
-                deleted_concepts_refex = true;
-            } else {
-                deleted_concepts_refex = false;
-            }
+            deleted_concepts_refex = abstractButton.isSelected();
         }
     }
 
@@ -878,13 +850,7 @@ public class CreateReport extends AbstractTask {
         @Override
         public void itemStateChanged(ItemEvent e) {
             AbstractButton abstractButton = (AbstractButton) e.getSource();
-            boolean selected = abstractButton.getModel().isSelected();
-
-            if (selected) {
-                changed_concept_status = true;
-            } else {
-                changed_concept_status = false;
-            }
+            changed_concept_status = abstractButton.isSelected();
         }
     }
 
@@ -893,13 +859,7 @@ public class CreateReport extends AbstractTask {
         @Override
         public void itemStateChanged(ItemEvent e) {
             AbstractButton abstractButton = (AbstractButton) e.getSource();
-            boolean selected = abstractButton.getModel().isSelected();
-
-            if (selected) {
-                changed_concept_author = true;
-            } else {
-                changed_concept_author = false;
-            }
+            changed_concept_author = abstractButton.isSelected();
         }
     }
 
@@ -908,13 +868,7 @@ public class CreateReport extends AbstractTask {
         @Override
         public void itemStateChanged(ItemEvent e) {
             AbstractButton abstractButton = (AbstractButton) e.getSource();
-            boolean selected = abstractButton.getModel().isSelected();
-
-            if (selected) {
-                changed_description_author = true;
-            } else {
-                changed_description_author = false;
-            }
+            changed_description_author = abstractButton.isSelected();
         }
     }
 
@@ -923,13 +877,7 @@ public class CreateReport extends AbstractTask {
         @Override
         public void itemStateChanged(ItemEvent e) {
             AbstractButton abstractButton = (AbstractButton) e.getSource();
-            boolean selected = abstractButton.getModel().isSelected();
-
-            if (selected) {
-                changed_rel_author = true;
-            } else {
-                changed_rel_author = false;
-            }
+            changed_rel_author = abstractButton.isSelected();
         }
     }
 
@@ -938,13 +886,7 @@ public class CreateReport extends AbstractTask {
         @Override
         public void itemStateChanged(ItemEvent e) {
             AbstractButton abstractButton = (AbstractButton) e.getSource();
-            boolean selected = abstractButton.getModel().isSelected();
-
-            if (selected) {
-                changed_refex_author = true;
-            } else {
-                changed_refex_author = false;
-            }
+            changed_refex_author = abstractButton.isSelected();
         }
     }
 
@@ -953,13 +895,7 @@ public class CreateReport extends AbstractTask {
         @Override
         public void itemStateChanged(ItemEvent e) {
             AbstractButton abstractButton = (AbstractButton) e.getSource();
-            boolean selected = abstractButton.getModel().isSelected();
-
-            if (selected) {
-                changed_defined = true;
-            } else {
-                changed_defined = false;
-            }
+            changed_defined = abstractButton.isSelected();
         }
     }
 
@@ -968,13 +904,7 @@ public class CreateReport extends AbstractTask {
         @Override
         public void itemStateChanged(ItemEvent e) {
             AbstractButton abstractButton = (AbstractButton) e.getSource();
-            boolean selected = abstractButton.getModel().isSelected();
-
-            if (selected) {
-                added_descriptions = true;
-            } else {
-                added_descriptions = false;
-            }
+            added_descriptions = abstractButton.isSelected();
         }
     }
 
@@ -983,13 +913,7 @@ public class CreateReport extends AbstractTask {
         @Override
         public void itemStateChanged(ItemEvent e) {
             AbstractButton abstractButton = (AbstractButton) e.getSource();
-            boolean selected = abstractButton.getModel().isSelected();
-
-            if (selected) {
-                deleted_descriptions = true;
-            } else {
-                deleted_descriptions = false;
-            }
+            deleted_descriptions = abstractButton.isSelected();
         }
     }
 
@@ -998,13 +922,7 @@ public class CreateReport extends AbstractTask {
         @Override
         public void itemStateChanged(ItemEvent e) {
             AbstractButton abstractButton = (AbstractButton) e.getSource();
-            boolean selected = abstractButton.getModel().isSelected();
-
-            if (selected) {
-                changed_description_status = true;
-            } else {
-                changed_description_status = false;
-            }
+            changed_description_status = abstractButton.isSelected();
         }
     }
 
@@ -1013,13 +931,7 @@ public class CreateReport extends AbstractTask {
         @Override
         public void itemStateChanged(ItemEvent e) {
             AbstractButton abstractButton = (AbstractButton) e.getSource();
-            boolean selected = abstractButton.getModel().isSelected();
-
-            if (selected) {
-                changed_description_term = true;
-            } else {
-                changed_description_term = false;
-            }
+            changed_description_term = abstractButton.isSelected();
         }
     }
 
@@ -1028,13 +940,7 @@ public class CreateReport extends AbstractTask {
         @Override
         public void itemStateChanged(ItemEvent e) {
             AbstractButton abstractButton = (AbstractButton) e.getSource();
-            boolean selected = abstractButton.getModel().isSelected();
-
-            if (selected) {
-                changed_description_type = true;
-            } else {
-                changed_description_type = false;
-            }
+            changed_description_type = abstractButton.isSelected();
         }
     }
 
@@ -1043,13 +949,7 @@ public class CreateReport extends AbstractTask {
         @Override
         public void itemStateChanged(ItemEvent e) {
             AbstractButton abstractButton = (AbstractButton) e.getSource();
-            boolean selected = abstractButton.getModel().isSelected();
-
-            if (selected) {
-                changed_description_language = true;
-            } else {
-                changed_description_language = false;
-            }
+            changed_description_language = abstractButton.isSelected();
         }
     }
 
@@ -1058,13 +958,7 @@ public class CreateReport extends AbstractTask {
         @Override
         public void itemStateChanged(ItemEvent e) {
             AbstractButton abstractButton = (AbstractButton) e.getSource();
-            boolean selected = abstractButton.getModel().isSelected();
-
-            if (selected) {
-                changed_description_case = true;
-            } else {
-                changed_description_case = false;
-            }
+            changed_description_case = abstractButton.isSelected();
         }
     }
 
@@ -1073,13 +967,7 @@ public class CreateReport extends AbstractTask {
         @Override
         public void itemStateChanged(ItemEvent e) {
             AbstractButton abstractButton = (AbstractButton) e.getSource();
-            boolean selected = abstractButton.getModel().isSelected();
-
-            if (selected) {
-                added_relationships = true;
-            } else {
-                added_relationships = false;
-            }
+            added_relationships = abstractButton.isSelected();
         }
     }
 
@@ -1088,13 +976,7 @@ public class CreateReport extends AbstractTask {
         @Override
         public void itemStateChanged(ItemEvent e) {
             AbstractButton abstractButton = (AbstractButton) e.getSource();
-            boolean selected = abstractButton.getModel().isSelected();
-
-            if (selected) {
-                deleted_relationships = true;
-            } else {
-                deleted_relationships = false;
-            }
+            deleted_relationships = abstractButton.isSelected();
         }
     }
 
@@ -1103,13 +985,7 @@ public class CreateReport extends AbstractTask {
         @Override
         public void itemStateChanged(ItemEvent e) {
             AbstractButton abstractButton = (AbstractButton) e.getSource();
-            boolean selected = abstractButton.getModel().isSelected();
-
-            if (selected) {
-                changed_relationship_status = true;
-            } else {
-                changed_relationship_status = false;
-            }
+            changed_relationship_status = abstractButton.isSelected();
         }
     }
 
@@ -1118,13 +994,7 @@ public class CreateReport extends AbstractTask {
         @Override
         public void itemStateChanged(ItemEvent e) {
             AbstractButton abstractButton = (AbstractButton) e.getSource();
-            boolean selected = abstractButton.getModel().isSelected();
-
-            if (selected) {
-                changed_relationship_characteristic = true;
-            } else {
-                changed_relationship_characteristic = false;
-            }
+            changed_relationship_characteristic = abstractButton.isSelected();
         }
     }
 
@@ -1133,13 +1003,7 @@ public class CreateReport extends AbstractTask {
         @Override
         public void itemStateChanged(ItemEvent e) {
             AbstractButton abstractButton = (AbstractButton) e.getSource();
-            boolean selected = abstractButton.getModel().isSelected();
-
-            if (selected) {
-                changed_relationship_refinability = true;
-            } else {
-                changed_relationship_refinability = false;
-            }
+            changed_relationship_refinability = abstractButton.isSelected();
         }
     }
 
@@ -1148,13 +1012,7 @@ public class CreateReport extends AbstractTask {
         @Override
         public void itemStateChanged(ItemEvent e) {
             AbstractButton abstractButton = (AbstractButton) e.getSource();
-            boolean selected = abstractButton.getModel().isSelected();
-
-            if (selected) {
-                changed_relationship_type = true;
-            } else {
-                changed_relationship_type = false;
-            }
+            changed_relationship_type = abstractButton.isSelected();
         }
     }
 
@@ -1163,13 +1021,7 @@ public class CreateReport extends AbstractTask {
         @Override
         public void itemStateChanged(ItemEvent e) {
             AbstractButton abstractButton = (AbstractButton) e.getSource();
-            boolean selected = abstractButton.getModel().isSelected();
-
-            if (selected) {
-                changed_relationship_group = true;
-            } else {
-                changed_relationship_group = false;
-            }
+            changed_relationship_group = abstractButton.isSelected();
         }
     }
 
@@ -1178,13 +1030,7 @@ public class CreateReport extends AbstractTask {
         @Override
         public void itemStateChanged(ItemEvent e) {
             AbstractButton abstractButton = (AbstractButton) e.getSource();
-            boolean selected = abstractButton.getModel().isSelected();
-
-            if (selected) {
-                noDescendantsV1 = true;
-            } else {
-                noDescendantsV1 = false;
-            }
+            noDescendantsV1 = abstractButton.isSelected();
         }
     }
 
@@ -1193,13 +1039,7 @@ public class CreateReport extends AbstractTask {
         @Override
         public void itemStateChanged(ItemEvent e) {
             AbstractButton abstractButton = (AbstractButton) e.getSource();
-            boolean selected = abstractButton.getModel().isSelected();
-
-            if (selected) {
-                noDescendantsV2 = true;
-            } else {
-                noDescendantsV2 = false;
-            }
+            noDescendantsV2 = abstractButton.isSelected();
         }
     }
 
