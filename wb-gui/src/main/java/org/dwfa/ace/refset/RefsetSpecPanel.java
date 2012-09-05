@@ -49,7 +49,6 @@ import org.dwfa.ace.table.refset.ReflexiveRefsetTableModel;
 import org.dwfa.ace.table.refset.ReflexiveTableModel;
 import org.dwfa.ace.table.refset.StringWithExtTuple;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
-import org.dwfa.ace.tree.TreeMouseListener;
 import org.dwfa.bpa.util.SortClickListener;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.ComputationCanceled;
@@ -59,7 +58,6 @@ import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Position;
 
 import org.ihtsdo.taxonomy.TaxonomyHelper;
-import org.ihtsdo.taxonomy.TaxonomyMouseListener;
 import org.ihtsdo.taxonomy.model.childfilters.OrCompositeChildFilter;
 import org.ihtsdo.taxonomy.model.childfilters.RefsetMemberChildFilter;
 import org.ihtsdo.time.TimeUtil;
@@ -120,7 +118,6 @@ public class RefsetSpecPanel extends JPanel {
    private Set<Object>                      promotionTypes          = new HashSet<Object>();
    private JLabel                           filterLabel             = new JLabel("Filter view:");
    private Box                              snomedIdPanel           = new Box(BoxLayout.Y_AXIS);
-   private final ACE                        ace;
    private I_ConfigAceFrame                 aceFrameConfig;
    private JButton                          approveButton;
    private Box                              bottomPanelVerticalBox;
@@ -145,7 +142,6 @@ public class RefsetSpecPanel extends JPanel {
 
    public RefsetSpecPanel(ACE ace) throws Exception {
       super(new GridBagLayout());
-      this.ace       = ace;
       aceFrameConfig = ace.getAceFrameConfig();
       split          = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
       split.setOneTouchExpandable(true);
@@ -425,7 +421,7 @@ public class RefsetSpecPanel extends JPanel {
       snomedIdPanel.add(Box.createVerticalStrut(5));
    }
 
-   public ReflexiveRefsetCommentTableModel setupCommentTable() throws NoSuchMethodException, Exception {
+   private ReflexiveRefsetCommentTableModel setupCommentTable() throws NoSuchMethodException, Exception {
       JTableWithDragImage commentTable = createCommentTable(aceFrameConfig, editor);
 
       for (int i = 0; i < bottomTabs.getTabCount(); i++) {
@@ -441,7 +437,7 @@ public class RefsetSpecPanel extends JPanel {
       return (ReflexiveRefsetCommentTableModel) commentTable.getModel();
    }
 
-   public void setupRefsetMemberTable(ReflexiveRefsetCommentTableModel commentTableModel)
+   private void setupRefsetMemberTable(ReflexiveRefsetCommentTableModel commentTableModel)
            throws NoSuchMethodException, Exception {
       List<ReflexiveRefsetFieldData> columns = new ArrayList<ReflexiveRefsetFieldData>();
 
@@ -783,10 +779,6 @@ public class RefsetSpecPanel extends JPanel {
       return refsetTable;
    }
 
-   public JCheckBox getRendererComponent() {
-      return selectAllCheckBox;
-   }
-
    private Integer getSelectedPromotionFilter() {
       Object o = filterComboBox.getSelectedItem();
 
@@ -900,11 +892,7 @@ public class RefsetSpecPanel extends JPanel {
       editor.setTermComponent(refset);
    }
 
-   public void setRefsetTable(JTableWithDragImage refsetTable) {
-      this.refsetTable = refsetTable;
-   }
-
-   public void setShowButtons(boolean show) {
+   private void setShowButtons(boolean show) {
       approveButton.setVisible(show);
       disapproveButton.setVisible(show);
       filterLabel.setVisible(show);

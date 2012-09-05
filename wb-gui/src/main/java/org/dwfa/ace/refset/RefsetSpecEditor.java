@@ -28,8 +28,6 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
-import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.gui.concept.ConceptPanel;
 import org.dwfa.ace.log.AceLog;
@@ -44,7 +42,6 @@ import org.dwfa.ace.table.refset.ReflexiveRefsetUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
-import org.dwfa.ace.tree.TermTreeHelper;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.ExecutionRecord;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -64,14 +61,12 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.MouseInfo;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -90,7 +85,6 @@ import java.lang.reflect.InvocationTargetException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -131,10 +125,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
     private static EnumSet<EConcept.REFSET_TYPES> allowedTypes = EnumSet.of(EConcept.REFSET_TYPES.CID_CID,
             EConcept.REFSET_TYPES.CID_CID_CID,
             EConcept.REFSET_TYPES.CID_CID_STR);
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
+
     //~--- fields --------------------------------------------------------------
     PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private PropertyChangeListener labelListener = new LabelListener();
@@ -175,8 +166,6 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
     }
     
     private EditState localEditState = EditState.READONLY;
-    //private EditState localEditState = EditState.EDIT;
-    //private EditState localEditState = EditState.REVIEW;
     
 
     //~--- constructors --------------------------------------------------------
@@ -197,7 +186,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         init(ace,treeHelper,refsetTree,refsetSpecPanel);
     }
     
-    public void init(ACE ace, TaxonomyHelper treeHelper, TaxonomyHelper refsetTree,
+    private void init(ACE ace, TaxonomyHelper treeHelper, TaxonomyHelper refsetTree,
             RefsetSpecPanel refsetSpecPanel)
             throws Exception {
         this.ace = ace;
@@ -280,25 +269,9 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         this.historyButton.addActionListener(al);
     }
 
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        pcs.addPropertyChangeListener(listener);
-    }
-
     @Override
     public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         pcs.addPropertyChangeListener(propertyName, listener);
-    }
-
-    public void fireIndexedPropertyChange(String propertyName, int index, boolean oldValue, boolean newValue) {
-        pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
-    }
-
-    public void fireIndexedPropertyChange(String propertyName, int index, int oldValue, int newValue) {
-        pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
-    }
-
-    public void fireIndexedPropertyChange(String propertyName, int index, Object oldValue, Object newValue) {
-        pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
     }
 
     public void firePropertyChange(PropertyChangeEvent evt) {
@@ -306,10 +279,6 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
     }
 
     public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
-        pcs.firePropertyChange(propertyName, oldValue, newValue);
-    }
-
-    public void firePropertyChange(String propertyName, int oldValue, int newValue) {
         pcs.firePropertyChange(propertyName, oldValue, newValue);
     }
 
@@ -354,14 +323,6 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         if (commentTableModel != null) {
             commentTableModel.fireTableDataChanged();
         }
-    }
-
-    public void removeHistoryActionListener(ActionListener al) {
-        this.historyButton.removeActionListener(al);
-    }
-
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
-        pcs.removePropertyChangeListener(listener);
     }
 
     public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
@@ -512,7 +473,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         updater.execute();
     }
 
-    public void updateToggles() {
+    private void updateToggles() {
         for (TOGGLES t : TOGGLES.values()) {
             boolean visible = ((AceFrameConfig) ace.getAceFrameConfig()).isToggleVisible(t);
 
@@ -547,7 +508,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         return ace.getAceFrameConfig();
     }
 
-    public JComponent getContentPane() throws Exception {
+    private JComponent getContentPane() throws Exception {
         JTabbedPane refsetTabs = new JTabbedPane();
 
         refsetTabs.addTab("specification", getSpecPane());
@@ -601,24 +562,8 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         throw new UnsupportedOperationException();
     }
 
-    public JToggleButton getHistoryButton() {
-        return historyButton;
-    }
-
     public TermComponentLabel getLabel() {
         return label;
-    }
-
-    public Dimension getPreferredScrollableViewportSize() {
-        return new Dimension(30, 30);
-    }
-
-    public PropertyChangeListener[] getPropertyChangeListeners() {
-        return pcs.getPropertyChangeListeners();
-    }
-
-    public PropertyChangeListener[] getPropertyChangeListeners(String propertyName) {
-        return pcs.getPropertyChangeListeners(propertyName);
     }
 
     public I_GetConceptData getRefsetSpecInSpecEditor() throws IOException, TerminologyException {
@@ -641,22 +586,6 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         return refsetSpecPanel;
     }
 
-    public int getScrollableBlockIncrement(Rectangle arg0, int arg1, int arg2) {
-        return 75;
-    }
-
-    public boolean getScrollableTracksViewportHeight() {
-        return false;
-    }
-
-    public boolean getScrollableTracksViewportWidth() {
-        return true;
-    }
-
-    public int getScrollableUnitIncrement(Rectangle arg0, int arg1, int arg2) {
-        return 10;
-    }
-
     @Override
     public boolean getShowHistory() {
         return historyButton.isSelected();
@@ -667,7 +596,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         throw new UnsupportedOperationException();
     }
 
-    public JComponent getSpecPane() throws Exception {
+    private JComponent getSpecPane() throws Exception {
         JPanel content = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
 
@@ -743,11 +672,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         return label.getTermComponent();
     }
     
-    public void setToggleBar(JPanel toggleBarIn) {
-        this.toggleBar = toggleBarIn;
-    }
-
-    public JComponent getToggleBar() throws IOException, ClassNotFoundException {
+    private JComponent getToggleBar() throws IOException, ClassNotFoundException {
         
         if(toggleBar == null){
         toggleBar = new JPanel(new GridBagLayout());
@@ -915,10 +840,13 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
             switch (toggle) {
                 case HISTORY:
                     return historyButton.isSelected();
+                default:
+                    // Do nothing
             }
         }
-
+        
         throw new UnsupportedOperationException(" Can't handle toggle: " + toggle);
+        
     }
 
     public JPanel getTopPanel() {
@@ -931,10 +859,6 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
 
     public boolean getUsePrefs() {
         return false;
-    }
-
-    public boolean hasListeners(String propertyName) {
-        return pcs.hasListeners(propertyName);
     }
 
     //~--- set methods ---------------------------------------------------------
@@ -1194,16 +1118,6 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         Terms.get().addUncommittedNoChecks(concept);
     }
     //~--- inner classes -------------------------------------------------------
-
-    private class AddSpecMetadaListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (addRefsetMetadata(false, (I_GetConceptData) getTermComponent(),null)) {
-                return;
-            }
-        }
-    }
 
     private class FixedToggleChangeActionListener implements ActionListener, PropertyChangeListener {
 
@@ -1559,6 +1473,5 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
     public void setLocalEditState(EditState localEditStateIn) {
         this.localEditState = localEditStateIn;
     }
-    
     
 }
