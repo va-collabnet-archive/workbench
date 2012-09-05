@@ -1875,14 +1875,6 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         return primordialSapNid == -1;
     }
 
-    /*
-     * (non-Javadoc) @see org.ihtsdo.db.bdb.concept.component.I_HandleDeferredStatusAtPositionSetup #isSetup()
-     */
-    @Override
-    public boolean isSetup() {
-        return primordialSapNid != Integer.MAX_VALUE;
-    }
-
     public boolean isUncommitted() {
         if (this.getTime() == Long.MAX_VALUE) {
             return true;

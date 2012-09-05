@@ -469,11 +469,6 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
         return sapNid <= Bdb.getSapDb().getReadOnlyMax();
     }
 
-    @Override
-    public boolean isSetup() {
-        return sapNid != Integer.MAX_VALUE;
-    }
-
     public boolean isUncommitted() {
         return getTime() == Long.MAX_VALUE;
     }

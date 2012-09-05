@@ -246,14 +246,7 @@ public abstract class IdentifierVersion
       return ThinVersionHelper.convert(getTime());
    }
 
-   /*
-    * (non-Javadoc)
-    * @see org.ihtsdo.db.bdb.concept.component.I_HandleDeferredStatusAtPositionSetup#isSetup()
-    */
-   @Override
-   public boolean isSetup() {
-      return statusAtPositionNid != Integer.MAX_VALUE;
-   }
+   
 
    //~--- set methods ---------------------------------------------------------
 
