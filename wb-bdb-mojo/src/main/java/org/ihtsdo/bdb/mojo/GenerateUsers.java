@@ -148,7 +148,7 @@ public class GenerateUsers extends AbstractMojo {
 	private ConceptSpec defaultRelType;
 	private ConceptSpec defaultRelChar;
 	private ConceptSpec defaultRelRefinability;
-        private String moduleFsn;
+        private ConceptSpec module;
 	private String visibleRefests;
 	private String projectDevelopmentPathFsn;
 	private String projectDevelopmentViewPathFsn;
@@ -196,7 +196,7 @@ public class GenerateUsers extends AbstractMojo {
 			projectDevelopmentPathFsn = configProps.getProperty("projectDevelopmentPathFsn");
 			projectDevelopmentViewPathFsn = configProps.getProperty("projectDevelopmentViewPathFsn");
                         projectDevelopmentAdjPathFsn = configProps.getProperty("projectDevelopmentAdjPathFsn");
-                        moduleFsn = configProps.getProperty("moduleFsn");
+                        module = getConceptSpecFromPrefs(configProps.getProperty("module"));
                         generateAdjCs = configProps.getProperty("generateAdjCs");
 
 			//create user based on profile config
@@ -365,12 +365,7 @@ public class GenerateUsers extends AbstractMojo {
 				userConfig = newProfile(fullname, username, password, adminUsername,
 						adminPassword);
 				userConfig.getDbConfig().setProfileFile(userProfile);
-                                UUID moduleUuid = null;
-                                if(moduleFsn.contains(Snomed.CORE_MODULE.getDescription())){
-                                    moduleUuid = Snomed.CORE_MODULE.getLenient().getPrimUuid();
-                                }else{
-                                    moduleUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, moduleFsn);
-                                }
+                                UUID moduleUuid = module.getLenient().getPrimUuid();
                                 userConfig.setModuleNid(Ts.get().getNidForUuids(moduleUuid));
 
 				Terms.get().setActiveAceFrameConfig(userConfig);
