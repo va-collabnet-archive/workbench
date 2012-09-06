@@ -26,14 +26,33 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class DescriptionAdditionFileHelper {
 
-    private static ArrayList<String> descFileList = null; //make correct types
+    private static ArrayList<String> descFileList = null;
     private static Lock initLock = new ReentrantLock();
+    private static final int BOM_SIZE = 4;
 
     private static void lazyInit(File memberFile)
             throws IOException {
         initLock.lock();
+        byte bom[] = new byte[BOM_SIZE];
+        String encoding;
+        int unread;
+        PushbackInputStream pushbackStream = new PushbackInputStream(new FileInputStream(memberFile), BOM_SIZE);
+        int n = pushbackStream.read(bom, 0, bom.length);
+        // Read ahead four bytes and check for BOM marks.
+        if ((bom[0] == (byte) 0xEF) && (bom[1] == (byte) 0xBB) && (bom[2] == (byte) 0xBF)) {
+            unread = n - 3;
+        }else{
+            unread = n;
+        }
+         // Unread bytes if necessary and skip BOM marks.
+        if (unread > 0) {
+            pushbackStream.unread(bom, (n - unread), unread);
+        } else if (unread < -1) {
+            pushbackStream.unread(bom, 0, 0);
+        }
+        
         InputStreamReader isr =
-                new InputStreamReader(new FileInputStream(memberFile), "UTF-8");
+                new InputStreamReader(pushbackStream, "UTF-8");
         HashMap msFileSetMap = new HashMap<String, Set<String>>();
         BufferedReader reader = new BufferedReader(isr);
         String line = reader.readLine();
