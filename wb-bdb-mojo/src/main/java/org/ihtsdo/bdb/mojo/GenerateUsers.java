@@ -417,15 +417,15 @@ public class GenerateUsers extends AbstractMojo {
 				newDbProfile.setUsername(userConfig.getUsername());
                                 
                                 String tempKey = UUID.randomUUID().toString();
+                                ChangeSetGeneratorBI generator =
+                                Ts.get().createDtoChangeSetGenerator(new File(absoluteChangeSetRoot, newDbProfile.getChangeSetWriterFileName()), new File(absoluteChangeSetRoot, "#0#"
+                                                + newDbProfile.getChangeSetWriterFileName()), ChangeSetGenerationPolicy.MUTABLE_ONLY);
+                                List<ChangeSetGeneratorBI> extraGeneratorList = new ArrayList<ChangeSetGeneratorBI>();
+
+                                extraGeneratorList.add(generator);
+                                Ts.get().addChangeSetGenerator(tempKey, generator);
 				try {
 					Terms.get().commit();
-                                        ChangeSetGeneratorBI generator =
-                                                Ts.get().createDtoChangeSetGenerator(new File(absoluteChangeSetRoot, newDbProfile.getChangeSetWriterFileName()), new File(absoluteChangeSetRoot, "#0#"
-                                                                + newDbProfile.getChangeSetWriterFileName()), ChangeSetGenerationPolicy.MUTABLE_ONLY);
-                                        List<ChangeSetGeneratorBI> extraGeneratorList = new ArrayList<ChangeSetGeneratorBI>();
-
-                                        extraGeneratorList.add(generator);
-                                        Ts.get().addChangeSetGenerator(tempKey, generator);
 				} catch (Exception e) {
 					throw new MojoExecutionException(e.getLocalizedMessage(), e);
 				} finally {
