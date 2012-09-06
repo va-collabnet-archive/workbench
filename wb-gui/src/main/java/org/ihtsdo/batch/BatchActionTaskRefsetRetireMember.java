@@ -70,24 +70,24 @@ public class BatchActionTaskRefsetRetireMember extends BatchActionTask {
         for (RefexVersionBI rvbi : currentRefexes) {
             if (rvbi.getRefexNid() == collectionNid) {
                 if (matchValue == null) {
-                        RefexCAB bluePrint = rvbi.makeBlueprint(vc);
-                        bluePrint.setStatusUuid(ts.getConcept(RETIRED_NID).getPrimUuid());
-                        tsSnapshot.constructIfNotCurrent(bluePrint);
-                        changedReferencedConcept = true; //... pass to BatchActionProcessor
-//                    for (int editPath : ec.getEditPaths()) {
-//                        rvbi.makeAnalog(RETIRED_NID,
-//                                Long.MAX_VALUE,
-//                                ec.getAuthorNid(),
-//                                ec.getModuleNid(),
-//                                editPath);
-//                    }
-//                    if (collectionConcept.isAnnotationStyleRefex()) {
-//                        // Ts.get().addUncommitted(c); <-- done in BatchActionProcessor for concept
-//                        changedReferencedConcept = true; // pass to BatchActionProcessor
-//                    } else {
+//                        RefexCAB bluePrint = rvbi.makeBlueprint(vc);
+//                        bluePrint.setStatusUuid(ts.getConcept(RETIRED_NID).getPrimUuid());
+//                        tsSnapshot.constructIfNotCurrent(bluePrint);
 //                        changedReferencedConcept = true; //... pass to BatchActionProcessor
-//                        ts.addUncommitted(collectionConcept);
-//                    }
+                    for (int editPath : ec.getEditPaths()) {
+                        rvbi.makeAnalog(RETIRED_NID,
+                                Long.MAX_VALUE,
+                                ec.getAuthorNid(),
+                                ec.getModuleNid(),
+                                editPath);
+                    }
+                    if (collectionConcept.isAnnotationStyleRefex()) {
+                        // Ts.get().addUncommitted(c); <-- done in BatchActionProcessor for concept
+                        changedReferencedConcept = true; // pass to BatchActionProcessor
+                    } else {
+                        changedReferencedConcept = true; //... pass to BatchActionProcessor
+                        ts.addUncommitted(collectionConcept);
+                    }
 
                     changed = true;
                     BatchActionEventReporter.add(new BatchActionEvent(c,
