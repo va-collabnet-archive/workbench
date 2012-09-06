@@ -661,8 +661,6 @@ public class LoadBdbMulti extends AbstractMojo {
                             parentUuid);
                     if(conceptUuid != null){
                         conceptBp.setComponentUuid(conceptUuid);
-                    }else{
-                        conceptBp.setComponentUuid(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, fsn));
                     }
                     List<DescriptionCAB> fsnCABs = conceptBp.getFullySpecifiedNameCABs();
                     List<DescriptionCAB> prefCABs = conceptBp.getPreferredNameCABs();
