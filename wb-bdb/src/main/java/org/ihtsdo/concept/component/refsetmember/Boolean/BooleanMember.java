@@ -118,8 +118,8 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember>
     
     @Override
     public BooleanRevision makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
-         BooleanRevision newR = new BooleanRevision(getStatusNid(), getTime(),
-                authorNid, moduleNid, getPathNid(), this);
+         BooleanRevision newR = new BooleanRevision(statusNid, time,
+                authorNid, moduleNid, pathNid, this);
 
         addRevision(newR);
 

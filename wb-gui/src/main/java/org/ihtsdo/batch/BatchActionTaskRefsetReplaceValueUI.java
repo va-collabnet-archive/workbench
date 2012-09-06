@@ -332,7 +332,7 @@ public class BatchActionTaskRefsetReplaceValueUI extends javax.swing.JPanel impl
                 ((BatchActionTaskRefsetReplaceValue) task).setRefsetType(TK_REFEX_TYPE.INT);
                 Integer valInt = ((ValueIntUI) jPanelValueReplace).getValue();
                 if (valInt != null) {
-                    ((BatchActionTaskRefsetReplaceValue) task).setMatchValue(valInt);
+                    ((BatchActionTaskRefsetReplaceValue) task).setRefsetValue(valInt);
                 } else {
                     BatchActionEventReporter.add(new BatchActionEvent(null, BatchActionTaskType.REFSET_REPLACE_VALUE,
                             BatchActionEventType.TASK_INVALID, "replace value not set"));
@@ -343,7 +343,7 @@ public class BatchActionTaskRefsetReplaceValueUI extends javax.swing.JPanel impl
                 ((BatchActionTaskRefsetReplaceValue) task).setRefsetType(TK_REFEX_TYPE.STR);
                 String valStr = ((ValueStringUI) jPanelValueReplace).getValue();
                 if (valStr != null) {
-                    ((BatchActionTaskRefsetReplaceValue) task).setMatchValue(valStr);
+                    ((BatchActionTaskRefsetReplaceValue) task).setRefsetValue(valStr);
                 } else {
                     BatchActionEventReporter.add(new BatchActionEvent(null, BatchActionTaskType.REFSET_REPLACE_VALUE,
                             BatchActionEventType.TASK_INVALID, "replace value not set"));
