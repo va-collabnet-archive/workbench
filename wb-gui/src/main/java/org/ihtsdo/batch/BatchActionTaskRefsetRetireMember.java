@@ -60,7 +60,8 @@ public class BatchActionTaskRefsetRetireMember extends BatchActionTask {
 
     // BatchActionTask
     @Override
-    public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc) throws IOException, InvalidCAB, ContradictionException {
+    public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc)
+            throws IOException, InvalidCAB, ContradictionException {
 
         Collection<? extends RefexVersionBI<?>> currentRefexes = c.getRefexesActive(vc);
         boolean changed = false;
@@ -69,19 +70,24 @@ public class BatchActionTaskRefsetRetireMember extends BatchActionTask {
         for (RefexVersionBI rvbi : currentRefexes) {
             if (rvbi.getRefexNid() == collectionNid) {
                 if (matchValue == null) {
-                    for (int editPath : ec.getEditPaths()) {
-                        rvbi.makeAnalog(RETIRED_NID,
-                            Long.MAX_VALUE,
-                            ec.getAuthorNid(),
-                            ec.getModuleNid(),
-                            editPath);
-                    }
-                    if (collectionConcept.isAnnotationStyleRefex()) {
-                        // Ts.get().addUncommitted(c); <-- done in BatchActionProcessor for concept
-                        changedReferencedConcept = true; // pass to BatchActionProcessor
-                    } else {
-                        ts.addUncommitted(collectionConcept);
-                    }
+                        RefexCAB bluePrint = rvbi.makeBlueprint(vc);
+                        bluePrint.setStatusUuid(ts.getConcept(RETIRED_NID).getPrimUuid());
+                        tsSnapshot.constructIfNotCurrent(bluePrint);
+                        changedReferencedConcept = true; //... pass to BatchActionProcessor
+//                    for (int editPath : ec.getEditPaths()) {
+//                        rvbi.makeAnalog(RETIRED_NID,
+//                                Long.MAX_VALUE,
+//                                ec.getAuthorNid(),
+//                                ec.getModuleNid(),
+//                                editPath);
+//                    }
+//                    if (collectionConcept.isAnnotationStyleRefex()) {
+//                        // Ts.get().addUncommitted(c); <-- done in BatchActionProcessor for concept
+//                        changedReferencedConcept = true; // pass to BatchActionProcessor
+//                    } else {
+//                        changedReferencedConcept = true; //... pass to BatchActionProcessor
+//                        ts.addUncommitted(collectionConcept);
+//                    }
 
                     changed = true;
                     BatchActionEventReporter.add(new BatchActionEvent(c,
@@ -129,6 +135,7 @@ public class BatchActionTaskRefsetRetireMember extends BatchActionTask {
                             // Ts.get().addUncommitted(c); <-- done in BatchActionProcessor for concept
                             changedReferencedConcept = true; // pass to BatchActionProcessor
                         } else {
+                            changedReferencedConcept = true; //... pass to BatchActionProcessor
                             ts.addUncommitted(collectionConcept);
                         }
 

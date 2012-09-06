@@ -65,7 +65,8 @@ public class BatchActionTaskRefsetReplaceValue extends BatchActionTask {
 
     // BatchActionTask
     @Override
-    public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc) throws IOException, InvalidCAB, ContradictionException {
+    public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc)
+            throws IOException, InvalidCAB, ContradictionException {
         int rcNid = c.getNid(); // referenced component
         Collection<? extends RefexVersionBI<?>> currentRefexes = c.getRefexesActive(vc);
         boolean changed = false;
@@ -86,6 +87,7 @@ public class BatchActionTaskRefsetReplaceValue extends BatchActionTask {
                         // Ts.get().addUncommitted(c); <-- done in BatchActionProcessor for concept
                         changedReferencedConcept = true; // pass to BatchActionProcessor
                     } else {
+                        changedReferencedConcept = true; //... pass to BatchActionProcessor
                         ts.addUncommitted(collectionConcept);
                     }
 
@@ -110,11 +112,12 @@ public class BatchActionTaskRefsetReplaceValue extends BatchActionTask {
                         // Ts.get().addUncommitted(c); <-- done in BatchActionProcessor for concept
                         changedReferencedConcept = true; // pass to BatchActionProcessor
                     } else {
+                        changedReferencedConcept = true; //... pass to BatchActionProcessor
                         ts.addUncommitted(collectionConcept);
                     }
 
                     BatchActionEventReporter.add(new BatchActionEvent(c,
-                            BatchActionTaskType.REFSET_ADD_MEMBER,
+                            BatchActionTaskType.REFSET_REPLACE_VALUE,
                             BatchActionEventType.EVENT_SUCCESS,
                             "member value changed: " + nidToName(collectionNid)));
 
@@ -161,6 +164,7 @@ public class BatchActionTaskRefsetReplaceValue extends BatchActionTask {
                             // Ts.get().addUncommitted(c); <-- done in BatchActionProcessor for concept
                             changedReferencedConcept = true; // pass to BatchActionProcessor
                         } else {
+                            changedReferencedConcept = true; //... pass to BatchActionProcessor
                             ts.addUncommitted(collectionConcept);
                         }
 
@@ -186,11 +190,12 @@ public class BatchActionTaskRefsetReplaceValue extends BatchActionTask {
                             // Ts.get().addUncommitted(c); <-- done in BatchActionProcessor for concept
                             changedReferencedConcept = true; // pass to BatchActionProcessor
                         } else {
+                            changedReferencedConcept = true; //... pass to BatchActionProcessor
                             ts.addUncommitted(collectionConcept);
                         }
 
                         BatchActionEventReporter.add(new BatchActionEvent(c,
-                                BatchActionTaskType.REFSET_ADD_MEMBER,
+                                BatchActionTaskType.REFSET_REPLACE_VALUE,
                                 BatchActionEventType.EVENT_SUCCESS,
                                 "(matched) member value changed: " + nidToName(collectionNid)));
 
