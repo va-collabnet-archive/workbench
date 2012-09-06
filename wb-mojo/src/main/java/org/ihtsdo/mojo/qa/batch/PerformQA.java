@@ -82,9 +82,9 @@ public class PerformQA implements I_ProcessConcepts {
 		rulesAlerted = new HashSet<String>();
 		monitoredUuids = new ArrayList<UUID>();
 
-//		monitoredUuids.add(UUID.fromString("48b0c96d-06a9-34f8-9479-6a278c74e87c"));
-//		monitoredUuids.add(UUID.fromString("57a97fd5-5278-358c-a9d5-16deb1a587d1"));
-//		monitoredUuids.add(UUID.fromString("1eb658fd-6f5c-3170-b736-56459b35490e"));
+		//		monitoredUuids.add(UUID.fromString("48b0c96d-06a9-34f8-9479-6a278c74e87c"));
+		//		monitoredUuids.add(UUID.fromString("57a97fd5-5278-358c-a9d5-16deb1a587d1"));
+		//		monitoredUuids.add(UUID.fromString("1eb658fd-6f5c-3170-b736-56459b35490e"));
 
 		try {
 			destRels = Terms.get().newIntSet();
@@ -341,56 +341,51 @@ public class PerformQA implements I_ProcessConcepts {
 			if (!results.getResultsItems().isEmpty()) {
 				writeOutputFile(results, loopConcept);
 			}
-		} else {
-			skippedCount++;
-			if (skippedCount % 1000 == 0) {
-				System.out.println("Skipped concepts: " + skippedCount);
-				System.out.println("");
-			}
+		} 
+	
+}
+
+private void writeOutputFile(ResultsCollectorWorkBench results, I_GetConceptData concept) throws Exception {
+
+	try {
+		List<AlertToDataConstraintFailure> alertList = results.getAlertList();
+
+		for (AlertToDataConstraintFailure alertToDataConstraintFailure : alertList) {
+			alertToDataConstraintFailure.getAlertType();
+			alertToDataConstraintFailure.getAlertMessage();
 		}
-	}
 
-	private void writeOutputFile(ResultsCollectorWorkBench results, I_GetConceptData concept) throws Exception {
-
-		try {
-			List<AlertToDataConstraintFailure> alertList = results.getAlertList();
-
-			for (AlertToDataConstraintFailure alertToDataConstraintFailure : alertList) {
-				alertToDataConstraintFailure.getAlertType();
-				alertToDataConstraintFailure.getAlertMessage();
-			}
-
-			List<ResultsItem> resultItems = results.getResultsItems();
-			for (ResultsItem resultItem : resultItems) {
-				//Get finding data
-				UUID findingUUID = UUID.randomUUID();
-				int errorCode = resultItem.getErrorCode();//Rule
-				String message = resultItem.getMessage();
-				String ruleUuid = resultItem.getRuleUuid();
-				String conceptName = concept.toUserString();
-				UUID conceptUUID = concept.getUids().get(0);
-				if (!allRules.containsKey(ruleUuid)){
-					if (!rulesAlerted.contains(ruleUuid)) {
-						rulesAlerted.add(ruleUuid);
-						System.out.println("RULE DOESN'T EXIST IN RULE FILE - UUID:" + ruleUuid +  " error code:" + errorCode +  " Message:" + message);
-						//throw new Exception("RULE DOESN'T EXIST IN RULE FILE - UUID:" + ruleUuid +  " error code:" + errorCode +  " Message:" + message);
-					}
+		List<ResultsItem> resultItems = results.getResultsItems();
+		for (ResultsItem resultItem : resultItems) {
+			//Get finding data
+			UUID findingUUID = UUID.randomUUID();
+			int errorCode = resultItem.getErrorCode();//Rule
+			String message = resultItem.getMessage();
+			String ruleUuid = resultItem.getRuleUuid();
+			String conceptName = concept.toUserString();
+			UUID conceptUUID = concept.getUids().get(0);
+			if (!allRules.containsKey(ruleUuid)){
+				if (!rulesAlerted.contains(ruleUuid)) {
+					rulesAlerted.add(ruleUuid);
+					System.out.println("RULE DOESN'T EXIST IN RULE FILE - UUID:" + ruleUuid +  " error code:" + errorCode +  " Message:" + message);
+					//throw new Exception("RULE DOESN'T EXIST IN RULE FILE - UUID:" + ruleUuid +  " error code:" + errorCode +  " Message:" + message);
 				}
-				//Write data to file
-				findingPw.print(findingUUID + "\t");
-				findingPw.print(databaseUuid + "\t");
-				findingPw.print(testPathUuid + "\t");
-				findingPw.print(executionUUID + "\t");
-				findingPw.print(ruleUuid + "\t");// Rule
-				findingPw.print(conceptUUID + "\t");
-				findingPw.print(errorCode + "-" + message + "\t");
-				findingPw.print(conceptName);
-				findingPw.println();
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw e;
+			//Write data to file
+			findingPw.print(findingUUID + "\t");
+			findingPw.print(databaseUuid + "\t");
+			findingPw.print(testPathUuid + "\t");
+			findingPw.print(executionUUID + "\t");
+			findingPw.print(ruleUuid + "\t");// Rule
+			findingPw.print(conceptUUID + "\t");
+			findingPw.print(errorCode + "-" + message + "\t");
+			findingPw.print(conceptName);
+			findingPw.println();
 		}
+	} catch (Exception e) {
+		e.printStackTrace();
+		throw e;
 	}
+}
 
 }
