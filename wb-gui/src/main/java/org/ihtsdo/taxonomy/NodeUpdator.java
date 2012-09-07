@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CountDownLatch;
@@ -57,20 +58,23 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
    private long                       sequence;
    private final TerminologyStoreDI   ts;
    private final ViewCoordinate       vc;
+   private String helperName;
 
    //~--- constructors --------------------------------------------------------
 
    public NodeUpdator(TaxonomyModel model, long sequence, Set<Integer> originsOfChangedRels,
                       Set<Integer> destinationsOfChangedRels,
                       Set<Integer> referencedComponentsOfChangedRefexs, Set<Integer> changedComponents,
-                      TaxonomyNodeRenderer renderer)
-           throws IOException {
+                      TaxonomyNodeRenderer renderer,
+                      String helperName)
+           throws IOException, ContradictionException {
       this.ts                 = Ts.get();
       this.model              = model;
       this.sequence           = sequence;
       this.conceptsToRetrieve = (IdentifierSet) ts.getEmptyNidSet();
       this.renderer           = renderer;
-      this.vc                 = renderer.getViewCoordinate();
+      this.vc                 = model.getTs().getViewCoordinate();
+      this.helperName = helperName;
 
       for (Integer nid : changedComponents) {
          int cNid = ts.getConceptNidForNid(nid);
@@ -196,7 +200,7 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
 
                   int[]                          possibleChildren     = ts.getPossibleChildren(cNid,
                                                                            renderer.getViewCoordinate());
-                  ConcurrentSkipListSet<Integer> possibleChildrenCSLS = new ConcurrentSkipListSet<Integer>();
+                  ConcurrentSkipListSet<Integer> possibleChildrenCSLS = new ConcurrentSkipListSet();
 
                   for (int pcNid : possibleChildren) {
                      possibleChildrenCSLS.add(pcNid);
@@ -330,7 +334,7 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
 
    private class ChildChangeNodeUpdate extends UpdateNode implements UpdateNodeBI {
       TaxonomyNode                        newNode  = null;
-      ConcurrentSkipListSet<TaxonomyNode> children = new ConcurrentSkipListSet<TaxonomyNode>();
+      ConcurrentSkipListSet<TaxonomyNode> children = new ConcurrentSkipListSet();
       TaxonomyNode                        currentNode;
       ConcurrentSkipListSet<Integer>      possibleChildren;
 
@@ -347,6 +351,17 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
       @Override
       public void update(ConceptVersionBI cv) {
          try {
+             if(cv.getPrimUuid().equals(UUID.fromString("047f2aae-335b-4d45-92c6-faf0320d496b"))){
+                 System.out.println("Here (equiv)");
+             }
+             if(cv.getPrimUuid().equals(UUID.fromString("37a8780b-9777-3f1e-8536-4968ca61d9b1"))){
+                 System.out.println("Here (ex of spine)");
+             }
+             if(Ts.get().getUuidPrimordialForNid(currentNode.getCnid()).equals(
+                     UUID.fromString("37a8780b-9777-3f1e-8536-4968ca61d9b1"))){
+                 System.out.println("HERE examination of spine");
+             }
+                 
             if (cv.getNid() == currentNode.getCnid()) {
                newNode = model.getNodeFactory().makeNode(cv, currentNode.getParentNid(),
                        model.getNodeStore().get(currentNode.parentNodeId));
@@ -366,6 +381,9 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
             }
 
             if (possibleChildren.isEmpty() && (newNode != null)) {
+               if(newNode.isLeaf()){
+                   System.out.println("Helper name: " + helperName);
+               }
                for (TaxonomyNode child : children) {
                   newNode.addChild(child);
                }
@@ -373,9 +391,9 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
 
                publish(pr);
             }
-         } catch (ContradictionException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-         } catch (IOException ex) {
+         } catch (ContradictionException ex){
+             AceLog.getAppLog().alertAndLogException(ex);
+         }catch(IOException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
          }
       }
@@ -410,7 +428,7 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
 
    private class ParentAndChildChangeNodeUpdate extends UpdateNode implements UpdateNodeBI {
      TaxonomyNode                        newNode  = null;
-      ConcurrentSkipListSet<TaxonomyNode> children = new ConcurrentSkipListSet<TaxonomyNode>();
+      ConcurrentSkipListSet<TaxonomyNode> children = new ConcurrentSkipListSet();
       TaxonomyNode                        currentNode;
       ConcurrentSkipListSet<Integer>      possibleChildren;
 
@@ -453,9 +471,9 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
 
                publish(pr);
             }
-         } catch (ContradictionException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-         } catch (IOException ex) {
+         } catch (ContradictionException ex){
+             AceLog.getAppLog().alertAndLogException(ex);
+         } catch(IOException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
          }
       }
@@ -486,13 +504,13 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
                      cycleExists = true;
                 }
             }
-            if(parentNode.getChildren().size() == 0){
+            if(parentNode.getChildren().isEmpty()){
                 cycleExists = true;
             }
             parentNode = model.getNodeStore().nodeMap.get(currentNode.parentNodeId);
             Collection<Long> children = parentNode.getChildren();
             if(cycleExists){
-                if(children.size() == 0){
+                if(children.isEmpty()){
                     model.getNodeStore().remove(currentNode.nodeId);
                 }else{
                     TaxonomyNode newNode = model.getNodeFactory().makeNode(cv, currentNode.getParentNid(),

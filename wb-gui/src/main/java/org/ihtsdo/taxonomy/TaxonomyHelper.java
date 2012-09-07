@@ -53,6 +53,8 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.*;
 import javax.swing.event.TreeExpansionEvent;
@@ -61,13 +63,14 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.TreePath;
+import org.ihtsdo.tk.api.ContradictionException;
 
 /**
  *
  * @author kec
  */
 public class TaxonomyHelper extends TermChangeListener implements PropertyChangeListener {
-   private static ImageIcon statedView =
+   private static ImageIcon statedView = 
       new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/graph_edge.png"));
    private static ImageIcon preferredDisplay =
       new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/car_compact_green.png"));
@@ -100,7 +103,7 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
    //~--- constructors --------------------------------------------------------
 
    public TaxonomyHelper(I_ConfigAceFrame config, String helperName, ChildNodeFilterBI childNodeFilter) {
-      super();
+      super(); 
       this.aceFrameConfig = config;
       this.assertionType  = config.getRelAssertionType();
       Ts.get().addTermChangeListener(this);
@@ -137,12 +140,15 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
                             destinationsOfChangedRels,
                             referencedComponentsOfChangedRefexs, 
                             changedComponents,
-                            renderer);
+                            renderer,
+                            helperName);
 
             FutureHelper.addFuture(ACE.threadPool.submit(changeWorker));
             }
-        } catch (IOException ex) {
+        } catch (ContradictionException ex){
             AceLog.getAppLog().alertAndLogException(ex);
+        }catch(IOException ex) {
+           AceLog.getAppLog().alertAndLogException(ex);
         }
       
    }
@@ -220,15 +226,21 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
          break;
       }
    }
-
+   Object lastPropigationId = Long.MIN_VALUE;
    @Override
    public void propertyChange(PropertyChangeEvent evt) {
-      if (evt.getPropertyName().equals("roots")) {
-         updateNewModel(evt.getPropertyName());
-      } else if ("viewPositions".equals(evt.getPropertyName())
+       if (evt.getPropagationId() != null && 
+               evt.getPropagationId().equals(lastPropigationId)) {
+           return;
+       }
+       lastPropigationId = evt.getPropagationId();
+      if ("roots".equals(evt.getPropertyName())
+//                 || "termComponent".equals(evt.getPropertyName())
+                 || "viewPositions".equals(evt.getPropertyName())
                  || "showPathInfoInTaxonomy".equals(evt.getPropertyName())
                  || "showRefsetInfoInTaxonomy".equals(evt.getPropertyName())
                  || "showViewerImagesInTaxonomy".equals(evt.getPropertyName())
+                 || "languagePref".equals(evt.getPropertyName())
                  || "updateHierarchyView".equals(evt.getPropertyName())) {
          updateNewModel(evt.getPropertyName());
       }

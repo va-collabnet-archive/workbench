@@ -25,12 +25,13 @@ import java.io.IOException;
 
 import java.util.Collection;
 import java.util.List;
+import org.ihtsdo.tk.Ts;
 
 /**
  *
  * @author kec
  */
-public class PathExpander implements Runnable {
+public class PathExpander implements Runnable { 
    I_ConfigAceFrame config;
    ConceptVersionBI focus;
    TaxonomyModel    model;
@@ -72,7 +73,11 @@ public class PathExpander implements Runnable {
             parent = node;
          }
 
-         TaxonomyNode        focusNode = model.getNodeFactory().makeNode(focus.getNid(), parent);
+         TaxonomyNode        focusNode = model.getNodeFactory().makeNode(
+                 Ts.get().getConceptVersion(model.getTs().getViewCoordinate(),
+                 focus.getNid()),
+                 parent.getCnid(),
+                 parent);
          PathSegmentExpander expander  = new PathSegmentExpander(tree.getNodeFactory(),
                                             NodePath.getTreePath(model, focusNode), 1);
 
