@@ -211,7 +211,7 @@ public class Description extends ConceptComponent<DescriptionRevision, Descripti
     public DescriptionRevision makeAnalog(int statusNid,long time, int authorNid, int moduleNid, int pathNid) {
         DescriptionRevision newR;
 
-        newR = new DescriptionRevision(this, statusNid, time, Terms.get().getAuthorNid(),
+        newR = new DescriptionRevision(this, statusNid, time, authorNid,
                 moduleNid, pathNid, this);
         addRevision(newR);
 
