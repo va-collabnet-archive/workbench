@@ -392,7 +392,8 @@ public class Bdb {
         if (version.getTime() == Long.MIN_VALUE) {
             return -1;
         }
-        String sapNidKey = version.getStatusUuid().toString() + version.getAuthorUuid() + version.getPathUuid() + version.getTime();
+        String sapNidKey = version.getStatusUuid().toString() + version.getAuthorUuid() + 
+                version.getPathUuid() + version.getTime() + version.getModuleUuid();
         Integer sapNid = sapNidCache.get(sapNidKey);
         if (sapNid != null) {
             return sapNid;
