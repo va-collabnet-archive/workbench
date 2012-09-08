@@ -74,7 +74,7 @@ public class RF2ICDOTargetsImpl extends RF2IDImpl {
 
 
 			String line1;
-			br2.readLine();
+			br1.readLine();
 			br2.readLine();
 			
 			bw.append("id");
