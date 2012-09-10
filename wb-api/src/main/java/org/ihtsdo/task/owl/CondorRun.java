@@ -30,7 +30,6 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
-import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -67,8 +66,9 @@ public class CondorRun extends AbstractTask implements ActionListener {
 
             Process cli = null;
             if (isWindows()) {
-                cli = Runtime.getRuntime().exec("DIR");
-                printProcess(cli);
+                // cli = Runtime.getRuntime().exec("DIR");
+                // printProcess(cli);
+                //String cmd[] = {"cmd.exe", "/c", "start dir"};  //This test works but for DIR you need the cmd.exe and the /c
                 cli = cliRuntime.exec("./bin2/condor32.exe -i condor_in.owl -o condor_out.owl");
             } else if (isMac()) {
                 // Process cli = Runtime.getRuntime().exec("./bin/condor -i condor_in.owl -o condor_out.owl");
@@ -86,9 +86,7 @@ public class CondorRun extends AbstractTask implements ActionListener {
             gui1.setProgressInfoLower("complete, time = " + toStringLapseSec(startTime1));
             gui1.complete();
 
-        } catch (TerminologyException e) {
-            throw new TaskFailedException("exception happened - here's what I know: ", e);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new TaskFailedException("exception happened - here's what I know: ", e);
         }
         return Condition.CONTINUE;

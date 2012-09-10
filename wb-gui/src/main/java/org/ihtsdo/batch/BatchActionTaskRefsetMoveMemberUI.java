@@ -90,7 +90,7 @@ public class BatchActionTaskRefsetMoveMemberUI extends javax.swing.JPanel implem
 
         setPreferredSize(new java.awt.Dimension(218, 67));
 
-        jLabel1.setText("Move Fr0m:");
+        jLabel1.setText("Move From:");
 
         jComboBoxExistingRefsets.setModel(jComboBoxExistingRefsets.getModel());
         jComboBoxExistingRefsets.setRenderer(new org.ihtsdo.batch.JComboBoxExistingRefsetsRender());
@@ -130,7 +130,7 @@ public class BatchActionTaskRefsetMoveMemberUI extends javax.swing.JPanel implem
         );
         jPanelValueMatchLayout.setVerticalGroup(
             jPanelValueMatchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 32, Short.MAX_VALUE)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);

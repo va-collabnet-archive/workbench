@@ -380,7 +380,7 @@ public class BatchActionTaskLogicUnionCreateUI extends javax.swing.JPanel
 //        Collection<? extends RefexVersionBI<?>> currentRefexes = c.getRefexesActive(vc);
 //        for (RefexVersionBI rvbi : currentRefexes) {
 //            if (rvbi.getCollectionNid() == collectionNid) {
-//                BatchActionEventReporter.add(new BatchActionEvent(c, BatchActionTaskType.REFSET_ADD_MEMBER,
+//                BatchActionEventReporter.add(new BatchActionEvent(c, BatchActionTaskType.LOGIC_UNION_SET_CREATE,
 //                        BatchActionEventType.EVENT_NOOP, "already member of: " + nidToName(collectionNid)));
 //                return false;
 //            }

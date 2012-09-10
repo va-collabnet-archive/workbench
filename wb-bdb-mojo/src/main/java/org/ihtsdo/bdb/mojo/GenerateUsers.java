@@ -148,7 +148,7 @@ public class GenerateUsers extends AbstractMojo {
 	private ConceptSpec defaultRelType;
 	private ConceptSpec defaultRelChar;
 	private ConceptSpec defaultRelRefinability;
-        private String moduleFsn;
+        private ConceptSpec module;
 	private String visibleRefests;
 	private String projectDevelopmentPathFsn;
 	private String projectDevelopmentViewPathFsn;
@@ -196,7 +196,7 @@ public class GenerateUsers extends AbstractMojo {
 			projectDevelopmentPathFsn = configProps.getProperty("projectDevelopmentPathFsn");
 			projectDevelopmentViewPathFsn = configProps.getProperty("projectDevelopmentViewPathFsn");
                         projectDevelopmentAdjPathFsn = configProps.getProperty("projectDevelopmentAdjPathFsn");
-                        moduleFsn = configProps.getProperty("moduleFsn");
+                        module = getConceptSpecFromPrefs(configProps.getProperty("module"));
                         generateAdjCs = configProps.getProperty("generateAdjCs");
 
 			//create user based on profile config
@@ -365,12 +365,7 @@ public class GenerateUsers extends AbstractMojo {
 				userConfig = newProfile(fullname, username, password, adminUsername,
 						adminPassword);
 				userConfig.getDbConfig().setProfileFile(userProfile);
-                                UUID moduleUuid = null;
-                                if(moduleFsn.contains(Snomed.CORE_MODULE.getDescription())){
-                                    moduleUuid = Snomed.CORE_MODULE.getLenient().getPrimUuid();
-                                }else{
-                                    moduleUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, moduleFsn);
-                                }
+                                UUID moduleUuid = module.getLenient().getPrimUuid();
                                 userConfig.setModuleNid(Ts.get().getNidForUuids(moduleUuid));
 
 				Terms.get().setActiveAceFrameConfig(userConfig);
@@ -417,15 +412,15 @@ public class GenerateUsers extends AbstractMojo {
 				newDbProfile.setUsername(userConfig.getUsername());
                                 
                                 String tempKey = UUID.randomUUID().toString();
+                                ChangeSetGeneratorBI generator =
+                                Ts.get().createDtoChangeSetGenerator(new File(absoluteChangeSetRoot, newDbProfile.getChangeSetWriterFileName()), new File(absoluteChangeSetRoot, "#0#"
+                                                + newDbProfile.getChangeSetWriterFileName()), ChangeSetGenerationPolicy.MUTABLE_ONLY);
+                                List<ChangeSetGeneratorBI> extraGeneratorList = new ArrayList<ChangeSetGeneratorBI>();
+
+                                extraGeneratorList.add(generator);
+                                Ts.get().addChangeSetGenerator(tempKey, generator);
 				try {
 					Terms.get().commit();
-                                        ChangeSetGeneratorBI generator =
-                                                Ts.get().createDtoChangeSetGenerator(new File(absoluteChangeSetRoot, newDbProfile.getChangeSetWriterFileName()), new File(absoluteChangeSetRoot, "#0#"
-                                                                + newDbProfile.getChangeSetWriterFileName()), ChangeSetGenerationPolicy.MUTABLE_ONLY);
-                                        List<ChangeSetGeneratorBI> extraGeneratorList = new ArrayList<ChangeSetGeneratorBI>();
-
-                                        extraGeneratorList.add(generator);
-                                        Ts.get().addChangeSetGenerator(tempKey, generator);
 				} catch (Exception e) {
 					throw new MojoExecutionException(e.getLocalizedMessage(), e);
 				} finally {

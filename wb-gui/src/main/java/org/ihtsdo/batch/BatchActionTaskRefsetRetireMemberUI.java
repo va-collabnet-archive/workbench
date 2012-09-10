@@ -221,7 +221,6 @@ public class BatchActionTaskRefsetRetireMemberUI extends javax.swing.JPanel impl
 
         // Sort existing parents by name.
         Comparator<ComponentVersionBI> cmp = new Comparator<ComponentVersionBI>() {
-
             @Override // Comparator
             public int compare(ComponentVersionBI o1, ComponentVersionBI o2) {
                 return o1.toUserString().compareToIgnoreCase(o2.toUserString());
@@ -265,7 +264,8 @@ public class BatchActionTaskRefsetRetireMemberUI extends javax.swing.JPanel impl
     }
 
     @Override // I_BatchActionTask
-    public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc, List<ConceptChronicleBI> concepts) {
+    public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc,
+            List<ConceptChronicleBI> concepts) {
         // referenced component provided at execution time
 
         // SET REFSET EXITING COLLECTION NID

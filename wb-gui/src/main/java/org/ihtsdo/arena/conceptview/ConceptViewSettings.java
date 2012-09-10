@@ -22,6 +22,7 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -505,9 +506,9 @@ public class ConceptViewSettings extends ArenaComponentSettings {
                         }
 
                         navigator = getNavigator();
-                        setNavigatorLocation();
                         navigator.setVisible(true);
-
+                        setNavigatorLocation();
+                        
                         if (((JToggleButton) e.getSource()).isSelected() == false) {
                             ((JToggleButton) e.getSource()).setSelected(true);
                         }
@@ -523,6 +524,15 @@ public class ConceptViewSettings extends ArenaComponentSettings {
                     historyWasShown = view.isHistoryShown();
                     view.setHistoryShown(false);
                     navigator.invalidate();
+                    JLayeredPane layers = renderer.getRootPane().getLayeredPane();
+                    int index = 0;
+                    Component[] components = layers.getComponents();
+                    for(Component layer : components){
+                        if(layer instanceof  ConceptNavigator){
+                            layers.remove(index);
+                        }
+                        index++;
+                    }
 
                     if (((JToggleButton) e.getSource()).isSelected()) {
                         ((JToggleButton) e.getSource()).setSelected(false);
@@ -692,9 +702,9 @@ public class ConceptViewSettings extends ArenaComponentSettings {
             }
 
             navigator.setBounds(loc.x, loc.y, navigator.getWidth(), renderer.getHeight() + 1);
-            layers.add(navigator, JLayeredPane.PALETTE_LAYER);
+            layers.add(navigator, JLayeredPane.POPUP_LAYER);
+            }
         }
-    }
 
     //~--- inner classes -------------------------------------------------------
     private class ConceptChangedListener implements PropertyChangeListener {

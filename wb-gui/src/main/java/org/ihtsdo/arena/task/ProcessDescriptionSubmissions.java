@@ -134,7 +134,7 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
                 String configPos = configParts[i];
                 if (configPos.equalsIgnoreCase("uuid")) {
                     uuidPosition = i;
-                } if (configPos.equalsIgnoreCase("sctId")) {
+                }else if (configPos.equalsIgnoreCase("sctId")) {
                     sctPosition = i;
                 }else if (configPos.equalsIgnoreCase("description")) {
                     descPosition = i;

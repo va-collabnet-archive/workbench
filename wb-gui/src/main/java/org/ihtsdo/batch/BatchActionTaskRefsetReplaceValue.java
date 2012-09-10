@@ -18,7 +18,9 @@ package org.ihtsdo.batch;
 
 import java.io.IOException;
 import java.util.Collection;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
+import org.ihtsdo.tk.api.AnalogBI;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
@@ -26,6 +28,7 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 
@@ -65,7 +68,8 @@ public class BatchActionTaskRefsetReplaceValue extends BatchActionTask {
 
     // BatchActionTask
     @Override
-    public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc) throws IOException, InvalidCAB, ContradictionException {
+    public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc)
+            throws IOException, InvalidCAB, ContradictionException {
         int rcNid = c.getNid(); // referenced component
         Collection<? extends RefexVersionBI<?>> currentRefexes = c.getRefexesActive(vc);
         boolean changed = false;
@@ -74,47 +78,35 @@ public class BatchActionTaskRefsetReplaceValue extends BatchActionTask {
         for (RefexVersionBI rvbi : currentRefexes) {
             if (rvbi.getRefexNid() == collectionNid) {
                 if (matchValue == null) {
-                    // RETIRE old value
-                    for (int editPath : ec.getEditPaths()) {
-                        rvbi.makeAnalog(RETIRED_NID,
-                            Long.MAX_VALUE,
-                            ec.getAuthorNid(),
-                            ec.getModuleNid(),
-                            editPath);
-                    }
-                    if (collectionConcept.isAnnotationStyleRefex()) {
-                        // Ts.get().addUncommitted(c); <-- done in BatchActionProcessor for concept
-                        changedReferencedConcept = true; // pass to BatchActionProcessor
-                    } else {
-                        ts.addUncommitted(collectionConcept);
-                    }
+                    RefexCAB blueprint = rvbi.makeBlueprint(vc);
+                    blueprint.setMemberUuid(rvbi.getPrimUuid());
+                    TK_REFEX_TYPE memberType = blueprint.getMemberType();
 
-                    // ADD new value
-                    RefexCAB refexSpec = null;
+                    // CHANGE value
                     if (refsetType == TK_REFEX_TYPE.BOOLEAN) {
-                        refexSpec = new RefexCAB(TK_REFEX_TYPE.BOOLEAN, rcNid, collectionNid);
-                        refexSpec.with(RefexCAB.RefexProperty.BOOLEAN1, (Boolean) refsetValue);
+                        blueprint.with(RefexCAB.RefexProperty.BOOLEAN1, (Boolean) refsetValue);
                     } else if (refsetType == TK_REFEX_TYPE.CID) {  // int nid
-                        refexSpec = new RefexCAB(TK_REFEX_TYPE.CID, rcNid, collectionNid);
-                        refexSpec.with(RefexCAB.RefexProperty.CNID1, ((Integer) refsetValue).intValue());
+                        blueprint.with(RefexCAB.RefexProperty.CNID1, ((Integer) refsetValue).intValue());
                     } else if (refsetType == TK_REFEX_TYPE.INT) {
-                        refexSpec = new RefexCAB(TK_REFEX_TYPE.INT, rcNid, collectionNid);
-                        refexSpec.with(RefexCAB.RefexProperty.INTEGER1, (Integer) refsetValue);
+                        blueprint.with(RefexCAB.RefexProperty.INTEGER1, (Integer) refsetValue);
                     } else if (refsetType == TK_REFEX_TYPE.STR) {
-                        refexSpec = new RefexCAB(TK_REFEX_TYPE.STR, rcNid, collectionNid);
-                        refexSpec.with(RefexCAB.RefexProperty.STRING1, (String) refsetValue);
+                        blueprint.with(RefexCAB.RefexProperty.STRING1, (String) refsetValue);
                     }
-                    tsSnapshot.constructIfNotCurrent(refexSpec);
+                    RefexChronicleBI<?> annot = tsSnapshot.constructIfNotCurrent(blueprint);
 
                     if (collectionConcept.isAnnotationStyleRefex()) {
                         // Ts.get().addUncommitted(c); <-- done in BatchActionProcessor for concept
                         changedReferencedConcept = true; // pass to BatchActionProcessor
+                        c.addAnnotation(annot);
+                        ts.addUncommitted(c);
                     } else {
+                        changedReferencedConcept = true; //... pass to BatchActionProcessor
                         ts.addUncommitted(collectionConcept);
+                        ts.addUncommitted(c);
                     }
 
                     BatchActionEventReporter.add(new BatchActionEvent(c,
-                            BatchActionTaskType.REFSET_ADD_MEMBER,
+                            BatchActionTaskType.REFSET_REPLACE_VALUE,
                             BatchActionEventType.EVENT_SUCCESS,
                             "member value changed: " + nidToName(collectionNid)));
 
@@ -149,48 +141,34 @@ public class BatchActionTaskRefsetReplaceValue extends BatchActionTask {
                     }
 
                     if (matched) {
-                        // RETIRE old value
-                        for (int editPath : ec.getEditPaths()) {
-                            rvbi.makeAnalog(RETIRED_NID,
-                                    Long.MAX_VALUE,
-                                    ec.getAuthorNid(),
-                                    ec.getModuleNid(),
-                                    editPath);
-                        }
-                        if (collectionConcept.isAnnotationStyleRefex()) {
-                            // Ts.get().addUncommitted(c); <-- done in BatchActionProcessor for concept
-                            changedReferencedConcept = true; // pass to BatchActionProcessor
-                        } else {
-                            ts.addUncommitted(collectionConcept);
-                        }
+                        RefexCAB blueprint = rvbi.makeBlueprint(vc);
+                        TK_REFEX_TYPE memberType = blueprint.getMemberType();
 
-                        // ADD new value
-                        RefexCAB refexSpec = null;
+                        // CHANGE value
                         if (refsetType == TK_REFEX_TYPE.BOOLEAN) {
-                            refexSpec = new RefexCAB(TK_REFEX_TYPE.BOOLEAN, rcNid, collectionNid);
-                            refexSpec.with(RefexCAB.RefexProperty.BOOLEAN1, (Boolean) refsetValue);
-                        } else if (refsetType == TK_REFEX_TYPE.CID) {
-                            refexSpec = new RefexCAB(TK_REFEX_TYPE.CID, rcNid, collectionNid);
-                            refexSpec.with(RefexCAB.RefexProperty.CNID1, ((Integer) refsetValue).intValue()); // int nid
+                            blueprint.with(RefexCAB.RefexProperty.BOOLEAN1, (Boolean) refsetValue);
+                        } else if (refsetType == TK_REFEX_TYPE.CID) {  // int nid
+                            blueprint.with(RefexCAB.RefexProperty.CNID1, ((Integer) refsetValue).intValue());
                         } else if (refsetType == TK_REFEX_TYPE.INT) {
-                            refexSpec = new RefexCAB(TK_REFEX_TYPE.INT, rcNid, collectionNid);
-                            refexSpec.with(RefexCAB.RefexProperty.INTEGER1, (Integer) refsetValue);
+                            blueprint.with(RefexCAB.RefexProperty.INTEGER1, (Integer) refsetValue);
                         } else if (refsetType == TK_REFEX_TYPE.STR) {
-                            refexSpec = new RefexCAB(TK_REFEX_TYPE.STR, rcNid, collectionNid);
-                            refexSpec.with(RefexCAB.RefexProperty.STRING1, (String) refsetValue);
+                            blueprint.with(RefexCAB.RefexProperty.STRING1, (String) refsetValue);
                         }
-
-                        tsSnapshot.constructIfNotCurrent(refexSpec);
+                        RefexChronicleBI<?> annot = tsSnapshot.constructIfNotCurrent(blueprint);
 
                         if (collectionConcept.isAnnotationStyleRefex()) {
                             // Ts.get().addUncommitted(c); <-- done in BatchActionProcessor for concept
                             changedReferencedConcept = true; // pass to BatchActionProcessor
+                            c.addAnnotation(annot);
+                            ts.addUncommitted(c);
                         } else {
+                            changedReferencedConcept = true; //... pass to BatchActionProcessor
                             ts.addUncommitted(collectionConcept);
+                            ts.addUncommitted(c);
                         }
 
                         BatchActionEventReporter.add(new BatchActionEvent(c,
-                                BatchActionTaskType.REFSET_ADD_MEMBER,
+                                BatchActionTaskType.REFSET_REPLACE_VALUE,
                                 BatchActionEventType.EVENT_SUCCESS,
                                 "(matched) member value changed: " + nidToName(collectionNid)));
 
