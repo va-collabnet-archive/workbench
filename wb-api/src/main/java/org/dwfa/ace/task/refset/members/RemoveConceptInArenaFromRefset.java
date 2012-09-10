@@ -22,6 +22,7 @@ import java.io.ObjectOutputStream;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
@@ -45,6 +46,7 @@ import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 
@@ -118,8 +120,12 @@ public class RemoveConceptInArenaFromRefset extends AbstractTask {
                         
             TerminologyBuilderBI ammender = 
                     Ts.get().getTerminologyBuilder(config.getEditCoordinate(), 
-                    config.getViewCoordinate()); 
-            
+                    config.getViewCoordinate());
+            UUID memberUuid = null;
+            Collection<? extends RefexVersionBI<?>> annotationMembersActive = conceptToAdd.getAnnotationMembersActive(config.getViewCoordinate(), refsetConcept.getNid());
+            for(RefexVersionBI refex : annotationMembersActive){
+                memberUuid = refex.getPrimUuid();
+            }
             //add to refset
             RefexCAB refexSpec = 
                     new RefexCAB(TK_REFEX_TYPE.CID, 
@@ -127,6 +133,7 @@ public class RemoveConceptInArenaFromRefset extends AbstractTask {
             refexSpec.put(RefexCAB.RefexProperty.CNID1, 
                     member.getConceptNid());
             refexSpec.setRetired();
+            refexSpec.setMemberUuid(memberUuid);
             RefexChronicleBI<?> newMember = ammender.constructIfNotCurrent(refexSpec);
             conceptToAdd.addAnnotation(newMember);
 
