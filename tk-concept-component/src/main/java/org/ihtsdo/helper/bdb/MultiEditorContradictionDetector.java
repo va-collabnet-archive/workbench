@@ -47,8 +47,8 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
     private final boolean ignoreReadOnlySap;
     private final int maxSap; // does not compute AuthorTimeHash from readonly database.
     private NidBitSetBI nidSet;
-    private ConcurrentHashMap<UUID, Collection<Integer>> timeAthStampNidMap = new ConcurrentHashMap<UUID, Collection<Integer>>();
-    private ConcurrentHashMap<Integer, Collection<UUID>> projectPathNidTimeAthMap = new ConcurrentHashMap<Integer, Collection<UUID>>();
+    private ConcurrentHashMap<UUID, ConcurrentSkipListSet<Integer>> timeAthStampNidMap = new ConcurrentHashMap<UUID, ConcurrentSkipListSet<Integer>>();
+    private ConcurrentHashMap<Integer, ConcurrentSkipListSet<UUID>> projectPathNidTimeAthMap = new ConcurrentHashMap<Integer, ConcurrentSkipListSet<UUID>>();
     private ConcurrentSkipListSet<Integer> conflictSaps = new ConcurrentSkipListSet<Integer>();
     List<MultiEditorContradictionCase> contradictionCaseList;
     HashSet<Integer> watchSet;
@@ -230,9 +230,9 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
             int cNid,
             int userProjectPathNid,
             boolean ignoreNonVisibleAth,
-            ConcurrentHashMap<Integer, Collection<UUID>> projectPathNidTimeAthMap,
+            ConcurrentHashMap<Integer, ConcurrentSkipListSet<UUID>> projectPathNidTimeAthMap,
             ConcurrentSkipListSet<Integer> conflictSaps,
-            ConcurrentHashMap<UUID, Collection<Integer>> timeAthStampNidMap,
+            ConcurrentHashMap<UUID, ConcurrentSkipListSet<Integer>> timeAthStampNidMap,
             ConcurrentSkipListSet<Integer> componentsMissingCommitRecord,
             ArrayList<HashSet<UUID>> commitRefsetAthSetsList,
             ArrayList<HashSet<UUID>> replacementSet,
@@ -412,13 +412,13 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
             String valueStr = toStringAuthorTime(time, authorConcept, type5Uuid);
             conceptComputedAthMap.put(type5Uuid, valueStr);
             if (!timeAthStampNidMap.containsKey(type5Uuid)) {
-                timeAthStampNidMap.put(type5Uuid, new ArrayList<Integer>());
+                timeAthStampNidMap.put(type5Uuid, new ConcurrentSkipListSet<Integer>());
             }
             timeAthStampNidMap.get(type5Uuid).add(sap);
             
             int projectPathNid = Ts.get().getPathNidForStampNid(sap);
             if(!projectPathNidTimeAthMap.containsKey(projectPathNid)){
-                projectPathNidTimeAthMap.put(projectPathNid, new ArrayList<UUID>());
+                projectPathNidTimeAthMap.put(projectPathNid, new ConcurrentSkipListSet<UUID>());
             }
             projectPathNidTimeAthMap.get(projectPathNid).add(type5Uuid);
         }
@@ -461,7 +461,7 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
 
     private static HashSet<Integer> getComponentNidsInConflict(HashSet<UUID> accumDiffSet,
             int cNid,
-            ConcurrentHashMap<UUID, Collection<Integer>> timeAthStampNidMap,
+            ConcurrentHashMap<UUID, ConcurrentSkipListSet<Integer>> timeAthStampNidMap,
             ConcurrentSkipListSet<Integer> conflictSaps) throws IOException {
         HashSet<Integer> componentNids = new HashSet<Integer>();
         for (UUID timeAuthHash : accumDiffSet) {
