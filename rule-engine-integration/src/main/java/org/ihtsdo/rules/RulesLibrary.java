@@ -386,6 +386,7 @@ STATED, /** The CONSTRAIN t_ norma l_ form. */
 				}
 				AceLog.getAppLog().alertAndLogException(e);
 			}
+			throw(e);
 		}
 		long endTime = System.currentTimeMillis();
 		long elapsed = endTime - startTime;
