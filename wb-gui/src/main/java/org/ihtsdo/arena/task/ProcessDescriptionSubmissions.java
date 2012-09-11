@@ -235,8 +235,8 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
                 }else {
                     throw new TaskFailedException("Cannot determine appropriate language/dialect refset.");
                 }
-
                 //add description to concept
+                ConceptChronicleBI concept = Ts.get().getConceptForNid(conceptNid);
                 DescriptionCAB descBp = new DescriptionCAB(conceptNid,
                         SnomedMetadataRfx.getDES_SYNONYM_NID(),
                         lang,
@@ -259,7 +259,6 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
                     description.addAnnotation(secondAnnotation);
                     addSecondDialectRefex = false;
                 }
-                ConceptChronicleBI concept = Ts.get().getConcept(conceptNid);
                 Ts.get().addUncommitted(concept);
                 list.add(Ts.get().getUuidPrimordialForNid(conceptNid));
                 uuidList.add(list);
