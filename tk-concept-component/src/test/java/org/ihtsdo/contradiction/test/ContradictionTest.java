@@ -43,9 +43,9 @@ public class ContradictionTest {
     int userProjectPathNid = 100;
     int anotherUserProjectPathNid = 200;
     boolean ignoreNonVisibleAth = true;
-    ConcurrentHashMap<Integer, Collection<UUID>> projectPathNidTimeAthMap = new ConcurrentHashMap<Integer, Collection<UUID>>(); //make
+    ConcurrentHashMap<Integer, ConcurrentSkipListSet<UUID>> projectPathNidTimeAthMap = new ConcurrentHashMap<Integer, ConcurrentSkipListSet<UUID>>(); //make
     ConcurrentSkipListSet<Integer> conflictSaps; //gets populated during conflict detection
-    ConcurrentHashMap<UUID, Collection<Integer>> timeAthStampNidMap = new ConcurrentHashMap<UUID, Collection<Integer>>();
+    ConcurrentHashMap<UUID, ConcurrentSkipListSet<Integer>> timeAthStampNidMap = new ConcurrentHashMap<UUID, ConcurrentSkipListSet<Integer>>();
     ConcurrentSkipListSet<Integer> componentsMissingCommitRecord = new ConcurrentSkipListSet<Integer>(); //gets populated during conflict detection
     HashMap<UUID, String> allConceptComputedAthAllMap = new HashMap<UUID, String> (); //make
     MockConcept conceptA;
@@ -103,35 +103,35 @@ public class ContradictionTest {
         
         //make time author -> stamp nid map
         //maps which stamps are valid for an Author Time Hash (ATH)
-        timeAthStampNidMap = new ConcurrentHashMap<UUID, Collection<Integer>>();
-        HashSet<Integer> set1 = new HashSet<Integer>();
+        timeAthStampNidMap = new ConcurrentHashMap<UUID, ConcurrentSkipListSet<Integer>>();
+        ConcurrentSkipListSet<Integer> set1 = new ConcurrentSkipListSet<Integer>();
         set1.add(stamp1);
         set1.add(stamp2);
         timeAthStampNidMap.put(ath1, set1);
-        HashSet<Integer> set2 = new HashSet<Integer>();
+        ConcurrentSkipListSet<Integer> set2 = new ConcurrentSkipListSet<Integer>();
         set2.add(stamp3);
         timeAthStampNidMap.put(ath2, set2);
-        HashSet<Integer> set3 = new HashSet<Integer>();
+        ConcurrentSkipListSet<Integer> set3 = new ConcurrentSkipListSet<Integer>();
         set3.add(stamp4);
         timeAthStampNidMap.put(ath3, set3);
-        HashSet<Integer> set4 = new HashSet<Integer>();
+        ConcurrentSkipListSet<Integer> set4 = new ConcurrentSkipListSet<Integer>();
         set4.add(stamp5);
         timeAthStampNidMap.put(ath4, set4);
-        HashSet<Integer> set5 = new HashSet<Integer>();
+        ConcurrentSkipListSet<Integer> set5 = new ConcurrentSkipListSet<Integer>();
         set5.add(stamp6);
         timeAthStampNidMap.put(ath5, set5);
-        HashSet<Integer> set6 = new HashSet<Integer>();
+        ConcurrentSkipListSet<Integer> set6 = new ConcurrentSkipListSet<Integer>();
         set6.add(stamp7);
         timeAthStampNidMap.put(ath6, set6);
-        HashSet<Integer> set7 = new HashSet<Integer>();
+        ConcurrentSkipListSet<Integer> set7 = new ConcurrentSkipListSet<Integer>();
         set7.add(stamp8);
         timeAthStampNidMap.put(ath7, set7);
-        HashSet<Integer> set8 = new HashSet<Integer>();
+        ConcurrentSkipListSet<Integer> set8 = new ConcurrentSkipListSet<Integer>();
         set8.add(stamp9);
         timeAthStampNidMap.put(ath8, set8);
         
         //make project path -> time author map]
-        HashSet<UUID> athTimeSet = new HashSet<UUID>();
+        ConcurrentSkipListSet<UUID> athTimeSet = new ConcurrentSkipListSet<UUID>();
         athTimeSet.add(ath1);
         athTimeSet.add(ath2);
         athTimeSet.add(ath3);
@@ -139,7 +139,7 @@ public class ContradictionTest {
         athTimeSet.add(ath5);
         athTimeSet.add(ath6);
         projectPathNidTimeAthMap.put(userProjectPathNid, athTimeSet);
-        HashSet<UUID> anotherAthTimeSet = new HashSet<UUID>();
+        ConcurrentSkipListSet<UUID> anotherAthTimeSet = new ConcurrentSkipListSet<UUID>();
         anotherAthTimeSet.add(ath7);
         anotherAthTimeSet.add(ath8);
         projectPathNidTimeAthMap.put(anotherUserProjectPathNid, anotherAthTimeSet);
