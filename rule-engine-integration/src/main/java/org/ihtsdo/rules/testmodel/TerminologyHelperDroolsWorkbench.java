@@ -86,10 +86,10 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 
 	/** The parents cache. */
 	private static Map<String, ConceptVersionBI> parentsCache = new HashMap<String, ConceptVersionBI>();
-	
+
 	/** The refsets cache. */
 	private static Map<String, I_GetConceptData> refsetsCache = new HashMap<String, I_GetConceptData>();
-	
+
 	/**
 	 * Instantiates a new terminology helper drools workbench.
 	 */
@@ -192,27 +192,21 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 	 * @see org.ihtsdo.tk.helper.TerminologyHelperDrools#isMemberOf(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public boolean isMemberOf(String conceptUUID, String refsetUUID) {
+	public boolean isMemberOf(String conceptUUID, String refsetUUID) throws Exception {
 		boolean result = false;
-		try {
-			I_TermFactory tf = Terms.get();
-			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
-			I_GetConceptData refsetConcept;
-			if (refsetsCache.containsKey(refsetUUID)) {
-				refsetConcept = refsetsCache.get(refsetUUID);
-			} else {
-				refsetConcept = tf.getConcept(uuidFromString(refsetUUID));
-				refsetsCache.put(refsetUUID, refsetConcept);
-			}
-			I_GetConceptData concept = tf.getConcept(uuidFromString(conceptUUID));
-			if (refsetConcept != null && concept != null) {
-				result = RulesLibrary.isIncludedInRefsetSpec(refsetConcept, 
-						concept, config);
-			}
-		} catch (TerminologyException e) {
-			// error, reported as not member
-		} catch (IOException e) {
-			// error, reported as not member
+		I_TermFactory tf = Terms.get();
+		I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
+		I_GetConceptData refsetConcept;
+		if (refsetsCache.containsKey(refsetUUID)) {
+			refsetConcept = refsetsCache.get(refsetUUID);
+		} else {
+			refsetConcept = tf.getConcept(uuidFromString(refsetUUID));
+			refsetsCache.put(refsetUUID, refsetConcept);
+		}
+		I_GetConceptData concept = tf.getConcept(uuidFromString(conceptUUID));
+		if (refsetConcept != null && concept != null) {
+			result = RulesLibrary.isIncludedInRefsetSpec(refsetConcept, 
+					concept, config);
 		}
 		return result;
 	}
@@ -238,7 +232,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 
 		subtypeConceptNid = Terms.get().uuidToNative(uuidFromString(subtype));
 		subtypeConcept = Ts.get().getConceptVersion(config.getViewCoordinate(), subtypeConceptNid);
-		
+
 		if (parentConcept ==  null || subtypeConcept == null) {
 			result = false;
 		} else {
@@ -251,7 +245,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 	 * @see org.ihtsdo.tk.helper.TerminologyHelperDrools#isParentOfOrEqualTo(java.lang.String, java.lang.String)
 	 */
 	public boolean isParentOfOrEqualTo(String parent, String subtype)
-	throws Exception {
+			throws Exception {
 		boolean result = (subtype.equals(parent) || isParentOf(parent, subtype));
 		return result;
 	}
@@ -300,7 +294,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 							if (originalConcept.getConceptNid() != cnid) {
 
 								DescriptionVersionBI description = (DescriptionVersionBI) 
-								Ts.get().getComponentVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), dnid);
+										Ts.get().getComponentVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), dnid);
 								//						AceLog.getAppLog().info("Evaluating match - Description: " + description.getText() + "Concept: " + potentialMatchConcept);
 
 								if (description != null && description.getText().toLowerCase().equals(descText.toLowerCase())) { 
@@ -618,6 +612,8 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 			} catch (TerminologyException e) {
 				AceLog.getAppLog().alertAndLogException(e);
 			} catch (IOException e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			} catch (Exception e) {
 				AceLog.getAppLog().alertAndLogException(e);
 			}
 			return domains;

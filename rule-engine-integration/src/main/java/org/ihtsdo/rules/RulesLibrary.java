@@ -180,12 +180,12 @@ public class RulesLibrary {
 	 * @throws Exception
 	 *             the exception
 	 */
-//	public static KindOfCacheBI setupIsACache() throws TerminologyException, Exception {
-//		myStaticIsACache = Ts.get().getCache(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
-//		RefsetSpecQuery.myStaticIsACache = myStaticIsACache;
-//		myStaticIsACacheRefsetSpec = RefsetSpecQuery.myStaticIsACache;
-//		return myStaticIsACache;
-//	}
+	//	public static KindOfCacheBI setupIsACache() throws TerminologyException, Exception {
+	//		myStaticIsACache = Ts.get().getCache(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+	//		RefsetSpecQuery.myStaticIsACache = myStaticIsACache;
+	//		myStaticIsACacheRefsetSpec = RefsetSpecQuery.myStaticIsACache;
+	//		return myStaticIsACache;
+	//	}
 
 	/**
 	 * Check concept.
@@ -1252,84 +1252,67 @@ public class RulesLibrary {
 	 * @param config
 	 *            the config
 	 * @return true, if is included in refset spec
+	 * @throws Exception 
 	 */
-	public static boolean isIncludedInRefsetSpec(I_GetConceptData refset, I_GetConceptData candidateConcept, I_ConfigAceFrame config) {
+	public static boolean isIncludedInRefsetSpec(I_GetConceptData refset, I_GetConceptData candidateConcept, I_ConfigAceFrame config) throws Exception {
 		boolean result = false;
 		// AceLog.getAppLog().info("************ Starting test computation *****************");
 		Long start = System.currentTimeMillis();
-		try {
-			RefsetSpec refsetSpecHelper = new RefsetSpec(refset, true, config);
-			I_GetConceptData refsetSpec = refsetSpecHelper.getRefsetSpecConcept();
-			// AceLog.getAppLog().info("Refset: " + refset.getInitialText() +
-			// " " + refset.getUids().get(0));
-			// AceLog.getAppLog().info("Checking Refset spec: " +
-			// refsetSpec.getInitialText() + " " + refsetSpec.getUids().get(0));
-			RefsetComputeType computeType = RefsetComputeType.CONCEPT; // default
-			if (refsetSpecHelper.isDescriptionComputeType()) {
-				computeType = RefsetComputeType.DESCRIPTION;
-			} else if (refsetSpecHelper.isRelationshipComputeType()) {
-				AceLog.getAppLog().info("Invalid refset spec to compute - relationship compute types not supported.");
-				if (!DwfaEnv.isHeadless()) {
-					JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Invalid refset spec to compute - relationship compute types not supported.", "", JOptionPane.ERROR_MESSAGE);
-				}
-			}
-
-			// verify a valid refset spec construction
-			if (refsetSpec == null) {
-				AceLog.getAppLog().info("Invalid refset spec to compute - unable to get spec from the refset currently in the spec panel.");
-				if (!DwfaEnv.isHeadless()) {
-					JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Invalid refset spec to compute - unable to get spec from the refset currently in the spec panel.", "", JOptionPane.ERROR_MESSAGE);
-				}
-			}
-			// Step 1: create the query object, based on the refset spec
-			RefsetSpecQuery query = RefsetQueryFactory.createQuery(config, Terms.get(), refsetSpec, refset, computeType);
-
-			// check validity of query
-			if (!query.isValidQuery() && query.getTotalStatementCount() != 0) {
-				AceLog.getAppLog().info("Refset spec has dangling AND/OR. These must have sub-statements.");
-				if (!DwfaEnv.isHeadless()) {
-					JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Refset spec has dangling AND/OR. These must have sub-statements.", "", JOptionPane.ERROR_MESSAGE);
-				}
-			}
-
-			I_GetConceptData selectedConcept = candidateConcept;
-
-			// AceLog.getAppLog().info("Refset spec = " +
-			// refsetSpec.toString());
-			// AceLog.getAppLog().info("Refset = " + refset.toString());
-			// AceLog.getAppLog().info("Concept to test = " +
-			// selectedConcept.toString());
-
-			List<I_ShowActivity> activities = new ArrayList<I_ShowActivity>();
-			result = query.execute(selectedConcept.getNid(), selectedConcept, activities);
-
-			// ArrayList<RefsetSpecComponent> components =
-			// query.getAllComponents();
-			//
-			// boolean resultByComponents = false;
-			// for (RefsetSpecComponent loopComponent : components) {
-			// try {
-			// ConceptStatement loopConceptStatement = (ConceptStatement)
-			// loopComponent;
-			// //loopConceptStatement..getTokenEnum().equals(loopConceptStatement.getTokenEnum().CONCEPT_IS);
-			// } catch (Exception e) {
-			// // skip, unknown component
-			// }
-			//
-			// }
-
-			// AceLog.getAppLog().info("++++++++++++++ Result = " + result);
-			// AceLog.getAppLog().info("************ Finished test computation in "
-			// + (System.currentTimeMillis() - start) +
-			// " ms. *****************");
-		} catch (Exception e) {
-//			AceLog.getAppLog().alertAndLogException(e);
-//			try {
-//				Terms.get().cancel();
-//			} catch (IOException ioException) {
-//				AceLog.getAppLog().alertAndLogException(ioException);
-//			}
+		RefsetSpec refsetSpecHelper = new RefsetSpec(refset, true, config);
+		I_GetConceptData refsetSpec = refsetSpecHelper.getRefsetSpecConcept();
+		// AceLog.getAppLog().info("Refset: " + refset.getInitialText() +
+		// " " + refset.getUids().get(0));
+		// AceLog.getAppLog().info("Checking Refset spec: " +
+		// refsetSpec.getInitialText() + " " + refsetSpec.getUids().get(0));
+		RefsetComputeType computeType = RefsetComputeType.CONCEPT; // default
+		if (refsetSpecHelper.isDescriptionComputeType()) {
+			computeType = RefsetComputeType.DESCRIPTION;
+		} else if (refsetSpecHelper.isRelationshipComputeType()) {
+			throw new Exception("Invalid refset spec to compute - relationship compute types not supported.(" + refset.toUserString() + ")");
 		}
+
+		// verify a valid refset spec construction
+		if (refsetSpec == null) {
+			throw new Exception("Invalid refset spec to compute - refset is null. (" + refset.toUserString() + ")");
+		}
+		// Step 1: create the query object, based on the refset spec
+		RefsetSpecQuery query = RefsetQueryFactory.createQuery(config, Terms.get(), refsetSpec, refset, computeType);
+
+		// check validity of query
+		if (!query.isValidQuery() && query.getTotalStatementCount() != 0) {
+			throw new Exception("Invalid refset spec to compute - Query not valid. (" + refset.toUserString() + ")");
+		}
+
+		I_GetConceptData selectedConcept = candidateConcept;
+
+		// AceLog.getAppLog().info("Refset spec = " +
+		// refsetSpec.toString());
+		// AceLog.getAppLog().info("Refset = " + refset.toString());
+		// AceLog.getAppLog().info("Concept to test = " +
+		// selectedConcept.toString());
+
+		List<I_ShowActivity> activities = new ArrayList<I_ShowActivity>();
+		result = query.execute(selectedConcept.getNid(), selectedConcept, activities);
+
+		// ArrayList<RefsetSpecComponent> components =
+		// query.getAllComponents();
+		//
+		// boolean resultByComponents = false;
+		// for (RefsetSpecComponent loopComponent : components) {
+		// try {
+		// ConceptStatement loopConceptStatement = (ConceptStatement)
+		// loopComponent;
+		// //loopConceptStatement..getTokenEnum().equals(loopConceptStatement.getTokenEnum().CONCEPT_IS);
+		// } catch (Exception e) {
+		// // skip, unknown component
+		// }
+		//
+		// }
+
+		// AceLog.getAppLog().info("++++++++++++++ Result = " + result);
+		// AceLog.getAppLog().info("************ Finished test computation in "
+		// + (System.currentTimeMillis() - start) +
+		// " ms. *****************");
 
 		return result;
 	}
