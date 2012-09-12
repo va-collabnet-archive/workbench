@@ -354,7 +354,7 @@ public class GenerateScripts extends AbstractMojo {
 
             // write JINI security options
             writeFileLine(fw, "-Djava.util.logging.config.file=config/logging.properties");
-            writeFileLine(fw, "-Djava.security.policy=config/dwa.policy");
+            writeFileLine(fw, "-Djava.security.policy=config/wb.policy");
             writeFileLine(fw, "-Djava.security.properties=config/dynamic-policy.security-properties");
             writeFileLine(fw, "-Djava.security.auth.login.config=config/dwa.login");
             writeFileLine(fw, "-Djavax.net.ssl.trustStore=config/prebuiltkeys/truststore");
