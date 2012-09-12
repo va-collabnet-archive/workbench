@@ -400,6 +400,7 @@ public class RulesLibrary {
 				}
 				AceLog.getAppLog().alertAndLogException(e);
 			}
+			throw(e);
 		}
 		long endTime = System.currentTimeMillis();
 		long elapsed = endTime - startTime;
