@@ -368,6 +368,9 @@ public class NidCNidMapBdb extends ComponentBdb {
     public int[] getChildrenConceptNids(int conceptNid, ViewCoordinate viewCoordinate) throws IOException, ContradictionException {
         Set<Integer> nidList = new HashSet<>();
         for (int cNid : getIndexCacheRecord(conceptNid).getDestinationOriginNids()) {
+            if (cNid == -2146264864) {
+                System.out.println("Found it...");
+            }
             if (isChildOf(cNid, conceptNid, viewCoordinate)) {
                 nidList.add(cNid);
             }

@@ -164,7 +164,9 @@ public class RelationshipIndexRecord implements Iterable<RelationshipIndexRecord
       if (vc.getIsaTypeNids().contains(getTypeNid())) {
          int           stampIndex = offset + DESTINATION_NID_OFFSET + 1;
          int           recordEnd  = offset + data[offset + RECORD_LENGTH_OFFSET];
-         List<Integer> stamps     = new ArrayList<>();
+         List<Integer> inferredStamps     = new ArrayList<>();
+         List<Integer> statedStamps     = new ArrayList<>();
+         List[] ArrayOfStampLists = new List[] {inferredStamps, statedStamps};
 
          while (stampIndex < recordEnd) {
             if ((data[stampIndex] & GROUP_BITMASK) != 0) {
@@ -180,21 +182,25 @@ public class RelationshipIndexRecord implements Iterable<RelationshipIndexRecord
                switch (vc.getRelationshipAssertionType()) {
                case INFERRED :
                   if ((data[stampIndex] & INFERRED_BITMASK) != 0) {
-                     stamps.add(stamp);
+                     inferredStamps.add(stamp);
                   }
 
                   break;
 
                case STATED :
                   if ((data[stampIndex] & INFERRED_BITMASK) == 0) {
-                     stamps.add(stamp);
+                     statedStamps.add(stamp);
                   }
 
                   break;
 
                case INFERRED_THEN_STATED :
-                  stamps.add(stamp);
-
+                  if ((data[stampIndex] & INFERRED_BITMASK) != 0) {
+                     inferredStamps.add(stamp);
+                  }
+                  if ((data[stampIndex] & INFERRED_BITMASK) == 0) {
+                     statedStamps.add(stamp);
+                  }
                   break;
 
                default :
@@ -207,47 +213,49 @@ public class RelationshipIndexRecord implements Iterable<RelationshipIndexRecord
          }
 
          // see if latest stamp is active;
-         if (!stamps.isEmpty()) {
-            VersionPoint latestStamp = null;
+         for (List<Integer> stamps: ArrayOfStampLists) {
+              if (!stamps.isEmpty()) {
+                 VersionPoint latestStamp = null;
 
-            for (Integer stamp : stamps) {
-               VersionPoint stampPoint = new VersionPoint(stamp);
+                 for (Integer stamp : stamps) {
+                    VersionPoint stampPoint = new VersionPoint(stamp);
 
-               if (computer.onRoute(stampPoint)) {
-                  if (latestStamp == null) {
-                     latestStamp = stampPoint;
-                  } else {
-                     switch (computer.relativePosition(stampPoint, latestStamp)) {
-                     case AFTER :
-                        latestStamp = stampPoint;
+                    if (computer.onRoute(stampPoint)) {
+                       if (latestStamp == null) {
+                          latestStamp = stampPoint;
+                       } else {
+                          switch (computer.relativePosition(stampPoint, latestStamp)) {
+                          case AFTER :
+                             latestStamp = stampPoint;
 
-                        break;
+                             break;
 
-                     case EQUAL:
-                     case BEFORE :
-                        break;
+                          case EQUAL:
+                          case BEFORE :
+                             break;
 
-                     case CONTRADICTION :
-                        throw new ContradictionException("latestStamp: " + latestStamp + " stampPoint: "
-                                                         + stampPoint);
+                          case CONTRADICTION :
+                             throw new ContradictionException("latestStamp: " + latestStamp + " stampPoint: "
+                                                              + stampPoint);
 
-                     case UNREACHABLE :
-                        break;
+                          case UNREACHABLE :
+                             break;
 
-                     default :
-                        throw new UnsupportedOperationException(computer.relativePosition(latestStamp,
-                                latestStamp).toString());
-                     }
-                  }
-               }
-            }
+                          default :
+                             throw new UnsupportedOperationException(computer.relativePosition(latestStamp,
+                                     latestStamp).toString());
+                          }
+                       }
+                    }
+                 }
 
-            if (latestStamp != null) {
-               if (vc.getAllowedStatusNids().contains(latestStamp.getStatusNid())) {
-                  return true;
-               }
-            }
-         }
+                 if (latestStamp != null) {
+                    if (vc.getAllowedStatusNids().contains(latestStamp.getStatusNid())) {
+                       return true;
+                    }
+                 }
+              }
+          }
       }
 
       return false;

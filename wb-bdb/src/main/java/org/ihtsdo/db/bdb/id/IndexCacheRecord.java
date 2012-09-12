@@ -377,7 +377,7 @@ public class IndexCacheRecord {
             for (RelationshipIndexRecord record : getRelationshipsRecord()) {
                 try {
                     sb.append("  ").append(Concept.get(record.getTypeNid()).toString()).append(" [").
-                            append(record.getDestinationNid()).append("]: ").
+                            append(record.getTypeNid()).append("]: ").
                             append(Concept.get(record.getDestinationNid()).toString()).append(" [").
                             append(record.getDestinationNid()).append("]\n");
                 } catch (IOException ex) {
