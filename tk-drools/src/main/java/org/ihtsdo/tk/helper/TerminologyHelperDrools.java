@@ -395,7 +395,7 @@ public class TerminologyHelperDrools {
 	}
 	
 	//Mock implementation
-	public boolean isMemberOf(String conceptUUID, String refsetUUID) {
+	public boolean isMemberOf(String conceptUUID, String refsetUUID) throws Exception {
 		return true;
 	}
 	
