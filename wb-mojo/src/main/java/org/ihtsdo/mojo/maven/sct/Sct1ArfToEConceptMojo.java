@@ -3296,7 +3296,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
     // UUID OF INTEREST
     // ICD-0-3 == cff53f1a-1d11-5ae7-801e-d3301cfdbea0
-//    private static final UUID debugUuid01 = UUID.fromString("1b90be6e-f625-391a-9e14-08dc8b84392c");
+//    private static final UUID debugUuid01 = UUID.fromString("445d932f-f552-3b4b-a323-3a06f1d26d98");
     //private static final UUID debugUuid02 = UUID.fromString("daa9598a-2ddb-5527-beda-ee4303a7656c");
     //private static final UUID debugUuid03 = UUID.fromString("3ca0d065-06b8-596c-8ca0-e4d2a605701c");
     private void createEConcept(ArrayList<Sct1_ConRecord> conList,
@@ -5320,7 +5320,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
     private int compareConcept(Sct1_ConRecord c1, Sct1_ConRecord c2) {
         if (c1.conUuidMsb == c2.conUuidMsb && c1.conUuidLsb == c2.conUuidLsb) {
-            if ((c1.status == c2.status) && (c1.isprimitive == c2.isprimitive)) {
+            if ((c1.status == c2.status) && (c1.isprimitive == c2.isprimitive)
+                    && (c1.moduleIdx == c2.moduleIdx)) {
                 return 1; // SAME
             } else {
                 return 2; // MODIFIED
@@ -5342,7 +5343,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             if ((d1.status == d2.status) && (d1.conSnoId == d2.conSnoId)
                     && d1.termText.contentEquals(d2.termText) && (d1.capStatus == d2.capStatus)
                     && (d1.descriptionType == d2.descriptionType)
-                    && d1.languageCode.contentEquals(d2.languageCode)) {
+                    && d1.languageCode.contentEquals(d2.languageCode)
+                    && d1.moduleIdx == d2.moduleIdx) {
                 return 1; // SAME
             } else {
                 return 2; // MODIFIED
@@ -5362,7 +5364,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         if (c1.relUuidMsb == c2.relUuidMsb && c1.relUuidLsb == c2.relUuidLsb) {
             // SAME REL UUID
             if ((c1.status == c2.status) && (c1.characteristic == c2.characteristic)
-                    && (c1.refinability == c2.refinability) && (c1.group == c2.group)) {
+                    && (c1.refinability == c2.refinability) && (c1.group == c2.group)
+                    && (c1.moduleIdx == c2.moduleIdx)) {
                 if (c1.relSnoId == c2.relSnoId) {
                     return 1; // SAME LOGICAL REL, SAME SNOMED_ID
                 } else {

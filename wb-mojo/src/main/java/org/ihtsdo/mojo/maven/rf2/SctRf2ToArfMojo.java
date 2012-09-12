@@ -137,7 +137,8 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
                 concepts = Sct2_ConRecord.attachStatus(concepts, statusRecords);
                 for (Sct2_ConRecord c : concepts) {
                     c.writeArf(bw);
-                    writeSctSnomedLongId(bwIds, c.conSnoIdL, c.effDateStr, c.pathUuidStr);
+                    writeSctSnomedLongId(bwIds, c.conSnoIdL, c.effDateStr, c.pathUuidStr,
+                            Rf2Defaults.getAuthorUuidStr(), c.moduleUuidStr);
                 }
             }
             bw.flush();
@@ -154,7 +155,8 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
                 descriptions = Sct2_DesRecord.attachStatus(descriptions, statusRecords);
                 for (Sct2_DesRecord d : descriptions) {
                     d.writeArf(bw);
-                    writeSctSnomedLongId(bwIds, d.desSnoIdL, d.effDateStr, d.pathUuidStr);
+                    writeSctSnomedLongId(bwIds, d.desSnoIdL, d.effDateStr, d.pathUuidStr,
+                            Rf2Defaults.getAuthorUuidStr(), d.moduleUuidStr);
                 }
             }
             bw.flush();
@@ -172,7 +174,8 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
                 rels = Sct2_RelRecord.attachStatus(rels, statusRecords);
                 for (Sct2_RelRecord r : rels) {
                     r.writeArf(bw);
-                    writeSctSnomedLongId(bwIds, r.relSnoId, r.effDateStr, r.pathUuidStr);
+                    writeSctSnomedLongId(bwIds, r.relSnoId, r.effDateStr, r.pathUuidStr,
+                            Rf2Defaults.getAuthorUuidStr(), r.moduleUuidStr);
                 }
             }
 
@@ -183,7 +186,8 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
                 Sct2_RelRecord[] rels = Sct2_RelRecord.parseRelationships(rf2File, false);
                 for (Sct2_RelRecord r : rels) {
                     r.writeArf(bw);
-                    writeSctSnomedLongId(bwIds, r.relSnoId, r.effDateStr, r.pathUuidStr);
+                    writeSctSnomedLongId(bwIds, r.relSnoId, r.effDateStr, r.pathUuidStr,
+                            Rf2Defaults.getAuthorUuidStr(), r.moduleUuidStr);
                 }
             }
             bw.flush();
@@ -206,7 +210,8 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
         }
     }
 
-    private void writeSctSnomedLongId(BufferedWriter writer, long sctId, String date, String path)
+    private void writeSctSnomedLongId(BufferedWriter writer, long sctId, String date, String path,
+            String author, String module)
             throws IOException, TerminologyException {
         // PRIMARY_UUID = 0;
         writer.append(Rf2x.convertIdToUuidStr(sctId) + TAB_CHARACTER);
@@ -219,6 +224,11 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
         // EFFECTIVE_DATE = 4; // yyyy-MM-dd HH:mm:ss
         writer.append(date + TAB_CHARACTER);
         // PATH_UUID = 5;
-        writer.append(path + LINE_TERMINATOR);
+        writer.append(path + TAB_CHARACTER);
+                // Author UUID String --> user
+        writer.append(author + TAB_CHARACTER);
+        // Module UUID String
+        writer.append(module + LINE_TERMINATOR);
+
     }
 }

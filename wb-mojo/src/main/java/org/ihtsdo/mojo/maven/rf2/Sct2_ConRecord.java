@@ -189,7 +189,8 @@ class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
         for (int idx = 0; idx < lenA - 2; idx++) {
             if ((a[idx].conSnoIdL == a[idx + 1].conSnoIdL)
                     && (a[idx].isPrimitiveB == a[idx + 1].isPrimitiveB)
-                    && (a[idx].statusConceptL == a[idx + 1].statusConceptL)) {
+                    && (a[idx].statusConceptL == a[idx + 1].statusConceptL)
+                    && a[idx].moduleUuidStr.equalsIgnoreCase(a[idx + 1].moduleUuidStr)) {
                 if (a[idx].statusConceptL == Long.MAX_VALUE) {
                     if (a[idx].isActive == a[idx + 1].isActive) {
                         duplIdxList.add(Integer.valueOf(idx + 1));
