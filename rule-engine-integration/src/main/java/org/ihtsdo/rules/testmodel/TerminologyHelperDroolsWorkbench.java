@@ -207,6 +207,12 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		if (refsetConcept != null && concept != null) {
 			result = RulesLibrary.isIncludedInRefsetSpec(refsetConcept, 
 					concept, config);
+		} else {
+			if (refsetConcept == null) {
+				throw new Exception("Refset not found! [" + refsetUUID + "]");
+			} else if (concept == null) {
+				throw new Exception("Concept not found! [" + conceptUUID + "]");
+			}
 		}
 		return result;
 	}
