@@ -257,135 +257,135 @@ public class PerformQA implements I_ProcessConcepts {
 				System.out.println("");
 				System.out.println("");
 			}
-
-			long individualElapsed = Calendar.getInstance().getTimeInMillis()-individualStart;
-
-			String fsn = "";
-			int loopConceptStatusNid = 0;
-			List<? extends I_ConceptAttributeTuple> statusTuples = loopConcept.getConceptAttributeTuples(config.getPrecedence(), config.getConflictResolutionStrategy());
-			if (statusTuples.size() > 0 ) {
-				loopConceptStatusNid = statusTuples.iterator().next().getStatusNid();
-			}
-
-			if (loopConceptStatusNid == activeNid) {
-				for (I_DescriptionTuple loopTuple : loopConcept.getDescriptionTuples(config.getAllowedStatus(),
-						config.getDescTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(),
-						config.getConflictResolutionStrategy())) {
-					if (loopTuple.getTypeNid() == fsnNid && loopTuple.getLang().equals("en")) {
-						fsn = loopTuple.getText();
-					}
-				}
-
-				if (uniqueFsnMap.containsKey(Type5UuidFactory.get(fsn))) {
-					if (!duplicatesSet.contains(loopConcept.getNid())) {
-						ResultsItem r1 = new ResultsItem();
-						r1.setErrorCode(4);
-						r1.setMessage("FSN Duplicated:" + fsn);
-						r1.setRuleUuid("d4d60d70-0733-11e1-be50-0800200c9a66");
-						r1.setSeverity("f9545a20-12cf-11e0-ac64-0800200c9a66");
-						List<ResultsItem> r1List = new ArrayList<ResultsItem>();
-						r1List.add(r1);
-						ResultsCollectorWorkBench tmpResults1 = new ResultsCollectorWorkBench();
-						tmpResults1.setAlertList(new ArrayList<AlertToDataConstraintFailure>());
-						tmpResults1.setResultsItems(r1List);
-						writeOutputFile(tmpResults1, loopConcept);
-						duplicatesSet.add(loopConcept.getNid());
-					}
-
-					I_GetConceptData duplicateConcept = Terms.get().getConcept(uniqueFsnMap.get(Type5UuidFactory.get(fsn)));
-					if (!duplicatesSet.contains(duplicateConcept.getNid())) {
-						ResultsItem r2 = new ResultsItem();
-						r2.setErrorCode(4);
-						r2.setMessage("FSN Duplicated:" + fsn);
-						r2.setRuleUuid("d4d60d70-0733-11e1-be50-0800200c9a66");
-						r2.setSeverity("f9545a20-12cf-11e0-ac64-0800200c9a66");
-						List<ResultsItem> r2List = new ArrayList<ResultsItem>();
-						r2List.add(r2);
-						ResultsCollectorWorkBench tmpResults2 = new ResultsCollectorWorkBench();
-						tmpResults2.setAlertList(new ArrayList<AlertToDataConstraintFailure>());
-						tmpResults2.setResultsItems(r2List);
-						writeOutputFile(tmpResults2, duplicateConcept);
-						duplicatesSet.add(duplicateConcept.getNid());
-					}
-					System.out.println("* Found FSN duplication: " + fsn);
-				} else {
-					uniqueFsnMap.put(Type5UuidFactory.get(fsn), loopConcept.getNid());
-				}
-			}
-
-			//System.out.println("Individual loop for " + loopConcept.toString() + " in " + individualElapsed + " ms.");
-			if (individualElapsed > 6000) {
-				System.out.println("Specially long check: " + loopConcept.toString() + " took " + individualElapsed + " ms.");
-			}
-
-			count++;
-			if (count % 10000 == 0 || count == 100 || count == 1000) {
-				long elapsedInterval = Calendar.getInstance().getTimeInMillis()-start;
-				elapsedTotal = elapsedTotal + elapsedInterval;
-				System.out.println("Checked " + count + " effective concepts in " + elapsedInterval + " ms.");
-				String elpasedString = String.format("%d hours, %d min, %d sec",
-						TimeUnit.MILLISECONDS.toHours(elapsedTotal),
-						TimeUnit.MILLISECONDS.toMinutes(elapsedTotal) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(elapsedTotal)),
-						TimeUnit.MILLISECONDS.toSeconds(elapsedTotal) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(elapsedTotal))
-						);
-				long predictedTime = (estimatedNumberOfConcepts * elapsedTotal)/count;
-				String predictedString = String.format("%d hours, %d min, %d sec",
-						TimeUnit.MILLISECONDS.toHours(predictedTime),
-						TimeUnit.MILLISECONDS.toMinutes(predictedTime) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(predictedTime)),
-						TimeUnit.MILLISECONDS.toSeconds(predictedTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(predictedTime))
-						);
-				System.out.println("Elapsed until now: " + elpasedString + ", predicted time: " + predictedString + " (average: " + elapsedTotal/count + ")");
-				System.out.println("");
-				start = Calendar.getInstance().getTimeInMillis();
-			}
-			if (!results.getResultsItems().isEmpty()) {
-				writeOutputFile(results, loopConcept);
-			}
-		} 
-	
-}
-
-private void writeOutputFile(ResultsCollectorWorkBench results, I_GetConceptData concept) throws Exception {
-
-	try {
-		List<AlertToDataConstraintFailure> alertList = results.getAlertList();
-
-		for (AlertToDataConstraintFailure alertToDataConstraintFailure : alertList) {
-			alertToDataConstraintFailure.getAlertType();
-			alertToDataConstraintFailure.getAlertMessage();
 		}
 
-		List<ResultsItem> resultItems = results.getResultsItems();
-		for (ResultsItem resultItem : resultItems) {
-			//Get finding data
-			UUID findingUUID = UUID.randomUUID();
-			int errorCode = resultItem.getErrorCode();//Rule
-			String message = resultItem.getMessage();
-			String ruleUuid = resultItem.getRuleUuid();
-			String conceptName = concept.toUserString();
-			UUID conceptUUID = concept.getUids().get(0);
-			if (!allRules.containsKey(ruleUuid)){
-				if (!rulesAlerted.contains(ruleUuid)) {
-					rulesAlerted.add(ruleUuid);
-					System.out.println("RULE DOESN'T EXIST IN RULE FILE - UUID:" + ruleUuid +  " error code:" + errorCode +  " Message:" + message);
-					//throw new Exception("RULE DOESN'T EXIST IN RULE FILE - UUID:" + ruleUuid +  " error code:" + errorCode +  " Message:" + message);
+		long individualElapsed = Calendar.getInstance().getTimeInMillis()-individualStart;
+
+		String fsn = "";
+		int loopConceptStatusNid = 0;
+		List<? extends I_ConceptAttributeTuple> statusTuples = loopConcept.getConceptAttributeTuples(config.getPrecedence(), config.getConflictResolutionStrategy());
+		if (statusTuples.size() > 0 ) {
+			loopConceptStatusNid = statusTuples.iterator().next().getStatusNid();
+		}
+
+		if (loopConceptStatusNid == activeNid) {
+			for (I_DescriptionTuple loopTuple : loopConcept.getDescriptionTuples(config.getAllowedStatus(),
+					config.getDescTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(),
+					config.getConflictResolutionStrategy())) {
+				if (loopTuple.getTypeNid() == fsnNid && loopTuple.getLang().equals("en")) {
+					fsn = loopTuple.getText();
 				}
 			}
-			//Write data to file
-			findingPw.print(findingUUID + "\t");
-			findingPw.print(databaseUuid + "\t");
-			findingPw.print(testPathUuid + "\t");
-			findingPw.print(executionUUID + "\t");
-			findingPw.print(ruleUuid + "\t");// Rule
-			findingPw.print(conceptUUID + "\t");
-			findingPw.print(errorCode + "-" + message + "\t");
-			findingPw.print(conceptName);
-			findingPw.println();
+
+			if (uniqueFsnMap.containsKey(Type5UuidFactory.get(fsn))) {
+				if (!duplicatesSet.contains(loopConcept.getNid())) {
+					ResultsItem r1 = new ResultsItem();
+					r1.setErrorCode(4);
+					r1.setMessage("FSN Duplicated:" + fsn);
+					r1.setRuleUuid("d4d60d70-0733-11e1-be50-0800200c9a66");
+					r1.setSeverity("f9545a20-12cf-11e0-ac64-0800200c9a66");
+					List<ResultsItem> r1List = new ArrayList<ResultsItem>();
+					r1List.add(r1);
+					ResultsCollectorWorkBench tmpResults1 = new ResultsCollectorWorkBench();
+					tmpResults1.setAlertList(new ArrayList<AlertToDataConstraintFailure>());
+					tmpResults1.setResultsItems(r1List);
+					writeOutputFile(tmpResults1, loopConcept);
+					duplicatesSet.add(loopConcept.getNid());
+				}
+
+				I_GetConceptData duplicateConcept = Terms.get().getConcept(uniqueFsnMap.get(Type5UuidFactory.get(fsn)));
+				if (!duplicatesSet.contains(duplicateConcept.getNid())) {
+					ResultsItem r2 = new ResultsItem();
+					r2.setErrorCode(4);
+					r2.setMessage("FSN Duplicated:" + fsn);
+					r2.setRuleUuid("d4d60d70-0733-11e1-be50-0800200c9a66");
+					r2.setSeverity("f9545a20-12cf-11e0-ac64-0800200c9a66");
+					List<ResultsItem> r2List = new ArrayList<ResultsItem>();
+					r2List.add(r2);
+					ResultsCollectorWorkBench tmpResults2 = new ResultsCollectorWorkBench();
+					tmpResults2.setAlertList(new ArrayList<AlertToDataConstraintFailure>());
+					tmpResults2.setResultsItems(r2List);
+					writeOutputFile(tmpResults2, duplicateConcept);
+					duplicatesSet.add(duplicateConcept.getNid());
+				}
+				System.out.println("* Found FSN duplication: " + fsn);
+			} else {
+				uniqueFsnMap.put(Type5UuidFactory.get(fsn), loopConcept.getNid());
+			}
 		}
-	} catch (Exception e) {
-		e.printStackTrace();
-		throw e;
+		//System.out.println("Individual loop for " + loopConcept.toString() + " in " + individualElapsed + " ms.");
+		if (individualElapsed > 6000) {
+			System.out.println("Specially long check: " + loopConcept.toString() + " took " + individualElapsed + " ms.");
+		}
+
+
+		count++;
+		if (count % 10000 == 0 || count == 100 || count == 1000) {
+			long elapsedInterval = Calendar.getInstance().getTimeInMillis()-start;
+			elapsedTotal = elapsedTotal + elapsedInterval;
+			System.out.println("Checked " + count + " effective concepts in " + elapsedInterval + " ms.");
+			String elpasedString = String.format("%d hours, %d min, %d sec",
+					TimeUnit.MILLISECONDS.toHours(elapsedTotal),
+					TimeUnit.MILLISECONDS.toMinutes(elapsedTotal) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(elapsedTotal)),
+					TimeUnit.MILLISECONDS.toSeconds(elapsedTotal) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(elapsedTotal))
+					);
+			long predictedTime = (estimatedNumberOfConcepts * elapsedTotal)/count;
+			String predictedString = String.format("%d hours, %d min, %d sec",
+					TimeUnit.MILLISECONDS.toHours(predictedTime),
+					TimeUnit.MILLISECONDS.toMinutes(predictedTime) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(predictedTime)),
+					TimeUnit.MILLISECONDS.toSeconds(predictedTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(predictedTime))
+					);
+			System.out.println("Elapsed until now: " + elpasedString + ", predicted time: " + predictedString + " (average: " + elapsedTotal/count + ")");
+			System.out.println("");
+			start = Calendar.getInstance().getTimeInMillis();
+		}
+		if (!results.getResultsItems().isEmpty()) {
+			writeOutputFile(results, loopConcept);
+		}
+
 	}
-}
+
+	private void writeOutputFile(ResultsCollectorWorkBench results, I_GetConceptData concept) throws Exception {
+
+		try {
+			List<AlertToDataConstraintFailure> alertList = results.getAlertList();
+
+			for (AlertToDataConstraintFailure alertToDataConstraintFailure : alertList) {
+				alertToDataConstraintFailure.getAlertType();
+				alertToDataConstraintFailure.getAlertMessage();
+			}
+
+			List<ResultsItem> resultItems = results.getResultsItems();
+			for (ResultsItem resultItem : resultItems) {
+				//Get finding data
+				UUID findingUUID = UUID.randomUUID();
+				int errorCode = resultItem.getErrorCode();//Rule
+				String message = resultItem.getMessage();
+				String ruleUuid = resultItem.getRuleUuid();
+				String conceptName = concept.toUserString();
+				UUID conceptUUID = concept.getUids().get(0);
+				if (!allRules.containsKey(ruleUuid)){
+					if (!rulesAlerted.contains(ruleUuid)) {
+						rulesAlerted.add(ruleUuid);
+						System.out.println("RULE DOESN'T EXIST IN RULE FILE - UUID:" + ruleUuid +  " error code:" + errorCode +  " Message:" + message);
+						//throw new Exception("RULE DOESN'T EXIST IN RULE FILE - UUID:" + ruleUuid +  " error code:" + errorCode +  " Message:" + message);
+					}
+				}
+				//Write data to file
+				findingPw.print(findingUUID + "\t");
+				findingPw.print(databaseUuid + "\t");
+				findingPw.print(testPathUuid + "\t");
+				findingPw.print(executionUUID + "\t");
+				findingPw.print(ruleUuid + "\t");// Rule
+				findingPw.print(conceptUUID + "\t");
+				findingPw.print(errorCode + "-" + message + "\t");
+				findingPw.print(conceptName);
+				findingPw.println();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+	}
 
 }

@@ -227,6 +227,7 @@ public class BatchQACheck extends AbstractMojo {
 			executionUUID = UUID.randomUUID();
 			validateParamenters();
 			openDb();
+			config.setRelAssertionType(RelAssertionType.INFERRED_THEN_STATED);
 			if (config.getDbConfig() == null) {
 				setDbConfig();
 			}
