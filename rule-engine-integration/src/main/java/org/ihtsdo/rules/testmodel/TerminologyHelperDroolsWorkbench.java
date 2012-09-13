@@ -46,6 +46,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.helper.metadata.MetadataConversor;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.tk.Ts;
@@ -98,14 +99,19 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
      * The refsets cache.
      */
     private static Map<String, I_GetConceptData> refsetsCache = new HashMap<String, I_GetConceptData>();
+    
+    private int fsnRf2Nid;
+    private final MetadataConversor metadataConversor;
 
     /**
      * Instantiates a new terminology helper drools workbench.
      */
     public TerminologyHelperDroolsWorkbench() {
         super();
+        metadataConversor = new MetadataConversor();
         try {
             semtagsRoot = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.SEMTAGS_ROOT.getUids());
+            fsnRf2Nid = SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid();
         } catch (TerminologyException e) {
             AceLog.getAppLog().alertAndLogException(e);
         } catch (IOException e) {
@@ -270,9 +276,9 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
         boolean result = (subtype.equals(parent) || isParentOf(parent, subtype));
         return result;
     }
-    
+
     @Override
-    public boolean isDescriptionTextNotUniqueInProvidedHierarchy(String descText, String conceptUuid, 
+    public boolean isDescriptionTextNotUniqueInProvidedHierarchy(String descText, String conceptUuid,
             String hierarchyConceptUuid) throws Exception {
         I_TermFactory tf = Terms.get();
         SearchResult result = Terms.get().doLuceneSearch(QueryParser.escape(descText));
@@ -282,16 +288,35 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
             unique = true;
         } else {
             NidSetBI allowedStatusNids = Terms.get().getActiveAceFrameConfig().getViewCoordinate().getAllowedStatusNids();
-            search: for (int i = 0; i < result.topDocs.totalHits; i++) {
+            search:
+            for (int i = 0; i < result.topDocs.totalHits; i++) {
                 Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
                 int cnid = Integer.parseInt(doc.get("cnid"));
                 int dnid = Integer.parseInt(doc.get("dnid"));
                 if (cnid != conceptNid) {
                     I_DescriptionVersioned<?> potential_match = Terms.get().getDescription(dnid, cnid);
                     if (potential_match != null) {
-                        for (I_DescriptionPart part_search : potential_match.getMutableParts()) {
+
+                        for (DescriptionVersionBI part_search : 
+                                potential_match.getVersions(Terms.get().getActiveAceFrameConfig().getViewCoordinate())) {
+                            String text1 = "";
+                            String text2 = "";
+
+                            if (part_search.getText().contains("(")) {
+                                text1 = part_search.getText().substring(0, part_search.getText().lastIndexOf("(")-1).toLowerCase().trim();
+                            } else {
+                                text1 = part_search.getText().toLowerCase().trim();
+                            }
+                            
+                            if (descText.contains("(")) {
+                                text2 = descText.substring(0, descText.lastIndexOf("(")-1).toLowerCase().trim();
+                            } else {
+                                text2 = descText.toLowerCase().trim();
+                            }
+                            
                             if (allowedStatusNids.contains(part_search.getStatusNid())
-                                    && part_search.getText().toLowerCase().equals(descText.toLowerCase())
+                                    && (part_search.getText().toLowerCase().equals(descText.toLowerCase()) 
+                                        || (text1.equals(text2) && metadataConversor.getRf2Value(part_search.getTypeNid()) == fsnRf2Nid ))
                                     && isParentOf(hierarchyConceptUuid, tf.nidToUuid(cnid).toString())) {
                                 unique = false;
                                 break search;
