@@ -261,7 +261,7 @@ public class BusinessRulesReport extends AbstractMavenReport {
 		List<Node> fromCompositePattern = document.selectNodes("//rule/lhs/fromCompositePattern");
 
 		List<Node> compositePattern = document.selectNodes("//rule/lhs/compositePattern");
-
+		List<Node> freeFormTexts = document.selectNodes("//rule/lhs/freeForm/text");
 		List<Node> dslNode = document.selectNodes("//rule/lhs/dslSentence");
 
 		srs.table();
@@ -312,6 +312,14 @@ public class BusinessRulesReport extends AbstractMavenReport {
 
 		}
 
+		for (Node node : freeFormTexts) {
+			StringBuffer freeFormLine = new StringBuffer(node.getText());
+			srs.tableRow();
+			srs.tableCell();
+			srs.text(freeFormLine.toString());
+			srs.tableCell_();
+			srs.tableRow_();
+		}
 		srs.table_();
 	}
 

@@ -21,6 +21,8 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.apache.maven.plugin.AbstractMojo;
@@ -53,7 +55,7 @@ public class DownloadPackageSnapshots extends AbstractMojo {
 	 * 
 	 * @parameter expression="inputfiles"
 	 */
-	private String brlinputfolder;
+	private String brlOutputFolder;
 
 	/**
 	 * Location of the build directory.
@@ -68,15 +70,13 @@ public class DownloadPackageSnapshots extends AbstractMojo {
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
 			Sardine sardine = SardineFactory.begin("admin", "admin");
-			log.info(pkgUrl);
-			log.info(pkgUrl.replaceAll("/package/", "/snapshot/"));
-			List<DavResource> resources = sardine.getResources(pkgUrl.replaceAll("/package/", "/webdav/snapshots/"));
+			List<DavResource> resources = sardine.getResources(pkgUrl);
 			for (DavResource res : resources) {
 				try {
 					if (!res.getNameDecoded().trim().equals("") && !res.isDirectory() && !res.getNameDecoded().trim().equals("drools.package")) {
 						log.info("Downloading from " + res.getAbsoluteUrl().replaceAll(" ", "%20"));
 						InputStream is = sardine.getInputStream(res.getAbsoluteUrl().replaceAll(" ", "%20"));
-						File inFolder = new File(brlinputfolder);
+						File inFolder = new File(brlOutputFolder);
 						inFolder.mkdirs();
 						File file = new File(inFolder, res.getName());
 						file.createNewFile();
