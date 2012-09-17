@@ -238,32 +238,36 @@ public class BatchQACheck extends AbstractMojo {
 				contextHelper.removePkgReferenceFromContext(loopPkg, context);
 			}
 
+
+
 			if ((pkgName != null && !pkgName.isEmpty()) && ((pkgUrl != null && !pkgUrl.isEmpty()))) {
 				RulesDeploymentPackageReferenceHelper pkgHelper = new RulesDeploymentPackageReferenceHelper(config);
-				boolean alreadyThere = false;
+				RulesDeploymentPackageReference pkg = null;
 				for (RulesDeploymentPackageReference loopPkg : pkgHelper.getAllRulesDeploymentPackages()) {
 					if (loopPkg.getUrl().equals(pkgUrl) || loopPkg.getName().equals(pkgName)) {
-						alreadyThere = true;
+						pkg = loopPkg;
 					}
 				}
-				if (!alreadyThere) {
-					RulesDeploymentPackageReference pkgReference = pkgHelper.createNewRulesDeploymentPackage(pkgName, pkgUrl);
-					contextHelper.addPkgReferenceToContext(pkgReference, context);
+				if (pkg != null) {
+					pkg = pkgHelper.createNewRulesDeploymentPackage(pkgName, pkgUrl);
 				}
+
+				contextHelper.addPkgReferenceToContext(pkg, context);
 			}
 
 			if ((extPkgName != null && !extPkgName.isEmpty()) && ((extPkgUrl != null && !extPkgUrl.isEmpty()))) {
 				RulesDeploymentPackageReferenceHelper pkgHelper = new RulesDeploymentPackageReferenceHelper(config);
-				boolean alreadyThere = false;
+				RulesDeploymentPackageReference pkg = null;
 				for (RulesDeploymentPackageReference loopPkg : pkgHelper.getAllRulesDeploymentPackages()) {
 					if (loopPkg.getUrl().equals(extPkgUrl) || loopPkg.getName().equals(extPkgName)) {
-						alreadyThere = true;
+						pkg = loopPkg;
 					}
 				}
-				if (!alreadyThere) {
-					RulesDeploymentPackageReference pkgReference = pkgHelper.createNewRulesDeploymentPackage(extPkgName, extPkgUrl);
-					contextHelper.addPkgReferenceToContext(pkgReference, context);
+				if (pkg != null) {
+					pkg = pkgHelper.createNewRulesDeploymentPackage(extPkgName, extPkgUrl);
+
 				}
+				contextHelper.addPkgReferenceToContext(pkg, context);
 			}
 
 			contextHelper.clearCache();
@@ -302,7 +306,7 @@ public class BatchQACheck extends AbstractMojo {
 
 
 			I_GetConceptData context = tf.getConcept(UUID.fromString(context_uuid));
-			contextHelper.getKnowledgeBaseForContext(context, config, true);
+			contextHelper.getKnowledgeBaseForContext(context, config, false);
 
 
 			// Create the execution XMLexecutionPw
