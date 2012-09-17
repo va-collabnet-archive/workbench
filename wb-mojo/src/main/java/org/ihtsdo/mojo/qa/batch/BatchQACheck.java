@@ -248,7 +248,7 @@ public class BatchQACheck extends AbstractMojo {
 						pkg = loopPkg;
 					}
 				}
-				if (pkg != null) {
+				if (pkg == null) {
 					pkg = pkgHelper.createNewRulesDeploymentPackage(pkgName, pkgUrl);
 				}
 
@@ -263,7 +263,7 @@ public class BatchQACheck extends AbstractMojo {
 						pkg = loopPkg;
 					}
 				}
-				if (pkg != null) {
+				if (pkg == null) {
 					pkg = pkgHelper.createNewRulesDeploymentPackage(extPkgName, extPkgUrl);
 
 				}
