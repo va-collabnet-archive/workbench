@@ -5,10 +5,14 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 import org.apache.maven.doxia.markup.HtmlMarkup;
 import org.apache.maven.doxia.sink.Sink;
@@ -162,7 +166,7 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 			sink.head_();
 
 			sink.body();
-			sink.section1();
+			 sink.section1();
 
 			sink.sectionTitle1();
 			sink.text("Last Batch QA Execution");
@@ -172,6 +176,7 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 
 			String executionLine = br.readLine();
 			executionLine = br.readLine();
+			br.close();
 			String[] splitedLine = executionLine.split("\\t", -1);
 
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
@@ -195,7 +200,6 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 			sink.bold_();
 			sink.text(startTime);
 			sink.lineBreak();
-			
 
 			sink.bold();
 			sink.text("End time: ");
@@ -258,14 +262,16 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 				sink.lineBreak();
 
 				sink.text("This is the list of rules of the QA system, including the number of violation in each one. The list can be sorted by clicking on the headers.");
-				
+
 				sink.lineBreak();
 				sink.lineBreak();
 
 				SinkEventAttributes tableAttr = new SinkEventAttributeSet();
 				tableAttr.addAttribute(SinkEventAttributes.ID, "results");
-				tableAttr.addAttribute(SinkEventAttributes.CLASS,
-						"bodyTable sortable-onload-3 no-arrow rowstyle-alt colstyle-alt paginate-20 max-pages-7 paginationcallback-callbackTest-calculateTotalRating paginationcallback-callbackTest-displayTextInfo sortcompletecallback-callbackTest-calculateTotalRating");
+				tableAttr
+						.addAttribute(
+								SinkEventAttributes.CLASS,
+								"bodyTable sortable-onload-3 no-arrow rowstyle-alt colstyle-alt paginate-20 max-pages-7 paginationcallback-callbackTest-calculateTotalRating paginationcallback-callbackTest-displayTextInfo sortcompletecallback-callbackTest-calculateTotalRating");
 
 				sink.table(tableAttr);
 				sink.tableRow();
@@ -287,52 +293,94 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 				while (ruleBr.ready()) {
 					String ruleLine = ruleBr.readLine();
 					String[] ruleLineSplit = ruleLine.split("\\t", -1);
-					int findigSize = 0;
+					HashMap<String, Integer> findings = null;
+
 					if (rulesWithFindings.contains(ruleLineSplit[0])) {
-						findigSize = createFindingsReport(ruleLineSplit, sortedFindings, findingFolder);
+						findings = createFindingsReport(ruleLineSplit, sortedFindings, findingFolder);
 					}
 					SinkEventAttributes linkAttr = new SinkEventAttributeSet();
-					if (findigSize == 0) {
-						linkAttr.addAttribute("onclick", "javascript:showRuleDetails(this);");
-					} else {
-						linkAttr.addAttribute("onclick", "javascript:showRuleDetails(this);javascript:showFindings(\"findings/" + ruleLineSplit[0] + ".html\"" + ")");
-					}
-					linkAttr.addAttribute("href", "javascript:linkme();");
-					sink.tableRow();
-					for (int i = 0; i < ruleLineSplit.length; i++) {
-						if (i >= 1 && i <= 3) {
+					if (findings != null) {
+						Set<String> findingFiles = findings.keySet();
+						for (String string : findingFiles) {
+							Integer findingSize = findings.get(string);
+							if (findings != null && findingSize == 0) {
+								linkAttr.addAttribute("onclick", "javascript:showRuleDetails(this);");
+							} else {
+								linkAttr.addAttribute("onclick", "javascript:showRuleDetails(this);javascript:showFindings(\"findings/" + string + "\"" + ")");
+							}
+							linkAttr.addAttribute("href", "javascript:linkme();");
+							sink.tableRow();
+							for (int i = 0; i < ruleLineSplit.length; i++) {
+								if (i >= 1 && i <= 3) {
+									sink.tableCell();
+									if (i == 3) {
+										sink.text(resources.getString(ruleLineSplit[i]));
+									} else if (i == 1) {
+										sink.unknown("a", new Object[] { new Integer(HtmlMarkup.TAG_TYPE_START) }, linkAttr);
+										if (findings.size() > 1) {
+											sink.text(ruleLineSplit[i] + string.replaceAll(ruleLineSplit[0], ""));
+										} else {
+											sink.text(ruleLineSplit[i]);
+										}
+										sink.unknown("a", new Object[] { new Integer(HtmlMarkup.TAG_TYPE_END) }, null);
+									} else {
+										sink.text(ruleLineSplit[i]);
+									}
+								}
+								sink.tableCell_();
+								SinkEventAttributeSet hidden = new SinkEventAttributeSet();
+								hidden.addAttribute(SinkEventAttributes.TYPE, "hidden");
+								hidden.addAttribute(SinkEventAttributes.NAME, rulesHeaderSplited[i].replaceAll(" ", "").toLowerCase());
+								hidden.addAttribute("value", ruleLineSplit[i]);
+								sink.unknown("input", new Object[] { new Integer(HtmlMarkup.TAG_TYPE_START) }, hidden);
+								sink.unknown("input", new Object[] { new Integer(HtmlMarkup.TAG_TYPE_END) }, null);
+							}
 							sink.tableCell();
-							if (i == 3) {
-								sink.text(resources.getString(ruleLineSplit[i]));
-							} else if (i == 1) {
-								sink.unknown("a", new Object[] { new Integer(HtmlMarkup.TAG_TYPE_START) }, linkAttr);
-								sink.text(ruleLineSplit[i]);
+							if (findingSize > 0) {
+								SinkEventAttributes findigLinkAttrs = new SinkEventAttributeSet();
+								findigLinkAttrs.addAttribute("onclick", "javascript:showRuleDetails(this);javascript:showFindings(\"findings/" + string + "\"" + ")");
+								findigLinkAttrs.addAttribute("href", "javascript:linkme();");
+								sink.unknown("a", new Object[] { new Integer(HtmlMarkup.TAG_TYPE_START) }, findigLinkAttrs);
+								sink.text("" + findings.get(string));
 								sink.unknown("a", new Object[] { new Integer(HtmlMarkup.TAG_TYPE_END) }, null);
 							} else {
-								sink.text(ruleLineSplit[i]);
+								sink.text("" + findings.get(string));
 							}
+							sink.tableRow_();
+							sink.tableCell_();
 						}
-						sink.tableCell_();
-						SinkEventAttributeSet hidden = new SinkEventAttributeSet();
-						hidden.addAttribute(SinkEventAttributes.TYPE, "hidden");
-						hidden.addAttribute(SinkEventAttributes.NAME, rulesHeaderSplited[i].replaceAll(" ", "").toLowerCase());
-						hidden.addAttribute("value", ruleLineSplit[i]);
-						sink.unknown("input", new Object[] { new Integer(HtmlMarkup.TAG_TYPE_START) }, hidden);
-						sink.unknown("input", new Object[] { new Integer(HtmlMarkup.TAG_TYPE_END) }, null);
-					}
-					sink.tableCell();
-					if (findigSize > 0) {
-						SinkEventAttributes findigLinkAttrs = new SinkEventAttributeSet();
-						findigLinkAttrs.addAttribute("onclick", "javascript:showRuleDetails(this);javascript:showFindings(\"findings/" + ruleLineSplit[0] + ".html\"" + ")");
-						findigLinkAttrs.addAttribute("href", "javascript:linkme();");
-						sink.unknown("a", new Object[] { new Integer(HtmlMarkup.TAG_TYPE_START) }, findigLinkAttrs);
-						sink.text("" + findigSize);
-						sink.unknown("a", new Object[] { new Integer(HtmlMarkup.TAG_TYPE_END) }, null);
 					} else {
-						sink.text("" + findigSize);
+						linkAttr.addAttribute("onclick", "javascript:showRuleDetails(this);");
+						linkAttr.addAttribute("href", "javascript:linkme();");
+						sink.tableRow();
+						for (int i = 0; i < ruleLineSplit.length; i++) {
+							if (i >= 1 && i <= 3) {
+								sink.tableCell();
+								if (i == 3) {
+									sink.text(resources.getString(ruleLineSplit[i]));
+								} else if (i == 1) {
+									sink.unknown("a", new Object[] { new Integer(HtmlMarkup.TAG_TYPE_START) }, linkAttr);
+									sink.text(ruleLineSplit[i]);
+									sink.unknown("a", new Object[] { new Integer(HtmlMarkup.TAG_TYPE_END) }, null);
+								} else if (i == 2) {
+									sink.text(ruleLineSplit[i].equals("null") ? "Technical rule" : ruleLineSplit[i]);
+								} else {
+									sink.text(ruleLineSplit[i]);
+								}
+							}
+							sink.tableCell_();
+							SinkEventAttributeSet hidden = new SinkEventAttributeSet();
+							hidden.addAttribute(SinkEventAttributes.TYPE, "hidden");
+							hidden.addAttribute(SinkEventAttributes.NAME, rulesHeaderSplited[i].replaceAll(" ", "").toLowerCase());
+							hidden.addAttribute("value", ruleLineSplit[i]);
+							sink.unknown("input", new Object[] { new Integer(HtmlMarkup.TAG_TYPE_START) }, hidden);
+							sink.unknown("input", new Object[] { new Integer(HtmlMarkup.TAG_TYPE_END) }, null);
+						}
+						sink.tableCell();
+						sink.text("" + 0);
+						sink.tableRow_();
+						sink.tableCell_();
 					}
-					sink.tableRow_();
-					sink.tableCell_();
 				}
 				sink.table_();
 			}
@@ -371,107 +419,115 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 		}
 	}
 
-	private int createFindingsReport(String[] ruleLineSplit, File sortedFindings, File findingFolder) {
-		int result = 0;
+	private HashMap<String, Integer> createFindingsReport(String[] ruleLineSplit, File sortedFindings, File findingFolder) {
+		HashMap<String, Integer> result = new HashMap<String, Integer>();
 		try {
 			FileInputStream sortedFis = new FileInputStream(sortedFindings);
 			InputStreamReader sortedIsr = new InputStreamReader(sortedFis, "UTF-8");
 			BufferedReader sortedBr = new BufferedReader(sortedIsr);
 
-			File findingFile = new File(findingFolder, ruleLineSplit[0] + ".html");
-			BufferedWriter bw = new BufferedWriter(new FileWriter(findingFile));
-			bw.write("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
-			bw.write("<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">");
-			bw.write("<body>");
+			int lines = 0;
+			boolean keepmaking = true;
+			while (keepmaking) {
+				File findingFile = new File(findingFolder, ruleLineSplit[0]);
+				BufferedWriter bw = new BufferedWriter(new FileWriter(findingFile));
+				bw.write("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
+				bw.write("<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">");
+				bw.write("<body>");
 
-			bw.write("<table border=\"0\" id=\"findingTable\" class=\"bodyTable\">");
+				bw.write("<table border=\"0\" id=\"findingTable\" class=\"bodyTable\">");
 
-			String header = sortedBr.readLine();
-			String[] headerSplited = header.split("\\t", -1);
+				String header = sortedBr.readLine();
+				String[] headerSplited = header.split("\\t", -1);
 
-			bw.write("<tr class=\"a\">");
-			bw.newLine();
-			bw.write("<th>Component name</th>");
-			bw.newLine();
-			bw.write("<th>UUID</th>");
-			bw.newLine();
-			bw.write("</tr>");
-			// Create tableheader in the report.
-			String line = "";
-			String[] splitedLine = null;
-			while (sortedBr.ready()) {
-				line = sortedBr.readLine();
-				splitedLine = line.split("\\t", -1);
-				if (splitedLine[4].equals(ruleLineSplit[0])) {
-					break;
-				}
-			}
-
-			while (sortedBr.ready() && splitedLine != null && splitedLine.length >= 7 && splitedLine[4].equals(ruleLineSplit[0])) {
-				result++;
-				bw.write("<tr class=\"b\">");
-				String name = "";
-				String uuid = "";
-				for (int i = 0; i < splitedLine.length; i++) {
-					if (i == 5) {
-						uuid = splitedLine[i];
-					} else if (i == 7) {
-						name = splitedLine[i];
-					}
-					bw.write("<input type=\"hidden\" name=\"" + headerSplited[i].replaceAll(" ", "").toLowerCase() + "\"" + " value=\"" + splitedLine[i] + "\"/>");
-				}
-				bw.write("<td>" + name + "</td>");
-				bw.write("<td>" + uuid + "</td>");
+				bw.write("<tr class=\"a\">");
+				bw.newLine();
+				bw.write("<th>Component name</th>");
+				bw.newLine();
+				bw.write("<th>UUID</th>");
+				bw.newLine();
 				bw.write("</tr>");
-				line = sortedBr.readLine();
-				splitedLine = line.split("\\t", -1);
-			}
-
-			if (line.trim() != "" && splitedLine.length >= 7 && splitedLine[4].equals(ruleLineSplit[0])) {
-				result++;
-				bw.write("<tr class=\"b\">");
-				String name = "";
-				String uuid = "";
-				for (int i = 0; i < splitedLine.length; i++) {
-					if (i == 5) {
-						uuid = splitedLine[i];
-					} else if (i == 7) {
-						name = splitedLine[i];
+				// Create tableheader in the report.
+				String line = "";
+				String[] splitedLine = null;
+				while (sortedBr.ready()) {
+					line = sortedBr.readLine();
+					splitedLine = line.split("\\t", -1);
+					if (splitedLine[4].equals(ruleLineSplit[0])) {
+						break;
 					}
-					bw.write("<input type=\"hidden\" name=\"" + headerSplited[i].replaceAll(" ", "").toLowerCase() + "\"" + " value=\"" + splitedLine[i] + "\"/>");
 				}
-				bw.write("<td>" + name + "</td>");
-				bw.write("<td>" + uuid + "</td>");
-				bw.write("</tr>");
+				while (sortedBr.ready() && splitedLine != null && splitedLine.length >= 7 && splitedLine[4].equals(ruleLineSplit[0])) {
+					lines++;
+					bw.write("<tr class=\"b\">");
+					String name = "";
+					String uuid = "";
+					for (int i = 0; i < splitedLine.length; i++) {
+						if (i == 5) {
+							uuid = splitedLine[i];
+						} else if (i == 7) {
+							name = splitedLine[i];
+						}
+						bw.write("<input type=\"hidden\" name=\"" + headerSplited[i].replaceAll(" ", "").toLowerCase() + "\"" + " value=\"" + splitedLine[i] + "\"/>");
+					}
+					bw.write("<td>" + name + "</td>");
+					bw.write("<td>" + uuid + "</td>");
+					bw.write("</tr>");
+					line = sortedBr.readLine();
+					splitedLine = line.split("\\t", -1);
+					if ((lines + 1) % 1000 == 0) {
+						// 1000 lines processed
+						break;
+					}
+				}
+
+				if (line.trim() != "" && splitedLine.length >= 7 && splitedLine[4].equals(ruleLineSplit[0])) {
+					lines++;
+					bw.write("<tr class=\"b\">");
+					String name = "";
+					String uuid = "";
+					for (int i = 0; i < splitedLine.length; i++) {
+						if (i == 5) {
+							uuid = splitedLine[i];
+						} else if (i == 7) {
+							name = splitedLine[i];
+						}
+						bw.write("<input type=\"hidden\" name=\"" + headerSplited[i].replaceAll(" ", "").toLowerCase() + "\"" + " value=\"" + splitedLine[i] + "\"/>");
+					}
+					bw.write("<td>" + name + "</td>");
+					bw.write("<td>" + uuid + "</td>");
+					bw.write("</tr>");
+				}
+				bw.write("</table>");
+				bw.write("</body>");
+				bw.write("</html>");
+				bw.flush();
+				bw.close();
+				if (lines % 1000 == 0) {
+					int startline = lines - 1000;
+					if (startline <= 0) {
+						startline = 1;
+					} else {
+						startline = lines - (lines % 1000);
+					}
+					findingFile.renameTo(new File(findingFolder, ruleLineSplit[0] + "(" + startline + " - " + lines + ")"));
+					result.put(ruleLineSplit[0] + "(" + startline + " - " + lines + ")", lines - startline + 1);
+				} else {
+					int startline = lines - 1000;
+					if (startline <= 0) {
+						startline = 1;
+					} else {
+						startline = lines - (lines % 1000);
+					}
+					findingFile.renameTo(new File(findingFolder, ruleLineSplit[0] + "(" + startline + " - " + lines + ")"));
+					result.put(ruleLineSplit[0] + "(" + startline + " - " + lines + ")", lines - startline + 1);
+					keepmaking = false;
+				}
 			}
-			bw.write("</table>");
-			bw.write("</body>");
-			bw.write("</html>");
-			bw.flush();
-			bw.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return result;
-	}
-
-	private File generateHtmlReport() {
-		BufferedWriter bw = null;
-		File f = null;
-		try {
-			f = new File(outputDirectory, "file.html");
-			bw = new BufferedWriter(new FileWriter(f));
-			bw.write("HOLA");
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				bw.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		return f;
 	}
 
 	@Override
