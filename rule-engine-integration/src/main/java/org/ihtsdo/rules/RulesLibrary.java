@@ -194,7 +194,7 @@ public class RulesLibrary {
 	 *            the concept
 	 * @param context
 	 *            the context
-	 * @param onlyUncommittedContent
+	 * @param checkUncommittedContent
 	 *            the only uncommitted content
 	 * @param config
 	 *            the config
@@ -202,9 +202,9 @@ public class RulesLibrary {
 	 * @throws Exception
 	 *             the exception
 	 */
-	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, boolean onlyUncommittedContent, I_ConfigAceFrame config) throws Exception {
+	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, boolean checkUncommittedContent, I_ConfigAceFrame config) throws Exception {
 		RulesContextHelper contextHelper = new RulesContextHelper(config);
-		return checkConcept(concept, context, onlyUncommittedContent, config, contextHelper, INFERRED_VIEW_ORIGIN.STATED);
+		return checkConcept(concept, context, checkUncommittedContent, config, contextHelper, INFERRED_VIEW_ORIGIN.STATED);
 	}
 
 	/**
@@ -214,7 +214,7 @@ public class RulesLibrary {
 	 *            the concept
 	 * @param context
 	 *            the context
-	 * @param onlyUncommittedContent
+	 * @param checkUncommittedContent
 	 *            the only uncommitted content
 	 * @param config
 	 *            the config
@@ -224,8 +224,8 @@ public class RulesLibrary {
 	 * @throws Exception
 	 *             the exception
 	 */
-	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, boolean onlyUncommittedContent, I_ConfigAceFrame config, RulesContextHelper contextHelper) throws Exception {
-		return checkConcept(concept, context, onlyUncommittedContent, config, contextHelper, INFERRED_VIEW_ORIGIN.STATED);
+	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, boolean checkUncommittedContent, I_ConfigAceFrame config, RulesContextHelper contextHelper) throws Exception {
+		return checkConcept(concept, context, checkUncommittedContent, config, contextHelper, INFERRED_VIEW_ORIGIN.STATED);
 	}
 
 	/**
@@ -235,7 +235,7 @@ public class RulesLibrary {
 	 *            the concept
 	 * @param context
 	 *            the context
-	 * @param onlyUncommittedContent
+	 * @param checkUncommittedContent
 	 *            the only uncommitted content
 	 * @param config
 	 *            the config
@@ -245,9 +245,9 @@ public class RulesLibrary {
 	 * @throws Exception
 	 *             the exception
 	 */
-	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, boolean onlyUncommittedContent, I_ConfigAceFrame config, INFERRED_VIEW_ORIGIN inferredOrigin) throws Exception {
+	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, boolean checkUncommittedContent, I_ConfigAceFrame config, INFERRED_VIEW_ORIGIN inferredOrigin) throws Exception {
 		RulesContextHelper contextHelper = new RulesContextHelper(config);
-		return checkConcept(concept, context, onlyUncommittedContent, config, contextHelper, inferredOrigin);
+		return checkConcept(concept, context, checkUncommittedContent, config, contextHelper, inferredOrigin);
 	}
 
 	/**
@@ -257,7 +257,7 @@ public class RulesLibrary {
 	 *            the concept
 	 * @param context
 	 *            the context
-	 * @param onlyUncommittedContent
+	 * @param checkUncommittedContent
 	 *            the only uncommitted content
 	 * @param config
 	 *            the config
@@ -269,9 +269,10 @@ public class RulesLibrary {
 	 * @throws Exception
 	 *             the exception
 	 */
-	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, boolean onlyUncommittedContent, I_ConfigAceFrame config, RulesContextHelper contextHelper, INFERRED_VIEW_ORIGIN inferredOrigin)
+	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, boolean checkUncommittedContent, I_ConfigAceFrame config, RulesContextHelper contextHelper, INFERRED_VIEW_ORIGIN inferredOrigin)
 			throws Exception {
 		HashSet<I_ShowActivity> activities = new HashSet<I_ShowActivity>();
+		
 		I_ShowActivity activity = null;
 		if (!DwfaEnv.isHeadless()) {
 			activity = Terms.get().newActivityPanel(true, config, "<html>Performing QA check on concept: " + concept.toString() + " for " + context.toString(), true);
@@ -430,15 +431,15 @@ public class RulesLibrary {
 	 *            the concept
 	 * @param kbId
 	 *            the kb id
-	 * @param onlyUncommittedContent
+	 * @param checkUncommittedContent
 	 *            the only uncommitted content
 	 * @return the array list< alert to data constraint failure>
 	 * @throws Exception
 	 *             the exception
 	 */
 	@Deprecated
-	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, int kbId, boolean onlyUncommittedContent) throws Exception {
-		return checkConcept(concept, kbId, null, onlyUncommittedContent);
+	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, int kbId, boolean checkUncommittedContent) throws Exception {
+		return checkConcept(concept, kbId, null, checkUncommittedContent);
 	}
 
 	/**
@@ -450,14 +451,14 @@ public class RulesLibrary {
 	 *            the kb id
 	 * @param languageRefset
 	 *            the language refset
-	 * @param onlyUncommittedContent
+	 * @param checkUncommittedContent
 	 *            the only uncommitted content
 	 * @return the results collector work bench
 	 * @throws Exception
 	 *             the exception
 	 */
 	@Deprecated
-	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, int kbId, I_GetConceptData languageRefset, boolean onlyUncommittedContent) throws Exception {
+	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, int kbId, I_GetConceptData languageRefset, boolean checkUncommittedContent) throws Exception {
 		KnowledgeBase kbase = getKnowledgeBase(kbId);
 
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
@@ -494,7 +495,7 @@ public class RulesLibrary {
 		// TODO: convert to tk model
 		// List<TerminologyComponent> termComponents = new
 		// ArrayList<TerminologyComponent>();
-		// if (onlyUncommittedContent) {
+		// if (checkUncommittedContent) {
 		// termComponents.addAll(TestModelUtil.convertUncommittedToTestModel(concept,
 		// true, true, true, true));
 		// } else {
