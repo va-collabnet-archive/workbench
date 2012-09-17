@@ -121,9 +121,18 @@ public class CreateDroolsKnowledgeBase extends AbstractMojo {
 			RulesContextHelper contextHelper = new RulesContextHelper(activeConfig);
 			if ((pkgName != null && !pkgName.isEmpty()) && ((pkgUrl != null && !pkgUrl.isEmpty()))) {
 				RulesDeploymentPackageReferenceHelper pkgHelper = new RulesDeploymentPackageReferenceHelper(activeConfig);
-				RulesDeploymentPackageReference pkgReference = pkgHelper.createNewRulesDeploymentPackage(pkgName, pkgUrl);
-				for (String loopUuid : context_uuid) {
-					contextHelper.addPkgReferenceToContext(pkgReference, tf.getConcept(UUID.fromString(loopUuid)));
+				boolean alreadyThere = false;
+				for (RulesDeploymentPackageReference loopPkg : pkgHelper.getAllRulesDeploymentPackages()) {
+					if (loopPkg.getUrl().equals(pkgUrl) || loopPkg.getName().equals(pkgName)) {
+						alreadyThere = true;
+					}
+				}
+
+				if (!alreadyThere) {
+					RulesDeploymentPackageReference pkgReference = pkgHelper.createNewRulesDeploymentPackage(pkgName, pkgUrl);
+					for (String loopUuid : context_uuid) {
+						contextHelper.addPkgReferenceToContext(pkgReference, tf.getConcept(UUID.fromString(loopUuid)));
+					}
 				}
 			}
 		} catch (Exception e) {

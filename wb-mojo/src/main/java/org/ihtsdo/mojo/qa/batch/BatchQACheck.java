@@ -169,7 +169,7 @@ public class BatchQACheck extends AbstractMojo {
 	 * @parameter
 	 */
 	private String pkgUrl;
-	
+
 	/**
 	 * extension deployment package reference name.
 	 * 
@@ -240,16 +240,32 @@ public class BatchQACheck extends AbstractMojo {
 
 			if ((pkgName != null && !pkgName.isEmpty()) && ((pkgUrl != null && !pkgUrl.isEmpty()))) {
 				RulesDeploymentPackageReferenceHelper pkgHelper = new RulesDeploymentPackageReferenceHelper(config);
-				RulesDeploymentPackageReference pkgReference = pkgHelper.createNewRulesDeploymentPackage(pkgName, pkgUrl);
-				contextHelper.addPkgReferenceToContext(pkgReference, context);
+				boolean alreadyThere = false;
+				for (RulesDeploymentPackageReference loopPkg : pkgHelper.getAllRulesDeploymentPackages()) {
+					if (loopPkg.getUrl().equals(pkgUrl) || loopPkg.getName().equals(pkgName)) {
+						alreadyThere = true;
+					}
+				}
+				if (!alreadyThere) {
+					RulesDeploymentPackageReference pkgReference = pkgHelper.createNewRulesDeploymentPackage(pkgName, pkgUrl);
+					contextHelper.addPkgReferenceToContext(pkgReference, context);
+				}
 			}
-			
+
 			if ((extPkgName != null && !extPkgName.isEmpty()) && ((extPkgUrl != null && !extPkgUrl.isEmpty()))) {
 				RulesDeploymentPackageReferenceHelper pkgHelper = new RulesDeploymentPackageReferenceHelper(config);
-				RulesDeploymentPackageReference pkgReference = pkgHelper.createNewRulesDeploymentPackage(extPkgName, extPkgUrl);
-				contextHelper.addPkgReferenceToContext(pkgReference, context);
+				boolean alreadyThere = false;
+				for (RulesDeploymentPackageReference loopPkg : pkgHelper.getAllRulesDeploymentPackages()) {
+					if (loopPkg.getUrl().equals(extPkgUrl) || loopPkg.getName().equals(extPkgName)) {
+						alreadyThere = true;
+					}
+				}
+				if (!alreadyThere) {
+					RulesDeploymentPackageReference pkgReference = pkgHelper.createNewRulesDeploymentPackage(extPkgName, extPkgUrl);
+					contextHelper.addPkgReferenceToContext(pkgReference, context);
+				}
 			}
-			
+
 			contextHelper.clearCache();
 			cleanKbFileCache();
 			allRules=new HashMap<String,String>();
@@ -297,7 +313,7 @@ public class BatchQACheck extends AbstractMojo {
 
 			Document document = impl.createDocument(null, "description", null);
 			Element rootElement = document.getDocumentElement();
-			
+
 			HashSet<String> rules;
 			List<RulesDeploymentPackageReference> kbPackages = contextHelper.getPackagesForContext(context);
 			for (RulesDeploymentPackageReference loopPackage : kbPackages) {
