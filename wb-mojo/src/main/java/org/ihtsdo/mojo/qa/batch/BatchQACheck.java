@@ -264,7 +264,7 @@ public class BatchQACheck extends AbstractMojo {
 
 
 			I_GetConceptData context = tf.getConcept(UUID.fromString(context_uuid));
-			contextHelper.getKnowledgeBaseForContext(context, config, true);
+			contextHelper.getKnowledgeBaseForContext(context, config, false);
 
 
 			// Create the execution XMLexecutionPw
