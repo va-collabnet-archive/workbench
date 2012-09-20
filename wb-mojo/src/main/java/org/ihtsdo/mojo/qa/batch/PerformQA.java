@@ -372,11 +372,13 @@ public class PerformQA implements I_ProcessConcepts {
             }
         } catch (Exception e) {
             exceptionCount++;
-            System.out.println("Exception Count: " + exceptionCount + " on " + loopConcept.toUserString());
-            if (exceptionCount > 100) {
-                throw(e);
+            
+            if (exceptionCount < 10 || (exceptionCount % 1000) == 0) {
+                System.out.println("Exception Count: " + exceptionCount + " on " + loopConcept.toUserString() + 
+                        " - " + loopConcept.getPrimUuid().toString());
+                //throw(e);
             } else {
-                System.out.println(e.getMessage());
+                //System.out.println(e.getMessage());
             }
         }
     }
