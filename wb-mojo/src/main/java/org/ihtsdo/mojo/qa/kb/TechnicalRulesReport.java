@@ -17,10 +17,16 @@
 package org.ihtsdo.mojo.qa.kb;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -29,7 +35,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.apache.maven.doxia.markup.HtmlMarkup;
-import org.apache.maven.doxia.module.xhtml.XhtmlSink;
 import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.doxia.sink.SinkEventAttributeSet;
 import org.apache.maven.doxia.sink.SinkEventAttributes;
@@ -51,7 +56,7 @@ import com.googlecode.sardine.util.SardineException;
  */
 public class TechnicalRulesReport extends AbstractMavenReport {
 
-	private static final String BRLRULES = "brlrules";
+	private static final String BRLRULES = "drlrules";
 
 	/**
 	 * The Maven Project Object
@@ -77,13 +82,6 @@ public class TechnicalRulesReport extends AbstractMavenReport {
 	 */
 	private String brlinputfolder;
 
-	/**
-	 * Location of the build directory.
-	 * 
-	 * @parameter expression="${project.build.directory}"
-	 * @required
-	 */
-	private File targetDirectory;
 
 	/**
 	 * @component
@@ -104,27 +102,6 @@ public class TechnicalRulesReport extends AbstractMavenReport {
 			e.printStackTrace();
 			log.error(e);
 		}
-	}
-
-	private void createRuleHtml(File brlFile) throws Exception {
-		File rulesHtmlFolder = new File(outputDirectory + "/" + BRLRULES);
-		rulesHtmlFolder.mkdirs();
-		File file = new File(rulesHtmlFolder, brlFile.getName().replaceAll(".brl", ".html"));
-		XhtmlSink srs = new XhtmlSink(new FileWriter(file));
-
-		srs.body();
-
-		srs.section2();
-		srs.sectionTitle2();
-		srs.text("WHEN");
-		srs.sectionTitle2_();
-
-		srs.section2_();
-
-		srs.body_();
-
-		srs.flush();
-		srs.close();
 	}
 
 	private void generateReport() throws SardineException, Exception {
@@ -231,8 +208,14 @@ public class TechnicalRulesReport extends AbstractMavenReport {
 		for (File file : dir) {
 			if (file.getName().endsWith(".drl")) {
 				sink.tableRow();
+				createRuleHtml(file);
+				SinkEventAttributes linkAttr = new SinkEventAttributeSet();
+				linkAttr.addAttribute("onclick", "javascript:showBusinessRules(\"" + BRLRULES + "/" + file.getName().replaceAll(".drl", ".html").replaceAll(" ", "") + "\"" + ")");
+				linkAttr.addAttribute("href", "javascript:linkme();");
 				sink.tableCell();
+				sink.unknown("a", new Object[] { new Integer(HtmlMarkup.TAG_TYPE_START) }, linkAttr);
 				sink.text(file.getName().replaceAll(".drl", ""));
+				sink.unknown("a", new Object[] { new Integer(HtmlMarkup.TAG_TYPE_END) }, null);
 				sink.tableCell_();
 				sink.tableRow_();
 			}
@@ -249,13 +232,43 @@ public class TechnicalRulesReport extends AbstractMavenReport {
 		sink.sectionTitle3_();
 		sink.lineBreak();
 		SinkEventAttributeSet findigDivAttrs = new SinkEventAttributeSet();
-		findigDivAttrs.addAttribute(SinkEventAttributes.CLASS, "technicalrules");
+		findigDivAttrs.addAttribute(SinkEventAttributes.CLASS, "businessrules");
 		sink.unknown("div", new Object[] { new Integer(HtmlMarkup.TAG_TYPE_START) }, findigDivAttrs);
 		sink.text("Click findig on rule table to see the details.");
 		sink.unknown("div", new Object[] { new Integer(HtmlMarkup.TAG_TYPE_END) }, null);
 		sink.section3_();
 
 		sink.section1_();
+	}
+
+	private void createRuleHtml(File brlFile) {
+		try {
+			File rulesHtmlFolder = new File(outputDirectory + "/" + BRLRULES);
+			rulesHtmlFolder.mkdirs();
+			File file = new File(rulesHtmlFolder, brlFile.getName().replaceAll(".drl", ".html").replaceAll(" ", ""));
+			BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
+
+			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(brlFile), "UTF-8"));
+			bw.write("<body>");
+			while (br.ready()) {
+				String line = br.readLine();
+				if (line.contains("\\t")) {
+					line = line.replaceAll("\\t", "<blockquote>");
+					line = line + "</blockquote>";
+				}
+				bw.write(line);
+				bw.write("<br/>");
+			}
+			bw.write("</body>");
+			bw.close();
+			br.close();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
