@@ -316,8 +316,9 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
                             
                             if (allowedStatusNids.contains(part_search.getStatusNid())
                                     && (part_search.getText().toLowerCase().equals(descText.toLowerCase()) 
-                                        || (text1.equals(text2) && metadataConversor.getRf2Value(part_search.getTypeNid()) == fsnRf2Nid ))
-                                    && isParentOf(hierarchyConceptUuid, tf.nidToUuid(cnid).toString())) {
+                                        )) {
+                                // removed || (text1.equals(text2) && metadataConversor.getRf2Value(part_search.getTypeNid()) == fsnRf2Nid ))
+                                //    && isParentOf(hierarchyConceptUuid, tf.nidToUuid(cnid).toString()
                                 unique = false;
                                 break search;
                             }

@@ -67,9 +67,11 @@ import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.helper.time.TimeHelper;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
@@ -723,12 +725,10 @@ public class RulesContextHelper {
 						I_GetConceptData targetPackage = termFactory.getConcept(loopTuple.getC2Id());
 						Long time = Long.MIN_VALUE;
 						int statusId = Integer.MIN_VALUE;
-						for (ConAttrVersionBI loopAttr : targetPackage.getConceptAttributes().getVersions()) {
-							if (loopAttr.getTime() > time) {
-								time = loopAttr.getTime();
-								statusId = loopAttr.getStatusNid();
-							}
-						}
+                                                ConceptVersionBI cv = Ts.get().getConceptVersion(config.getViewCoordinate(), targetPackage.getConceptNid());
+						statusId = cv.getStatusNid();
+                                                time = cv.getTime();
+                                                
 						if (isActive(statusId) && 
 								!targetPackage.getPrimUuid().equals(UUID.fromString("00000000-0000-0000-C000-000000000046"))) {
 							returnData.add(refHelper.getRulesDeploymentPackageReference(targetPackage));
