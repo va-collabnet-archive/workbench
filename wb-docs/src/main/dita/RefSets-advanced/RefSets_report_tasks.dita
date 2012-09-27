@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN"
+"http://docs.oasis-open.org/dita/dtd/task.dtd">
+<task id="report_generation-tasks">
+  <title>Refset metadata report generation - tasks</title>
+
+  <taskbody>
+    <context>A refset metadata report can be generated under Maven control
+    using the following steps. A sample POM is included below.</context>
+
+    <steps>
+      <step>
+        <cmd>Check out the changesets from the appropriate SVN location.</cmd>
+      </step>
+
+      <step>
+        <cmd>Write the dependency files to the generated resource folder (this
+        allows the database to be quickly accessible, rather than in a
+        JAR).</cmd>
+      </step>
+
+      <step>
+        <cmd>Open the database.</cmd>
+      </step>
+
+      <step>
+        <cmd>Initialize the database.</cmd>
+      </step>
+
+      <step>
+        <cmd>Apply the changesets to the database.</cmd>
+      </step>
+
+      <step>
+        <cmd>Run the refset listing mojo.</cmd>
+      </step>
+
+      <step>
+        <cmd>Close the database.</cmd>
+      </step>
+    </steps>
+
+    <result>The sample output rendered in a browser:-<table>
+        <title/>
+
+        <tgroup cols="2">
+          <tbody>
+            <row>
+              <entry>ID</entry>
+
+              <entry>fb98edf7-779f-4560-b410-4675b94a9d0a</entry>
+            </row>
+
+            <row>
+              <entry>refset owner</entry>
+
+              <entry>ownerPerry</entry>
+            </row>
+
+            <row>
+              <entry>refset editor</entry>
+
+              <entry>authorPerry</entry>
+            </row>
+
+            <row>
+              <entry>refset reviewer</entry>
+
+              <entry>revPerry</entry>
+            </row>
+
+            <row>
+              <entry>refset purpose</entry>
+
+              <entry>simple component</entry>
+            </row>
+
+            <row>
+              <entry>comments</entry>
+
+              <entry/>
+            </row>
+
+            <row>
+              <entry/>
+
+              <entry>create a refset</entry>
+            </row>
+
+            <row>
+              <entry/>
+
+              <entry>minister of health</entry>
+            </row>
+
+            <row>
+              <entry/>
+
+              <entry>testing</entry>
+            </row>
+
+            <row>
+              <entry>promotion</entry>
+
+              <entry/>
+            </row>
+          </tbody>
+        </tgroup>
+      </table></result>
+
+    <example>The following sample Maven POM file can be used as a template for
+    generating a refset metadata report.</example>
+
+    <postreq><codeblock>project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"&gt;
+	&lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+	&lt;groupId&gt;net.nhs&lt;/groupId&gt;
+	&lt;artifactId&gt;refset-listing&lt;/artifactId&gt;
+	&lt;version&gt;0.0.1-SNAPSHOT&lt;/version&gt;
+	&lt;dependencies&gt;
+		&lt;dependency&gt;
+			&lt;groupId&gt;org.dwfa&lt;/groupId&gt;
+			&lt;artifactId&gt;term-mojo&lt;/artifactId&gt;
+			&lt;version&gt;1.43-SNAPSHOT&lt;/version&gt;
+			&lt;type&gt;maven-plugin&lt;/type&gt;
+			&lt;scope&gt;compile&lt;/scope&gt;
+		&lt;/dependency&gt;
+	&lt;/dependencies&gt;
+
+	&lt;build&gt;
+		&lt;plugins&gt;
+&lt;plugin&gt;
+				&lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+				&lt;artifactId&gt;maven-assembly-plugin&lt;/artifactId&gt;
+				&lt;version&gt;${maven.assembly.plugin.version}&lt;/version&gt;
+				&lt;executions&gt;
+					&lt;execution&gt;
+						&lt;id&gt;assembly&lt;/id&gt;
+						&lt;phase&gt;process-resources&lt;/phase&gt;
+						&lt;goals&gt;
+							&lt;goal&gt;directory-single&lt;/goal&gt;
+						&lt;/goals&gt;
+						&lt;configuration&gt;
+							&lt;descriptors&gt;
+								&lt;descriptor&gt;src/main/assembly/bundle-all.xml&lt;/descriptor&gt;
+							&lt;/descriptors&gt;
+							&lt;finalName&gt;${sa.bundle.name}&lt;/finalName&gt;
+						&lt;/configuration&gt;
+					&lt;/execution&gt;
+				&lt;/executions&gt;
+			&lt;/plugin&gt;
+			&lt;plugin&gt;
+				&lt;groupId&gt;org.dwfa&lt;/groupId&gt;
+				&lt;artifactId&gt;dwfa-mojo&lt;/artifactId&gt;
+				&lt;version&gt;${org.dwfa.dwfa-mojo.version}&lt;/version&gt;
+				&lt;dependencies&gt;
+					&lt;dependency&gt;
+						&lt;groupId&gt;org.dwfa&lt;/groupId&gt;
+						&lt;artifactId&gt;vodb&lt;/artifactId&gt;
+						&lt;version&gt;${org.dwfa.vodb.version}&lt;/version&gt;
+					&lt;/dependency&gt;
+				&lt;/dependencies&gt;
+				&lt;executions&gt;
+			
+				&lt;execution&gt;
+					&lt;id&gt;write-directories-site&lt;/id&gt;
+					&lt;phase&gt;pre-site&lt;/phase&gt;
+					&lt;goals&gt;
+						&lt;goal&gt;write-directories&lt;/goal&gt;
+					&lt;/goals&gt;
+					&lt;configuration&gt;
+						&lt;targetSubDir&gt;generated-resources/&lt;/targetSubDir&gt;
+					&lt;/configuration&gt;
+				&lt;/execution&gt;
+			&lt;/executions&gt;
+		&lt;/plugin&gt;
+
+		&lt;plugin&gt;
+			&lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+			&lt;artifactId&gt;maven-scm-plugin&lt;/artifactId&gt;
+			&lt;version&gt;1.2&lt;/version&gt;
+			&lt;executions&gt;
+				&lt;execution&gt;
+					&lt;id&gt;svn-checkout&lt;/id&gt;
+					&lt;phase&gt;pre-site&lt;/phase&gt;
+					&lt;goals&gt;
+													&lt;goal&gt;checkout&lt;/goal&gt;
+					&lt;/goals&gt;
+					&lt;configuration&gt;
+							&lt;checkoutDirectory&gt;${project.build.directory}/changesets&lt;/checkoutDirectory&gt;
+							&lt;connectionUrl&gt;
+								scm:svn:https://csfe.aceworkspace.net/svn/repos/nhs-subset-editor-master/
+									trunk/nhs-subset-editor-tide-mmb/nhs-subset-editor-profiles/src/main/resources/profiles
+							&lt;/connectionUrl&gt;
+							&lt;username&gt;${svnusername}&lt;/username&gt;
+							&lt;password&gt;${svnpassword}&lt;/password&gt;
+						&lt;/configuration&gt;
+					&lt;/execution&gt;
+				&lt;/executions&gt;
+			&lt;/plugin&gt;
+
+			&lt;plugin&gt;
+				&lt;groupId&gt;org.dwfa&lt;/groupId&gt;
+				&lt;artifactId&gt;term-mojo&lt;/artifactId&gt;
+				&lt;dependencies&gt;
+					&lt;dependency&gt;
+						&lt;groupId&gt;org.dwfa&lt;/groupId&gt;
+						&lt;artifactId&gt;vodb&lt;/artifactId&gt;
+						&lt;version&gt;${org.dwfa.vodb.version}&lt;/version&gt;
+						&lt;scope&gt;compile&lt;/scope&gt;
+					&lt;/dependency&gt;
+				&lt;/dependencies&gt;
+				&lt;executions&gt;
+					&lt;execution&gt;
+						&lt;id&gt;vodb-open&lt;/id&gt;
+						&lt;phase&gt;pre-site&lt;/phase&gt;
+						&lt;goals&gt;
+							&lt;goal&gt;vodb-open&lt;/goal&gt;
+						&lt;/goals&gt;
+						&lt;configuration&gt;
+							&lt;vodbDirectory&gt;target/generated-resources/berkeley-db&lt;/vodbDirectory&gt;
+						&lt;/configuration&gt;
+					&lt;/execution&gt;
+					&lt;execution&gt;
+						&lt;id&gt;DBPropertyCreator&lt;/id&gt;
+						&lt;phase&gt;pre-site&lt;/phase&gt;
+						&lt;goals&gt;
+							&lt;goal&gt;setproperties&lt;/goal&gt;
+						&lt;/goals&gt;
+						&lt;configuration&gt;
+							&lt;inputDirectory&gt;${user.home}/.m2&lt;/inputDirectory&gt;
+							&lt;fileName&gt;properties&lt;/fileName&gt;
+						&lt;/configuration&gt;
+					&lt;/execution&gt;
+					&lt;execution&gt;
+						&lt;id&gt;bcs-read-all&lt;/id&gt;
+						&lt;phase&gt;pre-site&lt;/phase&gt;
+						&lt;goals&gt;
+							&lt;goal&gt;bcs-read-all&lt;/goal&gt;
+						&lt;/goals&gt;
+						&lt;configuration&gt;
+							&lt;validators&gt;
+								&lt;validator&gt;
+									org.dwfa.ace.api.cs.LenientComponentValidator
+							&lt;/validator&gt;
+							&lt;/validators&gt;
+							&lt;changeSetDir&gt;${project.build.directory}/changesets&lt;/changeSetDir&gt;
+						&lt;/configuration&gt;
+					&lt;/execution&gt;
+					&lt;execution&gt;
+						&lt;id&gt;refset-listing&lt;/id&gt;
+						&lt;phase&gt;pre-site&lt;/phase&gt;
+						&lt;goals&gt;
+							&lt;goal&gt;refset-listing&lt;/goal&gt;
+						&lt;/goals&gt;
+						&lt;configuration&gt;
+							&lt;name&gt;default&lt;/name&gt;
+							&lt;sort_by_name&gt;false&lt;/sort_by_name&gt;
+							&lt;list_file&gt;target/classes/refsets.html&lt;/list_file&gt;
+						&lt;/configuration&gt;
+					&lt;/execution&gt;
+					&lt;execution&gt;
+						&lt;id&gt;vodb-close&lt;/id&gt;
+						&lt;phase&gt;pre-site&lt;/phase&gt;
+						&lt;goals&gt;
+							&lt;goal&gt;vodb-close&lt;/goal&gt;
+						&lt;/goals&gt;
+					&lt;/execution&gt;
+				&lt;/executions&gt;
+			&lt;/plugin&gt;
+		&lt;/plugins&gt;
+	&lt;/build&gt;
+&lt;/project&gt;
+</codeblock>By executing these in the “pre-site” phase, we can separate the
+    report generation from the normal install build which builds the bundle
+    for accessing ACE. To build the report and associated web site from the
+    command line, the following command is used: <codeblock>mvn clean site</codeblock>
+    To view the generated website, you can navigate to the target/site folder
+    and open the <codeph>index.html</codeph>. From there you can navigate to
+    the report using the left hand side menu (it is labeled “Refset listing”
+    under the “Reports” menu item). The default behavior is to list all
+    refsets hierarchically. That is, starting at the root refset listed them
+    using a depth first traversal. Siblings are sorted by name. <p/>All mojo
+    parameters are optional. They are as follows: <ul>
+        <li><codeph>Sort_by_name</codeph> – Boolean value. If this value is
+        true, it will list the refsets in order sorted by name. If false, the
+        report will list them hierarchically.</li>
+
+        <li><codeph>List_file</codeph> – String value. This specifies the name
+        of the file in which to produce the report (the output file).</li>
+
+        <li><codeph>refset_con_uuid</codeph> – UUID. This specifies the refset
+        on which to start the search. The default value is the refset identity
+        (“refset”). This can be used to narrow the search space, if only a
+        particular sub-hierarchy is required.</li>
+      </ul> The metadata elements in the sample output are currently available
+    and produced in the report. Note that optional metadata elements will be
+    blank. The comments and promotion may be multi-valued and are therefore
+    listed on multiple lines with the metadata elements label line always
+    being blank.</postreq>
+  </taskbody>
+</task>

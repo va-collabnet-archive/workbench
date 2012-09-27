@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE bookmap PUBLIC "-//OASIS//DTD DITA BookMap//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/bookmap.dtd">
+<bookmap id="book_admin" xml:lang="en_US">
+    <booktitle>
+        <mainbooktitle>Workbench component: Administration <image href="../images/IHTSDO_logo_165.png"></image></mainbooktitle>
+    </booktitle>
+    <bookmeta>
+        <author type="creator">Keith Campbell</author>
+        <author type="contributor">Susan Castillo, Eric Browne</author>
+        <keywords>
+            <keyword>IHTSDO</keyword>
+            <keyword>Workbench</keyword>
+            <keyword>administration</keyword>
+            <keyword>administrative functions</keyword>
+        </keywords>
+        <prodinfo>
+            <prodname>IHTSDO Workbench Component</prodname>
+            <vrmlist>
+                <vrm version="1.0"/>
+            </vrmlist>
+        </prodinfo>
+        <bookrights>
+            <copyrfirst>
+                <year>2010</year>
+            </copyrfirst>
+            <!--copyrlast>
+                <year>2010</year>
+            </copyrlast-->
+            <bookowner>
+                <organization>IHTSDO</organization>
+            </bookowner>
+        </bookrights>
+    </bookmeta>
+    <frontmatter>
+        <booklists>
+            <toc/>
+        </booklists>
+        <preface>
+            <!--<topicref href="frontCover.xml" format="dita" type="topic"/>-->
+ 
+        </preface>
+    </frontmatter>
+
+    <chapter href="../Admin/Admin.ditamap" format="ditamap" navtitle="Administrative Functions">
+    </chapter>
+    <backmatter>
+        <booklists>
+            <indexlist/>
+        </booklists>
+    </backmatter>
+</bookmap>

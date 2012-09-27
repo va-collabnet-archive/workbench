@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+
+<topic id="topic18" xml:lang="en">
+ <title>View tasks</title>
+ <abstract>
+  <simpletable id="ap1028290">
+   <strow>
+    <stentry>
+     <b>add view position<ph>
+       <indexterm>Task <indexterm>add view position</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>ide view</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.ace.data.view</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>SetViewPosition.java<indexterm>Task bean <indexterm>SetViewPosition.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p><ph>profilePropName</ph>: The property containing the profile to change.</p>
+     <p><ph>positionStr</ph>: The version as a string. Expressed as \"latest\" or yyyy-MM-dd
+       HH:mm:ss.<indexterm>version </indexterm><indexterm>version </indexterm></p>
+     <p><ph>viewPathEntry</ph>: The property that contains the concept that identifies the view
+      path.</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1028521">
+   <strow>
+    <stentry>
+     <b>add view position from property<ph>
+       <indexterm>Task <indexterm>add view position from property</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>ide view</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.ace.data.view</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>SetViewPositionFromProperty.java<indexterm>Task bean
+        <indexterm>SetViewPositionFromProperty.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p><ph>profilePropName</ph>: The property containing the profile to change.</p>
+     <p><ph>positionStr</ph>: The version as a string. Expressed as \"latest\" or yyyy-MM-dd
+       HH:mm:ss.<indexterm>version </indexterm></p>
+     <p><ph>viewPathConceptPropName</ph>: The property that contains the concept that identifies the
+      view path.</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1028752">
+   <strow>
+    <stentry>
+     <b>add view positions from position list<ph>
+       <indexterm>Task <indexterm>add view positions from position list</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>ide view</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.ace.data.view</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>AddViewsFromUniversalPositionList.java<indexterm>Task bean
+        <indexterm>AddViewsFromUniversalPositionList.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p><ph>profilePropName</ph>: The property containing the profile to change.</p>
+     <p><ph>positionListPropName</ph>: The property that contains universal position list</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1028985">
+   <strow>
+    <stentry>
+     <b>clear view positions<ph>
+       <indexterm>Task <indexterm>clear view positions</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>ide view</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.ace.data.view</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>ClearViewPositions.java<indexterm>Task bean <indexterm>ClearViewPositions.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p><ph>profilePropName</ph>: The property containing the profile to change.</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1029179">
+   <strow>
+    <stentry>
+     <b>set view to position on edit path set<ph>
+       <indexterm>Task <indexterm>set view to position on edit path set</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list n avigator, under:</p>
+     <p>ide view</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.ace.data.view</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>SetViewToPositionOnEditPathSet.java<indexterm>Task bean
+        <indexterm>SetViewToPositionOnEditPathSet.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p><ph>profilePropName</ph>: The property containing the profile to change.</p>
+     <p><ph>positionStr</ph>: The version as a string. Expressed as \"latest\" or yyyy-MM-dd
+       HH:mm:ss.<indexterm>version </indexterm><indexterm>version </indexterm></p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+ </abstract>
+</topic>
+

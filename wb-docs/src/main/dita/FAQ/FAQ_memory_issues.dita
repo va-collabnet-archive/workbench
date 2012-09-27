@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN"
+"http://docs.oasis-open.org/dita/dtd/topic.dtd">
+<topic id="memory_issues">
+  <title>How to overcome memory issues?</title>
+
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>memory issues</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <section><p>Some users may require special configuration such as changing
+    default memory settings, which otherwise might lead to application errors
+    such as:</p><codeblock>Error occurred during initialization of VM
+Could not reserve enough space for object heap</codeblock><p>The IHTSDO
+    Workbench editor is invoked from an operating system specific startup
+    script (<codeph><ph>startAce.bat</ph></codeph><ph>,
+    <codeph>startAceLinux.sh</codeph>,
+    </ph><codeph><ph>startAceOsX.sh</ph></codeph>) which in turn, invokes the
+    JVM with initial memory parameters, specified with the
+    <ph><codeph>-Xms</codeph></ph> and <codeph><ph>-Xmx</ph></codeph> switches
+    The IHTSDO Workbench application bundle has a directory <ph>config</ph>,
+    where various configuration specific files are located. The file
+    <codeph>ace.config</codeph> specifies, amongst other parameters, a
+    <codeph>cache-size</codeph> parameter. The Berkeley database
+    implementation from Oracle (formerly Sleepycat Software) uses a
+    configuration file <codeph>je.properties</codeph>, which has
+    <codeph>maxMemory</codeph> or alternative
+    <codeph>maxMemoryPercent</codeph> parameter which may require
+    localisation.<indexterm>cache-size</indexterm><indexterm>Berkeley</indexterm></p><p>There
+    are no hard and fast rules about the values for maximum memory allocation,
+    and depends on the user's environment, and the tasks being undertaken by
+    the Workbench. The following intensive tasks may be limited by memory,
+    such that they may not complete. Increasing, particularly the maximum heap
+    size (e.g. to <codeph>-Xms600m</codeph> ) may significantly improve
+    performance:-<ul>
+        <li>complex searches</li>
+      </ul></p><p><ul>
+        <li>computing members of a refset from a refset specification</li>
+      </ul></p><p><ul>
+        <li>running the classifier (requires a value of at least
+        <codeph>-Xms1200m</codeph> ).</li>
+      </ul></p></section>
+  </body>
+</topic>

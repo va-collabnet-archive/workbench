@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE dita PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/ditabase.dtd">
+<dita>
+ <topic id="new_path_tab" xml:lang="en">
+  <title>New Path Tab</title>
+  <shortdesc>
+   <ph>Allows for the creation of a new editing path</ph>
+  </shortdesc>
+  <body>
+   <section>
+    <title>Description for new path-- TBD</title>
+   </section>
+   <section>
+    <title>Parent for new path-- OK?</title>
+   </section>
+   <section>
+    <title>Create button</title>
+   </section>
+  </body>
+ </topic>
+</dita>

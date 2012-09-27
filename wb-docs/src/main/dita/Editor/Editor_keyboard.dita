@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="keyboard" xml:lang="en">
+    <title>Keyboard shortcuts</title>
+    <prolog>
+        <author>Eric Browne</author>
+        <metadata>
+            <keywords>
+                <indexterm>keyboard shortcuts </indexterm><indexterm>shortcuts<indexterm
+                        >keyboard</indexterm></indexterm>
+            </keywords>
+        </metadata>
+    </prolog>
+    <body>
+        <section>The IHTSDO Workbench user interface has been designed with user productivity a
+            priority. Extensive use has been made of drag and drop functionality, and there is an
+            extensive range of user preferences that can allow the user to tailor the IDE to the
+            user's workflow. The Workbench IDE has provides some keyboard shortcuts described in the
+            following table, along with their context of use. The action performed by a specific key
+            will be dependent on the context and state of the IDE at the time, especially where the
+            current focus or selection is highlighted.<table frame="all"
+                id="table_1dcd8e7f-fa05-4015-a462-15907831faa6">
+                <title>Keyboard shortcuts</title>
+                <tgroup cols="4">
+                    <colspec colname="c1" colnum="1" colwidth="1.0*"/>
+                    <colspec colname="c2" colnum="2" colwidth="1.0*"/>
+                    <colspec colname="c3" colnum="3" colwidth="1.0*"/>
+                    <colspec colname="c4" colnum="4" colwidth="2.0*"/>
+                    <thead>
+                        <row>
+                            <entry>Windows/Linux</entry>
+                            <entry>MacOs X</entry>
+                            <entry>Context</entry>
+                            <entry>Action</entry>
+                        </row>
+                    </thead>
+                    <tbody>
+                        <row>
+                            <entry><i>control</i>-C</entry>
+                            <entry><i>command</i>-C</entry>
+                            <entry>general data entry</entry>
+                            <entry>Copy current selection to clipboard</entry>
+                        </row>
+                        <row>
+                            <entry><i>control</i>-V</entry>
+                            <entry><i>command</i>-V</entry>
+                            <entry>general data entry</entry>
+                            <entry>paste clipboard into current field</entry>
+                        </row>
+                        <row>
+                            <entry><i>control</i>-X</entry>
+                            <entry><i>command</i>-X</entry>
+                            <entry>general data entry</entry>
+                            <entry>Cut from current selection into clipboard</entry>
+                        </row>
+                        <row>
+                            <entry><i>control</i>-Q</entry>
+                            <entry><i>command</i>-Q</entry>
+                            <entry>general</entry>
+                            <entry>Exit the Workbench IDE. Confirmation required.</entry>
+                        </row>
+                        <row>
+                            <entry><i>space bar</i></entry>
+                            <entry><i>space bar</i></entry>
+                            <entry>general</entry>
+                            <entry>Toggles the action of the currently selected toggle
+                                button</entry>
+                        </row>
+                        <row>
+                            <entry><i>R arrow</i></entry>
+                            <entry><i>R arrow</i></entry>
+                            <entry>Process Builder</entry>
+                            <entry>finely repositions selected task on canvas</entry>
+                        </row>
+                        <row>
+                            <entry><i>R arrow</i></entry>
+                            <entry><i>R arrow</i></entry>
+                            <entry>taxonomy hierarchy</entry>
+                            <entry>descends hierarchy, i.e. moves to first child of currently
+                                selected item</entry>
+                        </row>
+                        <row>
+                            <entry><i>L arrow</i></entry>
+                            <entry><i>L arrow</i></entry>
+                            <entry>Process Builder</entry>
+                            <entry>finely repositions selected task on canvas</entry>
+                        </row>
+                        <row>
+                            <entry><i>L arrow</i></entry>
+                            <entry><i>L arrow</i></entry>
+                            <entry>taxonomy hierarchy</entry>
+                            <entry>ascends hierarchy. ie. moves to parent of currently selected
+                                item</entry>
+                        </row>
+                        <row>
+                            <entry><i>up arrow</i></entry>
+                            <entry><i>up arrow</i></entry>
+                            <entry>Process Builder</entry>
+                            <entry>finely repositions selected task on canvas</entry>
+                        </row>
+                        <row>
+                            <entry><i>up arrow</i></entry>
+                            <entry><i>up arrow</i></entry>
+                            <entry>taxonomy hierarchy</entry>
+                            <entry>moves to preceding available item displayed, irrespective of
+                                level. i.e. leaves open/closed state unchanged</entry>
+                        </row>
+                        <row>
+                            <entry><i>down arrow</i></entry>
+                            <entry><i>down arrow</i></entry>
+                            <entry>Process Builder</entry>
+                            <entry>finely repositions selected task on canvas</entry>
+                        </row>
+                        <row>
+                            <entry><i>down arrow</i></entry>
+                            <entry><i>down arrow</i></entry>
+                            <entry>taxonomy hierarchy</entry>
+                            <entry>moves to next available item displayed, irrespective of level.
+                                i.e. leaves open/closed state unchanged</entry>
+                        </row>
+                        <row>
+                            <entry><i>shift</i></entry>
+                            <entry><i>shift</i></entry>
+                            <entry>Process Builder</entry>
+                            <entry>in conjunction with mouse drag, repositions selected task on
+                                canvas </entry>
+                        </row>
+                        <row>
+                            <entry><i>tab</i></entry>
+                            <entry><i>tab</i></entry>
+                            <entry>component panel</entry>
+                            <entry>Moves focus to next item, i.e.. next button or text field</entry>
+                        </row>
+                        <row>
+                            <entry><i>shift tab</i></entry>
+                            <entry><i>shift tab</i></entry>
+                            <entry>component panel</entry>
+                            <entry>Moves focus to previous item, i.e.. next button or text
+                                field</entry>
+                        </row>
+                        <row>
+                            <entry><i>ctl-tab</i></entry>
+                            <entry><i>cmd-tab</i></entry>
+                            <entry>component panel</entry>
+                            <entry>Moves focus to next pane in series of tabbed panes</entry>
+                        </row>
+                        <row>
+                            <entry><i>shift-ctl-tab</i></entry>
+                            <entry><i>shift-cmd-tab</i></entry>
+                            <entry>component panel</entry>
+                            <entry>Moves focus to previous pane in series of tabbed panes</entry>
+                        </row>
+                    </tbody>
+                </tgroup>
+            </table></section>
+    </body>
+</topic>

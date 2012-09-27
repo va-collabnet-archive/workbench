@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN"
+"http://docs.oasis-open.org/dita/dtd/topic.dtd">
+<topic id="ID_allocation">
+  <title>How are new SNOMED IDs allocated – by sequence or otherwise?</title>
+
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>concept identifiers<indexterm>in refset
+        creation</indexterm></indexterm>
+
+        <indexterm>refsets<indexterm>concept identifier
+        allocation</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <p>SNOMED IDs are allocated by a class in dwfa-mojo
+    (<codeph>org/dwfa/maven/transform/UuidSnomedMap</codeph>). They are
+    allocated in sequence using an incremented number as well as the project
+    code digits, namespace digits and the type digits (concept, description,
+    relationship or subset) and finally the check sum digits.</p>
+
+    <p>Allocated SNOMED IDs are stored in a mapping file in Subversion. This
+    is a mapping from UUID to SNOMED ID. If no mapping exists for the UUID,
+    then the SNOMED ID is generated.</p>
+
+    <p>If a component had an associated SNOMED ID within the workbench (i.e.
+    one that had been added via the import refset BP or manually using the
+    component view), then this ID would be used instead of allocating a new
+    SNOMED ID.</p>
+  </body>
+</topic>

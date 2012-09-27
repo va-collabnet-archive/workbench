@@ -1,0 +1,42 @@
+/* Security policy for SSL server */
+
+/* Keystore containing trusted certificates to use for authentication */
+keystore "..${/}prebuiltkeys${/}truststore";
+
+/* Grant all permissions to local JAR files */
+grant codeBase "file:${/}-" {
+    permission java.security.AllPermission;
+};
+
+/* Grant permissions to client principal */
+grant principal "client" {
+    permission org.dwfa.queue.QueueServerPermission "getProcessMetaData";
+    permission org.dwfa.queue.QueueServerPermission "getNodeInboxAddress";
+    permission org.dwfa.queue.QueueServerPermission "read";
+    permission org.dwfa.queue.QueueServerPermission "take";
+    permission org.dwfa.queue.QueueServerPermission "write";
+};
+
+/* Grant permissions to client principal */
+grant principal "client1" {
+    permission org.dwfa.queue.QueueServerPermission "getProcessMetaData";
+    permission org.dwfa.queue.QueueServerPermission "getNodeInboxAddress";
+    permission org.dwfa.queue.QueueServerPermission "read";
+    permission org.dwfa.queue.QueueServerPermission "take";
+    permission org.dwfa.queue.QueueServerPermission "write";
+};
+
+/* Grant permissions to client principal */
+grant principal "client2" {
+    permission org.dwfa.queue.QueueServerPermission "getProcessMetaData";
+    permission org.dwfa.queue.QueueServerPermission "getNodeInboxAddress";
+    permission org.dwfa.queue.QueueServerPermission "read";
+    permission org.dwfa.queue.QueueServerPermission "take";
+    permission org.dwfa.queue.QueueServerPermission "write";
+};
+
+/* Grant permissions to all principals */
+grant {
+    /* Call getProxyVerifier method */
+    permission org.dwfa.queue.QueueServerPermission "getProxyVerifier";
+};

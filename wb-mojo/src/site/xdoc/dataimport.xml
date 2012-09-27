@@ -1,0 +1,52 @@
+<document>
+<!-- 
+ !  Copyright (c) 2009 International Health Terminology Standards Development Organisation
+ !
+ !  Licensed under the Apache License, Version 2.0 (the "License");
+ !  you may not use this file except in compliance with the License.
+ !  You may obtain a copy of the License at
+ ! 
+ !      http://www.apache.org/licenses/LICENSE-2.0
+ !
+ !  Unless required by applicable law or agreed to in writing, software
+ !  distributed under the License is distributed on an "AS IS" BASIS,
+ !  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ !  See the License for the specific language governing permissions and
+ !  limitations under the License.
+ -->
+
+  <properties>
+    <author email="user@company.com">Keith Campbell</author>
+    <title>ACE Format Data Import</title>
+  </properties>
+  <!-- Optional HEAD element, which is copied as is into the XHTML <head> element -->
+  <head> </head>
+  <body>
+    <!-- The body of the document contains a number of sections -->
+    <section name="ACE Format Data Import">
+      <p>The ACE version-oriented database can import uuid-based data from tab-delimited text files
+        using the <a href="plugins/berkley-vodb-dir-mojo.html">berkley-vodb-dir</a> goal.</p><p>
+          
+        This article describes the required data formats. The following types of files can be
+        imported. </p>
+      
+      <ul>
+        <li><a href="concepts.html">Concepts</a></li>
+        <li><a href="descriptions.html">Descriptions</a></li>
+        <li><a href="relationships.html">Relationships</a></li>
+        <li><a href="ids.html">Identifiers</a></li>
+        <li><a href="licit-words.html">Licit Words</a></li>
+        <li><a href="illicit-words.html">Illicit Words</a></li>
+        <li><a href="boolean-refset.html">Boolean RefSet</a></li>
+        <li><a href="concept-refset.html">Concept RefSet</a></li>
+        <li><a href="concept-integer-refset.html">Concept-Integer RefSet</a></li>
+        <li><a href="measurement-refset.html">Measurement RefSet</a></li>
+        <li><a href="integer-refset.html">Integer RefSet</a></li>
+        <li><a href="string-refset.html">String RefSet</a></li>
+        <li><a href="language-refset.html">Language RefSet</a></li>
+      </ul>
+      
+      <!-- Within sections, any XHTML can be used -->
+    </section>
+  </body>
+</document>

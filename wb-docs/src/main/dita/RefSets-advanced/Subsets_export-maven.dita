@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN"
+"http://docs.oasis-open.org/dita/dtd/topic.dtd">
+<topic id="subset_export-maven">
+  <title>Refset Subset export:</title>
+
+  <body>
+    <p>The subset export is similar to the refset export, using a mojo
+    configurable in the cfh_refset_release Maven pom file. A default
+    configuration of this mojo has been checked into <codeblock>https://csfe.aceworkspace.net/svn/repos/dmd/branches/2009-04-01-trial-1/dev/cfh_refset_release</codeblock>Parameters
+    include:</p>
+
+    <ul>
+      <li>releaseVersion - specifies the SNOMED CT version the refsets are
+      intended to be used with. It is an 8-digit number of the form
+      "YYYYMMDD".</li>
+
+      <li>country code - used in the naming of subset files. An example of
+      this code is “<codeph>uk</codeph>”.</li>
+
+      <li>language code - used in the subset file export, in the “
+      LANGUAGECODE” field. An example of this code is “<codeph>en-GB</codeph>”
+      or “<codeph>en</codeph>”<p><codeblock>&lt;execution&gt;
+   &lt;id&gt;export-subsets&lt;/id&gt;
+   &lt;phase&gt;generate-test-resources&lt;/phase&gt;
+   &lt;goals&gt;
+      &lt;goal&gt;subset-export&lt;/goal&gt;
+   &lt;/goals&gt;
+   &lt;configuration&gt;
+      &lt;releaseVersion&gt;20090401&lt;/releaseVersion&gt; 
+      &lt;subsetOutputDirectory&gt;
+     ${project.build.directory}/classes/subset_sctid/subsets
+      &lt;/subsetOutputDirectory&gt;
+      &lt;countryCode&gt;uk&lt;/countryCode&gt;
+      &lt;languageCode&gt;en-GB&lt;/languageCode&gt;
+      &lt;fixedMapDirectory&gt;
+        ${project.build.directory}/generated-resources
+      &lt;/fixedMapDirectory&gt;
+      &lt;readWriteMapDirectory&gt;
+          src/main/sct-uuid-maps
+      &lt;/readWriteMapDirectory&gt; ...
+   &lt;/configuration&gt;
+&lt;/execution&gt;</codeblock></p></li>
+    </ul>
+
+    <p>Similarly to the refset export, the exported subsets can be found in
+    the project's generated JAR file - this can be found in the local Maven
+    repository (.m2\repository\net\nhs\uktc\cfh_refset_release\2009.06.01-
+    SNAPSHOT\cfh_refset_release-2009.06.01-SNAPSHOT.jar). This includes the
+    “Subsets table” (index), and a “Subset Members table” for each exported
+    subset.</p>
+  </body>
+</topic>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+
+<topic id="topic11" xml:lang="en">
+ <title>Extension Tasks</title>
+ <abstract>
+  <simpletable id="ap1014757">
+   <strow>
+    <stentry>
+     <b>Count Extensions<ph>
+       <indexterm>Task <indexterm>Count Extensions</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry>
+     <p>Counts the number of extensions by reference and diplays in log view</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>ide ebr</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.ace.task.ebr</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>CountExtensions.java<indexterm>Task bean <indexterm>CountExtensions.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p>none</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1014944">
+   <strow>
+    <stentry>
+     <b>Count Extensions in Refset<ph>
+       <indexterm>Task <indexterm>Count Extensions in Refset</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>ide ebr</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.ace.task.ebr</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>CountExtensionsInRefset.java<indexterm>Task bean
+        <indexterm>CountExtensionsInRefset.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p><ph>refsetTermEntry</ph>: The identity concept for the refset of interest.</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+ </abstract>
+</topic>
+

@@ -1,0 +1,112 @@
+<document>
+<!-- 
+ !  Copyright (c) 2009 International Health Terminology Standards Development Organisation
+ !
+ !  Licensed under the Apache License, Version 2.0 (the "License");
+ !  you may not use this file except in compliance with the License.
+ !  You may obtain a copy of the License at
+ ! 
+ !      http://www.apache.org/licenses/LICENSE-2.0
+ !
+ !  Unless required by applicable law or agreed to in writing, software
+ !  distributed under the License is distributed on an "AS IS" BASIS,
+ !  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ !  See the License for the specific language governing permissions and
+ !  limitations under the License.
+ -->
+
+  <properties>
+    <author email="user@company.com">Keith Campbell</author>
+    <title>ACE Format Concept Import</title>
+  </properties>
+  <!-- Optional HEAD element, which is copied as is into the XHTML <head> element -->
+  <head> </head>
+  <body>
+    <!-- The body of the document contains a number of sections -->
+    <section name="ACE Format Concept Import">
+
+      <dl>
+        <dt><p>concepts.txt</p></dt>
+        <dd>
+          <p>A required file containing all the concepts of the terminology database, and their
+            status and version information.</p>
+          <table>
+            <tr>
+              <th>Column Name</th>
+              <th>Data Description</th>
+            </tr>
+            <tr>
+              <td>
+                <p>concept uuid</p>
+              </td>
+              <td>
+                <p>The <a href="http://en.wikipedia.org/wiki/Universally_Unique_Identifier"
+                    >Universally Unique Identifier</a> of the concept. </p>
+                <p> The UUID is represented in its canonical form, consisting of 32 hexadecimal
+                  digits, displayed in 5 groups separated by hyphens, for a total of 36 characters.
+                  For example: 550e8400-e29b-41d4-a716-446655440000</p>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <p>status uuid</p>
+              </td>
+              <td>
+                <p>The <a href="http://en.wikipedia.org/wiki/Universally_Unique_Identifier"
+                    >Universally Unique Identifier</a> of the status concept associated with this
+                  record. </p>
+                <p> The UUID is represented in its canonical form, consisting of 32 hexadecimal
+                  digits, displayed in 5 groups separated by hyphens, for a total of 36 characters.
+                  For example: 550e8400-e29b-41d4-a716-446655440000</p>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <p>primitive</p>
+              </td>
+              <td>
+                <p>A boolean value that determines if the concept is primitive or defined. The value
+                  is represented by a string 0 (false == defined) or 1 (true == primitive) </p>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <p>effective date</p>
+              </td>
+              <td>
+                <p>The date this change became, or will become, effective, with a required
+                  granularity of seconds. The value is represented by a string of one of the
+                  following <a
+                    href="http://java.sun.com/j2se/1.5.0/docs/api/java/text/SimpleDateFormat.html"
+                    >formats:</a></p>
+                <ul>
+                  <li>
+                    <code>yyyy-MM-dd HH:mm:ss</code>
+                  </li>
+                  <li>
+                    <code>yyyyMMdd HH:mm:ss</code>
+                  </li>
+                </ul>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <p>path uuid</p>
+              </td>
+              <td>
+                <p>The <a href="http://en.wikipedia.org/wiki/Universally_Unique_Identifier"
+                    >Universally Unique Identifier</a> of the development path upon which this
+                  record is committed. </p>
+                <p> The UUID is represented in its canonical form, consisting of 32 hexadecimal
+                  digits, displayed in 5 groups separated by hyphens, for a total of 36 characters.
+                  For example: 550e8400-e29b-41d4-a716-446655440000</p>
+              </td>
+            </tr>
+          </table>
+        </dd>
+      </dl>
+
+      <!-- Within sections, any XHTML can be used -->
+    </section>
+  </body>
+</document>

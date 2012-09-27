@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Composite//EN"
+"ditabase.dtd" [
+<!-- Begin Document Specific Declarations -->
+<!-- End Document Specific Declarations -->
+]>
+<topic id="overview_intro">
+  <title>IHTSDO Workbench Guide: Documentation status</title>
+
+  <body>
+    <table>
+      <title>Document Properties</title>
+
+      <tgroup cols="2">
+        <tbody>
+          <row>
+            <entry><b>Title:</b></entry>
+
+            <entry>IHTSDO Workbench Guidebook</entry>
+          </row>
+
+          <row>
+            <entry><b>Project build version:</b></entry>
+
+            <entry>MVN:project-version</entry>
+          </row>
+
+          <row>
+            <entry><b>Build Date:</b></entry>
+
+            <entry>MVN:release-date</entry>
+          </row>
+
+          <row>
+            <entry><b>Guidebook Version:2.0</b></entry>
+          </row>
+
+          <row>
+            <entry><b>Creating Authors:</b></entry>
+
+            <entry>Keith Campbell, Susan Castillo, Eric Browne, Marc
+            Campbell</entry>
+          </row>
+
+          <row>
+            <entry><b>Subject:</b></entry>
+
+            <entry>IHTSDO , Workbench , Guidebook</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+
+    <p/>
+
+    <table>
+      <title>Amendment History</title>
+
+      <tgroup cols="3">
+        <colspec colwidth="10*"/>
+
+        <colspec colwidth="12*"/>
+
+        <colspec colwidth="90*"/>
+
+        <thead>
+          <row>
+            <entry>Version</entry>
+
+            <entry>Date</entry>
+
+            <entry>Comments</entry>
+          </row>
+        </thead>
+
+        <tbody>
+          <row>
+            <entry>1.0</entry>
+
+            <entry>2010-10-02</entry>
+
+            <entry>initial Workbench Developers Guide. </entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+
+    <p/>
+
+    <p id="ihtsdo_copyr">© 2007-2010 International Health Terminology
+    Standards Development Organisation. All rights of exploitation in any form
+    and by any means are reserved worldwide for IHTSDO Members.</p>
+
+    <p id="cap">SNOMED CT was originally created by the College of American
+    Pathologists.</p>
+
+    <p id="reproduction">No part of this document may be reproduced or
+    transmitted in any form or by any means, or stored in any kind of
+    retrieval system, except by an Affiliate of the IHTSDO in accordance with
+    the SNOMED CT Affiliate Licence. Any modification of this document
+    (including without limitation the removal or modification of this notice)
+    is prohibited without the express written permission of the IHTSDO.
+    Details of the SNOMED CT Affiliate Licence may be found at <xref
+    format="html"
+    href="http://www.ihtsdo.org/join-us/use-snomed-ct-licenses/"/>.</p>
+
+    <p id="copies">Any copy of this document that is not obtained directly
+    from the IHTSDO (or a Member of the IHTSDO) is not controlled by the
+    IHTSDO, and may have been modified and may be out of date. Any recipient
+    of this document who has received it by other means is encouraged to
+    obtain a copy directly from the IHTSDO, or a Member of the IHTSDO.
+    (Details of the Members of the IHTSDO may be found at <xref format="html"
+    href="http://www.ihtsdo.org/members/"/>).</p>
+  </body>
+
+  <topic id="overview_purpose">
+    <title>Purpose of this document</title>
+
+    <body>
+      <p>This document contains the user and developer guide for the IHTSDO
+      Terminology Workbench, which is the primary development and management
+      environment for the content of SNOMED CT and related terminology
+      products. The document has been prepared using the Darwin Information
+      Typing Architecture (DITA) Open Toolkit (version 1.5), and may be
+      rendered in various formats, including PDF and HTML.</p>
+    </body>
+  </topic>
+
+  <topic id="overview_status">
+    <title>Status</title>
+
+    <body>
+      <p>The document is a revision release for IHTSDO Affiliates.</p>
+    </body>
+  </topic>
+
+  <topic id="overview_sources">
+    <title>Source documents</title>
+
+    <body>
+      <p>Significant parts of this document were derived from "The ACE
+      Guidebook", the operations guide for the ACE Toolkit developed by
+      Informatics Inc.</p>
+
+      <p>Some chapters have been automatically generated from Workbench
+      application source and binary components - particularly those chapters
+      documenting the the Task Library and the Business Process Library.
+      Consequently, their content may vary from release to release.</p>
+    </body>
+  </topic>
+</topic>

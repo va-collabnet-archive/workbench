@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA 1.1 Map//EN"
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/map.dtd">
+<map id="CreatingTasks" title="Creating Tasks" xml:lang="en-us">
+  <title>Business Process tasks</title>
+
+  <topicref href="tasks_intro.dita" navtitle="Creating new tasks" type="topic">
+    <topicref href="task_extensions.dita" navtitle="Example Task Extensions"
+              type="topic"/>
+
+    <topicref href="creating_tasks.dita" navtitle="Steps to Create A Task"
+              type="topic"/>
+  </topicref>
+</map>

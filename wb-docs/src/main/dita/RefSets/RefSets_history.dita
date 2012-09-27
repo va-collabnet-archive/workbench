@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="refset_history" xml:lang="en">
+    <title>Refset History</title>
+    <prolog>
+        <author/>
+        <metadata>
+            <keywords>
+                <indexterm>refset<indexterm>history</indexterm></indexterm>
+            </keywords>
+        </metadata>
+    </prolog>
+    <body>
+        <section>When working with many refsets, it can be convenient to reload a prior viewed or
+            edited refset. This can be readily achieved using the Refset History button <image
+                href="../images/Refsets_Images/icon_refset_history_small.png"/> located in the
+            Refset spec pane. Clicking this button raises a dialog ( see <xref
+                href="#refset_history/fig_refset_history" format="dita"/>) containing previously
+            processed refsets, from which the desired one can be selected. </section>
+        <fig id="fig_refset_history">
+            <title>Refset history</title>
+            <image href="../images/Refsets_Images/refset_history.jpg" placement="break"/>
+        </fig>
+    </body>
+</topic>

@@ -1,0 +1,30 @@
+package org.ihtsdo.rules.test;
+
+import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
+import org.ihtsdo.rules.testmodel.ResultsCollector;
+import org.ihtsdo.testmodel.Concept;
+import org.ihtsdo.testmodel.Description;
+import org.ihtsdo.testmodel.Relationship;
+import org.ihtsdo.testmodel.Identifier;
+import org.ihtsdo.testmodel.TerminologyComponent;
+import org.ihtsdo.rules.testmodel.TestModelUtil;
+import org.ihtsdo.rules.TransitiveClosureHelperWorkbench;
+import java.util.ArrayList;
+import java.util.UUID;
+import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
+import org.dwfa.cement.ArchitectonicAuxiliary;
+
+rule "Domain and range for causative agent - f770e2d8-91e6-3c55-91be-f794ee835265"
+when
+	$concept : Concept($conceptId : id)
+    $relationship : Relationship(sourceId == $conceptId)
+    eval($relationship.getTypeId().equals(UUID.fromString("f770e2d8-91e6-3c55-91be-f794ee835265")))
+    eval(!TransitiveClosureHelperWorkbench.isParentOfOrEqualTo(UUID.fromString("bd83b1dd-5a82-34fa-bb52-06f666420a1c"), $relationship.getSourceId()) ||
+    	 !TransitiveClosureHelperWorkbench.isParentOfOrEqualTo(UUID.fromString("5032532f-6b58-31f9-84c1-4a365dde4449"), $relationship.getDestinationId()))
+    $results : ResultsCollector()
+then
+    $results.getAlertList().add(new AlertToDataConstraintFailure(
+    		AlertToDataConstraintFailure.ALERT_TYPE.ERROR, 
+    		"Error: a Causative agent relationship has a concept model violation", 
+    		TestModelUtil.getWorkbenchConcept($concept)));
+end

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="differences" xml:lang="en">
+  <title>Creating a Differences Report</title>
+
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>differences<indexterm>creating a
+        report</indexterm><indexterm>between terminology
+        versions</indexterm></indexterm>
+
+        <indexterm>changes<index-see>differences</index-see></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <section>It is often important to identify differences that have resulted
+    from a change to some aspect of a terminology. The IHTSDO Workbench has a
+    facility for identifying a range of differences, known as a "difference
+    report", that can be launched from the <b>Task</b> menu of the Editor's
+    main menu bar.</section>
+
+    <p>The business process that produces the difference report requests some
+    information from the user, then calculates the differences and displays
+    them in the List tabbed pane of the component panel. The workbench needs
+    to know the two sources to compare. These are solicited from the user in
+    the form of paths. The criterion on which the differences should be
+    calculated is also sought. The currently available change criteria
+    are:-</p>
+
+    <p><ul>
+        <li>concept status</li>
+
+        <li>fully specified name</li>
+
+        <li>preferred term</li>
+
+        <li>any source relationship</li>
+
+        <li>any destination relationship</li>
+
+        <li>any relationship</li>
+
+        <li>any refset member</li>
+
+        <li>any IS KIND OF relationship</li>
+      </ul></p>
+
+    <p>Only one of these criteria can be selected for the report. The sequence
+    of steps for running a difference report are illustrated in the following
+    screenshots.</p>
+
+    <fig>
+      <title>form dialog for adding source paths for a difference
+      report</title>
+
+      <image href="../images/Using_The_ACE_Editor_Images/differences_source_adding.jpg"/>
+    </fig>
+
+    <p/>
+
+    <fig>
+      <title>two SNOMED versions selected for reporting differences</title>
+
+      <image href="../images/Using_The_ACE_Editor_Images/differences_sources_added.jpg"/>
+    </fig>
+
+    <p/>
+
+    <fig>
+      <title>selecting the criterion upon which the differences should be
+      identified</title>
+
+      <image href="../images/Using_The_ACE_Editor_Images/differences_criterion_selecting.jpg"/>
+    </fig>
+
+    <p/>
+
+    <fig>
+      <title>differences report progress in status bar</title>
+
+      <image href="../images/Using_The_ACE_Editor_Images/differences_monitoring_activity.jpg"/>
+    </fig>
+
+    <p/>
+
+    <fig>
+      <title>differences displayed in the List pane</title>
+
+      <image href="../images/Using_The_ACE_Editor_Images/differences_list_display.jpg"/>
+    </fig>
+
+    <p/>
+
+    <fig>
+      <title>total number of differences from Activity Viewer</title>
+
+      <image href="../images/Using_The_ACE_Editor_Images/differences_count.jpg"/>
+    </fig>
+  </body>
+</topic>

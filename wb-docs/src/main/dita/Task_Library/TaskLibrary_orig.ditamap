@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE map PUBLIC "-//OASIS//DTD DITA 1.1 Map//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/map.dtd">
+<map id="TaskLibrary" xml:lang="en" title="Task Library">
+
+ <title>Standard Task Library</title>
+ <topicref href="tlib_intro.dita#topic1" type="topic" navtitle="Standard Task Library Catalogue">
+  <topicref href="tlib_process_flow.dita#topic2" type="topic" navtitle="Process control: flow tasks"> </topicref>
+  <topicref href="tlib_process_start.dita#topic3" type="topic" navtitle="Process control: Start tasks"> </topicref>
+  <!--<topicref href="tlib_process_look_feel.dita#topic4" type="topic" navtitle="Process Control: Look and Feel Tasks"> </topicref>
+  <topicref href="tlib_process_list.dita#topic5" type="topic" navtitle="Process control: List tasks"> </topicref>
+  <topicref href="tlib_process_test.dita#topic6" type="topic" navtitle="Process control: Test tasks"> </topicref>
+  <topicref href="tlib_process_set.dita#topic7" type="topic" navtitle="Process control: Set tasks"> </topicref>
+  <topicref href="tlib_ide.dita#topic8" type="topic" navtitle="IHTSDO Workbench IDE tasks"> </topicref>
+  <topicref href="tlib_workspace.dita#topic9" type="topic" navtitle="Workspace Tasks"> </topicref>
+  <topicref href="tlib_database.dita#topic10" type="topic" navtitle="Database tasks"> </topicref>
+  <topicref href="tlib_extension.dita#topic11" type="topic" navtitle="Extension Tasks"> </topicref>
+  <topicref href="tlib_gui.dita#topic12" type="topic" navtitle="GUI (User Interface) tasks"> </topicref>
+  <topicref href="tlib_subversion.dita#topic13" type="topic" navtitle="Subversion tasks"> </topicref>
+  <topicref href="tlib_data_check.dita#topic14" type="topic" navtitle="Data check tasks"> </topicref>
+  <topicref href="tlib_copy.dita#topic15" type="topic" navtitle="Copy tasks"> </topicref>
+  <topicref href="tlib_path.dita#topic16" type="topic" navtitle="Path tasks"> </topicref>
+  <topicref href="tlib_property.dita#topic17" type="topic" navtitle="Property tasks"> </topicref>
+  <topicref href="tlib_view.dita#topic18" type="topic" navtitle="View tasks"> </topicref>
+  <topicref href="tlib_queue.dita#topic19" type="topic" navtitle="Queue tasks"> </topicref>
+  <topicref href="tlib_address.dita#topic20" type="topic" navtitle="Address tasks"> </topicref>
+  <topicref href="tlib_misc.dita#topic21" type="topic" navtitle="Miscellaneous Tasks"> </topicref>-->
+ </topicref>
+</map>

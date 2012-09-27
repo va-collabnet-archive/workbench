@@ -1,0 +1,1 @@
+Can be used by .getClassLoader().getResource to locate library directory. 

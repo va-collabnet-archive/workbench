@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic6" xml:lang="en">
+  <title>Incremental Classification</title>
+
+  <prolog>
+    <author>Eric Browne</author>
+
+    <metadata>
+      <keywords>
+        <indexterm>classifier <indexterm>incremental</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <section>To get the incremental classification into the Workbench bundle
+    modify the <codeph>pom</codeph> file to include the following, which makes
+    the incremental classification capability defined in the
+    ClassifyCurrentConcept business process available as a plug-in.</section>
+
+    <section><codeph>&lt;extractAndProcessSpec&gt; </codeph></section>
+
+    <section><codeph>&lt;filePatternStr&gt;^org/dwfa/ace/plugins/component/ClassifyCurrentConcept.bp
+    </codeph></section>
+
+    <section><codeph>&lt;/filePatternStr&gt; </codeph></section>
+
+    <section><codeph>&lt;destDir&gt;ace-bundle.dir/plugins/component/
+    </codeph></section>
+
+    <section><codeph>&lt;/destDir&gt; </codeph></section>
+
+    <section><codeph>&lt;/extractAndProcessSpec&gt; </codeph></section>
+
+    <section>The incremental classifier business process classifies the
+    concept currently being edited against the base state of SNOMED and
+    displays the results in the signpost. In the business process shown below,
+    it can be seen (<xref format="dita" href="#topic6/ar1002895" type="fig"/>
+    ) that the base state for classification is maintained as a file on the
+    local file system. This file is in the root directory of the Workbench
+    install.</section>
+
+    <fig id="ar1002895">
+      <title>Incremental classifier business process</title>
+
+      <image href="../images/classifier_images/incremental_classifier_workflow.jpg"
+             placement="break"/>
+    </fig>
+
+    <section>For SNOMED, the size of the file is 195MB. This is a plain text
+    file, with the classification state written as a printed representation.
+    It is likely that the file size could be reduced considerably if it were
+    serialized as a binary object.</section>
+
+    <section>Note that the business process creates the classification base
+    state file if it is not present. For SNOMED, in this situation, memory is
+    exhausted when attempting to load the base state in a 32-bit Java
+    environment. This appears to be due to the initial classification data
+    structures not being released for garbage collection after the file is
+    written. It takes slightly more than 5 minutes from the time the
+    incremental classification is initiated until the out of memory error is
+    encountered. Restarting enables the capability to function.</section>
+
+    <section>The <xref format="dita" href="#topic6/ar1002999" type="fig"/>
+    shows the results of an incremental classification.</section>
+
+    <fig id="ar1002999">
+      <title>Incremental classifier results</title>
+
+      <image height="342"
+             href="../images/classifier_images/incremental_classifier_results.jpg"
+             placement="break" width="435"/>
+    </fig>
+
+    <section>Note that incremental classification does not permit editing base
+    SNOMED concepts.</section>
+
+    <section>The function of the incremental classification has some
+    limitations. For example, creating a primitive sub-concept and classifying
+    yields no results in the display. There is also no display of equivalent
+    concepts. No provision is made for detecting or displaying concept cycles
+    (C1 isa C2 and C2 isa C1). Similarly, role cycles are
+    undetected.</section>
+
+    <section id="ar999763"><title>Testing </title></section>
+
+    <section>The IHTSDO Classifier includes a number of small test cases which
+    are exercise specific aspects of the classifier. These are organized in
+    the JUnit framework. Doing the Maven build and including execution of
+    tests exercises the test suite. In addition to a number of traditional
+    unit tests, this also includes exercising the classification of the
+    January 2009 SNOMED stated relationships, which could be considered a
+    system test from the Classifier SNOMED perspective. The time required to
+    do the Maven build including the test suites is slightly more than 10
+    minutes.</section>
+
+    <section id="ar999790"><title>Performance </title></section>
+
+    <section>The IHTSDO classifier was tested on the January 2009 release
+    distribution of SNOMED using the newly available stated relationships
+    release. The timings include reading the SNOMED input files from the file
+    system and writing the results. The system configuration was Mac OS 10.5
+    on 2.8 GHz Intel 2 core with 4GB memory.</section>
+
+    <section>Total time was 163 secs.</section>
+
+    <section>Broken down into the three main phases, including elapsed time
+    and memory footprint (following GC):</section>
+
+    <section>Load: 8 secs, 145 MB</section>
+
+    <section>Classify: 83 secs, 653 MB</section>
+
+    <section>Write: 72 secs, 721 MB</section>
+
+    <section>These performance results may be obtained on other platforms by
+    running the test with the system property "log.memory" set to "T".
+    ("<codeph>-Dlog.memory=T</codeph>"). Inspect the log for entries of the
+    form "Used memory @ ... " and "Time @ ...". The relevant entries are "Post
+    loadOntylogy", "Post classify" , and "Post xxxRelationships".</section>
+  </body>
+</topic>

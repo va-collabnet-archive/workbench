@@ -1,0 +1,9 @@
+ -----
+ DWFA Foundation Module
+ -----
+ Keith Campbell
+ -----
+
+Foundation Module for DWFA
+
+ Provides a number of foundation classes, such as a simple terminology API, that will be common to all project modules.

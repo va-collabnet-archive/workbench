@@ -1,0 +1,63 @@
+package org.ihtsdo.rules.test;
+
+import org.ihtsdo.tk.concept.component.description.TkDescription;
+import org.ihtsdo.tk.concept.component.description.TkDescriptionRevision;
+import org.ihtsdo.tk.concept.component.description.TkTestFriendlyDescription;
+import org.ihtsdo.tk.concept.component.description.marked.DescriptionCurrentVersion;
+import org.ihtsdo.tk.concept.component.description.marked.DescriptionPreviousVersion;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+rule "Find description"
+when
+	$d : TkDescription()
+then
+    System.out.println("Tk description found: " + $d.getText());
+end
+
+rule "Find description revision"
+when
+	$d : TkDescription( $rlist : revisionList)
+	$r : TkDescriptionRevision(lang == "en") from $rlist
+then
+    System.out.println("Tk description revision found: " + $r.getText());
+end
+
+rule "Find latest description revision"
+when
+	$d : TkDescription( $rlist : revisionList)
+	$t : Double()
+			from accumulate ( TkDescriptionRevision(lang == "en", $time : time) from $rlist,
+								max($time))
+	$r : TkDescriptionRevision(time == $t) from $rlist
+then
+    System.out.println("Tk description latest revision time found: " + $t);
+    System.out.println("Tk description latest revision found: " + $r.getText());
+    DescriptionCurrentVersion currentDescription = new TkTestFriendlyDescription($d, $r);
+    insert(currentDescription);
+end
+
+rule "Find previous description revision"
+when
+	$d : TkDescription( $rlist : revisionList)
+	$t1 : Double()
+			from accumulate ( TkDescriptionRevision(lang == "en", $time : time) from $rlist,
+								max($time))
+	$t2 : Double()
+			from accumulate ( TkDescriptionRevision(lang == "en", time < $t1, $time : time) from $rlist,
+								max($time))
+	$r : TkDescriptionRevision(time == $t2) from $rlist
+then
+    System.out.println("Tk description previous revision time found: " + $t2);
+    System.out.println("Tk description previous revision found: " + $r.getText());
+    DescriptionPreviousVersion currentDescription = new TkTestFriendlyDescription($d, $r);
+    insert(currentDescription);
+end
+
+rule "Find description current version"
+when
+	$d : DescriptionCurrentVersion()
+then
+    System.out.println("Current description found: " + $d.getText());
+end

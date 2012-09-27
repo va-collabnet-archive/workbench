@@ -1,0 +1,800 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<process xmlns="http://drools.org/drools-5.0/process"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema-instance"
+         xs:schemaLocation="http://drools.org/drools-5.0/process drools-processes-5.0.xsd"
+         type="RuleFlow" name="convertToRf1" id="org.ihtsdo.convertToRf1" package-name="org.ihtsdo" >
+
+  <header>
+    <imports>
+      <import name="org.ihtsdo.conversion.validation.InputFileValidator" />
+      <import name="org.ihtsdo.conversion.utils.FileAnalyzer" />
+      <import name="org.ihtsdo.conversion.tasks.FileSorter" />
+      <import name="org.ihtsdo.conversion.tasks.SnapshotGenerator" />
+      <import name="org.ihtsdo.conversion.tasks.GenerateRF1ComponentHistory" />
+      <import name="org.ihtsdo.conversion.tasks.GenerateRF1CptDescLangSubs" />
+      <import name="org.ihtsdo.conversion.tasks.GenerateRF1Relationships" />
+      <import name="org.ihtsdo.conversion.tasks.FileFilterAndSorter" />
+      <import name="java.io.File" />
+    </imports>
+    <globals>
+      <global identifier="rf1Date" type="java.lang.String" />
+      <global identifier="rf2SimpleMapsFile" type="java.lang.String" />
+      <global identifier="RF2_INACT_CPT_REFSET" type="java.lang.String" />
+      <global identifier="rf2DescriptionsFile" type="java.lang.String" />
+      <global identifier="snapshotDate" type="java.lang.String" />
+      <global identifier="rf2AssociationsFile" type="java.lang.String" />
+      <global identifier="rf1Generate" type="java.lang.String" />
+      <global identifier="deltaFinalDate" type="java.lang.String" />
+      <global identifier="rf2AttributesFile" type="java.lang.String" />
+      <global identifier="rf2RelationshipsFile" type="java.lang.String" />
+      <global identifier="RF2_INACT_DESC_REFSET" type="java.lang.String" />
+      <global identifier="rf1Validate" type="java.lang.String" />
+      <global identifier="deltaInitialDate" type="java.lang.String" />
+      <global identifier="RF2_ENUS_REFSET" type="java.lang.String" />
+      <global identifier="RF2_ENGB_REFSET" type="java.lang.String" />
+      <global identifier="rf2LanguagesFile" type="java.lang.String" />
+      <global identifier="RF2_REFINABILITY_REFSETID" type="java.lang.String" />
+      <global identifier="snapshotGenerate" type="java.lang.String" />
+      <global identifier="rf2ConceptsFile" type="java.lang.String" />
+      <global identifier="deltaGenerate" type="java.lang.String" />
+    </globals>
+    <variables>
+      <variable name="conceptsRf2InputFileName" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="conceptsRf2SortedFileName" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="descriptionsRf2InputFileName" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="descriptionsRf2SortedFileName" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="relationshipsRf2InputFileName" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="relationshipsRf2SortedFileName" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="languagesRf2InputFileName" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="languagesRf2SortedFileName" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="simpleMapsRf2InputFileName" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="simpleMapsRf2SortedFileName" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="attributesRf2InputFileName" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="attributesRf2SortedFileName" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="RF2_INACT_DESC_REFSET" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="RF2_ENUS_REFSET" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="RF2_ENGB_REFSET" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="conceptsRf2SnapshotFileName" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="descriptionsRf2SnapshotFileName" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="relationshipsRf2SnapshotFileName" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="ENLanguageRf2SnapshotFileName" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="GBLanguageRf2SnapshotFileName" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="inactConceptsRf2SnapshotFileName" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="inactDescrptsRf2SnapshotFileName" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="refinabilityRf2SnapshotFileName" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="simpleMapsRf2SnapshotFileName" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="RF1ConceptsFileName" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="RF1DescriptionsFileName" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="RF1RelationshipsFileName" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="RF1ENLangMembersFileName" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="RF1GBLangMembersFileName" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="RF1ComponentHistoryFileName" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="RF2_INACT_CPT_REFSET" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="RF2_REFINABILITY_REFSETID" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="associationsRf2InputFileName" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="associationsRf2SortedFileName" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="associationsRf2SnapshotFileName" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="inactConceptsRf2SortedFileName" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="inactDescrptsRf2SortedFileName" >
+        <type name="org.drools.process.core.datatype.impl.type.StringDataType" />
+      </variable>
+      <variable name="filesOk" >
+        <type name="org.drools.process.core.datatype.impl.type.BooleanDataType" />
+        <value>true</value>
+      </variable>
+    </variables>
+  </header>
+
+  <nodes>
+    <start id="1" name="Start" x="16" y="572" width="49" height="48" />
+    <actionNode id="3" name="Setup" x="92" y="572" width="80" height="48" >
+        <action type="expression" dialect="java" >System.out.println("Setting up... ");
+kcontext.setVariable("conceptsRf2InputFileName", rf2ConceptsFile);
+kcontext.setVariable("descriptionsRf2InputFileName", rf2DescriptionsFile);
+kcontext.setVariable("relationshipsRf2InputFileName", rf2RelationshipsFile);
+kcontext.setVariable("languagesRf2InputFileName", rf2LanguagesFile);
+kcontext.setVariable("attributesRf2InputFileName", rf2AttributesFile);
+kcontext.setVariable("simpleMapsRf2InputFileName", rf2SimpleMapsFile);
+kcontext.setVariable("associationsRf2InputFileName", rf2AssociationsFile);
+kcontext.setVariable("RF2_REFINABILITY_REFSETID",RF2_REFINABILITY_REFSETID);
+kcontext.setVariable("RF2_ENUS_REFSET",RF2_ENUS_REFSET);
+kcontext.setVariable("RF2_ENGB_REFSET",RF2_ENGB_REFSET);
+kcontext.setVariable("RF2_INACT_CPT_REFSET",RF2_INACT_CPT_REFSET);
+kcontext.setVariable("RF2_INACT_DESC_REFSET",RF2_INACT_DESC_REFSET);
+			System.gc();</action>
+    </actionNode>
+    <end id="8" name="End" x="2601" y="581" width="49" height="48" />
+    <split id="9" name="Gateway" x="820" y="94" width="49" height="49" type="2" >
+      <constraints>
+        <constraint toNodeId="10" toType="DROOLS_DEFAULT" name="not sorted" priority="1" type="code" dialect="java" >return !InputFileValidator.isSorted(new File( (String) kcontext.getVariable("conceptsRf2InputFileName")), new int[]{0,1});</constraint>
+        <constraint toNodeId="11" toType="DROOLS_DEFAULT" name="sorted" priority="1" type="code" dialect="java" >return InputFileValidator.isSorted(new File( (String) kcontext.getVariable("conceptsRf2InputFileName")), new int[]{0,1});</constraint>
+      </constraints>
+    </split>
+    <actionNode id="10" name="SortConcepts" x="901" y="14" width="218" height="48" >
+        <action type="expression" dialect="java" >System.out.println("Sorting concepts... " + kcontext.getVariable("conceptsRf2InputFileName"));
+FileSorter fsc=new FileSorter(
+										new File( (String) kcontext.getVariable("conceptsRf2InputFileName")), 
+										new File("data/RF2_Sorted/Sorted_Concepts.txt"), 
+										new File("data/temp"), new int[]{0,1});
+fsc.execute();
+			fsc=null;
+			System.gc();
+kcontext.setVariable("conceptsRf2SortedFileName", "data/RF2_Sorted/Sorted_Concepts.txt");</action>
+    </actionNode>
+    <actionNode id="11" name="UseConceptsInputAsSorted" x="901" y="94" width="218" height="48" >
+        <action type="expression" dialect="java" >System.out.println("Using sorted concepts..." + kcontext.getVariable("conceptsRf2InputFileName"));
+kcontext.setVariable("conceptsRf2SortedFileName",  kcontext.getVariable("conceptsRf2InputFileName"));</action>
+    </actionNode>
+    <join id="12" name="Gateway" x="1151" y="94" width="49" height="49" type="2" />
+    <actionNode id="13" name="Script" x="1308" y="577" width="80" height="48" >
+        <action type="expression" dialect="java" >System.out.println("Final Concepts sorted file: " + kcontext.getVariable("conceptsRf2SortedFileName"));
+System.out.println("Final Descriptions sorted file: " + kcontext.getVariable("descriptionsRf2SortedFileName"));
+System.out.println("Final Relationships sorted file: " + kcontext.getVariable("relationshipsRf2SortedFileName"));
+System.out.println("Final Languages sorted file: " + kcontext.getVariable("languagesRf2SortedFileName"));
+System.out.println("Final Attributes Values sorted file: " + kcontext.getVariable("attributesRf2SortedFileName"));
+System.out.println("Final Simple Maps sorted file: " + kcontext.getVariable("simpleMapsRf2SortedFileName"));
+System.out.println("Final Associations sorted file: " + kcontext.getVariable("associationsRf2SortedFileName"));
+System.out.println("Final Inactive Concepts sorted file: " + kcontext.getVariable("inactConceptsRf2SortedFileName"));
+System.out.println("Final Inactive Descriptions sorted file: " + kcontext.getVariable("inactDescrptsRf2SortedFileName"));
+			System.gc();</action>
+    </actionNode>
+    <split id="14" name="Gateway" x="744" y="572" width="49" height="49" type="1" />
+    <join id="15" name="Gateway" x="1227" y="577" width="49" height="49" type="1" />
+    <actionNode id="17" name="SortDescriptions" x="901" y="184" width="218" height="48" >
+        <action type="expression" dialect="java" >System.out.println("Sorting descriptions... " + kcontext.getVariable("descriptionsRf2InputFileName"));
+FileSorter fsc=new FileSorter(
+										new File( (String) kcontext.getVariable("descriptionsRf2InputFileName")), 
+										new File("data/RF2_Sorted/Sorted_Descriptions.txt"), 
+										new File("data/temp"), new int[]{4,0,1});
+fsc.execute();
+			fsc=null;
+			System.gc();
+kcontext.setVariable("descriptionsRf2SortedFileName", "data/RF2_Sorted/Sorted_Descriptions.txt");</action>
+    </actionNode>
+    <split id="16" name="Gateway" x="820" y="254" width="49" height="49" type="2" >
+      <constraints>
+        <constraint toNodeId="17" toType="DROOLS_DEFAULT" name="not sorted" priority="1" type="code" dialect="java" >return !InputFileValidator.isSorted(new File( (String) kcontext.getVariable("descriptionsRf2InputFileName")), new int[]{4,0,1});</constraint>
+        <constraint toNodeId="18" toType="DROOLS_DEFAULT" name="sorted" priority="1" type="code" dialect="java" >return InputFileValidator.isSorted(new File( (String) kcontext.getVariable("descriptionsRf2InputFileName")), new int[]{4,0,1});</constraint>
+      </constraints>
+    </split>
+    <join id="19" name="Gateway" x="1151" y="254" width="49" height="49" type="2" />
+    <actionNode id="18" name="UseDescriptionsInputAsSorted" x="901" y="254" width="218" height="48" >
+        <action type="expression" dialect="java" >System.out.println("Using sorted descriptions..." + kcontext.getVariable("descriptionsRf2InputFileName"));
+kcontext.setVariable("descriptionsRf2SortedFileName",  kcontext.getVariable("descriptionsRf2InputFileName"));</action>
+    </actionNode>
+    <actionNode id="21" name="SortRelationships" x="901" y="334" width="218" height="48" >
+        <action type="expression" dialect="java" >System.out.println("Sorting relationships... " + kcontext.getVariable("relationshipsRf2InputFileName"));
+FileSorter fsc=new FileSorter(
+										new File( (String) kcontext.getVariable("relationshipsRf2InputFileName")), 
+										new File("data/RF2_Sorted/Sorted_Relationships.txt"), 
+										new File("data/temp"), new int[]{0,1});
+fsc.execute();
+			fsc=null;
+			System.gc();
+kcontext.setVariable("relationshipsRf2SortedFileName", "data/RF2_Sorted/Sorted_Relationships.txt");</action>
+    </actionNode>
+    <split id="20" name="Gateway" x="820" y="413" width="49" height="49" type="2" >
+      <constraints>
+        <constraint toNodeId="21" toType="DROOLS_DEFAULT" name="not sorted" priority="1" type="code" dialect="java" >return !InputFileValidator.isSorted(new File( (String) kcontext.getVariable("relationshipsRf2InputFileName")), new int[]{0,1});</constraint>
+        <constraint toNodeId="22" toType="DROOLS_DEFAULT" name="sorted" priority="1" type="code" dialect="java" >return InputFileValidator.isSorted(new File( (String) kcontext.getVariable("relationshipsRf2InputFileName")), new int[]{0,1});</constraint>
+      </constraints>
+    </split>
+    <join id="23" name="Gateway" x="1151" y="414" width="49" height="49" type="2" />
+    <actionNode id="22" name="UseRelationshipsInputAsSorted" x="901" y="414" width="218" height="48" >
+        <action type="expression" dialect="java" >System.out.println("Using sorted relationships..." + kcontext.getVariable("relationshipsRf2InputFileName"));
+kcontext.setVariable("relationshipsRf2SortedFileName",  kcontext.getVariable("relationshipsRf2InputFileName"));</action>
+    </actionNode>
+    <actionNode id="25" name="UseLanguagesInputAsSorted" x="901" y="666" width="218" height="48" >
+        <action type="expression" dialect="java" >System.out.println("Using sorted languages..." + kcontext.getVariable("languagesRf2InputFileName"));
+kcontext.setVariable("languagesRf2SortedFileName",  kcontext.getVariable("languagesRf2InputFileName"));</action>
+    </actionNode>
+    <split id="24" name="Gateway" x="820" y="666" width="49" height="49" type="2" >
+      <constraints>
+        <constraint toNodeId="25" toType="DROOLS_DEFAULT" name="sorted" priority="1" type="code" dialect="java" >return InputFileValidator.isSorted(new File( (String) kcontext.getVariable("languagesRf2InputFileName")), new int[]{4,5,1});</constraint>
+        <constraint toNodeId="26" toType="DROOLS_DEFAULT" name="not sorted" priority="1" type="code" dialect="java" >return !InputFileValidator.isSorted(new File( (String) kcontext.getVariable("languagesRf2InputFileName")), new int[]{4,5,1});</constraint>
+      </constraints>
+    </split>
+    <join id="27" name="Gateway" x="1151" y="667" width="49" height="49" type="2" />
+    <actionNode id="26" name="SortLanguages" x="901" y="753" width="218" height="48" >
+        <action type="expression" dialect="java" >System.out.println("Sorting languages... " + kcontext.getVariable("languagesRf2InputFileName"));
+FileSorter fsc=new FileSorter(
+										new File( (String) kcontext.getVariable("languagesRf2InputFileName")), 
+										new File("data/RF2_Sorted/Sorted_Languages.txt"), 
+										new File("data/temp"), new int[]{4,5,1});
+fsc.execute();
+			fsc=null;
+			System.gc();
+kcontext.setVariable("languagesRf2SortedFileName", "data/RF2_Sorted/Sorted_Languages.txt");</action>
+    </actionNode>
+    <actionNode id="29" name="SortAttributes" x="901" y="833" width="218" height="48" >
+        <action type="expression" dialect="java" >System.out.println("Sorting attribute value... " + kcontext.getVariable("attributesRf2InputFileName"));
+FileSorter fsc=new FileSorter(
+										new File( (String) kcontext.getVariable("attributesRf2InputFileName")), 
+										new File("data/RF2_Sorted/Sorted_Attributes.txt"), 
+										new File("data/temp"), new int[]{5,1});
+fsc.execute();
+			fsc=null;
+			System.gc();
+kcontext.setVariable("attributesRf2SortedFileName", "data/RF2_Sorted/Sorted_Attributes.txt");</action>
+    </actionNode>
+    <split id="28" name="Gateway" x="820" y="833" width="49" height="49" type="2" >
+      <constraints>
+        <constraint toNodeId="29" toType="DROOLS_DEFAULT" name="not sorted" priority="1" type="code" dialect="java" >return !InputFileValidator.isSorted(new File( (String) kcontext.getVariable("attributesRf2InputFileName")), new int[]{5,1});</constraint>
+        <constraint toNodeId="30" toType="DROOLS_DEFAULT" name="sorted" priority="1" type="code" dialect="java" >return InputFileValidator.isSorted(new File( (String) kcontext.getVariable("attributesRf2InputFileName")), new int[]{5,1});</constraint>
+      </constraints>
+    </split>
+    <join id="31" name="Gateway" x="1151" y="833" width="49" height="49" type="2" />
+    <actionNode id="30" name="UseAttributesAsSorted" x="906" y="920" width="218" height="48" >
+        <action type="expression" dialect="java" >System.out.println("Using sorted attribute values..." + kcontext.getVariable("attributesRf2InputFileName"));
+kcontext.setVariable("attributesRf2SortedFileName",  kcontext.getVariable("attributesRf2InputFileName"));</action>
+    </actionNode>
+    <actionNode id="34" name="SortSimpleMaps" x="906" y="1000" width="218" height="48" >
+        <action type="expression" dialect="java" >System.out.println("Sorting simple maps... " + kcontext.getVariable("simpleMapsRf2InputFileName"));
+FileSorter fsc=new FileSorter(
+										new File( (String) kcontext.getVariable("simpleMapsRf2InputFileName")), 
+										new File("data/RF2_Sorted/Sorted_SimpleMaps.txt"), 
+										new File("data/temp"), new int[]{5,1});
+fsc.execute();
+			fsc=null;
+			System.gc();
+kcontext.setVariable("simpleMapsRf2SortedFileName", "data/RF2_Sorted/Sorted_SimpleMaps.txt");</action>
+    </actionNode>
+    <join id="35" name="Gateway" x="1156" y="1000" width="49" height="49" type="2" />
+    <split id="32" name="Gateway" x="825" y="1000" width="49" height="49" type="2" >
+      <constraints>
+        <constraint toNodeId="33" toType="DROOLS_DEFAULT" name="sorted" priority="1" type="code" dialect="java" >return InputFileValidator.isSorted(new File( (String) kcontext.getVariable("simpleMapsRf2InputFileName")), new int[]{5,1});</constraint>
+        <constraint toNodeId="34" toType="DROOLS_DEFAULT" name="not sorted" priority="1" type="code" dialect="java" >return !InputFileValidator.isSorted(new File( (String) kcontext.getVariable("simpleMapsRf2InputFileName")), new int[]{5,1});</constraint>
+      </constraints>
+    </split>
+    <actionNode id="33" name="UseSimpleMapsInputAsSorted" x="906" y="1080" width="218" height="48" >
+        <action type="expression" dialect="java" >System.out.println("Using sorted simple maps..." + kcontext.getVariable("simpleMapsRf2InputFileName"));
+kcontext.setVariable("simpleMapsRf2SortedFileName",  kcontext.getVariable("simpleMapsRf2InputFileName"));</action>
+    </actionNode>
+    <split id="38" name="Gateway" x="1525" y="99" width="126" height="49" type="2" >
+      <constraints>
+        <constraint toNodeId="37" toType="DROOLS_DEFAULT" name="constraint" priority="1" type="code" dialect="java" >return !InputFileValidator.isSnapshot(new File((String) kcontext.getVariable("conceptsRf2SortedFileName")),new int[]{0});</constraint>
+        <constraint toNodeId="39" toType="DROOLS_DEFAULT" name="constraint" priority="1" type="code" dialect="java" >return InputFileValidator.isSnapshot(new File((String) kcontext.getVariable("conceptsRf2SortedFileName")),new int[]{0});</constraint>
+      </constraints>
+    </split>
+    <actionNode id="39" name="Use Concept Input as Snapshot" x="1625" y="20" width="211" height="48" >
+        <action type="expression" dialect="mvel" >System.out.println("Using concepts snapshot..." + kcontext.getVariable("conceptsRf2SortedFileName"));
+kcontext.setVariable("conceptsRf2SnapshotFileName", kcontext.getVariable("conceptsRf2SortedFileName"));</action>
+    </actionNode>
+    <split id="36" name="Gateway" x="1430" y="578" width="49" height="49" type="1" />
+    <actionNode id="37" name="Sorted Concept Snapshot" x="1625" y="100" width="211" height="48" >
+        <action type="expression" dialect="java" >System.out.println("Creating snapshot for concepts... " + kcontext.getVariable("conceptsRf2SortedFileName"));
+SnapshotGenerator fsc=new SnapshotGenerator(
+										new File( (String) kcontext.getVariable("conceptsRf2SortedFileName")),  
+										(String)rf1Date, 0, 1, 
+										new File("data/RF2_Snapshot/snapshotSortedConcept.txt")
+										, null, null);
+fsc.execute();
+			fsc=null;
+			System.gc();
+kcontext.setVariable("conceptsRf2SnapshotFileName", "data/RF2_Snapshot/snapshotSortedConcept.txt");</action>
+    </actionNode>
+    <actionNode id="42" name="Sorted Description Snapshot" x="1625" y="180" width="211" height="48" >
+        <action type="expression" dialect="java" >System.out.println("Creating snapshot for descriptions... " + kcontext.getVariable("descriptionsRf2SortedFileName"));
+SnapshotGenerator fsc=new SnapshotGenerator(
+										new File( (String) kcontext.getVariable("descriptionsRf2SortedFileName")),  
+										(String)rf1Date, 0, 1, 
+										new File("data/RF2_Snapshot/snapshotSortedDescription.txt")
+										, null, null);
+fsc.execute();
+			fsc=null;
+			System.gc();
+kcontext.setVariable("descriptionsRf2SnapshotFileName", "data/RF2_Snapshot/snapshotSortedDescription.txt");</action>
+    </actionNode>
+    <actionNode id="43" name="Sorted Relationships Snapshot" x="1625" y="340" width="211" height="48" >
+        <action type="expression" dialect="java" >System.out.println("Creating snapshot for relationships... " + kcontext.getVariable("relationshipsRf2SortedFileName"));
+SnapshotGenerator fsc=new SnapshotGenerator(
+										new File( (String) kcontext.getVariable("relationshipsRf2SortedFileName")),  
+										(String)rf1Date, 0, 1, 
+										new File("data/RF2_Snapshot/snapshotSortedRelationship.txt")
+										, null, null);
+fsc.execute();
+			fsc=null;
+			System.gc();
+kcontext.setVariable("relationshipsRf2SnapshotFileName", "data/RF2_Snapshot/snapshotSortedRelationship.txt");</action>
+    </actionNode>
+    <split id="40" name="Gateway" x="1525" y="259" width="126" height="49" type="2" >
+      <constraints>
+        <constraint toNodeId="41" toType="DROOLS_DEFAULT" name="constraint" priority="1" type="code" dialect="java" >return InputFileValidator.isSnapshot(new File((String) kcontext.getVariable("descriptionsRf2SortedFileName")),new int[]{0});</constraint>
+        <constraint toNodeId="42" toType="DROOLS_DEFAULT" name="constraint" priority="1" type="code" dialect="java" >return !InputFileValidator.isSnapshot(new File((String) kcontext.getVariable("descriptionsRf2SortedFileName")),new int[]{0});</constraint>
+      </constraints>
+    </split>
+    <actionNode id="41" name="Use Description Input as Snapshot" x="1625" y="260" width="211" height="48" >
+        <action type="expression" dialect="mvel" >System.out.println("Using descriptions snapshot..." + kcontext.getVariable("descriptionsRf2SortedFileName"));
+kcontext.setVariable("descriptionsRf2SnapshotFileName", kcontext.getVariable("descriptionsRf2SortedFileName"));</action>
+    </actionNode>
+    <split id="47" name="Gateway" x="1525" y="388" width="126" height="49" type="2" >
+      <constraints>
+        <constraint toNodeId="43" toType="DROOLS_DEFAULT" name="constraint" priority="1" type="code" dialect="java" >return !InputFileValidator.isSnapshot(new File((String) kcontext.getVariable("relationshipsRf2SortedFileName")),new int[]{0});</constraint>
+        <constraint toNodeId="44" toType="DROOLS_DEFAULT" name="constraint" priority="1" type="code" dialect="java" >return InputFileValidator.isSnapshot(new File((String) kcontext.getVariable("relationshipsRf2SortedFileName")),new int[]{0});</constraint>
+      </constraints>
+    </split>
+    <actionNode id="44" name="Use Relationships Input as Snapshot" x="1625" y="420" width="211" height="48" >
+        <action type="expression" dialect="mvel" >System.out.println("Using relationships snapshot..." + kcontext.getVariable("relationshipsRf2SortedFileName"));
+kcontext.setVariable("relationshipsRf2SnapshotFileName", kcontext.getVariable("relationshipsRf2SortedFileName"));</action>
+    </actionNode>
+    <actionNode id="45" name="Sorted EN language Snapshot" x="1625" y="493" width="211" height="48" >
+        <action type="expression" dialect="java" >System.out.println("Creating snapshot for EN language... " + kcontext.getVariable("languagesRf2SortedFileName"));
+SnapshotGenerator fsc=new SnapshotGenerator(
+										new File( (String) kcontext.getVariable("languagesRf2SortedFileName")),  
+										(String)rf1Date, 5, 1, 
+										new File("data/RF2_Snapshot/snapshotSortedENLanguage.txt")
+										, new Integer[]{4}, new String[]{(String)kcontext.getVariable("RF2_ENUS_REFSET")});
+fsc.execute();
+			fsc=null;
+			System.gc();
+kcontext.setVariable("ENLanguageRf2SnapshotFileName", "data/RF2_Snapshot/snapshotSortedENLanguage.txt");</action>
+    </actionNode>
+    <actionNode id="49" name="Sorted GB Language Snapshot" x="1624" y="734" width="211" height="48" >
+        <action type="expression" dialect="java" >System.out.println("Creating snapshot for GB language... " + kcontext.getVariable("languagesRf2SortedFileName"));
+SnapshotGenerator fsc=new SnapshotGenerator(
+										new File( (String) kcontext.getVariable("languagesRf2SortedFileName")),  
+										(String)rf1Date, 5, 1, 
+										new File("data/RF2_Snapshot/snapshotSortedGBLanguage.txt")
+										, new Integer[]{4}, new String[]{(String)kcontext.getVariable("RF2_ENGB_REFSET")});
+fsc.execute();
+			fsc=null;
+			System.gc();
+kcontext.setVariable("GBLanguageRf2SnapshotFileName", "data/RF2_Snapshot/snapshotSortedGBLanguage.txt");</action>
+    </actionNode>
+    <actionNode id="55" name="Use Simple Map Input as SnapShot" x="1625" y="578" width="211" height="48" >
+        <action type="expression" dialect="mvel" >System.out.println("Using simple maps snapshot..." + kcontext.getVariable("simpleMapsRf2SortedFileName"));
+kcontext.setVariable("simpleMapsRf2SnapshotFileName", kcontext.getVariable("simpleMapsRf2SortedFileName"));</action>
+    </actionNode>
+    <actionNode id="52" name="Sorted Refinability Snapshot" x="1624" y="895" width="211" height="48" >
+        <action type="expression" dialect="java" >System.out.println("Creating snapshot for refinability... " + kcontext.getVariable("attributesRf2SortedFileName"));
+SnapshotGenerator fsc=new SnapshotGenerator(
+										new File( (String) kcontext.getVariable("attributesRf2SortedFileName")),  
+										(String)rf1Date, 5, 1, 
+										new File("data/RF2_Snapshot/snapshotSortedRefinability.txt")
+										, new Integer[]{4}, new String[]{(String)kcontext.getVariable("RF2_REFINABILITY_REFSETID")});
+fsc.execute();
+			fsc=null;
+			System.gc();
+kcontext.setVariable("refinabilityRf2SnapshotFileName", "data/RF2_Snapshot/snapshotSortedRefinability.txt");</action>
+    </actionNode>
+    <actionNode id="58" name="Sorted Inact concept snapshot" x="1625" y="818" width="211" height="48" >
+        <action type="expression" dialect="java" >System.out.println("Creating snapshot for Inactive Concepts... " + kcontext.getVariable("inactConceptsRf2SortedFileName"));
+SnapshotGenerator fsc=new SnapshotGenerator(
+										new File( (String) kcontext.getVariable("inactConceptsRf2SortedFileName")),  
+										(String)rf1Date, 5, 1, 
+										new File("data/RF2_Snapshot/snapshotSortedInactConcept.txt")
+										, null, null);
+fsc.execute();
+			fsc=null;
+			System.gc();
+kcontext.setVariable("inactConceptsRf2SnapshotFileName", "data/RF2_Snapshot/snapshotSortedInactConcept.txt");</action>
+    </actionNode>
+    <split id="57" name="Gateway" x="1525" y="577" width="126" height="49" type="2" >
+      <constraints>
+        <constraint toNodeId="56" toType="DROOLS_DEFAULT" name="constraint" priority="1" type="code" dialect="java" >return !InputFileValidator.isSnapshot(new File((String) kcontext.getVariable("simpleMapsRf2SortedFileName")),new int[]{5,1});</constraint>
+        <constraint toNodeId="55" toType="DROOLS_DEFAULT" name="constraint" priority="1" type="code" dialect="java" >return InputFileValidator.isSnapshot(new File((String) kcontext.getVariable("simpleMapsRf2SortedFileName")),new int[]{5,1});</constraint>
+      </constraints>
+    </split>
+    <actionNode id="56" name="Sorted Simple Map Snapshot" x="1624" y="655" width="211" height="48" >
+        <action type="expression" dialect="java" >System.out.println("skipping snapshot for simple maps... " + kcontext.getVariable("simpleMapsRf2SortedFileName"));
+/*
+SnapshotGenerator fsc=new SnapshotGenerator(
+										new File( (String) kcontext.getVariable("simpleMapsRf2SortedFileName")),  
+										(String)kcontext.getVariable("date"), 5, 1, 
+										new File("RF2_Snapshot/snapshotSortedSimpleMaps.txt")
+										, null, null);
+fsc.execute();
+			fsc=null;
+			System.gc();
+*/
+kcontext.setVariable("simpleMapsRf2SnapshotFileName", (String) kcontext.getVariable("simpleMapsRf2SortedFileName"));</action>
+    </actionNode>
+    <actionNode id="61" name="Sorted Inact Description Snapshot" x="1625" y="970" width="211" height="48" >
+        <action type="expression" dialect="java" >System.out.println("Creating snapshot for Inactive Descriptions... " + kcontext.getVariable("inactDescrptsRf2SortedFileName"));
+SnapshotGenerator fsc=new SnapshotGenerator(
+										new File( (String) kcontext.getVariable("inactDescrptsRf2SortedFileName")),  
+										(String)rf1Date, 5, 1, 
+										new File("data/RF2_Snapshot/snapshotSortedInactDescrpt.txt")
+										, null, null);
+fsc.execute();
+			fsc=null;
+			System.gc();
+kcontext.setVariable("inactDescrptsRf2SnapshotFileName", "data/RF2_Snapshot/snapshotSortedInactDescrpt.txt");</action>
+    </actionNode>
+    <join id="64" name="Gateway" x="1881" y="100" width="49" height="49" type="2" />
+    <join id="66" name="Gateway" x="1881" y="391" width="49" height="49" type="2" />
+    <join id="76" name="Gateway" x="1972" y="581" width="49" height="49" type="1" />
+    <join id="73" name="Gateway" x="1882" y="580" width="49" height="49" type="2" />
+    <join id="75" name="Gateway" x="1881" y="261" width="49" height="49" type="2" />
+    <actionNode id="87" name="Script" x="2034" y="585" width="80" height="48" >
+        <action type="expression" dialect="java" >System.out.println("Final Concepts snapshot file: " + kcontext.getVariable("conceptsRf2SnapshotFileName"));
+System.out.println("Final Descriptions snapshot file: " + kcontext.getVariable("descriptionsRf2SnapshotFileName"));
+System.out.println("Final Relationships snapshot file: " + kcontext.getVariable("relationshipsRf2SnapshotFileName"));
+System.out.println("Final EN Language snapshot file: " + kcontext.getVariable("ENLanguageRf2SnapshotFileName"));
+System.out.println("Final GB Language snapshot file: " + kcontext.getVariable("GBLanguageRf2SnapshotFileName"));
+System.out.println("Final Inactive Concepts snapshot file: " + kcontext.getVariable("inactConceptsRf2SnapshotFileName"));
+System.out.println("Final Inactive Descriptions snapshot file: " + kcontext.getVariable("inactDescrptsRf2SnapshotFileName"));
+System.out.println("Final Refinability snapshot file: " + kcontext.getVariable("refinabilityRf2SnapshotFileName"));
+System.out.println("Final Simple Maps snapshot file: " + kcontext.getVariable("simpleMapsRf2SnapshotFileName"));
+System.out.println("Final Associations snapshot file: " + kcontext.getVariable("associationsRf2SnapshotFileName"));
+			System.gc();</action>
+    </actionNode>
+    <actionNode id="93" name="Script" x="2507" y="583" width="80" height="48" >
+        <action type="expression" dialect="java" >System.out.println("Final RF1 Concepts file: " + kcontext.getVariable("RF1ConceptsFileName"));
+System.out.println("Final RF1 Descriptions file: " + kcontext.getVariable("RF1DescriptionsFileName"));
+System.out.println("Final RF1 Relationships  file: " + kcontext.getVariable("RF1RelationshipsFileName"));
+System.out.println("Final RF1 EN Language members file: " + kcontext.getVariable("RF1ENLangMembersFileName"));
+System.out.println("Final RF1 GB Language members file: " + kcontext.getVariable("RF1GBLangMembersFileName"));
+System.out.println("Final RF1 Component History file: " + kcontext.getVariable("RF1ComponentHistoryFileName"));
+System.gc();</action>
+    </actionNode>
+    <actionNode id="92" name="Create Component History" x="2231" y="502" width="185" height="48" >
+        <action type="expression" dialect="java" >System.out.println("Creating component history... " );
+GenerateRF1ComponentHistory genCH=new GenerateRF1ComponentHistory( 
+		new File((String) kcontext.getVariable("conceptsRf2SortedFileName")),
+ 		new File((String) kcontext.getVariable("descriptionsRf2SortedFileName")),
+ 		new File( (String) kcontext.getVariable("inactConceptsRf2SortedFileName")),
+ 		new File( (String) kcontext.getVariable("inactDescrptsRf2SortedFileName")),
+ 		(String)rf1Date,
+  		new File("output/RF1/Component_History.txt"));
+genCH.execute();
+			genCH=null;
+			System.gc();
+kcontext.setVariable("RF1ComponentHistoryFileName", "output/RF1/Component_History.txt");</action>
+    </actionNode>
+    <actionNode id="95" name="SortAssociations" x="909" y="1153" width="218" height="48" >
+        <action type="expression" dialect="java" >System.out.println("Sorting associations... " + kcontext.getVariable("associationsRf2InputFileName"));
+FileSorter fsc=new FileSorter(
+										new File( (String) kcontext.getVariable("associationsRf2InputFileName")), 
+										new File("data/RF2_Sorted/Sorted_Associations.txt"), 
+										new File("data/temp"), new int[]{0,1});
+fsc.execute();
+			fsc=null;
+			System.gc();
+kcontext.setVariable("associationsRf2SortedFileName", "data/RF2_Sorted/Sorted_Associations.txt");</action>
+    </actionNode>
+    <split id="94" name="Gateway" x="828" y="1154" width="49" height="49" type="2" >
+      <constraints>
+        <constraint toNodeId="97" toType="DROOLS_DEFAULT" name="sorted" priority="1" type="code" dialect="java" >return InputFileValidator.isSorted(new File( (String) kcontext.getVariable("associationsRf2InputFileName")), new int[]{0,1});</constraint>
+        <constraint toNodeId="95" toType="DROOLS_DEFAULT" name="not sorted" priority="1" type="code" dialect="java" >return !InputFileValidator.isSorted(new File( (String) kcontext.getVariable("associationsRf2InputFileName")), new int[]{0,1});</constraint>
+      </constraints>
+    </split>
+    <actionNode id="89" name="Create Concepts Descriptions and subset members" x="2231" y="582" width="187" height="48" >
+        <action type="expression" dialect="java" >System.out.println("Creating concepts descriptions and lang subsets... " );
+
+			File outputGBLanguageSubsetFile= new File("output/RF1/Subsetmembers_en-GB.txt");
+			File outputENLanguageSubsetFile= new File("output/RF1/Subsetmembers_en-US.txt");
+			File outputDescriptionFile= new File("output/RF1/Descriptions.txt");
+			File outputConceptFile = new File("output/RF1/Concepts.txt");
+
+			GenerateRF1CptDescLangSubs genCDS=new GenerateRF1CptDescLangSubs(
+					new File((String) kcontext.getVariable("ENLanguageRf2SnapshotFileName")),
+					new File((String) kcontext.getVariable("GBLanguageRf2SnapshotFileName")),
+					new File((String) kcontext.getVariable("descriptionsRf2SnapshotFileName")),
+					new File((String) kcontext.getVariable("conceptsRf2SnapshotFileName")),
+					new File((String) kcontext.getVariable("simpleMapsRf2SnapshotFileName")),
+					new File((String) kcontext.getVariable("inactConceptsRf2SnapshotFileName")),
+					new File((String) kcontext.getVariable("inactDescrptsRf2SnapshotFileName")),
+					outputGBLanguageSubsetFile, 
+					outputENLanguageSubsetFile, 
+					outputDescriptionFile, 
+					outputConceptFile);
+
+genCDS.execute();
+			genCDS=null;
+			System.gc();
+kcontext.setVariable("RF1DescriptionsFileName", "RF1/Descriptions.txt");
+kcontext.setVariable("RF1ConceptsFileName", "RF1/Concepts.txt");
+kcontext.setVariable("RF1ENLangMembersFileName", "RF1/Subsetmembers_en-US.txt");
+kcontext.setVariable("RF1GBLangMembersFileName", "RF1/Subsetmembers_en-US.txt");
+kcontext.setVariable("RF1ComponentHistoryFileName", "RF1/Component_History.txt");</action>
+    </actionNode>
+    <split id="88" name="Gateway" x="2148" y="582" width="49" height="49" type="1" />
+    <actionNode id="91" name="Create Relationships" x="2231" y="662" width="188" height="48" >
+        <action type="expression" dialect="java" >System.out.println("Creating relationships... " );
+  		
+GenerateRF1Relationships genRel=new GenerateRF1Relationships(
+		new File((String) kcontext.getVariable("relationshipsRf2SnapshotFileName")),
+		new File((String) kcontext.getVariable("refinabilityRf2SnapshotFileName")),
+		new File((String) kcontext.getVariable("associationsRf2SnapshotFileName"))
+		, new File("output/RF1/Relationships.txt"));
+  		
+genRel.execute();
+			genRel=null;
+			System.gc();
+kcontext.setVariable("RF1RelationshipsFileName", "output/RF1/Relationships.txt");</action>
+    </actionNode>
+    <join id="90" name="Gateway" x="2437" y="581" width="49" height="49" type="1" />
+    <actionNode id="102" name="Sort and filter Inact Concept" x="897" y="488" width="223" height="48" >
+        <action type="expression" dialect="java" >System.out.println("Sorting and filtering inactive Concepts from... " + kcontext.getVariable("attributesRf2InputFileName"));
+FileFilterAndSorter fs=new FileFilterAndSorter(
+									new File( (String) kcontext.getVariable("attributesRf2InputFileName")), 
+									new File("data/RF2_Sorted/Sorted_InactConcepts.txt"), 
+									new File("data/temp"), new int[]{5,1}, new Integer[]{4}, new String[]{RF2_INACT_CPT_REFSET});
+			fs.execute();
+			fs=null;
+			System.gc();
+kcontext.setVariable("inactConceptsRf2SortedFileName", "data/RF2_Sorted/Sorted_InactConcepts.txt");</action>
+    </actionNode>
+    <actionNode id="103" name="Sort and filter Inact Description" x="897" y="574" width="223" height="48" >
+        <action type="expression" dialect="java" >System.out.println("Sorting and filtering inactive Descriptions from... " + kcontext.getVariable("attributesRf2InputFileName"));
+FileFilterAndSorter fs=new FileFilterAndSorter(
+									new File( (String) kcontext.getVariable("attributesRf2InputFileName")), 
+									new File("data/RF2_Sorted/Sorted_InactDescriptions.txt"), 
+									new File("data/temp"), new int[]{5,1}, new Integer[]{4}, new String[]{RF2_INACT_DESC_REFSET});
+			fs.execute();
+			fs=null;
+			System.gc();
+kcontext.setVariable("inactDescrptsRf2SortedFileName", "data/RF2_Sorted/Sorted_InactDescriptions.txt");</action>
+    </actionNode>
+    <actionNode id="100" name="Sorted Associations snapshot" x="1626" y="1039" width="213" height="48" >
+        <action type="expression" dialect="java" >System.out.println("Creating snapshot for associations... " + kcontext.getVariable("associationsRf2SortedFileName"));
+SnapshotGenerator fsc=new SnapshotGenerator(
+										new File( (String) kcontext.getVariable("associationsRf2SortedFileName")),  
+										(String)rf1Date, 0, 1, 
+										new File("data/RF2_Snapshot/snapshotSortedAssociations.txt")
+										, null, null);
+fsc.execute();
+			fsc=null;
+			System.gc();
+kcontext.setVariable("associationsRf2SnapshotFileName", "data/RF2_Snapshot/snapshotSortedAssociations.txt");</action>
+    </actionNode>
+    <actionNode id="101" name="Use Associations input as snapshot" x="1622" y="1111" width="218" height="48" >
+        <action type="expression" dialect="java" >System.out.println("Using associations snapshot..." + kcontext.getVariable("associationsRf2SortedFileName"));
+kcontext.setVariable("associationsRf2SnapshotFileName", kcontext.getVariable("associationsRf2SortedFileName"));</action>
+    </actionNode>
+    <split id="98" name="Gateway" x="1525" y="1032" width="49" height="49" type="2" >
+      <constraints>
+        <constraint toNodeId="101" toType="DROOLS_DEFAULT" name="constraint" priority="1" type="code" dialect="java" >return InputFileValidator.isSnapshot(new File((String) kcontext.getVariable("associationsRf2SortedFileName")),new int[]{0});</constraint>
+        <constraint toNodeId="100" toType="DROOLS_DEFAULT" name="constraint" priority="1" type="code" dialect="java" >return !InputFileValidator.isSnapshot(new File((String) kcontext.getVariable("associationsRf2SortedFileName")),new int[]{0});</constraint>
+      </constraints>
+    </split>
+    <join id="99" name="Gateway" x="1881" y="1029" width="49" height="49" type="2" />
+    <join id="96" name="Gateway" x="1171" y="1151" width="49" height="49" type="2" />
+    <actionNode id="97" name="UseAssociationsInputAsSorted" x="908" y="1227" width="219" height="48" >
+        <action type="expression" dialect="java" >System.out.println("Using sorted associations..." + kcontext.getVariable("associationsRf2InputFileName"));
+kcontext.setVariable("associationsRf2SortedFileName",  kcontext.getVariable("associationsRf2InputFileName"));</action>
+    </actionNode>
+    <actionNode id="108" name="Aborted process" x="545" y="703" width="80" height="48" >
+        <action type="expression" dialect="java" >System.out.println("Aborted process");</action>
+    </actionNode>
+    <end id="107" name="End" x="616" y="831" width="48" height="48" />
+    <actionNode id="104" name="Input File Validation" x="263" y="572" width="158" height="48" >
+        <action type="expression" dialect="java" >System.out.println("Validating input files... " );
+	boolean finalRes=true;
+	
+	boolean partRes=	FileAnalyzer.validate(new File((String)kcontext.getVariable("conceptsRf2InputFileName")), 
+					FileAnalyzer.FileType.RF2_CONCEPTS, new File("config/validation-rules.xml"));
+	System.out.println("******* File : " +   (String)kcontext.getVariable("conceptsRf2InputFileName") + "  validation result: " +
+			partRes
+		);
+		finalRes=partRes;
+		partRes=FileAnalyzer.validate(new File((String)kcontext.getVariable("descriptionsRf2InputFileName")), 
+				FileAnalyzer.FileType.RF2_DESCRIPTIONS, new File("config/validation-rules.xml"));
+	System.out.println("******* File : " +   (String)kcontext.getVariable("descriptionsRf2InputFileName") + "  validation result: " +
+		partRes
+		);
+		
+		finalRes=finalRes &amp;&amp; partRes;
+		
+		partRes=FileAnalyzer.validate(new File((String)kcontext.getVariable("relationshipsRf2InputFileName")), 
+				FileAnalyzer.FileType.RF2_RELATIONSHIPS, new File("config/validation-rules.xml"));
+		System.out.println("******* File : " +   (String)kcontext.getVariable("relationshipsRf2InputFileName") + "  validation result: " +
+			partRes
+		);
+		
+//		finalRes=finalRes &amp;&amp; partRes;
+		
+		partRes=FileAnalyzer.validate(new File((String)kcontext.getVariable("simpleMapsRf2InputFileName") ), 
+				FileAnalyzer.FileType.RF2_SIMPLEMAPS, new File("config/validation-rules.xml"));
+		System.out.println("******* File : " +   (String)kcontext.getVariable("simpleMapsRf2InputFileName") + "  validation result: " +
+			partRes
+		);
+		
+		finalRes=finalRes &amp;&amp; partRes;
+		
+		partRes=	FileAnalyzer.validate(new File((String)kcontext.getVariable("languagesRf2InputFileName")), 
+						FileAnalyzer.FileType.RF2_LANGUAGE, new File("config/validation-rules.xml"));
+		System.out.println("******* File : " +   (String)kcontext.getVariable("languagesRf2InputFileName") + "  validation result: " +
+			partRes
+		);
+
+		finalRes=finalRes &amp;&amp; partRes;
+				
+		partRes=FileAnalyzer.validate(new File((String)kcontext.getVariable("attributesRf2InputFileName") ), 
+						FileAnalyzer.FileType.RF2_ATTRIBUTEVALUE, new File("config/validation-rules.xml"));
+		System.out.println("******* File : " +   (String)kcontext.getVariable("attributesRf2InputFileName") + "  validation result: " +
+				partRes
+		);
+		finalRes=finalRes &amp;&amp; partRes;
+		
+kcontext.setVariable("filesOk",finalRes);</action>
+    </actionNode>
+    <split id="105" name="Gateway" x="502" y="572" width="49" height="49" type="2" >
+      <constraints>
+        <constraint toNodeId="14" toType="DROOLS_DEFAULT" name="Continue" priority="1" type="code" dialect="java" >return ((Boolean)kcontext.getVariable("filesOk"));</constraint>
+        <constraint toNodeId="108" toType="DROOLS_DEFAULT" name="Abort" priority="1" type="code" dialect="java" >return !((Boolean)kcontext.getVariable("filesOk"));</constraint>
+      </constraints>
+    </split>
+  </nodes>
+
+  <connections>
+    <connection from="1" to="3" />
+    <connection from="93" to="8" />
+    <connection from="14" to="9" />
+    <connection from="9" to="10" />
+    <connection from="9" to="11" />
+    <connection from="10" to="12" />
+    <connection from="11" to="12" />
+    <connection from="15" to="13" />
+    <connection from="105" to="14" />
+    <connection from="12" to="15" />
+    <connection from="19" to="15" />
+    <connection from="23" to="15" />
+    <connection from="27" to="15" />
+    <connection from="31" to="15" />
+    <connection from="35" to="15" />
+    <connection from="96" to="15" />
+    <connection from="102" to="15" />
+    <connection from="103" to="15" />
+    <connection from="16" to="17" />
+    <connection from="14" to="16" />
+    <connection from="17" to="19" />
+    <connection from="18" to="19" />
+    <connection from="16" to="18" />
+    <connection from="20" to="21" />
+    <connection from="14" to="20" />
+    <connection from="21" to="23" />
+    <connection from="22" to="23" />
+    <connection from="20" to="22" />
+    <connection from="24" to="25" />
+    <connection from="14" to="24" />
+    <connection from="25" to="27" />
+    <connection from="26" to="27" />
+    <connection from="24" to="26" />
+    <connection from="28" to="29" />
+    <connection from="14" to="28" />
+    <connection from="29" to="31" />
+    <connection from="30" to="31" />
+    <connection from="28" to="30" />
+    <connection from="32" to="34" />
+    <connection from="33" to="35" />
+    <connection from="34" to="35" />
+    <connection from="14" to="32" />
+    <connection from="32" to="33" />
+    <connection from="36" to="38" />
+    <connection from="38" to="39" />
+    <connection from="13" to="36" />
+    <connection from="38" to="37" />
+    <connection from="40" to="42" />
+    <connection from="47" to="43" />
+    <connection from="36" to="40" />
+    <connection from="40" to="41" />
+    <connection from="36" to="47" />
+    <connection from="47" to="44" />
+    <connection from="36" to="45" />
+    <connection from="36" to="49" />
+    <connection from="57" to="55" />
+    <connection from="36" to="52" />
+    <connection from="36" to="58" />
+    <connection from="36" to="57" />
+    <connection from="57" to="56" />
+    <connection from="36" to="61" />
+    <connection from="39" to="64" />
+    <connection from="37" to="64" />
+    <connection from="43" to="66" />
+    <connection from="44" to="66" />
+    <connection from="73" to="76" />
+    <connection from="66" to="76" />
+    <connection from="75" to="76" />
+    <connection from="64" to="76" />
+    <connection from="45" to="76" />
+    <connection from="49" to="76" />
+    <connection from="58" to="76" />
+    <connection from="52" to="76" />
+    <connection from="61" to="76" />
+    <connection from="99" to="76" />
+    <connection from="55" to="73" />
+    <connection from="56" to="73" />
+    <connection from="42" to="75" />
+    <connection from="41" to="75" />
+    <connection from="76" to="87" />
+    <connection from="90" to="93" />
+    <connection from="88" to="92" />
+    <connection from="94" to="95" />
+    <connection from="14" to="94" />
+    <connection from="88" to="89" />
+    <connection from="87" to="88" />
+    <connection from="88" to="91" />
+    <connection from="89" to="90" />
+    <connection from="91" to="90" />
+    <connection from="92" to="90" />
+    <connection from="14" to="102" />
+    <connection from="14" to="103" />
+    <connection from="98" to="100" />
+    <connection from="98" to="101" />
+    <connection from="36" to="98" />
+    <connection from="100" to="99" />
+    <connection from="101" to="99" />
+    <connection from="95" to="96" />
+    <connection from="97" to="96" />
+    <connection from="94" to="97" />
+    <connection from="105" to="108" />
+    <connection from="108" to="107" />
+    <connection from="3" to="104" />
+    <connection from="104" to="105" />
+  </connections>
+
+</process>

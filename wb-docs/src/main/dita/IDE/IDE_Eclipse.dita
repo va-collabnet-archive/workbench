@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dita PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/ditabase.dtd">
+<dita>
+  <topic id="IDEEclipse" xml:lang="en">
+    <title>Eclipse IDE</title>
+
+    <prolog>
+      <metadata>
+        <keywords>
+          <indexterm>Eclipse</indexterm>
+        </keywords>
+      </metadata>
+    </prolog>
+
+    <body>
+      <section id="ac999465">The CollabNet Desktop - Eclipse Edition,
+      eliminates the need for developers to leave their preferred development
+      environment and switch to other tools and systems to collaborate with
+      remote colleagues and contribute to the lifecycle processes mandated by
+      the enterprise. Eclipse users to connect to CollabNet CUBiT and access a
+      centralized pool of build and test servers that can be dynamically
+      allocated to their projects. Developers can now easily fix, rebuild and
+      test code components, and track and manage efficiently the application
+      configurations used for each build without leaving
+      Eclipse.<indexterm>CollabNet </indexterm><indexterm>CUBiT
+      </indexterm></section>
+
+      <section id="ac999480">CollabNet Desktop users can access their
+      CollabNet Subversion repositories and perform all Subversion-related
+      activities directly from the graphical Eclipse client. In addition, the
+      CollabNet Desktop includes a powerful merge client that takes advantage
+      of the merge tracking features that are available with CollabNet
+      Subversion.<indexterm>Subversion </indexterm></section>
+
+      <section>Users can interact with issue trackers in CollabNet SourceForge
+      Enterprise directly from the Eclipse client, and they can access their
+      CUBiT manager node and dynamically provision and access hosts. In
+      addition, they can access all CUBiT functionality directly from Eclipse,
+      such as assigning profiles, monitoring activity etc.</section>
+    </body>
+  </topic>
+</dita>

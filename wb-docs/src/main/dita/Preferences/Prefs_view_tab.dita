@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE dita PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/ditabase.dtd">
+<dita>
+
+ <topic id="view_tab" xml:lang="en">
+  <title>View Tab</title>
+  <shortdesc>
+   <ph>The View tab is used to control the display of items in the taxonomy view pane, how fields
+    are displayed in the various sections of the work area</ph>
+  </shortdesc>
+  <topic id="descriptions">
+   <title>Descriptions</title>
+
+   <body>
+    <section>
+     <title>Short label preference order</title>
+     <ph>Specifies how to display the concept name in those areas of the screen that use short
+      labels (e.g. the taxonomy pane), based on the concept description type. The first concept
+      description whose description type matches one of description types in the list (in descending
+      order) will be the one displayed for that concept.</ph>
+    </section>
+    <section>
+     <title>Long label preference order</title>
+     <ph>Specifies how to display the concept name in those areas of the screen that use long labels
+      (e.g. the concept work area), based on the concept descrip­tion type (e.g. fully specified
+      name, preferred term). The first concept description whose description type matches one of
+      description types in the list (in descending order) will be the one displayed for that
+      concept.</ph>
+    </section>
+    <section>
+     <title>Tree preference order</title>
+     <ph>Specifies how to display the concept name in the taxonomy view pane, based on the concept
+      description type (e.g. fully specified name, preferred term). The first concept description
+      whose description type matches one of description types in the list (in descending order) will
+      be the one displayed for that concept.</ph>
+    </section>
+    <section>
+     <title>Table preference order</title>
+    </section>
+   </body>
+  </topic>
+
+  <topic id="hierarchy_roots">
+   <title>Hierarchy Roots</title>
+   <body>
+    <p>Defines the highest level (root) concepts in the taxonomy. All other con­cepts will be
+     children or sub-children of these concepts.</p>
+   </body>
+  </topic>
+
+  <topic id="taxonomy">
+   <title>Taxonomy</title>
+   <body>
+    <section>
+     <ph>Display toggles</ph>
+    </section>
+    <section>
+     <ph>Use inferred rels in taxonomy view</ph>
+    </section>
+    <section>
+     <ph>Allow variable height taxonomy view</ph>
+    </section>
+    <section>
+     <ph>Show viewer images in taxonomy view</ph>
+    </section>
+    <section>
+     <ph>Show refset info in taxonomy view</ph>
+    </section>
+    <section>
+     <ph>Sort taxonomy using refset</ph>
+    </section>
+    <section>
+     <title>Parent relationships</title>
+     <ph>Defines the relationships used to associated parent concepts with child con­cepts.</ph>
+    </section>
+    <section>
+     <title>Child relationships</title>
+     <ph>Defines the relationships used to associated child concepts with parent con­cepts.</ph>
+    </section>
+    <section>
+     <title>Stated view characteristic types</title>
+    </section>
+    <section>
+     <title>Inferred view characteristic types</title>
+    </section>
+   </body>
+  </topic>
+
+  <topic id="taxonomy_sort">
+   <title>Taxonomy sort</title>
+   <body>
+    <p>If the Sort taxonomy using refset is selected on the Taxonomy tab (see previous section),
+     defines the refsets that will order the taxonomy display.</p>
+   </body>
+  </topic>
+
+  <topic id="status">
+   <title>Status</title>
+   <body>
+    <p>Defines which concepts will be displayed in the taxonomy view pane based on their value in
+     their status field.</p>
+   </body>
+  </topic>
+
+  <topic id="refsets_in_taxonomy">
+   <title>Refsets to show in taxonomy view</title>
+   <body>
+    <p>Specifies the refsets for which concepts in the hierarchy display will show adjacent
+     inclusion or exclusion symbols.</p>
+   </body>
+  </topic>
+
+ </topic>
+</dita>
