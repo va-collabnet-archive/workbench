@@ -17,7 +17,7 @@
 package org.ihtsdo.helper.transform;
 
 public class SctIdGenerator {
-
+    
    public static enum TYPE {
         CONCEPT("10"),
         DESCRIPTION("11"),
@@ -53,6 +53,17 @@ public class SctIdGenerator {
                 FnF[i][j] = FnF[i - 1][FnF[1][j]];
             }
         }
+    }
+    
+    public static String generate(long sequence, int projectId, int namespaceId, TYPE type) {
+
+        if (sequence <= 0) {
+            throw new RuntimeException("sequence must be > 0");
+        }
+
+        String mergedid = Long.toString(sequence) + projectId + namespaceId + type.digits;
+
+        return mergedid + verhoeffCompute(mergedid);
     }
 
     public static String generate(long sequence, String namespaceStr, TYPE type) {
