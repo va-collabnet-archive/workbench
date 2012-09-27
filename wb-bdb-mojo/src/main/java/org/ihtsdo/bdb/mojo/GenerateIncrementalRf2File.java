@@ -27,12 +27,13 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.helper.export.Rf2Export;
 import org.ihtsdo.helper.rf2.Rf2File;
 import org.ihtsdo.helper.time.TimeHelper;
+import org.ihtsdo.helper.transform.UuidSnomedMapHandler;
 import org.ihtsdo.helper.transform.UuidToSctIdMapper;
+import org.ihtsdo.helper.transform.UuidToSctIdWriter;
 import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
 /**
@@ -197,6 +198,11 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
             vc.setPositionSet(new PositionSet(position));
             getLog().info("Criterion matches " + sapsToWrite.size() + " sapNids: " + sapsToWrite);
                 NidBitSetBI allConcepts = Ts.get().getAllConceptNids();
+                UuidToSctIdMapper mapper = new UuidToSctIdMapper(allConcepts, namespace, output);
+                Ts.get().iterateConceptDataInSequence(mapper);
+                mapper.close();
+                UuidSnomedMapHandler handler = new UuidSnomedMapHandler(output, output);
+                handler.setNamespace(namespace);
                 Rf2Export exporter = new Rf2Export(output,
                         Rf2File.ReleaseType.DELTA,
                         LANG_CODE.EN,
@@ -204,7 +210,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
                         namespace,
                         moduleId.toString(),
                         new Date(TimeHelper.getTimeFromString(effectiveDate,
-                        TimeHelper.getFileDateFormat())),
+                        TimeHelper.getAltFileDateFormat())),
                         sapsToWrite.getAsSet(),
                         vc.getViewCoordinateWithAllStatusValues(),
                         excludedRefsetIds.getAsSet(),
@@ -213,10 +219,10 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
                 Ts.get().iterateConceptDataInSequence(exporter);
                 exporter.writeOneTimeFiles();
                 exporter.close();
-                UuidToSctIdMapper mapper = new UuidToSctIdMapper(namespace, moduleId.toString(),
-                        output);
-                mapper.map();
-                mapper.close();
+                UuidToSctIdWriter writer = new UuidToSctIdWriter(namespace, moduleId.toString(),
+                        output, handler);
+                writer.write();
+                writer.close();
         } catch (Exception e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }
