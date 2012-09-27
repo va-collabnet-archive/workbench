@@ -31,6 +31,7 @@ import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.type_cnid_str.RefexCnidStrVersionBI;
 import org.ihtsdo.tk.binding.snomed.CaseSensitive;
 
 /**
@@ -65,7 +66,6 @@ public class CsWordsHelper {
 					for (RefexChronicleBI<?> refex : csWords) {
 						// if (refex.getVersion(vc) instanceof RefexVersionBI) {
 						if (refex.getVersion(vc) instanceof I_ExtendByRefPartCidString) {
-
 							I_ExtendByRefPartCidString member = (I_ExtendByRefPartCidString) refex
 									.getVersion(vc);
 							if (member != null) {
@@ -74,6 +74,17 @@ public class CsWordsHelper {
 									csWordSet.add(member.getStringValue());
 								} else {
 									maybeCsWordSet.add(member.getStringValue());
+								}
+							}
+						} else {
+							RefexCnidStrVersionBI member = (RefexCnidStrVersionBI) refex
+									.getVersion(vc);
+							if (member != null) {
+								int typeNid = member.getCnid1();
+								if (typeNid == icSigNid) {
+									csWordSet.add(member.getStr1());
+								} else {
+									maybeCsWordSet.add(member.getStr1());
 								}
 							}
 						}
