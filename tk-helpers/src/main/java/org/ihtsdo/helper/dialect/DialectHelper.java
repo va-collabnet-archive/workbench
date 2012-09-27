@@ -78,10 +78,12 @@ public class DialectHelper {
 
 							}
 						} else {
-							RefexStrVersionBI variantText = (RefexStrVersionBI) refex
-									.getVersion(vc);
-							if (variantText != null) {
-								variantSet.add(variantText.getStr1());
+							if (refex.getVersion(vc) instanceof RefexStrVersionBI) {
+								RefexStrVersionBI variantText = (RefexStrVersionBI) refex
+										.getVersion(vc);
+								if (variantText != null) {
+									variantSet.add(variantText.getStr1());
+								}
 							}
 						}
 					}

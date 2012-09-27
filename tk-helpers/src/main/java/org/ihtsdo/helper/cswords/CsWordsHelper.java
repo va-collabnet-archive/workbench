@@ -65,6 +65,9 @@ public class CsWordsHelper {
 					Set<String> maybeCsWordSet = new HashSet<String>();
 					for (RefexChronicleBI<?> refex : csWords) {
 						// if (refex.getVersion(vc) instanceof RefexVersionBI) {
+
+						boolean IsExtendRefPartCidString = refex.getVersion(vc) instanceof I_ExtendByRefPartCidString;
+
 						if (refex.getVersion(vc) instanceof I_ExtendByRefPartCidString) {
 							I_ExtendByRefPartCidString member = (I_ExtendByRefPartCidString) refex
 									.getVersion(vc);
@@ -77,16 +80,22 @@ public class CsWordsHelper {
 								}
 							}
 						} else {
-							RefexCnidStrVersionBI member = (RefexCnidStrVersionBI) refex
-									.getVersion(vc);
-							if (member != null) {
-								int typeNid = member.getCnid1();
-								if (typeNid == icSigNid) {
-									csWordSet.add(member.getStr1());
-								} else {
-									maybeCsWordSet.add(member.getStr1());
+							// try {
+							if (refex.getVersion(vc) instanceof RefexCnidStrVersionBI) {
+								RefexCnidStrVersionBI member = (RefexCnidStrVersionBI) refex
+										.getVersion(vc);
+								if (member != null) {
+									int typeNid = member.getCnid1();
+									if (typeNid == icSigNid) {
+										csWordSet.add(member.getStr1());
+									} else {
+										maybeCsWordSet.add(member.getStr1());
+									}
 								}
 							}
+							// } catch (ClassCastException cce) {
+							// cce.printStackTrace();
+							// }
 						}
 
 						// else {
