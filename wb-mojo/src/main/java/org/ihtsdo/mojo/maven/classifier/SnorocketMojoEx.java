@@ -40,6 +40,8 @@ import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
+import org.ihtsdo.tk.api.cs.ChangeSetWriterThreading;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 /**
@@ -1205,14 +1207,13 @@ public class SnorocketMojoEx extends AbstractMojo {
         // :!!!: config.setClassifierIsaType(null);
         // :!!!: config.setClassifierInputPath(null);
         // :!!!: config.setClassifierOutputPath(null);
-
-        // I_ConfigAceDb newDbProfile = tf.newAceDbConfig();
-        // newDbProfile.setUsername("username");
-        // newDbProfile.setClassifierChangesChangeSetPolicy(ChangeSetPolicy.OFF);
-        // newDbProfile.setRefsetChangesChangeSetPolicy(ChangeSetPolicy.OFF);
-        // newDbProfile.setUserChangesChangeSetPolicy(ChangeSetPolicy.INCREMENTAL);
-        // newDbProfile.setChangeSetWriterThreading(ChangeSetWriterThreading.SINGLE_THREAD);
-        // tmpConfig.setDbConfig(newDbProfile);
+         I_ConfigAceDb newDbProfile = ((I_ImplementTermFactory) Terms.get()).newAceDbConfig();
+         newDbProfile.setUsername("username");
+         newDbProfile.setClassifierChangesChangeSetPolicy(ChangeSetPolicy.OFF);
+         newDbProfile.setRefsetChangesChangeSetPolicy(ChangeSetPolicy.OFF);
+         newDbProfile.setUserChangesChangeSetPolicy(ChangeSetPolicy.INCREMENTAL);
+         newDbProfile.setChangeSetWriterThreading(ChangeSetWriterThreading.SINGLE_THREAD);
+         tmpConfig.setDbConfig(newDbProfile);
 
         tmpConfig.setPrecedence(Precedence.TIME);
 
