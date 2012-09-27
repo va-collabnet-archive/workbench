@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2012 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.tk.dto.concept.component.refex.type_uuid_long;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -21,19 +37,42 @@ import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.dto.RevisionHandling;
 import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_int.TkRefexUuidIntRevision;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class TkRefexUuidLongMember.
+ */
 public class TkRefexUuidLongMember extends TkRefexAbstractMember<TkRefexUuidLongRevision> {
 
+    /** The Constant serialVersionUID. */
     public static final long serialVersionUID = 1;
     //~--- fields --------------------------------------------------------------
+    /** The uuid1. */
     public UUID uuid1;
+    
+    /** The extra versions. */
     public List<TkRefexUuidLongRevision> extraVersions;
+    
+    /** The long1. */
     public long long1;
 
     //~--- constructors --------------------------------------------------------
+    /**
+     * Instantiates a new tk refex uuid long member.
+     *
+     * @param refexChronicle the refex chronicle
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public TkRefexUuidLongMember(RefexChronicleBI refexChronicle) throws IOException {
         this((RefexNidLongVersionBI) refexChronicle.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
     }
 
+    /**
+     * Instantiates a new tk refex uuid long member.
+     *
+     * @param refexNidLongVersion the refex nid long version
+     * @param revisionHandling the revision handling
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public TkRefexUuidLongMember(RefexNidLongVersionBI refexNidLongVersion,
             RevisionHandling revisionHandling) throws IOException {
         super(refexNidLongVersion);
@@ -68,15 +107,34 @@ public class TkRefexUuidLongMember extends TkRefexAbstractMember<TkRefexUuidLong
         }
     }
 
+    /**
+     * Instantiates a new tk refex uuid long member.
+     */
     public TkRefexUuidLongMember() {
         super();
     }
 
+    /**
+     * Instantiates a new tk refex uuid long member.
+     *
+     * @param in the in
+     * @param dataVersion the data version
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ClassNotFoundException the class not found exception
+     */
     public TkRefexUuidLongMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
         readExternal(in, dataVersion);
     }
 
+    /**
+     * Instantiates a new tk refex uuid long member.
+     *
+     * @param another the another
+     * @param conversionMap the conversion map
+     * @param offset the offset
+     * @param mapAll the map all
+     */
     public TkRefexUuidLongMember(TkRefexUuidLongMember another, Map<UUID, UUID> conversionMap, long offset,
             boolean mapAll) {
         super(another, conversionMap, offset, mapAll);
@@ -90,6 +148,18 @@ public class TkRefexUuidLongMember extends TkRefexAbstractMember<TkRefexUuidLong
         }
     }
 
+    /**
+     * Instantiates a new tk refex uuid long member.
+     *
+     * @param refexNidLongVersion the refex nid long version
+     * @param excludedNids the excluded nids
+     * @param conversionMap the conversion map
+     * @param offset the offset
+     * @param mapAll the map all
+     * @param viewCoordinate the view coordinate
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ContradictionException the contradiction exception
+     */
     public TkRefexUuidLongMember(RefexNidLongVersionBI refexNidLongVersion, NidBitSetBI excludedNids,
             Map<UUID, UUID> conversionMap, long offset, boolean mapAll, ViewCoordinate viewCoordinate)
             throws IOException, ContradictionException {
@@ -111,7 +181,7 @@ public class TkRefexUuidLongMember extends TkRefexAbstractMember<TkRefexUuidLong
      * field, as this <tt>ERefsetCidLongMember</tt>.
      *
      * @param obj the object to compare with.
-     * @return
+     * @return true, if successful
      * <code>true</code> if the objects are the same;
      * <code>false</code> otherwise.
      */
@@ -155,11 +225,17 @@ public class TkRefexUuidLongMember extends TkRefexAbstractMember<TkRefexUuidLong
         return this.primordialUuid.hashCode();
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.dto.concept.component.TkRevision#makeConversion(java.util.Map, long, boolean)
+     */
     @Override
     public TkRefexUuidLongMember makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
         return new TkRefexUuidLongMember(this, conversionMap, offset, mapAll);
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember#readExternal(java.io.DataInput, int)
+     */
     @Override
     public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super.readExternal(in, dataVersion);
@@ -186,6 +262,8 @@ public class TkRefexUuidLongMember extends TkRefexAbstractMember<TkRefexUuidLong
 
     /**
      * Returns a string representation of the object.
+     *
+     * @return the string
      */
     @Override
     public String toString() {
@@ -202,6 +280,9 @@ public class TkRefexUuidLongMember extends TkRefexAbstractMember<TkRefexUuidLong
         return buff.toString();
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember#writeExternal(java.io.DataOutput)
+     */
     @Override
     public void writeExternal(DataOutput out) throws IOException {
         super.writeExternal(out);
@@ -221,34 +302,63 @@ public class TkRefexUuidLongMember extends TkRefexAbstractMember<TkRefexUuidLong
     }
 
     //~--- get methods ---------------------------------------------------------
+    /**
+     * Gets the uuid1.
+     *
+     * @return the uuid1
+     */
     public UUID getUuid1() {
         return uuid1;
     }
 
+    /**
+     * Gets the long1.
+     *
+     * @return the long1
+     */
     public long getLong1() {
         return long1;
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.dto.concept.component.TkComponent#getRevisionList()
+     */
     @Override
     public List<TkRefexUuidLongRevision> getRevisionList() {
         return extraVersions;
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.dto.concept.component.TkComponent#getRevisions()
+     */
     @Override
     public List<TkRefexUuidLongRevision> getRevisions() {
         return extraVersions;
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember#getType()
+     */
     @Override
     public TK_REFEX_TYPE getType() {
         return TK_REFEX_TYPE.CID_LONG;
     }
 
     //~--- set methods ---------------------------------------------------------
+    /**
+     * Sets the uuid1.
+     *
+     * @param uuid1 the new uuid1
+     */
     public void setUuid1(UUID uuid1) {
         this.uuid1 = uuid1;
     }
 
+    /**
+     * Sets the long1.
+     *
+     * @param long1 the new long1
+     */
     public void setLong1(long long1) {
         this.long1 = long1;
     }

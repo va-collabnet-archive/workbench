@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2012 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.tk.dto.concept;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -59,31 +75,71 @@ import org.ihtsdo.tk.api.refex.type_string.RefexStringVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.refex.type_arrayofbytearray.TkRefexArrayOfBytearrayMember;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class TkConcept.
+ */
 public class TkConcept {
 
+    /** The Constant PADDING. */
     public static final String PADDING = "     ";
+    
+    /** The Constant dataVersion. */
     public static final int dataVersion = 9;
+    
+    /** The Constant serialVersionUID. */
     public static final long serialVersionUID = 1;
     //~--- fields --------------------------------------------------------------
+    /** The annotation style refex. */
     public boolean annotationStyleRefex = false;
+    
+    /** The annotation index style refex. */
     public boolean annotationIndexStyleRefex = false;
+    
+    /** The concept attributes. */
     public TkConceptAttributes conceptAttributes;
+    
+    /** The descriptions. */
     public List<TkDescription> descriptions;
+    
+    /** The media. */
     public List<TkMedia> media;
+    
+    /** The primordial uuid. */
     public UUID primordialUuid;
+    
+    /** The refset members. */
     public List<TkRefexAbstractMember<?>> refsetMembers;
+    
+    /** The relationships. */
     public List<TkRelationship> relationships;
 
     //~--- constructors --------------------------------------------------------
+    /**
+     * Instantiates a new tk concept.
+     */
     public TkConcept() {
         super();
     }
 
+    /**
+     * Instantiates a new tk concept.
+     *
+     * @param in the in
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ClassNotFoundException the class not found exception
+     */
     public TkConcept(DataInput in) throws IOException, ClassNotFoundException {
         super();
         readExternal(in);
     }
 
+    /**
+     * Instantiates a new tk concept.
+     *
+     * @param conceptChronicle the concept chronicle
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public TkConcept(ConceptChronicleBI conceptChronicle) throws IOException {
         annotationStyleRefex = conceptChronicle.isAnnotationStyleRefex();
         annotationIndexStyleRefex = conceptChronicle.isAnnotationIndex();
@@ -127,6 +183,13 @@ public class TkConcept {
         }
     }
 
+    /**
+     * Convert refex.
+     *
+     * @param refexChronicle the refex chronicle
+     * @return the tk refex abstract member
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public static TkRefexAbstractMember<?> convertRefex(RefexChronicleBI<?> refexChronicle) throws IOException {
         if (refexChronicle.getPrimordialVersion() instanceof RefexNidNidNidVersionBI) {
             return new TkRefexUuidUuidUuidMember((RefexNidNidNidVersionBI) refexChronicle);
@@ -161,6 +224,14 @@ public class TkConcept {
         }
     }
 
+    /**
+     * Instantiates a new tk concept.
+     *
+     * @param another the another
+     * @param conversionMap the conversion map
+     * @param offset the offset
+     * @param mapAll the map all
+     */
     public TkConcept(TkConcept another, Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
         super();
         this.annotationStyleRefex = another.annotationStyleRefex;
@@ -206,6 +277,18 @@ public class TkConcept {
         }
     }
 
+    /**
+     * Instantiates a new tk concept.
+     *
+     * @param conceptVersion the concept version
+     * @param excludedNids the excluded nids
+     * @param conversionMap the conversion map
+     * @param offset the offset
+     * @param mapAll the map all
+     * @param viewCoordinate the view coordinate
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ContradictionException the contradiction exception
+     */
     public TkConcept(ConceptVersionBI conceptVersion, NidBitSetBI excludedNids, Map<UUID, UUID> conversionMap,
             long offset, boolean mapAll, ViewCoordinate viewCoordinate)
             throws IOException, ContradictionException {
@@ -213,6 +296,20 @@ public class TkConcept {
                 offset, mapAll, viewCoordinate, viewCoordinate, viewCoordinate);
     }
 
+    /**
+     * Instantiates a new tk concept.
+     *
+     * @param conceptVersion the concept version
+     * @param excludedNids the excluded nids
+     * @param conversionMap the conversion map
+     * @param offset the offset
+     * @param mapAll the map all
+     * @param conceptVc the concept vc
+     * @param descVc the desc vc
+     * @param relVc the rel vc
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ContradictionException the contradiction exception
+     */
     public TkConcept(ConceptVersionBI conceptVersion, NidBitSetBI excludedNids, Map<UUID, UUID> conversionMap,
             long offset, boolean mapAll,
             ViewCoordinate conceptVc,
@@ -313,7 +410,7 @@ public class TkConcept {
      * this <tt>EConcept</tt>.
      *
      * @param obj the object to compare with.
-     * @return
+     * @return true, if successful
      * <code>true</code> if the objects are the same;
      * <code>false</code> otherwise.
      */
@@ -400,6 +497,13 @@ public class TkConcept {
         return this.conceptAttributes.primordialUuid.hashCode();
     }
 
+    /**
+     * Read external.
+     *
+     * @param in the in
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ClassNotFoundException the class not found exception
+     */
     public final void readExternal(DataInput in) throws IOException, ClassNotFoundException {
         int readDataVersion = in.readInt();
 
@@ -556,6 +660,8 @@ public class TkConcept {
 
     /**
      * Returns a string representation of the object.
+     *
+     * @return the string
      */
     @Override
     public String toString() {
@@ -625,6 +731,12 @@ public class TkConcept {
         return buff.toString();
     }
 
+    /**
+     * Write external.
+     *
+     * @param out the out
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public void writeExternal(DataOutput out) throws IOException {
         out.writeInt(dataVersion);
 
@@ -688,67 +800,147 @@ public class TkConcept {
     }
 
     //~--- get methods ---------------------------------------------------------
+    /**
+     * Gets the concept attributes.
+     *
+     * @return the concept attributes
+     */
     public TkConceptAttributes getConceptAttributes() {
         return conceptAttributes;
     }
 
+    /**
+     * Gets the descriptions.
+     *
+     * @return the descriptions
+     */
     public List<TkDescription> getDescriptions() {
         return descriptions;
     }
 
+    /**
+     * Gets the images.
+     *
+     * @return the images
+     */
     public List<TkMedia> getImages() {
         return media;
     }
 
+    /**
+     * Gets the primordial uuid.
+     *
+     * @return the primordial uuid
+     */
     public UUID getPrimordialUuid() {
         return primordialUuid;
     }
 
+    /**
+     * Gets the refset members.
+     *
+     * @return the refset members
+     */
     public List<TkRefexAbstractMember<?>> getRefsetMembers() {
         return refsetMembers;
     }
 
+    /**
+     * Gets the relationships.
+     *
+     * @return the relationships
+     */
     public List<TkRelationship> getRelationships() {
         return relationships;
     }
 
+    /**
+     * Checks if is annotation style refex.
+     *
+     * @return true, if is annotation style refex
+     */
     public boolean isAnnotationStyleRefex() {
         return annotationStyleRefex;
     }
     
+    /**
+     * Checks if is annotation index style refex.
+     *
+     * @return true, if is annotation index style refex
+     */
     public boolean isAnnotationIndexStyleRefex() {
         return annotationIndexStyleRefex;
     }
 
     //~--- set methods ---------------------------------------------------------
+    /**
+     * Sets the annotation style refex.
+     *
+     * @param annotationStyleRefex the new annotation style refex
+     */
     public void setAnnotationStyleRefex(boolean annotationStyleRefex) {
         this.annotationStyleRefex = annotationStyleRefex;
     }
     
+    /**
+     * Sets the annotation index style refex.
+     *
+     * @param annotationIndexStyleRefex the new annotation index style refex
+     */
     public void setAnnotationIndexStyleRefex(boolean annotationIndexStyleRefex) {
         this.annotationIndexStyleRefex = annotationIndexStyleRefex;
     }
 
+    /**
+     * Sets the concept attributes.
+     *
+     * @param conceptAttributes the new concept attributes
+     */
     public void setConceptAttributes(TkConceptAttributes conceptAttributes) {
         this.conceptAttributes = conceptAttributes;
     }
 
+    /**
+     * Sets the descriptions.
+     *
+     * @param descriptions the new descriptions
+     */
     public void setDescriptions(List<TkDescription> descriptions) {
         this.descriptions = descriptions;
     }
 
+    /**
+     * Sets the images.
+     *
+     * @param images the new images
+     */
     public void setImages(List<TkMedia> images) {
         this.media = images;
     }
 
+    /**
+     * Sets the primordial uuid.
+     *
+     * @param primordialUuid the new primordial uuid
+     */
     public void setPrimordialUuid(UUID primordialUuid) {
         this.primordialUuid = primordialUuid;
     }
 
+    /**
+     * Sets the refset members.
+     *
+     * @param refsetMembers the new refset members
+     */
     public void setRefsetMembers(List<TkRefexAbstractMember<?>> refsetMembers) {
         this.refsetMembers = refsetMembers;
     }
 
+    /**
+     * Sets the relationships.
+     *
+     * @param relationships the new relationships
+     */
     public void setRelationships(List<TkRelationship> relationships) {
         this.relationships = relationships;
     }

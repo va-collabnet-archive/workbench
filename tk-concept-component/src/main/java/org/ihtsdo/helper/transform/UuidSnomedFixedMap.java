@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2009 International Health Terminology Standards Development
+ * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,20 +33,39 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class UuidSnomedFixedMap.
+ */
 public class UuidSnomedFixedMap implements Map<UUID, Long> {
 
+    /** The uuid snomed map. */
     private Map<UUID, Long> uuidSnomedMap = new HashMap<UUID, Long>();
 
+    /** The fixed maps. */
     private List<Map<UUID, Long>> fixedMaps = new ArrayList<Map<UUID, Long>>();
 
+    /**
+     * Instantiates a new uuid snomed fixed map.
+     */
     private UuidSnomedFixedMap() {
         super();
     }
 
+    /**
+     * Adds the fixed map.
+     *
+     * @param fixedMap the fixed map
+     */
     public void addFixedMap(Map<UUID, Long> fixedMap) {
         fixedMaps.add(fixedMap);
     }
 
+    /**
+     * Gets the snomed uuid list map.
+     *
+     * @return the snomed uuid list map
+     */
     public Map<Long, List<UUID>> getSnomedUuidListMap() {
         Map<Long, List<UUID>> snomedUuidListMap = new HashMap<Long, List<UUID>>();
         for (Entry<UUID, Long> entry : uuidSnomedMap.entrySet()) {
@@ -61,26 +80,44 @@ public class UuidSnomedFixedMap implements Map<UUID, Long> {
         return snomedUuidListMap;
     }
 
+    /* (non-Javadoc)
+     * @see java.util.Map#clear()
+     */
     public void clear() {
         throw new UnsupportedOperationException();
     }
 
+    /* (non-Javadoc)
+     * @see java.util.Map#containsKey(java.lang.Object)
+     */
     public boolean containsKey(Object arg0) {
         return uuidSnomedMap.containsKey(arg0);
     }
 
+    /* (non-Javadoc)
+     * @see java.util.Map#containsValue(java.lang.Object)
+     */
     public boolean containsValue(Object arg0) {
         return uuidSnomedMap.containsValue(arg0);
     }
 
+    /* (non-Javadoc)
+     * @see java.util.Map#entrySet()
+     */
     public Set<Entry<UUID, Long>> entrySet() {
         return uuidSnomedMap.entrySet();
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
     public boolean equals(Object obj) {
         return uuidSnomedMap.equals(obj);
     }
 
+    /* (non-Javadoc)
+     * @see java.util.Map#get(java.lang.Object)
+     */
     public Long get(Object key) {
         for (Map<UUID, Long> fixed : fixedMaps) {
             if (fixed.containsKey(key)) {
@@ -90,40 +127,70 @@ public class UuidSnomedFixedMap implements Map<UUID, Long> {
         return uuidSnomedMap.get(key);
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
     public int hashCode() {
         return uuidSnomedMap.hashCode();
     }
 
+    /* (non-Javadoc)
+     * @see java.util.Map#isEmpty()
+     */
     public boolean isEmpty() {
         return uuidSnomedMap.isEmpty();
     }
 
+    /* (non-Javadoc)
+     * @see java.util.Map#keySet()
+     */
     public Set<UUID> keySet() {
         return uuidSnomedMap.keySet();
     }
 
+    /* (non-Javadoc)
+     * @see java.util.Map#put(java.lang.Object, java.lang.Object)
+     */
     public Long put(UUID key, Long sctId) {
         return uuidSnomedMap.put(key, sctId);
     }
 
+    /* (non-Javadoc)
+     * @see java.util.Map#putAll(java.util.Map)
+     */
     public void putAll(Map<? extends UUID, ? extends Long> map) {
         for (Entry<? extends UUID, ? extends Long> entry : map.entrySet()) {
             put(entry.getKey(), entry.getValue());
         }
     }
 
+    /* (non-Javadoc)
+     * @see java.util.Map#remove(java.lang.Object)
+     */
     public Long remove(Object key) {
         throw new UnsupportedOperationException();
     }
 
+    /* (non-Javadoc)
+     * @see java.util.Map#size()
+     */
     public int size() {
         return uuidSnomedMap.size();
     }
 
+    /* (non-Javadoc)
+     * @see java.util.Map#values()
+     */
     public Collection<Long> values() {
         return uuidSnomedMap.values();
     }
 
+    /**
+     * Write.
+     *
+     * @param f the f
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public void write(File f) throws IOException {
         BufferedWriter bw = new BufferedWriter(new FileWriter(f));
 
@@ -145,6 +212,13 @@ public class UuidSnomedFixedMap implements Map<UUID, Long> {
         bw.close();
     }
 
+    /**
+     * Read.
+     *
+     * @param f the f
+     * @return the uuid snomed fixed map
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public static UuidSnomedFixedMap read(File f) throws IOException {
         UuidSnomedFixedMap map = new UuidSnomedFixedMap();
         readData(f, map);
@@ -159,12 +233,29 @@ public class UuidSnomedFixedMap implements Map<UUID, Long> {
      * }
      */
 
+    /**
+     * Read.
+     *
+     * @param f the f
+     * @param namespace the namespace
+     * @param project the project
+     * @return the uuid snomed fixed map
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public static UuidSnomedFixedMap read(File f, int namespace, int project) throws IOException {
         UuidSnomedFixedMap map = new UuidSnomedFixedMap();
         readData(f, map);
         return map;
     }
 
+    /**
+     * Read data.
+     *
+     * @param f the f
+     * @param map the map
+     * @throws FileNotFoundException the file not found exception
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private static void readData(File f, UuidSnomedFixedMap map) throws FileNotFoundException, IOException {
         System.out.println("Reading map file: " + f.getAbsolutePath());
         BufferedReader br = new BufferedReader(new FileReader(f));

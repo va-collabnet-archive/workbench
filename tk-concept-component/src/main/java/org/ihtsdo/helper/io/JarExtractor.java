@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2009 International Health Terminology Standards Development
+ * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,12 +26,24 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class JarExtractor.
+ */
 public class JarExtractor {
 
+    /**
+     * The Enum READ_TYPE.
+     */
     private enum READ_TYPE {
-        JAR_FILE, JAR_INPUT_STREAM
+        
+        /** The jar file. */
+        JAR_FILE, 
+ /** The jar input stream. */
+ JAR_INPUT_STREAM
     };
 
+    /** The read type. */
     private static READ_TYPE readType = READ_TYPE.JAR_INPUT_STREAM;
 
     /**
@@ -50,7 +62,10 @@ public class JarExtractor {
      * 
      * For now, using JarInputStream bypasses the memory mapped issues with
      * JarFile, but may be worse performance.
-     * 
+     *
+     * @param source the source
+     * @param destDir the dest dir
+     * @throws IOException Signals that an I/O exception has occurred.
      */
 
     public static void execute(File source, File destDir) throws IOException {
@@ -67,6 +82,13 @@ public class JarExtractor {
 
     }
 
+    /**
+     * Execute jar file.
+     *
+     * @param source the source
+     * @param destDir the dest dir
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private static void executeJarFile(File source, File destDir) throws IOException {
         destDir.mkdirs();
         JarFile jf = new JarFile(source);
@@ -96,6 +118,13 @@ public class JarExtractor {
         }
     }
 
+    /**
+     * Execute jar input stream.
+     *
+     * @param source the source
+     * @param destDir the dest dir
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private static void executeJarInputStream(File source, File destDir) throws IOException {
         destDir.mkdirs();
         FileInputStream fis = new FileInputStream(source);

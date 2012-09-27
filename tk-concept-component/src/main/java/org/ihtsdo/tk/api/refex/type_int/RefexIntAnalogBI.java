@@ -1,12 +1,13 @@
-/*
- * Copyright 2010 International Health Terminology Standards Development Organisation.
- *
+/**
+ * Copyright (c) 2012 International Health Terminology Standards Development
+ * Organisation
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,13 +20,22 @@ package org.ihtsdo.tk.api.refex.type_int;
 import java.beans.PropertyVetoException;
 import org.ihtsdo.tk.api.refex.RefexAnalogBI;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Interface RefexIntAnalogBI.
  *
+ * @param <A> the generic type
  * @author kec
  */
 public interface RefexIntAnalogBI<A extends RefexIntAnalogBI<A>> extends 
 	RefexAnalogBI<A>, RefexIntVersionBI<A> {
     
+     /**
+      * Sets the int1.
+      *
+      * @param int1 the new int1
+      * @throws PropertyVetoException the property veto exception
+      */
      void setInt1(int int1) throws PropertyVetoException;
 
 }

@@ -1,12 +1,13 @@
-/*
- * Copyright 2011 International Health Terminology Standards Development Organisation.
- *
+/**
+ * Copyright (c) 2012 International Health Terminology Standards Development
+ * Organisation
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -47,19 +48,37 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class UuidDupReporter.
  *
  * @author kec
  */
 public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
+   
+   /** The count. */
    private AtomicInteger                         count = new AtomicInteger(0);
+   
+   /** The dots. */
    private AtomicInteger                         dots  = new AtomicInteger(0);
+   
+   /** The dup map. */
    ConcurrentHashMap<UUID, Collection<DupEntry>> dupMap;
+   
+   /** The dup uuids. */
    ConcurrentSkipListSet<UUID>                   dupUuids;
+   
+   /** The nidset. */
    private NidBitSetBI                           nidset;
 
    //~--- constructors --------------------------------------------------------
 
+   /**
+    * Instantiates a new uuid dup reporter.
+    *
+    * @param dupUuids the dup uuids
+    * @throws IOException Signals that an I/O exception has occurred.
+    */
    public UuidDupReporter(ConcurrentSkipListSet<UUID> dupUuids) throws IOException {
       this.dupUuids = dupUuids;
       dupMap        = new ConcurrentHashMap<UUID, Collection<DupEntry>>(dupUuids.size());
@@ -73,6 +92,12 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
 
    //~--- methods -------------------------------------------------------------
 
+   /**
+    * Adds the if dup.
+    *
+    * @param component the component
+    * @throws IOException Signals that an I/O exception has occurred.
+    */
    private void addIfDup(ComponentChronicleBI component) throws IOException {
       UUID primUuid = component.getPrimUuid();
 
@@ -95,11 +120,20 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
       }
    }
 
+   /* (non-Javadoc)
+    * @see org.ihtsdo.tk.api.ContinuationTrackerBI#continueWork()
+    */
    @Override
    public boolean continueWork() {
       return true;
    }
 
+   /**
+    * Process concept.
+    *
+    * @param concept the concept
+    * @throws IOException Signals that an I/O exception has occurred.
+    */
    private void processConcept(ConceptChronicleBI concept) throws IOException {
 
       // add prim uuids to list
@@ -128,6 +162,9 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
       }
    }
 
+   /* (non-Javadoc)
+    * @see org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI#processUnfetchedConceptData(int, org.ihtsdo.tk.api.ConceptFetcherBI)
+    */
    @Override
    public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fetcher) throws Exception {
       count.incrementAndGet();
@@ -147,6 +184,9 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
       processConcept(fetcher.fetch());
    }
 
+   /**
+    * Report dup classes.
+    */
    public void reportDupClasses() {
       int         printCount  = 0;
       Set<DupSet> dupClassSet = new HashSet<DupSet>();
@@ -176,6 +216,9 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
 
    //~--- get methods ---------------------------------------------------------
 
+   /* (non-Javadoc)
+    * @see org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI#getNidSet()
+    */
    @Override
    public NidBitSetBI getNidSet() throws IOException {
       return nidset;
@@ -183,12 +226,25 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
 
    //~--- inner classes -------------------------------------------------------
 
+   /**
+    * The Class DupEntry.
+    */
    private static class DupEntry {
+      
+      /** The dup. */
       ComponentChronicleBI dup;
+      
+      /** The enclosing concept. */
       ConceptChronicleBI   enclosingConcept;
 
       //~--- constructors -----------------------------------------------------
 
+      /**
+       * Instantiates a new dup entry.
+       *
+       * @param dup the dup
+       * @param enclosingConcept the enclosing concept
+       */
       public DupEntry(ComponentChronicleBI dup, ConceptChronicleBI enclosingConcept) {
          this.dup              = dup;
          this.enclosingConcept = enclosingConcept;
@@ -196,11 +252,21 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
    }
 
 
+   /**
+    * The Class DupSet.
+    */
    private static class DupSet implements Comparable<DupSet> {
+      
+      /** The dups. */
       ArrayList<Class<?>> dups;
 
       //~--- constructors -----------------------------------------------------
 
+      /**
+       * Instantiates a new dup set.
+       *
+       * @param classes the classes
+       */
       public DupSet(Class<?>... classes) {
          Arrays.sort(classes, new Comparator<Class<?>>() {
             @Override
@@ -221,6 +287,9 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
 
       //~--- methods ----------------------------------------------------------
 
+      /* (non-Javadoc)
+       * @see java.lang.Comparable#compareTo(java.lang.Object)
+       */
       @Override
       public int compareTo(DupSet o) {
          if (dups.size() != o.dups.size()) {
@@ -238,6 +307,9 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
          return 0;
       }
 
+      /* (non-Javadoc)
+       * @see java.lang.Object#equals(java.lang.Object)
+       */
       @Override
       public boolean equals(Object obj) {
          if (obj instanceof DupSet) {
@@ -247,11 +319,17 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
          return false;
       }
 
+      /* (non-Javadoc)
+       * @see java.lang.Object#hashCode()
+       */
       @Override
       public int hashCode() {
          return dups.hashCode();
       }
 
+      /* (non-Javadoc)
+       * @see java.lang.Object#toString()
+       */
       @Override
       public String toString() {
          return dups.toString();

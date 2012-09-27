@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2012 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.tk.dto.concept.component.relationship;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -20,26 +36,58 @@ import java.io.IOException;
 import java.util.*;
 import org.ihtsdo.tk.dto.RevisionHandling;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class TkRelationship.
+ */
 public class TkRelationship extends TkComponent<TkRelationshipRevision> implements I_RelateExternally {
 
+    /** The Constant serialVersionUID. */
     public static final long serialVersionUID = 1;
     //~--- fields --------------------------------------------------------------
+    /** The c1 uuid. */
     public UUID c1Uuid;
+    
+    /** The c2 uuid. */
     public UUID c2Uuid;
+    
+    /** The characteristic uuid. */
     public UUID characteristicUuid;
+    
+    /** The refinability uuid. */
     public UUID refinabilityUuid;
+    
+    /** The rel group. */
     public int relGroup;
+    
+    /** The type uuid. */
     public UUID typeUuid;
 
     //~--- constructors --------------------------------------------------------
+    /**
+     * Instantiates a new tk relationship.
+     */
     public TkRelationship() {
         super();
     }
 
+    /**
+     * Instantiates a new tk relationship.
+     *
+     * @param relationshipChronicle the relationship chronicle
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public TkRelationship(RelationshipChronicleBI relationshipChronicle) throws IOException {
         this(relationshipChronicle.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
     }
 
+    /**
+     * Instantiates a new tk relationship.
+     *
+     * @param relationshipVersion the relationship version
+     * @param revisionHandling the revision handling
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public TkRelationship(RelationshipVersionBI relationshipVersion,
             RevisionHandling revisionHandling) throws IOException {
         super(relationshipVersion.getPrimordialVersion());
@@ -81,11 +129,27 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
         }
     }
 
+    /**
+     * Instantiates a new tk relationship.
+     *
+     * @param in the in
+     * @param dataVersion the data version
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ClassNotFoundException the class not found exception
+     */
     public TkRelationship(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
         readExternal(in, dataVersion);
     }
 
+    /**
+     * Instantiates a new tk relationship.
+     *
+     * @param another the another
+     * @param conversionMap the conversion map
+     * @param offset the offset
+     * @param mapAll the map all
+     */
     public TkRelationship(TkRelationship another, Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
         super(another, conversionMap, offset, mapAll);
 
@@ -106,6 +170,18 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
         }
     }
 
+    /**
+     * Instantiates a new tk relationship.
+     *
+     * @param relationshipVersion the relationship version
+     * @param excludedNids the excluded nids
+     * @param conversionMap the conversion map
+     * @param offset the offset
+     * @param mapAll the map all
+     * @param viewCoordinate the view coordinate
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ContradictionException the contradiction exception
+     */
     public TkRelationship(RelationshipVersionBI relationshipVersion, NidBitSetBI excludedNids,
             Map<UUID, UUID> conversionMap, long offset, boolean mapAll, ViewCoordinate viewCoordinate)
             throws IOException, ContradictionException {
@@ -139,7 +215,7 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
      * as this <tt>ERelationship</tt>.
      *
      * @param obj the object to compare with.
-     * @return
+     * @return true, if successful
      * <code>true</code> if the objects are the same;
      * <code>false</code> otherwise.
      */
@@ -203,11 +279,17 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
         return this.primordialUuid.hashCode();
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.dto.concept.component.TkRevision#makeConversion(java.util.Map, long, boolean)
+     */
     @Override
     public TkRelationship makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
         return new TkRelationship(this, conversionMap, offset, mapAll);
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.dto.concept.component.TkComponent#readExternal(java.io.DataInput, int)
+     */
     @Override
     public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super.readExternal(in, dataVersion);
@@ -231,6 +313,8 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
 
     /**
      * Returns a string representation of the object.
+     *
+     * @return the string
      */
     @Override
     public String toString() {
@@ -255,6 +339,9 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
         return buff.toString();
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.dto.concept.component.TkComponent#writeExternal(java.io.DataOutput)
+     */
     @Override
     public void writeExternal(DataOutput out) throws IOException {
         super.writeExternal(out);
@@ -325,6 +412,9 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
         return relGroup;
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.dto.concept.component.TkComponent#getRevisionList()
+     */
     @Override
     public List<TkRelationshipRevision> getRevisionList() {
         return revisions;
@@ -339,26 +429,56 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
     }
 
     //~--- set methods ---------------------------------------------------------
+    /**
+     * Sets the c1 uuid.
+     *
+     * @param c1Uuid the new c1 uuid
+     */
     public void setC1Uuid(UUID c1Uuid) {
         this.c1Uuid = c1Uuid;
     }
 
+    /**
+     * Sets the c2 uuid.
+     *
+     * @param c2Uuid the new c2 uuid
+     */
     public void setC2Uuid(UUID c2Uuid) {
         this.c2Uuid = c2Uuid;
     }
 
+    /**
+     * Sets the characteristic uuid.
+     *
+     * @param characteristicUuid the new characteristic uuid
+     */
     public void setCharacteristicUuid(UUID characteristicUuid) {
         this.characteristicUuid = characteristicUuid;
     }
 
+    /**
+     * Sets the refinability uuid.
+     *
+     * @param refinabilityUuid the new refinability uuid
+     */
     public void setRefinabilityUuid(UUID refinabilityUuid) {
         this.refinabilityUuid = refinabilityUuid;
     }
 
+    /**
+     * Sets the rel group.
+     *
+     * @param relGroup the new rel group
+     */
     public void setRelGroup(int relGroup) {
         this.relGroup = relGroup;
     }
 
+    /**
+     * Sets the type uuid.
+     *
+     * @param typeUuid the new type uuid
+     */
     public void setTypeUuid(UUID typeUuid) {
         this.typeUuid = typeUuid;
     }

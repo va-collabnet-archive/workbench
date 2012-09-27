@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2009 International Health Terminology Standards Development
+ * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,27 +36,51 @@ import java.util.UUID;
 
 import org.ihtsdo.helper.transform.SctIdGenerator.TYPE;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class UuidSnomedMap.
+ */
 public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
 
+    /** The now. */
     private static Calendar now = Calendar.getInstance();
+    
+    /** The modified. */
     private boolean modified = false;
 
+    /** The max sequence. */
     private long maxSequence = 0;
 
+    /** The uuid snomed map. */
     private Map<UUID, Long> uuidSnomedMap = new HashMap<UUID, Long>();
 
+    /** The fixed maps. */
     private List<Map<UUID, Long>> fixedMaps = new ArrayList<Map<UUID, Long>>();
+    
+    /** The effective date of sct id. */
     private Map<Long, String> effectiveDateOfSctId = new HashMap<Long, String>();
 
+    /** The namespace id. */
     private int namespaceId;
+    
+    /** The project id. */
     private int projectId;
 
+    /**
+     * Instantiates a new uuid snomed map.
+     *
+     * @param projectId the project id
+     * @param namespaceId the namespace id
+     */
     private UuidSnomedMap(int projectId, int namespaceId) {
         super();
         this.projectId = projectId;
         this.namespaceId = namespaceId;
     }
 
+    /**
+     * Instantiates a new uuid snomed map.
+     */
     private UuidSnomedMap() {
         super();
     }
@@ -123,6 +147,9 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
         return uuidSnomedMap.entrySet();
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
     public boolean equals(Object obj) {
         return uuidSnomedMap.equals(obj);
     }
@@ -140,6 +167,7 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
         return uuidSnomedMap.get(key);
     }
 
+    /** The max sct id. */
     private static long MAX_SCT_ID = 999999999999999999L;
 
     /*
@@ -164,6 +192,9 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
         return returnValue;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
     public int hashCode() {
         return uuidSnomedMap.hashCode();
     }
@@ -184,6 +215,13 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
         return uuidSnomedMap.keySet();
     }
 
+    /**
+     * Gets the sequence.
+     *
+     * @param sctId the sct id
+     * @return the sequence
+     * @throws StringIndexOutOfBoundsException the string index out of bounds exception
+     */
     private static long getSequence(Long sctId) throws StringIndexOutOfBoundsException {
         String sctIdStr = sctId.toString();
         String sequence = sctIdStr.substring(0, sctIdStr.length() - "011000036106".length());
@@ -295,6 +333,13 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
         }
     }
 
+    /**
+     * Read.
+     *
+     * @param f the f
+     * @return the uuid snomed map
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public static UuidSnomedMap read(File f) throws IOException {
         UuidSnomedMap map = new UuidSnomedMap();
         readData(f, map);
@@ -302,6 +347,15 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
         return map;
     }
 
+    /**
+     * Read.
+     *
+     * @param f the f
+     * @param namespaceId the namespace id
+     * @param projectId the project id
+     * @return the uuid snomed map
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public static UuidSnomedMap read(File f, int namespaceId, int projectId) throws IOException {
         UuidSnomedMap map = new UuidSnomedMap(projectId, namespaceId);
         readData(f, map);
@@ -309,6 +363,14 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
         return map;
     }
 
+    /**
+     * Read data.
+     *
+     * @param f the f
+     * @param map the map
+     * @throws FileNotFoundException the file not found exception
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private static void readData(File f, UuidSnomedMap map) throws FileNotFoundException, IOException {
         System.out.println("Reading map file: " + f.getAbsolutePath());
         BufferedReader br = new BufferedReader(new FileReader(f));
@@ -360,6 +422,11 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
         return effectiveDateOfSctId.get(sctId);
     }
 
+    /**
+     * Gets the current effective date.
+     *
+     * @return the current effective date
+     */
     public static String getCurrentEffectiveDate() {
         int month = now.get(Calendar.MONTH);
         month++;
@@ -377,10 +444,20 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
 
     }
 
+    /**
+     * Gets the namespace id.
+     *
+     * @return the namespace id
+     */
     public int getNamespaceId() {
         return namespaceId;
     }
 
+    /**
+     * Sets the namespace id.
+     *
+     * @param namespaceId the new namespace id
+     */
     public void setNamespaceId(int namespaceId) {
         this.namespaceId = namespaceId;
     }

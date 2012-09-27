@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2009 International Health Terminology Standards Development
+ * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 
+// TODO: Auto-generated Javadoc
 /**
  * Implements the original ACE conflict resolution strategy. This is also used
  * as the default
@@ -40,8 +41,12 @@ import org.ihtsdo.tk.api.ComponentVersionBI;
  */
 public class IdentifyAllContradictionStrategy extends ContradictionManagementStrategy implements Serializable {
 
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.ContradictionManagerBI#getDescription()
+     */
     @Override
     public String getDescription() {
         return "<html>This resolution strategy has two main characteristics"
@@ -50,16 +55,25 @@ public class IdentifyAllContradictionStrategy extends ContradictionManagementStr
             + "This strategy is useful for expert users or for independant authoring.</html>";
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.ContradictionManagerBI#getDisplayName()
+     */
     @Override
     public String getDisplayName() {
         return "Identify all conflicts";
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.ContradictionManagerBI#resolveVersions(java.util.List)
+     */
     @Override
     public <T extends ComponentVersionBI> List<T> resolveVersions(List<T> versions) {
         return versions;
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.ContradictionManagerBI#resolveVersions(org.ihtsdo.tk.api.ComponentVersionBI, org.ihtsdo.tk.api.ComponentVersionBI)
+     */
     @Override
     public <T extends ComponentVersionBI> List<T> resolveVersions(T part1, T part2) {
         ArrayList<T> values = new ArrayList();

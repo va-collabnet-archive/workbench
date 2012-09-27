@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2009 International Health Terminology Standards Development
+ * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,9 +22,18 @@ package org.ihtsdo.tk.api.contradiction;
 import java.util.Comparator;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class PartDateOrderSortComparator.
+ */
 class PartDateOrderSortComparator implements Comparator<ComponentVersionBI> {
+    
+    /** The reverse order. */
     private boolean reverseOrder = false;
 
+    /* (non-Javadoc)
+     * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+     */
     @Override
     public int compare(ComponentVersionBI componentVersion1, ComponentVersionBI componentVersion2) {
         if (reverseOrder) {
@@ -44,6 +53,11 @@ class PartDateOrderSortComparator implements Comparator<ComponentVersionBI> {
         }
     }
 
+    /**
+     * Instantiates a new part date order sort comparator.
+     *
+     * @param reverseOrder the reverse order
+     */
     public PartDateOrderSortComparator(boolean reverseOrder) {
         super();
         this.reverseOrder = reverseOrder;

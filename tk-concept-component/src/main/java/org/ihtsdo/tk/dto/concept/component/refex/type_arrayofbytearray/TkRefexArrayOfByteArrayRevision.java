@@ -1,12 +1,13 @@
-/*
- * Copyright 2011 International Health Terminology Standards Development Organisation.
- *
+/**
+ * Copyright (c) 2012 International Health Terminology Standards Development
+ * Organisation
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,33 +25,63 @@ import java.util.UUID;
 import org.ihtsdo.tk.api.refex.type_array_of_bytearray.RefexArrayOfBytearrayVersionBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class TkRefexArrayOfByteArrayRevision.
  *
  * @author kec
  */
 public class TkRefexArrayOfByteArrayRevision extends TkRevision {
+   
+   /** The Constant serialVersionUID. */
    public static final long serialVersionUID = 1;
 
    //~--- fields --------------------------------------------------------------
 
+   /** The array of byte array1. */
    public byte[][] arrayOfByteArray1;
 
    //~--- constructors --------------------------------------------------------
 
+   /**
+    * Instantiates a new tk refex array of byte array revision.
+    */
    public TkRefexArrayOfByteArrayRevision() {
       super();
    }
 
+   /**
+    * Instantiates a new tk refex array of byte array revision.
+    *
+    * @param refexArrayOfBytearrayVersion the refex array of bytearray version
+    * @throws IOException Signals that an I/O exception has occurred.
+    */
    public TkRefexArrayOfByteArrayRevision(RefexArrayOfBytearrayVersionBI refexArrayOfBytearrayVersion) throws IOException {
       super(refexArrayOfBytearrayVersion);
       this.arrayOfByteArray1 = refexArrayOfBytearrayVersion.getArrayOfByteArray();
    }
 
+   /**
+    * Instantiates a new tk refex array of byte array revision.
+    *
+    * @param in the in
+    * @param dataVersion the data version
+    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws ClassNotFoundException the class not found exception
+    */
    public TkRefexArrayOfByteArrayRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       super();
       readExternal(in, dataVersion);
    }
 
+   /**
+    * Instantiates a new tk refex array of byte array revision.
+    *
+    * @param another the another
+    * @param conversionMap the conversion map
+    * @param offset the offset
+    * @param mapAll the map all
+    */
    public TkRefexArrayOfByteArrayRevision(TkRefexArrayOfByteArrayRevision another, Map<UUID, UUID> conversionMap, long offset,
                                boolean mapAll) {
       super(another, conversionMap, offset, mapAll);
@@ -92,16 +123,25 @@ public class TkRefexArrayOfByteArrayRevision extends TkRevision {
       return false;
    }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.dto.concept.component.TkRevision#hashCode()
+     */
     @Override
     public int hashCode() {
         return super.hashCode();
     }
 
+   /* (non-Javadoc)
+    * @see org.ihtsdo.tk.dto.concept.component.TkRevision#makeConversion(java.util.Map, long, boolean)
+    */
    @Override
    public TkRefexArrayOfByteArrayRevision makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
       return new TkRefexArrayOfByteArrayRevision(this, conversionMap, offset, mapAll);
    }
 
+   /* (non-Javadoc)
+    * @see org.ihtsdo.tk.dto.concept.component.TkRevision#readExternal(java.io.DataInput, int)
+    */
    @Override
    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       super.readExternal(in, dataVersion);
@@ -116,6 +156,8 @@ public class TkRefexArrayOfByteArrayRevision extends TkRevision {
 
    /**
     * Returns a string representation of the object.
+    *
+    * @return the string
     */
    @Override
    public String toString() {
@@ -135,6 +177,9 @@ public class TkRefexArrayOfByteArrayRevision extends TkRevision {
       return buff.toString();
    }
 
+   /* (non-Javadoc)
+    * @see org.ihtsdo.tk.dto.concept.component.TkRevision#writeExternal(java.io.DataOutput)
+    */
    @Override
    public void writeExternal(DataOutput out) throws IOException {
       super.writeExternal(out);
@@ -145,10 +190,20 @@ public class TkRefexArrayOfByteArrayRevision extends TkRevision {
       }
    }
 
+    /**
+     * Gets the array of byte array1.
+     *
+     * @return the array of byte array1
+     */
     public byte[][] getArrayOfByteArray1() {
         return arrayOfByteArray1;
     }
 
+    /**
+     * Sets the array of byte array1.
+     *
+     * @param byteArray1 the new array of byte array1
+     */
     public void setArrayOfByteArray1(byte[][] byteArray1) {
         this.arrayOfByteArray1 = byteArray1;
     }

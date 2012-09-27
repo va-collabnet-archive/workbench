@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2012 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.tk.dto.concept.component.refex;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -19,31 +35,67 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class TkRefexAbstractMember.
+ *
+ * @param <V> the value type
+ */
 public abstract class TkRefexAbstractMember<V extends TkRevision> extends TkComponent<V> {
+   
+   /** The Constant serialVersionUID. */
    public static final long serialVersionUID = 1;
 
    //~--- fields --------------------------------------------------------------
 
+   /** The component uuid. */
    public UUID componentUuid;
+   
+   /** The refset uuid. */
    public UUID refsetUuid;
 
    //~--- constructors --------------------------------------------------------
 
+   /**
+    * Instantiates a new tk refex abstract member.
+    */
    public TkRefexAbstractMember() {
       super();
    }
 
+   /**
+    * Instantiates a new tk refex abstract member.
+    *
+    * @param refexVersion the refex version
+    * @throws IOException Signals that an I/O exception has occurred.
+    */
    public TkRefexAbstractMember(RefexVersionBI refexVersion) throws IOException {
       super(refexVersion);
       this.componentUuid = Ts.get().getComponent(refexVersion.getReferencedComponentNid()).getPrimUuid();
       this.refsetUuid    = Ts.get().getComponent(refexVersion.getRefexNid()).getPrimUuid();
    }
 
+   /**
+    * Instantiates a new tk refex abstract member.
+    *
+    * @param in the in
+    * @param dataVersion the data version
+    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws ClassNotFoundException the class not found exception
+    */
    public TkRefexAbstractMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       super();
       readExternal(in, dataVersion);
    }
 
+   /**
+    * Instantiates a new tk refex abstract member.
+    *
+    * @param another the another
+    * @param conversionMap the conversion map
+    * @param offset the offset
+    * @param mapAll the map all
+    */
    public TkRefexAbstractMember(TkRefexAbstractMember another, Map<UUID, UUID> conversionMap, long offset,
                                  boolean mapAll) {
       super(another, conversionMap, offset, mapAll);
@@ -57,6 +109,18 @@ public abstract class TkRefexAbstractMember<V extends TkRevision> extends TkComp
       }
    }
 
+   /**
+    * Instantiates a new tk refex abstract member.
+    *
+    * @param refexVersion the refex version
+    * @param excludedNids the excluded nids
+    * @param conversionMap the conversion map
+    * @param offset the offset
+    * @param mapAll the map all
+    * @param viewCoordinate the view coordinate
+    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws ContradictionException the contradiction exception
+    */
    public TkRefexAbstractMember(RefexVersionBI refexVersion, NidBitSetBI excludedNids,
                                  Map<UUID, UUID> conversionMap, long offset, boolean mapAll,
                                  ViewCoordinate viewCoordinate)
@@ -124,6 +188,9 @@ public abstract class TkRefexAbstractMember<V extends TkRevision> extends TkComp
       return this.primordialUuid.hashCode();
    }
 
+   /* (non-Javadoc)
+    * @see org.ihtsdo.tk.dto.concept.component.TkComponent#readExternal(java.io.DataInput, int)
+    */
    @Override
    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       super.readExternal(in, dataVersion);
@@ -133,6 +200,8 @@ public abstract class TkRefexAbstractMember<V extends TkRevision> extends TkComp
 
    /**
     * Returns a string representation of the object.
+    *
+    * @return the string
     */
    @Override
    public String toString() {
@@ -148,6 +217,9 @@ public abstract class TkRefexAbstractMember<V extends TkRevision> extends TkComp
       return buff.toString();
    }
 
+   /* (non-Javadoc)
+    * @see org.ihtsdo.tk.dto.concept.component.TkComponent#writeExternal(java.io.DataOutput)
+    */
    @Override
    public void writeExternal(DataOutput out) throws IOException {
       super.writeExternal(out);
@@ -159,22 +231,47 @@ public abstract class TkRefexAbstractMember<V extends TkRevision> extends TkComp
 
    //~--- get methods ---------------------------------------------------------
 
+   /**
+    * Gets the component uuid.
+    *
+    * @return the component uuid
+    */
    public UUID getComponentUuid() {
       return componentUuid;
    }
 
+   /**
+    * Gets the refex uuid.
+    *
+    * @return the refex uuid
+    */
    public UUID getRefexUuid() {
       return refsetUuid;
    }
 
+   /**
+    * Gets the type.
+    *
+    * @return the type
+    */
    public abstract TK_REFEX_TYPE getType();
 
    //~--- set methods ---------------------------------------------------------
 
+   /**
+    * Sets the component uuid.
+    *
+    * @param componentUuid the new component uuid
+    */
    public void setComponentUuid(UUID componentUuid) {
       this.componentUuid = componentUuid;
    }
 
+   /**
+    * Sets the refset uuid.
+    *
+    * @param refsetUuid the new refset uuid
+    */
    public void setRefsetUuid(UUID refsetUuid) {
       this.refsetUuid = refsetUuid;
    }

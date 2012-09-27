@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2012 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.tk.dto.concept.component.refex.type_int;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -19,21 +35,43 @@ import java.util.*;
 import org.ihtsdo.tk.dto.RevisionHandling;
 import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_string.TkRefexUuidStringRevision;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class TkRefexIntMember.
+ */
 public class TkRefexIntMember extends TkRefexAbstractMember<TkRefexIntRevision> {
 
+    /** The Constant serialVersionUID. */
     public static final long serialVersionUID = 1;
     //~--- fields --------------------------------------------------------------
+    /** The int1. */
     public int int1;
 
     //~--- constructors --------------------------------------------------------
+    /**
+     * Instantiates a new tk refex int member.
+     */
     public TkRefexIntMember() {
         super();
     }
 
+    /**
+     * Instantiates a new tk refex int member.
+     *
+     * @param refexChronicle the refex chronicle
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public TkRefexIntMember(RefexChronicleBI refexChronicle) throws IOException {
         this((RefexIntVersionBI) refexChronicle.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
     }
 
+    /**
+     * Instantiates a new tk refex int member.
+     *
+     * @param refexIntVersion the refex int version
+     * @param revisionHandling the revision handling
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public TkRefexIntMember(RefexIntVersionBI refexIntVersion,
             RevisionHandling revisionHandling) throws IOException {
         super(refexIntVersion);
@@ -64,17 +102,45 @@ public class TkRefexIntMember extends TkRefexAbstractMember<TkRefexIntRevision> 
         }
     }
 
+    /**
+     * Instantiates a new tk refex int member.
+     *
+     * @param in the in
+     * @param dataVersion the data version
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ClassNotFoundException the class not found exception
+     */
     public TkRefexIntMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
         readExternal(in, dataVersion);
     }
 
+    /**
+     * Instantiates a new tk refex int member.
+     *
+     * @param another the another
+     * @param conversionMap the conversion map
+     * @param offset the offset
+     * @param mapAll the map all
+     */
     public TkRefexIntMember(TkRefexIntMember another, Map<UUID, UUID> conversionMap, long offset,
             boolean mapAll) {
         super(another, conversionMap, offset, mapAll);
         this.int1 = another.int1;
     }
 
+    /**
+     * Instantiates a new tk refex int member.
+     *
+     * @param refexIntVersion the refex int version
+     * @param excludedNids the excluded nids
+     * @param conversionMap the conversion map
+     * @param offset the offset
+     * @param mapAll the map all
+     * @param viewCoordinate the view coordinate
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ContradictionException the contradiction exception
+     */
     public TkRefexIntMember(RefexIntVersionBI refexIntVersion, NidBitSetBI excludedNids, Map<UUID, UUID> conversionMap,
             long offset, boolean mapAll, ViewCoordinate viewCoordinate)
             throws IOException, ContradictionException {
@@ -89,7 +155,7 @@ public class TkRefexIntMember extends TkRefexAbstractMember<TkRefexIntRevision> 
      * field, as this <tt>ERefsetIntMember</tt>.
      *
      * @param obj the object to compare with.
-     * @return
+     * @return true, if successful
      * <code>true</code> if the objects are the same;
      * <code>false</code> otherwise.
      */
@@ -139,11 +205,17 @@ public class TkRefexIntMember extends TkRefexAbstractMember<TkRefexIntRevision> 
         return this.primordialUuid.hashCode();
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.dto.concept.component.TkRevision#makeConversion(java.util.Map, long, boolean)
+     */
     @Override
     public TkRefexIntMember makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
         return new TkRefexIntMember(this, conversionMap, offset, mapAll);
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember#readExternal(java.io.DataInput, int)
+     */
     @Override
     public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super.readExternal(in, dataVersion);
@@ -168,6 +240,8 @@ public class TkRefexIntMember extends TkRefexAbstractMember<TkRefexIntRevision> 
 
     /**
      * Returns a string representation of the object.
+     *
+     * @return the string
      */
     @Override
     public String toString() {
@@ -182,6 +256,9 @@ public class TkRefexIntMember extends TkRefexAbstractMember<TkRefexIntRevision> 
         return buff.toString();
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember#writeExternal(java.io.DataOutput)
+     */
     @Override
     public void writeExternal(DataOutput out) throws IOException {
         super.writeExternal(out);
@@ -199,21 +276,37 @@ public class TkRefexIntMember extends TkRefexAbstractMember<TkRefexIntRevision> 
     }
 
     //~--- get methods ---------------------------------------------------------
+    /**
+     * Gets the int1.
+     *
+     * @return the int1
+     */
     public int getInt1() {
         return int1;
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.dto.concept.component.TkComponent#getRevisionList()
+     */
     @Override
     public List<TkRefexIntRevision> getRevisionList() {
         return revisions;
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember#getType()
+     */
     @Override
     public TK_REFEX_TYPE getType() {
         return TK_REFEX_TYPE.INT;
     }
 
     //~--- set methods ---------------------------------------------------------
+    /**
+     * Sets the int1.
+     *
+     * @param int1 the new int1
+     */
     public void setInt1(int int1) {
         this.int1 = int1;
     }

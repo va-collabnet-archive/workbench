@@ -1,12 +1,13 @@
-/*
- * Copyright 2011 International Health Terminology Standards Development Organisation.
- *
+/**
+ * Copyright (c) 2012 International Health Terminology Standards Development
+ * Organisation
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -51,47 +52,129 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.uuid.UuidT5Generator;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class Rf2Export.
  *
  * @author kec
  */
 public class Rf2Export implements ProcessUnfetchedConceptDataBI {
 
+    /** The concepts to process. */
     NidBitSetBI conceptsToProcess;
+    
+    /** The concepts writer. */
     Writer conceptsWriter;
+    
+    /** The country. */
     COUNTRY_CODE country;
+    
+    /** The descriptions writer. */
     Writer descriptionsWriter;
+    
+    /** The effective date. */
     Date effectiveDate;
+    
+    /** The effective date string. */
     String effectiveDateString;
+    
+    /** The identifiers writer. */
     Writer identifiersWriter;
+    
+    /** The public identifiers writer. */
     Writer publicIdentifiersWriter;
+    
+    /** The language. */
     LANG_CODE language;
+    
+    /** The namespace. */
     String namespace;
+    
+    /** The module. */
     String module;
+    
+    /** The relationships writer. */
     Writer relationshipsWriter;
+    
+    /** The relationships stated writer. */
     Writer relationshipsStatedWriter;
+    
+    /** The release type. */
     ReleaseType releaseType;
+    
+    /** The sap nids. */
     Set<Integer> sapNids;
+    
+    /** The store. */
     TerminologyStoreDI store;
+    
+    /** The vc. */
     ViewCoordinate vc;
+    
+    /** The lang refsets writer. */
     Writer langRefsetsWriter;
+    
+    /** The other lang refsets writer. */
     Writer otherLangRefsetsWriter;
+    
+    /** The mod depend writer. */
     Writer modDependWriter;
+    
+    /** The desc type writer. */
     Writer descTypeWriter;
+    
+    /** The refset desc writer. */
     Writer refsetDescWriter;
+    
+    /** The excluded refset ids. */
     Set<Integer> excludedRefsetIds;
+    
+    /** The uuid id scheme. */
     ConceptSpec uuidIdScheme = new ConceptSpec("SNOMED CT universally unique identifier (core metadata concept)",
             UUID.fromString("680f3f6c-7a2a-365d-b527-8c9a96dd1a94"));
+    
+    /** The lang refex nids. */
     Set<Integer> langRefexNids = new HashSet<Integer>();
+    
+    /** The desc types. */
     Set<ConceptSpec> descTypes = new HashSet<ConceptSpec>();
+    
+    /** The new vc. */
     ViewCoordinate newVc;
+    
+    /** The parent cv. */
     ConceptVersionBI parentCv;
+    
+    /** The refset desc namespace. */
     public static UUID REFSET_DESC_NAMESPACE = UUID.fromString("d1871eb0-8a47-11e1-b0c4-0800200c9a66");
+    
+    /** The module depend namespace. */
     public static UUID MODULE_DEPEND_NAMESPACE = UUID.fromString("d1871eb2-8a47-11e1-b0c4-0800200c9a66");
+    
+    /** The desc type namespace. */
     public static UUID DESC_TYPE_NAMESPACE = UUID.fromString("d1871eb3-8a47-11e1-b0c4-0800200c9a66");
+    
+    /** The make private id file. */
     boolean makePrivateIdFile;
 
     //~--- constructors --------------------------------------------------------
+    /**
+     * Instantiates a new rf2 export.
+     *
+     * @param directory the directory
+     * @param releaseType the release type
+     * @param language the language
+     * @param country the country
+     * @param namespace the namespace
+     * @param module the module
+     * @param effectiveDate the effective date
+     * @param sapNids the sap nids
+     * @param vc the vc
+     * @param excludedRefsetIds the excluded refset ids
+     * @param conceptsToProcess the concepts to process
+     * @param makePrivateIdFile the make private id file
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public Rf2Export(File directory, ReleaseType releaseType, LANG_CODE language, COUNTRY_CODE country,
             String namespace, String module, Date effectiveDate, Set<Integer> sapNids, ViewCoordinate vc,
             Set<Integer> excludedRefsetIds, NidBitSetBI conceptsToProcess, boolean makePrivateIdFile)
@@ -259,6 +342,11 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
     }
 
     //~--- methods -------------------------------------------------------------
+    /**
+     * Close.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public void close() throws IOException {
         if (conceptsWriter != null) {
             conceptsWriter.close();
@@ -306,11 +394,20 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.ContinuationTrackerBI#continueWork()
+     */
     @Override
     public boolean continueWork() {
         return true;
     }
 
+    /**
+     * Process.
+     *
+     * @param c the c
+     * @throws Exception the exception
+     */
     public void process(ConceptChronicleBI c) throws Exception {
         if (c.getPrimUuid().equals(UUID.fromString("568cd2a4-bcac-4cf7-a6af-29587639a354"))) {
             System.out.println(c);
@@ -341,6 +438,12 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         }
     }
 
+    /**
+     * Write one time files.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws NoSuchAlgorithmException the no such algorithm exception
+     */
     public void writeOneTimeFiles() throws IOException, NoSuchAlgorithmException {
 
         processModularDependency();
@@ -355,6 +458,12 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         }
     }
 
+    /**
+     * Process concept attribute.
+     *
+     * @param ca the ca
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void processConceptAttribute(ConceptAttributeChronicleBI ca) throws IOException {
         if (ca != null) {
             for (ConceptAttributeVersionBI car : ca.getVersions(vc)) {
@@ -393,6 +502,12 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         }
     }
 
+    /**
+     * Process description.
+     *
+     * @param desc the desc
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void processDescription(DescriptionChronicleBI desc) throws IOException {
         if (desc != null) {
             for (DescriptionVersionBI descr : desc.getVersions(vc)) {
@@ -453,6 +568,12 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         }
     }
 
+    /**
+     * Process relationship.
+     *
+     * @param r the r
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void processRelationship(RelationshipChronicleBI r) throws IOException {
         if (r != null) {
             for (RelationshipVersionBI rv : r.getVersions(vc)) {
@@ -469,6 +590,12 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         }
     }
 
+    /**
+     * Process inferred relationship.
+     *
+     * @param rv the rv
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void processInferredRelationship(RelationshipVersionBI rv) throws IOException {
         for (Rf2File.RelationshipsFileFields field : Rf2File.RelationshipsFileFields.values()) {
             switch (field) {
@@ -531,6 +658,12 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         }
     }
 
+    /**
+     * Process stated relationship.
+     *
+     * @param rv the rv
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void processStatedRelationship(RelationshipVersionBI rv) throws IOException {
         for (Rf2File.RelationshipsFileFields field : Rf2File.RelationshipsFileFields.values()) {
             switch (field) {
@@ -593,6 +726,13 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         }
     }
 
+    /**
+     * Process identifiers.
+     *
+     * @param primUuid the prim uuid
+     * @param primSapNid the prim sap nid
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void processIdentifiers(UUID primUuid, int primSapNid) throws IOException {
         if (primUuid != null) {
             if (sapNids.contains(primSapNid)) {
@@ -634,6 +774,12 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         }
     }
 
+    /**
+     * Process lang refsets.
+     *
+     * @param r the r
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void processLangRefsets(RefexChronicleBI r) throws IOException {
         if (r != null) {
             if (!excludedRefsetIds.contains(r.getRefexNid())) {
@@ -656,6 +802,12 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         }
     }
 
+    /**
+     * Process lang.
+     *
+     * @param rv the rv
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void processLang(RefexVersionBI rv) throws IOException {
         if (rv != null) {
             for (Rf2File.LanguageRefsetFileFields field : Rf2File.LanguageRefsetFileFields.values()) {
@@ -700,6 +852,12 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         }
     }
 
+    /**
+     * Process other lang.
+     *
+     * @param rv the rv
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void processOtherLang(RefexVersionBI rv) throws IOException {
        if (rv != null) {
             for (Rf2File.LanguageRefsetFileFields field : Rf2File.LanguageRefsetFileFields.values()) {
@@ -744,6 +902,13 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         }
     }
 
+    /**
+     * Process refset desc.
+     *
+     * @param refexNid the refex nid
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws NoSuchAlgorithmException the no such algorithm exception
+     */
     private void processRefsetDesc(int refexNid) throws IOException, NoSuchAlgorithmException {
         ConceptSpec refsetDescriptor = new ConceptSpec("Reference set descriptor reference set (foundation metadata concept)",
                 UUID.fromString("5ddff82f-5aee-3b16-893f-6b7aa726cc4b"));
@@ -805,6 +970,13 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         }
     }
     
+    /**
+     * Process refset desc attribute.
+     *
+     * @param refexNid the refex nid
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws NoSuchAlgorithmException the no such algorithm exception
+     */
     private void processRefsetDescAttribute (int refexNid) throws IOException, NoSuchAlgorithmException {
         ConceptSpec refsetDescriptor = new ConceptSpec("Reference set descriptor reference set (foundation metadata concept)",
                 UUID.fromString("5ddff82f-5aee-3b16-893f-6b7aa726cc4b"));
@@ -865,6 +1037,12 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         }
     }
 
+    /**
+     * Process modular dependency.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws NoSuchAlgorithmException the no such algorithm exception
+     */
     private void processModularDependency() throws IOException, NoSuchAlgorithmException {
         ConceptSpec modDepenRefex = new ConceptSpec("Module dependency reference set (foundation metadata concept)",
                 UUID.fromString("19076bfe-661f-39c2-860c-8706a37073b0"));
@@ -921,6 +1099,13 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         }
     }
 
+    /**
+     * Process desc type.
+     *
+     * @param descType the desc type
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws NoSuchAlgorithmException the no such algorithm exception
+     */
     private void processDescType(ConceptSpec descType) throws IOException, NoSuchAlgorithmException {
         ConceptSpec descFormatRefex = new ConceptSpec("Description format reference set (foundation metadata concept)",
                 UUID.fromString("c3467f1f-c0d5-3865-b169-61712ca03072"));
@@ -983,12 +1168,18 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI#processUnfetchedConceptData(int, org.ihtsdo.tk.api.ConceptFetcherBI)
+     */
     @Override
     public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fetcher) throws Exception {
         process(fetcher.fetch());
     }
 
     //~--- get methods ---------------------------------------------------------
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI#getNidSet()
+     */
     @Override
     public NidBitSetBI getNidSet() throws IOException {
         return conceptsToProcess;

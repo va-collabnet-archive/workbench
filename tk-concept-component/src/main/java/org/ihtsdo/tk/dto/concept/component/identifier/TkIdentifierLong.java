@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2012 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.tk.dto.concept.component.identifier;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -15,29 +31,61 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class TkIdentifierLong.
+ */
 public class TkIdentifierLong extends TkIdentifier {
+   
+   /** The Constant serialVersionUID. */
    public static final long serialVersionUID = 1;
 
    //~--- fields --------------------------------------------------------------
 
+   /** The denotation. */
    public long denotation;
 
    //~--- constructors --------------------------------------------------------
 
+   /**
+    * Instantiates a new tk identifier long.
+    */
    public TkIdentifierLong() {
       super();
    }
 
+   /**
+    * Instantiates a new tk identifier long.
+    *
+    * @param id the id
+    * @throws IOException Signals that an I/O exception has occurred.
+    */
    public TkIdentifierLong(LongIdBI id) throws IOException {
       super(id);
       denotation = id.getDenotation();
    }
 
+   /**
+    * Instantiates a new tk identifier long.
+    *
+    * @param in the in
+    * @param dataVersion the data version
+    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws ClassNotFoundException the class not found exception
+    */
    public TkIdentifierLong(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       super(in, dataVersion);
       denotation = in.readLong();
    }
 
+   /**
+    * Instantiates a new tk identifier long.
+    *
+    * @param another the another
+    * @param conversionMap the conversion map
+    * @param offset the offset
+    * @param mapAll the map all
+    */
    public TkIdentifierLong(TkIdentifierLong another, Map<UUID, UUID> conversionMap, long offset,
                            boolean mapAll) {
       super(another, conversionMap, offset, mapAll);
@@ -93,6 +141,9 @@ public class TkIdentifierLong extends TkIdentifier {
       });
    }
 
+   /* (non-Javadoc)
+    * @see org.ihtsdo.tk.dto.concept.component.TkRevision#makeConversion(java.util.Map, long, boolean)
+    */
    @Override
    public TkRevision makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
       return new TkIdentifierLong(this, conversionMap, offset, mapAll);
@@ -100,6 +151,8 @@ public class TkIdentifierLong extends TkIdentifier {
 
    /**
     * Returns a string representation of the object.
+    *
+    * @return the string
     */
    @Override
    public String toString() {
@@ -114,6 +167,9 @@ public class TkIdentifierLong extends TkIdentifier {
       return buff.toString();
    }
 
+   /* (non-Javadoc)
+    * @see org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier#writeDenotation(java.io.DataOutput)
+    */
    @Override
    public void writeDenotation(DataOutput out) throws IOException {
       out.writeLong(denotation);
@@ -121,11 +177,17 @@ public class TkIdentifierLong extends TkIdentifier {
 
    //~--- get methods ---------------------------------------------------------
 
+   /* (non-Javadoc)
+    * @see org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier#getDenotation()
+    */
    @Override
    public Long getDenotation() {
       return denotation;
    }
 
+   /* (non-Javadoc)
+    * @see org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier#getIdType()
+    */
    @Override
    public IDENTIFIER_PART_TYPES getIdType() {
       return IDENTIFIER_PART_TYPES.LONG;
@@ -133,6 +195,9 @@ public class TkIdentifierLong extends TkIdentifier {
 
    //~--- set methods ---------------------------------------------------------
 
+   /* (non-Javadoc)
+    * @see org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier#setDenotation(java.lang.Object)
+    */
    @Override
    public void setDenotation(Object denotation) {
       this.denotation = (Long) denotation;

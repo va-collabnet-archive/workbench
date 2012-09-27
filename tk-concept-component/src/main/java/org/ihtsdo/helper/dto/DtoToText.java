@@ -1,12 +1,13 @@
-/*
- * Copyright 2011 International Health Terminology Standards Development Organisation.
- *
+/**
+ * Copyright (c) 2012 International Health Terminology Standards Development
+ * Organisation
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,11 +38,24 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.UUID;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class DtoToText.
  *
  * @author kec
  */
 public class DtoToText {
+   
+   /**
+    * Convert.
+    *
+    * @param changeSetFile the change set file
+    * @param changeSet the change set
+    * @param append the append
+    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws FileNotFoundException the file not found exception
+    * @throws ClassNotFoundException the class not found exception
+    */
    private static void convert(File changeSetFile, boolean changeSet, boolean append)
            throws IOException, FileNotFoundException, ClassNotFoundException {
       FileInputStream     fis        = new FileInputStream(changeSetFile);
@@ -79,14 +93,38 @@ public class DtoToText {
       }
    }
 
+   /**
+    * Convert change set.
+    *
+    * @param changeSetFile the change set file
+    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws ClassNotFoundException the class not found exception
+    */
    public static void convertChangeSet(File changeSetFile) throws IOException, ClassNotFoundException {
       convert(changeSetFile, true, false);
    }
 
+   /**
+    * Convert dto.
+    *
+    * @param changeSetFile the change set file
+    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws ClassNotFoundException the class not found exception
+    */
    public static void convertDto(File changeSetFile) throws IOException, ClassNotFoundException {
       convert(changeSetFile, false, false);
    }
 
+   /**
+    * Search.
+    *
+    * @param changeSetFile the change set file
+    * @param conceptUuids the concept uuids
+    * @param append the append
+    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws FileNotFoundException the file not found exception
+    * @throws ClassNotFoundException the class not found exception
+    */
    private static void search(File changeSetFile, Collection<UUID> conceptUuids, boolean append)
            throws IOException, FileNotFoundException, ClassNotFoundException {
       FileInputStream     fis        = new FileInputStream(changeSetFile);
@@ -118,6 +156,14 @@ public class DtoToText {
       }
    }
 
+   /**
+    * Search for dto.
+    *
+    * @param file the file
+    * @param conceptUuids the concept uuids
+    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws ClassNotFoundException the class not found exception
+    */
    public static void searchForDto(File file, Collection<UUID> conceptUuids)
            throws IOException, ClassNotFoundException {
       search(file, conceptUuids, false);

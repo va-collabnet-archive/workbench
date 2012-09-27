@@ -1,12 +1,13 @@
-/*
- * Copyright 2011 International Health Terminology Standards Development Organisation.
- *
+/**
+ * Copyright (c) 2012 International Health Terminology Standards Development
+ * Organisation
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,31 +40,61 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class UuidDupFinder.
  *
  * @author kec
  */
 public class UuidDupFinder implements ProcessUnfetchedConceptDataBI {
 
+    /** The count. */
     private AtomicInteger count = new AtomicInteger(0);
+    
+    /** The dots. */
     private AtomicInteger dots = new AtomicInteger(0);
+    
+    /** The all prim uuids. */
     ConcurrentSkipListSet<UUID> allPrimUuids = new ConcurrentSkipListSet<UUID>();
+    
+    /** The dup uuids. */
     ConcurrentSkipListSet<UUID> dupUuids = new ConcurrentSkipListSet<UUID>();
+    
+    /** The dups file. */
     File dupsFile = new File("dups.oos");
+    
+    /** The nidset. */
     private final NidBitSetBI nidset;
 
     //~--- constant enums ------------------------------------------------------
+    /**
+     * The Enum PASS.
+     */
     private enum PASS {
 
-        PASS_ONE, PASS_TWO
+        /** The pass one. */
+        PASS_ONE, /** The pass two. */
+ PASS_TWO
     }
 
     //~--- constructors --------------------------------------------------------
+    /**
+     * Instantiates a new uuid dup finder.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ClassNotFoundException the class not found exception
+     */
     public UuidDupFinder() throws IOException, ClassNotFoundException {
         nidset = Ts.get().getAllConceptNids();
     }
 
     //~--- methods -------------------------------------------------------------
+    /**
+     * Adds the to uuid list.
+     *
+     * @param component the component
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void addToUuidList(ComponentChronicleBI component) throws IOException {
         if (component != null) {
             UUID primUuid = component.getPrimUuid();
@@ -80,11 +111,20 @@ public class UuidDupFinder implements ProcessUnfetchedConceptDataBI {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.ContinuationTrackerBI#continueWork()
+     */
     @Override
     public boolean continueWork() {
         return true;
     }
 
+    /**
+     * Process concept.
+     *
+     * @param concept the concept
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void processConcept(ConceptChronicleBI concept) throws IOException {
 
         // add prim uuids to list
@@ -113,6 +153,9 @@ public class UuidDupFinder implements ProcessUnfetchedConceptDataBI {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI#processUnfetchedConceptData(int, org.ihtsdo.tk.api.ConceptFetcherBI)
+     */
     @Override
     public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fetcher) throws Exception {
         count.incrementAndGet();
@@ -132,6 +175,11 @@ public class UuidDupFinder implements ProcessUnfetchedConceptDataBI {
         processConcept(fetcher.fetch());
     }
 
+    /**
+     * Write dup file.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public void writeDupFile() throws IOException {
         count.set(0);
 
@@ -147,10 +195,18 @@ public class UuidDupFinder implements ProcessUnfetchedConceptDataBI {
     }
 
     //~--- get methods ---------------------------------------------------------
+    /**
+     * Gets the dup uuids.
+     *
+     * @return the dup uuids
+     */
     public ConcurrentSkipListSet<UUID> getDupUuids() {
         return dupUuids;
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI#getNidSet()
+     */
     @Override
     public NidBitSetBI getNidSet() throws IOException {
         return nidset;

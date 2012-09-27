@@ -1,12 +1,13 @@
-/*
- * Copyright 2011 International Health Terminology Standards Development Organisation.
- *
+/**
+ * Copyright (c) 2012 International Health Terminology Standards Development
+ * Organisation
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,31 +42,61 @@ import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class NullComponentFinder.
  *
  * @author kec
  */
 public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
 
+    /** The count. */
     private AtomicInteger count = new AtomicInteger(0);
+    
+    /** The dots. */
     private AtomicInteger dots = new AtomicInteger(0);
+    
+    /** The all prim nids. */
     ConcurrentSkipListSet<Integer> allPrimNids = new ConcurrentSkipListSet<Integer>();
+    
+    /** The null component. */
     ConcurrentSkipListSet<Integer> nullComponent = new ConcurrentSkipListSet<Integer>();
+    
+    /** The null component file. */
     File nullComponentFile = new File("nullComponent.oos");
+    
+    /** The nidset. */
     private final NidBitSetBI nidset;
 
     //~--- constant enums ------------------------------------------------------
+    /**
+     * The Enum PASS.
+     */
     private enum PASS {
 
-        PASS_ONE, PASS_TWO
+        /** The pass one. */
+        PASS_ONE, /** The pass two. */
+ PASS_TWO
     }
 
     //~--- constructors --------------------------------------------------------
+    /**
+     * Instantiates a new null component finder.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ClassNotFoundException the class not found exception
+     */
     public NullComponentFinder() throws IOException, ClassNotFoundException {
         nidset = Ts.get().getAllConceptNids();
     }
 
     //~--- methods -------------------------------------------------------------
+    /**
+     * Verify component.
+     *
+     * @param component the component
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void verifyComponent(ComponentChronicleBI component) throws IOException {
         if (component != null) {
             if (component instanceof ConceptAttributeChronicleBI) {
@@ -102,6 +133,12 @@ public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
         }
     }
 
+    /**
+     * Verify nids.
+     *
+     * @param nids the nids
+     * @param component the component
+     */
     private void verifyNids(Set<Integer> nids, ComponentChronicleBI component) {
         for (Integer nid : nids) {
             ComponentChronicleBI<?> referencedComponent = null;
@@ -125,11 +162,20 @@ public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
 
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.ContinuationTrackerBI#continueWork()
+     */
     @Override
     public boolean continueWork() {
         return true;
     }
 
+    /**
+     * Process concept.
+     *
+     * @param concept the concept
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void processConcept(ConceptChronicleBI concept) throws IOException {
 
         // add prim uuids to list
@@ -158,6 +204,9 @@ public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI#processUnfetchedConceptData(int, org.ihtsdo.tk.api.ConceptFetcherBI)
+     */
     @Override
     public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fetcher) throws Exception {
         count.incrementAndGet();
@@ -177,6 +226,11 @@ public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
         processConcept(fetcher.fetch());
     }
 
+    /**
+     * Write null component file.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public void writeNullComponentFile() throws IOException { //TODO: implement for null components
         count.set(0);
 
@@ -192,10 +246,18 @@ public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
     }
 
     //~--- get methods ---------------------------------------------------------    
+    /**
+     * Gets the null component.
+     *
+     * @return the null component
+     */
     public ConcurrentSkipListSet<Integer> getNullComponent() {
         return nullComponent;
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI#getNidSet()
+     */
     @Override
     public NidBitSetBI getNidSet() throws IOException {
         return nidset;

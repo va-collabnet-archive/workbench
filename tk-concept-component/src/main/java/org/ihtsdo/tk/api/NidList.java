@@ -1,12 +1,13 @@
-/*
- * Copyright 2011 International Health Terminology Standards Development Organisation.
- *
+/**
+ * Copyright (c) 2012 International Health Terminology Standards Development
+ * Organisation
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,15 +30,25 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.ihtsdo.tk.Ts;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class NidList.
  *
  * @author kec
  */
 public class NidList implements NidListBI, Serializable {
+   
+   /** The Constant dataVersion. */
    private static final int dataVersion = 1;
 
+   /** The list values. */
    private List<Integer> listValues = new ArrayList<Integer>(2);
 
+   /**
+    * Instantiates a new native id list.
+    *
+    * @param values the values
+    */
    public NidList(int[] values) {
       super();
       for (int i : values) {
@@ -45,10 +56,20 @@ public class NidList implements NidListBI, Serializable {
       }
    }
 
+   /**
+    * Instantiates a new native id list.
+    */
    public NidList() {
       super();
    }
 
+   /**
+    * Write int list.
+    *
+    * @param out the out
+    * @param nidList the nid list
+    * @throws IOException Signals that an I/O exception has occurred.
+    */
    public static void writeIntList(ObjectOutputStream out, NidList nidList) throws IOException {
       if (nidList == null) {
          out.writeInt(Integer.MIN_VALUE);
@@ -68,14 +89,39 @@ public class NidList implements NidListBI, Serializable {
       }
    }
 
+   /**
+    * Read int list ignore map errors.
+    *
+    * @param in the in
+    * @return the native id list bi
+    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws ClassNotFoundException the class not found exception
+    */
    public static NidListBI readIntListIgnoreMapErrors(ObjectInputStream in) throws IOException, ClassNotFoundException {
       return readIntList(in, true);
    }
 
+   /**
+    * Read int list strict.
+    *
+    * @param in the in
+    * @return the native id list bi
+    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws ClassNotFoundException the class not found exception
+    */
    public static NidListBI readIntListStrict(ObjectInputStream in) throws IOException, ClassNotFoundException {
       return readIntList(in, true);
    }
 
+   /**
+    * Read int list.
+    *
+    * @param in the in
+    * @param ignoreMappingErrors the ignore mapping errors
+    * @return the native id list bi
+    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws ClassNotFoundException the class not found exception
+    */
    @SuppressWarnings("unchecked")
    private static NidListBI readIntList(ObjectInputStream in, boolean ignoreMappingErrors) throws IOException,
            ClassNotFoundException {
@@ -370,6 +416,9 @@ public class NidList implements NidListBI, Serializable {
       return listValues;
    }
 
+   /* (non-Javadoc)
+    * @see org.ihtsdo.tk.api.NidListBI#getListArray()
+    */
    @Override
    public int[] getListArray() {
       int[] listArray = new int[listValues.size()];
@@ -379,6 +428,9 @@ public class NidList implements NidListBI, Serializable {
       return listArray;
    }
 
+   /* (non-Javadoc)
+    * @see java.lang.Object#toString()
+    */
    @Override
    public String toString() {
       StringBuilder buf = new StringBuilder();

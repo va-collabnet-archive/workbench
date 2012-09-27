@@ -1,12 +1,13 @@
-/*
- * Copyright 2012 International Health Terminology Standards Development Organisation.
- *
+/**
+ * Copyright (c) 2012 International Health Terminology Standards Development
+ * Organisation
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,48 +33,120 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.binding.snomed.TermAux;
 import org.ihtsdo.tk.spec.ValidationException;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class UuidToSctIdWriter.
  *
  * @author akf
  */
 public class UuidToSctIdWriter {
 
+    /** The namespace. */
     String namespace;
+    
+    /** The module. */
     String module;
+    
+    /** The directory. */
     File directory;
+    
+    /** The concepts writer. */
     Writer conceptsWriter;
+    
+    /** The descriptions writer. */
     Writer descriptionsWriter;
+    
+    /** The identifiers writer. */
     Writer identifiersWriter;
+    
+    /** The private identifiers writer. */
     Writer privateIdentifiersWriter;
+    
+    /** The relationships writer. */
     Writer relationshipsWriter;
+    
+    /** The relationships stated writer. */
     Writer relationshipsStatedWriter;
+    
+    /** The lang refsets writer. */
     Writer langRefsetsWriter;
+    
+    /** The other lang refsets writer. */
     Writer otherLangRefsetsWriter;
+    
+    /** The mod depend writer. */
     Writer modDependWriter;
+    
+    /** The desc type writer. */
     Writer descTypeWriter;
+    
+    /** The refset desc writer. */
     Writer refsetDescWriter;
+    
+    /** The uuid to sct map writer. */
     Writer uuidToSctMapWriter;
+    
+    /** The concepts reader. */
     BufferedReader conceptsReader;
+    
+    /** The descriptions reader. */
     BufferedReader descriptionsReader;
+    
+    /** The identifiers reader. */
     BufferedReader identifiersReader;
+    
+    /** The private identifiers reader. */
     BufferedReader  privateIdentifiersReader;
+    
+    /** The relationships reader. */
     BufferedReader relationshipsReader;
+    
+    /** The relationships stated reader. */
     BufferedReader relationshipsStatedReader;
+    
+    /** The lang refsets reader. */
     BufferedReader langRefsetsReader;
+    
+    /** The other lang refsets reader. */
     BufferedReader otherLangRefsetsReader;
+    
+    /** The mod depend reader. */
     BufferedReader modDependReader;
+    
+    /** The desc type reader. */
     BufferedReader descTypeReader;
+    
+    /** The refset desc reader. */
     BufferedReader refsetDescReader;
+    
+    /** The uuid sct map reader. */
     BufferedReader uuidSctMapReader;
+    
+    /** The store. */
     TerminologyStoreDI store;
+    
+    /** The uuid to sct map. */
     HashMap<UUID, String> uuidToSctMap = new HashMap<UUID, String>();
+    
+    /** The uuid to existing sct map. */
     HashMap<UUID, String> uuidToExistingSctMap = new HashMap<UUID, String>();
 //    int conceptCounter = 1;
 //    int descCounter = 1;
 //    int relCounter = 1;
-    boolean makePrivateAltIdsFile;
+    /** The make private alt ids file. */
+boolean makePrivateAltIdsFile;
+    
+    /** The handler. */
     UuidSnomedMapHandler handler;
 
+    /**
+     * Instantiates a new uuid to sct id writer.
+     *
+     * @param namespace the namespace
+     * @param module the module
+     * @param directory the directory
+     * @param handler the handler
+     */
     public UuidToSctIdWriter(String namespace, String module,
             File directory, UuidSnomedMapHandler handler) {
         this.namespace = namespace;
@@ -83,17 +156,38 @@ public class UuidToSctIdWriter {
         this.handler = handler;
     }
 
+    /**
+     * The Enum exisitingSctIds.
+     */
     private enum exisitingSctIds {
 
-        PRIMITIVE("900000000000074008"), DEFINED("900000000000073002"),
-        CASE_SENSITIVE("900000000000017005"), CASE_INSENSITIVE("900000000000448009");
+        /** The primitive. */
+        PRIMITIVE("900000000000074008"), /** The defined. */
+ DEFINED("900000000000073002"),
+        
+        /** The case sensitive. */
+        CASE_SENSITIVE("900000000000017005"), 
+ /** The case insensitive. */
+ CASE_INSENSITIVE("900000000000448009");
+        
+        /** The value. */
         public final String value;
 
+        /**
+         * Instantiates a new exisiting sct ids.
+         *
+         * @param value the value
+         */
         private exisitingSctIds(String value) {
             this.value = value;
         }
     }
 
+    /**
+     * Write.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public void write() throws IOException {
         setup();
 
@@ -186,6 +280,11 @@ public class UuidToSctIdWriter {
         processUuidToSctMap();
     }
 
+    /**
+     * Setup.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void setup() throws IOException {
         File[] uuidFiles = directory.listFiles(new FilenameFilter() {
 
@@ -346,6 +445,12 @@ public class UuidToSctIdWriter {
         }
     }
 
+    /**
+     * Process concept attribute.
+     *
+     * @param line the line
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void processConceptAttribute(String line) throws IOException {
         if (line != null) {
             String[] parts = line.split("\t");
@@ -397,6 +502,12 @@ public class UuidToSctIdWriter {
         }
     }
 
+    /**
+     * Process description.
+     *
+     * @param line the line
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void processDescription(String line) throws IOException {
         if (line != null) {
             String[] parts = line.split("\t");
@@ -483,6 +594,12 @@ public class UuidToSctIdWriter {
         }
     }
 
+    /**
+     * Process relationship.
+     *
+     * @param line the line
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void processRelationship(String line) throws IOException {
         if (line != null) {
             String[] parts = line.split("\t");
@@ -583,6 +700,12 @@ public class UuidToSctIdWriter {
         }
     }
     
+    /**
+     * Process stated relationship.
+     *
+     * @param line the line
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void processStatedRelationship(String line) throws IOException {
         if (line != null) {
             String[] parts = line.split("\t");
@@ -683,6 +806,13 @@ public class UuidToSctIdWriter {
         }
     }
 
+    /**
+     * Process identifiers.
+     *
+     * @param line the line
+     * @param writer the writer
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void processIdentifiers(String line, Writer writer) throws IOException {
         if (line != null) {
             String[] parts = line.split("\t");
@@ -734,6 +864,12 @@ public class UuidToSctIdWriter {
         }
     }
 
+    /**
+     * Process lang refsets.
+     *
+     * @param line the line
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void processLangRefsets(String line) throws IOException {
         if (line != null) {
             String[] parts = line.split("\t");
@@ -799,6 +935,12 @@ public class UuidToSctIdWriter {
         }
     }
     
+    /**
+     * Process other lang refsets.
+     *
+     * @param line the line
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void processOtherLangRefsets(String line) throws IOException {
         if (line != null) {
             String[] parts = line.split("\t");
@@ -864,6 +1006,12 @@ public class UuidToSctIdWriter {
         }
     }
 
+    /**
+     * Process module depedency.
+     *
+     * @param line the line
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void processModuleDepedency(String line) throws IOException {
         if (line != null) {
             String[] parts = line.split("\t");
@@ -931,6 +1079,12 @@ public class UuidToSctIdWriter {
         }
     }
 
+    /**
+     * Process desc type.
+     *
+     * @param line the line
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void processDescType(String line) throws IOException {
         if (line != null) {
             String[] parts = line.split("\t");
@@ -1002,6 +1156,12 @@ public class UuidToSctIdWriter {
         }
     }
 
+    /**
+     * Process refset desc.
+     *
+     * @param line the line
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void processRefsetDesc(String line) throws IOException {
         if (line != null) {
             String[] parts = line.split("\t");
@@ -1084,6 +1244,11 @@ public class UuidToSctIdWriter {
         }
     }
 
+    /**
+     * Process uuid to sct map.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void processUuidToSctMap() throws IOException {
         Set<UUID> keySet = uuidToSctMap.keySet();
         for (UUID uuid : keySet) {
@@ -1105,6 +1270,11 @@ public class UuidToSctIdWriter {
         }
     }
     
+    /**
+     * Write uuid to sct map file.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void writeUuidToSctMapFile() throws IOException {
         Set<UUID> keySet = uuidToSctMap.keySet();
         for (UUID uuid : keySet) {
@@ -1126,6 +1296,14 @@ public class UuidToSctIdWriter {
         }
     }
     
+    /**
+     * Convert status.
+     *
+     * @param statusString the status string
+     * @return the integer
+     * @throws ValidationException the validation exception
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private Integer convertStatus(String statusString) throws ValidationException, IOException {
         UUID status = UUID.fromString(statusString);
         int inactive = 0;
@@ -1157,6 +1335,13 @@ public class UuidToSctIdWriter {
         return null;
     }
 
+    /**
+     * Gets the existing sct id.
+     *
+     * @param uuidString the uuid string
+     * @return the existing sct id
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private String getExistingSctId(String uuidString) throws IOException {
         UUID componentUuid = UUID.fromString(uuidString);
         boolean idExists = false;
@@ -1191,6 +1376,11 @@ public class UuidToSctIdWriter {
         return componentSctId;
     }
 
+    /**
+     * Close.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public void close() throws IOException {
         if (conceptsWriter != null) {
             conceptsWriter.close();

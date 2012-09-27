@@ -1,12 +1,13 @@
-/*
- * Copyright 2012 International Health Terminology Standards Development Organisation.
- *
+/**
+ * Copyright (c) 2012 International Health Terminology Standards Development
+ * Organisation
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,19 +26,24 @@ import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.VersionPointBI;
 
+// TODO: Auto-generated Javadoc
 /**
- *
- *
- *
- *
+ * The Class RelativePositionComputer.
  *
  * @author kec
  */
 public class RelativePositionComputer implements RelativePositionComputerBI {
 
+    /** The mapper cache. */
     private static ConcurrentHashMap<PositionBI, RelativePositionComputerBI> mapperCache =
             new ConcurrentHashMap<>();
 
+    /**
+     * Gets the computer.
+     *
+     * @param position the position
+     * @return the computer
+     */
     public static RelativePositionComputerBI getComputer(PositionBI position) {
         RelativePositionComputerBI pm = mapperCache.get(position);
 
@@ -55,21 +61,48 @@ public class RelativePositionComputer implements RelativePositionComputerBI {
 
         return pm;
     }
+    
+    /** The destination. */
     PositionBI destination;
+    
+    /** The path nid segment map. */
     HashMap<Integer, Segment> pathNidSegmentMap;
 
+    /**
+     * Instantiates a new relative position computer.
+     *
+     * @param destination the destination
+     */
     public RelativePositionComputer(PositionBI destination) {
         this.destination = destination;
         pathNidSegmentMap = setupPathNidSegmentMap(destination);
     }
 
+    /**
+     * The Class Segment.
+     */
     private static class Segment {
 
+        /** The segment nid. */
         int segmentNid;
+        
+        /** The path nid. */
         int pathNid;
+        
+        /** The end time. */
         long endTime;
+        
+        /** The preceding segments. */
         BitSet precedingSegments;
 
+        /**
+         * Instantiates a new segment.
+         *
+         * @param segmentNid the segment nid
+         * @param pathNid the path nid
+         * @param endTime the end time
+         * @param precedingSegments the preceding segments
+         */
         public Segment(int segmentNid, int pathNid, long endTime, BitSet precedingSegments) {
             this.segmentNid = segmentNid;
             this.pathNid = pathNid;
@@ -78,6 +111,13 @@ public class RelativePositionComputer implements RelativePositionComputerBI {
             this.precedingSegments.or(precedingSegments);
         }
 
+        /**
+         * Contains position.
+         *
+         * @param pathNid the path nid
+         * @param time the time
+         * @return true, if successful
+         */
         public boolean containsPosition(int pathNid, long time) {
             if (this.pathNid == pathNid && time != Long.MIN_VALUE) {
                 return time <= endTime;
@@ -86,6 +126,12 @@ public class RelativePositionComputer implements RelativePositionComputerBI {
         }
     }
 
+    /**
+     * Setup path nid segment map.
+     *
+     * @param destination the destination
+     * @return the hash map
+     */
     private static HashMap<Integer, Segment>  setupPathNidSegmentMap(PositionBI destination) {
         HashMap<Integer, Segment> pathNidSegmentMap = new HashMap<>();
         AtomicInteger segmentNidSequence = new AtomicInteger(0);
@@ -96,6 +142,14 @@ public class RelativePositionComputer implements RelativePositionComputerBI {
 
     }
 
+    /**
+     * Adds the origins to path nid segment map.
+     *
+     * @param destination the destination
+     * @param pathNidRpcNidMap the path nid rpc nid map
+     * @param segmentNidSequence the segment nid sequence
+     * @param precedingSegments the preceding segments
+     */
     private static void addOriginsToPathNidSegmentMap(PositionBI destination,
             HashMap<Integer, Segment> pathNidRpcNidMap, AtomicInteger segmentNidSequence, BitSet precedingSegments) {
         Segment segment = new Segment(segmentNidSequence.getAndIncrement(), destination.getPath().getConceptNid(),
@@ -107,6 +161,9 @@ public class RelativePositionComputer implements RelativePositionComputerBI {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.helper.version.RelativePositionComputerBI#fastRelativePosition(org.ihtsdo.tk.api.VersionPointBI, org.ihtsdo.tk.api.VersionPointBI, org.ihtsdo.tk.api.Precedence)
+     */
     @Override
     public RelativePosition fastRelativePosition(VersionPointBI v1, VersionPointBI v2, Precedence precedencePolicy) {
         if (v1.getPathNid() == v2.getPathNid()) {
@@ -155,11 +212,17 @@ public class RelativePositionComputer implements RelativePositionComputerBI {
         return RelativePosition.CONTRADICTION;
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.helper.version.RelativePositionComputerBI#getDestination()
+     */
     @Override
     public PositionBI getDestination() {
         return destination;
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.helper.version.RelativePositionComputerBI#onRoute(org.ihtsdo.tk.api.VersionPointBI)
+     */
     @Override
     public boolean onRoute(VersionPointBI v) {
         Segment seg = (Segment) pathNidSegmentMap.get(v.getPathNid());
@@ -169,6 +232,9 @@ public class RelativePositionComputer implements RelativePositionComputerBI {
         return false;
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.helper.version.RelativePositionComputerBI#relativePosition(org.ihtsdo.tk.api.VersionPointBI, org.ihtsdo.tk.api.VersionPointBI)
+     */
     @Override
     public RelativePosition relativePosition(VersionPointBI v1, VersionPointBI v2) throws IOException {
         if (!(onRoute(v1) && onRoute(v2))) {

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2009 International Health Terminology Standards Development
+ * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,29 +28,66 @@ import java.util.UUID;
 
 import org.ihtsdo.helper.transform.SctIdGenerator.TYPE;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class UuidSnomedMapHandler.
+ */
 public class UuidSnomedMapHandler {
+    
+    /**
+     * The Class SctMapRwFilter.
+     */
     private final class SctMapRwFilter implements FileFilter {
+        
+        /** The type. */
         private final TYPE type;
 
+        /**
+         * Instantiates a new sct map rw filter.
+         *
+         * @param type the type
+         */
         private SctMapRwFilter(TYPE type) {
             this.type = type;
         }
 
+        /* (non-Javadoc)
+         * @see java.io.FileFilter#accept(java.io.File)
+         */
         public boolean accept(File f) {
             return f.getName().endsWith(type + "-sct-map-rw.txt");
         }
     }
 
+    /**
+     * The Class SctMapFilter.
+     */
     private final class SctMapFilter implements FileFilter {
+        
+        /* (non-Javadoc)
+         * @see java.io.FileFilter#accept(java.io.File)
+         */
         public boolean accept(File f) {
             return f.getName().endsWith("sct-map.txt");
         }
     }
 
+    /** The map map. */
     private Map<TYPE, UuidSnomedMap> mapMap;
+    
+    /** The file map. */
     private Map<TYPE, File> fileMap;
+    
+    /** The namespace. */
     private String namespace;
 
+    /**
+     * Instantiates a new uuid snomed map handler.
+     *
+     * @param idGeneratedDir the id generated dir
+     * @param sourceDirectory the source directory
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public UuidSnomedMapHandler(File idGeneratedDir, File sourceDirectory) throws IOException {
         if (mapMap == null) {
             mapMap = new HashMap<TYPE, UuidSnomedMap>();
@@ -84,6 +121,15 @@ public class UuidSnomedMapHandler {
         }
     }
 
+    /**
+     * Instantiates a new uuid snomed map handler.
+     *
+     * @param idGeneratedDir the id generated dir
+     * @param sourceDirectory the source directory
+     * @param namespace the namespace
+     * @param project the project
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public UuidSnomedMapHandler(File idGeneratedDir, File sourceDirectory, int namespace, int project)
             throws IOException {
         if (mapMap == null) {
@@ -117,26 +163,55 @@ public class UuidSnomedMapHandler {
         }
     }
 
+    /**
+     * Gets the with generation.
+     *
+     * @param id the id
+     * @param type the type
+     * @return the with generation
+     */
     public Long getWithGeneration(UUID id, TYPE type) {
         UuidSnomedMap map = mapMap.get(type);
         map.setNamespaceId(Integer.parseInt(namespace));
         return mapMap.get(type).getWithGeneration(id, type);
     }
 
+    /**
+     * Gets the without generation.
+     *
+     * @param id the id
+     * @param type the type
+     * @return the without generation
+     */
     public Long getWithoutGeneration(UUID id, TYPE type) {
         return mapMap.get(type).get(id);
     }
 
+    /**
+     * Write maps.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public void writeMaps() throws IOException {
         for (TYPE type : TYPE.values()) {
             mapMap.get(type).write(fileMap.get(type));
         }
     }
 
+    /**
+     * Gets the namespace.
+     *
+     * @return the namespace
+     */
     public String getNamespace() {
         return namespace;
     }
 
+    /**
+     * Sets the namespace.
+     *
+     * @param namespace the new namespace
+     */
     public void setNamespace(String namespace) {
         this.namespace = namespace;
     }

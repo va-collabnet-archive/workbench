@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2012 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.tk.api;
 
 import java.io.IOException;
@@ -9,13 +25,25 @@ import java.util.Collection;
 import java.util.HashSet;
 import org.ihtsdo.tk.Ts;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class NidSet.
+ */
 public class NidSet implements NidSetBI, Serializable {
+   
+   /** The Constant dataVersion. */
    private static final int dataVersion = 1;
 
-   /**
-    *
-    */
+   /** The Constant serialVersionUID. */
    private static final long serialVersionUID = 1L;
+  
+  /**
+   * Read object.
+   *
+   * @param in the in
+   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws ClassNotFoundException the class not found exception
+   */
   private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
       int objDataVersion = in.readInt();
 
@@ -27,17 +55,35 @@ public class NidSet implements NidSetBI, Serializable {
       }
    }
 
+   /**
+    * Write object.
+    *
+    * @param out the out
+    * @throws IOException Signals that an I/O exception has occurred.
+    */
    private void writeObject(ObjectOutputStream out) throws IOException {
       out.writeInt(dataVersion);
       out.writeObject(setValues);
    }
 
 
+    /** The set values. */
     private int[] setValues = new int[0];
 
+    /**
+     * Instantiates a new native id set.
+     *
+     * @param another the another
+     */
     public NidSet(NidSet another) {
         this(another.setValues);
     }
+    
+    /**
+     * Instantiates a new native id set.
+     *
+     * @param values the values
+     */
     public NidSet(int[] values) {
         super();
         this.setValues = new int[values.length];
@@ -64,11 +110,19 @@ public class NidSet implements NidSetBI, Serializable {
         }
     }
 
+    /**
+     * Instantiates a new native id set.
+     */
     public NidSet() {
         super();
         this.setValues = new int[0];
     }
 
+    /**
+     * Instantiates a new native id set.
+     *
+     * @param paths the paths
+     */
     public NidSet(Collection<PathBI> paths) {
         super();
         setValues = new int[paths.size()];
@@ -99,6 +153,9 @@ public class NidSet implements NidSetBI, Serializable {
         return setValues;
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.NidSetBI#add(int)
+     */
     @Override
     public synchronized void add(int key) {
         if (setValues.length == 0) {
@@ -120,6 +177,9 @@ public class NidSet implements NidSetBI, Serializable {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.NidSetBI#remove(int)
+     */
     @Override
     public void remove(int key) {
         int insertionPoint = Arrays.binarySearch(setValues, key);
@@ -163,6 +223,11 @@ public class NidSet implements NidSetBI, Serializable {
         replaceWithSet(members);
     }
 
+    /**
+     * Gets the as set.
+     *
+     * @return the as set
+     */
     public HashSet<Integer> getAsSet() {
         HashSet<Integer> members = new HashSet<Integer>();
         for (int elem : setValues) {
@@ -171,6 +236,11 @@ public class NidSet implements NidSetBI, Serializable {
         return members;
     }
 
+    /**
+     * Replace with set.
+     *
+     * @param nids the nids
+     */
     public void replaceWithSet(HashSet<Integer> nids) {
         setValues = new int[nids.size()];
         int i = 0;
@@ -190,6 +260,9 @@ public class NidSet implements NidSetBI, Serializable {
         setValues = new int[0];
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
     @Override
     public boolean equals(Object obj) {
         if (NidSetBI.class.isAssignableFrom(obj.getClass())) {
@@ -207,16 +280,25 @@ public class NidSet implements NidSetBI, Serializable {
         return super.equals(obj);
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
     @Override
     public int hashCode() {
         return super.hashCode();
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.NidSetBI#size()
+     */
     @Override
     public int size() {
         return setValues.length;
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.NidSetBI#getMax()
+     */
     @Override
     public int getMax() {
         if (setValues.length == 0) {
@@ -225,6 +307,9 @@ public class NidSet implements NidSetBI, Serializable {
         return setValues[setValues.length - 1];
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.NidSetBI#getMin()
+     */
     @Override
     public int getMin() {
         if (setValues.length == 0) {
@@ -233,6 +318,9 @@ public class NidSet implements NidSetBI, Serializable {
         return setValues[0];
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.NidSetBI#contiguous()
+     */
     @Override
     public boolean contiguous() {
         if (setValues.length == 0) {
@@ -248,6 +336,9 @@ public class NidSet implements NidSetBI, Serializable {
         return true;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();

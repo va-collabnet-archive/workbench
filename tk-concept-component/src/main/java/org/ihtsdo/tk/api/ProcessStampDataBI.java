@@ -1,12 +1,13 @@
-/*
- * Copyright 2012 International Health Terminology Standards Development Organisation.
- *
+/**
+ * Copyright (c) 2012 International Health Terminology Standards Development
+ * Organisation
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +16,7 @@
  */
 package org.ihtsdo.tk.api;
 
+// TODO: Auto-generated Javadoc
 /**
  * Allows all stamp nids to be efficiently tested according to the criteria
  * specified in each implementation. Each component of a concept
@@ -24,11 +26,13 @@ package org.ihtsdo.tk.api;
  * @see StampBI
  */
 public interface ProcessStampDataBI {
+    
     /**
      * Implement this method to processes all stamp nids according to certain criteria.
      * All stamp nids in the database will be returned but in no particular order.
-     * @param stamp
-     * @throws Exception
+     *
+     * @param stamp the stamp
+     * @throws Exception the exception
      */
     void processStampData(StampBI stamp) throws Exception;
     

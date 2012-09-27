@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2012 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.tk.spec;
 
 import java.io.IOException;
@@ -14,18 +30,37 @@ import org.ihtsdo.tk.binding.snomed.Taxonomies;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.spec.RelationshipSpec;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class RelationshipSpecFromConcept.
+ */
 public class RelationshipSpecFromConcept {
 	
+	/** The concept. */
 	ConceptVersionBI concept;
+	
+	/** The rel spec. */
 	RelationshipSpec relSpec;
+	
+	/** The indv rel specs. */
 	ArrayList<RelationshipSpec> indvRelSpecs = new ArrayList<RelationshipSpec>();
+	
+	/** The all rel specs. */
 	ArrayList<RelationshipSpec> allRelSpecs = new ArrayList<RelationshipSpec>();
 	
+	/**
+	 * Instantiates a new relationship spec from concept.
+	 *
+	 * @param conceptVersion the concept version
+	 */
 	public RelationshipSpecFromConcept (ConceptVersionBI conceptVersion){
 		this.concept = conceptVersion;
 		makeRelationshipSpec();
 	}
 	
+	/**
+	 * Make relationship spec.
+	 */
 	private void makeRelationshipSpec (){
 		try {
 			Collection<? extends ConceptVersionBI> rels;
@@ -66,6 +101,11 @@ public class RelationshipSpecFromConcept {
 		}
 	}
 	
+	/**
+	 * Gets the relationship specs.
+	 *
+	 * @return the relationship specs
+	 */
 	public ArrayList<RelationshipSpec> getRelationshipSpecs(){
 		return allRelSpecs;
 	}	

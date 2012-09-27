@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2009 International Health Terminology Standards Development
+ * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,14 +34,24 @@ import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class ConceptSpec.
+ */
 public class ConceptSpec implements SpecBI {
 
-    /**
-     * 
-     */
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
+    
+    /** The Constant dataVersion. */
     private static final int dataVersion = 1;
 
+    /**
+     * Write object.
+     *
+     * @param out the out
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeUTF(description);
@@ -49,6 +59,13 @@ public class ConceptSpec implements SpecBI {
         out.writeObject(relSpecs);
     }
 
+    /**
+     * Read object.
+     *
+     * @param in the in
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ClassNotFoundException the class not found exception
+     */
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
@@ -60,8 +77,14 @@ public class ConceptSpec implements SpecBI {
         }
 
     }
+    
+    /** The uuids. */
     private UUID[] uuids;
+    
+    /** The description. */
     private String description;
+    
+    /** The rel specs. */
     private RelationshipSpec[] relSpecs;
 
     /**
@@ -71,28 +94,68 @@ public class ConceptSpec implements SpecBI {
         super();
     }
 
+    /**
+     * Instantiates a new concept spec.
+     *
+     * @param descriptionText the description text
+     * @param conceptUuid the concept uuid
+     */
     public ConceptSpec(String descriptionText, String conceptUuid) {
         this(descriptionText, conceptUuid, new RelationshipSpec[]{});
     }
 
+    /**
+     * Instantiates a new concept spec.
+     *
+     * @param descriptionText the description text
+     * @param conceptUuid the concept uuid
+     * @param relationshipSpecs the relationship specs
+     */
     public ConceptSpec(String descriptionText, String conceptUuid, RelationshipSpec... relationshipSpecs) {
         this(descriptionText, UUID.fromString(conceptUuid), relationshipSpecs);
     }
 
+    /**
+     * Instantiates a new concept spec.
+     *
+     * @param descriptionText the description text
+     * @param conceptUuid the concept uuid
+     */
     public ConceptSpec(String descriptionText, UUID conceptUuid) {
         this(descriptionText, new UUID[]{conceptUuid}, new RelationshipSpec[]{});
     }
 
+    /**
+     * Instantiates a new concept spec.
+     *
+     * @param descriptionText the description text
+     * @param conceptUuid the concept uuid
+     * @param relationshipSpecs the relationship specs
+     */
     public ConceptSpec(String descriptionText, UUID conceptUuid, RelationshipSpec... relationshipSpecs) {
         this(descriptionText, new UUID[]{conceptUuid}, relationshipSpecs);
     }
 
+    /**
+     * Instantiates a new concept spec.
+     *
+     * @param descriptionText the description text
+     * @param conceptUuids the concept uuids
+     * @param relationshipSpecs the relationship specs
+     */
     public ConceptSpec(String descriptionText, UUID[] conceptUuids, RelationshipSpec... relationshipSpecs) {
         this.uuids = conceptUuids;
         this.description = descriptionText;
         this.relSpecs = relationshipSpecs;
     }
 
+    /**
+     * Gets the lenient.
+     *
+     * @return the lenient
+     * @throws ValidationException the validation exception
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public ConceptChronicleBI getLenient() throws ValidationException, IOException {
         try {
             boolean found = false;
@@ -114,6 +177,14 @@ public class ConceptSpec implements SpecBI {
         }
     }
 
+    /**
+     * Gets the strict.
+     *
+     * @param viewCoordinate the view coordinate
+     * @return the strict
+     * @throws ValidationException the validation exception
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public ConceptVersionBI getStrict(ViewCoordinate viewCoordinate) throws ValidationException, IOException {
         try {
             boolean found = false;
@@ -137,17 +208,25 @@ public class ConceptSpec implements SpecBI {
     }
 
     /**
-     * 
-     * @param viewCoordinate
-     * @return
-     * @throws IOException
-     * @deprecated Use getStrict or getLienient instead. 
+     * Gets the.
+     *
+     * @param viewCoordinate the view coordinate
+     * @return the concept version bi
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @deprecated Use getStrict or getLienient instead.
      */
     @Deprecated
     public ConceptVersionBI get(ViewCoordinate viewCoordinate) throws IOException {
         return getStrict(viewCoordinate);
     }
 
+    /**
+     * Validate relationships.
+     *
+     * @param conceptVersion the concept version
+     * @param viewCoordinate the view coordinate
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void validateRelationships(ConceptVersionBI conceptVersion, ViewCoordinate viewCoordinate) throws IOException {
         if (relSpecs == null || relSpecs.length == 0) {
             return;
@@ -170,6 +249,12 @@ public class ConceptSpec implements SpecBI {
         }
     }
 
+    /**
+     * Validate relationships.
+     *
+     * @param conceptChronicle the concept chronicle
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void validateRelationships(ConceptChronicleBI conceptChronicle) throws IOException {
         if (relSpecs == null || relSpecs.length == 0) {
             return;
@@ -195,6 +280,13 @@ public class ConceptSpec implements SpecBI {
         }
     }
 
+    /**
+     * Validate description.
+     *
+     * @param conceptChronicle the concept chronicle
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ContradictionException the contradiction exception
+     */
     private void validateDescription(ConceptChronicleBI conceptChronicle) throws IOException, ContradictionException {
         boolean found = false;
         for (DescriptionChronicleBI desc : conceptChronicle.getDescriptions()) {
@@ -213,6 +305,14 @@ public class ConceptSpec implements SpecBI {
         }
     }
 
+    /**
+     * Validate description.
+     *
+     * @param conceptVersion the concept version
+     * @param viewCoordinate the view coordinate
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ContradictionException the contradiction exception
+     */
     private void validateDescription(ConceptVersionBI conceptVersion, ViewCoordinate viewCoordinate) throws IOException, ContradictionException {
         boolean found = false;
         for (DescriptionVersionBI desc : conceptVersion.getDescriptionsActive()) {
@@ -232,7 +332,9 @@ public class ConceptSpec implements SpecBI {
     /**
      * added as an alternative way to get the uuids as strings rather than UUID
      * objects
-     * this was done to help with Maven making use of this class
+     * this was done to help with Maven making use of this class.
+     *
+     * @return the uuids as string
      */
     public String[] getUuidsAsString() {
         String[] returnVal = new String[uuids.length];
@@ -253,6 +355,8 @@ public class ConceptSpec implements SpecBI {
      * for a similar purpose, however it exists in a dependent project and
      * cannot
      * be used in this project.
+     *
+     * @param uuids the new uuids as string
      */
     public void setUuidsAsString(String[] uuids) {
         this.uuids = new UUID[uuids.length];
@@ -262,14 +366,29 @@ public class ConceptSpec implements SpecBI {
         }
     }
 
+    /**
+     * Gets the uuids.
+     *
+     * @return the uuids
+     */
     public UUID[] getUuids() {
         return uuids;
     }
 
+    /**
+     * Sets the uuids.
+     *
+     * @param uuids the new uuids
+     */
     public void setUuids(UUID[] uuids) {
         this.uuids = uuids;
     }
 
+    /**
+     * Sets the uuid strings.
+     *
+     * @param uuidStrings the new uuid strings
+     */
     public void setUuidStrings(String[] uuidStrings) {
         this.uuids = new UUID[uuidStrings.length];
         for (int i = 0; i < uuidStrings.length; i++) {
@@ -277,6 +396,11 @@ public class ConceptSpec implements SpecBI {
         }
     }
 
+    /**
+     * Gets the uuid strings.
+     *
+     * @return the uuid strings
+     */
     public String[] getUuidStrings() {
         String[] results = new String[uuids.length];
         for (int i = 0; i < uuids.length; i++) {
@@ -285,22 +409,45 @@ public class ConceptSpec implements SpecBI {
         return results;
     }
 
+    /**
+     * Gets the description.
+     *
+     * @return the description
+     */
     public String getDescription() {
         return description;
     }
 
+    /**
+     * Sets the description.
+     *
+     * @param description the new description
+     */
     public void setDescription(String description) {
         this.description = description;
     }
 
+    /**
+     * Gets the relationship specs.
+     *
+     * @return the relationship specs
+     */
     public RelationshipSpec[] getRelationshipSpecs() {
         return relSpecs;
     }
 
+    /**
+     * Sets the relationship specs.
+     *
+     * @param relationshipSpecs the new relationship specs
+     */
     public void setRelationshipSpecs(RelationshipSpec[] relationshipSpecs) {
         this.relSpecs = relationshipSpecs;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
         return "ConceptSpec{" + description + "; " + Arrays.asList(uuids)

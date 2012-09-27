@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2012 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.tk.dto.concept.component;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -23,25 +39,53 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.ihtsdo.tk.binding.snomed.Snomed;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class TkRevision.
+ */
 public abstract class TkRevision implements I_VersionExternally {
+   
+   /** The Constant serialVersionUID. */
    private static final long serialVersionUID    = 1;
+   
+   /** The unspecified user uuid. */
    public static UUID        unspecifiedUserUuid = UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c");
+   
+   /** The unspecified module uuid. */
    public static UUID        unspecifiedModuleUuid = UUID.fromString("40d1c869-b509-32f8-b735-836eac577a67");
 
    //~--- fields --------------------------------------------------------------
 
+   /** The time. */
    public long time = Long.MIN_VALUE;
+   
+   /** The author uuid. */
    public UUID authorUuid;
+   
+   /** The path uuid. */
    public UUID pathUuid;
+   
+   /** The status uuid. */
    public UUID statusUuid;
+   
+   /** The module uuid. */
    public UUID moduleUuid;
 
    //~--- constructors --------------------------------------------------------
 
+   /**
+    * Instantiates a new tk revision.
+    */
    public TkRevision() {
       super();
    }
 
+   /**
+    * Instantiates a new tk revision.
+    *
+    * @param componentVersion the component version
+    * @throws IOException Signals that an I/O exception has occurred.
+    */
    public TkRevision(ComponentVersionBI componentVersion) throws IOException {
       super();
       this.statusUuid = Ts.get().getComponent(componentVersion.getStatusNid()).getPrimUuid();
@@ -55,6 +99,12 @@ public abstract class TkRevision implements I_VersionExternally {
       this.time = componentVersion.getTime();
    }
 
+   /**
+    * Instantiates a new tk revision.
+    *
+    * @param id the id
+    * @throws IOException Signals that an I/O exception has occurred.
+    */
    public TkRevision(IdBI id) throws IOException {
       super();
       this.authorUuid = Ts.get().getComponent(id.getAuthorNid()).getPrimUuid();
@@ -68,6 +118,14 @@ public abstract class TkRevision implements I_VersionExternally {
       assert moduleUuid != null : id;
    }
 
+   /**
+    * Instantiates a new tk revision.
+    *
+    * @param in the in
+    * @param dataVersion the data version
+    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws ClassNotFoundException the class not found exception
+    */
    public TkRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       super();
       readExternal(in, dataVersion);
@@ -77,6 +135,15 @@ public abstract class TkRevision implements I_VersionExternally {
       assert moduleUuid != null : this;
    }
 
+   /**
+    * Instantiates a new tk revision.
+    *
+    * @param componentVersion the component version
+    * @param conversionMap the conversion map
+    * @param offset the offset
+    * @param mapAll the map all
+    * @throws IOException Signals that an I/O exception has occurred.
+    */
    public TkRevision(ComponentVersionBI componentVersion, Map<UUID, UUID> conversionMap, long offset, boolean mapAll)
            throws IOException {
       super();
@@ -100,6 +167,14 @@ public abstract class TkRevision implements I_VersionExternally {
       this.time = componentVersion.getTime() + offset;
    }
 
+   /**
+    * Instantiates a new tk revision.
+    *
+    * @param another the another
+    * @param conversionMap the conversion map
+    * @param offset the offset
+    * @param mapAll the map all
+    */
    public TkRevision(TkRevision another, Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
       super();
 
@@ -192,6 +267,12 @@ public abstract class TkRevision implements I_VersionExternally {
                                          (int) (time >>> 32) });
    }
 
+   /**
+    * Inform about uuid.
+    *
+    * @param uuid the uuid
+    * @return the char sequence
+    */
    public static CharSequence informAboutUuid(UUID uuid) {
       if (Ts.get() == null) {
           if (uuid == null) {
@@ -243,8 +324,24 @@ public abstract class TkRevision implements I_VersionExternally {
       return sb;
    }
 
+   /**
+    * Make conversion.
+    *
+    * @param conversionMap the conversion map
+    * @param offset the offset
+    * @param mapAll the map all
+    * @return the tk revision
+    */
    public abstract TkRevision makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll);
 
+   /**
+    * Read external.
+    *
+    * @param in the in
+    * @param dataVersion the data version
+    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws ClassNotFoundException the class not found exception
+    */
    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       pathUuid   = new UUID(in.readLong(), in.readLong());
       statusUuid = new UUID(in.readLong(), in.readLong());
@@ -269,6 +366,8 @@ public abstract class TkRevision implements I_VersionExternally {
 
    /**
     * Returns a string representation of the object.
+    *
+    * @return the string
     */
    @Override
    public String toString() {
@@ -289,6 +388,12 @@ public abstract class TkRevision implements I_VersionExternally {
       return buff.toString();
    }
 
+   /**
+    * Write external.
+    *
+    * @param out the out
+    * @throws IOException Signals that an I/O exception has occurred.
+    */
    public void writeExternal(DataOutput out) throws IOException {
       if (time == Long.MAX_VALUE) {
          time = Long.MIN_VALUE;
@@ -314,6 +419,9 @@ public abstract class TkRevision implements I_VersionExternally {
 
    //~--- get methods ---------------------------------------------------------
 
+   /* (non-Javadoc)
+    * @see org.ihtsdo.tk.api.ext.I_VersionExternally#getAuthorUuid()
+    */
    @Override
    public UUID getAuthorUuid() {
       return authorUuid;
@@ -339,6 +447,9 @@ public abstract class TkRevision implements I_VersionExternally {
       return statusUuid;
    }
    
+   /* (non-Javadoc)
+    * @see org.ihtsdo.tk.api.ext.I_VersionExternally#getModuleUuid()
+    */
    public UUID getModuleUuid() {
       return moduleUuid;
    }
@@ -355,23 +466,48 @@ public abstract class TkRevision implements I_VersionExternally {
 
    //~--- set methods ---------------------------------------------------------
 
+   /**
+    * Sets the author uuid.
+    *
+    * @param authorUuid the new author uuid
+    */
    public void setAuthorUuid(UUID authorUuid) {
       this.authorUuid = authorUuid;
       assert authorUuid != null : this;
    }
 
+   /**
+    * Sets the path uuid.
+    *
+    * @param pathUuid the new path uuid
+    */
    public void setPathUuid(UUID pathUuid) {
       this.pathUuid = pathUuid;
    }
 
+   /**
+    * Sets the status uuid.
+    *
+    * @param statusUuid the new status uuid
+    */
    public void setStatusUuid(UUID statusUuid) {
       this.statusUuid = statusUuid;
    }
    
+   /**
+    * Sets the module uuid.
+    *
+    * @param moduleUuid the new module uuid
+    */
    public void setModuleUuid(UUID moduleUuid) {
       this.moduleUuid = moduleUuid;
    }
 
+   /**
+    * Sets the time.
+    *
+    * @param time the new time
+    */
    public void setTime(long time) {
       this.time = time;
    }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2009 International Health Terminology Standards Development
+ * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,20 +18,44 @@ package org.ihtsdo.helper.io;
 
 import java.beans.PersistenceDelegate;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class PersistenceDelegateSpec.
+ */
 public class PersistenceDelegateSpec {
+    
+    /** The type. */
     private Class<?> type;
+    
+    /** The persistence delegate. */
     private PersistenceDelegate persistenceDelegate;
 
+    /**
+     * Instantiates a new persistence delegate spec.
+     *
+     * @param type the type
+     * @param persistenceDelegate the persistence delegate
+     */
     public PersistenceDelegateSpec(Class<?> type, PersistenceDelegate persistenceDelegate) {
         super();
         this.type = type;
         this.persistenceDelegate = persistenceDelegate;
     }
 
+    /**
+     * Gets the persistence delegate.
+     *
+     * @return the persistence delegate
+     */
     public PersistenceDelegate getPersistenceDelegate() {
         return persistenceDelegate;
     }
 
+    /**
+     * Gets the type.
+     *
+     * @return the type
+     */
     public Class<?> getType() {
         return type;
     }

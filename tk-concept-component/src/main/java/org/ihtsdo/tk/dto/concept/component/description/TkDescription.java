@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2012 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.tk.dto.concept.component.description;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -21,25 +37,55 @@ import java.io.IOException;
 import java.util.*;
 import org.ihtsdo.tk.dto.RevisionHandling;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class TkDescription.
+ */
 public class TkDescription extends TkComponent<TkDescriptionRevision> implements I_DescribeExternally {
 
+    /** The Constant serialVersionUID. */
     public static final long serialVersionUID = 1;
     //~--- fields --------------------------------------------------------------
+    /** The concept uuid. */
     public UUID conceptUuid;
+    
+    /** The initial case significant. */
     public boolean initialCaseSignificant;
+    
+    /** The lang. */
     public String lang;
+    
+    /** The text. */
     public String text;
+    
+    /** The type uuid. */
     public UUID typeUuid;
 
     //~--- constructors --------------------------------------------------------
+    /**
+     * Instantiates a new tk description.
+     */
     public TkDescription() {
         super();
     }
 
+    /**
+     * Instantiates a new tk description.
+     *
+     * @param descriptionChronicle the description chronicle
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public TkDescription(DescriptionChronicleBI descriptionChronicle) throws IOException {
         this(descriptionChronicle.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
     }
 
+    /**
+     * Instantiates a new tk description.
+     *
+     * @param descriptionVersion the description version
+     * @param revisionHandling the revision handling
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public TkDescription(DescriptionVersionBI descriptionVersion,
             RevisionHandling revisionHandling) throws IOException {
         super(descriptionVersion);
@@ -79,11 +125,27 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
         }
     }
 
+    /**
+     * Instantiates a new tk description.
+     *
+     * @param in the in
+     * @param dataVersion the data version
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ClassNotFoundException the class not found exception
+     */
     public TkDescription(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
         readExternal(in, dataVersion);
     }
 
+    /**
+     * Instantiates a new tk description.
+     *
+     * @param another the another
+     * @param conversionMap the conversion map
+     * @param offset the offset
+     * @param mapAll the map all
+     */
     public TkDescription(TkDescription another, Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
         super(another, conversionMap, offset, mapAll);
 
@@ -100,6 +162,18 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
         this.text = another.text;
     }
 
+    /**
+     * Instantiates a new tk description.
+     *
+     * @param descriptionVersion the description version
+     * @param excludedNids the excluded nids
+     * @param conversionMap the conversion map
+     * @param offset the offset
+     * @param mapAll the map all
+     * @param viewCoordinate the view coordinate
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ContradictionException the contradiction exception
+     */
     public TkDescription(DescriptionVersionBI descriptionVersion, NidBitSetBI excludedNids, Map<UUID, UUID> conversionMap,
             long offset, boolean mapAll, ViewCoordinate viewCoordinate)
             throws IOException, ContradictionException {
@@ -125,7 +199,7 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
      * as this <tt>EDescription</tt>.
      *
      * @param obj the object to compare with.
-     * @return
+     * @return true, if successful
      * <code>true</code> if the objects are the same;
      * <code>false</code> otherwise.
      */
@@ -173,11 +247,17 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
         return false;
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.dto.concept.component.TkRevision#makeConversion(java.util.Map, long, boolean)
+     */
     @Override
     public TkDescription makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
         return new TkDescription(this, conversionMap, offset, mapAll);
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.dto.concept.component.TkComponent#readExternal(java.io.DataInput, int)
+     */
     @Override
     public final void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super.readExternal(in, dataVersion);
@@ -200,6 +280,8 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
 
     /**
      * Returns a string representation of the object.
+     *
+     * @return the string
      */
     @Override
     public String toString() {
@@ -221,6 +303,9 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
         return buff.toString();
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.dto.concept.component.TkComponent#writeExternal(java.io.DataOutput)
+     */
     @Override
     public void writeExternal(DataOutput out) throws IOException {
         super.writeExternal(out);
@@ -244,52 +329,97 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
     }
 
     //~--- get methods ---------------------------------------------------------
+    /**
+     * Gets the concept uuid.
+     *
+     * @return the concept uuid
+     */
     public UUID getConceptUuid() {
         return conceptUuid;
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.ext.I_DescribeExternally#getLang()
+     */
     @Override
     public String getLang() {
         return lang;
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.dto.concept.component.TkComponent#getRevisionList()
+     */
     @Override
     public List<TkDescriptionRevision> getRevisionList() {
         return revisions;
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.ext.I_DescribeExternally#getText()
+     */
     @Override
     public String getText() {
         return text;
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.ext.I_DescribeExternally#getTypeUuid()
+     */
     @Override
     public UUID getTypeUuid() {
         return typeUuid;
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.ext.I_DescribeExternally#isInitialCaseSignificant()
+     */
     @Override
     public boolean isInitialCaseSignificant() {
         return initialCaseSignificant;
     }
 
     //~--- set methods ---------------------------------------------------------
+    /**
+     * Sets the concept uuid.
+     *
+     * @param conceptUuid the new concept uuid
+     */
     public void setConceptUuid(UUID conceptUuid) {
         this.conceptUuid = conceptUuid;
     }
 
+    /**
+     * Sets the initial case significant.
+     *
+     * @param initialCaseSignificant the new initial case significant
+     */
     public void setInitialCaseSignificant(boolean initialCaseSignificant) {
         this.initialCaseSignificant = initialCaseSignificant;
     }
 
+    /**
+     * Sets the lang.
+     *
+     * @param lang the new lang
+     */
     public void setLang(String lang) {
         this.lang = lang;
     }
 
+    /**
+     * Sets the text.
+     *
+     * @param text the new text
+     */
     public void setText(String text) {
         this.text = text;
     }
 
+    /**
+     * Sets the type uuid.
+     *
+     * @param typeUuid the new type uuid
+     */
     public void setTypeUuid(UUID typeUuid) {
         this.typeUuid = typeUuid;
     }

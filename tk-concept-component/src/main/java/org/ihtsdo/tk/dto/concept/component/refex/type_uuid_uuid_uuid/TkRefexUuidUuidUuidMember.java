@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2012 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.tk.dto.concept.component.refex.type_uuid_uuid_uuid;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -21,23 +37,49 @@ import java.util.*;
 import org.ihtsdo.tk.dto.RevisionHandling;
 import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_uuid.TkRefsetUuidUuidRevision;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class TkRefexUuidUuidUuidMember.
+ */
 public class TkRefexUuidUuidUuidMember extends TkRefexAbstractMember<TkRefexUuidUuidUuidRevision> {
 
+    /** The Constant serialVersionUID. */
     public static final long serialVersionUID = 1;
     //~--- fields --------------------------------------------------------------
+    /** The uuid1. */
     public UUID uuid1;
+    
+    /** The uuid2. */
     public UUID uuid2;
+    
+    /** The uuid3. */
     public UUID uuid3;
 
     //~--- constructors --------------------------------------------------------
+    /**
+     * Instantiates a new tk refex uuid uuid uuid member.
+     */
     public TkRefexUuidUuidUuidMember() {
         super();
     }
 
+    /**
+     * Instantiates a new tk refex uuid uuid uuid member.
+     *
+     * @param refexChronicle the refex chronicle
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public TkRefexUuidUuidUuidMember(RefexChronicleBI refexChronicle) throws IOException {
         this((RefexNidNidNidVersionBI) refexChronicle.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
     }
 
+    /**
+     * Instantiates a new tk refex uuid uuid uuid member.
+     *
+     * @param refexNidNidNidVersion the refex nid nid nid version
+     * @param revisionHandling the revision handling
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public TkRefexUuidUuidUuidMember(RefexNidNidNidVersionBI refexNidNidNidVersion,
             RevisionHandling revisionHandling) throws IOException {
         super(refexNidNidNidVersion);
@@ -75,11 +117,27 @@ public class TkRefexUuidUuidUuidMember extends TkRefexAbstractMember<TkRefexUuid
         }
     }
 
+    /**
+     * Instantiates a new tk refex uuid uuid uuid member.
+     *
+     * @param in the in
+     * @param dataVersion the data version
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ClassNotFoundException the class not found exception
+     */
     public TkRefexUuidUuidUuidMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
         readExternal(in, dataVersion);
     }
 
+    /**
+     * Instantiates a new tk refex uuid uuid uuid member.
+     *
+     * @param another the another
+     * @param conversionMap the conversion map
+     * @param offset the offset
+     * @param mapAll the map all
+     */
     public TkRefexUuidUuidUuidMember(TkRefexUuidUuidUuidMember another, Map<UUID, UUID> conversionMap,
             long offset, boolean mapAll) {
         super(another, conversionMap, offset, mapAll);
@@ -95,6 +153,18 @@ public class TkRefexUuidUuidUuidMember extends TkRefexAbstractMember<TkRefexUuid
         }
     }
 
+    /**
+     * Instantiates a new tk refex uuid uuid uuid member.
+     *
+     * @param refexNidNidNidVersion the refex nid nid nid version
+     * @param excludedNids the excluded nids
+     * @param conversionMap the conversion map
+     * @param offset the offset
+     * @param mapAll the map all
+     * @param viewCoordinate the view coordinate
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ContradictionException the contradiction exception
+     */
     public TkRefexUuidUuidUuidMember(RefexNidNidNidVersionBI refexNidNidNidVersion, NidBitSetBI excludedNids,
             Map<UUID, UUID> conversionMap, long offset, boolean mapAll,
             ViewCoordinate viewCoordinate)
@@ -119,7 +189,7 @@ public class TkRefexUuidUuidUuidMember extends TkRefexAbstractMember<TkRefexUuid
      * by field, as this <tt>ERefsetCidCidCidMember</tt>.
      *
      * @param obj the object to compare with.
-     * @return
+     * @return true, if successful
      * <code>true</code> if the objects are the same;
      * <code>false</code> otherwise.
      */
@@ -168,11 +238,17 @@ public class TkRefexUuidUuidUuidMember extends TkRefexAbstractMember<TkRefexUuid
         return this.primordialUuid.hashCode();
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.dto.concept.component.TkRevision#makeConversion(java.util.Map, long, boolean)
+     */
     @Override
     public TkRefexUuidUuidUuidMember makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
         return new TkRefexUuidUuidUuidMember(this, conversionMap, offset, mapAll);
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember#readExternal(java.io.DataInput, int)
+     */
     @Override
     public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super.readExternal(in, dataVersion);
@@ -201,6 +277,8 @@ public class TkRefexUuidUuidUuidMember extends TkRefexAbstractMember<TkRefexUuid
 
     /**
      * Returns a string representation of the object.
+     *
+     * @return the string
      */
     @Override
     public String toString() {
@@ -219,6 +297,9 @@ public class TkRefexUuidUuidUuidMember extends TkRefexAbstractMember<TkRefexUuid
         return buff.toString();
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember#writeExternal(java.io.DataOutput)
+     */
     @Override
     public void writeExternal(DataOutput out) throws IOException {
         super.writeExternal(out);
@@ -241,37 +322,73 @@ public class TkRefexUuidUuidUuidMember extends TkRefexAbstractMember<TkRefexUuid
     }
 
     //~--- get methods ---------------------------------------------------------
+    /**
+     * Gets the uuid1.
+     *
+     * @return the uuid1
+     */
     public UUID getUuid1() {
         return uuid1;
     }
 
+    /**
+     * Gets the uuid2.
+     *
+     * @return the uuid2
+     */
     public UUID getUuid2() {
         return uuid2;
     }
 
+    /**
+     * Gets the uuid3.
+     *
+     * @return the uuid3
+     */
     public UUID getUuid3() {
         return uuid3;
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.dto.concept.component.TkComponent#getRevisionList()
+     */
     @Override
     public List<TkRefexUuidUuidUuidRevision> getRevisionList() {
         return revisions;
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember#getType()
+     */
     @Override
     public TK_REFEX_TYPE getType() {
         return TK_REFEX_TYPE.CID_CID_CID;
     }
 
     //~--- set methods ---------------------------------------------------------
+    /**
+     * Sets the uuid1.
+     *
+     * @param uuid1 the new uuid1
+     */
     public void setUuid1(UUID uuid1) {
         this.uuid1 = uuid1;
     }
 
+    /**
+     * Sets the uuid2.
+     *
+     * @param uuid2 the new uuid2
+     */
     public void setUuid2(UUID uuid2) {
         this.uuid2 = uuid2;
     }
 
+    /**
+     * Sets the uuid3.
+     *
+     * @param uuid3 the new uuid3
+     */
     public void setUuid3(UUID uuid3) {
         this.uuid3 = uuid3;
     }

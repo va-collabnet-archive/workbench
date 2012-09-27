@@ -1,12 +1,13 @@
-/*
- * Copyright 2011 International Health Terminology Standards Development Organisation.
- *
+/**
+ * Copyright (c) 2012 International Health Terminology Standards Development
+ * Organisation
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,18 +21,37 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Interface ConceptFetcherBI.
  *
  * @author kec
  */
 public interface ConceptFetcherBI {
+   
+   /**
+    * Fetch.
+    *
+    * @return the concept chronicle bi
+    * @throws Exception the exception
+    */
    ConceptChronicleBI fetch() throws Exception;
+   
+   /**
+    * Fetch.
+    *
+    * @param viewCoordinate the view coordinate
+    * @return the concept version bi
+    * @throws Exception the exception
+    */
    ConceptVersionBI fetch(ViewCoordinate viewCoordinate) throws Exception;
+   
    /**
     * Update the currently fetched concept. Must not be used for
-    * random updates. 
-    * @param conceptChronicle
-    * @throws Exception 
+    * random updates.
+    *
+    * @param conceptChronicle the concept chronicle
+    * @throws Exception the exception
     */
    void update(ConceptChronicleBI conceptChronicle) throws Exception;
 }

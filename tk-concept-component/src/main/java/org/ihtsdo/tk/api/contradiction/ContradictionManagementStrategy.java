@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2009 International Health Terminology Standards Development
+ * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,35 +29,71 @@ import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class ContradictionManagementStrategy.
+ */
 public abstract class ContradictionManagementStrategy implements ContradictionManagerBI{
 
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
     
+    /** The vc. */
     protected transient ViewCoordinate vc;
     
+    /** The ec. */
     protected transient EditCoordinate ec;
 
+    /**
+     * Sets the view coordinate.
+     *
+     * @param viewCoordinate the new view coordinate
+     */
     public void setViewCoordinate(ViewCoordinate viewCoordinate) {
         this.vc = viewCoordinate;
     }
 
+    /**
+     * Gets the view coordinate.
+     *
+     * @return the view coordinate
+     */
     public ViewCoordinate getViewCoordinate() {
         return vc;
     }
     
+    /**
+     * Sets the edits the coordinate.
+     *
+     * @param editCoordinate the new edits the coordinate
+     */
     public void setEditCoordinate(EditCoordinate editCoordinate) {
         this.ec = editCoordinate;
     }
 
+    /**
+     * Gets the edits the coordinate.
+     *
+     * @return the edits the coordinate
+     */
     public EditCoordinate getEditCoordinate() {
         return ec;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
         return getDisplayName();
     }
 
+    /**
+     * Checks if is null.
+     *
+     * @param obj the obj
+     * @return true, if is null
+     */
     private boolean isNull(Object... obj) {
         if (obj == null) {
             return true;
@@ -69,11 +105,17 @@ public abstract class ContradictionManagementStrategy implements ContradictionMa
         return false;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
     @Override
     public boolean equals(Object obj) {
          return toString().equals(obj.toString());
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
     @Override
     public int hashCode() {
         return toString().hashCode();
@@ -87,9 +129,13 @@ public abstract class ContradictionManagementStrategy implements ContradictionMa
      * to check the dependent entities of the conceptChronicle (descriptions,
      * relationships,
      * extensions etc) it will check through each.
-     * 
+     *
+     * @param conceptChronicle the concept chronicle
+     * @param includeDependentEntities the include dependent entities
+     * @return true, if is in conflict
+     * @throws IOException Signals that an I/O exception has occurred.
      * @see org.dwfa.ace.api.I_ManageContradiction#isInConflict(org.dwfa.ace.api.I_GetConceptData,
-     *      boolean)
+     * boolean)
      */
     @Override
     public boolean isInConflict(ConceptChronicleBI conceptChronicle, boolean includeDependentEntities) throws IOException{
@@ -128,6 +174,9 @@ public abstract class ContradictionManagementStrategy implements ContradictionMa
         return false;
     }
     
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.ContradictionManagerBI#isInConflict(org.ihtsdo.tk.api.concept.ConceptChronicleBI)
+     */
     @Override
     public boolean isInConflict(ConceptChronicleBI conceptChronicle){
         if(resolveVersions(new ArrayList(conceptChronicle.getVersions(vc))).size() > 1){
@@ -136,6 +185,9 @@ public abstract class ContradictionManagementStrategy implements ContradictionMa
         return false;
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.ContradictionManagerBI#isInConflict(org.ihtsdo.tk.api.conceptattribute.ConceptAttributeChronicleBI)
+     */
     @Override
     public boolean isInConflict(ConceptAttributeChronicleBI conceptAttributeChronicle){
         if(resolveVersions(new ArrayList(conceptAttributeChronicle.getVersions(vc))).size() > 1){
@@ -144,6 +196,9 @@ public abstract class ContradictionManagementStrategy implements ContradictionMa
         return false;
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.ContradictionManagerBI#isInConflict(org.ihtsdo.tk.api.media.MediaChronicleBI)
+     */
     @Override
     public boolean isInConflict(MediaChronicleBI mediaChronicle){
         if(resolveVersions(new ArrayList(mediaChronicle.getVersions(vc))).size() > 1){
@@ -152,6 +207,9 @@ public abstract class ContradictionManagementStrategy implements ContradictionMa
         return false;
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.ContradictionManagerBI#isInConflict(org.ihtsdo.tk.api.relationship.RelationshipChronicleBI)
+     */
     @Override
     public boolean isInConflict(RelationshipChronicleBI relationshipChronicle){
         if(resolveVersions(new ArrayList(relationshipChronicle.getVersions(vc))).size() > 1){
@@ -160,6 +218,9 @@ public abstract class ContradictionManagementStrategy implements ContradictionMa
         return false;
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.ContradictionManagerBI#isInConflict(org.ihtsdo.tk.api.description.DescriptionChronicleBI)
+     */
     @Override
     public boolean isInConflict(DescriptionChronicleBI descriptionChronicle){
         if(resolveVersions(new ArrayList(descriptionChronicle.getVersions(vc))).size() > 1){
@@ -168,6 +229,9 @@ public abstract class ContradictionManagementStrategy implements ContradictionMa
         return false;
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.ContradictionManagerBI#isInConflict(org.ihtsdo.tk.api.refex.RefexChronicleBI)
+     */
     @Override
     public boolean isInConflict(RefexChronicleBI refexChronicle){
         if(resolveVersions(new ArrayList(refexChronicle.getVersions(vc))).size() > 1){

@@ -1,12 +1,13 @@
-/*
- * Copyright 2012 International Health Terminology Standards Development Organisation.
- *
+/**
+ * Copyright (c) 2012 International Health Terminology Standards Development
+ * Organisation
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,20 +23,32 @@ package org.ihtsdo.concurrency;
 
 import java.util.concurrent.locks.ReentrantLock;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class ConcurrentReentrantLocks.
  *
  * @author kec
  */
 public class ConcurrentReentrantLocks extends ConcurrencyLocks {
+   
+   /** The locks. */
    public ReentrantLock[] locks;
 
    //~--- constructors --------------------------------------------------------
 
+   /**
+    * Instantiates a new concurrent reentrant locks.
+    */
    public ConcurrentReentrantLocks() {
       super();
       setupLocks();
    }
 
+   /**
+    * Instantiates a new concurrent reentrant locks.
+    *
+    * @param concurrencyLevel the concurrency level
+    */
    public ConcurrentReentrantLocks(int concurrencyLevel) {
       super(concurrencyLevel);
       setupLocks();
@@ -43,18 +56,29 @@ public class ConcurrentReentrantLocks extends ConcurrencyLocks {
 
    //~--- methods -------------------------------------------------------------
 
+   /**
+    * Lock.
+    *
+    * @param dbKey the db key
+    */
    public void lock(int dbKey) {
       int word = (dbKey >>> segmentShift) & segmentMask;
 
       locks[word].lock();
    }
 
+   /**
+    * Lock all.
+    */
    public void lockAll() {
       for (int i = 0; i < locks.length; i++) {
          locks[i].lock();
       }
    }
 
+   /**
+    * Setup locks.
+    */
    private void setupLocks() {
       locks = new ReentrantLock[concurrencyLevel];
 
@@ -63,12 +87,20 @@ public class ConcurrentReentrantLocks extends ConcurrencyLocks {
       }
    }
 
+   /**
+    * Unlock.
+    *
+    * @param dbKey the db key
+    */
    public void unlock(int dbKey) {
       int word = (dbKey >>> segmentShift) & segmentMask;
 
       locks[word].unlock();
    }
 
+   /**
+    * Unlock all.
+    */
    public void unlockAll() {
       for (int i = 0; i < locks.length; i++) {
          locks[i].unlock();

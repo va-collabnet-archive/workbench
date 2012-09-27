@@ -1,12 +1,13 @@
-/*
- * Copyright 2010 International Health Terminology Standards Development Organisation.
- *
+/**
+ * Copyright (c) 2012 International Health Terminology Standards Development
+ * Organisation
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -51,16 +52,28 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 import org.ihtsdo.tk.uuid.UuidT5Generator;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class RefexCAB.
  *
  * @author kec
  */
 public class RefexCAB extends CreateOrAmendBlueprint {
 
+    /** The Constant refexSpecNamespace. */
     public static final UUID refexSpecNamespace =
             UUID.fromString("c44bc030-1166-11e0-ac64-0800200c9a66");
+    
+    /** The member type. */
     private TK_REFEX_TYPE memberType;
 
+    /**
+     * Compute member component uuid.
+     *
+     * @return the uuid
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws InvalidCAB the invalid cab
+     */
     public UUID computeMemberComponentUuid() throws IOException, InvalidCAB {
         try {
             UUID memberComponentUuid = UuidT5Generator.get(refexSpecNamespace,
@@ -76,6 +89,13 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         }
     }
 
+    /**
+     * Sets the member content uuid.
+     *
+     * @return the uuid
+     * @throws InvalidCAB the invalid cab
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public UUID setMemberContentUuid() throws InvalidCAB, IOException {
         UUID memberContentUuid = computeMemberContentUuid();
         properties.put(RefexProperty.MEMBER_UUID, memberContentUuid);
@@ -89,8 +109,8 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      * @return A
      * <code>UUID</code> based on a Type 5 generator that uses the content
      * fields of the refex.
-     * @throws InvalidAmendmentSpec
-     * @throws IOException
+     * @throws InvalidCAB the invalid cab
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public UUID computeMemberContentUuid() throws InvalidCAB, IOException {
         try {
@@ -120,6 +140,9 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint#recomputeUuid()
+     */
     @Override
     /**
      * For a refex the componentUuid methods from CreateOrAmendBlueprint
@@ -133,6 +156,14 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         }
     }
 
+    /**
+     * Gets the primordial uuid string for nid prop.
+     *
+     * @param prop the prop
+     * @return the primordial uuid string for nid prop
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws InvalidCAB the invalid cab
+     */
     private String getPrimordialUuidStringForNidProp(RefexProperty prop)
             throws IOException, InvalidCAB {
         Object idObj = properties.get(prop);
@@ -155,6 +186,8 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         throw new InvalidCAB("Can't find nid for: " + prop
                 + " props: " + this.properties);
     }
+    
+    /** The properties. */
     protected EnumMap<RefexProperty, Object> properties =
             new EnumMap<RefexProperty, Object>(RefexProperty.class);
 
@@ -167,11 +200,12 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      * collections where there should be no more than one refex per referenced
      * component.
      *
-     * @param memberType
-     * @param referencedComponentNid
-     * @param collectionNid
-     * @throws IOException
-     * @throws InvalidAmendmentSpec
+     * @param memberType the member type
+     * @param referencedComponentNid the referenced component nid
+     * @param collectionNid the collection nid
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws InvalidCAB the invalid cab
+     * @throws ContradictionException the contradiction exception
      */
     public RefexCAB(TK_REFEX_TYPE memberType,
             int referencedComponentNid, int collectionNid) throws IOException, InvalidCAB, ContradictionException {
@@ -181,6 +215,18 @@ public class RefexCAB extends CreateOrAmendBlueprint {
                 computeMemberComponentUuid());
     }
 
+    /**
+     * Instantiates a new refex cab.
+     *
+     * @param memberType the member type
+     * @param referencedComponentUuid the referenced component uuid
+     * @param collectionNid the collection nid
+     * @param refexVersion the refex version
+     * @param viewCoordinate the view coordinate
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws InvalidCAB the invalid cab
+     * @throws ContradictionException the contradiction exception
+     */
     public RefexCAB(TK_REFEX_TYPE memberType,
             UUID referencedComponentUuid, int collectionNid, RefexVersionBI refexVersion,
             ViewCoordinate viewCoordinate) throws IOException, InvalidCAB, ContradictionException {
@@ -190,6 +236,19 @@ public class RefexCAB extends CreateOrAmendBlueprint {
                 computeMemberComponentUuid());
     }
 
+    /**
+     * Instantiates a new refex cab.
+     *
+     * @param memberType the member type
+     * @param referencedComponentUuid the referenced component uuid
+     * @param collectionNid the collection nid
+     * @param memberUuid the member uuid
+     * @param refexVersion the refex version
+     * @param viewCoordinate the view coordinate
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws InvalidCAB the invalid cab
+     * @throws ContradictionException the contradiction exception
+     */
     public RefexCAB(TK_REFEX_TYPE memberType,
             UUID referencedComponentUuid, int collectionNid,
             UUID memberUuid, RefexVersionBI refexVersion,
@@ -209,6 +268,9 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint#setCurrent()
+     */
     @Override
     public void setCurrent() {
         super.setCurrent();
@@ -220,6 +282,9 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint#setRetired()
+     */
     @Override
     public void setRetired() {
         super.setRetired();
@@ -231,10 +296,18 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         }
     }
 
+    /**
+     * Sets the referenced component uuid.
+     *
+     * @param referencedComponentUuid the new referenced component uuid
+     */
     protected void setReferencedComponentUuid(UUID referencedComponentUuid) {
         this.properties.put(RefexProperty.RC_UUID, referencedComponentUuid);
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint#getStatusUuid()
+     */
     @Override
     public UUID getStatusUuid() {
         try {
@@ -246,6 +319,9 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         return super.getStatusUuid();
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint#setStatusUuid(java.util.UUID)
+     */
     @Override
     public void setStatusUuid(UUID statusUuid) {
         super.setStatusUuid(statusUuid);
@@ -259,57 +335,140 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         }
     }
 
+    /**
+     * The Enum RefexProperty.
+     */
     public enum RefexProperty {
 
+        /** The member uuid. */
         MEMBER_UUID,
+        
+        /** The collection nid. */
         COLLECTION_NID,
+        
+        /** The rc uuid. */
         RC_UUID,
+        
+        /** The status nid. */
         STATUS_NID,
+        
+        /** The CNI d1. */
         CNID1,
+        
+        /** The CNI d2. */
         CNID2,
+        
+        /** The CNI d3. */
         CNID3,
+        
+        /** The UUI d1. */
         UUID1,
+        
+        /** The UUI d2. */
         UUID2,
+        
+        /** The UUI d3. */
         UUID3,
+        
+        /** The BOOLEA n1. */
         BOOLEAN1,
+        
+        /** The INTEGE r1. */
         INTEGER1,
+        
+        /** The STRIN g1. */
         STRING1,
+        
+        /** The LON g1. */
         LONG1,
+        
+        /** The FLOA t1. */
         FLOAT1,
+        
+        /** The array bytearray. */
         ARRAY_BYTEARRAY,
     }
 
+    /**
+     * Sets the member uuid.
+     *
+     * @param memberUuid the new member uuid
+     */
     public void setMemberUuid(UUID memberUuid) {
         setComponentUuid(memberUuid);
         properties.put(RefexProperty.MEMBER_UUID, memberUuid);
     }
 
+    /**
+     * Contains key.
+     *
+     * @param key the key
+     * @return true, if successful
+     */
     public boolean containsKey(RefexProperty key) {
         return properties.containsKey(key);
     }
 
+    /**
+     * Entry set.
+     *
+     * @return the sets the
+     */
     public Set<Entry<RefexProperty, Object>> entrySet() {
         return properties.entrySet();
     }
 
+    /**
+     * Key set.
+     *
+     * @return the sets the
+     */
     public Set<RefexProperty> keySet() {
         return properties.keySet();
     }
 
+    /**
+     * Put.
+     *
+     * @param key the key
+     * @param value the value
+     * @return the object
+     */
     public Object put(RefexProperty key, Number value) {
         return properties.put(key, value);
     }
 
+    /**
+     * Put.
+     *
+     * @param key the key
+     * @param value the value
+     * @return the object
+     */
     public Object put(RefexProperty key, String value) {
         assert key == RefexProperty.STRING1;
         return properties.put(key, value);
     }
 
+    /**
+     * Put.
+     *
+     * @param key the key
+     * @param value the value
+     * @return the object
+     */
     public Object put(RefexProperty key, Boolean value) {
         assert key == RefexProperty.BOOLEAN1;
         return properties.put(key, value);
     }
 
+    /**
+     * Put.
+     *
+     * @param key the key
+     * @param value the value
+     * @return the object
+     */
     public Object put(RefexProperty key, UUID value) {
         assert key == RefexProperty.MEMBER_UUID ||
                 key == RefexProperty.UUID1 ||
@@ -319,35 +478,73 @@ public class RefexCAB extends CreateOrAmendBlueprint {
                 value);
     }
     
+    /**
+     * Put.
+     *
+     * @param key the key
+     * @param value the value
+     * @return the object
+     */
     public Object put(RefexProperty key, byte[][] value){
         assert key == RefexProperty.ARRAY_BYTEARRAY;
         return properties.put(RefexProperty.ARRAY_BYTEARRAY,
                 value);
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
         return this.getClass().getSimpleName() + " "
                 + memberType + " " + properties;
     }
 
+    /**
+     * With.
+     *
+     * @param key the key
+     * @param value the value
+     * @return the refex cab
+     */
     public RefexCAB with(RefexProperty key, Number value) {
         put(key, value);
         return this;
     }
 
+    /**
+     * With.
+     *
+     * @param key the key
+     * @param value the value
+     * @return the refex cab
+     */
     public RefexCAB with(RefexProperty key, String value) {
         assert key == RefexProperty.STRING1;
         properties.put(key, value);
         return this;
     }
 
+    /**
+     * With.
+     *
+     * @param key the key
+     * @param value the value
+     * @return the refex cab
+     */
     public RefexCAB with(RefexProperty key, Boolean value) {
         assert key == RefexProperty.BOOLEAN1;
         properties.put(key, value);
         return this;
     }
     
+    /**
+     * With.
+     *
+     * @param key the key
+     * @param arrayOfByteArray the array of byte array
+     * @return the refex cab
+     */
     public RefexCAB with(RefexProperty key, byte[][] arrayOfByteArray) {
         assert key == RefexProperty.ARRAY_BYTEARRAY;
         properties.put(key, arrayOfByteArray);
@@ -356,14 +553,34 @@ public class RefexCAB extends CreateOrAmendBlueprint {
     
     
 
+    /**
+     * Checks for property.
+     *
+     * @param key the key
+     * @return true, if successful
+     */
     public boolean hasProperty(RefexProperty key) {
         return properties.containsKey(key);
     }
 
+    /**
+     * Write to.
+     *
+     * @param refexAnalog the refex analog
+     * @throws PropertyVetoException the property veto exception
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public void writeTo(RefexAnalogBI<?> refexAnalog) throws PropertyVetoException, IOException {
         setProperties(refexAnalog);
     }
 
+    /**
+     * Sets the properties.
+     *
+     * @param refexAnalog the new properties
+     * @throws PropertyVetoException the property veto exception
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public void setProperties(RefexAnalogBI<?> refexAnalog) throws PropertyVetoException, IOException {
         for (Entry<RefexProperty, Object> entry : properties.entrySet()) {
             switch (entry.getKey()) {
@@ -427,6 +644,13 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         }
     }
 
+    /**
+     * Sets the properties except sap.
+     *
+     * @param refexAnalog the new properties except sap
+     * @throws PropertyVetoException the property veto exception
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public void setPropertiesExceptSap(RefexAnalogBI<?> refexAnalog) throws PropertyVetoException, IOException {
         for (Entry<RefexProperty, Object> entry : properties.entrySet()) {
             switch (entry.getKey()) {
@@ -499,6 +723,12 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         }
     }
 
+    /**
+     * Validate.
+     *
+     * @param refexVersion the refex version
+     * @return true, if successful
+     */
     public boolean validate(RefexVersionBI<?> refexVersion) {
         if (memberType != null) {
             if (TK_REFEX_TYPE.classToType(refexVersion.getClass()) != memberType) {
@@ -653,45 +883,100 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         return true;
     }
 
+    /**
+     * Gets the int.
+     *
+     * @param key the key
+     * @return the int
+     */
     public int getInt(RefexProperty key) {
         return (Integer) properties.get(key);
     }
 
+    /**
+     * Gets the refex collection nid.
+     *
+     * @return the refex collection nid
+     */
     public int getRefexCollectionNid() {
         return getInt(RefexProperty.COLLECTION_NID);
     }
 
+    /**
+     * Gets the referenced component uuid.
+     *
+     * @return the referenced component uuid
+     */
     public UUID getReferencedComponentUuid() {
         return (UUID) properties.get(RefexProperty.RC_UUID);
     }
 
+    /**
+     * Gets the string.
+     *
+     * @param key the key
+     * @return the string
+     */
     public String getString(RefexProperty key) {
         assert key == RefexProperty.STRING1;
         return (String) properties.get(key);
     }
 
+    /**
+     * Gets the boolean.
+     *
+     * @param key the key
+     * @return the boolean
+     */
     public boolean getBoolean(RefexProperty key) {
         assert key == RefexProperty.BOOLEAN1;
         return (Boolean) properties.get(key);
     }
 
+    /**
+     * Gets the member uuid.
+     *
+     * @param key the key
+     * @return the member uuid
+     */
     public UUID getMemberUuid(RefexProperty key) {
         assert key == RefexProperty.MEMBER_UUID;
         return (UUID) properties.get(key);
     }
 
+    /**
+     * Gets the member uuid.
+     *
+     * @return the member uuid
+     */
     public UUID getMemberUUID() {
         return (UUID) properties.get(RefexProperty.MEMBER_UUID);
     }
 
+    /**
+     * Gets the member type.
+     *
+     * @return the member type
+     */
     public TK_REFEX_TYPE getMemberType() {
         return memberType;
     }
 
+    /**
+     * Sets the member type.
+     *
+     * @param memberType the new member type
+     */
     public void setMemberType(TK_REFEX_TYPE memberType) {
         this.memberType = memberType;
     }
 
+    /**
+     * Sets the content uuid.
+     *
+     * @throws InvalidCAB the invalid cab
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public void setContentUuid() throws InvalidCAB, IOException {
         this.properties.put(RefexProperty.MEMBER_UUID,
                 computeMemberContentUuid());

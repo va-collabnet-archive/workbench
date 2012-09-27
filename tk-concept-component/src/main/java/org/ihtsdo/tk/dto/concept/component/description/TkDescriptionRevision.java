@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2012 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.ihtsdo.tk.dto.concept.component.description;
 
 //~--- non-JDK imports --------------------------------------------------------
@@ -16,22 +32,44 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class TkDescriptionRevision.
+ */
 public class TkDescriptionRevision extends TkRevision implements I_DescribeExternally {
+   
+   /** The Constant serialVersionUID. */
    public static final long serialVersionUID = 1;
 
    //~--- fields --------------------------------------------------------------
 
+   /** The initial case significant. */
    public boolean initialCaseSignificant;
+   
+   /** The lang. */
    public String  lang;
+   
+   /** The text. */
    public String  text;
+   
+   /** The type uuid. */
    public UUID    typeUuid;
 
    //~--- constructors --------------------------------------------------------
 
+   /**
+    * Instantiates a new tk description revision.
+    */
    public TkDescriptionRevision() {
       super();
    }
 
+   /**
+    * Instantiates a new tk description revision.
+    *
+    * @param descriptionVersion the description version
+    * @throws IOException Signals that an I/O exception has occurred.
+    */
    public TkDescriptionRevision(DescriptionVersionBI descriptionVersion) throws IOException {
       super(descriptionVersion);
       this.initialCaseSignificant = descriptionVersion.isInitialCaseSignificant();
@@ -40,11 +78,27 @@ public class TkDescriptionRevision extends TkRevision implements I_DescribeExter
       this.typeUuid               = Ts.get().getUuidPrimordialForNid(descriptionVersion.getTypeNid());
    }
 
+   /**
+    * Instantiates a new tk description revision.
+    *
+    * @param in the in
+    * @param dataVersion the data version
+    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws ClassNotFoundException the class not found exception
+    */
    public TkDescriptionRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       super();
       readExternal(in, dataVersion);
    }
 
+   /**
+    * Instantiates a new tk description revision.
+    *
+    * @param another the another
+    * @param conversionMap the conversion map
+    * @param offset the offset
+    * @param mapAll the map all
+    */
    public TkDescriptionRevision(TkDescriptionRevision another, Map<UUID, UUID> conversionMap, long offset,
                                 boolean mapAll) {
       super(another, conversionMap, offset, mapAll);
@@ -110,11 +164,17 @@ public class TkDescriptionRevision extends TkRevision implements I_DescribeExter
       return false;
    }
 
+   /* (non-Javadoc)
+    * @see org.ihtsdo.tk.dto.concept.component.TkRevision#makeConversion(java.util.Map, long, boolean)
+    */
    @Override
    public TkDescriptionRevision makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
       return new TkDescriptionRevision(this, conversionMap, offset, mapAll);
    }
 
+   /* (non-Javadoc)
+    * @see org.ihtsdo.tk.dto.concept.component.TkRevision#readExternal(java.io.DataInput, int)
+    */
    @Override
    public final void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       super.readExternal(in, dataVersion);
@@ -142,6 +202,8 @@ public class TkDescriptionRevision extends TkRevision implements I_DescribeExter
 
    /**
     * Returns a string representation of the object.
+    *
+    * @return the string
     */
    @Override
    public String toString() {
@@ -162,6 +224,9 @@ public class TkDescriptionRevision extends TkRevision implements I_DescribeExter
       return buff.toString();
    }
 
+   /* (non-Javadoc)
+    * @see org.ihtsdo.tk.dto.concept.component.TkRevision#writeExternal(java.io.DataOutput)
+    */
    @Override
    public void writeExternal(DataOutput out) throws IOException {
       super.writeExternal(out);
@@ -204,6 +269,9 @@ public class TkDescriptionRevision extends TkRevision implements I_DescribeExter
       return text;
    }
 
+   /* (non-Javadoc)
+    * @see org.ihtsdo.tk.api.ext.I_DescribeExternally#getTypeUuid()
+    */
    @Override
    public UUID getTypeUuid() {
       return typeUuid;
@@ -221,18 +289,38 @@ public class TkDescriptionRevision extends TkRevision implements I_DescribeExter
 
    //~--- set methods ---------------------------------------------------------
 
+   /**
+    * Sets the initial case significant.
+    *
+    * @param initialCaseSignificant the new initial case significant
+    */
    public void setInitialCaseSignificant(boolean initialCaseSignificant) {
       this.initialCaseSignificant = initialCaseSignificant;
    }
 
+   /**
+    * Sets the lang.
+    *
+    * @param lang the new lang
+    */
    public void setLang(String lang) {
       this.lang = lang;
    }
 
+   /**
+    * Sets the text.
+    *
+    * @param text the new text
+    */
    public void setText(String text) {
       this.text = text;
    }
 
+   /**
+    * Sets the type uuid.
+    *
+    * @param typeUuid the new type uuid
+    */
    public void setTypeUuid(UUID typeUuid) {
       this.typeUuid = typeUuid;
    }

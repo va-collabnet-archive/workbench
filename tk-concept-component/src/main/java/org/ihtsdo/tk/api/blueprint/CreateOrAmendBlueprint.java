@@ -1,12 +1,13 @@
-/*
- * Copyright 2011 International Health Terminology Standards Development Organisation.
- *
+/**
+ * Copyright (c) 2012 International Health Terminology Standards Development
+ * Organisation
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,38 +39,87 @@ import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class CreateOrAmendBlueprint.
  *
  * @author kec
  */
 public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
 
+    /** The current status uuid. */
     private static UUID currentStatusUuid = null;
+    
+    /** The retired status uuid. */
     private static UUID retiredStatusUuid = null;
+    
+    /** The component uuid. */
     private UUID componentUuid;
+    
+    /** The status uuid. */
     private UUID statusUuid;
+    
+    /** The cv. */
     private ComponentVersionBI cv;
+    
+    /** The vc. */
     private ViewCoordinate vc;
+    
+    /** The annotations. */
     private List<RefexCAB> annotations = new ArrayList<RefexCAB>();
+    
+    /** The pcs. */
     protected PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
+    /**
+     * Removes the property change listener.
+     *
+     * @param string the string
+     * @param propertyChangeListener the property change listener
+     */
     public synchronized void removePropertyChangeListener(String string,
             PropertyChangeListener propertyChangeListener) {
         pcs.removePropertyChangeListener(string, propertyChangeListener);
     }
 
+    /**
+     * Removes the property change listener.
+     *
+     * @param propertyChangeListener the property change listener
+     */
     public synchronized void removePropertyChangeListener(PropertyChangeListener propertyChangeListener) {
         pcs.removePropertyChangeListener(propertyChangeListener);
     }
 
+    /**
+     * Adds the property change listener.
+     *
+     * @param string the string
+     * @param propertyChangeListener the property change listener
+     */
     public synchronized void addPropertyChangeListener(String string, PropertyChangeListener propertyChangeListener) {
         pcs.addPropertyChangeListener(string, propertyChangeListener);
     }
 
+    /**
+     * Adds the property change listener.
+     *
+     * @param propertyChangeListener the property change listener
+     */
     public synchronized void addPropertyChangeListener(PropertyChangeListener propertyChangeListener) {
         pcs.addPropertyChangeListener(propertyChangeListener);
     }
 
+    /**
+     * Instantiates a new creates the or amend blueprint.
+     *
+     * @param componentUuid the component uuid
+     * @param componentVersion the component version
+     * @param viewCoordinate the view coordinate
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws InvalidCAB the invalid cab
+     * @throws ContradictionException the contradiction exception
+     */
     public CreateOrAmendBlueprint(UUID componentUuid, ComponentVersionBI componentVersion,
             ViewCoordinate viewCoordinate) throws IOException, InvalidCAB, ContradictionException {
         try {
@@ -91,9 +141,21 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
         pcs.addPropertyChangeListener(this);
     }
 
+    /**
+     * Recompute uuid.
+     *
+     * @throws NoSuchAlgorithmException the no such algorithm exception
+     * @throws UnsupportedEncodingException the unsupported encoding exception
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws InvalidCAB the invalid cab
+     * @throws ContradictionException the contradiction exception
+     */
     public abstract void recomputeUuid() throws NoSuchAlgorithmException, UnsupportedEncodingException,
             IOException, InvalidCAB, ContradictionException;
 
+    /* (non-Javadoc)
+     * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+     */
     @Override
     public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
         try {
@@ -112,6 +174,14 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
 
     }
 
+    /**
+     * Gets the primoridal uuid string.
+     *
+     * @param nid the nid
+     * @return the primoridal uuid string
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws InvalidCAB the invalid cab
+     */
     protected String getPrimoridalUuidString(int nid)
             throws IOException, InvalidCAB {
         ComponentBI component = Ts.get().getComponent(nid);
@@ -125,6 +195,14 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
         throw new InvalidCAB("Can't find primordialUuid for: " + component);
     }
 
+    /**
+     * Gets the primoridal uuid string.
+     *
+     * @param uuid the uuid
+     * @return the primoridal uuid string
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws InvalidCAB the invalid cab
+     */
     protected String getPrimoridalUuidString(UUID uuid)
             throws IOException, InvalidCAB {
         if (Ts.get().hasUuid(uuid)) {
@@ -137,29 +215,52 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
         return uuid.toString();
     }
 
+    /**
+     * Gets the component uuid.
+     *
+     * @return the component uuid
+     */
     public UUID getComponentUuid() {
         return componentUuid;
     }
 
+    /**
+     * Sets the component uuid.
+     *
+     * @param componentUuid the new component uuid
+     */
     public void setComponentUuid(UUID componentUuid) {
         UUID oldUuid = this.componentUuid;
         this.componentUuid = componentUuid;
         pcs.firePropertyChange("componentUuid", oldUuid, this.componentUuid);
     }
     
+    /**
+     * Sets the component uuid no recompute.
+     *
+     * @param componentUuid the new component uuid no recompute
+     */
     public void setComponentUuidNoRecompute(UUID componentUuid) {
         this.componentUuid = componentUuid;
     }
 
+    /**
+     * Gets the component nid.
+     *
+     * @return the component nid
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public int getComponentNid() throws IOException {
         return Ts.get().getNidForUuids(componentUuid);
     }
+    
     /**
      * Returns list of annotation blueprints, gets list from original component if null.
-     * @return
-     * @throws IOException
-     * @throws InvalidCAB
-     * @throws ContradictionException 
+     *
+     * @return the annotation blueprints from original
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws InvalidCAB the invalid cab
+     * @throws ContradictionException the contradiction exception
      */
     public List<RefexCAB> getAnnotationBlueprintsFromOriginal() throws IOException, InvalidCAB, ContradictionException {
         if (annotations.isEmpty() && cv != null) {
@@ -175,34 +276,74 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
         return annotations;
     }
     
+    /**
+     * Gets the annotation blueprints.
+     *
+     * @return the annotation blueprints
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws InvalidCAB the invalid cab
+     * @throws ContradictionException the contradiction exception
+     */
     public List<RefexCAB> getAnnotationBlueprints() throws IOException, InvalidCAB, ContradictionException {
         return annotations;
     }
     
+    /**
+     * Adds the annotation blueprint.
+     *
+     * @param annotationBlueprint the annotation blueprint
+     */
     public void addAnnotationBlueprint(RefexCAB annotationBlueprint){
         annotations.add(annotationBlueprint);
     }
     
+    /**
+     * Replace annotation blueprints.
+     *
+     * @param annotationBlueprints the annotation blueprints
+     */
     public void replaceAnnotationBlueprints(List<RefexCAB> annotationBlueprints){
         this.annotations = annotationBlueprints;
     }
 
+    /**
+     * Gets the status uuid.
+     *
+     * @return the status uuid
+     */
     public UUID getStatusUuid() {
         return statusUuid;
     }
 
+    /**
+     * Gets the status nid.
+     *
+     * @return the status nid
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public int getStatusNid() throws IOException {
         return Ts.get().getNidForUuids(statusUuid);
     }
 
+    /**
+     * Sets the status uuid.
+     *
+     * @param statusUuid the new status uuid
+     */
     public void setStatusUuid(UUID statusUuid) {
         this.statusUuid = statusUuid;
     }
 
+    /**
+     * Sets the current.
+     */
     public void setCurrent() {
         this.statusUuid = currentStatusUuid;
     }
 
+    /**
+     * Sets the retired.
+     */
     public void setRetired() {
         this.statusUuid = retiredStatusUuid;
     }

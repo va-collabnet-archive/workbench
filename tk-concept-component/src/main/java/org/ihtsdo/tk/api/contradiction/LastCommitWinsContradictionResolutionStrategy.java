@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2009 International Health Terminology Standards Development
+ * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,6 +23,7 @@ import java.io.Serializable;
 import java.util.*;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 
+// TODO: Auto-generated Javadoc
 /**
  * "Last commit wins" implementation of a conflict resolution strategy.
  * Specifically this resolution
@@ -46,8 +47,12 @@ import org.ihtsdo.tk.api.ComponentVersionBI;
  */
 public class LastCommitWinsContradictionResolutionStrategy extends ContradictionManagementStrategy implements Serializable {
 
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.ContradictionManagerBI#getDescription()
+     */
     @Override
     public String getDescription() {
         return "<html>This resolution strategy implements resolution that"
@@ -57,11 +62,21 @@ public class LastCommitWinsContradictionResolutionStrategy extends Contradiction
             + "This strategy is useful for single expert authoring where all editors are viewing each other's paths.</html>";
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.ContradictionManagerBI#getDisplayName()
+     */
     @Override
     public String getDisplayName() {
         return "Last commit wins resolution";
     }
 
+    /**
+     * Gets the sorted versions copy.
+     *
+     * @param <T> the generic type
+     * @param originalVersions the original versions
+     * @return the sorted versions copy
+     */
     private <T extends ComponentVersionBI> Collection<List<T>> getSortedVersionsCopy(List<T> originalVersions) {
         Map<Integer, List<T>> map = new HashMap();
 
@@ -83,6 +98,13 @@ public class LastCommitWinsContradictionResolutionStrategy extends Contradiction
         return map.values();
     }
 
+    /**
+     * Gets the latest versions.
+     *
+     * @param <T> the generic type
+     * @param versions the versions
+     * @return the latest versions
+     */
     private <T extends ComponentVersionBI> List<T> getLatestVersions(List<T> versions) {
         Collection<List<T>> sortedVersions = getSortedVersionsCopy(versions);
 
@@ -102,6 +124,13 @@ public class LastCommitWinsContradictionResolutionStrategy extends Contradiction
     }
 
    
+    /**
+     * Gets the sorted parts copy.
+     *
+     * @param <T> the generic type
+     * @param versions the versions
+     * @return the sorted parts copy
+     */
     private <T extends ComponentVersionBI> List<T> getSortedPartsCopy(List<T> versions) {
         List<T> copy = new ArrayList(versions);
         Collections.sort(copy, new PartDateOrderSortComparator(true));
@@ -109,6 +138,9 @@ public class LastCommitWinsContradictionResolutionStrategy extends Contradiction
         return copy;
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.ContradictionManagerBI#resolveVersions(java.util.List)
+     */
     @Override
     public <T extends ComponentVersionBI> List<T> resolveVersions(List<T> tuples) {
         if (tuples == null || tuples.isEmpty()) {
@@ -118,6 +150,9 @@ public class LastCommitWinsContradictionResolutionStrategy extends Contradiction
         return getLatestVersions(tuples);
     }
     
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.ContradictionManagerBI#resolveVersions(org.ihtsdo.tk.api.ComponentVersionBI, org.ihtsdo.tk.api.ComponentVersionBI)
+     */
     @Override
     public <T extends ComponentVersionBI> List<T> resolveVersions(T part1, T part2) {
         ArrayList<T> values = new ArrayList();

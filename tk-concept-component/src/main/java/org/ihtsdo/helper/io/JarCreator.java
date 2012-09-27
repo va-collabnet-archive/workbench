@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2009 International Health Terminology Standards Development
+ * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,7 +24,20 @@ import java.net.URL;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class JarCreator.
+ */
 public class JarCreator {
+    
+    /**
+     * Recursive add to zip.
+     *
+     * @param output the output
+     * @param parent the parent
+     * @param prefix the prefix
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public static void recursiveAddToZip(JarOutputStream output, File parent, String prefix) throws IOException {
         if (parent == null) {
             return;
@@ -38,6 +51,15 @@ public class JarCreator {
         }
     }
 
+    /**
+     * Adds the to zip.
+     *
+     * @param prefix the prefix
+     * @param f the f
+     * @param output the output
+     * @param comment the comment
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public static void addToZip(String prefix, File f, JarOutputStream output, String comment) throws IOException {
         ZipEntry entry = new ZipEntry(prefix + FileIO.getRelativePath(f));
         if (f.exists()) {
@@ -62,6 +84,14 @@ public class JarCreator {
         output.closeEntry();
     }
 
+    /**
+     * Adds the to zip.
+     *
+     * @param theClass the the class
+     * @param output the output
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ClassNotFoundException the class not found exception
+     */
     public static void addToZip(Class<?> theClass, JarOutputStream output) throws IOException, ClassNotFoundException {
         String classFileName = theClass.getName().replace('.', '/') + ".class";
         ZipEntry entry = new ZipEntry(classFileName);

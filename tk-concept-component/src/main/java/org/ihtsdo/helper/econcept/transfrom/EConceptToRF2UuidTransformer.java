@@ -1,12 +1,13 @@
-/*
- * Copyright 2011 International Health Terminology Standards Development Organisation.
- *
+/**
+ * Copyright (c) 2012 International Health Terminology Standards Development
+ * Organisation
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,23 +42,54 @@ import org.ihtsdo.helper.rf2.Rf2File.IdentifiersFileFields;
 import org.ihtsdo.helper.rf2.Rf2File.RelationshipsFileFields;
 import org.ihtsdo.helper.rf2.Rf2File.ReleaseType;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class EConceptToRF2UuidTransformer.
  *
  * @author kec
  */
 public class EConceptToRF2UuidTransformer implements EConceptTransformerBI {
+   
+   /** The concepts writer. */
    Writer       conceptsWriter;
+   
+   /** The country. */
    COUNTRY_CODE country;
+   
+   /** The descriptions writer. */
    Writer       descriptionsWriter;
+   
+   /** The effective date. */
    Date         effectiveDate;
+   
+   /** The identifiers writer. */
    Writer       identifiersWriter;
+   
+   /** The language. */
    LANG_CODE    language;
+   
+   /** The namespace. */
    String       namespace;
+   
+   /** The relationships writer. */
    Writer       relationshipsWriter;
+   
+   /** The release type. */
    ReleaseType  releaseType;
 
    //~--- constructors --------------------------------------------------------
 
+   /**
+    * Instantiates a new e concept to r f2 uuid transformer.
+    *
+    * @param directory the directory
+    * @param releaseType the release type
+    * @param language the language
+    * @param country the country
+    * @param namespace the namespace
+    * @param effectiveDate the effective date
+    * @throws IOException Signals that an I/O exception has occurred.
+    */
    public EConceptToRF2UuidTransformer(File directory, ReleaseType releaseType, LANG_CODE language,
                              COUNTRY_CODE country, String namespace, Date effectiveDate)
            throws IOException {
@@ -134,6 +166,9 @@ public class EConceptToRF2UuidTransformer implements EConceptTransformerBI {
  
    //~--- methods -------------------------------------------------------------
 
+   /* (non-Javadoc)
+    * @see org.ihtsdo.helper.econcept.transfrom.EConceptTransformerBI#close()
+    */
    @Override
    public void close() throws IOException {
       if (conceptsWriter != null) {
@@ -153,6 +188,9 @@ public class EConceptToRF2UuidTransformer implements EConceptTransformerBI {
       }
    }
 
+   /* (non-Javadoc)
+    * @see org.ihtsdo.helper.econcept.transfrom.EConceptTransformerBI#process(org.ihtsdo.tk.dto.concept.TkConcept)
+    */
    @Override
    public void process(TkConcept c) throws Exception {
       TkConceptAttributes ca = c.getConceptAttributes();
@@ -174,6 +212,12 @@ public class EConceptToRF2UuidTransformer implements EConceptTransformerBI {
       throw new UnsupportedOperationException("Not supported yet.");
    }
 
+   /**
+    * Process concept attribute.
+    *
+    * @param ca the ca
+    * @throws IOException Signals that an I/O exception has occurred.
+    */
    private void processConceptAttribute(TkConceptAttributes ca) throws IOException {
       if (ca != null) {
          for (ConceptsFileFields field : ConceptsFileFields.values()) {
@@ -240,6 +284,12 @@ public class EConceptToRF2UuidTransformer implements EConceptTransformerBI {
       }
    }
 
+   /**
+    * Process description.
+    *
+    * @param desc the desc
+    * @throws IOException Signals that an I/O exception has occurred.
+    */
    private void processDescription(TkDescription desc) throws IOException {
       if (desc != null) {
          for (DescriptionsFileFields field : DescriptionsFileFields.values()) {
@@ -346,6 +396,12 @@ public class EConceptToRF2UuidTransformer implements EConceptTransformerBI {
       }
    }
 
+   /**
+    * Process relationship.
+    *
+    * @param r the r
+    * @throws IOException Signals that an I/O exception has occurred.
+    */
    private void processRelationship(TkRelationship r) throws IOException {
       if (r != null) {
          for (RelationshipsFileFields field : RelationshipsFileFields.values()) {

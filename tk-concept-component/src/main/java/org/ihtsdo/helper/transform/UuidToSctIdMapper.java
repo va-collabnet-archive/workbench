@@ -1,12 +1,13 @@
-/*
- * Copyright 2012 International Health Terminology Standards Development Organisation.
- *
+/**
+ * Copyright (c) 2012 International Health Terminology Standards Development
+ * Organisation
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,6 +38,7 @@ import org.ihtsdo.tk.api.media.MediaChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.binding.snomed.TermAux;
 
+// TODO: Auto-generated Javadoc
 /**
  * Creates a mapping of sctIds to uuids. One file is created for each type:
  * concept, description, and relationship. The file takes the following format. A mapping consists of two lines
@@ -46,15 +48,38 @@ import org.ihtsdo.tk.binding.snomed.TermAux;
  */
 public class UuidToSctIdMapper implements ProcessUnfetchedConceptDataBI {
 
+    /** The concepts to process. */
     NidBitSetBI conceptsToProcess;
+    
+    /** The namespace. */
     String namespace;
+    
+    /** The concepts writer. */
     Writer conceptsWriter;
+    
+    /** The descriptions writer. */
     Writer descriptionsWriter;
+    
+    /** The relationships writer. */
     Writer relationshipsWriter;
+    
+    /** The refex writer. */
     Writer refexWriter;
+    
+    /** The tab. */
     String tab = "\t";
+    
+    /** The end of line. */
     String endOfLine = "\r\n";
     
+    /**
+     * Instantiates a new uuid to sct id mapper.
+     *
+     * @param conceptsToProcess the concepts to process
+     * @param namespace the namespace
+     * @param sourceDirectory the source directory
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public UuidToSctIdMapper(NidBitSetBI conceptsToProcess, String namespace, File sourceDirectory) throws IOException {
         this.conceptsToProcess = conceptsToProcess;
         this.namespace = namespace;
@@ -74,6 +99,11 @@ public class UuidToSctIdMapper implements ProcessUnfetchedConceptDataBI {
         refexWriter = new BufferedWriter(new OutputStreamWriter(refexOs, "UTF8"));
     }
     
+    /**
+     * Close.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public void close() throws IOException {
         if (conceptsWriter != null) {
             conceptsWriter.close();
@@ -92,21 +122,36 @@ public class UuidToSctIdMapper implements ProcessUnfetchedConceptDataBI {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI#processUnfetchedConceptData(int, org.ihtsdo.tk.api.ConceptFetcherBI)
+     */
     @Override
     public void processUnfetchedConceptData(int conceptNid, ConceptFetcherBI conceptFetcher) throws Exception {
         process(conceptFetcher.fetch());
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI#getNidSet()
+     */
     @Override
     public NidBitSetBI getNidSet() throws IOException {
         return conceptsToProcess;
     }
 
+    /* (non-Javadoc)
+     * @see org.ihtsdo.tk.api.ContinuationTrackerBI#continueWork()
+     */
     @Override
     public boolean continueWork() {
         return true;
     }
     
+    /**
+     * Process.
+     *
+     * @param c the c
+     * @throws Exception the exception
+     */
     public void process(ConceptChronicleBI c) throws Exception {
         ConceptAttributeChronicleBI conceptAttr = c.getConceptAttributes();
         UUID conceptAttrUuid = conceptAttr.getPrimUuid();
@@ -153,6 +198,12 @@ public class UuidToSctIdMapper implements ProcessUnfetchedConceptDataBI {
         }
     }
     
+    /**
+     * Gets the namespace.
+     *
+     * @param sctId the sct id
+     * @return the namespace
+     */
     private String getNamespace(String sctId){
         int length = sctId.length();
         String namespace = sctId.substring(length - 10, length - 3);

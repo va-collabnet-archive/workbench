@@ -1,12 +1,13 @@
-/*
- * Copyright 2011 International Health Terminology Standards Development Organisation.
- *
+/**
+ * Copyright (c) 2012 International Health Terminology Standards Development
+ * Organisation
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,16 +41,29 @@ import org.ihtsdo.tk.spec.DescriptionSpec;
 import org.ihtsdo.tk.spec.SpecFactory;
 import org.ihtsdo.tk.uuid.UuidT5Generator;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class DialectHelper. Loads the lists of dialect variant words from a file into refsets.
  *
- * @author kec
  */
 public class DialectHelper {
 
+    /** The variant map. */
     private static Map<Integer, Map<String, String>> variantMap = null;
+    
+    /** The variant set map. */
     private static Map<Integer, Set<String>> variantSetMap = null;
+    
+    /** The initialization lock. */
     private static Lock initLock = new ReentrantLock();
 
+    /**
+     * Imports the dialect variant words into the refset for the dialect, a child of language refset, if the refset does not contain members.
+     *
+     * @param dialectOrLanguageNid the dialect or language nid
+     * @throws UnsupportedDialectOrLanguage the unsupported dialect or language
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private static void lazyInit(int dialectOrLanguageNid)
             throws UnsupportedDialectOrLanguage, IOException {
         if (variantMap == null) {
@@ -102,6 +116,17 @@ public class DialectHelper {
         }
     }
 
+    /**
+     * Adds the dialect.
+     *
+     * @param dialectSpec the dialect spec
+     * @param vc the vc
+     * @param varientsSpec the varients spec
+     * @param ts the ts
+     * @param initialVariantMap the initial variant map
+     * @throws ContradictionException the contradiction exception
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private static void addDialect(ConceptSpec dialectSpec,
             ViewCoordinate vc,
             ConceptSpec varientsSpec,
@@ -125,6 +150,17 @@ public class DialectHelper {
         initialVariantMap.put(dialectC.getNid(), variantDialectMap);
     }
 
+    /**
+     * Checks if is missing desc for dialect.
+     *
+     * @param desc the desc
+     * @param dialectNid the dialect nid
+     * @param vc the vc
+     * @return true, if is missing desc for dialect
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ContradictionException the contradiction exception
+     * @throws UnsupportedDialectOrLanguage the unsupported dialect or language
+     */
     public static boolean isMissingDescForDialect(DescriptionVersionBI desc,
             int dialectNid, ViewCoordinate vc) throws IOException,
             ContradictionException, UnsupportedDialectOrLanguage {
@@ -143,6 +179,15 @@ public class DialectHelper {
         return true;
     }
 
+    /**
+     * Checks for dialect variants.
+     *
+     * @param text the text
+     * @param languageNid the language nid
+     * @return true, if successful
+     * @throws UnsupportedDialectOrLanguage the unsupported dialect or language
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public static boolean hasDialectVariants(String text, int languageNid)
             throws UnsupportedDialectOrLanguage, IOException {
         lazyInit(languageNid);
@@ -156,6 +201,15 @@ public class DialectHelper {
         return false;
     }
 
+    /**
+     * Checks if is text for dialect.
+     *
+     * @param text the text
+     * @param dialectNid the dialect nid
+     * @return true, if is text for dialect
+     * @throws UnsupportedDialectOrLanguage the unsupported dialect or language
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public static boolean isTextForDialect(String text, int dialectNid)
             throws UnsupportedDialectOrLanguage, IOException {
         lazyInit(dialectNid);
@@ -169,6 +223,15 @@ public class DialectHelper {
         return true;
     }
 
+    /**
+     * Make text for dialect.
+     *
+     * @param text the text
+     * @param dialectNid the dialect nid
+     * @return the string
+     * @throws UnsupportedDialectOrLanguage the unsupported dialect or language
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public static String makeTextForDialect(String text, int dialectNid)
             throws UnsupportedDialectOrLanguage, IOException {
         lazyInit(dialectNid);
@@ -196,6 +259,16 @@ public class DialectHelper {
         return sb.toString();
     }
 
+    /**
+     * Gets the description spec for dialect.
+     *
+     * @param desc the desc
+     * @param dialectSpec the dialect spec
+     * @param vc the vc
+     * @return the description spec for dialect
+     * @throws UnsupportedDialectOrLanguage the unsupported dialect or language
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public static DescriptionSpec getDescriptionSpecForDialect(
             DescriptionVersionBI desc,
             ConceptSpec dialectSpec, ViewCoordinate vc)
@@ -205,6 +278,16 @@ public class DialectHelper {
                 dialectSpec.get(vc).getNid(), vc);
     }
 
+    /**
+     * Gets the description spec for dialect.
+     *
+     * @param desc the desc
+     * @param dialectNid the dialect nid
+     * @param vc the vc
+     * @return the description spec for dialect
+     * @throws UnsupportedDialectOrLanguage the unsupported dialect or language
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public static DescriptionSpec getDescriptionSpecForDialect(
             DescriptionVersionBI desc,
             int dialectNid, ViewCoordinate vc)

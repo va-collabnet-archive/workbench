@@ -1,23 +1,35 @@
-/*
- * Copyright 2011 International Health Terminology Standards Development Organisation.
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of the License at
- *
+/**
+ * Copyright (c) 2012 International Health Terminology Standards Development
+ * Organisation
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software distributed under the License is
- * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and limitations under the License.
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.ihtsdo.tk.hash;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class Hashcode.
  *
  * @author kec
  */
 public class Hashcode {
 
+    /**
+     * Compute.
+     *
+     * @param parts the parts
+     * @return the int
+     */
     public static int compute(int... parts) {
         int hash = 0;
         int len = parts.length;
@@ -35,6 +47,12 @@ public class Hashcode {
         return hash;
     }
 
+    /**
+     * Compute long.
+     *
+     * @param parts the parts
+     * @return the int
+     */
     public static int computeLong(long... parts) {
         int[] intParts = new int[parts.length * 2];
 
@@ -46,6 +64,12 @@ public class Hashcode {
         return compute(intParts);
     }
 
+    /**
+     * Compute.
+     *
+     * @param parts the parts
+     * @return the short
+     */
     public static short compute(short... parts) {
         short hash = 0;
         for (int i = 0; i < parts.length; i++) {
@@ -58,6 +82,12 @@ public class Hashcode {
         return hash;
     }
 
+    /**
+     * Int hash to short hash.
+     *
+     * @param hash the hash
+     * @return the short
+     */
     public static short intHashToShortHash(int hash) {
         short[] parts = new short[2];
         parts[0] = (short) hash; // low order short
