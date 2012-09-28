@@ -151,8 +151,8 @@ public abstract class RF2AbstractImpl {
 			this.tf = Terms.get();
 			this.currenAceConfig = tf.getActiveAceFrameConfig();
 			snomedIntId = tf.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids());
-			snomedRoot = tf.getConcept(UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8"));
-			
+//			snomedRoot = tf.getConcept(UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8"));
+			snomedRoot = tf.getConcept(UUID.fromString("a60bd881-9010-3260-9653-0c85716b4391"));
 			snomedCTModelComponent = tf.getConcept(UUID.fromString("a60bd881-9010-3260-9653-0c85716b4391"));
 			coreMetaConceptRoot = tf.getConcept(UUID.fromString("4c6d8b0b-774a-341e-b0e5-1fc2deedb5a5"));
 			foundationMetaDataConceptRoot = tf.getConcept(UUID.fromString("f328cdec-6198-36c4-9c55-d7f4f5b30922"));
@@ -696,6 +696,12 @@ public abstract class RF2AbstractImpl {
 		allDescTypes.add(tf.uuidToNative(UUID.fromString("00791270-77c9-32b6-b34f-d932569bd2bf")));
 		allDescTypes.add(tf.uuidToNative(UUID.fromString("8bfba944-3965-3946-9bcb-1e80a5da63a2")));
 		allDescTypes.add(tf.uuidToNative(UUID.fromString("700546a3-09c7-3fc2-9eb9-53d318659a09")));
+		allDescTypes.add(tf.uuidToNative(UUID.fromString("5e1fe940-8faf-11db-b606-0800200c9a66")));
+		allDescTypes.add(tf.uuidToNative(UUID.fromString("d6fad981-7df6-3388-94d8-238cc0465a79")));
+		allDescTypes.add(tf.uuidToNative(UUID.fromString("d8e3b37d-7c11-33ef-b1d0-8769e2264d44")));
+		allDescTypes.add(tf.uuidToNative(UUID.fromString("aa610ed0-fb1c-364f-8db8-551da4c46419")));
+		
+		
 		return allDescTypes;
 	}
 
