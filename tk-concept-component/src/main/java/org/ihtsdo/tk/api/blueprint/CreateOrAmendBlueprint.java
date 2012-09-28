@@ -71,7 +71,7 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
 
     public CreateOrAmendBlueprint(UUID componentUuid, ComponentVersionBI cv, ViewCoordinate vc) throws IOException, InvalidCAB, ContradictionException {
         try {
-            if (Ts.get().usesRf2Metadata()) {
+            if (Ts.get().usesRf2Metadata() && currentStatusUuid == null) {
                 currentStatusUuid = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid();
                 retiredStatusUuid = SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getPrimUuid();
             } else {
