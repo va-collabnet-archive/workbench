@@ -159,6 +159,10 @@ public class NewConcept extends PreviousNextOrCancel {
     private ConceptChronicleBI synConcept;
     private String fsnText;
     private String prefText;
+    
+    private PreferredNameDocumentListener preferredLister = new PreferredNameDocumentListener();
+    private boolean userModifiedPreferred = false;
+
 
     /*
      * -----------------------
@@ -180,7 +184,8 @@ public class NewConcept extends PreviousNextOrCancel {
             } else {
                 instruction = "<html>Select Parent for Concept Being Retired:";
             }
-
+            preferredLister = new PreferredNameDocumentListener();
+            userModifiedPreferred = false;
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -421,6 +426,7 @@ public class NewConcept extends PreviousNextOrCancel {
                 pref.setText("");
                 pref.setFixedWidth(300);
                 pref.setEditable(true);
+                pref.getDocument().addDocumentListener(preferredLister);
                 wizardPanel.add(pref, c);
 
                 c.gridwidth = 4;
@@ -621,12 +627,34 @@ public class NewConcept extends PreviousNextOrCancel {
         wizardPanel.repaint();
     }
 
+    public class PreferredNameDocumentListener implements DocumentListener {
+
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            userModifiedPreferred = true;
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+           userModifiedPreferred = true;
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+           userModifiedPreferred = true;
+        }
+        
+    }
     public class CopyTextDocumentListener implements DocumentListener {
 
         int paren;
 
         @Override
         public void changedUpdate(DocumentEvent arg0) {
+            if (userModifiedPreferred) {
+                return;
+            }
+            pref.getDocument().removeDocumentListener(preferredLister);
             fsnText = "";
             prefText = "";
             fsnText = fsn.extractText();
@@ -642,11 +670,16 @@ public class NewConcept extends PreviousNextOrCancel {
             }
 
             addSpellingVarients(prefText, fsnText);
+            pref.getDocument().addDocumentListener(preferredLister);
 
         }
 
         @Override
         public void insertUpdate(DocumentEvent arg0) {
+            if (userModifiedPreferred) {
+                return;
+            }
+            pref.getDocument().removeDocumentListener(preferredLister);
             fsnText = "";
             prefText = "";
             fsnText = fsn.extractText();
@@ -662,11 +695,16 @@ public class NewConcept extends PreviousNextOrCancel {
             }
 
             addSpellingVarients(prefText, fsnText);
+            pref.getDocument().addDocumentListener(preferredLister);
 
         }
 
         @Override
         public void removeUpdate(DocumentEvent arg0) {
+            if (userModifiedPreferred) {
+                return;
+            }
+            pref.getDocument().removeDocumentListener(preferredLister);
             fsnText = "";
             prefText = "";
             fsnText = fsn.extractText();
@@ -682,6 +720,7 @@ public class NewConcept extends PreviousNextOrCancel {
             }
 
             addSpellingVarients(prefText, fsnText);
+            pref.getDocument().addDocumentListener(preferredLister);
 
         }
     }
