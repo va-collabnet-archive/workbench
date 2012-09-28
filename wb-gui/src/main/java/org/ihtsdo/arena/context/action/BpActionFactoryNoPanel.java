@@ -13,6 +13,7 @@ import javax.swing.Action;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.log.AceLog;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 
 public class BpActionFactoryNoPanel {
 
@@ -26,6 +27,9 @@ public class BpActionFactoryNoPanel {
       this.host = host;
    }
    
+   public EditCoordinate getEditCoordinate() {
+       return frameConfig.getEditCoordinate();
+   }
   
    public Action make(String processUrlStr) {
       try {
