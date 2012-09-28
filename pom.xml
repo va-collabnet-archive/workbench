@@ -227,13 +227,13 @@
 		</plugins>
 	</reporting>
 	<modules>
-		<!-- <module>wb-foundation</module>
+		<module>wb-foundation</module>
 		<module>wb-core</module>
 		<module>wb-api</module>
 		<module>id-generation-ws-client</module>
-		<module>id-generation-api</module> -->
+		<module>id-generation-api</module>
 		<module>wb-release-process</module>
-		<!-- <module>wb-mojo</module>
+		<module>wb-mojo</module>
 		<module>wb-gui</module>
 		<module>wb-bdb</module>
 		<module>wb-bdb-mojo</module>
@@ -250,7 +250,7 @@
 		<module>tk-junit-ext</module>
 		<module>tk-case-sensitive-words</module>
 		<module>tk-cern-prim</module>
-		<module>wb-schema-mojo</module> -->
+		<module>wb-schema-mojo</module>
 		<!-- <module>bdb-properties</module> -->
 	</modules>
 </project>
