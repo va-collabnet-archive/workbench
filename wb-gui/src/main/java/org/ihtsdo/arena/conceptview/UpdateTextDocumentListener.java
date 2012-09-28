@@ -43,6 +43,7 @@ import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.thread.NamedThreadFactory;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidAnalogBI;
 import org.ihtsdo.tk.binding.snomed.Language;
 import org.ihtsdo.tk.binding.snomed.CaseSensitive;
@@ -65,11 +66,12 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
     boolean update = false;
     I_ConfigAceFrame config;
     Collection<? extends RefexChronicleBI<?>> refexes;
-    ConceptChronicleBI gbConcept;
-    ConceptChronicleBI usConcept;
-    int prefNid;
-    int acceptNid;
-    TerminologyBuilderBI tc;
+    static ConceptChronicleBI gbConcept = null;
+    static ConceptChronicleBI usConcept;
+    static int prefNid;
+    static int acceptNid;
+    static int fsn;
+    TerminologyBuilderBI builder;
     String text;
 
     public UpdateTextDocumentListener(FixedWidthJEditorPane editorPane,
@@ -80,9 +82,17 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
         t = new Timer(5000, this);
         c = Terms.get().getConcept(desc.getConceptNid());
         Ts.get().addVetoablePropertyChangeListener(TerminologyStoreDI.CONCEPT_EVENT.PRE_COMMIT, this);
+        //get rf1/rf2 concept
+        if (gbConcept == null) {
+            gbConcept = Ts.get().getConcept(SnomedMetadataRfx.getGB_DIALECT_REFEX_NID());
+            acceptNid = SnomedMetadataRfx.getDESC_ACCEPTABLE_NID();
+            prefNid = SnomedMetadataRfx.getDESC_PREFERRED_NID();
+            fsn = SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID();
+            usConcept = Ts.get().getConcept(SnomedMetadataRfx.getUS_DIALECT_REFEX_NID());
+        }
     }
     long lastChange = Long.MIN_VALUE;
-    
+
     @Override
     public void insertUpdate(DocumentEvent e) {
         lastChange++;
@@ -120,7 +130,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
         }
         update = true;
     }
-    
+
     @Override
     public void changedUpdate(DocumentEvent e) {
         lastChange++;
@@ -148,7 +158,6 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
 
             if (desc.getLang().equals(LANG_CODE.EN.getFormatedLanguageCode())) {
                 updateDocListenrService.submit(new Runnable() {
-
                     @Override
                     public void run() {
                         try {
@@ -171,7 +180,6 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
 
             } else {
                 updateDocListenrService.submit(new Runnable() {
-
                     @Override
                     public void run() {
                         try {
@@ -189,20 +197,15 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
 
     private void doAction() throws IOException, PropertyVetoException, InvalidCAB, UnsupportedDialectOrLanguage, TerminologyException, ContradictionException {
         config = Terms.get().getActiveAceFrameConfig();
-        tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
+        builder = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
                 config.getViewCoordinate());
+        ConceptVersionBI cv = Ts.get().getConceptVersion(config.getViewCoordinate(), desc.getConceptNid());
         if (update) { //create new
             if (desc.getLang().equals(LANG_CODE.EN.getFormatedLanguageCode())) {
 
                 refexes = desc.getCurrentAnnotationMembers(config.getViewCoordinate());
                 int type = desc.getTypeNid();
-                int fsn = SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID();
 
-                //get rf1/rf2 concept
-                gbConcept = Ts.get().getConcept(SnomedMetadataRfx.getGB_DIALECT_REFEX_NID());
-                usConcept = Ts.get().getConcept(SnomedMetadataRfx.getUS_DIALECT_REFEX_NID());
-                acceptNid = SnomedMetadataRfx.getDESC_ACCEPTABLE_NID();
-                prefNid = SnomedMetadataRfx.getDESC_PREFERRED_NID();
 
                 if (refexes.isEmpty()) { //check for previous changes
                     if (type == fsn) {
@@ -217,16 +220,20 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                     for (RefexChronicleBI<?> descRefex : refexes) {
                         if (descRefex.isUncommitted()) {
                             if (descRefex.getCollectionNid() == gbConcept.getNid()) {
-                                gbRefex = (RefexCnidAnalogBI) descRefex;;
+                                gbRefex = (RefexCnidAnalogBI) descRefex;
                             } else if (descRefex.getCollectionNid() == usConcept.getNid()) {
                                 usRefex = (RefexCnidAnalogBI) descRefex;
                             }
                         }
                     }
                     if (type == fsn) {
-                        doFsnUpdate(gbRefex, usRefex);
+                        if (cv.getFsnDescsActive().size() > 1) {
+                            doFsnUpdate(gbRefex, usRefex);
+                        }
                     } else {
-                        doSynUpdate(gbRefex, usRefex);
+                        if (cv.getPrefDescsActive().size() > 1) {
+                            doSynUpdate(gbRefex, usRefex);
+                        }
                     }
                 }
             }
@@ -245,14 +252,14 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                 desc.getNid(),
                 usConcept.getNid());
         refexSpecUs.put(RefexProperty.CNID1, prefNid);
-        RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
+        RefexChronicleBI<?> newRefexUs = builder.construct(refexSpecUs);
 
         RefexCAB refexSpecGb = new RefexCAB(
                 TK_REFSET_TYPE.CID,
                 desc.getNid(),
                 gbConcept.getNid());
         refexSpecGb.put(RefexProperty.CNID1, prefNid);
-        RefexChronicleBI<?> newRefexGb = tc.construct(refexSpecGb);
+        RefexChronicleBI<?> newRefexGb = builder.construct(refexSpecGb);
 
         I_GetConceptData refexGb = Terms.get().getConceptForNid(newRefexGb.getNid());
         Ts.get().addUncommitted(refexGb);
@@ -270,14 +277,14 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                     desc.getNid(),
                     usConcept.getNid());
             refexSpecUs.put(RefexProperty.CNID1, acceptNid);
-            RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
+            RefexChronicleBI<?> newRefexUs = builder.construct(refexSpecUs);
 
             RefexCAB refexSpecGb = new RefexCAB(
                     TK_REFSET_TYPE.CID,
                     desc.getNid(),
                     gbConcept.getNid());
             refexSpecGb.put(RefexProperty.CNID1, acceptNid);
-            RefexChronicleBI<?> newRefexGb = tc.construct(refexSpecGb);
+            RefexChronicleBI<?> newRefexGb = builder.construct(refexSpecGb);
 
             I_GetConceptData refexGb = Terms.get().getConceptForNid(newRefexGb.getNid());
             Ts.get().addUncommitted(refexGb);
@@ -289,7 +296,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                     desc.getNid(),
                     usConcept.getNid());
             refexSpecUs.put(RefexProperty.CNID1, acceptNid);
-            RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
+            RefexChronicleBI<?> newRefexUs = builder.construct(refexSpecUs);
 
             I_GetConceptData refexUs = Terms.get().getConceptForNid(newRefexUs.getConceptNid());
             Ts.get().addUncommitted(refexUs);
@@ -299,7 +306,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                     desc.getNid(),
                     gbConcept.getNid());
             refexSpecGb.put(RefexProperty.CNID1, acceptNid);
-            RefexChronicleBI<?> newRefexGb = tc.construct(refexSpecGb);
+            RefexChronicleBI<?> newRefexGb = builder.construct(refexSpecGb);
 
             I_GetConceptData refexGb = Terms.get().getConceptForNid(newRefexGb.getConceptNid());
             Ts.get().addUncommitted(refexGb);
