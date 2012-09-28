@@ -13,26 +13,27 @@ import javax.swing.Action;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.log.AceLog;
-import org.ihtsdo.arena.ScrollablePanel;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 
-public class BpActionFactory {
+public class BpActionFactoryNoPanel {
 
    I_ConfigAceFrame frameConfig;
    I_HostConceptPlugins host;
-   ScrollablePanel wizardPanel;
 
-   public BpActionFactory(I_ConfigAceFrame frameConfig,
-           I_HostConceptPlugins host, ScrollablePanel wizardPanel) {
+   public BpActionFactoryNoPanel(I_ConfigAceFrame frameConfig,
+           I_HostConceptPlugins host) {
       super();
       this.frameConfig = frameConfig;
       this.host = host;
-      this.wizardPanel = wizardPanel;
    }
-
+   
+   public EditCoordinate getEditCoordinate() {
+       return frameConfig.getEditCoordinate();
+   }
+  
    public Action make(String processUrlStr) {
       try {
-         return new BpAction(processUrlStr, frameConfig, host,
-                 wizardPanel);
+         return new BpAction(processUrlStr, frameConfig, host);
       } catch (Exception e) {
          AceLog.getAppLog().alertAndLog(null,
                  Level.SEVERE,
@@ -55,7 +56,7 @@ public class BpActionFactory {
       if (processfile.exists()) {
          try {
             return new BpAction(processfile.toURI().toURL(), frameConfig,
-                    host, wizardPanel);
+                    host);
          } catch (Exception e) {
             AceLog.getAppLog().alertAndLog(null,
                     Level.SEVERE,
@@ -78,7 +79,7 @@ public class BpActionFactory {
    public Action makeDisabled(File processfile) {
       try {
          BpAction act = new BpAction(processfile.toURI().toURL(),
-                 frameConfig, host, wizardPanel);
+                 frameConfig, host);
          act.setEnabled(false);
          return act;
       } catch (Exception e) {
