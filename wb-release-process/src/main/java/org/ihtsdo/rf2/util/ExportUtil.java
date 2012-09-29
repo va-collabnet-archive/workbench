@@ -1697,6 +1697,7 @@ public class ExportUtil {
 					namespaceId = config.getNamespaceId();
 					releaseId	= config.getReleaseId();
 					executionId = config.getExecutionId();
+					partitionId = config.getPartitionId();
 				}
 				conceptId = idGen.createSCTID(uuid, Integer.parseInt(namespaceId) , partitionId, releaseId, executionId, sctModuleId);
 
