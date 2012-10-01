@@ -14,6 +14,7 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.apache.maven.doxia.markup.HtmlMarkup;
 import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.doxia.sink.SinkEventAttributeSet;
@@ -88,6 +89,8 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 	private static final int EXECUTION_CONTEXT = 7;
 	private static final int EXECUTION_PATH_NAME = 8;
 
+	private static final Logger log = Logger.getLogger(ReportBatchQACheck.class);
+
 	@Override
 	protected void executeReport(Locale arg0) throws MavenReportException {
 		try {
@@ -127,10 +130,10 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 			sortedBr.close();
 			ResourceBundle resources = ResourceBundle.getBundle("convertion");
 
-			File executionFile = new File(executionDetailsOutputStr);
-			FileInputStream fis = new FileInputStream(executionFile);
-			InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
-			BufferedReader br = new BufferedReader(isr);
+			 File executionFile = new File(executionDetailsOutputStr);
+			 FileInputStream fis = new FileInputStream(executionFile);
+			 InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
+			 BufferedReader br = new BufferedReader(isr);
 
 			Sink sink = getSink();
 
@@ -166,7 +169,7 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 			sink.head_();
 
 			sink.body();
-			 sink.section1();
+			sink.section1();
 
 			sink.sectionTitle1();
 			sink.text("Last Batch QA Execution");
@@ -174,76 +177,83 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 
 			sink.lineBreak();
 
-			String executionLine = br.readLine();
-			executionLine = br.readLine();
-			br.close();
-			String[] splitedLine = executionLine.split("\\t", -1);
+			 String executionLine = br.readLine();
+			 executionLine = br.readLine();
+			 br.close();
+			 String[] splitedLine = executionLine.split("\\t", -1);
 
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
-			SimpleDateFormat sdf1 = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss z");
-			String startTime = "";
-			try {
-				startTime = sdf1.format(sdf.parse(splitedLine[EXECUTION_START_TIME]));
-			} catch (Exception e) {
-				e.printStackTrace();
-				startTime = "{Invalid date format in execution file}";
-			}
-			String endTime = "";
-			try {
-				endTime = sdf1.format(sdf.parse(splitedLine[EXECUTION_END_TIME]));
-			} catch (Exception e) {
-				e.printStackTrace();
-				endTime = "{Invalid date format in execution file}";
-			}
-			sink.bold();
-			sink.text("Start time: ");
-			sink.bold_();
-			sink.text(startTime);
-			sink.lineBreak();
+			 SimpleDateFormat sdf = new
+			 SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+			 SimpleDateFormat sdf1 = new
+			 SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss z");
+			 String startTime = "";
+			 try {
+			 startTime =
+			 sdf1.format(sdf.parse(splitedLine[EXECUTION_START_TIME]));
+			 } catch (Exception e) {
+			 e.printStackTrace();
+			 startTime = "{Invalid date format in execution file}";
+			 }
+			 String endTime = "";
+			 try {
+			 endTime =
+			 sdf1.format(sdf.parse(splitedLine[EXECUTION_END_TIME]));
+			 } catch (Exception e) {
+			 e.printStackTrace();
+			 endTime = "{Invalid date format in execution file}";
+			 }
+			 sink.bold();
+			 sink.text("Start time: ");
+			 sink.bold_();
+			 sink.text(startTime);
+			 sink.lineBreak();
+			
+			 sink.bold();
+			 sink.text("End time: ");
+			 sink.bold_();
+			 sink.text(endTime);
+			 sink.lineBreak();
+			
+			 sink.bold();
+			 sink.text("Database Name: ");
+			 sink.bold_();
+			
+			 sink.text(splitedLine[EXECUTION_NAME]);
+			 sink.lineBreak();
 
-			sink.bold();
-			sink.text("End time: ");
-			sink.bold_();
-			sink.text(endTime);
-			sink.lineBreak();
-
-			sink.bold();
-			sink.text("Database Name: ");
-			sink.bold_();
-
-			sink.text(splitedLine[EXECUTION_NAME]);
-			sink.lineBreak();
-
-			sink.bold();
-			sink.text("Database UUID: ");
-			sink.bold_();
-
-			sink.text(splitedLine[EXECUTION_DATABASE_UUID]);
-			sink.lineBreak();
-
-			sink.bold();
-			sink.text("Path tested: ");
-			sink.bold_();
-			sink.text(splitedLine[EXECUTION_PATH_NAME] + " - " + splitedLine[EXECUTION_PATH_UUID]);
-			sink.lineBreak();
-			String vpt = "";
-			try {
-				Date viewPointTime = sdf.parse(splitedLine[EXECUTION_VIEW_POINT]);
-				Date oneYearAfter = new Date((new Date().getTime()) + 30000000000l);
-				if (viewPointTime.getTime() > oneYearAfter.getTime()) {
-					vpt = "latest";
-				} else {
-					vpt = sdf1.format(viewPointTime);
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-				vpt = "{Invalid date format in execution file}";
-			}
-			sink.bold();
-			sink.text("View point time: ");
-			sink.bold_();
-			sink.text(vpt);
-			sink.section1_();
+			 sink.bold();
+			 sink.text("Database UUID: ");
+			 sink.bold_();
+			
+			 sink.text(splitedLine[EXECUTION_DATABASE_UUID]);
+			 sink.lineBreak();
+			
+			 sink.bold();
+			 sink.text("Path tested: ");
+			 sink.bold_();
+			 sink.text(splitedLine[EXECUTION_PATH_NAME] + " - " +
+			 splitedLine[EXECUTION_PATH_UUID]);
+			 sink.lineBreak();
+			 String vpt = "";
+			 try {
+			 Date viewPointTime =
+			 sdf.parse(splitedLine[EXECUTION_VIEW_POINT]);
+			 Date oneYearAfter = new Date((new Date().getTime()) +
+			 30000000000l);
+			 if (viewPointTime.getTime() > oneYearAfter.getTime()) {
+			 vpt = "latest";
+			 } else {
+			 vpt = sdf1.format(viewPointTime);
+			 }
+			 } catch (Exception e) {
+			 e.printStackTrace();
+			 vpt = "{Invalid date format in execution file}";
+			 }
+			 sink.bold();
+			 sink.text("View point time: ");
+			 sink.bold_();
+			 sink.text(vpt);
+			 sink.section1_();
 
 			File rules = new File(rulesOutputStr);
 			FileInputStream ruleFis = new FileInputStream(rules);
@@ -318,7 +328,7 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 									} else if (i == 1) {
 										sink.unknown("a", new Object[] { new Integer(HtmlMarkup.TAG_TYPE_START) }, linkAttr);
 										if (findings.size() > 1) {
-											sink.text(ruleLineSplit[i] + string.replaceAll(ruleLineSplit[0], ""));
+											sink.text(ruleLineSplit[i] + " "+ string.replaceAll(ruleLineSplit[0], ""));
 										} else {
 											sink.text(ruleLineSplit[i]);
 										}
@@ -476,13 +486,14 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 					line = sortedBr.readLine();
 					splitedLine = line.split("\\t", -1);
 					if ((lines + 1) % 1000 == 0) {
-						// 1000 lines processed
+						log.info("LINES + 1 = " + (lines + 1));
 						break;
 					}
 				}
 
 				if (line.trim() != "" && splitedLine.length >= 7 && splitedLine[4].equals(ruleLineSplit[0])) {
 					lines++;
+					log.info("PROCESSING LAST LINE");
 					bw.write("<tr class=\"b\">");
 					String name = "";
 					String uuid = "";
@@ -504,26 +515,25 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 				bw.flush();
 				bw.close();
 				if (lines % 1000 == 0) {
+					log.info("1000 line file");
 					int startline = lines - 1000;
 					if (startline <= 0) {
 						startline = 1;
-					} else {
-						startline = lines - (lines % 1000);
 					}
-					findingFile.renameTo(new File(findingFolder, ruleLineSplit[0] + "(" + startline + " - " + lines + ")"));
-					result.put(ruleLineSplit[0] + "(" + startline + " - " + lines + ")", lines - startline + 1);
+					findingFile.renameTo(new File(findingFolder, ruleLineSplit[0]+ "("+  startline + "-" + lines + ").html"));
+					result.put(ruleLineSplit[0]+ "("+  startline + "-" + lines + ").html", lines - startline);
 				} else {
+					log.info("LAST FILE");
 					int startline = lines - 1000;
 					if (startline <= 0) {
 						startline = 1;
-					} else {
-						startline = lines - (lines % 1000);
 					}
-					findingFile.renameTo(new File(findingFolder, ruleLineSplit[0] + "(" + startline + " - " + lines + ")"));
-					result.put(ruleLineSplit[0] + "(" + startline + " - " + lines + ")", lines - startline + 1);
+					findingFile.renameTo(new File(findingFolder, ruleLineSplit[0] + "("+ startline + "-" + lines + ").html"));
+					result.put(ruleLineSplit[0] + "("+  startline + "-" + lines + ").html", lines - startline);
 					keepmaking = false;
 				}
 			}
+			sortedBr.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
