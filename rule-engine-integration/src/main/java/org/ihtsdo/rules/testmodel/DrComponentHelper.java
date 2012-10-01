@@ -343,9 +343,7 @@ public class DrComponentHelper {
             
             addAnnotationsToConcept(concept, conceptBi, mockVc, factContextName);
 
-        } catch (IOException e) {
-            AceLog.getAppLog().alertAndLogException(e);
-        } catch (TerminologyException e) {
+        } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
         }
 
@@ -354,9 +352,9 @@ public class DrComponentHelper {
     }
     
     private static void addAnnotationsToConcept(DrConcept concept, ConceptVersionBI componentBi, 
-            ViewCoordinate mockVc, String factContextName) throws IOException {
+            ViewCoordinate mockVc, String factContextName) throws IOException, ContradictionException {
         I_TermFactory tf = Terms.get();
-        Collection<? extends RefexVersionBI<?>> annotations = componentBi.getCurrentAnnotationMembers(mockVc);
+        Collection<? extends RefexVersionBI<?>> annotations = componentBi.getConAttrsActive().getCurrentAnnotationMembers(mockVc);
             
             for (RefexVersionBI annotation : annotations) {
                 DrRefsetExtension extension = new DrRefsetExtension();

@@ -302,17 +302,17 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
                             String text1 = "";
                             String text2 = "";
 
-                            if (part_search.getText().contains("(") && part_search.getText().indexOf("(") > 2) {
-                                text1 = part_search.getText().substring(0, part_search.getText().lastIndexOf("(")-1).toLowerCase().trim();
-                            } else {
-                                text1 = part_search.getText().toLowerCase().trim();
-                            }
-                            
-                            if (descText.contains("(")  && descText.indexOf("(") > 2) {
-                                text2 = descText.substring(0, descText.lastIndexOf("(")-1).toLowerCase().trim();
-                            } else {
-                                text2 = descText.toLowerCase().trim();
-                            }
+//                            if (part_search.getText().contains("(") && part_search.getText().indexOf("(") > 2) {
+//                                text1 = part_search.getText().substring(0, part_search.getText().lastIndexOf("(")-1).toLowerCase().trim();
+//                            } else {
+//                                text1 = part_search.getText().toLowerCase().trim();
+//                            }
+//                            
+//                            if (descText.contains("(")  && descText.indexOf("(") > 2) {
+//                                text2 = descText.substring(0, descText.lastIndexOf("(")-1).toLowerCase().trim();
+//                            } else {
+//                                text2 = descText.toLowerCase().trim();
+//                            }
                             
                             if (allowedStatusNids.contains(part_search.getStatusNid())
                                     && (part_search.getText().toLowerCase().equals(descText.toLowerCase()) 
