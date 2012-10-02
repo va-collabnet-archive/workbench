@@ -53,7 +53,7 @@
 		<maven-jxr-plugin.version>2.2</maven-jxr-plugin.version>
 		<maven-compiler-plugin.version>2.0.2</maven-compiler-plugin.version>
 		<maven-project-info-reports-plugin.version>2.2</maven-project-info-reports-plugin.version>
-		<maven-javadoc-plugin.version>2.7</maven-javadoc-plugin.version>
+		<maven-javadoc-plugin.version>2.8.1</maven-javadoc-plugin.version>
 		<maven-plugin-plugin.version>2.6</maven-plugin-plugin.version>
 		<maven-surefire-report-plugin.version>2.6</maven-surefire-report-plugin.version>
 		<maven-enforcer-plugin.version>1.0</maven-enforcer-plugin.version>
@@ -190,6 +190,14 @@
 					<target>1.7</target>
 				</configuration>
 			</plugin>
+                        <plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>${maven-javadoc-plugin.version}</version>
+                                <configuration>
+                                  <stylesheet>java</stylesheet>
+                                </configuration>
+                        </plugin>
 		</plugins>
 	</build>
 	<reporting>
