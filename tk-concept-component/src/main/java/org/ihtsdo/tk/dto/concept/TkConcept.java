@@ -126,7 +126,7 @@ public class TkConcept {
      * Instantiates a new tk concept.
      *
      * @param in the in
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ClassNotFoundException the class not found exception
      */
     public TkConcept(DataInput in) throws IOException, ClassNotFoundException {
@@ -138,7 +138,7 @@ public class TkConcept {
      * Instantiates a new tk concept.
      *
      * @param conceptChronicle the concept chronicle
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public TkConcept(ConceptChronicleBI conceptChronicle) throws IOException {
         annotationStyleRefex = conceptChronicle.isAnnotationStyleRefex();
@@ -188,7 +188,7 @@ public class TkConcept {
      *
      * @param refexChronicle the refex chronicle
      * @return the tk refex abstract member
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static TkRefexAbstractMember<?> convertRefex(RefexChronicleBI<?> refexChronicle) throws IOException {
         if (refexChronicle.getPrimordialVersion() instanceof RefexNidNidNidVersionBI) {
@@ -286,7 +286,7 @@ public class TkConcept {
      * @param offset the offset
      * @param mapAll the map all
      * @param viewCoordinate the view coordinate
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     public TkConcept(ConceptVersionBI conceptVersion, NidBitSetBI excludedNids, Map<UUID, UUID> conversionMap,
@@ -307,7 +307,7 @@ public class TkConcept {
      * @param conceptVc the concept vc
      * @param descVc the desc vc
      * @param relVc the rel vc
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     public TkConcept(ConceptVersionBI conceptVersion, NidBitSetBI excludedNids, Map<UUID, UUID> conversionMap,
@@ -410,7 +410,7 @@ public class TkConcept {
      * this <tt>EConcept</tt>.
      *
      * @param obj the object to compare with.
-     * @return true, if successful
+     * @return <code>true</code>, if successful
      * <code>true</code> if the objects are the same;
      * <code>false</code> otherwise.
      */
@@ -501,7 +501,7 @@ public class TkConcept {
      * Read external.
      *
      * @param in the in
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ClassNotFoundException the class not found exception
      */
     public final void readExternal(DataInput in) throws IOException, ClassNotFoundException {
@@ -735,7 +735,7 @@ public class TkConcept {
      * Write external.
      *
      * @param out the out
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public void writeExternal(DataOutput out) throws IOException {
         out.writeInt(dataVersion);
@@ -857,7 +857,7 @@ public class TkConcept {
     /**
      * Checks if is annotation style refex.
      *
-     * @return true, if is annotation style refex
+     * @return <code>true</code>, if is annotation style refex
      */
     public boolean isAnnotationStyleRefex() {
         return annotationStyleRefex;
@@ -866,7 +866,7 @@ public class TkConcept {
     /**
      * Checks if is annotation index style refex.
      *
-     * @return true, if is annotation index style refex
+     * @return <code>true</code>, if is annotation index style refex
      */
     public boolean isAnnotationIndexStyleRefex() {
         return annotationIndexStyleRefex;

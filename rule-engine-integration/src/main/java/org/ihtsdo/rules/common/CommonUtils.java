@@ -43,7 +43,7 @@ public class CommonUtils {
 	 * @param extension the extension
 	 * @return the last extension part
 	 * @throws TerminologyException the terminology exception
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred.
 	 */
 	public static I_ExtendByRefPart getLastExtensionPart(I_ExtendByRef extension) throws TerminologyException, IOException {
 		long lastVersion = Long.MIN_VALUE;

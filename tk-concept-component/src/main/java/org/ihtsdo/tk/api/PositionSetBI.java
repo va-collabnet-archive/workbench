@@ -23,7 +23,7 @@ import java.util.Set;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Interface PositionSetBI.
+ * The Interface PositionSetBI. TODO-javadoc: ?
  */
 public interface PositionSetBI extends Set<PositionBI>, Serializable {
     

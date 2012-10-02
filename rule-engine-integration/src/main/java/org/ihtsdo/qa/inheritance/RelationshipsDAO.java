@@ -109,7 +109,7 @@ ROLEGROUPS_CROSSOVER};
 		/**
 		 * Instantiates a new relationships dao.
 		 *
-		 * @throws IOException Signals that an I/O exception has occurred.
+		 * @throws IOException signals that an I/O exception has occurred.
 		 * @throws TerminologyException the terminology exception
 		 */
 		public RelationshipsDAO() throws IOException, TerminologyException{
@@ -136,7 +136,7 @@ ROLEGROUPS_CROSSOVER};
 		 *
 		 * @param concept the concept
 		 * @return the parents
-		 * @throws IOException Signals that an I/O exception has occurred.
+		 * @throws IOException signals that an I/O exception has occurred.
 		 * @throws TerminologyException the terminology exception
 		 */
 		public Set<? extends I_GetConceptData> getParents(I_GetConceptData concept) throws IOException, TerminologyException {
@@ -151,7 +151,7 @@ ROLEGROUPS_CROSSOVER};
 		 *
 		 * @param concept the concept
 		 * @return the stated is a rels
-		 * @throws IOException Signals that an I/O exception has occurred.
+		 * @throws IOException signals that an I/O exception has occurred.
 		 * @throws TerminologyException the terminology exception
 		 */
 		public List<? extends I_RelTuple> getStatedIsARels(I_GetConceptData concept) throws IOException, TerminologyException {
@@ -168,7 +168,7 @@ ROLEGROUPS_CROSSOVER};
 		 *
 		 * @param concept the concept
 		 * @return the stated all rels
-		 * @throws IOException Signals that an I/O exception has occurred.
+		 * @throws IOException signals that an I/O exception has occurred.
 		 * @throws TerminologyException the terminology exception
 		 */
 		public List<? extends I_RelTuple> getStatedAllRels(I_GetConceptData concept) throws IOException, TerminologyException {
@@ -185,7 +185,7 @@ ROLEGROUPS_CROSSOVER};
 		 *
 		 * @param concept the concept
 		 * @return the inferred rels
-		 * @throws IOException Signals that an I/O exception has occurred.
+		 * @throws IOException signals that an I/O exception has occurred.
 		 * @throws TerminologyException the terminology exception
 		 */
 		public List<? extends I_RelTuple> getInferredRels(I_GetConceptData concept) throws IOException, TerminologyException {
@@ -202,7 +202,7 @@ ROLEGROUPS_CROSSOVER};
 		 *
 		 * @param concept the concept
 		 * @return the rel tuples
-		 * @throws IOException Signals that an I/O exception has occurred.
+		 * @throws IOException signals that an I/O exception has occurred.
 		 * @throws TerminologyException the terminology exception
 		 */
 		public List<I_RelTuple> getRelTuples(I_GetConceptData concept) throws IOException, TerminologyException{
@@ -241,7 +241,7 @@ ROLEGROUPS_CROSSOVER};
 		 *
 		 * @param concept the concept
 		 * @return the children
-		 * @throws IOException Signals that an I/O exception has occurred.
+		 * @throws IOException signals that an I/O exception has occurred.
 		 * @throws TerminologyException the terminology exception
 		 */
 		public Set<? extends I_GetConceptData> getChildren(I_GetConceptData concept) throws IOException, TerminologyException {
@@ -258,7 +258,7 @@ ROLEGROUPS_CROSSOVER};
 		 * @param concept1 the concept1
 		 * @param concept2 the concept2
 		 * @return the tES t_ results
-		 * @throws IOException Signals that an I/O exception has occurred.
+		 * @throws IOException signals that an I/O exception has occurred.
 		 * @throws TerminologyException the terminology exception
 		 */
 		public TEST_RESULTS subsumptionConceptTest(I_GetConceptData concept1, I_GetConceptData concept2) throws IOException, TerminologyException, ContradictionException{
@@ -282,7 +282,7 @@ ROLEGROUPS_CROSSOVER};
 		 * @param role2 the role2
 		 * @return the tES t_ results
 		 * @throws TerminologyException the terminology exception
-		 * @throws IOException Signals that an I/O exception has occurred.
+		 * @throws IOException signals that an I/O exception has occurred.
 		 */
 		public TEST_RESULTS subsumptionRoleTest(I_RelTuple role1, I_RelTuple role2) throws TerminologyException, IOException, ContradictionException{
 			TEST_RESULTS relTargetSubSum=subsumptionConceptTest(termFactory.getConcept( role1.getC2Id()),termFactory.getConcept(role2.getC2Id()));
@@ -339,7 +339,7 @@ ROLEGROUPS_CROSSOVER};
 		 * @param rolegroup2 the rolegroup2
 		 * @return the tES t_ results
 		 * @throws TerminologyException the terminology exception
-		 * @throws IOException Signals that an I/O exception has occurred.
+		 * @throws IOException signals that an I/O exception has occurred.
 		 */
 		public TEST_RESULTS subsumptionRoleGroupTest(I_RelTuple[] rolegroup1, I_RelTuple[] rolegroup2) throws TerminologyException, IOException, ContradictionException{
 			TEST_RESULTS roleTestResult ;
@@ -448,7 +448,7 @@ ROLEGROUPS_CROSSOVER};
 		 * @param rolegroup2 the rolegroup2
 		 * @return true, if successful
 		 * @throws TerminologyException the terminology exception
-		 * @throws IOException Signals that an I/O exception has occurred.
+		 * @throws IOException signals that an I/O exception has occurred.
 		 */
 		private boolean roleGroup1SubSumToRoleGroup2(
 				I_RelTuple[] rolegroup1, I_RelTuple[] rolegroup2) throws
@@ -502,7 +502,7 @@ ROLEGROUPS_CROSSOVER};
 		 *
 		 * @param concept the concept
 		 * @return the inherited relationships
-		 * @throws IOException Signals that an I/O exception has occurred.
+		 * @throws IOException signals that an I/O exception has occurred.
 		 * @throws TerminologyException the terminology exception
 		 */
 		public InheritedRelationships getInheritedRelationships (I_GetConceptData concept) throws
@@ -526,7 +526,7 @@ ROLEGROUPS_CROSSOVER};
 		 * @param parents the parents
 		 * @return the inherited relationships
 		 * @throws TerminologyException the terminology exception
-		 * @throws IOException Signals that an I/O exception has occurred.
+		 * @throws IOException signals that an I/O exception has occurred.
 		 */
 		public InheritedRelationships getInheritedRelationships (Set<I_GetConceptData> parents) throws 
                         TerminologyException, IOException, ContradictionException{
@@ -554,7 +554,7 @@ ROLEGROUPS_CROSSOVER};
 		 * @param allSingleRoles the all single roles
 		 * @return the more specific roles
 		 * @throws TerminologyException the terminology exception
-		 * @throws IOException Signals that an I/O exception has occurred.
+		 * @throws IOException signals that an I/O exception has occurred.
 		 */
 		private void getMoreSpecificRoles(List<I_RelTuple[]> allRoleGroups,
 				List<I_RelTuple> allSingleRoles) throws TerminologyException, IOException, ContradictionException {
@@ -613,7 +613,7 @@ ROLEGROUPS_CROSSOVER};
 		 * @param allSingleRoles the all single roles
 		 * @param parents the parents
 		 * @return the recursive defining attributes
-		 * @throws IOException Signals that an I/O exception has occurred.
+		 * @throws IOException signals that an I/O exception has occurred.
 		 * @throws TerminologyException the terminology exception
 		 */
 		@SuppressWarnings("unchecked")
@@ -670,7 +670,7 @@ ROLEGROUPS_CROSSOVER};
 		 *
 		 * @param characteristicId the characteristic id
 		 * @return true, if is defining char
-		 * @throws IOException Signals that an I/O exception has occurred.
+		 * @throws IOException signals that an I/O exception has occurred.
 		 * @throws TerminologyException the terminology exception
 		 */
 		public boolean isDefiningChar(int characteristicId) throws IOException, TerminologyException, ContradictionException {

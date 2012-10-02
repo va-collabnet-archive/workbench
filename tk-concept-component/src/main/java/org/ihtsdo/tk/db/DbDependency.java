@@ -37,7 +37,7 @@ public abstract class DbDependency implements Serializable {
      * Write object.
      *
      * @param out the out
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -49,7 +49,7 @@ public abstract class DbDependency implements Serializable {
      * Read object.
      *
      * @param in the in
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ClassNotFoundException the class not found exception
      */
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -102,7 +102,7 @@ public abstract class DbDependency implements Serializable {
 	 * Satisfactory value.
 	 *
 	 * @param value the value
-	 * @return true, if successful
+	 * @return <code>true</code>, if successful
 	 */
 	public abstract boolean satisfactoryValue(String value);
 

@@ -38,7 +38,7 @@ public interface EConceptTransformerBI {
     /**
      * Close.
      *
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public void close() throws IOException;
     

@@ -39,7 +39,7 @@ public interface NidListBI {
      * Adds the.
      *
      * @param o the o
-     * @return true, if successful
+     * @return <code>true</code>, if successful
      */
     public boolean add(Integer o);
 
@@ -47,7 +47,7 @@ public interface NidListBI {
      * Adds the all.
      *
      * @param c the c
-     * @return true, if successful
+     * @return <code>true</code>, if successful
      */
     public boolean addAll(Collection<? extends Integer> c);
 
@@ -56,7 +56,7 @@ public interface NidListBI {
      *
      * @param index the index
      * @param c the c
-     * @return true, if successful
+     * @return <code>true</code>, if successful
      */
     public boolean addAll(int index, Collection<? extends Integer> c);
 
@@ -69,7 +69,7 @@ public interface NidListBI {
      * Contains.
      *
      * @param obj the obj
-     * @return true, if successful
+     * @return <code>true</code>, if successful
      */
     public boolean contains(Object obj);
 
@@ -77,7 +77,7 @@ public interface NidListBI {
      * Contains all.
      *
      * @param c the c
-     * @return true, if successful
+     * @return <code>true</code>, if successful
      */
     public boolean containsAll(Collection<?> c);
 
@@ -100,7 +100,7 @@ public interface NidListBI {
     /**
      * Checks if is empty.
      *
-     * @return true, if is empty
+     * @return <code>true</code>, if is empty
      */
     public boolean isEmpty();
 
@@ -146,7 +146,7 @@ public interface NidListBI {
      * Removes the.
      *
      * @param obj the obj
-     * @return true, if successful
+     * @return <code>true</code>, if successful
      */
     public boolean remove(Object obj);
 
@@ -154,7 +154,7 @@ public interface NidListBI {
      * Removes the all.
      *
      * @param c the c
-     * @return true, if successful
+     * @return <code>true</code>, if successful
      */
     public boolean removeAll(Collection<?> c);
 
@@ -162,7 +162,7 @@ public interface NidListBI {
      * Retain all.
      *
      * @param c the c
-     * @return true, if successful
+     * @return <code>true</code>, if successful
      */
     public boolean retainAll(Collection<?> c);
 

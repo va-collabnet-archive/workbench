@@ -86,7 +86,7 @@ public class UuidSnomedMapHandler {
      *
      * @param idGeneratedDir the id generated dir
      * @param sourceDirectory the source directory
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public UuidSnomedMapHandler(File idGeneratedDir, File sourceDirectory) throws IOException {
         if (mapMap == null) {
@@ -128,7 +128,7 @@ public class UuidSnomedMapHandler {
      * @param sourceDirectory the source directory
      * @param namespace the namespace
      * @param project the project
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public UuidSnomedMapHandler(File idGeneratedDir, File sourceDirectory, int namespace, int project)
             throws IOException {
@@ -190,7 +190,7 @@ public class UuidSnomedMapHandler {
     /**
      * Write maps.
      *
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public void writeMaps() throws IOException {
         for (TYPE type : TYPE.values()) {

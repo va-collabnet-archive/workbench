@@ -67,7 +67,7 @@ public abstract class TkRefexAbstractMember<V extends TkRevision> extends TkComp
     * Instantiates a new tk refex abstract member.
     *
     * @param refexVersion the refex version
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     */
    public TkRefexAbstractMember(RefexVersionBI refexVersion) throws IOException {
       super(refexVersion);
@@ -80,7 +80,7 @@ public abstract class TkRefexAbstractMember<V extends TkRevision> extends TkComp
     *
     * @param in the in
     * @param dataVersion the data version
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     * @throws ClassNotFoundException the class not found exception
     */
    public TkRefexAbstractMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -118,7 +118,7 @@ public abstract class TkRefexAbstractMember<V extends TkRevision> extends TkComp
     * @param offset the offset
     * @param mapAll the map all
     * @param viewCoordinate the view coordinate
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     * @throws ContradictionException the contradiction exception
     */
    public TkRefexAbstractMember(RefexVersionBI refexVersion, NidBitSetBI excludedNids,

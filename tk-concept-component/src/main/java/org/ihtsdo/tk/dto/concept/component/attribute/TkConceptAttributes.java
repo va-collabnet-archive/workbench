@@ -59,7 +59,7 @@ public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision
      * Instantiates a new tk concept attributes.
      *
      * @param conceptAttributeChronicle the concept attribute chronicle
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public TkConceptAttributes(ConceptAttributeChronicleBI conceptAttributeChronicle) throws IOException {
         this(conceptAttributeChronicle.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
@@ -70,7 +70,7 @@ public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision
      *
      * @param conceptAttributeVersion the concept attribute version
      * @param revisionHandling the revision handling
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public TkConceptAttributes(ConceptAttributeVersionBI conceptAttributeVersion,
             RevisionHandling revisionHandling) throws IOException {
@@ -100,7 +100,7 @@ public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision
      *
      * @param in the in
      * @param dataVersion the data version
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ClassNotFoundException the class not found exception
      */
     public TkConceptAttributes(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -131,7 +131,7 @@ public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision
      * @param offset the offset
      * @param mapAll the map all
      * @param viewCoordinate the view coordinate
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     public TkConceptAttributes(ConceptAttributeVersionBI conceptAttributeVersion, NidBitSetBI excludedNids,
@@ -148,7 +148,7 @@ public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision
      * field, as this <tt>EConceptAttributes</tt>.
      *
      * @param obj the object to compare with.
-     * @return true, if successful
+     * @return <code>true</code>, if successful
      * <code>true</code> if the objects are the same;
      * <code>false</code> otherwise.
      */

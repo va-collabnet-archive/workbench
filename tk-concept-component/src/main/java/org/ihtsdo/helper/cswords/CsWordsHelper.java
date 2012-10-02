@@ -48,7 +48,7 @@ public class CsWordsHelper {
     /**
      * Imports the case sensitive word list into the Case Sensitive Words Refset if the refset does not contain members.
      *
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static void lazyInit()
             throws IOException {
@@ -98,8 +98,8 @@ public class CsWordsHelper {
      *
      * @param text the string to check
      * @param icsTypeNid the ICS type nid
-     * @return true, if the string is IC type significant, otherwise false
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @return <code>true</code>, if the string is IC type significant, otherwise false
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static boolean isIcTypeSignificant(String text, int icsTypeNid)
             throws IOException {

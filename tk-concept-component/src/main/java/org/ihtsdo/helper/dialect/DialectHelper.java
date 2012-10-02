@@ -62,7 +62,7 @@ public class DialectHelper {
      *
      * @param dialectOrLanguageNid the dialect or language nid
      * @throws UnsupportedDialectOrLanguage the unsupported dialect or language
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     private static void lazyInit(int dialectOrLanguageNid)
             throws UnsupportedDialectOrLanguage, IOException {
@@ -125,7 +125,7 @@ public class DialectHelper {
      * @param ts the ts
      * @param initialVariantMap the initial variant map
      * @throws ContradictionException the contradiction exception
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     private static void addDialect(ConceptSpec dialectSpec,
             ViewCoordinate vc,
@@ -156,8 +156,8 @@ public class DialectHelper {
      * @param desc the desc
      * @param dialectNid the dialect nid
      * @param vc the vc
-     * @return true, if is missing desc for dialect
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @return <code>true</code>, if is missing desc for dialect
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      * @throws UnsupportedDialectOrLanguage the unsupported dialect or language
      */
@@ -184,9 +184,9 @@ public class DialectHelper {
      *
      * @param text the text
      * @param languageNid the language nid
-     * @return true, if successful
+     * @return <code>true</code>, if successful
      * @throws UnsupportedDialectOrLanguage the unsupported dialect or language
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static boolean hasDialectVariants(String text, int languageNid)
             throws UnsupportedDialectOrLanguage, IOException {
@@ -206,9 +206,9 @@ public class DialectHelper {
      *
      * @param text the text
      * @param dialectNid the dialect nid
-     * @return true, if is text for dialect
+     * @return <code>true</code>, if is text for dialect
      * @throws UnsupportedDialectOrLanguage the unsupported dialect or language
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static boolean isTextForDialect(String text, int dialectNid)
             throws UnsupportedDialectOrLanguage, IOException {
@@ -230,7 +230,7 @@ public class DialectHelper {
      * @param dialectNid the dialect nid
      * @return the string
      * @throws UnsupportedDialectOrLanguage the unsupported dialect or language
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static String makeTextForDialect(String text, int dialectNid)
             throws UnsupportedDialectOrLanguage, IOException {
@@ -267,7 +267,7 @@ public class DialectHelper {
      * @param vc the vc
      * @return the description spec for dialect
      * @throws UnsupportedDialectOrLanguage the unsupported dialect or language
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static DescriptionSpec getDescriptionSpecForDialect(
             DescriptionVersionBI desc,
@@ -286,7 +286,7 @@ public class DialectHelper {
      * @param vc the vc
      * @return the description spec for dialect
      * @throws UnsupportedDialectOrLanguage the unsupported dialect or language
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static DescriptionSpec getDescriptionSpecForDialect(
             DescriptionVersionBI desc,

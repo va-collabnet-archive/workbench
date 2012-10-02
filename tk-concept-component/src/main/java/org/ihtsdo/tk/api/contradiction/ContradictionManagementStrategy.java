@@ -92,7 +92,7 @@ public abstract class ContradictionManagementStrategy implements ContradictionMa
      * Checks if is null.
      *
      * @param obj the obj
-     * @return true, if is null
+     * @return <code>true</code>, if is null
      */
     private boolean isNull(Object... obj) {
         if (obj == null) {
@@ -132,8 +132,8 @@ public abstract class ContradictionManagementStrategy implements ContradictionMa
      *
      * @param conceptChronicle the concept chronicle
      * @param includeDependentEntities the include dependent entities
-     * @return true, if is in conflict
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @return <code>true</code>, if is in conflict
+     * @throws IOException signals that an I/O exception has occurred.
      * @see org.dwfa.ace.api.I_ManageContradiction#isInConflict(org.dwfa.ace.api.I_GetConceptData,
      * boolean)
      */

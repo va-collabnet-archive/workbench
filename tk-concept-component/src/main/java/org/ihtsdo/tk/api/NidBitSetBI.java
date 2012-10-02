@@ -17,34 +17,38 @@
 package org.ihtsdo.tk.api;
 
 // TODO: Auto-generated Javadoc
+
+import java.util.BitSet;
+
 /**
- * The Interface NidBitSetBI.
+ * The Interface NidBitSetBI. TODO-javadoc: needs review
+ * @see BitSet
  */
 public interface NidBitSetBI {
    
    /**
-    * And.
+    * Add the members of the <code>other</code> set to this set.
     *
-    * @param other the other
+    * @param other the other nid bit set
     */
    public void and(NidBitSetBI other);
 
    /**
-    * And not.
+    * Retains everything in this set that is not in the <code>other</code>.
     *
-    * @param other the other
+    * @param other the other nid bit set
     */
    void andNot(NidBitSetBI other);
 
    /**
-    * Cardinality.
+    * Gets the cardinality of the set.
     *
     * @return number of set bits.
     */
    public int cardinality();
 
    /**
-    * Clear.
+    * Clear the set.
     */
    public void clear();
    
@@ -54,16 +58,16 @@ public interface NidBitSetBI {
    public void setAll();
 
    /**
-    * Iterator.
+    * Gets the iterator for this set.
     *
-    * @return the native id bit set itr bi
+    * @return the nid bit set iterator
     */
    public NidBitSetItrBI iterator();
 
    /**
-    * Or.
-    *
-    * @param other the other
+    * Performs a logical OR of this set and the <code>other</code>.
+    * 
+    * @param other the other nid bit set
     */
    public void or(NidBitSetBI other);
 
@@ -75,42 +79,42 @@ public interface NidBitSetBI {
    public int totalBits();
 
    /**
-    * Union.
+    * Performs a logical UNION of this set and the <code>other</code>.
     *
-    * @param other the other
+    * @param other the other nid bit set
     */
    void union(NidBitSetBI other);
 
    /**
-    * Xor.
+    * Performs a logical XOR of this set and the <code>other</code>.
     *
-    * @param other the other
+    * @param other the other nid bit set
     */
    void xor(NidBitSetBI other);
 
    //~--- get methods ---------------------------------------------------------
 
    /**
-    * Checks if is member.
+    * Checks if the <code>nid</code> is member of this set.
     *
-    * @param nid the nid
-    * @return true, if is member
+    * @param nid the nid to test
+    * @return <code>true</code>, if the nid is member
     */
    public boolean isMember(int nid);
 
    //~--- set methods ---------------------------------------------------------
 
    /**
-    * Sets the member.
+    * Sets the <code>nid</code> as a member of this set.
     *
-    * @param nid the new member
+    * @param nid the nid to set as a member
     */
    public void setMember(int nid);
 
    /**
-    * Sets the not member.
+    * Sets the <code>nid</code> as not a member of this set.
     *
-    * @param nid the new not member
+    * @param nid the nid to set as not a member
     */
    public void setNotMember(int nid);
 }

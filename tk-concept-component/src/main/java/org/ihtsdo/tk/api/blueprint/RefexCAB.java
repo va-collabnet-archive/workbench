@@ -71,7 +71,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      * Compute member component uuid.
      *
      * @return the uuid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws InvalidCAB the invalid cab
      */
     public UUID computeMemberComponentUuid() throws IOException, InvalidCAB {
@@ -94,7 +94,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      *
      * @return the uuid
      * @throws InvalidCAB the invalid cab
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public UUID setMemberContentUuid() throws InvalidCAB, IOException {
         UUID memberContentUuid = computeMemberContentUuid();
@@ -110,7 +110,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      * <code>UUID</code> based on a Type 5 generator that uses the content
      * fields of the refex.
      * @throws InvalidCAB the invalid cab
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public UUID computeMemberContentUuid() throws InvalidCAB, IOException {
         try {
@@ -161,7 +161,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      *
      * @param prop the prop
      * @return the primordial uuid string for nid prop
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws InvalidCAB the invalid cab
      */
     private String getPrimordialUuidStringForNidProp(RefexProperty prop)
@@ -203,7 +203,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      * @param memberType the member type
      * @param referencedComponentNid the referenced component nid
      * @param collectionNid the collection nid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -223,7 +223,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      * @param collectionNid the collection nid
      * @param refexVersion the refex version
      * @param viewCoordinate the view coordinate
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -245,7 +245,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      * @param memberUuid the member uuid
      * @param refexVersion the refex version
      * @param viewCoordinate the view coordinate
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -403,7 +403,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      * Contains key.
      *
      * @param key the key
-     * @return true, if successful
+     * @return <code>true</code>, if successful
      */
     public boolean containsKey(RefexProperty key) {
         return properties.containsKey(key);
@@ -557,7 +557,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      * Checks for property.
      *
      * @param key the key
-     * @return true, if successful
+     * @return <code>true</code>, if successful
      */
     public boolean hasProperty(RefexProperty key) {
         return properties.containsKey(key);
@@ -568,7 +568,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      *
      * @param refexAnalog the refex analog
      * @throws PropertyVetoException the property veto exception
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public void writeTo(RefexAnalogBI<?> refexAnalog) throws PropertyVetoException, IOException {
         setProperties(refexAnalog);
@@ -579,7 +579,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      *
      * @param refexAnalog the new properties
      * @throws PropertyVetoException the property veto exception
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public void setProperties(RefexAnalogBI<?> refexAnalog) throws PropertyVetoException, IOException {
         for (Entry<RefexProperty, Object> entry : properties.entrySet()) {
@@ -649,7 +649,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      *
      * @param refexAnalog the new properties except sap
      * @throws PropertyVetoException the property veto exception
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public void setPropertiesExceptSap(RefexAnalogBI<?> refexAnalog) throws PropertyVetoException, IOException {
         for (Entry<RefexProperty, Object> entry : properties.entrySet()) {
@@ -727,7 +727,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      * Validate.
      *
      * @param refexVersion the refex version
-     * @return true, if successful
+     * @return <code>true</code>, if successful
      */
     public boolean validate(RefexVersionBI<?> refexVersion) {
         if (memberType != null) {
@@ -975,7 +975,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      * Sets the content uuid.
      *
      * @throws InvalidCAB the invalid cab
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public void setContentUuid() throws InvalidCAB, IOException {
         this.properties.put(RefexProperty.MEMBER_UUID,

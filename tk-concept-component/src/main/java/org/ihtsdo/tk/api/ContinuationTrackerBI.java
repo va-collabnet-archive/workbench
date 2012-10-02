@@ -21,14 +21,13 @@ package org.ihtsdo.tk.api;
 /**
  * The Interface ContinuationTrackerBI.
  *
- * @author kec
  */
 public interface ContinuationTrackerBI {
        
        /**
         * Continue work.
         *
-        * @return true, if successful
+        * @return <code>true</code>, if successful
         */
        public boolean continueWork();
 }

@@ -34,30 +34,29 @@ import java.util.concurrent.atomic.AtomicInteger;
  * the termChange event occurs, that object's appropriate
  * method is invoked.
  *
- * @author kec
  */
 public abstract class TermChangeListener {
    
-   /** The listener id sequence. */
+   
    private static AtomicInteger listenerIdSequence = new AtomicInteger();
 
    //~--- fields --------------------------------------------------------------
 
-   /** The listener id. */
+   
    private int listenerId = listenerIdSequence.incrementAndGet();
 
    //~--- methods -------------------------------------------------------------
 
    /**
-    * Change notify.
+    * Allows the implemented method to do process the sets of changed nids when a term change event occurs.
     *
-    * @param sequence the sequence
-    * @param sourcesOfChangedRels the sources of changed rels
-    * @param targetsOfChangedRels the targets of changed rels
-    * @param referencedComponentsOfChangedRefexs the referenced components of changed refexs
-    * @param changedComponents the changed components
-    * @param changedComponentAlerts the changed component alerts
-    * @param changedComponentTypes the changed component types
+    * @param sequence the sequence TODO-javadoc: what is this?
+    * @param sourcesOfChangedRels the nids associated with the sources of changed relationships
+    * @param targetsOfChangedRels the nids associated with the targets of changed relationships
+    * @param referencedComponentsOfChangedRefexs the nids associated with the referenced components of changed refexs
+    * @param changedComponents the nids associated with the changed components
+    * @param changedComponentAlerts the nids associated with the changed component alerts
+    * @param changedComponentTypes the the nids associated with the changed component types
     */
    public abstract void changeNotify(long sequence, 
                                      Set<Integer> sourcesOfChangedRels,
@@ -70,7 +69,7 @@ public abstract class TermChangeListener {
    //~--- get methods ---------------------------------------------------------
 
    /**
-    * Gets the listener id.
+    * Gets the id of the associated listener.
     *
     * @return the listener id
     */

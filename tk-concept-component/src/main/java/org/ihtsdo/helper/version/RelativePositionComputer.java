@@ -116,7 +116,7 @@ public class RelativePositionComputer implements RelativePositionComputerBI {
          *
          * @param pathNid the path nid
          * @param time the time
-         * @return true, if successful
+         * @return <code>true</code>, if successful
          */
         public boolean containsPosition(int pathNid, long time) {
             if (this.pathNid == pathNid && time != Long.MIN_VALUE) {

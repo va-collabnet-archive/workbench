@@ -36,7 +36,7 @@ public class JarCreator {
      * @param output the output
      * @param parent the parent
      * @param prefix the prefix
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static void recursiveAddToZip(JarOutputStream output, File parent, String prefix) throws IOException {
         if (parent == null) {
@@ -58,7 +58,7 @@ public class JarCreator {
      * @param f the f
      * @param output the output
      * @param comment the comment
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static void addToZip(String prefix, File f, JarOutputStream output, String comment) throws IOException {
         ZipEntry entry = new ZipEntry(prefix + FileIO.getRelativePath(f));
@@ -89,7 +89,7 @@ public class JarCreator {
      *
      * @param theClass the the class
      * @param output the output
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ClassNotFoundException the class not found exception
      */
     public static void addToZip(Class<?> theClass, JarOutputStream output) throws IOException, ClassNotFoundException {

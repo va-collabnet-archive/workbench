@@ -122,10 +122,6 @@ public class BdbTerminologySnapshot implements TerminologySnapshotDI {
 
    //~--- get methods ---------------------------------------------------------
 
-   @Override
-   public TerminologyBuilderBI getAmender(EditCoordinate ec) {
-      return store.getTerminologyBuilder(ec, vc);
-   }
 
    @Override
    public TerminologyBuilderBI getBuilder(EditCoordinate ec) {
@@ -195,8 +191,8 @@ public class BdbTerminologySnapshot implements TerminologySnapshotDI {
    }
 
    @Override
-   public Set<PathBI> getPathSetFromSapSet(Set<Integer> sapNids) throws IOException {
-      return store.getPathSetFromSapSet(sapNids);
+   public Set<PathBI> getPathSetFromStampSet(Set<Integer> stampNids) throws IOException {
+      return store.getPathSetFromStampSet(stampNids);
    }
 
    @Override

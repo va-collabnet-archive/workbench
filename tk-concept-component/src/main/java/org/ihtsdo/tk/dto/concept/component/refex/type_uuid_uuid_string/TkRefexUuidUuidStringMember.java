@@ -61,7 +61,7 @@ public class TkRefexUuidUuidStringMember extends TkRefexAbstractMember<TkRefexUu
      * Instantiates a new tk refex uuid uuid string member.
      *
      * @param refexChronicle the refex chronicle
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public TkRefexUuidUuidStringMember(RefexChronicleBI refexChronicle) throws IOException {
         this((RefexNidNidStringVersionBI) refexChronicle.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
@@ -72,7 +72,7 @@ public class TkRefexUuidUuidStringMember extends TkRefexAbstractMember<TkRefexUu
      *
      * @param refexNidNidStringVersion the refex nid nid string version
      * @param revisionHandling the revision handling
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public TkRefexUuidUuidStringMember(RefexNidNidStringVersionBI refexNidNidStringVersion,
             RevisionHandling revisionHandling) throws IOException {
@@ -123,7 +123,7 @@ public class TkRefexUuidUuidStringMember extends TkRefexAbstractMember<TkRefexUu
      *
      * @param in the in
      * @param dataVersion the data version
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ClassNotFoundException the class not found exception
      */
     public TkRefexUuidUuidStringMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -163,7 +163,7 @@ public class TkRefexUuidUuidStringMember extends TkRefexAbstractMember<TkRefexUu
      * @param offset the offset
      * @param mapAll the map all
      * @param viewCoordinate the view coordinate
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     public TkRefexUuidUuidStringMember(RefexNidNidStringVersionBI refexNidNidStringVersion, NidBitSetBI excludedNids,
@@ -190,7 +190,7 @@ public class TkRefexUuidUuidStringMember extends TkRefexAbstractMember<TkRefexUu
      * by field, as this <tt>ERefsetCidCidStrMember</tt>.
      *
      * @param obj the object to compare with.
-     * @return true, if successful
+     * @return <code>true</code>, if successful
      * <code>true</code> if the objects are the same;
      * <code>false</code> otherwise.
      */

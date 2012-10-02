@@ -57,7 +57,7 @@ public class TkRefexLongRevision extends TkRevision {
     * Instantiates a new tk refex long revision.
     *
     * @param refexLongVersion the refex long version
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     */
    public TkRefexLongRevision(RefexLongVersionBI refexLongVersion) throws IOException {
       super(refexLongVersion);
@@ -69,7 +69,7 @@ public class TkRefexLongRevision extends TkRevision {
     *
     * @param in the in
     * @param dataVersion the data version
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     * @throws ClassNotFoundException the class not found exception
     */
    public TkRefexLongRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

@@ -1360,7 +1360,7 @@ public class RulesLibrary {
 	 * @throws TerminologyException
 	 *             the terminology exception
 	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
+	 *             signals that an I/O exception has occurred.
 	 */
 	public static I_IntSet getHistoricalRels() throws TerminologyException, IOException {
 
@@ -1383,7 +1383,7 @@ public class RulesLibrary {
 	 * @throws TerminologyException
 	 *             the terminology exception
 	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
+	 *             signals that an I/O exception has occurred.
 	 */
 	public static I_IntSet getConceptModelRels() throws TerminologyException, IOException {
 
@@ -1407,7 +1407,7 @@ public class RulesLibrary {
 	 * @throws TerminologyException
 	 *             the terminology exception
 	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
+	 *             signals that an I/O exception has occurred.
 	 */
 	public static I_IntSet getAllRels() throws TerminologyException, IOException {
 

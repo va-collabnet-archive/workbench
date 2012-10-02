@@ -67,7 +67,7 @@ public class TkRefexUuidUuidUuidMember extends TkRefexAbstractMember<TkRefexUuid
      * Instantiates a new tk refex uuid uuid uuid member.
      *
      * @param refexChronicle the refex chronicle
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public TkRefexUuidUuidUuidMember(RefexChronicleBI refexChronicle) throws IOException {
         this((RefexNidNidNidVersionBI) refexChronicle.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
@@ -78,7 +78,7 @@ public class TkRefexUuidUuidUuidMember extends TkRefexAbstractMember<TkRefexUuid
      *
      * @param refexNidNidNidVersion the refex nid nid nid version
      * @param revisionHandling the revision handling
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public TkRefexUuidUuidUuidMember(RefexNidNidNidVersionBI refexNidNidNidVersion,
             RevisionHandling revisionHandling) throws IOException {
@@ -122,7 +122,7 @@ public class TkRefexUuidUuidUuidMember extends TkRefexAbstractMember<TkRefexUuid
      *
      * @param in the in
      * @param dataVersion the data version
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ClassNotFoundException the class not found exception
      */
     public TkRefexUuidUuidUuidMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -162,7 +162,7 @@ public class TkRefexUuidUuidUuidMember extends TkRefexAbstractMember<TkRefexUuid
      * @param offset the offset
      * @param mapAll the map all
      * @param viewCoordinate the view coordinate
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     public TkRefexUuidUuidUuidMember(RefexNidNidNidVersionBI refexNidNidNidVersion, NidBitSetBI excludedNids,
@@ -189,7 +189,7 @@ public class TkRefexUuidUuidUuidMember extends TkRefexAbstractMember<TkRefexUuid
      * by field, as this <tt>ERefsetCidCidCidMember</tt>.
      *
      * @param obj the object to compare with.
-     * @return true, if successful
+     * @return <code>true</code>, if successful
      * <code>true</code> if the objects are the same;
      * <code>false</code> otherwise.
      */

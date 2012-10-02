@@ -72,7 +72,7 @@ public class TkIdentifierUuid extends TkIdentifier {
     * Instantiates a new tk identifier uuid.
     *
     * @param id the id
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     */
    public TkIdentifierUuid(UuidIdBI id) throws IOException {
       super(id);
@@ -84,7 +84,7 @@ public class TkIdentifierUuid extends TkIdentifier {
     *
     * @param in the in
     * @param dataVersion the data version
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     * @throws ClassNotFoundException the class not found exception
     */
    public TkIdentifierUuid(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

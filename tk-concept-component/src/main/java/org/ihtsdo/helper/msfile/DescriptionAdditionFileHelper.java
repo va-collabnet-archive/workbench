@@ -42,7 +42,7 @@ public class DescriptionAdditionFileHelper {
      * Lazy init.
      *
      * @param memberFile the member file
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     private static void lazyInit(File memberFile)
             throws IOException {
@@ -83,7 +83,7 @@ public class DescriptionAdditionFileHelper {
      *
      * @param descFile the desc file
      * @return the desc file list
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static ArrayList<String> getDescFileList(File descFile) throws IOException {
             lazyInit(descFile);

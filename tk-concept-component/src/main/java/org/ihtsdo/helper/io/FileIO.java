@@ -70,7 +70,7 @@ public class FileIO {
      *
      * @param in the in
      * @param out the out
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static void copyFile(File in, File out) throws IOException {
         FileChannel sourceChannel = new FileInputStream(in).getChannel();
@@ -92,7 +92,7 @@ public class FileIO {
      * @param from the from
      * @param to the to
      * @param copyInvisibles the copy invisibles
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static void recursiveCopy(File from, File to, boolean copyInvisibles) throws IOException {
         if (from.isDirectory()) {
@@ -112,7 +112,7 @@ public class FileIO {
      * Recursive delete.
      *
      * @param from the from
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static void recursiveDelete(File from) throws IOException {
         if (from.isDirectory()) {
@@ -172,7 +172,7 @@ public class FileIO {
      * @param inName the in name
      * @param outName the out name
      * @throws FileNotFoundException the file not found exception
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static void copyFile(String inName, String outName) throws FileNotFoundException, IOException {
         BufferedInputStream is = new BufferedInputStream(new FileInputStream(inName));
@@ -185,7 +185,7 @@ public class FileIO {
      *
      * @param is the is
      * @param outFile the out file
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static void copyFile(InputStream is, File outFile) throws IOException {
         outFile.getParentFile().mkdirs();
@@ -199,7 +199,7 @@ public class FileIO {
      * @param is the is
      * @param os the os
      * @param close the close
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static void copyFile(InputStream is, OutputStream os, boolean close) throws IOException {
         byte[] buffer = new byte[4096];
@@ -223,7 +223,7 @@ public class FileIO {
      * @param is the is
      * @param os the os
      * @param close the close
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static void copyFile(Reader is, Writer os, boolean close) throws IOException {
         int b; // the byte read from the file
@@ -242,7 +242,7 @@ public class FileIO {
      * @param pw the pw
      * @param close the close
      * @throws FileNotFoundException the file not found exception
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static void copyFile(String inName, PrintWriter pw, boolean close) throws FileNotFoundException, IOException {
         BufferedReader ir = new BufferedReader(new FileReader(inName));
@@ -255,7 +255,7 @@ public class FileIO {
      * @param inName the in name
      * @return the string
      * @throws FileNotFoundException the file not found exception
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static String readLine(String inName) throws FileNotFoundException, IOException {
         BufferedReader is = new BufferedReader(new FileReader(inName));
@@ -276,7 +276,7 @@ public class FileIO {
      * @param inName the in name
      * @param outName the out name
      * @throws FileNotFoundException the file not found exception
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public void copyFileBuffered(String inName, String outName) throws FileNotFoundException, IOException {
         InputStream is = new FileInputStream(inName);
@@ -295,7 +295,7 @@ public class FileIO {
      *
      * @param is the is
      * @return the string
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static String readerToString(Reader is) throws IOException {
         StringBuffer sb = new StringBuffer();
@@ -316,7 +316,7 @@ public class FileIO {
      *
      * @param is the is
      * @return the string
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static String inputStreamToString(InputStream is) throws IOException {
         return readerToString(new InputStreamReader(is));
@@ -378,7 +378,7 @@ public class FileIO {
      * @param startDir the start dir
      * @param fileFilter the file filter
      * @return the obj from filesystem
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ClassNotFoundException the class not found exception
      */
     public static FileAndObject getObjFromFilesystem(final Frame parent, final String title, final String startDir,
@@ -465,7 +465,7 @@ public class FileIO {
      * @param fileFilter the file filter
      * @return the obj from filesystem core
      * @throws FileNotFoundException the file not found exception
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ClassNotFoundException the class not found exception
      */
     private static FileAndObject getObjFromFilesystemCore(Frame parent, String title, String startDir,
@@ -553,7 +553,7 @@ public class FileIO {
      * @param defaultFile the default file
      * @param obj the obj
      * @return the file
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static File writeObjToFilesystem(final Frame parent, final String title, final String startDir,
             final String defaultFile, final Object obj) throws IOException {
@@ -598,7 +598,7 @@ public class FileIO {
      * @param obj the obj
      * @return the file
      * @throws FileNotFoundException the file not found exception
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     private static File writeObjeToFilesystemCore(Frame parent, String title, String startDir, String defaultFile,
             Object obj) throws FileNotFoundException, IOException {
@@ -633,7 +633,7 @@ public class FileIO {
      * @param delegates the delegates
      * @param owner the owner
      * @return the file
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static File writeObjXmlToFilesystem(final Frame parent, final String title, final String startDir,
             final String defaultFile, final Object obj, final Collection<PersistenceDelegateSpec> delegates,
@@ -683,7 +683,7 @@ public class FileIO {
      * @param owner the owner
      * @return the file
      * @throws FileNotFoundException the file not found exception
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     private static File writeObjXmlToFilesystemCore(Frame parent, String title, String startDir, String defaultFile,
             Object obj, Collection<PersistenceDelegateSpec> delegates, Object owner) throws FileNotFoundException,

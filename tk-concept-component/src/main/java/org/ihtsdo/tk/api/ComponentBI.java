@@ -32,159 +32,177 @@ import java.util.UUID;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Interface ComponentBI for the
- * {@link org.ihtsdo.concept.component.ConceptComponent} Class. A component is
- * the generic term for: a concept attribute, description, relationship, refex,
- * media, or concept.
+ * The Interface ComponentBI provides terminology generic methods for editing or
+ * creating a component. A component is the generic term for: a concept
+ * attribute, description, relationship, refex, media, or concept.
  */
 public interface ComponentBI {
 
     /**
-     * Adds the annotation.
+     * Adds an annotation to a component.
      *
-     * @param annotation the annotation
-     * @return true, if successful
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param annotation the annotation to add
+     * @return <code>true</code>, if the addition was successful
+     * @throws IOException signals that an I/O exception has occurred.
      */
     boolean addAnnotation(RefexChronicleBI<?> annotation) throws IOException;
 
     /**
-     * Returns a string representing a description on the component. The type of
-     * description returned is based on the description preferences of the user.
+     * Returns a string representing a description on a component. The type of
+     * description returned is based on the description preferences of the user,
+     * set in the <code>viewCoordinate</code>
      *
-     * @return the components description
+     * @return the component's description
+     * @see ViewCoordinate
      */
     String toUserString();
 
     //~--- get methods ---------------------------------------------------------
     /**
-     * Gets the additional ids.
+     * Gets the additional identifiers, other than the primordial UUID, of a component.
+     * This method would be used to get the SCT ID of a component.
      *
-     * @return the additional ids
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @return the additional ids of the component
+     * @throws IOException signals that an I/O exception has occurred.
      */
     Collection<? extends IdBI> getAdditionalIds() throws IOException;
 
     /**
-     * Gets the all ids.
+     * Gets the all identifiers of a component.
      *
-     * @return the all ids
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @return all the ids of the component
+     * @throws IOException signals that an I/O exception has occurred.
      */
     Collection<? extends IdBI> getAllIds() throws IOException;
 
     /**
-     * Gets the annotations.
+     * Gets the annotations on a component.
      *
-     * @return the annotations
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @return the annotations of the component
+     * @throws IOException signals that an I/O exception has occurred.
      */
     Collection<? extends RefexChronicleBI<?>> getAnnotations() throws IOException;
 
     /**
-     * Gets the concept nid.
+     * Gets the concept nid associated with a component. This is not the nid of the component, rather the
+     * nid of the enclosing concept,the concept which this component is a part of. 
      *
      * @return the concept nid
      */
     int getConceptNid();
 
     /**
-     * Returns the annotations on the component.
+     * Returns the active annotations on a component based on the given
+     * <code>viewCoordinate</code>.
      *
-     * @param viewCoordinate the view coordinate
-     * @return the annotations active
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param viewCoordinate the view coordinate specifying which annotations are active or inactive
+     * @return the specified active annotations on the component
+     * @throws IOException signals that an I/O exception has occurred.
      */
     Collection<? extends RefexVersionBI<?>> getAnnotationsActive(ViewCoordinate viewCoordinate) throws IOException;
 
     /**
-     * Gets the annotation members active.
+     * Gets active annotations for the refex, specified by the <code>refexNid</code>, on a component based on
+     * the given
+     * <code>viewCoordiante</code>. TODO-javadoc: the use of
+     * members here is confusing, too similar to refset member
      *
-     * @param viewCoordinate the view coordinate
-     * @param refexNid the refex nid
-     * @return the annotation members active
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param viewCoordinate the view coordinate specifying which annotations are active or inactive
+     * @param refexNid the nid associated with the desired refex
+     * @return the specified active annotations
+     * @throws IOException signals that an I/O exception has occurred.
      */
     Collection<? extends RefexVersionBI<?>> getAnnotationMembersActive(ViewCoordinate viewCoordinate, int refexNid)
             throws IOException;
 
     /**
-     * Gets the active annotations.
+     * Gets the active annotations on a component.
      *
-     * @param viewCoordinate the view coordinate
-     * @return the active annotations
-     * @throws IOException Signals that an I/O exception has occurred.
-     * @deprecated use getAnnotationsActive
+     * @param viewCoordinate the view coordinate specifying which annotations are active or inactive
+     * @return the specified active annotations
+     * @throws IOException signals that an I/O exception has occurred.
+     * @deprecated use getAnnotationsActive(ViewCoordinate viewCoordinate)
      */
-    @Deprecated
     Collection<? extends RefexVersionBI<?>> getActiveAnnotations(ViewCoordinate viewCoordinate) throws IOException;
 
     /**
-     * Gets the active annotations.
+     * Gets active annotations for the a given refex on the component based on
+     * the given
+     * <code>ViewCoordiante</code> and the refex nid.
      *
-     * @param viewCoordinate the view coordinate
-     * @param refexNid the refex nid
-     * @return the active annotations
-     * @throws IOException Signals that an I/O exception has occurred.
-     * @deprecated use getAnnotationsActive
+     * @param viewCoordinate the view coordinate specifying which annotations are active or inactive
+     * @param refexNid the nid associated with the desired refex
+     * @return the specified active annotations
+     * @throws IOException signals that an I/O exception has occurred.
+     * @deprecated use getAnnotationMembersActive(ViewCoordinate viewCoordinate, int refexNid)
      */
-    @Deprecated
     Collection<? extends RefexVersionBI<?>> getActiveAnnotations(ViewCoordinate viewCoordinate, int refexNid)
             throws IOException;
 
     /**
      * Returns any annotations on the component, or any members that are a
-     * "referenced component". Refsets can only be on a concept not on a
-     * component.
+     * "referenced component" of the refset specified by the <code>refexNid</code> and based on the given
+     * <code>viewCoordinate</code>. This does not return the
+     * refset members as a whole, as a refset is a concept not a component.
      *
-     * @param viewCoordinate the view coordinate
-     * @param refexNid the refex nid
-     * @return the refex members active
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param viewCoordinate the view coordinate specifying which annotations are active or inactive
+     * @param refexNid the nid associated with the desired refex
+     * @return the spcified active refex members
+     * @throws IOException signals that an I/O exception has occurred.
      */
     Collection<? extends RefexVersionBI<?>> getRefexMembersActive(ViewCoordinate viewCoordinate, int refexNid)
             throws IOException;
 
     /**
-     * Gets the refexes active.
+     * Returns any active annotations on the component, or any active
+     * "referenced components" of refsets based on the given
+     * <code>viewCoordinate</code>. This does not return the refset members as a
+     * whole, as a refset is a concept not a component.
      *
-     * @param viewCoordinate the view coordinate
-     * @return the refexes active
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param viewCoordinate the view coordinate specifying which annotations are active or inactive
+     * @return the spcified active refexes
+     * @throws IOException signals that an I/O exception has occurred.
      */
     Collection<? extends RefexVersionBI<?>> getRefexesActive(ViewCoordinate viewCoordinate) throws IOException;
 
     /**
-     * Gets the active refexes.
+     * Returns any active annotations on the component, or any active
+     * "referenced components" of the refset spcified by the <code>refexNid</code> and based on the given
+     * <code>ViewCoordinate</code> . This does not return the
+     * refset members as a whole, as a refset is a concept not a component.
      *
-     * @param viewCoordinate the view coordinate
-     * @param refexNid the refex nid
-     * @return the active refexes
-     * @throws IOException Signals that an I/O exception has occurred.
-     * @deprecated use getRefexMembersActive
+     * @param viewCoordinate the view coordinate specifying which annotations are active or inactive
+     * @param refexNid the nid associated with the desired refex
+     * @return the spcified active refexes
+     * @throws IOException signals that an I/O exception has occurred.
+     * @deprecated use getRefexMembersActive(ViewCoordinate viewCoordinate, int refexNid)
      */
-    @Deprecated
     Collection<? extends RefexVersionBI<?>> getActiveRefexes(ViewCoordinate viewCoordinate, int refexNid)
             throws IOException;
 
     /**
-     * Gets the refexes inactive.
+     * Returns any inactive annotations on the component, or any inactive
+     * "referenced components" of refsets based on the given
+     * <code>ViewCoordinate</code>. This does not return the refset members as a
+     * whole, as a refset is a concept not a component.
      *
-     * @param viewCoordinate the view coordinate
-     * @return the refexes inactive
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param viewCoordinate the view coordinate specifying which annotations are active or inactive
+     * @return the spcified inactive refexes
+     * @throws IOException signals that an I/O exception has occurred.
      */
     Collection<? extends RefexVersionBI<?>> getRefexesInactive(ViewCoordinate viewCoordinate) throws IOException;
 
     /**
-     * Gets the native id.
+     * Gets the native identifier associated with a component.
      *
-     * @return the native id
+     * @return the native id of the component
      */
     int getNid();
 
     /**
-     * Gets the prim uuid.
+     * Gets the primordial uuid of a component. The primordial uuid is the uuid associated with the
+     * first version of a component. More than one uuid can be associated with a
+     * component, but each component will have only one primordial uuid.
      *
      * @return the primordial if known. The IUnknown UUID
      * (00000000-0000-0000-C000-000000000046) if not known.
@@ -192,57 +210,67 @@ public interface ComponentBI {
     UUID getPrimUuid();
 
     /**
-     * Gets the refex members.
+     * Returns any annotations on a component, or any "referenced components"
+     * of a refset based on the given<code>refexNid</code>. This does not return the refset
+     * members as a whole, as a refset is a concept not a component.
      *
-     * @param refexNid the refex nid
-     * @return the refex members
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param refexNid the nid associated with the desired refex
+     * @return the specified refex members
+     * @throws IOException signals that an I/O exception has occurred.
      */
     Collection<? extends RefexChronicleBI<?>> getRefexMembers(int refexNid) throws IOException;
 
     /**
-     * Gets the refexes.
+     * Returns any active annotations on a component, or any active
+     * "referenced components" of a refset. This does not return the refset
+     * members as a whole, as a refset is a concept not a component.
      *
-     * @return the refexes
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @return the refexes on the component
+     * @throws IOException signals that an I/O exception has occurred.
      */
     Collection<? extends RefexChronicleBI<?>> getRefexes() throws IOException;
 
     /**
-     * Gets the refexes.
+     * Returns any annotations on the component, or any "referenced components"
+     * of a refset based on the given <code>refexNid</code>. This does not return the refset
+     * members as a whole, as a refset is a concept not a component.
      *
-     * @param refexNid the refex nid
-     * @return the refexes
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param refexNid the nid of the desired refex
+     * @return the specified refexes
+     * @throws IOException signals that an I/O exception has occurred.
      * @deprecated use getRefexMembers
      */
     @Deprecated
     Collection<? extends RefexChronicleBI<?>> getRefexes(int refexNid) throws IOException;
 
     /**
-     * Gets the uUI ds.
+     * Gets the UUIDs associated with a component.
      *
-     * @return the uUI ds
+     * @return the UUIDs for the component
      */
     List<UUID> getUUIDs();
 
     /**
-     * Checks for annotation member active.
+     * Checks if the component has active annotations for the specified <code>refexNid</code>
+     * and based on the given
+     * <code>viewCoordinate</code>.
      *
-     * @param viewCoordinate the view coordinate
-     * @param refexNid the refex nid
-     * @return true, if successful
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param viewCoordinate the view coordinate specifying which annotations are active or inactive
+     * @param refexNid the nid of the desired refex
+     * @return <code>true</code>, if the component has active annotations
+     * @throws IOException signals that an I/O exception has occurred.
      */
     boolean hasAnnotationMemberActive(ViewCoordinate viewCoordinate, int refexNid) throws IOException;
 
     /**
-     * Checks for refex member active.
+     * Checks if the component has active annotations, or is a referenced
+     * component, for the specified <code>refexNid</code> and based on the given
+     * <code>viewCoordinate</code>.
      *
-     * @param viewCoordinate the view coordinate
-     * @param refexNid the refex nid
-     * @return true, if successful
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param viewCoordinate the view coordinate specifying which annotations are active or inactive
+     * @param refexNid the nid of the desired refex
+     * @return <code>true</code>, if the component has active annotation or is an active referenced component
+     * @throws IOException signals that an I/O exception has occurred.
      */
     boolean hasRefexMemberActive(ViewCoordinate viewCoordinate, int refexNid) throws IOException;
 }

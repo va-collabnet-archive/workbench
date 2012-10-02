@@ -301,7 +301,7 @@ public class TestContexts extends TestCase {
 	 *
 	 * @param sourceLocation the source location
 	 * @param targetLocation the target location
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred.
 	 */
 	public void copyDirectory(File sourceLocation , File targetLocation)
 	throws IOException {

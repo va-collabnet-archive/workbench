@@ -53,8 +53,8 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * @param subjectCheck the subject check
      * @param propertyCheck the property check
      * @param valueCheck the value check
-     * @return true, if successful
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @return <code>true</code>, if successful
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     boolean satisfies(ConstraintBI constraint, ConstraintCheckType subjectCheck,
@@ -72,7 +72,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * Gets the concept attributes active.
      *
      * @return the concept attributes active
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     ConceptAttributeVersionBI getConceptAttributesActive() throws IOException, ContradictionException;
@@ -82,7 +82,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      *
      * @param refsetNid the refset nid
      * @return the refex members active
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     Collection<? extends RefexVersionBI<?>> getRefexMembersActive(int refsetNid) throws IOException;
 
@@ -91,7 +91,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      *
      * @param componentNid the component nid
      * @return the refex member for component active
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     RefexChronicleBI<?> getRefexMemberForComponentActive(int componentNid) throws IOException;
 
@@ -99,7 +99,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * Gets the active refset members.
      *
      * @return the active refset members
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      * @deprecated use getRefsetMembersActive
      */
@@ -111,7 +111,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * Gets the descriptions active.
      *
      * @return the descriptions active
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     Collection<? extends DescriptionVersionBI> getDescriptionsActive() throws IOException, ContradictionException;
@@ -121,7 +121,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      *
      * @param typeNid the type nid
      * @return the descriptions active
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     Collection<? extends DescriptionVersionBI> getDescriptionsActive(int typeNid)
@@ -132,7 +132,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      *
      * @param typeNids the type nids
      * @return the descriptions active
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     Collection<? extends DescriptionVersionBI> getDescriptionsActive(NidSetBI typeNids)
@@ -142,7 +142,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * Gets the descriptions fully specified active.
      *
      * @return the descriptions fully specified active
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     Collection<? extends DescriptionVersionBI> getDescriptionsFullySpecifiedActive() throws IOException;
 
@@ -150,7 +150,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * Gets the description fully specified.
      *
      * @return the description fully specified
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     DescriptionVersionBI getDescriptionFullySpecified() throws IOException, ContradictionException;
@@ -159,7 +159,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * Gets the media active.
      *
      * @return the media active
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     Collection<? extends MediaVersionBI> getMediaActive() throws IOException, ContradictionException;
@@ -168,7 +168,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * Gets the native id paths to root.
      *
      * @return the native id paths to root
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     Collection<List<Integer>> getNidPathsToRoot() throws IOException;
 
@@ -176,7 +176,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * Gets the descriptions preferred active.
      *
      * @return the descriptions preferred active
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     Collection<? extends DescriptionVersionBI> getDescriptionsPreferredActive() throws IOException;
 
@@ -184,7 +184,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * Gets the description preferred.
      *
      * @return the description preferred
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     DescriptionVersionBI getDescriptionPreferred() throws IOException, ContradictionException;
@@ -193,7 +193,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * Gets the refset members active.
      *
      * @return the refset members active
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     Collection<? extends RefexVersionBI<?>> getRefsetMembersActive() throws IOException, ContradictionException;
@@ -202,7 +202,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * Gets the relationship groups.
      *
      * @return the relationship groups
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     Collection<? extends RelationshipGroupVersionBI> getRelationshipGroups() throws IOException, ContradictionException;
@@ -211,7 +211,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * Gets the relationships target active.
      *
      * @return the relationships target active
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     Collection<? extends RelationshipVersionBI> getRelationshipsTargetActive()
@@ -221,7 +221,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * Gets the relationships target active isa.
      *
      * @return the relationships target active isa
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     Collection<? extends RelationshipVersionBI> getRelationshipsTargetActiveIsa()
@@ -231,7 +231,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * Returns the concepts representing the sources of the target relationships.
      *
      * @return the relationships target source concepts
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConcepts() throws IOException;
 
@@ -240,7 +240,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      *
      * @param typeNid the type nid
      * @return the relationships target source concepts
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConcepts(int typeNid) throws IOException;
 
@@ -249,7 +249,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      *
      * @param typeNids the type nids
      * @return the relationships target source concepts
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConcepts(NidSetBI typeNids) throws IOException;
 
@@ -257,7 +257,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * Gets the relationships target source concepts active.
      *
      * @return the relationships target source concepts active
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConceptsActive()
@@ -268,7 +268,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      *
      * @param typeNid the type nid
      * @return the relationships target source concepts active
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConceptsActive(int typeNid)
@@ -279,7 +279,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      *
      * @param typeNids the type nids
      * @return the relationships target source concepts active
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConceptsActive(NidSetBI typeNids)
@@ -289,7 +289,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * Gets the relationships target source concepts active isa.
      *
      * @return the relationships target source concepts active isa
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConceptsActiveIsa()
@@ -299,7 +299,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * Gets the relationships target source concepts isa.
      *
      * @return the relationships target source concepts isa
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConceptsIsa() throws IOException;
 
@@ -307,7 +307,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * Gets the relationships source active.
      *
      * @return the relationships source active
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     Collection<? extends RelationshipVersionBI> getRelationshipsSourceActive()
@@ -317,7 +317,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * Gets the relationships source active isa.
      *
      * @return the relationships source active isa
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     Collection<? extends RelationshipVersionBI> getRelationshipsSourceActiveIsa()
@@ -327,7 +327,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * Returns the concepts representing the target concept of the source relationships.
      *
      * @return the relationships source target concepts
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     Collection<? extends ConceptVersionBI> getRelationshipsSourceTargetConcepts() throws IOException;
 
@@ -336,7 +336,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      *
      * @param typeNid the type nid
      * @return the relationships source target concepts
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     Collection<? extends ConceptVersionBI> getRelationshipsSourceTargetConcepts(int typeNid) throws IOException;
 
@@ -345,7 +345,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      *
      * @param typeNids the type nids
      * @return the relationships source target concepts
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     Collection<? extends ConceptVersionBI> getRelationshipsSourceTargetConcepts(NidSetBI typeNids) throws IOException;
 
@@ -353,7 +353,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * Gets the relationships source target concepts active.
      *
      * @return the relationships source target concepts active
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     Collection<? extends ConceptVersionBI> getRelationshipsSourceTargetConceptsActive()
@@ -364,7 +364,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      *
      * @param typeNid the type nid
      * @return the relationships source target concepts active
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     Collection<? extends ConceptVersionBI> getRelationshipsSourceTargetConceptsActive(int typeNid)
@@ -375,7 +375,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      *
      * @param typeNids the type nids
      * @return the relationships source target concepts active
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     Collection<? extends ConceptVersionBI> getRelationshipsSourceTargetConceptsActive(NidSetBI typeNids)
@@ -385,7 +385,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * Gets the relationships source target concepts active isa.
      *
      * @return the relationships source target concepts active isa
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     Collection<? extends ConceptVersionBI> getRelationshipsSourceTargetConceptsActiveIsa()
@@ -395,7 +395,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * Gets the relationships source target concepts isa.
      *
      * @return the relationships source target concepts isa
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     Collection<? extends ConceptVersionBI> getRelationshipsSourceTargetConceptsIsa() throws IOException;
 
@@ -403,7 +403,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * Gets the relationships source target nids active isa.
      *
      * @return the relationships source target nids active isa
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     int[] getRelationshipsSourceTargetNidsActiveIsa() throws IOException;
 
@@ -411,7 +411,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * Gets the synonyms.
      *
      * @return the synonyms
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     Collection<? extends DescriptionVersionBI> getSynonyms() throws IOException;
 
@@ -426,16 +426,16 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * Checks for annotation member active.
      *
      * @param refexNid the refex nid
-     * @return true, if successful
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @return <code>true</code>, if successful
+     * @throws IOException signals that an I/O exception has occurred.
      */
     boolean hasAnnotationMemberActive(int refexNid) throws IOException;
 
     /**
      * Checks for children.
      *
-     * @return true, if successful
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @return <code>true</code>, if successful
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     boolean hasChildren() throws IOException, ContradictionException;
@@ -443,8 +443,8 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
     /**
      * Checks for historical relationships.
      *
-     * @return true, if successful
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @return <code>true</code>, if successful
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     boolean hasHistoricalRelationships() throws IOException, ContradictionException;
@@ -453,8 +453,8 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * Checks for refex member active.
      *
      * @param refexNid the refex nid
-     * @return true, if successful
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @return <code>true</code>, if successful
+     * @throws IOException signals that an I/O exception has occurred.
      */
     boolean hasRefexMemberActive(int refexNid) throws IOException;
 
@@ -462,16 +462,16 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * Checks for refset member for component active.
      *
      * @param componentNid the component nid
-     * @return true, if successful
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @return <code>true</code>, if successful
+     * @throws IOException signals that an I/O exception has occurred.
      */
     boolean hasRefsetMemberForComponentActive(int componentNid) throws IOException;
 
     /**
      * Checks if is active.
      *
-     * @return true, if is active
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @return <code>true</code>, if is active
+     * @throws IOException signals that an I/O exception has occurred.
      */
     boolean isActive() throws IOException;
 
@@ -479,8 +479,8 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * Checks if is child of.
      *
      * @param childConceptVersion the child concept version
-     * @return true, if is child of
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @return <code>true</code>, if is child of
+     * @throws IOException signals that an I/O exception has occurred.
      */
     boolean isChildOf(ConceptVersionBI childConceptVersion) throws IOException;
 
@@ -488,8 +488,8 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * Checks if is kind of.
      *
      * @param parentConceptVersion the parent concept version
-     * @return true, if is kind of
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @return <code>true</code>, if is kind of
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     boolean isKindOf(ConceptVersionBI parentConceptVersion) throws IOException, ContradictionException;
@@ -497,8 +497,8 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
     /**
      * Checks if is leaf.
      *
-     * @return true, if is leaf
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @return <code>true</code>, if is leaf
+     * @throws IOException signals that an I/O exception has occurred.
      */
     boolean isLeaf() throws IOException;
 
@@ -506,8 +506,8 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * Checks if is member.
      *
      * @param refexCollectionNid the refex collection nid
-     * @return true, if is member
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @return <code>true</code>, if is member
+     * @throws IOException signals that an I/O exception has occurred.
      */
     boolean isMember(int refexCollectionNid) throws IOException;
 
@@ -515,7 +515,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * Make blueprint.
      *
      * @return the concept cb
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      * @throws InvalidCAB the invalid cab
      */

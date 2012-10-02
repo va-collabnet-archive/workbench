@@ -39,7 +39,7 @@ public class SpecFactory {
      * @param conceptChronicle the concept chronicle
      * @param viewCoordinate the view coordinate
      * @return the concept spec
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static ConceptSpec get(ConceptChronicleBI conceptChronicle, ViewCoordinate viewCoordinate) throws IOException {
         ConceptVersionBI cv = Ts.get().getConceptVersion(viewCoordinate, conceptChronicle.getNid());
@@ -62,7 +62,7 @@ public class SpecFactory {
      *
      * @param conceptVersion the concept version
      * @return the concept spec
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static ConceptSpec get(ConceptVersionBI conceptVersion) throws IOException {
         try {
@@ -81,7 +81,7 @@ public class SpecFactory {
      * @param descriptionVersion the description version
      * @param viewCoordinate the view coordinate
      * @return the description spec
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static DescriptionSpec get(DescriptionVersionBI descriptionVersion, ViewCoordinate viewCoordinate) throws IOException {
         if (descriptionVersion != null && descriptionVersion.getUUIDs() != null) {

@@ -61,7 +61,7 @@ public class MediaCAB extends CreateOrAmendBlueprint {
      * @param format the format
      * @param textDescription the text description
      * @param dataBytes the data bytes
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -82,7 +82,7 @@ public class MediaCAB extends CreateOrAmendBlueprint {
      * @param format the format
      * @param textDescription the text description
      * @param dataBytes the data bytes
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -104,7 +104,7 @@ public class MediaCAB extends CreateOrAmendBlueprint {
      * @param dataBytes the data bytes
      * @param mediaVersion the media version
      * @param viewCoordinate the view coordinate
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -127,7 +127,7 @@ public class MediaCAB extends CreateOrAmendBlueprint {
      * @param dataBytes the data bytes
      * @param mediaVersion the media version
      * @param viewCoordinate the view coordinate
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -150,7 +150,7 @@ public class MediaCAB extends CreateOrAmendBlueprint {
      * @param componentUuid the component uuid
      * @param mediaVersion the media version
      * @param viewCoordinate the view coordinate
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -206,7 +206,7 @@ public class MediaCAB extends CreateOrAmendBlueprint {
      * Gets the type nid.
      *
      * @return the type nid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public int getTypeNid() throws IOException {
         return Ts.get().getNidForUuids(typeUuid);
@@ -216,7 +216,7 @@ public class MediaCAB extends CreateOrAmendBlueprint {
      * Gets the concept nid.
      *
      * @return the concept nid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public int getConceptNid() throws IOException {
         return Ts.get().getNidForUuids(conceptUuid);
@@ -271,8 +271,8 @@ public class MediaCAB extends CreateOrAmendBlueprint {
      * Validate.
      *
      * @param mediaVersion the media version
-     * @return true, if successful
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @return <code>true</code>, if successful
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public boolean validate(MediaVersionBI mediaVersion) throws IOException {
         if (mediaVersion.getStatusNid() != getStatusNid()) {

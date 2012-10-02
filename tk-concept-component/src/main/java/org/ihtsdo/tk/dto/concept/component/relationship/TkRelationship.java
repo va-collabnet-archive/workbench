@@ -75,7 +75,7 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
      * Instantiates a new tk relationship.
      *
      * @param relationshipChronicle the relationship chronicle
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public TkRelationship(RelationshipChronicleBI relationshipChronicle) throws IOException {
         this(relationshipChronicle.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
@@ -86,7 +86,7 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
      *
      * @param relationshipVersion the relationship version
      * @param revisionHandling the revision handling
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public TkRelationship(RelationshipVersionBI relationshipVersion,
             RevisionHandling revisionHandling) throws IOException {
@@ -134,7 +134,7 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
      *
      * @param in the in
      * @param dataVersion the data version
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ClassNotFoundException the class not found exception
      */
     public TkRelationship(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -179,7 +179,7 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
      * @param offset the offset
      * @param mapAll the map all
      * @param viewCoordinate the view coordinate
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     public TkRelationship(RelationshipVersionBI relationshipVersion, NidBitSetBI excludedNids,
@@ -215,7 +215,7 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
      * as this <tt>ERelationship</tt>.
      *
      * @param obj the object to compare with.
-     * @return true, if successful
+     * @return <code>true</code>, if successful
      * <code>true</code> if the objects are the same;
      * <code>false</code> otherwise.
      */

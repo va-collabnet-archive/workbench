@@ -59,7 +59,7 @@ public class TkRefsetStrMember extends TkRefexAbstractMember<TkRefsetStrRevision
      * Instantiates a new tk refset str member.
      *
      * @param refexChronicle the refex chronicle
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public TkRefsetStrMember(RefexChronicleBI refexChronicle) throws IOException {
         this((RefexStringVersionBI) refexChronicle.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
@@ -70,7 +70,7 @@ public class TkRefsetStrMember extends TkRefexAbstractMember<TkRefsetStrRevision
      *
      * @param refexStringVersion the refex string version
      * @param revisionHandling the revision handling
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public TkRefsetStrMember(RefexStringVersionBI refexStringVersion,
             RevisionHandling revisionHandling) throws IOException {
@@ -108,7 +108,7 @@ public class TkRefsetStrMember extends TkRefexAbstractMember<TkRefsetStrRevision
      *
      * @param in the in
      * @param dataVersion the data version
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ClassNotFoundException the class not found exception
      */
     public TkRefsetStrMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -139,7 +139,7 @@ public class TkRefsetStrMember extends TkRefexAbstractMember<TkRefsetStrRevision
      * @param offset the offset
      * @param mapAll the map all
      * @param viewCoordinate the view coordinate
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     public TkRefsetStrMember(RefexStringVersionBI refexStringVersion, NidBitSetBI excludedNids, Map<UUID, UUID> conversionMap,
@@ -156,7 +156,7 @@ public class TkRefsetStrMember extends TkRefexAbstractMember<TkRefsetStrRevision
      * field, as this <tt>ERefsetStrMember</tt>.
      *
      * @param obj the object to compare with.
-     * @return true, if successful
+     * @return <code>true</code>, if successful
      * <code>true</code> if the objects are the same;
      * <code>false</code> otherwise.
      */

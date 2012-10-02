@@ -47,7 +47,7 @@ public class PathSpec implements SpecBI {
      * Write object.
      *
      * @param out the out
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -60,7 +60,7 @@ public class PathSpec implements SpecBI {
      * Read object.
      *
      * @param in the in
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ClassNotFoundException the class not found exception
      * @throws ValidationException the validation exception
      * @throws InvalidCAB the invalid cab
@@ -123,7 +123,7 @@ public class PathSpec implements SpecBI {
     /**
      * Test path concept.
      *
-     * @return true, if successful
+     * @return <code>true</code>, if successful
      * @deprecated not in TK3
      */
     @Deprecated
@@ -141,7 +141,7 @@ public class PathSpec implements SpecBI {
      *
      * @return the concept cb
      * @throws ValidationException the validation exception
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */

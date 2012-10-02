@@ -100,7 +100,7 @@ public class TrackerAppSoapUtil {
          * 
          * @param object the object
          * 
-         * @throws IOException Signals that an I/O exception has occurred.
+         * @throws IOException signals that an I/O exception has occurred.
          */
         public ProcDataSource(Object object) throws IOException {
             this.object = object;

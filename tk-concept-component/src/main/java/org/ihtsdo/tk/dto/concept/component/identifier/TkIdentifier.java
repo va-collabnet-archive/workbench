@@ -62,7 +62,7 @@ public abstract class TkIdentifier extends TkRevision {
     * Instantiates a new tk identifier.
     *
     * @param id the id
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     */
    public TkIdentifier(IdBI id) throws IOException {
       super(id);
@@ -74,7 +74,7 @@ public abstract class TkIdentifier extends TkRevision {
     *
     * @param in the in
     * @param dataVersion the data version
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     * @throws ClassNotFoundException the class not found exception
     */
    public TkIdentifier(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -107,7 +107,7 @@ public abstract class TkIdentifier extends TkRevision {
     *
     * @param id the id
     * @return the tk identifier
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     */
    public static TkIdentifier convertId(IdBI id) throws IOException {
       Object denotation = id.getDenotation();
@@ -202,7 +202,7 @@ public abstract class TkIdentifier extends TkRevision {
     * Write denotation.
     *
     * @param out the out
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     */
    public abstract void writeDenotation(DataOutput out) throws IOException;
 

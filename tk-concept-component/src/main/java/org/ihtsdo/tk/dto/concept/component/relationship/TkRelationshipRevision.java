@@ -68,7 +68,7 @@ public class TkRelationshipRevision extends TkRevision {
     * Instantiates a new tk relationship revision.
     *
     * @param relationshipVersion the relationship version
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     */
    public TkRelationshipRevision(RelationshipVersionBI relationshipVersion) throws IOException {
        super(relationshipVersion);
@@ -85,7 +85,7 @@ public class TkRelationshipRevision extends TkRevision {
     *
     * @param in the in
     * @param dataVersion the data version
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     * @throws ClassNotFoundException the class not found exception
     */
    public TkRelationshipRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

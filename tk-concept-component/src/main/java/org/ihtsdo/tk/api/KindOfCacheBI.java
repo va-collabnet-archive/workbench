@@ -23,7 +23,7 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Interface KindOfCacheBI.
+ * The Interface KindOfCacheBI. TODO-javadoc: Alejandro? 
  */
 public interface KindOfCacheBI {
 
@@ -40,7 +40,7 @@ public interface KindOfCacheBI {
 	 *
 	 * @param childNid the child nid
 	 * @param parentNid the parent nid
-	 * @return true, if is kind of
+	 * @return <code>true</code>, if is kind of
 	 * @throws Exception the exception
 	 */
 	public abstract boolean isKindOf(int childNid, int parentNid)

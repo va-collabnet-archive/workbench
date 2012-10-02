@@ -393,7 +393,7 @@ public class RulesDeploymentPackageReferenceHelper {
 	 * @param extension the extension
 	 * @return the last extension part
 	 * @throws TerminologyException the terminology exception
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred.
 	 */
 	public I_ExtendByRefPart getLastExtensionPart(I_ExtendByRef extension) throws TerminologyException, IOException {
 		long lastVersion = Long.MIN_VALUE;
@@ -473,7 +473,7 @@ public class RulesDeploymentPackageReferenceHelper {
 	 *
 	 * @param concept the concept
 	 * @return the lastest attribute part
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred.
 	 */
 	private static I_ConceptAttributePart getLastestAttributePart(final I_GetConceptData concept) throws IOException {
 		List<? extends I_ConceptAttributePart> refsetAttibuteParts = concept.getConAttrs().getMutableParts();

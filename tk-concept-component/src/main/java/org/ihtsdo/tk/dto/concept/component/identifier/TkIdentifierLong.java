@@ -58,7 +58,7 @@ public class TkIdentifierLong extends TkIdentifier {
     * Instantiates a new tk identifier long.
     *
     * @param id the id
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     */
    public TkIdentifierLong(LongIdBI id) throws IOException {
       super(id);
@@ -70,7 +70,7 @@ public class TkIdentifierLong extends TkIdentifier {
     *
     * @param in the in
     * @param dataVersion the data version
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     * @throws ClassNotFoundException the class not found exception
     */
    public TkIdentifierLong(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

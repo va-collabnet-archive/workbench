@@ -16,14 +16,16 @@
  */
 package org.ihtsdo.tk.api;
 
-// TODO: Auto-generated Javadoc
 /**
  * Allows all stamp nids to be efficiently tested according to the criteria
  * specified in each implementation. Each component of a concept
  * contains a stamp nid. By finding stamp nids which meet a certain criteria, the
  * concepts in the database can be efficiently sorted based on those concepts
- * which contain a desired sap stamp.
+ * which contain a desired stamp.
+ * 
  * @see StampBI
+ * @see TerminologyStoreDI#iterateSapDataInSequence(org.ihtsdo.tk.api.ProcessStampDataBI) 
+ * 
  */
 public interface ProcessStampDataBI {
     
@@ -31,8 +33,8 @@ public interface ProcessStampDataBI {
      * Implement this method to processes all stamp nids according to certain criteria.
      * All stamp nids in the database will be returned but in no particular order.
      *
-     * @param stamp the stamp
-     * @throws Exception the exception
+     * @param stamp the object representing the stamp nid to process
+     * @throws Exception todo-javadoc: why?
      */
     void processStampData(StampBI stamp) throws Exception;
     

@@ -25,12 +25,12 @@ import org.ihtsdo.tk.api.blueprint.DescriptionCAB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
-// TODO: Auto-generated Javadoc
+// TODO: Auto-generated Javadoc  <-- indicates that initially this javadoc was generated automatically and that the javadoc for this interface is not yet finalized
 /**
- * The Interface DescriptionVersionBI for the
- * {@link org.ihtsdo.concept.component.description.Description} Class.
+ * The Interface DescriptionVersionBI provides
+ * methods for editing or creating version of a description.
  *
- * @param <A> the generic type
+ * @param <A> the type of object returned by the analog generator
  * @see org.ihtsdo.tk.api.ComponentVersionBI
  */
 public interface DescriptionVersionBI<A extends DescriptionAnalogBI>
@@ -39,33 +39,33 @@ public interface DescriptionVersionBI<A extends DescriptionAnalogBI>
         AnalogGeneratorBI<A> {
 
     /**
-     * Gets the text of the version of the description.
+     * Gets the text of this version of a description.
      *
-     * @return a <code>String</code> representing the text of the
-     * description.
+     * @return a <code>String</code> representing the text of the description.
      */
     public String getText();
 
     /**
      * Checks if the description text is initial case significant.
      *
-     * @return true, if is text is initial case significant
+     * @return <code>true</code>, if is text is initial case significant
      */
     public boolean isInitialCaseSignificant();
 
     /**
-     * Gets the language that the description is in.
+     * Gets the language that the description is in. Used to determine what
+     * language the description is in when comparing descriptions or making new
+     * descriptions.
      *
-     * @return a <code>String</code> representing the language of the
-     * description
+     * @return a two character abbreviation of the language of the description
      */
     public String getLang();
 
     /**
-     * @param viewCoordinate the view coordinate
+     * @param viewCoordinate the view coordinate specifying which version of the description to make a blueprint of
      * @return the description blueprint
-     * @throws IOException Signals that an I/O exception has occurred.
-     * @throws ContradictionException the contradiction exception
+     * @throws IOException signals that an I/O exception has occurred.
+     * @throws ContradictionException if more than one version of the description was returned for the specified view coordinate
      * @throws InvalidCAB the invalid cab
      * @see org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint
      */
@@ -73,10 +73,10 @@ public interface DescriptionVersionBI<A extends DescriptionAnalogBI>
     public DescriptionCAB makeBlueprint(ViewCoordinate viewCoordinate) throws IOException, ContradictionException, InvalidCAB;
 
     /**
-     * Tests to see if the description text matches the given pattern.
+     * Tests to see if the description text matches the given <code>pattern</code>.
      *
-     * @param pattern the pattern
-     * @return true, if matches
+     * @param pattern the description text matches the object representing the regular expression pattern
+     * @return <code>true</code>, if matches
      */
     public boolean matches(Pattern pattern);
 }

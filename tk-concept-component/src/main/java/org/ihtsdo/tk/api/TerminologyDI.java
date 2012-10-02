@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.tk.api;
 
@@ -31,189 +31,227 @@ import org.ihtsdo.tk.api.search.ScoredComponentReference;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Interface TerminologyDI.
+ * The Interface TerminologyDI provides methods for working with terminology
+ * which are general to both chronicles and versions.
  */
 public interface TerminologyDI {
-    
-   /**
-    * Do text search.
-    *
-    * @param query the query
-    * @return the collection
-    * @throws IOException Signals that an I/O exception has occurred.
-    * @throws ParseException the parse exception
-    */
-   Collection<ScoredComponentReference> doTextSearch(String query) throws IOException, ParseException;;
 
-   /**
-    * Adds the uncommitted.
-    *
-    * @param conceptChronicle the concept chronicle
-    * @throws IOException Signals that an I/O exception has occurred.
-    */
-   void addUncommitted(ConceptChronicleBI conceptChronicle) throws IOException;
+    /**
+     * Perform a search of description text based on given
+     * <code>query</code>. TODO-javadoc: when to use this?
+     *
+     * @param query the string to search for
+     * @return the matching results in the form * * * * *
+     * of <code>ScoredComponentReferences</code>, which represent the
+     * concept/component nid of the result and a score of how well the result
+     * matches the search criteria
+     * @throws IOException signals that an I/O exception has occurred.
+     * @throws ParseException the parse exception
+     */
+    Collection<ScoredComponentReference> doTextSearch(String query) throws IOException, ParseException;
 
-   /**
-    * Adds the uncommitted.
-    *
-    * @param conceptVersion the concept version
-    * @throws IOException Signals that an I/O exception has occurred.
-    */
-   void addUncommitted(ConceptVersionBI conceptVersion) throws IOException;
-   
-   /**
-    * Adds the uncommitted no checks.
-    *
-    * @param conceptChronicle the concept chronicle
-    * @throws IOException Signals that an I/O exception has occurred.
-    */
-   void addUncommittedNoChecks(ConceptChronicleBI conceptChronicle) throws IOException;
-   
-   /**
-    * Adds the uncommitted no checks.
-    *
-    * @param conceptVersion the concept version
-    * @throws IOException Signals that an I/O exception has occurred.
-    */
-   void addUncommittedNoChecks(ConceptVersionBI conceptVersion) throws IOException;
-   
-   /**
-    * Write direct.
-    *
-    * @param conceptChronicle the concept chronicle
-    * @throws IOException Signals that an I/O exception has occurred.
-    * @deprecated not in TK3
-    */
-   @Deprecated
-   void writeDirect(ConceptChronicleBI conceptChronicle) throws IOException;
+    /**
+     * Adds a new or changed
+     * <code>conceptChronicle</code> as uncommitted. Performs datachecks in the
+     * plugins/precommit folder of the install directory.
+     *
+     * @param conceptChronicle the concept with changes
+     * @throws IOException signals that an I/O exception has occurred.
+     */
+    void addUncommitted(ConceptChronicleBI conceptChronicle) throws IOException;
 
-   /**
-    * Commit.
-    *
-    * @throws IOException Signals that an I/O exception has occurred.
-    */
-   void commit() throws IOException;
+    /**
+     * Adds a new or changed
+     * <code>conceptVersion</code> as uncommitted. Performs datachecks in the
+     * plugins/precommit folder of the install directory.
+     *
+     * @param conceptVersion the concept version with changes
+     * @throws IOException signals that an I/O exception has occurred.
+     */
+    void addUncommitted(ConceptVersionBI conceptVersion) throws IOException;
 
-   /**
-    * Cancel.
-    *
-    * @throws IOException Signals that an I/O exception has occurred.
-    */
-   void cancel() throws IOException;
+    /**
+     * Adds a new or changed
+     * <code>conceptChronicle</code> as uncommitted. No datachecks are
+     * performed.
+     *
+     * @param conceptChronicle the concept with changes
+     * @throws IOException signals that an I/O exception has occurred.
+     */
+    void addUncommittedNoChecks(ConceptChronicleBI conceptChronicle) throws IOException;
 
-   /**
-    * Commit.
-    *
-    * @param conceptChronicle the concept chronicle
-    * @throws IOException Signals that an I/O exception has occurred.
-    */
-   void commit(ConceptChronicleBI conceptChronicle) throws IOException;
-   
-   /**
-    * Commit.
-    *
-    * @param cc the cc
-    * @param changeSetPolicy the change set policy
-    * @throws IOException Signals that an I/O exception has occurred.
-    */
-   void commit(ConceptChronicleBI cc, ChangeSetPolicy changeSetPolicy) throws IOException;
+    /**
+     * Adds a new
+     * <code>conceptVersion</code> as uncommitted. No datachecks are performed.
+     *
+     * @param conceptVersion the new concept version
+     * @throws IOException signals that an I/O exception has occurred.
+     */
+    void addUncommittedNoChecks(ConceptVersionBI conceptVersion) throws IOException;
 
-   /**
-    * Cancel.
-    *
-    * @param conceptChronicle the concept chronicle
-    * @throws IOException Signals that an I/O exception has occurred.
-    */
-   void cancel(ConceptChronicleBI conceptChronicle) throws IOException;
+    /**
+     * Write direct. TODO-javadoc: what does this do?
+     *
+     * @param conceptChronicle the concept chronicle
+     * @throws IOException signals that an I/O exception has occurred.
+     * @deprecated not in TK3
+     */
+    @Deprecated
+    void writeDirect(ConceptChronicleBI conceptChronicle) throws IOException;
 
-   /**
-    * Commit.
-    *
-    * @param conceptVersion the concept version
-    * @throws IOException Signals that an I/O exception has occurred.
-    */
-   void commit(ConceptVersionBI conceptVersion) throws IOException;
+    /**
+     * Commits all uncommitted changes. Performs datachecks in the
+     * plugins/commit folder of the install directory.
+     *
+     * @throws IOException signals that an I/O exception has occurred.
+     */
+    void commit() throws IOException;
 
-   /**
-    * Cancel.
-    *
-    * @param conceptVersion the concept version
-    * @throws IOException Signals that an I/O exception has occurred.
-    */
-   void cancel(ConceptVersionBI conceptVersion) throws IOException;
+    /**
+     * Cancels all uncommitted changes.
+     *
+     * @throws IOException signals that an I/O exception has occurred.
+     */
+    void cancel() throws IOException;
 
-   /**
-    * Adds the change set generator.
-    *
-    * @param key the key
-    * @param changeSetGenerator the change set generator
-    */
-   void addChangeSetGenerator(String key, ChangeSetGeneratorBI changeSetGenerator);
+    /**
+     * Commits the specified
+     * <code>conceptChronicle</code>. Only the specified concept will be
+     * committed. Performs datachecks in the plugins/commit folder of the
+     * install directory.
+     *
+     * @param conceptChronicle the concept to commit
+     * @throws IOException signals that an I/O exception has occurred.
+     */
+    void commit(ConceptChronicleBI conceptChronicle) throws IOException;
 
-   /**
-    * Removes the change set generator.
-    *
-    * @param key the key
-    */
-   void removeChangeSetGenerator(String key);
+    /**
+     * Commits the specified
+     * <code>conceptChronicle</code> with changesets written according to the
+     * <code>changeSetPolicy</code>.
+     *
+     * @param conceptChronicle the concept to commit
+     * @param changeSetPolicy the change set policy to use for writing changeset
+     * generated on commit
+     * @throws IOException signals that an I/O exception has occurred.
+     */
+    void commit(ConceptChronicleBI conceptChronicle, ChangeSetPolicy changeSetPolicy) throws IOException;
 
-   /**
-    * Creates the dto change set generator.
-    *
-    * @param changeSetFileName the change set file name
-    * @param changeSetTempFileName the change set temp file name
-    * @param changeSetGenerationPolicy the change set generation policy
-    * @return the change set generator bi
-    */
-   ChangeSetGeneratorBI createDtoChangeSetGenerator(File changeSetFileName,
-           File changeSetTempFileName,
-           ChangeSetGenerationPolicy changeSetGenerationPolicy);
+    /**
+     * Cancels any uncommitted changes on the specified
+     * <code>conceptChronicle</code>.
+     *
+     * @param conceptChronicle the uncommitted concept
+     * @throws IOException signals that an I/O exception has occurred.
+     */
+    void cancel(ConceptChronicleBI conceptChronicle) throws IOException;
 
-   /**
-    * Gets the position set.
-    *
-    * @param stampNids the stamp nids
-    * @return the position set
-    * @throws IOException Signals that an I/O exception has occurred.
-    */
-   Set<PositionBI> getPositionSet(Set<Integer> stampNids) throws IOException;
+    /**
+     * Commits an uncommitted
+     * <code>conceptVersion</code>.
+     *
+     * @param conceptVersion the uncommitted concept version
+     * @throws IOException signals that an I/O exception has occurred.
+     */
+    void commit(ConceptVersionBI conceptVersion) throws IOException;
 
-   /**
-    * Gets the path set from sap set.
-    *
-    * @param stampNids the stamp nids
-    * @return the path set from sap set
-    * @throws IOException Signals that an I/O exception has occurred.
-    */
-   Set<PathBI> getPathSetFromSapSet(Set<Integer> stampNids) throws IOException;
+    /**
+     * Cancels an uncommitted
+     * <code>conceptVersion</code>.
+     *
+     * @param conceptVersion the uncommitted concept version to cancel
+     * @throws IOException signals that an I/O exception has occurred.
+     */
+    void cancel(ConceptVersionBI conceptVersion) throws IOException;
 
-   /**
-    * Gets the path set from position set.
-    *
-    * @param positions the positions
-    * @return the path set from position set
-    * @throws IOException Signals that an I/O exception has occurred.
-    */
-   Set<PathBI> getPathSetFromPositionSet(Set<PositionBI> positions) throws IOException;
-   
-   /**
-    * Gets the path.
-    *
-    * @param pathNid the path nid
-    * @return the path
-    * @throws IOException Signals that an I/O exception has occurred.
-    */
-   PathBI getPath(int pathNid) throws IOException;
-   
-     
-   /**
-    * Gets the native id from alternate id.
-    *
-    * @param authorityUuid the authority uuid
-    * @param altId the alt id
-    * @return the native id from alternate id
-    * @throws IOException Signals that an I/O exception has occurred.
-    */
-   int getNidFromAlternateId(UUID authorityUuid, String altId) throws IOException;
+    /**
+     * Adds a change set generator which is needed in order to write changesets
+     * upon commit. This is only necessary to add when needing to write
+     * changesets for edits that do not occur in a running envrionment. For
+     * example, an edit generated at build time will need to use a changeset
+     * generator in order to generate a changeset. A changeset generator is
+     * already in place for user-initiated edits in the workbench, and will
+     * generate changesets according to the user's preferences.
+     *
+     * @param key the string identifying this <code>changesetGenerator</code>
+     * @param changeSetGenerator the change set generator to use for writing
+     * changests
+     */
+    void addChangeSetGenerator(String key, ChangeSetGeneratorBI changeSetGenerator);
 
+    /**
+     * Removes the change set generator. If generating changesets at build time,
+     * the changeset generator should be removed after the changeset is
+     * generated.
+     *
+     * TODO-javadoc: is this correct?
+     *
+     * @param key the string identifying the changeset generator to be removed
+     */
+    void removeChangeSetGenerator(String key);
+
+    /**
+     * Creates the dto change set generator. TODO-javadoc: how is this different
+     * from the other change set generator
+     *
+     * @param changeSetFileName the change set file name
+     * @param changeSetTempFileName the change set temp file name
+     * @param changeSetGenerationPolicy the change set generation policy
+     * @return the change set generator bi
+     */
+    ChangeSetGeneratorBI createDtoChangeSetGenerator(File changeSetFileName,
+            File changeSetTempFileName,
+            ChangeSetGenerationPolicy changeSetGenerationPolicy);
+
+    /**
+     * Gets the positions associated with the given
+     * <code>stampNids</code>.
+     *
+     * @param stampNids the stamp nids representing the desired positions
+     * @return the positions found from the specified stamp nids
+     * @throws IOException signals that an I/O exception has occurred.
+     * @see StampBI
+     */
+    Set<PositionBI> getPositionSet(Set<Integer> stampNids) throws IOException;
+
+    /**
+     * Gets the paths associated with the given
+     * <code>stampNids</code>.
+     *
+     * @param stampNids the stamp nids representing the desired paths
+     * @return the paths found from the specified stamp nids
+     * @throws IOException signals that an I/O exception has occurred.
+     */
+    Set<PathBI> getPathSetFromStampSet(Set<Integer> stampNids) throws IOException;
+
+    /**
+     * Gets the paths used in the given
+     * <code>positions</code>.
+     *
+     * @param positions the positions
+     * @return the paths found in the specified positions
+     * @throws IOException signals that an I/O exception has occurred.
+     */
+    Set<PathBI> getPathSetFromPositionSet(Set<PositionBI> positions) throws IOException;
+
+    /**
+     * Gets the
+     * <code>PathBI</code> object for the path associated with the given
+     * <code>pathNid</code>.
+     *
+     * @param pathNid the path nid
+     * @return the path associated with the specified path nid
+     * @throws IOException signals that an I/O exception has occurred.
+     */
+    PathBI getPath(int pathNid) throws IOException;
+
+    /**
+     * Gets the nid associated with the component spcified by the <code>alternateId</code>.
+     *
+     * @param authorityUuid the uuid representing the authority associated with the alternate id
+     * @param alternateId a string representation of the alternate id
+     * @return the nid associated with the specified component
+     * @throws IOException signals that an I/O exception has occurred.
+     */
+    int getNidFromAlternateId(UUID authorityUuid, String alternateId) throws IOException;
 }

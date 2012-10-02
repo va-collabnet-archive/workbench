@@ -16,23 +16,24 @@
  */
 package org.ihtsdo.tk.api;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Interface AnalogGeneratorBI.
+ * The Interface AnalogGeneratorBI can be used for generating analogs of components. 
+ * It is preferable to use a blueprint rather than an analog when creating or modifying components.
  *
- * @param <T> the generic type
+ * @param <T> The type of object returned by the analog generator.
+ * @see org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint
  */
 public interface AnalogGeneratorBI <T extends AnalogBI> {
         
         /**
-         * Make analog.
+         * Creates an analog based on a component and using the given values.
          *
-         * @param statusNid the status nid
-         * @param time the time
-         * @param authorNid the author nid
-         * @param moduleNid the module nid
-         * @param pathNid the path nid
-         * @return the t
+         * @param statusNid the nid representing the new status
+         * @param time the time to be associated with the new component
+         * @param authorNid the nid representing the new author
+         * @param moduleNid the nid representing the new module
+         * @param pathNid the nid representing the new path
+         * @return the generic type of an object returned by the analog generator
          */
         T makeAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid);
 }

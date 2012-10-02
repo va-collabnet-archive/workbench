@@ -338,7 +338,7 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
      *
      * @param f the f
      * @return the uuid snomed map
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static UuidSnomedMap read(File f) throws IOException {
         UuidSnomedMap map = new UuidSnomedMap();
@@ -354,7 +354,7 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
      * @param namespaceId the namespace id
      * @param projectId the project id
      * @return the uuid snomed map
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static UuidSnomedMap read(File f, int namespaceId, int projectId) throws IOException {
         UuidSnomedMap map = new UuidSnomedMap(projectId, namespaceId);
@@ -369,7 +369,7 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
      * @param f the f
      * @param map the map
      * @throws FileNotFoundException the file not found exception
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     private static void readData(File f, UuidSnomedMap map) throws FileNotFoundException, IOException {
         System.out.println("Reading map file: " + f.getAbsolutePath());

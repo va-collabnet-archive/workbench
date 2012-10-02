@@ -95,7 +95,7 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
     * Instantiates a new tk component.
     *
     * @param componentVersion the component version
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     */
    public TkComponent(ComponentVersionBI componentVersion) throws IOException {
       super(componentVersion);
@@ -121,7 +121,7 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
     *
     * @param in the in
     * @param dataVersion the data version
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     * @throws ClassNotFoundException the class not found exception
     */
    public TkComponent(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -176,7 +176,7 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
     * @param offset the offset
     * @param mapAll the map all
     * @param viewCoordinate the view coordinate
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     * @throws ContradictionException the contradiction exception
     */
    public TkComponent(ComponentVersionBI componentVersion, NidBitSetBI excludedNids, Map<UUID, UUID> conversionMap,
@@ -283,7 +283,7 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
     * Process annotations.
     *
     * @param annotations the annotations
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     */
    private void processAnnotations(Collection<? extends RefexChronicleBI<?>> annotations) throws IOException {
       if ((annotations != null) &&!annotations.isEmpty()) {
@@ -302,7 +302,7 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
     * @param viewCoordinate the view coordinate
     * @param excludedNids the excluded nids
     * @param conversionMap the conversion map
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     * @throws ContradictionException the contradiction exception
     */
    private void processAnnotations(Collection<? extends RefexChronicleBI<?>> annotations, ViewCoordinate viewCoordinate,

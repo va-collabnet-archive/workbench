@@ -38,7 +38,7 @@ public interface ConceptAttributeVersionBI<A extends ConceptAttributeAnalogBI>
     /**
      * Checks if is defined.
      *
-     * @return true, if is defined
+     * @return <code>true</code>, if is defined
      */
     public boolean isDefined();
     

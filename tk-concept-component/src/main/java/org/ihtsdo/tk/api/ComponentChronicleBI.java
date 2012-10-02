@@ -26,84 +26,94 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Interface ComponentChronicleBI for the
- * {@link org.ihtsdo.concept.component.ConceptComponent} Class. The
- * ComponentChronicleBI contains all of the versions of a component.
+ * The Interface ComponentChronicleBI contains terminology generic methods for
+ * editing and interacting with a component. A ComponentChronicleBI contains all of the versions of
+ * a component.
  *
- * @param <T> the generic type
+ * @param <T> the generic type TODO-javadoc: what to put here?
  * @see org.ihtsdo.tk.api.ComponentBI
  */
 public interface ComponentChronicleBI<T extends ComponentVersionBI>
         extends ComponentBI {
 
     /**
-     * Gets the version.
+     * Gets a particular version of a component based the given
+     * <code>viewCoordinate</code>.
      *
-     * @param viewCoordinate the view coordinate
-     * @return the version
-     * @throws ContradictionException the contradiction exception
+     * @param viewCoordinate the view coordinate specifying which version of the component to return
+     * @return the specified  version of the component
+     * @throws ContradictionException if there is more than one version for a
+     * particular <code>viewCoordinate</code>
      */
     T getVersion(ViewCoordinate viewCoordinate) throws ContradictionException;
 
     /**
-     * Gets the versions.
+     * Gets all the versions of a component based the
+     * <code>viewCoordinate</code>.
      *
-     * @param viewCoordinate the view coordinate
-     * @return the versions
+     * @param viewCoordinate the view coordinate specifying which version of the component to return
+     * @return the specified  versions of the component
      */
     Collection<? extends T> getVersions(ViewCoordinate viewCoordinate);
 
     /**
-     * Gets the versions.
+     * Gets the all versions of a component.
      *
-     * @return the versions
+     * @return all the versions the component
      */
     Collection<? extends T> getVersions();
 
     /**
-     * Checks if is uncommitted.
+     * Checks if the component is uncommitted.
      *
-     * @return true, if is uncommitted
+     * @return <code>true</code>, if the component is uncommitted
      */
     boolean isUncommitted();
 
     /**
-     * Gets the all stamp nids.
+     * Gets the all stamp nids for all versions on a component.
      *
-     * @return the all stamp nids
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @return the stamp nids of the component
+     * @throws IOException signals that an I/O exception has occurred.
+     * @see org.ihtsdo.tk.api.StampBI
      */
     Set<Integer> getAllStampNids() throws IOException;
 
     /**
-     * Gets the positions.
+     * Gets the positions represented in the versions of a component.
+     * TODO-javadoc: is this correct?
      *
-     * @return the positions
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @return the positions found in the component
+     * @throws IOException signals that an I/O exception has occurred.
+     * @see org.ihtsdo.tk.api.PositionBI
      */
     Set<PositionBI> getPositions() throws IOException;
 
     /**
-     * Gets the primordial version.
+     * Gets the primordial version, the first version, of a component.
      *
-     * @return the primordial version
+     * @return the primordial version of the component
      */
     T getPrimordialVersion();
 
     /**
-     * Make adjudication analogs.
+     * Makes an analog of the component based on the given
+     * <code>viewCoordinate</code> and created based on the specifications given by the
+     * <code>editCoordinate</code>. TODO-javadoc: not sure what this is used
+     * for
      *
-     * @param editCoordinate the edit coordinate
-     * @param viewCoordinate the view coordinate
-     * @return true, if successful
-     * @throws Exception the exception
+     * @param editCoordinate the edit coordinate specifying the editing metadata to use in creation
+     * @param viewCoordinate the view coordinate specifying which versions are active and inactive
+     * @return <code>true</code>, if analogs were successfully created
+     * @throws Exception the exception TODO-javadoc: why?
+     * @see org.ihtsdo.tk.api.AnalogBI
      */
     boolean makeAdjudicationAnalogs(EditCoordinate editCoordinate, ViewCoordinate viewCoordinate) throws Exception;
 
     /**
-     * Gets the enclosing concept.
+     * Gets the concept that a component is a part of.
      *
-     * @return the enclosing concept
+     * @return the component's enclosing concept
      */
     ConceptChronicleBI getEnclosingConcept();
 }

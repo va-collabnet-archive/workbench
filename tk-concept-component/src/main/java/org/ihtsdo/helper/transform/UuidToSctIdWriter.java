@@ -186,7 +186,7 @@ boolean makePrivateAltIdsFile;
     /**
      * Write.
      *
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public void write() throws IOException {
         setup();
@@ -283,7 +283,7 @@ boolean makePrivateAltIdsFile;
     /**
      * Setup.
      *
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     private void setup() throws IOException {
         File[] uuidFiles = directory.listFiles(new FilenameFilter() {
@@ -449,7 +449,7 @@ boolean makePrivateAltIdsFile;
      * Process concept attribute.
      *
      * @param line the line
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     private void processConceptAttribute(String line) throws IOException {
         if (line != null) {
@@ -506,7 +506,7 @@ boolean makePrivateAltIdsFile;
      * Process description.
      *
      * @param line the line
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     private void processDescription(String line) throws IOException {
         if (line != null) {
@@ -598,7 +598,7 @@ boolean makePrivateAltIdsFile;
      * Process relationship.
      *
      * @param line the line
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     private void processRelationship(String line) throws IOException {
         if (line != null) {
@@ -704,7 +704,7 @@ boolean makePrivateAltIdsFile;
      * Process stated relationship.
      *
      * @param line the line
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     private void processStatedRelationship(String line) throws IOException {
         if (line != null) {
@@ -811,7 +811,7 @@ boolean makePrivateAltIdsFile;
      *
      * @param line the line
      * @param writer the writer
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     private void processIdentifiers(String line, Writer writer) throws IOException {
         if (line != null) {
@@ -868,7 +868,7 @@ boolean makePrivateAltIdsFile;
      * Process lang refsets.
      *
      * @param line the line
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     private void processLangRefsets(String line) throws IOException {
         if (line != null) {
@@ -939,7 +939,7 @@ boolean makePrivateAltIdsFile;
      * Process other lang refsets.
      *
      * @param line the line
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     private void processOtherLangRefsets(String line) throws IOException {
         if (line != null) {
@@ -1010,7 +1010,7 @@ boolean makePrivateAltIdsFile;
      * Process module depedency.
      *
      * @param line the line
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     private void processModuleDepedency(String line) throws IOException {
         if (line != null) {
@@ -1083,7 +1083,7 @@ boolean makePrivateAltIdsFile;
      * Process desc type.
      *
      * @param line the line
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     private void processDescType(String line) throws IOException {
         if (line != null) {
@@ -1160,7 +1160,7 @@ boolean makePrivateAltIdsFile;
      * Process refset desc.
      *
      * @param line the line
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     private void processRefsetDesc(String line) throws IOException {
         if (line != null) {
@@ -1247,7 +1247,7 @@ boolean makePrivateAltIdsFile;
     /**
      * Process uuid to sct map.
      *
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     private void processUuidToSctMap() throws IOException {
         Set<UUID> keySet = uuidToSctMap.keySet();
@@ -1273,7 +1273,7 @@ boolean makePrivateAltIdsFile;
     /**
      * Write uuid to sct map file.
      *
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     private void writeUuidToSctMapFile() throws IOException {
         Set<UUID> keySet = uuidToSctMap.keySet();
@@ -1302,7 +1302,7 @@ boolean makePrivateAltIdsFile;
      * @param statusString the status string
      * @return the integer
      * @throws ValidationException the validation exception
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     private Integer convertStatus(String statusString) throws ValidationException, IOException {
         UUID status = UUID.fromString(statusString);
@@ -1340,7 +1340,7 @@ boolean makePrivateAltIdsFile;
      *
      * @param uuidString the uuid string
      * @return the existing sct id
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     private String getExistingSctId(String uuidString) throws IOException {
         UUID componentUuid = UUID.fromString(uuidString);
@@ -1379,7 +1379,7 @@ boolean makePrivateAltIdsFile;
     /**
      * Close.
      *
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public void close() throws IOException {
         if (conceptsWriter != null) {

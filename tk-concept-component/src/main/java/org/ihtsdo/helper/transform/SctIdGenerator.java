@@ -144,7 +144,7 @@ public class SctIdGenerator {
      * Verhoeff check.
      *
      * @param idAsString the id as string
-     * @return true, if successful
+     * @return <code>true</code>, if successful
      */
     public static boolean verhoeffCheck(String idAsString) {
         int check = 0;

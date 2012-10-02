@@ -56,7 +56,7 @@ public interface I_MapUuidsToSnomed {
      * Contains key.
      *
      * @param arg0 the arg0
-     * @return true, if successful
+     * @return <code>true</code>, if successful
      */
     public abstract boolean containsKey(Object arg0);
 
@@ -64,7 +64,7 @@ public interface I_MapUuidsToSnomed {
      * Contains value.
      *
      * @param arg0 the arg0
-     * @return true, if successful
+     * @return <code>true</code>, if successful
      */
     public abstract boolean containsValue(Object arg0);
 
@@ -95,7 +95,7 @@ public interface I_MapUuidsToSnomed {
     /**
      * Checks if is empty.
      *
-     * @return true, if is empty
+     * @return <code>true</code>, if is empty
      */
     public abstract boolean isEmpty();
 
@@ -155,7 +155,7 @@ public interface I_MapUuidsToSnomed {
      * Write.
      *
      * @param f the f
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public abstract void write(File f) throws IOException;
 

@@ -69,7 +69,7 @@ public interface RelativePositionComputerBI {
      *
      * @param version the part to be tested to determine if it is on route to the
      * destination.
-     * @return true if the part's position is on the route to the destination of
+     * @return <code>true</code> if the part's position is on the route to the destination of
      * the class's instance.
      */
     boolean onRoute(VersionPointBI version);
@@ -81,7 +81,7 @@ public interface RelativePositionComputerBI {
      * @param v2 the second part of the comparison.
      * @return the <code>RelativePosition</code> of v1 compared to v2
      * with respect to the destination position of the class's instance.
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     RelativePosition relativePosition(VersionPointBI v1, VersionPointBI v2) throws IOException;
 

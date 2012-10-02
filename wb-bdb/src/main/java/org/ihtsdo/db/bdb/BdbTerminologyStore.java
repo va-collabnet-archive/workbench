@@ -507,10 +507,10 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     }
     
     @Override
-    public Set<PathBI> getPathSetFromSapSet(Set<Integer> sapNids) throws IOException {
-        HashSet<PathBI> paths = new HashSet<PathBI>(sapNids.size());
+    public Set<PathBI> getPathSetFromStampSet(Set<Integer> stampNids) throws IOException {
+        HashSet<PathBI> paths = new HashSet<PathBI>(stampNids.size());
         
-        for (int sap : sapNids) {
+        for (int sap : stampNids) {
             try {
                 PathBI path = Bdb.getSapDb().getPosition(sap).getPath();
                 

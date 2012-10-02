@@ -200,7 +200,7 @@ public interface WorkflowHistoryJavaBeanBI {
 	 *
 	 * @param viewCoordinate the view coordinate
 	 * @return the state for title bar
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred.
 	 */
 	public String getStateForTitleBar(ViewCoordinate viewCoordinate) throws IOException;
 	
@@ -209,7 +209,7 @@ public interface WorkflowHistoryJavaBeanBI {
 	 *
 	 * @param viewCoordinate the view coordinate
 	 * @return the modeler for title bar
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred.
 	 */
 	public String getModelerForTitleBar(ViewCoordinate viewCoordinate) throws IOException;
 	

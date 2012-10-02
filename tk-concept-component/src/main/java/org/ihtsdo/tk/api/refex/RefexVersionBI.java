@@ -56,7 +56,7 @@ public interface RefexVersionBI<A extends RefexAnalogBI<A>>
      * @param conversionMap the conversion map
      * @return the tk refset member active only
      * @throws ContradictionException the contradiction exception
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     TkRefexAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate viewCoordinate, NidBitSetBI excludedNids,
             Map<UUID, UUID> conversionMap)
@@ -66,7 +66,7 @@ public interface RefexVersionBI<A extends RefexAnalogBI<A>>
      * Refex fields equal.
      *
      * @param another the another
-     * @return true, if successful
+     * @return <code>true</code>, if successful
      */
     boolean refexFieldsEqual(RefexVersionBI another);
     

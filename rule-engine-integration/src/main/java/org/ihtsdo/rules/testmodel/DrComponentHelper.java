@@ -450,7 +450,7 @@ public class DrComponentHelper {
 	 *
 	 * @param nid the nid
 	 * @return the snomed int id
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred.
 	 * @throws TerminologyException the terminology exception
 	 */
 	public static String getSnomedIntId(int nid) throws IOException, TerminologyException {

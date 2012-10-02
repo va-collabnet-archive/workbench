@@ -270,7 +270,7 @@ public class TestModelUtil {
 	 * @return the workbench concept
 	 * 
 	 * @throws TerminologyException the terminology exception
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred.
 	 *//*
 	public static I_GetConceptData getWorkbenchConcept(Concept concept) throws TerminologyException, IOException {
 		return Terms.get().getConcept(new UUID[] {concept.getId()});

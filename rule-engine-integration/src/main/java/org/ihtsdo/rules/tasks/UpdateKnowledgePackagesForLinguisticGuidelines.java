@@ -55,7 +55,7 @@ public class UpdateKnowledgePackagesForLinguisticGuidelines extends AbstractTask
 	 * 
 	 * @param out the out
 	 * 
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred.
 	 */
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
@@ -66,7 +66,7 @@ public class UpdateKnowledgePackagesForLinguisticGuidelines extends AbstractTask
 	 * 
 	 * @param in the in
 	 * 
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred.
 	 * @throws ClassNotFoundException the class not found exception
 	 */
 	private void readObject(java.io.ObjectInputStream in) throws IOException,

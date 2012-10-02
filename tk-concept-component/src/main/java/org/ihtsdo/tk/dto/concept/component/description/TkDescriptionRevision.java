@@ -68,7 +68,7 @@ public class TkDescriptionRevision extends TkRevision implements I_DescribeExter
     * Instantiates a new tk description revision.
     *
     * @param descriptionVersion the description version
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     */
    public TkDescriptionRevision(DescriptionVersionBI descriptionVersion) throws IOException {
       super(descriptionVersion);
@@ -83,7 +83,7 @@ public class TkDescriptionRevision extends TkRevision implements I_DescribeExter
     *
     * @param in the in
     * @param dataVersion the data version
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     * @throws ClassNotFoundException the class not found exception
     */
    public TkDescriptionRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

@@ -101,7 +101,7 @@ public class Language {
      * @param lang the lang
      * @param vc the vc
      * @return the concept from lang
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static ConceptVersionBI getConceptFromLang(
             String lang,

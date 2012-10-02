@@ -38,7 +38,7 @@ public interface IdBI extends VersionPointBI {
     * Gets the all nids for id.
     *
     * @return the all nids for id
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     */
    Set<Integer> getAllNidsForId() throws IOException;
 

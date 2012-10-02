@@ -42,7 +42,7 @@ public class RefexAmendmentSpec extends RefexCAB {
      * @param referencedComponentUuid the referenced component uuid
      * @param collectionNid the collection nid
      * @param memberUuid the member uuid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -57,7 +57,7 @@ public class RefexAmendmentSpec extends RefexCAB {
      * @param memberType the member type
      * @param referencedComponentNid the referenced component nid
      * @param collectionNid the collection nid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */

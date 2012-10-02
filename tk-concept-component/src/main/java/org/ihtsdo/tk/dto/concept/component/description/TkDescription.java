@@ -73,7 +73,7 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
      * Instantiates a new tk description.
      *
      * @param descriptionChronicle the description chronicle
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public TkDescription(DescriptionChronicleBI descriptionChronicle) throws IOException {
         this(descriptionChronicle.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
@@ -84,7 +84,7 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
      *
      * @param descriptionVersion the description version
      * @param revisionHandling the revision handling
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public TkDescription(DescriptionVersionBI descriptionVersion,
             RevisionHandling revisionHandling) throws IOException {
@@ -130,7 +130,7 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
      *
      * @param in the in
      * @param dataVersion the data version
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ClassNotFoundException the class not found exception
      */
     public TkDescription(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -171,7 +171,7 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
      * @param offset the offset
      * @param mapAll the map all
      * @param viewCoordinate the view coordinate
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     public TkDescription(DescriptionVersionBI descriptionVersion, NidBitSetBI excludedNids, Map<UUID, UUID> conversionMap,
@@ -199,7 +199,7 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
      * as this <tt>EDescription</tt>.
      *
      * @param obj the object to compare with.
-     * @return true, if successful
+     * @return <code>true</code>, if successful
      * <code>true</code> if the objects are the same;
      * <code>false</code> otherwise.
      */

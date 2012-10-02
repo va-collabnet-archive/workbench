@@ -18,7 +18,7 @@ package org.ihtsdo.tk.api;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Interface ProcessComponentChronicleBI.
+ * The Interface ProcessComponentChronicleBI. TODO-javadoc: ?
  *
  * @author kec
  */

@@ -78,7 +78,7 @@ public class UuidToSctIdMapper implements ProcessUnfetchedConceptDataBI {
      * @param conceptsToProcess the concepts to process
      * @param namespace the namespace
      * @param sourceDirectory the source directory
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public UuidToSctIdMapper(NidBitSetBI conceptsToProcess, String namespace, File sourceDirectory) throws IOException {
         this.conceptsToProcess = conceptsToProcess;
@@ -102,7 +102,7 @@ public class UuidToSctIdMapper implements ProcessUnfetchedConceptDataBI {
     /**
      * Close.
      *
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public void close() throws IOException {
         if (conceptsWriter != null) {

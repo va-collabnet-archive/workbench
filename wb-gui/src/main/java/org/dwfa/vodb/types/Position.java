@@ -110,8 +110,7 @@ public class Position implements I_Position, Serializable {
 
    //~--- methods -------------------------------------------------------------
 
-   /*
-    * (non-Javadoc)
+   /**
     *
     * @see
     * org.dwfa.vodb.types.I_Position#checkAntecedentOrEqualToOrigins(java.util
@@ -210,8 +209,7 @@ public class Position implements I_Position, Serializable {
         return Hashcode.computeLong(time, path.getConceptNid());
     }
 
-   /*
-    * (non-Javadoc)
+   /**
     *
     * @see org.dwfa.vodb.types.I_Position#equals(int, int)
     */

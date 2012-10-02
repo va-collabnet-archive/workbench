@@ -167,7 +167,7 @@ public class SnomedMetadataRfx {
      * Gets the des full specified name nid.
      *
      * @return the des full specified name nid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static int getDES_FULL_SPECIFIED_NAME_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -183,7 +183,7 @@ public class SnomedMetadataRfx {
      * Gets the des synonym preferred name nid.
      *
      * @return the des synonym preferred name nid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static int getDES_SYNONYM_PREFERRED_NAME_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -199,7 +199,7 @@ public class SnomedMetadataRfx {
      * Gets the des synonym nid.
      *
      * @return the des synonym nid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static int getDES_SYNONYM_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -215,7 +215,7 @@ public class SnomedMetadataRfx {
      * Gets the desc acceptable.
      *
      * @return the desc acceptable
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static ConceptSpec getDESC_ACCEPTABLE() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -231,7 +231,7 @@ public class SnomedMetadataRfx {
      * Gets the desc acceptable nid.
      *
      * @return the desc acceptable nid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static int getDESC_ACCEPTABLE_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -247,7 +247,7 @@ public class SnomedMetadataRfx {
      * Gets the desc preferred.
      *
      * @return the desc preferred
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static ConceptSpec getDESC_PREFERRED() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -263,7 +263,7 @@ public class SnomedMetadataRfx {
      * Gets the desc preferred nid.
      *
      * @return the desc preferred nid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static int getDESC_PREFERRED_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -279,7 +279,7 @@ public class SnomedMetadataRfx {
      * Gets the rel ch additional characteristic nid.
      *
      * @return the rel ch additional characteristic nid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static int getREL_CH_ADDITIONAL_CHARACTERISTIC_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -295,7 +295,7 @@ public class SnomedMetadataRfx {
      * Gets the rel ch defining characteristic nid.
      *
      * @return the rel ch defining characteristic nid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static int getREL_CH_DEFINING_CHARACTERISTIC_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -311,7 +311,7 @@ public class SnomedMetadataRfx {
      * Gets the rel ch inferred relationship nid.
      *
      * @return the rel ch inferred relationship nid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static int getREL_CH_INFERRED_RELATIONSHIP_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -327,7 +327,7 @@ public class SnomedMetadataRfx {
      * Gets the rel ch qualifier characteristic nid.
      *
      * @return the rel ch qualifier characteristic nid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static int getREL_CH_QUALIFIER_CHARACTERISTIC_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -343,7 +343,7 @@ public class SnomedMetadataRfx {
      * Gets the rel ch stated relationship nid.
      *
      * @return the rel ch stated relationship nid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static int getREL_CH_STATED_RELATIONSHIP_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -359,7 +359,7 @@ public class SnomedMetadataRfx {
      * Gets the rel history historic nid.
      *
      * @return the rel history historic nid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static int getREL_HISTORY_HISTORIC_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -375,7 +375,7 @@ public class SnomedMetadataRfx {
      * Gets the rel history moved to nid.
      *
      * @return the rel history moved to nid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static int getREL_HISTORY_MOVED_TO_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -391,7 +391,7 @@ public class SnomedMetadataRfx {
      * Gets the rel mandatory refinability nid.
      *
      * @return the rel mandatory refinability nid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static int getREL_MANDATORY_REFINABILITY_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -407,7 +407,7 @@ public class SnomedMetadataRfx {
      * Gets the rel not refinable nid.
      *
      * @return the rel not refinable nid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static int getREL_NOT_REFINABLE_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -423,7 +423,7 @@ public class SnomedMetadataRfx {
      * Gets the rel optional refinability nid.
      *
      * @return the rel optional refinability nid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static int getREL_OPTIONAL_REFINABILITY_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -439,7 +439,7 @@ public class SnomedMetadataRfx {
      * Gets the release format.
      *
      * @return the release format
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static int getReleaseFormat() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -453,7 +453,7 @@ public class SnomedMetadataRfx {
      * Gets the status current.
      *
      * @return the status current
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static ConceptSpec getSTATUS_CURRENT() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -469,7 +469,7 @@ public class SnomedMetadataRfx {
      * Gets the status current nid.
      *
      * @return the status current nid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static int getSTATUS_CURRENT_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -485,7 +485,7 @@ public class SnomedMetadataRfx {
      * Gets the status limited.
      *
      * @return the status limited
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static ConceptSpec getSTATUS_LIMITED() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -501,7 +501,7 @@ public class SnomedMetadataRfx {
      * Gets the status limited nid.
      *
      * @return the status limited nid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static int getSTATUS_LIMITED_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -517,7 +517,7 @@ public class SnomedMetadataRfx {
      * Gets the status retired.
      *
      * @return the status retired
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static ConceptSpec getSTATUS_RETIRED() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -533,7 +533,7 @@ public class SnomedMetadataRfx {
      * Gets the status retired nid.
      *
      * @return the status retired nid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static int getSTATUS_RETIRED_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -549,7 +549,7 @@ public class SnomedMetadataRfx {
      * Gets the status inappropriate.
      *
      * @return the status inappropriate
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static ConceptSpec getSTATUS_INAPPROPRIATE() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -565,7 +565,7 @@ public class SnomedMetadataRfx {
      * Gets the status inappropriate nid.
      *
      * @return the status inappropriate nid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static int getSTATUS_INAPPROPRIATE_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -581,7 +581,7 @@ public class SnomedMetadataRfx {
      * Gets the status ambiguous.
      *
      * @return the status ambiguous
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static ConceptSpec getSTATUS_AMBIGUOUS() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -597,7 +597,7 @@ public class SnomedMetadataRfx {
      * Gets the status ambiguous nid.
      *
      * @return the status ambiguous nid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static int getSTATUS_AMBIGUOUS_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -613,7 +613,7 @@ public class SnomedMetadataRfx {
      * Gets the status duplicate.
      *
      * @return the status duplicate
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static ConceptSpec getSTATUS_DUPLICATE() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -629,7 +629,7 @@ public class SnomedMetadataRfx {
      * Gets the status duplicate nid.
      *
      * @return the status duplicate nid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static int getSTATUS_DUPLICATE_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -645,7 +645,7 @@ public class SnomedMetadataRfx {
      * Gets the status erroneous.
      *
      * @return the status erroneous
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static ConceptSpec getSTATUS_ERRONEOUS() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -661,7 +661,7 @@ public class SnomedMetadataRfx {
      * Gets the status erroneous nid.
      *
      * @return the status erroneous nid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static int getSTATUS_ERRONEOUS_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -677,7 +677,7 @@ public class SnomedMetadataRfx {
      * Gets the status outdated.
      *
      * @return the status outdated
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static ConceptSpec getSTATUS_OUTDATED() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -693,7 +693,7 @@ public class SnomedMetadataRfx {
      * Gets the status outdated nid.
      *
      * @return the status outdated nid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static int getSTATUS_OUTDATED_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -709,7 +709,7 @@ public class SnomedMetadataRfx {
      * Gets the us dialect refex nid.
      *
      * @return the us dialect refex nid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static int getUS_DIALECT_REFEX_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -725,7 +725,7 @@ public class SnomedMetadataRfx {
      * Gets the gb dialect refex nid.
      *
      * @return the gb dialect refex nid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static int getGB_DIALECT_REFEX_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -741,7 +741,7 @@ public class SnomedMetadataRfx {
      * Gets the synonymy refex nid.
      *
      * @return the synonymy refex nid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static int getSYNONYMY_REFEX_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -757,7 +757,7 @@ public class SnomedMetadataRfx {
      * Gets the refers to refex nid.
      *
      * @return the refers to refex nid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static int getREFERS_TO_REFEX_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -774,7 +774,7 @@ public class SnomedMetadataRfx {
      * Gets the refex non human.
      *
      * @return the refex non human
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static ConceptSpec getREFEX_NON_HUMAN() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -790,7 +790,7 @@ public class SnomedMetadataRfx {
      * Gets the refex vtm.
      *
      * @return the refex vtm
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static ConceptSpec getREFEX_VTM() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -806,7 +806,7 @@ public class SnomedMetadataRfx {
      * Gets the refex vmp.
      *
      * @return the refex vmp
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static ConceptSpec getREFEX_VMP() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -822,7 +822,7 @@ public class SnomedMetadataRfx {
      * Gets the refex synonymy.
      *
      * @return the refex synonymy
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static ConceptSpec getREFEX_SYNONYMY() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -838,7 +838,7 @@ public class SnomedMetadataRfx {
      * Sets the up sno rf1 rf2.
      *
      * @param releaseFormatNumber the new up sno rf1 rf2
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static void setupSnoRf1Rf2(int releaseFormatNumber) throws IOException {
         if (releaseFormatNumber != 1 || releaseFormatNumber != 2) {
@@ -853,7 +853,7 @@ public class SnomedMetadataRfx {
     /**
      * Setup sno rf1 rf2.
      *
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     private static void setupSnoRf1Rf2() throws IOException {
         tf = Ts.get();

@@ -71,7 +71,7 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
      * Instantiates a new tk media.
      *
      * @param mediaChronicle the media chronicle
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public TkMedia(MediaChronicleBI mediaChronicle) throws IOException {
         this(mediaChronicle.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
@@ -82,7 +82,7 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
      *
      * @param mediaVersion the media version
      * @param revisionHandling the revision handling
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public TkMedia(MediaVersionBI mediaVersion,
             RevisionHandling revisionHandling) throws IOException {
@@ -122,7 +122,7 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
      *
      * @param in the in
      * @param dataVersion the data version
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ClassNotFoundException the class not found exception
      */
     public TkMedia(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -165,7 +165,7 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
      * @param offset the offset
      * @param mapAll the map all
      * @param viewCoordinate the view coordinate
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     public TkMedia(MediaVersionBI mediaVersion, NidBitSetBI excludedNids, Map<UUID, UUID> conversionMap, long offset,
@@ -193,7 +193,7 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
      * this <tt>EImage</tt>.
      *
      * @param obj the object to compare with.
-     * @return true, if successful
+     * @return <code>true</code>, if successful
      * <code>true</code> if the objects are the same;
      * <code>false</code> otherwise.
      */

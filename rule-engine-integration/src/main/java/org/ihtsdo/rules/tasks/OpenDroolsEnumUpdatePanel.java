@@ -56,7 +56,7 @@ public class OpenDroolsEnumUpdatePanel extends AbstractTask {
 	 *            the out
 	 * 
 	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
+	 *             signals that an I/O exception has occurred.
 	 */
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
@@ -69,7 +69,7 @@ public class OpenDroolsEnumUpdatePanel extends AbstractTask {
 	 *            the in
 	 * 
 	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
+	 *             signals that an I/O exception has occurred.
 	 * @throws ClassNotFoundException
 	 *             the class not found exception
 	 */

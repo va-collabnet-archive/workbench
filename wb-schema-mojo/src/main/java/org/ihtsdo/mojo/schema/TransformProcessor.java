@@ -136,7 +136,7 @@ public class TransformProcessor implements ProcessUnfetchedConceptDataBI{
 	 * Write list of EConcepts to the DataOutputStream.
 	 *
 	 * @param eConcepts the e concepts
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred.
 	 */
 	public void writeList(List<EConcept> eConcepts) throws IOException {
 		if (eConcepts != null) {
@@ -150,7 +150,7 @@ public class TransformProcessor implements ProcessUnfetchedConceptDataBI{
 	 * Write a single Econcept to the DataOutputStream.
 	 *
 	 * @param eConcept the e concept
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred.
 	 */
 	public void write(EConcept eConcept) throws IOException {
 		writeSemaphore.acquireUninterruptibly();

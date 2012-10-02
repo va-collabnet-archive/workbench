@@ -367,7 +367,7 @@ public class HierarchyNavigator extends JPanel {
 		 * @throws TerminologyException
 		 *             the terminology exception
 		 * @throws IOException
-		 *             Signals that an I/O exception has occurred.
+		 *             signals that an I/O exception has occurred.
 		 */
 		private Transferable getTransferable(I_GetConceptData obj) throws TerminologyException, IOException {
 			return new ConceptTransferable(Terms.get().getConcept(obj.getConceptNid()));
@@ -380,7 +380,7 @@ public class HierarchyNavigator extends JPanel {
 		 *            the obj
 		 * @return the drag image
 		 * @throws IOException
-		 *             Signals that an I/O exception has occurred.
+		 *             signals that an I/O exception has occurred.
 		 */
 		public Image getDragImage(I_GetConceptData obj) throws IOException {
 

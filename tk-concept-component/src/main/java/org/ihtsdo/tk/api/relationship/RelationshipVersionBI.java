@@ -59,14 +59,14 @@ public interface RelationshipVersionBI<A extends RelationshipAnalogBI>
     /**
      * Checks if is inferred.
      *
-     * @return true, if is inferred
+     * @return <code>true</code>, if is inferred
      */
     public boolean isInferred();
     
     /**
      * Checks if is stated.
      *
-     * @return true, if is stated
+     * @return <code>true</code>, if is stated
      */
     public boolean isStated();
     

@@ -62,7 +62,7 @@ public class TkRefexUuidFloatRevision extends TkRevision {
     * Instantiates a new tk refex uuid float revision.
     *
     * @param refexNidFloatVersion the refex nid float version
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     */
    public TkRefexUuidFloatRevision(RefexNidFloatVersionBI refexNidFloatVersion) throws IOException {
       super(refexNidFloatVersion);
@@ -78,7 +78,7 @@ public class TkRefexUuidFloatRevision extends TkRevision {
     *
     * @param in the in
     * @param dataVersion the data version
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     * @throws ClassNotFoundException the class not found exception
     */
    public TkRefexUuidFloatRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

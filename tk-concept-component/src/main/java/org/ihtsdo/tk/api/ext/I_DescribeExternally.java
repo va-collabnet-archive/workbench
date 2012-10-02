@@ -28,7 +28,7 @@ public interface I_DescribeExternally extends I_VersionExternally {
 	/**
 	 * Checks if is initial case significant.
 	 *
-	 * @return true, if is initial case significant
+	 * @return <code>true</code>, if is initial case significant
 	 */
 	public boolean isInitialCaseSignificant();
 

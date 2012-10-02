@@ -19,16 +19,15 @@
 
 package org.ihtsdo.tk.api;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Interface ConceptContainerBI.
+ * The Interface ConceptContainerBI. This interface is used to provide a
+ * standard for objects which contain concepts.
  *
- * @author kec
  */
 public interface ConceptContainerBI {
    
    /**
-    * Gets the concept nid.
+    * Gets the nid of the concept which is held in the container.
     *
     * @return the concept nid
     */

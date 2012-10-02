@@ -58,7 +58,7 @@ public class TkRefsetStrRevision extends TkRevision {
     * Instantiates a new tk refset str revision.
     *
     * @param refexStringVersion the refex string version
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     */
    public TkRefsetStrRevision(RefexStringVersionBI refexStringVersion) throws IOException {
       super(refexStringVersion);
@@ -70,7 +70,7 @@ public class TkRefsetStrRevision extends TkRevision {
     *
     * @param in the in
     * @param dataVersion the data version
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     * @throws ClassNotFoundException the class not found exception
     */
    public TkRefsetStrRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

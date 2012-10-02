@@ -46,7 +46,7 @@ public class PositionSet implements PositionSetBI, Serializable {
    * Read object.
    *
    * @param in the in
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws IOException signals that an I/O exception has occurred.
    * @throws ClassNotFoundException the class not found exception
    */
   private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -65,7 +65,7 @@ public class PositionSet implements PositionSetBI, Serializable {
     * Write object.
     *
     * @param out the out
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     */
    private void writeObject(ObjectOutputStream out) throws IOException {
       out.writeInt(dataVersion);

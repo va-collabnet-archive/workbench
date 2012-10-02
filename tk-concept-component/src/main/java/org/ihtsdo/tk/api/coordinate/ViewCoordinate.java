@@ -267,7 +267,7 @@ public class ViewCoordinate implements Serializable {
      *
      * @param obj1 the obj1
      * @param obj2 the obj2
-     * @return true, if equal
+     * @return <code>true</code>, if equal
      */
     private static boolean testEquals(Object obj1, Object obj2) {
         if ((obj1 == null) && (obj2 == null)) {

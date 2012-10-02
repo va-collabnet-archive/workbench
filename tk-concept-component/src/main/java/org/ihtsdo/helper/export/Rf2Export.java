@@ -173,7 +173,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      * @param excludedRefsetIds the excluded refset ids
      * @param conceptsToProcess the concepts to process
      * @param makePrivateIdFile the make private id file
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public Rf2Export(File directory, ReleaseType releaseType, LANG_CODE language, COUNTRY_CODE country,
             String namespace, String module, Date effectiveDate, Set<Integer> sapNids, ViewCoordinate vc,
@@ -345,7 +345,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
     /**
      * Close.
      *
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public void close() throws IOException {
         if (conceptsWriter != null) {
@@ -441,7 +441,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
     /**
      * Write one time files.
      *
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws NoSuchAlgorithmException the no such algorithm exception
      */
     public void writeOneTimeFiles() throws IOException, NoSuchAlgorithmException {
@@ -462,7 +462,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      * Process concept attribute.
      *
      * @param ca the ca
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     private void processConceptAttribute(ConceptAttributeChronicleBI ca) throws IOException {
         if (ca != null) {
@@ -506,7 +506,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      * Process description.
      *
      * @param desc the desc
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     private void processDescription(DescriptionChronicleBI desc) throws IOException {
         if (desc != null) {
@@ -572,7 +572,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      * Process relationship.
      *
      * @param r the r
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     private void processRelationship(RelationshipChronicleBI r) throws IOException {
         if (r != null) {
@@ -594,7 +594,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      * Process inferred relationship.
      *
      * @param rv the rv
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     private void processInferredRelationship(RelationshipVersionBI rv) throws IOException {
         for (Rf2File.RelationshipsFileFields field : Rf2File.RelationshipsFileFields.values()) {
@@ -662,7 +662,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      * Process stated relationship.
      *
      * @param rv the rv
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     private void processStatedRelationship(RelationshipVersionBI rv) throws IOException {
         for (Rf2File.RelationshipsFileFields field : Rf2File.RelationshipsFileFields.values()) {
@@ -731,7 +731,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      *
      * @param primUuid the prim uuid
      * @param primSapNid the prim sap nid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     private void processIdentifiers(UUID primUuid, int primSapNid) throws IOException {
         if (primUuid != null) {
@@ -778,7 +778,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      * Process lang refsets.
      *
      * @param r the r
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     private void processLangRefsets(RefexChronicleBI r) throws IOException {
         if (r != null) {
@@ -806,7 +806,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      * Process lang.
      *
      * @param rv the rv
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     private void processLang(RefexVersionBI rv) throws IOException {
         if (rv != null) {
@@ -856,7 +856,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      * Process other lang.
      *
      * @param rv the rv
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     private void processOtherLang(RefexVersionBI rv) throws IOException {
        if (rv != null) {
@@ -906,7 +906,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      * Process refset desc.
      *
      * @param refexNid the refex nid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws NoSuchAlgorithmException the no such algorithm exception
      */
     private void processRefsetDesc(int refexNid) throws IOException, NoSuchAlgorithmException {
@@ -974,7 +974,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      * Process refset desc attribute.
      *
      * @param refexNid the refex nid
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws NoSuchAlgorithmException the no such algorithm exception
      */
     private void processRefsetDescAttribute (int refexNid) throws IOException, NoSuchAlgorithmException {
@@ -1040,7 +1040,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
     /**
      * Process modular dependency.
      *
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws NoSuchAlgorithmException the no such algorithm exception
      */
     private void processModularDependency() throws IOException, NoSuchAlgorithmException {
@@ -1103,7 +1103,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      * Process desc type.
      *
      * @param descType the desc type
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws NoSuchAlgorithmException the no such algorithm exception
      */
     private void processDescType(ConceptSpec descType) throws IOException, NoSuchAlgorithmException {

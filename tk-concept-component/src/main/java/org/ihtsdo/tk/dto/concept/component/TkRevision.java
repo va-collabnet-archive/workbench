@@ -84,7 +84,7 @@ public abstract class TkRevision implements I_VersionExternally {
     * Instantiates a new tk revision.
     *
     * @param componentVersion the component version
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     */
    public TkRevision(ComponentVersionBI componentVersion) throws IOException {
       super();
@@ -103,7 +103,7 @@ public abstract class TkRevision implements I_VersionExternally {
     * Instantiates a new tk revision.
     *
     * @param id the id
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     */
    public TkRevision(IdBI id) throws IOException {
       super();
@@ -123,7 +123,7 @@ public abstract class TkRevision implements I_VersionExternally {
     *
     * @param in the in
     * @param dataVersion the data version
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     * @throws ClassNotFoundException the class not found exception
     */
    public TkRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -142,7 +142,7 @@ public abstract class TkRevision implements I_VersionExternally {
     * @param conversionMap the conversion map
     * @param offset the offset
     * @param mapAll the map all
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     */
    public TkRevision(ComponentVersionBI componentVersion, Map<UUID, UUID> conversionMap, long offset, boolean mapAll)
            throws IOException {
@@ -339,7 +339,7 @@ public abstract class TkRevision implements I_VersionExternally {
     *
     * @param in the in
     * @param dataVersion the data version
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     * @throws ClassNotFoundException the class not found exception
     */
    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -392,7 +392,7 @@ public abstract class TkRevision implements I_VersionExternally {
     * Write external.
     *
     * @param out the out
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     */
    public void writeExternal(DataOutput out) throws IOException {
       if (time == Long.MAX_VALUE) {

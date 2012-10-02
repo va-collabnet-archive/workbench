@@ -42,7 +42,7 @@ public class UtfHelper {
       * @param in the in
       * @param dataVersion the data version
       * @return the string
-      * @throws IOException Signals that an I/O exception has occurred.
+      * @throws IOException signals that an I/O exception has occurred.
       */
      public static String readUtfV7(DataInput in, int dataVersion)
             throws IOException {
@@ -69,7 +69,7 @@ public class UtfHelper {
      * @param in the in
      * @param dataVersion the data version
      * @return the string
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static String readUtfV6(DataInput in, int dataVersion)
             throws IOException {
@@ -106,7 +106,7 @@ public class UtfHelper {
      *
      * @param out the out
      * @param utfData the utf data
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static void writeUtf(DataOutput out, String utfData) 
             throws IOException {

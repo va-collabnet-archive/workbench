@@ -50,7 +50,7 @@ public enum IDENTIFIER_PART_TYPES {
      * Write type.
      *
      * @param output the output
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public void writeType(DataOutput output) throws IOException {
         output.writeByte(externalPartTypeToken);
@@ -78,7 +78,7 @@ public enum IDENTIFIER_PART_TYPES {
      *
      * @param input the input
      * @return the identifier part types
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public static IDENTIFIER_PART_TYPES readType(DataInput input) throws IOException {
         byte typeByte = input.readByte();

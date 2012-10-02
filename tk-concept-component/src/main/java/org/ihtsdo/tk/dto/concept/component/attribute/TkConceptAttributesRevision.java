@@ -58,7 +58,7 @@ public class TkConceptAttributesRevision extends TkRevision implements I_Concept
     * Instantiates a new tk concept attributes revision.
     *
     * @param conceptAttributeVersion the concept attribute version
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     */
    public TkConceptAttributesRevision(ConceptAttributeVersionBI conceptAttributeVersion) throws IOException {
       super(conceptAttributeVersion);
@@ -70,7 +70,7 @@ public class TkConceptAttributesRevision extends TkRevision implements I_Concept
     *
     * @param in the in
     * @param dataVersion the data version
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     * @throws ClassNotFoundException the class not found exception
     */
    public TkConceptAttributesRevision(DataInput in, int dataVersion)

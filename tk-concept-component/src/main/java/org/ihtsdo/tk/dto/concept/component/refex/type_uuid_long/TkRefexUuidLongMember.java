@@ -60,7 +60,7 @@ public class TkRefexUuidLongMember extends TkRefexAbstractMember<TkRefexUuidLong
      * Instantiates a new tk refex uuid long member.
      *
      * @param refexChronicle the refex chronicle
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public TkRefexUuidLongMember(RefexChronicleBI refexChronicle) throws IOException {
         this((RefexNidLongVersionBI) refexChronicle.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
@@ -71,7 +71,7 @@ public class TkRefexUuidLongMember extends TkRefexAbstractMember<TkRefexUuidLong
      *
      * @param refexNidLongVersion the refex nid long version
      * @param revisionHandling the revision handling
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public TkRefexUuidLongMember(RefexNidLongVersionBI refexNidLongVersion,
             RevisionHandling revisionHandling) throws IOException {
@@ -119,7 +119,7 @@ public class TkRefexUuidLongMember extends TkRefexAbstractMember<TkRefexUuidLong
      *
      * @param in the in
      * @param dataVersion the data version
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ClassNotFoundException the class not found exception
      */
     public TkRefexUuidLongMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -157,7 +157,7 @@ public class TkRefexUuidLongMember extends TkRefexAbstractMember<TkRefexUuidLong
      * @param offset the offset
      * @param mapAll the map all
      * @param viewCoordinate the view coordinate
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     public TkRefexUuidLongMember(RefexNidLongVersionBI refexNidLongVersion, NidBitSetBI excludedNids,
@@ -181,7 +181,7 @@ public class TkRefexUuidLongMember extends TkRefexAbstractMember<TkRefexUuidLong
      * field, as this <tt>ERefsetCidLongMember</tt>.
      *
      * @param obj the object to compare with.
-     * @return true, if successful
+     * @return <code>true</code>, if successful
      * <code>true</code> if the objects are the same;
      * <code>false</code> otherwise.
      */

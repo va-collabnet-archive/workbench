@@ -162,7 +162,7 @@ public class ConceptDetailsPanel extends JPanel {
 	/**
 	 * Inits the custom components.
 	 *
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred.
 	 * @throws TerminologyException the terminology exception
 	 */
 	private void initCustomComponents() throws IOException, TerminologyException {
@@ -266,7 +266,7 @@ public class ConceptDetailsPanel extends JPanel {
 	 * Creates the tree.
 	 *
 	 * @param top the top
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred.
 	 * @throws TerminologyException the terminology exception
 	 */
 	private void createTree(DefaultMutableTreeNode top) throws IOException, TerminologyException {
@@ -370,7 +370,7 @@ public class ConceptDetailsPanel extends JPanel {
 	 *
 	 * @param parentNode the parent node
 	 * @param relTuple the rel tuple
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred.
 	 * @throws TerminologyException the terminology exception
 	 */
 	private void createGenericRelationProperties(DefaultMutableTreeNode parentNode, RelationshipVersionBI relTuple) throws IOException, TerminologyException {
@@ -419,7 +419,7 @@ public class ConceptDetailsPanel extends JPanel {
 	 *
 	 * @param parentNode the parent node
 	 * @param relTuple the rel tuple
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred.
 	 * @throws TerminologyException the terminology exception
 	 */
 	private void createGenericRelationProperties(DefaultMutableTreeNode parentNode, I_RelTuple relTuple) throws IOException, TerminologyException {
@@ -464,7 +464,7 @@ public class ConceptDetailsPanel extends JPanel {
 	 *
 	 * @param parentNode the parent node
 	 * @param relTuple the rel tuple
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred.
 	 * @throws TerminologyException the terminology exception
 	 */
 	private void createGenericRelationProperties(DefaultMutableTreeNode parentNode, DrRelationship relTuple) throws IOException, TerminologyException {
@@ -509,7 +509,7 @@ public class ConceptDetailsPanel extends JPanel {
 	 *
 	 * @param relTuple the rel tuple
 	 * @return the default mutable tree node
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred.
 	 * @throws TerminologyException the terminology exception
 	 */
 	private DefaultMutableTreeNode createRelationNode(RelationshipVersionBI relTuple) throws IOException, TerminologyException {
@@ -546,7 +546,7 @@ public class ConceptDetailsPanel extends JPanel {
 	 *
 	 * @param relTuple the rel tuple
 	 * @return the default mutable tree node
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred.
 	 * @throws TerminologyException the terminology exception
 	 */
 	private DefaultMutableTreeNode createRelationNode(I_RelTuple relTuple) throws IOException, TerminologyException {
@@ -607,7 +607,7 @@ public class ConceptDetailsPanel extends JPanel {
 	 *
 	 * @param relTuple the rel tuple
 	 * @return the default mutable tree node
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred.
 	 * @throws TerminologyException the terminology exception
 	 */
 	private DefaultMutableTreeNode createRelationNode(DrRelationship relTuple) throws IOException, TerminologyException {
@@ -668,7 +668,7 @@ public class ConceptDetailsPanel extends JPanel {
 	 *
 	 * @param conceptNid the concept nid
 	 * @return the default mutable tree node
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred.
 	 * @throws TerminologyException the terminology exception
 	 */
 	private DefaultMutableTreeNode createRelAttributeNode(int conceptNid) throws IOException, TerminologyException {
@@ -684,7 +684,7 @@ public class ConceptDetailsPanel extends JPanel {
 	 *
 	 * @param conceptUUID the concept uuid
 	 * @return the default mutable tree node
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred.
 	 * @throws TerminologyException the terminology exception
 	 */
 	private DefaultMutableTreeNode createRelAttributeNode(String conceptUUID) throws IOException, TerminologyException {

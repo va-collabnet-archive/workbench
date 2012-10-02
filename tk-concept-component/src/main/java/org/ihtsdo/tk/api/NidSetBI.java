@@ -26,7 +26,7 @@ public interface NidSetBI {
      * Contains.
      *
      * @param nid the nid
-     * @return true, if successful
+     * @return <code>true</code>, if successful
      */
     boolean contains(int nid);
 
@@ -95,7 +95,7 @@ public interface NidSetBI {
     /**
      * Contiguous.
      *
-     * @return true, if successful
+     * @return <code>true</code>, if successful
      */
     boolean contiguous();
 }

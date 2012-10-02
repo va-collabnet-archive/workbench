@@ -281,7 +281,7 @@ public class RulesContextHelper {
 	 * @param config the config
 	 * @return the knowledge base
 	 * @throws TerminologyException the terminology exception
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred.
 	 */
 	public KnowledgeBase filterForContext(KnowledgeBase kbase, I_GetConceptData context, I_ConfigAceFrame config) throws TerminologyException, IOException {
 		RulesContextHelper contextHelper = new RulesContextHelper(config);
@@ -621,7 +621,7 @@ public class RulesContextHelper {
 	 * @param extension the extension
 	 * @return the last extension part
 	 * @throws TerminologyException the terminology exception
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred.
 	 */
 	public I_ExtendByRefPart getLastExtensionPart(I_ExtendByRef extension) throws TerminologyException, IOException {
 		long lastVersion = Long.MIN_VALUE;

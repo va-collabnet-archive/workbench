@@ -64,7 +64,7 @@ public class RulesBrowserPanel extends JPanel {
 	 *
 	 * @param kbase the kbase
 	 * @param config the config
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred.
 	 */
 	public RulesBrowserPanel(KnowledgeBase kbase, I_ConfigAceFrame config) throws IOException {
 		this.kbase = kbase;

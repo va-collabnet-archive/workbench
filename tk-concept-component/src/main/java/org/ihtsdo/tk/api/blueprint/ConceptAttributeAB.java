@@ -41,7 +41,7 @@ public class ConceptAttributeAB extends CreateOrAmendBlueprint {
      *
      * @param conceptNid the concept nid
      * @param defined the defined
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -59,7 +59,7 @@ public class ConceptAttributeAB extends CreateOrAmendBlueprint {
      * @param defined the defined
      * @param conceptAttributeVersion the concept attribute version
      * @param viewCoordinate the view coordinate
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -77,7 +77,7 @@ public class ConceptAttributeAB extends CreateOrAmendBlueprint {
      * @param defined the defined
      * @param conceptAttributeVersion the concept attribute version
      * @param viewCoordinate the view coordinate
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -92,8 +92,8 @@ public class ConceptAttributeAB extends CreateOrAmendBlueprint {
      * Validate.
      *
      * @param conceptAttributeVersion the concept attribute version
-     * @return true, if successful
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @return <code>true</code>, if successful
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public boolean validate(ConceptAttributeVersionBI conceptAttributeVersion) throws IOException {
         if (conceptAttributeVersion.getStatusNid() != getStatusNid()) {

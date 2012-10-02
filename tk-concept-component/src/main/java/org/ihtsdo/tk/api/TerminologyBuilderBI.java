@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.tk.api;
 
@@ -33,159 +33,202 @@ import org.ihtsdo.tk.api.media.MediaChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Interface TerminologyBuilderBI.
+ * The Interface TerminologyBuilderBI is used for constructing blueprints.
+ * Constructing is the processes of taking the blueprint specification and a
+ * creating a component. This is the preferred method for updating or creating
+ * new components. The edits occur according to the editing metadata values set
+ * in the
+ * <code>editCoordinate</code>, such as the author, time, module and path to be
+ * associated with the edit.
+ *
+ * @see org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint
  */
 public interface TerminologyBuilderBI {
 
     /**
-     * Construct.
+     * Constructs a refex from the
+     * <code>refexBlueprint</code>.
      *
      * @param refexBlueprint the refex blueprint
-     * @return A <code>RefexChronicleBI</code> if the <code>refexBlueprint</code>
-     * regardless of if the RefexChronicleBI was modified.
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @return A <code>RefexChronicleBI</code> if * *
+     * the <code>refexBlueprint</code> regardless of if the RefexChronicleBI was
+     * modified.
+     *
+     * //TODO-javadoc: what's happening here? See same below on other methods
+     *
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
     RefexChronicleBI<?> construct(RefexCAB refexBlueprint) throws IOException, InvalidCAB, ContradictionException;
 
     /**
-     * This method incurs an extra cost to determine if a current version already meets the specification.
+     * Constructs a refex from the
+     * <code>refexBlueprint</code>.. This method incurs an extra cost to
+     * determine if a current version already meets the specification.
      *
      * @param refexBlueprint the refex blueprint
-     * @return A <code>RefexChronicleBI</code> if the <code>refexBlueprint</code>
-     * regardless of if the RefexChronicleBI was modified.
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @return A <code>RefexChronicleBI</code> if * *
+     * the <code>refexBlueprint</code> regardless of if the RefexChronicleBI was
+     * modified.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
     RefexChronicleBI<?> constructIfNotCurrent(RefexCAB refexBlueprint) throws IOException, InvalidCAB, ContradictionException;
 
     /**
-     * Construct.
+     * Constructs a relationship from the
+     * <code>relBlueprint</code>..
      *
-     * @param relBlueprint the rel blueprint
-     * @return A <code>RelationshipChronicleBI</code> if the <code>relBlueprint</code>
-     * regardless of if the RelationshipChronicleBI was modified.
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @param relBlueprint the relationship blueprint
+     * @return A <code>RelationshipChronicleBI</code> if * *
+     * the <code>relBlueprint</code> regardless of if the
+     * RelationshipChronicleBI was modified.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
     RelationshipChronicleBI construct(RelationshipCAB relBlueprint) throws IOException, InvalidCAB, ContradictionException;
 
     /**
-     * This method incurs an extra cost to determine if a current version already meets the specification.
+     * Constructs a relationship from the
+     * <code>relBlueprint</code>. This method incurs an extra cost to determine
+     * if a current version already meets the specification.
      *
-     * @param relBlueprint the rel blueprint
+     * @param relBlueprint the relationship blueprint
      * @return A <code>RelationshipChronicleBI</code> if the
-     * <code>relBlueprint</code> regardless of if the RelationshipChronicleBI was modified.
-     * @throws IOException Signals that an I/O exception has occurred.
+     * <code>relBlueprint</code> regardless of if the RelationshipChronicleBI
+     * was modified.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
     RelationshipChronicleBI constructIfNotCurrent(RelationshipCAB relBlueprint) throws IOException, InvalidCAB, ContradictionException;
 
     /**
-     * Construct.
+     * Constructs a description from the
+     * <code>descriptionBlueprint</code>.
      *
      * @param descriptionBlueprint the description blueprint
-     * @return A <code>DescriptionChronicleBI</code> if the <code>descriptionBlueprint</code>
-     * regardless of if the DescriptionChronicleBI was modified.
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @return A <code>DescriptionChronicleBI</code> if * *
+     * the <code>descriptionBlueprint</code> regardless of if the
+     * DescriptionChronicleBI was modified.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
     DescriptionChronicleBI construct(DescriptionCAB descriptionBlueprint) throws IOException, InvalidCAB, ContradictionException;
 
     /**
-     * This method incurs an extra cost to determine if a current version already meets the specification.
+     * Constructs a description from the
+     * <code>descriptionBlueprint</code>. This method incurs an extra cost to
+     * determine if a current version already meets the specification.
      *
      * @param descriptionBlueprint the description blueprint
      * @return A <code>DescriptionChronicleBI</code> if the
-     * <code>descriptionBlueprint</code> regardless of if the DescriptionChronicleBI was modified.
-     * @throws IOException Signals that an I/O exception has occurred.
+     * <code>descriptionBlueprint</code> regardless of if the
+     * DescriptionChronicleBI was modified.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
     DescriptionChronicleBI constructIfNotCurrent(DescriptionCAB descriptionBlueprint) throws IOException, InvalidCAB, ContradictionException;
 
     /**
-     * Construct.
+     * Constructs a type of media from the
+     * <code>mediaBlueprint</code>.
      *
      * @param mediaBlueprint the media blueprint
-     * @return A <code>MediaChronicleBI</code> if the <code>mediaBlueprint</code>
-     * regardless of if the MediaChronicleBI was modified.
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @return A <code>MediaChronicleBI</code> if * *
+     * the <code>mediaBlueprint</code> regardless of if the MediaChronicleBI was
+     * modified.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
     MediaChronicleBI construct(MediaCAB mediaBlueprint) throws IOException, InvalidCAB, ContradictionException;
 
     /**
-     * This method incurs an extra cost to determine if a current version already meets the specification.
+     * Constructs a type of media from the
+     * <code>mediaBlueprint</code>.. This method incurs an extra cost to
+     * determine if a current version already meets the specification.
      *
      * @param mediaBlueprint the media blueprint
-     * @return A <code>MediaChronicleBI</code> if the <code>mediaBlueprint</code>
-     * regardless of if the MediaChronicleBI was modified.
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @return A <code>MediaChronicleBI</code> if * *
+     * the <code>mediaBlueprint</code> regardless of if the MediaChronicleBI was
+     * modified.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
     MediaChronicleBI constructIfNotCurrent(MediaCAB mediaBlueprint) throws IOException, InvalidCAB, ContradictionException;
 
     /**
-     * Construct.
+     * Constructs a concept from the
+     * <code>conceptBlueprint</code>.
      *
      * @param conceptBlueprint the concept blueprint
-     * @return A <code>ConceptChronicleBI</code> if the <code>conceptBlueprint</code>
-     * regardless of if the ConceptChronicleBI was modified.
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @return A <code>ConceptChronicleBI</code> if * *
+     * the <code>conceptBlueprint</code> regardless of if the ConceptChronicleBI
+     * was modified.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
     ConceptChronicleBI construct(ConceptCB conceptBlueprint) throws IOException, InvalidCAB, ContradictionException;
 
     /**
-     * This method incurs an extra cost to determine if a current version
-     * already meets the specification.
+     * Constructs a concept from the
+     * <code>conceptBlueprint</code>. This method incurs an extra cost to
+     * determine if a current version already meets the specification.
      *
      * @param conceptBlueprint the concept blueprint
-     * @return A <code>ConceptChronicleBI</code> if the <code>conceptBlueprint</code>
-     * regardless of if the ConceptChronicleBI was modified.
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @return A <code>ConceptChronicleBI</code> if * *
+     * the <code>conceptBlueprint</code> regardless of if the ConceptChronicleBI
+     * was modified.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
     ConceptChronicleBI constructIfNotCurrent(ConceptCB conceptBlueprint) throws IOException, InvalidCAB, ContradictionException;
 
     /**
-     * Construct.
+     * Constructs a concept attribute from the
+     * <code>conceptAttributeBlueprint</code>.
      *
      * @param conceptAttributeBlueprint the concept attribute blueprint
-     * @return A <code>ConceptAttributeChronicleBI</code> if the <code>conceptAttributeBlueprint</code> regardless of if the ConceptAttributeChronicleBI was modified.
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @return A <code>ConceptAttributeChronicleBI</code> if * *
+     * the <code>conceptAttributeBlueprint</code> regardless of if the
+     * ConceptAttributeChronicleBI was modified.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
     ConceptAttributeChronicleBI construct(ConceptAttributeAB conceptAttributeBlueprint) throws IOException, InvalidCAB, ContradictionException;
 
     /**
-     * This method incurs an extra cost to determine if a current version already meets the specification.
+     * Constructs a concept attribute from the
+     * <code>conceptAttributeBlueprint</code>. This method incurs an extra cost
+     * to determine if a current version already meets the specification.
      *
      * @param conceptAttributeBlueprint the concept attribute blueprint
-     * @return A <code>ConceptAttributeChronicleBI</code> if the <code>conceptAttributeBlueprint</code> regardless of if the ConceptAttributeChronicleBI was modified.
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @return A <code>ConceptAttributeChronicleBI</code> if * *
+     * the <code>conceptAttributeBlueprint</code> regardless of if the
+     * ConceptAttributeChronicleBI was modified.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
     ConceptAttributeChronicleBI constructIfNotCurrent(ConceptAttributeAB conceptAttributeBlueprint) throws IOException, InvalidCAB, ContradictionException;
-    
+
     /**
-     * Gets the edits the coordinate.
+     * Gets the edit coordinate used in constructing this terminology builder.
+     * The edit coordinate contains the metadata needed for editing such as the
+     * author, time, module and path to be associated with the edit.
      *
-     * @return the edits the coordinate
+     * @return the edit coordinate associated with this builder
      */
     EditCoordinate getEditCoordinate();
 }

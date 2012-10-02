@@ -80,7 +80,7 @@ public class ComputeRefsetForAConceptTask extends AbstractTask {
      * Write object.
      *
      * @param out the out
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -90,7 +90,7 @@ public class ComputeRefsetForAConceptTask extends AbstractTask {
      * Read object.
      *
      * @param in the in
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ClassNotFoundException the class not found exception
      */
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -228,7 +228,7 @@ public class ComputeRefsetForAConceptTask extends AbstractTask {
      * @param showActivityPanel the show activity panel
      * @param query the query
      * @throws TerminologyException the terminology exception
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws Exception the exception
      */
     private void computeNestedRefsets(I_ConfigAceFrame configFrame, boolean showActivityPanel, RefsetSpecQuery query)

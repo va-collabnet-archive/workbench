@@ -65,8 +65,8 @@ public interface ContradictionManagerBI extends Serializable {
      * <p>
      * Note that the input list of tuples will not be modified by this method.
      *
-     * @param <T> the generic type
-     * @param versions the versions
+     * @param <T> the generic type TODO-javadoc: better description
+     * @param versions the versions to resolve
      * @return tuples resolved as per the resolution strategy
      */
     <T extends ComponentVersionBI> List<T> resolveVersions(List<T> versions);
@@ -84,7 +84,7 @@ public interface ContradictionManagerBI extends Serializable {
      * and resolution will take place assuming they are all from the same
      * entity. </strong>
      *
-     * @param <T> the generic type
+     * @param <T> the generic type TODO-javadoc: better description
      * @param part1 the part1
      * @param part2 the part2
      * @return parts resolved as per the resolution strategy
@@ -92,71 +92,71 @@ public interface ContradictionManagerBI extends Serializable {
     <T extends ComponentVersionBI> List<T> resolveVersions(T part1, T part2);
     
     /**
-     * Checks if is in conflict.
+     * Checks if a concept specified by the <code>conceptChronicle</code> is in conflict.
      *
-     * @param conceptChronicle conceptChronicle to test
+     * @param conceptChronicle concept to test
      * @param includeDependentEntities indicates that this conceptChronicle should be
      * considered
      * in conflict if the conceptChronicle's parts of any of its dependent
      * objects (descriptions,
      * relationships, extensions...etc) are in conflict.
-     * @return true if this conceptChronicle is in conflict according to the resolution
+     * @return <code>true</code> if this conceptChronicle is in conflict according to the resolution
      * strategy
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     boolean isInConflict(ConceptChronicleBI conceptChronicle, boolean includeDependentEntities) throws IOException;
     
     /**
-     * Checks if is in conflict.
+     * Checks if a concept specified by the <code>conceptChronicle</code> is in conflict.
      *
-     * @param conceptChronicle conceptChronicle to test
-     * @return true if this conceptChronicle is in conflict according to the resolution
+     * @param conceptChronicle concept to test
+     * @return <code>true</code> if this conceptChronicle is in conflict according to the resolution
      * strategy
      */
     boolean isInConflict(ConceptChronicleBI conceptChronicle);
 
     /**
-     * Checks if is in conflict.
+     * Checks if the description specified by the <code>descriptionChronicle</code> is in conflict.
      *
-     * @param descriptionChronicle descriptionChronicle to test
-     * @return true if this descriptionChronicle is in conflict according to the
+     * @param descriptionChronicle description to test
+     * @return <code>true</code> if this descriptionChronicle is in conflict according to the
      * resolution strategy
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     boolean isInConflict(DescriptionChronicleBI descriptionChronicle) throws IOException;
 
     /**
-     * Checks if is in conflict.
+     * Checks if the refex specified by the <code>refexChronicle</code> is in conflict.
      *
-     * @param refexChronicle the refex chronicle
-     * @return true if this extension is in conflict according to the resolution
+     * @param refexChronicle the refex to test
+     * @return <code>true</code> if this extension is in conflict according to the resolution
      * strategy
      */
     boolean isInConflict(RefexChronicleBI refexChronicle);
 
     /**
-     * Checks if is in conflict.
+     * Checks if the media specified by the <code>mediaChronicle</code> is in conflict.
      *
-     * @param mediaChronicle the media chronicle
-     * @return true if this image is in conflict according to the resolution
+     * @param mediaChronicle the media to test
+     * @return <code>true</code> if this image is in conflict according to the resolution
      * strategy
      */
     boolean isInConflict(MediaChronicleBI mediaChronicle);
 
     /**
-     * Checks if is in conflict.
+     * Checks if the relationship specified by the <code>relationshipChronicle</code> is in conflict.
      *
-     * @param relationshipChronicle relationshipChronicle to test
-     * @return true if this relationshipChronicle is in conflict according to the
+     * @param relationshipChronicle relationship to test
+     * @return <code>true</code> if this relationshipChronicle is in conflict according to the
      * resolution strategy
      */
     boolean isInConflict(RelationshipChronicleBI relationshipChronicle);
 
     /**
-     * Checks if is in conflict.
+     * Checks if the concept attributes specified by the <code>conceptAttributteChronicle</code> are is in conflict.
      *
-     * @param conceptAttributteChronicle the concept attributte chronicle
-     * @return true if this conceptAttribute is in conflict according to the
+     * @param conceptAttributteChronicle the concept attribute to test
+     * @return <code>true</code> if this conceptAttribute is in conflict according to the
      * resolution strategy
      */
     boolean isInConflict(ConceptAttributeChronicleBI conceptAttributteChronicle);

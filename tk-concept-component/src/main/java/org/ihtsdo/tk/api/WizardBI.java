@@ -21,7 +21,7 @@ import javax.swing.JPanel;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Interface WizardBI.
+ * The Interface WizardBI. TODO-javadoc: this should get moved out of the api
  *
  * @author kec
  */

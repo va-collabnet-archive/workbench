@@ -43,7 +43,7 @@ public class EConceptToChangeSet {
      * Create change set files, based on the input econFiles, with each file appended with ".eccs".
      *
      * @param econFiles Files to convert to change set files.
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ClassNotFoundException the class not found exception
      */
    public static void convert(File[] econFiles) throws IOException, ClassNotFoundException {
@@ -64,7 +64,7 @@ public class EConceptToChangeSet {
     * @param econFiles Files to convert to change set files.
     * @param eccsFiles Corresponding files to store the change set. If file already exists,
     * it will be overwritten.
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     * @throws ClassNotFoundException the class not found exception
     */
     public static void convert(File[] econFiles, File[] eccsFiles) throws IOException, ClassNotFoundException {

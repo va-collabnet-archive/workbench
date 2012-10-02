@@ -60,7 +60,7 @@ public class TkRefexLongMember extends TkRefexAbstractMember<TkRefexLongRevision
      * Instantiates a new tk refex long member.
      *
      * @param refexChronicle the refex chronicle
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public TkRefexLongMember(RefexChronicleBI refexChronicle) throws IOException {
         this((RefexLongVersionBI) refexChronicle.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
@@ -71,7 +71,7 @@ public class TkRefexLongMember extends TkRefexAbstractMember<TkRefexLongRevision
      *
      * @param refexLongVersion the refex long version
      * @param revisionHandling the revision handling
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      */
     public TkRefexLongMember(RefexLongVersionBI refexLongVersion,
             RevisionHandling revisionHandling) throws IOException {
@@ -109,7 +109,7 @@ public class TkRefexLongMember extends TkRefexAbstractMember<TkRefexLongRevision
      *
      * @param in the in
      * @param dataVersion the data version
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ClassNotFoundException the class not found exception
      */
     public TkRefexLongMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -140,7 +140,7 @@ public class TkRefexLongMember extends TkRefexAbstractMember<TkRefexLongRevision
      * @param offset the offset
      * @param mapAll the map all
      * @param viewCoordinate the view coordinate
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     public TkRefexLongMember(RefexLongVersionBI refexLongVersion, NidBitSetBI excludedNids,
@@ -157,7 +157,7 @@ public class TkRefexLongMember extends TkRefexAbstractMember<TkRefexLongRevision
      * field, as this <tt>ERefsetLongMember</tt>.
      *
      * @param obj the object to compare with.
-     * @return true, if successful
+     * @return <code>true</code>, if successful
      * <code>true</code> if the objects are the same;
      * <code>false</code> otherwise.
      */

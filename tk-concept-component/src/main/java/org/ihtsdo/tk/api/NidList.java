@@ -32,9 +32,8 @@ import org.ihtsdo.tk.Ts;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Class NidList.
+ * The Class NidList. TODO-javadoc: ?
  *
- * @author kec
  */
 public class NidList implements NidListBI, Serializable {
    
@@ -68,7 +67,7 @@ public class NidList implements NidListBI, Serializable {
     *
     * @param out the out
     * @param nidList the nid list
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     */
    public static void writeIntList(ObjectOutputStream out, NidList nidList) throws IOException {
       if (nidList == null) {
@@ -94,7 +93,7 @@ public class NidList implements NidListBI, Serializable {
     *
     * @param in the in
     * @return the native id list bi
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     * @throws ClassNotFoundException the class not found exception
     */
    public static NidListBI readIntListIgnoreMapErrors(ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -106,7 +105,7 @@ public class NidList implements NidListBI, Serializable {
     *
     * @param in the in
     * @return the native id list bi
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     * @throws ClassNotFoundException the class not found exception
     */
    public static NidListBI readIntListStrict(ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -119,7 +118,7 @@ public class NidList implements NidListBI, Serializable {
     * @param in the in
     * @param ignoreMappingErrors the ignore mapping errors
     * @return the native id list bi
-    * @throws IOException Signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred.
     * @throws ClassNotFoundException the class not found exception
     */
    @SuppressWarnings("unchecked")
