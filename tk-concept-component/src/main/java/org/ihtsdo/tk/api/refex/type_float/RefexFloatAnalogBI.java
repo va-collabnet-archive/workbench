@@ -23,18 +23,20 @@ import org.ihtsdo.tk.api.refex.RefexAnalogBI;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Interface RefexFloatAnalogBI.
+ * The Interface RefexFloatAnalogBI contains methods for editing a float type refex analog. The
+ * preferred method of editing terminology is through a blueprint.
  *
- * @param <A> the generic type
- * @author kec
+ * @param <A> the type of object returned by the analog generator
+ * @see AnalogBI
+ * @eee CreateOrAmendBlueprint
  */
 public interface RefexFloatAnalogBI<A extends RefexFloatAnalogBI<A>> extends RefexAnalogBI<A> {
     
      /**
-      * Sets the float1.
+      * Sets the float value, <code>float1</code>, associated with this float refex member.
       *
-      * @param float1 the new float1
-      * @throws PropertyVetoException the property veto exception
+      * @param float1 the float value associated with this refex member
+      * @throws PropertyVetoException if the new value is not valid
       */
      void setFloat1(float float1) throws PropertyVetoException;
 

@@ -26,8 +26,8 @@ import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 /**
- * The Interface DescriptionVersionBI provides methods for interacting with or
- * creating version of a description.
+ * The Interface DescriptionVersionBI provides methods for interacting with, or
+ * creating version of, a description.
  *
  * @param <A> the type of object returned by the analog generator
  * @see ComponentVersionBI

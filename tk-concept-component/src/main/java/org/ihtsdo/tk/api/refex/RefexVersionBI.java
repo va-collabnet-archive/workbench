@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.tk.api.refex;
 
@@ -35,21 +35,31 @@ import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Interface RefexVersionBI.
+ * The Interface RefexVersionBI provides methods for interacting with, or
+ * creating a version of, a refex.
  *
- * @param <A> the generic type
+ * @param <A> the type of object returned by the analog generator
+ * @see ComponentVersionBI
  */
 public interface RefexVersionBI<A extends RefexAnalogBI<A>>
         extends ComponentVersionBI, RefexChronicleBI<A>, AnalogGeneratorBI<A>, Comparable<RefexVersionBI<A>> {
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.api.ComponentVersionBI#makeBlueprint(org.ihtsdo.tk.api.coordinate.ViewCoordinate)
+    /**
+     * @param viewCoordinate the view coordinate specifying which version of the
+     * description to make a blueprint of
+     * @return the refex blueprint, which can be constructed to create      * a <code>RefexChronicleBI</code>
+     * @throws IOException signals that an I/O exception has occurred.
+     * @throws ContradictionException if more than one version of the
+     * description was returned for the specified view coordinate
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @see org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint
      */
     @Override
     RefexCAB makeBlueprint(ViewCoordinate viewCoordinate) throws IOException, InvalidCAB, ContradictionException;
 
     /**
-     * Gets the tk refset member active only.
+     * Gets the tk refset member active only. TODO-javadoc: when/why to use this?
      *
      * @param viewCoordinate the view coordinate
      * @param excludedNids the excluded nids
@@ -63,12 +73,11 @@ public interface RefexVersionBI<A extends RefexAnalogBI<A>>
             throws ContradictionException, IOException;
 
     /**
-     * Refex fields equal.
+     * Compares the fields of this refex with the fields of
+     * <code>another</code> refex.
      *
-     * @param another the another
-     * @return <code>true</code>, if successful
+     * @param another the other refex for comparison
+     * @return <code>true</code>, the fields are equal
      */
     boolean refexFieldsEqual(RefexVersionBI another);
-    
-    
 }

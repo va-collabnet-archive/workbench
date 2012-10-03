@@ -18,19 +18,21 @@ package org.ihtsdo.tk.api.refex.type_nid_nid_nid;
 
 import org.ihtsdo.tk.api.refex.type_nid_nid.RefexNidNidVersionBI;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Interface RefexNidNidNidVersionBI.
+ * The Interface RefexNidNidNidVersionBI provides methods for interacting with a
+ * particular version of a nid-nid-nid type refex member.
  *
- * @param <A> the generic type
+ * @param <A> the type of object returned by the analog generator
+ * @see ComponentVersionBI
  */
 public interface RefexNidNidNidVersionBI <A extends RefexNidNidNidAnalogBI<A>> 
     extends RefexNidNidVersionBI<A> {
      
      /**
-      * Gets the nid3.
+      * Gets the third nid value associated with this version of the nid-nid refex
+      * member.
       *
-      * @return the nid3
+      * @return the third nid value associated with this refex version
       */
      int getNid3();
 

@@ -21,10 +21,13 @@ import org.ihtsdo.tk.api.refex.type_nid.RefexNidAnalogBI;
 import org.ihtsdo.tk.api.refex.type_int.RefexIntAnalogBI;
 
 /**
- * The Interface RefexNidIntAnalogBI.
+ * The Interface RefexNidIntAnalogBI provides an editable nid-int
+ * type refex member. The preferred method of editing terminology is through a
+ * blueprint.
  *
- * @param <A> the generic type
- * @author kec
+ * @param <A> the type of object returned by the analog generator
+ * @see AnalogBI
+ * @eee CreateOrAmendBlueprint
  */
 public interface RefexNidIntAnalogBI<A extends RefexNidIntAnalogBI<A>>  
     extends RefexNidAnalogBI<A>, RefexIntAnalogBI<A>, RefexNidIntVersionBI<A> {

@@ -20,17 +20,20 @@ import org.ihtsdo.tk.api.refex.RefexVersionBI;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Interface RefexStringVersionBI.
+ * The Interface RefexStringVersionBI provides methods for interacting with a
+ * particular version of a string type refex member.
  *
- * @param <A> the generic type
+ * @param <A> the type of object returned by the analog generator
+ * @see ComponentVersionBI
  */
 public interface RefexStringVersionBI <A extends RefexStringAnalogBI<A>>
         extends RefexVersionBI<A> {
     
      /**
-      * Gets the string1.
+      * Gets the string associated with this version of the string refex
+     * member.
       *
-      * @return the string1
+      * @return the string associated with this refex version
       */
      String getString1();
 

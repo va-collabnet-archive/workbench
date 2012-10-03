@@ -78,40 +78,42 @@ import org.ihtsdo.tk.dto.concept.component.refex.type_arrayofbytearray.TkRefexAr
 // TODO: Auto-generated Javadoc
 /**
  * The Class TkConcept.
+ * 
+ * TODO-javadoc: discussion about tk classes and econcepts
  */
 public class TkConcept {
 
-    /** The Constant PADDING. */
+    /** The Constant PADDING. */ //TODO-javadoc: what's this?
     public static final String PADDING = "     ";
     
-    /** The Constant dataVersion. */
+    /** The dataVersion of this class. Increment if adding additional functionality. */
     public static final int dataVersion = 9;
     
-    /** The Constant serialVersionUID. */
+    /** The Constant serialVersionUID. *///TODO-javadoc: what's the serial version for?
     public static final long serialVersionUID = 1;
     //~--- fields --------------------------------------------------------------
-    /** The annotation style refex. */
+    /** The boolean value indicating if the concept is an annotation style refex. */
     public boolean annotationStyleRefex = false;
     
-    /** The annotation index style refex. */
+    /** The boolean value indicating if the concept is an indexed annotation style refex. */
     public boolean annotationIndexStyleRefex = false;
     
-    /** The concept attributes. */
+    /** The concept attributes of this concept. */
     public TkConceptAttributes conceptAttributes;
     
-    /** The descriptions. */
+    /** The descriptions on this concept. */
     public List<TkDescription> descriptions;
     
-    /** The media. */
+    /** The media associated with this concept. */
     public List<TkMedia> media;
     
-    /** The primordial uuid. */
+    /** The primordial uuid of this concept. */
     public UUID primordialUuid;
     
-    /** The refset members. */
+    /** The refset members associated with this concept. */
     public List<TkRefexAbstractMember<?>> refsetMembers;
     
-    /** The relationships. */
+    /** The relationships on this concept. */
     public List<TkRelationship> relationships;
 
     //~--- constructors --------------------------------------------------------
@@ -123,11 +125,11 @@ public class TkConcept {
     }
 
     /**
-     * Instantiates a new tk concept.
+     * Instantiates a new tk concept based on the specified data input, <code>in</code>.
      *
-     * @param in the in
+     * @param in the data input specifying how to construct the new tk concept
      * @throws IOException signals that an I/O exception has occurred.
-     * @throws ClassNotFoundException the class not found exception
+     * @throws ClassNotFoundException the class not found exception TODO-javadoc: why?
      */
     public TkConcept(DataInput in) throws IOException, ClassNotFoundException {
         super();
@@ -135,9 +137,9 @@ public class TkConcept {
     }
 
     /**
-     * Instantiates a new tk concept.
+     * Instantiates a new tk concept based on the specified <code>conceptChronicle</code>.
      *
-     * @param conceptChronicle the concept chronicle
+     * @param conceptChronicle the concept chronicle specifying how to construct the new tk concept
      * @throws IOException signals that an I/O exception has occurred.
      */
     public TkConcept(ConceptChronicleBI conceptChronicle) throws IOException {
@@ -184,10 +186,10 @@ public class TkConcept {
     }
 
     /**
-     * Convert refex.
+     * Converts refex from a WHAT KIND of object to a tk refex object.
      *
-     * @param refexChronicle the refex chronicle
-     * @return the tk refex abstract member
+     * @param refexChronicle the refex chronicle to convert
+     * @return an abstract tk refex member
      * @throws IOException signals that an I/O exception has occurred.
      */
     public static TkRefexAbstractMember<?> convertRefex(RefexChronicleBI<?> refexChronicle) throws IOException {

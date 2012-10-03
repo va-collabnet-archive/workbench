@@ -22,19 +22,23 @@ import org.ihtsdo.tk.api.refex.RefexAnalogBI;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Interface RefexStringAnalogBI.
+ * The Interface RefexStringAnalogBI provides methods for editing a boolean
+ * type refex analog. The preferred method of editing terminology is through a
+ * blueprint.
  *
- * @param <A> the generic type
- * @author kec
+ * @param <A> the type of object returned by the analog generator
+ * @see AnalogBI
+ * @eee CreateOrAmendBlueprint
  */
 public interface RefexStringAnalogBI <A extends RefexStringAnalogBI<A>> 
 	extends RefexAnalogBI<A>, RefexStringVersionBI<A> {
     
      /**
-      * Sets the string1.
+      * Sets the string value,
+     * <code>string1</code>, associated with this string refex member.
       *
-      * @param string1 the new string1
-      * @throws PropertyVetoException the property veto exception
+      * @param string1 the string associated with the refex member
+      * @throws PropertyVetoException if the new value is not valid
       */
      void setString1(String string1) throws PropertyVetoException;
 

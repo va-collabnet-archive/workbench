@@ -24,10 +24,12 @@ package org.ihtsdo.tk.api.refex.type_member;
 import org.ihtsdo.tk.api.refex.RefexAnalogBI;
 
 /**
- * The Interface RefexMemberAnalogBI.
+ * The Interface RefexMemberAnalogBI represents an editable version of a member type refex member. The preferred method of editing terminology is through a
+ * blueprint.
  *
- * @param <A> the generic type
- * @author kec
+ * @param <A> the type of object returned by the analog generator
+ * @see AnalogBI
+ * @eee CreateOrAmendBlueprint
  */
 public interface RefexMemberAnalogBI<A extends RefexMemberAnalogBI<A>>
         extends RefexAnalogBI<A>, RefexMemberVersionBI<A> {}

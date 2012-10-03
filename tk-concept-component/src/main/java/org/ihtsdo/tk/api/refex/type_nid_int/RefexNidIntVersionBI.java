@@ -20,9 +20,11 @@ import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 import org.ihtsdo.tk.api.refex.type_int.RefexIntVersionBI;
 
 /**
- * The Interface RefexNidIntVersionBI.
+ * The Interface RefexNidIntVersionBI represents a particular version of a
+ * nid-int type refex member.
  *
- * @param <A> the generic type
+ * @param <A> the type of object returned by the analog generator
+ * @see ComponentVersionBI
  */
 public interface RefexNidIntVersionBI <A extends RefexNidIntAnalogBI<A>>
     extends RefexNidVersionBI<A>, RefexIntVersionBI<A> {

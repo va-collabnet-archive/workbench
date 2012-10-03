@@ -23,18 +23,17 @@ import org.ihtsdo.tk.binding.snomed.TermAux;
 
 // TODO: Auto-generated Javadoc
 /**
- * A factory for creating Uuid objects.
+ * The Class UuidFactory is factory for creating UUID objects.
  *
- * @author kec
  */
 public class UuidFactory {
 
     /**
-     * Gets the uuid from alternate id.
+     * Gets the uuid of a component from the specified alternate identifier of the same component.
      *
-     * @param authorityUuid the authority uuid
-     * @param altId the alt id
-     * @return the uuid from alternate id
+     * @param authorityUuid the uuid representing the authoring associated with the alternate id
+     * @param altId a string representation of the alternate id
+     * @return the uuid of the specified component
      */
     public static UUID getUuidFromAlternateId(UUID authorityUuid, String altId) {
         try {

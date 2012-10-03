@@ -21,7 +21,6 @@ import org.ihtsdo.tk.api.AnalogBI;
 
 import org.ihtsdo.tk.api.TypedComponentAnalogBI;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Interface DescriptionAnalogBI contains methods for editing a description analog.
  * The preferred method of editing terminology is through a blueprint.

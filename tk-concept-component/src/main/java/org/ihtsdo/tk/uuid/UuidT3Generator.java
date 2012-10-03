@@ -1,21 +1,20 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.tk.uuid;
-
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -24,36 +23,49 @@ import java.util.UUID;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Class UuidT3Generator.
+ * The Class UuidT3Generator generates a type 3 UUID object. A type 3 UUID is
+ * name based and uses MD5 hashing to create the uuid from the given name.
+ * 
+ * @see <a href="http://en.wikipedia.org/wiki/Universally_unique_identifier">http://en.wikipedia.org/wiki/Universally_unique_identifier</a>
  */
 public class UuidT3Generator {
-    
-    /** The Constant SNOMED_ROOT_CONCEPTID. */
+
+    /**
+     * The Constant SNOMED_ROOT_CONCEPTID.
+     */
     public static final long SNOMED_ROOT_CONCEPTID = 138875005L;
-    
-    /** The Constant SNOMED_ROOT_DESCID. */
+    /**
+     * The Constant SNOMED_ROOT_DESCID.
+     */
     public static final long SNOMED_ROOT_DESCID = 220309016L;
-    
-    /** The Constant SNOMED_ISA_REL. */
+    /**
+     * The Constant SNOMED_ISA_REL.
+     */
     public static final long SNOMED_ISA_REL = 116680003L;
-
-    /** The Constant SNOMED_ROOT_UUID. */
+    /**
+     * The Constant SNOMED_ROOT_UUID.
+     */
     public static final UUID SNOMED_ROOT_UUID = UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8");
-    
-    /** The Constant SNOMED_ROOT_DESC_UUID. */
+    /**
+     * The Constant SNOMED_ROOT_DESC_UUID.
+     */
     public static final UUID SNOMED_ROOT_DESC_UUID = UUID.fromString("5fdbd08a-f7e5-311a-b9f6-3f27e6f43a14");
-    
-    /** The Constant SNOMED_ISA_REL_UUID. */
+    /**
+     * The Constant SNOMED_ISA_REL_UUID.
+     */
     public static final UUID SNOMED_ISA_REL_UUID = UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25");
-
-    /** The Constant encoding. */
+    /**
+     * The Constant encoding.
+     */
     public static final String encoding = "8859_1";
 
     /**
-     * From snomed.
+     * Generates a type 3 UUID from the given string representing a SNOMED id.
      *
-     * @param id the id
-     * @return the uuid
+     * TODO-javadoc: needs review
+     *
+     * @param id a String representation of a SNOMED id
+     * @return the generated uuid
      */
     public static UUID fromSNOMED(String id) {
         String name = "org.snomed." + id;
@@ -65,30 +77,37 @@ public class UuidT3Generator {
     }
 
     /**
-     * From snomed.
+     * Generates a type 3 UUID from the given SNOMED id.
      *
-     * @param id the id
-     * @return the uuid
+     * TODO-javadoc: needs review
+     *
+     * @param id the SNOMED id
+     * @return the generated uuid
      */
     public static UUID fromSNOMED(long id) {
         return fromSNOMED(Long.toString(id));
     }
 
     /**
-     * From snomed.
+     * Generates a type 3 UUID from the given SNOMED id.
      *
-     * @param id the id
-     * @return the uuid
+     * TODO-javadoc: needs review
+     *
+     * @param id the SNOMED id
+     * @return the generated uuid
      */
     public static UUID fromSNOMED(Long id) {
         return fromSNOMED(id.toString());
     }
 
     /**
-     * From enum.
+     * Generates a type 3 UUID from the given enumeration
+     * <code>e</code>.
      *
-     * @param e the e
-     * @return the uuid
+     * TODO-javadoc: needs review
+     *
+     * @param e the enumeration to generate the uuid from
+     * @return the generated uuid
      */
     public static UUID fromEnum(Enum<?> e) {
         String name = e.getClass().getName() + "." + e.name();
@@ -100,12 +119,13 @@ public class UuidT3Generator {
     }
 
     /**
-     * For rel.
+     * Generates a type 3 UUID for a relationship based on the given source
+     * relationships, relationship types, and destination relationships.
      *
-     * @param srcUids the src uids
-     * @param typeUids the type uids
-     * @param destUids the dest uids
-     * @return the collection
+     * @param srcUids the uuids representing the source relationships
+     * @param typeUids the uuids representing the relationship types
+     * @param destUids the uuids representing the destination relationship
+     * @return a collection containing the generated uuid
      */
     public static Collection<UUID> forRel(Collection<UUID> srcUids, Collection<UUID> typeUids, Collection<UUID> destUids) {
         String name = "org.dwfa." + srcUids + typeUids + destUids;
@@ -113,10 +133,10 @@ public class UuidT3Generator {
     }
 
     /**
-     * Uuid collection from name.
+     * Generates a collection containing a type 3 UUID.
      *
-     * @param name the name
-     * @return the collection
+     * @param name the name to generate the uuid from
+     * @return the collection containing the generated uuid
      */
     private static Collection<UUID> uuidCollectionFromName(String name) {
         try {
@@ -130,12 +150,14 @@ public class UuidT3Generator {
     }
 
     /**
-     * For desc.
+     * Generates a type 3 UUID for a description based on the given concepts,
+     * description types, and description text.
      *
-     * @param conceptUids the concept uids
-     * @param typeUids the type uids
-     * @param desc the desc
-     * @return the collection
+     * @param conceptUids the uuids representing the concept associated with the
+     * description
+     * @param typeUids the uuids representing the description types
+     * @param desc the String representation of the description text
+     * @return the collection containing the generated uuid
      */
     public static Collection<UUID> forDesc(Collection<UUID> conceptUids, Collection<UUID> typeUids, String desc) {
         String name = "org.dwfa." + conceptUids + typeUids + desc;

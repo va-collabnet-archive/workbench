@@ -20,21 +20,24 @@ package org.ihtsdo.tk.api.refex.type_int;
 import java.beans.PropertyVetoException;
 import org.ihtsdo.tk.api.refex.RefexAnalogBI;
 
-// TODO: Auto-generated Javadoc
+
 /**
- * The Interface RefexIntAnalogBI.
+ * The Interface RefexIntAnalogBI provides methods for editing a int type refex
+ * analog. The
+ * preferred method of editing terminology is through a blueprint.
  *
- * @param <A> the generic type
- * @author kec
+ * @param <A> the type of object returned by the analog generator
+ * @see AnalogBI
+ * @eee CreateOrAmendBlueprint
  */
 public interface RefexIntAnalogBI<A extends RefexIntAnalogBI<A>> extends 
 	RefexAnalogBI<A>, RefexIntVersionBI<A> {
     
      /**
-      * Sets the int1.
+      * Sets the int value, <code>int1</code>, associated with this int type refex member.
       *
-      * @param int1 the new int1
-      * @throws PropertyVetoException the property veto exception
+      * @param int1 the int value associated with the refex member
+     * @throws PropertyVetoException if the new value is not valid
       */
      void setInt1(int int1) throws PropertyVetoException;
 

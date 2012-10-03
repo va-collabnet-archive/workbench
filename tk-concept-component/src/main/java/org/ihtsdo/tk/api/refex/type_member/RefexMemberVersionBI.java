@@ -19,10 +19,10 @@ package org.ihtsdo.tk.api.refex.type_member;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 
 /**
- * The Interface RefexMemberVersionBI.
+ * The Interface RefexMemberVersionBI represents a particular version of a member type refex member.
  *
- * @param <A> the generic type
- * @author kec
+ * @param <A> the type of object returned by the analog generator
+ * @see ComponentVersionBI
  */
 public interface RefexMemberVersionBI <A extends RefexMemberAnalogBI<A>> extends RefexVersionBI<A> {
     

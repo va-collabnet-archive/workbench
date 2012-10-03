@@ -21,10 +21,13 @@ import org.ihtsdo.tk.api.refex.type_nid.RefexNidAnalogBI;
 import org.ihtsdo.tk.api.refex.type_long.RefexLongAnalogBI;
 
 /**
- * The Interface RefexNidLongAnalogBI.
+ * The Interface RefexNidLongAnalogBI provides an editable nid-long
+ * type refex member. The preferred method of editing terminology is through a
+ * blueprint.
  *
- * @param <A> the generic type
- * @author kec
+ * @param <A> the type of object returned by the analog generator
+ * @see AnalogBI
+ * @eee CreateOrAmendBlueprint
  */
 public interface RefexNidLongAnalogBI<A extends RefexNidLongAnalogBI<A>>
     extends RefexNidAnalogBI<A>, RefexLongAnalogBI<A>, RefexNidLongVersionBI<A> {

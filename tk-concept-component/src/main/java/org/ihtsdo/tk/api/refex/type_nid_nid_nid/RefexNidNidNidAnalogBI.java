@@ -20,21 +20,24 @@ package org.ihtsdo.tk.api.refex.type_nid_nid_nid;
 import org.ihtsdo.tk.api.refex.type_nid_nid.RefexNidNidAnalogBI;
 import java.beans.PropertyVetoException;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Interface RefexNidNidNidAnalogBI.
+ * The Interface RefexNidNidNidAnalogBI provides methods for editing a nid-nid-nid
+ * type refex member. The preferred method of editing terminology is through a
+ * blueprint.
  *
- * @param <A> the generic type
- * @author kec
+ * @param <A> the type of object returned by the analog generator
+ * @see AnalogBI
+ * @eee CreateOrAmendBlueprint
  */
 public interface RefexNidNidNidAnalogBI<A extends RefexNidNidNidAnalogBI<A>> 
 		extends RefexNidNidAnalogBI<A>, RefexNidNidNidVersionBI<A> {
      
      /**
-      * Sets the nid3.
+      * Sets the third nid value,
+      * <code>nid3</code>, associated with this nid-nid refex member.
       *
-      * @param nid3 the new nid3
-      * @throws PropertyVetoException the property veto exception
+      * @param nid3 the third nid value associated with the refex member
+      * @throws PropertyVetoException if the new value is not valid
       */
      void setNid3(int nid3) throws PropertyVetoException;
 

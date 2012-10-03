@@ -18,19 +18,20 @@ package org.ihtsdo.tk.api.refex.type_int;
 
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Interface RefexIntVersionBI.
+ * The Interface RefexIntVersionBI provides methods for interacting with a particular version 
+ * of a int type refex member.
  *
- * @param <A> the generic type
+ * @param <A> the type of object returned by the analog generator
+ * @see ComponentVersionBI
  */
 public interface RefexIntVersionBI <A extends RefexIntAnalogBI<A>>
         extends RefexVersionBI<A> {
     
      /**
-      * Gets the int1.
+      * Gets the int value associated with this version of the int refex member.
       *
-      * @return the int1
+      * @return the int value associated with this refex version
       */
      int getInt1();
 

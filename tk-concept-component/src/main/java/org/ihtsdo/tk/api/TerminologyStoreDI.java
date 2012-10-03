@@ -497,7 +497,8 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * components rather than chronicles.
      *
      * @param viewCoordinate the view coordinate specifying which version of
-     * components and concepts should be used by the methods on * * * *      * the <code>TerminolgoySnapshotDI</code> interface.
+     * components and concepts should be used by the methods on * * * * *
+     * the <code>TerminolgoySnapshotDI</code> interface.
      * @return the terminology snapshot as specified
      */
     TerminologySnapshotDI getSnapshot(ViewCoordinate viewCoordinate);
@@ -862,8 +863,8 @@ public interface TerminologyStoreDI extends TerminologyDI {
     /**
      * Checks if the concept specified by the
      * <code>childNid</code> is a kind of the concept specified by the
-     * <code>parentNid</code>. TODO-javadoc: what's the difference between this
-     * and isKindOf? Implementation looks the same.
+     * <code>parentNid</code>. Is kind of considers all possible children, not
+     * just the direct children of the parent concept.
      *
      * @param childNid the nid associated with the child concept
      * @param parentNid the nid associated with the parent concept
@@ -881,7 +882,8 @@ public interface TerminologyStoreDI extends TerminologyDI {
     /**
      * Checks if the concept specified by the
      * <code>childNid</code> is a child of the concept specified by the
-     * <code>parentNid</code>.
+     * <code>parentNid</code>. Is child of only considers direct children of the
+     * parent concept.
      *
      * @param childNid the nid associated with the child concept
      * @param parentNid the nid associated with the parent concept
@@ -913,11 +915,11 @@ public interface TerminologyStoreDI extends TerminologyDI {
 
     /**
      * Gets the nids of incoming relationships source concepts. TODO-javadoc:
-     * need to look at renaming. Not sure what convention should be. 
-     * 
-     * In the
-     * relationship A is a B, the concept A has a target relationship to the
-     * concept B, and the concept B has a source relationship to the concept A.
+     * need to look at renaming. Not sure what convention should be.
+     *
+     * In the relationship A is a B, the concept A has a target relationship to
+     * the concept B, and the concept B has a source relationship to the concept
+     * A.
      *
      * @param conceptNid the nid of the concept in question
      * @param relTypes the nids of types of relationship to consider
