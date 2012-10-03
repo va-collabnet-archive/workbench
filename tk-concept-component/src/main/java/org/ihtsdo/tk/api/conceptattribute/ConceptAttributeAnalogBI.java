@@ -19,21 +19,24 @@ package org.ihtsdo.tk.api.conceptattribute;
 import java.beans.PropertyVetoException;
 
 import org.ihtsdo.tk.api.AnalogBI;
+import org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Interface ConceptAttributeAnalogBI.
+ * The Interface ConceptAttributeAnalogBI contains methods for editing a concept attribute analog.
+ * The preferred method of editing terminology is through a blueprint.
  *
- * @param <A> the generic type
+ * @param <A> the type of object returned by the analog generator
+ * @see AnalogBI
+ * @see CreateOrAmendBlueprint
  */
 public interface ConceptAttributeAnalogBI<A extends ConceptAttributeAnalogBI>
         extends AnalogBI, ConceptAttributeVersionBI<A> {
 	
     /**
-     * Sets the defined.
+     * Sets concept as defined in this analog.
      *
-     * @param defined the new defined
-     * @throws PropertyVetoException the property veto exception
+     * @param defined set to <code>true</code> to make the concept defined
+     * @throws PropertyVetoException if the new value is not valid
      */
     public void setDefined(boolean defined) throws PropertyVetoException;
 

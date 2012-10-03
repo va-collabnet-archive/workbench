@@ -22,7 +22,7 @@ import org.ihtsdo.tk.api.ComponentChronicleBI;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Interface RefexChronicleBI.
+ * The Interface RefexChronicleBI. Include a discussion of refset, refex, annotation, and indexed annotation
  *
  * @param <A> the generic type
  */

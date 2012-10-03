@@ -497,8 +497,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * components rather than chronicles.
      *
      * @param viewCoordinate the view coordinate specifying which version of
-     * components and concepts should be used by the methods on * * * *
-     * the <code>TerminolgoySnapshotDI</code> interface.
+     * components and concepts should be used by the methods on * * * *      * the <code>TerminolgoySnapshotDI</code> interface.
      * @return the terminology snapshot as specified
      */
     TerminologySnapshotDI getSnapshot(ViewCoordinate viewCoordinate);
@@ -743,8 +742,8 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * TODO-javadoc: should this be refex?
      * @param componentNid the component nid associated with the component in
      * question
-     * @return <code>true</code>, if the specified component is a member of the specified
-     * refset
+     * @return <code>true</code>, if the specified component is a member of the
+     * specified refset
      */
     boolean hasExtension(int refsetNid, int componentNid);
 
@@ -863,14 +862,18 @@ public interface TerminologyStoreDI extends TerminologyDI {
     /**
      * Checks if the concept specified by the
      * <code>childNid</code> is a kind of the concept specified by the
-     * <code>parentNid</code>. TODO-javadoc: what's the difference between this and isKindOf? Implementation looks the same.
+     * <code>parentNid</code>. TODO-javadoc: what's the difference between this
+     * and isKindOf? Implementation looks the same.
      *
      * @param childNid the nid associated with the child concept
      * @param parentNid the nid associated with the parent concept
-     * @param viewCoordinate the viewCoordinate specifying which version of the concepts in question to use
-     * @return <code>true</code>, if the child concept is kind of the parent concept
+     * @param viewCoordinate the viewCoordinate specifying which version of the
+     * concepts in question to use
+     * @return <code>true</code>, if the child concept is kind of the parent
+     * concept
      * @throws IOException signals that an I/O exception has occurred.
-     * @throws ContradictionException if more than one version of a concept is found for the given view coordinate
+     * @throws ContradictionException if more than one version of a concept is
+     * found for the given view coordinate
      */
     boolean isKindOf(int childNid, int parentNid, ViewCoordinate viewCoordinate)
             throws IOException, ContradictionException;
@@ -882,32 +885,44 @@ public interface TerminologyStoreDI extends TerminologyDI {
      *
      * @param childNid the nid associated with the child concept
      * @param parentNid the nid associated with the parent concept
-     * @param viewCoordinate the viewCoordinate specifying which version of the concepts in question to use
-     * @return <code>true</code>, if the child concept is child of the parent concept
+     * @param viewCoordinate the viewCoordinate specifying which version of the
+     * concepts in question to use
+     * @return <code>true</code>, if the child concept is child of the parent
+     * concept
      * @throws IOException signals that an I/O exception has occurred.
-     * @throws ContradictionException if more than one version of a concept is found for the given view coordinate
+     * @throws ContradictionException if more than one version of a concept is
+     * found for the given view coordinate
      */
     boolean isChildOf(int childNid, int parentNid, ViewCoordinate viewCoordinate)
             throws IOException, ContradictionException;
 
     /**
-     * Gets the nids of the ancestor concepts for the concept associated with the given <code>childNid</code>.
+     * Gets the nids of the ancestor concepts for the concept associated with
+     * the given
+     * <code>childNid</code>.
      *
      * @param childNid the nid associated with the child concept
-     * @param viewCoordinate the viewCoordinate specifying which version of the concepts in question to use
+     * @param viewCoordinate the viewCoordinate specifying which version of the
+     * concepts in question to use
      * @return the nids of ancestor concepts
      * @throws IOException signals that an I/O exception has occurred.
-     * @throws ContradictionException if more than one version of a concept is found for the given view coordinate
+     * @throws ContradictionException if more than one version of a concept is
+     * found for the given view coordinate
      */
     Set<Integer> getAncestors(int childNid, ViewCoordinate viewCoordinate) throws IOException, ContradictionException;
 
     /**
-     * Gets the nids of incoming relationships source concepts. TODO-javadoc: need to look at renaming. Not sure what convention should be.
-     * In the relationship A is a B, the concept A has a target relationship to the concept B, and the concept B has a source relationship to the concept A.
+     * Gets the nids of incoming relationships source concepts. TODO-javadoc:
+     * need to look at renaming. Not sure what convention should be. 
+     * 
+     * In the
+     * relationship A is a B, the concept A has a target relationship to the
+     * concept B, and the concept B has a source relationship to the concept A.
      *
      * @param conceptNid the nid of the concept in question
-     * @param relTypes the nids of types of relationship to consider TODO-javadoc: are these listed anywhere?
-     * @return the nids of the incoming relationships source concepts 
+     * @param relTypes the nids of types of relationship to consider
+     * TODO-javadoc: are these listed anywhere?
+     * @return the nids of the incoming relationships source concepts
      * @throws IOException signals that an I/O exception has occurred.
      */
     int[] getIncomingRelationshipsSourceNids(int conceptNid, NidSetBI relTypes) throws IOException;

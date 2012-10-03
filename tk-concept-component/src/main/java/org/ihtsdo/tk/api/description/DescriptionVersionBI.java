@@ -25,13 +25,12 @@ import org.ihtsdo.tk.api.blueprint.DescriptionCAB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
-// TODO: Auto-generated Javadoc  <-- indicates that initially this javadoc was generated automatically and that the javadoc for this interface is not yet finalized
 /**
- * The Interface DescriptionVersionBI provides
- * methods for editing or creating version of a description.
+ * The Interface DescriptionVersionBI provides methods for interacting with or
+ * creating version of a description.
  *
  * @param <A> the type of object returned by the analog generator
- * @see org.ihtsdo.tk.api.ComponentVersionBI
+ * @see ComponentVersionBI
  */
 public interface DescriptionVersionBI<A extends DescriptionAnalogBI>
         extends TypedComponentVersionBI,
@@ -62,20 +61,25 @@ public interface DescriptionVersionBI<A extends DescriptionAnalogBI>
     public String getLang();
 
     /**
-     * @param viewCoordinate the view coordinate specifying which version of the description to make a blueprint of
-     * @return the description blueprint
+     * @param viewCoordinate the view coordinate specifying which version of the
+     * description to make a blueprint of
+     * @return the description blueprint, which can be constructed to create
+     * a <code>DescriptionChronicleBI</code>
      * @throws IOException signals that an I/O exception has occurred.
-     * @throws ContradictionException if more than one version of the description was returned for the specified view coordinate
-     * @throws InvalidCAB the invalid cab
+     * @throws ContradictionException if more than one version of the
+     * description was returned for the specified view coordinate
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @see org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint
      */
     @Override
     public DescriptionCAB makeBlueprint(ViewCoordinate viewCoordinate) throws IOException, ContradictionException, InvalidCAB;
 
     /**
-     * Tests to see if the description text matches the given <code>pattern</code>.
+     * Tests to see if the description text matches the given
+     * <code>pattern</code>.
      *
-     * @param pattern the description text matches the object representing the regular expression pattern
+     * @param pattern the description text matches the regular express as
+     * specified in the <code>pattern</code>
      * @return <code>true</code>, if matches
      */
     public boolean matches(Pattern pattern);

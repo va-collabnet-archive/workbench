@@ -19,7 +19,10 @@ package org.ihtsdo.tk.api.conceptattribute;
 import org.ihtsdo.tk.api.ComponentChronicleBI;
 
 /**
- * The Interface ConceptAttributeChronicleBI.
+ * The Interface ConceptAttributeChronicleBI represents the collection of concept attribute versions.
+ * 
+ * TODO-javadoc: anything else?
+ * @see ComponentChronicleBI
  */
 public interface ConceptAttributeChronicleBI
         extends ComponentChronicleBI<ConceptAttributeVersionBI>  {

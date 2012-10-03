@@ -24,11 +24,11 @@ import org.ihtsdo.tk.api.blueprint.ConceptAttributeAB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Interface ConceptAttributeVersionBI.
+ * The Interface ConceptAttributeVersionBI contains methods specific to interacting with or creating a concept attribute version.
  *
- * @param <A> the generic type
+ * @param <A> the type of object returned by the analog generator
+ * @see ComponentVersionBI
  */
 public interface ConceptAttributeVersionBI<A extends ConceptAttributeAnalogBI>
 	extends ComponentVersionBI,
@@ -36,14 +36,19 @@ public interface ConceptAttributeVersionBI<A extends ConceptAttributeAnalogBI>
         AnalogGeneratorBI<A> {
 
     /**
-     * Checks if is defined.
+     * Checks if this version is defined.
      *
-     * @return <code>true</code>, if is defined
+     * @return <code>true</code>, if this version is defined
      */
     public boolean isDefined();
     
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.api.ComponentVersionBI#makeBlueprint(org.ihtsdo.tk.api.coordinate.ViewCoordinate)
+    /**
+     * 
+     * @param viewCoordinate specifying which version of the concept attributes to use for the blueprint
+     * @return the concept attribute blueprint which can be constructed to create a <code>ConceptAttributeChronicleBI</code>
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws ContradictionException if more than one version is returned
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      */
     @Override
     public ConceptAttributeAB makeBlueprint(ViewCoordinate viewCoordinate) throws IOException, ContradictionException, InvalidCAB;

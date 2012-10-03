@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.tk.api.concept;
 
@@ -42,12 +42,15 @@ import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Interface ConceptVersionBI.
+ * The Interface ConceptVersionBI provides methods for interacting with a
+ * particular version of a concept and for creating new, editable versions.
+ * 
+ * @see ComponentVersionBI
  */
 public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI {
 
     /**
-     * Satisfies.
+     * Satisfies. TODO-javadoc: when/how do you use this?
      *
      * @param constraint the constraint
      * @param subjectCheck the subject check
@@ -62,110 +65,125 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
             throws IOException, ContradictionException;
 
     //~--- get methods ---------------------------------------------------------
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.api.ComponentVersionBI#getChronicle()
+    /**
+     *
+     * @return the concept chronicle that contains this version
      */
     @Override
     ConceptChronicleBI getChronicle();
 
     /**
-     * Gets the concept attributes active.
+     * Gets active concept attributes for this version.
      *
-     * @return the concept attributes active
+     * @return active concept attributes for this version, <code>null</code> if none are found
      * @throws IOException signals that an I/O exception has occurred.
      * @throws ContradictionException the contradiction exception
      */
     ConceptAttributeVersionBI getConceptAttributesActive() throws IOException, ContradictionException;
 
     /**
-     * Gets the refex members active.
+     * Gets the active refex members, belonging to the refset specified by the
+     * <code>refsetNid</code>, for which the concept is a referenced component
+     * or that is a member of this concept, if the concept is a refset.
      *
-     * @param refsetNid the refset nid
-     * @return the refex members active
+     * @param refsetNid the nid of the refset in question
+     * @return the specified active refex members, an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred.
      */
     Collection<? extends RefexVersionBI<?>> getRefexMembersActive(int refsetNid) throws IOException;
 
     /**
-     * Gets the refex member for component active.
+     * Gets any active refex members, for which the component, specified by the
+     * <code>componentNid</code>, is a referenced component.
      *
-     * @param componentNid the component nid
-     * @return the refex member for component active
+     * @param componentNid the nid of the component in question
+     * @return the active refex members for which the specified component is a
+     * referenced component, <code>null</code> if none are found
      * @throws IOException signals that an I/O exception has occurred.
      */
-    RefexChronicleBI<?> getRefexMemberForComponentActive(int componentNid) throws IOException;
+    RefexChronicleBI<?> getRefexMemberActiveForComponent(int componentNid) throws IOException;
 
     /**
-     * Gets the active refset members.
+     * Gets any active refset members, for which the concept is a referenced
+     * component or that is a member of this concept, if the concept is a
+     * refset.
      *
-     * @return the active refset members
+     * @return any active refset members for this version, an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred.
-     * @throws ContradictionException the contradiction exception
-     * @deprecated use getRefsetMembersActive
+     * @throws ContradictionException if there are differing versions of the
+     * active refset members returned for this version
+     * @deprecated use getRefsetMembersActive()
      */
     @Deprecated
     Collection<? extends RefexVersionBI<?>> getActiveRefsetMembers()
             throws IOException, ContradictionException;
 
     /**
-     * Gets the descriptions active.
+     * Gets the active descriptions for this version.
      *
-     * @return the descriptions active
+     * @return the active descriptions, an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred.
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if differing active descriptions are found
+     * for this version
      */
     Collection<? extends DescriptionVersionBI> getDescriptionsActive() throws IOException, ContradictionException;
 
     /**
-     * Gets the descriptions active.
+     * Gets active descriptions of the type specified by the
+     * <code>typeNid</code>.
      *
-     * @param typeNid the type nid
-     * @return the descriptions active
+     * @param typeNid the nid associated with the desired type of description
+     * @return the specified active descriptions, an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred.
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if differing active descriptions are found
+     * for this version
      */
     Collection<? extends DescriptionVersionBI> getDescriptionsActive(int typeNid)
             throws IOException, ContradictionException;
 
     /**
-     * Gets the descriptions active.
+     * Gets active descriptions of the types specified by the
+     * <code>typeNids</code>.
      *
-     * @param typeNids the type nids
-     * @return the descriptions active
+     * @param typeNids the nids associated with the desired types of
+     * descriptions
+     * @return the specified active descriptions, an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred.
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if differing active descriptions are found
+     * for this version
      */
     Collection<? extends DescriptionVersionBI> getDescriptionsActive(NidSetBI typeNids)
             throws IOException, ContradictionException;
 
     /**
-     * Gets the descriptions fully specified active.
+     * Gets the active fully specified descriptions for this version.
      *
-     * @return the descriptions fully specified active
+     * @return the active fully specified descriptions, more than one can be
+     * returned if there were simultaneous edits of the fully specified name, an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred.
      */
     Collection<? extends DescriptionVersionBI> getDescriptionsFullySpecifiedActive() throws IOException;
 
     /**
-     * Gets the description fully specified.
+     * Gets the fully specified description for this version.
      *
-     * @return the description fully specified
+     * @return the fully specified description for this version
      * @throws IOException signals that an I/O exception has occurred.
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if more than one fully specified description is found for this version
      */
     DescriptionVersionBI getDescriptionFullySpecified() throws IOException, ContradictionException;
 
     /**
-     * Gets the media active.
+     * Gets active media associated with this version.
      *
-     * @return the media active
+     * @return the active media for this version, an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred.
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if differing media is found for this version
      */
     Collection<? extends MediaVersionBI> getMediaActive() throws IOException, ContradictionException;
 
     /**
-     * Gets the native id paths to root.
+     * Gets the native id paths to root. TODO-javadoc: how/why to use this?
      *
      * @return the native id paths to root
      * @throws IOException signals that an I/O exception has occurred.
@@ -173,142 +191,195 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
     Collection<List<Integer>> getNidPathsToRoot() throws IOException;
 
     /**
-     * Gets the descriptions preferred active.
+     * Gets the active preferred descriptions for this version.
      *
-     * @return the descriptions preferred active
+     * @return the active preferred descriptions, more than one can be
+     * returned if there were simultaneous edits of the preferred term, an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred.
      */
     Collection<? extends DescriptionVersionBI> getDescriptionsPreferredActive() throws IOException;
 
     /**
-     * Gets the description preferred.
+     * Gets the preferred description for this version.
      *
-     * @return the description preferred
+     * @return the preferred description for this version, <code>null</code> if none are found
      * @throws IOException signals that an I/O exception has occurred.
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if more than one preferred description was found for this version
      */
     DescriptionVersionBI getDescriptionPreferred() throws IOException, ContradictionException;
 
     /**
-     * Gets the refset members active.
+     * Gets any active refset members, for which the concept is a referenced
+     * component or that is a member of this concept, if the concept is a
+     * refset.
      *
-     * @return the refset members active
+     * @return active refset members for this version, an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred.
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if differing refset members are found for this version
      */
     Collection<? extends RefexVersionBI<?>> getRefsetMembersActive() throws IOException, ContradictionException;
 
     /**
-     * Gets the relationship groups.
+     * Gets all the relationship groups for this version regardless of status.
      *
-     * @return the relationship groups
+     * @return all the relationship groups for this version, an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred.
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if differing relationship groups are found for this version
      */
     Collection<? extends RelationshipGroupVersionBI> getRelationshipGroups() throws IOException, ContradictionException;
 
     /**
-     * Gets the relationships target active.
+     * Gets active target relationships for this version.
+     * TODO-javadoc: renaming?
      *
-     * @return the relationships target active
+     * In the relationship A is a B, the concept A has a target relationship to
+     * the concept B, and the concept B has a source relationship to the concept
+     * A.
+     *
+     * @return the active target relationships, an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred.
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if different target relationships are found for this version
      */
     Collection<? extends RelationshipVersionBI> getRelationshipsTargetActive()
             throws IOException, ContradictionException;
 
     /**
-     * Gets the relationships target active isa.
+     * Gets the active target "is a" relationships for this version.
+     * 
+     * TODO-javadoc: renaming?
      *
-     * @return the relationships target active isa
+     * In the relationship A is a B, the concept A has a target relationship to
+     * the concept B, and the concept B has a source relationship to the concept
+     * A.
+     *
+     * @return the active target "is a" relationships, an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred.
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if differing "is a" relationships are found for this version
      */
     Collection<? extends RelationshipVersionBI> getRelationshipsTargetActiveIsa()
             throws IOException, ContradictionException;
 
     /**
-     * Returns the concepts representing the sources of the target relationships.
+     * Returns the concepts representing the destination of the target
+     * relationships for this version. All status values will be returned.
+     * 
+     * TODO-javadoc: renaming?
      *
-     * @return the relationships target source concepts
+     * In the relationship A is a B, the concept A has a target relationship to
+     * the concept B, and the concept B has a source relationship to the concept
+     * A.
+     *
+     * @return the concepts representing the destination of the target relationships for this version, an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred.
      */
     Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConcepts() throws IOException;
 
     /**
-     * Gets the relationships target source concepts.
+     * Returns the concepts representing the destination of the target
+     * relationships of the type specified by the <code>typeNid</code> for this version.
+     * All status values will be returned.
+     * 
+     * TODO-javadoc: renaming?
      *
-     * @param typeNid the type nid
-     * @return the relationships target source concepts
+     * In the relationship A is a B, the concept A has a target relationship to
+     * the concept B, and the concept B has a source relationship to the concept
+     * A.
+     *
+     * @param typeNid the nid representing the type of the relationship in question
+     * @return the concepts representing the destination of the target relationships for this version, an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred.
      */
     Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConcepts(int typeNid) throws IOException;
 
     /**
-     * Gets the relationships target source concepts.
+     * Returns the concepts representing the destination of the target
+     * relationships of the type specified by the <code>typeNids</code> for this version.
+     * All status values will be returned.
+     * 
+     * TODO-javadoc: renaming?
      *
-     * @param typeNids the type nids
-     * @return the relationships target source concepts
+     * In the relationship A is a B, the concept A has a target relationship to
+     * the concept B, and the concept B has a source relationship to the concept
+     * A.
+     *
+     * @param typeNids the nids representing the desired types of relationships
+     * @return the concepts representing the destination of the target relationships for this version, an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred.
      */
     Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConcepts(NidSetBI typeNids) throws IOException;
 
     /**
-     * Gets the relationships target source concepts active.
+     * Returns the concepts representing the destination of the active target
+     * relationships for this version.
+     * 
+     * TODO-javadoc: renaming?
      *
-     * @return the relationships target source concepts active
+     * In the relationship A is a B, the concept A has a target relationship to
+     * the concept B, and the concept B has a source relationship to the concept
+     * A.
+     *
+     * @return the concepts representing the destination of the active target relationships for this version, an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred.
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if different destination concepts are returned for this version
      */
     Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConceptsActive()
             throws IOException, ContradictionException;
 
     /**
-     * Gets the relationships target source concepts active.
+     * Returns the concepts representing the destination of the active target
+     * relationships of the type specified by the <code>typeNid</code> for this version.
      *
-     * @param typeNid the type nid
-     * @return the relationships target source concepts active
+     * @param typeNid the nid representing the desired type of relationship
+     * @return the concepts representing the destination of the specified active target relationships for this version, an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred.
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if different destination concepts are returned for this version
      */
     Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConceptsActive(int typeNid)
             throws IOException, ContradictionException;
 
     /**
-     * Gets the relationships target source concepts active.
+     * Returns the concepts representing the destination of the active target
+     * relationships of the type specified by the <code>typeNids</code> for this version.
      *
-     * @param typeNids the type nids
-     * @return the relationships target source concepts active
+     * @param typeNids the nids representing the desired types of relationships
+     * @return the concepts representing the destination of the specified active target relationships for this version, an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred.
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if different destination concepts are returned for this version
      */
     Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConceptsActive(NidSetBI typeNids)
             throws IOException, ContradictionException;
 
     /**
-     * Gets the relationships target source concepts active isa.
+     * Returns the concepts representing the destination of the active "is a" target
+     * relationships for this version.
      *
-     * @return the relationships target source concepts active isa
+     * @return the concepts representing the destination of the active  "is a" target relationships for this version, an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred.
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if different destination concepts are returned for this version
      */
     Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConceptsActiveIsa()
             throws IOException, ContradictionException;
 
     /**
-     * Gets the relationships target source concepts isa.
+     * Returns the concepts representing the destination of the "is a" target
+     * relationships for this version regardless of status.
      *
-     * @return the relationships target source concepts isa
+     * @return the concepts representing the destination of the target relationships for this version, an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred.
      */
     Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConceptsIsa() throws IOException;
 
     /**
-     * Gets the relationships source active.
+     * Gets active source relationships for this version.
+     * TODO-javadoc: renaming?
      *
-     * @return the relationships source active
+     * In the relationship A is a B, the concept A has a target relationship to
+     * the concept B, and the concept B has a source relationship to the concept
+     * A.
+     *
+     * @return the active source relationships, an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred.
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if different source relationships are found for this version
      */
     Collection<? extends RelationshipVersionBI> getRelationshipsSourceActive()
             throws IOException, ContradictionException;
@@ -322,9 +393,10 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      */
     Collection<? extends RelationshipVersionBI> getRelationshipsSourceActiveIsa()
             throws IOException, ContradictionException;
-    
+
     /**
-     * Returns the concepts representing the target concept of the source relationships.
+     * Returns the concepts representing the target concept of the source
+     * relationships.
      *
      * @return the relationships source target concepts
      * @throws IOException signals that an I/O exception has occurred.
@@ -520,7 +592,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * @throws InvalidCAB the invalid cab
      */
     ConceptCB makeBlueprint() throws IOException, ContradictionException, InvalidCAB;
-    
+
     /* (non-Javadoc)
      * @see org.ihtsdo.tk.api.ComponentVersionBI#makeBlueprint(org.ihtsdo.tk.api.coordinate.ViewCoordinate)
      */
