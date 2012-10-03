@@ -1170,7 +1170,7 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
     }
 
     @Override
-    public boolean hasRefsetMemberForComponentActive(int componentNid) throws IOException {
+    public boolean hasRefsetMemberActiveForComponent(int componentNid) throws IOException {
         return concept.hasRefsetMemberActiveForComponent(vc, componentNid);
     }
 

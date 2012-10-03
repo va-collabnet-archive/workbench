@@ -30,6 +30,6 @@ public class RefsetMemberChildFilter implements ChildNodeFilterBI {
          return possibleChild.hasAnnotationMemberActive(refsetConcept.getNid());
       }
 
-      return refsetConcept.hasRefsetMemberForComponentActive(possibleChild.getNid());
+      return refsetConcept.hasRefsetMemberActiveForComponent(possibleChild.getNid());
    }
 }
