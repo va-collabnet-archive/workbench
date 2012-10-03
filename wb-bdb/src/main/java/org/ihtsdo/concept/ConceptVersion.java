@@ -431,7 +431,7 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
     }
 
     @Override
-    public RefexChronicleBI<?> getRefexMemberForComponentActive(int componentNid) throws IOException {
+    public RefexChronicleBI<?> getRefexMemberActiveForComponent(int componentNid) throws IOException {
         return concept.getRefsetMemberActiveForComponent(vc, componentNid);
     }
 
