@@ -115,7 +115,7 @@ public class SctIdGenImpl implements SctIdGen {
 				log.info("UPDATE IDBASE VALUE IN: " + (insertEndTime - insertStartTime) + " MS");
 
 				numTmp = num;
-				num = (num * multip) + (namespaceId * 100) + Integer.parseInt(partitionId);
+				num = (num * multip) + ((long)(namespaceId * 100)) + Long.parseLong(partitionId);
 				log.debug("NUMBER: " + num);
 				result = GenIdHelper.verhoeffCompute("" + num);
 				String newSctId = String.valueOf(num) + String.valueOf(result);
