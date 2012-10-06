@@ -51,13 +51,11 @@ public interface TerminologyBuilderBI {
      * <code>refexBlueprint</code>.
      *
      * @param refexBlueprint the refex blueprint
-     * @return A <code>RefexChronicleBI</code> if * *
+     * @return A <code>RefexChronicleBI</code> of
      * the <code>refexBlueprint</code> regardless of if the RefexChronicleBI was
      * modified.
      *
-     * //TODO-javadoc: what's happening here? See same below on other methods
-     *
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -69,10 +67,10 @@ public interface TerminologyBuilderBI {
      * determine if a current version already meets the specification.
      *
      * @param refexBlueprint the refex blueprint
-     * @return A <code>RefexChronicleBI</code> if * *
+     * @return A <code>RefexChronicleBI</code> of
      * the <code>refexBlueprint</code> regardless of if the RefexChronicleBI was
      * modified.
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -83,10 +81,10 @@ public interface TerminologyBuilderBI {
      * <code>relBlueprint</code>..
      *
      * @param relBlueprint the relationship blueprint
-     * @return A <code>RelationshipChronicleBI</code> if * *
+     * @return A <code>RelationshipChronicleBI</code> of
      * the <code>relBlueprint</code> regardless of if the
      * RelationshipChronicleBI was modified.
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -98,10 +96,10 @@ public interface TerminologyBuilderBI {
      * if a current version already meets the specification.
      *
      * @param relBlueprint the relationship blueprint
-     * @return A <code>RelationshipChronicleBI</code> if the
+     * @return A <code>RelationshipChronicleBI</code> of the
      * <code>relBlueprint</code> regardless of if the RelationshipChronicleBI
      * was modified.
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -112,10 +110,10 @@ public interface TerminologyBuilderBI {
      * <code>descriptionBlueprint</code>.
      *
      * @param descriptionBlueprint the description blueprint
-     * @return A <code>DescriptionChronicleBI</code> if * *
+     * @return A <code>DescriptionChronicleBI</code> of
      * the <code>descriptionBlueprint</code> regardless of if the
      * DescriptionChronicleBI was modified.
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -127,10 +125,10 @@ public interface TerminologyBuilderBI {
      * determine if a current version already meets the specification.
      *
      * @param descriptionBlueprint the description blueprint
-     * @return A <code>DescriptionChronicleBI</code> if the
+     * @return A <code>DescriptionChronicleBI</code> of the
      * <code>descriptionBlueprint</code> regardless of if the
      * DescriptionChronicleBI was modified.
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -141,10 +139,10 @@ public interface TerminologyBuilderBI {
      * <code>mediaBlueprint</code>.
      *
      * @param mediaBlueprint the media blueprint
-     * @return A <code>MediaChronicleBI</code> if * *
+     * @return A <code>MediaChronicleBI</code> of
      * the <code>mediaBlueprint</code> regardless of if the MediaChronicleBI was
      * modified.
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -156,10 +154,10 @@ public interface TerminologyBuilderBI {
      * determine if a current version already meets the specification.
      *
      * @param mediaBlueprint the media blueprint
-     * @return A <code>MediaChronicleBI</code> if * *
+     * @return A <code>MediaChronicleBI</code> of
      * the <code>mediaBlueprint</code> regardless of if the MediaChronicleBI was
      * modified.
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -170,10 +168,10 @@ public interface TerminologyBuilderBI {
      * <code>conceptBlueprint</code>.
      *
      * @param conceptBlueprint the concept blueprint
-     * @return A <code>ConceptChronicleBI</code> if * *
+     * @return A <code>ConceptChronicleBI</code> of
      * the <code>conceptBlueprint</code> regardless of if the ConceptChronicleBI
      * was modified.
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -185,10 +183,10 @@ public interface TerminologyBuilderBI {
      * determine if a current version already meets the specification.
      *
      * @param conceptBlueprint the concept blueprint
-     * @return A <code>ConceptChronicleBI</code> if * *
+     * @return A <code>ConceptChronicleBI</code> of
      * the <code>conceptBlueprint</code> regardless of if the ConceptChronicleBI
      * was modified.
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -199,10 +197,10 @@ public interface TerminologyBuilderBI {
      * <code>conceptAttributeBlueprint</code>.
      *
      * @param conceptAttributeBlueprint the concept attribute blueprint
-     * @return A <code>ConceptAttributeChronicleBI</code> if * *
+     * @return A <code>ConceptAttributeChronicleBI</code> of
      * the <code>conceptAttributeBlueprint</code> regardless of if the
      * ConceptAttributeChronicleBI was modified.
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -214,10 +212,10 @@ public interface TerminologyBuilderBI {
      * to determine if a current version already meets the specification.
      *
      * @param conceptAttributeBlueprint the concept attribute blueprint
-     * @return A <code>ConceptAttributeChronicleBI</code> if * *
+     * @return A <code>ConceptAttributeChronicleBI</code> of
      * the <code>conceptAttributeBlueprint</code> regardless of if the
      * ConceptAttributeChronicleBI was modified.
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */

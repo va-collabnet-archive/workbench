@@ -52,7 +52,7 @@ public class DtoToText {
     * @param changeSetFile the change set file
     * @param changeSet the change set
     * @param append the append
-    * @throws IOException signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred
     * @throws FileNotFoundException the file not found exception
     * @throws ClassNotFoundException the class not found exception
     */
@@ -97,7 +97,7 @@ public class DtoToText {
     * Convert change set.
     *
     * @param changeSetFile the change set file
-    * @throws IOException signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred
     * @throws ClassNotFoundException the class not found exception
     */
    public static void convertChangeSet(File changeSetFile) throws IOException, ClassNotFoundException {
@@ -108,7 +108,7 @@ public class DtoToText {
     * Convert dto.
     *
     * @param changeSetFile the change set file
-    * @throws IOException signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred
     * @throws ClassNotFoundException the class not found exception
     */
    public static void convertDto(File changeSetFile) throws IOException, ClassNotFoundException {
@@ -121,7 +121,7 @@ public class DtoToText {
     * @param changeSetFile the change set file
     * @param conceptUuids the concept uuids
     * @param append the append
-    * @throws IOException signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred
     * @throws FileNotFoundException the file not found exception
     * @throws ClassNotFoundException the class not found exception
     */
@@ -161,7 +161,7 @@ public class DtoToText {
     *
     * @param file the file
     * @param conceptUuids the concept uuids
-    * @throws IOException signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred
     * @throws ClassNotFoundException the class not found exception
     */
    public static void searchForDto(File file, Collection<UUID> conceptUuids)

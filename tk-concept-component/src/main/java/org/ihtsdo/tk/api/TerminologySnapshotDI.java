@@ -51,7 +51,7 @@ public interface TerminologySnapshotDI extends TerminologyDI {
      * @param path the path
      * @param time the time
      * @return the position
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     PositionBI newPosition(PathBI path, long time) throws IOException;
 
@@ -71,7 +71,7 @@ public interface TerminologySnapshotDI extends TerminologyDI {
      *
      * @param uuids the uuids
      * @return the component version
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException the contradiction exception
      */
     ComponentVersionBI getComponentVersion(Collection<UUID> uuids) throws IOException, ContradictionException;
@@ -81,7 +81,7 @@ public interface TerminologySnapshotDI extends TerminologyDI {
      *
      * @param componentContainer the component container
      * @return the component version
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException the contradiction exception
      */
     ComponentVersionBI getComponentVersion(ComponentContainerBI componentContainer) throws IOException, ContradictionException;
@@ -91,7 +91,7 @@ public interface TerminologySnapshotDI extends TerminologyDI {
      *
      * @param nid the nid
      * @return the component version
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException the contradiction exception
      */
     ComponentVersionBI getComponentVersion(int nid) throws IOException, ContradictionException;
@@ -101,7 +101,7 @@ public interface TerminologySnapshotDI extends TerminologyDI {
      *
      * @param uuids the uuids
      * @return the component version
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException the contradiction exception
      */
     ComponentVersionBI getComponentVersion(UUID... uuids) throws IOException, ContradictionException;
@@ -111,7 +111,7 @@ public interface TerminologySnapshotDI extends TerminologyDI {
      *
      * @param nid the nid
      * @return the concept for nid
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     ConceptVersionBI getConceptForNid(int nid) throws IOException;
 
@@ -120,7 +120,7 @@ public interface TerminologySnapshotDI extends TerminologyDI {
      *
      * @param uuids the uuids
      * @return the concept version
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     ConceptVersionBI getConceptVersion(Collection<UUID> uuids) throws IOException;
 
@@ -129,7 +129,7 @@ public interface TerminologySnapshotDI extends TerminologyDI {
      *
      * @param conceptContainer the concept container
      * @return the concept version
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     ConceptVersionBI getConceptVersion(ConceptContainerBI conceptContainer) throws IOException;
 
@@ -138,7 +138,7 @@ public interface TerminologySnapshotDI extends TerminologyDI {
      *
      * @param conceptNid the concept nid
      * @return the concept version
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     ConceptVersionBI getConceptVersion(int conceptNid) throws IOException;
 
@@ -147,7 +147,7 @@ public interface TerminologySnapshotDI extends TerminologyDI {
      *
      * @param uuids the uuids
      * @return the concept version
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     ConceptVersionBI getConceptVersion(UUID... uuids) throws IOException;
 
@@ -156,7 +156,7 @@ public interface TerminologySnapshotDI extends TerminologyDI {
      *
      * @param conceptNids the concept nids
      * @return the concept versions
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     Map<Integer, ConceptVersionBI> getConceptVersions(NidBitSetBI conceptNids) throws IOException;
 
@@ -165,7 +165,7 @@ public interface TerminologySnapshotDI extends TerminologyDI {
      *
      * @param conceptNid the concept nid
      * @return the possible children
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     int[] getPossibleChildren(int conceptNid) throws IOException;
 
@@ -181,7 +181,7 @@ public interface TerminologySnapshotDI extends TerminologyDI {
      *
      * @param nid the nid
      * @return the concept nid
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     int getConceptNidForNid(Integer nid) throws IOException;
 
@@ -191,7 +191,7 @@ public interface TerminologySnapshotDI extends TerminologyDI {
      * @param childNid the child nid
      * @param parentNid the parent nid
      * @return <code>true</code>, if is kind of
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException the contradiction exception
      */
     boolean isKindOf(int childNid, int parentNid) throws IOException, ContradictionException;

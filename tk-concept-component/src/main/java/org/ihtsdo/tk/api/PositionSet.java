@@ -42,7 +42,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 
-// TODO: Auto-generated Javadoc TODO-javadoc: ?
+// TODO: Auto-generated Javadoc TODO-javadoc: need overview
 /**
  * The Class PositionSet.
  */

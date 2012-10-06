@@ -155,7 +155,7 @@ public interface I_MapUuidsToSnomed {
      * Write.
      *
      * @param f the f
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public abstract void write(File f) throws IOException;
 

@@ -65,7 +65,7 @@ public interface DescriptionVersionBI<A extends DescriptionAnalogBI>
      * description to make a blueprint of
      * @return the description blueprint, which can be constructed to create
      * a <code>DescriptionChronicleBI</code>
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException if more than one version of the
      * description was returned for the specified view coordinate
      * @throws InvalidCAB if the any of the values in blueprint to make are invalid

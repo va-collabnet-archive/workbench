@@ -21,7 +21,7 @@ import org.ihtsdo.tk.spec.ConceptSpec;
 
 /**
  * The Class CaseSensitive contains
- * <code>ConceptSpec</code> representations of terminology describing
+ * <code>ConceptSpec</code> representations of concepts describing
  * description case significance.
  *
  * @see ConceptSpec

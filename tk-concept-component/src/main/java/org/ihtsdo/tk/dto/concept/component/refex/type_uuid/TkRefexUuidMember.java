@@ -54,7 +54,7 @@ public class TkRefexUuidMember extends TkRefexAbstractMember<TkRefexUuidRevision
      * Instantiates a new tk refex uuid member.
      *
      * @param refexChronicle the refex chronicle
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public TkRefexUuidMember(RefexChronicleBI refexChronicle) throws IOException {
         this((RefexNidVersionBI) refexChronicle.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
@@ -65,7 +65,7 @@ public class TkRefexUuidMember extends TkRefexAbstractMember<TkRefexUuidRevision
      *
      * @param refexNidVersion the refex nid version
      * @param revisionHandling the revision handling
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public TkRefexUuidMember(RefexNidVersionBI refexNidVersion,
             RevisionHandling revisionHandling) throws IOException {
@@ -107,7 +107,7 @@ public class TkRefexUuidMember extends TkRefexAbstractMember<TkRefexUuidRevision
      *
      * @param in the in
      * @param dataVersion the data version
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException the class not found exception
      */
     public TkRefexUuidMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -143,7 +143,7 @@ public class TkRefexUuidMember extends TkRefexAbstractMember<TkRefexUuidRevision
      * @param offset the offset
      * @param mapAll the map all
      * @param viewCoordinate the view coordinate
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException the contradiction exception
      */
     public TkRefexUuidMember(RefexNidVersionBI refexNidVersion, NidBitSetBI excludedNids,

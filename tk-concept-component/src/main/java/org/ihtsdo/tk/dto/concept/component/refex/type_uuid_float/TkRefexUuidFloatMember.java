@@ -64,7 +64,7 @@ public class TkRefexUuidFloatMember extends TkRefexAbstractMember<TkRefexUuidFlo
      * Instantiates a new tk refex uuid float member.
      *
      * @param refexChronicle the refex chronicle
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public TkRefexUuidFloatMember(RefexChronicleBI refexChronicle) throws IOException {
          this((RefexNidFloatVersionBI) refexChronicle.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
@@ -75,7 +75,7 @@ public class TkRefexUuidFloatMember extends TkRefexAbstractMember<TkRefexUuidFlo
      *
      * @param refexNidFloatVersion the refex nid float version
      * @param revisionHandling the revision handling
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public TkRefexUuidFloatMember(RefexNidFloatVersionBI refexNidFloatVersion,
             RevisionHandling revisionHandling) throws IOException {
@@ -116,7 +116,7 @@ public class TkRefexUuidFloatMember extends TkRefexAbstractMember<TkRefexUuidFlo
      *
      * @param in the in
      * @param dataVersion the data version
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException the class not found exception
      */
     public TkRefexUuidFloatMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -154,7 +154,7 @@ public class TkRefexUuidFloatMember extends TkRefexAbstractMember<TkRefexUuidFlo
      * @param offset the offset
      * @param mapAll the map all
      * @param viewCoordinate the view coordinate
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException the contradiction exception
      */
     public TkRefexUuidFloatMember(RefexNidFloatVersionBI refexNidFloatVersion, NidBitSetBI excludedNids,

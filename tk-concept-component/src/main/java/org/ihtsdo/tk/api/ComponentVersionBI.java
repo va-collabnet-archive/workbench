@@ -63,7 +63,7 @@ public interface ComponentVersionBI extends ComponentBI, VersionPointBI {
      * version the component should be used
      * @return the <code>String</code> representing a shortened, user friendly,
      * description of the component.
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException if more than one version of the component
      * is found
      */
@@ -75,7 +75,7 @@ public interface ComponentVersionBI extends ComponentBI, VersionPointBI {
      * the components within the concept.
      *
      * @return all the nids of a concept version
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     Set<Integer> getAllNidsForVersion() throws IOException;
 
@@ -104,7 +104,7 @@ public interface ComponentVersionBI extends ComponentBI, VersionPointBI {
      * Gets the position associated with this component version.
      *
      * @return the position for this version
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     PositionBI getPosition() throws IOException;
 
@@ -128,7 +128,7 @@ public interface ComponentVersionBI extends ComponentBI, VersionPointBI {
      *
      * @param allowedStatusNids the nids representing the allowed statuses
      * @return <code>true</code>, if the version is active
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     boolean isActive(NidSetBI allowedStatusNids) throws IOException;
 
@@ -138,7 +138,7 @@ public interface ComponentVersionBI extends ComponentBI, VersionPointBI {
      *
      * @param viewCoordinate the view coordinate specifying which versions are active and inactive
      * @return <code>true</code>, if the version is active
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     boolean isActive(ViewCoordinate viewCoordinate) throws IOException;
 
@@ -178,7 +178,7 @@ public interface ComponentVersionBI extends ComponentBI, VersionPointBI {
      *
      * @param viewCoordinate the view coordinate
      * @return the creates the or amend blueprint
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException the contradiction exception
      * @throws InvalidCAB the invalid cab
      * @see org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint

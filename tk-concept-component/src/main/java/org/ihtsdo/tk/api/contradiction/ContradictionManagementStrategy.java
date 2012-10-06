@@ -133,7 +133,7 @@ public abstract class ContradictionManagementStrategy implements ContradictionMa
      * @param conceptChronicle the concept chronicle
      * @param includeDependentEntities the include dependent entities
      * @return <code>true</code>, if is in conflict
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @see org.dwfa.ace.api.I_ManageContradiction#isInConflict(org.dwfa.ace.api.I_GetConceptData,
      * boolean)
      */
@@ -154,7 +154,7 @@ public abstract class ContradictionManagementStrategy implements ContradictionMa
             }
         }
 
-        for (RelationshipChronicleBI relationship : conceptChronicle.getRelationshipsSource()) {
+        for (RelationshipChronicleBI relationship : conceptChronicle.getRelationshipsOutgoing()) {
             if (resolveVersions(new ArrayList(relationship.getVersions(vc))).size() > 1) {
                 return true;
             }

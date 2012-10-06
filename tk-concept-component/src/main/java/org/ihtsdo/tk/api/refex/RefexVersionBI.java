@@ -48,7 +48,7 @@ public interface RefexVersionBI<A extends RefexAnalogBI<A>>
      * @param viewCoordinate the view coordinate specifying which version of the
      * description to make a blueprint of
      * @return the refex blueprint, which can be constructed to create      * a <code>RefexChronicleBI</code>
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException if more than one version of the
      * description was returned for the specified view coordinate
      * @throws InvalidCAB if the any of the values in blueprint to make are
@@ -66,7 +66,7 @@ public interface RefexVersionBI<A extends RefexAnalogBI<A>>
      * @param conversionMap the conversion map
      * @return the tk refset member active only
      * @throws ContradictionException the contradiction exception
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     TkRefexAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate viewCoordinate, NidBitSetBI excludedNids,
             Map<UUID, UUID> conversionMap)

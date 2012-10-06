@@ -57,7 +57,7 @@ public class DtoExtract {
     * @param cUuids the c uuids
     * @param extractFile the extract file
     * @return <code>true</code>, if successful
-    * @throws IOException signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred
     * @throws ClassNotFoundException the class not found exception
     */
    public static boolean extract(File changeSetFile, Collection<UUID> cUuids, File extractFile)
@@ -112,7 +112,7 @@ public class DtoExtract {
     * @param extractFile the extract file
     * @param map the map
     * @return <code>true</code>, if successful
-    * @throws IOException signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred
     * @throws ClassNotFoundException the class not found exception
     */
    public static boolean extractChangeSetsAndAssignNewNids(File changeSetFile, Collection<UUID> cUuids,

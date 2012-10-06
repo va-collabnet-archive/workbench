@@ -55,22 +55,19 @@ public interface ConceptChronicleBI extends ComponentChronicleBI<ConceptVersionB
     /**
      * Cancels any uncommitted changes on this concept.
      *
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     void cancel() throws IOException;
 
     /**
      * Commits any uncommitted changes on this concept.
      *
-     * TODO-javadoc: is is preferred to use the commit methods on
-     * termstore/termsnapshot?
-     *
      * @param changeSetGenerationPolicy the change set generation policy to use
      * when writing changesets for this commit
      * @param changeSetGenerationThreadingPolicy the change set generation
      * threading policy
      * @return <code>true</code>, if the commit was successful
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     boolean commit(ChangeSetGenerationPolicy changeSetGenerationPolicy,
             ChangeSetGenerationThreadingPolicy changeSetGenerationThreadingPolicy)
@@ -86,7 +83,7 @@ public interface ConceptChronicleBI extends ComponentChronicleBI<ConceptVersionB
      * @param writeAdjudication set to <code>true</code> if adjudication records
      * should be written, committing in the adjudication window
      * @return <code>true</code>, if the commit was successful
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     boolean commit(ChangeSetGenerationPolicy changeSetGenerationPolicy,
             ChangeSetGenerationThreadingPolicy changeSetGenerationThreadingPolicy,
@@ -107,7 +104,7 @@ public interface ConceptChronicleBI extends ComponentChronicleBI<ConceptVersionB
      * Gets the concept attributes of this concept.
      *
      * @return the concept attributes of this concept
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     ConceptAttributeChronicleBI getConceptAttributes() throws IOException;
 
@@ -117,14 +114,14 @@ public interface ConceptChronicleBI extends ComponentChronicleBI<ConceptVersionB
      * the
      * <code>componentNid</code> is a referenced component.
      *
-     * TODO-javadoc: is this only for refsets
+     * TODO-javadoc: is this only for refsets?
      *
      * @param viewCoordinate the view coordinate specifying which refset members
      * are active or inactive
      * @param componentNid the nid associated with the component in question
      * @return the active refset member which have the specified component as a
      * referenced component, <code>null</code> if none are found
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     RefexVersionBI<?> getRefsetMemberActiveForComponent(ViewCoordinate viewCoordinate, int componentNid)
             throws IOException;
@@ -139,7 +136,7 @@ public interface ConceptChronicleBI extends ComponentChronicleBI<ConceptVersionB
      * @return the active refset members which have this concept, or concept's
      * components, as a referenced component, an empty <code>Collection</code>
      * if none are found
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     Collection<? extends RefexVersionBI<?>> getRefsetMembersActive(ViewCoordinate viewCoordinate) throws IOException;
 
@@ -156,7 +153,7 @@ public interface ConceptChronicleBI extends ComponentChronicleBI<ConceptVersionB
      * @return the active refset members that have this concept, or its
      * components, as referenced component and that have a time earlier than the
      * cutoff time, an empty <code>Collection</code> if none are found
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public Collection<? extends RefexVersionBI<?>> getRefsetMembersActive(ViewCoordinate viewCoordinate, Long cutoffTime)
             throws IOException;
@@ -165,12 +162,15 @@ public interface ConceptChronicleBI extends ComponentChronicleBI<ConceptVersionB
      * Gets all of the descriptions on this concept regardless of status.
      *
      * @return all descriptions on this concept
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     Collection<? extends DescriptionChronicleBI> getDescriptions() throws IOException;
 
     /**
-     * Gets the last modification sequence. TODO-javadoc: what is this?
+     * Gets the last modification sequence. This sequence is incremented any
+     * time the chronicle was changed, for example this sequence can be used to
+     * determine if the concept has changed since the last layout (if the layout
+     * caches sequence numbers).
      *
      * @return the last modification sequence
      */
@@ -179,8 +179,8 @@ public interface ConceptChronicleBI extends ComponentChronicleBI<ConceptVersionB
     /**
      * Gets any media associated with this concept regardless of status.
      *
-     * @return the media associated with this concept, an * * *      * empty <code>Collection</code> if none are found
-     * @throws IOException signals that an I/O exception has occurred.
+     * @return the media associated with this concept, an      * empty <code>Collection</code> if none are found
+     * @throws IOException signals that an I/O exception has occurred
      */
     Collection<? extends MediaChronicleBI> getMedia() throws IOException;
 
@@ -192,7 +192,7 @@ public interface ConceptChronicleBI extends ComponentChronicleBI<ConceptVersionB
      * @param componentNid the nid associated with the component in question
      * @return the refset member that has the specified component as a
      * referenced component, <code>null</code> if none are found
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     RefexChronicleBI<?> getRefsetMemberForComponent(int componentNid) throws IOException;
 
@@ -201,49 +201,52 @@ public interface ConceptChronicleBI extends ComponentChronicleBI<ConceptVersionB
      * concept. Use this method when then this concept is a refset and you wish
      * to find all of the members associated with that refset.
      *
-     * @return the refset members associated with this concept, an * *      * empty <code>Collection</code> if none are found
-     * @throws IOException signals that an I/O exception has occurred.
+     * @return the refset members associated with this concept, an empty <code>Collection</code> if none are found
+     * @throws IOException signals that an I/O exception has occurred
      */
     Collection<? extends RefexChronicleBI<?>> getRefsetMembers() throws IOException;
 
     /**
      * Gets the groups of relationships, based on the specified
      * <code>viewCoordinate</codde>, that are associated with this concept.
+     * 
+     * In the relationship A is-a B, the concept A is a source and the concept B
+     * is a target. The relationship A-B is an outgoing relationship on concept
+     * A and an incoming relationship on concept B.
      *
      * @param viewCoordinate the view coordinate specifying which version of the relationship group to return
      * @return any specified relationship groups associated with this concept,
      * an empty <code>Collection</code> if none are found
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException the contradiction exception
      */
-    Collection<? extends RelationshipGroupVersionBI> getRelationshipGroups(ViewCoordinate viewCoordinate)
+    Collection<? extends RelationshipGroupVersionBI> getRelationshipOutgoingGroups(ViewCoordinate viewCoordinate)
             throws IOException, ContradictionException;
 
     /**
-     * Gets all target relationships regardless of status. TODO-javadoc:
-     * renaming?
+     * Gets all target relationships regardless of status.
      *
-     * In the relationship A is a B, the concept A has a target relationship to
-     * the concept B, and the concept B has a source relationship to the concept
-     * A.
+     * In the relationship A is-a B, the concept A is a source and the concept B
+     * is a target. The relationship A-B is an outgoing relationship on concept
+     * A and an incoming relationship on concept B.
      *
      * @return the relationships target
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
-    Collection<? extends RelationshipChronicleBI> getRelationshipsTarget() throws IOException;
+    Collection<? extends RelationshipChronicleBI> getRelationshipsIncoming() throws IOException;
 
     /**
      * Gets all source relationships regardless of status. TODO-javadoc:
      * renaming?
      *
-     * In the relationship A is a B, the concept A has a target relationship to
-     * the concept B, and the concept B has a source relationship to the concept
-     * A.
+     * In the relationship A is-a B, the concept A is a source and the concept B
+     * is a target. The relationship A-B is an outgoing relationship on concept
+     * A and an incoming relationship on concept B.
      *
      * @return the relationships source
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
-    Collection<? extends RelationshipChronicleBI> getRelationshipsSource() throws IOException;
+    Collection<? extends RelationshipChronicleBI> getRelationshipsOutgoing() throws IOException;
 
     /**
      * Gets any versions, based on the given
@@ -266,7 +269,7 @@ public interface ConceptChronicleBI extends ComponentChronicleBI<ConceptVersionB
      * nids
      * @return any component nids on this concept associated with the given
      * stamp nids, an empty <code>Set</code> if none are found
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     Set<Integer> getAllNidsForStamps(Set<Integer> stampNids) throws IOException;
 
@@ -281,7 +284,7 @@ public interface ConceptChronicleBI extends ComponentChronicleBI<ConceptVersionB
      * @param componentNid the nid of the component in question
      * @return <code>true</code>, if any active refset members are found which
      * have the component as a referenced component
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     boolean hasRefsetMemberActiveForComponent(ViewCoordinate viewCoordinate, int componentNid) throws IOException;
 
@@ -289,7 +292,7 @@ public interface ConceptChronicleBI extends ComponentChronicleBI<ConceptVersionB
      * Checks if this concept is an annotation style refex.
      *
      * @return <code>true</code>, if the concept is annotation
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @see RefexChronicleBI
      */
     boolean isAnnotationStyleRefex() throws IOException;
@@ -298,7 +301,7 @@ public interface ConceptChronicleBI extends ComponentChronicleBI<ConceptVersionB
      * Checks if this concept is an indexed annotation style refex..
      *
      * @return <code>true</code>, if concept is an indexed annotation
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @see RefexChronicleBI
      */
     boolean isAnnotationIndex() throws IOException;
@@ -318,7 +321,7 @@ public interface ConceptChronicleBI extends ComponentChronicleBI<ConceptVersionB
      *
      * @param annotationIndex set to <code>true</code> to mark the concept as an
      * indexed annotation style refex
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @see RefexChronicleBI
      */
     void setAnnotationIndex(boolean annotationIndex) throws IOException;
@@ -327,7 +330,7 @@ public interface ConceptChronicleBI extends ComponentChronicleBI<ConceptVersionB
      * Gets all the nids associated with this concept or its components.
      *
      * @return all the nids found on this concept
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     Collection<Integer> getAllNids() throws IOException;
 }

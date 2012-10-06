@@ -57,7 +57,7 @@ public class TkRefexBooleanRevision extends TkRevision {
     * Instantiates a new tk refex boolean revision.
     *
     * @param refexBooleanVersion the refex boolean version
-    * @throws IOException signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred
     */
    public TkRefexBooleanRevision(RefexBooleanVersionBI refexBooleanVersion) throws IOException {
       super(refexBooleanVersion);
@@ -69,7 +69,7 @@ public class TkRefexBooleanRevision extends TkRevision {
     *
     * @param in the in
     * @param dataVersion the data version
-    * @throws IOException signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred
     * @throws ClassNotFoundException the class not found exception
     */
    public TkRefexBooleanRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

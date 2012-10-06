@@ -70,7 +70,7 @@ public class ActiveOnlyExport implements ProcessUnfetchedConceptDataBI {
      * @param exclusionSet the exclusion set
      * @param out the out
      * @param conversionMap the conversion map
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public ActiveOnlyExport(ViewCoordinate conceptVc, ViewCoordinate descVc, ViewCoordinate relVc, 
             NidBitSetBI exclusionSet, DataOutputStream out,

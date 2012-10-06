@@ -41,7 +41,7 @@ public class RelationshipConstraint implements ConstraintBI {
      * Write object.
      *
      * @param out the out
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -54,7 +54,7 @@ public class RelationshipConstraint implements ConstraintBI {
      * Read object.
      *
      * @param in the in
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException the class not found exception
      */
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -125,7 +125,7 @@ public class RelationshipConstraint implements ConstraintBI {
 	 *
 	 * @param viewCoordinate the view coordinate
 	 * @return the source
-	 * @throws IOException signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred
 	 */
 	public ConceptVersionBI getSource(ViewCoordinate viewCoordinate) throws IOException {
 		return originSpec.get(viewCoordinate);
@@ -136,7 +136,7 @@ public class RelationshipConstraint implements ConstraintBI {
 	 *
 	 * @param viewCoordinate the view coordinate
 	 * @return the relationship type
-	 * @throws IOException signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred
 	 */
 	public ConceptVersionBI getRelationshipType(ViewCoordinate viewCoordinate) throws IOException {
 		return relTypeSpec.get(viewCoordinate);
@@ -147,7 +147,7 @@ public class RelationshipConstraint implements ConstraintBI {
 	 *
 	 * @param viewCoordinate the view coordinate
 	 * @return the target
-	 * @throws IOException signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred
 	 */
 	public ConceptVersionBI getTarget(ViewCoordinate viewCoordinate) throws IOException {
 		return destinationSpec.get(viewCoordinate);
@@ -157,7 +157,7 @@ public class RelationshipConstraint implements ConstraintBI {
 	 * Gets the source nid.
 	 *
 	 * @return the source nid
-	 * @throws IOException signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred
 	 */
 	public int getSourceNid() throws IOException {
 		return Ts.get().getNidForUuids(originSpec.getUuids());
@@ -167,7 +167,7 @@ public class RelationshipConstraint implements ConstraintBI {
 	 * Gets the relationship type nid.
 	 *
 	 * @return the relationship type nid
-	 * @throws IOException signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred
 	 */
 	public int getRelationshipTypeNid() throws IOException {
 		return Ts.get().getNidForUuids(relTypeSpec.getUuids());
@@ -177,7 +177,7 @@ public class RelationshipConstraint implements ConstraintBI {
 	 * Gets the target nid.
 	 *
 	 * @return the target nid
-	 * @throws IOException signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred
 	 */
 	public int getTargetNid() throws IOException {
 		return Ts.get().getNidForUuids(destinationSpec.getUuids());

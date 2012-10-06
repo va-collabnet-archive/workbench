@@ -27,10 +27,10 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 // TODO: Auto-generated Javadoc
 /**
  * The Interface ComponentChronicleBI contains terminology generic methods for
- * editing and interacting with a component. A ComponentChronicleBI contains all of the versions of
- * a component.
+ * editing and interacting with a component. A ComponentChronicleBI contains all
+ * of the versions of a component.
  *
- * @param <T> the generic type TODO-javadoc: what to put here?
+ * @param <T> the generic type of the versions that the chronicle contains
  * @see org.ihtsdo.tk.api.ComponentBI
  */
 public interface ComponentChronicleBI<T extends ComponentVersionBI>
@@ -40,8 +40,9 @@ public interface ComponentChronicleBI<T extends ComponentVersionBI>
      * Gets a particular version of a component based the given
      * <code>viewCoordinate</code>.
      *
-     * @param viewCoordinate the view coordinate specifying which version of the component to return
-     * @return the specified  version of the component
+     * @param viewCoordinate the view coordinate specifying which version of the
+     * component to return
+     * @return the specified version of the component
      * @throws ContradictionException if there is more than one version for a
      * particular <code>viewCoordinate</code>
      */
@@ -51,8 +52,9 @@ public interface ComponentChronicleBI<T extends ComponentVersionBI>
      * Gets all the versions of a component based the
      * <code>viewCoordinate</code>.
      *
-     * @param viewCoordinate the view coordinate specifying which version of the component to return
-     * @return the specified  versions of the component
+     * @param viewCoordinate the view coordinate specifying which version of the
+     * component to return
+     * @return the specified versions of the component
      */
     Collection<? extends T> getVersions(ViewCoordinate viewCoordinate);
 
@@ -74,17 +76,16 @@ public interface ComponentChronicleBI<T extends ComponentVersionBI>
      * Gets the all stamp nids for all versions on a component.
      *
      * @return the stamp nids of the component
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @see org.ihtsdo.tk.api.StampBI
      */
     Set<Integer> getAllStampNids() throws IOException;
 
     /**
      * Gets the positions represented in the versions of a component.
-     * TODO-javadoc: is this correct?
      *
      * @return the positions found in the component
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @see org.ihtsdo.tk.api.PositionBI
      */
     Set<PositionBI> getPositions() throws IOException;
@@ -97,15 +98,20 @@ public interface ComponentChronicleBI<T extends ComponentVersionBI>
     T getPrimordialVersion();
 
     /**
-     * Makes an analog of the component based on the given
-     * <code>viewCoordinate</code> and created based on the specifications given by the
-     * <code>editCoordinate</code>. TODO-javadoc: not sure what this is used
-     * for
+     * Makes an uncommitted analog of the component based on the given
+     * <code>viewCoordinate</code> and created based on the specifications given
+     * by the
+     * <code>editCoordinate</code>. The analog is only created for the versions
+     * which are not a part of the baseline version and is created using the
+     * Contradiction Manager specified in the
+     * <code>viewCoordinate</code> and will resolve contradictions accordingly.
      *
-     * @param editCoordinate the edit coordinate specifying the editing metadata to use in creation
-     * @param viewCoordinate the view coordinate specifying which versions are active and inactive
+     * @param editCoordinate the edit coordinate specifying the editing metadata
+     * to use in creation
+     * @param viewCoordinate the view coordinate specifying which versions are
+     * active and inactive
      * @return <code>true</code>, if analogs were successfully created
-     * @throws Exception the exception TODO-javadoc: why?
+     * @throws Exception indicates an exception has occurred
      * @see org.ihtsdo.tk.api.AnalogBI
      */
     boolean makeAdjudicationAnalogs(EditCoordinate editCoordinate, ViewCoordinate viewCoordinate) throws Exception;

@@ -115,7 +115,7 @@ public enum TK_REFEX_TYPE {
      * Write type.
      *
      * @param output the output
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public void writeType(DataOutput output) throws IOException {
         output.writeByte(externalizedToken);
@@ -178,7 +178,7 @@ public enum TK_REFEX_TYPE {
      *
      * @param input the input
      * @return the tk refex type
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public static TK_REFEX_TYPE readType(DataInput input) throws IOException {
         int type = input.readByte();

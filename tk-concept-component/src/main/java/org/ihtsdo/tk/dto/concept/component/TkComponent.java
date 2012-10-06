@@ -1,23 +1,22 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.tk.dto.concept.component;
 
 //~--- non-JDK imports --------------------------------------------------------
-
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContradictionException;
@@ -59,644 +58,682 @@ import org.ihtsdo.tk.dto.concept.component.refex.type_arrayofbytearray.TkRefexAr
 
 // TODO: Auto-generated Javadoc
 /**
- * The Class TkComponent.
+ * The Class TkComponent represents a concept component in the eConcept format
+ * and contains methods general to interacting with a component. Further
+ * discussion of the eConcept format can be found on
+ * <code>TkConcept</code>.
  *
+ * @see TkConcept
  * @param <V> the value type
  */
 public abstract class TkComponent<V extends TkRevision> extends TkRevision {
-   
-   /** The Constant serialVersionUID. */
-   private static final long serialVersionUID = 1;
 
-   //~--- fields --------------------------------------------------------------
+    /**
+     * The Constant serialVersionUID, used to prevent the class from computing its
+     * own serialVersionUID based on a hash of all the method signatures.
+     */
+    private static final long serialVersionUID = 1;
+    //~--- fields --------------------------------------------------------------
+    /**
+     * Any additional identifiers associated with this TK Component.
+     */
+    public List<TkIdentifier> additionalIds;
+    /**
+     * Any annotations on this TK Component.
+     */
+    public List<TkRefexAbstractMember<?>> annotations;
+    /**
+     * The primordial uuid associated with this TK Component.
+     */
+    public UUID primordialUuid;
+    /**
+     * The different versions of this TK Component.
+     */
+    public List<V> revisions;
 
-   /** The additional ids. */
-   public List<TkIdentifier>              additionalIds;
-   
-   /** The annotations. */
-   public List<TkRefexAbstractMember<?>> annotations;
-   
-   /** The primordial uuid. */
-   public UUID                            primordialUuid;
-   
-   /** The revisions. */
-   public List<V>                         revisions;
+    //~--- constructors --------------------------------------------------------
+    /**
+     * Instantiates a new TK Component.
+     */
+    public TkComponent() {
+        super();
+    }
 
-   //~--- constructors --------------------------------------------------------
+    /**
+     * Instantiates a new TK Component based on the
+     * <code>componentVersion</code>.
+     *
+     * @param componentVersion the component version specifying how to construct
+     * this TK Component
+     * @throws IOException signals that an I/O exception has occurred
+     */
+    public TkComponent(ComponentVersionBI componentVersion) throws IOException {
+        super(componentVersion);
 
-   /**
-    * Instantiates a new tk component.
-    */
-   public TkComponent() {
-      super();
-   }
+        Collection<? extends IdBI> anotherAdditionalIds = componentVersion.getAdditionalIds();
 
-   /**
-    * Instantiates a new tk component.
-    *
-    * @param componentVersion the component version
-    * @throws IOException signals that an I/O exception has occurred.
-    */
-   public TkComponent(ComponentVersionBI componentVersion) throws IOException {
-      super(componentVersion);
-
-      Collection<? extends IdBI> anotherAdditionalIds = componentVersion.getAdditionalIds();
-
-      if (anotherAdditionalIds != null) {
-         this.additionalIds = new ArrayList<TkIdentifier>(anotherAdditionalIds.size());
-         nextId:
-         for (IdBI id : anotherAdditionalIds) {
-            this.additionalIds.add((TkIdentifier) TkIdentifier.convertId(id));
-         }
-      }
-
-      Collection<? extends RefexChronicleBI<?>> anotherAnnotations = componentVersion.getAnnotations();
-
-      processAnnotations(anotherAnnotations);
-      this.primordialUuid = componentVersion.getPrimUuid();
-   }
-
-   /**
-    * Instantiates a new tk component.
-    *
-    * @param in the in
-    * @param dataVersion the data version
-    * @throws IOException signals that an I/O exception has occurred.
-    * @throws ClassNotFoundException the class not found exception
-    */
-   public TkComponent(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
-      super();
-      readExternal(in, dataVersion);
-   }
-
-   /**
-    * Instantiates a new tk component.
-    *
-    * @param another the another
-    * @param conversionMap the conversion map
-    * @param offset the offset
-    * @param mapAll the map all
-    */
-   public TkComponent(TkComponent<V> another, Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
-      super(another, conversionMap, offset, mapAll);
-
-      if (another.additionalIds != null) {
-         this.additionalIds = new ArrayList<TkIdentifier>(another.additionalIds.size());
-
-         for (TkIdentifier id : another.additionalIds) {
-            this.additionalIds.add((TkIdentifier) id.makeConversion(conversionMap, offset, mapAll));
-         }
-      }
-
-      if (another.annotations != null) {
-         this.annotations = new ArrayList<TkRefexAbstractMember<?>>(another.annotations.size());
-
-         for (TkRefexAbstractMember<?> r : another.annotations) {
-            this.annotations.add((TkRefexAbstractMember<?>) r.makeConversion(conversionMap, offset, mapAll));
-         }
-      }
-
-      this.primordialUuid = conversionMap.get(another.primordialUuid);
-
-      if (another.revisions != null) {
-         this.revisions = new ArrayList<V>(another.revisions.size());
-
-         for (V r : another.revisions) {
-            this.revisions.add((V) r.makeConversion(conversionMap, offset, mapAll));
-         }
-      }
-   }
-
-   /**
-    * Instantiates a new tk component.
-    *
-    * @param componentVersion the component version
-    * @param excludedNids the excluded nids
-    * @param conversionMap the conversion map
-    * @param offset the offset
-    * @param mapAll the map all
-    * @param viewCoordinate the view coordinate
-    * @throws IOException signals that an I/O exception has occurred.
-    * @throws ContradictionException the contradiction exception
-    */
-   public TkComponent(ComponentVersionBI componentVersion, NidBitSetBI excludedNids, Map<UUID, UUID> conversionMap,
-                      long offset, boolean mapAll, ViewCoordinate viewCoordinate)
-           throws IOException, ContradictionException {
-      super(componentVersion, conversionMap, offset, mapAll);
-
-      Collection<? extends IdBI> anotherAdditionalIds = componentVersion.getAdditionalIds();
-
-      if (anotherAdditionalIds != null) {
-         this.additionalIds = new ArrayList<TkIdentifier>(anotherAdditionalIds.size());
-         nextId:
-         for (IdBI id : anotherAdditionalIds) {
-            for (int nid : id.getAllNidsForId()) {
-               if (excludedNids.isMember(nid) || (Ts.get().getComponent(nid) == null)) {
-                  continue nextId;
-               } else if (Ts.get().getComponent(nid).getVersions(viewCoordinate).isEmpty()) {
-                   continue nextId;
-               }
+        if (anotherAdditionalIds != null) {
+            this.additionalIds = new ArrayList<TkIdentifier>(anotherAdditionalIds.size());
+            nextId:
+            for (IdBI id : anotherAdditionalIds) {
+                this.additionalIds.add((TkIdentifier) TkIdentifier.convertId(id));
             }
+        }
 
-            this.additionalIds.add((TkIdentifier) TkIdentifier.convertId(id).makeConversion(conversionMap,
-                    offset, mapAll));
-         }
-      }
+        Collection<? extends RefexChronicleBI<?>> anotherAnnotations = componentVersion.getAnnotations();
 
-      Collection<? extends RefexChronicleBI<?>> anotherAnnotations = componentVersion.getAnnotations();
+        processAnnotations(anotherAnnotations);
+        this.primordialUuid = componentVersion.getPrimUuid();
+    }
 
-      processAnnotations(anotherAnnotations, viewCoordinate, excludedNids, conversionMap);
-      this.primordialUuid = conversionMap.get(componentVersion.getPrimUuid());
-   }
+    /**
+     * Instantiates a new TK Component based on the specified data input,
+     * <code>in</code>.
+     *
+     * @param in the data input specifying how to construct this TK Component
+     * @param dataVersion the data version of the external source
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws ClassNotFoundException the class not found exception
+     * TODO-javadoc: why?
+     */
+    public TkComponent(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super();
+        readExternal(in, dataVersion);
+    }
 
-   //~--- methods -------------------------------------------------------------
+    /**
+     * Instantiates a new TK Component based on
+     * <code>another</code> TK Component and allows for uuid conversion.
+     *
+     * @param another the TK Component specifying how to construct this TK
+     * Component
+     * @param conversionMap the map for converting from one set of uuids to
+     * another
+     * @param offset the offset to be applied to the time associated with this
+     * TK Component
+     * @param mapAll set to <code>true</code> to map all the uuids in this TK
+     * Component based on the conversion map
+     */
+    public TkComponent(TkComponent<V> another, Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
+        super(another, conversionMap, offset, mapAll);
 
+        if (another.additionalIds != null) {
+            this.additionalIds = new ArrayList<TkIdentifier>(another.additionalIds.size());
 
-   /**
-    * Compares this object to the specified object. The result is <tt>true</tt>
-    * if and only if the argument is not <tt>null</tt>, is a
-    * <tt>EComponent</tt> object, and contains the same values, field by field,
-    * as this <tt>EComponent</tt>.
-    *
-    * @param obj the object to compare with.
-    * @return <code>true</code> if the objects are the same;
-    *         <code>false</code> otherwise.
-    */
-   @Override
-   public boolean equals(Object obj) {
-      if (obj == null) {
-         return false;
-      }
+            for (TkIdentifier id : another.additionalIds) {
+                this.additionalIds.add((TkIdentifier) id.makeConversion(conversionMap, offset, mapAll));
+            }
+        }
 
-      if (TkComponent.class.isAssignableFrom(obj.getClass())) {
-         TkComponent<?> another = (TkComponent<?>) obj;
+        if (another.annotations != null) {
+            this.annotations = new ArrayList<TkRefexAbstractMember<?>>(another.annotations.size());
 
-         // =========================================================
-         // Compare properties of 'this' class to the 'another' class
-         // =========================================================
-         // Compare primordialComponentUuid
-         if (!this.primordialUuid.equals(another.primordialUuid)) {
+            for (TkRefexAbstractMember<?> r : another.annotations) {
+                this.annotations.add((TkRefexAbstractMember<?>) r.makeConversion(conversionMap, offset, mapAll));
+            }
+        }
+
+        this.primordialUuid = conversionMap.get(another.primordialUuid);
+
+        if (another.revisions != null) {
+            this.revisions = new ArrayList<V>(another.revisions.size());
+
+            for (V r : another.revisions) {
+                this.revisions.add((V) r.makeConversion(conversionMap, offset, mapAll));
+            }
+        }
+    }
+
+    /**
+     * Instantiates a new TK Component based on a
+     * <code>componentVersion</code> and allows for uuid conversion. Can exclude
+     * components based on their nid.
+     *
+     * @param componentVersion the component version specifying how to construct
+     * this TK Component
+     * @param excludedNids the nids in the specified component version to
+     * exclude from this TK Component
+     * @param conversionMap the map for converting from one set of uuids to
+     * another
+     * @param offset the offset to be applied to the time associated with this
+     * TK Component
+     * @param mapAll set to <code>true</code> to map all the uuids in this TK
+     * Component based on the conversion map
+     * @param viewCoordinate the view coordinate specifying which version of the
+     * components to use
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws ContradictionException if more than one version of a component is
+     * found for the specified view coordinate
+     */
+    public TkComponent(ComponentVersionBI componentVersion, NidBitSetBI excludedNids, Map<UUID, UUID> conversionMap,
+            long offset, boolean mapAll, ViewCoordinate viewCoordinate)
+            throws IOException, ContradictionException {
+        super(componentVersion, conversionMap, offset, mapAll);
+
+        Collection<? extends IdBI> anotherAdditionalIds = componentVersion.getAdditionalIds();
+
+        if (anotherAdditionalIds != null) {
+            this.additionalIds = new ArrayList<TkIdentifier>(anotherAdditionalIds.size());
+            nextId:
+            for (IdBI id : anotherAdditionalIds) {
+                for (int nid : id.getAllNidsForId()) {
+                    if (excludedNids.isMember(nid) || (Ts.get().getComponent(nid) == null)) {
+                        continue nextId;
+                    } else if (Ts.get().getComponent(nid).getVersions(viewCoordinate).isEmpty()) {
+                        continue nextId;
+                    }
+                }
+
+                this.additionalIds.add((TkIdentifier) TkIdentifier.convertId(id).makeConversion(conversionMap,
+                        offset, mapAll));
+            }
+        }
+
+        Collection<? extends RefexChronicleBI<?>> anotherAnnotations = componentVersion.getAnnotations();
+
+        processAnnotations(anotherAnnotations, viewCoordinate, excludedNids, conversionMap);
+        this.primordialUuid = conversionMap.get(componentVersion.getPrimUuid());
+    }
+
+    //~--- methods -------------------------------------------------------------
+    /**
+     * Compares this object to the specified object. The result is <tt>true</tt>
+     * if and only if the argument is not <tt>null</tt>, is a
+     * <tt>EComponent</tt> object, and contains the same values, field by field,
+     * as this <tt>EComponent</tt>.
+     *
+     * @param obj the object to compare with.
+     * @return <code>true</code> if the objects are the same; <code>false</code>
+     * otherwise.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
             return false;
-         }
+        }
 
-         // Compare additionalIdComponents
-         if (this.additionalIds == null) {
-            if (another.additionalIds == null) {             // Equal!
-            } else if (another.additionalIds.isEmpty()) {    // Equal!
-            } else {
-               return false;
+        if (TkComponent.class.isAssignableFrom(obj.getClass())) {
+            TkComponent<?> another = (TkComponent<?>) obj;
+
+            // =========================================================
+            // Compare properties of 'this' class to the 'another' class
+            // =========================================================
+            // Compare primordialComponentUuid
+            if (!this.primordialUuid.equals(another.primordialUuid)) {
+                return false;
             }
-         } else if (!this.additionalIds.equals(another.additionalIds)) {
-            return false;
-         }
 
-         // Compare extraVersions
-         if (this.revisions == null) {
-            if (another.revisions == null) {                 // Equal!
-            } else if (another.revisions.isEmpty()) {        // Equal!
-            } else {
-               return false;
+            // Compare additionalIdComponents
+            if (this.additionalIds == null) {
+                if (another.additionalIds == null) {             // Equal!
+                } else if (another.additionalIds.isEmpty()) {    // Equal!
+                } else {
+                    return false;
+                }
+            } else if (!this.additionalIds.equals(another.additionalIds)) {
+                return false;
             }
-         } else if (!this.revisions.equals(another.revisions)) {
-            return false;
-         }
 
-         // Compare their parents
-         return super.equals(obj);
-      }
-
-      return false;
-   }
-
-   /**
-    * Returns a hash code for this <code>EComponent</code>.
-    *
-    * @return a hash code value for this <tt>EComponent</tt>.
-    */
-   @Override
-   public int hashCode() {
-      return Arrays.hashCode(new int[] { getPrimordialComponentUuid().hashCode(), statusUuid.hashCode(),
-                                         pathUuid.hashCode(), (int) time, (int) (time >>> 32) });
-   }
-
-   /**
-    * Process annotations.
-    *
-    * @param annotations the annotations
-    * @throws IOException signals that an I/O exception has occurred.
-    */
-   private void processAnnotations(Collection<? extends RefexChronicleBI<?>> annotations) throws IOException {
-      if ((annotations != null) &&!annotations.isEmpty()) {
-         this.annotations = new ArrayList<TkRefexAbstractMember<?>>(annotations.size());
-
-         for (RefexChronicleBI<?> r : annotations) {
-            this.annotations.add(TkConcept.convertRefex(r));
-         }
-      }
-   }
-
-   /**
-    * Process annotations.
-    *
-    * @param annotations the annotations
-    * @param viewCoordinate the view coordinate
-    * @param excludedNids the excluded nids
-    * @param conversionMap the conversion map
-    * @throws IOException signals that an I/O exception has occurred.
-    * @throws ContradictionException the contradiction exception
-    */
-   private void processAnnotations(Collection<? extends RefexChronicleBI<?>> annotations, ViewCoordinate viewCoordinate,
-                                   NidBitSetBI excludedNids, Map<UUID, UUID> conversionMap)
-           throws IOException, ContradictionException {
-      if ((annotations != null) &&!annotations.isEmpty()) {
-         this.annotations = new ArrayList<TkRefexAbstractMember<?>>(annotations.size());
-
-         for (RefexChronicleBI<?> r : annotations) {
-            nextVersion:
-            for (RefexVersionBI v : r.getVersions(viewCoordinate)) {
-               for (int vNid : v.getAllNidsForVersion()) {
-                  if (excludedNids.isMember(vNid) || (Ts.get().getComponent(vNid) == null)) {
-                     continue nextVersion;
-                  } else if (Ts.get().getComponent(vNid).getVersions(viewCoordinate).isEmpty()) {
-                      continue nextVersion;
-                  }
-               }
-
-               this.annotations.add(v.getTkRefsetMemberActiveOnly(viewCoordinate, excludedNids, conversionMap));
+            // Compare extraVersions
+            if (this.revisions == null) {
+                if (another.revisions == null) {                 // Equal!
+                } else if (another.revisions.isEmpty()) {        // Equal!
+                } else {
+                    return false;
+                }
+            } else if (!this.revisions.equals(another.revisions)) {
+                return false;
             }
-         }
-      }
-   }
 
-   /* (non-Javadoc)
-    * @see org.ihtsdo.tk.dto.concept.component.TkRevision#readExternal(java.io.DataInput, int)
-    */
-   @Override
-   public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
-      super.readExternal(in, dataVersion);
-      primordialUuid = new UUID(in.readLong(), in.readLong());
+            // Compare their parents
+            return super.equals(obj);
+        }
 
-      short idVersionCount = in.readShort();
+        return false;
+    }
 
-      assert idVersionCount < 500 : "idVersionCount is: " + idVersionCount;
+    /**
+     * Returns a hash code for this
+     * <code>EComponent</code>.
+     *
+     * @return a hash code value for this <tt>EComponent</tt>.
+     */
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(new int[]{getPrimordialComponentUuid().hashCode(), statusUuid.hashCode(),
+                    pathUuid.hashCode(), (int) time, (int) (time >>> 32)});
+    }
 
-      if (idVersionCount > 0) {
-         additionalIds = new ArrayList<TkIdentifier>(idVersionCount);
+    /**
+     * Adds the specified
+     * <code>annotations</code> to this TK Component.
+     *
+     * @param annotations the annotations to add
+     * @throws IOException signals that an I/O exception has occurred
+     */
+    private void processAnnotations(Collection<? extends RefexChronicleBI<?>> annotations) throws IOException {
+        if ((annotations != null) && !annotations.isEmpty()) {
+            this.annotations = new ArrayList<TkRefexAbstractMember<?>>(annotations.size());
 
-         for (int i = 0; i < idVersionCount; i++) {
-            switch (IDENTIFIER_PART_TYPES.readType(in)) {
-            case LONG :
-               additionalIds.add(new TkIdentifierLong(in, dataVersion));
-
-               break;
-
-            case STRING :
-               additionalIds.add(new TkIdentifierString(in, dataVersion));
-
-               break;
-
-            case UUID :
-               additionalIds.add(new TkIdentifierUuid(in, dataVersion));
-
-               break;
-
-            default :
-               throw new UnsupportedOperationException();
+            for (RefexChronicleBI<?> r : annotations) {
+                this.annotations.add(TkConcept.convertRefex(r));
             }
-         }
-      }
+        }
+    }
 
-      short annotationCount = in.readShort();
+    /**
+     * Adds the specified
+     * <code>annotations</code> to this TK Component based on a
+     * <code>viewCoordinate</code>. Can exclude annotations based on their nid.
+     *
+     * @param annotations the annotations to add
+     * @param viewCoordinate the view coordinate specifying which version of the
+     * annotations to use
+     * @param excludedNids the nids in the specified refex version to exclude
+     * from this TK Component
+     * @param conversionMap the conversion map
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws ContradictionException if more than one version of an annotation
+     * is found for the specified view coordinate
+     */
+    private void processAnnotations(Collection<? extends RefexChronicleBI<?>> annotations, ViewCoordinate viewCoordinate,
+            NidBitSetBI excludedNids, Map<UUID, UUID> conversionMap)
+            throws IOException, ContradictionException {
+        if ((annotations != null) && !annotations.isEmpty()) {
+            this.annotations = new ArrayList<TkRefexAbstractMember<?>>(annotations.size());
 
-      assert annotationCount < 5000 : "annotation count is: " + annotationCount;
+            for (RefexChronicleBI<?> r : annotations) {
+                nextVersion:
+                for (RefexVersionBI v : r.getVersions(viewCoordinate)) {
+                    for (int vNid : v.getAllNidsForVersion()) {
+                        if (excludedNids.isMember(vNid) || (Ts.get().getComponent(vNid) == null)) {
+                            continue nextVersion;
+                        } else if (Ts.get().getComponent(vNid).getVersions(viewCoordinate).isEmpty()) {
+                            continue nextVersion;
+                        }
+                    }
 
-      if (annotationCount > 0) {
-         annotations = new ArrayList<TkRefexAbstractMember<?>>(annotationCount);
-
-         for (int i = 0; i < annotationCount; i++) {
-            TK_REFEX_TYPE type = TK_REFEX_TYPE.readType(in);
-
-            switch (type) {
-            case CID :
-               annotations.add(new TkRefexUuidMember(in, dataVersion));
-
-               break;
-
-            case CID_CID :
-               annotations.add(new TkRefexUuidUuidMember(in, dataVersion));
-
-               break;
-
-            case MEMBER :
-               annotations.add(new TkRefexMember(in, dataVersion));
-
-               break;
-
-            case CID_CID_CID :
-               annotations.add(new TkRefexUuidUuidUuidMember(in, dataVersion));
-
-               break;
-
-            case CID_CID_STR :
-               annotations.add(new TkRefexUuidUuidStringMember(in, dataVersion));
-
-               break;
-
-            case INT :
-               annotations.add(new TkRefexIntMember(in, dataVersion));
-
-               break;
-
-            case STR :
-               annotations.add(new TkRefsetStrMember(in, dataVersion));
-
-               break;
-
-            case CID_INT :
-               annotations.add(new TkRefexUuidIntMember(in, dataVersion));
-
-               break;
-
-            case BOOLEAN :
-               annotations.add(new TkRefexBooleanMember(in, dataVersion));
-
-               break;
-
-            case CID_FLOAT :
-               annotations.add(new TkRefexUuidFloatMember(in, dataVersion));
-
-               break;
-
-            case CID_LONG :
-               annotations.add(new TkRefexUuidLongMember(in, dataVersion));
-
-               break;
-
-            case CID_STR :
-               annotations.add(new TkRefexUuidStringMember(in, dataVersion));
-
-               break;
-
-            case LONG :
-               annotations.add(new TkRefexLongMember(in, dataVersion));
-
-               break;
-                
-            case ARRAY_BYTEARRAY:
-                annotations.add(new TkRefexArrayOfBytearrayMember(in, dataVersion));
-                break;
-            default :
-               throw new UnsupportedOperationException("Can't handle refset type: " + type);
+                    this.annotations.add(v.getTkRefsetMemberActiveOnly(viewCoordinate, excludedNids, conversionMap));
+                }
             }
-         }
-      }
-   }
+        }
+    }
 
-   /**
-    * Returns a string representation of the object.
-    *
-    * @return the string
-    */
-   @Override
-   public String toString() {
-      int depth = 1;
+    /**
+     *
+     * @param in the data input specifying the TK Concept
+     * @param dataVersion the data version of the external source
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws ClassNotFoundException TODO-javadoc: why?
+     */
+    @Override
+    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super.readExternal(in, dataVersion);
+        primordialUuid = new UUID(in.readLong(), in.readLong());
 
-      if (this instanceof TkRefexAbstractMember) {
-         depth = 2;
-      }
+        short idVersionCount = in.readShort();
 
-      StringBuilder buff = new StringBuilder();
+        assert idVersionCount < 500 : "idVersionCount is: " + idVersionCount;
 
-      buff.append(" primordial:");
-      buff.append(this.primordialUuid);
-      buff.append(" xtraIds:");
-      buff.append(this.additionalIds);
-      buff.append(super.toString());
+        if (idVersionCount > 0) {
+            additionalIds = new ArrayList<TkIdentifier>(idVersionCount);
 
-      if ((annotations != null) && (annotations.size() > 0)) {
-         buff.append("\n" + TkConcept.PADDING);
+            for (int i = 0; i < idVersionCount; i++) {
+                switch (IDENTIFIER_PART_TYPES.readType(in)) {
+                    case LONG:
+                        additionalIds.add(new TkIdentifierLong(in, dataVersion));
 
-         for (int i = 0; i < depth; i++) {
-            buff.append(TkConcept.PADDING);
-         }
+                        break;
 
-         buff.append("annotations:\n");
+                    case STRING:
+                        additionalIds.add(new TkIdentifierString(in, dataVersion));
 
-         for (TkRefexAbstractMember m : this.annotations) {
-            buff.append(TkConcept.PADDING);
-            buff.append(TkConcept.PADDING);
+                        break;
+
+                    case UUID:
+                        additionalIds.add(new TkIdentifierUuid(in, dataVersion));
+
+                        break;
+
+                    default:
+                        throw new UnsupportedOperationException();
+                }
+            }
+        }
+
+        short annotationCount = in.readShort();
+
+        assert annotationCount < 5000 : "annotation count is: " + annotationCount;
+
+        if (annotationCount > 0) {
+            annotations = new ArrayList<TkRefexAbstractMember<?>>(annotationCount);
+
+            for (int i = 0; i < annotationCount; i++) {
+                TK_REFEX_TYPE type = TK_REFEX_TYPE.readType(in);
+
+                switch (type) {
+                    case CID:
+                        annotations.add(new TkRefexUuidMember(in, dataVersion));
+
+                        break;
+
+                    case CID_CID:
+                        annotations.add(new TkRefexUuidUuidMember(in, dataVersion));
+
+                        break;
+
+                    case MEMBER:
+                        annotations.add(new TkRefexMember(in, dataVersion));
+
+                        break;
+
+                    case CID_CID_CID:
+                        annotations.add(new TkRefexUuidUuidUuidMember(in, dataVersion));
+
+                        break;
+
+                    case CID_CID_STR:
+                        annotations.add(new TkRefexUuidUuidStringMember(in, dataVersion));
+
+                        break;
+
+                    case INT:
+                        annotations.add(new TkRefexIntMember(in, dataVersion));
+
+                        break;
+
+                    case STR:
+                        annotations.add(new TkRefsetStrMember(in, dataVersion));
+
+                        break;
+
+                    case CID_INT:
+                        annotations.add(new TkRefexUuidIntMember(in, dataVersion));
+
+                        break;
+
+                    case BOOLEAN:
+                        annotations.add(new TkRefexBooleanMember(in, dataVersion));
+
+                        break;
+
+                    case CID_FLOAT:
+                        annotations.add(new TkRefexUuidFloatMember(in, dataVersion));
+
+                        break;
+
+                    case CID_LONG:
+                        annotations.add(new TkRefexUuidLongMember(in, dataVersion));
+
+                        break;
+
+                    case CID_STR:
+                        annotations.add(new TkRefexUuidStringMember(in, dataVersion));
+
+                        break;
+
+                    case LONG:
+                        annotations.add(new TkRefexLongMember(in, dataVersion));
+
+                        break;
+
+                    case ARRAY_BYTEARRAY:
+                        annotations.add(new TkRefexArrayOfBytearrayMember(in, dataVersion));
+                        break;
+                    default:
+                        throw new UnsupportedOperationException("Can't handle refset type: " + type);
+                }
+            }
+        }
+    }
+
+    /**
+     * Returns a string representation of this TK Component object.
+     *
+     * @return a string representation of this TK Component object including its
+     * additional ids and annotations
+     */
+    @Override
+    public String toString() {
+        int depth = 1;
+
+        if (this instanceof TkRefexAbstractMember) {
+            depth = 2;
+        }
+
+        StringBuilder buff = new StringBuilder();
+
+        buff.append(" primordial:");
+        buff.append(this.primordialUuid);
+        buff.append(" xtraIds:");
+        buff.append(this.additionalIds);
+        buff.append(super.toString());
+
+        if ((annotations != null) && (annotations.size() > 0)) {
+            buff.append("\n" + TkConcept.PADDING);
 
             for (int i = 0; i < depth; i++) {
-               buff.append(TkConcept.PADDING);
+                buff.append(TkConcept.PADDING);
             }
 
-            buff.append(m);
-            buff.append("\n");
-         }
-      }
+            buff.append("annotations:\n");
 
-      if ((revisions != null) && (revisions.size() > 0)) {
-         buff.append("\n" + TkConcept.PADDING + "revisions:\n");
+            for (TkRefexAbstractMember m : this.annotations) {
+                buff.append(TkConcept.PADDING);
+                buff.append(TkConcept.PADDING);
 
-         for (TkRevision r : this.revisions) {
-            buff.append(TkConcept.PADDING);
-            buff.append(TkConcept.PADDING);
+                for (int i = 0; i < depth; i++) {
+                    buff.append(TkConcept.PADDING);
+                }
 
-            for (int i = 0; i < depth; i++) {
-               buff.append(TkConcept.PADDING);
+                buff.append(m);
+                buff.append("\n");
             }
+        }
 
-            buff.append(r);
-            buff.append("\n");
-         }
-      }
+        if ((revisions != null) && (revisions.size() > 0)) {
+            buff.append("\n" + TkConcept.PADDING + "revisions:\n");
 
-      return buff.toString();
-   }
+            for (TkRevision r : this.revisions) {
+                buff.append(TkConcept.PADDING);
+                buff.append(TkConcept.PADDING);
 
-   /* (non-Javadoc)
-    * @see org.ihtsdo.tk.dto.concept.component.TkRevision#writeExternal(java.io.DataOutput)
-    */
-   @Override
-   public void writeExternal(DataOutput out) throws IOException {
-      super.writeExternal(out);
-      out.writeLong(primordialUuid.getMostSignificantBits());
-      out.writeLong(primordialUuid.getLeastSignificantBits());
+                for (int i = 0; i < depth; i++) {
+                    buff.append(TkConcept.PADDING);
+                }
 
-      if (additionalIds == null) {
-         out.writeShort(0);
-      } else {
-         assert additionalIds.size() < 500 : "additionalIds is: " + additionalIds.size();
-         out.writeShort(additionalIds.size());
-
-         for (TkIdentifier idv : additionalIds) {
-            idv.getIdType().writeType(out);
-            idv.writeExternal(out);
-         }
-      }
-
-      if (annotations == null) {
-         out.writeShort(0);
-      } else {
-         assert annotations.size() < 500 : "annotation count is: " + annotations.size();
-         out.writeShort(annotations.size());
-
-         for (TkRefexAbstractMember<?> r : annotations) {
-            r.getType().writeType(out);
-            r.writeExternal(out);
-         }
-      }
-   }
-
-   //~--- get methods ---------------------------------------------------------
-
-   /**
-    * Gets the additional id components.
-    *
-    * @return the additional id components
-    */
-   public List<TkIdentifier> getAdditionalIdComponents() {
-      return additionalIds;
-   }
-
-   /**
-    * Gets the annotations.
-    *
-    * @return the annotations
-    */
-   public List<TkRefexAbstractMember<?>> getAnnotations() {
-      return annotations;
-   }
-
-   /**
-    * Gets the e identifiers.
-    *
-    * @return the e identifiers
-    */
-   public List<TkIdentifier> getEIdentifiers() {
-      List<TkIdentifier> ids;
-
-      if (additionalIds != null) {
-         ids = new ArrayList<TkIdentifier>(additionalIds.size() + 1);
-         ids.addAll(additionalIds);
-      } else {
-         ids = new ArrayList<TkIdentifier>(1);
-      }
-
-      ids.add(new TkIdentifierUuid(this.primordialUuid));
-
-      return ids;
-   }
-
-   /**
-    * Gets the id component count.
-    *
-    * @return the id component count
-    */
-   public int getIdComponentCount() {
-      if (additionalIds == null) {
-         return 1;
-      }
-
-      return additionalIds.size() + 1;
-   }
-
-   /**
-    * Gets the primordial component uuid.
-    *
-    * @return the primordial component uuid
-    */
-   public UUID getPrimordialComponentUuid() {
-      return primordialUuid;
-   }
-
-   /**
-    * Gets the revision list.
-    *
-    * @return the revision list
-    */
-   public abstract List<? extends TkRevision> getRevisionList();
-
-   /**
-    * Gets the revisions.
-    *
-    * @return the revisions
-    */
-   public List<V> getRevisions() {
-      return revisions;
-   }
-
-   /**
-    * Gets the uuids.
-    *
-    * @return the uuids
-    */
-   public List<UUID> getUuids() {
-      List<UUID> uuids = new ArrayList<UUID>();
-
-      uuids.add(primordialUuid);
-
-      if (additionalIds != null) {
-         for (TkIdentifier idv : additionalIds) {
-            if (TkIdentifierUuid.class.isAssignableFrom(idv.getClass())) {
-               uuids.add((UUID) idv.getDenotation());
+                buff.append(r);
+                buff.append("\n");
             }
-         }
-      }
+        }
 
-      return uuids;
-   }
+        return buff.toString();
+    }
 
-   /**
-    * Gets the version count.
-    *
-    * @return the version count
-    */
-   public int getVersionCount() {
-      List<? extends TkRevision> extraVersions = getRevisionList();
+    /**
+     *
+     * @param out the data output object that writes to the external source
+     * @throws IOException signals that an I/O exception has occurred
+     */
+    @Override
+    public void writeExternal(DataOutput out) throws IOException {
+        super.writeExternal(out);
+        out.writeLong(primordialUuid.getMostSignificantBits());
+        out.writeLong(primordialUuid.getLeastSignificantBits());
 
-      if (extraVersions == null) {
-         return 1;
-      }
+        if (additionalIds == null) {
+            out.writeShort(0);
+        } else {
+            assert additionalIds.size() < 500 : "additionalIds is: " + additionalIds.size();
+            out.writeShort(additionalIds.size());
 
-      return extraVersions.size() + 1;
-   }
+            for (TkIdentifier idv : additionalIds) {
+                idv.getIdType().writeType(out);
+                idv.writeExternal(out);
+            }
+        }
 
-   //~--- set methods ---------------------------------------------------------
+        if (annotations == null) {
+            out.writeShort(0);
+        } else {
+            assert annotations.size() < 500 : "annotation count is: " + annotations.size();
+            out.writeShort(annotations.size());
 
-   /**
-    * Sets the additional id components.
-    *
-    * @param additionalIdComponents the new additional id components
-    */
-   public void setAdditionalIdComponents(List<TkIdentifier> additionalIdComponents) {
-      this.additionalIds = additionalIdComponents;
-   }
+            for (TkRefexAbstractMember<?> r : annotations) {
+                r.getType().writeType(out);
+                r.writeExternal(out);
+            }
+        }
+    }
 
-   /**
-    * Sets the annotations.
-    *
-    * @param annotations the new annotations
-    */
-   public void setAnnotations(List<TkRefexAbstractMember<?>> annotations) {
-      this.annotations = annotations;
-   }
+    //~--- get methods ---------------------------------------------------------
+    /**
+     * Gets any additional identifiers associated with this TK Component.
+     *
+     * @return the additional identifiers associated with this TK Component
+     */
+    public List<TkIdentifier> getAdditionalIdComponents() {
+        return additionalIds;
+    }
 
-   /**
-    * Sets the primordial component uuid.
-    *
-    * @param primordialComponentUuid the new primordial component uuid
-    */
-   public void setPrimordialComponentUuid(UUID primordialComponentUuid) {
-      this.primordialUuid = primordialComponentUuid;
-   }
+    /**
+     * Gets the annotations associated with this TK Component.
+     *
+     * @return the annotations associated with this TK Component
+     */
+    public List<TkRefexAbstractMember<?>> getAnnotations() {
+        return annotations;
+    }
 
-   /**
-    * Sets the revisions.
-    *
-    * @param revisions the new revisions
-    */
-   public void setRevisions(List<V> revisions) {
-      this.revisions = revisions;
-   }
+    /**
+     * Gets the identifiers associated with this TK Component, including the
+     * additional identifiers and the primordial uuid.
+     *
+     * @return the e identifiers associated with this TK Component
+     */
+    public List<TkIdentifier> getEIdentifiers() {
+        List<TkIdentifier> ids;
+
+        if (additionalIds != null) {
+            ids = new ArrayList<TkIdentifier>(additionalIds.size() + 1);
+            ids.addAll(additionalIds);
+        } else {
+            ids = new ArrayList<TkIdentifier>(1);
+        }
+
+        ids.add(new TkIdentifierUuid(this.primordialUuid));
+
+        return ids;
+    }
+
+    /**
+     * Gets the number of ids associated with this TK Component, including the primordial uuid.
+     *
+     * @return an int representing the number of ids associated with this component
+     */
+    public int getIdComponentCount() {
+        if (additionalIds == null) {
+            return 1;
+        }
+
+        return additionalIds.size() + 1;
+    }
+
+    /**
+     * Gets the primordial uuid associated with this TK Component.
+     *
+     * @return the primordial uuid associated with this TK Component
+     */
+    public UUID getPrimordialComponentUuid() {
+        return primordialUuid;
+    }
+
+    /**
+     * Gets a list of revisions associated with this TK Component.
+     *
+     * @return a list of revisions on this TK Component
+     */
+    public abstract List<? extends TkRevision> getRevisionList();
+
+    /**
+     * Gets the versions associated with this TK Component.
+     *
+     * @return the versions of this TK Component
+     */
+    public List<V> getRevisions() {
+        return revisions;
+    }
+
+    /**
+     * Gets all of the uuids associated with this TK Component.
+     *
+     * @return the uuids associated with this TK Component
+     */
+    public List<UUID> getUuids() {
+        List<UUID> uuids = new ArrayList<UUID>();
+
+        uuids.add(primordialUuid);
+
+        if (additionalIds != null) {
+            for (TkIdentifier idv : additionalIds) {
+                if (TkIdentifierUuid.class.isAssignableFrom(idv.getClass())) {
+                    uuids.add((UUID) idv.getDenotation());
+                }
+            }
+        }
+
+        return uuids;
+    }
+
+    /**
+     * Gets the number of versions associated with this TK Component.
+     *
+     * @return an int representing the number of versions
+     */
+    public int getVersionCount() {
+        List<? extends TkRevision> extraVersions = getRevisionList();
+
+        if (extraVersions == null) {
+            return 1;
+        }
+
+        return extraVersions.size() + 1;
+    }
+
+    //~--- set methods ---------------------------------------------------------
+    /**
+     * Sets the additional identifiers associated with this TK Component.
+     *
+     * @param additionalIdComponents the TK Identifiers for this TK Component
+     */
+    public void setAdditionalIdComponents(List<TkIdentifier> additionalIdComponents) {
+        this.additionalIds = additionalIdComponents;
+    }
+
+    /**
+     * Sets the annotations associated with this TK Component.
+     *
+     * @param annotations the TK Refex Memembers for this TK Component
+     */
+    public void setAnnotations(List<TkRefexAbstractMember<?>> annotations) {
+        this.annotations = annotations;
+    }
+
+    /**
+     * Sets the primordial uuid associated with this TK Component.
+     *
+     * @param primordialComponentUuid the primordial uuid of this TK Component
+     */
+    public void setPrimordialComponentUuid(UUID primordialComponentUuid) {
+        this.primordialUuid = primordialComponentUuid;
+    }
+
+    /**
+     * Sets the versions associated with this TK Component.
+     *
+     * @param revisions the TK Revisions associated with this TK Component
+     */
+    public void setRevisions(List<V> revisions) {
+        this.revisions = revisions;
+    }
 }

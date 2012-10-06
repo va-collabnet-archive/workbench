@@ -77,7 +77,7 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
     * Instantiates a new uuid dup reporter.
     *
     * @param dupUuids the dup uuids
-    * @throws IOException signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred
     */
    public UuidDupReporter(ConcurrentSkipListSet<UUID> dupUuids) throws IOException {
       this.dupUuids = dupUuids;
@@ -96,7 +96,7 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
     * Adds the if dup.
     *
     * @param component the component
-    * @throws IOException signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred
     */
    private void addIfDup(ComponentChronicleBI component) throws IOException {
       UUID primUuid = component.getPrimUuid();
@@ -132,7 +132,7 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
     * Process concept.
     *
     * @param concept the concept
-    * @throws IOException signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred
     */
    private void processConcept(ConceptChronicleBI concept) throws IOException {
 
@@ -146,7 +146,7 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
       }
 
       // relationships
-      for (RelationshipChronicleBI rel : concept.getRelationshipsSource()) {
+      for (RelationshipChronicleBI rel : concept.getRelationshipsOutgoing()) {
          addIfDup(rel);
       }
 

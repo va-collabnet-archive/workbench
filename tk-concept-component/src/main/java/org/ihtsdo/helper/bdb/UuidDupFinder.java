@@ -81,7 +81,7 @@ public class UuidDupFinder implements ProcessUnfetchedConceptDataBI {
     /**
      * Instantiates a new uuid dup finder.
      *
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException the class not found exception
      */
     public UuidDupFinder() throws IOException, ClassNotFoundException {
@@ -93,7 +93,7 @@ public class UuidDupFinder implements ProcessUnfetchedConceptDataBI {
      * Adds the to uuid list.
      *
      * @param component the component
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     private void addToUuidList(ComponentChronicleBI component) throws IOException {
         if (component != null) {
@@ -123,7 +123,7 @@ public class UuidDupFinder implements ProcessUnfetchedConceptDataBI {
      * Process concept.
      *
      * @param concept the concept
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     private void processConcept(ConceptChronicleBI concept) throws IOException {
 
@@ -137,7 +137,7 @@ public class UuidDupFinder implements ProcessUnfetchedConceptDataBI {
         }
 
         // relationships
-        for (RelationshipChronicleBI rel : concept.getRelationshipsSource()) {
+        for (RelationshipChronicleBI rel : concept.getRelationshipsOutgoing()) {
             addToUuidList(rel);
         }
 
@@ -178,7 +178,7 @@ public class UuidDupFinder implements ProcessUnfetchedConceptDataBI {
     /**
      * Write dup file.
      *
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public void writeDupFile() throws IOException {
         count.set(0);

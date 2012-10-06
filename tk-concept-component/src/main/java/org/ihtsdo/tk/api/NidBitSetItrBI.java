@@ -20,7 +20,7 @@ import java.io.IOException;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Interface NidBitSetItrBI. TODO-javadoc: ?
+ * The Interface NidBitSetItrBI. TODO-javadoc: need overview
  */
 public interface NidBitSetItrBI {
     
@@ -38,7 +38,7 @@ public interface NidBitSetItrBI {
      * there is such a nid.
      *
      * @return <code>true</code>, if successful
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public boolean next() throws IOException;
 
@@ -64,7 +64,7 @@ public interface NidBitSetItrBI {
      *
      * @param targetNid the target nid
      * @return <code>true</code>, if successful
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public boolean skipTo(int targetNid) throws IOException;
 

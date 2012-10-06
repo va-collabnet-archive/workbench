@@ -23,7 +23,8 @@ import java.util.ListIterator;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Interface NidListBI.
+ * The Interface NidListBI. All implementations must serialize the list as uuids.
+ * TODO-javadoc: udpate
  */
 public interface NidListBI {
 

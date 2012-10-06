@@ -62,7 +62,7 @@ public class DescriptionCAB extends CreateOrAmendBlueprint {
      * @param langCode the lang code
      * @param text the text
      * @param initialCaseSignificant the initial case significant
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -82,7 +82,7 @@ public class DescriptionCAB extends CreateOrAmendBlueprint {
      * @param langCode the lang code
      * @param text the text
      * @param initialCaseSignificant the initial case significant
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -103,7 +103,7 @@ public class DescriptionCAB extends CreateOrAmendBlueprint {
      * @param initialCaseSignificant the initial case significant
      * @param descriptionVersion the description version
      * @param viewCoordinate the view coordinate
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -125,7 +125,7 @@ public class DescriptionCAB extends CreateOrAmendBlueprint {
      * @param initialCaseSignificant the initial case significant
      * @param descriptionVersion the description version
      * @param viewCoordinate the view coordinate
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -148,7 +148,7 @@ public class DescriptionCAB extends CreateOrAmendBlueprint {
      * @param componentUuid the component uuid
      * @param descriptionVersion the description version
      * @param viewCoordinate the view coordinate
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -208,7 +208,7 @@ public class DescriptionCAB extends CreateOrAmendBlueprint {
      * Gets the type nid.
      *
      * @return the type nid
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public int getTypeNid() throws IOException {
         return Ts.get().getNidForUuids(typeUuid);
@@ -218,7 +218,7 @@ public class DescriptionCAB extends CreateOrAmendBlueprint {
      * Gets the concept nid.
      *
      * @return the concept nid
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public int getConceptNid() throws IOException {
         return Ts.get().getNidForUuids(conceptUuid);
@@ -283,7 +283,7 @@ public class DescriptionCAB extends CreateOrAmendBlueprint {
      *
      * @param DescriptionVersion the description version
      * @return <code>true</code>, if successful
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public boolean validate(DescriptionVersionBI DescriptionVersion) throws IOException {
         if (DescriptionVersion.getStatusNid() != getStatusNid()) {

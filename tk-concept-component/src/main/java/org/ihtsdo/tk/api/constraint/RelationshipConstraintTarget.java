@@ -38,7 +38,7 @@ public class RelationshipConstraintTarget extends RelationshipConstraint {
      * Write object.
      *
      * @param out the out
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -48,7 +48,7 @@ public class RelationshipConstraintTarget extends RelationshipConstraint {
      * Read object.
      *
      * @param in the in
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException the class not found exception
      */
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {

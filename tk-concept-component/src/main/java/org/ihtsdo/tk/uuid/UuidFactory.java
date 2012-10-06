@@ -37,7 +37,7 @@ public class UuidFactory {
      */
     public static UUID getUuidFromAlternateId(UUID authorityUuid, String altId) {
         try {
-            if (authorityUuid.equals(TermAux.SNOMED_IDENTIFIER.getUuids()[0])) {
+            if (authorityUuid.equals(TermAux.SCT_ID_AUTHORITY.getUuids()[0])) {
                 return UuidT3Generator.fromSNOMED(altId);
             }
             return UuidT5Generator.get(authorityUuid, altId);

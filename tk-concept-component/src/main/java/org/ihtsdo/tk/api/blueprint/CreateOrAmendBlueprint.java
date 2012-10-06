@@ -116,7 +116,7 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
      * @param componentUuid the component uuid
      * @param componentVersion the component version
      * @param viewCoordinate the view coordinate
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -146,7 +146,7 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
      *
      * @throws NoSuchAlgorithmException the no such algorithm exception
      * @throws UnsupportedEncodingException the unsupported encoding exception
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -179,7 +179,7 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
      *
      * @param nid the nid
      * @return the primoridal uuid string
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      */
     protected String getPrimoridalUuidString(int nid)
@@ -200,7 +200,7 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
      *
      * @param uuid the uuid
      * @return the primoridal uuid string
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      */
     protected String getPrimoridalUuidString(UUID uuid)
@@ -248,7 +248,7 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
      * Gets the component nid.
      *
      * @return the component nid
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public int getComponentNid() throws IOException {
         return Ts.get().getNidForUuids(componentUuid);
@@ -258,7 +258,7 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
      * Returns list of annotation blueprints, gets list from original component if null.
      *
      * @return the annotation blueprints from original
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -280,7 +280,7 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
      * Gets the annotation blueprints.
      *
      * @return the annotation blueprints
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -319,7 +319,7 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
      * Gets the status nid.
      *
      * @return the status nid
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public int getStatusNid() throws IOException {
         return Ts.get().getNidForUuids(statusUuid);

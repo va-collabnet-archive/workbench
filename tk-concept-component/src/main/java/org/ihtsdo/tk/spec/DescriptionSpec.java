@@ -43,7 +43,7 @@ public class DescriptionSpec implements SpecBI {
      * Write object.
      *
      * @param out the out
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -56,7 +56,7 @@ public class DescriptionSpec implements SpecBI {
      * Read object.
      *
      * @param in the in
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException the class not found exception
      */
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -144,7 +144,7 @@ public class DescriptionSpec implements SpecBI {
 	 *
 	 * @param viewCoordinate the view coordinate
 	 * @return the description version bi
-	 * @throws IOException signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred
 	 */
 	public DescriptionVersionBI get(ViewCoordinate viewCoordinate) throws IOException {
 		ConceptVersionBI concept = conceptSpec.get(viewCoordinate);

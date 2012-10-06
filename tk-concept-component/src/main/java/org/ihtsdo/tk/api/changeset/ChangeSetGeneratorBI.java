@@ -31,7 +31,7 @@ public interface ChangeSetGeneratorBI {
      * Open.
      *
      * @param commitStampNids the commit stamp nids
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public void open(NidSetBI commitStampNids) throws IOException;
 
@@ -40,7 +40,7 @@ public interface ChangeSetGeneratorBI {
      *
      * @param conceptChronicle the concept chronicle
      * @param time the time
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public void writeChanges(ConceptChronicleBI conceptChronicle, long time) throws IOException;
     
@@ -54,7 +54,7 @@ public interface ChangeSetGeneratorBI {
     /**
      * Commit.
      *
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public void commit() throws IOException;
 

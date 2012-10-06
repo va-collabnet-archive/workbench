@@ -50,7 +50,7 @@ public class ConceptSpec implements SpecBI {
      * Write object.
      *
      * @param out the out
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -63,7 +63,7 @@ public class ConceptSpec implements SpecBI {
      * Read object.
      *
      * @param in the in
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException the class not found exception
      */
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -154,7 +154,7 @@ public class ConceptSpec implements SpecBI {
      *
      * @return the lenient
      * @throws ValidationException the validation exception
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public ConceptChronicleBI getLenient() throws ValidationException, IOException {
         try {
@@ -183,7 +183,7 @@ public class ConceptSpec implements SpecBI {
      * @param viewCoordinate the view coordinate
      * @return the strict
      * @throws ValidationException the validation exception
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public ConceptVersionBI getStrict(ViewCoordinate viewCoordinate) throws ValidationException, IOException {
         try {
@@ -212,7 +212,7 @@ public class ConceptSpec implements SpecBI {
      *
      * @param viewCoordinate the view coordinate
      * @return the concept version bi
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @deprecated Use getStrict or getLienient instead.
      */
     @Deprecated
@@ -225,7 +225,7 @@ public class ConceptSpec implements SpecBI {
      *
      * @param conceptVersion the concept version
      * @param viewCoordinate the view coordinate
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     private void validateRelationships(ConceptVersionBI conceptVersion, ViewCoordinate viewCoordinate) throws IOException {
         if (relSpecs == null || relSpecs.length == 0) {
@@ -253,7 +253,7 @@ public class ConceptSpec implements SpecBI {
      * Validate relationships.
      *
      * @param conceptChronicle the concept chronicle
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     private void validateRelationships(ConceptChronicleBI conceptChronicle) throws IOException {
         if (relSpecs == null || relSpecs.length == 0) {
@@ -268,7 +268,7 @@ public class ConceptSpec implements SpecBI {
             NidSetBI typeNids = new NidSet();
             typeNids.add(relType.getNid());
 
-            for (RelationshipChronicleBI rel : conceptChronicle.getRelationshipsSource()) {
+            for (RelationshipChronicleBI rel : conceptChronicle.getRelationshipsOutgoing()) {
                 for (RelationshipVersionBI rv : rel.getVersions()) {
                     if (rv.getTypeNid() == relType.getNid()
                             && rv.getTargetNid() == destination.getNid()) {
@@ -284,7 +284,7 @@ public class ConceptSpec implements SpecBI {
      * Validate description.
      *
      * @param conceptChronicle the concept chronicle
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException the contradiction exception
      */
     private void validateDescription(ConceptChronicleBI conceptChronicle) throws IOException, ContradictionException {
@@ -310,7 +310,7 @@ public class ConceptSpec implements SpecBI {
      *
      * @param conceptVersion the concept version
      * @param viewCoordinate the view coordinate
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException the contradiction exception
      */
     private void validateDescription(ConceptVersionBI conceptVersion, ViewCoordinate viewCoordinate) throws IOException, ContradictionException {

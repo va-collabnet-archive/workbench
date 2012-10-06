@@ -22,7 +22,7 @@ import org.ihtsdo.tk.api.ComponentChronicleBI;
  * The Interface DescriptionChronicleBI represents the collection of description
  * versions.
  *
- * TODO-javadoc: anything else?
+ * TODO-javadoc: match concept attributes
  *
  * @see ComponentChronicleBI
  */

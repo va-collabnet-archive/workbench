@@ -38,7 +38,7 @@ public interface WorkflowHandlerBI {
 	 * @param concept the concept
 	 * @param ViewCoordinate the view coordinate
 	 * @return the available workflow actions
-	 * @throws IOException signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred
 	 * @throws ContradictionException the contradiction exception
 	 */
 	public Collection<? extends WorkflowHistoryJavaBeanBI> getAvailableWorkflowActions(ConceptVersionBI concept, ViewCoordinate ViewCoordinate) throws IOException, ContradictionException;
@@ -56,7 +56,7 @@ public interface WorkflowHandlerBI {
 	 * @param beans the beans
 	 * @param actionSpec the action spec
 	 * @return <code>true</code>, if successful
-	 * @throws IOException signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred
 	 * @throws ContradictionException the contradiction exception
 	 */
 	public boolean hasAction(Collection<? extends WorkflowHistoryJavaBeanBI> beans, ConceptSpec actionSpec) throws IOException, ContradictionException;

@@ -88,7 +88,7 @@ public class EConceptToRF2UuidTransformer implements EConceptTransformerBI {
     * @param country the country
     * @param namespace the namespace
     * @param effectiveDate the effective date
-    * @throws IOException signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred
     */
    public EConceptToRF2UuidTransformer(File directory, ReleaseType releaseType, LANG_CODE language,
                              COUNTRY_CODE country, String namespace, Date effectiveDate)
@@ -216,7 +216,7 @@ public class EConceptToRF2UuidTransformer implements EConceptTransformerBI {
     * Process concept attribute.
     *
     * @param ca the ca
-    * @throws IOException signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred
     */
    private void processConceptAttribute(TkConceptAttributes ca) throws IOException {
       if (ca != null) {
@@ -288,7 +288,7 @@ public class EConceptToRF2UuidTransformer implements EConceptTransformerBI {
     * Process description.
     *
     * @param desc the desc
-    * @throws IOException signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred
     */
    private void processDescription(TkDescription desc) throws IOException {
       if (desc != null) {
@@ -400,7 +400,7 @@ public class EConceptToRF2UuidTransformer implements EConceptTransformerBI {
     * Process relationship.
     *
     * @param r the r
-    * @throws IOException signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred
     */
    private void processRelationship(TkRelationship r) throws IOException {
       if (r != null) {

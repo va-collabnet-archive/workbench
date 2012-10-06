@@ -24,7 +24,7 @@ import org.ihtsdo.tk.spec.RelationshipSpec;
  */
 public class SnomedRelationshipSpec {
 	
-	/** The finding site. */
+	/**  TODO */
 	public static RelationshipSpec FINDING_SITE = 
 		new RelationshipSpec(Taxonomies.SNOMED, 
 					SnomedRelationshipType.FINDING_SITE, 

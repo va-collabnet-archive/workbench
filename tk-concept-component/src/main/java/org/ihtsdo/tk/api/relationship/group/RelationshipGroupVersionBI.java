@@ -29,20 +29,20 @@ import java.util.Collection;
 /**
  * The Interface RelationshipGroupVersionBI provides methods for interacting
  * with a version of a relationship group.
+ *
  * 
- * TODO-javadoc: all these methods seem to return what is on the chronicle rather than on the version,
- * why are they on the version? or why aren't they returning relationship from the version?
+ * TODO-javadoc: look at else for if view coordinate != null in implementation
  */
 public interface RelationshipGroupVersionBI extends RelationshipGroupChronicleBI, ComponentVersionBI {
 
     /**
-     * Gets all the active relationships found in this group. If the
+     * Gets all the active relationships found in this group for any versions specified by the <code>viewCoordinate</code>. If the
      * relationship group version contains a
-     * <code>viewCoordinate</code> all active relationships found using that
-     * <code>viewCoordinate</code> will be returned, regardless of which
-     * <code>RelationshipGroupVersion</code> the are found in. If relationship
-     * group version does not contain a
-     * <code>viewCoordinate</code>, all active relationships found in any
+     * <code>viewCoordinate</code> all active relationships found or any
+     * versions using that
+     * <code>viewCoordinate</code> will be returned. If relationship group
+     * version does not contain a
+     * <code>viewCoordinate</code>, all relationships for this rel group number found in any
      * version will be returned.
      *
      * @return active relationships found in the relationship group chronicle
@@ -51,7 +51,9 @@ public interface RelationshipGroupVersionBI extends RelationshipGroupChronicleBI
     Collection<? extends RelationshipVersionBI> getRelationshipsActiveAllVersions();
 
     /**
-     * Gets all the relationships found in this relationship group version regardless of status.
+     * Gets all the relationships found in this relationship group version
+     * regardless of status. If the relationship group version does not have a
+     * <code>viewCoordinate</code>, all versions for this rel group number found on the rel group chronicle will be returned.
      *
      * @return all the relationships in this version of the relationship group
      * @throws ContradictionException the contradiction exception
@@ -59,10 +61,16 @@ public interface RelationshipGroupVersionBI extends RelationshipGroupChronicleBI
     Collection<? extends RelationshipVersionBI> getRelationshipsAll() throws ContradictionException;
 
     /**
-     * Gets the relationships active.
+     * Gets all the active relationships found in this group for the verions specified by the <code>viewCoordinate</code>. If the
+     * relationship group version contains a
+     * <code>viewCoordinate</code> all active relationships found on that version will be returned. If relationship group
+     * version does not contain a
+     * <code>viewCoordinate</code>, all relationships for this rel group number found in any
+     * version will be returned.
      *
-     * @return the relationships active
-     * @throws ContradictionException the contradiction exception
+     * @return active relationships found in the relationship group chronicle
+     * associated that contains this relationship group version
+     * @throws ContradictionException if more than one version is found for the specified view coordinate
      */
     Collection<? extends RelationshipVersionBI> getRelationshipsActive() throws ContradictionException;
 }

@@ -61,7 +61,7 @@ public class TkRefexBooleanMember extends TkRefexAbstractMember<TkRefexBooleanRe
      *
      * @param refexBooleanVersion the refex boolean version
      * @param revisionHandling the revision handling
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public TkRefexBooleanMember(RefexBooleanVersionBI refexBooleanVersion,
             RevisionHandling revisionHandling) throws IOException {
@@ -98,7 +98,7 @@ public class TkRefexBooleanMember extends TkRefexAbstractMember<TkRefexBooleanRe
      * Instantiates a new tk refex boolean member.
      *
      * @param refexChronicle the refex chronicle
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public TkRefexBooleanMember(RefexChronicleBI refexChronicle) throws IOException {
         this((RefexBooleanVersionBI) refexChronicle.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
@@ -109,7 +109,7 @@ public class TkRefexBooleanMember extends TkRefexAbstractMember<TkRefexBooleanRe
      *
      * @param in the in
      * @param dataVersion the data version
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException the class not found exception
      */
     public TkRefexBooleanMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -140,7 +140,7 @@ public class TkRefexBooleanMember extends TkRefexAbstractMember<TkRefexBooleanRe
      * @param offset the offset
      * @param mapAll the map all
      * @param viewCoordinate the view coordinate
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException the contradiction exception
      */
     public TkRefexBooleanMember(RefexBooleanVersionBI refexBooleanVersion, NidBitSetBI excludedNids,

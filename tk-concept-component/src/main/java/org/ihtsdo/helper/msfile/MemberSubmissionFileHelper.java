@@ -48,7 +48,7 @@ public class MemberSubmissionFileHelper {
      *
      * @param member the member
      * @param memberFile the member file
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public static void lazyInit(String member, File memberFile)
             throws IOException {
@@ -74,7 +74,7 @@ public class MemberSubmissionFileHelper {
      * @param member the member
      * @param msFile the ms file
      * @return the ms file set
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public static Set<String> getMsFileSet(String member, File msFile) throws IOException {
         lazyInit(member, msFile);

@@ -77,7 +77,7 @@ public interface RelationshipVersionBI<A extends RelationshipAnalogBI>
      * relationship to make a blueprint of
      * @return the relationship blueprint, which can be constructed to create
      * a <code>RelationshipChronicleBI</code>
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException if more than one version of the
      * description was returned for the specified view coordinate
      * @throws InvalidCAB if the any of the values in blueprint to make are invalid

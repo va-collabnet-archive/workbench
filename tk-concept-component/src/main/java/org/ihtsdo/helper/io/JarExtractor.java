@@ -65,7 +65,7 @@ public class JarExtractor {
      *
      * @param source the source
      * @param destDir the dest dir
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
 
     public static void execute(File source, File destDir) throws IOException {
@@ -87,7 +87,7 @@ public class JarExtractor {
      *
      * @param source the source
      * @param destDir the dest dir
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     private static void executeJarFile(File source, File destDir) throws IOException {
         destDir.mkdirs();
@@ -123,7 +123,7 @@ public class JarExtractor {
      *
      * @param source the source
      * @param destDir the dest dir
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     private static void executeJarInputStream(File source, File destDir) throws IOException {
         destDir.mkdirs();

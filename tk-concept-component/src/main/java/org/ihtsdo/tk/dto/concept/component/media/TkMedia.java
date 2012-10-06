@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.tk.dto.concept.component.media;
 
@@ -37,52 +37,73 @@ import org.ihtsdo.tk.dto.RevisionHandling;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Class TkMedia.
+ * The Class TkMedia represents a type of media in the eConcept format and
+ * contains methods for interacting with a type of media. Further discussion of
+ * the eConcept format can be found on
+ * <code>TkConcept</code>.
+ *
+ * @see TkConcept
+ * @param <V> the value type
  */
 public class TkMedia extends TkComponent<TkMediaRevision> {
 
-    /** The Constant serialVersionUID. */
+    /**
+     * The Constant serialVersionUID, used to prevent the class from computing
+     * its own serialVersionUID based on a hash of all the method signatures.
+     */
     public static final long serialVersionUID = 1;
     //~--- fields --------------------------------------------------------------
-    /** The concept uuid. */
+    /**
+     * The the uuid of the enclosing concept.
+     */
     public UUID conceptUuid;
-    
-    /** The data bytes. */
+    /**
+     * The data bytes. TODO-javadoc: what's this?
+     */
     public byte[] dataBytes;
-    
-    /** The format. */
+    /**
+     * The String representing the format of this media.
+     */
     public String format;
-    
-    /** The text description. */
+    /**
+     * The text associated with a description of the media.
+     */
     public String textDescription;
-    
-    /** The type uuid. */
+    /**
+     * The uuid representing the type of media.
+     */
     public UUID typeUuid;
 
     //~--- constructors --------------------------------------------------------
     /**
-     * Instantiates a new tk media.
+     * Instantiates a new TK Media.
      */
     public TkMedia() {
         super();
     }
 
     /**
-     * Instantiates a new tk media.
+     * Instantiates a new TK Media based on the
+     * <code>mediaChronicle</code>.
      *
-     * @param mediaChronicle the media chronicle
-     * @throws IOException signals that an I/O exception has occurred.
+     * @param mediaChronicle the media chronicle specifying how to construct
+     * this TK Media
+     * @throws IOException signals that an I/O exception has occurred
      */
     public TkMedia(MediaChronicleBI mediaChronicle) throws IOException {
         this(mediaChronicle.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
     }
 
     /**
-     * Instantiates a new tk media.
+     * Instantiates a new TK Media based on the
+     * <code>descriptionVersion</code> and using the given
+     * <code>revisionHandling</code>.
      *
-     * @param mediaVersion the media version
-     * @param revisionHandling the revision handling
-     * @throws IOException signals that an I/O exception has occurred.
+     * @param mediaVersion the media version specifying how to construct this TK
+     * Media
+     * @param revisionHandling specifying if addition versions should be
+     * included or not
+     * @throws IOException signals that an I/O exception has occurred
      */
     public TkMedia(MediaVersionBI mediaVersion,
             RevisionHandling revisionHandling) throws IOException {
@@ -118,11 +139,12 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
     }
 
     /**
-     * Instantiates a new tk media.
+     * Instantiates a new TK Media based on the specified data input,
+     * <code>in</code>.
      *
-     * @param in the in
-     * @param dataVersion the data version
-     * @throws IOException signals that an I/O exception has occurred.
+     * @param in the data input specifying how to construct this TK Media
+     * @param dataVersion the data version of the external source
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException the class not found exception
      */
     public TkMedia(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -131,12 +153,16 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
     }
 
     /**
-     * Instantiates a new tk media.
+     * Instantiates a new TK Media based on
+     * <code>another</code> TK Media and allows for uuid conversion.
      *
-     * @param another the another
-     * @param conversionMap the conversion map
-     * @param offset the offset
-     * @param mapAll the map all
+     * @param another the TK Media specifying how to construct this TK Media
+     * @param conversionMap the map for converting from one set of uuids to
+     * another
+     * @param offset the offset to be applied to the time associated with this
+     * TK Media
+     * @param mapAll set to <code>true</code> to map all the uuids in this TK
+     * Media based on the conversion map
      */
     public TkMedia(TkMedia another, Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
         super(another, conversionMap, offset, mapAll);
@@ -157,16 +183,24 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
     }
 
     /**
-     * Instantiates a new tk media.
+     * Instantiates a new TK Media based on a
+     * <code>mediaVersion</code> and allows for uuid conversion. Can exclude
+     * components based on their nid.
      *
-     * @param mediaVersion the media version
-     * @param excludedNids the excluded nids
-     * @param conversionMap the conversion map
-     * @param offset the offset
-     * @param mapAll the map all
+     * @param mediaVersion the media version specifying how to construct this TK
+     * Description
+     * @param excludedNids the nids in the specified component version to
+     * exclude from this TK Media
+     * @param conversionMap the map for converting from one set of uuids to
+     * another
+     * @param offset the offset to be applied to the time associated with this
+     * TK Media
+     * @param mapAll set to <code>true</code> to map all the uuids in this TK
+     * Media based on the conversion map
      * @param viewCoordinate the view coordinate
-     * @throws IOException signals that an I/O exception has occurred.
-     * @throws ContradictionException the contradiction exception
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws ContradictionException if more than one version of a component is
+     * found for the specified view coordinate
      */
     public TkMedia(MediaVersionBI mediaVersion, NidBitSetBI excludedNids, Map<UUID, UUID> conversionMap, long offset,
             boolean mapAll, ViewCoordinate viewCoordinate)
@@ -188,14 +222,14 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
 
     //~--- methods -------------------------------------------------------------
     /**
-     * Compares this object to the specified object. The result is <tt>true</tt> if and only if the argument
-     * is not <tt>null</tt>, is a <tt>EImage</tt> object, and contains the same values, field by field, as
-     * this <tt>EImage</tt>.
+     * Compares this object to the specified object. The result is <tt>true</tt>
+     * if and only if the argument is not <tt>null</tt>, is a <tt>EImage</tt>
+     * object, and contains the same values, field by field, as this
+     * <tt>EImage</tt>.
      *
      * @param obj the object to compare with.
-     * @return <code>true</code>, if successful
-     * <code>true</code> if the objects are the same;
-     * <code>false</code> otherwise.
+     * @return <code>true</code>, if successful <code>true</code> if the objects
+     * are the same; <code>false</code> otherwise.
      */
     @Override
     public boolean equals(Object obj) {
@@ -254,16 +288,28 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
         return this.primordialUuid.hashCode();
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.TkRevision#makeConversion(java.util.Map, long, boolean)
+    /**
+     *
+     * @param conversionMap the map for converting from one set of uuids to
+     * another
+     * @param offset the offset to be applied to the time associated with this
+     * TK Media
+     * @param mapAll set to <code>true</code> to map all the uuids in this TK
+     * Media based on the conversion map
+     * @return the converted TK Media
      */
     @Override
     public TkMedia makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
         return new TkMedia(this, conversionMap, offset, mapAll);
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.TkComponent#readExternal(java.io.DataInput, int)
+    /**
+     *
+     * @param in the data input specifying how to construct this TK Media
+     * @param dataVersion the data version of the external source
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws ClassNotFoundException the class not found exception
+     * TODO-javadoc: why?
      */
     @Override
     public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -290,7 +336,10 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
     }
 
     /**
-     * Returns a string representation of the object.
+     * Returns a string representation of this TK Media object.
+     *
+     * @return a string representation of this TK Media object including if the
+     * concept is defined or not
      *
      * @return the string
      */
@@ -315,8 +364,10 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
         return buff.toString();
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.TkComponent#writeExternal(java.io.DataOutput)
+    /**
+     *
+     * @param out the data output object that writes to the external source
+     * @throws IOException signals that an I/O exception has occurred
      */
     @Override
     public void writeExternal(DataOutput out) throws IOException {
@@ -343,16 +394,16 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
 
     //~--- get methods ---------------------------------------------------------
     /**
-     * Gets the concept uuid.
+     * Gets the uuid of the enclosing concept.
      *
-     * @return the concept uuid
+     * @return the uuid of the enclosing concept
      */
     public UUID getConceptUuid() {
         return conceptUuid;
     }
 
     /**
-     * Gets the data bytes.
+     * Gets the data bytes. TODO-javadoc: ?
      *
      * @return the data bytes
      */
@@ -361,16 +412,17 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
     }
 
     /**
-     * Gets the format.
+     * Gets the format of the media.
      *
-     * @return the format
+     * @return a String representation of the format of the media
      */
     public String getFormat() {
         return format;
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.TkComponent#getRevisionList()
+    /**
+     *
+     * @return a list of revisions on this TK Media
      */
     @Override
     public List<TkMediaRevision> getRevisionList() {
@@ -378,16 +430,16 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
     }
 
     /**
-     * Gets the text description.
+     * Gets the text describing this media.
      *
-     * @return the text description
+     * @return a String representing a description of this media
      */
     public String getTextDescription() {
         return textDescription;
     }
 
     /**
-     * Gets the type uuid.
+     * Gets the uuid representing the type of media.
      *
      * @return the type uuid
      */
@@ -397,16 +449,16 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
 
     //~--- set methods ---------------------------------------------------------
     /**
-     * Sets the concept uuid.
+     * Sets uuid associated with the enclosing concept of this TK Description.
      *
-     * @param conceptUuid the new concept uuid
+     * @param conceptUuid the uuid associated with the enclosing concept
      */
     public void setConceptUuid(UUID conceptUuid) {
         this.conceptUuid = conceptUuid;
     }
 
     /**
-     * Sets the data bytes.
+     * Sets the data bytes. TODO-javadoc: ?
      *
      * @param data the new data bytes
      */
@@ -415,27 +467,28 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
     }
 
     /**
-     * Sets the format.
+     * Sets the String representing the format of this TK Media.
      *
-     * @param format the new format
+     * @param format the String representing the format of this TK Media
      */
     public void setFormat(String format) {
         this.format = format;
     }
 
     /**
-     * Sets the text description.
+     * Sets the text description of this media.
      *
-     * @param textDescription the new text description
+     * @param textDescription the String representing the text description of
+     * this media
      */
     public void setTextDescription(String textDescription) {
         this.textDescription = textDescription;
     }
 
     /**
-     * Sets the type uuid.
+     * Sets the uuid for the type associated with this TK Media.
      *
-     * @param typeUuid the new type uuid
+     * @param typeUuid the uuid representing the media type
      */
     public void setTypeUuid(UUID typeUuid) {
         this.typeUuid = typeUuid;

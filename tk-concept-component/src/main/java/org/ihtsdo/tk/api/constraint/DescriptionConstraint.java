@@ -41,7 +41,7 @@ public class DescriptionConstraint implements ConstraintBI {
      * Write object.
      *
      * @param out the out
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -54,7 +54,7 @@ public class DescriptionConstraint implements ConstraintBI {
      * Read object.
      *
      * @param in the in
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException the class not found exception
      */
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -124,7 +124,7 @@ public class DescriptionConstraint implements ConstraintBI {
 	 *
 	 * @param viewCoordinate the view coordinate
 	 * @return the concept
-	 * @throws IOException signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred
 	 */
 	public ConceptVersionBI getConcept(ViewCoordinate viewCoordinate) throws IOException {
 		return conceptSpec.get(viewCoordinate);
@@ -135,7 +135,7 @@ public class DescriptionConstraint implements ConstraintBI {
 	 *
 	 * @param viewCoordinate the view coordinate
 	 * @return the desc type
-	 * @throws IOException signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred
 	 */
 	public ConceptVersionBI getDescType(ViewCoordinate viewCoordinate) throws IOException {
 		return descTypeSpec.get(viewCoordinate);
@@ -146,7 +146,7 @@ public class DescriptionConstraint implements ConstraintBI {
 	 * Gets the concept nid.
 	 *
 	 * @return the concept nid
-	 * @throws IOException signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred
 	 */
 	public int getConceptNid() throws IOException {
 		return Ts.get().getNidForUuids(conceptSpec.getUuids());
@@ -156,7 +156,7 @@ public class DescriptionConstraint implements ConstraintBI {
 	 * Gets the description type nid.
 	 *
 	 * @return the description type nid
-	 * @throws IOException signals that an I/O exception has occurred.
+	 * @throws IOException signals that an I/O exception has occurred
 	 */
 	public int getDescriptionTypeNid() throws IOException {
 		return Ts.get().getNidForUuids(descTypeSpec.getUuids());

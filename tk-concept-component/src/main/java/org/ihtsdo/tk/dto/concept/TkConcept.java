@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.tk.dto.concept;
 
@@ -77,59 +77,83 @@ import org.ihtsdo.tk.dto.concept.component.refex.type_arrayofbytearray.TkRefexAr
 
 // TODO: Auto-generated Javadoc
 /**
- * The Class TkConcept.
- * 
- * TODO-javadoc: discussion about tk classes and econcepts
+ * The Class TkConcept contains methods for importing/exporting a concept.
+ * TkConcept was originally named eConcept which stood for "external concept".
+ * When the classes where moved out of ace-api to the tk-concept-component, they
+ * where renamed to be TK classes (toolkit) classes, but they still implement
+ * the eConcept format. <p> The eConcept format is a "data" format, not an
+ * "object-serialization" format. The Java object serialization format was found
+ * to be to slow and memory intensive for the import and export of these
+ * concepts.<p> For the TK concepts class, each component consists of a set of
+ * revisions. These revisions each represent a version.
  */
 public class TkConcept {
 
-    /** The Constant PADDING. */ //TODO-javadoc: what's this?
+    /**
+     * The padding to use in the string representation of this TK Concept.
+     */
     public static final String PADDING = "     ";
-    
-    /** The dataVersion of this class. Increment if adding additional functionality. */
+    /**
+     * The dataVersion of this class. Increment if adding additional
+     * functionality.
+     */
     public static final int dataVersion = 9;
-    
-    /** The Constant serialVersionUID. *///TODO-javadoc: what's the serial version for?
+    /**
+     * The Constant serialVersionUID, used to prevent the class from computing its
+     * own serialVersionUID based on a hash of all the method signatures.
+     */
     public static final long serialVersionUID = 1;
     //~--- fields --------------------------------------------------------------
-    /** The boolean value indicating if the concept is an annotation style refex. */
+    /**
+     * The boolean value indicating if the concept is an annotation style refex.
+     */
     public boolean annotationStyleRefex = false;
-    
-    /** The boolean value indicating if the concept is an indexed annotation style refex. */
+    /**
+     * The boolean value indicating if the concept is an indexed annotation
+     * style refex.
+     */
     public boolean annotationIndexStyleRefex = false;
-    
-    /** The concept attributes of this concept. */
+    /**
+     * The concept attributes of this concept.
+     */
     public TkConceptAttributes conceptAttributes;
-    
-    /** The descriptions on this concept. */
+    /**
+     * The descriptions on this concept.
+     */
     public List<TkDescription> descriptions;
-    
-    /** The media associated with this concept. */
+    /**
+     * The media associated with this concept.
+     */
     public List<TkMedia> media;
-    
-    /** The primordial uuid of this concept. */
+    /**
+     * The primordial uuid of this concept.
+     */
     public UUID primordialUuid;
-    
-    /** The refset members associated with this concept. */
+    /**
+     * The refset members associated with this concept.
+     */
     public List<TkRefexAbstractMember<?>> refsetMembers;
-    
-    /** The relationships on this concept. */
+    /**
+     * The relationships on this concept.
+     */
     public List<TkRelationship> relationships;
 
     //~--- constructors --------------------------------------------------------
     /**
-     * Instantiates a new tk concept.
+     * Instantiates a new TK Concept.
      */
     public TkConcept() {
         super();
     }
 
     /**
-     * Instantiates a new tk concept based on the specified data input, <code>in</code>.
+     * Instantiates a new TK Concept based on the specified data input,
+     * <code>in</code>.
      *
-     * @param in the data input specifying how to construct the new tk concept
-     * @throws IOException signals that an I/O exception has occurred.
-     * @throws ClassNotFoundException the class not found exception TODO-javadoc: why?
+     * @param in the data input specifying how to construct this TK Concept
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws ClassNotFoundException the class not found exception
+     * TODO-javadoc: why?
      */
     public TkConcept(DataInput in) throws IOException, ClassNotFoundException {
         super();
@@ -137,19 +161,21 @@ public class TkConcept {
     }
 
     /**
-     * Instantiates a new tk concept based on the specified <code>conceptChronicle</code>.
+     * Instantiates a new TK Concept based on the specified
+     * <code>conceptChronicle</code>.
      *
-     * @param conceptChronicle the concept chronicle specifying how to construct the new tk concept
-     * @throws IOException signals that an I/O exception has occurred.
+     * @param conceptChronicle the concept chronicle specifying how to construct
+     * the new TK Concept
+     * @throws IOException signals that an I/O exception has occurred
      */
     public TkConcept(ConceptChronicleBI conceptChronicle) throws IOException {
         annotationStyleRefex = conceptChronicle.isAnnotationStyleRefex();
         annotationIndexStyleRefex = conceptChronicle.isAnnotationIndex();
         conceptAttributes = new TkConceptAttributes(conceptChronicle.getConceptAttributes());
         primordialUuid = conceptAttributes.primordialUuid;
-        relationships = new ArrayList<TkRelationship>(conceptChronicle.getRelationshipsSource().size());
+        relationships = new ArrayList<TkRelationship>(conceptChronicle.getRelationshipsOutgoing().size());
 
-        for (RelationshipChronicleBI rel : conceptChronicle.getRelationshipsSource()) {
+        for (RelationshipChronicleBI rel : conceptChronicle.getRelationshipsOutgoing()) {
             relationships.add(new TkRelationship(rel));
         }
 
@@ -186,11 +212,12 @@ public class TkConcept {
     }
 
     /**
-     * Converts refex from a WHAT KIND of object to a tk refex object.
+     * Converts refex from a RefexVersionBI object, using native identifiers, to
+     * a tk refex object, using uuids.
      *
      * @param refexChronicle the refex chronicle to convert
      * @return an abstract tk refex member
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public static TkRefexAbstractMember<?> convertRefex(RefexChronicleBI<?> refexChronicle) throws IOException {
         if (refexChronicle.getPrimordialVersion() instanceof RefexNidNidNidVersionBI) {
@@ -227,12 +254,16 @@ public class TkConcept {
     }
 
     /**
-     * Instantiates a new tk concept.
+     * Instantiates a new TK Concept based on
+     * <code>another</code> TK Concept and allows for uuid conversion.
      *
-     * @param another the another
-     * @param conversionMap the conversion map
-     * @param offset the offset
-     * @param mapAll the map all
+     * @param another the TK Concept specifying how to construct this TK Concept
+     * @param conversionMap the map for converting from one set of uuids to
+     * another
+     * @param offset the offset to be applied to the time associated with this
+     * TK Concept
+     * @param mapAll set to <code>true</code> to map all the uuids in this TK
+     * Concept based on the conversion map
      */
     public TkConcept(TkConcept another, Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
         super();
@@ -280,16 +311,26 @@ public class TkConcept {
     }
 
     /**
-     * Instantiates a new tk concept.
+     * Instantiates a new TK Concept based on the given
+     * <code>conceptVersion</code> and allows for uuid conversion. Uses one view
+     * coordinate to find versions of all components. Can exclude components
+     * based on their nid.
      *
-     * @param conceptVersion the concept version
-     * @param excludedNids the excluded nids
-     * @param conversionMap the conversion map
-     * @param offset the offset
-     * @param mapAll the map all
-     * @param viewCoordinate the view coordinate
-     * @throws IOException signals that an I/O exception has occurred.
-     * @throws ContradictionException the contradiction exception
+     * @param conceptVersion the concept version specifying how to construct
+     * this TK Concept
+     * @param excludedNids the nids in the specified concept version to exclude
+     * from this TK Concept
+     * @param conversionMap the map for converting from one set of uuids to
+     * another
+     * @param offset the offset to be applied to the time associated with this
+     * TK Concept
+     * @param mapAll set to <code>true</code> to map all the uuids in this TK
+     * Concept based on the conversion map
+     * @param viewCoordinate the view coordinate specifying which version of the
+     * components to use
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws ContradictionException if more than one version of a component is
+     * found for the specified view coordinate
      */
     public TkConcept(ConceptVersionBI conceptVersion, NidBitSetBI excludedNids, Map<UUID, UUID> conversionMap,
             long offset, boolean mapAll, ViewCoordinate viewCoordinate)
@@ -299,18 +340,28 @@ public class TkConcept {
     }
 
     /**
-     * Instantiates a new tk concept.
+     * Instantiates a new TK Concept based on the given
+     * <code>conceptVersion</code> and allows for uuid conversion. Can specify
+     * view coordinates for the concept, descriptions, and relationships
      *
-     * @param conceptVersion the concept version
+     * @param conceptVersion the concept version specifying how to construct
+     * this TK Concept
      * @param excludedNids the excluded nids
-     * @param conversionMap the conversion map
-     * @param offset the offset
-     * @param mapAll the map all
-     * @param conceptVc the concept vc
-     * @param descVc the desc vc
-     * @param relVc the rel vc
-     * @throws IOException signals that an I/O exception has occurred.
-     * @throws ContradictionException the contradiction exception
+     * @param conversionMap the nids in the specified concept version to exclude
+     * from this TK Concept
+     * @param offset the offset to be applied to the time associated with this
+     * TK Concept
+     * @param mapAll set to <code>true</code> to map all the uuids in this TK
+     * Concept based on the conversion map
+     * @param conceptVc the view coordinate specifying which version of the
+     * concept attributes to use
+     * @param descVc the view coordinate specifying which version of the
+     * descriptions to use
+     * @param relVc the view coordinate specifying which version of the
+     * relationships to use
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws ContradictionException if more than one version of a component is
+     * found for the specified view coordinate
      */
     public TkConcept(ConceptVersionBI conceptVersion, NidBitSetBI excludedNids, Map<UUID, UUID> conversionMap,
             long offset, boolean mapAll,
@@ -388,7 +439,7 @@ public class TkConcept {
             for (RelationshipVersionBI rel : rels) {
                 int destNid = rel.getTargetNid();
                 for (int nid : rel.getAllNidsForVersion()) {
-                   if (excludedNids.isMember(nid) || (Ts.get().getComponent(nid) == null)) {
+                    if (excludedNids.isMember(nid) || (Ts.get().getComponent(nid) == null)) {
                         continue nextRel;
                     } else if (Ts.get().getComponent(nid).getVersions(relVc).isEmpty()) {
                         if (nid == destNid) {
@@ -407,14 +458,14 @@ public class TkConcept {
 
     //~--- methods -------------------------------------------------------------
     /**
-     * Compares this object to the specified object. The result is <tt>true</tt> if and only if the argument
-     * is not <tt>null</tt>, is a <tt>EConcept</tt> object, and contains the same values, field by field, as
-     * this <tt>EConcept</tt>.
+     * Compares this object to the specified object. The result is <tt>true</tt>
+     * if and only if the argument is not <tt>null</tt>, is a <tt>EConcept</tt>
+     * object, and contains the same values, field by field, as this
+     * <tt>EConcept</tt>.
      *
      * @param obj the object to compare with.
-     * @return <code>true</code>, if successful
-     * <code>true</code> if the objects are the same;
-     * <code>false</code> otherwise.
+     * @return <code>true</code>, if successful <code>true</code> if the objects
+     * are the same; <code>false</code> otherwise.
      */
     @Override
     public boolean equals(Object obj) {
@@ -500,11 +551,12 @@ public class TkConcept {
     }
 
     /**
-     * Read external.
+     * Reads a TK Concept from an external source.
      *
-     * @param in the in
-     * @throws IOException signals that an I/O exception has occurred.
+     * @param in the data input specifying the TK Concept
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException the class not found exception
+     * TODO-javadoc: why?
      */
     public final void readExternal(DataInput in) throws IOException, ClassNotFoundException {
         int readDataVersion = in.readInt();
@@ -652,7 +704,7 @@ public class TkConcept {
         } else {
             annotationStyleRefex = false;
         }
-        
+
         if (readDataVersion >= 9) {
             annotationIndexStyleRefex = in.readBoolean();
         } else {
@@ -661,9 +713,10 @@ public class TkConcept {
     }
 
     /**
-     * Returns a string representation of the object.
+     * Returns a string representation of this TK Concept object.
      *
-     * @return the string
+     * @return a string representation of this TK Concept object and all of its
+     * components
      */
     @Override
     public String toString() {
@@ -734,10 +787,10 @@ public class TkConcept {
     }
 
     /**
-     * Write external.
+     * Writes this TK Concept to an external source.
      *
-     * @param out the out
-     * @throws IOException signals that an I/O exception has occurred.
+     * @param out the data output object that writes to the external source
+     * @throws IOException signals that an I/O exception has occurred
      */
     public void writeExternal(DataOutput out) throws IOException {
         out.writeInt(dataVersion);
@@ -803,34 +856,34 @@ public class TkConcept {
 
     //~--- get methods ---------------------------------------------------------
     /**
-     * Gets the concept attributes.
+     * Gets the concept attributes associated with this TK Concept.
      *
-     * @return the concept attributes
+     * @return the TK Concept attributes associated with this TK Concept
      */
     public TkConceptAttributes getConceptAttributes() {
         return conceptAttributes;
     }
 
     /**
-     * Gets the descriptions.
+     * Gets the descriptions associated with this TK Concept.
      *
-     * @return the descriptions
+     * @return the TK descriptions associated with this TK Concept
      */
     public List<TkDescription> getDescriptions() {
         return descriptions;
     }
 
     /**
-     * Gets the images.
+     * Gets the media associated with this TK Concept.
      *
-     * @return the images
+     * @return the TK media associated with this TK Concept
      */
     public List<TkMedia> getImages() {
         return media;
     }
 
     /**
-     * Gets the primordial uuid.
+     * Gets the primordial uuid of this TK Concept.
      *
      * @return the primordial uuid
      */
@@ -839,16 +892,17 @@ public class TkConcept {
     }
 
     /**
-     * Gets the refset members.
+     * Gets the refset members associated with this TK Concept. These are the
+     * refset members, not annotations.
      *
-     * @return the refset members
+     * @return the TK refset members associated with this TK Concept
      */
     public List<TkRefexAbstractMember<?>> getRefsetMembers() {
         return refsetMembers;
     }
 
     /**
-     * Gets the relationships.
+     * Gets the relationships associated with this TK Concept.
      *
      * @return the relationships
      */
@@ -857,18 +911,20 @@ public class TkConcept {
     }
 
     /**
-     * Checks if is annotation style refex.
+     * Checks if this TK Concept is an annotation style refex.
      *
-     * @return <code>true</code>, if is annotation style refex
+     * @return <code>true</code>, if this TK Concept is an annotation style
+     * refex
      */
     public boolean isAnnotationStyleRefex() {
         return annotationStyleRefex;
     }
-    
+
     /**
-     * Checks if is annotation index style refex.
+     * Checks if this TK Concept is an indexed annotation style refex.
      *
-     * @return <code>true</code>, if is annotation index style refex
+     * @return <code>true</code>, if this TK Concept is an indexed annotation
+     * style refex
      */
     public boolean isAnnotationIndexStyleRefex() {
         return annotationIndexStyleRefex;
@@ -876,72 +932,76 @@ public class TkConcept {
 
     //~--- set methods ---------------------------------------------------------
     /**
-     * Sets the annotation style refex.
+     * Marks this TK Concept as an annotation style refex.
      *
-     * @param annotationStyleRefex the new annotation style refex
+     * @param annotationStyleRefex set to <code>true</code> to mark as
+     * annotation style refex
      */
     public void setAnnotationStyleRefex(boolean annotationStyleRefex) {
         this.annotationStyleRefex = annotationStyleRefex;
     }
-    
+
     /**
-     * Sets the annotation index style refex.
+     * Marks this TK Concept as an indexed annotation style refex.
      *
-     * @param annotationIndexStyleRefex the new annotation index style refex
+     *
+     * @param annotationIndexStyleRefex set to <code>true</code> to mark as
+     * indexed annotation style refex
      */
     public void setAnnotationIndexStyleRefex(boolean annotationIndexStyleRefex) {
         this.annotationIndexStyleRefex = annotationIndexStyleRefex;
     }
 
     /**
-     * Sets the concept attributes.
+     * Sets the concept attributes associated with this TK Concept.
      *
-     * @param conceptAttributes the new concept attributes
+     * @param conceptAttributes the TK Concept attributes for this TK Concept
      */
     public void setConceptAttributes(TkConceptAttributes conceptAttributes) {
         this.conceptAttributes = conceptAttributes;
     }
 
     /**
-     * Sets the descriptions.
+     * Sets the descriptions associated with this TK Concept.
      *
-     * @param descriptions the new descriptions
+     * @param descriptions the TK descriptions for this TK Concept
      */
     public void setDescriptions(List<TkDescription> descriptions) {
         this.descriptions = descriptions;
     }
 
     /**
-     * Sets the images.
+     * Sets the media associated with this TK Concept.
      *
-     * @param images the new images
+     * @param images the TK media for this TK Concept
      */
     public void setImages(List<TkMedia> images) {
         this.media = images;
     }
 
     /**
-     * Sets the primordial uuid.
+     * Sets the primordial uuid of this TK Concept.
      *
-     * @param primordialUuid the new primordial uuid
+     * @param primordialUuid the primordial uuid
      */
     public void setPrimordialUuid(UUID primordialUuid) {
         this.primordialUuid = primordialUuid;
     }
 
     /**
-     * Sets the refset members.
+     * Sets the refset members associated with this TK Concept. This is refset
+     * members, not annotations.
      *
-     * @param refsetMembers the new refset members
+     * @param refsetMembers the TK refset members for this TK Concept
      */
     public void setRefsetMembers(List<TkRefexAbstractMember<?>> refsetMembers) {
         this.refsetMembers = refsetMembers;
     }
 
     /**
-     * Sets the relationships.
+     * Sets the relationships on this TK Concept.
      *
-     * @param relationships the new relationships
+     * @param relationships the TK relationships for this TK Concept
      */
     public void setRelationships(List<TkRelationship> relationships) {
         this.relationships = relationships;

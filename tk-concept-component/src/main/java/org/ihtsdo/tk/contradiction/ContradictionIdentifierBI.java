@@ -41,10 +41,8 @@ public interface ContradictionIdentifierBI {
     ContradictionResult isConceptInConflict(ConceptChronicleBI conceptChronicle) throws Exception;
 
     /**
-     * Gets versions of the component found to be in conflict.
-     * 
-     * TODO-javadoc: correct?
-     *
+     * Gets versions of the components found to be in conflict.
+     * TODO-javadoc: rename to getConflictingVersions
      * @return the conflicting component versions
      */
     Collection<? extends ComponentVersionBI> getReturnVersions();

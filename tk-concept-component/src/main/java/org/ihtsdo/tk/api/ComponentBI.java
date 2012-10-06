@@ -43,7 +43,7 @@ public interface ComponentBI {
      *
      * @param annotation the annotation to add
      * @return <code>true</code>, if the addition was successful
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     boolean addAnnotation(RefexChronicleBI<?> annotation) throws IOException;
 
@@ -63,7 +63,7 @@ public interface ComponentBI {
      * This method would be used to get the SCT ID of a component.
      *
      * @return the additional ids of the component
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     Collection<? extends IdBI> getAdditionalIds() throws IOException;
 
@@ -71,7 +71,7 @@ public interface ComponentBI {
      * Gets the all identifiers of a component.
      *
      * @return all the ids of the component
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     Collection<? extends IdBI> getAllIds() throws IOException;
 
@@ -79,7 +79,7 @@ public interface ComponentBI {
      * Gets the annotations on a component.
      *
      * @return the annotations of the component
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     Collection<? extends RefexChronicleBI<?>> getAnnotations() throws IOException;
 
@@ -97,20 +97,19 @@ public interface ComponentBI {
      *
      * @param viewCoordinate the view coordinate specifying which annotations are active or inactive
      * @return the specified active annotations on the component
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     Collection<? extends RefexVersionBI<?>> getAnnotationsActive(ViewCoordinate viewCoordinate) throws IOException;
 
     /**
      * Gets active annotations for the refex, specified by the <code>refexNid</code>, on a component based on
      * the given
-     * <code>viewCoordiante</code>. TODO-javadoc: the use of
-     * members here is confusing, too similar to refset member
+     * <code>viewCoordiante</code>.
      *
      * @param viewCoordinate the view coordinate specifying which annotations are active or inactive
      * @param refexNid the nid associated with the desired refex
      * @return the specified active annotations
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     Collection<? extends RefexVersionBI<?>> getAnnotationMembersActive(ViewCoordinate viewCoordinate, int refexNid)
             throws IOException;
@@ -120,7 +119,7 @@ public interface ComponentBI {
      *
      * @param viewCoordinate the view coordinate specifying which annotations are active or inactive
      * @return the specified active annotations
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @deprecated use getAnnotationsActive(ViewCoordinate viewCoordinate)
      */
     Collection<? extends RefexVersionBI<?>> getActiveAnnotations(ViewCoordinate viewCoordinate) throws IOException;
@@ -133,7 +132,7 @@ public interface ComponentBI {
      * @param viewCoordinate the view coordinate specifying which annotations are active or inactive
      * @param refexNid the nid associated with the desired refex
      * @return the specified active annotations
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @deprecated use getAnnotationMembersActive(ViewCoordinate viewCoordinate, int refexNid)
      */
     Collection<? extends RefexVersionBI<?>> getActiveAnnotations(ViewCoordinate viewCoordinate, int refexNid)
@@ -148,7 +147,7 @@ public interface ComponentBI {
      * @param viewCoordinate the view coordinate specifying which annotations are active or inactive
      * @param refexNid the nid associated with the desired refex
      * @return the spcified active refex members
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     Collection<? extends RefexVersionBI<?>> getRefexMembersActive(ViewCoordinate viewCoordinate, int refexNid)
             throws IOException;
@@ -161,7 +160,7 @@ public interface ComponentBI {
      *
      * @param viewCoordinate the view coordinate specifying which annotations are active or inactive
      * @return the spcified active refexes
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     Collection<? extends RefexVersionBI<?>> getRefexesActive(ViewCoordinate viewCoordinate) throws IOException;
 
@@ -174,7 +173,7 @@ public interface ComponentBI {
      * @param viewCoordinate the view coordinate specifying which annotations are active or inactive
      * @param refexNid the nid associated with the desired refex
      * @return the spcified active refexes
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @deprecated use getRefexMembersActive(ViewCoordinate viewCoordinate, int refexNid)
      */
     Collection<? extends RefexVersionBI<?>> getActiveRefexes(ViewCoordinate viewCoordinate, int refexNid)
@@ -188,7 +187,7 @@ public interface ComponentBI {
      *
      * @param viewCoordinate the view coordinate specifying which annotations are active or inactive
      * @return the spcified inactive refexes
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     Collection<? extends RefexVersionBI<?>> getRefexesInactive(ViewCoordinate viewCoordinate) throws IOException;
 
@@ -216,7 +215,7 @@ public interface ComponentBI {
      *
      * @param refexNid the nid associated with the desired refex
      * @return the specified refex members
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     Collection<? extends RefexChronicleBI<?>> getRefexMembers(int refexNid) throws IOException;
 
@@ -226,7 +225,7 @@ public interface ComponentBI {
      * members as a whole, as a refset is a concept not a component.
      *
      * @return the refexes on the component
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     Collection<? extends RefexChronicleBI<?>> getRefexes() throws IOException;
 
@@ -237,7 +236,7 @@ public interface ComponentBI {
      *
      * @param refexNid the nid of the desired refex
      * @return the specified refexes
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @deprecated use getRefexMembers
      */
     @Deprecated
@@ -258,7 +257,7 @@ public interface ComponentBI {
      * @param viewCoordinate the view coordinate specifying which annotations are active or inactive
      * @param refexNid the nid of the desired refex
      * @return <code>true</code>, if the component has active annotations
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     boolean hasAnnotationMemberActive(ViewCoordinate viewCoordinate, int refexNid) throws IOException;
 
@@ -270,7 +269,7 @@ public interface ComponentBI {
      * @param viewCoordinate the view coordinate specifying which annotations are active or inactive
      * @param refexNid the nid of the desired refex
      * @return <code>true</code>, if the component has active annotation or is an active referenced component
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     boolean hasRefexMemberActive(ViewCoordinate viewCoordinate, int refexNid) throws IOException;
 }

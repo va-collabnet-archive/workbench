@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.tk.dto.concept.component.attribute;
 
@@ -36,41 +36,59 @@ import org.ihtsdo.tk.dto.RevisionHandling;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Class TkConceptAttributes.
+ * The Class TkConceptAttributes represents a concept attribute in the eConcept
+ * format and contains methods for interacting with a concept attribute. Further
+ * discussion of the eConcept format can be found on
+ * <code>TkConcept</code>.
+ *
+ * @see TkConcept
+ * @param <V> the value type
  */
 public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision>
         implements I_ConceptualizeExternally {
 
-    /** The Constant serialVersionUID. */
+    /**
+     * The Constant serialVersionUID, used to prevent the class from computing its
+     * own serialVersionUID based on a hash of all the method signatures.
+     */
     public static final long serialVersionUID = 1;
     //~--- fields --------------------------------------------------------------
-    /** The defined. */
+    /**
+     * The boolean value indicating if the concept associated with these concept
+     * attributes is defined.
+     */
     public boolean defined;
 
     //~--- constructors --------------------------------------------------------
     /**
-     * Instantiates a new tk concept attributes.
+     * Instantiates a new TK Concept Attributes.
      */
     public TkConceptAttributes() {
         super();
     }
 
     /**
-     * Instantiates a new tk concept attributes.
+     * Instantiates a new TK Concept Attributes based on the
+     * <code>conceptAttributeChronicle</code>.
      *
      * @param conceptAttributeChronicle the concept attribute chronicle
-     * @throws IOException signals that an I/O exception has occurred.
+     * specifying how to construct this TK Concept Attribute
+     * @throws IOException signals that an I/O exception has occurred
      */
     public TkConceptAttributes(ConceptAttributeChronicleBI conceptAttributeChronicle) throws IOException {
         this(conceptAttributeChronicle.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
     }
 
     /**
-     * Instantiates a new tk concept attributes.
+     * Instantiates a new TK Concept Attributes based on the
+     * <code>conceptAttributeVersion</code> and using the given
+     * <code>revisionHandling</code>.
      *
-     * @param conceptAttributeVersion the concept attribute version
-     * @param revisionHandling the revision handling
-     * @throws IOException signals that an I/O exception has occurred.
+     * @param conceptAttributeVersion the concept attribute version specifying
+     * how to construct this TK Concept Attribute
+     * @param revisionHandling specifying if addition versions should be
+     * included or not
+     * @throws IOException signals that an I/O exception has occurred
      */
     public TkConceptAttributes(ConceptAttributeVersionBI conceptAttributeVersion,
             RevisionHandling revisionHandling) throws IOException {
@@ -96,12 +114,16 @@ public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision
     }
 
     /**
-     * Instantiates a new tk concept attributes.
+     * Instantiates a new TK Concept Attributes based on the specified data
+     * input,
+     * <code>in</code>.
      *
-     * @param in the in
-     * @param dataVersion the data version
-     * @throws IOException signals that an I/O exception has occurred.
+     * @param in the data input specifying how to construct this TK Concept
+     * Attributes
+     * @param dataVersion the data version of the external source
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException the class not found exception
+     * TODO-javadoc: why?
      */
     public TkConceptAttributes(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
@@ -109,12 +131,18 @@ public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision
     }
 
     /**
-     * Instantiates a new tk concept attributes.
+     * Instantiates a new TK Concept Attributes based on
+     * <code>another</code> TK Concept Attributes and allows for uuid
+     * conversion.
      *
-     * @param another the another
-     * @param conversionMap the conversion map
-     * @param offset the offset
-     * @param mapAll the map all
+     * @param another the TK Concept Attributes specifying how to construct this
+     * TK Concept Attributes
+     * @param conversionMap the map for converting from one set of uuids to
+     * another
+     * @param offset the offset to be applied to the time associated with this
+     * TK Concept Attributes
+     * @param mapAll set to <code>true</code> to map all the uuids in this TK
+     * Concept Attributes based on the conversion map
      */
     public TkConceptAttributes(TkConceptAttributes another, Map<UUID, UUID> conversionMap, long offset,
             boolean mapAll) {
@@ -123,16 +151,25 @@ public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision
     }
 
     /**
-     * Instantiates a new tk concept attributes.
+     * Instantiates a new TK Concept Attributes based on a
+     * <code>conceptAttributeVersion</code> and allows for uuid conversion. Can
+     * exclude components based on their nid.
      *
-     * @param conceptAttributeVersion the concept attribute version
-     * @param excludedNids the excluded nids
-     * @param conversionMap the conversion map
-     * @param offset the offset
-     * @param mapAll the map all
-     * @param viewCoordinate the view coordinate
-     * @throws IOException signals that an I/O exception has occurred.
-     * @throws ContradictionException the contradiction exception
+     * @param conceptAttributeVersion the concept attribute version specifying
+     * how to construct this TK Concept Attributes
+     * @param excludedNids the nids in the specified component version to
+     * exclude from this TK Concept Attributes
+     * @param conversionMap the map for converting from one set of uuids to
+     * another
+     * @param offset the offset to be applied to the time associated with this
+     * TK Concept Attributes
+     * @param mapAll set to <code>true</code> to map all the uuids in this TK
+     * Concept Attributes based on the conversion map
+     * @param viewCoordinate the view coordinate specifying which version of the
+     * components to use
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws ContradictionException if more than one version of a component is
+     * found for the specified view coordinate
      */
     public TkConceptAttributes(ConceptAttributeVersionBI conceptAttributeVersion, NidBitSetBI excludedNids,
             Map<UUID, UUID> conversionMap, long offset, boolean mapAll, ViewCoordinate viewCoordinate)
@@ -143,14 +180,14 @@ public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision
 
     //~--- methods -------------------------------------------------------------
     /**
-     * Compares this object to the specified object. The result is <tt>true</tt> if and only if the argument
-     * is not <tt>null</tt>, is a <tt>EConceptAttributes</tt> object, and contains the same values, field by
-     * field, as this <tt>EConceptAttributes</tt>.
+     * Compares this object to the specified object. The result is <tt>true</tt>
+     * if and only if the argument is not <tt>null</tt>, is a
+     * <tt>EConceptAttributes</tt> object, and contains the same values, field
+     * by field, as this <tt>EConceptAttributes</tt>.
      *
      * @param obj the object to compare with.
-     * @return <code>true</code>, if successful
-     * <code>true</code> if the objects are the same;
-     * <code>false</code> otherwise.
+     * @return <code>true</code>, if successful <code>true</code> if the objects
+     * are the same; <code>false</code> otherwise.
      */
     @Override
     public boolean equals(Object obj) {
@@ -187,16 +224,29 @@ public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision
         return this.primordialUuid.hashCode();
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.TkRevision#makeConversion(java.util.Map, long, boolean)
+    /**
+     *
+     * @param conversionMap the map for converting from one set of uuids to
+     * another
+     * @param offset the offset to be applied to the time associated with this
+     * TK Concept Attributes
+     * @param mapAll set to <code>true</code> to map all the uuids in this TK Concept Attributes
+     * based on the conversion map
+     * @return the converted TK Concept Attributes
      */
     @Override
     public TkConceptAttributes makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
         return new TkConceptAttributes(this, conversionMap, offset, mapAll);
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.TkComponent#readExternal(java.io.DataInput, int)
+    /**
+     *
+     * @param in the data input specifying how to construct this TK Concept
+     * Attributes
+     * @param dataVersion the data version of the external source
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws ClassNotFoundException the class not found exception
+     * TODO-javadoc: why?
      */
     @Override
     public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -217,9 +267,10 @@ public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision
     }
 
     /**
-     * Returns a string representation of the object.
+     * Returns a String representation of this TK Concept Attributes object.
      *
-     * @return the string
+     * @return a String representation of this TK Concept Attributes object
+     * including if the concept is defined or not
      */
     @Override
     public String toString() {
@@ -234,8 +285,10 @@ public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision
         return buff.toString();
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.TkComponent#writeExternal(java.io.DataOutput)
+    /**
+     *
+     * @param out the data output object that writes to the external source
+     * @throws IOException signals that an I/O exception has occurred
      */
     @Override
     public void writeExternal(DataOutput out) throws IOException {
@@ -255,16 +308,18 @@ public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision
     }
 
     //~--- get methods ---------------------------------------------------------
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.TkComponent#getRevisionList()
+    /**
+     *
+     * @return a list of revisions on this TK Concept Attribute
      */
     @Override
     public List<TkConceptAttributesRevision> getRevisionList() {
         return revisions;
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.api.ext.I_ConceptualizeExternally#isDefined()
+    /**
+     *
+     * @return <code>true</code> if associated concept is defined
      */
     @Override
     public boolean isDefined() {
@@ -273,9 +328,10 @@ public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision
 
     //~--- set methods ---------------------------------------------------------
     /**
-     * Sets the defined.
+     * Indicates the associated concept is defined.
      *
-     * @param defined the new defined
+     * @param defined set to <code>true</code> to indicate the associated
+     * concept is defined
      */
     public void setDefined(boolean defined) {
         this.defined = defined;

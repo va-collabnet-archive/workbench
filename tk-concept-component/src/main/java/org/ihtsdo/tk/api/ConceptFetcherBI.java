@@ -23,9 +23,9 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Interface ConceptFetcherBI provides methods for fetching concepts.
- * Use with a parallel or sequential iterator to retrieve the concepts for processing.
- * TODO-javadoc: what else?
+ * The Interface ConceptFetcherBI provides methods for fetching concepts from the database.
+ * Use with a parallel or sequential iterator to retrieve the concepts from the database for processing.
+ * Prior to calling fetch() the concept may or may not be in memory. Only need to fetch a concept if more than its identifier is needed.
  */
 public interface ConceptFetcherBI {
    
@@ -51,7 +51,7 @@ public interface ConceptFetcherBI {
     * random updates.
     *
     * @param conceptChronicle the concept chronicle to update
-    * @throws Exception the exception TODO-javadoc: why?
+    * @throws Exception the exception TODO-javadoc: how to document exception?
     */
    void update(ConceptChronicleBI conceptChronicle) throws Exception;
 }

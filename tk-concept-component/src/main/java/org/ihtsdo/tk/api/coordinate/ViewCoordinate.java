@@ -150,11 +150,11 @@ public class ViewCoordinate implements Serializable {
     public enum LANGUAGE_SORT {
 
         /**
-         * The language before type. TODO-javadoc: what type?
+         * The language before description type.
          */
         LANG_BEFORE_TYPE("language before type"),
         /**
-         * The type before language.
+         * The description type before language.
          */
         TYPE_BEFORE_LANG("type before language"),
         /**
@@ -162,7 +162,7 @@ public class ViewCoordinate implements Serializable {
          */
         LANG_REFEX("use language refex"),
         /**
-         * The Rf2 language refex.
+         * The RF2 language refex.
          */
         RF2_LANG_REFEX("use RF2 language refex");
         ;
@@ -442,7 +442,7 @@ public class ViewCoordinate implements Serializable {
     }
 
     /**
-     * Gets the language nid. TODO-javadoc: not used?
+     * Gets the language nid. TODO-javadoc: not used
      *
      * @return the language refex nid
      */

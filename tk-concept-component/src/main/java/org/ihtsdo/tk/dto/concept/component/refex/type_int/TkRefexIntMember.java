@@ -59,7 +59,7 @@ public class TkRefexIntMember extends TkRefexAbstractMember<TkRefexIntRevision> 
      * Instantiates a new tk refex int member.
      *
      * @param refexChronicle the refex chronicle
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public TkRefexIntMember(RefexChronicleBI refexChronicle) throws IOException {
         this((RefexIntVersionBI) refexChronicle.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
@@ -70,7 +70,7 @@ public class TkRefexIntMember extends TkRefexAbstractMember<TkRefexIntRevision> 
      *
      * @param refexIntVersion the refex int version
      * @param revisionHandling the revision handling
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public TkRefexIntMember(RefexIntVersionBI refexIntVersion,
             RevisionHandling revisionHandling) throws IOException {
@@ -107,7 +107,7 @@ public class TkRefexIntMember extends TkRefexAbstractMember<TkRefexIntRevision> 
      *
      * @param in the in
      * @param dataVersion the data version
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException the class not found exception
      */
     public TkRefexIntMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -138,7 +138,7 @@ public class TkRefexIntMember extends TkRefexAbstractMember<TkRefexIntRevision> 
      * @param offset the offset
      * @param mapAll the map all
      * @param viewCoordinate the view coordinate
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException the contradiction exception
      */
     public TkRefexIntMember(RefexIntVersionBI refexIntVersion, NidBitSetBI excludedNids, Map<UUID, UUID> conversionMap,

@@ -56,7 +56,7 @@ public class TkRefexArrayOfBytearrayMember extends TkRefexAbstractMember<TkRefex
      * Instantiates a new tk refex array of bytearray member.
      *
      * @param refexChronicle the refex chronicle
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public TkRefexArrayOfBytearrayMember(RefexChronicleBI refexChronicle) throws IOException {
         this((RefexArrayOfBytearrayVersionBI) refexChronicle.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
@@ -67,7 +67,7 @@ public class TkRefexArrayOfBytearrayMember extends TkRefexAbstractMember<TkRefex
      *
      * @param refexArrayOfBytearrayVersion the refex array of bytearray version
      * @param revisionHandling the revision handling
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public TkRefexArrayOfBytearrayMember(RefexArrayOfBytearrayVersionBI refexArrayOfBytearrayVersion,
             RevisionHandling revisionHandling) throws IOException {
@@ -105,7 +105,7 @@ public class TkRefexArrayOfBytearrayMember extends TkRefexAbstractMember<TkRefex
      *
      * @param in the in
      * @param dataVersion the data version
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException the class not found exception
      */
     public TkRefexArrayOfBytearrayMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -136,7 +136,7 @@ public class TkRefexArrayOfBytearrayMember extends TkRefexAbstractMember<TkRefex
      * @param offset the offset
      * @param mapAll the map all
      * @param viewCoordinate the view coordinate
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException the contradiction exception
      */
     public TkRefexArrayOfBytearrayMember(RefexArrayOfBytearrayVersionBI refexArrayOfBytearrayVersion, NidBitSetBI excludedNids,

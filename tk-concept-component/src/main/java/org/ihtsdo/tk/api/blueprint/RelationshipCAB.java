@@ -67,7 +67,7 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
      * @param targetNid the target nid
      * @param group the group
      * @param relationshipType the relationship type
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -88,7 +88,7 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
      * @param targetUuid the target uuid
      * @param group the group
      * @param relationshipType the relationship type
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -108,7 +108,7 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
      * @param relationshipType the relationship type
      * @param relationshipVersion the relationship version
      * @param viewCoordinate the view coordinate
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -131,7 +131,7 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
      * @param relationshipType the relationship type
      * @param relationshipVersion the relationship version
      * @param viewCoordinate the view coordinate
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -153,7 +153,7 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
      * @param relationshipType the relationship type
      * @param relationshipVersion the relationship version
      * @param viewCoordinate the view coordinate
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -314,7 +314,7 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
      * Gets the characteristic nid.
      *
      * @return the characteristic nid
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public int getCharacteristicNid() throws IOException {
         return Ts.get().getNidForUuids(characteristicUuid);
@@ -324,7 +324,7 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
      * Gets the target nid.
      *
      * @return the target nid
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public int getTargetNid() throws IOException {
         return Ts.get().getNidForUuids(destUuid);
@@ -334,7 +334,7 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
      * Gets the refinability nid.
      *
      * @return the refinability nid
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public int getRefinabilityNid() throws IOException {
         return Ts.get().getNidForUuids(refinabilityUuid);
@@ -344,7 +344,7 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
      * Gets the source nid.
      *
      * @return the source nid
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public int getSourceNid() throws IOException {
         return Ts.get().getNidForUuids(sourceUuid);
@@ -354,7 +354,7 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
      * Gets the type nid.
      *
      * @return the type nid
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public int getTypeNid() throws IOException {
         return Ts.get().getNidForUuids(typeUuid);
@@ -374,7 +374,7 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
      *
      * @param relationshipVersion the relationship version
      * @return <code>true</code>, if successful
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public boolean validate(RelationshipVersionBI relationshipVersion) throws IOException {
         if (relationshipVersion.getStatusNid() != getStatusNid()) {

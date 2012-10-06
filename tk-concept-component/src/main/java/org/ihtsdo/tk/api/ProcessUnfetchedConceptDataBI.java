@@ -45,7 +45,7 @@ public interface ProcessUnfetchedConceptDataBI extends ContinuationTrackerBI {
      * Gets the set of nids to process.
      *
      * @return the nid set to process
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     NidBitSetBI getNidSet() throws IOException;
 }

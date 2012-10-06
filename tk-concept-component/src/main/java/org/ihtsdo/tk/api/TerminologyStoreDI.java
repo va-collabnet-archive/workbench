@@ -45,7 +45,7 @@ import org.ihtsdo.tk.dto.concept.component.TkRevision;
 public interface TerminologyStoreDI extends TerminologyDI {
 
     /**
-     * Adds a term change listener. Add this to recieve notification for term
+     * Adds a term change listener. Add this to receive notification for term
      * change events.
      *
      * @param termChangeListener the term change listener
@@ -55,8 +55,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
     void addTermChangeListener(TermChangeListener termChangeListener);
 
     /**
-     * Suspend change notifications. TODO-javadoc: are these term change
-     * notifications?
+     * Suspend change notifications. TODO-javadoc: are these term change notifications?
      *
      * @deprecated not in TK3
      */
@@ -64,8 +63,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
     void suspendChangeNotifications();
 
     /**
-     * Resume change notifications. TODO-javadoc: are these term change
-     * notifications?
+     * Resume change notifications. TODO-javadoc: are these term change notifications?
      *
      * @deprecated not in TK3
      */
@@ -126,7 +124,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * @param path the path to use for the position
      * @param time the time to use for the position
      * @return the position specified by the path and time
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @deprecated not in TK3
      */
     @Deprecated
@@ -149,7 +147,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * determines what this method returns.
      *
      * @return <code>true</code>, if the database uses RF2 metadata
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @deprecated not in TK3
      */
     @Deprecated
@@ -160,7 +158,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * Gets all the concept nids for every concept in the database.
      *
      * @return all the concept nids
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @deprecated not in TK3
      */
     @Deprecated
@@ -172,7 +170,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      *
      * @param uuids the uuids of the desired component
      * @return the component chronicle associated with the uuids
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     ComponentChronicleBI<?> getComponent(Collection<UUID> uuids) throws IOException;
 
@@ -183,7 +181,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * @param componentContainer the component container that contains the
      * desired component
      * @return the component chronicle contained by the component container
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     ComponentChronicleBI<?> getComponent(ComponentContainerBI componentContainer) throws IOException;
 
@@ -193,7 +191,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      *
      * @param nid the nid of the desired component
      * @return the component chronicle specified by the nid
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     ComponentChronicleBI<?> getComponent(int nid) throws IOException;
 
@@ -203,7 +201,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      *
      * @param uuids the uuids of the desired component
      * @return the component chronicle associated with the uuids
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     ComponentChronicleBI<?> getComponent(UUID... uuids) throws IOException;
 
@@ -216,7 +214,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * be returned
      * @param uuids the uuids of the desired component
      * @return the specified version of the component
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException if more than one version is found
      */
     ComponentVersionBI getComponentVersion(ViewCoordinate viewCoordinate, Collection<UUID> uuids)
@@ -231,7 +229,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * be returned
      * @param nid the nid of the desired component
      * @return the specified version of the component
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException if more than one version is found
      */
     ComponentVersionBI getComponentVersion(ViewCoordinate viewCoordinate, int nid)
@@ -246,7 +244,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * be returned
      * @param uuids the uuids of the desired component
      * @return the specified version of the component
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException if more than one version is found
      */
     ComponentVersionBI getComponentVersion(ViewCoordinate viewCoordinate, UUID... uuids)
@@ -257,7 +255,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      *
      * @param uuids the uuids of the desired concept
      * @return the concept chronicle associated with the uuids
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     ConceptChronicleBI getConcept(Collection<UUID> uuids) throws IOException;
 
@@ -266,7 +264,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      *
      * @param conceptContainer the concept container which contains the concept
      * @return the concept chronicle contained by the concept container
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     ConceptChronicleBI getConcept(ConceptContainerBI conceptContainer) throws IOException;
 
@@ -276,7 +274,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      *
      * @param conceptNid the nid of the desired concept
      * @return the concept chronicle associated with the nid
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     ConceptChronicleBI getConcept(int conceptNid) throws IOException;
 
@@ -286,7 +284,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      *
      * @param uuids the uuids of the desired concept
      * @return the concept chronicle associated with the uuids
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     ConceptChronicleBI getConcept(UUID... uuids) throws IOException;
 
@@ -297,7 +295,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * @param nid the nid of a component within a concept
      * @return the concept chronicle which contains the component specified by
      * the nid
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     ConceptChronicleBI getConceptForNid(int nid) throws IOException;
 
@@ -308,7 +306,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * @param nid the nid of a component within a concept
      * @return the concept nid associated with the concept which contains the
      * component specified by the nid
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     int getConceptNidForNid(int nid) throws IOException;
 
@@ -321,7 +319,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * be returned
      * @param uuids the uuids associated with the desired concept
      * @return the specified version of the concept
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     ConceptVersionBI getConceptVersion(ViewCoordinate viewCoordinate, Collection<UUID> uuids) throws IOException;
 
@@ -334,7 +332,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * be returned
      * @param conceptNid the concept nid of the desired concept
      * @return the specified version of the concept
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     ConceptVersionBI getConceptVersion(ViewCoordinate viewCoordinate, int conceptNid) throws IOException;
 
@@ -347,7 +345,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * be returned
      * @param uuids the uuids of the desired concept
      * @return the specified version of the concept
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     ConceptVersionBI getConceptVersion(ViewCoordinate viewCoordinate, UUID... uuids) throws IOException;
 
@@ -360,7 +358,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * be returned
      * @param conceptNids the concept nids associated with the desired concepts
      * @return a map of concept nids to the concept version
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     Map<Integer, ConceptVersionBI> getConceptVersions(ViewCoordinate viewCoordinate, NidBitSetBI conceptNids) throws IOException;
 
@@ -370,7 +368,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      *
      * @param conceptNids a set of concept nids of the desired concepts
      * @return the a map of the concept nids to the associated concept
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     Map<Integer, ConceptChronicleBI> getConcepts(NidBitSetBI conceptNids) throws IOException;
 
@@ -384,19 +382,18 @@ public interface TerminologyStoreDI extends TerminologyDI {
     ContradictionIdentifierBI getConflictIdentifier(ViewCoordinate viewCoordinate, boolean useCase);
 
     /**
-     * Gets an empty nid set. TODO-javadoc: how to use this, why to use this?
+     * Gets an empty nid set. TODO-javadoc: need overview of nid set
      *
      * @return an empty nid set
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     NidBitSetBI getEmptyNidSet() throws IOException;
 
     /**
-     * Gets the latest change set dependencies. TODO-javadoc: not sure what this
-     * does
+     * Gets the latest change set dependencies. TODO-javadoc: not sure what this does
      *
      * @return the latest change set dependencies
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     Collection<DbDependency> getLatestChangeSetDependencies() throws IOException;
 
@@ -407,7 +404,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * the Architectonic Auxiliary path.
      *
      * @return a generic view coordinate
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @deprecated not in TK3
      */
     @Deprecated
@@ -421,7 +418,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * "user" as author.
      *
      * @return a generic edit coordinate
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @deprecated not in TK3
      */
     @Deprecated
@@ -433,7 +430,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      *
      * @param uuids the uuids associated with the component with the desired nid
      * @return the nid of the component associated with the given uuids
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     int getNidForUuids(Collection<UUID> uuids) throws IOException;
 
@@ -443,7 +440,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      *
      * @param uuids the uuids associated with the component with the desired nid
      * @return the nid of the component associated with the given uuids
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     int getNidForUuids(UUID... uuids) throws IOException;
 
@@ -451,7 +448,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * Gets max stamp nid associated with any component in the read-only
      * database.
      *
-     * @return the stamp nid TODO-javadoc: HERE
+     * @return the stamp nid
      * @deprecated not in TK3
      */
     @Deprecated
@@ -459,7 +456,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
 
     /**
      * Gets the paths which have the path specified by the given
-     * <code>pathNid</code> as an origin. TODO-javadoc: is this correct?
+     * <code>pathNid</code> as an origin. TODO-javadoc: is this correct? when to use?
      *
      * @param pathNid the path nid associated with the desired origin path
      * @return a list of paths which are a child of the specified path
@@ -476,14 +473,14 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * @param viewCoordinate the view coordinate specifying which version of the
      * concept should be used as a parent
      * @return the nids of the possible child concepts
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException if more than one set of children exists
      * for the version specified by the view coordinate
      */
     int[] getPossibleChildren(int conceptNid, ViewCoordinate viewCoordinate) throws IOException, ContradictionException;
 
     /**
-     * Gets the sequence. TODO-javadoc: what is this?
+     * Gets the sequence. TODO-javadoc: what is the sequence?
      *
      * @return the sequence
      * @deprecated not in TK3
@@ -533,7 +530,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * @param nid the nid of the concept for which to find the primordial uuid
      * @return the primordial UUID if known. The IUnknown UUID
      * (00000000-0000-0000-C000-000000000046) if not known.
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     UUID getUuidPrimordialForNid(int nid) throws IOException;
 
@@ -543,7 +540,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      *
      * @param nid the nid of the concept for which to find the uuids
      * @return the uuids of the concept specified by the nid
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     List<UUID> getUuidsForNid(int nid) throws IOException;
 
@@ -553,7 +550,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      *
      * @param nid the nid associated with the path in question
      * @return <code>true</code>, if the database has the desired path
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     boolean hasPath(int nid) throws IOException;
 
@@ -592,7 +589,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * <code>relationshipVersion</code>.
      *
      * @param relationshipVersion the uncommitted relationship version to forget
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @deprecated not in TK3
      */
     @Deprecated
@@ -604,7 +601,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * <code>descriptionVersion</code>.
      *
      * @param descriptionVersion the uncommitted description version to forget
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @deprecated not in TK3
      */
     @Deprecated
@@ -616,7 +613,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      *
      * @param refexChronicle the refex which has the uncommitted changes to
      * forget TODO-javadoc: why is this method a chronicle?
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @deprecated not in TK3
      */
     @Deprecated
@@ -630,7 +627,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * @param conceptAttributeVersion the uncommitted concept attribute version
      * to forget
      * @return <code>true</code>, if successful
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @deprecated not in TK3
      */
     @Deprecated
@@ -643,7 +640,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      *
      * @param conceptChronicle the concept which has the uncommitted changes to
      * forget
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @deprecated not in TK3
      */
     @Deprecated
@@ -855,7 +852,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      *
      * @param version the version with the desired stamp nid
      * @return the stamp nid
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @see StampBI
      */
     int getStampNid(TkRevision version) throws IOException;
@@ -872,7 +869,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * concepts in question to use
      * @return <code>true</code>, if the child concept is kind of the parent
      * concept
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException if more than one version of a concept is
      * found for the given view coordinate
      */
@@ -891,7 +888,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * concepts in question to use
      * @return <code>true</code>, if the child concept is child of the parent
      * concept
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException if more than one version of a concept is
      * found for the given view coordinate
      */
@@ -907,15 +904,14 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * @param viewCoordinate the viewCoordinate specifying which version of the
      * concepts in question to use
      * @return the nids of ancestor concepts
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException if more than one version of a concept is
      * found for the given view coordinate
      */
     Set<Integer> getAncestors(int childNid, ViewCoordinate viewCoordinate) throws IOException, ContradictionException;
 
     /**
-     * Gets the nids of incoming relationships source concepts. TODO-javadoc:
-     * need to look at renaming. Not sure what convention should be.
+     * Gets the nids of incoming relationships source concepts. TODO-javadoc: need to look at renaming. Not sure what convention should be.
      *
      * In the relationship A is a B, the concept A has a target relationship to
      * the concept B, and the concept B has a source relationship to the concept
@@ -925,7 +921,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * @param relTypes the nids of types of relationship to consider
      * TODO-javadoc: are these listed anywhere?
      * @return the nids of the incoming relationships source concepts
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     int[] getIncomingRelationshipsSourceNids(int conceptNid, NidSetBI relTypes) throws IOException;
 }

@@ -37,7 +37,7 @@ public interface PathBI {
      * available.
      *
      * @return the html formatted string
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public String toHtmlString() throws IOException;
 
@@ -58,10 +58,10 @@ public interface PathBI {
 
     /**
      * Gets the matching path for the given
-     * <code>pathNid</code>. TODO-javadoc: why would you use this?
+     * <code>pathNid</code> from this path or its origins.
      *
-     * @param pathNid the nid associated with the path to match
-     * @return the matching path
+     * @param pathNid the nid associated with matching path
+     * @return the matching path if found, <code>null</code> otherwise
      */
     public PathBI getMatchingPath(int pathNid);
 

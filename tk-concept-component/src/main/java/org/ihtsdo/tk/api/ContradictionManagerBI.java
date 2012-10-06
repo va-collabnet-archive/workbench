@@ -65,7 +65,7 @@ public interface ContradictionManagerBI extends Serializable {
      * <p>
      * Note that the input list of tuples will not be modified by this method.
      *
-     * @param <T> the generic type TODO-javadoc: better description
+     * @param <T> the generic type of component version
      * @param versions the versions to resolve
      * @return tuples resolved as per the resolution strategy
      */
@@ -84,7 +84,7 @@ public interface ContradictionManagerBI extends Serializable {
      * and resolution will take place assuming they are all from the same
      * entity. </strong>
      *
-     * @param <T> the generic type TODO-javadoc: better description
+     * @param <T> the generic type of component versions
      * @param part1 the part1
      * @param part2 the part2
      * @return parts resolved as per the resolution strategy
@@ -102,7 +102,7 @@ public interface ContradictionManagerBI extends Serializable {
      * relationships, extensions...etc) are in conflict.
      * @return <code>true</code> if this conceptChronicle is in conflict according to the resolution
      * strategy
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     boolean isInConflict(ConceptChronicleBI conceptChronicle, boolean includeDependentEntities) throws IOException;
     
@@ -121,7 +121,7 @@ public interface ContradictionManagerBI extends Serializable {
      * @param descriptionChronicle description to test
      * @return <code>true</code> if this descriptionChronicle is in conflict according to the
      * resolution strategy
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     boolean isInConflict(DescriptionChronicleBI descriptionChronicle) throws IOException;
 

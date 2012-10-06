@@ -45,7 +45,7 @@ public interface TerminologyDI {
      * of <code>ScoredComponentReferences</code>, which represent the
      * concept/component nid of the result and a score of how well the result
      * matches the search criteria
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ParseException the parse exception
      */
     Collection<ScoredComponentReference> doTextSearch(String query) throws IOException, ParseException;
@@ -56,7 +56,7 @@ public interface TerminologyDI {
      * plugins/precommit folder of the install directory.
      *
      * @param conceptChronicle the concept with changes
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     void addUncommitted(ConceptChronicleBI conceptChronicle) throws IOException;
 
@@ -66,7 +66,7 @@ public interface TerminologyDI {
      * plugins/precommit folder of the install directory.
      *
      * @param conceptVersion the concept version with changes
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     void addUncommitted(ConceptVersionBI conceptVersion) throws IOException;
 
@@ -76,7 +76,7 @@ public interface TerminologyDI {
      * performed.
      *
      * @param conceptChronicle the concept with changes
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     void addUncommittedNoChecks(ConceptChronicleBI conceptChronicle) throws IOException;
 
@@ -85,7 +85,7 @@ public interface TerminologyDI {
      * <code>conceptVersion</code> as uncommitted. No datachecks are performed.
      *
      * @param conceptVersion the new concept version
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     void addUncommittedNoChecks(ConceptVersionBI conceptVersion) throws IOException;
 
@@ -93,7 +93,7 @@ public interface TerminologyDI {
      * Write direct. TODO-javadoc: what does this do?
      *
      * @param conceptChronicle the concept chronicle
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @deprecated not in TK3
      */
     @Deprecated
@@ -103,14 +103,14 @@ public interface TerminologyDI {
      * Commits all uncommitted changes. Performs datachecks in the
      * plugins/commit folder of the install directory.
      *
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     void commit() throws IOException;
 
     /**
      * Cancels all uncommitted changes.
      *
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     void cancel() throws IOException;
 
@@ -121,7 +121,7 @@ public interface TerminologyDI {
      * install directory.
      *
      * @param conceptChronicle the concept to commit
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     void commit(ConceptChronicleBI conceptChronicle) throws IOException;
 
@@ -133,7 +133,7 @@ public interface TerminologyDI {
      * @param conceptChronicle the concept to commit
      * @param changeSetPolicy the change set policy to use for writing changeset
      * generated on commit
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     void commit(ConceptChronicleBI conceptChronicle, ChangeSetPolicy changeSetPolicy) throws IOException;
 
@@ -142,7 +142,7 @@ public interface TerminologyDI {
      * <code>conceptChronicle</code>.
      *
      * @param conceptChronicle the uncommitted concept
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     void cancel(ConceptChronicleBI conceptChronicle) throws IOException;
 
@@ -151,7 +151,7 @@ public interface TerminologyDI {
      * <code>conceptVersion</code>.
      *
      * @param conceptVersion the uncommitted concept version
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     void commit(ConceptVersionBI conceptVersion) throws IOException;
 
@@ -160,7 +160,7 @@ public interface TerminologyDI {
      * <code>conceptVersion</code>.
      *
      * @param conceptVersion the uncommitted concept version to cancel
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     void cancel(ConceptVersionBI conceptVersion) throws IOException;
 
@@ -191,8 +191,7 @@ public interface TerminologyDI {
     void removeChangeSetGenerator(String key);
 
     /**
-     * Creates the dto change set generator. TODO-javadoc: how is this different
-     * from the other change set generator
+     * Creates the dto change set generator. TODO-javadoc: what are dto changesets?
      *
      * @param changeSetFileName the change set file name
      * @param changeSetTempFileName the change set temp file name
@@ -209,7 +208,7 @@ public interface TerminologyDI {
      *
      * @param stampNids the stamp nids representing the desired positions
      * @return the positions found from the specified stamp nids
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @see StampBI
      */
     Set<PositionBI> getPositionSet(Set<Integer> stampNids) throws IOException;
@@ -220,7 +219,7 @@ public interface TerminologyDI {
      *
      * @param stampNids the stamp nids representing the desired paths
      * @return the paths found from the specified stamp nids
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     Set<PathBI> getPathSetFromStampSet(Set<Integer> stampNids) throws IOException;
 
@@ -230,7 +229,7 @@ public interface TerminologyDI {
      *
      * @param positions the positions
      * @return the paths found in the specified positions
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     Set<PathBI> getPathSetFromPositionSet(Set<PositionBI> positions) throws IOException;
 
@@ -241,7 +240,7 @@ public interface TerminologyDI {
      *
      * @param pathNid the path nid
      * @return the path associated with the specified path nid
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     PathBI getPath(int pathNid) throws IOException;
 
@@ -251,7 +250,7 @@ public interface TerminologyDI {
      * @param authorityUuid the uuid representing the authority associated with the alternate id
      * @param alternateId a string representation of the alternate id
      * @return the nid associated with the specified component
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     int getNidFromAlternateId(UUID authorityUuid, String alternateId) throws IOException;
 }

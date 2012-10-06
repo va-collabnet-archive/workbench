@@ -58,7 +58,7 @@ public class TkRefexMember extends TkRefexAbstractMember<TkRefexRevision> {
      *
      * @param in the in
      * @param dataVersion the data version
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException the class not found exception
      */
     public TkRefexMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -70,7 +70,7 @@ public class TkRefexMember extends TkRefexAbstractMember<TkRefexRevision> {
      * Instantiates a new tk refex member.
      *
      * @param refexChronicle the refex chronicle
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public TkRefexMember(RefexChronicleBI refexChronicle) throws IOException {
         this((RefexMemberVersionBI) refexChronicle.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
@@ -81,7 +81,7 @@ public class TkRefexMember extends TkRefexAbstractMember<TkRefexRevision> {
      *
      * @param refexMemberVersion the refex member version
      * @param revisionHandling the revision handling
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public TkRefexMember(RefexMemberVersionBI refexMemberVersion,
             RevisionHandling revisionHandling) throws IOException {
@@ -132,7 +132,7 @@ public class TkRefexMember extends TkRefexAbstractMember<TkRefexRevision> {
      * @param offset the offset
      * @param mapAll the map all
      * @param viewCoordinate the view coordinate
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException the contradiction exception
      */
     public TkRefexMember(RefexVersionBI refexVersion, NidBitSetBI excludedNids, Map<UUID, UUID> conversionMap,

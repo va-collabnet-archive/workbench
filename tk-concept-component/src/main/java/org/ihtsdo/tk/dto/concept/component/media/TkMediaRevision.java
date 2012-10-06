@@ -61,7 +61,7 @@ public class TkMediaRevision extends TkRevision {
     * Instantiates a new tk media revision.
     *
     * @param mediaVersion the media version
-    * @throws IOException signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred
     */
    public TkMediaRevision(MediaVersionBI mediaVersion) throws IOException {
       super(mediaVersion);
@@ -74,7 +74,7 @@ public class TkMediaRevision extends TkRevision {
     *
     * @param in the in
     * @param dataVersion the data version
-    * @throws IOException signals that an I/O exception has occurred.
+    * @throws IOException signals that an I/O exception has occurred
     * @throws ClassNotFoundException the class not found exception
     */
    public TkMediaRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

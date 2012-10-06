@@ -83,7 +83,7 @@ public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
     /**
      * Instantiates a new null component finder.
      *
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException the class not found exception
      */
     public NullComponentFinder() throws IOException, ClassNotFoundException {
@@ -95,7 +95,7 @@ public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
      * Verify component.
      *
      * @param component the component
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     private void verifyComponent(ComponentChronicleBI component) throws IOException {
         if (component != null) {
@@ -174,7 +174,7 @@ public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
      * Process concept.
      *
      * @param concept the concept
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     private void processConcept(ConceptChronicleBI concept) throws IOException {
 
@@ -188,7 +188,7 @@ public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
         }
 
         // relationships
-        for (RelationshipChronicleBI rel : concept.getRelationshipsSource()) {
+        for (RelationshipChronicleBI rel : concept.getRelationshipsOutgoing()) {
             verifyComponent(rel);
         }
 
@@ -229,7 +229,7 @@ public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
     /**
      * Write null component file.
      *
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public void writeNullComponentFile() throws IOException { //TODO: implement for null components
         count.set(0);

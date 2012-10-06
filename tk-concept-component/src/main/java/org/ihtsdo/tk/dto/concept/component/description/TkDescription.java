@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.tk.dto.concept.component.description;
 
@@ -39,52 +39,74 @@ import org.ihtsdo.tk.dto.RevisionHandling;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Class TkDescription.
+ * The Class TkDescription represents a concept attribute in the eConcept format
+ * and contains methods for interacting with a description. Further discussion
+ * of the eConcept format can be found on
+ * <code>TkConcept</code>.
+ *
+ * @see TkConcept
+ * @param <V> the value type
  */
 public class TkDescription extends TkComponent<TkDescriptionRevision> implements I_DescribeExternally {
 
-    /** The Constant serialVersionUID. */
+    /**
+     * The Constant serialVersionUID, used to prevent the class from computing
+     * its own serialVersionUID based on a hash of all the method signatures.
+     */
     public static final long serialVersionUID = 1;
     //~--- fields --------------------------------------------------------------
-    /** The concept uuid. */
+    /**
+     * The the uuid of the enclosing concept.
+     */
     public UUID conceptUuid;
-    
-    /** The initial case significant. */
+    /**
+     * The boolean value indicating if the description text is initial case
+     * significant.
+     */
     public boolean initialCaseSignificant;
-    
-    /** The lang. */
+    /**
+     * The a two character abbreviation of language of the description text.
+     */
     public String lang;
-    
-    /** The text. */
+    /**
+     * The text associated with a description.
+     */
     public String text;
-    
-    /** The type uuid. */
+    /**
+     * The uuid representing the type of a description.
+     */
     public UUID typeUuid;
 
     //~--- constructors --------------------------------------------------------
     /**
-     * Instantiates a new tk description.
+     * Instantiates a new TK Description.
      */
     public TkDescription() {
         super();
     }
 
     /**
-     * Instantiates a new tk description.
+     * Instantiates a new TK Description based on the
+     * <code>descriptionChronicle</code>.
      *
-     * @param descriptionChronicle the description chronicle
-     * @throws IOException signals that an I/O exception has occurred.
+     * @param descriptionChronicle the description chronicle specifying how to
+     * construct this TK Description
+     * @throws IOException signals that an I/O exception has occurred
      */
     public TkDescription(DescriptionChronicleBI descriptionChronicle) throws IOException {
         this(descriptionChronicle.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
     }
 
     /**
-     * Instantiates a new tk description.
+     * Instantiates a new TK Description based on the
+     * <code>descriptionVersion</code> and using the given
+     * <code>revisionHandling</code>.
      *
-     * @param descriptionVersion the description version
-     * @param revisionHandling the revision handling
-     * @throws IOException signals that an I/O exception has occurred.
+     * @param descriptionVersion the description version specifying how to
+     * construct this TK Description
+     * @param revisionHandling specifying if addition versions should be
+     * included or not
+     * @throws IOException signals that an I/O exception has occurred
      */
     public TkDescription(DescriptionVersionBI descriptionVersion,
             RevisionHandling revisionHandling) throws IOException {
@@ -126,12 +148,15 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
     }
 
     /**
-     * Instantiates a new tk description.
+     * Instantiates a new TK Description based on the specified data input,
+     * <code>in</code>.
      *
-     * @param in the in
-     * @param dataVersion the data version
-     * @throws IOException signals that an I/O exception has occurred.
+     * @param in the data input specifying how to construct this TK
+     * Description
+     * @param dataVersion the data version of the external source
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException the class not found exception
+     * TODO-javadoc: why?
      */
     public TkDescription(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
@@ -139,12 +164,17 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
     }
 
     /**
-     * Instantiates a new tk description.
+     * Instantiates a new TK Description based on
+     * <code>another</code> TK Description and allows for uuid conversion.
      *
-     * @param another the another
-     * @param conversionMap the conversion map
-     * @param offset the offset
-     * @param mapAll the map all
+     * @param another the TK Description specifying how to construct this TK
+     * Description
+     * @param conversionMap the map for converting from one set of uuids to
+     * another
+     * @param offset the offset to be applied to the time associated with this
+     * TK Description
+     * @param mapAll set to <code>true</code> to map all the uuids in this TK
+     * Description based on the conversion map
      */
     public TkDescription(TkDescription another, Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
         super(another, conversionMap, offset, mapAll);
@@ -163,16 +193,25 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
     }
 
     /**
-     * Instantiates a new tk description.
+     * Instantiates a new TK Description based on a
+     * <code>descriptionVersion</code> and allows for uuid conversion. Can
+     * exclude components based on their nid.
      *
-     * @param descriptionVersion the description version
-     * @param excludedNids the excluded nids
-     * @param conversionMap the conversion map
-     * @param offset the offset
-     * @param mapAll the map all
-     * @param viewCoordinate the view coordinate
-     * @throws IOException signals that an I/O exception has occurred.
-     * @throws ContradictionException the contradiction exception
+     * @param descriptionVersion the description version specifying how to
+     * construct this TK Description
+     * @param excludedNids the nids in the specified component version to
+     * exclude from this TK Description
+     * @param conversionMap the map for converting from one set of uuids to
+     * another
+     * @param offset the offset to be applied to the time associated with this
+     * TK Description
+     * @param mapAll set to <code>true</code> to map all the uuids in this TK
+     * Description based on the conversion map
+     * @param viewCoordinate the view coordinate specifying which version of the
+     * components to use
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws ContradictionException if more than one version of a component is
+     * found for the specified view coordinate
      */
     public TkDescription(DescriptionVersionBI descriptionVersion, NidBitSetBI excludedNids, Map<UUID, UUID> conversionMap,
             long offset, boolean mapAll, ViewCoordinate viewCoordinate)
@@ -194,14 +233,14 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
 
     //~--- methods -------------------------------------------------------------
     /**
-     * Compares this object to the specified object. The result is <tt>true</tt> if and only if the argument
-     * is not <tt>null</tt>, is a <tt>EDescription</tt> object, and contains the same values, field by field,
-     * as this <tt>EDescription</tt>.
+     * Compares this object to the specified object. The result is <tt>true</tt>
+     * if and only if the argument is not <tt>null</tt>, is a
+     * <tt>EDescription</tt> object, and contains the same values, field by
+     * field, as this <tt>EDescription</tt>.
      *
      * @param obj the object to compare with.
-     * @return <code>true</code>, if successful
-     * <code>true</code> if the objects are the same;
-     * <code>false</code> otherwise.
+     * @return <code>true</code>, if successful <code>true</code> if the objects
+     * are the same; <code>false</code> otherwise.
      */
     @Override
     public boolean equals(Object obj) {
@@ -247,16 +286,28 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
         return false;
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.TkRevision#makeConversion(java.util.Map, long, boolean)
+    /**
+     *
+     * @param conversionMap the map for converting from one set of uuids to
+     * another
+     * @param offset the offset to be applied to the time associated with this
+     * TK Description
+     * @param mapAll set to <code>true</code> to map all the uuids in this TK
+     * Description based on the conversion map
+     * @return the converted TK Description
      */
     @Override
     public TkDescription makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
         return new TkDescription(this, conversionMap, offset, mapAll);
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.TkComponent#readExternal(java.io.DataInput, int)
+    /**
+     *
+     * @param in the data input specifying how to construct this TK Description
+     * @param dataVersion the data version of the external source
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws ClassNotFoundException the class not found exception
+     * TODO-javadoc: why?
      */
     @Override
     public final void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -279,7 +330,10 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
     }
 
     /**
-     * Returns a string representation of the object.
+     * Returns a string representation of this TK Description object.
+     *
+     * @return a string representation of this TK Description object including
+     * if the concept is defined or not
      *
      * @return the string
      */
@@ -303,8 +357,10 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
         return buff.toString();
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.TkComponent#writeExternal(java.io.DataOutput)
+    /**
+     *
+     * @param out the data output object that writes to the external source
+     * @throws IOException signals that an I/O exception has occurred
      */
     @Override
     public void writeExternal(DataOutput out) throws IOException {
@@ -330,48 +386,56 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
 
     //~--- get methods ---------------------------------------------------------
     /**
-     * Gets the concept uuid.
+     * Gets the uuid of the enclosing concept.
      *
-     * @return the concept uuid
+     * @return the uuid of the enclosing concept
      */
     public UUID getConceptUuid() {
         return conceptUuid;
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.api.ext.I_DescribeExternally#getLang()
+    /**
+     *
+     * @return the two character abbreviation of the language of the description
+     * text
      */
     @Override
     public String getLang() {
         return lang;
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.TkComponent#getRevisionList()
+    /**
+     *
+     * @return a list of revisions on this TK Description
      */
     @Override
     public List<TkDescriptionRevision> getRevisionList() {
         return revisions;
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.api.ext.I_DescribeExternally#getText()
+    /**
+     *
+     * @return a String representing the text associated with this TK
+     * Description
      */
     @Override
     public String getText() {
         return text;
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.api.ext.I_DescribeExternally#getTypeUuid()
+    /**
+     *
+     * @return the uuid of the type of this TK Description
      */
     @Override
     public UUID getTypeUuid() {
         return typeUuid;
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.api.ext.I_DescribeExternally#isInitialCaseSignificant()
+    /**
+     *
+     * @return <code>true</code>, if the text of this TK Description is case
+     * significant
      */
     @Override
     public boolean isInitialCaseSignificant() {
@@ -380,45 +444,47 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
 
     //~--- set methods ---------------------------------------------------------
     /**
-     * Sets the concept uuid.
+     * Sets uuid associated with the enclosing concept of this TK Description.
      *
-     * @param conceptUuid the new concept uuid
+     * @param conceptUuid the uuid associated with the enclosing concept
      */
     public void setConceptUuid(UUID conceptUuid) {
         this.conceptUuid = conceptUuid;
     }
 
     /**
-     * Sets the initial case significant.
+     * Indicates that the text associated with this TK Description is initial
+     * case significant.
      *
-     * @param initialCaseSignificant the new initial case significant
+     * @param initialCaseSignificant set to <code>true</code> to indicate that
+     * the description text is initial case significant
      */
     public void setInitialCaseSignificant(boolean initialCaseSignificant) {
         this.initialCaseSignificant = initialCaseSignificant;
     }
 
     /**
-     * Sets the lang.
+     * Sets the language associated with the text of this TK Description.
      *
-     * @param lang the new lang
+     * @param lang the two character String abbreviation of the language of the description text
      */
     public void setLang(String lang) {
         this.lang = lang;
     }
 
     /**
-     * Sets the text.
+     * Sets the text associated with this TK Description.
      *
-     * @param text the new text
+     * @param text the String representing the description text
      */
     public void setText(String text) {
         this.text = text;
     }
 
     /**
-     * Sets the type uuid.
+     * Sets the uuid for the type associated with this TK Description.
      *
-     * @param typeUuid the new type uuid
+     * @param typeUuid the uuid representing the description type
      */
     public void setTypeUuid(UUID typeUuid) {
         this.typeUuid = typeUuid;

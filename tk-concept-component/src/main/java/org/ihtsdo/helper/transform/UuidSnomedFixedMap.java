@@ -189,7 +189,7 @@ public class UuidSnomedFixedMap implements Map<UUID, Long> {
      * Write.
      *
      * @param f the f
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public void write(File f) throws IOException {
         BufferedWriter bw = new BufferedWriter(new FileWriter(f));
@@ -217,7 +217,7 @@ public class UuidSnomedFixedMap implements Map<UUID, Long> {
      *
      * @param f the f
      * @return the uuid snomed fixed map
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public static UuidSnomedFixedMap read(File f) throws IOException {
         UuidSnomedFixedMap map = new UuidSnomedFixedMap();
@@ -240,7 +240,7 @@ public class UuidSnomedFixedMap implements Map<UUID, Long> {
      * @param namespace the namespace
      * @param project the project
      * @return the uuid snomed fixed map
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public static UuidSnomedFixedMap read(File f, int namespace, int project) throws IOException {
         UuidSnomedFixedMap map = new UuidSnomedFixedMap();
@@ -254,7 +254,7 @@ public class UuidSnomedFixedMap implements Map<UUID, Long> {
      * @param f the f
      * @param map the map
      * @throws FileNotFoundException the file not found exception
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     private static void readData(File f, UuidSnomedFixedMap map) throws FileNotFoundException, IOException {
         System.out.println("Reading map file: " + f.getAbsolutePath());

@@ -141,7 +141,7 @@ public class DescriptionLogic { // :SNOOWL:
      * Gets the disjoint sets refset nid.
      *
      * @return the disjoint sets refset nid
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public static int getDisjointSetsRefsetNid() throws IOException {
         return Ts.get().getNidForUuids(DISJOINT_SETS_REFSET.getUuids());
@@ -151,7 +151,7 @@ public class DescriptionLogic { // :SNOOWL:
      * Gets the negation refset nid.
      *
      * @return the negation refset nid
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public static int getNegationRefsetNid() throws IOException {
         return Ts.get().getNidForUuids(NEGATION_REFSET.getUuids());
@@ -161,7 +161,7 @@ public class DescriptionLogic { // :SNOOWL:
      * Gets the union sets refset nid.
      *
      * @return the union sets refset nid
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public static int getUnionSetsRefsetNid() throws IOException {
         return Ts.get().getNidForUuids(UNION_SETS_REFSET.getUuids());
@@ -173,7 +173,7 @@ public class DescriptionLogic { // :SNOOWL:
      * @param relNid the rel nid
      * @param vc the vc
      * @return <code>true</code>, if is negated rel
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public static boolean isNegatedRel(int relNid, ViewCoordinate vc) throws IOException {
 //        if (relNid == -2145628237 || relNid == -2147479420 || relNid == -2143114520

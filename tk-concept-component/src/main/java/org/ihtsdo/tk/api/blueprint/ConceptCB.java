@@ -146,7 +146,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      * @param langCode the lang code
      * @param isaTypeUuid the isa type uuid
      * @param parentUuids the parent uuids
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -177,7 +177,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      * @param langCode the lang code
      * @param isaTypeUuid the isa type uuid
      * @param parentUuids the parent uuids
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -203,7 +203,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      *
      * @param conceptVersion the concept version
      * @param newConceptUuid the new concept uuid
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException the contradiction exception
      * @throws InvalidCAB the invalid cab
      */
@@ -344,7 +344,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      * @param dialect language code of fsn dialect
      * @throws NoSuchAlgorithmException the no such algorithm exception
      * @throws UnsupportedEncodingException the unsupported encoding exception
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -362,7 +362,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      * @param dialect the dialect
      * @throws NoSuchAlgorithmException the no such algorithm exception
      * @throws UnsupportedEncodingException the unsupported encoding exception
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -405,7 +405,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      * changing
      * @throws NoSuchAlgorithmException the no such algorithm exception
      * @throws UnsupportedEncodingException the unsupported encoding exception
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -492,7 +492,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      * @param dialect language code of pref name dialect
      * @throws NoSuchAlgorithmException the no such algorithm exception
      * @throws UnsupportedEncodingException the unsupported encoding exception
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -510,7 +510,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      * @param dialect the dialect
      * @throws NoSuchAlgorithmException the no such algorithm exception
      * @throws UnsupportedEncodingException the unsupported encoding exception
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -556,7 +556,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      * isn't changing
      * @throws NoSuchAlgorithmException the no such algorithm exception
      * @throws UnsupportedEncodingException the unsupported encoding exception
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -619,7 +619,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      * Make fully specified name cab.
      *
      * @return the description cab
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -643,7 +643,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      * Make preferred cab.
      *
      * @return the description cab
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -667,7 +667,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      * Gets the parent ca bs.
      *
      * @return the parent ca bs
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -690,7 +690,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      * Gets the fully specified name ca bs.
      *
      * @return the fully specified name ca bs
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -705,7 +705,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      * Gets the preferred name ca bs.
      *
      * @return the preferred name ca bs
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */
@@ -729,7 +729,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      * Gets the relationship ca bs.
      *
      * @return the relationship ca bs
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB the invalid cab
      * @throws ContradictionException the contradiction exception
      */

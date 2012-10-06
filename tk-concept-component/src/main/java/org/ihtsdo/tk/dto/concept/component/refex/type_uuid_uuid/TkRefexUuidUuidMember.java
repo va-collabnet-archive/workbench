@@ -64,7 +64,7 @@ public class TkRefexUuidUuidMember extends TkRefexAbstractMember<TkRefsetUuidUui
      * Instantiates a new tk refex uuid uuid member.
      *
      * @param refexChronicle the refex chronicle
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public TkRefexUuidUuidMember(RefexChronicleBI refexChronicle) throws IOException {
         this((RefexNidNidVersionBI) refexChronicle.getPrimordialVersion(), RevisionHandling.INCLUDE_REVISIONS);
@@ -75,7 +75,7 @@ public class TkRefexUuidUuidMember extends TkRefexAbstractMember<TkRefsetUuidUui
      *
      * @param refexNidNidVersion the refex nid nid version
      * @param revisionHandling the revision handling
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      */
     public TkRefexUuidUuidMember(RefexNidNidVersionBI refexNidNidVersion,
             RevisionHandling revisionHandling) throws IOException {
@@ -116,7 +116,7 @@ public class TkRefexUuidUuidMember extends TkRefexAbstractMember<TkRefsetUuidUui
      *
      * @param in the in
      * @param dataVersion the data version
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException the class not found exception
      */
     public TkRefexUuidUuidMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -154,7 +154,7 @@ public class TkRefexUuidUuidMember extends TkRefexAbstractMember<TkRefsetUuidUui
      * @param offset the offset
      * @param mapAll the map all
      * @param viewCoordinate the view coordinate
-     * @throws IOException signals that an I/O exception has occurred.
+     * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException the contradiction exception
      */
     public TkRefexUuidUuidMember(RefexNidNidVersionBI refexNidNidVersion, NidBitSetBI excludedNids,
