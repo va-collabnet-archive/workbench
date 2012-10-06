@@ -643,9 +643,9 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
    }
 
    @Override
-   public Collection<? extends RelationshipGroupVersionBI> getRelationshipGroups(ViewCoordinate vc)
+   public Collection<? extends RelationshipGroupVersionBI> getRelationshipOutgoingGroups(ViewCoordinate vc)
            throws IOException, ContradictionException {
-      return bean.getRelationshipGroups(vc);
+      return bean.getRelationshipOutgoingGroups(vc);
    }
 
    @Override
@@ -654,13 +654,13 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
    }
 
    @Override
-   public Collection<? extends RelationshipChronicleBI> getRelationshipsTarget() throws IOException {
-      return bean.getRelationshipsTarget();
+   public Collection<? extends RelationshipChronicleBI> getRelationshipsIncoming() throws IOException {
+      return bean.getRelationshipsIncoming();
    }
 
    @Override
-   public Collection<? extends RelationshipChronicleBI> getRelationshipsSource() throws IOException {
-      return bean.getRelationshipsSource();
+   public Collection<? extends RelationshipChronicleBI> getRelationshipsOutgoing() throws IOException {
+      return bean.getRelationshipsOutgoing();
    }
 
    @Override

@@ -70,7 +70,7 @@ public class BatchActionTaskLogicUnionRetire extends BatchActionTask {
         Collection<? extends RefexVersionBI<?>> rm = c.getRefexesActive(vc);
         for (RefexChronicleBI<?> rcbi : rm) {
             ConceptChronicleBI cb = rcbi.getEnclosingConcept();
-            Collection<? extends RelationshipChronicleBI> parents = cb.getRelationshipsSource();
+            Collection<? extends RelationshipChronicleBI> parents = cb.getRelationshipsOutgoing();
             for (RelationshipChronicleBI parentRel : parents) {
                 if (parentRel.getTargetNid() == DescriptionLogic.getUnionSetsRefsetNid()) {
                     Collection<? extends RefexVersionBI<?>> ml = cb.getRefsetMembersActive(vc);

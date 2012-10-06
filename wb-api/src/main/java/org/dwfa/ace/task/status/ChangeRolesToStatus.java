@@ -104,7 +104,7 @@ public class ChangeRolesToStatus extends AbstractTask {
            
             ViewCoordinate vc = config.getViewCoordinate();
             
-            Collection<? extends RelationshipChronicleBI> relsOut = concept.getRelationshipsSource();
+            Collection<? extends RelationshipChronicleBI> relsOut = concept.getRelationshipsOutgoing();
             
             //get rels that are NOT isa
             for (RelationshipChronicleBI rel : relsOut) {

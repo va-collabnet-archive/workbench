@@ -201,7 +201,7 @@ public class UpdateIdProcessor implements ProcessUnfetchedConceptDataBI {
 			}
 		}
 
-		for (RelationshipChronicleBI relationship : concept.getRelationshipsSource()) {
+		for (RelationshipChronicleBI relationship : concept.getRelationshipsOutgoing()) {
 			if (sctidsMap.containsKey(relationship.getPrimUuid())) {
 				// verify and update
 				String foundId = sctidsMap.get(relationship.getPrimUuid());

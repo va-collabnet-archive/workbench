@@ -49,7 +49,7 @@ public class CopyRelGroupAction extends AbstractAction {
 
             //get group numbers in target concept
             ConceptChronicleBI target = (ConceptChronicleBI) targetComponent;
-            Collection targetGroups = target.getRelationshipGroups(config.getViewCoordinate());
+            Collection targetGroups = target.getRelationshipOutgoingGroups(config.getViewCoordinate());
             int max = 0;
             for (Object groupObject : targetGroups) {
                 RelationshipGroupVersionBI rg = (RelationshipGroupVersionBI) groupObject;

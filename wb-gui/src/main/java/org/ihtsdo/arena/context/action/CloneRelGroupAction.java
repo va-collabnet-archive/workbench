@@ -49,7 +49,7 @@ public class CloneRelGroupAction extends AbstractAction {
 
             //get group numbers in target concept
             ConceptChronicleBI target = (ConceptChronicleBI) targetComponent;
-            Collection<? extends RelationshipGroupVersionBI> targetGroups = target.getRelationshipGroups(config.getViewCoordinate());
+            Collection<? extends RelationshipGroupVersionBI> targetGroups = target.getRelationshipOutgoingGroups(config.getViewCoordinate());
             int max = 0;
             for (RelationshipGroupVersionBI rg : targetGroups) {
                 Collection<? extends RelationshipVersionBI> currentRels = rg.getRelationshipsActive();
