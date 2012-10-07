@@ -363,7 +363,13 @@ public class DrComponentHelper {
                 extension.setRefsetUuid(tf.nidToUuid(annotation.getCollectionNid()).toString());
                 extension.setPrimordialUuid(annotation.getPrimUuid().toString());
                 extension.setFactContextName(factContextName);                
-                if (annotation instanceof RefexCnidCnidCnidVersionBI) {
+                if (annotation instanceof RefexCnidVersionBI) {
+                    RefexCnidVersionBI annotationTyped = (RefexCnidVersionBI) annotation;
+                    extension.setC1Uuid(tf.nidToUuid(annotationTyped.getCnid1()).toString());
+                    extension.setStatusUuid(tf.nidToUuid(annotationTyped.getStatusNid()).toString());
+                    extension.setTime(annotationTyped.getTime());
+                    extension.setAuthorUuid(tf.nidToUuid(annotationTyped.getAuthorNid()).toString());
+                } else if (annotation instanceof RefexCnidCnidCnidVersionBI) {
                     RefexCnidCnidCnidVersionBI annotationTyped = (RefexCnidCnidCnidVersionBI) annotation;
                     extension.setC1Uuid(tf.nidToUuid(annotationTyped.getCnid1()).toString());
                     extension.setC2Uuid(tf.nidToUuid(annotationTyped.getCnid2()).toString());
@@ -460,7 +466,13 @@ public class DrComponentHelper {
                 extension.setRefsetUuid(tf.nidToUuid(annotation.getCollectionNid()).toString());
                 extension.setPrimordialUuid(annotation.getPrimUuid().toString());
                 extension.setFactContextName(factContextName);                
-                if (annotation instanceof RefexCnidCnidCnidVersionBI) {
+                if (annotation instanceof RefexCnidVersionBI) {
+                    RefexCnidVersionBI annotationTyped = (RefexCnidVersionBI) annotation;
+                    extension.setC1Uuid(tf.nidToUuid(annotationTyped.getCnid1()).toString());
+                    extension.setStatusUuid(tf.nidToUuid(annotationTyped.getStatusNid()).toString());
+                    extension.setTime(annotationTyped.getTime());
+                    extension.setAuthorUuid(tf.nidToUuid(annotationTyped.getAuthorNid()).toString());
+                } else if (annotation instanceof RefexCnidCnidCnidVersionBI) {
                     RefexCnidCnidCnidVersionBI annotationTyped = (RefexCnidCnidCnidVersionBI) annotation;
                     extension.setC1Uuid(tf.nidToUuid(annotationTyped.getCnid1()).toString());
                     extension.setC2Uuid(tf.nidToUuid(annotationTyped.getCnid2()).toString());
