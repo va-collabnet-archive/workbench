@@ -4,8 +4,12 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -123,6 +127,8 @@ public abstract class RF2AbstractImpl {
 
 	private HashMap<String, String> modmodMap;
 
+	private BufferedWriter br;
+
 	public static Config getConfig() {
 		return config;
 	}
@@ -162,7 +168,10 @@ public abstract class RF2AbstractImpl {
 
 		dupRecord = 0;
 
+
+
 		try {
+
 			this.tf = Terms.get();
 			this.currenAceConfig = tf.getActiveAceFrameConfig();
 			snomedIntId = tf.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids());
@@ -198,7 +207,7 @@ public abstract class RF2AbstractImpl {
 			modMap.put("13b9d324-0913-4c7e-a4cd-c92f8d28e8bd","999000021000000109");
 			modMap.put("7049fbe6-220d-4580-a369-d1981d0753f8","999000031000000106");
 			modMap.put("ab30cbe7-92e5-4445-b489-9226a91d6506","999000041000000102");
-			
+
 
 			modmodMap=new HashMap<String,String>();
 			modmodMap.put("f9d7e720-cf9c-43d0-9b6b-17af1ff905c5","999000011000000103");
@@ -207,7 +216,7 @@ public abstract class RF2AbstractImpl {
 			modmodMap.put("13b9d324-0913-4c7e-a4cd-c92f8d28e8bd","999000011000000103");
 			modmodMap.put("7049fbe6-220d-4580-a369-d1981d0753f8","999000011000000103");
 			modmodMap.put("ab30cbe7-92e5-4445-b489-9226a91d6506","999000011000000103");
-			
+
 			nspMap=new HashMap<String,String>();
 			nspMap.put("999000011000000103","1000000");
 			nspMap.put("999000011000001104","1000001");
@@ -215,7 +224,7 @@ public abstract class RF2AbstractImpl {
 			nspMap.put("999000021000000109","1000000");
 			nspMap.put("999000031000000106","1000000");
 			nspMap.put("999000041000000102","1000000");
-			
+
 			this.preferredNid=tf.uuidToNative(UUID.fromString("266f1bc3-3361-39f3-bffe-69db9daea56e"));
 			this.acceptableNid=tf.uuidToNative(UUID.fromString("12b9e103-060e-3256-9982-18c1191af60e"));
 			this.currentNid=tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
@@ -272,6 +281,33 @@ public abstract class RF2AbstractImpl {
 		return descTypes;
 	}
 
+	public BufferedWriter getModSubsMapFile(){
+		return br;
+	}
+	public void openModSubsMapFile(){
+
+		FileOutputStream fis;
+		OutputStreamWriter isr;
+		try {
+			fis = new FileOutputStream("target/module-subsorigId.txt");
+			isr = new OutputStreamWriter(fis, "UTF-8");
+			br = new BufferedWriter(isr);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	public void closeModSubsFileMap(){
+		try {
+			br.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	private void setupCoreNids() throws TerminologyException, IOException {
 
 		// SETUP CORE NATIVES IDs
