@@ -44,6 +44,14 @@ public class RF2SimpleMapExporterMojo extends AbstractMojo {
 	 * @required
 	 */
 	private String exportFolder;
+
+	/**
+	 * Location of the rF2Format.
+	 * 
+	 * @parameter
+	 * @required
+	 */
+	private String rF2Format;
 	
 	// for accessing the web service
 	/**
@@ -52,6 +60,7 @@ public class RF2SimpleMapExporterMojo extends AbstractMojo {
 	 * @parameter
 	 * 
 	 */
+	
 	private String endpointURL;
 	
 	/**
@@ -150,6 +159,7 @@ public class RF2SimpleMapExporterMojo extends AbstractMojo {
 			// set all the values passed via mojo
 			config.setOutputFolderName(exportFolder);
 			config.setReleaseDate(releaseDate);
+			config.setRf2Format(rF2Format);
 			config.setFlushCount(10000);
 			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");
