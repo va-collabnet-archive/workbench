@@ -516,10 +516,11 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 					} else {
 						AceLog.getAppLog().info("existingVersion is null ");
 					}
-				} else {
-					AceLog.getAppLog().info("existingMember " + existingMember);
-					AceLog.getAppLog().info("vcStatus " + vcStatus);
 				}
+				// else {
+				// AceLog.getAppLog().info("existingMember " + existingMember);
+				// // AceLog.getAppLog().info("vcStatus " + vcStatus);
+				// }
 
 			} else {
 				RefsetPropertyMap refsetMap = new RefsetPropertyMap(
