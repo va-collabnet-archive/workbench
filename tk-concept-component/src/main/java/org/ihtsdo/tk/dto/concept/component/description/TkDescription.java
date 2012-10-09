@@ -333,9 +333,7 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
      * Returns a string representation of this TK Description object.
      *
      * @return a string representation of this TK Description object including
-     * if the concept is defined or not
-     *
-     * @return the string
+     * the enclosing concept, initial case sensitivity, language, and type.
      */
     @Override
     public String toString() {

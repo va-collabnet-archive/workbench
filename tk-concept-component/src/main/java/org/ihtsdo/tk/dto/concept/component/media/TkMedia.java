@@ -338,8 +338,8 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
     /**
      * Returns a string representation of this TK Media object.
      *
-     * @return a string representation of this TK Media object including if the
-     * concept is defined or not
+     * @return a string representation of this TK Media object including the
+     * enclosing concept, format, image, description, and media type.
      *
      * @return the string
      */
@@ -479,7 +479,7 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
      * Sets the text description of this media.
      *
      * @param textDescription the String representing the text description of
-     * this media
+     * this TK Media
      */
     public void setTextDescription(String textDescription) {
         this.textDescription = textDescription;

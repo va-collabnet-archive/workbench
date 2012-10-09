@@ -55,7 +55,8 @@ public interface TerminologyStoreDI extends TerminologyDI {
     void addTermChangeListener(TermChangeListener termChangeListener);
 
     /**
-     * Suspend change notifications. TODO-javadoc: are these term change notifications?
+     * Suspend change notifications. TODO-javadoc: are these term change
+     * notifications? yes
      *
      * @deprecated not in TK3
      */
@@ -63,7 +64,8 @@ public interface TerminologyStoreDI extends TerminologyDI {
     void suspendChangeNotifications();
 
     /**
-     * Resume change notifications. TODO-javadoc: are these term change notifications?
+     * Resume change notifications. TODO-javadoc: are these term change
+     * notifications? yes
      *
      * @deprecated not in TK3
      */
@@ -390,7 +392,9 @@ public interface TerminologyStoreDI extends TerminologyDI {
     NidBitSetBI getEmptyNidSet() throws IOException;
 
     /**
-     * Gets the latest change set dependencies. TODO-javadoc: not sure what this does
+     * Gets the latest change set dependencies. TODO-javadoc: Can attach
+     * changeset dependancy to a task, will see if those are in the db, can hide
+     * task in inbox until cs are in db
      *
      * @return the latest change set dependencies
      * @throws IOException signals that an I/O exception has occurred
@@ -456,7 +460,8 @@ public interface TerminologyStoreDI extends TerminologyDI {
 
     /**
      * Gets the paths which have the path specified by the given
-     * <code>pathNid</code> as an origin. TODO-javadoc: is this correct? when to use?
+     * <code>pathNid</code> as an origin. TODO-javadoc: getting children or
+     * descendants? change name if descendants
      *
      * @param pathNid the path nid associated with the desired origin path
      * @return a list of paths which are a child of the specified path
@@ -480,7 +485,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
     int[] getPossibleChildren(int conceptNid, ViewCoordinate viewCoordinate) throws IOException, ContradictionException;
 
     /**
-     * Gets the sequence. TODO-javadoc: what is the sequence?
+     * Gets the sequence. TODO-javadoc: db last change sequence
      *
      * @return the sequence
      * @deprecated not in TK3
@@ -494,8 +499,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * components rather than chronicles.
      *
      * @param viewCoordinate the view coordinate specifying which version of
-     * components and concepts should be used by the methods on * * * * *
-     * the <code>TerminolgoySnapshotDI</code> interface.
+     * components and concepts should be used by the methods on * * * * *      * the <code>TerminolgoySnapshotDI</code> interface.
      * @return the terminology snapshot as specified
      */
     TerminologySnapshotDI getSnapshot(ViewCoordinate viewCoordinate);
@@ -612,7 +616,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * <code>refexChronicle</code>.
      *
      * @param refexChronicle the refex which has the uncommitted changes to
-     * forget TODO-javadoc: why is this method a chronicle?
+     * forget
      * @throws IOException signals that an I/O exception has occurred
      * @deprecated not in TK3
      */
@@ -778,7 +782,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
     void touchComponent(int nid);
 
     /**
-     * Touch component alert. TODO-javadoc: not sure what this does
+     * Touch component alert. TODO-javadoc: listening for an alert (information) about a component
      *
      * @param nid the nid
      * @deprecated not in TK3
@@ -787,8 +791,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
     void touchComponentAlert(int nid);
 
     /**
-     * Touch component template. TODO-javadoc: not sure what this does
-     *
+     * Touch component template. TODO-javadoc: listening for a template about a component, template available
      * @param nid the nid
      * @deprecated not in TK3
      */
@@ -911,7 +914,8 @@ public interface TerminologyStoreDI extends TerminologyDI {
     Set<Integer> getAncestors(int childNid, ViewCoordinate viewCoordinate) throws IOException, ContradictionException;
 
     /**
-     * Gets the nids of incoming relationships source concepts. TODO-javadoc: need to look at renaming. Not sure what convention should be.
+     * Gets the nids of incoming relationships source concepts. TODO-javadoc:
+     * fix
      *
      * In the relationship A is a B, the concept A has a target relationship to
      * the concept B, and the concept B has a source relationship to the concept
@@ -919,7 +923,6 @@ public interface TerminologyStoreDI extends TerminologyDI {
      *
      * @param conceptNid the nid of the concept in question
      * @param relTypes the nids of types of relationship to consider
-     * TODO-javadoc: are these listed anywhere?
      * @return the nids of the incoming relationships source concepts
      * @throws IOException signals that an I/O exception has occurred
      */

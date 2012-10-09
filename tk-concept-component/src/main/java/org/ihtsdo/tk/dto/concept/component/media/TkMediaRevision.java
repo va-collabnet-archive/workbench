@@ -1,23 +1,22 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.tk.dto.concept.component.media;
 
 //~--- non-JDK imports --------------------------------------------------------
-
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.media.MediaVersionBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
@@ -33,202 +32,232 @@ import java.util.UUID;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Class TkMediaRevision.
+ * The Class TkMediaRevision represents a version of a description in the
+ * eConcept format and contains methods for interacting with a version of a
+ * description. Further discussion of the eConcept format can be found on
+ * <code>TkConcept</code>.
+ *
+ * @see TkConcept
  */
 public class TkMediaRevision extends TkRevision {
-   
-   /** The Constant serialVersionUID. */
-   public static final long serialVersionUID = 1;
 
-   //~--- fields --------------------------------------------------------------
+    /**
+     * The Constant serialVersionUID, used to prevent the class from computing
+     * its own serialVersionUID based on a hash of all the method signatures.
+     */
+    public static final long serialVersionUID = 1;
+    //~--- fields --------------------------------------------------------------
+    /**
+     * The text associated with a description of the media.
+     */
+    public String textDescription;
+    /**
+     * The uuid representing the type of media.
+     */
+    public UUID typeUuid;
 
-   /** The text description. */
-   public String textDescription;
-   
-   /** The type uuid. */
-   public UUID   typeUuid;
+    //~--- constructors --------------------------------------------------------
+    /**
+     * Instantiates a new TK Media Revision.
+     */
+    public TkMediaRevision() {
+        super();
+    }
 
-   //~--- constructors --------------------------------------------------------
+    /**
+     * Instantiates a new TK Media Revision based on the
+     * <code>mediaVersion</code>.
+     *
+     * @param mediaVersion the media version specifying how to construct
+     * this TK Media Revision
+     * @throws IOException signals that an I/O exception has occurred
+     */
+    public TkMediaRevision(MediaVersionBI mediaVersion) throws IOException {
+        super(mediaVersion);
+        this.textDescription = mediaVersion.getTextDescription();
+        this.typeUuid = Ts.get().getUuidPrimordialForNid(mediaVersion.getTypeNid());
+    }
 
-   /**
-    * Instantiates a new tk media revision.
-    */
-   public TkMediaRevision() {
-      super();
-   }
+    /**
+     * Instantiates a new TK Media Revision based on the specified data input,
+     * <code>in</code>.
+     *
+     * @param in the data input specifying how to construct this TK Media Revision
+     * @param dataVersion the data version of the external source
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws ClassNotFoundException the class not found exception
+     */
+    public TkMediaRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super();
+        readExternal(in, dataVersion);
+    }
 
-   /**
-    * Instantiates a new tk media revision.
-    *
-    * @param mediaVersion the media version
-    * @throws IOException signals that an I/O exception has occurred
-    */
-   public TkMediaRevision(MediaVersionBI mediaVersion) throws IOException {
-      super(mediaVersion);
-      this.textDescription = mediaVersion.getTextDescription();
-      this.typeUuid        = Ts.get().getUuidPrimordialForNid(mediaVersion.getTypeNid());
-   }
+    /**
+     * Instantiates a new TK Media Revision based on
+     * <code>another</code> TK Media and allows for uuid conversion..
+     *
+     * @param another the TK Media Revision specifying how to construct this TK Media
+     * @param conversionMap the map for converting from one set of uuids to
+     * another
+     * @param offset the offset to be applied to the time associated with this
+     * TK Media Revision
+     * @param mapAll set to <code>true</code> to map all the uuids in this TK
+     * Media Revision based on the conversion map
+     */
+    public TkMediaRevision(TkMediaRevision another, Map<UUID, UUID> conversionMap, long offset,
+            boolean mapAll) {
+        super(another, conversionMap, offset, mapAll);
+        this.textDescription = another.textDescription;
 
-   /**
-    * Instantiates a new tk media revision.
-    *
-    * @param in the in
-    * @param dataVersion the data version
-    * @throws IOException signals that an I/O exception has occurred
-    * @throws ClassNotFoundException the class not found exception
-    */
-   public TkMediaRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
-      super();
-      readExternal(in, dataVersion);
-   }
+        if (mapAll) {
+            this.typeUuid = conversionMap.get(another.typeUuid);
+        } else {
+            this.typeUuid = another.typeUuid;
+        }
+    }
 
-   /**
-    * Instantiates a new tk media revision.
-    *
-    * @param another the another
-    * @param conversionMap the conversion map
-    * @param offset the offset
-    * @param mapAll the map all
-    */
-   public TkMediaRevision(TkMediaRevision another, Map<UUID, UUID> conversionMap, long offset,
-                          boolean mapAll) {
-      super(another, conversionMap, offset, mapAll);
-      this.textDescription = another.textDescription;
-
-      if (mapAll) {
-         this.typeUuid = conversionMap.get(another.typeUuid);
-      } else {
-         this.typeUuid = another.typeUuid;
-      }
-   }
-
-   //~--- methods -------------------------------------------------------------
-
-   /**
-    * Compares this object to the specified object. The result is <tt>true</tt>
-    * if and only if the argument is not <tt>null</tt>, is a
-    * <tt>EImageVersion</tt> object, and contains the same values, field by field,
-    * as this <tt>EImageVersion</tt>.
-    *
-    * @param obj the object to compare with.
-    * @return <code>true</code> if the objects are the same;
-    *         <code>false</code> otherwise.
-    */
-   @Override
-   public boolean equals(Object obj) {
-      if (obj == null) {
-         return false;
-      }
-
-      if (TkMediaRevision.class.isAssignableFrom(obj.getClass())) {
-         TkMediaRevision another = (TkMediaRevision) obj;
-
-         // =========================================================
-         // Compare properties of 'this' class to the 'another' class
-         // =========================================================
-         // Compare textDescription
-         if (!this.textDescription.equals(another.textDescription)) {
+    //~--- methods -------------------------------------------------------------
+    /**
+     * Compares this object to the specified object. The result is <tt>true</tt>
+     * if and only if the argument is not <tt>null</tt>, is a
+     * <tt>EImageVersion</tt> object, and contains the same values, field by
+     * field, as this <tt>EImageVersion</tt>.
+     *
+     * @param obj the object to compare with.
+     * @return <code>true</code> if the objects are the same; <code>false</code>
+     * otherwise.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
             return false;
-         }
+        }
 
-         // Compare typeUuid
-         if (!this.typeUuid.equals(another.typeUuid)) {
-            return false;
-         }
+        if (TkMediaRevision.class.isAssignableFrom(obj.getClass())) {
+            TkMediaRevision another = (TkMediaRevision) obj;
 
-         // Compare their parents
-         return super.equals(obj);
-      }
+            // =========================================================
+            // Compare properties of 'this' class to the 'another' class
+            // =========================================================
+            // Compare textDescription
+            if (!this.textDescription.equals(another.textDescription)) {
+                return false;
+            }
 
-      return false;
-   }
+            // Compare typeUuid
+            if (!this.typeUuid.equals(another.typeUuid)) {
+                return false;
+            }
 
-   /* (non-Javadoc)
-    * @see org.ihtsdo.tk.dto.concept.component.TkRevision#makeConversion(java.util.Map, long, boolean)
-    */
-   @Override
-   public TkRevision makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
-      return new TkMediaRevision(this, conversionMap, offset, mapAll);
-   }
+            // Compare their parents
+            return super.equals(obj);
+        }
 
-   /* (non-Javadoc)
-    * @see org.ihtsdo.tk.dto.concept.component.TkRevision#readExternal(java.io.DataInput, int)
-    */
-   @Override
-   public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
-      super.readExternal(in, dataVersion);
-      textDescription = in.readUTF();
-      typeUuid        = new UUID(in.readLong(), in.readLong());
-   }
+        return false;
+    }
 
    /**
-    * Returns a string representation of the object.
-    *
-    * @return the string
-    */
-   @Override
-   public String toString() {
-      StringBuilder buff = new StringBuilder();
+     *
+     * @param conversionMap the map for converting from one set of uuids to
+     * another
+     * @param offset the offset to be applied to the time associated with this
+     * TK Media Revision
+     * @param mapAll set to <code>true</code> to map all the uuids in this TK
+     * Media Revision based on the conversion map
+     * @return the converted TK Media Revision
+     */
+    @Override
+    public TkRevision makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
+        return new TkMediaRevision(this, conversionMap, offset, mapAll);
+    }
 
-      buff.append(this.getClass().getSimpleName()).append(": ");
-      buff.append(" desc:");
-      buff.append("'").append(this.textDescription).append("'");
-      buff.append(" type:");
-      buff.append(informAboutUuid(this.typeUuid));
-      buff.append(" ");
-      buff.append(super.toString());
+    /**
+     *
+     * @param in the data input specifying how to construct this TK Media Revision
+     * @param dataVersion the data version of the external source
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws ClassNotFoundException the class not found exception
+     * TODO-javadoc: why?
+     */
+    @Override
+    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super.readExternal(in, dataVersion);
+        textDescription = in.readUTF();
+        typeUuid = new UUID(in.readLong(), in.readLong());
+    }
 
-      return buff.toString();
-   }
+    /**
+     * Returns a string representation of this TK Media object.
+     *
+     * @return a string representation of this TK Media object including 
+     * the description and type of media.
+     *
+     * @return the string
+     */
+    @Override
+    public String toString() {
+        StringBuilder buff = new StringBuilder();
 
-   /* (non-Javadoc)
-    * @see org.ihtsdo.tk.dto.concept.component.TkRevision#writeExternal(java.io.DataOutput)
-    */
-   @Override
-   public void writeExternal(DataOutput out) throws IOException {
-      super.writeExternal(out);
-      out.writeUTF(textDescription);
-      out.writeLong(typeUuid.getMostSignificantBits());
-      out.writeLong(typeUuid.getLeastSignificantBits());
-   }
+        buff.append(this.getClass().getSimpleName()).append(": ");
+        buff.append(" desc:");
+        buff.append("'").append(this.textDescription).append("'");
+        buff.append(" type:");
+        buff.append(informAboutUuid(this.typeUuid));
+        buff.append(" ");
+        buff.append(super.toString());
 
-   //~--- get methods ---------------------------------------------------------
+        return buff.toString();
+    }
 
-   /**
-    * Gets the text description.
-    *
-    * @return the text description
-    */
-   public String getTextDescription() {
-      return textDescription;
-   }
+    /**
+     *
+     * @param out the data output object that writes to the external source
+     * @throws IOException signals that an I/O exception has occurred
+     */
+    @Override
+    public void writeExternal(DataOutput out) throws IOException {
+        super.writeExternal(out);
+        out.writeUTF(textDescription);
+        out.writeLong(typeUuid.getMostSignificantBits());
+        out.writeLong(typeUuid.getLeastSignificantBits());
+    }
 
-   /**
-    * Gets the type uuid.
-    *
-    * @return the type uuid
-    */
-   public UUID getTypeUuid() {
-      return typeUuid;
-   }
+    //~--- get methods ---------------------------------------------------------
+    /**
+     * Gets the text describing this media.
+     *
+     * @return a String representing a description of this media
+     */
+    public String getTextDescription() {
+        return textDescription;
+    }
 
-   //~--- set methods ---------------------------------------------------------
+    /**
+     * Gets the uuid representing the type of media.
+     *
+     * @return the type uuid
+     */
+    public UUID getTypeUuid() {
+        return typeUuid;
+    }
 
-   /**
-    * Sets the text description.
-    *
-    * @param textDescription the new text description
-    */
-   public void setTextDescription(String textDescription) {
-      this.textDescription = textDescription;
-   }
+    //~--- set methods ---------------------------------------------------------
+    /**
+     * Sets the text description of this media.
+     *
+     * @param textDescription the String representing the text description of
+     * this TK Media
+     */
+    public void setTextDescription(String textDescription) {
+        this.textDescription = textDescription;
+    }
 
-   /**
-    * Sets the type uuid.
-    *
-    * @param typeUuid the new type uuid
-    */
-   public void setTypeUuid(UUID typeUuid) {
-      this.typeUuid = typeUuid;
-   }
+    /**
+     * Sets the uuid for the type associated with this TK Media.
+     *
+     * @param typeUuid the uuid representing the media type
+     */
+    public void setTypeUuid(UUID typeUuid) {
+        this.typeUuid = typeUuid;
+    }
 }

@@ -24,9 +24,12 @@ import java.util.UUID;
 // TODO: Auto-generated Javadoc
 /**
  * The Class UuidT3Generator generates a type 3 UUID object. A type 3 UUID is
- * name based and uses MD5 hashing to create the uuid from the given name.
- * 
- * @see <a href="http://en.wikipedia.org/wiki/Universally_unique_identifier">http://en.wikipedia.org/wiki/Universally_unique_identifier</a>
+ * name based and uses MD5 hashing to create the uuid from the given name. This
+ * generator should only be used for SNOMED Ids, all other users should use
+ * <code>UuidT5Generator</code>
+ *
+ * @see <a
+ * href="http://en.wikipedia.org/wiki/Universally_unique_identifier">http://en.wikipedia.org/wiki/Universally_unique_identifier</a>
  */
 public class UuidT3Generator {
 
@@ -62,8 +65,6 @@ public class UuidT3Generator {
     /**
      * Generates a type 3 UUID from the given string representing a SNOMED id.
      *
-     * TODO-javadoc: needs review
-     *
      * @param id a String representation of a SNOMED id
      * @return the generated uuid
      */
@@ -79,8 +80,6 @@ public class UuidT3Generator {
     /**
      * Generates a type 3 UUID from the given SNOMED id.
      *
-     * TODO-javadoc: needs review
-     *
      * @param id the SNOMED id
      * @return the generated uuid
      */
@@ -90,8 +89,6 @@ public class UuidT3Generator {
 
     /**
      * Generates a type 3 UUID from the given SNOMED id.
-     *
-     * TODO-javadoc: needs review
      *
      * @param id the SNOMED id
      * @return the generated uuid
@@ -104,10 +101,9 @@ public class UuidT3Generator {
      * Generates a type 3 UUID from the given enumeration
      * <code>e</code>.
      *
-     * TODO-javadoc: needs review
-     *
      * @param e the enumeration to generate the uuid from
      * @return the generated uuid
+     * @deprecated use <code>UuidT5Generator</code>
      */
     public static UUID fromEnum(Enum<?> e) {
         String name = e.getClass().getName() + "." + e.name();
@@ -126,6 +122,7 @@ public class UuidT3Generator {
      * @param typeUids the uuids representing the relationship types
      * @param destUids the uuids representing the destination relationship
      * @return a collection containing the generated uuid
+     * @deprecated use <code>UuidT5Generator</code>
      */
     public static Collection<UUID> forRel(Collection<UUID> srcUids, Collection<UUID> typeUids, Collection<UUID> destUids) {
         String name = "org.dwfa." + srcUids + typeUids + destUids;
@@ -137,6 +134,7 @@ public class UuidT3Generator {
      *
      * @param name the name to generate the uuid from
      * @return the collection containing the generated uuid
+     * @deprecated use <code>UuidT5Generator</code>
      */
     private static Collection<UUID> uuidCollectionFromName(String name) {
         try {
@@ -158,6 +156,7 @@ public class UuidT3Generator {
      * @param typeUids the uuids representing the description types
      * @param desc the String representation of the description text
      * @return the collection containing the generated uuid
+     * @deprecated use <code>UuidT5Generator</code>
      */
     public static Collection<UUID> forDesc(Collection<UUID> conceptUids, Collection<UUID> typeUids, String desc) {
         String name = "org.dwfa." + conceptUids + typeUids + desc;

@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.tk.dto.concept.component.refex.type_arrayofbytearray;
 
@@ -32,30 +32,42 @@ import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Class TkRefexArrayOfBytearrayMember.
+ * The Class TkRefexArrayOfBytearrayMember represents an array of byte array
+ * type refex member in the eConcept format and contains methods specific for
+ * interacting with an array of byte array type refex member. Further discussion
+ * of the eConcept format can be found on
+ * <code>TkConcept</code>.
  *
- * @author kec
+ * @see TkConcept
  */
 public class TkRefexArrayOfBytearrayMember extends TkRefexAbstractMember<TkRefexArrayOfByteArrayRevision> {
 
-    /** The Constant serialVersionUID. */
+    /**
+     * The Constant serialVersionUID, used to prevent the class from computing
+     * its own serialVersionUID based on a hash of all the method signatures.
+     */
     public static final long serialVersionUID = 1;
     //~--- fields --------------------------------------------------------------
-    /** The array of byte array1. */
+    /**
+     * The array of byte array associated with this TK Refex Array of Bytearray
+     * Member.
+     */
     public byte[][] arrayOfByteArray1;
 
     //~--- constructors --------------------------------------------------------
     /**
-     * Instantiates a new tk refex array of bytearray member.
+     * Instantiates a new TK Refex Array of Byte Array Member.
      */
     public TkRefexArrayOfBytearrayMember() {
         super();
     }
 
     /**
-     * Instantiates a new tk refex array of bytearray member.
+     * Instantiates a new TK Refex Array of Byte Array Member based on the
+     * <code>refexChronicle</code>.
      *
-     * @param refexChronicle the refex chronicle
+     * @param refexChronicle the refex chronicle specifying how to construct
+     * this TK Refex Array of Byte Array Member
      * @throws IOException signals that an I/O exception has occurred
      */
     public TkRefexArrayOfBytearrayMember(RefexChronicleBI refexChronicle) throws IOException {
@@ -63,10 +75,14 @@ public class TkRefexArrayOfBytearrayMember extends TkRefexAbstractMember<TkRefex
     }
 
     /**
-     * Instantiates a new tk refex array of bytearray member.
+     * Instantiates a new TK Refex Array of Byte Array Member based on the
+     * <code>refexArrayOfBytearrayVersion</code> and using the given
+     * <code>revisionHandling</code>.
      *
-     * @param refexArrayOfBytearrayVersion the refex array of bytearray version
-     * @param revisionHandling the revision handling
+     * @param refexArrayOfBytearrayVersion the refex array of byte array version
+     * specifying how to construct this TK Refex Array of Byte Array Member
+     * @param revisionHandling specifying if addition versions should be
+     * included or not
      * @throws IOException signals that an I/O exception has occurred
      */
     public TkRefexArrayOfBytearrayMember(RefexArrayOfBytearrayVersionBI refexArrayOfBytearrayVersion,
@@ -98,13 +114,15 @@ public class TkRefexArrayOfBytearrayMember extends TkRefexAbstractMember<TkRefex
             }
         }
     }
-    
 
     /**
-     * Instantiates a new tk refex array of bytearray member.
+     * Instantiates a new TK Refex Array of Byte Array Member based on the
+     * specified data input,
+     * <code>in</code>.
      *
-     * @param in the in
-     * @param dataVersion the data version
+     * @param in the data input specifying how to construct this TK Refex
+     * Array of Byte Array Member
+     * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException the class not found exception
      */
@@ -114,12 +132,18 @@ public class TkRefexArrayOfBytearrayMember extends TkRefexAbstractMember<TkRefex
     }
 
     /**
-     * Instantiates a new tk refex array of bytearray member.
+     * Instantiates a new TK Refex Array of Byte Array Member based on
+     * <code>another</code> TK Refex Array of Byte Array Member and allows for
+     * uuid conversion.
      *
-     * @param another the another
-     * @param conversionMap the conversion map
-     * @param offset the offset
-     * @param mapAll the map all
+     * @param another the TK Refex Array of Byte Array Member specifying how to
+     * construct this TK Refex Array of Byte Array Member
+     * @param conversionMap the map for converting from one set of uuids to
+     * another
+     * @param offset the offset to be applied to the time associated with this
+     * TK Refex Array of Byte Array Member
+     * @param mapAll set to <code>true</code> to map all the uuids in this TK
+     * Refex Array of Byte Array Member based on the conversion map
      */
     public TkRefexArrayOfBytearrayMember(TkRefexArrayOfBytearrayMember another, Map<UUID, UUID> conversionMap, long offset,
             boolean mapAll) {
@@ -128,16 +152,24 @@ public class TkRefexArrayOfBytearrayMember extends TkRefexAbstractMember<TkRefex
     }
 
     /**
-     * Instantiates a new tk refex array of bytearray member.
+     * Instantiates a new TK Refex Array of Byte Array Member based on a
+     * <code>refexArrayOfBytearrayVersion</code> and allows for uuid conversion.
+     * Can exclude components based on their nid.
      *
      * @param refexArrayOfBytearrayVersion the refex array of bytearray version
-     * @param excludedNids the excluded nids
-     * @param conversionMap the conversion map
-     * @param offset the offset
+     * specifying how to construct this TkRefexArrayOfBytearrayMember
+     * @param excludedNids the nids in the specified component version to
+     * exclude from this TK Refex Array of Byte Array Member
+     * @param conversionMap the map for converting from one set of uuids to
+     * another
+     * @param offset the offset to be applied to the time associated with this
+     * TK Refex Array of Byte Array Member
      * @param mapAll the map all
-     * @param viewCoordinate the view coordinate
+     * @param viewCoordinate the view coordinate specifying which version of the
+     * components to use
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if more than one version is found for the
+     * given view coordinate
      */
     public TkRefexArrayOfBytearrayMember(RefexArrayOfBytearrayVersionBI refexArrayOfBytearrayVersion, NidBitSetBI excludedNids,
             Map<UUID, UUID> conversionMap, long offset, boolean mapAll, ViewCoordinate viewCoordinate)
@@ -148,14 +180,14 @@ public class TkRefexArrayOfBytearrayMember extends TkRefexAbstractMember<TkRefex
 
     //~--- methods -------------------------------------------------------------
     /**
-     * Compares this object to the specified object. The result is <tt>true</tt> if and only if the argument
-     * is not <tt>null</tt>, is a <tt>ERefsetLongMember</tt> object, and contains the same values, field by
+     * Compares this object to the specified object. The result is <tt>true</tt>
+     * if and only if the argument is not <tt>null</tt>, is a
+     * <tt>ERefsetLongMember</tt> object, and contains the same values, field by
      * field, as this <tt>ERefsetLongMember</tt>.
      *
      * @param obj the object to compare with.
-     * @return <code>true</code>, if successful
-     * <code>true</code> if the objects are the same;
-     * <code>false</code> otherwise.
+     * @return <code>true</code>, if successful <code>true</code> if the objects
+     * are the same; <code>false</code> otherwise.
      */
     @Override
     public boolean equals(Object obj) {
@@ -183,25 +215,38 @@ public class TkRefexArrayOfBytearrayMember extends TkRefexAbstractMember<TkRefex
 
     /**
      * Returns a hash code for this
-     * <code>ERefsetLongMember</code>.
+     * <code>ERefsetArrayofByteArrayMember</code>.
      *
-     * @return a hash code value for this <tt>ERefsetLongMember</tt>.
+     * @return a hash code value for this <tt>ERefsetArrayofByteArrayMember</tt>.
      */
     @Override
     public int hashCode() {
         return this.primordialUuid.hashCode();
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.TkRevision#makeConversion(java.util.Map, long, boolean)
+    /**
+     *
+     * @param conversionMap the map for converting from one set of uuids to
+     * another
+     * @param offset the offset to be applied to the time associated with this
+     * TK Refex Array of Byte Array Member
+     * @param mapAll set to <code>true</code> to map all the uuids in this TK
+     * Refex Array of Byte Array Member based on the conversion map
+     * @return the converted TK Refex Array of Byte Array Member
      */
     @Override
     public TkRefexArrayOfBytearrayMember makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
         return new TkRefexArrayOfBytearrayMember(this, conversionMap, offset, mapAll);
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember#readExternal(java.io.DataInput, int)
+    /**
+     *
+     * @param in the data input specifying how to construct this TK Refex Array
+     * of Byte Array Member
+     * @param dataVersion the data version of the external source
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws ClassNotFoundException the class not found exception
+     * TODO-javadoc: why?
      */
     @Override
     public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -230,11 +275,11 @@ public class TkRefexArrayOfBytearrayMember extends TkRefexAbstractMember<TkRefex
             }
         }
     }
-
     /**
-     * Returns a string representation of the object.
+     * Returns a string representation of this TK Refex Array of Byte Array Member object.
      *
-     * @return the string
+     * @return a string representation of this TK Refex Array of Byte Array Member object
+     * including the size and the array of byte array.
      */
     @Override
     public String toString() {
@@ -254,8 +299,10 @@ public class TkRefexArrayOfBytearrayMember extends TkRefexAbstractMember<TkRefex
         return buff.toString();
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember#writeExternal(java.io.DataOutput)
+    /**
+     *
+     * @param out the data output object that writes to the external source
+     * @throws IOException signals that an I/O exception has occurred
      */
     @Override
     public void writeExternal(DataOutput out) throws IOException {
@@ -277,16 +324,18 @@ public class TkRefexArrayOfBytearrayMember extends TkRefexAbstractMember<TkRefex
     }
 
     //~--- get methods ---------------------------------------------------------
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.TkComponent#getRevisionList()
+    /**
+     *
+     * @return a list of revisions on this TK Refex Array of Byte Array Member
      */
     @Override
     public List<TkRefexArrayOfByteArrayRevision> getRevisionList() {
         return revisions;
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember#getType()
+    /**
+     * 
+     * @return TK_REFEX_TYPE.ARRAY_BYTEARRAY
      */
     @Override
     public TK_REFEX_TYPE getType() {
@@ -294,18 +343,18 @@ public class TkRefexArrayOfBytearrayMember extends TkRefexAbstractMember<TkRefex
     }
 
     /**
-     * Gets the array of byte array1.
+     * Gets the array of byte array associated with this TK Refex Array of Byte Array Member.
      *
-     * @return the array of byte array1
+     * @return the array of byte array
      */
     public byte[][] getArrayOfByteArray1() {
         return arrayOfByteArray1;
     }
 
     /**
-     * Sets the array of byte array1.
+     * Sets the array of byte array associated with this TK Refex Array of Byte Array Member.
      *
-     * @param byteArray1 the new array of byte array1
+     * @param byteArray1 the array of byte array
      */
     public void setArrayOfByteArray1(byte[][] byteArray1) {
         this.arrayOfByteArray1 = byteArray1;

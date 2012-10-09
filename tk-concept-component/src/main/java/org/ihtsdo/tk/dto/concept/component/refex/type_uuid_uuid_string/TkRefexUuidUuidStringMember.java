@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.tk.dto.concept.component.refex.type_uuid_uuid_string;
 
@@ -40,27 +40,42 @@ import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_uuid_uuid.TkRefexUuid
 
 // TODO: Auto-generated Javadoc
 /**
- * The Class TkRefexUuidUuidStringMember.
+ * The Class TkRefexUuidUuidStringMember represents a uuid-uuid-string type refex member in
+ * the eConcept format and contains methods specific for interacting with a
+ * uuid-uuid-string type refex member. Further discussion of the eConcept format can be
+ * found on
+ * <code>TkConcept</code>.
+ *
+ * @see TkConcept
  */
 public class TkRefexUuidUuidStringMember extends TkRefexAbstractMember<TkRefexUuidUuidStringRevision> {
 
-    /** The Constant serialVersionUID. */
+    /**
+     * The Constant serialVersionUID, used to prevent the class from computing
+     * its own serialVersionUID based on a hash of all the method signatures.
+     */
     public static final long serialVersionUID = 1;
     //~--- fields --------------------------------------------------------------
-    /** The uuid1. */
+    /**
+     * The first uuid associated with this TK Refex Uuid Uuid String Member.
+     */
     public UUID uuid1;
-    
-    /** The uuid2. */
+    /**
+     * The second uuid associated with this TK Refex Uuid Uuid String Member.
+     */
     public UUID uuid2;
-    
-    /** The string1. */
+    /**
+     * The string associated with this TK Refex Uuid Uuid String Member.
+     */
     public String string1;
 
     //~--- constructors --------------------------------------------------------
     /**
-     * Instantiates a new tk refex uuid uuid string member.
+     * Instantiates a new TK Refex Uuid Uuid String Member based on the
+     * <code>refexChronicle</code>.
      *
-     * @param refexChronicle the refex chronicle
+     * @param refexChronicle the refex chronicle specifying how to construct
+     * this TK Refex Uuid Uuid String Member
      * @throws IOException signals that an I/O exception has occurred
      */
     public TkRefexUuidUuidStringMember(RefexChronicleBI refexChronicle) throws IOException {
@@ -68,10 +83,14 @@ public class TkRefexUuidUuidStringMember extends TkRefexAbstractMember<TkRefexUu
     }
 
     /**
-     * Instantiates a new tk refex uuid uuid string member.
+     * Instantiates a new TK Refex Uuid Uuid String Member based on the
+     * <code>refexNidNidStringVersion</code> and using the given
+     * <code>revisionHandling</code>.
      *
-     * @param refexNidNidStringVersion the refex nid nid string version
-     * @param revisionHandling the revision handling
+     * @param refexNidNidStringVersion the refex nid nid string version specifying how to
+     * construct this TK Refex Uuid Uuid String Member
+     * @param revisionHandling specifying if addition versions should be
+     * included or not
      * @throws IOException signals that an I/O exception has occurred
      */
     public TkRefexUuidUuidStringMember(RefexNidNidStringVersionBI refexNidNidStringVersion,
@@ -112,17 +131,19 @@ public class TkRefexUuidUuidStringMember extends TkRefexAbstractMember<TkRefexUu
     }
 
     /**
-     * Instantiates a new tk refex uuid uuid string member.
+     * Instantiates a new TK Refex Uuid Uuid String Member.
      */
     public TkRefexUuidUuidStringMember() {
         super();
     }
 
     /**
-     * Instantiates a new tk refex uuid uuid string member.
+     * Instantiates a new TK Refex Uuid Uuid String Member based on the specified data
+     * input, <code>in</code>.
      *
-     * @param in the in
-     * @param dataVersion the data version
+     * @param in the data input specifying how to construct this TK Refex Uuid
+     * Uuid String Member
+     * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException the class not found exception
      */
@@ -132,12 +153,18 @@ public class TkRefexUuidUuidStringMember extends TkRefexAbstractMember<TkRefexUu
     }
 
     /**
-     * Instantiates a new tk refex uuid uuid string member.
+     * Instantiates a new TK Refex Uuid Uuid String Member based on
+     * <code>another</code> TK Refex Uuid Uuid String Member and allows for uuid
+     * conversion.
      *
-     * @param another the another
-     * @param conversionMap the conversion map
-     * @param offset the offset
-     * @param mapAll the map all
+     * @param another the TK Refex Uuid Uuid String Member specifying how to construct
+     * this TK Refex Uuid Uuid String Member
+     * @param conversionMap the map for converting from one set of uuids to
+     * another
+     * @param offset the offset to be applied to the time associated with this
+     * TK Refex Uuid Uuid String Member
+     * @param mapAll set to <code>true</code> to map all the uuids in this TK
+     * Refex Uuid Uuid String Member based on the conversion map
      */
     public TkRefexUuidUuidStringMember(TkRefexUuidUuidStringMember another, Map<UUID, UUID> conversionMap,
             long offset, boolean mapAll) {
@@ -155,16 +182,24 @@ public class TkRefexUuidUuidStringMember extends TkRefexAbstractMember<TkRefexUu
     }
 
     /**
-     * Instantiates a new tk refex uuid uuid string member.
+     * Instantiates a new TK Refex Uuid Uuid String Member based on a
+     * <code>refexNidNidVersion</code> and allows for uuid conversion. Can
+     * exclude components based on their nid.
      *
-     * @param refexNidNidStringVersion the refex nid nid string version
-     * @param excludedNids the excluded nids
-     * @param conversionMap the conversion map
-     * @param offset the offset
+     * @param refexNidNidStringVersion the refex nid nid string version specifying how to
+     * construct this TK Refex Uuid Uuid String Member
+     * @param excludedNids the nids in the specified component version to
+     * exclude from this TK Refex Uuid Uuid String Member
+     * @param conversionMap the map for converting from one set of uuids to
+     * another
+     * @param offset the offset to be applied to the time associated with this
+     * TK Refex Uuid Uuid String Member
      * @param mapAll the map all
-     * @param viewCoordinate the view coordinate
+     * @param viewCoordinate the view coordinate specifying which version of the
+     * components to use
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if more than one version is found for the
+     * given view coordinate
      */
     public TkRefexUuidUuidStringMember(RefexNidNidStringVersionBI refexNidNidStringVersion, NidBitSetBI excludedNids,
             Map<UUID, UUID> conversionMap, long offset, boolean mapAll,
@@ -185,14 +220,14 @@ public class TkRefexUuidUuidStringMember extends TkRefexAbstractMember<TkRefexUu
 
     //~--- methods -------------------------------------------------------------
     /**
-     * Compares this object to the specified object. The result is <tt>true</tt> if and only if the argument
-     * is not <tt>null</tt>, is a <tt>ERefsetCidCidStrMember</tt> object, and contains the same values, field
-     * by field, as this <tt>ERefsetCidCidStrMember</tt>.
+     * Compares this object to the specified object. The result is <tt>true</tt>
+     * if and only if the argument is not <tt>null</tt>, is a
+     * <tt>ERefsetCidCidStrMember</tt> object, and contains the same values,
+     * field by field, as this <tt>ERefsetCidCidStrMember</tt>.
      *
      * @param obj the object to compare with.
-     * @return <code>true</code>, if successful
-     * <code>true</code> if the objects are the same;
-     * <code>false</code> otherwise.
+     * @return <code>true</code>, if successful <code>true</code> if the objects
+     * are the same; <code>false</code> otherwise.
      */
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -237,16 +272,29 @@ public class TkRefexUuidUuidStringMember extends TkRefexAbstractMember<TkRefexUu
         return this.primordialUuid.hashCode();
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.TkRevision#makeConversion(java.util.Map, long, boolean)
+    /**
+     *
+     * @param conversionMap the map for converting from one set of uuids to
+     * another
+     * @param offset the offset to be applied to the time associated with this
+     * TK Refex Uuid Uuid String Member
+     * @param mapAll set to <code>true</code> to map all the uuids in this TK
+     * Refex Uuid Uuid String Member based on the conversion map
+     * @return the converted TK Refex Uuid Uuid String Member
      */
     @Override
     public TkRefexUuidUuidStringMember makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
         return new TkRefexUuidUuidStringMember(this, conversionMap, offset, mapAll);
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember#readExternal(java.io.DataInput, int)
+    /**
+     *
+     * @param in the data input specifying how to construct this TK
+     * Refex Uuid Uuid String Member
+     * @param dataVersion the data version of the external source
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws ClassNotFoundException the class not found exception
+     * TODO-javadoc: why?
      */
     @Override
     public final void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -275,9 +323,10 @@ public class TkRefexUuidUuidStringMember extends TkRefexAbstractMember<TkRefexUu
     }
 
     /**
-     * Returns a string representation of the object.
+     * Returns a string representation of this TK Refex Uuid Uuid String Member object.
      *
-     * @return the string
+     * @return a string representation of this TK Refex Uuid Uuid String Member object
+     * including the concepts represented by the uuids and the associated string.
      */
     @Override
     public String toString() {
@@ -296,8 +345,10 @@ public class TkRefexUuidUuidStringMember extends TkRefexAbstractMember<TkRefexUu
         return buff.toString();
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember#writeExternal(java.io.DataOutput)
+    /**
+     *
+     * @param out the data output object that writes to the external source
+     * @throws IOException signals that an I/O exception has occurred
      */
     @Override
     public void writeExternal(DataOutput out) throws IOException {
@@ -321,41 +372,43 @@ public class TkRefexUuidUuidStringMember extends TkRefexAbstractMember<TkRefexUu
 
     //~--- get methods ---------------------------------------------------------
     /**
-     * Gets the uuid1.
+     * Gets the first uuid associated with this TK Refex Uuid Uuid String Member.
      *
-     * @return the uuid1
+     * @return the first uuid associated with this TK Refex Uuid Uuid String Member
      */
     public UUID getUuid1() {
         return uuid1;
     }
 
     /**
-     * Gets the uuid2.
+     * Gets the second uuid associated with this TK Refex Uuid Uuid String Member.
      *
-     * @return the uuid2
+     * @return the second uuid associated with this TK Refex Uuid Uuid String Member
      */
     public UUID getUuid2() {
         return uuid2;
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.TkComponent#getRevisionList()
+    /**
+     * 
+     * @return a list of revisions on this TK Refex Uuid Uuid String Member
      */
     public List<TkRefexUuidUuidStringRevision> getRevisionList() {
         return revisions;
     }
 
     /**
-     * Gets the string1.
+     * Gets the string associated with this TK Refex Uuid Uuid String Member.
      *
-     * @return the string1
+     * @return the string associated with this TK Refex Uuid Uuid String Member
      */
     public String getString1() {
         return string1;
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember#getType()
+    /**
+     * 
+     * @return TK_REFEX_TYPE.CID_CID_STR
      */
     @Override
     public TK_REFEX_TYPE getType() {
@@ -364,27 +417,27 @@ public class TkRefexUuidUuidStringMember extends TkRefexAbstractMember<TkRefexUu
 
     //~--- set methods ---------------------------------------------------------
     /**
-     * Sets the uuid1.
+     * Sets the first uuid associated with this TK Refex Uuid Uuid String Member.
      *
-     * @param uuid1 the new uuid1
+     * @param uuid1 the first uuid associated with this TK Refex Uuid Uuid String Member
      */
     public void setUuid1(UUID uuid1) {
         this.uuid1 = uuid1;
     }
 
     /**
-     * Sets the uuid2.
+     * Sets the second uuid associated with this TK Refex Uuid Uuid String Member.
      *
-     * @param uuid2 the new uuid2
+     * @param uuid2 the second uuid associated with this TK Refex Uuid Uuid String Member
      */
     public void setUuid2(UUID uuid2) {
         this.uuid2 = uuid2;
     }
 
     /**
-     * Sets the string1.
+     * Sets the string1 associated with this TK Refex Uuid Uuid String Member.
      *
-     * @param string1 the new string1
+     * @param string1 the string associated with this TK Refex Uuid Uuid String Member
      */
     public void setString1(String string1) {
         this.string1 = string1;

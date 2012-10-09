@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.tk.dto.concept.component.refex.type_int;
 
@@ -37,28 +37,40 @@ import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_string.TkRefexUuidStr
 
 // TODO: Auto-generated Javadoc
 /**
- * The Class TkRefexIntMember.
+ * The Class TkRefexIntMember represents a int type refex member in the eConcept
+ * format and contains methods specific for interacting with a int type
+ * refex member. Further discussion of the eConcept format can be found on
+ * <code>TkConcept</code>.
+ *
+ * @see TkConcept
  */
 public class TkRefexIntMember extends TkRefexAbstractMember<TkRefexIntRevision> {
 
-    /** The Constant serialVersionUID. */
+    /**
+     * The Constant serialVersionUID, used to prevent the class from computing
+     * its own serialVersionUID based on a hash of all the method signatures.
+     */
     public static final long serialVersionUID = 1;
     //~--- fields --------------------------------------------------------------
-    /** The int1. */
+    /**
+     * The int value associated with this TK Refex Int Member.
+     */
     public int int1;
 
     //~--- constructors --------------------------------------------------------
     /**
-     * Instantiates a new tk refex int member.
+     * Instantiates a new TK Refex Int Member.
      */
     public TkRefexIntMember() {
         super();
     }
 
     /**
-     * Instantiates a new tk refex int member.
+     * Instantiates a new TK Refex Int Member based on the
+     * <code>refexChronicle</code>.
      *
-     * @param refexChronicle the refex chronicle
+     * @param refexChronicle the refex chronicle specifying how to construct
+     * this TK Refex Int Member
      * @throws IOException signals that an I/O exception has occurred
      */
     public TkRefexIntMember(RefexChronicleBI refexChronicle) throws IOException {
@@ -66,10 +78,14 @@ public class TkRefexIntMember extends TkRefexAbstractMember<TkRefexIntRevision> 
     }
 
     /**
-     * Instantiates a new tk refex int member.
+     * Instantiates a new TK Refex Int Member based on the
+     * <code>refexIntVersion</code> and using the given
+     * <code>revisionHandling</code>.
      *
-     * @param refexIntVersion the refex int version
-     * @param revisionHandling the revision handling
+     * @param refexIntVersion the refex int version specifying how to
+     * construct this TK Refex Int Member
+     * @param revisionHandling specifying if addition versions should be
+     * included or not
      * @throws IOException signals that an I/O exception has occurred
      */
     public TkRefexIntMember(RefexIntVersionBI refexIntVersion,
@@ -103,10 +119,11 @@ public class TkRefexIntMember extends TkRefexAbstractMember<TkRefexIntRevision> 
     }
 
     /**
-     * Instantiates a new tk refex int member.
+     * Instantiates a new TK Refex Int Member based on the specified data
+     * input, <code>in</code>.
      *
-     * @param in the in
-     * @param dataVersion the data version
+     * @param in the data input specifying how to construct this TK Refex Boolean Member
+     * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException the class not found exception
      */
@@ -116,12 +133,17 @@ public class TkRefexIntMember extends TkRefexAbstractMember<TkRefexIntRevision> 
     }
 
     /**
-     * Instantiates a new tk refex int member.
+     * Instantiates a new TK Refex Int Member based on
+     * <code>another</code> TK Refex Int Member and allows for uuid
+     * conversion.
      *
-     * @param another the another
-     * @param conversionMap the conversion map
-     * @param offset the offset
-     * @param mapAll the map all
+     * @param another the TK Refex Int Member specifying how to construct
+     * this TK Refex Int Member
+     * @param conversionMap the map for converting from one set of uuids to
+     * another
+     * @param offset the offset to be applied to the time associated with this
+     * TK Refex Int Member
+     * @param mapAll set to <code>true</code> to map all the uuids in this TK Refex Int Member based on the conversion map
      */
     public TkRefexIntMember(TkRefexIntMember another, Map<UUID, UUID> conversionMap, long offset,
             boolean mapAll) {
@@ -130,16 +152,24 @@ public class TkRefexIntMember extends TkRefexAbstractMember<TkRefexIntRevision> 
     }
 
     /**
-     * Instantiates a new tk refex int member.
+     * Instantiates a new TK Refex Int Member based on a
+     * <code>refexIntVersion</code> and allows for uuid conversion. Can
+     * exclude components based on their nid.
      *
-     * @param refexIntVersion the refex int version
-     * @param excludedNids the excluded nids
-     * @param conversionMap the conversion map
-     * @param offset the offset
+     * @param refexIntVersion the refex int version specifying how to
+     * construct this TK Refex Int Member
+     * @param excludedNids the nids in the specified component version to
+     * exclude from this TK Refex Int Member
+     * @param conversionMap the map for converting from one set of uuids to
+     * another
+     * @param offset the offset to be applied to the time associated with this
+     * TK Refex Int Member
      * @param mapAll the map all
-     * @param viewCoordinate the view coordinate
+     * @param viewCoordinate the view coordinate specifying which version of the
+     * components to use
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if more than one version is found for the
+     * given view coordinate
      */
     public TkRefexIntMember(RefexIntVersionBI refexIntVersion, NidBitSetBI excludedNids, Map<UUID, UUID> conversionMap,
             long offset, boolean mapAll, ViewCoordinate viewCoordinate)
@@ -150,14 +180,14 @@ public class TkRefexIntMember extends TkRefexAbstractMember<TkRefexIntRevision> 
 
     //~--- methods -------------------------------------------------------------
     /**
-     * Compares this object to the specified object. The result is <tt>true</tt> if and only if the argument
-     * is not <tt>null</tt>, is a <tt>ERefsetIntMember</tt> object, and contains the same values, field by
+     * Compares this object to the specified object. The result is <tt>true</tt>
+     * if and only if the argument is not <tt>null</tt>, is a
+     * <tt>ERefsetIntMember</tt> object, and contains the same values, field by
      * field, as this <tt>ERefsetIntMember</tt>.
      *
      * @param obj the object to compare with.
-     * @return <code>true</code>, if successful
-     * <code>true</code> if the objects are the same;
-     * <code>false</code> otherwise.
+     * @return <code>true</code>, if successful <code>true</code> if the objects
+     * are the same; <code>false</code> otherwise.
      */
     @Override
     public boolean equals(Object obj) {
@@ -205,16 +235,27 @@ public class TkRefexIntMember extends TkRefexAbstractMember<TkRefexIntRevision> 
         return this.primordialUuid.hashCode();
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.TkRevision#makeConversion(java.util.Map, long, boolean)
+    /**
+     *
+     * @param conversionMap the map for converting from one set of uuids to
+     * another
+     * @param offset the offset to be applied to the time associated with this
+     * TK Refex Int Member
+     * @param mapAll set to <code>true</code> to map all the uuids in this TK Refex Int Member based on the conversion map
+     * @return the converted TK Refex Int Member
      */
     @Override
     public TkRefexIntMember makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
         return new TkRefexIntMember(this, conversionMap, offset, mapAll);
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember#readExternal(java.io.DataInput, int)
+    /**
+     *
+     * @param in the data input specifying how to construct this TK Refex Int Member
+     * @param dataVersion the data version of the external source
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws ClassNotFoundException the class not found exception
+     * TODO-javadoc: why?
      */
     @Override
     public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -239,9 +280,10 @@ public class TkRefexIntMember extends TkRefexAbstractMember<TkRefexIntRevision> 
     }
 
     /**
-     * Returns a string representation of the object.
+     * Returns a string representation of this TK Refex Int Member object.
      *
-     * @return the string
+     * @return a string representation of this TK Refex Int Member object
+     * including the concept represented by the uuid.
      */
     @Override
     public String toString() {
@@ -256,8 +298,10 @@ public class TkRefexIntMember extends TkRefexAbstractMember<TkRefexIntRevision> 
         return buff.toString();
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember#writeExternal(java.io.DataOutput)
+    /**
+     *
+     * @param out the data output object that writes to the external source
+     * @throws IOException signals that an I/O exception has occurred
      */
     @Override
     public void writeExternal(DataOutput out) throws IOException {
@@ -277,24 +321,26 @@ public class TkRefexIntMember extends TkRefexAbstractMember<TkRefexIntRevision> 
 
     //~--- get methods ---------------------------------------------------------
     /**
-     * Gets the int1.
+     * Gets the int associated with this TK Refex Int Member.
      *
-     * @return the int1
+     * @return the int associated with this TK Refex Int Member
      */
     public int getInt1() {
         return int1;
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.TkComponent#getRevisionList()
+    /**
+     * 
+     * @return a list of revisions on this TK Refex Int Member
      */
     @Override
     public List<TkRefexIntRevision> getRevisionList() {
         return revisions;
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember#getType()
+    /**
+     * 
+     * @return TK_REFEX_TYPE.BOOLEAN
      */
     @Override
     public TK_REFEX_TYPE getType() {
@@ -303,9 +349,9 @@ public class TkRefexIntMember extends TkRefexAbstractMember<TkRefexIntRevision> 
 
     //~--- set methods ---------------------------------------------------------
     /**
-     * Sets the int1.
+     * Sets the int associated with this TK Refex Int Member.
      *
-     * @param int1 the new int1
+     * @param int1 the int associated with this TK Refex Int Member.
      */
     public void setInt1(int int1) {
         this.int1 = int1;

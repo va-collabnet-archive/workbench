@@ -1,23 +1,22 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.tk.dto.concept.component.refex.type_int;
 
 //~--- non-JDK imports --------------------------------------------------------
-
 import org.ihtsdo.tk.api.refex.type_int.RefexIntVersionBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
@@ -32,164 +31,190 @@ import java.util.UUID;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Class TkRefexIntRevision.
+ * The Class TkRefexIntRevision represents a version of a int type refex member
+ * in the eConcept format and contains methods specific for interacting with
+ * this version. Further discussion of the eConcept format can be found on
+ * <code>TkConcept</code>.
+ *
+ * @see TkConcept
  */
 public class TkRefexIntRevision extends TkRevision {
-   
-   /** The Constant serialVersionUID. */
-   public static final long serialVersionUID = 1;
 
-   //~--- fields --------------------------------------------------------------
+    /**
+     * The Constant serialVersionUID, used to prevent the class from computing
+     * its own serialVersionUID based on a hash of all the method signatures.
+     */
+    public static final long serialVersionUID = 1;
+    //~--- fields --------------------------------------------------------------
+    /**
+     * The int value associated with this TK Refex Int Revision.
+     */
+    public int int1;
 
-   /** The int1. */
-   public int int1;
+    //~--- constructors --------------------------------------------------------
+    /**
+     * Instantiates a new TK Refex Int Revision.
+     */
+    public TkRefexIntRevision() {
+        super();
+    }
 
-   //~--- constructors --------------------------------------------------------
+    /**
+     * Instantiates a new TK Refex Int Revision based on the
+     * <code>refexIntVersion</code>.
+     *
+     * @param refexIntVersion the refex int version specifying how to
+     * construct this TK Refex Int Revision
+     * @throws IOException signals that an I/O exception has occurred
+     */
+    public TkRefexIntRevision(RefexIntVersionBI refexIntVersion) throws IOException {
+        super(refexIntVersion);
+        this.int1 = refexIntVersion.getInt1();
+    }
 
-   /**
-    * Instantiates a new tk refex int revision.
-    */
-   public TkRefexIntRevision() {
-      super();
-   }
+    /**
+     * Instantiates a new TK Refex Int Revision based on the specified data
+     * input, <code>in</code>.
+     *
+     * @param in the data input specifying how to construct this TK Refex Boolean Member
+     * @param dataVersion the data version of the external source
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws ClassNotFoundException the class not found exception
+     */
+    public TkRefexIntRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super();
+        readExternal(in, dataVersion);
+    }
 
-   /**
-    * Instantiates a new tk refex int revision.
-    *
-    * @param refexIntVersion the refex int version
-    * @throws IOException signals that an I/O exception has occurred
-    */
-   public TkRefexIntRevision(RefexIntVersionBI refexIntVersion) throws IOException {
-      super(refexIntVersion);
-      this.int1 = refexIntVersion.getInt1();
-   }
+    /**
+     * Instantiates a new TK Refex Int Revision based on
+     * <code>another</code> TK Refex Int Revision and allows for uuid
+     * conversion.
+     *
+     * @param another the TK Refex Int Revision specifying how to construct
+     * this TK Refex Int Revision
+     * @param conversionMap the map for converting from one set of uuids to
+     * another
+     * @param offset the offset to be applied to the time associated with this
+     * TK Refex Int Revision
+     * @param mapAll set to <code>true</code> to map all the uuids in this TK Refex Int Revision based on the conversion map
+     */
+    public TkRefexIntRevision(TkRefexIntRevision another, Map<UUID, UUID> conversionMap, long offset,
+            boolean mapAll) {
+        super(another, conversionMap, offset, mapAll);
+        this.int1 = another.int1;
+    }
 
-   /**
-    * Instantiates a new tk refex int revision.
-    *
-    * @param in the in
-    * @param dataVersion the data version
-    * @throws IOException signals that an I/O exception has occurred
-    * @throws ClassNotFoundException the class not found exception
-    */
-   public TkRefexIntRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
-      super();
-      readExternal(in, dataVersion);
-   }
-
-   /**
-    * Instantiates a new tk refex int revision.
-    *
-    * @param another the another
-    * @param conversionMap the conversion map
-    * @param offset the offset
-    * @param mapAll the map all
-    */
-   public TkRefexIntRevision(TkRefexIntRevision another, Map<UUID, UUID> conversionMap, long offset,
-                              boolean mapAll) {
-      super(another, conversionMap, offset, mapAll);
-      this.int1 = another.int1;
-   }
-
-   //~--- methods -------------------------------------------------------------
-
-   /**
-    * Compares this object to the specified object. The result is <tt>true</tt>
-    * if and only if the argument is not <tt>null</tt>, is a
-    * <tt>ERefsetIntVersion</tt> object, and contains the same values, field by field,
-    * as this <tt>ERefsetIntVersion</tt>.
-    *
-    * @param obj the object to compare with.
-    * @return <code>true</code> if the objects are the same;
-    *         <code>false</code> otherwise.
-    */
-   @Override
-   public boolean equals(Object obj) {
-      if (obj == null) {
-         return false;
-      }
-
-      if (TkRefexIntRevision.class.isAssignableFrom(obj.getClass())) {
-         TkRefexIntRevision another = (TkRefexIntRevision) obj;
-
-         // =========================================================
-         // Compare properties of 'this' class to the 'another' class
-         // =========================================================
-         // Compare int1
-         if (this.int1 != another.int1) {
+    //~--- methods -------------------------------------------------------------
+    /**
+     * Compares this object to the specified object. The result is <tt>true</tt>
+     * if and only if the argument is not <tt>null</tt>, is a
+     * <tt>ERefsetIntVersion</tt> object, and contains the same values, field by
+     * field, as this <tt>ERefsetIntVersion</tt>.
+     *
+     * @param obj the object to compare with.
+     * @return <code>true</code> if the objects are the same; <code>false</code>
+     * otherwise.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
             return false;
-         }
+        }
 
-         // Compare their parents
-         return super.equals(obj);
-      }
+        if (TkRefexIntRevision.class.isAssignableFrom(obj.getClass())) {
+            TkRefexIntRevision another = (TkRefexIntRevision) obj;
 
-      return false;
-   }
+            // =========================================================
+            // Compare properties of 'this' class to the 'another' class
+            // =========================================================
+            // Compare int1
+            if (this.int1 != another.int1) {
+                return false;
+            }
 
-   /* (non-Javadoc)
-    * @see org.ihtsdo.tk.dto.concept.component.TkRevision#makeConversion(java.util.Map, long, boolean)
-    */
-   @Override
-   public TkRefexIntRevision makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
-      return new TkRefexIntRevision(this, conversionMap, offset, mapAll);
-   }
+            // Compare their parents
+            return super.equals(obj);
+        }
 
-   /* (non-Javadoc)
-    * @see org.ihtsdo.tk.dto.concept.component.TkRevision#readExternal(java.io.DataInput, int)
-    */
-   @Override
-   public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
-      super.readExternal(in, dataVersion);
-      int1 = in.readInt();
-   }
+        return false;
+    }
 
    /**
-    * Returns a string representation of the object.
-    *
-    * @return the string
-    */
-   @Override
-   public String toString() {
-      StringBuilder buff = new StringBuilder();
+     *
+     * @param conversionMap the map for converting from one set of uuids to
+     * another
+     * @param offset the offset to be applied to the time associated with this
+     * TK Refex Int Revision
+     * @param mapAll set to <code>true</code> to map all the uuids in this TK Refex Int Revision based on the conversion map
+     * @return the converted TK Refex Int Revision
+     */
+    @Override
+    public TkRefexIntRevision makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
+        return new TkRefexIntRevision(this, conversionMap, offset, mapAll);
+    }
 
-      buff.append(this.getClass().getSimpleName()).append(": ");
-      buff.append(" int: ");
-      buff.append(this.int1);
-      buff.append(" ");
-      buff.append(super.toString());
+    /**
+     *
+     * @param in the data input specifying how to construct this TK Refex Int Revision
+     * @param dataVersion the data version of the external source
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws ClassNotFoundException the class not found exception
+     * TODO-javadoc: why?
+     */
+    @Override
+    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super.readExternal(in, dataVersion);
+        int1 = in.readInt();
+    }
 
-      return buff.toString();
-   }
+    /**
+     * Returns a string representation of this TK Refex Int Revision object.
+     *
+     * @return a string representation of this TK Refex Int Revision object
+     * including the concept represented by the uuid.
+     */
+    @Override
+    public String toString() {
+        StringBuilder buff = new StringBuilder();
 
-   /* (non-Javadoc)
-    * @see org.ihtsdo.tk.dto.concept.component.TkRevision#writeExternal(java.io.DataOutput)
-    */
-   @Override
-   public void writeExternal(DataOutput out) throws IOException {
-      super.writeExternal(out);
-      out.writeInt(int1);
-   }
+        buff.append(this.getClass().getSimpleName()).append(": ");
+        buff.append(" int: ");
+        buff.append(this.int1);
+        buff.append(" ");
+        buff.append(super.toString());
 
-   //~--- get methods ---------------------------------------------------------
+        return buff.toString();
+    }
 
-   /**
-    * Gets the int1.
-    *
-    * @return the int1
-    */
-   public int getInt1() {
-      return int1;
-   }
+    /**
+     *
+     * @param out the data output object that writes to the external source
+     * @throws IOException signals that an I/O exception has occurred
+     */
+    @Override
+    public void writeExternal(DataOutput out) throws IOException {
+        super.writeExternal(out);
+        out.writeInt(int1);
+    }
 
-   //~--- set methods ---------------------------------------------------------
+    //~--- get methods ---------------------------------------------------------
+    /**
+     * Gets the int associated with this TK Refex Int Revision.
+     *
+     * @return the int associated with this TK Refex Int Revision
+     */
+    public int getInt1() {
+        return int1;
+    }
 
-   /**
-    * Sets the int1.
-    *
-    * @param int1 the new int1
-    */
-   public void setInt1(int int1) {
-      this.int1 = int1;
-   }
+    //~--- set methods ---------------------------------------------------------
+    /**
+     * Sets the int associated with this TK Refex Int Revision.
+     *
+     * @param int1 the int associated with this TK Refex Int Revision.
+     */
+    public void setInt1(int int1) {
+        this.int1 = int1;
+    }
 }

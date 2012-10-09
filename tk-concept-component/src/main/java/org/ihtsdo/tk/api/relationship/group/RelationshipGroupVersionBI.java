@@ -31,7 +31,7 @@ import java.util.Collection;
  * with a version of a relationship group.
  *
  * 
- * TODO-javadoc: look at else for if view coordinate != null in implementation
+ * TODO-javadoc: look at else for if view coordinate != null in implementation, if null return empty set
  */
 public interface RelationshipGroupVersionBI extends RelationshipGroupChronicleBI, ComponentVersionBI {
 
@@ -61,7 +61,7 @@ public interface RelationshipGroupVersionBI extends RelationshipGroupChronicleBI
     Collection<? extends RelationshipVersionBI> getRelationshipsAll() throws ContradictionException;
 
     /**
-     * Gets all the active relationships found in this group for the verions specified by the <code>viewCoordinate</code>. If the
+     * Gets all the active relationships found in this group for the versions specified by the <code>viewCoordinate</code>. If the
      * relationship group version contains a
      * <code>viewCoordinate</code> all active relationships found on that version will be returned. If relationship group
      * version does not contain a

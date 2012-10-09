@@ -18,7 +18,7 @@ package org.ihtsdo.tk.api;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Interface ProcessComponentChronicleBI. TODO-javadoc: need overview, used with annotations not sure what else/how
+ * The Interface ProcessComponentChronicleBI. TODO-javadoc: processor which gives component chronicle, fetches and handles iterations
  *
  * @author kec
  */

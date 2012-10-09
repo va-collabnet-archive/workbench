@@ -110,7 +110,7 @@ public class TkDescriptionRevision extends TkRevision implements I_DescribeExter
     /**
      * Instantiates a new TK Description Revision based on
      * <code>another</code> TK Description Revision and allows for uuid
-     * conversion..
+     * conversion.
      *
      * @param another the TK Description Revision specifying how to construct
      * this TK Description Revision

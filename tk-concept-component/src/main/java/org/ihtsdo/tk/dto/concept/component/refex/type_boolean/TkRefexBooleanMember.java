@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.tk.dto.concept.component.refex.type_boolean;
 
@@ -38,29 +38,43 @@ import org.ihtsdo.tk.dto.concept.component.refex.type_string.TkRefsetStrRevision
 
 // TODO: Auto-generated Javadoc
 /**
- * The Class TkRefexBooleanMember.
+ * The Class TkRefexBooleanMember represents a boolean type refex member in the
+ * eConcept format and contains methods specific for interacting with a boolean
+ * type refex member. Further discussion of the eConcept format can be found on
+ * <code>TkConcept</code>.
+ *
+ * @see TkConcept
  */
 public class TkRefexBooleanMember extends TkRefexAbstractMember<TkRefexBooleanRevision> {
 
-    /** The Constant serialVersionUID. */
+    /**
+     * The Constant serialVersionUID, used to prevent the class from computing
+     * its own serialVersionUID based on a hash of all the method signatures.
+     */
     public static final long serialVersionUID = 1;
     //~--- fields --------------------------------------------------------------
-    /** The boolean1. */
+    /**
+     * The boolean value associated with this TK Refex Boolean Member.
+     */
     public boolean boolean1;
 
     //~--- constructors --------------------------------------------------------
     /**
-     * Instantiates a new tk refex boolean member.
+     * Instantiates a new TK Refex Boolean Member.
      */
     public TkRefexBooleanMember() {
         super();
     }
 
     /**
-     * Instantiates a new tk refex boolean member.
+     * Instantiates a new TK Refex Boolean Member based on the
+     * <code>refexBooleanVersion</code> and using the given
+     * <code>revisionHandling</code>.
      *
-     * @param refexBooleanVersion the refex boolean version
-     * @param revisionHandling the revision handling
+     * @param refexBooleanVersion the refex boolean version specifying how to
+     * construct this TK Refex Boolean Member
+     * @param revisionHandling specifying if addition versions should be
+     * included or not
      * @throws IOException signals that an I/O exception has occurred
      */
     public TkRefexBooleanMember(RefexBooleanVersionBI refexBooleanVersion,
@@ -95,9 +109,11 @@ public class TkRefexBooleanMember extends TkRefexAbstractMember<TkRefexBooleanRe
     }
 
     /**
-     * Instantiates a new tk refex boolean member.
+     * Instantiates a new TK Refex Boolean Member based on the
+     * <code>refexChronicle</code>.
      *
-     * @param refexChronicle the refex chronicle
+     * @param refexChronicle the refex chronicle specifying how to construct
+     * this TK Refex Boolean Member
      * @throws IOException signals that an I/O exception has occurred
      */
     public TkRefexBooleanMember(RefexChronicleBI refexChronicle) throws IOException {
@@ -105,10 +121,11 @@ public class TkRefexBooleanMember extends TkRefexAbstractMember<TkRefexBooleanRe
     }
 
     /**
-     * Instantiates a new tk refex boolean member.
+     * Instantiates a new TK Refex Boolean Member based on the specified data
+     * input, <code>in</code>.
      *
-     * @param in the in
-     * @param dataVersion the data version
+     * @param in the data input specifying how to construct this TK Refex BooleanMember
+     * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException the class not found exception
      */
@@ -118,12 +135,18 @@ public class TkRefexBooleanMember extends TkRefexAbstractMember<TkRefexBooleanRe
     }
 
     /**
-     * Instantiates a new tk refex boolean member.
+     * Instantiates a new TK Refex Boolean Member based on
+     * <code>another</code> TK Refex Boolean Member and allows for uuid
+     * conversion.
      *
-     * @param another the another
-     * @param conversionMap the conversion map
-     * @param offset the offset
-     * @param mapAll the map all
+     * @param another the TK Refex Boolean Member specifying how to construct
+     * this TK Refex Boolean Member
+     * @param conversionMap the map for converting from one set of uuids to
+     * another
+     * @param offset the offset to be applied to the time associated with this
+     * TK Refex Boolean Member
+     * @param mapAll set to <code>true</code> to map all the uuids in this TK
+     * Refex Boolean Member based on the conversion map
      */
     public TkRefexBooleanMember(TkRefexBooleanMember another, Map<UUID, UUID> conversionMap, long offset,
             boolean mapAll) {
@@ -132,16 +155,24 @@ public class TkRefexBooleanMember extends TkRefexAbstractMember<TkRefexBooleanRe
     }
 
     /**
-     * Instantiates a new tk refex boolean member.
+     * Instantiates a new TK Refex Boolean Member based on a
+     * <code>refexBooleanVersion</code> and allows for uuid conversion. Can
+     * exclude components based on their nid.
      *
-     * @param refexBooleanVersion the refex boolean version
-     * @param excludedNids the excluded nids
-     * @param conversionMap the conversion map
-     * @param offset the offset
+     * @param refexBooleanVersion the refex boolean version specifying how to
+     * construct this TK Refex Boolean Member
+     * @param excludedNids the nids in the specified component version to
+     * exclude from this TK Refex Boolean Member
+     * @param conversionMap the map for converting from one set of uuids to
+     * another
+     * @param offset the offset to be applied to the time associated with this
+     * TK Refex Boolean Member
      * @param mapAll the map all
-     * @param viewCoordinate the view coordinate
+     * @param viewCoordinate the view coordinate specifying which version of the
+     * components to use
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if more than one version is found for the
+     * given view coordinate
      */
     public TkRefexBooleanMember(RefexBooleanVersionBI refexBooleanVersion, NidBitSetBI excludedNids,
             Map<UUID, UUID> conversionMap, long offset, boolean mapAll, ViewCoordinate viewCoordinate)
@@ -152,14 +183,14 @@ public class TkRefexBooleanMember extends TkRefexAbstractMember<TkRefexBooleanRe
 
     //~--- methods -------------------------------------------------------------
     /**
-     * Compares this object to the specified object. The result is <tt>true</tt> if and only if the argument
-     * is not <tt>null</tt>, is a <tt>ERefsetBooleanMember</tt> object, and contains the same values, field by
-     * field, as this <tt>ERefsetBooleanMember</tt>.
+     * Compares this object to the specified object. The result is <tt>true</tt>
+     * if and only if the argument is not <tt>null</tt>, is a
+     * <tt>ERefsetBooleanMember</tt> object, and contains the same values, field
+     * by field, as this <tt>ERefsetBooleanMember</tt>.
      *
      * @param obj the object to compare with.
-     * @return <code>true</code>, if successful
-     * <code>true</code> if the objects are the same;
-     * <code>false</code> otherwise.
+     * @return <code>true</code>, if successful <code>true</code> if the objects
+     * are the same; <code>false</code> otherwise.
      */
     @Override
     public boolean equals(Object obj) {
@@ -196,16 +227,29 @@ public class TkRefexBooleanMember extends TkRefexAbstractMember<TkRefexBooleanRe
         return this.primordialUuid.hashCode();
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.TkRevision#makeConversion(java.util.Map, long, boolean)
+    /**
+     *
+     * @param conversionMap the map for converting from one set of uuids to
+     * another
+     * @param offset the offset to be applied to the time associated with this
+     * TK Refex Boolean Member
+     * @param mapAll set to <code>true</code> to map all the uuids in this TK
+     * Refex Boolean Member based on the conversion map
+     * @return the converted TK Refex Boolean Member
      */
     @Override
     public TkRefexBooleanMember makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
         return new TkRefexBooleanMember(this, conversionMap, offset, mapAll);
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember#readExternal(java.io.DataInput, int)
+    /**
+     *
+     * @param in the data input specifying how to construct this TK
+     * Refex Boolean Member
+     * @param dataVersion the data version of the external source
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws ClassNotFoundException the class not found exception
+     * TODO-javadoc: why?
      */
     @Override
     public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -230,9 +274,10 @@ public class TkRefexBooleanMember extends TkRefexAbstractMember<TkRefexBooleanRe
     }
 
     /**
-     * Returns a string representation of the object.
+     * Returns a string representation of this TK Refex Boolean Member object.
      *
-     * @return the string
+     * @return a string representation of this TK Refex Boolean Member object
+     * including the concept represented by the uuid.
      */
     @Override
     public String toString() {
@@ -246,8 +291,10 @@ public class TkRefexBooleanMember extends TkRefexAbstractMember<TkRefexBooleanRe
         return buff.toString();
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember#writeExternal(java.io.DataOutput)
+    /**
+     *
+     * @param out the data output object that writes to the external source
+     * @throws IOException signals that an I/O exception has occurred
      */
     @Override
     public void writeExternal(DataOutput out) throws IOException {
@@ -267,23 +314,25 @@ public class TkRefexBooleanMember extends TkRefexAbstractMember<TkRefexBooleanRe
 
     //~--- get methods ---------------------------------------------------------
     /**
-     * Gets the boolean1.
+     * Gets the boolean associated with this TK Refex Boolean Member.
      *
-     * @return the boolean1
+     * @return the boolean associated with this TK Refex Boolean Member
      */
     public boolean getBoolean1() {
         return boolean1;
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.TkComponent#getRevisionList()
+    /**
+     * 
+     * @return a list of revisions on this TK Refex Boolean Member
      */
     public List<TkRefexBooleanRevision> getRevisionList() {
         return revisions;
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember#getType()
+    /**
+     * 
+     * @return TK_REFEX_TYPE.BOOLEAN
      */
     @Override
     public TK_REFEX_TYPE getType() {
@@ -292,9 +341,9 @@ public class TkRefexBooleanMember extends TkRefexAbstractMember<TkRefexBooleanRe
 
     //~--- set methods ---------------------------------------------------------
     /**
-     * Sets the boolean1.
+     * Sets the boolean associated with this TK Refex Boolean Member.
      *
-     * @param boolean1 the new boolean1
+     * @param boolean1 the new boolean associated with this TK Refex Boolean Member
      */
     public void setBoolean1(boolean boolean1) {
         this.boolean1 = boolean1;

@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.tk.dto.concept.component.relationship;
 
@@ -38,43 +38,60 @@ import org.ihtsdo.tk.dto.RevisionHandling;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Class TkRelationship.
+ * The Class TkRelationship relationship in the eConcept format and contains
+ * methods general to interacting with a relationship. Further discussion of the
+ * eConcept format can be found on
+ * <code>TkConcept</code>.
+ *
+ * @see TkConcept
  */
 public class TkRelationship extends TkComponent<TkRelationshipRevision> implements I_RelateExternally {
 
-    /** The Constant serialVersionUID. */
+    /**
+     * The Constant serialVersionUID, used to prevent the class from computing
+     * its own serialVersionUID based on a hash of all the method signatures.
+     */
     public static final long serialVersionUID = 1;
     //~--- fields --------------------------------------------------------------
-    /** The c1 uuid. */
+    /**
+     * The uuid of the source concept.
+     */
     public UUID c1Uuid;
-    
-    /** The c2 uuid. */
+    /**
+     * The uuid of the target concept.
+     */
     public UUID c2Uuid;
-    
-    /** The characteristic uuid. */
+    /**
+     * The uuid representing the relationship characteristic uuid.
+     */
     public UUID characteristicUuid;
-    
-    /** The refinability uuid. */
+    /**
+     * The uuid representing the relationship refinability uuid.
+     */
     public UUID refinabilityUuid;
-    
-    /** The rel group. */
+    /**
+     * The int value representing the relationship group.
+     */
     public int relGroup;
-    
-    /** The type uuid. */
+    /**
+     * The uuid representing the relationship type.
+     */
     public UUID typeUuid;
 
     //~--- constructors --------------------------------------------------------
     /**
-     * Instantiates a new tk relationship.
+     * Instantiates a new TK Relationship.
      */
     public TkRelationship() {
         super();
     }
 
     /**
-     * Instantiates a new tk relationship.
+     * Instantiates a new TK Relationship based on the
+     * <code>relationshipChronicle</code>.
      *
-     * @param relationshipChronicle the relationship chronicle
+     * @param relationshipChronicle the relationship chronicle how to construct
+     * this TK Relationship
      * @throws IOException signals that an I/O exception has occurred
      */
     public TkRelationship(RelationshipChronicleBI relationshipChronicle) throws IOException {
@@ -82,10 +99,14 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
     }
 
     /**
-     * Instantiates a new tk relationship.
+     * Instantiates a new TK Relationship based on the
+     * <code>relationshipVersion</code> and using the given
+     * <code>revisionHandling</code>.
      *
-     * @param relationshipVersion the relationship version
-     * @param revisionHandling the revision handling
+     * @param relationshipVersion the relationship version specifying how to
+     * construct this TK Relationship
+     * @param revisionHandling the revision handling specifying if addition
+     * versions should be included or not
      * @throws IOException signals that an I/O exception has occurred
      */
     public TkRelationship(RelationshipVersionBI relationshipVersion,
@@ -130,12 +151,14 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
     }
 
     /**
-     * Instantiates a new tk relationship.
+     * Instantiates a new TK Relationship based on the specified data input,
+     * <code>in</code>.
      *
-     * @param in the in
-     * @param dataVersion the data version
+     * @param in the data input specifying how to construct this TK Relationship
+     * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException the class not found exception
+     * TODO-javadoc: why?
      */
     public TkRelationship(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
@@ -143,12 +166,17 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
     }
 
     /**
-     * Instantiates a new tk relationship.
+     * Instantiates a new TK Relationship based on
+     * <code>another</code> TK Relationship and allows for uuid conversion.
      *
-     * @param another the another
-     * @param conversionMap the conversion map
-     * @param offset the offset
-     * @param mapAll the map all
+     * @param another the TK Relationship specifying how to construct this TK
+     * Relationship
+     * @param conversionMap the map for converting from one set of uuids to
+     * another
+     * @param offset the offset to be applied to the time associated with this
+     * TK Relationship
+     * @param mapAll set to <code>true</code> to map all the uuids in this TK
+     * Relationship based on the conversion map
      */
     public TkRelationship(TkRelationship another, Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
         super(another, conversionMap, offset, mapAll);
@@ -171,16 +199,25 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
     }
 
     /**
-     * Instantiates a new tk relationship.
+     * Instantiates a new TK Relationship based on a
+     * <code>relationshipVersion</code> and allows for uuid conversion. Can
+     * exclude components based on their nid.
      *
-     * @param relationshipVersion the relationship version
-     * @param excludedNids the excluded nids
-     * @param conversionMap the conversion map
-     * @param offset the offset
-     * @param mapAll the map all
-     * @param viewCoordinate the view coordinate
+     * @param relationshipVersion the relationship version specifying how to
+     * construct this TK Relationship
+     * @param excludedNids the nids in the specified component version to
+     * exclude from this TK Relationship
+     * @param conversionMap the map for converting from one set of uuids to
+     * another
+     * @param offset the offset to be applied to the time associated with this
+     * TK Relationship
+     * @param mapAll set to <code>true</code> to map all the uuids in this TK
+     * Relationship based on the conversion map
+     * @param viewCoordinate the view coordinate specifying which version of the
+     * components to use
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if more than one version of a component is
+     * found for the specified view coordinate
      */
     public TkRelationship(RelationshipVersionBI relationshipVersion, NidBitSetBI excludedNids,
             Map<UUID, UUID> conversionMap, long offset, boolean mapAll, ViewCoordinate viewCoordinate)
@@ -210,14 +247,14 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
 
     //~--- methods -------------------------------------------------------------
     /**
-     * Compares this object to the specified object. The result is <tt>true</tt> if and only if the argument
-     * is not <tt>null</tt>, is a <tt>ERelationship</tt> object, and contains the same values, field by field,
-     * as this <tt>ERelationship</tt>.
+     * Compares this object to the specified object. The result is <tt>true</tt>
+     * if and only if the argument is not <tt>null</tt>, is a
+     * <tt>ERelationship</tt> object, and contains the same values, field by
+     * field, as this <tt>ERelationship</tt>.
      *
      * @param obj the object to compare with.
-     * @return <code>true</code>, if successful
-     * <code>true</code> if the objects are the same;
-     * <code>false</code> otherwise.
+     * @return <code>true</code>, if successful <code>true</code> if the objects
+     * are the same; <code>false</code> otherwise.
      */
     @Override
     public boolean equals(Object obj) {
@@ -279,16 +316,28 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
         return this.primordialUuid.hashCode();
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.TkRevision#makeConversion(java.util.Map, long, boolean)
+    /**
+     *
+     * @param conversionMap the map for converting from one set of uuids to
+     * another
+     * @param offset the offset to be applied to the time associated with this
+     * TK Relationship
+     * @param mapAll set to <code>true</code> to map all the uuids in this TK
+     * Relationship based on the conversion map
+     * @return the converted TK Relationship
      */
     @Override
     public TkRelationship makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
         return new TkRelationship(this, conversionMap, offset, mapAll);
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.TkComponent#readExternal(java.io.DataInput, int)
+    /**
+     *
+     * @param in the data input specifying how to construct this TK Relationship
+     * @param dataVersion the data version of the external source
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws ClassNotFoundException the class not found exception
+     * TODO-javadoc: why?
      */
     @Override
     public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -312,9 +361,11 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
     }
 
     /**
-     * Returns a string representation of the object.
+     * Returns a string representation of this TK Relationship object.
      *
-     * @return the string
+     * @return a string representation of this TK Relationship object including
+     * the source concept, relationship type, target concept, group number,
+     * relationship characteristic, and relationship refinability.
      */
     @Override
     public String toString() {
@@ -339,8 +390,10 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
         return buff.toString();
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.TkComponent#writeExternal(java.io.DataOutput)
+    /**
+     *
+     * @param out the data output object that writes to the external source
+     * @throws IOException signals that an I/O exception has occurred
      */
     @Override
     public void writeExternal(DataOutput out) throws IOException {
@@ -369,59 +422,69 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
     }
 
     //~--- get methods ---------------------------------------------------------
-
-    /*
-     * (non-Javadoc) @see org.ihtsdo.tk.concept.component.relationship.I_RelateExternally#getRelationshipSourceUuid()
+    /**
+     *
+     * @return the uuid of the source concept associated with this TK
+     * Relationship
      */
     @Override
     public UUID getRelationshipSourceUuid() {
         return c1Uuid;
     }
 
-    /*
-     * (non-Javadoc) @see org.ihtsdo.tk.concept.component.relationship.I_RelateExternally#getRelationshipTargetUuid()
+    /**
+     *
+     * @return the uuid of the target concept associated with this TK
+     * Relationship
      */
     @Override
     public UUID getRelationshipTargetUuid() {
         return c2Uuid;
     }
 
-    /*
-     * (non-Javadoc) @see
-     * org.ihtsdo.tk.concept.component.relationship.I_RelateExternally#getCharacteristicUuid()
+    /**
+     *
+     * @return the uuid of the relationship characteristic associated with this
+     * TK Relationship
      */
     @Override
     public UUID getCharacteristicUuid() {
         return characteristicUuid;
     }
 
-    /*
-     * (non-Javadoc) @see
-     * org.ihtsdo.tk.concept.component.relationship.I_RelateExternally#getRefinabilityUuid()
+    /**
+     *
+     * @return the uuid of the relationship refinability associated with this TK
+     * Relationship
      */
     @Override
     public UUID getRefinabilityUuid() {
         return refinabilityUuid;
     }
 
-    /*
-     * (non-Javadoc) @see org.ihtsdo.tk.concept.component.relationship.I_RelateExternally#getRelationshipGroup()
+    /**
+     *
+     * @return the <code>int</code> representing the relationship group
+     * associated with this TK Relationship
      */
     @Override
     public int getRelationshipGroup() {
         return relGroup;
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.dto.concept.component.TkComponent#getRevisionList()
+    /**
+     *
+     * @return a list of revisions on this TK Relationship
      */
     @Override
     public List<TkRelationshipRevision> getRevisionList() {
         return revisions;
     }
 
-    /*
-     * (non-Javadoc) @see org.ihtsdo.tk.concept.component.relationship.I_RelateExternally#getTypeUuid()
+    /**
+     *
+     * @return the uuid of the relationship type associated with this TK
+     * Relationship
      */
     @Override
     public UUID getTypeUuid() {
@@ -430,54 +493,58 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
 
     //~--- set methods ---------------------------------------------------------
     /**
-     * Sets the c1 uuid.
+     * Sets the uuid of the source concept associated with this TK Relationship.
      *
-     * @param c1Uuid the new c1 uuid
+     * @param c1Uuid the uuid of the source concept
      */
     public void setC1Uuid(UUID c1Uuid) {
         this.c1Uuid = c1Uuid;
     }
 
     /**
-     * Sets the c2 uuid.
+     * Sets the uuid of the target concept associated with this TK Relationship.
      *
-     * @param c2Uuid the new c2 uuid
+     * @param c2Uuid the uuid of the target concept
      */
     public void setC2Uuid(UUID c2Uuid) {
         this.c2Uuid = c2Uuid;
     }
 
     /**
-     * Sets the characteristic uuid.
+     * Sets the relationship characteristic uuid associated with this TK
+     * Relationship.
      *
-     * @param characteristicUuid the new characteristic uuid
+     * @param characteristicUuid the relationship characteristic uuid
      */
     public void setCharacteristicUuid(UUID characteristicUuid) {
         this.characteristicUuid = characteristicUuid;
     }
 
     /**
-     * Sets the refinability uuid.
+     * Sets the relationship refinability uuid associated with this TK
+     * Relationship.
      *
-     * @param refinabilityUuid the new refinability uuid
+     * @param refinabilityUuid the relationship refinability uuid
      */
     public void setRefinabilityUuid(UUID refinabilityUuid) {
         this.refinabilityUuid = refinabilityUuid;
     }
 
     /**
-     * Sets the rel group.
+     * Sets the
+     * <code>int</code> representing the relationship group associated with this
+     * TK Relationship.
      *
-     * @param relGroup the new rel group
+     * @param relGroup the <code>int</code> representing the relationship group
      */
     public void setRelGroup(int relGroup) {
         this.relGroup = relGroup;
     }
 
     /**
-     * Sets the type uuid.
+     * Sets the relationship type uuid associated with this TK Relationship.
      *
-     * @param typeUuid the new type uuid
+     * @param typeUuid the relationship type uuid
      */
     public void setTypeUuid(UUID typeUuid) {
         this.typeUuid = typeUuid;

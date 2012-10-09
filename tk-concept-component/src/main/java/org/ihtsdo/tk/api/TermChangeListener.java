@@ -50,7 +50,7 @@ public abstract class TermChangeListener {
    /**
     * Allows the implemented method to do process the sets of changed nids when a term change event occurs.
     *
-    * @param sequence the sequence TODO-javadoc: what is the sequence?
+    * @param sequence the sequence TODO-javadoc: same as others
     * @param sourcesOfChangedRels the nids associated with the sources of changed relationships
     * @param targetsOfChangedRels the nids associated with the targets of changed relationships
     * @param referencedComponentsOfChangedRefexs the nids associated with the referenced components of changed refexs

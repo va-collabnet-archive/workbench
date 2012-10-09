@@ -890,22 +890,6 @@ public class SnomedMetadataRfx {
     }
 
     /**
-     * Sets up the release format to use based on the <code>releaseFormatNumber</code>.
-     *
-     * @param releaseFormatNumber 1 to use RF1, 2 to use RF2
-     * @throws IOException signals that an I/O exception has occurred
-     */
-    public static void setupSnoRf1Rf2(int releaseFormatNumber) throws IOException {
-        if (releaseFormatNumber != 1 || releaseFormatNumber != 2) {
-            throw new IOException("Invalid Release Format Number" + releaseFormatNumber);
-        }
-        //TODO-javadoc: I think this should check for the format number first
-        isReleaseFormatSetupB = true;
-        releaseFormat = releaseFormatNumber;
-        setupSnoRf1Rf2();
-    }
-
-    /**
      * Sets up the RF1/RF2 format.
      *
      * @throws IOException signals that an I/O exception has occurred

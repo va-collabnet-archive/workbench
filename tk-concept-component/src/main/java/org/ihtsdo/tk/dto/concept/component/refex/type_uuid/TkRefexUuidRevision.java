@@ -1,23 +1,22 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.tk.dto.concept.component.refex.type_uuid;
 
 //~--- non-JDK imports --------------------------------------------------------
-
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
@@ -34,173 +33,203 @@ import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Class TkRefexUuidRevision.
+ * The Class TkRefexUuidRevision represents a version of a uuid type refex
+ * member in the eConcept format and contains methods specific for interacting
+ * with this version. Further discussion of the eConcept format can be found on
+ * <code>TkConcept</code>.
+ *
+ * @see TkConcept
  */
 public class TkRefexUuidRevision extends TkRevision {
-   
-   /** The Constant serialVersionUID. */
-   public static final long serialVersionUID = 1;
 
-   //~--- fields --------------------------------------------------------------
+    /**
+     * The Constant serialVersionUID, used to prevent the class from computing
+     * its own serialVersionUID based on a hash of all the method signatures.
+     */
+    public static final long serialVersionUID = 1;
+    //~--- fields --------------------------------------------------------------
+    /**
+     * The uuid associated with this TK Refex Uuid Revision.
+     */
+    public UUID uuid1;
 
-   /** The uuid1. */
-   public UUID uuid1;
+    //~--- constructors --------------------------------------------------------
+    /**
+     * Instantiates a new TK Refex Uuid Revision.
+     */
+    public TkRefexUuidRevision() {
+        super();
+    }
 
-   //~--- constructors --------------------------------------------------------
+    /**
+     * Instantiates a new TK Refex Uuid Revision based on the
+     * <code>refexNidVersion</code>.
+     *
+     * @param refexNidVersion the refex nid version specifying how to
+     * construct this TK Refex Uuid Revision
+     * @throws IOException signals that an I/O exception has occurred
+     */
+    public TkRefexUuidRevision(RefexNidVersionBI refexNidVersion) throws IOException {
+        super(refexNidVersion);
 
-   /**
-    * Instantiates a new tk refex uuid revision.
-    */
-   public TkRefexUuidRevision() {
-      super();
-   }
+        TerminologyStoreDI ts = Ts.get();
 
-   /**
-    * Instantiates a new tk refex uuid revision.
-    *
-    * @param refexNidVersion the refex nid version
-    * @throws IOException signals that an I/O exception has occurred
-    */
-   public TkRefexUuidRevision(RefexNidVersionBI refexNidVersion) throws IOException {
-      super(refexNidVersion);
+        this.uuid1 = ts.getUuidPrimordialForNid(refexNidVersion.getNid1());
+    }
 
-      TerminologyStoreDI ts = Ts.get();
+    /**
+     * Instantiates a new TK Refex Uuid Revision based on the specified data
+     * input, <code>in</code>.
+     *
+     * @param in the data input specifying how to construct this TK Refex Uuid
+     * Revision
+     * @param dataVersion the data version of the external source
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws ClassNotFoundException the class not found exception
+     */
+    public TkRefexUuidRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super();
+        readExternal(in, dataVersion);
+    }
 
-      this.uuid1 = ts.getUuidPrimordialForNid(refexNidVersion.getNid1());
-   }
+    /**
+     * Instantiates a new TK Refex Uuid Revision based on
+     * <code>another</code> TK Refex Uuid Revision and allows for uuid
+     * conversion.
+     *
+     * @param another the TK Refex Uuid Revision specifying how to construct
+     * this TK Refex Uuid Revision
+     * @param conversionMap the map for converting from one set of uuids to
+     * another
+     * @param offset the offset to be applied to the time associated with this
+     * TK Refex Uuid Revision
+     * @param mapAll set to <code>true</code> to map all the uuids in this TK
+     * Refex Uuid Revision based on the conversion map
+     */
+    public TkRefexUuidRevision(TkRefexUuidRevision another, Map<UUID, UUID> conversionMap, long offset,
+            boolean mapAll) {
+        super(another, conversionMap, offset, mapAll);
 
-   /**
-    * Instantiates a new tk refex uuid revision.
-    *
-    * @param in the in
-    * @param dataVersion the data version
-    * @throws IOException signals that an I/O exception has occurred
-    * @throws ClassNotFoundException the class not found exception
-    */
-   public TkRefexUuidRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
-      super();
-      readExternal(in, dataVersion);
-   }
+        if (mapAll) {
+            this.uuid1 = conversionMap.get(another.uuid1);
+        } else {
+            this.uuid1 = another.uuid1;
+        }
+    }
 
-   /**
-    * Instantiates a new tk refex uuid revision.
-    *
-    * @param another the another
-    * @param conversionMap the conversion map
-    * @param offset the offset
-    * @param mapAll the map all
-    */
-   public TkRefexUuidRevision(TkRefexUuidRevision another, Map<UUID, UUID> conversionMap, long offset,
-                              boolean mapAll) {
-      super(another, conversionMap, offset, mapAll);
-
-      if (mapAll) {
-         this.uuid1 = conversionMap.get(another.uuid1);
-      } else {
-         this.uuid1 = another.uuid1;
-      }
-   }
-
-   //~--- methods -------------------------------------------------------------
-
-   /**
-    * Compares this object to the specified object. The result is <tt>true</tt>
-    * if and only if the argument is not <tt>null</tt>, is a
-    * <tt>ERefsetCidVersion</tt> object, and contains the same values, field by field,
-    * as this <tt>ERefsetCidVersion</tt>.
-    *
-    * @param obj the object to compare with.
-    * @return <code>true</code> if the objects are the same;
-    *         <code>false</code> otherwise.
-    */
-   @Override
-   public boolean equals(Object obj) {
-      if (obj == null) {
-         return false;
-      }
-
-      if (TkRefexUuidRevision.class.isAssignableFrom(obj.getClass())) {
-         TkRefexUuidRevision another = (TkRefexUuidRevision) obj;
-
-         // =========================================================
-         // Compare properties of 'this' class to the 'another' class
-         // =========================================================
-         // Compare setUuid1
-         if (!this.uuid1.equals(another.uuid1)) {
+    //~--- methods -------------------------------------------------------------
+    /**
+     * Compares this object to the specified object. The result is <tt>true</tt>
+     * if and only if the argument is not <tt>null</tt>, is a
+     * <tt>ERefsetCidVersion</tt> object, and contains the same values, field by
+     * field, as this <tt>ERefsetCidVersion</tt>.
+     *
+     * @param obj the object to compare with.
+     * @return <code>true</code> if the objects are the same; <code>false</code>
+     * otherwise.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
             return false;
-         }
+        }
 
-         // Compare their parents
-         return super.equals(obj);
-      }
+        if (TkRefexUuidRevision.class.isAssignableFrom(obj.getClass())) {
+            TkRefexUuidRevision another = (TkRefexUuidRevision) obj;
 
-      return false;
-   }
+            // =========================================================
+            // Compare properties of 'this' class to the 'another' class
+            // =========================================================
+            // Compare setUuid1
+            if (!this.uuid1.equals(another.uuid1)) {
+                return false;
+            }
 
-   /* (non-Javadoc)
-    * @see org.ihtsdo.tk.dto.concept.component.TkRevision#makeConversion(java.util.Map, long, boolean)
-    */
-   @Override
-   public TkRefexUuidRevision makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
-      return new TkRefexUuidRevision(this, conversionMap, offset, mapAll);
-   }
+            // Compare their parents
+            return super.equals(obj);
+        }
 
-   /* (non-Javadoc)
-    * @see org.ihtsdo.tk.dto.concept.component.TkRevision#readExternal(java.io.DataInput, int)
-    */
-   @Override
-   public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
-      super.readExternal(in, dataVersion);
-      uuid1 = new UUID(in.readLong(), in.readLong());
-   }
+        return false;
+    }
 
-   /**
-    * Returns a string representation of the object.
-    *
-    * @return the string
-    */
-   @Override
-   public String toString() {
-      StringBuilder buff = new StringBuilder();
+    /**
+     *
+     * @param conversionMap the map for converting from one set of uuids to
+     * another
+     * @param offset the offset to be applied to the time associated with this
+     * TK Refex Uuid Revision
+     * @param mapAll set to <code>true</code> to map all the uuids in this TK
+     * Refex Uuid Revision based on the conversion map
+     * @return the converted TK Refex Uuid Revision
+     */
+    @Override
+    public TkRefexUuidRevision makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
+        return new TkRefexUuidRevision(this, conversionMap, offset, mapAll);
+    }
 
-      buff.append(this.getClass().getSimpleName()).append(": ");
-      buff.append(" c1:");
-      buff.append(informAboutUuid(this.uuid1));
-      buff.append(" ");
-      buff.append(super.toString());
+    /**
+     *
+     * @param in the data input specifying how to construct this TK
+     * Refex Uuid Revision
+     * @param dataVersion the data version of the external source
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws ClassNotFoundException the class not found exception
+     * TODO-javadoc: why?
+     */
+    @Override
+    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+        super.readExternal(in, dataVersion);
+        uuid1 = new UUID(in.readLong(), in.readLong());
+    }
 
-      return buff.toString();
-   }
+    /**
+     * Returns a string representation of this TK Refex Uuid Revision object.
+     *
+     * @return a string representation of this TK Refex Uuid Revision object
+     * including the concept represented by the uuid.
+     */
+    @Override
+    public String toString() {
+        StringBuilder buff = new StringBuilder();
 
-   /* (non-Javadoc)
-    * @see org.ihtsdo.tk.dto.concept.component.TkRevision#writeExternal(java.io.DataOutput)
-    */
-   @Override
-   public void writeExternal(DataOutput out) throws IOException {
-      super.writeExternal(out);
-      out.writeLong(uuid1.getMostSignificantBits());
-      out.writeLong(uuid1.getLeastSignificantBits());
-   }
+        buff.append(this.getClass().getSimpleName()).append(": ");
+        buff.append(" c1:");
+        buff.append(informAboutUuid(this.uuid1));
+        buff.append(" ");
+        buff.append(super.toString());
 
-   //~--- get methods ---------------------------------------------------------
+        return buff.toString();
+    }
 
-   /**
-    * Gets the uuid1.
-    *
-    * @return the uuid1
-    */
-   public UUID getUuid1() {
-      return uuid1;
-   }
+    /**
+     *
+     * @param out the data output object that writes to the external source
+     * @throws IOException signals that an I/O exception has occurred
+     */
+    @Override
+    public void writeExternal(DataOutput out) throws IOException {
+        super.writeExternal(out);
+        out.writeLong(uuid1.getMostSignificantBits());
+        out.writeLong(uuid1.getLeastSignificantBits());
+    }
 
-   //~--- set methods ---------------------------------------------------------
+    //~--- get methods ---------------------------------------------------------
+    /**
+     * Gets the uuid associated with this TK Refex Uuid Revision.
+     *
+     * @return the uuid associated with this TK Refex Uuid Revision
+     */
+    public UUID getUuid1() {
+        return uuid1;
+    }
 
-   /**
-    * Sets the uuid1.
-    *
-    * @param uuid1 the new uuid1
-    */
-   public void setUuid1(UUID uuid1) {
-      this.uuid1 = uuid1;
-   }
+    //~--- set methods ---------------------------------------------------------
+    /**
+     * Sets the uuid associated with this TK Refex Uuid Revision.
+     *
+     * @param uuid2 the uuid associated with this TK Refex Uuid Revision
+     */
+    public void setUuid1(UUID uuid1) {
+        this.uuid1 = uuid1;
+    }
 }

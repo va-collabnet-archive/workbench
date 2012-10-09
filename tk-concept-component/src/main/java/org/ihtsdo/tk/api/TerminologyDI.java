@@ -38,7 +38,7 @@ public interface TerminologyDI {
 
     /**
      * Perform a search of description text based on given
-     * <code>query</code>. TODO-javadoc: when to use this?
+     * <code>query</code>.
      *
      * @param query the string to search for
      * @return the matching results in the form * * * * *
@@ -90,7 +90,7 @@ public interface TerminologyDI {
     void addUncommittedNoChecks(ConceptVersionBI conceptVersion) throws IOException;
 
     /**
-     * Write direct. TODO-javadoc: what does this do?
+     * Write direct. TODO-javadoc: doesn't go through a transaction, such as loading an econcepts file
      *
      * @param conceptChronicle the concept chronicle
      * @throws IOException signals that an I/O exception has occurred
@@ -184,14 +184,12 @@ public interface TerminologyDI {
      * the changeset generator should be removed after the changeset is
      * generated.
      *
-     * TODO-javadoc: is this correct?
-     *
      * @param key the string identifying the changeset generator to be removed
      */
     void removeChangeSetGenerator(String key);
 
     /**
-     * Creates the dto change set generator. TODO-javadoc: what are dto changesets?
+     * Creates the dto change set generator. TODO-javadoc: specifically what writes out dto/econcepts changesets
      *
      * @param changeSetFileName the change set file name
      * @param changeSetTempFileName the change set temp file name
