@@ -24,7 +24,7 @@ import org.ihtsdo.tk.api.Precedence;
 
 public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts {
 
-	private static Logger logger = Logger.getLogger(RF2UKTCConceptImpl.class);
+	private static Logger logger = Logger.getLogger(RF2ConceptImpl.class);
 
 	public RF2ConceptImpl(Config config) {
 		super(config);
