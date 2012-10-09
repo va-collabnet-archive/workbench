@@ -1616,17 +1616,17 @@ public class ExportUtil {
 
 
 	// get the conceptid for the given UUID (Hardcoded values)
-	public static String getSCTId(Config config, UUID uuid) {
+	public static String getSCTId(Config config, UUID uuid,String part) {
 		try{
 			String namespaceId = null;
-			String partitionId = null;
+			String partitionId = part;
 			String releaseId = null;
 			String executionId = null;
 			String sctModuleId = null;
 			if(!config.getNamespaceId().equals(null))
 			{
 				namespaceId = config.getNamespaceId();
-				partitionId = config.getPartitionId();
+//				partitionId = config.getPartitionId();
 				releaseId	= config.getReleaseId();
 				executionId = config.getExecutionId();
 				sctModuleId = config.getModuleId();

@@ -60,7 +60,7 @@ public class RF2Ctv3IdImpl extends RF2AbstractImpl implements I_ProcessConcepts 
 				//get conceptId by calling web service if exist otherwise create
 				String wsConceptId="";
 				if (referencedComponentId.contains("-")){
-					wsConceptId=getSCTId(getConfig(),UUID.fromString(referencedComponentId));
+					wsConceptId=getSCTId(getConfig(),UUID.fromString(referencedComponentId),"10");
 					mapTarget = getCTV3ID(getConfig(), UUID.fromString(referencedComponentId));
 				}else{
 					mapTarget = getCTV3ID(getConfig(), concept.getUids().iterator().next());
@@ -71,6 +71,26 @@ public class RF2Ctv3IdImpl extends RF2AbstractImpl implements I_ProcessConcepts 
 				}
 			}
 
+			String[]moduleNspId;
+			moduleNspId=getModule(concept);
+			if (moduleNspId==null){
+				String subsOrigId=getSubsetOrigId(concept);
+				if (subsOrigId==null){
+					moduleNspId=new String[]{"999000011000000103","1000000"};
+				}else{
+					moduleNspId=getModuleForSubsOrigId(subsOrigId);
+				}
+			}
+
+			if (moduleNspId!=null){
+				moduleId=moduleNspId[0];
+				String namespaceId=moduleNspId[1];
+				if (referencedComponentId.contains("-")){
+					UUID componentUuid = UUID.fromString(referencedComponentId);
+
+					referencedComponentId= getSCTId(getConfig(), componentUuid, Integer.parseInt(namespaceId), getConfig().getPartitionId(), getConfig().getReleaseDate(), getConfig().getExecutionId(), moduleId);
+				}
+			}
 			UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId + mapTarget);
 			writeRF2TypeLine(uuid, getConfig().getReleaseDate(), I_Constants.SIMPLE_MAP_REFSET_ACTIVE, moduleId, refsetId, referencedComponentId, mapTarget);
 		} catch (TerminologyException e) {

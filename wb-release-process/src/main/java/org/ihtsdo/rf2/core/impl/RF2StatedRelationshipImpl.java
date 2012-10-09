@@ -13,6 +13,7 @@ import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.impl.RF2AbstractImpl;
 import org.ihtsdo.rf2.util.Config;
@@ -188,6 +189,33 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 						relationshipId=rel.getUUIDs().iterator().next().toString();
 					}
 					
+
+					String[]moduleNspId;
+					moduleNspId=getModule(sourceConcept);
+					if (moduleNspId==null){
+						String subsOrigId=getSubsetOrigId(sourceConcept);
+						if (subsOrigId==null){
+							moduleNspId=new String[]{"999000011000000103","1000000"};
+						}else{
+							moduleNspId=getModuleForSubsOrigId(subsOrigId);
+						}
+					}
+					if (sourceId.contains("-")){
+						sourceId=getSCTId(getConfig(),sourceConcept.getUids().iterator().next(),"10");
+					}
+					if (destinationId.contains("-")){
+						destinationId=getSCTId(getConfig(),UUID.fromString(destinationId),"10");
+					}
+					if (relTypeId.contains("-")){
+						relTypeId=getSCTId(getConfig(),UUID.fromString(relTypeId),"10");
+					}
+					if (moduleNspId!=null){
+						moduleId=moduleNspId[0];
+						String namespaceId=moduleNspId[1];
+						UUID componentUuid = Type5UuidFactory.get(sourceId + destinationId + relTypeId + relationshipGroup);	// sourceId + destinationId + typeId + relationshipGroup
+
+						relationshipId= getSCTId(getConfig(), componentUuid, Integer.parseInt(namespaceId), getConfig().getPartitionId(), getConfig().getReleaseDate(), getConfig().getExecutionId(), moduleId);
+					}
 					String authorName = tf.getConcept(rel.getAuthorNid()).getInitialText();
 					
 					if (relationshipId==null || relationshipId.equals("")){

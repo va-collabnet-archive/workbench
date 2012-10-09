@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -12,6 +13,7 @@ import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.impl.RF2AbstractImpl;
 import org.ihtsdo.rf2.util.Config;
@@ -81,7 +83,29 @@ public class RF2LanguageImpl extends RF2AbstractImpl implements I_ProcessConcept
 					logger.debug("!descs.isEmpty() && descs.size() > 0 :" + (!descriptions.isEmpty() && descriptions.size() > 0));
 				}
 				for (I_DescriptionTuple description: descriptions) {
-
+					String term = description.getText();
+					if (term!=null ){
+						if (term.indexOf("\t")>-1){
+							term=term.replaceAll("\t", "");
+						}
+						if (term.indexOf("\r")>-1){
+							term=term.replaceAll("\r", "");
+						}
+						if (term.indexOf("\n")>-1){
+							term=term.replaceAll("\n", "");
+						}
+						term=StringEscapeUtils.unescapeHtml(term);
+						
+					}
+					boolean nan=false;
+					try {
+						long subsOrigId=Long.parseLong(term);
+					}catch(Exception exc){
+						nan=true;
+					}
+					if (!nan){
+						continue;
+					}
 					List<? extends I_ExtendByRef> extensions = tf.getAllExtensionsForComponent(
 							description.getDescId(), true);
 					I_ExtendByRef languageExtension=null;
@@ -149,7 +173,26 @@ public class RF2LanguageImpl extends RF2AbstractImpl implements I_ProcessConcept
 							if ((descriptionid==null || descriptionid.equals("")) && active.equals("1")){
 								descriptionid=description.getUUIDs().iterator().next().toString();
 							}
-							
+							String[]moduleNspId;
+							moduleNspId=getModule(concept);
+							if (moduleNspId==null){
+								String subsOrigId=getSubsetOrigId(concept);
+								if (subsOrigId==null){
+									moduleNspId=new String[]{"999000011000000103","1000000"};
+								}else{
+									moduleNspId=getModuleForSubsOrigId(subsOrigId);
+								}
+							}
+
+							if (moduleNspId!=null){
+								moduleId=moduleNspId[0];
+								String namespaceId=moduleNspId[1];
+								if (descriptionid.contains("-")){
+									UUID componentUuid = description.getUUIDs().iterator().next();
+
+									descriptionid= getSCTId(getConfig(), componentUuid, Integer.parseInt(namespaceId), getConfig().getPartitionId(), getConfig().getReleaseDate(), getConfig().getExecutionId(), moduleId);
+								}
+							}
 							if (descriptionid==null || descriptionid.equals("")){
 								logger.error("Unplublished Retired Description of Lang Refset : " + description.getUUIDs().iterator().next().toString());
 							}else {

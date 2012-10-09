@@ -1,25 +1,31 @@
 package org.ihtsdo.rf2.impl;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IntSet;
-import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
@@ -34,6 +40,7 @@ import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.ExportUtil;
 import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
@@ -83,11 +90,11 @@ public abstract class RF2AbstractImpl {
 	protected NidSetBI textDefinTypes;
 
 	private I_GetConceptData snomedRoot;
-	
+
 	private I_GetConceptData snomedCTModelComponent;	
 	private I_GetConceptData coreMetaConceptRoot;
 	private I_GetConceptData foundationMetaDataConceptRoot;
-	
+
 	protected I_IntSet allStatusSet;
 
 	protected int preferredNid;
@@ -97,16 +104,24 @@ public abstract class RF2AbstractImpl {
 	protected int currentNid;
 
 	protected int retiredNid;	
-	
+
 	protected int activeNid ; //Active value	900000000000545005	
-	
+
 	protected int inactiveNid; //Inactive value	900000000000546006	
-	
+
 	protected String nullUuid; // null string to match with UUID.fromString("00000000-0000-0000-C000-000000000046")
 
 	private int activeStatus;
 
 	private I_IntSet activeStatusSet;
+
+	private HashMap<String, String> modMap;
+
+	private HashMap<String, String> map;
+
+	private HashMap<String, String> nspMap;
+
+	private HashMap<String, String> modmodMap;
 
 	public static Config getConfig() {
 		return config;
@@ -123,7 +138,7 @@ public abstract class RF2AbstractImpl {
 	public void incrementDupRecord() {
 		dupRecord++;
 	}
-	
+
 	public void incrementMetaDataCount() {
 		metadataCount++;
 	}
@@ -135,7 +150,7 @@ public abstract class RF2AbstractImpl {
 	public int getMetaDataCount() {
 		return metadataCount;
 	}
-	
+
 	public KnowledgeBase getKbase() {
 		return kbase;
 	}
@@ -151,11 +166,55 @@ public abstract class RF2AbstractImpl {
 			this.tf = Terms.get();
 			this.currenAceConfig = tf.getActiveAceFrameConfig();
 			snomedIntId = tf.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids());
-//			snomedRoot = tf.getConcept(UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8"));
+			//			snomedRoot = tf.getConcept(UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8"));
 			snomedRoot = tf.getConcept(UUID.fromString("a60bd881-9010-3260-9653-0c85716b4391"));
 			snomedCTModelComponent = tf.getConcept(UUID.fromString("a60bd881-9010-3260-9653-0c85716b4391"));
 			coreMetaConceptRoot = tf.getConcept(UUID.fromString("4c6d8b0b-774a-341e-b0e5-1fc2deedb5a5"));
 			foundationMetaDataConceptRoot = tf.getConcept(UUID.fromString("f328cdec-6198-36c4-9c55-d7f4f5b30922"));
+			File mappingFile = new File("SubsetMapping.txt");
+
+			FileInputStream fis = new FileInputStream(mappingFile);
+			InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
+			BufferedReader br = new BufferedReader(isr);
+
+			map = new HashMap<String, String>();
+
+			while (br.ready()) {
+				String line = br.readLine();
+				line = line.replaceAll("\"", "");
+				String[] splited = line.split(",");
+				if (splited[1].equals("SNOMED CT UK Clinical extension Refset module (core metadata concept)")) {
+					map.put(splited[0], "999000011000000103");
+				} else if (splited[1].equals("SNOMED CT UK Edition Refset module (core metadata concept)")) {
+					map.put(splited[0], "999000011000000103");
+				} else if (splited[1].equals("SNOMED CT UK Drug extension Refset module (core metadata concept)")) {
+					map.put(splited[0], "999000011000001104");
+				}
+			}
+			modMap=new HashMap<String,String>();
+			modMap.put("f9d7e720-cf9c-43d0-9b6b-17af1ff905c5","999000011000000103");
+			modMap.put("6a78f662-d4c8-43a5-9412-9f68e4641f5e","999000011000001104");
+			modMap.put("e9195ef9-0e1d-46a2-8268-2281b1b74251","999000021000001108");
+			modMap.put("13b9d324-0913-4c7e-a4cd-c92f8d28e8bd","999000021000000109");
+			modMap.put("7049fbe6-220d-4580-a369-d1981d0753f8","999000031000000106");
+			modMap.put("ab30cbe7-92e5-4445-b489-9226a91d6506","999000041000000102");
+			
+
+			modmodMap=new HashMap<String,String>();
+			modmodMap.put("f9d7e720-cf9c-43d0-9b6b-17af1ff905c5","999000011000000103");
+			modmodMap.put("6a78f662-d4c8-43a5-9412-9f68e4641f5e","999000011000001104");
+			modmodMap.put("e9195ef9-0e1d-46a2-8268-2281b1b74251","999000011000001104");
+			modmodMap.put("13b9d324-0913-4c7e-a4cd-c92f8d28e8bd","999000011000000103");
+			modmodMap.put("7049fbe6-220d-4580-a369-d1981d0753f8","999000011000000103");
+			modmodMap.put("ab30cbe7-92e5-4445-b489-9226a91d6506","999000011000000103");
+			
+			nspMap=new HashMap<String,String>();
+			nspMap.put("999000011000000103","1000000");
+			nspMap.put("999000011000001104","1000001");
+			nspMap.put("999000021000001108","1000001");
+			nspMap.put("999000021000000109","1000000");
+			nspMap.put("999000031000000106","1000000");
+			nspMap.put("999000041000000102","1000000");
 			
 			this.preferredNid=tf.uuidToNative(UUID.fromString("266f1bc3-3361-39f3-bffe-69db9daea56e"));
 			this.acceptableNid=tf.uuidToNative(UUID.fromString("12b9e103-060e-3256-9982-18c1191af60e"));
@@ -171,7 +230,7 @@ public abstract class RF2AbstractImpl {
 			this.activeStatus=tf.uuidToNative(UUID.fromString("d12702ee-c37f-385f-a070-61d56d4d0f1f"));
 			this.activeStatusSet=tf.newIntSet();
 			this.activeStatusSet.add(activeStatus);
-			
+
 			allDescTypes = getAllDescTypes();
 			descTypes=tf.newIntSet();
 			descTypes=getDescTypes();
@@ -227,6 +286,89 @@ public abstract class RF2AbstractImpl {
 		setIsCh_INFERRED_RELATIONSHIP(SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2.getLenient().getNid());
 	}
 
+
+
+	public String[] getModuleForSubsOrigId(String subsOrigId) {
+		String mod=map.get(subsOrigId);
+		String nsp;
+		if (mod!=null){
+			nsp=nspMap.get(mod);
+			String[] ret={mod,nsp};
+			return ret;
+		}
+		return null;
+	}
+
+	public String[] getModule(I_GetConceptData concept) {
+		String uuid=null;
+		try {
+			uuid = concept.getUids().iterator().next().toString();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		String mod=modmodMap.get(uuid);
+		String nsp;
+		if (mod!=null){
+			nsp=nspMap.get(mod);
+			String[] ret={mod,nsp};
+			return ret;
+		}
+		return null;
+	}
+
+	public String getSubsetOrigId(I_GetConceptData concept) {
+
+		try {
+			List<? extends I_DescriptionTuple> descriptions = concept.getDescriptionTuples(allStatuses, 
+					allDescTypes, currenAceConfig.getViewPositionSetReadOnly(), 
+					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
+
+
+			for (I_DescriptionTuple description: descriptions) {
+
+				String sDescType = getSnomedDescriptionType(description.getTypeNid());
+				String typeId = getTypeId(sDescType);
+
+
+				if (!sDescType.equals("4") ) { 
+					//&& !effectiveTime.contains("1031") && !effectiveTime.contains("0430")) {
+
+					String term = description.getText();
+					if (term!=null ){
+						if (term.indexOf("\t")>-1){
+							term=term.replaceAll("\t", "");
+						}
+						if (term.indexOf("\r")>-1){
+							term=term.replaceAll("\r", "");
+						}
+						if (term.indexOf("\n")>-1){
+							term=term.replaceAll("\n", "");
+						}
+						term=StringEscapeUtils.unescapeHtml(term);
+
+					}
+					boolean nan=false;
+					try {
+						long subsOrigId=Long.parseLong(term);
+					}catch(Exception exc){
+						nan=true;
+					}
+					if (!nan){
+						return term;
+					}
+
+				}
+			}
+		}catch (NullPointerException ne) {
+			logger.error("NullPointerException: " + ne.getMessage());
+		} catch (IOException e) {
+			logger.error("IOExceptions: " + e.getMessage());
+		} catch (Exception e) {
+			logger.error("Exceptions in exportDescription: " + e.getMessage());
+		}
+		return null;
+	}
 	public I_ConfigAceFrame getAceConfig() {
 		return ExportUtil.getAceConfig();
 	}
@@ -250,41 +392,41 @@ public abstract class RF2AbstractImpl {
 	public String getMetaModuleID(I_GetConceptData concept) throws TerminologyException, IOException {
 		return ExportUtil.getMetaModuleID(concept);
 	}
-	
+
 	public Long getLatestActivePart(List<I_RelPart> parts) throws Exception {
 		return ExportUtil.getLatestActivePart(parts);
 	}
-	
+
 
 	public String getRefinabilityStatusType(int status) throws TerminologyException, IOException {
 		return ExportUtil.getRefinabilityStatusType(status);
 	}
-	
+
 	public boolean insertSctId(int componentNid  ,Config config, String wbSctId, int pathNid, int statusNid, long effectiveDate) throws Exception {
 		return ExportUtil.insertSctId(componentNid , getConfig(), wbSctId , pathNid , statusNid , effectiveDate);
 	}
-	
-	
+
+
 	public boolean insertSnomedId(int componentNid  ,Config config, String wbSctId, int pathNid, int statusNid, long effectiveDate) throws Exception {
 		return ExportUtil.insertSnomedId(componentNid , getConfig(), wbSctId , pathNid , statusNid , effectiveDate);
 	}	
-	
+
 	public boolean insertCtv3Id(int componentNid  ,Config config, String wbSctId, int pathNid, int statusNid, long effectiveDate) throws Exception {
 		return ExportUtil.insertCtv3Id(componentNid , getConfig(), wbSctId , pathNid , statusNid , effectiveDate);
 	}
-		
+
 	public boolean insertSctId(int componentNid  ,Config config, String wbSctId, int pathNid, int statusNid) throws Exception {
 		return ExportUtil.insertSctId(componentNid , getConfig(), wbSctId , pathNid , statusNid);
 	}	
-	
+
 	public boolean insertSnomedId(int componentNid  ,Config config, String wbSctId, int pathNid, int statusNid) throws Exception {
 		return ExportUtil.insertSnomedId(componentNid , getConfig(), wbSctId , pathNid , statusNid );
 	}	
-	
+
 	public boolean insertCtv3Id(int componentNid  ,Config config, String wbSctId, int pathNid, int statusNid) throws Exception {
 		return ExportUtil.insertCtv3Id(componentNid , getConfig(), wbSctId , pathNid , statusNid );
 	}
-	
+
 	public String getConceptInactivationStatusType(int status) throws TerminologyException, IOException {
 		return ExportUtil.getConceptInactivationStatusType(status);
 	}
@@ -336,16 +478,16 @@ public abstract class RF2AbstractImpl {
 	public String getSNOMEDID(Config config, UUID componentUuid, String parentSnomedId) throws Exception {
 		return ExportUtil.getSNOMEDID(config ,componentUuid, parentSnomedId);
 	}
-	
+
 	public String getCTV3ID(Config config, UUID componentUuid) throws Exception {
 		return ExportUtil.getCTV3ID(config ,componentUuid);
 	}
-	
+
 	public  Set<I_GetConceptData>  getParentLocal(Set<I_GetConceptData> parents, I_GetConceptData concept) throws Exception {
 		return ExportUtil.getParentLocal(parents ,concept);
 	}
-	
-	
+
+
 
 	public int getNid(String struuid) throws TerminologyException, IOException {
 		return ExportUtil.getNid(struuid);
@@ -362,7 +504,7 @@ public abstract class RF2AbstractImpl {
 	public int getSnorocketAuthorNid() {
 		return ExportUtil.getSnorocketAuthorNid();
 	}
-	
+
 	public int getUserAuthorNid() {
 		return ExportUtil.getUserAuthorNid();
 	}
@@ -379,11 +521,11 @@ public abstract class RF2AbstractImpl {
 		return ExportUtil.isOnPath(onPath, nid);
 	}
 
-	
+
 	public String getParentSnomedId(I_GetConceptData concept) throws Exception {
 		return ExportUtil.getParentSnomedId(concept);
 	}
-	
+
 	//Get the sctid for the given UUID
 	public String getSCTId(Config config, UUID componentUuid, Integer namespaceId, String partitionId, String releaseId, String executionId, String moduleId) throws IOException, TerminologyException {
 		return ExportUtil.getSCTId( config,  componentUuid,  namespaceId,  partitionId,  releaseId,  executionId,  moduleId);
@@ -395,15 +537,15 @@ public abstract class RF2AbstractImpl {
 	}
 
 	// get the id for the given UUID
-	public String getSCTId(Config config, UUID uuid) throws Exception {
-		return ExportUtil.getSCTId(config, uuid);
+	public String getSCTId(Config config, UUID uuid, String part) throws Exception {
+		return ExportUtil.getSCTId(config, uuid, part);
 	}
-	
+
 	// get the conceptid for the given UUID
 	public String getConceptId(Config config, UUID uuid) throws Exception {
 		return ExportUtil.getConceptId(config, uuid);
 	}
-	
+
 	public String getConceptId(I_GetConceptData concept, int snomedCorePathNid) throws IOException, TerminologyException {
 		return ExportUtil.getConceptId(concept, snomedCorePathNid);
 	}
@@ -419,13 +561,13 @@ public abstract class RF2AbstractImpl {
 	public String getDescriptionId(int descriptionNid, int snomedCorePathNid) throws IOException, TerminologyException {
 		return ExportUtil.getDescriptionId(descriptionNid, snomedCorePathNid);
 	}
-	
-	
+
+
 	// get the descriptionid for the given UUID
 	public String getDescriptionId(Config config, UUID uuid) throws Exception {
 		return ExportUtil.getDescriptionId(config, uuid);
 	}
-	
+
 	// get the relationshipid for the given UUID
 	public String getRelationshipId(Config config, UUID uuid) throws Exception {
 		return ExportUtil.getRelationshipId(config, uuid);
@@ -434,7 +576,7 @@ public abstract class RF2AbstractImpl {
 	public static void setupProfile(Config config) throws TerminologyException, IOException {
 		ExportUtil.setupProfile(config);
 	}
-	
+
 	public Set<I_GetConceptData> getDescendants(Set<I_GetConceptData> descendants, I_GetConceptData concept) {
 		return ExportUtil.getDescendants(descendants, concept);
 	}
@@ -579,7 +721,7 @@ public abstract class RF2AbstractImpl {
 	}
 
 	public void process(I_GetConceptData concept) throws IOException, TerminologyException, ContradictionException {
-		
+
 		if (snomedRoot.isParentOf(concept, 
 				currenAceConfig.getAllowedStatus(),
 				currenAceConfig.getDestRelTypes(), 
@@ -600,7 +742,7 @@ public abstract class RF2AbstractImpl {
 			/*int len= conceptid.length();
 			CharSequence partition = conceptid.substring(len-3, len).subSequence(0, 2);
 			if(partition.equals("00")){		*/	
-			
+
 			String active="0"; //Default value
 			List<? extends I_ConceptAttributeTuple> conceptAttributes = concept.getConceptAttributeTuples(
 					allStatuses, 
@@ -617,20 +759,20 @@ public abstract class RF2AbstractImpl {
 				} else {
 					active = "0";
 				}
-				
+
 				if ((conceptid==null || conceptid.equals("") || conceptid.equals("0")) && active.equals("1") ){
 					conceptid=concept.getUids().iterator().next().toString();
 				}
 			}
-			
+
 			if (conceptid==null || conceptid.equals("") || conceptid.equals("0")){
 				logger.info("Unplublished Retired Concept: " + concept.getUUIDs().iterator().next().toString());
 			}else{
-					export(concept, conceptid);
+				export(concept, conceptid);
 			}
 		}
 	}
-	
+
 	//all the contents resides under SNOMED CT Model Component (metadata) gets metamoduleid (900000000000012004)
 	//This returns of the content which belongs meta-module
 	public String computeModuleId(I_GetConceptData concept) throws IOException, TerminologyException, ContradictionException {
@@ -641,11 +783,11 @@ public abstract class RF2AbstractImpl {
 				currenAceConfig.getViewPositionSetReadOnly(), 
 				currenAceConfig.getPrecedence(), 
 				currenAceConfig.getConflictResolutionStrategy())) {
-				moduleid = I_Constants.META_MODULE_ID;
+			moduleid = I_Constants.META_MODULE_ID;
 		}else if(snomedCTModelComponent.equals(concept)){
-				moduleid = I_Constants.META_MODULE_ID;
+			moduleid = I_Constants.META_MODULE_ID;
 		}
-		
+
 		/*if (foundationMetaDataConceptRoot.isParentOf(concept, 
 				currenAceConfig.getAllowedStatus(),
 				currenAceConfig.getDestRelTypes(), 
@@ -663,11 +805,11 @@ public abstract class RF2AbstractImpl {
 		}else if(snomedCTModelComponent.equals(concept)){
 				isMetaConcept=true;
 		}*/
-		
-		
+
+
 		return moduleid;
 	}
-	
+
 	public NidSetBI getAllStatuses() throws TerminologyException, IOException {
 		NidSetBI allStatuses = new NidSet();
 		Set<I_GetConceptData> descendants = new HashSet<I_GetConceptData>();
@@ -700,15 +842,15 @@ public abstract class RF2AbstractImpl {
 		allDescTypes.add(tf.uuidToNative(UUID.fromString("d6fad981-7df6-3388-94d8-238cc0465a79")));
 		allDescTypes.add(tf.uuidToNative(UUID.fromString("d8e3b37d-7c11-33ef-b1d0-8769e2264d44")));
 		allDescTypes.add(tf.uuidToNative(UUID.fromString("aa610ed0-fb1c-364f-8db8-551da4c46419")));
-		
-		
+
+
 		return allDescTypes;
 	}
 
 	public String getConceptMetaModuleID(I_GetConceptData concept , String effectiveTime) throws TerminologyException, IOException {
 		return ExportUtil.getConceptMetaModuleID(concept , effectiveTime);
 	}
-	
+
 	public  Set<I_GetConceptData> getDescendantsLocal(Set<I_GetConceptData> descendants, I_GetConceptData concept) {
 		try {
 			I_TermFactory termFactory = Terms.get();
@@ -716,7 +858,7 @@ public abstract class RF2AbstractImpl {
 			I_IntSet allowedDestRelTypes =  termFactory.newIntSet();
 			allowedDestRelTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
 			allowedDestRelTypes.add(termFactory.uuidToNative(UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25")));
-			
+
 			Set<I_GetConceptData> childrenSet = new HashSet<I_GetConceptData>();
 			childrenSet.addAll(concept.getDestRelOrigins(config.getAllowedStatus(), allowedDestRelTypes, 
 					config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy()));
@@ -751,7 +893,7 @@ public abstract class RF2AbstractImpl {
 			config = Terms.get().getActiveAceFrameConfig();
 			currentId = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
 			activeId = Terms.get().uuidToNative(UUID.fromString("d12702ee-c37f-385f-a070-61d56d4d0f1f"));
-			
+
 		} catch (TerminologyException e) {
 			//
 		} catch (IOException e) {

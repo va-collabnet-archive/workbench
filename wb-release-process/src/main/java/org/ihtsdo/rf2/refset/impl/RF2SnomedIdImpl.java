@@ -68,7 +68,7 @@ public class RF2SnomedIdImpl extends RF2AbstractImpl implements I_ProcessConcept
 					//get conceptId by calling web service if exist otherwise create
 					String wsConceptId="";
 					if (referencedComponentId.contains("-")){
-						wsConceptId=getSCTId(getConfig(),UUID.fromString(referencedComponentId));
+						wsConceptId=getSCTId(getConfig(),UUID.fromString(referencedComponentId),"10");
 						
 						mapTarget = getSNOMEDID(getConfig(), UUID.fromString(referencedComponentId), parentSnomedId);
 					}else{

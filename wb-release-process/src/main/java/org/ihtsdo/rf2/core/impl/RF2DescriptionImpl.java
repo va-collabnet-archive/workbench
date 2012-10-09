@@ -3,6 +3,7 @@ package org.ihtsdo.rf2.core.impl;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
@@ -73,8 +74,7 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 
 				if (!sDescType.equals("4") && !description.getLang().equals("es")) { 
 					//&& !effectiveTime.contains("1031") && !effectiveTime.contains("0430")) {
-					descriptionid = getDescriptionId(description.getDescId(), ExportUtil.getSnomedCorePathNid());
-
+					
 					String term = description.getText();
 					if (term!=null ){
 						if (term.indexOf("\t")>-1){
@@ -89,6 +89,16 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 						term=StringEscapeUtils.unescapeHtml(term);
 						
 					}
+					boolean nan=false;
+					try {
+						long subsOrigId=Long.parseLong(term);
+					}catch(Exception exc){
+						nan=true;
+					}
+					if (!nan){
+						continue;
+					}
+					descriptionid = getDescriptionId(description.getDescId(), ExportUtil.getSnomedCorePathNid());
 					String descriptionstatus = getStatusType(description.getStatusNid());
 					
 					String authorName = tf.getConcept(description.getAuthorNid()).getInitialText();
@@ -106,11 +116,11 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 					}
 					
 					//moduleId = getConceptMetaModuleID(concept , getConfig().getReleaseDate());
-					moduleId = computeModuleId(concept);	
-					if(moduleId.equals(I_Constants.META_MODULE_ID)){			
-						//logger.info("==Meta Concept==" + conceptid + " & Name : " + concept.getInitialText());
-						incrementMetaDataCount();
-					}
+//					moduleId = computeModuleId(concept);	
+//					if(moduleId.equals(I_Constants.META_MODULE_ID)){			
+//						//logger.info("==Meta Concept==" + conceptid + " & Name : " + concept.getInitialText());
+//						incrementMetaDataCount();
+//					}
 					
 					if (conceptid==null || conceptid.equals("") || conceptid.equals("0")){
 						conceptid=concept.getUids().iterator().next().toString();
@@ -119,6 +129,23 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 					if ((descriptionid==null || descriptionid.equals("") || descriptionid.equals("0")) && active.equals("1")){
 						descriptionid=description.getUUIDs().iterator().next().toString();
 					}					
+
+					String[]moduleNspId;
+					moduleNspId=getModule(concept);
+					if (moduleNspId==null){
+						String subsOrigId=getSubsetOrigId(concept);
+						if (subsOrigId==null){
+							moduleNspId=new String[]{"999000011000000103","1000000"};
+						}else{
+							moduleNspId=getModuleForSubsOrigId(subsOrigId);
+						}
+					}
+					if (moduleNspId!=null){
+						moduleId=moduleNspId[0];
+						String namespaceId=moduleNspId[1];
+						UUID componentUuid=description.getUUIDs().iterator().next();
+						descriptionid= getSCTId(getConfig(), componentUuid, Integer.parseInt(namespaceId), getConfig().getPartitionId(), getConfig().getReleaseDate(), getConfig().getExecutionId(), moduleId);
+					}
 					
 					if (descriptionid==null || descriptionid.equals("") || descriptionid.equals("0")){
 						logger.info("Unplublished Retired Description: " + description.getUUIDs().iterator().next().toString());

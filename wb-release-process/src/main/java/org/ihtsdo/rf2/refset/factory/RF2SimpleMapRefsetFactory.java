@@ -38,14 +38,14 @@ public class RF2SimpleMapRefsetFactory extends RF2AbstractFactory {
 
 			logger.info("Finished Simple Map SnomedId & CTV3Id  Refset Export.");
 			
-			logger.info("Started ICDO Map Refset Export ...");
+//			logger.info("Started ICDO Map Refset Export ...");
 			
-			RF2ICDOMapImpl icdoMapIterator = new RF2ICDOMapImpl(getConfig());
-			Terms.get().iterateConcepts(icdoMapIterator);
+//			RF2ICDOMapImpl icdoMapIterator = new RF2ICDOMapImpl(getConfig());
+//			Terms.get().iterateConcepts(icdoMapIterator);
 
 			closeExportFileWriter();
 
-			logger.info("Finished ICDO Map Refset Export.");
+//			logger.info("Finished ICDO Map Refset Export.");
 
 		} catch (IOException e) {
 			logger.error(e.getMessage());
