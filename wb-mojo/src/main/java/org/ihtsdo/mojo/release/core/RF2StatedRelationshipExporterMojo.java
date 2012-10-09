@@ -141,13 +141,6 @@ public class RF2StatedRelationshipExporterMojo extends AbstractMojo {
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		System.setProperty("java.awt.headless", "true");
 		try {
-			try {
-				if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName(), this.getClass(), targetDirectory)) {
-					return;
-				}
-			} catch (NoSuchAlgorithmException e) {
-				throw new MojoExecutionException(e.getLocalizedMessage(), e);
-			}
 			
 			Config config;
 			
