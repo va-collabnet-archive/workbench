@@ -804,7 +804,9 @@ public abstract class RF2AbstractImpl {
 			if (conceptid==null || conceptid.equals("") || conceptid.equals("0")){
 				logger.info("Unplublished Retired Concept: " + concept.getUUIDs().iterator().next().toString());
 			}else{
-				export(concept, conceptid);
+				if (conceptid.contains("-")){
+					export(concept, conceptid);
+				}
 			}
 		}
 	}
