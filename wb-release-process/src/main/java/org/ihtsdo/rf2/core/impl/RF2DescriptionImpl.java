@@ -146,7 +146,10 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 						UUID componentUuid=description.getUUIDs().iterator().next();
 						descriptionid= getSCTId(getConfig(), componentUuid, Integer.parseInt(namespaceId), getConfig().getPartitionId(), getConfig().getReleaseDate(), getConfig().getExecutionId(), moduleId);
 					}
-					
+
+					if (conceptid.contains("-")){
+						conceptid=getSCTId(getConfig(),UUID.fromString(conceptid),"10");
+					}
 					if (descriptionid==null || descriptionid.equals("") || descriptionid.equals("0")){
 						logger.info("Unplublished Retired Description: " + description.getUUIDs().iterator().next().toString());
 					}else if(getConfig().getRf2Format().equals("false") ){
