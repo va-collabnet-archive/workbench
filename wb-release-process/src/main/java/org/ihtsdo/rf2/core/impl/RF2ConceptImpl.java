@@ -99,8 +99,9 @@ public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts
 					//					}
 					String[]moduleNspId;
 					moduleNspId=getModule(concept);
+					String subsOrigId=null;
 					if (moduleNspId==null){
-						String subsOrigId=getSubsetOrigId(concept);
+						subsOrigId=getSubsetOrigId(concept);
 						if (subsOrigId==null){
 							moduleNspId=new String[]{"999000011000000103","1000000"};
 						}else{
@@ -112,6 +113,12 @@ public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts
 						String namespaceId=moduleNspId[1];
 						UUID componentUuid=concept.getUids().iterator().next();
 						conceptid= getSCTId(getConfig(), componentUuid, Integer.parseInt(namespaceId), getConfig().getPartitionId(), getConfig().getReleaseDate(), getConfig().getExecutionId(), moduleId);
+					}
+					if (subsOrigId!=null){
+						getModSubsMapFile().append(subsOrigId);
+						getModSubsMapFile().append("\t");
+						getModSubsMapFile().append(conceptid);
+						getModSubsMapFile().append("\r\n");
 					}
 				}
 
