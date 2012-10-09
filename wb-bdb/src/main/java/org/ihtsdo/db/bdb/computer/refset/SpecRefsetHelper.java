@@ -504,14 +504,21 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 				ViewCoordinate vc = config.getViewCoordinate();
 				ViewCoordinate vcStatus = vc.getVcWithAllStatusValues();
 
-				RefexVersionBI<?> existingVersion = existingMember
-						.getVersion(vcStatus);
-				if (existingVersion != null) {
-					RefexCAB bluePrint = existingVersion.makeBlueprint(vc);
-					bluePrint.setStatusUuid(SnomedMetadataRfx
-							.getSTATUS_CURRENT().getUuids()[0]);
-					bluePrint.setMemberUuid(memberUuid);
-					builder.constructIfNotCurrent(bluePrint);
+				if (existingMember != null && vcStatus != null) {
+					RefexVersionBI<?> existingVersion = existingMember
+							.getVersion(vcStatus);
+					if (existingVersion != null) {
+						RefexCAB bluePrint = existingVersion.makeBlueprint(vc);
+						bluePrint.setStatusUuid(SnomedMetadataRfx
+								.getSTATUS_CURRENT().getUuids()[0]);
+						bluePrint.setMemberUuid(memberUuid);
+						builder.constructIfNotCurrent(bluePrint);
+					} else {
+						AceLog.getAppLog().info("existingVersion is null ");
+					}
+				} else {
+					AceLog.getAppLog().info("existingMember " + existingMember);
+					AceLog.getAppLog().info("vcStatus " + vcStatus);
 				}
 
 			} else {
