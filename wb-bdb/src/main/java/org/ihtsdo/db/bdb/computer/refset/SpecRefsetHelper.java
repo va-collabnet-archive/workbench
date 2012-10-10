@@ -513,9 +513,10 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 								.getSTATUS_CURRENT().getUuids()[0]);
 						bluePrint.setMemberUuid(memberUuid);
 						builder.constructIfNotCurrent(bluePrint);
-					} else {
-						AceLog.getAppLog().info("existingVersion is null ");
 					}
+					// else {
+					// AceLog.getAppLog().info("existingVersion is null ");
+					// }
 				}
 				// else {
 				// AceLog.getAppLog().info("existingMember " + existingMember);
