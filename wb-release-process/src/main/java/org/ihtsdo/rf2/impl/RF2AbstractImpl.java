@@ -289,7 +289,7 @@ public abstract class RF2AbstractImpl {
 		FileOutputStream fis;
 		OutputStreamWriter isr;
 		try {
-			fis = new FileOutputStream("target/module-subsorigId.txt");
+			fis = new FileOutputStream("target/subsOrigId-refsetId.txt");
 			isr = new OutputStreamWriter(fis, "UTF-8");
 			br = new BufferedWriter(isr);
 		} catch (FileNotFoundException e) {
