@@ -129,6 +129,11 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 						descriptionid=description.getUUIDs().iterator().next().toString();
 					}					
 
+					if (descriptionid==null || descriptionid.equals("") || descriptionid.equals("0")){
+						logger.info("Unplublished Retired Description: " + description.getUUIDs().iterator().next().toString());
+						continue;
+					} 
+
 					String[]moduleNspId;
 					moduleNspId=getModule(concept);
 					if (moduleNspId==null){
@@ -149,9 +154,7 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 					if (conceptid.contains("-")){
 						conceptid=getSCTId(getConfig(),UUID.fromString(conceptid),"10");
 					}
-					if (descriptionid==null || descriptionid.equals("") || descriptionid.equals("0")){
-						logger.info("Unplublished Retired Description: " + description.getUUIDs().iterator().next().toString());
-					}else if(getConfig().getRf2Format().equals("false") ){
+					if(getConfig().getRf2Format().equals("false") ){
 						writeRF2TypeLine(descriptionid, effectiveTime, active, moduleId, conceptid, languageCode, typeId, term, caseSignificanceId, authorName);
 					}else{
 						writeRF2TypeLine(descriptionid, effectiveTime, active, moduleId, conceptid, languageCode, typeId, term, caseSignificanceId);

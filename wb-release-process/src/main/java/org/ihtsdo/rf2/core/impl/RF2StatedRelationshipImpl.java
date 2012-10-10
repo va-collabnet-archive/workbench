@@ -159,10 +159,10 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 					      }
 				     }
 				    
-					if(moduleId.equals(I_Constants.META_MODULE_ID)){		
-						//logger.info("==Meta Concept==" + sourceId + " & Name : " + sourceConcept.getInitialText());
-						incrementMetaDataCount();
-					}
+//					if(moduleId.equals(I_Constants.META_MODULE_ID)){		
+//						//logger.info("==Meta Concept==" + sourceId + " & Name : " + sourceConcept.getInitialText());
+//						incrementMetaDataCount();
+//					}
 					
 					int relationshipGroup = rel.getGroup();
 
@@ -188,6 +188,11 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 						relationshipId=rel.getUUIDs().iterator().next().toString();
 					}
 					
+					if (relationshipId==null || relationshipId.equals("")){
+						logger.info("Unplublished Retired Stated Relationship: " + rel.getUUIDs().iterator().next().toString());
+						continue;
+					}
+
 
 					String[]moduleNspId;
 					moduleNspId=getModule(sourceConcept);
@@ -217,9 +222,7 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 					}
 					String authorName = tf.getConcept(rel.getAuthorNid()).getInitialText();
 					
-					if (relationshipId==null || relationshipId.equals("")){
-						logger.info("Unplublished Retired Stated Relationship: " + rel.getUUIDs().iterator().next().toString());
-					}else if(getConfig().getRf2Format().equals("false") ){
+					if(getConfig().getRf2Format().equals("false") ){
 						writeRF2TypeLine(relationshipId, effectiveTime, active, moduleId, sourceId, destinationId, relationshipGroup, relTypeId,
 							characteristicTypeId, modifierId, authorName);
 					}else{

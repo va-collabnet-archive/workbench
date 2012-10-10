@@ -90,7 +90,7 @@ public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts
 					conceptid=concept.getUUIDs().iterator().next().toString();
 				}
 
-				if(active.equals("1")){
+//				if(active.equals("1")){
 					//moduleId = getConceptMetaModuleID(concept , getConfig().getReleaseDate());
 					//	moduleId = computeModuleId(concept);					
 					//					if(moduleId.equals(I_Constants.META_MODULE_ID)){
@@ -120,7 +120,7 @@ public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts
 						getModSubsMapFile().append(conceptid);
 						getModSubsMapFile().append("\r\n");
 					}
-				}
+//				}
 
 				if(getConfig().getRf2Format().equals("false") ){
 					writeRF2TypeLine(conceptid, effectiveTime, active, moduleId, definitionStatusId, authorName);

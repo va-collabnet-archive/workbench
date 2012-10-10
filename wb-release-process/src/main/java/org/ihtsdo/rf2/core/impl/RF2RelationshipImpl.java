@@ -202,7 +202,12 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 						//This won't work in editing environment because relationshipgroup changes with respect to classifier 
 						//relationshipId = Type5UuidFactory.get(sourceId + destinationId + relTypeId + relationshipGroup).toString();	// sourceId + destinationId + typeId + relationshipGroup
 					}
-					
+					if (relationshipId==null || relationshipId.equals("")){
+						logger.info("Unplublished Retired Relationship: " + rel.getUUIDs().iterator().next().toString());
+						continue;
+						
+					}
+
 					String[]moduleNspId;
 					moduleNspId=getModule(sourceConcept);
 					if (moduleNspId==null){
@@ -230,9 +235,8 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 						relationshipId= getSCTId(getConfig(), componentUuid, Integer.parseInt(namespaceId), getConfig().getPartitionId(), getConfig().getReleaseDate(), getConfig().getExecutionId(), moduleId);
 					}
 					String authorName = tf.getConcept(rel.getAuthorNid()).getInitialText();
-					if (relationshipId==null || relationshipId.equals("")){
-						logger.info("Unplublished Retired Relationship: " + rel.getUUIDs().iterator().next().toString());
-					}else if(getConfig().getRf2Format().equals("false") ){	
+					
+					if(getConfig().getRf2Format().equals("false") ){	
 						writeRF2TypeLine(relationshipId, effectiveTime, active, moduleId, sourceId, destinationId, relationshipGroup, relTypeId,
 							characteristicTypeId, modifierId, authorName);
 					}else{
