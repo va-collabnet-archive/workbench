@@ -172,8 +172,8 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 						incrementMetaDataCount();
 					}
 					
-					
-					effectiveTime = getDateFormat().format(new Date(rel.getTime()));
+
+					effectiveTime = getConfig().getReleaseDate();
 					
 					int relationshipGroup = rel.getGroup();
 

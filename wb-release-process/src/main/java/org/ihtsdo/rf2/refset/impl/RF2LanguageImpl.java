@@ -198,8 +198,8 @@ public class RF2LanguageImpl extends RF2AbstractImpl implements I_ProcessConcept
 							}else {
 								
 								refsetuuid = extensionPart.getPrimUuid(); 
-								
-								effectiveTime = getDateFormat().format(new Date(extensionPart.getTime()));
+
+								effectiveTime = getConfig().getReleaseDate();
 	
 								writeRF2TypeLine(refsetuuid, effectiveTime, active, moduleId, refsetSCTId, descriptionid, acceptabilityId);
 							}

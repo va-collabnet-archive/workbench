@@ -139,9 +139,8 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 							}
 						}
 					}
-					
-					Date et = new Date(rel.getTime());
-					effectiveTime = getDateFormat().format(et);
+
+					effectiveTime = getConfig().getReleaseDate();
 					
 					relationshipStatusId = rel.getStatusNid();
 					if (relationshipStatusId == activeNid) {               
