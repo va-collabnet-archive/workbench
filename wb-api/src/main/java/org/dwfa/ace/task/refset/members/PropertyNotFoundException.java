@@ -24,11 +24,4 @@ public final class PropertyNotFoundException extends RuntimeException {
         super(message);
     }
 
-    public PropertyNotFoundException(final Throwable cause) {
-        super(cause);
-    }
-
-    public PropertyNotFoundException(final String message, final Throwable cause) {
-        super(message, cause);
-    }
 }

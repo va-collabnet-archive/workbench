@@ -18,7 +18,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 
-import java.util.logging.Logger;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.PathNotExistsException;
@@ -47,8 +46,7 @@ import org.ihtsdo.tk.api.Precedence;
  */
 public class PositionMapper {
 
-    public static final BigInteger BIG_MINUS_ONE = BigInteger.valueOf(-1);
-    public static final int INT_MINUS_ONE = -1;
+    private static final BigInteger BIG_MINUS_ONE = BigInteger.valueOf(-1);
     private static int initialIndex = -1;
     
     private static void setupInitialIndex() {
@@ -136,7 +134,7 @@ public class PositionMapper {
      * @throws InterruptedException
      * @throws IOException
      */
-    public <V extends ConceptComponent<?, ?>.Version> boolean onRoute(V version) {
+    /*package*/ <V extends ConceptComponent<?, ?>.Version> boolean onRoute(V version) {
         queryCount++;
         if (version.getSapNid() < 0) {
             return false;
@@ -160,7 +158,7 @@ public class PositionMapper {
         return false;
     }
 
-    public void waitTillSetup() {
+    private void waitTillSetup() {
         // Forms a barrier to ensure that the setup is complete prior to use
         try {
             if (completeLatch.getCount() == 0) {
@@ -197,7 +195,7 @@ public class PositionMapper {
         }
     }
 
-    public boolean idsOnRoute(I_IdPart idVersion) {
+    /*package*/ boolean idsOnRoute(I_IdPart idVersion) {
         queryCount++;
         if (Bdb.getSapNid(idVersion.getStatusNid(), idVersion.getAuthorNid(),
                 idVersion.getPathNid(), idVersion.getTime()) < 0) {
@@ -237,7 +235,7 @@ public class PositionMapper {
      * @throws IOException
      * @throws InterruptedException
      */
-    public <V extends ConceptComponent<?, ?>.Version> RELATIVE_POSITION relativePosition(V v1, V v2)
+    /*package*/ <V extends ConceptComponent<?, ?>.Version> RELATIVE_POSITION relativePosition(V v1, V v2)
             throws IOException {
         queryCount++;
         if (v1.getSapNid() < 0) {
@@ -341,71 +339,6 @@ public class PositionMapper {
                 throw new RuntimeException("Can't handle policy: " + precedencePolicy);
         }
     }
-
-    public RELATIVE_POSITION fastRelativeIdPartsPosition(I_IdPart part1, I_IdPart part2, Precedence precedencePolicy) {
-        queryCount++;
-        lastRequestTime = System.currentTimeMillis();
-        // Forms a barrier to ensure that the setup is complete prior to use
-        try {
-            waitTillSetup();
-            assert Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime()) < conflictMatrix.length :
-                    "SapNid: " + Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime()) + " out of range; "
-                    + " rows: " + conflictMatrix.length
-                    + " columns: " + conflictMatrix.length
-                    + " time: " + new Date(Bdb.getSapDb().getTime(Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())))
-                    + " status: " + Concept.get(Bdb.getSapDb().getStatusNid(Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())))
-                    + " path: " + Concept.get(Bdb.getSapDb().getPathNid(Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())))
-                    + " destination: " + destination + " latch: " + completeLatch.getCount()
-                    + " positionCount: " + positionCount;
-            assert Bdb.getSapNid(part2.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime()) < conflictMatrix.length :
-                    "SapNid: " + Bdb.getSapNid(part2.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime()) + " out of range; "
-                    + " rows: " + conflictMatrix.length
-                    + " columns: " + conflictMatrix.length
-                    + " time: " + new Date(Bdb.getSapDb().getTime(Bdb.getSapNid(part2.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())))
-                    + " status: " + Concept.get(Bdb.getSapDb().getStatusNid(Bdb.getSapNid(part2.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())))
-                    + " path: " + Concept.get(Bdb.getSapDb().getPathNid(Bdb.getSapNid(part2.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())))
-                    + " destination: " + destination + " latch: " + completeLatch.getCount()
-                    + " positionCount: " + positionCount;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        switch (precedencePolicy) {
-            case PATH:
-                return pathBasedPolicy(part1, part2);
-            case TIME:
-                return timeBasedPolicy(part1, part2);
-            case MIXED:
-                RELATIVE_POSITION mixedPos;
-                RELATIVE_POSITION pathPos = pathBasedPolicy(part1, part2);
-                RELATIVE_POSITION timePos = timeBasedPolicy(part1, part2);
-                
-                if(!pathPos.equals(timePos)){
-                    mixedPos = RELATIVE_POSITION.CONTRADICTION;
-                }else {
-                    mixedPos = pathPos;
-                }
-                
-                return mixedPos;
-            default:
-                throw new RuntimeException("Can't handle policy: " + precedencePolicy);
-        }
-    }
-    
-    private RELATIVE_POSITION pathBasedPolicy(I_IdPart part1, I_IdPart part2){
-        if (inConflict(Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime()), Bdb.getSapNid(part2.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime()))) {
-                    return RELATIVE_POSITION.CONTRADICTION;
-                } else if (positionDistance[Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())]
-                        > positionDistance[Bdb.getSapNid(part2.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())]) {
-                    return RELATIVE_POSITION.BEFORE;
-                } else if (positionDistance[Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())]
-                        < positionDistance[Bdb.getSapNid(part2.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())]) {
-                    return RELATIVE_POSITION.AFTER;
-                }
-                if (part1.getAuthorNid() != part2.getAuthorNid()) {
-                    return RELATIVE_POSITION.CONTRADICTION;
-                }
-                return RELATIVE_POSITION.EQUAL;
-    }
     
     private <V extends ConceptComponent<?, ?>.Version> RELATIVE_POSITION pathBasedPolicy (V part1, V part2){
         if (inConflict(part1.getSapNid(), part2.getSapNid())) {
@@ -421,22 +354,6 @@ public class PositionMapper {
                     return RELATIVE_POSITION.CONTRADICTION;
                 }
                 return RELATIVE_POSITION.EQUAL;
-    }
-    
-    private RELATIVE_POSITION timeBasedPolicy(I_IdPart part1, I_IdPart part2){
-        if (part1.getTime() == part2.getTime()) {
-                    if (positionDistance[Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())]
-                            > positionDistance[Bdb.getSapNid(part2.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())]) {
-                        return RELATIVE_POSITION.BEFORE;
-                    } else if (positionDistance[Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())]
-                            < positionDistance[Bdb.getSapNid(part2.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())]) {
-                        return RELATIVE_POSITION.AFTER;
-                    }
-                    return RELATIVE_POSITION.CONTRADICTION;
-                } else if (part1.getTime() < part2.getTime()) {
-                    return RELATIVE_POSITION.BEFORE;
-                }
-                return RELATIVE_POSITION.AFTER;
     }
     
     private <V extends ConceptComponent<?, ?>.Version> RELATIVE_POSITION timeBasedPolicy (V part1, V part2){
@@ -721,20 +638,6 @@ public class PositionMapper {
         return BIG_MINUS_ONE; // not on path
     }
 
-    private Integer getDepth__int(PositionBI testPath, PositionBI depthFinder,
-            int depthSeed) {
-        if (testPath.getPath().getConceptNid() == depthFinder.getPath().getConceptNid()) {
-            return depthSeed;
-        }
-        for (PositionBI child : depthFinder.getPath().getOrigins()) {
-            int depth = getDepth__int(testPath, child, depthSeed + 1);
-            if (depth > 0) {
-                return depth;
-            }
-        }
-        return INT_MINUS_ONE; // not on path
-    }
-
     /**
      *
      * @param position
@@ -748,10 +651,7 @@ public class PositionMapper {
         this.destination = destination;
     }
 
-    public PositionBI getDestination() {
-        return destination;
-    }
-    int lengthToPrint = 150;
+    private int lengthToPrint = 150;
 
     @Override
     public String toString() {
@@ -761,6 +661,7 @@ public class PositionMapper {
         buf.append(" destination:");
         buf.append(destination);
         buf.append("\nsapNid|distance|time|path|status\n");
+        
         for (int i = initialIndex; i < lengthToPrint && i < positionDistance.length; i++) {
             f.format("%1$2d|", i); // sapNid
             f.format("%1$2d|", positionDistance[i]); // distance

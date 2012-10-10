@@ -421,7 +421,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                         I_ExtendByRefVersion tuple = allTuples.get(rowIndex);
                         switch (columns[columnIndex].invokeOnObjectType) {
                             case CONCEPT_COMPONENT:
-                                if (columns[columnIndex].readParamaters != null) {
+                                if (columns[columnIndex].readParameters != null) {
                                     if (Terms.get().hasConcept(tuple.getComponentId())) {
                                         conceptNids.setMember(tuple.getComponentId());
                                     } else {
@@ -515,11 +515,11 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
             switch (columns[columnIndex].invokeOnObjectType) {
                 case CONCEPT_COMPONENT:
                     id = tuple.getComponentId();
-                    if (columns[columnIndex].readParamaters != null) {
+                    if (columns[columnIndex].readParameters != null) {
                         if (tf.hasConcept(id)) {
                             value =
                                     columns[columnIndex].getReadMethod().invoke(Terms.get().getConcept(tuple.getComponentId()),
-                                    columns[columnIndex].readParamaters);
+                                    columns[columnIndex].readParameters);
                         } else {
                             try {
                                 I_DescriptionVersioned desc = tf.getDescription(id);
@@ -541,17 +541,17 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                 case CONCEPT:
                     throw new UnsupportedOperationException();
                 case IMMUTABLE:
-                    if (columns[columnIndex].readParamaters != null) {
-                        value = columns[columnIndex].getReadMethod().invoke(tuple, columns[columnIndex].readParamaters);
+                    if (columns[columnIndex].readParameters != null) {
+                        value = columns[columnIndex].getReadMethod().invoke(tuple, columns[columnIndex].readParameters);
                     } else {
                         value = columns[columnIndex].getReadMethod().invoke(tuple);
                     }
                     break;
                 case PART:
-                    if (columns[columnIndex].readParamaters != null) {
+                    if (columns[columnIndex].readParameters != null) {
                         value =
                                 columns[columnIndex].getReadMethod().invoke(tuple.getMutablePart(),
-                                columns[columnIndex].readParamaters);
+                                columns[columnIndex].readParameters);
                     } else {
                         try {
                             I_ExtendByRefPart part = tuple.getMutablePart();
@@ -617,7 +617,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
 
                         } else if (tf.hasExtension(id)) {
                             I_ExtendByRef ext = tf.getExtension(id);
-                            I_ConfigAceFrame config = (I_ConfigAceFrame) columns[columnIndex].readParamaters[1];
+                            I_ConfigAceFrame config = (I_ConfigAceFrame) columns[columnIndex].readParameters[1];
                             List<I_ExtendByRefVersion> tuples =
                                     (List<I_ExtendByRefVersion>) ext.getTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
                             if (tuples.size() > 0) {

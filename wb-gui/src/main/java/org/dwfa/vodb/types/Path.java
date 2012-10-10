@@ -71,8 +71,8 @@ public class Path implements PathBI, I_Path, Serializable {
     /**
      *
      */
-    int conceptNid;
-    Set<PositionBI> origins;
+    private int conceptNid;
+    private Set<PositionBI> origins;
 
     public Path(int conceptId, List<? extends PositionBI> origins) {
         super();

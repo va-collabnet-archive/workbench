@@ -91,9 +91,9 @@ public class ReflexiveRefsetMemberTableModel extends ReflexiveTableModel {
                     if (col.getType() == REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER) {
                         switch (col.invokeOnObjectType) {
                         case CONCEPT_COMPONENT:
-                            if (col.readParamaters != null) {
+                            if (col.readParameters != null) {
                                 conceptsToFetch.add((Integer) col.getReadMethod().invoke(
-                                    Terms.get().getConcept(extension.getComponentNid()), col.readParamaters));
+                                    Terms.get().getConcept(extension.getComponentNid()), col.readParameters));
                             } else {
                                 conceptsToFetch.add((Integer) col.getReadMethod().invoke(
                                 		Terms.get().getConcept(extension.getComponentNid())));
@@ -104,16 +104,16 @@ public class ReflexiveRefsetMemberTableModel extends ReflexiveTableModel {
                         case CONCEPT:
                             throw new UnsupportedOperationException();
                         case IMMUTABLE:
-                            if (col.readParamaters != null) {
-                                conceptsToFetch.add((Integer) col.getReadMethod().invoke(ebrTuple, col.readParamaters));
+                            if (col.readParameters != null) {
+                                conceptsToFetch.add((Integer) col.getReadMethod().invoke(ebrTuple, col.readParameters));
                             } else {
                                 conceptsToFetch.add((Integer) col.getReadMethod().invoke(ebrTuple));
                             }
                             break;
                         case PART:
-                            if (col.readParamaters != null) {
+                            if (col.readParameters != null) {
                                 conceptsToFetch.add((Integer) col.getReadMethod().invoke(ebrTuple.getMutablePart(),
-                                    col.readParamaters));
+                                    col.readParameters));
                             } else {
                                 conceptsToFetch.add((Integer) col.getReadMethod().invoke(ebrTuple.getMutablePart()));
                             }

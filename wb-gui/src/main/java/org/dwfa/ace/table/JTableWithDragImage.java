@@ -49,7 +49,6 @@ import org.dwfa.vodb.bind.ThinVersionHelper;
 
 import org.ihtsdo.ace.table.WorkflowHistoryTableModel.WORKFLOW_FIELD;
 import org.ihtsdo.ace.table.WorkflowHistoryTableModel.WorkflowStringWithConceptTuple;
-import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 import sun.awt.dnd.SunDragSourceContextPeer;
 

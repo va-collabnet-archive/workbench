@@ -252,7 +252,7 @@ public class RefsetSpecPanel extends JPanel {
 
       parameters.add(aceFrameConfig.getTableDescPreferenceList());
       parameters.add(aceFrameConfig);
-      column1.setReadParamaters(parameters);
+      column1.setReadParameters(parameters);
       column1.setType(REFSET_FIELD_TYPE.COMPONENT_IDENTIFIER);
       columns.add(column1);
 
@@ -460,7 +460,7 @@ public class RefsetSpecPanel extends JPanel {
 
       parameters.add(aceFrameConfig.getTableDescPreferenceList());
       parameters.add(aceFrameConfig);
-      column1.setReadParamaters(parameters);
+      column1.setReadParameters(parameters);
       column1.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
       columns.add(column1);
 

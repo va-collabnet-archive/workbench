@@ -12,7 +12,6 @@ import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.IdentifierSet;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.log.AceLog;
 
@@ -23,7 +22,6 @@ import org.ihtsdo.taxonomy.model.ChildNodeFilterBI;
 import org.ihtsdo.taxonomy.model.NodeFactory;
 import org.ihtsdo.taxonomy.model.NodePath;
 import org.ihtsdo.taxonomy.model.TaxonomyModel;
-import org.ihtsdo.taxonomy.nodes.InternalNode;
 import org.ihtsdo.taxonomy.nodes.RootNode;
 import org.ihtsdo.taxonomy.nodes.TaxonomyNode;
 import org.ihtsdo.taxonomy.path.PathExpander;
@@ -55,8 +53,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.*;
 import javax.swing.event.TreeExpansionEvent;

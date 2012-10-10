@@ -18,14 +18,12 @@ package org.dwfa.ace.reporting;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.tapi.spec.ConceptSpec;
 
 /**
  * 

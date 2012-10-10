@@ -14,12 +14,6 @@ import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.concept.component.ConceptComponent;
-import org.ihtsdo.concept.component.attributes.ConceptAttributes;
-import org.ihtsdo.concept.component.description.Description;
-import org.ihtsdo.concept.component.refset.RefsetMember;
-import org.ihtsdo.concept.component.refsetmember.cidCid.CidCidRevision;
-import org.ihtsdo.concept.component.relationship.Relationship;
-import org.ihtsdo.concept.component.relationship.RelationshipRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.computer.version.PositionMapper.RELATIVE_POSITION;
@@ -344,7 +338,7 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
                 return true;
             }
             if (part instanceof RelationshipVersionBI) {
-                RelationshipVersionBI relPart = (RelationshipVersionBI) part;
+                RelationshipVersionBI<?> relPart = (RelationshipVersionBI<?>) part;
                 if (inferredNidSet.contains(relPart.getCharacteristicNid())) {
                     return true;
                 }
@@ -377,7 +371,7 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
                 }
                 if (allowedTypes != null) {
                     if (allowedTypes.contains(
-                            ((I_AmTypedPart) part).getTypeNid()) == false) {
+                            ((I_AmTypedPart<?>) part).getTypeNid()) == false) {
                         if (mapper.onRoute(part)) {
                             handlePart(partsForPosition, mapper, part,
                                     precedencePolicy, contradictionManager,
@@ -435,7 +429,7 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
                 }
                 if (allowedTypes != null) {
                     if (allowedTypes.contains(
-                            ((I_AmTypedPart) part).getTypeNid()) == false) {
+                            ((I_AmTypedPart<?>) part).getTypeNid()) == false) {
                         if (mapper.onRoute(part)) {
                             handlePart(partsForPosition, mapper, part,
                                     precedencePolicy, contradictionManager,
@@ -506,7 +500,7 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
             }
             if (allowedTypes != null
                     && allowedTypes.contains(
-                    ((I_AmTypedPart) part).getTypeNid()) == false) {
+                    ((I_AmTypedPart<?>) part).getTypeNid()) == false) {
                 rejectedVersions.add(part);
                 continue nextpart;
             }
