@@ -53,7 +53,7 @@ public class Ts {
     /**
      * Setup.
      *
-     * @throws Exception the exception
+     * @throws Exception indicates an exception has occurred
      */
     public static void setup() throws Exception {
         setup("org.ihtsdo.db.bdb.Bdb", "berkeley-db");
@@ -64,7 +64,7 @@ public class Ts {
      *
      * @param storeClassName the store class name
      * @param dbRoot the db root
-     * @throws Exception the exception
+     * @throws Exception indicates an exception has occurred
      */
     public static void setup(String storeClassName, String dbRoot) throws Exception {
         Class<?> class1 = Class.forName(storeClassName);

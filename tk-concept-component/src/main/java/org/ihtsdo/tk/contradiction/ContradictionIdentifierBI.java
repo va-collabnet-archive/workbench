@@ -36,7 +36,7 @@ public interface ContradictionIdentifierBI {
      *
      * @param conceptChronicle the concept in question
      * @return the type of contradiction found
-     * @throws Exception the exception
+     * @throws Exception indicates an exception has occurred
      */
     ContradictionResult isConceptInConflict(ConceptChronicleBI conceptChronicle) throws Exception;
 

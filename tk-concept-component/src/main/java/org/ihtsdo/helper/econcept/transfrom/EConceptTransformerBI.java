@@ -31,7 +31,7 @@ public interface EConceptTransformerBI {
      * Process.
      *
      * @param c the c
-     * @throws Exception the exception
+     * @throws Exception indicates an exception has occurred
      */
     public void process(TkConcept c) throws Exception;
     

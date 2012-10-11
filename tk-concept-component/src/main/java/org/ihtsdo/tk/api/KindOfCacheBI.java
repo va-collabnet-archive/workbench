@@ -31,7 +31,7 @@ public interface KindOfCacheBI {
 	 * Sets the up.
 	 *
 	 * @param viewCoordinate the new up
-	 * @throws Exception the exception
+	 * @throws Exception indicates an exception has occurred
 	 */
 	public abstract void setup(ViewCoordinate viewCoordinate) throws Exception;
 
@@ -41,7 +41,7 @@ public interface KindOfCacheBI {
 	 * @param childNid the child nid
 	 * @param parentNid the parent nid
 	 * @return <code>true</code>, if is kind of
-	 * @throws Exception the exception
+	 * @throws Exception indicates an exception has occurred
 	 */
 	public abstract boolean isKindOf(int childNid, int parentNid)
 			throws Exception;
@@ -57,7 +57,7 @@ public interface KindOfCacheBI {
          * Update cache.
          *
          * @param conceptChronicle the concept chronicle
-         * @throws Exception the exception
+         * @throws Exception indicates an exception has occurred
          */
         public void updateCache(ConceptChronicleBI conceptChronicle) throws Exception;
     

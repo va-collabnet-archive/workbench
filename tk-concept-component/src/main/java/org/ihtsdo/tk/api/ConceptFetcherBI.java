@@ -33,7 +33,7 @@ public interface ConceptFetcherBI {
     * Fetches a concept.
     *
     * @return the fetched concept
-    * @throws Exception the exception
+    * @throws Exception indicates an exception has occurred
     */
    ConceptChronicleBI fetch() throws Exception;
    
@@ -42,7 +42,7 @@ public interface ConceptFetcherBI {
     *
     * @param viewCoordinate the view coordinate specifying which version to return
     * @return the specified concept version
-    * @throws Exception the exception
+    * @throws Exception indicates an exception has occurred
     */
    ConceptVersionBI fetch(ViewCoordinate viewCoordinate) throws Exception;
    
@@ -51,7 +51,7 @@ public interface ConceptFetcherBI {
     * random updates.
     *
     * @param conceptChronicle the concept chronicle to update
-    * @throws Exception the exception TODO-javadoc: how to document exception?
+    * @throws Exception indicates an exception has occurred TODO-javadoc: how to document exception?
     */
    void update(ConceptChronicleBI conceptChronicle) throws Exception;
 }

@@ -28,7 +28,7 @@ public interface ProcessComponentChronicleBI {
      * Process.
      *
      * @param componentChronicle the component chronicle
-     * @throws Exception the exception
+     * @throws Exception indicates an exception has occurred
      */
     void process(ComponentChronicleBI componentChronicle) throws Exception;
 }

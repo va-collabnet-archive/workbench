@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.helper.msfile;
 
@@ -21,27 +21,27 @@ import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class DescriptionAdditionFileHelper.
+ * The Class DescriptionAdditionFileHelper takes a text file specifying
+ * descriptions and loads the descriptions into an
+ * <code>ArrayList</code> with one element for each line of the file. Can handle
+ * files with or without a byte order mark (BOM). The description file should
+ * have one description per line.
  *
- * @author AKF
  */
 public class DescriptionAdditionFileHelper {
 
-    /** The desc file list. */
     private static ArrayList<String> descFileList = null;
-    
-    /** The init lock. */
     private static Lock initLock = new ReentrantLock();
-    
-    /** The Constant BOM_SIZE. */
     private static final int BOM_SIZE = 4;
 
     /**
-     * Lazy init.
+     * Imports each line of the
+     * <code>memberFile</code> into a list of
+     * <code>Strings</code> with one element per file line. Checks if the file
+     * has a BOM and reads accordingly.
      *
-     * @param memberFile the member file
+     * @param memberFile the member file to import
      * @throws IOException signals that an I/O exception has occurred
      */
     private static void lazyInit(File memberFile)
@@ -55,16 +55,16 @@ public class DescriptionAdditionFileHelper {
         // Read ahead four bytes and check for BOM marks.
         if ((bom[0] == (byte) 0xEF) && (bom[1] == (byte) 0xBB) && (bom[2] == (byte) 0xBF)) {
             unread = n - 3;
-        }else{
+        } else {
             unread = n;
         }
-         // Unread bytes if necessary and skip BOM marks.
+        // Unread bytes if necessary and skip BOM marks.
         if (unread > 0) {
             pushbackStream.unread(bom, (n - unread), unread);
         } else if (unread < -1) {
             pushbackStream.unread(bom, 0, 0);
         }
-        
+
         InputStreamReader isr =
                 new InputStreamReader(pushbackStream, "UTF-8");
         HashMap msFileSetMap = new HashMap<String, Set<String>>();
@@ -79,14 +79,16 @@ public class DescriptionAdditionFileHelper {
     }
 
     /**
-     * Gets the desc file list.
+     * Gets a list of strings representing the given
+     * <code>descriptionFile</code>.
      *
-     * @param descFile the desc file
-     * @return the desc file list
+     * @param descriptionFile the text file with one description per line
+     * @return the list of of strings where each element represents one line of
+     * the description file
      * @throws IOException signals that an I/O exception has occurred
      */
-    public static ArrayList<String> getDescFileList(File descFile) throws IOException {
-            lazyInit(descFile);
+    public static ArrayList<String> getDescFileList(File descriptionFile) throws IOException {
+        lazyInit(descriptionFile);
         return descFileList;
     }
 }

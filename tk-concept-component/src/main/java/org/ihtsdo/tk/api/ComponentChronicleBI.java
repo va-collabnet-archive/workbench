@@ -111,7 +111,7 @@ public interface ComponentChronicleBI<T extends ComponentVersionBI>
      * @param viewCoordinate the view coordinate specifying which versions are
      * active and inactive
      * @return <code>true</code>, if analogs were successfully created
-     * @throws Exception indicates an exception has occurred
+     * @throws Exception indicates an exception has occurred indicates an exception has occurred
      * @see org.ihtsdo.tk.api.AnalogBI
      */
     boolean makeAdjudicationAnalogs(EditCoordinate editCoordinate, ViewCoordinate viewCoordinate) throws Exception;

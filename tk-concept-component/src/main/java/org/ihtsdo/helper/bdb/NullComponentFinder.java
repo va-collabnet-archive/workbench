@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.helper.bdb;
 
@@ -43,29 +43,42 @@ import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 // TODO: Auto-generated Javadoc
+//TODO-javadoc: skipped private methods/variables
 /**
- * The Class NullComponentFinder.
+ * The Class NullComponentFinde processes every concept in the database to
+ * determine if each component has valid identifiers. This class implements
+ * <code>ProcessUnfetchedConceptDataBI</code> and can
+ * be "run" using the terminology store method iterateConceptDataInParallel.
  *
- * @author kec
+ * @see
+ * TerminologyStoreDI#iterateConceptDataInParallel(org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI)
+ *
  */
 public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
 
-    /** The count. */
+    /**
+     * The count.
+     */
     private AtomicInteger count = new AtomicInteger(0);
-    
-    /** The dots. */
+    /**
+     * The dots.
+     */
     private AtomicInteger dots = new AtomicInteger(0);
-    
-    /** The all prim nids. */
+    /**
+     * The list of nids to be processed.
+     */
     ConcurrentSkipListSet<Integer> allPrimNids = new ConcurrentSkipListSet<Integer>();
-    
-    /** The null component. */
+    /**
+     * The the list to hold any nids found to be null components.
+     */
     ConcurrentSkipListSet<Integer> nullComponent = new ConcurrentSkipListSet<Integer>();
-    
-    /** The null component file. */
+    /**
+     * The output file: nullComponent.oos.
+     */
     File nullComponentFile = new File("nullComponent.oos");
-    
-    /** The nidset. */
+    /**
+     * The nidset.
+     */
     private final NidBitSetBI nidset;
 
     //~--- constant enums ------------------------------------------------------
@@ -74,9 +87,13 @@ public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
      */
     private enum PASS {
 
-        /** The pass one. */
-        PASS_ONE, /** The pass two. */
- PASS_TWO
+        /**
+         * The pass one.
+         */
+        PASS_ONE, /**
+         * The pass two.
+         */
+        PASS_TWO
     }
 
     //~--- constructors --------------------------------------------------------
@@ -162,8 +179,9 @@ public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
 
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.api.ContinuationTrackerBI#continueWork()
+    /**
+     * 
+     * @return <code>true</code>
      */
     @Override
     public boolean continueWork() {
@@ -204,8 +222,12 @@ public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI#processUnfetchedConceptData(int, org.ihtsdo.tk.api.ConceptFetcherBI)
+    /**
+     * Processes each concept to determine if the associated nids are valid.
+     * @param cNid the nid of the concept to process
+     * @param fetcher the fetcher for getting the concept associated
+     * with the <code>cNid</code> from the database
+     * @throws Exception indicates an exception has occurred 
      */
     @Override
     public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fetcher) throws Exception {
@@ -227,7 +249,7 @@ public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
     }
 
     /**
-     * Write null component file.
+     * Writes a file, nullComponent.oos, listing the null components.
      *
      * @throws IOException signals that an I/O exception has occurred
      */
@@ -247,16 +269,18 @@ public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
 
     //~--- get methods ---------------------------------------------------------    
     /**
-     * Gets the null component.
+     * Gets a list of any null component nids found.
      *
-     * @return the null component
+     * @return a list of null component nids
      */
     public ConcurrentSkipListSet<Integer> getNullComponent() {
         return nullComponent;
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI#getNidSet()
+    /**
+     * 
+     * @return the set of nids to process
+     * @throws IOException 
      */
     @Override
     public NidBitSetBI getNidSet() throws IOException {

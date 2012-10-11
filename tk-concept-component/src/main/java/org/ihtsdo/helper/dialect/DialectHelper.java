@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.helper.dialect;
 
@@ -41,27 +41,26 @@ import org.ihtsdo.tk.spec.DescriptionSpec;
 import org.ihtsdo.tk.spec.SpecFactory;
 import org.ihtsdo.tk.uuid.UuidT5Generator;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class DialectHelper. Loads the lists of dialect variant words from a file into refsets.
+ * The Class DialectHelper. Loads the lists of dialect variant words from the
+ * dialect specific refset into a map of the dialect type and the associated
+ * dialect variant word.
  *
  */
 public class DialectHelper {
 
-    /** The variant map. */
     private static Map<Integer, Map<String, String>> variantMap = null;
-    
-    /** The variant set map. */
     private static Map<Integer, Set<String>> variantSetMap = null;
-    
-    /** The initialization lock. */
     private static Lock initLock = new ReentrantLock();
 
     /**
-     * Imports the dialect variant words into the refset for the dialect, a child of language refset, if the refset does not contain members.
+     * Imports the dialect variant words into a map of the dialect to the
+     * dialect variant word. Checks to see if the map is empty before loading,
+     * and will only load the words if the map is found to be empty.
      *
      * @param dialectOrLanguageNid the dialect or language nid
-     * @throws UnsupportedDialectOrLanguage the unsupported dialect or language
+     * @throws UnsupportedDialectOrLanguage indicates an unsupported dialect or
+     * language
      * @throws IOException signals that an I/O exception has occurred
      */
     private static void lazyInit(int dialectOrLanguageNid)
@@ -82,9 +81,9 @@ public class DialectHelper {
                             enVariantTextRefsetC.getRefexes();
                     Set<String> variantSet = new HashSet<String>();
                     for (RefexChronicleBI<?> refex : enVariants) {
-                        if(RefexStringVersionBI.class.isAssignableFrom(refex.getClass())){
+                        if (RefexStringVersionBI.class.isAssignableFrom(refex.getClass())) {
                             RefexStringVersionBI variantText =
-                                (RefexStringVersionBI) refex.getVersion(vc);
+                                    (RefexStringVersionBI) refex.getVersion(vc);
                             if (variantText != null) {
                                 variantSet.add(variantText.getString1());
                             }
@@ -117,32 +116,32 @@ public class DialectHelper {
     }
 
     /**
-     * Adds the dialect.
+     * Adds a dialect to the <code>initialVariantMap</code>.
      *
-     * @param dialectSpec the dialect spec
-     * @param vc the vc
-     * @param varientsSpec the varients spec
-     * @param ts the ts
-     * @param initialVariantMap the initial variant map
+     * @param dialectSpec the <code>ConceptSpec</code> representing the dialect concept
+     * @param viewCoordinate the view coordinate specifying which versions are active or inactive
+     * @param varientsSpec the <code>ConceptSpec</code> representing the dialect refex concept
+     * @param terminologySnapshot the terminologySnapshot to use for getting component versions
+     * @param initialVariantMap the map to udpate
      * @throws ContradictionException the contradiction exception
      * @throws IOException signals that an I/O exception has occurred
      */
     private static void addDialect(ConceptSpec dialectSpec,
-            ViewCoordinate vc,
+            ViewCoordinate viewCoordinate,
             ConceptSpec varientsSpec,
-            TerminologySnapshotDI ts,
+            TerminologySnapshotDI terminologySnapshot,
             HashMap<Integer, Map<String, String>> initialVariantMap) throws ContradictionException, IOException {
-        ConceptVersionBI dialectC = dialectSpec.get(vc);
-        ConceptVersionBI variantTextRefsetC = varientsSpec.get(vc);
+        ConceptVersionBI dialectC = dialectSpec.get(viewCoordinate);
+        ConceptVersionBI variantTextRefsetC = varientsSpec.get(viewCoordinate);
 
         Collection<? extends RefexChronicleBI<?>> dialectVarients =
                 variantTextRefsetC.getActiveRefsetMembers();
         Map<String, String> variantDialectMap = new HashMap<String, String>();
         for (RefexChronicleBI<?> refex : dialectVarients) {
-            if(RefexStringVersionBI.class.isAssignableFrom(refex.getClass())){
-                RefexStringVersionBI dialectText = (RefexStringVersionBI) refex.getVersion(vc);
+            if (RefexStringVersionBI.class.isAssignableFrom(refex.getClass())) {
+                RefexStringVersionBI dialectText = (RefexStringVersionBI) refex.getVersion(viewCoordinate);
                 if (dialectText != null) {
-                    RefexStringVersionBI variantText = (RefexStringVersionBI) ts.getComponentVersion(dialectText.getReferencedComponentNid());
+                    RefexStringVersionBI variantText = (RefexStringVersionBI) terminologySnapshot.getComponentVersion(dialectText.getReferencedComponentNid());
                     variantDialectMap.put(variantText.getString1(), dialectText.getString1());
                 }
             }
@@ -151,26 +150,35 @@ public class DialectHelper {
     }
 
     /**
-     * Checks if is missing desc for dialect.
+     * Checks if the enclosing concept of the given
+     * <code>description</code> is has any descriptions in the specified
+     * dialect,
+     * <code>dialectNid</code>. Uses the given
+     * <code>viewCoordinate</code> to determine which version of the
+     * descriptions to use.
      *
-     * @param desc the desc
-     * @param dialectNid the dialect nid
-     * @param vc the vc
-     * @return <code>true</code>, if is missing desc for dialect
+     * @param description the description containing the text to check
+     * @param dialectNid the dialect nid specifying the desired dialect
+     * @param viewCoordinate the view coordinate specifying which version of the
+     * description to use
+     * @return <code>true</code>, if no description is found in the specified
+     * dialect
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ContradictionException the contradiction exception
-     * @throws UnsupportedDialectOrLanguage the unsupported dialect or language
+     * @throws ContradictionException if more than one version is found for the
+     * given view coordinate
+     * @throws UnsupportedDialectOrLanguage indicates an unsupported dialect or
+     * language
      */
-    public static boolean isMissingDescForDialect(DescriptionVersionBI desc,
-            int dialectNid, ViewCoordinate vc) throws IOException,
+    public static boolean isMissingDescForDialect(DescriptionVersionBI description,
+            int dialectNid, ViewCoordinate viewCoordinate) throws IOException,
             ContradictionException, UnsupportedDialectOrLanguage {
         lazyInit(dialectNid);
-        if (isTextForDialect(desc.getText(), dialectNid)) {
+        if (isTextForDialect(description.getText(), dialectNid)) {
             return false;
         }
-        String dialectText = makeTextForDialect(desc.getText(), dialectNid);
-        ConceptVersionBI concept = Ts.get().getConceptVersion(vc,
-                desc.getConceptNid());
+        String dialectText = makeTextForDialect(description.getText(), dialectNid);
+        ConceptVersionBI concept = Ts.get().getConceptVersion(viewCoordinate,
+                description.getConceptNid());
         for (DescriptionVersionBI d : concept.getDescriptionsActive()) {
             if (d.getText().toLowerCase().equals(dialectText.toLowerCase())) {
                 return false;
@@ -180,12 +188,16 @@ public class DialectHelper {
     }
 
     /**
-     * Checks for dialect variants.
+     * Checks if the given
+     * <code>text</code> has dialect variants in the specified
+     * <code>language</code>.
      *
-     * @param text the text
-     * @param languageNid the language nid
-     * @return <code>true</code>, if successful
-     * @throws UnsupportedDialectOrLanguage the unsupported dialect or language
+     * @param text the string to check for variants
+     * @param languageNid the nid representing the desired language
+     * @return <code>true</code>, if the text has any dialect variants in the
+     * specified language
+     * @throws UnsupportedDialectOrLanguage indicates an unsupported dialect or
+     * language
      * @throws IOException signals that an I/O exception has occurred
      */
     public static boolean hasDialectVariants(String text, int languageNid)
@@ -202,12 +214,14 @@ public class DialectHelper {
     }
 
     /**
-     * Checks if is text for dialect.
+     * Checks if the given<code>text</code> is written in the specified dialect.
      *
-     * @param text the text
-     * @param dialectNid the dialect nid
-     * @return <code>true</code>, if is text for dialect
-     * @throws UnsupportedDialectOrLanguage the unsupported dialect or language
+     * @param text the string to check
+     * @param dialectNid the nid associated with the desired dialect
+     * @return <code>true</code>, if the text is written in the specified
+     * dialect
+     * @throws UnsupportedDialectOrLanguage indicates an unsupported dialect or
+     * language
      * @throws IOException signals that an I/O exception has occurred
      */
     public static boolean isTextForDialect(String text, int dialectNid)
@@ -224,12 +238,15 @@ public class DialectHelper {
     }
 
     /**
-     * Make text for dialect.
+     * Generates a String representing the given
+     * <code>text</code> re-written in specified dialect.
      *
-     * @param text the text
-     * @param dialectNid the dialect nid
-     * @return the string
-     * @throws UnsupportedDialectOrLanguage the unsupported dialect or language
+     * @param text the string to re-write
+     * @param dialectNid the nid representing the desired dialect
+     * @return the string representing the given text re-written in the
+     * specified dialect
+     * @throws UnsupportedDialectOrLanguage indicates an unsupported dialect or
+     * language
      * @throws IOException signals that an I/O exception has occurred
      */
     public static String makeTextForDialect(String text, int dialectNid)
@@ -260,51 +277,57 @@ public class DialectHelper {
     }
 
     /**
-     * Gets the description spec for dialect.
+     * Gets a description spec representing the
+     * <code>description</code> in the dialect specified by the
+     * <code>dialectSpec</code>.
      *
-     * @param desc the desc
-     * @param dialectSpec the dialect spec
-     * @param vc the vc
-     * @return the description spec for dialect
-     * @throws UnsupportedDialectOrLanguage the unsupported dialect or language
+     * @param description the description to represent
+     * @param dialectSpec specifying the dialect of the description spec
+     * @param viewCoordinate specifying which version of the description to use
+     * @return the generated description spec for the specified dialect
+     * @throws UnsupportedDialectOrLanguage indicates an unsupported dialect or
+     * language
      * @throws IOException signals that an I/O exception has occurred
      */
     public static DescriptionSpec getDescriptionSpecForDialect(
-            DescriptionVersionBI desc,
-            ConceptSpec dialectSpec, ViewCoordinate vc)
+            DescriptionVersionBI description,
+            ConceptSpec dialectSpec, ViewCoordinate viewCoordinate)
             throws UnsupportedDialectOrLanguage, IOException {
         return getDescriptionSpecForDialect(
-                desc,
-                dialectSpec.get(vc).getNid(), vc);
+                description,
+                dialectSpec.get(viewCoordinate).getNid(), viewCoordinate);
     }
 
     /**
-     * Gets the description spec for dialect.
+     * Gets a description spec representing the
+     * <code>description</code> in the dialect specified by the
+     * <code>dialectNid</code>.
      *
-     * @param desc the desc
-     * @param dialectNid the dialect nid
-     * @param vc the vc
-     * @return the description spec for dialect
-     * @throws UnsupportedDialectOrLanguage the unsupported dialect or language
+     * @param description the description to represent
+     * @param dialectNid specifying the dialect of the description spec
+     * @param viewCoordinate specifying which version of the description to use
+     * @return the generated description spec for the specified dialect
+     * @throws UnsupportedDialectOrLanguage indicates an unsupported dialect or
+     * language
      * @throws IOException signals that an I/O exception has occurred
      */
     public static DescriptionSpec getDescriptionSpecForDialect(
-            DescriptionVersionBI desc,
-            int dialectNid, ViewCoordinate vc)
+            DescriptionVersionBI description,
+            int dialectNid, ViewCoordinate viewCoordinate)
             throws UnsupportedDialectOrLanguage, IOException {
         try {
             lazyInit(dialectNid);
-            String variantText = makeTextForDialect(desc.getText(), dialectNid);
+            String variantText = makeTextForDialect(description.getText(), dialectNid);
 
-            UUID descUuid = UuidT5Generator.getDescUuid(desc.getText(),
+            UUID descUuid = UuidT5Generator.getDescUuid(description.getText(),
                     Ts.get().getConcept(dialectNid).getPrimUuid(),
-                    Ts.get().getConcept(desc.getConceptNid()).getPrimUuid());
+                    Ts.get().getConcept(description.getConceptNid()).getPrimUuid());
 
             DescriptionSpec ds = new DescriptionSpec(new UUID[]{descUuid},
-                    SpecFactory.get(Ts.get().getConcept(desc.getConceptNid()), vc),
-                    SpecFactory.get(Ts.get().getConcept(desc.getTypeNid()), vc),
+                    SpecFactory.get(Ts.get().getConcept(description.getConceptNid()), viewCoordinate),
+                    SpecFactory.get(Ts.get().getConcept(description.getTypeNid()), viewCoordinate),
                     variantText);
-            ds.setLangText(desc.getLang());
+            ds.setLangText(description.getLang());
             return ds;
         } catch (NoSuchAlgorithmException ex) {
             throw new IOException(ex);

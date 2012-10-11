@@ -34,7 +34,7 @@ public interface ProcessStampDataBI {
      * All stamp nids in the database will be returned but in no particular order.
      *
      * @param stamp the object representing the stamp nid to process
-     * @throws Exception todo-javadoc: why?
+     * @throws Exception indicates an exception has occurred todo-javadoc: why?
      */
     void processStampData(StampBI stamp) throws Exception;
     

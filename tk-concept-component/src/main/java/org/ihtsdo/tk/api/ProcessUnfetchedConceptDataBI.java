@@ -36,7 +36,7 @@ public interface ProcessUnfetchedConceptDataBI extends ContinuationTrackerBI {
      *
      * @param conceptNid the concept nid
      * @param conceptFetcher the concept fetcher
-     * @throws Exception the exception
+     * @throws Exception indicates an exception has occurred
      */
     void processUnfetchedConceptData(int conceptNid,
             ConceptFetcherBI conceptFetcher) throws Exception;

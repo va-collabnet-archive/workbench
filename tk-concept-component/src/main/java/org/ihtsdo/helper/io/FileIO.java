@@ -171,7 +171,7 @@ public class FileIO {
      *
      * @param inName the in name
      * @param outName the out name
-     * @throws FileNotFoundException the file not found exception
+     * @throws FileNotFoundException if a specified file was not found
      * @throws IOException signals that an I/O exception has occurred
      */
     public static void copyFile(String inName, String outName) throws FileNotFoundException, IOException {
@@ -241,7 +241,7 @@ public class FileIO {
      * @param inName the in name
      * @param pw the pw
      * @param close the close
-     * @throws FileNotFoundException the file not found exception
+     * @throws FileNotFoundException if a specified file was not found
      * @throws IOException signals that an I/O exception has occurred
      */
     public static void copyFile(String inName, PrintWriter pw, boolean close) throws FileNotFoundException, IOException {
@@ -254,7 +254,7 @@ public class FileIO {
      *
      * @param inName the in name
      * @return the string
-     * @throws FileNotFoundException the file not found exception
+     * @throws FileNotFoundException if a specified file was not found
      * @throws IOException signals that an I/O exception has occurred
      */
     public static String readLine(String inName) throws FileNotFoundException, IOException {
@@ -275,7 +275,7 @@ public class FileIO {
      *
      * @param inName the in name
      * @param outName the out name
-     * @throws FileNotFoundException the file not found exception
+     * @throws FileNotFoundException if a specified file was not found
      * @throws IOException signals that an I/O exception has occurred
      */
     public void copyFileBuffered(String inName, String outName) throws FileNotFoundException, IOException {
@@ -464,7 +464,7 @@ public class FileIO {
      * @param startDir the start dir
      * @param fileFilter the file filter
      * @return the obj from filesystem core
-     * @throws FileNotFoundException the file not found exception
+     * @throws FileNotFoundException if a specified file was not found
      * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException the class not found exception
      */
@@ -597,7 +597,7 @@ public class FileIO {
      * @param defaultFile the default file
      * @param obj the obj
      * @return the file
-     * @throws FileNotFoundException the file not found exception
+     * @throws FileNotFoundException if a specified file was not found
      * @throws IOException signals that an I/O exception has occurred
      */
     private static File writeObjeToFilesystemCore(Frame parent, String title, String startDir, String defaultFile,
@@ -682,7 +682,7 @@ public class FileIO {
      * @param delegates the delegates
      * @param owner the owner
      * @return the file
-     * @throws FileNotFoundException the file not found exception
+     * @throws FileNotFoundException if a specified file was not found
      * @throws IOException signals that an I/O exception has occurred
      */
     private static File writeObjXmlToFilesystemCore(Frame parent, String title, String startDir, String defaultFile,

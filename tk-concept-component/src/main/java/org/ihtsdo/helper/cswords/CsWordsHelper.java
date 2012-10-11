@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.helper.cswords;
 
@@ -33,20 +33,28 @@ import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.type_nid_string.RefexNidStringVersionBI;
 import org.ihtsdo.tk.binding.snomed.CaseSensitive;
 
-// TODO: Auto-generated Javadoc
+// TODO-javadoc: skipped private methods/variables
 /**
- * The Class CsWordsHelper. Loads the list of case sensitive words from a file into refset.
+ * The Class CsWordsHelper loads the list of case sensitive words from the Case
+ * Sensitive Words Refset in to a map of the word and the associated sensitivity
+ * (either "case sensitive" or "maybe case sensitive").
  */
 public class CsWordsHelper {
 
-    /** The cs word set map. */
+    /**
+     * The cs word set map.
+     */
     private static Map<Integer, Set<String>> csWordSetMap = null;
-    
-    /** The initialization lock. */
+    /**
+     * The initialization lock.
+     */
     private static Lock initLock = new ReentrantLock();
 
     /**
-     * Imports the case sensitive word list into the Case Sensitive Words Refset if the refset does not contain members.
+     * Imports the case sensitive word list from the Case Sensitive Words Refset
+     * into a map of the word to the associated sensitivity (either "case
+     * sensitive" or "maybe case sensitive"). Checks to see if the map is empty
+     * before loading, and will only load the words if the map is found to be empty.
      *
      * @throws IOException signals that an I/O exception has occurred
      */
@@ -94,11 +102,12 @@ public class CsWordsHelper {
     }
 
     /**
-     * Checks if text is initial case significant (ICS) based on the ICS type given.
+     * Checks if text is initial case significant (ICS) based on the ICS type
+     * given.
      *
-     * @param text the string to check
+     * @param text the string representing the word to check
      * @param icsTypeNid the ICS type nid
-     * @return <code>true</code>, if the string is IC type significant, otherwise false
+     * @return <code>true</code>, if the given string is found for the specified ICS type
      * @throws IOException signals that an I/O exception has occurred
      */
     public static boolean isIcTypeSignificant(String text, int icsTypeNid)

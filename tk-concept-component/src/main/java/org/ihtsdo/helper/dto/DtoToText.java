@@ -53,7 +53,7 @@ public class DtoToText {
     * @param changeSet the change set
     * @param append the append
     * @throws IOException signals that an I/O exception has occurred
-    * @throws FileNotFoundException the file not found exception
+    * @throws FileNotFoundException if a specified file was not found
     * @throws ClassNotFoundException the class not found exception
     */
    private static void convert(File changeSetFile, boolean changeSet, boolean append)
@@ -122,7 +122,7 @@ public class DtoToText {
     * @param conceptUuids the concept uuids
     * @param append the append
     * @throws IOException signals that an I/O exception has occurred
-    * @throws FileNotFoundException the file not found exception
+    * @throws FileNotFoundException if a specified file was not found
     * @throws ClassNotFoundException the class not found exception
     */
    private static void search(File changeSetFile, Collection<UUID> conceptUuids, boolean append)

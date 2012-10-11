@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.helper.descriptionlogic;
 
@@ -36,43 +36,45 @@ import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.uuid.UuidT5Generator;
 
-// TODO: Auto-generated Javadoc
+// TODO-javadoc: Marc needs to review
 /**
- * The Class DescriptionLogic.
- *
- * @author marc
+ * The Class DescriptionLogic. Marc -- can you describe what this class is for
+ * and also review the method documentation for accuracy?
  */
 public class DescriptionLogic { // :SNOOWL:
 
-    /** The Constant REFSET_ID_NAMESPACE_UUID_TYPE1. */
- private static final String REFSET_ID_NAMESPACE_UUID_TYPE1 = "d0b3c9c0-e395-11df-bccf-0800200c9a66";
+    private static final String REFSET_ID_NAMESPACE_UUID_TYPE1 = "d0b3c9c0-e395-11df-bccf-0800200c9a66";
     // CONCEPT SPECS
-    /** The description logic refset. */
+    /**
+     * A Concept Spec representing the concept: description logic refset.
+     */
     public static ConceptSpec DESCRIPTION_LOGIC_REFSET =
             new ConceptSpec("Description logic refset",
             genUuid("Description logic refset"));
-    
-    /** The disjoint sets refset. */
+    /**
+     * A Concept Spec representing the concept: disjoint sets refset.
+     */
     public static ConceptSpec DISJOINT_SETS_REFSET =
             new ConceptSpec("Disjoint sets refset",
             genUuid("Disjoint sets refset"));
-    
-    /** The negation refset. */
+    /**
+     * A Concept Spec representing the concept: negation refset.
+     */
     public static ConceptSpec NEGATION_REFSET =
             new ConceptSpec("Negation refset",
             genUuid("Negation refset"));
-    
-    /** The union sets refset. */
+    /**
+     * A Concept Spec representing the concept: union sets refset.
+     */
     public static ConceptSpec UNION_SETS_REFSET =
             new ConceptSpec("Union sets refset",
             genUuid("Union sets refset"));
-    
-    /** The condor reasoner. */
+    /**
+     * A Concept Spec representing the concept: condor reasoner.
+     */
     public static ConceptSpec CONDOR_REASONER =
             new ConceptSpec("ConDOR",
             genUuid("ConDOR Reasoner"));
-    
-    /** The is visible b. */
     private static boolean isVisibleB = false;
 
     /**
@@ -83,9 +85,9 @@ public class DescriptionLogic { // :SNOOWL:
     }
 
     /**
-     * Checks if is present.
+     * Checks the description logic refset is present in the database.
      *
-     * @return <code>true</code>, if is present
+     * @return <code>true</code>, if the description logic refset is present
      */
     public static boolean isPresent() {
         // Check for presence of both refset and attribute to be present
@@ -100,6 +102,8 @@ public class DescriptionLogic { // :SNOOWL:
     /**
      * Checks if is visible.
      *
+     * TODO-javadoc-marc: what does this do?
+     *
      * @return <code>true</code>, if is visible
      */
     public static boolean isVisible() {
@@ -108,6 +112,8 @@ public class DescriptionLogic { // :SNOOWL:
 
     /**
      * Sets the visible.
+     *
+     * TODO-javadoc-marc: what does this do?
      *
      * @param visible the new visible
      */
@@ -120,10 +126,12 @@ public class DescriptionLogic { // :SNOOWL:
     }
 
     /**
-     * Gen uuid.
+     * Generates a type 5 uuid from the given
+     * <code>String</code> representing the description text of a fully
+     * specified name.
      *
-     * @param fsn the fsn
-     * @return the uuid
+     * @param fsn the description text of a fully specified name
+     * @return the generated type 5 uuid
      */
     private static UUID genUuid(String fsn) {
         try {
@@ -168,22 +176,24 @@ public class DescriptionLogic { // :SNOOWL:
     }
 
     /**
-     * Checks if is negated rel.
+     * Checks if the given relationship is a member of the negation refset.
      *
-     * @param relNid the rel nid
-     * @param vc the vc
-     * @return <code>true</code>, if is negated rel
+     * @param relationshipNid the nid associated with the relationship in
+     * question
+     * @param viewCoordinate the view coordinate specifying which members are
+     * active or inactive
+     * @return <code>true</code>, if the relationship is negated
      * @throws IOException signals that an I/O exception has occurred
      */
-    public static boolean isNegatedRel(int relNid, ViewCoordinate vc) throws IOException {
-//        if (relNid == -2145628237 || relNid == -2147479420 || relNid == -2143114520
-//                || relNid == -2144096571 || relNid == -2144869271) {
+    public static boolean isNegatedRel(int relationshipNid, ViewCoordinate viewCoordinate) throws IOException {
+//        if (relationshipNid == -2145628237 || relationshipNid == -2147479420 || relationshipNid == -2143114520
+//                || relationshipNid == -2144096571 || relationshipNid == -2144869271) {
 //            System.out.println(":!!!:DEBUG: found relationship of interest");
 //        }
-        ComponentChronicleBI<?> component = Ts.get().getComponent(relNid);
+        ComponentChronicleBI<?> component = Ts.get().getComponent(relationshipNid);
         boolean isNegatedRel = false;
         try {
-            Collection<? extends RefexChronicleBI> refexes = component.getRefexesActive(vc);
+            Collection<? extends RefexChronicleBI> refexes = component.getRefexesActive(viewCoordinate);
             int evalRefsetNid = getNegationRefsetNid();
 
             if (refexes != null) {
@@ -211,15 +221,19 @@ public class DescriptionLogic { // :SNOOWL:
     }
 
     /**
-     * Compute ordered set uuid.
+     * Computes a type 5 uuid representing an orderd set of the
+     * <code>concepts</code> and the given
+     * <code>string</code>.
      *
-     * @param concepts the concepts
-     * @param str the str
-     * @return the uuid
-     * @throws NoSuchAlgorithmException the no such algorithm exception
-     * @throws UnsupportedEncodingException the unsupported encoding exception
+     * @param concepts the list of concepts to represent
+     * @param string the string to represent
+     * @return the computed uuid
+     * @throws NoSuchAlgorithmException indicates a no such algorithm exception
+     * has occurred
+     * @throws UnsupportedEncodingException indicates an unsupported encoding
+     * exception has occurred
      */
-    public static UUID computeOrderedSetUuid(List<ConceptChronicleBI> concepts, String str)
+    public static UUID computeOrderedSetUuid(List<ConceptChronicleBI> concepts, String string)
             throws NoSuchAlgorithmException, UnsupportedEncodingException {
         // UUID SORT ORDER -- order required for deterministic refset UUID
         Comparator<ConceptChronicleBI> comp = new Comparator<ConceptChronicleBI>() {
@@ -233,7 +247,7 @@ public class DescriptionLogic { // :SNOOWL:
         // :!!!:SNOOWL:NYI: reject non-unique UUIDS
 
         StringBuilder conceptsUuidStr = new StringBuilder(concepts.size() * (36 + 1));
-        conceptsUuidStr.append(str);
+        conceptsUuidStr.append(string);
         for (ConceptChronicleBI ccbi : concepts) {
             conceptsUuidStr.append(ccbi.getPrimUuid().toString()).append("|");
         }

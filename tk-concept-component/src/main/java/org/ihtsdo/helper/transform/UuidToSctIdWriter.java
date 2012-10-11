@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.helper.transform;
 
@@ -33,119 +33,56 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.binding.snomed.TermAux;
 import org.ihtsdo.tk.spec.ValidationException;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class UuidToSctIdWriter.
- *
- * @author akf
+ * The Class UuidToSctIdWriter converts UUID based Release Format 2 (RF2) files
+ * into SCT ID based RF2 files.
  */
 public class UuidToSctIdWriter {
 
-    /** The namespace. */
-    String namespace;
-    
-    /** The module. */
-    String module;
-    
-    /** The directory. */
-    File directory;
-    
-    /** The concepts writer. */
-    Writer conceptsWriter;
-    
-    /** The descriptions writer. */
-    Writer descriptionsWriter;
-    
-    /** The identifiers writer. */
-    Writer identifiersWriter;
-    
-    /** The private identifiers writer. */
-    Writer privateIdentifiersWriter;
-    
-    /** The relationships writer. */
-    Writer relationshipsWriter;
-    
-    /** The relationships stated writer. */
-    Writer relationshipsStatedWriter;
-    
-    /** The lang refsets writer. */
-    Writer langRefsetsWriter;
-    
-    /** The other lang refsets writer. */
-    Writer otherLangRefsetsWriter;
-    
-    /** The mod depend writer. */
-    Writer modDependWriter;
-    
-    /** The desc type writer. */
-    Writer descTypeWriter;
-    
-    /** The refset desc writer. */
-    Writer refsetDescWriter;
-    
-    /** The uuid to sct map writer. */
-    Writer uuidToSctMapWriter;
-    
-    /** The concepts reader. */
-    BufferedReader conceptsReader;
-    
-    /** The descriptions reader. */
-    BufferedReader descriptionsReader;
-    
-    /** The identifiers reader. */
-    BufferedReader identifiersReader;
-    
-    /** The private identifiers reader. */
-    BufferedReader  privateIdentifiersReader;
-    
-    /** The relationships reader. */
-    BufferedReader relationshipsReader;
-    
-    /** The relationships stated reader. */
-    BufferedReader relationshipsStatedReader;
-    
-    /** The lang refsets reader. */
-    BufferedReader langRefsetsReader;
-    
-    /** The other lang refsets reader. */
-    BufferedReader otherLangRefsetsReader;
-    
-    /** The mod depend reader. */
-    BufferedReader modDependReader;
-    
-    /** The desc type reader. */
-    BufferedReader descTypeReader;
-    
-    /** The refset desc reader. */
-    BufferedReader refsetDescReader;
-    
-    /** The uuid sct map reader. */
-    BufferedReader uuidSctMapReader;
-    
-    /** The store. */
-    TerminologyStoreDI store;
-    
-    /** The uuid to sct map. */
-    HashMap<UUID, String> uuidToSctMap = new HashMap<UUID, String>();
-    
-    /** The uuid to existing sct map. */
-    HashMap<UUID, String> uuidToExistingSctMap = new HashMap<UUID, String>();
-//    int conceptCounter = 1;
-//    int descCounter = 1;
-//    int relCounter = 1;
-    /** The make private alt ids file. */
-boolean makePrivateAltIdsFile;
-    
-    /** The handler. */
-    UuidSnomedMapHandler handler;
+    private String namespace;
+    private String module;
+    private File directory;
+    private Writer conceptsWriter;
+    private Writer descriptionsWriter;
+    private Writer identifiersWriter;
+    private Writer privateIdentifiersWriter;
+    private Writer relationshipsWriter;
+    private Writer relationshipsStatedWriter;
+    private Writer langRefsetsWriter;
+    private Writer otherLangRefsetsWriter;
+    private Writer modDependWriter;
+    private Writer descTypeWriter;
+    private Writer refsetDescWriter;
+    private Writer uuidToSctMapWriter;
+    private BufferedReader conceptsReader;
+    private BufferedReader descriptionsReader;
+    private BufferedReader identifiersReader;
+    private BufferedReader privateIdentifiersReader;
+    private BufferedReader relationshipsReader;
+    private BufferedReader relationshipsStatedReader;
+    private BufferedReader langRefsetsReader;
+    private BufferedReader otherLangRefsetsReader;
+    private BufferedReader modDependReader;
+    private BufferedReader descTypeReader;
+    private BufferedReader refsetDescReader;
+    private BufferedReader uuidSctMapReader;
+    private TerminologyStoreDI store;
+    private HashMap<UUID, String> uuidToSctMap = new HashMap<UUID, String>();
+    private HashMap<UUID, String> uuidToExistingSctMap = new HashMap<UUID, String>();
+    private boolean makePrivateAltIdsFile;
+    private UuidSnomedMapHandler handler;
 
     /**
-     * Instantiates a new uuid to sct id writer.
+     * Instantiates a new uuid to sct id writer for release files from the
+     * specified
+     * <code>namespace</code> and
+     * <code>module</code>.
      *
-     * @param namespace the namespace
-     * @param module the module
-     * @param directory the directory
-     * @param handler the handler
+     * @param namespace the namespace responsible for the release
+     * @param module the module which is being released
+     * @param directory the directory contain the uuid based RF2 files
+     * @param handler the uuid-snomed map handler to use for converting to SCT
+     * IDs
      */
     public UuidToSctIdWriter(String namespace, String module,
             File directory, UuidSnomedMapHandler handler) {
@@ -157,26 +94,37 @@ boolean makePrivateAltIdsFile;
     }
 
     /**
-     * The Enum exisitingSctIds.
+     * The Enum exisitingSctIds lists metadata SCT IDs needed for the release
+     * files.
      */
     private enum exisitingSctIds {
 
-        /** The primitive. */
-        PRIMITIVE("900000000000074008"), /** The defined. */
- DEFINED("900000000000073002"),
-        
-        /** The case sensitive. */
-        CASE_SENSITIVE("900000000000017005"), 
- /** The case insensitive. */
- CASE_INSENSITIVE("900000000000448009");
-        
-        /** The value. */
+        /**
+         * The SCT ID for the concept: primitive.
+         */
+        PRIMITIVE("900000000000074008"),
+        /**
+         * The SCT ID for the concept: defined.
+         */
+        DEFINED("900000000000073002"),
+        /**
+         * The SCT ID for the concept: case sensitive.
+         */
+        CASE_SENSITIVE("900000000000017005"),
+        /**
+         * The SCT ID for the concept: case insensitive.
+         */
+        CASE_INSENSITIVE("900000000000448009");
+        /**
+         * The value.
+         */
         public final String value;
 
         /**
-         * Instantiates a new exisiting sct ids.
+         * Instantiates a new exisiting sct ids for the give SCT ID
+         * <code>value</code>.
          *
-         * @param value the value
+         * @param value the SCT ID value to add
          */
         private exisitingSctIds(String value) {
             this.value = value;
@@ -184,7 +132,7 @@ boolean makePrivateAltIdsFile;
     }
 
     /**
-     * Write.
+     * Converts and writes the SCT ID based RF2 files.
      *
      * @throws IOException signals that an I/O exception has occurred
      */
@@ -197,21 +145,21 @@ boolean makePrivateAltIdsFile;
             module = handler.getWithGeneration(UUID.fromString(moduleId), SctIdGenerator.TYPE.CONCEPT).toString();
             uuidToSctMap.put(UUID.fromString(moduleId), module);
         }
-        
+
         String conceptLine = conceptsReader.readLine();
         conceptLine = conceptsReader.readLine();
         while (conceptLine != null) {
             processConceptAttribute(conceptLine);
             conceptLine = conceptsReader.readLine();
         }
-        
+
         String descLine = descriptionsReader.readLine();
         descLine = descriptionsReader.readLine();
         while (descLine != null) {
             processDescription(descLine);
             descLine = descriptionsReader.readLine();
         }
-        
+
         String relLine = relationshipsReader.readLine();
         relLine = relationshipsReader.readLine();
         while (relLine != null) {
@@ -232,7 +180,7 @@ boolean makePrivateAltIdsFile;
             processLangRefsets(langRefLine);
             langRefLine = langRefsetsReader.readLine();
         }
-        
+
         String otherLangRefLine = otherLangRefsetsReader.readLine();
         otherLangRefLine = otherLangRefsetsReader.readLine();
         while (otherLangRefLine != null) {
@@ -243,7 +191,7 @@ boolean makePrivateAltIdsFile;
         String modDependLine = modDependReader.readLine();
         modDependLine = modDependReader.readLine();
         while (modDependLine != null) {
-            processModuleDepedency(modDependLine);
+            processModuleDependency(modDependLine);
             modDependLine = modDependReader.readLine();
         }
 
@@ -260,40 +208,39 @@ boolean makePrivateAltIdsFile;
             processRefsetDesc(refsetDescLine);
             refsetDescLine = refsetDescReader.readLine();
         }
-        
+
         String idLine = identifiersReader.readLine();
         idLine = identifiersReader.readLine();
         while (idLine != null) {
             processIdentifiers(idLine, identifiersWriter);
             idLine = identifiersReader.readLine();
         }
-        
-        if(privateIdentifiersReader != null && privateIdentifiersWriter != null){
+
+        if (privateIdentifiersReader != null && privateIdentifiersWriter != null) {
             String privateIdLine = privateIdentifiersReader.readLine();
-        privateIdLine = privateIdentifiersReader.readLine();
-        while (privateIdLine != null) {
-            processIdentifiers(privateIdLine, privateIdentifiersWriter);
             privateIdLine = privateIdentifiersReader.readLine();
+            while (privateIdLine != null) {
+                processIdentifiers(privateIdLine, privateIdentifiersWriter);
+                privateIdLine = privateIdentifiersReader.readLine();
+            }
         }
-        }
-        
+
         processUuidToSctMap();
     }
 
     /**
-     * Setup.
+     * Sets up the file readers and writers.
      *
      * @throws IOException signals that an I/O exception has occurred
      */
     private void setup() throws IOException {
         File[] uuidFiles = directory.listFiles(new FilenameFilter() {
-
             @Override
             public boolean accept(File file, String string) {
                 return string.endsWith(".txt");
             }
         });
-        
+
         File conceptsFileUuid = null;
         File descriptionsFileUuid = null;
         File relationshipsFileUuid = null;
@@ -309,7 +256,7 @@ boolean makePrivateAltIdsFile;
         for (File inputFile : uuidFiles) {
             if (inputFile.getName().startsWith("sct2_Concept_UUID_")) {
                 conceptsFileUuid = inputFile;
-                        
+
                 conceptsReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
             } else if (inputFile.getName().startsWith("sct2_Description_UUID_")) {
                 descriptionsFileUuid = inputFile;
@@ -323,15 +270,15 @@ boolean makePrivateAltIdsFile;
             } else if (inputFile.getName().startsWith("sct2_Identifier_Auxiliary_UUID_")) {
                 privateIdentifiersFileUuid = inputFile;
                 privateIdentifiersReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
-            }else if (inputFile.getName().startsWith("sct2_StatedRelationships_UUID_")) {
+            } else if (inputFile.getName().startsWith("sct2_StatedRelationships_UUID_")) {
                 statedRelFileUuid = inputFile;
                 relationshipsStatedReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
-            } else if (inputFile.getName().startsWith("sct2_LangRefset_UUID_") &&
-                    inputFile.getName().contains(LANG_CODE.EN.getFormatedLanguageCode())) {
+            } else if (inputFile.getName().startsWith("sct2_LangRefset_UUID_")
+                    && inputFile.getName().contains(LANG_CODE.EN.getFormatedLanguageCode())) {
                 langRefsetsFileUuid = inputFile;
                 langRefsetsReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
-            } else if (inputFile.getName().startsWith("sct2_LangRefset_UUID_")&&
-                    !inputFile.getName().contains(LANG_CODE.EN.getFormatedLanguageCode())) {
+            } else if (inputFile.getName().startsWith("sct2_LangRefset_UUID_")
+                    && !inputFile.getName().contains(LANG_CODE.EN.getFormatedLanguageCode())) {
                 otherLangRefsetsFileUuid = inputFile;
                 otherLangRefsetsReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
             } else if (inputFile.getName().startsWith("sct2_ModuleDependency_UUID_")) {
@@ -345,7 +292,7 @@ boolean makePrivateAltIdsFile;
                 refsetDescReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
             }
         }
-        
+
         File conceptsFile = new File(directory,
                 conceptsFileUuid.getName().replace("sct2_Concept_UUID_", "sct2_Concept_"));
         File descriptionsFile = new File(directory,
@@ -355,9 +302,9 @@ boolean makePrivateAltIdsFile;
         File identifiersFile = new File(directory,
                 identifiersFileUuid.getName().replace("sct2_Identifier_UUID_", "sct2_Identifier_"));
         File privateIdentifiersFile = null;
-        if(privateIdentifiersFileUuid != null){
+        if (privateIdentifiersFileUuid != null) {
             privateIdentifiersFile = new File(directory,
-                privateIdentifiersFileUuid.getName().replace("sct2_Identifier_Auxiliary_UUID_", "sct2_Identifier_Auxiliary_"));
+                    privateIdentifiersFileUuid.getName().replace("sct2_Identifier_Auxiliary_UUID_", "sct2_Identifier_Auxiliary_"));
         }
         File statedRelFile = new File(directory,
                 statedRelFileUuid.getName().replace("sct2_StatedRelationships_UUID_", "sct2_StatedRelationships_"));
@@ -373,7 +320,7 @@ boolean makePrivateAltIdsFile;
                 refsetDescFileUuid.getName().replace("sct2_RefsetDescriptor_UUID_", "sct2_RefsetDescriptor_"));
         File uuidToSctIdsFile = new File(directory,
                 refsetDescFileUuid.getName().replace("sct2_RefsetDescriptor_UUID_", "sct2_to_uuid_map"));
-        
+
         FileOutputStream conceptOs = new FileOutputStream(conceptsFile);
         conceptsWriter = new BufferedWriter(new OutputStreamWriter(conceptOs, "UTF8"));
         FileOutputStream descriptionOs = new FileOutputStream(descriptionsFile);
@@ -381,8 +328,8 @@ boolean makePrivateAltIdsFile;
         FileOutputStream relOs = new FileOutputStream(relationshipsFile);
         relationshipsWriter = new BufferedWriter(new OutputStreamWriter(relOs, "UTF8"));
         FileOutputStream pubIdOs = new FileOutputStream(identifiersFile);
-            identifiersWriter = new BufferedWriter(new OutputStreamWriter(pubIdOs, "UTF8"));
-        if(privateIdentifiersFile != null){
+        identifiersWriter = new BufferedWriter(new OutputStreamWriter(pubIdOs, "UTF8"));
+        if (privateIdentifiersFile != null) {
             FileOutputStream privIdOs = new FileOutputStream(privateIdentifiersFile);
             privateIdentifiersWriter = new BufferedWriter(new OutputStreamWriter(privIdOs, "UTF8"));
         }
@@ -424,7 +371,7 @@ boolean makePrivateAltIdsFile;
         for (Rf2File.LanguageRefsetFileFields field : Rf2File.LanguageRefsetFileFields.values()) {
             langRefsetsWriter.write(field.headerText + field.seperator);
         }
-        
+
         for (Rf2File.LanguageRefsetFileFields field : Rf2File.LanguageRefsetFileFields.values()) {
             otherLangRefsetsWriter.write(field.headerText + field.seperator);
         }
@@ -446,9 +393,9 @@ boolean makePrivateAltIdsFile;
     }
 
     /**
-     * Process concept attribute.
+     * Processes the concepts file and converts to SCT IDs.
      *
-     * @param line the line
+     * @param line a line of the concept file
      * @throws IOException signals that an I/O exception has occurred
      */
     private void processConceptAttribute(String line) throws IOException {
@@ -503,9 +450,9 @@ boolean makePrivateAltIdsFile;
     }
 
     /**
-     * Process description.
+     * Processes the descriptions file and converts to SCT IDs.
      *
-     * @param line the line
+     * @param line a line of the description file
      * @throws IOException signals that an I/O exception has occurred
      */
     private void processDescription(String line) throws IOException {
@@ -595,9 +542,9 @@ boolean makePrivateAltIdsFile;
     }
 
     /**
-     * Process relationship.
+     * Processes the inferred relationships and converts to SCT IDs.
      *
-     * @param line the line
+     * @param line a line of the inferred relationship file
      * @throws IOException signals that an I/O exception has occurred
      */
     private void processRelationship(String line) throws IOException {
@@ -699,11 +646,11 @@ boolean makePrivateAltIdsFile;
             }
         }
     }
-    
+
     /**
-     * Process stated relationship.
+     * Processes the stated relationships file and converts to SCT IDs.
      *
-     * @param line the line
+     * @param line a line of the stated relationships file
      * @throws IOException signals that an I/O exception has occurred
      */
     private void processStatedRelationship(String line) throws IOException {
@@ -807,10 +754,10 @@ boolean makePrivateAltIdsFile;
     }
 
     /**
-     * Process identifiers.
+     * Processes the identifiers file and converts to SCT IDs.
      *
-     * @param line the line
-     * @param writer the writer
+     * @param line a line of the identifiers file
+     * @param writer the output file writer
      * @throws IOException signals that an I/O exception has occurred
      */
     private void processIdentifiers(String line, Writer writer) throws IOException {
@@ -865,9 +812,9 @@ boolean makePrivateAltIdsFile;
     }
 
     /**
-     * Process lang refsets.
+     * Processes an English language refsets file.
      *
-     * @param line the line
+     * @param line a line from the language refsets file
      * @throws IOException signals that an I/O exception has occurred
      */
     private void processLangRefsets(String line) throws IOException {
@@ -934,11 +881,11 @@ boolean makePrivateAltIdsFile;
             }
         }
     }
-    
+
     /**
-     * Process other lang refsets.
+     * Processes any other language refsets file and converts to SCT IDs.
      *
-     * @param line the line
+     * @param line a line from the language refset file
      * @throws IOException signals that an I/O exception has occurred
      */
     private void processOtherLangRefsets(String line) throws IOException {
@@ -1007,12 +954,12 @@ boolean makePrivateAltIdsFile;
     }
 
     /**
-     * Process module depedency.
+     * Processes the module dependency file and converts to SCT IDs.
      *
-     * @param line the line
+     * @param line a line from the module dependency file
      * @throws IOException signals that an I/O exception has occurred
      */
-    private void processModuleDepedency(String line) throws IOException {
+    private void processModuleDependency(String line) throws IOException {
         if (line != null) {
             String[] parts = line.split("\t");
             for (Rf2File.ModuleDependencyFileFields field : Rf2File.ModuleDependencyFileFields.values()) {
@@ -1045,7 +992,7 @@ boolean makePrivateAltIdsFile;
                         String refsetSctId = getExistingSctId(refsetId);
                         if (refsetSctId == null) {
                             refsetSctId = handler.getWithGeneration(UUID.fromString(refsetId),
-                                SctIdGenerator.TYPE.CONCEPT).toString(); //TODO akf: subset?
+                                    SctIdGenerator.TYPE.CONCEPT).toString(); //TODO akf: subset?
                             this.uuidToSctMap.put(UUID.fromString(refsetId), refsetSctId);
                         }
                         modDependWriter.write(refsetSctId + field.seperator);
@@ -1080,9 +1027,9 @@ boolean makePrivateAltIdsFile;
     }
 
     /**
-     * Process desc type.
+     * Processes the description type file and converts to SCT IDs.
      *
-     * @param line the line
+     * @param line a line from the description type file
      * @throws IOException signals that an I/O exception has occurred
      */
     private void processDescType(String line) throws IOException {
@@ -1157,9 +1104,9 @@ boolean makePrivateAltIdsFile;
     }
 
     /**
-     * Process refset desc.
+     * Processes the refset description file and converts to SCT IDs.
      *
-     * @param line the line
+     * @param line a line from the refset description file
      * @throws IOException signals that an I/O exception has occurred
      */
     private void processRefsetDesc(String line) throws IOException {
@@ -1245,7 +1192,7 @@ boolean makePrivateAltIdsFile;
     }
 
     /**
-     * Process uuid to sct map.
+     * Creates a uuid to SCT ID map file.
      *
      * @throws IOException signals that an I/O exception has occurred
      */
@@ -1269,39 +1216,15 @@ boolean makePrivateAltIdsFile;
             }
         }
     }
-    
+
     /**
-     * Write uuid to sct map file.
+     * Convert status to either active or inactive.
      *
-     * @throws IOException signals that an I/O exception has occurred
-     */
-    private void writeUuidToSctMapFile() throws IOException {
-        Set<UUID> keySet = uuidToSctMap.keySet();
-        for (UUID uuid : keySet) {
-            String sctId = uuidToSctMap.get(uuid);
-            for (Rf2File.UuidToSctMapFileFields field : Rf2File.UuidToSctMapFileFields.values()) {
-
-                switch (field) {
-                    case UUID:
-                        uuidToSctMapWriter.write(uuid + field.seperator);
-
-                        break;
-
-                    case SCT:
-                        uuidToSctMapWriter.write(sctId + field.seperator);
-
-                        break;
-                }
-            }
-        }
-    }
-    
-    /**
-     * Convert status.
-     *
-     * @param statusString the status string
-     * @return the integer
-     * @throws ValidationException the validation exception
+     * @param statusString a String representing a description of the status to
+     * convert
+     * @return the integer representation of the status as either active, 1, or
+     * inactive, 0
+     * @throws ValidationException indicates a validation exception has occurred
      * @throws IOException signals that an I/O exception has occurred
      */
     private Integer convertStatus(String statusString) throws ValidationException, IOException {
@@ -1336,10 +1259,11 @@ boolean makePrivateAltIdsFile;
     }
 
     /**
-     * Gets the existing sct id.
+     * Checks to see of the component, specified by the
+     * <code>uuidString</code>, already has an associated uuid.
      *
-     * @param uuidString the uuid string
-     * @return the existing sct id
+     * @param uuidString the uuid string associated with the component in question
+     * @return a string representing the SCT ID, <code>null</code> if not found
      * @throws IOException signals that an I/O exception has occurred
      */
     private String getExistingSctId(String uuidString) throws IOException {
@@ -1377,7 +1301,7 @@ boolean makePrivateAltIdsFile;
     }
 
     /**
-     * Close.
+     * Closes the file writers.
      *
      * @throws IOException signals that an I/O exception has occurred
      */
@@ -1397,7 +1321,7 @@ boolean makePrivateAltIdsFile;
         if (identifiersWriter != null) {
             identifiersWriter.close();
         }
-        
+
         if (privateIdentifiersWriter != null) {
             privateIdentifiersWriter.close();
         }
@@ -1409,7 +1333,7 @@ boolean makePrivateAltIdsFile;
         if (langRefsetsWriter != null) {
             langRefsetsWriter.close();
         }
-        
+
         if (otherLangRefsetsWriter != null) {
             otherLangRefsetsWriter.close();
         }
@@ -1453,7 +1377,7 @@ boolean makePrivateAltIdsFile;
         if (langRefsetsReader != null) {
             langRefsetsReader.close();
         }
-        
+
         if (otherLangRefsetsReader != null) {
             otherLangRefsetsReader.close();
         }

@@ -1,17 +1,18 @@
-/*
- * Copyright 2012 International Health Terminology Standards Development Organisation.
+/**
+ * Copyright (c) 2012 International Health Terminology Standards Development
+ * Organisation
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.helper.bdb;
 
@@ -26,6 +27,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -34,18 +36,25 @@ import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_array_of_bytearray.RefexArrayOfBytearrayVersionBI;
 import org.ihtsdo.tk.uuid.UuidT5Generator;
 
+// TODO-javadoc: skipped private methods/variables
 /**
+ * The Class MultiEditorContradictionDetector processes concepts and determines
+ * if a contradiction exists. This class implements
+ * <code>ProcessUnfetchedConceptDataBI</code> and the contradiction detector can
+ * be "run" using the terminology store method iterateConceptDataInParallel.
  *
- * @author marc
+ * @see
+ * TerminologyStoreDI#iterateConceptDataInParallel(org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI)
+ *
  */
 public class MultiEditorContradictionDetector implements ProcessUnfetchedConceptDataBI {
 
     private int commitRecRefsetNid;
     private int adjudicateRecRefsetNid;
     private ViewCoordinate vc;
-    private final boolean ignoreNonVisibleAth; // ignore SAP not computeable from concept
-    private final boolean ignoreReadOnlySap;
-    private final int maxSap; // does not compute AuthorTimeHash from readonly database.
+    private final boolean ignoreNonVisibleAth; // ignore SAP not computable from concept
+    private final boolean ignoreReadOnlySap; // does not compute AuthorTimeHash from readonly database.
+    private final int maxSap;
     private NidBitSetBI nidSet;
     private ConcurrentHashMap<UUID, ConcurrentSkipListSet<Integer>> timeAthStampNidMap = new ConcurrentHashMap<UUID, ConcurrentSkipListSet<Integer>>();
     private ConcurrentHashMap<Integer, ConcurrentSkipListSet<UUID>> projectPathNidTimeAthMap = new ConcurrentHashMap<Integer, ConcurrentSkipListSet<UUID>>();
@@ -58,20 +67,43 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
     int userAuthorNid;
     int userProjectPathNid;
 
+    /**
+     * Instantiates a new multi editor contradiction detector which will process
+     * every concept in the database. This can be "run" using the terminology
+     * store method iterateConceptDataInParallel.
+     *
+     * @see
+     * TerminologyStoreDI#iterateConceptDataInParallel(org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI)
+     *
+     * @param commitRecRefsetNid the nid associated with the refset storing
+     * commit records
+     * @param adjudicationRecRefsetNid the nid associated with the refset
+     * sorting adjudication records
+     * @param viewCoordinate the view coordinate representing which version of
+     * the concept to test for contradictions
+     * @param caseList the list of *      * type <code>MultiEditorContradictionCase</code> which will contain
+     * any found contradiction
+     * @param watchSet a set of concept nids to watch for debugging purposes
+     * @param ignoreReadOnlySap set to <code>true</code> to not compute
+     * author-time hash for stamps from read-only database
+     * @param ignoreNonVisibleAth set to <code>true</code> to ignore stamp nids
+     * not computable from the concept
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public MultiEditorContradictionDetector(int commitRecRefsetNid,
             int adjudicationRecRefsetNid,
-            ViewCoordinate vc,
-            List<MultiEditorContradictionCase> cl,
-            HashSet<Integer> ws,
+            ViewCoordinate viewCoordinate,
+            List<MultiEditorContradictionCase> caseList,
+            HashSet<Integer> watchSet,
             boolean ignoreReadOnlySap,
             boolean ignoreNonVisibleAth)
             throws IOException {
         this.commitRecRefsetNid = commitRecRefsetNid;
         this.adjudicateRecRefsetNid = adjudicationRecRefsetNid;
-        this.vc = vc;
+        this.vc = viewCoordinate;
         this.nidSet = Ts.get().getAllConceptNids();
-        this.contradictionCaseList = cl;
-        this.watchSet = ws;
+        this.contradictionCaseList = caseList;
+        this.watchSet = watchSet;
         this.watchCaseList = null;
         if (this.watchSet != null) {
             this.watchCaseList = new ArrayList<MultiEditorContradictionCase>();
@@ -83,14 +115,41 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
 
         snorocketAuthorNid = Ts.get().getNidForUuids(UUID.fromString("7e87cc5b-e85f-3860-99eb-7a44f2b9e6f9"));
         userAuthorNid = Ts.get().getNidForUuids(UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c"));
-        
-        int[] viewPathNids = vc.getPositionSet().getViewPathNidSet().getSetValues();
-        if(viewPathNids.length > 1){
+
+        int[] viewPathNids = viewCoordinate.getPositionSet().getViewPathNidSet().getSetValues();
+        if (viewPathNids.length > 1) {
             throw new UnsupportedOperationException("User must only have one view path. View position set size is: " + viewPathNids.length);
         }
         userProjectPathNid = viewPathNids[0];
     }
 
+    /**
+     * Instantiates a new multi editor contradiction detector which will process
+     * every concept represented in the
+     * <code>nidSet</code>. This can be "run" using the terminology store method
+     * iterateConceptDataInParallel.
+     *
+     * @see
+     * TerminologyStoreDI#iterateConceptDataInParallel(org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI)
+     *
+     * @param commitRecRefsetNid the nid associated with the refset storing
+     * commit records
+     * @param adjudicationRecRefsetNid the nid associated with the refset
+     * sorting adjudication records
+     * @param viewCoordinate the view coordinate representing which version of
+     * the concept to test for contradictions
+     * @param caseList the list of *      * type <code>MultiEditorContradictionCase</code> which will contain
+     * any found contradiction
+     * @param watchSet a set of concept nids to watch for debugging purposes,
+     * creates a list of contradiction cases for just these concepts
+     * @param nidSet the set of nids representing the concepts to test for
+     * contradictions
+     * @param ignoreReadOnlySap set to <code>true</code> to not compute
+     * author-time hash for stamps from read-only database
+     * @param ignoreNonVisibleAth set to <code>true</code> to ignore stamp nids
+     * not computable from the concept
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public MultiEditorContradictionDetector(int commitRecRefsetNid,
             int adjudicationRecRefsetNid,
             ViewCoordinate vc,
@@ -117,37 +176,62 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
 
         snorocketAuthorNid = Ts.get().getNidForUuids(UUID.fromString("7e87cc5b-e85f-3860-99eb-7a44f2b9e6f9"));
         userAuthorNid = Ts.get().getNidForUuids(UUID.fromString("7e87cc5b-e85f-3860-99eb-7a44f2b9e6f9"));
-        
+
         int[] viewPathNids = vc.getPositionSet().getViewPathNidSet().getSetValues();
-        if(viewPathNids.length > 1){
+        if (viewPathNids.length > 1) {
             throw new UnsupportedOperationException("User must only have one view path. View position set size is: " + viewPathNids.length);
         }
         userProjectPathNid = viewPathNids[0];
     }
 
+    /**
+     *
+     * @return <code>true</code>
+     */
     @Override
     public boolean continueWork() {
         return true;
     }
 
+    /**
+     *
+     * @return the set of nids representing the concepts to test for
+     * contradictions
+     * @throws IOException
+     */
     @Override
     public NidBitSetBI getNidSet() throws IOException {
         return nidSet;
     }
 
+    /**
+     * Gets the list contradictions generated from the concepts represented in
+     * the
+     * <code>watchSet</code>.
+     *
+     * @return the list of contradictions from the watch concepts
+     */
     public List<MultiEditorContradictionCase> getWatchCaseList() {
         return watchCaseList;
     }
 
+    /**
+     * Processes the given concept to see if contradictions exist.
+     *
+     * @param cNid the nid of the concept for processing
+     * @param fetcher the fetcher for getting the concept version associated
+     * with the <code>cNid</code> from the database
+     * @throws Exception indicates an exception has occurred
+     */
     @Override
     public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fetcher) throws Exception {
         ConceptVersionBI conceptVersion = fetcher.fetch(vc);
-        if(conceptVersion.getPrimUuid().equals(UUID.fromString(
-            "850a9fe0-7ca6-4bcc-af87-fdb4b5bd27ea"))){
+        if (conceptVersion.getPrimUuid().equals(UUID.fromString(
+                "850a9fe0-7ca6-4bcc-af87-fdb4b5bd27ea"))) {
             System.out.println("Found it");
         }
         Boolean watchConcept = false;
-        
+
         //SET UP DATA FOR CONTRADICTION DETECTION
         if (watchSet != null && watchSet.contains(Integer.valueOf(cNid))) {
             watchConcept = true;
@@ -156,82 +240,110 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         if (conceptVersion.getPrimUuid() == null) {
             return; // concept missing important data
         }
-        
+
         // Add all Commit Refset Author Time Hash (Ath) Sets in a List.
         ArrayList<HashSet<UUID>> commitRefsetAthSetsList = getAthSetsFromRefset(conceptVersion, commitRecRefsetNid);
         // Add all Adjudication Refset Author Time Hash (Ath) Sets in a List.
         ArrayList<HashSet<UUID>> replacementSet = getAthSetsFromRefset(conceptVersion, adjudicateRecRefsetNid);
         HashMap<UUID, String> conceptComputedAthAllMap = getComputedAthMap(conceptVersion, false);
         HashMap<UUID, String> conceptComputedAthDiffAllMap = getComputedAthMap(conceptVersion, true);
-        
+
         //are populated from contradiciton detection algorithm
-        HashMap<UUID, String> conceptComputedAthMap = new HashMap<UUID, String> ();
-        HashMap<UUID, String> conceptMissingAthMap = new HashMap<UUID, String> ();
+        HashMap<UUID, String> conceptComputedAthMap = new HashMap<UUID, String>();
+        HashMap<UUID, String> conceptMissingAthMap = new HashMap<UUID, String>();
         ArrayList<HashSet<UUID>> truthRefsetAthSetsList = new ArrayList<HashSet<UUID>>();
-        
+
 
         //RUN CONTRADICTION DETECTION ALGORITHM
         HashSet<UUID> accumDiffSet = contradictionDetectionAlgorithm(
-            cNid,
-            userProjectPathNid,
-            ignoreNonVisibleAth,
-            projectPathNidTimeAthMap,
-            conflictSaps,
-            timeAthStampNidMap,
-            componentsMissingCommitRecord,
-            commitRefsetAthSetsList,
-            replacementSet,
-            conceptComputedAthAllMap,
-            conceptComputedAthDiffAllMap,
-            conceptComputedAthMap, //empty
-            conceptMissingAthMap, //empty
-            truthRefsetAthSetsList); //empty
-        
-        // REPORT ANY CONTRADICTING CONCEPTS
-        if (accumDiffSet != null){
-                    if(!accumDiffSet.isEmpty() || watchConcept) {
+                cNid,
+                userProjectPathNid,
+                ignoreNonVisibleAth,
+                projectPathNidTimeAthMap,
+                conflictSaps,
+                timeAthStampNidMap,
+                componentsMissingCommitRecord,
+                commitRefsetAthSetsList,
+                replacementSet,
+                conceptComputedAthAllMap,
+                conceptComputedAthDiffAllMap,
+                conceptComputedAthMap, //empty
+                conceptMissingAthMap, //empty
+                truthRefsetAthSetsList); //empty
 
-            // List case information in time order
-            ArrayList<String> caseList = new ArrayList<String>();
-            for (UUID uuid : accumDiffSet) {
-                String s = conceptComputedAthMap.get(uuid);
-                if (s != null) {
-                    caseList.add(s);
+        // REPORT ANY CONTRADICTING CONCEPTS
+        if (accumDiffSet != null) {
+            if (!accumDiffSet.isEmpty() || watchConcept) {
+
+                // List case information in time order
+                ArrayList<String> caseList = new ArrayList<String>();
+                for (UUID uuid : accumDiffSet) {
+                    String s = conceptComputedAthMap.get(uuid);
+                    if (s != null) {
+                        caseList.add(s);
+                    }
+                }
+                Collections.sort(caseList, String.CASE_INSENSITIVE_ORDER);
+                HashSet<Integer> componentNids = getComponentNidsInConflict(accumDiffSet,
+                        cNid,
+                        timeAthStampNidMap,
+                        conflictSaps);
+
+                // ADD TO CASE LIST
+                MultiEditorContradictionCase caseToAdd;
+                caseToAdd = new MultiEditorContradictionCase(cNid, caseList,
+                        componentNids, conflictSaps);
+                caseToAdd.setAuthTimeMapComputed(conceptComputedAthMap);
+                caseToAdd.setAuthTimeMapMissing(conceptMissingAthMap);
+                caseToAdd.setAuthTimeSetsList(commitRefsetAthSetsList);
+                caseToAdd.setAuthTimeSetsTruthList(truthRefsetAthSetsList);
+
+                if (!accumDiffSet.isEmpty()) {
+                    contradictionCaseList.add(caseToAdd);
+                    //:: System.out.println("\r\n** CONFLICT **" + caseToAdd.toStringLong());
+                } else {
+                    watchCaseList.add(caseToAdd);
+                    //:: System.out.println("\r\n** WATCH **" + caseToAdd.toStringLong());
                 }
             }
-            Collections.sort(caseList, String.CASE_INSENSITIVE_ORDER);
-            HashSet<Integer> componentNids = getComponentNidsInConflict(accumDiffSet,
-                cNid,
-                timeAthStampNidMap,
-                conflictSaps);
-
-            // ADD TO CASE LIST
-            MultiEditorContradictionCase caseToAdd;
-            caseToAdd = new MultiEditorContradictionCase(cNid, caseList,
-                    componentNids, conflictSaps);
-            caseToAdd.setAuthTimeMapComputed(conceptComputedAthMap);
-            caseToAdd.setAuthTimeMapMissing(conceptMissingAthMap);
-            caseToAdd.setAuthTimeSetsList(commitRefsetAthSetsList);
-            caseToAdd.setAuthTimeSetsTruthList(truthRefsetAthSetsList);
-            
-            if(!accumDiffSet.isEmpty()){
-                contradictionCaseList.add(caseToAdd);
-                //:: System.out.println("\r\n** CONFLICT **" + caseToAdd.toStringLong());
-            }else{
-                watchCaseList.add(caseToAdd);
-                //:: System.out.println("\r\n** WATCH **" + caseToAdd.toStringLong());
-            }
-        }
         }
 
     }
-    
+
+    /**
+     * The algorithm for detecting contradictions. Used in the
+     * processUnfetchedConceptData method, but separated for testing purposes.
+     * Allows specified author-time sets to be passed in which can include the
+     * sets found from a given concept or mock sets generated for testing and
+     * doesn't necessitate a database. Use processUnfetchedConceptData to test
+     * for a contradiction unless in a testing scenario.
+     *
+     * @param cNid the nid representing the concept to test
+     * @param ignoreReadOnlySap set to <code>true</code> to not compute
+     * author-time hash for stamps from read-only database
+     * @param ignoreNonVisibleAth set to <code>true</code> to ignore stamp nids
+     * not computable from the concept
+     * @param projectPathNidTimeAthMap the time-author maps for the specified project path
+     * @param conflictStamps the set of stamp nids in conflict, empty--will be populated
+     * @param timeAthStampNidMap the map of suthor-times to stamp nids
+     * @param componentsMissingCommitRecord the set of components missing commit record, empty--will be populated
+     * @param commitRefsetAthSetsList the list of author-times sets for commit
+     * @param replacementSet the list of author-times for adjudication commit
+     * @param conceptComputedAthAllMap the map of all component uuids to computed author-times for the concept
+     * @param conceptComputedAthDiffAllMap the map of all component uuids to computed author-times for the concept without components with non-synchronized authors (classifier)
+     * @param conceptComputedAthMap the map of component uuids to computed author-times for the concept on the project path, empty--will be populated
+     * @param conceptMissingAthMap the map of missing computed author-times on the concept, empty--will be populated
+     * @param truthRefsetAthSetsList the list of author-times for adjudication commit, empty--will be populated
+     * @return the set of of contradicting author-time hashes
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws NoSuchAlgorithmException the no such algorithm exception
+     */
     public static HashSet<UUID> contradictionDetectionAlgorithm(
             int cNid,
             int userProjectPathNid,
             boolean ignoreNonVisibleAth,
             ConcurrentHashMap<Integer, ConcurrentSkipListSet<UUID>> projectPathNidTimeAthMap,
-            ConcurrentSkipListSet<Integer> conflictSaps,
+            ConcurrentSkipListSet<Integer> conflictStamps,
             ConcurrentHashMap<UUID, ConcurrentSkipListSet<Integer>> timeAthStampNidMap,
             ConcurrentSkipListSet<Integer> componentsMissingCommitRecord,
             ArrayList<HashSet<UUID>> commitRefsetAthSetsList,
@@ -240,57 +352,57 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
             HashMap<UUID, String> conceptComputedAthDiffAllMap,
             HashMap<UUID, String> conceptComputedAthMap,
             HashMap<UUID, String> conceptMissingAthMap,
-            ArrayList<HashSet<UUID>> truthRefsetAthSetsList) throws IOException, NoSuchAlgorithmException{
-        
+            ArrayList<HashSet<UUID>> truthRefsetAthSetsList) throws IOException, NoSuchAlgorithmException {
+
         if (commitRefsetAthSetsList.isEmpty()) {
             return null; // no commit records to review
         }
-       
+
         //filter by path
-        Collection<UUID> authTimeForProjectPath = projectPathNidTimeAthMap.get(userProjectPathNid);  
-        
-        HashMap<UUID, String> conceptComputedAthDiffMap = new HashMap<UUID, String> ();
-        
-        if(authTimeForProjectPath != null){
-            for(UUID authTime : authTimeForProjectPath){
-                if(conceptComputedAthAllMap.containsKey(authTime)){
+        Collection<UUID> authTimeForProjectPath = projectPathNidTimeAthMap.get(userProjectPathNid);
+
+        HashMap<UUID, String> conceptComputedAthDiffMap = new HashMap<UUID, String>();
+
+        if (authTimeForProjectPath != null) {
+            for (UUID authTime : authTimeForProjectPath) {
+                if (conceptComputedAthAllMap.containsKey(authTime)) {
                     conceptComputedAthMap.put(authTime, conceptComputedAthAllMap.get(authTime));
-                    if(conceptComputedAthDiffAllMap.containsKey(authTime)){
+                    if (conceptComputedAthDiffAllMap.containsKey(authTime)) {
                         conceptComputedAthDiffMap.put(authTime, conceptComputedAthDiffAllMap.get(authTime));
                     }
                 }
             }
         }
-        
+
         for (HashSet<UUID> truthSet : replacementSet) {
             truthSet.retainAll(conceptComputedAthMap.keySet());
         }
-        
+
         for (HashSet<UUID> truthSet : replacementSet) {
             if (!truthSet.isEmpty()) {
                 truthRefsetAthSetsList.add(truthSet);
             }
         }
-        
+
         // SORT BY HASHSET LENGTH
         Collections.sort(truthRefsetAthSetsList, new SizeComparator());
 
         // Put concept missing Author Time Hash (ATH) Sets in a Map
         conceptMissingAthMap = getMissingAthMap(conceptComputedAthMap,
                 commitRefsetAthSetsList, truthRefsetAthSetsList);
-       
+
         Set<UUID> authTimeSetMissing = null;
         if (ignoreNonVisibleAth) {
             authTimeSetMissing = conceptMissingAthMap.keySet();
         }
-        
+
         // Check for computed commit without CommitRecord
         for (HashSet<UUID> hs : commitRefsetAthSetsList) {
             for (UUID uuid : hs) {
                 conceptComputedAthDiffMap.remove(uuid); // removed actual commits from computed
             }
         }
-        
+
         if (conceptComputedAthDiffMap.isEmpty() == false) {
             componentsMissingCommitRecord.add(cNid);
         }
@@ -308,7 +420,7 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         HashSet<UUID> greater;
         HashSet<UUID> diff;
         HashSet<UUID> accumDiffSet = new HashSet<UUID>();
-        
+
         // Last truth supercedes all previous truth
         HashSet<UUID> lastTruth = null;
         if (truthRefsetAthSetsList.size() > 0) {
@@ -333,11 +445,17 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
                 editorIdx++;
             }
         }
-        
+
         return accumDiffSet;
     }
+
     /**
-     * get Author Time Hash (ATH) sets from refset for the provided concept
+     * Gets Author Time Hash (ATH) sets from the specified <code>refset<code> for the provided <code>concept<code>.
+     *
+     * @param concept the concept in question
+     * @param refset the nid representing the refset (either commit or adjudication)
+     * @return the list of sets of author-time hashes
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     private ArrayList<HashSet<UUID>> getAthSetsFromRefset(ConceptVersionBI concept, int refset)
             throws IOException {
@@ -368,8 +486,14 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         return authTimeSetsList;
     }
 
+    /**
+     * The Class SizeComparator.
+     */
     private static class SizeComparator implements Comparator<HashSet<UUID>> {
 
+        /* (non-Javadoc)
+         * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+         */
         @Override
         public int compare(HashSet<UUID> o1, HashSet<UUID> o2) {
             if (o1.size() > o2.size()) { // larger set first
@@ -381,6 +505,16 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         }
     }
 
+    /**
+     * Gets the computed ath map.
+     *
+     * @param concept the concept
+     * @param skipExtra the skip extra
+     * @return the computed ath map
+     * @throws NoSuchAlgorithmException the no such algorithm exception
+     * @throws UnsupportedEncodingException the unsupported encoding exception
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private HashMap<UUID, String> getComputedAthMap(ConceptVersionBI concept, boolean skipExtra)
             throws NoSuchAlgorithmException, UnsupportedEncodingException, IOException {
         HashMap<UUID, String> conceptComputedAthMap = new HashMap<UUID, String>();
@@ -388,7 +522,7 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
             if (sap == Integer.MIN_VALUE) {
                 continue;
             }
-            if(Ts.get().getTimeForStampNid(sap) == Long.MIN_VALUE){
+            if (Ts.get().getTimeForStampNid(sap) == Long.MIN_VALUE) {
                 continue;
             }
             // SKIP READ ONLY DATABASE
@@ -415,9 +549,9 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
                 timeAthStampNidMap.put(type5Uuid, new ConcurrentSkipListSet<Integer>());
             }
             timeAthStampNidMap.get(type5Uuid).add(sap);
-            
+
             int projectPathNid = Ts.get().getPathNidForStampNid(sap);
-            if(!projectPathNidTimeAthMap.containsKey(projectPathNid)){
+            if (!projectPathNidTimeAthMap.containsKey(projectPathNid)) {
                 projectPathNidTimeAthMap.put(projectPathNid, new ConcurrentSkipListSet<UUID>());
             }
             projectPathNidTimeAthMap.get(projectPathNid).add(type5Uuid);
@@ -425,6 +559,11 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         return conceptComputedAthMap;
     }
 
+    /**
+     * Checks if this contradiction detector has found components missing commit records.
+     *
+     * @return true, if there are components missing commit records
+     */
     public boolean hasComponentsMissingCommitRecord() {
         if (componentsMissingCommitRecord != null && componentsMissingCommitRecord.size() > 0) {
             return true;
@@ -433,6 +572,14 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         }
     }
 
+    /**
+     * Gets the missing ath map.
+     *
+     * @param computedMap the computed map
+     * @param commitRefsetAthSetsList the commit refset ath sets list
+     * @param truthRefsetAthSetsList the truth refset ath sets list
+     * @return the missing ath map
+     */
     private static HashMap<UUID, String> getMissingAthMap(HashMap<UUID, String> computedMap,
             ArrayList<HashSet<UUID>> commitRefsetAthSetsList,
             ArrayList<HashSet<UUID>> truthRefsetAthSetsList) {
@@ -459,6 +606,16 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         return conceptMissingAthMap;
     }
 
+    /**
+     * Gets the component nids in conflict.
+     *
+     * @param accumDiffSet the accum diff set
+     * @param cNid the c nid
+     * @param timeAthStampNidMap the time ath stamp nid map
+     * @param conflictSaps the conflict saps
+     * @return the component nids in conflict
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private static HashSet<Integer> getComponentNidsInConflict(HashSet<UUID> accumDiffSet,
             int cNid,
             ConcurrentHashMap<UUID, ConcurrentSkipListSet<Integer>> timeAthStampNidMap,
@@ -476,6 +633,14 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         return componentNids;
     }
 
+    /**
+     * Lesser diff from greater.
+     *
+     * @param lesser the lesser
+     * @param greater the greater
+     * @param checkEqualSize the check equal size
+     * @return the hash set
+     */
     private static HashSet<UUID> lesserDiffFromGreater(HashSet<UUID> lesser, HashSet<UUID> greater,
             boolean checkEqualSize) {
         HashSet<UUID> diffSet = new HashSet<UUID>();
@@ -493,6 +658,14 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         return diffSet;
     }
 
+    /**
+     * To string author time.
+     *
+     * @param time the time
+     * @param author the author
+     * @param uuid the uuid
+     * @return the string
+     */
     private static String toStringAuthorTime(long time, ConceptChronicleBI author,
             UUID uuid) {
         StringBuilder sb = new StringBuilder();
@@ -511,6 +684,12 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         return sb.toString();
     }
 
+    /**
+     * To string author time missing.
+     *
+     * @param uuid the uuid
+     * @return the string
+     */
     private static String toStringAuthorTimeMissing(UUID uuid) {
         StringBuilder sb = new StringBuilder();
 
@@ -526,6 +705,11 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         return sb.toString();
     }
 
+    /**
+     * Generates a string representing any missing commit records, including the uuid and a string representation of the components.
+     *
+     * @return a string representing any missing commit records
+     */
     public String toStringMissingCommitRecords() {
         StringBuilder sb = new StringBuilder();
         for (Integer nid : componentsMissingCommitRecord) {

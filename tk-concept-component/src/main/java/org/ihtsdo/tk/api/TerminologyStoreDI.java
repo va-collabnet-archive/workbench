@@ -79,7 +79,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * (multi-threaded) and the processor must be thread safe.
      *
      * @param processor the concept processor
-     * @throws Exception
+     * @throws Exception indicates an exception has occurred
      * @see ProcessUnfetchedConceptDataBI
      */
     void iterateConceptDataInParallel(ProcessUnfetchedConceptDataBI processor) throws Exception;
@@ -91,7 +91,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * (single-threaded).
      *
      * @param processor the concept processor
-     * @throws Exception
+     * @throws Exception indicates an exception has occurred
      * @see ProcessUnfetchedConceptDataBI
      *
      */
@@ -104,7 +104,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * (single-threaded).
      *
      * @param processor the concept processor
-     * @throws Exception
+     * @throws Exception indicates an exception has occurred
      * @see ProcessUnfetchedConceptDataBI
      *
      */
