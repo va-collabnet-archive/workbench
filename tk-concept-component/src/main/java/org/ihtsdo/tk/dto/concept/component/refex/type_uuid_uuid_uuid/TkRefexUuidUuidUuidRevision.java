@@ -95,7 +95,7 @@ public class TkRefexUuidUuidUuidRevision extends TkRevision {
      * Uuid Uuid Revision
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ClassNotFoundException the class not found exception
+     * @throws ClassNotFoundException indicates a specified class was not found
      */
     public TkRefexUuidUuidUuidRevision(DataInput in, int dataVersion)
             throws IOException, ClassNotFoundException {
@@ -198,7 +198,7 @@ public class TkRefexUuidUuidUuidRevision extends TkRevision {
      * Refex Uuid Uuid Uuid Revision
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ClassNotFoundException the class not found exception
+     * @throws ClassNotFoundException indicates a specified class was not found
      * TODO-javadoc: why?
      */
     @Override

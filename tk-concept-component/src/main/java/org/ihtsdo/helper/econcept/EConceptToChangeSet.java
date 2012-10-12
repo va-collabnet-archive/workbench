@@ -41,7 +41,7 @@ public class EConceptToChangeSet {
      *
      * @param econFiles Files to convert to change set files.
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ClassNotFoundException the class not found exception
+     * @throws ClassNotFoundException indicates a specified class was not found
      */
     public static void convert(File[] econFiles) throws IOException, ClassNotFoundException {
         File[] eccsFiles = new File[econFiles.length];
@@ -62,7 +62,7 @@ public class EConceptToChangeSet {
      * @param eccsFiles Corresponding files to store the change set. If file
      * already exists, it will be overwritten.
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ClassNotFoundException the class not found exception
+     * @throws ClassNotFoundException indicates a specified class was not found
      */
     public static void convert(File[] econFiles, File[] eccsFiles) throws IOException, ClassNotFoundException {
         assert econFiles.length == eccsFiles.length;

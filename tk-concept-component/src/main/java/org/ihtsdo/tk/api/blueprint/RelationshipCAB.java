@@ -68,7 +68,7 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
      * @param group the group
      * @param relationshipType the relationship type
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public RelationshipCAB(
@@ -89,7 +89,7 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
      * @param group the group
      * @param relationshipType the relationship type
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public RelationshipCAB(
@@ -109,7 +109,7 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
      * @param relationshipVersion the relationship version
      * @param viewCoordinate the view coordinate
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public RelationshipCAB(
@@ -132,7 +132,7 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
      * @param relationshipVersion the relationship version
      * @param viewCoordinate the view coordinate
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public RelationshipCAB(
@@ -154,7 +154,7 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
      * @param relationshipVersion the relationship version
      * @param viewCoordinate the view coordinate
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public RelationshipCAB(

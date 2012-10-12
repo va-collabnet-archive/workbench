@@ -180,7 +180,7 @@ public interface ComponentVersionBI extends ComponentBI, VersionPointBI {
      * @return the creates the or amend blueprint
      * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException the contradiction exception
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @see org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint
      */
     CreateOrAmendBlueprint makeBlueprint(ViewCoordinate viewCoordinate)

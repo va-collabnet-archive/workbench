@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.tk.spec;
 
@@ -23,22 +23,20 @@ import java.io.ObjectOutputStream;
 import org.ihtsdo.tk.api.constraint.RelationshipConstraintTarget;
 import org.ihtsdo.tk.api.constraint.RelationshipConstraintSource;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class RelationshipSpec.
+ * The Class RelationshipSpec provides a way of representing a relationship in a
+ * verifiable and human-readable way.
  */
 public class RelationshipSpec implements SpecBI {
 
-    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
-
-    /** The Constant dataVersion. */
     private static final int dataVersion = 1;
 
     /**
-     * Write object.
+     * Writes the relationship spec object, including the data version, origin,
+     * relationship type, and destination.
      *
-     * @param out the out
+     * @param out the output stream
      * @throws IOException signals that an I/O exception has occurred
      */
     private void writeObject(ObjectOutputStream out) throws IOException {
@@ -49,39 +47,38 @@ public class RelationshipSpec implements SpecBI {
     }
 
     /**
-     * Read object.
+     * Reads the relationship spec object, including the data version, origin,
+     * relationship type, and destination.
      *
-     * @param in the in
+     * @param in the input stream
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ClassNotFoundException the class not found exception
+     * @throws ClassNotFoundException indicates a specified class was not found
      */
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
-        	originSpec = (ConceptSpec) in.readObject();
-        	relTypeSpec = (ConceptSpec) in.readObject();
-        	destinationSpec = (ConceptSpec) in.readObject();
+            originSpec = (ConceptSpec) in.readObject();
+            relTypeSpec = (ConceptSpec) in.readObject();
+            destinationSpec = (ConceptSpec) in.readObject();
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
 
     }
-
-    /** The origin spec. */
     private ConceptSpec originSpec;
-	
-	/** The rel type spec. */
-	private ConceptSpec relTypeSpec;
-    
-    /** The destination spec. */
+    private ConceptSpec relTypeSpec;
     private ConceptSpec destinationSpec;
 
     /**
-     * Instantiates a new relationship spec.
+     * Instantiates a new relationship spec for the relationships specified by
+     * the given
+     * <code>sorceSpec</code>,
+     * <code>relationshipTypeSpec</code>, and
+     * <code>targetSpec</code>.
      *
-     * @param sourceSpec the source spec
-     * @param relationshipTypeSpec the relationship type spec
-     * @param targetSpec the target spec
+     * @param sourceSpec the concept spec representing the source concept of the relationship
+     * @param relationshipTypeSpec the concept spec representing the relationship type
+     * @param targetSpec the concept spec representing the target concept of the relationship
      */
     public RelationshipSpec(ConceptSpec sourceSpec, ConceptSpec relationshipTypeSpec, ConceptSpec targetSpec) {
         super();
@@ -91,75 +88,74 @@ public class RelationshipSpec implements SpecBI {
     }
 
     /**
-     * Gets the source spec.
+     * Gets the source concept associated with this relationship spec.
      *
-     * @return the source spec
+     * @return the concept spec representing the source concept
      */
     public ConceptSpec getSourceSpec() {
-		return originSpec;
-	}
+        return originSpec;
+    }
 
     /**
-     * Gets the relationship type spec.
+     * Gets the relationship type concept associated with this relationship spec.
      *
-     * @return the relationship type spec
+     * @return the concept spec representing the relationship type
      */
     public ConceptSpec getRelationshipTypeSpec() {
         return relTypeSpec;
     }
 
     /**
-     * Gets the target spec.
+     * Gets the target concept associated with this relationship spec.
      *
-     * @return the target spec
+     * @return the concept spec representing the target concept
      */
     public ConceptSpec getTargetSpec() {
         return destinationSpec;
     }
-    
+
     /**
      * Gets the source relationship constraint.
      *
      * @return the source relationship constraint
      */
     public RelationshipConstraintSource getSourceRelationshipConstraint() {
-    	return new RelationshipConstraintSource(originSpec, relTypeSpec, destinationSpec);
+        return new RelationshipConstraintSource(originSpec, relTypeSpec, destinationSpec);
     }
-    
+
     /**
      * Gets the target relationship constraint.
      *
      * @return the target relationship constraint
      */
     public RelationshipConstraintTarget getTargetRelationshipConstraint() {
-    	return new RelationshipConstraintTarget(originSpec, relTypeSpec, destinationSpec);
+        return new RelationshipConstraintTarget(originSpec, relTypeSpec, destinationSpec);
     }
 
-	/**
-	 * Sets the source spec.
-	 *
-	 * @param sourceSpec the new source spec
-	 */
-	public void setSourceSpec(ConceptSpec sourceSpec) {
-		this.originSpec = sourceSpec;
-	}
+    /**
+     * Sets the source concept associated with this relationship spec.
+     *
+     * @param sourceSpec the concept spec representing the source concept
+     */
+    public void setSourceSpec(ConceptSpec sourceSpec) {
+        this.originSpec = sourceSpec;
+    }
 
-	/**
-	 * Sets the relationship type spec.
-	 *
-	 * @param relationshipTypeSpec the new relationship type spec
-	 */
-	public void setRelationshipTypeSpec(ConceptSpec relationshipTypeSpec) {
-		this.relTypeSpec = relationshipTypeSpec;
-	}
+    /**
+     * Sets the relationship type associated with this relationship spec.
+     *
+     * @param relationshipTypeSpec the concept spec representing the relationship type
+     */
+    public void setRelationshipTypeSpec(ConceptSpec relationshipTypeSpec) {
+        this.relTypeSpec = relationshipTypeSpec;
+    }
 
-	/**
-	 * Sets the target spec.
-	 *
-	 * @param targetSpec the new target spec
-	 */
-	public void setTargetSpec(ConceptSpec targetSpec) {
-		this.destinationSpec = targetSpec;
-	}
-
+    /**
+     * Sets the target concept associated with this relationship spec.
+     *
+     * @param targetSpec the concept spec representing the target concept
+     */
+    public void setTargetSpec(ConceptSpec targetSpec) {
+        this.destinationSpec = targetSpec;
+    }
 }

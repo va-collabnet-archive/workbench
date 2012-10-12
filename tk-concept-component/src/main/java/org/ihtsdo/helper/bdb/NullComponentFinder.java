@@ -101,7 +101,7 @@ public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
      * Instantiates a new null component finder.
      *
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ClassNotFoundException the class not found exception
+     * @throws ClassNotFoundException indicates a specified class was not found
      */
     public NullComponentFinder() throws IOException, ClassNotFoundException {
         nidset = Ts.get().getAllConceptNids();

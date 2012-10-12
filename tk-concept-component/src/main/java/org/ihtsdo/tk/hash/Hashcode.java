@@ -16,19 +16,17 @@
  */
 package org.ihtsdo.tk.hash;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class Hashcode.
- *
- * @author kec
+ * The Class Hashcode contains methods for computing a hashcode based on a given set of parts.
+ * @see Hashcode
  */
 public class Hashcode {
 
     /**
-     * Compute.
+     * Computes a hashcode based on the given integers, <code>parts</code>.
      *
-     * @param parts the parts
-     * @return the int
+     * @param parts the integers from which the hashcode should be computed
+     * @return the int value representing the hashcode
      */
     public static int compute(int... parts) {
         int hash = 0;
@@ -48,10 +46,10 @@ public class Hashcode {
     }
 
     /**
-     * Compute long.
+     * Computes a hashcode based on the given longs, <code>parts</code>.
      *
-     * @param parts the parts
-     * @return the int
+     * @param parts the longs from which the hashcode should be computed
+     * @return the long value representing the hashcode
      */
     public static int computeLong(long... parts) {
         int[] intParts = new int[parts.length * 2];
@@ -65,10 +63,10 @@ public class Hashcode {
     }
 
     /**
-     * Compute.
+     * Computes a hashcode based on the given shorts, <code>parts</code>.
      *
-     * @param parts the parts
-     * @return the short
+     * @param parts the shorts from which the hashcode should be computed
+     * @return the short value representing the hashcode
      */
     public static short compute(short... parts) {
         short hash = 0;
@@ -83,10 +81,10 @@ public class Hashcode {
     }
 
     /**
-     * Int hash to short hash.
+     * Converts an <code>int</code> hashcode to a <code>short</code> hashcode.
      *
-     * @param hash the hash
-     * @return the short
+     * @param hash the int hashcode to convert
+     * @return a short hashcode
      */
     public static short intHashToShortHash(int hash) {
         short[] parts = new short[2];

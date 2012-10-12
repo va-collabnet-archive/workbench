@@ -134,7 +134,7 @@ public class TkRefexUuidStringMember extends TkRefexAbstractMember<TkRefexUuidSt
      * String Member
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ClassNotFoundException the class not found exception
+     * @throws ClassNotFoundException indicates a specified class was not found
      */
     public TkRefexUuidStringMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
@@ -274,7 +274,7 @@ public class TkRefexUuidStringMember extends TkRefexAbstractMember<TkRefexUuidSt
      * Refex Uuid String Member
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ClassNotFoundException the class not found exception
+     * @throws ClassNotFoundException indicates a specified class was not found
      * TODO-javadoc: why?
      */
     @Override

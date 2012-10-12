@@ -85,7 +85,7 @@ public class TkMediaRevision extends TkRevision {
      * @param in the data input specifying how to construct this TK Media Revision
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ClassNotFoundException the class not found exception
+     * @throws ClassNotFoundException indicates a specified class was not found
      */
     public TkMediaRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
@@ -176,7 +176,7 @@ public class TkMediaRevision extends TkRevision {
      * @param in the data input specifying how to construct this TK Media Revision
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ClassNotFoundException the class not found exception
+     * @throws ClassNotFoundException indicates a specified class was not found
      * TODO-javadoc: why?
      */
     @Override

@@ -147,7 +147,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      * @param isaTypeUuid the isa type uuid
      * @param parentUuids the parent uuids
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public ConceptCB(String fullySpecifiedName,
@@ -178,7 +178,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      * @param isaTypeUuid the isa type uuid
      * @param parentUuids the parent uuids
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public ConceptCB(List<String> fullySpecifiedNames,
@@ -205,7 +205,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      * @param newConceptUuid the new concept uuid
      * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException the contradiction exception
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      */
     public ConceptCB(ConceptVersionBI conceptVersion, UUID newConceptUuid) throws IOException, ContradictionException, InvalidCAB {
         super(null, conceptVersion, conceptVersion.getViewCoordinate());
@@ -345,7 +345,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      * @throws NoSuchAlgorithmException the no such algorithm exception
      * @throws UnsupportedEncodingException the unsupported encoding exception
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public void addFullySpecifiedName(DescriptionCAB fullySpecifiedNameBlueprint, LANG_CODE dialect) throws NoSuchAlgorithmException,
@@ -363,7 +363,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      * @throws NoSuchAlgorithmException the no such algorithm exception
      * @throws UnsupportedEncodingException the unsupported encoding exception
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     private void addFullySpecifiedNameDialectRefexes(DescriptionCAB fullySpecifiedNameBlueprint, LANG_CODE dialect) throws NoSuchAlgorithmException,
@@ -406,7 +406,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      * @throws NoSuchAlgorithmException the no such algorithm exception
      * @throws UnsupportedEncodingException the unsupported encoding exception
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public void updateFullySpecifiedName(String newFullySpecifiedName, DescriptionCAB fullySpecifiedNameBlueprint, LANG_CODE dialect) throws
@@ -493,7 +493,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      * @throws NoSuchAlgorithmException the no such algorithm exception
      * @throws UnsupportedEncodingException the unsupported encoding exception
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public void addPreferredName(DescriptionCAB perferredNameBlueprint, LANG_CODE dialect) throws NoSuchAlgorithmException,
@@ -511,7 +511,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      * @throws NoSuchAlgorithmException the no such algorithm exception
      * @throws UnsupportedEncodingException the unsupported encoding exception
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     private void addPreferredNameDialectRefexes(DescriptionCAB preferredBlueprint, LANG_CODE dialect) throws NoSuchAlgorithmException,
@@ -557,7 +557,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      * @throws NoSuchAlgorithmException the no such algorithm exception
      * @throws UnsupportedEncodingException the unsupported encoding exception
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public void updatePreferredName(String newPreferredName, DescriptionCAB preferredNameBlueprint, LANG_CODE dialect) throws
@@ -620,7 +620,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      *
      * @return the description cab
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public DescriptionCAB makeFullySpecifiedNameCAB() throws IOException, InvalidCAB, ContradictionException {
@@ -644,7 +644,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      *
      * @return the description cab
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public DescriptionCAB makePreferredCAB() throws IOException, InvalidCAB, ContradictionException {
@@ -668,7 +668,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      *
      * @return the parent ca bs
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public List<RelationshipCAB> getParentCABs() throws IOException, InvalidCAB, ContradictionException {
@@ -691,7 +691,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      *
      * @return the fully specified name ca bs
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public List<DescriptionCAB> getFullySpecifiedNameCABs() throws IOException, InvalidCAB, ContradictionException {
@@ -706,7 +706,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      *
      * @return the preferred name ca bs
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public List<DescriptionCAB> getPreferredNameCABs() throws IOException, InvalidCAB, ContradictionException {
@@ -730,7 +730,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      *
      * @return the relationship ca bs
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public List<RelationshipCAB> getRelationshipCABs() throws IOException, InvalidCAB, ContradictionException {

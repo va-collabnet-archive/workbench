@@ -84,7 +84,7 @@ public class TkConceptAttributesRevision extends TkRevision implements I_Concept
      * Attributes Revision
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ClassNotFoundException the class not found exception
+     * @throws ClassNotFoundException indicates a specified class was not found
      * TODO-javadoc: why?
      */
     public TkConceptAttributesRevision(DataInput in, int dataVersion)
@@ -169,7 +169,7 @@ public class TkConceptAttributesRevision extends TkRevision implements I_Concept
      * @param in the data input specifying how to construct this TK Concept Attributes Revision
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ClassNotFoundException the class not found exception
+     * @throws ClassNotFoundException indicates a specified class was not found
      * TODO-javadoc: why?
      */
     @Override

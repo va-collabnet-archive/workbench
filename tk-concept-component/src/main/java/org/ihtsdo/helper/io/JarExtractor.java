@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.helper.io;
 
@@ -26,77 +26,76 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 
-// TODO: Auto-generated Javadoc
+
 /**
- * The Class JarExtractor.
+ * The Class JarExtractor provides methods for extracting a jar.
  */
 public class JarExtractor {
 
     /**
-     * The Enum READ_TYPE.
+     * The Enum READ_TYPE listing the types available to read.
      */
     private enum READ_TYPE {
-        
-        /** The jar file. */
-        JAR_FILE, 
- /** The jar input stream. */
- JAR_INPUT_STREAM
-    };
 
-    /** The read type. */
+        /**
+         * The read type is a jar file.
+         */
+        JAR_FILE,
+        /**
+         * The read type is a jar input stream.
+         */
+        JAR_INPUT_STREAM
+    };
+    
     private static READ_TYPE readType = READ_TYPE.JAR_INPUT_STREAM;
 
     /**
-     * Note the following about opening large jar files:
-     * <p>
+     * Note the following about opening large jar files: <p>
      * http://confluence.atlassian.com/display/DOC/java.util.zip.ZipFile.open+
-     * causes+OutOfMemoryError+for+large+zip+files
-     * <p>
-     * http://bugs.sun.com/bugdatabase/view_bug.do;:YfiG?bug_id=4705373
-     * <p>
-     * The method java.util.zip.ZipFile.open does not actually use the allocated
+     * causes+OutOfMemoryError+for+large+zip+files <p>
+     * http://bugs.sun.com/bugdatabase/view_bug.do;:YfiG?bug_id=4705373 <p> The
+     * method java.util.zip.ZipFile.open does not actually use the allocated
      * memory of the heap, it maps the entire zip file into virtual memory
      * outside the heap. If you run into this problem, you should try to reduce
      * your heap size to about 600MB and try the restore again. This problem is
      * allegedly fixed in java 6.
-     * 
+     *
      * For now, using JarInputStream bypasses the memory mapped issues with
      * JarFile, but may be worse performance.
      *
-     * @param source the source
-     * @param destDir the dest dir
+     * @param source the jar to open
+     * @param destDir the destination directory
      * @throws IOException signals that an I/O exception has occurred
      */
-
     public static void execute(File source, File destDir) throws IOException {
         switch (readType) {
-        case JAR_FILE:
-            executeJarFile(source, destDir);
-            break;
-        case JAR_INPUT_STREAM:
-            executeJarInputStream(source, destDir);
-            break;
-        default:
-            throw new RuntimeException("Can't handle readtype: " + readType);
+            case JAR_FILE:
+                executeJarFile(source, destDir);
+                break;
+            case JAR_INPUT_STREAM:
+                executeJarInputStream(source, destDir);
+                break;
+            default:
+                throw new RuntimeException("Can't handle readtype: " + readType);
         }
 
     }
 
     /**
-     * Execute jar file.
+     * Extracts a jar file to the given directory.
      *
-     * @param source the source
-     * @param destDir the dest dir
+     * @param source the jar file
+     * @param destinationDirectory the destination directory
      * @throws IOException signals that an I/O exception has occurred
      */
-    private static void executeJarFile(File source, File destDir) throws IOException {
-        destDir.mkdirs();
+    private static void executeJarFile(File source, File destinationDirectory) throws IOException {
+        destinationDirectory.mkdirs();
         JarFile jf = new JarFile(source);
         for (Enumeration<JarEntry> e = jf.entries(); e.hasMoreElements();) {
             JarEntry je = e.nextElement();
             System.out.println("Jar entry (a): " + je.getName() + " compressed: " + je.getCompressedSize() + " size: "
-                + je.getSize() + " time: " + new Date(je.getTime()) + " comment: " + je.getComment());
-            java.io.File f = new java.io.File(destDir + java.io.File.separator + je.getName());
+                    + je.getSize() + " time: " + new Date(je.getTime()) + " comment: " + je.getComment());
+            java.io.File f = new java.io.File(destinationDirectory + java.io.File.separator + je.getName());
 
             if (je.isDirectory()) { // if its a directory, create it
                 f.mkdir();
@@ -119,22 +118,22 @@ public class JarExtractor {
     }
 
     /**
-     * Execute jar input stream.
+     * Extracts a jar input stream into a given directory.
      *
-     * @param source the source
-     * @param destDir the dest dir
+     * @param source the jar input stream
+     * @param destinationDirectory the dest dir
      * @throws IOException signals that an I/O exception has occurred
      */
-    private static void executeJarInputStream(File source, File destDir) throws IOException {
-        destDir.mkdirs();
+    private static void executeJarInputStream(File source, File destinationDirectory) throws IOException {
+        destinationDirectory.mkdirs();
         FileInputStream fis = new FileInputStream(source);
         BufferedInputStream bis = new BufferedInputStream(fis);
         JarInputStream jis = new JarInputStream(bis);
         JarEntry je = jis.getNextJarEntry();
         while (je != null) {
             System.out.println("Jar entry (b): " + je.getName() + " compressed: " + je.getCompressedSize() + " size: "
-                + je.getSize() + " time: " + new Date(je.getTime()) + " comment: " + je.getComment());
-            java.io.File f = new java.io.File(destDir + java.io.File.separator + je.getName());
+                    + je.getSize() + " time: " + new Date(je.getTime()) + " comment: " + je.getComment());
+            java.io.File f = new java.io.File(destinationDirectory + java.io.File.separator + je.getName());
 
             if (je.isDirectory()) { // if it is a directory, create it
                 f.mkdir();
@@ -154,5 +153,4 @@ public class JarExtractor {
         }
         jis.close();
     }
-
 }

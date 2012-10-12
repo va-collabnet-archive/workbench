@@ -56,7 +56,7 @@ public interface TerminologyBuilderBI {
      * modified.
      *
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     RefexChronicleBI<?> construct(RefexCAB refexBlueprint) throws IOException, InvalidCAB, ContradictionException;
@@ -71,7 +71,7 @@ public interface TerminologyBuilderBI {
      * the <code>refexBlueprint</code> regardless of if the RefexChronicleBI was
      * modified.
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     RefexChronicleBI<?> constructIfNotCurrent(RefexCAB refexBlueprint) throws IOException, InvalidCAB, ContradictionException;
@@ -85,7 +85,7 @@ public interface TerminologyBuilderBI {
      * the <code>relBlueprint</code> regardless of if the
      * RelationshipChronicleBI was modified.
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     RelationshipChronicleBI construct(RelationshipCAB relBlueprint) throws IOException, InvalidCAB, ContradictionException;
@@ -100,7 +100,7 @@ public interface TerminologyBuilderBI {
      * <code>relBlueprint</code> regardless of if the RelationshipChronicleBI
      * was modified.
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     RelationshipChronicleBI constructIfNotCurrent(RelationshipCAB relBlueprint) throws IOException, InvalidCAB, ContradictionException;
@@ -114,7 +114,7 @@ public interface TerminologyBuilderBI {
      * the <code>descriptionBlueprint</code> regardless of if the
      * DescriptionChronicleBI was modified.
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     DescriptionChronicleBI construct(DescriptionCAB descriptionBlueprint) throws IOException, InvalidCAB, ContradictionException;
@@ -129,7 +129,7 @@ public interface TerminologyBuilderBI {
      * <code>descriptionBlueprint</code> regardless of if the
      * DescriptionChronicleBI was modified.
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     DescriptionChronicleBI constructIfNotCurrent(DescriptionCAB descriptionBlueprint) throws IOException, InvalidCAB, ContradictionException;
@@ -143,7 +143,7 @@ public interface TerminologyBuilderBI {
      * the <code>mediaBlueprint</code> regardless of if the MediaChronicleBI was
      * modified.
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     MediaChronicleBI construct(MediaCAB mediaBlueprint) throws IOException, InvalidCAB, ContradictionException;
@@ -158,7 +158,7 @@ public interface TerminologyBuilderBI {
      * the <code>mediaBlueprint</code> regardless of if the MediaChronicleBI was
      * modified.
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     MediaChronicleBI constructIfNotCurrent(MediaCAB mediaBlueprint) throws IOException, InvalidCAB, ContradictionException;
@@ -172,7 +172,7 @@ public interface TerminologyBuilderBI {
      * the <code>conceptBlueprint</code> regardless of if the ConceptChronicleBI
      * was modified.
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     ConceptChronicleBI construct(ConceptCB conceptBlueprint) throws IOException, InvalidCAB, ContradictionException;
@@ -187,7 +187,7 @@ public interface TerminologyBuilderBI {
      * the <code>conceptBlueprint</code> regardless of if the ConceptChronicleBI
      * was modified.
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     ConceptChronicleBI constructIfNotCurrent(ConceptCB conceptBlueprint) throws IOException, InvalidCAB, ContradictionException;
@@ -201,7 +201,7 @@ public interface TerminologyBuilderBI {
      * the <code>conceptAttributeBlueprint</code> regardless of if the
      * ConceptAttributeChronicleBI was modified.
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     ConceptAttributeChronicleBI construct(ConceptAttributeAB conceptAttributeBlueprint) throws IOException, InvalidCAB, ContradictionException;
@@ -216,7 +216,7 @@ public interface TerminologyBuilderBI {
      * the <code>conceptAttributeBlueprint</code> regardless of if the
      * ConceptAttributeChronicleBI was modified.
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     ConceptAttributeChronicleBI constructIfNotCurrent(ConceptAttributeAB conceptAttributeBlueprint) throws IOException, InvalidCAB, ContradictionException;

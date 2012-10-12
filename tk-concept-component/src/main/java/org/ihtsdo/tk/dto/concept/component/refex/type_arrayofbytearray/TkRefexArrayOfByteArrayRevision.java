@@ -79,7 +79,7 @@ public class TkRefexArrayOfByteArrayRevision extends TkRevision {
      * Array of Byte Array Revision
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ClassNotFoundException the class not found exception
+     * @throws ClassNotFoundException indicates a specified class was not found
      */
     public TkRefexArrayOfByteArrayRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
@@ -170,7 +170,7 @@ public class TkRefexArrayOfByteArrayRevision extends TkRevision {
      * of Byte Array Revision
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ClassNotFoundException the class not found exception
+     * @throws ClassNotFoundException indicates a specified class was not found
      * TODO-javadoc: why?
      */
     @Override

@@ -142,7 +142,7 @@ public abstract class TkRevision implements I_VersionExternally {
      * @param in the data input specifying how to construct this TK Revision
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ClassNotFoundException the class not found exception
+     * @throws ClassNotFoundException indicates a specified class was not found
      * TODO-javadoc: why?
      */
     public TkRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -381,7 +381,7 @@ public abstract class TkRevision implements I_VersionExternally {
      * @param in the data input specifying how to construct this TK Revision
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ClassNotFoundException the class not found exception
+     * @throws ClassNotFoundException indicates a specified class was not found
      * TODO-javadoc: why?
      */
     public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.tk.spec;
 
@@ -20,25 +20,24 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-// TODO: Auto-generated Javadoc
+// TODO-javadoc-kec: this class isn't done
 /**
- * The Class ComponentAnnotationSpec.
+ * The Class ComponentAnnotationSpec provides a way of representing concept
+ * attributes in a verifiable and human-readable way. This class is not
+ * finished.
  *
  * @TODO
  * @author kec
  */
 public class ComponentAnnotationSpec implements SpecBI {
 
-    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
-
-    /** The Constant dataVersion. */
     private static final int dataVersion = 1;
 
     /**
-     * Write object.
+     * Writes the component annotation spec object. Including the dataVersion.
      *
-     * @param out the out
+     * @param out the output stream
      * @throws IOException signals that an I/O exception has occurred
      */
     private void writeObject(ObjectOutputStream out) throws IOException {
@@ -46,20 +45,19 @@ public class ComponentAnnotationSpec implements SpecBI {
     }
 
     /**
-     * Read object.
+     * Reads the component annotation spec object. Including the dataVersion.
      *
-     * @param in the in
+     * @param in the inpupt stream
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ClassNotFoundException the class not found exception
+     * @throws ClassNotFoundException indicates a specified class was not found
      */
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
-        	// Nothing to do
+            // Nothing to do
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
 
     }
-
 }

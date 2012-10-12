@@ -63,7 +63,7 @@ public class DescriptionCAB extends CreateOrAmendBlueprint {
      * @param text the text
      * @param initialCaseSignificant the initial case significant
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public DescriptionCAB(
@@ -83,7 +83,7 @@ public class DescriptionCAB extends CreateOrAmendBlueprint {
      * @param text the text
      * @param initialCaseSignificant the initial case significant
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public DescriptionCAB(
@@ -104,7 +104,7 @@ public class DescriptionCAB extends CreateOrAmendBlueprint {
      * @param descriptionVersion the description version
      * @param viewCoordinate the view coordinate
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public DescriptionCAB(
@@ -126,7 +126,7 @@ public class DescriptionCAB extends CreateOrAmendBlueprint {
      * @param descriptionVersion the description version
      * @param viewCoordinate the view coordinate
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public DescriptionCAB(
@@ -149,7 +149,7 @@ public class DescriptionCAB extends CreateOrAmendBlueprint {
      * @param descriptionVersion the description version
      * @param viewCoordinate the view coordinate
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public DescriptionCAB(

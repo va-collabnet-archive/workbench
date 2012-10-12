@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.tk.spec;
 
@@ -27,18 +27,19 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
-// TODO: Auto-generated Javadoc
 /**
  * A factory for creating Spec objects.
  */
 public class SpecFactory {
 
     /**
-     * Gets the.
+     * Gets a concept spec representing the given
+     * <code>conceptChronicle</code> and based on the given
+     * <code>viewCoordinate</code>.
      *
-     * @param conceptChronicle the concept chronicle
-     * @param viewCoordinate the view coordinate
-     * @return the concept spec
+     * @param conceptChronicle the concept to represent
+     * @param viewCoordinate the view coordinate specifying which versions of the concept are active or inactive
+     * @return a concept spec representing the specified concept
      * @throws IOException signals that an I/O exception has occurred
      */
     public static ConceptSpec get(ConceptChronicleBI conceptChronicle, ViewCoordinate viewCoordinate) throws IOException {
@@ -58,10 +59,11 @@ public class SpecFactory {
     }
 
     /**
-     * Gets the.
+     * Gets a concept spec representing the given
+     * <code>conceptVersion</code>.
      *
-     * @param conceptVersion the concept version
-     * @return the concept spec
+     * @param conceptVersion the concept version to represent
+     * @return a concept spec representing the specified concept
      * @throws IOException signals that an I/O exception has occurred
      */
     public static ConceptSpec get(ConceptVersionBI conceptVersion) throws IOException {
@@ -76,11 +78,12 @@ public class SpecFactory {
     }
 
     /**
-     * Gets the.
+     * Gets a description spec representing the given
+     * <code>descriptionVersion</code>.
      *
-     * @param descriptionVersion the description version
-     * @param viewCoordinate the view coordinate
-     * @return the description spec
+     * @param descriptionVersion the description version to represent
+     * @param viewCoordinate the view coordinate specifying which versions are active or inactive
+     * @return the description spec representing the specified concept
      * @throws IOException signals that an I/O exception has occurred
      */
     public static DescriptionSpec get(DescriptionVersionBI descriptionVersion, ViewCoordinate viewCoordinate) throws IOException {

@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.tk.spec;
 
@@ -34,22 +34,28 @@ import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
-// TODO: Auto-generated Javadoc
+
 /**
- * The Class ConceptSpec.
+ * The Class ConceptSpec provides a way of representing a concept in a
+ * verifiable and human-readable way. The uuid and text of the spec is check to
+ * ensure they both point the same concept. A concept spec can be used to find
+ * both the nid and uuid that are associated with the represented concept as
+ * well as the concept chronicle and version.
+ *
+ * <p> A concept should never be represented by only a uuid since this provides
+ * no way of verifying the uuid is pointing to the correct concept and no
+ * human-readable way of knowing which concept is identified.
  */
 public class ConceptSpec implements SpecBI {
 
-    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
-    
-    /** The Constant dataVersion. */
     private static final int dataVersion = 1;
 
     /**
-     * Write object.
+     * Writes the concept spec object, including the data version, description,
+     * uuids, and relationship specs.
      *
-     * @param out the out
+     * @param out the output stream
      * @throws IOException signals that an I/O exception has occurred
      */
     private void writeObject(ObjectOutputStream out) throws IOException {
@@ -60,11 +66,12 @@ public class ConceptSpec implements SpecBI {
     }
 
     /**
-     * Read object.
+     * Reads a concept spec object, including the data version, description,
+     * uuids, and relationship specs.
      *
-     * @param in the in
+     * @param in the input stream
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ClassNotFoundException the class not found exception
+     * @throws ClassNotFoundException indicates a specified class was not found
      */
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
@@ -77,71 +84,83 @@ public class ConceptSpec implements SpecBI {
         }
 
     }
-    
-    /** The uuids. */
     private UUID[] uuids;
-    
-    /** The description. */
     private String description;
-    
-    /** The rel specs. */
     private RelationshipSpec[] relSpecs;
 
     /**
-     * added to allow JavaBeans spec use.
+     * Added to allow JavaBeans spec use.
      */
     public ConceptSpec() {
         super();
     }
 
     /**
-     * Instantiates a new concept spec.
+     * Instantiates a new concept spec based on the given
+     * <code>descriptionText</code> and
+     * <code>conceptUuidString</code>.
      *
-     * @param descriptionText the description text
-     * @param conceptUuid the concept uuid
+     * @param descriptionText the description text of the concept to represent
+     * @param conceptUuidString a String representing the uuid of the concept to
+     * represent
      */
-    public ConceptSpec(String descriptionText, String conceptUuid) {
-        this(descriptionText, conceptUuid, new RelationshipSpec[]{});
+    public ConceptSpec(String descriptionText, String conceptUuidString) {
+        this(descriptionText, conceptUuidString, new RelationshipSpec[]{});
     }
 
     /**
-     * Instantiates a new concept spec.
+     * Instantiates a new concept spec based on the given
+     * <code>descriptionText</code>,
+     * <code>conceptUuidString</code>, and
+     * <code>relationshipSpecs</code>.
      *
-     * @param descriptionText the description text
-     * @param conceptUuid the concept uuid
-     * @param relationshipSpecs the relationship specs
+     * @param descriptionText the description text of the concept to represent
+     * @param conceptUuidString a String representing the uuid of the concept to
+     * represent
+     * @param relationshipSpecs the relationship specs representing the
+     * relationships on the concept
      */
-    public ConceptSpec(String descriptionText, String conceptUuid, RelationshipSpec... relationshipSpecs) {
-        this(descriptionText, UUID.fromString(conceptUuid), relationshipSpecs);
+    public ConceptSpec(String descriptionText, String conceptUuidString, RelationshipSpec... relationshipSpecs) {
+        this(descriptionText, UUID.fromString(conceptUuidString), relationshipSpecs);
     }
 
     /**
-     * Instantiates a new concept spec.
+     * Instantiates a new concept spec based on the given
+     * <code>descriptionText</code> and
+     * <code>conceptUuid</code>.
      *
-     * @param descriptionText the description text
-     * @param conceptUuid the concept uuid
+     * @param descriptionText the description text of the concept to represent
+     * @param conceptUuid the uuid of the concept to represent
      */
     public ConceptSpec(String descriptionText, UUID conceptUuid) {
         this(descriptionText, new UUID[]{conceptUuid}, new RelationshipSpec[]{});
     }
 
     /**
-     * Instantiates a new concept spec.
+     * Instantiates a new concept spec based on the given
+     * <code>descriptionText</code>,
+     * <code>conceptUuid</code>, and
+     * <code>relationshipSpecs</code>.
      *
-     * @param descriptionText the description text
-     * @param conceptUuid the concept uuid
-     * @param relationshipSpecs the relationship specs
+     * @param descriptionText the description text of the concept to represent
+     * @param conceptUuid the uuid of the concept to represent
+     * @param relationshipSpecs the relationship specs representing the
+     * relationships on the concept
      */
     public ConceptSpec(String descriptionText, UUID conceptUuid, RelationshipSpec... relationshipSpecs) {
         this(descriptionText, new UUID[]{conceptUuid}, relationshipSpecs);
     }
 
     /**
-     * Instantiates a new concept spec.
+     * Instantiates a new concept spec based on the given
+     * <code>descriptionText</code>,
+     * <code>conceptUuids</code>, and
+     * <code>relationshipSpecs</code>.
      *
-     * @param descriptionText the description text
-     * @param conceptUuids the concept uuids
-     * @param relationshipSpecs the relationship specs
+     * @param descriptionText the description text of the concept to represent
+     * @param conceptUuids the uuids of the concept to represent
+     * @param relationshipSpecs the relationship specs representing the
+     * relationships on the concept
      */
     public ConceptSpec(String descriptionText, UUID[] conceptUuids, RelationshipSpec... relationshipSpecs) {
         this.uuids = conceptUuids;
@@ -150,10 +169,16 @@ public class ConceptSpec implements SpecBI {
     }
 
     /**
-     * Gets the lenient.
+     * Gets a
+     * <code>ConceptChronicleBI</code> representing the concept associated with
+     * this concept spec. Checks to see if the database has any of the uuids
+     * associated with this concept. Validates the descriptions and
+     * relationships. Does not guarantee that the concept returned is active.
      *
-     * @return the lenient
-     * @throws ValidationException the validation exception
+     * @return the concept chronicle representing the concept associated with
+     * this concept spec
+     * @throws ValidationException if the elements of a spec cannot be found, or
+     * point to different concepts/components
      * @throws IOException signals that an I/O exception has occurred
      */
     public ConceptChronicleBI getLenient() throws ValidationException, IOException {
@@ -166,7 +191,7 @@ public class ConceptSpec implements SpecBI {
                 }
             }
             if (!found) {
-               throw new ValidationException("No matching ids in db: " + this.toString());
+                throw new ValidationException("No matching ids in db: " + this.toString());
             }
             ConceptChronicleBI local = Ts.get().getConcept(uuids);
             validateDescription(local);
@@ -178,11 +203,18 @@ public class ConceptSpec implements SpecBI {
     }
 
     /**
-     * Gets the strict.
+     * Gets a
+     * <code>ConceptVersionBI</code> representing the concept associated with
+     * this concept spec. Checks to see if the database has any of the uuids
+     * associated with this concept. Validates the descriptions and
+     * relationships based on the view coordinate.
      *
-     * @param viewCoordinate the view coordinate
-     * @return the strict
-     * @throws ValidationException the validation exception
+     * @param viewCoordinate the view coordinate specifying which versions are
+     * active and inactive
+     * @return the concept chronicle representing the concept associated with
+     * this concept spec
+     * @throws ValidationException if the elements of a spec cannot be found, or
+     * point to different concepts/components
      * @throws IOException signals that an I/O exception has occurred
      */
     public ConceptVersionBI getStrict(ViewCoordinate viewCoordinate) throws ValidationException, IOException {
@@ -195,7 +227,7 @@ public class ConceptSpec implements SpecBI {
                 }
             }
             if (!found) {
-               throw new ValidationException("No matching ids in db: " + this.toString());
+                throw new ValidationException("No matching ids in db: " + this.toString());
             }
 
             ConceptVersionBI local = Ts.get().getConceptVersion(viewCoordinate, uuids);
@@ -208,10 +240,12 @@ public class ConceptSpec implements SpecBI {
     }
 
     /**
-     * Gets the.
+     * Gets a
+     * <code>ConceptVersionBI</code> representing the concept associated with
+     * this concept spec.
      *
-     * @param viewCoordinate the view coordinate
-     * @return the concept version bi
+     * @param viewCoordinate the view coordinate specifying which version are active and inactive
+     * @return the concept version
      * @throws IOException signals that an I/O exception has occurred
      * @deprecated Use getStrict or getLienient instead.
      */
@@ -221,10 +255,16 @@ public class ConceptSpec implements SpecBI {
     }
 
     /**
-     * Validate relationships.
+     * Validates the relationships associated with this concept spec based on
+     * the given
+     * <code>conceptVersion</code> and
+     * <code>viewCoordinate</code>. Ensures that the concept has the specified
+     * active relationships.
      *
-     * @param conceptVersion the concept version
-     * @param viewCoordinate the view coordinate
+     * @param conceptVersion the concept version representing the concept to
+     * validate
+     * @param viewCoordinate the view coordinate specifying which versions are
+     * active and inactive
      * @throws IOException signals that an I/O exception has occurred
      */
     private void validateRelationships(ConceptVersionBI conceptVersion, ViewCoordinate viewCoordinate) throws IOException {
@@ -250,9 +290,13 @@ public class ConceptSpec implements SpecBI {
     }
 
     /**
-     * Validate relationships.
+     * Validates the relationships associated with this concept spec based on
+     * the given
+     * <code>conceptChronicle</code>. Ensures that the concept has the specified
+     * relationships. Does not guarantee the relationships are active.
      *
-     * @param conceptChronicle the concept chronicle
+     * @param conceptChronicle the concept version representing the concept to
+     * validate
      * @throws IOException signals that an I/O exception has occurred
      */
     private void validateRelationships(ConceptChronicleBI conceptChronicle) throws IOException {
@@ -281,11 +325,16 @@ public class ConceptSpec implements SpecBI {
     }
 
     /**
-     * Validate description.
+     * Validates the descriptions associated with this concept spec based on the
+     * given
+     * <code>conceptChronicle</code>. Ensures that the concept has the specified
+     * descriptions. Does not guarantee the descriptions are active.
      *
-     * @param conceptChronicle the concept chronicle
+     * @param conceptChronicle the concept version representing the concept to
+     * validate
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if more than one version is found for the
+     * specified view coordinate
      */
     private void validateDescription(ConceptChronicleBI conceptChronicle) throws IOException, ContradictionException {
         boolean found = false;
@@ -306,10 +355,16 @@ public class ConceptSpec implements SpecBI {
     }
 
     /**
-     * Validate description.
+     * Validates the descriptions associated with this concept spec based on the
+     * given
+     * <code>conceptVersion</code> and
+     * <code>viewCoordinate</code>. Ensures that the concept has the specified
+     * active descriptions.
      *
-     * @param conceptVersion the concept version
-     * @param viewCoordinate the view coordinate
+     * @param conceptVersion the concept version representing the concept to
+     * validate
+     * @param viewCoordinate the view coordinate specifying which versions are
+     * active and inactive
      * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException the contradiction exception
      */
@@ -330,11 +385,10 @@ public class ConceptSpec implements SpecBI {
     }
 
     /**
-     * added as an alternative way to get the uuids as strings rather than UUID
-     * objects
-     * this was done to help with Maven making use of this class.
+     * Added as an alternative way to get the uuids as strings rather than UUID
+     * objects this was done to help with Maven making use of this class.
      *
-     * @return the uuids as string
+     * @return an array of strings representing the uuids
      */
     public String[] getUuidsAsString() {
         String[] returnVal = new String[uuids.length];
@@ -346,17 +400,14 @@ public class ConceptSpec implements SpecBI {
     }
 
     /**
-     * Added primarily for Maven so that using a String type configuration in
-     * a POM file the UUIDs array could be set.
-     * This allows the ConceptSpec class to be embedded into a object to be
-     * configured
-     * by Maven POM configuration. Note that the ConceptDescriptor class also
-     * exists
-     * for a similar purpose, however it exists in a dependent project and
-     * cannot
-     * be used in this project.
+     * Added primarily for Maven so that using a String type configuration in a
+     * POM file the UUIDs array could be set. This allows the ConceptSpec class
+     * to be embedded into a object to be configured by Maven POM configuration.
+     * Note that the ConceptDescriptor class also exists for a similar purpose,
+     * however it exists in a dependent project and cannot be used in this
+     * project.
      *
-     * @param uuids the new uuids as string
+     * @param uuids an array of strings representing the uuids
      */
     public void setUuidsAsString(String[] uuids) {
         this.uuids = new UUID[uuids.length];
@@ -367,27 +418,29 @@ public class ConceptSpec implements SpecBI {
     }
 
     /**
-     * Gets the uuids.
+     * Gets the uuids associated with this concept spec. No validation is
+     * performed.
      *
-     * @return the uuids
+     * @return the uuids associated with this concept spec
      */
     public UUID[] getUuids() {
         return uuids;
     }
 
     /**
-     * Sets the uuids.
+     * Sets the uuids associated with this concept spec.
      *
-     * @param uuids the new uuids
+     * @param uuids the uuids associated with this concept spec
      */
     public void setUuids(UUID[] uuids) {
         this.uuids = uuids;
     }
 
     /**
-     * Sets the uuid strings.
+     * ets the uuids associated with this concept spec from a string
+     * representing the uuid.
      *
-     * @param uuidStrings the new uuid strings
+     * @param uuidStrings an array of strings representing the uuids
      */
     public void setUuidStrings(String[] uuidStrings) {
         this.uuids = new UUID[uuidStrings.length];
@@ -397,9 +450,9 @@ public class ConceptSpec implements SpecBI {
     }
 
     /**
-     * Gets the uuid strings.
+     * Gets an array of strings representing the uuids.
      *
-     * @return the uuid strings
+     * @return an array of strings representing the uuids
      */
     public String[] getUuidStrings() {
         String[] results = new String[uuids.length];
@@ -410,43 +463,47 @@ public class ConceptSpec implements SpecBI {
     }
 
     /**
-     * Gets the description.
+     * Gets the description associated with this concept spec.
      *
-     * @return the description
+     * @return the description associated with this concept spec
      */
     public String getDescription() {
         return description;
     }
 
     /**
-     * Sets the description.
+     * Sets the description associated with this concept spec.
      *
-     * @param description the new description
+     * @param description the description associated with this concept spec
      */
     public void setDescription(String description) {
         this.description = description;
     }
 
     /**
-     * Gets the relationship specs.
+     * Gets the relationship specs associated with this concept spec.
      *
-     * @return the relationship specs
+     * @return the relationship specs associated with this concept spec
      */
     public RelationshipSpec[] getRelationshipSpecs() {
         return relSpecs;
     }
 
     /**
-     * Sets the relationship specs.
+     * Sets the relationship specs associated with this concept spec.
      *
-     * @param relationshipSpecs the new relationship specs
+     * @param relationshipSpecs the new relationship specs associated with this
+     * concept spec
      */
     public void setRelationshipSpecs(RelationshipSpec[] relationshipSpecs) {
         this.relSpecs = relationshipSpecs;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
+    /**
+     * Returns a String representation of this concept spec object. Includes the
+     * associated description and uuids.
+     *
+     * @return a string representing this concept spec
      */
     @Override
     public String toString() {

@@ -21,18 +21,15 @@ import org.ihtsdo.tk.api.TerminologyStoreDI;
 
 // TODO: Auto-generated Javadoc
 /**
- * Ts is short for Terminology store...
- * 
- * @author kec
+ * The Class Ts provides methods for setting up and accessing the Terminolgoy Store. Ts is an abbreviation for Terminology store.
  *
  */
 public class Ts {
 
-    /** The store. */
     private static TerminologyStoreDI store;
 
     /**
-     * Sets the.
+     * Sets the terminology store.
      *
      * @param terminologyStore the terminology store
      */
@@ -41,9 +38,9 @@ public class Ts {
     }
 
     /**
-     * Gets the.
+     * Gets the terminology store.
      *
-     * @return the terminology store di
+     * @return the terminology store
      */
     public static TerminologyStoreDI get() {
         return store;
@@ -51,7 +48,7 @@ public class Ts {
 
     
     /**
-     * Setup.
+     * Sets up the terminology store.
      *
      * @throws Exception indicates an exception has occurred
      */
@@ -60,10 +57,10 @@ public class Ts {
     }
 
     /**
-     * Setup.
+     * Sets up the terminology store.
      *
-     * @param storeClassName the store class name
-     * @param dbRoot the db root
+     * @param storeClassName the class name of the store
+     * @param dbRoot a String representing the database root
      * @throws Exception indicates an exception has occurred
      */
     public static void setup(String storeClassName, String dbRoot) throws Exception {

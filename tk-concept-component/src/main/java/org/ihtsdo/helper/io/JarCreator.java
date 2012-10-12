@@ -24,19 +24,19 @@ import java.net.URL;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class JarCreator.
+ * The Class JarCreator writes files or classes to zip files.
  */
 public class JarCreator {
     
     /**
-     * Recursive add to zip.
+     * Writes the files in the parent directory to a zip file.
      *
-     * @param output the output
-     * @param parent the parent
-     * @param prefix the prefix
+     * @param output the output writer
+     * @param parent the parent directory
+     * @param prefix the prefix to use for creating the <code>ZipEntry</code>
      * @throws IOException signals that an I/O exception has occurred
+     * @see ZipEntry
      */
     public static void recursiveAddToZip(JarOutputStream output, File parent, String prefix) throws IOException {
         if (parent == null) {
@@ -52,13 +52,14 @@ public class JarCreator {
     }
 
     /**
-     * Adds the to zip.
+     * Writes the specified file to a zip file.
      *
-     * @param prefix the prefix
-     * @param f the f
-     * @param output the output
-     * @param comment the comment
+     * @param prefix the prefix to use for creating the <code>ZipEntry</code>
+     * @param f the file to zip
+     * @param output the output stream
+     * @param comment a comment associated with the <code>ZipEntry</code>
      * @throws IOException signals that an I/O exception has occurred
+     * @see ZipEntry
      */
     public static void addToZip(String prefix, File f, JarOutputStream output, String comment) throws IOException {
         ZipEntry entry = new ZipEntry(prefix + FileIO.getRelativePath(f));
@@ -85,12 +86,12 @@ public class JarCreator {
     }
 
     /**
-     * Adds the to zip.
+     * Writes the class to a zip file.
      *
-     * @param theClass the the class
-     * @param output the output
+     * @param theClass the the class to write
+     * @param output the output writer
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ClassNotFoundException the class not found exception
+     * @throws ClassNotFoundException indicates a specified class was not found
      */
     public static void addToZip(Class<?> theClass, JarOutputStream output) throws IOException, ClassNotFoundException {
         String classFileName = theClass.getName().replace('.', '/') + ".class";

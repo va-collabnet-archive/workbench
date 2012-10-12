@@ -79,7 +79,7 @@ public class TkRefexLongRevision extends TkRevision {
      * @param in the data input specifying how to construct this TK Refex Long Revision
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ClassNotFoundException the class not found exception
+     * @throws ClassNotFoundException indicates a specified class was not found
      */
     public TkRefexLongRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
@@ -159,7 +159,7 @@ public class TkRefexLongRevision extends TkRevision {
      * @param in the data input specifying how to construct this TK Refex Long Revision
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ClassNotFoundException the class not found exception
+     * @throws ClassNotFoundException indicates a specified class was not found
      * TODO-javadoc: why?
      */
     @Override

@@ -42,7 +42,7 @@ public class ConceptAttributeAB extends CreateOrAmendBlueprint {
      * @param conceptNid the concept nid
      * @param defined the defined
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public ConceptAttributeAB(
@@ -60,7 +60,7 @@ public class ConceptAttributeAB extends CreateOrAmendBlueprint {
      * @param conceptAttributeVersion the concept attribute version
      * @param viewCoordinate the view coordinate
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public ConceptAttributeAB(
@@ -78,7 +78,7 @@ public class ConceptAttributeAB extends CreateOrAmendBlueprint {
      * @param conceptAttributeVersion the concept attribute version
      * @param viewCoordinate the view coordinate
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public ConceptAttributeAB(

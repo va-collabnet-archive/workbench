@@ -117,7 +117,7 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
      * @param componentVersion the component version
      * @param viewCoordinate the view coordinate
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public CreateOrAmendBlueprint(UUID componentUuid, ComponentVersionBI componentVersion,
@@ -147,7 +147,7 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
      * @throws NoSuchAlgorithmException the no such algorithm exception
      * @throws UnsupportedEncodingException the unsupported encoding exception
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public abstract void recomputeUuid() throws NoSuchAlgorithmException, UnsupportedEncodingException,
@@ -180,7 +180,7 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
      * @param nid the nid
      * @return the primoridal uuid string
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      */
     protected String getPrimoridalUuidString(int nid)
             throws IOException, InvalidCAB {
@@ -201,7 +201,7 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
      * @param uuid the uuid
      * @return the primoridal uuid string
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      */
     protected String getPrimoridalUuidString(UUID uuid)
             throws IOException, InvalidCAB {
@@ -259,7 +259,7 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
      *
      * @return the annotation blueprints from original
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public List<RefexCAB> getAnnotationBlueprintsFromOriginal() throws IOException, InvalidCAB, ContradictionException {
@@ -281,7 +281,7 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
      *
      * @return the annotation blueprints
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public List<RefexCAB> getAnnotationBlueprints() throws IOException, InvalidCAB, ContradictionException {

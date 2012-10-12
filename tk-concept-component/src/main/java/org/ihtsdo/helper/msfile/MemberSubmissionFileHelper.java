@@ -29,7 +29,6 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-// TODO-javadoc: skipping private methods/variables
 /**
  * The Class MemberSubmissionFileHelper takes a text file specifying concepts
  * and loads the concepts into an

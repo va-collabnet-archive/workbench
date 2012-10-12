@@ -62,7 +62,7 @@ public class MediaCAB extends CreateOrAmendBlueprint {
      * @param textDescription the text description
      * @param dataBytes the data bytes
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public MediaCAB(
@@ -83,7 +83,7 @@ public class MediaCAB extends CreateOrAmendBlueprint {
      * @param textDescription the text description
      * @param dataBytes the data bytes
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public MediaCAB(
@@ -105,7 +105,7 @@ public class MediaCAB extends CreateOrAmendBlueprint {
      * @param mediaVersion the media version
      * @param viewCoordinate the view coordinate
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public MediaCAB(
@@ -128,7 +128,7 @@ public class MediaCAB extends CreateOrAmendBlueprint {
      * @param mediaVersion the media version
      * @param viewCoordinate the view coordinate
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public MediaCAB(
@@ -151,7 +151,7 @@ public class MediaCAB extends CreateOrAmendBlueprint {
      * @param mediaVersion the media version
      * @param viewCoordinate the view coordinate
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public MediaCAB(

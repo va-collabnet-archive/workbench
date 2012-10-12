@@ -19,7 +19,7 @@ package org.ihtsdo.tk.spec;
 import java.io.Serializable;
 
 /**
- * The Interface SpecBI.
+ * The Interface SpecBI represents a specification of a terminology component.
  */
 public interface SpecBI extends Serializable {
 

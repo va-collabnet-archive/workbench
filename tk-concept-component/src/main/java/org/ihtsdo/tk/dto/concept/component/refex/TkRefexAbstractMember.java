@@ -92,7 +92,7 @@ public abstract class TkRefexAbstractMember<V extends TkRevision> extends TkComp
      * Abstract Member
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ClassNotFoundException the class not found exception
+     * @throws ClassNotFoundException indicates a specified class was not found
      */
     public TkRefexAbstractMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
@@ -219,7 +219,7 @@ public abstract class TkRefexAbstractMember<V extends TkRevision> extends TkComp
      * @param in the data input specifying how to construct this TK Description
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ClassNotFoundException the class not found exception
+     * @throws ClassNotFoundException indicates a specified class was not found
      * TODO-javadoc: why?
      */
     @Override

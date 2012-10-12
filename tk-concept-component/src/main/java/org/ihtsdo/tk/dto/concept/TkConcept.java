@@ -152,7 +152,7 @@ public class TkConcept {
      *
      * @param in the data input specifying how to construct this TK Concept
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ClassNotFoundException the class not found exception
+     * @throws ClassNotFoundException indicates a specified class was not found
      * TODO-javadoc: why?
      */
     public TkConcept(DataInput in) throws IOException, ClassNotFoundException {
@@ -555,7 +555,7 @@ public class TkConcept {
      *
      * @param in the data input specifying the TK Concept
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ClassNotFoundException the class not found exception
+     * @throws ClassNotFoundException indicates a specified class was not found
      * TODO-javadoc: why?
      */
     public final void readExternal(DataInput in) throws IOException, ClassNotFoundException {

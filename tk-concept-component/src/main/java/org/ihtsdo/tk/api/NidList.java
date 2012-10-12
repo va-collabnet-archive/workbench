@@ -101,7 +101,7 @@ public class NidList implements NidListBI, Serializable {
      * @param in the in
      * @return the native id list bi
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ClassNotFoundException the class not found exception
+     * @throws ClassNotFoundException indicates a specified class was not found
      */
     public static NidListBI readIntListIgnoreMapErrors(ObjectInputStream in) throws IOException, ClassNotFoundException {
         return readIntList(in, true);
@@ -113,7 +113,7 @@ public class NidList implements NidListBI, Serializable {
      * @param in the in
      * @return the native id list bi
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ClassNotFoundException the class not found exception
+     * @throws ClassNotFoundException indicates a specified class was not found
      */
     public static NidListBI readIntListStrict(ObjectInputStream in) throws IOException, ClassNotFoundException {
         return readIntList(in, true);
@@ -126,7 +126,7 @@ public class NidList implements NidListBI, Serializable {
      * @param ignoreMappingErrors the ignore mapping errors
      * @return the native id list bi
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ClassNotFoundException the class not found exception
+     * @throws ClassNotFoundException indicates a specified class was not found
      */
     @SuppressWarnings("unchecked")
     private static NidListBI readIntList(ObjectInputStream in, boolean ignoreMappingErrors) throws IOException,

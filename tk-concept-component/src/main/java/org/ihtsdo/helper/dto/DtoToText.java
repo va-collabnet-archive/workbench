@@ -54,7 +54,7 @@ public class DtoToText {
     * @param append the append
     * @throws IOException signals that an I/O exception has occurred
     * @throws FileNotFoundException if a specified file was not found
-    * @throws ClassNotFoundException the class not found exception
+    * @throws ClassNotFoundException indicates a specified class was not found
     */
    private static void convert(File changeSetFile, boolean changeSet, boolean append)
            throws IOException, FileNotFoundException, ClassNotFoundException {
@@ -98,7 +98,7 @@ public class DtoToText {
     *
     * @param changeSetFile the change set file
     * @throws IOException signals that an I/O exception has occurred
-    * @throws ClassNotFoundException the class not found exception
+    * @throws ClassNotFoundException indicates a specified class was not found
     */
    public static void convertChangeSet(File changeSetFile) throws IOException, ClassNotFoundException {
       convert(changeSetFile, true, false);
@@ -109,7 +109,7 @@ public class DtoToText {
     *
     * @param changeSetFile the change set file
     * @throws IOException signals that an I/O exception has occurred
-    * @throws ClassNotFoundException the class not found exception
+    * @throws ClassNotFoundException indicates a specified class was not found
     */
    public static void convertDto(File changeSetFile) throws IOException, ClassNotFoundException {
       convert(changeSetFile, false, false);
@@ -123,7 +123,7 @@ public class DtoToText {
     * @param append the append
     * @throws IOException signals that an I/O exception has occurred
     * @throws FileNotFoundException if a specified file was not found
-    * @throws ClassNotFoundException the class not found exception
+    * @throws ClassNotFoundException indicates a specified class was not found
     */
    private static void search(File changeSetFile, Collection<UUID> conceptUuids, boolean append)
            throws IOException, FileNotFoundException, ClassNotFoundException {
@@ -162,7 +162,7 @@ public class DtoToText {
     * @param file the file
     * @param conceptUuids the concept uuids
     * @throws IOException signals that an I/O exception has occurred
-    * @throws ClassNotFoundException the class not found exception
+    * @throws ClassNotFoundException indicates a specified class was not found
     */
    public static void searchForDto(File file, Collection<UUID> conceptUuids)
            throws IOException, ClassNotFoundException {

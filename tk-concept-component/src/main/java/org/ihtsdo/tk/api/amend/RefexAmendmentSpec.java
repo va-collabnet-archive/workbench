@@ -43,7 +43,7 @@ public class RefexAmendmentSpec extends RefexCAB {
      * @param collectionNid the collection nid
      * @param memberUuid the member uuid
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public RefexAmendmentSpec(TK_REFEX_TYPE memberType, UUID referencedComponentUuid, int collectionNid, UUID memberUuid) 
@@ -58,7 +58,7 @@ public class RefexAmendmentSpec extends RefexCAB {
      * @param referencedComponentNid the referenced component nid
      * @param collectionNid the collection nid
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public RefexAmendmentSpec(TK_REFEX_TYPE memberType, int referencedComponentNid, int collectionNid) 

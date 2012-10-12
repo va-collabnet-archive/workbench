@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.helper.io;
 
@@ -50,9 +50,8 @@ import java.util.regex.Pattern;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
-// TODO: Auto-generated Javadoc
 /**
- * From the book "Java Cookbook, 2nd Edition. Some simple file IO primitives
+ * From the book "Java Cookbook, 2nd Edition". Some simple file IO primitives
  * reimplemented in Java. All methods are static since there is no state.
  */
 public class FileIO {
@@ -64,12 +63,11 @@ public class FileIO {
      * cannot handle > 64MB files.
      * please see: http://www.rgagnon.com/javadetails/java-0064.html
      */
-
     /**
-     * Copy file.
+     * Copies a file from one location to another.
      *
-     * @param in the in
-     * @param out the out
+     * @param in the input file
+     * @param out the output file
      * @throws IOException signals that an I/O exception has occurred
      */
     public static void copyFile(File in, File out) throws IOException {
@@ -87,11 +85,11 @@ public class FileIO {
     }
 
     /**
-     * Recursive copy.
+     * Copies all the files in the directory.
      *
-     * @param from the from
-     * @param to the to
-     * @param copyInvisibles the copy invisibles
+     * @param from the directory to copy from
+     * @param to the directory to copy to
+     * @param copyInvisibles set to <code>true</code> to copy hidden files
      * @throws IOException signals that an I/O exception has occurred
      */
     public static void recursiveCopy(File from, File to, boolean copyInvisibles) throws IOException {
@@ -109,9 +107,9 @@ public class FileIO {
     }
 
     /**
-     * Recursive delete.
+     * Deletes all the files in the directory.
      *
-     * @param from the from
+     * @param from the directory to delete all the files from
      * @throws IOException signals that an I/O exception has occurred
      */
     public static void recursiveDelete(File from) throws IOException {
@@ -124,21 +122,20 @@ public class FileIO {
     }
 
     /**
-     * The Class FileAndObject.
+     * The Class FileAndObject associates a
+     * <code>File</code> with an
+     * <code>Object</code>.
      */
     public static class FileAndObject {
-        
-        /** The obj. */
-        private Object obj;
 
-        /** The file. */
+        private Object obj;
         private File file;
 
         /**
          * Instantiates a new file and object.
          *
-         * @param obj the obj
-         * @param file the file
+         * @param obj the object to associate
+         * @param file the file to associate
          */
         public FileAndObject(Object obj, File file) {
             super();
@@ -147,30 +144,29 @@ public class FileIO {
         }
 
         /**
-         * Gets the file.
+         * Gets the file associated with this file and object.
          *
-         * @return the file
+         * @return the associated file
          */
         public File getFile() {
             return file;
         }
 
         /**
-         * Gets the obj.
+         * Gets the object associated with this file and object.
          *
-         * @return the obj
+         * @return the associated object
          */
         public Object getObj() {
             return obj;
         }
-
     }
 
     /**
-     * Copy a file from one filename to another.
+     * Copies a file from one filename to another.
      *
-     * @param inName the in name
-     * @param outName the out name
+     * @param inName the input name
+     * @param outName the output name
      * @throws FileNotFoundException if a specified file was not found
      * @throws IOException signals that an I/O exception has occurred
      */
@@ -179,12 +175,12 @@ public class FileIO {
         BufferedOutputStream os = new BufferedOutputStream(new FileOutputStream(outName));
         copyFile(is, os, true);
     }
-    
+
     /**
-     * Copy file.
+     * Copies a file from an opened input stream to a file location.
      *
-     * @param is the is
-     * @param outFile the out file
+     * @param is the input stream
+     * @param outFile the output file
      * @throws IOException signals that an I/O exception has occurred
      */
     public static void copyFile(InputStream is, File outFile) throws IOException {
@@ -196,9 +192,9 @@ public class FileIO {
     /**
      * Copy a file from an opened InputStream to an opened OutputStream.
      *
-     * @param is the is
-     * @param os the os
-     * @param close the close
+     * @param is the input stream
+     * @param os the output sream
+     * @param close set to <code>true</code> to close the output stream
      * @throws IOException signals that an I/O exception has occurred
      */
     public static void copyFile(InputStream is, OutputStream os, boolean close) throws IOException {
@@ -220,9 +216,9 @@ public class FileIO {
     /**
      * Copy a file from an opened Reader to an opened Writer.
      *
-     * @param is the is
-     * @param os the os
-     * @param close the close
+     * @param is the file reader
+     * @param os the output writer
+     * @param close set to <code>true</code> to close the writer
      * @throws IOException signals that an I/O exception has occurred
      */
     public static void copyFile(Reader is, Writer os, boolean close) throws IOException {
@@ -231,16 +227,17 @@ public class FileIO {
             os.write(b);
         }
         is.close();
-        if (close)
+        if (close) {
             os.close();
+        }
     }
 
     /**
      * Copy a file from a filename to a PrintWriter.
      *
-     * @param inName the in name
-     * @param pw the pw
-     * @param close the close
+     * @param inName the filename
+     * @param pw the print writer
+     * @param close set to <code>true</code> to close the print writer
      * @throws FileNotFoundException if a specified file was not found
      * @throws IOException signals that an I/O exception has occurred
      */
@@ -252,8 +249,8 @@ public class FileIO {
     /**
      * Open a file and read the first line from it.
      *
-     * @param inName the in name
-     * @return the string
+     * @param inName the input file name
+     * @return a string representing the first line of the file
      * @throws FileNotFoundException if a specified file was not found
      * @throws IOException signals that an I/O exception has occurred
      */
@@ -264,8 +261,9 @@ public class FileIO {
         is.close();
         return line;
     }
-
-    /** The size of blocking to use. */
+    /**
+     * The size of blocking to use.
+     */
     protected static final int BLKSIZ = 8192;
 
     /**
@@ -273,8 +271,8 @@ public class FileIO {
      * name suggests, use my own buffer instead of letting the BufferedReader
      * allocate and use the buffer.
      *
-     * @param inName the in name
-     * @param outName the out name
+     * @param inName the input file name
+     * @param outName the output file name
      * @throws FileNotFoundException if a specified file was not found
      * @throws IOException signals that an I/O exception has occurred
      */
@@ -293,8 +291,8 @@ public class FileIO {
     /**
      * Read the entire content of a Reader into a String.
      *
-     * @param is the is
-     * @return the string
+     * @param is the input reader
+     * @return the content of the reader represented as a string
      * @throws IOException signals that an I/O exception has occurred
      */
     public static String readerToString(Reader is) throws IOException {
@@ -314,8 +312,8 @@ public class FileIO {
     /**
      * Read the content of a Stream into a String.
      *
-     * @param is the is
-     * @return the string
+     * @param is the input stream
+     * @return the content of the input stream represented as a string
      * @throws IOException signals that an I/O exception has occurred
      */
     public static String inputStreamToString(InputStream is) throws IOException {
@@ -323,47 +321,45 @@ public class FileIO {
     }
 
     /**
-     * The Class FileAndObjectResult.
+     * The Class FileAndObjectResult associates a
+     * <code>FileAndObject</code> with a result.
      */
     public static class FileAndObjectResult {
-        
-        /** The return value. */
+
         private FileAndObject returnValue;
-        
-        /** The ex. */
         private Exception ex;
 
         /**
-         * Gets the return value.
+         * Gets the file and object.
          *
-         * @return the return value
+         * @return the file and object
          */
         public FileAndObject getReturnValue() {
             return returnValue;
         }
 
         /**
-         * Sets the return value.
+         * Sets the file and object to return.
          *
-         * @param returnValue the new return value
+         * @param returnValue the file and object to return
          */
         public void setReturnValue(FileAndObject returnValue) {
             this.returnValue = returnValue;
         }
 
         /**
-         * Gets the ex.
+         * Gets the exception associated with this file and object.
          *
-         * @return the ex
+         * @return the associated exception
          */
         public Exception getEx() {
             return ex;
         }
 
         /**
-         * Sets the ex.
+         * Sets the exception associated with this file and object.
          *
-         * @param ex the new ex
+         * @param ex the exception to be associated
          */
         public void setEx(Exception ex) {
             this.ex = ex;
@@ -371,15 +367,15 @@ public class FileIO {
     }
 
     /**
-     * Gets the obj from filesystem.
+     * Gets the file and object from a file system.
      *
-     * @param parent the parent
-     * @param title the title
-     * @param startDir the start dir
-     * @param fileFilter the file filter
-     * @return the obj from filesystem
+     * @param parent the frame to use for presenting the file dialog
+     * @param title the title of the file dialog
+     * @param startDir the directory to start with for locating files
+     * @param fileFilter the filter to apply to the files
+     * @return the file and object found
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ClassNotFoundException the class not found exception
+     * @throws ClassNotFoundException indicates a specified class was not found
      */
     public static FileAndObject getObjFromFilesystem(final Frame parent, final String title, final String startDir,
             final FilenameFilter fileFilter) throws IOException, ClassNotFoundException {
@@ -401,7 +397,6 @@ public class FileIO {
                             returnValue.setEx(e);
                         }
                     }
-
                 });
             } catch (InterruptedException e) {
                 throw new IOException(returnValue.getEx().getMessage(), e);
@@ -416,13 +411,13 @@ public class FileIO {
     }
 
     /**
-     * Gets the file.
+     * Gets the file from the specified location.
      *
-     * @param parent the parent
-     * @param title the title
-     * @param startDir the start dir
-     * @param fileFilter the file filter
-     * @return the file
+     * @param parent the frame to use for presenting the file dialog
+     * @param title the title of the file dialog
+     * @param startDir the directory to start with for locating files
+     * @param fileFilter the filter to apply to the files
+     * @return the file found, <code>null</code> if none are found
      */
     public static File getFile(Frame parent, String title, String startDir,
             FilenameFilter fileFilter) {
@@ -443,10 +438,10 @@ public class FileIO {
         if (fd.getFile() != null) {
             File f = new File(fd.getDirectory(), fd.getFile());
             if (f.exists()) {
-                return f;                
+                return f;
             }
             File d = new File(fd.getDirectory());
-            for (File child: d.listFiles()) {
+            for (File child : d.listFiles()) {
                 if (child.getName().startsWith(fd.getFile())) {
                     return child;
                 }
@@ -455,18 +450,17 @@ public class FileIO {
         return null;
     }
 
-    
     /**
-     * Gets the obj from filesystem core.
+     * Gets the file and object from file system core.
      *
-     * @param parent the parent
-     * @param title the title
-     * @param startDir the start dir
-     * @param fileFilter the file filter
-     * @return the obj from filesystem core
+     * @param parent the frame to use for presenting the file dialog
+     * @param title the title of the file dialog
+     * @param startDir the directory to start with for locating files
+     * @param fileFilter the filter to apply to the files
+     * @return the file and object found
      * @throws FileNotFoundException if a specified file was not found
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ClassNotFoundException the class not found exception
+     * @throws ClassNotFoundException indicates a specified class was not found
      */
     private static FileAndObject getObjFromFilesystemCore(Frame parent, String title, String startDir,
             FilenameFilter fileFilter) throws FileNotFoundException, IOException, ClassNotFoundException {
@@ -497,47 +491,48 @@ public class FileIO {
     }
 
     /**
-     * The Class FileResult.
+     * The Class FileResult associates a
+     * <code>Exception</code> with an
+     * <code>Exception</code>.
      */
     public static class FileResult {
+
         
-        /** The return value. */
         private File returnValue;
         
-        /** The ex. */
         private Exception ex;
 
         /**
-         * Gets the return value.
+         * Gets the file associated with this file and result.
          *
-         * @return the return value
+         * @return the associated file
          */
         public File getReturnValue() {
             return returnValue;
         }
 
         /**
-         * Sets the return value.
+         * Sets the file to be returned.
          *
-         * @param returnValue the new return value
+         * @param returnValue the file to associate
          */
         public void setReturnValue(File returnValue) {
             this.returnValue = returnValue;
         }
 
         /**
-         * Gets the ex.
+         * Gets the exception associated with this file and result.
          *
-         * @return the ex
+         * @return the associated exception
          */
         public Exception getEx() {
             return ex;
         }
 
         /**
-         * Sets the ex.
+         * Sets the exception associated with this file and result.
          *
-         * @param ex the new ex
+         * @param ex the exception to associate
          */
         public void setEx(Exception ex) {
             this.ex = ex;
@@ -545,14 +540,14 @@ public class FileIO {
     }
 
     /**
-     * Write obj to filesystem.
+     * Writes an object to file system.
      *
-     * @param parent the parent
-     * @param title the title
-     * @param startDir the start dir
-     * @param defaultFile the default file
-     * @param obj the obj
-     * @return the file
+     * @param parent the frame to use for presenting the file dialog
+     * @param title the title of the file dialog
+     * @param startDir the directory to start with for locating files
+     * @param defaultFile the default file for the file dialog
+     * @param obj the object to write
+     * @return the written file
      * @throws IOException signals that an I/O exception has occurred
      */
     public static File writeObjToFilesystem(final Frame parent, final String title, final String startDir,
@@ -567,14 +562,13 @@ public class FileIO {
                     public void run() {
                         try {
                             returnValue.setReturnValue(writeObjeToFilesystemCore(parent, title, startDir, defaultFile,
-                                obj));
+                                    obj));
                         } catch (FileNotFoundException e) {
                             returnValue.setEx(e);
                         } catch (IOException e) {
                             returnValue.setEx(e);
                         }
                     }
-
                 });
             } catch (InterruptedException e) {
                 throw new IOException(returnValue.getEx().getMessage(), e);
@@ -589,14 +583,14 @@ public class FileIO {
     }
 
     /**
-     * Write obje to filesystem core.
+     * Writes an object to file system.
      *
-     * @param parent the parent
-     * @param title the title
-     * @param startDir the start dir
-     * @param defaultFile the default file
-     * @param obj the obj
-     * @return the file
+     * @param parent the frame to use for presenting the file dialog
+     * @param title the title of the file dialog
+     * @param startDir the directory to start with for locating files
+     * @param defaultFile the default file for the file dialog
+     * @param obj the object to write
+     * @return the written file
      * @throws FileNotFoundException if a specified file was not found
      * @throws IOException signals that an I/O exception has occurred
      */
@@ -623,16 +617,16 @@ public class FileIO {
     }
 
     /**
-     * Write obj xml to filesystem.
+     * Writes an xml object to a file system.
      *
-     * @param parent the parent
-     * @param title the title
-     * @param startDir the start dir
-     * @param defaultFile the default file
-     * @param obj the obj
-     * @param delegates the delegates
-     * @param owner the owner
-     * @return the file
+     * @param parent the frame to use for presenting the file dialog
+     * @param title the title of the file dialog
+     * @param startDir the directory to start with for locating files
+     * @param defaultFile the default file for the file dialog
+     * @param obj the object to write
+     * @param delegates the delegates associated with the xml object
+     * @param owner the owner associated with the xml object
+     * @return the written file
      * @throws IOException signals that an I/O exception has occurred
      */
     public static File writeObjXmlToFilesystem(final Frame parent, final String title, final String startDir,
@@ -641,7 +635,7 @@ public class FileIO {
         final FileResult returnValue = new FileResult();
         if (SwingUtilities.isEventDispatchThread()) {
             returnValue.setReturnValue(writeObjXmlToFilesystemCore(parent, title, startDir, defaultFile, obj,
-                delegates, owner));
+                    delegates, owner));
         } else {
             try {
                 SwingUtilities.invokeAndWait(new Runnable() {
@@ -649,14 +643,13 @@ public class FileIO {
                     public void run() {
                         try {
                             returnValue.setReturnValue(writeObjXmlToFilesystemCore(parent, title, startDir,
-                                defaultFile, obj, delegates, owner));
+                                    defaultFile, obj, delegates, owner));
                         } catch (FileNotFoundException e) {
                             returnValue.setEx(e);
                         } catch (IOException e) {
                             returnValue.setEx(e);
                         }
                     }
-
                 });
             } catch (InterruptedException e) {
                 throw new IOException(returnValue.getEx().getMessage(), e);
@@ -672,16 +665,16 @@ public class FileIO {
     }
 
     /**
-     * Write obj xml to filesystem core.
+     * Writes an xml object to a file system.
      *
-     * @param parent the parent
-     * @param title the title
-     * @param startDir the start dir
-     * @param defaultFile the default file
-     * @param obj the obj
-     * @param delegates the delegates
-     * @param owner the owner
-     * @return the file
+     * @param parent the frame to use for presenting the file dialog
+     * @param title the title of the file dialog
+     * @param startDir the directory to start with for locating files
+     * @param defaultFile the default file for the file dialog
+     * @param obj the object to write
+     * @param delegates the delegates associated with the xml object
+     * @param owner the owner associated with the xml object
+     * @return the written file
      * @throws FileNotFoundException if a specified file was not found
      * @throws IOException signals that an I/O exception has occurred
      */
@@ -725,12 +718,11 @@ public class FileIO {
     /**
      * Accepts a string with regular expressions and possibly /../ portions.
      * Removes the /../ sections, by substituting the higher named directory,
-     * and
-     * then returns the first file in the file system that matches the
+     * and then returns the first file in the file system that matches the
      * optionally included regular expression.
      *
-     * @param s the s
-     * @return the file
+     * @param s the string to normalize
+     * @return the found file
      */
     public static File normalizeFileStr(String s) {
         // System.out.println("s" + s);
@@ -766,10 +758,10 @@ public class FileIO {
     }
 
     /**
-     * Normalize file string.
+     * Gets and string representing the normalized path of a file.
      *
-     * @param f the f
-     * @return the string
+     * @param f the file specifying the path
+     * @return the string representation of the path
      */
     private static String normalizeFileString(File f) {
         // return f.getAbsolutePath().replace("/", " ").replace("-", " ");
@@ -781,11 +773,11 @@ public class FileIO {
     }
 
     /**
-     * Match pattern.
+     * Returns a file found in the specified directory based on the given <code>pattern</code>.
      *
-     * @param p the p
-     * @param pattern the pattern
-     * @return the file
+     * @param p the parent directory
+     * @param pattern the pattern representing a regular expression
+     * @return a file matching the given pattern, <code>null</code> if none found
      */
     private static File matchPattern(File p, Pattern pattern) {
         for (File f : p.listFiles()) {
@@ -809,9 +801,9 @@ public class FileIO {
     /**
      * Returns a String of the relative directory of a file, relative to the
      * <code>user.dir</code> System property.
-     * 
+     *
      * @param f the file to get the relative directory of.
-     * @return a String of the relative directory.
+     * @return a String representing the relative directory.
      */
     public static String getRelativePath(File f) {
         File startupDir = new File(System.getProperty("user.dir"));
@@ -834,24 +826,24 @@ public class FileIO {
         relativePath.append(fileAbsolutePath.substring(parent.getAbsolutePath().length() + 1));
         return relativePath.toString();
     }
-    
+
     /**
      * Returns a String of the relative directory of a file, relative to the
-     * <code>user.dir</code> System property.
+     * specified <code>directory</code>.
      *
      * @param f the file to get the relative directory of.
-     * @param dir the dir
-     * @return a String of the relative directory.
+     * @param directory the directory
+     * @return a String representing the relative directory.
      */
-    public static String getPathRelativeToDir(File f, File dir) {
-        String startupDirString = dir.getAbsolutePath();
+    public static String getPathRelativeToDir(File f, File directory) {
+        String startupDirString = directory.getAbsolutePath();
         String fileAbsolutePath = f.getAbsolutePath();
         if (fileAbsolutePath.contains(startupDirString)) {
             return fileAbsolutePath.substring(startupDirString.length() + 1);
         }
 
         int depth = 1;
-        File parent = dir.getParentFile();
+        File parent = directory.getParentFile();
         while (fileAbsolutePath.contains(parent.getAbsolutePath()) == false) {
             depth++;
             parent = parent.getParentFile();
@@ -865,23 +857,24 @@ public class FileIO {
     }
 
     /**
-     * Gets the normalized relative path.
+     * Gets the normalized version of a relative path.
      *
-     * @param f the f
-     * @return the normalized relative path
+     * @param f the file to use for finding the relative path
+     * @return the normalized String representing the relative path
      */
     public static String getNormalizedRelativePath(File f) {
         return getRelativePath(f).replace('\\', '/');
     }
 
     /**
-     * Recursive get files.
+     * Gets the files within the specified directory. Can filter by the start or end of the file name.
      *
-     * @param rootFile the root file
-     * @param prefix the prefix
-     * @param suffix the suffix
-     * @param excludeHidden the exclude hidden
-     * @return the list
+     * @param rootFile the parent directory
+     * @param fileList the list to add the found files to
+     * @param prefix the prefix of the desired files
+     * @param suffix the suffix of the desired file
+     * @param excludeHidden set to <code>true</code> to exclude hidden files
+     * @return a list of files that were found
      */
     public static List<File> recursiveGetFiles(File rootFile, String prefix, String suffix, boolean excludeHidden) {
         List<File> fileList = new ArrayList<File>();
@@ -890,18 +883,17 @@ public class FileIO {
     }
 
     /**
-     * Recursive get files.
+     * Gets the files within the specified directory. Can filter by the start or end of the file name.
      *
-     * @param rootFile the root file
-     * @param fileList the file list
-     * @param prefix the prefix
-     * @param suffix the suffix
-     * @param excludeHidden the exclude hidden
+     * @param rootFile the parent directory
+     * @param fileList the list to add the found files to
+     * @param prefix the prefix of the desired files
+     * @param suffix the suffix of the desired file
+     * @param excludeHidden set to <code>true</code> to exclude hidden files
      */
     private static void recursiveGetFiles(File rootFile, List<File> fileList, final String prefix, final String suffix,
             final boolean excludeHidden) {
         File[] children = rootFile.listFiles(new FileFilter() {
-
             @Override
             public boolean accept(File child) {
                 if (excludeHidden) {
@@ -929,5 +921,4 @@ public class FileIO {
             }
         }
     }
-
 }

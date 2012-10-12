@@ -79,7 +79,7 @@ public class TkRefexUuidFloatRevision extends TkRevision {
     * @param in the in
     * @param dataVersion the data version
     * @throws IOException signals that an I/O exception has occurred
-    * @throws ClassNotFoundException the class not found exception
+    * @throws ClassNotFoundException indicates a specified class was not found
     */
    public TkRefexUuidFloatRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       super();

@@ -99,7 +99,7 @@ public class UuidDupFinder implements ProcessUnfetchedConceptDataBI {
      * Instantiates a new uuid dup finder.
      *
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ClassNotFoundException the class not found exception
+     * @throws ClassNotFoundException indicates a specified class was not found
      */
     public UuidDupFinder() throws IOException, ClassNotFoundException {
         nidset = Ts.get().getAllConceptNids();

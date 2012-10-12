@@ -72,7 +72,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      *
      * @return the uuid
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      */
     public UUID computeMemberComponentUuid() throws IOException, InvalidCAB {
         try {
@@ -93,7 +93,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      * Sets the member content uuid.
      *
      * @return the uuid
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws IOException signals that an I/O exception has occurred
      */
     public UUID setMemberContentUuid() throws InvalidCAB, IOException {
@@ -109,7 +109,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      * @return A
      * <code>UUID</code> based on a Type 5 generator that uses the content
      * fields of the refex.
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws IOException signals that an I/O exception has occurred
      */
     public UUID computeMemberContentUuid() throws InvalidCAB, IOException {
@@ -162,7 +162,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      * @param prop the prop
      * @return the primordial uuid string for nid prop
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      */
     private String getPrimordialUuidStringForNidProp(RefexProperty prop)
             throws IOException, InvalidCAB {
@@ -204,7 +204,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      * @param referencedComponentNid the referenced component nid
      * @param collectionNid the collection nid
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public RefexCAB(TK_REFEX_TYPE memberType,
@@ -224,7 +224,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      * @param refexVersion the refex version
      * @param viewCoordinate the view coordinate
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public RefexCAB(TK_REFEX_TYPE memberType,
@@ -246,7 +246,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      * @param refexVersion the refex version
      * @param viewCoordinate the view coordinate
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
      */
     public RefexCAB(TK_REFEX_TYPE memberType,
@@ -974,7 +974,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
     /**
      * Sets the content uuid.
      *
-     * @throws InvalidCAB the invalid cab
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws IOException signals that an I/O exception has occurred
      */
     public void setContentUuid() throws InvalidCAB, IOException {

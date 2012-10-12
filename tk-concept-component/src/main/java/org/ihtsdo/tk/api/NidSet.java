@@ -42,7 +42,7 @@ public class NidSet implements NidSetBI, Serializable {
    *
    * @param in the in
    * @throws IOException signals that an I/O exception has occurred
-   * @throws ClassNotFoundException the class not found exception
+   * @throws ClassNotFoundException indicates a specified class was not found
    */
   private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
       int objDataVersion = in.readInt();

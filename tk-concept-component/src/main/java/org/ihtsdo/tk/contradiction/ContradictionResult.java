@@ -16,7 +16,6 @@
  */
 package org.ihtsdo.tk.contradiction;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Enum ContradictionResult lists the types of contradiction that could
  * occur.
