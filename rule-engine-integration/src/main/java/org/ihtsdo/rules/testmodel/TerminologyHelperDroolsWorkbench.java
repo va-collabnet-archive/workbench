@@ -299,26 +299,31 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 
                         for (DescriptionVersionBI part_search : 
                                 potential_match.getVersions(Terms.get().getActiveAceFrameConfig().getViewCoordinate())) {
-                            String text1 = "";
-                            String text2 = "";
+                            String part_searchText1 = "";
+                            String descText2 = "";
 
-//                            if (part_search.getText().contains("(") && part_search.getText().indexOf("(") > 2) {
-//                                text1 = part_search.getText().substring(0, part_search.getText().lastIndexOf("(")-1).toLowerCase().trim();
-//                            } else {
-//                                text1 = part_search.getText().toLowerCase().trim();
-//                            }
-//                            
-//                            if (descText.contains("(")  && descText.indexOf("(") > 2) {
-//                                text2 = descText.substring(0, descText.lastIndexOf("(")-1).toLowerCase().trim();
-//                            } else {
-//                                text2 = descText.toLowerCase().trim();
-//                            }
+                            if (part_search.getText().contains("(") 
+                                    && part_search.getText().indexOf("(") > 2
+                                    && part_search.getText().endsWith(")")) {
+                                part_searchText1 = part_search.getText().substring(0, part_search.getText().lastIndexOf("(")-1).toLowerCase().trim();
+                            } else {
+                                part_searchText1 = part_search.getText().toLowerCase().trim();
+                            }
+                            
+                            if (descText.contains("(")  
+                                    && descText.indexOf("(") > 2
+                                    && descText.endsWith(")")) {
+                                descText2 = descText.substring(0, descText.lastIndexOf("(")-1).toLowerCase().trim();
+                            } else {
+                                descText2 = descText.toLowerCase().trim();
+                            }
                             
                             if (allowedStatusNids.contains(part_search.getStatusNid())
-                                    && (part_search.getText().toLowerCase().equals(descText.toLowerCase()) 
-                                        )) {
-                                // removed || (text1.equals(text2) && metadataConversor.getRf2Value(part_search.getTypeNid()) == fsnRf2Nid ))
-                                //    && isParentOf(hierarchyConceptUuid, tf.nidToUuid(cnid).toString()
+                                    && (part_search.getText().toLowerCase().equals(descText.toLowerCase())
+                                    || part_searchText1.equals(descText2)
+                                    || part_search.getText().toLowerCase().equals(descText2)
+                                    || part_searchText1.equals(descText.toLowerCase()))
+                                    && isParentOf(hierarchyConceptUuid, tf.nidToUuid(cnid).toString())) { 
                                 unique = false;
                                 break search;
                             }
