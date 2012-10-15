@@ -57,11 +57,11 @@ public class WorkflowHandler implements WorkflowHandlerBI {
 
 	@Override
 	public boolean hasAction(Collection<? extends WorkflowHistoryJavaBeanBI> beans,ConceptSpec action) 
-		throws IOException, ContradictionException 
+		throws IOException
 	{
 		for (WorkflowHistoryJavaBeanBI bean : beans)
 		{
-			if (bean.getAction().equals(action.getUuids()[0]))
+			if (bean.getAction().equals(action.getLenient().getPrimUuid()))
 				return true;
 		}
 		
@@ -69,7 +69,7 @@ public class WorkflowHandler implements WorkflowHandlerBI {
 	}
 
 	@Override
-	public boolean isActiveAction(
+	public boolean hasAction(
 			Collection<? extends WorkflowHistoryJavaBeanBI> possibleActions, UUID action) 
 	{
 			for (WorkflowHistoryJavaBeanBI bean : possibleActions)
