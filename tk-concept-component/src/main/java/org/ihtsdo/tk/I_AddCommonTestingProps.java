@@ -1,81 +1,84 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.tk;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Interface I_AddCommonTestingProps.
+ * The Interface I_AddCommonTestingProps contains methods for interacting with
+ * terminology generic test properties.
  */
 public interface I_AddCommonTestingProps {
-	
-	/**
-	 * Is published.
-	 *
-	 * @return the boolean
-	 */
-	public Boolean isPublished();
-	
-	/**
-	 * Sets the published.
-	 *
-	 * @param published the new published
-	 */
-	public void setPublished(Boolean published);
-	
-	/**
-	 * Is new component.
-	 *
-	 * @return the boolean
-	 */
-	public Boolean isNewComponent();
-	
-	/**
-	 * Sets the new component.
-	 *
-	 * @param newComponent the new new component
-	 */
-	public void setNewComponent(Boolean newComponent);
-	
-	/**
-	 * Is changed component.
-	 *
-	 * @return the boolean
-	 */
-	public Boolean isChangedComponent();
-	
-	/**
-	 * Sets the changed component.
-	 *
-	 * @param changedComponent the new changed component
-	 */
-	public void setChangedComponent(Boolean changedComponent);
 
-	/**
-	 * Is retired.
-	 *
-	 * @return the boolean
-	 */
-	public Boolean isRetired();
-	
-	/**
-	 * Sets the retired.
-	 *
-	 * @param retired the new retired
-	 */
-	public void setRetired(Boolean retired);
+    /**
+     * Tests if the component is set as published.
+     *
+     * @return <code>true</code> if the component is published
+     */
+    public Boolean isPublished();
 
+    /**
+     * Sets the component as published.
+     *
+     * @param published set to <code>true</code> to indicate the component is
+     * published
+     */
+    public void setPublished(Boolean published);
+
+    /**
+     * Tests if the component is set as new.
+     *
+     * @return <code>true</code</code> if the component is new
+     */
+    public Boolean isNewComponent();
+
+    /**
+     * Sets the component as new.
+     *
+     * @param newComponent set to <code>true</code> to indicate the component is
+     * new
+     */
+    public void setNewComponent(Boolean newComponent);
+
+    /**
+     * Tests if the component is set as changed.
+     *
+     * @return <code>true</code</code> if the component is changed
+     */
+    public Boolean isChangedComponent();
+
+    /**
+     * Sets the component as changed.
+     *
+     * @param changedComponent set to <code>true</code> to indicate the
+     * component has changed
+     */
+    public void setChangedComponent(Boolean changedComponent);
+
+    /**
+     * Tests if the component is set as retired.
+     *
+     * @return <code>true</code</code> if the component is retired
+     */
+    public Boolean isRetired();
+
+    /**
+     * Sets the component as retired.
+     *
+     * @param retired set to <code>true</code> to indicate the component is
+     * retired
+     */
+    public void setRetired(Boolean retired);
 }

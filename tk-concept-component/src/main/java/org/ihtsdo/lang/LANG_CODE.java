@@ -18,10 +18,13 @@ package org.ihtsdo.lang;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Enum LANG_CODE.
- * TODO-javadoc: Alo says that the dialect is no longer part of the language, are we using these?
+ * The Enum LANG_CODE represents a two or six character representation of the
+ * language or language and dialect code respectively. If the language has a
+ * dialect, the dialect is represented by a dash and two characters following
+ * the language.
  *
- * @see http://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
+ * @see <a
+ * href="http://en.wikipedia.org/wiki/List_of_ISO_639-1_codes">http://en.wikipedia.org/wiki/List_of_ISO_639-1_codes</a>
  */
 public enum LANG_CODE {
 
@@ -35,7 +38,7 @@ public enum LANG_CODE {
     EN_AU,
     /**
      * English (Belize).
-     * 
+     *
      */
     EN_BZ,
     /**
@@ -64,18 +67,13 @@ public enum LANG_CODE {
     EN_TT,
     /**
      * English (United States).
-     * 
+     *
      */
     EN_US,
     /**
      * English (South African).
      */
     EN_ZA,
-    /**
-     * Lithuanian.
-     * TODO-javadoc: should be lt for 639-1 standard
-     */
-    LIT,
     /**
      * Spanish.
      */
@@ -136,10 +134,6 @@ public enum LANG_CODE {
      * Spanish (Peru).
      */
     ES_PE,
-    /**
-     * TODO-javadoc: can't find this
-     */
-    ES_ER,
     /**
      * Spanish (Paraguay).
      */
@@ -233,11 +227,11 @@ public enum LANG_CODE {
      */
     ZH_HK,
     /**
-     * The zh chs.
+     * Chinese (Simplified).
      */
     ZH_CHS,
     /**
-     * The zh cht.
+     * Chinese (Traditional).
      */
     ZH_CHT,
     /**
@@ -245,20 +239,20 @@ public enum LANG_CODE {
      */
     ZH_MO,
     /**
-     * The zh sg.
+     * Chinese (Singapore).
      */
     ZH_SG,
     /**
-     * The zh tw.
+     * Chinese (Taiwan).
      */
     ZH_TW,
     /**
-     * The en zz.
+     * Unspecified.
      */
-    EN_ZZ;
+    ZZ;
 
     /**
-     * Gets the formated language code.
+     * Gets a formated language code.
      *
      * @return the string representing the language code and dialect code
      */
@@ -275,9 +269,9 @@ public enum LANG_CODE {
     }
 
     /**
-     * Gets the formated language without a dialect code.
+     * Gets a formated language without a dialect code.
      *
-     * @return the string representing the language code with no dialect code
+     * @return a two character string representing the language code with no dialect code
      */
     public String getFormatedLanguageNoDialectCode() {
         String name = this.name();
@@ -286,10 +280,10 @@ public enum LANG_CODE {
     }
 
     /**
-     * Gets the lang code.
+     * Gets a <code>LANG_CODE</code> representing the given <code>name</code>.
      *
-     * @param name the string representing the language code
-     * @return the lang code
+     * @param name the two or six character string representing the language code
+     * @return the specified LANG_CODE
      */
     public static LANG_CODE getLangCode(String name) {
         String result = null;
@@ -302,8 +296,11 @@ public enum LANG_CODE {
         return LANG_CODE.valueOf(result);
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Enum#toString()
+    /**
+     * Returns a string representation of this LANG_CODE.
+     * 
+     * @return a string representation of this LANG_CODE
+     * @see LANG_CODE#name() 
      */
     @Override
     public String toString() {

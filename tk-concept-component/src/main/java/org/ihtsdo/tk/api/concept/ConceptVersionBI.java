@@ -52,17 +52,18 @@ import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI {
 
     /**
-     * A way of being able to declare constraints on a concept.
-     * 
-     * TODO-javadoc: need to fix this
+     * Checks if this concept satisfies the given
+     * <code>constraint</code>. The constraint check type can be: ignore,
+     * equals, kind of, or regex.
      *
-     * @param constraint the constraint to check which contains a source, type, and value (source/type/target)
-     * @param subjectCheck the subject check - source
-     * @param propertyCheck the property check - type
-     * @param valueCheck the value check - target
-     * @return <code>true</code>, if successful
+     * @param constraint the constraint to check
+     * @param subjectCheck the subject check type
+     * @param propertyCheck the property check type
+     * @param valueCheck the value check type
+     * @return <code>true</code>, if the concept meets the constraint
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException indicates more than one version was found
+     * for a given position
      */
     boolean satisfies(ConstraintBI constraint, ConstraintCheckType subjectCheck,
             ConstraintCheckType propertyCheck, ConstraintCheckType valueCheck)
@@ -92,7 +93,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * or that is a member of this concept, if the concept is a refset.
      *
      * @param refsetNid the nid of the refset in question
-     * @return the specified active refex members, an
+     * @return the specified active refex members, an *
      * empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred
      */
@@ -114,7 +115,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * component or that is a member of this concept, if the concept is a
      * refset.
      *
-     * @return any active refset members for this version, an
+     * @return any active refset members for this version, an *
      * empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException if there are differing versions of the
@@ -141,7 +142,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * <code>typeNid</code>.
      *
      * @param typeNid the nid associated with the desired type of description
-     * @return the specified active descriptions, an
+     * @return the specified active descriptions, an *
      * empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException if differing active descriptions are found
@@ -156,7 +157,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      *
      * @param typeNids the nids associated with the desired types of
      * descriptions
-     * @return the specified active descriptions, an
+     * @return the specified active descriptions, an *
      * empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException if differing active descriptions are found
@@ -188,7 +189,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
     /**
      * Gets active media associated with this version.
      *
-     * @return the active media for this version, an
+     * @return the active media for this version, an *
      * empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException if differing media is found for this
@@ -197,11 +198,12 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
     Collection<? extends MediaVersionBI> getMediaActive() throws IOException, ContradictionException;
 
     /**
-     * Gets a list of concept nids which represent the sequence of concepts to 
-     * navigate from this concept version to the root. Each list in the collection
-     * represents an independent path.
+     * Gets a list of concept nids which represent the sequence of concepts to
+     * navigate from this concept version to the root. Each list in the
+     * collection represents an independent path.
      *
-     * @return a collection of lists representing the paths from this concept to the root
+     * @return a collection of lists representing the paths from this concept to
+     * the root
      * @throws IOException signals that an I/O exception has occurred
      */
     Collection<List<Integer>> getNidPathsToRoot() throws IOException;
@@ -210,7 +212,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * Gets the active preferred descriptions for this version.
      *
      * @return the active preferred descriptions, more than one can be returned
-     * if there were simultaneous edits of the preferred term, an
+     * if there were simultaneous edits of the preferred term, an *
      * empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred
      */
@@ -232,7 +234,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * component or that is a member of this concept, if the concept is a
      * refset.
      *
-     * @return active refset members for this version, an
+     * @return active refset members for this version, an *
      * empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException if differing refset members are found for
@@ -243,7 +245,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
     /**
      * Gets all the relationship groups for this version regardless of status.
      *
-     * @return all the relationship groups for this version, an
+     * @return all the relationship groups for this version, an *
      * empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException if differing relationship groups are found
@@ -252,7 +254,8 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
     Collection<? extends RelationshipGroupVersionBI> getRelationshipGroups() throws IOException, ContradictionException;
 
     /**
-     * Gets active target relationships for this version. TODO-javadoc: renaming?
+     * Gets active target relationships for this version. TODO-javadoc:
+     * renaming?
      *
      * In the relationship A is a B, the concept A has a target relationship to
      * the concept B, and the concept B has a source relationship to the concept
@@ -276,7 +279,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * the concept B, and the concept B has a source relationship to the concept
      * A.
      *
-     * @return the active target "is a" relationships, an
+     * @return the active target "is a" relationships, an *
      * empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException if differing "is a" relationships are
@@ -437,7 +440,8 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
     Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConceptsIsa() throws IOException;
 
     /**
-     * Gets active source relationships for this version. TODO-javadoc: renaming?
+     * Gets active source relationships for this version. TODO-javadoc:
+     * renaming?
      *
      * In the relationship A is a B, the concept A has a target relationship to
      * the concept B, and the concept B has a source relationship to the concept
@@ -461,7 +465,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * the concept B, and the concept B has a source relationship to the concept
      * A.
      *
-     * @return the active source "is a" relationships, an
+     * @return the active source "is a" relationships, an *
      * empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException if differing "is a" relationships are
@@ -757,7 +761,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
     /**
      * @param viewCoordinate the view coordinate specifying which version of the
      * concept to make a blueprint of
-     * @return the concept blueprint, which can be constructed to create
+     * @return the concept blueprint, which can be constructed to create *
      * a <code>ConceptChronicleBI</code>
      * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException if more than one version of the

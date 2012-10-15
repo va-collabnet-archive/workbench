@@ -114,12 +114,11 @@ public interface ConceptChronicleBI extends ComponentChronicleBI<ConceptVersionB
      * the
      * <code>componentNid</code> is a referenced component.
      *
-     * TODO-javadoc: is this only for refsets?
      *
      * @param viewCoordinate the view coordinate specifying which refset members
      * are active or inactive
      * @param componentNid the nid associated with the component in question
-     * @return the active refset member which have the specified component as a
+     * @return the active refset member which has the specified component as a
      * referenced component, <code>null</code> if none are found
      * @throws IOException signals that an I/O exception has occurred
      */

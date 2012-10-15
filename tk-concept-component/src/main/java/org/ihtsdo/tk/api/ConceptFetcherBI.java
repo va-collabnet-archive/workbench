@@ -51,7 +51,7 @@ public interface ConceptFetcherBI {
     * random updates.
     *
     * @param conceptChronicle the concept chronicle to update
-    * @throws Exception indicates an exception has occurred TODO-javadoc: how to document exception?
+    * @throws Exception indicates an exception has occurred
     */
    void update(ConceptChronicleBI conceptChronicle) throws Exception;
 }
