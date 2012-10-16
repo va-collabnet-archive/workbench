@@ -32,6 +32,9 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import org.ihtsdo.util.swing.GuiUtil;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+
 class UpdateTreeSpec extends SwingWorker<RefsetSpecTreeNode, Object> {
    private static int count = 0;
 
@@ -61,6 +64,9 @@ class UpdateTreeSpec extends SwingWorker<RefsetSpecTreeNode, Object> {
    private int                    specScrollHorizValue;
    private int                    specScrollVertValue;
 
+   /** By default, allow all clause nodes */
+   private Predicate<I_ExtendByRef> clauseFilter = Predicates.alwaysTrue();
+   
    //~--- constructors --------------------------------------------------------
 
    /**
@@ -112,6 +118,7 @@ class UpdateTreeSpec extends SwingWorker<RefsetSpecTreeNode, Object> {
 
       commentTable = refsetSpecEditor.getRefsetSpecPanel().createCommentTable(
          this.refsetSpecEditor.ace.getAceFrameConfig(), this.refsetSpecEditor);
+      
       specScrollHorizValue    = this.refsetSpecEditor.specTreeScroller.getHorizontalScrollBar().getValue();
       specScrollVertValue     = this.refsetSpecEditor.specTreeScroller.getVerticalScrollBar().getValue();
       commentScrollHorizValue = this.refsetSpecEditor.commentScroller.getHorizontalScrollBar().getValue();
@@ -277,8 +284,8 @@ class UpdateTreeSpec extends SwingWorker<RefsetSpecTreeNode, Object> {
             return;
          }
 
-         DefaultTreeModel tm = (DefaultTreeModel) this.refsetSpecEditor.specTree.getModel();
-
+         DefaultTreeModel tm = new RefexTreeModel(root, clauseFilter);
+         refsetSpecEditor.specTree.setModel(tm);
          tm.setRoot(root);
 
          if (cancel) {
