@@ -191,8 +191,9 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements
 	 */
 	private static final long serialVersionUID = 1L;
 
+	
 	public int compareTo(RefsetSpecTreeNode o) {
-
+	    // TODO fix this implementation so it follows the actual contract of Comparable
 		if (o == null) {
 			return -1;
 		}
@@ -344,24 +345,10 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements
 	public boolean sortChildren() {
 		if (children != null) {
 			try {
-
-				// ArrayList<RefsetSpecTreeNode> childNodes = new
-				// ArrayList<RefsetSpecTreeNode>();
-				//
-				// Iterator it = children.iterator();
-				//
-				// while (it.hasNext()) {
-				// RefsetSpecTreeNode refSpecNode = (RefsetSpecTreeNode) it
-				// .next();
-				// if (refSpecNode != null) {
-				// childNodes.add(refSpecNode);
-				// AceLog.getAppLog().info("refSpecNode");
-				// }
-				// }
-
 				Collections.sort(children);
-			} catch (Exception ex) {
-				ex.printStackTrace();
+			} catch (IllegalArgumentException ex) {
+				// the new Java 7 TimSort routine barfs on the implementation of
+			    // Comparable in RefsetSpecTreeNode
 			}
 			return true;
 		}
