@@ -452,13 +452,9 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
             AceLog.getAppLog().info("treeHelper.getRenderer() == null");
         }
         
-       // this.localEditState = EditState.READONLY;
-       // AceLog.getAppLog().info("updatePanel localEditState = "+localEditState);
-      //  reInitToggleBar();
-        
     }
 
-    public synchronized void updateSpecTree(boolean clearSelection) {
+    /* package */ synchronized void updateSpecTree(boolean clearSelection) {
         refsetSpecConcept = null;
 
         if (clearSelection) {
