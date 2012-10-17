@@ -18,7 +18,6 @@ package org.ihtsdo.tk.api.ext;
 
 import java.util.UUID;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Interface I_DescribeExternally is implemented by the TK Description
  * classes provides methods to access the information associated with

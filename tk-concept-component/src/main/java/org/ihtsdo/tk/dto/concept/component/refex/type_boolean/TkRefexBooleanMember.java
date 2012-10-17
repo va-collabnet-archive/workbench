@@ -36,7 +36,6 @@ import java.util.*;
 import org.ihtsdo.tk.dto.RevisionHandling;
 import org.ihtsdo.tk.dto.concept.component.refex.type_string.TkRefsetStrRevision;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class TkRefexBooleanMember represents a boolean type refex member in the
  * eConcept format and contains methods specific for interacting with a boolean
@@ -249,7 +248,6 @@ public class TkRefexBooleanMember extends TkRefexAbstractMember<TkRefexBooleanRe
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException indicates a specified class was not found
-     * TODO-javadoc: why?
      */
     @Override
     public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

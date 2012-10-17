@@ -21,7 +21,6 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class SnomedMetadataRfx contains methods which retrieve either the
  * Release Format 1 (RF1) or Release Format 2 (RF2) metatdata values for a

@@ -25,7 +25,6 @@ import java.util.UUID;
 import org.ihtsdo.tk.api.refex.type_array_of_bytearray.RefexArrayOfBytearrayVersionBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class TkRefexArrayOfByteArrayRevision represents a version of an array of
  * byte array type refex member in the eConcept format and contains methods
@@ -171,7 +170,6 @@ public class TkRefexArrayOfByteArrayRevision extends TkRevision {
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException indicates a specified class was not found
-     * TODO-javadoc: why?
      */
     @Override
     public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

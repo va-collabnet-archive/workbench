@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class TkDescriptionRevision represents a version of a description in the
  * eConcept format and contains methods for interacting with a version of a
@@ -100,7 +99,6 @@ public class TkDescriptionRevision extends TkRevision implements I_DescribeExter
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException indicates a specified class was not found
-     * TODO-javadoc: why?
      */
     public TkDescriptionRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
@@ -206,7 +204,6 @@ public class TkDescriptionRevision extends TkRevision implements I_DescribeExter
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException indicates a specified class was not found
-     * TODO-javadoc: why?
      */
     @Override
     public final void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

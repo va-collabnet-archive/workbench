@@ -20,17 +20,22 @@ import java.util.ArrayList;
 import java.util.List;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 
-// TODO: Auto-generated Javadoc
+
 /**
- * The Class ViewPathLosesStrategy.
+ * The Class ViewPathLosesStrategy implements resolution that
+ * checks if conflicting members are present on the users view path(s), 
+ * and if so, suppresses the members on the view path from participating in the
+ * potential contradiction.
  */
 public class ViewPathLosesStrategy extends ContradictionManagementStrategy {
 
-    /** The Constant serialVersionUID. */
+    
     private static final long serialVersionUID = 1L;
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.api.ContradictionManagerBI#getDescription()
+    /**
+     *
+     * @return a description of this view path loses conflict resolution
+     * strategy
      */
     @Override
     public String getDescription() {
@@ -41,8 +46,10 @@ public class ViewPathLosesStrategy extends ContradictionManagementStrategy {
         + "</html>";
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.api.ContradictionManagerBI#getDisplayName()
+    /**
+     *
+     * @return the display name of this view path loses conflict resolution
+     * strategy
      */
     @Override
     public String getDisplayName() {
@@ -50,8 +57,12 @@ public class ViewPathLosesStrategy extends ContradictionManagementStrategy {
     }
 
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.api.ContradictionManagerBI#resolveVersions(org.ihtsdo.tk.api.ComponentVersionBI, org.ihtsdo.tk.api.ComponentVersionBI)
+    /**
+     *
+     * @param <T> the generic type of component versions
+     * @param part1 the first part
+     * @param part2 the second part
+     * @return parts resolved according to this view path losses strategy
      */
     @Override
     public <T extends ComponentVersionBI> List<T> resolveVersions(T part1, T part2) {
@@ -69,8 +80,12 @@ public class ViewPathLosesStrategy extends ContradictionManagementStrategy {
         return returnValues;
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.api.ContradictionManagerBI#resolveVersions(java.util.List)
+    /**
+     *
+     * @param <T> the generic type of component version
+     * @param versions the versions to resolve
+     * @return the component versions resolved according to this view path
+     * losses strategy
      */
     @Override
     public <T extends ComponentVersionBI> List<T> resolveVersions(List<T> versions) {

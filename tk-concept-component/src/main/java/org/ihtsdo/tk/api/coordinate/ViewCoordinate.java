@@ -38,7 +38,6 @@ import java.io.Serializable;
 
 import java.util.Arrays;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class ViewCoordinate contains specific information which filters a
  * component and allows for different versions of components based on a

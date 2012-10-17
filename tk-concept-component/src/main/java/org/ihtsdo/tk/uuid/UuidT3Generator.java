@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class UuidT3Generator generates a type 3 UUID object. A type 3 UUID is
  * name based and uses MD5 hashing to create the uuid from the given name. This
@@ -34,31 +33,31 @@ import java.util.UUID;
 public class UuidT3Generator {
 
     /**
-     * The Constant SNOMED_ROOT_CONCEPTID.
+     * The SCTID of the SNOMED root concept.
      */
     public static final long SNOMED_ROOT_CONCEPTID = 138875005L;
     /**
-     * The Constant SNOMED_ROOT_DESCID.
+     * The SCTID of the SNOMED description root concept.
      */
     public static final long SNOMED_ROOT_DESCID = 220309016L;
     /**
-     * The Constant SNOMED_ISA_REL.
+     * The SCTID of the "is a" relationship type concept.
      */
     public static final long SNOMED_ISA_REL = 116680003L;
     /**
-     * The Constant SNOMED_ROOT_UUID.
+     * The uuid of the SNOMED root concept.
      */
     public static final UUID SNOMED_ROOT_UUID = UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8");
     /**
-     * The Constant SNOMED_ROOT_DESC_UUID.
+     * The uuid of the SNOMED description root concept.
      */
     public static final UUID SNOMED_ROOT_DESC_UUID = UUID.fromString("5fdbd08a-f7e5-311a-b9f6-3f27e6f43a14");
     /**
-     * The Constant SNOMED_ISA_REL_UUID.
+     * The uuid of the "is a" relationship type concept.
      */
     public static final UUID SNOMED_ISA_REL_UUID = UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25");
     /**
-     * The Constant encoding.
+     * The the encoding string.
      */
     public static final String encoding = "8859_1";
 

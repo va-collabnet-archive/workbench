@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.tk.api;
 
@@ -27,62 +27,62 @@ import org.ihtsdo.tk.Ts;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Class NidSet.
+ * The Class NidSet represents a bit set optimized for use with nids. It should
+ * be used for sets with large numbers of nids. For example, the lists of all
+ * concept identifiers when iterating the database.
  */
 public class NidSet implements NidSetBI, Serializable {
-   
-   /** The Constant dataVersion. */
-   private static final int dataVersion = 1;
 
-   /** The Constant serialVersionUID. */
-   private static final long serialVersionUID = 1L;
-  
-  /**
-   * Read object.
-   *
-   * @param in the in
-   * @throws IOException signals that an I/O exception has occurred
-   * @throws ClassNotFoundException indicates a specified class was not found
-   */
-  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-      int objDataVersion = in.readInt();
+    private static final int dataVersion = 1;
+    private static final long serialVersionUID = 1L;
 
-      if (objDataVersion == 1) {
-          setValues = (int[]) in.readObject();
-      }
-      else {
-         throw new IOException("Can't handle dataversion: " + objDataVersion);
-      }
-   }
+    /**
+     * Reads a
+     * <code>NidSet</code> object from an external source.
+     *
+     * @param in the input stream
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws ClassNotFoundException indicates a specified class was not found
+     */
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        int objDataVersion = in.readInt();
 
-   /**
-    * Write object.
-    *
-    * @param out the out
-    * @throws IOException signals that an I/O exception has occurred
-    */
-   private void writeObject(ObjectOutputStream out) throws IOException {
-      out.writeInt(dataVersion);
-      out.writeObject(setValues);
-   }
+        if (objDataVersion == 1) {
+            setValues = (int[]) in.readObject();
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+    }
 
-
-    /** The set values. */
+    /**
+     * Write a
+     * <code>NidSet</code> object to an external source.
+     *
+     * @param out the output stream
+     * @throws IOException signals that an I/O exception has occurred
+     */
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+        out.writeObject(setValues);
+    }
     private int[] setValues = new int[0];
 
     /**
-     * Instantiates a new native id set.
+     * Instantiates a new native id set based on
+     * <code>another</code> nid set.
      *
-     * @param another the another
+     * @param another the other nid set specifying the values to use in
+     * constructing this nid set
      */
     public NidSet(NidSet another) {
         this(another.setValues);
     }
-    
+
     /**
-     * Instantiates a new native id set.
+     * Instantiates a new native id set based on the given <code>values</code>.
      *
-     * @param values the values
+     * @param values an array specifying the values to use in
+     * constructing this nid set
      */
     public NidSet(int[] values) {
         super();
@@ -119,9 +119,9 @@ public class NidSet implements NidSetBI, Serializable {
     }
 
     /**
-     * Instantiates a new native id set.
+     * Instantiates a new native id set based on the given <code>paths</code>.
      *
-     * @param paths the paths
+     * @param paths the path concepts to use in constructing this nid set
      */
     public NidSet(Collection<PathBI> paths) {
         super();

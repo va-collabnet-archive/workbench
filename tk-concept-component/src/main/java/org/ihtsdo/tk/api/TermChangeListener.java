@@ -24,7 +24,7 @@ package org.ihtsdo.tk.api;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-// TODO: Auto-generated Javadoc
+
 /**
  * The listener interface for receiving termChange events.
  * The class that is interested in processing a termChange

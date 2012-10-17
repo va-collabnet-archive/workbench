@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.util.*;
 import org.ihtsdo.tk.dto.RevisionHandling;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class TkConceptAttributes represents a concept attribute in the eConcept
  * format and contains methods for interacting with a concept attribute. Further
@@ -42,7 +41,7 @@ import org.ihtsdo.tk.dto.RevisionHandling;
  * <code>TkConcept</code>.
  *
  * @see TkConcept
- * @param <V> the value type
+ * @param <V> the generic component type
  */
 public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision>
         implements I_ConceptualizeExternally {
@@ -123,7 +122,6 @@ public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException indicates a specified class was not found
-     * TODO-javadoc: why?
      */
     public TkConceptAttributes(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
@@ -246,7 +244,6 @@ public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException indicates a specified class was not found
-     * TODO-javadoc: why?
      */
     @Override
     public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

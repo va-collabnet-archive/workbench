@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 
-// TODO: Auto-generated Javadoc
+
 /**
  * The Class MultiEditorContradictionCase represents a contradiction on a single
  * concept and contains methods for accessing details about the contradiction. A

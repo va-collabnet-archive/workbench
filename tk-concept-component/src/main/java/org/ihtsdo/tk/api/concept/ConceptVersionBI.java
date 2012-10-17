@@ -40,7 +40,7 @@ import java.util.List;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 
-// TODO: Auto-generated Javadoc
+
 /**
  * The Interface ConceptVersionBI provides methods for interacting with a
  * particular version of a concept and for creating new, editable versions.

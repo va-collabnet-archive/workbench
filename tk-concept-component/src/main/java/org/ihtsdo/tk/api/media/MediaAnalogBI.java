@@ -20,20 +20,22 @@ import java.beans.PropertyVetoException;
 
 import org.ihtsdo.tk.api.TypedComponentAnalogBI;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Interface MediaAnalogBI.
- *
- * @param <A> the generic type
+ * The Interface MediaAnalogBI contains methods for editing a media analog.
+ * The preferred method of editing terminology is through a blueprint.
+ * 
+ * @param <A> the type of object returned by the analog generator
+ * @see AnalogBI
+ * @eee CreateOrAmendBlueprint
  */
 public interface MediaAnalogBI<A extends MediaAnalogBI>
         extends TypedComponentAnalogBI, MediaVersionBI<A> {
 	
     /**
-     * Sets the text description.
+     * Sets the text description of this media.
      *
-     * @param text the new text description
-     * @throws PropertyVetoException the property veto exception
+     * @param text the text description
+     * @throws PropertyVetoException if the new value is not valid
      */
     public void setTextDescription(String text) throws PropertyVetoException;
     

@@ -23,7 +23,6 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Interface ContradictionIdentifierBI provides methods for identifying
  * contradictions in the terminology.

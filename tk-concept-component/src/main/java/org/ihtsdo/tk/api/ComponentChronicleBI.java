@@ -24,7 +24,6 @@ import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Interface ComponentChronicleBI contains terminology generic methods for
  * editing and interacting with a component. A ComponentChronicleBI contains all

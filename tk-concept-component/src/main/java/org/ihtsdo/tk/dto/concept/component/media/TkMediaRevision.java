@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class TkMediaRevision represents a version of a description in the
  * eConcept format and contains methods for interacting with a version of a
@@ -177,7 +176,6 @@ public class TkMediaRevision extends TkRevision {
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException indicates a specified class was not found
-     * TODO-javadoc: why?
      */
     @Override
     public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

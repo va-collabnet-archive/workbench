@@ -30,7 +30,6 @@ import org.ihtsdo.tk.dto.concept.component.refex.type_long.TkRefexLongRevision;
 import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class TkRefexArrayOfBytearrayMember represents an array of byte array
  * type refex member in the eConcept format and contains methods specific for
@@ -246,7 +245,6 @@ public class TkRefexArrayOfBytearrayMember extends TkRefexAbstractMember<TkRefex
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException indicates a specified class was not found
-     * TODO-javadoc: why?
      */
     @Override
     public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

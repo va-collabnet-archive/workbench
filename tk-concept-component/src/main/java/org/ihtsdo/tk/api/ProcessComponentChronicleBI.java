@@ -1,33 +1,35 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.tk.api;
 
-// TODO: Auto-generated Javadoc
+
 /**
- * The Interface ProcessComponentChronicleBI. TODO-javadoc: processor which gives component chronicle, fetches and handles iterations
+ * The Interface ProcessComponentChronicleBI can be implemented by classes
+ * wanting a processor which gives component chronicle, fetches concepts, and handles
+ * iterations.
  *
- * @author kec
+ * @see ProcessUnfetchedConceptDataBI
  */
 public interface ProcessComponentChronicleBI {
-    
+
     /**
-     * Process.
+     * This should be implemented by classes wanting to process component chronicles.
      *
-     * @param componentChronicle the component chronicle
+     * @param componentChronicle the component chronicle to process
      * @throws Exception indicates an exception has occurred
      */
     void process(ComponentChronicleBI componentChronicle) throws Exception;

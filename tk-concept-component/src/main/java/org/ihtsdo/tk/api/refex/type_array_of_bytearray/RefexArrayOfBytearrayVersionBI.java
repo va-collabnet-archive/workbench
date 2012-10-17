@@ -18,7 +18,6 @@ package org.ihtsdo.tk.api.refex.type_array_of_bytearray;
 
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Interface RefexArrayOfBytearrayVersionBI provides methods for interacting
  * with a specific array of byte array type refex version.

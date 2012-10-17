@@ -42,10 +42,10 @@ import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
-// TODO: Auto-generated Javadoc
+
 //TODO-javadoc: skipped private methods/variables
 /**
- * The Class NullComponentFinde processes every concept in the database to
+ * The Class NullComponentFinder processes every concept in the database to
  * determine if each component has valid identifiers. This class implements
  * <code>ProcessUnfetchedConceptDataBI</code> and can
  * be "run" using the terminology store method iterateConceptDataInParallel.

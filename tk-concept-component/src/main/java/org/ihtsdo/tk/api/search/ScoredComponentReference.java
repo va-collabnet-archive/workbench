@@ -19,7 +19,6 @@ package org.ihtsdo.tk.api.search;
 import java.io.IOException;
 import org.ihtsdo.tk.Ts;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class ScoredComponentReference represents a scored search result. The
  * found component nid is associated with a search score indicating the

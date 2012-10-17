@@ -19,7 +19,6 @@ package org.ihtsdo.tk.binding.snomed;
 import java.util.UUID;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class SnomedMetadataRf2 contains
  * <code>ConceptSpec</code> representations of SNOMED Metadata which conform to

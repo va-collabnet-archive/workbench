@@ -75,7 +75,6 @@ import org.ihtsdo.tk.api.refex.type_string.RefexStringVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.refex.type_arrayofbytearray.TkRefexArrayOfBytearrayMember;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class TkConcept contains methods for importing/exporting a concept.
  * TkConcept was originally named eConcept which stood for "external concept".
@@ -153,7 +152,6 @@ public class TkConcept {
      * @param in the data input specifying how to construct this TK Concept
      * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException indicates a specified class was not found
-     * TODO-javadoc: why?
      */
     public TkConcept(DataInput in) throws IOException, ClassNotFoundException {
         super();
@@ -556,7 +554,6 @@ public class TkConcept {
      * @param in the data input specifying the TK Concept
      * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException indicates a specified class was not found
-     * TODO-javadoc: why?
      */
     public final void readExternal(DataInput in) throws IOException, ClassNotFoundException {
         int readDataVersion = in.readInt();

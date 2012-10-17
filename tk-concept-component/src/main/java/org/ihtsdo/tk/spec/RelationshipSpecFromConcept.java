@@ -30,7 +30,6 @@ import org.ihtsdo.tk.binding.snomed.Taxonomies;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.spec.RelationshipSpec;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class RelationshipSpecFromConcept.
  */

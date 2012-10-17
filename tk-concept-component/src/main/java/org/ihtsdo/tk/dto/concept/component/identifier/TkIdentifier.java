@@ -34,7 +34,6 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class TkIdentifier represents a version of an identifier in the eConcept
  * format and contains methods general to interacting with a version of an
@@ -197,7 +196,6 @@ public abstract class TkIdentifier extends TkRevision {
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException indicates a specified class was not found
-     * TODO-javadoc: why?
      */
     @Override
     public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

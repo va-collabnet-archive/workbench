@@ -36,7 +36,6 @@ import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.type_member.RefexMemberVersionBI;
 import org.ihtsdo.tk.dto.RevisionHandling;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class TkRefexMember represents a refex member in the eConcept format and
  * contains methods specific for interacting with a refex member. Further
@@ -229,7 +228,6 @@ public class TkRefexMember extends TkRefexAbstractMember<TkRefexRevision> {
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException indicates a specified class was not found
-     * TODO-javadoc: why?
      */
     @Override
     public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

@@ -567,7 +567,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      * Write to.
      *
      * @param refexAnalog the refex analog
-     * @throws PropertyVetoException the property veto exception
+     * @throws PropertyVetoException if the new value is not valid
      * @throws IOException signals that an I/O exception has occurred
      */
     public void writeTo(RefexAnalogBI<?> refexAnalog) throws PropertyVetoException, IOException {
@@ -578,7 +578,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      * Sets the properties.
      *
      * @param refexAnalog the new properties
-     * @throws PropertyVetoException the property veto exception
+     * @throws PropertyVetoException if the new value is not valid
      * @throws IOException signals that an I/O exception has occurred
      */
     public void setProperties(RefexAnalogBI<?> refexAnalog) throws PropertyVetoException, IOException {
@@ -648,7 +648,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      * Sets the properties except sap.
      *
      * @param refexAnalog the new properties except sap
-     * @throws PropertyVetoException the property veto exception
+     * @throws PropertyVetoException if the new value is not valid
      * @throws IOException signals that an I/O exception has occurred
      */
     public void setPropertiesExceptSap(RefexAnalogBI<?> refexAnalog) throws PropertyVetoException, IOException {

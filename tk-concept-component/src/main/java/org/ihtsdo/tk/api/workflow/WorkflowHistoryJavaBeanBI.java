@@ -21,7 +21,6 @@ import java.util.UUID;
 
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Interface WorkflowHistoryJavaBeanBI contains methods for interacting with
  * a particular workflow item.

@@ -28,7 +28,7 @@ import java.util.UUID;
 
 import org.ihtsdo.helper.transform.SctIdGenerator.TYPE;
 
-// TODO: Auto-generated Javadoc
+
 /**
  * The Class UuidSnomedMapHandler handles uuid-snomed mappings and contains
  * methods for reading or writing a set of mapping files. additionally it

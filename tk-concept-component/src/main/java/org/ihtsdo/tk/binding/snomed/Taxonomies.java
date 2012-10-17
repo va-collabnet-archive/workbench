@@ -20,7 +20,6 @@ import java.util.UUID;
 
 import org.ihtsdo.tk.spec.ConceptSpec;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Taxonomies contains
  * <code>ConceptSpec</code> representations of top-level taxonomy concepts.

@@ -37,7 +37,6 @@ import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.dto.RevisionHandling;
 import org.ihtsdo.tk.dto.concept.component.refex.type_arrayofbytearray.TkRefexArrayOfByteArrayRevision;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class TkRefexUuidMember represents a uuid-uuid type refex member in the
  * eConcept format and contains methods specific for interacting with a
@@ -259,7 +258,6 @@ public class TkRefexUuidMember extends TkRefexAbstractMember<TkRefexUuidRevision
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException indicates a specified class was not found
-     * TODO-javadoc: why?
      */
     @Override
     public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

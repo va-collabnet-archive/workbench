@@ -18,17 +18,17 @@ package org.ihtsdo.tk.api;
 
 import java.beans.PropertyVetoException;
 
-// TODO: Auto-generated Javadoc
+
 /**
- * The Interface TypedComponentAnalogBI.
+ * The Interface TypedComponentAnalogBI represents an editable analog of a component with a type.
  */
 public interface TypedComponentAnalogBI extends AnalogBI {
 
 	/**
-	 * Sets the type nid.
+	 * Sets the component type.
 	 *
-	 * @param typeNid the new type nid
-	 * @throws PropertyVetoException the property veto exception
+	 * @param typeNid the nid of the new type
+	 * @throws PropertyVetoException if the new value is not valid
 	 */
 	public void setTypeNid(int typeNid) throws PropertyVetoException;
 

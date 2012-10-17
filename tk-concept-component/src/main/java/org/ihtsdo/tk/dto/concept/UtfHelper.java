@@ -20,7 +20,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-// TODO: Auto-generated Javadoc
 /**
  * Handle writing of UTF data, considering that data may sometimes be
  * > than the 64K limit. 
@@ -28,20 +27,18 @@ import java.io.IOException;
  * Note that we are using max #of characters for the default read/write UTF
  * as 24000 (~64K/3 since there are a max of 3 bytes per UTF-8 character).
  * 
- * @author kec
- * @author Jack Hahn
  */
 public class UtfHelper {
     
-    /** The max chars. */
+
     private static int MAX_CHARS = 21000;
     
      /**
-      * Read utf v7.
+      * Reads UTF from an external source with a data version of 7.
       *
-      * @param in the in
-      * @param dataVersion the data version
-      * @return the string
+      * @param in the input stream
+      * @param dataVersion the data version of the external source
+      * @return a string formated with UTF-8 representing the data
       * @throws IOException signals that an I/O exception has occurred
       */
      public static String readUtfV7(DataInput in, int dataVersion)
@@ -64,11 +61,11 @@ public class UtfHelper {
     }
 
     /**
-     * Read utf v6.
+     * Reads UTF from an external source with a data version of 6.
      *
-     * @param in the in
-     * @param dataVersion the data version
-     * @return the string
+     * @param in the input stream
+     * @param dataVersion the data version of the external source
+     * @return a string formated with UTF-8 representing the data
      * @throws IOException signals that an I/O exception has occurred
      */
     public static String readUtfV6(DataInput in, int dataVersion)
@@ -102,10 +99,10 @@ public class UtfHelper {
     
     
     /**
-     * Write utf.
+     * Writes UTF-8 to an external source.
      *
-     * @param out the out
-     * @param utfData the utf data
+     * @param out the output stream
+     * @param utfData the data to write
      * @throws IOException signals that an I/O exception has occurred
      */
     public static void writeUtf(DataOutput out, String utfData) 

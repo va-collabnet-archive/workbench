@@ -30,7 +30,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-// TODO: Auto-generated Javadoc
+
 /**
  * The Interface ComponentBI provides terminology generic methods for editing or
  * creating a component. A component is the generic term for: a concept
@@ -87,7 +87,7 @@ public interface ComponentBI {
      * Gets the concept nid associated with a component. This is not the nid of the component, rather the
      * nid of the enclosing concept,the concept which this component is a part of. 
      *
-     * @return the concept nid
+     * @return the enclosing concept nid
      */
     int getConceptNid();
 

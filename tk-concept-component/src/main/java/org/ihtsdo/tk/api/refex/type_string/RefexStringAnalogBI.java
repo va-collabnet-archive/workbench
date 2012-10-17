@@ -20,7 +20,6 @@ package org.ihtsdo.tk.api.refex.type_string;
 import java.beans.PropertyVetoException;
 import org.ihtsdo.tk.api.refex.RefexAnalogBI;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Interface RefexStringAnalogBI provides methods for editing a boolean
  * type refex analog. The preferred method of editing terminology is through a

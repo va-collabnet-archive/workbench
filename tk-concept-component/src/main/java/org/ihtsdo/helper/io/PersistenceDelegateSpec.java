@@ -18,7 +18,7 @@ package org.ihtsdo.helper.io;
 
 import java.beans.PersistenceDelegate;
 
-// TODO: Auto-generated Javadoc
+
 /**
  * The Class PersistenceDelegateSpec represents a
  * <code>PerseistenceDelegate</code> associated with a type.

@@ -342,8 +342,8 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      *
      * @param fullySpecifiedNameBlueprint blueprint of fsn
      * @param dialect language code of fsn dialect
-     * @throws NoSuchAlgorithmException the no such algorithm exception
-     * @throws UnsupportedEncodingException the unsupported encoding exception
+     * @throws NoSuchAlgorithmException indicates a no such algorithm exception has occurred
+     * @throws UnsupportedEncodingException indicates an unsupported encoding exception has occurred
      * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
@@ -360,8 +360,8 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      *
      * @param fullySpecifiedNameBlueprint the fully specified name blueprint
      * @param dialect the dialect
-     * @throws NoSuchAlgorithmException the no such algorithm exception
-     * @throws UnsupportedEncodingException the unsupported encoding exception
+     * @throws NoSuchAlgorithmException indicates a no such algorithm exception has occurred
+     * @throws UnsupportedEncodingException indicates an unsupported encoding exception has occurred
      * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
@@ -403,8 +403,8 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      * @param fullySpecifiedNameBlueprint blueprint of fsn
      * @param dialect language code of fsn dialect, leave null if dialect isn't
      * changing
-     * @throws NoSuchAlgorithmException the no such algorithm exception
-     * @throws UnsupportedEncodingException the unsupported encoding exception
+     * @throws NoSuchAlgorithmException indicates a no such algorithm exception has occurred
+     * @throws UnsupportedEncodingException indicates an unsupported encoding exception has occurred
      * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
@@ -490,8 +490,8 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      *
      * @param perferredNameBlueprint blueprint of pref name
      * @param dialect language code of pref name dialect
-     * @throws NoSuchAlgorithmException the no such algorithm exception
-     * @throws UnsupportedEncodingException the unsupported encoding exception
+     * @throws NoSuchAlgorithmException indicates a no such algorithm exception has occurred
+     * @throws UnsupportedEncodingException indicates an unsupported encoding exception has occurred
      * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
@@ -508,8 +508,8 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      *
      * @param preferredBlueprint the preferred blueprint
      * @param dialect the dialect
-     * @throws NoSuchAlgorithmException the no such algorithm exception
-     * @throws UnsupportedEncodingException the unsupported encoding exception
+     * @throws NoSuchAlgorithmException indicates a no such algorithm exception has occurred
+     * @throws UnsupportedEncodingException indicates an unsupported encoding exception has occurred
      * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception
@@ -554,8 +554,8 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      * @param preferredNameBlueprint blueprint of pref name
      * @param dialect language code of pref name dialect, leave null if dialect
      * isn't changing
-     * @throws NoSuchAlgorithmException the no such algorithm exception
-     * @throws UnsupportedEncodingException the unsupported encoding exception
+     * @throws NoSuchAlgorithmException indicates a no such algorithm exception has occurred
+     * @throws UnsupportedEncodingException indicates an unsupported encoding exception has occurred
      * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @throws ContradictionException the contradiction exception

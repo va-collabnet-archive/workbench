@@ -16,7 +16,7 @@
  */
 package org.ihtsdo.lang;
 
-// TODO: Auto-generated Javadoc
+
 /**
  * The Enum LANG_CODE represents a two or six character representation of the
  * language or language and dialect code respectively. If the language has a

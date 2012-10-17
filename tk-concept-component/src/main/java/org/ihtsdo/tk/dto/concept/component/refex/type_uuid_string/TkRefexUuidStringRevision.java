@@ -32,7 +32,6 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.refex.type_nid_string.RefexNidStringVersionBI;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class TkRefexUuidStringRevision a version of a uuid-string type refex
  * member in the eConcept format and contains methods specific for interacting
@@ -187,7 +186,6 @@ public class TkRefexUuidStringRevision extends TkRevision {
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException indicates a specified class was not found
-     * TODO-javadoc: why?
      */
     @Override
     public final void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

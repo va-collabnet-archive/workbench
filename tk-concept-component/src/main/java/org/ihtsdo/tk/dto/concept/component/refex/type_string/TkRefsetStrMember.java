@@ -35,7 +35,6 @@ import java.io.IOException;
 import java.util.*;
 import org.ihtsdo.tk.dto.RevisionHandling;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class TkRefsetStrMember represents a string type refex member in the
  * eConcept format and contains methods specific for interacting with a refex
@@ -245,7 +244,6 @@ public class TkRefsetStrMember extends TkRefexAbstractMember<TkRefsetStrRevision
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException indicates a specified class was not found
-     * TODO-javadoc: why?
      */
     @Override
     public final void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

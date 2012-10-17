@@ -21,7 +21,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 import org.ihtsdo.tk.binding.snomed.TermAux;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class UuidFactory is factory for creating UUID objects.
  *

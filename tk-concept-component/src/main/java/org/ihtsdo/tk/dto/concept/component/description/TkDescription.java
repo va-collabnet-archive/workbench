@@ -37,7 +37,6 @@ import java.io.IOException;
 import java.util.*;
 import org.ihtsdo.tk.dto.RevisionHandling;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class TkDescription represents a concept attribute in the eConcept format
  * and contains methods for interacting with a description. Further discussion
@@ -45,7 +44,7 @@ import org.ihtsdo.tk.dto.RevisionHandling;
  * <code>TkConcept</code>.
  *
  * @see TkConcept
- * @param <V> the value type
+ * @param <V> the generic component type
  */
 public class TkDescription extends TkComponent<TkDescriptionRevision> implements I_DescribeExternally {
 
@@ -156,7 +155,6 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException indicates a specified class was not found
-     * TODO-javadoc: why?
      */
     public TkDescription(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
@@ -307,7 +305,6 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException indicates a specified class was not found
-     * TODO-javadoc: why?
      */
     @Override
     public final void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

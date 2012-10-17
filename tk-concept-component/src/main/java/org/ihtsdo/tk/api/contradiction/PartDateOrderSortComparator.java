@@ -22,17 +22,24 @@ package org.ihtsdo.tk.api.contradiction;
 import java.util.Comparator;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class PartDateOrderSortComparator.
+ * The Class PartDateOrderSortComparator compares component versions according
+ * to the commit time and date.
  */
 class PartDateOrderSortComparator implements Comparator<ComponentVersionBI> {
     
-    /** The reverse order. */
+   
     private boolean reverseOrder = false;
 
-    /* (non-Javadoc)
-     * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+    /**
+     * Compares the given component versions according to their associated
+     * commit times.
+     *
+     * @param componentVersion1 the first version to compare
+     * @param componentVersion2 the second version to compare
+     * @return 0 if the times are equal, 1 if version1 is greater than version2,
+     * -1 if version2 is greater than version1. The opposite applies if using
+     * reverse order.
      */
     @Override
     public int compare(ComponentVersionBI componentVersion1, ComponentVersionBI componentVersion2) {
@@ -56,7 +63,8 @@ class PartDateOrderSortComparator implements Comparator<ComponentVersionBI> {
     /**
      * Instantiates a new part date order sort comparator.
      *
-     * @param reverseOrder the reverse order
+     * @param reverseOrder set to <code>true</code> to use reverse date order
+     * with oldest versions returned first
      */
     public PartDateOrderSortComparator(boolean reverseOrder) {
         super();

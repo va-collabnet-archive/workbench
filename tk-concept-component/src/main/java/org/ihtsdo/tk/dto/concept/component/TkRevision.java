@@ -38,7 +38,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.ihtsdo.tk.binding.snomed.Snomed;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class TkRevision represents a version of a concept component in the
  * eConcept format and contains methods general to interacting with a version of a
@@ -143,7 +142,6 @@ public abstract class TkRevision implements I_VersionExternally {
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException indicates a specified class was not found
-     * TODO-javadoc: why?
      */
     public TkRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
@@ -382,7 +380,6 @@ public abstract class TkRevision implements I_VersionExternally {
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException indicates a specified class was not found
-     * TODO-javadoc: why?
      */
     public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         pathUuid = new UUID(in.readLong(), in.readLong());

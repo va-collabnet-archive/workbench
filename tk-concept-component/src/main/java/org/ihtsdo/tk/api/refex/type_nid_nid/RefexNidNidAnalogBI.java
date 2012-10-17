@@ -38,7 +38,7 @@ public interface RefexNidNidAnalogBI<A extends RefexNidNidAnalogBI<A>>
       * <code>nid2</code>, associated with this nid-nid refex member.
       *
       * @param nid2 the second nid value associated with the refex member
-      * @throws PropertyVetoException the property veto exception
+      * @throws PropertyVetoException if the new value is not valid
       */
      void setNid2(int nid2) throws PropertyVetoException;
 

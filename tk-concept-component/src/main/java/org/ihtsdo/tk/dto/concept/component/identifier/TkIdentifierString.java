@@ -29,7 +29,6 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class TkIdentifierString represents a version of a String identifier in
  * the eConcept format and contains methods specific to interacting with a

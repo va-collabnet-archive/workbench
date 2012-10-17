@@ -19,7 +19,6 @@ package org.ihtsdo.tk.api.refex;
 //~--- non-JDK imports --------------------------------------------------------
 import org.ihtsdo.tk.api.ComponentChronicleBI;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Interface RefexChronicleBI represents the collection of refex versions.
  * <p>Refex is a generic term for both refsets and annotations. While both

@@ -33,7 +33,6 @@ import java.util.Map;
 import java.util.UUID;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Interface RefexVersionBI provides methods for interacting with, or
  * creating a version of, a refex.

@@ -1,26 +1,22 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
-
-
-
 package org.ihtsdo.helper.dto;
 
 //~--- non-JDK imports --------------------------------------------------------
-
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.tk.dto.concept.TkConcept;
 
@@ -38,134 +34,137 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.UUID;
 
-// TODO: Auto-generated Javadoc
+
 /**
- * The Class DtoToText.
+ * The Class DtoToText contains methods for converting a changeset or eConcept
+ * file to text.
  *
- * @author kec
  */
 public class DtoToText {
-   
-   /**
-    * Convert.
-    *
-    * @param changeSetFile the change set file
-    * @param changeSet the change set
-    * @param append the append
-    * @throws IOException signals that an I/O exception has occurred
-    * @throws FileNotFoundException if a specified file was not found
-    * @throws ClassNotFoundException indicates a specified class was not found
-    */
-   private static void convert(File changeSetFile, boolean changeSet, boolean append)
-           throws IOException, FileNotFoundException, ClassNotFoundException {
-      FileInputStream     fis        = new FileInputStream(changeSetFile);
-      BufferedInputStream bis        = new BufferedInputStream(fis);
-      DataInputStream     dataStream = new DataInputStream(bis);
-      File                textFile   = new File(changeSetFile.getParentFile(),
-                                          changeSetFile.getName() + ".txt");
-      FileWriter          textOut    = new FileWriter(textFile, append);
 
-      try {
-         int count = 0;
+    /**
+     * Converts the given
+     * <code>changeSetFile</code> to text.
+     *
+     * @param changeSetFile the file to convert
+     * @param changeSet set to <code>true</code> to indicate the file is for a
+     * changeset and not an eCocnept
+     * @param append if <code>true</code>, then bytes will be written to the end
+     * of the file rather than the beginning
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws FileNotFoundException if a specified file was not found
+     * @throws ClassNotFoundException indicates a specified class was not found
+     */
+    private static void convert(File changeSetFile, boolean changeSet, boolean append)
+            throws IOException, FileNotFoundException, ClassNotFoundException {
+        FileInputStream fis = new FileInputStream(changeSetFile);
+        BufferedInputStream bis = new BufferedInputStream(fis);
+        DataInputStream dataStream = new DataInputStream(bis);
+        File textFile = new File(changeSetFile.getParentFile(),
+                changeSetFile.getName() + ".txt");
+        FileWriter textOut = new FileWriter(textFile, append);
 
-         while (dataStream.available() > 0) {
-            if (changeSet) {
-               long nextCommit = dataStream.readLong();
+        try {
+            int count = 0;
 
-               textOut.append("\n*******************************\n");
-               textOut.append(Integer.toString(count));
-               textOut.append(": ");
-               textOut.append(TimeHelper.formatDateForFile(nextCommit));
+            while (dataStream.available() > 0) {
+                if (changeSet) {
+                    long nextCommit = dataStream.readLong();
+
+                    textOut.append("\n*******************************\n");
+                    textOut.append(Integer.toString(count));
+                    textOut.append(": ");
+                    textOut.append(TimeHelper.formatDateForFile(nextCommit));
+                }
+
+                TkConcept eConcept = new TkConcept(dataStream);
+
+                textOut.append("\n*******************************\n");
+                textOut.append(eConcept.toString());
+                count++;
             }
+        } catch (EOFException ex) {
+            // Nothing to do...
+        } finally {
+            dataStream.close();
+            textOut.close();
+        }
+    }
 
-            TkConcept eConcept = new TkConcept(dataStream);
+    /**
+     * Converts a change set file to text.
+     *
+     * @param changeSetFile the change set file to convert
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws ClassNotFoundException indicates a specified class was not found
+     */
+    public static void convertChangeSet(File changeSetFile) throws IOException, ClassNotFoundException {
+        convert(changeSetFile, true, false);
+    }
 
-            textOut.append("\n*******************************\n");
-            textOut.append(eConcept.toString());
-            count++;
-         }
-      } catch (EOFException ex) {
+    /**
+     * Convert an eConcept file to text.
+     *
+     * @param changeSetFile the change set file
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws ClassNotFoundException indicates a specified class was not found
+     */
+    public static void convertDto(File changeSetFile) throws IOException, ClassNotFoundException {
+        convert(changeSetFile, false, false);
+    }
 
-         // Nothing to do...
-      } finally {
-         dataStream.close();
-         textOut.close();
-      }
-   }
+    /**
+     * Searches the given changeset or eConcept file for the specified
+     * <code>conceptUuids</code>.
+     *
+     * @param changeSetFile the file to convert
+     * @param conceptUuids the concept uuids to find
+     * @param append if <code>true</code>, then bytes will be written to the end
+     * of the file rather than the beginning
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws FileNotFoundException if a specified file was not found
+     * @throws ClassNotFoundException indicates a specified class was not found
+     */
+    private static void search(File changeSetFile, Collection<UUID> conceptUuids, boolean append)
+            throws IOException, FileNotFoundException, ClassNotFoundException {
+        FileInputStream fis = new FileInputStream(changeSetFile);
+        BufferedInputStream bis = new BufferedInputStream(fis);
+        DataInputStream dataStream = new DataInputStream(bis);
+        File textFile = new File(changeSetFile.getParentFile(),
+                changeSetFile.getName() + "-search.txt");
+        FileWriter textOut = new FileWriter(textFile, append);
 
-   /**
-    * Convert change set.
-    *
-    * @param changeSetFile the change set file
-    * @throws IOException signals that an I/O exception has occurred
-    * @throws ClassNotFoundException indicates a specified class was not found
-    */
-   public static void convertChangeSet(File changeSetFile) throws IOException, ClassNotFoundException {
-      convert(changeSetFile, true, false);
-   }
+        try {
+            int count = 0;
 
-   /**
-    * Convert dto.
-    *
-    * @param changeSetFile the change set file
-    * @throws IOException signals that an I/O exception has occurred
-    * @throws ClassNotFoundException indicates a specified class was not found
-    */
-   public static void convertDto(File changeSetFile) throws IOException, ClassNotFoundException {
-      convert(changeSetFile, false, false);
-   }
+            while (dataStream.available() > 0) {
+                TkConcept eConcept = new TkConcept(dataStream);
 
-   /**
-    * Search.
-    *
-    * @param changeSetFile the change set file
-    * @param conceptUuids the concept uuids
-    * @param append the append
-    * @throws IOException signals that an I/O exception has occurred
-    * @throws FileNotFoundException if a specified file was not found
-    * @throws ClassNotFoundException indicates a specified class was not found
-    */
-   private static void search(File changeSetFile, Collection<UUID> conceptUuids, boolean append)
-           throws IOException, FileNotFoundException, ClassNotFoundException {
-      FileInputStream     fis        = new FileInputStream(changeSetFile);
-      BufferedInputStream bis        = new BufferedInputStream(fis);
-      DataInputStream     dataStream = new DataInputStream(bis);
-      File                textFile   = new File(changeSetFile.getParentFile(),
-                                          changeSetFile.getName() + "-search.txt");
-      FileWriter          textOut    = new FileWriter(textFile, append);
+                if (conceptUuids.contains(eConcept.getPrimordialUuid())) {
+                    textOut.append("\n*******************************\n");
+                    textOut.append(eConcept.toString());
+                }
 
-      try {
-         int count = 0;
-
-         while (dataStream.available() > 0) {
-            TkConcept eConcept = new TkConcept(dataStream);
-
-            if (conceptUuids.contains(eConcept.getPrimordialUuid())) {
-               textOut.append("\n*******************************\n");
-               textOut.append(eConcept.toString());
+                count++;
             }
+        } catch (EOFException ex) {
+            // Nothing to do...
+        } finally {
+            dataStream.close();
+            textOut.close();
+        }
+    }
 
-            count++;
-         }
-      } catch (EOFException ex) {
-
-         // Nothing to do...
-      } finally {
-         dataStream.close();
-         textOut.close();
-      }
-   }
-
-   /**
-    * Search for dto.
-    *
-    * @param file the file
-    * @param conceptUuids the concept uuids
-    * @throws IOException signals that an I/O exception has occurred
-    * @throws ClassNotFoundException indicates a specified class was not found
-    */
-   public static void searchForDto(File file, Collection<UUID> conceptUuids)
-           throws IOException, ClassNotFoundException {
-      search(file, conceptUuids, false);
-   }
+    /**
+     * Searches the eConcept file for the given <code>conceptUuids</code>.
+     *
+     * @param file the eConcept file to search
+     * @param conceptUuids the concept uuids to find
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws ClassNotFoundException indicates a specified class was not found
+     */
+    public static void searchForDto(File file, Collection<UUID> conceptUuids)
+            throws IOException, ClassNotFoundException {
+        search(file, conceptUuids, false);
+    }
 }

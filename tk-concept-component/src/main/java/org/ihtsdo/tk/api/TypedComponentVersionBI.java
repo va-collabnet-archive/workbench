@@ -16,14 +16,14 @@
  */
 package org.ihtsdo.tk.api;
 
-// TODO: Auto-generated Javadoc
+
 /**
- * The Interface TypedComponentVersionBI.
+ * The Interface TypedComponentVersionBI represents a component with a type.
  */
 public interface TypedComponentVersionBI extends ComponentVersionBI {
 
     /**
-     * Gets the type nid.
+     * Gets the nid of the component type.
      *
      * @return the type nid
      */

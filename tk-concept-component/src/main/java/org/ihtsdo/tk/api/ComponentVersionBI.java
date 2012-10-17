@@ -176,8 +176,8 @@ public interface ComponentVersionBI extends ComponentBI, VersionPointBI {
      * and is the preferred method for editing or creating a new version of a
      * component.
      *
-     * @param viewCoordinate the view coordinate
-     * @return the creates the or amend blueprint
+     * @param viewCoordinate the view coordinate specifying which version is active or inactive
+     * @return the blueprint of the component
      * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException the contradiction exception
      * @throws InvalidCAB if the any of the values in blueprint to make are invalid

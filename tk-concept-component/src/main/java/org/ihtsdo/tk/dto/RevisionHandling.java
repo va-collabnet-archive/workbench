@@ -16,9 +16,8 @@
  */
 package org.ihtsdo.tk.dto;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Enum RevisionHandling.
+ * The Enum RevisionHandling represents ways of handling revisions on a concept or a component.
  *
  * @deprecated not in TK3
  */
@@ -26,11 +25,11 @@ package org.ihtsdo.tk.dto;
 public enum RevisionHandling {
 
     /**
-     * The include revisions.
+     * Include revisions.
      */
     INCLUDE_REVISIONS,
     /**
-     * The exclude revisions.
+     * Exclude revisions.
      */
     EXCLUDE_REVISIONS;
 }

@@ -33,7 +33,6 @@ import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.type_nid_string.RefexNidStringVersionBI;
 import org.ihtsdo.tk.binding.snomed.CaseSensitive;
 
-// TODO-javadoc: skipped private methods/variables
 /**
  * The Class CsWordsHelper loads the list of case sensitive words from the Case
  * Sensitive Words Refset in to a map of the word and the associated sensitivity
@@ -41,20 +40,15 @@ import org.ihtsdo.tk.binding.snomed.CaseSensitive;
  */
 public class CsWordsHelper {
 
-    /**
-     * The cs word set map.
-     */
     private static Map<Integer, Set<String>> csWordSetMap = null;
-    /**
-     * The initialization lock.
-     */
     private static Lock initLock = new ReentrantLock();
 
     /**
      * Imports the case sensitive word list from the Case Sensitive Words Refset
      * into a map of the word to the associated sensitivity (either "case
      * sensitive" or "maybe case sensitive"). Checks to see if the map is empty
-     * before loading, and will only load the words if the map is found to be empty.
+     * before loading, and will only load the words if the map is found to be
+     * empty.
      *
      * @throws IOException signals that an I/O exception has occurred
      */
@@ -107,7 +101,8 @@ public class CsWordsHelper {
      *
      * @param text the string representing the word to check
      * @param icsTypeNid the ICS type nid
-     * @return <code>true</code>, if the given string is found for the specified ICS type
+     * @return <code>true</code>, if the given string is found for the specified
+     * ICS type
      * @throws IOException signals that an I/O exception has occurred
      */
     public static boolean isIcTypeSignificant(String text, int icsTypeNid)

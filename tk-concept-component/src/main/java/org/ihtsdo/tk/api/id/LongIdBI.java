@@ -19,16 +19,17 @@
 
 package org.ihtsdo.tk.api.id;
 
-// TODO: Auto-generated Javadoc
+
 /**
- * The Interface LongIdBI.
+ * The Interface LongIdBI contains methods for interacting with a <code>long</code> type of
+ * identifier.
  *
- * @author kec
  */
 public interface LongIdBI extends IdBI {
    
-   /* (non-Javadoc)
-    * @see org.ihtsdo.tk.api.id.IdBI#getDenotation()
+   /**
+    * 
+    * @return the <code>long</code> id denotation value
     */
    @Override
    Long getDenotation();

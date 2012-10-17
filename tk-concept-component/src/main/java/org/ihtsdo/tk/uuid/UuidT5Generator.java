@@ -22,7 +22,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class UuidT3Generator generates a type 5 UUID object. A type 5 UUID is
  * name based and uses SHA-1 hashing to create the uuid from the given name.
@@ -50,10 +49,8 @@ public class UuidT5Generator {
      * @param namespace the uuid associated with the namespace
      * @param name the name to generate the uuid from
      * @return the generated uuid
-     * @throws NoSuchAlgorithmException the no such algorithm exception
-     * TODO-javadoc: why?
-     * @throws UnsupportedEncodingException the unsupported encoding exception
-     * TODO-javadoc: why?
+     * @throws NoSuchAlgorithmException indicates a no such algorithm exception has occurred
+     * @throws UnsupportedEncodingException indicates an unsupported encoding exception has occurred
      */
     public static UUID get(UUID namespace, String name) throws NoSuchAlgorithmException, UnsupportedEncodingException {
         MessageDigest sha1Algorithm = MessageDigest.getInstance("SHA-1");
@@ -89,10 +86,8 @@ public class UuidT5Generator {
      *
      * @param name the name to generate the uuid from
      * @return the generated uuid
-     * @throws NoSuchAlgorithmException the no such algorithm exception
-     * TODO-javadoc: why?
-     * @throws UnsupportedEncodingException the unsupported encoding exception
-     * TODO-javadoc: why?
+     * @throws NoSuchAlgorithmException indicates a no such algorithm exception has occurred
+     * @throws UnsupportedEncodingException indicates an unsupported encoding exception has occurred
      */
     public static UUID get(String name) throws NoSuchAlgorithmException, UnsupportedEncodingException {
         return get(null, name);
@@ -108,10 +103,8 @@ public class UuidT5Generator {
      * @param conceptPrimordialUuid the uuids representing the concept
      * associated with the primordial version of the description
      * @return the generated uuid
-     * @throws NoSuchAlgorithmException the no such algorithm exception
-     * TODO-javadoc: why?
-     * @throws UnsupportedEncodingException the unsupported encoding exception
-     * TODO-javadoc: why?
+     * @throws NoSuchAlgorithmException indicates a no such algorithm exception has occurred
+     * @throws UnsupportedEncodingException indicates an unsupported encoding exception has occurred
      */
     public static UUID getDescUuid(String text,
             UUID langPrimoridalUuid,

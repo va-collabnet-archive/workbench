@@ -33,67 +33,41 @@ import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 import java.io.*;
 
 import java.util.Date;
+import org.ihtsdo.helper.rf2.Rf2File;
 import org.ihtsdo.helper.rf2.Rf2File.ConceptsFileFields;
 import org.ihtsdo.helper.rf2.Rf2File.DescriptionsFileFields;
 import org.ihtsdo.helper.rf2.Rf2File.IdentifiersFileFields;
 import org.ihtsdo.helper.rf2.Rf2File.RelationshipsFileFields;
 import org.ihtsdo.helper.rf2.Rf2File.ReleaseType;
 
-// TODO: Auto-generated Javadoc
+
 /**
- * The Class EConceptToRF2UuidTransformer.
+ * The Class EConceptToRF2UuidTransformer converts an eConcept into a uuid-based
+ * RF2 release file.
  *
- * @author kec
  */
 public class EConceptToRF2UuidTransformer implements EConceptTransformerBI {
 
-    /**
-     * The concepts writer.
-     */
     Writer conceptsWriter;
-    /**
-     * The country.
-     */
     COUNTRY_CODE country;
-    /**
-     * The descriptions writer.
-     */
     Writer descriptionsWriter;
-    /**
-     * The effective date.
-     */
     Date effectiveDate;
-    /**
-     * The identifiers writer.
-     */
     Writer identifiersWriter;
-    /**
-     * The language.
-     */
     LANG_CODE language;
-    /**
-     * The namespace.
-     */
     String namespace;
-    /**
-     * The relationships writer.
-     */
     Writer relationshipsWriter;
-    /**
-     * The release type.
-     */
     ReleaseType releaseType;
 
     //~--- constructors --------------------------------------------------------
     /**
-     * Instantiates a new e concept to r f2 uuid transformer.
+     * Instantiates a new eConcept to RF2 uuid transformer.
      *
-     * @param directory the directory
-     * @param releaseType the release type
-     * @param language the language
-     * @param country the country
-     * @param namespace the namespace
-     * @param effectiveDate the effective date
+     * @param directory the directory to write the files to
+     * @param releaseType the type of release
+     * @param language the language associated with the
+     * @param country the country associated with the release
+     * @param namespace the namespace associated with the release
+     * @param effectiveDate the publication date
      * @throws IOException signals that an I/O exception has occurred
      */
     public EConceptToRF2UuidTransformer(File directory, ReleaseType releaseType, LANG_CODE language,
@@ -170,9 +144,9 @@ public class EConceptToRF2UuidTransformer implements EConceptTransformerBI {
     }
 
     //~--- methods -------------------------------------------------------------
-
-    /* (non-Javadoc)
-     * @see org.ihtsdo.helper.econcept.transfrom.EConceptTransformerBI#close()
+    /**
+     *
+     * @throws IOException signals an I/O exception has occurred
      */
     @Override
     public void close() throws IOException {
@@ -193,23 +167,26 @@ public class EConceptToRF2UuidTransformer implements EConceptTransformerBI {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.helper.econcept.transfrom.EConceptTransformerBI#process(org.ihtsdo.tk.dto.concept.TkConcept)
+    /**
+     * Writes the concept's components to the RF2 files.
+     *
+     * @param tkConcept the concept to process
+     * @throws Exception indicates an exception has occurred
      */
     @Override
-    public void process(TkConcept c) throws Exception {
-        TkConceptAttributes ca = c.getConceptAttributes();
+    public void process(TkConcept tkConcept) throws Exception {
+        TkConceptAttributes ca = tkConcept.getConceptAttributes();
 
         processConceptAttribute(ca);
 
-        if (c.getDescriptions() != null) {
-            for (TkDescription d : c.getDescriptions()) {
+        if (tkConcept.getDescriptions() != null) {
+            for (TkDescription d : tkConcept.getDescriptions()) {
                 processDescription(d);
             }
         }
 
-        if (c.getRelationships() != null) {
-            for (TkRelationship r : c.getRelationships()) {
+        if (tkConcept.getRelationships() != null) {
+            for (TkRelationship r : tkConcept.getRelationships()) {
                 processRelationship(r);
             }
         }
@@ -218,32 +195,35 @@ public class EConceptToRF2UuidTransformer implements EConceptTransformerBI {
     }
 
     /**
-     * Process concept attribute.
+     * Converts the concept attribute to uuids and writes the concept file according
+     * to the
+     * <code>ConceptsFileFields</code>.
      *
-     * @param ca the ca
+     * @param tkConceptAttributes the concept attributes to process
      * @throws IOException signals that an I/O exception has occurred
+     * @see Rf2File.ConceptsFileFields
      */
-    private void processConceptAttribute(TkConceptAttributes ca) throws IOException {
-        if (ca != null) {
+    private void processConceptAttribute(TkConceptAttributes tkConceptAttributes) throws IOException {
+        if (tkConceptAttributes != null) {
             for (ConceptsFileFields field : ConceptsFileFields.values()) {
                 switch (field) {
                     case ACTIVE:
-                        conceptsWriter.write(ca.getStatusUuid().toString() + "\t");
+                        conceptsWriter.write(tkConceptAttributes.getStatusUuid().toString() + "\t");
 
                         break;
 
                     case DEFINITION_STATUS_ID:
-                        conceptsWriter.write(ca.isDefined() + "\n");
+                        conceptsWriter.write(tkConceptAttributes.isDefined() + "\n");
 
                         break;
 
                     case EFFECTIVE_TIME:
-                        conceptsWriter.write(TimeHelper.formatDateForFile(ca.getTime()) + "\t");
+                        conceptsWriter.write(TimeHelper.formatDateForFile(tkConceptAttributes.getTime()) + "\t");
 
                         break;
 
                     case ID:
-                        conceptsWriter.write(ca.getPrimordialComponentUuid().toString() + "\t");
+                        conceptsWriter.write(tkConceptAttributes.getPrimordialComponentUuid().toString() + "\t");
 
                         break;
 
@@ -254,8 +234,8 @@ public class EConceptToRF2UuidTransformer implements EConceptTransformerBI {
                 }
             }
 
-            if (ca.revisions != null) {
-                for (TkConceptAttributesRevision car : ca.revisions) {
+            if (tkConceptAttributes.revisions != null) {
+                for (TkConceptAttributesRevision car : tkConceptAttributes.revisions) {
                     for (ConceptsFileFields field : ConceptsFileFields.values()) {
                         switch (field) {
                             case ACTIVE:
@@ -274,7 +254,7 @@ public class EConceptToRF2UuidTransformer implements EConceptTransformerBI {
                                 break;
 
                             case ID:
-                                conceptsWriter.write(ca.getPrimordialComponentUuid().toString() + "\t");
+                                conceptsWriter.write(tkConceptAttributes.getPrimordialComponentUuid().toString() + "\t");
 
                                 break;
 
@@ -290,27 +270,30 @@ public class EConceptToRF2UuidTransformer implements EConceptTransformerBI {
     }
 
     /**
-     * Process description.
+     * Converts the description to uuids and writes the description file according
+     * to the
+     * <code>DescriptionsFileFields</code>.
      *
-     * @param desc the desc
+     * @param tkDescription the description to process
      * @throws IOException signals that an I/O exception has occurred
+     * @see Rf2File.DescriptionsFileFields
      */
-    private void processDescription(TkDescription desc) throws IOException {
-        if (desc != null) {
+    private void processDescription(TkDescription tkDescription) throws IOException {
+        if (tkDescription != null) {
             for (DescriptionsFileFields field : DescriptionsFileFields.values()) {
                 switch (field) {
                     case ACTIVE:
-                        descriptionsWriter.write(desc.getStatusUuid().toString() + "\t");
+                        descriptionsWriter.write(tkDescription.getStatusUuid().toString() + "\t");
 
                         break;
 
                     case EFFECTIVE_TIME:
-                        descriptionsWriter.write(TimeHelper.formatDateForFile(desc.getTime()) + "\t");
+                        descriptionsWriter.write(TimeHelper.formatDateForFile(tkDescription.getTime()) + "\t");
 
                         break;
 
                     case ID:
-                        descriptionsWriter.write(desc.getPrimordialComponentUuid().toString() + "\t");
+                        descriptionsWriter.write(tkDescription.getPrimordialComponentUuid().toString() + "\t");
 
                         break;
 
@@ -320,34 +303,34 @@ public class EConceptToRF2UuidTransformer implements EConceptTransformerBI {
                         break;
 
                     case CONCEPT_ID:
-                        descriptionsWriter.write(desc.getConceptUuid() + "\t");
+                        descriptionsWriter.write(tkDescription.getConceptUuid() + "\t");
 
                         break;
 
                     case LANGUAGE_CODE:
-                        descriptionsWriter.write(desc.getLang() + "\t");
+                        descriptionsWriter.write(tkDescription.getLang() + "\t");
 
                         break;
 
                     case TYPE_ID:
-                        descriptionsWriter.write(desc.getTypeUuid() + "\t");
+                        descriptionsWriter.write(tkDescription.getTypeUuid() + "\t");
 
                         break;
 
                     case TERM:
-                        descriptionsWriter.write(desc.getText() + "\t");
+                        descriptionsWriter.write(tkDescription.getText() + "\t");
 
                         break;
 
                     case CASE_SIGNIFICANCE_ID:
-                        descriptionsWriter.write(desc.isInitialCaseSignificant() + "\n");
+                        descriptionsWriter.write(tkDescription.isInitialCaseSignificant() + "\n");
 
                         break;
                 }
             }
 
-            if (desc.revisions != null) {
-                for (TkDescriptionRevision descr : desc.revisions) {
+            if (tkDescription.revisions != null) {
+                for (TkDescriptionRevision descr : tkDescription.revisions) {
                     for (DescriptionsFileFields field : DescriptionsFileFields.values()) {
                         switch (field) {
                             case ACTIVE:
@@ -361,7 +344,7 @@ public class EConceptToRF2UuidTransformer implements EConceptTransformerBI {
                                 break;
 
                             case ID:
-                                descriptionsWriter.write(desc.getPrimordialComponentUuid().toString() + "\t");
+                                descriptionsWriter.write(tkDescription.getPrimordialComponentUuid().toString() + "\t");
 
                                 break;
 
@@ -371,7 +354,7 @@ public class EConceptToRF2UuidTransformer implements EConceptTransformerBI {
                                 break;
 
                             case CONCEPT_ID:
-                                descriptionsWriter.write(desc.getConceptUuid() + "\t");
+                                descriptionsWriter.write(tkDescription.getConceptUuid() + "\t");
 
                                 break;
 
@@ -402,27 +385,30 @@ public class EConceptToRF2UuidTransformer implements EConceptTransformerBI {
     }
 
     /**
-     * Process relationship.
+     * Converts the relationship to uuids and writes the relationship file according
+     * to the
+     * <code>RelationshipsFileFields</code>.
      *
-     * @param r the r
+     * @param tkRelationship the relationship to process
      * @throws IOException signals that an I/O exception has occurred
+     * @see Rf2File.RelationshipsFileFields
      */
-    private void processRelationship(TkRelationship r) throws IOException {
-        if (r != null) {
+    private void processRelationship(TkRelationship tkRelationship) throws IOException {
+        if (tkRelationship != null) {
             for (RelationshipsFileFields field : RelationshipsFileFields.values()) {
                 switch (field) {
                     case ACTIVE:
-                        relationshipsWriter.write(r.getStatusUuid().toString() + "\t");
+                        relationshipsWriter.write(tkRelationship.getStatusUuid().toString() + "\t");
 
                         break;
 
                     case EFFECTIVE_TIME:
-                        relationshipsWriter.write(TimeHelper.formatDateForFile(r.getTime()) + "\t");
+                        relationshipsWriter.write(TimeHelper.formatDateForFile(tkRelationship.getTime()) + "\t");
 
                         break;
 
                     case ID:
-                        relationshipsWriter.write(r.getPrimordialComponentUuid().toString() + "\t");
+                        relationshipsWriter.write(tkRelationship.getPrimordialComponentUuid().toString() + "\t");
 
                         break;
 
@@ -432,39 +418,39 @@ public class EConceptToRF2UuidTransformer implements EConceptTransformerBI {
                         break;
 
                     case SOURCE_ID:
-                        relationshipsWriter.write(r.getRelationshipSourceUuid() + "\t");
+                        relationshipsWriter.write(tkRelationship.getRelationshipSourceUuid() + "\t");
 
                         break;
 
                     case DESTINATION_ID:
-                        relationshipsWriter.write(r.getRelationshipTargetUuid() + "\t");
+                        relationshipsWriter.write(tkRelationship.getRelationshipTargetUuid() + "\t");
 
                         break;
 
                     case RELATIONSHIP_GROUP:
-                        relationshipsWriter.write(r.getRelationshipGroup() + "\t");
+                        relationshipsWriter.write(tkRelationship.getRelationshipGroup() + "\t");
 
                         break;
 
                     case TYPE_ID:
-                        relationshipsWriter.write(r.getTypeUuid() + "\t");
+                        relationshipsWriter.write(tkRelationship.getTypeUuid() + "\t");
 
                         break;
 
                     case CHARCTERISTIC_ID:
-                        relationshipsWriter.write(r.getCharacteristicUuid() + "\t");
+                        relationshipsWriter.write(tkRelationship.getCharacteristicUuid() + "\t");
 
                         break;
 
                     case MODIFIER_ID:
-                        relationshipsWriter.write(r.getRefinabilityUuid() + "\n");
+                        relationshipsWriter.write(tkRelationship.getRefinabilityUuid() + "\n");
 
                         break;
                 }
             }
 
-            if (r.revisions != null) {
-                for (TkRelationshipRevision rv : r.revisions) {
+            if (tkRelationship.revisions != null) {
+                for (TkRelationshipRevision rv : tkRelationship.revisions) {
                     for (RelationshipsFileFields field : RelationshipsFileFields.values()) {
                         switch (field) {
                             case ACTIVE:
@@ -478,7 +464,7 @@ public class EConceptToRF2UuidTransformer implements EConceptTransformerBI {
                                 break;
 
                             case ID:
-                                relationshipsWriter.write(r.getPrimordialComponentUuid().toString() + "\t");
+                                relationshipsWriter.write(tkRelationship.getPrimordialComponentUuid().toString() + "\t");
 
                                 break;
 
@@ -488,12 +474,12 @@ public class EConceptToRF2UuidTransformer implements EConceptTransformerBI {
                                 break;
 
                             case SOURCE_ID:
-                                relationshipsWriter.write(r.getRelationshipSourceUuid() + "\t");
+                                relationshipsWriter.write(tkRelationship.getRelationshipSourceUuid() + "\t");
 
                                 break;
 
                             case DESTINATION_ID:
-                                relationshipsWriter.write(r.getRelationshipTargetUuid() + "\t");
+                                relationshipsWriter.write(tkRelationship.getRelationshipTargetUuid() + "\t");
 
                                 break;
 

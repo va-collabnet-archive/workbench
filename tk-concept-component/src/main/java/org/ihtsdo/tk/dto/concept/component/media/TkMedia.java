@@ -35,7 +35,6 @@ import java.io.IOException;
 import java.util.*;
 import org.ihtsdo.tk.dto.RevisionHandling;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class TkMedia represents a type of media in the eConcept format and
  * contains methods for interacting with a type of media. Further discussion of
@@ -43,7 +42,7 @@ import org.ihtsdo.tk.dto.RevisionHandling;
  * <code>TkConcept</code>.
  *
  * @see TkConcept
- * @param <V> the value type
+ * @param <V> the generic media type
  */
 public class TkMedia extends TkComponent<TkMediaRevision> {
 
@@ -309,7 +308,6 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException indicates a specified class was not found
-     * TODO-javadoc: why?
      */
     @Override
     public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

@@ -1107,7 +1107,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      * @param descType a <code>ConceptSpec</code> representing the description
      * type to write
      * @throws IOException signals that an I/O exception has occurred
-     * @throws NoSuchAlgorithmException the no such algorithm exception
+     * @throws NoSuchAlgorithmException indicates a no such algorithm exception has occurred
      * @see Rf2File.DescTypeFileFields
      */
     private void processDescType(ConceptSpec descType) throws IOException, NoSuchAlgorithmException {

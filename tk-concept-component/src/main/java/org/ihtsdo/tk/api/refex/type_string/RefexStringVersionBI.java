@@ -18,7 +18,7 @@ package org.ihtsdo.tk.api.refex.type_string;
 
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 
-// TODO: Auto-generated Javadoc
+
 /**
  * The Interface RefexStringVersionBI provides methods for interacting with a
  * particular version of a string type refex member.

@@ -20,7 +20,7 @@ import java.io.Serializable;
 
 /**
  * The Interface ConstraintBI represents a generic constraint which can be
- * declared on a component.
+ * declared on a component. A constraint is defined by a subject-property-value.
  */
 public interface ConstraintBI extends Serializable {
 }

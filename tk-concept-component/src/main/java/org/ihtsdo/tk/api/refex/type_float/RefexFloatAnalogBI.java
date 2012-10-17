@@ -21,7 +21,6 @@ import java.beans.PropertyVetoException;
 
 import org.ihtsdo.tk.api.refex.RefexAnalogBI;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Interface RefexFloatAnalogBI contains methods for editing a float type refex analog. The
  * preferred method of editing terminology is through a blueprint.

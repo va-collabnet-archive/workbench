@@ -38,7 +38,6 @@ import org.ihtsdo.tk.contradiction.ContradictionIdentifierBI;
 import org.ihtsdo.tk.db.DbDependency;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Interface TerminologyStoreDI.
  */

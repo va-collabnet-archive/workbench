@@ -24,44 +24,55 @@ import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.MediaCAB;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
-// TODO: Auto-generated Javadoc
+
 /**
- * The Interface MediaVersionBI.
+ * The Interface MediaVersionBI provides methods for interacting with, or
+ * creating version of, a type of media.
  *
- * @param <A> the generic type
+ * @param <A> the type of object returned by the analog generator
+ * @see ComponentVersionBI
  */
 public interface MediaVersionBI<A extends MediaAnalogBI>
         extends TypedComponentVersionBI,
 		MediaChronicleBI, AnalogGeneratorBI<A> {
 
     /**
-     * Gets the media.
+     * Gets the media associated with this media version.
      *
      * @return the media
      */
     public byte[] getMedia();
 
     /**
-     * Gets the text description.
+     * Gets a text description associated with this media version.
      *
      * @return the text description
      */
     public String getTextDescription();
 
     /**
-     * Gets the format.
+     * Gets a string representing the media format.
      *
-     * @return the format
+     * @return the format of this media
      */
     public String getFormat();
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.api.ComponentBI#getConceptNid()
+    /**
+     * 
+     * @return the enclosing concept nid
      */
+    @Override
     public int getConceptNid();
     
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.api.ComponentVersionBI#makeBlueprint(org.ihtsdo.tk.api.coordinate.ViewCoordinate)
+    /**
+     * 
+     * @param viewCoordinate the view coordinate specifying which version is active or inactive
+     * @return the media blueprint, which can be constructed to create
+     * a <code>MediaChronicleBI</code>
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws ContradictionException the contradiction exception
+     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
+     * @see org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint
      */
     @Override
     public MediaCAB makeBlueprint(ViewCoordinate viewCoordinate) throws IOException, ContradictionException, InvalidCAB;

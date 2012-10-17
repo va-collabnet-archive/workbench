@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class TkConceptAttributesRevision represents a version of a concept
  * attribute in the eConcept format and contains methods for interacting with
@@ -85,7 +84,6 @@ public class TkConceptAttributesRevision extends TkRevision implements I_Concept
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException indicates a specified class was not found
-     * TODO-javadoc: why?
      */
     public TkConceptAttributesRevision(DataInput in, int dataVersion)
             throws IOException, ClassNotFoundException {
@@ -170,7 +168,6 @@ public class TkConceptAttributesRevision extends TkRevision implements I_Concept
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException indicates a specified class was not found
-     * TODO-javadoc: why?
      */
     @Override
     public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

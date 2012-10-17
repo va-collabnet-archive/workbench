@@ -26,7 +26,7 @@ import org.ihtsdo.tk.api.media.MediaChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 
-// TODO: Auto-generated Javadoc
+
 /**
  * Interface for classes that resolve contradictions - i.e. the scenario where two
  * different paths have different data for a given component.
@@ -52,7 +52,7 @@ public interface ContradictionManagerBI extends Serializable {
      * attempting to choose a conflict resolution strategy. This content
      * may contain XHTML markup for readability.
      * 
-     * @return The display name of this conflict resolution strategy
+     * @return a description of this conflict resolution strategy
      */
     String getDescription();
 
@@ -67,7 +67,7 @@ public interface ContradictionManagerBI extends Serializable {
      *
      * @param <T> the generic type of component version
      * @param versions the versions to resolve
-     * @return tuples resolved as per the resolution strategy
+     * @return the component versions resolved as per the resolution strategy
      */
     <T extends ComponentVersionBI> List<T> resolveVersions(List<T> versions);
 
@@ -85,8 +85,8 @@ public interface ContradictionManagerBI extends Serializable {
      * entity. </strong>
      *
      * @param <T> the generic type of component versions
-     * @param part1 the part1
-     * @param part2 the part2
+     * @param part1 the first part
+     * @param part2 the second part
      * @return parts resolved as per the resolution strategy
      */
     <T extends ComponentVersionBI> List<T> resolveVersions(T part1, T part2);

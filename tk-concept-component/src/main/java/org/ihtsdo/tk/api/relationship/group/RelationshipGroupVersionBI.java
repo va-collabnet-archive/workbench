@@ -25,7 +25,6 @@ import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 import java.util.Collection;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Interface RelationshipGroupVersionBI provides methods for interacting
  * with a version of a relationship group.

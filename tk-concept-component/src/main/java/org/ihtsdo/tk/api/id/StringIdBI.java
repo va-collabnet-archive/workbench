@@ -19,16 +19,16 @@
 
 package org.ihtsdo.tk.api.id;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Interface StringIdBI.
+ * The Interface StringIdBI contains methods for interacting with a <code>String</code> type of
+ * identifier.
  *
- * @author kec
  */
 public interface StringIdBI extends IdBI {
    
-   /* (non-Javadoc)
-    * @see org.ihtsdo.tk.api.id.IdBI#getDenotation()
+   /**
+    * 
+    * @return the <code>String</code> id denotation value
     */
    @Override
    String getDenotation();

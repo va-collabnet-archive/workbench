@@ -17,17 +17,17 @@
 
 package org.ihtsdo.tk.api;
 
-// TODO: Auto-generated Javadoc
+
 /**
- * The Interface ContinuationTrackerBI.
- *
+ * The Interface ContinuationTrackerBI is implemented by the classes using parallel concept iterators.
+ * @see ProcessUnfetchedConceptDataBI
  */
 public interface ContinuationTrackerBI {
        
        /**
-        * Continue work.
+        * Checks if the processor can continue.
         *
-        * @return <code>true</code>, if successful
+        * @return <code>true</code>, if the processor can continue
         */
        public boolean continueWork();
 }

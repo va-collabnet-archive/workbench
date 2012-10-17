@@ -30,7 +30,6 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class TkIdentifierUuid represents a version of a uuid identifier in the
  * eConcept format and contains methods specific to interacting with a version

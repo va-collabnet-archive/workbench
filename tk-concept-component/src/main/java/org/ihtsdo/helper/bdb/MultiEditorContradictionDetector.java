@@ -36,7 +36,6 @@ import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_array_of_bytearray.RefexArrayOfBytearrayVersionBI;
 import org.ihtsdo.tk.uuid.UuidT5Generator;
 
-// TODO-javadoc: skipped private methods/variables
 /**
  * The Class MultiEditorContradictionDetector processes concepts and determines
  * if a contradiction exists. This class implements
@@ -81,7 +80,7 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
      * sorting adjudication records
      * @param viewCoordinate the view coordinate representing which version of
      * the concept to test for contradictions
-     * @param caseList the list of *      * type <code>MultiEditorContradictionCase</code> which will contain
+     * @param caseList the list of * * * *      * type <code>MultiEditorContradictionCase</code> which will contain
      * any found contradiction
      * @param watchSet a set of concept nids to watch for debugging purposes
      * @param ignoreReadOnlySap set to <code>true</code> to not compute
@@ -138,7 +137,7 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
      * sorting adjudication records
      * @param viewCoordinate the view coordinate representing which version of
      * the concept to test for contradictions
-     * @param caseList the list of *      * type <code>MultiEditorContradictionCase</code> which will contain
+     * @param caseList the list of * * * *      * type <code>MultiEditorContradictionCase</code> which will contain
      * any found contradiction
      * @param watchSet a set of concept nids to watch for debugging purposes,
      * creates a list of contradiction cases for just these concepts
@@ -284,7 +283,7 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
                     }
                 }
                 Collections.sort(caseList, String.CASE_INSENSITIVE_ORDER);
-                HashSet<Integer> componentNids = getComponentNidsInConflict(accumDiffSet,
+                HashSet<Integer> componentNids = getComponentNidsInContradiction(accumDiffSet,
                         cNid,
                         timeAthStampNidMap,
                         conflictSaps);
@@ -323,20 +322,31 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
      * author-time hash for stamps from read-only database
      * @param ignoreNonVisibleAth set to <code>true</code> to ignore stamp nids
      * not computable from the concept
-     * @param projectPathNidTimeAthMap the time-author maps for the specified project path
-     * @param conflictStamps the set of stamp nids in conflict, empty--will be populated
+     * @param projectPathNidTimeAthMap the time-author maps for the specified
+     * project path
+     * @param conflictStamps the set of stamp nids in conflict, empty--will be
+     * populated
      * @param timeAthStampNidMap the map of suthor-times to stamp nids
-     * @param componentsMissingCommitRecord the set of components missing commit record, empty--will be populated
+     * @param componentsMissingCommitRecord the set of components missing commit
+     * record, empty--will be populated
      * @param commitRefsetAthSetsList the list of author-times sets for commit
      * @param replacementSet the list of author-times for adjudication commit
-     * @param conceptComputedAthAllMap the map of all component uuids to computed author-times for the concept
-     * @param conceptComputedAthDiffAllMap the map of all component uuids to computed author-times for the concept without components with non-synchronized authors (classifier)
-     * @param conceptComputedAthMap the map of component uuids to computed author-times for the concept on the project path, empty--will be populated
-     * @param conceptMissingAthMap the map of missing computed author-times on the concept, empty--will be populated
-     * @param truthRefsetAthSetsList the list of author-times for adjudication commit, empty--will be populated
+     * @param conceptComputedAthAllMap the map of all component uuids to
+     * computed author-times for the concept
+     * @param conceptComputedAthDiffAllMap the map of all component uuids to
+     * computed author-times for the concept without components with
+     * non-synchronized authors (classifier)
+     * @param conceptComputedAthMap the map of component uuids to computed
+     * author-times for the concept on the project path, empty--will be
+     * populated
+     * @param conceptMissingAthMap the map of missing computed author-times on
+     * the concept, empty--will be populated
+     * @param truthRefsetAthSetsList the list of author-times for adjudication
+     * commit, empty--will be populated
      * @return the set of of contradicting author-time hashes
      * @throws IOException Signals that an I/O exception has occurred.
-     * @throws NoSuchAlgorithmException the no such algorithm exception
+     * @throws NoSuchAlgorithmException indicates a no such algorithm exception
+     * has occurred
      */
     public static HashSet<UUID> contradictionDetectionAlgorithm(
             int cNid,
@@ -450,10 +460,13 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
     }
 
     /**
-     * Gets Author Time Hash (ATH) sets from the specified <code>refset<code> for the provided <code>concept<code>.
+     * Gets Author Time Hash (ATH) sets from the specified
+     * <code>refset<code> for the provided
+     * <code>concept<code>.
      *
      * @param concept the concept in question
-     * @param refset the nid representing the refset (either commit or adjudication)
+     * @param refset the nid representing the refset (either commit or
+     * adjudication)
      * @return the list of sets of author-time hashes
      * @throws IOException Signals that an I/O exception has occurred.
      */
@@ -487,12 +500,23 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
     }
 
     /**
-     * The Class SizeComparator.
+     * The Class SizeComparator compares the size of two
+     * <code>HashSets</code>.
      */
     private static class SizeComparator implements Comparator<HashSet<UUID>> {
 
-        /* (non-Javadoc)
-         * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+        /**
+         * Compares the size of two
+         * <code>HashSets</code>,
+         * <code>o1</code> and
+         * <code>o2</code>.
+         *
+         * @param o1 the first <code>HashSet</code> to compare
+         * @param o2 the second <code>HashSet</code> to compare
+         * @return 1 if <code>o1</code> is larger than <code>o2</code>, -1 * *
+         * if <code>o2</code> is larger than <code>o1</code>
+         * @see java.util.Comparator#compare
+         *
          */
         @Override
         public int compare(HashSet<UUID> o1, HashSet<UUID> o2) {
@@ -506,13 +530,18 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
     }
 
     /**
-     * Gets the computed ath map.
+     * Gets a map of computed author-times for the given
+     * <code>concept</code>. This is computed based on the stamp nids associated
+     * with the version of the concept.
      *
-     * @param concept the concept
-     * @param skipExtra the skip extra
-     * @return the computed ath map
-     * @throws NoSuchAlgorithmException the no such algorithm exception
-     * @throws UnsupportedEncodingException the unsupported encoding exception
+     * @param concept the concept version to use for computing the author-times
+     * @param skipExtra set to <code>true</code> to exclude the classifier and
+     * "user" authors
+     * @return the computed author-times mapped to a String representing the
+     * time, author concept, and a string representation of the author-time hash
+     * @throws NoSuchAlgorithmException indicates a no such algorithm exception
+     * has occurred
+     * @throws UnsupportedEncodingException indicates an unsupported encoding exception has occurred
      * @throws IOException Signals that an I/O exception has occurred.
      */
     private HashMap<UUID, String> getComputedAthMap(ConceptVersionBI concept, boolean skipExtra)
@@ -560,7 +589,8 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
     }
 
     /**
-     * Checks if this contradiction detector has found components missing commit records.
+     * Checks if this contradiction detector has found components missing commit
+     * records.
      *
      * @return true, if there are components missing commit records
      */
@@ -573,12 +603,15 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
     }
 
     /**
-     * Gets the missing ath map.
+     * Creates a set of the adjudication and commit author-times and checks to
+     * make sure all of the uuids in the
+     * <code>computedMap</code> are present.
      *
-     * @param computedMap the computed map
-     * @param commitRefsetAthSetsList the commit refset ath sets list
-     * @param truthRefsetAthSetsList the truth refset ath sets list
-     * @return the missing ath map
+     * @param computedMap the map containing the computed author-times
+     * @param commitRefsetAthSetsList the commit author-times
+     * @param truthRefsetAthSetsList the adjudication author-times
+     * @return the a map of any computed author-times that were missing from the
+     * commit or adjudication maps
      */
     private static HashMap<UUID, String> getMissingAthMap(HashMap<UUID, String> computedMap,
             ArrayList<HashSet<UUID>> commitRefsetAthSetsList,
@@ -607,39 +640,46 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
     }
 
     /**
-     * Gets the component nids in conflict.
+     * Gets the nids of the components in contradiction.
      *
-     * @param accumDiffSet the accum diff set
-     * @param cNid the c nid
-     * @param timeAthStampNidMap the time ath stamp nid map
-     * @param conflictSaps the conflict saps
-     * @return the component nids in conflict
+     * @param accumDiffSet the set of author-times found by the contradiction
+     * detection algorithm to be in contradiction
+     * @param cNid the nid of the enclosing concept
+     * @param timeAthStampNidMap a map of author-times mapped to the stamp nids
+     * they represent
+     * @param contradictionStamps the stamp nids associated with components in
+     * contradiction
+     * @return the nids of the components in contradiction
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    private static HashSet<Integer> getComponentNidsInConflict(HashSet<UUID> accumDiffSet,
+    private static HashSet<Integer> getComponentNidsInContradiction(HashSet<UUID> accumDiffSet,
             int cNid,
             ConcurrentHashMap<UUID, ConcurrentSkipListSet<Integer>> timeAthStampNidMap,
-            ConcurrentSkipListSet<Integer> conflictSaps) throws IOException {
+            ConcurrentSkipListSet<Integer> contradictionStamps) throws IOException {
         HashSet<Integer> componentNids = new HashSet<Integer>();
         for (UUID timeAuthHash : accumDiffSet) {
             if (timeAthStampNidMap.containsKey(timeAuthHash)) {
                 for (int sap : timeAthStampNidMap.get(timeAuthHash)) {
-                    conflictSaps.add(sap);
+                    contradictionStamps.add(sap);
                 }
             }
         }
         ConceptChronicleBI concept = Ts.get().getConcept(cNid);
-        componentNids.addAll(concept.getAllNidsForStamps(conflictSaps));
+        componentNids.addAll(concept.getAllNidsForStamps(contradictionStamps));
         return componentNids;
     }
 
     /**
-     * Lesser diff from greater.
+     * Returns a set of the author-times from the
+     * <code>lesser</code> set which are not represented in the
+     * <code>greater</code>.
      *
-     * @param lesser the lesser
-     * @param greater the greater
-     * @param checkEqualSize the check equal size
-     * @return the hash set
+     * @param lesser the lesser sized set of author-times
+     * @param greater the greater sized set of author-times
+     * @param checkEqualSize set to <code>true</code> to check of the sets are
+     * the same size
+     * @return set of the author-times from the <code>lesser</code> set which
+     * are not represented in the <code>greater</code>
      */
     private static HashSet<UUID> lesserDiffFromGreater(HashSet<UUID> lesser, HashSet<UUID> greater,
             boolean checkEqualSize) {
@@ -659,12 +699,15 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
     }
 
     /**
-     * To string author time.
+     * Creates a
+     * <code>String</code> representation of the author-time. Includes the time
+     * in a yyyy-MM-dd HH:mm:ss format, the author uuid, and the author-time
+     * hash.
      *
-     * @param time the time
-     * @param author the author
-     * @param uuid the uuid
-     * @return the string
+     * @param time a <code>long</code> representing the time
+     * @param author the author concept
+     * @param uuid the author-time uuid
+     * @return a string representing the specified author-time
      */
     private static String toStringAuthorTime(long time, ConceptChronicleBI author,
             UUID uuid) {
@@ -685,10 +728,12 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
     }
 
     /**
-     * To string author time missing.
+     * Creates a
+     * <code>String</code> representation of a missing author-time. Includes the
+     * author-time, but has "unknown" for the time and component.
      *
-     * @param uuid the uuid
-     * @return the string
+     * @param uuid the author-time uuid
+     * @return a string representing the missing author-time
      */
     private static String toStringAuthorTimeMissing(UUID uuid) {
         StringBuilder sb = new StringBuilder();
@@ -706,7 +751,8 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
     }
 
     /**
-     * Generates a string representing any missing commit records, including the uuid and a string representation of the components.
+     * Generates a string representing any missing commit records, including the
+     * uuid and a string representation of the components.
      *
      * @return a string representing any missing commit records
      */

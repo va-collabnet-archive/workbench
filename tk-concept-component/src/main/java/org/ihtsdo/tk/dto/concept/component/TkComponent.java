@@ -56,7 +56,6 @@ import java.io.IOException;
 import java.util.*;
 import org.ihtsdo.tk.dto.concept.component.refex.type_arrayofbytearray.TkRefexArrayOfBytearrayMember;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class TkComponent represents a concept component in the eConcept format
  * and contains methods general to interacting with a component. Further
@@ -64,7 +63,7 @@ import org.ihtsdo.tk.dto.concept.component.refex.type_arrayofbytearray.TkRefexAr
  * <code>TkConcept</code>.
  *
  * @see TkConcept
- * @param <V> the value type
+ * @param <V> the generic revision type
  */
 public abstract class TkComponent<V extends TkRevision> extends TkRevision {
 
@@ -134,7 +133,6 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException indicates a specified class was not found
-     * TODO-javadoc: why?
      */
     public TkComponent(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
@@ -364,7 +362,7 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
      * @param in the data input specifying the TK Concept
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ClassNotFoundException TODO-javadoc: why?
+     * @throws ClassNotFoundException  indicates a specified class was not found
      */
     @Override
     public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

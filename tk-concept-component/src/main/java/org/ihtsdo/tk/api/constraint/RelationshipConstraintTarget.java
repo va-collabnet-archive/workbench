@@ -60,7 +60,7 @@ public class RelationshipConstraintTarget extends RelationshipConstraint {
     }
 
     /**
-     * Instantiates a new outgoin relationship constraint based on the
+     * Instantiates a new outgoing relationship constraint based on the
      * <code>sourceSpec</code>,
      * <code>relationshipTypeSpec</code>, and
      * <code>targetSpec</code>.

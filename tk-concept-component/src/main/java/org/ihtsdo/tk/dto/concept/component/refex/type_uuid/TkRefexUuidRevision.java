@@ -31,7 +31,6 @@ import java.util.Map;
 import java.util.UUID;
 import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class TkRefexUuidRevision represents a version of a uuid type refex
  * member in the eConcept format and contains methods specific for interacting
@@ -174,7 +173,6 @@ public class TkRefexUuidRevision extends TkRevision {
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException indicates a specified class was not found
-     * TODO-javadoc: why?
      */
     @Override
     public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

@@ -38,7 +38,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Set;
 
-// TODO: Auto-generated Javadoc
+
 /**
  * The Interface ConceptChronicleBI provides methods for interacting with a
  * concept such as getting the concepts components or identifiers. A concept can

@@ -19,10 +19,9 @@ package org.ihtsdo.tk.api.description;
 import org.ihtsdo.tk.api.ComponentChronicleBI;
 
 /**
- * The Interface DescriptionChronicleBI represents the collection of description
- * versions.
- *
- * TODO-javadoc: match concept attributes
+ * The Interface DescriptionChronicleBI represents a chronicle that has
+ * version of type
+ * <code>DescriptionVersionBI</code>.\
  *
  * @see ComponentChronicleBI
  */

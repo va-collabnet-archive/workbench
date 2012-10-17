@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class TkRefexAbstractMember represents a refex member in the eConcept
  * format and contains methods generic for interacting with a refex member.
@@ -220,7 +219,6 @@ public abstract class TkRefexAbstractMember<V extends TkRevision> extends TkComp
      * @param dataVersion the data version of the external source
      * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException indicates a specified class was not found
-     * TODO-javadoc: why?
      */
     @Override
     public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

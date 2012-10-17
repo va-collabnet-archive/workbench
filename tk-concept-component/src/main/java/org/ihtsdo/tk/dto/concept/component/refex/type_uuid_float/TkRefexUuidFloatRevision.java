@@ -32,7 +32,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class TkRefexUuidFloatRevision.
  */

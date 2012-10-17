@@ -33,7 +33,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
 
-// TODO: Auto-generated Javadoc
+
 /**
  * The Class UuidSnomedFixedMap contains two uuid-snomed maps. One is fixed and
  * not modifiable, the other is modifiable. The fixed map is queried when an SCT

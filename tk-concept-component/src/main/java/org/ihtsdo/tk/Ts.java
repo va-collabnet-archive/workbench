@@ -19,7 +19,7 @@ package org.ihtsdo.tk;
 import java.lang.reflect.Method;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 
-// TODO: Auto-generated Javadoc
+
 /**
  * The Class Ts provides methods for setting up and accessing the Terminolgoy Store. Ts is an abbreviation for Terminology store.
  *

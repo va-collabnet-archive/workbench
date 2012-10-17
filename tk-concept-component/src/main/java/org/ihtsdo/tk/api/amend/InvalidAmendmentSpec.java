@@ -1,32 +1,29 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
-
 package org.ihtsdo.tk.api.amend;
 
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class InvalidAmendmentSpec.
+ * The Class InvalidAmendmentSpec represents an exception that occurs when a
+ * field of the specification contains an invalid value.
  *
- * @author kec
  * @deprecated use InvalidCAB
  */
-
 @Deprecated
 public class InvalidAmendmentSpec extends InvalidCAB {
 
@@ -39,7 +36,7 @@ public class InvalidAmendmentSpec extends InvalidCAB {
     /**
      * Instantiates a new invalid amendment spec.
      *
-     * @param string the string
+     * @param string the description string
      */
     public InvalidAmendmentSpec(String string) {
         super(string);
@@ -48,7 +45,7 @@ public class InvalidAmendmentSpec extends InvalidCAB {
     /**
      * Instantiates a new invalid amendment spec.
      *
-     * @param string the string
+     * @param string the description string
      * @param throwable the throwable
      */
     public InvalidAmendmentSpec(String string, Throwable throwable) {
@@ -63,5 +60,4 @@ public class InvalidAmendmentSpec extends InvalidCAB {
     public InvalidAmendmentSpec(Throwable throwable) {
         super(throwable);
     }
-
 }

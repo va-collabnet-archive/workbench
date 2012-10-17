@@ -18,7 +18,6 @@ package org.ihtsdo.tk.api.ext;
 
 import java.util.UUID;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Interface I_VersionExternally is implemented by the class TkRevision and
  * provides methods to access the basic information associated with all

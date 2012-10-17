@@ -33,7 +33,7 @@ public interface AnalogBI {
      * Sets the native id.
      *
      * @param nid the new native id
-     * @throws PropertyVetoException the property veto exception
+     * @throws PropertyVetoException if the new value is not valid
      */
     void setNid(int nid) throws PropertyVetoException;
 
@@ -41,7 +41,7 @@ public interface AnalogBI {
      * Sets the status of the new component.
      *
      * @param statusNid the new status nid
-     * @throws PropertyVetoException the property veto exception
+     * @throws PropertyVetoException if the new value is not valid
      */
     void setStatusNid(int statusNid) throws PropertyVetoException;
 
@@ -49,7 +49,7 @@ public interface AnalogBI {
      * Sets the author of the new component.
      *
      * @param authorNid the new author nid
-     * @throws PropertyVetoException the property veto exception
+     * @throws PropertyVetoException if the new value is not valid
      */
     void setAuthorNid(int authorNid) throws PropertyVetoException;
 
@@ -57,7 +57,7 @@ public interface AnalogBI {
      * Sets the module of the new component.
      *
      * @param moduleNid the new module nid
-     * @throws PropertyVetoException the property veto exception
+     * @throws PropertyVetoException if the new value is not valid
      */
     void setModuleNid(int moduleNid) throws PropertyVetoException;
 
@@ -65,7 +65,7 @@ public interface AnalogBI {
      * Sets the path of the new component.
      *
      * @param pathNid the new path nid
-     * @throws PropertyVetoException the property veto exception
+     * @throws PropertyVetoException if the new value is not valid
      */
     void setPathNid(int pathNid) throws PropertyVetoException;
 
@@ -73,7 +73,7 @@ public interface AnalogBI {
      * Sets the time associated with the addition of the new component.
      *
      * @param time the new time
-     * @throws PropertyVetoException the property veto exception
+     * @throws PropertyVetoException if the new value is not valid
      */
     void setTime(long time) throws PropertyVetoException;
 

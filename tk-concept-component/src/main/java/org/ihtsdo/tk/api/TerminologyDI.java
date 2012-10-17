@@ -29,7 +29,7 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
 import org.ihtsdo.tk.api.search.ScoredComponentReference;
 
-// TODO: Auto-generated Javadoc
+
 /**
  * The Interface TerminologyDI provides methods for working with terminology
  * which are general to both chronicles and versions.
@@ -41,7 +41,7 @@ public interface TerminologyDI {
      * <code>query</code>.
      *
      * @param query the string to search for
-     * @return the matching results in the form * * * * *
+     * @return the matching results in the form
      * of <code>ScoredComponentReferences</code>, which represent the
      * concept/component nid of the result and a score of how well the result
      * matches the search criteria

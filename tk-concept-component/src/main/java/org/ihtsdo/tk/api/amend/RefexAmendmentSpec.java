@@ -25,9 +25,10 @@ import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 
-// TODO: Auto-generated Javadoc
+// TODO-javadoc-kec: not using and deprecated, can delete?
 /**
- * The Class RefexAmendmentSpec.
+ * The Class RefexAmendmentSpec an exception that occurs when a
+ * field of the specification contains an invalid value.
  *
  * @author kec
  * @deprecated

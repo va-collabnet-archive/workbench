@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.tk.api.blueprint;
 
@@ -33,48 +33,38 @@ import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.ComponentChronicleBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.TerminologyBuilderBI;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class CreateOrAmendBlueprint.
+ * The Class CreateOrAmendBlueprint contains methods for creating a terminology
+ * generic blueprint. This blueprint can be constructed into a type of
+ * <code>ComonentChronicleBI</code>. This is the preferred method for updating
+ * or creating new components or concepts.
  *
- * @author kec
+ * @see TerminologyBuilderBI
+ * @see ComponentChronicleBI
  */
 public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
 
-    /** The current status uuid. */
     private static UUID currentStatusUuid = null;
-    
-    /** The retired status uuid. */
     private static UUID retiredStatusUuid = null;
-    
-    /** The component uuid. */
     private UUID componentUuid;
-    
-    /** The status uuid. */
     private UUID statusUuid;
-    
-    /** The cv. */
     private ComponentVersionBI cv;
-    
-    /** The vc. */
     private ViewCoordinate vc;
-    
-    /** The annotations. */
     private List<RefexCAB> annotations = new ArrayList<RefexCAB>();
-    
-    /** The pcs. */
     protected PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
     /**
-     * Removes the property change listener.
+     * Removes the specified property change listener.
      *
-     * @param string the string
+     * @param string the string describing the property name
      * @param propertyChangeListener the property change listener
      */
     public synchronized void removePropertyChangeListener(String string,
@@ -83,7 +73,7 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
     }
 
     /**
-     * Removes the property change listener.
+     * Removes the specified property change listener.
      *
      * @param propertyChangeListener the property change listener
      */
@@ -92,9 +82,9 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
     }
 
     /**
-     * Adds the property change listener.
+     * Adds the specified property change listener.
      *
-     * @param string the string
+     * @param string the string describing the property name
      * @param propertyChangeListener the property change listener
      */
     public synchronized void addPropertyChangeListener(String string, PropertyChangeListener propertyChangeListener) {
@@ -102,7 +92,7 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
     }
 
     /**
-     * Adds the property change listener.
+     * Adds the specified property change listener.
      *
      * @param propertyChangeListener the property change listener
      */
@@ -111,14 +101,19 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
     }
 
     /**
-     * Instantiates a new creates the or amend blueprint.
+     * Instantiates a new create or amend blueprint.
      *
-     * @param componentUuid the component uuid
-     * @param componentVersion the component version
-     * @param viewCoordinate the view coordinate
+     * @param componentUuid the uuid of the component specified by this
+     * blueprint
+     * @param componentVersion the component version to create this blueprint
+     * from
+     * @param viewCoordinate the view coordinate specifying which versions are
+     * active and inactive
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
-     * @throws ContradictionException the contradiction exception
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is returned for
+     * the view coordinate
      */
     public CreateOrAmendBlueprint(UUID componentUuid, ComponentVersionBI componentVersion,
             ViewCoordinate viewCoordinate) throws IOException, InvalidCAB, ContradictionException {
@@ -142,19 +137,29 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
     }
 
     /**
-     * Recompute uuid.
+     * This method is implements by the other component blueprint classes. This
+     * allows the components to recompute their uuids if a dependent component
+     * changes.
      *
-     * @throws NoSuchAlgorithmException the no such algorithm exception
-     * @throws UnsupportedEncodingException the unsupported encoding exception
+     * @throws NoSuchAlgorithmException indicates a no such algorithm exception
+     * has occurred
+     * @throws UnsupportedEncodingException indicates an unsupported encoding
+     * exception has occurred
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
-     * @throws ContradictionException the contradiction exception
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * give position or view coordinate
      */
     public abstract void recomputeUuid() throws NoSuchAlgorithmException, UnsupportedEncodingException,
             IOException, InvalidCAB, ContradictionException;
 
-    /* (non-Javadoc)
-     * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+    /**
+     * Listens for a property change event in any of the component blueprint
+     * classes and recomputes the blueprints' computed uuid if a dependent
+     * component has changed.
+     *
+     * @param propertyChangeEvent the property change event
      */
     @Override
     public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
@@ -175,20 +180,25 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
     }
 
     /**
-     * Gets the primoridal uuid string.
+     * Gets a string representing the primordial uuid for the component
+     * specified by the
+     * <code>componentNid</code>. This is uuid associated with the first version
+     * of the component.
      *
-     * @param nid the nid
-     * @return the primoridal uuid string
+     * @param componentNid the nid associated with the component in question
+     * @return a string representing the primordial uuid of the component in
+     * question
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
      */
-    protected String getPrimoridalUuidString(int nid)
+    protected String getPrimoridalUuidString(int componentNid)
             throws IOException, InvalidCAB {
-        ComponentBI component = Ts.get().getComponent(nid);
+        ComponentBI component = Ts.get().getComponent(componentNid);
         if (component != null) {
             return component.getPrimUuid().toString();
         }
-        List<UUID> uuids = Ts.get().getUuidsForNid(nid);
+        List<UUID> uuids = Ts.get().getUuidsForNid(componentNid);
         if (uuids.size() == 1) {
             return uuids.get(0).toString();
         }
@@ -196,18 +206,22 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
     }
 
     /**
-     * Gets the primoridal uuid string.
+     * Gets a string representing the primordial uuid for the component
+     * specified by the
+     * <code>uuid/code>. This is uuid associated with the first version of the component.
      *
-     * @param uuid the uuid
-     * @return the primoridal uuid string
+     * @param uuid the uuid of the component in question
+     * @return a string representing the primordial uuid of the component in
+     * question
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
      */
     protected String getPrimoridalUuidString(UUID uuid)
             throws IOException, InvalidCAB {
         if (Ts.get().hasUuid(uuid)) {
             ComponentChronicleBI<?> component = Ts.get().getComponent(uuid);
-            if(component == null){
+            if (component == null) {
                 return uuid.toString();
             }
             return Ts.get().getComponent(uuid).getPrimUuid().toString();
@@ -216,27 +230,31 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
     }
 
     /**
-     * Gets the component uuid.
+     * Gets the uuid of the component specified by this blueprint.
      *
-     * @return the component uuid
+     * @return the uuid of the component specified by this blueprint
      */
     public UUID getComponentUuid() {
         return componentUuid;
     }
 
     /**
-     * Sets the component uuid.
+     * Sets the uuid of the component specified by this blueprint.
      *
-     * @param componentUuid the new component uuid
+     * @param componentUuid the uuid of the component specified by this
+     * blueprint
      */
     public void setComponentUuid(UUID componentUuid) {
         UUID oldUuid = this.componentUuid;
         this.componentUuid = componentUuid;
         pcs.firePropertyChange("componentUuid", oldUuid, this.componentUuid);
     }
-    
+
     /**
-     * Sets the component uuid no recompute.
+     * Sets the component uuid. Does not fire a property change event for the
+     * changed uuid. No dependent component uuids will be recomputed. This is
+     * useful when setting the component uuid to a pre-determined uuid, and
+     * purposefully not use a re-computable uuid.
      *
      * @param componentUuid the new component uuid no recompute
      */
@@ -245,22 +263,25 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
     }
 
     /**
-     * Gets the component nid.
+     * Gets the nid of the component specified by this blueprint.
      *
-     * @return the component nid
+     * @return the nid of the component specified by this blueprint.
      * @throws IOException signals that an I/O exception has occurred
      */
     public int getComponentNid() throws IOException {
         return Ts.get().getNidForUuids(componentUuid);
     }
-    
+
     /**
-     * Returns list of annotation blueprints, gets list from original component if null.
+     * Returns list of annotation blueprints associated with this component
+     * blueprint. Gets a list from the original component if null.
      *
-     * @return the annotation blueprints from original
+     * @return a list of annotation blueprints associated with this component
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
-     * @throws ContradictionException the contradiction exception
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more then one version is found for a
+     * particular view coordinate
      */
     public List<RefexCAB> getAnnotationBlueprintsFromOriginal() throws IOException, InvalidCAB, ContradictionException {
         if (annotations.isEmpty() && cv != null) {
@@ -275,50 +296,57 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
         }
         return annotations;
     }
-    
+
     /**
-     * Gets the annotation blueprints.
+     * Returns list of annotation blueprints associated with this component
+     * blueprint.
      *
-     * @return the annotation blueprints
+     * @return a list of annotation blueprints associated with this component
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
-     * @throws ContradictionException the contradiction exception
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more then one version is found for a
+     * particular view coordinate
      */
     public List<RefexCAB> getAnnotationBlueprints() throws IOException, InvalidCAB, ContradictionException {
         return annotations;
     }
-    
+
     /**
-     * Adds the annotation blueprint.
+     * Adds an annotation blueprint to be associated with this component
+     * blueprint.
      *
-     * @param annotationBlueprint the annotation blueprint
+     * @param annotationBlueprint the annotation blueprint to associate with
+     * this component blueprint
      */
-    public void addAnnotationBlueprint(RefexCAB annotationBlueprint){
+    public void addAnnotationBlueprint(RefexCAB annotationBlueprint) {
         annotations.add(annotationBlueprint);
     }
-    
+
     /**
-     * Replace annotation blueprints.
+     * Replace the annotation blueprints associated with this blueprint with the
+     * given list of
+     * <code>annoationBlueprints</code>.
      *
-     * @param annotationBlueprints the annotation blueprints
+     * @param annotationBlueprints the annotation blueprints to associate with this component blueprint
      */
-    public void replaceAnnotationBlueprints(List<RefexCAB> annotationBlueprints){
+    public void replaceAnnotationBlueprints(List<RefexCAB> annotationBlueprints) {
         this.annotations = annotationBlueprints;
     }
 
     /**
-     * Gets the status uuid.
+     * Gets the uuid of the status associated with this component blueprint.
      *
-     * @return the status uuid
+     * @return the uuid of the status associated with this component blueprint
      */
     public UUID getStatusUuid() {
         return statusUuid;
     }
 
     /**
-     * Gets the status nid.
+     * Gets the nid of the status associated with this component blueprint.
      *
-     * @return the status nid
+     * @return the nid of the status associated with this component blueprint
      * @throws IOException signals that an I/O exception has occurred
      */
     public int getStatusNid() throws IOException {
@@ -326,23 +354,23 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
     }
 
     /**
-     * Sets the status uuid.
+     * Sets the uuid of the status associated with this component blueprint.
      *
-     * @param statusUuid the new status uuid
+     * @param statusUuid the uuid of the status associated with this component blueprint
      */
     public void setStatusUuid(UUID statusUuid) {
         this.statusUuid = statusUuid;
     }
 
     /**
-     * Sets the current.
+     * Sets this component blueprint's status to active.
      */
     public void setCurrent() {
         this.statusUuid = currentStatusUuid;
     }
 
     /**
-     * Sets the retired.
+     * Sets this component blueprint's status to retired.
      */
     public void setRetired() {
         this.statusUuid = retiredStatusUuid;

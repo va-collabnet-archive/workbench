@@ -23,16 +23,16 @@ package org.ihtsdo.tk.api.id;
 
 import java.util.UUID;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Interface UuidIdBI.
+ * The Interface UuidIdBI contains methods for interacting with a <code>UUID</code> type of
+ * identifier.
  *
- * @author kec
  */
 public interface UuidIdBI extends IdBI {
    
-   /* (non-Javadoc)
-    * @see org.ihtsdo.tk.api.id.IdBI#getDenotation()
+   /**
+    * 
+    * @return the <code>UUID</code> id denotation value
     */
    @Override
    UUID getDenotation();
