@@ -215,9 +215,10 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember>
         return TK_REFSET_TYPE.BOOLEAN;
     }
 
+    @Deprecated
     @Override
     public int getTypeId() {
-        return REFSET_TYPES.BOOLEAN.getTypeNid();
+        return getTypeNid();
     }
 
     @Override

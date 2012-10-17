@@ -961,8 +961,6 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                     Terms.get().getConcept(RefsetAuxiliary.Concept.STRING_ANNOTATION_PURPOSE.getUids());
             I_GetConceptData markedParentAnnotation =
                     Terms.get().getConcept(RefsetAuxiliary.Concept.REFSET_PARENT_MEMBER_PURPOSE.getUids());
-            I_GetConceptData enumeratedAnnotation =
-                    Terms.get().getConcept(RefsetAuxiliary.Concept.ENUMERATED_ANNOTATION_PURPOSE.getUids());
             I_GetConceptData specAnnotation =
                     Terms.get().getConcept(RefsetAuxiliary.Concept.REFSET_SPECIFICATION.getUids());
             I_GetConceptData ancillaryDataAnnotation =
@@ -1092,7 +1090,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                 try {
                     I_DescriptionVersioned<?> potential_fsn = Terms.get().getDescription(dnid, cnid);
                     if (potential_fsn != null && potential_fsn.getMutableParts() != null) {
-                        for (I_DescriptionPart part_search : potential_fsn.getMutableParts()) {
+                        for (I_DescriptionPart<?> part_search : potential_fsn.getMutableParts()) {
                             if (actives.contains(part_search.getStatusNid())
                                     && (part_search.getTypeNid()
                                     == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid()) && part_search.getText().equals(description)) {
@@ -1283,7 +1281,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                 I_ExtendByRef ext = (I_ExtendByRef) selectedNode.getUserObject();
 
                 try {
-                    EConcept.REFSET_TYPES extType = EConcept.REFSET_TYPES.nidToType(ext.getTypeId());
+                    EConcept.REFSET_TYPES extType = EConcept.REFSET_TYPES.nidToType(ext.getTypeNid());
 
                     if (allowedTypes.contains(extType) == false) {
                         throw new Exception("Can't handle " + extType);
