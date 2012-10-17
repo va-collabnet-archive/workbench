@@ -77,7 +77,7 @@ class UpdateTreeSpec extends SwingWorker<RefsetSpecTreeNode, Object> {
       this.refsetSpecEditor = refsetSpecEditor;
       frameConfig           = this.refsetSpecEditor.ace.getAceFrameConfig();
       oldRoot               = (RefsetSpecTreeNode) this.refsetSpecEditor.specTree.getModel().getRoot();
-      refsetConcept         = (I_GetConceptData) this.refsetSpecEditor.label.getTermComponent();
+      refsetConcept         = (I_GetConceptData) this.refsetSpecEditor.refexConceptLabel.getTermComponent();
    }
 
    //~--- methods -------------------------------------------------------------

@@ -131,45 +131,61 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
     private PropertyChangeListener labelListener = new LabelListener();
     private Map<TOGGLES, I_PluginToConceptPanel> pluginMap = new HashMap<TOGGLES, I_PluginToConceptPanel>();
     ACE ace;
-    private JTableWithDragImage clauseTable;
-    JScrollPane commentScroller;
-    private JTableWithDragImage commentTable;
-    private ReflexiveRefsetCommentTableModel commentTableModel;
-    private JButton componentHistoryButton;
+
+    /*package*/ I_GetConceptData refsetSpecConcept;
+
+    private TaxonomyHelper treeHelper;
+    private TaxonomyHelper refsetTreeHelper;
+
+    private UpdateTreeSpec updater;
+
+    private LinkedList<I_GetConceptData> tabHistoryList;
+    private I_AmTermComponent tempComponent;
+
+
+    private JPanel topPanel;
+
+    private JPanel toggleBar;
+
+    private JPanel leftTogglePane;
+
+    TermComponentLabel refexConceptLabel;
+
+    private JLabel memberCountValueLabel;
+    private JLabel lastComputeTimeValueLabel;
     private JLabel computeStatusValueLabel;
     private JLabel computeTypeValueLabel;
-    private JComponent contentPanel;
-    private FixedToggleChangeActionListener fixedToggleChangeActionListener;
-    JToggleButton historyButton;
-    TermComponentLabel label;
-    private JLabel lastComputeTimeValueLabel;
-    private JPanel leftTogglePane;
-    private JLabel memberCountValueLabel;
-    private ArrayList<org.dwfa.ace.api.I_PluginToConceptPanel> plugins;
-    public I_GetConceptData refsetSpecConcept;
-    private RefsetSpecPanel refsetSpecPanel;
-    private TaxonomyHelper refsetTree;
-    JTree specTree;
-    JScrollPane specTreeScroller;
-    private LinkedList<I_GetConceptData> tabHistoryList;
-    I_AmTermComponent tempComponent;
-    private JPanel topPanel;
-    private TaxonomyHelper treeHelper;
-    UpdateTreeSpec updater;
-    
-    private JPanel toggleBar;
-    
 
+    JToggleButton historyButton;
+    private JButton componentHistoryButton;
+
+    private FixedToggleChangeActionListener fixedToggleChangeActionListener;
+
+    /** This includes the "compute" button */
+    private ArrayList<org.dwfa.ace.api.I_PluginToConceptPanel> plugins;
+
+    private JComponent contentPanel;
+
+    private JTableWithDragImage clauseTable;
+    JScrollPane specTreeScroller;
+    JTree specTree;
+
+    private JTableWithDragImage commentTable;
+    private ReflexiveRefsetCommentTableModel commentTableModel;
+    JScrollPane commentScroller;
+
+    /** The bottom panel with "taxonomy", "tree", "members" tabs */
+    private RefsetSpecPanel refsetSpecPanel;
 
     public static enum EditState {
         READONLY, EDIT, REVIEW
     }
-    
+
     private EditState localEditState = EditState.READONLY;
-    
+
 
     //~--- constructors --------------------------------------------------------
-    
+
     public RefsetSpecEditor(ACE ace, TaxonomyHelper treeHelper, TaxonomyHelper refsetTree,
             RefsetSpecPanel refsetSpecPanel,EditState locES)
             throws Exception {
@@ -177,21 +193,21 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         setLocalEditState(locES);
         init(ace,treeHelper,refsetTree,refsetSpecPanel);
     }
-    
-    
+
+
     public RefsetSpecEditor(ACE ace, TaxonomyHelper treeHelper, TaxonomyHelper refsetTree,
             RefsetSpecPanel refsetSpecPanel)
             throws Exception {
         super();
         init(ace,treeHelper,refsetTree,refsetSpecPanel);
     }
-    
+
     private void init(ACE ace, TaxonomyHelper treeHelper, TaxonomyHelper refsetTree,
             RefsetSpecPanel refsetSpecPanel)
             throws Exception {
         this.ace = ace;
         this.treeHelper = treeHelper;
-        this.refsetTree = refsetTree;
+        this.refsetTreeHelper = refsetTree;
         this.refsetSpecPanel = refsetSpecPanel;
         topPanel = new JPanel(new GridBagLayout());
         this.tabHistoryList =
@@ -205,58 +221,67 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         plugins = new ArrayList<org.dwfa.ace.api.I_PluginToConceptPanel>(
                 Arrays.asList(new org.dwfa.ace.api.I_PluginToConceptPanel[]{}));
         ace.getAceFrameConfig().addPropertyChangeListener("uncommitted", new UncommittedChangeListener());
-        label = new TermComponentLabel(this.ace.getAceFrameConfig());
-        label.addMouseListener(new RefsetCommentPopupListener(ace.getAceFrameConfig(), this));
-        label.addTermChangeListener(treeHelper);
-        label.addTermChangeListener(refsetTree);
+
+        refexConceptLabel = new TermComponentLabel(this.ace.getAceFrameConfig());
+        refexConceptLabel.addMouseListener(new RefsetCommentPopupListener(ace.getAceFrameConfig(), this));
+        refexConceptLabel.addTermChangeListener(treeHelper);
+        refexConceptLabel.addTermChangeListener(refsetTree);
+
         fixedToggleChangeActionListener = new FixedToggleChangeActionListener();
         this.ace.getAceFrameConfig().addPropertyChangeListener("visibleRefsets",
                 fixedToggleChangeActionListener);
         this.ace.getAceFrameConfig().addPropertyChangeListener(this);
 
         GridBagConstraints c = new GridBagConstraints();
+
         JLabel linkSpinner =
                 new JLabel(new ImageIcon(ACE.class.getResource("/24x24/plain/paperclip.png")));
-
         linkSpinner.setBorder(BorderFactory.createEmptyBorder(3, 3, 2, 5));
         c.anchor = GridBagConstraints.WEST;
         c.gridx = 0;
         c.gridy = 0;
         c.fill = GridBagConstraints.BOTH;
         topPanel.add(linkSpinner, c);
+
         c.gridx++;
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 1.0;
-        topPanel.add(label, c);
+        topPanel.add(refexConceptLabel, c);
+
         c.weightx = 0.0;
         c.gridx++;
+
+        // FIXME : we are replacing a previously plumbed-in listener - the first one will be disconnected
         fixedToggleChangeActionListener = new FixedToggleChangeActionListener();
+
         historyButton =
                 new JToggleButton(new ImageIcon(ACE.class.getResource("/24x24/plain/history.png")));
         historyButton.setSelected(false);
         historyButton.addActionListener(fixedToggleChangeActionListener);
         historyButton.setToolTipText("show/hide the history records");
         topPanel.add(historyButton, c);
+
         c.gridx++;
         componentHistoryButton = new JButton(ConceptPanel.HISTORY_ICON);
         componentHistoryButton.addActionListener(new ShowHistoryListener());
         componentHistoryButton.setToolTipText(
                 "click to show history of the RefSet Specification displayed in this viewer");
         topPanel.add(componentHistoryButton, c);
+
         c.gridx = 0;
         c.gridy++;
         c.gridwidth = 5;
         c.fill = GridBagConstraints.HORIZONTAL;
 
-        JComponent toggleBar = getToggleBar();
-
+        JComponent toggleBar = createToggleBar();
         topPanel.add(toggleBar, c);
+
         c.fill = GridBagConstraints.BOTH;
         c.weighty = 1.0;
         c.gridy++;
         topPanel.setBorder(BorderFactory.createRaisedBevelBorder());
-        this.contentPanel = getContentPane();
-        label.addPropertyChangeListener("termComponent", labelListener);
+        this.contentPanel = createContentPanel();
+        refexConceptLabel.addPropertyChangeListener("termComponent", labelListener);
 
         if ((this.tabHistoryList.size() > 0) && (this.tabHistoryList.getFirst() != null)) {
             this.tempComponent = this.tabHistoryList.getFirst();
@@ -265,7 +290,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
     }
 
     //~--- methods -------------------------------------------------------------
-    public void addHistoryActionListener(ActionListener al) {
+    /*package*/ void addHistoryActionListener(ActionListener al) {
         this.historyButton.addActionListener(al);
     }
 
@@ -274,15 +299,15 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         pcs.addPropertyChangeListener(propertyName, listener);
     }
 
-    public void firePropertyChange(PropertyChangeEvent evt) {
+    private void firePropertyChange(PropertyChangeEvent evt) {
         pcs.firePropertyChange(evt);
     }
 
-    public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
+    private void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
         pcs.firePropertyChange(propertyName, oldValue, newValue);
     }
 
-    public void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
+    private void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
         pcs.firePropertyChange(propertyName, oldValue, newValue);
     }
 
@@ -291,15 +316,15 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         if (evt.getPropertyName().equals("viewPositions")) {
             fixedToggleChangeActionListener.actionPerformed(null);
         } else if (evt.getPropertyName().equals("commit")) {
-            if (label.getTermComponent() != null) {
-                I_GetConceptData cb = (I_GetConceptData) label.getTermComponent();
+            if (refexConceptLabel.getTermComponent() != null) {
+                I_GetConceptData cb = (I_GetConceptData) refexConceptLabel.getTermComponent();
 
                 try {
                     if (cb.getConceptAttributes() == null) {
-                        label.setTermComponent(null);
+                        refexConceptLabel.setTermComponent(null);
                     }
                 } catch (IOException e) {
-                    label.setTermComponent(null);
+                    refexConceptLabel.setTermComponent(null);
                     AceLog.getAppLog().alertAndLogException(e);
                 }
             }
@@ -317,7 +342,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         }
     }
 
-    public void refresh() {
+    /*package*/ void refresh() {
         updatePanel();
 
         if (commentTableModel != null) {
@@ -333,7 +358,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         throw new UnsupportedOperationException();
     }
 
-    public void updatePanel() {
+    private void updatePanel() {
         I_GetConceptData refset = (I_GetConceptData) getLabel().getTermComponent();
 
         if (refset != null) {
@@ -388,7 +413,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
             try {
                 ConceptVersionBI refsetVersion = Ts.get().getConceptVersion(getConfig().getViewCoordinate(), refset.getConceptNid());
                 memberCountValueLabel.setText("" + refsetVersion.getRefsetMembersActive().size());
-                
+
             } catch (Exception e) {
                 memberCountValueLabel.setText("Error computing member count");
                 e.printStackTrace();
@@ -404,16 +429,16 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         }
 
         refsetSpecConcept = null;
-        tempComponent = label.getTermComponent();
+        tempComponent = refexConceptLabel.getTermComponent();
 
-        if (label.getTermComponent() != null) {
-            ace.getAceFrameConfig().setLastViewed((I_GetConceptData) label.getTermComponent());
+        if (refexConceptLabel.getTermComponent() != null) {
+            ace.getAceFrameConfig().setLastViewed((I_GetConceptData) refexConceptLabel.getTermComponent());
 
             if (tabHistoryList.size() == 0) {
-                tabHistoryList.addFirst((I_GetConceptData) label.getTermComponent());
+                tabHistoryList.addFirst((I_GetConceptData) refexConceptLabel.getTermComponent());
             } else if ((tabHistoryList.size() > 0)
-                    && (label.getTermComponent().equals(tabHistoryList.getFirst()) == false)) {
-                tabHistoryList.addFirst((I_GetConceptData) label.getTermComponent());
+                    && (refexConceptLabel.getTermComponent().equals(tabHistoryList.getFirst()) == false)) {
+                tabHistoryList.addFirst((I_GetConceptData) refexConceptLabel.getTermComponent());
             }
 
             while (tabHistoryList.size() > 20) {
@@ -438,20 +463,20 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
             AceLog.getAppLog().info("treeHelper.getRenderer() == null");
         }
 
-        if (refsetTree.getRenderer() != null) {
-            refsetTree.getRenderer().propertyChange(new PropertyChangeEvent(this, "showRefsetInfoInTaxonomy",
+        if (refsetTreeHelper.getRenderer() != null) {
+            refsetTreeHelper.getRenderer().propertyChange(new PropertyChangeEvent(this, "showRefsetInfoInTaxonomy",
                     null, null));
-            refsetTree.getRenderer().propertyChange(new PropertyChangeEvent(this, "variableHeightTaxonomyView",
+            refsetTreeHelper.getRenderer().propertyChange(new PropertyChangeEvent(this, "variableHeightTaxonomyView",
                     null, null));
-            refsetTree.getRenderer().propertyChange(new PropertyChangeEvent(this,
+            refsetTreeHelper.getRenderer().propertyChange(new PropertyChangeEvent(this,
                     "highlightConflictsInTaxonomyView", null, null));
-            refsetTree.getRenderer().propertyChange(new PropertyChangeEvent(this, "showViewerImagesInTaxonomy",
+            refsetTreeHelper.getRenderer().propertyChange(new PropertyChangeEvent(this, "showViewerImagesInTaxonomy",
                     null, null));
-            refsetTree.getRenderer().propertyChange(new PropertyChangeEvent(this, "refsetsToShow", null, null));
+            refsetTreeHelper.getRenderer().propertyChange(new PropertyChangeEvent(this, "refsetsToShow", null, null));
         } else {
             AceLog.getAppLog().info("treeHelper.getRenderer() == null");
         }
-        
+
     }
 
     /* package */ synchronized void updateSpecTree(boolean clearSelection) {
@@ -496,7 +521,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
     }
 
     //~--- get methods ---------------------------------------------------------
-    public ReflexiveRefsetCommentTableModel getCommentTableModel() {
+    /*package*/ ReflexiveRefsetCommentTableModel getCommentTableModel() {
         return commentTableModel;
     }
 
@@ -504,10 +529,10 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         return ace.getAceFrameConfig();
     }
 
-    private JComponent getContentPane() throws Exception {
+    private JComponent createContentPanel() throws Exception {
         JTabbedPane refsetTabs = new JTabbedPane();
 
-        refsetTabs.addTab("specification", getSpecPane());
+        refsetTabs.addTab("specification", createSpecPanel());
         commentTable = getRefsetSpecPanel().createCommentTable(ace.getAceFrameConfig(), this);
         commentTableModel = (ReflexiveRefsetCommentTableModel) commentTable.getModel();
         commentScroller = new JScrollPane(commentTable);
@@ -516,11 +541,11 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         return refsetTabs;
     }
 
-    public JComponent getContentPanel() {
+    /*package*/ JComponent getContentPanel() {
         return contentPanel;
     }
 
-    public static void getDefaultSpecColumns(EConcept.REFSET_TYPES extType,
+    private static void getDefaultSpecColumns(EConcept.REFSET_TYPES extType,
             List<ReflexiveRefsetFieldData> columns)
             throws NoSuchMethodException {
         ReflexiveRefsetFieldData column1 = new ReflexiveRefsetFieldData();
@@ -558,11 +583,11 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         throw new UnsupportedOperationException();
     }
 
-    public TermComponentLabel getLabel() {
-        return label;
+    /*package*/ TermComponentLabel getLabel() {
+        return refexConceptLabel;
     }
 
-    public I_GetConceptData getRefsetSpecInSpecEditor() throws IOException, TerminologyException {
+    /*package*/ I_GetConceptData getRefsetSpecInSpecEditor() throws IOException, TerminologyException {
         I_GetConceptData refsetConcept = (I_GetConceptData) getLabel().getTermComponent();
 
         if (refsetConcept != null) {
@@ -592,8 +617,8 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         throw new UnsupportedOperationException();
     }
 
-    private JComponent getSpecPane() throws Exception {
-        JPanel content = new JPanel(new GridBagLayout());
+    private JComponent createSpecPanel() throws Exception {
+        JPanel specPanel = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
 
         c.anchor = GridBagConstraints.NORTHWEST;
@@ -626,7 +651,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
             columnIndex++;
         }
 
-        content.add(clauseTablePanel, c);
+        specPanel.add(clauseTablePanel, c);
         c.gridy++;
         c.weighty = 1.0;
         specTree = new JTree(new DefaultTreeModel(new RefsetSpecTreeNode(null)));
@@ -635,16 +660,16 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         specTree.setRootVisible(false);
         specTree.setShowsRootHandles(true);
         specTreeScroller = new JScrollPane(specTree);
-        content.add(specTreeScroller, c);
+        specPanel.add(specTreeScroller, c);
         specTree.addTreeSelectionListener(new RefsetSpecSelectionListener());
         c.gridy++;
 
         for (org.dwfa.ace.api.I_PluginToConceptPanel plugin : plugins) {
-            
+
             if (plugin.showComponent()) {
                 AceLog.getAppLog().info("Adding plugins "+plugin.getName() +" component = "+plugin.getComponent(this));
-                
-                content.add(plugin.getComponent(this), c);
+
+                specPanel.add(plugin.getComponent(this), c);
                 c.gridy++;
             }
         }
@@ -652,9 +677,9 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         c.weightx = 0.0;
         c.weighty = 0.0;
         c.fill = GridBagConstraints.BOTH;
-        content.add(new JPanel(), c);
+        specPanel.add(new JPanel(), c);
 
-        return content;
+        return specPanel;
     }
 
     @Override
@@ -665,12 +690,11 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
             return returnValue;
         }
 
-        return label.getTermComponent();
+        return refexConceptLabel.getTermComponent();
     }
-    
-    private JComponent getToggleBar() throws IOException, ClassNotFoundException {
-        
-        if(toggleBar == null){
+
+    private JComponent createToggleBar() throws IOException, ClassNotFoundException {
+
         toggleBar = new JPanel(new GridBagLayout());
         GridBagConstraints outer = new GridBagConstraints();
 
@@ -738,9 +762,9 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         computeTypeValueLabel = new JLabel("");
         leftTogglePane.add(computeTypeValueLabel, inner);
         inner.gridy++;
-               
+
         outer.weightx = 1.0;
-        
+
         outer.fill = GridBagConstraints.HORIZONTAL;
         toggleBar.add(new JPanel(), outer);
 
@@ -749,12 +773,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
 
             @Override
             public boolean accept(File arg0, String fileName) {
-               /* if(getLocalEditState().equals(EditState.EDIT)){
-                return fileName.toLowerCase().endsWith(".bp");
-                }
-                else{*/
-                    return fileName.toLowerCase().endsWith(".bp") && fileName.contains("compute refset from refset spec");   
-              //  }
+                return fileName.toLowerCase().endsWith(".bp") && fileName.contains("compute refset from refset spec");
             }
         });
 
@@ -780,7 +799,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                     BufferedInputStream bis = new BufferedInputStream(fis);
                     ObjectInputStream ois = new ObjectInputStream(bis);
                     BusinessProcess bp = (BusinessProcess) ois.readObject();
-                    
+
 
                     ois.close();
 
@@ -815,7 +834,6 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         }
 
         updateToggles();
-        }
 
         return toggleBar;
     }
@@ -840,16 +858,16 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                     // Do nothing
             }
         }
-        
+
         throw new UnsupportedOperationException(" Can't handle toggle: " + toggle);
-        
+
     }
 
-    public JPanel getTopPanel() {
+    /*package*/ JPanel getTopPanel() {
         return topPanel;
     }
 
-    public JTree getTreeInSpecEditor() {
+    /*package*/ JTree getTreeInSpecEditor() {
         return specTree;
     }
 
@@ -870,13 +888,13 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         tempComponent = termComponent;
 
         if (SwingUtilities.isEventDispatchThread()) {
-            label.setTermComponent(termComponent);
+            refexConceptLabel.setTermComponent(termComponent);
         } else {
             try {
                 SwingUtilities.invokeAndWait(new Runnable() {
 
                     public void run() {
-                        label.setTermComponent(termComponent);
+                        refexConceptLabel.setTermComponent(termComponent);
                     }
                 });
             } catch (InterruptedException e) {
@@ -885,7 +903,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                 AceLog.getAppLog().alertAndLogException(e);
             }
         }
-        
+
     }
 
     public void setToggleState(TOGGLES toggle, boolean state) {
@@ -913,7 +931,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
             refsetComputeType =
                     Terms.get().getConcept(RefsetAuxiliary.Concept.CONCEPT_COMPUTE_TYPE.getUids());
             }
-            
+
             I_GetConceptData fsnConcept =
                     Terms.get().getConcept(
                     ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
@@ -1035,7 +1053,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         return true;
     }
 
-    public static I_GetConceptData newConcept(I_ConfigAceFrame aceConfig, I_GetConceptData status)
+    private static I_GetConceptData newConcept(I_ConfigAceFrame aceConfig, I_GetConceptData status)
             throws Exception {
         boolean isDefined = true;
         UUID conceptUuid = UUID.randomUUID();
@@ -1045,7 +1063,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         return newConcept;
     }
 
-    public static void newDescription(I_GetConceptData concept, I_GetConceptData descriptionType,
+    private static void newDescription(I_GetConceptData concept, I_GetConceptData descriptionType,
             String description, I_ConfigAceFrame aceConfig, I_GetConceptData status)
             throws TerminologyException, Exception {
         I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
@@ -1096,7 +1114,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         Terms.get().addUncommittedNoChecks(concept);
     }
 
-    public static void newRelationship(I_GetConceptData concept, I_GetConceptData relationshipType,
+    private static void newRelationship(I_GetConceptData concept, I_GetConceptData relationshipType,
             I_GetConceptData destination, I_ConfigAceFrame aceConfig)
             throws Exception {
         int statusId =
@@ -1190,7 +1208,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                 // Set concept bean
                 // Set config
                 worker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), getConfig());
-                bp.writeAttachment(ProcessAttachmentKeys.I_GET_CONCEPT_DATA.name(), label.getTermComponent());
+                bp.writeAttachment(ProcessAttachmentKeys.I_GET_CONCEPT_DATA.name(), refexConceptLabel.getTermComponent());
                 worker.writeAttachment(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name(), RefsetSpecEditor.this);
 
                 Runnable r = new Runnable() {
@@ -1256,7 +1274,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         }
     }
 
-    public class RefsetSpecSelectionListener implements TreeSelectionListener {
+    private class RefsetSpecSelectionListener implements TreeSelectionListener {
 
         public void valueChanged(TreeSelectionEvent tse) {
             if (tse.getNewLeadSelectionPath() != null) {
@@ -1462,12 +1480,12 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         }
     }
 
-    public EditState getLocalEditState() {
+    /*package*/ EditState getLocalEditState() {
         return localEditState;
     }
 
     public void setLocalEditState(EditState localEditStateIn) {
         this.localEditState = localEditStateIn;
     }
-    
+
 }
