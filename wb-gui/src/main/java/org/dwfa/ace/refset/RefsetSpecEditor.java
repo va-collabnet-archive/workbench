@@ -119,6 +119,9 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+
 public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeListener {
 
     private static final String TAB_HISTORY_KEY = "refset 0";
@@ -176,6 +179,9 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
 
     /** The bottom panel with "taxonomy", "tree", "members" tabs */
     private RefsetSpecPanel refsetSpecPanel;
+
+    /** a filter to only show certain clauses */
+    private Predicate<I_ExtendByRef> clauseFilter = Predicates.alwaysTrue();
 
     public static enum EditState {
         READONLY, EDIT, REVIEW
@@ -490,7 +496,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
             updater.cancel = true;
         }
 
-        updater = new UpdateTreeSpec(this);
+        updater = new UpdateTreeSpec(this, clauseFilter);
         updater.execute();
     }
 
@@ -1472,10 +1478,20 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
     private class UncommittedChangeListener implements PropertyChangeListener {
 
         public void propertyChange(PropertyChangeEvent arg0) {
-            UpdateTreeSpec specUpdater = new UpdateTreeSpec(RefsetSpecEditor.this);
+            UpdateTreeSpec specUpdater = new UpdateTreeSpec(RefsetSpecEditor.this, clauseFilter);
 
             specUpdater.execute();
         }
+    }
+
+    /**
+     * Set a filter used to show only nodes that we want to find interesting
+     *
+     * @param clauseFilter
+     */
+    public void setFilter(Predicate<I_ExtendByRef> clauseFilter) {
+        this.clauseFilter = clauseFilter;
+        updateSpecTree(true);
     }
 
     /*package*/ EditState getLocalEditState() {

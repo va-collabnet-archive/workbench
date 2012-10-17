@@ -64,15 +64,17 @@ class UpdateTreeSpec extends SwingWorker<RefsetSpecTreeNode, Object> {
    private int                    specScrollHorizValue;
    private int                    specScrollVertValue;
 
-   /** By default, allow all clause nodes */
    private Predicate<I_ExtendByRef> clauseFilter = Predicates.alwaysTrue();
-   
+
    //~--- constructors --------------------------------------------------------
 
    /**
-    * @param refsetSpecEditor
+    * Create a tree updater that only shows nodes that pass the clauseFilter (and those required to support them)
+    *
+    * @param refsetSpecEditor   The editor
+    * @param clauseFilter       Should return true for clauses that you want to see
     */
-   UpdateTreeSpec(RefsetSpecEditor refsetSpecEditor) {
+   UpdateTreeSpec(RefsetSpecEditor refsetSpecEditor, Predicate<I_ExtendByRef> clauseFilter) {
       this.id               = count++;
       this.refsetSpecEditor = refsetSpecEditor;
       frameConfig           = this.refsetSpecEditor.ace.getAceFrameConfig();
@@ -118,7 +120,7 @@ class UpdateTreeSpec extends SwingWorker<RefsetSpecTreeNode, Object> {
 
       commentTable = refsetSpecEditor.getRefsetSpecPanel().createCommentTable(
          this.refsetSpecEditor.ace.getAceFrameConfig(), this.refsetSpecEditor);
-      
+
       specScrollHorizValue    = this.refsetSpecEditor.specTreeScroller.getHorizontalScrollBar().getValue();
       specScrollVertValue     = this.refsetSpecEditor.specTreeScroller.getVerticalScrollBar().getValue();
       commentScrollHorizValue = this.refsetSpecEditor.commentScroller.getHorizontalScrollBar().getValue();
