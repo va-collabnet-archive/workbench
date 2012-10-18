@@ -123,7 +123,7 @@ public class DialectHelper {
      * @param varientsSpec the <code>ConceptSpec</code> representing the dialect refex concept
      * @param terminologySnapshot the terminologySnapshot to use for getting component versions
      * @param initialVariantMap the map to udpate
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if more than one version is found for a given position or view coordinate
      * @throws IOException signals that an I/O exception has occurred
      */
     private static void addDialect(ConceptSpec dialectSpec,

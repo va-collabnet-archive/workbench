@@ -72,7 +72,7 @@ public interface TerminologySnapshotDI extends TerminologyDI {
      * @param uuids the uuids
      * @return the component version
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if more than one version is found for a given position or view coordinate
      */
     ComponentVersionBI getComponentVersion(Collection<UUID> uuids) throws IOException, ContradictionException;
 
@@ -82,7 +82,7 @@ public interface TerminologySnapshotDI extends TerminologyDI {
      * @param componentContainer the component container
      * @return the component version
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if more than one version is found for a given position or view coordinate
      */
     ComponentVersionBI getComponentVersion(ComponentContainerBI componentContainer) throws IOException, ContradictionException;
 
@@ -92,7 +92,7 @@ public interface TerminologySnapshotDI extends TerminologyDI {
      * @param nid the nid
      * @return the component version
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if more than one version is found for a given position or view coordinate
      */
     ComponentVersionBI getComponentVersion(int nid) throws IOException, ContradictionException;
 
@@ -102,7 +102,7 @@ public interface TerminologySnapshotDI extends TerminologyDI {
      * @param uuids the uuids
      * @return the component version
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if more than one version is found for a given position or view coordinate
      */
     ComponentVersionBI getComponentVersion(UUID... uuids) throws IOException, ContradictionException;
 
@@ -192,7 +192,7 @@ public interface TerminologySnapshotDI extends TerminologyDI {
      * @param parentNid the parent nid
      * @return <code>true</code>, if is kind of
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if more than one version is found for a given position or view coordinate
      */
     boolean isKindOf(int childNid, int parentNid) throws IOException, ContradictionException;
 }

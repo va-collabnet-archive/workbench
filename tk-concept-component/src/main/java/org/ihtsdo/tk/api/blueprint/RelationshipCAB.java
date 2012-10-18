@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.tk.api.blueprint;
 
@@ -29,47 +29,43 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipType;
 import org.ihtsdo.tk.uuid.UuidT5Generator;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class RelationshipCAB.
+ * The Class RelationshipCAB contains methods for creating a relationship
+ * blueprint. This blueprint can be constructed into a type of
+ * <code>RelationshipChronicleBI</code>. This is the preferred method for
+ * updating or creating new descriptions.
  *
- * @author kec
+ * @see TerminologyBuilderBI
+ * @see RelationshipChronicleBI
+ *
  */
 public class RelationshipCAB extends CreateOrAmendBlueprint {
 
-    /** The Constant relSpecNamespace. */
     public static final UUID relSpecNamespace =
             UUID.fromString("16d79820-5289-11e0-b8af-0800200c9a66");
-    
-    /** The source uuid. */
     private UUID sourceUuid;
-    
-    /** The type uuid. */
     private UUID typeUuid;
-    
-    /** The dest uuid. */
     private UUID destUuid;
-    
-    /** The group. */
     private int group;
-    
-    /** The characteristic uuid. */
     private UUID characteristicUuid;
-    
-    /** The refinability uuid. */
     private UUID refinabilityUuid;
 
     /**
-     * Instantiates a new relationship cab.
+     * Instantiates a new relationship blueprint using nids values.
      *
-     * @param sourceNid the source nid
-     * @param typeNid the type nid
-     * @param targetNid the target nid
-     * @param group the group
-     * @param relationshipType the relationship type
+     * @param sourceNid the nid of the source concept
+     * @param typeNid the nid of the relationship type
+     * @param targetNid the nid of the target concept
+     * @param group the int representing the relationship group, set to 0 if
+     * relationship is not grouped
+     * @param relationshipType the tk relationship type specifying the
+     * relationship characteristic type. This value is used to determine the
+     * relationship refinability type.
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
-     * @throws ContradictionException the contradiction exception
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * view coordinate
      */
     public RelationshipCAB(
             int sourceNid, int typeNid, int targetNid, int group, TkRelationshipType relationshipType)
@@ -81,40 +77,52 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Instantiates a new relationship cab.
+     * Instantiates a new relationship blueprint using uuids values.
      *
-     * @param sourceUuid the source uuid
-     * @param typeUuid the type uuid
-     * @param targetUuid the target uuid
-     * @param group the group
-     * @param relationshipType the relationship type
+     * @param sourceUuid the uuid of the source concept
+     * @param typeUuid the uuid of the relationship type
+     * @param targetUuid the uuid of the target concept
+     * @param group the int representing the relationship group, set to 0 if
+     * relationship is not grouped
+     * @param relationshipType the tk relationship type specifying the
+     * relationship characteristic type. This value is used to determine the
+     * relationship refinability type.
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
-     * @throws ContradictionException the contradiction exception
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * view coordinate
      */
     public RelationshipCAB(
             UUID sourceUuid, UUID typeUuid, UUID targetUuid, int group, TkRelationshipType relationshipType)
             throws IOException, InvalidCAB, ContradictionException {
         this(sourceUuid, typeUuid, targetUuid, group, null, relationshipType, null, null);
     }
-    
+
     /**
-     * Instantiates a new relationship cab.
+     * Instantiates a new relationship blueprint using nid values and a given
+     * <code>relationshipVersion</code>.
      *
-     * @param sourceNid the source nid
-     * @param typeNid the type nid
-     * @param targetNid the target nid
-     * @param group the group
-     * @param relationshipType the relationship type
-     * @param relationshipVersion the relationship version
-     * @param viewCoordinate the view coordinate
+     * @param sourceNid the nid of the source concept
+     * @param typeNid the nid of the relationship type
+     * @param targetNid the nid of the target concept
+     * @param group the int representing the relationship group, set to 0 if
+     * relationship is not grouped
+     * @param relationshipType the tk relationship type specifying the
+     * relationship characteristic type. This value is used to determine the
+     * relationship refinability type.
+     * @param relationshipVersion the relationship version to use as a pattern
+     * @param viewCoordinate the view coordinate specifying which versions are
+     * active and inactive
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
-     * @throws ContradictionException the contradiction exception
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * view coordinate
      */
     public RelationshipCAB(
             int sourceNid, int typeNid, int targetNid, int group, TkRelationshipType relationshipType,
-            RelationshipVersionBI relationshipVersion, ViewCoordinate viewCoordinate)throws IOException, InvalidCAB, ContradictionException {
+            RelationshipVersionBI relationshipVersion, ViewCoordinate viewCoordinate) throws IOException, InvalidCAB, ContradictionException {
         this(Ts.get().getComponent(sourceNid).getPrimUuid(),
                 Ts.get().getComponent(typeNid).getPrimUuid(),
                 Ts.get().getComponent(targetNid).getPrimUuid(),
@@ -122,18 +130,25 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Instantiates a new relationship cab.
+     * Instantiates a new relationship blueprint using uuid values and a given
+     * <code>relationshipVersion</code>.
      *
-     * @param sourceUuid the source uuid
-     * @param typeUuid the type uuid
-     * @param targetUuid the target uuid
-     * @param group the group
-     * @param relationshipType the relationship type
-     * @param relationshipVersion the relationship version
-     * @param viewCoordinate the view coordinate
+     * @param sourceUuid the uuid of the source concept
+     * @param typeUuid the uuid of the relationship type
+     * @param targetUuid the uuid of the target concept
+     * @param group the int representing the relationship group, set to 0 if
+     * relationship is not grouped
+     * @param relationshipType the tk relationship type specifying the
+     * relationship characteristic type. This value is used to determine the
+     * relationship refinability type.
+     * @param relationshipVersion the relationship version to use as a pattern
+     * @param viewCoordinate the view coordinate specifying which versions are
+     * active and inactive
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
-     * @throws ContradictionException the contradiction exception
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * view coordinate
      */
     public RelationshipCAB(
             UUID sourceUuid, UUID typeUuid, UUID targetUuid, int group,
@@ -143,19 +158,27 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Instantiates a new relationship cab.
+     * Instantiates a new relationship blueprint using uuid values and a given
+     * <code>relationshipVersion</code>. Can specify the uuid to be associated
+     * with the new relationship.
      *
-     * @param sourceUuid the source uuid
-     * @param typeUuid the type uuid
-     * @param targetUuid the target uuid
-     * @param group the group
-     * @param componentUuid the component uuid
-     * @param relationshipType the relationship type
-     * @param relationshipVersion the relationship version
-     * @param viewCoordinate the view coordinate
+     * @param sourceUuid the uuid of the source concept
+     * @param typeUuid the uuid of the relationship type
+     * @param targetUuid the uuid of the target concept
+     * @param group the int representing the relationship group, set to 0 if
+     * relationship is not grouped
+     * @param componentUuid the uuid representing the new relationship
+     * @param relationshipType the tk relationship type specifying the
+     * relationship characteristic type. This value is used to determine the
+     * relationship refinability type.
+     * @param relationshipVersion the relationship version to use as a pattern
+     * @param viewCoordinate the view coordinate specifying which versions are
+     * active and inactive
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
-     * @throws ContradictionException the contradiction exception
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * view coordinate
      */
     public RelationshipCAB(
             UUID sourceUuid, UUID typeUuid, UUID targetUuid, int group,
@@ -222,34 +245,52 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
             }
         }
     }
-    
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint#recomputeUuid()
+
+    /**
+     * Computes the uuid for this relationship based on the source concept uuid,
+     * relationship type uuid, and target concept uuid. Recomputes the uuids for
+     * dependent annotations.
+     *
+     * @throws NoSuchAlgorithmException indicates a no such algorithm exception
+     * has occurred
+     * @throws UnsupportedEncodingException indicates an unsupported encoding
+     * exception has occurred
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * give position or view coordinate
      */
     @Override
-    public void recomputeUuid() throws NoSuchAlgorithmException, UnsupportedEncodingException, IOException, InvalidCAB, ContradictionException{
+    public void recomputeUuid() throws NoSuchAlgorithmException, UnsupportedEncodingException, IOException, InvalidCAB, ContradictionException {
         setComponentUuid(UuidT5Generator.get(relSpecNamespace,
-                        getPrimoridalUuidString(sourceUuid)
-                        + getPrimoridalUuidString(typeUuid)
-                        + getPrimoridalUuidString(destUuid)
-                        + group));
-        for(RefexCAB annotBp: getAnnotationBlueprints()){
+                getPrimoridalUuidString(sourceUuid)
+                + getPrimoridalUuidString(typeUuid)
+                + getPrimoridalUuidString(destUuid)
+                + group));
+        for (RefexCAB annotBp : getAnnotationBlueprints()) {
             annotBp.setReferencedComponentUuid(getComponentUuid());
             annotBp.recomputeUuid();
         }
     }
-    
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
+
+    /**
+     * Checks if this relationship blueprint is equal to the given object.
+     * Compares source concept, relationship type, target concept, and group
+     * number.
+     *
+     * @param o the other relationship blueprint to check for equality
+     * @return <code>true</code> if the specified relationship blueprint is
+     * equal to this relationship blueprint
      */
     @Override
-    public boolean equals(Object o){
-        if(RelationshipCAB.class.isAssignableFrom(o.getClass())){
+    public boolean equals(Object o) {
+        if (RelationshipCAB.class.isAssignableFrom(o.getClass())) {
             RelationshipCAB another = (RelationshipCAB) o;
-            if(this.sourceUuid.equals(another.sourceUuid) &&
-              this.typeUuid.equals(another.typeUuid) &&
-              this.destUuid.equals(another.destUuid) &&
-              this.group == another.group){
+            if (this.sourceUuid.equals(another.sourceUuid)
+                    && this.typeUuid.equals(another.typeUuid)
+                    && this.destUuid.equals(another.destUuid)
+                    && this.group == another.group) {
                 return true;
             }
         }
@@ -257,34 +298,35 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Gets the characteristic uuid.
+     * Gets the uuid of the relationship characteristic.
      *
-     * @return the characteristic uuid
+     * @return the relationship characteristic uuid
      */
     public UUID getCharacteristicUuid() {
         return characteristicUuid;
     }
 
     /**
-     * Gets the target uuid.
+     * Gets the uuid of the target concept.
      *
-     * @return the target uuid
+     * @return the target concept uuid
      */
     public UUID getTargetUuid() {
         return destUuid;
     }
 
     /**
-     * Gets the group.
+     * Gets the int representing the grouping for this relationship blueprint. 0
+     * indicates the relationship is not part of a group.
      *
-     * @return the group
+     * @return the group number
      */
     public int getGroup() {
         return group;
     }
 
     /**
-     * Gets the refinability uuid.
+     * Gets the uuid of the relationship refinability.
      *
      * @return the refinability uuid
      */
@@ -293,27 +335,27 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Gets the source uuid.
+     * Gets the uuid of the source concept.
      *
-     * @return the source uuid
+     * @return the source concept uuid
      */
     public UUID getSourceUuid() {
         return sourceUuid;
     }
 
     /**
-     * Gets the type uuid.
+     * Gets the uuid of the relationship type.
      *
-     * @return the type uuid
+     * @return the relationship type uuid
      */
     public UUID getTypeUuid() {
         return typeUuid;
     }
 
     /**
-     * Gets the characteristic nid.
+     * Gets the nid of the relationship characteristic.
      *
-     * @return the characteristic nid
+     * @return the relationship characteristic nid
      * @throws IOException signals that an I/O exception has occurred
      */
     public int getCharacteristicNid() throws IOException {
@@ -321,9 +363,9 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Gets the target nid.
+     * Gets the nid of the target concept.
      *
-     * @return the target nid
+     * @return the target concept nid
      * @throws IOException signals that an I/O exception has occurred
      */
     public int getTargetNid() throws IOException {
@@ -331,9 +373,9 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Gets the refinability nid.
+     * Gets the nid of the relationship refinability.
      *
-     * @return the refinability nid
+     * @return the relationship refinability nid
      * @throws IOException signals that an I/O exception has occurred
      */
     public int getRefinabilityNid() throws IOException {
@@ -341,9 +383,9 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Gets the source nid.
+     * Gets the nid of the source concept.
      *
-     * @return the source nid
+     * @return the source concept nid
      * @throws IOException signals that an I/O exception has occurred
      */
     public int getSourceNid() throws IOException {
@@ -351,29 +393,33 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Gets the type nid.
+     * Gets the nid of the relationship type.
      *
-     * @return the type nid
+     * @return the relationship type nid
      * @throws IOException signals that an I/O exception has occurred
      */
     public int getTypeNid() throws IOException {
         return Ts.get().getNidForUuids(typeUuid);
     }
-    
+
     /**
-     * Sets the source uuid.
+     * Sets the uuid of the source concept.
      *
-     * @param sourceNewUuid the new source uuid
+     * @param sourceNewUuid the uuid of the source concept
      */
-    protected void setSourceUuid(UUID sourceNewUuid){
+    protected void setSourceUuid(UUID sourceNewUuid) {
         this.sourceUuid = sourceNewUuid;
     }
-    
+
     /**
-     * Validate.
+     * Validates this relationship blueprint's fields against the given
+     * <code>relationhipVersion</code>. Compares the status nid, relationship
+     * nid, source concept nid, relationship type nid, relationship refinability
+     * nid, relationship characteristic nid, and relationship target nid.
      *
-     * @param relationshipVersion the relationship version
-     * @return <code>true</code>, if successful
+     * @param relationshipVersion the relationship version to use for validation
+     * @return <code>true</code>, if this relationship blueprint's fields are
+     * equal to the specified relationship version
      * @throws IOException signals that an I/O exception has occurred
      */
     public boolean validate(RelationshipVersionBI relationshipVersion) throws IOException {

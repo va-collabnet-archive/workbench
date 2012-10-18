@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.tk.api.blueprint;
 
@@ -27,44 +27,41 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.uuid.UuidT5Generator;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class DescriptionCAB.
+ * The Class DescriptionCAB contains methods for creating a description
+ * blueprint. This blueprint can be constructed into a type of
+ * <code>DescriptionChronicleBI</code>. This is the preferred method for
+ * updating or creating new descriptions.
  *
- * @author kec
+ * @see TerminologyBuilderBI
+ * @see DescriptionChronicleBI
+ *
  */
 public class DescriptionCAB extends CreateOrAmendBlueprint {
 
-    /** The Constant descSpecNamespace. */
     public static final UUID descSpecNamespace =
             UUID.fromString("457e4a20-5284-11e0-b8af-0800200c9a66");
-    
-    /** The concept uuid. */
     private UUID conceptUuid;
-    
-    /** The type uuid. */
     private UUID typeUuid;
-    
-    /** The lang. */
     public String lang;
-    
-    /** The text. */
     public String text;
-    
-    /** The initial case significant. */
     public boolean initialCaseSignificant;
 
     /**
-     * Instantiates a new description cab.
+     * Instantiates a new description blueprint using nids values.
      *
-     * @param conceptNid the concept nid
-     * @param typeNid the type nid
-     * @param langCode the lang code
-     * @param text the text
-     * @param initialCaseSignificant the initial case significant
+     * @param conceptNid the nid of the enclosing concept
+     * @param typeNid the nid of the description type
+     * @param langCode the lang code representing the language of the
+     * description
+     * @param text the text of the description
+     * @param initialCaseSignificant set to <code>true</code> to mark the
+     * description as initial case significant
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
-     * @throws ContradictionException the contradiction exception
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * view coordinate
      */
     public DescriptionCAB(
             int conceptNid, int typeNid, LANG_CODE langCode, String text, boolean initialCaseSignificant)
@@ -75,16 +72,20 @@ public class DescriptionCAB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Instantiates a new description cab.
+     * Instantiates a new description blueprint using uuid values.
      *
-     * @param conceptUuid the concept uuid
-     * @param typeUuid the type uuid
-     * @param langCode the lang code
-     * @param text the text
-     * @param initialCaseSignificant the initial case significant
+     * @param conceptUuid the uuid of the enclosing concept
+     * @param typeUuid the uuid of the description type
+     * @param langCode the lang code representing the language of the
+     * description
+     * @param text the lang code representing the language of the description
+     * @param initialCaseSignificant set to <code>true</code> to mark the
+     * description as initial case significant
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
-     * @throws ContradictionException the contradiction exception
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * view coordinate
      */
     public DescriptionCAB(
             UUID conceptUuid, UUID typeUuid, LANG_CODE langCode, String text, boolean initialCaseSignificant)
@@ -94,18 +95,24 @@ public class DescriptionCAB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Instantiates a new description cab.
+     * Instantiates a new description blueprint using nid values and a given
+     * <code>descriptionVersion</code>.
      *
-     * @param conceptNid the concept nid
-     * @param typeNid the type nid
-     * @param langCode the lang code
-     * @param text the text
-     * @param initialCaseSignificant the initial case significant
-     * @param descriptionVersion the description version
-     * @param viewCoordinate the view coordinate
+     * @param conceptNid the nid of the enclosing concept
+     * @param typeNid the nid of the description type
+     * @param langCode the lang code representing the language of the
+     * description
+     * @param text the lang code representing the language of the description
+     * @param initialCaseSignificant set to <code>true</code> to mark the
+     * description as initial case significant
+     * @param descriptionVersion the description version to use as a pattern
+     * @param viewCoordinate the view coordinate specifying which versions are
+     * active and inactive
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
-     * @throws ContradictionException the contradiction exception
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * view coordinate
      */
     public DescriptionCAB(
             int conceptNid, int typeNid, LANG_CODE langCode, String text, boolean initialCaseSignificant,
@@ -116,21 +123,27 @@ public class DescriptionCAB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Instantiates a new description cab.
+     * Instantiates a new description blueprint using uuid values and a given
+     * <code>descriptionVersion</code>.
      *
-     * @param conceptUuid the concept uuid
-     * @param typeUuid the type uuid
-     * @param langCode the lang code
-     * @param text the text
-     * @param initialCaseSignificant the initial case significant
-     * @param descriptionVersion the description version
-     * @param viewCoordinate the view coordinate
+     * @param conceptUuid the uuid of the enclosing concept
+     * @param typeUuid the uuid of the description type
+     * @param langCode the lang code representing the language of the
+     * description
+     * @param text the lang code representing the language of the description
+     * @param initialCaseSignificant set to <code>true</code> to mark the
+     * description as initial case significant
+     * @param descriptionVersion the description version to use as a pattern
+     * @param viewCoordinate the view coordinate specifying which versions are
+     * active and inactive
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
-     * @throws ContradictionException the contradiction exception
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * view coordinate
      */
     public DescriptionCAB(
-            UUID conceptUuid, UUID typeUuid, LANG_CODE langCode, String text, 
+            UUID conceptUuid, UUID typeUuid, LANG_CODE langCode, String text,
             boolean initialCaseSignificant, DescriptionVersionBI descriptionVersion, ViewCoordinate viewCoordinate) throws
             IOException, InvalidCAB, ContradictionException {
         this(conceptUuid, typeUuid, langCode, text, initialCaseSignificant,
@@ -138,19 +151,26 @@ public class DescriptionCAB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Instantiates a new description cab.
+     * Instantiates a new description blueprint using uuid values and a given
+     * <code>descriptionVersion</code>. Can specify the uuid to be associated
+     * with the new description.
      *
-     * @param conceptUuid the concept uuid
-     * @param typeUuid the type uuid
-     * @param langCode the lang code
-     * @param text the text
-     * @param initialCaseSignificant the initial case significant
-     * @param componentUuid the component uuid
-     * @param descriptionVersion the description version
-     * @param viewCoordinate the view coordinate
+     * @param conceptUuid the uuid of the enclosing concept
+     * @param typeUuid the uuid of the description type
+     * @param langCode the lang code representing the language of the
+     * description
+     * @param text the lang code representing the language of the description
+     * @param initialCaseSignificant set to <code>true</code> to mark the
+     * description as initial case significant
+     * @param componentUuid the uuid representing the new description
+     * @param descriptionVersion the description version to use as a pattern
+     * @param viewCoordinate the view coordinate specifying which versions are
+     * active and inactive
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
-     * @throws ContradictionException the contradiction exception
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * view coordinate
      */
     public DescriptionCAB(
             UUID conceptUuid, UUID typeUuid, LANG_CODE langCode, String text,
@@ -176,8 +196,20 @@ public class DescriptionCAB extends CreateOrAmendBlueprint {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint#recomputeUuid()
+    /**
+     * Computes the uuid for this description based on the enclosing concept
+     * uuid, description type uuid, language, and description text. Recomputes
+     * the uuids for dependent annotations.
+     *
+     * @throws NoSuchAlgorithmException indicates a no such algorithm exception
+     * has occurred
+     * @throws UnsupportedEncodingException indicates an unsupported encoding
+     * exception has occurred
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * given position or view coordinate
      */
     @Override
     public void recomputeUuid() throws NoSuchAlgorithmException, UnsupportedEncodingException,
@@ -187,27 +219,28 @@ public class DescriptionCAB extends CreateOrAmendBlueprint {
                 + typeUuid
                 + lang
                 + text));
-        for(RefexCAB annotBp: getAnnotationBlueprints()){
+        for (RefexCAB annotBp : getAnnotationBlueprints()) {
             annotBp.setReferencedComponentUuid(getComponentUuid());
             annotBp.recomputeUuid();
-            
+
         }
 
     }
 
     /**
-     * Gets the type uuid.
+     * Gets the description type uuid associated with this description
+     * blueprint.
      *
-     * @return the type uuid
+     * @return the description type uuid
      */
     public UUID getTypeUuid() {
         return typeUuid;
     }
 
     /**
-     * Gets the type nid.
+     * Gets the description type nid associated with this description blueprint.
      *
-     * @return the type nid
+     * @return the description type nid
      * @throws IOException signals that an I/O exception has occurred
      */
     public int getTypeNid() throws IOException {
@@ -215,9 +248,10 @@ public class DescriptionCAB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Gets the concept nid.
+     * Gets the enclosing concept nid associated with this description
+     * blueprint.
      *
-     * @return the concept nid
+     * @return the enclosing concept nid
      * @throws IOException signals that an I/O exception has occurred
      */
     public int getConceptNid() throws IOException {
@@ -225,86 +259,95 @@ public class DescriptionCAB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Gets the concept uuid.
+     * Gets the enclosing concept uuid associated with this description
+     * blueprint.
      *
-     * @return the concept uuid
+     * @return the enclosing concept uuid
      */
     public UUID getConceptUuid() {
         return conceptUuid;
     }
 
     /**
-     * Checks if is initial case significant.
+     * Checks if this description blueprint is marked as initial case
+     * significant.
      *
-     * @return <code>true</code>, if is initial case significant
+     * @return <code>true</code>, if this description blueprint is initial case
+     * significant
      */
     public boolean isInitialCaseSignificant() {
         return initialCaseSignificant;
     }
 
     /**
-     * Gets the lang.
+     * Gets a two character abbreviation of language of this description
+     * blueprint.
      *
-     * @return the lang
+     * @return a two character abbreviation of the description language
      */
     public String getLang() {
         return lang;
     }
 
     /**
-     * Gets the text.
+     * Gets the text of the description blueprint.
      *
-     * @return the text
+     * @return the description text
      */
     public String getText() {
         return text;
     }
-    
+
     /**
-     * Sets the concept uuid.
+     * Sets the enclosing concept for this description blueprint based on the
+     * given
+     * <code>enclosingConceptUuid</code>.
      *
-     * @param conceptNewUuid the new concept uuid
+     * @param enclosingConceptUuid the uuid of the enclosing concept
      */
-    protected void setConceptUuid(UUID conceptNewUuid){
-        this.conceptUuid = conceptNewUuid;
+    protected void setConceptUuid(UUID enclosingConceptUuid) {
+        this.conceptUuid = enclosingConceptUuid;
     }
-    
+
     /**
-     * Sets the text.
+     * Sets the description text for this description blueprint.
      *
-     * @param newText the new text
+     * @param newText the description text
      */
-    public void setText(String newText){
+    public void setText(String newText) {
         this.text = newText;
     }
 
     /**
-     * Validate.
+     * Validates this description blueprint's fields against the given
+     * <code>descriptionVersion</code>. Compares the status nid, component nid,
+     * enclosing concept nid, description type nid, language, and text.
      *
-     * @param DescriptionVersion the description version
-     * @return <code>true</code>, if successful
+     * @param descriptionVersion the description version to use for validation
+     * @return <code>true</code>, if this description blueprint's fields are
+     * equal to the specified description version
      * @throws IOException signals that an I/O exception has occurred
      */
-    public boolean validate(DescriptionVersionBI DescriptionVersion) throws IOException {
-        if (DescriptionVersion.getStatusNid() != getStatusNid()) {
+    public boolean validate(DescriptionVersionBI descriptionVersion) throws IOException {
+        if (descriptionVersion.getStatusNid() != getStatusNid()) {
             return false;
         }
-        if (DescriptionVersion.getNid() != getComponentNid()) {
+        if (descriptionVersion.getNid() != getComponentNid()) {
             return false;
         }
-        if (DescriptionVersion.getConceptNid() != getConceptNid()) {
+        if (descriptionVersion.getConceptNid() != getConceptNid()) {
             return false;
         }
-        if (DescriptionVersion.getTypeNid() != getTypeNid()) {
+        if (descriptionVersion.getTypeNid() != getTypeNid()) {
             return false;
         }
-        if (!DescriptionVersion.getLang().equals(getLang())) {
+        if (!descriptionVersion.getLang().equals(getLang())) {
             return false;
         }
-        if (!DescriptionVersion.getText().equals(getText())) {
+        if (!descriptionVersion.getText().equals(getText())) {
             return false;
         }
-        if (DescriptionVersion.isInitialCaseSignificant() != isInitialCaseSignificant()) {
+        if (descriptionVersion.isInitialCaseSignificant() != isInitialCaseSignificant()) {
             return false;
         }
         return true;

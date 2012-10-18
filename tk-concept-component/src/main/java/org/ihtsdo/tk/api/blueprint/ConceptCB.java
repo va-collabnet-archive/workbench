@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.tk.api.blueprint;
 
@@ -37,69 +37,39 @@ import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipType;
 import org.ihtsdo.tk.uuid.UuidT5Generator;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class ConceptCB.
+ * The Class ConceptCB contains methods for creating a concept blueprint. This
+ * blueprint can be constructed into a type of
+ * <code>ConceptChronicleBI</code>. This is the preferred method for creating
+ * new concepts. Use ConceptAttributeAB to amend concept attributes if the
+ * concept already exists.
  *
- * @author kec
+ * @see TerminologyBuilderBI
+ * @see ConceptChronicleBI
+ * @see ConceptAttributeAB
+ * 
  */
 public final class ConceptCB extends CreateOrAmendBlueprint {
 
-    /** The Constant conceptSpecNamespace. */
     public static final UUID conceptSpecNamespace =
             UUID.fromString("620d1f30-5285-11e0-b8af-0800200c9a66");
-    
-    /** The fully specified name. */
     private String fullySpecifiedName;
-    
-    /** The preferred name. */
     private String preferredName;
-    
-    /** The fsns. */
     private List<String> fsns = new ArrayList<String>();
-    
-    /** The pref names. */
     private List<String> prefNames = new ArrayList<String>();
-    
-    /** The initial case sensitive. */
     private boolean initialCaseSensitive = false;
-    
-    /** The lang. */
     private String lang;
-    
-    /** The isa type. */
     private UUID isaType;
-    
-    /** The defined. */
     private boolean defined;
-    
-    /** The fsn ca bs. */
     private List<DescriptionCAB> fsnCABs = new ArrayList<DescriptionCAB>();
-    
-    /** The pref ca bs. */
     private List<DescriptionCAB> prefCABs = new ArrayList<DescriptionCAB>();
-    
-    /** The desc ca bs. */
     private List<DescriptionCAB> descCABs = new ArrayList<DescriptionCAB>();
-    
-    /** The rel ca bs. */
     private List<RelationshipCAB> relCABs = new ArrayList<RelationshipCAB>();
-    
-    /** The media ca bs. */
     private List<MediaCAB> mediaCABs = new ArrayList<MediaCAB>();
-    
-    /** The con attr. */
     private ConceptAttributeAB conAttr;
-    
-    /** The us refex nid. */
     private int usRefexNid = SnomedMetadataRfx.getUS_DIALECT_REFEX_NID();
-    
-    /** The gb refex nid. */
     private int gbRefexNid = SnomedMetadataRfx.getGB_DIALECT_REFEX_NID();
-    
-    /** The parents. */
     private Collection<UUID> parents = new TreeSet<UUID>() {
-
         @Override
         public boolean add(UUID e) {
             boolean result = super.add(e);
@@ -130,31 +100,36 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
     };
 
     /**
-     * Gets the parents.
+     * Gets the uuids of parent concept for this concept blueprint.
      *
-     * @return the parents
+     * @return the uuids of the parent concepts
      */
     public Collection<UUID> getParents() {
         return parents;
     }
 
     /**
-     * Instantiates a new concept cb.
+     * Instantiates a new concept blueprint using uuid values to specify the new
+     * concept.
      *
-     * @param fullySpecifiedName the fully specified name
-     * @param preferredName the preferred name
-     * @param langCode the lang code
-     * @param isaTypeUuid the isa type uuid
-     * @param parentUuids the parent uuids
+     * @param fullySpecifiedName the text to use for the fully specified name
+     * @param preferredName the text to use for the preferred name
+     * @param langCode the lang code representing the language of the
+     * description
+     * @param isaTypeUuid the uuid representing the relationship type to use for
+     * specifying the parent concepts
+     * @param parentUuids the uuids of the parent concept
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
-     * @throws ContradictionException the contradiction exception
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * view coordinate
      */
     public ConceptCB(String fullySpecifiedName,
             String preferredName,
             LANG_CODE langCode,
             UUID isaTypeUuid,
-            UUID... parentUuids) throws IOException, InvalidCAB, ContradictionException{
+            UUID... parentUuids) throws IOException, InvalidCAB, ContradictionException {
         super(null, null, null);
         this.fsns.add(fullySpecifiedName);
         this.fullySpecifiedName = fullySpecifiedName; //@akf todo: these should be removed when NewConcept, etc. is upated
@@ -170,22 +145,29 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Instantiates a new concept cb.
+     * Instantiates a new concept blueprint using uuid values to specify the new
+     * concept. Allows multiple fully specified names and preferred names to be
+     * specified.
      *
-     * @param fullySpecifiedNames the fully specified names
-     * @param preferredNames the preferred names
-     * @param langCode the lang code
-     * @param isaTypeUuid the isa type uuid
-     * @param parentUuids the parent uuids
+     * @param fullySpecifiedNames a list of strings to use for the fully
+     * specified names
+     * @param preferredNames a list of strings to use for the preferred names
+     * @param langCode the lang code representing the language of the
+     * description
+     * @param isaTypeUuid the uuid representing the relationship type to use for
+     * specifying the parent concepts
+     * @param parentUuids the uuids of the parent concept
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
-     * @throws ContradictionException the contradiction exception
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * view coordinate
      */
     public ConceptCB(List<String> fullySpecifiedNames,
             List<String> preferredNames,
             LANG_CODE langCode,
             UUID isaTypeUuid,
-            UUID... parentUuids) throws IOException, InvalidCAB, ContradictionException{
+            UUID... parentUuids) throws IOException, InvalidCAB, ContradictionException {
         super(null, null, null);
         this.fsns = fullySpecifiedNames;
         this.prefNames = preferredNames;
@@ -199,13 +181,17 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Instantiates a new concept cb.
+     * Instantiates a new concept blueprint based on the given
+     * <code>conceptVersion</code>. Can specify a uuid for the new concept.
      *
-     * @param conceptVersion the concept version
-     * @param newConceptUuid the new concept uuid
+     * @param conceptVersion the concept version to use to create this concept
+     * blueprint
+     * @param newConceptUuid the uuid representing the new concept
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ContradictionException the contradiction exception
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
+     * @throws ContradictionException if more than one version is found for a
+     * given position or view coordinate
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
      */
     public ConceptCB(ConceptVersionBI conceptVersion, UUID newConceptUuid) throws IOException, ContradictionException, InvalidCAB {
         super(null, conceptVersion, conceptVersion.getViewCoordinate());
@@ -252,8 +238,12 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
         this.setComponentUuid(newConceptUuid);
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint#propertyChange(java.beans.PropertyChangeEvent)
+    /**
+     * Listens for a property change event in any of the component blueprint
+     * classes and recomputes the concept blueprint's computed uuid if a
+     * dependent component has changed.
+     *
+     * @param propertyChangeEvent the property change event
      */
     @Override
     public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
@@ -274,9 +264,10 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Compute component uuid.
+     * Computes the uuid for the concept represented by this concept blueprint
+     * based on the fully specified names and preferred terms.
      *
-     * @throws RuntimeException the runtime exception
+     * @throws RuntimeException indicates a runtime exception has occurred
      */
     public final void computeComponentUuid() throws RuntimeException {
         try {
@@ -298,8 +289,20 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint#recomputeUuid()
+    /**
+     * Resets the enclosing or source concepts for the components on this
+     * concept. Then recomputes the uuids of the components based on the new
+     * uuid of the concept.
+     *
+     * @throws NoSuchAlgorithmException indicates a no such algorithm exception
+     * has occurred
+     * @throws UnsupportedEncodingException indicates an unsupported encoding
+     * exception has occurred
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * given position or view coordinate
      */
     @Override
     public void recomputeUuid() throws NoSuchAlgorithmException, UnsupportedEncodingException,
@@ -319,18 +322,21 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Gets the fully specified name.
+     * Gets the text of fully specified name associated with this concept
+     * blueprint.
      *
-     * @return the fully specified name
+     * @return the fully specified name text
      */
     public String getFullySpecifiedName() {//@akf todo : update to use set when NewConcept, etc. has been updated
         return fullySpecifiedName;
     }
 
     /**
-     * Sets the fully specified name.
+     * Sets the text to use in the fully specified name (FSN) associated with
+     * this concept blueprint. Recomputes the uuid associated with this concept
+     * based on the updated FSN text.
      *
-     * @param fullySpecifiedName the new fully specified name
+     * @param fullySpecifiedName the text to use for the fully specified name
      */
     public void setFullySpecifiedName(String fullySpecifiedName) {
         this.fullySpecifiedName = fullySpecifiedName;
@@ -338,15 +344,25 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Adds an fsn.
+     * Adds a description blueprint to use for the fully specified name (FSN)
+     * description associated with this concept blueprint. Recomputes the uuid
+     * associated with this concept based on the updated FSN text. Adds the
+     * appropriate language/dialect refexes based on the given dialect code
+     * (only supports en-us and en-gb). This method does not remove existing FSN
+     * blueprints that are already associated with this concept blueprint.
      *
-     * @param fullySpecifiedNameBlueprint blueprint of fsn
-     * @param dialect language code of fsn dialect
-     * @throws NoSuchAlgorithmException indicates a no such algorithm exception has occurred
-     * @throws UnsupportedEncodingException indicates an unsupported encoding exception has occurred
+     * @param fullySpecifiedNameBlueprint the description blueprint for the
+     * fully specified name description
+     * @param dialect the language code representing the dialect of the FSN
+     * @throws NoSuchAlgorithmException indicates a no such algorithm exception
+     * has occurred
+     * @throws UnsupportedEncodingException indicates an unsupported encoding
+     * exception has occurred
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
-     * @throws ContradictionException the contradiction exception
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * given position or view coordinate
      */
     public void addFullySpecifiedName(DescriptionCAB fullySpecifiedNameBlueprint, LANG_CODE dialect) throws NoSuchAlgorithmException,
             UnsupportedEncodingException, IOException, InvalidCAB, ContradictionException {
@@ -356,15 +372,21 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Adds the fully specified name dialect refexes.
+     * Adds the appropriate dialect refexes to the fully specified name
+     * description blueprint.
      *
-     * @param fullySpecifiedNameBlueprint the fully specified name blueprint
-     * @param dialect the dialect
-     * @throws NoSuchAlgorithmException indicates a no such algorithm exception has occurred
-     * @throws UnsupportedEncodingException indicates an unsupported encoding exception has occurred
+     * @param fullySpecifiedNameBlueprint the fully specified name description
+     * blueprint
+     * @param dialect the dialect of the FSN, only supports en-gb and en-us
+     * @throws NoSuchAlgorithmException indicates a no such algorithm exception
+     * has occurred
+     * @throws UnsupportedEncodingException indicates an unsupported encoding
+     * exception has occurred
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
-     * @throws ContradictionException the contradiction exception
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * given position or view coordinate
      */
     private void addFullySpecifiedNameDialectRefexes(DescriptionCAB fullySpecifiedNameBlueprint, LANG_CODE dialect) throws NoSuchAlgorithmException,
             UnsupportedEncodingException, IOException, InvalidCAB, ContradictionException {
@@ -397,17 +419,24 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Updates an existing fsn.
+     * Updates an the text associated with the specified fully specified name
+     * description blueprint. Removes previous dialect refexes associated with
+     * the FSN blueprint and remakes them with the updated text.
      *
-     * @param newFullySpecifiedName text to be updated
-     * @param fullySpecifiedNameBlueprint blueprint of fsn
-     * @param dialect language code of fsn dialect, leave null if dialect isn't
+     * @param newFullySpecifiedName the new text to use for the update
+     * @param fullySpecifiedNameBlueprint the FSN description blueprint to
+     * update
+     * @param dialect language code of FSN dialect, leave null if dialect isn't
      * changing
-     * @throws NoSuchAlgorithmException indicates a no such algorithm exception has occurred
-     * @throws UnsupportedEncodingException indicates an unsupported encoding exception has occurred
+     * @throws NoSuchAlgorithmException indicates a no such algorithm exception
+     * has occurred
+     * @throws UnsupportedEncodingException indicates an unsupported encoding
+     * exception has occurred
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
-     * @throws ContradictionException the contradiction exception
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * given position or view coordinate
      */
     public void updateFullySpecifiedName(String newFullySpecifiedName, DescriptionCAB fullySpecifiedNameBlueprint, LANG_CODE dialect) throws
             NoSuchAlgorithmException, UnsupportedEncodingException, IOException, InvalidCAB, ContradictionException {
@@ -429,18 +458,20 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Gets the isa type.
+     * Gets the uuid of isa type to use for the parent relationships associated
+     * with this concept blueprint.
      *
-     * @return the isa type
+     * @return the isa type uuid
      */
     public UUID getIsaType() {
         return isaType;
     }
 
     /**
-     * Sets the isa type.
+     * Sets the uuid of isa type to use for the parent relationships associated
+     * with this concept blueprint.
      *
-     * @param isaTypeUuid the new isa type
+     * @param isaTypeUuid the isa type uuid
      */
     public void setIsaType(UUID isaTypeUuid) {
         this.isaType = isaTypeUuid;
@@ -448,18 +479,21 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Gets the lang.
+     * Gets a two character abbreviation of the language of the descriptions
+     * associated with this concept blueprint.
      *
-     * @return the lang
+     * @return a two character abbreviation of the language of the descriptions
      */
     public String getLang() {
         return lang;
     }
 
     /**
-     * Sets the lang.
+     * Sets the language of the descriptions associated with this concept
+     * blueprint.
      *
-     * @param lang the new lang
+     * @param lang a two character abbreviation of the language of the
+     * descriptions
      */
     public void setLang(String lang) {
         this.lang = lang;
@@ -467,18 +501,20 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Gets the preferred name.
+     * Gets the text of the preferred name description associated with this
+     * concept blueprint.
      *
-     * @return the preferred name
+     * @return the preferred name text
      */
     public String getPreferredName() { //@akf todo : update to use set when NewConcept, etc. has been updated
         return preferredName;
     }
 
     /**
-     * Sets the preferred name.
+     * Sets the text of the preferred name associated with this concept
+     * blueprint.
      *
-     * @param preferredName the new preferred name
+     * @param preferredName the new preferred name text
      */
     public void setPreferredName(String preferredName) {
         this.preferredName = preferredName;
@@ -486,15 +522,27 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Adds a new preferred name.
+     * Adds a description blueprint to use for the preferred name description
+     * associated with this concept blueprint. Recomputes the uuid associated
+     * with this concept based on the updated preferred name text. Adds the
+     * appropriate language/dialect refexes based on the given dialect code
+     * (only supports en-us and en-gb). This method does not remove existing
+     * preferred name blueprints that are already associated with this concept
+     * blueprint.
      *
-     * @param perferredNameBlueprint blueprint of pref name
-     * @param dialect language code of pref name dialect
-     * @throws NoSuchAlgorithmException indicates a no such algorithm exception has occurred
-     * @throws UnsupportedEncodingException indicates an unsupported encoding exception has occurred
+     * @param perferredNameBlueprint the description blueprint for the preferred
+     * name description
+     * @param dialect the language code representing the dialect of the
+     * preferred term
+     * @throws NoSuchAlgorithmException indicates a no such algorithm exception
+     * has occurred
+     * @throws UnsupportedEncodingException indicates an unsupported encoding
+     * exception has occurred
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
-     * @throws ContradictionException the contradiction exception
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * given position or view coordinate
      */
     public void addPreferredName(DescriptionCAB perferredNameBlueprint, LANG_CODE dialect) throws NoSuchAlgorithmException,
             UnsupportedEncodingException, IOException, InvalidCAB, ContradictionException {
@@ -504,15 +552,21 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Adds the preferred name dialect refexes.
+     * Adds the appropriate dialect refexes to the preferred name description
+     * blueprint.
      *
-     * @param preferredBlueprint the preferred blueprint
-     * @param dialect the dialect
-     * @throws NoSuchAlgorithmException indicates a no such algorithm exception has occurred
-     * @throws UnsupportedEncodingException indicates an unsupported encoding exception has occurred
+     * @param preferredBlueprint the preferred name description blueprint
+     * @param dialect the dialect of the preferred name, only supports en-gb and
+     * en-us
+     * @throws NoSuchAlgorithmException indicates a no such algorithm exception
+     * has occurred
+     * @throws UnsupportedEncodingException indicates an unsupported encoding
+     * exception has occurred
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
-     * @throws ContradictionException the contradiction exception
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * given position or view coordinate
      */
     private void addPreferredNameDialectRefexes(DescriptionCAB preferredBlueprint, LANG_CODE dialect) throws NoSuchAlgorithmException,
             UnsupportedEncodingException, IOException, InvalidCAB, ContradictionException {
@@ -548,17 +602,24 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Updates an existing preferred name.
+     * Updates an the text associated with the specified preferred name
+     * description blueprint. Removes previous dialect refexes associated with
+     * the preferred name blueprint and remakes them with the updated text.
      *
-     * @param newPreferredName text to be updated
-     * @param preferredNameBlueprint blueprint of pref name
-     * @param dialect language code of pref name dialect, leave null if dialect
-     * isn't changing
-     * @throws NoSuchAlgorithmException indicates a no such algorithm exception has occurred
-     * @throws UnsupportedEncodingException indicates an unsupported encoding exception has occurred
+     * @param newPreferredName the new text to use for the update
+     * @param preferredNameBlueprint the preferred name description blueprint to
+     * update
+     * @param dialect language code of preferred name dialect, leave null if
+     * dialect isn't changing
+     * @throws NoSuchAlgorithmException indicates a no such algorithm exception
+     * has occurred
+     * @throws UnsupportedEncodingException indicates an unsupported encoding
+     * exception has occurred
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
-     * @throws ContradictionException the contradiction exception
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * given position or view coordinate
      */
     public void updatePreferredName(String newPreferredName, DescriptionCAB preferredNameBlueprint, LANG_CODE dialect) throws
             NoSuchAlgorithmException, UnsupportedEncodingException, IOException, InvalidCAB, ContradictionException {
@@ -580,48 +641,54 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Checks if is defined.
+     * Checks if this concept blueprint is marked as defined.
      *
-     * @return <code>true</code>, if is defined
+     * @return <code>true</code>, if the concept is defined
      */
     public boolean isDefined() {
         return defined;
     }
 
     /**
-     * Sets the defined.
+     * Marks this concept blueprint as defined
      *
-     * @param defined the new defined
+     * @param defined set to <code>true</code> if the concept is defined
      */
     public void setDefined(boolean defined) {
         this.defined = defined;
     }
 
     /**
-     * Checks if is initial case sensitive.
+     * Checks if the descriptions associated with this concept are marked as
+     * initial case sensitive.
      *
-     * @return <code>true</code>, if is initial case sensitive
+     * @return <code>true</code>, if the descriptions are initial case sensitive
      */
     public boolean isInitialCaseSensitive() {
         return initialCaseSensitive;
     }
 
     /**
-     * Sets the initial case sensitive.
+     * Marks the descriptions associated with this concept are marked as initial
+     * case sensitive.
      *
-     * @param initialCaseSensitive the new initial case sensitive
+     * @param initialCaseSensitive set to <code>true</code> to mark the
+     * descriptions as initial case sensitive
      */
     public void setInitialCaseSensitive(boolean initialCaseSensitive) {
         this.initialCaseSensitive = initialCaseSensitive;
     }
 
     /**
-     * Make fully specified name cab.
+     * Generates a description blueprint representing the fully specified name
+     * of this blueprint.
      *
-     * @return the description cab
+     * @return a description blueprint representing the fully specified name
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
-     * @throws ContradictionException the contradiction exception
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * given position or view coordinate
      */
     public DescriptionCAB makeFullySpecifiedNameCAB() throws IOException, InvalidCAB, ContradictionException {
         //get rf1/rf2 concepts
@@ -640,12 +707,15 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Make preferred cab.
+     * Generates a description blueprint representing the preferred name of this
+     * concept blueprint.
      *
-     * @return the description cab
+     * @return a description blueprint representing the preferred name
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
-     * @throws ContradictionException the contradiction exception
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * given position or view coordinate
      */
     public DescriptionCAB makePreferredCAB() throws IOException, InvalidCAB, ContradictionException {
         //get rf1/rf2 concepts
@@ -657,19 +727,23 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
         }
         return new DescriptionCAB(
                 getComponentUuid(),
-                synUuid, //from PREFERRED
+                synUuid,
                 LANG_CODE.getLangCode(lang),
                 getPreferredName(),
                 isInitialCaseSensitive());
     }
 
     /**
-     * Gets the parent ca bs.
+     * Generates relationship blueprints representing the parent relationships
+     * of this concept blueprint.
      *
-     * @return the parent ca bs
+     * @return a list of relationship blueprints representing the parent
+     * relationships
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
-     * @throws ContradictionException the contradiction exception
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * given position or view coordinate
      */
     public List<RelationshipCAB> getParentCABs() throws IOException, InvalidCAB, ContradictionException {
         List<RelationshipCAB> parentCabs =
@@ -687,12 +761,16 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Gets the fully specified name ca bs.
+     * Returns a list of the fully specified name blueprints associated with
+     * this concept blueprint. If no FSN blueprints are associated, one will be
+     * generated based on the associated FSN text.
      *
-     * @return the fully specified name ca bs
+     * @return a list of fully specified name blueprints
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
-     * @throws ContradictionException the contradiction exception
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * given position or view coordinate
      */
     public List<DescriptionCAB> getFullySpecifiedNameCABs() throws IOException, InvalidCAB, ContradictionException {
         if (fsnCABs.isEmpty()) {
@@ -702,12 +780,16 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Gets the preferred name ca bs.
+     * Gets a list of the preferred name blueprints associated with this concept
+     * blueprint. If no preferred name blueprints are associated, one will be
+     * generated based on the associated preferred name text.
      *
-     * @return the preferred name ca bs
+     * @return a list of preferred name blueprints
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
-     * @throws ContradictionException the contradiction exception
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * given position or view coordinate
      */
     public List<DescriptionCAB> getPreferredNameCABs() throws IOException, InvalidCAB, ContradictionException {
         if (prefCABs.isEmpty()) {
@@ -717,99 +799,111 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Gets the description ca bs.
+     * Gets the description blueprints associated with this concept blueprint.
      *
-     * @return the description ca bs
+     * @return a list of description blueprints
      */
     public List<DescriptionCAB> getDescriptionCABs() {
         return descCABs;
     }
 
     /**
-     * Gets the relationship ca bs.
+     * Gets a list of relationship blueprints associated with this concept
+     * blueprint. If not relationships blueprints are associated, they will be
+     * generated for the relationships to the associated parent concepts.
      *
-     * @return the relationship ca bs
+     * @return a list of parent relationship blueprints
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
-     * @throws ContradictionException the contradiction exception
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * given position or view coordinate
      */
     public List<RelationshipCAB> getRelationshipCABs() throws IOException, InvalidCAB, ContradictionException {
         List<RelationshipCAB> parentCABs = getParentCABs();
         for (RelationshipCAB parentBp : parentCABs) {
-            if(!relCABs.contains(parentBp)){
-                 relCABs.add(parentBp);
+            if (!relCABs.contains(parentBp)) {
+                relCABs.add(parentBp);
             }
         }
         return relCABs;
     }
 
     /**
-     * Gets the media ca bs.
+     * Gets the media blueprints associated with this concept blueprint.
      *
-     * @return the media ca bs
+     * @return a list of media blueprints
      */
     public List<MediaCAB> getMediaCABs() {
         return mediaCABs;
     }
 
     /**
-     * Gets the concept attributte ab.
+     * Gets the concept attribute blueprint associated with this concept
+     * blueprint.
      *
-     * @return the concept attributte ab
+     * @return the concept attributte blueprint
      */
     public ConceptAttributeAB getConceptAttributteAB() {
         return conAttr;
     }
 
     /**
-     * Adds the fully specified name cab.
+     * Adds a fully specified name description blueprint to the list of
+     * description blueprints associated with this concept blueprint.
      *
-     * @param fullySpecifiedNameBlueprint the fully specified name blueprint
+     * @param fullySpecifiedNameBlueprint the fully specified name blueprint to
+     * add
      */
     public void addFullySpecifiedNameCAB(DescriptionCAB fullySpecifiedNameBlueprint) {
         fsnCABs.add(fullySpecifiedNameBlueprint);
     }
 
     /**
-     * Adds the preferred name cab.
+     * Adds a preferred name description blueprint to the list of description
+     * blueprints associated with this concept blueprint.
      *
-     * @param preferredNameBlueprint the preferred name blueprint
+     * @param preferredNameBlueprint the preferred name blueprint to add
      */
     public void addPreferredNameCAB(DescriptionCAB preferredNameBlueprint) {
         prefCABs.add(preferredNameBlueprint);
     }
 
     /**
-     * Adds the description cab.
+     * Adds a description blueprint to the list of description blueprints
+     * associated with this concept blueprint.
      *
-     * @param descriptionBlueprint the description blueprint
+     * @param descriptionBlueprint the description blueprint to add
      */
     public void addDescriptionCAB(DescriptionCAB descriptionBlueprint) {
         descCABs.add(descriptionBlueprint);
     }
 
     /**
-     * Sets the relationship cab.
+     * Adds a relationship blueprint to the list of relationship blueprints
+     * associated with this concept blueprint.
      *
-     * @param relationshipBlueprint the new relationship cab
+     * @param relationshipBlueprint the relationship blueprint to add
      */
     public void setRelationshipCAB(RelationshipCAB relationshipBlueprint) {
         relCABs.add(relationshipBlueprint);
     }
 
     /**
-     * Adds the media cab.
+     * Adds a media blueprint to the list of media blueprints associated with
+     * this concept blueprint.
      *
-     * @param mediaBlueprint the media blueprint
+     * @param mediaBlueprint the media blueprint to add
      */
     public void addMediaCAB(MediaCAB mediaBlueprint) {
         mediaCABs.add(mediaBlueprint);
     }
 
     /**
-     * Sets the concept attribute ab.
+     * Adds a concept attribute blueprint to the list of concept attribute
+     * blueprints associated with this concept blueprint.
      *
-     * @param conceptAttributeBlueprint the new concept attribute ab
+     * @param conceptAttributeBlueprint the concept attribute blueprint to add
      */
     public void setConceptAttributeAB(ConceptAttributeAB conceptAttributeBlueprint) {
         this.conAttr = conceptAttributeBlueprint;

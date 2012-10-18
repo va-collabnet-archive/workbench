@@ -137,7 +137,7 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
     }
 
     /**
-     * This method is implements by the other component blueprint classes. This
+     * This method is implemented by the other component blueprint classes. This
      * allows the components to recompute their uuids if a dependent component
      * changes.
      *

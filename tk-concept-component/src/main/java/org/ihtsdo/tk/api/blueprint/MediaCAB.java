@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.tk.api.blueprint;
 
@@ -26,44 +26,39 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.media.MediaVersionBI;
 import org.ihtsdo.tk.uuid.UuidT5Generator;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class MediaCAB.
+ * The Class MediaCAB contains methods for creating a media blueprint. This
+ * blueprint can be constructed into a type of
+ * <code>MediaChronicleBI</code>. This is the preferred method for updating or
+ * creating new descriptions.
  *
- * @author kec
+ * @see TerminologyBuilderBI
+ * @see MediaChronicleBI
+ *
  */
 public class MediaCAB extends CreateOrAmendBlueprint {
 
-    /** The Constant mediaSpecNamespace. */
     public static final UUID mediaSpecNamespace =
             UUID.fromString("743f0510-5285-11e0-b8af-0800200c9a66");
-    
-    /** The concept uuid. */
     private UUID conceptUuid;
-    
-    /** The type uuid. */
     private UUID typeUuid;
-    
-    /** The format. */
     public String format;
-    
-    /** The text description. */
     public String textDescription;
-    
-    /** The data bytes. */
     public byte[] dataBytes;
 
     /**
-     * Instantiates a new media cab.
+     * Instantiates a new media blueprint using nid values.
      *
-     * @param conceptNid the concept nid
-     * @param typeNid the type nid
-     * @param format the format
-     * @param textDescription the text description
-     * @param dataBytes the data bytes
+     * @param conceptNid the nid of the enclosing concept
+     * @param typeNid the nid representing the type of media
+     * @param format a string describing the media format
+     * @param textDescription a string describing the media
+     * @param dataBytes the data bytes representing the media
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
-     * @throws ContradictionException the contradiction exception
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * given position or view coordinate
      */
     public MediaCAB(
             int conceptNid, int typeNid, String format, String textDescription,
@@ -75,16 +70,18 @@ public class MediaCAB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Instantiates a new media cab.
+     * Instantiates a new media blueprint using uuid values.
      *
-     * @param conceptUuid the concept uuid
-     * @param typeUuid the type uuid
-     * @param format the format
-     * @param textDescription the text description
-     * @param dataBytes the data bytes
+     * @param conceptUuid the uuid of the enclosing concept
+     * @param typeUuid the uuid representing the type of media
+     * @param format a string describing the media format
+     * @param textDescription a string describing the media
+     * @param dataBytes the data bytes representing the media
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
-     * @throws ContradictionException the contradiction exception
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * given position or view coordinate
      */
     public MediaCAB(
             UUID conceptUuid, UUID typeUuid, String format, String textDescription,
@@ -95,18 +92,22 @@ public class MediaCAB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Instantiates a new media cab.
+     * Instantiates a new media blueprint using nid values and a given
+     * <code>mediaVersion</code>.
      *
-     * @param conceptNid the concept nid
-     * @param typeNid the type nid
-     * @param format the format
-     * @param textDescription the text description
-     * @param dataBytes the data bytes
-     * @param mediaVersion the media version
-     * @param viewCoordinate the view coordinate
+     * @param conceptNid the nid of the enclosing concept
+     * @param typeNid the nid representing the type of media
+     * @param format a string describing the media format
+     * @param textDescription a string describing the media
+     * @param dataBytes the data bytes representing the media
+     * @param mediaVersion the media version to use as a pattern
+     * @param viewCoordinate the view coordinate specifying which versions are
+     * active and inactive
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
-     * @throws ContradictionException the contradiction exception
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * given position or view coordinate
      */
     public MediaCAB(
             int conceptNid, int typeNid, String format, String textDescription,
@@ -118,18 +119,22 @@ public class MediaCAB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Instantiates a new media cab.
+     * Instantiates a new media blueprint using uuid values and a given
+     * <code>mediaVersion</code>.
      *
-     * @param conceptUuid the concept uuid
-     * @param typeUuid the type uuid
-     * @param format the format
-     * @param textDescription the text description
-     * @param dataBytes the data bytes
-     * @param mediaVersion the media version
-     * @param viewCoordinate the view coordinate
+     * @param conceptUuid the uuid of the enclosing concept
+     * @param typeUuid the uuid representing the type of media
+     * @param format a string describing the media format
+     * @param textDescription a string describing the media
+     * @param dataBytes the data bytes representing the media
+     * @param mediaVersion the media version to use as a pattern
+     * @param viewCoordinate the view coordinate specifying which versions are
+     * active and inactive
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
-     * @throws ContradictionException the contradiction exception
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * given position or view coordinate
      */
     public MediaCAB(
             UUID conceptUuid, UUID typeUuid, String format, String textDescription,
@@ -140,19 +145,24 @@ public class MediaCAB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Instantiates a new media cab.
+     * Instantiates a new media blueprint using uuid values and a given
+     * <code>mediaVersion</code>. Can specify a uuid to represent the media
+     * component.
      *
-     * @param conceptUuid the concept uuid
-     * @param typeUuid the type uuid
-     * @param format the format
-     * @param textDescription the text description
-     * @param dataBytes the data bytes
-     * @param componentUuid the component uuid
-     * @param mediaVersion the media version
-     * @param viewCoordinate the view coordinate
+     * @param conceptUuid the uuid of the enclosing concept
+     * @param typeUuid the uuid representing the type of media
+     * @param format a string describing the media format
+     * @param textDescription a string describing the media
+     * @param dataBytes the data bytes representing the media
+     * @param componentUuid the uuid to represent the media component
+     * @param mediaVersion the media version to use as a pattern
+     * @param viewCoordinate the view coordinate specifying which versions are
+     * active and inactive
      * @throws IOException signals that an I/O exception has occurred
-     * @throws InvalidCAB if the any of the values in blueprint to make are invalid
-     * @throws ContradictionException the contradiction exception
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * given position or view coordinate
      */
     public MediaCAB(
             UUID conceptUuid, UUID typeUuid, String format, String textDescription,
@@ -178,8 +188,19 @@ public class MediaCAB extends CreateOrAmendBlueprint {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint#recomputeUuid()
+    /**
+     * Computes the uuid for this media based on the enclosing concept uuid and
+     * the data bytes. Recomputes the uuids for dependent annotations.
+     *
+     * @throws NoSuchAlgorithmException indicates a no such algorithm exception
+     * has occurred
+     * @throws UnsupportedEncodingException indicates an unsupported encoding
+     * exception has occurred
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * given position or view coordinate
      */
     @Override
     public void recomputeUuid() throws NoSuchAlgorithmException, IOException, InvalidCAB, ContradictionException {
@@ -187,25 +208,25 @@ public class MediaCAB extends CreateOrAmendBlueprint {
                 UuidT5Generator.get(mediaSpecNamespace,
                 getPrimoridalUuidString(conceptUuid)
                 + dataBytes));
-        for(RefexCAB annotBp: getAnnotationBlueprints()){
+        for (RefexCAB annotBp : getAnnotationBlueprints()) {
             annotBp.setReferencedComponentUuid(getComponentUuid());
             annotBp.recomputeUuid();
         }
     }
 
     /**
-     * Gets the type uuid.
+     * Gets the media type uuid associated with this media blueprint.
      *
-     * @return the type uuid
+     * @return the media type uuid
      */
     public UUID getTypeUuid() {
         return typeUuid;
     }
 
     /**
-     * Gets the type nid.
+     * Gets the media type nid associated with this media blueprint.
      *
-     * @return the type nid
+     * @return the media type nid
      * @throws IOException signals that an I/O exception has occurred
      */
     public int getTypeNid() throws IOException {
@@ -213,9 +234,9 @@ public class MediaCAB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Gets the concept nid.
+     * Gets the enclosing concept nid associated with this media blueprint.
      *
-     * @return the concept nid
+     * @return the enclosing concept nid
      * @throws IOException signals that an I/O exception has occurred
      */
     public int getConceptNid() throws IOException {
@@ -223,55 +244,58 @@ public class MediaCAB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Gets the concept uuid.
+     * Gets the enclosing concept uuid associated with this media blueprint.
      *
-     * @return the concept uuid
+     * @return the enclosing concept uuid
      */
     public UUID getConceptUuid() {
         return conceptUuid;
     }
 
     /**
-     * Gets the data bytes.
+     * Gets the data bytes representing the media associated with this media type.
      *
-     * @return the data bytes
+     * @return the media data bytes
      */
     public byte[] getDataBytes() {
         return dataBytes;
     }
 
     /**
-     * Gets the format.
+     * Gets the string representing the format associated with this media type.
      *
-     * @return the format
+     * @return the media format
      */
     public String getFormat() {
         return format;
     }
 
     /**
-     * Gets the text description.
+     * Gets a text description of the media associated with this media blueprint.
      *
-     * @return the text description
+     * @return the text description of the media
      */
     public String getTextDescription() {
         return textDescription;
     }
-    
+
     /**
-     * Sets the concept uuid.
+     * Sets the enclosing concept uuid associated with this media blueprint.
      *
-     * @param conceptNewUuid the new concept uuid
+     * @param conceptNewUuid the enclosing concept uuid
      */
-    protected void setConceptUuid(UUID conceptNewUuid){
+    protected void setConceptUuid(UUID conceptNewUuid) {
         this.conceptUuid = conceptNewUuid;
     }
 
     /**
-     * Validate.
+     * Validates this media blueprint's fields against the given
+     * <code>mediaVersion</code>. Compares the status nid, component nid,
+     * enclosing concept nid, media type nid, format, description, and bytes.
      *
-     * @param mediaVersion the media version
-     * @return <code>true</code>, if successful
+     * @param mediaVersion the media version to use for validation
+     * @return <code>true</code>, if this media blueprint's fields are
+     * equal to the specified media version
      * @throws IOException signals that an I/O exception has occurred
      */
     public boolean validate(MediaVersionBI mediaVersion) throws IOException {

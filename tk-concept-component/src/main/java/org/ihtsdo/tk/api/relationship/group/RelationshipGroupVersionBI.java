@@ -55,7 +55,7 @@ public interface RelationshipGroupVersionBI extends RelationshipGroupChronicleBI
      * <code>viewCoordinate</code>, all versions for this rel group number found on the rel group chronicle will be returned.
      *
      * @return all the relationships in this version of the relationship group
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if more than one version is found for a given position or view coordinate
      */
     Collection<? extends RelationshipVersionBI> getRelationshipsAll() throws ContradictionException;
 

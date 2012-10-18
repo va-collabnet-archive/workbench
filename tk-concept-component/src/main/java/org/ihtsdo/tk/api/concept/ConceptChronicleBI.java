@@ -217,7 +217,7 @@ public interface ConceptChronicleBI extends ComponentChronicleBI<ConceptVersionB
      * @return any specified relationship groups associated with this concept,
      * an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if more than one version is found for a given position or view coordinate
      */
     Collection<? extends RelationshipGroupVersionBI> getRelationshipOutgoingGroups(ViewCoordinate viewCoordinate)
             throws IOException, ContradictionException;

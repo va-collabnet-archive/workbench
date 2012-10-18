@@ -179,7 +179,7 @@ public interface ComponentVersionBI extends ComponentBI, VersionPointBI {
      * @param viewCoordinate the view coordinate specifying which version is active or inactive
      * @return the blueprint of the component
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if more than one version is found for a given position or view coordinate
      * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @see org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint
      */

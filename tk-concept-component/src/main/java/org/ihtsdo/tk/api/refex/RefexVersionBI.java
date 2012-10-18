@@ -64,7 +64,7 @@ public interface RefexVersionBI<A extends RefexAnalogBI<A>>
      * @param excludedNids the excluded nids
      * @param conversionMap the conversion map
      * @return the tk refset member active only
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if more than one version is found for a given position or view coordinate
      * @throws IOException signals that an I/O exception has occurred
      */
     TkRefexAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate viewCoordinate, NidBitSetBI excludedNids,

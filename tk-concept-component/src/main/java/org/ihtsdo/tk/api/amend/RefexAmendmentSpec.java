@@ -45,7 +45,7 @@ public class RefexAmendmentSpec extends RefexCAB {
      * @param memberUuid the member uuid
      * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB if the any of the values in blueprint to make are invalid
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if more than one version is found for a given position or view coordinate
      */
     public RefexAmendmentSpec(TK_REFEX_TYPE memberType, UUID referencedComponentUuid, int collectionNid, UUID memberUuid) 
             throws IOException, InvalidCAB, ContradictionException {
@@ -60,7 +60,7 @@ public class RefexAmendmentSpec extends RefexCAB {
      * @param collectionNid the collection nid
      * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB if the any of the values in blueprint to make are invalid
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if more than one version is found for a given position or view coordinate
      */
     public RefexAmendmentSpec(TK_REFEX_TYPE memberType, int referencedComponentNid, int collectionNid) 
             throws IOException, InvalidCAB, ContradictionException {

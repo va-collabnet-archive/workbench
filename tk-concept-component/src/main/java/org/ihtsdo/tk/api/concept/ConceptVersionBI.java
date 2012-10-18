@@ -83,7 +83,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * @return active concept attributes for this version, <code>null</code> if
      * none are found
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if more than one version is found for a given position or view coordinate
      */
     ConceptAttributeVersionBI getConceptAttributesActive() throws IOException, ContradictionException;
 
@@ -732,7 +732,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * @return <code>true</code>, if this version is a kind of the specified
      * parent version
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if more than one version is found for a given position or view coordinate
      */
     boolean isKindOf(ConceptVersionBI parentConceptVersion) throws IOException, ContradictionException;
 

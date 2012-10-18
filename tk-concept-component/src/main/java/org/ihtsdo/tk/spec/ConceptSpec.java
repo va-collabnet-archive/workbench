@@ -366,7 +366,7 @@ public class ConceptSpec implements SpecBI {
      * @param viewCoordinate the view coordinate specifying which versions are
      * active and inactive
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if more than one version is found for a given position or view coordinate
      */
     private void validateDescription(ConceptVersionBI conceptVersion, ViewCoordinate viewCoordinate) throws IOException, ContradictionException {
         boolean found = false;

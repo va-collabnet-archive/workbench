@@ -42,7 +42,7 @@ public interface WorkflowHandlerBI {
      * active and inactive
      * @return the workflow actions available of the specified concept
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ContradictionException the contradiction exception
+     * @throws ContradictionException if more than one version is found for a given position or view coordinate
      */
     public Collection<? extends WorkflowHistoryJavaBeanBI> getAvailableWorkflowActions(ConceptVersionBI concept, ViewCoordinate viewCoordinate) throws IOException, ContradictionException;
 
