@@ -472,7 +472,7 @@ public class WorkflowHelper {
 			ViewCoordinate vc = concept.getViewCoordinate();
 
 			if (vc.getRelationshipAssertionType() == RelAssertionType.STATED || vc.getRelationshipAssertionType() == RelAssertionType.INFERRED_THEN_STATED) {
-				Collection<? extends ConceptVersionBI> children = concept.getRelationshipsTargetSourceConceptsActiveIsa();
+				Collection<? extends ConceptVersionBI> children = concept.getRelationshipsIncomingSourceConceptsActiveIsa();
 	
 		    	if (children == null || children.size() == 0) {
 		    		return resultSet;

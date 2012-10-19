@@ -44,7 +44,7 @@ import org.ihtsdo.tk.dto.RevisionHandling;
  * <code>TkConcept</code>.
  *
  * @see TkConcept
- * @param <V> the generic component type
+ * @param <V> the generic revision type
  */
 public class TkDescription extends TkComponent<TkDescriptionRevision> implements I_DescribeExternally {
 
@@ -330,7 +330,7 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
      * Returns a string representation of this TK Description object.
      *
      * @return a string representation of this TK Description object including
-     * the enclosing concept, initial case sensitivity, language, and type.
+     * the enclosing concept, initial case sensitivity, language, and type
      */
     @Override
     public String toString() {

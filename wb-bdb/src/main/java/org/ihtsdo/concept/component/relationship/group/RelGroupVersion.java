@@ -137,12 +137,6 @@ public class RelGroupVersion implements RelationshipGroupVersionBI {
                         results.add(rv);
                     }
                 }
-            } else {
-                for (RelationshipVersionBI rv : relc.getVersions()) {
-                    if (rv.getGroup() == rg.getRelationshipGroupNumber()) {
-                        results.add(rv);
-                    }
-                }
             }
         }
 
@@ -177,12 +171,6 @@ public class RelGroupVersion implements RelationshipGroupVersionBI {
                         if (rv.getGroup() == rg.getRelationshipGroupNumber()) {
                             results.add(rv);
                         }
-                    }
-                }
-            } else {
-                for (RelationshipVersionBI rv : relc.getVersions()) {
-                    if (rv.getGroup() == rg.getRelationshipGroupNumber()) {
-                        results.add(rv);
                     }
                 }
             }
@@ -271,13 +259,7 @@ public class RelGroupVersion implements RelationshipGroupVersionBI {
                         results.add(rv);
                     }
                 }
-            } else {
-                for (RelationshipVersionBI rv : relc.getVersions()) {
-                    if (rv.getGroup() == rg.getRelationshipGroupNumber()) {
-                        results.add(rv);
-                    }
-                }
-            }
+            } 
         }
 
         return results;

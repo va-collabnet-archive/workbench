@@ -68,7 +68,7 @@ public class BatchActionTaskParentAddNew extends BatchActionTask {
     @Override
     public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
         // Check if parent already exists and is active.
-        Collection<? extends RelationshipVersionBI> checkParents = c.getRelationshipsSourceActive();
+        Collection<? extends RelationshipVersionBI> checkParents = c.getRelationshipsOutgoingActive();
         for (RelationshipVersionBI rvbi : checkParents) {
             if (rvbi.getTypeNid() == selectedRoleTypeNid
                     && rvbi.getTargetNid() == selectedDestNid

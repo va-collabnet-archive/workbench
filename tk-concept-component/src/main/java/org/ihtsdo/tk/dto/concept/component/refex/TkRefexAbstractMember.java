@@ -41,7 +41,7 @@ import java.util.UUID;
  * <code>TkConcept</code>.
  *
  * @see TkConcept
- * @param <V> the generic refex type
+ * @param <V> the generic revision type
  */
 public abstract class TkRefexAbstractMember<V extends TkRevision> extends TkComponent<V> {
 

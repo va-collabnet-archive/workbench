@@ -36,7 +36,7 @@ import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.uuid.UuidT5Generator;
 
-// TODO-javadoc: Marc needs to review
+// TODO-javadoc-marc: needs to review
 /**
  * The Class DescriptionLogic. Marc -- can you describe what this class is for
  * and also review the method documentation for accuracy?

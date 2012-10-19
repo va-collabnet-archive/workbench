@@ -61,7 +61,7 @@ public class BatchActionTaskRoleReplaceValue extends BatchActionTask {
     public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
         int conceptNid = c.getNid();
         boolean changed = false;
-        Collection<? extends RelationshipVersionBI> rels = c.getRelationshipsSourceActive();
+        Collection<? extends RelationshipVersionBI> rels = c.getRelationshipsOutgoingActive();
         for (RelationshipVersionBI rvbi : rels) {
             if (rvbi.getTypeNid() == roleNid && rvbi.getTargetNid() == valueOldNid) {
                 for (int editPath : ec.getEditPaths()) {

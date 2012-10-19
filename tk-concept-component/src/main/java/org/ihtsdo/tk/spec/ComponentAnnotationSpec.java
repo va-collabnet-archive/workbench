@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-// TODO-javadoc-kec: this class isn't done
+
 /**
  * The Class ComponentAnnotationSpec provides a way of representing concept
  * attributes in a verifiable and human-readable way. This class is not

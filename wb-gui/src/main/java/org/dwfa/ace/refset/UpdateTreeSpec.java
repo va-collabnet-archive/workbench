@@ -139,7 +139,7 @@ class UpdateTreeSpec extends SwingWorker<RefsetSpecTreeNode, Object> {
       if (refsetConcept != null) {
            ConceptVersionBI refsetConceptVersion = refsetConcept.getVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
            Collection<? extends ConceptVersionBI> relationshipsTargetSourceConcepts = 
-                    refsetConceptVersion.getRelationshipsTargetSourceConcepts(RefsetAuxiliary.Concept.SPECIFIES_REFSET.localize().getNid());
+                    refsetConceptVersion.getRelationshipsIncomingSourceConcepts(RefsetAuxiliary.Concept.SPECIFIES_REFSET.localize().getNid());
            if ((relationshipsTargetSourceConcepts != null) && (relationshipsTargetSourceConcepts.size() > 0)) {
             this.refsetSpecEditor.refsetSpecConcept =
                (I_GetConceptData) relationshipsTargetSourceConcepts.iterator().next().getChronicle();

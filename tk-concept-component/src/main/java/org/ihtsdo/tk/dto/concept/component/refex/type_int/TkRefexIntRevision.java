@@ -170,7 +170,7 @@ public class TkRefexIntRevision extends TkRevision {
      * Returns a string representation of this TK Refex Int Revision object.
      *
      * @return a string representation of this TK Refex Int Revision object
-     * including the concept represented by the uuid.
+     * including the int value
      */
     @Override
     public String toString() {

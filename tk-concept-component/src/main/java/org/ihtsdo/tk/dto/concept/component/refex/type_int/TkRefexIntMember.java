@@ -281,7 +281,7 @@ public class TkRefexIntMember extends TkRefexAbstractMember<TkRefexIntRevision> 
      * Returns a string representation of this TK Refex Int Member object.
      *
      * @return a string representation of this TK Refex Int Member object
-     * including the concept represented by the uuid.
+     * including the int value
      */
     @Override
     public String toString() {

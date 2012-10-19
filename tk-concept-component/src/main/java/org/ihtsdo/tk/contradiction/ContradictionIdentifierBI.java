@@ -31,7 +31,7 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 public interface ContradictionIdentifierBI {
 
     /**
-     * Determines if the specified <code>conceptChronicle</code> is in conflict.
+     * Determines if the specified <code>conceptChronicle</code> is in contradiction.
      *
      * @param conceptChronicle the concept in question
      * @return the type of contradiction found
@@ -40,9 +40,9 @@ public interface ContradictionIdentifierBI {
     ContradictionResult isConceptInConflict(ConceptChronicleBI conceptChronicle) throws Exception;
 
     /**
-     * Gets versions of the components found to be in conflict.
-     * TODO-javadoc: rename to getConflictingVersions
-     * @return the conflicting component versions
+     * Gets versions of the components found to be in contradiction.
+     * 
+     * @return the contradicting component versions
      */
-    Collection<? extends ComponentVersionBI> getReturnVersions();
+    Collection<? extends ComponentVersionBI> getContradictingVersions();
 }

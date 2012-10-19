@@ -26,7 +26,6 @@ import org.ihtsdo.rf2.util.Database;
 import org.ihtsdo.rf2.util.ExportUtil;
 import org.ihtsdo.rf2.util.JAXBUtil;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.KindOfCacheBI;
 import java.io.File;
 import java.io.IOException;
 
@@ -48,7 +47,6 @@ public class StatedRelationshipTest extends TestCase {
 
 	private static I_TermFactory _termfactory;
 	I_ConfigAceFrame _aceConfig;
-	public static KindOfCacheBI myStaticIsACache;
 
 	/**
 	 * Create the test case

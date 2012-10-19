@@ -109,7 +109,7 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         }
         this.ignoreNonVisibleAth = ignoreNonVisibleAth;
         this.ignoreReadOnlySap = ignoreReadOnlySap;
-        this.maxSap = Ts.get().getReadOnlyMaxSap();
+        this.maxSap = Ts.get().getReadOnlyMaxStamp();
         this.componentsMissingCommitRecord = new ConcurrentSkipListSet<Integer>();
 
         snorocketAuthorNid = Ts.get().getNidForUuids(UUID.fromString("7e87cc5b-e85f-3860-99eb-7a44f2b9e6f9"));
@@ -170,7 +170,7 @@ public class MultiEditorContradictionDetector implements ProcessUnfetchedConcept
         }
         this.ignoreNonVisibleAth = ignoreNonVisibleAth;
         this.ignoreReadOnlySap = ignoreReadOnlySap;
-        this.maxSap = Ts.get().getReadOnlyMaxSap();
+        this.maxSap = Ts.get().getReadOnlyMaxStamp();
         this.componentsMissingCommitRecord = new ConcurrentSkipListSet<Integer>();
 
         snorocketAuthorNid = Ts.get().getNidForUuids(UUID.fromString("7e87cc5b-e85f-3860-99eb-7a44f2b9e6f9"));

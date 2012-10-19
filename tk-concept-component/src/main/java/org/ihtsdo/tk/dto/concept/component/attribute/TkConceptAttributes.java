@@ -41,7 +41,7 @@ import org.ihtsdo.tk.dto.RevisionHandling;
  * <code>TkConcept</code>.
  *
  * @see TkConcept
- * @param <V> the generic component type
+ * @param <V> the generic revision type
  */
 public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision>
         implements I_ConceptualizeExternally {

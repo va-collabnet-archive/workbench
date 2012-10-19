@@ -206,7 +206,7 @@ public class BatchActionTaskLogicDisjointRetireUI extends javax.swing.JPanel imp
                                 editPath);
                     }
                 }
-                Collection<? extends RelationshipVersionBI> outrels = c.getRelationshipsSourceActive();
+                Collection<? extends RelationshipVersionBI> outrels = c.getRelationshipsOutgoingActive();
                 for (RelationshipVersionBI r : outrels) {
                     for (int editPath : ec.getEditPaths()) {
                         r.makeAnalog(SnomedMetadataRfx.getSTATUS_RETIRED_NID(),

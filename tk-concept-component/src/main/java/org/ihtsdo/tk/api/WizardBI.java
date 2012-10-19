@@ -15,29 +15,30 @@
  * limitations under the License.
  */
 
-package org.ihtsdo.tk.api; //org.ihtsdo.swing.wizard;
+package org.ihtsdo.tk.api;
 
 import javax.swing.JPanel;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Interface WizardBI. TODO-javadoc: this should get moved out of the api
+ * The Interface WizardBI represents the wizard panel associated with an arena panel.
  *
- * @author kec
+ * @deprecated need to move this class out of the API
  */
 public interface WizardBI {
 
    /**
-    * Gets the wizard panel.
+    * Gets the wizard panel of an arena panel.
     *
     * @return the wizard panel
+    * @deprecated need to move this class out of the API
     */
    JPanel getWizardPanel();
 
    /**
     * Sets the wizard panel visible.
     *
-    * @param visible the new wizard panel visible
+    * @param visible set to <code>true</code> to make the wizard panel visible
+    * @deprecated need to move this class out of the API
     */
    void setWizardPanelVisible(boolean visible);
 

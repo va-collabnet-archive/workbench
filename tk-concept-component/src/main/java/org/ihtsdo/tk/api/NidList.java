@@ -30,30 +30,19 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.ihtsdo.tk.Ts;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class NidList represents a list of nids which is serializable. The
- * benefit of using this type of list over a
- * <code>List</code> is in the serialization and the toString method, which
- * converts the list from nids to Strings representing the concept's preferred term.
- * 
- * TODO-javadoc: udpate
+ * The Class NidList represents represents a serializable list of nids.
  */
 public class NidList implements NidListBI, Serializable {
 
-    /**
-     * The Constant dataVersion.
-     */
     private static final int dataVersion = 1;
-    /**
-     * The list values.
-     */
     private List<Integer> listValues = new ArrayList<Integer>(2);
 
     /**
-     * Instantiates a new native id list.
+     * Instantiates a new nid list using the specified
+     * <code>values</code>.
      *
-     * @param values the values
+     * @param values the values to add to this nid list
      */
     public NidList(int[] values) {
         super();
@@ -63,17 +52,18 @@ public class NidList implements NidListBI, Serializable {
     }
 
     /**
-     * Instantiates a new native id list.
+     * Instantiates a new nid list.
      */
     public NidList() {
         super();
     }
 
     /**
-     * Write int list.
+     * Writes a
+     * <code>NidList</code> object to an external source.
      *
-     * @param out the out
-     * @param nidList the nid list
+     * @param out the output stream
+     * @param nidList the nid list to write
      * @throws IOException signals that an I/O exception has occurred
      */
     public static void writeIntList(ObjectOutputStream out, NidList nidList) throws IOException {
@@ -96,10 +86,12 @@ public class NidList implements NidListBI, Serializable {
     }
 
     /**
-     * Read int list ignore map errors.
+     * Reads a
+     * <code>NidList</code> object from an external source. Ignores nids that
+     * don't map to a uuid in the current environment.
      *
-     * @param in the in
-     * @return the native id list bi
+     * @param in the input stream
+     * @return a nid list representing the imported nids
      * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException indicates a specified class was not found
      */
@@ -108,10 +100,14 @@ public class NidList implements NidListBI, Serializable {
     }
 
     /**
-     * Read int list strict.
+     * Reads a
+     * <code>NidList</code> object from an external source. Returns a nid list
+     * of the same size as the one read. If the nid does not map to a uuid the
+     * current, a
+     * <code>null</code> value will be used.
      *
-     * @param in the in
-     * @return the native id list bi
+     * @param in the input stream
+     * @return a nid list representing the imported nids
      * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException indicates a specified class was not found
      */
@@ -120,11 +116,15 @@ public class NidList implements NidListBI, Serializable {
     }
 
     /**
-     * Read int list.
+     * Reads a
+     * <code>NidList</code> object from an external source. Can specify if
+     * mapping errors should be ignored.
      *
-     * @param in the in
-     * @param ignoreMappingErrors the ignore mapping errors
-     * @return the native id list bi
+     * @param in the input stream
+     * @param ignoreMappingErrors set to <code>true</code> to skip nids which do
+     * not map to a uuid in the current environment, <code>false</code> will add
+     * a <code>null</code> element if no mapping is found
+     * @return a nid list representing the imported nids
      * @throws IOException signals that an I/O exception has occurred
      * @throws ClassNotFoundException indicates a specified class was not found
      */
@@ -168,21 +168,20 @@ public class NidList implements NidListBI, Serializable {
         return returnSet;
     }
 
-
-    /*
-     * (non-Javadoc)
+    /**
      *
-     * @see org.dwfa.vodb.types.I_IntList#add(int, java.lang.Integer)
+     * @param index the index at which the specified nid is to be inserted
+     * @param nid the nid to add
      */
     @Override
     public void add(int index, Integer element) {
         listValues.add(index, element);
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      *
-     * @see org.dwfa.vodb.types.I_IntList#add(java.lang.Integer)
+     * @param nid the nid to add
+     * @return <code>true</code>, if the collection changed as a result
      */
     @Override
     public boolean add(Integer nid) {
@@ -190,10 +189,10 @@ public class NidList implements NidListBI, Serializable {
         return returnValue;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      *
-     * @see org.dwfa.vodb.types.I_IntList#addAll(java.util.Collection)
+     * @param nids a collection of nids to add
+     * @return <code>true</code>, if the collection changed as a result
      */
     @Override
     public boolean addAll(Collection<? extends Integer> c) {
@@ -201,10 +200,11 @@ public class NidList implements NidListBI, Serializable {
         return returnValue;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      *
-     * @see org.dwfa.vodb.types.I_IntList#addAll(int, java.util.Collection)
+     * @param index the index at which the specified nid is to be inserted
+     * @param nids a collection of nids to add
+     * @return <code>true</code>, if successful
      */
     @Override
     public boolean addAll(int index, Collection<? extends Integer> c) {
@@ -212,10 +212,8 @@ public class NidList implements NidListBI, Serializable {
         return returnValue;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      *
-     * @see org.dwfa.vodb.types.I_IntList#clear()
      */
     @Override
     public void clear() {
@@ -223,100 +221,102 @@ public class NidList implements NidListBI, Serializable {
         listValues.clear();
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      *
-     * @see org.dwfa.vodb.types.I_IntList#contains(java.lang.Object)
+     * @param obj the nid in question
+     * @return <code>true</code>, if this nid list contains the specified nid
      */
     @Override
     public boolean contains(Object obj) {
         return listValues.contains(obj);
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      *
-     * @see org.dwfa.vodb.types.I_IntList#containsAll(java.util.Collection)
+     * @param c the nids in question
+     * @return <code>true</code>, if this nid list contains the specified nids
      */
     @Override
     public boolean containsAll(Collection<?> c) {
         return listValues.containsAll(c);
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      *
-     * @see org.dwfa.vodb.types.I_IntList#get(int)
+     * @param index the index of the nid to return
+     * @return the nid at the specified position
      */
     @Override
     public Integer get(int index) {
         return listValues.get(index);
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      *
-     * @see org.dwfa.vodb.types.I_IntList#indexOf(java.lang.Object)
+     * @param obj the nid to search for
+     * @return the index of the first occurrence of the specified nid, or -1 if
+     * this nid list does not contain the nid
      */
     @Override
     public int indexOf(Object obj) {
         return listValues.indexOf(obj);
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      *
-     * @see org.dwfa.vodb.types.I_IntList#isEmpty()
+     * @return <code>true</code>, if this nid list contains no nids
      */
     @Override
     public boolean isEmpty() {
         return listValues.isEmpty();
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      *
-     * @see org.dwfa.vodb.types.I_IntList#iterator()
+     * @return an iterator that will iterate of the nids in this nid list in the
+     * proper sequence
      */
     @Override
     public Iterator<Integer> iterator() {
         return listValues.iterator();
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      *
-     * @see org.dwfa.vodb.types.I_IntList#lastIndexOf(java.lang.Object)
+     * @param obj the nid to search for
+     * @return the index of the last occurrence of the specified nid in this nid
+     * list, or -1 if this nid list does not contain the nid
      */
     @Override
     public int lastIndexOf(Object obj) {
         return listValues.lastIndexOf(obj);
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      *
-     * @see org.dwfa.vodb.types.I_IntList#listIterator()
+     * @return Returns a list iterator over the nids in this nid list (in proper
+     * sequence)
      */
     @Override
     public ListIterator<Integer> listIterator() {
         return listValues.listIterator();
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      *
-     * @see org.dwfa.vodb.types.I_IntList#listIterator(int)
+     * @param index the index of the first nid to be returned
+     * @return a list iterator of the nids in this nid list (in proper
+     * sequence), starting at the specified position in this nid list
      */
     @Override
     public ListIterator<Integer> listIterator(int index) {
         return listValues.listIterator(index);
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      *
-     * @see org.dwfa.vodb.types.I_IntList#remove(int)
+     * @param index the index of the nid to remove
+     * @return the nid previously at the specified position
      */
     @Override
     public Integer remove(int index) {
@@ -325,10 +325,10 @@ public class NidList implements NidListBI, Serializable {
         return returnValue;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      *
-     * @see org.dwfa.vodb.types.I_IntList#remove(java.lang.Object)
+     * @param obj nid to be removed from this list
+     * @return <code>true</code>, if this nid list contained the specified nid
      */
     @Override
     public boolean remove(Object obj) {
@@ -337,10 +337,10 @@ public class NidList implements NidListBI, Serializable {
         return returnValue;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      *
-     * @see org.dwfa.vodb.types.I_IntList#removeAll(java.util.Collection)
+     * @param c the nids to remove
+     * @return <code>true</code>, if this nid list changed as a result
      */
     @Override
     public boolean removeAll(Collection<?> c) {
@@ -349,10 +349,10 @@ public class NidList implements NidListBI, Serializable {
         return returnValue;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      *
-     * @see org.dwfa.vodb.types.I_IntList#retainAll(java.util.Collection)
+     * @param c the nids to retain
+     * @return <code>true</code>, if this nid list changed as a result
      */
     @Override
     public boolean retainAll(Collection<?> c) {
@@ -361,10 +361,11 @@ public class NidList implements NidListBI, Serializable {
         return returnValue;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      *
-     * @see org.dwfa.vodb.types.I_IntList#set(int, java.lang.Integer)
+     * @param index the index of the nid to replace
+     * @param nid the new nid
+     * @return the nid previously at the specified position
      */
     @Override
     public Integer set(int index, Integer element) {
@@ -372,58 +373,60 @@ public class NidList implements NidListBI, Serializable {
         return old;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      *
-     * @see org.dwfa.vodb.types.I_IntList#size()
+     * @return an int representing the number of nids in this nid list
      */
     @Override
     public int size() {
         return listValues.size();
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      *
-     * @see org.dwfa.vodb.types.I_IntList#subList(int, int)
+     * @param fromIndex low endpoint (inclusive) of the subList
+     * @param toIndex high endpoint (exclusive) of the subList
+     * @return a view of the specified range within this nid list
+     * @see List#subList(int, int)
      */
     @Override
     public List<Integer> subList(int fromIndex, int toIndex) {
         return listValues.subList(fromIndex, toIndex);
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      *
-     * @see org.dwfa.vodb.types.I_IntList#toArray()
+     * @return an array representing the nids in this nid list
      */
     @Override
     public Object[] toArray() {
         return listValues.toArray();
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      *
-     * @see org.dwfa.vodb.types.I_IntList#toArray(T[])
+     * @param <T> the type of the new array
+     * @param a the array to store the new elements
+     * @return an array representing the set of positions
+     * @see List#toArray(T[])
      */
     @Override
     public <T> T[] toArray(T[] a) {
         return listValues.toArray(a);
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      *
-     * @see org.dwfa.vodb.types.I_IntList#getListValues()
+     * @return a list representing the nids in this nid list
      */
     @Override
     public List<Integer> getListValues() {
         return listValues;
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.api.NidListBI#getListArray()
+    /**
+     *
+     * @return an array representing the nids in this nid list
      */
     @Override
     public int[] getListArray() {
@@ -434,8 +437,12 @@ public class NidList implements NidListBI, Serializable {
         return listArray;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
+    /**
+     * Generates a string representation the concepts associated with the nids
+     * in this nid list.
+     *
+     * @return a string representation the concepts associated with the nids
+     * in this nid list
      */
     @Override
     public String toString() {

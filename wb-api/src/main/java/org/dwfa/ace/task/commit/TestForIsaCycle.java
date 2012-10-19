@@ -77,7 +77,7 @@ public class TestForIsaCycle extends AbstractConceptTest {
              */
             ConceptVersionBI cv = Ts.get().getConceptVersion(
                     Terms.get().getActiveAceFrameConfig().getViewCoordinate(), concept.getConceptNid());
-            Collection<? extends RelationshipVersionBI> activeRels = cv.getRelationshipsSourceActive();
+            Collection<? extends RelationshipVersionBI> activeRels = cv.getRelationshipsOutgoingActive();
             
             if (Terms.get().getActiveAceFrameConfig() == null || Terms.get().getActiveAceFrameConfig().getEditingPathSet().isEmpty()) {
                 return alertList;

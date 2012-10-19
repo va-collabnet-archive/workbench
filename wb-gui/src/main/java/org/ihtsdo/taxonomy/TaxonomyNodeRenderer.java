@@ -508,7 +508,7 @@ public class TaxonomyNodeRenderer extends JLabel
                 this.setBorder(BorderFactory.createCompoundBorder(this.getBorder(),
                         BorderFactory.createMatteBorder(0, iconRect.x, 0, 0, backgroundNonSelectionColor)));
 
-                if (cv.getRelationshipsSourceTargetNidsActiveIsa().length == 0) {
+                if (cv.getRelationshipsOutgoingTargetNidsActiveIsa().length == 0) {
                     node.setIcon(NodeIcon.MULTI_PARENT_ROOT);
                 } else {
                     if (node.isSecondaryParentOpened()) {

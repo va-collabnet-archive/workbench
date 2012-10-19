@@ -69,7 +69,7 @@ public class TaxonomyMouseListenerForAce extends MouseAdapter {
            throws ContradictionException, IOException {
       node.getExtraParents().clear();
       if (node.getParentNid() != Integer.MAX_VALUE) {    // test if root
-         for (ConceptVersionBI parent : nodeConcept.getRelationshipsSourceTargetConceptsActiveIsa()) {
+         for (ConceptVersionBI parent : nodeConcept.getRelationshipsOutgoingTargetConceptsActiveIsa()) {
             if (parent.getNid() != node.getParentNid()) {
                TaxonomyNode extraParentNode = null;
                long[]       nodesToCompare  = new long[node.getNodesToCompare().length + 1];
@@ -78,7 +78,7 @@ public class TaxonomyMouseListenerForAce extends MouseAdapter {
                                 node.getNodesToCompare().length);
                nodesToCompare[node.getNodesToCompare().length] = Long.MAX_VALUE;
 
-               if (parent.getRelationshipsSourceActiveIsa().isEmpty()) {
+               if (parent.getRelationshipsOutgoingActiveIsa().isEmpty()) {
                   extraParentNode = new SecondaryParentNodeRoot(parent.getNid(), nodeConcept.getNid(),
                           node.parentNodeId, nodesToCompare);
                } else {

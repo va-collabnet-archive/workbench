@@ -447,7 +447,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
     * processed.
     * @throws Exception 
     */
-    public void iterateSapDataInSequence(ProcessStampDataBI processor) throws Exception {
+    public void iterateStampDataInSequence(ProcessStampDataBI processor) throws Exception {
         for (int sap = initialPosition; sap < sequence.get(); sap++) {
             processor.processStampData(new STAMP(sap));
         }

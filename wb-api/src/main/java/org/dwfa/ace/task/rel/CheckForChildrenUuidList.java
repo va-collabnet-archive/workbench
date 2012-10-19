@@ -353,8 +353,8 @@ public class CheckForChildrenUuidList extends AbstractTask {
         try {
             ConceptVersionBI cv = Ts.get().getConceptVersion(tempVc, concept.getNid());
 
-            Collection<? extends ConceptVersionBI> allRelsIncoming = cv.getRelationshipsTargetSourceConcepts();
-            Collection<? extends ConceptVersionBI> relsIncoming = cv.getRelationshipsTargetSourceConceptsActiveIsa();
+            Collection<? extends ConceptVersionBI> allRelsIncoming = cv.getRelationshipsIncomingSourceConcepts();
+            Collection<? extends ConceptVersionBI> relsIncoming = cv.getRelationshipsIncomingSourceConceptsActiveIsa();
             uuidList = new ArrayList<UUID>();
             uncommittedUuidList = new ArrayList<UUID>();
             if (allRelsIncoming != null) {

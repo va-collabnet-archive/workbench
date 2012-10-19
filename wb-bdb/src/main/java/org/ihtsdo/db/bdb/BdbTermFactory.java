@@ -160,7 +160,6 @@ import org.ihtsdo.lucene.WfHxIndexGenerator;
 import org.ihtsdo.lucene.WfHxLuceneManager;
 import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.ComponentChronicleBI;
-import org.ihtsdo.tk.api.KindOfCacheBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.NidBitSetItrBI;
 import org.ihtsdo.tk.api.NidSetBI;

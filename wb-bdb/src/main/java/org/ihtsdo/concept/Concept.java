@@ -1524,9 +1524,9 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
     public ConceptCB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
         ConceptVersion cv = getVersion(vc);
-        UUID[] uuidArray = new UUID[cv.getRelationshipsSourceTargetConceptsActiveIsa().size()];
+        UUID[] uuidArray = new UUID[cv.getRelationshipsOutgoingTargetConceptsActiveIsa().size()];
         int index = 0;
-        for (ConceptVersionBI parent : cv.getRelationshipsSourceTargetConceptsActiveIsa()) {
+        for (ConceptVersionBI parent : cv.getRelationshipsOutgoingTargetConceptsActiveIsa()) {
             uuidArray[index] = parent.getPrimUuid();
             index++;
         }
@@ -2379,7 +2379,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             ContradictionIdentifier identifier = new ContradictionIdentifier(vc, true);
             ContradictionResult result = identifier.isConceptInConflict(this);
 
-            return new FoundContradictionVersions(result, identifier.getReturnVersions());
+            return new FoundContradictionVersions(result, identifier.getContradictingVersions());
         } catch (Exception e) {
             return null;
         }

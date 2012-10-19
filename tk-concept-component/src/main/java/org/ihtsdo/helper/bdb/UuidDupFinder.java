@@ -40,7 +40,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
-// TODO-javadoc: skipped private methods/variables
 /**
  * The Class UuidDupFinder processes every concept in the database to determine
  * if the same uuid is used to identify more than one concept or component. This
@@ -54,42 +53,24 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class UuidDupFinder implements ProcessUnfetchedConceptDataBI {
 
-    /**
-     * The count.
-     */
     private AtomicInteger count = new AtomicInteger(0);
-    /**
-     * The dots.
-     */
     private AtomicInteger dots = new AtomicInteger(0);
-    /**
-     * The list of nids to be processed.
-     */
     ConcurrentSkipListSet<UUID> allPrimUuids = new ConcurrentSkipListSet<UUID>();
-    /**
-     * The the list to hold any duplicate uuids.
-     */
     ConcurrentSkipListSet<UUID> dupUuids = new ConcurrentSkipListSet<UUID>();
-    /**
-     * The output file: dups.oos.
-     */
     File dupsFile = new File("dups.oos");
-    /**
-     * The nidset.
-     */
     private final NidBitSetBI nidset;
 
     //~--- constant enums ------------------------------------------------------
     /**
-     * The Enum PASS.
+     * The Enum PASS represent which pass of the data the processor is on.
      */
     private enum PASS {
 
         /**
-         * The pass one.
+         * The first pass.
          */
         PASS_ONE, /**
-         * The pass two.
+         * The second pass.
          */
         PASS_TWO
     }
@@ -107,9 +88,11 @@ public class UuidDupFinder implements ProcessUnfetchedConceptDataBI {
 
     //~--- methods -------------------------------------------------------------
     /**
-     * Adds the to uuid list.
+     * Adds the primordial uuid of the specified
+     * <code>component</code> to a list of duplicate uuids, if it is duplicate,
+     * otherwise to a list of primordial uuids.
      *
-     * @param component the component
+     * @param component the component to check for duplicate uuids
      * @throws IOException signals that an I/O exception has occurred
      */
     private void addToUuidList(ComponentChronicleBI component) throws IOException {
@@ -138,15 +121,16 @@ public class UuidDupFinder implements ProcessUnfetchedConceptDataBI {
     }
 
     /**
-     * Process concept.
+     * Process the components of the specified
+     * <code>concept</code> to determine if any of the uuids are duplicates.
      *
-     * @param concept the concept
+     * @param concept the concept to check for duplicates
      * @throws IOException signals that an I/O exception has occurred
      */
     private void processConcept(ConceptChronicleBI concept) throws IOException {
 
         // add prim uuids to list
-        // concept attributtes
+        // concept attributes
         addToUuidList(concept.getConceptAttributes());
 
         // descriptions
@@ -176,7 +160,7 @@ public class UuidDupFinder implements ProcessUnfetchedConceptDataBI {
      * identify another concept or component.
      *
      * @param cNid the nid of the concept to process
-     * @param fetcher the fetcher for getting the concept associated with
+     * @param fetcher the fetcher for getting the concept associated with *
      * the <code>cNid</code> from the database
      * @throws Exception indicates an exception has occurred
      */
@@ -229,9 +213,9 @@ public class UuidDupFinder implements ProcessUnfetchedConceptDataBI {
     }
 
     /**
-     * 
+     *
      * @return the set of nids to process
-     * @throws IOException 
+     * @throws IOException
      */
     @Override
     public NidBitSetBI getNidSet() throws IOException {

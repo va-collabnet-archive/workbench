@@ -173,7 +173,7 @@ public class TkRefexBooleanRevision extends TkRevision {
      * Returns a string representation of this TK Refex Boolean Revision object.
      *
      * @return a string representation of this TK Refex Boolean Revision object
-     * including the concept represented by the uuid.
+     * including the boolean value
      */
     @Override
     public String toString() {

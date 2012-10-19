@@ -567,8 +567,8 @@ public class BdbTermBuilder implements TerminologyBuilderBI {
         List<RelationshipCAB> relBps = blueprint.getRelationshipCABs();
         List<MediaCAB> mediaBps = blueprint.getMediaCABs();
 
-        if (blueprint.getConceptAttributteAB() != null) {
-            for (RefexCAB annot : blueprint.getConceptAttributteAB().getAnnotationBlueprints()) {
+        if (blueprint.getConceptAttributeAB() != null) {
+            for (RefexCAB annot : blueprint.getConceptAttributeAB().getAnnotationBlueprints()) {
                 this.construct(annot);
             }
         }

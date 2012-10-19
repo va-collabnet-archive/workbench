@@ -184,7 +184,7 @@ public class TkRefexUuidRevision extends TkRevision {
      * Returns a string representation of this TK Refex Uuid Revision object.
      *
      * @return a string representation of this TK Refex Uuid Revision object
-     * including the concept represented by the uuid.
+     * including the concept represented by the uuid
      */
     @Override
     public String toString() {

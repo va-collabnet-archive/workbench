@@ -49,7 +49,6 @@ import org.ihtsdo.thread.NamedThreadFactory;
 import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.ContradictionException;
-import org.ihtsdo.tk.api.KindOfCacheBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 
 /**

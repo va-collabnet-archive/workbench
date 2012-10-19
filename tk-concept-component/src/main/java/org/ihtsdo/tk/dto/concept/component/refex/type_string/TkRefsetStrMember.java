@@ -271,7 +271,7 @@ public class TkRefsetStrMember extends TkRefexAbstractMember<TkRefsetStrRevision
      * Returns a string representation of this TK Refset String Member object.
      *
      * @return a string representation of this TK Refset String Member object
-     * including the concept represented by the uuid.
+     * including the string value
      */
     @Override
     public String toString() {

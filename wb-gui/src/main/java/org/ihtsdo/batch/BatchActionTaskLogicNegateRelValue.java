@@ -73,7 +73,7 @@ public class BatchActionTaskLogicNegateRelValue extends BatchActionTask {
             throws IOException, ContradictionException, InvalidCAB {
         int cNid = c.getNid(); // referenced component
         boolean changed = false;
-        Collection<? extends RelationshipVersionBI> rels = c.getRelationshipsSourceActive();
+        Collection<? extends RelationshipVersionBI> rels = c.getRelationshipsOutgoingActive();
         Collection<? extends RefexVersionBI<?>> negationRefex = null;
         for (RelationshipVersionBI rvbi : rels) {
 

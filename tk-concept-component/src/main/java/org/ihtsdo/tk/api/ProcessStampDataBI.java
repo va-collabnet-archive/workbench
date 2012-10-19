@@ -24,7 +24,7 @@ package org.ihtsdo.tk.api;
  * which contain a desired stamp.
  * 
  * @see StampBI
- * @see TerminologyStoreDI#iterateSapDataInSequence(org.ihtsdo.tk.api.ProcessStampDataBI) 
+ * @see TerminologyStoreDI#iterateStampDataInSequence(org.ihtsdo.tk.api.ProcessStampDataBI) 
  * 
  */
 public interface ProcessStampDataBI {

@@ -429,7 +429,7 @@ public class TkConcept {
             }
         }
 
-        Collection<? extends RelationshipVersionBI> rels = conceptVersion.getChronicle().getVersion(relVc).getRelationshipsSourceActive();
+        Collection<? extends RelationshipVersionBI> rels = conceptVersion.getChronicle().getVersion(relVc).getRelationshipsOutgoingActive();
 
         if (rels != null) {
             this.relationships = new ArrayList<TkRelationship>(rels.size());

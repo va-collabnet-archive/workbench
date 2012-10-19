@@ -171,7 +171,7 @@ public class TkRefsetStrRevision extends TkRevision {
      * Returns a string representation of this TK Refset String Revision object.
      *
      * @return a string representation of this TK Refset String Revision object
-     * including the concept represented by the uuid.
+     * including the string value
      */
     @Override
     public String toString() {

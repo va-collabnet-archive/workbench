@@ -22,7 +22,11 @@ import org.ihtsdo.tk.api.ComponentChronicleBI;
  * The Interface RelationshipChronicleBI represents the collection of
  * relationship versions and contains methods specific to interacting with the
  * relationship as a whole.
- * 
+ *
+ * <p>In the relationship A is-a B, the concept A is a source and the concept B is
+ * a target. The relationship A-B is an outgoing relationship on concept A and
+ * an incoming relationship on concept B.
+ *
  * @see ComponentChronicleBI
  */
 public interface RelationshipChronicleBI extends ComponentChronicleBI<RelationshipVersionBI> {

@@ -253,7 +253,6 @@ public class TkRefexMember extends TkRefexAbstractMember<TkRefexRevision> {
      * Returns a string representation of this TK Refex Member object.
      *
      * @return a string representation of this TK Refex Member object
-     * including the concept represented by the uuid.
      */
     @Override
     public String toString() {

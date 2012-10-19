@@ -40,12 +40,13 @@ import java.util.List;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 
-
 /**
  * The Interface ConceptVersionBI provides methods for interacting with a
  * particular version of a concept and for creating new, editable versions.
  *
- * TODO-javadoc: should there be discussion of source/target and active here?
+ * <p>In the relationship A is-a B, the concept A is a source and the concept B is
+ * a target. The relationship A-B is an outgoing relationship on concept A and
+ * an incoming relationship on concept B.
  *
  * @see ComponentVersionBI
  */
@@ -83,7 +84,8 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * @return active concept attributes for this version, <code>null</code> if
      * none are found
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ContradictionException if more than one version is found for a given position or view coordinate
+     * @throws ContradictionException if more than one version is found for a
+     * given position or view coordinate
      */
     ConceptAttributeVersionBI getConceptAttributesActive() throws IOException, ContradictionException;
 
@@ -93,8 +95,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * or that is a member of this concept, if the concept is a refset.
      *
      * @param refsetNid the nid of the refset in question
-     * @return the specified active refex members, an *
-     * empty <code>Collection</code> if none are found
+     * @return the specified active refex members, an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred
      */
     Collection<? extends RefexVersionBI<?>> getRefexMembersActive(int refsetNid) throws IOException;
@@ -115,8 +116,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * component or that is a member of this concept, if the concept is a
      * refset.
      *
-     * @return any active refset members for this version, an *
-     * empty <code>Collection</code> if none are found
+     * @return any active refset members for this version, an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException if there are differing versions of the
      * active refset members returned for this version
@@ -142,8 +142,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * <code>typeNid</code>.
      *
      * @param typeNid the nid associated with the desired type of description
-     * @return the specified active descriptions, an *
-     * empty <code>Collection</code> if none are found
+     * @return the specified active descriptions, an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException if differing active descriptions are found
      * for this version
@@ -157,8 +156,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      *
      * @param typeNids the nids associated with the desired types of
      * descriptions
-     * @return the specified active descriptions, an *
-     * empty <code>Collection</code> if none are found
+     * @return the specified active descriptions, an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException if differing active descriptions are found
      * for this version
@@ -189,8 +187,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
     /**
      * Gets active media associated with this version.
      *
-     * @return the active media for this version, an *
-     * empty <code>Collection</code> if none are found
+     * @return the active media for this version, an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException if differing media is found for this
      * version
@@ -212,8 +209,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * Gets the active preferred descriptions for this version.
      *
      * @return the active preferred descriptions, more than one can be returned
-     * if there were simultaneous edits of the preferred term, an *
-     * empty <code>Collection</code> if none are found
+     * if there were simultaneous edits of the preferred term, an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred
      */
     Collection<? extends DescriptionVersionBI> getDescriptionsPreferredActive() throws IOException;
@@ -234,8 +230,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * component or that is a member of this concept, if the concept is a
      * refset.
      *
-     * @return active refset members for this version, an *
-     * empty <code>Collection</code> if none are found
+     * @return active refset members for this version, an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException if differing refset members are found for
      * this version
@@ -245,8 +240,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
     /**
      * Gets all the relationship groups for this version regardless of status.
      *
-     * @return all the relationship groups for this version, an *
-     * empty <code>Collection</code> if none are found
+     * @return all the relationship groups for this version, an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException if differing relationship groups are found
      * for this version
@@ -254,12 +248,11 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
     Collection<? extends RelationshipGroupVersionBI> getRelationshipGroups() throws IOException, ContradictionException;
 
     /**
-     * Gets active target relationships for this version. TODO-javadoc:
-     * renaming?
+     * Gets active target relationships for this version.
      *
-     * In the relationship A is a B, the concept A has a target relationship to
-     * the concept B, and the concept B has a source relationship to the concept
-     * A.
+     * <p>In the relationship A is-a B, the concept A is a source and the concept B
+     * is a target. The relationship A-B is an outgoing relationship on concept
+     * A and an incoming relationship on concept B.
      *
      * @return the active target relationships, an empty <code>Collection</code>
      * if none are found
@@ -267,43 +260,40 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * @throws ContradictionException if different target relationships are
      * found for this version
      */
-    Collection<? extends RelationshipVersionBI> getRelationshipsTargetActive()
+    Collection<? extends RelationshipVersionBI> getRelationshipsIncomingActive()
             throws IOException, ContradictionException;
 
     /**
      * Gets the active target "is a" relationships for this version.
      *
-     * TODO-javadoc: renaming?
      *
-     * In the relationship A is a B, the concept A has a target relationship to
-     * the concept B, and the concept B has a source relationship to the concept
-     * A.
+     * <p>In the relationship A is-a B, the concept A is a source and the concept B
+     * is a target. The relationship A-B is an outgoing relationship on concept
+     * A and an incoming relationship on concept B.
      *
-     * @return the active target "is a" relationships, an *
-     * empty <code>Collection</code> if none are found
+     * @return the active target "is a" relationships, an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException if differing "is a" relationships are
      * found for this version
      */
-    Collection<? extends RelationshipVersionBI> getRelationshipsTargetActiveIsa()
+    Collection<? extends RelationshipVersionBI> getRelationshipsIncomingActiveIsa()
             throws IOException, ContradictionException;
 
     /**
      * Returns the concepts representing the destination of the target
      * relationships for this version. All status values will be returned.
      *
-     * TODO-javadoc: renaming?
      *
-     * In the relationship A is a B, the concept A has a target relationship to
-     * the concept B, and the concept B has a source relationship to the concept
-     * A.
+     * <p>In the relationship A is-a B, the concept A is a source and the concept B
+     * is a target. The relationship A-B is an outgoing relationship on concept
+     * A and an incoming relationship on concept B.
      *
      * @return the concepts representing the destinations of the target
      * relationships for this version, an empty <code>Collection</code> if none
      * are found
      * @throws IOException signals that an I/O exception has occurred
      */
-    Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConcepts() throws IOException;
+    Collection<? extends ConceptVersionBI> getRelationshipsIncomingSourceConcepts() throws IOException;
 
     /**
      * Returns the concepts representing the destination of the target
@@ -311,11 +301,10 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * <code>typeNid</code> for this version. All status values will be
      * returned.
      *
-     * TODO-javadoc: renaming?
      *
-     * In the relationship A is a B, the concept A has a target relationship to
-     * the concept B, and the concept B has a source relationship to the concept
-     * A.
+     * <p>In the relationship A is-a B, the concept A is a source and the concept B
+     * is a target. The relationship A-B is an outgoing relationship on concept
+     * A and an incoming relationship on concept B.
      *
      * @param typeNid the nid representing the type of the relationship in
      * question
@@ -324,7 +313,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * are found
      * @throws IOException signals that an I/O exception has occurred
      */
-    Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConcepts(int typeNid) throws IOException;
+    Collection<? extends ConceptVersionBI> getRelationshipsIncomingSourceConcepts(int typeNid) throws IOException;
 
     /**
      * Returns the concepts representing the destination of the target
@@ -332,11 +321,10 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * <code>typeNids</code> for this version. All status values will be
      * returned.
      *
-     * TODO-javadoc: renaming?
      *
-     * In the relationship A is a B, the concept A has a target relationship to
-     * the concept B, and the concept B has a source relationship to the concept
-     * A.
+     * <p>In the relationship A is-a B, the concept A is a source and the concept B
+     * is a target. The relationship A-B is an outgoing relationship on concept
+     * A and an incoming relationship on concept B.
      *
      * @param typeNids the nids representing the desired types of relationships
      * @return the concepts representing the destinations of the target
@@ -344,17 +332,16 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * are found
      * @throws IOException signals that an I/O exception has occurred
      */
-    Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConcepts(NidSetBI typeNids) throws IOException;
+    Collection<? extends ConceptVersionBI> getRelationshipsIncomingSourceConcepts(NidSetBI typeNids) throws IOException;
 
     /**
      * Returns the concepts representing the destination of the active target
      * relationships for this version.
      *
-     * TODO-javadoc: renaming?
      *
-     * In the relationship A is a B, the concept A has a target relationship to
-     * the concept B, and the concept B has a source relationship to the concept
-     * A.
+     * <p>In the relationship A is-a B, the concept A is a source and the concept B
+     * is a target. The relationship A-B is an outgoing relationship on concept
+     * A and an incoming relationship on concept B.
      *
      * @return the concepts representing the destinations of the active target
      * relationships for this version, an empty <code>Collection</code> if none
@@ -363,7 +350,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * @throws ContradictionException if different destination concepts are
      * returned for this version
      */
-    Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConceptsActive()
+    Collection<? extends ConceptVersionBI> getRelationshipsIncomingSourceConceptsActive()
             throws IOException, ContradictionException;
 
     /**
@@ -371,9 +358,9 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * relationships of the type specified by the
      * <code>typeNid</code> for this version.
      *
-     * In the relationship A is a B, the concept A has a target relationship to
-     * the concept B, and the concept B has a source relationship to the concept
-     * A.
+     * <p>In the relationship A is-a B, the concept A is a source and the concept B
+     * is a target. The relationship A-B is an outgoing relationship on concept
+     * A and an incoming relationship on concept B.
      *
      * @param typeNid the nid representing the desired type of relationship
      * @return the concepts representing the destination of the specified active
@@ -383,7 +370,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * @throws ContradictionException if different destination concepts are
      * returned for this version
      */
-    Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConceptsActive(int typeNid)
+    Collection<? extends ConceptVersionBI> getRelationshipsIncomingSourceConceptsActive(int typeNid)
             throws IOException, ContradictionException;
 
     /**
@@ -391,9 +378,9 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * relationships of the type specified by the
      * <code>typeNids</code> for this version.
      *
-     * In the relationship A is a B, the concept A has a target relationship to
-     * the concept B, and the concept B has a source relationship to the concept
-     * A.
+     * <p>In the relationship A is-a B, the concept A is a source and the concept B
+     * is a target. The relationship A-B is an outgoing relationship on concept
+     * A and an incoming relationship on concept B.
      *
      * @param typeNids the nids representing the desired types of relationships
      * @return the concepts representing the destination of the specified active
@@ -403,16 +390,16 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * @throws ContradictionException if different destination concepts are
      * returned for this version
      */
-    Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConceptsActive(NidSetBI typeNids)
+    Collection<? extends ConceptVersionBI> getRelationshipsIncomingSourceConceptsActive(NidSetBI typeNids)
             throws IOException, ContradictionException;
 
     /**
      * Returns the concepts representing the destination of the active "is a"
      * target relationships for this version.
      *
-     * In the relationship A is a B, the concept A has a target relationship to
-     * the concept B, and the concept B has a source relationship to the concept
-     * A.
+     * <p>In the relationship A is-a B, the concept A is a source and the concept B
+     * is a target. The relationship A-B is an outgoing relationship on concept
+     * A and an incoming relationship on concept B.
      *
      * @return the concepts representing the destination of the active "is a"
      * target relationships for this version, an empty <code>Collection</code>
@@ -421,31 +408,30 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * @throws ContradictionException if different destination concepts are
      * returned for this version
      */
-    Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConceptsActiveIsa()
+    Collection<? extends ConceptVersionBI> getRelationshipsIncomingSourceConceptsActiveIsa()
             throws IOException, ContradictionException;
 
     /**
      * Returns the concepts representing the destination of the "is a" target
      * relationships for this version regardless of status.
      *
-     * In the relationship A is a B, the concept A has a target relationship to
-     * the concept B, and the concept B has a source relationship to the concept
-     * A.
+     * <p>In the relationship A is-a B, the concept A is a source and the concept B
+     * is a target. The relationship A-B is an outgoing relationship on concept
+     * A and an incoming relationship on concept B.
      *
      * @return the concepts representing the destination of the target
      * relationships for this version, an empty <code>Collection</code> if none
      * are found
      * @throws IOException signals that an I/O exception has occurred
      */
-    Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConceptsIsa() throws IOException;
+    Collection<? extends ConceptVersionBI> getRelationshipsIncomingSourceConceptsIsa() throws IOException;
 
     /**
-     * Gets active source relationships for this version. TODO-javadoc:
-     * renaming?
+     * Gets active source relationships for this version. 
      *
-     * In the relationship A is a B, the concept A has a target relationship to
-     * the concept B, and the concept B has a source relationship to the concept
-     * A.
+     * <p>In the relationship A is-a B, the concept A is a source and the concept B
+     * is a target. The relationship A-B is an outgoing relationship on concept
+     * A and an incoming relationship on concept B.
      *
      * @return the active source relationships, an empty <code>Collection</code>
      * if none are found
@@ -453,42 +439,40 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * @throws ContradictionException if different source relationships are
      * found for this version
      */
-    Collection<? extends RelationshipVersionBI> getRelationshipsSourceActive()
+    Collection<? extends RelationshipVersionBI> getRelationshipsOutgoingActive()
             throws IOException, ContradictionException;
 
     /**
      * Gets the active source "is a" relationships for this version.
      *
-     * TODO-javadoc: renaming?
      *
-     * In the relationship A is a B, the concept A has a target relationship to
-     * the concept B, and the concept B has a source relationship to the concept
-     * A.
      *
-     * @return the active source "is a" relationships, an *
-     * empty <code>Collection</code> if none are found
+     * <p>In the relationship A is-a B, the concept A is a source and the concept B
+     * is a target. The relationship A-B is an outgoing relationship on concept
+     * A and an incoming relationship on concept B.
+     *
+     * @return the active source "is a" relationships, an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException if differing "is a" relationships are
      * found for this version
      */
-    Collection<? extends RelationshipVersionBI> getRelationshipsSourceActiveIsa()
+    Collection<? extends RelationshipVersionBI> getRelationshipsOutgoingActiveIsa()
             throws IOException, ContradictionException;
 
     /**
      * Returns the concepts representing the origin of the source relationships
      * for this version. All status values will be returned.
      *
-     * TODO-javadoc: renaming?
      *
-     * In the relationship A is a B, the concept A has a target relationship to
-     * the concept B, and the concept B has a source relationship to the concept
-     * A.
+     * <p>In the relationship A is-a B, the concept A is a source and the concept B
+     * is a target. The relationship A-B is an outgoing relationship on concept
+     * A and an incoming relationship on concept B.
      *
      * @return the concepts representing the origins of the source relationships
      * for this version, an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred
      */
-    Collection<? extends ConceptVersionBI> getRelationshipsSourceTargetConcepts() throws IOException;
+    Collection<? extends ConceptVersionBI> getRelationshipsOutgoingTargetConcepts() throws IOException;
 
     /**
      * Returns the concepts representing the origin of the source relationships
@@ -496,11 +480,10 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * <code>typeNid</code> for this version. All status values will be
      * returned.
      *
-     * TODO-javadoc: renaming?
      *
-     * In the relationship A is a B, the concept A has a target relationship to
-     * the concept B, and the concept B has a source relationship to the concept
-     * A.
+     * <p>In the relationship A is-a B, the concept A is a source and the concept B
+     * is a target. The relationship A-B is an outgoing relationship on concept
+     * A and an incoming relationship on concept B.
      *
      * @param typeNid the nid representing the type of the relationship in
      * question
@@ -508,7 +491,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * for this version, an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred
      */
-    Collection<? extends ConceptVersionBI> getRelationshipsSourceTargetConcepts(int typeNid) throws IOException;
+    Collection<? extends ConceptVersionBI> getRelationshipsOutgoingTargetConcepts(int typeNid) throws IOException;
 
     /**
      * Returns the concepts representing the origin of the source relationships
@@ -516,28 +499,26 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * <code>typeNids</code> for this version. All status values will be
      * returned.
      *
-     * TODO-javadoc: renaming?
      *
-     * In the relationship A is a B, the concept A has a target relationship to
-     * the concept B, and the concept B has a source relationship to the concept
-     * A.
+     * <p>In the relationship A is-a B, the concept A is a source and the concept B
+     * is a target. The relationship A-B is an outgoing relationship on concept
+     * A and an incoming relationship on concept B.
      *
      * @param typeNids the nids representing the desired types of relationships
      * @return the concepts representing the origins of the source relationships
      * for this version, an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred
      */
-    Collection<? extends ConceptVersionBI> getRelationshipsSourceTargetConcepts(NidSetBI typeNids) throws IOException;
+    Collection<? extends ConceptVersionBI> getRelationshipsOutgoingTargetConcepts(NidSetBI typeNids) throws IOException;
 
     /**
      * Returns the concepts representing the origin of the active source
      * relationships for this version.
      *
-     * TODO-javadoc: renaming?
      *
-     * In the relationship A is a B, the concept A has a target relationship to
-     * the concept B, and the concept B has a source relationship to the concept
-     * A.
+     * <p>In the relationship A is-a B, the concept A is a source and the concept B
+     * is a target. The relationship A-B is an outgoing relationship on concept
+     * A and an incoming relationship on concept B.
      *
      * @return the concepts representing the origins of the active source
      * relationships for this version, an empty <code>Collection</code> if none
@@ -546,7 +527,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * @throws ContradictionException if different destination concepts are
      * returned for this version
      */
-    Collection<? extends ConceptVersionBI> getRelationshipsSourceTargetConceptsActive()
+    Collection<? extends ConceptVersionBI> getRelationshipsOutgoingTargetConceptsActive()
             throws IOException, ContradictionException;
 
     /**
@@ -554,9 +535,9 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * relationships of the type specified by the
      * <code>typeNid</code> for this version.
      *
-     * In the relationship A is a B, the concept A has a target relationship to
-     * the concept B, and the concept B has a source relationship to the concept
-     * A.
+     * <p>In the relationship A is-a B, the concept A is a source and the concept B
+     * is a target. The relationship A-B is an outgoing relationship on concept
+     * A and an incoming relationship on concept B.
      *
      * @param typeNid the nid representing the desired type of relationship
      * @return the concepts representing the origins of the specified active
@@ -566,7 +547,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * @throws ContradictionException if different destination concepts are
      * returned for this version
      */
-    Collection<? extends ConceptVersionBI> getRelationshipsSourceTargetConceptsActive(int typeNid)
+    Collection<? extends ConceptVersionBI> getRelationshipsOutgoingTargetConceptsActive(int typeNid)
             throws IOException, ContradictionException;
 
     /**
@@ -574,9 +555,9 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * relationships of the type specified by the
      * <code>typeNids</code> for this version.
      *
-     * In the relationship A is a B, the concept A has a target relationship to
-     * the concept B, and the concept B has a source relationship to the concept
-     * A.
+     * <p>In the relationship A is-a B, the concept A is a source and the concept B
+     * is a target. The relationship A-B is an outgoing relationship on concept
+     * A and an incoming relationship on concept B.
      *
      * @param typeNids the nids representing the desired types of relationships
      * @return the concepts representing the origins of the specified active
@@ -586,16 +567,16 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * @throws ContradictionException if different destination concepts are
      * returned for this version
      */
-    Collection<? extends ConceptVersionBI> getRelationshipsSourceTargetConceptsActive(NidSetBI typeNids)
+    Collection<? extends ConceptVersionBI> getRelationshipsOutgoingTargetConceptsActive(NidSetBI typeNids)
             throws IOException, ContradictionException;
 
     /**
      * Returns the concepts representing the origin of the active "is a" source
      * relationships for this version.
      *
-     * In the relationship A is a B, the concept A has a target relationship to
-     * the concept B, and the concept B has a source relationship to the concept
-     * A.
+     * <p>In the relationship A is-a B, the concept A is a source and the concept B
+     * is a target. The relationship A-B is an outgoing relationship on concept
+     * A and an incoming relationship on concept B.
      *
      * @return the concepts representing the origin of the active "is a" source
      * relationships for this version, an empty <code>Collection</code> if none
@@ -604,37 +585,37 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * @throws ContradictionException if different destination concepts are
      * returned for this version
      */
-    Collection<? extends ConceptVersionBI> getRelationshipsSourceTargetConceptsActiveIsa()
+    Collection<? extends ConceptVersionBI> getRelationshipsOutgoingTargetConceptsActiveIsa()
             throws IOException, ContradictionException;
 
     /**
      * Returns the concepts representing the origin of the "is a" source
      * relationships for this version regardless of status.
      *
-     * In the relationship A is a B, the concept A has a target relationship to
-     * the concept B, and the concept B has a source relationship to the concept
-     * A.
+     * <p>In the relationship A is-a B, the concept A is a source and the concept B
+     * is a target. The relationship A-B is an outgoing relationship on concept
+     * A and an incoming relationship on concept B.
      *
      * @return the concepts representing the origins of the source relationships
      * for this version, an empty <code>Collection</code> if none are found
      * @throws IOException signals that an I/O exception has occurred
      */
-    Collection<? extends ConceptVersionBI> getRelationshipsSourceTargetConceptsIsa() throws IOException;
+    Collection<? extends ConceptVersionBI> getRelationshipsOutgoingTargetConceptsIsa() throws IOException;
 
     /**
      * Returns the concepts representing the origin of the "is a" source
      * relationships for this version regardless of status.
      *
-     * In the relationship A is a B, the concept A has a target relationship to
-     * the concept B, and the concept B has a source relationship to the concept
-     * A.
+     * <p>In the relationship A is-a B, the concept A is a source and the concept B
+     * is a target. The relationship A-B is an outgoing relationship on concept
+     * A and an incoming relationship on concept B.
      *
      * @return an array of nids associated with the origins of the source
      * relationships for this version, an empty <code>Collection</code> if none
      * are found
      * @throws IOException signals that an I/O exception has occurred
      */
-    int[] getRelationshipsSourceTargetNidsActiveIsa() throws IOException;
+    int[] getRelationshipsOutgoingTargetNidsActiveIsa() throws IOException;
 
     /**
      * Gets the synonyms or this concept version.
@@ -732,7 +713,8 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * @return <code>true</code>, if this version is a kind of the specified
      * parent version
      * @throws IOException signals that an I/O exception has occurred
-     * @throws ContradictionException if more than one version is found for a given position or view coordinate
+     * @throws ContradictionException if more than one version is found for a
+     * given position or view coordinate
      */
     boolean isKindOf(ConceptVersionBI parentConceptVersion) throws IOException, ContradictionException;
 
@@ -761,8 +743,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
     /**
      * @param viewCoordinate the view coordinate specifying which version of the
      * concept to make a blueprint of
-     * @return the concept blueprint, which can be constructed to create *
-     * a <code>ConceptChronicleBI</code>
+     * @return the concept blueprint, which can be constructed to create a <code>ConceptChronicleBI</code>
      * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException if more than one version of the
      * description was returned for the specified view coordinate

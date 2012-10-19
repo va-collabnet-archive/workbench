@@ -153,11 +153,11 @@ public interface ContradictionManagerBI extends Serializable {
     boolean isInConflict(RelationshipChronicleBI relationshipChronicle);
 
     /**
-     * Checks if the concept attributes specified by the <code>conceptAttributteChronicle</code> are is in conflict.
+     * Checks if the concept attributes specified by the <code>conceptAttributeChronicle</code> are is in conflict.
      *
-     * @param conceptAttributteChronicle the concept attribute to test
+     * @param conceptAttributeChronicle the concept attribute to test
      * @return <code>true</code> if this conceptAttribute is in conflict according to the
      * resolution strategy
      */
-    boolean isInConflict(ConceptAttributeChronicleBI conceptAttributteChronicle);
+    boolean isInConflict(ConceptAttributeChronicleBI conceptAttributeChronicle);
 }

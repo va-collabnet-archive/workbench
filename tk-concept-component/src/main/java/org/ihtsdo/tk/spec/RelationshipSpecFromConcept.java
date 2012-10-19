@@ -58,7 +58,7 @@ public class RelationshipSpecFromConcept {
     private void makeRelationshipSpec() {
         try {
             Collection<? extends ConceptVersionBI> rels;
-            rels = concept.getRelationshipsSourceTargetConceptsIsa();
+            rels = concept.getRelationshipsOutgoingTargetConceptsIsa();
             String description = null;
 
             //get rels for concept

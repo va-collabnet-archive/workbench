@@ -190,7 +190,7 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
                 if (!cb.isCanceled()) {
                     // EXISTING PARENTS
                     for (ConceptVersionBI cvbi : cb.getVersions(vc)) {
-                        for (RelationshipVersionBI rvbi : cvbi.getRelationshipsSourceActive()) {
+                        for (RelationshipVersionBI rvbi : cvbi.getRelationshipsOutgoingActive()) {
                             if (rvbi.isStated() && parentLinkageTypes.contains(rvbi.getTypeNid())) {
                                 // Check if role-value already exists
                                 Boolean found = false;
@@ -209,7 +209,7 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
 
                     // EXISTING ROLES
                     for (ConceptVersionBI cvbi : cb.getVersions(vc)) {
-                        for (RelationshipVersionBI rvbi : cvbi.getRelationshipsSourceActive()) {
+                        for (RelationshipVersionBI rvbi : cvbi.getRelationshipsOutgoingActive()) {
                             if (rvbi.isStated()) {
                                 // Check if role-value already exists
                                 Boolean found = false;

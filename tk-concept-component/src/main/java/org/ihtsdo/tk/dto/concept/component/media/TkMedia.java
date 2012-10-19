@@ -42,7 +42,7 @@ import org.ihtsdo.tk.dto.RevisionHandling;
  * <code>TkConcept</code>.
  *
  * @see TkConcept
- * @param <V> the generic media type
+ * @param <V> the generic revision type
  */
 public class TkMedia extends TkComponent<TkMediaRevision> {
 
@@ -57,7 +57,7 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
      */
     public UUID conceptUuid;
     /**
-     * The data bytes. TODO-javadoc: what's this?
+     * The data bytes representing the media.
      */
     public byte[] dataBytes;
     /**
@@ -401,9 +401,9 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
     }
 
     /**
-     * Gets the data bytes. TODO-javadoc: ?
+     * Gets the data bytes containing the media.
      *
-     * @return the data bytes
+     * @return the media data bytes
      */
     public byte[] getDataBytes() {
         return dataBytes;
@@ -456,9 +456,9 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
     }
 
     /**
-     * Sets the data bytes. TODO-javadoc: ?
+     * Sets the data bytes containing the media.
      *
-     * @param data the new data bytes
+     * @param data the data bytes representing the media
      */
     public void setDataBytes(byte[] data) {
         this.dataBytes = data;

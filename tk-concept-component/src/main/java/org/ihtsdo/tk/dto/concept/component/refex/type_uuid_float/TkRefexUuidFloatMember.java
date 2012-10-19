@@ -262,7 +262,7 @@ public class TkRefexUuidFloatMember extends TkRefexAbstractMember<TkRefexUuidFlo
      * @param conversionMap the map for converting from one set of uuids to
      * another
      * @param offset the offset to be applied to the time associated with this
-     * TK Refex Array of Byte Array Member
+     * TK Refex Uuid Float Member
      * @param mapAll set to <code>true</code> to map all the uuids in this TK
      * Refex Uuid Float Member based on the conversion map
      * @return the converted TK Refex Uuid Float Member

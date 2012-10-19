@@ -22,13 +22,12 @@ import java.io.ObjectOutputStream;
 
 import org.ihtsdo.tk.spec.ConceptSpec;
 
-// TODO-javadoc: rename to incoming/outgoing and update class-level doc
 /**
- * The Class RelationshipConstraintSource represents a constraint which can be
+ * The Class RelationshipConstraintOutgoing represents a constraint which can be
  * declared on a relationship. The constraint subject-property-value is defined
  * as: enclosing sourceConcept-relationshipType-targetConcept.
  */
-public class RelationshipConstraintSource extends RelationshipConstraint {
+public class RelationshipConstraintOutgoing extends RelationshipConstraint {
 
     private static final long serialVersionUID = 1L;
     private static final int dataVersion = 1;
@@ -70,7 +69,7 @@ public class RelationshipConstraintSource extends RelationshipConstraint {
      * relationship type concept
      * @param targetSpec the concept spec representing the target concept
      */
-    public RelationshipConstraintSource(ConceptSpec sourceSpec,
+    public RelationshipConstraintOutgoing(ConceptSpec sourceSpec,
             ConceptSpec relationshipTypeSpec, ConceptSpec targetSpec) {
         super(sourceSpec, relationshipTypeSpec, targetSpec);
     }

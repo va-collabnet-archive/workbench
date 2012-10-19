@@ -1285,7 +1285,7 @@ private AtomicReference<RelativePositionComputerBI> conflictMapper;
 	}
 
 	@Override
-	public Collection<? extends ComponentVersionBI> getReturnVersions() {
+	public Collection<? extends ComponentVersionBI> getContradictingVersions() {
 		return returnVersionCollection;
 	}
 

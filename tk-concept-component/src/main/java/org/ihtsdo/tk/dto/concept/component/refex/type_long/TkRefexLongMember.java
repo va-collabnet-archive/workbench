@@ -271,7 +271,7 @@ public class TkRefexLongMember extends TkRefexAbstractMember<TkRefexLongRevision
      * Returns a string representation of this TK Refex Long Member object.
      *
      * @return a string representation of this TK Refex Long Member object
-     * including the concept represented by the uuid.
+     * including the long value
      */
     @Override
     public String toString() {

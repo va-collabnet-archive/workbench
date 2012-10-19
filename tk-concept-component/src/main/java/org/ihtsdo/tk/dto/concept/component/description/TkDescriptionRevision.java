@@ -234,7 +234,8 @@ public class TkDescriptionRevision extends TkRevision implements I_DescribeExter
      * Returns a string representation of this TK Description Revision object.
      *
      * @return a string representation of this TK Description Revision object
-     * including if the concept is defined or not
+     * including
+     * the enclosing concept, initial case sensitivity, language, and type
      *
      * @return the string
      */

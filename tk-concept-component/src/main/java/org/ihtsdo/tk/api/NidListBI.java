@@ -21,7 +21,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Interface NidListBI represents a serializable list of nids. All
  * implementations must serialize the set using uuids.
@@ -138,7 +137,7 @@ public interface NidListBI {
      * sequence).
      *
      * @return Returns a list iterator over the nids in this nid list (in proper
-     * sequence).
+     * sequence)
      */
     public ListIterator<Integer> listIterator();
 

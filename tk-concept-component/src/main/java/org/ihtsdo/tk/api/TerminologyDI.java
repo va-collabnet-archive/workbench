@@ -29,7 +29,6 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
 import org.ihtsdo.tk.api.search.ScoredComponentReference;
 
-
 /**
  * The Interface TerminologyDI provides methods for working with terminology
  * which are general to both chronicles and versions.
@@ -41,8 +40,7 @@ public interface TerminologyDI {
      * <code>query</code>.
      *
      * @param query the string to search for
-     * @return the matching results in the form
-     * of <code>ScoredComponentReferences</code>, which represent the
+     * @return the matching results in the form      * of <code>ScoredComponentReferences</code>, which represent the
      * concept/component nid of the result and a score of how well the result
      * matches the search criteria
      * @throws IOException signals that an I/O exception has occurred
@@ -90,9 +88,10 @@ public interface TerminologyDI {
     void addUncommittedNoChecks(ConceptVersionBI conceptVersion) throws IOException;
 
     /**
-     * Write direct. TODO-javadoc: doesn't go through a transaction, such as loading an econcepts file
+     * Writes directly to the database. This method does not go through a
+     * transaction, such as loading an eConcepts file.
      *
-     * @param conceptChronicle the concept chronicle
+     * @param conceptChronicle the concept chronicle to write
      * @throws IOException signals that an I/O exception has occurred
      * @deprecated not in TK3
      */
@@ -167,7 +166,7 @@ public interface TerminologyDI {
     /**
      * Adds a change set generator which is needed in order to write changesets
      * upon commit. This is only necessary to add when needing to write
-     * changesets for edits that do not occur in a running envrionment. For
+     * changesets for edits that do not occur in a running environment. For
      * example, an edit generated at build time will need to use a changeset
      * generator in order to generate a changeset. A changeset generator is
      * already in place for user-initiated edits in the workbench, and will
@@ -189,12 +188,12 @@ public interface TerminologyDI {
     void removeChangeSetGenerator(String key);
 
     /**
-     * Creates the dto change set generator. TODO-javadoc: specifically what writes out dto/econcepts changesets
+     * Creates a changeset generator which writes DTO (eConcept) type changesets.
      *
      * @param changeSetFileName the change set file name
      * @param changeSetTempFileName the change set temp file name
      * @param changeSetGenerationPolicy the change set generation policy
-     * @return the change set generator bi
+     * @return a changeset generator
      */
     ChangeSetGeneratorBI createDtoChangeSetGenerator(File changeSetFileName,
             File changeSetTempFileName,
@@ -243,9 +242,11 @@ public interface TerminologyDI {
     PathBI getPath(int pathNid) throws IOException;
 
     /**
-     * Gets the nid associated with the component spcified by the <code>alternateId</code>.
+     * Gets the nid associated with the component spcified by the
+     * <code>alternateId</code>.
      *
-     * @param authorityUuid the uuid representing the authority associated with the alternate id
+     * @param authorityUuid the uuid representing the authority associated with
+     * the alternate id
      * @param alternateId a string representation of the alternate id
      * @return the nid associated with the specified component
      * @throws IOException signals that an I/O exception has occurred

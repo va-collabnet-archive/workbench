@@ -42,13 +42,11 @@ import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
-
-//TODO-javadoc: skipped private methods/variables
 /**
  * The Class NullComponentFinder processes every concept in the database to
  * determine if each component has valid identifiers. This class implements
- * <code>ProcessUnfetchedConceptDataBI</code> and can
- * be "run" using the terminology store method iterateConceptDataInParallel.
+ * <code>ProcessUnfetchedConceptDataBI</code> and can be "run" using the
+ * terminology store method iterateConceptDataInParallel.
  *
  * @see
  * TerminologyStoreDI#iterateConceptDataInParallel(org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI)
@@ -56,42 +54,24 @@ import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
  */
 public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
 
-    /**
-     * The count.
-     */
     private AtomicInteger count = new AtomicInteger(0);
-    /**
-     * The dots.
-     */
     private AtomicInteger dots = new AtomicInteger(0);
-    /**
-     * The list of nids to be processed.
-     */
     ConcurrentSkipListSet<Integer> allPrimNids = new ConcurrentSkipListSet<Integer>();
-    /**
-     * The the list to hold any nids found to be null components.
-     */
     ConcurrentSkipListSet<Integer> nullComponent = new ConcurrentSkipListSet<Integer>();
-    /**
-     * The output file: nullComponent.oos.
-     */
     File nullComponentFile = new File("nullComponent.oos");
-    /**
-     * The nidset.
-     */
     private final NidBitSetBI nidset;
 
     //~--- constant enums ------------------------------------------------------
     /**
-     * The Enum PASS.
+     * The Enum PASS represents which pass of the data the procesesor is on.
      */
     private enum PASS {
 
         /**
-         * The pass one.
+         * The first pass.
          */
         PASS_ONE, /**
-         * The pass two.
+         * The second pass.
          */
         PASS_TWO
     }
@@ -109,9 +89,10 @@ public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
 
     //~--- methods -------------------------------------------------------------
     /**
-     * Verify component.
+     * Verifies that all of the component nids point to an actual concept or
+     * component.
      *
-     * @param component the component
+     * @param component the component to verify
      * @throws IOException signals that an I/O exception has occurred
      */
     private void verifyComponent(ComponentChronicleBI component) throws IOException {
@@ -151,10 +132,11 @@ public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
     }
 
     /**
-     * Verify nids.
+     * Verifies that given set of
+     * <code>nid</code> point to an actual concept or component.
      *
-     * @param nids the nids
-     * @param component the component
+     * @param nids the nids to verify
+     * @param component the component associated with the given nids
      */
     private void verifyNids(Set<Integer> nids, ComponentChronicleBI component) {
         for (Integer nid : nids) {
@@ -180,7 +162,7 @@ public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
     }
 
     /**
-     * 
+     *
      * @return <code>true</code>
      */
     @Override
@@ -189,15 +171,16 @@ public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
     }
 
     /**
-     * Process concept.
+     * Processes the concept to determine if the nids used in the concept and
+     * its components are valid.
      *
-     * @param concept the concept
+     * @param concept the concept to verify
      * @throws IOException signals that an I/O exception has occurred
      */
     private void processConcept(ConceptChronicleBI concept) throws IOException {
 
         // add prim uuids to list
-        // concept attributtes
+        // concept attributes
         verifyComponent(concept.getConceptAttributes());
 
         // descriptions
@@ -224,10 +207,10 @@ public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
 
     /**
      * Processes each concept to determine if the associated nids are valid.
+     *
      * @param cNid the nid of the concept to process
-     * @param fetcher the fetcher for getting the concept associated
-     * with the <code>cNid</code> from the database
-     * @throws Exception indicates an exception has occurred 
+     * @param fetcher the fetcher for getting the concept associated with      * the <code>cNid</code> from the database
+     * @throws Exception indicates an exception has occurred
      */
     @Override
     public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fetcher) throws Exception {
@@ -278,9 +261,9 @@ public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
     }
 
     /**
-     * 
+     *
      * @return the set of nids to process
-     * @throws IOException 
+     * @throws IOException
      */
     @Override
     public NidBitSetBI getNidSet() throws IOException {

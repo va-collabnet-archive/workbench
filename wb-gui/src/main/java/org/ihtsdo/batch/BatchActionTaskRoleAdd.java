@@ -52,7 +52,7 @@ public class BatchActionTaskRoleAdd extends BatchActionTask {
     @Override
     public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc) throws Exception {
         // Check if role-value already exists and is active.
-        Collection<? extends RelationshipVersionBI> checkParents = c.getRelationshipsSourceActive();
+        Collection<? extends RelationshipVersionBI> checkParents = c.getRelationshipsOutgoingActive();
         for (RelationshipVersionBI rvbi : checkParents) {
             if (rvbi.getTypeNid() == roleNid
                     && rvbi.getTargetNid() == valueNid

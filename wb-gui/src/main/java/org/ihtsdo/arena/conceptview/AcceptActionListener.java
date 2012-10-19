@@ -79,7 +79,7 @@ public class AcceptActionListener implements ActionListener {
                 I_GetConceptData c = settings.getConcept();
                 Set<UUID> authorTimeHashSet = new HashSet<UUID>();
                 if (adjudicationRecRefsetNid == Integer.MAX_VALUE) {
-                    readOnlyMaxSap = Ts.get().getReadOnlyMaxSap();
+                    readOnlyMaxSap = Ts.get().getReadOnlyMaxStamp();
                     snorocketNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.SNOROCKET.getUids());
                     adjudicationRecRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.ADJUDICATION_RECORD.getUids());
                 }

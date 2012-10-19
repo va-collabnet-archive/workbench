@@ -44,33 +44,23 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
-// TODO-javadoc: skipped private methods/variables
+
 /**
- * The Class UuidDupReporter.
+ * The Class UuidDupReporter reports on the duplicate uuids found by the
+ * <code>UuidDupFinder</code>. This class implements
+ * <code>ProcessUnfetchedConceptDataBI</code> and the contradiction detector can
+ * be "run" using the terminology store method iterateConceptDataInParallel.
  *
- * @author kec
+ * @see
+ * TerminologyStoreDI#iterateConceptDataInParallel(org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI).
+ *
  */
 public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
 
-    /**
-     * The count.
-     */
     private AtomicInteger count = new AtomicInteger(0);
-    /**
-     * The dots.
-     */
     private AtomicInteger dots = new AtomicInteger(0);
-    /**
-     * The map of duplicate uuids to the associated components or concepts.
-     */
     ConcurrentHashMap<UUID, Collection<DupEntry>> dupMap;
-    /**
-     * The set of duplicate uuids.
-     */
     ConcurrentSkipListSet<UUID> dupUuids;
-    /**
-     * The nidset.
-     */
     private NidBitSetBI nidset;
 
     //~--- constructors --------------------------------------------------------
@@ -94,9 +84,10 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
 
     //~--- methods -------------------------------------------------------------
     /**
-     * Adds the if dup.
+     * Adds the component, if it contains a duplicate uuid, to a collection of
+     * concepts that have duplicate uuids.
      *
-     * @param component the component
+     * @param component the component to check and add
      * @throws IOException signals that an I/O exception has occurred
      */
     private void addIfDup(ComponentChronicleBI component) throws IOException {
@@ -131,15 +122,18 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
     }
 
     /**
-     * Process concept.
+     * Process the components on the specified
+     * <code>concept</code> to determine if the component has a duplicate uuids.
+     * Adds the component to a collection of duplicates, if a duplicate uuid is
+     * used.
      *
-     * @param concept the concept
+     * @param concept the concept to check for duplicates
      * @throws IOException signals that an I/O exception has occurred
      */
     private void processConcept(ConceptChronicleBI concept) throws IOException {
 
         // add prim uuids to list
-        // concept attributtes
+        // concept attributes
         addIfDup(concept.getConceptAttributes());
 
         // descriptions
@@ -169,7 +163,8 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
      * identified with the duplicate uuids.
      *
      * @param cNid the nid of the concept to process
-     * @param fetcher the fetcher for getting the concept associated with *      * the <code>cNid</code> from the database
+     * @param fetcher the fetcher for getting the concept associated with * *
+     * the <code>cNid</code> from the database
      * @throws Exception indicates an exception has occurred
      */
     @Override
@@ -226,7 +221,7 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
     /**
      *
      * @return the set of nids to process
-     * @throws IOException
+     * @throws IOException signals an I/O exception occurred
      */
     @Override
     public NidBitSetBI getNidSet() throws IOException {
@@ -235,17 +230,11 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
 
     //~--- inner classes -------------------------------------------------------
     /**
-     * The Class DupEntry.
+     * The Class DupEntry represents a component which uses a duplicate uuid.
      */
     private static class DupEntry {
 
-        /**
-         * The dup.
-         */
         ComponentChronicleBI dup;
-        /**
-         * The enclosing concept.
-         */
         ConceptChronicleBI enclosingConcept;
 
         //~--- constructors -----------------------------------------------------
@@ -255,8 +244,7 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
          * <code>dup</code>, and its
          * <code>enclosingConcept</code>.
          *
-         * @param dup the component associated with
-         * the duplicate uuid
+         * @param dup the component associated with the duplicate uuid
          * @param enclosingConcept the component's enclosing concept
          */
         public DupEntry(ComponentChronicleBI dup, ConceptChronicleBI enclosingConcept) {
@@ -266,18 +254,17 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
     }
 
     /**
-     * The Class DupSet.
+     * The Class DupSet represents a set of
+     * <code>DuplicateEntries</code>.
      */
     private static class DupSet implements Comparable<DupSet> {
 
-        /**
-         * The dups.
-         */
         ArrayList<Class<?>> dups;
 
         //~--- constructors -----------------------------------------------------
         /**
-         * Instantiates a new dup set based on the given <code>classes</code>.
+         * Instantiates a new dup set based on the given
+         * <code>classes</code>.
          *
          * @param classes the <code>DupEntry</code> classes
          */
@@ -300,11 +287,16 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
         }
 
         //~--- methods ----------------------------------------------------------
-
         /**
-         * 
+         * Compares this object with the specified object for order. Returns a
+         * negative integer, zero, or a positive integer as this object is less
+         * than, equal to, or greater than the specified object.
+         *
          * @param o the <code>DupSet</code> to compare against
-         * @return 
+         * @return a negative integer, zero, or a positive integer as this
+         * object is less than, equal to, or greater than the specified object.
+         * @see Comparable#compareTo(java.lang.Object) 
+         * 
          */
         @Override
         public int compareTo(DupSet o) {
@@ -323,8 +315,10 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
             return 0;
         }
 
-        /* (non-Javadoc)
-         * @see java.lang.Object#equals(java.lang.Object)
+        /**
+         * Checks if this dup set is equal to another dup set.
+         * @param obj the other <code>DupSet</code> to check
+         * @return <code>true</code> if the two dup sets are equal
          */
         @Override
         public boolean equals(Object obj) {
@@ -335,16 +329,18 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
             return false;
         }
 
-        /* (non-Javadoc)
-         * @see java.lang.Object#hashCode()
+        /**
+         * Gets a hash code representing this dup set
+         * @return a hash code value for this dup set
          */
         @Override
         public int hashCode() {
             return dups.hashCode();
         }
 
-        /* (non-Javadoc)
-         * @see java.lang.Object#toString()
+        /**
+         * Generates a string representing this dup set.
+         * @return a string representation of this dup set
          */
         @Override
         public String toString() {

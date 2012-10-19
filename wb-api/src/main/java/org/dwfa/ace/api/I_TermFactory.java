@@ -43,7 +43,6 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 
 import org.ihtsdo.lucene.SearchResult;
-import org.ihtsdo.tk.api.KindOfCacheBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;

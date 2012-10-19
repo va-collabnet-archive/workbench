@@ -275,7 +275,7 @@ public class TkRefexBooleanMember extends TkRefexAbstractMember<TkRefexBooleanRe
      * Returns a string representation of this TK Refex Boolean Member object.
      *
      * @return a string representation of this TK Refex Boolean Member object
-     * including the concept represented by the uuid.
+     * including the boolean value.
      */
     @Override
     public String toString() {

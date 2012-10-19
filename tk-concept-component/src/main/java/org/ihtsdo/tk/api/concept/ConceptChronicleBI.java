@@ -209,7 +209,7 @@ public interface ConceptChronicleBI extends ComponentChronicleBI<ConceptVersionB
      * Gets the groups of relationships, based on the specified
      * <code>viewCoordinate</codde>, that are associated with this concept.
      * 
-     * In the relationship A is-a B, the concept A is a source and the concept B
+     * <p>In the relationship A is-a B, the concept A is a source and the concept B
      * is a target. The relationship A-B is an outgoing relationship on concept
      * A and an incoming relationship on concept B.
      *
@@ -225,7 +225,7 @@ public interface ConceptChronicleBI extends ComponentChronicleBI<ConceptVersionB
     /**
      * Gets all target relationships regardless of status.
      *
-     * In the relationship A is-a B, the concept A is a source and the concept B
+     * <p>In the relationship A is-a B, the concept A is a source and the concept B
      * is a target. The relationship A-B is an outgoing relationship on concept
      * A and an incoming relationship on concept B.
      *
@@ -235,10 +235,9 @@ public interface ConceptChronicleBI extends ComponentChronicleBI<ConceptVersionB
     Collection<? extends RelationshipChronicleBI> getRelationshipsIncoming() throws IOException;
 
     /**
-     * Gets all source relationships regardless of status. TODO-javadoc:
-     * renaming?
+     * Gets all source relationships regardless of status.
      *
-     * In the relationship A is-a B, the concept A is a source and the concept B
+     * <p>In the relationship A is-a B, the concept A is a source and the concept B
      * is a target. The relationship A-B is an outgoing relationship on concept
      * A and an incoming relationship on concept B.
      *

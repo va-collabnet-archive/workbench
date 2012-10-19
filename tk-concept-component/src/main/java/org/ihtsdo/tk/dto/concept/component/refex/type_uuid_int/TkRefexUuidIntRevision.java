@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * The Class represents a version of a uuid-int type refex member in the
+ * The Class TKRefexUuidIntRevision represents a version of a uuid-int type refex member in the
  * eConcept format and contains methods specific for interacting with this
  * version. Further discussion of the eConcept format can be found on
  * <code>TkConcept</code>.

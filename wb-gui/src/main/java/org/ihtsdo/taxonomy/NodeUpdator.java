@@ -366,7 +366,7 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
                newNode = model.getNodeFactory().makeNode(cv, currentNode.getParentNid(),
                        model.getNodeStore().get(currentNode.parentNodeId));
             } else {
-               for (RelationshipVersionBI rel : cv.getRelationshipsSourceActiveIsa()) {
+               for (RelationshipVersionBI rel : cv.getRelationshipsOutgoingActiveIsa()) {
                   if (rel.getTargetNid() == currentNode.getConceptNid()) {
                      TaxonomyNode childNode = model.getNodeFactory().makeNode(cv, currentNode.getConceptNid(),
                                                  currentNode);
@@ -447,7 +447,7 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
                newNode = model.getNodeFactory().makeNode(cv, currentNode.getParentNid(),
                        model.getNodeStore().get(currentNode.parentNodeId));
             } else {
-               for (RelationshipVersionBI rel : cv.getRelationshipsSourceActiveIsa()) {
+               for (RelationshipVersionBI rel : cv.getRelationshipsOutgoingActiveIsa()) {
                   if (rel.getTargetNid() == currentNode.getConceptNid()) {
                      TaxonomyNode childNode = model.getNodeFactory().makeNode(cv, currentNode.getConceptNid(),
                                                  currentNode);

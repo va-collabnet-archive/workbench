@@ -442,7 +442,7 @@ public class ViewCoordinate implements Serializable {
     }
 
     /**
-     * Gets the language nid. TODO-javadoc: not used
+     * Gets the nid of the language refex.
      *
      * @return the language refex nid
      */

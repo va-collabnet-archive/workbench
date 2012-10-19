@@ -17,8 +17,8 @@
 package org.ihtsdo.tk.binding.snomed;
 
 import org.ihtsdo.tk.api.constraint.DescriptionConstraint;
-import org.ihtsdo.tk.api.constraint.RelationshipConstraintTarget;
-import org.ihtsdo.tk.api.constraint.RelationshipConstraintSource;
+import org.ihtsdo.tk.api.constraint.RelationshipConstraintIncoming;
+import org.ihtsdo.tk.api.constraint.RelationshipConstraintOutgoing;
 
 /**
  * The Class SnomedConstraints represents constraints that can be declared on
@@ -31,12 +31,12 @@ public class SnomedConstraints {
     /**
      * The outgoing relationship must be of type finding site.
      */
-    public static RelationshipConstraintSource FINDING_SITE_OUT =
+    public static RelationshipConstraintOutgoing FINDING_SITE_OUT =
             SnomedRelationshipSpec.FINDING_SITE.getSourceRelationshipConstraint();
     /**
      * The incoming relationship must be of type finding site.
      */
-    public static RelationshipConstraintTarget FINDING_SITE_IN =
+    public static RelationshipConstraintIncoming FINDING_SITE_IN =
             SnomedRelationshipSpec.FINDING_SITE.getTargetRelationshipConstraint();
     /**
      * The fully specified name must have a semantic tag.

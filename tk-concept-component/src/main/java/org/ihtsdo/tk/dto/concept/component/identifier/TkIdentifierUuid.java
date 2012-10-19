@@ -47,7 +47,7 @@ public class TkIdentifierUuid extends TkIdentifier {
      */
     public static final long serialVersionUID = 1;
     /**
-     * The generated uuid. TODO-javadoc: ?
+     * The uuid representing the authority associated with the TK Identifier Uuid.
      */
     public static UUID generatedUuid = UUID.fromString("2faa9262-8fb2-11db-b606-0800200c9a66");
     //~--- fields --------------------------------------------------------------

@@ -30,8 +30,8 @@ import org.ihtsdo.tk.api.constraint.ConstraintBI;
 import org.ihtsdo.tk.api.constraint.ConstraintCheckType;
 import org.ihtsdo.tk.api.constraint.DescriptionConstraint;
 import org.ihtsdo.tk.api.constraint.RelationshipConstraint;
-import org.ihtsdo.tk.api.constraint.RelationshipConstraintTarget;
-import org.ihtsdo.tk.api.constraint.RelationshipConstraintSource;
+import org.ihtsdo.tk.api.constraint.RelationshipConstraintIncoming;
+import org.ihtsdo.tk.api.constraint.RelationshipConstraintOutgoing;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
@@ -220,10 +220,10 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
     public boolean satisfies(ConstraintBI constraint, ConstraintCheckType subjectCheck,
             ConstraintCheckType propertyCheck, ConstraintCheckType valueCheck)
             throws IOException, ContradictionException {
-        if (RelationshipConstraintSource.class.isAssignableFrom(constraint.getClass())) {
-            return testRels(constraint, subjectCheck, propertyCheck, valueCheck, getRelationshipsSourceActive());
-        } else if (RelationshipConstraintTarget.class.isAssignableFrom(constraint.getClass())) {
-            return testRels(constraint, subjectCheck, propertyCheck, valueCheck, getRelationshipsTargetActive());
+        if (RelationshipConstraintOutgoing.class.isAssignableFrom(constraint.getClass())) {
+            return testRels(constraint, subjectCheck, propertyCheck, valueCheck, getRelationshipsOutgoingActive());
+        } else if (RelationshipConstraintIncoming.class.isAssignableFrom(constraint.getClass())) {
+            return testRels(constraint, subjectCheck, propertyCheck, valueCheck, getRelationshipsIncomingActive());
         } else if (DescriptionConstraint.class.isAssignableFrom(constraint.getClass())) {
             DescriptionConstraint dc = (DescriptionConstraint) constraint;
 
@@ -572,7 +572,7 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
         });
 
         try {
-            Collection<? extends ConceptVersionBI> parents = getRelationshipsSourceTargetConceptsActiveIsa();
+            Collection<? extends ConceptVersionBI> parents = getRelationshipsOutgoingTargetConceptsActiveIsa();
 
             if (parents.isEmpty()) {
                 pathList.add(nidPath);
@@ -690,7 +690,7 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
     }
 
     @Override
-    public Collection<? extends RelationshipVersionBI> getRelationshipsTargetActive()
+    public Collection<? extends RelationshipVersionBI> getRelationshipsIncomingActive()
             throws IOException, ContradictionException {
         Collection<RelationshipVersionBI> returnValues = new ArrayList<RelationshipVersionBI>();
 
@@ -702,7 +702,7 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
     }
 
     @Override
-    public Collection<? extends RelationshipVersionBI> getRelationshipsTargetActiveIsa()
+    public Collection<? extends RelationshipVersionBI> getRelationshipsIncomingActiveIsa()
             throws IOException, ContradictionException {
         Collection<RelationshipVersionBI> returnValues = new ArrayList<RelationshipVersionBI>();
 
@@ -718,7 +718,7 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
     }
 
     @Override
-    public Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConcepts() throws IOException {
+    public Collection<? extends ConceptVersionBI> getRelationshipsIncomingSourceConcepts() throws IOException {
         HashSet<ConceptVersionBI> conceptSet = new HashSet<ConceptVersionBI>();
 
         for (RelationshipChronicleBI rel : getRelationshipsIncoming()) {
@@ -733,12 +733,12 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
     }
 
     @Override
-    public Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConcepts(int typeNid) throws IOException {
-        return getRelationshipsTargetSourceConcepts(new IntSet(new int[]{typeNid}));
+    public Collection<? extends ConceptVersionBI> getRelationshipsIncomingSourceConcepts(int typeNid) throws IOException {
+        return getRelationshipsIncomingSourceConcepts(new IntSet(new int[]{typeNid}));
     }
 
     @Override
-    public Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConcepts(NidSetBI typeNids)
+    public Collection<? extends ConceptVersionBI> getRelationshipsIncomingSourceConcepts(NidSetBI typeNids)
             throws IOException {
         HashSet<ConceptVersionBI> conceptSet = new HashSet<ConceptVersionBI>();
 
@@ -756,7 +756,7 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
     }
 
     @Override
-    public Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConceptsActive()
+    public Collection<? extends ConceptVersionBI> getRelationshipsIncomingSourceConceptsActive()
             throws IOException, ContradictionException {
         HashSet<ConceptVersionBI> conceptSet = new HashSet<ConceptVersionBI>();
 
@@ -772,13 +772,13 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
     }
 
     @Override
-    public Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConceptsActive(int typeNid)
+    public Collection<? extends ConceptVersionBI> getRelationshipsIncomingSourceConceptsActive(int typeNid)
             throws IOException, ContradictionException {
-        return getRelationshipsTargetSourceConceptsActive(new IntSet(new int[]{typeNid}));
+        return getRelationshipsIncomingSourceConceptsActive(new IntSet(new int[]{typeNid}));
     }
 
     @Override
-    public Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConceptsActive(NidSetBI typeNids)
+    public Collection<? extends ConceptVersionBI> getRelationshipsIncomingSourceConceptsActive(NidSetBI typeNids)
             throws IOException, ContradictionException {
         HashSet<ConceptVersionBI> conceptSet = new HashSet<ConceptVersionBI>();
 
@@ -796,7 +796,7 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
     }
 
     @Override
-    public Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConceptsActiveIsa()
+    public Collection<? extends ConceptVersionBI> getRelationshipsIncomingSourceConceptsActiveIsa()
             throws IOException, ContradictionException {
         HashSet<ConceptVersionBI> conceptSet = new HashSet<ConceptVersionBI>();
 
@@ -814,7 +814,7 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
     }
 
     @Override
-    public Collection<? extends ConceptVersionBI> getRelationshipsTargetSourceConceptsIsa() throws IOException {
+    public Collection<? extends ConceptVersionBI> getRelationshipsIncomingSourceConceptsIsa() throws IOException {
         HashSet<ConceptVersionBI> conceptSet = new HashSet<ConceptVersionBI>();
 
         for (RelationshipChronicleBI rel : getRelationshipsIncoming()) {
@@ -874,7 +874,7 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
     }
 
     @Override
-    public Collection<? extends RelationshipVersionBI> getRelationshipsSourceActive()
+    public Collection<? extends RelationshipVersionBI> getRelationshipsOutgoingActive()
             throws IOException, ContradictionException {
         Collection<RelationshipVersionBI> returnValues = new ArrayList<RelationshipVersionBI>();
 
@@ -886,7 +886,7 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
     }
 
     @Override
-    public Collection<? extends RelationshipVersionBI> getRelationshipsSourceActiveIsa()
+    public Collection<? extends RelationshipVersionBI> getRelationshipsOutgoingActiveIsa()
             throws IOException, ContradictionException {
         Collection<RelationshipVersionBI> returnValues = new ArrayList<RelationshipVersionBI>();
 
@@ -902,7 +902,7 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
     }
 
     @Override
-    public Collection<? extends ConceptVersionBI> getRelationshipsSourceTargetConcepts() throws IOException {
+    public Collection<? extends ConceptVersionBI> getRelationshipsOutgoingTargetConcepts() throws IOException {
         HashSet<ConceptVersionBI> conceptSet = new HashSet<ConceptVersionBI>();
 
         for (RelationshipChronicleBI rel : getRelationshipsOutgoing()) {
@@ -917,12 +917,12 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
     }
 
     @Override
-    public Collection<? extends ConceptVersionBI> getRelationshipsSourceTargetConcepts(int typeNid) throws IOException {
-        return getRelationshipsSourceTargetConcepts(new IntSet(new int[]{typeNid}));
+    public Collection<? extends ConceptVersionBI> getRelationshipsOutgoingTargetConcepts(int typeNid) throws IOException {
+        return getRelationshipsOutgoingTargetConcepts(new IntSet(new int[]{typeNid}));
     }
 
     @Override
-    public Collection<? extends ConceptVersionBI> getRelationshipsSourceTargetConcepts(NidSetBI typeNids)
+    public Collection<? extends ConceptVersionBI> getRelationshipsOutgoingTargetConcepts(NidSetBI typeNids)
             throws IOException {
         HashSet<ConceptVersionBI> conceptSet = new HashSet<ConceptVersionBI>();
 
@@ -940,7 +940,7 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
     }
 
     @Override
-    public Collection<? extends ConceptVersionBI> getRelationshipsSourceTargetConceptsActive()
+    public Collection<? extends ConceptVersionBI> getRelationshipsOutgoingTargetConceptsActive()
             throws IOException, ContradictionException {
         HashSet<ConceptVersionBI> conceptSet = new HashSet<ConceptVersionBI>();
 
@@ -956,13 +956,13 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
     }
 
     @Override
-    public Collection<? extends ConceptVersionBI> getRelationshipsSourceTargetConceptsActive(int typeNid)
+    public Collection<? extends ConceptVersionBI> getRelationshipsOutgoingTargetConceptsActive(int typeNid)
             throws IOException, ContradictionException {
-        return getRelationshipsSourceTargetConceptsActive(new IntSet(new int[]{typeNid}));
+        return getRelationshipsOutgoingTargetConceptsActive(new IntSet(new int[]{typeNid}));
     }
 
     @Override
-    public Collection<? extends ConceptVersionBI> getRelationshipsSourceTargetConceptsActive(NidSetBI typeNids)
+    public Collection<? extends ConceptVersionBI> getRelationshipsOutgoingTargetConceptsActive(NidSetBI typeNids)
             throws IOException, ContradictionException {
         HashSet<ConceptVersionBI> conceptSet = new HashSet<ConceptVersionBI>();
 
@@ -980,7 +980,7 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
     }
 
     @Override
-    public Collection<? extends ConceptVersionBI> getRelationshipsSourceTargetConceptsActiveIsa()
+    public Collection<? extends ConceptVersionBI> getRelationshipsOutgoingTargetConceptsActiveIsa()
             throws IOException, ContradictionException {
         HashSet<ConceptVersionBI> conceptSet = new HashSet<ConceptVersionBI>();
 
@@ -998,7 +998,7 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
     }
 
     @Override
-    public Collection<? extends ConceptVersionBI> getRelationshipsSourceTargetConceptsIsa() throws IOException {
+    public Collection<? extends ConceptVersionBI> getRelationshipsOutgoingTargetConceptsIsa() throws IOException {
         HashSet<ConceptVersionBI> conceptSet = new HashSet<ConceptVersionBI>();
 
         for (RelationshipChronicleBI rel : getRelationshipsOutgoing()) {
@@ -1015,7 +1015,7 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
     }
 
     @Override
-    public int[] getRelationshipsSourceTargetNidsActiveIsa() throws IOException {
+    public int[] getRelationshipsOutgoingTargetNidsActiveIsa() throws IOException {
         OpenIntIntHashMap nidList = new OpenIntIntHashMap(10);
 
         for (RelationshipChronicleBI rel : getRelationshipsOutgoing()) {
@@ -1110,7 +1110,7 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
 
     @Override
     public boolean hasChildren() throws IOException, ContradictionException {
-        Collection<? extends RelationshipVersionBI> children = this.getRelationshipsTargetActive();
+        Collection<? extends RelationshipVersionBI> children = this.getRelationshipsIncomingActive();
 
         if (children.isEmpty()) {
             return false;
@@ -1242,7 +1242,7 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
 
     @Override
     public boolean isChildOf(ConceptVersionBI possibleParent) throws IOException {
-        for (int nid : getRelationshipsSourceTargetNidsActiveIsa()) {
+        for (int nid : getRelationshipsOutgoingTargetNidsActiveIsa()) {
             if (nid == possibleParent.getNid()) {
                 return true;
             }

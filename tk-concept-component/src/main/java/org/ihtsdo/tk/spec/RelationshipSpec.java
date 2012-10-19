@@ -20,8 +20,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import org.ihtsdo.tk.api.constraint.RelationshipConstraintTarget;
-import org.ihtsdo.tk.api.constraint.RelationshipConstraintSource;
+import org.ihtsdo.tk.api.constraint.RelationshipConstraintIncoming;
+import org.ihtsdo.tk.api.constraint.RelationshipConstraintOutgoing;
 
 /**
  * The Class RelationshipSpec provides a way of representing a relationship in a
@@ -119,8 +119,8 @@ public class RelationshipSpec implements SpecBI {
      *
      * @return the source relationship constraint
      */
-    public RelationshipConstraintSource getSourceRelationshipConstraint() {
-        return new RelationshipConstraintSource(originSpec, relTypeSpec, destinationSpec);
+    public RelationshipConstraintOutgoing getSourceRelationshipConstraint() {
+        return new RelationshipConstraintOutgoing(originSpec, relTypeSpec, destinationSpec);
     }
 
     /**
@@ -128,8 +128,8 @@ public class RelationshipSpec implements SpecBI {
      *
      * @return the target relationship constraint
      */
-    public RelationshipConstraintTarget getTargetRelationshipConstraint() {
-        return new RelationshipConstraintTarget(originSpec, relTypeSpec, destinationSpec);
+    public RelationshipConstraintIncoming getTargetRelationshipConstraint() {
+        return new RelationshipConstraintIncoming(originSpec, relTypeSpec, destinationSpec);
     }
 
     /**

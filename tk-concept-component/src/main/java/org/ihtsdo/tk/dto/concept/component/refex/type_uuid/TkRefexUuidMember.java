@@ -285,7 +285,7 @@ public class TkRefexUuidMember extends TkRefexAbstractMember<TkRefexUuidRevision
      * Returns a string representation of this TK Refex Uuid Member object.
      *
      * @return a string representation of this TK Refex Uuid Member object
-     * including the concept represented by the uuid.
+     * including the concept represented by the uuid
      */
     @Override
     public String toString() {

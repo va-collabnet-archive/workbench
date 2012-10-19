@@ -42,8 +42,6 @@ public abstract class ConcurrencyLocks {
      * Instantiates a new concurrency locks using the given
      * <code>concurrencyLevel</code>.
      *
-     * TODO-javadoc-kec: is this correct?
-     *
      * @param concurrencyLevel an <code>int</code> indicating how many locks are
      * available for this concurrency lock
      */

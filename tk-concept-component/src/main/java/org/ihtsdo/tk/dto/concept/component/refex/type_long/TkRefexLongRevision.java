@@ -170,7 +170,7 @@ public class TkRefexLongRevision extends TkRevision {
      * Returns a string representation of this TK Refex Long Revision object.
      *
      * @return a string representation of this TK Refex Long Revision object
-     * including the concept represented by the uuid.
+     * including the long value
      */
     @Override
     public String toString() {

@@ -205,7 +205,7 @@ public abstract class ContradictionManagementStrategy implements ContradictionMa
 
     /**
      * 
-     * @param conceptAttributteChronicle the concept attribute to test
+     * @param conceptAttributeChronicle the concept attribute to test
      * @return <code>true</code> if this conceptAttribute is in conflict according to the
      * resolution strategy
      */

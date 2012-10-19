@@ -56,7 +56,7 @@ public class PositionSet implements PositionSetBI, Serializable {
     }
 
     /**
-     * Write a <code>PositionSet</code> object to an external source, including the
+     * Write this <code>PositionSet</code> object to an external source, including the
      * positions and path nids.
      *
      * @param out the output stream

@@ -192,8 +192,8 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     }
     
     @Override
-    public void iterateSapDataInSequence(ProcessStampDataBI processor) throws Exception {
-        Bdb.getSapDb().iterateSapDataInSequence(processor);
+    public void iterateStampDataInSequence(ProcessStampDataBI processor) throws Exception {
+        Bdb.getSapDb().iterateStampDataInSequence(processor);
     }
     
     @Override
@@ -551,7 +551,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     }
     
     @Override
-    public int getReadOnlyMaxSap() {
+    public int getReadOnlyMaxStamp() {
         return Bdb.getSapDb().getReadOnlyMax();
     }
     

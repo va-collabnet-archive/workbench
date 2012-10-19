@@ -54,8 +54,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
     void addTermChangeListener(TermChangeListener termChangeListener);
 
     /**
-     * Suspend change notifications. TODO-javadoc: are these term change
-     * notifications? yes
+     * Suspend term change notifications. T
      *
      * @deprecated not in TK3
      */
@@ -63,8 +62,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
     void suspendChangeNotifications();
 
     /**
-     * Resume change notifications. TODO-javadoc: are these term change
-     * notifications? yes
+     * Resume term change notifications.
      *
      * @deprecated not in TK3
      */
@@ -107,7 +105,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * @see ProcessUnfetchedConceptDataBI
      *
      */
-    void iterateSapDataInSequence(ProcessStampDataBI processor) throws Exception;
+    void iterateStampDataInSequence(ProcessStampDataBI processor) throws Exception;
 
     /**
      * Removes the specified
@@ -132,10 +130,10 @@ public interface TerminologyStoreDI extends TerminologyDI {
     PositionBI newPosition(PathBI path, long time) throws IOException;
 
     /**
-     * Satisfies dependencies. TODO-javadoc: what does this do?
+     * Checks if the specified <code>dependencies</code> are satisfied.
      *
-     * @param dependencies the dependencies
-     * @return <code>true</code>, if successful
+     * @param dependencies the dependencies in question
+     * @return <code>true</code>, if the dependencies are satisfied
      * @deprecated not in TK3
      */
     @Deprecated
@@ -374,16 +372,18 @@ public interface TerminologyStoreDI extends TerminologyDI {
     Map<Integer, ConceptChronicleBI> getConcepts(NidBitSetBI conceptNids) throws IOException;
 
     /**
-     * Gets the conflict identifier. TODO-javadoc: what is the useCase?
+     * Gets a conflict identifier to use for identifying conflicts.
      *
-     * @param viewCoordinate the view coordinate
-     * @param useCase the use case
-     * @return the conflict identifier
+     * @param viewCoordinate the view coordinate specifying which versions are
+     * active or inactive
+     * @param useCase set to <code>true</code> if the conflict identifier should
+     * return the conflicting versions
+     * @return a conflict identifier
      */
     ContradictionIdentifierBI getConflictIdentifier(ViewCoordinate viewCoordinate, boolean useCase);
 
     /**
-     * Gets an empty nid set. TODO-javadoc: need overview of nid set
+     * Gets an empty nid set.
      *
      * @return an empty nid set
      * @throws IOException signals that an I/O exception has occurred
@@ -391,9 +391,10 @@ public interface TerminologyStoreDI extends TerminologyDI {
     NidBitSetBI getEmptyNidSet() throws IOException;
 
     /**
-     * Gets the latest change set dependencies. TODO-javadoc: Can attach
-     * changeset dependancy to a task, will see if those are in the db, can hide
-     * task in inbox until cs are in db
+     * Gets the latest change set dependencies. Can associate a changeset
+     * dependency with an object, such as a task. This method gets a collection
+     * of all of the changeset dependencies for the latest changesets to be
+     * written and read.
      *
      * @return the latest change set dependencies
      * @throws IOException signals that an I/O exception has occurred
@@ -455,12 +456,11 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * @deprecated not in TK3
      */
     @Deprecated
-    int getReadOnlyMaxSap();
+    int getReadOnlyMaxStamp();
 
     /**
      * Gets the paths which have the path specified by the given
-     * <code>pathNid</code> as an origin. TODO-javadoc: getting children or
-     * descendants? change name if descendants
+     * <code>pathNid</code> as an immediate origin.
      *
      * @param pathNid the path nid associated with the desired origin path
      * @return a list of paths which are a child of the specified path
@@ -484,9 +484,12 @@ public interface TerminologyStoreDI extends TerminologyDI {
     int[] getPossibleChildren(int conceptNid, ViewCoordinate viewCoordinate) throws IOException, ContradictionException;
 
     /**
-     * Gets the sequence. TODO-javadoc: db last change sequence
+     * Gets the sequence representing the last change in the database. For
+     * example, this sequence can be used to determine if the database has
+     * changed since a component was drawn, and therefor, if the layout needs to
+     * be refreshed.
      *
-     * @return the sequence
+     * @return the sequence representing the last change in the database
      * @deprecated not in TK3
      */
     @Deprecated
@@ -498,7 +501,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * components rather than chronicles.
      *
      * @param viewCoordinate the view coordinate specifying which version of
-     * components and concepts should be used by the methods on * * * * *      * the <code>TerminolgoySnapshotDI</code> interface.
+     * components and concepts should be used by the methods on      * the <code>TerminolgoySnapshotDI</code> interface.
      * @return the terminology snapshot as specified
      */
     TerminologySnapshotDI getSnapshot(ViewCoordinate viewCoordinate);
@@ -736,17 +739,16 @@ public interface TerminologyStoreDI extends TerminologyDI {
 
     /**
      * Checks to see of the component specified by the
-     * <code>componentNid</code> is a member of the refset specified by the
-     * <code>refsetNid</code>.
+     * <code>componentNid</code> is a member of the refex collection specified by the
+     * <code>refexNid</code>.
      *
-     * @param refsetNid the refset nid associated with the refset in question
-     * TODO-javadoc: should this be refex?
+     * @param refexNid the nid associated with the refex collection in question
      * @param componentNid the component nid associated with the component in
      * question
      * @return <code>true</code>, if the specified component is a member of the
-     * specified refset
+     * specified refex
      */
-    boolean hasExtension(int refsetNid, int componentNid);
+    boolean hasExtension(int refexNid, int componentNid);
 
     /**
      * The Enum CONCEPT_EVENT lists the possible types of concept events.
@@ -781,17 +783,22 @@ public interface TerminologyStoreDI extends TerminologyDI {
     void touchComponent(int nid);
 
     /**
-     * Touch component alert. TODO-javadoc: listening for an alert (information) about a component
+     * Creates a change notification event that the component associated with
+     * the given
+     * <code>nid</code> has changed.
      *
-     * @param nid the nid
+     * @param nid the nid associated with the changed component
      * @deprecated not in TK3
      */
     @Deprecated
     void touchComponentAlert(int nid);
 
     /**
-     * Touch component template. TODO-javadoc: listening for a template about a component, template available
-     * @param nid the nid
+     * Creates a change notification event that there is a template available
+     * for the component associated with the given
+     * <code>nid</code>.
+     *
+     * @param nid the nid associated with component for the template
      * @deprecated not in TK3
      */
     @Deprecated
@@ -913,8 +920,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
     Set<Integer> getAncestors(int childNid, ViewCoordinate viewCoordinate) throws IOException, ContradictionException;
 
     /**
-     * Gets the nids of incoming relationships source concepts. TODO-javadoc:
-     * fix
+     * Gets the nids of incoming relationships source concepts. 
      *
      * In the relationship A is a B, the concept A has a target relationship to
      * the concept B, and the concept B has a source relationship to the concept

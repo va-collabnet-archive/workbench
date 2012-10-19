@@ -220,7 +220,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
             descCABs.add(descBp);
             descBp.getAnnotationBlueprintsFromOriginal();
         }
-        for (RelationshipVersionBI rv : conceptVersion.getRelationshipsSourceActive()) {
+        for (RelationshipVersionBI rv : conceptVersion.getRelationshipsOutgoingActive()) {
             if (rv.getCharacteristicNid() == SnomedMetadataRf1.INFERRED_DEFINING_CHARACTERISTIC_TYPE_RF1.getLenient().getNid()
                     || rv.getCharacteristicNid() == SnomedMetadataRf1.DEFINING_CHARACTERISTIC_TYPE_RF1.getLenient().getNid()
                     || rv.getCharacteristicNid() == SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2.getLenient().getNid()) {
@@ -842,9 +842,9 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      * Gets the concept attribute blueprint associated with this concept
      * blueprint.
      *
-     * @return the concept attributte blueprint
+     * @return the concept attribute blueprint
      */
-    public ConceptAttributeAB getConceptAttributteAB() {
+    public ConceptAttributeAB getConceptAttributeAB() {
         return conAttr;
     }
 

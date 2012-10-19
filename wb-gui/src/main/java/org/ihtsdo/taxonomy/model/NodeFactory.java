@@ -170,7 +170,7 @@ public class NodeFactory {
         if (model.ts.getPossibleChildren(nodeConcept.getNid()).length == 0) {
             boolean multiParent = false;
             
-            for (RelationshipVersionBI isaRel : nodeConcept.getRelationshipsSourceActiveIsa()) {
+            for (RelationshipVersionBI isaRel : nodeConcept.getRelationshipsOutgoingActiveIsa()) {
                 if (isaRel == null || parentNode == null) {
                     continue;
                 } else if (isaRel.getTargetNid() != parentNode.getConceptNid()) {
@@ -276,7 +276,7 @@ public class NodeFactory {
     private void setExtraParents(ConceptVersionBI nodeConcept, TaxonomyNode node)
             throws ContradictionException, IOException {
         if (node.getParentNid() != Integer.MAX_VALUE) {    // test if root
-            for (ConceptVersionBI parent : nodeConcept.getRelationshipsSourceTargetConceptsActiveIsa()) {
+            for (ConceptVersionBI parent : nodeConcept.getRelationshipsOutgoingTargetConceptsActiveIsa()) {
                 if (parent.getNid() != node.getParentNid()) {
                     node.setHasExtraParents(true);
                     
