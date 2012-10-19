@@ -19,7 +19,7 @@ package org.dwfa.ace.api;
 import java.util.Set;
 
 import org.ihtsdo.tk.api.PositionBI;
-import org.ihtsdo.tk.api.coordinate.PositionSet;
+import org.ihtsdo.tk.api.PositionSet;
 
 
 public class PositionSetReadOnly extends PositionSet {

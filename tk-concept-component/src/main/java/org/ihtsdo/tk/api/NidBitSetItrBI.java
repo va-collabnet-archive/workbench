@@ -18,18 +18,18 @@ package org.ihtsdo.tk.api;
 
 import java.io.IOException;
 
-// TODO: Auto-generated Javadoc
+
 /**
- * The Interface NidBitSetItrBI. TODO-javadoc: need overview
+ * The Interface NidBitSetItrBI.
  */
 public interface NidBitSetItrBI {
     
     /**
-     * Returns the current native id.
+     * Returns the current nid.
      * <p>
      * This is invalid until {@link #next()} is called for the first time.
      *
-     * @return the int
+     * @return the nid
      */
     public int nid();
 
@@ -37,7 +37,7 @@ public interface NidBitSetItrBI {
      * Moves to the next identifier in the set. Returns true, if
      * there is such a nid.
      *
-     * @return <code>true</code>, if successful
+     * @return <code>true</code>, if there is another identifier in the set
      * @throws IOException signals that an I/O exception has occurred
      */
     public boolean next() throws IOException;
@@ -46,7 +46,7 @@ public interface NidBitSetItrBI {
      * Skips entries to the first beyond the current whose nid is
      * greater than or equal to <i>targetNid</i>.
      * <p>
-     * Returns true iff there is such an entry.
+     * Returns true if there is such an entry.
      * <p>
      * Behaves as if written:
      * 

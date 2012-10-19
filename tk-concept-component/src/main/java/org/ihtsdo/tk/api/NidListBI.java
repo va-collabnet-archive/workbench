@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2012 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.tk.api;
 
@@ -23,203 +23,225 @@ import java.util.ListIterator;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Interface NidListBI. All implementations must serialize the list as uuids.
- * TODO-javadoc: udpate
+ * The Interface NidListBI represents a serializable list of nids. All
+ * implementations must serialize the set using uuids.
  */
 public interface NidListBI {
 
     /**
-     * Adds the.
+     * Adds the given
+     * <code>nid</code> in the specified
+     * <code>index</code>.
      *
-     * @param index the index
-     * @param element the element
+     * @param index the index at which the specified nid is to be inserted
+     * @param nid the nid to add
      */
-    public void add(int index, Integer element);
+    public void add(int index, Integer nid);
 
     /**
-     * Adds the.
+     * Adds the specified
+     * <code>nid</code> to the end of this nid list.
      *
-     * @param o the o
+     * @param nid the nid to add
+     * @return <code>true</code>, if the collection changed as a result
+     */
+    public boolean add(Integer nid);
+
+    /**
+     * Adds the specified
+     * <code>nids</code> to the end of this nid list.
+     *
+     * @param nids a collection of nids to add
+     * @return <code>true</code>, if the collection changed as a result
+     */
+    public boolean addAll(Collection<? extends Integer> nids);
+
+    /**
+     * Adds the given
+     * <code>nids</code> in the specified
+     * <code>index</code>.
+     *
+     * @param index the index at which the specified nid is to be inserted
+     * @param nids a collection of nids to add
      * @return <code>true</code>, if successful
      */
-    public boolean add(Integer o);
+    public boolean addAll(int index, Collection<? extends Integer> nids);
 
     /**
-     * Adds the all.
-     *
-     * @param c the c
-     * @return <code>true</code>, if successful
-     */
-    public boolean addAll(Collection<? extends Integer> c);
-
-    /**
-     * Adds the all.
-     *
-     * @param index the index
-     * @param c the c
-     * @return <code>true</code>, if successful
-     */
-    public boolean addAll(int index, Collection<? extends Integer> c);
-
-    /**
-     * Clear.
+     * Removes all of the nids from this nid list.
      */
     public void clear();
 
     /**
-     * Contains.
+     * Checks if this nid list contains the specified nid.
      *
-     * @param obj the obj
-     * @return <code>true</code>, if successful
+     * @param obj the nid in question
+     * @return <code>true</code>, if this nid list contains the specified nid
      */
     public boolean contains(Object obj);
 
     /**
-     * Contains all.
+     * Checks if this nid list contains the specified nids.
      *
-     * @param c the c
-     * @return <code>true</code>, if successful
+     * @param c the nids in question
+     * @return <code>true</code>, if this nid list contains the specified nids
      */
     public boolean containsAll(Collection<?> c);
 
     /**
-     * Gets the.
+     * Gets the nid at the specified
+     * <code>index</code> in this nid list.
      *
-     * @param index the index
-     * @return the integer
+     * @param index the index of the nid to return
+     * @return the nid at the specified position
      */
     public Integer get(int index);
 
     /**
-     * Index of.
+     * Gets the index of the first occurrence of the specified nid, or -1 if
+     * this nid list does not contain the nid.
      *
-     * @param obj the obj
-     * @return the int
+     * @param obj the nid to search for
+     * @return the index of the first occurrence of the specified nid, or -1 if
+     * this nid list does not contain the nid
      */
     public int indexOf(Object obj);
 
     /**
-     * Checks if is empty.
+     * Checks if this nid list is empty.
      *
-     * @return <code>true</code>, if is empty
+     * @return <code>true</code>, if this nid list contains no nids
      */
     public boolean isEmpty();
 
     /**
-     * Iterator.
+     * Returns an iterator that will iterate of the nids in this nid list in the
+     * proper sequence.
      *
-     * @return the iterator
+     * @return an iterator that will iterate of the nids in this nid list in the
+     * proper sequence
      */
     public Iterator<Integer> iterator();
 
     /**
-     * Last index of.
+     * Returns the index of the last occurrence of the specified nid in this nid
+     * list, or -1 if this nid list does not contain the nid.
      *
-     * @param obj the obj
-     * @return the int
+     * @param obj the nid to search for
+     * @return the index of the last occurrence of the specified nid in this nid
+     * list, or -1 if this nid list does not contain the nid
      */
     public int lastIndexOf(Object obj);
 
     /**
-     * List iterator.
+     * Returns a list iterator over the nids in this nid list (in proper
+     * sequence).
      *
-     * @return the list iterator
+     * @return Returns a list iterator over the nids in this nid list (in proper
+     * sequence).
      */
     public ListIterator<Integer> listIterator();
 
     /**
-     * List iterator.
+     * Returns a list iterator of the nids in this nid list (in proper
+     * sequence), starting at the specified position in this nid list.
      *
-     * @param index the index
-     * @return the list iterator
+     * @param index the index of the first nid to be returned
+     * @return a list iterator of the nids in this nid list (in proper
+     * sequence), starting at the specified position in this nid list
      */
     public ListIterator<Integer> listIterator(int index);
 
     /**
-     * Removes the.
+     * Removes the nid at the specified position in this nid list.
      *
-     * @param index the index
-     * @return the integer
+     * @param index the index of the nid to remove
+     * @return the nid previously at the specified position
      */
     public Integer remove(int index);
 
     /**
-     * Removes the.
+     * Removes the first occurrence of the specified nid from this nid list, if
+     * it is present.
      *
-     * @param obj the obj
-     * @return <code>true</code>, if successful
+     * @param obj nid to be removed from this list
+     * @return <code>true</code>, if this nid list contained the specified nid
      */
     public boolean remove(Object obj);
 
     /**
-     * Removes the all.
+     * Removes from this nid list all of its nids that are contained in the
+     * specified collection.
      *
-     * @param c the c
-     * @return <code>true</code>, if successful
+     * @param c the nids to remove
+     * @return <code>true</code>, if this nid list changed as a result
      */
     public boolean removeAll(Collection<?> c);
 
     /**
-     * Retain all.
+     * Retains only the nids in this nid list that are contained in the
+     * specified collection.
      *
-     * @param c the c
-     * @return <code>true</code>, if successful
+     * @param c the nids to retain
+     * @return <code>true</code>, if this nid list changed as a result
      */
     public boolean retainAll(Collection<?> c);
 
     /**
-     * Sets the.
+     * Replaces the nid at the specified position in this nid list with the
+     * specified nid.
      *
-     * @param index the index
-     * @param element the element
-     * @return the integer
+     * @param index the index of the nid to replace
+     * @param nid the new nid
+     * @return the nid previously at the specified position
      */
-    public Integer set(int index, Integer element);
+    public Integer set(int index, Integer nid);
 
     /**
-     * Size.
+     * The number of nids in this nid list.
      *
-     * @return the int
+     * @return an int representing the number of nids in this nid list
      */
     public int size();
 
     /**
-     * Sub list.
+     * Returns a view of the portion of this nid list between the specified
+     * <code>fromIndex</code>, inclusive, and <code>toIndex</code>, exclusive.
      *
-     * @param fromIndex the from index
-     * @param toIndex the to index
-     * @return the list
+     * @param fromIndex low endpoint (inclusive) of the subList
+     * @param toIndex high endpoint (exclusive) of the subList
+     * @return a view of the specified range within this nid list
+     * @see List#subList(int, int) 
      */
     public List<Integer> subList(int fromIndex, int toIndex);
 
     /**
-     * To array.
+     * Returns an array representing the nids in this nid list.
      *
-     * @return the object[]
+     * @return an array representing the nids in this nid list
      */
     public Object[] toArray();
 
     /**
-     * To array.
-     *
-     * @param <T> the generic type
-     * @param a the a
-     * @return the t[]
+     * Returns an array representing the nids in this nid list.
+     * @param <T> the type of the new array
+     * @param a the array to store the new elements
+     * @return an array representing the set of positions
+     * @see List#toArray(T[]) 
      */
     public <T> T[] toArray(T[] a);
 
     /**
-     * Gets the list values.
+     * Gets a list representing the nids in this nid list.
      *
-     * @return the list values
+     * @return a list representing the nids in this nid list
      */
     public List<Integer> getListValues();
 
     /**
-     * Gets the list array.
+     *  Gets an array representing the nids in this nid list.
      *
-     * @return the list array
+     * @return an array representing the nids in this nid list
      */
     public int[] getListArray();
-
 }

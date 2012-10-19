@@ -23,7 +23,7 @@ import java.util.UUID;
 
 import org.dwfa.ace.utypes.UniversalAceIdentification;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.api.coordinate.PositionSet;
+import org.ihtsdo.tk.api.PositionSet;
 
 public interface I_Identify extends I_AmTermComponent {
 

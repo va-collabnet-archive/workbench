@@ -19,25 +19,22 @@ package org.ihtsdo.tk.api;
 import java.io.Serializable;
 import java.util.Set;
 
-
-
-// TODO: Auto-generated Javadoc
 /**
- * The Interface PositionSetBI. TODO-javadoc: how is this different from position?
+ * The Interface PositionSetBI represents a serializable set of positions.
  */
 public interface PositionSetBI extends Set<PositionBI>, Serializable {
     
     /**
-     * Gets the view path nid set.
+     * Gets a nid set of all of the view path nids represented in this position set.
      *
-     * @return the view path nid set
+     * @return a set of view path nids
      */
     public NidSetBI getViewPathNidSet();
     
     /**
-     * Gets the position array.
+     * Gets an array representation of all of the positions in this position set.
      *
-     * @return the position array
+     * @return an array representing this position set
      */
     public PositionBI[] getPositionArray();
 	

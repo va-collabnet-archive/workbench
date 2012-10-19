@@ -25,11 +25,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import org.ihtsdo.tk.Ts;
 
-// TODO: Auto-generated Javadoc
+
 /**
- * The Class NidSet represents a bit set optimized for use with nids. It should
- * be used for sets with large numbers of nids. For example, the lists of all
- * concept identifiers when iterating the database.
+ * The Class NidSet represents a serializable set of nids.
  */
 public class NidSet implements NidSetBI, Serializable {
 
@@ -79,10 +77,11 @@ public class NidSet implements NidSetBI, Serializable {
     }
 
     /**
-     * Instantiates a new native id set based on the given <code>values</code>.
+     * Instantiates a new native id set based on the given
+     * <code>values</code>.
      *
-     * @param values an array specifying the values to use in
-     * constructing this nid set
+     * @param values an array specifying the values to use in constructing this
+     * nid set
      */
     public NidSet(int[] values) {
         super();
@@ -119,7 +118,8 @@ public class NidSet implements NidSetBI, Serializable {
     }
 
     /**
-     * Instantiates a new native id set based on the given <code>paths</code>.
+     * Instantiates a new native id set based on the given
+     * <code>paths</code>.
      *
      * @param paths the path concepts to use in constructing this nid set
      */
@@ -133,43 +133,48 @@ public class NidSet implements NidSetBI, Serializable {
         Arrays.sort(setValues);
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * Checks if this nid set contains the specified
+     * <code>nid</code>.
      *
-     * @see org.dwfa.ace.api.I_IntSet#contains(int)
+     * @param nid the nid in question
+     * @return true if this nid set contains the specified nid
      */
     @Override
-    public boolean contains(int key) {
-        return Arrays.binarySearch(setValues, key) >= 0;
+    public boolean contains(int nid) {
+        return Arrays.binarySearch(setValues, nid) >= 0;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * Gets an array representing the nids in this set.
      *
-     * @see org.dwfa.ace.api.I_IntSet#getSetValues()
+     * @return an array representing the nids in this set
      */
     @Override
     public int[] getSetValues() {
         return setValues;
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.api.NidSetBI#add(int)
+    /**
+     * Adds the specified
+     * <code>nid</code> to this nid set.
+     *
+     * @param nid the nid to add
      */
     @Override
-    public synchronized void add(int key) {
+    public synchronized void add(int nid) {
         if (setValues.length == 0) {
             setValues = new int[1];
-            setValues[0] = key;
+            setValues[0] = nid;
         } else {
-            int insertionPoint = Arrays.binarySearch(setValues, key);
+            int insertionPoint = Arrays.binarySearch(setValues, nid);
             if (insertionPoint >= 0) {
                 return;
             }
             insertionPoint = -insertionPoint - 1;
             int[] newSet = new int[setValues.length + 1];
             System.arraycopy(setValues, 0, newSet, 0, insertionPoint);
-            newSet[insertionPoint] = key;
+            newSet[insertionPoint] = nid;
             for (int i = insertionPoint + 1; i < newSet.length; i++) {
                 newSet[i] = setValues[i - 1];
             }
@@ -177,12 +182,15 @@ public class NidSet implements NidSetBI, Serializable {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.api.NidSetBI#remove(int)
+    /**
+     * Removes the specified
+     * <code>nid</code> from this nid set.
+     *
+     * @param nid the nid to remove
      */
     @Override
-    public void remove(int key) {
-        int insertionPoint = Arrays.binarySearch(setValues, key);
+    public void remove(int nid) {
+        int insertionPoint = Arrays.binarySearch(setValues, nid);
         if (insertionPoint < 0) {
             return;
         }
@@ -194,39 +202,43 @@ public class NidSet implements NidSetBI, Serializable {
         setValues = newSet;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * Adds all of the given
+     * <code>nids</code> to this nid set.
      *
-     * @see org.dwfa.ace.api.I_IntSet#addAll(int[])
+     * @param nids an array of nids to add
+     * @return this nid set with the additional nids
      */
     @Override
-    public synchronized NidSet addAll(int[] keys) {
+    public synchronized NidSet addAll(int[] nids) {
         HashSet<Integer> members = getAsSet();
-        for (int key : keys) {
+        for (int key : nids) {
             members.add(key);
         }
         replaceWithSet(members);
         return this;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * Removes all of the given
+     * <code>nids</code> from this nid set.
      *
-     * @see org.dwfa.ace.api.I_IntSet#removeAll(int[])
+     * @param nids an array of nids to remove
      */
     @Override
-    public synchronized void removeAll(int[] keys) {
+    public synchronized void removeAll(int[] nids) {
         HashSet<Integer> members = getAsSet();
-        for (int key : keys) {
+        for (int key : nids) {
             members.remove(key);
         }
         replaceWithSet(members);
     }
 
     /**
-     * Gets the as set.
+     * Returns this nid set as a
+     * <code>HashSet</code>.
      *
-     * @return the as set
+     * @return a hash set representing this nid set
      */
     public HashSet<Integer> getAsSet() {
         HashSet<Integer> members = new HashSet<Integer>();
@@ -237,9 +249,10 @@ public class NidSet implements NidSetBI, Serializable {
     }
 
     /**
-     * Replace with set.
+     * Replaces the nids in this nid set with the given
+     * <code>nids</code>.
      *
-     * @param nids the nids
+     * @param nids a hash set of the nids to replace with
      */
     public void replaceWithSet(HashSet<Integer> nids) {
         setValues = new int[nids.size()];
@@ -250,18 +263,19 @@ public class NidSet implements NidSetBI, Serializable {
         Arrays.sort(setValues);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.dwfa.ace.api.I_IntSet#clear()
+    /**
+     * Clears the nids in this set.
      */
     @Override
     public void clear() {
         setValues = new int[0];
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
+    /**
+     * Checks to see if this nid set is equal to another nid set.
+     *
+     * @param obj the nid set to check
+     * @return <code>true</code> if the nid sets are equal
      */
     @Override
     public boolean equals(Object obj) {
@@ -280,24 +294,31 @@ public class NidSet implements NidSetBI, Serializable {
         return super.equals(obj);
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
+    /**
+     * Returns the hash code value for this set.
+     *
+     * @return the hash code value for this set
+     *
+     * @see Set#hashCode()
      */
     @Override
     public int hashCode() {
         return super.hashCode();
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.api.NidSetBI#size()
+    /**
+     *
+     *
+     * @return an int representing the number of nids in this nid set
      */
     @Override
     public int size() {
         return setValues.length;
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.api.NidSetBI#getMax()
+    /**
+     *
+     * @return the max value of a nid in this nid set
      */
     @Override
     public int getMax() {
@@ -307,8 +328,9 @@ public class NidSet implements NidSetBI, Serializable {
         return setValues[setValues.length - 1];
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.api.NidSetBI#getMin()
+    /**
+     *
+     * @return the min value of a nid in this nid set
      */
     @Override
     public int getMin() {
@@ -318,8 +340,9 @@ public class NidSet implements NidSetBI, Serializable {
         return setValues[0];
     }
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.tk.api.NidSetBI#contiguous()
+    /**
+     *
+     * @return <code>true</code>, if the nids in this set are contiguous
      */
     @Override
     public boolean contiguous() {
@@ -336,8 +359,12 @@ public class NidSet implements NidSetBI, Serializable {
         return true;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
+    /**
+     * A string representing all of the concepts associated with the nids in
+     * this set.
+     *
+     * @return a string representing all of the concepts associated with the
+     * nids in this set
      */
     @Override
     public String toString() {

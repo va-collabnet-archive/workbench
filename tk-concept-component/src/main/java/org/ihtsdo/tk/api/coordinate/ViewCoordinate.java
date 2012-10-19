@@ -17,6 +17,7 @@
 package org.ihtsdo.tk.api.coordinate;
 
 //~--- non-JDK imports --------------------------------------------------------
+import org.ihtsdo.tk.api.PositionSet;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.ContradictionException;
