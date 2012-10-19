@@ -21,7 +21,6 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.util.Database;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.KindOfCacheBI;
 import java.io.File;
 import java.io.IOException;
 
@@ -43,7 +42,6 @@ public class SctIDChangeSetCreation extends TestCase {
 
 	private static I_TermFactory _termfactory;
 	I_ConfigAceFrame _aceConfig;
-	public static KindOfCacheBI myStaticIsACache;
 
 	/**
 	 * Create the test case

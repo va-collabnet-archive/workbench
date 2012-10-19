@@ -41,7 +41,6 @@ import org.ihtsdo.rf2.util.Database;
 import org.ihtsdo.rf2.util.ExportUtil;
 
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.KindOfCacheBI;
 
 
 import java.io.BufferedInputStream;
@@ -95,7 +94,6 @@ public class InsertIDTest extends TestCase {
 
 	private I_IntSet allowedDestRelTypes;
 	private I_GetConceptData snomedRoot;
-	public static KindOfCacheBI myStaticIsACache;
 
 	/**
 	 * Create the test case
