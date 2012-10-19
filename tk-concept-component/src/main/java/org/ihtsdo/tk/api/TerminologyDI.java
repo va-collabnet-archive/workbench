@@ -16,6 +16,8 @@
  */
 package org.ihtsdo.tk.api;
 
+import java.beans.PropertyChangeListener;
+import java.beans.VetoableChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
@@ -26,8 +28,11 @@ import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
 import org.ihtsdo.tk.api.search.ScoredComponentReference;
+import org.ihtsdo.tk.db.DbDependency;
 
 /**
  * The Interface TerminologyDI provides methods for working with terminology
@@ -252,4 +257,145 @@ public interface TerminologyDI {
      * @throws IOException signals that an I/O exception has occurred
      */
     int getNidFromAlternateId(UUID authorityUuid, String alternateId) throws IOException;
+    
+    /**
+     * Adds a term change listener. Add this to receive notification for term
+     * change events.
+     *
+     * @param termChangeListener the term change listener
+     */
+    void addTermChangeListener(TermChangeListener termChangeListener);
+    
+    /**
+     * Suspend term change notifications. 
+     *
+     */
+    void suspendChangeNotifications();
+
+    /**
+     * Resume term change notifications.
+     *
+     */
+    void resumeChangeNotifications();
+    
+    /**
+     * Creates a new position based on the given
+     * <code>path</code> and
+     * <code>time</code>.
+     *
+     * @param path the path to use for the position
+     * @param time the time to use for the position
+     * @return the position specified by the path and time
+     * @throws IOException signals that an I/O exception has occurred
+     * 
+     */
+    PositionBI newPosition(PathBI path, long time) throws IOException;
+    
+    /**
+     * Checks if the specified <code>dependencies</code> are satisfied.
+     *
+     * @param dependencies the dependencies in question
+     * @return <code>true</code>, if the dependencies are satisfied
+     * 
+     */
+    boolean satisfiesDependencies(Collection<DbDependency> dependencies);
+
+    /**
+     * Gets all the concept nids for every concept in the database.
+     *
+     * @return all the concept nids
+     * @throws IOException signals that an I/O exception has occurred
+     *
+     */
+    NidBitSetBI getAllConceptNids() throws IOException;
+    
+    /**
+     * Gets a generic view coordinate. This is appropriate to use when a
+     * <code>viewCoordinate</code> is needed, but no user/preferences have been
+     * selected. For example, in a mojo which would run at build time. Views on
+     * the Architectonic Auxiliary path.
+     *
+     * @return a generic view coordinate
+     * @throws IOException signals that an I/O exception has occurred
+     * 
+     */
+    ViewCoordinate getMetadataViewCoordinate() throws IOException;
+    
+    /**
+     * Gets a generic edit coordinate. This is appropriate to use when an
+     * <code>editCoordinate</code> is needed, but no user/preferences have been
+     * selected. For example, in a mojo which would run at build time. Edits on
+     * the Architectonic Auxiliary path, with the SNOMED CT core module, and
+     * "user" as author.
+     *
+     * @return a generic edit coordinate
+     * @throws IOException signals that an I/O exception has occurred
+     * 
+     */
+    EditCoordinate getMetadataEditCoordinate() throws IOException;
+    
+    /**
+     * Gets the author nid specified by the given
+     * <code>stampNid</code>.
+     *
+     * @param stampNid the stamp nid
+     * @return the author nid of the given stamp nid
+     * @see StampBI
+     * 
+     */
+    int getAuthorNidForStampNid(int stampNid);
+    
+    /**
+     * Gets the status nid specified by the given
+     * <code>stampNid</code>.
+     *
+     * @param stampNid the stamp nid
+     * @return the status nid of the given stamp nid
+     * @see StampBI
+     */
+    int getStatusNidForStampNid(int stampNid);
+
+    /**
+     * Gets the module nid specified by the given
+     * <code>stampNid</code>.
+     *
+     * @param stampNid the stamp nid
+     * @return the module nid specified by the given stamp nid
+     * @see StampBI
+     */
+    int getModuleNidForStampNid(int stampNid);
+
+    /**
+     * Gets the time specified by the given
+     * <code>stampNid</code>.
+     *
+     * @param stampNid the stamp nid
+     * @return the time specified by the given stamp nid
+     * @see StampBI
+     */
+    long getTimeForStampNid(int stampNid);
+    
+    /**
+     * Adds a vetoable property change listener as specified by the
+     * <code>vetoableChangeListener</code> for the given
+     * <code>conceptEvent</code>. Only CONCEPT_EVENT.PRE_COMMIT is a vetoable
+     * change.
+     *
+     * @param conceptEvent the concept event the listener is registered for
+     * @param vetoableChangeListener the vetoable change listener
+     *
+     */
+    void addVetoablePropertyChangeListener(TerminologyStoreDI.CONCEPT_EVENT conceptEvent, VetoableChangeListener vetoableChangeListener);
+
+    /**
+     * Adds a property change listener as specified by the
+     * <code>propertyChangeListener</code> for the given
+     * <code>conceptEvent</code>.
+     *
+     * @param conceptEvent the concept event the listener is registered for
+     * @param propertyChangeListener the property change listener
+     * 
+     */
+    void addPropertyChangeListener(TerminologyStoreDI.CONCEPT_EVENT conceptEvent, PropertyChangeListener propertyChangeListener);
+
 }

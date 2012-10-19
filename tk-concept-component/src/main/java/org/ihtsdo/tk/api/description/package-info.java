@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Package info for description. This is the second. This is the third. 
+ * Provides interfaces representing a description.
  */
 package org.ihtsdo.tk.api.description;

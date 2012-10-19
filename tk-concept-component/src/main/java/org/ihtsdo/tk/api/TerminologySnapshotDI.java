@@ -29,6 +29,10 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 /**
  * The Interface TerminologySnapshotDI provides methods for interacting with a
@@ -195,4 +199,63 @@ public interface TerminologySnapshotDI extends TerminologyDI {
      * @throws ContradictionException if more than one version is found for a given position or view coordinate
      */
     boolean isKindOf(int childNid, int parentNid) throws IOException, ContradictionException;
+    
+    /**
+     * Used to delete an uncommitted change to a relationship specified by the
+     * given
+     * <code>relationshipVersion</code>.
+     *
+     * @param relationshipVersion the uncommitted relationship version to forget
+     * @throws IOException signals that an I/O exception has occurred
+     * 
+     */
+    void forget(RelationshipVersionBI relationshipVersion) throws IOException;
+
+    /**
+     * Used to delete an uncommitted change to a description specified by the
+     * given
+     * <code>descriptionVersion</code>.
+     *
+     * @param descriptionVersion the uncommitted description version to forget
+     * @throws IOException signals that an I/O exception has occurred
+     * 
+     */
+    void forget(DescriptionVersionBI descriptionVersion) throws IOException;
+
+    /**
+     * Used to delete an uncommitted change to a refex specified by the given
+     * <code>refexChronicle</code>.
+     *
+     * @param refexChronicle the refex which has the uncommitted changes to
+     * forget
+     * @throws IOException signals that an I/O exception has occurred
+     * 
+     */
+    void forget(RefexChronicleBI refexChronicle) throws IOException;
+
+    /**
+     * Used to delete an uncommitted change to the concept attributes specified
+     * by the given
+     * <code>conceptAttributeVersion</code>.
+     *
+     * @param conceptAttributeVersion the uncommitted concept attribute version
+     * to forget
+     * @return <code>true</code>, if successful
+     * @throws IOException signals that an I/O exception has occurred
+     * 
+     */
+    boolean forget(ConceptAttributeVersionBI conceptAttributeVersion) throws IOException;
+
+    /**
+     * Used to delete any uncommitted changes to the concept specified by the
+     * given
+     * <code>conceptChronicle</code>.
+     *
+     * @param conceptChronicle the concept which has the uncommitted changes to
+     * forget
+     * @throws IOException signals that an I/O exception has occurred
+     * 
+     */
+    void forget(ConceptChronicleBI conceptChronicle) throws IOException;
+
 }

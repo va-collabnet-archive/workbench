@@ -1,6 +1,4 @@
 /**
- * Provides...  (need basic description of what is in this package, 
- *               what it is for and what other packages it relates 
- *               to or is dependent upon in a non-obvious way)
+ * Provides general terminology interfaces, including the Terminolgoy Store.
  */
 package org.ihtsdo.tk.api;

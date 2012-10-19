@@ -48,15 +48,15 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * change events.
      *
      * @param termChangeListener the term change listener
-     * @deprecated not in TK3
+     * @deprecated not in TK3 -- use TerminolgoyDI
      */
     @Deprecated
     void addTermChangeListener(TermChangeListener termChangeListener);
 
     /**
-     * Suspend term change notifications. T
+     * Suspend term change notifications. 
      *
-     * @deprecated not in TK3
+     * @deprecated not in TK3 -- use TerminolgoyDI
      */
     @Deprecated
     void suspendChangeNotifications();
@@ -64,7 +64,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
     /**
      * Resume term change notifications.
      *
-     * @deprecated not in TK3
+     * @deprecated not in TK3 -- use TerminologyDI
      */
     @Deprecated
     void resumeChangeNotifications();
@@ -124,7 +124,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * @param time the time to use for the position
      * @return the position specified by the path and time
      * @throws IOException signals that an I/O exception has occurred
-     * @deprecated not in TK3
+     * @deprecated not in TK3 -- use TerminologyDI
      */
     @Deprecated
     PositionBI newPosition(PathBI path, long time) throws IOException;
@@ -134,7 +134,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      *
      * @param dependencies the dependencies in question
      * @return <code>true</code>, if the dependencies are satisfied
-     * @deprecated not in TK3
+     * @deprecated not in TK3 -- use TerminologyDI
      */
     @Deprecated
     boolean satisfiesDependencies(Collection<DbDependency> dependencies);
@@ -158,7 +158,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      *
      * @return all the concept nids
      * @throws IOException signals that an I/O exception has occurred
-     * @deprecated not in TK3
+     * @deprecated not in TK3 -- use TerminologyDI
      */
     @Deprecated
     NidBitSetBI getAllConceptNids() throws IOException;
@@ -409,7 +409,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      *
      * @return a generic view coordinate
      * @throws IOException signals that an I/O exception has occurred
-     * @deprecated not in TK3
+     * @deprecated not in TK3 -- use TerminologyDI
      */
     @Deprecated
     ViewCoordinate getMetadataViewCoordinate() throws IOException;
@@ -423,7 +423,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      *
      * @return a generic edit coordinate
      * @throws IOException signals that an I/O exception has occurred
-     * @deprecated not in TK3
+     * @deprecated not in TK3 -- use TerminologyDI
      */
     @Deprecated
     EditCoordinate getMetadataEditCoordinate() throws IOException;
@@ -490,9 +490,8 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * be refreshed.
      *
      * @return the sequence representing the last change in the database
-     * @deprecated not in TK3
+     * 
      */
-    @Deprecated
     long getSequence();
 
     /**
@@ -596,7 +595,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      *
      * @param relationshipVersion the uncommitted relationship version to forget
      * @throws IOException signals that an I/O exception has occurred
-     * @deprecated not in TK3
+     * @deprecated not in TK3 -- use TerminologySnapshotDI
      */
     @Deprecated
     void forget(RelationshipVersionBI relationshipVersion) throws IOException;
@@ -608,7 +607,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      *
      * @param descriptionVersion the uncommitted description version to forget
      * @throws IOException signals that an I/O exception has occurred
-     * @deprecated not in TK3
+     * @deprecated not in TK3 -- use TerminologySnapshotDI
      */
     @Deprecated
     void forget(DescriptionVersionBI descriptionVersion) throws IOException;
@@ -620,7 +619,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * @param refexChronicle the refex which has the uncommitted changes to
      * forget
      * @throws IOException signals that an I/O exception has occurred
-     * @deprecated not in TK3
+     * @deprecated not in TK3 -- use TerminologySnapshotDI
      */
     @Deprecated
     void forget(RefexChronicleBI refexChronicle) throws IOException;
@@ -634,7 +633,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * to forget
      * @return <code>true</code>, if successful
      * @throws IOException signals that an I/O exception has occurred
-     * @deprecated not in TK3
+     * @deprecated not in TK3 -- use TerminologySnapshotDI
      */
     @Deprecated
     boolean forget(ConceptAttributeVersionBI conceptAttributeVersion) throws IOException;
@@ -647,7 +646,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * @param conceptChronicle the concept which has the uncommitted changes to
      * forget
      * @throws IOException signals that an I/O exception has occurred
-     * @deprecated not in TK3
+     * @deprecated not in TK3 -- use TerminologySnapshotDI
      */
     @Deprecated
     void forget(ConceptChronicleBI conceptChronicle) throws IOException;
@@ -671,7 +670,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * @param stampNid the stamp nid
      * @return the author nid of the given stamp nid
      * @see StampBI
-     * @deprecated not in TK3
+     * @deprecated not in TK3 -- use TerminolgoyDI
      */
     @Deprecated
     int getAuthorNidForStampNid(int stampNid);
@@ -683,7 +682,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * @param stampNid the stamp nid
      * @return the status nid of the given stamp nid
      * @see StampBI
-     * @deprecated not in TK3
+     * @deprecated not in TK3 -- use TerminolgoyDI
      */
     @Deprecated
     int getStatusNidForStampNid(int stampNid);
@@ -695,7 +694,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * @param stampNid the stamp nid
      * @return the module nid specified by the given stamp nid
      * @see StampBI
-     * @deprecated not in TK3
+     * @deprecated not in TK3 -- use TerminolgoyDI
      */
     @Deprecated
     int getModuleNidForStampNid(int stampNid);
@@ -707,7 +706,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * @param stampNid the stamp nid
      * @return the time specified by the given stamp nid
      * @see StampBI
-     * @deprecated not in TK3
+     * @deprecated not in TK3 -- use TerminolgoyDI
      */
     @Deprecated
     long getTimeForStampNid(int stampNid);
@@ -720,7 +719,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      *
      * @param conceptEvent the concept event the listener is registered for
      * @param vetoableChangeListener the vetoable change listener
-     * @deprecated not in TK3
+     * @deprecated not in TK3 -- use TerminolgoyDI
      */
     @Deprecated
     void addVetoablePropertyChangeListener(CONCEPT_EVENT conceptEvent, VetoableChangeListener vetoableChangeListener);
@@ -732,7 +731,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      *
      * @param conceptEvent the concept event the listener is registered for
      * @param propertyChangeListener the property change listener
-     * @deprecated not in TK3
+     * @deprecated not in TK3 -- use TerminolgoyDI
      */
     @Deprecated
     void addPropertyChangeListener(CONCEPT_EVENT conceptEvent, PropertyChangeListener propertyChangeListener);

@@ -1,6 +1,4 @@
 /**
- * Provides...  (need basic description of what is in this package, 
- *               what it is for and what other packages it relates 
- *               to or is dependent upon in a non-obvious way)
+ * Provides concurrent read and read write locks.
  */
 package org.ihtsdo.concurrency;

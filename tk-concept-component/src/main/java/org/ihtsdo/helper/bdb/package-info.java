@@ -1,6 +1,4 @@
 /**
- * Provides...  (need basic description of what is in this package, 
- *               what it is for and what other packages it relates 
- *               to or is dependent upon in a non-obvious way)
+ * Provides helper classes for the database. For example, helpers for finding contradictions, null components, or duplicate uuids.
  */
 package org.ihtsdo.helper.bdb;
