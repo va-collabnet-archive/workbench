@@ -123,7 +123,7 @@ public class IsParentMemberOfEvaluatorDefinition implements EvaluatorDefinition 
                 ViewCoordinate vc = possibleMember.getViewCoordinate();
                 ConceptVersionBI possibleRefsetCV = null;
                 ConceptSpec possibleRefset = null;
-                Collection<? extends ConceptVersionBI> parents = possibleMember.getRelationshipsSourceTargetConceptsActiveIsa();
+                Collection<? extends ConceptVersionBI> parents = possibleMember.getRelationshipsOutgoingTargetConceptsActiveIsa();
 
                 int evalRefsetNid = 0;
 
@@ -160,8 +160,8 @@ public class IsParentMemberOfEvaluatorDefinition implements EvaluatorDefinition 
                     parentMember = parent.isMember(evalRefsetNid);
                     if (parentMember) {
                         break;
-                    } else if (!parentMember && !parent.getRelationshipsSourceTargetConceptsActiveIsa().isEmpty()) {
-                        parentMember = testParentOf(evalRefsetNid, parent.getRelationshipsSourceTargetConceptsActiveIsa(), possibleMember);
+                    } else if (!parentMember && !parent.getRelationshipsOutgoingTargetConceptsActiveIsa().isEmpty()) {
+                        parentMember = testParentOf(evalRefsetNid, parent.getRelationshipsOutgoingTargetConceptsActiveIsa(), possibleMember);
                     }
                 }
             } catch (IOException e) {

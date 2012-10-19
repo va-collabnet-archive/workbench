@@ -186,7 +186,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
                     TimeHelper.getFileDateFormat().parse(startDate).getTime(),
                     TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()));
             
-//            Ts.get().iterateSapDataInSequence(this);
+//            Ts.get().iterateStampDataInSequence(this);
 
             ViewCoordinate vc = new ViewCoordinate(Ts.get().getMetadataViewCoordinate());
             NidSetBI allowedStatusNids = vc.getAllowedStatusNids();

@@ -90,7 +90,6 @@ import org.ihtsdo.rules.testmodel.TerminologyHelperDroolsWorkbench;
 import org.ihtsdo.testmodel.DrConcept;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
-import org.ihtsdo.tk.api.KindOfCacheBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
@@ -121,12 +120,6 @@ public class RulesLibrary {
 
 	/** The LINGUISTI c_ guideline s_ pkg. */
 	public static int LINGUISTIC_GUIDELINES_PKG = 1;
-
-	/** The my static is a cache. */
-	public static KindOfCacheBI myStaticIsACache;
-
-	/** The my static is a cache refset spec. */
-	public static KindOfCacheBI myStaticIsACacheRefsetSpec;
 
 	/** The terminology helper cache. */
 	public static TerminologyHelperDroolsWorkbench terminologyHelperCache;
