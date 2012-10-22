@@ -2,6 +2,8 @@ package org.ihtsdo.db.bdb;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.beans.PropertyChangeListener;
+import java.beans.VetoableChangeListener;
 import org.ihtsdo.concept.ConceptVersion;
 import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
@@ -23,15 +25,32 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.ace.log.AceLog;
+import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
+import org.ihtsdo.db.change.ChangeNotifier;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.TerminologyStoreDI.CONCEPT_EVENT;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
+import org.ihtsdo.tk.api.contradiction.IdentifyAllContradictionStrategy;
 import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.search.ScoredComponentReference;
+import org.ihtsdo.tk.binding.snomed.Snomed;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
+import org.ihtsdo.tk.db.DbDependency;
 import org.ihtsdo.tk.uuid.UuidFactory;
 
 public class BdbTerminologySnapshot implements TerminologySnapshotDI {
    private BdbTerminologyStore store;
 
     private ViewCoordinate      vc;
+    private static ViewCoordinate metadataVC = null;
+    private static EditCoordinate metadataEC = null;
 
    //~--- constructors --------------------------------------------------------
 
@@ -237,5 +256,145 @@ public class BdbTerminologySnapshot implements TerminologySnapshotDI {
     @Override
     public Collection<ScoredComponentReference> doTextSearch(String query) throws IOException, ParseException {
         return store.doTextSearch(query);
+    }
+
+    @Override
+    public void forget(RelationshipVersionBI relationshipVersion) throws IOException {
+        BdbCommitManager.forget(relationshipVersion);
+    }
+
+    @Override
+    public void forget(DescriptionVersionBI descriptionVersion) throws IOException {
+        BdbCommitManager.forget(descriptionVersion);
+    }
+
+    @Override
+    public void forget(RefexChronicleBI refexChronicle) throws IOException {
+        BdbCommitManager.forget(refexChronicle);
+    }
+
+    @Override
+    public boolean forget(ConceptAttributeVersionBI conceptAttributeVersion) throws IOException {
+        boolean forgotten = BdbCommitManager.forget(conceptAttributeVersion);
+        return forgotten;
+    }
+
+    @Override
+    public void forget(ConceptChronicleBI conceptChronicle) throws IOException {
+        BdbCommitManager.forget(conceptChronicle);
+    }
+
+    @Override
+    public void addTermChangeListener(TermChangeListener termChangeListener) {
+         ChangeNotifier.addTermChangeListener(termChangeListener);
+    }
+
+    @Override
+    public void suspendChangeNotifications() {
+        ChangeNotifier.suspendNotifications();
+    }
+
+    @Override
+    public void resumeChangeNotifications() {
+        ChangeNotifier.resumeNotifications();
+    }
+
+    @Override
+    public boolean satisfiesDependencies(Collection<DbDependency> dependencies) {
+         if (dependencies != null) {
+            try {
+                for (DbDependency d : dependencies) {
+                    String value = Bdb.getProperty(d.getKey());
+                    
+                    if (d.satisfactoryValue(value) == false) {
+                        return false;
+                    }
+                }
+            } catch (Throwable e) {
+                AceLog.getAppLog().alertAndLogException(e);
+                
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
+    @Override
+    public NidBitSetBI getAllConceptNids() throws IOException {
+        return Bdb.getConceptDb().getReadOnlyConceptIdSet();
+    }
+
+    @Override
+    public ViewCoordinate getMetadataViewCoordinate() throws IOException {
+        if (metadataVC == null) {
+            PathBI viewPath =
+                    new Path(Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids()), null);
+            PositionBI viewPosition = new Position(Long.MAX_VALUE, viewPath);
+            PositionSetBI positionSet = new PositionSetReadOnly(viewPosition);
+            NidSet allowedStatusNids = new NidSet();
+            
+            allowedStatusNids.add(Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
+            allowedStatusNids.add(Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()));
+            allowedStatusNids.add(SnomedMetadataRfx.getSTATUS_CURRENT_NID());
+            
+            NidSetBI isaTypeNids = new NidSet();
+            
+            isaTypeNids.add(Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
+            
+            ContradictionManagerBI contradictionManager = new IdentifyAllContradictionStrategy();
+            int languageNid =
+                    Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.EN_US.getUids());
+            int classifierNid =
+                    Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.SNOROCKET.getUids());
+            
+            metadataVC = new ViewCoordinate(Precedence.PATH, positionSet, allowedStatusNids, isaTypeNids,
+                    contradictionManager, languageNid, classifierNid,
+                    RelAssertionType.INFERRED_THEN_STATED, null,
+                    ViewCoordinate.LANGUAGE_SORT.TYPE_BEFORE_LANG);
+        }
+        
+        return metadataVC;
+    }
+
+    @Override
+    public EditCoordinate getMetadataEditCoordinate() throws IOException {
+        if (metadataEC == null) {
+            int authorNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.USER.getUids());
+            int editPathNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
+            metadataEC = new EditCoordinate(authorNid, Snomed.CORE_MODULE.getLenient().getNid(), editPathNid); //@akf make the same as what the metadata is on
+        }
+        
+        return metadataEC;
+    }
+
+    @Override
+    public int getAuthorNidForStampNid(int stampNid) {
+        return Bdb.getAuthorNidForSapNid(stampNid);
+    }
+
+    @Override
+    public int getStatusNidForStampNid(int stampNid) {
+        return Bdb.getStatusNidForSapNid(stampNid);
+    }
+
+    @Override
+    public int getModuleNidForStampNid(int stampNid) {
+        return Bdb.getModuleNidForSapNid(stampNid);
+    }
+
+    @Override
+    public long getTimeForStampNid(int stampNid) {
+        return Bdb.getTimeForSapNid(stampNid);
+    }
+
+    @Override
+    public void addVetoablePropertyChangeListener(CONCEPT_EVENT conceptEvent, VetoableChangeListener vetoableChangeListener) {
+         GlobalPropertyChange.addVetoableChangeListener(conceptEvent, vetoableChangeListener);
+    }
+
+    @Override
+    public void addPropertyChangeListener(CONCEPT_EVENT conceptEvent, PropertyChangeListener propertyChangeListener) {
+        GlobalPropertyChange.addPropertyChangeListener(conceptEvent, propertyChangeListener);
     }
 }
