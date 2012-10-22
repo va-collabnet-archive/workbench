@@ -285,7 +285,7 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
 
 	public void addUncommitted() throws Exception {
 
-		if (!canceled && isaCache != null) {
+		if (!canceled) {
 		    addNewMarkedParents();
 		    retireOldMarkedParents();
 		}
@@ -329,8 +329,10 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
 
         I_RepresentIdSet newParents = Bdb.getConceptDb().getEmptyIdSet();
         NidBitSetItrBI newMemberItr = newMemberNids.iterator();
-        while (newMemberItr.next()) {
-            isaCache.addParents(newMemberItr.nid(), newParents);
+        if(isaCache != null) {
+            while (newMemberItr.next()) {
+                isaCache.addParents(newMemberItr.nid(), newParents);
+            }
         }
         NidBitSetItrBI newParentItr = newParents.iterator();
         while (newParentItr.next()) {
@@ -363,8 +365,10 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
         I_RepresentIdSet currentParents = Bdb.getConceptDb().getEmptyIdSet();
         NidBitSetItrBI currentMemberItr = currentRefsetMemberComponentNids
                 .iterator();
-        while (currentMemberItr.next()) {
-            isaCache.addParents(currentMemberItr.nid(), currentParents);
+        if(isaCache != null) {
+            while (currentMemberItr.next()) {
+                isaCache.addParents(currentMemberItr.nid(), currentParents);
+            }
         }
         parentsToRetire.andNot(currentParents);
         NidBitSetItrBI parentToRetireItr = parentsToRetire.iterator();
