@@ -2,10 +2,11 @@
 	<parent>
 		<groupId>org.ihtsdo</groupId>
 		<artifactId>wb-mmb</artifactId>
-		<version>2.6.0-trek-145</version>
+		<version>wb-trek-145-kp</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>wb-release-process</artifactId>
+  <version>2.6.0.2012-kp-oct-1-SNAPSHOT</version>
 	<!--<packaging>jar</packaging> -->
 	<packaging>maven-plugin</packaging>
 	<name>${branch}: Workbench Release Process</name>
