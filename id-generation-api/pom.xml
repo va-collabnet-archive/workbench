@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.ihtsdo</groupId>
         <artifactId>wb-mmb</artifactId>
-        <version>2.6.0.2012-rb-oct-1</version>
+        <version>2.6.0.2013-rb-oct-1-SNAPSHOT</version>
 	</parent>
 	<artifactId>id-generation-api</artifactId>
 	<packaging>jar</packaging>
