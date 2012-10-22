@@ -5,6 +5,7 @@ package org.ihtsdo.db.bdb.computer.refset;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -24,6 +25,7 @@ import org.dwfa.ace.refset.spec.I_HelpMemberRefset;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.I_ProcessUnfetchedConceptData;
 import org.ihtsdo.concept.ParallelConceptIterator;
@@ -282,66 +284,12 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
 	}
 
 	public void addUncommitted() throws Exception {
-		int parentMemberTypeNid = Terms.get()
-				.getConcept(RefsetAuxiliary.Concept.MARKED_PARENT.getUids())
-				.getConceptNid();
+
 		if (!canceled && isaCache != null) {
-			long endTime = System.currentTimeMillis();
-			long elapsed = endTime - startTime;
-			String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
-			activity.setIndeterminate(true);
-			activity.setProgressInfoLower("Adding marked parents. Elapsed: "
-					+ elapsedStr + ";  Members: " + members.get() + " New: "
-					+ newMembers.get() + " Ret: " + retiredMembers.get());
-
-			I_RepresentIdSet newParents = Bdb.getConceptDb().getEmptyIdSet();
-			NidBitSetItrBI newMemberItr = newMemberNids.iterator();
-			while (newMemberItr.next()) {
-				isaCache.addParents(newMemberItr.nid(), newParents);
-			}
-			NidBitSetItrBI newParentItr = newParents.iterator();
-			while (newParentItr.next()) {
-				memberRefsetHelper.newRefsetExtension(
-						markedParentRefsetConcept.getNid(), newParentItr.nid(),
-						parentMemberTypeNid);
-			}
+		    addNewMarkedParents();
+		    retireOldMarkedParents();
 		}
-		if (!canceled && isaCache != null) {
-			long endTime = System.currentTimeMillis();
-			long elapsed = endTime - startTime;
-			String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
-			activity.setIndeterminate(true);
-			activity.setProgressInfoLower("Removing old marked parents. Elapsed: "
-					+ elapsedStr
-					+ ";  Members: "
-					+ members.get()
-					+ " New: "
-					+ newMembers.get() + " Ret: " + retiredMembers.get());
 
-			retiredMemberNids.andNot(newMemberNids);
-
-			I_RepresentIdSet parentsToRetire = Bdb.getConceptDb()
-					.getEmptyIdSet();
-			NidBitSetItrBI retiredMemberItr = retiredMemberNids.iterator();
-			while (retiredMemberItr.next()) {
-				isaCache.addParents(retiredMemberItr.nid(), parentsToRetire);
-			}
-			I_RepresentIdSet currentParents = Bdb.getConceptDb()
-					.getEmptyIdSet();
-			NidBitSetItrBI currentMemberItr = currentRefsetMemberComponentNids
-					.iterator();
-			while (currentMemberItr.next()) {
-				isaCache.addParents(currentMemberItr.nid(), currentParents);
-			}
-			parentsToRetire.andNot(currentParents);
-			NidBitSetItrBI parentToRetireItr = parentsToRetire.iterator();
-			while (parentToRetireItr.next()) {
-				memberRefsetHelper.retireRefsetExtension(
-						markedParentRefsetConcept.getNid(),
-						parentToRetireItr.nid(), parentMemberTypeNid);
-			}
-			NidBitSetItrBI newMemberItr = newMemberNids.iterator();
-		}
 		if (!canceled) {
 			BdbCommitManager.addUncommittedNoChecks(refsetConcept);
 			BdbCommitManager.addUncommittedNoChecks(markedParentRefsetConcept);
@@ -365,6 +313,67 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
 		activity.complete();
 		activity.removeStopActionListener(this.stopListener);
 	}
+
+    private void addNewMarkedParents() throws TerminologyException,
+            IOException, Exception {
+        int parentMemberTypeNid = Terms.get()
+                .getConcept(RefsetAuxiliary.Concept.MARKED_PARENT.getUids())
+                .getConceptNid();
+        long endTime = System.currentTimeMillis();
+        long elapsed = endTime - startTime;
+        String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
+        activity.setIndeterminate(true);
+        activity.setProgressInfoLower("Adding marked parents. Elapsed: "
+                + elapsedStr + ";  Members: " + members.get() + " New: "
+                + newMembers.get() + " Ret: " + retiredMembers.get());
+
+        I_RepresentIdSet newParents = Bdb.getConceptDb().getEmptyIdSet();
+        NidBitSetItrBI newMemberItr = newMemberNids.iterator();
+        while (newMemberItr.next()) {
+            isaCache.addParents(newMemberItr.nid(), newParents);
+        }
+        NidBitSetItrBI newParentItr = newParents.iterator();
+        while (newParentItr.next()) {
+            memberRefsetHelper.newRefsetExtension(
+                    markedParentRefsetConcept.getNid(), newParentItr.nid(),
+                    parentMemberTypeNid);
+        }
+    }
+
+    private void retireOldMarkedParents() throws TerminologyException,
+            IOException, Exception {
+        int parentMemberTypeNid = Terms.get()
+                .getConcept(RefsetAuxiliary.Concept.MARKED_PARENT.getUids())
+                .getConceptNid();
+        long endTime = System.currentTimeMillis();
+        long elapsed = endTime - startTime;
+        String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
+        activity.setIndeterminate(true);
+        activity.setProgressInfoLower("Removing old marked parents. Elapsed: "
+                + elapsedStr + ";  Members: " + members.get() + " New: "
+                + newMembers.get() + " Ret: " + retiredMembers.get());
+
+        retiredMemberNids.andNot(newMemberNids);
+
+        I_RepresentIdSet parentsToRetire = Bdb.getConceptDb().getEmptyIdSet();
+        NidBitSetItrBI retiredMemberItr = retiredMemberNids.iterator();
+        while (retiredMemberItr.next()) {
+            isaCache.addParents(retiredMemberItr.nid(), parentsToRetire);
+        }
+        I_RepresentIdSet currentParents = Bdb.getConceptDb().getEmptyIdSet();
+        NidBitSetItrBI currentMemberItr = currentRefsetMemberComponentNids
+                .iterator();
+        while (currentMemberItr.next()) {
+            isaCache.addParents(currentMemberItr.nid(), currentParents);
+        }
+        parentsToRetire.andNot(currentParents);
+        NidBitSetItrBI parentToRetireItr = parentsToRetire.iterator();
+        while (parentToRetireItr.next()) {
+            memberRefsetHelper.retireRefsetExtension(
+                    markedParentRefsetConcept.getNid(),
+                    parentToRetireItr.nid(), parentMemberTypeNid);
+        }
+    }
 
 	public AtomicInteger getProcessedCount() {
 		return processedCount;
