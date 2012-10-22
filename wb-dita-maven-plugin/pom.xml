@@ -4,10 +4,10 @@
   <parent>
     <artifactId>wb-mmb</artifactId>
     <groupId>org.ihtsdo</groupId>
-    <version>wb-trek-145-kp</version>
+    <version>2.6.0-trek-145</version>
   </parent>
   <artifactId>wb-dita-maven-plugin</artifactId>
-  <version>2.6.0.2012-kp-oct-1-SNAPSHOT</version>
+  <version>2.6.0-trek-145</version>
   <packaging>maven-plugin</packaging>
   <name>${branch}: Workbench Maven DITA documentation mojo</name>
   <description>This Maven plugin (or mojo - Maven plain Old Java Object) builds a set of DITA topic
