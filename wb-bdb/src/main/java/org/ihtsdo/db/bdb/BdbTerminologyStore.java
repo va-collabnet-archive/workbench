@@ -455,19 +455,9 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     @Override
     public EditCoordinate getMetadataEditCoordinate() throws IOException {
         if (metadataEC == null) {
-            /*
-             * public EditCoordinate(int authorNid, NidSetBI editPaths) {
-             super();
-             assert editPaths != null;
-             assert authorNid != Integer.MIN_VALUE;
-             this.authorNid = authorNid;
-             this.editPaths = editPaths.getSetValues();
-             }
-             */
-            
             int authorNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.USER.getUids());
             int editPathNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
-            metadataEC = new EditCoordinate(authorNid, editPathNid, Snomed.CORE_MODULE.getLenient().getNid()); //@akf make the same as what the metadata is on
+            metadataEC = new EditCoordinate(authorNid, Snomed.CORE_MODULE.getLenient().getNid(), editPathNid);
         }
         
         return metadataEC;
