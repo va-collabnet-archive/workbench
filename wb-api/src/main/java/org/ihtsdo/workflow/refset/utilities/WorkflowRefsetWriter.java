@@ -17,6 +17,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.workflow.refset.WorkflowRefset;
 
 /*
@@ -39,6 +40,7 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
     }
 
     public I_ExtendByRef addMember(boolean autoCommit) {
+        ConceptSpec wfHxRefSpec = new ConceptSpec("history workflow refset",UUID.fromString("0b6f0e24-5fe2-3869-9342-c18008f53283"));
         I_ExtendByRef ref = null;
         try {
             if (fields.valuesExist()) {
@@ -62,8 +64,13 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
 		                	Terms.get().addUncommittedNoChecks(ref);
 		                }
 	                } else {
-	                	// Other workflow refsets (ie editor category)
-	                    Ts.get().commit(refset);
+                            UUID refsetUuid = Ts.get().getUuidPrimordialForNid(refsetNid);
+                            if (refsetUuid.equals(wfHxRefSpec.getLenient().getPrimUuid())) {
+                                Terms.get().addUncommittedNoChecks(refset);
+                            } else {
+                                // Other workflow refsets (ie editor category)
+                                Ts.get().commit(refset);
+                            }
 	                }
 	            } else {
 	                throw new NullPointerException("Null wfhx refset member created for concept: " + fields.getReferencedComponentNid()); 
