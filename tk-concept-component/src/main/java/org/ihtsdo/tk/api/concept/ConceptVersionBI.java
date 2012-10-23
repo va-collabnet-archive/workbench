@@ -248,7 +248,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
     Collection<? extends RelationshipGroupVersionBI> getRelationshipGroups() throws IOException, ContradictionException;
 
     /**
-     * Gets active target relationships for this version.
+     * Gets active incoming relationships for this version.
      *
      * <p>In the relationship A is-a B, the concept A is a source and the concept B
      * is a target. The relationship A-B is an outgoing relationship on concept
@@ -264,7 +264,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
             throws IOException, ContradictionException;
 
     /**
-     * Gets the active target "is a" relationships for this version.
+     * Gets the active incoming "is a" relationships for this version.
      *
      *
      * <p>In the relationship A is-a B, the concept A is a source and the concept B
@@ -280,7 +280,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
             throws IOException, ContradictionException;
 
     /**
-     * Returns the concepts representing the destination of the target
+     * Returns the concepts representing the sources of the incoming
      * relationships for this version. All status values will be returned.
      *
      *
@@ -296,7 +296,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
     Collection<? extends ConceptVersionBI> getRelationshipsIncomingSourceConcepts() throws IOException;
 
     /**
-     * Returns the concepts representing the destination of the target
+     * Returns the concepts representing the sources of the incoming
      * relationships of the type specified by the
      * <code>typeNid</code> for this version. All status values will be
      * returned.
@@ -316,7 +316,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
     Collection<? extends ConceptVersionBI> getRelationshipsIncomingSourceConcepts(int typeNid) throws IOException;
 
     /**
-     * Returns the concepts representing the destination of the target
+     * Returns the concepts representing the sources of the incoming
      * relationships of the type specified by the
      * <code>typeNids</code> for this version. All status values will be
      * returned.
@@ -335,7 +335,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
     Collection<? extends ConceptVersionBI> getRelationshipsIncomingSourceConcepts(NidSetBI typeNids) throws IOException;
 
     /**
-     * Returns the concepts representing the destination of the active target
+     * Returns the concepts representing the sources of the incoming target
      * relationships for this version.
      *
      *
@@ -354,7 +354,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
             throws IOException, ContradictionException;
 
     /**
-     * Returns the concepts representing the destination of the active target
+     * Returns the concepts representing the sources of the active incoming
      * relationships of the type specified by the
      * <code>typeNid</code> for this version.
      *
@@ -374,7 +374,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
             throws IOException, ContradictionException;
 
     /**
-     * Returns the concepts representing the destinations of the active target
+     * Returns the concepts representing the sources of the active incoming
      * relationships of the type specified by the
      * <code>typeNids</code> for this version.
      *
@@ -394,8 +394,8 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
             throws IOException, ContradictionException;
 
     /**
-     * Returns the concepts representing the destination of the active "is a"
-     * target relationships for this version.
+     * Returns the concepts representing the sources of the active "is a"
+     * incoming relationships for this version.
      *
      * <p>In the relationship A is-a B, the concept A is a source and the concept B
      * is a target. The relationship A-B is an outgoing relationship on concept
@@ -412,7 +412,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
             throws IOException, ContradictionException;
 
     /**
-     * Returns the concepts representing the destination of the "is a" target
+     * Returns the concepts representing the sources of the "is a" incoming
      * relationships for this version regardless of status.
      *
      * <p>In the relationship A is-a B, the concept A is a source and the concept B
@@ -427,7 +427,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
     Collection<? extends ConceptVersionBI> getRelationshipsIncomingSourceConceptsIsa() throws IOException;
 
     /**
-     * Gets active source relationships for this version. 
+     * Gets active outgoing relationships for this version. 
      *
      * <p>In the relationship A is-a B, the concept A is a source and the concept B
      * is a target. The relationship A-B is an outgoing relationship on concept
@@ -443,7 +443,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
             throws IOException, ContradictionException;
 
     /**
-     * Gets the active source "is a" relationships for this version.
+     * Gets the active outgoing "is a" relationships for this version.
      *
      *
      *
@@ -460,7 +460,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
             throws IOException, ContradictionException;
 
     /**
-     * Returns the concepts representing the origin of the source relationships
+     * Returns the concepts representing the targets of the outgoing relationships
      * for this version. All status values will be returned.
      *
      *
@@ -475,7 +475,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
     Collection<? extends ConceptVersionBI> getRelationshipsOutgoingTargetConcepts() throws IOException;
 
     /**
-     * Returns the concepts representing the origin of the source relationships
+     * Returns the concepts representing the targets of the outgoing relationships
      * of the type specified by the
      * <code>typeNid</code> for this version. All status values will be
      * returned.
@@ -494,7 +494,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
     Collection<? extends ConceptVersionBI> getRelationshipsOutgoingTargetConcepts(int typeNid) throws IOException;
 
     /**
-     * Returns the concepts representing the origin of the source relationships
+     * Returns the concepts representing the targets of the outgoing relationships
      * of the type specified by the
      * <code>typeNids</code> for this version. All status values will be
      * returned.
@@ -512,7 +512,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
     Collection<? extends ConceptVersionBI> getRelationshipsOutgoingTargetConcepts(NidSetBI typeNids) throws IOException;
 
     /**
-     * Returns the concepts representing the origin of the active source
+     * Returns the concepts representing the targets of the active outgoing
      * relationships for this version.
      *
      *
@@ -531,7 +531,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
             throws IOException, ContradictionException;
 
     /**
-     * Returns the concepts representing the origins of the active source
+     * Returns the concepts representing the targets of the active outgoing
      * relationships of the type specified by the
      * <code>typeNid</code> for this version.
      *
@@ -551,7 +551,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
             throws IOException, ContradictionException;
 
     /**
-     * Returns the concepts representing the origins of the active source
+     * Returns the concepts representing the targets of the active outgoing
      * relationships of the type specified by the
      * <code>typeNids</code> for this version.
      *
@@ -571,7 +571,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
             throws IOException, ContradictionException;
 
     /**
-     * Returns the concepts representing the origin of the active "is a" source
+     * Returns the concepts representing the targets of the active "is a" outgoing
      * relationships for this version.
      *
      * <p>In the relationship A is-a B, the concept A is a source and the concept B
@@ -589,7 +589,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
             throws IOException, ContradictionException;
 
     /**
-     * Returns the concepts representing the origin of the "is a" source
+     * Returns the concepts representing the target of the "is a" outgoing
      * relationships for this version regardless of status.
      *
      * <p>In the relationship A is-a B, the concept A is a source and the concept B
@@ -603,7 +603,7 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
     Collection<? extends ConceptVersionBI> getRelationshipsOutgoingTargetConceptsIsa() throws IOException;
 
     /**
-     * Returns the concepts representing the origin of the "is a" source
+     * Returns the concepts representing the target of the "is a" outgoing
      * relationships for this version regardless of status.
      *
      * <p>In the relationship A is-a B, the concept A is a source and the concept B
