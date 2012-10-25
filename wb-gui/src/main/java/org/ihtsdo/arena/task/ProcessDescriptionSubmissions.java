@@ -80,6 +80,7 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
     private ArrayList<List<UUID>> uuidList;
     private boolean addSecondDialectRefex = false; //true if lang is EN and description is valid for both us and gb spellings
     private LANG_CODE dialect = null;
+    private ArrayList<ConceptChronicleBI> conceptsToCommit;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -106,6 +107,7 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
         int count = 0;
         try {
             uuidList = new ArrayList<List<UUID>>();
+            conceptsToCommit = new ArrayList<>();
             I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(
                     WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             String fileName = (String) process.getProperty(
@@ -165,6 +167,12 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
             count++;
             while (line != null) {
                 count++;
+                conceptNid = 0;
+                descText = null;
+                lang = null;
+                langRefexNid = 0;
+                secondDialectRefexNid = 0;
+                acceptabilityNid = 0;
                 
                 List<UUID> list = new ArrayList<UUID>();
                 String[] parts = line.split("\t");
@@ -175,9 +183,15 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
                     for (I_GetConceptData concept : concepts) {
                         conceptNid = concept.getNid();
                     }
+                    if(conceptNid == 0){
+                        throw new TaskFailedException("No concept found for the specified ID: " + part);
+                    }
                 }
                 if (uuidPosition != null && sctPosition == null) {
                     part = parts[uuidPosition];
+                    if(!Ts.get().hasUuid(UUID.fromString(part))){
+                        throw new TaskFailedException("No concept found for the specified ID: " + part);
+                    }
                     conceptNid = Ts.get().getNidForUuids(UUID.fromString(part));
                 }
                 if(conceptNid == 0){
@@ -259,7 +273,7 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
                     description.addAnnotation(secondAnnotation);
                     addSecondDialectRefex = false;
                 }
-                Ts.get().addUncommitted(concept);
+                conceptsToCommit.add(concept);
                 list.add(Ts.get().getUuidPrimordialForNid(conceptNid));
                 uuidList.add(list);
                 if (iterator.hasNext()) {
@@ -273,7 +287,9 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
                 }
             }
             process.setProperty(uuidListListPropName, uuidList);
-
+            for(ConceptChronicleBI concept : conceptsToCommit){
+                Ts.get().addUncommitted(concept);
+            }
             returnCondition = Condition.CONTINUE;
         } catch (IndexOutOfBoundsException e) {
             throw new TaskFailedException("<html>Import process is expecting data which is missing.<br>Please review import file. Line: " + count, e);
