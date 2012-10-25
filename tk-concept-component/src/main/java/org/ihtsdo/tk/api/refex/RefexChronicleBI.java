@@ -45,10 +45,10 @@ public interface RefexChronicleBI<A extends RefexAnalogBI<A>>
         extends ComponentChronicleBI<RefexVersionBI<A>> {
 
     /**
-     * Gets the nid associated with this refex member. This is the member nid
-     * and not the refex collection nid.
+     * Gets the nid of the refex collection containing this refex member. This is the collection nid
+     * and not the refex member nid.
      *
-     * @return the nid associated with this refex member
+     * @return the nid of the refex collection containing this refex member
      */
     int getRefexNid();
 
