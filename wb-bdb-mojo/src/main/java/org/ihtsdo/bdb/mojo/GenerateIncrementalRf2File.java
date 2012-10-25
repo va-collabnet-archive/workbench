@@ -34,6 +34,7 @@ import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
 /**
@@ -96,11 +97,17 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
      */
     private String namespace;
     /**
-     * Project module, as fsn
+     * Project moduleFsn, as fsn
      *
-     * @parameter @required
+     * @parameter
      */
-    private String module;
+    private String moduleFsn;
+    /**
+     * Project moduleConcept
+     *
+     * @parameter
+     */
+    private ConceptDescriptor moduleConcept;
     /**
      * country code
      *
@@ -140,6 +147,12 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
      * default-value="false"
      */
     private boolean makePrivateAltIdsFile;
+    /**
+     * Simple refset parent concept.
+     *
+     * @parameter
+     */
+    private ConceptDescriptor refsetParentConceptSpec;
     
     private IntSet sapsToWrite = new IntSet();
     private IntSet pathIds;
@@ -170,8 +183,14 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
                     excludedRefsetIds.add(validatedNid);
                 }
             }
-                
-            UUID moduleId = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, module);
+            UUID moduleId = null;
+            if(moduleConcept != null){
+                moduleId = UUID.fromString(moduleConcept.getUuid());
+            }else if(moduleFsn != null){
+                moduleId = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, moduleFsn);
+            }else{
+                throw new MojoExecutionException("No module specified.");
+            }
 
             int viewPathNid;
             if (viewPathConceptSpec != null) {
@@ -185,12 +204,10 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
             IntSet sapsToWrite = Bdb.getSapDb().getSpecifiedSapNids(pathIds,
                     TimeHelper.getFileDateFormat().parse(startDate).getTime(),
                     TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()));
-            
-//            Ts.get().iterateStampDataInSequence(this);
 
             ViewCoordinate vc = new ViewCoordinate(Ts.get().getMetadataViewCoordinate());
+            vc.getIsaTypeNids().add(Snomed.IS_A.getLenient().getConceptNid());
             NidSetBI allowedStatusNids = vc.getAllowedStatusNids();
-            System.out.println("THIS : " + allowedStatusNids);
 
             PathBI path = Ts.get().getPath(viewPathNid);
             PositionBI position = Ts.get().newPosition(path,
@@ -203,6 +220,10 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
                 mapper.close();
                 UuidSnomedMapHandler handler = new UuidSnomedMapHandler(output, output);
                 handler.setNamespace(namespace);
+                Integer refsetParentConceptNid = 0;
+                if(refsetParentConceptSpec != null){
+                    refsetParentConceptNid = Ts.get().getNidForUuids(UUID.fromString(refsetParentConceptSpec.getUuid()));
+                }
                 Rf2Export exporter = new Rf2Export(output,
                         Rf2File.ReleaseType.DELTA,
                         LANG_CODE.EN,
@@ -215,7 +236,8 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
                         vc.getViewCoordinateWithAllStatusValues(),
                         excludedRefsetIds.getAsSet(),
                         allConcepts,
-                        makePrivateAltIdsFile);
+                        makePrivateAltIdsFile,
+                        refsetParentConceptNid);
                 Ts.get().iterateConceptDataInSequence(exporter);
                 exporter.writeOneTimeFiles();
                 exporter.close();
@@ -228,22 +250,4 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
         }
     }
 
-//    @Override
-//    public void processSapData(SapBI sap) throws Exception {
-//        Long start = TimeHelper.getTimeFromString(startDate, TimeHelper.getFileDateFormat());
-//        Long end = TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat());
-//        boolean add = true;
-//        
-//        if(!pathIds.contains(sap.getPathNid())){
-//            add = false;
-//        }else if(sap.getStatusNid() != SnomedMetadataRfx.getSTATUS_CURRENT_NID()){
-//            add = false;
-//        }else if( start >= sap.getTime() && sap.getTime()>= end){
-//            add = false;
-//        }
-//        
-//        if(add){
-//            sapsToWrite.add(sap.getSapNid());
-//        }
-//    }
 }

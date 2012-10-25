@@ -27,6 +27,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentChronicleBI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.id.IdBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
@@ -71,6 +72,7 @@ public class UuidToSctIdWriter {
     private HashMap<UUID, String> uuidToExistingSctMap = new HashMap<UUID, String>();
     private boolean makePrivateAltIdsFile;
     private UuidSnomedMapHandler handler;
+    File[] uuidFiles;
 
     /**
      * Instantiates a new uuid to sct id writer for release files from the
@@ -224,7 +226,7 @@ public class UuidToSctIdWriter {
                 privateIdLine = privateIdentifiersReader.readLine();
             }
         }
-
+        processSimpleRefsets();
         processUuidToSctMap();
     }
 
@@ -234,7 +236,7 @@ public class UuidToSctIdWriter {
      * @throws IOException signals that an I/O exception has occurred
      */
     private void setup() throws IOException {
-        File[] uuidFiles = directory.listFiles(new FilenameFilter() {
+        uuidFiles = directory.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File file, String string) {
                 return string.endsWith(".txt");
@@ -1187,6 +1189,85 @@ public class UuidToSctIdWriter {
 
                         break;
                 }
+            }
+        }
+    }
+    /**
+     * Converts uuid-based simple refset files to SCT ID based files.
+     * 
+     * @throws IOException signals that an I/O exception has occurred
+     */
+    private void processSimpleRefsets() throws  IOException {
+        for (File inputFile : uuidFiles) {
+            if (inputFile.getName().toLowerCase().contains("simple-refset")) {
+                BufferedReader simpleRefsetReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
+                File simpleRefsetFile = new File(directory,
+                        inputFile.getName().replace("UUID_", ""));
+                FileOutputStream outputStream = new FileOutputStream(simpleRefsetFile);
+                BufferedWriter simpleRefsetWriter = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF8"));
+
+                for (Rf2File.SimpleRefsetFileFields field : Rf2File.SimpleRefsetFileFields.values()) {
+                    simpleRefsetWriter.write(field.headerText + field.seperator);
+                }
+
+                String refsetLine = simpleRefsetReader.readLine();
+                refsetLine = simpleRefsetReader.readLine();
+                while (refsetLine != null) {
+                    String[] parts = refsetLine.split("\t");
+                    for (Rf2File.SimpleRefsetFileFields field : Rf2File.SimpleRefsetFileFields.values()) {
+                        switch (field) {
+                            case ID:
+                                String memberUuid = parts[Rf2File.SimpleRefsetFileFields.ID.ordinal()];
+                                simpleRefsetWriter.write(memberUuid + field.seperator);
+
+                                break;
+
+                            case EFFECTIVE_TIME:
+                                String effectiveDateString = parts[Rf2File.SimpleRefsetFileFields.EFFECTIVE_TIME.ordinal()];
+                                simpleRefsetWriter.write(effectiveDateString + field.seperator);
+
+                                break;
+
+                            case ACTIVE:
+                                String status = parts[Rf2File.SimpleRefsetFileFields.ACTIVE.ordinal()];
+                                simpleRefsetWriter.write(convertStatus(status) + field.seperator);
+
+                                break;
+
+                            case MODULE_ID:
+                                simpleRefsetWriter.write(module + field.seperator);
+
+                                break;
+
+                            case REFSET_ID:
+                                String refsetId = parts[Rf2File.SimpleRefsetFileFields.REFSET_ID.ordinal()];
+                                String refsetSctId = getExistingSctId(refsetId);
+                                if (refsetSctId == null) {
+                                    refsetSctId = handler.getWithGeneration(UUID.fromString(refsetId), SctIdGenerator.TYPE.CONCEPT).toString(); //TODO akf: subset?
+                                    this.uuidToSctMap.put(UUID.fromString(refsetId), refsetSctId);
+                                }
+                                simpleRefsetWriter.write(refsetSctId + field.seperator);
+
+                                break;
+
+                            case REFERENCED_COMPONENT_ID:
+                                String rc = parts[Rf2File.SimpleRefsetFileFields.REFERENCED_COMPONENT_ID.ordinal()];
+                                String rcSctId = getExistingSctId(rc);
+                                if (rcSctId == null) {
+                                    rcSctId = handler.getWithGeneration(UUID.fromString(rc), SctIdGenerator.TYPE.CONCEPT).toString();
+                                    this.uuidToSctMap.put(UUID.fromString(rc), rcSctId);
+                                }
+                                simpleRefsetWriter.write(rcSctId + field.seperator);
+
+                                break;
+                        }
+                    }
+
+                    refsetLine = simpleRefsetReader.readLine();
+                }
+
+                simpleRefsetReader.close();
+                simpleRefsetWriter.close();
             }
         }
     }
