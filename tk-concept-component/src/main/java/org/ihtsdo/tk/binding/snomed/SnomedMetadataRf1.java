@@ -167,6 +167,9 @@ public class SnomedMetadataRf1 {
     public static ConceptSpec CURRENT_RF1 =
             new ConceptSpec("current (active status type)",
             UUID.fromString("2faa9261-8fb2-11db-b606-0800200c9a66"));
+    public static ConceptSpec ACTIVE_RF1 =
+            new ConceptSpec("active",
+            UUID.fromString("32dc7b19-95cc-365e-99c9-5095124ebe72"));
     /**** Associations ***/
     // Part_Of (Refset) 123005000
     public static ConceptSpec PART_OF_ATTRIBUTE_REFSET =
