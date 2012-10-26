@@ -65,10 +65,11 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
     boolean update = false;
     I_ConfigAceFrame config;
     Collection<? extends RefexChronicleBI<?>> refexes;
-    ConceptChronicleBI gbConcept;
-    ConceptChronicleBI usConcept;
-    int prefNid;
-    int acceptNid;
+    static ConceptChronicleBI gbConcept = null;
+    static ConceptChronicleBI usConcept;
+    static int prefNid;
+    static int acceptNid;
+    static int fsn;
     TerminologyBuilderBI tc;
     String text;
 
@@ -80,6 +81,14 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
         t = new Timer(5000, this);
         c = Terms.get().getConcept(desc.getConceptNid());
         Ts.get().addVetoablePropertyChangeListener(TerminologyStoreDI.CONCEPT_EVENT.PRE_COMMIT, this);
+        //get rf1/rf2 concept
+        if (gbConcept == null) {
+            gbConcept = Ts.get().getConcept(SnomedMetadataRfx.getGB_DIALECT_REFEX_NID());
+            acceptNid = SnomedMetadataRfx.getDESC_ACCEPTABLE_NID();
+            prefNid = SnomedMetadataRfx.getDESC_PREFERRED_NID();
+            fsn = SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID();
+            usConcept = Ts.get().getConcept(SnomedMetadataRfx.getUS_DIALECT_REFEX_NID());
+        }
     }
     long lastChange = Long.MIN_VALUE;
     
@@ -191,18 +200,13 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
         config = Terms.get().getActiveAceFrameConfig();
         tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
                 config.getViewCoordinate());
+        ConceptVersionBI cv = Ts.get().getConceptVersion(config.getViewCoordinate(), desc.getConceptNid());
         if (update) { //create new
             if (desc.getLang().equals(LANG_CODE.EN.getFormatedLanguageCode())) {
 
                 refexes = desc.getAnnotationsActive(config.getViewCoordinate());
                 int type = desc.getTypeNid();
-                int fsn = SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID();
 
-                //get rf1/rf2 concept
-                gbConcept = Ts.get().getConcept(SnomedMetadataRfx.getGB_DIALECT_REFEX_NID());
-                usConcept = Ts.get().getConcept(SnomedMetadataRfx.getUS_DIALECT_REFEX_NID());
-                acceptNid = SnomedMetadataRfx.getDESC_ACCEPTABLE_NID();
-                prefNid = SnomedMetadataRfx.getDESC_PREFERRED_NID();
 
                 if (refexes.isEmpty()) { //check for previous changes
                     if (type == fsn) {
@@ -224,9 +228,13 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                         }
                     }
                     if (type == fsn) {
-                        doFsnUpdate(gbRefex, usRefex);
+                        if (cv.getFsnDescsActive().size() > 1) {
+                            doFsnUpdate(gbRefex, usRefex);
+                        }
                     } else {
-                        doSynUpdate(gbRefex, usRefex);
+                        if (cv.getPrefDescsActive().size() > 1) {
+                            doSynUpdate(gbRefex, usRefex);
+                        }
                     }
                 }
             }
