@@ -48,6 +48,10 @@ import java.awt.image.FilteredImageSource;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -62,6 +66,7 @@ import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.text.View;
+import net.jini.id.Uuid;
 
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -75,11 +80,14 @@ import org.dwfa.ace.dnd.ConceptTransferable;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.api.id.IdBI;
 
 import sun.awt.dnd.SunDragSourceContextPeer;
 
@@ -502,6 +510,10 @@ public class TermComponentLabel extends JLabel
 
     @Override
     public void setTermComponent(I_AmTermComponent termComponent) {
+        setTermComponent(termComponent, false);
+    }
+
+    public void setTermComponent(I_AmTermComponent termComponent, boolean prependIdB) {
         if (isFrozen()) {
             return;
         }
@@ -532,12 +544,21 @@ public class TermComponentLabel extends JLabel
                     } catch (ContradictionException ex) {
                         cv = cb.getVersions(vc).iterator().next();
                     }
+
+                    String prependIdString = "";
                     try {
+                        if (prependIdB && cv.getAdditionalIds() != null) {
+                            for (IdBI idBI : cv.getAdditionalIds()) {
+                                if (testIdPrependSet(idBI.getAuthorityNid())) {
+                                    prependIdString = idBI.getDenotation() + ": ";
+                                }
+                            }
+                        }
                         switch (textType) {
                             case FULLYSPECIFIED:
                                 DescriptionVersionBI fsn = cv.getDescriptionFullySpecified();
                                 if (fsn != null) {
-                                    this.setText(fsn.getText());
+                                    this.setText(prependIdString + fsn.getText());
                                 } else {
                                     this.setText("No fsn for: " + termComponent);
                                     AceLog.getAppLog().warning("No fsn for: " + termComponent);
@@ -546,21 +567,21 @@ public class TermComponentLabel extends JLabel
                             case PREFERRED:
                                 DescriptionVersionBI pt = cv.getDescriptionPreferred();
                                 if (pt != null) {
-                                    this.setText(pt.getText());
+                                    this.setText(prependIdString + pt.getText());
                                 } else {
                                     this.setText("No pt for: " + termComponent);
                                     AceLog.getAppLog().warning("No pt for: " + termComponent);
                                 }
                                 break;
                             default:
-                                this.setText(this.termComponent.toString());
+                                this.setText(prependIdString + this.termComponent.toString());
                         }
                     } catch (IOException e) {
                         this.setText(e.getMessage());
                         AceLog.getAppLog().alertAndLogException(e);
                     } catch (ContradictionException e) {
                         try {
-                            this.setText(cv.getDescriptionsActive().iterator().next().getText());
+                            this.setText(prependIdString + cv.getDescriptionsActive().iterator().next().getText());
                             AceLog.getAppLog().alertAndLogException(e);
                         } catch (IOException ex) {
                             AceLog.getAppLog().alertAndLogException(e);
@@ -727,5 +748,28 @@ public class TermComponentLabel extends JLabel
     @Override
     public void unlink() {
         // nothing to do...
+    }
+
+    private Set<Integer> idPrependSet = null;
+    private boolean testIdPrependSet(int authorityNid) {
+        if (idPrependSet == null) {
+            idPrependSet = new HashSet<Integer>();
+            TerminologyStoreDI ts = Ts.get();
+            try {
+                // Terminology Auxiliary concept/identifier source/ICD9
+                UUID uuid = UUID.fromString("a8160cc4-c49c-3a56-aa82-ea51e6c538ba");
+                if (ts.hasUuid(uuid)) {
+                    idPrependSet.add(ts.getNidForUuids(uuid));
+                }
+                // Terminology Auxiliary concept/identifier source/ICD10
+                uuid = UUID.fromString("9228d285-e625-33f9-bf46-9cfba3beee6d");
+                if (ts.hasUuid(uuid)) {
+                    idPrependSet.add(ts.getNidForUuids(uuid));
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(TermComponentLabel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return idPrependSet.contains(authorityNid);
     }
 }
