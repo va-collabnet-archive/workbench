@@ -214,7 +214,7 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
             String author, String module)
             throws IOException, TerminologyException {
         // PRIMARY_UUID = 0;
-        writer.append(Rf2x.convertIdToUuidStr(sctId) + TAB_CHARACTER);
+        writer.append(Rf2x.convertSctIdToUuidStr(sctId) + TAB_CHARACTER);
         // SOURCE_SYSTEM_UUID = 1;
         writer.append(uuidSourceSnomedLongStr + TAB_CHARACTER);
         // ID_FROM_SOURCE_SYSTEM = 2;

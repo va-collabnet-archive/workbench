@@ -144,7 +144,7 @@ public class SctRf2TextDefToArfMojo extends AbstractMojo implements Serializable
     private void writeSctSnomedLongId(BufferedWriter writer, long sctId, String date, String path)
             throws IOException, TerminologyException {
         // PRIMARY_UUID = 0;
-        writer.append(Rf2x.convertIdToUuidStr(sctId) + TAB_CHARACTER);
+        writer.append(Rf2x.convertSctIdToUuidStr(sctId) + TAB_CHARACTER);
         // SOURCE_SYSTEM_UUID = 1;
         writer.append(uuidSourceSnomedLongStr + TAB_CHARACTER);
         // ID_FROM_SOURCE_SYSTEM = 2;

@@ -244,7 +244,7 @@ class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
                 a[idx] = new Sct2_ConRecord(Long.parseLong(line[ID]),
                         Rf2x.convertEffectiveTimeToDate(line[EFFECTIVE_TIME]),
                         Rf2x.convertStringToBoolean(line[ACTIVE]),
-                        Rf2x.convertIdToUuidStr(line[MODULE_ID]),
+                        Rf2x.convertSctIdToUuidStr(line[MODULE_ID]),
                         Rf2x.convertDefinitionStatusToIsPrimitive(line[DEFINITION_STATUS_ID]),
                         Long.MAX_VALUE);
                 idx++;
@@ -268,11 +268,11 @@ class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
     public void writeArf(BufferedWriter writer)
             throws IOException, TerminologyException, ParseException {
         // Concept UUID
-        writer.append(Rf2x.convertIdToUuidStr(conSnoIdL) + TAB_CHARACTER);
+        writer.append(Rf2x.convertSctIdToUuidStr(conSnoIdL) + TAB_CHARACTER);
 
         // Status UUID
         if (statusConceptL < Long.MAX_VALUE) {
-            writer.append(Rf2x.convertIdToUuidStr(statusConceptL) + TAB_CHARACTER);
+            writer.append(Rf2x.convertSctIdToUuidStr(statusConceptL) + TAB_CHARACTER);
         } else {
             writer.append(Rf2x.convertActiveToStatusUuid(isActive) + TAB_CHARACTER);
         }
