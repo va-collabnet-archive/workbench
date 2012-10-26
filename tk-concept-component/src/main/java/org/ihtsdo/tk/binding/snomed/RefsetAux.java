@@ -21,4 +21,10 @@ public class RefsetAux {
     public static ConceptSpec EN_GB_REFEX =
             new ConceptSpec("Great Britain English language reference set",
             UUID.fromString("eb9a5e42-3cba-356d-b623-3ed472e20b30"));
+    public static ConceptSpec PATH_REFSET =
+            new ConceptSpec("Path reference set",
+            UUID.fromString("fd9d47b7-c0a4-3eea-b3ab-2b5a3f9e888f"));
+    public static ConceptSpec PATH_ORIGIN_REFEST =
+            new ConceptSpec("Path origin reference set",
+            UUID.fromString("1239b874-41b4-32a1-981f-88b448829b4b"));
 }
