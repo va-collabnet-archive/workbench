@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.UUID;
 import java.util.logging.Level;
 import org.dwfa.ace.log.AceLog;
-import sun.security.x509.OIDMap;
 
 /**
  *
