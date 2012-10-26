@@ -1682,6 +1682,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
       } else if (evt.getPropertyName().equals("imported")) {
 
          // Nothing to do...
+      } else if (evt.getPropertyName().equals("viewPositions")) {
+          termTreeConceptSplit.setBackground(aceFrameConfig.getColorForPath(aceFrameConfig.getEditCoordinate().getEditPaths()[0]));
+
       }
    }
 
@@ -2205,6 +2208,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
        */
       conceptTabs.setMinimumSize(new Dimension(0, 0));
       c2Panel.setMinimumSize(new Dimension(0, 0));
+      termTreeConceptSplit.setBackground(aceFrameConfig.getColorForPath(aceFrameConfig.getEditCoordinate().getEditPaths()[0]));
       termTreeConceptSplit.setRightComponent(conceptTabs);
       leftTabs.addTab(taxonomyTabLabel, termTree);
 
