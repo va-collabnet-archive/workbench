@@ -33,9 +33,9 @@ import org.dwfa.ace.log.AceLog;
  */
 public class Sct2_IdLookUp {
 
-    long sctIdArray[];
-    long uuidMsbArray[];
-    long uuidLsbArray[];
+    private long sctIdArray[];
+    private long uuidMsbArray[];
+    private long uuidLsbArray[];
 
     public Sct2_IdLookUp(String filePathName)
             throws IOException, ClassNotFoundException {
@@ -106,6 +106,10 @@ public class Sct2_IdLookUp {
             this.uuidMsbArray[i] = sct2_IdCompact.uuidMsbL;
             this.uuidLsbArray[i] = sct2_IdCompact.uuidLsbL;
         }
+    }
+
+    public UUID getUuid(String sctIdString) {
+        return getUuid(Long.parseLong(sctIdString));
     }
 
     public UUID getUuid(long sctId) {

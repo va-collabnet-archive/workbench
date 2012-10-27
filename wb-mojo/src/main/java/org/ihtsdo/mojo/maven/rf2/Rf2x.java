@@ -71,6 +71,11 @@ public class Rf2x {
         }
     }
 
+    static String convertActiveToStatusUuid(String activeString)
+            throws IOException, TerminologyException {
+        return convertActiveToStatusUuid(convertStringToBoolean(activeString));
+    }
+
     /**
      * Converts <code><b>true</code></b> to RF2 Active UUID.
      * Converts <code><b>false</code></b> to RF2 Inactive UUID.<br>

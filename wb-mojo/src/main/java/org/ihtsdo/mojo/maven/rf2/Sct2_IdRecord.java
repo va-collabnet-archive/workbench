@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -45,11 +44,11 @@ public class Sct2_IdRecord implements Serializable {
     private static final String TAB_CHARACTER = "\t";
     // RECORD FILES
     // long identifierScheme; // IDENTIFIER_SCHEME_ID column 0;
-    UUID primordialUuid; // ALTERNATE_IDENTIFIER column 1;
-    long revTime; // EFFECTIVE_TIME column 2; e.g. date time of "20020131"
-    int active; // ACTIVE column 3; value 1 is active
-    long moduleId; // MODULE_ID column 4; value 900000000000207008
-    long referencedComponent; // REFERENCED_COMPONENT_ID column 5 SCTID
+    private UUID primordialUuid; // ALTERNATE_IDENTIFIER column 1;
+    private long revTimeL; // EFFECTIVE_TIME column 2; e.g. date time of "20020131"
+    private int active; // ACTIVE column 3; value 1 is active
+    private long moduleSctId; // MODULE_ID column 4; value 900000000000207008
+    private long referencedComponentSctId; // REFERENCED_COMPONENT_ID column 5 SCTID
     // PATH
     // int pathIdx;
     // USER
@@ -57,10 +56,10 @@ public class Sct2_IdRecord implements Serializable {
 
     public Sct2_IdRecord(UUID pUuid, long revTime, int active, long moduleId, long referencedComponent) {
         this.primordialUuid = pUuid; // CONCEPTID/PRIMARYID
-        this.revTime = revTime;
+        this.revTimeL = revTime;
         this.active = active;
-        this.moduleId = moduleId;
-        this.referencedComponent = referencedComponent;
+        this.moduleSctId = moduleId;
+        this.referencedComponentSctId = referencedComponent;
     }
 
     /**
@@ -71,7 +70,7 @@ public class Sct2_IdRecord implements Serializable {
      * @return
      * @throws Exception
      */
-    static void createIdsJbinFile(List<Rf2File> fList, String outputPathString)
+    static void parseToIdPreCacheFile(List<Rf2File> fList, String outputPathStr)
             throws Exception {
         // SNOMED CT UUID scheme
         long sctUuidSchemeIdL = Long.parseLong("900000000000002006");
@@ -84,7 +83,7 @@ public class Sct2_IdRecord implements Serializable {
         Set<Long> moduleIdSet = new HashSet<>();
         try (ObjectOutputStream oos = new ObjectOutputStream(
                         new BufferedOutputStream(
-                        new FileOutputStream(outputPathString)))) {
+                        new FileOutputStream(outputPathStr)))) {
             int IDENTIFIER_SCHEME_ID = 0;
             int ALTERNATE_IDENTIFIER = 1;
             int EFFECTIVE_TIME = 2;
@@ -194,17 +193,15 @@ public class Sct2_IdRecord implements Serializable {
      * @return
      * @throws Exception
      */
-    static ArrayList<Sct2_IdRecord> parseIds(Rf2File f,
-            boolean returnIdRecordListB,
+    static void parseIdsToArf(List<Rf2File> fList,
             BufferedWriter arfWriter,
-            ObjectOutputStream compactIdStream)
+            Sct2_IdLookUp idLookUp, UUID pathUuid, UUID authorUuid)
             throws Exception {
         // SNOMED CT UUID scheme
-        long sctUuidSchemeId = Long.parseLong("900000000000002006");
-
-        ArrayList<Sct2_IdRecord> idRecordList = null;
-        if (returnIdRecordListB) {
-            idRecordList = new ArrayList();
+        String sctUuidSchemeId = "900000000000002006";
+        UUID sourceSystemUuid = idLookUp.getUuid(sctUuidSchemeId);
+        if (sourceSystemUuid == null) {
+            throw new Exception("Source System ID not found in ID lookup");
         }
 
         // DATA COLUMNS
@@ -212,77 +209,94 @@ public class Sct2_IdRecord implements Serializable {
         int ALTERNATE_IDENTIFIER = 1; // UUID of interest
         int EFFECTIVE_TIME = 2; // effectiveTime 20020131
         int ACTIVE = 3; // active 1
-        int MODULE_ID = 4; // moduleId 900000000000207008
+        int MODULE_ID = 4; // moduleSctId 900000000000207008
         int REFERENCED_COMPONENT_ID = 5; // referencedComponentId 100000000
 
-        BufferedReader br = new BufferedReader(
-                new InputStreamReader(
-                new FileInputStream(f.file), "UTF-8"));
+        for (Rf2File f : fList) {
+            BufferedReader br = new BufferedReader(
+                    new InputStreamReader(
+                    new FileInputStream(f.file), "UTF-8"));
 
-        // Header row
-        br.readLine();
+            // Header row
+            br.readLine();
 
-        while (br.ready()) {
-            String tempLine = br.readLine();
-            String[] line = tempLine.split(TAB_CHARACTER);
-            if (line.length < REFERENCED_COMPONENT_ID + 1) {
-                System.err.println("not parsed: " + tempLine);
-                continue;
-            }
-            // Check IDENTIFIER_SCHEME_ID
-            long identifierScheme = Long.parseLong(line[IDENTIFIER_SCHEME_ID]);
-            if (identifierScheme != sctUuidSchemeId) {
-                throw new UnsupportedOperationException("ID scheme not supported");
-            }
+            while (br.ready()) {
+                String tempLine = br.readLine();
+                String[] line = tempLine.split(TAB_CHARACTER);
+                if (line.length < REFERENCED_COMPONENT_ID + 1) {
+                    System.err.println("not parsed: " + tempLine);
+                    continue;
+                }
+                // SCTID
+                String componentSctIdString = line[REFERENCED_COMPONENT_ID];
+                UUID sctIdUuid = idLookUp.getUuid(componentSctIdString);
+                // PRIMARY_UUID
+                UUID pUuid = UUID.fromString(line[ALTERNATE_IDENTIFIER]);
+                if (sctIdUuid == null || pUuid.compareTo(sctIdUuid) != 0) {
+                    throw new Exception("ALTERNATE_IDENTIFIER not found in cache");
+                }
 
-            int activeData = Integer.parseInt(line[ACTIVE]);
-            String eTimeStr = Rf2x.convertEffectiveTimeToDate(line[EFFECTIVE_TIME]);
-            long eTime = Rf2x.convertDateToTime(eTimeStr);
-            UUID aUuid = UUID.fromString(line[ALTERNATE_IDENTIFIER]);
-            long sctIdL = Long.parseLong(line[REFERENCED_COMPONENT_ID]);
+                // Check IDENTIFIER_SCHEME_ID ARF ID_FROM_SOURCE_SYSTEM
+                if (!sctUuidSchemeId.equalsIgnoreCase(line[IDENTIFIER_SCHEME_ID])) {
+                    throw new UnsupportedOperationException("ID scheme "
+                            + line[IDENTIFIER_SCHEME_ID]
+                            + " not supported");
+                }
+                // yyyy-MM-dd HH:mm:ss
+                String dateStr = Rf2x.convertEffectiveTimeToDate(line[EFFECTIVE_TIME]);
 
-            Sct2_IdRecord tempIdRecord = new Sct2_IdRecord(aUuid,
-                    eTime,
-                    activeData,
-                    Long.parseLong(line[MODULE_ID]),
-                    sctIdL);
-            // Add to Sct2_IdRecord List
-            if (idRecordList != null) {
-                idRecordList.add(tempIdRecord);
+                // module uuid
+                UUID moduleUuid = idLookUp.getUuid(line[MODULE_ID]);
+                if (moduleUuid == null) {
+                    throw new Exception("MODULE_ID not in id cache");
+                }
+
+                // Write to ARF file
+                writeArf(arfWriter,
+                        pUuid, // PRIMARY_UUID = 0
+                        sourceSystemUuid, // SOURCE_SYSTEM_UUID = 1
+                        line[REFERENCED_COMPONENT_ID], // ID_FROM_SOURCE_SYSTEM
+                        line[ACTIVE], // STATUS_UUID = 3
+                        dateStr, // EFFECTIVE_DATE = 4; yyyy-MM-dd HH:mm:ss
+                        pathUuid, // PATH_UUID = 5;
+                        authorUuid, // AUTHOR_UUID = 6;
+                        moduleUuid); // MODULE_UUID = 7;
             }
-            // Write to ARF file
-            if (arfWriter != null) {
-                tempIdRecord.writeArf(arfWriter);
-            }
+            StringBuilder sb = new StringBuilder();
+            sb.append("\n::: parseIdsToArf() FILE: ");
+            sb.append(f.file.toURI().toString());
+            AceLog.getAppLog().info(sb.toString());
         }
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("\n::: FILE: ");
-        sb.append(f.file.toURI().toString());
-        sb.append("::: completed parseIds()\n");
-        AceLog.getAppLog().info(sb.toString());
-        return idRecordList;
     }
 
     // writeSctSnomedLongId
     // BufferedWriter writer, long sctId, String date, String path
-    public void writeArf(BufferedWriter writer)
+    private static void writeArf(BufferedWriter writer,
+            UUID pUuid,
+            UUID sourceSystemUuid,
+            String sctIdString,
+            String activeStr,
+            String dateStr,
+            UUID pathUuid,
+            UUID authorUuid,
+            UUID moduleUuid)
             throws IOException, TerminologyException {
         // PRIMARY_UUID = 0;
-        writer.append(this.primordialUuid.toString() + TAB_CHARACTER);
+        writer.append(pUuid.toString() + TAB_CHARACTER);
         // SOURCE_SYSTEM_UUID = 1;
-        //writer.append(uuidSourceSnomedLongStr + TAB_CHARACTER);
-        writer.append(":!!!:REPLACE_THIS" + TAB_CHARACTER);
+        writer.append(sourceSystemUuid + TAB_CHARACTER);
         // ID_FROM_SOURCE_SYSTEM = 2;
-        writer.append(Long.toString(this.referencedComponent) + TAB_CHARACTER);
-        // STATUS_UUID = 3; // :!!!:NYI: always true :???:
-        writer.append(Rf2x.convertActiveToStatusUuid(true) + TAB_CHARACTER);
+        writer.append(sctIdString + TAB_CHARACTER);
+        // STATUS_UUID = 3;
+        writer.append(Rf2x.convertActiveToStatusUuid(activeStr) + TAB_CHARACTER);
         // EFFECTIVE_DATE = 4; // yyyy-MM-dd HH:mm:ss
         // writer.append(date + TAB_CHARACTER);
-        writer.append(":!!!:REPLACE_THIS" + TAB_CHARACTER);
+        writer.append(dateStr + TAB_CHARACTER);
         // PATH_UUID = 5;
-        // writer.append(path + LINE_TERMINATOR);
-        writer.append(":!!!:REPLACE_THIS" + LINE_TERMINATOR);
-        // :!!!: module & author
+        writer.append(pathUuid.toString() + TAB_CHARACTER);
+        // AUTHOR_UUID = 6;
+        writer.append(authorUuid.toString() + TAB_CHARACTER);
+        // MODULE_UUID = 7;
+        writer.append(moduleUuid.toString() + LINE_TERMINATOR);
     }
 }

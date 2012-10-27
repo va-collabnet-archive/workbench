@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.maven.plugin.AbstractMojo;
@@ -72,6 +73,26 @@ public class Rf2UuidXmapGenMojo extends AbstractMojo implements Serializable {
      * @parameter default-value="uuid-xmap"
      */
     private String outputDir;
+    /**
+     * Default value SNOMED Core
+     *
+     * @parameter default-value="8c230474-9f11-30ce-9cad-185a96fd03a2"
+     */
+    private UUID uuidPath;
+
+    public void setUuidPath(String uuidStr) {
+        uuidPath = UUID.fromString(uuidStr);
+    }
+    /**
+     * Default value Workbench Auxiliary 'user'
+     *
+     * @parameter default-value="f7495b58-6630-3499-a44e-2052b5fcf06c"
+     */
+    private UUID uuidAuthor;
+
+    public void setUuidAuthor(String uuidStr) {
+        uuidAuthor = UUID.fromString(uuidStr);
+    }
 
     @Override
     public void execute()
@@ -106,19 +127,33 @@ public class Rf2UuidXmapGenMojo extends AbstractMojo implements Serializable {
             filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir,
                     "_Identifier_", ".txt");
 
-            // Setup intermediate ser file.
+            // Parse IHTSDO Terminology Identifiers
+            // to Sct_CompactId serial object file.
             String idPreCacheFName = idCacheDir + "idPreCache.ser";
-            Sct2_IdRecord.createIdsJbinFile(filesIn, idPreCacheFName);
+            Sct2_IdRecord.parseToIdPreCacheFile(filesIn, idPreCacheFName);
             // Setup id array cache object
             // idCacheDir + FILE_SEPARATOR + "idObjectCache.jbin"
             long startTime = System.currentTimeMillis();
             Sct2_IdLookUp idLookup = new Sct2_IdLookUp(idPreCacheFName);
             System.out.println((System.currentTimeMillis() - startTime) + " mS");
 
-            // Converted IDs to ARF
+            // Parse IHTSDO Terminology Identifiers
+            // to Sct_CompactId serial object file.
+            String idAssignedArfFName = outDir + "ids_assigned.txt";
+            try (BufferedWriter bwIdArf = new BufferedWriter(
+                            new OutputStreamWriter(
+                            new FileOutputStream(
+                            idAssignedArfFName), "UTF-8"))) {
+                getLog().info("::: Assigned SCTID/UUID ARF output: "
+                        + idAssignedArfFName);
+                Sct2_IdRecord.parseIdsToArf(filesIn, bwIdArf, idLookup,
+                        uuidPath, uuidAuthor);
+                bwIdArf.flush();
+                bwIdArf.close();
+            }
 
             for (Rf2File rf2File : filesIn) {
-                // Sct2_IdRecord.parseIds(rf2File, false, bwArf);
+                // Sct2_IdRecord.parseIdsToArf(rf2File, false, bwArf);
 //                for (Sct2_DesRecord d : textdefinitions) {
 //                    d.writeArf(bw);
 //                    writeSctSnomedLongId(bwIds, d.desSnoIdL, d.effDateStr, d.pathUuidStr);
