@@ -24,6 +24,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -60,6 +61,14 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
     private ViewCoordinate vc;
     private List<RefexCAB> annotations = new ArrayList<RefexCAB>();
     protected PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    private Long longId;
+    private int longAuthorityNid;
+    private String stringId;
+    private int stringAuthorityNnid;
+    private UUID extraUuid;
+    private int uuidAuthortiyNid;
+    private boolean hasAdditionalIds = false;
+    private HashMap<Object, Integer> idMap = new HashMap<>();
 
     /**
      * Removes the specified property change listener.
@@ -328,7 +337,8 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
      * given list of
      * <code>annoationBlueprints</code>.
      *
-     * @param annotationBlueprints the annotation blueprints to associate with this component blueprint
+     * @param annotationBlueprints the annotation blueprints to associate with
+     * this component blueprint
      */
     public void replaceAnnotationBlueprints(List<RefexCAB> annotationBlueprints) {
         this.annotations = annotationBlueprints;
@@ -356,7 +366,8 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
     /**
      * Sets the uuid of the status associated with this component blueprint.
      *
-     * @param statusUuid the uuid of the status associated with this component blueprint
+     * @param statusUuid the uuid of the status associated with this component
+     * blueprint
      */
     public void setStatusUuid(UUID statusUuid) {
         this.statusUuid = statusUuid;
@@ -374,5 +385,74 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
      */
     public void setRetired() {
         this.statusUuid = retiredStatusUuid;
+    }
+
+    /**
+     * Adds an additional
+     * <code>long</code> ID to the component specified by this component
+     * blueprint. Any SCT IDs to add to this concept should be added using this
+     * method.
+     *
+     * @param longId the long identifier to add
+     * @param authorityNid the authority associated with the identifier
+     */
+    public void addLongId(Long longId, int authorityNid) {
+        this.longId = longId;
+        this.longAuthorityNid = authorityNid;
+        idMap.put(longId, authorityNid);
+        hasAdditionalIds = true;
+    }
+
+    /**
+     * Adds an additional
+     * <code>String</code> ID to the component specified by this component
+     * blueprint.
+     *
+     * @param stringId the string identifier to add
+     * @param authorityNid the authority associated with the identifier
+     */
+    public void addStringId(String stringId, int authorityNid) {
+        this.stringId = stringId;
+        this.stringAuthorityNnid = authorityNid;
+        idMap.put(stringId, authorityNid);
+        hasAdditionalIds = true;
+    }
+
+    /**
+     * Adds an additional
+     * <code>UUID</code> ID to the component specified by this component
+     * blueprint. This is a UUID in addition to the primordial uuid associated
+     * with this concept. Use setComponentUuid to set the primordial uuid.
+     *
+     * @param extraUuid the uuid identifier to add
+     * @param authorityNid the authority associated with the identifier
+     * @see CreateOrAmendBlueprint#setComponentUuid(java.util.UUID)
+     */
+    public void addExtraUuid(UUID extraUuid, int authorityNid) {
+        this.extraUuid = extraUuid;
+        this.uuidAuthortiyNid = authorityNid;
+        idMap.put(extraUuid, authorityNid);
+        hasAdditionalIds = true;
+    }
+
+    /**
+     * Returns true if any additional ids have been added to this blueprint.
+     *
+     * @return <code>true</code> if this blueprint has any additional ids
+     */
+    public boolean hasAdditionalIds() {
+        return hasAdditionalIds;
+    }
+
+    /**
+     * Returns a map of IDs as
+     * <code>Objects</code> and their associated authority nids. The supported
+     * IDs are currently: long, string, and uuid.
+     *
+     * @return a map of IDs as <code>Objects</code> and their associated
+     * authority nids
+     */
+    public HashMap<Object, Integer> getIdMap() {
+        return idMap;
     }
 }
