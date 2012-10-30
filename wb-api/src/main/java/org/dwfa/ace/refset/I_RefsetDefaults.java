@@ -27,4 +27,8 @@ public interface I_RefsetDefaults {
     public I_GetConceptData getDefaultStatusForRefset();
 
     public I_IntList getStatusPopupIds();
+    
+    public void setDefaultRefset(I_GetConceptData defaultRefset);
+    
+    public void setDefaultStatusForRefset(I_GetConceptData defaultStatusForRefset);
 }
