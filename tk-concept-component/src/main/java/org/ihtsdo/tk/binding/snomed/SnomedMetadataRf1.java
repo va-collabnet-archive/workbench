@@ -54,11 +54,11 @@ public class SnomedMetadataRf1 {
     /*** LANGUAGE ***/
     // US language 100033
     public static ConceptSpec US_LANGUAGE_REFSET_RF1 =
-            new ConceptSpec("US Language Refset",
+            new ConceptSpec("US English Dialect Subset",
             UUID.fromString("29bf812c-7a77-595d-8b12-ea37c473a5e6"));
     // GB language 101032
     public static ConceptSpec GB_LANGUAGE_REFSET_RF1 =
-            new ConceptSpec("GB Language Refset",
+            new ConceptSpec("GB English Dialect Subset",
             UUID.fromString("a0982f18-ec51-56d2-a8b1-6ff8964813dd"));
     /*** CASE SIGNIFICANCE ***/
     // Case significant 1
