@@ -25,7 +25,7 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
+import org.ihtsdo.tk.api.refex.type_string.RefexStringVersionBI;
 
 /**
  *
@@ -34,7 +34,7 @@ import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
 @BeanList(specs = {
     @Spec(directory = "tasks/ide/search", type = BeanType.TASK_BEAN),
     @Spec(directory = "search", type = BeanType.TASK_BEAN)})
-public class RefsetStr1ContainsText extends AbstractSearchTest {
+public class RefsetString1ContainsText extends AbstractSearchTest {
 
     private static final long serialVersionUID = 1;
     private static final int dataVersion = 1;
@@ -58,9 +58,9 @@ public class RefsetStr1ContainsText extends AbstractSearchTest {
     public boolean test(I_AmTermComponent component,
             I_ConfigAceFrame frameConfig) throws TaskFailedException {
         if (I_ExtendByRefVersion.class.isAssignableFrom(component.getClass())) {
-            if (RefexStrVersionBI.class.isAssignableFrom(component.getClass())) {
-                RefexStrVersionBI strVersion = (RefexStrVersionBI) component;
-                return strVersion.getStr1().toLowerCase().contains(text.toLowerCase());
+            if (RefexStringVersionBI.class.isAssignableFrom(component.getClass())) {
+                RefexStringVersionBI strVersion = (RefexStringVersionBI) component;
+                return strVersion.getString1().toLowerCase().contains(text.toLowerCase());
             }
         }
         return false;

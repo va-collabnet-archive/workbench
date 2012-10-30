@@ -27,8 +27,8 @@ import org.dwfa.ace.task.search.AbstractSearchTestBeanInfo;
  *
  * @author kec
  */
-public class RefsetStr1ContainsTextBeanInfo extends AbstractSearchTestBeanInfo {
-    private static AbstractSeachTestSearchInfo searchInfo = new RefsetStr1ContainsTextSearchInfo();
+public class RefsetString1ContainsTextBeanInfo extends AbstractSearchTestBeanInfo {
+    private static AbstractSeachTestSearchInfo searchInfo = new RefsetString1ContainsTextSearchInfo();
 
     @Override
     public PropertyDescriptor[] getPropertyDescriptors() {

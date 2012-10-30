@@ -25,7 +25,7 @@ import org.dwfa.bpa.tasks.editor.JTextFieldEditorOneLine;
  *
  * @author kec
  */
-public class RefsetStr1ContainsTextSearchInfo extends AbstractSeachTestSearchInfo {
+public class RefsetString1ContainsTextSearchInfo extends AbstractSeachTestSearchInfo {
 
     @Override
     protected PropertyDescriptor[] getAdditionalPropertyDescriptors() {
@@ -50,7 +50,7 @@ public class RefsetStr1ContainsTextSearchInfo extends AbstractSeachTestSearchInf
      */
     @Override
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd = new BeanDescriptor(RefsetStr1ContainsText.class);
+        BeanDescriptor bd = new BeanDescriptor(RefsetString1ContainsText.class);
         bd.setDisplayName("text in string field");
         return bd;
     }
