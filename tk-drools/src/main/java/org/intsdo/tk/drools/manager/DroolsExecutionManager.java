@@ -30,9 +30,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
-
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseConfiguration;
@@ -53,6 +50,7 @@ import org.drools.runtime.rule.ConsequenceExceptionHandler;
 import org.ihtsdo.tk.drools.IsGbMemberTypeOfEvaluatorDefinition;
 import org.ihtsdo.tk.drools.IsKindOfEvaluatorDefinition;
 import org.ihtsdo.tk.drools.IsMemberOfEvaluatorDefinition;
+import org.ihtsdo.tk.drools.IsMemberOfWithTypeEvaluatorDefinition;
 import org.ihtsdo.tk.drools.IsMissingDescForDialectEvaluatorDefinition;
 import org.ihtsdo.tk.drools.IsParentMemberOfEvaluatorDefinition;
 import org.ihtsdo.tk.drools.IsSynonymMemberTypeOfEvaluatorDefinition;
@@ -76,7 +74,8 @@ public class DroolsExecutionManager {
         IS_KIND_OF, SAFISFIES_CONSTRAINT,
         IS_MEMBER_OF, IS_PARENT_MEMBER_OF,
         IS_MISSING_DESC_FOR, IS_GB_MEMBER_TYPE_OF,
-        IS_US_MEMBER_TYPE_OF, IS_SYNONYM_MEMBER_TYPE_OF;
+        IS_US_MEMBER_TYPE_OF, IS_SYNONYM_MEMBER_TYPE_OF,
+        IS_MEMBER_OF_WITH_TYPE;
     }
     private boolean failed = false;
     Collection<KnowledgePackage> kpkgs = null;
@@ -200,6 +199,11 @@ public class DroolsExecutionManager {
                     IsMemberOfEvaluatorDefinition.IS_MEMBER_OF.getOperatorString(),
                     new IsMemberOfEvaluatorDefinition()));
         }
+        if (extraEvaluators.contains(ExtraEvaluators.IS_MEMBER_OF_WITH_TYPE)) {
+            builderConfig.setOption(EvaluatorOption.get(
+                    IsMemberOfWithTypeEvaluatorDefinition.IS_MEMBER_OF_WITH_TYPE.getOperatorString(),
+                    new IsMemberOfWithTypeEvaluatorDefinition()));
+        }
         if (extraEvaluators.contains(ExtraEvaluators.IS_PARENT_MEMBER_OF)) {
             builderConfig.setOption(EvaluatorOption.get(
                     IsParentMemberOfEvaluatorDefinition.IS_PARENT_MEMBER_OF.getOperatorString(),
@@ -235,7 +239,9 @@ public class DroolsExecutionManager {
         kbase = KnowledgeBaseFactory.newKnowledgeBase(kBaseConfig);
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder(kbase, builderConfig);
         for (Resource resource : resources.keySet()) {
-            kbuilder.add(resource, resources.get(resource));
+            synchronized (this) {
+                kbuilder.add(resource, resources.get(resource)); 
+            }
         }
         if (kbuilder.hasErrors()) {
             throw new RuntimeException(kbuilder.getErrors().toString());
