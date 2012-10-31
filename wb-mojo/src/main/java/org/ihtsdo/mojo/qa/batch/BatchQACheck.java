@@ -285,7 +285,7 @@ public class BatchQACheck extends AbstractMojo {
 
 
 			I_GetConceptData context = tf.getConcept(UUID.fromString(context_uuid));
-			contextHelper.getKnowledgeBaseForContext(context, config, true);
+			contextHelper.getKnowledgeBaseForContext(context, config, false);
 
 
 			// Create the execution XMLexecutionPw
@@ -523,7 +523,7 @@ public class BatchQACheck extends AbstractMojo {
 		config.getAllowedStatus().add(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
 		config.getAllowedStatus().add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
 		config.getAllowedStatus().add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
-		config.setRelAssertionType(RelAssertionType.INFERRED);
+		config.setRelAssertionType(RelAssertionType.INFERRED_THEN_STATED);
 
 		config.setPrecedence(Precedence.TIME);
 		config.setConflictResolutionStrategy(new LastCommitWinsContradictionResolutionStrategy());
