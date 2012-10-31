@@ -45,29 +45,34 @@ public class DrRefsetExtension extends DrComponent{
 			} catch (IllegalArgumentException ex) {
 			}
 
-			try {
-				ConceptChronicleBI c1 = Ts.get().getConcept(UUID.fromString(c1Uuid));
-				sb.append(" C1: " + c1 + " (" + c1Uuid + "),");
-			} catch (IllegalArgumentException ex) {
-			}
+            sb.append(" C1: ");
+            if (c1Uuid != null) {
+                try {
+                    ConceptChronicleBI c1 = Ts.get().getConcept(UUID.fromString(c1Uuid));
+                    sb.append(c1 + " (" + c1Uuid + "),");
+                } catch (IllegalArgumentException ex) {
+                }
+            }
 			
-			try {
-				ConceptChronicleBI c2 = Ts.get().getConcept(UUID.fromString(c2Uuid));
-				sb.append(" C2: " + c2 + " (" + c2Uuid + "),");
-			} catch (IllegalArgumentException ex) {
-			}
+            sb.append(" C2: ");
+            if (c2Uuid != null) {
+                try {
+                    ConceptChronicleBI c1 = Ts.get().getConcept(UUID.fromString(c2Uuid));
+                    sb.append(c1 + " (" + c2Uuid + "),");
+                } catch (IllegalArgumentException ex) {
+                }
+            }
 			
-			try {
-				ConceptChronicleBI c3 = Ts.get().getConcept(UUID.fromString(c3Uuid));
-				sb.append(" C3: " + c3 + " (" + c3Uuid + "),");
-			} catch (IllegalArgumentException ex) {
-			}
+            sb.append(" C3: ");
+            if (c3Uuid != null) {
+                try {
+                    ConceptChronicleBI c1 = Ts.get().getConcept(UUID.fromString(c3Uuid));
+                    sb.append(c1 + " (" + c3Uuid + "),");
+                } catch (IllegalArgumentException ex) {
+                }
+            }
+           
 			
-			try {
-				ConceptChronicleBI c1 = Ts.get().getConcept(UUID.fromString(c1Uuid));
-				sb.append(" C1: " + c1 + " (" + c1Uuid + "),");
-			} catch (IllegalArgumentException ex) {
-			}
 			sb.append(" DRCOMPONENT FIELDS: {" + super.toString() + "}, ");
 			sb.append("\nIdentifiers: [");
 			if (identifiers != null) {
@@ -192,5 +197,4 @@ public class DrRefsetExtension extends DrComponent{
 	public void setComponentUuid(String componentUuid) {
 		this.componentUuid = componentUuid;
 	}
-
 }
