@@ -2,13 +2,16 @@ package org.ihtsdo.db.bdb;
 
 import java.beans.PropertyVetoException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.vodb.types.Path;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.RevisionSet;
@@ -28,6 +31,8 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.AnalogBI;
 import org.ihtsdo.tk.api.ComponentChronicleBI;
 import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.blueprint.ConceptAttributeAB;
 import org.ihtsdo.tk.api.blueprint.DescriptionCAB;
 
@@ -38,6 +43,7 @@ import org.ihtsdo.tk.api.blueprint.RelationshipCAB;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
 import org.ihtsdo.tk.api.blueprint.MediaCAB;
+import org.ihtsdo.tk.api.blueprint.PathCB;
 import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeChronicleBI;
 import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -734,7 +740,7 @@ public class BdbTermBuilder implements TerminologyBuilderBI {
         }
         
         RefexChronicleBI<?> pathOriginRefexOther = construct(blueprint.getPathAsOriginBp());
-        ConceptChronicleBI pathOriginRefexConcept = Ts.get().getConcept(pathOriginRefexOther.getCollectionNid());
+        ConceptChronicleBI pathOriginRefexConcept = Ts.get().getConcept(pathOriginRefexOther.getRefexNid());
         if(pathOriginRefexConcept.isAnnotationStyleRefex()){
             Ts.get().addUncommitted(Ts.get().getConcept(pathOriginRefexOther.getConceptNid()));
             Ts.get().commit(Ts.get().getConcept(pathOriginRefexOther.getConceptNid()));

@@ -505,7 +505,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
         return mediaCABs;
     }
 
-    public ConceptAttributeAB getConceptAttributteAB() {
+    public ConceptAttributeAB getConceptAttributeAB() {
         return conAttr;
     }
 
