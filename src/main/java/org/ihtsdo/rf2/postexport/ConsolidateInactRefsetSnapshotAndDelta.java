@@ -90,14 +90,14 @@ public class ConsolidateInactRefsetSnapshotAndDelta extends AbstractTask {
 				if (line2!=null){
 					int comp = splittedLine1[index].compareTo(splittedLine2[index]);
 					if ( comp<0){
-							addPreviousLine(splittedLine1);
-							lines++;
+//							addPreviousLine(splittedLine1);
+//							lines++;
 					}else{
 						if (comp>0){
 							while (comp>0){
 								if (splittedLine2[STATUS_COLUMN].compareTo("")!=0){
-									addExportedLine(splittedLine2);
-									lines++;
+//									addExportedLine(splittedLine2);
+//									lines++;
 								}
 								line2=br2.readLine();
 								if (line2==null){
@@ -108,8 +108,8 @@ public class ConsolidateInactRefsetSnapshotAndDelta extends AbstractTask {
 								comp = splittedLine1[index].compareTo(splittedLine2[index]);
 							}
 							if ( comp<0){
-								addPreviousLine(splittedLine1);
-								lines++;
+//								addPreviousLine(splittedLine1);
+//								lines++;
 							}
 						}
 						while(comp==0){
@@ -118,11 +118,13 @@ public class ConsolidateInactRefsetSnapshotAndDelta extends AbstractTask {
 								splittedLine2[STATUS_COLUMN]=splittedLine1[STATUS_COLUMN];
 							}
 							if (fieldsCompare(splittedLine1,splittedLine2)!=0){
+								if (dateCompare(splittedLine2)){
 								addExportedLine(splittedLine2);
 								lines++;
+								}
 							}else{
-								addPreviousLine(splittedLine1);
-								lines++;		
+//								addPreviousLine(splittedLine1);
+//								lines++;		
 							}
 							line2=br2.readLine();
 							if (line2==null){
@@ -134,22 +136,22 @@ public class ConsolidateInactRefsetSnapshotAndDelta extends AbstractTask {
 						}
 					}
 				}else{
-					addPreviousLine(splittedLine1);
-					lines++;
+//					addPreviousLine(splittedLine1);
+//					lines++;
 				}
 			}
 
 			if (line2!=null){
 
 				if (splittedLine2[STATUS_COLUMN].compareTo("")!=0){
-					addExportedLine(splittedLine2);
-					lines++;
+//					addExportedLine(splittedLine2);
+//					lines++;
 				}
 				while ((line2= br2.readLine()) != null) {
 					splittedLine2=line2.split("\t",-1);
 					if (splittedLine2[STATUS_COLUMN].compareTo("")!=0){
-						addExportedLine(splittedLine2);
-						lines++;
+//						addExportedLine(splittedLine2);
+//						lines++;
 					}
 				}
 			}
@@ -170,7 +172,7 @@ public class ConsolidateInactRefsetSnapshotAndDelta extends AbstractTask {
 		StringBuffer sb=new StringBuffer();
 		for (int i = 0; i < colLen; i++) {
 			if (i==1){
-				sb.append(releaseDate);
+				sb.append(splittedLine[i]);
 				
 			}else{
 			
@@ -207,7 +209,14 @@ public class ConsolidateInactRefsetSnapshotAndDelta extends AbstractTask {
 		return 0;
 	}
 
-	
+
+	private boolean dateCompare(String[] splittedLine2) {
+		if (splittedLine2[1].compareTo("20120731")<=0){
+			return true;
+		}
+		return false;
+	}
+
 
 }
 

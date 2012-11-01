@@ -32,7 +32,13 @@ public class RF2ConceptFactory extends RF2AbstractFactory {
 
 			RF2ConceptImpl iterator = new RF2ConceptImpl(getConfig());
 
+			iterator.openExtIdsFile();
+			iterator.openDupFile();
+			
 			Terms.get().iterateConcepts(iterator);
+
+			iterator.closeExtIdsFile();
+			iterator.closeDupsFile();
 
 			closeExportFileWriter();
 			

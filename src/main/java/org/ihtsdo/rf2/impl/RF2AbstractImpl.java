@@ -1,9 +1,14 @@
 package org.ihtsdo.rf2.impl;
 
 import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -107,6 +112,12 @@ public abstract class RF2AbstractImpl {
 
 	private I_IntSet activeStatusSet;
 
+	private BufferedWriter brid;
+
+	private HashMap<String, String> HashDup;
+
+	private BufferedWriter brdu;
+	
 	public static Config getConfig() {
 		return config;
 	}
@@ -167,6 +178,7 @@ public abstract class RF2AbstractImpl {
 			this.allStatusSet=tf.newIntSet();
 			this.allStatusSet.addAll(allStatuses.getSetValues());
 
+			HashDup = new HashMap<String,String>();
 			this.activeStatus=tf.uuidToNative(UUID.fromString("d12702ee-c37f-385f-a070-61d56d4d0f1f"));
 			this.activeStatusSet=tf.newIntSet();
 			this.activeStatusSet.add(activeStatus);
@@ -578,7 +590,6 @@ public abstract class RF2AbstractImpl {
 	}
 
 	public void process(I_GetConceptData concept) throws IOException, TerminologyException {
-		
 		if (snomedRoot.isParentOf(concept, 
 				currenAceConfig.getAllowedStatus(),
 				currenAceConfig.getDestRelTypes(), 
@@ -599,7 +610,7 @@ public abstract class RF2AbstractImpl {
 			/*int len= conceptid.length();
 			CharSequence partition = conceptid.substring(len-3, len).subSequence(0, 2);
 			if(partition.equals("00")){		*/	
-			
+
 			String active="0"; //Default value
 			List<? extends I_ConceptAttributeTuple> conceptAttributes = concept.getConceptAttributeTuples(
 					allStatuses, 
@@ -616,17 +627,88 @@ public abstract class RF2AbstractImpl {
 				} else {
 					active = "0";
 				}
-				
+
 				if ((conceptid==null || conceptid.equals("") || conceptid.equals("0")) && active.equals("1") ){
 					conceptid=concept.getUids().iterator().next().toString();
 				}
 			}
-			
+
 			if (conceptid==null || conceptid.equals("") || conceptid.equals("0")){
 				logger.info("Unplublished Retired Concept: " + concept.getUUIDs().iterator().next().toString());
 			}else{
-					export(concept, conceptid);
+				if (HashDup.containsKey(conceptid)){
+					brdu.append(conceptid);
+					brdu.append("\t");
+					brdu.append(concept.getUUIDs().iterator().next().toString());
+					brdu.append("\t");
+					brdu.append(HashDup.get(conceptid));
+					brdu.append("\r\n");
+				}
+				if (conceptid.substring(conceptid.length()-3,conceptid.length()-1).equals("10")){
+					String item=conceptid.substring(0,conceptid.length()-10);
+					String part=conceptid.substring(conceptid.length()-10,conceptid.length()-3);
+					brdu.append(conceptid);
+					brdu.append("\t");
+					brdu.append(concept.getUUIDs().iterator().next().toString());
+					brdu.append("\t");
+					brdu.append(item);
+					brdu.append("\t");
+					brdu.append(part);
+					brdu.append("\r\n");
+					//export(concept, conceptid);
+				}
 			}
+		}
+	}
+
+	public void openExtIdsFile(){
+
+		FileOutputStream fis;
+		OutputStreamWriter isr;
+		try {
+			fis = new FileOutputStream("target/extIds.txt");
+			isr = new OutputStreamWriter(fis, "UTF-8");
+			brid = new BufferedWriter(isr);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	public void openDupFile(){
+
+		FileOutputStream fis;
+		OutputStreamWriter isr;
+		try {
+			fis = new FileOutputStream("target/DupIds.txt");
+			isr = new OutputStreamWriter(fis, "UTF-8");
+			brdu = new BufferedWriter(isr);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void closeExtIdsFile(){
+		try {
+			brid.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public void closeDupsFile(){
+		try {
+			brdu.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	

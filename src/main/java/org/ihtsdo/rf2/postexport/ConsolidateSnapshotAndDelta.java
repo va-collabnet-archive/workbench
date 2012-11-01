@@ -94,13 +94,13 @@ public class ConsolidateSnapshotAndDelta extends AbstractTask {
 //					int comp = splittedLine1[index].compareTo(splittedLine2[index]);
 					if ( comp<0){
 
-						addPreviousLine(splittedLine1);
-						lines++;
+						//addPreviousLine(splittedLine1);
+//						lines++;
 					}else{
 						if (comp>0){
 							while (comp>0){
-								addExportedLine(splittedLine2);
-								lines++;
+						//		addExportedLine(splittedLine2);
+//								lines++;
 								line2=br2.readLine();
 								if (line2==null){
 									comp=-1;
@@ -111,17 +111,19 @@ public class ConsolidateSnapshotAndDelta extends AbstractTask {
 //								comp = splittedLine1[index].compareTo(splittedLine2[index]);
 							}
 							if ( comp<0){
-								addPreviousLine(splittedLine1);
-								lines++;
+						//		addPreviousLine(splittedLine1);
+//								lines++;
 							}
 						}
 						while(comp==0){
 							if (fieldsCompare(splittedLine1,splittedLine2)!=0){
+								if (dateCompare(splittedLine2)){
 								addExportedLine(splittedLine2);
 								lines++;
+								}
 							}else{
-								addPreviousLine(splittedLine1);
-								lines++;		
+//								addPreviousLine(splittedLine1);
+//								lines++;		
 							}
 							line2=br2.readLine();
 							if (line2==null){
@@ -134,20 +136,20 @@ public class ConsolidateSnapshotAndDelta extends AbstractTask {
 						}
 					}
 				}else{
-					addPreviousLine(splittedLine1);
-					lines++;
+//					addPreviousLine(splittedLine1);
+//					lines++;
 				}
 			}
 
 			if (line2!=null){
 
-				addExportedLine(splittedLine2);
-				lines++;
+//				addExportedLine(splittedLine2);
+//				lines++;
 
 				while ((line2= br2.readLine()) != null) {
 					splittedLine2=line2.split("\t",-1);
-					addExportedLine(splittedLine2);
-					lines++;
+//					addExportedLine(splittedLine2);
+//					lines++;
 				}
 			}
 			br1.close();
@@ -163,11 +165,18 @@ public class ConsolidateSnapshotAndDelta extends AbstractTask {
 
 	}
 
+	private boolean dateCompare(String[] splittedLine2) {
+		if (splittedLine2[this.effectiveTimeColIndex].compareTo("20120731")<=0){
+			return true;
+		}
+		return false;
+	}
+
 	private void addExportedLine( String[] splittedLine) throws Exception {
 		StringBuffer sb=new StringBuffer();
 		for (int i = 0; i < colLen; i++) {
 			if (i==this.effectiveTimeColIndex){
-				sb.append(releaseDate);
+				sb.append(splittedLine[i]);
 				
 			}else{
 			
