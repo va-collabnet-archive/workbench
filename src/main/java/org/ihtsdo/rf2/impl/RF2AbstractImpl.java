@@ -643,6 +643,8 @@ public abstract class RF2AbstractImpl {
 					brdu.append("\t");
 					brdu.append(HashDup.get(conceptid));
 					brdu.append("\r\n");
+				}else{
+					HashDup.put(conceptid, concept.getUUIDs().iterator().next().toString());
 				}
 				if (conceptid.substring(conceptid.length()-3,conceptid.length()-1).equals("10")){
 					String item=conceptid.substring(0,conceptid.length()-10);
