@@ -275,7 +275,7 @@ public class BatchQACheck extends AbstractMojo {
 
 			Document document = impl.createDocument(null, "description", null);
 			Element rootElement = document.getDocumentElement();
-			
+
 			HashSet<String> rules;
 			List<RulesDeploymentPackageReference> kbPackages = contextHelper.getPackagesForContext(context);
 			for (RulesDeploymentPackageReference loopPackage : kbPackages) {
@@ -378,6 +378,17 @@ public class BatchQACheck extends AbstractMojo {
 			rulePw.print("FSN should be unique (batch check)" + "\t");
 			rulePw.print("FSN should be unique (batch check)" + "\t");
 			System.out.println("*+*+ " + "d4d60d70-0733-11e1-be50-0800200c9a66" + " - " + "FSN should be unique (batch check)" + " - Default");
+			rulePw.print("f9545a20-12cf-11e0-ac64-0800200c9a66" + "\t");
+			rulePw.print("Batch Rule" + "\t");
+			rulePw.print("Batch Rule" + "\t");
+			rulePw.print("" + "\t");
+			rulePw.print(4);
+			rulePw.println();
+			// Add batch duplicate sctid rule
+			rulePw.print("20925650-2449-11e2-81c1-0800200c9a66" + "\t");
+			rulePw.print("Concept SCTID should be unique (batch check)" + "\t");
+			rulePw.print("Concept SCTID should be unique (batch check)" + "\t");
+			System.out.println("*+*+ " + "20925650-2449-11e2-81c1-0800200c9a66" + " - " + "Concept SCTID should be unique (batch check)" + " - Default");
 			rulePw.print("f9545a20-12cf-11e0-ac64-0800200c9a66" + "\t");
 			rulePw.print("Batch Rule" + "\t");
 			rulePw.print("Batch Rule" + "\t");
