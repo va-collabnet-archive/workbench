@@ -363,6 +363,47 @@ public class BatchQACheck extends AbstractMojo {
 				}
 			}
 
+			// Generate Additional batch rules entries
+			Element packageElement = document.createElement("package");
+			packageElement.setAttribute("name", "Batch only package");
+			packageElement.setAttribute("url", "");
+			rootElement.appendChild(packageElement);
+			// FSN Dupl
+			Element ruleElement = document.createElement("rule");
+			ruleElement.setAttribute("name", "FSN should be unique (batch check)");
+			Element desciptionElement = document.createElement("description");
+			desciptionElement.appendChild(document.createTextNode("FSN should be unique (batch check)"));
+			ruleElement.appendChild(desciptionElement);
+			Element UUIDElement = document.createElement("UUID");
+			UUIDElement.appendChild(document.createTextNode("d4d60d70-0733-11e1-be50-0800200c9a66"));
+			ruleElement.appendChild(UUIDElement);
+			Element statusElement = document.createElement("status");
+			statusElement.appendChild(document.createTextNode("default"));
+			ruleElement.appendChild(statusElement);
+			Element severityElement = document.createElement("severity");
+			severityElement.appendChild(document.createTextNode("Severity: " + "f9545a20-12cf-11e0-ac64-0800200c9a66"));
+			ruleElement.appendChild(severityElement);
+			packageElement.appendChild(ruleElement);
+			// SCTID Dupl
+			Element ruleElement2 = document.createElement("rule");
+			ruleElement2.setAttribute("name", "Concept SCTID should be unique (batch check)");
+			Element desciptionElement2 = document.createElement("description");
+			desciptionElement2.appendChild(document.createTextNode("Concept SCTID should be unique (batch check)"));
+			ruleElement2.appendChild(desciptionElement2);
+			Element UUIDElement2 = document.createElement("UUID");
+			UUIDElement2.appendChild(document.createTextNode("20925650-2449-11e2-81c1-0800200c9a66"));
+			ruleElement2.appendChild(UUIDElement2);
+			Element statusElement2 = document.createElement("status");
+			statusElement2.appendChild(document.createTextNode("default"));
+			ruleElement2.appendChild(statusElement2);
+			Element severityElement2 = document.createElement("severity");
+			severityElement2.appendChild(document.createTextNode("Severity: " + "f9545a20-12cf-11e0-ac64-0800200c9a66"));
+			ruleElement2.appendChild(severityElement2);
+			packageElement.appendChild(ruleElement2);
+			Element lastExecutionElement = document.createElement("lastExecution");
+			lastExecutionElement.appendChild(document.createTextNode(df.format(executionDate.getTime())));
+			packageElement.appendChild(ruleElement);
+
 			// Serialize the document onto System.out
 			TransformerFactory xformFactory = TransformerFactory.newInstance();  
 			Transformer idTransform = xformFactory.newTransformer();
