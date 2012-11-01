@@ -304,7 +304,7 @@ public class PerformQA implements I_ProcessConcepts {
 				for (I_DescriptionTuple loopTuple : loopConcept.getDescriptionTuples(config.getAllowedStatus(),
 						config.getDescTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(),
 						config.getConflictResolutionStrategy())) {
-					if (loopTuple.getTypeNid() == fsnNid && loopTuple.getLang().equals("en")) {
+					if (loopTuple.getTypeNid() == fsnNid && loopTuple.getLang().toLowerCase().startsWith("en")) {
 						fsn = loopTuple.getText();
 					}
 				}
