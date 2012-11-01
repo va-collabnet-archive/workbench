@@ -32,13 +32,12 @@ public class RF2ConceptFactory extends RF2AbstractFactory {
 
 			RF2ConceptImpl iterator = new RF2ConceptImpl(getConfig());
 
-			iterator.openExtIdsFile();
-			iterator.openDupFile();
+			iterator.openModSubsMapFile();
 			
 			Terms.get().iterateConcepts(iterator);
 
-			iterator.closeExtIdsFile();
-			iterator.closeDupsFile();
+			iterator.closeModSubsFileMap();
+			
 			closeExportFileWriter();
 			
 			logger.info("==========Total number of metadata concept records======" + iterator.getMetaDataCount());

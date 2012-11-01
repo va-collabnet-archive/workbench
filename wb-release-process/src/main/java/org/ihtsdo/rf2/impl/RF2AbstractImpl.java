@@ -129,12 +129,6 @@ public abstract class RF2AbstractImpl {
 
 	private BufferedWriter br;
 
-	private BufferedWriter brid;
-
-	private HashMap<String, String> HashDup;
-
-	private BufferedWriter brdu;
-
 	public static Config getConfig() {
 		return config;
 	}
@@ -188,11 +182,10 @@ public abstract class RF2AbstractImpl {
 			foundationMetaDataConceptRoot = tf.getConcept(UUID.fromString("f328cdec-6198-36c4-9c55-d7f4f5b30922"));
 			File mappingFile = new File("SubsetMapping.txt");
 
-			HashDup = new HashMap<String,String>();
 			FileInputStream fis = new FileInputStream(mappingFile);
 			InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
 			BufferedReader br = new BufferedReader(isr);
-			
+
 			map = new HashMap<String, String>();
 
 			while (br.ready()) {
@@ -307,51 +300,9 @@ public abstract class RF2AbstractImpl {
 			e.printStackTrace();
 		}
 	}
-	public void openExtIdsFile(){
-
-		FileOutputStream fis;
-		OutputStreamWriter isr;
+	public void closeModSubsFileMap(){
 		try {
-			fis = new FileOutputStream("target/extIds.txt");
-			isr = new OutputStreamWriter(fis, "UTF-8");
-			brid = new BufferedWriter(isr);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	public void openDupFile(){
-
-		FileOutputStream fis;
-		OutputStreamWriter isr;
-		try {
-			fis = new FileOutputStream("target/DupIds.txt");
-			isr = new OutputStreamWriter(fis, "UTF-8");
-			brdu = new BufferedWriter(isr);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	public void closeExtIdsFile(){
-		try {
-			brid.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	public void closeDupsFile(){
-		try {
-			brdu.close();
+			br.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -853,26 +804,8 @@ public abstract class RF2AbstractImpl {
 			if (conceptid==null || conceptid.equals("") || conceptid.equals("0")){
 				logger.info("Unplublished Retired Concept: " + concept.getUUIDs().iterator().next().toString());
 			}else{
-				if (HashDup.containsKey(conceptid)){
-					brdu.append(conceptid);
-					brdu.append("\t");
-					brdu.append(concept.getUUIDs().iterator().next().toString());
-					brdu.append("\t");
-					brdu.append(HashDup.get(conceptid));
-					brdu.append("\r\n");
-				}
-				if (conceptid.substring(conceptid.length()-3,conceptid.length()-1).equals("10")){
-					String item=conceptid.substring(0,conceptid.length()-10);
-					String part=conceptid.substring(conceptid.length()-10,conceptid.length()-3);
-					brdu.append(conceptid);
-					brdu.append("\t");
-					brdu.append(concept.getUUIDs().iterator().next().toString());
-					brdu.append("\t");
-					brdu.append(item);
-					brdu.append("\t");
-					brdu.append(part);
-					brdu.append("\r\n");
-					//export(concept, conceptid);
+				if (conceptid.contains("-")){
+					export(concept, conceptid);
 				}
 			}
 		}
