@@ -649,14 +649,14 @@ public abstract class RF2AbstractImpl {
 				if (conceptid.substring(conceptid.length()-3,conceptid.length()-1).equals("10")){
 					String item=conceptid.substring(0,conceptid.length()-10);
 					String part=conceptid.substring(conceptid.length()-10,conceptid.length()-3);
-					brdu.append(conceptid);
-					brdu.append("\t");
-					brdu.append(concept.getUUIDs().iterator().next().toString());
-					brdu.append("\t");
-					brdu.append(item);
-					brdu.append("\t");
-					brdu.append(part);
-					brdu.append("\r\n");
+					brid.append(conceptid);
+					brid.append("\t");
+					brid.append(concept.getUUIDs().iterator().next().toString());
+					brid.append("\t");
+					brid.append(item);
+					brid.append("\t");
+					brid.append(part);
+					brid.append("\r\n");
 					//export(concept, conceptid);
 				}
 			}
