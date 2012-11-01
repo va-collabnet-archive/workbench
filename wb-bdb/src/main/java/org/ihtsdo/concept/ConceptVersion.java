@@ -69,6 +69,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
+import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
@@ -610,8 +611,27 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
     @Override
     public Collection<? extends DescriptionVersionBI> getDescriptionsPreferredActive() throws IOException {
         setupPreferredOrder();
-
-        return getDescriptionsActive(new IntSet(preferredOrder.getListArray()));
+        Collection<DescriptionVersionBI> returnValues = new ArrayList<DescriptionVersionBI>();
+        Collection<? extends DescriptionVersionBI> synonyms = getSynonyms();
+        for (int refexNid : vc.getLangPrefList().getListArray()) {
+        NEXT_VERSION:
+            for (DescriptionVersionBI dv : synonyms) {
+                for (RefexChronicleBI<?> annot : dv.getAnnotations()) {
+                    if (annot.getRefexNid() == refexNid) {
+                        for (RefexVersionBI<?> annotVers : annot.getVersions(vc)) {
+                            if (preferredOrder.contains(((RefexNidVersionBI) annotVers).getNid1())) {
+                                returnValues.add(dv);
+                                continue NEXT_VERSION;
+    }
+                        }
+                    }
+                }
+            }
+            if (!returnValues.isEmpty()) {
+                return returnValues;
+            }
+        }
+        return returnValues;
     }
 
     @Override
