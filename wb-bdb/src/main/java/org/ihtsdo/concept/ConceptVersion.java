@@ -84,7 +84,7 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
     }
     NidListBI fsnOrder;
     NidListBI preferredOrder;
-    NidListBI synonymOrder;
+    NidSetBI synonymOrder;
     private ViewCoordinate vc;
 
     //~--- constructors --------------------------------------------------------
@@ -1055,13 +1055,12 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
     @Override
     public Collection<? extends DescriptionVersionBI> getSynonyms() throws IOException {
         if (synonymOrder == null) {
-            synonymOrder = new IntList();
+            synonymOrder = new IntSet();
             synonymOrder.add(ReferenceConcepts.ACCEPTABLE_ACCEPTABILITY.getNid());
             synonymOrder.add(ReferenceConcepts.SYNONYM_RF1.getNid());
             synonymOrder.add(ReferenceConcepts.SYNONYM_RF2.getNid());
         }
-
-        throw new UnsupportedOperationException();
+        return getDescriptionsActive(synonymOrder);
     }
 
     @Override
