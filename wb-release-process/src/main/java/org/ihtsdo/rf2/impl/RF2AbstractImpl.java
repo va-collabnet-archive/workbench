@@ -646,7 +646,7 @@ public abstract class RF2AbstractImpl {
 				}else{
 					HashDup.put(conceptid, concept.getUUIDs().iterator().next().toString());
 				}
-				if (conceptid.substring(conceptid.length()-3,conceptid.length()-1).equals("10")){
+				if (conceptid.substring(conceptid.length()-3,conceptid.length()-1).equals("10") && !conceptid.contains("-")){
 					String item=conceptid.substring(0,conceptid.length()-10);
 					String part=conceptid.substring(conceptid.length()-10,conceptid.length()-3);
 					brid.append(conceptid);
