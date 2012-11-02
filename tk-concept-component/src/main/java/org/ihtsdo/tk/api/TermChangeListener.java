@@ -57,11 +57,12 @@ public abstract class TermChangeListener {
      */
     public abstract void changeNotify(long sequence,
             Set<Integer> sourcesOfChangedRels,
-            Set<Integer> targetsOfChangedRels,
-            Set<Integer> referencedComponentsOfChangedRefexs,
-            Set<Integer> changedComponents,
-            Set<Integer> changedComponentAlerts,
-            Set<Integer> changedComponentTypes);
+            Set<Integer> targetsOfChangedRels, 
+            Set<Integer> referencedComponentsOfChangedRefexs, 
+            Set<Integer> changedComponents, 
+            Set<Integer> changedComponentAlerts, 
+            Set<Integer> changedComponentTypes, 
+            boolean fromClassification);
 
     //~--- get methods ---------------------------------------------------------
     /**

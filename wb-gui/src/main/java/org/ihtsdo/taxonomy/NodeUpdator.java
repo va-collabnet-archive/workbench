@@ -39,6 +39,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.SwingWorker;
 import javax.swing.tree.TreePath;
 import org.ihtsdo.taxonomy.nodes.InternalNodeMultiParent;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
+import org.ihtsdo.tk.binding.snomed.TermAux;
 
 /**
  *
@@ -75,7 +77,7 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
       this.renderer           = renderer;
       this.vc                 = model.getTs().getViewCoordinate();
       this.helperName = helperName;
-
+      
       for (Integer nid : changedComponents) {
          int cNid = ts.getConceptNidForNid(nid);
 
@@ -351,17 +353,6 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
       @Override
       public void update(ConceptVersionBI cv) {
          try {
-             if(cv.getPrimUuid().equals(UUID.fromString("047f2aae-335b-4d45-92c6-faf0320d496b"))){
-                 System.out.println("Here (equiv)");
-             }
-             if(cv.getPrimUuid().equals(UUID.fromString("37a8780b-9777-3f1e-8536-4968ca61d9b1"))){
-                 System.out.println("Here (ex of spine)");
-             }
-             if(Ts.get().getUuidPrimordialForNid(currentNode.getConceptNid()).equals(
-                     UUID.fromString("37a8780b-9777-3f1e-8536-4968ca61d9b1"))){
-                 System.out.println("HERE examination of spine");
-             }
-                 
             if (cv.getNid() == currentNode.getConceptNid()) {
                newNode = model.getNodeFactory().makeNode(cv, currentNode.getParentNid(),
                        model.getNodeStore().get(currentNode.parentNodeId));
@@ -381,9 +372,6 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
             }
 
             if (possibleChildren.isEmpty() && (newNode != null)) {
-               if(newNode.isLeaf()){
-                   System.out.println("Helper name: " + helperName);
-               }
                for (TaxonomyNode child : children) {
                   newNode.addChild(child);
                }

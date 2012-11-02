@@ -135,4 +135,11 @@ public class TermAux {
     public static ConceptSpec USER =
             new ConceptSpec("user",
             UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c"));
+    
+    /**
+     * Represents the concept: classifier. This is the concept used for the author in the inferred view.
+     */
+    public static ConceptSpec CLASSIFIER_USER =
+            new ConceptSpec("IHTSDO Classifier",
+            UUID.fromString("7e87cc5b-e85f-3860-99eb-7a44f2b9e6f9"));
 }

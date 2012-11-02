@@ -149,6 +149,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     @Override
     protected void addRevisionHook(boolean returnValue, RelationshipRevision r) {
         ChangeNotifier.touchRelTarget(getTargetNid());
+        ChangeNotifier.touchRelOrigin(getSourceNid());
     }
     @Override
     public boolean addVersionNoRedundancyCheck(I_RelPart rel) {

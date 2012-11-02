@@ -34,6 +34,8 @@ import javax.swing.JLabel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import javax.swing.TransferHandler;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 public class DragPanelRel extends DragPanelComponentVersion<RelationshipVersionBI> {
 
@@ -153,11 +155,16 @@ public class DragPanelRel extends DragPanelComponentVersion<RelationshipVersionB
          @Override
          protected void changeProperty(I_GetConceptData newValue) {
             try {
-               getComponent().setTargetNid(newValue.getNid());
+                 int oldTargetNid = getComponent().getTargetNid();
+                getComponent().setTargetNid(newValue.getNid());
 
-               if (getComponent().isUncommitted()) {
-                  Terms.get().addUncommitted(Terms.get().getConcept(getComponent().getSourceNid()));
-               }
+                if (getComponent().isUncommitted()) {
+                    Terms.get().addUncommitted(Terms.get().getConcept(getComponent().getSourceNid()));
+                }
+                Ts.get().touchRelOrigin(getComponent().getSourceNid());
+                Ts.get().touchRelTarget(getComponent().getTargetNid());
+                 Ts.get().touchRelTarget(oldTargetNid);
+                Ts.get().touchComponent(oldTargetNid);
             } catch (PropertyVetoException e) {
                AceLog.getAppLog().alertAndLogException(e);
             } catch (TerminologyException e) {

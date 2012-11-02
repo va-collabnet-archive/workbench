@@ -66,6 +66,7 @@ import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import javax.swing.plaf.basic.BasicGraphicsUtils;
 import javax.swing.tree.TreeCellRenderer;
+import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 /**
@@ -792,6 +793,10 @@ public class TaxonomyNodeRenderer extends JLabel
         }
 
         return this;
+    }
+    
+    public RelAssertionType getAssertionType(){
+        return helper.getAssertionType();
     }
 
     //~--- set methods ---------------------------------------------------------

@@ -267,7 +267,7 @@ public class BdbCommitManager {
         Concept c = (Concept) concept;
 
         c.modified();
-        ChangeNotifier.touch(c);
+        ChangeNotifier.touch(c, true);
         try {
             writeUncommitted(c);
         } catch (InterruptedException e) {

@@ -177,13 +177,7 @@ public class ConceptView extends JPanel {
     private class CVChangeListener extends TermChangeListener {
 
         @Override
-        public void changeNotify(long sequence,
-                Set<Integer> originsOfChangedRels,
-                Set<Integer> destinationsOfChangedRels,
-                Set<Integer> referencedComponentsOfChangedRefexs,
-                Set<Integer> changedComponents,
-                Set<Integer> changedComponentAlerts,
-                Set<Integer> changedComponentTemplates) {
+        public void changeNotify(long sequence, Set<Integer> originsOfChangedRels, Set<Integer> destinationsOfChangedRels, Set<Integer> referencedComponentsOfChangedRefexs, Set<Integer> changedComponents, Set<Integer> changedComponentAlerts, Set<Integer> changedComponentTemplates, boolean fromClassification) {
             ChangeListenerSwingWorker worker = new ChangeListenerSwingWorker(sequence,
                     originsOfChangedRels,
                     destinationsOfChangedRels,
