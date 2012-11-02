@@ -53,7 +53,7 @@ public class PerformQA implements I_ProcessConcepts {
 
 	HashMap<String,Long> traceElapsedTimes;
 	HashMap<String,Integer> traceCounts;
-	HashMap<UUID,Integer> uniqueFsnMap;
+	HashMap<String,Integer> uniqueFsnMap;
 	HashMap<Long,Integer> uniqueSCTIDMap;
 	Set<Integer> fsnDuplicatesSet;
 	Set<Integer> sctidDuplicatesSet;
@@ -86,7 +86,7 @@ public class PerformQA implements I_ProcessConcepts {
 		this.allRules=allRules;
 		traceElapsedTimes = new HashMap<String,Long>();
 		traceCounts = new HashMap<String,Integer>();
-		uniqueFsnMap = new HashMap<UUID,Integer>();
+		uniqueFsnMap = new HashMap<String,Integer>();
 		uniqueSCTIDMap = new HashMap<Long,Integer>();
 		fsnDuplicatesSet = new HashSet<Integer>();
 		sctidDuplicatesSet = new HashSet<Integer>();
@@ -306,11 +306,11 @@ public class PerformQA implements I_ProcessConcepts {
 						config.getDescTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(),
 						config.getConflictResolutionStrategy())) {
 					if (loopTuple.getTypeNid() == fsnNid && loopTuple.getLang().toLowerCase().startsWith("en")) {
-						fsn = loopTuple.getText();
+						fsn = loopTuple.getText().toLowerCase().trim();
 					}
 				}
 
-				if (uniqueFsnMap.containsKey(Type5UuidFactory.get(fsn))) {
+				if (uniqueFsnMap.containsKey(fsn)) {
 					if (!fsnDuplicatesSet.contains(loopConcept.getNid())) {
 						ResultsItem r1 = new ResultsItem();
 						r1.setErrorCode(4);
@@ -326,7 +326,7 @@ public class PerformQA implements I_ProcessConcepts {
 						fsnDuplicatesSet.add(loopConcept.getNid());
 					}
 
-					I_GetConceptData duplicateConcept = Terms.get().getConcept(uniqueFsnMap.get(Type5UuidFactory.get(fsn)));
+					I_GetConceptData duplicateConcept = Terms.get().getConcept(uniqueFsnMap.get(fsn));
 					if (!fsnDuplicatesSet.contains(duplicateConcept.getNid())) {
 						ResultsItem r2 = new ResultsItem();
 						r2.setErrorCode(4);
@@ -343,7 +343,7 @@ public class PerformQA implements I_ProcessConcepts {
 					}
 					System.out.println("* Found FSN duplication: " + fsn);
 				} else {
-					uniqueFsnMap.put(Type5UuidFactory.get(fsn), loopConcept.getNid());
+					uniqueFsnMap.put(fsn, loopConcept.getNid());
 				}
 			}
 			
