@@ -1,9 +1,7 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<parent>
-		<groupId>org.ihtsdo</groupId>
-		<artifactId>wb-mmb</artifactId>
-		<version>2.6.3-trek-termmed-rb1-101-SNAPSHOT</version>
-	</parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<groupId>org.ihtsdo</groupId>
+	<version>2.6.3-trek-termmed-rb1-101-SNAPSHOT</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>wb-release-process</artifactId>
 	<!--<packaging>jar</packaging> -->
