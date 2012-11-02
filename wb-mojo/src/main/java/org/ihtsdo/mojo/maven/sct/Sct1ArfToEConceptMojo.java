@@ -3171,7 +3171,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                 //                    getLog().info("!!! --- description       \"" + desList.get(0).termText + "\"");
                 //                    getLog().info("!!! \r\n");
                 //                }
-                throw new MojoFailureException("Case not implemented -- executeMojoStep7()");
+                //throw new MojoFailureException("Case not implemented -- executeMojoStep7()");
+            	System.out.println("Case not implemented -- executeMojoStep7()");
             }
 
             if (conNext == null && desNext == null && relNext == null) {
