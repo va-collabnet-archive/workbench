@@ -28,8 +28,8 @@
         needs of their end users.
     </description>
 	<scm>
-		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-toolkit_trek-release-termmed-rb-may-2012</connection>
-		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-toolkit_trek-release-termmed-rb-may-2012</developerConnection>
+		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-toolkit_trek-release-termmed-testids</connection>
+		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-toolkit_trek-release-termmed-testids</developerConnection>
 		<url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/branches/wb-toolkit_trek/?root=workbench&amp;system=exsy1002</url>
 	</scm>
 	<properties>
