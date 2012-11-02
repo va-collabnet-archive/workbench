@@ -32,7 +32,17 @@ public class RF2ConceptFactory extends RF2AbstractFactory {
 
 			RF2ConceptImpl iterator = new RF2ConceptImpl(getConfig());
 
+			logger.info("openning ext id...");
+			iterator.openExtIdsFile();
+			logger.info("openning dup ..");
+			iterator.openDupFile();
+			
+			logger.info("begin iterator  ..");
 			Terms.get().iterateConcepts(iterator);
+
+			logger.info("closing files  ..");
+			iterator.closeExtIdsFile();
+			iterator.closeDupsFile();
 
 			closeExportFileWriter();
 			
@@ -43,8 +53,10 @@ public class RF2ConceptFactory extends RF2AbstractFactory {
 			logger.info("Finished Concept Snapshot Export...");
 
 		} catch (IOException e) {
+			logger.info("error iterator  .." + e.getMessage());
 			logger.error(e.getMessage());
 		} catch (Exception e) {
+			logger.info("error iterator  .." + e.getMessage());
 			logger.error(e.getMessage());			
 		}
 	}
