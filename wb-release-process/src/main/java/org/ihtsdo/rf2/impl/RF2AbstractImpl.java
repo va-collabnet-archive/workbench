@@ -657,8 +657,8 @@ public abstract class RF2AbstractImpl {
 					brid.append("\t");
 					brid.append(part);
 					brid.append("\r\n");
-					//export(concept, conceptid);
 				}
+				export(concept, conceptid);
 			}
 		}
 	}
