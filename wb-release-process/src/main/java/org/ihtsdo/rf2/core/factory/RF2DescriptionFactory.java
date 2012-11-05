@@ -28,10 +28,21 @@ public class RF2DescriptionFactory extends RF2AbstractFactory {
 		logger.info("Started Description Snapshot Export...");
 
 		try {
-
 			RF2DescriptionImpl iterator = new RF2DescriptionImpl(getConfig());
 
+			logger.info("openning ext id...");
+			iterator.openExtIdsFile();
+			logger.info("openning dup ..");
+			iterator.openDupFile();
+			
+			logger.info("begin iterator  ..");
+		
 			ExportUtil.getTermFactory().iterateConcepts(iterator);
+
+			logger.info("closing files  ..");
+			iterator.closeExtIdsFile();
+			iterator.closeDupsFile();
+			
 			
 			logger.info("==========Total number of metadata description records======" + iterator.getMetaDataCount());
 			
