@@ -1830,6 +1830,8 @@ public class ExportUtil {
 				int pathNid = i_IdVersion.getPathNid();
 				if (pathNid == snomedCorePathNid && snomedIntegerNid == arcAuxSnomedIntegerNid) {
 					descriptionId = (Long) denotion;
+				}else if (descriptionId==null && snomedIntegerNid == arcAuxSnomedIntegerNid){
+					descriptionId = (Long) denotion;
 				}
 			}
 		}
