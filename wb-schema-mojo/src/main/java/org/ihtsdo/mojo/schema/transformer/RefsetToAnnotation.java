@@ -182,9 +182,12 @@ public class RefsetToAnnotation extends AbstractTransformer {
 			I_GetConceptData refset = Terms.get().getConcept(refsetUuid);
 			EConcept refsetEConcept = new EConcept(refset);
 			membersMap = new HashMap<UUID,TkRefsetAbstractMember<?>>();
-			for ( TkRefsetAbstractMember<?> loopMember : refsetEConcept.getRefsetMembers()) {
+                        if (refsetEConcept.getRefsetMembers() != null) {
+                            for ( TkRefsetAbstractMember<?> loopMember : refsetEConcept.getRefsetMembers()) {
 				membersMap.put(loopMember.getComponentUuid(), loopMember);
-			}
+                            }
+                        }
+			
 			
 		} catch (IOException e) {
 			e.printStackTrace();
