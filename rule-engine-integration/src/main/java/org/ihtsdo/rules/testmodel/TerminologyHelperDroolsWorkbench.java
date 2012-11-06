@@ -50,15 +50,11 @@ import org.ihtsdo.helper.metadata.MetadataConversor;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.NidSetBI;
-import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.PositionBI;
-import org.ihtsdo.tk.api.PositionSet;
-import org.ihtsdo.tk.api.Precedence;
-import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
@@ -99,7 +95,6 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
      * The refsets cache.
      */
     private static Map<String, I_GetConceptData> refsetsCache = new HashMap<String, I_GetConceptData>();
-    
     private int fsnRf2Nid;
     private final MetadataConversor metadataConversor;
 
@@ -295,38 +290,58 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
                 int dnid = Integer.parseInt(doc.get("dnid"));
                 if (cnid != conceptNid) {
                     I_DescriptionVersioned<?> potential_match = Terms.get().getDescription(dnid, cnid);
+
+
+
                     // if its not null and not "patient friendly preferred term" type
                     if (potential_match != null && potential_match.getTypeNid() != Terms.get().uuidToNative(UUID.fromString("084283a0-b7ca-5626-b604-6dd69fb5ff2d"))) {
 
-                        for (DescriptionVersionBI part_search : 
-                                potential_match.getVersions(Terms.get().getActiveAceFrameConfig().getViewCoordinate())) {
-                            String part_searchText1 = "";
-                            String descText2 = "";
+                        boolean preferredInUs = false;
 
-                            if (part_search.getText().contains("(") 
-                                    && part_search.getText().indexOf("(") > 2
-                                    && part_search.getText().endsWith(")")) {
-                                part_searchText1 = part_search.getText().substring(0, part_search.getText().lastIndexOf("(")-1).toLowerCase().trim();
-                            } else {
-                                part_searchText1 = part_search.getText().toLowerCase().trim();
+                        for (RefexChronicleBI annot : potential_match.getAnnotations()) {
+                            // has an US refset extension (annotated)
+                            if (annot.getCollectionNid() == Terms.get().uuidToNative(UUID.fromString("29bf812c-7a77-595d-8b12-ea37c473a5e6"))) {
+                                RefexCnidVersionBI langAnnot = (RefexCnidVersionBI) annot.getVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+                                // has preferred acceptability value
+                                if (langAnnot.getCnid1() == Terms.get().uuidToNative(UUID.fromString("15877c09-60d7-3464-bed8-635a98a7e5b2"))) {
+                                    preferredInUs = true;
+                                }
+
                             }
-                            
-                            if (descText.contains("(")  
-                                    && descText.indexOf("(") > 2
-                                    && descText.endsWith(")")) {
-                                descText2 = descText.substring(0, descText.lastIndexOf("(")-1).toLowerCase().trim();
-                            } else {
-                                descText2 = descText.toLowerCase().trim();
-                            }
-                            
-                            if (allowedStatusNids.contains(part_search.getStatusNid())
-                                    && (part_search.getText().toLowerCase().equals(descText.toLowerCase())
-                                    || part_searchText1.equals(descText2)
-                                    || part_search.getText().toLowerCase().equals(descText2)
-                                    || part_searchText1.equals(descText.toLowerCase()))
-                                    && isParentOf(hierarchyConceptUuid, tf.nidToUuid(cnid).toString())) { 
-                                unique = false;
-                                break search;
+                        }
+
+                        if (preferredInUs) {
+
+                            for (DescriptionVersionBI part_search :
+                                    potential_match.getVersions(Terms.get().getActiveAceFrameConfig().getViewCoordinate())) {
+                                String part_searchText1 = "";
+                                String descText2 = "";
+
+                                if (part_search.getText().contains("(")
+                                        && part_search.getText().indexOf("(") > 2
+                                        && part_search.getText().endsWith(")")) {
+                                    part_searchText1 = part_search.getText().substring(0, part_search.getText().lastIndexOf("(") - 1).toLowerCase().trim();
+                                } else {
+                                    part_searchText1 = part_search.getText().toLowerCase().trim();
+                                }
+
+                                if (descText.contains("(")
+                                        && descText.indexOf("(") > 2
+                                        && descText.endsWith(")")) {
+                                    descText2 = descText.substring(0, descText.lastIndexOf("(") - 1).toLowerCase().trim();
+                                } else {
+                                    descText2 = descText.toLowerCase().trim();
+                                }
+
+                                if (allowedStatusNids.contains(part_search.getStatusNid())
+                                        && (part_search.getText().toLowerCase().equals(descText.toLowerCase())
+                                        || part_searchText1.equals(descText2)
+                                        || part_search.getText().toLowerCase().equals(descText2)
+                                        || part_searchText1.equals(descText.toLowerCase()))
+                                        && isParentOf(hierarchyConceptUuid, tf.nidToUuid(cnid).toString())) {
+                                    unique = false;
+                                    break search;
+                                }
                             }
                         }
                     }
