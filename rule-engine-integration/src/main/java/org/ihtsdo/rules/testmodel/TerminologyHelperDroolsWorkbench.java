@@ -295,7 +295,8 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
                 int dnid = Integer.parseInt(doc.get("dnid"));
                 if (cnid != conceptNid) {
                     I_DescriptionVersioned<?> potential_match = Terms.get().getDescription(dnid, cnid);
-                    if (potential_match != null) {
+                    // if its not null and not "patient friendly preferred term" type
+                    if (potential_match != null && potential_match.getTypeNid() != Terms.get().uuidToNative(UUID.fromString("084283a0-b7ca-5626-b604-6dd69fb5ff2d"))) {
 
                         for (DescriptionVersionBI part_search : 
                                 potential_match.getVersions(Terms.get().getActiveAceFrameConfig().getViewCoordinate())) {
