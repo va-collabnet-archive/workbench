@@ -118,13 +118,7 @@ public class TermTreeHelper extends TermChangeListener implements PropertyChange
    }
 
    @Override
-   public void changeNotify(long sequence, 
-                            Set<Integer> originsOfChangedRels,
-                            Set<Integer> destinationsOfChangedRels,
-                            Set<Integer> referencedComponentsOfChangedRefexs,
-                            Set<Integer> changedComponents,
-                            Set<Integer> changedComponentAlerts,
-                            Set<Integer> changedComponentTemplates) {
+   public void changeNotify(long sequence, Set<Integer> originsOfChangedRels, Set<Integer> destinationsOfChangedRels, Set<Integer> referencedComponentsOfChangedRefexs, Set<Integer> changedComponents, Set<Integer> changedComponentAlerts, Set<Integer> changedComponentTemplates, boolean fromClassification) {
       if (AceLog.getAppLog().isLoggable(Level.FINE)) {
          AceLog.getAppLog().info("Term change. Sequence: " + sequence + 
                                  " changed rel origins: " + originsOfChangedRels + 

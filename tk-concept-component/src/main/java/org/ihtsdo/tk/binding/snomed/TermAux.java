@@ -62,4 +62,10 @@ public class TermAux {
     public static ConceptSpec SNOMED_IDENTIFIER  =
             new ConceptSpec("SNOMED integer id",
             UUID.fromString("0418a591-f75b-39ad-be2c-3ab849326da9"));
+    /**
+     * Represents the concept: classifier. This is the concept used for the author in the inferred view.
+     */
+    public static ConceptSpec CLASSIFIER_USER =
+            new ConceptSpec("IHTSDO Classifier",
+            UUID.fromString("7e87cc5b-e85f-3860-99eb-7a44f2b9e6f9"));
 }

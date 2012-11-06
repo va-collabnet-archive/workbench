@@ -194,13 +194,7 @@ public class TerminologyTableModel extends AbstractTableModel implements
     private class ConceptCheckChangeListener extends TermChangeListener {
         int index = 0;
         @Override
-        public void changeNotify(long sequence,
-                Set<Integer> originsOfChangedRels,
-                Set<Integer> destinationsOfChangedRels,
-                Set<Integer> referencedComponentsOfChangedRefexs,
-                Set<Integer> changedComponents,
-                Set<Integer> changedComponentAlerts,
-                Set<Integer> changedComponentTemplates) {
+        public void changeNotify(long sequence, Set<Integer> originsOfChangedRels, Set<Integer> destinationsOfChangedRels, Set<Integer> referencedComponentsOfChangedRefexs, Set<Integer> changedComponents, Set<Integer> changedComponentAlerts, Set<Integer> changedComponentTemplates, boolean fromClassification) {
             if (!changedComponentTemplates.isEmpty()) {
                 index = 0;
                 for (ConceptChronicleBI c : elements) {

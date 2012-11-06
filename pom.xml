@@ -19,7 +19,7 @@
 	<artifactId>wb-mmb</artifactId>
 	<version>2.6.0.2013-rb-oct-1-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<name>${branch}: (MMP) Workbench Toolkit</name>
+	<name>wb-trek-145-rb : (MMP) Workbench Toolkit</name>
 	<description>The IHTSDO Workbench provides two software frameworks for
         terminology-focused applications: one for build-process
         automation, and another for interactive development environments.

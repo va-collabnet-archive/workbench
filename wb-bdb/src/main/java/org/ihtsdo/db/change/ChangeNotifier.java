@@ -59,6 +59,7 @@ public class ChangeNotifier {
    private static ConcurrentSkipListSet<WeakReference<TermChangeListener>> changeListenerRefs =
       new ConcurrentSkipListSet<WeakReference<TermChangeListener>>();
    private static AtomicBoolean active = new AtomicBoolean(true);
+   private static AtomicBoolean fromClassification = new AtomicBoolean(false);
 
    //~--- static initializers -------------------------------------------------
 
@@ -95,6 +96,15 @@ public class ChangeNotifier {
       }
 
       touch(c.getNid(), Change.COMPONENT);
+   }
+   
+   public static void touch(Concept c, boolean classifier) {
+      for (int nid : c.getUncommittedNids().getListArray()) {
+         touch(nid, Change.COMPONENT);
+      }
+
+      touch(c.getNid(), Change.COMPONENT);
+      fromClassification.set(classifier);
    }
 
    public static void touch(int nid, Change changeType) {
@@ -230,14 +240,14 @@ public class ChangeNotifier {
                      try {
                         cl.changeNotify(sequence, originsOfChangedRels, destinationsOfChangedRels,
                                         referencedComponentsOfChangedRefexs, changedComponents,
-                                        changedComponentAlerts, changedComponentTemplates);
+                                        changedComponentAlerts, changedComponentTemplates, fromClassification.get());
                      } catch (Throwable e) {
                         e.printStackTrace();
                         toRemove.add(clr);
                      }
                   }
                }
-
+               fromClassification.set(false);
                changeListenerRefs.removeAll(toRemove);
             }
          }

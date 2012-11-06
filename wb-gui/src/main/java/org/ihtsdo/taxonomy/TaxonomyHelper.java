@@ -125,25 +125,34 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
    }
 
    @Override
-   public void changeNotify(long sequence, 
-                            Set<Integer> originsOfChangedRels,
-                            Set<Integer> destinationsOfChangedRels, 
-                            Set<Integer> referencedComponentsOfChangedRefexs, 
-                            Set<Integer> changedComponents,
-                            Set<Integer> changedComponentAlerts,
-                            Set<Integer> changedComponentTemplates) {
+   public void changeNotify(long sequence, Set<Integer> originsOfChangedRels, Set<Integer> destinationsOfChangedRels, Set<Integer> referencedComponentsOfChangedRefexs, Set<Integer> changedComponents, Set<Integer> changedComponentAlerts, Set<Integer> changedComponentTemplates, boolean fromClassification) {
         try {
-            if (renderer != null && model != null) {
-            NodeUpdator changeWorker = new NodeUpdator(model, 
-                            sequence, 
+            if (!renderer.getAssertionType().equals(RelAssertionType.INFERRED)) {
+                if (renderer != null && model != null) {
+                    NodeUpdator changeWorker = new NodeUpdator(model,
+                            sequence,
                             originsOfChangedRels,
                             destinationsOfChangedRels,
-                            referencedComponentsOfChangedRefexs, 
+                            referencedComponentsOfChangedRefexs,
                             changedComponents,
                             renderer,
                             helperName);
 
-            FutureHelper.addFuture(ACE.threadPool.submit(changeWorker));
+                    FutureHelper.addFuture(ACE.threadPool.submit(changeWorker));
+                }
+            } else if (renderer.getAssertionType().equals(RelAssertionType.INFERRED) && fromClassification) {
+                if (renderer != null && model != null) {
+                    NodeUpdator changeWorker = new NodeUpdator(model,
+                            sequence,
+                            originsOfChangedRels,
+                            destinationsOfChangedRels,
+                            referencedComponentsOfChangedRefexs,
+                            changedComponents,
+                            renderer,
+                            helperName);
+
+                    FutureHelper.addFuture(ACE.threadPool.submit(changeWorker));
+                }
             }
         } catch (ContradictionException | IOException ex) {
            AceLog.getAppLog().alertAndLogException(ex);
