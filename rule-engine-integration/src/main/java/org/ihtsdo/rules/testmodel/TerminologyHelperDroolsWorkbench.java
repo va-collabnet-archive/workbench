@@ -293,8 +293,10 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 
 
 
-                    // if its not null and not "patient friendly preferred term" type
-                    if (potential_match != null && potential_match.getTypeNid() != Terms.get().uuidToNative(UUID.fromString("084283a0-b7ca-5626-b604-6dd69fb5ff2d"))) {
+                    // if its not null and not "patient friendly preferred term" type and not preferred term type
+                    if (potential_match != null && 
+                            potential_match.getTypeNid() != Terms.get().uuidToNative(UUID.fromString("084283a0-b7ca-5626-b604-6dd69fb5ff2d")) &&
+                            potential_match.getTypeNid() != Terms.get().uuidToNative(UUID.fromString("d8e3b37d-7c11-33ef-b1d0-8769e2264d44"))) {
 
                         boolean preferredInUs = false;
 
