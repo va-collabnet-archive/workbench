@@ -7,7 +7,6 @@ package org.ihtsdo.mojo.schema;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
@@ -104,7 +103,7 @@ public abstract class AbstractTransformer {
 	 *
 	 * @return the list of concepts that should be written at the end of the iteration
 	 */
-	public abstract List<EConcept> postProcessIteration();
+	public abstract List<TkConcept> postProcessIteration();
 
 	/**
 	 * Transform. Executes the complete transformation cycle for one EConcept.
@@ -112,7 +111,7 @@ public abstract class AbstractTransformer {
 	 * @param eConcept the e concept
 	 * @return true, if should write, according to what's returned in post-process-concept stage
 	 */
-	public boolean transform(EConcept eConcept) {
+	public boolean transform(TkConcept eConcept) {
 		transformAttributes(eConcept.conceptAttributes, eConcept);
 
 		if (eConcept.getConceptAttributes().getAnnotations() != null) {

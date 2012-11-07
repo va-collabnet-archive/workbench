@@ -28,10 +28,10 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.mojo.schema.config.TransformersConfigApi;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
+import org.ihtsdo.tk.dto.concept.TkConcept;
 
 /**
  * Goal that runs transformation of the current open database, creating a binary EConcepts file as a result.
@@ -68,6 +68,7 @@ extends AbstractMojo
 	public static HashMap<String,Object> supportMap;
 	private final Semaphore writeSemaphore = new Semaphore(1);
 
+    @Override
 	public void execute() throws MojoExecutionException {
 		try {
 			I_TermFactory tf = Terms.get();
@@ -93,7 +94,7 @@ extends AbstractMojo
 
 			ts.iterateConceptDataInSequence(processor);
 
-			List<EConcept> postProcessList = transformer.postProcessIteration();
+			List<TkConcept> postProcessList = transformer.postProcessIteration();
 			
 			processor.writeList(postProcessList);
 

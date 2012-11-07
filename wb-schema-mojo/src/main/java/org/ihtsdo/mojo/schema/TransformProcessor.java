@@ -19,6 +19,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
+import org.ihtsdo.tk.dto.concept.TkConcept;
 
 /**
  * The Class TransformProcessor.<br>
@@ -98,7 +99,7 @@ public class TransformProcessor implements ProcessUnfetchedConceptDataBI{
 	@Override
 	public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fetcher) throws Exception {
 		I_GetConceptData c = (I_GetConceptData) fetcher.fetch();
-		EConcept eC;
+		TkConcept eC;
 		try {
 			long ini = Calendar.getInstance().getTimeInMillis();
 
@@ -138,9 +139,9 @@ public class TransformProcessor implements ProcessUnfetchedConceptDataBI{
 	 * @param eConcepts the e concepts
 	 * @throws IOException signals that an I/O exception has occurred.
 	 */
-	public void writeList(List<EConcept> eConcepts) throws IOException {
+	public void writeList(List<TkConcept> eConcepts) throws IOException {
 		if (eConcepts != null) {
-			for (EConcept eConcept : eConcepts) {
+			for (TkConcept eConcept : eConcepts) {
 				write(eConcept);
 			}
 		}
@@ -152,7 +153,7 @@ public class TransformProcessor implements ProcessUnfetchedConceptDataBI{
 	 * @param eConcept the e concept
 	 * @throws IOException signals that an I/O exception has occurred.
 	 */
-	public void write(EConcept eConcept) throws IOException {
+	public void write(TkConcept eConcept) throws IOException {
 		writeSemaphore.acquireUninterruptibly();
 		try {
 			eConcept.writeExternal(eConceptDOS);
