@@ -93,11 +93,11 @@ public class CreateDescriptionsDiffRefsets extends AbstractTask {
 				this.waitTillDone(worker.getLogger());
 			}
 			if (!canceled) {
-				String refsetNamePrefix = "Comparison Jan 12 to Jul 11";
 				String initialTime1 = dialog.getInitTime();// "2011.01.31 23:59:59 CST";
 				String laterTime2 = dialog.getLaterTime();// "2011.07.31 23:59:59 CST";
 				UUID path1UUID = dialog.getUUID1();// UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2");
 				UUID path2UUID = dialog.getUUID2();// .fromString("8c230474-9f11-30ce-9cad-185a96fd03a2");
+				String refsetNamePrefix = "Comparison " + initialTime1.substring(0, initialTime1.indexOf(" ")) + " to " + laterTime2.substring(0, laterTime2.indexOf(" "));
 				DescriptionsDiffComputer diff = new DescriptionsDiffComputer(Terms.get().getActiveAceFrameConfig(), refsetNamePrefix, initialTime1, laterTime2, path1UUID, path2UUID);
 				diff.setup();
 				diff.run();

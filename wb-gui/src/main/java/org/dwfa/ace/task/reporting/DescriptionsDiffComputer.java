@@ -3,6 +3,7 @@ package org.dwfa.ace.task.reporting;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -109,7 +110,8 @@ public class DescriptionsDiffComputer {
 		ts = Ts.get();
 		tb = ts.getTerminologyBuilder(config.getEditCoordinate(), config.getViewCoordinate());
 
-		this.refsetNamePrefix = refsetNamePrefix + TimeHelper.formatDate(System.currentTimeMillis());
+		Calendar cal = Calendar.getInstance();
+		this.refsetNamePrefix = refsetNamePrefix + " (Created in " + dateFormat.format(cal.getTime()) + ")";
 		this.time1 = initialTime1;
 		this.time2 = laterTime2;
 		this.path1Uuid = path1Uuid;
