@@ -29,12 +29,12 @@ import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
  * annotation. The refset is retrieved in the pre-iteration phase, annotations
  * are added and the refset is stripped of members during the iteration.
  */
-public class RefsetToAnnotation extends AbstractTransformer {
+public class RefsetToAnnotationMulti extends AbstractTransformer {
 
     /**
      * The id.
      */
-    private final String id = "refset-to-annotation";
+    private final String id = "refset-to-annotation-multi";
     /**
      * The concept count.
      */
@@ -42,27 +42,18 @@ public class RefsetToAnnotation extends AbstractTransformer {
     /**
      * The refset uuid.
      */
-    private UUID refsetUuid;
+    private List<UUID> refsetUuids;
     /**
      * The members map.
      */
-    private Map<UUID, TkRefsetAbstractMember<?>> membersMap;
+    private Map<UUID, Map<UUID, TkRefsetAbstractMember<?>>> membersMaps;
 
     /**
      * Instantiates a new refset to annotation.
      */
-    public RefsetToAnnotation() {
+    public RefsetToAnnotationMulti() {
     }
 
-    /**
-     * Instantiates a new refset to annotation.
-     *
-     * @param refsetUuid the refset uuid
-     */
-    public RefsetToAnnotation(UUID refsetUuid) {
-        super();
-        this.refsetUuid = refsetUuid;
-    }
 
     /*
      * (non-Javadoc) @see
@@ -71,9 +62,12 @@ public class RefsetToAnnotation extends AbstractTransformer {
     @Override
     public void setupFromXml(String xmlFile) throws Exception {
         TransformersConfigApi api = new TransformersConfigApi(xmlFile);
+        refsetUuids = new ArrayList<UUID>();
 
-        ConceptDescriptor refset = api.getConceptDescriptor(api.getIntId(id), "parameters.refset");
-        setRefsetUuid(refset.getVerifiedConcept().getPrimUuid());
+        List<String> refsets = api.getCollectionAt(api.getIntId(id), "parameters.refsets");
+        for (String entry : refsets) {
+            refsetUuids.add(UUID.fromString(entry));
+        }
 
     }
 
@@ -83,13 +77,17 @@ public class RefsetToAnnotation extends AbstractTransformer {
      */
     @Override
     public void transformAttributes(TkConceptAttributes attributes, TkConcept concept) {
-        if (membersMap.get(attributes.getPrimordialComponentUuid()) != null) {
-            if (attributes.getAnnotations() == null) {
-                attributes.setAnnotations(new ArrayList<TkRefsetAbstractMember<?>>());
+        for (UUID key : membersMaps.keySet()) {
+            Map<UUID, TkRefsetAbstractMember<?>> membersMap = membersMaps.get(key);
+            if (membersMap.get(attributes.getPrimordialComponentUuid()) != null) {
+                if (attributes.getAnnotations() == null) {
+                    attributes.setAnnotations(new ArrayList<TkRefsetAbstractMember<?>>());
+                }
+                attributes.getAnnotations().add(membersMap.get(attributes.getPrimordialComponentUuid()));
+                count();
             }
-            attributes.getAnnotations().add(membersMap.get(attributes.getPrimordialComponentUuid()));
-            count();
         }
+
     }
 
     /*
@@ -98,13 +96,17 @@ public class RefsetToAnnotation extends AbstractTransformer {
      */
     @Override
     public void transformDescription(TkDescription description, TkConcept concept) {
-        if (membersMap.get(description.getPrimordialComponentUuid()) != null) {
-            if (description.getAnnotations() == null) {
-                description.setAnnotations(new ArrayList<TkRefsetAbstractMember<?>>());
+        for (UUID key : membersMaps.keySet()) {
+            Map<UUID, TkRefsetAbstractMember<?>> membersMap = membersMaps.get(key);
+            if (membersMap.get(description.getPrimordialComponentUuid()) != null) {
+                if (description.getAnnotations() == null) {
+                    description.setAnnotations(new ArrayList<TkRefsetAbstractMember<?>>());
+                }
+                description.getAnnotations().add(membersMap.get(description.getPrimordialComponentUuid()));
+                count();
             }
-            description.getAnnotations().add(membersMap.get(description.getPrimordialComponentUuid()));
-            count();
         }
+
     }
 
     /*
@@ -113,12 +115,15 @@ public class RefsetToAnnotation extends AbstractTransformer {
      */
     @Override
     public void transformRelationship(TkRelationship relationship, TkConcept concept) {
-        if (membersMap.get(relationship.getPrimordialComponentUuid()) != null) {
-            if (relationship.getAnnotations() == null) {
-                relationship.setAnnotations(new ArrayList<TkRefsetAbstractMember<?>>());
+        for (UUID key : membersMaps.keySet()) {
+            Map<UUID, TkRefsetAbstractMember<?>> membersMap = membersMaps.get(key);
+            if (membersMap.get(relationship.getPrimordialComponentUuid()) != null) {
+                if (relationship.getAnnotations() == null) {
+                    relationship.setAnnotations(new ArrayList<TkRefsetAbstractMember<?>>());
+                }
+                relationship.getAnnotations().add(membersMap.get(relationship.getPrimordialComponentUuid()));
+                count();
             }
-            relationship.getAnnotations().add(membersMap.get(relationship.getPrimordialComponentUuid()));
-            count();
         }
     }
 
@@ -141,15 +146,20 @@ public class RefsetToAnnotation extends AbstractTransformer {
     @Override
     public void transformMember(TkRefsetAbstractMember<?> member,
             TkConcept concept) {
-        if (member.getRefsetUuid().equals(refsetUuid) && concept.getConceptAttributes().getPrimordialComponentUuid().equals(refsetUuid)) {
+
+        if (refsetUuids.contains(member.getRefsetUuid()) && concept.getConceptAttributes().getPrimordialComponentUuid().equals(member.getRefsetUuid())) {
             concept.getRefsetMembers().remove(member);
         }
-        if (membersMap.get(member.getPrimordialComponentUuid()) != null) {
-            if (member.getAnnotations() == null) {
-                member.setAnnotations(new ArrayList<TkRefsetAbstractMember<?>>());
+
+        for (UUID key : membersMaps.keySet()) {
+            Map<UUID, TkRefsetAbstractMember<?>> membersMap = membersMaps.get(key);
+            if (membersMap.get(member.getPrimordialComponentUuid()) != null) {
+                if (member.getAnnotations() == null) {
+                    member.setAnnotations(new ArrayList<TkRefsetAbstractMember<?>>());
+                }
+                member.getAnnotations().add(membersMap.get(member.getPrimordialComponentUuid()));
+                count();
             }
-            member.getAnnotations().add(membersMap.get(member.getPrimordialComponentUuid()));
-            count();
         }
     }
 
@@ -178,8 +188,8 @@ public class RefsetToAnnotation extends AbstractTransformer {
      *
      * @return the refset uuid
      */
-    public UUID getRefsetUuid() {
-        return refsetUuid;
+    public List<UUID> getRefsetUuid() {
+        return refsetUuids;
     }
 
     /**
@@ -187,8 +197,8 @@ public class RefsetToAnnotation extends AbstractTransformer {
      *
      * @param refsetUuid the new refset uuid
      */
-    public void setRefsetUuid(UUID refsetUuid) {
-        this.refsetUuid = refsetUuid;
+    public void setRefsetUuid(List<UUID> refsetUuids) {
+        this.refsetUuids = refsetUuids;
     }
 
     /*
@@ -198,21 +208,24 @@ public class RefsetToAnnotation extends AbstractTransformer {
     @Override
     public void preProcessIteration() {
 
-        try {
-            I_GetConceptData refset = Terms.get().getConcept(refsetUuid);
-            System.out.println("**** Running refset-to-annotation conversion for: " + refset.toUserString());
-            EConcept refsetEConcept = new EConcept(refset);
-            membersMap = new HashMap<UUID, TkRefsetAbstractMember<?>>();
-            if (refsetEConcept.getRefsetMembers() != null) {
-                for (TkRefsetAbstractMember<?> loopMember : refsetEConcept.getRefsetMembers()) {
-                    membersMap.put(loopMember.getComponentUuid(), loopMember);
+        try {            
+            for (UUID key : membersMaps.keySet()) {
+                Map<UUID, TkRefsetAbstractMember<?>> membersMap = membersMaps.get(key);
+                I_GetConceptData refset = Terms.get().getConcept(key);
+                EConcept refsetEConcept = new EConcept(refset);
+                System.out.println("**** Running refset-to-annotation conversion for: " + refset.toUserString());
+                membersMap = new HashMap<UUID, TkRefsetAbstractMember<?>>();
+                if (refsetEConcept.getRefsetMembers() != null) {
+                    for (TkRefsetAbstractMember<?> loopMember : refsetEConcept.getRefsetMembers()) {
+                        membersMap.put(loopMember.getComponentUuid(), loopMember);
+                    }
+                } else {
+                    System.out.println("**** RefsetMembers collection is NULL");
                 }
-            } else {
-                System.out.println("**** RefsetMembers collection is NULL");
+                System.out.println("**** Number of members to convert for this reset : " + membersMap.size());
             }
-            System.out.println("**** Total number of members to convert: " + membersMap.size());
-
-
+            
+            
         } catch (IOException e) {
             e.printStackTrace();
         } catch (TerminologyException e) {
