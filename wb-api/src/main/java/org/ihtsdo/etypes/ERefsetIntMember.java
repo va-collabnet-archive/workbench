@@ -46,6 +46,7 @@ public class ERefsetIntMember extends TkRefexIntMember {
       pathUuid   = Terms.get().nidToUuid(part.getPathNid());
       statusUuid = Terms.get().nidToUuid(part.getStatusNid());
       moduleUuid    = Terms.get().nidToUuid(part.getModuleNid());
+      authorUuid = Terms.get().nidToUuid(part.getAuthorNid());
       time       = part.getTime();
 
       if (partCount > 1) {
