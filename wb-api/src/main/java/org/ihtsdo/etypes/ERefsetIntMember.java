@@ -43,8 +43,9 @@ public class ERefsetIntMember extends TkRefsetIntMember {
       I_ExtendByRefPartInt part = (I_ExtendByRefPartInt) m.getMutableParts().get(0);
 
       intValue   = part.getIntValue();
-      pathUuid   = Terms.get().nidToUuid(part.getPathId());
-      statusUuid = Terms.get().nidToUuid(part.getStatusId());
+      pathUuid   = Terms.get().nidToUuid(part.getPathNid());
+      statusUuid = Terms.get().nidToUuid(part.getStatusNid());
+      authorUuid = Terms.get().nidToUuid(part.getAuthorNid());
       time       = part.getTime();
 
       if (partCount > 1) {
