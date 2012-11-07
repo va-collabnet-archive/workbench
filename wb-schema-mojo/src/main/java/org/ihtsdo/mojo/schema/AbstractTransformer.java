@@ -112,7 +112,7 @@ public abstract class AbstractTransformer {
 	 * @param eConcept the e concept
 	 * @return true, if should write, according to what's returned in post-process-concept stage
 	 */
-	public boolean transform(EConcept eConcept) {
+	public boolean transform(TkConcept eConcept) {
 		transformAttributes(eConcept.conceptAttributes, eConcept);
 
 		if (eConcept.getConceptAttributes().getAnnotations() != null) {
