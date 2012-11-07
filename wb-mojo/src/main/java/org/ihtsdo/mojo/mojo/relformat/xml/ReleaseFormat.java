@@ -31,6 +31,10 @@ public class ReleaseFormat {
         this.type = type;
         this.schema = schema;
     }
+    public ReleaseFormat() {
+        this.type = null;
+        this.schema = null;
+    }
 
     public String getType() {
         return type;

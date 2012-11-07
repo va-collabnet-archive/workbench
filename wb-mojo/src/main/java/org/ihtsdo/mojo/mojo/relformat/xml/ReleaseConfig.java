@@ -20,12 +20,17 @@ import java.util.List;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import java.util.ArrayList;
 
 @XStreamAlias("ReleaseConfig")
 public class ReleaseConfig {
 
     @XStreamImplicit
     private final List<ReleaseFormat> releaseFormats;
+
+    public ReleaseConfig() {
+        this.releaseFormats = new ArrayList<ReleaseFormat>();
+    }
 
     public ReleaseConfig(final List<ReleaseFormat> releaseFormats) {
         this.releaseFormats = releaseFormats;
