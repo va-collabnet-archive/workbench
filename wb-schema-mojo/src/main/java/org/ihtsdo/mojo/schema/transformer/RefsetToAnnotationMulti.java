@@ -52,6 +52,7 @@ public class RefsetToAnnotationMulti extends AbstractTransformer {
      * Instantiates a new refset to annotation.
      */
     public RefsetToAnnotationMulti() {
+        membersMaps = new HashMap<UUID, Map<UUID, TkRefsetAbstractMember<?>>>();
     }
 
 
@@ -64,7 +65,10 @@ public class RefsetToAnnotationMulti extends AbstractTransformer {
         TransformersConfigApi api = new TransformersConfigApi(xmlFile);
         refsetUuids = new ArrayList<UUID>();
 
-        List<String> refsets = api.getCollectionAt(api.getIntId(id), "parameters.refsets");
+        String refsetsList = api.getValueAt(api.getIntId(id), "parameters.refsets");
+        String[] refsets = refsetsList.split("\\|");
+        
+//        List<String> refsets = api.getCollectionAt(api.getIntId(id), "parameters.refsets");
         for (String entry : refsets) {
             refsetUuids.add(UUID.fromString(entry));
         }
@@ -209,8 +213,8 @@ public class RefsetToAnnotationMulti extends AbstractTransformer {
     public void preProcessIteration() {
 
         try {            
-            for (UUID key : membersMaps.keySet()) {
-                Map<UUID, TkRefsetAbstractMember<?>> membersMap = membersMaps.get(key);
+            for (UUID key : refsetUuids) {
+                Map<UUID, TkRefsetAbstractMember<?>> membersMap = new HashMap<UUID, TkRefsetAbstractMember<?>>();
                 I_GetConceptData refset = Terms.get().getConcept(key);
                 EConcept refsetEConcept = new EConcept(refset);
                 System.out.println("**** Running refset-to-annotation conversion for: " + refset.toUserString());
@@ -223,6 +227,7 @@ public class RefsetToAnnotationMulti extends AbstractTransformer {
                     System.out.println("**** RefsetMembers collection is NULL");
                 }
                 System.out.println("**** Number of members to convert for this reset : " + membersMap.size());
+                membersMaps.put(key,membersMap);
             }
             
             
