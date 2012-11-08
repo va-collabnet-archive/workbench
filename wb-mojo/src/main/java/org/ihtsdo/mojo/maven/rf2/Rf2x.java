@@ -182,7 +182,7 @@ public class Rf2x {
         if (uuid == null) {
             // System.err.println("!!!@! sctid not in cache " + Long.toString(id));
             missCounter++;
-            if (missCounter % 10000 == 1) {
+            if (missCounter % 100000 == 1) {
                 System.out.println(":::TEST: missCounter=" + missCounter 
                         + " SCTID=" + Long.toString(id));
             }
