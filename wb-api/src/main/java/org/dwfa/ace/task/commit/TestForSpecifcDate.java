@@ -59,6 +59,7 @@ import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
+import java.util.Collection;
 
 /**
  * The <code>TestForFsnValue</code> class represents a data constraint test that
@@ -94,7 +95,7 @@ public class TestForSpecifcDate extends AbstractConceptTest {
             List<AlertToDataConstraintFailure> alerts = new ArrayList<AlertToDataConstraintFailure>();
             boolean found = false;
             
-            for (ConAttrVersionBI attr : concept.getConceptAttributes().getVersions()) {
+            for (ConAttrVersionBI attr :(Collection<ConAttrVersionBI>) concept.getConceptAttributes().getVersions()) {
             	long time = attr.getTime();
             	if (time == timeToCheck) {
             		found = true;
@@ -102,7 +103,7 @@ public class TestForSpecifcDate extends AbstractConceptTest {
             }
             
             for (I_DescriptionVersioned loopDesc : concept.getDescriptions()) {
-            	for (DescriptionVersionBI dv : loopDesc.getVersions()) {
+            	for (DescriptionVersionBI dv : (Collection<DescriptionVersionBI>) loopDesc.getVersions()) {
             		long time = dv.getTime();
             		if (time == timeToCheck) {
                 		found = true;

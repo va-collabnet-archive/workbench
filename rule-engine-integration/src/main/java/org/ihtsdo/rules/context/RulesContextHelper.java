@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
+import java.util.Collection;
 
 import javax.swing.JOptionPane;
 
@@ -723,7 +724,7 @@ public class RulesContextHelper {
 						I_GetConceptData targetPackage = termFactory.getConcept(loopTuple.getC2Id());
 						Long time = Long.MIN_VALUE;
 						int statusId = Integer.MIN_VALUE;
-						for (ConAttrVersionBI loopAttr : targetPackage.getConceptAttributes().getVersions()) {
+						for (ConAttrVersionBI loopAttr : (Collection<ConAttrVersionBI>) targetPackage.getConceptAttributes().getVersions()) {
 							if (loopAttr.getTime() > time) {
 								time = loopAttr.getTime();
 								statusId = loopAttr.getStatusNid();
