@@ -53,7 +53,9 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
@@ -93,15 +95,15 @@ public class TestForSpecifcDate extends AbstractConceptTest {
             I_TermFactory termFactory = getTermFactory();
             List<AlertToDataConstraintFailure> alerts = new ArrayList<AlertToDataConstraintFailure>();
             boolean found = false;
-            
-            for (ConAttrVersionBI attr : concept.getConceptAttributes().getVersions()) {
+            ConAttrChronicleBI attrChron = (ConAttrChronicleBI) concept.getConceptAttributes();
+            for (ConAttrVersionBI attr : attrChron.getVersions()) {
             	long time = attr.getTime();
             	if (time == timeToCheck) {
             		found = true;
             	}
             }
             
-            for (I_DescriptionVersioned loopDesc : concept.getDescriptions()) {
+            for (DescriptionChronicleBI loopDesc : concept.getDescriptions()) {
             	for (DescriptionVersionBI dv : loopDesc.getVersions()) {
             		long time = dv.getTime();
             		if (time == timeToCheck) {
