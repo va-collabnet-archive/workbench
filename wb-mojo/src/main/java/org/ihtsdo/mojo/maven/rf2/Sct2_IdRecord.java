@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.UUID;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.id.Type3UuidFactory;
 
 /**
  * Simple case: single date (no versioning). all active. one id schema. Handle
@@ -70,7 +71,7 @@ public class Sct2_IdRecord implements Serializable {
      * @return
      * @throws Exception
      */
-    static void parseToIdPreCacheFile(List<Rf2File> fList, String outputPathStr)
+    static void parseToIdPreCacheFile(List<Rf2File> fList, String idCacheOutputPathFnameStr)
             throws Exception {
         // SNOMED CT UUID scheme
         long sctUuidSchemeIdL = Long.parseLong("900000000000002006");
@@ -83,7 +84,7 @@ public class Sct2_IdRecord implements Serializable {
         Set<Long> moduleIdSet = new HashSet<>();
         try (ObjectOutputStream oos = new ObjectOutputStream(
                         new BufferedOutputStream(
-                        new FileOutputStream(outputPathStr)))) {
+                        new FileOutputStream(idCacheOutputPathFnameStr)))) {
             int IDENTIFIER_SCHEME_ID = 0;
             int ALTERNATE_IDENTIFIER = 1;
             int EFFECTIVE_TIME = 2;
@@ -134,7 +135,9 @@ public class Sct2_IdRecord implements Serializable {
                     UUID aUuid = UUID.fromString(line[ALTERNATE_IDENTIFIER]);
                     // Computed uuid
                     long sctIdL = Long.parseLong(line[REFERENCED_COMPONENT_ID]);
-                    UUID cUuid = UUID.fromString(Rf2x.convertSctIdToUuidStr(sctIdL));
+                    UUID cUuid = UUID.fromString(
+                            Type3UuidFactory.fromSNOMED(sctIdL).toString());
+                    // UUID cUuid = UUID.fromString(Rf2x.convertSctIdToUuidStr(sctIdL));
                     if (aUuid.compareTo(cUuid) != 0) {
                         countNonComputedIdsL++;
                     }
@@ -147,7 +150,7 @@ public class Sct2_IdRecord implements Serializable {
                     oos.writeUnshared(tempIdCompact);
                 }
                 StringBuilder sb = new StringBuilder();
-                sb.append("\n::: PARSED: ");
+                sb.append("\n::: PARSED & WRITTEN TO ID CACHE: ");
                 sb.append(f.file.toURI().toString());
                 if (idSchemeSet.size() > 0) {
                     Long[] idSchemeArray = idSchemeSet.toArray(new Long[0]);

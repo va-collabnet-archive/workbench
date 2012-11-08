@@ -102,7 +102,7 @@ public class SctRf2DoSToMojo extends AbstractMojo implements Serializable {
             bw.close();
 
             // WRITE PARENT REFSET CONCEPT :!!!:INTERIM:
-            ArrayList<Rf2_RefsetId> refsetIdList = new ArrayList<Rf2_RefsetId>();
+            ArrayList<Rf2_RefsetId> refsetIdList = new ArrayList<>();
             refsetIdList.add(new Rf2_RefsetId(449613003L, /* refsetSctIdOriginal */
                     "2002.01.31", /* refsetDate */
                     "8c230474-9f11-30ce-9cad-185a96fd03a2", /* refsetPathUuidStr */
@@ -112,13 +112,7 @@ public class SctRf2DoSToMojo extends AbstractMojo implements Serializable {
             Rf2_RefsetId.saveRefsetConcept(outDir, refsetIdList);
 
             getLog().info("::: END Rf2_RefsetCreateConceptMojo");
-        } catch (TerminologyException ex) {
-            Logger.getLogger(SctRf2DoSToMojo.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(SctRf2DoSToMojo.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ParseException ex) {
-            Logger.getLogger(SctRf2DoSToMojo.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NoSuchAlgorithmException ex) {
+        } catch (TerminologyException | IOException | ParseException | NoSuchAlgorithmException ex) {
             Logger.getLogger(SctRf2DoSToMojo.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

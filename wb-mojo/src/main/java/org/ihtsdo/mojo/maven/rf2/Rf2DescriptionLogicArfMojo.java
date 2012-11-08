@@ -82,7 +82,7 @@ public class Rf2DescriptionLogicArfMojo extends AbstractMojo implements Serializ
             }
 
             // WRITE DESCRIPTION LOGIC METADATA AND REFSET CONCEPTS
-            ArrayList<Rf2_RefsetId> refsetIdList = new ArrayList<Rf2_RefsetId>();
+            ArrayList<Rf2_RefsetId> refsetIdList = new ArrayList<>();
 
             // DESCRIPTION LOGIC CHARACTERISTIC TYPE
             refsetIdList.add(new Rf2_RefsetId(Long.MAX_VALUE, /* refsetSctIdOriginal N/A */

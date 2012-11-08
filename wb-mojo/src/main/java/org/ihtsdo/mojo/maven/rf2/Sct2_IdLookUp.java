@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.dwfa.ace.log.AceLog;
 
 /**
@@ -38,7 +39,7 @@ public class Sct2_IdLookUp {
     private long uuidLsbArray[];
 
     public Sct2_IdLookUp(String filePathName)
-            throws IOException, ClassNotFoundException {
+            throws IOException {
         ArrayList<Sct2_IdCompact> idList = new ArrayList<>();
         ObjectInputStream ois;
         ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(filePathName)));
@@ -49,6 +50,8 @@ public class Sct2_IdLookUp {
                     idList.add((Sct2_IdCompact) obj);
                 }
             }
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Sct2_IdLookUp.class.getName()).log(Level.SEVERE, null, ex);
         } catch (EOFException ex) {
             // getLog().info(" relationship count = " + count + " @EOF\r\n");
             ois.close();
