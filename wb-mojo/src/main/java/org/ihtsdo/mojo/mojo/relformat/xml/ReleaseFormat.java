@@ -21,6 +21,9 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("ReleaseFormat")
 public class ReleaseFormat {
 
+    public ReleaseFormat() {
+    }
+
     @XStreamAlias("Type")
     private String type;
 
