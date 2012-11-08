@@ -13,7 +13,6 @@ import java.util.UUID;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.mojo.db.ConceptDescriptor;
 import org.ihtsdo.mojo.schema.AbstractTransformer;
 import org.ihtsdo.mojo.schema.config.TransformersConfigApi;
@@ -148,9 +147,9 @@ public class RefsetToAnnotation extends AbstractTransformer {
 	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#postProcessIteration()
 	 */
 	@Override
-	public List<EConcept> postProcessIteration() {
+	public List<TkConcept> postProcessIteration() {
 		System.out.println("**** Final, total converted " + conceptCount + " members");
-		List<EConcept> postProcessList = new ArrayList<EConcept>();
+		List<TkConcept> postProcessList = new ArrayList<>();
 		return postProcessList;
 	}
 	
@@ -180,9 +179,9 @@ public class RefsetToAnnotation extends AbstractTransformer {
 		System.out.println("**** Running refset-to-annotation conversion");
 		try {
 			I_GetConceptData refset = Terms.get().getConcept(refsetUuid);
-			EConcept refsetEConcept = new EConcept(refset);
+			TkConcept refsetTkConcept = new TkConcept(refset);
 			membersMap = new HashMap<UUID,TkRefexAbstractMember<?>>();
-			for ( TkRefexAbstractMember<?> loopMember : refsetEConcept.getRefsetMembers()) {
+			for ( TkRefexAbstractMember<?> loopMember : refsetTkConcept.getRefsetMembers()) {
 				membersMap.put(loopMember.getComponentUuid(), loopMember);
 			}
 			

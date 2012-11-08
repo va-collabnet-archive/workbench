@@ -8,13 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.dwfa.ace.api.I_GetConceptData;
 
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.helper.dialect.DialectHelper;
 import org.ihtsdo.helper.dialect.UnsupportedDialectOrLanguage;
 import org.ihtsdo.lang.LANG_CODE;
@@ -32,7 +27,6 @@ import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refex.type_uuid.TkRefexUuidMember;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
-import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.spec.ValidationException;
 
 /**
@@ -313,9 +307,9 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
      * org.ihtsdo.mojo.schema.AbstractTransformer#postProcessIteration()
      */
     @Override
-    public List<EConcept> postProcessIteration() {
+    public List<TkConcept> postProcessIteration() {
         System.out.println("**** Final, total converted " + conceptCount + " members");
-        List<EConcept> postProcessList = new ArrayList<EConcept>();
+        List<TkConcept> postProcessList = new ArrayList<>();
         return postProcessList;
     }
 

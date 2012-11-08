@@ -12,7 +12,6 @@ import java.util.logging.Level;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.mojo.schema.AbstractTransformer;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
@@ -272,9 +271,9 @@ public class AuxiliaryToRF2Transformer extends AbstractTransformer {
 	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#postProcessIteration()
 	 */
 	@Override
-	public List<EConcept> postProcessIteration() {
+	public List<TkConcept> postProcessIteration() {
 		System.out.println("**** Final, total converted " + conceptCount + " members");
-		List<EConcept> postProcessList = new ArrayList<EConcept>();
+		List<TkConcept> postProcessList = new ArrayList<>();
 		return postProcessList;
 	}
 

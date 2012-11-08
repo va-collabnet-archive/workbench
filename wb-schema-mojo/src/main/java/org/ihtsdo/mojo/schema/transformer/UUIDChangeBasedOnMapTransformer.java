@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.UUID;
 import org.dwfa.util.id.Type3UuidFactory;
 
-import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.mojo.schema.AbstractTransformer;
 import org.ihtsdo.mojo.schema.config.TransformersConfigApi;
 import org.ihtsdo.tk.dto.concept.TkConcept;
@@ -317,8 +316,8 @@ public class UUIDChangeBasedOnMapTransformer extends AbstractTransformer {
 	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#postProcessIteration()
 	 */
 	@Override
-	public List<EConcept> postProcessIteration() {
-		List<EConcept> postProcessList = new ArrayList<EConcept>();
+	public List<TkConcept> postProcessIteration() {
+		List<TkConcept> postProcessList = new ArrayList<>();
 		return postProcessList;
 	}
 

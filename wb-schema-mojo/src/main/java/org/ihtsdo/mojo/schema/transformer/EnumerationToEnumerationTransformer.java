@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.mojo.db.ConceptDescriptor;
 import org.ihtsdo.mojo.schema.AbstractTransformer;
 import org.ihtsdo.mojo.schema.config.TransformersConfigApi;
@@ -177,9 +176,9 @@ public class EnumerationToEnumerationTransformer extends AbstractTransformer {
 	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#postProcessIteration()
 	 */
 	@Override
-	public List<EConcept> postProcessIteration() {
+	public List<TkConcept> postProcessIteration() {
 		System.out.println("**** Final, total converted " + conceptCount + " members");
-		List<EConcept> postProcessList = new ArrayList<EConcept>();
+		List<TkConcept> postProcessList = new ArrayList<>();
 		return postProcessList;
 	}
 

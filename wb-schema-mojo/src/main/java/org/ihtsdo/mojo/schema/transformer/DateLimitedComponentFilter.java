@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.dwfa.ace.api.Terms;
-import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.mojo.schema.AbstractTransformer;
 import org.ihtsdo.mojo.schema.config.TransformersConfigApi;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
@@ -147,7 +146,7 @@ public class DateLimitedComponentFilter extends AbstractTransformer {
 	}
 
 	@Override
-	public List<EConcept> postProcessIteration() {
+	public List<TkConcept> postProcessIteration() {
 		return null;
 	}
 

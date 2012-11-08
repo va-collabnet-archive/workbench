@@ -11,7 +11,6 @@ import java.util.UUID;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.mojo.db.ConceptDescriptor;
 import org.ihtsdo.mojo.schema.AbstractTransformer;
 import org.ihtsdo.mojo.schema.config.TransformersConfigApi;
@@ -38,7 +37,7 @@ public class AnnotationToRefset extends AbstractTransformer {
 	private UUID refsetUuid;
 	
 	/** The refset. */
-	private EConcept refset;
+	private TkConcept refset;
 	
 	/** The write. */
 	boolean write = true;
@@ -133,9 +132,9 @@ public class AnnotationToRefset extends AbstractTransformer {
 	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#postProcessIteration()
 	 */
 	@Override
-	public List<EConcept> postProcessIteration() {
+	public List<TkConcept> postProcessIteration() {
 		System.out.println("**** Final, total converted " + conceptCount + " members");
-		List<EConcept> postProcessList = new ArrayList<EConcept>();
+		List<TkConcept> postProcessList = new ArrayList<>();
 		postProcessList.add(refset);
 		return postProcessList;
 	}
@@ -166,7 +165,7 @@ public class AnnotationToRefset extends AbstractTransformer {
 		System.out.println("**** Running annotation-to-refset conversion");
 		try {
 			I_GetConceptData refsetConcept = Terms.get().getConcept(refsetUuid);
-			refset = new EConcept(refsetConcept);
+			refset = new TkConcept(refsetConcept);
 			refset.setAnnotationStyleRefex(false);
 			if (refset.getRefsetMembers() == null) {
 				refset.setRefsetMembers(new ArrayList<TkRefexAbstractMember<?>>());
