@@ -14,7 +14,6 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept;
-import org.ihtsdo.mojo.db.ConceptDescriptor;
 import org.ihtsdo.mojo.schema.AbstractTransformer;
 import org.ihtsdo.mojo.schema.config.TransformersConfigApi;
 import org.ihtsdo.tk.dto.concept.TkConcept;
@@ -65,12 +64,10 @@ public class RefsetToAnnotationMulti extends AbstractTransformer {
         TransformersConfigApi api = new TransformersConfigApi(xmlFile);
         refsetUuids = new ArrayList<UUID>();
 
-        String refsetsList = api.getValueAt(api.getIntId(id), "parameters.refsets");
-        String[] refsets = refsetsList.split("\\|");
-        
-//        List<String> refsets = api.getCollectionAt(api.getIntId(id), "parameters.refsets");
-        for (String entry : refsets) {
-            refsetUuids.add(UUID.fromString(entry));
+        List<String> uuidStrings = api.getStringList("transformer.parameters.refsets.uuid");
+
+        for (String uuidStr : uuidStrings) {
+            refsetUuids.add(UUID.fromString(uuidStr));
         }
 
     }

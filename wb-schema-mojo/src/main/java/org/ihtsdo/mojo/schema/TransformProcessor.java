@@ -99,6 +99,9 @@ public class TransformProcessor implements ProcessUnfetchedConceptDataBI{
 	@Override
 	public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fetcher) throws Exception {
 		I_GetConceptData c = (I_GetConceptData) fetcher.fetch();
+                if (!c.getRefsetMembers().isEmpty()) {
+                    System.out.println("\n Refset: "+ c.getPrimUuid() + "\n");
+                }
 		TkConcept eC;
 		try {
 			long ini = Calendar.getInstance().getTimeInMillis();

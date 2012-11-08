@@ -148,4 +148,12 @@ public class TransformersConfigApi {
         }
         return values;
     }
+    public List<String> getStringList(String path) {
+        Object prop = xmlConfig.getProperty(path);
+        List<String> values = new LinkedList<String>();
+        if (prop instanceof Collection) {
+            values.addAll((Collection) prop);
+        }
+        return values;
+    }
 }
