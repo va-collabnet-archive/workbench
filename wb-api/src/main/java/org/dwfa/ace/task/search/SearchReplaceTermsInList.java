@@ -220,6 +220,7 @@ public class SearchReplaceTermsInList extends AbstractTask {
                                 String finalDesc = description.getText().replaceAll(searchPrepend + searchString,
                                     replaceString);
                                 finalDesc = finalDesc.replace("  ", " "); //remove double spaces
+                                finalDesc = finalDesc.trim(); //remove leading/trailing spaces
                                 String origDescHtml = description.getText().replaceAll(searchPrepend + searchString,
                                     "<font color='red'>" + searchString + "</font>");
                                 String finalDescHtml = description.getText().replaceAll(searchPrepend + searchString,
