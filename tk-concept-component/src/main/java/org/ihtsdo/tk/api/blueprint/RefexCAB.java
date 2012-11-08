@@ -332,7 +332,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      *
      * @param referencedComponentUuid the uuid of the referenced component
      */
-    protected void setReferencedComponentUuid(UUID referencedComponentUuid) {
+    public void setReferencedComponentUuid(UUID referencedComponentUuid) {
         this.properties.put(RefexProperty.RC_UUID, referencedComponentUuid);
     }
 
