@@ -437,9 +437,9 @@ public class RulesContextHelper {
 									I_ExtendByRefPartCidString newPart = (I_ExtendByRefPartCidString) 
 									lastPart.makeAnalog(
 											ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
-                                                                                        Long.MAX_VALUE,
-                                                                                        config.getEditCoordinate().getAuthorNid(),
-                                                                                        config.getEditCoordinate().getAuthorNid(),
+                                            Long.MAX_VALUE,
+                                            config.getEditCoordinate().getAuthorNid(),
+                                            config.getEditCoordinate().getModuleNid(),
 											editPath.getConceptNid());
 									newPart.setC1id(newRole.getConceptNid());
 									extension.addVersion(newPart);
@@ -475,8 +475,8 @@ public class RulesContextHelper {
 								lastPart.makeAnalog(
 										ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
 										Long.MAX_VALUE,
-                                                                                config.getEditCoordinate().getAuthorNid(),
-                                                                                config.getEditCoordinate().getAuthorNid(),
+                                        config.getEditCoordinate().getAuthorNid(),
+                                        config.getEditCoordinate().getModuleNid(),
 										editPath.getConceptNid());
 								extension.addVersion(newPart);
 								tf.addUncommittedNoChecks(extension);
@@ -597,8 +597,8 @@ public class RulesContextHelper {
 						I_DescriptionPart newPart = (I_DescriptionPart) tuple.getMutablePart().makeAnalog(
 								ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
 								Long.MAX_VALUE,
-                                                                config.getEditCoordinate().getAuthorNid(),
-                                                                config.getEditCoordinate().getAuthorNid(),
+                                config.getEditCoordinate().getAuthorNid(),
+                                config.getEditCoordinate().getModuleNid(),
 								editPath.getConceptNid());
 						newPart.setText(newString);
 						description.addVersion(newPart);
@@ -834,8 +834,8 @@ public class RulesContextHelper {
 							I_RelPart newPart = (I_RelPart) loopTuple.getMutablePart().makeAnalog(
 									ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
 									Long.MAX_VALUE,
-                                                                        config.getEditCoordinate().getAuthorNid(),
-                                                                        config.getEditCoordinate().getAuthorNid(),
+                                    config.getEditCoordinate().getAuthorNid(),
+                                    config.getEditCoordinate().getModuleNid(),
 									config.getEditingPathSetReadOnly().iterator().next().getConceptNid());
 							loopTuple.getFixedPart().addVersion(newPart);
 							retiredAndReactivated = true;
@@ -898,8 +898,8 @@ public class RulesContextHelper {
 						I_RelPart newPart = (I_RelPart) rel.getMutablePart().makeAnalog(
 								ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
 								Long.MAX_VALUE,
-                                                                config.getEditCoordinate().getAuthorNid(),
-                                                                config.getEditCoordinate().getAuthorNid(),
+                                config.getEditCoordinate().getAuthorNid(),
+                                config.getEditCoordinate().getModuleNid(),
 								editPath.getConceptNid());
 						relVersioned.addVersion(newPart);
 					}
