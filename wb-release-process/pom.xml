@@ -16,7 +16,7 @@
 		<src.dir>${project.build.directory}/generated-resources</src.dir>
 		<!-- Application mandatory arguments -->
 		<database />
-		<releaseDate>20120131</releaseDate>
+		<releaseDate>20130131</releaseDate>
 		<outputFolder>export</outputFolder>
 		<!-- Application optional arguments -->
 		<rf2Format />
