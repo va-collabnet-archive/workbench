@@ -201,4 +201,18 @@ public class Rf2x {
             return false;
         }
     }
+    
+       
+    static boolean isSctIdInUuidCache(long sctId) throws IOException {
+        UUID uuid;
+        if (sctid2UuidCache == null) {
+            setupIdCache();
+        }
+        uuid = sctid2UuidCache.getUuid(sctId);
+        if (uuid == null) {
+            return false;
+        } 
+        return true;
+    }
+
 }

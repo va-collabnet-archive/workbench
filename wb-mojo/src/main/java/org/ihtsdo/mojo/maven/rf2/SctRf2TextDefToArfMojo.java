@@ -60,18 +60,16 @@ public class SctRf2TextDefToArfMojo extends AbstractMojo implements Serializable
      */
     private String targetSubDir = "";
     /**
-     * @parameter
-     * @required
+     * @parameter @required
      */
     private String inputDir;
     /**
-     * @parameter
-     * @required
+     * @parameter @required
      */
     private String statusDir;
     /**
-     * Directory used to output the eConcept format files
-     * Default value "/classes" set programmatically due to file separator
+     * Directory used to output the eConcept format files Default value
+     * "/classes" set programmatically due to file separator
      *
      * @parameter default-value="generated-arf"
      */
@@ -121,7 +119,9 @@ public class SctRf2TextDefToArfMojo extends AbstractMojo implements Serializable
                 textdefinitions = Sct2_DesRecord.attachStatus(textdefinitions, statusRecords);
                 for (Sct2_DesRecord d : textdefinitions) {
                     d.writeArf(bw);
-                    writeSctSnomedLongId(bwIds, d.desSnoIdL, d.effDateStr, d.pathUuidStr);
+                    if (Rf2x.isSctIdInUuidCache(d.desSnoIdL) == false) {
+                        writeSctSnomedLongId(bwIds, d.desSnoIdL, d.effDateStr, d.pathUuidStr);
+                    }
                 }
             }
             bw.flush();
