@@ -14,8 +14,8 @@ import com.termmed.genid.util.MyBatisUtil;
 public class GenIdHelper {
 
 	private static final Logger logger = Logger.getLogger(GenIdHelper.class);
-	private static int[][] FnF = { { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }, { 1, 5, 7, 6, 2, 8, 3, 0, 9, 4 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-			{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
+	private static int[][] FnF = { { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }, { 1, 5, 7, 6, 2, 8, 3, 0, 9, 4 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+			{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
 
 	static {
 		for (int i = 2; i < 8; i++) {
@@ -24,9 +24,8 @@ public class GenIdHelper {
 			}
 		}
 	}
-	private static int[][] Dihedral = { { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }, { 1, 2, 3, 4, 0, 6, 7, 8, 9, 5 }, { 2, 3, 4, 0, 1, 7, 8, 9, 5, 6 }, { 3, 4, 0, 1, 2, 8, 9, 5, 6, 7 },
-			{ 4, 0, 1, 2, 3, 9, 5, 6, 7, 8 }, { 5, 9, 8, 7, 6, 0, 4, 3, 2, 1 }, { 6, 5, 9, 8, 7, 1, 0, 4, 3, 2 }, { 7, 6, 5, 9, 8, 2, 1, 0, 4, 3 }, { 8, 7, 6, 5, 9, 3, 2, 1, 0, 4 },
-			{ 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 } };
+	private static int[][] Dihedral = { { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }, { 1, 2, 3, 4, 0, 6, 7, 8, 9, 5 }, { 2, 3, 4, 0, 1, 7, 8, 9, 5, 6 }, { 3, 4, 0, 1, 2, 8, 9, 5, 6, 7 }, { 4, 0, 1, 2, 3, 9, 5, 6, 7, 8 }, { 5, 9, 8, 7, 6, 0, 4, 3, 2, 1 }, { 6, 5, 9, 8, 7, 1, 0, 4, 3, 2 },
+			{ 7, 6, 5, 9, 8, 2, 1, 0, 4, 3 }, { 8, 7, 6, 5, 9, 3, 2, 1, 0, 4 }, { 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 } };
 
 	private static int[] InverseD5 = { 0, 4, 3, 2, 1, 5, 6, 7, 8, 9 };
 
@@ -65,7 +64,7 @@ public class GenIdHelper {
 		int suffixToNum = 0;
 
 		if (parentSnomedId != null && !parentSnomedId.trim().equals("")) {
-			if (parentSnomedId.contains("M-8") || parentSnomedId.contains("M-9") || parentSnomedId.contains("R-") ) {
+			if (parentSnomedId.contains("M-8") || parentSnomedId.contains("M-9") || parentSnomedId.contains("R-")) {
 				logger.info("M-8/9 parent " + parentSnomedId);
 				tempParent = "R-10000";
 				prefix = "R";
@@ -81,7 +80,7 @@ public class GenIdHelper {
 				String incremented = Integer.toHexString(valueOfIdBaseInInteger);
 				logger.info("ID_BASE result incremented: " + incremented.toUpperCase());
 				session.update("com.termmed.genid.data.IDBaseMapper.updateSnomedIdBase", incremented.toUpperCase());
-				String resultStr = prefix + "-"+incremented;
+				String resultStr = prefix + "-" + incremented;
 				return resultStr.toUpperCase();
 			} else {
 				logger.info("Parent snomed id:" + parentSnomedId);
@@ -117,6 +116,9 @@ public class GenIdHelper {
 				int startDecimal = Integer.parseInt(parentSnomedId.split("-")[1], 16);
 				logger.info("Full Total: " + (endDecimal - startDecimal));
 				int k = 1;
+				// while endDecimal - startDecimal == total means that the range
+				// is full so k that is the length is incremented to look in
+				// bigger range
 				while (endDecimal - startDecimal == total && k < lenSuffix) {
 					startId = parentSnomedId.substring(0, lenSuffix - k);
 					for (int j = 0; j < k; j++) {
@@ -148,13 +150,13 @@ public class GenIdHelper {
 						lista.add(startSplit[0] + "-" + Integer.toString(startNum, 16));
 						Collections.sort(lista);
 					}
-					String last = lista.get(lista.size()-1);
+					String last = lista.get(lista.size() - 1);
 					String first = lista.get(0);
 					int startDecimalLista = Integer.parseInt(first.split("-")[1], 16);
 					logger.info("lista decimal start: " + startDecimalLista);
 					int endDecimalLista = Integer.parseInt(last.split("-")[1], 16);
 					logger.info("lista decimal end: " + endDecimalLista);
-					if (lista != null && !lista.isEmpty() && startDecimalLista + pageLenght < endDecimalLista) {
+					if (lista != null && !lista.isEmpty() && startDecimalLista + pageLenght != endDecimalLista) {
 						int resultNum = findFirstAvailableNumber(lista, digits, lenSuffix);
 						logger.info("First Avalable Number: " + resultNum);
 
@@ -228,7 +230,7 @@ public class GenIdHelper {
 						int actNum = Integer.parseInt(actSuffix, 16);
 						logger.info("Actual Number: " + actNum);
 						if (actNum - antNum >= 1) {
-							
+
 							resultNum = antNum;
 							break;
 						}
