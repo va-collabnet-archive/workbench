@@ -10,6 +10,7 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.mojo.ReleaseConfigMojo;
@@ -24,7 +25,7 @@ import org.ihtsdo.rf2.postexport.SnapshotGenerator;
  * @goal patch-snomedid-not-replaced
  * 
  */
-public class PatchSnomedIdNotReplaced extends ReleaseConfigMojo {
+public class PatchSnomedIdNotReplaced extends AbstractMojo {
 
 	/**
 	 * Location of the build directory.
