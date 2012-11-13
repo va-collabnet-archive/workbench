@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.lucene.document.Document;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
@@ -29,7 +30,9 @@ import org.ihtsdo.concept.component.relationship.Relationship.Version;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
 import org.ihtsdo.db.change.ChangeNotifier;
+import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.lucene.SearchResult;
+import org.ihtsdo.lucene.WfHxIndexGenerator;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
@@ -818,5 +821,20 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     @Override
     public boolean hasExtension(int refsetNid, int componentNid) {
         return Bdb.getNidCNidMap().hasExtension(refsetNid, componentNid);
+    }
+    
+    @Override
+    public boolean regenerateWfHxLuceneIndex(ViewCoordinate viewCoordinate) throws Exception{
+        if (LuceneManager.indexExists(LuceneManager.LuceneSearchType.WORKFLOW_HISTORY) == false) {
+                File wfLuceneDirectory = new File("workflow/lucene");
+
+                LuceneManager.setLuceneRootDir(wfLuceneDirectory, LuceneManager.LuceneSearchType.WORKFLOW_HISTORY);
+                if (LuceneManager.indexExists(LuceneManager.LuceneSearchType.WORKFLOW_HISTORY) == false) {
+                    WfHxIndexGenerator.setSourceInputFile(null);
+                    LuceneManager.createLuceneIndex(LuceneManager.LuceneSearchType.WORKFLOW_HISTORY, viewCoordinate);
+                    return true;
+                }
+        }
+        return false;
     }
 }

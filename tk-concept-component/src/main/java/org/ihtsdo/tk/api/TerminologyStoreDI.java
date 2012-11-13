@@ -54,7 +54,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
     void addTermChangeListener(TermChangeListener termChangeListener);
 
     /**
-     * Suspend term change notifications. 
+     * Suspend term change notifications.
      *
      * @deprecated not in TK3 -- use TerminolgoyDI
      */
@@ -130,7 +130,8 @@ public interface TerminologyStoreDI extends TerminologyDI {
     PositionBI newPosition(PathBI path, long time) throws IOException;
 
     /**
-     * Checks if the specified <code>dependencies</code> are satisfied.
+     * Checks if the specified
+     * <code>dependencies</code> are satisfied.
      *
      * @param dependencies the dependencies in question
      * @return <code>true</code>, if the dependencies are satisfied
@@ -490,7 +491,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * be refreshed.
      *
      * @return the sequence representing the last change in the database
-     * 
+     *
      */
     long getSequence();
 
@@ -500,7 +501,8 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * components rather than chronicles.
      *
      * @param viewCoordinate the view coordinate specifying which version of
-     * components and concepts should be used by the methods on      * the <code>TerminolgoySnapshotDI</code> interface.
+     * components and concepts should be used by the methods on *
+     * the <code>TerminolgoySnapshotDI</code> interface.
      * @return the terminology snapshot as specified
      */
     TerminologySnapshotDI getSnapshot(ViewCoordinate viewCoordinate);
@@ -738,7 +740,8 @@ public interface TerminologyStoreDI extends TerminologyDI {
 
     /**
      * Checks to see of the component specified by the
-     * <code>componentNid</code> is a member of the refex collection specified by the
+     * <code>componentNid</code> is a member of the refex collection specified
+     * by the
      * <code>refexNid</code>.
      *
      * @param refexNid the nid associated with the refex collection in question
@@ -919,7 +922,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
     Set<Integer> getAncestors(int childNid, ViewCoordinate viewCoordinate) throws IOException, ContradictionException;
 
     /**
-     * Gets the nids of incoming relationships source concepts. 
+     * Gets the nids of incoming relationships source concepts.
      *
      * In the relationship A is a B, the concept A has a target relationship to
      * the concept B, and the concept B has a source relationship to the concept
@@ -931,4 +934,15 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * @throws IOException signals that an I/O exception has occurred
      */
     int[] getIncomingRelationshipsSourceNids(int conceptNid, NidSetBI relTypes) throws IOException;
+
+    /**
+     * Regenerates workflow history lucene index. The workflow/lucene directory
+     * must not exist for the index to be regenerated.
+     *
+     * @param viewCoordinate the view coordinate to use for finding workflow
+     * history members
+     * @return <code>true</code> when the index has been regenerated
+     * @throws Exception indicates an exception has occurred
+     */
+    boolean regenerateWfHxLuceneIndex(ViewCoordinate viewCoordinate) throws Exception;
 }
