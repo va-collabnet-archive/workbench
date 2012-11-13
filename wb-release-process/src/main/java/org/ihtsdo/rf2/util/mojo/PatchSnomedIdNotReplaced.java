@@ -62,7 +62,8 @@ public class PatchSnomedIdNotReplaced extends AbstractMojo {
 	public void execute() throws MojoExecutionException {	
 
 		try {
-
+			File ftmp=new File(outputFile);
+			ftmp.getParentFile().mkdirs();
 
 			FileOutputStream dfos = new FileOutputStream( outputFile);
 			OutputStreamWriter dosw = new OutputStreamWriter(dfos,"UTF-8");
