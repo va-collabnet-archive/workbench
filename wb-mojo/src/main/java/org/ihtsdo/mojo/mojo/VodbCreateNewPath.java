@@ -213,8 +213,10 @@ public class VodbCreateNewPath extends AbstractMojo {
         UUID prefDescUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, pathUUID.toString()
             + ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids() + pathPrefDesc);
 
+        I_GetConceptData prefDescTypeConcept = tf.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
+        
         I_DescriptionVersioned idvpt = tf.newDescription(prefDescUuid, pathConcept, "en", pathPrefDesc,
-        		descTypeConcept, activeConfig);
+        		prefDescTypeConcept, activeConfig);
         newTuples.addAll(idvpt.getTuples());
 
         UUID relUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, pathUUID.toString() + fsDescUuid
