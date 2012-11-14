@@ -23,13 +23,16 @@ import java.io.IOException;
 import java.util.Vector;
 
 import javax.swing.DefaultListModel;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JTree;
 import javax.swing.TransferHandler;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.lucene.queryParser.ParseException;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -41,75 +44,76 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.modeler.tool.I_GetItemForModel;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.dnd.FixedTerminologyTransferable;
+import org.ihtsdo.qa.gui.viewers.gui.TreeObj;
 
 /**
  * The Class ObjectTransferHandler.
  */
 public class ObjectTransferHandler extends TransferHandler {
-	
+
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
-	
+
 	/** The Constant TARGET_LIST_NAME. */
 	public final static String TARGET_LIST_NAME = "targetLanguageList";
-	
+
 	/** The indices. */
 	private int[] indices = null;
-	
+
 	/** The add index. */
 	private int addIndex = -1; // Location where items were added
-	
+
 	/** The add count. */
 	private int addCount = 0; // Number of items added.
-	
+
 	/** The config. */
 	private I_ConfigAceFrame config;
-	
+
 	/** The get item. */
 	private I_GetItemForModel getItem;
-	
+
 	/** The concept bean flavor. */
 	public static DataFlavor conceptBeanFlavor;
-	
+
 	/** The thin desc versioned flavor. */
 	public static DataFlavor thinDescVersionedFlavor;
-	
+
 	/** The thin desc tuple flavor. */
 	public static DataFlavor thinDescTupleFlavor;
-	
+
 	/** The supported flavors. */
 	public static DataFlavor[] supportedFlavors;
 
-
 	/**
 	 * Instantiates a new object transfer handler.
-	 *
-	 * @param config the config
-	 * @param getItem the get item
+	 * 
+	 * @param config
+	 *            the config
+	 * @param getItem
+	 *            the get item
 	 */
 	public ObjectTransferHandler(I_ConfigAceFrame config, I_GetItemForModel getItem) {
 		this.config = config;
 		this.getItem = getItem;
 		if (conceptBeanFlavor == null) {
-            try {
-                conceptBeanFlavor = new DataFlavor(ConceptTransferable.conceptBeanType);
-                thinDescVersionedFlavor = new DataFlavor(DescriptionTransferable.thinDescVersionedType);
-                thinDescTupleFlavor = new DataFlavor(DescriptionTransferable.thinDescTupleType);
-                supportedFlavors = new DataFlavor[] { thinDescVersionedFlavor, thinDescTupleFlavor, conceptBeanFlavor,
-                                                     FixedTerminologyTransferable.universalFixedConceptFlavor,
-                                                     FixedTerminologyTransferable.universalFixedConceptInterfaceFlavor,
-                                                     FixedTerminologyTransferable.universalFixedDescFlavor,
-                                                     FixedTerminologyTransferable.universalFixedDescInterfaceFlavor,
-                                                     DataFlavor.stringFlavor };
-            } catch (ClassNotFoundException e) {
-                // should never happen.
-                throw new RuntimeException(e);
-            }
-        }
+			try {
+				conceptBeanFlavor = new DataFlavor(ConceptTransferable.conceptBeanType);
+				thinDescVersionedFlavor = new DataFlavor(DescriptionTransferable.thinDescVersionedType);
+				thinDescTupleFlavor = new DataFlavor(DescriptionTransferable.thinDescTupleType);
+				supportedFlavors = new DataFlavor[] { thinDescVersionedFlavor, thinDescTupleFlavor, conceptBeanFlavor, FixedTerminologyTransferable.universalFixedConceptFlavor, FixedTerminologyTransferable.universalFixedConceptInterfaceFlavor, FixedTerminologyTransferable.universalFixedDescFlavor,
+						FixedTerminologyTransferable.universalFixedDescInterfaceFlavor, DataFlavor.stringFlavor };
+			} catch (ClassNotFoundException e) {
+				// should never happen.
+				throw new RuntimeException(e);
+			}
+		}
 	}
 
-	/* (non-Javadoc)
-	 * @see javax.swing.TransferHandler#importData(javax.swing.JComponent, java.awt.datatransfer.Transferable)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see javax.swing.TransferHandler#importData(javax.swing.JComponent,
+	 * java.awt.datatransfer.Transferable)
 	 */
 	public boolean importData(JComponent c, Transferable t) {
 		if (canImport(c, t.getTransferDataFlavors())) {
@@ -134,7 +138,7 @@ public class ObjectTransferHandler extends TransferHandler {
 						}
 					} else if (c instanceof JTable) {
 						JTable table = (JTable) c;
-						if(!c.getName().equals("droolsEnumTable")){
+						if (!c.getName().equals("droolsEnumTable")) {
 							return false;
 						}
 						DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
@@ -187,7 +191,7 @@ public class ObjectTransferHandler extends TransferHandler {
 						} catch (Exception e) {
 							AceLog.getAppLog().alertAndLogException(e);
 						}
-					} else {
+					} else if (c instanceof JList) {
 						JList target = (JList) c;
 						DefaultListModel listModel = (DefaultListModel) target.getModel();
 						int index = target.getSelectedIndex();
@@ -245,6 +249,20 @@ public class ObjectTransferHandler extends TransferHandler {
 						} catch (TerminologyException e) {
 							AceLog.getAppLog().alertAndLogException(e);
 						}
+					} else if (c instanceof JComboBox) {
+						I_GetConceptData concept = (I_GetConceptData) t.getTransferData(conceptBeanFlavor);
+						if (getItem == null) {
+							((JComboBox) c).addItem(concept);
+							((JComboBox) c).setSelectedItem(concept);
+						} else {
+							try {
+								getItem.getItemFromConcept(concept);
+							} catch (Exception e) {
+								AceLog.getAppLog().info(e.getMessage());
+								AceLog.getAppLog().alertAndLogException(e);
+								return false;
+							}
+						}
 					}
 				}
 				return true;
@@ -259,12 +277,15 @@ public class ObjectTransferHandler extends TransferHandler {
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see javax.swing.TransferHandler#createTransferable(javax.swing.JComponent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * javax.swing.TransferHandler#createTransferable(javax.swing.JComponent)
 	 */
 	protected Transferable createTransferable(JComponent c) {
 		I_GetConceptData concept = null;
-		if(c instanceof JTable){
+		if (c instanceof JTable) {
 			JTable table = (JTable) c;
 			indices = table.getSelectedRows();
 			TableModel model = table.getModel();
@@ -278,29 +299,42 @@ public class ObjectTransferHandler extends TransferHandler {
 			} catch (IOException e) {
 				AceLog.getAppLog().alertAndLogException(e);
 			}
-		}else{
+		} else if (c instanceof JList) {
 			JList list = (JList) c;
 			indices = list.getSelectedIndices();
 			Object[] values = list.getSelectedValues();
 			concept = (I_GetConceptData) values[0];
+		} else if (c instanceof JTree) {
+			JTree tree = (JTree) c;
+			Object selectedComp = tree.getLastSelectedPathComponent();
+			if (selectedComp instanceof DefaultMutableTreeNode) {
+				DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) selectedComp;
+				TreeObj treeObj = (TreeObj) treeNode.getUserObject();
+				concept = (I_GetConceptData) treeObj.getAtrValue();
+			}
 		}
 		return new ConceptTransferable(concept);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see javax.swing.TransferHandler#getSourceActions(javax.swing.JComponent)
 	 */
 	public int getSourceActions(JComponent c) {
 		return COPY_OR_MOVE;
 	}
 
-	/* (non-Javadoc)
-	 * @see javax.swing.TransferHandler#exportDone(javax.swing.JComponent, java.awt.datatransfer.Transferable, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see javax.swing.TransferHandler#exportDone(javax.swing.JComponent,
+	 * java.awt.datatransfer.Transferable, int)
 	 */
 	protected void exportDone(JComponent c, Transferable data, int action) {
 		if (action == MOVE) {
 			if (indices != null) {
-				if(!(c instanceof JTable)){
+				if (!(c instanceof JTable)) {
 					JList source = (JList) c;
 					DefaultListModel model = (DefaultListModel) source.getModel();
 					// If we are moving items around in the same list, we
@@ -324,8 +358,11 @@ public class ObjectTransferHandler extends TransferHandler {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see javax.swing.TransferHandler#canImport(javax.swing.JComponent, java.awt.datatransfer.DataFlavor[])
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see javax.swing.TransferHandler#canImport(javax.swing.JComponent,
+	 * java.awt.datatransfer.DataFlavor[])
 	 */
 	public boolean canImport(JComponent c, DataFlavor[] flavors) {
 		if (c.isEnabled()) {
@@ -341,9 +378,11 @@ public class ObjectTransferHandler extends TransferHandler {
 
 	/**
 	 * Checks for concept bean flavor.
-	 *
-	 * @param flavors the flavors
-	 * @param conceptBeanFlavor the concept bean flavor
+	 * 
+	 * @param flavors
+	 *            the flavors
+	 * @param conceptBeanFlavor
+	 *            the concept bean flavor
 	 * @return true, if successful
 	 */
 	private boolean hasConceptBeanFlavor(DataFlavor[] flavors, DataFlavor conceptBeanFlavor) {
