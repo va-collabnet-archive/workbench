@@ -71,23 +71,28 @@ public class Sct2_IdLookUp {
         for (int i = 0; i < idList.size() - 1; i++) {
             if (idList.get(i).sctIdL == idList.get(i + 1).sctIdL) {
                 countSctDuplicates++;
+                boolean isNotChanged = true;
                 if (idList.get(i).uuidMsbL != idList.get(i + 1).uuidMsbL
                         || idList.get(i).uuidLsbL != idList.get(i + 1).uuidLsbL) {
                     countSctPairUuidChanged++;
-
-                    if (countSctPairUuidChanged < 10) {
+                    isNotChanged = false;
+                }
+                if (countSctDuplicates < 200) {
+                    if (isNotChanged) {
+                        sb.append("\r\nAMBIGUOUS PRIMORDIAL UUID ====\r\n");
+                    } else {
                         sb.append("\r\nAMBIGUOUS PRIMORDIAL UUID\r\n");
-                        sb.append(idList.get(i).sctIdL);
-                        UUID uuid1 = new UUID(idList.get(i).uuidMsbL,
-                                idList.get(i).uuidLsbL);
-                        UUID uuid2 = new UUID(idList.get(i + 1).uuidMsbL,
-                                idList.get(i + 1).uuidLsbL);
-                        sb.append(uuid1.toString());
-                        sb.append("\r\n");
-                        sb.append(uuid2.toString());
-                        sb.append("\r\n");
                     }
-
+                    sb.append(idList.get(i).sctIdL);
+                    sb.append("\r\n");
+                    UUID uuid1 = new UUID(idList.get(i).uuidMsbL,
+                            idList.get(i).uuidLsbL);
+                    UUID uuid2 = new UUID(idList.get(i + 1).uuidMsbL,
+                            idList.get(i + 1).uuidLsbL);
+                    sb.append(uuid1.toString());
+                    sb.append("\r\n");
+                    sb.append(uuid2.toString());
+                    sb.append("\r\n");
                 }
             }
         }
