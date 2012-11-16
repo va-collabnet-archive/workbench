@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -85,10 +86,19 @@ public class DescriptionDiffAttrDialog extends JDialog {
 		dispose();
 	}
 
+	public static void main(String[] arg) {
+		Calendar cal = Calendar.getInstance();
+		int year = cal.get(Calendar.YEAR);
+		System.out.println("Current Year: " + year);
+	}
+
 	private void initCustomComponents() {
 		try {
 			// Set release dates
-			for (int i = 2002; i <= 2012; i++) {
+			Calendar c = new GregorianCalendar();
+			c.setTime(new Date());
+			int currentYear = c.get(Calendar.YEAR);
+			for (int i = 2002; i <= currentYear+1; i++) {
 				Calendar c0 = new GregorianCalendar(cstTime);
 				Calendar c3 = new GregorianCalendar(cstTime);
 				Calendar c6 = new GregorianCalendar(cstTime);
@@ -97,7 +107,7 @@ public class DescriptionDiffAttrDialog extends JDialog {
 				c3.set(i, 3, 30, 23, 59, 59);
 				c6.set(i, 6, 31, 23, 59, 59);
 				c9.set(i, 9, 31, 23, 59, 59);
-				
+
 				initTimeCombo.addItem(new TimeItem(c0));
 				initTimeCombo.addItem(new TimeItem(c3));
 				initTimeCombo.addItem(new TimeItem(c6));
