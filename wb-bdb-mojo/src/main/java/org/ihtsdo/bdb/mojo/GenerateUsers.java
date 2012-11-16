@@ -18,6 +18,7 @@ package org.ihtsdo.bdb.mojo;
 import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -174,31 +175,6 @@ public class GenerateUsers extends AbstractMojo {
 
 			Bdb.setup(berkeleyDir.getAbsolutePath());
 
-			//get config properties
-
-			/*
-			 * LIST OF CONFIG PROPERTIES: langSortPref, langPrefOrder,
-			 * statedInferredPolicy, defaultStatus, defaultDescType,
-			 * defaultRelType, defaultRelChar, defaultRelRefinability,
-			 * visibleRefests, editPath, viewPath
-			 */
-			BufferedReader configReader = new BufferedReader(new FileReader(defaultUserConfig));
-			configProps.load(configReader);
-			langSortPref = configProps.getProperty("langSortPref");
-			langPrefOrder = configProps.getProperty("langPrefOrder");
-			statedInferredPolicy = configProps.getProperty("statedInferredPolicy");
-			defaultStatus = getConceptSpecFromPrefs(configProps.getProperty("defaultStatus"));
-			defaultDescType = getConceptSpecFromPrefs(configProps.getProperty("defaultDescType"));
-			defaultRelChar = getConceptSpecFromPrefs(configProps.getProperty("defaultRelChar"));
-			defaultRelType = getConceptSpecFromPrefs(configProps.getProperty("defaultRelType"));
-			defaultRelRefinability = getConceptSpecFromPrefs(configProps.getProperty("defaultRelRefinability"));
-			visibleRefests = configProps.getProperty("visibleRefests");
-			projectDevelopmentPathFsn = configProps.getProperty("projectDevelopmentPathFsn");
-			projectDevelopmentViewPathFsn = configProps.getProperty("projectDevelopmentViewPathFsn");
-                        projectDevelopmentAdjPathFsn = configProps.getProperty("projectDevelopmentAdjPathFsn");
-                        module = getConceptSpecFromPrefs(configProps.getProperty("module"));
-                        generateAdjCs = configProps.getProperty("generateAdjCs");
-
 			//create user based on profile config
 			BufferedReader userReader = new BufferedReader(new FileReader(usersFile));
 			userReader.readLine();
@@ -206,9 +182,13 @@ public class GenerateUsers extends AbstractMojo {
 
 			while (userLine != null) {
 				String[] parts = userLine.split("\t");
-				if (parts.length >= 6) {
-					setupUser(parts[0], parts[1], parts[2], parts[3], parts[4], parts[5]);
-				}
+				if (parts.length == 6) {
+                                    readConfigFile("");
+                                    setupUser(parts[0], parts[1], parts[2], parts[3], parts[4], parts[5]);
+				}if(parts.length == 7){
+                                    readConfigFile(parts[6]);
+                                    setupUser(parts[0], parts[1], parts[2], parts[3], parts[4], parts[5]);
+                                }
 				userLine = userReader.readLine();
 			}
 
@@ -904,4 +884,32 @@ public class GenerateUsers extends AbstractMojo {
 
 		return activeConfig;
 	}
+        
+        private void readConfigFile(String userConfig) throws FileNotFoundException, IOException {
+            if(userConfig == ""){
+                BufferedReader configReader = new BufferedReader(new FileReader(defaultUserConfig));
+                configProps.load(configReader);
+            }else{
+                String userConfigFile = defaultUserConfig.getPath();
+                userConfigFile = userConfigFile.replace("userConfig.txt", userConfig);
+                File configFile = new File(userConfigFile);
+                BufferedReader configReader = new BufferedReader(new FileReader(configFile));
+                configProps.load(configReader);
+            }
+            
+            langSortPref = configProps.getProperty("langSortPref");
+            langPrefOrder = configProps.getProperty("langPrefOrder");
+            statedInferredPolicy = configProps.getProperty("statedInferredPolicy");
+            defaultStatus = getConceptSpecFromPrefs(configProps.getProperty("defaultStatus"));
+            defaultDescType = getConceptSpecFromPrefs(configProps.getProperty("defaultDescType"));
+            defaultRelChar = getConceptSpecFromPrefs(configProps.getProperty("defaultRelChar"));
+            defaultRelType = getConceptSpecFromPrefs(configProps.getProperty("defaultRelType"));
+            defaultRelRefinability = getConceptSpecFromPrefs(configProps.getProperty("defaultRelRefinability"));
+            visibleRefests = configProps.getProperty("visibleRefests");
+            projectDevelopmentPathFsn = configProps.getProperty("projectDevelopmentPathFsn");
+            projectDevelopmentViewPathFsn = configProps.getProperty("projectDevelopmentViewPathFsn");
+            projectDevelopmentAdjPathFsn = configProps.getProperty("projectDevelopmentAdjPathFsn");
+            module = getConceptSpecFromPrefs(configProps.getProperty("module"));
+            generateAdjCs = configProps.getProperty("generateAdjCs");
+    }
 }
