@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 
+import org.ihtsdo.rf2.postexport.RF2ArtifactPostExportAbst.FILE_TYPE;
+
 
 public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
 
@@ -128,6 +130,11 @@ public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
 
 		if (fType==FILE_TYPE.RF2_ATTRIBUTE_VALUE){
 			ConsolidateInactRefsetSnapshotAndDelta  cis=new ConsolidateInactRefsetSnapshotAndDelta(fType,snapshotSortedPreviousfile,snapshotSortedExportedfile,snapshotFinalFile,deltaFinalFile,releaseDate);
+			cis.execute();
+			cis=null;
+			System.gc();
+		}else if (fType==FILE_TYPE.RF2_ISA_RETIRED){
+			ConsolidateInfRelsSnapshotAndDelta  cis=new ConsolidateInfRelsSnapshotAndDelta(fType,snapshotSortedPreviousfile,snapshotSortedExportedfile,snapshotFinalFile,deltaFinalFile,releaseDate);
 			cis.execute();
 			cis=null;
 			System.gc();
