@@ -174,6 +174,11 @@ public class Rf2x {
 
     static String convertSctIdToUuidStr(long id) 
             throws IOException {
+        return convertSctIdToUuid(id).toString();
+    }
+
+    static UUID convertSctIdToUuid(long id) 
+            throws IOException {
         UUID uuid;
         if (sctid2UuidCache == null) {
             setupIdCache();
@@ -186,9 +191,9 @@ public class Rf2x {
                 System.out.println(":::TEST: missCounter=" + missCounter 
                         + " SCTID=" + Long.toString(id));
             }
-            return Type3UuidFactory.fromSNOMED(id).toString();                    
+            return Type3UuidFactory.fromSNOMED(id);                    
         } else {
-            return uuid.toString();
+            return uuid;
         }
     }
 
