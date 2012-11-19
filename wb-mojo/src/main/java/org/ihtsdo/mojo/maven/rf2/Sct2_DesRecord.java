@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.UUID;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.util.id.Type3UuidFactory;
 
 class Sct2_DesRecord implements Comparable<Sct2_DesRecord>, Serializable {
 
@@ -53,9 +52,10 @@ class Sct2_DesRecord implements Comparable<Sct2_DesRecord>, Serializable {
             String conUuidStr, String termStr,
             boolean capitalization, String desTypeStr, String langCodeStr,
             long statusConceptL)
-            throws ParseException {
+            throws ParseException, IOException {
         desSnoIdL = dId;
-        UUID tmpUUID = Type3UuidFactory.fromSNOMED(desSnoIdL);
+        // UUID tmpUUID = Type3UuidFactory.fromSNOMED(desSnoIdL);
+        UUID tmpUUID = Rf2x.convertSctIdToUuid(desSnoIdL);
         this.desUuidStr = tmpUUID.toString();
         this.effDateStr = dateStr;
         this.timeL = Rf2x.convertDateToTime(dateStr);
@@ -270,11 +270,11 @@ class Sct2_DesRecord implements Comparable<Sct2_DesRecord>, Serializable {
             a[idx] = new Sct2_DesRecord(Long.parseLong(line[ID]),
                     Rf2x.convertEffectiveTimeToDate(line[EFFECTIVE_TIME]),
                     Rf2x.convertStringToBoolean(line[ACTIVE]),
-                    Rf2x.convertIdToUuidStr(line[MODULE_ID]),
-                    Rf2x.convertIdToUuidStr(line[CONCEPT_ID]),
+                    Rf2x.convertSctIdToUuidStr(line[MODULE_ID]),
+                    Rf2x.convertSctIdToUuidStr(line[CONCEPT_ID]),
                     line[TERM],
                     Rf2x.convertCaseSignificanceIdToCapStatus(line[CASE_SIGNIFICANCE_ID]),
-                    Rf2x.convertIdToUuidStr(line[TYPE_ID]),
+                    Rf2x.convertSctIdToUuidStr(line[TYPE_ID]),
                     line[LANGUAGE_CODE],
                     Long.MAX_VALUE);
             idx++;
@@ -310,11 +310,12 @@ class Sct2_DesRecord implements Comparable<Sct2_DesRecord>, Serializable {
     public void writeArf(BufferedWriter writer)
             throws IOException, TerminologyException, ParseException {
         // Description UUID
-        writer.append(desUuidStr + TAB_CHARACTER);
+        // writer.append(desUuidStr + TAB_CHARACTER);
+        writer.append(Rf2x.convertSctIdToUuidStr(desSnoIdL) + TAB_CHARACTER);
 
         // Status UUID
         if (statusConceptL < Long.MAX_VALUE) {
-            writer.append(Rf2x.convertIdToUuidStr(statusConceptL) + TAB_CHARACTER);
+            writer.append(Rf2x.convertSctIdToUuidStr(statusConceptL) + TAB_CHARACTER);
         } else {
             writer.append(Rf2x.convertActiveToStatusUuid(isActive) + TAB_CHARACTER);
         }
