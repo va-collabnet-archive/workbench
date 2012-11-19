@@ -457,7 +457,7 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * @deprecated not in TK3
      */
     @Deprecated
-    int getReadOnlyMaxStamp();
+    int getReadOnlyMaxSap();
 
     /**
      * Gets the paths which have the path specified by the given

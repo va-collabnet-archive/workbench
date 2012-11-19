@@ -196,7 +196,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     
     @Override
     public void iterateStampDataInSequence(ProcessStampDataBI processor) throws Exception {
-        Bdb.getSapDb().iterateStampDataInSequence(processor);
+        Bdb.getSapDb().iterateSapDataInSequence(processor);
     }
     
     @Override
@@ -500,7 +500,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     }
     
     @Override
-    public Set<PathBI> getPathSetFromStampSet(Set<Integer> stampNids) throws IOException {
+    public Set<PathBI> getPathSetFromSapSet(Set<Integer> stampNids) throws IOException {
         HashSet<PathBI> paths = new HashSet<PathBI>(stampNids.size());
         
         for (int sap : stampNids) {
@@ -544,7 +544,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     }
     
     @Override
-    public int getReadOnlyMaxStamp() {
+    public int getReadOnlyMaxSap() {
         return Bdb.getSapDb().getReadOnlyMax();
     }
     

@@ -166,18 +166,18 @@ public class Rf2x {
         }
     }
 
-    static String convertSctIdToUuidStr(String idStr) 
+    static String convertIdToUuidStr(String idStr) 
             throws IOException {
         long id = Long.parseLong(idStr);
-        return convertSctIdToUuidStr(id);
+        return convertIdToUuidStr(id);
     }
 
-    static String convertSctIdToUuidStr(long id) 
+    static String convertIdToUuidStr(long id) 
             throws IOException {
-        return convertSctIdToUuid(id).toString();
+        return convertIdToUuid(id).toString();
     }
 
-    static UUID convertSctIdToUuid(long id) 
+    static UUID convertIdToUuid(long id) 
             throws IOException {
         UUID uuid;
         if (sctid2UuidCache == null) {
