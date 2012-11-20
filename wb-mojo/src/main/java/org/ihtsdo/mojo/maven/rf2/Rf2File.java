@@ -30,8 +30,8 @@ import java.util.List;
 import org.apache.maven.plugin.MojoFailureException;
 
 public class Rf2File implements Comparable<Object> {
-    private static final String TAB_CHARACTER = "\t";
 
+    private static final String TAB_CHARACTER = "\t";
     File file;
     Date revDate;
     long time;
@@ -80,19 +80,21 @@ public class Rf2File implements Comparable<Object> {
     private static boolean inDateRange(Date revDate, Date dateStart, Date dateStop)
             throws MojoFailureException {
 
-        if (dateStart != null && revDate.compareTo(dateStart) < 0)
-            return false; // precedes start date
+        if (dateStart != null && revDate.compareTo(dateStart) < 0) {
+            return false;
+        } // precedes start date
 
-        if (dateStop != null && revDate.compareTo(dateStop) > 0)
-            return false; // after end date
+        if (dateStop != null && revDate.compareTo(dateStop) > 0) {
+            return false;
+        } // after end date
 
         return true;
     }
 
-   private static Date getFileRevDate(File f) throws ParseException {
+    private static Date getFileRevDate(File f) throws ParseException {
         int pos;
-        Date d1 = null;
-        Date d2 = null;
+        Date d1;
+        Date d2;
         // Check file name for date yyyyMMdd
         // EXAMPLE: ../net/nhs/uktc/ukde/sct1_relationships_uk_drug_20090401.txt
         pos = f.getName().length() - 12; // "yyyyMMdd.txt"
@@ -138,10 +140,10 @@ public class Rf2File implements Comparable<Object> {
     public static List<Rf2File> getFiles(String wDir, String subDir, String rootDir,
             String prefix, String postfix) throws ParseException {
 
-        ArrayList<Rf2File> listOfFiles = new ArrayList<Rf2File>();
+        ArrayList<Rf2File> listOfFiles = new ArrayList<>();
 
         File f1 = new File(new File(wDir, subDir), rootDir);
-        ArrayList<File> fv = new ArrayList<File>();
+        ArrayList<File> fv = new ArrayList<>();
         listFilesRecursive(fv, f1, prefix, postfix);
 
         File[] files = new File[0];
@@ -164,10 +166,10 @@ public class Rf2File implements Comparable<Object> {
             String infix, String postfix, Date dateStart, Date dateStop) throws ParseException,
             MojoFailureException {
 
-        ArrayList<Rf2File> listOfFiles = new ArrayList<Rf2File>();
+        ArrayList<Rf2File> listOfFiles = new ArrayList<>();
 
         File f1 = new File(new File(wDir, subDir), rootDir);
-        ArrayList<File> fv = new ArrayList<File>();
+        ArrayList<File> fv = new ArrayList<>();
         listFilesRecursive(fv, f1, infix, postfix);
 
         File[] files = new File[0];
@@ -208,5 +210,4 @@ public class Rf2File implements Comparable<Object> {
             }
         }
     }
-
 }

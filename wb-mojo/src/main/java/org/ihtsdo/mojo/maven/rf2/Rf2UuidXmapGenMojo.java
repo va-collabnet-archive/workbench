@@ -73,7 +73,7 @@ public class Rf2UuidXmapGenMojo extends AbstractMojo implements Serializable {
             br.readLine(); // Header row
             while (br.ready()) {
                 String[] line = br.readLine().split(TAB_CHARACTER);
-                String sctidUuidStr = Rf2x.convertIdToUuidStr(line[SCTID]);
+                String sctidUuidStr = Rf2x.convertSctIdToUuidStr(line[SCTID]);
 
                 if (sctidUuidStr.equalsIgnoreCase(line[UUID_CODE])) {
                     System.out.println(line[UUID_CODE] + "\t" + line[UUID_CODE]);

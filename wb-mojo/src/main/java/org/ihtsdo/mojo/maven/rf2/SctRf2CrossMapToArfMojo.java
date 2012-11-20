@@ -22,9 +22,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -74,7 +72,7 @@ public class SctRf2CrossMapToArfMojo extends AbstractMojo implements Serializabl
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        BufferedWriter bwIds = null;
+        BufferedWriter bwIds;
         List<Rf2File> filesIn;
         getLog().info("::: BEGIN SctRf2CrossMapToArfMojo");
         // SHOW DIRECTORIES
