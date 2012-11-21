@@ -52,7 +52,7 @@ import org.ihtsdo.tk.dto.concept.component.identifier.IDENTIFIER_PART_TYPES;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
 import org.ihtsdo.tk.dto.concept.component.media.TkMedia;
 import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
-import org.ihtsdo.tk.dto.concept.component.refex.type_arrayofbytearray.TkRefexArrayOfBytearrayMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_array_of_bytearray.TkRefexArrayOfBytearrayMember;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 
 public class EConcept extends TkConcept implements I_AmChangeSetObject {
