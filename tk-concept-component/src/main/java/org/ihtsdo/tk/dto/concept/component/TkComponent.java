@@ -54,7 +54,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import java.util.*;
-import org.ihtsdo.tk.dto.concept.component.refex.type_arrayofbytearray.TkRefexArrayOfBytearrayMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_array_of_bytearray.TkRefexArrayOfBytearrayMember;
 
 /**
  * The Class TkComponent represents a concept component in the eConcept format

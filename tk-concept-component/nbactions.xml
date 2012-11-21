@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+        <action>
+            <actionName>CUSTOM-effective pom</actionName>
+            <displayName>effective pom</displayName>
+            <goals>
+                <goal>help:effective-pom</goal>
+            </goals>
+        </action>
+    </actions>
