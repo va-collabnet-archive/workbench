@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type3UuidFactory;
 
@@ -200,9 +201,8 @@ public class Sct2_IdRecord implements Serializable {
             BufferedWriter arfWriter,
             Sct2_IdLookUp idLookUp, UUID pathUuid, UUID authorUuid)
             throws Exception {
-        // SNOMED CT UUID scheme
-        String sctUuidSchemeId = "900000000000002006";
-        UUID sourceSystemUuid = idLookUp.getUuid(sctUuidSchemeId);
+        // SNOMED integer ID
+        UUID sourceSystemUuid = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getPrimoridalUid();
         if (sourceSystemUuid == null) {
             throw new Exception("Source System ID not found in ID lookup");
         }
@@ -239,12 +239,6 @@ public class Sct2_IdRecord implements Serializable {
                     throw new Exception("ALTERNATE_IDENTIFIER not found in cache");
                 }
 
-                // Check IDENTIFIER_SCHEME_ID ARF ID_FROM_SOURCE_SYSTEM
-                if (!sctUuidSchemeId.equalsIgnoreCase(line[IDENTIFIER_SCHEME_ID])) {
-                    throw new UnsupportedOperationException("ID scheme "
-                            + line[IDENTIFIER_SCHEME_ID]
-                            + " not supported");
-                }
                 // yyyy-MM-dd HH:mm:ss
                 String dateStr = Rf2x.convertEffectiveTimeToDate(line[EFFECTIVE_TIME]);
 
