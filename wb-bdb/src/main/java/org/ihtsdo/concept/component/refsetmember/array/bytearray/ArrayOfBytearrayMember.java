@@ -122,7 +122,7 @@ public class ArrayOfBytearrayMember extends RefsetMember<ArrayOfBytearrayRevisio
     @Override
     public ArrayOfBytearrayRevision makeAnalog() {
         ArrayOfBytearrayRevision newR = new ArrayOfBytearrayRevision(getStatusNid(), getTime(),
-                getAuthorNid(), getMemberId(), getPathNid(), this);
+                getAuthorNid(), getModuleNid(), getPathNid(), this);
 
         return newR;
     }
