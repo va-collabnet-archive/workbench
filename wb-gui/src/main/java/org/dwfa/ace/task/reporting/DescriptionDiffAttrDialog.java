@@ -200,6 +200,10 @@ public class DescriptionDiffAttrDialog extends JDialog {
 		createDescriptionsDiffRefsets.ok();
 		close();
 	}
+	
+	public boolean isCanceled() {
+		return canceled;
+	}
 
 	private void cancelButtonActionPerformed(ActionEvent e) {
 		canceled = true;

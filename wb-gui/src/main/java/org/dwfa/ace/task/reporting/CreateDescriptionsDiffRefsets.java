@@ -97,10 +97,12 @@ public class CreateDescriptionsDiffRefsets extends AbstractTask {
 				String laterTime2 = dialog.getLaterTime();// "2011.07.31 23:59:59 CST";
 				UUID path1UUID = dialog.getUUID1();// UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2");
 				UUID path2UUID = dialog.getUUID2();// .fromString("8c230474-9f11-30ce-9cad-185a96fd03a2");
-				String refsetNamePrefix = "Comparison " + initialTime1.substring(0, initialTime1.indexOf(" ")) + " to " + laterTime2.substring(0, laterTime2.indexOf(" "));
-				DescriptionsDiffComputer diff = new DescriptionsDiffComputer(Terms.get().getActiveAceFrameConfig(), refsetNamePrefix, initialTime1, laterTime2, path1UUID, path2UUID);
-				diff.setup();
-				diff.run();
+				if (!dialog.isCanceled()) {
+					String refsetNamePrefix = "Comparison " + initialTime1.substring(0, initialTime1.indexOf(" ")) + " to " + laterTime2.substring(0, laterTime2.indexOf(" "));
+					DescriptionsDiffComputer diff = new DescriptionsDiffComputer(Terms.get().getActiveAceFrameConfig(), refsetNamePrefix, initialTime1, laterTime2, path1UUID, path2UUID);
+					diff.setup();
+					diff.run();
+				}
 			}
 			return Condition.CONTINUE;
 		} catch (Exception e) {
