@@ -106,6 +106,9 @@ public class RF2HistoricalAssociationIdentImpl extends RF2AbstractImpl implement
 					UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId + targetComponent);
 					String relationshipUuid = uuid.toString();
 
+					if (referencedComponentId.equals("284831000119107") || referencedComponentId.equals("ae72b722-e8d2-77ad-ab83-a0a5201b6aad")){
+						System.out.println("UUID Concept in test " + uuid.toString());
+					}
 					if (relationshipId==null || relationshipId.equals("")){
 						relationshipId=relationshipUuid;
 					}
