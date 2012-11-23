@@ -1295,6 +1295,8 @@ public class ExportUtil {
 				int pathNid = i_IdVersion.getPathNid();
 				if (pathNid == snomedCorePathNid && snomedRTNid == arcAuxSnomedRTNid) {
 					snomedId = (String) denotion;
+				}else if (snomedId.equals("") && snomedRTNid == arcAuxSnomedRTNid) {
+					snomedId = (String) denotion;
 				}
 			}
 		}
@@ -1319,6 +1321,8 @@ public class ExportUtil {
 				if (pathNid == snomedCorePathNid && ctv3Nid == arcAuxCtv3Nid) {
 					ctv3Id = (String) denotion;
 					// logger.error("=======ctv3id value=======" + ctv3Id);
+				}else if (ctv3Id.equals("") && ctv3Nid == arcAuxCtv3Nid){
+					ctv3Id = (String) denotion;
 				}
 			}
 		}
@@ -1546,6 +1550,8 @@ public class ExportUtil {
 					sctId = (Long) denotion; // Inferred Path
 				} else if (sctNid == getSnomedStatedPathNid() && snomedIntegerNid == arcAuxSnomedIntegerNid) { // -2147480865
 					sctId = (Long) denotion; // Stated Path
+				} else if (sctId==null && snomedIntegerNid == arcAuxSnomedIntegerNid) { // -2147480865
+					sctId = (Long) denotion; 
 				}
 			}
 		}
@@ -1634,6 +1640,14 @@ public class ExportUtil {
 						// This is all the subset which gets imported and subsetoriginalid becomes conceptid (not need to extracted)
 						// System.out.println("ClassCastException ===>" + concept.getInitialText());
 					}
+				}else if(conceptId==null && snomedIntegerNid == arcAuxSnomedIntegerNid){
+					try {
+						conceptId = (Long) denotion;
+					} catch (java.lang.ClassCastException e) {
+						// e.printStackTrace();
+						// This is all the subset which gets imported and subsetoriginalid becomes conceptid (not need to extracted)
+						// System.out.println("ClassCastException ===>" + concept.getInitialText());
+					}	
 				}
 			}
 		}
@@ -1829,6 +1843,8 @@ public class ExportUtil {
 				int arcAuxSnomedIntegerNid = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid();
 				int pathNid = i_IdVersion.getPathNid();
 				if (pathNid == snomedCorePathNid && snomedIntegerNid == arcAuxSnomedIntegerNid) {
+					descriptionId = (Long) denotion;
+				}else if (descriptionId==null && snomedIntegerNid == arcAuxSnomedIntegerNid){
 					descriptionId = (Long) denotion;
 				}
 			}
