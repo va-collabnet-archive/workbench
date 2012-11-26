@@ -178,7 +178,9 @@ public class BdbCommitManager {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }finally{
+            dbCheckerPermit.acquireUninterruptibly(PERMIT_COUNT);
             readLock.unlock();
+            dbCheckerPermit.release(PERMIT_COUNT);
         }
     }
     
@@ -413,44 +415,46 @@ public class BdbCommitManager {
 
                         int errorCount = 0;
                         int warningCount = 0;
-
+                        boolean hasDataChecks = false;
+                        
                         if (performCreationTests) {
                             datacheckWriteLock.lock();
                             NidBitSetItrBI uncommittedCNidItr = uncommittedCNids.iterator();
 
                             DataCheckRunner.cancelAll();
                             dataCheckMap.clear();
-
                             while (uncommittedCNidItr.next()) {
                                 Set<AlertToDataConstraintFailure> warningsAndErrors =
                                         new HashSet<AlertToDataConstraintFailure>();
                                 Concept concept = Concept.get(uncommittedCNidItr.nid());
+                                hasDataChecks = ConceptTemplates.dataChecks.get(concept.getConceptNid());
+                                if (!hasDataChecks) {
+                                    dataCheckMap.put(concept, warningsAndErrors);
+                                    DataCheckRunner checkRunner = DataCheckRunner.runDataChecks(concept, commitTests);
+                                    checkRunner.latch.await();
 
-                                dataCheckMap.put(concept, warningsAndErrors);
-                                DataCheckRunner checkRunner = DataCheckRunner.runDataChecks(concept, commitTests);
-                                checkRunner.latch.await();
-                                
-                                warningsAndErrors.addAll(checkRunner.get());
-                                if(checkRunner.get().isEmpty()){
-                                    ConceptTemplates.dataChecks.put(uncommittedCNidItr.nid(), false);
-                                    Ts.get().touchComponentAlert(uncommittedCNidItr.nid());
-                                }else{
-                                    ConceptTemplates.dataChecks.put(uncommittedCNidItr.nid(), true);
-                                    Ts.get().touchComponentAlert(uncommittedCNidItr.nid());
-                                }
-                                for (AlertToDataConstraintFailure alert : warningsAndErrors) {
-                                    if (alert.getAlertType().equals(ALERT_TYPE.ERROR)) {
-                                        errorCount++;
-                                    } else if (alert.getAlertType().equals(ALERT_TYPE.OMG)) {
-                                        errorCount++;
-                                    }else if (alert.getAlertType().equals(ALERT_TYPE.WARNING)) {
-                                        warningCount++;
+                                    warningsAndErrors.addAll(checkRunner.get());
+                                    if (checkRunner.get().isEmpty()) {
+                                        ConceptTemplates.dataChecks.put(uncommittedCNidItr.nid(), false);
+                                        Ts.get().touchComponentAlert(uncommittedCNidItr.nid());
+                                    } else {
+                                        ConceptTemplates.dataChecks.put(uncommittedCNidItr.nid(), true);
+                                        Ts.get().touchComponentAlert(uncommittedCNidItr.nid());
+                                    }
+                                    for (AlertToDataConstraintFailure alert : warningsAndErrors) {
+                                        if (alert.getAlertType().equals(ALERT_TYPE.ERROR)) {
+                                            errorCount++;
+                                        } else if (alert.getAlertType().equals(ALERT_TYPE.OMG)) {
+                                            errorCount++;
+                                        } else if (alert.getAlertType().equals(ALERT_TYPE.WARNING)) {
+                                            warningCount++;
+                                        }
                                     }
                                 }
                             }
                         }
-                        if (errorCount + warningCount != 0) {
-                            if (errorCount > 0) {
+                        if (errorCount + warningCount != 0 || hasDataChecks) {
+                            if (errorCount > 0 || hasDataChecks) {
                                 performCommit = false;
                                 SwingUtilities.invokeLater(new Runnable() {
 
@@ -1553,7 +1557,7 @@ public class BdbCommitManager {
             if (canceled) {
                 return runnerAlerts;
             }
-
+            
 //       System.out.println(">>>>>>>>>>>>> Doing in background: " + latch.getCount());
             if ((c != null) && (tests != null)) {
                 for (I_TestDataConstraints test : tests) {
