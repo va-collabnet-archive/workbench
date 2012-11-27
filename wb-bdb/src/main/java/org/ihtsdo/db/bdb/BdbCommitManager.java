@@ -415,7 +415,6 @@ public class BdbCommitManager {
 
                         int errorCount = 0;
                         int warningCount = 0;
-                        boolean hasDataChecks = false;
                         
                         if (performCreationTests) {
                             datacheckWriteLock.lock();
@@ -427,8 +426,6 @@ public class BdbCommitManager {
                                 Set<AlertToDataConstraintFailure> warningsAndErrors =
                                         new HashSet<AlertToDataConstraintFailure>();
                                 Concept concept = Concept.get(uncommittedCNidItr.nid());
-                                hasDataChecks = ConceptTemplates.dataChecks.get(concept.getConceptNid());
-                                if (!hasDataChecks) {
                                     dataCheckMap.put(concept, warningsAndErrors);
                                     DataCheckRunner checkRunner = DataCheckRunner.runDataChecks(concept, commitTests);
                                     checkRunner.latch.await();
@@ -450,11 +447,10 @@ public class BdbCommitManager {
                                             warningCount++;
                                         }
                                     }
-                                }
                             }
                         }
-                        if (errorCount + warningCount != 0 || hasDataChecks) {
-                            if (errorCount > 0 || hasDataChecks) {
+                        if (errorCount + warningCount != 0) {
+                            if (errorCount > 0) {
                                 performCommit = false;
                                 SwingUtilities.invokeLater(new Runnable() {
 
