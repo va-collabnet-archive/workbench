@@ -121,6 +121,8 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
             Integer descPosition = null;
             Integer langPosition = null;
             Integer dialectPosition = null;
+            Integer casePosition = null;
+            
             Integer acceptSct = null;
             Integer acceptUuid = null;
 
@@ -149,6 +151,8 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
                     acceptSct = i;
                 }else if (configPos.equalsIgnoreCase("acceptabilityUuid")) {
                     acceptUuid = i;
+                }else if (configPos.equalsIgnoreCase("caseSensitive")) {
+                    casePosition = i;
                 }
             }
 
@@ -158,6 +162,7 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
             int langRefexNid = 0;
             int secondDialectRefexNid = 0;
             int acceptabilityNid = 0;
+            boolean caseSensitive = false;
             
             line = iterator.next();
             if(line.startsWith("<")){
@@ -173,6 +178,7 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
                 langRefexNid = 0;
                 secondDialectRefexNid = 0;
                 acceptabilityNid = 0;
+                caseSensitive = false;
                 
                 List<UUID> list = new ArrayList<UUID>();
                 String[] parts = line.split("\t");
@@ -215,6 +221,16 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
                 } else if (lang == LANG_CODE.EN) {
                     dialect = LANG_CODE.EN_US;
                 }
+                if(casePosition != null){
+                    part = parts[casePosition];
+                    if(part.equalsIgnoreCase("true")){
+                        caseSensitive = true;
+                    }else if(part.equalsIgnoreCase("false")){
+                        caseSensitive = false;
+                    }else{
+                        throw new TaskFailedException("Cannot read preference for case sensitivity. Must be either true or false.");
+                    }
+                }
                 if (acceptSct != null) {
                     part = parts[acceptSct];
                     Set<I_GetConceptData> concepts = Terms.get().getConcept(part);
@@ -255,7 +271,7 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
                         SnomedMetadataRfx.getDES_SYNONYM_NID(),
                         lang,
                         descText,
-                        false);
+                        caseSensitive);
                 TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(config.getEditCoordinate(), config.getViewCoordinate());
                 DescriptionChronicleBI description = builder.construct(descBp);
                 RefexCAB annotBp = new RefexCAB(TK_REFEX_TYPE.CID,
