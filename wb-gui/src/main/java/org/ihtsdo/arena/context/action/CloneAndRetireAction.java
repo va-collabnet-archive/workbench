@@ -119,7 +119,7 @@ public class CloneAndRetireAction extends AbstractAction {
                         }
 
                         tc.construct(newSpec);
-                        ConceptChronicleBI refexConcept = Ts.get().getConcept(refex.getConceptNid());
+                        ConceptChronicleBI refexConcept = Ts.get().getConcept(refex.getRefexNid());
                         if (!refexConcept.isAnnotationStyleRefex()) {
                             Ts.get().addUncommitted(refexConcept);
                         }
@@ -197,7 +197,6 @@ public class CloneAndRetireAction extends AbstractAction {
                                 ep.getConceptNid());
                     }
                     I_GetConceptData concept = Terms.get().getConceptForNid(component.getNid());
-                    Terms.get().addUncommitted(concept);
             }
         } catch (IOException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
