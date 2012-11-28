@@ -149,10 +149,6 @@ public class MoveDescAction extends AbstractAction {
                 }
             }
 
-            Terms.get().addUncommitted(concept);
-
-
-
             if (I_AmPart.class.isAssignableFrom(sourceComponent.getClass())) {
                 I_AmPart componentVersion = (I_AmPart) sourceComponent;
                 for (PathBI ep : config.getEditingPathSet()) {
@@ -164,13 +160,11 @@ public class MoveDescAction extends AbstractAction {
                             ep.getConceptNid());
                 }
                 retireFromRefexes(sourceComponent);
-                I_GetConceptData retireConcept = Terms.get().getConceptForNid(componentVersion.getNid());
-                Terms.get().addUncommitted(retireConcept);
             }
 
-
-
-
+            Terms.get().addUncommitted(concept);
+            I_GetConceptData sourceConcept = Terms.get().getConceptForNid(sourceComponent.getNid());
+            Terms.get().addUncommitted(sourceConcept);
 
 
         } catch (TerminologyException e1) {
@@ -208,8 +202,11 @@ public class MoveDescAction extends AbstractAction {
                                 config.getEditCoordinate().getModuleNid(), 
                                 ep.getConceptNid());
                     }
-                    I_GetConceptData concept = Terms.get().getConceptForNid(sourceComponent.getNid());
-                    Terms.get().addUncommitted(concept);
+                    ConceptChronicleBI refexConcept = Ts.get().getConcept(refexNid);
+                    if (!refexConcept.isAnnotationStyleRefex()) {
+                            Ts.get().addUncommitted(refexConcept);
+                    }
+                    
                 } else {
                     throw new UnsupportedOperationException("Can't convert: RefexCnidVersionBI");
                 }
