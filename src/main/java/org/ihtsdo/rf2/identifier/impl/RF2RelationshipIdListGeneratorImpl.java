@@ -212,7 +212,10 @@ public class RF2RelationshipIdListGeneratorImpl extends RF2IDImpl {
 			String moduleId = getConfig().getRf2Files().get(f).sctidparam.moduleId;			
 			String componentType = getConfig().getRf2Files().get(f).sctidparam.componentType;
 			String idType = getConfig().getRf2Files().get(f).sctidparam.idType;
-
+			String componentTypeAction = getConfig().getComponentType();
+			if (componentTypeAction==null){
+				componentTypeAction="";
+			}
 			hmTmp=hmTypeMap.get(idType);
 			// Creating SctIds			
 			logger.info("Creating SCTIds for ....................." + componentType);
@@ -249,7 +252,7 @@ public class RF2RelationshipIdListGeneratorImpl extends RF2IDImpl {
 
 								if (lSctId!=null){
 									sctid=String.valueOf(lSctId);
-								}else{
+								}else if (!componentTypeAction.toLowerCase().equals("nosctidcreate")){
 									//sctid = getSCTId(getConfig(), UUID.fromString(uuid) , Integer.parseInt(namespaceId), partitionId , releaseId , executionId , moduleId);
 									logger.info("Inferred relationship uuid sending to webservice "  +uuid);
 									sctid = getSCTId(getConfig(), uuid , Integer.parseInt(namespaceId), partitionId , releaseId , executionId , moduleId);
@@ -257,6 +260,8 @@ public class RF2RelationshipIdListGeneratorImpl extends RF2IDImpl {
 										//sctid = getSCTId(getConfig(), UUID.fromString(uuid) , Integer.parseInt(namespaceId), partitionId , releaseId , executionId , moduleId);
 										sctid = getSCTId(getConfig(), uuid , Integer.parseInt(namespaceId), partitionId , releaseId , executionId , moduleId);
 									}
+								}else{
+									sctid=uuid.toString();
 								}
 								bNewId=true;
 							} catch (NoSuchAlgorithmException e) {

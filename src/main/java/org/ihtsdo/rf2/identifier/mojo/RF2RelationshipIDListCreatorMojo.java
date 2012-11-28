@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 
 import org.apache.maven.plugin.MojoExecutionException;
-import org.ihtsdo.rf2.identifier.factory.RF2IdListGeneratorFactory;
 import org.ihtsdo.rf2.identifier.factory.RF2RelationshipIdListGeneratorFactory;
 import org.ihtsdo.rf2.mojo.ReleaseConfigMojo;
 import org.ihtsdo.rf2.util.Config;
@@ -82,7 +81,7 @@ public class RF2RelationshipIDListCreatorMojo extends ReleaseConfigMojo {
 	
 	// for accessing the web service
 	/**
-	 * Files
+	 * WS URL
 	 * 
 	 * @parameter
 	 * @required
@@ -90,7 +89,7 @@ public class RF2RelationshipIDListCreatorMojo extends ReleaseConfigMojo {
 	private String endpointURL;
 	
 	/**
-	 * Files
+	 * WS username 
 	 * 
 	 * @parameter
 	 * @required
@@ -98,12 +97,20 @@ public class RF2RelationshipIDListCreatorMojo extends ReleaseConfigMojo {
 	private String username;
 	
 	/**
-	 * Files
+	 * WS Password 
 	 * 
 	 * @parameter
 	 * @required
 	 */
 	private String password;
+
+	/**
+	 * Component type to decide create or not sctid
+	 * 
+	 * @parameter
+	 * @required
+	 */
+	private String componentType;
 
 	
 	//This mojo needs to be used only for replacing sctid with existing uuid
@@ -126,6 +133,7 @@ public class RF2RelationshipIDListCreatorMojo extends ReleaseConfigMojo {
 		config.setRf2Files(rf2Files);
 		config.setUpdateWbSctId(updateWbSctId);
 		config.setPreviousIdNotReleasedFile(previousIdNotReleasedFile);
+		config.setComponentType(componentType);
 		
 		getLog().info("Running the RF2 File ID Creation with the following ");
 		getLog().info("Destination Folder :" + destinationFolder);
