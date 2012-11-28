@@ -354,6 +354,7 @@ public class DrComponentHelper {
     private static void addAnnotationsToConcept(DrConcept concept, ConceptVersionBI componentBi, 
             ViewCoordinate mockVc, String factContextName) throws IOException, ContradictionException {
         I_TermFactory tf = Terms.get();
+        if (componentBi != null && componentBi.getConAttrsActive() != null) {
         Collection<? extends RefexVersionBI<?>> annotations = componentBi.getConAttrsActive().getCurrentAnnotationMembers(mockVc);
             
             for (RefexVersionBI annotation : annotations) {
@@ -450,8 +451,10 @@ public class DrComponentHelper {
                 if (concept.getExtensions() == null) {
                     concept.setExtensions(new ArrayList<DrRefsetExtension>());
                 }
+                
                 concept.getExtensions().add(extension);
             }
+        }
     }
     
     private static void addAnnotationsToDescription(DrDescription description, DescriptionVersionBI componentBi, 
