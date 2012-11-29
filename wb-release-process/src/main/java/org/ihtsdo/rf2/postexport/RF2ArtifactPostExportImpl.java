@@ -131,7 +131,7 @@ public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
 			cis.execute();
 			cis=null;
 			System.gc();
-		}else if (fType==FILE_TYPE.RF2_RELATIONSHIP){
+		}else if (fType==FILE_TYPE.RF2_RELATIONSHIP || fType==FILE_TYPE.RF2_ISA_RETIRED){
 			ConsolidateInfRelsSnapshotAndDelta  cis=new ConsolidateInfRelsSnapshotAndDelta(fType,snapshotSortedPreviousfile,snapshotSortedExportedfile,snapshotFinalFile,deltaFinalFile,releaseDate);
 			cis.execute();
 			cis=null;
