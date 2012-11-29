@@ -15,14 +15,14 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.rf2.constant.I_Constants;
-import org.ihtsdo.rf2.impl.RF2IDImpl;
+import org.ihtsdo.rf2.postexport.AbstractTask;
 import org.ihtsdo.rf2.postexport.RF2ArtifactPostExportImpl;
 import org.ihtsdo.rf2.postexport.RF2ArtifactPostExportAbst.FILE_TYPE;
 import org.ihtsdo.rf2.refset.impl.RF2SnomedIdImpl;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.ExportUtil;
 
-public class RF2ICDOTargetsImpl extends RF2IDImpl {
+public class RF2ICDOTargetsImpl extends AbstractTask {
 
 	private File snapshotSortedPreviousfile;
 	private File snapshotSortedExportedfile;
@@ -38,13 +38,12 @@ public class RF2ICDOTargetsImpl extends RF2IDImpl {
 	private File exportedFileName;
 
 	private static Logger logger = Logger.getLogger(RF2SnomedIdImpl.class);
-	
 	public RF2ICDOTargetsImpl(Config config, String releaseDate,
 			File snapshotSortedPreviousfile, File snapshotSortedExportedfile,
 			String rf2FullFolder, String previousReleaseDate, File targetDirectory, 
 			String outputFolder, 
 			File ouputFile) {
-		super(config);
+
 		this.rf2FullFolder=rf2FullFolder;
 		this.previousReleaseDate=previousReleaseDate;
 		this.targetDirectory=targetDirectory;
@@ -56,7 +55,9 @@ public class RF2ICDOTargetsImpl extends RF2IDImpl {
 		this.releaseDate=releaseDate;
 		this.config=config;
 	}
-	public void generateIdentifier() {
+
+	@Override
+	public void execute() throws Exception {
 
 		try {
 
@@ -94,7 +95,7 @@ public class RF2ICDOTargetsImpl extends RF2IDImpl {
 			bw.append("TARGETRULE");
 			bw.append("\t");
 			bw.append("TARGETADVICE");
-			bw.append(newLine);
+			bw.append("\r\n");
 
 			String[] splittedLine1;
 			String line2;
@@ -172,7 +173,7 @@ public class RF2ICDOTargetsImpl extends RF2IDImpl {
 				status=expTgt.get(key);
 				uuid=Type5UuidFactory.get(I_Constants.ICDO_SUBSET_ID + key );
 
-				sctid = getSCTId(config, uuid , nspce, "05" ,releaseDate ,releaseDate , I_Constants.CORE_MODULE_ID);
+				sctid = ExportUtil.getSCTId(config, uuid , nspce, "05" ,releaseDate ,releaseDate , I_Constants.CORE_MODULE_ID);
 				if(sctid==null || sctid.equals("0") || sctid.equals("")){
 
 					logger.info("=====Error creating mapTargetId for uuid===" + uuid.toString());
@@ -208,7 +209,7 @@ public class RF2ICDOTargetsImpl extends RF2IDImpl {
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-		} catch (Exception e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 

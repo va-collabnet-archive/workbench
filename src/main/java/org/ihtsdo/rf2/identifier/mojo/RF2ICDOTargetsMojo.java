@@ -178,7 +178,7 @@ public class RF2ICDOTargetsMojo extends ReleaseConfigMojo {
 			RF2ICDOTargetsImpl rIdReassign=new RF2ICDOTargetsImpl(config,releaseDate,snapshotSortedPreviousfile, snapshotSortedExportedfile,
 					rf2CompatibiliyPkgFolder, previousReleaseDate, targetDirectory, outputFolder, finalFile);
 
-			rIdReassign.generateIdentifier();
+			rIdReassign.execute();
 			rIdReassign=null;
 
 		} catch (IOException e) {
