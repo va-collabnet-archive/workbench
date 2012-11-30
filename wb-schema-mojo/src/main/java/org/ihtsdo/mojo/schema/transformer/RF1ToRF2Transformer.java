@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_GetConceptData;
 
 import org.dwfa.ace.log.AceLog;
@@ -23,6 +24,7 @@ import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.mojo.db.ConceptDescriptor;
 import org.ihtsdo.mojo.schema.AbstractTransformer;
 import org.ihtsdo.mojo.schema.config.TransformersConfigApi;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.binding.snomed.Language;
@@ -149,7 +151,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
                     attributes.setStatusUuid(SnomedMetadataRf2.INAPPROPRIATE_COMPONENT_RF2.getLenient().getPrimUuid());
                 } else if (attributes.getStatusUuid().equals(SnomedMetadataRf1.LIMITED_ACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
                     attributes.setStatusUuid(SnomedMetadataRf2.LIMITED_COMPONENT_RF2.getLenient().getPrimUuid());
-                }
+                    }
                 if (attributes.getAuthorUuid() == null) {
                     attributes.setAuthorUuid(authorUser);
                 }
@@ -174,19 +176,24 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
             try {
                 if (description.getStatusUuid().equals(SnomedMetadataRf1.CURRENT_RF1.getLenient().getPrimUuid())) {
                     description.setStatusUuid(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid());
+                } else if (description.getStatusUuid().equals(SnomedMetadataRf1.CONCEPT_RETIRED_ACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
+                    description.setStatusUuid(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid());
                 } else if (description.getStatusUuid().equals(SnomedMetadataRf1.RETIRED_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
                     description.setStatusUuid(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getPrimUuid());
                 } else if (description.getStatusUuid().equals(SnomedMetadataRf1.AMBIGUOUS_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
-                    description.setStatusUuid(SnomedMetadataRf2.AMBIGUOUS_COMPONENT_RF2.getLenient().getPrimUuid());
+                    description.setStatusUuid(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getPrimUuid());
                 } else if (description.getStatusUuid().equals(SnomedMetadataRf1.DUPLICATE_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
-                    description.setStatusUuid(SnomedMetadataRf2.DUPLICATE_COMPONENT_RF2.getLenient().getPrimUuid());
+                    description.setStatusUuid(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getPrimUuid());
                 } else if (description.getStatusUuid().equals(SnomedMetadataRf1.ERRONEOUS_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
-                    description.setStatusUuid(SnomedMetadataRf2.ERRONEOUS_COMPONENT_RF2.getLenient().getPrimUuid());
+                    description.setStatusUuid(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getPrimUuid());
                 } else if (description.getStatusUuid().equals(SnomedMetadataRf1.INAPPROPRIATE_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
-                    description.setStatusUuid(SnomedMetadataRf2.INAPPROPRIATE_COMPONENT_RF2.getLenient().getPrimUuid());
+                    description.setStatusUuid(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getPrimUuid());
                 } else if (description.getStatusUuid().equals(SnomedMetadataRf1.LIMITED_ACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
-                    description.setStatusUuid(SnomedMetadataRf2.LIMITED_COMPONENT_RF2.getLenient().getPrimUuid());
+                    description.setStatusUuid(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getPrimUuid());
+                } else if (description.getStatusUuid().equals(SnomedMetadataRf1.MOVED_ELSEWHERE_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
+                    description.setStatusUuid(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getPrimUuid());
                 }
+
 
                 if (langRefsetUUID != null && !description.getLang().equals(LANG_CODE.EN.getFormatedLanguageCode())) {
                     processLangDescription(description, concept);
@@ -214,9 +221,9 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
                 AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
             } catch (IOException e) {
                 AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
-            }catch (NoSuchAlgorithmException e) {
+            } catch (NoSuchAlgorithmException e) {
                 AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
-            }
+            } 
         }
     }
 
@@ -232,7 +239,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
                     relationship.setStatusUuid(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid());
                 } else if (relationship.getStatusUuid().equals(SnomedMetadataRf1.RETIRED_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
                     relationship.setStatusUuid(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getPrimUuid());
-                }
+                    }
 
                 if (relationship.getCharacteristicUuid().equals(SnomedMetadataRf1.DEFINING_CHARACTERISTIC_TYPE_RF1.getLenient().getPrimUuid())) {
                     relationship.setCharacteristicUuid(SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getLenient().getPrimUuid());

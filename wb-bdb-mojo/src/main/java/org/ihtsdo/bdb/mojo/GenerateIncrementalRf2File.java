@@ -27,12 +27,14 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.helper.export.Rf2Export;
 import org.ihtsdo.helper.rf2.Rf2File;
 import org.ihtsdo.helper.time.TimeHelper;
+import org.ihtsdo.helper.transform.UuidSnomedMapHandler;
 import org.ihtsdo.helper.transform.UuidToSctIdMapper;
+import org.ihtsdo.helper.transform.UuidToSctIdWriter;
 import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
+import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
 /**
@@ -95,11 +97,17 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
      */
     private String namespace;
     /**
-     * Project module, as fsn
+     * Project moduleFsn, as fsn
      *
-     * @parameter @required
+     * @parameter
      */
-    private String module;
+    private String moduleFsn;
+    /**
+     * Project moduleConcept
+     *
+     * @parameter
+     */
+    private ConceptDescriptor moduleConcept;
     /**
      * country code
      *
@@ -139,6 +147,12 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
      * default-value="false"
      */
     private boolean makePrivateAltIdsFile;
+    /**
+     * Simple refset parent concept.
+     *
+     * @parameter
+     */
+    private ConceptDescriptor refsetParentConceptSpec;
     
     private IntSet sapsToWrite = new IntSet();
     private IntSet pathIds;
@@ -169,8 +183,14 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
                     excludedRefsetIds.add(validatedNid);
                 }
             }
-                
-            UUID moduleId = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, module);
+            UUID moduleId = null;
+            if(moduleConcept != null){
+                moduleId = UUID.fromString(moduleConcept.getUuid());
+            }else if(moduleFsn != null){
+                moduleId = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, moduleFsn);
+            }else{
+                throw new MojoExecutionException("No module specified.");
+            }
 
             int viewPathNid;
             if (viewPathConceptSpec != null) {
@@ -184,12 +204,10 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
             IntSet sapsToWrite = Bdb.getSapDb().getSpecifiedSapNids(pathIds,
                     TimeHelper.getFileDateFormat().parse(startDate).getTime(),
                     TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()));
-            
-//            Ts.get().iterateSapDataInSequence(this);
 
             ViewCoordinate vc = new ViewCoordinate(Ts.get().getMetadataViewCoordinate());
+            vc.getIsaTypeNids().add(Snomed.IS_A.getLenient().getConceptNid());
             NidSetBI allowedStatusNids = vc.getAllowedStatusNids();
-            System.out.println("THIS : " + allowedStatusNids);
 
             PathBI path = Ts.get().getPath(viewPathNid);
             PositionBI position = Ts.get().newPosition(path,
@@ -197,6 +215,15 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
             vc.setPositionSet(new PositionSet(position));
             getLog().info("Criterion matches " + sapsToWrite.size() + " sapNids: " + sapsToWrite);
                 NidBitSetBI allConcepts = Ts.get().getAllConceptNids();
+                UuidToSctIdMapper mapper = new UuidToSctIdMapper(allConcepts, namespace, output);
+                Ts.get().iterateConceptDataInSequence(mapper);
+                mapper.close();
+                UuidSnomedMapHandler handler = new UuidSnomedMapHandler(output, output);
+                handler.setNamespace(namespace);
+                Integer refsetParentConceptNid = 0;
+                if(refsetParentConceptSpec != null){
+                    refsetParentConceptNid = Ts.get().getNidForUuids(UUID.fromString(refsetParentConceptSpec.getUuid()));
+                }
                 Rf2Export exporter = new Rf2Export(output,
                         Rf2File.ReleaseType.DELTA,
                         LANG_CODE.EN,
@@ -204,40 +231,23 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
                         namespace,
                         moduleId.toString(),
                         new Date(TimeHelper.getTimeFromString(effectiveDate,
-                        TimeHelper.getFileDateFormat())),
+                        TimeHelper.getAltFileDateFormat())),
                         sapsToWrite.getAsSet(),
                         vc.getViewCoordinateWithAllStatusValues(),
                         excludedRefsetIds.getAsSet(),
                         allConcepts,
-                        makePrivateAltIdsFile);
+                        makePrivateAltIdsFile,
+                        refsetParentConceptNid);
                 Ts.get().iterateConceptDataInSequence(exporter);
                 exporter.writeOneTimeFiles();
                 exporter.close();
-                UuidToSctIdMapper mapper = new UuidToSctIdMapper(namespace, moduleId.toString(),
-                        output);
-                mapper.map();
-                mapper.close();
+                UuidToSctIdWriter writer = new UuidToSctIdWriter(namespace, moduleId.toString(),
+                        output, handler);
+                writer.write();
+                writer.close();
         } catch (Exception e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }
     }
 
-//    @Override
-//    public void processSapData(SapBI sap) throws Exception {
-//        Long start = TimeHelper.getTimeFromString(startDate, TimeHelper.getFileDateFormat());
-//        Long end = TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat());
-//        boolean add = true;
-//        
-//        if(!pathIds.contains(sap.getPathNid())){
-//            add = false;
-//        }else if(sap.getStatusNid() != SnomedMetadataRfx.getSTATUS_CURRENT_NID()){
-//            add = false;
-//        }else if( start >= sap.getTime() && sap.getTime()>= end){
-//            add = false;
-//        }
-//        
-//        if(add){
-//            sapsToWrite.add(sap.getSapNid());
-//        }
-//    }
 }
