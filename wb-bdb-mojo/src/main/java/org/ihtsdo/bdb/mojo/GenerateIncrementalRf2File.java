@@ -233,7 +233,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
                         new Date(TimeHelper.getTimeFromString(effectiveDate,
                         TimeHelper.getAltFileDateFormat())),
                         sapsToWrite.getAsSet(),
-                        vc.getViewCoordinateWithAllStatusValues(),
+                        vc,
                         excludedRefsetIds.getAsSet(),
                         allConcepts,
                         makePrivateAltIdsFile,
