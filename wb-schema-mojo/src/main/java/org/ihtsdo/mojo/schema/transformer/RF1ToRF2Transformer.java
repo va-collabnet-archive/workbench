@@ -235,17 +235,19 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
     public void transformRelationship(TkRelationship relationship, TkConcept concept) {
         if (relationship.getPathUuid().equals(pathUUID)) {
             try {
-                if (relationship.getStatusUuid().equals(SnomedMetadataRf1.CURRENT_RF1.getLenient().getPrimUuid())) {
+             if (relationship.getStatusUuid().equals(SnomedMetadataRf1.CURRENT_RF1.getLenient().getPrimUuid())) {
                     relationship.setStatusUuid(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid());
                 } else if (relationship.getStatusUuid().equals(SnomedMetadataRf1.RETIRED_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
                     relationship.setStatusUuid(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getPrimUuid());
                     }
 
                 if (relationship.getCharacteristicUuid().equals(SnomedMetadataRf1.DEFINING_CHARACTERISTIC_TYPE_RF1.getLenient().getPrimUuid())) {
-                    relationship.setCharacteristicUuid(SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getLenient().getPrimUuid());
+                    relationship.setCharacteristicUuid(SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2.getLenient().getPrimUuid());
                 } else if (relationship.getCharacteristicUuid().equals(SnomedMetadataRf1.STATED_DEFINING_CHARACTERISTIC_TYPE_RF1.getLenient().getPrimUuid())) {
                     relationship.setCharacteristicUuid(SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getLenient().getPrimUuid());
-                }
+                } else if (relationship.getCharacteristicUuid().equals(SnomedMetadataRf1.INFERRED_DEFINING_CHARACTERISTIC_TYPE_RF1.getLenient().getPrimUuid())) {
+                    relationship.setCharacteristicUuid(SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2.getLenient().getPrimUuid());
+                } 
 
                 if (relationship.getAuthorUuid() == null) {
                     relationship.setAuthorUuid(authorUser);

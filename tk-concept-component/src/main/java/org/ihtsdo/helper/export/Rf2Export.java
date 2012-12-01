@@ -600,7 +600,11 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                                 break;
 
                             case LANGUAGE_CODE:
-                                descriptionsWriter.write(descr.getLang() + field.seperator);
+                                String lang = descr.getLang();
+                                if(lang.length() > 2){
+                                    lang = lang.substring(0, 2);
+                                }
+                                descriptionsWriter.write(lang + field.seperator);
 
                                 break;
 
