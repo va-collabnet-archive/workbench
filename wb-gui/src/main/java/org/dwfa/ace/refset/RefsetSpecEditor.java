@@ -1317,10 +1317,6 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 					localEditState = EditState.EDIT;
 				}
 			}
-			AceLog.getAppLog()
-					.info("RefsetSpecEditor 1415 localEdit State = "
-							+ localEditState);
-
 			firePropertyChange(evt.getPropertyName(), evt.getOldValue(),
 					evt.getNewValue());
 		}
