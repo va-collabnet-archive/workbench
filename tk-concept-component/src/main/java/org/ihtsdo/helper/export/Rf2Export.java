@@ -45,6 +45,7 @@ import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 import org.ihtsdo.tk.binding.snomed.RefsetAux;
 import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
@@ -926,7 +927,8 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                         break;
 
                     case ACCEPTABILITY:
-                        langRefsetsWriter.write(store.getComponent(refexVersion.getReferencedComponentNid()).getPrimUuid() + field.seperator);
+                        RefexNidVersionBI refexNidVersion = (RefexNidVersionBI) refexVersion;
+                        langRefsetsWriter.write(store.getComponent(refexNidVersion.getNid1()).getPrimUuid() + field.seperator);
 
                         break;
                 }
@@ -979,7 +981,8 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                         break;
 
                     case ACCEPTABILITY:
-                        otherLangRefsetsWriter.write(store.getComponent(refexVersion.getReferencedComponentNid()).getPrimUuid() + field.seperator);
+                        RefexNidVersionBI refexNidVersion = (RefexNidVersionBI) refexVersion;
+                        otherLangRefsetsWriter.write(store.getComponent(refexNidVersion.getNid1()).getPrimUuid() + field.seperator);
 
                         break;
                 }
