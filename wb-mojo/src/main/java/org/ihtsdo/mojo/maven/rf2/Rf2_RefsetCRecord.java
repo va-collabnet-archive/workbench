@@ -210,6 +210,12 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
             return -1; // instance less than received
         } else if (this.referencedComponentIdL > t.referencedComponentIdL) {
             return 1; // instance greater than received
+        } else {
+            if (this.timeL < t.timeL) {
+                return -1; // instance less than received
+            } else if (this.timeL > t.timeL) {
+                return 1; // instance greater than received
+            }
         }
         return 0; // instance == received
     }
