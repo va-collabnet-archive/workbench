@@ -305,7 +305,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
                             if (annot.getCollectionNid() == Terms.get().uuidToNative(UUID.fromString("29bf812c-7a77-595d-8b12-ea37c473a5e6"))) {
                                 RefexCnidVersionBI langAnnot = (RefexCnidVersionBI) annot.getVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
                                 // has preferred acceptability value
-                                if (langAnnot.getCnid1() == Terms.get().uuidToNative(UUID.fromString("15877c09-60d7-3464-bed8-635a98a7e5b2"))) {
+                                if (langAnnot != null && langAnnot.getCnid1() == Terms.get().uuidToNative(UUID.fromString("15877c09-60d7-3464-bed8-635a98a7e5b2"))) {
                                     preferredInUs = true;
                                 }
 
