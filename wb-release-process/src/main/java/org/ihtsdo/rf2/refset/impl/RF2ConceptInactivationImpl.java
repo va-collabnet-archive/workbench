@@ -49,7 +49,7 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 	}
 
 	public String getConceptInactivationRelationshipValueId(I_GetConceptData concept) throws IOException, TerminologyException, ParseException{
-		String valueId = "XXX";
+		String valueId = null;
 		Date PREVIOUSRELEASEDATE = getDateFormat().parse(I_Constants.inactivation_policy_change);
 
 		List<? extends I_RelTuple> relationships = concept.getSourceRelTuples(allStatuses, null, 
@@ -60,6 +60,7 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 			Date et = new Date(rel.getTime());
 			//Active stated relationship pointing to one of the special inactive concept
 			if ((rel.getStatusNid() == activeNid) && (et.after(PREVIOUSRELEASEDATE) || et.equals(PREVIOUSRELEASEDATE))){
+			
 				String characteristicTypeId="";
 				I_Identify charId = tf.getId(rel.getCharacteristicId());
 				
@@ -119,7 +120,8 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 							valueId = I_Constants.LIMITED;
 						else if (destinationId.equals(I_Constants.MOVED_ELSEWHERE_CONCEPT))
 							valueId = I_Constants.MOVED_ELSE_WHERE;
-						//REASON_NOT_STATED_CONCEPT = 363661006
+						else if (destinationId.equals(I_Constants.REASON_NOT_STATED_CONCEPT))
+							valueId = "XXX";
 					} 
 				}
 			}
@@ -158,31 +160,21 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 					effectiveTime = getDateFormat().format(et);
 					
 					if (conceptStatus.equals("0")){
-						active = "0";
-					} else if(conceptStatus.equals("1") && (et.before(PREVIOUSRELEASEDATE) || et.equals(PREVIOUSRELEASEDATE))) {
-						active = "0";
+						valueId="XXX";
+//					} else if(conceptStatus.equals("1") && (et.before(PREVIOUSRELEASEDATE) || et.equals(PREVIOUSRELEASEDATE))) {
+//						active = "0";
 					} else {
-						active = "1";
+						valueId= getConceptInactivationRelationshipValueId(concept); 
 					}
 					
-					//valueId = getConceptInactivationValueId(i_ConceptAttributeTuple.getStatusNid());
-					//if (valueId.equals("XXX")){
-						//valueId= getConceptInactivationRelationshipValueId(concept);
-					//}
+					if (valueId!=null){
 					
-					valueId= getConceptInactivationRelationshipValueId(concept);
-					
-					/*if (valueId.equals("XXX") && et.after(PREVIOUSRELEASEDATE)) {
-						valueId= getConceptInactivationRelationshipValueId(concept);
-					}else{
-						//logger.info("====else====" + conceptStatus + "===referencedComponentId==" + referencedComponentId + "==et==" + et);
-					}*/
-					
-					if (!valueId.equals("XXX")) {
-						WriteRF2TypeLine(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, valueId);
-					} else {
-						WriteRF2TypeLine(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, "");
-						recordCounter++;
+						if (!valueId.equals("XXX")) {
+							WriteRF2TypeLine(uuid, effectiveTime, "1", moduleId, refsetId, referencedComponentId, valueId);
+						} else {
+							WriteRF2TypeLine(uuid, effectiveTime, "0", moduleId, refsetId, referencedComponentId, "");
+							recordCounter++;
+						}
 					}
 				}
 			}

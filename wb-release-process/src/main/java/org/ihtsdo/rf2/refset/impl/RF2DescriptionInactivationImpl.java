@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.drools.runtime.StatefulKnowledgeSession;
+import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
@@ -52,6 +53,7 @@ public class RF2DescriptionInactivationImpl extends RF2AbstractImpl implements I
 		try {
 			String effectiveTime = "";
 			String valueId = "";
+			String conceptStatus="";
 
 			int descInactivationRefsetNid = getNid(I_Constants.DESCRIPTION_INACTIVATION_REFSET_UID);
 			String refsetId = getSctId(descInactivationRefsetNid, getSnomedCorePathNid());
@@ -73,8 +75,25 @@ public class RF2DescriptionInactivationImpl extends RF2AbstractImpl implements I
 					}
 					UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId);
 
-					valueId = getDescInactivationValueId(description.getStatusNid());
-					
+					//20121207 patch to generate concept-non-current record for active descriptions in retired concept
+					if(description.getStatusNid()==activeNid){
+						valueId="XXX";
+						List<? extends I_ConceptAttributeTuple> conceptAttributes = concept.getConceptAttributeTuples(
+								allStatuses, 
+								currenAceConfig.getViewPositionSetReadOnly(), 
+								Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
+
+						if (conceptAttributes != null && !conceptAttributes.isEmpty()) {
+							I_ConceptAttributeTuple attributes = conceptAttributes.iterator().next();
+							
+							conceptStatus = getStatusType(attributes.getStatusNid());
+							if (!conceptStatus.equals("0") && !conceptStatus.equals("6") ) {
+								valueId=I_Constants.CONCEPT_NON_CURRENT;
+							}
+						}
+					}else{
+						valueId = getDescInactivationValueId(description.getStatusNid());
+					}
 					if ( !valueId.equals("XXX")) {
 						writeRF2TypeLine(uuid, effectiveTime, "1", moduleId, refsetId, referencedComponentId, valueId);
 
