@@ -200,9 +200,9 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
                 } else if (usRefsetUUID != null && DialectHelper.isTextForDialect(description.getText(), Language.EN_US.getLenient().getNid())
                         && gbRefsetUUID != null && DialectHelper.isTextForDialect(description.getText(), Language.EN_UK.getLenient().getNid())) {
                     processEnDescription(description, concept);
-                } else if (usRefsetUUID != null && DialectHelper.isTextForDialect(description.getText(), Language.EN_US.getLenient().getNid())) {
+                } else if (usRefsetUUID != null && DialectHelper.isTextForDialect(description.getText(), Language.EN_UK.getLenient().getNid())) {
                     processUSDescription(description, concept);
-                } else if (gbRefsetUUID != null && DialectHelper.isTextForDialect(description.getText(), Language.EN_UK.getLenient().getNid())) {
+                } else if (gbRefsetUUID != null && DialectHelper.isTextForDialect(description.getText(), Language.EN_US.getLenient().getNid())) {
                     processGBDescription(description, concept);
                 } else {
                     throw new UnsupportedDialectOrLanguage("Can't support language or dialect.");
