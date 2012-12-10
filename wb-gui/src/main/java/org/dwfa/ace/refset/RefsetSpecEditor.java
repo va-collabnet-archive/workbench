@@ -191,6 +191,10 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 
 	IWorkflowQuery workflowQuery = null;
 
+	JButton addSpecMetaData;
+
+	private static final String SPEC_METADATA_BTN_ICON = "/24x24/plain/paperclip_new.png";
+
 	// ~--- constructors
 	// --------------------------------------------------------
 
@@ -780,6 +784,11 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 		inner.gridheight = 2; // make button use 2 rows
 		inner.insets = new Insets(0, 0, 0, 10);
 
+		// if EDIT
+		if (localEditState == EditState.EDIT) {
+			leftTogglePane.add(getAddSpecMetaData(), inner);
+		}
+
 		inner.gridx = 0;
 		inner.gridy = 0;
 		inner.gridheight = 1;
@@ -1259,6 +1268,17 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 	// ~--- inner classes
 	// -------------------------------------------------------
 
+	private class AddSpecMetadaListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if (addRefsetMetadata(false, (I_GetConceptData) getTermComponent(),
+					null)) {
+				return;
+			}
+		}
+	}
+
 	private class FixedToggleChangeActionListener implements ActionListener,
 			PropertyChangeListener {
 
@@ -1698,6 +1718,22 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 
 	public final void setWorkflowQuery(IWorkflowQuery workflowQueryIn) {
 		workflowQuery = workflowQueryIn;
+	}
+
+	public final JButton getAddSpecMetaData() {
+		if (addSpecMetaData == null) {
+			addSpecMetaData = new JButton(new ImageIcon(
+					ACE.class.getResource(SPEC_METADATA_BTN_ICON)));
+			addSpecMetaData.addActionListener(new AddSpecMetadaListener());
+			addSpecMetaData
+					.setToolTipText("Add metadata to enable refset specification for this concept.");
+		}
+
+		return addSpecMetaData;
+	}
+
+	public final void setAddSpecMetaData(final JButton addSpecMetaDataIn) {
+		addSpecMetaData = addSpecMetaDataIn;
 	}
 
 }
