@@ -34,6 +34,7 @@ import java.io.ObjectInputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -79,6 +80,9 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
+import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.config.AceFrameConfig;
@@ -105,10 +109,12 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
+import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.taxonomy.TaxonomyHelper;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
@@ -147,6 +153,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 	private JPanel toggleBar;
 
 	private JPanel leftTogglePane;
+	private JPanel rightTogglePane;
 
 	TermComponentLabel refexConceptLabel;
 
@@ -195,6 +202,13 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 
 	private static final String SPEC_METADATA_BTN_ICON = "/24x24/plain/paperclip_new.png";
 
+	public static final String DIFF_TITLE = "Diff";
+	File[] pluginFiles;
+
+	List<JButton> pluginButtons;
+	private JButton btnPromo;
+	private JButton btnDiff;
+
 	// ~--- constructors
 	// --------------------------------------------------------
 
@@ -220,7 +234,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 		this.treeHelper = treeHelper;
 		this.refsetTreeHelper = refsetTree;
 		this.refsetSpecPanel = refsetSpecPanel;
-		topPanel = new JPanel(new GridBagLayout());
+
 		this.tabHistoryList = (LinkedList<I_GetConceptData>) ace
 				.getAceFrameConfig().getTabHistoryMap().get(TAB_HISTORY_KEY);
 
@@ -246,55 +260,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 				"visibleRefsets", fixedToggleChangeActionListener);
 		this.ace.getAceFrameConfig().addPropertyChangeListener(this);
 
-		GridBagConstraints c = new GridBagConstraints();
-
-		JLabel linkSpinner = new JLabel(new ImageIcon(
-				ACE.class.getResource("/24x24/plain/paperclip.png")));
-		linkSpinner.setBorder(BorderFactory.createEmptyBorder(3, 3, 2, 5));
-		c.anchor = GridBagConstraints.WEST;
-		c.gridx = 0;
-		c.gridy = 0;
-		c.fill = GridBagConstraints.BOTH;
-		topPanel.add(linkSpinner, c);
-
-		c.gridx++;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weightx = 1.0;
-		topPanel.add(refexConceptLabel, c);
-
-		c.weightx = 0.0;
-		c.gridx++;
-
-		// FIXME : we are replacing a previously plumbed-in listener - the first
-		// one will be disconnected
-		fixedToggleChangeActionListener = new FixedToggleChangeActionListener();
-
-		historyButton = new JToggleButton(new ImageIcon(
-				ACE.class.getResource("/24x24/plain/history.png")));
-		historyButton.setSelected(false);
-		historyButton.addActionListener(fixedToggleChangeActionListener);
-		historyButton.setToolTipText("show/hide the history records");
-		topPanel.add(historyButton, c);
-
-		c.gridx++;
-		componentHistoryButton = new JButton(ConceptPanel.HISTORY_ICON);
-		componentHistoryButton.addActionListener(new ShowHistoryListener());
-		componentHistoryButton
-				.setToolTipText("click to show history of the RefSet Specification displayed in this viewer");
-		topPanel.add(componentHistoryButton, c);
-
-		c.gridx = 0;
-		c.gridy++;
-		c.gridwidth = 5;
-		c.fill = GridBagConstraints.HORIZONTAL;
-
-		JComponent toggleBar = createToggleBar();
-		topPanel.add(toggleBar, c);
-
-		c.fill = GridBagConstraints.BOTH;
-		c.weighty = 1.0;
-		c.gridy++;
-		topPanel.setBorder(BorderFactory.createRaisedBevelBorder());
+		getTopPanel();
 		this.contentPanel = createContentPanel();
 		refexConceptLabel.addPropertyChangeListener("termComponent",
 				labelListener);
@@ -385,7 +351,6 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 	private void updatePanel() {
 		I_GetConceptData refset = (I_GetConceptData) getLabel()
 				.getTermComponent();
-
 		if (refset != null) {
 			RefsetSpec spec = new RefsetSpec(refset, true,
 					ace.getAceFrameConfig());
@@ -459,6 +424,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 					leftTogglePane.getParent().validate();
 				}
 			}
+			refreshRightTogglePane();
 		}
 
 		refsetSpecConcept = null;
@@ -760,159 +726,97 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 
 	private JComponent createToggleBar() throws IOException,
 			ClassNotFoundException {
-
 		toggleBar = new JPanel(new GridBagLayout());
 		GridBagConstraints outer = new GridBagConstraints();
-
 		outer.anchor = GridBagConstraints.WEST;
 		outer.gridx = 0;
 		outer.gridy = 0;
 		outer.fill = GridBagConstraints.NONE;
 		outer.weightx = 0;
 		outer.weighty = 0;
-		leftTogglePane = new JPanel(new GridBagLayout());
-		toggleBar.add(leftTogglePane, outer);
-
-		GridBagConstraints inner = new GridBagConstraints();
-
-		inner.anchor = GridBagConstraints.WEST;
-		inner.gridx = 0;
-		inner.gridy = 3;
-		inner.fill = GridBagConstraints.NONE;
-		inner.weightx = 0;
-		inner.weighty = 0;
-		inner.gridheight = 2; // make button use 2 rows
-		inner.insets = new Insets(0, 0, 0, 10);
-
-		// if EDIT
-		if (localEditState == EditState.EDIT) {
-			leftTogglePane.add(getAddSpecMetaData(), inner);
-		}
-
-		inner.gridx = 0;
-		inner.gridy = 0;
-		inner.gridheight = 1;
-		inner.insets = new Insets(0, 0, 0, 0);
-		inner.anchor = GridBagConstraints.EAST;
-
-		JLabel memberCountLabel = new JLabel("member count at last compute: ");
-
-		leftTogglePane.add(memberCountLabel, inner);
-		inner.gridy++;
-
-		JLabel lastComputeTimeLabel = new JLabel("time of last compute: ");
-
-		leftTogglePane.add(lastComputeTimeLabel, inner);
-		inner.gridy++;
-
-		JLabel computeStatusLabel = new JLabel("compute status: ");
-
-		leftTogglePane.add(computeStatusLabel, inner);
-		inner.gridy++;
-
-		JLabel computeTypeLabel = new JLabel("compute type: ");
-
-		leftTogglePane.add(computeTypeLabel, inner);
-		inner.gridy++;
-
-		inner.anchor = GridBagConstraints.WEST;
-		inner.gridx++;
-		inner.gridy--;
-		inner.gridy--;
-		inner.gridy--;
-		inner.gridy--;
-		memberCountValueLabel = new JLabel("");
-		leftTogglePane.add(memberCountValueLabel, inner);
-		inner.gridy++;
-		lastComputeTimeValueLabel = new JLabel("");
-		leftTogglePane.add(lastComputeTimeValueLabel, inner);
-		inner.gridy++;
-		computeStatusValueLabel = new JLabel("");
-		leftTogglePane.add(computeStatusValueLabel, inner);
-		inner.gridy++;
-		computeTypeValueLabel = new JLabel("");
-		leftTogglePane.add(computeTypeValueLabel, inner);
-		inner.gridy++;
-
+		toggleBar.add(getLeftTogglePane(), outer);
 		outer.weightx = 1.0;
-
 		outer.fill = GridBagConstraints.HORIZONTAL;
 		toggleBar.add(new JPanel(), outer);
 
-		File componentPluginDir = new File(ace.getPluginRoot() + File.separator
-				+ "refsetspec");
-		File[] pluginFiles = componentPluginDir.listFiles(new FilenameFilter() {
+		outer.weightx = 0.0;
+		outer.weighty = 0.0;
+		outer.fill = GridBagConstraints.NONE;
+		outer.anchor = GridBagConstraints.SOUTHEAST;
+		outer.gridx++;
 
-			@Override
-			public boolean accept(File arg0, String fileName) {
-				return fileName.toLowerCase().endsWith(".bp")
-						&& fileName.contains("compute refset from refset spec");
-			}
-		});
-
-		if (pluginFiles != null) {
-			outer.weightx = 0.0;
-			outer.weighty = 0.0;
-			outer.fill = GridBagConstraints.NONE;
-			outer.anchor = GridBagConstraints.SOUTHEAST;
-			outer.gridx++;
-
-			JPanel rightTogglePane = new JPanel(new FlowLayout());
-
-			toggleBar.add(rightTogglePane, outer);
-
-			boolean exceptions = false;
-			StringBuilder exceptionMessage = new StringBuilder();
-
-			exceptionMessage
-					.append("<html>Exception(s) reading the following plugin(s): <p><p>");
-
-			for (File f : pluginFiles) {
-				try {
-					FileInputStream fis = new FileInputStream(f);
-					BufferedInputStream bis = new BufferedInputStream(fis);
-					ObjectInputStream ois = new ObjectInputStream(bis);
-					BusinessProcess bp = (BusinessProcess) ois.readObject();
-
-					ois.close();
-
-					byte[] iconBytes = (byte[]) bp
-							.readAttachement("button_icon");
-
-					if (iconBytes != null) {
-						ImageIcon icon = new ImageIcon(iconBytes);
-						JButton pluginButton = new JButton(icon);
-
-						pluginButton.setToolTipText(bp.getSubject());
-						pluginButton.addActionListener(new PluginListener(f));
-						rightTogglePane.add(pluginButton, outer);
-					} else {
-						JButton pluginButton = new JButton(bp.getName());
-
-						pluginButton.setToolTipText(bp.getSubject());
-						pluginButton.addActionListener(new PluginListener(f));
-						rightTogglePane.add(pluginButton, outer);
-					}
-				} catch (Throwable e) {
-					exceptions = true;
-					exceptionMessage.append("Exception reading plugin: ")
-							.append(f.getAbsolutePath()).append("<p>");
-					AceLog.getAppLog().log(Level.SEVERE,
-							"Exception reading: " + f.getAbsolutePath(), e);
-				}
-			}
-
-			if (exceptions) {
-				exceptionMessage
-						.append("<p>Please see the log file for more details.");
-				JOptionPane.showMessageDialog(this.contentPanel,
-						exceptionMessage.toString());
-			}
-		}
+		toggleBar.add(getRightTogglePane(), outer);
 
 		updateToggles();
 
 		return toggleBar;
+	}
+
+	private int getNumRefsetSpecTuples(I_GetConceptData refset) {
+
+		if (refset != null) {
+			try {
+				IntSet relTypes = new IntSet();
+				relTypes.add(RefsetAuxiliary.Concept.SPECIFIES_REFSET
+						.localize().getNid());
+				List<? extends I_RelTuple> refsetSpecTuples = refset
+						.getDestRelTuples(ace.getAceFrameConfig()
+								.getAllowedStatus(), relTypes, ace
+								.getAceFrameConfig()
+								.getViewPositionSetReadOnly(),
+								ace.aceFrameConfig.getPrecedence(),
+								ace.aceFrameConfig
+										.getConflictResolutionStrategy());
+				if (refsetSpecTuples != null) {
+					return refsetSpecTuples.size();
+
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+		return 0;
+	}
+
+	private List<JButton> getRtpStdButtons() {
+		AceLog.getAppLog().info("getRtpStdButtons");
+		I_GetConceptData refset = (I_GetConceptData) getLabel()
+				.getTermComponent();
+
+		// fire property
+
+		List<JButton> rtpStdButtons = new ArrayList<JButton>();
+
+		boolean isRefsetWithSpec = false;
+		if (refset != null && getNumRefsetSpecTuples(refset) > 0) {
+			isRefsetWithSpec = true;
+		}
+
+		// if EDIT
+		if (localEditState == EditState.EDIT) {
+			// not yet a refset i.e. no metadata -
+			if (isRefsetWithSpec) {
+				rtpStdButtons.add(getAddSpecMetaData());
+			}
+
+			// If current path not promote path
+			if (refset != null) {
+				// if(refset.getPositions().)
+
+				rtpStdButtons.add(getBtnPromo());
+			}
+
+		}
+
+		// If refset is not null then add diff button
+		if (isRefsetWithSpec) {
+			rtpStdButtons.add(getBtnDiff());
+		}
+
+		return rtpStdButtons;
+
 	}
 
 	@Override
@@ -941,7 +845,62 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 
 	}
 
-	/* package */JPanel getTopPanel() {
+	/* package */
+	JPanel getTopPanel() throws Exception {
+
+		if (topPanel == null) {
+			topPanel = new JPanel(new GridBagLayout());
+			GridBagConstraints c = new GridBagConstraints();
+
+			JLabel linkSpinner = new JLabel(new ImageIcon(
+					ACE.class.getResource("/24x24/plain/paperclip.png")));
+			linkSpinner.setBorder(BorderFactory.createEmptyBorder(3, 3, 2, 5));
+			c.anchor = GridBagConstraints.WEST;
+			c.gridx = 0;
+			c.gridy = 0;
+			c.fill = GridBagConstraints.BOTH;
+			topPanel.add(linkSpinner, c);
+
+			c.gridx++;
+			c.fill = GridBagConstraints.HORIZONTAL;
+			c.weightx = 1.0;
+			topPanel.add(refexConceptLabel, c);
+
+			c.weightx = 0.0;
+			c.gridx++;
+
+			// FIXME : we are replacing a previously plumbed-in listener - the
+			// first
+			// one will be disconnected
+			fixedToggleChangeActionListener = new FixedToggleChangeActionListener();
+
+			historyButton = new JToggleButton(new ImageIcon(
+					ACE.class.getResource("/24x24/plain/history.png")));
+			historyButton.setSelected(false);
+			historyButton.addActionListener(fixedToggleChangeActionListener);
+			historyButton.setToolTipText("show/hide the history records");
+			topPanel.add(historyButton, c);
+
+			c.gridx++;
+			componentHistoryButton = new JButton(ConceptPanel.HISTORY_ICON);
+			componentHistoryButton.addActionListener(new ShowHistoryListener());
+			componentHistoryButton
+					.setToolTipText("click to show history of the RefSet Specification displayed in this viewer");
+			topPanel.add(componentHistoryButton, c);
+
+			c.gridx = 0;
+			c.gridy++;
+			c.gridwidth = 5;
+			c.fill = GridBagConstraints.HORIZONTAL;
+
+			JComponent toggleBar = createToggleBar();
+			topPanel.add(toggleBar, c);
+			c.fill = GridBagConstraints.BOTH;
+			c.weighty = 1.0;
+			c.gridy++;
+			topPanel.setBorder(BorderFactory.createRaisedBevelBorder());
+		}
+
 		return topPanel;
 	}
 
@@ -1268,14 +1227,37 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 	// ~--- inner classes
 	// -------------------------------------------------------
 
-	private class AddSpecMetadaListener implements ActionListener {
+	private class InternalActionListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if (addRefsetMetadata(false, (I_GetConceptData) getTermComponent(),
-					null)) {
-				return;
+			AceLog.getAppLog().info("InternalActionListener AP");
+			if (e.getSource() instanceof JButton) {
+				AceLog.getAppLog().info("InternalActionListener IS button");
+				if (e.getSource() == getAddSpecMetaData()) {
+					if (addRefsetMetadata(false,
+							(I_GetConceptData) getTermComponent(), null)) {
+						return;
+					}
+				}
+				if (e.getSource() == getBtnDiff()) {
+					AceLog.getAppLog().info("InternalActionListener ISDIFF");
+					I_GetConceptData igcd = (I_GetConceptData) getTermComponent();
+					String conName = "";
+					try {
+						conName = igcd.getInitialText();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					String conUid = igcd.getUUIDs().get(0).toString();
+					firePropertyChange(DIFF_TITLE, conName, conUid);
+				}
+				if (e.getSource() == getBtnPromo()) {
+					promoteRefset();
+				}
 			}
+
 		}
 	}
 
@@ -1314,6 +1296,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 
 		@Override
 		public void propertyChange(PropertyChangeEvent evt) {
+			AceLog.getAppLog().info("propertyChange");
 			updatePanel();
 			localEditState = EditState.READONLY;
 			String conId = "";
@@ -1724,7 +1707,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 		if (addSpecMetaData == null) {
 			addSpecMetaData = new JButton(new ImageIcon(
 					ACE.class.getResource(SPEC_METADATA_BTN_ICON)));
-			addSpecMetaData.addActionListener(new AddSpecMetadaListener());
+			addSpecMetaData.addActionListener(new InternalActionListener());
 			addSpecMetaData
 					.setToolTipText("Add metadata to enable refset specification for this concept.");
 		}
@@ -1734,6 +1717,354 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 
 	public final void setAddSpecMetaData(final JButton addSpecMetaDataIn) {
 		addSpecMetaData = addSpecMetaDataIn;
+	}
+
+	public final JPanel getLeftTogglePane() {
+
+		if (leftTogglePane == null) {
+
+			// Inspect refset
+
+			// if (getLabel() != null && getLabel().getTermComponent() != null)
+			// {
+			// I_GetConceptData refsetLabel = (I_GetConceptData) getLabel()
+			// .getTermComponent();
+			//
+			// AceLog.getAppLog().info(
+			// "refsetLabel " + refsetLabel.toLongString());
+			// }
+			//
+			// // .getRefsetSpecEditor()
+			// if (getTermComponent() != null) {
+			// I_GetConceptData refsetTC = (I_GetConceptData)
+			// getTermComponent();
+			// AceLog.getAppLog().info("refsetTC " + refsetTC.toLongString());
+			// }
+			// AceLog.getAppLog().info("localEditState = " + localEditState);
+
+			leftTogglePane = new JPanel(new GridBagLayout());
+			GridBagConstraints inner = new GridBagConstraints();
+
+			inner.anchor = GridBagConstraints.WEST;
+			inner.gridx = 0;
+			inner.gridy = 3;
+			inner.fill = GridBagConstraints.NONE;
+			inner.weightx = 0;
+			inner.weighty = 0;
+			inner.gridheight = 2; // make button use 2 rows
+			inner.insets = new Insets(0, 0, 0, 0);
+
+			inner.gridx = 0;
+			inner.gridy = 0;
+			inner.gridheight = 1;
+			inner.insets = new Insets(0, 0, 0, 0);
+			inner.anchor = GridBagConstraints.EAST;
+
+			JLabel memberCountLabel = new JLabel(
+					"member count at last compute: ");
+
+			leftTogglePane.add(memberCountLabel, inner);
+			inner.gridy++;
+
+			JLabel lastComputeTimeLabel = new JLabel("time of last compute: ");
+
+			leftTogglePane.add(lastComputeTimeLabel, inner);
+			inner.gridy++;
+
+			JLabel computeStatusLabel = new JLabel("compute status: ");
+
+			leftTogglePane.add(computeStatusLabel, inner);
+			inner.gridy++;
+
+			JLabel computeTypeLabel = new JLabel("compute type: ");
+
+			leftTogglePane.add(computeTypeLabel, inner);
+			inner.gridy++;
+
+			inner.anchor = GridBagConstraints.WEST;
+			inner.gridx++;
+			inner.gridy--;
+			inner.gridy--;
+			inner.gridy--;
+			inner.gridy--;
+			memberCountValueLabel = new JLabel("");
+			leftTogglePane.add(memberCountValueLabel, inner);
+			inner.gridy++;
+			lastComputeTimeValueLabel = new JLabel("");
+			leftTogglePane.add(lastComputeTimeValueLabel, inner);
+			inner.gridy++;
+			computeStatusValueLabel = new JLabel("");
+			leftTogglePane.add(computeStatusValueLabel, inner);
+			inner.gridy++;
+			computeTypeValueLabel = new JLabel("");
+			leftTogglePane.add(computeTypeValueLabel, inner);
+			inner.gridy++;
+
+		}
+
+		return leftTogglePane;
+	}
+
+	public final void setLeftTogglePane(JPanel leftTogglePaneIn) {
+		leftTogglePane = leftTogglePaneIn;
+	}
+
+	public final JPanel getRightTogglePane() {
+
+		if (rightTogglePane == null) {
+			rightTogglePane = new JPanel(new FlowLayout());
+			addRtpButtons();
+		}
+
+		return rightTogglePane;
+	}
+
+	public void addRtpButtons() {
+		if (getPluginFiles() != null) {
+			boolean exceptions = false;
+			StringBuilder exceptionMessage = new StringBuilder();
+			exceptionMessage
+					.append("<html>Exception(s) reading the following plugin(s): <p><p>");
+			for (JButton btn : getPluginButtons()) {
+				// rightTogglePane.add(btn, contraints);
+				getRightTogglePane().add(btn);
+			}
+			if (exceptions) {
+				exceptionMessage
+						.append("<p>Please see the log file for more details.");
+				JOptionPane.showMessageDialog(this.contentPanel,
+						exceptionMessage.toString());
+			}
+		}
+
+		for (JButton btn : getRtpStdButtons()) {
+			getRightTogglePane().add(btn);
+			// rightTogglePane.add(btn, contraints);
+		}
+	}
+
+	public final void setRightTogglePane(JPanel rightTogglePaneIn) {
+		rightTogglePane = rightTogglePaneIn;
+	}
+
+	public final void refreshRightTogglePane() {
+		getRightTogglePane().removeAll();
+		addRtpButtons();
+		getRightTogglePane().validate();
+	}
+
+	public final File[] getPluginFiles() {
+
+		if (pluginFiles == null) {
+			File componentPluginDir = new File(ace.getPluginRoot()
+					+ File.separator + "refsetspec");
+			pluginFiles = componentPluginDir.listFiles(new FilenameFilter() {
+				@Override
+				public boolean accept(File arg0, String fileName) {
+					return fileName.toLowerCase().endsWith(".bp")
+							&& fileName
+									.contains("compute refset from refset spec");
+				}
+			});
+		}
+		return pluginFiles;
+	}
+
+	public final void setPluginFiles(File[] pluginFilesIn) {
+		pluginFiles = pluginFilesIn;
+	}
+
+	private List<JButton> getPluginButtons() {
+		if (pluginButtons == null) {
+			pluginButtons = new ArrayList<JButton>();
+		}
+		if (pluginButtons.size() == 0) {
+			for (File f : getPluginFiles()) {
+				try {
+					FileInputStream fis = new FileInputStream(f);
+					BufferedInputStream bis = new BufferedInputStream(fis);
+					ObjectInputStream ois = new ObjectInputStream(bis);
+					BusinessProcess bp = (BusinessProcess) ois.readObject();
+					ois.close();
+
+					byte[] iconBytes = (byte[]) bp
+							.readAttachement("button_icon");
+
+					if (iconBytes != null) {
+						ImageIcon icon = new ImageIcon(iconBytes);
+						JButton pluginButton = new JButton(icon);
+
+						pluginButton.setToolTipText(bp.getSubject());
+						pluginButton.addActionListener(new PluginListener(f));
+						pluginButtons.add(pluginButton);
+					} else {
+						JButton pluginButton = new JButton(bp.getName());
+
+						pluginButton.setToolTipText(bp.getSubject());
+						pluginButton.addActionListener(new PluginListener(f));
+						pluginButtons.add(pluginButton);
+					}
+				} catch (Throwable e) {
+					// exceptions = true;
+					// exceptionMessage.append("Exception reading plugin: ")
+					// .append(f.getAbsolutePath()).append("<p>");
+					AceLog.getAppLog().log(Level.SEVERE,
+							"Exception reading: " + f.getAbsolutePath(), e);
+				}
+			}
+		}
+
+		return pluginButtons;
+	}
+
+	public final void setPluginButtons(List<JButton> pluginButtonsIn) {
+		pluginButtons = pluginButtonsIn;
+	}
+
+	public void promoteRefset() {
+
+		I_GetConceptData refset = (I_GetConceptData) getLabel()
+				.getTermComponent();
+
+		if (refset != null && getNumRefsetSpecTuples(refset) == 0) {
+			promoteRefset(refset);
+			updatePanel();
+		}
+
+	}
+
+	public void promoteRefset(I_GetConceptData refsetToPromote) {
+
+		// Position is Latest
+
+		// get the termfactory
+		I_TermFactory tf = Terms.get();
+		// Get the frameConfig;
+		AceFrameConfig frameConfig = null;
+		try {
+			frameConfig = (AceFrameConfig) tf.getActiveAceFrameConfig();
+
+			if (frameConfig != null) {
+
+				PathSetReadOnly promotionPaths = new PathSetReadOnly(
+						frameConfig.getPromotionPathSet());
+				Set<? extends PositionBI> viewPositionSet = frameConfig
+						.getViewPositionSet();
+				// there should be only 1 promotionPath
+				if (promotionPaths.size() > 0) {
+
+					PositionBI viewPosition = viewPositionSet.iterator().next();
+					promoteRefset(frameConfig, viewPosition, promotionPaths,
+							tf, refsetToPromote);
+
+					for (I_GetConceptData specificationRefsetIdentity : Terms
+							.get()
+							.getRefsetHelper(frameConfig)
+							.getSpecificationRefsetForRefset(refsetToPromote,
+									frameConfig)) {
+						promoteRefset(frameConfig, viewPosition,
+								promotionPaths, tf, specificationRefsetIdentity);
+					}
+					for (I_GetConceptData promotionRefsetIdentity : Terms
+							.get()
+							.getRefsetHelper(frameConfig)
+							.getPromotionRefsetForRefset(refsetToPromote,
+									frameConfig)) {
+						promoteRefset(frameConfig, viewPosition,
+								promotionPaths, tf, promotionRefsetIdentity);
+					}
+					for (I_GetConceptData markedParentRefsetIdentity : Terms
+							.get()
+							.getRefsetHelper(frameConfig)
+							.getMarkedParentRefsetForRefset(refsetToPromote,
+									frameConfig)) {
+						promoteRefset(frameConfig, viewPosition,
+								promotionPaths, tf, markedParentRefsetIdentity);
+					}
+					for (I_GetConceptData commentsRefsetIdentity : Terms
+							.get()
+							.getRefsetHelper(frameConfig)
+							.getCommentsRefsetForRefset(refsetToPromote,
+									frameConfig)) {
+						promoteRefset(frameConfig, viewPosition,
+								promotionPaths, tf, commentsRefsetIdentity);
+					}
+
+					for (I_GetConceptData editTimeRefsetIdentity : Terms
+							.get()
+							.getRefsetHelper(frameConfig)
+							.getEditTimeRefsetForRefset(refsetToPromote,
+									frameConfig)) {
+						promoteRefset(frameConfig, viewPosition,
+								promotionPaths, tf, editTimeRefsetIdentity);
+					}
+
+					for (I_GetConceptData computeTimeRefsetIdentity : Terms
+							.get()
+							.getRefsetHelper(frameConfig)
+							.getComputeTimeRefsetForRefset(refsetToPromote,
+									frameConfig)) {
+						promoteRefset(frameConfig, viewPosition,
+								promotionPaths, tf, computeTimeRefsetIdentity);
+					}
+				}
+
+			}
+			tf.commit();
+		} catch (Exception e) {
+			AceLog.getAppLog().log(Level.SEVERE, "promoteRefset Exception", e);
+		}
+	}
+
+	/**
+	 * @see org.dwfa.ace.task.promote.PromoteRefset.promoteRefset Get rid of all
+	 *      the activity promotionPath default edit path, viewposition = latest
+	 */
+
+	private void promoteRefset(I_ConfigAceFrame config,
+			PositionBI viewPosition, PathSetReadOnly promotionPaths,
+			I_TermFactory tf, I_GetConceptData refsetIdentity)
+			throws TerminologyException, IOException {
+		AceLog.getAppLog().info(
+				"promoteRefset called refsetID = "
+						+ refsetIdentity.toLongString());
+		Collection<? extends I_ExtendByRef> extensions = tf
+				.getRefsetExtensionMembers(refsetIdentity.getConceptNid());
+		AceLog.getAppLog().info(
+				"promoteRefset extensions size = " + extensions.size());
+		refsetIdentity.promote(viewPosition, promotionPaths, null,
+				config.getPrecedence());
+		for (I_ExtendByRef ext : extensions) {
+			AceLog.getAppLog().info("promoteRefset I_ExtendByRef ext = " + ext);
+			ext.promote(viewPosition, new PathSetReadOnly(promotionPaths),
+					null, config.getPrecedence());
+		}
+		AceLog.getAppLog().info("promoteRefset addUncommittedNoChecks");
+		tf.addUncommittedNoChecks(refsetIdentity);
+	}
+
+	public final JButton getBtnPromo() {
+		if (btnPromo == null) {
+			btnPromo = new JButton("Promote");
+			btnPromo.addActionListener(new InternalActionListener());
+		}
+		return btnPromo;
+	}
+
+	public final void setBtnPromo(JButton btnPromoIn) {
+		btnPromo = btnPromoIn;
+	}
+
+	public final JButton getBtnDiff() {
+		if (btnDiff == null) {
+			btnDiff = new JButton(DIFF_TITLE);
+			btnDiff.addActionListener(new InternalActionListener());
+		}
+		return btnDiff;
+	}
+
+	public final void setBtnDiff(JButton btnDiffIn) {
+		btnDiff = btnDiffIn;
 	}
 
 }
