@@ -1,23 +1,19 @@
 package org.ihtsdo.rf2.refset.impl;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.dwfa.ace.api.I_DescriptionPart;
+import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_DescriptionTuple;
-import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.impl.RF2AbstractImpl;
-import org.ihtsdo.rf2.refset.dao.RefsetConceptDAO;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.ExportUtil;
 import org.ihtsdo.rf2.util.WriteUtil;
@@ -52,6 +48,7 @@ public class RF2DescriptionInactivationImpl extends RF2AbstractImpl implements I
 		try {
 			String effectiveTime = "";
 			String valueId = "";
+			String conceptStatus="";
 
 			int descInactivationRefsetNid = getNid(I_Constants.DESCRIPTION_INACTIVATION_REFSET_UID);
 			String refsetId = getSctId(descInactivationRefsetNid, getSnomedCorePathNid());
@@ -73,8 +70,25 @@ public class RF2DescriptionInactivationImpl extends RF2AbstractImpl implements I
 					}
 					UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId);
 
-					valueId = getDescInactivationValueId(description.getStatusNid());
-					
+					//20121207 patch to generate concept-non-current record for active descriptions in retired concept
+					if(description.getStatusNid()==activeNid){
+						valueId="XXX";
+						List<? extends I_ConceptAttributeTuple> conceptAttributes = concept.getConceptAttributeTuples(
+								allStatuses, 
+								currenAceConfig.getViewPositionSetReadOnly(), 
+								Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
+
+						if (conceptAttributes != null && !conceptAttributes.isEmpty()) {
+							I_ConceptAttributeTuple attributes = conceptAttributes.iterator().next();
+							
+							conceptStatus = getStatusType(attributes.getStatusNid());
+							if (!conceptStatus.equals("0") && !conceptStatus.equals("6") ) {
+								valueId=I_Constants.CONCEPT_NON_CURRENT;
+							}
+						}
+					}else{
+						valueId = getDescInactivationValueId(description.getStatusNid());
+					}
 					if ( !valueId.equals("XXX")) {
 						writeRF2TypeLine(uuid, effectiveTime, "1", moduleId, refsetId, referencedComponentId, valueId);
 

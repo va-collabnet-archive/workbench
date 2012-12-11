@@ -49,7 +49,7 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 	}
 
 	public String getConceptInactivationRelationshipValueId(I_GetConceptData concept) throws IOException, TerminologyException, ParseException{
-		String valueId = "XXX";
+		String valueId = null;
 		Date PREVIOUSRELEASEDATE = getDateFormat().parse(I_Constants.inactivation_policy_change);
 
 		List<? extends I_RelTuple> relationships = concept.getSourceRelTuples(allStatuses, null, 
@@ -60,12 +60,13 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 			Date et = new Date(rel.getTime());
 			//Active stated relationship pointing to one of the special inactive concept
 			if ((rel.getStatusNid() == activeNid) && (et.after(PREVIOUSRELEASEDATE) || et.equals(PREVIOUSRELEASEDATE))){
+
 				String characteristicTypeId="";
 				I_Identify charId = tf.getId(rel.getCharacteristicId());
-				
+
 				List<? extends I_IdPart> idParts = charId.getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
 						snomedIntId);
-				
+
 				if (idParts != null) {
 					Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), 
 							RelAssertionType.INFERRED_THEN_STATED);
@@ -91,7 +92,7 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 					}
 
 					String relTypeId = "";
-	
+
 					id = tf.getId(rel.getTypeNid());
 					if (id != null) {
 						idParts = tf.getId(rel.getTypeNid()).getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
@@ -119,17 +120,18 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 							valueId = I_Constants.LIMITED;
 						else if (destinationId.equals(I_Constants.MOVED_ELSEWHERE_CONCEPT))
 							valueId = I_Constants.MOVED_ELSE_WHERE;
-						//REASON_NOT_STATED_CONCEPT = 363661006
+						else if (destinationId.equals(I_Constants.REASON_NOT_STATED_CONCEPT))
+							valueId = "XXX";
 					} 
 				}
 			}
 		}
 
-				
+
 		return valueId;
-		
+
 	}
-	
+
 	@Override
 	public void export(I_GetConceptData concept, String referencedComponentId) {
 		try {
@@ -142,47 +144,34 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 			String refsetId = getSctId(conceptInactivationRefsetNid, getSnomedCorePathNid());
 			String moduleId = I_Constants.CORE_MODULE_ID;
 			UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId);
-			//Date LIMITED = getDateFormat().parse(I_Constants.limited_policy_change);
 			Date PREVIOUSRELEASEDATE = getDateFormat().parse(I_Constants.inactivation_policy_change);
 
 			List<? extends I_ConceptAttributeTuple> conceptAttributes = concept.getConceptAttributeTuples(
 					allStatuses, 
 					currenAceConfig.getViewPositionSetReadOnly(), 
 					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
-			
+
 			if (conceptAttributes.size() > 0) {
 				for (int i = 0; i < conceptAttributes.size(); i++) {
 					I_ConceptAttributeTuple<?> i_ConceptAttributeTuple = (I_ConceptAttributeTuple<?>) conceptAttributes.get(i);
 					conceptStatus = getConceptInactivationStatusType(i_ConceptAttributeTuple.getStatusNid());
 					Date et = new Date(getTermFactory().convertToThickVersion(i_ConceptAttributeTuple.getVersion()));
 					effectiveTime = getDateFormat().format(et);
-					
+
 					if (conceptStatus.equals("0")){
-						active = "0";
-					} else if(conceptStatus.equals("1") && (et.before(PREVIOUSRELEASEDATE) || et.equals(PREVIOUSRELEASEDATE))) {
-						active = "0";
+						valueId="XXX";
 					} else {
-						active = "1";
+						valueId= getConceptInactivationRelationshipValueId(concept); 
 					}
-					
-					//valueId = getConceptInactivationValueId(i_ConceptAttributeTuple.getStatusNid());
-					//if (valueId.equals("XXX")){
-						//valueId= getConceptInactivationRelationshipValueId(concept);
-					//}
-					
-					valueId= getConceptInactivationRelationshipValueId(concept);
-					
-					/*if (valueId.equals("XXX") && et.after(PREVIOUSRELEASEDATE)) {
-						valueId= getConceptInactivationRelationshipValueId(concept);
-					}else{
-						//logger.info("====else====" + conceptStatus + "===referencedComponentId==" + referencedComponentId + "==et==" + et);
-					}*/
-					
-					if (!valueId.equals("XXX")) {
-						WriteRF2TypeLine(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, valueId);
-					} else {
-						WriteRF2TypeLine(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, "");
-						recordCounter++;
+
+					if (valueId!=null){
+
+						if (!valueId.equals("XXX")) {
+							WriteRF2TypeLine(uuid, effectiveTime, "1", moduleId, refsetId, referencedComponentId, valueId);
+						} else {
+							WriteRF2TypeLine(uuid, effectiveTime, "0", moduleId, refsetId, referencedComponentId, "");
+							recordCounter++;
+						}
 					}
 				}
 			}
