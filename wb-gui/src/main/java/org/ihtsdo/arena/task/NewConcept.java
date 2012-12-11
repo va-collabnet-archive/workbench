@@ -815,12 +815,16 @@ public class NewConcept extends PreviousNextOrCancel {
             conceptSpec.setComponentUuid(UUID.randomUUID());
             List<DescriptionCAB> fullySpecifiedNameCABs = conceptSpec.getFullySpecifiedNameCABs();
             for(DescriptionCAB fsnBp: fullySpecifiedNameCABs){
-                fsnBp.initialCaseSignificant = CsWordsHelper.isIcTypeSignificant(fsnBp.getText(),
+                String text = fsnBp.getText();
+                String[] parts = text.split(" ");
+                fsnBp.initialCaseSignificant = CsWordsHelper.isIcTypeSignificant(parts[0],
                         CaseSensitive.IC_SIGNIFICANT.getLenient().getNid());
             }
             List<DescriptionCAB> preferredNameCABs = conceptSpec.getPreferredNameCABs();
             for(DescriptionCAB prefBp: preferredNameCABs){
-                prefBp.initialCaseSignificant = CsWordsHelper.isIcTypeSignificant(prefBp.getText(),
+                String text = prefBp.getText();
+                String[] parts = text.split(" ");
+                prefBp.initialCaseSignificant = CsWordsHelper.isIcTypeSignificant(parts[0],
                         CaseSensitive.IC_SIGNIFICANT.getLenient().getNid());
             }
             newConcept = tc.constructIfNotCurrent(conceptSpec);
@@ -837,12 +841,13 @@ public class NewConcept extends PreviousNextOrCancel {
         text = text.replaceAll("[\\s]", " ");
         text = text.replaceAll("   *", " ");
         try {
+            String[] parts = text.split(" ");
             descSpecGbFsn = new DescriptionCAB(
                     conceptSpec.getComponentUuid(),
                     fsnConcept.getPrimUuid(),
                     LANG_CODE.EN_GB,
                     text,
-                    CsWordsHelper.isIcTypeSignificant(text,
+                    CsWordsHelper.isIcTypeSignificant(parts[0],
                         CaseSensitive.IC_SIGNIFICANT.getLenient().getNid()));
 
             tc.construct(descSpecGbFsn);
@@ -877,12 +882,13 @@ public class NewConcept extends PreviousNextOrCancel {
         text = text.replaceAll("   *", " ");
         ComponentVersionBI cv = null;
         try {
+            String[] parts = text.split(" ");
             descSpecGbPref = new DescriptionCAB(
                     conceptSpec.getComponentUuid(),
                     synConcept.getPrimUuid(),
                     LANG_CODE.EN_GB,
                     text,
-                    CsWordsHelper.isIcTypeSignificant(text,
+                    CsWordsHelper.isIcTypeSignificant(parts[0],
                         CaseSensitive.IC_SIGNIFICANT.getLenient().getNid()));
 
             DescriptionChronicleBI dc = tc.construct(descSpecGbPref);
@@ -936,12 +942,13 @@ public class NewConcept extends PreviousNextOrCancel {
         text = text.replaceAll("[\\s]", " ");
         text = text.replaceAll("   *", " ");
         try {
+            String[] parts = text.split(" ");
             descSpecUsFsn = new DescriptionCAB(
                     conceptSpec.getComponentUuid(),
                     fsnConcept.getPrimUuid(),
                     LANG_CODE.EN_US,
                     text,
-                    CsWordsHelper.isIcTypeSignificant(text,
+                    CsWordsHelper.isIcTypeSignificant(parts[0],
                         CaseSensitive.IC_SIGNIFICANT.getLenient().getNid()));
 
             tc.construct(descSpecUsFsn);
@@ -977,12 +984,13 @@ public class NewConcept extends PreviousNextOrCancel {
         text = text.replaceAll("   *", " ");
         ComponentVersionBI cv = null;
         try {
+            String[] parts = text.split(" ");
             descSpecUsPref = new DescriptionCAB(
                     conceptSpec.getComponentUuid(),
                     synConcept.getPrimUuid(),
                     LANG_CODE.EN_US,
                     text,
-                    CsWordsHelper.isIcTypeSignificant(text,
+                    CsWordsHelper.isIcTypeSignificant(parts[0],
                         CaseSensitive.IC_SIGNIFICANT.getLenient().getNid()));
 
             DescriptionChronicleBI dc = tc.construct(descSpecUsPref);
