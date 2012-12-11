@@ -217,12 +217,14 @@ public class DialectHelper {
      * Checks if the given<code>text</code> is written in the specified dialect.
      *
      * @param text the string to check
-     * @param dialectNid the nid associated with the desired dialect
+     * @param dialectNid the nid associated with the other dialect. Use GB nid
+     * to test for US dialect, use US nid to test for GB dialect.
      * @return <code>true</code>, if the text is written in the specified
      * dialect
      * @throws UnsupportedDialectOrLanguage indicates an unsupported dialect or
      * language
      * @throws IOException signals that an I/O exception has occurred
+     * @deprecated need to correct naming or implementation
      */
     public static boolean isTextForDialect(String text, int dialectNid)
             throws UnsupportedDialectOrLanguage, IOException {
