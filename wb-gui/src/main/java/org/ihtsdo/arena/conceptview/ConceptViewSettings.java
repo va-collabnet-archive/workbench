@@ -40,6 +40,7 @@ import java.io.ObjectOutputStream;
 import java.lang.ref.WeakReference;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -62,7 +63,9 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 public class ConceptViewSettings extends ArenaComponentSettings {
 
@@ -631,7 +634,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
         conceptChangedListener.propertyChange(null);
     }
 
-    @Override
+        @Override
     public String getTitle() {
         if (getHost() != null) {
             if (getHost().getTermComponent() != null) {
@@ -639,15 +642,27 @@ public class ConceptViewSettings extends ArenaComponentSettings {
                     ConceptChronicleBI cc = (ConceptChronicleBI) getHost().getTermComponent();
                     ConceptVersionBI cv = Ts.get().getConceptVersion(config.getViewCoordinate(), 
                             cc.getConceptNid());
-                    DescriptionVersionBI fsn = cv.getDescriptionsFullySpecifiedActive().iterator().next();
-                    return fsn.getText();
+                    if (!cv.getDescriptionsFullySpecifiedActive().isEmpty()){
+                        DescriptionVersionBI fsn = cv.getDescriptionsFullySpecifiedActive().iterator().next();
+                        return fsn.getText();
+                    }else{
+                        for(DescriptionChronicleBI desc : cv.getDescriptions()){
+                            for(DescriptionVersionBI dv : desc.getVersions()){
+                                if(dv.getTypeNid() == SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID()){
+                                    return dv.getText();
+                                }
+                                return dv.getText();
+                            }
+                        }
+                    }
+                    return "concept missing descriptions";
+                    
                 } catch (IOException ex) {
                     AceLog.getAppLog().alertAndLogException(ex);
                 }
                 return getHost().getTermComponent().toString();
             }
         }
-
         return "empty";
     }
 
