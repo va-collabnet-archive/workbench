@@ -54,7 +54,7 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 			String destinationId = "";
 			String relTypeId = "";
 			String active = "";
-			String moduleId="";
+			String moduleId=I_Constants.CORE_MODULE_ID;
 			String characteristicTypeId = "";
 			String modifierId = I_Constants.SOMEMODIFIER; 
 			int relationshipStatusId=0;
@@ -146,15 +146,15 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 						moduleId = getConceptMetaModuleID(sourceConcept,releaseDate);
 				     } else if (relationshipStatusId == inactiveNid) {               
 					      active = "0";
-					      Long lastActiveDate=getLatestActivePart(rel.getFixedPart().getMutableParts());
-						      
-					      if (lastActiveDate!=null){
-					      moduleId = getConceptMetaModuleID(sourceConcept,
-					        getDateFormat().format(new Date(lastActiveDate)));
-					      }else{
-					       moduleId = getConceptMetaModuleID(sourceConcept,
-					         getDateFormat().format(new Date(rel.getTime())));
-					      }
+//					      Long lastActiveDate=getLatestActivePart(rel.getFixedPart().getMutableParts());
+//						      
+//					      if (lastActiveDate!=null){
+//					      moduleId = getConceptMetaModuleID(sourceConcept,
+//					        getDateFormat().format(new Date(lastActiveDate)));
+//					      }else{
+//					       moduleId = getConceptMetaModuleID(sourceConcept,
+//					         getDateFormat().format(new Date(rel.getTime())));
+//					      }
 				     }
 					
 					/*relationshipStatusId = rel.getStatusNid();
