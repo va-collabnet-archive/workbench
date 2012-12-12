@@ -5,11 +5,11 @@
 	<parent>
 		<artifactId>wb-mmb</artifactId>
 		<groupId>org.ihtsdo</groupId>
-		<version>wb-trek-145-kp</version>
+		<version>2.6.0-kp-145.00-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>wb-docs</artifactId>
-  <version>2.6.0.2012-kp-oct-1-SNAPSHOT</version>
+  
 	<name>${branch}: BP task dita files for Guidebook</name>
 
 	<description>Generate Workbench Guidebook DITA topic files for Business Process 
