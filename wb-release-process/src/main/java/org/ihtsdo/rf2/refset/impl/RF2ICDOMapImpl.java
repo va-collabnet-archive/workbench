@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
+import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.Terms;
@@ -87,6 +88,23 @@ public class RF2ICDOMapImpl extends RF2AbstractImpl implements I_ProcessConcepts
 								
 								if (extensionStatusId == activeNid) { // active													
 									active = "1";
+									List<? extends I_ConceptAttributeTuple> conceptAttributes = concept.getConceptAttributeTuples(
+											allStatuses, 
+											currenAceConfig.getViewPositionSetReadOnly(), 
+											Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
+
+									if (conceptAttributes != null && !conceptAttributes.isEmpty()) {
+										I_ConceptAttributeTuple attributes = conceptAttributes.iterator().next();
+										
+										String conceptStatus = getStatusType(attributes.getStatusNid());
+										if (conceptStatus.equals("0")) {
+											active = "1";
+										} else if (getConfig().getReleaseDate().compareTo(I_Constants.limited_policy_change)<0 && conceptStatus.equals("6")) {
+											active = "1";
+										} else {
+											active = "0";
+										}
+									}
 								} else if (extensionStatusId == inactiveNid) { // inactive													
 									active = "0";								
 								} else {
