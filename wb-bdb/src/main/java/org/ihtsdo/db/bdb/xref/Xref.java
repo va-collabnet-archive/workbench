@@ -31,6 +31,7 @@ import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.LockMode;
 import com.sleepycat.je.OperationStatus;
 import org.ihtsdo.concept.Concept;
+import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.change.ChangeNotifier;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidSetBI;
@@ -172,6 +173,7 @@ public class Xref extends ComponentBdb implements I_ProcessUnfetchedConceptData 
     public List<NidPairForRel> getDestRelPairs(int cNid) {
         // only need a read lock for sync,
         // since underlying structure is concurrent...
+        BdbCommitManager.waitTillWritesFinished();
         rwl.readLock().lock();
 
         try {
@@ -190,6 +192,7 @@ public class Xref extends ComponentBdb implements I_ProcessUnfetchedConceptData 
     }
 
     public List<NidPairForRel> getDestRelPairs(int cNid, NidSetBI relTypes) {
+        BdbCommitManager.waitTillWritesFinished();
         rwl.readLock().lock();// only need a read lock for sync,
         // since underlying structure is concurrent...
         try {
@@ -207,6 +210,7 @@ public class Xref extends ComponentBdb implements I_ProcessUnfetchedConceptData 
     }
 
     public int[] getDestRelOrigins(int cNid, NidSetBI relTypes) {
+        BdbCommitManager.waitTillWritesFinished();
         rwl.readLock().lock();// only need a read lock for sync,
         // since underlying structure is concurrent...
         try {
@@ -224,6 +228,7 @@ public class Xref extends ComponentBdb implements I_ProcessUnfetchedConceptData 
     }
 
     public List<NidPairForRefset> getRefsetPairs(int nid) {
+        BdbCommitManager.waitTillWritesFinished();
         // only need a read lock for sync,
         // since underlying structure is concurrent...
         rwl.readLock().lock();
