@@ -73,6 +73,8 @@ import org.apache.lucene.queryParser.QueryParser;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.TermComponentLabel;
 import org.dwfa.ace.api.I_AmTermComponent;
+import org.dwfa.ace.api.I_ConceptAttributePart;
+import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
@@ -83,6 +85,7 @@ import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PathSetReadOnly;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.config.AceFrameConfig;
@@ -114,6 +117,7 @@ import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.taxonomy.TaxonomyHelper;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
@@ -802,9 +806,8 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 			}
 
 			// If current path not promote path
-			if (refset != null) {
+			if (canPromote(refset)) {
 				// if(refset.getPositions().)
-
 				rtpStdButtons.add(getBtnPromo());
 			}
 
@@ -2065,6 +2068,46 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 
 	public final void setBtnDiff(JButton btnDiffIn) {
 		btnDiff = btnDiffIn;
+	}
+
+	private boolean canPromote(I_GetConceptData refset) {
+		if (refset == null) {
+			return false;
+		}
+		try {
+			I_ConfigAceFrame aceConfig = Terms.get().getActiveAceFrameConfig();
+
+			// get current version
+			I_ConceptAttributePart ic = getLatestAttributePart(refset,
+					aceConfig);
+			// get current version path
+			PathBI path = ic.getPosition().getPath();
+			// if version path != promote path then promote
+			if (aceConfig.getPromotionPathSet().contains(path)) {
+				return false;
+			} else {
+				return true;
+			}
+		} catch (Exception ex) {
+			// ping
+		}
+
+		return false;
+	}
+
+	private I_ConceptAttributePart getLatestAttributePart(
+			I_GetConceptData concept, I_ConfigAceFrame aceConfig)
+			throws IOException, TerminologyException {
+		I_ConceptAttributePart latest = null;
+		for (I_ConceptAttributeTuple tuple : concept.getConceptAttributeTuples(
+				aceConfig.getAllowedStatus(),
+				new PositionSetReadOnly(concept.getPositions()), null, null)) {
+			if (latest == null || latest.getVersion() < tuple.getVersion()) {
+				latest = tuple.getMutablePart();
+			}
+		}
+
+		return latest;
 	}
 
 }
