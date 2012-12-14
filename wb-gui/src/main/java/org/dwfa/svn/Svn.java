@@ -80,7 +80,6 @@ public class Svn implements I_HandleSubversion {
     private static SVNClientInterface client;
     private static SvnPrompter prompter = new SvnPrompter();
     public static final int SEMAPHORE_PERMITS = 10;
-    
     public static Semaphore rwl = new Semaphore(SEMAPHORE_PERMITS, true);
 
     public static SVNClientInterface getSvnClient() {
@@ -1376,14 +1375,14 @@ public class Svn implements I_HandleSubversion {
         ACE.setSynchronizeButtonIsEnabled(connectedToSvn);
     }
     
-	public static SvnPrompter getPrompter() {
-		if (prompter == null){
-			prompter = new SvnPrompter();
-		}
-		return prompter;
-	}
+    public static SvnPrompter getPrompter() {
+        if (prompter == null){
+            prompter = new SvnPrompter();
+        }
+        return prompter;
+    }
 
-	public static void setPrompter(SvnPrompter prompter) {
-		Svn.prompter = prompter;
-	}
+    public static void setPrompter(SvnPrompter prompter) {
+        Svn.prompter = prompter;
+    }
 }
