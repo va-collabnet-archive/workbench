@@ -661,7 +661,6 @@ public class PositionMapper {
         buf.append(" destination:");
         buf.append(destination);
         buf.append("\nsapNid|distance|time|path|status\n");
-        
         for (int i = initialIndex; i < lengthToPrint && i < positionDistance.length; i++) {
             f.format("%1$2d|", i); // sapNid
             f.format("%1$2d|", positionDistance[i]); // distance
