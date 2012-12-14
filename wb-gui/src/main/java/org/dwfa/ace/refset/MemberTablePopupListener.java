@@ -106,28 +106,27 @@ public class MemberTablePopupListener extends MouseAdapter {
     }
 
     private void makePopup(MouseEvent e) {
-        //AceLog.getAppLog().info("MemberTablePopupListener makePopup editState = "+specEditor.getLocalEditState());
         popup = null;
         if(!this.specEditor.getLocalEditState().equals(EditState.READONLY)){
-        try {
-            
-            int column = table.columnAtPoint(e.getPoint());
-            int row = table.rowAtPoint(e.getPoint());
-            if ((row != -1) && (column != -1)) {
-                popup = new JPopupMenu();
-                JMenuItem noActionItem = new JMenuItem("");
-                popup.add(noActionItem);
-                selectedObject = (StringWithExtTuple) table.getValueAt(row, column);
-                I_GetConceptData refsetConcept = config.getRefsetInSpecEditor();
-                I_DescriptionTuple refsetDesc = refsetConcept.getDescTuple(config.getTableDescPreferenceList(), config);
-                String prompt = "Add comment for '" + refsetDesc.getText() + "'";
-                JMenuItem commentItem = new JMenuItem(prompt + "...");
-                popup.add(commentItem);
-                commentItem.addActionListener(new CommentSpecAction(prompt));
+            try {
+                
+                int column = table.columnAtPoint(e.getPoint());
+                int row = table.rowAtPoint(e.getPoint());
+                if ((row != -1) && (column != -1)) {
+                    popup = new JPopupMenu();
+                    JMenuItem noActionItem = new JMenuItem("");
+                    popup.add(noActionItem);
+                    selectedObject = (StringWithExtTuple) table.getValueAt(row, column);
+                    I_GetConceptData refsetConcept = config.getRefsetInSpecEditor();
+                    I_DescriptionTuple refsetDesc = refsetConcept.getDescTuple(config.getTableDescPreferenceList(), config);
+                    String prompt = "Add comment for '" + refsetDesc.getText() + "'";
+                    JMenuItem commentItem = new JMenuItem(prompt + "...");
+                    popup.add(commentItem);
+                    commentItem.addActionListener(new CommentSpecAction(prompt));
+                }
+            } catch (IOException e1) {
+                AceLog.getAppLog().alertAndLogException(e1);
             }
-        } catch (IOException e1) {
-            AceLog.getAppLog().alertAndLogException(e1);
-        }
         }
     }
 
