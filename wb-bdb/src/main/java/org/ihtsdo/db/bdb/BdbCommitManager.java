@@ -551,8 +551,6 @@ public class BdbCommitManager {
         if (performCommit) {
             return true;
         }
-      
-      
 
         return false;
     }
