@@ -513,9 +513,9 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                     REFSET_TYPES.CID_CID);
             refsetMap.put(REFSET_PROPERTY.CID_ONE, c1Id);
             refsetMap.put(REFSET_PROPERTY.CID_TWO, c2Id);
-            if (effectiveTime != Long.MAX_VALUE) {
-                refsetMap.put(REFSET_PROPERTY.TIME, Long.MAX_VALUE);
-            }
+          
+            refsetMap.put(REFSET_PROPERTY.TIME, effectiveTime);
+           
             I_ExtendByRef newExtension = getOrCreateRefsetExtension(refsetId,
                     componentId, REFSET_TYPES.CID_CID, refsetMap, memberUuid);
             if (isAutocommitActive()) {
@@ -567,9 +567,9 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                     REFSET_TYPES.STR);
             refsetMap.put(REFSET_PROPERTY.STRING_VALUE, extString);
             refsetMap.put(REFSET_PROPERTY.STATUS, Bdb.uuidToNid(statusUuid));
-            if (effectiveTime != Long.MAX_VALUE) {
-                refsetMap.put(REFSET_PROPERTY.TIME, Long.MAX_VALUE);
-            }
+           
+            refsetMap.put(REFSET_PROPERTY.TIME, effectiveTime);
+          
             I_ExtendByRef newExtension = getOrCreateRefsetExtension(refsetId,
                     componentId, REFSET_TYPES.STR, refsetMap, memberUuid);
             if (isAutocommitActive()) {
@@ -621,9 +621,9 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                     REFSET_TYPES.LONG);
             refsetMap.put(REFSET_PROPERTY.LONG_VALUE, extLong);
             refsetMap.put(REFSET_PROPERTY.STATUS, Bdb.uuidToNid(statusUuid));
-            if (effectiveTime != Long.MAX_VALUE) {
-                refsetMap.put(REFSET_PROPERTY.TIME, Long.MAX_VALUE);
-            }
+           
+            refsetMap.put(REFSET_PROPERTY.TIME, effectiveTime);
+            
             I_ExtendByRef newExtension = getOrCreateRefsetExtension(refsetId,
                     componentId, REFSET_TYPES.LONG, refsetMap, memberUuid);
             if (isAutocommitActive()) {
@@ -677,9 +677,9 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
             refsetMap.put(REFSET_PROPERTY.CID_ONE, c1Id);
             refsetMap.put(REFSET_PROPERTY.STRING_VALUE, extString);
             refsetMap.put(REFSET_PROPERTY.STATUS, Bdb.uuidToNid(statusUuid));
-            if (effectiveTime != Long.MAX_VALUE) {
-                refsetMap.put(REFSET_PROPERTY.TIME, Long.MAX_VALUE);
-            }
+           
+            refsetMap.put(REFSET_PROPERTY.TIME, effectiveTime);
+            
             I_ExtendByRef newExtension = getOrCreateRefsetExtension(refsetId,
                     componentId, REFSET_TYPES.STR, refsetMap, memberUuid);
             if (isAutocommitActive()) {
@@ -774,9 +774,9 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
         // editing)
         RefsetPropertyMap refsetMap = new RefsetPropertyMap(REFSET_TYPES.CID);
         refsetMap.put(REFSET_PROPERTY.CID_ONE, conceptId);
-        if (effectiveTime != Long.MAX_VALUE) {
-            refsetMap.put(REFSET_PROPERTY.TIME, Long.MAX_VALUE);
-        }
+        
+        refsetMap.put(REFSET_PROPERTY.TIME, effectiveTime);
+       
         I_ExtendByRef newExtension = makeMemberAndSetup(refsetId, componentId,
                 REFSET_TYPES.CID, refsetMap, memberUuid);
         if (isAutocommitActive()) {
@@ -826,9 +826,8 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
         refsetMap.put(REFSET_PROPERTY.CID_ONE, c1Id);
         refsetMap.put(REFSET_PROPERTY.CID_TWO, c2Id);
         refsetMap.put(REFSET_PROPERTY.CID_THREE, c3Id);
-        if (effectiveTime != Long.MAX_VALUE) {
-            refsetMap.put(REFSET_PROPERTY.TIME, Long.MAX_VALUE);
-        }
+       
+        refsetMap.put(REFSET_PROPERTY.TIME, effectiveTime);
         I_ExtendByRef newExtension = getOrCreateRefsetExtension(refsetId,
                 componentId, REFSET_TYPES.CID_CID_CID, refsetMap, memberUuid);
         if (isAutocommitActive()) {
@@ -899,9 +898,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
         refsetMap.put(REFSET_PROPERTY.CID_ONE, c1Id);
         refsetMap.put(REFSET_PROPERTY.CID_TWO, c2Id);
         refsetMap.put(REFSET_PROPERTY.STRING_VALUE, stringValue);
-        if (effectiveTime != Long.MAX_VALUE) {
-            refsetMap.put(REFSET_PROPERTY.TIME, Long.MAX_VALUE);
-        }
+        refsetMap.put(REFSET_PROPERTY.TIME, effectiveTime);
         I_ExtendByRef newExtension = getOrCreateRefsetExtension(refsetId,
                 componentId, REFSET_TYPES.CID_CID_STR, refsetMap, memberUuid);
         if (isAutocommitActive()) {
