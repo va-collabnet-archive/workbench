@@ -104,7 +104,6 @@ public class WorkbenchRunner {
     public static File wbConfigFile;
     public static Properties wbProperties;
 
-    // TODO Switch?
     public static boolean SSO = false;
     public static final String SSO_Key = "SSO";
     public static final String LAST_PROFILE_DIR_KEY = "last-profile-dir";
@@ -133,19 +132,14 @@ public class WorkbenchRunner {
 
     }
 
-    // ~--- static initializers
-    // -------------------------------------------------
+    //~--- static initializers -------------------------------------------------
     static {
         DwfaEnv.setHeadless(false);
     }
 
     public static UIAuthenticator auth = new UIAuthenticator();
 
-    // public static SvnPrompter prompt;
-
     private String authenticate(SvnPrompter prompt, String baseURL,String lastUserProfile) {
-        // String result = auth.authenticate(svnH);
-        // SvnPrompter prompt = new SvnPrompter();
         AceLog.getAppLog().info("authenticate lastUserProfile = "+lastUserProfile);
         String result = auth.authenticate(prompt, baseURL,lastUserProfile);
         if (result != null) {
@@ -156,96 +150,64 @@ public class WorkbenchRunner {
         }
         userProfile = auth.getProfile();
         if (userProfile == null) {
-            // AceLog.getAppLog().info("up is null "+auth.getApm().getProfile().getAbsolutePath());
             AceLog.getAppLog()
                 .info("userProfile is null " + auth.getApm().getUserName());
-            // here
         }
         if (userProfile != null) {
             wbProperties.setProperty(LAST_PROFILE_DIR_KEY,
                 FileIO.getRelativePath(userProfile)); 
         }
 
-        /*
-         * if(result != null && result.length() > 0){
-         * AceLog.getAppLog().info("authenticate Called result = "+result);
-         * }
-         * 
-         * else{
-         * AceLog.getAppLog().info(
-         * "authenticate Called everything OK prompt User = "
-         * +prompt.getUsername()+" pw = "+prompt.getPassword());
-         * AceLog.getAppLog().info("authenticate Called profile = "
-         * +auth.getProfile().getName());
-         * AceLog.getAppLog().info("authenticate debug here");
-         * }
-         */
-
         return result;
     }
 
-    // ~--- constructors
-    // --------------------------------------------------------
+    //~--- constructors --------------------------------------------------------
     public WorkbenchRunner(String[] args, LifeCycle lc) {
         try {
             AceProtocols.setupExtraProtocols();
             WorkbenchRunner.args = args;
             WorkbenchRunner.lc = lc;
-            AceLog.getAppLog().info(
-                "\n*******************\n" + "\n Starting "
-                    + this.getClass().getSimpleName() + "\n with config file: "
-                    + getArgString(args) + "\n\n******************\n");
+            AceLog.getAppLog().info("\n*******************\n" + "\n Starting " + this.getClass().getSimpleName()
+                    + "\n with config file: " + getArgString(args) + "\n\n******************\n");
 
             if (new File(args[0]).exists()) {
-                jiniConfig =
-                    ConfigurationProvider.getInstance(args,
-                        getClass().getClassLoader());
+                jiniConfig = ConfigurationProvider.getInstance(args, getClass().getClassLoader());
             }
 
             if (jiniConfig != null) {
-                wbConfigFile =
-                    (File) jiniConfig.getEntry(this.getClass().getName(),
-                        "wbConfigFile", File.class,
+                wbConfigFile = (File) jiniConfig.getEntry(this.getClass().getName(), "wbConfigFile", File.class,
                         new File("config/wb.config"));
-                initializeFromSubversion =
-                    (Boolean) jiniConfig.getEntry(this.getClass().getName(),
+                initializeFromSubversion = (Boolean) jiniConfig.getEntry(this.getClass().getName(),
                         "initFromSubversion", Boolean.class, Boolean.FALSE);
-                svnUpdateOnStart =
-                    (String[]) jiniConfig.getEntry(this.getClass().getName(),
-                        "svnUpdateOnStart", String[].class, null);
+                svnUpdateOnStart = (String[]) jiniConfig.getEntry(this.getClass().getName(), "svnUpdateOnStart",
+                        String[].class, null);
                 setSSO(svnUpdateOnStart);
-                System.out.println("is_SSO: " + isSSO());
                 DroolsExecutionManager.drools_dialect_java_compiler =
-                    (String) jiniConfig.getEntry(this.getClass().getName(),
-                        "drools_dialect_java_compiler", String.class, null);
-                ACE.refsetOnly =
-                    (Boolean) jiniConfig.getEntry(this.getClass().getName(),
-                        "refsetOnly", Boolean.class, Boolean.FALSE);
-                ACE.editMode =
-                    (Boolean) jiniConfig.getEntry(this.getClass().getName(),
-                        "allowEdit", Boolean.class, Boolean.TRUE);
-                isaCacheCreateOnStartUp =
-                    (Boolean) jiniConfig.getEntry(this.getClass().getName(),
+                        (String) jiniConfig.getEntry(this.getClass().getName(), "drools_dialect_java_compiler",
+                        String.class, null);
+                ACE.refsetOnly = (Boolean) jiniConfig.getEntry(this.getClass().getName(), "refsetOnly",
+                        Boolean.class, Boolean.FALSE);
+                ACE.editMode = (Boolean) jiniConfig.getEntry(this.getClass().getName(), "allowEdit",
+                        Boolean.class, Boolean.TRUE);
+                isaCacheCreateOnStartUp = (Boolean) jiniConfig.getEntry(this.getClass().getName(),
                         "isaCacheCreateOnStartUp", Boolean.class, Boolean.TRUE);
-                persistIsaCache =
-                    (Boolean) jiniConfig.getEntry(this.getClass().getName(),
+                persistIsaCache = (Boolean) jiniConfig.getEntry(this.getClass().getName(),
                         "persistIsaCache", Boolean.class, Boolean.FALSE);
                 EConceptChangeSetWriter.writeDebugFiles =
-                    (Boolean) jiniConfig.getEntry(this.getClass().getName(),
-                        "writeDebugFiles", Boolean.class, Boolean.FALSE);
+                        (Boolean) jiniConfig.getEntry(this.getClass().getName(), "writeDebugFiles", Boolean.class,
+                        Boolean.FALSE);
                 EConceptChangeSetWriter.validateAfterWrite =
-                    (Boolean) jiniConfig.getEntry(this.getClass().getName(),
-                        "validateAfterWrite", Boolean.class, Boolean.FALSE);
-
-                BatchActionEditorPanel.batchEditingDisabled =
-                    (Boolean) jiniConfig.getEntry(this.getClass().getName(),
-                        "batchEditingDisabled", Boolean.class, Boolean.FALSE);
+                        (Boolean) jiniConfig.getEntry(this.getClass().getName(), "validateAfterWrite", Boolean.class,
+                        Boolean.FALSE);
+                
+                BatchActionEditorPanel.batchEditingDisabled = 
+                        (Boolean) jiniConfig.getEntry(this.getClass().getName(), "batchEditingDisabled", Boolean.class,
+                        Boolean.FALSE);
             } else {
                 wbConfigFile = new File("config/wb.config");
             }
 
-            UIManager.LookAndFeelInfo[] lookAndFeels =
-                UIManager.getInstalledLookAndFeels();
+            UIManager.LookAndFeelInfo[] lookAndFeels = UIManager.getInstalledLookAndFeels();
             boolean windowsSystem = false;
 
             for (UIManager.LookAndFeelInfo lookAndFeel : lookAndFeels) {
@@ -257,11 +219,10 @@ public class WorkbenchRunner {
             String lookAndFeelStr = null;
 
             if (windowsSystem
-                && (jiniConfig.getEntry(this.getClass().getName(),
-                    "lookAndFeelStr", String.class, null) != null)) {
-                lookAndFeelStr =
-                    (String) jiniConfig.getEntry(this.getClass().getName(),
-                        "lookAndFeelStr", String.class, null);
+                    && (jiniConfig.getEntry(this.getClass().getName(), "lookAndFeelStr", String.class, null)
+                    != null)) {
+                lookAndFeelStr = (String) jiniConfig.getEntry(this.getClass().getName(), "lookAndFeelStr",
+                        String.class, null);
                 System.out.println("LAF: " + lookAndFeelStr);
             } else if (windowsSystem && (lookAndFeelStr == null)) {
                 for (UIManager.LookAndFeelInfo lookAndFeel : lookAndFeels) {
@@ -303,22 +264,15 @@ public class WorkbenchRunner {
             if (ComponentFrameBean.MAC_OS_X) {
 
                 // javax.swing.UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
-                // javax.swing.UIManager.put( "ProgressBarUI",
-                // "javax.swing.plaf.synth.SynthProgressBarUI");
-                // javax.swing.UIManager.put(
-                // "javax.swing.plaf.basic.BasicProgressBarUI",
-                // Class.forName("javax.swing.plaf.synth.SynthProgressBarUI") );
-                // System.getProperties().setProperty("swing.defaultlaf",
-                // "com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
-                javax.swing.UIManager.put("ProgressBarUI",
-                    "javax.swing.plaf.basic.BasicProgressBarUI");
+                // javax.swing.UIManager.put( "ProgressBarUI", "javax.swing.plaf.synth.SynthProgressBarUI");
+                // javax.swing.UIManager.put( "javax.swing.plaf.basic.BasicProgressBarUI", Class.forName("javax.swing.plaf.synth.SynthProgressBarUI") );
+                // System.getProperties().setProperty("swing.defaultlaf", "com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
+                javax.swing.UIManager.put("ProgressBarUI", "javax.swing.plaf.basic.BasicProgressBarUI");
                 javax.swing.UIManager.put("ProgressBar.foreground", Color.GREEN);
                 javax.swing.UIManager.put("ProgressBar.background", Color.GRAY);
-                javax.swing.UIManager.put("ProgressBar.border",
-                    BorderFactory.createRaisedBevelBorder());
-                javax.swing.UIManager.put(
-                    "javax.swing.plaf.basic.BasicProgressBarUI",
-                    Class.forName("javax.swing.plaf.basic.BasicProgressBarUI"));
+                javax.swing.UIManager.put("ProgressBar.border", BorderFactory.createRaisedBevelBorder());
+                javax.swing.UIManager.put("javax.swing.plaf.basic.BasicProgressBarUI",
+                        Class.forName("javax.swing.plaf.basic.BasicProgressBarUI"));
             }
 
             OpenFrames.addNewWindowMenuItemGenerator(new ContradictionEditorGenerator());
@@ -334,15 +288,14 @@ public class WorkbenchRunner {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    System.out.println("System.exit from activity action listener: "
-                        + e.getActionCommand());
+                    System.out.println("System.exit from activity action listener: " + e.getActionCommand());
                     System.exit(0);
                 }
             });
             ActivityViewer.addActivity(activity);
 
             if ((System.getProperty("viewer") != null)
-                && System.getProperty("viewer").toLowerCase().startsWith("t")) {
+                    && System.getProperty("viewer").toLowerCase().startsWith("t")) {
                 ACE.editMode = false;
             }
 
@@ -370,29 +323,16 @@ public class WorkbenchRunner {
                         setSSO(true);
                     }
                 }
-
             }
 
-            SvnHelper svnHelper =
-                new SvnHelper(WorkbenchRunner.class, jiniConfig);
-
+            SvnHelper svnHelper = new SvnHelper(WorkbenchRunner.class, jiniConfig);
             if (SSO) {
-                String testSVNURL = svnHelper.getSvnCheckoutProfileOnStart();
-                // AceLog.getAppLog().info("About to open the init svn dialog svnCheckoutProfileOnStart = "+testSVNURL);
-                // TODO throw some sort of error if url is empty or null
-                String auth_e_msg = authenticate(Svn.getPrompter(), testSVNURL,lastUserprofile);
+                prompter = Svn.getPrompter();
             }
 
             if ((acePropertiesFileExists == false) || (initialized == false)) {
                 try {
-                    if (!SSO) {
-                        svnHelper.initialSubversionOperationsAndChangeSetImport(
-                            wbPropertiesFile, prompter);
-                    } else {
-                        boolean ok =
-                            svnHelper.initialSubversionOperationsAndChangeSetImport(
-                                wbPropertiesFile, Svn.getPrompter());
-                    }
+                    svnHelper.initialSubversionOperationsAndChangeSetImport(wbPropertiesFile, prompter);
                 } catch (Exception ex) {
                     AceLog.getAppLog().alertAndLogException(ex);
                     System.exit(0);
@@ -403,16 +343,10 @@ public class WorkbenchRunner {
 
             File profileDir = new File("profiles");
 
-            if (((profileDir.exists() == false) && initializeFromSubversion)
-                || (svnUpdateOnStart != null)) {
+            if (((profileDir.exists() == false) && initializeFromSubversion) || (svnUpdateOnStart != null)) {
                 Svn.setConnectedToSvn(true);
-                if (!SSO) {
-                    svnHelper.initialSubversionOperationsAndChangeSetImport(
-                        new File("config", WB_PROPERTIES), prompter);
-                } else {
-                    svnHelper.initialSubversionOperationsAndChangeSetImport(
-                        new File("config", WB_PROPERTIES), Svn.getPrompter());
-                }
+                svnHelper.initialSubversionOperationsAndChangeSetImport(new File("config", WB_PROPERTIES),
+                        prompter);
             }
 
             // Check to see if there is a custom Properties file
@@ -420,8 +354,7 @@ public class WorkbenchRunner {
 
             if ((wbConfigFile == null) || !wbConfigFile.exists()) {
                 if (acePropertiesFileExists) {
-                    wbProperties.loadFromXML(new FileInputStream(
-                        wbPropertiesFile));
+                    wbProperties.loadFromXML(new FileInputStream(wbPropertiesFile));
                 }
 
                 String lastProfileDirStr = "profiles";
@@ -436,28 +369,20 @@ public class WorkbenchRunner {
                 if (lastProfileDir.isFile()) {
                     wbConfigFile = lastProfileDir;
                 } else {
-                    String[] profileFiles =
-                        lastProfileDir.list(new FilenameFilter() {
+                    String[] profileFiles = lastProfileDir.list(new FilenameFilter() {
 
-                            @Override
-                            public boolean accept(File dir, String name) {
-                                return name.endsWith(".ace")
-                                    || name.endsWith(".wb")
-                                    || name.endsWith(".wbp");
-                            }
-                        });
+                        @Override
+                        public boolean accept(File dir, String name) {
+                            return name.endsWith(".ace") || name.endsWith(".wb") || name.endsWith(".wbp");
+                        }
+                    });
 
                     if ((profileFiles != null) && (profileFiles.length == 1)) {
-                        wbConfigFile =
-                            new File(lastProfileDir, profileFiles[0]).getCanonicalFile();
-                    } else if ((profileFiles != null)
-                        && (profileFiles.length > 1)) {
-                        AceLog.getAppLog()
-                            .warning(
+                        wbConfigFile = new File(lastProfileDir, profileFiles[0]).getCanonicalFile();
+                    } else if ((profileFiles != null) && (profileFiles.length > 1)) {
+                        AceLog.getAppLog().warning(
                                 "Profile from jini configuration does not exist and more than one profile file found in "
-                                    + "last profile directory "
-                                    + lastProfileDir
-                                    + ", unable to determine profile to use.");
+                                + "last profile directory " + lastProfileDir + ", unable to determine profile to use.");
                     }
                 }
             }
@@ -473,61 +398,53 @@ public class WorkbenchRunner {
 
             AceLog.getAppLog().info("### Load time: " + loadTime + " ms");
             AceLog.getAppLog().info("Adding bdb shutdown hook. ");
-            Runtime.getRuntime().addShutdownHook(
-                new Thread(this.getClass().getCanonicalName()) {
+            Runtime.getRuntime().addShutdownHook(new Thread(this.getClass().getCanonicalName()) {
 
-                    /**
-                     * TODO For some reason, this thread does not seem to run in
-                     * normal shutdown (only on ^c). Need to figure out why and
-                     * make
-                     * sure that we never fail to gracefully shutdown the
-                     * database.
-                     */
-                    @Override
-                    public void run() {
-                        try {
-                            System.out.println("Starting bdb shutdown from shutdown hook...");
-                            System.out.flush();
-                            NodeFactory.close();
-                            Bdb.close();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        } catch (ExecutionException e) {
-                            e.printStackTrace();
-                        }
-
-                        System.out.println("Finished bdb shutdown from shutdown hook...");
+                /**
+                 * TODO For some reason, this thread does not seem to run in
+                 * normal shutdown (only on ^c). Need to figure out why and make
+                 * sure that we never fail to gracefully shutdown the database.
+                 */
+                @Override
+                public void run() {
+                    try {
+                        System.out.println("Starting bdb shutdown from shutdown hook...");
                         System.out.flush();
+                        NodeFactory.close();
+                        Bdb.close();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
                     }
-                });
+
+                    System.out.println("Finished bdb shutdown from shutdown hook...");
+                    System.out.flush();
+                }
+            });
             setupSwingExpansionTimerLogging();
 
             if (System.getProperty("newprofile") != null) {
                 File dbFolder = new File("berkeley-db");
 
                 if (jiniConfig != null) {
-                    dbFolder =
-                        (File) jiniConfig.getEntry(this.getClass().getName(),
-                            "dbFolder", File.class, new File(
-                                "target/berkeley-db"));
+                    dbFolder = (File) jiniConfig.getEntry(this.getClass().getName(), "dbFolder", File.class,
+                            new File("target/berkeley-db"));
                 }
 
                 AceConfig.config = new AceConfig(dbFolder);
 
                 String username = "username";
-                File profileFile =
-                    new File("profiles/" + username, username + ".wb");
+                File profileFile = new File("profiles/" + username, username + ".wb");
 
                 AceConfig.config.setProfileFile(profileFile);
                 AceConfig.setupAceConfig(AceConfig.config, null, null, false);
 
-                File startupFolder =
-                    new File(profileFile.getParent(), "startup");
+                File startupFolder = new File(profileFile.getParent(), "startup");
 
                 startupFolder.mkdirs();
 
-                File shutdownFolder =
-                    new File(profileFile.getParent(), "shutdown");
+                File shutdownFolder = new File(profileFile.getParent(), "shutdown");
 
                 shutdownFolder.mkdirs();
             }
@@ -553,8 +470,8 @@ public class WorkbenchRunner {
                     }
                 }
             }
-            if ((wbConfigFile != null) && wbConfigFile.exists()
-                && wbPropertiesFile.exists()) {
+
+            if ((wbConfigFile != null) && wbConfigFile.exists() && wbPropertiesFile.exists()) {
 
                 // Put up a dialog to select the configuration file...
                 CountDownLatch latch = new CountDownLatch(1);
@@ -563,20 +480,16 @@ public class WorkbenchRunner {
                 profiler.start();
                 latch.await();
 
-                File jeUserPropertiesFile =
-                    new File(userProfile.getParentFile(), "je.properties");
+                File jeUserPropertiesFile = new File(userProfile.getParentFile(), "je.properties");
 
                 if (jeUserPropertiesFile.exists()) {
-                    File jeDbPropertiesFile =
-                        new File(AceConfig.config.getDbFolder(),
-                            "je.properties");
+                    File jeDbPropertiesFile = new File(AceConfig.config.getDbFolder(), "je.properties");
 
                     FileIO.copyFile(jeUserPropertiesFile, jeDbPropertiesFile);
                 }
 
                 ObjectInputStream ois =
-                    new ObjectInputStream(new BufferedInputStream(
-                        new FileInputStream(userProfile)));
+                        new ObjectInputStream(new BufferedInputStream(new FileInputStream(userProfile)));
 
                 try {
                     AceConfig.config = (AceConfig) ois.readObject();
@@ -625,52 +538,41 @@ public class WorkbenchRunner {
             } else {
                 if (initializeFromSubversion) {
                     JOptionPane.showMessageDialog(
-                        LogWithAlerts.getActiveFrame(null),
-                        "Unable to initialize from subversion. Is the network connected?");
+                            LogWithAlerts.getActiveFrame(null),
+                            "Unable to initialize from subversion. Is the network connected?");
                 } else {
                     File dbFolder = new File("berkeley-db");
 
                     if (jiniConfig != null) {
-                        dbFolder =
-                            (File) jiniConfig.getEntry(this.getClass()
-                                .getName(), "dbFolder", File.class, new File(
-                                "target/berkeley-db"));
+                        dbFolder = (File) jiniConfig.getEntry(this.getClass().getName(), "dbFolder", File.class,
+                                new File("target/berkeley-db"));
                     }
 
                     AceConfig.config = new AceConfig(dbFolder);
                     AceConfig.config.setProfileFile(wbConfigFile);
-                    AceConfig.setupAceConfig(AceConfig.config, null, null,
-                        false);
+                    AceConfig.setupAceConfig(AceConfig.config, null, null, false);
                 }
             }
 
-            wbProperties.storeToXML(new FileOutputStream(wbPropertiesFile),
-                null);
+            wbProperties.storeToXML(new FileOutputStream(wbPropertiesFile), null);
             ACE.setAceConfig(AceConfig.config);
 
             String writerName = AceConfig.config.getChangeSetWriterFileName();
 
             if (!writerName.endsWith(".eccs")) {
-                String firstPart =
-                    writerName.substring(0, writerName.lastIndexOf('.'));
+                String firstPart = writerName.substring(0, writerName.lastIndexOf('.'));
 
                 writerName = firstPart.concat(".eccs");
                 AceConfig.config.setChangeSetWriterFileName(writerName);
             }
 
-            ChangeSetWriterHandler.addWriter(
-                AceConfig.config.getUsername() + ".eccs",
-                new EConceptChangeSetWriter(new File(
-                    AceConfig.config.getChangeSetRoot(),
-                    AceConfig.config.getChangeSetWriterFileName()), new File(
-                    AceConfig.config.getChangeSetRoot(), "."
-                        + AceConfig.config.getChangeSetWriterFileName()),
-                    ChangeSetGenerationPolicy.INCREMENTAL, true));
-            ChangeSetWriterHandler.addWriter(
-                AceConfig.config.getUsername() + ".commitLog.xls",
-                new CommitLog(new File(AceConfig.config.getChangeSetRoot(),
-                    "commitLog.xls"), new File(
-                    AceConfig.config.getChangeSetRoot(), "." + "commitLog.xls")));
+            ChangeSetWriterHandler.addWriter(AceConfig.config.getUsername()
+                    + ".eccs", new EConceptChangeSetWriter(new File(AceConfig.config.getChangeSetRoot(), AceConfig.config.getChangeSetWriterFileName()), new File(AceConfig.config.getChangeSetRoot(), "."
+                    + AceConfig.config.getChangeSetWriterFileName()), ChangeSetGenerationPolicy.INCREMENTAL, true));
+            ChangeSetWriterHandler.addWriter(AceConfig.config.getUsername() + ".commitLog.xls",
+                    new CommitLog(new File(AceConfig.config.getChangeSetRoot(),
+                    "commitLog.xls"), new File(AceConfig.config.getChangeSetRoot(),
+                    "." + "commitLog.xls")));
 
             int successCount = 0;
             int frameCount = 0;
@@ -757,53 +659,13 @@ public class WorkbenchRunner {
                             handleAdministrativeFrame(Svn.getPrompter(), ace);
                         } else {
                             successCount++;
-                            // AceLog.getAppLog().info("Workbench runner 517 successCount = "+successCount);
                             if (successCount == 1 && svnHelper != null) {
-                                /*
-                                 * AceLog.getAppLog().info(
-                                 * "Workbench runner 519 svnHelper.getSubversionMap().size = "
-                                 * +svnHelper.getSubversionMap().size());
-                                 * for (String key :
-                                 * svnHelper.getSubversionMap().keySet()) {
-                                 * SubversionData svd =
-                                 * svnHelper.getSubversionMap().get(key);
-                                 * AceLog.getAppLog().info(
-                                 * " Printing svnHelper.getSubversionMap key = "
-                                 * + key+" SubversionData = "+svd);
-                                 * }
-                                 * 
-                                 * AceLog.getAppLog().info(
-                                 * "Workbench runner 520 ace.getSubversionMap().size() 1 = "
-                                 * +ace.getSubversionMap().size());
-                                 * for (String key :
-                                 * ace.getSubversionMap().keySet()) {
-                                 * SubversionData svd =
-                                 * ace.getSubversionMap().get(key);
-                                 * AceLog.getAppLog().info(" Printing ace key = "
-                                 * + key+" SubversionData = "+svd);
-                                 * }
-                                 */
 
                                 ace.getSubversionMap().clear();
                                 ace.getSubversionMap().putAll(
                                     svnHelper.getSubversionMap());
-                                /*
-                                 * AceLog.getAppLog().info(
-                                 * "Workbench runner 534 ace.getSubversionMap().size() = "
-                                 * +ace.getSubversionMap().size());
-                                 * for (String key :
-                                 * ace.getSubversionMap().keySet()) {
-                                 * SubversionData svd =
-                                 * ace.getSubversionMap().get(key);
-                                 * AceLog.getAppLog().info(
-                                 * " Printing ace svnMap info key = " +
-                                 * key+" SubversionData = "+svd);
-                                 * }
-                                 */
 
                             }
-                            // AceLog.getAppLog().info("About to handleNormalFrame");
-                            // handleNormalFrame(ace);
                             HandleNormalFrame handler =
                                 new HandleNormalFrame(ace);
 
@@ -811,15 +673,13 @@ public class WorkbenchRunner {
 
                         }
                     }
-
                 }
             }
 
             if (successCount == 0) {
-                JOptionPane.showMessageDialog(
-                    LogWithAlerts.getActiveFrame(null),
-                    "No frames where opened. Now exiting.",
-                    "No successful logins...", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "No frames where opened. Now exiting.", "No successful logins...",
+                        JOptionPane.ERROR_MESSAGE);
                 System.exit(0);
             }
 
@@ -842,17 +702,13 @@ public class WorkbenchRunner {
                 File queueFile = new File(queue);
 
                 if (queueFile.exists()) {
-                    AceLog.getAppLog().info(
-                        "Found queue: "
-                            + queueFile.toURI().toURL().toExternalForm());
+                    AceLog.getAppLog().info("Found queue: " + queueFile.toURI().toURL().toExternalForm());
 
                     if (QueueServer.started(queueFile)) {
-                        AceLog.getAppLog().info(
-                            "Queue already started: "
+                        AceLog.getAppLog().info("Queue already started: "
                                 + queueFile.toURI().toURL().toExternalForm());
                     } else {
-                        new QueueServer(
-                            new String[] { queueFile.getCanonicalPath() }, lc);
+                        new QueueServer(new String[]{queueFile.getCanonicalPath()}, lc);
                     }
                 } else {
                     queuesToRemove.add(queue);
@@ -873,10 +729,8 @@ public class WorkbenchRunner {
                 }
 
                 buff.append("</body></html>");
-                AceLog.getAppLog().alertAndLog(
-                    Level.WARNING,
-                    buff.toString(),
-                    new Exception("Removing queues that are not accessable: "
+                AceLog.getAppLog().alertAndLog(Level.WARNING, buff.toString(),
+                        new Exception("Removing queues that are not accessable: "
                         + queuesToRemove));
             }
         } catch (Exception e) {
@@ -885,17 +739,14 @@ public class WorkbenchRunner {
         }
     }
 
-    // ~--- methods
-    // -------------------------------------------------------------
+    //~--- methods -------------------------------------------------------------
     private void checkCustom() {
         String custPropFN = null;
 
         try {
             if (wbProperties.getProperty(CustomStatics.CUSTOMPROPS) != null) {
-                custPropFN =
-                    wbProperties.getProperty(CustomStatics.CUSTOMPROPS);
-                AceLog.getAppLog().info(
-                    "checkCustom custPropFN = " + custPropFN);
+                custPropFN = wbProperties.getProperty(CustomStatics.CUSTOMPROPS);
+                AceLog.getAppLog().info("checkCustom custPropFN = " + custPropFN);
 
                 File custPropertiesFile = new File("config", custPropFN);
 
@@ -903,8 +754,8 @@ public class WorkbenchRunner {
                     String cpfn = custPropertiesFile.getCanonicalPath();
                     Properties custProps = new Properties();
 
-                    custProps.loadFromXML(new FileInputStream(
-                        custPropertiesFile));
+                    custProps.loadFromXML(new FileInputStream(custPropertiesFile));
+
 
                     ObjectCache.INSTANCE.put(CustomStatics.CUSTOMPROPSFN, cpfn);
                     ObjectCache.INSTANCE.put(CustomStatics.CUSTOMPROPS,
@@ -939,14 +790,11 @@ public class WorkbenchRunner {
 
             }
         } catch (Exception E) {
-            AceLog.getAppLog().severe(
-                "checkCustom threw an error trying to get " + custPropFN, E);
+            AceLog.getAppLog().severe("checkCustom threw an error trying to get " + custPropFN, E);
         }
     }
 
-    private void generateCache(Collection<IsaCoordinate> isaCoordinates,
-            List<CountDownLatch> latches) throws InterruptedException,
-            IOException {
+    private void generateCache(Collection<IsaCoordinate> isaCoordinates, List<CountDownLatch> latches) throws InterruptedException, IOException {
         // not persisted
         for (IsaCoordinate isac : isaCoordinates) {
             IsaCache loopCache = (IsaCache) Terms.get().setupIsaCache(isac);
@@ -959,8 +807,7 @@ public class WorkbenchRunner {
         }
     }
 
-    private void handleAdministrativeFrame(SvnPrompter prompter,
-            final I_ConfigAceFrame ace) {
+    private void handleAdministrativeFrame(SvnPrompter prompter, final I_ConfigAceFrame ace) {
         String username = prompter.getUsername();
         String password = prompter.getPassword();
         boolean tryAgain = true;
@@ -969,11 +816,10 @@ public class WorkbenchRunner {
         prompter.setPassword("");
 
         while (tryAgain) {
-            prompter.prompt("Please authenticate as an administrative user:",
-                ace.getAdminUsername());
+            prompter.prompt("Please authenticate as an administrative user:", ace.getAdminUsername());
 
             if (ace.getAdminUsername().equals(prompter.getUsername())
-                && ace.getAdminPassword().equals(prompter.getPassword())) {
+                    && ace.getAdminPassword().equals(prompter.getPassword())) {
                 SwingUtilities.invokeLater(new Runnable() {
 
                     @Override
@@ -987,13 +833,11 @@ public class WorkbenchRunner {
 
                             AceFrame.setPluginRoot(AceFrame.getAdminPluginRoot());
 
-                            AceFrame newFrame =
-                                new AceFrame(args, lc, ace, startup);
+                            AceFrame newFrame = new AceFrame(args, lc, ace, startup);
 
                             AceFrame.setPluginRoot(regularPluginRoot);
                             ace.setSubversionToggleVisible(true);
-                            newFrame.setTitle(newFrame.getTitle().replace(
-                                "Editor", "Administrator"));
+                            newFrame.setTitle(newFrame.getTitle().replace("Editor", "Administrator"));
                             newFrame.setVisible(true);
                         } catch (Exception e) {
                             AceLog.getAppLog().alertAndLogException(e);
@@ -1003,11 +847,8 @@ public class WorkbenchRunner {
                 tryAgain = false;
                 prompter.setPassword("");
             } else {
-                int n =
-                    JOptionPane.showConfirmDialog(null,
-                        "Would you like to try again?",
-                        "Administrative authentication failed",
-                        JOptionPane.YES_NO_OPTION);
+                int n = JOptionPane.showConfirmDialog(null, "Would you like to try again?",
+                        "Administrative authentication failed", JOptionPane.YES_NO_OPTION);
 
                 if (n == JOptionPane.YES_OPTION) {
                     tryAgain = true;
@@ -1023,11 +864,9 @@ public class WorkbenchRunner {
 
     private void processFile(File file, LifeCycle lc) throws Exception {
         if (file.isDirectory() == false) {
-            if (file.getName().equalsIgnoreCase("queue.config")
-                && (QueueServer.started(file) == false)) {
-                AceLog.getAppLog().info(
-                    "Found user queue: " + file.getCanonicalPath());
-                new QueueServer(new String[] { file.getCanonicalPath() }, lc);
+            if (file.getName().equalsIgnoreCase("queue.config") && (QueueServer.started(file) == false)) {
+                AceLog.getAppLog().info("Found user queue: " + file.getCanonicalPath());
+                new QueueServer(new String[]{file.getCanonicalPath()}, lc);
             }
         } else {
             String fileName = file.getName();
@@ -1043,8 +882,7 @@ public class WorkbenchRunner {
     }
 
     private void setupIsaCache(Collection<IsaCoordinate> isaCoordinates)
-            throws Exception, ComputationCanceled, InterruptedException,
-            IOException {
+            throws Exception, ComputationCanceled, InterruptedException, IOException {
 
         // Startup queues in profile sub-directories here...
         // Isa Cache Setup start
@@ -1090,24 +928,20 @@ public class WorkbenchRunner {
         }
     }
 
-    private void setupSwingExpansionTimerLogging()
-            throws ConfigurationException {
+    private void setupSwingExpansionTimerLogging() throws ConfigurationException {
         if (jiniConfig != null) {
-            Boolean logTimingInfo =
-                (Boolean) jiniConfig.getEntry(this.getClass().getName(),
-                    "logTimingInfo", Boolean.class, null);
+            Boolean logTimingInfo = (Boolean) jiniConfig.getEntry(this.getClass().getName(), "logTimingInfo",
+                    Boolean.class, null);
 
             if (logTimingInfo != null) {
                 ExpandNodeSwingWorker.setLogTimingInfo(logTimingInfo);
             }
 
-            AceLog.getAppLog().info(
-                "Swing expansion logTimingInfo " + logTimingInfo);
+            AceLog.getAppLog().info("Swing expansion logTimingInfo " + logTimingInfo);
         }
     }
 
-    // ~--- get methods
-    // ---------------------------------------------------------
+    //~--- get methods ---------------------------------------------------------
     private String getArgString(final String[] args) {
         String argsStr;
 
@@ -1120,8 +954,7 @@ public class WorkbenchRunner {
         return argsStr;
     }
 
-    // ~--- inner classes
-    // -------------------------------------------------------
+    //~--- inner classes -------------------------------------------------------
     private static class GetProfileWorker extends SwingWorker<Boolean> {
 
         StartupFrameListener fl = new StartupFrameListener();
@@ -1133,8 +966,7 @@ public class WorkbenchRunner {
         private AceLoginDialog loginDialog;
         private String password;
 
-        // ~--- constructors
-        // -----------------------------------------------------
+        //~--- constructors -----------------------------------------------------
         public GetProfileWorker(CountDownLatch latch) {
             super();
             parentFrame = new JFrame();
@@ -1148,13 +980,11 @@ public class WorkbenchRunner {
 
                         @Override
                         public void run() {
-                            parentFrame.setContentPane(new JLabel(
-                                "The Terminology IDE is starting..."));
+                            parentFrame.setContentPane(new JLabel("The Terminology IDE is starting..."));
                             parentFrame.pack();
                             parentFrame.setVisible(true);
-                            parentFrame.setLocation((d.width / 2)
-                                - (parentFrame.getWidth() / 2), (d.height / 2)
-                                - (parentFrame.getHeight() / 2));
+                            parentFrame.setLocation((d.width / 2) - (parentFrame.getWidth() / 2),
+                                    (d.height / 2) - (parentFrame.getHeight() / 2));
                             OpenFrames.addFrame(parentFrame);
                             AceLog.getAppLog().info("### Using a new frame");
                             newFrame = true;
@@ -1175,8 +1005,7 @@ public class WorkbenchRunner {
             this.latch = latch;
         }
 
-        // ~--- methods
-        // ----------------------------------------------------------
+        //~--- methods ----------------------------------------------------------
         @Override
         protected Boolean construct() throws Exception {
             File profileDir = new File("profiles" + File.separator + "users");
@@ -1206,12 +1035,10 @@ public class WorkbenchRunner {
 
                     @Override
                     public void run() {
-                        parentFrame.setContentPane(new JLabel(
-                            "The Terminology IDE is starting..."));
+                        parentFrame.setContentPane(new JLabel("The Terminology IDE is starting..."));
                         parentFrame.pack();
 
-                        Dimension d =
-                            Toolkit.getDefaultToolkit().getScreenSize();
+                        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
 
                         parentFrame.setLocation(d.width / 2, d.height / 2);
                         parentFrame.setVisible(true);
@@ -1250,8 +1077,7 @@ public class WorkbenchRunner {
             }
         }
 
-        // ~--- get methods
-        // ------------------------------------------------------
+        //~--- get methods ------------------------------------------------------
         public String getPassword() {
             return password;
         }
@@ -1259,35 +1085,32 @@ public class WorkbenchRunner {
 
     class HandleNormalFrame extends javax.swing.SwingWorker<Object, Object> {
 
-        boolean startup = firstStartup;;
+        boolean startup = firstStartup;
         I_ConfigAceFrame ace;
 
-        // ~--- constructors
-        // -----------------------------------------------------
+        //~--- constructors -----------------------------------------------------
         public HandleNormalFrame(I_ConfigAceFrame ace) {
             this.ace = ace;
         }
 
-        // ~--- methods
-        // ----------------------------------------------------------
+        //~--- methods ----------------------------------------------------------
         @Override
         protected Object doInBackground() throws Exception {
             firstStartup = false;
 
-            if ((ace.getViewPositionSet() == null)
-                || ace.getViewPositionSet().isEmpty()) {
+            if ((ace.getViewPositionSet() == null) || ace.getViewPositionSet().isEmpty()) {
                 Set<PositionBI> viewPositions = new HashSet<PositionBI>();
 
-                viewPositions.add(new Position(Long.MAX_VALUE,
-                    Bdb.getPathManager().get(
-                        ArchitectonicAuxiliary.Concept.SNOMED_CORE.localize()
-                            .getNid())));
-                viewPositions.add(new Position(
-                    Long.MAX_VALUE,
-                    Bdb.getPathManager()
-                        .get(
-                            ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.localize()
-                                .getNid())));
+                viewPositions.add(
+                        new Position(
+                        Long.MAX_VALUE,
+                        Bdb.getPathManager().get(
+                        ArchitectonicAuxiliary.Concept.SNOMED_CORE.localize().getNid())));
+                viewPositions.add(
+                        new Position(
+                        Long.MAX_VALUE,
+                        Bdb.getPathManager().get(
+                        ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.localize().getNid())));
                 ace.setViewPositions(viewPositions);
             }
 
