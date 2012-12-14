@@ -325,14 +325,26 @@ public class WorkbenchRunner {
                 }
             }
 
-            SvnHelper svnHelper = new SvnHelper(WorkbenchRunner.class, jiniConfig);
+            SvnHelper svnHelper =
+                new SvnHelper(WorkbenchRunner.class, jiniConfig);
+
             if (SSO) {
-                prompter = Svn.getPrompter();
+                String testSVNURL = svnHelper.getSvnCheckoutProfileOnStart();
+                // AceLog.getAppLog().info("About to open the init svn dialog svnCheckoutProfileOnStart = "+testSVNURL);
+                // TODO throw some sort of error if url is empty or null
+                String auth_e_msg = authenticate(Svn.getPrompter(), testSVNURL,lastUserprofile);
             }
 
             if ((acePropertiesFileExists == false) || (initialized == false)) {
                 try {
-                    svnHelper.initialSubversionOperationsAndChangeSetImport(wbPropertiesFile, prompter);
+                    if (!SSO) {
+                        svnHelper.initialSubversionOperationsAndChangeSetImport(
+                            wbPropertiesFile, prompter);
+                    } else {
+                        boolean ok =
+                            svnHelper.initialSubversionOperationsAndChangeSetImport(
+                                wbPropertiesFile, Svn.getPrompter());
+                    }
                 } catch (Exception ex) {
                     AceLog.getAppLog().alertAndLogException(ex);
                     System.exit(0);
@@ -343,10 +355,16 @@ public class WorkbenchRunner {
 
             File profileDir = new File("profiles");
 
-            if (((profileDir.exists() == false) && initializeFromSubversion) || (svnUpdateOnStart != null)) {
+            if (((profileDir.exists() == false) && initializeFromSubversion)
+                || (svnUpdateOnStart != null)) {
                 Svn.setConnectedToSvn(true);
-                svnHelper.initialSubversionOperationsAndChangeSetImport(new File("config", WB_PROPERTIES),
-                        prompter);
+                if (!SSO) {
+                    svnHelper.initialSubversionOperationsAndChangeSetImport(
+                        new File("config", WB_PROPERTIES), prompter);
+                } else {
+                    svnHelper.initialSubversionOperationsAndChangeSetImport(
+                        new File("config", WB_PROPERTIES), Svn.getPrompter());
+                }
             }
 
             // Check to see if there is a custom Properties file
