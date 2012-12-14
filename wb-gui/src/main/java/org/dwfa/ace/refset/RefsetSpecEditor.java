@@ -1234,9 +1234,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			AceLog.getAppLog().info("InternalActionListener AP");
 			if (e.getSource() instanceof JButton) {
-				AceLog.getAppLog().info("InternalActionListener IS button");
 				if (e.getSource() == getAddSpecMetaData()) {
 					if (addRefsetMetadata(false,
 							(I_GetConceptData) getTermComponent(), null)) {
@@ -1244,7 +1242,6 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 					}
 				}
 				if (e.getSource() == getBtnDiff()) {
-					AceLog.getAppLog().info("InternalActionListener ISDIFF");
 					I_GetConceptData igcd = (I_GetConceptData) getTermComponent();
 					String conName = "";
 					try {
