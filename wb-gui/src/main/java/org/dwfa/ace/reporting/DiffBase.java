@@ -1144,9 +1144,9 @@ public class DiffBase {
     protected HashMap<Integer, Integer> diff_count = new HashMap<Integer, Integer>();
 
     protected void incr(int id) {
-    	if (diff_count.isEmpty()) {
-    		this.diff_count.put(id, 1);
-    	}
+        if (diff_count.isEmpty()) {
+            this.diff_count.put(id, 1);
+        }
         this.diff_count.put(id, this.diff_count.get(id) + 1);
     }
     protected int concepts = 0;
