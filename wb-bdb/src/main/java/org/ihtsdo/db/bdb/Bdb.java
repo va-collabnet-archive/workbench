@@ -591,12 +591,12 @@ public class Bdb {
                 }
                 
                 if (KindOfComputer.persistIsaCache) {
-                	activity.setProgressInfoLower("1-b/11: Persisting Isa Cache.");
-                	try {
-                	    KindOfComputer.persistIsaCache();
-                	} catch (IOException ioex) {
-                	    AceLog.getAppLog().severe("ERR-0001 : Failed to persist Isa Cache :", ioex);
-                	}
+                    activity.setProgressInfoLower("1-b/11: Persisting Isa Cache.");
+                    try {
+                        KindOfComputer.persistIsaCache();
+                    } catch (IOException ioex) {
+                        AceLog.getAppLog().severe("ERR-0001 : Failed to persist Isa Cache :", ioex);
+                    }
                 }
 
                 activity.setProgressInfoLower("2/11: Starting sync using service.");
