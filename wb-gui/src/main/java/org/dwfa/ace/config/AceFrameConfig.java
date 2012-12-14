@@ -2226,13 +2226,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     public void svnCommit(SubversionData svd) throws TaskFailedException {
         aceFrame.setupSvn();
-        //Svn.commit(svd, getAuthenticator(svd), true);
-      if(Svn.getPrompter().getUsername() == null || Svn.getPrompter().getPassword() == null){
-    	  //show the login dialog
-    	  Svn.getPrompter().prompt("Subversion authentication", getUsername());
-      }
-        
-        AceLog.getAppLog().info("svnCommit Svn.getPrompter() username = "+Svn.getPrompter().getUsername()+" pw string length = "+Svn.getPrompter().getPassword().length());
+        if (Svn.getPrompter().getUsername() == null
+                || Svn.getPrompter().getPassword() == null) {
+            Svn.getPrompter()
+                    .prompt("Subversion authentication", getUsername());
+        }
+
         Svn.commit(svd, Svn.getPrompter(), true);
     }
 
