@@ -60,220 +60,193 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
  * @author kec
  */
 public class MarkedParentComputer {
-    private static final int SETUP_ISA_CACHE_THRESHOLD = 5000;
 
-    // ~--- fields
-    // --------------------------------------------------------------
+   // ~--- fields
+   // --------------------------------------------------------------
 
-    private final AtomicInteger members = new AtomicInteger();
-    private boolean canceled = false;
-    private final long startTime = System.currentTimeMillis();
-    private Collection<I_ShowActivity> activities;
-    private I_ShowActivity activity;
-    private Collection<? extends I_ExtendByRef> allRefsetMembers;
-    private int conceptCount;
-    private I_RepresentIdSet currentRefsetMemberComponentNids;
-    private EditCoordinate editCoordinate;
-    private Concept markedParentRefsetConcept;
-    private I_HelpMemberRefset memberRefsetHelper;
-    private Concept refsetConcept;
-    private RefsetSpec specHelper;
-    private StopActionListener stopListener;
-    private ViewCoordinate viewCoordinate;
+   private final AtomicInteger                 members   = new AtomicInteger();
+   private boolean                             canceled  = false;
+   private final long                          startTime = System.currentTimeMillis();
+   private Collection<I_ShowActivity>          activities;
+   private I_ShowActivity                      activity;
+   private Collection<? extends I_ExtendByRef> allRefsetMembers;
+   private int                                 conceptCount;
+   private I_RepresentIdSet                    currentRefsetMemberComponentNids;
+   private EditCoordinate                      editCoordinate;
+   private Concept                             markedParentRefsetConcept;
+   private I_HelpMemberRefset                  memberRefsetHelper;
+   private Concept                             refsetConcept;
+   private RefsetSpec                          specHelper;
+   private StopActionListener                  stopListener;
+   private ViewCoordinate                      viewCoordinate;
     private final TerminologyBuilderBI builder;
 
-    // ~--- constructors
-    // --------------------------------------------------------
+   //~--- constructors --------------------------------------------------------
 
-    public MarkedParentComputer(Concept refsetConcept,
-            Collection<RefsetMember<?, ?>> members,
-            I_ConfigAceFrame frameConfig, HashSet<I_ShowActivity> activities)
-            throws Exception {
-        super();
-        this.activities = activities;
-        this.editCoordinate = frameConfig.getEditCoordinate();
-        this.viewCoordinate = frameConfig.getViewCoordinate();
-        this.builder =
-            Ts.get().getSnapshot(viewCoordinate).getBuilder(editCoordinate);
-        this.refsetConcept = refsetConcept;
-        this.conceptCount = members.size();
+   public MarkedParentComputer(Concept refsetConcept, Collection<RefsetMember<?, ?>> members,
+                               I_ConfigAceFrame frameConfig, HashSet<I_ShowActivity> activities)
+           throws Exception {
+      super();
+      this.activities     = activities;
+      this.editCoordinate = frameConfig.getEditCoordinate();
+      this.viewCoordinate = frameConfig.getViewCoordinate();
+      this.builder = Ts.get().getSnapshot(viewCoordinate).getBuilder(editCoordinate);
+      this.refsetConcept  = refsetConcept;
+      this.conceptCount   = members.size();
 
-        if (this.conceptCount == 0) {
-            return;
-        }
+      if (this.conceptCount == 0) {
+         return;
+      }
 
-        memberRefsetHelper =
-            Terms.get()
-                .getSpecRefsetHelper(frameConfig)
-                .getMemberHelper(refsetConcept.getConceptNid(),
-                    ReferenceConcepts.NORMAL_MEMBER.getNid());
-        memberRefsetHelper.setAutocommitActive(false);
+      memberRefsetHelper =
+         Terms.get().getSpecRefsetHelper(frameConfig).getMemberHelper(refsetConcept.getConceptNid(),
+                                         ReferenceConcepts.NORMAL_MEMBER.getNid());
+      memberRefsetHelper.setAutocommitActive(false);
 
-        if (memberRefsetHelper.getMarkedParentRefsetForRefset(refsetConcept,
-            frameConfig).isEmpty()) {
-            int n =
-                JOptionPane.showConfirmDialog(
-                    frameConfig.getTreeInSpecEditor(),
+      if (memberRefsetHelper.getMarkedParentRefsetForRefset(refsetConcept, frameConfig).isEmpty()) {
+         int n = JOptionPane.showConfirmDialog(frameConfig.getTreeInSpecEditor(),
                     "Would you like to create an associated marked parent refset?",
-                    "No associated marked parent refset",
-                    JOptionPane.YES_NO_OPTION);
+                    "No associated marked parent refset", JOptionPane.YES_NO_OPTION);
 
-            switch (n) {
-            case JOptionPane.YES_OPTION:
-                RefsetSpecEditor.addRefsetMetadata(true, refsetConcept, null);
+         switch (n) {
+         case JOptionPane.YES_OPTION:
+            RefsetSpecEditor.addRefsetMetadata(true, refsetConcept, null);
 
-                break;
+            break;
 
-            case JOptionPane.NO_OPTION:
-                conceptCount = 0;
+         case JOptionPane.NO_OPTION:
+            conceptCount = 0;
 
-                return;
-            }
-        }
-
-        this.activity =
-            Terms.get().newActivityPanel(true, frameConfig,
-                "Computing marked parents for: " + refsetConcept.toString(),
-                true);
-        activities.add(activity);
-        activity.setIndeterminate(true);
-        activity.setProgressInfoUpper("Computing marked parents for: "
-            + refsetConcept.toString());
-        activity.setProgressInfoLower("Setting up the computer...");
-        stopListener = new StopActionListener();
-        activity.addStopActionListener(stopListener);
-        ActivityViewer.addActivity(activity);
-        allRefsetMembers = members;
-        currentRefsetMemberComponentNids =
-            filterNonCurrentRefsetMembers((Collection<RefsetMember<?, ?>>) allRefsetMembers);
-        markedParentRefsetConcept =
-            (Concept) memberRefsetHelper.getMarkedParentRefsetForRefset(
-                refsetConcept, frameConfig)
-                .iterator()
-                .next();
-        activity.setProgressInfoLower("Setting up is-a cache...");
-
-        activity.setProgressInfoLower("Starting computation...");
-        activity.setValue(0);
-        activity.setMaximum(conceptCount);
-        activity.setIndeterminate(false);
-        specHelper = new RefsetSpec(refsetConcept, true, frameConfig);
-    }
-
-    // ~--- methods
-    // -------------------------------------------------------------
-
-    public void addUncommitted() throws Exception {
-        if (this.conceptCount == 0) {
             return;
-        }
+         }
+      }
 
-        int parentMemberTypeNid =
-            Terms.get()
-                .getConcept(RefsetAuxiliary.Concept.MARKED_PARENT.getUids())
-                .getConceptNid();
+      this.activity = Terms.get().newActivityPanel(true, frameConfig,
+              "Computing marked parents for: " + refsetConcept.toString(), true);
+      activities.add(activity);
+      activity.setIndeterminate(true);
+      activity.setProgressInfoUpper("Computing marked parents for: " + refsetConcept.toString());
+      activity.setProgressInfoLower("Setting up the computer...");
+      stopListener = new StopActionListener();
+      activity.addStopActionListener(stopListener);
+      ActivityViewer.addActivity(activity);
+      allRefsetMembers                 = members;
+      currentRefsetMemberComponentNids = filterNonCurrentRefsetMembers((Collection<RefsetMember<?,
+              ?>>) allRefsetMembers);
+      markedParentRefsetConcept = (Concept) memberRefsetHelper.getMarkedParentRefsetForRefset(refsetConcept,
+              frameConfig).iterator().next();
+      activity.setProgressInfoLower("Setting up is-a cache...");
 
-        if (!canceled) {
-            long endTime = System.currentTimeMillis();
-            long elapsed = endTime - startTime;
-            String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
+      activity.setProgressInfoLower("Starting computation...");
+      activity.setValue(0);
+      activity.setMaximum(conceptCount);
+      activity.setIndeterminate(false);
+      specHelper = new RefsetSpec(refsetConcept, true, frameConfig);
+   }
 
-            activity.setIndeterminate(true);
-            activity.setProgressInfoLower("Adding marked parents. Elapsed: "
-                + elapsedStr + ";  Members: " + members.get());
+   //~--- methods -------------------------------------------------------------
 
-            I_RepresentIdSet allParents = Bdb.getConceptDb().getEmptyIdSet();
-            NidBitSetItrBI memberItr =
-                currentRefsetMemberComponentNids.iterator();
+   public void addUncommitted() throws Exception {
+      if (this.conceptCount == 0) {
+         return;
+      }
 
-            while (memberItr.next()) {
-                KindOfComputer.getIsaCacheMap()
-                    .get(viewCoordinate.getIsaCoordinates().iterator().next())
-                    .addParents(memberItr.nid(), allParents);
+      int parentMemberTypeNid =
+         Terms.get().getConcept(RefsetAuxiliary.Concept.MARKED_PARENT.getUids()).getConceptNid();
+
+      if (!canceled) {
+         long   endTime    = System.currentTimeMillis();
+         long   elapsed    = endTime - startTime;
+         String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
+
+         activity.setIndeterminate(true);
+         activity.setProgressInfoLower("Adding marked parents. Elapsed: " + elapsedStr + ";  Members: "
+                                       + members.get());
+
+         I_RepresentIdSet allParents = Bdb.getConceptDb().getEmptyIdSet();
+         NidBitSetItrBI   memberItr  = currentRefsetMemberComponentNids.iterator();
+
+         while (memberItr.next()) {
+            KindOfComputer.getIsaCacheMap().get(viewCoordinate.getIsaCoordinates().iterator().next()).addParents(memberItr.nid(), allParents);
+         }
+
+         for (RefexVersionBI<?> mpv : markedParentRefsetConcept.getCurrentRefsetMembers(viewCoordinate)) {
+            RefexCnidVersionBI<?> cnidMpv = (RefexCnidVersionBI) mpv;
+            if (!allParents.isMember(cnidMpv.getCnid1())) {
+                RefexCAB rcBp = cnidMpv.makeBlueprint(viewCoordinate);
+                rcBp.setStatusUuid(SnomedMetadataRfx.getSTATUS_RETIRED().getUuids()[0]);
+                builder.constructIfNotCurrent(rcBp);
+            } else {
+                // remove existing marked parent... Already set. 
+                allParents.setNotMember(cnidMpv.getCnid1());
             }
+         }
 
-            for (RefexVersionBI<?> mpv : markedParentRefsetConcept.getCurrentRefsetMembers(viewCoordinate)) {
-                RefexCnidVersionBI<?> cnidMpv = (RefexCnidVersionBI) mpv;
-                if (!allParents.isMember(cnidMpv.getCnid1())) {
-                    RefexCAB rcBp = cnidMpv.makeBlueprint(viewCoordinate);
-                    rcBp.setStatusUuid(SnomedMetadataRfx.getSTATUS_RETIRED()
-                        .getUuids()[0]);
-                    builder.constructIfNotCurrent(rcBp);
-                } else {
-                    // remove existing marked parent... Already set.
-                    allParents.setNotMember(cnidMpv.getCnid1());
-                }
-            }
+         NidBitSetItrBI newParentItr = allParents.iterator();
 
-            NidBitSetItrBI newParentItr = allParents.iterator();
-
-            while (newParentItr.next()) {
-                ChangeNotifier.touchRefexRC(newParentItr.nid());
-                memberRefsetHelper.newRefsetExtension(
-                    markedParentRefsetConcept.getNid(), newParentItr.nid(),
+         while (newParentItr.next()) {
+            ChangeNotifier.touchRefexRC(newParentItr.nid());
+            memberRefsetHelper.newRefsetExtension(markedParentRefsetConcept.getNid(), newParentItr.nid(),
                     parentMemberTypeNid);
+         }
+      }
+
+      if (!canceled) {
+         BdbCommitManager.addUncommittedNoChecks(markedParentRefsetConcept);
+      }
+
+      long   elapsed    = System.currentTimeMillis() - startTime;
+      String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
+
+      if (!canceled) {
+         activity.setProgressInfoLower("Complete. Time: " + elapsedStr);
+      } else {
+         activity.setProgressInfoLower("Cancelled.");
+
+         for (I_ShowActivity a : activities) {
+            if (!a.isComplete()) {
+               a.cancel();
+               a.setProgressInfoLower("Cancelled.");
             }
-        }
+         }
+      }
 
-        if (!canceled) {
-            BdbCommitManager.addUncommittedNoChecks(markedParentRefsetConcept);
-        }
+      activity.complete();
+      activity.removeStopActionListener(this.stopListener);
+   }
 
-        long elapsed = System.currentTimeMillis() - startTime;
-        String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
+   private I_RepresentIdSet filterNonCurrentRefsetMembers(Collection<RefsetMember<?, ?>> allRefsetMembers)
+           throws Exception {
+      I_RepresentIdSet newList = Terms.get().getEmptyIdSet();
 
-        if (!canceled) {
-            activity.setProgressInfoLower("Complete. Time: " + elapsedStr);
-        } else {
-            activity.setProgressInfoLower("Cancelled.");
+      for (RefsetMember<?, ?> e : allRefsetMembers) {
+         if (e.getVersions(viewCoordinate).size() > 0) {
+            newList.setMember(e.getComponentNid());
+         }
+      }
+
+      return newList;
+   }
+
+   //~--- inner classes -------------------------------------------------------
+
+   public class StopActionListener implements ActionListener {
+      public StopActionListener() {}
+
+      //~--- methods ----------------------------------------------------------
+
+      @Override
+      public void actionPerformed(ActionEvent e) {
+         if (!canceled) {
+            canceled = true;
 
             for (I_ShowActivity a : activities) {
-                if (!a.isComplete()) {
-                    a.cancel();
-                    a.setProgressInfoLower("Cancelled.");
-                }
+               a.cancel();
+               a.setProgressInfoLower("Cancelled.");
             }
-        }
 
-        activity.complete();
-        activity.removeStopActionListener(this.stopListener);
-    }
-
-    private I_RepresentIdSet filterNonCurrentRefsetMembers(
-            Collection<RefsetMember<?, ?>> allRefsetMembers) throws Exception {
-        I_RepresentIdSet newList = Terms.get().getEmptyIdSet();
-
-        for (RefsetMember<?, ?> e : allRefsetMembers) {
-            if (e.getVersions(viewCoordinate).size() > 0) {
-                newList.setMember(e.getComponentNid());
-            }
-        }
-
-        return newList;
-    }
-
-    // ~--- inner classes
-    // -------------------------------------------------------
-
-    public class StopActionListener implements ActionListener {
-        public StopActionListener() {
-        }
-
-        // ~--- methods
-        // ----------------------------------------------------------
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (!canceled) {
-                canceled = true;
-
-                for (I_ShowActivity a : activities) {
-                    a.cancel();
-                    a.setProgressInfoLower("Cancelled.");
-                }
-
-                activity.removeStopActionListener(this);
-            }
-        }
-    }
+            activity.removeStopActionListener(this);
+         }
+      }
+   }
 }
