@@ -46,6 +46,7 @@
 		</dependency>
 	</dependencies>
 	<build>
+		<sourceDirectory>${project.build.directory}/generated-sources/axis2/wsdl2code/src</sourceDirectory>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.axis2</groupId>
@@ -53,7 +54,6 @@
 				<version>1.5.2</version>
 				<executions>
 					<execution>
-						<phase>compile</phase>
 						<goals>
 							<goal>wsdl2code</goal>
 						</goals>
@@ -66,7 +66,6 @@
 							<generateServerSideInterface>true</generateServerSideInterface>
 							<generateAllClasses>true</generateAllClasses>
 							<syncMode>sync</syncMode>
-							<outputDirectory>${project.build.directory}</outputDirectory>
 							<overWrite>true</overWrite>
 							<packageName>org.ihtsdo.idgen.ws</packageName>
 							<namespaceURIs>
@@ -129,7 +128,6 @@
 						<goals>
 							<goal>single</goal>
 						</goals>
-						<phase>compile</phase>
 					</execution>
 				</executions>
 			</plugin>
