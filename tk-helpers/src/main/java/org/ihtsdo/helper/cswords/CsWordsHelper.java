@@ -35,107 +35,88 @@ import org.ihtsdo.tk.api.refex.type_cnid_str.RefexCnidStrVersionBI;
 import org.ihtsdo.tk.binding.snomed.CaseSensitive;
 
 /**
- * 
+ *
  * @author AKF
  */
 public class CsWordsHelper {
 
-	private static Map<Integer, Set<String>> csWordSetMap = null;
-	private static Lock initLock = new ReentrantLock();
+    private static Map<Integer, Set<String>> csWordSetMap = null;
+    private static Lock initLock = new ReentrantLock();
 
-	public static void lazyInit() throws IOException {
-		if (csWordSetMap == null) {
-			initLock.lock();
-			try {
-				if (csWordSetMap == null) {
-					ViewCoordinate vc = Ts.get().getMetadataVC();
-					TerminologySnapshotDI ts = Ts.get().getSnapshot(vc);
-					HashMap csWordSetMap = new HashMap<Integer, Set<String>>();
-					ConceptVersionBI csWordsRefsetC = CaseSensitive.CS_WORDS_REFSET
-							.get(vc);
-					Collection<? extends RefexChronicleBI<?>> csWords = csWordsRefsetC
-							.getRefexes();
+    public static void lazyInit()
+            throws IOException {
+        if (csWordSetMap == null) {
+            initLock.lock();
+            try {
+                if (csWordSetMap == null) {
+                    ViewCoordinate vc = Ts.get().getMetadataVC();
+                    TerminologySnapshotDI ts = Ts.get().getSnapshot(vc);
+                    HashMap csWordSetMap = new HashMap<Integer, Set<String>>();
+                    ConceptVersionBI csWordsRefsetC =
+                            CaseSensitive.CS_WORDS_REFSET.get(vc);
+                    Collection<? extends RefexChronicleBI<?>> csWords =
+                            csWordsRefsetC.getRefexes();
 
-					Set<String> csWordSet = new HashSet<String>();
+                    Set<String> csWordSet = new HashSet<String>();
 
-					int icSigNid = CaseSensitive.IC_SIGNIFICANT.getLenient()
-							.getNid();
-					int maybeSigNid = CaseSensitive.MAYBE_IC_SIGNIFICANT
-							.getLenient().getNid();
-					Set<String> maybeCsWordSet = new HashSet<String>();
-					for (RefexChronicleBI<?> refex : csWords) {
-						// if (refex.getVersion(vc) instanceof RefexVersionBI) {
+                    int icSigNid = CaseSensitive.IC_SIGNIFICANT.getLenient().getNid();
+                    int maybeSigNid = CaseSensitive.MAYBE_IC_SIGNIFICANT.getLenient().getNid();
+                    Set<String> maybeCsWordSet = new HashSet<String>();
+                    for (RefexChronicleBI<?> refex : csWords) {
 
-						boolean IsExtendRefPartCidString = refex.getVersion(vc) instanceof I_ExtendByRefPartCidString;
+                        boolean IsExtendRefPartCidString = refex.getVersion(vc) instanceof I_ExtendByRefPartCidString;
 
-						if (refex.getVersion(vc) instanceof I_ExtendByRefPartCidString) {
-							I_ExtendByRefPartCidString member = (I_ExtendByRefPartCidString) refex
-									.getVersion(vc);
-							if (member != null) {
-								int typeNid = member.getC1id();
-								if (typeNid == icSigNid) {
-									csWordSet.add(member.getStringValue());
-								} else {
-									maybeCsWordSet.add(member.getStringValue());
-								}
-							}
-						} else {
-							// try {
-							if (refex.getVersion(vc) instanceof RefexCnidStrVersionBI) {
-								RefexCnidStrVersionBI member = (RefexCnidStrVersionBI) refex
-										.getVersion(vc);
-								if (member != null) {
-									int typeNid = member.getCnid1();
-									if (typeNid == icSigNid) {
-										csWordSet.add(member.getStr1());
-									} else {
-										maybeCsWordSet.add(member.getStr1());
-									}
-								}
-							}
-							// } catch (ClassCastException cce) {
-							// cce.printStackTrace();
-							// }
-						}
+                        if (refex.getVersion(vc) instanceof I_ExtendByRefPartCidString) {
+                            I_ExtendByRefPartCidString member = (I_ExtendByRefPartCidString) refex
+                                    .getVersion(vc);
+                            if (member != null) {
+                                int typeNid = member.getC1id();
+                                if (typeNid == icSigNid) {
+                                    csWordSet.add(member.getStringValue());
+                                } else {
+                                    maybeCsWordSet.add(member.getStringValue());
+                                }
+                            }
+                        } else {
+                            // try {
+                            if (refex.getVersion(vc) instanceof RefexCnidStrVersionBI) {
+                                RefexCnidStrVersionBI member = 
+                                        (RefexCnidStrVersionBI) refex.getVersion(vc);
+                                if (member != null) {
+                                    int typeNid = member.getCnid1();
+                                    if (typeNid == icSigNid) {
+                                        csWordSet.add(member.getStr1());
+                                    } else {
+                                        maybeCsWordSet.add(member.getStr1());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    csWordSetMap.put(icSigNid, csWordSet);
+                    csWordSetMap.put(maybeSigNid, maybeCsWordSet);
+                    CsWordsHelper.csWordSetMap = csWordSetMap;
+                }
+            } catch (ContradictionException ex) {
+                throw new IOException(ex);
+            } finally {
+                initLock.unlock();
+            }
+        }
+    }
 
-						// else {
-						// CidStrMember member = (CidStrMember) refex
-						// .getVersion(vc);
-						// if (member != null) {
-						// int typeNid = member.getCnid1();
-						// if (typeNid == icSigNid) {
-						// csWordSet.add(member.getStr1());
-						// } else {
-						// maybeCsWordSet.add(member.getStr1());
-						// }
-						// }
-						// }
-
-					}
-					csWordSetMap.put(icSigNid, csWordSet);
-					csWordSetMap.put(maybeSigNid, maybeCsWordSet);
-					CsWordsHelper.csWordSetMap = csWordSetMap;
-				}
-			} catch (ContradictionException ex) {
-				throw new IOException(ex);
-			} finally {
-				initLock.unlock();
-			}
-		}
-	}
-
-	public static boolean isIcTypeSignificant(String text, int icsTypeNid)
-			throws IOException {
-		lazyInit();
-		String[] tokens = text.split(" ");
-		Set<String> csWords = csWordSetMap.get(icsTypeNid);
-		if (csWords != null) {
-			for (String token : tokens) {
-				if (csWords.contains(token)) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
+    public static boolean isIcTypeSignificant(String text, int icsTypeNid)
+            throws IOException {
+        lazyInit();
+        String[] tokens = text.split(" ");
+        Set<String> csWords = csWordSetMap.get(icsTypeNid);
+        if (csWords != null) {
+            for (String token : tokens) {
+                if (csWords.contains(token)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }
