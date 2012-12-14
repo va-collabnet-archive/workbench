@@ -84,7 +84,6 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
       changeSetWriters.incrementAndGet();
       this.changeSetPolicy = changeSetPolicy;
       writerListForHandler = new ArrayList<ChangeSetGeneratorBI>(writerMap.values());
-            writerMap.values());
    }
 
    @Override
