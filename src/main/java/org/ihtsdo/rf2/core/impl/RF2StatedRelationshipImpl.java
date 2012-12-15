@@ -148,6 +148,7 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 						moduleId = getConceptMetaModuleID(sourceConcept,releaseDate);
 				     } else if (relationshipStatusId == inactiveNid) {               
 					      active = "0";
+					      moduleId=I_Constants.CORE_MODULE_ID;
 //					      Long lastActiveDate=getLatestActivePart(rel.getFixedPart().getMutableParts());
 //						      
 //					      if (lastActiveDate!=null){
