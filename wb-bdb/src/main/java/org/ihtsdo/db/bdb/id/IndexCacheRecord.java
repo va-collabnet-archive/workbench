@@ -83,7 +83,7 @@ public class IndexCacheRecord {
     //~--- methods -------------------------------------------------------------
 
     public void addDestinationOriginNid(int originNid) {
-        if (destinationRelOriginAlreadyThere(originNid)) {
+        if (!destinationRelOriginAlreadyThere(originNid)) {
             int arrayLength = data[REFEX_OFFSET_INDEX] - data[DESTINATION_OFFSET_INDEX];
             int[] destinationOriginNids = new int[arrayLength + 1];
 
