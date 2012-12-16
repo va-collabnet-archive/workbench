@@ -21,7 +21,6 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.*;
 import org.apache.commons.collections.primitives.ArrayIntList;
-import org.dwfa.ace.api.Terms;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.RevisionSet;
 import org.ihtsdo.concept.component.refset.RefsetMember;
@@ -50,7 +49,7 @@ public class ArrayOfBytearrayMember extends RefsetMember<ArrayOfBytearrayRevisio
         implements RefexArrayOfBytearrayAnalogBI<ArrayOfBytearrayRevision> {
 
     private static VersionComputer<RefsetMember<ArrayOfBytearrayRevision, ArrayOfBytearrayMember>.Version> computer =
-            new VersionComputer<RefsetMember<ArrayOfBytearrayRevision, ArrayOfBytearrayMember>.Version>();
+            new VersionComputer<>();
     //~--- fields --------------------------------------------------------------
     private byte[][] arrayOfByteArray;
 
@@ -257,7 +256,7 @@ public class ArrayOfBytearrayMember extends RefsetMember<ArrayOfBytearrayRevisio
                 count = count + revisions.size();
             }
 
-            ArrayList<ArrayOfBytearrayMember.Version> list = new ArrayList<ArrayOfBytearrayMember.Version>(count);
+            ArrayList<ArrayOfBytearrayMember.Version> list = new ArrayList<>(count);
 
             if (getTime() != Long.MIN_VALUE) {
                 list.add(new ArrayOfBytearrayMember.Version(this));
