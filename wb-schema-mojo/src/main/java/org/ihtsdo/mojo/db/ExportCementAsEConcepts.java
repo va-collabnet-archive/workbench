@@ -192,11 +192,11 @@ public class ExportCementAsEConcepts extends AbstractMojo {
     					member.uuid1 = ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getPrimoridalUid();
     					member.setRefsetUuid(eC.primordialUuid);
     					member.statusUuid = eC.conceptAttributes.statusUuid;
-    					member.authorUuid = eC.conceptAttributes.authorUuid;
-    					member.pathUuid = eC.conceptAttributes.pathUuid;
     					member.time = eC.conceptAttributes.time;
-    					member.moduleUuid = eC.conceptAttributes.moduleUuid;
-                                        List<TkRefexAbstractMember<?>> memberList = new ArrayList<TkRefexAbstractMember<?>>();
+    					member.authorUuid = eC.conceptAttributes.authorUuid;
+                        member.moduleUuid = eC.conceptAttributes.moduleUuid;
+    					member.pathUuid = eC.conceptAttributes.pathUuid;
+                        List<TkRefexAbstractMember<?>> memberList = new ArrayList<TkRefexAbstractMember<?>>();
 
     					memberList.add(member);
     					eC.setRefsetMembers(memberList);
@@ -264,10 +264,10 @@ public class ExportCementAsEConcepts extends AbstractMojo {
 				media.dataBytes = image;
 				media.typeUuid = typeUuid;
 				media.statusUuid = eC.conceptAttributes.statusUuid;
-				media.authorUuid = eC.conceptAttributes.authorUuid;
-				media.pathUuid = eC.conceptAttributes.pathUuid;
 				media.time = eC.conceptAttributes.time;
-                                media.moduleUuid = eC.conceptAttributes.moduleUuid;
+				media.authorUuid = eC.conceptAttributes.authorUuid;
+                media.moduleUuid = eC.conceptAttributes.moduleUuid;
+				media.pathUuid = eC.conceptAttributes.pathUuid;
 				List<TkMedia> images = new ArrayList<TkMedia>();
 				images.add(media);
 				eC.setImages(images);
