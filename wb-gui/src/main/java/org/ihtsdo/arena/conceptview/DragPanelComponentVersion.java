@@ -41,6 +41,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.SwingWorker;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 
 public abstract class DragPanelComponentVersion<T extends ComponentVersionBI> extends DragPanel<T>
         implements I_ToggleSubPanels {
@@ -72,6 +73,7 @@ public abstract class DragPanelComponentVersion<T extends ComponentVersionBI> ex
    private boolean       collapsed     = true;
    private JButton       collapseExpandButton;
    private CollapsePanel parentCollapsePanel;
+   private I_ConfigAceFrame config;
 
    //~--- constant enums ------------------------------------------------------
 
@@ -83,6 +85,7 @@ public abstract class DragPanelComponentVersion<T extends ComponentVersionBI> ex
                                     T component) {
       super(viewLayout, component);
       this.parentCollapsePanel = parentCollapsePanel;
+      this.config = viewLayout.getSettings().getConfig();
       setupCollapseExpandButton();
    }
 
@@ -90,6 +93,7 @@ public abstract class DragPanelComponentVersion<T extends ComponentVersionBI> ex
                                     CollapsePanel parentCollapsePanel, T component) {
       super(layout, viewLayout, component);
       this.parentCollapsePanel = parentCollapsePanel;
+      this.config = viewLayout.getSettings().getConfig();
       setupCollapseExpandButton();
    }
 
@@ -149,6 +153,10 @@ public abstract class DragPanelComponentVersion<T extends ComponentVersionBI> ex
             dpe.setBorder(BorderFactory.createEtchedBorder());
             dpe.setVisible(parentCollapsePanel.isShown(SubPanelTypes.REFEX)
                            && parentCollapsePanel.areExtrasShown());
+            if(dpe.getDraggedThing().isUncommitted() &&
+                    dpe.getDraggedThing().isActive(config.getViewCoordinate())){
+                dpe.setVisible(true);
+            }
             add(dpe, gbc);
             refexSubPanels.add(dpe);
             gbc.gridy++;
@@ -162,6 +170,10 @@ public abstract class DragPanelComponentVersion<T extends ComponentVersionBI> ex
             dpe.setBorder(BorderFactory.createEtchedBorder());
             dpe.setVisible(parentCollapsePanel.isShown(SubPanelTypes.REFEX)
                            && parentCollapsePanel.areExtrasShown());
+            if(dpe.getDraggedThing().isUncommitted() &&
+                    dpe.getDraggedThing().isActive(config.getViewCoordinate())){
+                dpe.setVisible(true);
+            }
             add(dpe, gbc);
             historicalRefexSubPanels.add(dpe);
             gbc.gridy++;

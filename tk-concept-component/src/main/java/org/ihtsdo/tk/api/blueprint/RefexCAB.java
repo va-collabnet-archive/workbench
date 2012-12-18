@@ -36,6 +36,8 @@ import org.ihtsdo.tk.api.refex.type_array_of_bytearray.RefexArrayOfBytearrayAnal
 import org.ihtsdo.tk.api.refex.type_array_of_bytearray.RefexArrayOfBytearrayVersionBI;
 import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanAnalogBI;
 import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanVersionBI;
+import org.ihtsdo.tk.api.refex.type_float.RefexFloatAnalogBI;
+import org.ihtsdo.tk.api.refex.type_float.RefexFloatVersionBI;
 import org.ihtsdo.tk.api.refex.type_int.RefexIntAnalogBI;
 import org.ihtsdo.tk.api.refex.type_int.RefexIntVersionBI;
 import org.ihtsdo.tk.api.refex.type_long.RefexLongAnalogBI;
@@ -736,6 +738,10 @@ public class RefexCAB extends CreateOrAmendBlueprint {
                     RefexStringAnalogBI<?> strPart = (RefexStringAnalogBI<?>) refexAnalog;
                     strPart.setString1((String) entry.getValue());
                     break;
+                case FLOAT1:
+                    RefexFloatAnalogBI<?> floatPart = (RefexFloatAnalogBI<?>) refexAnalog;
+                    floatPart.setFloat1((Float.parseFloat(entry.getValue().toString())));
+                    break;
 
                 default:
                     throw new RuntimeException("Can't handle: " + entry.getKey());
@@ -817,6 +823,10 @@ public class RefexCAB extends CreateOrAmendBlueprint {
                 case ARRAY_BYTEARRAY:
                     RefexArrayOfBytearrayAnalogBI<?> arrayPart = (RefexArrayOfBytearrayAnalogBI<?>) refexAnalog;
                     arrayPart.setArrayOfByteArray((byte[][]) entry.getValue());
+                    break;
+                case FLOAT1:
+                    RefexFloatAnalogBI<?> floatPart = (RefexFloatAnalogBI<?>) refexAnalog;
+                    floatPart.setFloat1((Float.parseFloat(entry.getValue().toString())));
                     break;
                 default:
                     throw new RuntimeException("Can't handle: " + entry.getKey());
@@ -977,6 +987,15 @@ public class RefexCAB extends CreateOrAmendBlueprint {
                     }
                     RefexArrayOfBytearrayVersionBI<?> arrayPart = (RefexArrayOfBytearrayVersionBI<?>) refexVersion;
                     if (!entry.getValue().equals(arrayPart.getArrayOfByteArray())) {
+                        return false;
+                    }
+                    break;
+                case FLOAT1:
+                    if(!RefexFloatVersionBI.class.isAssignableFrom(refexVersion.getClass())){
+                        return false;
+                    }
+                    RefexFloatVersionBI<?> floatPart = (RefexFloatVersionBI<?>) refexVersion;
+                    if (!entry.getValue().equals(floatPart.getFloat1())) {
                         return false;
                     }
                     break;
