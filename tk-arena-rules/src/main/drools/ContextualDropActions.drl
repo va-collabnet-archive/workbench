@@ -49,6 +49,7 @@ import org.ihtsdo.arena.context.action.SetDefinedAction;
 import org.ihtsdo.arena.context.action.SetICSignificantAction;
 import org.ihtsdo.arena.context.action.RetireAsInappropriateAction;
 import org.ihtsdo.arena.context.action.CancelAction;
+import org.ihtsdo.arena.context.action.AddToNidFloatRefexAction;
 //import org.ihtsdo.arena.context.action.ChangeRefexAction;
 
 import org.ihtsdo.tk.drools.facts.ComponentFact;
@@ -70,7 +71,7 @@ import org.ihtsdo.helper.dialect.DialectHelper;
 
 import org.ihtsdo.tk.example.binding.Language;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
-import org.ihtsdo.tk.example.binding.Snomed;
+import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.example.binding.SnomedConstraints;
 import org.ihtsdo.tk.example.binding.SnomedRelType;
 import org.ihtsdo.tk.example.binding.SnomedRelSpec;
@@ -1020,3 +1021,20 @@ rule "rule 58" #retire inappropriate synonym
 	then
 		actions.add(new RetireAsInappropriateAction("retire as inappropriate", $dropTarget, cvSettings, config));
 end
+
+rule "rule 59" #quantity
+	when
+                ViewFact(getView() == View.STATED)
+		$dropTarget: RelFact(context == Context.DROP_TARGET)
+		$dropObject: RelFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
+	then
+		actions.add(new AddToNidFloatRefexAction("add quantity", $dropTarget, Snomed.QUANTITY, config));
+end
+
+"rule 60" #concentration
+	when
+                ViewFact(getView() == View.STATED)
+		$dropTarget: RelFact(context == Context.DROP_TARGET)
+		$dropObject: RelFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
+	then
+		actions.add(new AddToNidFloatRefexAction("add concentration", $dropTarget, Snomed.CONCENTRATION, config));

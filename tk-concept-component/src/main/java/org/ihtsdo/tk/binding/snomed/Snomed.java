@@ -253,4 +253,10 @@ public class Snomed {
     public static ConceptSpec USING_SUBSTANCE =
 		new ConceptSpec("Using substance (attribute)",
 		UUID.fromString("996261c3-3c12-3f09-8f14-e30e85e9e70d"));
+    public static ConceptSpec QUANTITY =
+		new ConceptSpec("Quantity reference set (foundation metadata concept)",
+		UUID.fromString("1bdc1153-e4e0-4058-be87-14ad46edb1f8"));
+    public static ConceptSpec CONCENTRATION =
+		new ConceptSpec("Quantity reference set (foundation metadata concept)",
+		UUID.fromString("1bdc1153-e4e0-4058-be87-14ad46edb1f8"));
 }
