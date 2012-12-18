@@ -182,78 +182,72 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 			 br.close();
 			 String[] splitedLine = executionLine.split("\\t", -1);
 
-			 SimpleDateFormat sdf = new
-			 SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
-			 SimpleDateFormat sdf1 = new
-			 SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss z");
-			 String startTime = "";
-			 try {
-			 startTime =
-			 sdf1.format(sdf.parse(splitedLine[EXECUTION_START_TIME]));
-			 } catch (Exception e) {
-			 e.printStackTrace();
-			 startTime = "{Invalid date format in execution file}";
-			 }
-			 String endTime = "";
-			 try {
-			 endTime =
-			 sdf1.format(sdf.parse(splitedLine[EXECUTION_END_TIME]));
-			 } catch (Exception e) {
-			 e.printStackTrace();
-			 endTime = "{Invalid date format in execution file}";
-			 }
-			 sink.bold();
-			 sink.text("Start time: ");
-			 sink.bold_();
-			 sink.text(startTime);
-			 sink.lineBreak();
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+			SimpleDateFormat sdf1 = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss z");
+			String startTime = "";
+			try {
+				startTime = sdf1.format(sdf.parse(splitedLine[EXECUTION_START_TIME]));
+			} catch (Exception e) {
+				e.printStackTrace();
+				startTime = "{Invalid date format in execution file}";
+			}
+			String endTime = "";
+			try {
+				endTime = sdf1.format(sdf.parse(splitedLine[EXECUTION_END_TIME]));
+			} catch (Exception e) {
+				e.printStackTrace();
+				endTime = "{Invalid date format in execution file}";
+			}
+			sink.bold();
+			sink.text("Start time: ");
+			sink.bold_();
+			sink.text(startTime);
+			sink.lineBreak();
 			
-			 sink.bold();
-			 sink.text("End time: ");
-			 sink.bold_();
-			 sink.text(endTime);
-			 sink.lineBreak();
-			
-			 sink.bold();
-			 sink.text("Database Name: ");
-			 sink.bold_();
-			
-			 sink.text(splitedLine[EXECUTION_NAME]);
-			 sink.lineBreak();
 
-			 sink.bold();
-			 sink.text("Database UUID: ");
-			 sink.bold_();
-			
-			 sink.text(splitedLine[EXECUTION_DATABASE_UUID]);
-			 sink.lineBreak();
-			
-			 sink.bold();
-			 sink.text("Path tested: ");
-			 sink.bold_();
-			 sink.text(splitedLine[EXECUTION_PATH_NAME] + " - " +
-			 splitedLine[EXECUTION_PATH_UUID]);
-			 sink.lineBreak();
-			 String vpt = "";
-			 try {
-			 Date viewPointTime =
-			 sdf.parse(splitedLine[EXECUTION_VIEW_POINT]);
-			 Date oneYearAfter = new Date((new Date().getTime()) +
-			 30000000000l);
-			 if (viewPointTime.getTime() > oneYearAfter.getTime()) {
-			 vpt = "latest";
-			 } else {
-			 vpt = sdf1.format(viewPointTime);
-			 }
-			 } catch (Exception e) {
-			 e.printStackTrace();
-			 vpt = "{Invalid date format in execution file}";
-			 }
-			 sink.bold();
-			 sink.text("View point time: ");
-			 sink.bold_();
-			 sink.text(vpt);
-			 sink.section1_();
+			sink.bold();
+			sink.text("End time: ");
+			sink.bold_();
+			sink.text(endTime);
+			sink.lineBreak();
+
+			sink.bold();
+			sink.text("Database Name: ");
+			sink.bold_();
+
+			sink.text(splitedLine[EXECUTION_NAME]);
+			sink.lineBreak();
+
+			sink.bold();
+			sink.text("Database UUID: ");
+			sink.bold_();
+
+			sink.text(splitedLine[EXECUTION_DATABASE_UUID]);
+			sink.lineBreak();
+
+			sink.bold();
+			sink.text("Path tested: ");
+			sink.bold_();
+			sink.text(splitedLine[EXECUTION_PATH_NAME] + " - " + splitedLine[EXECUTION_PATH_UUID]);
+			sink.lineBreak();
+			String vpt = "";
+			try {
+				Date viewPointTime = sdf.parse(splitedLine[EXECUTION_VIEW_POINT]);
+				Date oneYearAfter = new Date((new Date().getTime()) + 30000000000l);
+				if (viewPointTime.getTime() > oneYearAfter.getTime()) {
+					vpt = "latest";
+				} else {
+					vpt = sdf1.format(viewPointTime);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				vpt = "{Invalid date format in execution file}";
+			}
+			sink.bold();
+			sink.text("View point time: ");
+			sink.bold_();
+			sink.text(vpt);
+			sink.section1_();
 
 			File rules = new File(rulesOutputStr);
 			FileInputStream ruleFis = new FileInputStream(rules);
@@ -272,16 +266,14 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 				sink.lineBreak();
 
 				sink.text("This is the list of rules of the QA system, including the number of violation in each one. The list can be sorted by clicking on the headers.");
-
+				
 				sink.lineBreak();
 				sink.lineBreak();
 
 				SinkEventAttributes tableAttr = new SinkEventAttributeSet();
 				tableAttr.addAttribute(SinkEventAttributes.ID, "results");
-				tableAttr
-						.addAttribute(
-								SinkEventAttributes.CLASS,
-								"bodyTable sortable-onload-3 no-arrow rowstyle-alt colstyle-alt paginate-20 max-pages-7 paginationcallback-callbackTest-calculateTotalRating paginationcallback-callbackTest-displayTextInfo sortcompletecallback-callbackTest-calculateTotalRating");
+				tableAttr.addAttribute(SinkEventAttributes.CLASS,
+						"bodyTable sortable-onload-3 no-arrow rowstyle-alt colstyle-alt paginate-20 max-pages-7 paginationcallback-callbackTest-calculateTotalRating paginationcallback-callbackTest-displayTextInfo sortcompletecallback-callbackTest-calculateTotalRating");
 
 				sink.table(tableAttr);
 				sink.tableRow();

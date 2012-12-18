@@ -67,7 +67,7 @@ public class CriterionPanel extends JPanel {
 				editorPanel.setLayout(new GridBagLayout());
 				((GridBagLayout) editorPanel.getLayout()).columnWidths = new int[] { 0, 0, 0, 0, 0 };
 				((GridBagLayout) editorPanel.getLayout()).rowHeights = new int[] { 25, 0, 0, 0, 0 };
-				((GridBagLayout) editorPanel.getLayout()).columnWeights = new double[] { 0.0, 1.0, 0.0, 1.0};
+				((GridBagLayout) editorPanel.getLayout()).columnWeights = new double[] { 0.0, 1.0, 0.0, 1.0, 1.0E-4 };
 				((GridBagLayout) editorPanel.getLayout()).rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 1.0E-4 };
 				GridBagConstraints gbc = new GridBagConstraints();
 				gbc.anchor = GridBagConstraints.CENTER;
@@ -107,10 +107,8 @@ public class CriterionPanel extends JPanel {
 					editorPanel.add(editorComponent, gbc);
 
 					gbc.gridx++;
-					if (count % 2 == 0) {
-						gbc.gridy++;
-						gbc.gridx = 0;
-					}
+					gbc.gridy++;
+					gbc.gridx = 0;
 					count++;
 				}
 				editorPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 10));
@@ -123,7 +121,7 @@ public class CriterionPanel extends JPanel {
 		}
 
 	}
-	
+
 	private String getName(String tagHeader) {
 		return tagHeader.replaceAll("\\<[^>]*>", "");
 	}
