@@ -94,7 +94,7 @@ public class CriterionPanel extends JPanel {
 					gbc.gridx++;
 					PropertyEditor editor = pd.createPropertyEditor(bean);
 					if (AbstractButton.class.isAssignableFrom(editor.getCustomEditor().getClass())) {
-						//gbc.weightx = 0.0;
+						// gbc.weightx = 0.0;
 					}
 
 					Method readMethod = pd.getReadMethod();
