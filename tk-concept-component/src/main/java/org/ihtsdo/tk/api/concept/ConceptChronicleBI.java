@@ -81,9 +81,9 @@ public interface ConceptChronicleBI extends ComponentChronicleBI<ConceptVersionB
    Collection<? extends RelationshipGroupVersionBI> getRelationshipGroups(ViewCoordinate viewCoordinate)
            throws IOException, ContradictionException;
 
-   Collection<? extends RelationshipChronicleBI> getRelationshipsTarget() throws IOException;
+   Collection<? extends RelationshipChronicleBI> getRelationshipsIncoming() throws IOException;
 
-   Collection<? extends RelationshipChronicleBI> getRelationshipsSource() throws IOException;
+   Collection<? extends RelationshipChronicleBI> getRelationshipsOutgoing() throws IOException;
 
    FoundContradictionVersions getVersionsInContradiction(ViewCoordinate viewCoordinate);
    

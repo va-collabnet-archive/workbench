@@ -112,7 +112,7 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
       }
 
       // relationships
-      for (RelationshipChronicleBI rel : concept.getRelationshipsSource()) {
+      for (RelationshipChronicleBI rel : concept.getRelationshipsOutgoing()) {
          addIfDup(rel);
       }
 

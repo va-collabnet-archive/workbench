@@ -119,7 +119,7 @@ public class TestForSpecifcDate extends AbstractConceptTest {
             	}
             }
             
-            for (RelationshipChronicleBI loopRel : concept.getRelationshipsSource()) {
+            for (RelationshipChronicleBI loopRel : concept.getRelationshipsOutgoing()) {
             	for (RelationshipVersionBI rv : loopRel.getVersions()) {
             		long time = rv.getTime();
             		if (time == timeToCheck) {

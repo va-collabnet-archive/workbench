@@ -34,7 +34,7 @@ public class RelationshipIndexRecordFactory {
    public static int[] make(ConceptChronicleBI concept) throws IOException {
       Map<RecordKey, IntArrayList> records = new TreeMap<>();
 
-      for (RelationshipChronicleBI relationship : concept.getRelationshipsSource()) {
+      for (RelationshipChronicleBI relationship : concept.getRelationshipsOutgoing()) {
          for (RelationshipVersionBI rv : relationship.getVersions()) {
             if (rv.isInferred() || rv.isStated()) {
                RecordKey    key  = new RecordKey(rv.getTypeNid(), rv.getTargetNid());

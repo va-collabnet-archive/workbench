@@ -183,7 +183,7 @@ public class ConceptSpec implements SpecBI {
             NidSetBI typeNids = new NidSet();
             typeNids.add(relType.getNid());
 
-            for (RelationshipChronicleBI rel : conceptChronicle.getRelationshipsSource()) {
+            for (RelationshipChronicleBI rel : conceptChronicle.getRelationshipsOutgoing()) {
                 for (RelationshipVersionBI rv : rel.getVersions()) {
                     if (rv.getTypeNid() == relType.getNid()
                             && rv.getTargetNid() == destination.getNid()) {

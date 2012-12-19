@@ -97,7 +97,7 @@ public class UuidDupFinder implements ProcessUnfetchedConceptDataBI {
         }
 
         // relationships
-        for (RelationshipChronicleBI rel : concept.getRelationshipsSource()) {
+        for (RelationshipChronicleBI rel : concept.getRelationshipsOutgoing()) {
             addToUuidList(rel);
         }
 

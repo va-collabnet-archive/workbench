@@ -38,11 +38,13 @@ import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 /**
- * Stores cross-reference information for origin relationships, destination relationship origins, and refex
- * referenced components in a integer array, minimizing the object allocation burden that would otherwise be
- * associated with this information. This class interprets and manages the contents of that array. <br>
- * <h2>Implementation notes</h2> See the class
- * <code>RelationshipIndexRecord</code> for documentation of the structure of the relationship index data.
+ * Stores cross-reference information for origin relationships, destination
+ * relationship origins, and refex referenced components in a integer array,
+ * minimizing the object allocation burden that would otherwise be associated
+ * with this information. This class interprets and manages the contents of that
+ * array. <br> <h2>Implementation notes</h2> See the class
+ * <code>RelationshipIndexRecord</code> for documentation of the structure of
+ * the relationship index data.
  *
  * @see RelationshipIndexRecord
  * @author kec
@@ -68,16 +70,21 @@ public class IndexCacheRecord {
         }
     }
 
-    //~--- methods -------------------------------------------------------------
-    public void addDestinationOriginNid(int originNid) {
+    public boolean destinationRelOriginAlreadyThere(int originNid) {
         int arrayLength = data[REFEX_OFFSET_INDEX] - data[DESTINATION_OFFSET_INDEX];
         int index = Arrays.binarySearch(data, data[DESTINATION_OFFSET_INDEX],
                 data[DESTINATION_OFFSET_INDEX] + arrayLength, originNid);
         
         if (index >= 0) {
-            return;    // origin already there...
+            return true;    // origin already there...
         }
+        return false;
+        }
+    //~--- methods -------------------------------------------------------------
         
+    public void addDestinationOriginNid(int originNid) {
+        if (!destinationRelOriginAlreadyThere(originNid)) {
+            int arrayLength = data[REFEX_OFFSET_INDEX] - data[DESTINATION_OFFSET_INDEX];
         int[] destinationOriginNids = new int[arrayLength + 1];
         
         destinationOriginNids[arrayLength] = originNid;
@@ -86,17 +93,23 @@ public class IndexCacheRecord {
         Arrays.sort(destinationOriginNids);
         updateData(getRelationshipOutgoingArray(), destinationOriginNids, getRefexIndexArray());
     }
+    }
     
-    public void addNidPairForRefex(int refexNid, int memberNid) {
+    public boolean refexAlreadyThere(int memberNid) {
         int arrayLength = data.length - data[REFEX_OFFSET_INDEX];
         int start = data.length - arrayLength;
         
         for (int i = start; i < data.length; i++) {
             if (data[i] == memberNid) {
-                return;    // already there...
+                return true;
             }
+            }
+        return false;
         }
         
+    public void addNidPairForRefex(int refexNid, int memberNid) {
+        if (!refexAlreadyThere(memberNid)) {
+            int arrayLength = data.length - data[REFEX_OFFSET_INDEX];
         int[] nidPairForRefexArray = new int[arrayLength + 2];
         
         nidPairForRefexArray[arrayLength] = refexNid;
@@ -104,6 +117,7 @@ public class IndexCacheRecord {
         System.arraycopy(data, data[REFEX_OFFSET_INDEX], nidPairForRefexArray, 0,
                 nidPairForRefexArray.length - 2);
         updateData(getRelationshipOutgoingArray(), getDestinationOriginNids(), nidPairForRefexArray);
+    }
     }
     
     public void forgetNidPairForRefex(int refexNid, int memberNid) {
@@ -167,7 +181,7 @@ public class IndexCacheRecord {
         for (int originCNid : originCNids) {
             ConceptChronicleBI c = Ts.get().getConcept(originCNid);
             
-            for (RelationshipChronicleBI r : c.getRelationshipsSource()) {
+            for (RelationshipChronicleBI r : c.getRelationshipsOutgoing()) {
                 if (r.getTargetNid() == cNid) {
                     returnValues.add(r.getNid());
                 }
@@ -196,7 +210,7 @@ public class IndexCacheRecord {
         for (int originCNid : originCNids) {
             ConceptChronicleBI c = Ts.get().getConcept(originCNid);
             
-            for (RelationshipChronicleBI r : c.getRelationshipsSource()) {
+            for (RelationshipChronicleBI r : c.getRelationshipsOutgoing()) {
                 if (r.getTargetNid() == cNid) {
                     for (RelationshipVersionBI rv : r.getVersions()) {
                         if (relTypes.contains(rv.getTypeNid())) {
@@ -260,7 +274,8 @@ public class IndexCacheRecord {
 
     /**
      *
-     * @return int[] of concept nids with relationships that point to this component
+     * @return int[] of concept nids with relationships that point to this
+     * component
      */
     public int[] getDestinationOriginNids() {
         int arrayLength = data[REFEX_OFFSET_INDEX] - data[DESTINATION_OFFSET_INDEX];
@@ -315,7 +330,8 @@ public class IndexCacheRecord {
 
     /**
      *
-     * @return a <code>RelationshipIndexRecord</code> backed by the data in this array.
+     * @return a <code>RelationshipIndexRecord</code> backed by the data in this
+     * array.
      */
     public RelationshipIndexRecord getRelationshipsRecord() {
         return new RelationshipIndexRecord(data, RELATIONSHIP_OFFSET, data[DESTINATION_OFFSET_INDEX]);

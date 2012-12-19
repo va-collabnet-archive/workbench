@@ -27,6 +27,7 @@ import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.cern.colt.map.OpenIntIntHashMap;
 import org.ihtsdo.concurrency.ConcurrentReentrantLocks;
+import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.helper.version.RelativePositionComputer;
 import org.ihtsdo.helper.version.RelativePositionComputerBI;
 import org.ihtsdo.tk.api.ContradictionException;
@@ -39,10 +40,11 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
  * <h2>Implementation Details</h2> The
  * <code>nid</code> is the
  * <code>(nid - Integer.MIN_VALUE)</code> index into an
- * <code>int[]</code> which stores the cNid. <br> <br>This single array approach is taken because Java stores
- * multidimensional arrays as arrays of arrays, rather than a contiguous block of arrays. Each array has an
- * overhead of 96 bits (above and beyond its data), which doubles the memory size, and also increases the
- * burden on the garbage collector.
+ * <code>int[]</code> which stores the cNid. <br> <br>This single array approach
+ * is taken because Java stores multidimensional arrays as arrays of arrays,
+ * rather than a contiguous block of arrays. Each array has an overhead of 96
+ * bits (above and beyond its data), which doubles the memory size, and also
+ * increases the burden on the garbage collector.
  *
  *
  * @author kec
@@ -75,18 +77,18 @@ public class NidCNidMapBdb extends ComponentBdb {
         if (mapIndex >= nidCNidMaps.get().length) {
             ensureCapacity(nid);
         }
+        IndexCacheRecord record = new IndexCacheRecord(indexCacheRecords.get()[mapIndex][nidIndexInMap]);
 
+        if (!record.refexAlreadyThere(pair.getMemberNid())) {
         locks.lock(nid);
-
         try {
-            IndexCacheRecord record = new IndexCacheRecord(indexCacheRecords.get()[mapIndex][nidIndexInMap]);
-
             record.addNidPairForRefex(pair.getRefexNid(), pair.getMemberNid());
             indexCacheRecords.get()[mapIndex][nidIndexInMap] = record.getData();
             mapChanged[mapIndex] = true;
         } finally {
             locks.unlock(nid);
         }
+    }
     }
 
     public void addRelOrigin(int destinationCNid, int originCNid) throws IOException {
@@ -96,7 +98,8 @@ public class NidCNidMapBdb extends ComponentBdb {
         assert (mapIndex >= 0) && (nidIndexInMap >= 0) :
                 "mapIndex: " + mapIndex + " indexInMap: " + nidIndexInMap + " destinationCNid: "
                 + destinationCNid;
-
+        IndexCacheRecord record = new IndexCacheRecord(indexCacheRecords.get()[mapIndex][nidIndexInMap]);
+        if (!record.destinationRelOriginAlreadyThere(originCNid)) {
         if (mapIndex >= nidCNidMaps.get().length) {
             ensureCapacity(destinationCNid);
         }
@@ -104,7 +107,6 @@ public class NidCNidMapBdb extends ComponentBdb {
         locks.lock(destinationCNid);
 
         try {
-            IndexCacheRecord record = new IndexCacheRecord(indexCacheRecords.get()[mapIndex][nidIndexInMap]);
 
             record.addDestinationOriginNid(originCNid);
             indexCacheRecords.get()[mapIndex][nidIndexInMap] = record.getData();
@@ -112,6 +114,7 @@ public class NidCNidMapBdb extends ComponentBdb {
         } finally {
             locks.unlock(destinationCNid);
         }
+    }
     }
 
     @Override
@@ -457,7 +460,8 @@ public class NidCNidMapBdb extends ComponentBdb {
      * @param cNid
      * @return
      * @throws IOException
-     * @deprecated use methods that get child nids, rather than rel nids. They are faster.
+     * @deprecated use methods that get child nids, rather than rel nids. They
+     * are faster.
      */
     @Deprecated
     public int[] getDestRelNids(int cNid) throws IOException {
@@ -470,7 +474,8 @@ public class NidCNidMapBdb extends ComponentBdb {
      * @param relTypes
      * @return
      * @throws IOException
-     * @deprecated use methods that get child nids, rather than rel nids. They are faster.
+     * @deprecated use methods that get child nids, rather than rel nids. They
+     * are faster.
      */
     @Deprecated
     public int[] getDestRelNids(int cNid, NidSetBI relTypes) throws IOException {
@@ -485,7 +490,8 @@ public class NidCNidMapBdb extends ComponentBdb {
      * @param vc
      * @return
      * @throws IOException
-     * @deprecated use methods that get child nids, rather than rel nids. They are faster.
+     * @deprecated use methods that get child nids, rather than rel nids. They
+     * are faster.
      */
     @Deprecated
     public int[] getDestRelNids(int cNid, ViewCoordinate vc) throws IOException {
@@ -497,7 +503,8 @@ public class NidCNidMapBdb extends ComponentBdb {
      * @param cNid
      * @return
      * @throws IOException
-     * @deprecated use methods that get child nids, rather than rels. They are faster.
+     * @deprecated use methods that get child nids, rather than rels. They are
+     * faster.
      */
     @Deprecated
     public Collection<Relationship> getDestRels(int cNid) throws IOException {
@@ -514,8 +521,13 @@ public class NidCNidMapBdb extends ComponentBdb {
         if (mapIndex >= nidCNidMaps.get().length) {
             throw new NoSuchElementException("nid: " + cNid);
         }
+        locks.lock(cNid);
 
+        try {
         return new IndexCacheRecord(indexCacheRecords.get()[mapIndex][nidIndexInMap]);
+        } finally {
+            locks.unlock(cNid);
+        }
     }
 
     public NidPairForRefex[] getRefsetPairs(int nid) {

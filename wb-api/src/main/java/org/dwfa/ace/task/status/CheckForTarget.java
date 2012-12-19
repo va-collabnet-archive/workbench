@@ -258,7 +258,7 @@ public class CheckForTarget extends AbstractTask {
     private void testForTarget() {
         try {
             //find roles which concept is target of
-            Collection<? extends RelationshipChronicleBI> relsIn = concept.getRelationshipsTarget();
+            Collection<? extends RelationshipChronicleBI> relsIn = concept.getRelationshipsIncoming();
             if (relsIn != null) {
                 uuidList = new ArrayList<List<UUID>>();
                 for (RelationshipChronicleBI rel : relsIn) {

@@ -333,8 +333,8 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
             }
         }
 
-        if (c.getRelationshipsSource() != null) {
-            for (RelationshipChronicleBI r : c.getRelationshipsSource()) {
+        if (c.getRelationshipsOutgoing() != null) {
+            for (RelationshipChronicleBI r : c.getRelationshipsOutgoing()) {
                 processRelationship(r);
                 processIdentifiers(r.getPrimUuid(), r.getPrimordialVersion().getStampNid());
             }

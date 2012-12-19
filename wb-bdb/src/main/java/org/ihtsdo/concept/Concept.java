@@ -907,7 +907,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         Map<Integer, HashSet<RelationshipChronicleBI>> inferredGroupMap =
                 new HashMap<Integer, HashSet<RelationshipChronicleBI>>();
 
-        for (RelationshipChronicleBI r : getRelationshipsSource()) {
+        for (RelationshipChronicleBI r : getRelationshipsOutgoing()) {
 
             // Inferred
             for (RelationshipVersionBI rv : r.getVersions()) {
@@ -962,7 +962,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             }
         }
 
-        if (getRelationshipsSource() != null) {
+        if (getRelationshipsOutgoing() != null) {
             for (Relationship r : getSourceRels()) {
                 stamps.addAll(r.getComponentSapNids());
             }
@@ -998,7 +998,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             }
         }
 
-        if (getRelationshipsSource() != null) {
+        if (getRelationshipsOutgoing() != null) {
             for (Relationship r : getSourceRels()) {
                 componentNids.addAll(r.getComponentNidsForSaps(sapNids));
             }
@@ -1920,7 +1920,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
         tempVc.setAllowedStatusNids(null);
 
-        for (RelationshipChronicleBI r : getRelationshipsSource()) {
+        for (RelationshipChronicleBI r : getRelationshipsOutgoing()) {
             for (RelationshipVersionBI rv : r.getVersions(tempVc)) {
                 int group = rv.getGroup();
 
@@ -1954,12 +1954,12 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     }
 
     @Override
-    public Collection<? extends RelationshipChronicleBI> getRelationshipsTarget() throws IOException {
+    public Collection<? extends RelationshipChronicleBI> getRelationshipsIncoming() throws IOException {
         return getDestRels();
     }
 
     @Override
-    public Collection<? extends RelationshipChronicleBI> getRelationshipsSource() throws IOException {
+    public Collection<? extends RelationshipChronicleBI> getRelationshipsOutgoing() throws IOException {
         return getSourceRels();
     }
 

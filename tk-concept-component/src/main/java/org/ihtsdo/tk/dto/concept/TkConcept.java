@@ -89,9 +89,9 @@ public class TkConcept {
         annotationIndexStyleRefex = conceptChronicle.isAnnotationIndex();
         conceptAttributes = new TkConceptAttributes(conceptChronicle.getConceptAttributes());
         primordialUuid = conceptAttributes.primordialUuid;
-        relationships = new ArrayList<TkRelationship>(conceptChronicle.getRelationshipsSource().size());
+        relationships = new ArrayList<TkRelationship>(conceptChronicle.getRelationshipsOutgoing().size());
 
-        for (RelationshipChronicleBI rel : conceptChronicle.getRelationshipsSource()) {
+        for (RelationshipChronicleBI rel : conceptChronicle.getRelationshipsOutgoing()) {
             relationships.add(new TkRelationship(rel));
         }
 

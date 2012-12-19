@@ -487,7 +487,7 @@ public class WorkflowHelper {
 				vc = new ViewCoordinate(vc);
 				vc.setRelationshipAssertionType(RelAssertionType.INFERRED_THEN_STATED);
 
-				Collection<? extends RelationshipChronicleBI> children = concept.getRelationshipsTarget();
+				Collection<? extends RelationshipChronicleBI> children = concept.getRelationshipsIncoming();
 
 		    	if (children == null || children.size() == 0) {
 		    		return resultSet;

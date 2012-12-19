@@ -108,7 +108,7 @@ public abstract class ContradictionManagementStrategy implements ContradictionMa
             }
         }
 
-        for (RelationshipChronicleBI relationship : conceptChronicle.getRelationshipsSource()) {
+        for (RelationshipChronicleBI relationship : conceptChronicle.getRelationshipsOutgoing()) {
             if (resolveVersions(new ArrayList(relationship.getVersions(vc))).size() > 1) {
                 return true;
             }
