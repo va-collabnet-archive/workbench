@@ -104,7 +104,7 @@ public class Rf2_RefsetCUuidRecord implements Comparable<Rf2_RefsetCUuidRecord> 
 			    a.add(new Rf2_RefsetCUuidRecord(line[ID],
 			            Rf2x.convertEffectiveTimeToDate(line[EFFECTIVE_TIME]),
 			            Rf2x.convertStringToBoolean(line[ACTIVE]),
-			            Rf2x.convertIdToUuidStr(line[MODULE_ID]),
+			            Rf2x.convertSctIdToUuidStr(line[MODULE_ID]),
 			            Long.parseLong(line[REFSET_ID]),
 			            Long.parseLong(line[REFERENCED_COMPONENT_ID]),
 			            line[VALUE_ID]));
@@ -122,7 +122,7 @@ public class Rf2_RefsetCUuidRecord implements Comparable<Rf2_RefsetCUuidRecord> 
         for (Long l : aLongs) {
             sb.append(l.toString());
             sb.append("\t");
-            sb.append(Rf2x.convertIdToUuidStr(l));
+            sb.append(Rf2x.convertSctIdToUuidStr(l));
             sb.append("\r\n");
         }
         Logger.getLogger(Rf2_RefsetCUuidRecord.class.getName()).info(sb.toString());
@@ -135,7 +135,7 @@ public class Rf2_RefsetCUuidRecord implements Comparable<Rf2_RefsetCUuidRecord> 
             for (Long l : exclusions) {
                 sb.append(l.toString());
                 sb.append("\t");
-                sb.append(Rf2x.convertIdToUuidStr(l));
+                sb.append(Rf2x.convertSctIdToUuidStr(l));
                 sb.append("\r\n");
             }
         } else {
@@ -168,7 +168,7 @@ public class Rf2_RefsetCUuidRecord implements Comparable<Rf2_RefsetCUuidRecord> 
     public void writeArf(BufferedWriter writer) throws IOException, TerminologyException {
 
         // Refset UUID
-        writer.append(Rf2x.convertIdToUuidStr(refsetIdL) + TAB_CHARACTER);
+        writer.append(Rf2x.convertSctIdToUuidStr(refsetIdL) + TAB_CHARACTER);
 
         // Member UUID
         if (id.length() == 36) {
@@ -185,7 +185,7 @@ public class Rf2_RefsetCUuidRecord implements Comparable<Rf2_RefsetCUuidRecord> 
         writer.append(Rf2x.convertActiveToStatusUuid(isActive) + TAB_CHARACTER);
 
         // Component UUID
-        writer.append(Rf2x.convertIdToUuidStr(referencedComponentIdL) + TAB_CHARACTER);
+        writer.append(Rf2x.convertSctIdToUuidStr(referencedComponentIdL) + TAB_CHARACTER);
 
         // Effective Date
         writer.append(effDateStr + TAB_CHARACTER);

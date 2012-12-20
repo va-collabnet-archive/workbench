@@ -92,7 +92,7 @@ public class Rf2_RefsetSimpleRecord implements Comparable<Rf2_RefsetSimpleRecord
             a[idx] = new Rf2_RefsetSimpleRecord(line[ID],
                     Rf2x.convertEffectiveTimeToDate(line[EFFECTIVE_TIME]),
                     Rf2x.convertStringToBoolean(line[ACTIVE]),
-                    Rf2x.convertIdToUuidStr(line[MODULE_ID]),
+                    Rf2x.convertSctIdToUuidStr(line[MODULE_ID]),
                     Long.parseLong(line[REFSET_ID]),
                     Long.parseLong(line[REFERENCED_COMPONENT_ID]),
                     uuidNormalMember);
@@ -107,7 +107,7 @@ public class Rf2_RefsetSimpleRecord implements Comparable<Rf2_RefsetSimpleRecord
         for (Long l : aLongs) {
             sb.append(l.toString());
             sb.append("\t");
-            sb.append(Rf2x.convertIdToUuidStr(l));
+            sb.append(Rf2x.convertSctIdToUuidStr(l));
             sb.append("\r\n");
         }
         Logger.getLogger(Rf2_CrossmapRecord.class.getName()).info(sb.toString());
@@ -118,7 +118,7 @@ public class Rf2_RefsetSimpleRecord implements Comparable<Rf2_RefsetSimpleRecord
     public void writeArf(BufferedWriter writer) throws IOException, TerminologyException {
 
         // Refset UUID
-        writer.append(Rf2x.convertIdToUuidStr(refsetIdL) + TAB_CHARACTER);
+        writer.append(Rf2x.convertSctIdToUuidStr(refsetIdL) + TAB_CHARACTER);
 
         // Member UUID
         if (id.length() == 36) {
@@ -135,7 +135,7 @@ public class Rf2_RefsetSimpleRecord implements Comparable<Rf2_RefsetSimpleRecord
         writer.append(Rf2x.convertActiveToStatusUuid(isActive) + TAB_CHARACTER);
 
         // Component UUID
-        writer.append(Rf2x.convertIdToUuidStr(referencedComponentIdL) + TAB_CHARACTER);
+        writer.append(Rf2x.convertSctIdToUuidStr(referencedComponentIdL) + TAB_CHARACTER);
 
         // Effective Date
         writer.append(effDateStr + TAB_CHARACTER);

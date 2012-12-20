@@ -333,7 +333,7 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
             a[idx] = new Sct2_RelRecord(Long.parseLong(line[ID]),
                     Rf2x.convertEffectiveTimeToDate(line[EFFECTIVE_TIME]),
                     Rf2x.convertStringToBoolean(line[ACTIVE]),
-                    Rf2x.convertIdToUuidStr(line[MODULE_ID]),
+                    Rf2x.convertSctIdToUuidStr(line[MODULE_ID]),
                     Long.parseLong(line[SOURCE_ID]),
                     thisRoleTypeSctId,
                     Long.parseLong(line[DESTINATION_ID]),
@@ -358,27 +358,27 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
     public void writeArf(BufferedWriter writer)
             throws IOException, TerminologyException, ParseException {
         // Relationship UUID
-        writer.append(Rf2x.convertIdToUuidStr(relSnoId) + TAB_CHARACTER);
+        writer.append(Rf2x.convertSctIdToUuidStr(relSnoId) + TAB_CHARACTER);
 
         // Status UUID
         if (statusConceptL < Long.MAX_VALUE) {
-            writer.append(Rf2x.convertIdToUuidStr(statusConceptL) + TAB_CHARACTER);
+            writer.append(Rf2x.convertSctIdToUuidStr(statusConceptL) + TAB_CHARACTER);
         } else {
             writer.append(Rf2x.convertActiveToStatusUuid(isActive) + TAB_CHARACTER);
         }
 
         // Source Concept UUID
-        writer.append(Rf2x.convertIdToUuidStr(c1SnoId) + TAB_CHARACTER);
+        writer.append(Rf2x.convertSctIdToUuidStr(c1SnoId) + TAB_CHARACTER);
 
         // Relationship Type UUID
-        writer.append(Rf2x.convertIdToUuidStr(roleTypeSnoId) + TAB_CHARACTER);
+        writer.append(Rf2x.convertSctIdToUuidStr(roleTypeSnoId) + TAB_CHARACTER);
 
         // Destination Concept UUID
-        writer.append(Rf2x.convertIdToUuidStr(c2SnoId) + TAB_CHARACTER);
+        writer.append(Rf2x.convertSctIdToUuidStr(c2SnoId) + TAB_CHARACTER);
 
         // Characteristic Type UUID
         if (characteristicL >= 0) {
-            writer.append(Rf2x.convertIdToUuidStr(characteristicL) + TAB_CHARACTER);
+            writer.append(Rf2x.convertSctIdToUuidStr(characteristicL) + TAB_CHARACTER);
         } else { // -1 becomes  ==> (2) historical relationship
             writer.append(ArchitectonicAuxiliary.getSnomedCharacteristicType(2).getPrimoridalUid().toString()
                     + TAB_CHARACTER);
@@ -388,7 +388,7 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
         // notRefinable	RF2==900000000000007000, RF1="0"
         // optional     RF2==900000000000216007, RF1="1" <--
         // mandatory    RF2==900000000000218008, RF1="2"
-        writer.append(Rf2x.convertIdToUuidStr(refinabilityL) + TAB_CHARACTER);
+        writer.append(Rf2x.convertSctIdToUuidStr(refinabilityL) + TAB_CHARACTER);
 
         // Relationship Group
         writer.append(group + TAB_CHARACTER);

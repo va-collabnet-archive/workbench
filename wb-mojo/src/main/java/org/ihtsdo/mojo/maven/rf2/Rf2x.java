@@ -15,30 +15,100 @@
  */
 package org.ihtsdo.mojo.maven.rf2;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.UUID;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type3UuidFactory;
 
 public class Rf2x {
 
     private static final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static Sct2_IdLookUp sctid2UuidCache = null;
+    private static long missCounter;
 
-    static String convertEffectiveTimeToDate(String date) {
-        return date.substring(0, 4) + "-" + date.substring(4, 6) + "-" + date.substring(6, 8)
+    public Rf2x() 
+            throws IOException {
+        // Default cache location
+        setupIdCache();
+    }
+
+    public Rf2x(String sctid2UuidCachePathFile) 
+            throws IOException {
+        setupIdCache(sctid2UuidCachePathFile);
+    }
+    
+    private static void setupIdCache() 
+            throws IOException {
+        // Default cache location
+        setupIdCache("target/id-cache/idSctUuidCache.ser");
+    }
+
+    private static void setupIdCache(String idCachePathFile) 
+            throws IOException {
+        File file = new File(idCachePathFile);
+        System.out.println("File = " + file.getAbsolutePath());
+        if (!file.exists()) {
+            System.out.println(":::TEST: id cache file does not exist!!!@!");
+            // Initialize with an empty id list
+            sctid2UuidCache = new Sct2_IdLookUp(new ArrayList<Sct2_IdCompact>());
+            missCounter = 0;
+        } else {
+            System.out.println(":::TEST: id cache file exists!!!@!");
+            sctid2UuidCache = new Sct2_IdLookUp(file.getAbsolutePath());
+            missCounter = 0;
+        }
+    }
+
+    /**
+     * Convert "yyyyMMdd" effective time
+     * <code>String</code> to "yyyy-MM-dd 00:00:00"
+     * <code>String</code>.
+     *
+     * @param effectiveTimeStr
+     * @return
+     */
+    static String convertEffectiveTimeToDate(String effectiveTimeStr) {
+        return effectiveTimeStr.substring(0, 4) + "-"
+                + effectiveTimeStr.substring(4, 6) + "-"
+                + effectiveTimeStr.substring(6, 8)
                 + " 00:00:00";
     }
 
+    /**
+     * Convert "yyyy-MM-dd 00:00:00" date
+     * <code>String</code> to
+     * <code>long</code> time milliseconds.
+     *
+     * @param date
+     * @return
+     * @throws ParseException
+     */
     static long convertDateToTime(String date) throws ParseException {
         return formatter.parse(date).getTime();
     }
 
+    /**
+     * Convert
+     * <code>long</code> time milliseconds to "yyyy-MM-dd HH:mm:ss"
+     * <code>String</code>
+     *
+     * @param time
+     * @return
+     * @throws ParseException
+     */
     static String convertTimeToDate(long time) throws ParseException {
         return formatter.format(new Date(time));
     }
 
+    /**
+     * converts "1" to
+     * <code><b>true</code></b>
+     */
     static boolean convertStringToBoolean(String s) {
         if (s.startsWith("1")) {
             return true;
@@ -47,10 +117,25 @@ public class Rf2x {
         }
     }
 
+    static String convertActiveToStatusUuid(String activeString)
+            throws IOException, TerminologyException {
+        return convertActiveToStatusUuid(convertStringToBoolean(activeString));
+    }
+
+    /**
+     * Converts
+     * <code><b>true</code></b> to RF2 Active UUID. Converts
+     * <code><b>false</code></b> to RF2 Inactive UUID.<br> <br> <i>Note:<br> RF1
+     * definition: "0" = current, "1" = noncurrent<br> RF2 definition: "0" =
+     * inactive, "1" = active<br> ARF Status UUID is most general and supports
+     * RF1 and RF2<br></i>
+     *
+     * @param active
+     * @return
+     * @throws IOException
+     * @throws TerminologyException
+     */
     static String convertActiveToStatusUuid(boolean active) throws IOException, TerminologyException {
-        // RF1 "0" current, "1" noncurrent
-        // RF2 "0" inactive, "1" active
-        // ARF Status UUID <-- most general
         if (active) {
             // return ArchitectonicAuxiliary.Concept.CURRENT.getPrimoridalUid().toString();
             return "d12702ee-c37f-385f-a070-61d56d4d0f1f"; // RF2 Active
@@ -60,11 +145,20 @@ public class Rf2x {
         }
     }
 
+    /**
+     * If "900000000000074008" returns true, otherwise returns false. <br>
+     * <pre><i>
+     * Notes:
+     * RF1 definition: "0" Fully defined, "1" Primitive
+     * RF2 Set to a child of |Definition status| in the metadata hierarchy.
+     *     900000000000074008 == primitive
+     * ARF definition: boolean string where 0 (false == defined) or 1 (true == primitive)
+     * <i></pre>
+     *
+     * @param defStatus
+     * @return
+     */
     static boolean convertDefinitionStatusToIsPrimitive(String defStatus) {
-        // RF1 "0" Fully defined, "1" Primitive
-        // RF2 Set to a child of |Definition status| in the metadata hierarchy.
-        //     900000000000074008 == primitive
-        // ARF  boolean string 0 (false == defined) or 1 (true == primitive)
         if (defStatus.equalsIgnoreCase("900000000000074008")) {
             return true;
         } else {
@@ -72,13 +166,35 @@ public class Rf2x {
         }
     }
 
-    static String convertIdToUuidStr(String idStr) {
+    static String convertSctIdToUuidStr(String idStr) 
+            throws IOException {
         long id = Long.parseLong(idStr);
-        return Type3UuidFactory.fromSNOMED(id).toString();
+        return convertSctIdToUuidStr(id);
     }
 
-    static String convertIdToUuidStr(long id) {
-        return Type3UuidFactory.fromSNOMED(id).toString();
+    static String convertSctIdToUuidStr(long id) 
+            throws IOException {
+        return convertSctIdToUuid(id).toString();
+    }
+
+    static UUID convertSctIdToUuid(long id) 
+            throws IOException {
+        UUID uuid;
+        if (sctid2UuidCache == null) {
+            setupIdCache();
+        }
+        uuid = sctid2UuidCache.getUuid(id);
+        if (uuid == null) {
+            // System.err.println("!!!@! sctid not in cache " + Long.toString(id));
+            missCounter++;
+            if (missCounter % 100000 == 1) {
+                System.out.println(":::TEST: missCounter=" + missCounter 
+                        + " SCTID=" + Long.toString(id));
+            }
+            return Type3UuidFactory.fromSNOMED(id);                    
+        } else {
+            return uuid;
+        }
     }
 
     static boolean convertCaseSignificanceIdToCapStatus(String caseSignifcanceId) {
@@ -90,4 +206,18 @@ public class Rf2x {
             return false;
         }
     }
+    
+       
+    static boolean isSctIdInUuidCache(long sctId) throws IOException {
+        UUID uuid;
+        if (sctid2UuidCache == null) {
+            setupIdCache();
+        }
+        uuid = sctid2UuidCache.getUuid(sctId);
+        if (uuid == null) {
+            return false;
+        } 
+        return true;
+    }
+
 }

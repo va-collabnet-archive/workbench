@@ -98,7 +98,7 @@ public class Rf2_CrossmapRecord {
             a[idx] = new Rf2_CrossmapRecord(line[ID],
                     Rf2x.convertEffectiveTimeToDate(line[EFFECTIVE_TIME]),
                     Rf2x.convertStringToBoolean(line[ACTIVE]),
-                    Rf2x.convertIdToUuidStr(line[MODULE_ID]),
+                    Rf2x.convertSctIdToUuidStr(line[MODULE_ID]),
                     refsetIdL,
                     Long.parseLong(line[REFERENCED_COMPONENT_ID]),
                     line[MAP_TARGET_ID]);
@@ -113,7 +113,7 @@ public class Rf2_CrossmapRecord {
         for (Long l : aLongs) {
             sb.append(l.toString());
             sb.append("\t");
-            sb.append(Rf2x.convertIdToUuidStr(l));
+            sb.append(Rf2x.convertSctIdToUuidStr(l));
             sb.append("\r\n");
         }
         Logger.getLogger(Rf2_CrossmapRecord.class.getName()).info(sb.toString());
@@ -124,7 +124,7 @@ public class Rf2_CrossmapRecord {
     public void writeArfRefset(BufferedWriter writer)
             throws IOException, TerminologyException {
         // Refset UUID
-        writer.append(Rf2x.convertIdToUuidStr(refsetIdL) + TAB_CHARACTER);
+        writer.append(Rf2x.convertSctIdToUuidStr(refsetIdL) + TAB_CHARACTER);
 
         // Member UUID
         writer.append(id + TAB_CHARACTER);
@@ -133,7 +133,7 @@ public class Rf2_CrossmapRecord {
         writer.append(Rf2x.convertActiveToStatusUuid(isActive) + TAB_CHARACTER);
 
         // Component UUID
-        writer.append(Rf2x.convertIdToUuidStr(referencedComponentIdL) + TAB_CHARACTER);
+        writer.append(Rf2x.convertSctIdToUuidStr(referencedComponentIdL) + TAB_CHARACTER);
 
         // Effective Date
         writer.append(effDateStr + TAB_CHARACTER);
@@ -154,7 +154,7 @@ public class Rf2_CrossmapRecord {
     public void writeArfId(BufferedWriter writer)
             throws IOException, TerminologyException {
         // REFERENCED_COMPONENT_ID = 5;
-        writer.append(Rf2x.convertIdToUuidStr(referencedComponentIdL) + TAB_CHARACTER);
+        writer.append(Rf2x.convertSctIdToUuidStr(referencedComponentIdL) + TAB_CHARACTER);
         // SOURCE_SYSTEM_UUID = 1;
         // 446608001 ICD-O
         // 900000000000498005 SNOMED RT
