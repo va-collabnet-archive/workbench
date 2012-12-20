@@ -126,8 +126,8 @@ public class GenerateUsers extends AbstractMojo {
      */
     private File relPermissionsFile;
     /**
-     *
-     * @parameter expression="${project.build.directory}/users/userConfig.txt"
+     * :WAS: "${project.build.directory}/users/userConfig.txt"
+     * @parameter expression="${project.build.directory}/users"
      */
     private File defaultUserConfig;
     /**
@@ -214,22 +214,22 @@ public class GenerateUsers extends AbstractMojo {
              * defaultRelType, defaultRelChar, defaultRelRefinability,
              * visibleRefests, editPath, viewPath
              */
-            BufferedReader configReader = new BufferedReader(new FileReader(defaultUserConfig));
-            configProps.load(configReader);
-            langSortPref = configProps.getProperty("langSortPref");
-            langPrefOrder = configProps.getProperty("langPrefOrder");
-            statedInferredPolicy = configProps.getProperty("statedInferredPolicy");
-            defaultStatus = getConceptSpecFromPrefs(configProps.getProperty("defaultStatus"));
-            defaultDescType = getConceptSpecFromPrefs(configProps.getProperty("defaultDescType"));
-            defaultRelChar = getConceptSpecFromPrefs(configProps.getProperty("defaultRelChar"));
-            defaultRelType = getConceptSpecFromPrefs(configProps.getProperty("defaultRelType"));
-            defaultRelRefinability = getConceptSpecFromPrefs(configProps.getProperty("defaultRelRefinability"));
-            visibleRefests = configProps.getProperty("visibleRefests");
-            projectDevelopmentPathFsn = configProps.getProperty("projectDevelopmentPathFsn");
-            projectDevelopmentViewPathFsn = configProps.getProperty("projectDevelopmentViewPathFsn");
-            projectDevelopmentAdjPathFsn = configProps.getProperty("projectDevelopmentAdjPathFsn");
-            module = getConceptSpecFromPrefs(configProps.getProperty("module"));
-            generateAdjCs = configProps.getProperty("generateAdjCs");
+//            BufferedReader configReader = new BufferedReader(new FileReader(defaultUserConfig  + File.separator + "userConfig.txt"));
+//            configProps.load(configReader);
+//            langSortPref = configProps.getProperty("langSortPref");
+//            langPrefOrder = configProps.getProperty("langPrefOrder");
+//            statedInferredPolicy = configProps.getProperty("statedInferredPolicy");
+//            defaultStatus = getConceptSpecFromPrefs(configProps.getProperty("defaultStatus"));
+//            defaultDescType = getConceptSpecFromPrefs(configProps.getProperty("defaultDescType"));
+//            defaultRelChar = getConceptSpecFromPrefs(configProps.getProperty("defaultRelChar"));
+//            defaultRelType = getConceptSpecFromPrefs(configProps.getProperty("defaultRelType"));
+//            defaultRelRefinability = getConceptSpecFromPrefs(configProps.getProperty("defaultRelRefinability"));
+//            visibleRefests = configProps.getProperty("visibleRefests");
+//            projectDevelopmentPathFsn = configProps.getProperty("projectDevelopmentPathFsn");
+//            projectDevelopmentViewPathFsn = configProps.getProperty("projectDevelopmentViewPathFsn");
+//            projectDevelopmentAdjPathFsn = configProps.getProperty("projectDevelopmentAdjPathFsn");
+//            module = getConceptSpecFromPrefs(configProps.getProperty("module"));
+//            generateAdjCs = configProps.getProperty("generateAdjCs");
 
             //create user based on profile config
             BufferedReader userReader = new BufferedReader(new FileReader(usersFile));
@@ -401,6 +401,8 @@ public class GenerateUsers extends AbstractMojo {
             if (configProps.getProperty("makeUserDevPath").equals("true")) {
                 makeUserDevPath = true;
             }
+            module = getConceptSpecFromPrefs(configProps.getProperty("module"));
+            generateAdjCs = configProps.getProperty("generateAdjCs");
 
         } catch (FileNotFoundException ex) {
             throw new MojoExecutionException(ex.getLocalizedMessage(), ex);
@@ -1168,7 +1170,7 @@ public class GenerateUsers extends AbstractMojo {
 
         //status popup values
         I_IntList statusPopupTypes = tf.newIntList();
-        statusPopupTypes.add(SnomedMetadataRf1.CURRENT_RF1.getLenient().getNid());
+       statusPopupTypes.add(SnomedMetadataRf1.CURRENT_RF1.getLenient().getNid());
         statusPopupTypes.add(SnomedMetadataRf1.RETIRED_INACTIVE_STATUS_RF1.getLenient().getNid());
         statusPopupTypes.add(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
         statusPopupTypes.add(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid());
