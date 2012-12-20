@@ -8,12 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.dwfa.ace.api.I_GetConceptData;
-
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.helper.dialect.DialectHelper;
 import org.ihtsdo.helper.dialect.UnsupportedDialectOrLanguage;
@@ -32,7 +27,6 @@ import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refex.type_uuid.TkRefexUuidMember;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
-import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.spec.ValidationException;
 
 /**
@@ -85,6 +79,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
     private UUID gbRefsetUUID;
     private UUID langRefsetUUID;
     private UUID pathUUID;
+    private UUID pathUUID2;
     private UUID authorUser = UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c");
 
     /**
@@ -105,7 +100,9 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
         ConceptDescriptor gbRefset = api.getConceptDescriptor(api.getIntId(id), "parameters.gbDialectRefset");
         ConceptDescriptor langRefset = api.getConceptDescriptor(api.getIntId(id), "parameters.langRefset");
         ConceptDescriptor path = api.getConceptDescriptor(api.getIntId(id), "parameters.path");
+        ConceptDescriptor path2 = api.getConceptDescriptor(api.getIntId(id), "parameters.path2");
         this.pathUUID = path.getVerifiedConcept().getPrimUuid();
+        this.pathUUID2 = path2.getVerifiedConcept().getPrimUuid();
 
         if (usRefset.getUuid() != null) {
             this.usRefsetUUID = usRefset.getVerifiedConcept().getPrimUuid();
@@ -124,7 +121,8 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
      */
     @Override
     public void transformAttributes(TkConceptAttributes attributes, TkConcept concept) {
-        if (attributes.getPathUuid().equals(pathUUID)) {
+        if (attributes.getPathUuid().equals(pathUUID)
+                || (pathUUID2 != null && attributes.getPathUuid().equals(pathUUID2))) {
             try {
                 if (attributes.getStatusUuid().equals(SnomedMetadataRf1.CURRENT_RF1.getLenient().getPrimUuid())) {
                     attributes.setStatusUuid(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid());
@@ -161,7 +159,8 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
      */
     @Override
     public void transformDescription(TkDescription description, TkConcept concept) {
-        if (description.getPathUuid().equals(pathUUID)) {
+        if (description.getPathUuid().equals(pathUUID)
+                || (pathUUID2 != null && description.getPathUuid().equals(pathUUID2))) {
             try {
                 if (description.getStatusUuid().equals(SnomedMetadataRf1.CURRENT_RF1.getLenient().getPrimUuid())) {
                     description.setStatusUuid(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid());
@@ -215,7 +214,8 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
      */
     @Override
     public void transformRelationship(TkRelationship relationship, TkConcept concept) {
-        if (relationship.getPathUuid().equals(pathUUID)) {
+        if (relationship.getPathUuid().equals(pathUUID)
+                || (pathUUID2 != null && relationship.getPathUuid().equals(pathUUID2))) {
             try {
                 if (relationship.getStatusUuid().equals(SnomedMetadataRf1.CURRENT_RF1.getLenient().getPrimUuid())) {
                     relationship.setStatusUuid(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid());
@@ -249,7 +249,8 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
     @Override
     public void transformAnnotation(TkRefexAbstractMember<?> annotation,
             TkComponent<?> component) {
-        if (annotation.getPathUuid().equals(pathUUID)) {
+        if (annotation.getPathUuid().equals(pathUUID)
+                || (pathUUID2 != null && annotation.getPathUuid().equals(pathUUID2))) {
             try {
                 if (annotation.getStatusUuid().equals(SnomedMetadataRf1.CURRENT_RF1.getLenient().getPrimUuid())) {
                     annotation.setStatusUuid(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid());
@@ -278,7 +279,8 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
     @Override
     public void transformMember(TkRefexAbstractMember<?> member,
             TkConcept concept) {
-        if (member.getPathUuid().equals(pathUUID)) {
+        if (member.getPathUuid().equals(pathUUID)
+                || (pathUUID2 != null && member.getPathUuid().equals(pathUUID2))) {
             try {
                 if (member.getStatusUuid().equals(SnomedMetadataRf1.CURRENT_RF1.getLenient().getPrimUuid())) {
                     member.setStatusUuid(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid());
@@ -315,7 +317,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
     @Override
     public List<EConcept> postProcessIteration() {
         System.out.println("**** Final, total converted " + conceptCount + " members");
-        List<EConcept> postProcessList = new ArrayList<EConcept>();
+        List<EConcept> postProcessList = new ArrayList<>();
         return postProcessList;
     }
 
