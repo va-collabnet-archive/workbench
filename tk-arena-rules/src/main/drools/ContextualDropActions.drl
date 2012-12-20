@@ -1031,10 +1031,11 @@ rule "rule 59" #quantity
 		actions.add(new AddToNidFloatRefexAction("add quantity", $dropTarget, Snomed.QUANTITY, config));
 end
 
-"rule 60" #concentration
+rule "rule 60" #concentration
 	when
                 ViewFact(getView() == View.STATED)
 		$dropTarget: RelFact(context == Context.DROP_TARGET)
 		$dropObject: RelFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
 	then
 		actions.add(new AddToNidFloatRefexAction("add concentration", $dropTarget, Snomed.CONCENTRATION, config));
+end

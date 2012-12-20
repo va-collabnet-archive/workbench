@@ -255,8 +255,8 @@ public class Snomed {
 		UUID.fromString("996261c3-3c12-3f09-8f14-e30e85e9e70d"));
     public static ConceptSpec QUANTITY =
 		new ConceptSpec("Quantity reference set (foundation metadata concept)",
-		UUID.fromString("1bdc1153-e4e0-4058-be87-14ad46edb1f8"));
+		UUID.fromString("704ceee7-6d19-392f-a0e6-e28dfd444801"));
     public static ConceptSpec CONCENTRATION =
-		new ConceptSpec("Quantity reference set (foundation metadata concept)",
-		UUID.fromString("1bdc1153-e4e0-4058-be87-14ad46edb1f8"));
+		new ConceptSpec("Concentration reference set (foundation metadata concept)",
+		UUID.fromString("29f8b0a9-daf8-3df8-bc46-710a76298c4c"));
 }
