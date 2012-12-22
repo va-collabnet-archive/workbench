@@ -265,5 +265,10 @@
 		<module>tk-cern-prim</module>
 		<module>wb-schema-mojo</module>
 		<!-- <module>bdb-properties</module> -->
+		<module>issue-management</module>
+		<module>issue-repository-integration</module>
+		<module>project-management</module>
+		<module>document-management</module>
+		<module>translation</module>
 	</modules>
 </project>
