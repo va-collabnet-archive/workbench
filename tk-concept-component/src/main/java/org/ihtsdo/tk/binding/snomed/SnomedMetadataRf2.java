@@ -359,4 +359,12 @@ public class SnomedMetadataRf2 {
     public static ConceptSpec NON_HUMAN_RF2 =
             new ConceptSpec("Non-human simple reference set",
             UUID.fromString("b1b1e773-3eb6-3bcc-a6c7-52ac5d0a53be"));
+    
+    public static ConceptSpec CONCEPT_INACTIVE_REFSET =
+            new ConceptSpec("Concept inactivation indicator attribute value reference set (foundation metadata concept)",
+            UUID.fromString("a959e36c-39a3-3ec6-8a0b-9a4ee564348b"));
+    
+    public static ConceptSpec DESC_INACTIVE_REFSET =
+            new ConceptSpec("Description inactivation indicator attribute value reference set (foundation metadata concept)",
+            UUID.fromString("d40e6d5c-6a93-34ab-b6e1-11f24e350380"));
 }
