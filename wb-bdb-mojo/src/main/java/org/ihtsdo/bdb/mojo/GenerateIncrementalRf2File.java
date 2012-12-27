@@ -256,16 +256,11 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
             stampsToWrite = Bdb.getSapDb().getSpecifiedSapNids(pathIds,
                     TimeHelper.getTimeFromString(startDate, TimeHelper.getFileDateFormat()),
                     TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()));
-            //TODO
-            /*
-             * Process rf2 refex computer
-             * make changsets, binary changeset, look at runner
-             * stick changeset in target folder
-             * make changeset folder a qualified artifact
-             */
+            File refsetCs = new File(output.getParentFile(), "changesets");
+            refsetCs.mkdir();
             if (makeRf2Refsets) {
                 Rf2RefexComputer rf2RefexComputer = new Rf2RefexComputer(vc, Ts.get().getMetadataEditCoordinate(),
-                        new File(output, "changesets"), stampsToWrite.getAsSet());
+                        refsetCs, stampsToWrite.getAsSet());
                 rf2RefexComputer.setup();
                 Ts.get().iterateConceptDataInSequence(rf2RefexComputer);
                 rf2RefexComputer.cleanup();
