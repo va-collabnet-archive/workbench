@@ -1,0 +1,65 @@
+/*
+ * Copyright 2012 International Health Terminology Standards Development Organisation.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.ihtsdo.project.workflow2;
+
+import java.util.Collection;
+import java.util.UUID;
+
+/**
+ * The workflow definition includes all components that specify the actions and
+ * transitions that will occur in a workflow.
+ * 
+ * @author alo
+ */
+public interface WfDefinitionBI {
+    
+    /** 
+     * Gets the name of the workflow definition
+     */
+    String getName();
+    
+    /** 
+     * Gets the UUID of the workflow definition
+     */
+    UUID getUuid();
+    
+    /** 
+     * Gets the roles that participate in this workflow definition
+     */
+    Collection<WfRoleBI> getRoles();
+    
+    /** 
+     * Gets the states that are used in this workflow definition
+     */
+    Collection<WfStateBI> getStates();
+    
+    /** 
+     * Gets the actions that are used in this workflow definition
+     */
+    Collection<WfActionBI> getActions();
+    
+    /** 
+     * Gets the logic that will define state transitions
+     */
+    Object getLogic();
+    
+    /** 
+     * Validates if the logic covers all roles, states and actions included in
+     * the definition
+     */
+    boolean logicIsValid();
+    
+}
