@@ -16,6 +16,7 @@
 package org.ihtsdo.project.workflow2;
 
 import java.util.Collection;
+import java.util.LinkedList;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 
 /**
@@ -87,5 +88,10 @@ public interface WfInstanceBI {
      */
     Collection<WfActionBI> getActionsForOverrideMode();
     
+    /** 
+     * Gets all available actions for the workflow, override allows to skip
+     * logic and perform any action
+     */
+    LinkedList<WfHistoryEntryBI> getHistory();
     
 }
