@@ -64,10 +64,10 @@ public class DrComponentHelper {
 
 	/** The all rels. */
 	public static I_IntSet allRels;
-	
+
 	/** The hist rels. */
 	public static I_IntSet histRels;
-	
+
 	/** The Cpt model rels. */
 	public static I_IntSet CptModelRels;
 
@@ -88,7 +88,7 @@ public class DrComponentHelper {
 		try {
 			I_GetConceptData oldStyleConcept = tf.getConcept(conceptBi.getNid());
 			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
-			
+
 			Set<PositionBI> viewPositions =  new HashSet<PositionBI>();
 			for (PathBI loopPath : config.getEditingPathSet()) {
 				PositionBI pos = Terms.get().newPosition(loopPath, Long.MAX_VALUE);
@@ -254,7 +254,7 @@ public class DrComponentHelper {
 
 			DrDefiningRolesSet modelersRolesSet = new DrDefiningRolesSet();
 			modelersRolesSet.setRolesSetType("Modelers");
-			
+
 			DrDefiningRolesSet definingFormRolesSet = new DrDefiningRolesSet();
 			definingFormRolesSet.setRolesSetType("Defining");
 
@@ -299,7 +299,7 @@ public class DrComponentHelper {
 			concept.getDefiningRoleSets().add(statedRolesSet);
 			concept.getDefiningRoleSets().add(modelersRolesSet);
 			concept.getDefiningRoleSets().add(inferredRolesSet);
-			
+
 			definingFormRolesSet.setRelationships(new ArrayList<DrRelationship>());
 			definingFormRolesSet.getRelationships().addAll(concept.getOutgoingRelationships());
 			concept.getDefiningRoleSets().add(definingFormRolesSet);
@@ -368,7 +368,7 @@ public class DrComponentHelper {
 		}
 		return descendants;
 	}
-	
+
 	/**
 	 * Gets the snomed int id.
 	 *
@@ -380,19 +380,21 @@ public class DrComponentHelper {
 	public static String getSnomedIntId(int nid) throws IOException, TerminologyException {
 		Long descriptionId = 0L; //If description is new then descriptionid doesn't exist in workbench so use dummy value.
 		I_Identify desc_Identify = Terms.get().getId(nid);
-		List<? extends I_IdVersion> i_IdentifyList = desc_Identify.getIdVersions();
-		if (i_IdentifyList.size() > 0) {
-			for (int i = 0; i < i_IdentifyList.size(); i++) {
-				I_IdVersion i_IdVersion = (I_IdVersion) i_IdentifyList.get(i);
-				Object denotation = (Object) i_IdVersion.getDenotation();
-				int authorityNid = i_IdVersion.getAuthorityNid();
-				int arcAuxSnomedIntegerNid = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid();
-				if (authorityNid == arcAuxSnomedIntegerNid) {
-					descriptionId = (Long) denotation;
+		if (desc_Identify != null) {
+			List<? extends I_IdVersion> i_IdentifyList = desc_Identify.getIdVersions();
+			if (i_IdentifyList.size() > 0) {
+				for (int i = 0; i < i_IdentifyList.size(); i++) {
+					I_IdVersion i_IdVersion = (I_IdVersion) i_IdentifyList.get(i);
+					Object denotation = (Object) i_IdVersion.getDenotation();
+					int authorityNid = i_IdVersion.getAuthorityNid();
+					int arcAuxSnomedIntegerNid = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid();
+					if (authorityNid == arcAuxSnomedIntegerNid) {
+						descriptionId = (Long) denotation;
+					}
 				}
 			}
 		}
 		return descriptionId.toString();
 	}
-	
+
 }
