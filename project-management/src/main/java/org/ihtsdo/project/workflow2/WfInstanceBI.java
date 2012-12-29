@@ -98,4 +98,11 @@ public interface WfInstanceBI {
      */
     LinkedList<WfHistoryEntryBI> getHistory();
     
+    /** 
+     * Due date for this instance
+     */
+    Long getDueDate();
+    
+    
+    
 }
