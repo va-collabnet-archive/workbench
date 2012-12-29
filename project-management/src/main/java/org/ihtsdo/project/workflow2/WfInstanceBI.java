@@ -19,7 +19,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 import org.ihtsdo.tk.api.ComponentVersionBI;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 
 /**
  * A representation of the status of a component in workflow.
@@ -104,13 +103,32 @@ public interface WfInstanceBI {
     Long getDueDate();
     
     /** 
+     * Gets the creation date for this instance
+     */
+    Long getCreationDate();
+    
+    /** 
      * Gets the priority for this instance.
      * 1- Highest
      * 2- High
      * 3- Normal
      * 4- Low
      * 5- Lowest
+     * 
+     * TODO: move to Enum?
      */
     Integer getPriority();
+    
+    /**
+	 * True when is active, regardless of if is complete or incomplete. 
+	 * False when is inactive, meaning that this instance should not
+	 * be considered in any operation.
+	 */
+    boolean isActive();
+
+	/**
+	 * True when is complete, Fals when is not.
+	 */
+	boolean isCompleted();
     
 }
