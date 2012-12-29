@@ -17,21 +17,25 @@ package org.ihtsdo.project.workflow2;
 
 import java.util.Collection;
 import java.util.LinkedList;
+
+import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 
 /**
- * A representation of the status of a concept in workflow.
- * When a concept is sent into a workflow, a new instance is created. A concept
+ * A representation of the status of a component in workflow.
+ * When a component is sent into a workflow, a new instance is created. A component
  * can have multiple concurrent instances, that progress separately.
+ * Most of the time a component focus of a workflow will be concept, in exceptional cases it 
+ * can be other kind of components.
  * 
  * @author alo
  */
 public interface WfInstanceBI {
     
     /** 
-     * Gets the concept of this instance
+     * Gets the component of this instance
      */
-    ConceptVersionBI getConcept();
+    ComponentVersionBI getComponent();
     
     /** 
      * Gets the WorkList where this instance is member of

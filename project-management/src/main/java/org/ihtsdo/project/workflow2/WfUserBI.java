@@ -40,8 +40,8 @@ public interface WfUserBI {
     UUID getUuid();
     
     /** 
-     * Gets the Roles for the workflow user
+     * Gets the Roles for the workflow user in a project, empty is not a member of the project
      */
-    Collection<WfRoleBI> getRoles();
+    Collection<WfRoleBI> getRoles(ProjectBI project);
     
 }

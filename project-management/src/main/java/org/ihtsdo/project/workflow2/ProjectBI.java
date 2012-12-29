@@ -31,7 +31,7 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
  * 
  * @author alo
  */
-public interface WorkListBI {
+public interface ProjectBI {
     
     /** 
      * Gets the name of the work list
@@ -44,12 +44,34 @@ public interface WorkListBI {
     UUID getUuid();
     
     /** 
-     * Gets the UUID of the work list
+     * Gets the ViewCoordinate of this project, this allows the retrieval of
+     * of the current concept version for this instance
      */
-    Collection<WfInstanceBI> getInstances();
+    ViewCoordinate getViewCoordinate();
     
     /** 
-     * Gets a description of the worklist, goals, instructions on how to edit, etc.
+     * Gets the EditCoordinate of this project, actions should use this edit
+     * coordinate to perform changes in the data
+     */
+    EditCoordinate getEditCoordinate();
+    
+    /** 
+     * Gets all work lists in the project
+     */
+    Collection<WorkListBI> getWorkLists();
+    
+    /** 
+     * Gets all users assigned to this project
+     */
+    Collection<WfUserBI> getUsers();
+    
+    /** 
+     * Gets roles for the user (in this project)
+     */
+    Collection<WfRoleBI> getRolesForUser(WfUserBI user);
+    
+    /** 
+     * Gets a description of the project, goals, instructions on how to edit, etc.
      */
     String getDescription();
     

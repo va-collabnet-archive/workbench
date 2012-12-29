@@ -31,11 +31,6 @@ public interface WorkflowBI {
     Collection<WfInstanceBI> getInstances(ConceptVersionBI concept);
     
     /** 
-     * Gets all work lists in the system
-     */
-    Collection<WorkListBI> getWorkLists();
-    
-    /** 
      * Gets all instances in the system using the filters criteria
      */
     Collection<WfInstanceBI> searchWorkflow(Collection<WfFilterBI> filters);
@@ -43,21 +38,26 @@ public interface WorkflowBI {
     /** 
      * Gets all users in the system
      */
-    Collection<WfUserBI> getUsers();
+    Collection<WfUserBI> getAllUsers();
     
     /** 
      * Gets all states in the system
      */
-    Collection<WfStateBI> getStates();
+    Collection<WfStateBI> getAllStates();
     
     /** 
      * Gets all actions in the system
      */
-    Collection<WfActionBI> getActions();
+    Collection<WfActionBI> getAllActions();
+    
+    /** 
+     * Gets all roles in the system
+     */
+    Collection<WfRoleBI> getAllRoles();
     
     /** 
      * Gets all workflow definitions in the system
      */
-    Collection<WfDefinitionBI> getDefinitions();
+    Collection<WfDefinitionBI> getAllDefinitions();
     
 }
