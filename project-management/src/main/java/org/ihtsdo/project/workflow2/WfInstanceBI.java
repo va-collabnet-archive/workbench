@@ -99,10 +99,18 @@ public interface WfInstanceBI {
     LinkedList<WfHistoryEntryBI> getHistory();
     
     /** 
-     * Due date for this instance
+     * Gets the due date for this instance
      */
     Long getDueDate();
     
-    
+    /** 
+     * Gets the priority for this instance.
+     * 1- Highest
+     * 2- High
+     * 3- Normal
+     * 4- Low
+     * 5- Lowest
+     */
+    Integer getPriority();
     
 }
