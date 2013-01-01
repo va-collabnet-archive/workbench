@@ -188,7 +188,15 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
                 } else if (gbRefsetUUID != null && DialectHelper.isTextForDialect(description.getText(), Language.EN_UK.getLenient().getNid())) {
                     processGBDescription(description, concept);
                 } else {
-                    throw new UnsupportedDialectOrLanguage("Can't support language or dialect.");
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("Can't support language or dialect.\n");
+                    sb.append(description.getPrimordialComponentUuid().toString());
+                    sb.append(" ");
+                    sb.append(description.getLang());
+                    sb.append(" ");
+                    sb.append(description.getText());
+                    sb.append("\n");
+                    throw new UnsupportedDialectOrLanguage(sb.toString());
                 }
 
                 if (description.getAuthorUuid() == null) {

@@ -31,7 +31,8 @@ import org.apache.maven.plugin.MojoFailureException;
 /**
  *
  * Read a file of SCTID with corresponding UUIDs and determines if the UUIDs
- * need to be re-mapped.
+ * need to be re-mapped. 
+ * Creates an ARF file of primordial UUIDs<br>
  *
  * @author Marc E. Campbell
  *
@@ -146,11 +147,10 @@ public class Rf2IdUuidCacheArfGenMojo extends AbstractMojo implements Serializab
             // Setup id array cache object
             // idCacheDir + FILE_SEPARATOR + "idObjectCache.jbin"
             long startTime = System.currentTimeMillis();
-            Sct2_IdLookUp idLookup = new Sct2_IdLookUp(idCacheFName);
+            Sct2_UuidUuidRemapper idLookup = new Sct2_UuidUuidRemapper(idCacheFName);
             System.out.println((System.currentTimeMillis() - startTime) + " mS");
 
-            // Parse IHTSDO Terminology Identifiers
-            // to Sct_CompactId serial object file.
+            // Create an ARF file of primordial UUIDs
             String idAssignedArfFName = arfOutPath + "ids_assigned.txt";
             try (BufferedWriter bwIdArf = new BufferedWriter(
                             new OutputStreamWriter(

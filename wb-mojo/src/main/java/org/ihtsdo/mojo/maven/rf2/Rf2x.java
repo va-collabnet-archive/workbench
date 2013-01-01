@@ -53,12 +53,12 @@ public class Rf2x {
         File file = new File(idCachePathFile);
         System.out.println("File = " + file.getAbsolutePath());
         if (!file.exists()) {
-            System.out.println(":::TEST: id cache file does not exist!!!@!");
+            System.out.println(":::INFO: SCTID/UUID cache file does not exist!!!@!");
             // Initialize with an empty id list
             sctid2UuidCache = new Sct2_IdLookUp(new ArrayList<Sct2_IdCompact>());
             notMappedCounter = 0;
         } else {
-            System.out.println(":::TEST: id cache file exists!!!@!");
+            System.out.println(":::INFO: SCTID/UUID cache file exists!!!@!");
             sctid2UuidCache = new Sct2_IdLookUp(file.getAbsolutePath());
             notMappedCounter = 0;
         }
