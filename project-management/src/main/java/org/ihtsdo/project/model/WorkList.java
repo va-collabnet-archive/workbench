@@ -19,6 +19,7 @@ package org.ihtsdo.project.model;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,11 +36,13 @@ import org.ihtsdo.project.workflow.api.WorkflowDefinitionManager;
 import org.ihtsdo.project.workflow.model.WfMembership;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
+import org.ihtsdo.project.workflow2.WfTaskBI;
+import org.ihtsdo.project.workflow2.WorkListBI;
 
 /**
  * The Class WorkList.
  */
-public class WorkList extends WorkflowRefset implements Serializable{
+public class WorkList extends WorkflowRefset implements Serializable, WorkListBI{
 
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
@@ -117,6 +120,7 @@ public class WorkList extends WorkflowRefset implements Serializable{
 	 * 
 	 * @return the name
 	 */
+	@Override
 	public String getName() {
 		return name;
 	}
@@ -326,5 +330,22 @@ public class WorkList extends WorkflowRefset implements Serializable{
 		}
 		return null;
 
+	}
+
+	@Override
+	public UUID getUuid() {
+		return getUids().iterator().next();
+	}
+
+	@Override
+	public Collection<WfTaskBI> getInstances() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getDescription() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
