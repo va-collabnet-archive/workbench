@@ -29,6 +29,6 @@ public interface WfFilterBI {
      * values. It can be implemented to filter by state, role, destination, 
      * etc.
      */
-    boolean evaluateInstance(WfTaskBI instance);
+    boolean evaluateInstance(WfProcessInstanceBI instance);
     
 }

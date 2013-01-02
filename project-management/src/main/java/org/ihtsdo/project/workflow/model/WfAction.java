@@ -20,12 +20,12 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.UUID;
 
-import org.ihtsdo.project.workflow2.WfActionBI;
+import org.ihtsdo.project.workflow2.WfActivityBI;
 
 /**
  * The Class WfAction.
  */
-public class WfAction implements Serializable, WfActionBI {
+public class WfAction implements Serializable, WfActivityBI {
 
 	public static final String SEND_TO_OUTBOX = "Send to outbox";
 	public static final String NO_ACTION = "No action";

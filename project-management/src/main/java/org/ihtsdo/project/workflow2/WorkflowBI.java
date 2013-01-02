@@ -26,14 +26,14 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 public interface WorkflowBI {
     
     /** 
-     * Gets all workflow instances for a concept
+     * Gets all workflow process instances for a concept
      */
-    Collection<WfTaskBI> getTasks(ConceptVersionBI concept);
+    Collection<WfProcessInstanceBI> getProcessInstances(ConceptVersionBI concept);
     
     /** 
      * Gets all instances in the system using the filters criteria
      */
-    Collection<WfTaskBI> searchWorkflow(Collection<WfFilterBI> filters);
+    Collection<WfProcessInstanceBI> searchWorkflow(Collection<WfFilterBI> filters);
     
     /** 
      * Gets all users in the system
@@ -46,9 +46,9 @@ public interface WorkflowBI {
     Collection<WfStateBI> getAllStates();
     
     /** 
-     * Gets all actions in the system
+     * Gets all activities in the system
      */
-    Collection<WfActionBI> getAllActions();
+    Collection<WfActivityBI> getAllActivities();
     
     /** 
      * Gets all roles in the system
@@ -56,12 +56,12 @@ public interface WorkflowBI {
     Collection<WfRoleBI> getAllRoles();
     
     /** 
-     * Gets all workflow definitions in the system
+     * Gets all workflow process definitions in the system
      */
-    Collection<WfDefinitionBI> getAllDefinitions();
+    Collection<WfProcessDefinitionBI> getAllProcessDefinitions();
     
     /** 
-     * Gets all workflow definitions in the system
+     * Gets all projects in the system
      * @throws Exception 
      */
     Collection<ProjectBI> getAllProjects() throws Exception;

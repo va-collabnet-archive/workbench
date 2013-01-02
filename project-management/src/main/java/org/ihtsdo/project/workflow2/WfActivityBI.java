@@ -31,7 +31,7 @@ import java.util.UUID;
  * 
  * @author alo
  */
-public interface WfActionBI {
+public interface WfActivityBI {
     
     /** 
      * Gets the name of the workflow action

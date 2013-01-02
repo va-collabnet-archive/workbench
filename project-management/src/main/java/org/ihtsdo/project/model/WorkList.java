@@ -36,7 +36,7 @@ import org.ihtsdo.project.workflow.api.WorkflowDefinitionManager;
 import org.ihtsdo.project.workflow.model.WfMembership;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
-import org.ihtsdo.project.workflow2.WfTaskBI;
+import org.ihtsdo.project.workflow2.WfProcessInstanceBI;
 import org.ihtsdo.project.workflow2.WorkListBI;
 
 /**
@@ -338,7 +338,7 @@ public class WorkList extends WorkflowRefset implements Serializable, WorkListBI
 	}
 
 	@Override
-	public Collection<WfTaskBI> getInstances() {
+	public Collection<WfProcessInstanceBI> getInstances() {
 		// TODO Auto-generated method stub
 		return null;
 	}

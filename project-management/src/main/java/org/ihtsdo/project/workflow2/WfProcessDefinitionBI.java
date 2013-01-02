@@ -24,7 +24,7 @@ import java.util.UUID;
  * 
  * @author alo
  */
-public interface WfDefinitionBI {
+public interface WfProcessDefinitionBI {
     
     /** 
      * Gets the name of the workflow definition
@@ -47,9 +47,9 @@ public interface WfDefinitionBI {
     Collection<WfStateBI> getStates();
     
     /** 
-     * Gets the actions that are used in this workflow definition
+     * Gets the activities that are used in this workflow definition
      */
-    Collection<WfActionBI> getActions();
+    Collection<WfActivityBI> getActivities();
     
     /** 
      * Gets the logic that will define state transitions

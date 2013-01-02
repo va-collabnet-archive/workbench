@@ -3,17 +3,17 @@ package org.ihtsdo.project.workflow.model;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import org.ihtsdo.project.workflow2.WfActionBI;
-import org.ihtsdo.project.workflow2.WfDefinitionBI;
+import org.ihtsdo.project.workflow2.WfActivityBI;
+import org.ihtsdo.project.workflow2.WfProcessDefinitionBI;
 import org.ihtsdo.project.workflow2.WfHistoryEntryBI;
 import org.ihtsdo.project.workflow2.WfRoleBI;
 import org.ihtsdo.project.workflow2.WfStateBI;
-import org.ihtsdo.project.workflow2.WfTaskBI;
+import org.ihtsdo.project.workflow2.WfProcessInstanceBI;
 import org.ihtsdo.project.workflow2.WfUserBI;
 import org.ihtsdo.project.workflow2.WorkListBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 
-public class WfTaskImpl implements WfTaskBI {
+public class WfTaskImpl implements WfProcessInstanceBI {
 	
 	WfInstance instance;
 
@@ -34,7 +34,7 @@ public class WfTaskImpl implements WfTaskBI {
 	}
 
 	@Override
-	public WfDefinitionBI getWorkflowDefinition() {
+	public WfProcessDefinitionBI getWorkflowDefinition() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -64,25 +64,25 @@ public class WfTaskImpl implements WfTaskBI {
 	}
 
 	@Override
-	public Collection<WfActionBI> getActions(WfUserBI user) {
+	public Collection<WfActivityBI> getActions(WfUserBI user) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Collection<WfActionBI> getActions(WfRoleBI role) {
+	public Collection<WfActivityBI> getActions(WfRoleBI role) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Collection<WfActionBI> getActions(Collection<WfRoleBI> roles) {
+	public Collection<WfActivityBI> getActions(Collection<WfRoleBI> roles) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Collection<WfActionBI> getActionsForOverrideMode() {
+	public Collection<WfActivityBI> getActionsForOverrideMode() {
 		// TODO Auto-generated method stub
 		return null;
 	}

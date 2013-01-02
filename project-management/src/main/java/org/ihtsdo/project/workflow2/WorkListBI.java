@@ -46,7 +46,7 @@ public interface WorkListBI {
     /** 
      * Gets the UUID of the work list
      */
-    Collection<WfTaskBI> getInstances();
+    Collection<WfProcessInstanceBI> getInstances();
     
     /** 
      * Gets a description of the worklist, goals, instructions on how to edit, etc.

@@ -8,12 +8,12 @@ import org.dwfa.ace.api.Terms;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.workflow2.ProjectBI;
-import org.ihtsdo.project.workflow2.WfActionBI;
-import org.ihtsdo.project.workflow2.WfDefinitionBI;
+import org.ihtsdo.project.workflow2.WfActivityBI;
+import org.ihtsdo.project.workflow2.WfProcessDefinitionBI;
 import org.ihtsdo.project.workflow2.WfFilterBI;
 import org.ihtsdo.project.workflow2.WfRoleBI;
 import org.ihtsdo.project.workflow2.WfStateBI;
-import org.ihtsdo.project.workflow2.WfTaskBI;
+import org.ihtsdo.project.workflow2.WfProcessInstanceBI;
 import org.ihtsdo.project.workflow2.WfUserBI;
 import org.ihtsdo.project.workflow2.WorkflowBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -25,13 +25,13 @@ public class Workflow implements WorkflowBI {
 	}
 
 	@Override
-	public Collection<WfTaskBI> getTasks(ConceptVersionBI concept) {
+	public Collection<WfProcessInstanceBI> getProcessInstances(ConceptVersionBI concept) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Collection<WfTaskBI> searchWorkflow(Collection<WfFilterBI> filters) {
+	public Collection<WfProcessInstanceBI> searchWorkflow(Collection<WfFilterBI> filters) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -49,7 +49,7 @@ public class Workflow implements WorkflowBI {
 	}
 
 	@Override
-	public Collection<WfActionBI> getAllActions() {
+	public Collection<WfActivityBI> getAllActivities() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -61,7 +61,7 @@ public class Workflow implements WorkflowBI {
 	}
 
 	@Override
-	public Collection<WfDefinitionBI> getAllDefinitions() {
+	public Collection<WfProcessDefinitionBI> getAllProcessDefinitions() {
 		// TODO Auto-generated method stub
 		return null;
 	}

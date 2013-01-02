@@ -29,7 +29,7 @@ import org.ihtsdo.tk.api.ComponentVersionBI;
  * 
  * @author alo
  */
-public interface WfTaskBI {
+public interface WfProcessInstanceBI {
     
     /** 
      * Gets the component of this instance
@@ -44,7 +44,7 @@ public interface WfTaskBI {
     /** 
      * Gets the Workflow definition used in this instance
      */
-    WfDefinitionBI getWorkflowDefinition();
+    WfProcessDefinitionBI getWorkflowDefinition();
     
     /** 
      * Gets the current state of this instance
@@ -71,25 +71,25 @@ public interface WfTaskBI {
      * Gets available actions for the user, based on the roles, state of the
      * instance, and logic defined in the workflow definition
      */
-    Collection<WfActionBI> getActions(WfUserBI user);
+    Collection<WfActivityBI> getActions(WfUserBI user);
     
     /** 
      * Gets available actions for the role, state of the
      * instance, and logic defined in the workflow definition
      */
-    Collection<WfActionBI> getActions(WfRoleBI role);
+    Collection<WfActivityBI> getActions(WfRoleBI role);
     
     /** 
      * Gets available actions for the roles, state of the
      * instance, and logic defined in the workflow definition
      */
-    Collection<WfActionBI> getActions(Collection<WfRoleBI> roles);
+    Collection<WfActivityBI> getActions(Collection<WfRoleBI> roles);
     
     /** 
      * Gets all available actions for the workflow, override allows to skip
      * logic and perform any action
      */
-    Collection<WfActionBI> getActionsForOverrideMode();
+    Collection<WfActivityBI> getActionsForOverrideMode();
     
     /** 
      * Gets all available actions for the workflow, override allows to skip
