@@ -19,10 +19,13 @@ package org.ihtsdo.project.workflow.model;
 import java.io.Serializable;
 import java.util.UUID;
 
+import org.ihtsdo.project.workflow2.WfPermissionBI;
+import org.ihtsdo.project.workflow2.WfUserBI;
+
 /**
  * The Class WfPermission.
  */
-public class WfPermission implements Serializable{
+public class WfPermission implements Serializable, WfPermissionBI{
 	
 	/** The id. */
 	private UUID id;
@@ -104,6 +107,7 @@ public class WfPermission implements Serializable{
 	 *
 	 * @return the role
 	 */
+	@Override
 	public WfRole getRole() {
 		return role;
 	}
@@ -115,5 +119,22 @@ public class WfPermission implements Serializable{
 	 */
 	public void setRole(WfRole role) {
 		this.role = role;
+	}
+
+	@Override
+	public WfUserBI getUser() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public UUID getHierarchyParent() {
+		return hiearchyId;
+	}
+
+	@Override
+	public UUID getProject() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

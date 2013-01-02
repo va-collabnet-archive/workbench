@@ -19,10 +19,12 @@ package org.ihtsdo.project.workflow.model;
 import java.io.Serializable;
 import java.util.UUID;
 
+import org.ihtsdo.project.workflow2.WfRoleBI;
+
 /**
  * The Class WfRole.
  */
-public class WfRole implements Serializable {
+public class WfRole implements Serializable, WfRoleBI {
 	
 	/** The name. */
 	private String name;
@@ -54,6 +56,7 @@ public class WfRole implements Serializable {
 	 *
 	 * @return the name
 	 */
+	@Override
 	public String getName() {
 		return name;
 	}
@@ -90,6 +93,11 @@ public class WfRole implements Serializable {
 	 */
 	public String toString() {
 		return name;
+	}
+
+	@Override
+	public UUID getUuid() {
+		return getId();
 	}
 
 }

@@ -18,13 +18,19 @@ package org.ihtsdo.project.workflow.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+
+import org.ihtsdo.project.workflow2.ProjectBI;
+import org.ihtsdo.project.workflow2.WfPermissionBI;
+import org.ihtsdo.project.workflow2.WfRoleBI;
+import org.ihtsdo.project.workflow2.WfUserBI;
 
 /**
  * The Class WfUser.
  */
-public class WfUser implements Serializable{
+public class WfUser implements Serializable, WfUserBI {
 
 	/** The username. */
 	private String username;
@@ -153,6 +159,22 @@ public class WfUser implements Serializable{
 		} else {
 			return false;
 		}
+	}
+
+	@Override
+	public String getName() {
+		return getUsername();
+	}
+
+	@Override
+	public UUID getUuid() {
+		return getId();
+	}
+
+	@Override
+	public Collection<WfPermissionBI> getPermissions(ProjectBI project) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

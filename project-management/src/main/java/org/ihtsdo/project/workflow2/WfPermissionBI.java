@@ -27,21 +27,27 @@ import java.util.UUID;
  * 
  * @author alo
  */
-public interface WfUserBI {
+public interface WfPermissionBI {
     
     /** 
-     * Gets the name of the workflow user
+     * Gets the workflow user
      */
-    String getName();
+    WfUserBI getUser();
     
     /** 
-     * Gets the UUID of the workflow user
+     * Gets the role
      */
-    UUID getUuid();
+    WfRoleBI getRole();
     
     /** 
-     * Gets the Roles for the workflow user in a project, empty is not a member of the project
+     * Gets the UUID for the concept that is the parent of the hierarchy 
+     * where this permission applies
      */
-    Collection<WfPermissionBI> getPermissions(ProjectBI project);
+    UUID getHierarchyParent();
+    
+    /** 
+     * Gets the project where this permission applies
+     */
+    UUID getProject();
     
 }

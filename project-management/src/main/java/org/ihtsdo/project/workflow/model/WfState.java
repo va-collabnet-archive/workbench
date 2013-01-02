@@ -19,10 +19,12 @@ package org.ihtsdo.project.workflow.model;
 import java.io.Serializable;
 import java.util.UUID;
 
+import org.ihtsdo.project.workflow2.WfStateBI;
+
 /**
  * The Class WfState.
  */
-public class WfState implements Serializable{
+public class WfState implements Serializable, WfStateBI {
 
 	/** The name. */
 	private String name;
@@ -54,6 +56,7 @@ public class WfState implements Serializable{
 	 *
 	 * @return the name
 	 */
+	@Override
 	public String getName() {
 		return name;
 	}
@@ -103,6 +106,11 @@ public class WfState implements Serializable{
 		} else {
 			return false;
 		}
+	}
+
+	@Override
+	public UUID getUuid() {
+		return getId();
 	}
 
 }
