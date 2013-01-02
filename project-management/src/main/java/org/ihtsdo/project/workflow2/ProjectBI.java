@@ -60,15 +60,16 @@ public interface ProjectBI {
      */
     Collection<WorkListBI> getWorkLists();
     
-    /** 
-     * Gets all users assigned to this project
-     */
-    Collection<WfUserBI> getUsers();
     
     /** 
-     * Gets roles for the user (in this project)
+     * Gets permissions for the user (in this project)
      */
-    Collection<WfRoleBI> getRolesForUser(WfUserBI user);
+    Collection<WfPermissionBI> getPermissions(WfUserBI user);
+    
+    /** 
+     * Gets permissions in this project
+     */
+    Collection<WfPermissionBI> getPermissions();
     
     /** 
      * Gets a description of the project, goals, instructions on how to edit, etc.

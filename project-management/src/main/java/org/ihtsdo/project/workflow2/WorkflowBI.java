@@ -28,7 +28,7 @@ public interface WorkflowBI {
     /** 
      * Gets all workflow instances for a concept
      */
-    Collection<WfTaskBI> getInstances(ConceptVersionBI concept);
+    Collection<WfTaskBI> getTasks(ConceptVersionBI concept);
     
     /** 
      * Gets all instances in the system using the filters criteria
@@ -62,7 +62,8 @@ public interface WorkflowBI {
     
     /** 
      * Gets all workflow definitions in the system
+     * @throws Exception 
      */
-    Collection<WfDefinitionBI> getAllProjects();
+    Collection<ProjectBI> getAllProjects() throws Exception;
     
 }
