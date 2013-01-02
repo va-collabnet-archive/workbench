@@ -19,7 +19,7 @@ import java.util.Collection;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 
 /**
- * A class that handle all workflow operations
+ * A class that handles all workflow operations
  * 
  * @author alo
  */

@@ -18,8 +18,24 @@ package org.ihtsdo.project.workflow2;
 import java.util.UUID;
 
 /**
- * A representation of a workflow state value, each WorkflowInstance will have
- * one state value in one point in time.
+ * A representation of the internal conditions defining the 
+ * status of a process instance at a particular point in time. 
+ * Most workflow management systems maintain such status 
+ * information as part of their workflow control data.
+ * 
+ * The state of each process instance under enactment is maintained 
+ * by the workflow management system. Different vendor systems have 
+ * different ways of representing process state and may have their 
+ * own set of state definitions
+ * 
+ * As the execution of a process instance proceeds it follows a 
+ * series of transitions between the various states which it may take. 
+ * The complete set of process states for a process definition fully 
+ * defines the internal behavior which its process instances may 
+ * follow.
+ * 
+ * Source: Workflow Management Coalition http://www.wfmc.org/reference-model.html
+ * 
  * Example values:
  *  - Assigned
  *  - Reviewed

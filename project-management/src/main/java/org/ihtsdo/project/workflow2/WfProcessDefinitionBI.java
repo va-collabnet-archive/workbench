@@ -19,8 +19,15 @@ import java.util.Collection;
 import java.util.UUID;
 
 /**
- * The workflow definition includes all components that specify the actions and
- * transitions that will occur in a workflow.
+ * The representation of a business process in a form which 
+ * supports automated manipulation, such as modelling, or enactment by a 
+ * workflow management system. The process definition consists of a 
+ * network of activities and their relationships, criteria to indicate 
+ * the start and termination of the process, and information about the 
+ * individual activities, such as participants, associated IT applications 
+ * and data, etc.
+ * 
+ * Source: Workflow Management Coalition http://www.wfmc.org/reference-model.html
  * 
  * @author alo
  */

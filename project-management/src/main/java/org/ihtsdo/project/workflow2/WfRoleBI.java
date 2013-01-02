@@ -18,9 +18,16 @@ package org.ihtsdo.project.workflow2;
 import java.util.UUID;
 
 /**
- * A representation of a workflow role, each user participating in a workflow 
- * will have an assigned role. 
- * Actions will be available depending on the role.
+ * The role defines the context in which the user 
+ * participates in a particular process or activity. 
+ * The role often embraces organisational concepts such as 
+ * structure and relationships, responsibility or authority, 
+ * but may also refer to other attributes such as skill, 
+ * location, value data, time or date, etc.. 
+ * 
+ * Source: Workflow Management Coalition http://www.wfmc.org/reference-model.html
+ * 
+ * Activities will be available depending on the role.
  * Example values:
  *  - Editor Category A
  *  - Reviewer

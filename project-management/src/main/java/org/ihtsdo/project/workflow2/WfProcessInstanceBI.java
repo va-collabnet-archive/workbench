@@ -21,11 +21,25 @@ import java.util.LinkedList;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 
 /**
- * A representation of the status of a component in workflow.
- * When a component is sent into a workflow, a new instance is created. A component
- * can have multiple concurrent instances, that progress separately.
- * Most of the time a component focus of a workflow will be concept, in exceptional cases it 
- * can be other kind of components.
+ * The representation of a single enactment of a process.
+ * A process instance is created, managed and (eventually) 
+ * terminated by a workflow management system, in accordance 
+ * with the process definition.
+ * 
+ * Each process instance represents one individual enactment 
+ * of the process, using its own process instance data, and 
+ * which is (normally) capable of independent control and audit 
+ * as it progresses towards completion or termination. It 
+ * represents the unit of work with respect to a business process 
+ * which passes through a workflow management system (for example, 
+ * the processing of one insurance claim, or the production of one 
+ * engineering design).
+ * 
+ * Each process instance exhibits internal state, which represents 
+ * its progress towards completion and its status with respect to its 
+ * constituent activities.
+ * 
+ * Source: Workflow Management Coalition http://www.wfmc.org/reference-model.html
  * 
  * @author alo
  */

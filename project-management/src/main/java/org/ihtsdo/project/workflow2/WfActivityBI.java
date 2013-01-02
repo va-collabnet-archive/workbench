@@ -18,11 +18,15 @@ package org.ihtsdo.project.workflow2;
 import java.util.UUID;
 
 /**
- * A representation of a workflow Action, these actions will be executed
- * manually by the users or automatically triggered by events.
- * Executables are represented as generic objects, each implementation will
- * specialize this classes to use specific technologies.
- * Example actions:
+ * A description of a piece of work that forms one logical step within a process. 
+ * An activity may be a manual activity, which does not support computer automation, 
+ * or a workflow (automated) activity. A workflow activity requires human and/or 
+ * machine resources(s) to support process execution; where human resource is required 
+ * an activity may be allocated to a workflow participant.
+ * 
+ * Source: Workflow Management Coalition http://www.wfmc.org/reference-model.html
+ * 
+ * Example activities:
  *  - Send to reviewer
  *  - Approve for publication
  *  - Reject translation
