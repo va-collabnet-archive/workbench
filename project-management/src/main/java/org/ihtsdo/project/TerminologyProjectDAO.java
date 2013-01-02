@@ -2887,7 +2887,10 @@ public class TerminologyProjectDAO {
 		newNacWorkList.setWorkflowUserRoles(workflowUserRoles);
 
 		WorkList returnWorkList = createNewWorkList(newNacWorkList, config);
-		ActivityUpdater updater = new ActivityUpdater(activity, "Generating WorkList");
+		ActivityUpdater updater = null;
+		if(activity != null){
+			updater = new ActivityUpdater(activity, "Generating WorkList");
+		}
 		if (returnWorkList != null) {
 			initializeWorkList(nacWorkListPartition, returnWorkList, config, updater);
 		}
