@@ -20,12 +20,16 @@ import java.util.*;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.country.COUNTRY_CODE;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.helper.export.Rf2Export;
+import org.ihtsdo.helper.refex.Rf2RefexComputer;
 import org.ihtsdo.helper.rf2.Rf2File;
+import org.ihtsdo.helper.rf2.Rf2File.ReleaseType;
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.helper.transform.UuidSnomedMapHandler;
 import org.ihtsdo.helper.transform.UuidToSctIdMapper;
@@ -35,10 +39,13 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.binding.snomed.Snomed;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
 /**
- * Goal which generates an incremental Rf2 file.
+ * Goal which generates an incremental Rf2 file. If first release, use a delta
+ * release type with start date of the time to start including data and an end
+ * date of latest.
  *
  * @goal generate-irf2-file
  *
@@ -75,13 +82,13 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
     /**
      * Start date for inclusion in the RF2 files, in yyyy-MM-dd-HH.mm.ss format.
      *
-     * @parameter @required
+     * @parameter
      */
     private String startDate;
     /**
      * End date for inclusion in the RF2 files, in yyyy-MM-dd-HH.mm.ss format.
-     *
-     * @parameter @required
+     * 
+     * @parameter
      */
     private String endDate;
     /**
@@ -153,8 +160,32 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
      * @parameter
      */
     private ConceptDescriptor refsetParentConceptSpec;
+    /**
+     * Set to true to make initial sct to uuid mapping files.
+     *
+     * @parameter 
+     * default-value="false"
+     */
+    private boolean makeInitialMappingFiles;
+    /**
+     * Effective date of previous release.
+     * @parameter
+     */
+    private String previousReleaseDate;
+    /**
+     * RF2 release file type.
+     * @parameter @required
+     */
+    private ReleaseType releaseType;
+    /**
+     * Set to true to create rf2 release refsets.
+     *
+     * @parameter 
+     * default-value="false"
+     */
+    private boolean makeRf2Refsets;
     
-    private IntSet sapsToWrite = new IntSet();
+    private IntSet stampsToWrite = new IntSet();
     private IntSet pathIds;
 
     @Override
@@ -201,50 +232,98 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
             } else {
                 throw new MojoExecutionException("No view path specified.");
             }
-            IntSet sapsToWrite = Bdb.getSapDb().getSpecifiedSapNids(pathIds,
-                    TimeHelper.getFileDateFormat().parse(startDate).getTime(),
-                    TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()));
-
+            
+            //filter start and end dates by release version
+            if (releaseType.equals(ReleaseType.DELTA)) {
+                if(startDate == null || endDate == null){
+                    throw new MojoExecutionException("A Delta Release requires both a start and end date to be specified.");
+                }
+                //use specified start and end dates
+            } else if (releaseType.equals(ReleaseType.FULL)) {
+                startDate = "bot";
+                endDate = "latest";
+            } else if (releaseType.equals(ReleaseType.SNAPSHOT)) {
+                startDate = "bot";
+                endDate = "latest";
+            }
+            
             ViewCoordinate vc = new ViewCoordinate(Ts.get().getMetadataViewCoordinate());
             vc.getIsaTypeNids().add(Snomed.IS_A.getLenient().getConceptNid());
-            NidSetBI allowedStatusNids = vc.getAllowedStatusNids();
-
             PathBI path = Ts.get().getPath(viewPathNid);
             PositionBI position = Ts.get().newPosition(path,
                     TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()));
             vc.setPositionSet(new PositionSet(position));
-            getLog().info("Criterion matches " + sapsToWrite.size() + " sapNids: " + sapsToWrite);
-                NidBitSetBI allConcepts = Ts.get().getAllConceptNids();
+            stampsToWrite = Bdb.getSapDb().getSpecifiedSapNids(pathIds,
+                    TimeHelper.getTimeFromString(startDate, TimeHelper.getFileDateFormat()),
+                    TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()));
+            File refsetCs = new File(output.getParentFile(), "changesets");
+            refsetCs.mkdir();
+            if (makeRf2Refsets) {
+                Rf2RefexComputer rf2RefexComputer = new Rf2RefexComputer(vc, Ts.get().getMetadataEditCoordinate(),
+                        refsetCs, stampsToWrite.getAsSet());
+                rf2RefexComputer.setup();
+                Ts.get().iterateConceptDataInSequence(rf2RefexComputer);
+                rf2RefexComputer.cleanup();
+
+                Set<Integer> newStampNids = rf2RefexComputer.getNewStampNids();
+                for (int stamp : newStampNids) {
+                    stampsToWrite.add(stamp);
+                }
+            }
+
+            IntSet sapsToRemove = new IntSet();
+            if(previousReleaseDate != null){
+                sapsToRemove = Bdb.getSapDb().getSpecifiedSapNids(pathIds,
+                    TimeHelper.getTimeFromString(previousReleaseDate, TimeHelper.getFileDateFormat()),
+                    TimeHelper.getTimeFromString("latest", TimeHelper.getFileDateFormat()));
+            }
+            getLog().info("Release type: " + releaseType);  
+            getLog().info("Criterion matches " + stampsToWrite.size() + " sapNids: " + stampsToWrite);
+            for(int stamp : stampsToWrite.getAsSet()){
+                long timeForStampNid = Ts.get().getTimeForStampNid(stamp);
+                String time = TimeHelper.formatDate(timeForStampNid);
+                System.out.println("#### stamp: " + stamp + " Time: " + time);
+            }
+            NidBitSetBI allConcepts = Ts.get().getAllConceptNids();
+            if (makeInitialMappingFiles) {
                 UuidToSctIdMapper mapper = new UuidToSctIdMapper(allConcepts, namespace, output);
                 Ts.get().iterateConceptDataInSequence(mapper);
                 mapper.close();
-                UuidSnomedMapHandler handler = new UuidSnomedMapHandler(output, output);
-                handler.setNamespace(namespace);
-                Integer refsetParentConceptNid = 0;
-                if(refsetParentConceptSpec != null){
-                    refsetParentConceptNid = Ts.get().getNidForUuids(UUID.fromString(refsetParentConceptSpec.getUuid()));
-                }
-                Rf2Export exporter = new Rf2Export(output,
-                        Rf2File.ReleaseType.DELTA,
-                        LANG_CODE.EN,
-                        COUNTRY_CODE.valueOf(countryCode),
-                        namespace,
-                        moduleId.toString(),
-                        new Date(TimeHelper.getTimeFromString(effectiveDate,
-                        TimeHelper.getAltFileDateFormat())),
-                        sapsToWrite.getAsSet(),
-                        vc,
-                        excludedRefsetIds.getAsSet(),
-                        allConcepts,
-                        makePrivateAltIdsFile,
-                        refsetParentConceptNid);
-                Ts.get().iterateConceptDataInSequence(exporter);
-                exporter.writeOneTimeFiles();
-                exporter.close();
-                UuidToSctIdWriter writer = new UuidToSctIdWriter(namespace, moduleId.toString(),
-                        output, handler);
-                writer.write();
-                writer.close();
+            }
+            UuidSnomedMapHandler handler = new UuidSnomedMapHandler(output, output);
+            handler.setNamespace(namespace);
+            Integer refsetParentConceptNid = 0;
+            if (refsetParentConceptSpec != null) {
+                refsetParentConceptNid = Ts.get().getNidForUuids(UUID.fromString(refsetParentConceptSpec.getUuid()));
+            }
+            
+             Rf2Export exporter = new Rf2Export(output,
+                    releaseType,
+                    LANG_CODE.EN,
+                    COUNTRY_CODE.valueOf(countryCode),
+                    namespace,
+                    moduleId.toString(),
+                    new Date(TimeHelper.getTimeFromString(effectiveDate,
+                    TimeHelper.getAltFileDateFormat())),
+                    stampsToWrite.getAsSet(),
+                    vc,
+                    excludedRefsetIds.getAsSet(),
+                    allConcepts,
+                    makePrivateAltIdsFile,
+                    refsetParentConceptNid,
+                    new Date(TimeHelper.getTimeFromString(this.previousReleaseDate,
+                        TimeHelper.getFileDateFormat())),
+                    sapsToRemove.getAsSet());
+            Ts.get().iterateConceptDataInSequence(exporter);
+            exporter.writeOneTimeFiles();
+            exporter.close();
+            UuidToSctIdWriter writer = new UuidToSctIdWriter(namespace, moduleId.toString(),
+                    output, handler, releaseType, COUNTRY_CODE.valueOf(countryCode),
+                    new Date(TimeHelper.getTimeFromString(effectiveDate,
+                    TimeHelper.getAltFileDateFormat())));
+            writer.write();
+            writer.close();
+            handler.writeMaps();
         } catch (Exception e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }
