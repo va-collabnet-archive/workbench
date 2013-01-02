@@ -28,12 +28,12 @@ public interface WorkflowBI {
     /** 
      * Gets all workflow instances for a concept
      */
-    Collection<WfInstanceBI> getInstances(ConceptVersionBI concept);
+    Collection<WfTaskBI> getInstances(ConceptVersionBI concept);
     
     /** 
      * Gets all instances in the system using the filters criteria
      */
-    Collection<WfInstanceBI> searchWorkflow(Collection<WfFilterBI> filters);
+    Collection<WfTaskBI> searchWorkflow(Collection<WfFilterBI> filters);
     
     /** 
      * Gets all users in the system
@@ -59,5 +59,10 @@ public interface WorkflowBI {
      * Gets all workflow definitions in the system
      */
     Collection<WfDefinitionBI> getAllDefinitions();
+    
+    /** 
+     * Gets all workflow definitions in the system
+     */
+    Collection<WfDefinitionBI> getAllProjects();
     
 }

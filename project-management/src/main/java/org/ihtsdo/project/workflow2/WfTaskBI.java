@@ -29,7 +29,7 @@ import org.ihtsdo.tk.api.ComponentVersionBI;
  * 
  * @author alo
  */
-public interface WfInstanceBI {
+public interface WfTaskBI {
     
     /** 
      * Gets the component of this instance
