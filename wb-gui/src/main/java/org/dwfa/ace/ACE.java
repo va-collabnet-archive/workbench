@@ -39,6 +39,7 @@ import java.util.logging.Level;
 import javax.security.auth.login.LoginException;
 import javax.swing.Timer;
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import net.jini.config.Configuration;
@@ -1977,7 +1978,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
       return batchConceptTable.getList();
    }
 
-   JPanel getBottomPanel() {
+   JPanel getBottomPanel() throws IOException {
       JPanel             bottomPanel = new JPanel(new GridBagLayout());
       GridBagConstraints c           = new GridBagConstraints();
 
@@ -2003,6 +2004,19 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
          new TransporterLabel(new ImageIcon(ACE.class.getResource("/32x32/plain/flash.png")), this);
 
       bottomPanel.add(flashButton, c);
+      c.gridx++;
+      bottomPanel.add(new JLabel("  "), c);
+      c.gridx++;
+      Set<PathBI> editingPathSet = aceFrameConfig.getEditingPathSet();
+      PathBI path = editingPathSet.iterator().next();
+      JTextField pathDisplay = new JTextField();
+      pathDisplay.setOpaque(false);
+      Border outside = BorderFactory.createLineBorder(aceFrameConfig.getColorForPath(path.getConceptNid()), 2);
+      Border inside = BorderFactory.createEmptyBorder(1, 2, 1, 2);
+      Border border = BorderFactory.createCompoundBorder(outside, inside);
+      pathDisplay.setBorder(border);
+      pathDisplay.setText(Ts.get().getConceptForNid(path.getConceptNid()).toUserString());
+      bottomPanel.add(pathDisplay, c);
       c.gridx++;
       bottomPanel.add(new JLabel("  "), c);
       c.gridx++;
