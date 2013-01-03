@@ -3011,6 +3011,7 @@ public class TerminologyProjectDAO {
 	 * @throws Exception
 	 *             the exception
 	 */
+	@Deprecated
 	public static WorkList createNewNacWorkList(String name, BusinessProcess bp, I_TerminologyProject project, I_ConfigAceFrame config) throws Exception {
 		WorkList newNacWorkList = null;
 		WorkSet nacWorkSet = getNonAssignedChangesWorkSet(project, config);
