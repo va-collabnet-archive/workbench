@@ -17,6 +17,7 @@ package org.ihtsdo.project.workflow2;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.UUID;
 
 import org.ihtsdo.tk.api.ComponentVersionBI;
 
@@ -46,9 +47,9 @@ import org.ihtsdo.tk.api.ComponentVersionBI;
 public interface WfProcessInstanceBI {
     
     /** 
-     * Gets the component of this instance
+     * Gets the UUID from component of this instance
      */
-    ComponentVersionBI getComponent();
+    UUID getComponentPrimUuid();
     
     /** 
      * Gets the WorkList where this instance is member of

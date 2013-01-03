@@ -17,6 +17,8 @@
 package org.ihtsdo.project.workflow.model;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -30,11 +32,19 @@ import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
+import org.ihtsdo.project.workflow2.WfActivityBI;
+import org.ihtsdo.project.workflow2.WfHistoryEntryBI;
+import org.ihtsdo.project.workflow2.WfProcessDefinitionBI;
+import org.ihtsdo.project.workflow2.WfProcessInstanceBI;
+import org.ihtsdo.project.workflow2.WfRoleBI;
+import org.ihtsdo.project.workflow2.WfStateBI;
+import org.ihtsdo.project.workflow2.WfUserBI;
+import org.ihtsdo.tk.api.ComponentVersionBI;
 
 /**
  * The Class WfInstance.
  */
-public class WfInstance implements Serializable{
+public class WfInstance implements Serializable, WfProcessInstanceBI {
 	
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
@@ -178,24 +188,6 @@ COMPLETE};
 	}
 
 	/**
-	 * Gets the history.
-	 *
-	 * @return the history
-	 */
-	public List<WfHistoryEntry> getHistory() {
-		return history;
-	}
-
-	/**
-	 * Sets the history.
-	 *
-	 * @param history the new history
-	 */
-	public void setHistory(List<WfHistoryEntry> history) {
-		this.history = history;
-	}
-
-	/**
 	 * Gets the work list.
 	 *
 	 * @return the work list
@@ -326,5 +318,92 @@ COMPLETE};
 		}else{
 			return false;
 		}
+	}
+
+	@Override
+	public UUID getComponentPrimUuid() {
+		return this.getComponentId();
+	}
+
+	@Override
+	public WfProcessDefinitionBI getWorkflowDefinition() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setState(WfStateBI state) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public WfUserBI getAssignedUser() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setAssignedUser(WfUserBI user) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Collection<WfActivityBI> getActions(WfUserBI user) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Collection<WfActivityBI> getActions(WfRoleBI role) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Collection<WfActivityBI> getActions(Collection<WfRoleBI> roles) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Collection<WfActivityBI> getActionsForOverrideMode() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Long getDueDate() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Long getCreationDate() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Integer getPriority() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean isActive() {
+		return false;
+	}
+
+	@Override
+	public boolean isCompleted() {
+		return false;
+	}
+
+	@Override
+	public LinkedList<WfHistoryEntryBI> getHistory() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

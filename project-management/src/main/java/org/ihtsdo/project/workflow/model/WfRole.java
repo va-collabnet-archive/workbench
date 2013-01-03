@@ -26,6 +26,11 @@ import org.ihtsdo.project.workflow2.WfRoleBI;
  */
 public class WfRole implements Serializable, WfRoleBI {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	/** The name. */
 	private String name;
 	

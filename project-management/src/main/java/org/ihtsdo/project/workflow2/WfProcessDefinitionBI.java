@@ -40,8 +40,9 @@ public interface WfProcessDefinitionBI {
     
     /** 
      * Gets the UUID of the workflow definition
+     * @throws Exception 
      */
-    UUID getUuid();
+    UUID getUuid() throws Exception;
     
     /** 
      * Gets the roles that participate in this workflow definition

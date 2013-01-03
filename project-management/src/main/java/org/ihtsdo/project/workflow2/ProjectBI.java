@@ -46,30 +46,35 @@ public interface ProjectBI {
     /** 
      * Gets the ViewCoordinate of this project, this allows the retrieval of
      * of the current concept version for this instance
+     * @throws Exception 
      */
-    ViewCoordinate getViewCoordinate();
+    ViewCoordinate getViewCoordinate() throws Exception;
     
     /** 
      * Gets the EditCoordinate of this project, actions should use this edit
      * coordinate to perform changes in the data
+     * @throws Exception 
      */
-    EditCoordinate getEditCoordinate();
+    EditCoordinate getEditCoordinate() throws Exception;
     
     /** 
      * Gets all work lists in the project
+     * @throws Exception 
      */
-    Collection<WorkListBI> getWorkLists();
+    Collection<WorkListBI> getWorkLists() throws Exception;
     
     
     /** 
      * Gets permissions for the user (in this project)
+     * @throws Exception 
      */
-    Collection<WfPermissionBI> getPermissions(WfUserBI user);
+    Collection<WfPermissionBI> getPermissions(WfUserBI user) throws Exception;
     
     /** 
      * Gets permissions in this project
+     * @throws Exception 
      */
-    Collection<WfPermissionBI> getPermissions();
+    Collection<WfPermissionBI> getPermissions() throws Exception;
     
     /** 
      * Gets a description of the project, goals, instructions on how to edit, etc.

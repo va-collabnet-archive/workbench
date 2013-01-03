@@ -27,8 +27,9 @@ public interface WorkflowBI {
     
     /** 
      * Gets all workflow process instances for a concept
+     * @throws Exception 
      */
-    Collection<WfProcessInstanceBI> getProcessInstances(ConceptVersionBI concept);
+    Collection<WfProcessInstanceBI> getProcessInstances(ConceptVersionBI concept) throws Exception;
     
     /** 
      * Gets all instances in the system using the filters criteria

@@ -17,6 +17,7 @@ import org.ihtsdo.project.workflow2.WfProcessInstanceBI;
 import org.ihtsdo.project.workflow2.WfUserBI;
 import org.ihtsdo.project.workflow2.WorkflowBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
 
 public class Workflow implements WorkflowBI {
 
@@ -25,8 +26,8 @@ public class Workflow implements WorkflowBI {
 	}
 
 	@Override
-	public Collection<WfProcessInstanceBI> getProcessInstances(ConceptVersionBI concept) {
-		// TODO Auto-generated method stub
+	public Collection<WfProcessInstanceBI> getProcessInstances(ConceptVersionBI concept) throws Exception {
+		Collection<? extends RefexVersionBI<?>> annotations = concept.getAnnotationsActive(concept.getViewCoordinate());
 		return null;
 	}
 
