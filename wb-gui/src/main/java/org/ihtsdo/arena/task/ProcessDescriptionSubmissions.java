@@ -48,6 +48,7 @@ import org.ihtsdo.helper.msfile.DescriptionAdditionFileHelper;
 import org.ihtsdo.helper.msfile.MemberSubmissionFileHelper;
 import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ComponentChronicleBI;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.DescriptionCAB;
@@ -81,6 +82,8 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
     private boolean addSecondDialectRefex = false; //true if lang is EN and description is valid for both us and gb spellings
     private LANG_CODE dialect = null;
     private ArrayList<ConceptChronicleBI> conceptsToCommit;
+    private ArrayList<String> duplicateDescriptions;
+    private ArrayList<String> descMissingParentConcept;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -107,6 +110,8 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
         int count = 0;
         try {
             uuidList = new ArrayList<List<UUID>>();
+            duplicateDescriptions = new ArrayList<>();
+            descMissingParentConcept = new ArrayList<>();
             conceptsToCommit = new ArrayList<>();
             I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(
                     WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
@@ -170,7 +175,9 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
                 count++;
             }
             count++;
+            boolean add = true;
             while (line != null) {
+                add = true;
                 count++;
                 conceptNid = 0;
                 descText = null;
@@ -189,109 +196,119 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
                     for (I_GetConceptData concept : concepts) {
                         conceptNid = concept.getNid();
                     }
-                    if(conceptNid == 0){
-                        throw new TaskFailedException("No concept found for the specified ID: " + part);
+                    if (conceptNid == 0) {
+                        descMissingParentConcept.add(line);
+                        add = false;
                     }
                 }
                 if (uuidPosition != null && sctPosition == null) {
                     part = parts[uuidPosition];
-                    if(!Ts.get().hasUuid(UUID.fromString(part))){
-                        throw new TaskFailedException("No concept found for the specified ID: " + part);
-                    }
-                    conceptNid = Ts.get().getNidForUuids(UUID.fromString(part));
-                }
-                if(conceptNid == 0){
-                    throw new TaskFailedException("Must specify either UUID or SCT ID for concept.");
-                }
-                if (descPosition != null) {
-                    part = parts[descPosition];
-                    descText = part;
-                } else {
-                    throw new TaskFailedException("Description text cannot be empty.");
-                }
-                if (langPosition != null) {
-                    part = parts[langPosition];
-                    lang = LANG_CODE.getLangCode(part);
-                } else {
-                    lang = LANG_CODE.EN;
-                }
-                if (dialectPosition != null) {
-                    part = parts[dialectPosition];
-                    dialect = LANG_CODE.getLangCode(part);
-                } else if (lang == LANG_CODE.EN) {
-                    dialect = LANG_CODE.EN_US;
-                }
-                if(casePosition != null){
-                    part = parts[casePosition];
-                    if(part.equalsIgnoreCase("true")){
-                        caseSensitive = true;
-                    }else if(part.equalsIgnoreCase("false")){
-                        caseSensitive = false;
+                    if (!Ts.get().hasUuid(UUID.fromString(part))) {
+                        descMissingParentConcept.add(line);
+                        add = false;
                     }else{
-                        throw new TaskFailedException("Cannot read preference for case sensitivity. Must be either true or false.");
+                        conceptNid = Ts.get().getNidForUuids(UUID.fromString(part));
                     }
                 }
-                if (acceptSct != null) {
-                    part = parts[acceptSct];
-                    Set<I_GetConceptData> concepts = Terms.get().getConcept(part);
-                    for (I_GetConceptData concept : concepts) {
-                        acceptabilityNid = concept.getNid();
+                if (add) {
+                    if (conceptNid == 0) {
+                        throw new TaskFailedException("Must specify either UUID or SCT ID for concept.");
                     }
-                } 
-                if (acceptUuid != null) {
-                    part = parts[acceptUuid];
-                    acceptabilityNid = Ts.get().getNidForUuids(UUID.fromString(part));
-                }
-                if(acceptabilityNid == 0){
-                    acceptabilityNid = SnomedMetadataRfx.getDESC_ACCEPTABLE_NID();
-                }
+                    if (descPosition != null) {
+                        part = parts[descPosition];
+                        descText = part;
+                    } else {
+                        throw new TaskFailedException("Description text cannot be empty.");
+                    }
+                    if (langPosition != null) {
+                        part = parts[langPosition];
+                        lang = LANG_CODE.getLangCode(part);
+                    } else {
+                        lang = LANG_CODE.EN;
+                    }
+                    if (dialectPosition != null) {
+                        part = parts[dialectPosition];
+                        dialect = LANG_CODE.getLangCode(part);
+                    } else if (lang == LANG_CODE.EN) {
+                        dialect = LANG_CODE.EN_US;
+                    }
+                    if (casePosition != null) {
+                        part = parts[casePosition];
+                        if (part.equalsIgnoreCase("true")) {
+                            caseSensitive = true;
+                        } else if (part.equalsIgnoreCase("false")) {
+                            caseSensitive = false;
+                        } else {
+                            throw new TaskFailedException("Cannot read preference for case sensitivity. Must be either true or false.");
+                        }
+                    }
+                    if (acceptSct != null) {
+                        part = parts[acceptSct];
+                        Set<I_GetConceptData> concepts = Terms.get().getConcept(part);
+                        for (I_GetConceptData concept : concepts) {
+                            acceptabilityNid = concept.getNid();
+                        }
+                    }
+                    if (acceptUuid != null) {
+                        part = parts[acceptUuid];
+                        acceptabilityNid = Ts.get().getNidForUuids(UUID.fromString(part));
+                    }
+                    if (acceptabilityNid == 0) {
+                        acceptabilityNid = SnomedMetadataRfx.getDESC_ACCEPTABLE_NID();
+                    }
 
-                if (dialect == LANG_CODE.EN_US) {
-                    langRefexNid = SnomedMetadataRfx.getUS_DIALECT_REFEX_NID();
-                    checkForDialectVariant(descText);
-                    if(addSecondDialectRefex){
-                        secondDialectRefexNid = SnomedMetadataRfx.getGB_DIALECT_REFEX_NID();
+                    if (dialect == LANG_CODE.EN_US) {
+                        langRefexNid = SnomedMetadataRfx.getUS_DIALECT_REFEX_NID();
+                        checkForDialectVariant(descText);
+                        if (addSecondDialectRefex) {
+                            secondDialectRefexNid = SnomedMetadataRfx.getGB_DIALECT_REFEX_NID();
+                        }
+                    } else if (dialect == LANG_CODE.EN_GB) {
+                        langRefexNid = SnomedMetadataRfx.getGB_DIALECT_REFEX_NID();
+                        checkForDialectVariant(descText);
+                        if (addSecondDialectRefex) {
+                            secondDialectRefexNid = SnomedMetadataRfx.getUS_DIALECT_REFEX_NID();
+                        }
+                    } else if (lang == LANG_CODE.NL) {
+                        langRefexNid = RefsetAux.NL_REFEX.getStrict(config.getViewCoordinate()).getNid();
+                    } else if (lang == LANG_CODE.SV) {
+                        langRefexNid = RefsetAux.SV_REFEX.getStrict(config.getViewCoordinate()).getNid();
+                    } else {
+                        throw new TaskFailedException("Cannot determine appropriate language/dialect refset.");
                     }
-                } else if (dialect == LANG_CODE.EN_GB) {
-                    langRefexNid = SnomedMetadataRfx.getGB_DIALECT_REFEX_NID();
-                    checkForDialectVariant(descText);
-                    if(addSecondDialectRefex){
-                        secondDialectRefexNid = SnomedMetadataRfx.getUS_DIALECT_REFEX_NID();
+                    //add description to concept
+                    ConceptChronicleBI concept = Ts.get().getConceptForNid(conceptNid);
+                    DescriptionCAB descBp = new DescriptionCAB(conceptNid,
+                            SnomedMetadataRfx.getDES_SYNONYM_NID(),
+                            lang,
+                            descText,
+                            caseSensitive);
+                    TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(config.getEditCoordinate(), config.getViewCoordinate());
+                    ComponentChronicleBI<?> component = Ts.get().getComponent(descBp.getComponentUuid());
+                    if (component == null) {
+                        DescriptionChronicleBI description = builder.construct(descBp);
+                        RefexCAB annotBp = new RefexCAB(TK_REFEX_TYPE.CID,
+                                description.getNid(),
+                                langRefexNid);
+                        annotBp.put(RefexCAB.RefexProperty.CNID1, acceptabilityNid);
+                        RefexChronicleBI<?> annotation = builder.construct(annotBp);
+                        description.addAnnotation(annotation);
+                        if (addSecondDialectRefex) {
+                            RefexCAB secondAnnotBp = new RefexCAB(TK_REFEX_TYPE.CID,
+                                    description.getNid(),
+                                    secondDialectRefexNid);
+                            secondAnnotBp.put(RefexCAB.RefexProperty.CNID1, acceptabilityNid);
+                            RefexChronicleBI<?> secondAnnotation = builder.construct(secondAnnotBp);
+                            description.addAnnotation(secondAnnotation);
+                            addSecondDialectRefex = false;
+                        }
+                        conceptsToCommit.add(concept);
+                        list.add(Ts.get().getUuidPrimordialForNid(conceptNid));
+                        uuidList.add(list);
+                    } else {
+                        duplicateDescriptions.add(line);
                     }
-                } else if (lang == LANG_CODE.NL) {
-                    langRefexNid = RefsetAux.NL_REFEX.getStrict(config.getViewCoordinate()).getNid();
-                } else if (lang == LANG_CODE.SV) {
-                    langRefexNid = RefsetAux.SV_REFEX.getStrict(config.getViewCoordinate()).getNid();
-                }else {
-                    throw new TaskFailedException("Cannot determine appropriate language/dialect refset.");
                 }
-                //add description to concept
-                ConceptChronicleBI concept = Ts.get().getConceptForNid(conceptNid);
-                DescriptionCAB descBp = new DescriptionCAB(conceptNid,
-                        SnomedMetadataRfx.getDES_SYNONYM_NID(),
-                        lang,
-                        descText,
-                        caseSensitive);
-                TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(config.getEditCoordinate(), config.getViewCoordinate());
-                DescriptionChronicleBI description = builder.construct(descBp);
-                RefexCAB annotBp = new RefexCAB(TK_REFEX_TYPE.CID,
-                        description.getNid(),
-                        langRefexNid);
-                annotBp.put(RefexCAB.RefexProperty.CNID1, acceptabilityNid);
-                RefexChronicleBI<?> annotation = builder.construct(annotBp);
-                description.addAnnotation(annotation);
-                if(addSecondDialectRefex){
-                    RefexCAB secondAnnotBp = new RefexCAB(TK_REFEX_TYPE.CID,
-                        description.getNid(),
-                        secondDialectRefexNid);
-                    secondAnnotBp.put(RefexCAB.RefexProperty.CNID1, acceptabilityNid);
-                    RefexChronicleBI<?> secondAnnotation = builder.construct(secondAnnotBp);
-                    description.addAnnotation(secondAnnotation);
-                    addSecondDialectRefex = false;
-                }
-                conceptsToCommit.add(concept);
-                list.add(Ts.get().getUuidPrimordialForNid(conceptNid));
-                uuidList.add(list);
                 if (iterator.hasNext()) {
                     line = iterator.next();
                     if(line.startsWith("<")){
@@ -305,6 +322,22 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
             process.setProperty(uuidListListPropName, uuidList);
             for(ConceptChronicleBI concept : conceptsToCommit){
                 Ts.get().addUncommitted(concept);
+            }
+            if (!duplicateDescriptions.isEmpty()) {
+                worker.getLogger().info("NOT ADDING. Found " + duplicateDescriptions.size() + " existing descriptions matching. ");
+                int count1 = 1;
+                for (String dup : duplicateDescriptions) {
+                    worker.getLogger().info("DUP " + count1 + " - " + dup);
+                    count1++;
+                }
+            }
+            if (!descMissingParentConcept.isEmpty()) {
+                int count1 = 1;
+                worker.getLogger().info("NOT ADDING. Found " + descMissingParentConcept.size() + " descriptions with a parent concept that did not exist. ");
+                for (String missing : descMissingParentConcept) {
+                    worker.getLogger().info("MISSING PARENT " + count1 + " - " + missing);
+                    count1++;
+                }
             }
             returnCondition = Condition.CONTINUE;
         } catch (IndexOutOfBoundsException e) {
