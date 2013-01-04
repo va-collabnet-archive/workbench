@@ -88,7 +88,7 @@ public abstract class ContradictionManagementStrategy implements ContradictionMa
      * relationships,
      * extensions etc) it will check through each.
      * 
-     * @see org.dwfa.ace.api.I_ManageContradiction#isInConflict(org.dwfa.ace.api.I_GetConceptData,
+     * @see org.ihtsdo.tk.api.ContradictionManagerBI#isInConflict(org.dwfa.ace.api.I_GetConceptData,
      *      boolean)
      */
     @Override
