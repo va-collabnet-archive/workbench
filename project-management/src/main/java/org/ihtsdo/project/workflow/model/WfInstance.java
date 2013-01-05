@@ -33,7 +33,7 @@ import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
 import org.ihtsdo.project.workflow2.WfActivityBI;
-import org.ihtsdo.project.workflow2.WfHistoryEntryBI;
+import org.ihtsdo.project.workflow2.WfActivityInstanceBI;
 import org.ihtsdo.project.workflow2.WfProcessDefinitionBI;
 import org.ihtsdo.project.workflow2.WfProcessInstanceBI;
 import org.ihtsdo.project.workflow2.WfRoleBI;
@@ -401,9 +401,24 @@ COMPLETE};
 		return false;
 	}
 
+	/**
+	 * @return the history
+	 */
+	public List<WfHistoryEntry> getHistory() {
+		return history;
+	}
+
+	/**
+	 * @param history the history to set
+	 */
+	public void setHistory(List<WfHistoryEntry> history) {
+		this.history = history;
+	}
+
 	@Override
-	public LinkedList<WfHistoryEntryBI> getHistory() {
+	public LinkedList<WfActivityInstanceBI> getActivityInstances() {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 }

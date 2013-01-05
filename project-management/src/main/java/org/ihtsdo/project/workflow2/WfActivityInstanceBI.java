@@ -23,7 +23,7 @@ package org.ihtsdo.project.workflow2;
  * 
  * @author alo
  */
-public interface WfHistoryEntryBI {
+public interface WfActivityInstanceBI {
     
     /** 
      * Gets the timestamp of the entry

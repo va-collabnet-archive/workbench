@@ -110,7 +110,7 @@ public interface WfProcessInstanceBI {
      * Gets all available actions for the workflow, override allows to skip
      * logic and perform any action
      */
-    LinkedList<WfHistoryEntryBI> getHistory();
+    LinkedList<WfActivityInstanceBI> getActivityInstances();
     
     /** 
      * Gets the due date for this instance
