@@ -197,8 +197,13 @@ public class BdbCommitManager {
            if (performCreationTests) {
                 waitTillWritesFinished();
                 Set<AlertToDataConstraintFailure> warningsAndErrors = new HashSet<AlertToDataConstraintFailure>();
-
-                dataCheckMap.put(concept, warningsAndErrors);
+                if(!warningsAndErrors.isEmpty()){
+                    dataCheckMap.put(concept, warningsAndErrors);
+                }else{
+                    if(dataCheckMap.containsKey(concept)){
+                        dataCheckMap.remove(concept);
+                    }
+                }
                 DataCheckRunner checkRunner = DataCheckRunner.runDataChecks(concept, creationTests);
                 
                 try {
@@ -426,7 +431,13 @@ public class BdbCommitManager {
                                 Set<AlertToDataConstraintFailure> warningsAndErrors =
                                         new HashSet<AlertToDataConstraintFailure>();
                                 Concept concept = Concept.get(uncommittedCNidItr.nid());
-                                    dataCheckMap.put(concept, warningsAndErrors);
+                                    if (!warningsAndErrors.isEmpty()) {
+                                        dataCheckMap.put(concept, warningsAndErrors);
+                                    } else {
+                                        if (dataCheckMap.containsKey(concept)) {
+                                            dataCheckMap.remove(concept);
+                                        }
+                                    }
                                     DataCheckRunner checkRunner = DataCheckRunner.runDataChecks(concept, commitTests);
                                     checkRunner.latch.await();
 
@@ -632,8 +643,13 @@ public class BdbCommitManager {
             int errorCount = 0;
             int warningCount = 0;
             Set<AlertToDataConstraintFailure> warningsAndErrors = new HashSet<AlertToDataConstraintFailure>();
-
-            dataCheckMap.put(c, warningsAndErrors);
+            if(!warningsAndErrors.isEmpty()){
+                dataCheckMap.put(c, warningsAndErrors);
+            }else{
+                if(dataCheckMap.containsKey(c)){
+                    dataCheckMap.remove(c);
+                }
+            }
             datacheckWriteLock.lock();
             DataCheckRunner checkRunner = DataCheckRunner.runDataChecks(c, commitTests);
             CountDownLatch latch = checkRunner.latch;
@@ -1641,7 +1657,13 @@ public class BdbCommitManager {
                 }
 
                 currentAlerts.addAll(results);
-                dataCheckMap.put(c, currentAlerts);
+                if(!currentAlerts.isEmpty()){
+                    dataCheckMap.put(c, currentAlerts);
+                }else{
+                    if(dataCheckMap.containsKey(c)){
+                        dataCheckMap.remove(c);
+                    }
+                }
             }
 
             if (canceled) {

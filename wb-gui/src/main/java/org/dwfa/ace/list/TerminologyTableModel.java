@@ -7,6 +7,7 @@ package org.dwfa.ace.list;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.table.AbstractTableModel;
@@ -25,7 +26,7 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 public class TerminologyTableModel extends AbstractTableModel implements 
         ListDataListener {
 
-    List<ConceptChronicleBI> elements = new ArrayList<ConceptChronicleBI>();
+    CopyOnWriteArrayList<ConceptChronicleBI> elements = new CopyOnWriteArrayList<ConceptChronicleBI>();
     private ConceptCheckChangeListener listViewChangeListener = new ConceptCheckChangeListener();
 
     public enum MODEL_FIELD {
@@ -192,9 +193,9 @@ public class TerminologyTableModel extends AbstractTableModel implements
     }
 
     private class ConceptCheckChangeListener extends TermChangeListener {
-        int index = 0;
         @Override
         public void changeNotify(long sequence, Set<Integer> originsOfChangedRels, Set<Integer> destinationsOfChangedRels, Set<Integer> referencedComponentsOfChangedRefexs, Set<Integer> changedComponents, Set<Integer> changedComponentAlerts, Set<Integer> changedComponentTemplates, boolean fromClassification) {
+            int index = 0;
             if (!changedComponentTemplates.isEmpty()) {
                 index = 0;
                 for (ConceptChronicleBI c : elements) {
