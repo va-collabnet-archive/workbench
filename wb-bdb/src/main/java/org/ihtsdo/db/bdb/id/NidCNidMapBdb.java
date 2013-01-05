@@ -98,16 +98,13 @@ public class NidCNidMapBdb extends ComponentBdb {
         assert (mapIndex >= 0) && (nidIndexInMap >= 0) :
                 "mapIndex: " + mapIndex + " indexInMap: " + nidIndexInMap + " destinationCNid: "
                 + destinationCNid;
+        if (mapIndex >= nidCNidMaps.get().length) {
+            ensureCapacity(destinationCNid);
+        }
         IndexCacheRecord record = new IndexCacheRecord(indexCacheRecords.get()[mapIndex][nidIndexInMap]);
         if (!record.destinationRelOriginAlreadyThere(originCNid)) {
-            if (mapIndex >= nidCNidMaps.get().length) {
-                ensureCapacity(destinationCNid);
-            }
-
             locks.lock(destinationCNid);
-
             try {
-
                 record.addDestinationOriginNid(originCNid);
                 indexCacheRecords.get()[mapIndex][nidIndexInMap] = record.getData();
                 mapChanged[mapIndex] = true;
