@@ -67,6 +67,17 @@ public class IndexCacheRecord {
             this.data = new int[]{2, 2};
         }
     }
+    
+    public boolean destinationRelOriginAlreadyThere(int originNid) {
+        int arrayLength = data[REFEX_OFFSET_INDEX] - data[DESTINATION_OFFSET_INDEX];
+        int index = Arrays.binarySearch(data, data[DESTINATION_OFFSET_INDEX],
+                data[DESTINATION_OFFSET_INDEX] + arrayLength, originNid);
+
+        if (index >= 0) {
+            return true;    // origin already there...
+        }
+        return false;
+    }
 
     //~--- methods -------------------------------------------------------------
     public void addDestinationOriginNid(int originNid) {
