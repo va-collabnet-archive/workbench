@@ -32,6 +32,24 @@ public interface WorkflowBI {
     Collection<WfProcessInstanceBI> getProcessInstances(ConceptVersionBI concept) throws Exception;
     
     /** 
+     * Gets all workflow process instances for a concept in the provided workList
+     * @throws Exception 
+     */
+    Collection<WfProcessInstanceBI> getProcessInstances(WorkListBI workList, ConceptVersionBI concept) throws Exception;
+    
+    /** 
+     * Gets active workflow process instances for a concept in the provided workList
+     * @throws Exception 
+     */
+    Collection<WfProcessInstanceBI> getActiveProcessInstances(WorkListBI workList, ConceptVersionBI concept) throws Exception;
+    
+    /** 
+     * Gets active and not completed workflow process instances for a concept in the provided workList
+     * @throws Exception 
+     */
+    Collection<WfProcessInstanceBI> getIncompleteProcessInstances(WorkListBI workList, ConceptVersionBI concept) throws Exception;
+    
+    /** 
      * Gets all instances in the system using the filters criteria
      */
     Collection<WfProcessInstanceBI> searchWorkflow(Collection<WfFilterBI> filters);
