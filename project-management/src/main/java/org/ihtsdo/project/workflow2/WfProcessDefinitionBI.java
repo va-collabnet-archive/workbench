@@ -70,4 +70,9 @@ public interface WfProcessDefinitionBI {
      */
     boolean logicIsValid();
     
+    /** 
+     * True is state is considered a complete state in this definition, false if not
+     */
+    boolean isCompleteState(WfStateBI state);
+    
 }

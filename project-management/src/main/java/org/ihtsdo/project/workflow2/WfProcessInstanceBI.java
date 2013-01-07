@@ -107,8 +107,7 @@ public interface WfProcessInstanceBI {
     Collection<WfActivityBI> getActionsForOverrideMode();
     
     /** 
-     * Gets all available actions for the workflow, override allows to skip
-     * logic and perform any action
+     * Gets all previously executed activities, each activity instance is a history item
      */
     LinkedList<WfActivityInstanceBI> getActivityInstances();
     

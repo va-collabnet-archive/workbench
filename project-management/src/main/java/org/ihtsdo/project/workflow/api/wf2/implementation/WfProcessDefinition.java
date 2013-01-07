@@ -60,4 +60,10 @@ public class WfProcessDefinition implements WfProcessDefinitionBI {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
+	public boolean isCompleteState(WfStateBI state) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

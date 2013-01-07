@@ -393,7 +393,7 @@ COMPLETE};
 
 	@Override
 	public boolean isActive() {
-		return false;
+		return true;
 	}
 
 	@Override
