@@ -14,6 +14,7 @@ package org.dwfa.ace.refset;
 
 //~--- non-JDK imports --------------------------------------------------------
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -1837,8 +1838,12 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 			}
 		}
 
+		// int height = getRightTogglePane().getHeight();
+		// AceLog.getAppLog().info("getRightTogglePane height " + height);
 		for (JButton btn : getRtpStdButtons()) {
+			// btn.setSize(btn.getWidth(), height);
 			getRightTogglePane().add(btn);
+
 			// rightTogglePane.add(btn, contraints);
 		}
 	}
@@ -2058,6 +2063,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins,
 	public final JButton getBtnDiff() {
 		if (btnDiff == null) {
 			btnDiff = new JButton(DIFF_TITLE);
+			btnDiff.setPreferredSize(new Dimension(60, 33));
 			btnDiff.addActionListener(new InternalActionListener());
 		}
 		return btnDiff;
