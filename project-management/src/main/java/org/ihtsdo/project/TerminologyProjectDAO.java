@@ -76,6 +76,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -103,6 +104,7 @@ import org.ihtsdo.project.model.WorklistMetadata;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
 import org.ihtsdo.project.refset.PromotionRefset;
+import org.ihtsdo.project.tasks.GetTranslationProject;
 import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.api.WorkflowInterpreter;
 import org.ihtsdo.project.workflow.model.WfInstance;
@@ -5616,5 +5618,23 @@ public class TerminologyProjectDAO {
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
+	}
+
+	public static I_TerminologyProject getProject(
+			I_GetConceptData projectConcept, AceFrameConfig aceFrameConfig) {
+		I_TerminologyProject project=null;
+		try {
+			project=getTranslationProject(projectConcept, aceFrameConfig);
+		} catch (Exception e) {
+			
+		}
+		if (project==null){
+			try {
+				project=getTerminologyProject(projectConcept, aceFrameConfig);
+			} catch (Exception e) {
+				
+			}
+		}
+		return project;
 	}
 }
