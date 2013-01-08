@@ -126,13 +126,13 @@ public class TestIssuesCRUD extends TestCase {
 		assertEquals("https://csfe.aceworkspace.net", newRepository.getUrl());
 
 		IssueRepoRegistration issueRepoReg = new IssueRepoRegistration(issueRepoConcept.getUids().iterator().next(),
-				"alopez", "snomed", null);
+				"user", "password", null);
 		IssueRepositoryDAO.addRepositoryToProfile(issueRepoReg);
 
 		config = Terms.get().getActiveAceFrameConfig();
 
-		assertEquals ("alopez", IssueRepositoryDAO.getRepositoryRegistration(newRepository.getUuid(), config).getUserId());
-		assertEquals ("snomed", IssueRepositoryDAO.getRepositoryRegistration(newRepository.getUuid(), config).getPassword());
+		assertEquals ("user", IssueRepositoryDAO.getRepositoryRegistration(newRepository.getUuid(), config).getUserId());
+		assertEquals ("password", IssueRepositoryDAO.getRepositoryRegistration(newRepository.getUuid(), config).getPassword());
 		//Create issue
 		issueTitle = "Issue test case " + now();
 		newIssue= new Issue();
@@ -146,7 +146,7 @@ public class TestIssuesCRUD extends TestCase {
 		newIssue.setProjectId("");
 		newIssue.setWorkflowStatus("");
 		newIssue.setTitle(issueTitle);
-		newIssue.setUser("alopez");
+		newIssue.setUser("user");
 		newIssue.setFieldMap(new HashMap<String,Object>());
 		newIssue.setDownloadStatus("Open");
 
