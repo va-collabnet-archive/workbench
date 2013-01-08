@@ -164,7 +164,7 @@ public class RulesDeploymentPackageReference {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
 		//TODO: implement full authentication
-		buff.append("' type='PKG' basicAuthentication='enabled' username='alopez' password='snomed'/>");
+		buff.append("' type='PKG' basicAuthentication='enabled' username='ihtsdo' password='ihtsdo'/>");
 		buff.append("		</add>");
 		buff.append("</change-set>");
 		//AceLog.getAppLog().info(buff.toString());
