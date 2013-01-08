@@ -37,10 +37,10 @@ public class RulesDeploymentPackageReference {
 
 	/** The name. */
 	private String name;
-	
+
 	/** The url. */
 	private String url;
-	
+
 	/** The uuids. */
 	private Collection<UUID> uuids;
 
@@ -132,7 +132,7 @@ public class RulesDeploymentPackageReference {
 		buff.append("			<resource source='");
 		buff.append(url);
 		//TODO: implement full authentication
-		buff.append("' type='PKG' basicAuthentication='enabled' username='alopez' password='snomed'/>");
+		buff.append("' type='PKG' basicAuthentication='enabled' username='ihtsdo' password='ihtsdo'/>");
 		buff.append("		</add>");
 		buff.append("</change-set>");
 		//AceLog.getAppLog().info(buff.toString());
@@ -196,18 +196,32 @@ public class RulesDeploymentPackageReference {
 	 * @throws Exception the exception
 	 */
 	public KnowledgeBase getKnowledgeBase(boolean recreate) throws Exception {
-		if (!recreate) {
-			KnowledgeBase fileBased = null;
-			try {
-				fileBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
-						getChangeSetXmlBytesForFile(), recreate);
-			} catch (Exception e) {
-				AceLog.getAppLog().info("File Package not accessible: " + getName());
-			}
-			if (fileBased != null && fileBased.getKnowledgePackages().size() > 0) {
-				return fileBased;
+		if (url.startsWith("http")) {
+			if (!recreate) {
+				KnowledgeBase fileBased = null;
+				try {
+					fileBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
+							getChangeSetXmlBytesForFile(), recreate);
+				} catch (Exception e) {
+					AceLog.getAppLog().info("File Package not accessible: " + getName());
+				}
+				if (fileBased != null && fileBased.getKnowledgePackages().size() > 0) {
+					return fileBased;
+				} else {
+					KnowledgeBase guvnorBased = null;
+					try {
+						guvnorBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
+								getChangeSetXmlBytes(), recreate);
+					} catch (Exception e1) {
+						AceLog.getAppLog().info("Web Package not accessible: " + getName());
+					}
+					if (guvnorBased != null && guvnorBased.getKnowledgePackages().size() > 0) {
+						return guvnorBased;
+					}
+				}
 			} else {
 				KnowledgeBase guvnorBased = null;
+
 				try {
 					guvnorBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
 							getChangeSetXmlBytes(), recreate);
@@ -216,28 +230,24 @@ public class RulesDeploymentPackageReference {
 				}
 				if (guvnorBased != null && guvnorBased.getKnowledgePackages().size() > 0) {
 					return guvnorBased;
+				} else {
+					KnowledgeBase fileBased = null;
+					try {
+						fileBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
+								getChangeSetXmlBytesForFile(), recreate);
+					} catch (Exception e) {
+						AceLog.getAppLog().info("File Package not accessible: " + getName());
+					}
+					if (fileBased != null && fileBased.getKnowledgePackages().size() > 0) return fileBased;
 				}
 			}
 		} else {
-			KnowledgeBase guvnorBased = null;
-
-			try {
-				guvnorBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
-						getChangeSetXmlBytes(), recreate);
-			} catch (Exception e1) {
-				AceLog.getAppLog().info("Web Package not accessible: " + getName());
-			}
-			if (guvnorBased != null && guvnorBased.getKnowledgePackages().size() > 0) {
-				return guvnorBased;
+			File localFolder = new File(url);
+			if (localFolder != null && localFolder.exists() && localFolder.isDirectory()) {
+				KnowledgeBase folderBased = RulesLibrary.getKnowledgeBaseFromFolder(uuids.iterator().next(), localFolder);
+				return folderBased;
 			} else {
-				KnowledgeBase fileBased = null;
-				try {
-					fileBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
-							getChangeSetXmlBytesForFile(), recreate);
-				} catch (Exception e) {
-					AceLog.getAppLog().info("File Package not accessible: " + getName());
-				}
-				if (fileBased != null && fileBased.getKnowledgePackages().size() > 0) return fileBased;
+				AceLog.getAppLog().info("Folder not accessible: " + url + " | " + getName());
 			}
 		}
 		AceLog.getAppLog().info("WARNING: KB Recreation failed.");
@@ -271,7 +281,16 @@ public class RulesDeploymentPackageReference {
 	 * @return true, if successful
 	 */
 	public boolean validate() {
-		return RulesLibrary.validateDeploymentPackage(uuids.iterator().next(), getChangeSetXmlBytes());
+		boolean result = false;
+		try {
+			KnowledgeBase kb = getKnowledgeBase(true);
+			if (kb != null && !kb.getKnowledgePackages().isEmpty()) {
+				result = true;
+			}
+		} catch (Exception e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		}
+		return result;
 	}
 
 }

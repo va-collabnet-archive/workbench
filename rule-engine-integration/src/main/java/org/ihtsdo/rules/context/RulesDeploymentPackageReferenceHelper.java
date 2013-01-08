@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConceptAttributePart;
+import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
@@ -310,9 +311,10 @@ public class RulesDeploymentPackageReferenceHelper {
 					allowedDestRelTypes, config.getViewPositionSetReadOnly(), config.getPrecedence(), 
 					config.getConflictResolutionStrategy());
 			for (I_GetConceptData child : children) {
-				if (child.getConceptAttributeTuples(allowedStatuses, config.getViewPositionSetReadOnly(), 
+				List<? extends I_ConceptAttributeTuple> attrs = child.getConceptAttributeTuples(allowedStatuses, config.getViewPositionSetReadOnly(), 
 						config.getPrecedence(), 
-						config.getConflictResolutionStrategy()).iterator().next().getStatusNid() !=
+						config.getConflictResolutionStrategy());
+				if (!attrs.isEmpty() && attrs.iterator().next().getStatusNid() !=
 							ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid()) {
 					rulesPackages.add(getRulesDeploymentPackageReference(child));
 				}

@@ -684,6 +684,38 @@ public class RulesLibrary {
 		}
 		return kbase;
 	}
+	
+	/**
+	 * Gets the knowledge base from the Guvnor deployment URL retrieved from a
+	 * byteArray, not a file.
+	 * 
+	 * @param referenceUuid
+	 *            the reference uuid
+	 * @param bytes
+	 *            the bytes
+	 * @param recreate
+	 *            the recreate
+	 * @return the knowledge base
+	 * @throws Exception
+	 *             the exception
+	 */
+	public static KnowledgeBase getKnowledgeBaseFromFolder(UUID referenceUuid, File folder) throws Exception {
+		KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
+		
+		for (File loopFile : folder.listFiles()) {
+			if (loopFile.getName().endsWith(".drl")) {
+				kbuilder.add( ResourceFactory.newFileResource(loopFile), ResourceType.DRL );
+			}
+		}
+		if ( kbuilder.hasErrors() ) {
+		    AceLog.getAppLog().info( kbuilder.getErrors().toString() );
+		}
+
+		KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+
+		kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
+		return kbase;
+	}
 
 	/**
 	 * Gets the knowledge base from the Guvnor deployment URL retrieved from a
@@ -887,15 +919,8 @@ public class RulesLibrary {
 		return kbase;
 	}
 
-	/**
-	 * Validate deployment package.
-	 * 
-	 * @param referenceUuid
-	 *            the reference uuid
-	 * @param bytes
-	 *            the bytes
-	 * @return true, if successful
-	 */
+	@Deprecated
+	// now is validated in the rules deplyment package itself
 	public static boolean validateDeploymentPackage(UUID referenceUuid, byte[] bytes) {
 		KnowledgeBase kbase = null;
 		try {
