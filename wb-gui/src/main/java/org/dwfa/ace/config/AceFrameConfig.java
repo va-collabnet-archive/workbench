@@ -65,9 +65,11 @@ import org.dwfa.ace.api.I_FilterTaxonomyRels;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HoldRefsetPreferences;
 import org.dwfa.ace.api.I_HostConceptPlugins;
+import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
+import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
+import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
-import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.dwfa.ace.api.I_OverrideTaxonomyRenderer;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_ShowActivity;
@@ -76,9 +78,6 @@ import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
-import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
-import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
@@ -111,28 +110,29 @@ import org.dwfa.svn.Svn;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.PropertyChangeSupportWithPropagationId;
-import org.ihtsdo.tk.api.contradiction.EditPathLosesStrategy;
-import org.ihtsdo.tk.api.contradiction.EditPathWinsStrategy;
-import org.ihtsdo.tk.api.contradiction.IdentifyAllContradictionStrategy;
-import org.ihtsdo.tk.api.contradiction.LastCommitWinsContradictionResolutionStrategy;
-import org.ihtsdo.tk.api.contradiction.ViewPathLosesStrategy;
-import org.ihtsdo.tk.api.contradiction.ViewPathWinsStrategy;
 import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
 import org.ihtsdo.concurrent.future.FutureHelper;
 import org.ihtsdo.helper.descriptionlogic.DescriptionLogic;
+import org.ihtsdo.taxonomy.path.PathExpander;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.contradiction.EditPathLosesStrategy;
+import org.ihtsdo.tk.api.contradiction.EditPathWinsStrategy;
+import org.ihtsdo.tk.api.contradiction.IdentifyAllContradictionStrategy;
+import org.ihtsdo.tk.api.contradiction.LastCommitWinsContradictionResolutionStrategy;
+import org.ihtsdo.tk.api.contradiction.ViewPathLosesStrategy;
+import org.ihtsdo.tk.api.contradiction.ViewPathWinsStrategy;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.taxonomy.path.PathExpander;
-import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
@@ -311,7 +311,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      *
      */
     private static final long serialVersionUID = 1L;
-    private static final int dataVersion = 52; // keep current with
+    private static final int dataVersion = 53; // keep current with
     // objDataVersion logic
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
     private transient VetoableChangeSupport vetoSupport = new VetoableChangeSupport(this);
@@ -456,6 +456,16 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     private TreeSet<? extends ConceptVersionBI> workflowActions = null;
     private List<UUID> availableWorkflowActions = null;
 
+    // 53
+	private I_GetConceptData defaultProjectForNewConcept;
+	// 53
+	private I_GetConceptData defaultWorkflowForNewConcept;
+
+    // 53
+	private I_GetConceptData defaultProjectForChangedConcept;
+	// 53
+	private I_GetConceptData defaultWorkflowForChangedConcept;
+	
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeBoolean(active);
@@ -680,6 +690,18 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
         // 51 :SNOOWL:
         out.writeBoolean (classifierOwlFeatureStatus); // :SNOOWL:
+
+    // 53
+    writeConceptAsId(defaultProjectForNewConcept, out);
+
+    // 53
+    writeConceptAsId(defaultWorkflowForNewConcept, out);
+
+    // 53
+    writeConceptAsId(defaultProjectForChangedConcept, out);
+
+    // 53
+    writeConceptAsId(defaultWorkflowForChangedConcept, out);
 }
 private void writeConceptAsId(I_GetConceptData concept, ObjectOutputStream out) throws IOException {
         if (concept == null) {
@@ -1185,7 +1207,39 @@ private void writeConceptAsId(I_GetConceptData concept, ObjectOutputStream out) 
             } else {
                 classifierOwlFeatureStatus = false;
             }
-            //52 see above
+
+            if (objDataVersion >= 53) {
+            	try {
+					defaultProjectForNewConcept = readConceptFromSerializedUuids(in);
+				} catch (TerminologyException e) {
+					  throw new IOException(e);
+				}
+            }
+
+            if (objDataVersion >= 53) {
+            	try {
+					defaultWorkflowForNewConcept = readConceptFromSerializedUuids(in);
+				} catch (TerminologyException e) {
+					  throw new IOException(e);
+				}
+            }
+
+            if (objDataVersion >= 53) {
+            	try {
+					defaultProjectForChangedConcept = readConceptFromSerializedUuids(in);
+				} catch (TerminologyException e) {
+					  throw new IOException(e);
+				}
+            }
+
+            if (objDataVersion >= 53) {
+            	try {
+					defaultWorkflowForChangedConcept = readConceptFromSerializedUuids(in);
+				} catch (TerminologyException e) {
+					  throw new IOException(e);
+				}
+            }
+            //54 see above
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -3510,4 +3564,44 @@ public ServiceItemFilter getInboxQueueFilter() {
         public void setModuleNid(int moduleNid) {
         this.moduleNid = moduleNid;
     }
+    
+    @Override    
+	public void setDefaultProjectForNewConcept(I_GetConceptData project) {
+		this.defaultProjectForNewConcept=project;
+	}
+    
+    @Override
+	public I_GetConceptData getDefaultProjectForNewConcept() {
+		return defaultProjectForNewConcept;
+	}
+    
+    @Override
+	public void setDefaultWorkflowForNewConcept(I_GetConceptData workflow) {
+		this.defaultWorkflowForNewConcept = workflow;
+	}
+    
+    @Override
+	public I_GetConceptData getDefaultWorkflowForNewConcept() {
+		return defaultWorkflowForNewConcept;
+	}
+
+    @Override    
+	public void setDefaultProjectForChangedConcept(I_GetConceptData project) {
+		this.defaultProjectForChangedConcept=project;
+	}
+    
+    @Override
+	public I_GetConceptData getDefaultProjectForChangedConcept() {
+		return defaultProjectForChangedConcept;
+	}
+    
+    @Override
+	public void setDefaultWorkflowForChangedConcept(I_GetConceptData workflow) {
+		this.defaultWorkflowForChangedConcept = workflow;
+	}
+    
+    @Override
+	public I_GetConceptData getDefaultWorkflowForChangedConcept() {
+		return defaultWorkflowForChangedConcept;
+	}
 }

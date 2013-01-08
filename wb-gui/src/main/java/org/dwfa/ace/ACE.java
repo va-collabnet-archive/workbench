@@ -21,41 +21,122 @@ package org.dwfa.ace;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.KeyboardFocusManager;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.beans.IntrospectionException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivilegedActionException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
+
 import javax.security.auth.login.LoginException;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
+import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRootPane;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+import javax.swing.JTextPane;
+import javax.swing.JToggleButton;
+import javax.swing.JTree;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-import javax.swing.*;
+import javax.swing.TransferHandler;
 import javax.swing.border.Border;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
+
 import net.jini.config.Configuration;
 import net.jini.config.ConfigurationException;
 import net.jini.lookup.ServiceItemFilter;
+
 import org.dwfa.ace.CdePalette.TOGGLE_DIRECTION;
-import org.dwfa.ace.actions.*;
+import org.dwfa.ace.actions.Abort;
+import org.dwfa.ace.actions.ChangeFramePassword;
+import org.dwfa.ace.actions.Commit;
+import org.dwfa.ace.actions.SaveProfile;
+import org.dwfa.ace.actions.SaveProfileAs;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
+import org.dwfa.ace.api.AceEditor;
+import org.dwfa.ace.api.I_AmTermComponent;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ConfigAceFrame.CLASSIFIER_INPUT_MODE_PREF;
 import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
+import org.dwfa.ace.api.I_ContainTermComponent;
+import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
 import org.dwfa.ace.api.I_HostConceptPlugins.LINK_TYPE;
 import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
-import org.dwfa.ace.api.*;
+import org.dwfa.ace.api.I_IntList;
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_ShowActivity;
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.I_Transact;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
@@ -66,7 +147,12 @@ import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.config.CreatePathPanel;
 import org.dwfa.ace.gui.concept.ConceptPanel;
 import org.dwfa.ace.gui.popup.ProcessPopupUtil;
-import org.dwfa.ace.list.*;
+import org.dwfa.ace.list.TerminologyIntList;
+import org.dwfa.ace.list.TerminologyIntListModel;
+import org.dwfa.ace.list.TerminologyList;
+import org.dwfa.ace.list.TerminologyListModel;
+import org.dwfa.ace.list.TerminologyTable;
+import org.dwfa.ace.list.TerminologyTableModel;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.path.SelectPathAndPositionPanelWithCombo;
 import org.dwfa.ace.queue.AddQueueListener;
@@ -83,7 +169,6 @@ import org.dwfa.ace.task.commit.I_Fixup;
 import org.dwfa.ace.task.commit.I_TestDataConstraints;
 import org.dwfa.ace.task.gui.toptoggles.TopToggleTypes;
 import org.dwfa.ace.task.search.I_TestSearchResults;
-import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.ExecutionRecord;
 import org.dwfa.bpa.gui.glue.PropertyListenerGlue;
@@ -103,6 +188,10 @@ import org.ihtsdo.arena.Arena;
 import org.ihtsdo.custom.statics.CustomStatics;
 import org.ihtsdo.helper.descriptionlogic.DescriptionLogic;
 import org.ihtsdo.objectCache.ObjectCache;
+import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.project.model.I_TerminologyProject;
+import org.ihtsdo.project.model.WorkList;
+import org.ihtsdo.project.workflow2.WorkListBI;
 import org.ihtsdo.taxonomy.TaxonomyHelper;
 import org.ihtsdo.taxonomy.TaxonomyMouseListenerForAce;
 import org.ihtsdo.taxonomy.TaxonomyTree;
@@ -115,6 +204,8 @@ import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
+
+import com.sleepycat.je.DatabaseException;
 
 public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActions {
    public static final String DATA_CHECK_TAB_LABEL = "data checks";
@@ -239,6 +330,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
    private WorkflowHistorySearchPanel       wfSearchPanel;
    private JPanel                           workflowDetailsSheet;
    private JPanel                           workflowPanel;
+   private JComboBox worklistSelectCombo;
+   private JComboBox worklistCCSelectCombo;
 
    //~--- constructors --------------------------------------------------------
 
@@ -813,6 +906,10 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
       return new JScrollPane(makeClassifierPrefPane());
    }
 
+   private JScrollPane makeProjectConfig() throws Exception {
+      return new JScrollPane(makeProjectPrefPane());
+   }
+
    private JPanel makeClassifierPrefPane() {
       JPanel classifierPrefPanel = new JPanel(new GridLayout(0, 1));
 
@@ -939,6 +1036,197 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
       return classifierPrefPanel;
    }
 
+   private JPanel makeProjectPrefPane() {
+
+      JPanel projectPrefPanel = new JPanel(new GridLayout(0, 1));
+
+      // INPUT SELECTION
+      JPanel             projectNewConceptSubpanel = new JPanel(new GridBagLayout());
+
+      projectNewConceptSubpanel.setBorder(BorderFactory.createTitledBorder(" New Concept "));
+      GridBagConstraints gbc                         = new GridBagConstraints();
+
+      gbc.weightx    = 0;
+      gbc.weighty    = 0;
+      gbc.anchor     = GridBagConstraints.WEST;
+      gbc.fill       = GridBagConstraints.HORIZONTAL ;
+      gbc.gridx      = 0;
+      gbc.gridy      = 0;
+      gbc.gridwidth  = 1;
+      gbc.gridheight = 1;
+
+      JLabel inputSelectLabel = new JLabel(" Project:");
+
+      inputSelectLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 0));
+      projectNewConceptSubpanel.add(inputSelectLabel, gbc);
+      gbc.gridx++;
+      gbc.weightx = 1;
+
+      List<I_TerminologyProject> projects = TerminologyProjectDAO.getAllProjects(aceFrameConfig);
+      JComboBox projectSelectCombo = new JComboBox(projects.toArray());
+
+      projectNewConceptSubpanel.add(projectSelectCombo, gbc);
+      projectSelectCombo.addActionListener(new ActionListener() {
+         @Override
+         public void actionPerformed(ActionEvent e) {
+            JComboBox                  cb       = (JComboBox) e.getSource();
+            I_TerminologyProject projPref = (I_TerminologyProject) cb.getSelectedItem();
+            
+            aceFrameConfig.setDefaultProjectForNewConcept(projPref.getConcept());
+
+            worklistSelectCombo.removeAllItems();
+			List<WorkList> worklists = TerminologyProjectDAO.getAllNacWorkLists(projPref, aceFrameConfig);
+         
+			for (WorkList worklist:worklists){
+				worklistSelectCombo.addItem(worklist);
+			}
+			I_GetConceptData worklistConcept=aceFrameConfig.getDefaultWorkflowForNewConcept();
+			if (worklistConcept!=null){
+			
+				WorkListBI worklist=TerminologyProjectDAO.getWorkList(worklistConcept, aceFrameConfig);
+				if (worklist!=null){
+					worklistSelectCombo.setSelectedItem(worklist);
+				}
+			}
+         }
+      });
+
+      gbc.weightx    = 0;
+      gbc.gridx      = 0;
+      gbc.gridy++ ;
+     
+      JLabel inputSelectWorklist = new JLabel(" Workflow:");
+
+      inputSelectWorklist.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 0));
+      projectNewConceptSubpanel.add(inputSelectWorklist, gbc);
+      gbc.gridx++;
+      gbc.weightx = 1;
+
+      worklistSelectCombo = new JComboBox();
+      projectNewConceptSubpanel.add(worklistSelectCombo, gbc);
+      
+      worklistSelectCombo.addActionListener(new ActionListener() {
+         @Override
+         public void actionPerformed(ActionEvent e) {
+            JComboBox                  cb       = (JComboBox) e.getSource();
+            
+            WorkListBI workList = (WorkListBI) cb.getSelectedItem();
+
+            try {
+				aceFrameConfig.setDefaultWorkflowForNewConcept(Terms.get().getConcept(workList.getUuid()));
+			} catch (TerminologyException e1) {
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+         }
+      });
+
+      projectPrefPanel.add(projectNewConceptSubpanel);
+      
+      I_GetConceptData projectConcept=aceFrameConfig.getDefaultProjectForNewConcept();
+
+      I_TerminologyProject project=TerminologyProjectDAO.getProject(projectConcept, aceFrameConfig);
+      if (project!=null){
+    	  projectSelectCombo.setSelectedItem(project);
+      }
+      
+      
+
+      JPanel             projectChangedConceptSubpanel = new JPanel(new GridBagLayout());
+
+      projectChangedConceptSubpanel.setBorder(BorderFactory.createTitledBorder(" Changed Concept "));
+      GridBagConstraints gbcCC                         = new GridBagConstraints();
+
+      gbcCC.weightx    = 0;
+      gbcCC.weighty    = 0;
+      gbcCC.anchor     = GridBagConstraints.WEST;
+      gbcCC.fill       = GridBagConstraints.HORIZONTAL ;
+      gbcCC.gridx      = 0;
+      gbcCC.gridy      = 0;
+      gbcCC.gridwidth  = 1;
+      gbcCC.gridheight = 1;
+
+      
+      JLabel inputProjectSelectLabel = new JLabel(" Project:");
+      inputProjectSelectLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 0));
+      projectChangedConceptSubpanel.add(inputProjectSelectLabel, gbcCC);
+      gbcCC.gridx++;
+      gbcCC.weightx = 1;
+
+      List<I_TerminologyProject> projectsCC = TerminologyProjectDAO.getAllProjects(aceFrameConfig);
+      JComboBox projectCCSelectCombo = new JComboBox(projectsCC.toArray());
+
+      projectChangedConceptSubpanel.add(projectCCSelectCombo, gbcCC);
+      projectCCSelectCombo.addActionListener(new ActionListener() {
+         @Override
+         public void actionPerformed(ActionEvent e) {
+            JComboBox                  cb       = (JComboBox) e.getSource();
+            I_TerminologyProject projPref = (I_TerminologyProject) cb.getSelectedItem();
+            
+            aceFrameConfig.setDefaultProjectForChangedConcept(projPref.getConcept());
+
+            worklistCCSelectCombo.removeAllItems();
+			List<WorkList> worklists = TerminologyProjectDAO.getAllNacWorkLists(projPref, aceFrameConfig);
+         
+			for (WorkList worklist:worklists){
+				worklistCCSelectCombo.addItem(worklist);
+			}
+			I_GetConceptData worklistConcept=aceFrameConfig.getDefaultWorkflowForChangedConcept();
+			if (worklistConcept!=null){
+			
+				WorkListBI worklist=TerminologyProjectDAO.getWorkList(worklistConcept, aceFrameConfig);
+				if (worklist!=null){
+					worklistCCSelectCombo.setSelectedItem(worklist);
+				}
+			}
+         }
+      });
+
+      gbcCC.weightx    = 0;
+      gbcCC.gridx      = 0;
+      gbcCC.gridy++ ;
+     
+      JLabel inputSelectWorklistCC = new JLabel(" Workflow:");
+
+      inputSelectWorklistCC.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 0));
+      projectChangedConceptSubpanel.add(inputSelectWorklistCC, gbcCC);
+      gbcCC.gridx++;
+      gbcCC.weightx = 1;
+
+      worklistCCSelectCombo = new JComboBox();
+      projectChangedConceptSubpanel.add(worklistCCSelectCombo, gbcCC);
+      
+      worklistCCSelectCombo.addActionListener(new ActionListener() {
+         @Override
+         public void actionPerformed(ActionEvent e) {
+            JComboBox                  cb       = (JComboBox) e.getSource();
+            
+            WorkListBI workList = (WorkListBI) cb.getSelectedItem();
+
+            try {
+				aceFrameConfig.setDefaultWorkflowForChangedConcept(Terms.get().getConcept(workList.getUuid()));
+			} catch (TerminologyException e1) {
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+         }
+      });
+
+      projectPrefPanel.add(projectChangedConceptSubpanel);
+      
+      I_GetConceptData projectCConcept=aceFrameConfig.getDefaultProjectForChangedConcept();
+
+      I_TerminologyProject projectCC=TerminologyProjectDAO.getProject(projectCConcept, aceFrameConfig);
+      if (projectCConcept!=null){
+    	  projectCCSelectCombo.setSelectedItem(projectCConcept);
+      }
+      
+      
+      return projectPrefPanel;
+   }
+
    private JScrollPane makeComponentConfig() throws Exception {
       return new JScrollPane(makeComponentToggleCheckboxPane());
    }
@@ -991,6 +1279,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
       preferencesTab.addTab("changeset", new ChangeSetConfigPanel(aceFrameConfig));
       preferencesTab.addTab("chronicler", makeChroniclerPreferences());
       preferencesTab.addTab("classifier", makeClassifierConfig());
+      preferencesTab.addTab("project", makeProjectConfig());
+
       layers.add(preferencesPalette, JLayeredPane.PALETTE_LAYER);
       preferencesPalette.add(preferencesTab, BorderLayout.CENTER);
       preferencesPalette.setBorder(BorderFactory.createRaisedBevelBorder());

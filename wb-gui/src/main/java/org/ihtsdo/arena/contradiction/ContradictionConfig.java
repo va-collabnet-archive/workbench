@@ -1253,7 +1253,45 @@ public class ContradictionConfig implements I_ConfigAceFrame {
     public void setModuleNid(int moduleNid) {
         config.setModuleNid(moduleNid);
     }
-    
-    
+
+	@Override
+	public void setDefaultProjectForChangedConcept(I_GetConceptData project) {
+		config.setDefaultProjectForChangedConcept(project);
+	}
+
+	@Override
+	public I_GetConceptData getDefaultProjectForChangedConcept() {
+		return config.getDefaultProjectForChangedConcept();
+	}
+
+	@Override
+	public void setDefaultWorkflowForChangedConcept(I_GetConceptData workflow) {
+		config.setDefaultWorkflowForChangedConcept(workflow);
+	}
+
+	@Override
+	public I_GetConceptData getDefaultWorkflowForChangedConcept() {
+		return config.getDefaultWorkflowForChangedConcept();
+	}
+
+	@Override
+	public void setDefaultProjectForNewConcept(I_GetConceptData project) {
+		config.setDefaultProjectForNewConcept(project);
+	}
+
+	@Override
+	public I_GetConceptData getDefaultProjectForNewConcept() {
+		return config.getDefaultProjectForNewConcept();
+	}
+
+	@Override
+	public void setDefaultWorkflowForNewConcept(I_GetConceptData workflow) {
+		config.setDefaultWorkflowForNewConcept(workflow);
+	}
+
+	@Override
+	public I_GetConceptData getDefaultWorkflowForNewConcept() {
+		return config.getDefaultWorkflowForNewConcept();
+	}
 
 }

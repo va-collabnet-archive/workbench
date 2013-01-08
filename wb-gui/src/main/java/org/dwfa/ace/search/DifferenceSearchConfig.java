@@ -1296,4 +1296,44 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
     public void setModuleNid(int moduleNid) {
         frameConfig.setModuleNid(moduleNid);
     }
+
+	@Override
+	public void setDefaultProjectForChangedConcept(I_GetConceptData project) {
+		frameConfig.setDefaultProjectForChangedConcept(project);
+	}
+
+	@Override
+	public I_GetConceptData getDefaultProjectForChangedConcept() {
+		return frameConfig.getDefaultProjectForChangedConcept();
+	}
+
+	@Override
+	public void setDefaultWorkflowForChangedConcept(I_GetConceptData workflow) {
+		frameConfig.setDefaultWorkflowForChangedConcept(workflow);
+	}
+
+	@Override
+	public I_GetConceptData getDefaultWorkflowForChangedConcept() {
+		return frameConfig.getDefaultWorkflowForChangedConcept();
+	}
+
+	@Override
+	public void setDefaultProjectForNewConcept(I_GetConceptData project) {
+		frameConfig.setDefaultProjectForNewConcept(project);
+	}
+
+	@Override
+	public I_GetConceptData getDefaultProjectForNewConcept() {
+		return frameConfig.getDefaultProjectForNewConcept();
+	}
+
+	@Override
+	public void setDefaultWorkflowForNewConcept(I_GetConceptData workflow) {
+		frameConfig.setDefaultWorkflowForNewConcept(workflow);
+	}
+
+	@Override
+	public I_GetConceptData getDefaultWorkflowForNewConcept() {
+		return frameConfig.getDefaultWorkflowForNewConcept();
+	}
 }
