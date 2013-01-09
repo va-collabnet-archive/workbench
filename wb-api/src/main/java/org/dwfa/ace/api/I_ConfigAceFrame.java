@@ -739,15 +739,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
 	public void setAllAvailableWorkflowActionUids(List<UUID> actions);
         
-    public void setModuleNid(int moduleNid);
-    
-	public void setDefaultProjectForNewConcept(I_GetConceptData project) ;
-	
-	public I_GetConceptData getDefaultProjectForNewConcept() ;
-	
-	public void setDefaultWorkflowForNewConcept(I_GetConceptData workflow) ;
-	
-	public I_GetConceptData getDefaultWorkflowForNewConcept(); 
+    public void setModuleNid(int moduleNid); 
 
 	public void setDefaultProjectForChangedConcept(I_GetConceptData project) ;
 	
