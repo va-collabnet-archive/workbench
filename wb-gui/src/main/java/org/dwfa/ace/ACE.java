@@ -1041,101 +1041,10 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
       JPanel projectPrefPanel = new JPanel(new GridLayout(0, 1));
 
       // INPUT SELECTION
-      JPanel             projectNewConceptSubpanel = new JPanel(new GridBagLayout());
-
-      projectNewConceptSubpanel.setBorder(BorderFactory.createTitledBorder(" New Concept "));
-      GridBagConstraints gbc                         = new GridBagConstraints();
-
-      gbc.weightx    = 0;
-      gbc.weighty    = 0;
-      gbc.anchor     = GridBagConstraints.WEST;
-      gbc.fill       = GridBagConstraints.HORIZONTAL ;
-      gbc.gridx      = 0;
-      gbc.gridy      = 0;
-      gbc.gridwidth  = 1;
-      gbc.gridheight = 1;
-
-      JLabel inputSelectLabel = new JLabel(" Project:");
-
-      inputSelectLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 0));
-      projectNewConceptSubpanel.add(inputSelectLabel, gbc);
-      gbc.gridx++;
-      gbc.weightx = 1;
-
-      List<I_TerminologyProject> projects = TerminologyProjectDAO.getAllProjects(aceFrameConfig);
-      JComboBox projectSelectCombo = new JComboBox(projects.toArray());
-
-      projectNewConceptSubpanel.add(projectSelectCombo, gbc);
-      projectSelectCombo.addActionListener(new ActionListener() {
-         @Override
-         public void actionPerformed(ActionEvent e) {
-            JComboBox                  cb       = (JComboBox) e.getSource();
-            I_TerminologyProject projPref = (I_TerminologyProject) cb.getSelectedItem();
-            
-            aceFrameConfig.setDefaultProjectForNewConcept(projPref.getConcept());
-
-            worklistSelectCombo.removeAllItems();
-			List<WorkList> worklists = TerminologyProjectDAO.getAllNacWorkLists(projPref, aceFrameConfig);
-         
-			for (WorkList worklist:worklists){
-				worklistSelectCombo.addItem(worklist);
-			}
-			I_GetConceptData worklistConcept=aceFrameConfig.getDefaultWorkflowForNewConcept();
-			if (worklistConcept!=null){
-			
-				WorkListBI worklist=TerminologyProjectDAO.getWorkList(worklistConcept, aceFrameConfig);
-				if (worklist!=null){
-					worklistSelectCombo.setSelectedItem(worklist);
-				}
-			}
-         }
-      });
-
-      gbc.weightx    = 0;
-      gbc.gridx      = 0;
-      gbc.gridy++ ;
-     
-      JLabel inputSelectWorklist = new JLabel(" Workflow:");
-
-      inputSelectWorklist.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 0));
-      projectNewConceptSubpanel.add(inputSelectWorklist, gbc);
-      gbc.gridx++;
-      gbc.weightx = 1;
-
-      worklistSelectCombo = new JComboBox();
-      projectNewConceptSubpanel.add(worklistSelectCombo, gbc);
-      
-      worklistSelectCombo.addActionListener(new ActionListener() {
-         @Override
-         public void actionPerformed(ActionEvent e) {
-            JComboBox                  cb       = (JComboBox) e.getSource();
-            
-            WorkListBI workList = (WorkListBI) cb.getSelectedItem();
-
-            try {
-				aceFrameConfig.setDefaultWorkflowForNewConcept(Terms.get().getConcept(workList.getUuid()));
-			} catch (TerminologyException e1) {
-				e1.printStackTrace();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-         }
-      });
-
-      projectPrefPanel.add(projectNewConceptSubpanel);
-      
-      I_GetConceptData projectConcept=aceFrameConfig.getDefaultProjectForNewConcept();
-
-      I_TerminologyProject project=TerminologyProjectDAO.getProject(projectConcept, aceFrameConfig);
-      if (project!=null){
-    	  projectSelectCombo.setSelectedItem(project);
-      }
-      
-      
 
       JPanel             projectChangedConceptSubpanel = new JPanel(new GridBagLayout());
 
-      projectChangedConceptSubpanel.setBorder(BorderFactory.createTitledBorder(" Changed Concept "));
+      projectChangedConceptSubpanel.setBorder(BorderFactory.createTitledBorder(" Default configuration for changes review "));
       GridBagConstraints gbcCC                         = new GridBagConstraints();
 
       gbcCC.weightx    = 0;
@@ -1279,7 +1188,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
       preferencesTab.addTab("changeset", new ChangeSetConfigPanel(aceFrameConfig));
       preferencesTab.addTab("chronicler", makeChroniclerPreferences());
       preferencesTab.addTab("classifier", makeClassifierConfig());
-      preferencesTab.addTab("project", makeProjectConfig());
+      preferencesTab.addTab("workflow", makeProjectConfig());
 
       layers.add(preferencesPalette, JLayeredPane.PALETTE_LAYER);
       preferencesPalette.add(preferencesTab, BorderLayout.CENTER);

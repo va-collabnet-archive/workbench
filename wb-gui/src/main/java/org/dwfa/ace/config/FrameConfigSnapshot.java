@@ -1441,23 +1441,4 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 		return baseFrame.getDefaultWorkflowForChangedConcept();
 	}
 
-	@Override
-	public void setDefaultProjectForNewConcept(I_GetConceptData project) {
-		baseFrame.setDefaultProjectForNewConcept(project);
-	}
-
-	@Override
-	public I_GetConceptData getDefaultProjectForNewConcept() {
-		return baseFrame.getDefaultProjectForNewConcept();
-	}
-
-	@Override
-	public void setDefaultWorkflowForNewConcept(I_GetConceptData workflow) {
-		baseFrame.setDefaultWorkflowForNewConcept(workflow);
-	}
-
-	@Override
-	public I_GetConceptData getDefaultWorkflowForNewConcept() {
-		return baseFrame.getDefaultWorkflowForNewConcept();
-	}
 }

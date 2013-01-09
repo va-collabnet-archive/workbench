@@ -457,11 +457,6 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     private List<UUID> availableWorkflowActions = null;
 
     // 53
-	private I_GetConceptData defaultProjectForNewConcept;
-	// 53
-	private I_GetConceptData defaultWorkflowForNewConcept;
-
-    // 53
 	private I_GetConceptData defaultProjectForChangedConcept;
 	// 53
 	private I_GetConceptData defaultWorkflowForChangedConcept;
@@ -690,12 +685,6 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
         // 51 :SNOOWL:
         out.writeBoolean (classifierOwlFeatureStatus); // :SNOOWL:
-
-    // 53
-    writeConceptAsId(defaultProjectForNewConcept, out);
-
-    // 53
-    writeConceptAsId(defaultWorkflowForNewConcept, out);
 
     // 53
     writeConceptAsId(defaultProjectForChangedConcept, out);
@@ -1206,22 +1195,6 @@ private void writeConceptAsId(I_GetConceptData concept, ObjectOutputStream out) 
                 classifierOwlFeatureStatus = in.readBoolean();
             } else {
                 classifierOwlFeatureStatus = false;
-            }
-
-            if (objDataVersion >= 53) {
-            	try {
-					defaultProjectForNewConcept = readConceptFromSerializedUuids(in);
-				} catch (TerminologyException e) {
-					  throw new IOException(e);
-				}
-            }
-
-            if (objDataVersion >= 53) {
-            	try {
-					defaultWorkflowForNewConcept = readConceptFromSerializedUuids(in);
-				} catch (TerminologyException e) {
-					  throw new IOException(e);
-				}
             }
 
             if (objDataVersion >= 53) {
@@ -3565,26 +3538,6 @@ public ServiceItemFilter getInboxQueueFilter() {
         this.moduleNid = moduleNid;
     }
     
-    @Override    
-	public void setDefaultProjectForNewConcept(I_GetConceptData project) {
-		this.defaultProjectForNewConcept=project;
-	}
-    
-    @Override
-	public I_GetConceptData getDefaultProjectForNewConcept() {
-		return defaultProjectForNewConcept;
-	}
-    
-    @Override
-	public void setDefaultWorkflowForNewConcept(I_GetConceptData workflow) {
-		this.defaultWorkflowForNewConcept = workflow;
-	}
-    
-    @Override
-	public I_GetConceptData getDefaultWorkflowForNewConcept() {
-		return defaultWorkflowForNewConcept;
-	}
-
     @Override    
 	public void setDefaultProjectForChangedConcept(I_GetConceptData project) {
 		this.defaultProjectForChangedConcept=project;
