@@ -100,14 +100,18 @@ public class DrComponentHelper {
             I_GetConceptData oldStyleConcept = tf.getConcept(conceptBi.getNid());
             I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
 
-            Set<PositionBI> viewPositions = new HashSet<PositionBI>();
-            for (PathBI loopPath : config.getEditingPathSet()) {
-                PositionBI pos = Terms.get().newPosition(loopPath, Long.MAX_VALUE);
-                viewPositions.add(pos);
-            }
-            PositionSet mockViewSet = new PositionSet(viewPositions);
-            ViewCoordinate mockVc = new ViewCoordinate(config.getViewCoordinate());
-            mockVc.setPositionSet(mockViewSet);
+//            ##Commented out to support KP path structure
+//            Set<PositionBI> viewPositions = new HashSet<PositionBI>();
+//            for (PathBI loopPath : config.getEditingPathSet()) {
+//                PositionBI pos = Terms.get().newPosition(loopPath, Long.MAX_VALUE);
+//                viewPositions.add(pos);
+//            }
+//            PositionSet mockViewSet = new PositionSet(viewPositions);
+//            ViewCoordinate mockVc = new ViewCoordinate(config.getViewCoordinate());
+//            mockVc.setPositionSet(mockViewSet);
+            
+            PositionSet mockViewSet = new PositionSet(config.getViewPositionSet());
+            ViewCoordinate mockVc = config.getViewCoordinate();
 
             List<? extends I_ConceptAttributeTuple> attributeTuples = oldStyleConcept.getConceptAttributeTuples(null,
                     mockViewSet, config.getPrecedence(),
