@@ -23,15 +23,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
 
-import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
-
-import net.jini.core.entry.Entry;
-import net.jini.core.lookup.ServiceID;
-import net.jini.core.lookup.ServiceItem;
-import net.jini.core.lookup.ServiceTemplate;
-import net.jini.lookup.ServiceItemFilter;
-import net.jini.lookup.entry.Name;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -39,7 +31,6 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
-import org.dwfa.bpa.process.I_QueueProcesses;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;

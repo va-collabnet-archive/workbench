@@ -29,7 +29,6 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.jini.TermEntry;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;

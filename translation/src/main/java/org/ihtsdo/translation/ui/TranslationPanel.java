@@ -113,15 +113,15 @@ import org.ihtsdo.project.ContextualizedDescription;
 import org.ihtsdo.project.I_ContextualizeDescription;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.help.HelpApi;
-import org.ihtsdo.project.issue.manager.IssuesListPanel2;
 import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
-import org.ihtsdo.project.panel.PanelHelperFactory;
-import org.ihtsdo.project.panel.TranslationHelperPanel;
-import org.ihtsdo.project.panel.details.WorklistMemberLogPanel;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.util.IconUtilities;
+import org.ihtsdo.project.view.PanelHelperFactory;
+import org.ihtsdo.project.view.TranslationHelperPanel;
+import org.ihtsdo.project.view.details.WorklistMemberLogPanel;
+import org.ihtsdo.project.view.issue.IssuesListPanel2;
 import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.api.WorkflowInterpreter;
 import org.ihtsdo.project.workflow.model.WfAction;
@@ -1059,7 +1059,7 @@ public class TranslationPanel extends JPanel {
 	 * M hist action performed.
 	 */
 	private void mHistActionPerformed() {
-		org.ihtsdo.project.panel.TranslationHelperPanel thp;
+		TranslationHelperPanel thp;
 		try {
 			thp = PanelHelperFactory.getTranslationHelperPanel();
 			JTabbedPane tp = thp.getTabbedPanel();

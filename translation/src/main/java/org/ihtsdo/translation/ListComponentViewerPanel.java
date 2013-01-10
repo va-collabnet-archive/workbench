@@ -69,9 +69,9 @@ import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
-import org.ihtsdo.project.panel.NacWorkListChooser;
-import org.ihtsdo.project.panel.PanelHelperFactory;
-import org.ihtsdo.project.panel.TranslationHelperPanel;
+import org.ihtsdo.project.view.NacWorkListChooser;
+import org.ihtsdo.project.view.PanelHelperFactory;
+import org.ihtsdo.project.view.TranslationHelperPanel;
 import org.ihtsdo.translation.ui.TranslationConceptEditorRO;
 import org.ihtsdo.translation.ui.ZebraJTable;
 

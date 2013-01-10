@@ -18,7 +18,6 @@ package org.ihtsdo.translation.tasks.search;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.util.List;
 import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_AmTermComponent;
@@ -27,8 +26,6 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
-import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.AceTaskUtil;
 import org.dwfa.ace.task.search.AbstractSearchTest;
@@ -42,7 +39,6 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.refset.PromotionRefset;
-import org.ihtsdo.tk.api.Precedence;
 
 /**
  * The Class SearchLangRefsetStatus.

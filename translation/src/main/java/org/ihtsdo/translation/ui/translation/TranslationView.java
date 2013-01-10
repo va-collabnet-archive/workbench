@@ -39,19 +39,19 @@ import org.ihtsdo.issue.manager.IssueRepositoryDAO;
 import org.ihtsdo.project.I_ContextualizeDescription;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.help.HelpApi;
-import org.ihtsdo.project.issue.manager.IssuesListPanel2;
 import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
-import org.ihtsdo.project.panel.PanelHelperFactory;
-import org.ihtsdo.project.panel.TranslationHelperPanel;
-import org.ihtsdo.project.panel.details.WorklistMemberLogPanel;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.util.IconUtilities;
+import org.ihtsdo.project.view.PanelHelperFactory;
+import org.ihtsdo.project.view.TranslationHelperPanel;
+import org.ihtsdo.project.view.details.WorklistMemberLogPanel;
+import org.ihtsdo.project.view.event.EventMediator;
+import org.ihtsdo.project.view.event.GenericEvent.EventType;
+import org.ihtsdo.project.view.issue.IssuesListPanel2;
 import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.api.WorkflowInterpreter;
-import org.ihtsdo.project.workflow.event.EventMediator;
-import org.ihtsdo.project.workflow.event.GenericEvent.EventType;
 import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfPermission;
 import org.ihtsdo.project.workflow.model.WfRole;
@@ -312,7 +312,7 @@ public class TranslationView extends JPanel {
 		mediator.suscribe(EventType.HISTORY_EVENT, new HistoryEventHandler<HistoryEvent>(this) {
 			@Override
 			public void handleEvent(HistoryEvent event) {
-				org.ihtsdo.project.panel.TranslationHelperPanel thp;
+				TranslationHelperPanel thp;
 				try {
 					thp = PanelHelperFactory.getTranslationHelperPanel();
 					JTabbedPane tp = thp.getTabbedPanel();

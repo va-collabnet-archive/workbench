@@ -7,7 +7,6 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import org.ihtsdo.project.util.IconUtilities;
-import org.ihtsdo.translation.ui.translation.LanguageTermPanel;
 
 /**
  * The Class TermTypeIconRenderer.

@@ -16,19 +16,14 @@
  */
 package org.ihtsdo.translation.tasks;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.MalformedURLException;
 import java.util.Collection;
 
 import javax.swing.JOptionPane;
-import javax.swing.JProgressBar;
 import javax.swing.JTabbedPane;
-import javax.swing.Timer;
 
-import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.config.AceFrameConfig;
@@ -45,7 +40,7 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.project.ProjectPermissionsAPI;
-import org.ihtsdo.project.panel.TranslationHelperPanel;
+import org.ihtsdo.project.view.TranslationHelperPanel;
 import org.ihtsdo.translation.ui.SpecialInboxPanel;
 
 /**

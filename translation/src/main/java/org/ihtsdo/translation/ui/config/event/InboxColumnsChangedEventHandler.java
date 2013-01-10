@@ -16,7 +16,8 @@
  */
 package org.ihtsdo.translation.ui.config.event;
 
-import org.ihtsdo.project.workflow.event.EventHandler;
+import org.ihtsdo.project.view.event.EventHandler;
+
 
 /**
  * The Class InboxColumnsChangedEventHandler.

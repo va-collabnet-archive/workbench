@@ -32,7 +32,6 @@ import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.Partition;
 
 /**

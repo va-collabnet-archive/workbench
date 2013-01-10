@@ -20,7 +20,8 @@ import java.util.List;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.ihtsdo.project.I_ContextualizeDescription;
-import org.ihtsdo.project.workflow.event.GenericEvent;
+import org.ihtsdo.project.view.event.GenericEvent;
+import org.ihtsdo.project.view.event.GenericEvent.EventType;
 
 /**
  * The Class EmptyInboxItemSelectedEvent.

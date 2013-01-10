@@ -18,7 +18,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
-import org.ihtsdo.project.tasks.GetInforForUnassignedWorkDC;
+import org.ihtsdo.project.task.GetInforForUnassignedWorkDC;
 import org.ihtsdo.translation.DefaultProjectForLanguage;
 import org.ihtsdo.translation.LanguageUtil;
 

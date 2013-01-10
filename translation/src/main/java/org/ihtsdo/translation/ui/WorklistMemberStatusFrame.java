@@ -30,7 +30,7 @@ import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.ihtsdo.project.model.WorkList;
-import org.ihtsdo.project.panel.details.WorklistMemberStatusPanel;
+import org.ihtsdo.project.view.details.WorklistMemberStatusPanel;
 
 /**
  * The Class WorklistMemberStatusFrame.

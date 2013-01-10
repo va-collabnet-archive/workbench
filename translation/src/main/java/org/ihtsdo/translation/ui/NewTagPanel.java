@@ -39,8 +39,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import org.ihtsdo.project.workflow.tag.InboxTag;
-import org.ihtsdo.project.workflow.tag.TagManager;
+import org.ihtsdo.project.view.tag.InboxTag;
+import org.ihtsdo.project.view.tag.TagManager;
 
 /**
  * The Class NewTagPanel.

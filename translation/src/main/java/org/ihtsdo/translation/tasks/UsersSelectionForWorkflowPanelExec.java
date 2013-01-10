@@ -27,25 +27,17 @@ import java.util.Set;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.bpa.PropertyDescriptorWithTarget;
 import org.dwfa.bpa.process.I_DefineTask;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.jini.TermEntry;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.project.FileLinkAPI;
 import org.ihtsdo.project.ProjectPermissionsAPI;
-import org.ihtsdo.project.TerminologyProjectDAO;
-import org.ihtsdo.project.model.I_TerminologyProject;
-import org.ihtsdo.project.model.WorkList;
-import org.ihtsdo.project.model.WorkListMember;
-import org.ihtsdo.project.refset.PromotionRefset;
 
 /**
  * The Class UsersSelectionForWorkflowPanelExec.

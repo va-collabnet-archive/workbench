@@ -38,7 +38,6 @@ import org.dwfa.util.bean.Spec;
 import org.ihtsdo.project.ContextualizedDescription;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.refset.PromotionRefset;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.spec.ValidationException;
 
 /**

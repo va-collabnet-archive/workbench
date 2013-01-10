@@ -39,7 +39,7 @@ import javax.swing.border.EmptyBorder;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.ihtsdo.project.workflow.event.EventMediator;
+import org.ihtsdo.project.view.event.EventMediator;
 import org.ihtsdo.translation.ui.ConfigTranslationModule;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.InboxColumn;
 import org.ihtsdo.translation.ui.config.event.InboxColumnsChangedEvent;

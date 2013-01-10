@@ -17,10 +17,10 @@
 
 package org.ihtsdo.translation.ui;
 
-import java.awt.*;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -86,8 +86,8 @@ import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.project.panel.TreeObj;
 import org.ihtsdo.project.util.IconUtilities;
+import org.ihtsdo.project.view.TreeObj;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 

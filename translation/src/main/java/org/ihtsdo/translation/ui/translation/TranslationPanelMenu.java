@@ -19,7 +19,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
-import org.ihtsdo.project.workflow.event.EventMediator;
+import org.ihtsdo.project.view.event.EventMediator;
 import org.ihtsdo.translation.ui.ConfigTranslationModule;
 import org.ihtsdo.translation.ui.event.AddDescriptionEvent;
 import org.ihtsdo.translation.ui.event.AddFsnEvent;

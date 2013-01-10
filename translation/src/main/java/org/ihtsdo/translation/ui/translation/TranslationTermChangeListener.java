@@ -4,7 +4,7 @@ import java.util.Set;
 
 import javax.swing.SwingWorker;
 
-import org.ihtsdo.project.workflow.event.EventMediator;
+import org.ihtsdo.project.view.event.EventMediator;
 import org.ihtsdo.tk.api.TermChangeListener;
 import org.ihtsdo.translation.ui.event.TermChangedEvent;
 

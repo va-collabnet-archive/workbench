@@ -64,9 +64,9 @@ import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
-import org.ihtsdo.project.panel.details.LogObjectContainer;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.refset.PromotionRefset;
+import org.ihtsdo.project.view.details.LogObjectContainer;
 
 /**
  * The Class TranslationWlstMemberLogPanel.
