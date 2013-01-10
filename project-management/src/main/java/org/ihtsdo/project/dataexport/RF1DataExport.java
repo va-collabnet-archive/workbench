@@ -16,47 +16,23 @@
  */
 package org.ihtsdo.project.dataexport;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.log4j.Logger;
-import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_DescriptionTuple;
-import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
-import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.log.AceLog;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.project.refset.LanguageMembershipRefset;
+import org.ihtsdo.tk.api.NidSetBI;
 //import org.ihtsdo.rf2.constant.I_Constants;
 //import org.ihtsdo.rf2.identifier.factory.RF2IdListGeneratorFactory;
 //import org.ihtsdo.rf2.identifier.mojo.Key;
@@ -65,13 +41,6 @@ import org.ihtsdo.project.refset.LanguageMembershipRefset;
 //import org.ihtsdo.rf2.util.Config;
 //import org.ihtsdo.rf2.util.ExportUtil;
 //import org.ihtsdo.rf2.util.JAXBUtil;
-import org.ihtsdo.tk.api.NidSet;
-import org.ihtsdo.tk.api.NidSetBI;
-import org.ihtsdo.tk.api.Precedence;
-import org.ihtsdo.tk.api.id.IdBI;
-import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
  * The Class RF1DataExport.

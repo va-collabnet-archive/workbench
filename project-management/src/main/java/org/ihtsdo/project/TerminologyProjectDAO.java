@@ -76,7 +76,6 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -87,7 +86,6 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.project.model.I_TerminologyProject;
@@ -104,7 +102,6 @@ import org.ihtsdo.project.model.WorklistMetadata;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
 import org.ihtsdo.project.refset.PromotionRefset;
-import org.ihtsdo.project.tasks.GetTranslationProject;
 import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.api.WorkflowInterpreter;
 import org.ihtsdo.project.workflow.model.WfInstance;
@@ -4639,7 +4636,7 @@ public class TerminologyProjectDAO {
 					I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) lastPart;
 					for (PathBI editPath : config.getEditingPathSet()) {
 						part.makeAnalog(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid(), Long.MAX_VALUE, config.getDbConfig().getUserConcept().getNid(), config.getEditCoordinate().getModuleNid(), editPath.getConceptNid());
-						if (part instanceof RefsetRevision) {
+						if (part instanceof RefexVersionBI) {
 							extension.addVersion(part);
 						}
 					}
@@ -5621,7 +5618,7 @@ public class TerminologyProjectDAO {
 	}
 
 	public static I_TerminologyProject getProject(
-			I_GetConceptData projectConcept, AceFrameConfig aceFrameConfig) {
+			I_GetConceptData projectConcept, I_ConfigAceFrame aceFrameConfig) {
 		I_TerminologyProject project=null;
 		try {
 			project=getTranslationProject(projectConcept, aceFrameConfig);

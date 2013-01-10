@@ -32,11 +32,8 @@ import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.cs.I_Count;
 import org.dwfa.ace.exceptions.ToIoException;
 import org.dwfa.ace.log.AceLog;
-import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.helper.time.TimeHelper;
-
-import com.sleepycat.je.DatabaseException;
 
 /**
  * The Class ChangeSetViewer.
@@ -250,7 +247,7 @@ public class ChangeSetViewer {
             if (AceLog.getEditLog().isLoggable(Level.FINE)) {
                 AceLog.getEditLog().fine("Committing time branches: " + values);
             }
-        } catch (DatabaseException e) {
+        } catch (Exception e) {
             throw new ToIoException(e);
         }
         AceLog.getAppLog().info(
@@ -307,13 +304,13 @@ public class ChangeSetViewer {
                 FileInputStream fis = new FileInputStream(changeSetFile);
                 BufferedInputStream bis = new BufferedInputStream(fis);
                 dataStream = new DataInputStream(bis);
-
-                if (EConceptChangeSetWriter.writeDebugFiles) {
-                    csreFile = new File(changeSetFile.getParentFile(), changeSetFile.getName() + ".csre");
-                    csreOut = new FileWriter(csreFile, true);
-                    csrcFile = new File(changeSetFile.getParentFile(), changeSetFile.getName() + ".csrc");
-                    csrcOut = new FileWriter(csrcFile, true);
-                }
+//
+//                if (EConceptChangeSetWriter.writeDebugFiles) {
+//                    csreFile = new File(changeSetFile.getParentFile(), changeSetFile.getName() + ".csre");
+//                    csreOut = new FileWriter(csreFile, true);
+//                    csrcFile = new File(changeSetFile.getParentFile(), changeSetFile.getName() + ".csrc");
+//                    csrcOut = new FileWriter(csrcFile, true);
+//                }
             } else {
                 nextCommit = Long.MAX_VALUE;
                 nextCommitStr = "end of time";

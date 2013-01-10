@@ -16,46 +16,18 @@
  */
 package org.ihtsdo.project.dataexport;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.log4j.Logger;
-import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IdPart;
-import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_RelTuple;
-import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
-import org.dwfa.ace.log.AceLog;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.util.id.Type5UuidFactory;
+import org.ihtsdo.tk.api.ConceptFetcherBI;
+import org.ihtsdo.tk.api.NidSetBI;
+import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
 //import org.ihtsdo.rf2.constant.I_Constants;
 //import org.ihtsdo.rf2.util.ExportUtil;
-import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ConceptFetcherBI;
-import org.ihtsdo.tk.api.ContradictionException;
-import org.ihtsdo.tk.api.NidBitSetBI;
-import org.ihtsdo.tk.api.NidSet;
-import org.ihtsdo.tk.api.NidSetBI;
-import org.ihtsdo.tk.api.PositionBI;
-import org.ihtsdo.tk.api.PositionSet;
-import org.ihtsdo.tk.api.Precedence;
-import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
-import org.ihtsdo.tk.api.RelAssertionType;
-import org.ihtsdo.tk.api.id.IdBI;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
  * The Class RF2DataExport.
