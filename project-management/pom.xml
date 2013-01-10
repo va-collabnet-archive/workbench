@@ -38,13 +38,13 @@
 			<version>${project.version}</version>
 			<scope>compile</scope>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.ihtsdo</groupId>
-			<artifactId>wb-bdb</artifactId>
+			<artifactId>wb-gui</artifactId>
 			<version>${project.version}</version>
 			<scope>compile</scope>
 		</dependency>
-		<!-- <dependency>
+		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>wb-release-process</artifactId>
 			<version>${project.version}</version>

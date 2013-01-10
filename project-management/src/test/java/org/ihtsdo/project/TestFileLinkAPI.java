@@ -28,7 +28,6 @@ import java.util.UUID;
 import junit.framework.TestCase;
 
 import org.dwfa.ace.api.DatabaseSetupConfig;
-import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
@@ -36,10 +35,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.db.bdb.BdbTermFactory;
 import org.ihtsdo.tk.api.Precedence;
-import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
-import org.ihtsdo.tk.api.cs.ChangeSetWriterThreading;
 
 /**
  * The Class TestFileLinkAPI.
@@ -209,14 +205,14 @@ public class TestFileLinkAPI extends TestCase {
 			config.getAllowedStatus().add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
 			config.getAllowedStatus().add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
 
-			BdbTermFactory bdbFactory = (BdbTermFactory) tf;
-			I_ConfigAceDb newDbProfile = bdbFactory.newAceDbConfig();
-			newDbProfile.setUsername("username");
-			newDbProfile.setClassifierChangesChangeSetPolicy(ChangeSetPolicy.OFF);
-			newDbProfile.setRefsetChangesChangeSetPolicy(ChangeSetPolicy.OFF);
-			newDbProfile.setUserChangesChangeSetPolicy(ChangeSetPolicy.INCREMENTAL);
-			newDbProfile.setChangeSetWriterThreading(ChangeSetWriterThreading.SINGLE_THREAD);
-			config.setDbConfig(newDbProfile);
+//			BdbTermFactory bdbFactory = (BdbTermFactory) tf;
+//			I_ConfigAceDb newDbProfile = bdbFactory.newAceDbConfig();
+//			newDbProfile.setUsername("username");
+//			newDbProfile.setClassifierChangesChangeSetPolicy(ChangeSetPolicy.OFF);
+//			newDbProfile.setRefsetChangesChangeSetPolicy(ChangeSetPolicy.OFF);
+//			newDbProfile.setUserChangesChangeSetPolicy(ChangeSetPolicy.INCREMENTAL);
+//			newDbProfile.setChangeSetWriterThreading(ChangeSetWriterThreading.SINGLE_THREAD);
+//			config.setDbConfig(newDbProfile);
 
 			config.setPrecedence(Precedence.TIME);
 

@@ -47,7 +47,6 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.db.bdb.BdbTermFactory;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.tk.api.PathBI;
@@ -326,8 +325,12 @@ public class CommentsRefset extends Refset {
 
         // Removed to allow duplicate strings creations, using BdbTermFactory.createMember instead
         //refsetHelper.newRefsetExtension(this.refsetId, componentId, EConcept.REFSET_TYPES.CID_CID_STR, rfPropMap, config);
-        BdbTermFactory.createMember(UUID.randomUUID(), componentId, EConcept.REFSET_TYPES.CID_CID_STR, org.ihtsdo.concept.Concept.get(refsetId),
-                config, rfPropMap);
+		//        BdbTermFactory.createMember(UUID.randomUUID(), componentId, EConcept.REFSET_TYPES.CID_CID_STR, org.ihtsdo.concept.Concept.get(refsetId),
+		//                config, rfPropMap);
+        
+		refsetHelper.newRefsetExtension(refsetId, componentId, EConcept.REFSET_TYPES.CID_CID_STR, rfPropMap, // metadata
+				config);
+		termFactory.addUncommittedNoChecks(Terms.get().getConcept(refsetId));
         refsetConcept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
     }
 

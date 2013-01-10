@@ -16,45 +16,20 @@
  */
 package org.ihtsdo.project.dataexport;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_DescriptionTuple;
-import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
-import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.refset.members.RefsetUtilImpl;
-import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.idgeneration.IdAssignmentBI;
-import org.ihtsdo.idgeneration.IdAssignmentImpl;
-import org.ihtsdo.project.refset.LanguageMembershipRefset;
-import org.ihtsdo.project.util.RF2ArtifactPostExportAbst;
-import org.ihtsdo.project.util.RF2ArtifactPostExportImpl;
-import org.ihtsdo.project.util.RF2ArtifactPostExportAbst.FILE_TYPE;
+import org.ihtsdo.tk.api.ConceptFetcherBI;
+import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.NidSetBI;
 //import org.ihtsdo.rf2.constant.I_Constants;
 //import org.ihtsdo.rf2.identifier.factory.RF2IdListGeneratorFactory;
 //import org.ihtsdo.rf2.identifier.mojo.Key;
@@ -64,13 +39,6 @@ import org.ihtsdo.project.util.RF2ArtifactPostExportAbst.FILE_TYPE;
 //import org.ihtsdo.rf2.util.ExportUtil;
 //import org.ihtsdo.rf2.util.JAXBUtil;
 //import org.ihtsdo.rf2.util.WriteUtil;
-import org.ihtsdo.tk.api.ConceptFetcherBI;
-import org.ihtsdo.tk.api.NidBitSetBI;
-import org.ihtsdo.tk.api.NidSetBI;
-import org.ihtsdo.tk.api.Precedence;
-import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
  * The Class TranslationRF2Export.
