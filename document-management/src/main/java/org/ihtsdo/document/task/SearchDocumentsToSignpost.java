@@ -34,8 +34,8 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.document.DocumentsSearchPanel;
-import org.ihtsdo.project.panel.PanelHelperFactory;
-import org.ihtsdo.project.panel.TranslationHelperPanel;
+import org.ihtsdo.project.view.PanelHelperFactory;
+import org.ihtsdo.project.view.TranslationHelperPanel;
 
 /**
  * The Class SearchDocumentsToSignpost.

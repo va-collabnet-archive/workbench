@@ -17,19 +17,13 @@
 package org.ihtsdo.document.task;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.util.Collection;
 
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.Terms;
@@ -45,9 +39,8 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.document.report.ReportPanel;
-import org.ihtsdo.project.panel.PanelHelperFactory;
-import org.ihtsdo.project.panel.RefsetViewerPanel;
-import org.ihtsdo.project.panel.TranslationHelperPanel;
+import org.ihtsdo.project.view.PanelHelperFactory;
+import org.ihtsdo.project.view.TranslationHelperPanel;
 
 /**
  * The Class ListWorkSetMembersToSignpost.

@@ -49,9 +49,9 @@ import javax.swing.event.ListSelectionListener;
 
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.document.report.I_Report.Reports;
-import org.ihtsdo.project.panel.PanelHelperFactory;
-import org.ihtsdo.project.panel.TranslationHelperPanel;
 import org.ihtsdo.project.util.IconUtilities;
+import org.ihtsdo.project.view.PanelHelperFactory;
+import org.ihtsdo.project.view.TranslationHelperPanel;
 
 /**
  * The Class ReportPanel.

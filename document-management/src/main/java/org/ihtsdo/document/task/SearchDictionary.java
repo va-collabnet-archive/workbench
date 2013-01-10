@@ -34,10 +34,8 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.document.DictionaryResultsPanel;
-import org.ihtsdo.project.panel.PanelHelperFactory;
-import org.ihtsdo.project.panel.TranslationHelperPanel;
-
-import com.lowagie.text.pdf.FontMapper;
+import org.ihtsdo.project.view.PanelHelperFactory;
+import org.ihtsdo.project.view.TranslationHelperPanel;
 
 /**
  * The Class SearchDictionary.

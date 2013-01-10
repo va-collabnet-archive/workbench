@@ -55,14 +55,14 @@ import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.model.WorkSet;
-import org.ihtsdo.project.panel.TranslationProjectDialog;
 import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
+import org.ihtsdo.project.view.TranslationProjectDialog;
 import org.ihtsdo.project.workflow.model.WfMembership;
 import org.ihtsdo.project.workflow.model.WfRole;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.type_nid_nid.RefexNidNidVersionBI;
 
 import au.com.bytecode.opencsv.CSVReader;
-import org.ihtsdo.tk.api.refex.type_nid_nid.RefexNidNidVersionBI;
 
 /**
  * The Class AccumulatedStatusChanges.

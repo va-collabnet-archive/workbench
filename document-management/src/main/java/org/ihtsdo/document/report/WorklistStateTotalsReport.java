@@ -52,8 +52,8 @@ import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkSet;
-import org.ihtsdo.project.panel.TranslationProjectListDialog;
-import org.ihtsdo.project.workflow.api.WorkflowSearcher;
+import org.ihtsdo.project.util.WorkflowSearcher;
+import org.ihtsdo.project.view.TranslationProjectListDialog;
 import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfState;
 
