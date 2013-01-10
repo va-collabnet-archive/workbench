@@ -92,7 +92,8 @@ global ViewCoordinate vc;
 global ConceptViewSettings cvSettings;
 global I_ConfigAceFrame config;
 
-rule "rule 1" #concept onto different SNOMED concept
+rule "rule 1" 
+#concept onto different SNOMED concept
 
    when
       (and
@@ -104,7 +105,8 @@ rule "rule 1" #concept onto different SNOMED concept
       actions.add(new CreateRelAction("Is-a", $dropTarget, Snomed.IS_A, $dropObject, config));
 end
 
-rule "rule 3" #concept onto NOT snomed concept
+rule "rule 3" 
+#concept onto NOT snomed concept
 
    when
       (and
@@ -117,7 +119,8 @@ rule "rule 3" #concept onto NOT snomed concept
 end 
 
 
-rule "rule 4" #concept onto same concept
+rule "rule 4" 
+#concept onto same concept
 
    when
          ViewFact(getView() == View.STATED)
@@ -133,7 +136,8 @@ rule "rule 4" #concept onto same concept
       actions.add(new CloneAndRetireAction("clone & retire", $dropObject, config));
 end
 
-rule "rule 4.2" #CANCEL concept onto same concept
+rule "rule 4.2" 
+#CANCEL concept onto same concept
 
    when
          ViewFact(getView() == View.STATED)
@@ -147,7 +151,8 @@ rule "rule 4.2" #CANCEL concept onto same concept
       actions.add(new CancelAction("cancel", $dropObject, vc, config));
 end
 
-rule "rule 4.3" #CANCEL conAttr 
+rule "rule 4.3" 
+#CANCEL conAttr 
 
    when
          ViewFact(getView() == View.STATED)
@@ -160,7 +165,8 @@ rule "rule 4.3" #CANCEL conAttr
 end
 
 
-rule "rule 5" #template onto concept
+rule "rule 5" 
+#template onto concept
 
    when
       (and
@@ -180,7 +186,8 @@ rule "rule 5" #template onto concept
                         }
 end
 
-rule "rule 6" #rel template onto concept
+rule "rule 6" 
+#rel template onto concept
 
    when
       (and
@@ -193,7 +200,8 @@ rule "rule 6" #rel template onto concept
       actions.add(new AddFromSpecAction("add rel", $dropTarget, $dropObject, config));
 end 
 
- rule "rule 7" #rel onto rel (in group)
+ rule "rule 7" 
+#rel onto rel (in group)
 
    when
          ViewFact(getView() == View.STATED)
@@ -208,7 +216,8 @@ end
 
 end
 
-rule "rule 8" #desc onto concept
+rule "rule 8" 
+#desc onto concept
 
    when
       (and
@@ -226,7 +235,8 @@ rule "rule 8" #desc onto concept
       actions.add(new MoveDescAction("move desc", $dropObject, $dropTarget, config));
 end
 
-rule "rule 9" #rel (w/o group) onto rel group"
+rule "rule 9" 
+#rel (w/o group) onto rel group"
    when
       ViewFact(getView() == View.STATED)
       $dropTarget: RelGroupFact(context == Context.DROP_TARGET)
@@ -238,7 +248,8 @@ rule "rule 9" #rel (w/o group) onto rel group"
       actions.add(new CopyToRelGroupAction("copy rel", $dropObject, $dropTarget, config));
 end
 
-rule "rule 9.1" #rel (w/o group) onto rel group"
+rule "rule 9.1" 
+#rel (w/o group) onto rel group"
    when
       ViewFact(getView() == View.STATED)
       $dropTarget: RelGroupFact(context == Context.DROP_TARGET)
@@ -250,7 +261,8 @@ rule "rule 9.1" #rel (w/o group) onto rel group"
       actions.add(new MoveToRelGroupAction("add rel", $dropObject, $dropTarget, config));
 end
 
-rule "rule 10" #rel w/group onto different rel group"
+rule "rule 10" 
+#rel w/group onto different rel group"
    when
       ViewFact(getView() == View.STATED)
       $dropTarget: RelGroupFact(context == Context.DROP_TARGET)
@@ -262,7 +274,8 @@ rule "rule 10" #rel w/group onto different rel group"
       actions.add(new CopyToRelGroupAction("copy to rel group", $dropObject, $dropTarget, config));
 end
 
-rule "rule 10.1" #rel w/group onto different rel group"
+rule "rule 10.1" 
+#rel w/group onto different rel group"
    when
       ViewFact(getView() == View.STATED)
       $dropTarget: RelGroupFact(context == Context.DROP_TARGET)
@@ -275,7 +288,8 @@ rule "rule 10.1" #rel w/group onto different rel group"
       actions.add(new MoveToRelGroupAction("move to rel group", $dropObject, $dropTarget, config));
 end
 
-rule "rule 11" #rel onto concept"
+rule "rule 11" 
+#rel onto concept"
 
    when
        ViewFact(getView() == View.STATED)
@@ -288,7 +302,8 @@ rule "rule 11" #rel onto concept"
 
 end
 
-rule "rule 11.1" #rel onto concept"
+rule "rule 11.1" 
+#rel onto concept"
 
    when
        ViewFact(getView() == View.STATED)
@@ -303,7 +318,8 @@ rule "rule 11.1" #rel onto concept"
 
 end
 
-rule "rule 11.2" #clone rel (in rel group) onto concept
+rule "rule 11.2" 
+#clone rel (in rel group) onto concept
 
    when
    ViewFact(getView() == View.STATED)
@@ -316,10 +332,12 @@ rule "rule 11.2" #clone rel (in rel group) onto concept
 
 end
 
-rule "rule 12" #rel group onto same concept"
+rule "rule 12" 
+#rel group onto same concept"
 
    when
-   #concept  origin
+   
+#concept  origin
    ViewFact(getView() == View.STATED)
    $dropTarget: ConceptFact(context == Context.DROP_TARGET)
    $dropObject: RelGroupFact(context == Context.DROP_OBJECT,  
@@ -333,10 +351,12 @@ rule "rule 12" #rel group onto same concept"
 end
 
 
-rule "rule 12.1" #rel group onto concept"
+rule "rule 12.1" 
+#rel group onto concept"
 
    when
-   #concept != origin
+   
+#concept != origin
    ViewFact(getView() == View.STATED)
    $dropTarget: ConceptFact(context == Context.DROP_TARGET)
    $dropObject: RelGroupFact(context == Context.DROP_OBJECT,
@@ -347,10 +367,12 @@ rule "rule 12.1" #rel group onto concept"
 
 end
 
-rule "rule 12.2" #rel group onto concept"
+rule "rule 12.2" 
+#rel group onto concept"
 
    when
-   #concept != origin
+   
+#concept != origin
    ViewFact(getView() == View.STATED)
    $dropTarget: ConceptFact(context == Context.DROP_TARGET)
    $dropObject: RelGroupFact(context == Context.DROP_OBJECT,
@@ -361,7 +383,8 @@ rule "rule 12.2" #rel group onto concept"
 
 end 
 
-rule "rule 13" #rel template onto rel group"
+rule "rule 13" 
+#rel template onto rel group"
    when
    ViewFact(getView() == View.STATED)
    $dropObject: RelSpecFact(context == Context.DROP_TARGET)
@@ -372,7 +395,8 @@ rule "rule 13" #rel template onto rel group"
    actions.add(new AddToRelGroupAction("add to rel group", $dropTarget, $dropObject, config));
 end
 
-rule "rule 14" #historical rel template onto rel"
+rule "rule 14" 
+#historical rel template onto rel"
 	when
                 ViewFact(getView() == View.STATED)
 		$dropObject : RelFact(context == Context.DROP_OBJECT);
@@ -382,7 +406,8 @@ rule "rule 14" #historical rel template onto rel"
 		actions.add(new ReplaceAction("Replace with", $dropObject, $dropTarget, config));
 end
 
-rule "rule 15" #pref acceptability GB
+rule "rule 15" 
+#pref acceptability GB
 	when
                 ViewFact(getView() == View.STATED)
 		$dropTarget: DescFact(this isGbMemberTypeOf SnomedMetadataRfx.getDESC_PREFERRED(), 
@@ -392,7 +417,8 @@ rule "rule 15" #pref acceptability GB
 		actions.add(new MakeAcceptableAction("GB Acceptable", $dropTarget, LANG_CODE.EN_GB, config));
 end
 
-rule "rule 16.1" #pref acceptibility US
+rule "rule 16.1" 
+#pref acceptibility US
 	when
                 ViewFact(getView() == View.STATED)
 		$dropTarget: DescFact(this isUsMemberTypeOf SnomedMetadataRfx.getDESC_PREFERRED(), 
@@ -402,7 +428,8 @@ rule "rule 16.1" #pref acceptibility US
 		actions.add(new MakeAcceptableAction("US Acceptable", $dropTarget, LANG_CODE.EN_US, config));
 end
 
-rule "rule 17.1" #acceptable acceptability GB
+rule "rule 17.1" 
+#acceptable acceptability GB
 	when
                 ViewFact(getView() == View.STATED)
 		$dropTarget: DescFact(this isGbMemberTypeOf SnomedMetadataRfx.getDESC_ACCEPTABLE(), 
@@ -412,7 +439,8 @@ rule "rule 17.1" #acceptable acceptability GB
 		actions.add(new MakePreferredAction("GB Preferred", $dropTarget, LANG_CODE.EN_GB, config));
 end
 
-rule "rule 18.1" #aceptable acceptibility US
+rule "rule 18.1" 
+#aceptable acceptibility US
 	when
                 ViewFact(getView() == View.STATED)
 		$dropTarget: DescFact(this isUsMemberTypeOf SnomedMetadataRfx.getDESC_ACCEPTABLE(), 
@@ -422,7 +450,8 @@ rule "rule 18.1" #aceptable acceptibility US
 		actions.add(new MakePreferredAction("US Preferred", $dropTarget, LANG_CODE.EN_US, config));
 end
 
-rule "rule 19" #not acceptable acceptability GB
+rule "rule 19" 
+#not acceptable acceptability GB
 	when
                 ViewFact(getView() == View.STATED)
 		$dropTarget: DescFact(this isGbMemberTypeOf AcceptabilityType.NOT_ACCEPTABLE, 
@@ -433,7 +462,8 @@ rule "rule 19" #not acceptable acceptability GB
 		actions.add(new MakeAcceptableAction("GB Acceptable", $dropTarget, LANG_CODE.EN_GB, config));
 end
 
-rule "rule 20" #not acceptable acceptibility US
+rule "rule 20" 
+#not acceptable acceptibility US
 	when
                 ViewFact(getView() == View.STATED)
 		$dropTarget: DescFact(this isUsMemberTypeOf AcceptabilityType.NOT_ACCEPTABLE, 
@@ -444,7 +474,8 @@ rule "rule 20" #not acceptable acceptibility US
 		actions.add(new MakeAcceptableAction("US Acceptable", $dropTarget, LANG_CODE.EN_US, config));
 end
 
-rule "rule 21" #rel (w/o group) onto rel (w/o group): create new rel group"
+rule "rule 21" 
+#rel (w/o group) onto rel (w/o group): create new rel group"
    when
       ViewFact(getView() == View.STATED)
       $dropTarget: RelFact(context == Context.DROP_TARGET,
@@ -458,7 +489,8 @@ rule "rule 21" #rel (w/o group) onto rel (w/o group): create new rel group"
       actions.add(new GroupRelsAction("group rels", $dropObject, $dropTarget, config));
 end
 
-rule "rule 22" #set degree of synonymy if not set rf1
+rule "rule 22" 
+#set degree of synonymy if not set rf1
 	when
                 ViewFact(getView() == View.STATED)
 		$dropTarget: DescFact(this not isMemberOf SnomedMetadataRfx.getREFEX_SYNONYMY(),
@@ -471,7 +503,8 @@ rule "rule 22" #set degree of synonymy if not set rf1
 		actions.add(new SetSynonymyAction("non synonymous", $dropTarget, SynonymyType.NON_SYNONYMOUS, false, config));
 end
 
-rule "rule 23" #change synonymy from synonymous
+rule "rule 23" 
+#change synonymy from synonymous
 	when
                 ViewFact(getView() == View.STATED)
 		$dropTarget: DescFact(this isSynonymMemberTypeOf SynonymyType.SYNONYM,
@@ -483,7 +516,8 @@ rule "rule 23" #change synonymy from synonymous
 		actions.add(new SetSynonymyAction("non synonymous", $dropTarget, SynonymyType.NON_SYNONYMOUS, true, config));
 end
 
-rule "rule 24" #change synonymy from near synonymous
+rule "rule 24" 
+#change synonymy from near synonymous
 	when
                 ViewFact(getView() == View.STATED)
 		$dropTarget: DescFact(this isSynonymMemberTypeOf SynonymyType.NEAR_SYNONYMOUS,
@@ -495,7 +529,8 @@ rule "rule 24" #change synonymy from near synonymous
 		actions.add(new SetSynonymyAction("non synonymous", $dropTarget, SynonymyType.NON_SYNONYMOUS, true, config));
 end
 
-rule "rule 25" #change synonymy from non synonymous
+rule "rule 25" 
+#change synonymy from non synonymous
 	when
                 ViewFact(getView() == View.STATED)
 		$dropTarget: DescFact(this isSynonymMemberTypeOf SynonymyType.NON_SYNONYMOUS,
@@ -507,7 +542,8 @@ rule "rule 25" #change synonymy from non synonymous
 		actions.add(new SetSynonymyAction("near synonymous", $dropTarget, SynonymyType.NEAR_SYNONYMOUS, true, config));
 end
 
-rule "rule 26" #procedure and decendants onto body structure
+rule "rule 26" 
+#procedure and decendants onto body structure
 
    when
       (and
@@ -522,7 +558,8 @@ rule "rule 26" #procedure and decendants onto body structure
       actions.add(new CreateRelAction("Procedure Site - Indirect", $dropTarget, Snomed.PROCEDURE_SITE_INDIRECT, $dropObject, config));
 end
 
-rule "rule 27" #procedure onto morphologic abnormality
+rule "rule 27" 
+#procedure onto morphologic abnormality
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -536,7 +573,8 @@ rule "rule 27" #procedure onto morphologic abnormality
       	actions.add(new CreateRelAction("Procedure Morphology - Indirect", $dropTarget, Snomed.PROCEDURE_INDIRECT_MORPHOLOGY, $dropObject, config));
 end
 
-rule "rule 28" #procedure onto physical object
+rule "rule 28" 
+#procedure onto physical object
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -552,7 +590,8 @@ rule "rule 28" #procedure onto physical object
       	actions.add(new CreateRelAction("Procedure Device - using device", $dropTarget, Snomed.PROCEDURE_USING_DEVICE, $dropObject, config));
 end
 
-rule "rule 29" #procedure onto substance
+rule "rule 29" 
+#procedure onto substance
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -565,7 +604,8 @@ rule "rule 29" #procedure onto substance
       	actions.add(new CreateRelAction("Component", $dropTarget, Snomed.COMPONENT, $dropObject, config));
 end
 
-rule "rule 29.1" #procedure onto clinical finding
+rule "rule 29.1" 
+#procedure onto clinical finding
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -576,7 +616,8 @@ rule "rule 29.1" #procedure onto clinical finding
             actions.add(new CreateRelAction("Has Focus", $dropTarget, Snomed.HAS_FOCUS, $dropObject, config));
 end
 
-rule "rule 30" #procedure onto specimen
+rule "rule 30" 
+#procedure onto specimen
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -587,7 +628,8 @@ rule "rule 30" #procedure onto specimen
 		actions.add(new CreateRelAction("Has Specimen", $dropTarget, Snomed.HAS_SPECIMEN, $dropObject, config));
 end
 
-rule "rule 30.1" #procedure onto procedure
+rule "rule 30.1" 
+#procedure onto procedure
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -598,7 +640,8 @@ rule "rule 30.1" #procedure onto procedure
 		actions.add(new CreateRelAction("Measurement Method", $dropTarget, Snomed.MEASUREMENT_METHOD, $dropObject, config));
 end
 
-rule "rule 31" #procedure onto social concept
+rule "rule 31" 
+#procedure onto social concept
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -610,7 +653,8 @@ rule "rule 31" #procedure onto social concept
 		actions.add(new CreateRelAction("Recipient Category", $dropTarget, Snomed.RECIPIENT_CATEGORY, $dropObject, config));
 end
 
-rule "rule 31.1" #procedure onto physical force
+rule "rule 31.1" 
+#procedure onto physical force
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -621,7 +665,8 @@ rule "rule 31.1" #procedure onto physical force
 		actions.add(new CreateRelAction("Using Energy", $dropTarget, Snomed.USING_ENERGY, $dropObject, config));
 end
 
-rule "rule 32" #procedure onto qualifier value
+rule "rule 32" 
+#procedure onto qualifier value
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -641,7 +686,8 @@ rule "rule 32" #procedure onto qualifier value
 		actions.add(new CreateRelAction("Approach", $dropTarget, Snomed.APPROACH, $dropObject, config));
 end
 
-rule "rule 33" #clinical finding onto body structure
+rule "rule 33" 
+#clinical finding onto body structure
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -653,7 +699,8 @@ rule "rule 33" #clinical finding onto body structure
 		actions.add(new CreateRelAction("Finding Site", $dropTarget, Snomed.FINDING_SITE, $dropObject, config));
 end
 
-rule "rule 34" #clinical finding onto morphologic abnormality
+rule "rule 34" 
+#clinical finding onto morphologic abnormality
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -664,7 +711,8 @@ rule "rule 34" #clinical finding onto morphologic abnormality
 		actions.add(new CreateRelAction("Associated Morphology", $dropTarget, Snomed.ASSOCIATED_MORPHOLOGY, $dropObject, config));
 end
 
-rule "rule 35" #clinical finding onto procedure
+rule "rule 35" 
+#clinical finding onto procedure
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -678,7 +726,8 @@ rule "rule 35" #clinical finding onto procedure
                 actions.add(new CreateRelAction("Interprets", $dropTarget, Snomed.INTERPRETS, $dropObject, config));
 end
 
-rule "rule 36" #clinical finding onto clinical finding
+rule "rule 36" 
+#clinical finding onto clinical finding
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -690,7 +739,8 @@ rule "rule 36" #clinical finding onto clinical finding
 		actions.add(new CreateRelAction("Has Definitional Manifestation", $dropTarget, Snomed.HAS_DEFINITIONAL_MANIFESTATION, $dropObject, config));
 end
 
-rule "rule 36.1" #clinical finding onto event
+rule "rule 36.1" 
+#clinical finding onto event
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -701,7 +751,8 @@ rule "rule 36.1" #clinical finding onto event
 		actions.add(new CreateRelAction("Associated With - due to", $dropTarget, Snomed.ASSOCIATED_WITH_DUE, $dropObject, config));
 end
 
-rule "rule 37" #clinical finding onto qualifier value
+rule "rule 37" 
+#clinical finding onto qualifier value
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -715,7 +766,8 @@ rule "rule 37" #clinical finding onto qualifier value
 		actions.add(new CreateRelAction("Pathological Process", $dropTarget, Snomed.PATHOLOGICAL_PROCESS, $dropObject, config));
 end
 
-rule "rule 38" #clinical finding onto person
+rule "rule 38" 
+#clinical finding onto person
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -726,7 +778,8 @@ rule "rule 38" #clinical finding onto person
 		actions.add(new CreateRelAction("Finding Informer", $dropTarget, Snomed.FINDING_INFORMER, $dropObject, config));
 end
 
-rule "rule 39" #clinical finding onto observable entity
+rule "rule 39" 
+#clinical finding onto observable entity
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -737,7 +790,8 @@ rule "rule 39" #clinical finding onto observable entity
 		actions.add(new CreateRelAction("Interprets", $dropTarget, Snomed.INTERPRETS, $dropObject, config));
 end
 
-rule "rule 40" #clinical finding onto substance
+rule "rule 40" 
+#clinical finding onto substance
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -748,7 +802,8 @@ rule "rule 40" #clinical finding onto substance
 		actions.add(new CreateRelAction("Accociated With - Causative agent", $dropTarget, Snomed.ASSOCIATED_WITH_AGENT, $dropObject, config));
 end
 
-rule "rule 41" #clinical finding onto organism
+rule "rule 41" 
+#clinical finding onto organism
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -759,7 +814,8 @@ rule "rule 41" #clinical finding onto organism
 		actions.add(new CreateRelAction("Accociated With - Causative agent", $dropTarget, Snomed.ASSOCIATED_WITH_AGENT, $dropObject, config));
 end
 
-rule "rule 41.1" #clinical finding onto physical object
+rule "rule 41.1" 
+#clinical finding onto physical object
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -770,7 +826,8 @@ rule "rule 41.1" #clinical finding onto physical object
 		actions.add(new CreateRelAction("Accociated With - Causative agent", $dropTarget, Snomed.ASSOCIATED_WITH_AGENT, $dropObject, config));
 end
 
-rule "rule 41.2" #clinical finding onto physical force
+rule "rule 41.2" 
+#clinical finding onto physical force
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -781,7 +838,8 @@ rule "rule 41.2" #clinical finding onto physical force
 		actions.add(new CreateRelAction("Accociated With - Causative agent", $dropTarget, Snomed.ASSOCIATED_WITH_AGENT, $dropObject, config));
 end
 
-rule "rule 41.3" #clinical finding onto product
+rule "rule 41.3" 
+#clinical finding onto product
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -792,7 +850,8 @@ rule "rule 41.3" #clinical finding onto product
 		actions.add(new CreateRelAction("Accociated With - Causative agent", $dropTarget, Snomed.ASSOCIATED_WITH_AGENT, $dropObject, config));
 end
 
-rule "rule 42" #Specimen onto procedure
+rule "rule 42" 
+#Specimen onto procedure
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -803,7 +862,8 @@ rule "rule 42" #Specimen onto procedure
 		actions.add(new CreateRelAction("Specimen Procedure", $dropTarget, Snomed.SPECIMEN_PROCEDURE, $dropObject, config));
 end
 
-rule "rule 43" #Specimen onto person
+rule "rule 43" 
+#Specimen onto person
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -814,7 +874,8 @@ rule "rule 43" #Specimen onto person
 		actions.add(new CreateRelAction("Specimen Source Identity", $dropTarget, Snomed.SPECIMEN_SOURCE_ID, $dropObject, config));
 end
 
-rule "rule 44" #Specimen onto physical object
+rule "rule 44" 
+#Specimen onto physical object
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -825,7 +886,8 @@ rule "rule 44" #Specimen onto physical object
 		actions.add(new CreateRelAction("Specimen Source Identity", $dropTarget, Snomed.SPECIMEN_SOURCE_ID, $dropObject, config));
 end
 
-rule "rule 45" #Specimen onto environment
+rule "rule 45" 
+#Specimen onto environment
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -836,7 +898,8 @@ rule "rule 45" #Specimen onto environment
 		actions.add(new CreateRelAction("Specimen Source Identity", $dropTarget, Snomed.SPECIMEN_SOURCE_ID, $dropObject, config));
 end
 
-rule "rule 46" #Specimen onto morphologic abnormality
+rule "rule 46" 
+#Specimen onto morphologic abnormality
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -849,7 +912,8 @@ rule "rule 46" #Specimen onto morphologic abnormality
 		actions.add(new CreateRelAction("Specimen Source Morphology", $dropTarget, Snomed.SPECIMEN_SOURCE_MORPHOLOGY, $dropObject, config));
 end
 
-rule "rule 47" #Specimen onto body structure
+rule "rule 47" 
+#Specimen onto body structure
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -860,7 +924,8 @@ rule "rule 47" #Specimen onto body structure
 		actions.add(new CreateRelAction("Specimen Source Topography", $dropTarget, Snomed.SPECIMEN_SOURCE_TOPOGRAPHY, $dropObject, config));
 end
 
-rule "rule 48" #Specimen onto substance
+rule "rule 48" 
+#Specimen onto substance
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -871,7 +936,8 @@ rule "rule 48" #Specimen onto substance
 		actions.add(new CreateRelAction("Specimen Substance", $dropTarget, Snomed.SPECIMEN_SUBSTANCE, $dropObject, config));
 end
 
-rule "rule 49" #Product onto substance
+rule "rule 49" 
+#Product onto substance
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -882,7 +948,8 @@ rule "rule 49" #Product onto substance
 		actions.add(new CreateRelAction("Has Active Ingredient", $dropTarget, Snomed.HAS_ACTIVE_INGREDIENT, $dropObject, config));
 end
 
-rule "rule 50" #Product onto qualifier value
+rule "rule 50" 
+#Product onto qualifier value
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -893,7 +960,8 @@ rule "rule 50" #Product onto qualifier value
 		actions.add(new CreateRelAction("Has Dose Form", $dropTarget, Snomed.HAS_DOSE_FORM, $dropObject, config));
 end
 
-rule "rule 51" #Situation with explicit context onto qualifier value
+rule "rule 51" 
+#Situation with explicit context onto qualifier value
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -906,7 +974,8 @@ rule "rule 51" #Situation with explicit context onto qualifier value
 		actions.add(new CreateRelAction("Temporal Context", $dropTarget, Snomed.TEMPORAL_CONTEXT, $dropObject, config));
 end
 
-rule "rule 52" #Situation with explicit context onto person
+rule "rule 52" 
+#Situation with explicit context onto person
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -917,7 +986,8 @@ rule "rule 52" #Situation with explicit context onto person
 		actions.add(new CreateRelAction("Subject Relationship Context", $dropTarget, Snomed.SUBJECT_REL_CONTEXT, $dropObject, config));
 end
 
-rule "rule 52.1" #Situation with explicit context onto clinical finding
+rule "rule 52.1" 
+#Situation with explicit context onto clinical finding
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -928,7 +998,8 @@ rule "rule 52.1" #Situation with explicit context onto clinical finding
 		actions.add(new CreateRelAction("Associated finding", $dropTarget, Snomed.ASSOCIATED_FINDING, $dropObject, config));
 end
 
-rule "rule 52.2" #Situation with explicit context onto clinical finding
+rule "rule 52.2" 
+#Situation with explicit context onto clinical finding
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -939,7 +1010,8 @@ rule "rule 52.2" #Situation with explicit context onto clinical finding
 		actions.add(new CreateRelAction("Associated finding", $dropTarget, Snomed.ASSOCIATED_FINDING, $dropObject, config));
 end
 
-rule "rule 52.3" #Situation with explicit context onto clinical finding
+rule "rule 52.3" 
+#Situation with explicit context onto clinical finding
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -950,7 +1022,8 @@ rule "rule 52.3" #Situation with explicit context onto clinical finding
 		actions.add(new CreateRelAction("Associated finding", $dropTarget, Snomed.ASSOCIATED_FINDING, $dropObject, config));
 end
 
-rule "rule 52.4" #Situation with explicit context onto clinical finding
+rule "rule 52.4" 
+#Situation with explicit context onto clinical finding
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -961,7 +1034,8 @@ rule "rule 52.4" #Situation with explicit context onto clinical finding
 		actions.add(new CreateRelAction("Associated finding", $dropTarget, Snomed.ASSOCIATED_FINDING, $dropObject, config));
 end
 
-rule "rule 53" #Body structure onto qualifier value
+rule "rule 53" 
+#Body structure onto qualifier value
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -972,7 +1046,8 @@ rule "rule 53" #Body structure onto qualifier value
 		actions.add(new CreateRelAction("Laterality", $dropTarget, Snomed.LATERALITY, $dropObject, config));
 end 
 
-rule "rule 54" #change from primitve to defined
+rule "rule 54" 
+#change from primitve to defined
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -983,7 +1058,8 @@ rule "rule 54" #change from primitve to defined
 		actions.add(new SetDefinedAction("make primitive", $dropTarget, config));
 end
 
-rule "rule 55" #change from defined to primitive
+rule "rule 55" 
+#change from defined to primitive
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -994,7 +1070,8 @@ rule "rule 55" #change from defined to primitive
 		actions.add(new SetDefinedAction("make defined", $dropTarget, config));
 end
 
-rule "rule 56" #set case sensitivity 
+rule "rule 56" 
+#set case sensitivity 
 	when
                 ViewFact(getView() == View.STATED)
 		$dropTarget: DescFact(context == Context.DROP_TARGET, getDesc().isInitialCaseSignificant() == false)
@@ -1003,7 +1080,8 @@ rule "rule 56" #set case sensitivity
 		actions.add(new SetICSignificantAction("make case sensitive", $dropTarget, config));
 end
 
-rule "rule 57" #change to non-case-sensitive
+rule "rule 57" 
+#change to non-case-sensitive
 	when
                 ViewFact(getView() == View.STATED)
 		$dropTarget: DescFact(context == Context.DROP_TARGET, getDesc().isInitialCaseSignificant() == true)
@@ -1012,7 +1090,8 @@ rule "rule 57" #change to non-case-sensitive
 		actions.add(new SetICSignificantAction("make case insensitive", $dropTarget, config));
 end
 
-rule "rule 58" #retire inappropriate synonym
+rule "rule 58" 
+#retire inappropriate synonym
 	when
                 ViewFact(getView() == View.STATED)
 		$dropTarget: DescFact(getDesc().getTypeNid() == SnomedMetadataRfx.getDES_SYNONYM_NID(),
@@ -1024,7 +1103,8 @@ end
 
 # need to wait for these concepts to exist in int dev bundle
 /*
-rule "rule 59" #quantity
+rule "rule 59" 
+#quantity
 	when
                 ViewFact(getView() == View.STATED)
 		$dropTarget: RelFact(context == Context.DROP_TARGET)
@@ -1033,7 +1113,8 @@ rule "rule 59" #quantity
 		actions.add(new AddToNidFloatRefexAction("add quantity", $dropTarget, Snomed.QUANTITY, config));
 end
 
-"rule 60" #concentration
+"rule 60" 
+#concentration
 	when
                 ViewFact(getView() == View.STATED)
 		$dropTarget: RelFact(context == Context.DROP_TARGET)
