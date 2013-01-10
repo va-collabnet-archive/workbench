@@ -2,7 +2,7 @@ package org.ihtsdo.project.util;
 
 import java.io.File;
 
-import org.ihtsdo.rf2.postexport.AuxiliaryFilesRetrieve;
+//import org.ihtsdo.rf2.postexport.AuxiliaryFilesRetrieve;
 
 public abstract class RF2ArtifactPostExportAbst {
 
@@ -84,83 +84,84 @@ public abstract class RF2ArtifactPostExportAbst {
     };
 
     public File getPreviousFile(String rf2FullFolder, FILE_TYPE fType) throws Exception {
-        RF2FileRetrieve RF2fRetrieve = null;
-        AuxiliaryFilesRetrieve AuxFileRetrieve = null;
-        String retFile = null;
-        switch (fType) {
-            case RF2_CONCEPT:
-                RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
-                retFile = RF2fRetrieve.getConceptFile();
-                break;
-            case RF2_DESCRIPTION:
-                RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
-                retFile = RF2fRetrieve.getDescriptionFile();
-                break;
-            case RF2_RELATIONSHIP:
-                RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
-                retFile = RF2fRetrieve.getRelationshipFile();
-                break;
-            case RF2_STATED_RELATIONSHIP:
-                RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
-                retFile = RF2fRetrieve.getStatedRelationshipFile();
-                break;
-            case RF2_IDENTIFIER:
-                RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
-                retFile = RF2fRetrieve.getIdentifierFile();
-                break;
-            case RF2_TEXTDEFINITION:
-                RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
-                retFile = RF2fRetrieve.getTextDefinitionFile();
-                break;
-            case RF2_LANGUAGE_REFSET:
-                RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
-                retFile = RF2fRetrieve.getLanguageFile();
-                break;
-            case RF2_ATTRIBUTE_VALUE:
-                RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
-                retFile = RF2fRetrieve.getAttributeValueFile();
-                break;
-            case RF2_SIMPLE_MAP:
-                RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
-                retFile = RF2fRetrieve.getSimpleMapFile();
-                break;
-            case RF2_SIMPLE:
-                RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
-                retFile = RF2fRetrieve.getRefsetSimpleFile();
-                break;
-            case RF2_ASSOCIATION:
-                RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
-                retFile = RF2fRetrieve.getAssociationFile();
-                break;
-            case RF2_ICD9_MAP:
-                RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
-                retFile = RF2fRetrieve.getICD9CrossMapFile();
-                break;
-            case RF2_QUALIFIER:
-                AuxFileRetrieve = new AuxiliaryFilesRetrieve(rf2FullFolder);
-                retFile = AuxFileRetrieve.getQualifierFile();
-                break;
-            case RF2_COMPATIBILITY_IDENTIFIER:
-                AuxFileRetrieve = new AuxiliaryFilesRetrieve(rf2FullFolder);
-                retFile = AuxFileRetrieve.getAssociationAuxiliaryFile();
-                break;
-            case RF2_ISA_RETIRED:
-                AuxFileRetrieve = new AuxiliaryFilesRetrieve(rf2FullFolder);
-                retFile = AuxFileRetrieve.getRelationshipAuxiliaryFile();
-                break;
-            case RF2_STATED_ISA_RETIRED:
-                AuxFileRetrieve = new AuxiliaryFilesRetrieve(rf2FullFolder);
-                retFile = AuxFileRetrieve.getStatedRelationshipAuxiliaryFile();
-                break;
-            case RF2_ICDO_TARGETS:
-                AuxFileRetrieve = new AuxiliaryFilesRetrieve(rf2FullFolder);
-                retFile = AuxFileRetrieve.getCrossMapICDOTgtAuxRF2File();
-                break;
-        }
-        if (retFile == null) {
-            return null;
-        }
-        return new File(retFile);
+//        RF2FileRetrieve RF2fRetrieve = null;
+//        AuxiliaryFilesRetrieve AuxFileRetrieve = null;
+//        String retFile = null;
+//        switch (fType) {
+//            case RF2_CONCEPT:
+//                RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
+//                retFile = RF2fRetrieve.getConceptFile();
+//                break;
+//            case RF2_DESCRIPTION:
+//                RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
+//                retFile = RF2fRetrieve.getDescriptionFile();
+//                break;
+//            case RF2_RELATIONSHIP:
+//                RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
+//                retFile = RF2fRetrieve.getRelationshipFile();
+//                break;
+//            case RF2_STATED_RELATIONSHIP:
+//                RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
+//                retFile = RF2fRetrieve.getStatedRelationshipFile();
+//                break;
+//            case RF2_IDENTIFIER:
+//                RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
+//                retFile = RF2fRetrieve.getIdentifierFile();
+//                break;
+//            case RF2_TEXTDEFINITION:
+//                RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
+//                retFile = RF2fRetrieve.getTextDefinitionFile();
+//                break;
+//            case RF2_LANGUAGE_REFSET:
+//                RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
+//                retFile = RF2fRetrieve.getLanguageFile();
+//                break;
+//            case RF2_ATTRIBUTE_VALUE:
+//                RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
+//                retFile = RF2fRetrieve.getAttributeValueFile();
+//                break;
+//            case RF2_SIMPLE_MAP:
+//                RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
+//                retFile = RF2fRetrieve.getSimpleMapFile();
+//                break;
+//            case RF2_SIMPLE:
+//                RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
+//                retFile = RF2fRetrieve.getRefsetSimpleFile();
+//                break;
+//            case RF2_ASSOCIATION:
+//                RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
+//                retFile = RF2fRetrieve.getAssociationFile();
+//                break;
+//            case RF2_ICD9_MAP:
+//                RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
+//                retFile = RF2fRetrieve.getICD9CrossMapFile();
+//                break;
+//            case RF2_QUALIFIER:
+//                AuxFileRetrieve = new AuxiliaryFilesRetrieve(rf2FullFolder);
+//                retFile = AuxFileRetrieve.getQualifierFile();
+//                break;
+//            case RF2_COMPATIBILITY_IDENTIFIER:
+//                AuxFileRetrieve = new AuxiliaryFilesRetrieve(rf2FullFolder);
+//                retFile = AuxFileRetrieve.getAssociationAuxiliaryFile();
+//                break;
+//            case RF2_ISA_RETIRED:
+//                AuxFileRetrieve = new AuxiliaryFilesRetrieve(rf2FullFolder);
+//                retFile = AuxFileRetrieve.getRelationshipAuxiliaryFile();
+//                break;
+//            case RF2_STATED_ISA_RETIRED:
+//                AuxFileRetrieve = new AuxiliaryFilesRetrieve(rf2FullFolder);
+//                retFile = AuxFileRetrieve.getStatedRelationshipAuxiliaryFile();
+//                break;
+//            case RF2_ICDO_TARGETS:
+//                AuxFileRetrieve = new AuxiliaryFilesRetrieve(rf2FullFolder);
+//                retFile = AuxFileRetrieve.getCrossMapICDOTgtAuxRF2File();
+//                break;
+//        }
+//        if (retFile == null) {
+//            return null;
+//        }
+//        return new File(retFile);
+    	return null;
     }
 
     public File getFullOutputFile(String parentFolder, FILE_TYPE fType, String date) {

@@ -38,12 +38,12 @@
 			<version>${project.version}</version>
 			<scope>compile</scope>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>wb-release-process</artifactId>
 			<version>${project.version}</version>
 			<scope>compile</scope>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>tk-concept-component</artifactId>

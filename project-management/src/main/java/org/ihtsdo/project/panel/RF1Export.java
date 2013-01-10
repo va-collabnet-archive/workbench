@@ -314,15 +314,15 @@ public class RF1Export extends JPanel {
 							}
 							PathBI sourcePath = Terms.get().getPath(sourcePathConcept.getNid());
 							I_ConfigAceFrame releaseConfig = ReleaseUtils.getNewConfigFromPath(sourcePath, config);
-							RF1DataExport expConcept = new RF1DataExport(releaseConfig, exportDescFile, exportSubsFile, reportFile, languageRefset, newSctId, sourceRefset, chkNotTrans.isSelected());
-							Terms.get().iterateConcepts(expConcept);
-
-							expConcept.closeFiles();
-							if (chkIDGen.isSelected()) {
-								expConcept.idAssignmentProcess(txtRelDate.getText().trim(), chkIdInsert.isSelected(), txtIDUser.getText().trim(), txtIDPass.getPassword().toString(), txtIDURL.getText().trim(), txtNsp.getText().trim());
-							}
-
-							txtERes.setText(expConcept.getLog());
+//							RF1DataExport expConcept = new RF1DataExport(releaseConfig, exportDescFile, exportSubsFile, reportFile, languageRefset, newSctId, sourceRefset, chkNotTrans.isSelected());
+//							Terms.get().iterateConcepts(expConcept);
+//
+//							expConcept.closeFiles();
+//							if (chkIDGen.isSelected()) {
+//								expConcept.idAssignmentProcess(txtRelDate.getText().trim(), chkIdInsert.isSelected(), txtIDUser.getText().trim(), txtIDPass.getPassword().toString(), txtIDURL.getText().trim(), txtNsp.getText().trim());
+//							}
+//
+//							txtERes.setText(expConcept.getLog());
 						} catch (TerminologyException e) {
 							strErr = e.getMessage();
 							AceLog.getAppLog().alertAndLogException(e);

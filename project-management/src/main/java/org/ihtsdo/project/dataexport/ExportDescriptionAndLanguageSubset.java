@@ -42,7 +42,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.ContextualizedDescription;
 import org.ihtsdo.project.I_ContextualizeDescription;
 import org.ihtsdo.project.TerminologyProjectDAO;
-import org.ihtsdo.rf2.util.ExportUtil;
+//import org.ihtsdo.rf2.util.ExportUtil;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
@@ -280,73 +280,73 @@ public class ExportDescriptionAndLanguageSubset implements I_ProcessConcepts {
     private boolean writeTerms(I_GetConceptData concept, I_GetConceptData refset) {
         List<ContextualizedDescription> descriptions;
         boolean bwrite = false;
-        try {
-            descriptions = ContextualizedDescription.getContextualizedDescriptions(
-                    concept.getConceptNid(), refset.getConceptNid(), true);
-
-            I_ConceptAttributeVersioned attrib = concept.getConAttrs();
-            int conceptStatus = attrib.getStatusNid();
-
-            String conceptId = rUtil.getSnomedId(concept.getConceptNid(), termFactory).toString();
-            try {
-                Long.parseLong(conceptId);
-            } catch (NumberFormatException e) {
-                conceptId = concept.getUUIDs().iterator().next().toString();
-
-                reportFileWriter.append("The concept " + conceptId + " has not Snomed Concept ID, It will be replaced with its UUID." + "\r\n");
-
-            }
-            for (I_ContextualizeDescription cdescription : descriptions) {
-                if (cdescription.getLanguageExtension() != null) {
-
-                    String did = rUtil.getSnomedId(cdescription.getDescId(), termFactory).toString();
-                    try {
-                        Long.parseLong(did);
-                    } catch (NumberFormatException e) {
-                        did = cdescription.getDescriptionVersioned().getUUIDs().iterator().next().toString();
-                        reportFileWriter.append("The description " + did + " has not Snomed Description ID, It will be replaced with its UUID." + "\r\n");
-
-                    }
-                    String dStatus = ExportUtil.getStatusType(cdescription.getDescriptionStatusId());
-
-                    String lang = cdescription.getLang();
-
-                    int typeId = cdescription.getTypeId();
-                    String dType = "";
-                    if (typeId == FSN) {
-                        dType = "3";
-                    } else {
-                        int acceptId = cdescription.getAcceptabilityId();
-                        if (acceptId == PREFERRED) {
-                            dType = "1";
-                        } else {
-                            dType = "2";
-                        }
-                    }
-                    String term = cdescription.toString();
-
-                    String ics = cdescription.isInitialCaseSignificant() ? "1" : "0";
-
-
-                    outputDescFileWriter.append(begEnd + did + sep + dStatus + sep + conceptId + sep + term + sep + ics + sep + dType + sep + lang + begEnd + "\r\n");
-
-                    descLineCount++;
-
-                    if (dStatus == "0") {
-                        outputSubsFileWriter.append(begEnd + refsetSCTID + sep + did + sep + dType + sep + begEnd + "\r\n");
-
-                        subsLineCount++;
-                    }
-                    bwrite = true;
-                }
-            }
-        } catch (TerminologyException e) {
-            AceLog.getAppLog().alertAndLogException(e);
-        } catch (IOException e) {
-            AceLog.getAppLog().alertAndLogException(e);
-        } catch (Exception e) {
-            AceLog.getAppLog().alertAndLogException(e);
-        }
+//        try {
+//            descriptions = ContextualizedDescription.getContextualizedDescriptions(
+//                    concept.getConceptNid(), refset.getConceptNid(), true);
+//
+//            I_ConceptAttributeVersioned attrib = concept.getConAttrs();
+//            int conceptStatus = attrib.getStatusNid();
+//
+//            String conceptId = rUtil.getSnomedId(concept.getConceptNid(), termFactory).toString();
+//            try {
+//                Long.parseLong(conceptId);
+//            } catch (NumberFormatException e) {
+//                conceptId = concept.getUUIDs().iterator().next().toString();
+//
+//                reportFileWriter.append("The concept " + conceptId + " has not Snomed Concept ID, It will be replaced with its UUID." + "\r\n");
+//
+//            }
+//            for (I_ContextualizeDescription cdescription : descriptions) {
+//                if (cdescription.getLanguageExtension() != null) {
+//
+//                    String did = rUtil.getSnomedId(cdescription.getDescId(), termFactory).toString();
+//                    try {
+//                        Long.parseLong(did);
+//                    } catch (NumberFormatException e) {
+//                        did = cdescription.getDescriptionVersioned().getUUIDs().iterator().next().toString();
+//                        reportFileWriter.append("The description " + did + " has not Snomed Description ID, It will be replaced with its UUID." + "\r\n");
+//
+//                    }
+//                    String dStatus = ExportUtil.getStatusType(cdescription.getDescriptionStatusId());
+//
+//                    String lang = cdescription.getLang();
+//
+//                    int typeId = cdescription.getTypeId();
+//                    String dType = "";
+//                    if (typeId == FSN) {
+//                        dType = "3";
+//                    } else {
+//                        int acceptId = cdescription.getAcceptabilityId();
+//                        if (acceptId == PREFERRED) {
+//                            dType = "1";
+//                        } else {
+//                            dType = "2";
+//                        }
+//                    }
+//                    String term = cdescription.toString();
+//
+//                    String ics = cdescription.isInitialCaseSignificant() ? "1" : "0";
+//
+//
+//                    outputDescFileWriter.append(begEnd + did + sep + dStatus + sep + conceptId + sep + term + sep + ics + sep + dType + sep + lang + begEnd + "\r\n");
+//
+//                    descLineCount++;
+//
+//                    if (dStatus == "0") {
+//                        outputSubsFileWriter.append(begEnd + refsetSCTID + sep + did + sep + dType + sep + begEnd + "\r\n");
+//
+//                        subsLineCount++;
+//                    }
+//                    bwrite = true;
+//                }
+//            }
+//        } catch (TerminologyException e) {
+//            AceLog.getAppLog().alertAndLogException(e);
+//        } catch (IOException e) {
+//            AceLog.getAppLog().alertAndLogException(e);
+//        } catch (Exception e) {
+//            AceLog.getAppLog().alertAndLogException(e);
+//        }
         return bwrite;
     }
 

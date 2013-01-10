@@ -332,54 +332,54 @@ public class RF2Export extends JPanel {
 
 						saveExportData();
 						String strErr="";
-						TranslationRF2Export expConcept=null;
-						try {
-							PathBI sourcePath = Terms.get().getPath(sourcePathConcept.getNid());
-							I_ConfigAceFrame releaseConfig = ReleaseUtils.getNewConfigFromPath(sourcePath, config);
-							expConcept=new TranslationRF2Export(releaseConfig,moduleConcept,nspNr, txtFileExp.getText().trim(), reportFile,
-									languageRefset ,txtRelDate.getText().trim(),sourceRefset,chkNotTrans.isSelected(),chkIDGen.isSelected(),txtPrevFolder.getText().trim(),
-									txtPrevDate.getText().trim(), txtIDURL.getText().trim(), txtIDUser.getText().trim(), txtIDPass.getPassword().toString());
-							Ts.get().iterateConceptDataInSequence(expConcept);
-
-							expConcept.closeFiles(chkPost.isSelected());
-							if (chkPost.isSelected()){
-								expConcept.postExportProcess(chkIDGen.isSelected());
-								if (chkIDGen.isSelected()){
-									expConcept.idAssignmentProcess(chkIdInsert.isSelected());
-								}
-							}
-
-							txtERes.setText(expConcept.getLog());
-						} catch (TerminologyException e) {
-							if (expConcept!=null)
-								txtERes.setText(expConcept.getLog());
-							strErr=e.getMessage();
-							AceLog.getAppLog().alertAndLogException(e);
-						} catch (IOException e) {
-							if (expConcept!=null)
-								txtERes.setText(expConcept.getLog());
-							strErr=e.getMessage();
-							AceLog.getAppLog().alertAndLogException(e);
-						} catch (Exception e) {
-							if (expConcept!=null)
-								txtERes.setText(expConcept.getLog());
-							strErr=e.getMessage();
-							AceLog.getAppLog().alertAndLogException(e);
-						}
-						pBarE.setVisible(false);
-						RF2Export.this.revalidate();
-
-						if (!strErr.equals("")){
-							JOptionPane.showMessageDialog(RF2Export.this,
-									"Errors in process!\n" + strErr, 
-									"Error", JOptionPane.ERROR_MESSAGE);
-						}else{
-
-							JOptionPane.showMessageDialog(RF2Export.this,
-									"Language exported!", 
-									"Message", JOptionPane.INFORMATION_MESSAGE);
-
-						}
+//						TranslationRF2Export expConcept=null;
+//						try {
+//							PathBI sourcePath = Terms.get().getPath(sourcePathConcept.getNid());
+//							I_ConfigAceFrame releaseConfig = ReleaseUtils.getNewConfigFromPath(sourcePath, config);
+//							expConcept=new TranslationRF2Export(releaseConfig,moduleConcept,nspNr, txtFileExp.getText().trim(), reportFile,
+//									languageRefset ,txtRelDate.getText().trim(),sourceRefset,chkNotTrans.isSelected(),chkIDGen.isSelected(),txtPrevFolder.getText().trim(),
+//									txtPrevDate.getText().trim(), txtIDURL.getText().trim(), txtIDUser.getText().trim(), txtIDPass.getPassword().toString());
+//							Ts.get().iterateConceptDataInSequence(expConcept);
+//
+//							expConcept.closeFiles(chkPost.isSelected());
+//							if (chkPost.isSelected()){
+//								expConcept.postExportProcess(chkIDGen.isSelected());
+//								if (chkIDGen.isSelected()){
+//									expConcept.idAssignmentProcess(chkIdInsert.isSelected());
+//								}
+//							}
+//
+//							txtERes.setText(expConcept.getLog());
+//						} catch (TerminologyException e) {
+//							if (expConcept!=null)
+//								txtERes.setText(expConcept.getLog());
+//							strErr=e.getMessage();
+//							AceLog.getAppLog().alertAndLogException(e);
+//						} catch (IOException e) {
+//							if (expConcept!=null)
+//								txtERes.setText(expConcept.getLog());
+//							strErr=e.getMessage();
+//							AceLog.getAppLog().alertAndLogException(e);
+//						} catch (Exception e) {
+//							if (expConcept!=null)
+//								txtERes.setText(expConcept.getLog());
+//							strErr=e.getMessage();
+//							AceLog.getAppLog().alertAndLogException(e);
+//						}
+//						pBarE.setVisible(false);
+//						RF2Export.this.revalidate();
+//
+//						if (!strErr.equals("")){
+//							JOptionPane.showMessageDialog(RF2Export.this,
+//									"Errors in process!\n" + strErr, 
+//									"Error", JOptionPane.ERROR_MESSAGE);
+//						}else{
+//
+//							JOptionPane.showMessageDialog(RF2Export.this,
+//									"Language exported!", 
+//									"Message", JOptionPane.INFORMATION_MESSAGE);
+//
+//						}
 					}
 
 				};
