@@ -128,11 +128,11 @@
             <artifactId>tk-cern-prim</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
+        <!-- <dependency>
             <groupId>org.ihtsdo</groupId>
 			<artifactId>project-management</artifactId>
             <version>${project.version}</version>
-        </dependency>
+        </dependency> -->
     </dependencies>
     <reporting>
         <plugins>
