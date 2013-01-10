@@ -61,11 +61,11 @@
 			<artifactId>wb-gui</artifactId>
 			<version>${project.version}</version>
 		</dependency> -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>wb-bdb</artifactId>
 			<version>${project.version}</version>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>issue-management</artifactId>
