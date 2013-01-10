@@ -56,11 +56,11 @@
 			<version>${project.version}</version>
 			<scope>compile</scope>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>wb-gui</artifactId>
 			<version>${project.version}</version>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>wb-bdb</artifactId>
