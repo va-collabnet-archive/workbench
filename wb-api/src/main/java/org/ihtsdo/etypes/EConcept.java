@@ -115,11 +115,24 @@ public class EConcept extends TkConcept implements I_AmChangeSetObject {
             for (I_ExtendByRef m : members) {
                TkRefexAbstractMember<?> member = convertRefsetMember(m);
 
-               if (member != null) {
-                  refsetMembers.add(member);
-               } else {
-                  AceLog.getAppLog().severe("Could not convert refset member: " + m + "\nfrom refset: " + c);
-               }
+                if (member != null
+                        && member.primordialUuid != null
+                        && member.componentUuid != null
+                        && member.refsetUuid != null) {
+                    refsetMembers.add(member);
+                } else {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("Could not convert refset member 'm': ");
+                    sb.append(m.toString());
+                    if (member != null) {
+                        sb.append("\r\nConversion 'member' attempt: ");
+                        sb.append(member.toString());
+                    }
+                    sb.append("\r\nfrom refset: ");
+                    // sb.append(c.toLongString());
+                    sb.append(c.toUserString());
+                    AceLog.getAppLog().severe(sb.toString());
+                }
             }
          }
       }
