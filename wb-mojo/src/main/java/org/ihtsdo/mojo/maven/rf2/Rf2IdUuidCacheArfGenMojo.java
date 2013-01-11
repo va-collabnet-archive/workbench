@@ -147,7 +147,7 @@ public class Rf2IdUuidCacheArfGenMojo extends AbstractMojo implements Serializab
             // Setup id array cache object
             // idCacheDir + FILE_SEPARATOR + "idObjectCache.jbin"
             long startTime = System.currentTimeMillis();
-            Sct2_UuidUuidRemapper idLookup = new Sct2_UuidUuidRemapper(idCacheFName);
+            Sct2_IdLookUp idLookup = new Sct2_IdLookUp(idCacheFName);
             System.out.println((System.currentTimeMillis() - startTime) + " mS");
 
             // Create an ARF file of primordial UUIDs

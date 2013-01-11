@@ -200,7 +200,7 @@ public class Sct2_IdRecord implements Serializable {
      */
     static void parseIdsToArf(List<Rf2File> fList,
             BufferedWriter arfWriter,
-            Sct2_UuidUuidRemapper idLookUp, UUID pathUuid, UUID authorUuid)
+            Sct2_IdLookUp idLookUp, UUID pathUuid, UUID authorUuid)
             throws Exception {
         // SNOMED integer id
         UUID sourceSystemUuid = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getPrimoridalUid();

@@ -162,7 +162,7 @@ public class Rf2IdUuidRemapArfMojo
 
     }
 
-    void RemapFile(File inFile, File outFile, Sct2_UuidUuidRemapper idLookup)
+    void RemapFile(File inFile, File outFile, Sct2_UuidUuidRemapper uuidUuidRemapper)
             throws IOException {
         getLog().info("remap UUIDs in: " + inFile.getAbsolutePath());
 
@@ -182,7 +182,7 @@ public class Rf2IdUuidRemapArfMojo
                                 && line[i].charAt(13) == '-'
                                 && line[i].charAt(18) == '-'
                                 && line[i].charAt(23) == '-') {
-                            UUID tmpUuid = idLookup.getUuid(line[i]);
+                            UUID tmpUuid = uuidUuidRemapper.getUuid(line[i]);
                             if (tmpUuid != null) {
                                 line[i] = tmpUuid.toString();
                             }
