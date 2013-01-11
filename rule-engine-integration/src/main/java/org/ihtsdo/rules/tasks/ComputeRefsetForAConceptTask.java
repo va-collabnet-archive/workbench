@@ -147,7 +147,7 @@ public class ComputeRefsetForAConceptTask extends AbstractTask {
             // verify a valid refset spec construction
             if (refsetSpec == null) {
                 AceLog.getAppLog().info(
-                    "Invalid refset spec to compute - unable to get spec from the refset currently in the spec panel.");
+                    "Invalid refset spec to compute: " + refset.toString() + " - " + refset.getPrimUuid());
                 if (!DwfaEnv.isHeadless()) {
                     JOptionPane
                         .showMessageDialog(
