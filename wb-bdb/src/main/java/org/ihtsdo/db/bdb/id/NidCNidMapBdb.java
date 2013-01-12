@@ -80,15 +80,16 @@ public class NidCNidMapBdb extends ComponentBdb {
         IndexCacheRecord record = new IndexCacheRecord(indexCacheRecords.get()[mapIndex][nidIndexInMap]);
 
         if (!record.refexAlreadyThere(pair.getMemberNid())) {
-        locks.lock(nid);
-        try {
-            record.addNidPairForRefex(pair.getRefexNid(), pair.getMemberNid());
-            indexCacheRecords.get()[mapIndex][nidIndexInMap] = record.getData();
-            mapChanged[mapIndex] = true;
-        } finally {
-            locks.unlock(nid);
+            locks.lock(nid);
+            try {
+                record = new IndexCacheRecord(indexCacheRecords.get()[mapIndex][nidIndexInMap]);
+                record.addNidPairForRefex(pair.getRefexNid(), pair.getMemberNid());
+                indexCacheRecords.get()[mapIndex][nidIndexInMap] = record.getData();
+                mapChanged[mapIndex] = true;
+            } finally {
+                locks.unlock(nid);
+            }
         }
-    }
     }
 
     public void addRelOrigin(int destinationCNid, int originCNid) throws IOException {
@@ -98,23 +99,23 @@ public class NidCNidMapBdb extends ComponentBdb {
         assert (mapIndex >= 0) && (nidIndexInMap >= 0) :
                 "mapIndex: " + mapIndex + " indexInMap: " + nidIndexInMap + " destinationCNid: "
                 + destinationCNid;
-        IndexCacheRecord record = new IndexCacheRecord(indexCacheRecords.get()[mapIndex][nidIndexInMap]);
-        if (!record.destinationRelOriginAlreadyThere(originCNid)) {
         if (mapIndex >= nidCNidMaps.get().length) {
             ensureCapacity(destinationCNid);
         }
 
-        locks.lock(destinationCNid);
-
-        try {
-
-            record.addDestinationOriginNid(originCNid);
-            indexCacheRecords.get()[mapIndex][nidIndexInMap] = record.getData();
-            mapChanged[mapIndex] = true;
-        } finally {
-            locks.unlock(destinationCNid);
+        IndexCacheRecord record = new IndexCacheRecord(indexCacheRecords.get()[mapIndex][nidIndexInMap]);
+        if (!record.destinationRelOriginAlreadyThere(originCNid)) {
+            locks.lock(destinationCNid);
+            try {
+                record = new IndexCacheRecord(indexCacheRecords.get()[mapIndex][nidIndexInMap]);
+                record.addDestinationOriginNid(originCNid);
+                indexCacheRecords.get()[mapIndex][nidIndexInMap] = record.getData();
+                mapChanged[mapIndex] = true;
+            } finally {
+                locks.unlock(destinationCNid);
+            }
         }
-    }
+
     }
 
     @Override
@@ -524,7 +525,7 @@ public class NidCNidMapBdb extends ComponentBdb {
         locks.lock(cNid);
 
         try {
-        return new IndexCacheRecord(indexCacheRecords.get()[mapIndex][nidIndexInMap]);
+            return new IndexCacheRecord(indexCacheRecords.get()[mapIndex][nidIndexInMap]);
         } finally {
             locks.unlock(cNid);
         }
