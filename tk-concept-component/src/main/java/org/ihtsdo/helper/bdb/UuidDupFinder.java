@@ -49,7 +49,7 @@ public class UuidDupFinder implements ProcessUnfetchedConceptDataBI {
     private AtomicInteger dots = new AtomicInteger(0);
     ConcurrentSkipListSet<UUID> allPrimUuids = new ConcurrentSkipListSet<UUID>();
     ConcurrentSkipListSet<UUID> dupUuids = new ConcurrentSkipListSet<UUID>();
-    File dupsFile = new File("dups.oos");
+    File dupsFile = new File("target/dups_UuidDupFinder.oos");
     private final NidBitSetBI nidset;
 
     //~--- constant enums ------------------------------------------------------
