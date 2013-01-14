@@ -75,4 +75,9 @@ public interface WfProcessDefinitionBI {
      */
     boolean isCompleteState(WfStateBI state);
     
+    /** 
+     * True is state is considered a promote state in this definition, false if not
+     */
+    boolean isPromoteState(WfStateBI state);
+    
 }

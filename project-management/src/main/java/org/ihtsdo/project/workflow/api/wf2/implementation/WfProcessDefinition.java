@@ -66,4 +66,10 @@ public class WfProcessDefinition implements WfProcessDefinitionBI {
 		return false;
 	}
 
+	@Override
+	public boolean isPromoteState(WfStateBI state) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

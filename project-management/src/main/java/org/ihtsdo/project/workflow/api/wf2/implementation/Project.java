@@ -135,4 +135,10 @@ public class Project implements ProjectBI {
 
 	}
 
+	@Override
+	public EditCoordinate getPromotionCoordinate() throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

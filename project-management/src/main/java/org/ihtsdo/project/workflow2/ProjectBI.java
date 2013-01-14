@@ -58,6 +58,12 @@ public interface ProjectBI {
     EditCoordinate getEditCoordinate() throws Exception;
     
     /** 
+     * Gets the PromotionCoordinate of this project, 
+     * @throws Exception 
+     */
+    EditCoordinate getPromotionCoordinate() throws Exception;
+    
+    /** 
      * Gets all work lists in the project
      * @throws Exception 
      */
