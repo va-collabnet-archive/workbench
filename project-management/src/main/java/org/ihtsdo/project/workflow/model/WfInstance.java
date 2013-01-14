@@ -421,4 +421,10 @@ COMPLETE};
 		return null;
 	}
 
+	@Override
+	public boolean isPromoted() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

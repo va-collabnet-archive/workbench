@@ -141,8 +141,13 @@ public interface WfProcessInstanceBI {
     boolean isActive();
 
 	/**
-	 * True when is complete, Fals when is not.
+	 * True when is complete, False when is not.
 	 */
 	boolean isCompleted();
+	
+	/**
+	 * True when is promoted, False when is not.
+	 */
+	boolean isPromoted();
     
 }
