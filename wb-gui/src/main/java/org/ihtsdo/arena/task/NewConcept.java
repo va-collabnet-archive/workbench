@@ -15,8 +15,10 @@ import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -83,8 +85,11 @@ import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.binding.snomed.CaseSensitive;
 import org.ihtsdo.tk.binding.snomed.Language;
 import org.ihtsdo.tk.binding.snomed.Snomed;
@@ -795,7 +800,6 @@ public class NewConcept extends PreviousNextOrCancel {
     private void createBlueprintConcept() throws ContradictionException {
         tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
                 config.getViewCoordinate());
-
         try {
             //get parents
             UUID isa = Snomed.IS_A.getLenient().getPrimUuid();
@@ -805,6 +809,18 @@ public class NewConcept extends PreviousNextOrCancel {
                 uuidArray[index] = Terms.get().nidToUuid(nidList.get(index));
             }
 
+            if (uuidArray.length > 0) {
+                ConceptVersionBI firstParent = Ts.get().getConceptVersion(config.getViewCoordinate(), uuidArray[0]);
+                Collection<? extends RelationshipVersionBI> outgoingIsa = firstParent.getRelationshipsSourceActiveIsa();
+                if (!outgoingIsa.isEmpty()) {
+                    isa = Ts.get().getUuidPrimordialForNid(outgoingIsa.iterator().next().getTypeNid());
+                } else {
+                    Collection<? extends RelationshipVersionBI> incomingIsa = firstParent.getRelationshipsTargetActiveIsa();
+                    if (!outgoingIsa.isEmpty()) {
+                        isa = Ts.get().getUuidPrimordialForNid(incomingIsa.iterator().next().getTypeNid());
+                    }
+                }
+            }
 
             //create concept blue print
             if (lang.equals(LANG_CODE.EN_GB)) {
