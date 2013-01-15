@@ -5017,7 +5017,10 @@ public class TerminologyProjectDAO {
 		workList.setWorkflowDefinition(workflowDefinition);
 		workList.setWorkflowUserRoles(workflowUserRoles);
 		workList = createNewWorkList(workList, config);
-		ActivityUpdater updater = new ActivityUpdater(activity, "Generating WorkList");
+		ActivityUpdater updater = null;
+		if(activity != null){
+			updater = new ActivityUpdater(activity, "Generating WorkList");
+		}
 		if (workList != null) {
 			initializeWorkList(partition, workList, config, updater);
 		}
