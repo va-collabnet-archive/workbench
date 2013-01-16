@@ -74,6 +74,11 @@ public class SctRf2TextDefToArfMojo extends AbstractMojo implements Serializable
      * @parameter default-value="generated-arf"
      */
     private String outputDir;
+    /**
+     * Path to import concepts on. Defaults to SNOMED Core.
+     * @parameter default-value="8c230474-9f11-30ce-9cad-185a96fd03a2"
+     */
+    private String pathUuid;
     String uuidSourceSnomedLongStr;
 
     @Override
@@ -115,7 +120,7 @@ public class SctRf2TextDefToArfMojo extends AbstractMojo implements Serializable
             getLog().info("::: TEXTDEFINITIONS FILE: " + outDir + "textdefinitions_rf2.txt");
             filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "sct2_TextDefinition", ".txt");
             for (Rf2File rf2File : filesIn) {
-                Sct2_DesRecord[] textdefinitions = Sct2_DesRecord.parseDescriptions(rf2File);
+                Sct2_DesRecord[] textdefinitions = Sct2_DesRecord.parseDescriptions(rf2File, pathUuid);
                 textdefinitions = Sct2_DesRecord.attachStatus(textdefinitions, statusRecords);
                 for (Sct2_DesRecord d : textdefinitions) {
                     d.writeArf(bw);

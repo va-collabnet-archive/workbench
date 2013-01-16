@@ -24,6 +24,7 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.UUID;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
@@ -57,7 +58,8 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
             long cOneID, long roleTypeSnoId, long cTwoID, int grp,
             long characterType, long refinibility,
             boolean inferredB,
-            long statusConceptL)
+            long statusConceptL,
+            String pathUuid)
             throws ParseException {
 
         this.relSnoId = relID; // RELATIONSHIPID
@@ -78,8 +80,8 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
 
         this.statusConceptL = statusConceptL;
 
-        // SNOMED Core :NYI: setup path as a POM parameter.
-        this.pathUuidStr = Rf2Defaults.getPathSnomedCoreUuidStr();
+        // POM parameter.
+        this.pathUuidStr = pathUuid;
         // this.authorUuidStr = Rf2Defaults.getAuthorUuidStr();
         this.moduleUuidStr = moduleUuidStr;
     }
@@ -257,7 +259,7 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
         }
     }
 
-    public static Sct2_RelRecord[] parseRelationships(Rf2File f, boolean inferredB)
+    public static Sct2_RelRecord[] parseRelationships(Rf2File f, boolean inferredB, String pathUuid)
             throws IOException, ParseException {
 
         int count = Rf2File.countFileLines(f);
@@ -341,7 +343,8 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
                     thisCharacteristicId,
                     thisRefinabilityId,
                     inferredRel,
-                    Long.MAX_VALUE);
+                    Long.MAX_VALUE,
+                    pathUuid);
             idx++;
         }
 

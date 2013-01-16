@@ -18,6 +18,7 @@ package org.ihtsdo.mojo.maven.rf2;
 import java.io.*;
 import java.text.ParseException;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.maven.plugin.AbstractMojo;
@@ -65,6 +66,11 @@ public class SctRf2ToArfNoStatusMojo extends AbstractMojo implements Serializabl
      * @parameter default-value="generated-arf"
      */
     private String outputDir;
+    /**
+     * Path to import concepts on. Defaults to SNOMED Core.
+     * @parameter default-value="8c230474-9f11-30ce-9cad-185a96fd03a2"
+     */
+    private String pathUuid;
     String uuidSourceSnomedLongStr;
 
     @Override
@@ -105,7 +111,7 @@ public class SctRf2ToArfNoStatusMojo extends AbstractMojo implements Serializabl
             filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "sct2_Concept", ".txt");
             for (Rf2File rf2File : filesIn) {
                 getLog().info("    ... " + rf2File.file.getName());
-                Sct2_ConRecord[] concepts = Sct2_ConRecord.parseConcepts(rf2File);
+                Sct2_ConRecord[] concepts = Sct2_ConRecord.parseConcepts(rf2File, pathUuid);
                 for (Sct2_ConRecord c : concepts) {
                     c.writeArf(bw);
                     if (Rf2x.isSctIdInUuidCache(c.conSnoIdL) == false) {
@@ -123,7 +129,7 @@ public class SctRf2ToArfNoStatusMojo extends AbstractMojo implements Serializabl
             filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "sct2_Description", ".txt");
             for (Rf2File rf2File : filesIn) {
                 getLog().info("    ... " + rf2File.file.getName());
-                Sct2_DesRecord[] descriptions = Sct2_DesRecord.parseDescriptions(rf2File);
+                Sct2_DesRecord[] descriptions = Sct2_DesRecord.parseDescriptions(rf2File, pathUuid);
                 for (Sct2_DesRecord d : descriptions) {
                     d.writeArf(bw);
                     if (Rf2x.isSctIdInUuidCache(d.desSnoIdL) == false) {
@@ -142,7 +148,7 @@ public class SctRf2ToArfNoStatusMojo extends AbstractMojo implements Serializabl
             filesIn.addAll(Rf2File.getFiles(wDir, targetSubDir, inputDir, "res2_RetiredIsaRelationship", ".txt"));
             for (Rf2File rf2File : filesIn) {
                 getLog().info("    ... " + rf2File.file.getName());
-                Sct2_RelRecord[] rels = Sct2_RelRecord.parseRelationships(rf2File, true);
+                Sct2_RelRecord[] rels = Sct2_RelRecord.parseRelationships(rf2File, true, pathUuid);
                 for (Sct2_RelRecord r : rels) {
                     r.writeArf(bw);
                     if (Rf2x.isSctIdInUuidCache(r.relSnoId) == false) {
@@ -155,7 +161,7 @@ public class SctRf2ToArfNoStatusMojo extends AbstractMojo implements Serializabl
             filesIn.addAll(Rf2File.getFiles(wDir, targetSubDir, inputDir, "res2_RetiredStatedIsaRelationship", ".txt"));
             for (Rf2File rf2File : filesIn) {
                 getLog().info("    ... " + rf2File.file.getName());
-                Sct2_RelRecord[] rels = Sct2_RelRecord.parseRelationships(rf2File, false);
+                Sct2_RelRecord[] rels = Sct2_RelRecord.parseRelationships(rf2File, false, pathUuid);
                 for (Sct2_RelRecord r : rels) {
                     r.writeArf(bw);
                     if (Rf2x.isSctIdInUuidCache(r.relSnoId) == false) {

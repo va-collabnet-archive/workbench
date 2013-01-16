@@ -47,7 +47,7 @@ class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
     String moduleUuidStr;
 
     public Sct2_ConRecord(long conIdL, String dateStr, boolean active, String moduleUuidStr,
-            boolean isPrim, long statusConceptL) throws ParseException {
+            boolean isPrim, long statusConceptL, String pathUuid) throws ParseException {
         this.conSnoIdL = conIdL; // column 0 - id
         this.effDateStr = dateStr; // column 1 - effectiveTime
         this.timeL = Rf2x.convertDateToTime(dateStr);
@@ -59,8 +59,8 @@ class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
 
         this.statusConceptL = statusConceptL;
 
-        // SNOMED Core :NYI: setup path as a POM parameter.
-        this.pathUuidStr = Rf2Defaults.getPathSnomedCoreUuidStr();
+        // POM parameter
+        this.pathUuidStr = pathUuid;
         // this.authorUuidStr = Rf2Defaults.getAuthorUuidStr();
         this.moduleUuidStr = moduleUuidStr;
     }
@@ -221,7 +221,7 @@ class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
         }
     }
 
-    static Sct2_ConRecord[] parseConcepts(Rf2File f) throws MojoFailureException {
+    static Sct2_ConRecord[] parseConcepts(Rf2File f, String pathUuid) throws MojoFailureException {
         try {
             int count = Rf2File.countFileLines(f);
             Sct2_ConRecord[] a = new Sct2_ConRecord[count];
@@ -246,7 +246,8 @@ class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
                         Rf2x.convertStringToBoolean(line[ACTIVE]),
                         Rf2x.convertSctIdToUuidStr(line[MODULE_ID]),
                         Rf2x.convertDefinitionStatusToIsPrimitive(line[DEFINITION_STATUS_ID]),
-                        Long.MAX_VALUE);
+                        Long.MAX_VALUE,
+                        pathUuid);
                 idx++;
             }
 
