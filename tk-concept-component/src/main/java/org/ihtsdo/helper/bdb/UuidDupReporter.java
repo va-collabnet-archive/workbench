@@ -251,6 +251,13 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
             this.dup = dup;
             this.enclosingConcept = enclosingConcept;
         }
+
+        @Override
+        public String toString() {
+            return "DupEntry{" + "dup=\n" + dup + ",\n\n enclosingConcept=\n" + enclosingConcept + "\n}\n";
+        }
+        
+        
     }
 
     /**
@@ -279,11 +286,8 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
                     return o1.toString().compareTo(o2.toString());
                 }
             });
-            dups = new ArrayList<Class<?>>(classes.length);
-
-            for (Class<?> c : classes) {
-                dups.add(c);
-            }
+            dups = new ArrayList<>(classes.length);
+            dups.addAll(Arrays.asList(classes));
         }
 
         //~--- methods ----------------------------------------------------------
