@@ -393,12 +393,12 @@ public class GenerateUsers extends AbstractMojo {
             cConceptRefsetConTypes = getConceptSpecListFromPrefs(configProps.getProperty("concept.conceptConTypes"));
             dConceptRefsetStatus = getConceptSpecListFromPrefs(configProps.getProperty("desc.conceptRefsetStatus"));
             dConceptRefsetConTypes = getConceptSpecListFromPrefs(configProps.getProperty("desc.conceptConTypes"));
-            if (configProps.getProperty("displayRf2").equals("true")) {
+            if ("true".equals(configProps.getProperty("displayRf2"))) {
                 displayRf2 = true;
             }
             refsetStatus = getConceptSpecFromPrefs(configProps.getProperty("refsetStatus"));
             additionalRoots = getConceptSpecListFromPrefs(configProps.getProperty("additionalRoots"));
-            if (configProps.getProperty("makeUserDevPath").equals("true")) {
+            if ("true".equals(configProps.getProperty("makeUserDevPath"))) {
                 makeUserDevPath = true;
             }
             module = getConceptSpecFromPrefs(configProps.getProperty("module"));
