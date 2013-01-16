@@ -104,15 +104,9 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
      */
     private String namespace;
     /**
-     * Project moduleFsn, as fsn
-     *
-     * @parameter
-     */
-    private String moduleFsn;
-    /**
      * Project moduleConcept
      *
-     * @parameter
+     * @parameter @required
      */
     private ConceptDescriptor moduleConcept;
     /**
@@ -217,8 +211,6 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
             UUID moduleId = null;
             if(moduleConcept != null){
                 moduleId = UUID.fromString(moduleConcept.getUuid());
-            }else if(moduleFsn != null){
-                moduleId = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, moduleFsn);
             }else{
                 throw new MojoExecutionException("No module specified.");
             }
