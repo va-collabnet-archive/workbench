@@ -144,17 +144,17 @@ public class ConceptConceptConceptExtTupleFileUtil {
                     "CidCidCid: Component UUID matches no identifier in database.");
             }
             if (!termFactory.hasId(c1Uuid)) {
-                writeWarning(outputFileWriter, lineCount, "CidCidCid: c1Uuid UUID matches no identifier in database.");
+                writeWarning(outputFileWriter, lineCount, "CidCidCid: c1Uuid UUID matches no identifier in database: " + c1Uuid);
             }
             if (!termFactory.hasId(c2Uuid)) {
-                writeWarning(outputFileWriter, lineCount, "CidCidCid: c2Uuid matches no identifier in database.");
+                writeWarning(outputFileWriter, lineCount, "CidCidCid: c2Uuid matches no identifier in database: " + c2Uuid);
             }
             if (!termFactory.hasId(c3Uuid)) {
-                writeWarning(outputFileWriter, lineCount, "CidCidCid: c3Uuid matches no identifier in database.");
+                writeWarning(outputFileWriter, lineCount, "CidCidCid: c3Uuid matches no identifier in database: " + c3Uuid);
             }
 
             if (!termFactory.hasId(statusUuid)) {
-                writeWarning(outputFileWriter, lineCount, "CidCidCid: statusUuid matches no identifier in database.");
+                writeWarning(outputFileWriter, lineCount, "CidCidCid: statusUuid matches no identifier in database: " + statusUuid);
             }
 
             try {

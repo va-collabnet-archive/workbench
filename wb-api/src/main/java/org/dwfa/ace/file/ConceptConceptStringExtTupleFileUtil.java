@@ -140,23 +140,23 @@ public class ConceptConceptStringExtTupleFileUtil {
 
             if (!termFactory.hasId(refsetUuid)) {
                 ConceptConceptConceptExtTupleFileUtil.writeWarning(outputFileWriter, lineCount,
-                    "CidCidStr: Refset UUID matches no identifier in database.");
+                    "CidCidStr: Refset UUID matches no identifier in database: " + refsetUuid);
             }
             if (!termFactory.hasId(componentUuid)) {
                 ConceptConceptConceptExtTupleFileUtil.writeWarning(outputFileWriter, lineCount,
-                    "CidCidStr: Component UUID matches no identifier in database.");
+                    "CidCidStr: Component UUID matches no identifier in database: " + componentUuid);
             }
             if (!termFactory.hasId(c1Uuid)) {
                 ConceptConceptConceptExtTupleFileUtil.writeWarning(outputFileWriter, lineCount,
-                    "CidCidStr: c1Uuid UUID matches no identifier in database.");
+                    "CidCidStr: c1Uuid UUID matches no identifier in database: " + c1Uuid);
             }
             if (!termFactory.hasId(c2Uuid)) {
                 ConceptConceptConceptExtTupleFileUtil.writeWarning(outputFileWriter, lineCount,
-                    "CidCidStr: c2Uuid matches no identifier in database.");
+                    "CidCidStr: c2Uuid matches no identifier in database: " + c2Uuid);
             }
             if (!termFactory.hasId(statusUuid)) {
                 ConceptConceptConceptExtTupleFileUtil.writeWarning(outputFileWriter, lineCount,
-                    "CidCidStr: statusUuid matches no identifier in database.");
+                    "CidCidStr: statusUuid matches no identifier in database: " + statusUuid);
             }
 
             try {

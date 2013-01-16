@@ -133,19 +133,19 @@ public class ConceptStringExtTupleFileUtil {
 
             if (!termFactory.hasId(refsetUuid)) {
                 ConceptConceptConceptExtTupleFileUtil.writeWarning(outputFileWriter, lineCount,
-                    "CidStr: Refset UUID matches no identifier in database.");
+                    "CidStr: Refset UUID matches no identifier in database: " + refsetUuid);
             }
             if (!termFactory.hasId(componentUuid)) {
                 ConceptConceptConceptExtTupleFileUtil.writeWarning(outputFileWriter, lineCount,
-                    "CidStr: Component UUID matches no identifier in database.");
+                    "CidStr: Component UUID matches no identifier in database: " + componentUuid);
             }
             if (!termFactory.hasId(conceptUuid)) {
                 ConceptConceptConceptExtTupleFileUtil.writeWarning(outputFileWriter, lineCount,
-                    "CidStr: conceptUuid UUID matches no identifier in database.");
+                    "CidStr: conceptUuid UUID matches no identifier in database: " + conceptUuid);
             }
             if (!termFactory.hasId(statusUuid)) {
                 ConceptConceptConceptExtTupleFileUtil.writeWarning(outputFileWriter, lineCount,
-                    "CidStr: statusUuid matches no identifier in database.");
+                    "CidStr: statusUuid matches no identifier in database: " + statusUuid);
             }
             try {
                 refsetHelper.newConceptStringRefsetExtension(termFactory.uuidToNative(refsetUuid), termFactory
