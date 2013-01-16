@@ -122,7 +122,7 @@ public class Rf2IdUuidRemapArfMojo
 
     void CreateUuidRemapCache(String wDir, String idCacheFName) {
         List<Rf2File> filesIn;
-        getLog().info("::: BEGIN Rf2UuidXmapGenMojo");
+        getLog().info("::: BEGIN Rf2IdUuidRemapArfMojo");
         try {
 
             // Parse IHTSDO Terminology Identifiers to Sct_CompactId cache file.
