@@ -175,8 +175,9 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
 
                 if (langRefsetUUID != null && !description.getLang().equals(LANG_CODE.EN.getFormatedLanguageCode())) {
                     processLangDescription(description, concept);
-                } else if (usRefsetUUID != null && DialectHelper.isTextForDialect(description.getText(), Language.EN_US.getLenient().getNid())
-                        && gbRefsetUUID != null && DialectHelper.isTextForDialect(description.getText(), Language.EN_UK.getLenient().getNid())) {
+                } else if (usRefsetUUID != null && !DialectHelper.isTextForDialect(description.getText(), Language.EN_US.getLenient().getNid())
+                            && gbRefsetUUID != null && !DialectHelper.isTextForDialect(description.getText(), Language.EN_UK.getLenient().getNid())
+                            && description.getLang().equals(LANG_CODE.EN.getFormatedLanguageCode())) {
                     processEnDescription(description, concept);
                 } else if (usRefsetUUID != null && DialectHelper.isTextForDialect(description.getText(), Language.EN_US.getLenient().getNid())) {
                     processUSDescription(description, concept);
