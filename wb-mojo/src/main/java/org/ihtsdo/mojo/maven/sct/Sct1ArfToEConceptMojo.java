@@ -3228,19 +3228,17 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                 // UNCONNECTED CONCEPT theCon ==theDes !=theRel !=theRelDest
                 createEConcept(conList, desList, null, null, addRsByCon, addRsByRs, dos);
             } else {
-                //                if (debug) {
-                //                    getLog().info(
-                //                            "!!! Case what case is this??? -- Step 4" + " theCon=\t" + theCon
-                //                                    + "\ttheDes=\t" + theDes + "\ttheRel=\t" + theRel
-                //                                    + "\ttheRelDest\t" + theRelDest);
-                //                    getLog().info("!!! --- concept UUID id   =" + theCon);
-                //                    getLog().info("!!! --- concept SNOMED id =" + conList.get(0).conSnoId);
-                //                    
-                //                    getLog().info("!!! --- concept counter   #" + countCon);
-                //                    getLog().info("!!! --- description       \"" + desList.get(0).termText + "\"");
-                //                    getLog().info("!!! \r\n");
-                //                }
-                throw new MojoFailureException("Case not implemented -- executeMojoStep7()");
+                                    getLog().info(
+                                            "!!! Case what case is this??? -- Step 4" + " theCon=\t" + theCon
+                                                    + "\ttheDes=\t" + theDes + "\ttheRel=\t" + theRel
+                                                    + "\ttheRelDest\t" + theRelDest);
+                                    getLog().info("!!! --- concept UUID id   =" + theCon);
+                                    getLog().info("!!! --- concept SNOMED id =" + conList.get(0).conSnoId);
+                                    
+                                    getLog().info("!!! --- concept counter   #" + countCon);
+                                    getLog().info("!!! --- description       \"" + desList.get(0).termText + "\"");
+                                    getLog().info("!!! \r\n");
+//                throw new MojoFailureException("Case not implemented -- executeMojoStep7()");
             }
 
             if (conNext == null && desNext == null && relNext == null) {

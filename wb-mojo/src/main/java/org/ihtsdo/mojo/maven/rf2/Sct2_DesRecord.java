@@ -51,7 +51,7 @@ class Sct2_DesRecord implements Comparable<Sct2_DesRecord>, Serializable {
     public Sct2_DesRecord(long dId, String dateStr, boolean activeB, String moduleUuidStr,
             String conUuidStr, String termStr,
             boolean capitalization, String desTypeStr, String langCodeStr,
-            long statusConceptL)
+            long statusConceptL, String pathUuid)
             throws ParseException, IOException {
         desSnoIdL = dId;
         // UUID tmpUUID = Type3UuidFactory.fromSNOMED(desSnoIdL);
@@ -70,8 +70,8 @@ class Sct2_DesRecord implements Comparable<Sct2_DesRecord>, Serializable {
 
         this.statusConceptL = statusConceptL;
 
-        // SNOMED Core :NYI: setup path as a POM parameter.
-        this.pathUuidStr = Rf2Defaults.getPathSnomedCoreUuidStr();
+        // POM parameter.
+        this.pathUuidStr = pathUuid;
         // this.authorUuidStr = Rf2Defaults.getAuthorUuidStr();
         this.moduleUuidStr = moduleUuidStr;
     }
@@ -243,7 +243,7 @@ class Sct2_DesRecord implements Comparable<Sct2_DesRecord>, Serializable {
         }
     }
 
-    public static Sct2_DesRecord[] parseDescriptions(Rf2File f)
+    public static Sct2_DesRecord[] parseDescriptions(Rf2File f, String pathUuid)
             throws IOException, ParseException {
 
         int count = Rf2File.countFileLines(f);
@@ -276,7 +276,8 @@ class Sct2_DesRecord implements Comparable<Sct2_DesRecord>, Serializable {
                     Rf2x.convertCaseSignificanceIdToCapStatus(line[CASE_SIGNIFICANCE_ID]),
                     Rf2x.convertSctIdToUuidStr(line[TYPE_ID]),
                     line[LANGUAGE_CODE],
-                    Long.MAX_VALUE);
+                    Long.MAX_VALUE,
+                    pathUuid);
             idx++;
         }
 
