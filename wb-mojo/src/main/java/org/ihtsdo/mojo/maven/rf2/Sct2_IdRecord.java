@@ -35,7 +35,7 @@ import org.dwfa.util.id.Type3UuidFactory;
 
 /**
  * Simple case: single date (no versioning). all active. one id schema. Handle
- * remapping of non-computed primorial UUIDs.
+ * remapping of non-computed primordial UUIDs.
  *
  * @author marc campbell
  */
@@ -151,6 +151,7 @@ public class Sct2_IdRecord implements Serializable {
                     oos.writeUnshared(tempIdCompact);
                 }
                 StringBuilder sb = new StringBuilder();
+                sb.append("\n::: parseToIdPreCacheFile(..) ");
                 sb.append("\n::: PARSED & WRITTEN TO ID CACHE: ");
                 sb.append(f.file.toURI().toString());
                 if (idSchemeSet.size() > 0) {
