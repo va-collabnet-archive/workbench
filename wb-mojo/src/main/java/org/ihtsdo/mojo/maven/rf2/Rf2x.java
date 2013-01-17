@@ -29,7 +29,7 @@ public class Rf2x {
 
     private static final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static Sct2_IdLookUp sctid2UuidCache = null;
-    private static long missCounter;
+    private static long notMappedCounter;
 
     public Rf2x() 
             throws IOException {
@@ -53,14 +53,14 @@ public class Rf2x {
         File file = new File(idCachePathFile);
         System.out.println("File = " + file.getAbsolutePath());
         if (!file.exists()) {
-            System.out.println(":::TEST: id cache file does not exist!!!@!");
+            System.out.println(":::INFO: SCTID/UUID cache file does not exist!!!@!");
             // Initialize with an empty id list
             sctid2UuidCache = new Sct2_IdLookUp(new ArrayList<Sct2_IdCompact>());
-            missCounter = 0;
+            notMappedCounter = 0;
         } else {
-            System.out.println(":::TEST: id cache file exists!!!@!");
+            System.out.println(":::INFO: SCTID/UUID cache file exists!!!@!");
             sctid2UuidCache = new Sct2_IdLookUp(file.getAbsolutePath());
-            missCounter = 0;
+            notMappedCounter = 0;
         }
     }
 
@@ -186,9 +186,9 @@ public class Rf2x {
         uuid = sctid2UuidCache.getUuid(id);
         if (uuid == null) {
             // System.err.println("!!!@! sctid not in cache " + Long.toString(id));
-            missCounter++;
-            if (missCounter % 100000 == 1) {
-                System.out.println(":::TEST: missCounter=" + missCounter 
+            notMappedCounter++;
+            if (notMappedCounter % 100000 == 1) {
+                System.out.println(":::INFO: UUID notMappedCounter=" + notMappedCounter 
                         + " SCTID=" + Long.toString(id));
             }
             return Type3UuidFactory.fromSNOMED(id);                    
