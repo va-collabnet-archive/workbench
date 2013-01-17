@@ -16,24 +16,26 @@
  */
 package org.ihtsdo.project.filter;
 
-import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfState;
+import org.ihtsdo.project.workflow2.WfFilterBI;
+import org.ihtsdo.project.workflow2.WfProcessInstanceBI;
 
 /**
  * The Class WfStateFilter.
  */
-public class WfStateFilter implements WfSearchFilterBI{
-	
+public class WfStateFilter implements WfFilterBI {
+
 	/** The TYPE. */
 	private final String TYPE = "WF_STATE_FILTER";
-	
+
 	/** The state. */
 	private WfState state;
 
 	/**
 	 * Instantiates a new wf state filter.
-	 *
-	 * @param state the state
+	 * 
+	 * @param state
+	 *            the state
 	 */
 	public WfStateFilter(WfState state) {
 		super();
@@ -42,8 +44,9 @@ public class WfStateFilter implements WfSearchFilterBI{
 
 	/**
 	 * Sets the state.
-	 *
-	 * @param state the new state
+	 * 
+	 * @param state
+	 *            the new state
 	 */
 	public void setState(WfState state) {
 		this.state = state;
@@ -51,27 +54,33 @@ public class WfStateFilter implements WfSearchFilterBI{
 
 	/**
 	 * Gets the state.
-	 *
+	 * 
 	 * @return the state
 	 */
 	public WfState getState() {
 		return state;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.ihtsdo.project.workflow.filters.WfSearchFilterBI#filter(org.ihtsdo.project.workflow.model.WfInstance)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ihtsdo.project.workflow.filters.WfSearchFilterBI#filter(org.ihtsdo
+	 * .project.workflow.model.WfInstance)
 	 */
 	@Override
-	public boolean filter(WfInstance instance) {
+	public boolean evaluateInstance(WfProcessInstanceBI instance) {
 		return instance.getState().equals(state);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.ihtsdo.project.workflow.filters.WfSearchFilterBI#getType()
 	 */
 	@Override
 	public String getType() {
 		return TYPE;
 	}
-	
+
 }

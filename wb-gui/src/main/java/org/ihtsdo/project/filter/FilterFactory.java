@@ -17,7 +17,6 @@
 package org.ihtsdo.project.filter;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.UUID;
 
 import org.dwfa.ace.log.AceLog;
@@ -26,6 +25,7 @@ import org.ihtsdo.project.view.tag.InboxTag;
 import org.ihtsdo.project.view.tag.TagManager;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WfUser;
+import org.ihtsdo.project.workflow2.WfFilterBI;
 
 /**
  * A factory for creating Filter objects.
@@ -47,13 +47,13 @@ public class FilterFactory {
 	 * @param obj the obj
 	 * @return the wf search filter bi
 	 */
-	public WfSearchFilterBI createFilterFromObject(Object obj) {
-		WfSearchFilterBI filter = null;
+	public WfFilterBI createFilterFromObject(Object obj) {
+		WfFilterBI filter = null;
 		if (obj instanceof WfState) {
 			filter = new WfStateFilter((WfState) obj);
 		} else if (obj instanceof WorkList) {
 			WorkList wl = (WorkList) obj;
-			filter = new WfWorklistFilter(wl.getUids());
+			//filter = new WfWorklistFilter(wl.getUids());
 		} else if (obj instanceof InboxTag) {
 			InboxTag tag = (InboxTag) obj;
 			InboxTag filterTag = null;
@@ -98,7 +98,7 @@ public class FilterFactory {
 	 * @param worklistUUID the worklist uuid
 	 * @return the wf worklist filter
 	 */
-	public WfWorklistFilter createWorklistFilter(List<UUID> worklistUUID) {
+	public WfWorklistFilter createWorklistFilter(UUID worklistUUID) {
 		return new WfWorklistFilter(worklistUUID);
 	}
 

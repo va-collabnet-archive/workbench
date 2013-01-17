@@ -102,6 +102,7 @@ import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfInstance.ActionReport;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WfUser;
+import org.ihtsdo.project.workflow2.WfFilterBI;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
@@ -150,7 +151,7 @@ public class WfInboxPanel extends JPanel {
 	private WfUser user;
 
 	/** The filter list. */
-	protected HashMap<String, WfSearchFilterBI> filterList;
+	protected HashMap<String, WfFilterBI> filterList;
 
 	/** The sorter. */
 	private TableRowSorter<InboxTableModel> sorter;
@@ -225,7 +226,7 @@ public class WfInboxPanel extends JPanel {
 
 			hookLabel.setIcon(IconUtilities.helpIcon);
 			hookLabel.setText("");
-			filterList = new HashMap<String, WfSearchFilterBI>();
+			filterList = new HashMap<String, WfFilterBI>();
 			if (tf != null) {
 				config = tf.getActiveAceFrameConfig();
 			}
@@ -314,10 +315,10 @@ public class WfInboxPanel extends JPanel {
 						todoSelected = false;
 					}
 				}
-				WfSearchFilterBI filter = FilterFactory.getInstance().createFilterFromObject(newInboxItem);
+				WfFilterBI filter = FilterFactory.getInstance().createFilterFromObject(newInboxItem);
 				Object oldValue = event.getOldInboxItem();
 				if (oldValue != null) {
-					WfSearchFilterBI oldFilter = FilterFactory.getInstance().createFilterFromObject(oldValue);
+					WfFilterBI oldFilter = FilterFactory.getInstance().createFilterFromObject(oldValue);
 					if (oldFilter != null) {
 						filterList.remove(oldFilter.getType());
 					}
@@ -532,7 +533,7 @@ public class WfInboxPanel extends JPanel {
 	private void updateTable() {
 		Set<String> keys = filterList.keySet();
 		for (String key : keys) {
-			WfSearchFilterBI filter = filterList.get(key);
+			WfFilterBI filter = filterList.get(key);
 			if (filter instanceof WfTagFilter) {
 				WfTagFilter tf = (WfTagFilter) filter;
 				if (tf.getTag().getTagName().equals(TagManager.OUTBOX) || tf.getTag().getTagName().equals(TagManager.TODO)) {
@@ -661,7 +662,8 @@ public class WfInboxPanel extends JPanel {
 					}
 					if (isUncommited && checkUncommited) {
 						Object[] options = { "Commit concept", "Cancel concept", "Stay in concept" };
-						int n = JOptionPane.showOptionDialog(this, "Uncommited concept in editor", "Uncommited", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[2]);
+						int n = JOptionPane.showOptionDialog(this, "Uncommited concept in editor", "Uncommited", JOptionPane.YES_NO_CANCEL_OPTION,
+								JOptionPane.WARNING_MESSAGE, null, options, options[2]);
 						if (n == JOptionPane.YES_OPTION) {
 							previousConcept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 						} else if (n == JOptionPane.NO_OPTION) {
@@ -672,8 +674,8 @@ public class WfInboxPanel extends JPanel {
 								inboxTable.setRowSelectionInterval(previousIndex, previousIndex);
 								selectedIndex = previousIndex;
 								return;
-							}else if(inboxTable.getRowCount() >= 0){
-								inboxTable.setRowSelectionInterval(0,0);
+							} else if (inboxTable.getRowCount() >= 0) {
+								inboxTable.setRowSelectionInterval(0, 0);
 								selectedIndex = 0;
 								return;
 							}
@@ -805,7 +807,9 @@ public class WfInboxPanel extends JPanel {
 						} catch (Exception e) {
 						}
 
-						if (todoSelected && TagManager.getInstance().getTagContent(TagManager.TODO).getUuidList().contains(oldWfInstance.getComponentId().toString())) {
+						if (todoSelected
+								&& TagManager.getInstance().getTagContent(TagManager.TODO).getUuidList()
+										.contains(oldWfInstance.getComponentId().toString())) {
 							EventMediator.getInstance().fireEvent(new RestFromToDoEvent());
 						}
 						model.removeRow(currentModelRowNum);
@@ -894,7 +898,8 @@ public class WfInboxPanel extends JPanel {
 				tag.setUuidList(uuidList);
 				TagManager.getInstance().createTag(tag);
 				model.addTagToCache(uuid, tag);
-				model.setValueAt(TagManager.getInstance().getHeader(tag) + selectedRow[InboxColumn.SOURCE_PREFERRED.getColumnNumber()], modelRowIndex, InboxColumn.SOURCE_PREFERRED.getColumnNumber());
+				model.setValueAt(TagManager.getInstance().getHeader(tag) + selectedRow[InboxColumn.SOURCE_PREFERRED.getColumnNumber()],
+						modelRowIndex, InboxColumn.SOURCE_PREFERRED.getColumnNumber());
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
@@ -937,9 +942,11 @@ public class WfInboxPanel extends JPanel {
 									}
 									if (isUncommited) {
 										Object[] options = { "Commit concept", "Cancel concept", "Stay in concept" };
-										int n = JOptionPane.showOptionDialog(this, "Uncommited concept in editor", "Uncommited", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[2]);
+										int n = JOptionPane.showOptionDialog(this, "Uncommited concept in editor", "Uncommited",
+												JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[2]);
 										if (n == JOptionPane.YES_OPTION) {
-											previousConcept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
+											previousConcept.commit(ChangeSetGenerationPolicy.INCREMENTAL,
+													ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 										} else if (n == JOptionPane.NO_OPTION) {
 											previousConcept.cancel();
 											Ts.get().cancel();
@@ -1024,12 +1031,12 @@ public class WfInboxPanel extends JPanel {
 	 * Empty action performed.
 	 * 
 	 * @param e
-	 *            the e
+	 *            the event
 	 */
 	private void emptyOutboxActionPerformed(ActionEvent e) {
 		try {
 			WorkflowSearcher searcher = new WorkflowSearcher();
-			Collection<WfSearchFilterBI> collection = new ArrayList<WfSearchFilterBI>();
+			Collection<WfFilterBI> collection = new ArrayList<WfFilterBI>();
 			InboxTag tag = TagManager.getInstance().getTagContent(TagManager.OUTBOX);
 			collection.add(new WfTagFilter(tag));
 			List<WfInstance> wfInstances = searcher.searchWfInstances(collection);
@@ -1094,7 +1101,8 @@ public class WfInboxPanel extends JPanel {
 				I_GetConceptData prevStatus = promotionRefset.getPreviousPromotionStatus(nid.getConceptNid(), config);
 				WfState prevState = new WfComponentProvider().statusConceptToWfState(prevStatus);
 				WfInstance.updateInstanceState(wfi, prevState);
-				Terms.get().getConcept(wfi.getComponentId()).commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
+				Terms.get().getConcept(wfi.getComponentId())
+						.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 				EventMediator.getInstance().fireEvent(new SendBackToInboxEvent(wfi));
 			} else if (tag.getTagName().equals(TagManager.TODO)) {
 				EventMediator.getInstance().fireEvent(new ItemRemovedFromTodoEvent(wfi));
@@ -1246,7 +1254,8 @@ public class WfInboxPanel extends JPanel {
 
 			// ---- progressBar1 ----
 			progressBar1.setVisible(false);
-			panel2.add(progressBar1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+			panel2.add(progressBar1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0,
+					0, 0, 0), 0, 0));
 		}
 		add(panel2, BorderLayout.SOUTH);
 
@@ -1294,7 +1303,8 @@ public class WfInboxPanel extends JPanel {
 						// ---- separator2 ----
 						separator2.setMaximumSize(new Dimension(40, 10));
 						separator2.setPreferredSize(new Dimension(35, 12));
-						panel6.add(separator2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
+						panel6.add(separator2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+								new Insets(0, 0, 0, 0), 0, 0));
 
 						// ---- label5 ----
 						label5.setText("+ Detach");
@@ -1312,13 +1322,16 @@ public class WfInboxPanel extends JPanel {
 								label5MouseClicked(e);
 							}
 						});
-						panel6.add(label5, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
+						panel6.add(label5, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+								new Insets(0, 0, 0, 0), 0, 0));
 
 						// ---- separator3 ----
 						separator3.setMaximumSize(new Dimension(32767, 10));
-						panel6.add(separator3, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
+						panel6.add(separator3, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+								new Insets(0, 0, 0, 0), 0, 0));
 					}
-					panel1.add(panel6, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+					panel1.add(panel6, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0,
+							0, 5, 0), 0, 0));
 
 					// ======== filterPanel ========
 					{
@@ -1335,23 +1348,31 @@ public class WfInboxPanel extends JPanel {
 
 							// ---- label4 ----
 							label4.setText("Source preferred");
-							panel3.add(label4, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+							panel3.add(label4, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+									new Insets(0, 0, 5, 5), 0, 0));
 
 							// ---- label2 ----
 							label2.setText("Target preferred");
-							panel3.add(label2, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+							panel3.add(label2, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+									new Insets(0, 0, 5, 5), 0, 0));
 
 							// ---- label3 ----
 							label3.setText("Target FSN");
-							panel3.add(label3, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+							panel3.add(label3, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+									new Insets(0, 0, 5, 5), 0, 0));
 
 							// ---- label6 ----
 							label6.setText("Status");
-							panel3.add(label6, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
-							panel3.add(componentFilter, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
-							panel3.add(targetPreferredFilter, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
-							panel3.add(targetFsnFilter, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
-							panel3.add(statusFilterCombo, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+							panel3.add(label6, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+									new Insets(0, 0, 5, 0), 0, 0));
+							panel3.add(componentFilter, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+									GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+							panel3.add(targetPreferredFilter, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+									GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+							panel3.add(targetFsnFilter, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+									GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+							panel3.add(statusFilterCombo, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+									GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 						}
 						filterPanel.add(panel3, BorderLayout.CENTER);
 
@@ -1370,7 +1391,8 @@ public class WfInboxPanel extends JPanel {
 									filterButtonActionPerformed(e);
 								}
 							});
-							panel5.add(filterButton, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(0, 0, 0, 5), 0, 0));
+							panel5.add(filterButton, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE,
+									new Insets(0, 0, 0, 5), 0, 0));
 
 							// ---- removeFilters ----
 							removeFilters.addActionListener(new ActionListener() {
@@ -1379,16 +1401,20 @@ public class WfInboxPanel extends JPanel {
 									removeFiltersActionPerformed(e);
 								}
 							});
-							panel5.add(removeFilters, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
+							panel5.add(removeFilters, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+									GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
 						}
 						filterPanel.add(panel5, BorderLayout.SOUTH);
 					}
-					panel1.add(filterPanel, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+					panel1.add(filterPanel, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 0), 0, 0));
 
 					// ---- label1 ----
 					label1.setText("Current item:");
-					panel1.add(label1, new GridBagConstraints(0, 2, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
-					panel1.add(currentTranslationItem, new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+					panel1.add(label1, new GridBagConstraints(0, 2, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0,
+							0, 5, 5), 0, 0));
+					panel1.add(currentTranslationItem, new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+							GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 
 					// ---- checkBox1 ----
 					checkBox1.setText("Automatically open next item in inbox after finishing with current item");
@@ -1398,7 +1424,8 @@ public class WfInboxPanel extends JPanel {
 							checkBox1ActionPerformed(e);
 						}
 					});
-					panel1.add(checkBox1, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+					panel1.add(checkBox1, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 0, 0), 0, 0));
 				}
 				inboxItems.add(panel1, BorderLayout.NORTH);
 			}
@@ -1422,7 +1449,8 @@ public class WfInboxPanel extends JPanel {
 					closeInboxActionPerformed(e);
 				}
 			});
-			panel4.add(closeInbox, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 5), 0, 0));
+			panel4.add(closeInbox, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(0,
+					0, 0, 5), 0, 0));
 
 			// ---- refreshButton ----
 			refreshButton.setText("Refresh");
@@ -1432,7 +1460,8 @@ public class WfInboxPanel extends JPanel {
 					refreshButtonActionPerformed(e);
 				}
 			});
-			panel4.add(refreshButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+			panel4.add(refreshButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0,
+					0, 0, 5), 0, 0));
 
 			// ---- sendToOutbox ----
 			sendToOutbox.setText("Send");
@@ -1442,7 +1471,8 @@ public class WfInboxPanel extends JPanel {
 					emptyOutboxActionPerformed(e);
 				}
 			});
-			panel4.add(sendToOutbox, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+			panel4.add(sendToOutbox, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0,
+					0, 0, 5), 0, 0));
 
 			// ---- hookLabel ----
 			hookLabel.setText("text");
@@ -1452,7 +1482,8 @@ public class WfInboxPanel extends JPanel {
 					hookLabelMouseClicked(e);
 				}
 			});
-			panel4.add(hookLabel, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+			panel4.add(hookLabel, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0,
+					0, 0), 0, 0));
 		}
 		add(panel4, BorderLayout.NORTH);
 

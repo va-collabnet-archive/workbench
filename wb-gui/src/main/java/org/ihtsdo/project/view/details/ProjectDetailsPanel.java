@@ -54,6 +54,7 @@ import java.util.logging.Logger;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -101,6 +102,7 @@ import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkSet;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
+import org.ihtsdo.project.search.WfInstanceSearchPanel;
 import org.ihtsdo.project.util.IconUtilities;
 import org.ihtsdo.project.view.ExportTabPanel;
 import org.ihtsdo.project.view.TranslationHelperPanel;
@@ -488,6 +490,16 @@ public class ProjectDetailsPanel extends JPanel {
 					JOptionPane.ERROR_MESSAGE);
 			AceLog.getAppLog().alertAndLogException(e);
 		}
+		label2.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				super.mouseClicked(e);
+				JDialog jd = new JDialog();
+				jd.setContentPane(new WfInstanceSearchPanel());
+				jd.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+				jd.setVisible(true);
+			}
+		});
 	}
 	
 	/**

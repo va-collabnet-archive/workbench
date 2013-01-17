@@ -30,7 +30,10 @@ import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.filter.WfSearchFilterBI;
 import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.TranslationProject;
+import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.workflow.model.WfInstance;
+import org.ihtsdo.project.workflow2.WfFilterBI;
+import org.ihtsdo.project.workflow2.WfProcessInstanceBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.spec.ValidationException;
 import org.ihtsdo.translation.LanguageUtil;
@@ -38,7 +41,7 @@ import org.ihtsdo.translation.LanguageUtil;
 /**
  * The Class WfComponentFilter.
  */
-public class WfComponentFilter implements WfSearchFilterBI {
+public class WfComponentFilter implements WfFilterBI {
 
 	/** The wf instance text filter. */
 	private String wfInstanceTextFilter;
@@ -79,16 +82,18 @@ public class WfComponentFilter implements WfSearchFilterBI {
 	 * .project.workflow.model.WfInstance)
 	 */
 	@Override
-	public boolean filter(WfInstance instance) {
+	public boolean evaluateInstance(WfProcessInstanceBI instance) {
 		try {
 
 			List<I_GetConceptData> langRefset = null;
 			List<ContextualizedDescription> descriptions = new ArrayList<ContextualizedDescription>();
 			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-			I_TerminologyProject projectConcept = TerminologyProjectDAO.getProjectForWorklist(instance.getWorkList(), config);
+			WorkList wl = TerminologyProjectDAO.getWorkList(Terms.get().getConcept(instance.getWorkList().getUuid()), config);
+			I_TerminologyProject projectConcept = TerminologyProjectDAO.getProjectForWorklist(wl, config);
 			TranslationProject translationProject = TerminologyProjectDAO.getTranslationProject(projectConcept.getConcept(), config);
 			langRefset = translationProject.getSourceLanguageRefsets();
-			descriptions = LanguageUtil.getContextualizedDescriptions(Terms.get().getConcept(instance.getComponentId()).getConceptNid(), langRefset.get(0).getConceptNid(), true);
+			descriptions = LanguageUtil.getContextualizedDescriptions(Terms.get().getConcept(instance.getComponentPrimUuid()).getConceptNid(), langRefset
+					.get(0).getConceptNid(), true);
 			String sourcePreferred = "";
 			for (I_ContextualizeDescription description : descriptions) {
 				if (description.getLanguageExtension() != null && description.getLanguageRefsetId() == langRefset.get(0).getConceptNid()) {

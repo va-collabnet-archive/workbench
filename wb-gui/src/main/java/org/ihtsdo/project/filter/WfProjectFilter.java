@@ -16,61 +16,28 @@
  */
 package org.ihtsdo.project.filter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.UUID;
 
-import org.ihtsdo.project.workflow.api.WfComponentProvider;
-import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow2.WfFilterBI;
 import org.ihtsdo.project.workflow2.WfProcessInstanceBI;
-import org.ihtsdo.project.workflow2.WfUserBI;
 
 /**
- * The Class WfDestinationFilter.
+ * The Class WfWorklistFilter.
  */
-public class WfDestinationFilter implements WfFilterBI {
+public class WfProjectFilter implements WfFilterBI {
 
 	/** The TYPE. */
-	public final String TYPE = "WF_DESTIANTION_FILTER";
+	private final String TYPE = "WF_WORKLIST_FILTER";
 
-	/** The destination. */
-	private WfUser destination;
+	/** The worklist uuid. */
+	private UUID worklistUUID;
 
-	/**
-	 * Instantiates a new wf destination filter.
-	 */
-	public WfDestinationFilter() {
+	public WfProjectFilter() {
+	}
+
+	public WfProjectFilter(UUID worklistUUID) {
 		super();
-	}
-
-	/**
-	 * Instantiates a new wf destination filter.
-	 * 
-	 * @param destination
-	 *            the destination
-	 */
-	public WfDestinationFilter(WfUser destination) {
-		super();
-		this.destination = destination;
-	}
-
-	/**
-	 * Gets the destination.
-	 * 
-	 * @return the destination
-	 */
-	public WfUser getDestination() {
-		return destination;
-	}
-
-	/**
-	 * Sets the destination.
-	 * 
-	 * @param destination
-	 *            the new destination
-	 */
-	public void setDestination(WfUser destination) {
-		this.destination = destination;
+		this.worklistUUID = worklistUUID;
 	}
 
 	/*
@@ -82,7 +49,15 @@ public class WfDestinationFilter implements WfFilterBI {
 	 */
 	@Override
 	public boolean evaluateInstance(WfProcessInstanceBI instance) {
-		return instance.getAssignedUser().equals(destination);
+		return this.worklistUUID.equals(instance.getWorkList().getUuid());
+	}
+
+	public UUID getWorklistUUID() {
+		return worklistUUID;
+	}
+
+	public void setWorklistUUID(UUID worklistUUID) {
+		this.worklistUUID = worklistUUID;
 	}
 
 	/*
@@ -97,13 +72,7 @@ public class WfDestinationFilter implements WfFilterBI {
 
 	@Override
 	public String toString() {
-		return "Destination";
-	}
-
-	public List<WfUserBI> getFilterOptions() {
-		List<WfUserBI> users = new ArrayList<WfUserBI>();
-		users.addAll(new WfComponentProvider().getUsers());
-		return users;
+		return "worklist";
 	}
 
 }

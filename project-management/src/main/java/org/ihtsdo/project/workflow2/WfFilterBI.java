@@ -30,5 +30,5 @@ public interface WfFilterBI {
      * etc.
      */
     boolean evaluateInstance(WfProcessInstanceBI instance);
-    
+    public String getType();
 }

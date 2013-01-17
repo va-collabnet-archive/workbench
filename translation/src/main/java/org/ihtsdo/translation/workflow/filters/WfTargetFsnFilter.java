@@ -28,14 +28,17 @@ import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.filter.WfSearchFilterBI;
 import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.TranslationProject;
+import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.workflow.model.WfInstance;
+import org.ihtsdo.project.workflow2.WfFilterBI;
+import org.ihtsdo.project.workflow2.WfProcessInstanceBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.translation.LanguageUtil;
 
 /**
  * The Class WfTargetFsnFilter.
  */
-public class WfTargetFsnFilter implements WfSearchFilterBI{
+public class WfTargetFsnFilter implements WfFilterBI{
 	
 	/** The TYPE. */
 	private final String TYPE = "WF_TARGET_FSN_FILTER";
@@ -75,16 +78,17 @@ public class WfTargetFsnFilter implements WfSearchFilterBI{
 	 * @see org.ihtsdo.project.workflow.filters.WfSearchFilterBI#filter(org.ihtsdo.project.workflow.model.WfInstance)
 	 */
 	@Override
-	public boolean filter(WfInstance wfInstance) {
+	public boolean evaluateInstance(WfProcessInstanceBI wfInstance) {
 		String targetFSN = "";
 		try {
 			I_GetConceptData langRefset = null;
 			List<ContextualizedDescription> descriptions = new ArrayList<ContextualizedDescription>();
 			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-			I_TerminologyProject projectConcept = TerminologyProjectDAO.getProjectForWorklist(wfInstance.getWorkList(), config );
+			WorkList wl = TerminologyProjectDAO.getWorkList(Terms.get().getConcept(wfInstance.getWorkList().getUuid()), config);
+			I_TerminologyProject projectConcept = TerminologyProjectDAO.getProjectForWorklist(wl, config);
 			TranslationProject translationProject = TerminologyProjectDAO.getTranslationProject(projectConcept.getConcept(), config);
 			langRefset = translationProject.getTargetLanguageRefset();
-			descriptions = LanguageUtil.getContextualizedDescriptions(Terms.get().uuidToNative(wfInstance.getComponentId()), langRefset.getConceptNid(), true);
+			descriptions = LanguageUtil.getContextualizedDescriptions(Terms.get().uuidToNative(wfInstance.getComponentPrimUuid()), langRefset.getConceptNid(), true);
 			for (I_ContextualizeDescription description : descriptions) {
 				if (description.getLanguageExtension() != null && description.getLanguageRefsetId() == langRefset.getConceptNid()) {
 					if (description.getTypeId() == Terms.get().getConcept(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid()).getConceptNid()) {

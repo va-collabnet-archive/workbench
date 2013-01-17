@@ -47,6 +47,7 @@ import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.model.WorklistPage;
+import org.ihtsdo.project.workflow2.WfFilterBI;
 
 /**
  * The Class WorkflowSearcher.
@@ -318,7 +319,7 @@ public class WorkflowSearcher {
 									String worklistUuid = workListMember.getWfInstance().getWorkList().getUids().iterator().next().toString();
 									boolean contains = false;
 									for (String[] outboxTodoUuids : outboxTodoTaguuids) {
-										if (outboxTodoUuids[InboxTag.TERM_WORKLIST_UUID_INDEX].equals(worklistUuid) 
+										if (outboxTodoUuids[InboxTag.TERM_WORKLIST_UUID_INDEX].equals(worklistUuid)
 												&& outboxTodoUuids[InboxTag.TERM_UUID_INDEX].equals(conceptUuid)) {
 											contains = true;
 										}
@@ -459,7 +460,8 @@ public class WorkflowSearcher {
 						PromotionAndAssignmentRefset prom = workList.getPromotionRefset(config);
 						for (WorkListMember workListMember : members) {
 							prom.setDestination(workListMember.getId(), Terms.get().uuidToNative(users.get(userRnd.nextInt(users.size())).getId()));
-							prom.setPromotionStatus(workListMember.getId(), Terms.get().uuidToNative(states.get(stateRnd.nextInt(states.size())).getId()));
+							prom.setPromotionStatus(workListMember.getId(),
+									Terms.get().uuidToNative(states.get(stateRnd.nextInt(states.size())).getId()));
 						}
 					}
 				}
@@ -485,20 +487,20 @@ public class WorkflowSearcher {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	public List<WfInstance> searchWfInstances(Collection<WfSearchFilterBI> collection) throws TerminologyException, IOException {
+	public List<WfInstance> searchWfInstances(Collection<WfFilterBI> collection) throws TerminologyException, IOException {
 
 		List<WfInstance> candidates = new ArrayList<WfInstance>();
 		List<WfInstance> results = new ArrayList<WfInstance>();
 
-		List<UUID> wlUuid = null;
-		for (WfSearchFilterBI loopFilter : collection) {
+		List<UUID> wlUuid = new ArrayList<UUID>();
+		for (WfFilterBI loopFilter : collection) {
 			if (loopFilter instanceof WfWorklistFilter) {
 				WfWorklistFilter wlFilter = (WfWorklistFilter) loopFilter;
-				wlUuid = wlFilter.getWorklistUUID();
+				wlUuid.add(wlFilter.getWorklistUUID());
 			}
 		}
 
-		if (wlUuid != null) {
+		if (!wlUuid.isEmpty()) {
 			candidates = getAllWrokflowInstancesForWorklist(wlUuid);
 		} else {
 			candidates = getAllWrokflowInstances();
@@ -506,8 +508,8 @@ public class WorkflowSearcher {
 
 		for (WfInstance loopInstance : candidates) {
 			boolean accepted = true;
-			for (WfSearchFilterBI loopFilter : collection) {
-				if (!loopFilter.filter(loopInstance)) {
+			for (WfFilterBI loopFilter : collection) {
+				if (!loopFilter.evaluateInstance(loopInstance)) {
 					accepted = false;
 					break;
 				}

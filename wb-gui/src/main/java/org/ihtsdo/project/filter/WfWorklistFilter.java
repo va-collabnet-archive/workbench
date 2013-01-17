@@ -16,64 +16,63 @@
  */
 package org.ihtsdo.project.filter;
 
-import java.util.List;
 import java.util.UUID;
 
-import org.ihtsdo.project.workflow.model.WfInstance;
+import org.ihtsdo.project.workflow2.WfFilterBI;
+import org.ihtsdo.project.workflow2.WfProcessInstanceBI;
 
 /**
  * The Class WfWorklistFilter.
  */
-public class WfWorklistFilter implements WfSearchFilterBI {
-	
+public class WfWorklistFilter implements WfFilterBI {
+
 	/** The TYPE. */
 	private final String TYPE = "WF_WORKLIST_FILTER";
-	
-	/** The worklist uuid. */
-	private List<UUID> worklistUUID;
 
-	/**
-	 * Instantiates a new wf worklist filter.
-	 *
-	 * @param worklistUUID the worklist uuid
-	 */
-	public WfWorklistFilter(List<UUID> worklistUUID) {
+	/** The worklist uuid. */
+	private UUID worklistUUID;
+
+	public WfWorklistFilter() {
+	}
+
+	public WfWorklistFilter(UUID worklistUUID) {
 		super();
 		this.worklistUUID = worklistUUID;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.ihtsdo.project.workflow.filters.WfSearchFilterBI#filter(org.ihtsdo.project.workflow.model.WfInstance)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ihtsdo.project.workflow.filters.WfSearchFilterBI#filter(org.ihtsdo
+	 * .project.workflow.model.WfInstance)
 	 */
 	@Override
-	public boolean filter(WfInstance instance) {
-		return this.worklistUUID.contains(instance.getWorkList().getUids().get(0));
+	public boolean evaluateInstance(WfProcessInstanceBI instance) {
+		return this.worklistUUID.equals(instance.getWorkList().getUuid());
 	}
 
-	/**
-	 * Gets the worklist uuid.
-	 *
-	 * @return the worklist uuid
-	 */
-	public List<UUID> getWorklistUUID() {
+	public UUID getWorklistUUID() {
 		return worklistUUID;
 	}
 
-	/**
-	 * Sets the worklist uuid.
-	 *
-	 * @param worklistUUID the new worklist uuid
-	 */
-	public void setWorklistUUID(List<UUID> worklistUUID) {
+	public void setWorklistUUID(UUID worklistUUID) {
 		this.worklistUUID = worklistUUID;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.ihtsdo.project.workflow.filters.WfSearchFilterBI#getType()
 	 */
 	@Override
 	public String getType() {
 		return TYPE;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "worklist";
+	}
+
 }

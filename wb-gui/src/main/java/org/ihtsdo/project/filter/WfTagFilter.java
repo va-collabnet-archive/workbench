@@ -19,11 +19,13 @@ package org.ihtsdo.project.filter;
 import org.ihtsdo.project.view.tag.InboxTag;
 import org.ihtsdo.project.view.tag.TagManager;
 import org.ihtsdo.project.workflow.model.WfInstance;
+import org.ihtsdo.project.workflow2.WfFilterBI;
+import org.ihtsdo.project.workflow2.WfProcessInstanceBI;
 
 /**
  * The Class WfTagFilter.
  */
-public class WfTagFilter implements WfSearchFilterBI {
+public class WfTagFilter implements WfFilterBI {
 	
 	/** The TYPE. */
 	private final String TYPE = "WF_TAG_FILTER";
@@ -44,7 +46,7 @@ public class WfTagFilter implements WfSearchFilterBI {
 	 * @see org.ihtsdo.project.workflow.filters.WfSearchFilterBI#filter(org.ihtsdo.project.workflow.model.WfInstance)
 	 */
 	@Override
-	public boolean filter(WfInstance instance) {
+	public boolean evaluateInstance(WfProcessInstanceBI instance) {
 		boolean result = false;
 		for (String[] uuidList : tag.getUuidList()) {
 			if(TagManager.getTagWorklistConceptUuids(instance)[InboxTag.TERM_WORKLIST_UUID_INDEX].equals(uuidList[InboxTag.TERM_WORKLIST_UUID_INDEX]) 

@@ -39,6 +39,7 @@ import org.ihtsdo.project.view.event.OutboxContentChangeEvent;
 import org.ihtsdo.project.view.event.TagRemovedEvent;
 import org.ihtsdo.project.view.event.TodoContentChangeEvent;
 import org.ihtsdo.project.workflow.model.WfInstance;
+import org.ihtsdo.project.workflow2.WfProcessInstanceBI;
 
 /**
  * The Class TagManager.
@@ -67,7 +68,8 @@ public class TagManager {
 	private File tagFolder;
 
 	/** The Constant tagHtml. */
-	private static final String tagHtml = "<html><body><table style=\"table-layout:fixed;\"><tr>" + "<td style=\"background-color:${COLOR}; " + "white-space:nowrap;color:${TEXT_COLOR};\"><B>${TAGNAME}</B></td>" + "<td style=\"white-space:nowrap;\">";
+	private static final String tagHtml = "<html><body><table style=\"table-layout:fixed;\"><tr>" + "<td style=\"background-color:${COLOR}; "
+			+ "white-space:nowrap;color:${TEXT_COLOR};\"><B>${TAGNAME}</B></td>" + "<td style=\"white-space:nowrap;\">";
 
 	/** The name color cache. */
 	private List<InboxTag> nameColorCache = new ArrayList<InboxTag>();
@@ -91,10 +93,10 @@ public class TagManager {
 		}
 	}
 
-	public static String[] getTagWorklistConceptUuids(WfInstance wfi) {
+	public static String[] getTagWorklistConceptUuids(WfProcessInstanceBI instance2) {
 		String[] uuid = new String[2];
-		uuid[InboxTag.TERM_WORKLIST_UUID_INDEX] = wfi.getWorkList().getUids().iterator().next().toString();
-		uuid[InboxTag.TERM_UUID_INDEX] = wfi.getComponentId().toString();
+		uuid[InboxTag.TERM_WORKLIST_UUID_INDEX] = instance2.getWorkList().getUuid().toString();
+		uuid[InboxTag.TERM_UUID_INDEX] = instance2.getComponentPrimUuid().toString();
 		return uuid;
 	}
 
@@ -124,7 +126,8 @@ public class TagManager {
 					String uuid = br.readLine();
 					uuidList.add(uuid.split(","));
 				}
-				InboxTag tag = new InboxTag(getName(tagHeader), getHtmlColor(getColorFromHeader(tagHeader)), getHtmlColor(getTextColorFromHeader(tagHeader)), uuidList);
+				InboxTag tag = new InboxTag(getName(tagHeader), getHtmlColor(getColorFromHeader(tagHeader)),
+						getHtmlColor(getTextColorFromHeader(tagHeader)), uuidList);
 				result.add(tag);
 			}
 		}
@@ -215,7 +218,8 @@ public class TagManager {
 	 * @return
 	 */
 	private boolean tagItemEquals(String[] uuidToRemove, String[] strings) {
-		return (strings[InboxTag.TERM_WORKLIST_UUID_INDEX].equals(uuidToRemove[InboxTag.TERM_WORKLIST_UUID_INDEX]) && strings[InboxTag.TERM_UUID_INDEX].equals(uuidToRemove[InboxTag.TERM_UUID_INDEX]));
+		return (strings[InboxTag.TERM_WORKLIST_UUID_INDEX].equals(uuidToRemove[InboxTag.TERM_WORKLIST_UUID_INDEX]) && strings[InboxTag.TERM_UUID_INDEX]
+				.equals(uuidToRemove[InboxTag.TERM_UUID_INDEX]));
 	}
 
 	/**
@@ -259,7 +263,8 @@ public class TagManager {
 				InputStreamReader iisr = new InputStreamReader(ifis, "UTF-8");
 				BufferedReader br = new BufferedReader(iisr);
 				String tagHeader = br.readLine();
-				InboxTag tag = new InboxTag(getName(tagHeader), getHtmlColor(getColorFromHeader(tagHeader)), getHtmlColor(getTextColorFromHeader(tagHeader)), null);
+				InboxTag tag = new InboxTag(getName(tagHeader), getHtmlColor(getColorFromHeader(tagHeader)),
+						getHtmlColor(getTextColorFromHeader(tagHeader)), null);
 				if (!result.contains(tag)) {
 					result.add(tag);
 				}

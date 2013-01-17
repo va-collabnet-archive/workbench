@@ -50,6 +50,7 @@ import org.ihtsdo.project.view.tag.InboxTag;
 import org.ihtsdo.project.view.tag.TagManager;
 import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.model.WfInstance;
+import org.ihtsdo.project.workflow2.WfFilterBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.translation.LanguageUtil;
 import org.ihtsdo.translation.ui.ConfigTranslationModule;
@@ -265,7 +266,7 @@ public class InboxTableModel extends DefaultTableModel {
 	 *            the filter list
 	 * @return true, if successful
 	 */
-	public boolean updatePage(HashMap<String, WfSearchFilterBI> filterList) {
+	public boolean updatePage(HashMap<String, WfFilterBI> filterList) {
 		boolean morePages = false;
 		if (inboxWorker != null && !inboxWorker.isDone()) {
 			inboxWorker.cancel(true);
@@ -430,7 +431,7 @@ public class InboxTableModel extends DefaultTableModel {
 	class InboxWorker extends SwingWorker<String, Object[]> {
 
 		/** The filter list. */
-		private HashMap<String, WfSearchFilterBI> filterList;
+		private HashMap<String, WfFilterBI> filterList;
 
 		/** The special tag. */
 		private boolean specialTag;
@@ -441,13 +442,13 @@ public class InboxTableModel extends DefaultTableModel {
 		 * @param filterList
 		 *            the filter list
 		 */
-		public InboxWorker(HashMap<String, WfSearchFilterBI> filterList) {
+		public InboxWorker(HashMap<String, WfFilterBI> filterList) {
 			super();
 			this.filterList = filterList;
 			Set<String> keys = filterList.keySet();
 
 			for (String key : keys) {
-				WfSearchFilterBI filter = filterList.get(key);
+				WfFilterBI filter = filterList.get(key);
 				if (filter instanceof WfTagFilter) {
 					WfTagFilter tf = (WfTagFilter) filter;
 					if (tf.getTag() != null && tf.getTag().getTagName().equals(TagManager.OUTBOX) || tf.getTag().getTagName().equals(TagManager.TODO)) {
@@ -569,7 +570,8 @@ public class InboxTableModel extends DefaultTableModel {
 				String[] tagWorklistConceptUuids = TagManager.getTagWorklistConceptUuids(wfInstance);
 				for (String[] uuidlist : tag.getUuidList()) {
 					String[] wlanduuid = tagWorklistConceptUuids;
-					if (uuidlist[InboxTag.TERM_WORKLIST_UUID_INDEX].equals(wlanduuid[InboxTag.TERM_WORKLIST_UUID_INDEX]) && uuidlist[InboxTag.TERM_UUID_INDEX].equals(wlanduuid[InboxTag.TERM_UUID_INDEX])) {
+					if (uuidlist[InboxTag.TERM_WORKLIST_UUID_INDEX].equals(wlanduuid[InboxTag.TERM_WORKLIST_UUID_INDEX])
+							&& uuidlist[InboxTag.TERM_UUID_INDEX].equals(wlanduuid[InboxTag.TERM_UUID_INDEX])) {
 						contains = true;
 						break;
 					}
@@ -584,7 +586,8 @@ public class InboxTableModel extends DefaultTableModel {
 						// Item tag isnot special or tree item selected is not
 						// outbox o todo
 						tagStr = TagManager.getInstance().getHeader(tag.getTagName(), tag.getColor(), tag.getTextColor());
-						tagCache.put(tagWorklistConceptUuids[InboxTag.TERM_WORKLIST_UUID_INDEX] + tagWorklistConceptUuids[InboxTag.TERM_UUID_INDEX], tag);
+						tagCache.put(tagWorklistConceptUuids[InboxTag.TERM_WORKLIST_UUID_INDEX] + tagWorklistConceptUuids[InboxTag.TERM_UUID_INDEX],
+								tag);
 					}
 				}
 			}
@@ -599,7 +602,8 @@ public class InboxTableModel extends DefaultTableModel {
 			translationProject = TerminologyProjectDAO.getTranslationProject(projectConcept.getConcept(), config);
 			langRefsets = translationProject.getSourceLanguageRefsets();
 			for (I_GetConceptData langRefset : langRefsets) {
-				descriptions = LanguageUtil.getContextualizedDescriptions(Terms.get().getConcept(wfInstance.getComponentId()).getConceptNid(), langRefset.getConceptNid(), true);
+				descriptions = LanguageUtil.getContextualizedDescriptions(Terms.get().getConcept(wfInstance.getComponentId()).getConceptNid(),
+						langRefset.getConceptNid(), true);
 				for (I_ContextualizeDescription description : descriptions) {
 					if (description.getLanguageExtension() != null && description.getLanguageRefsetId() == langRefset.getConceptNid()) {
 						if (description.getAcceptabilityId() == preferred.getConceptNid() && description.getTypeId() == synonym.getConceptNid()) {
@@ -625,7 +629,8 @@ public class InboxTableModel extends DefaultTableModel {
 			I_GetConceptData langRefset = null;
 			List<ContextualizedDescription> descriptions = new ArrayList<ContextualizedDescription>();
 			langRefset = translationProject.getTargetLanguageRefset();
-			descriptions = LanguageUtil.getContextualizedDescriptions(Terms.get().uuidToNative(wfInstance.getComponentId()), langRefset.getConceptNid(), true);
+			descriptions = LanguageUtil.getContextualizedDescriptions(Terms.get().uuidToNative(wfInstance.getComponentId()),
+					langRefset.getConceptNid(), true);
 			for (I_ContextualizeDescription description : descriptions) {
 				if (description.getLanguageExtension() != null && description.getLanguageRefsetId() == langRefset.getConceptNid()) {
 
@@ -686,6 +691,8 @@ class ArrayComparator implements Comparator<Object[]> {
 	}
 
 	public int compare(Object[] c1, Object[] c2) {
-		return ascending ? c1[columnToSort].toString().compareTo(c2[columnToSort].toString()) : c1[columnToSort].toString().compareTo(c2[columnToSort].toString()) * -1;
+		return ascending ? c1[columnToSort].toString().compareTo(c2[columnToSort].toString()) : c1[columnToSort].toString().compareTo(
+				c2[columnToSort].toString())
+				* -1;
 	}
 }
