@@ -257,6 +257,7 @@ public class PerformQA implements I_ProcessConcepts {
 				System.out.println("");
 				System.out.println("");
 			}
+		}
 
 			long individualElapsed = Calendar.getInstance().getTimeInMillis()-individualStart;
 
@@ -313,36 +314,35 @@ public class PerformQA implements I_ProcessConcepts {
 				}
 			}
 
-			//System.out.println("Individual loop for " + loopConcept.toString() + " in " + individualElapsed + " ms.");
-			if (individualElapsed > 6000) {
-				System.out.println("Specially long check: " + loopConcept.toString() + " took " + individualElapsed + " ms.");
-			}
+		//System.out.println("Individual loop for " + loopConcept.toString() + " in " + individualElapsed + " ms.");
+		if (individualElapsed > 6000) {
+			System.out.println("Specially long check: " + loopConcept.toString() + " took " + individualElapsed + " ms.");
+		}
 
-			count++;
-			if (count % 10000 == 0 || count == 100 || count == 1000) {
-				long elapsedInterval = Calendar.getInstance().getTimeInMillis()-start;
-				elapsedTotal = elapsedTotal + elapsedInterval;
-				System.out.println("Checked " + count + " effective concepts in " + elapsedInterval + " ms.");
-				String elpasedString = String.format("%d hours, %d min, %d sec",
-						TimeUnit.MILLISECONDS.toHours(elapsedTotal),
-						TimeUnit.MILLISECONDS.toMinutes(elapsedTotal) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(elapsedTotal)),
-						TimeUnit.MILLISECONDS.toSeconds(elapsedTotal) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(elapsedTotal))
-						);
-				long predictedTime = (estimatedNumberOfConcepts * elapsedTotal)/count;
-				String predictedString = String.format("%d hours, %d min, %d sec",
-						TimeUnit.MILLISECONDS.toHours(predictedTime),
-						TimeUnit.MILLISECONDS.toMinutes(predictedTime) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(predictedTime)),
-						TimeUnit.MILLISECONDS.toSeconds(predictedTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(predictedTime))
-						);
-				System.out.println("Elapsed until now: " + elpasedString + ", predicted time: " + predictedString + " (average: " + elapsedTotal/count + ")");
-				System.out.println("");
-				start = Calendar.getInstance().getTimeInMillis();
-			}
-			if (!results.getResultsItems().isEmpty()) {
-				writeOutputFile(results, loopConcept);
-			}
-		} 
-	
+		count++;
+		if (count % 10000 == 0 || count == 100 || count == 1000) {
+			long elapsedInterval = Calendar.getInstance().getTimeInMillis()-start;
+			elapsedTotal = elapsedTotal + elapsedInterval;
+			System.out.println("Checked " + count + " effective concepts in " + elapsedInterval + " ms.");
+			String elpasedString = String.format("%d hours, %d min, %d sec",
+					TimeUnit.MILLISECONDS.toHours(elapsedTotal),
+					TimeUnit.MILLISECONDS.toMinutes(elapsedTotal) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(elapsedTotal)),
+					TimeUnit.MILLISECONDS.toSeconds(elapsedTotal) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(elapsedTotal))
+					);
+			long predictedTime = (estimatedNumberOfConcepts * elapsedTotal)/count;
+			String predictedString = String.format("%d hours, %d min, %d sec",
+					TimeUnit.MILLISECONDS.toHours(predictedTime),
+					TimeUnit.MILLISECONDS.toMinutes(predictedTime) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(predictedTime)),
+					TimeUnit.MILLISECONDS.toSeconds(predictedTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(predictedTime))
+					);
+			System.out.println("Elapsed until now: " + elpasedString + ", predicted time: " + predictedString + " (average: " + elapsedTotal/count + ")");
+			System.out.println("");
+			start = Calendar.getInstance().getTimeInMillis();
+		}
+		if (!results.getResultsItems().isEmpty()) {
+			writeOutputFile(results, loopConcept);
+		}
+
 }
 
 private void writeOutputFile(ResultsCollectorWorkBench results, I_GetConceptData concept) throws Exception {
