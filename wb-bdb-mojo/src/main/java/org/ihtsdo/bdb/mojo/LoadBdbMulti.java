@@ -90,7 +90,8 @@ public class LoadBdbMulti extends AbstractMojo {
     /**
      * concepts file names.
      *
-     * @parameter default-value={"eConcepts.jbin"} @required
+     * @parameter default-value={"eConcepts.jbin"}
+     * @required
      */
     private String[] conceptsFileNames;
     /**
@@ -114,7 +115,8 @@ public class LoadBdbMulti extends AbstractMojo {
     /**
      * Berkeley directory.
      *
-     * @parameter expression="${project.build.directory}/berkeley-db" @required
+     * @parameter expression="${project.build.directory}/berkeley-db"
+     * @required
      */
     private File berkeleyDir;
     /**
@@ -140,6 +142,18 @@ public class LoadBdbMulti extends AbstractMojo {
      * @parameter
      */
     private String[] watchConceptUuids;
+    /**
+     * True if mojo should check for duplicate UUIDs in the database
+     *
+     * @parameter default-value=true
+     */
+    private boolean findDups;
+    /**
+     * True if mojo should check for null components in the database
+     *
+     * @parameter default-value=true
+     */
+    private boolean findNullComponents;
     AtomicInteger conceptsRead = new AtomicInteger();
     AtomicInteger conceptsProcessed = new AtomicInteger();
     private ThreadGroup loadBdbMultiDbThreadGroup = new ThreadGroup("LoadBdbMulti threads");
@@ -212,7 +226,7 @@ public class LoadBdbMulti extends AbstractMojo {
                     in.close();
                 }
                 System.out.println('.');
-                for (ConceptChronicleBI concept: indexedAnnotations) {
+                for (ConceptChronicleBI concept : indexedAnnotations) {
                     Ts.get().addUncommittedNoChecks(concept);
                 }
                 getLog().info("Processed concept count: " + conceptsRead);
@@ -227,23 +241,25 @@ public class LoadBdbMulti extends AbstractMojo {
             while (conceptsProcessed.get() < conceptsRead.get()) {
                 Thread.sleep(1000);
             }
-            getLog().info("Testing for dup UUIDs.");
-            Concept.disableComponentsCRHM();
-            UuidDupFinder dupFinder = new UuidDupFinder();
-            Bdb.getConceptDb().iterateConceptDataInParallel(dupFinder);
-            System.out.println();
-            if (dupFinder.getDupUuids().isEmpty()) {
-                getLog().info("No dup UUIDs found.");
-            } else {
-                dupFinder.writeDupFile();
-                getLog().warn("\n\nDuplicate UUIDs found: " + dupFinder.getDupUuids().size() + "\n"
-                        + dupFinder.getDupUuids() + "\n");
-                UuidDupReporter reporter = new UuidDupReporter(dupFinder.getDupUuids());
-                Bdb.getConceptDb().iterateConceptDataInParallel(reporter);
-                reporter.reportDupClasses();
-
+            UuidDupFinder dupFinder = null;
+            if (findDups) {
+                getLog().info("Testing for dup UUIDs.");
+                Concept.disableComponentsCRHM();
+                dupFinder = new UuidDupFinder();
+                Bdb.getConceptDb().iterateConceptDataInParallel(dupFinder);
+                System.out.println();
+                if (dupFinder.getDupUuids().isEmpty()) {
+                    getLog().info("No dup UUIDs found.");
+                } else {
+                    dupFinder.writeDupFile();
+                    getLog().warn("\n\nDuplicate UUIDs found: " + dupFinder.getDupUuids().size() + "\n"
+                            + dupFinder.getDupUuids() + "\n");
+                    UuidDupReporter reporter = new UuidDupReporter(dupFinder.getDupUuids());
+                    Bdb.getConceptDb().iterateConceptDataInParallel(reporter);
+                    reporter.reportDupClasses();
+                }
+                Concept.enableComponentsCRHM();
             }
-            Concept.enableComponentsCRHM();
             if (annotationIndexes != null) {
                 for (ConceptDescriptor cd : annotationIndexes) {
                     Concept c = (Concept) Ts.get().getConcept(UUID.fromString(cd.getUuid()));
@@ -282,15 +298,15 @@ public class LoadBdbMulti extends AbstractMojo {
 
                 for (PathSpec spec : initialPaths) {
                     boolean hasConcept = spec.testPathConcept();
-                    if(hasConcept){
+                    if (hasConcept) {
                         int nid = Ts.get().getNidForUuids(spec.getPathConcept().getUuids());
                         int cNid = Bdb.getConceptNid(nid);
-                        if(cNid == Integer.MAX_VALUE){
+                        if (cNid == Integer.MAX_VALUE) {
                             hasConcept = false;
                         }
                     }
-                    
-                    if(!hasConcept){
+
+                    if (!hasConcept) {
                         ConceptCB conceptBp = spec.makePathConceptBluePrint();
                         ViewCoordinate vc = Ts.get().getMetadataViewCoordinate();
                         EditCoordinate ec = Ts.get().getMetadataEditCoordinate();
@@ -298,7 +314,7 @@ public class LoadBdbMulti extends AbstractMojo {
                         ConceptChronicleBI concept = builder.construct(conceptBp);
                         BdbCommitManager.addUncommitted(concept);
                     }
-                    
+
                     ConceptChronicleBI path =
                             Ts.get().getConcept(spec.getPathConcept().getUuids());
                     validateSpec(path, spec.getPathConcept());
@@ -369,43 +385,47 @@ public class LoadBdbMulti extends AbstractMojo {
             getLog().info("Finished db sync, starting generate lucene index.");
             createLuceneIndices();
             BdbCommitManager.commit();
-            getLog().info("Finished create index, testing for UUID dups.");
+            getLog().info("Finished create index.");
 
-            Concept.disableComponentsCRHM();
-            dupFinder = new UuidDupFinder();
-            Bdb.getConceptDb().iterateConceptDataInParallel(dupFinder);
-            System.out.println();
-            if (dupFinder.getDupUuids().isEmpty()) {
-                getLog().info("No dup UUIDs found.");
-            } else {
-                dupFinder.writeDupFile();
-                getLog().warn("\n\nDuplicate UUIDs found: " + dupFinder.getDupUuids().size() + "\n"
-                        + dupFinder.getDupUuids() + "\n");
-                UuidDupReporter reporter = new UuidDupReporter(dupFinder.getDupUuids());
-                Bdb.getConceptDb().iterateConceptDataInParallel(reporter);
-                reporter.reportDupClasses();
+            if (findDups) {
+                Concept.disableComponentsCRHM();
+                getLog().info("Testing for UUID dups.");
+                dupFinder = new UuidDupFinder();
+                Bdb.getConceptDb().iterateConceptDataInParallel(dupFinder);
+                System.out.println();
+                if (dupFinder.getDupUuids().isEmpty()) {
+                    getLog().info("No dup UUIDs found.");
+                } else {
+                    dupFinder.writeDupFile();
+                    getLog().warn("\n\nDuplicate UUIDs found: " + dupFinder.getDupUuids().size() + "\n"
+                            + dupFinder.getDupUuids() + "\n");
+                    UuidDupReporter reporter = new UuidDupReporter(dupFinder.getDupUuids());
+                    Bdb.getConceptDb().iterateConceptDataInParallel(reporter);
+                    reporter.reportDupClasses();
 
+                }
             }
 
+            if (findNullComponents) {
 
-            getLog().info("Testing for Null Components Started.");
+                getLog().info("Testing for Null Components Started.");
 
-            Concept.disableComponentsCRHM();
+                Concept.disableComponentsCRHM();
 
-            NullComponentFinder nullComponentFinder = new NullComponentFinder();
-            Bdb.getConceptDb().iterateConceptDataInParallel(nullComponentFinder);
-            System.out.println();
+                NullComponentFinder nullComponentFinder = new NullComponentFinder();
+                Bdb.getConceptDb().iterateConceptDataInParallel(nullComponentFinder);
+                System.out.println();
 
-            if (nullComponentFinder.getNullComponent().isEmpty()) {
-                getLog().info("No Null component found.");
-            } else {
-                nullComponentFinder.writeNullComponentFile();
-                getLog().warn("\n\n Null Components found: " + nullComponentFinder.getNullComponent().size() + "\n"
-                        + nullComponentFinder.getNullComponent() + "\n");
+                if (nullComponentFinder.getNullComponent().isEmpty()) {
+                    getLog().info("No Null component found.");
+                } else {
+                    nullComponentFinder.writeNullComponentFile();
+                    getLog().warn("\n\n Null Components found: " + nullComponentFinder.getNullComponent().size() + "\n"
+                            + nullComponentFinder.getNullComponent() + "\n");
+                }
+                Concept.enableComponentsCRHM();
+                getLog().info("Testing for Null Components Finished.");
             }
-            Concept.enableComponentsCRHM();
-            getLog().info("Testing for Null Components Finished.");
-
 
 
             Concept.enableComponentsCRHM();
@@ -413,7 +433,7 @@ public class LoadBdbMulti extends AbstractMojo {
             Bdb.close();
             getLog().info("db closed");
             getLog().info("elapsed time: " + (System.currentTimeMillis() - startTime));
-            if (!dupFinder.getDupUuids().isEmpty()) {
+            if (dupFinder != null && !dupFinder.getDupUuids().isEmpty()) {
                 throw new Exception("Duplicate UUIDs found: " + dupFinder.getDupUuids().size());
             }
             if (moveToReadOnly) {
@@ -642,9 +662,10 @@ public class LoadBdbMulti extends AbstractMojo {
                     if (parts.length == 6) {
                         author = parts[5];
                         authorNid = store.getNidForUuids(UUID.fromString(author));
-                    }if (parts.length == 7) {
+                    }
+                    if (parts.length == 7) {
                         String uuidString = parts[6];
-                         conceptUuid = UUID.fromString(uuidString);
+                        conceptUuid = UUID.fromString(uuidString);
                     }
                     UUID parentUuid = UUID.fromString(parent);
                     UUID pathUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, path);
@@ -659,7 +680,7 @@ public class LoadBdbMulti extends AbstractMojo {
                             LANG_CODE.EN,
                             Snomed.IS_A.getLenient().getPrimUuid(),
                             parentUuid);
-                    if(conceptUuid != null){
+                    if (conceptUuid != null) {
                         conceptBp.setComponentUuid(conceptUuid);
                     }
                     List<DescriptionCAB> fsnCABs = conceptBp.getFullySpecifiedNameCABs();
@@ -672,7 +693,7 @@ public class LoadBdbMulti extends AbstractMojo {
                         conceptBp.addFullySpecifiedName(p, LANG_CODE.EN);
                     }
                     ConceptChronicleBI concept = builder.constructIfNotCurrent(conceptBp);
-                    if(makeAnnotation.equalsIgnoreCase("true")){
+                    if (makeAnnotation.equalsIgnoreCase("true")) {
                         concept.setAnnotationStyleRefex(true);
                     }
                     BdbCommitManager.addUncommitted(concept);
