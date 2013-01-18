@@ -181,7 +181,7 @@ public class ExportCementAsEConcepts extends AbstractMojo {
     			eConceptsFile.getParentFile().mkdirs();
     			BufferedOutputStream eConceptsBos = new BufferedOutputStream(
     					new FileOutputStream(eConceptsFile));
-    			DataOutputStream eConceptDOS = new DataOutputStream(eConceptsBos);
+            try (DataOutputStream eConceptDOS = new DataOutputStream(eConceptsBos)) {
     			for (I_ConceptualizeLocally localConcept: mts.getConcepts()) {
     				EConcept eC = new EConcept(localConcept, mts);
     				if (RefsetAuxiliary.Concept.REFSET_PATHS.getUids().contains(eC.getPrimordialUuid())) {
@@ -195,7 +195,9 @@ public class ExportCementAsEConcepts extends AbstractMojo {
     					member.authorUuid = eC.conceptAttributes.authorUuid;
     					member.pathUuid = eC.conceptAttributes.pathUuid;
     					member.time = eC.conceptAttributes.time;
-    					List<TkRefexAbstractMember<?>> memberList = new ArrayList<TkRefexAbstractMember<?>>();
+    					member.moduleUuid = eC.conceptAttributes.moduleUuid;
+                        List<TkRefexAbstractMember<?>> memberList = new ArrayList<>();
+
     					memberList.add(member);
     					eC.setRefsetMembers(memberList);
     				}
@@ -230,7 +232,7 @@ public class ExportCementAsEConcepts extends AbstractMojo {
 
     				eC.writeExternal(eConceptDOS);
     			}
-    			eConceptDOS.close();
+            }
 
             } catch (Exception e) {
                 throw new MojoExecutionException(e.getMessage(), e);
@@ -265,6 +267,7 @@ public class ExportCementAsEConcepts extends AbstractMojo {
 				media.authorUuid = eC.conceptAttributes.authorUuid;
 				media.pathUuid = eC.conceptAttributes.pathUuid;
 				media.time = eC.conceptAttributes.time;
+				media.moduleUuid = eC.conceptAttributes.moduleUuid;
 				List<TkMedia> images = new ArrayList<TkMedia>();
 				images.add(media);
 				eC.setImages(images);
