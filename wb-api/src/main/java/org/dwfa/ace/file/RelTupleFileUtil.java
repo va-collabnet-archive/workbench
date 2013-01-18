@@ -96,6 +96,9 @@ public class RelTupleFileUtil {
                 relUuid = UUID.fromString(lineParts[1]);
                 c1Uuid = UUID.fromString(lineParts[2]);
                 c2Uuid = UUID.fromString(lineParts[3]);
+                if (c2Uuid.equals(UUID.fromString("e94e449b-2017-48de-b663-cc6ff68d5329"))) {
+                    c2Uuid = UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c"); // User
+                }
                 charUuid = UUID.fromString(lineParts[4]);
                 refUuid = UUID.fromString(lineParts[6]);
                 relTypeUuid = UUID.fromString(lineParts[7]);
