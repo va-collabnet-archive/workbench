@@ -38,6 +38,14 @@ import org.ihtsdo.tk.dto.concept.component.refex.type_uuid.TkRefexUuidMember;
  * @phase process-resources
  */
 
+/**
+ * Export the specified CEMeNT (Common Enumerations and Metadata to Normalize
+ * Terminology) taxonomies in eConcept format.
+ * 
+ * @goal export-cement-as-econcept
+ * @phase process-resources
+ */
+
 public class ExportCementAsEConcepts extends AbstractMojo {
 
     /**
@@ -129,6 +137,7 @@ public class ExportCementAsEConcepts extends AbstractMojo {
      */
     private boolean append;
 
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
 
             getLog().info("Exporting cement taxonomies");
@@ -233,7 +242,6 @@ public class ExportCementAsEConcepts extends AbstractMojo {
     				eC.writeExternal(eConceptDOS);
     			}
             }
-
             } catch (Exception e) {
                 throw new MojoExecutionException(e.getMessage(), e);
             }
@@ -268,7 +276,7 @@ public class ExportCementAsEConcepts extends AbstractMojo {
 				media.pathUuid = eC.conceptAttributes.pathUuid;
 				media.time = eC.conceptAttributes.time;
 				media.moduleUuid = eC.conceptAttributes.moduleUuid;
-				List<TkMedia> images = new ArrayList<TkMedia>();
+				List<TkMedia> images = new ArrayList<>();
 				images.add(media);
 				eC.setImages(images);
 			} catch (Throwable e) {

@@ -16,7 +16,9 @@
  */
 package org.ihtsdo.mojo.mojo.refset.spec;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -29,6 +31,7 @@ import org.dwfa.ace.file.TupleFileUtil;
 import org.dwfa.ace.task.refset.spec.compute.ComputeRefsetFromSpecTask;
 import org.ihtsdo.mojo.maven.MojoUtil;
 import org.ihtsdo.mojo.mojo.ConceptDescriptor;
+import org.ihtsdo.tk.dto.concept.TkConcept;
 
 /**
  * Imports all the refset specs in a specified directory.
@@ -143,13 +146,21 @@ public class ImportRefsetSpecDirectory extends AbstractMojo {
                     I_GetConceptData refsetSpec =
                             tupleImporter.importFile(inputFile, outputFile, config, Terms.get().newActivityPanel(false,
                                 config, "Importing refset spec...", true));
-
-                    if (refsetSpec != null) {
-                        getLog().info("Refset is: " + refsetSpec.getInitialText() + " " + refsetSpec.getUids().get(0));
-                    } else {
-                        getLog().info("Refset is: " + refsetSpec);
+                    
+                    try (BufferedWriter outputFileWriter = new BufferedWriter(new FileWriter(outputFile, true))) {
+                        if (refsetSpec != null) {
+                            outputFileWriter.append("Refset is: " + refsetSpec.getInitialText() + " " + refsetSpec.getUids().get(0));
+                            outputFileWriter.append("\n\nRefset spec long form is: " + refsetSpec.toLongString());
+                            try {
+                                outputFileWriter.append("\n\nRefset spec eConcept form is: " + new TkConcept(refsetSpec));
+                            } catch (Exception exception) {
+                                outputFileWriter.append(exception.getLocalizedMessage());
+                            }
+              } else {
+                            outputFileWriter.append("Refset is: " + refsetSpec);
+                         }
                     }
-
+                    
                     getLog().info("Finished importing refset spec from " + inputFile.getPath());
 
                     if (computeP) {
