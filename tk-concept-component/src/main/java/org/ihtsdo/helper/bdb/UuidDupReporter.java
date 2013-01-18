@@ -43,6 +43,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
 
 
 /**
@@ -73,7 +74,7 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
      */
     public UuidDupReporter(ConcurrentSkipListSet<UUID> duplicateUuids) throws IOException {
         this.dupUuids = duplicateUuids;
-        dupMap = new ConcurrentHashMap<UUID, Collection<DupEntry>>(duplicateUuids.size());
+        dupMap = new ConcurrentHashMap<>(duplicateUuids.size());
 
         for (UUID duped : duplicateUuids) {
             dupMap.put(duped, new CopyOnWriteArrayList<DupEntry>());
@@ -92,10 +93,6 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
      */
     private void addIfDup(ComponentChronicleBI component) throws IOException {
         UUID primUuid = component.getPrimUuid();
-
-        if (primUuid.equals(UUID.fromString("80126d25-fc16-5a9f-b182-68a01d64504b"))) {
-            System.out.print("");
-        }
 
         if (dupUuids.contains(primUuid)) {
             Collection<DupEntry> dupCollection = dupMap.get(primUuid);
@@ -192,7 +189,7 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
      */
     public void reportDupClasses() {
         int printCount = 0;
-        Set<DupSet> dupClassSet = new HashSet<DupSet>();
+        Set<DupSet> dupClassSet = new HashSet<>();
 
         for (Collection<DupEntry> dup : dupMap.values()) {
             if (printCount < 100) {
@@ -254,7 +251,8 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
 
         @Override
         public String toString() {
-            return "DupEntry{" + "dup=\n" + dup + ",\n\n enclosingConcept=\n" + enclosingConcept + "\n}\n";
+            return "DupEntry{" + "dup=\n" + dup + ",\n\n enclosingConcept=\n" + 
+                    enclosingConcept.toLongString() + "\n}\n";
         }
         
         

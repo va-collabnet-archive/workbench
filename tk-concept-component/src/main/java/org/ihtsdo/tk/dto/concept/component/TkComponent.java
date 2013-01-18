@@ -55,6 +55,7 @@ import java.io.IOException;
 
 import java.util.*;
 import org.ihtsdo.tk.dto.concept.component.refex.type_array_of_bytearray.TkRefexArrayOfBytearrayMember;
+import org.ihtsdo.tk.uuid.UuidFactory;
 
 /**
  * The Class TkComponent represents a concept component in the eConcept format
@@ -368,6 +369,11 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
     public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super.readExternal(in, dataVersion);
         primordialUuid = new UUID(in.readLong(), in.readLong());
+        if (primordialUuid.equals(UUID.fromString("a6bfd29a-4ea4-3869-8fec-53a4fc1d25e8")) ||
+                primordialUuid.equals(UUID.fromString("21dc765f-519f-3386-8d05-0f6c266cf950")) ||
+                primordialUuid.equals(UUID.fromString("3a645862-4567-32ab-9e76-50456c060cf6"))) {
+            System.out.println("Found watch uuid: " + primordialUuid);
+        }
 
         short idVersionCount = in.readShort();
 
@@ -668,7 +674,7 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
      * @return the uuids associated with this TK Component
      */
     public List<UUID> getUuids() {
-        List<UUID> uuids = new ArrayList<UUID>();
+        List<UUID> uuids = new ArrayList<>();
 
         uuids.add(primordialUuid);
 
@@ -676,6 +682,9 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
             for (TkIdentifier idv : additionalIds) {
                 if (TkIdentifierUuid.class.isAssignableFrom(idv.getClass())) {
                     uuids.add((UUID) idv.getDenotation());
+                } else {
+                    uuids.add(UuidFactory.getUuidFromAlternateId(idv.authorityUuid, 
+                            idv.getDenotation().toString()));
                 }
             }
         }

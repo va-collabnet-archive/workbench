@@ -150,7 +150,7 @@ public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
             if (referencedComponent == null) {
                 try {
                     System.out.println("No component for nid: " + nid
-                            + " " + Ts.get().getUuidsForNid(nid)
+                            + " " + Ts.get().getUuidPrimordialForNid(nid)
                             + ". Used in component:" + component);
                     nullComponent.add(nid);
                 } catch (IOException ex) {

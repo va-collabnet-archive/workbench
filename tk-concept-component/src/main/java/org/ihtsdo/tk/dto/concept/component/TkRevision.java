@@ -331,8 +331,6 @@ public abstract class TkRevision implements I_VersionExternally {
                 } else {
                     ComponentBI component = Ts.get().getComponent(nid);
 
-                    sb.append("comp: '");
-
                     if (component != null) {
                         sb.append(component.toUserString());
                     } else {
@@ -438,9 +436,6 @@ public abstract class TkRevision implements I_VersionExternally {
         if (time == Long.MAX_VALUE) {
             time = Long.MIN_VALUE;
         }
-        if (moduleUuid == null) {
-            System.out.println("HERE");
-        }
         assert pathUuid != null : this;
         assert authorUuid != null : this;
         assert statusUuid != null : this;
@@ -489,6 +484,7 @@ public abstract class TkRevision implements I_VersionExternally {
      *
      * @return the module uuid associated with this TK Revsion
      */
+    @Override
     public UUID getModuleUuid() {
         return moduleUuid;
     }
