@@ -90,6 +90,8 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
         getLog().info("    POM Target Sub Data Directory: " + inputDir);
 
         try {
+            Rf2x.setupIdCache(targetDirectory.getAbsolutePath());
+            
             // SETUP CONSTANTS
             uuidSourceSnomedLongStr =
                     ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getPrimoridalUid().toString();

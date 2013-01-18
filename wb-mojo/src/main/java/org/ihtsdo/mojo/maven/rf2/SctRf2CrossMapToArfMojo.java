@@ -82,6 +82,8 @@ public class SctRf2CrossMapToArfMojo extends AbstractMojo implements Serializabl
         getLog().info("    POM Target Sub Data Directory: " + inputDir);
 
         try {
+            Rf2x.setupIdCache(targetDirectory.getAbsolutePath());
+
             // SETUP CONSTANTS
             Rf2_CrossmapRecord.uuidSourceSnomedRtStr =
                     ArchitectonicAuxiliary.Concept.SNOMED_RT_ID.getPrimoridalUid().toString();

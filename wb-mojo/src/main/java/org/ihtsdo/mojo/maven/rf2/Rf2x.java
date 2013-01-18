@@ -27,39 +27,31 @@ import org.dwfa.util.id.Type3UuidFactory;
 
 public class Rf2x {
 
+    private static final String FILE_SEPARATOR = File.separator;
     private static final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static String cachePath = null;
     private static Sct2_IdLookUp sctid2UuidCache = null;
     private static long notMappedCounter;
 
-    public Rf2x() 
-            throws IOException {
-        // Default cache location
-        setupIdCache();
+    public Rf2x() {
+        cachePath = null;
+        sctid2UuidCache = null;
     }
 
-    public Rf2x(String sctid2UuidCachePathFile) 
+    public static void setupIdCache(String idCachePath) 
             throws IOException {
-        setupIdCache(sctid2UuidCachePathFile);
-    }
-    
-    private static void setupIdCache() 
-            throws IOException {
-        // Default cache location
-        setupIdCache("target/id-cache/idSctUuidCache.ser");
-    }
-
-    private static void setupIdCache(String idCachePathFile) 
-            throws IOException {
-        File file = new File(idCachePathFile);
-        System.out.println("::: INFO: checking SCTID/UUID cache file location ..." + file.getAbsolutePath());
-        System.out.println("::: INFO:     " + file.getAbsolutePath());
+        System.out.println(":::INFO: checking SCTID/UUID cache file location ...");
+        System.out.println(":::      idCachePath=" + idCachePath);
+        cachePath = idCachePath + FILE_SEPARATOR + "idSctUuidCache.ser";
+        File file = new File(cachePath);
+        System.out.println(":::      " + file.getAbsolutePath());
         if (!file.exists()) {
-            System.out.println(":::INFO:     SCTID/UUID cache file does not exist!!!@!");
+            System.out.println(":::      SCTID/UUID cache file does not exist!!!@!");
             // Initialize with an empty id list
             sctid2UuidCache = new Sct2_IdLookUp(new ArrayList<Sct2_IdCompact>());
             notMappedCounter = 0;
         } else {
-            System.out.println(":::INFO:     SCTID/UUID cache file exists!!!@!");
+            System.out.println(":::      SCTID/UUID cache file exists!!!@!");
             sctid2UuidCache = new Sct2_IdLookUp(file.getAbsolutePath());
             notMappedCounter = 0;
         }
@@ -182,11 +174,10 @@ public class Rf2x {
             throws IOException {
         UUID uuid;
         if (sctid2UuidCache == null) {
-            setupIdCache();
+            throw new IOException("Rf2x.setupIdCache(path) needs to be called first");
         }
         uuid = sctid2UuidCache.getUuid(id);
         if (uuid == null) {
-            // System.err.println("!!!@! sctid not in cache " + Long.toString(id));
             notMappedCounter++;
             if (notMappedCounter % 100000 == 1) {
                 System.out.println(":::INFO: UUID notMappedCounter=" + notMappedCounter 
@@ -212,7 +203,7 @@ public class Rf2x {
     static boolean isSctIdInUuidCache(long sctId) throws IOException {
         UUID uuid;
         if (sctid2UuidCache == null) {
-            setupIdCache();
+            throw new IOException("Rf2x.setupIdCache(path) needs to be called first");
         }
         uuid = sctid2UuidCache.getUuid(sctId);
         if (uuid == null) {
