@@ -17,7 +17,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.ihtsdo</groupId>
 	<artifactId>wb-mmb</artifactId>
-	<version>2.6.0-trek-145-rb-2012-oct-rel-1.5-backend-1.0</version>
+	<version>2.6.0-trek-145-rb-2012-oct-rel-1.5-backend-1.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>wb-trek-145-rb : (MMP) Workbench Toolkit</name>
 	<description>The IHTSDO Workbench provides two software frameworks for
