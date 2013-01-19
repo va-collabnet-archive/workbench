@@ -112,7 +112,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
      */
     protected long primordialMsb;
     /**
-     * primordial: first created or developed Sap = status, author, position; position = path, time;
+     * primordial: first created or developed Sap = status, author, position;
+     * position = path, time;
      */
     public int primordialSapNid;
     public RevisionSet<R, C> revisions;
@@ -158,7 +159,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         } else {
             this.nid = Bdb.uuidsToNid(eComponent.getUuids());
         }
-        
+
         assert this.nid != Integer.MAX_VALUE : "Processing nid: " + enclosingConceptNid;
         this.enclosingConceptNid = enclosingConceptNid;
 
@@ -254,12 +255,18 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                 }
 
                 this.annotations.addAll(anotherAnnotationMap.values());
-                
-                for(RefsetMember refsetMember : anotherAnnotationMap.values()){
-                    Concept refsetConcept = (Concept)Ts.get().getConceptForNid(refsetMember.getRefsetId());
-                    if(refsetConcept.isAnnotationIndex()){
-                        refsetConcept.getData().getMemberNids().add(refsetMember.getNid());
-                        indexedAnnotationConcepts.add(refsetConcept);
+
+                for (RefsetMember refsetMember : anotherAnnotationMap.values()) {
+                    if (Ts.get().getConceptNidForNid(refsetMember.getRefsetId()) != Integer.MAX_VALUE) {
+                        Concept refsetConcept = (Concept) Ts.get().getConceptForNid(refsetMember.getRefsetId());
+                        if (refsetConcept.isAnnotationIndex()) {
+                            refsetConcept.getData().getMemberNids().add(refsetMember.getNid());
+                            indexedAnnotationConcepts.add(refsetConcept);
+                        }
+                    } else {
+                        // Not an error, it the indexed annotation concept does not exist, 
+                        // then it is from initial load, and the index will be created later. 
+                        //System.out.println("Nid to cNid == Integer.MAX_VALUE; " + refsetMember);
                     }
                 }
             }
@@ -321,7 +328,6 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     public boolean addAnnotation(RefexChronicleBI annotation) throws IOException {
         if (annotations == null) {
             annotations = new ConcurrentSkipListSet<RefsetMember<?, ?>>(new Comparator<RefexChronicleBI>() {
-
                 @Override
                 public int compare(RefexChronicleBI t, RefexChronicleBI t1) {
                     return t.getNid() - t1.getNid();
@@ -444,7 +450,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     public final boolean addRevisionNoRedundancyCheck(R r) {
         return addRevision(r);
     }
-    
+
     @Override
     public boolean addStringId(String stringId, int authorityNid, int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
         IdentifierVersionString v = new IdentifierVersionString(statusNid, time, authorNid, moduleNid, pathNid);
@@ -618,7 +624,6 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         return false;
     }
-    
     private static final UUID snomedAuthorityUuid = TermAux.SCT_ID_AUTHORITY.getUuids()[0];
 
     public final void convertId(List<TkIdentifier> list) throws IOException {
@@ -636,25 +641,25 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                     case LONG:
                         IdentifierVersionLong idvl = new IdentifierVersionLong((TkIdentifierLong) idv);
                         additionalIdVersions.add(idvl);
-                      if (idv.authorityUuid.equals(snomedAuthorityUuid)) {
-                          Bdb.getUuidsToNidMap().put(Type3UuidFactory.fromSNOMED(idv.getDenotation().toString()), nid);
-                      } else {
-                          Bdb.getUuidsToNidMap().put(Type5UuidFactory.get(idv.getAuthorityUuid(), idv.getDenotation().toString()), nid);
-                          
-                      }
+                        if (idv.authorityUuid.equals(snomedAuthorityUuid)) {
+                            Bdb.getUuidsToNidMap().put(Type3UuidFactory.fromSNOMED(idv.getDenotation().toString()), nid);
+                        } else {
+                            Bdb.getUuidsToNidMap().put(Type5UuidFactory.get(idv.getAuthorityUuid(), idv.getDenotation().toString()), nid);
+
+                        }
                         break;
 
                     case STRING:
                         IdentifierVersionString idvs = new IdentifierVersionString((TkIdentifierString) idv);
                         additionalIdVersions.add(idvs);
-                      Bdb.getUuidsToNidMap().put(Type5UuidFactory.get(idv.getAuthorityUuid(), idv.getDenotation().toString()), nid);
+                        Bdb.getUuidsToNidMap().put(Type5UuidFactory.get(idv.getAuthorityUuid(), idv.getDenotation().toString()), nid);
 
                         break;
 
                     case UUID:
                         Bdb.getUuidsToNidMap().put((UUID) denotation, nid);
                         additionalIdVersions.add(new IdentifierVersionUuid((TkIdentifierUuid) idv));
-                      Bdb.getUuidsToNidMap().put(Type5UuidFactory.get(idv.getAuthorityUuid(), idv.getDenotation().toString()), nid);
+                        Bdb.getUuidsToNidMap().put(Type5UuidFactory.get(idv.getAuthorityUuid(), idv.getDenotation().toString()), nid);
 
                         break;
 
@@ -1053,7 +1058,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
      * Test method to check to see if two objects are equal in all respects.
      *
      * @param another
-     * @return either a zero length String, or a String containing a description of the validation failures.
+     * @return either a zero length String, or a String containing a description
+     * of the validation failures.
      * @throws IOException
      */
     @SuppressWarnings("unchecked")
@@ -1142,7 +1148,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     }
 
     public final void writeComponentToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid)
-    throws IOException{
+            throws IOException {
         assert nid != 0;
         assert primordialSapNid != 0 : "Processing nid: " + enclosingConceptNid;;
         assert primordialSapNid != Integer.MAX_VALUE;
@@ -1216,7 +1222,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         return allNids;
     }
-    
+
     public Set<Integer> getAllStampNids() throws IOException {
         return getComponentSapNids();
     }
@@ -1283,7 +1289,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     public int getAuthorNid() {
         return Bdb.getSapDb().getAuthorNid(primordialSapNid);
     }
-    
+
     @Override
     public int getModuleNid() {
         return Bdb.getSapDb().getModuleNid(primordialSapNid);
@@ -1652,8 +1658,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         for (RefexChronicleBI<?> rcbi : r) {
             if (rcbi.getRefexNid() == refsetNid) {
-                  returnValues.add(rcbi);
-                
+                returnValues.add(rcbi);
+
             }
         }
 
@@ -1670,8 +1676,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             for (NidPairForRefex pair : pairs) {
                 RefexChronicleBI<?> ext = (RefexChronicleBI<?>) Bdb.getComponent(pair.getMemberNid());
 
-                if ((ext != null) && !addedMembers.contains(ext.getNid()) && 
-                        ext.getPrimordialVersion().getStampNid() != -1) {
+                if ((ext != null) && !addedMembers.contains(ext.getNid())
+                        && ext.getPrimordialVersion().getStampNid() != -1) {
                     addedMembers.add(ext.getNid());
                     returnValues.add(ext);
                 }
@@ -1689,14 +1695,14 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         if (fetchedAnnotations != null) {
             for (RefexChronicleBI<?> annotation : fetchedAnnotations) {
-                if (addedMembers.contains(annotation.getNid()) == false  && 
-                        annotation.getPrimordialVersion().getStampNid() != -1) {
+                if (addedMembers.contains(annotation.getNid()) == false
+                        && annotation.getPrimordialVersion().getStampNid() != -1) {
                     returnValues.add(annotation);
                     addedMembers.add(annotation.getNid());
                 }
             }
         }
-                
+
         return Collections.unmodifiableCollection(returnValues);
     }
 
@@ -2048,7 +2054,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
 
         if (authorNid != getAuthorNid()) {
-            this.primordialSapNid = Bdb.getSapNid(getStatusNid(),Long.MAX_VALUE, authorNid, getModuleNid(), getPathNid());
+            this.primordialSapNid = Bdb.getSapNid(getStatusNid(), Long.MAX_VALUE, authorNid, getModuleNid(), getPathNid());
             assert primordialSapNid != 0 : "Processing nid: " + enclosingConceptNid;;
             modified();
         }
@@ -2082,7 +2088,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
 
         if (pathId != getPathId()) {
-            this.primordialSapNid = Bdb.getSapNid(getStatusNid(), Long.MAX_VALUE, getAuthorNid(), 
+            this.primordialSapNid = Bdb.getSapNid(getStatusNid(), Long.MAX_VALUE, getAuthorNid(),
                     getModuleNid(), pathId);
             assert primordialSapNid != 0 : "Processing nid: " + enclosingConceptNid;
             modified();
@@ -2097,7 +2103,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
 
         if (pathId != getPathNid()) {
-            this.primordialSapNid = Bdb.getSapNid(getStatusNid(), Long.MAX_VALUE, getAuthorNid(), 
+            this.primordialSapNid = Bdb.getSapNid(getStatusNid(), Long.MAX_VALUE, getAuthorNid(),
                     getModuleNid(), pathId);
             assert primordialSapNid != 0 : "Processing nid: " + enclosingConceptNid;
             modified();
@@ -2134,7 +2140,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
 
         if (statusId != this.getStatusId()) {
-            this.primordialSapNid = Bdb.getSapNid(statusId, Long.MAX_VALUE, getAuthorNid(), 
+            this.primordialSapNid = Bdb.getSapNid(statusId, Long.MAX_VALUE, getAuthorNid(),
                     getModuleNid(), getPathNid());
             assert primordialSapNid != 0 : "Processing nid: " + enclosingConceptNid;
         }
@@ -2148,12 +2154,12 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
 
         if (statusId != this.getStatusNid()) {
-            this.primordialSapNid = Bdb.getSapNid(statusId, Long.MAX_VALUE, getAuthorNid(), 
+            this.primordialSapNid = Bdb.getSapNid(statusId, Long.MAX_VALUE, getAuthorNid(),
                     getModuleNid(), getPathNid());
             assert primordialSapNid != 0 : "Processing nid: " + enclosingConceptNid;
         }
     }
-    
+
     @Override
     public final void setModuleNid(int moduleId) {
         if (getTime() != Long.MAX_VALUE) {
@@ -2162,7 +2168,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
 
         if (moduleId != this.getModuleNid()) {
-            this.primordialSapNid = Bdb.getSapNid(getStatusNid(), Long.MAX_VALUE, getAuthorNid(), 
+            this.primordialSapNid = Bdb.getSapNid(getStatusNid(), Long.MAX_VALUE, getAuthorNid(),
                     moduleId, getPathNid());
             assert primordialSapNid != 0 : "Processing nid: " + enclosingConceptNid;
         }
@@ -2176,7 +2182,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
 
         if (time != getTime()) {
-            this.primordialSapNid = Bdb.getSapNid(getStatusNid(), time, Terms.get().getAuthorNid(), 
+            this.primordialSapNid = Bdb.getSapNid(getStatusNid(), time, Terms.get().getAuthorNid(),
                     getModuleNid(), getPathNid());
             assert primordialSapNid != 0 : "Processing nid: " + enclosingConceptNid;
         }
@@ -2217,9 +2223,9 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             return ConceptComponent.this.makeIdAnalog(getStatusNid(), getTime(),
                     getAuthorNid(), getModuleNid(), getPathNid());
         }
-        
+
         @Override
-        public I_IdPart makeIdAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) { 
+        public I_IdPart makeIdAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
             return ConceptComponent.this.makeIdAnalog(statusNid, time, authorNid, moduleNid, pathNid);
         }
 
@@ -2301,7 +2307,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
             return Bdb.getSapDb().getPathNid(primordialSapNid);
         }
-        
+
         @Override
         public int getModuleNid() {
             if ((index >= 0) && (additionalIdVersions != null) && (index < additionalIdVersions.size())) {
@@ -2444,7 +2450,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         @Override
         public boolean addStringId(String stringId, int authorityNid, int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
             return ConceptComponent.this.addStringId(stringId, authorityNid,
-                     statusNid, time, authorNid, moduleNid, pathNid);
+                    statusNid, time, authorNid, moduleNid, pathNid);
         }
 
         @Override
@@ -2735,7 +2741,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         public int getStatusNid() {
             return cv.getStatusNid();
         }
-        
+
         @Override
         public int getModuleNid() {
             return cv.getModuleNid();
@@ -2851,7 +2857,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         public void setStatusNid(int statusNid) throws PropertyVetoException {
             ((AnalogBI) cv).setStatusNid(statusNid);
         }
-        
+
         @Override
         public void setModuleNid(int moduleNid) throws PropertyVetoException {
             ((AnalogBI) cv).setModuleNid(moduleNid);
