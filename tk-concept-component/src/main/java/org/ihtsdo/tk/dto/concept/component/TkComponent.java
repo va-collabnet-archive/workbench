@@ -369,11 +369,11 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
     public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super.readExternal(in, dataVersion);
         primordialUuid = new UUID(in.readLong(), in.readLong());
-        if (primordialUuid.equals(UUID.fromString("a6bfd29a-4ea4-3869-8fec-53a4fc1d25e8")) ||
-                primordialUuid.equals(UUID.fromString("21dc765f-519f-3386-8d05-0f6c266cf950")) ||
-                primordialUuid.equals(UUID.fromString("3a645862-4567-32ab-9e76-50456c060cf6"))) {
-            System.out.println("Found watch uuid: " + primordialUuid);
-        }
+//        if (primordialUuid.equals(UUID.fromString("a6bfd29a-4ea4-3869-8fec-53a4fc1d25e8")) ||
+//                primordialUuid.equals(UUID.fromString("21dc765f-519f-3386-8d05-0f6c266cf950")) ||
+//                primordialUuid.equals(UUID.fromString("3a645862-4567-32ab-9e76-50456c060cf6"))) {
+//            System.out.println("Found watch uuid: " + primordialUuid);
+//        }
 
         short idVersionCount = in.readShort();
 
