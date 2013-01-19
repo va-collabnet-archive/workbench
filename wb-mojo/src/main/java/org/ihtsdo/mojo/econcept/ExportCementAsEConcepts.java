@@ -38,14 +38,6 @@ import org.ihtsdo.tk.dto.concept.component.refex.type_uuid.TkRefexUuidMember;
  * @phase process-resources
  */
 
-/**
- * Export the specified CEMeNT (Common Enumerations and Metadata to Normalize
- * Terminology) taxonomies in eConcept format.
- * 
- * @goal export-cement-as-econcept
- * @phase process-resources
- */
-
 public class ExportCementAsEConcepts extends AbstractMojo {
 
     /**
