@@ -38,11 +38,11 @@ public class Rf2x {
         sctid2UuidCache = null;
     }
 
-    public static void setupIdCache(String idCachePath) 
+    public static void setupIdCache(String targetPath) 
             throws IOException {
+        cachePath = targetPath + FILE_SEPARATOR + "id-cache" + FILE_SEPARATOR + "idSctUuidCache.ser";
         System.out.println(":::INFO: checking SCTID/UUID cache file location ...");
-        System.out.println(":::      idCachePath=" + idCachePath);
-        cachePath = idCachePath + FILE_SEPARATOR + "idSctUuidCache.ser";
+        System.out.println(":::      idCachePath=" + cachePath);
         File file = new File(cachePath);
         System.out.println(":::      " + file.getAbsolutePath());
         if (!file.exists()) {
