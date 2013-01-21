@@ -22,6 +22,7 @@ import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.api.WorkflowDefinitionManager;
 import org.ihtsdo.project.workflow.api.WorkflowInterpreter;
+import org.ihtsdo.project.workflow.model.WfAction;
 import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
@@ -195,12 +196,28 @@ public class WorkflowStore implements WorkflowStoreBI {
 	@Override
 	public Collection<WfActivityBI> getActivities(WfProcessInstanceBI instance,
 			WfUserBI user) throws Exception {
+		
+		List<WfActivityBI> activities = new ArrayList<WfActivityBI>();
+		
 		WorkflowDefinition oldStyleDefinition = ((WfProcessDefinition) instance.getProcessDefinition()).getDefinition();
 		WorkflowInterpreter interpreter = WorkflowInterpreter.createWorkflowInterpreter(oldStyleDefinition);
 		
-		interpreter.getPossibleActions((WfInstance) instance, (WfUser) user);
+		List<WfAction> possibleActions = interpreter.getPossibleActions((WfInstance) instance, (WfUser) user);
+		List<WfAction> autoActions = interpreter.getAutomaticActions((WfInstance) instance, (WfUser) user);
 		
-		return null;
+		for (WfAction loopAction : possibleActions) {
+			WfActivity loopActivity = new WfActivity(loopAction);
+			loopActivity.setAutomatic(false);
+			activities.add(loopActivity);
+		}
+		
+		for (WfAction loopAction : autoActions) {
+			WfActivity loopActivity = new WfActivity(loopAction);
+			loopActivity.setAutomatic(true);
+			activities.add(loopActivity);
+		}
+		
+		return activities;
 	}
 
 }

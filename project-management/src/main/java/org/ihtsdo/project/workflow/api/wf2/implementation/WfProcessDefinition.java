@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import org.ihtsdo.project.workflow.model.WfAction;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 import org.ihtsdo.project.workflow2.WfActivityBI;
 import org.ihtsdo.project.workflow2.WfProcessDefinitionBI;
@@ -46,7 +47,9 @@ public class WfProcessDefinition implements WfProcessDefinitionBI {
 	@Override
 	public Collection<WfActivityBI> getActivities() {
 		List<WfActivityBI> activities = new ArrayList<WfActivityBI>();
-		activities.addAll(definition.getActions().values());
+		for (WfAction loopAction : definition.getActions().values()) {
+			activities.add(new WfActivity(loopAction));
+		}
 		return activities;
 	}
 
