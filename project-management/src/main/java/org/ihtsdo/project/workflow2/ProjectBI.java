@@ -17,8 +17,6 @@ package org.ihtsdo.project.workflow2;
 
 import java.util.Collection;
 import java.util.UUID;
-import org.ihtsdo.tk.api.coordinate.EditCoordinate;
-import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 /**
  * A representation of a group of workflow instances. Instances are grouped
@@ -42,26 +40,6 @@ public interface ProjectBI {
      * Gets the UUID of the work list
      */
     UUID getUuid();
-    
-    /** 
-     * Gets the ViewCoordinate of this project, this allows the retrieval of
-     * of the current concept version for this instance
-     * @throws Exception 
-     */
-    ViewCoordinate getViewCoordinate() throws Exception;
-    
-    /** 
-     * Gets the EditCoordinate of this project, actions should use this edit
-     * coordinate to perform changes in the data
-     * @throws Exception 
-     */
-    EditCoordinate getEditCoordinate() throws Exception;
-    
-    /** 
-     * Gets the PromotionCoordinate of this project, 
-     * @throws Exception 
-     */
-    EditCoordinate getPromotionCoordinate() throws Exception;
     
     /** 
      * Gets all work lists in the project

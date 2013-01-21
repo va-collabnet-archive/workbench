@@ -3,7 +3,10 @@ package org.ihtsdo.project.workflow.api.wf2.implementation;
 import java.util.UUID;
 
 import org.ihtsdo.project.workflow.model.WfAction;
+import org.ihtsdo.project.workflow.model.WfInstance;
+import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow2.WfActivityBI;
+import org.ihtsdo.project.workflow2.WfProcessInstanceBI;
 
 public class WfActivity implements WfActivityBI {
 	
@@ -30,8 +33,8 @@ public class WfActivity implements WfActivityBI {
 	}
 
 	@Override
-	public void perform() {
-		// TODO Auto-generated method stub
+	public void perform(WfProcessInstanceBI instance) throws Exception {
+		WfInstance.updateInstanceState(((WfInstance)instance), action.getConsequence());
 	}
 
 	@Override

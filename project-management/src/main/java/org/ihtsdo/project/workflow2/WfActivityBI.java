@@ -56,7 +56,7 @@ public interface WfActivityBI {
     /** 
      * Performs the action
      */
-    void perform();
+    void perform(WfProcessInstanceBI instance) throws Exception;
     
     /** 
      * When true, the action should be executed automatically by the engine, 

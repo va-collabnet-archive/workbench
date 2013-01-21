@@ -42,11 +42,14 @@ import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkSet;
+import org.ihtsdo.project.workflow.api.wf2.implementation.WfProcessDefinition;
+import org.ihtsdo.project.workflow.model.TestXstream;
 import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfPermission;
 import org.ihtsdo.project.workflow.model.WfRole;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WfUser;
+import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -404,8 +407,33 @@ public class WfComponentProvider {
 	 */
 	public static List<File> getWorkflowDefinitionFiles() {
 		File folder = new File("./sampleProcesses");
+		return getWorkflowDefinitionFiles(folder);
+	}
+	
+	/**
+	 * Gets the workflow definition files.
+	 *
+	 * @return the workflow definition files
+	 */
+	public static List<File> getWorkflowDefinitionFiles(File folder) {
 		List<File> retFiles = loadFiles(folder, END_FILE);
 		return retFiles;
+	}
+	
+	/**
+	 * Gets the workflow definitions.
+	 *
+	 * @return the workflow definitions
+	 */
+	public static List<WorkflowDefinition> getWorkflowDefinitions(File folder) {
+		List<WorkflowDefinition> definitions = new ArrayList<WorkflowDefinition>();
+		List<File> retFiles = loadFiles(folder, END_FILE);
+		
+		for (File loopFile : retFiles) {
+			definitions.add(TestXstream.readWfDefinition(loopFile));
+		}
+		
+		return definitions;
 	}
 
 	/**

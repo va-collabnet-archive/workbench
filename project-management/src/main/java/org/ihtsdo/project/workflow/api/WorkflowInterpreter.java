@@ -281,6 +281,8 @@ public class WorkflowInterpreter {
 
 			actions = new ArrayList<String>();
 			ksession.setGlobal("actions", actions);
+			autoActions = new ArrayList<String>();
+			ksession.setGlobal("autoActions", autoActions);
 			prepActions = new ArrayList<String>();
 			ksession.setGlobal("prepActions", prepActions);
 			ksession.setGlobal("kindOfComputer", new SimpleKindOfComputer());
@@ -355,7 +357,7 @@ public class WorkflowInterpreter {
 	 * @param action the action
 	 * @param worker the worker
 	 */
-	public boolean doAction(WfInstance instance, WfRole role,WfAction action, I_Work worker) {
+	public static boolean doAction(WfInstance instance, WfRole role,WfAction action, I_Work worker) {
 		// TODO: decide if should check for action is possible
 		try {
 			BusinessProcess bp;

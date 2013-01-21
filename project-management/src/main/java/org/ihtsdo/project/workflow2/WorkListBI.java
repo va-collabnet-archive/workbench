@@ -17,8 +17,6 @@ package org.ihtsdo.project.workflow2;
 
 import java.util.Collection;
 import java.util.UUID;
-import org.ihtsdo.tk.api.coordinate.EditCoordinate;
-import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 /**
  * A representation of a group of workflow instances. Instances are grouped

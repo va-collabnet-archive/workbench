@@ -64,10 +64,10 @@ public class WorkflowStore implements WorkflowStoreBI {
 	
 	@Override
 	public WfProcessInstanceBI getProcessInstance(
-			WorkListBI workList, ConceptVersionBI concept) throws Exception {
+			WorkListBI workList, UUID componentUuid) throws Exception {
 		
 		for (WfProcessInstanceBI loopInstance : workList.getInstances()) {
-			if (loopInstance.getComponentPrimUuid().equals(concept.getPrimUuid())) {
+			if (loopInstance.getComponentPrimUuid().equals(componentUuid)) {
 				return loopInstance;
 			}
 		}
@@ -76,8 +76,9 @@ public class WorkflowStore implements WorkflowStoreBI {
 	}
 
 	@Override
-	public Collection<WfProcessInstanceBI> getProcessInstances(ConceptVersionBI concept) throws Exception {
+	public Collection<WfProcessInstanceBI> getProcessInstances(UUID componentUuid) throws Exception {
 		Collection<WfProcessInstanceBI> instances = new ArrayList<WfProcessInstanceBI>();
+		ConceptChronicleBI concept = Ts.get().getConcept(componentUuid);
 		Collection<? extends RefexVersionBI<?>> annotations = concept.getAnnotationsActive(config.getViewCoordinate());
 		I_TermFactory tf = Terms.get();
 		for (RefexVersionBI loopAnnot : annotations) {
@@ -160,10 +161,9 @@ public class WorkflowStore implements WorkflowStoreBI {
 	}
 
 	@Override
-	public Collection<WfProcessInstanceBI> getActiveProcessInstances(
-			ConceptVersionBI concept) throws Exception {
+	public Collection<WfProcessInstanceBI> getActiveProcessInstances(UUID componentUuid) throws Exception {
 		Collection<WfProcessInstanceBI> instances = new ArrayList<WfProcessInstanceBI>();
-		for (WfProcessInstanceBI loopInstance : getProcessInstances(concept)) {
+		for (WfProcessInstanceBI loopInstance : getProcessInstances(componentUuid)) {
 			if (loopInstance.isActive()) {
 				instances.add(loopInstance);
 			}
@@ -172,10 +172,9 @@ public class WorkflowStore implements WorkflowStoreBI {
 	}
 
 	@Override
-	public Collection<WfProcessInstanceBI> getIncompleteProcessInstances(
-			ConceptVersionBI concept) throws Exception {
+	public Collection<WfProcessInstanceBI> getIncompleteProcessInstances(UUID componentUuid) throws Exception {
 		Collection<WfProcessInstanceBI> instances = new ArrayList<WfProcessInstanceBI>();
-		for (WfProcessInstanceBI loopInstance : getProcessInstances(concept)) {
+		for (WfProcessInstanceBI loopInstance : getProcessInstances(componentUuid)) {
 			if (loopInstance.isActive() && !loopInstance.isCompleted()) {
 				instances.add(loopInstance);
 			}

@@ -45,12 +45,10 @@ public class Project implements ProjectBI {
 		return project.getUids().iterator().next();
 	}
 
-	@Override
 	public ViewCoordinate getViewCoordinate() throws Exception {
 		return Terms.get().getActiveAceFrameConfig().getViewCoordinate();
 	}
 
-	@Override
 	public EditCoordinate getEditCoordinate() throws Exception {
 		return Terms.get().getActiveAceFrameConfig().getEditCoordinate();
 	}
@@ -105,7 +103,6 @@ public class Project implements ProjectBI {
 		return "";
 	}
 
-	@Override
 	public EditCoordinate getPromotionCoordinate() throws Exception {
 		// TODO Auto-generated method stub
 		return null;

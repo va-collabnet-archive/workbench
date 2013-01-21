@@ -16,7 +16,7 @@
 package org.ihtsdo.project.workflow2;
 
 import java.util.Collection;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import java.util.UUID;
 
 /**
  * A class that handles all workflow operations
@@ -29,25 +29,25 @@ public interface WorkflowStoreBI {
      * Gets all workflow process instances for a concept
      * @throws Exception 
      */
-    Collection<WfProcessInstanceBI> getProcessInstances(ConceptVersionBI concept) throws Exception;
+    Collection<WfProcessInstanceBI> getProcessInstances(UUID componentUuid) throws Exception;
     
     /** 
      * Gets the workflow process instance for a concept in the provided workList
      * @throws Exception 
      */
-    WfProcessInstanceBI getProcessInstance(WorkListBI workList, ConceptVersionBI concept) throws Exception;
+    WfProcessInstanceBI getProcessInstance(WorkListBI workList, UUID componentUuid) throws Exception;
     
     /** 
      * Gets active workflow process instances for a concept
      * @throws Exception 
      */
-    Collection<WfProcessInstanceBI> getActiveProcessInstances(ConceptVersionBI concept) throws Exception;
+    Collection<WfProcessInstanceBI> getActiveProcessInstances(UUID componentUuid) throws Exception;
     
     /** 
      * Gets active and not completed workflow process instances for a concept
      * @throws Exception 
      */
-    Collection<WfProcessInstanceBI> getIncompleteProcessInstances(ConceptVersionBI concept) throws Exception;
+    Collection<WfProcessInstanceBI> getIncompleteProcessInstances(UUID componentUuid) throws Exception;
     
     /** 
      * Gets all instances in the system using the filters criteria
