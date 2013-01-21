@@ -23,7 +23,7 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
  * 
  * @author alo
  */
-public interface WorkflowBI {
+public interface WorkflowStoreBI {
     
     /** 
      * Gets all workflow process instances for a concept
@@ -32,22 +32,22 @@ public interface WorkflowBI {
     Collection<WfProcessInstanceBI> getProcessInstances(ConceptVersionBI concept) throws Exception;
     
     /** 
-     * Gets all workflow process instances for a concept in the provided workList
+     * Gets the workflow process instance for a concept in the provided workList
      * @throws Exception 
      */
-    Collection<WfProcessInstanceBI> getProcessInstances(WorkListBI workList, ConceptVersionBI concept) throws Exception;
+    WfProcessInstanceBI getProcessInstance(WorkListBI workList, ConceptVersionBI concept) throws Exception;
     
     /** 
-     * Gets active workflow process instances for a concept in the provided workList
+     * Gets active workflow process instances for a concept
      * @throws Exception 
      */
-    Collection<WfProcessInstanceBI> getActiveProcessInstances(WorkListBI workList, ConceptVersionBI concept) throws Exception;
+    Collection<WfProcessInstanceBI> getActiveProcessInstances(ConceptVersionBI concept) throws Exception;
     
     /** 
-     * Gets active and not completed workflow process instances for a concept in the provided workList
+     * Gets active and not completed workflow process instances for a concept
      * @throws Exception 
      */
-    Collection<WfProcessInstanceBI> getIncompleteProcessInstances(WorkListBI workList, ConceptVersionBI concept) throws Exception;
+    Collection<WfProcessInstanceBI> getIncompleteProcessInstances(ConceptVersionBI concept) throws Exception;
     
     /** 
      * Gets all instances in the system using the filters criteria
@@ -84,5 +84,11 @@ public interface WorkflowBI {
      * @throws Exception 
      */
     Collection<ProjectBI> getAllProjects() throws Exception;
+    
+    ProjectBI createProject(String name) throws Exception;
+    
+    ProjectBI createTranslationProject(String name) throws Exception;
+    
+    Collection<WfActivityBI> getActivities(WfProcessInstanceBI instance, WfUserBI user) throws Exception;
     
 }

@@ -1,66 +1,105 @@
 package org.ihtsdo.project.workflow.api.wf2.implementation;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.RefsetAuxiliary;
+import org.ihtsdo.project.ProjectPermissionsAPI;
+import org.ihtsdo.project.TerminologyProjectAuxiliary;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.api.WorkflowDefinitionManager;
+import org.ihtsdo.project.workflow.api.WorkflowInterpreter;
+import org.ihtsdo.project.workflow.model.WfInstance;
+import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 import org.ihtsdo.project.workflow2.ProjectBI;
 import org.ihtsdo.project.workflow2.WfActivityBI;
-import org.ihtsdo.project.workflow2.WfProcessDefinitionBI;
 import org.ihtsdo.project.workflow2.WfFilterBI;
+import org.ihtsdo.project.workflow2.WfProcessDefinitionBI;
+import org.ihtsdo.project.workflow2.WfProcessInstanceBI;
 import org.ihtsdo.project.workflow2.WfRoleBI;
 import org.ihtsdo.project.workflow2.WfStateBI;
-import org.ihtsdo.project.workflow2.WfProcessInstanceBI;
 import org.ihtsdo.project.workflow2.WfUserBI;
 import org.ihtsdo.project.workflow2.WorkListBI;
-import org.ihtsdo.project.workflow2.WorkflowBI;
+import org.ihtsdo.project.workflow2.WorkflowStoreBI;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 
-public class Workflow implements WorkflowBI {
-	
+public class WorkflowStore implements WorkflowStoreBI {
+
 	TerminologyStoreDI ts;
 	ConceptChronicleBI worklistsRoot;
 	WfComponentProvider wfComponentProvider;
+	I_ConfigAceFrame config;
+	ProjectPermissionsAPI permissionsApi;
 
-	public Workflow() {
+	public WorkflowStore() {
 		ts = Ts.get();
 		wfComponentProvider = new WfComponentProvider();
 		try {
 			worklistsRoot = ts.getConcept(UUID.fromString("2facb3a8-6829-314a-9798-ed006930ca18"));
-		} catch (IOException e) {
+			config = Terms.get().getActiveAceFrameConfig();
+			permissionsApi = new ProjectPermissionsAPI(config);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	@Override
+	public WfProcessInstanceBI getProcessInstance(
+			WorkListBI workList, ConceptVersionBI concept) throws Exception {
+		
+		for (WfProcessInstanceBI loopInstance : workList.getInstances()) {
+			if (loopInstance.getComponentPrimUuid().equals(concept.getPrimUuid())) {
+				return loopInstance;
+			}
+		}
+		
+		return null;
 	}
 
 	@Override
 	public Collection<WfProcessInstanceBI> getProcessInstances(ConceptVersionBI concept) throws Exception {
 		Collection<WfProcessInstanceBI> instances = new ArrayList<WfProcessInstanceBI>();
-		Collection<? extends RefexVersionBI<?>> annotations = concept.getAnnotationsActive(concept.getViewCoordinate());
+		Collection<? extends RefexVersionBI<?>> annotations = concept.getAnnotationsActive(config.getViewCoordinate());
+		I_TermFactory tf = Terms.get();
 		for (RefexVersionBI loopAnnot : annotations) {
-			ConceptChronicleBI refset = ts.getConcept(loopAnnot.getRefexNid());
+			I_GetConceptData refset = tf.getConcept(loopAnnot.getRefexNid());
 			if (ts.isKindOf(refset.getConceptNid(), worklistsRoot.getConceptNid(), 
-					Terms.get().getActiveAceFrameConfig().getViewCoordinate())) {
-				WorkList wlist = TerminologyProjectDAO.getWorkList((I_GetConceptData) refset, Terms.get().getActiveAceFrameConfig());
-				if (wlist != null) {
-					instances.add(TerminologyProjectDAO.getWorkListMember(
-							(I_GetConceptData) concept, wlist, Terms.get().getActiveAceFrameConfig()).getWfInstance());
+					config.getViewCoordinate())) {
+				I_IntSet allowedTypes = tf.newIntSet(); 
+				allowedTypes.add(RefsetAuxiliary.Concept.PROMOTION_REL.localize().getNid());
+				Set<? extends I_GetConceptData> sources = refset.getDestRelOrigins(config.getAllowedStatus(), 
+						allowedTypes, 
+						config.getViewPositionSetReadOnly(), 
+						config.getPrecedence(), 
+						config.getConflictResolutionStrategy());
+
+				if (!sources.isEmpty()) {
+					I_GetConceptData wRefset = sources.iterator().next();
+					WorkList wlist = TerminologyProjectDAO.getWorkList(wRefset, config);
+					if (wlist != null) {
+						instances.add(TerminologyProjectDAO.getWorkListMember(
+								tf.getConcept(concept.getNid()), wlist, config).getWfInstance());
+					}
 				}
-				
+
 			}
 		}
 		return instances;
@@ -113,38 +152,17 @@ public class Workflow implements WorkflowBI {
 	@Override
 	public Collection<ProjectBI> getAllProjects() throws Exception {
 		List<ProjectBI> projects = new ArrayList<ProjectBI>();
-		for (I_TerminologyProject loopProject : TerminologyProjectDAO.getAllProjects(Terms.get().getActiveAceFrameConfig())) {
+		for (I_TerminologyProject loopProject : TerminologyProjectDAO.getAllProjects(config)) {
 			projects.add(new Project(loopProject));
 		}
 		return projects;
 	}
 
 	@Override
-	public Collection<WfProcessInstanceBI> getProcessInstances(
-			WorkListBI workList, ConceptVersionBI concept) throws Exception {
-		Collection<WfProcessInstanceBI> instances = new ArrayList<WfProcessInstanceBI>();
-		Collection<? extends RefexVersionBI<?>> annotations = concept.getAnnotationMembersActive(concept.getViewCoordinate(), 
-				Terms.get().uuidToNative(workList.getUuid()));
-		for (RefexVersionBI loopAnnot : annotations) {
-			ConceptChronicleBI refset = ts.getConcept(loopAnnot.getRefexNid());
-			if (ts.isKindOf(refset.getConceptNid(), worklistsRoot.getConceptNid(), 
-					Terms.get().getActiveAceFrameConfig().getViewCoordinate())) {
-				WorkList wlist = TerminologyProjectDAO.getWorkList((I_GetConceptData) refset, Terms.get().getActiveAceFrameConfig());
-				if (wlist != null) {
-					instances.add(TerminologyProjectDAO.getWorkListMember(
-							(I_GetConceptData) concept, wlist, Terms.get().getActiveAceFrameConfig()).getWfInstance());
-				}
-				
-			}
-		}
-		return instances;
-	}
-
-	@Override
 	public Collection<WfProcessInstanceBI> getActiveProcessInstances(
-			WorkListBI workList, ConceptVersionBI concept) throws Exception {
+			ConceptVersionBI concept) throws Exception {
 		Collection<WfProcessInstanceBI> instances = new ArrayList<WfProcessInstanceBI>();
-		for (WfProcessInstanceBI loopInstance : getProcessInstances(workList, concept)) {
+		for (WfProcessInstanceBI loopInstance : getProcessInstances(concept)) {
 			if (loopInstance.isActive()) {
 				instances.add(loopInstance);
 			}
@@ -154,14 +172,35 @@ public class Workflow implements WorkflowBI {
 
 	@Override
 	public Collection<WfProcessInstanceBI> getIncompleteProcessInstances(
-			WorkListBI workList, ConceptVersionBI concept) throws Exception {
+			ConceptVersionBI concept) throws Exception {
 		Collection<WfProcessInstanceBI> instances = new ArrayList<WfProcessInstanceBI>();
-		for (WfProcessInstanceBI loopInstance : getProcessInstances(workList, concept)) {
+		for (WfProcessInstanceBI loopInstance : getProcessInstances(concept)) {
 			if (loopInstance.isActive() && !loopInstance.isCompleted()) {
 				instances.add(loopInstance);
 			}
 		}
 		return instances;
+	}
+
+	@Override
+	public ProjectBI createProject(String name) throws Exception {
+		return new Project(TerminologyProjectDAO.createNewTranslationProject(name, config));
+	}
+
+	@Override
+	public ProjectBI createTranslationProject(String name) throws Exception {
+		return new Project(TerminologyProjectDAO.createNewTerminologyProject(name, config));
+	}
+
+	@Override
+	public Collection<WfActivityBI> getActivities(WfProcessInstanceBI instance,
+			WfUserBI user) throws Exception {
+		WorkflowDefinition oldStyleDefinition = ((WfProcessDefinition) instance.getProcessDefinition()).getDefinition();
+		WorkflowInterpreter interpreter = WorkflowInterpreter.createWorkflowInterpreter(oldStyleDefinition);
+		
+		interpreter.getPossibleActions((WfInstance) instance, (WfUser) user);
+		
+		return null;
 	}
 
 }

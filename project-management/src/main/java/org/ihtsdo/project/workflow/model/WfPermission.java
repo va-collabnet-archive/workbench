@@ -25,7 +25,7 @@ import org.ihtsdo.project.workflow2.WfUserBI;
 /**
  * The Class WfPermission.
  */
-public class WfPermission implements Serializable, WfPermissionBI{
+public class WfPermission implements Serializable {
 	
 	/** The id. */
 	private UUID id;
@@ -107,7 +107,6 @@ public class WfPermission implements Serializable, WfPermissionBI{
 	 *
 	 * @return the role
 	 */
-	@Override
 	public WfRole getRole() {
 		return role;
 	}
@@ -121,20 +120,4 @@ public class WfPermission implements Serializable, WfPermissionBI{
 		this.role = role;
 	}
 
-	@Override
-	public WfUserBI getUser() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public UUID getHierarchyParent() {
-		return hiearchyId;
-	}
-
-	@Override
-	public UUID getProject() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }

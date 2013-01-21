@@ -76,6 +76,8 @@ public interface ProjectBI {
      */
     Collection<WfPermissionBI> getPermissions(WfUserBI user) throws Exception;
     
+    void setPermission(WfUserBI user, WfRoleBI role, UUID hierarchyUuid) throws Exception;
+    
     /** 
      * Gets permissions in this project
      * @throws Exception 
@@ -86,5 +88,7 @@ public interface ProjectBI {
      * Gets a description of the project, goals, instructions on how to edit, etc.
      */
     String getDescription();
+    
+    void createWorkList(WfProcessDefinitionBI definition, String name, Collection<WfPermissionBI> permissions) throws Exception;
     
 }

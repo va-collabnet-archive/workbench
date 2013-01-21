@@ -46,11 +46,13 @@ public interface WorkListBI {
     /** 
      * Gets the UUID of the work list
      */
-    Collection<WfProcessInstanceBI> getInstances();
+    Collection<WfProcessInstanceBI> getInstances() throws Exception;
     
     /** 
      * Gets a description of the worklist, goals, instructions on how to edit, etc.
      */
     String getDescription();
+    
+    WfProcessInstanceBI createInstanceForComponent(UUID componentUuid, WfProcessDefinitionBI definition) throws Exception;
     
 }

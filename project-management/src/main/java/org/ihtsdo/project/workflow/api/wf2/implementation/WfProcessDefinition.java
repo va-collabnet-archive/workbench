@@ -72,4 +72,18 @@ public class WfProcessDefinition implements WfProcessDefinitionBI {
 		return false;
 	}
 
+	/**
+	 * @return the definition
+	 */
+	public WorkflowDefinition getDefinition() {
+		return definition;
+	}
+
+	/**
+	 * @param definition the definition to set
+	 */
+	public void setDefinition(WorkflowDefinition definition) {
+		this.definition = definition;
+	}
+
 }

@@ -7,14 +7,20 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.ihtsdo.project.ProjectPermissionsAPI;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.WorkSet;
 import org.ihtsdo.project.workflow.api.WfComponentProvider;
+import org.ihtsdo.project.workflow.model.WfMembership;
+import org.ihtsdo.project.workflow.model.WfPermission;
+import org.ihtsdo.project.workflow.model.WfRole;
+import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow2.ProjectBI;
 import org.ihtsdo.project.workflow2.WfPermissionBI;
+import org.ihtsdo.project.workflow2.WfProcessDefinitionBI;
 import org.ihtsdo.project.workflow2.WfRoleBI;
 import org.ihtsdo.project.workflow2.WfUserBI;
 import org.ihtsdo.project.workflow2.WorkListBI;
@@ -55,6 +61,7 @@ public class Project implements ProjectBI {
 		for (WorkSet workSet : TerminologyProjectDAO.getAllWorkSetsForProject(project, Terms.get().getActiveAceFrameConfig())) {
 			workLists.addAll(TerminologyProjectDAO.getAllWorklistForWorkset(workSet, Terms.get().getActiveAceFrameConfig()));
 		}
+		//workLists.addAll(TerminologyProjectDAO.getAllNacWorkLists(project, Terms.get().getActiveAceFrameConfig()));
 		return workLists;
 	}
 
@@ -66,7 +73,7 @@ public class Project implements ProjectBI {
 		Map<I_GetConceptData, I_GetConceptData> permMap = permApi.getPermissionsForUser(Terms.get().getConcept(user.getUuid()));
 
 		for (I_GetConceptData roleConcept : permMap.keySet()) {
-			WfPermission loopPerm = new WfPermission(user, prov.roleConceptToWfRole(roleConcept), 
+			WfPermissionImpl loopPerm = new WfPermissionImpl(user, prov.roleConceptToWfRole(roleConcept), 
 					permMap.get(roleConcept).getPrimUuid(), project.getUids().iterator().next());
 			permissions.add(loopPerm);
 		}
@@ -80,11 +87,10 @@ public class Project implements ProjectBI {
 		List<WfPermissionBI> permissions = new ArrayList<WfPermissionBI>();
 		ProjectPermissionsAPI permApi = new ProjectPermissionsAPI(Terms.get().getActiveAceFrameConfig());
 
-		for (I_GetConceptData user : permApi.getUsers()) {
-			Map<I_GetConceptData, I_GetConceptData> permMap = permApi.getPermissionsForUser(Terms.get().getConcept(user.getPrimUuid()));
-
+		for (WfUser user : prov.getUsers()) {
+			Map<I_GetConceptData, I_GetConceptData> permMap = permApi.getPermissionsForUser(Terms.get().getConcept(user.getUuid()));
 			for (I_GetConceptData roleConcept : permMap.keySet()) {
-				WfPermission loopPerm = new WfPermission(prov.userConceptToWfUser(user), 
+				WfPermissionBI loopPerm = new WfPermissionImpl(user, 
 						prov.roleConceptToWfRole(roleConcept), 
 						permMap.get(roleConcept).getPrimUuid(), project.getUids().iterator().next());
 				permissions.add(loopPerm);
@@ -99,46 +105,35 @@ public class Project implements ProjectBI {
 		return "";
 	}
 
-	class WfPermission implements WfPermissionBI {
-
-		WfUserBI user;
-		WfRoleBI role;
-		UUID hierarchyParent;
-		UUID projectId;
-
-		public WfPermission(WfUserBI user, WfRoleBI role, UUID hierarchyParent, UUID projectId) {
-			this.user = user;
-			this.role = role;
-			this.hierarchyParent = hierarchyParent;
-			this.projectId = projectId;
-		}
-
-		@Override
-		public WfUserBI getUser() {
-			return user;
-		}
-
-		@Override
-		public WfRoleBI getRole() {
-			return role;
-		}
-
-		@Override
-		public UUID getHierarchyParent() {
-			return hierarchyParent;
-		}
-
-		@Override
-		public UUID getProject() {
-			return projectId;
-		}
-
-	}
-
 	@Override
 	public EditCoordinate getPromotionCoordinate() throws Exception {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void setPermission(WfUserBI user,
+			WfRoleBI role, UUID hierarchyUuid) throws Exception {
+		WfComponentProvider prov = new WfComponentProvider();
+		ProjectPermissionsAPI permApi = new ProjectPermissionsAPI(Terms.get().getActiveAceFrameConfig());
+		I_TermFactory tf = Terms.get();
+		permApi.addPermission(tf.getConcept(user.getUuid()),tf.getConcept(role.getUuid()), tf.getConcept(hierarchyUuid));
+	}
+
+	@Override
+	public void createWorkList(WfProcessDefinitionBI definition, String name,
+			Collection<WfPermissionBI> permissions) throws Exception {
+		WfProcessDefinition pdef = (WfProcessDefinition) definition;
+		ArrayList<WfMembership> oldStylePermissions = new ArrayList<WfMembership>();
+		for (WfPermissionBI loopPermission : permissions) {
+			oldStylePermissions.add(new WfMembership(UUID.randomUUID(), 
+					(WfUser) loopPermission.getUser(), 
+					(WfRole) loopPermission.getRole(), false));
+		}
+		
+		TerminologyProjectDAO.createNewNacWorkList(project, pdef.getDefinition(), oldStylePermissions, name, 
+				Terms.get().getActiveAceFrameConfig(), null);
+		
 	}
 
 }

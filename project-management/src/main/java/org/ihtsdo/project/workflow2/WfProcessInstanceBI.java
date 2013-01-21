@@ -57,9 +57,9 @@ public interface WfProcessInstanceBI {
     WorkListBI getWorkList();
     
     /** 
-     * Gets the Workflow definition used in this instance
+     * Gets the Process definition used in this instance
      */
-    WfProcessDefinitionBI getWorkflowDefinition();
+    WfProcessDefinitionBI getProcessDefinition();
     
     /** 
      * Gets the current state of this instance

@@ -36,6 +36,7 @@ import org.ihtsdo.project.workflow.api.WorkflowDefinitionManager;
 import org.ihtsdo.project.workflow.model.WfMembership;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
+import org.ihtsdo.project.workflow2.WfProcessDefinitionBI;
 import org.ihtsdo.project.workflow2.WfProcessInstanceBI;
 import org.ihtsdo.project.workflow2.WorkListBI;
 
@@ -338,14 +339,28 @@ public class WorkList extends WorkflowRefset implements Serializable, WorkListBI
 	}
 
 	@Override
-	public Collection<WfProcessInstanceBI> getInstances() {
-		// TODO Auto-generated method stub
-		return null;
+	public Collection<WfProcessInstanceBI> getInstances() throws Exception {
+		List<WfProcessInstanceBI> instances = new ArrayList<WfProcessInstanceBI>();
+		for (WorkListMember loopMember : TerminologyProjectDAO.getAllWorkListMembers(this, Terms.get().getActiveAceFrameConfig())) {
+			instances.add(loopMember.getWfInstance());
+		}
+		return instances;
 	}
 
 	@Override
 	public String getDescription() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.getName();
+	}
+
+	@Override
+	public WfProcessInstanceBI createInstanceForComponent(UUID componentUuid,
+			WfProcessDefinitionBI definition) throws Exception {
+		// Definition is ignored, managed at worklist level in legacy implementation
+		// Component is expected to be concept
+		WorkListMember newMember = TerminologyProjectDAO.addConceptAsNacWorklistMember(this, 
+				Terms.get().getConcept(componentUuid), 
+				Terms.get().getActiveAceFrameConfig());
+		
+		return newMember.getWfInstance();
 	}
 }

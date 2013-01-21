@@ -87,6 +87,9 @@ public class WorkflowInterpreter {
 	/** The actions. */
 	private List<String> actions;
 	
+	/** The automatic actions. */
+	private List<String> autoActions;
+	
 	/** The prep actions. */
 	private List<String> prepActions;
 	
@@ -158,6 +161,8 @@ public class WorkflowInterpreter {
 
 		actions = new ArrayList<String>();
 		ksession.setGlobal("actions", actions);
+		autoActions = new ArrayList<String>();
+		ksession.setGlobal("autoActions", autoActions);
 		prepActions = new ArrayList<String>();
 		ksession.setGlobal("prepActions", prepActions);
 		ksession.setGlobal("kindOfComputer", new SimpleKindOfComputer());
@@ -178,6 +183,37 @@ public class WorkflowInterpreter {
 
 		return possibleActions;
 	}
+	
+	public List<WfAction> getAutomaticActions(WfInstance instance, WfUser user) {
+		List<WfAction> automaticActions = new ArrayList<WfAction>();
+		WfComponentProvider cp=new WfComponentProvider();
+
+		//KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
+
+		actions = new ArrayList<String>();
+		ksession.setGlobal("actions", actions);
+		autoActions = new ArrayList<String>();
+		ksession.setGlobal("autoActions", autoActions);
+		prepActions = new ArrayList<String>();
+		ksession.setGlobal("prepActions", prepActions);
+		ksession.setGlobal("kindOfComputer", new SimpleKindOfComputer());
+
+		ArrayList<Object> facts = new ArrayList<Object>();
+		facts.add(instance);
+		facts.add(user);
+		facts.addAll(cp.getPermissionsForUser(user));
+		ksession.execute(facts);
+
+		for (String returnedActionName : autoActions) {
+			for (String loopActionName : wfDefinition.getActions().keySet()) {
+				if (loopActionName.equals(returnedActionName)) {
+					automaticActions.add(wfDefinition.getActions().get(loopActionName));
+				}
+			}
+		}
+
+		return automaticActions;
+	}
 
 	/**
 	 * Gets the preparation action.
@@ -194,6 +230,8 @@ public class WorkflowInterpreter {
 
 		actions = new ArrayList<String>();
 		ksession.setGlobal("actions", actions);
+		autoActions = new ArrayList<String>();
+		ksession.setGlobal("autoActions", autoActions);
 		prepActions = new ArrayList<String>();
 		ksession.setGlobal("prepActions", prepActions);
 		ksession.setGlobal("kindOfComputer", new SimpleKindOfComputer());

@@ -3595,9 +3595,11 @@ public class TerminologyProjectDAO {
 				I_GetConceptData activityStatusConcept = member.getActivityStatus();
 				promotionRefset.setDestinationAndPromotionStatus(member.getId(), assignedUserId, activityStatusConcept.getConceptNid());
 				TranslationProject transProject = (TranslationProject) getProjectForWorklist(workList, config);
-				LanguageMembershipRefset targetLanguage = new LanguageMembershipRefset(transProject.getTargetLanguageRefset(), config);
-				PromotionRefset languagePromotionRefset = targetLanguage.getPromotionRefset(config);
-				languagePromotionRefset.setPromotionStatus(member.getId(), activityStatusConcept.getConceptNid());
+				if (transProject.getTargetLanguageRefset() != null) {
+					LanguageMembershipRefset targetLanguage = new LanguageMembershipRefset(transProject.getTargetLanguageRefset(), config);
+					PromotionRefset languagePromotionRefset = targetLanguage.getPromotionRefset(config);
+					languagePromotionRefset.setPromotionStatus(member.getId(), activityStatusConcept.getConceptNid());
+				}
 			}
 		} catch (TerminologyException e1) {
 			e1.printStackTrace();

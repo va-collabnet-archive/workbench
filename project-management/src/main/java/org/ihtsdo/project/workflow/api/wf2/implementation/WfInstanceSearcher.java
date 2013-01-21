@@ -68,7 +68,7 @@ public class WfInstanceSearcher extends SwingWorker<List<WfProcessInstanceBI>, W
 		try {
 			ConceptChronicleBI concept = fetcher.fetch();
 			if (this.continueWork()) {
-				Workflow wf = new Workflow();
+				WorkflowStore wf = new WorkflowStore();
 				Collection<WfProcessInstanceBI> wfinstances = wf.getProcessInstances(concept.getVersion(config.getViewCoordinate()));
 				for (WfProcessInstanceBI wfProcessInstanceBI : wfinstances) {
 					boolean apply = true;

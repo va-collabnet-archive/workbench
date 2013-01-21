@@ -67,7 +67,7 @@ public class TestInterpreter {
 		//saveKB();
 		writeWfDefinition(getWfDefinition());
 		
-		WorkflowDefinition wfDef = readWfDefinition(new File("sampleProcesses/Workflow Canada 1.wfd"));
+		WorkflowDefinition wfDef = readWfDefinition(new File("sampleProcesses/WorkflowStore Canada 1.wfd"));
 		
 		WorkList workList = new WorkList();
 		workList.setWorkflowDefinition(wfDef);
@@ -216,7 +216,7 @@ public class TestInterpreter {
 		actions.put("Open Edit Translation Panel", new WfAction("Open Edit Translation Panel"));
 		actions.put("Open Read Only Translation Panel", new WfAction("Open Read Only Translation Panel"));
 		
-		wfdf.setName("Workflow Canada 1");
+		wfdf.setName("WorkflowStore Canada 1");
 		wfdf.setRoles(roles);
 		wfdf.setStates(states);
 		wfdf.setActions(actions);
@@ -243,7 +243,7 @@ public class TestInterpreter {
 		} catch (UnsupportedEncodingException e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
-		System.out.println("Workflow Definition saved!");
+		System.out.println("WorkflowStore Definition saved!");
 	}
 	
 	/**

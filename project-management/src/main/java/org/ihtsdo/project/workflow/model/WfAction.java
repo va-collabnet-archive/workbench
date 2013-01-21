@@ -25,7 +25,7 @@ import org.ihtsdo.project.workflow2.WfActivityBI;
 /**
  * The Class WfAction.
  */
-public class WfAction implements Serializable, WfActivityBI {
+public class WfAction implements Serializable {
 
 	public static final String SEND_TO_OUTBOX = "Send to outbox";
 	public static final String NO_ACTION = "No action";
@@ -82,7 +82,6 @@ public class WfAction implements Serializable, WfActivityBI {
 	 *
 	 * @return the name
 	 */
-	@Override
 	public String getName() {
 		return name;
 	}
@@ -155,28 +154,6 @@ public class WfAction implements Serializable, WfActivityBI {
 	 */
 	public void setBusinessProcess(File businessProcess) {
 		this.businessProcess = businessProcess;
-	}
-
-	@Override
-	public UUID getUuid() {
-		return getId();
-	}
-
-	@Override
-	public Object getExecutable() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void perform() {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public boolean isAutomatic() {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 }

@@ -326,7 +326,7 @@ COMPLETE};
 	}
 
 	@Override
-	public WfProcessDefinitionBI getWorkflowDefinition() {
+	public WfProcessDefinitionBI getProcessDefinition() {
 		// TODO Auto-generated method stub
 		return null;
 	}
