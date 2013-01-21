@@ -174,21 +174,31 @@ public class Rf2IdUuidRemapArfMojo
                 while (eachLine != null && eachLine.length() > 8) {
 
                     String[] line = eachLine.split(TAB_CHARACTER);
+                    StringBuilder sb = new StringBuilder();
                     for (int i = 0; i < line.length; i++) {
                         // 2bfc4102-f630-5fbe-96b8-625f2a6b3d5a
                         // 012345678901234567890123456789012345
-                        if (line.length == 36
+                        if (line[i].length() == 36
                                 && line[i].charAt(8) == '-'
                                 && line[i].charAt(13) == '-'
                                 && line[i].charAt(18) == '-'
                                 && line[i].charAt(23) == '-') {
                             UUID tmpUuid = uuidUuidRemapper.getUuid(line[i]);
                             if (tmpUuid != null) {
-                                line[i] = tmpUuid.toString();
+                                sb.append(tmpUuid.toString());
+                            } else {
+                                sb.append(line[i]);
                             }
+                        } else { // is not a UUID
+                            sb.append(line[i]);
+                        }
+                        if (i < line.length - 1) {
+                            sb.append(TAB_CHARACTER);
+                        } else {
+                            sb.append(LINE_TERMINATOR);
                         }
                     }
-                    bw.write(eachLine + LINE_TERMINATOR);
+                    bw.write(sb.toString());
                     eachLine = br.readLine();
                 }
 
