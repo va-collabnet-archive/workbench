@@ -13,7 +13,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -27,11 +29,17 @@ import javax.swing.SwingWorker;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.filter.WfProjectFilter;
 import org.ihtsdo.project.filter.WfWorklistFilter;
+import org.ihtsdo.project.model.WorkList;
+import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.search.WorkflowInstanceTableModel.WORKFLOW_FIELD;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WfInstanceSearcher;
+import org.ihtsdo.project.workflow.api.wf2.implementation.WorkflowStore;
 import org.ihtsdo.project.workflow2.WfFilterBI;
 
 /**
@@ -125,16 +133,34 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
 			}
 		}
 
+		WorkflowStore ws = new WorkflowStore();
+		try {
+			ws.searchWorkflow(filters);
+		} catch (Exception e2) {
+			e2.printStackTrace();
+		}
+		
 		if (!worklistOrProjectFilter) {
 			if (instanceSearchWorker != null && !instanceSearchWorker.isDone()) {
 				instanceSearchWorker.cancel(true);
 				instanceSearchWorker = null;
 			}
-			instanceSearchWorker = new WfInstanceSearcher(filters,model);
+			instanceSearchWorker = new WfInstanceSearcher(filters, model);
 			instanceSearchWorker.addPropertyChangeListener(new ProgressListener(progressBar1));
 			instanceSearchWorker.execute();
 		} else {
-
+			for (WfFilterBI filter : filters) {
+				if (filter instanceof WfWorklistFilter) {
+					try {
+						I_GetConceptData wlconcept = Terms.get().getConcept(((WfWorklistFilter) filter).getWorklistUUID());
+						WorkList worklist = TerminologyProjectDAO.getWorkList(wlconcept, config);
+						List<WorkListMember> wlmembers = TerminologyProjectDAO.getAllWorkListMembers(worklist, config);
+						//wlmembers.get(0).getWfInstance().get
+					} catch (TerminologyException | IOException e1) {
+						e1.printStackTrace();
+					}
+				}
+			}
 		}
 
 	}

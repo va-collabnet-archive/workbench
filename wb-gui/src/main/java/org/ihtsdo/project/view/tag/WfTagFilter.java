@@ -14,10 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ihtsdo.project.filter;
+package org.ihtsdo.project.view.tag;
 
-import org.ihtsdo.project.view.tag.InboxTag;
-import org.ihtsdo.project.view.tag.TagManager;
 import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow2.WfFilterBI;
 import org.ihtsdo.project.workflow2.WfProcessInstanceBI;

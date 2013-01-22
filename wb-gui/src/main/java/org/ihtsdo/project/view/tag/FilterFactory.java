@@ -14,15 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ihtsdo.project.filter;
+package org.ihtsdo.project.view.tag;
 
 import java.io.IOException;
 import java.util.UUID;
 
 import org.dwfa.ace.log.AceLog;
+import org.ihtsdo.project.filter.WfDestinationFilter;
+import org.ihtsdo.project.filter.WfStateFilter;
+import org.ihtsdo.project.filter.WfWorklistFilter;
 import org.ihtsdo.project.model.WorkList;
-import org.ihtsdo.project.view.tag.InboxTag;
-import org.ihtsdo.project.view.tag.TagManager;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow2.WfFilterBI;
