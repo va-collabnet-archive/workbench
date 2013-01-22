@@ -28,10 +28,10 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WfInstanceContainer;
-import org.ihtsdo.project.workflow2.WfProcessInstanceBI;
-import org.ihtsdo.project.workflow2.WfUserBI;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.workflow.api.WfProcessInstanceBI;
+import org.ihtsdo.tk.workflow.api.WfUserBI;
 
 public class WorkflowInstanceTableModel extends DefaultTableModel implements WfInstanceContainer {
 

@@ -26,7 +26,7 @@ import org.ihtsdo.project.filter.WfWorklistFilter;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WfUser;
-import org.ihtsdo.project.workflow2.WfFilterBI;
+import org.ihtsdo.tk.workflow.api.WfFilterBI;
 
 /**
  * A factory for creating Filter objects.

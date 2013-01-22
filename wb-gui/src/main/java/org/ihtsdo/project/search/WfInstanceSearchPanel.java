@@ -40,7 +40,7 @@ import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.search.WorkflowInstanceTableModel.WORKFLOW_FIELD;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WfInstanceSearcher;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WorkflowStore;
-import org.ihtsdo.project.workflow2.WfFilterBI;
+import org.ihtsdo.tk.workflow.api.WfFilterBI;
 
 /**
  * @author Guillermo Reynoso

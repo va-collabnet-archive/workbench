@@ -16,9 +16,8 @@
  */
 package org.ihtsdo.project.view.tag;
 
-import org.ihtsdo.project.workflow.model.WfInstance;
-import org.ihtsdo.project.workflow2.WfFilterBI;
-import org.ihtsdo.project.workflow2.WfProcessInstanceBI;
+import org.ihtsdo.tk.workflow.api.WfFilterBI;
+import org.ihtsdo.tk.workflow.api.WfProcessInstanceBI;
 
 /**
  * The Class WfTagFilter.

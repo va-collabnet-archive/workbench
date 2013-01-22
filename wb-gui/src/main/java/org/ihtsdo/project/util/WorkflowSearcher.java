@@ -47,7 +47,7 @@ import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.model.WorklistPage;
-import org.ihtsdo.project.workflow2.WfFilterBI;
+import org.ihtsdo.tk.workflow.api.WfFilterBI;
 
 /**
  * The Class WorkflowSearcher.

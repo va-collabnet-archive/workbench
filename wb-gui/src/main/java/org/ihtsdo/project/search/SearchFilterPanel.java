@@ -31,9 +31,9 @@ import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkSet;
 import org.ihtsdo.project.workflow.model.WfUser;
-import org.ihtsdo.project.workflow2.WfFilterBI;
-import org.ihtsdo.project.workflow2.WfUserBI;
-import org.ihtsdo.project.workflow2.WorkListBI;
+import org.ihtsdo.tk.workflow.api.WfFilterBI;
+import org.ihtsdo.tk.workflow.api.WfUserBI;
+import org.ihtsdo.tk.workflow.api.WorkListBI;
 
 /**
  * @author Guillermo Reynoso

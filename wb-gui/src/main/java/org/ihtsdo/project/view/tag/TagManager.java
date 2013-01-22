@@ -39,7 +39,7 @@ import org.ihtsdo.project.view.event.OutboxContentChangeEvent;
 import org.ihtsdo.project.view.event.TagRemovedEvent;
 import org.ihtsdo.project.view.event.TodoContentChangeEvent;
 import org.ihtsdo.project.workflow.model.WfInstance;
-import org.ihtsdo.project.workflow2.WfProcessInstanceBI;
+import org.ihtsdo.tk.workflow.api.WfProcessInstanceBI;
 
 /**
  * The Class TagManager.
