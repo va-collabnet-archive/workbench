@@ -181,10 +181,17 @@ public class WfComponentProvider {
 		List<WfRole> returnRoles = new ArrayList<WfRole>();
 
 		try {
-			Set<I_GetConceptData> allRoles = new HashSet<I_GetConceptData>();
-			allRoles = ProjectPermissionsAPI.getDescendants(allRoles, Terms.get().getConcept(ArchitectonicAuxiliary.Concept.TRANSLATOR_ROLE.getUids()));
+			Set<I_GetConceptData> translationRoles = new HashSet<I_GetConceptData>();
+			translationRoles = ProjectPermissionsAPI.getDescendants(translationRoles, Terms.get().getConcept(ArchitectonicAuxiliary.Concept.TRANSLATOR_ROLE.getUids()));
 
-			for (I_GetConceptData role : allRoles) {
+			for (I_GetConceptData role : translationRoles) {
+				returnRoles.add(roleConceptToWfRole(role));
+			}
+			
+			Set<I_GetConceptData> wfRoles = new HashSet<I_GetConceptData>();
+			wfRoles = ProjectPermissionsAPI.getDescendants(wfRoles, Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ROLES.getUids()));
+
+			for (I_GetConceptData role : wfRoles) {
 				returnRoles.add(roleConceptToWfRole(role));
 			}
 		} catch (TerminologyException e) {
