@@ -52,7 +52,7 @@ public interface WorkflowStoreBI {
     /** 
      * Gets all instances in the system using the filters criteria
      */
-    Collection<WfProcessInstanceBI> searchWorkflow(Collection<WfFilterBI> filters);
+    Collection<WfProcessInstanceBI> searchWorkflow(Collection<WfFilterBI> filters) throws Exception;
     
     /** 
      * Gets all users in the system
