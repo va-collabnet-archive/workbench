@@ -22,6 +22,7 @@ import org.ihtsdo.tk.api.blueprint.ConceptCB;
 import org.ihtsdo.tk.api.blueprint.DescriptionCAB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.MediaCAB;
+import org.ihtsdo.tk.api.blueprint.PathCB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RelationshipCAB;
 import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeChronicleBI;
@@ -229,4 +230,6 @@ public interface TerminologyBuilderBI {
      * @return the edit coordinate associated with this builder
      */
     EditCoordinate getEditCoordinate();
+    
+    PathBI construct(PathCB blueprint) throws IOException, InvalidCAB, ContradictionException;
 }

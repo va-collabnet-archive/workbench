@@ -37,7 +37,10 @@ rule "add if null concept in host"
 	when
 		$c: ConceptFact(getConcept() == null)
 	then 
-		actions.add(actionFactory.make(new File("plugins/arena/newconcept.bp")));
+		File f = new File("plugins/arena/newconcept.bp");
+		if(f.exists()){
+                    actions.add(actionFactory.make(f));
+		}
 end
 
 rule "panel has component"
@@ -46,5 +49,8 @@ rule "panel has component"
 	then
 		actions.add(actionFactory.make(new File("plugins/retire/retire-concept.bp")));
 		actions.add(actionFactory.make(new File("plugins/retire/move-concept.bp")));
-		actions.add(actionFactory.make(new File("plugins/arena/newconcept.bp")));
+		File f = new File("plugins/arena/newconcept.bp");
+		if(f.exists()){
+                    actions.add(actionFactory.make(f));
+		}
 end

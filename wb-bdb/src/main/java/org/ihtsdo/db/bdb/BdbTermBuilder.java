@@ -2,13 +2,16 @@ package org.ihtsdo.db.bdb;
 
 import java.beans.PropertyVetoException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.vodb.types.Path;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.RevisionSet;
@@ -28,6 +31,8 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.AnalogBI;
 import org.ihtsdo.tk.api.ComponentChronicleBI;
 import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.blueprint.ConceptAttributeAB;
 import org.ihtsdo.tk.api.blueprint.DescriptionCAB;
 
@@ -38,6 +43,7 @@ import org.ihtsdo.tk.api.blueprint.RelationshipCAB;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
 import org.ihtsdo.tk.api.blueprint.MediaCAB;
+import org.ihtsdo.tk.api.blueprint.PathCB;
 import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeChronicleBI;
 import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -710,6 +716,82 @@ public class BdbTermBuilder implements TerminologyBuilderBI {
                             p);
                 }
             }
+            
+            
         }
+    }
+    
+    @Override
+    /**
+     * Constructs a path and commits the path concept and refset member additions.
+     * 
+     */
+    public PathBI construct(PathCB blueprint) throws IOException, InvalidCAB, ContradictionException{
+        ConceptChronicleBI pathConcept = construct(blueprint.getPathBp());
+        Ts.get().addUncommitted(pathConcept);
+        Ts.get().commit(pathConcept);
+        
+        RefexChronicleBI<?> pathRefex = construct(blueprint.getPathRefsetBp());
+        ConceptChronicleBI pathRefexConcept = Ts.get().getConcept(pathRefex.getConceptNid());
+        if(pathRefexConcept.isAnnotationStyleRefex()){
+            Ts.get().addUncommitted(Ts.get().getConcept(pathRefex.getConceptNid()));
+            Ts.get().commit(Ts.get().getConcept(pathRefex.getConceptNid()));
+        }else{
+            Ts.get().addUncommitted(pathRefexConcept);
+            Ts.get().commit(pathRefexConcept);
+        }
+        
+        RefexChronicleBI<?> pathOriginRefexOther = construct(blueprint.getPathAsOriginBp());
+        ConceptChronicleBI pathOriginRefexConcept = Ts.get().getConcept(pathOriginRefexOther.getRefexNid());
+        if(pathOriginRefexConcept.isAnnotationStyleRefex()){
+            Ts.get().addUncommitted(Ts.get().getConcept(pathOriginRefexOther.getConceptNid()));
+            Ts.get().commit(Ts.get().getConcept(pathOriginRefexOther.getConceptNid()));
+        }
+        
+        RefexChronicleBI<?> pathOriginRefex = construct(blueprint.getPathOriginRefsetBp());
+        if(pathOriginRefexConcept.isAnnotationStyleRefex()){
+            Ts.get().addUncommitted(Ts.get().getConcept(pathOriginRefex.getConceptNid()));
+            Ts.get().commit(Ts.get().getConcept(pathOriginRefex.getConceptNid()));
+        }else{
+            Ts.get().addUncommitted(pathOriginRefexConcept);
+            Ts.get().commit(pathOriginRefexConcept);
+        }
+        
+        Collection<ConceptChronicleBI> originConcepts = blueprint.getOrigins();
+        Collection<PositionBI> origins = new HashSet<PositionBI>();
+        for(ConceptChronicleBI origin : originConcepts){
+            PathBI originPath = Ts.get().getPath(origin.getConceptNid());
+            PositionBI orginPosition = Ts.get().newPosition(originPath, Long.MAX_VALUE);
+            origins.add(orginPosition);
+        }
+        
+         ArrayList<PositionBI> originList = new ArrayList<PositionBI>();
+
+        if (origins != null) {
+            if (origins.size() > 1) {
+
+                // find any duplicates
+                HashMap<Integer, PositionBI> originMap = new HashMap<Integer, PositionBI>();
+
+                for (PositionBI p : origins) {
+                    if (originMap.containsKey(p.getPath().getConceptNid())) {
+                        PositionBI first = originMap.get(p.getPath().getConceptNid());
+
+                        if (first.getTime() < p.getTime()) {
+                            originMap.put(p.getPath().getConceptNid(), p);
+                        }
+                    } else {
+                        originMap.put(p.getPath().getConceptNid(), p);
+                    }
+                }
+
+                origins = originMap.values();
+            }
+
+            originList.addAll(origins);
+        }
+
+        Path newPath = new Path(pathConcept.getConceptNid(), originList);
+        return newPath;
     }
 }
