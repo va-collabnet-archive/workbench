@@ -109,7 +109,7 @@ public class TestWorkflow3 {
 		assertEquals(1,wfStore.getAllProjects().size());
 
 		// Let's get a process definition from a file in the root folder
-		WfProcessDefinitionBI wfDefinition = new WfProcessDefinition(TestXstream.readWfDefinition(new File("canada-fast-track-wf.wfd")));
+		WfProcessDefinitionBI wfDefinition = new WfProcessDefinition(TestXstream.readWfDefinition(new File("drools-rules/canada-fast-track-wf.wfd")));
 
 		assertNotNull(wfDefinition);
 
