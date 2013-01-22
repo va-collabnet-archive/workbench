@@ -126,7 +126,7 @@ public class GenerateUsersExtended extends AbstractMojo {
      */
     private File relPermissionsFile;
     /**
-     * :WAS: "${project.build.directory}/users/userConfig.txt"
+     * 
      * @parameter expression="${project.build.directory}/users"
      */
     private File defaultUserConfig;
@@ -205,31 +205,6 @@ public class GenerateUsersExtended extends AbstractMojo {
                     berkeleyDir);
 
             Bdb.setup(berkeleyDir.getAbsolutePath());
-
-            //get config properties
-
-            /*
-             * LIST OF CONFIG PROPERTIES: langSortPref, langPrefOrder,
-             * statedInferredPolicy, defaultStatus, defaultDescType,
-             * defaultRelType, defaultRelChar, defaultRelRefinability,
-             * visibleRefests, editPath, viewPath
-             */
-//            BufferedReader configReader = new BufferedReader(new FileReader(defaultUserConfig  + File.separator + "userConfig.txt"));
-//            configProps.load(configReader);
-//            langSortPref = configProps.getProperty("langSortPref");
-//            langPrefOrder = configProps.getProperty("langPrefOrder");
-//            statedInferredPolicy = configProps.getProperty("statedInferredPolicy");
-//            defaultStatus = getConceptSpecFromPrefs(configProps.getProperty("defaultStatus"));
-//            defaultDescType = getConceptSpecFromPrefs(configProps.getProperty("defaultDescType"));
-//            defaultRelChar = getConceptSpecFromPrefs(configProps.getProperty("defaultRelChar"));
-//            defaultRelType = getConceptSpecFromPrefs(configProps.getProperty("defaultRelType"));
-//            defaultRelRefinability = getConceptSpecFromPrefs(configProps.getProperty("defaultRelRefinability"));
-//            visibleRefests = configProps.getProperty("visibleRefests");
-//            projectDevelopmentPathFsn = configProps.getProperty("projectDevelopmentPathFsn");
-//            projectDevelopmentViewPathFsn = configProps.getProperty("projectDevelopmentViewPathFsn");
-//            projectDevelopmentAdjPathFsn = configProps.getProperty("projectDevelopmentAdjPathFsn");
-//            module = getConceptSpecFromPrefs(configProps.getProperty("module"));
-//            generateAdjCs = configProps.getProperty("generateAdjCs");
 
             //create user based on profile config
             BufferedReader userReader = new BufferedReader(new FileReader(usersFile));
@@ -446,119 +421,7 @@ public class GenerateUsersExtended extends AbstractMojo {
                     UUID.fromString(targetUid), 0, TkRelationshipType.STATED_ROLE);
             Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
                     config.getViewCoordinate()).constructIfNotCurrent(relCab);
-            //			old way
-            //			tf.newRelationship(UUID.randomUUID(), user, 
-            //					tf.getConcept(UUID.fromString(typeUid)), 
-            //					tf.getConcept(UUID.fromString(targetUid)), 
-            //					tf.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()), 
-            //					tf.getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()),
-            //					tf.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 
-            //					0, config);
             tf.addUncommittedNoChecks(user);
-        }
-    }
-
-    private boolean setupUser_trek145_Original(String fullname, String username, String password, String userUuid,
-            String adminUsername, String adminPassword)
-            throws MojoExecutionException {
-        try {
-            File userDir = new File(wbBundleDir, "profiles" + File.separator + username);
-            File userProfile = new File(userDir, username + ".wb");
-            create = !userProfile.exists();
-            if (create) {
-                File userQueueRoot = new File(wbBundleDir, "queues" + File.separator + username);
-
-                userConfig = newProfile(fullname, username, password, adminUsername,
-                        adminPassword);
-                userConfig.getDbConfig().setProfileFile(userProfile);
-                UUID moduleUuid = module.getLenient().getPrimUuid();
-                userConfig.setModuleNid(Ts.get().getNidForUuids(moduleUuid));
-
-                Terms.get().setActiveAceFrameConfig(userConfig);
-
-                if (username != null) {
-                    if (userConfig.getAddressesList().contains(username) == false) {
-                        userConfig.getAddressesList().add(username);
-                    }
-                }
-
-                userQueueRoot.mkdirs();
-
-                // Create new concept for user...
-                if (userUuid == null || userUuid.equals("")) {
-                    createUser();
-                } else {
-                    ConceptChronicleBI concept = Ts.get().getConcept(UUID.fromString(userUuid));
-                    setUserConcept(userUuid);
-                    addWfRelIfDoesNotExist(userUuid);
-                }
-
-
-                List<AlertToDataConstraintFailure> errorsAndWarnings = Terms.get().getCommitErrorsAndWarnings();
-
-                if (errorsAndWarnings.size() > 0) {
-                    AceLog.getAppLog().warning(errorsAndWarnings.toString());
-                    Terms.get().cancel();
-
-                    return false;
-                }
-
-                File changeSetRoot = new File(userDir, "changesets");
-                getLog().info("** Changeset root: " + changeSetRoot.getAbsolutePath());
-                changeSetRoot.mkdirs();
-
-                I_ConfigAceDb newDbProfile = userConfig.getDbConfig();
-                File absoluteChangeSetRoot = new File(wbBundleDir, "profiles/user-creation-changesets");
-
-                newDbProfile.setChangeSetRoot(changeSetRoot);
-                getLog().info("** Changeset root from db config: " + newDbProfile.getChangeSetRoot().getAbsolutePath());
-                getLog().info("** absoluteChangeSetRoot: " + absoluteChangeSetRoot.getAbsolutePath());
-                newDbProfile.setChangeSetWriterFileName(userConfig.getUsername() + "#1#"
-                        + UUID.randomUUID().toString() + ".eccs");
-                newDbProfile.setUsername(userConfig.getUsername());
-
-                String tempKey = UUID.randomUUID().toString();
-                ChangeSetGeneratorBI generator =
-                        Ts.get().createDtoChangeSetGenerator(new File(absoluteChangeSetRoot, newDbProfile.getChangeSetWriterFileName()), new File(absoluteChangeSetRoot, "#0#"
-                        + newDbProfile.getChangeSetWriterFileName()), ChangeSetGenerationPolicy.MUTABLE_ONLY);
-                List<ChangeSetGeneratorBI> extraGeneratorList = new ArrayList<>();
-
-                extraGeneratorList.add(generator);
-                Ts.get().addChangeSetGenerator(tempKey, generator);
-                try {
-                    Terms.get().commit();
-                } catch (Exception e) {
-                    throw new MojoExecutionException(e.getLocalizedMessage(), e);
-                } finally {
-                    Ts.get().removeChangeSetGenerator(tempKey);
-                }
-
-
-                // Create inbox
-                createInbox(userConfig, userConfig.getUsername() + ".inbox", userQueueRoot,
-                        userConfig.getUsername() + ".inbox");
-
-                // Create todo box
-                createInbox(userConfig, userConfig.getUsername() + ".todo", userQueueRoot,
-                        userConfig.getUsername() + ".inbox");
-
-                // Create outbox box
-                createOutbox(userConfig, userConfig.getUsername() + ".outbox", userQueueRoot,
-                        userConfig.getUsername() + ".inbox");
-
-                getLog().info("** Before write: " + userConfig.getDbConfig().getUserConcept());
-                File test = userConfig.getDbConfig().getProfileFile();
-                getLog().info("** User Profile File: " + test.getAbsolutePath());
-                FileOutputStream fos = new FileOutputStream(userConfig.getDbConfig().getProfileFile());
-                ObjectOutputStream oos = new ObjectOutputStream(fos);
-
-                oos.writeObject(userConfig.getDbConfig());
-                oos.close();
-            }
-
-            return true;
-        } catch (Exception e) {
-            throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }
     }
 
@@ -574,6 +437,8 @@ public class GenerateUsersExtended extends AbstractMojo {
                 if (userConfigList.equals("")) {
                     userConfigFile = new File(defaultUserConfig + File.separator + "userConfig.txt");
                     readUserConfigFile();
+                    userConfig = newProfile(fullname, username, password, adminUsername,
+                        adminPassword);
                 } else {
                     String[] userConfigs = userConfigList.split(",");
                     for (int i = userConfigs.length - 1; i >= 0; i--) {
@@ -768,8 +633,6 @@ public class GenerateUsersExtended extends AbstractMojo {
 
                 File userQueueRoot = new File(wbBundleDir, "queues" + File.separator + username);
 
-                userConfig = newProfile(fullname, username, password, adminUsername,
-                        adminPassword);
                 userConfig.getDbConfig().setProfileFile(userProfile);
                 UUID moduleUuid = module.getLenient().getPrimUuid();
                 userConfig.setModuleNid(Ts.get().getNidForUuids(moduleUuid));
@@ -1028,27 +891,17 @@ public class GenerateUsersExtended extends AbstractMojo {
         I_TermFactory tf = Terms.get();
 
         // Needs a concept record...
-        if (Ts.get().hasUuid(UUID.fromString("d8ebf7ea-afd7-5db8-aff0-d3028253f6bf"))) {
-            System.out.println("FOUND IT");
-        }
         ConceptCB userConceptBp = new ConceptCB(userConfig.getDbConfig().getFullName(),
                 userConfig.getUsername(),
                 LANG_CODE.EN,
                 TermAux.IS_A.getLenient().getPrimUuid(),
                 parentConcept.getPrimUuid());
-        if (Ts.get().hasUuid(UUID.fromString("d8ebf7ea-afd7-5db8-aff0-d3028253f6bf"))) {
-            System.out.println("FOUND IT");
-        }
         UUID userUuid = userConceptBp.getComponentUuid();
-        if (Ts.get().hasUuid(UUID.fromString("d8ebf7ea-afd7-5db8-aff0-d3028253f6bf"))) {
-            System.out.println("FOUND IT");
-        }
         if (Ts.get().hasUuid(userUuid)) {
             setUserConcept(userUuid.toString());
             addWfRelIfDoesNotExist(userUuid.toString());
             return Ts.get().getConcept(userUuid);
         } else {
-//                        userConceptBp.setComponentUuid(userUuid);
             // Needs a description record...
             DescriptionCAB inboxDescBp = new DescriptionCAB(userConceptBp.getComponentUuid(),
                     queueDescriptionType.getLenient().getPrimUuid(),
@@ -1200,8 +1053,13 @@ public class GenerateUsersExtended extends AbstractMojo {
         I_IntSet destRelTypes = tf.newIntSet();
         destRelTypes.add(Snomed.IS_A.getLenient().getNid());
         destRelTypes.add(TermAux.IS_A.getLenient().getNid());
+        if (destRelTypesList != null) {
+            for (ConceptSpec relTypeSpec : destRelTypesList) {
+                destRelTypes.add(relTypeSpec.getLenient().getConceptNid());
+            }
+        }
         activeConfig.setDestRelTypes(destRelTypes);
-
+        
         //set up editing defaults
         activeConfig.setDefaultImageType(tf.getConcept(TermAux.AUX_IMAGE.getLenient().getUUIDs()));
         activeConfig.setDefaultDescriptionType(tf.getConcept(defaultDescType.getLenient().getUUIDs()));
@@ -1209,6 +1067,164 @@ public class GenerateUsersExtended extends AbstractMojo {
         activeConfig.setDefaultRelationshipRefinability(tf.getConcept(defaultRelRefinability.getLenient().getUUIDs()));
         activeConfig.setDefaultRelationshipType(tf.getConcept(defaultRelType.getLenient().getUUIDs()));
         activeConfig.setDefaultStatus(tf.getConcept(defaultStatus.getLenient().getUUIDs()));
+        
+        //set up refset defaults for editing
+        I_HoldRefsetPreferences attribRefsetPref = activeConfig.getRefsetPreferencesForToggle(TOGGLES.ATTRIBUTES);
+        I_RefsetDefaultsTemplate templatePreferences = attribRefsetPref.getTemplatePreferences();
+
+        I_RefsetDefaultsBoolean booleanPreferences = attribRefsetPref.getBooleanPreferences();
+        I_IntList booleanPopupIds = booleanPreferences.getRefsetPopupIds();
+        booleanPopupIds.clear();
+        if (!cBooleanRefsets.isEmpty()) {
+            booleanPreferences.setDefaultRefset((I_GetConceptData) cBooleanRefsets.get(0).getLenient());
+            booleanPreferences.setDefaultStatusForRefset((I_GetConceptData) refsetStatus.getLenient());
+            for (ConceptSpec spec : cBooleanRefsets) {
+                booleanPopupIds.add(spec.getLenient().getConceptNid());
+            }
+        }
+        
+        I_RefsetDefaultsConcept conceptPreferences = attribRefsetPref.getConceptPreferences();
+        I_IntList conceptPopupIds = conceptPreferences.getRefsetPopupIds();
+        conceptPopupIds.clear();
+        if (!cConceptRefsets.isEmpty()) {
+            conceptPreferences.setDefaultRefset((I_GetConceptData) cConceptRefsets.get(0).getLenient());
+            conceptPreferences.setDefaultStatusForRefset((I_GetConceptData) refsetStatus.getLenient());
+            for (ConceptSpec spec : cConceptRefsets) {
+                conceptPopupIds.add(spec.getLenient().getConceptNid());
+            }
+        }
+        I_IntList conceptStatusPopupIds = conceptPreferences.getStatusPopupIds();
+        conceptStatusPopupIds.clear();
+        for (ConceptSpec spec : cConceptRefsetStatus) {
+            conceptStatusPopupIds.add(spec.getLenient().getNid());
+        }
+        I_IntList conceptConceptPopupIds = conceptPreferences.getConceptPopupIds();
+        conceptConceptPopupIds.clear();
+        for (ConceptSpec spec : cConceptRefsetConTypes) {
+            conceptConceptPopupIds.add(spec.getLenient().getNid());
+        }
+
+        I_RefsetDefaultsInteger integerPreferences = attribRefsetPref.getIntegerPreferences();
+        I_IntList integerPopupIds = integerPreferences.getRefsetPopupIds();
+        integerPopupIds.clear();
+        if (!cIntegerRefsets.isEmpty()) {
+            integerPreferences.setDefaultRefset((I_GetConceptData) cIntegerRefsets.get(0).getLenient());
+            integerPreferences.setDefaultStatusForRefset((I_GetConceptData) refsetStatus.getLenient());
+            for (ConceptSpec spec : cIntegerRefsets) {
+                integerPopupIds.add(spec.getLenient().getConceptNid());
+            }
+        }
+
+        I_RefsetDefaultsConInt conIntPreferences = attribRefsetPref.getConIntPreferences();
+        I_IntList conIntPopupIds = conIntPreferences.getRefsetPopupIds();
+        conIntPopupIds.clear();
+        if (!cConIntRefsets.isEmpty()) {
+            conIntPreferences.setDefaultRefset((I_GetConceptData) cConIntRefsets.get(0).getLenient());
+            conIntPreferences.setDefaultStatusForRefset((I_GetConceptData) refsetStatus.getLenient());
+            for (ConceptSpec spec : cConIntRefsets) {
+                conIntPopupIds.add(spec.getLenient().getConceptNid());
+            }
+        }
+
+        I_RefsetDefaultsString stringPreferences = attribRefsetPref.getStringPreferences();
+        I_IntList stringPopupIds = stringPreferences.getRefsetPopupIds();
+        stringPopupIds.clear();
+        if (!cStringRefsets.isEmpty()) {
+            stringPreferences.setDefaultRefset((I_GetConceptData) cStringRefsets.get(0).getLenient());
+            stringPreferences.setDefaultStatusForRefset((I_GetConceptData) refsetStatus.getLenient());
+            for (ConceptSpec spec : cStringRefsets) {
+                stringPopupIds.add(spec.getLenient().getConceptNid());
+            }
+        }
+
+        I_RefsetsDefaultsConConCon conConConPreferences = attribRefsetPref.getCidCidCidPreferences();
+        I_IntList conConConPopupIds = conConConPreferences.getRefsetPopupIds();
+        conConConPopupIds.clear();
+        if (!cConConConRefsets.isEmpty()) {
+            conConConPreferences.setDefaultRefset((I_GetConceptData) cConConConRefsets.get(0).getLenient());
+            conConConPreferences.setDefaultStatusForRefset((I_GetConceptData) refsetStatus.getLenient());
+            for (ConceptSpec spec : cConConConRefsets) {
+                conConConPopupIds.add(spec.getLenient().getConceptNid());
+            }
+        }
+
+        I_HoldRefsetPreferences descRefsetPref = activeConfig.getRefsetPreferencesForToggle(TOGGLES.DESCRIPTIONS);
+
+        I_RefsetDefaultsBoolean booleanPreferencesDesc = descRefsetPref.getBooleanPreferences();
+        I_IntList booleanPopupIdsDesc = booleanPreferencesDesc.getRefsetPopupIds();
+        booleanPopupIdsDesc.clear();
+        if (!dBooleanRefsets.isEmpty()) {
+            booleanPreferencesDesc.setDefaultRefset((I_GetConceptData) dBooleanRefsets.get(0).getLenient());
+            booleanPreferencesDesc.setDefaultStatusForRefset((I_GetConceptData) refsetStatus.getLenient());
+            for (ConceptSpec spec : dBooleanRefsets) {
+                booleanPopupIdsDesc.add(spec.getLenient().getConceptNid());
+            }
+        }
+
+        I_RefsetDefaultsConcept conceptPreferencesDesc = descRefsetPref.getConceptPreferences();
+        I_IntList conceptPopupIdsDesc = conceptPreferencesDesc.getRefsetPopupIds();
+        conceptPopupIdsDesc.clear();
+        if (!dConceptRefsets.isEmpty()) {
+            conceptPreferencesDesc.setDefaultRefset((I_GetConceptData) dConceptRefsets.get(0).getLenient());
+            conceptPreferencesDesc.setDefaultStatusForRefset((I_GetConceptData) refsetStatus.getLenient());
+            for (ConceptSpec spec : dConceptRefsets) {
+                conceptPopupIdsDesc.add(spec.getLenient().getConceptNid());
+            }
+        }
+        I_IntList descStatusPopupIds = conceptPreferencesDesc.getStatusPopupIds();
+        descStatusPopupIds.clear();
+        for (ConceptSpec spec : dConceptRefsetStatus) {
+            descStatusPopupIds.add(spec.getLenient().getNid());
+        }
+        I_IntList descConceptPopupIds = conceptPreferencesDesc.getConceptPopupIds();
+        descConceptPopupIds.clear();
+        for (ConceptSpec spec : dConceptRefsetConTypes) {
+            descConceptPopupIds.add(spec.getLenient().getNid());
+        }
+
+        I_RefsetDefaultsInteger integerPreferencesDesc = descRefsetPref.getIntegerPreferences();
+        I_IntList integerPopupIdsDesc = integerPreferencesDesc.getRefsetPopupIds();
+        integerPopupIdsDesc.clear();
+        if (!dIntegerRefsets.isEmpty()) {
+            integerPreferencesDesc.setDefaultRefset((I_GetConceptData) dIntegerRefsets.get(0).getLenient());
+            integerPreferencesDesc.setDefaultStatusForRefset((I_GetConceptData) refsetStatus.getLenient());
+            for (ConceptSpec spec : dIntegerRefsets) {
+                integerPopupIdsDesc.add(spec.getLenient().getConceptNid());
+            }
+        }
+
+        I_RefsetDefaultsConInt conIntPreferencesDesc = descRefsetPref.getConIntPreferences();
+        I_IntList conIntPopupIdsDesc = conIntPreferencesDesc.getRefsetPopupIds();
+        conIntPopupIdsDesc.clear();
+        if (!dConIntRefsets.isEmpty()) {
+            conIntPreferencesDesc.setDefaultRefset((I_GetConceptData) dConIntRefsets.get(0).getLenient());
+            conIntPreferencesDesc.setDefaultStatusForRefset((I_GetConceptData) refsetStatus.getLenient());
+            for (ConceptSpec spec : dConIntRefsets) {
+                conIntPopupIdsDesc.add(spec.getLenient().getConceptNid());
+            }
+        }
+
+        I_RefsetDefaultsString stringPreferencesDesc = descRefsetPref.getStringPreferences();
+        I_IntList stringPopupIdsDesc = stringPreferencesDesc.getRefsetPopupIds();
+        stringPopupIdsDesc.clear();
+        if (!dStringRefsets.isEmpty()) {
+            stringPreferencesDesc.setDefaultRefset((I_GetConceptData) dStringRefsets.get(0).getLenient());
+            stringPreferencesDesc.setDefaultStatusForRefset((I_GetConceptData) refsetStatus.getLenient());
+            for (ConceptSpec spec : dStringRefsets) {
+                stringPopupIdsDesc.add(spec.getLenient().getConceptNid());
+            }
+        }
+
+        I_RefsetsDefaultsConConCon conConConPreferencesDesc = descRefsetPref.getCidCidCidPreferences();
+        I_IntList conConConPopupIdsDesc = conConConPreferencesDesc.getRefsetPopupIds();
+        conConConPopupIdsDesc.clear();
+        if (!dConConConRefsets.isEmpty()) {
+            conConConPreferencesDesc.setDefaultRefset((I_GetConceptData) dConConConRefsets.get(0).getLenient());
+            conConConPreferencesDesc.setDefaultStatusForRefset((I_GetConceptData) refsetStatus.getLenient());
+            for (ConceptSpec spec : dConConConRefsets) {
+                conConConPopupIdsDesc.add(spec.getLenient().getConceptNid());
+            }
+        }
 
         //set up label display prefs
         I_IntList treeDescPrefList = activeConfig.getTreeDescPreferenceList();
@@ -1397,6 +1413,12 @@ public class GenerateUsersExtended extends AbstractMojo {
             }
         }
         userConfig.setRoots(roots);
+        
+        //set up allowed statuses
+        I_IntSet allowedStatus = tf.newIntSet();
+        allowedStatus.add(SnomedMetadataRf1.CURRENT_RF1.getLenient().getNid());
+        allowedStatus.add(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
+        userConfig.setAllowedStatus(allowedStatus);
 
         //set up parent relationship rel types (view->taxonomy)
         I_IntSet destRelTypes = tf.newIntSet();
@@ -1504,9 +1526,6 @@ public class GenerateUsersExtended extends AbstractMojo {
         I_RefsetDefaultsConcept conceptPreferencesDesc = descRefsetPref.getConceptPreferences();
         I_IntList conceptPopupIdsDesc = conceptPreferencesDesc.getRefsetPopupIds();
         if (!dConceptRefsets.isEmpty()) {
-            if (conceptPopupIdsDesc.get(0) == Taxonomies.REFSET_AUX.getLenient().getConceptNid()) {
-                conceptPopupIdsDesc.remove(0);
-            }
             conceptPreferencesDesc.setDefaultRefset((I_GetConceptData) dConceptRefsets.get(0).getLenient());
             conceptPreferencesDesc.setDefaultStatusForRefset((I_GetConceptData) refsetStatus.getLenient());
             for (ConceptSpec spec : dConceptRefsets) {
