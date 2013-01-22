@@ -16,7 +16,6 @@
  */
 package org.ihtsdo.project.refset.partition;
 
-import java.io.IOException;
 import java.io.Serializable;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -25,7 +24,6 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.tapi.TerminologyException;
 
 /**
  * The Class IsDescendantOfPartitioner.

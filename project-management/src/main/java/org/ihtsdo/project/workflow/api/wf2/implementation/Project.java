@@ -15,17 +15,16 @@ import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.WorkSet;
 import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.model.WfMembership;
-import org.ihtsdo.project.workflow.model.WfPermission;
 import org.ihtsdo.project.workflow.model.WfRole;
 import org.ihtsdo.project.workflow.model.WfUser;
-import org.ihtsdo.project.workflow2.ProjectBI;
-import org.ihtsdo.project.workflow2.WfPermissionBI;
-import org.ihtsdo.project.workflow2.WfProcessDefinitionBI;
-import org.ihtsdo.project.workflow2.WfRoleBI;
-import org.ihtsdo.project.workflow2.WfUserBI;
-import org.ihtsdo.project.workflow2.WorkListBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.workflow.api.ProjectBI;
+import org.ihtsdo.tk.workflow.api.WfPermissionBI;
+import org.ihtsdo.tk.workflow.api.WfProcessDefinitionBI;
+import org.ihtsdo.tk.workflow.api.WfRoleBI;
+import org.ihtsdo.tk.workflow.api.WfUserBI;
+import org.ihtsdo.tk.workflow.api.WorkListBI;
 
 public class Project implements ProjectBI {
 

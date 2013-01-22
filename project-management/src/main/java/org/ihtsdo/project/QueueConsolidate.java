@@ -19,9 +19,7 @@ package org.ihtsdo.project;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.security.PrivilegedActionException;
-import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 
 import net.jini.core.entry.Entry;
 import net.jini.core.lease.LeaseDeniedException;
@@ -35,10 +33,8 @@ import net.jini.core.transaction.UnknownTransactionException;
 import net.jini.lookup.ServiceItemFilter;
 import net.jini.lookup.entry.Name;
 
-import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.ace.select.Selector;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_QueueProcesses;
@@ -48,8 +44,6 @@ import org.dwfa.bpa.process.NoMatchingEntryException;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.queue.SelectAll;
 import org.ihtsdo.project.model.WorkListMember;
-import org.ihtsdo.tk.api.ContradictionManagerBI;
-import org.ihtsdo.tk.api.Precedence;
 
 /**
  * The Class QueueConsolidate.

@@ -24,11 +24,11 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
-import org.dwfa.ace.log.AceLog;
 
 /**
  * The Class WorkflowDefinitionManager.

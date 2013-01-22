@@ -20,8 +20,6 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.UUID;
 
-import org.ihtsdo.project.workflow2.WfActivityBI;
-
 /**
  * The Class WfAction.
  */

@@ -36,9 +36,9 @@ import org.ihtsdo.project.workflow.api.WorkflowDefinitionManager;
 import org.ihtsdo.project.workflow.model.WfMembership;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
-import org.ihtsdo.project.workflow2.WfProcessDefinitionBI;
-import org.ihtsdo.project.workflow2.WfProcessInstanceBI;
-import org.ihtsdo.project.workflow2.WorkListBI;
+import org.ihtsdo.tk.workflow.api.WfProcessDefinitionBI;
+import org.ihtsdo.tk.workflow.api.WfProcessInstanceBI;
+import org.ihtsdo.tk.workflow.api.WorkListBI;
 
 /**
  * The Class WorkList.

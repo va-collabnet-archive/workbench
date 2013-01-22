@@ -34,15 +34,13 @@ import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WfProcessDefinition;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WorkflowStore;
-import org.ihtsdo.project.workflow2.WfActivityBI;
-import org.ihtsdo.project.workflow2.WfActivityInstanceBI;
-import org.ihtsdo.project.workflow2.WfProcessDefinitionBI;
-import org.ihtsdo.project.workflow2.WfProcessInstanceBI;
-import org.ihtsdo.project.workflow2.WfRoleBI;
-import org.ihtsdo.project.workflow2.WfStateBI;
-import org.ihtsdo.project.workflow2.WfUserBI;
-import org.ihtsdo.project.workflow2.WorkflowStoreBI;
-import org.ihtsdo.tk.api.ComponentVersionBI;
+import org.ihtsdo.tk.workflow.api.WfActivityBI;
+import org.ihtsdo.tk.workflow.api.WfActivityInstanceBI;
+import org.ihtsdo.tk.workflow.api.WfProcessDefinitionBI;
+import org.ihtsdo.tk.workflow.api.WfProcessInstanceBI;
+import org.ihtsdo.tk.workflow.api.WfStateBI;
+import org.ihtsdo.tk.workflow.api.WfUserBI;
+import org.ihtsdo.tk.workflow.api.WorkflowStoreBI;
 
 /**
  * The Class WfInstance.

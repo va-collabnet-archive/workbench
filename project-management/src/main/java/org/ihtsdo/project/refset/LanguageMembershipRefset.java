@@ -30,7 +30,6 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.project.TerminologyProjectDAO;
 
 /**
  * The Class LanguageMembershipRefset.

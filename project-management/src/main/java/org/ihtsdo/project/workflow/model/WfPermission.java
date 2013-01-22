@@ -19,9 +19,6 @@ package org.ihtsdo.project.workflow.model;
 import java.io.Serializable;
 import java.util.UUID;
 
-import org.ihtsdo.project.workflow2.WfPermissionBI;
-import org.ihtsdo.project.workflow2.WfUserBI;
-
 /**
  * The Class WfPermission.
  */

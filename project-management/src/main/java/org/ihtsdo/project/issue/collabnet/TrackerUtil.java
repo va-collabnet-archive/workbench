@@ -18,9 +18,9 @@ package org.ihtsdo.project.issue.collabnet;
 
 
 import java.rmi.RemoteException;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 
 import org.dwfa.ace.log.AceLog;
@@ -30,10 +30,10 @@ import com.collabnet.ce.soap50.types.SoapFilter;
 import com.collabnet.ce.soap50.types.SoapSortKey;
 import com.collabnet.ce.soap50.webservices.ClientSoapStubFactory;
 import com.collabnet.ce.soap50.webservices.tracker.ArtifactDetailSoapRow;
-import com.collabnet.ce.soap50.webservices.tracker.ITrackerAppSoap;
-import com.collabnet.ce.soap50.webservices.tracker.ArtifactSoapRow;
-import com.collabnet.ce.soap50.webservices.tracker.ArtifactSoapList;
 import com.collabnet.ce.soap50.webservices.tracker.ArtifactSoapDO;
+import com.collabnet.ce.soap50.webservices.tracker.ArtifactSoapList;
+import com.collabnet.ce.soap50.webservices.tracker.ArtifactSoapRow;
+import com.collabnet.ce.soap50.webservices.tracker.ITrackerAppSoap;
 import com.collabnet.ce.soap50.webservices.tracker.TrackerSoapDO;
 
 

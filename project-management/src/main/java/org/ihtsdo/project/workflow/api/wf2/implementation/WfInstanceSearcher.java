@@ -9,13 +9,13 @@ import javax.swing.SwingWorker;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.Terms;
-import org.ihtsdo.project.workflow2.WfFilterBI;
-import org.ihtsdo.project.workflow2.WfProcessInstanceBI;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.workflow.api.WfFilterBI;
+import org.ihtsdo.tk.workflow.api.WfProcessInstanceBI;
 
 public class WfInstanceSearcher extends SwingWorker<List<WfProcessInstanceBI>, WfProcessInstanceBI> implements ProcessUnfetchedConceptDataBI {
 

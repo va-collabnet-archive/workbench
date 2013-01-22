@@ -19,7 +19,7 @@ package org.ihtsdo.project.workflow.model;
 import java.io.Serializable;
 import java.util.UUID;
 
-import org.ihtsdo.project.workflow2.WfRoleBI;
+import org.ihtsdo.tk.workflow.api.WfRoleBI;
 
 /**
  * The Class WfRole.

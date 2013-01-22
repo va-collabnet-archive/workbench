@@ -18,15 +18,8 @@ package org.ihtsdo.project.workflow.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-
-import org.ihtsdo.project.workflow2.WfActivityBI;
-import org.ihtsdo.project.workflow2.WfProcessDefinitionBI;
-import org.ihtsdo.project.workflow2.WfRoleBI;
-import org.ihtsdo.project.workflow2.WfStateBI;
 
 
 /**

@@ -17,18 +17,12 @@
 package org.ihtsdo.project.refset;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.PositionBI;
-import org.ihtsdo.tk.api.RelAssertionType;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
  * The Class ReleaseUtils.

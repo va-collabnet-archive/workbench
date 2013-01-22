@@ -30,20 +30,20 @@ import org.ihtsdo.project.workflow.model.WfAction;
 import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
-import org.ihtsdo.project.workflow2.ProjectBI;
-import org.ihtsdo.project.workflow2.WfActivityBI;
-import org.ihtsdo.project.workflow2.WfFilterBI;
-import org.ihtsdo.project.workflow2.WfProcessDefinitionBI;
-import org.ihtsdo.project.workflow2.WfProcessInstanceBI;
-import org.ihtsdo.project.workflow2.WfRoleBI;
-import org.ihtsdo.project.workflow2.WfStateBI;
-import org.ihtsdo.project.workflow2.WfUserBI;
-import org.ihtsdo.project.workflow2.WorkListBI;
-import org.ihtsdo.project.workflow2.WorkflowStoreBI;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.workflow.api.ProjectBI;
+import org.ihtsdo.tk.workflow.api.WfActivityBI;
+import org.ihtsdo.tk.workflow.api.WfFilterBI;
+import org.ihtsdo.tk.workflow.api.WfProcessDefinitionBI;
+import org.ihtsdo.tk.workflow.api.WfProcessInstanceBI;
+import org.ihtsdo.tk.workflow.api.WfRoleBI;
+import org.ihtsdo.tk.workflow.api.WfStateBI;
+import org.ihtsdo.tk.workflow.api.WfUserBI;
+import org.ihtsdo.tk.workflow.api.WorkListBI;
+import org.ihtsdo.tk.workflow.api.WorkflowStoreBI;
 
 public class WorkflowStore implements WorkflowStoreBI {
 
@@ -295,7 +295,7 @@ public class WorkflowStore implements WorkflowStoreBI {
 	}
 	
 	@Override
-	public WorkListBI getWorklist(UUID worklistUuid) throws TerminologyException, IOException {
+	public WorkListBI getWorklist(UUID worklistUuid) throws Exception {
 		return TerminologyProjectDAO.getWorkList(Terms.get().getConcept(worklistUuid), config);
 	}
 

@@ -7,10 +7,10 @@ import java.util.UUID;
 
 import org.ihtsdo.project.workflow.model.WfAction;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
-import org.ihtsdo.project.workflow2.WfActivityBI;
-import org.ihtsdo.project.workflow2.WfProcessDefinitionBI;
-import org.ihtsdo.project.workflow2.WfRoleBI;
-import org.ihtsdo.project.workflow2.WfStateBI;
+import org.ihtsdo.tk.workflow.api.WfActivityBI;
+import org.ihtsdo.tk.workflow.api.WfProcessDefinitionBI;
+import org.ihtsdo.tk.workflow.api.WfRoleBI;
+import org.ihtsdo.tk.workflow.api.WfStateBI;
 
 public class WfProcessDefinition implements WfProcessDefinitionBI {
 	

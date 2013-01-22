@@ -2,9 +2,9 @@ package org.ihtsdo.project.workflow.api.wf2.implementation;
 
 import java.util.UUID;
 
-import org.ihtsdo.project.workflow2.WfPermissionBI;
-import org.ihtsdo.project.workflow2.WfRoleBI;
-import org.ihtsdo.project.workflow2.WfUserBI;
+import org.ihtsdo.tk.workflow.api.WfPermissionBI;
+import org.ihtsdo.tk.workflow.api.WfRoleBI;
+import org.ihtsdo.tk.workflow.api.WfUserBI;
 
 public class WfPermissionImpl implements WfPermissionBI {
 

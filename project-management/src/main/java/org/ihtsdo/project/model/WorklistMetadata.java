@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.ihtsdo.project.workflow.model.WfMembership;
-import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 
 /**
  * The Class WorklistMetadata.

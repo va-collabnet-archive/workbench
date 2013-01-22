@@ -16,10 +16,7 @@
  */
 package org.ihtsdo.project;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.dwfa.ace.api.I_ShowActivity;
-import org.dwfa.tapi.ComputationCanceled;
 import org.ihtsdo.helper.time.TimeHelper;
 
 /**

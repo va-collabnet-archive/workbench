@@ -22,10 +22,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-import org.ihtsdo.project.workflow2.ProjectBI;
-import org.ihtsdo.project.workflow2.WfPermissionBI;
-import org.ihtsdo.project.workflow2.WfRoleBI;
-import org.ihtsdo.project.workflow2.WfUserBI;
+import org.ihtsdo.tk.workflow.api.ProjectBI;
+import org.ihtsdo.tk.workflow.api.WfPermissionBI;
+import org.ihtsdo.tk.workflow.api.WfUserBI;
 
 /**
  * The Class WfUser.

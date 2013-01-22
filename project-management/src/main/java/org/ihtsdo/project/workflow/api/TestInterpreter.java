@@ -39,6 +39,7 @@ import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
 import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
+import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.workflow.model.WfAction;
 import org.ihtsdo.project.workflow.model.WfInstance;
@@ -51,7 +52,6 @@ import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
-import org.dwfa.ace.log.AceLog;
 
 /**
  * The Class TestInterpreter.

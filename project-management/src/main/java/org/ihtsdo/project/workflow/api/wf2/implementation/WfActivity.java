@@ -4,9 +4,8 @@ import java.util.UUID;
 
 import org.ihtsdo.project.workflow.model.WfAction;
 import org.ihtsdo.project.workflow.model.WfInstance;
-import org.ihtsdo.project.workflow.model.WfState;
-import org.ihtsdo.project.workflow2.WfActivityBI;
-import org.ihtsdo.project.workflow2.WfProcessInstanceBI;
+import org.ihtsdo.tk.workflow.api.WfActivityBI;
+import org.ihtsdo.tk.workflow.api.WfProcessInstanceBI;
 
 public class WfActivity implements WfActivityBI {
 	

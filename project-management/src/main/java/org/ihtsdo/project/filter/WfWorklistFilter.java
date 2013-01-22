@@ -18,8 +18,8 @@ package org.ihtsdo.project.filter;
 
 import java.util.UUID;
 
-import org.ihtsdo.project.workflow2.WfFilterBI;
-import org.ihtsdo.project.workflow2.WfProcessInstanceBI;
+import org.ihtsdo.tk.workflow.api.WfFilterBI;
+import org.ihtsdo.tk.workflow.api.WfProcessInstanceBI;
 
 /**
  * The Class WfWorklistFilter.

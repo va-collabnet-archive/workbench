@@ -18,16 +18,10 @@ package org.ihtsdo.project.issue.collabnet;
 
 
 import java.rmi.RemoteException;
-import java.util.logging.Level;
-
-import org.dwfa.ace.log.AceLog;
 
 import com.collabnet.ce.soap50.webservices.ClientSoapStubFactory;
-import com.collabnet.ce.soap50.webservices.scm.*;
 import com.collabnet.ce.soap50.webservices.cemain.CommentSoapList;
 import com.collabnet.ce.soap50.webservices.cemain.ICollabNetSoap;
-import com.collabnet.ce.soap50.webservices.cemain.ProjectMemberSoapList;
-import com.collabnet.ce.soap50.webservices.cemain.ProjectMemberSoapRow;
 
 
 

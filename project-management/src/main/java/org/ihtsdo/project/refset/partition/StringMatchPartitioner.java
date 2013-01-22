@@ -16,15 +16,11 @@
  */
 package org.ihtsdo.project.refset.partition;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.util.List;
 import java.util.regex.Pattern;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_IntSet;
 
 /**
  * The Class StringMatchPartitioner.
