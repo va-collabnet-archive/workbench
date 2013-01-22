@@ -43,7 +43,6 @@ import org.ihtsdo.project.workflow2.WorkflowStoreBI;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 
 public class WorkflowStore implements WorkflowStoreBI {
@@ -107,7 +106,7 @@ public class WorkflowStore implements WorkflowStoreBI {
 	}
 
 	@Override
-	public Collection<WfProcessInstanceBI> searchWorkflow(Collection<WfFilterBI> filters) throws Exception {
+	public  Collection<WfProcessInstanceBI> searchWorkflow(Collection<WfFilterBI> filters) throws Exception {
 		boolean worklistOrProjectFilter = isProjectFilter(filters);
 		Collection<WfProcessInstanceBI> result = new ArrayList<WfProcessInstanceBI>();
 		if (!worklistOrProjectFilter) {
@@ -294,5 +293,14 @@ public class WorkflowStore implements WorkflowStoreBI {
 		
 		return activities;
 	}
+	
+	@Override
+	public WorkListBI getWorklist(UUID worklistUuid) throws TerminologyException, IOException {
+		return TerminologyProjectDAO.getWorkList(Terms.get().getConcept(worklistUuid), config);
+	}
 
+	@Override
+	public ProjectBI getProject(UUID projectUuid) throws Exception {
+		return new Project(TerminologyProjectDAO.getTranslationProject(Terms.get().getConcept(projectUuid), config));
+	}
 }

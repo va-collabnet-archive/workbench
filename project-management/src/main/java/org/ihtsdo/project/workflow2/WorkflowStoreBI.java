@@ -15,8 +15,11 @@
  */
 package org.ihtsdo.project.workflow2;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.UUID;
+
+import org.dwfa.tapi.TerminologyException;
 
 /**
  * A class that handles all workflow operations
@@ -51,8 +54,9 @@ public interface WorkflowStoreBI {
     
     /** 
      * Gets all instances in the system using the filters criteria
+     * @throws Exception 
      */
-    Collection<WfProcessInstanceBI> searchWorkflow(Collection<WfFilterBI> filters);
+    Collection<WfProcessInstanceBI> searchWorkflow(Collection<WfFilterBI> filters) throws Exception;
     
     /** 
      * Gets all users in the system
@@ -90,5 +94,9 @@ public interface WorkflowStoreBI {
     ProjectBI createTranslationProject(String name) throws Exception;
     
     Collection<WfActivityBI> getActivities(WfProcessInstanceBI instance, WfUserBI user) throws Exception;
+
+	WorkListBI getWorklist(UUID worklistUuid) throws TerminologyException, IOException;
+
+	ProjectBI getProject(UUID projectUuid) throws Exception;
     
 }
