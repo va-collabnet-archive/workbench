@@ -17,7 +17,6 @@
 package org.ihtsdo.translation.ui.inbox.event;
 
 import org.ihtsdo.project.view.event.GenericEvent;
-import org.ihtsdo.project.view.event.GenericEvent.EventType;
 
 /**
  * The Class InboxItemSelectedEvent.

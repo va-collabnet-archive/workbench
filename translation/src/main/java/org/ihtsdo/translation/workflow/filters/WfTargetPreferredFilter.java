@@ -27,15 +27,13 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.ContextualizedDescription;
 import org.ihtsdo.project.I_ContextualizeDescription;
 import org.ihtsdo.project.TerminologyProjectDAO;
-import org.ihtsdo.project.filter.WfSearchFilterBI;
 import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
-import org.ihtsdo.project.workflow.model.WfInstance;
-import org.ihtsdo.project.workflow2.WfFilterBI;
-import org.ihtsdo.project.workflow2.WfProcessInstanceBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.spec.ValidationException;
+import org.ihtsdo.tk.workflow.api.WfFilterBI;
+import org.ihtsdo.tk.workflow.api.WfProcessInstanceBI;
 import org.ihtsdo.translation.LanguageUtil;
 
 /**

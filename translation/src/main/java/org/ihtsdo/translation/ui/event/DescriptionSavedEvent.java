@@ -20,7 +20,6 @@ import java.util.UUID;
 
 import org.ihtsdo.project.ContextualizedDescription;
 import org.ihtsdo.project.view.event.GenericEvent;
-import org.ihtsdo.project.view.event.GenericEvent.EventType;
 
 /**
  * The Class EmptyInboxItemSelectedEvent.

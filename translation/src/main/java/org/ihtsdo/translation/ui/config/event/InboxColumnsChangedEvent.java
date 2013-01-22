@@ -19,7 +19,6 @@ package org.ihtsdo.translation.ui.config.event;
 import java.util.LinkedHashSet;
 
 import org.ihtsdo.project.view.event.GenericEvent;
-import org.ihtsdo.project.view.event.GenericEvent.EventType;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.InboxColumn;
 
 /**

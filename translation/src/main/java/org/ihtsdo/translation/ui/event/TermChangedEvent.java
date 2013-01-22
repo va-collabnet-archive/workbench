@@ -19,7 +19,6 @@ package org.ihtsdo.translation.ui.event;
 import java.util.Set;
 
 import org.ihtsdo.project.view.event.GenericEvent;
-import org.ihtsdo.project.view.event.GenericEvent.EventType;
 
 /**
  * The Class EmptyInboxItemSelectedEvent.
