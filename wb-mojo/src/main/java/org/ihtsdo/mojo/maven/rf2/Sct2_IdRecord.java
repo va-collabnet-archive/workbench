@@ -18,8 +18,10 @@ package org.ihtsdo.mojo.maven.rf2;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
@@ -86,6 +88,16 @@ public class Sct2_IdRecord implements Serializable {
         try (ObjectOutputStream oos = new ObjectOutputStream(
                         new BufferedOutputStream(
                         new FileOutputStream(idCacheOutputPathFnameStr)))) {
+            // open searchable text file
+            File txtFile = new File(idCacheOutputPathFnameStr + ".txt");
+            BufferedWriter bw = new BufferedWriter(new FileWriter(txtFile));
+            bw.append("SCT");
+            bw.append(TAB_CHARACTER);
+            bw.append("COMPUTED");
+            bw.append(TAB_CHARACTER);
+            bw.append("ASSIGNED");
+            bw.append(LINE_TERMINATOR);
+            
             int IDENTIFIER_SCHEME_ID = 0;
             int ALTERNATE_IDENTIFIER = 1;
             int EFFECTIVE_TIME = 2;
@@ -149,6 +161,16 @@ public class Sct2_IdRecord implements Serializable {
                             sctIdL);
                     // Write to JBIN file
                     oos.writeUnshared(tempIdCompact);
+                    
+                    // Write to TEXT file
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(tempIdCompact.sctIdL);
+                    sb.append(TAB_CHARACTER);
+                    sb.append(cUuid);
+                    sb.append(TAB_CHARACTER);
+                    sb.append(aUuid);
+                    sb.append(LINE_TERMINATOR);
+                    bw.append(sb.toString());
                 }
                 StringBuilder sb = new StringBuilder();
                 sb.append("\n::: parseToIdPreCacheFile(..) ");
@@ -187,6 +209,9 @@ public class Sct2_IdRecord implements Serializable {
                 AceLog.getAppLog().info(sb.toString());
             }
             oos.flush();
+            oos.close();
+            bw.flush();
+            bw.close();
         }
     }
 
