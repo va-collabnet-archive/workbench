@@ -10,6 +10,7 @@ import java.util.List;
 import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
+import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
@@ -55,6 +56,14 @@ public abstract class AbstractTransformer {
 	public abstract void transformAttributes(TkConceptAttributes attributes, TkConcept concept);
 	
 	/**
+	 * Transforms attribute revision.
+	 *
+	 * @param attributes the attributes
+	 * @param concept the concept
+	 */
+	public abstract void transformAttributesRevision(TkConceptAttributesRevision tkConceptAttributesRevision, TkConcept concept);
+
+    /**
 	 * Transforms a description.
 	 *
 	 * @param description the description
@@ -113,6 +122,13 @@ public abstract class AbstractTransformer {
 	 */
 	public boolean transform(TkConcept eConcept) {
 		transformAttributes(eConcept.conceptAttributes, eConcept);
+                
+            if (eConcept.getConceptAttributes().getRevisionList() != null) {
+                List<TkConceptAttributesRevision> conceptAttributeList = eConcept.getConceptAttributes().getRevisionList();
+                for (TkConceptAttributesRevision tkConceptAttributesRevision : conceptAttributeList) {
+                    transformAttributesRevision(tkConceptAttributesRevision,eConcept);
+                }
+            }
 
 		if (eConcept.getConceptAttributes().getAnnotations() != null) {
 			List<TkRefexAbstractMember<?>> annotationsReadOnly = new ArrayList<TkRefexAbstractMember<?>>(eConcept.getConceptAttributes().getAnnotations());

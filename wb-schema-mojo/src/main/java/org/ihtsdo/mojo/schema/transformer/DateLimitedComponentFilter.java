@@ -68,7 +68,16 @@ public class DateLimitedComponentFilter extends AbstractTransformer {
 
 	}
 
-	@Override
+    /* (non-Javadoc)
+     * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformAttributesRevision(org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision)
+     */
+    @Override
+    public void transformAttributesRevision(TkConceptAttributesRevision attributeRevision, TkConcept eConcept) {
+        // throw new UnsupportedOperationException("Not supported yet.");
+        // do nothing
+    }
+
+    @Override
 	public void transformDescription(TkDescription description, TkConcept concept) {
 		if (description.revisions != null) {
 			List<TkDescriptionRevision> descriptionRevisions = new ArrayList<TkDescriptionRevision>();

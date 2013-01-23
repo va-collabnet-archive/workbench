@@ -23,6 +23,7 @@ import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
+import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refex.type_uuid.TkRefexUuidMember;
@@ -140,6 +141,42 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
                 }
                 if (attributes.getModuleUuid() == null) {
                     attributes.setModuleUuid(TkRevision.unspecifiedModuleUuid);
+                }
+            } catch (ValidationException e) {
+                AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
+            } catch (IOException e) {
+                AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
+            }
+        }
+    }
+
+     /* (non-Javadoc)
+	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformAttributesRevision(org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision)
+	 */
+    @Override
+    public void transformAttributesRevision(TkConceptAttributesRevision attributeRevision, TkConcept eConcept) {
+        if (attributeRevision.getPathUuid().equals(pathUUID)) {
+            try {
+                if (attributeRevision.getStatusUuid().equals(SnomedMetadataRf1.CURRENT_RF1.getLenient().getPrimUuid())) {
+                    attributeRevision.setStatusUuid(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid());
+                } else if (attributeRevision.getStatusUuid().equals(SnomedMetadataRf1.RETIRED_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
+                    attributeRevision.setStatusUuid(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getPrimUuid());
+                } else if (attributeRevision.getStatusUuid().equals(SnomedMetadataRf1.AMBIGUOUS_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
+                    attributeRevision.setStatusUuid(SnomedMetadataRf2.AMBIGUOUS_COMPONENT_RF2.getLenient().getPrimUuid());
+                } else if (attributeRevision.getStatusUuid().equals(SnomedMetadataRf1.DUPLICATE_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
+                    attributeRevision.setStatusUuid(SnomedMetadataRf2.DUPLICATE_COMPONENT_RF2.getLenient().getPrimUuid());
+                } else if (attributeRevision.getStatusUuid().equals(SnomedMetadataRf1.ERRONEOUS_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
+                    attributeRevision.setStatusUuid(SnomedMetadataRf2.ERRONEOUS_COMPONENT_RF2.getLenient().getPrimUuid());
+                } else if (attributeRevision.getStatusUuid().equals(SnomedMetadataRf1.INAPPROPRIATE_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
+                    attributeRevision.setStatusUuid(SnomedMetadataRf2.INAPPROPRIATE_COMPONENT_RF2.getLenient().getPrimUuid());
+                } else if (attributeRevision.getStatusUuid().equals(SnomedMetadataRf1.LIMITED_ACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
+                    attributeRevision.setStatusUuid(SnomedMetadataRf2.LIMITED_COMPONENT_RF2.getLenient().getPrimUuid());
+                }
+                if (attributeRevision.getAuthorUuid() == null) {
+                    attributeRevision.setAuthorUuid(authorUser);
+                }
+                if (attributeRevision.getModuleUuid() == null) {
+                    attributeRevision.setModuleUuid(TkRevision.unspecifiedModuleUuid);
                 }
             } catch (ValidationException e) {
                 AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
@@ -341,7 +378,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
     private void processEnDescription(TkDescription description, TkConcept concept) throws ValidationException, IOException {
         List<TkRefexAbstractMember<?>> annotations = description.getAnnotations();
         if (annotations == null) {
-            annotations = new ArrayList<TkRefexAbstractMember<?>>();
+            annotations = new ArrayList<>();
         }
         if (description.getTypeUuid().equals(SnomedMetadataRf1.FULLY_SPECIFIED_DESCRIPTION_TYPE.getLenient().getPrimUuid())) {
             description.setTypeUuid(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getPrimUuid());
@@ -432,7 +469,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
     private void processUSDescription(TkDescription description, TkConcept concept) throws ValidationException, IOException {
         List<TkRefexAbstractMember<?>> annotations = description.getAnnotations();
         if (annotations == null) {
-            annotations = new ArrayList<TkRefexAbstractMember<?>>();
+            annotations = new ArrayList<>();
         }
         if (description.getTypeUuid().equals(SnomedMetadataRf1.FULLY_SPECIFIED_DESCRIPTION_TYPE.getLenient().getPrimUuid())) {
             description.setTypeUuid(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getPrimUuid());
@@ -510,7 +547,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
         //no FSN transform since current use of RF2 only uses US dialect as FSN
         List<TkRefexAbstractMember<?>> annotations = description.getAnnotations();
         if (annotations == null) {
-            annotations = new ArrayList<TkRefexAbstractMember<?>>();
+            annotations = new ArrayList<>();
         }
         if (description.getTypeUuid().equals(SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1.getLenient().getPrimUuid())) {
             description.setTypeUuid(SnomedMetadataRf2.SYNONYM_RF2.getLenient().getPrimUuid());
@@ -558,7 +595,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
     private void processLangDescription(TkDescription description, TkConcept concept) throws ValidationException, IOException {
         List<TkRefexAbstractMember<?>> annotations = description.getAnnotations();
         if (annotations == null) {
-            annotations = new ArrayList<TkRefexAbstractMember<?>>();
+            annotations = new ArrayList<>();
         }
         if (description.getTypeUuid().equals(SnomedMetadataRf1.FULLY_SPECIFIED_DESCRIPTION_TYPE.getLenient().getPrimUuid())) {
             description.setTypeUuid(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getPrimUuid());
@@ -604,4 +641,5 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
             description.setAnnotations(annotations);
         }
     }
+
 }

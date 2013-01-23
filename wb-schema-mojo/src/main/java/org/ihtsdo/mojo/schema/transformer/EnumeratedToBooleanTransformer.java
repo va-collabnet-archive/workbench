@@ -16,6 +16,7 @@ import org.ihtsdo.mojo.schema.config.TransformersConfigApi;
 import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
+import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refex.type_boolean.TkRefexBooleanMember;
@@ -80,7 +81,7 @@ public class EnumeratedToBooleanTransformer extends AbstractTransformer {
 		ConceptDescriptor refset = api.getConceptDescriptor(api.getIntId(id), "parameters.refset");
 		setRefsetUuid(refset.getVerifiedConcept().getPrimUuid());
 		int i = 0;
-		valuesForTrue = new ArrayList<UUID>();
+		valuesForTrue = new ArrayList<>();
 		for (String loopValue : api.getCollectionAt(api.getIntId(id), "parameters.valuesForTrue.concept")) {
 			ConceptDescriptor loopDescriptor = api.getConceptDescriptor(api.getIntId(id), 
 					"parameters.valuesForTrue.concept(" + i + ")");
@@ -88,7 +89,7 @@ public class EnumeratedToBooleanTransformer extends AbstractTransformer {
 			i++;
 		}
 		i = 0;
-		valuesForFalse = new ArrayList<UUID>();
+		valuesForFalse = new ArrayList<>();
 		for (String loopValue : api.getCollectionAt(api.getIntId(id), "parameters.valuesForFalse.concept")) {
 			ConceptDescriptor loopDescriptor = api.getConceptDescriptor(api.getIntId(id), 
 					"parameters.valuesForFalse.concept(" + i + ")");
@@ -180,6 +181,14 @@ public class EnumeratedToBooleanTransformer extends AbstractTransformer {
 	}
 
 	/* (non-Javadoc)
+	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformAttributesRevision(org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision)
+	 */
+    @Override
+    public void transformAttributesRevision(TkConceptAttributesRevision attributeRevision, TkConcept eConcept) {
+        // nothing
+    }
+
+	/* (non-Javadoc)
 	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformDescription(org.ihtsdo.tk.dto.concept.component.description.TkDescription)
 	 */
 	@Override
@@ -202,9 +211,7 @@ public class EnumeratedToBooleanTransformer extends AbstractTransformer {
 					relationship.getRelationshipSourceUuid().equals(refsetUuid)) {
 				relationship.setC2Uuid(booleanTypeId);
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (TerminologyException e) {
+		} catch (IOException | TerminologyException e) {
 			e.printStackTrace();
 		}
 	}

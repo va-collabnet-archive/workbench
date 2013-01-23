@@ -19,6 +19,7 @@ import org.ihtsdo.mojo.schema.config.TransformersConfigApi;
 import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
+import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
@@ -81,6 +82,15 @@ public class RefsetToAnnotation extends AbstractTransformer {
 			count();
 		}
 	}
+    
+    /* (non-Javadoc)
+     * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformAttributesRevision(org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision)
+     */
+    @Override
+    public void transformAttributesRevision(TkConceptAttributesRevision attributeRevision, TkConcept eConcept) {
+        // throw new UnsupportedOperationException("Not supported yet.");
+        // do nothing
+    }
 
 	/* (non-Javadoc)
 	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformDescription(org.ihtsdo.tk.dto.concept.component.description.TkDescription)

@@ -16,6 +16,7 @@ import org.ihtsdo.mojo.schema.config.TransformersConfigApi;
 import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
+import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refex.type_long.TkRefexLongMember;
@@ -97,6 +98,7 @@ public class IntegerToLongTransformer extends AbstractTransformer {
 	 *
 	 * @return the id
 	 */
+    @Override
 	public String getId() {
 		return id;
 	}
@@ -108,6 +110,14 @@ public class IntegerToLongTransformer extends AbstractTransformer {
 	public void transformAttributes(TkConceptAttributes attributes, TkConcept concept) {
 		// nothing
 	}
+
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformAttributesRevision(org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision)
+	 */
+    @Override
+    public void transformAttributesRevision(TkConceptAttributesRevision attributeRevision, TkConcept eConcept) {
+        // nothing
+    }
 
 	/* (non-Javadoc)
 	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformDescription(org.ihtsdo.tk.dto.concept.component.description.TkDescription)
@@ -131,9 +141,7 @@ public class IntegerToLongTransformer extends AbstractTransformer {
 					relationship.getRelationshipSourceUuid().equals(refsetUuid)) {
 				relationship.setC2Uuid(longTypeId);
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (TerminologyException e) {
+		} catch (IOException | TerminologyException e) {
 			e.printStackTrace();
 		}
 	}
