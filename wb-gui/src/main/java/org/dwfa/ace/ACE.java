@@ -2207,6 +2207,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
       Set<PathBI> editingPathSet = aceFrameConfig.getEditingPathSet();
       PathBI path = editingPathSet.iterator().next();
       JTextField pathDisplay = new JTextField();
+      pathDisplay.setEditable(false);
       pathDisplay.setOpaque(false);
       Border outside = BorderFactory.createLineBorder(aceFrameConfig.getColorForPath(path.getConceptNid()), 2);
       Border inside = BorderFactory.createEmptyBorder(1, 2, 1, 2);
