@@ -397,5 +397,16 @@ public interface TerminologyDI {
      * 
      */
     void addPropertyChangeListener(TerminologyStoreDI.CONCEPT_EVENT conceptEvent, PropertyChangeListener propertyChangeListener);
+    
+    /**
+    * Find concepts with a matching textual identifier where the identifier
+    * scheme/type is unknown.
+    * This may result in multiple matches.
+    *
+    * @param conceptId Any textual id, for instance a SNOMED CT id
+    * @throws TerminologyException if no suitable concepts are located
+    */
+   Set<ConceptChronicleBI> getConceptChronicle(String conceptId)
+           throws ParseException, IOException;
 
 }

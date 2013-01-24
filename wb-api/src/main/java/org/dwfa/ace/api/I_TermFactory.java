@@ -63,6 +63,7 @@ import java.util.concurrent.CountDownLatch;
 
 import javax.swing.JComponent;
 import javax.swing.TransferHandler;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 public interface I_TermFactory {
    void addChangeSetReader(I_ReadChangeSet reader);
@@ -462,6 +463,17 @@ public interface I_TermFactory {
     */
    Set<I_GetConceptData> getConcept(String conceptId)
            throws TerminologyException, ParseException, IOException;
+   
+   /**
+    * Find concepts with a matching textual identifier where the identifier
+    * scheme/type is unknown.
+    * This may result in multiple matches.
+    *
+    * @param conceptId Any textual id, for instance a SNOMED CT id
+    * @throws TerminologyException if no suitable concepts are located
+    */
+   Set<ConceptChronicleBI> getConceptChronicle(String conceptId)
+           throws TerminologyException, java.text.ParseException, IOException;
 
    I_GetConceptData getConcept(UUID... ids) throws TerminologyException, IOException;
 

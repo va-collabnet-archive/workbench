@@ -397,4 +397,9 @@ public class BdbTerminologySnapshot implements TerminologySnapshotDI {
     public void addPropertyChangeListener(CONCEPT_EVENT conceptEvent, PropertyChangeListener propertyChangeListener) {
         GlobalPropertyChange.addPropertyChangeListener(conceptEvent, propertyChangeListener);
     }
+
+    @Override
+    public Set<ConceptChronicleBI> getConceptChronicle(String conceptId) throws ParseException, IOException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

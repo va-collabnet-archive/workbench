@@ -10,7 +10,10 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.search.Query;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
@@ -650,6 +653,30 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
         } catch (org.apache.lucene.queryParser.ParseException ex) {
             throw new ParseException(query, 0);
         }
+    }
+
+    @Override
+    public Set<ConceptChronicleBI> getConceptChronicle(String conceptIdStr)
+            throws ParseException, IOException {
+        Set<ConceptChronicleBI> matchingConcepts = new HashSet<ConceptChronicleBI>();
+        Query q = null;
+        try {
+            q =
+                    new QueryParser(LuceneManager.version, "desc",
+                    new StandardAnalyzer(LuceneManager.version)).parse(conceptIdStr);
+            SearchResult result = LuceneManager.search(q, LuceneManager.LuceneSearchType.DESCRIPTION);
+
+            for (int i = 0; i < result.topDocs.totalHits; i++) {
+                Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
+                int cnid = Integer.parseInt(doc.get("cnid"));
+
+                matchingConcepts.add(Concept.get(cnid));
+            }
+        } catch (org.apache.lucene.queryParser.ParseException ex) {
+            throw new ParseException(q.toString(), 0);
+        }
+        
+        return matchingConcepts;
     }
 
     //~--- inner classes -------------------------------------------------------

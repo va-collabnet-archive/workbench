@@ -172,6 +172,7 @@ import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 import com.sleepycat.je.DatabaseException;
+import java.util.logging.Logger;
 import org.ihtsdo.db.change.ChangeNotifier;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -1802,6 +1803,30 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             matchingConcepts.add(Concept.get(cnid));
         }
 
+        return matchingConcepts;
+    }
+    
+    @Override
+    public Set<ConceptChronicleBI> getConceptChronicle(String conceptIdStr)
+            throws ParseException, IOException {
+        Set<ConceptChronicleBI> matchingConcepts = new HashSet<ConceptChronicleBI>();
+        Query q = null;
+        try {
+            q =
+                    new QueryParser(LuceneManager.version, "desc",
+                    new StandardAnalyzer(LuceneManager.version)).parse(conceptIdStr);
+            SearchResult result = LuceneManager.search(q, LuceneSearchType.DESCRIPTION);
+
+            for (int i = 0; i < result.topDocs.totalHits; i++) {
+                Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
+                int cnid = Integer.parseInt(doc.get("cnid"));
+
+                matchingConcepts.add(Concept.get(cnid));
+            }
+        } catch (org.apache.lucene.queryParser.ParseException ex) {
+            throw new ParseException(q.toString(), 0);
+        }
+        
         return matchingConcepts;
     }
 
