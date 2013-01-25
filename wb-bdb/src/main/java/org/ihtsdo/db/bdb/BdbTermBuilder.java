@@ -741,20 +741,23 @@ public class BdbTermBuilder implements TerminologyBuilderBI {
             Ts.get().commit(pathRefexConcept);
         }
         
-        RefexChronicleBI<?> pathOriginRefexOther = construct(blueprint.getPathAsOriginBp());
-        ConceptChronicleBI pathOriginRefexConcept = Ts.get().getConcept(pathOriginRefexOther.getRefexNid());
-        if(pathOriginRefexConcept.isAnnotationStyleRefex()){
-            Ts.get().addUncommitted(Ts.get().getConcept(pathOriginRefexOther.getConceptNid()));
-            Ts.get().commit(Ts.get().getConcept(pathOriginRefexOther.getConceptNid()));
-        }
-        
-        RefexChronicleBI<?> pathOriginRefex = construct(blueprint.getPathOriginRefsetBp());
-        if(pathOriginRefexConcept.isAnnotationStyleRefex()){
-            Ts.get().addUncommitted(Ts.get().getConcept(pathOriginRefex.getConceptNid()));
-            Ts.get().commit(Ts.get().getConcept(pathOriginRefex.getConceptNid()));
-        }else{
-            Ts.get().addUncommitted(pathOriginRefexConcept);
-            Ts.get().commit(pathOriginRefexConcept);
+        //adds path as orgin of another path
+        if (blueprint.getPathAsOriginBp() != null) {
+            RefexChronicleBI<?> pathOriginRefexOther = construct(blueprint.getPathAsOriginBp());
+            ConceptChronicleBI pathOriginRefexConcept = Ts.get().getConcept(pathOriginRefexOther.getRefexNid());
+            if (pathOriginRefexConcept.isAnnotationStyleRefex()) {
+                Ts.get().addUncommitted(Ts.get().getConcept(pathOriginRefexOther.getConceptNid()));
+                Ts.get().commit(Ts.get().getConcept(pathOriginRefexOther.getConceptNid()));
+            }
+
+            RefexChronicleBI<?> pathOriginRefex = construct(blueprint.getPathOriginRefsetBp());
+            if (pathOriginRefexConcept.isAnnotationStyleRefex()) {
+                Ts.get().addUncommitted(Ts.get().getConcept(pathOriginRefex.getConceptNid()));
+                Ts.get().commit(Ts.get().getConcept(pathOriginRefex.getConceptNid()));
+            } else {
+                Ts.get().addUncommitted(pathOriginRefexConcept);
+                Ts.get().commit(pathOriginRefexConcept);
+            }
         }
         
         Collection<ConceptChronicleBI> originConcepts = blueprint.getOrigins();

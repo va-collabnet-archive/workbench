@@ -40,12 +40,35 @@ public class PathCB {
     
     private RefexCAB pathOriginRefsetPathForPathAsOriginBp;
     private Collection<ConceptChronicleBI> origins = new TreeSet<ConceptChronicleBI>();
+    
     /**
      * 
      * @param pathBp Concept blueprint that will identify the new path
      * @param pathRefsetBp Refex member blueprint that adds this path to the path refex
      * @param pathOriginRefsetBp Refex member blueprint that adds this path to the path origin refex
-     * @param pathOriginRefsetPathForPathAsOriginBp
+     * @param origins A vararg of concepts that identify the origins of this new path. 
+     *      Each origin will have a time of "latest" with respect to the new path. 
+     */
+    public PathCB(ConceptCB pathBp, 
+            RefexCAB pathRefsetBp,
+            RefexCAB pathOriginRefsetBp,
+            ConceptChronicleBI... origins){
+        this.pathBp = pathBp;
+        this.pathRefsetBp = pathRefsetBp;
+        this.pathOriginRefsetBp = pathOriginRefsetBp;
+        this.pathOriginRefsetPathForPathAsOriginBp = null;
+        if (origins != null) {
+            this.origins.addAll(Arrays.asList(origins));
+        }
+    }
+    
+    /**
+     * 
+     * @param pathBp Concept blueprint that will identify the new path
+     * @param pathRefsetBp Refex member blueprint that adds this path to the path refex
+     * @param pathOriginRefsetBp Refex member blueprint that adds this path to the path origin refex
+     * @param pathOriginRefsetPathForPathAsOriginBp Allows the path created by this blueprint 
+     * to be set as the origins for an existing path.
      * @param origins A vararg of concepts that identify the origins of this new path. 
      *      Each origin will have a time of "latest" with respect to the new path. 
      */
@@ -78,11 +101,24 @@ public class PathCB {
     public RefexCAB getPathRefsetBp() {
         return pathRefsetBp;
     }
-
+    /**
+     * Use if making the path created by this
+     * <code>PathCB</code> as an origin of an existing path.
+     *
+     * @return a <code>RefexCAB</code> representing the membership of this path
+     * as an origin of an existing path.
+     */
     public RefexCAB getPathAsOriginBp() {
         return pathOriginRefsetPathForPathAsOriginBp;
     }
 
+    /**
+     * Use if making the path created by this
+     * <code>PathCB</code> as an origin of an existing path.
+     *
+     * @param pathOriginRefsetPathAsOriginBp a <code>RefexCAB</code>
+     * representing the membership of this path as an origin of an existing path
+     */
     public void setPathAsOriginBp(RefexCAB pathOriginRefsetPathAsOriginBp) {
         this.pathOriginRefsetPathForPathAsOriginBp = pathOriginRefsetPathAsOriginBp;
     }
