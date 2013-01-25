@@ -25,13 +25,32 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
  * @author akf
  */
 public class PathCB {
+    /**
+     * Concept that identifies the new path
+     */
     private ConceptCB pathBp;
+    /**
+     * Concept that identifies the path refset
+     */
     private RefexCAB pathRefsetBp;
+    /**
+     * Concept that identifies the path origin refset
+     */
     private RefexCAB pathOriginRefsetBp;
+    
     private RefexCAB pathOriginRefsetPathForPathAsOriginBp;
     private Collection<ConceptChronicleBI> origins = new TreeSet<ConceptChronicleBI>();
-    
-    public PathCB(ConceptCB pathBp, RefexCAB pathRefsetBp,
+    /**
+     * 
+     * @param pathBp Concept blueprint that will identify the new path
+     * @param pathRefsetBp Refex member blueprint that adds this path to the path refex
+     * @param pathOriginRefsetBp Refex member blueprint that adds this path to the path origin refex
+     * @param pathOriginRefsetPathForPathAsOriginBp
+     * @param origins A vararg of concepts that identify the origins of this new path. 
+     *      Each origin will have a time of "latest" with respect to the new path. 
+     */
+    public PathCB(ConceptCB pathBp, 
+            RefexCAB pathRefsetBp,
             RefexCAB pathOriginRefsetBp,
             RefexCAB pathOriginRefsetPathForPathAsOriginBp,
             ConceptChronicleBI... origins){
