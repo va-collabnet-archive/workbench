@@ -21,4 +21,7 @@ public class RefsetAux {
     public static ConceptSpec EN_GB_REFEX =
             new ConceptSpec("Great Britain English language reference set",
             UUID.fromString("eb9a5e42-3cba-356d-b623-3ed472e20b30"));
+    public static ConceptSpec DA_REFEX =
+            new ConceptSpec("Danish language reference set (foundation metadata concept)",
+            UUID.fromString("be446b41-0eda-3d36-84e4-ae196f05858b"));
 }
