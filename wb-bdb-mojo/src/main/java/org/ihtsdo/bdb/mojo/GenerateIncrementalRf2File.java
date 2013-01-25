@@ -54,7 +54,7 @@ import org.ihtsdo.tk.spec.ConceptSpec;
  *
  * 4.1 Subject to clause 2.1.4, the Licensee may not modify any part of the
  * SNOMED CT Core distributed as part of the International Release or as part of
- * a Member’s National Release.<p>
+ * a Member's National Release.<p>
  *
  * 4.2 Subject to any express and specific statement to the contrary in the
  * documentation distributed as part of the International Release, the Licensee
@@ -65,7 +65,7 @@ import org.ihtsdo.tk.spec.ConceptSpec;
  * 4.3 The Licensee may, by written notice, request the Licensor to modify the
  * SNOMED CT Core. Upon receipt of such written notice, the Licensor shall
  * consult with the Licensee and shall give due consideration as to whether the
- * proposed modification should be made based on the Licensor’s editorial
+ * proposed modification should be made based on the Licensor's editorial
  * guidelines and policies. Following due consideration of the matter, including
  * consideration of any information presented by the Licensee, the Licensor
  * shall inform the Licensee whether the proposed modification shall be made and
@@ -75,11 +75,11 @@ import org.ihtsdo.tk.spec.ConceptSpec;
  * Licensee would like the content of the proposed modification to be developed
  * more quickly than the Licensor has indicated, the Licensee may itself
  * undertake or procure the undertaking of the development of the content of the
- * proposed modification (outside of any existing Licensor’s support services
+ * proposed modification (outside of any existing Licensor's support services
  * contract). On receipt of the developed content of the proposed modification,
  * the Licensor will then give due consideration as to whether the developed
- * content meets the Licensor’s quality assurance, other governance processes,
- * Standards and Regulations. If the developed content meets the Licensor’s
+ * content meets the Licensor's quality assurance, other governance processes,
+ * Standards and Regulations. If the developed content meets the Licensor's
  * quality assurance, other governance processes, Standards and Regulations then
  * the Licensor shall incorporate the modification into the SNOMED CT Core
  * according to its schedule which will give due consideration as to when the
@@ -89,13 +89,13 @@ import org.ihtsdo.tk.spec.ConceptSpec;
  * Core.<p>
  *
  * There are guidelines around what can and cannot be done within an extension:<p>
- * · Relationships within the stated view of the International release should
+ * - Relationships within the stated view of the International release should
  * not be amended or retired within an extension. <p>
- * · Stated relationships (IS_A
+ * - Stated relationships (IS_A
  * or other) from concepts in the International release to concepts in an
  * extension are not allowed (in either an extension or in the International
  * release). <p>
- * · Stated relationships from concepts in an extension to concepts in
+ * - Stated relationships from concepts in an extension to concepts in
  * the International release are allowed.<p>
  *
  * Given the above, adding content to an extension (by adding relationships to
@@ -103,7 +103,7 @@ import org.ihtsdo.tk.spec.ConceptSpec;
  * retirement (within the extension) of redundant relationships in the
  * International release. There is not an issue with this as long as the stated
  * view and the transitive closure associated with the International release is
- * not changed (which it shouldn’t be, given the above guidelines).<p>
+ * not changed (which it shouldn't be, given the above guidelines).<p>
  *
  * @goal generate-irf2-file
  *
