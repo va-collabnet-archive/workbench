@@ -47,11 +47,69 @@ import org.ihtsdo.tk.spec.ConceptSpec;
  * release type with start date of the time to start including data and an end
  * date of latest.
  *
+ * Documentation of regarding managed service terms of service and release
+ * files.<p>
+ *
+ * 4. MODIFICATIONS TO THE INTERNATIONAL RELEASE<p>
+ *
+ * 4.1 Subject to clause 2.1.4, the Licensee may not modify any part of the
+ * SNOMED CT Core distributed as part of the International Release or as part of
+ * a Member’s National Release.<p>
+ *
+ * 4.2 Subject to any express and specific statement to the contrary in the
+ * documentation distributed as part of the International Release, the Licensee
+ * may not modify any of the documentation (including Specifications) or
+ * software (unless provided in source code form) distributed as part of the
+ * International Release.<p>
+ *
+ * 4.3 The Licensee may, by written notice, request the Licensor to modify the
+ * SNOMED CT Core. Upon receipt of such written notice, the Licensor shall
+ * consult with the Licensee and shall give due consideration as to whether the
+ * proposed modification should be made based on the Licensor’s editorial
+ * guidelines and policies. Following due consideration of the matter, including
+ * consideration of any information presented by the Licensee, the Licensor
+ * shall inform the Licensee whether the proposed modification shall be made and
+ * if the Licensor agrees that the proposed modification should be made, the
+ * Licensor shall give a non-binding indication of when, reasonably and in good
+ * faith, it anticipates that the proposed modification will be made. If the
+ * Licensee would like the content of the proposed modification to be developed
+ * more quickly than the Licensor has indicated, the Licensee may itself
+ * undertake or procure the undertaking of the development of the content of the
+ * proposed modification (outside of any existing Licensor’s support services
+ * contract). On receipt of the developed content of the proposed modification,
+ * the Licensor will then give due consideration as to whether the developed
+ * content meets the Licensor’s quality assurance, other governance processes,
+ * Standards and Regulations. If the developed content meets the Licensor’s
+ * quality assurance, other governance processes, Standards and Regulations then
+ * the Licensor shall incorporate the modification into the SNOMED CT Core
+ * according to its schedule which will give due consideration as to when the
+ * proposed modification shall be incorporated into the SNOMED CT Core, taking
+ * into account other proposals for the modification of the SNOMED CT Core and
+ * the work required to include the proposed modification in the SNOMED CT
+ * Core.<p>
+ *
+ * There are guidelines around what can and cannot be done within an extension:<p>
+ * · Relationships within the stated view of the International release should
+ * not be amended or retired within an extension. <p>
+ * · Stated relationships (IS_A
+ * or other) from concepts in the International release to concepts in an
+ * extension are not allowed (in either an extension or in the International
+ * release). <p>
+ * · Stated relationships from concepts in an extension to concepts in
+ * the International release are allowed.<p>
+ *
+ * Given the above, adding content to an extension (by adding relationships to
+ * the stated view of an extension and then classifying) may result in
+ * retirement (within the extension) of redundant relationships in the
+ * International release. There is not an issue with this as long as the stated
+ * view and the transitive closure associated with the International release is
+ * not changed (which it shouldn’t be, given the above guidelines).<p>
+ *
  * @goal generate-irf2-file
  *
  * @phase process-sources
  */
-public class GenerateIncrementalRf2File extends AbstractMojo  {
+public class GenerateIncrementalRf2File extends AbstractMojo {
 
     /**
      * ConceptSpec for the view paths to base the export on.
@@ -87,32 +145,36 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
     private String startDate;
     /**
      * End date for inclusion in the RF2 files, in yyyy-MM-dd-HH.mm.ss format.
-     * 
+     *
      * @parameter
      */
     private String endDate;
     /**
      * Effective date, in yyyy-MM-dd-HH.mm.ss format.
      *
-     * @parameter @required
+     * @parameter
+     * @required
      */
     private String effectiveDate;
     /**
      * Project ID namespace, as SCT id
      *
-     * @parameter @required
+     * @parameter
+     * @required
      */
     private String namespace;
     /**
      * Project moduleConcept
      *
-     * @parameter @required
+     * @parameter
+     * @required
      */
     private ConceptDescriptor moduleConcept;
     /**
      * country code
      *
-     * @parameter @required
+     * @parameter
+     * @required
      */
     private String countryCode;
     /**
@@ -124,13 +186,15 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
     /**
      * output directory.
      *
-     * @parameter expression="${project.build.directory}/classes" @required
+     * @parameter expression="${project.build.directory}/classes"
+     * @required
      */
     private File output;
     /**
      * source directory.
      *
-     * @parameter expression="${basedir}/src" @required
+     * @parameter expression="${basedir}/src"
+     * @required
      */
     private File sourceDir;
     /**
@@ -144,8 +208,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
     /**
      * Set to true to make private version of alternate identifiers file.
      *
-     * @parameter 
-     * default-value="false"
+     * @parameter default-value="false"
      */
     private boolean makePrivateAltIdsFile;
     /**
@@ -157,28 +220,28 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
     /**
      * Set to true to make initial sct to uuid mapping files.
      *
-     * @parameter 
-     * default-value="false"
+     * @parameter default-value="false"
      */
     private boolean makeInitialMappingFiles;
     /**
      * Effective date of previous release.
+     *
      * @parameter
      */
     private String previousReleaseDate;
     /**
      * RF2 release file type.
-     * @parameter @required
+     *
+     * @parameter
+     * @required
      */
     private ReleaseType releaseType;
     /**
      * Set to true to create rf2 release refsets.
      *
-     * @parameter 
-     * default-value="false"
+     * @parameter default-value="false"
      */
     private boolean makeRf2Refsets;
-    
     private IntSet stampsToWrite = new IntSet();
     private IntSet pathIds;
 
@@ -209,9 +272,9 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
                 }
             }
             UUID moduleId = null;
-            if(moduleConcept != null){
+            if (moduleConcept != null) {
                 moduleId = UUID.fromString(moduleConcept.getUuid());
-            }else{
+            } else {
                 throw new MojoExecutionException("No module specified.");
             }
 
@@ -224,10 +287,10 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
             } else {
                 throw new MojoExecutionException("No view path specified.");
             }
-            
+
             //filter start and end dates by release version
             if (releaseType.equals(ReleaseType.DELTA)) {
-                if(startDate == null || endDate == null){
+                if (startDate == null || endDate == null) {
                     throw new MojoExecutionException("A Delta Release requires both a start and end date to be specified.");
                 }
                 //use specified start and end dates
@@ -238,7 +301,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
                 startDate = "bot";
                 endDate = "latest";
             }
-            
+
             ViewCoordinate vc = new ViewCoordinate(Ts.get().getMetadataViewCoordinate());
             vc.getIsaTypeNids().add(Snomed.IS_A.getLenient().getConceptNid());
             PathBI path = Ts.get().getPath(viewPathNid);
@@ -264,14 +327,14 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
             }
 
             IntSet sapsToRemove = new IntSet();
-            if(previousReleaseDate != null){
+            if (previousReleaseDate != null) {
                 sapsToRemove = Bdb.getSapDb().getSpecifiedSapNids(pathIds,
-                    TimeHelper.getTimeFromString(previousReleaseDate, TimeHelper.getFileDateFormat()),
-                    TimeHelper.getTimeFromString("latest", TimeHelper.getFileDateFormat()));
+                        TimeHelper.getTimeFromString(previousReleaseDate, TimeHelper.getFileDateFormat()),
+                        TimeHelper.getTimeFromString("latest", TimeHelper.getFileDateFormat()));
             }
-            getLog().info("Release type: " + releaseType);  
+            getLog().info("Release type: " + releaseType);
             getLog().info("Criterion matches " + stampsToWrite.size() + " sapNids: " + stampsToWrite);
-            for(int stamp : stampsToWrite.getAsSet()){
+            for (int stamp : stampsToWrite.getAsSet()) {
                 long timeForStampNid = Ts.get().getTimeForStampNid(stamp);
                 String time = TimeHelper.formatDate(timeForStampNid);
                 System.out.println("#### stamp: " + stamp + " Time: " + time);
@@ -288,8 +351,8 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
             if (refsetParentConceptSpec != null) {
                 refsetParentConceptNid = Ts.get().getNidForUuids(UUID.fromString(refsetParentConceptSpec.getUuid()));
             }
-            
-             Rf2Export exporter = new Rf2Export(output,
+
+            Rf2Export exporter = new Rf2Export(output,
                     releaseType,
                     LANG_CODE.EN,
                     COUNTRY_CODE.valueOf(countryCode),
@@ -304,7 +367,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
                     makePrivateAltIdsFile,
                     refsetParentConceptNid,
                     new Date(TimeHelper.getTimeFromString(this.previousReleaseDate,
-                        TimeHelper.getFileDateFormat())),
+                    TimeHelper.getFileDateFormat())),
                     sapsToRemove.getAsSet());
             Ts.get().iterateConceptDataInSequence(exporter);
             exporter.writeOneTimeFiles();
@@ -320,5 +383,4 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }
     }
-
 }
