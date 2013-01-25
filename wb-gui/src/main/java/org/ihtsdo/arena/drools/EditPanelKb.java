@@ -29,6 +29,9 @@ public class EditPanelKb {
         super();
         this.config = config;
         kbFiles.add(new File("drools-rules/TkApiRules.drl"));
+        if(new File("drools-rules/extras/TkApiRulesXtra.drl").exists()){
+            kbFiles.add(new File("drools-rules/extras/TkApiRulesXtra.drl"));
+        }
         ACE.threadPool.execute(new KbSetkupRunner());
     }
 

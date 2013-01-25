@@ -112,6 +112,9 @@ public class ConceptView extends JPanel {
       this.settings   = settings;
       this.cvRenderer = cvRenderer;
       kbFiles.add(new File("drools-rules/ContextualDropActions.drl"));
+      if (new File("drools-rules/extras/ContextualDropActionsXtra.drl").exists()) {
+            kbFiles.add(new File("drools-rules/extras/ContextualDropActionsXtra.drl"));
+      }
       kb = ConceptTemplates.getKb();
       addCommitListener(settings);
       setupPrefMap();

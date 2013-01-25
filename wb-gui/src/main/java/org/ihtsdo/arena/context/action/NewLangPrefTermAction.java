@@ -60,7 +60,6 @@ public class NewLangPrefTermAction extends AbstractAction {
             refexBp.put(RefexProperty.CNID1, SnomedMetadataRfx.getDESC_PREFERRED_NID());
             RefexChronicleBI<?> newRefex = builder.construct(refexBp);
             ConceptVersionBI cv = Ts.get().getConceptVersion(config.getViewCoordinate(), desc.getConceptNid());
-            cv.addAnnotation(newRefex);
             Ts.get().addUncommitted(cv);
 
         } catch (IOException e1) {

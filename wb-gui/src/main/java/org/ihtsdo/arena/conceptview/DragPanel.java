@@ -147,6 +147,9 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
       this.viewLayout = viewLayout;
       this.setMinimumSize(new Dimension(minSize, minSize));
       this.kbFiles.add(new File("drools-rules/ContextualDropActions.drl"));
+      if(new File("drools-rules/extras/ContextualDropActionsXtra.drl").exists()){
+          kbFiles.add(new File("drools-rules/extras/ContextualDropActionsXtra.drl"));
+      }
       dropPanelMgr = new DropPanelActionManager();
 
       try {
