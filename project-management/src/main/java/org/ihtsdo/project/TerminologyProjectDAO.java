@@ -106,6 +106,7 @@ import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.api.WorkflowInterpreter;
 import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfMembership;
+import org.ihtsdo.project.workflow.model.WfRole;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 import org.ihtsdo.tk.Ts;
@@ -889,7 +890,10 @@ public class TerminologyProjectDAO {
 				I_GetConceptData loopConcept = termFactory.getConcept(loopTuple.getC1Id());
 				I_ConceptAttributePart latestAttributePart = getLastestAttributePart(loopConcept);
 				if (isActive(latestAttributePart.getStatusNid())) {
-					partitionSchemes.add(getPartitionScheme(loopConcept, config));
+					PartitionScheme loopPartScheme = getPartitionScheme(loopConcept, config);
+					if (loopPartScheme != null) {
+						partitionSchemes.add(loopPartScheme);
+					}
 				}
 			}
 		} catch (IOException e) {
@@ -2385,7 +2389,8 @@ public class TerminologyProjectDAO {
 			if (!currentVersionOfWorkList.getName().equals(workListWithMetadata.getName())) {
 				updatePreferredTerm(workListWithMetadata.getConcept(), workListWithMetadata.getName(), config);
 			}
-			WorklistMetadata worklistMetadata = new WorklistMetadata(workListWithMetadata.getName(), workListWithMetadata.getUids(), workListWithMetadata.getPartitionUUID(), workListWithMetadata.getWorkflowDefinitionFileName(), workListWithMetadata.getWorkflowUserRoles());
+			
+			WorklistMetadata worklistMetadata = new WorklistMetadata(workListWithMetadata.getName(), workListWithMetadata.getUids(), workListWithMetadata.getPartitionUUID(), workListWithMetadata.getWorkflowDefinitionFileName(), convertToStringListOfMembers(workListWithMetadata.getWorkflowUserRoles()));
 			String metadata = serialize(worklistMetadata);
 
 			Collection<? extends I_ExtendByRef> extensions = termFactory.getAllExtensionsForComponent(workListConcept.getConceptNid());
@@ -3181,7 +3186,7 @@ public class TerminologyProjectDAO {
 
 		workList.setWorkflowUserRoles(workListWithMetadata.getWorkflowUserRoles());
 		// String metadata = serialize(workList);
-		WorklistMetadata worklistMetadata = new WorklistMetadata(workList.getName(), workList.getUids(), workList.getPartitionUUID(), workList.getWorkflowDefinitionFileName(), workList.getWorkflowUserRoles());
+		WorklistMetadata worklistMetadata = new WorklistMetadata(workList.getName(), workList.getUids(), workList.getPartitionUUID(), workList.getWorkflowDefinitionFileName(), convertToStringListOfMembers(workList.getWorkflowUserRoles()));
 		String metadata = serialize(worklistMetadata);
 
 		termFactory.addUncommittedNoChecks(newConcept);
@@ -4356,7 +4361,7 @@ public class TerminologyProjectDAO {
 			// String metadata = serialize(objectWithMetadata);
 			if (objectWithMetadata instanceof WorkList) {
 				WorkList workList = (WorkList) objectWithMetadata;
-				WorklistMetadata worklistMetadata = new WorklistMetadata(workList.getName(), workList.getUids(), workList.getPartitionUUID(), workList.getWorkflowDefinitionFileName(), workList.getWorkflowUserRoles());
+				WorklistMetadata worklistMetadata = new WorklistMetadata(workList.getName(), workList.getUids(), workList.getPartitionUUID(), workList.getWorkflowDefinitionFileName(), convertToStringListOfMembers(workList.getWorkflowUserRoles()));
 				metadata = serialize(worklistMetadata);
 			} else {
 				metadata = serialize(objectWithMetadata);
@@ -5639,4 +5644,32 @@ public class TerminologyProjectDAO {
 		}
 		return project;
 	}
+	
+	public static List<WfMembership> convertToMembershipList(List<String> list) throws Exception {
+		List<WfMembership> members = new ArrayList<WfMembership>();
+		for (String line : list) {
+			String[] fields = line.split("|");
+			I_GetConceptData userConcept = Terms.get().getConcept(UUID.fromString(fields[1]));
+			WfUser user = new WfUser(userConcept.toString(), userConcept.getPrimUuid());
+			
+			I_GetConceptData roleConcept = Terms.get().getConcept(UUID.fromString(fields[2]));
+			WfRole role = new WfRole(userConcept.toString(), userConcept.getPrimUuid());
+			
+			WfMembership member = new WfMembership(UUID.fromString(fields[0]), user, role, Boolean.parseBoolean(fields[3]));
+			members.add(member);
+		}
+		
+		return members;
+	}
+	
+	public static List<String> convertToStringListOfMembers(List<WfMembership> list) {
+		List<String> members = new ArrayList<String>();
+		for (WfMembership line : list) {
+			members.add(line.getId().toString() + "|" + line.getUser().getId().toString() 
+					+ "|" + line.getRole().getId().toString() + "|" + line.isDefaultAssignment());
+		}
+		
+		return members;
+	}
+	
 }

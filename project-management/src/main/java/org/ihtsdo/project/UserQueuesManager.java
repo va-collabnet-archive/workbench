@@ -216,9 +216,7 @@ public class UserQueuesManager {
                 }
             }
 
-        } catch (TerminologyException e) {
-            AceLog.getAppLog().alertAndLogException(e);
-        } catch (IOException e) {
+        } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
         }
 

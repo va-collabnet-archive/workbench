@@ -107,12 +107,12 @@ public class WorkList extends WorkflowRefset implements Serializable, WorkListBI
 	 * @throws TerminologyException the terminology exception
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
-	public static WorkList getInstanceFromMetadata(WorklistMetadata worklistMetadata) throws TerminologyException, IOException{
+	public static WorkList getInstanceFromMetadata(WorklistMetadata worklistMetadata) throws Exception{
 		WorkList worklist=new WorkList(worklistMetadata.getName(),
 				Terms.get().uuidToNative(worklistMetadata.getUids())
 				,worklistMetadata.getUids(),worklistMetadata.getPartitionUUID());
 		worklist.setWorkflowDefinition(WorkflowDefinitionManager.readWfDefinition(worklistMetadata.getWorkflowDefinitionFileName()));
-		worklist.setWorkflowUserRoles(worklistMetadata.getWorkflowUserRoles());
+		worklist.setWorkflowUserRoles(TerminologyProjectDAO.convertToMembershipList(worklistMetadata.getWorkflowUserRoles()));
 		return worklist;
 	}
 

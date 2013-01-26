@@ -39,7 +39,7 @@ public class WorklistMetadata implements Serializable{
 	private String workflowDefinitionFileName;
 	
 	/** The workflow user roles. */
-	private List<WfMembership> workflowUserRoles;
+	private List<String> workflowUserRoles;
 
 	/**
 	 * Instantiates a new worklist metadata.
@@ -53,7 +53,7 @@ public class WorklistMetadata implements Serializable{
 	public WorklistMetadata(String name, List<UUID> uids,
 			UUID partitionUUID,
 			String workflowDefinitionFileName,
-			List<WfMembership> workflowUserRoles) {
+			List<String> workflowUserRoles) {
 		super();
 		this.name = name;
 		this.uids = uids;
@@ -139,7 +139,7 @@ public class WorklistMetadata implements Serializable{
 	 *
 	 * @return the workflow user roles
 	 */
-	public List<WfMembership> getWorkflowUserRoles() {
+	public List<String> getWorkflowUserRoles() {
 		return workflowUserRoles;
 	}
 
@@ -148,7 +148,7 @@ public class WorklistMetadata implements Serializable{
 	 *
 	 * @param workflowUserRoles the new workflow user roles
 	 */
-	public void setWorkflowUserRoles(List<WfMembership> workflowUserRoles) {
+	public void setWorkflowUserRoles(List<String> workflowUserRoles) {
 		this.workflowUserRoles = workflowUserRoles;
 	}
 }

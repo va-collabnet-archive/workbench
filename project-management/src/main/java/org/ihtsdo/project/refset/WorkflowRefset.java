@@ -21,19 +21,30 @@ import java.util.Map;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.RefsetAuxiliary;
 
 /**
  * The Class WorkflowRefset.
  */
-public abstract class WorkflowRefset extends Refset {
+public class WorkflowRefset extends Refset {
 
     /**
      * The prom refset cache.
      */
     private static Map<Integer, PromotionRefset> promRefsetCache;
 
+    public WorkflowRefset() {
+    }
+    public WorkflowRefset(I_GetConceptData refsetConcept) {
+    	super();
+    	this.refsetConcept = refsetConcept;
+    	this.refsetId = refsetConcept.getNid();
+    	this.refsetName = refsetConcept.toString();
+    	this.termFactory = Terms.get();
+    }
+    
     /**
      * Gets the comments refset.
      *
@@ -47,8 +58,15 @@ public abstract class WorkflowRefset extends Refset {
             if (refsetConcept == null) {
                 return null;
             }
-
-            return new CommentsRefset(getLatestSourceRelationshipTarget(refsetConcept, commentsRel, config));
+            
+            I_GetConceptData commentsConcept = getLatestSourceRelationshipTarget(refsetConcept, commentsRel, config);
+            
+            if ( commentsConcept != null) {
+            	return new CommentsRefset(commentsConcept);
+            } else {
+            	return null;
+            }
+            
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
             return null;
@@ -78,7 +96,7 @@ public abstract class WorkflowRefset extends Refset {
 
             I_GetConceptData target = getLatestSourceRelationshipTarget(refsetConcept, promotionRel, config);
             if (target == null) {
-                throw new Exception("Can't find promotion refset");
+                return null;
             }
             PromotionRefset promRef = new PromotionRefset(target);
 
@@ -89,12 +107,5 @@ public abstract class WorkflowRefset extends Refset {
             AceLog.getAppLog().alertAndLogException(e);
             return null;
         }
-    }
-
-    /**
-     * Instantiates a new workflow refset.
-     */
-    public WorkflowRefset() {
-        super();
     }
 }
