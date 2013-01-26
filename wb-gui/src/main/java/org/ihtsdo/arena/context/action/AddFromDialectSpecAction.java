@@ -20,6 +20,7 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.binding.snomed.Language;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.ihtsdo.tk.drools.facts.DescSpecFact;
@@ -69,6 +70,7 @@ public class AddFromDialectSpecAction extends AbstractAction {
             int type = Ts.get().getNidForUuids(descSpec.getDescriptionTypeSpec().getLenient().getPrimUuid());
             int syn = SnomedMetadataRfx.getDES_SYNONYM_NID();
             int fsn = SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID();
+            int def = SnomedMetadataRf2.DEFINITION_RF2.getLenient().getConceptNid();
             int usRefexNid = SnomedMetadataRfx.getUS_DIALECT_REFEX_NID();
             int gbRefexNid = SnomedMetadataRfx.getGB_DIALECT_REFEX_NID();
             int refexNid = 0;
@@ -119,6 +121,20 @@ public class AddFromDialectSpecAction extends AbstractAction {
                         refexNid);
                 refexSpecFsn.put(RefexProperty.CNID1, SnomedMetadataRfx.getDESC_PREFERRED_NID());
                 newDesc = tc.constructIfNotCurrent(descSpecFsn);
+                newRefex = tc.constructIfNotCurrent(refexSpecFsn);
+            } else if (type == def) {
+                DescriptionCAB descSpecDef = new DescriptionCAB(
+                        concept.getNid(),
+                        def,
+                        dialect,
+                        descSpec.getDescriptionText(),
+                        true);
+                newDesc = tc.constructIfNotCurrent(descSpecDef);
+                RefexCAB refexSpecFsn = new RefexCAB(
+                        TK_REFEX_TYPE.CID,
+                        descSpecDef.getComponentNid(),
+                        refexNid);
+                refexSpecFsn.put(RefexProperty.CNID1, SnomedMetadataRfx.getDESC_PREFERRED_NID());
                 newRefex = tc.constructIfNotCurrent(refexSpecFsn);
             }
             newDesc.addAnnotation(newRefex);

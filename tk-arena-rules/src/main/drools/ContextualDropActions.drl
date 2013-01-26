@@ -50,6 +50,7 @@ import org.ihtsdo.arena.context.action.SetICSignificantAction;
 import org.ihtsdo.arena.context.action.RetireAsInappropriateAction;
 import org.ihtsdo.arena.context.action.CancelAction;
 import org.ihtsdo.arena.context.action.AddToNidFloatRefexAction;
+import org.ihtsdo.arena.context.action.AddTextDefinitionAction;
 //import org.ihtsdo.arena.context.action.ChangeRefexAction;
 
 import org.ihtsdo.tk.drools.facts.ComponentFact;
@@ -1122,3 +1123,13 @@ end
 	then
 		actions.add(new AddToNidFloatRefexAction("add concentration", $dropTarget, Snomed.CONCENTRATION, config));
 */
+
+rule "61"
+#add text definition
+	when
+                ViewFact(getView() == View.STATED)
+		$dropTarget: DescFact(context == Context.DROP_TARGET)
+		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
+	then
+		actions.add(new AddTextDefinitionAction("create definition", $dropTarget, config));
+end

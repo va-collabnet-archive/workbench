@@ -41,6 +41,12 @@ public class SnomedMetadataRf2 {
     public static ConceptSpec SYNONYM_RF2 =
             new ConceptSpec("Synonym (core metadata concept)",
             UUID.fromString("8bfba944-3965-3946-9bcb-1e80a5da63a2"));
+    /**
+     * Represents the SNOMED RF2 concept: Definition.
+     */
+    public static ConceptSpec DEFINITION_RF2 =
+            new ConceptSpec("Definition (core metadata concept)",
+            UUID.fromString("700546a3-09c7-3fc2-9eb9-53d318659a09"));
     // SCT ID:	900000000000548007
     /**
      * Represents the SNOMED RF2 concept: Preferred.
@@ -359,11 +365,15 @@ public class SnomedMetadataRf2 {
     public static ConceptSpec NON_HUMAN_RF2 =
             new ConceptSpec("Non-human simple reference set",
             UUID.fromString("b1b1e773-3eb6-3bcc-a6c7-52ac5d0a53be"));
-    
+    /**
+     * Represents the SNOMED RF2 concept: Concept inactivation indicator attribute value reference set.
+     */
     public static ConceptSpec CONCEPT_INACTIVE_REFSET =
             new ConceptSpec("Concept inactivation indicator attribute value reference set (foundation metadata concept)",
             UUID.fromString("a959e36c-39a3-3ec6-8a0b-9a4ee564348b"));
-    
+    /**
+     * Represents the SNOMED RF2 concept: Description inactivation indicator attribute value reference set.
+     */
     public static ConceptSpec DESC_INACTIVE_REFSET =
             new ConceptSpec("Description inactivation indicator attribute value reference set (foundation metadata concept)",
             UUID.fromString("d40e6d5c-6a93-34ab-b6e1-11f24e350380"));
