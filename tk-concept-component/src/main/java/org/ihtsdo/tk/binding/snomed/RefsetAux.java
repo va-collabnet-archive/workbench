@@ -36,7 +36,7 @@ public class RefsetAux {
             new ConceptSpec("GMDN review status reference set (foundation metadata concept)",
             UUID.fromString("c5994e33-21d3-327c-ab25-06d2356d2d68"));
     
-    /** Represents the language refset for: Swedish.. */
+    /** Represents the language refset for: Swedish. */
     public static ConceptSpec SV_REFEX =
             new ConceptSpec("Swedish [International Organization for Standardization 639-1 code sv] language reference set (foundation metadata concept)",
             UUID.fromString("e57ec728-742f-56b3-9b53-9613670fb24d"));
@@ -51,10 +51,18 @@ public class RefsetAux {
             new ConceptSpec("Great Britain English language reference set",
             UUID.fromString("eb9a5e42-3cba-356d-b623-3ed472e20b30"));
     
+    /** Represents the metadata refset: Path reference set refset. */
     public static ConceptSpec PATH_REFSET =
             new ConceptSpec("Path reference set",
             UUID.fromString("fd9d47b7-c0a4-3eea-b3ab-2b5a3f9e888f"));
+    
+    /** Represents the metadata refset: Path origin refset. */
     public static ConceptSpec PATH_ORIGIN_REFEST =
             new ConceptSpec("Path origin reference set",
             UUID.fromString("1239b874-41b4-32a1-981f-88b448829b4b"));
+    
+    /** Represents the language refset for: Danish. */
+    public static ConceptSpec DA_REFEX =
+            new ConceptSpec("Danish language reference set (foundation metadata concept)",
+            UUID.fromString("be446b41-0eda-3d36-84e4-ae196f05858b"));
 }
