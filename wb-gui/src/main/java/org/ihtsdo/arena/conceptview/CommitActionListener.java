@@ -75,23 +75,27 @@ public class CommitActionListener implements ActionListener {
                 Ts.get().addUncommitted(conflictRefset);
                 Ts.get().commit(conflictRefset);
              }
-             
-             ContradictionEditorFrame cef = (ContradictionEditorFrame) settings.getView().getRootPane().getParent();
-             TerminologyList list = cef.getBatchConceptList();
-             TerminologyListModel model = (TerminologyListModel)list.getModel();
-             List<Integer> nidsInList = model.getNidsInList();
-             for(int i = 0; i < nidsInList.size(); i++){
-                 int nid = nidsInList.get(i);
-                 if(nid == c.getNid()){
-                     model.removeElement(i);
-                     break;
-                 }
-             }
          }
-
-         return c.commit(settings.getConfig().getDbConfig().getUserChangesChangeSetPolicy().convert(),
+         boolean committed = false;
+         committed = c.commit(settings.getConfig().getDbConfig().getUserChangesChangeSetPolicy().convert(),
                          settings.getConfig().getDbConfig().getChangeSetWriterThreading().convert(),
                          settings.isForAdjudication());
+                         
+          //remove from adjudication list
+          if (committed && settings.isForAdjudication()) {
+              ContradictionEditorFrame cef = (ContradictionEditorFrame) settings.getView().getRootPane().getParent();
+              TerminologyList list = cef.getBatchConceptList();
+              TerminologyListModel model = (TerminologyListModel) list.getModel();
+              List<Integer> nidsInList = model.getNidsInList();
+              for (int i = 0; i < nidsInList.size(); i++) {
+                  int nid = nidsInList.get(i);
+                  if (nid == c.getNid()) {
+                      model.removeElement(i);
+                      break;
+                  }
+              }
+          }
+          return committed;
       }
 
       @Override
