@@ -289,7 +289,7 @@ public abstract class IdentifierVersion
 
    public void setTime(long time) {
       if (getTime() != Long.MAX_VALUE) {
-         throw new UnsupportedOperationException("Time alreay committed.");
+         throw new UnsupportedOperationException("Time already committed.");
       }
 
       this.statusAtPositionNid = Bdb.getSapDb().getSapNid(getStatusId(), time, getAuthorId(), getModuleNid(), getPathId());
