@@ -15,6 +15,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.swing.BoxLayout;
@@ -38,9 +39,11 @@ import org.ihtsdo.project.filter.WfWorklistFilter;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.search.WorkflowInstanceTableModel.WORKFLOW_FIELD;
+import org.ihtsdo.project.workflow.api.wf2.implementation.CancelSearch;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WfInstanceSearcher;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WorkflowStore;
 import org.ihtsdo.tk.workflow.api.WfFilterBI;
+import org.ihtsdo.tk.workflow.api.WfProcessInstanceBI;
 
 /**
  * @author Guillermo Reynoso
@@ -52,6 +55,7 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
 	private ArrayList<WfFilterBI> filters;
 	private WfInstanceSearcher instanceSearchWorker;
 	private JButton stopButton;
+	private CancelSearch keepSearching;
 
 	public WfInstanceSearchPanel() {
 		initComponents();
@@ -78,11 +82,16 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
 		filtersWrapper.add(new SearchFilterPanel(this));
 		filtersWrapper.revalidate();
 		filtersWrapper.repaint();
+		
+		keepSearching = new CancelSearch();
 
 		try {
 			config = Terms.get().getActiveAceFrameConfig();
-
-			searchButton.setIcon(new ImageIcon(ACE.class.getResource("/32x32/plain/gear_find.png")));
+			try{
+				searchButton.setIcon(new ImageIcon(ACE.class.getResource("/32x32/plain/gear_find.png")));
+			}catch (Exception e){
+				
+			}
 			model = new WorkflowInstanceTableModel(new WORKFLOW_FIELD[] { WORKFLOW_FIELD.FSN, WORKFLOW_FIELD.EDITOR, WORKFLOW_FIELD.STATE,
 					WORKFLOW_FIELD.TIMESTAMP }, config);
 			table1.setModel(model);
@@ -90,7 +99,12 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
 			ex.printStackTrace();
 		}
 
-		stopButton = new JButton(new ImageIcon(ACE.class.getResource("/32x32/plain/stop.png")));
+		stopButton = new JButton();
+		try{
+			stopButton.setIcon(new ImageIcon(ACE.class.getResource("/32x32/plain/stop.png")));
+		}catch (Exception e ){
+			
+		}
 		stopButton.setVisible(false);
 		stopButton.setToolTipText("stop the current search");
 		stopButton.addActionListener(new StopActionListener());
@@ -102,32 +116,25 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
 	private class StopActionListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			if (instanceSearchWorker != null && !instanceSearchWorker.isDone()) {
-				instanceSearchWorker.cancel(true);
-				instanceSearchWorker = null;
-			}
 			stopButton.setVisible(false);
 			searchButton.setVisible(true);
+			keepSearching.cancel(false);
 		}
 	}
 
 	private void searchButtonActionPerformed(ActionEvent e) {
 		model.clearResults();
-
+		keepSearching.cancel(true);
 		searchButton.setVisible(false);
 		stopButton.setVisible(true);
 		filters = new ArrayList<WfFilterBI>();
 
 		Component[] components = filtersWrapper.getComponents();
-		boolean worklistOrProjectFilter = false;
 		for (Component component : components) {
 			if (component instanceof SearchFilterPanel) {
 				SearchFilterPanel sfp = (SearchFilterPanel) component;
 				WfFilterBI filter = sfp.getWfFilter();
 				if (filter != null) {
-					if (filter instanceof WfWorklistFilter || filter instanceof WfProjectFilter) {
-						worklistOrProjectFilter = true;
-					}
 					filters.add(filter);
 				}
 			}
@@ -135,32 +142,16 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
 
 		WorkflowStore ws = new WorkflowStore();
 		try {
-			ws.searchWorkflow(filters);
+			ProgressListener propertyChangeListener = new ProgressListener(progressBar1);
+			Collection<WfProcessInstanceBI> instances = ws.searchWorkflow(filters, model, propertyChangeListener, keepSearching );
+			if(instances != null && !instances.isEmpty()){
+				for (WfProcessInstanceBI wfProcessInstanceBI : instances) {
+					model.addWfInstance(wfProcessInstanceBI);
+				}
+				propertyChangeListener.progressBar.setIndeterminate(false);
+			}
 		} catch (Exception e2) {
 			e2.printStackTrace();
-		}
-		
-		if (!worklistOrProjectFilter) {
-			if (instanceSearchWorker != null && !instanceSearchWorker.isDone()) {
-				instanceSearchWorker.cancel(true);
-				instanceSearchWorker = null;
-			}
-			instanceSearchWorker = new WfInstanceSearcher(filters, model);
-			instanceSearchWorker.addPropertyChangeListener(new ProgressListener(progressBar1));
-			instanceSearchWorker.execute();
-		} else {
-			for (WfFilterBI filter : filters) {
-				if (filter instanceof WfWorklistFilter) {
-					try {
-						I_GetConceptData wlconcept = Terms.get().getConcept(((WfWorklistFilter) filter).getWorklistUUID());
-						WorkList worklist = TerminologyProjectDAO.getWorkList(wlconcept, config);
-						List<WorkListMember> wlmembers = TerminologyProjectDAO.getAllWorkListMembers(worklist, config);
-						//wlmembers.get(0).getWfInstance().get
-					} catch (TerminologyException | IOException e1) {
-						e1.printStackTrace();
-					}
-				}
-			}
 		}
 
 	}
