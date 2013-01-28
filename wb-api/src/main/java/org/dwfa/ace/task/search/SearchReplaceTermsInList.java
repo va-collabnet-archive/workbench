@@ -56,7 +56,14 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.TerminologyBuilderBI;
+import org.ihtsdo.tk.api.blueprint.DescCAB;
+import org.ihtsdo.tk.api.blueprint.InvalidCAB;
+import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/listview", type = BeanType.TASK_BEAN) })
 public class SearchReplaceTermsInList extends AbstractTask {
@@ -127,7 +134,7 @@ public class SearchReplaceTermsInList extends AbstractTask {
 
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException{
         try {
 
             I_TermFactory termFactory = Terms.get();
@@ -212,6 +219,7 @@ public class SearchReplaceTermsInList extends AbstractTask {
                                 String origDesc = description.getText();
                                 String finalDesc = description.getText().replaceAll(searchPrepend + searchString,
                                     replaceString);
+                                finalDesc = finalDesc.replace("  ", " "); //remove double spaces
                                 String origDescHtml = description.getText().replaceAll(searchPrepend + searchString,
                                     "<font color='red'>" + searchString + "</font>");
                                 String finalDescHtml = description.getText().replaceAll(searchPrepend + searchString,
@@ -226,11 +234,25 @@ public class SearchReplaceTermsInList extends AbstractTask {
                                 searchReplaceDescriptions.add(srDesc);
 
                                 Set<PathBI> paths = config.getEditingPathSet();
-
                                 // Create a new, cloned, description
-                                I_DescriptionVersioned newDesc = termFactory.newDescription(UUID.randomUUID(), child,
-                                    description.getLang(), finalDesc, termFactory.getConcept(description.getTypeId()),
-                                    config);
+                                try{
+                                    TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(config.getEditCoordinate(), config.getViewCoordinate());
+                                    DescCAB descriptionBlueprint = description.makeBlueprint(config.getViewCoordinate());
+                                    descriptionBlueprint.setText(finalDesc);
+                                    descriptionBlueprint.setComponentUuid(UUID.randomUUID());
+                                    builder.construct(descriptionBlueprint);
+                                    for (RefexVersionBI refex : description.getCurrentRefexes(config.getViewCoordinate())) {
+                                        RefexCAB refexBlueprint = refex.makeBlueprint(config.getViewCoordinate());
+                                        refexBlueprint.setMemberUuid(refex.getPrimUuid());
+                                        refexBlueprint.setRetired();
+                                        builder.construct(refexBlueprint);
+                                    }
+                                }catch(InvalidCAB e){
+                                    throw new TaskFailedException(e);
+                                }catch(ContradictionException e){
+                                    throw new TaskFailedException(e);
+                                }
+                                //check that uuid is different
 
                                 for (PathBI path : paths) {
                                     // retire the existing description
