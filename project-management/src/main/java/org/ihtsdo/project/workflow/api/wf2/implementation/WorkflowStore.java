@@ -104,15 +104,40 @@ public class WorkflowStore implements WorkflowStoreBI {
 		}
 		return instances;
 	}
+	
+	public Collection<WfProcessInstanceBI> getProcessInstances(ConceptChronicleBI concept) throws Exception {
+		Collection<WfProcessInstanceBI> instances = new ArrayList<WfProcessInstanceBI>();
+		Collection<? extends RefexVersionBI<?>> annotations = concept.getAnnotationsActive(config.getViewCoordinate());
+		I_TermFactory tf = Terms.get();
+		for (RefexVersionBI loopAnnot : annotations) {
+			I_GetConceptData refset = tf.getConcept(loopAnnot.getRefexNid());
+			if (ts.isKindOf(refset.getConceptNid(), worklistsRoot.getConceptNid(), config.getViewCoordinate())) {
+				I_IntSet allowedTypes = tf.newIntSet();
+				allowedTypes.add(RefsetAuxiliary.Concept.PROMOTION_REL.localize().getNid());
+				Set<? extends I_GetConceptData> sources = refset.getDestRelOrigins(config.getAllowedStatus(), allowedTypes,
+						config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
+				
+				if (!sources.isEmpty()) {
+					I_GetConceptData wRefset = sources.iterator().next();
+					WorkList wlist = TerminologyProjectDAO.getWorkList(wRefset, config);
+					if (wlist != null) {
+						instances.add(TerminologyProjectDAO.getWorkListMember(tf.getConcept(concept.getNid()), wlist, config).getWfInstance());
+					}
+				}
+				
+			}
+		}
+		return instances;
+	}
 
 	@Override
 	public  Collection<WfProcessInstanceBI> searchWorkflow(Collection<WfFilterBI> filters) throws Exception {
 		boolean worklistOrProjectFilter = isProjectFilter(filters);
 		Collection<WfProcessInstanceBI> result = new ArrayList<WfProcessInstanceBI>();
-		if (!worklistOrProjectFilter) {
+		if (worklistOrProjectFilter) {
 			getInstancesForProjectFilter(filters, result);
 		} else {
-			WfInstanceSearcher instanceSearchWorker = new WfInstanceSearcher(filters, null);
+			WfInstanceSearcher instanceSearchWorker = new WfInstanceSearcher(filters, null, new CancelSearch());
 			instanceSearchWorker.execute();
 			try {
 				return instanceSearchWorker.get();
@@ -151,7 +176,7 @@ public class WorkflowStore implements WorkflowStoreBI {
 	 * @throws TerminologyException 
 	 */
 	public Collection<WfProcessInstanceBI> searchWorkflow(Collection<WfFilterBI> filters, WfInstanceContainer wfinstanceCont,
-			PropertyChangeListener propertyChangeListener) throws Exception {
+			PropertyChangeListener propertyChangeListener, CancelSearch keepSearching) throws Exception {
 		boolean worklistOrProjectFilter = isProjectFilter(filters);
 
 		if (worklistOrProjectFilter) {
@@ -159,7 +184,7 @@ public class WorkflowStore implements WorkflowStoreBI {
 			getInstancesForProjectFilter(filters, result);
 			return result;
 		} else {
-			WfInstanceSearcher instanceSearchWorker = new WfInstanceSearcher(filters, wfinstanceCont);
+			WfInstanceSearcher instanceSearchWorker = new WfInstanceSearcher(filters, wfinstanceCont, keepSearching);
 			instanceSearchWorker.addPropertyChangeListener(propertyChangeListener);
 			instanceSearchWorker.execute();
 		}
