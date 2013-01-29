@@ -2926,6 +2926,8 @@ public class TerminologyProjectDAO {
 		try {
 			I_IntSet allowedDestRelTypes = termFactory.newIntSet();
 			allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
+			I_IntSet allowedStatuses = config.getAllowedStatus();
+			allowedStatuses.remove(ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid());
 			Set<? extends I_GetConceptData> parents = workListConcept.getSourceRelTargets(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
 
 			if (parents.size() != 1) {
@@ -5648,7 +5650,7 @@ public class TerminologyProjectDAO {
 	public static List<WfMembership> convertToMembershipList(List<String> list) throws Exception {
 		List<WfMembership> members = new ArrayList<WfMembership>();
 		for (String line : list) {
-			String[] fields = line.split("|");
+			String[] fields = line.split("\\|");
 			I_GetConceptData userConcept = Terms.get().getConcept(UUID.fromString(fields[1]));
 			WfUser user = new WfUser(userConcept.toString(), userConcept.getPrimUuid());
 			
