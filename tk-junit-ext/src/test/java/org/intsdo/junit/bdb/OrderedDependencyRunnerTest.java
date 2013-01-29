@@ -12,7 +12,7 @@ import org.junit.runner.RunWith;
  * checking each runs after any other dependant test methods. 
  */
 @RunWith(BdbTestRunner.class)
-@BdbTestRunnerConfig()
+@BdbTestRunnerConfig( bdbLocation = "" )
 public class OrderedDependencyRunnerTest {
 
     private static ArrayList<String> executedTests = new ArrayList<>();
