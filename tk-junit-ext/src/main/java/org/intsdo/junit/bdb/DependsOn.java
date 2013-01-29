@@ -21,25 +21,17 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Defines configuration parameters to be passed to {@link BdbTestRunner} 
+ * Declares that a test method should not be executed until AFTER another test method has been executed.
+ * This does not consider the outcome (pass or fail) of the dependant test case. 
+ * This annotation is only inteded to define a reliable execution order (when used with an appropriate test runner). 
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface BdbTestRunnerConfig {
+@Target(ElementType.METHOD)
+public @interface DependsOn {
 
     /**
-     * Sets the relative path of the working directory for the container. The default container work
-     * path will be correct for Maven projects.
-     * 
-     * <p>
-     * Default value: <code>test-resources/berkeley-db</code>
-     * </p>
+     * The name of the method (within the same class). Use short name only, package qualification should NOT be included.
      */
-    String bdbLocation() default "test-resources/berkeley-db";
-    
-    /**
-     * Specifies classes to be executed to perform initialisation routines when the test runner is 
-     * initialised (per test class)
-     */
-    Class<? extends BdbTestInitialiser>[] init() default {};
+    String value();
+
 }
