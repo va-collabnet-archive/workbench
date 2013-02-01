@@ -30,6 +30,7 @@ import java.io.ObjectInputStream;
 import java.rmi.MarshalledObject;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 
 import javax.swing.ImageIcon;
@@ -41,8 +42,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
-
-import net.jini.config.ConfigurationException;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.WizardPanel;
@@ -56,8 +55,6 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.util.ComponentFrame;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.tapi.TerminologyException;
-
-import com.sun.jini.start.LifeCycle;
 
 public class AceFrame extends ComponentFrame {
 
@@ -108,9 +105,9 @@ public class AceFrame extends ComponentFrame {
 
     private static String adminPluginRoot = "plugins" + File.separator + "admin";
 
-    public AceFrame(String[] args, LifeCycle lc, I_ConfigAceFrame frameConfig, boolean executeStartupProcesses)
+    public AceFrame(String[] args, I_ConfigAceFrame frameConfig, boolean executeStartupProcesses)
             throws Exception {
-        super(args, lc);
+        super(args);
         this.frameConfig = (AceFrameConfig) frameConfig;
         setTitle(getFrameName());
         ((AceFrameConfig) frameConfig).setAceFrame(this);
@@ -135,7 +132,7 @@ public class AceFrame extends ComponentFrame {
         doWindowActivation();
         getQuitList().add(getCdePanel());
         this.addWindowListener(new AceWindowActionListener());
-        MasterWorker worker = new MasterWorker(config);
+        MasterWorker worker = new MasterWorker(UUID.randomUUID(), "AceFrame MasterWorker");
         cdePanel.getAceFrameConfig().setWorker(worker);
         if (executeStartupProcesses) {
             File configFile = ((AceFrameConfig) frameConfig).getMasterConfig().getProfileFile();
@@ -236,7 +233,7 @@ public class AceFrame extends ComponentFrame {
                         && newFrameConfig.getAdminPassword().equals(prompter.getPassword())) {
                         String regularPluginRoot = pluginRoot;
                         pluginRoot = adminPluginRoot;
-                        AceFrame newFrame = new AceFrame(getArgs(), getLc(), newFrameConfig, false);
+                        AceFrame newFrame = new AceFrame(getArgs(), newFrameConfig, false);
                         pluginRoot = regularPluginRoot;
                         newFrameConfig.setSubversionToggleVisible(true);
                         newFrameConfig.setAdministrative(true);
@@ -269,7 +266,7 @@ public class AceFrame extends ComponentFrame {
                 newFrameConfig.setMasterConfig((AceConfig) cdePanel.getAceFrameConfig().getDbConfig());
                 newFrameConfig.getMasterConfig().aceFrames.add(newFrameConfig);
 
-                AceFrame newFrame = new AceFrame(getArgs(), getLc(), newFrameConfig, false);
+                AceFrame newFrame = new AceFrame(getArgs(), newFrameConfig, false);
                 newFrame.setVisible(true);
             } catch (Exception e1) {
                 AceLog.getAppLog().alertAndLogException(e1);
@@ -293,8 +290,8 @@ public class AceFrame extends ComponentFrame {
         }
     }
 
-    public String getNextFrameName() throws ConfigurationException {
-        String title = (String) config.getEntry(this.getClass().getName(), "frameName", String.class, "Viewer");
+    public String getNextFrameName() {
+        String title = "Viewer Window";
         if (ACE.editMode) {
             title.replace("Viewer", "Editor");
             title.replace("viewer", "editor");
@@ -336,7 +333,7 @@ public class AceFrame extends ComponentFrame {
 
     public ACE getCdePanel() {
         if (cdePanel == null) {
-            cdePanel = new ACE(config, pluginRoot);
+            cdePanel = new ACE(pluginRoot);
         }
         return cdePanel;
     }

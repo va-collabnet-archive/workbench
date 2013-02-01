@@ -72,9 +72,6 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-import net.jini.config.ConfigurationException;
-import net.jini.core.lease.LeaseDeniedException;
-
 import org.dwfa.ace.TermLabelMaker;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
@@ -193,7 +190,7 @@ public class ProjectsPanel extends JPanel {
 	 * @throws ConfigurationException the configuration exception
 	 * @throws TerminologyException the terminology exception
 	 */
-	public ProjectsPanel(I_Work worker) throws RemoteException, TaskFailedException, LeaseDeniedException, IOException, InterruptedException, PrivilegedActionException, ConfigurationException,
+	public ProjectsPanel(I_Work worker) throws RemoteException, TaskFailedException, IOException, InterruptedException, PrivilegedActionException,
 			TerminologyException {
 
 		initComponents();

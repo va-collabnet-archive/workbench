@@ -32,6 +32,7 @@ public class DefaultObjectInputStreamCreator implements I_GetObjectInputStream {
      * @seeorg.dwfa.queue.I_GetObjectInputStream#getObjectInputStream(java.io.
      * InputStream)
      */
+    @Override
     public ObjectInputStream getObjectInputStream(InputStream is) throws IOException {
         return new ObjectInputStream(is);
     }

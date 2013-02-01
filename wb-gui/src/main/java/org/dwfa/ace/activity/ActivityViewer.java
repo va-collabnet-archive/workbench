@@ -43,8 +43,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
 
-import net.jini.config.ConfigurationException;
-
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.log.AceLog;
@@ -254,7 +252,7 @@ public class ActivityViewer implements ActionListener {
         }
 
         @Override
-        public String getNextFrameName() throws ConfigurationException {
+        public String getNextFrameName()  {
             return "Activity Viewer";
         }
 

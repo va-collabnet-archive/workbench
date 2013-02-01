@@ -23,9 +23,8 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.UUID;
+import javax.transaction.Transaction;
 
-import net.jini.core.transaction.Transaction;
-import net.jini.core.transaction.TransactionException;
 
 public interface I_StoreIdentifiedObjects {
     /**
@@ -36,10 +35,9 @@ public interface I_StoreIdentifiedObjects {
      * @throws RemoteException
      * @throws TransactionException
      */
-    public EntryID write(Object obj, Transaction t) throws RemoteException, IOException, TransactionException;
+    public EntryID write(Object obj, Transaction t) throws IOException;
 
-    public void write(Object obj, EntryID entryID, Transaction t) throws RemoteException, IOException,
-            TransactionException;
+    public void write(Object obj, EntryID entryID, Transaction t) throws IOException;
 
     /**
      * @param entryID
@@ -49,8 +47,7 @@ public interface I_StoreIdentifiedObjects {
      * @throws RemoteException
      * @throws TransactionException
      */
-    public Object take(EntryID entryID, Transaction t) throws RemoteException, IOException, ClassNotFoundException,
-            TransactionException, NoMatchingEntryException;
+    public Object take(EntryID entryID, Transaction t) throws IOException, ClassNotFoundException, NoMatchingEntryException;
 
     /**
      * @param processId
@@ -60,8 +57,8 @@ public interface I_StoreIdentifiedObjects {
      * @throws RemoteException
      * @throws TransactionException
      */
-    public Object take(UUID objectID, Transaction t) throws RemoteException, IOException, ClassNotFoundException,
-            TransactionException, NoMatchingEntryException;
+    public Object take(UUID objectID, Transaction t) throws IOException, ClassNotFoundException,
+            NoMatchingEntryException;
 
     /**
      * Takes the first object (as ordered by the Stores's native ordering) that
@@ -75,8 +72,8 @@ public interface I_StoreIdentifiedObjects {
      * @throws TransactionException
      * @throws NoMatchingEntryException
      */
-    public Object take(I_SelectObjects selector, Transaction t) throws RemoteException, IOException,
-            ClassNotFoundException, TransactionException, NoMatchingEntryException;
+    public Object take(I_SelectObjects selector, Transaction t) throws IOException,
+            ClassNotFoundException, NoMatchingEntryException;
 
     /**
      * Hides the process with the given entryID for the duration of the
@@ -90,8 +87,8 @@ public interface I_StoreIdentifiedObjects {
      * @throws TransactionException
      * @throws NoMatchingEntryException
      */
-    public void hide(EntryID entryID, Transaction t) throws RemoteException, IOException, ClassNotFoundException,
-            TransactionException, NoMatchingEntryException;
+    public void hide(EntryID entryID, Transaction t) throws IOException, ClassNotFoundException,
+            NoMatchingEntryException;
 
     /**
      * @param processId
@@ -131,8 +128,8 @@ public interface I_StoreIdentifiedObjects {
      *            writeTran.
      * @throws TransactionException
      */
-    public EntryID writeThenTake(Object process, Transaction writeTran, Transaction takeTran) throws RemoteException,
-            IOException, ClassNotFoundException, TransactionException;
+    public EntryID writeThenTake(Object process, Transaction writeTran, Transaction takeTran) throws
+            IOException, ClassNotFoundException;
 
     /**
      * @return An address that specifies the inbox from which this queue can be

@@ -23,14 +23,13 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.util.UUID;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-
-import net.jini.core.lookup.ServiceID;
 
 import org.dwfa.bpa.process.I_DescribeQueueEntry;
 import org.dwfa.bpa.process.I_QueueProcesses;
@@ -50,14 +49,14 @@ public class QueueSelectorPanel extends JPanel {
 
         String queueName;
 
-        ServiceID id;
+        UUID id;
 
         /**
          * @param queue
          * @param queueName
          * @param id
          */
-        public QueueAdaptor(I_QueueProcesses queue, String queueName, ServiceID id) {
+        public QueueAdaptor(I_QueueProcesses queue, String queueName, UUID id) {
             super();
             this.queue = queue;
             this.queueName = queueName;

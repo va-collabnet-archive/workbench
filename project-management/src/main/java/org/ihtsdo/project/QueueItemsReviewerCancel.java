@@ -27,16 +27,6 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingUtilities;
 
-import net.jini.core.entry.Entry;
-import net.jini.core.lease.LeaseDeniedException;
-import net.jini.core.lookup.ServiceID;
-import net.jini.core.lookup.ServiceItem;
-import net.jini.core.lookup.ServiceTemplate;
-import net.jini.core.transaction.Transaction;
-import net.jini.core.transaction.TransactionException;
-import net.jini.lookup.ServiceItemFilter;
-import net.jini.lookup.entry.Name;
-
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.I_DescribeBusinessProcess;
@@ -125,78 +115,8 @@ public class QueueItemsReviewerCancel {
      * @throws IOException Signals that an I/O exception has occurred.
      * @throws PrivilegedActionException the privileged action exception
      */
-    public void process() throws TaskFailedException, LeaseDeniedException, RemoteException, InterruptedException, IOException, PrivilegedActionException {
-        if (contract != null) {
-            try {
-                ServiceID serviceID = null;
-                Class<?>[] serviceTypes = new Class[]{I_QueueProcesses.class};
-                Entry[] attrSetTemplates = new Entry[]{new Name(queueName)};
-                ServiceTemplate template = new ServiceTemplate(serviceID, serviceTypes, attrSetTemplates);
-                ServiceItemFilter filter = null;
-                ServiceItem service = worker.lookup(template, filter);
-                if (service == null) {
-                    throw new TaskFailedException("No queue with the specified name could be found: "
-                            + queueName);
-                }
-                queue = (I_QueueProcesses) service.service;
-
-
-            } catch (Exception e) {
-                throw new TaskFailedException(e);
-            }
-            I_EncodeBusinessProcess process = null;
-            HashSet<UUID> uuidSet = new HashSet<UUID>();
-            try {
-                Collection<I_DescribeBusinessProcess> processes = this.queue.getProcessMetaData(selector);
-
-                for (I_DescribeBusinessProcess descProcess : processes) {
-                    boolean modified = false;
-                    I_DescribeQueueEntry qEntry = (I_DescribeQueueEntry) descProcess;
-                    process = this.queue.read(qEntry.getEntryID(), null);
-                    UUID contractUuidTarget = (UUID) process.readAttachement(ProcessAttachmentKeys.QUEUE_UTIL_CONTRACT_UUID.getAttachmentKey());
-                    if (contractUuidTarget.toString().equals(contractUuid.toString())) {
-                        HashMap<UUID, String> contractTarget = (HashMap<UUID, String>) process.readAttachement(ProcessAttachmentKeys.QUEUE_UTIL_CONTRACT.getAttachmentKey());
-
-                        if (contractTarget != null) {
-                            for (UUID uuid : contract) {
-                                if (contractTarget.containsKey(uuid)) {
-                                    contractTarget.remove(uuid);
-                                    modified = true;
-                                }
-                            }
-                        }
-                        if (modified) {
-
-                            Transaction transaction = worker.getActiveTransaction();
-                            process = this.queue.take(qEntry.getEntryID(), transaction);
-
-                            process.writeAttachment(ProcessAttachmentKeys.QUEUE_UTIL_CONTRACT.getAttachmentKey(), contractTarget);
-
-                            this.queue.write(process, worker.getActiveTransaction());
-                            worker.commitTransactionIfActive();
-                        }
-                    }
-                }
-            } catch (ClassNotFoundException e) {
-                AceLog.getAppLog().alertAndLogException(e);
-            } catch (TransactionException e) {
-                AceLog.getAppLog().alertAndLogException(e);
-            } catch (NoMatchingEntryException e) {
-                AceLog.getAppLog().alertAndLogException(e);
-            }
-
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    setupExecuteEnd();
-                }
-
-                private void setupExecuteEnd() {
-                    RefreshServer ros = new RefreshServer();
-                    ros.start();
-
-                }
-            });
-        }
+    public void process() throws TaskFailedException, RemoteException, InterruptedException, IOException, PrivilegedActionException {
+        throw new UnsupportedOperationException("TODO: Removal of JINI");
     }
 
     /**

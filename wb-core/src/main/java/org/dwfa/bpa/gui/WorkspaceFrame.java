@@ -35,14 +35,13 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import javax.naming.ConfigurationException;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
-
-import net.jini.config.ConfigurationException;
 
 import org.dwfa.bpa.gui.GridBagPanel.GridBagPanelConstraints;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -82,7 +81,7 @@ public class WorkspaceFrame extends ComponentFrame implements ActionListener {
      */
     public WorkspaceFrame(String title, I_ManageUserTransactions transactionInterface, File menuDir, I_Work worker)
             throws Exception {
-        super(new String[] {}, null, menuDir);
+        super(new String[] {}, menuDir);
         this.title = title;
         this.menuDir = menuDir;
         this.worker = worker;
@@ -278,7 +277,7 @@ public class WorkspaceFrame extends ComponentFrame implements ActionListener {
      * @throws ConfigurationException
      * @see org.dwfa.bpa.util.ComponentFrame#getNextFrameName()
      */
-    public String getNextFrameName() throws ConfigurationException {
+    public String getNextFrameName() {
         if (count > 0) {
             return title + " " + count++;
         }

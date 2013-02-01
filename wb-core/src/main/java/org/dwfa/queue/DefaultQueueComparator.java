@@ -27,14 +27,13 @@ import org.dwfa.bpa.process.I_DescribeQueueEntry;
  * @author kec
  * 
  */
-public class DefaultQueueComparator implements Comparator {
+public class DefaultQueueComparator implements Comparator<I_DescribeQueueEntry> {
 
     /**
      * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
      */
-    public int compare(Object o1, Object o2) {
-        I_DescribeQueueEntry d1 = (I_DescribeQueueEntry) o1;
-        I_DescribeQueueEntry d2 = (I_DescribeQueueEntry) o2;
+    @Override
+    public int compare(I_DescribeQueueEntry d1, I_DescribeQueueEntry d2) {
         int compareValue = compareComparables(d1.getPriority(), d2.getPriority());
         if (compareValue != 0) {
             return compareValue;

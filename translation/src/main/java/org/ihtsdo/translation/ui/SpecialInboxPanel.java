@@ -58,15 +58,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
-import net.jini.config.ConfigurationException;
-import net.jini.core.entry.Entry;
-import net.jini.core.lease.LeaseDeniedException;
-import net.jini.core.lookup.ServiceID;
-import net.jini.core.lookup.ServiceItem;
-import net.jini.core.lookup.ServiceTemplate;
-import net.jini.lookup.ServiceItemFilter;
-import net.jini.lookup.entry.Name;
-
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
@@ -77,7 +68,6 @@ import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.EntryID;
 import org.dwfa.bpa.process.I_DescribeBusinessProcess;
 import org.dwfa.bpa.process.I_DescribeObject;
-import org.dwfa.bpa.process.I_DescribeQueueEntry;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_QueueProcesses;
 import org.dwfa.bpa.process.I_SelectProcesses;
@@ -231,23 +221,9 @@ public class SpecialInboxPanel extends JPanel {
 		try {
 			loadQueueItems();
 			refreshItemsTable();
-		} catch (RemoteException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
-		} catch (TaskFailedException e) {
-			e.printStackTrace();
-		} catch (LeaseDeniedException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (PrivilegedActionException e) {
-			e.printStackTrace();
-		} catch (ConfigurationException e) {
-			e.printStackTrace();
-		} catch (TerminologyException e) {
-			e.printStackTrace();
-		}
+		} 
 	}
 
 	/**
@@ -256,19 +232,7 @@ public class SpecialInboxPanel extends JPanel {
 	private void refreshItemsTable() {
 		try {
 			getOutboxItems();
-		} catch (TaskFailedException e1) {
-			e1.printStackTrace();
-		} catch (LoginException e1) {
-			e1.printStackTrace();
-		} catch (TerminologyException e1) {
-			e1.printStackTrace();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		} catch (ConfigurationException e1) {
-			e1.printStackTrace();
-		} catch (PrivilegedActionException e1) {
-			e1.printStackTrace();
-		} catch (InterruptedException e1) {
+		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
 
@@ -352,95 +316,8 @@ public class SpecialInboxPanel extends JPanel {
 	 * @throws LeaseDeniedException the lease denied exception
 	 * @throws TerminologyException the terminology exception
 	 */
-	private void loadQueueItems() throws RemoteException, IOException, TaskFailedException, InterruptedException, PrivilegedActionException, ConfigurationException, LeaseDeniedException,
-			TerminologyException {
-
-		ServiceID serviceID = null;
-		Class<?>[] serviceTypes = new Class[] { I_QueueProcesses.class };
-		Entry[] attrSetTemplates = new Entry[] { new Name(queueName) };
-		ServiceTemplate template = new ServiceTemplate(serviceID, serviceTypes, attrSetTemplates);
-		ServiceItemFilter filter = null;
-		ServiceItem service = worker.lookup(template, filter);
-		if (service == null) {
-			throw new TaskFailedException("No queue with the specified name could be found: " + queueName);
-		}
-		this.queue = (I_QueueProcesses) service.service;
-
-		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-		HashMap<String, String> worklistHash = new HashMap<String, String>();
-		HashMap<String, String> statusHash = new HashMap<String, String>();
-		I_EncodeBusinessProcess process = null;
-		Collection<I_DescribeBusinessProcess> processes = this.queue.getProcessMetaData(revisionProcSelector);
-
-		if (processes.size() <= 0) {
-			processes = this.queue.getProcessMetaData(selector);
-			HashMap<Integer, Integer> countAssignments = new HashMap<Integer, Integer>();
-			int countAssignmentsInt = 0;
-			String status = "";
-			String worklistName = "";
-			for (I_DescribeBusinessProcess descProcess : processes) {
-				try {
-					I_DescribeQueueEntry qEntry = (I_DescribeQueueEntry) descProcess;
-					process = this.queue.read(qEntry.getEntryID(), null);
-					WorkListMember member = (WorkListMember) process.readAttachement(ProcessAttachmentKeys.WORKLIST_MEMBER.getAttachmentKey());
-					if (member != null) {
-						countAssignmentsInt++;
-						I_TerminologyProject project = getProjectForMember(member, config);
-						if (project != null) {
-							if (!countAssignments.keySet().contains(project.getId())) {
-								countAssignments.put(project.getId(), 1);
-							} else {
-								countAssignments.put(project.getId(), countAssignments.get(project.getId()) + 1);
-							}
-							if (worklistHash.containsKey(member.getWorkListUUID().toString())) {
-								worklistName = worklistHash.get(member.getWorkListUUID().toString());
-							} else {
-								I_GetConceptData workListConcept = Terms.get().getConcept(member.getWorkListUUID());
-								WorkList worklist = (WorkList) TerminologyProjectDAO.getWorkList(workListConcept, config);
-								worklistName = worklist.getName();
-								worklistHash.put(member.getWorkListUUID().toString(), worklistName);
-								hashFolders.put(worklistName, new HashSet<EntryID>());
-							}
-							addEntryToWorklistFolder(worklistName, qEntry.getEntryID());
-
-							Set<String> tagsArray = (Set<String>) process.readAttachement(CUSTOM_NODE_KEY);
-
-							String[] targetTerms = getTerms(member, project, true);
-							String[] sourceTerms = getTerms(member, project, false);
-							if (statusHash.containsKey(member.getActivityStatus().toString())) {
-								status = statusHash.get(member.getActivityStatus().toString());
-							} else {
-								I_GetConceptData statusConcept = member.getActivityStatus();
-								status = statusConcept.toString();
-								statusHash.put(member.getActivityStatus().toString(), status);
-								hashFolders.put(status, new HashSet<EntryID>());
-							}
-							Long statusTime = member.getStatusDate();
-							QueueTableObj tObj = new QueueTableObj("leaf", sourceTerms[0], sourceTerms[1], status, targetTerms[0], targetTerms[1], qEntry.getEntryID(), tagsArray,
-									worklistName,statusTime);
-							hashAllItems.put(qEntry.getEntryID(), tObj);
-							// nodeRoot.add(new DefaultMutableTreeNode(new
-							// QueueTreeTableObj("leaf",sourceTerms[0],sourceTerms[1],status,
-							// targetTerms[0],targetTerms[1],
-							// qEntry.getEntryID())));
-						}
-					}
-				} catch (ClassNotFoundException e) {
-
-					e.printStackTrace();
-				} catch (NoMatchingEntryException e) {
-
-					e.printStackTrace();
-					break;
-				} catch (RemoteException e) {
-
-					e.printStackTrace();
-				} catch (IOException e) {
-
-					e.printStackTrace();
-				}
-			}
-		}
+	private void loadQueueItems() throws RemoteException, IOException, TaskFailedException, InterruptedException, PrivilegedActionException, TerminologyException {
+		throw new UnsupportedOperationException("TODO: Jini removal");
 	}
 
 	/**
@@ -528,80 +405,8 @@ public class SpecialInboxPanel extends JPanel {
 	 * @throws PrivilegedActionException the privileged action exception
 	 * @throws InterruptedException the interrupted exception
 	 */
-	private void getOutboxItems() throws TerminologyException, IOException, TaskFailedException, LoginException, ConfigurationException, PrivilegedActionException, InterruptedException {
-
-		I_ConfigAceFrame config;
-		config = Terms.get().getActiveAceFrameConfig();
-		String outboxQueueName = config.getUsername() + ".outbox";
-		ServiceID serviceID = null;
-		Class<?>[] serviceTypes = new Class[] { I_QueueProcesses.class };
-		Entry[] attrSetTemplates = new Entry[] { new Name(outboxQueueName) };
-		ServiceTemplate template = new ServiceTemplate(serviceID, serviceTypes, attrSetTemplates);
-		ServiceItemFilter filter = null;
-		if (outboxReadWorker == null){
-			outboxReadWorker = worker.getTransactionIndependentClone();
-			outboxReadWorker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), config);
-		}
-		ServiceItem service = outboxReadWorker.lookup(template, filter);
-		if (service == null) {
-			throw new TaskFailedException("No queue with the specified name could be found: " + outboxQueueName);
-		}
-		outboxQueue = (I_QueueProcesses) service.service;
-		Collection<I_DescribeBusinessProcess> processes = outboxQueue.getProcessMetaData(selector);
-		HashMap<Integer, Integer> countAssignments = new HashMap<Integer, Integer>();
-		HashMap<String, String> statusHash = new HashMap<String, String>();
-		I_EncodeBusinessProcess process = null;
-		int countAssignmentsInt = 0;
-		String status = "";
-		for (I_DescribeBusinessProcess descProcess : processes) {
-			try {
-				I_DescribeQueueEntry qEntry = (I_DescribeQueueEntry) descProcess;
-				process = outboxQueue.read(qEntry.getEntryID(), null);
-				WorkListMember member = (WorkListMember) process.readAttachement(ProcessAttachmentKeys.WORKLIST_MEMBER.getAttachmentKey());
-				if (member != null) {
-					countAssignmentsInt++;
-					I_TerminologyProject project = getProjectForMember(member, config);
-					if (project != null) {
-						if (!countAssignments.keySet().contains(project.getId())) {
-							countAssignments.put(project.getId(), 1);
-						} else {
-							countAssignments.put(project.getId(), countAssignments.get(project.getId()) + 1);
-						}
-						HashSet<String> oFolder = new HashSet<String>();
-
-						String[] targetTerms = getTerms(member, project, true);
-						String[] sourceTerms = getTerms(member, project, false);
-						if (statusHash.containsKey(member.getActivityStatus().toString())) {
-							status = statusHash.get(member.getActivityStatus().toString());
-						} else {
-							I_GetConceptData statusConcept = member.getActivityStatus();
-							status = statusConcept.toString();
-							statusHash.put(member.getActivityStatus().toString(), status);
-
-						}
-						Long statusTime = member.getStatusDate();
-						
-						QueueTableObj tObj = new QueueTableObj("leaf", sourceTerms[0], sourceTerms[1], status, targetTerms[0], targetTerms[1], qEntry.getEntryID(), oFolder, null,statusTime);
-						hashAllItems.put(qEntry.getEntryID(), tObj);
-
-					}
-				}
-			} catch (ClassNotFoundException e) {
-
-				e.printStackTrace();
-			} catch (NoMatchingEntryException e) {
-
-				e.printStackTrace();
-				break;
-			} catch (RemoteException e) {
-
-				e.printStackTrace();
-			} catch (IOException e) {
-
-				e.printStackTrace();
-			}
-		}
-
+	private void getOutboxItems() throws TerminologyException, IOException, TaskFailedException, LoginException, PrivilegedActionException, InterruptedException {
+		throw new UnsupportedOperationException("TODO: Jini removal");
 	}
 
 	/**

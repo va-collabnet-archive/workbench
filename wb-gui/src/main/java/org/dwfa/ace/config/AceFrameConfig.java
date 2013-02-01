@@ -52,10 +52,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
-import net.jini.core.entry.Entry;
-import net.jini.core.lookup.ServiceItem;
-import net.jini.lookup.ServiceItemFilter;
-
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.BundleType;
 import org.dwfa.ace.api.I_ConfigAceDb;
@@ -104,7 +100,6 @@ import org.dwfa.bpa.data.SortedSetModel;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.jini.ElectronicAddress;
 import org.dwfa.jini.TermEntry;
 import org.dwfa.svn.Svn;
 import org.dwfa.tapi.NoMappingException;
@@ -2406,26 +2401,6 @@ private void writeConceptAsId(I_GetConceptData concept, ObjectOutputStream out) 
 
 }
 
-    public class QueueFilter implements ServiceItemFilter {
-
-    public boolean check(ServiceItem item) {
-        if (showAllQueues) {
-            return true;
-        }
-        HashSet<Entry> itemAttributes = new HashSet<Entry>(Arrays.asList(item.attributeSets));
-        for (String address : queueAddressesToShow) {
-            if (itemAttributes.contains(new ElectronicAddress(address))) {
-                AceLog.getAppLog().info(" true");
-                return true;
-            }
-        }
-        return false;
-    }
-}
-public ServiceItemFilter getInboxQueueFilter() {
-        return new QueueFilter();
-    }
-
     public boolean getShowAllQueues() {
         return showAllQueues;
     }
@@ -2850,8 +2825,7 @@ public ServiceItemFilter getInboxQueueFilter() {
                 } else if (visible == true) {
                     try {
                         aceFrame =
-                                new AceFrame(new String[]{masterConfig.getAceRiverConfigFile()}, null,
-                                AceFrameConfig.this, false);
+                                new AceFrame(new String[]{}, AceFrameConfig.this, false);
                     } catch (Exception e) {
                         AceLog.getAppLog().alertAndLogException(e);
                     }
@@ -3383,7 +3357,7 @@ public ServiceItemFilter getInboxQueueFilter() {
 
     @Override
         public void setEnabledExistingInboxButton(boolean enable) {
-        aceFrame.getCdePanel().setEnabledExistingInboxButton(enable);
+        throw new UnsupportedOperationException("TODO: Jini removal");
     }
 
     @Override
@@ -3393,7 +3367,7 @@ public ServiceItemFilter getInboxQueueFilter() {
 
     @Override
         public void setEnabledNewInboxButton(boolean enable) {
-        aceFrame.getCdePanel().setEnabledNewInboxButton(enable);
+        throw new UnsupportedOperationException("TODO: Jini removal");
     }
 
     @Override

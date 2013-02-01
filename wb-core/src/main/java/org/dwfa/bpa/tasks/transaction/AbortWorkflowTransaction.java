@@ -18,11 +18,10 @@ package org.dwfa.bpa.tasks.transaction;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.rmi.RemoteException;
 import java.util.Collection;
-
-import net.jini.core.transaction.CannotAbortException;
-import net.jini.core.transaction.UnknownTransactionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.transaction.SystemException;
 
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -58,16 +57,13 @@ public class AbortWorkflowTransaction extends AbstractTask {
      * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.I_Work)
      */
+    @Override
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             worker.abortActiveTransaction();
-        } catch (RemoteException e) {
-            throw new TaskFailedException(e);
-        } catch (UnknownTransactionException e) {
-            throw new TaskFailedException(e);
-        } catch (CannotAbortException e) {
-            throw new TaskFailedException(e);
-        }
+        } catch (IllegalStateException | SystemException ex) {
+            throw new TaskFailedException(ex);
+        } 
         return Condition.PROCESS_COMPLETE;
     }
 
@@ -75,6 +71,7 @@ public class AbortWorkflowTransaction extends AbstractTask {
      * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.I_Work)
      */
+    @Override
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do
 

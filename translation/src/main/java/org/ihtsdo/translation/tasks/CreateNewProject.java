@@ -34,10 +34,6 @@ import java.util.UUID;
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 
-import net.jini.core.lease.LeaseDeniedException;
-import net.jini.core.transaction.CannotCommitException;
-import net.jini.core.transaction.UnknownTransactionException;
-
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
@@ -349,38 +345,7 @@ public class CreateNewProject extends AbstractTask {
 	 */
 	public void complete(I_EncodeBusinessProcess process, I_Work worker)
 	throws TaskFailedException {
-
-
-		try {
-			try {
-				TerminologyProjectDAO.deliverWorklistBusinessProcessToOutbox(workList1, worker);
-				TerminologyProjectDAO.deliverWorklistBusinessProcessToOutbox(workList2, worker);
-			} catch (UnknownTransactionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (CannotCommitException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (LeaseDeniedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (PrivilegedActionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-		} catch (TerminologyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-
+		throw new UnsupportedOperationException("TODO: Jini removal");
 	}
 
 	/* (non-Javadoc)

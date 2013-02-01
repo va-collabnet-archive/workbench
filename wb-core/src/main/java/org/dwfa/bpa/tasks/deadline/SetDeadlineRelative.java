@@ -21,7 +21,6 @@ package org.dwfa.bpa.tasks.deadline;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.logging.Level;
@@ -88,20 +87,15 @@ public class SetDeadlineRelative extends AbstractTask {
      * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.I_Work)
      */
+    @Override
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
-        Date now;
-        try {
-            now = new Date(worker.getTime());
-        } catch (RemoteException e) {
-            throw new TaskFailedException(e);
-        }
+        Date now = new Date(worker.getTime());
         long lengthToExtend = relativeTimeInMins;
         lengthToExtend = lengthToExtend * 1000 * 60;
         Date deadline = new Date(now.getTime() + lengthToExtend);
         if (worker.getLogger().isLoggable(Level.FINER)) {
-            worker.getLogger().finer(
-                this.getName() + " Now: " + Worker.dateFormat.format(now) + " relative time in min: "
-                    + this.relativeTimeInMins + " new deadline: " + Worker.dateFormat.format(deadline));
+            worker.getLogger().log(
+                Level.FINER, "{0} Now: {1} relative time in min: {2} new deadline: {3}", new Object[]{this.getName(), Worker.dateFormat.format(now), this.relativeTimeInMins, Worker.dateFormat.format(deadline)});
         }
         process.setDeadline(deadline);
         return Condition.CONTINUE;
@@ -111,6 +105,7 @@ public class SetDeadlineRelative extends AbstractTask {
      * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.I_Work)
      */
+    @Override
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // nothing to do...
 
@@ -119,6 +114,7 @@ public class SetDeadlineRelative extends AbstractTask {
     /**
      * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
      */
+    @Override
     public Collection<Condition> getConditions() {
         return CONTINUE_CONDITION;
     }

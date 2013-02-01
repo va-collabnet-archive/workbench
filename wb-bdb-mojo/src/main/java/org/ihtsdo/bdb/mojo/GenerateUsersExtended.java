@@ -22,19 +22,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.UUID;
 import java.util.logging.Level;
 
 import javax.swing.JOptionPane;
 
-import net.jini.config.Configuration;
-import net.jini.config.ConfigurationException;
-import net.jini.config.ConfigurationProvider;
-import net.jini.core.entry.Entry;
 
 import org.apache.lucene.document.Document;
 import org.apache.maven.plugin.AbstractMojo;
@@ -60,11 +54,8 @@ import org.dwfa.ace.refset.*;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.jini.ElectronicAddress;
-import org.dwfa.queue.QueueServer;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
-import org.dwfa.util.io.FileIO;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.lang.LANG_CODE;
@@ -788,91 +779,19 @@ public class GenerateUsersExtended extends AbstractMojo {
     }
 
     private void createInbox(I_ConfigAceFrame config, String inboxName, File userQueueRoot,
-            String nodeInboxAddress) throws IOException, ConfigurationException, Exception {
-        config.getQueueAddressesToShow().add(inboxName);
-        createQueue(config, "inbox", inboxName, userQueueRoot, nodeInboxAddress);
+            String nodeInboxAddress) throws IOException, Exception {
+		throw new UnsupportedOperationException("TODO: Jini removal");
     }
 
     private void createOutbox(I_ConfigAceFrame config, String outboxName, File userQueueRoot,
-            String nodeInboxAddress) throws IOException, ConfigurationException, Exception {
-        config.getQueueAddressesToShow().add(outboxName);
-        createQueue(config, "outbox", outboxName, userQueueRoot, nodeInboxAddress);
+            String nodeInboxAddress) throws IOException, Exception {
+		throw new UnsupportedOperationException("TODO: Jini removal");
     }
 
     private void createQueue(I_ConfigAceFrame config, String queueType, String queueName, File userQueueRoot,
-            String nodeInboxAddress) throws IOException, ConfigurationException, Exception {
+            String nodeInboxAddress) throws IOException, Exception {
+		throw new UnsupportedOperationException("TODO: Jini removal");
 
-        if (userQueueRoot.exists() == false) {
-            userQueueRoot.mkdirs();
-        }
-
-        File queueDirectory = new File(userQueueRoot, queueName);
-
-        queueDirectory.mkdirs();
-
-        Map<String, String> substutionMap = new TreeMap<String, String>();
-
-        substutionMap.put("**queueName**", queueDirectory.getName());
-        substutionMap.put("**inboxAddress**", queueDirectory.getName());
-        substutionMap.put("**directory**", FileIO.getPathRelativeToDir(queueDirectory, wbBundleDir).replace('\\', '/'));
-        substutionMap.put("**nodeInboxAddress**", nodeInboxAddress);
-
-        String fileName = "template.queue.config";
-
-        if (queueType.equals("aging")) {
-            fileName = "template.queueAging.config";
-        } else if (queueType.equals("archival")) {
-            fileName = "template.queueArchival.config";
-        } else if (queueType.equals("compute")) {
-            fileName = "template.queueCompute.config";
-        } else if (queueType.equals("inbox")) {
-            substutionMap.put("**mailPop3Host**", "**mailPop3Host**");
-            substutionMap.put("**mailUsername**", "**mailUsername**");
-            fileName = "template.queueInbox.config";
-        } else if (queueType.equals("launcher")) {
-            fileName = "template.queueLauncher.config";
-        } else if (queueType.equals("outbox")) {
-            substutionMap.put("//**allGroups**mailHost", "//**allGroups**mailHost");
-            substutionMap.put("//**outbox**mailHost", "//**outbox**mailHost");
-            substutionMap.put("**mailHost**", "**mailHost**");
-            fileName = "template.queueOutbox.config";
-        }
-
-        File queueConfigTemplate = new File(configDir, fileName);
-        String configTemplateString = FileIO.readerToString(new FileReader(queueConfigTemplate));
-
-        for (String key : substutionMap.keySet()) {
-            configTemplateString = configTemplateString.replace(key, substutionMap.get(key));
-        }
-
-        File newQueueConfig = new File(queueDirectory, "queue.config");
-        FileWriter fw = new FileWriter(newQueueConfig);
-
-        fw.write(configTemplateString);
-        fw.close();
-        config.getDbConfig().getQueues().add(FileIO.getPathRelativeToDir(newQueueConfig, wbBundleDir));
-
-        Configuration queueConfig = ConfigurationProvider.getInstance(new String[]{
-                    newQueueConfig.getAbsolutePath()});
-        Entry[] entries = (Entry[]) queueConfig.getEntry("org.dwfa.queue.QueueServer", "entries",
-                Entry[].class, new Entry[]{});
-
-        for (Entry entry : entries) {
-            if (ElectronicAddress.class.isAssignableFrom(entry.getClass())) {
-                ElectronicAddress ea = (ElectronicAddress) entry;
-
-                config.getQueueAddressesToShow().add(ea.address);
-
-                break;
-            }
-        }
-
-        if (QueueServer.started(newQueueConfig)) {
-            AceLog.getAppLog().info("Queue already started: "
-                    + newQueueConfig.toURI().toURL().toExternalForm());
-        } else {
-            new QueueServer(new String[]{newQueueConfig.getCanonicalPath()}, null);
-        }
     }
 
     private ConceptChronicleBI createUser()

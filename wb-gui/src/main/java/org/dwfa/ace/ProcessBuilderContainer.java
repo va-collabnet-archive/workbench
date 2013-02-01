@@ -20,6 +20,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
+import java.util.UUID;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -27,7 +28,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import net.jini.config.Configuration;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.log.AceLog;
@@ -50,30 +50,27 @@ public class ProcessBuilderContainer extends JPanel implements I_HandleDoubleCli
 	 */
     private static final long serialVersionUID = 1L;
 
-    private Configuration config;
-
     private I_ConfigAceFrame aceFrameConfig;
 
     private MasterWorker processWorker;
 
     private ProcessBuilderPanel processBuilderPanel;
 
-    public ProcessBuilderContainer(Configuration config, I_ConfigAceFrame aceFrameConfig) throws Exception {
-        this(config, aceFrameConfig, ContainerType.TOP_LEVEL);
+    public ProcessBuilderContainer(I_ConfigAceFrame aceFrameConfig) throws Exception {
+        this(aceFrameConfig, ContainerType.TOP_LEVEL);
     }
 
-    public ProcessBuilderContainer(Configuration config, I_ConfigAceFrame aceFrameConfig, ContainerType type)
+    public ProcessBuilderContainer(I_ConfigAceFrame aceFrameConfig, ContainerType type)
             throws Exception {
         super(new GridBagLayout());
-        this.config = config;
         this.aceFrameConfig = aceFrameConfig;
-        processWorker = new MasterWorker(config);
+        processWorker = new MasterWorker(UUID.randomUUID(), "Process Builder Master Worker");
         if (aceFrameConfig == null) {
             throw new NullPointerException("aceFrameConfig cannot be null...");
         }
         processWorker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), aceFrameConfig);
 
-        processBuilderPanel = new ProcessBuilderPanel(config, processWorker);
+        processBuilderPanel = new ProcessBuilderPanel(processWorker);
         processBuilderPanel.setDoubleClickHandler(this);
         processBuilderPanel.newProcess();
 
@@ -151,7 +148,7 @@ public class ProcessBuilderContainer extends JPanel implements I_HandleDoubleCli
 
     public void handle(I_EncodeBusinessProcess process, I_Work worker, I_EncodeBusinessProcess parent) {
         try {
-            ProcessBuilderContainer pbc = new ProcessBuilderContainer(config, aceFrameConfig,
+            ProcessBuilderContainer pbc = new ProcessBuilderContainer(aceFrameConfig,
                 ContainerType.EMBEDDED_TASK);
             pbc.processBuilderPanel.setExecutionButtonsVisible(false);
             pbc.processBuilderPanel.setDoubleClickHandler(pbc);

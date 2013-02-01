@@ -38,7 +38,6 @@ import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.svn.SvnPrompter;
 import org.dwfa.bpa.process.TaskFailedException;
-import org.dwfa.log.HtmlHandler;
 
 public class SvnPanel extends JPanel {
 
@@ -196,39 +195,6 @@ public class SvnPanel extends JPanel {
 
     }
 
-    private class ClearLogListener implements ActionListener {
-
-        HtmlHandler logHandler;
-
-        public ClearLogListener(HtmlHandler logHandler) {
-            super();
-            this.logHandler = logHandler;
-        }
-
-        public void actionPerformed(ActionEvent arg0) {
-            logHandler.clearLog();
-        }
-
-    }
-
-    private class LogLevelListener implements ActionListener {
-
-        HtmlHandler logHandler;
-        JComboBox logLevel;
-
-        public LogLevelListener(HtmlHandler logHandler, JComboBox logLevel) {
-            super();
-            this.logHandler = logHandler;
-            this.logLevel = logLevel;
-        }
-
-        public void actionPerformed(ActionEvent arg0) {
-            logHandler.setLevel((Level) logLevel.getSelectedItem());
-            SvnLog.setLevel(logHandler.getLevel());
-            SvnLog.info("Level set to: " + logHandler.getLevel());
-        }
-    }
-
     boolean database = false;
 
     /**
@@ -360,11 +326,6 @@ public class SvnPanel extends JPanel {
         c.fill = GridBagConstraints.BOTH;
         c.weighty = 1;
         JEditorPane logOut = new JEditorPane("text/html", "<html>");
-        HtmlHandler logHandler = new HtmlHandler(logOut, "svn");
-        logHandler.setLevel(Level.INFO);
-        SvnLog.addHandler(logHandler);
-        clear.addActionListener(new ClearLogListener(logHandler));
-        logLevel.addActionListener(new LogLevelListener(logHandler, logLevel));
         c.gridy++;
         this.add(new JScrollPane(logOut), c);
     }

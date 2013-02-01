@@ -38,12 +38,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.WindowConstants;
 
-import net.jini.config.Configuration;
-import net.jini.config.ConfigurationException;
-import net.jini.config.ConfigurationProvider;
-
-import com.sun.jini.start.LifeCycle;
-
 /**
  * @author kec
  * 
@@ -76,9 +70,7 @@ public abstract class ComponentFrame extends JFrame implements I_InitComponentMe
 		this.sendToBackInsteadOfClose = sendToBackInsteadOfClose;
 	}
 
-	protected Configuration config;
     private String[] args;
-    private LifeCycle lc;
     protected File menuDir;
 
     public static Rectangle getDefaultFrameSize() {
@@ -93,24 +85,21 @@ public abstract class ComponentFrame extends JFrame implements I_InitComponentMe
     public class NewFrame implements ActionListener {
 
         private String[] args;
-        private LifeCycle lc;
 
         /**
          * @param args
          * @param lc
          */
-        public NewFrame(String[] args, LifeCycle lc) {
+        public NewFrame(String[] args) {
             super();
             this.args = args;
-            this.lc = lc;
         }
 
         public void actionPerformed(ActionEvent e) {
             try {
                 Class<? extends ComponentFrame> classToMake = ComponentFrame.this.getClass();
-                Constructor<? extends ComponentFrame> c = classToMake.getConstructor(new Class[] { String[].class,
-                                                                                                  LifeCycle.class });
-                c.newInstance(new Object[] { args, lc });
+                Constructor<? extends ComponentFrame> c = classToMake.getConstructor(new Class[] { String[].class});
+                c.newInstance(new Object[] { args });
             } catch (Exception e1) {
                 logger.log(Level.SEVERE, e1.getMessage());
             }
@@ -123,34 +112,24 @@ public abstract class ComponentFrame extends JFrame implements I_InitComponentMe
      * @param title
      * @throws Exception
      */
-    public ComponentFrame(String[] args, LifeCycle lc) throws Exception {
-        this(args, lc, false);
+    public ComponentFrame(String[] args) throws Exception {
+        this(args, false);
     }
 
-    public ComponentFrame(String[] args, LifeCycle lc, File menuDir) throws Exception {
-        this(args, lc, false, menuDir);
+    public ComponentFrame(String[] args, File menuDir) throws Exception {
+        this(args, false, menuDir);
     }
 
-    public ComponentFrame(String[] args, LifeCycle lc, boolean hiddenFrame) throws Exception {
-        this(args, lc, hiddenFrame, null);
+    public ComponentFrame(String[] args, boolean hiddenFrame) throws Exception {
+        this(args, hiddenFrame, null);
     }
 
-    public ComponentFrame(String[] args, LifeCycle lc, boolean hiddenFrame, File menuDir) throws Exception {
+    public ComponentFrame(String[] args, boolean hiddenFrame, File menuDir) throws Exception {
         super();
         this.args = args;
-        this.lc = lc;
-        this.menuDir = menuDir;
-        String argsStr;
-        if (args == null) {
-            argsStr = "null";
-        } else {
-            argsStr = Arrays.asList(args).toString();
-        }
-        logger.info("\n*******************\n\n" + "Starting " + this.getClass().getSimpleName() + " with config file: "
-            + argsStr + "\n\n******************\n");
-        config = ConfigurationProvider.getInstance(args, getClass().getClassLoader());
+         this.menuDir = menuDir;
         this.setTitle(this.getNextFrameName());
-        this.cfb = new ComponentFrameBean(args, lc, this, this, hiddenFrame);
+        this.cfb = new ComponentFrameBean(args, this, this, hiddenFrame);
         this.cfb.setup();
     }
 
@@ -160,7 +139,7 @@ public abstract class ComponentFrame extends JFrame implements I_InitComponentMe
 
     public abstract JMenuItem[] getNewWindowMenu();
 
-    public abstract String getNextFrameName() throws ConfigurationException;
+    public abstract String getNextFrameName();
 
     /**
      * @return Returns the args.
@@ -171,13 +150,6 @@ public abstract class ComponentFrame extends JFrame implements I_InitComponentMe
 
     public boolean okToClose() {
         return getDefaultCloseOperation() == WindowConstants.DISPOSE_ON_CLOSE;
-    }
-
-    /**
-     * @return Returns the lc.
-     */
-    public LifeCycle getLc() {
-        return lc;
     }
 
     public abstract int getCount();

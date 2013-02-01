@@ -17,7 +17,6 @@ import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.Terms;
@@ -31,7 +30,6 @@ import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
 import org.ihtsdo.rules.testmodel.TerminologyHelperDroolsWorkbench;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.api.id.IdBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.helper.ResultsItem;
 
@@ -51,13 +49,10 @@ public class PerformQA implements I_ProcessConcepts {
 	HashMap<String,Long> traceElapsedTimes;
 	HashMap<String,Integer> traceCounts;
 	HashMap<UUID,Integer> uniqueFsnMap;
-	HashMap<Long,Integer> uniqueSCTIDMap;
-	Set<Integer> fsnDuplicatesSet;
-	Set<Integer> sctidDuplicatesSet;
+	Set<Integer> duplicatesSet;
 
 	int fsnNid;
 	int activeNid;
-	int sctIdAuthorityNid;
 	private String databaseUuid;
 	private String testPathUuid;
 	private long elapsedTotal;
@@ -83,9 +78,7 @@ public class PerformQA implements I_ProcessConcepts {
 		traceElapsedTimes = new HashMap<String,Long>();
 		traceCounts = new HashMap<String,Integer>();
 		uniqueFsnMap = new HashMap<UUID,Integer>();
-		uniqueSCTIDMap = new HashMap<Long,Integer>();
-		fsnDuplicatesSet = new HashSet<Integer>();
-		sctidDuplicatesSet = new HashSet<Integer>();
+		duplicatesSet = new HashSet<Integer>();
 		rulesAlerted = new HashSet<String>();
 		monitoredUuids = new ArrayList<UUID>();
 
@@ -99,7 +92,6 @@ public class PerformQA implements I_ProcessConcepts {
 			snomedRoot = Terms.get().getConcept(UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8"));
 			fsnNid = SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid();
 			activeNid = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid();
-			sctIdAuthorityNid = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid();
 			terminologyHelperCache = RulesLibrary.getTerminologyHelper(); // pointer to avoid garbage collection during qa
 		} catch (TerminologyException e) {
 			e.printStackTrace();
@@ -286,7 +278,7 @@ public class PerformQA implements I_ProcessConcepts {
 			}
 
 			if (uniqueFsnMap.containsKey(Type5UuidFactory.get(fsn))) {
-				if (!fsnDuplicatesSet.contains(loopConcept.getNid())) {
+				if (!duplicatesSet.contains(loopConcept.getNid())) {
 					ResultsItem r1 = new ResultsItem();
 					r1.setErrorCode(4);
 					r1.setMessage("FSN Duplicated:" + fsn);
@@ -298,11 +290,11 @@ public class PerformQA implements I_ProcessConcepts {
 					tmpResults1.setAlertList(new ArrayList<AlertToDataConstraintFailure>());
 					tmpResults1.setResultsItems(r1List);
 					writeOutputFile(tmpResults1, loopConcept);
-					fsnDuplicatesSet.add(loopConcept.getNid());
+					duplicatesSet.add(loopConcept.getNid());
 				}
 
 				I_GetConceptData duplicateConcept = Terms.get().getConcept(uniqueFsnMap.get(Type5UuidFactory.get(fsn)));
-				if (!fsnDuplicatesSet.contains(duplicateConcept.getNid())) {
+				if (!duplicatesSet.contains(duplicateConcept.getNid())) {
 					ResultsItem r2 = new ResultsItem();
 					r2.setErrorCode(4);
 					r2.setMessage("FSN Duplicated:" + fsn);
@@ -314,57 +306,11 @@ public class PerformQA implements I_ProcessConcepts {
 					tmpResults2.setAlertList(new ArrayList<AlertToDataConstraintFailure>());
 					tmpResults2.setResultsItems(r2List);
 					writeOutputFile(tmpResults2, duplicateConcept);
-					fsnDuplicatesSet.add(duplicateConcept.getNid());
+					duplicatesSet.add(duplicateConcept.getNid());
 				}
 				System.out.println("* Found FSN duplication: " + fsn);
 			} else {
 				uniqueFsnMap.put(Type5UuidFactory.get(fsn), loopConcept.getNid());
-			}
-			
-			I_Identify ids = loopConcept.getIdentifier();
-			Long sctid = null;
-			for (IdBI idv : ids.getAllIds()) {
-				if (idv.getAuthorityNid() == sctIdAuthorityNid) {
-					sctid = (Long) idv.getDenotation();
-				}
-			}
-
-			if (sctid != null) {
-				if (uniqueSCTIDMap.containsKey(sctid)) {
-					if (!sctidDuplicatesSet.contains(loopConcept.getNid())) {
-						ResultsItem r1 = new ResultsItem();
-						r1.setErrorCode(4);
-						r1.setMessage("SCTID Duplicated:" + sctid);
-						r1.setRuleUuid("20925650-2449-11e2-81c1-0800200c9a66");
-						r1.setSeverity("f9545a20-12cf-11e0-ac64-0800200c9a66");
-						List<ResultsItem> r1List = new ArrayList<ResultsItem>();
-						r1List.add(r1);
-						ResultsCollectorWorkBench tmpResults1 = new ResultsCollectorWorkBench();
-						tmpResults1.setAlertList(new ArrayList<AlertToDataConstraintFailure>());
-						tmpResults1.setResultsItems(r1List);
-						writeOutputFile(tmpResults1, loopConcept);
-						sctidDuplicatesSet.add(loopConcept.getNid());
-					}
-
-					I_GetConceptData duplicateConcept = Terms.get().getConcept(uniqueSCTIDMap.get(sctid));
-					if (!sctidDuplicatesSet.contains(duplicateConcept.getNid())) {
-						ResultsItem r2 = new ResultsItem();
-						r2.setErrorCode(4);
-						r2.setMessage("SCTID Duplicated:" + sctid);
-						r2.setRuleUuid("20925650-2449-11e2-81c1-0800200c9a66");
-						r2.setSeverity("f9545a20-12cf-11e0-ac64-0800200c9a66");
-						List<ResultsItem> r2List = new ArrayList<ResultsItem>();
-						r2List.add(r2);
-						ResultsCollectorWorkBench tmpResults2 = new ResultsCollectorWorkBench();
-						tmpResults2.setAlertList(new ArrayList<AlertToDataConstraintFailure>());
-						tmpResults2.setResultsItems(r2List);
-						writeOutputFile(tmpResults2, duplicateConcept);
-						sctidDuplicatesSet.add(duplicateConcept.getNid());
-					}
-					System.out.println("* Found SCTID duplication: " + sctid);
-				} else {
-					uniqueSCTIDMap.put(sctid, loopConcept.getNid());
-				}
 			}
 		}
 		//System.out.println("Individual loop for " + loopConcept.toString() + " in " + individualElapsed + " ms.");

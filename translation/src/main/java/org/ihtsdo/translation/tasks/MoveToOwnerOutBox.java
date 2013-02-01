@@ -23,13 +23,6 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
 
-import net.jini.core.entry.Entry;
-import net.jini.core.lookup.ServiceID;
-import net.jini.core.lookup.ServiceItem;
-import net.jini.core.lookup.ServiceTemplate;
-import net.jini.lookup.ServiceItemFilter;
-import net.jini.lookup.entry.Name;
-
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.bpa.process.Condition;
@@ -109,34 +102,7 @@ public class MoveToOwnerOutBox extends AbstractTask {
      * org.dwfa.bpa.process.I_Work)
      */
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
-    	try {
-
-    		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-
-
-    		String outboxQueueName = config.getUsername() + ".outbox";
-    		ServiceID serviceID = null;
-    		System.out.println(
-    				"Moving process " + process.getProcessID() + " to outbox: " + outboxQueueName);
-    		Class<?>[] serviceTypes = new Class[] { I_QueueProcesses.class };
-    		Entry[] attrSetTemplates = new Entry[] { new Name(outboxQueueName) };
-    		ServiceTemplate template = new ServiceTemplate(serviceID, serviceTypes, attrSetTemplates);
-    		ServiceItemFilter filter = null;
-
-    		ServiceItem service = worker.lookup(template, filter);
-    		if (service == null) {
-    			throw new TaskFailedException("No queue with the specified address could be found: "
-    					+ outboxQueueName);
-    		}
-    		I_QueueProcesses q = (I_QueueProcesses) service.service;
-    		q.write(process, worker.getActiveTransaction());
-			worker.commitTransactionIfActive();
-    		System.out.println("Moved process " + process.getProcessID() + " to queue: " + outboxQueueName);
-
-
-        } catch (Exception e) {
-        	throw new TaskFailedException(e);
-        }
+		throw new UnsupportedOperationException("TODO: Jini removal");
     }
 
     /**

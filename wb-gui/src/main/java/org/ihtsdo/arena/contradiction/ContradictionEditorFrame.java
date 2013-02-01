@@ -23,8 +23,6 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import net.jini.config.Configuration;
-
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -259,10 +257,6 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
 
     public ConceptPanel getC1Panel() {
         return c1Panel;
-    }
-
-    public Configuration getFrameConfig() {
-        return config;
     }
 
     /**

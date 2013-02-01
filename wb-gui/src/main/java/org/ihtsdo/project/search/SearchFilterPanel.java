@@ -4,9 +4,6 @@
 
 package org.ihtsdo.project.search;
 
-import java.awt.ComponentOrientation;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -20,10 +17,8 @@ import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSeparator;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -31,7 +26,6 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.filter.WfDestinationFilter;
-import org.ihtsdo.project.filter.WfProjectFilter;
 import org.ihtsdo.project.filter.WfWorklistFilter;
 import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.WorkList;
@@ -55,17 +49,12 @@ public class SearchFilterPanel extends JPanel {
 	public SearchFilterPanel(WFSearchFilterContainerBI wfInstanceSearchPanel) {
 		initComponents();
 		this.container = wfInstanceSearchPanel;
-		try {
-			addButton.setIcon(new ImageIcon(ACE.class.getResource("/16x16/plain/add2.png")));
-			removeButton.setIcon(new ImageIcon(ACE.class.getResource("/16x16/plain/delete2.png")));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		addButton.setIcon(new ImageIcon(ACE.class.getResource("/16x16/plain/add2.png")));
+		removeButton.setIcon(new ImageIcon(ACE.class.getResource("/16x16/plain/delete2.png")));
 
 		filterTypeCombo.addItem("");
 		filterTypeCombo.addItem(new WfDestinationFilter());
 		filterTypeCombo.addItem(new WfWorklistFilter());
-		filterTypeCombo.addItem(new WfProjectFilter());
 	}
 
 	private void addButtonActionPerformed(ActionEvent e) {
@@ -78,10 +67,10 @@ public class SearchFilterPanel extends JPanel {
 
 	public WfFilterBI getWfFilter() {
 		Object filterObject = filterCombo.getSelectedItem();
-		if (filterObject instanceof WfUser) {
+		if (filterObject instanceof WfDestinationFilter) {
 			return new WfDestinationFilter((WfUser) filterCombo.getSelectedItem());
-		} else if (filterObject instanceof WorkList) {
-			return new WfWorklistFilter(((WorkList) filterCombo.getSelectedItem()).getUuid());
+		} else if (filterObject instanceof WfWorklistFilter) {
+			return new WfWorklistFilter(((WorkListBI) filterCombo.getSelectedItem()).getUuid());
 		} else {
 			return null;
 		}
@@ -115,19 +104,6 @@ public class SearchFilterPanel extends JPanel {
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
-			} else if (e.getItem() instanceof WfProjectFilter) {
-				filterCombo.removeAllItems();
-				try {
-					I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-					List<I_TerminologyProject> projects = TerminologyProjectDAO.getAllProjects(config);
-					for (I_TerminologyProject i_TerminologyProject : projects) {
-						filterCombo.addItem(i_TerminologyProject);
-					}
-				} catch (TerminologyException e1) {
-					e1.printStackTrace();
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
 			} else {
 				filterCombo.removeAllItems();
 				filterCombo.addItem("");
@@ -135,7 +111,6 @@ public class SearchFilterPanel extends JPanel {
 		}
 	}
 
-	
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -159,8 +134,7 @@ public class SearchFilterPanel extends JPanel {
 				addButtonActionPerformed(e);
 			}
 		});
-		add(addButton, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 0), 0,
-				0));
+		add(addButton, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 0), 0, 0));
 
 		// ---- removeButton ----
 		removeButton.addActionListener(new ActionListener() {
@@ -169,8 +143,7 @@ public class SearchFilterPanel extends JPanel {
 				removeButtonActionPerformed(e);
 			}
 		});
-		add(removeButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 0),
-				0, 0));
+		add(removeButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 0), 0, 0));
 
 		// ---- filterTypeCombo ----
 		filterTypeCombo.addItemListener(new ItemListener() {
@@ -179,11 +152,9 @@ public class SearchFilterPanel extends JPanel {
 				filterTypeComboItemStateChanged(e);
 			}
 		});
-		add(filterTypeCombo, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0),
-				0, 0));
+		add(filterTypeCombo, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 		add(label1, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
-		add(filterCombo, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0,
-				0));
+		add(filterCombo, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 		// JFormDesigner - End of component initialization
 		// //GEN-END:initComponents
 	}

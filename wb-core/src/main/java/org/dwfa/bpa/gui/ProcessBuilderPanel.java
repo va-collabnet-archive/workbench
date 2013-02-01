@@ -85,9 +85,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeSelectionModel;
 
-import net.jini.config.Configuration;
-import net.jini.config.ConfigurationException;
-
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.BusinessProcessPersistenceDelegate;
 import org.dwfa.bpa.ExecutionRecord;
@@ -424,8 +421,6 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener, Prope
 
     private class ExecuteProcessActionListener implements ActionListener {
 
-        Configuration config;
-
         UUID id;
 
         I_Work worker;
@@ -440,9 +435,8 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener, Prope
          * @param worker
          * @param frames
          */
-        public ExecuteProcessActionListener(Configuration config, UUID id, I_Work worker, boolean launchOnly) {
+        public ExecuteProcessActionListener(UUID id, I_Work worker, boolean launchOnly) {
             super();
-            this.config = config;
             this.id = id;
             this.worker = worker;
             this.launchOnly = launchOnly;
@@ -638,11 +632,11 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener, Prope
      * @throws IOException
      * @throws ConfigurationException
      */
-    public ProcessBuilderPanel(Configuration jiniConfig, I_Work worker) throws SecurityException,
+    public ProcessBuilderPanel(I_Work worker) throws SecurityException,
             IntrospectionException, InvocationTargetException, IllegalAccessException, PropertyVetoException,
-            ClassNotFoundException, NoSuchMethodException, IOException, ConfigurationException {
+            ClassNotFoundException, NoSuchMethodException, IOException {
         super(new GridBagLayout());
-        defaultOrigin = (String) jiniConfig.getEntry(this.getClass().getName(), "defaultOrigin", String.class);
+        defaultOrigin = "defaultOrigin";
 
         this.worker = worker;
 
@@ -670,8 +664,8 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener, Prope
         c.gridy = 1;
         c.fill = GridBagConstraints.HORIZONTAL;
         this.add(this.statusPanel, c);
-        execute.addActionListener(new ExecuteProcessActionListener(jiniConfig, UUID.randomUUID(), worker, false));
-        launch.addActionListener(new ExecuteProcessActionListener(jiniConfig, UUID.randomUUID(), worker, true));
+        execute.addActionListener(new ExecuteProcessActionListener(UUID.randomUUID(), worker, false));
+        launch.addActionListener(new ExecuteProcessActionListener(UUID.randomUUID(), worker, true));
         cancel.addActionListener(new CancelProcessListener());
         cancel.setEnabled(false);
         tree.setSelectionRow(0);

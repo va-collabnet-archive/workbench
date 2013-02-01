@@ -1,13 +1,12 @@
-/**
- * Copyright (c) 2009 International Health Terminology Standards Development
- * Organisation
- * 
+/*
+ * Copyright 2013 International Health Terminology Standards Development Organisation.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
- * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,8 +20,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.UUID;
 
-import net.jini.core.entry.Entry;
-
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.QueueType;
 import org.dwfa.cement.SNOMED;
@@ -33,7 +30,11 @@ import org.dwfa.tapi.I_StoreLocalFixedTerminology;
 import org.dwfa.tapi.I_StoreUniversalFixedTerminology;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
 
-public class TermEntry implements Entry, Comparable {
+/**
+ *
+ * @author kec
+ */
+public class TermEntry implements Comparable {
 
     public UUID[] ids;
 

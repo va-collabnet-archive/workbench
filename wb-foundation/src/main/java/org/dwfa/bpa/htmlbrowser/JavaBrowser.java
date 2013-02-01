@@ -39,8 +39,6 @@ import javax.swing.WindowConstants;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
-import net.jini.config.ConfigurationException;
-
 import org.dwfa.bpa.util.ComponentFrame;
 import org.dwfa.bpa.util.OpenFramesWindowListener;
 
@@ -164,6 +162,7 @@ public class JavaBrowser extends ComponentFrame implements HyperlinkListener, Ac
 
     }
 
+    @Override
     public void hyperlinkUpdate(HyperlinkEvent e) {
         /*
          * Get the event type for the link. There could be three types of event
@@ -187,6 +186,7 @@ public class JavaBrowser extends ComponentFrame implements HyperlinkListener, Ac
     /**
      * @see org.dwfa.bpa.util.ComponentFrame#addAppMenus(javax.swing.JMenuBar)
      */
+    @Override
     public void addAppMenus(JMenuBar mainMenuBar) throws Exception {
         mainMenuBar.add(browserMenu = new JMenu("Browser"));
     }
@@ -194,6 +194,7 @@ public class JavaBrowser extends ComponentFrame implements HyperlinkListener, Ac
     /**
      * @see org.dwfa.bpa.util.ComponentFrame#getQuitMenu()
      */
+    @Override
     public JMenu getQuitMenu() {
         return this.browserMenu;
     }
@@ -201,14 +202,17 @@ public class JavaBrowser extends ComponentFrame implements HyperlinkListener, Ac
     /**
      * @see org.dwfa.bpa.util.I_InitComponentMenus#addInternalFrames(javax.swing.JMenu)
      */
+    @Override
     public void addInternalFrames(JMenu menu) {
 
     }
 
+    @Override
     public JMenuItem[] getNewWindowMenu() {
         return null;
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         // Load the new page
         String page = "";
@@ -228,7 +232,8 @@ public class JavaBrowser extends ComponentFrame implements HyperlinkListener, Ac
      * @throws ConfigurationException
      * @see org.dwfa.bpa.util.ComponentFrame#getNextFrameName()
      */
-    public String getNextFrameName() throws ConfigurationException {
+    @Override
+    public String getNextFrameName() {
         String title = "Java Browser";
         if (count > 0) {
             return title + " " + count++;
@@ -242,6 +247,7 @@ public class JavaBrowser extends ComponentFrame implements HyperlinkListener, Ac
     /**
      * @see org.dwfa.bpa.util.ComponentFrame#getCount()
      */
+    @Override
     public int getCount() {
         return count;
     }

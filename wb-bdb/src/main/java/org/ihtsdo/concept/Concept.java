@@ -74,6 +74,7 @@ import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
@@ -115,11 +116,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Level;
-import org.ihtsdo.concept.component.identifier.IdentifierVersionUuid;
 import org.ihtsdo.tk.api.NidBitSetBI;
-import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI, Comparable<Concept> {
 
@@ -401,15 +399,6 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         return c;
     }
 
-    /**
-     * merge from EConcept eConcept into Concept c  
-     * @param eConcept
-     * @param c
-     * @param updateLucene
-     * @param indexedAnnotationConcepts
-     * @return
-     * @throws IOException 
-     */
     @SuppressWarnings({"rawtypes", "unchecked"})
     private static Concept mergeWithEConcept(EConcept eConcept, Concept c, boolean updateLucene, Set<ConceptChronicleBI> indexedAnnotationConcepts)
             throws IOException {
@@ -430,42 +419,6 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                 ConceptAttributes ca = c.getConAttrs();
                 ca.merge(new ConceptAttributes(eAttr, c), indexedAnnotationConcepts);
             }
-            ChangeNotifier.touch(c.nid, ChangeNotifier.Change.COMPONENT);
-        }
-
-        // check if different primordial UUIDs are being merged
-        if (c.getPrimUuid().compareTo(UUID.fromString("00000000-0000-0000-c000-000000000046")) != 0
-                && c.getPrimUuid().compareTo(eConcept.getPrimordialUuid()) != 0) {
-            // add EConcept eConcept primordial uuid into Concept c additional ids
-            TerminologyStoreDI ts = Ts.get();
-            ts.getNidForUuids(eConcept.getConceptAttributes().getStatusUuid());
-            int idStatusNid = ts.getNidForUuids(UUID.fromString("d12702ee-c37f-385f-a070-61d56d4d0f1f"));
-            long idTime = eConcept.getConceptAttributes().time;
-            int idAuthorNid = ts.getNidForUuids(eConcept.getConceptAttributes().authorUuid);
-            int idModuleNid = ts.getNidForUuids(eConcept.getConceptAttributes().moduleUuid);
-            int idPathNid = ts.getNidForUuids(eConcept.getConceptAttributes().pathUuid);
-
-            // int statusNid, long time, int authorNid, int moduleNid, int pathNid
-            IdentifierVersionUuid idToAdd = new IdentifierVersionUuid(
-                    idStatusNid,
-                    idTime,
-                    idAuthorNid,
-                    idModuleNid,
-                    idPathNid);
-            idToAdd.setDenotation(eConcept.getPrimordialUuid());
-            Collection<UUID> authorityUuids = ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids();
-            idToAdd.setAuthorityNid(ts.getNidForUuids(authorityUuids));
-            
-            c.getConceptAttributes().addIdVersion(idToAdd);
-
-            StringBuilder sb = new StringBuilder();
-            sb.append("\r\nmergeWithEConcept .. added eConcept primordial uuid \t");
-            sb.append(c.getPrimUuid());
-            sb.append("\r\n                  .. into Concept c additional ids \t");
-            sb.append(eConcept.getPrimordialUuid().toString());
-            sb.append("\r\n");
-            AceLog.getAppLog().log(Level.INFO, sb.toString());
-
             ChangeNotifier.touch(c.nid, ChangeNotifier.Change.COMPONENT);
         }
 
@@ -1100,7 +1053,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     }
 
     @Override
-    public ConceptAttributes getConceptAttributes() throws IOException {
+    public ConceptAttributeChronicleBI getConceptAttributes() throws IOException {
         return getConAttrs();
     }
 

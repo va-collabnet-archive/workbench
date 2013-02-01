@@ -16,9 +16,6 @@ import java.util.TreeSet;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import net.jini.config.Configuration;
-import net.jini.config.ConfigurationException;
-
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.SubversionData;
@@ -51,10 +48,6 @@ import org.tmatesoft.svn.core.SVNErrorCode;
  */
 public class SvnHelper {
 
-    /**
-     * The jini configuration provider
-     */
-    private Configuration jiniConfig;
     private String svnCheckoutProfileOnStart = null;
     private String[] svnCheckoutOnStart = null;
     private String[] svnUpdateOnStart = null;
@@ -73,30 +66,13 @@ public class SvnHelper {
         this.subversionMap = subversionMap;
     }
 
-    public SvnHelper(Class<?> jiniClassToSet, Configuration jiniConfigToSet) throws ConfigurationException {
+    public SvnHelper(Class<?> jiniClassToSet) {
         jiniClass = jiniClassToSet;
-        jiniConfig = jiniConfigToSet;
-        if (jiniConfig != null) {
-            svnCheckoutProfileOnStart =
-                    (String) jiniConfig.getEntry(jiniClass.getName(), "svnCheckoutProfileOnStart", String.class, "");
 
-            svnCheckoutOnStart =
-                    (String[]) jiniConfig.getEntry(jiniClass.getName(), "svnCheckoutOnStart", String[].class,
-                    new String[]{});
-            svnUpdateOnStart =
-                    (String[]) jiniConfig.getEntry(jiniClass.getName(), "svnUpdateOnStart", String[].class, new String[]{});
-            csImportOnStart =
-                    (String[]) jiniConfig.getEntry(jiniClass.getName(), "csImportOnStart", String[].class, new String[]{});
-            if (csImportOnStart != null) {
-                for (String importLoc : csImportOnStart) {
-                    changeLocations.add(new File(importLoc));
-                }
-            }
-        }
     }
 
     void initialSubversionOperationsAndChangeSetImport(File acePropertiesFile, boolean connectToSubversion,
-            SvnPrompter prompter) throws ConfigurationException, FileNotFoundException, IOException, TaskFailedException,
+            SvnPrompter prompter) throws FileNotFoundException, IOException, TaskFailedException,
             ClientException {
         Properties aceProperties = new Properties();
         aceProperties.setProperty("initial-svn-checkout", "true");
@@ -174,7 +150,7 @@ public class SvnHelper {
     }
 
     public void initialSubversionOperationsAndChangeSetImport(File acePropertiesFile, SvnPrompter prompter)
-            throws ConfigurationException, FileNotFoundException, IOException, TaskFailedException, ClientException {
+            throws FileNotFoundException, IOException, TaskFailedException, ClientException {
 
         Properties wbProperties = new Properties();
         wbProperties.setProperty("initial-svn-checkout", "true");

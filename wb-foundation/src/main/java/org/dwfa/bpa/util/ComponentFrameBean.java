@@ -54,13 +54,8 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
-import net.jini.config.Configuration;
-import net.jini.config.ConfigurationProvider;
-
 import org.dwfa.app.I_ManageStandardAppFunctions;
 import org.dwfa.bpa.gui.action.BringWindowToFront;
-
-import com.sun.jini.start.LifeCycle;
 
 /**
  * @author kec
@@ -100,15 +95,6 @@ public class ComponentFrameBean implements ActionListener, I_ManageStandardAppFu
 
     private JMenuItem optionsMI, aboutMI;
 
-    /**
-     * Cache of our <code>LifeCycle</code> object TODO implement the lifeCycle
-     * destroy methods. See TxnManagerImpl for an example.
-     */
-    @SuppressWarnings("unused")
-    private LifeCycle lifeCycle = null;
-
-    /** The jini configuration file for this object */
-    protected Configuration config;
 
     // Ask AWT which menu modifier we should be using.
     protected static int MENU_MASK;
@@ -123,26 +109,26 @@ public class ComponentFrameBean implements ActionListener, I_ManageStandardAppFu
 
     private boolean hiddenFrame;
 
-    public ComponentFrameBean(String[] args, LifeCycle lc, ComponentFrame frame, I_InitComponentMenus compMenuIniter,
+    public ComponentFrameBean(String[] args, ComponentFrame frame, I_InitComponentMenus compMenuIniter,
             boolean hiddenFrame) throws Exception {
-        this(args, lc, frame, compMenuIniter, new JMenuBar(), hiddenFrame);
+        this(args, frame, compMenuIniter, new JMenuBar(), hiddenFrame);
     }
 
-    public ComponentFrameBean(String[] args, LifeCycle lc, ComponentFrame frame, I_InitComponentMenus compMenuIniter)
+    public ComponentFrameBean(String[] args, ComponentFrame frame, I_InitComponentMenus compMenuIniter)
             throws Exception {
-        this(args, lc, frame, compMenuIniter, new JMenuBar());
+        this(args, frame, compMenuIniter, new JMenuBar());
     }
 
-    public ComponentFrameBean(String[] args, LifeCycle lc, ComponentFrame frame, I_InitComponentMenus compMenuIniter,
+    public ComponentFrameBean(String[] args, ComponentFrame frame, I_InitComponentMenus compMenuIniter,
             JMenuBar mainMenuBar) throws Exception {
-        this(args, lc, frame, compMenuIniter, mainMenuBar, false);
+        this(args, frame, compMenuIniter, mainMenuBar, false);
     }
 
     /**
      * @param title
      * @throws Exception
      */
-    public ComponentFrameBean(String[] args, LifeCycle lc, ComponentFrame frame, I_InitComponentMenus compMenuIniter,
+    public ComponentFrameBean(String[] args, ComponentFrame frame, I_InitComponentMenus compMenuIniter,
             JMenuBar mainMenuBar, boolean hiddenFrame) throws Exception {
         super();
         // Ask AWT which menu modifier we should be using.
@@ -157,8 +143,6 @@ public class ComponentFrameBean implements ActionListener, I_ManageStandardAppFu
         this.frame = frame;
         this.frame.addWindowListener(this);
         this.compMenuIniter = compMenuIniter;
-        this.config = ConfigurationProvider.getInstance(args, getClass().getClassLoader());
-        this.lifeCycle = lc;
         this.hiddenFrame = hiddenFrame;
         this.quitList.add(new StandardQuitter(frame));
 

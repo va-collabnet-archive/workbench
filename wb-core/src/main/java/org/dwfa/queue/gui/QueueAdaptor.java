@@ -19,7 +19,7 @@
  */
 package org.dwfa.queue.gui;
 
-import net.jini.core.lookup.ServiceID;
+import java.util.UUID;
 
 import org.dwfa.bpa.process.I_QueueProcesses;
 
@@ -28,24 +28,26 @@ public class QueueAdaptor implements Comparable<QueueAdaptor> {
 
     String queueName;
 
-    ServiceID id;
+    UUID id;
 
     /**
      * @param queue
      * @param queueName
      * @param id
      */
-    public QueueAdaptor(I_QueueProcesses queue, String queueName, ServiceID id) {
+    public QueueAdaptor(I_QueueProcesses queue, String queueName, UUID id) {
         super();
         this.queue = queue;
         this.queueName = queueName;
         this.id = id;
     }
 
+    @Override
     public String toString() {
         return this.queueName;
     }
 
+    @Override
     public int compareTo(QueueAdaptor q) {
         return queueName.compareTo(q.queueName);
     }

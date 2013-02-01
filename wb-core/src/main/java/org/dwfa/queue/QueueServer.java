@@ -20,26 +20,12 @@
 package org.dwfa.queue;
 
 import java.awt.event.ActionEvent;
-import java.io.File;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.rmi.RemoteException;
-import java.rmi.server.ExportException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.logging.Logger;
-
-import net.jini.core.entry.Entry;
-import net.jini.core.transaction.Transaction;
-import net.jini.core.transaction.TransactionException;
-import net.jini.export.Exporter;
-import net.jini.export.ProxyAccessor;
-import net.jini.lookup.entry.ServiceInfo;
-import net.jini.security.TrustVerifier;
-import net.jini.security.proxytrust.ServerProxyTrust;
 
 import org.dwfa.bpa.BusinessProcessInfo;
 import org.dwfa.bpa.process.EntryID;
@@ -49,99 +35,43 @@ import org.dwfa.bpa.process.I_QueueProcesses;
 import org.dwfa.bpa.process.I_SelectProcesses;
 import org.dwfa.bpa.process.NoMatchingEntryException;
 import org.dwfa.bpa.process.ProcessID;
-import org.dwfa.bpa.worker.task.I_GetWorkFromQueue;
 
-import com.sun.jini.start.LifeCycle;
+import java.util.concurrent.ConcurrentSkipListSet;
+import javax.transaction.Transaction;
+import org.ihtsdo.ttk.queue.QueueAddress;
+import org.ihtsdo.ttk.queue.QueuePreferences;
 
 /**
  * @author kec
  * 
  */
-public class QueueServer extends ObjectServerCore<I_DescribeBusinessProcess> implements I_QueueProcesses,
-        ServerProxyTrust, ProxyAccessor {
+public class QueueServer extends ObjectServerCore<I_DescribeBusinessProcess> implements I_QueueProcesses {
 
-    private static HashSet<String> startedQueues = new HashSet<String>();
+    private static ConcurrentSkipListSet<QueuePreferences> startedQueues = new ConcurrentSkipListSet<>();
 
-    public static boolean started(File f) throws MalformedURLException {
-        return startedQueues.contains(f.toURI().toURL().toExternalForm());
+    public static boolean started(QueuePreferences q) throws MalformedURLException {
+        return startedQueues.contains(q);
     }
 
-    /** The server proxy, for use by getProxyVerifier */
-    protected I_QueueProcesses serverProxy;
-    protected static Logger logger = Logger.getLogger(QueueServer.class.getName());
-
-    private List<I_GetWorkFromQueue> workerList = new ArrayList<I_GetWorkFromQueue>();
+    protected static final Logger logger = Logger.getLogger(QueueServer.class.getName());
 
     /**
      * 
      */
-    public QueueServer(String[] args, LifeCycle lc) throws Exception {
-        super(args, lc);
-        File file = new File(args[0]);
-        startedQueues.add(file.toURI().toURL().toExternalForm());
-        QueueWorkerSpec[] workerSpecs = (QueueWorkerSpec[]) this.config.getEntry(this.getClass().getName(),
-            "workerSpecs", QueueWorkerSpec[].class);
-        for (int i = 0; i < workerSpecs.length; i++) {
-            I_GetWorkFromQueue worker = workerSpecs[i].create(this.config);
-            worker.start(this);
-            this.workerList.add(worker);
-        }
+    public QueueServer(QueuePreferences qp) throws Exception {
+        super(qp);
+        startedQueues.add(qp);
     }
 
-    /**
-     * @return
-     */
-    protected Entry[] getFixedServiceEntries() {
-        Entry[] moreEntries = new Entry[] { new ServiceInfo("Queue Service", "Informatics, Inc.", "Informatics, Inc.",
-            VERSION_STRING, "Queue server", "no serial number") };
-        return moreEntries;
-    }
 
-    /**
-     * @param exporter
-     * @throws ExportException
-     */
-    protected Object export(Exporter exporter) throws ExportException {
-        serverProxy = (I_QueueProcesses) exporter.export(this);
-        return QueueProxy.create(serverProxy);
-    }
-
-    /**
-     * If the impl gets GC'ed, then the server will be unexported. Store the
-     * instance here to prevent this.
-     */
-    @SuppressWarnings("unused")
-    private static QueueServer serverImpl;
-
-    public static void main(String[] args) throws Exception {
-
-        serverImpl = new QueueServer(args, null);
-        System.out.println("QueueServer is ready");
-    }
-
-    /**
-     * Implement the ServerProxyTrust interface to provide a verifier for secure
-     * smart proxies.
-     */
-    public TrustVerifier getProxyVerifier() {
-        return new QueueProxy.Verifier(serverProxy);
-    }
-
-    /**
-     * Returns a proxy object for this remote object.
-     * 
-     * @return our proxy
-     */
-    public Object getProxy() {
-        return serverProxy;
-    }
-
-    public I_EncodeBusinessProcess take(EntryID entryID, Transaction t) throws TransactionException, IOException,
+    @Override
+    public I_EncodeBusinessProcess take(EntryID entryID, Transaction t) throws IOException,
             ClassNotFoundException, NoMatchingEntryException {
         return (I_EncodeBusinessProcess) super.take(entryID, t);
     }
 
-    public I_EncodeBusinessProcess take(ProcessID processID, Transaction t) throws TransactionException, IOException,
+    @Override
+    public I_EncodeBusinessProcess take(ProcessID processID, Transaction t) throws IOException,
             ClassNotFoundException, NoMatchingEntryException {
         return (I_EncodeBusinessProcess) super.take(processID.getUuid(), t);
     }
@@ -153,6 +83,7 @@ public class QueueServer extends ObjectServerCore<I_DescribeBusinessProcess> imp
      * @see org.dwfa.bpa.process.I_QueueProcesses#read(net.jini.id.Uuid,
      *      net.jini.core.transaction.Transaction)
      */
+    @Override
     public I_EncodeBusinessProcess read(EntryID entryID, Transaction t) throws IOException, ClassNotFoundException,
             NoMatchingEntryException {
         return (I_EncodeBusinessProcess) super.read(entryID, t);
@@ -174,6 +105,7 @@ public class QueueServer extends ObjectServerCore<I_DescribeBusinessProcess> imp
      * @throws IOException 
      * @see org.dwfa.bpa.process.I_QueueProcesses#getProcessMetaData(org.dwfa.bpa.process.I_SelectProcesses)
      */
+    @Override
     public Collection<I_DescribeBusinessProcess> getProcessMetaData(I_SelectProcesses selector) throws IOException {
         return getMetaData(selector);
     }
@@ -181,19 +113,27 @@ public class QueueServer extends ObjectServerCore<I_DescribeBusinessProcess> imp
     /**
      * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
      */
-    public void actionPerformed(ActionEvent arg0) {
-        // Listening for changes. Need to wake the workers if a change happens.
-        Iterator<I_GetWorkFromQueue> workerItr = this.workerList.iterator();
-        while (workerItr.hasNext()) {
-            I_GetWorkFromQueue worker = workerItr.next();
-            worker.queueContentsChanged();
+    @Override
+    public void actionPerformed(ActionEvent event) {
+        
+        for (ActionListener l: commitListeners) {
+            l.actionPerformed(event);
         }
+        // Listening for changes. Need to wake the workers if a change happens.
+        
+//        SUPPORT FOR QUEUE WORKERS WAS REMOVED...
+//        Iterator<I_GetWorkFromQueue> workerItr = this.workerList.iterator();
+//        while (workerItr.hasNext()) {
+//            I_GetWorkFromQueue worker = workerItr.next();
+//            worker.queueContentsChanged();
+//        }
 
     }
 
     /**
      * @return Returns the file suffix.
      */
+    @Override
     public String getFileSuffix() {
         return ".bp";
     }
@@ -201,6 +141,7 @@ public class QueueServer extends ObjectServerCore<I_DescribeBusinessProcess> imp
     /**
      * @return Returns the file suffix for a pending take.
      */
+    @Override
     public String getFileSuffixTakePending() {
         return ".bp.take-pending";
     }
@@ -208,28 +149,26 @@ public class QueueServer extends ObjectServerCore<I_DescribeBusinessProcess> imp
     /**
      * @return Returns the file suffix for a pending write.
      */
+    @Override
     public String getFileSuffixWritePending() {
         return ".bp.write-pending";
     }
 
+    @Override
     protected I_DescribeBusinessProcess getObjectDescription(Object obj, EntryID entryID) throws IOException {
         return new BusinessProcessInfo((I_DescribeBusinessProcess) obj, entryID);
     }
 
-    public void write(I_EncodeBusinessProcess p, EntryID eid, Transaction t) throws RemoteException, IOException,
-            TransactionException {
+    @Override
+    public void write(I_EncodeBusinessProcess p, EntryID eid, Transaction t) throws RemoteException, IOException {
         super.write(p, eid, t);
 
     }
 
+    @Override
     public I_EncodeBusinessProcess take(I_SelectProcesses p, Transaction t) throws RemoteException, IOException,
-            ClassNotFoundException, TransactionException, NoMatchingEntryException {
+            ClassNotFoundException, NoMatchingEntryException {
         return (I_EncodeBusinessProcess) super.take(p, t);
-    }
-
-    public EntryID writeThenTake(I_EncodeBusinessProcess p, Transaction writeTran, Transaction takeTran)
-            throws RemoteException, IOException, ClassNotFoundException, TransactionException {
-        return super.writeThenTake(p, writeTran, takeTran);
     }
 
     @Override
@@ -237,9 +176,19 @@ public class QueueServer extends ObjectServerCore<I_DescribeBusinessProcess> imp
         return logger;
     }
 
-    public EntryID write(I_EncodeBusinessProcess process, Transaction t) throws RemoteException, IOException,
-            TransactionException {
+    @Override
+    public EntryID write(I_EncodeBusinessProcess process, Transaction t) throws RemoteException, IOException {
         return super.write(process, t);
+    }
+
+    @Override
+    public String getNodeInboxAddress() {
+        for (Object obj: getInstanceProperties()) {
+            if (obj instanceof QueueAddress) {
+                return obj.toString();
+            }
+        }
+        return null;
     }
 
 }

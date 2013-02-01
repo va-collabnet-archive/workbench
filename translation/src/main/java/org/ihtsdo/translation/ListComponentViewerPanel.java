@@ -35,6 +35,7 @@ import java.security.PrivilegedActionException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.security.auth.login.LoginException;
 import javax.swing.DefaultComboBoxModel;
@@ -52,8 +53,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
-
-import net.jini.config.ConfigurationException;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.log.AceLog;
@@ -139,11 +138,15 @@ public class ListComponentViewerPanel extends JPanel {
 		public void actionPerformed(ActionEvent e) {
 			if (nodes != null) {
 
-				try {
+				
 					final I_Work tworker;
 					if (config.getWorker().isExecuting()) {
-						tworker = config.getWorker().getTransactionIndependentClone();
-						tworker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), config);
+                                try {
+                                    tworker = config.getWorker().getTransactionIndependentClone();
+                                    tworker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), config);
+                                } catch (IOException ex) {
+                                    Logger.getLogger(ListComponentViewerPanel.class.getName()).log(Level.SEVERE, null, ex);
+                                }
 
 					} else {
 
@@ -171,16 +174,6 @@ public class ListComponentViewerPanel extends JPanel {
 						}
 					};
 					new Thread(r).start();
-
-				} catch (LoginException e1) {
-					e1.printStackTrace();
-				} catch (ConfigurationException e1) {
-					e1.printStackTrace();
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				} catch (PrivilegedActionException e1) {
-					e1.printStackTrace();
-				}
 			}
 
 		}

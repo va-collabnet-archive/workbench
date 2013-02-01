@@ -12,7 +12,6 @@ import java.util.concurrent.CancellationException;
 import javax.security.auth.login.LoginException;
 import javax.swing.SwingUtilities;
 
-import net.jini.config.ConfigurationException;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
@@ -154,8 +153,6 @@ public class TranslationTermChangeListener implements PropertyChangeListener {
 				} catch (TaskFailedException e) {
 					e.printStackTrace();
 				} catch (LoginException e) {
-					e.printStackTrace();
-				} catch (ConfigurationException e) {
 					e.printStackTrace();
 				} catch (PrivilegedActionException e) {
 					e.printStackTrace();

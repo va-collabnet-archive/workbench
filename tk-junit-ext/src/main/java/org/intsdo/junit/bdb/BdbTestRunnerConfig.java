@@ -21,7 +21,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Defines configuration parameters to be passed to {@link BdbTestRunner} 
+ *
+ * @author kec
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
@@ -36,10 +37,4 @@ public @interface BdbTestRunnerConfig {
      * </p>
      */
     String bdbLocation() default "test-resources/berkeley-db";
-    
-    /**
-     * Specifies classes to be executed to perform initialisation routines when the test runner is 
-     * initialised (per test class)
-     */
-    Class<? extends BdbTestInitialiser>[] init() default {};
 }

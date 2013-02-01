@@ -28,10 +28,6 @@ import javax.swing.JMenuItem;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
-import net.jini.config.ConfigurationException;
-
-import com.sun.jini.start.LifeCycle;
-
 public class PhantomFrame extends ComponentFrame implements ListDataListener {
     /**
      * 
@@ -39,8 +35,8 @@ public class PhantomFrame extends ComponentFrame implements ListDataListener {
     private static final long serialVersionUID = 1L;
     protected JMenu fileMenu;
 
-    public PhantomFrame(String[] args, LifeCycle lc) throws Exception {
-        super(args, lc, true);
+    public PhantomFrame(String[] args) throws Exception {
+        super(args, true);
         this.setName("Phantom Frame");
         JLabel l = new JLabel(
             "<html>This window shows up to give access to a menu bar<p>when no other windows are showing...");
@@ -53,30 +49,37 @@ public class PhantomFrame extends ComponentFrame implements ListDataListener {
         this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
     }
 
+    @Override
     public void addAppMenus(JMenuBar mainMenuBar) throws Exception {
         mainMenuBar.add(fileMenu = new JMenu("File"));
     }
 
+    @Override
     public JMenu getQuitMenu() {
         return fileMenu;
     }
 
+    @Override
     public JMenuItem[] getNewWindowMenu() {
         return null;
     }
 
-    public String getNextFrameName() throws ConfigurationException {
+    @Override
+    public String getNextFrameName() {
         return "Workflow Bundle";
     }
 
+    @Override
     public int getCount() {
         return 0;
     }
 
+    @Override
     public void addInternalFrames(JMenu menu) {
 
     }
 
+    @Override
     public void intervalRemoved(ListDataEvent e) {
         if ((e.getIndex1() == 0) && (OpenFrames.getNumOfFrames() == 0)) {
             this.setVisible(true);
@@ -93,6 +96,7 @@ public class PhantomFrame extends ComponentFrame implements ListDataListener {
     /**
      * @param object
      */
+    @Override
     public void intervalAdded(ListDataEvent e) {
         if ((e.getIndex1() == 0) && (OpenFrames.getNumOfFrames() == 0)) {
             this.setVisible(true);
@@ -106,6 +110,7 @@ public class PhantomFrame extends ComponentFrame implements ListDataListener {
         }
     }
 
+    @Override
     public void contentsChanged(ListDataEvent e) {
         if ((e.getIndex1() == 0) && (OpenFrames.getNumOfFrames() == 0)) {
             this.setVisible(true);

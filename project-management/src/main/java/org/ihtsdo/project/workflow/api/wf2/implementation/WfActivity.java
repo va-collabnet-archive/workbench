@@ -61,11 +61,5 @@ public class WfActivity implements WfActivityBI {
 	public void setAutomatic(boolean automatic) {
 		this.automatic = automatic;
 	}
-	
-	@Override
-	public String toString() {
-		// TODO Auto-generated method stub
-		return action.getName();
-	}
 
 }

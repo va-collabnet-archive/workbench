@@ -22,15 +22,14 @@ package org.dwfa.queue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.Date;
 import java.util.SortedSet;
-
-import net.jini.core.transaction.server.TransactionManager;
+import java.util.UUID;
+import javax.transaction.xa.XAException;
+import javax.transaction.xa.Xid;
 
 import org.dwfa.bpa.process.I_DescribeObject;
-import org.dwfa.jini.I_TransactionPart;
 
-public class WriteTransactionPart<T extends I_DescribeObject> implements I_TransactionPart {
+public class WriteTransactionPart<T extends I_DescribeObject> extends QueueTransactionPart {
 
     private T processDesc;
     private SortedSet<T> processesInfoSortedSet;
@@ -47,7 +46,7 @@ public class WriteTransactionPart<T extends I_DescribeObject> implements I_Trans
      */
     public WriteTransactionPart(T processDesc, SortedSet<T> processesInfoSortedSet, File processFile,
             ActionListener listener, ObjectServerCore server) {
-        super();
+        super(UUID.randomUUID().toString());
         this.processDesc = processDesc;
         this.processesInfoSortedSet = processesInfoSortedSet;
         this.processFile = processFile;
@@ -55,22 +54,20 @@ public class WriteTransactionPart<T extends I_DescribeObject> implements I_Trans
         this.server = server;
     }
 
-    /**
-     * @see org.dwfa.jini.I_TransactionPart#commit(net.jini.core.transaction.server.TransactionManager,
-     *      long, java.util.Date)
-     */
-    public void commit(TransactionManager mgr, long id, Date commitDate) {
+    @Override
+    public void commit(Xid xid, boolean onePhase) throws XAException {
         this.server.finishWrite(processFile);
         this.processesInfoSortedSet.add(processDesc);
         this.listener.actionPerformed(new ActionEvent(this, 0, "commit"));
     }
 
-    /**
-     * @see org.dwfa.jini.I_TransactionPart#abort(net.jini.core.transaction.server.TransactionManager,
-     *      long)
-     */
-    public void abort(TransactionManager mgr, long id) {
+    @Override
+    public void forget(Xid xid) throws XAException {
         processFile.delete();
     }
 
+    @Override
+    public void rollback(Xid xid) throws XAException {
+        processFile.delete();
+   }
 }

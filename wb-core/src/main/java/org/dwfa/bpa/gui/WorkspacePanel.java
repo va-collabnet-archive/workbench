@@ -31,7 +31,6 @@ import java.awt.event.ComponentListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -59,11 +58,6 @@ import javax.swing.event.InternalFrameListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import net.jini.core.event.RemoteEvent;
-import net.jini.core.event.RemoteEventListener;
-import net.jini.core.event.UnknownEventException;
-import net.jini.core.transaction.TransactionException;
-
 import org.dwfa.bpa.data.ArrayListModel;
 import org.dwfa.bpa.gui.GridBagPanel.GridBagPanelConstraints;
 import org.dwfa.bpa.process.I_Workspace;
@@ -74,7 +68,7 @@ import org.dwfa.util.bean.PropertyChangeSupportWithPropagationId;
  * @author kec
  * 
  */
-public class WorkspacePanel extends JPanel implements ListSelectionListener, ComponentListener, RemoteEventListener,
+public class WorkspacePanel extends JPanel implements ListSelectionListener, ComponentListener, 
         PropertyChangeListener, InternalFrameListener, I_Workspace {
 
     /**
@@ -92,7 +86,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
 
     private JPanel statusPanel;
 
-    private HashMap<String, Object> attachments = new HashMap<String, Object>();
+    private HashMap<String, Object> attachments = new HashMap<>();
 
     private PropertyChangeSupport propChangeSupport = new PropertyChangeSupportWithPropagationId(this);
 
@@ -118,6 +112,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
 
     private Semaphore ownership = new Semaphore(1);
 
+    @Override
     public boolean isShownInInternalFrame() {
         return this.showInInternalFrame;
     }
@@ -127,12 +122,12 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
      * @throws QueryException
      * 
      */
-    public WorkspacePanel(List<GridBagPanel> panels, WorkspaceFrame frame) throws TransactionException {
+    public WorkspacePanel(List<GridBagPanel> panels, WorkspaceFrame frame) {
         this(panels, frame, null);
     }
 
-    public WorkspacePanel(List<GridBagPanel> panels, WorkspaceFrame frame, I_ManageUserTransactions transactionInterface)
-            throws TransactionException {
+    public WorkspacePanel(List<GridBagPanel> panels, WorkspaceFrame frame, 
+            I_ManageUserTransactions transactionInterface) {
         super(new GridBagLayout());
         this.transactionInterface = transactionInterface;
         if (transactionInterface != null) {
@@ -187,7 +182,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
         // JSplitPane.DIVIDER_LOCATION_PROPERTY, this);
     }
 
-    private void updateCommitButton(I_ManageUserTransactions config) throws TransactionException {
+    private void updateCommitButton(I_ManageUserTransactions config) {
         if (transactionInterface != null) {
             if (transactionInterface.isTransactionActive()) {
                 this.commit.setText("<html><font color='#006400'>commit");
@@ -206,7 +201,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
      * @param panels
      */
     private void setupPanelList(List<GridBagPanel> panels) {
-        panelList = new JList(new ArrayListModel<GridBagPanel>(panels));
+        panelList = new JList(new ArrayListModel<>(panels));
         panelList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         panelList.setLayoutOrientation(JList.VERTICAL);
         panelList.setVisibleRowCount(-1);
@@ -248,6 +243,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public void addGridBagPanel(GridBagPanel panel) {
 
         ArrayListModel<GridBagPanel> listModel = (ArrayListModel<GridBagPanel>) this.panelList.getModel();
@@ -279,7 +275,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
         // int dividerLocation = this.splitPane.getDividerLocation();
         // int lastDividerLocation = this.splitPane.getLastDividerLocation();
         ArrayListModel<GridBagPanel> listModel = (ArrayListModel<GridBagPanel>) this.panelList.getModel();
-        List<CandP> panelAndConstraint = new ArrayList<CandP>();
+        List<CandP> panelAndConstraint = new ArrayList<>();
         for (GridBagPanel gbp : listModel) {
             // This operation ensures that the layer and position properties
             // reflect any user changes.
@@ -335,6 +331,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
         this.setSize(this.getWidth() - 1, this.getHeight() - 1);
     }
 
+    @Override
     public boolean isOptimizedDrawingEnabled() {
         return false;
     }
@@ -381,15 +378,15 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
                     GridBagPanelConstraints c = gbp.getConstraints();
                     if (showInInternalFrame) {
                         if (gbp.isAddedToLayout() == false) {
-                            JInternalFrame frame = new JInternalFrame(gbp.getTitle(), false, // resizable
+                            JInternalFrame internalFrame = new JInternalFrame(gbp.getTitle(), false, // resizable
                                 true, // closable
                                 true, // maximizable
                                 true);// iconifiable);
-                            frame.addInternalFrameListener(this);
-                            gbp.setInternalFrame(frame);
-                            frame.setContentPane(gbp);
-                            frame.setVisible(true);
-                            this.layoutPanel.add(frame, c.layer, c.positionInLayer);
+                            internalFrame.addInternalFrameListener(this);
+                            gbp.setInternalFrame(internalFrame);
+                            internalFrame.setContentPane(gbp);
+                            internalFrame.setVisible(true);
+                            this.layoutPanel.add(internalFrame, c.layer, c.positionInLayer);
                             gbp.setAddedToLayout(true);
                         }
                         gbp.getInternalFrame().setBounds((c.gridx - minX) * gridWidth, (c.gridy - minY) * gridHeight,
@@ -417,9 +414,10 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
          * 
          * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
          */
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             if (logger.isLoggable(Level.FINE)) {
-                logger.fine(evt + " " + evt.getPropertyName());
+                logger.log(Level.FINE, "{0} {1}", new Object[]{evt, evt.getPropertyName()});
             }
             if (evt.getPropertyName().equals("showInLayout")) {
                 GridBagPanel p = (GridBagPanel) evt.getSource();
@@ -447,6 +445,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
         /**
          * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
          */
+        @Override
         public void actionPerformed(ActionEvent e) {
             try {
                 WorkspacePanel.this.transactionInterface.commitActiveTransaction();
@@ -463,6 +462,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
         /**
          * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
          */
+        @Override
         public void actionPerformed(ActionEvent e) {
             try {
                 int n = JOptionPane.showConfirmDialog(WorkspacePanel.this, "You will lose changes to "
@@ -486,10 +486,11 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
          * 
          * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
          */
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
 
             if (logger.isLoggable(Level.FINE)) {
-                logger.fine("WorkspacePanel propertyChange: " + evt.getPropertyName());
+                logger.log(Level.FINE, "WorkspacePanel propertyChange: {0}", evt.getPropertyName());
             }
             if (evt.getPropertyName().equals("activeTransaction")) {
 
@@ -513,10 +514,11 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
          * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
          */
         @SuppressWarnings("unchecked")
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
 
             if (logger.isLoggable(Level.FINE)) {
-                logger.fine("WorkspacePanel propertyChange: " + evt.getPropertyName());
+                logger.log(Level.FINE, "WorkspacePanel propertyChange: {0}", evt.getPropertyName());
             }
             if (evt.getPropertyName().equals("uncommittedComponents")) {
                 Collection<Object> uncommitted = (Collection<Object>) evt.getNewValue();
@@ -536,6 +538,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
     /**
      * @see javax.swing.event.ListSelectionListener#valueChanged(javax.swing.event.ListSelectionEvent)
      */
+    @Override
     public void valueChanged(ListSelectionEvent e) {
         if (e.getValueIsAdjusting() == false) {
             if (this.panelList.getSelectedIndex() >= 0) {
@@ -560,6 +563,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
     /**
      * @see java.awt.event.ComponentListener#componentResized(java.awt.event.ComponentEvent)
      */
+    @Override
     public void componentResized(ComponentEvent e) {
         this.redoLayout();
 
@@ -568,6 +572,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
     /**
      * @see java.awt.event.ComponentListener#componentMoved(java.awt.event.ComponentEvent)
      */
+    @Override
     public void componentMoved(ComponentEvent e) {
 
     }
@@ -575,6 +580,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
     /**
      * @see java.awt.event.ComponentListener#componentShown(java.awt.event.ComponentEvent)
      */
+    @Override
     public void componentShown(ComponentEvent e) {
         this.redoLayout();
     }
@@ -582,24 +588,19 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
     /**
      * @see java.awt.event.ComponentListener#componentHidden(java.awt.event.ComponentEvent)
      */
+    @Override
     public void componentHidden(ComponentEvent e) {
-
-    }
-
-    /**
-     * @see net.jini.core.event.RemoteEventListener#notify(net.jini.core.event.RemoteEvent)
-     */
-    public void notify(RemoteEvent theEvent) throws UnknownEventException, RemoteException {
-        // TODO Auto-generated method stub
 
     }
 
     /**
      * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
      */
+    @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals(JSplitPane.DIVIDER_LOCATION_PROPERTY)) {
             SwingUtilities.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     redoLayout();
                 }
@@ -611,6 +612,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
     /**
      * @see javax.swing.event.InternalFrameListener#internalFrameOpened(javax.swing.event.InternalFrameEvent)
      */
+    @Override
     public void internalFrameOpened(InternalFrameEvent e) {
         // TODO Auto-generated method stub
 
@@ -619,6 +621,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
     /**
      * @see javax.swing.event.InternalFrameListener#internalFrameClosing(javax.swing.event.InternalFrameEvent)
      */
+    @Override
     public void internalFrameClosing(InternalFrameEvent e) {
         // TODO Auto-generated method stub
 
@@ -627,15 +630,17 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
     /**
      * @see javax.swing.event.InternalFrameListener#internalFrameClosed(javax.swing.event.InternalFrameEvent)
      */
+    @Override
     public void internalFrameClosed(InternalFrameEvent e) {
-        JInternalFrame frame = e.getInternalFrame();
-        GridBagPanel gbp = (GridBagPanel) frame.getContentPane();
+        JInternalFrame internalFrame = e.getInternalFrame();
+        GridBagPanel gbp = (GridBagPanel) internalFrame.getContentPane();
         gbp.setShowInLayout(false);
     }
 
     /**
      * @see javax.swing.event.InternalFrameListener#internalFrameIconified(javax.swing.event.InternalFrameEvent)
      */
+    @Override
     public void internalFrameIconified(InternalFrameEvent e) {
         redoLayout();
     }
@@ -643,6 +648,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
     /**
      * @see javax.swing.event.InternalFrameListener#internalFrameDeiconified(javax.swing.event.InternalFrameEvent)
      */
+    @Override
     public void internalFrameDeiconified(InternalFrameEvent e) {
         redoLayout();
     }
@@ -650,6 +656,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
     /**
      * @see javax.swing.event.InternalFrameListener#internalFrameActivated(javax.swing.event.InternalFrameEvent)
      */
+    @Override
     public void internalFrameActivated(InternalFrameEvent e) {
         // TODO Auto-generated method stub
 
@@ -658,6 +665,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
     /**
      * @see javax.swing.event.InternalFrameListener#internalFrameDeactivated(javax.swing.event.InternalFrameEvent)
      */
+    @Override
     public void internalFrameDeactivated(InternalFrameEvent e) {
         // TODO Auto-generated method stub
 
@@ -667,6 +675,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
      * @return Returns the panelList.
      */
     @SuppressWarnings("unchecked")
+    @Override
     public List<GridBagPanel> getPanelList() {
         ArrayListModel<GridBagPanel> listModel = (ArrayListModel<GridBagPanel>) this.panelList.getModel();
         return listModel;
@@ -675,6 +684,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
     /**
      * @see org.dwfa.bpa.process.I_Workspace#setWorkspaceVisible(boolean)
      */
+    @Override
     public void setWorkspaceVisible(boolean visible) {
         this.getTopLevelAncestor().setVisible(visible);
 
@@ -684,10 +694,12 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
      * @see org.dwfa.bpa.process.I_Workspace#setWorkspaceBounds(int, int, int,
      *      int)
      */
+    @Override
     public void setWorkspaceBounds(int x, int y, int width, int height) {
         this.getTopLevelAncestor().setBounds(x, y, width, height);
     }
 
+    @Override
     public void setWorkspaceBounds(Rectangle bounds) {
         this.getTopLevelAncestor().setBounds(bounds);
     }
@@ -695,6 +707,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
     /**
      * @see org.dwfa.bpa.process.I_Workspace#getPanel(java.lang.String)
      */
+    @Override
     public GridBagPanel getPanel(String panelName) throws NoMatchingEntryException {
         for (GridBagPanel p : this.getPanelList()) {
             if (p.getName().equals(panelName)) {
@@ -707,6 +720,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
     /**
      * @return Returns the id.
      */
+    @Override
     public UUID getId() {
         return id;
     }
@@ -715,6 +729,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
      * @param id
      *            The id to set.
      */
+    @Override
     public void setId(UUID id) {
         this.id = id;
     }
@@ -722,16 +737,18 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
     /**
      * @see org.dwfa.bpa.process.I_Workspace#bringToFront()
      */
+    @Override
     public void bringToFront() {
         this.requestFocus();
-        JFrame frame = (JFrame) this.getTopLevelAncestor();
-        frame.requestFocus();
+        JFrame topFrame = (JFrame) this.getTopLevelAncestor();
+        topFrame.requestFocus();
 
     }
 
     /**
      * @return Returns the statusMessage.
      */
+    @Override
     public String getStatusMessage() {
         return statusMessage.getText();
     }
@@ -740,6 +757,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
      * @param statusMessage
      *            The statusMessage to set.
      */
+    @Override
     public void setStatusMessage(String statusMessage) {
         this.statusMessage.setText(statusMessage);
     }
@@ -747,6 +765,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
     /**
      * @return Returns the statusMessage.
      */
+    @Override
     public String getAltMessage() {
         return altMessage.getText();
     }
@@ -755,6 +774,7 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
      * @param statusMessage
      *            The statusMessage to set.
      */
+    @Override
     public void setAltMessage(String altMessage) {
         this.altMessage.setText(altMessage);
     }
@@ -762,54 +782,65 @@ public class WorkspacePanel extends JPanel implements ListSelectionListener, Com
     /**
      * @return Returns the frame.
      */
+    @Override
     public Frame getFrame() {
         return frame;
     }
 
+    @Override
     public Object getAttachment(String key) {
         return this.attachments.get(key);
     }
 
+    @Override
     public void setAttachment(String key, Object attachment) {
         Object oldValue = this.attachments.get(key);
         this.attachments.put(key, attachment);
         propChangeSupport.firePropertyChange(key, oldValue, attachment);
     }
 
+    @Override
     public void setShownInInternalFrame(boolean b) {
         this.showInInternalFrame = b;
         restartLayout();
     }
 
+    @Override
     public void setOneTouchExpandable(boolean b) {
         // this.splitPane.setOneTouchExpandable(b);
 
     }
 
+    @Override
     public void addAttachmentListener(PropertyChangeListener l) {
         this.propChangeSupport.addPropertyChangeListener(l);
 
     }
 
+    @Override
     public void addAttachmentListener(String property, PropertyChangeListener l) {
         this.propChangeSupport.addPropertyChangeListener(property, l);
 
     }
 
+    @Override
     public void removeAttachmentListener(PropertyChangeListener l) {
         this.propChangeSupport.removePropertyChangeListener(l);
 
     }
 
+    @Override
     public void removeAttachmentListener(String property, PropertyChangeListener l) {
         this.propChangeSupport.removePropertyChangeListener(property, l);
 
     }
 
+    @Override
     public void acquireOwnership() {
         ownership.acquireUninterruptibly();
     }
 
+    @Override
     public void releaseOwnership() {
         ownership.release();
     }

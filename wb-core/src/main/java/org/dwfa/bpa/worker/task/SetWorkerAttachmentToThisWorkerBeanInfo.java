@@ -45,7 +45,7 @@ public class SetWorkerAttachmentToThisWorkerBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd = new BeanDescriptor(NewMasterWorker.class);
+        BeanDescriptor bd = new BeanDescriptor(SetWorkerAttachmentToThisWorker.class);
         bd.setDisplayName("<html><font color='green'><center>Set Property:<br>Worker Attachment<br>to This Worker");
         return bd;
     }

@@ -20,40 +20,16 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
-import java.util.List;
-
-import net.jini.config.ConfigurationException;
-import net.jini.core.entry.Entry;
-import net.jini.core.lookup.ServiceID;
-import net.jini.core.lookup.ServiceItem;
-import net.jini.core.lookup.ServiceTemplate;
-import net.jini.lookup.ServiceItemFilter;
-import net.jini.lookup.entry.Name;
-
-import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
-import org.dwfa.bpa.process.I_QueueProcesses;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
-import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.cement.RefsetAuxiliary;
-import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.project.TerminologyProjectDAO;
-import org.ihtsdo.project.model.I_TerminologyProject;
-import org.ihtsdo.project.model.TranslationProject;
-import org.ihtsdo.project.model.WorkList;
-import org.ihtsdo.project.model.WorkListMember;
-import org.ihtsdo.project.refset.PromotionRefset;
 
 /**
  * The Class GenerateUAWAssignment.
@@ -199,94 +175,8 @@ public class GenerateUAWAssignment extends AbstractTask {
      * org.dwfa.bpa.process.I_Work)
      */
     public Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
+       throw new UnsupportedOperationException("TODO: Jini Removal");
 
-        try {
-
-            termFactory = Terms.get();
-            // TODO: move to read from profile
-
-            I_GetConceptData enRefset = null;
-            try {
-                enRefset = Terms.get().getConcept(RefsetAuxiliary.Concept.LANGUAGE_REFSET_EN.getUids());
-            } catch (TerminologyException e) {
-                AceLog.getAppLog().alertAndLogException(e);
-            } catch (IOException e) {
-                AceLog.getAppLog().alertAndLogException(e);
-            }
-            I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
-            WorkListMember workListMember = (WorkListMember) process.getProperty(memberPropName);
-            String destination = (String) process.getProperty(translatorInboxPropName);
-
-            WorkList worklist = TerminologyProjectDAO.getWorkList(
-                    termFactory.getConcept(workListMember.getWorkListUUID()), config);
-            I_TerminologyProject project = TerminologyProjectDAO.getProjectForWorklist(worklist, config);
-
-            List<I_GetConceptData> souLanRefsets = ((TranslationProject) project).getSourceLanguageRefsets();
-            Integer langRefset = null;
-            for (I_GetConceptData lCon : souLanRefsets) {
-                if (lCon.getConceptNid() == enRefset.getConceptNid()) {
-                    langRefset = lCon.getConceptNid();
-                    break;
-                }
-            }
-            if (langRefset == null && souLanRefsets != null) {
-                langRefset = souLanRefsets.get(0).getConceptNid();
-            }
-
-            int statusId = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_DELIVERED_STATUS.getUids()).getConceptNid();
-
-            PromotionRefset promoRefset = worklist.getPromotionRefset(config);
-            ServiceID serviceID = null;
-            Class<?>[] serviceTypes = new Class[]{I_QueueProcesses.class};
-            String queueName = config.getUsername().trim() + ".outbox";
-            Entry[] attrSetTemplates = new Entry[]{new Name(queueName)};
-            ServiceTemplate template = new ServiceTemplate(serviceID, serviceTypes, attrSetTemplates);
-            ServiceItemFilter filter = null;
-            ServiceItem service = null;
-            try {
-                service = worker.lookup(template, filter);
-            } catch (ConfigurationException e1) {
-                e1.printStackTrace();
-            }
-            if (service == null) {
-                throw new TaskFailedException("No queue with the specified name could be found: "
-                        + "OUTBOX");
-            }
-//			I_QueueProcesses q = (I_QueueProcesses) service.service;
-//			I_EncodeBusinessProcess wfProcess=(I_EncodeBusinessProcess)worklist.getBusinessProcess();
-//			wfProcess.setDestination(destination);
-//			wfProcess.setProperty(translatorInboxPropName, process.getProperty(translatorInboxPropName));
-//			wfProcess.setProperty(reviewer1InboxPropName, process.getProperty(reviewer1InboxPropName));
-//			wfProcess.setProperty(reviewer2InboxPropName, process.getProperty(reviewer2InboxPropName));
-//			wfProcess.setProperty(smeInboxPropName, process.getProperty(smeInboxPropName));
-//			wfProcess.setProperty(editorialBoardInboxPropName, process.getProperty(editorialBoardInboxPropName));
-//
-//			workListMember.setActivityStatus(
-//					ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_DELIVERED_STATUS.getUids().iterator().next());
-//			TerminologyProjectDAO.updateWorkListMemberMetadata(workListMember, config);
-//			termFactory.commit();
-//			wfProcess.writeAttachment(ProcessAttachmentKeys.WORKLIST_MEMBER.getAttachmentKey(), workListMember);
-//			Long statusTime=promoRefset.getLastStatusTime(workListMember.getId(), config);
-//			
-//			String subj= TerminologyProjectDAO.getItemSubject(workListMember,worklist,project, promoRefset, langRefset, statusId, statusTime);
-//
-//			wfProcess.setSubject(subj);	
-//			wfProcess.setSubject(workListMember.getConcept().toString());
-//			wfProcess.setProcessID(new ProcessID(UUID.randomUUID()));
-//			worker.getLogger().info(
-//					"Moving process " + wfProcess.getProcessID() + " to Queue named: " + queueName);
-//			q.write(wfProcess, worker.getActiveTransaction());
-//			worker.commitTransactionIfActive();
-//			worker.getLogger()
-//			.info("Moved process " + wfProcess.getProcessID() + " to queue: " + q.getNodeInboxAddress());
-//			//TerminologyProjectDAO.promoteLanguageContent(workListMember, config);
-//			JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-//					"Assignment delivered!", "", JOptionPane.INFORMATION_MESSAGE);
-        } catch (Exception e) {
-            AceLog.getAppLog().alertAndLogException(e);
-            throw new TaskFailedException(e.getMessage());
-        }
-        return Condition.CONTINUE;
     }
 
     /**

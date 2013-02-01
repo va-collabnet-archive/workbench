@@ -2458,7 +2458,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
         public void run() {
             try {
-                AceFrame newFrame = new AceFrame(WorkbenchRunner.args, WorkbenchRunner.lc, frameConfig, false);
+                AceFrame newFrame = new AceFrame(WorkbenchRunner.args, frameConfig, false);
 
                 newFrame.setVisible(true);
 

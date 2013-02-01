@@ -24,7 +24,7 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
-import org.dwfa.bpa.tasks.editor.ConceptLabelEditor;
+import org.dwfa.ace.prop.editor.ConceptLabelPropEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
 /**
@@ -54,7 +54,7 @@ public class RoleBasedWFDestinationSelectorBeanInfo extends SimpleBeanInfo {
 			
 			PropertyDescriptor stepRole = new PropertyDescriptor("stepRole", getBeanDescriptor().getBeanClass());
 			stepRole.setBound(true);
-			stepRole.setPropertyEditorClass(ConceptLabelEditor.class);
+			stepRole.setPropertyEditorClass(ConceptLabelPropEditor.class);
 			stepRole.setDisplayName("<html><font color='green'>Role:");
 			stepRole.setShortDescription("Role associated with this wf step");
 

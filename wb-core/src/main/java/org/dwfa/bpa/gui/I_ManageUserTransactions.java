@@ -21,13 +21,8 @@ package org.dwfa.bpa.gui;
 
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
-import java.rmi.RemoteException;
-import java.security.PrivilegedActionException;
 import java.util.Collection;
-
-import net.jini.core.lease.LeaseDeniedException;
-import net.jini.core.transaction.Transaction;
-import net.jini.core.transaction.TransactionException;
+import javax.transaction.Transaction;
 
 public interface I_ManageUserTransactions {
 
@@ -39,18 +34,17 @@ public interface I_ManageUserTransactions {
 
     public void removeUncommittedComponentsListener(PropertyChangeListener listener);
 
-    public void commitActiveTransaction() throws TransactionException, RemoteException;
+    public void commitActiveTransaction();
 
-    public Transaction getActiveTransaction() throws TransactionException, LeaseDeniedException, RemoteException,
-            InterruptedException, IOException, PrivilegedActionException;
+    public Transaction getActiveTransaction() throws IOException;
 
-    public boolean isTransactionActive() throws TransactionException;
+    public boolean isTransactionActive();
 
-    public void setActiveTransaction(Transaction activeTransaction) throws TransactionException;
+    public void setActiveTransaction(Transaction activeTransaction);
 
     public void setTransactionDuration(long transactionDuration);
 
-    public Collection<?> getUncommittedComponents() throws TransactionException;
+    public Collection<?> getUncommittedComponents();
 
-    public void abortActiveTransaction() throws TransactionException, RemoteException;
+    public void abortActiveTransaction();
 }

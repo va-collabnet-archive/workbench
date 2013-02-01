@@ -30,7 +30,6 @@ import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.bpa.worker.Worker;
-import org.dwfa.queue.bpa.worker.OnDemandOutboxQueueWorker;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -94,23 +93,7 @@ public class RunOnDemandOutboxWorker extends AbstractTask {
      */
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
-        try {
-            I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-                    .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-
-            List<Worker> lWorker = ((Worker) worker).getWorkerList();
-            OnDemandOutboxQueueWorker oWorker = null;
-            for (Worker worktmp : lWorker) {
-                if (OnDemandOutboxQueueWorker.class.isAssignableFrom(worktmp.getClass())) {
-                    oWorker = (OnDemandOutboxQueueWorker) worktmp;
-                    oWorker.run();
-                }
-            }
-
-            return Condition.CONTINUE;
-        } catch (Exception e) {
-            throw new TaskFailedException(e);
-        }
+       throw new UnsupportedOperationException("TODO: Jini Removal");
     }
 
     /* (non-Javadoc)

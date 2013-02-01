@@ -26,8 +26,6 @@ import java.util.HashSet;
 import java.util.Stack;
 import java.util.UUID;
 
-import net.jini.core.lease.LeaseDeniedException;
-
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
@@ -110,8 +108,6 @@ public class CallBackQueueItemsCancel extends AbstractTask {
         try {
             qir.process();
         } catch (TaskFailedException e) {
-            AceLog.getAppLog().alertAndLogException(e);
-        } catch (LeaseDeniedException e) {
             AceLog.getAppLog().alertAndLogException(e);
         } catch (RemoteException e) {
             AceLog.getAppLog().alertAndLogException(e);

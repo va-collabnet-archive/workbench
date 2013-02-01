@@ -39,17 +39,6 @@ import java.util.logging.Level;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
-import net.jini.config.ConfigurationException;
-import net.jini.core.entry.Entry;
-import net.jini.core.lease.LeaseDeniedException;
-import net.jini.core.lookup.ServiceID;
-import net.jini.core.lookup.ServiceItem;
-import net.jini.core.lookup.ServiceTemplate;
-import net.jini.core.transaction.CannotCommitException;
-import net.jini.core.transaction.UnknownTransactionException;
-import net.jini.lookup.ServiceItemFilter;
-import net.jini.lookup.entry.Name;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.ParseException;
@@ -2926,8 +2915,6 @@ public class TerminologyProjectDAO {
 		try {
 			I_IntSet allowedDestRelTypes = termFactory.newIntSet();
 			allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
-			I_IntSet allowedStatuses = config.getAllowedStatus();
-			allowedStatuses.remove(ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid());
 			Set<? extends I_GetConceptData> parents = workListConcept.getSourceRelTargets(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
 
 			if (parents.size() != 1) {
@@ -3750,98 +3737,9 @@ public class TerminologyProjectDAO {
 	 * @throws PrivilegedActionException
 	 *             the privileged action exception
 	 */
-	public static void deliverWorklistBusinessProcessToOutbox(WorkList worklist, I_Work worker) throws TerminologyException, IOException, TaskFailedException, UnknownTransactionException, CannotCommitException, LeaseDeniedException, InterruptedException, PrivilegedActionException {
-
-		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-		List<WorkListMember> workListMembers = getAllWorkListMembers(worklist, config);
-		boolean bSent = false;
-		ServiceID serviceID = null;
-		Class<?>[] serviceTypes = new Class[] { I_QueueProcesses.class };
-		String queueName = config.getUsername().trim() + ".outbox";
-		Entry[] attrSetTemplates = new Entry[] { new Name(queueName) };
-		ServiceTemplate template = new ServiceTemplate(serviceID, serviceTypes, attrSetTemplates);
-		ServiceItemFilter filter = null;
-		ServiceItem service = null;
-		try {
-			service = worker.lookup(template, filter);
-		} catch (ConfigurationException e1) {
-			e1.printStackTrace();
-		}
-		if (service == null) {
-			throw new TaskFailedException("No queue with the specified name could be found: " + "OUTBOX");
-		}
-		I_QueueProcesses q = (I_QueueProcesses) service.service;
-		// I_EncodeBusinessProcess
-		// process=(I_EncodeBusinessProcess)worklist.getBusinessProcess();
-		// String destination=worklist.getDestination();
-		// // process.setDestination(destination);
-		// I_TerminologyProject project = getProjectForWorklist(worklist,
-		// config);
-		// List<I_GetConceptData> souLanRefsets =
-		// ((TranslationProject)project).getSourceLanguageRefsets();
-		// Integer langRefset = null;
-		// for (I_GetConceptData lCon:souLanRefsets){
-		// if (lCon.getConceptNid()==enRefset.getConceptNid()){
-		// langRefset=lCon.getConceptNid();
-		// break;
-		// }
-		// }
-		// if (langRefset==null && souLanRefsets!=null){
-		// langRefset=souLanRefsets.get(0).getConceptNid();
-		// }
-		// Long statusTime=new java.util.Date().getTime();
-		// int statusId =
-		// Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_DELIVERED_STATUS.getUids()).getConceptNid();
-		// PromotionRefset promoRefset = worklist.getPromotionRefset(config);
-		// for (WorkListMember workListMember : workListMembers) {
-		// if
-		// (ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids().contains(workListMember.getActivityStatus()))
-		// {
-		// // I_EncodeBusinessProcess process=
-		// workListMember.getBusinessProcessWithAttachments();
-		// try {
-		// if (workListMember.getDestination() != null &&
-		// !workListMember.getDestination().isEmpty()) {
-		// process.setDestination(workListMember.getDestination());
-		// }
-		// workListMember.setActivityStatus(
-		// ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_DELIVERED_STATUS.getUids().iterator().next());
-		// process.writeAttachment(ProcessAttachmentKeys.WORKLIST_MEMBER.getAttachmentKey(),
-		// workListMember);
-		// updateWorkListMemberMetadata(workListMember, config);
-		// // Due commit is missing take date from variable
-		// // statusTime=promoRefset.getLastStatusTime(workListMember.getId(),
-		// config);
-		// String
-		// subj=getItemSubject(workListMember,worklist,project,promoRefset,langRefset,statusId,statusTime);
-		//
-		// process.setSubject(subj);
-		// process.setProcessID(new ProcessID(UUID.randomUUID()));
-		// worker.getLogger().info(
-		// "Moving process " + process.getProcessID() + " to Queue named: " +
-		// queueName);
-		// q.write(process, worker.getActiveTransaction());
-		// bSent = true;
-		// worker.getLogger()
-		// .info("Moved process " + process.getProcessID() + " to queue: " +
-		// q.getNodeInboxAddress());
-		// updateWorkListMemberMetadata(workListMember, config);
-		// //TODO: move to a more generic promotion, not language specific
-		// // promoteLanguageContent(workListMember, config);
-		// } catch (Exception e) {
-		// throw new TaskFailedException(e);
-		// }
-		// }
-		// }
-		if (bSent) {
-			worker.getActiveTransaction().commit();
-		}
-		try {
-			Terms.get().commit();
-		} catch (Exception e) {
-			AceLog.getAppLog().alertAndLogException(e);
-		}
-	}
+	public static void deliverWorklistBusinessProcessToOutbox(WorkList worklist, I_Work worker) throws TerminologyException, IOException, TaskFailedException, InterruptedException, PrivilegedActionException {
+               throw new UnsupportedOperationException("TODO: JINI REMOVAL");
+        }
 
 	/**
 	 * The subject separator.
@@ -5650,7 +5548,7 @@ public class TerminologyProjectDAO {
 	public static List<WfMembership> convertToMembershipList(List<String> list) throws Exception {
 		List<WfMembership> members = new ArrayList<WfMembership>();
 		for (String line : list) {
-			String[] fields = line.split("\\|");
+			String[] fields = line.split("|");
 			I_GetConceptData userConcept = Terms.get().getConcept(UUID.fromString(fields[1]));
 			WfUser user = new WfUser(userConcept.toString(), userConcept.getPrimUuid());
 			

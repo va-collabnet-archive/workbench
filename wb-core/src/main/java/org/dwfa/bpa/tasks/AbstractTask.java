@@ -33,8 +33,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.rmi.RemoteException;
-import java.security.PrivilegedActionException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -43,12 +41,6 @@ import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 
-import net.jini.config.ConfigurationException;
-import net.jini.core.lookup.ServiceItem;
-import net.jini.core.lookup.ServiceTemplate;
-import net.jini.security.BasicProxyPreparer;
-import net.jini.security.ProxyPreparer;
-
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_DefineTask;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -56,13 +48,14 @@ import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.PropertyChangeSupportWithPropagationId;
+import org.ihtsdo.ttk.lookup.LookupService;
 
 /**
  * @author kec
  * 
  */
 public abstract class AbstractTask implements I_DefineTask {
-    private static Logger logger = Logger.getLogger(I_DefineTask.class.getName());
+    private static final Logger logger = Logger.getLogger(I_DefineTask.class.getName());
     private int id = -1;
 
     public AbstractTask() {
@@ -72,6 +65,7 @@ public abstract class AbstractTask implements I_DefineTask {
     /**
      * @see org.dwfa.bpa.process.I_DefineTask#getLogger()
      */
+    @Override
     public Logger getLogger() {
         return logger;
     }
@@ -79,6 +73,7 @@ public abstract class AbstractTask implements I_DefineTask {
     /**
      * @see org.dwfa.bpa.process.I_DefineTask#isLoggable(java.util.logging.Level)
      */
+    @Override
     public boolean isLoggable(Level level) {
         return logger.isLoggable(level);
     }
@@ -140,6 +135,7 @@ public abstract class AbstractTask implements I_DefineTask {
     /**
      * @see org.dwfa.bpa.process.I_DefineTask#getName()
      */
+    @Override
     public final String getName() {
         return this.getClass().getSimpleName();
     }
@@ -147,6 +143,7 @@ public abstract class AbstractTask implements I_DefineTask {
     /**
      * @see org.dwfa.bpa.process.I_DefineTask#getId()
      */
+    @Override
     public int getId() {
         return this.id;
     }
@@ -159,6 +156,7 @@ public abstract class AbstractTask implements I_DefineTask {
      * @throws PropertyVetoException
      * @see org.dwfa.bpa.process.I_DefineTask#setId(int)
      */
+    @Override
     public void setId(int id) throws PropertyVetoException {
         int oldId = this.id;
         this.vetoSupport.fireVetoableChange("id", oldId, id);
@@ -169,6 +167,7 @@ public abstract class AbstractTask implements I_DefineTask {
     /**
      * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
      */
+    @Override
     public void propertyChange(PropertyChangeEvent evt) {
         throw new UnsupportedOperationException();
     }
@@ -176,6 +175,7 @@ public abstract class AbstractTask implements I_DefineTask {
     /**
      * @param listener
      */
+    @Override
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         changeSupport.addPropertyChangeListener(listener);
     }
@@ -184,6 +184,7 @@ public abstract class AbstractTask implements I_DefineTask {
      * @param propertyName
      * @param listener
      */
+    @Override
     public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         changeSupport.addPropertyChangeListener(propertyName, listener);
     }
@@ -191,6 +192,7 @@ public abstract class AbstractTask implements I_DefineTask {
     /**
      * @return
      */
+    @Override
     public PropertyChangeListener[] getPropertyChangeListeners() {
         return changeSupport.getPropertyChangeListeners();
     }
@@ -199,6 +201,7 @@ public abstract class AbstractTask implements I_DefineTask {
      * @param propertyName
      * @return
      */
+    @Override
     public PropertyChangeListener[] getPropertyChangeListeners(String propertyName) {
         return changeSupport.getPropertyChangeListeners(propertyName);
     }
@@ -206,6 +209,7 @@ public abstract class AbstractTask implements I_DefineTask {
     /**
      * @param listener
      */
+    @Override
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         changeSupport.removePropertyChangeListener(listener);
     }
@@ -214,6 +218,7 @@ public abstract class AbstractTask implements I_DefineTask {
      * @param propertyName
      * @param listener
      */
+    @Override
     public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         changeSupport.removePropertyChangeListener(propertyName, listener);
     }
@@ -221,6 +226,7 @@ public abstract class AbstractTask implements I_DefineTask {
     /**
      * @param listener
      */
+    @Override
     public void addVetoableChangeListener(VetoableChangeListener listener) {
         vetoSupport.addVetoableChangeListener(listener);
     }
@@ -229,6 +235,7 @@ public abstract class AbstractTask implements I_DefineTask {
      * @param propertyName
      * @param listener
      */
+    @Override
     public void addVetoableChangeListener(String propertyName, VetoableChangeListener listener) {
         vetoSupport.addVetoableChangeListener(propertyName, listener);
     }
@@ -236,6 +243,7 @@ public abstract class AbstractTask implements I_DefineTask {
     /**
      * @return
      */
+    @Override
     public VetoableChangeListener[] getVetoableChangeListeners() {
         return vetoSupport.getVetoableChangeListeners();
     }
@@ -244,6 +252,7 @@ public abstract class AbstractTask implements I_DefineTask {
      * @param propertyName
      * @return
      */
+    @Override
     public VetoableChangeListener[] getVetoableChangeListeners(String propertyName) {
         return vetoSupport.getVetoableChangeListeners(propertyName);
     }
@@ -251,6 +260,7 @@ public abstract class AbstractTask implements I_DefineTask {
     /**
      * @param listener
      */
+    @Override
     public void removeVetoableChangeListener(VetoableChangeListener listener) {
         vetoSupport.removeVetoableChangeListener(listener);
     }
@@ -259,6 +269,7 @@ public abstract class AbstractTask implements I_DefineTask {
      * @param propertyName
      * @param listener
      */
+    @Override
     public void removeVetoableChangeListener(String propertyName, VetoableChangeListener listener) {
         vetoSupport.removeVetoableChangeListener(propertyName, listener);
     }
@@ -337,41 +348,8 @@ public abstract class AbstractTask implements I_DefineTask {
         vetoSupport.fireVetoableChange(propertyName, oldValue, newValue);
     }
 
-    protected Object getService(I_Work worker, Class<?> interfaceClass, String message, long timeout)
-            throws RemoteException, InterruptedException, IOException, ConfigurationException, TaskFailedException {
-        return getService(worker, interfaceClass, message, timeout, false);
-    }
-
-    protected Object getService(I_Work worker, Class<?> interfaceClass, String message, long timeout,
-            boolean lookupLocal) throws RemoteException, InterruptedException, IOException, ConfigurationException,
-            TaskFailedException {
-        ServiceTemplate queryServerTemplate = new ServiceTemplate(null, new Class[] { interfaceClass }, null);
-
-        if (logger.isLoggable(Level.FINEST)) {
-            logger.finest("searching for jini services: " + interfaceClass.getName());
-        }
-        ServiceItem[] serviceItemArray;
-        try {
-            serviceItemArray = worker.lookup(queryServerTemplate, 1, Integer.MAX_VALUE, null, timeout, lookupLocal);
-        } catch (PrivilegedActionException e) {
-            throw new TaskFailedException(e);
-        }
-        if (serviceItemArray.length == 0) {
-            TaskFailedException ex = new TaskFailedException("No services found on lookup");
-            this.getLogger().throwing(this.getClass().getName(), "getService", ex);
-            throw ex;
-
-        }
-        ServiceItem serviceItem = (ServiceItem) worker.selectFromList(serviceItemArray, "Select service", message);
-
-        Object server = serviceItem.service;
-
-        /* Prepare the server proxy */
-        ProxyPreparer preparer = (ProxyPreparer) worker.getJiniConfig().getEntry(this.getClass().getName(), "preparer",
-            ProxyPreparer.class, new BasicProxyPreparer());
-        server = preparer.prepareProxy(server);
-
-        return server;
+    protected Object getService(I_Work worker, Class<?> interfaceClass, String message, long timeout) throws IOException, TaskFailedException {
+        return LookupService.get().lookup(interfaceClass);
     }
 
     /**
@@ -391,15 +369,16 @@ public abstract class AbstractTask implements I_DefineTask {
             File processBinaryFile = new File(f.getDirectory(), f.getFile());
             FileOutputStream fos = new FileOutputStream(processBinaryFile);
             BufferedOutputStream bos = new BufferedOutputStream(fos);
-            ObjectOutputStream oos = new ObjectOutputStream(bos);
-            oos.writeObject(termConfig);
-            oos.close();
+                    try (ObjectOutputStream oos = new ObjectOutputStream(bos)) {
+                        oos.writeObject(termConfig);
+                    }
         } else {
             throw new TaskFailedException("User did not select file");
         }
 
     }
 
+    @Override
     public String toString() {
         return this.getName() + " id: " + id;
     }
@@ -408,6 +387,7 @@ public abstract class AbstractTask implements I_DefineTask {
      * @throws IntrospectionException
      * @see org.dwfa.bpa.process.I_DefineTask#getBeanInfo()
      */
+    @Override
     public BeanInfo getBeanInfo() throws IntrospectionException {
         return Introspector.getBeanInfo(this.getClass());
     }
@@ -415,6 +395,7 @@ public abstract class AbstractTask implements I_DefineTask {
     /**
      * @see org.dwfa.bpa.process.I_DefineTask#getAllPropertiesBeanInfo()
      */
+    @Override
     public BeanInfo getAllPropertiesBeanInfo() throws IntrospectionException {
         return Introspector.getBeanInfo(this.getClass());
     }
@@ -422,6 +403,7 @@ public abstract class AbstractTask implements I_DefineTask {
     /**
      * @see org.dwfa.bpa.process.I_DefineTask#getDataContainerIds()
      */
+    @Override
     public int[] getDataContainerIds() {
         throw new UnsupportedOperationException();
     }
