@@ -5655,7 +5655,7 @@ public class TerminologyProjectDAO {
 			WfUser user = new WfUser(userConcept.toString(), userConcept.getPrimUuid());
 			
 			I_GetConceptData roleConcept = Terms.get().getConcept(UUID.fromString(fields[2]));
-			WfRole role = new WfRole(userConcept.toString(), userConcept.getPrimUuid());
+			WfRole role = new WfRole(roleConcept.toString(), roleConcept.getPrimUuid());
 			
 			WfMembership member = new WfMembership(UUID.fromString(fields[0]), user, role, Boolean.parseBoolean(fields[3]));
 			members.add(member);
