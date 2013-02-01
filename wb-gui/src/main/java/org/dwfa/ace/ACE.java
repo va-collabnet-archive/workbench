@@ -1067,15 +1067,19 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 				try {
 					projectsCC = wfStore.getAllProjects();
 				} catch (Exception e2) {
-					// TODO Auto-generated catch block
 					e2.printStackTrace();
 				}
-
-				JComboBox projectCCSelectCombo = null;
+				JComboBox projectCCSelectCombo = new JComboBox();
 				if (projectsCC!=null){
-					projectCCSelectCombo=new JComboBox(projectsCC.toArray());
-				}else{
-					projectCCSelectCombo=new JComboBox();
+					for (ProjectBI proj:projectsCC){
+						I_GetConceptData conceptTmp;
+						try {
+							conceptTmp = Terms.get().getConcept(proj.getUuid());
+							projectCCSelectCombo.addItem(conceptTmp); 
+						} catch (TerminologyException | IOException e1) {
+							e1.printStackTrace();
+						}
+					}
 				}
 				projectChangedConceptSubpanel.add(projectCCSelectCombo, gbcCC);
 				projectCCSelectCombo.addActionListener(new ActionListener() {
@@ -1083,43 +1087,33 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 					public void actionPerformed(ActionEvent e) {
 						JComboBox                  cb       = (JComboBox) e.getSource();
 
-						ProjectBI projPref = (ProjectBI) cb.getSelectedItem();
+						I_GetConceptData projPref = (I_GetConceptData) cb.getSelectedItem();
 
-						try {
-							aceFrameConfig.setDefaultProjectForChangedConcept(Terms.get().getConcept(projPref.getUuid()));
-						} catch (TerminologyException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						} catch (IOException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
+						aceFrameConfig.setDefaultProjectForChangedConcept(projPref);
 
 						worklistCCSelectCombo.removeAllItems();
 						Collection<WorkListBI> worklists=null;
 						try {
-							worklists = projPref.getWorkLists();
+							worklists=wfStore.getProject(projPref.getPrimUuid()).getWorkLists();
 						} catch (Exception e1) {
-							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
 						if (worklists!=null){
+							List<I_GetConceptData> concepts=new ArrayList<I_GetConceptData>();
 							for (WorkListBI worklist:worklists){
-								worklistCCSelectCombo.addItem(worklist);
+
+								I_GetConceptData conceptTmp;
+								try {
+									conceptTmp = Terms.get().getConcept(worklist.getUuid());
+									worklistCCSelectCombo.addItem(conceptTmp);
+								} catch (TerminologyException | IOException e1) {
+									e1.printStackTrace();
+								}
 							}
 							I_GetConceptData worklistConcept=aceFrameConfig.getDefaultWorkflowForChangedConcept();
 							if (worklistConcept!=null){
-								
-								WorkListBI worklist=null;
-								try {
-									worklist = wfStore.getWorklist(worklistConcept.getPrimUuid());
-								} catch (Exception e1) {
-									// TODO Auto-generated catch block
-									e1.printStackTrace();
-								}
-								if (worklist!=null){
-									worklistCCSelectCombo.setSelectedItem(worklist);
-								}
+
+								worklistCCSelectCombo.setSelectedItem(worklistConcept);
 							}
 						}
 					}
@@ -1144,15 +1138,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 					public void actionPerformed(ActionEvent e) {
 						JComboBox                  cb       = (JComboBox) e.getSource();
 
-						WorkListBI workList = (WorkListBI) cb.getSelectedItem();
-
-						try {
-							aceFrameConfig.setDefaultWorkflowForChangedConcept(Terms.get().getConcept(workList.getUuid()));
-						} catch (TerminologyException e1) {
-							e1.printStackTrace();
-						} catch (IOException e1) {
-							e1.printStackTrace();
-						}
+						I_GetConceptData workList = (I_GetConceptData) cb.getSelectedItem();
+						aceFrameConfig.setDefaultWorkflowForChangedConcept(workList);
 					}
 				});
 
@@ -1160,16 +1147,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
 				I_GetConceptData projectCConcept=aceFrameConfig.getDefaultProjectForChangedConcept();
 
-				try {
-					ProjectBI projectCC= wfStore.getProject(projectCConcept.getPrimUuid());
-				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
 				if (projectCConcept!=null){
 					projectCCSelectCombo.setSelectedItem(projectCConcept);
 				}
-
 
 				return projectPrefPanel;
 			}
