@@ -79,7 +79,7 @@ public class LaunchWfInstanceSearchPanel extends AbstractTask {
     }
 
     /**
-     * Instantiates a new launch report panel.
+     * Instantiates a new launch wf instance serarch panel.
      *
      * @throws MalformedURLException the malformed url exception
      */

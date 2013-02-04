@@ -26,7 +26,7 @@ import java.beans.SimpleBeanInfo;
 public class LaunchWfInstanceSearchPanelBeanInfo extends SimpleBeanInfo {
 
     /**
-     * Instantiates a new launch report panel bean info.
+     * Instantiates a new launch wf instance search panel bean info.
      */
     public LaunchWfInstanceSearchPanelBeanInfo() {
         super();
@@ -46,7 +46,7 @@ public class LaunchWfInstanceSearchPanelBeanInfo extends SimpleBeanInfo {
      * @see java.beans.SimpleBeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd = new BeanDescriptor(LaunchReportPanel.class);
+        BeanDescriptor bd = new BeanDescriptor(LaunchWfInstanceSearchPanel.class);
         bd.setDisplayName("<html><font color='green'><center>Launch WfInstance Search Panel");
         return bd;
     }
