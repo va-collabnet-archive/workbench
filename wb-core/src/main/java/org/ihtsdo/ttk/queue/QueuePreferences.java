@@ -56,10 +56,11 @@ public class QueuePreferences implements Comparable<QueuePreferences>, Preferenc
     }
 
     public QueuePreferences(String displayName, String id, File queueDirectory,
-            QueueType queueType) {
+            Boolean readInsteadOfTake, QueueType queueType) {
         this.displayName    = displayName;
         this.id             = id;
         this.queueDirectory = queueDirectory;
+        this.readInsteadOfTake = readInsteadOfTake;
         this.serviceItemProperties.add(queueType);
     }
 
