@@ -47,7 +47,7 @@ public class LaunchWfInstanceSearchPanelBeanInfo extends SimpleBeanInfo {
      */
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(LaunchWfInstanceSearchPanel.class);
-        bd.setDisplayName("<html><font color='green'><center>Launch WfInstance Search Panel");
+        bd.setDisplayName("<html><font color='green'><center>Launch WfInstance<BR>Search Panel");
         return bd;
     }
 }
