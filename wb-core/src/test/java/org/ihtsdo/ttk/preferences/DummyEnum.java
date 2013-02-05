@@ -16,11 +16,12 @@
 package org.ihtsdo.ttk.preferences;
 
 /**
- * Dummy class with {@link Enum} for testing.
+ * Dummy {@link Enum} for testing.
+ *
  * @author ocarlsen
  */
-class TestClassWithEnum {
-    enum Fields {
-        JUNK;
-    }
+enum DummyEnum {
+
+    JUNK;
+
 }

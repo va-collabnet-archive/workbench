@@ -15,10 +15,6 @@
  */
 package org.ihtsdo.ttk.preferences;
 
-import org.ihtsdo.ttk.preferences.EnumPropertyKeyHelper;
-import org.ihtsdo.ttk.preferences.PreferenceWithDefaultEnumBI;
-import org.ihtsdo.ttk.queue.QueuePreferences;
-
 import java.util.prefs.Preferences;
 import junit.framework.TestCase;
 
@@ -30,26 +26,26 @@ import junit.framework.TestCase;
 public class EnumPropertyKeyHelperTest extends TestCase {
 
     public void testGetKeyStringClass() {
-        Class c = TestClassWithEnum.class;
+        Class c = DummyClassWithEnum.class;
         String keyString = EnumPropertyKeyHelper.getKeyString(c);
-        assertEquals("org/ihtsdo/ttk/preferences/TestClassWithEnum", keyString);
+        assertEquals("org/ihtsdo/ttk/preferences/DummyClassWithEnum", keyString);
     }
 
     public void testGetKeyStringInnerClass() {
-        Class c = TestClassWithEnum.Fields.class;  // Inner class.
+        Class c = DummyClassWithEnum.Fields.class;  // Inner class.
         String keyString = EnumPropertyKeyHelper.getKeyString(c);
-        assertEquals("org/ihtsdo/ttk/preferences/TestClassWithEnum.Fields", keyString);
+        assertEquals("org/ihtsdo/ttk/preferences/DummyClassWithEnum.Fields", keyString);
     }
 
     public void testGetKeyStringClassWithLongName() {
-        Class c = TestClassWithEnumAndLongLongLongLongLongLongLongLongLongLongName.class;
+        Class c = DummyClassWithEnumAndLongLongLongLongLongLongLongLongLongLongName.class;
         String keyString = EnumPropertyKeyHelper.getKeyString(c);
-        assertEquals("org/ihtsdo/ttk/preferences/0ba119b9-9af2-36fa-a629-a03004fda2bb", keyString);
+        assertEquals("org/ihtsdo/ttk/preferences/76d54987-3e59-3400-bd53-d1cb159bdc41", keyString);
         assertTrue(keyString.length() <= Preferences.MAX_KEY_LENGTH);
     }
 
     public void testGetKeyStringInnerClassWithLongName() {
-        Class c = TestClassWithEnumAndLongLongLongLongLongLongLongLongLongLongName.Fields.class;
+        Class c = DummyClassWithEnumAndLongLongLongLongLongLongLongLongLongLongName.Fields.class;
         String keyString = EnumPropertyKeyHelper.getKeyString(c);
         assertEquals("org/ihtsdo/ttk/preferences/a4ca5edd-20d0-35d5-82eb-ece575681f58", keyString);
         assertTrue(keyString.length() <= Preferences.MAX_KEY_LENGTH);
@@ -57,7 +53,7 @@ public class EnumPropertyKeyHelperTest extends TestCase {
 
     public void testGetKeyStringPreferenceWithDefaultEnumBI() {
         try {
-            PreferenceWithDefaultEnumBI pref = new TestPreferenceWithDefaultEnumBI("abc");
+            PreferenceWithDefaultEnumBI pref = new DummyPreferenceWithDefaultEnumBI("abc");
             String keyString = EnumPropertyKeyHelper.getKeyString(pref);
             fail("Expected ClassCastException to be thrown.");
         } catch (ClassCastException ex) {
@@ -66,20 +62,20 @@ public class EnumPropertyKeyHelperTest extends TestCase {
     }
 
     public void testGetKeyStringEnum() {
-        Enum e = TestEnum.JUNK;
+        Enum e = DummyEnum.JUNK;
         String keyString = EnumPropertyKeyHelper.getKeyString(e);
-        assertEquals("org/ihtsdo/ttk/preferences/TestEnum.JUNK", keyString);
+        assertEquals("org/ihtsdo/ttk/preferences/DummyEnum.JUNK", keyString);
     }
 
     public void testGetKeyStringInnerEnum() {
-        Enum e = TestClassWithEnum.Fields.JUNK;
+        Enum e = DummyClassWithEnum.Fields.JUNK;
         String keyString = EnumPropertyKeyHelper.getKeyString(e);
         System.out.println(keyString);
-        assertEquals("org/ihtsdo/ttk/preferences/TestClassWithEnum.Fields.JUNK", keyString);
+        assertEquals("org/ihtsdo/ttk/preferences/DummyClassWithEnum.Fields.JUNK", keyString);
     }
 
     public void testGetKeyStringEnumWithLongName() {
-        Enum e = TestClassWithEnumAndLongLongLongLongLongLongLongLongLongLongName.Fields.JUNK;
+        Enum e = DummyClassWithEnumAndLongLongLongLongLongLongLongLongLongLongName.Fields.JUNK;
         String keyString = EnumPropertyKeyHelper.getKeyString(e);
         System.out.println(keyString);
         assertEquals("org/ihtsdo/ttk/preferences/a4ca5edd-20d0-35d5-82eb-ece575681f58.JUNK", keyString);

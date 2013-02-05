@@ -16,12 +16,19 @@
 package org.ihtsdo.ttk.preferences;
 
 /**
- * Dummy {@link Enum} for testing.
- *
+ * Test implementation of {@link PreferenceWithDefaultEnumBI}.
  * @author ocarlsen
  */
-enum TestEnum {
+class DummyPreferenceWithDefaultEnumBI implements PreferenceWithDefaultEnumBI {
+    private final Object defaultValue;
 
-    JUNK;
+    DummyPreferenceWithDefaultEnumBI(Object defaultValue) {
+        this.defaultValue = defaultValue;
+    }
+
+    @Override
+    public Object getDefaultValue() {
+        return defaultValue;
+    }
 
 }

@@ -20,7 +20,7 @@ package org.ihtsdo.ttk.preferences;
  * Dummy class with {@link Enum} and long name for testing.
  * @author ocarlsen
  */
-class TestClassWithEnumAndLongLongLongLongLongLongLongLongLongLongName {
+class DummyClassWithEnumAndLongLongLongLongLongLongLongLongLongLongName {
     enum Fields {
         JUNK;
     }
