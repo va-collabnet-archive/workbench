@@ -51,6 +51,8 @@ public class QueuePreferences implements Comparable<QueuePreferences>, Preferenc
         this.serviceItemProperties =
             (List<PreferenceObject>) preferences.getList(Fields.QUEUE_INSTANCE_PROPERTIES_LIST);
         this.readInsteadOfTake = preferences.getBoolean(Fields.READ_INSTEAD_OF_TAKE);
+        this.id = preferences.get(Fields.ID);
+        this.displayName = preferences.get(Fields.DISPLAY_NAME);
     }
 
     public QueuePreferences(String displayName, String id, File queueDirectory,
