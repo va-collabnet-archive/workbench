@@ -13,10 +13,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -30,17 +28,9 @@ import javax.swing.SwingWorker;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.project.TerminologyProjectDAO;
-import org.ihtsdo.project.filter.WfProjectFilter;
-import org.ihtsdo.project.filter.WfWorklistFilter;
-import org.ihtsdo.project.model.WorkList;
-import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.search.WorkflowInstanceTableModel.WORKFLOW_FIELD;
 import org.ihtsdo.project.workflow.api.wf2.implementation.CancelSearch;
-import org.ihtsdo.project.workflow.api.wf2.implementation.WfInstanceSearcher;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WorkflowStore;
 import org.ihtsdo.tk.workflow.api.WfFilterBI;
 import org.ihtsdo.tk.workflow.api.WfProcessInstanceBI;
@@ -53,7 +43,6 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
 	private static final long serialVersionUID = 1L;
 	private WorkflowInstanceTableModel model;
 	private ArrayList<WfFilterBI> filters;
-	private WfInstanceSearcher instanceSearchWorker;
 	private JButton stopButton;
 	private CancelSearch keepSearching;
 
@@ -71,26 +60,23 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
 
 	@Override
 	public void removeFilterPanel(JComponent filterPanel) {
-		if (filtersWrapper.getComponentCount() > 1) {
-			filtersWrapper.remove(filterPanel);
-			filtersWrapper.revalidate();
-			filtersWrapper.repaint();
-		}
+		filtersWrapper.remove(filterPanel);
+		filtersWrapper.revalidate();
+		filtersWrapper.repaint();
 	}
 
 	private void initCustomComponents() {
-		filtersWrapper.add(new SearchFilterPanel(this));
 		filtersWrapper.revalidate();
 		filtersWrapper.repaint();
-		
+
 		keepSearching = new CancelSearch();
 
 		try {
 			config = Terms.get().getActiveAceFrameConfig();
-			try{
+			try {
 				searchButton.setIcon(new ImageIcon(ACE.class.getResource("/32x32/plain/gear_find.png")));
-			}catch (Exception e){
-				
+			} catch (Exception e) {
+
 			}
 			model = new WorkflowInstanceTableModel(new WORKFLOW_FIELD[] { WORKFLOW_FIELD.FSN, WORKFLOW_FIELD.EDITOR, WORKFLOW_FIELD.STATE,
 					WORKFLOW_FIELD.TIMESTAMP }, config);
@@ -100,15 +86,15 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
 		}
 
 		stopButton = new JButton();
-		try{
+		try {
 			stopButton.setIcon(new ImageIcon(ACE.class.getResource("/32x32/plain/stop.png")));
-		}catch (Exception e ){
-			
+		} catch (Exception e) {
+
 		}
 		stopButton.setVisible(false);
 		stopButton.setToolTipText("stop the current search");
 		stopButton.addActionListener(new StopActionListener());
-		panel1.add(stopButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+		panel1.add(stopButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 0), 0, 0));
 
 	}
@@ -139,18 +125,28 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
 				}
 			}
 		}
+		filters.add(((SearchFilterPanel)searchFilterPanel).getWfFilter());
 
 		WorkflowStore ws = new WorkflowStore();
+		ProgressListener propertyChangeListener = new ProgressListener(progressBar1);
 		try {
-			ProgressListener propertyChangeListener = new ProgressListener(progressBar1);
-			Collection<WfProcessInstanceBI> instances = ws.searchWorkflow(filters, model, propertyChangeListener, keepSearching );
-			if(instances != null && !instances.isEmpty()){
+			Collection<WfProcessInstanceBI> instances = ws.searchWorkflow(filters, model, propertyChangeListener, keepSearching);
+			if (instances != null) {
 				for (WfProcessInstanceBI wfProcessInstanceBI : instances) {
 					model.addWfInstance(wfProcessInstanceBI);
 				}
 				propertyChangeListener.progressBar.setIndeterminate(false);
+				searchButton.setVisible(true);
+				stopButton.setVisible(false);
+			}else{
+				propertyChangeListener.progressBar.setIndeterminate(false);
+				searchButton.setVisible(true);
+				stopButton.setVisible(false);
 			}
 		} catch (Exception e2) {
+			propertyChangeListener.progressBar.setIndeterminate(false);
+			searchButton.setVisible(true);
+			stopButton.setVisible(false);
 			e2.printStackTrace();
 		}
 
@@ -186,7 +182,6 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
 		searchButton = new JButton();
 		filtersWrapper = new JPanel();
 		tableContainer = new JPanel();
-		button1 = new JButton();
 		scrollPane1 = new JScrollPane();
 		table1 = new JTable();
 
@@ -200,11 +195,17 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
 			// ======== panel1 ========
 			{
 				panel1.setLayout(new GridBagLayout());
-				((GridBagLayout) panel1.getLayout()).columnWidths = new int[] { 0, 0, 0 };
-				((GridBagLayout) panel1.getLayout()).rowHeights = new int[] { 0, 0 };
-				((GridBagLayout) panel1.getLayout()).columnWeights = new double[] { 1.0, 0.0, 1.0E-4 };
+				((GridBagLayout) panel1.getLayout()).columnWidths = new int[] { 0, 264, 0, 0 };
+				((GridBagLayout) panel1.getLayout()).rowHeights = new int[] { 21, 0 };
+				((GridBagLayout) panel1.getLayout()).columnWeights = new double[] { 0.0, 0.0, 0.0, 1.0E-4 };
 				((GridBagLayout) panel1.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
-				panel1.add(progressBar1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
+				searchFilterPanel = new SearchFilterPanel(this);
+				GridBagConstraints gbc_searchFilterPanel = new GridBagConstraints();
+				gbc_searchFilterPanel.insets = new Insets(0, 0, 0, 5);
+				gbc_searchFilterPanel.gridx = 0;
+				gbc_searchFilterPanel.gridy = 0;
+				panel1.add(searchFilterPanel, gbc_searchFilterPanel);
+				panel1.add(progressBar1, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
 						0, 0, 0, 5), 0, 0));
 
 				// ---- searchButton ----
@@ -214,7 +215,7 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
 						searchButtonActionPerformed(e);
 					}
 				});
-				panel1.add(searchButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
+				panel1.add(searchButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
 						0, 0, 0, 0), 0, 0));
 			}
 			filterPanel.add(panel1, BorderLayout.PAGE_START);
@@ -230,10 +231,6 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
 		// ======== tableContainer ========
 		{
 			tableContainer.setLayout(new BoxLayout(tableContainer, BoxLayout.X_AXIS));
-
-			// ---- button1 ----
-			button1.setText("Create");
-			tableContainer.add(button1);
 
 			// ======== scrollPane1 ========
 			{
@@ -253,9 +250,9 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
 	private JButton searchButton;
 	private JPanel filtersWrapper;
 	private JPanel tableContainer;
-	private JButton button1;
 	private JScrollPane scrollPane1;
 	private JTable table1;
+	private SearchFilterPanel searchFilterPanel;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 
 }

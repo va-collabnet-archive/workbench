@@ -243,6 +243,8 @@ public class WorkflowInstanceTableModel extends DefaultTableModel implements WfI
 
 	public void clearResults() {
 		data.clear();
+		data = null;
+		data =  new LinkedList<Object[]>();
 		fireTableDataChanged();
 	}
 
