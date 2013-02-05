@@ -56,11 +56,11 @@ public class QueuePreferences implements Comparable<QueuePreferences>, Preferenc
     }
 
     public QueuePreferences(String displayName, String id, File queueDirectory,
-            QueueType.Types queueType) {
+            QueueType queueType) {
         this.displayName    = displayName;
         this.id             = id;
         this.queueDirectory = queueDirectory;
-        this.serviceItemProperties.add(new QueueType(queueType));
+        this.serviceItemProperties.add(queueType);
     }
 
     public enum Fields implements PreferenceWithDefaultEnumBI {
