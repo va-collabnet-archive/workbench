@@ -109,7 +109,7 @@ public class QueuePreferences implements Comparable<QueuePreferences>, Preferenc
     public void exportFields(EnumBasedPreferences preferences) {
         preferences.put(Fields.DISPLAY_NAME, displayName);
         preferences.put(Fields.ID, id);
-        preferences.put(Fields.QUEUE_DIRECTORY, queueDirectory.getAbsolutePath());
+        preferences.put(Fields.QUEUE_DIRECTORY, queueDirectory.getPath());
         preferences.putList(Fields.QUEUE_INSTANCE_PROPERTIES_LIST, serviceItemProperties);
         preferences.putBoolean(Fields.READ_INSTEAD_OF_TAKE, readInsteadOfTake);
     }
