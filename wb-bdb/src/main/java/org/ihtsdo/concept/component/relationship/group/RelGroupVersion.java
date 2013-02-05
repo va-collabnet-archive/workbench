@@ -287,7 +287,7 @@ public class RelGroupVersion implements RelGroupVersionBI {
     }
 
     @Override
-    public CreateOrAmendBlueprint makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException {
+    public CreateOrAmendBlueprint makeBlueprint(ViewCoordinate vc, org.ihtsdo.tk.api.blueprint.IdDirective idDirective, org.ihtsdo.tk.api.blueprint.RefexDirective refexDirective) throws IOException, ContradictionException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

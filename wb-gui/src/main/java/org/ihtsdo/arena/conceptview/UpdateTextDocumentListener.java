@@ -42,6 +42,7 @@ import org.ihtsdo.helper.dialect.DialectHelper;
 import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.thread.NamedThreadFactory;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidAnalogBI;
@@ -250,14 +251,14 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
         RefexCAB refexSpecUs = new RefexCAB(
                 TK_REFSET_TYPE.CID,
                 desc.getNid(),
-                usConcept.getNid());
+                usConcept.getNid(), IdDirective.GENERATE_HASH);
         refexSpecUs.put(RefexProperty.CNID1, prefNid);
         RefexChronicleBI<?> newRefexUs = builder.construct(refexSpecUs);
 
         RefexCAB refexSpecGb = new RefexCAB(
                 TK_REFSET_TYPE.CID,
                 desc.getNid(),
-                gbConcept.getNid());
+                gbConcept.getNid(), IdDirective.GENERATE_HASH);
         refexSpecGb.put(RefexProperty.CNID1, prefNid);
         RefexChronicleBI<?> newRefexGb = builder.construct(refexSpecGb);
 
@@ -275,14 +276,14 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
             RefexCAB refexSpecUs = new RefexCAB(
                     TK_REFSET_TYPE.CID,
                     desc.getNid(),
-                    usConcept.getNid());
+                    usConcept.getNid(), IdDirective.GENERATE_HASH);
             refexSpecUs.put(RefexProperty.CNID1, acceptNid);
             RefexChronicleBI<?> newRefexUs = builder.construct(refexSpecUs);
 
             RefexCAB refexSpecGb = new RefexCAB(
                     TK_REFSET_TYPE.CID,
                     desc.getNid(),
-                    gbConcept.getNid());
+                    gbConcept.getNid(), IdDirective.GENERATE_HASH);
             refexSpecGb.put(RefexProperty.CNID1, acceptNid);
             RefexChronicleBI<?> newRefexGb = builder.construct(refexSpecGb);
 
@@ -294,7 +295,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
             RefexCAB refexSpecUs = new RefexCAB(
                     TK_REFSET_TYPE.CID,
                     desc.getNid(),
-                    usConcept.getNid());
+                    usConcept.getNid(), IdDirective.GENERATE_HASH);
             refexSpecUs.put(RefexProperty.CNID1, acceptNid);
             RefexChronicleBI<?> newRefexUs = builder.construct(refexSpecUs);
 
@@ -304,7 +305,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
             RefexCAB refexSpecGb = new RefexCAB(
                     TK_REFSET_TYPE.CID,
                     desc.getNid(),
-                    gbConcept.getNid());
+                    gbConcept.getNid(), IdDirective.GENERATE_HASH);
             refexSpecGb.put(RefexProperty.CNID1, acceptNid);
             RefexChronicleBI<?> newRefexGb = builder.construct(refexSpecGb);
 

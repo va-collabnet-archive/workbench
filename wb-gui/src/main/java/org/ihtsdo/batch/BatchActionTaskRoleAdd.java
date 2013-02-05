@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.RelCAB;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
@@ -76,7 +77,7 @@ public class BatchActionTaskRoleAdd extends BatchActionTask {
             }
 
             RelCAB relSpec = new RelCAB(c.getPrimUuid(), roleUuids.get(0), valueUuids.get(0),
-                    0, relChType);
+                    0, relChType, IdDirective.GENERATE_HASH);
             tsSnapshot.construct(relSpec);
 
             BatchActionEventReporter.add(new BatchActionEvent(c,

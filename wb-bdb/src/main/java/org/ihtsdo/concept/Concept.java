@@ -121,6 +121,8 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Level;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 
 public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI, Comparable<Concept> {
 
@@ -1574,15 +1576,8 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         return data.getDestRels(allowedTypes);
     }
 
-    public ConceptCB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
-        ConceptVersion cv = getVersion(vc);
-        UUID[] uuidArray = new UUID[cv.getRelsOutgoingDestinationsActiveIsa().size()];
-        int index = 0;
-        for (ConceptVersionBI parent : cv.getRelsOutgoingDestinationsActiveIsa()) {
-            uuidArray[index] = parent.getPrimUuid();
-            index++;
-        }
-        ConceptCB cab = new ConceptCB(getVersion(vc), UUID.randomUUID());
+    public ConceptCB makeBlueprint(ViewCoordinate vc, IdDirective idDirective, RefexDirective refexDirective) throws IOException, ContradictionException, InvalidCAB {
+        ConceptCB cab = new ConceptCB(getVersion(vc), UUID.randomUUID(), idDirective, refexDirective);
         return cab;
     }
 

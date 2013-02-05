@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.ihtsdo.tk.Ts;
@@ -33,7 +34,6 @@ import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
@@ -51,7 +51,18 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
     private ComponentVersionBI cv;
     private ViewCoordinate vc;
     private List<RefexCAB> annotations = new ArrayList<RefexCAB>();
-    protected PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    private static AtomicLong propigationId = new AtomicLong();
+    protected PropertyChangeSupport pcs = new PropertyChangeSupport(this) {
+    
+        @Override
+        public void firePropertyChange(PropertyChangeEvent event) {
+            event.setPropagationId(propigationId.incrementAndGet());
+            super.firePropertyChange(event);
+        }
+    
+    };
+    protected IdDirective idDirective;
+    protected RefexDirective refexDirective;
 
     public synchronized void removePropertyChangeListener(String string, PropertyChangeListener pl) {
         pcs.removePropertyChangeListener(string, pl);
@@ -69,7 +80,11 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
         pcs.addPropertyChangeListener(pl);
     }
 
-    public CreateOrAmendBlueprint(UUID componentUuid, ComponentVersionBI cv, ViewCoordinate vc) throws IOException, InvalidCAB, ContradictionException {
+    public CreateOrAmendBlueprint(UUID componentUuid,
+            ComponentVersionBI cv,
+            ViewCoordinate vc,
+            IdDirective idDirective,
+            RefexDirective refexDirective) throws IOException, InvalidCAB, ContradictionException {
         try {
             if (Ts.get().usesRf2Metadata() && currentStatusUuid == null) {
                 currentStatusUuid = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid();
@@ -85,6 +100,9 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
         this.componentUuid = componentUuid;
         this.cv = cv;
         this.vc = vc;
+        this.idDirective = idDirective;
+        this.refexDirective = refexDirective;
+
         getAnnotationBlueprintsFromOriginal();
         pcs.addPropertyChangeListener(this);
     }
@@ -92,10 +110,15 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
     public abstract void recomputeUuid() throws NoSuchAlgorithmException, UnsupportedEncodingException,
             IOException, InvalidCAB, ContradictionException;
 
+    private Object lastPropigationId = new Long(-1);
     @Override
     public void propertyChange(PropertyChangeEvent pce) {
         try {
-            recomputeUuid();
+            if (!pce.getPropagationId().equals(lastPropigationId)) {
+                lastPropigationId = pce.getPropagationId();
+                recomputeUuid();
+            }
+                
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(CreateOrAmendBlueprint.class.getName()).log(Level.SEVERE, null, ex);
         } catch (UnsupportedEncodingException ex) {
@@ -127,7 +150,7 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
             throws IOException, InvalidCAB {
         if (Ts.get().hasUuid(uuid)) {
             ComponentChroncileBI<?> component = Ts.get().getComponent(uuid);
-            if(component == null){
+            if (component == null) {
                 return uuid.toString();
             }
             return Ts.get().getComponent(uuid).getPrimUuid().toString();
@@ -144,7 +167,7 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
         this.componentUuid = componentUuid;
         pcs.firePropertyChange("componentUuid", oldUuid, this.componentUuid);
     }
-    
+
     public void setComponentUuidNoRecompute(UUID componentUuid) {
         this.componentUuid = componentUuid;
     }
@@ -152,36 +175,41 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
     public int getComponentNid() throws IOException {
         return Ts.get().getNidForUuids(componentUuid);
     }
+
     /**
-     * Returns list of annotation blueprints, gets list from original component if null.
+     * Returns list of annotation blueprints, gets list from original component
+     * if null.
+     *
      * @return
      * @throws IOException
      * @throws InvalidCAB
-     * @throws ContradictionException 
+     * @throws ContradictionException
      */
-    public List<RefexCAB> getAnnotationBlueprintsFromOriginal() throws IOException, InvalidCAB, ContradictionException {
+    public final List<RefexCAB> getAnnotationBlueprintsFromOriginal() throws IOException, InvalidCAB, ContradictionException {
         if (annotations.isEmpty() && cv != null) {
-            if (cv.getCurrentRefexes(vc) != null) {
-                Collection<? extends RefexVersionBI<?>> originalRefexes = cv.getCurrentRefexes(vc);
-                if (!originalRefexes.isEmpty()) {
-                    for (RefexVersionBI refex : originalRefexes) {
-                        annotations.add(refex.makeBlueprint(vc));
+            if (refexDirective == RefexDirective.INCLUDE) {
+                if (cv.getCurrentRefexes(vc) != null) {
+                    Collection<? extends RefexVersionBI<?>> originalRefexes = cv.getCurrentRefexes(vc);
+                    if (!originalRefexes.isEmpty()) {
+                        for (RefexVersionBI refex : originalRefexes) {
+                            annotations.add(refex.makeBlueprint(vc, IdDirective.PRESERVE, RefexDirective.INCLUDE));
+                        }
                     }
                 }
             }
         }
         return annotations;
     }
-    
+
     public List<RefexCAB> getAnnotationBlueprints() throws IOException, InvalidCAB, ContradictionException {
         return annotations;
     }
-    
-    public void setAnnotationBlueprint(RefexCAB annotation){
+
+    public void setAnnotationBlueprint(RefexCAB annotation) {
         annotations.add(annotation);
     }
-    
-    public void replaceAnnotationBlueprints(List<RefexCAB> annotations){
+
+    public void replaceAnnotationBlueprints(List<RefexCAB> annotations) {
         this.annotations = annotations;
     }
 

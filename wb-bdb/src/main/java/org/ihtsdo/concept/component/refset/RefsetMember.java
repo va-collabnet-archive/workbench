@@ -53,7 +53,9 @@ import java.io.IOException;
 
 import java.util.*;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 
 public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends RefsetMember<R, C>>
@@ -441,12 +443,13 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
     }
 
     @Override
-    public RefexCAB makeBlueprint(ViewCoordinate vc) throws IOException,
+    public RefexCAB makeBlueprint(ViewCoordinate vc, IdDirective idDirective, 
+                    RefexDirective refexDirective) throws IOException,
         InvalidCAB, ContradictionException {
         RefexCAB rcs = new RefexCAB(getTkRefsetType(), 
                 Ts.get().getUuidPrimordialForNid(getReferencedComponentNid()),
                 getCollectionNid(),
-                getVersion(vc), vc);
+                getVersion(vc), vc, idDirective, refexDirective);
 
         addSpecProperties(rcs);
 
@@ -774,8 +777,9 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
         }
 
         @Override
-        public RefexCAB makeBlueprint(ViewCoordinate vc) throws IOException, InvalidCAB, ContradictionException {
-            return getCv().makeBlueprint(vc);
+        public RefexCAB makeBlueprint(ViewCoordinate vc, IdDirective idDirective, 
+            RefexDirective refexDirective) throws IOException, InvalidCAB, ContradictionException {
+            return getCv().makeBlueprint(vc, idDirective, refexDirective);
         }
 
         @Override

@@ -12,6 +12,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.DescCAB;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
@@ -89,20 +90,20 @@ public class AddFromDialectSpecAction extends AbstractAction {
                         SnomedMetadataRfx.getDES_SYNONYM_NID(),
                         LANG_CODE.EN,
                         descSpec.getDescText(),
-                        false);
+                        false, IdDirective.GENERATE_HASH);
                 newDesc = tc.constructIfNotCurrent(descSpecPref);
                 if (dialect.equals(LANG_CODE.EN_GB)) {
                     RefexCAB refexSpecPrefGb = new RefexCAB(
                         TK_REFSET_TYPE.CID,
                         descSpecPref.getComponentNid(),
-                        gbRefexNid);
+                        gbRefexNid, IdDirective.GENERATE_HASH);
                     refexSpecPrefGb.put(RefexProperty.CNID1, SnomedMetadataRfx.getDESC_ACCEPTABLE_NID());
                     newRefex = tc.constructIfNotCurrent(refexSpecPrefGb);
                 } else {
                     RefexCAB refexSpecPrefUs = new RefexCAB(
                         TK_REFSET_TYPE.CID,
                         descSpecPref.getComponentNid(),
-                        usRefexNid);
+                        usRefexNid, IdDirective.GENERATE_HASH);
                     refexSpecPrefUs.put(RefexProperty.CNID1, SnomedMetadataRfx.getDESC_ACCEPTABLE_NID());
                     newRefex = tc.constructIfNotCurrent(refexSpecPrefUs);
                 }
@@ -112,11 +113,11 @@ public class AddFromDialectSpecAction extends AbstractAction {
                         SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID(),
                         dialect,
                         descSpec.getDescText(),
-                        false);
+                        false, IdDirective.GENERATE_HASH);
                 RefexCAB refexSpecFsn = new RefexCAB(
                         TK_REFSET_TYPE.CID,
                         descSpecFsn.getComponentNid(),
-                        refexNid);
+                        refexNid, IdDirective.GENERATE_HASH);
                 refexSpecFsn.put(RefexProperty.CNID1, SnomedMetadataRfx.getDESC_PREFERRED_NID());
                 newDesc = tc.constructIfNotCurrent(descSpecFsn);
                 newRefex = tc.constructIfNotCurrent(refexSpecFsn);

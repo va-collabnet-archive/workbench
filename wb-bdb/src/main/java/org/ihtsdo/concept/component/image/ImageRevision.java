@@ -141,14 +141,16 @@ public class ImageRevision extends Revision<ImageRevision, Image>
    }
    
    @Override
-    public MediaCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB{
+    public MediaCAB makeBlueprint(ViewCoordinate vc, org.ihtsdo.tk.api.blueprint.IdDirective idDirective, org.ihtsdo.tk.api.blueprint.RefexDirective refexDirective) throws IOException, ContradictionException, InvalidCAB{
         MediaCAB mediaBp = new MediaCAB(getConceptNid(),
                 getTypeNid(),
                 getFormat(),
                 getTextDescription(),
                 getMedia(),
                 getVersion(vc),
-                vc);
+                vc,
+                idDirective,
+                refexDirective);
         return mediaBp;
     }
 

@@ -1,7 +1,6 @@
 package org.ihtsdo.arena.conceptview;
 
 //~--- non-JDK imports --------------------------------------------------------
-import au.csiro.snorocket.snapi.SnomedMetadata;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.log.AceLog;
 
@@ -30,16 +29,16 @@ import org.ihtsdo.arena.contradiction.ContradictionEditorFrame;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.binding.snomed.Snomed;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 
 public class AcceptActionListener implements ActionListener {
@@ -105,7 +104,7 @@ public class AcceptActionListener implements ActionListener {
 
                     RefexCAB annotBp = new RefexCAB(TK_REFSET_TYPE.ARRAY_BYTEARRAY,
                             c.getConceptNid(),
-                            adjudicationRecRefsetNid);
+                            adjudicationRecRefsetNid, IdDirective.GENERATE_HASH);
                     annotBp.put(RefexProperty.ARRAY_BYTEARRAY, arrayOfAuthorTime);
 
                     I_ConfigAceFrame config = settings.getView().getConfig();
@@ -141,7 +140,7 @@ public class AcceptActionListener implements ActionListener {
                         ConceptChronicleBI conflictRefset = Ts.get().getConceptForNid(conflictRefsetNid);
                         RefexVersionBI member = conflictRefset.getCurrentRefsetMemberForComponent(vc, c.getNid());
                         if (member != null) {
-                            RefexCAB memberBp = member.makeBlueprint(vc);
+                            RefexCAB memberBp = member.makeBlueprint(vc, IdDirective.PRESERVE, RefexDirective.EXCLUDE);
                             memberBp.setRetired();
                             builder.constructIfNotCurrent(memberBp);
                             Ts.get().addUncommittedNoChecks(conflictRefset);

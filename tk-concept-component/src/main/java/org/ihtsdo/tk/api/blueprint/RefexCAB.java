@@ -24,13 +24,16 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.AnalogBI;
 import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.amend.InvalidAmendmentSpec;
+import static org.ihtsdo.tk.api.blueprint.IdDirective.GENERATE_HASH;
+import static org.ihtsdo.tk.api.blueprint.IdDirective.GENERATE_RANDOM;
+import static org.ihtsdo.tk.api.blueprint.IdDirective.GENERATE_RANDOM_CONCEPT_REST_HASH;
+import static org.ihtsdo.tk.api.blueprint.IdDirective.PRESERVE;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexAnalogBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
@@ -64,7 +67,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
             UUID.fromString("c44bc030-1166-11e0-ac64-0800200c9a66");
     private TK_REFSET_TYPE memberType;
 
-    public UUID computeMemberComponentUuid() throws IOException, InvalidCAB {
+    public final UUID computeMemberComponentUuid() throws IOException, InvalidCAB {
         try {
             UUID memberComponentUuid = UuidT5Generator.get(refexSpecNamespace,
                     memberType.name()
@@ -80,6 +83,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
     }
 
     public UUID setMemberContentUuid() throws InvalidCAB, IOException {
+        this.idDirective = IdDirective.GENERATE_NON_STANDARD_REFEX_HASH;
         UUID memberContentUuid = computeMemberContentUuid();
         properties.put(RefexProperty.MEMBER_UUID, memberContentUuid);
         return memberContentUuid;
@@ -129,7 +133,23 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      * refer to the member component uuid.
      */
     public void recomputeUuid() throws InvalidCAB, IOException, ContradictionException {
-        setComponentUuid(computeMemberComponentUuid());
+        switch (idDirective) {
+            case GENERATE_RANDOM_CONCEPT_REST_HASH:
+            case GENERATE_HASH:
+                setComponentUuidNoRecompute(computeMemberComponentUuid());
+                break;
+            case GENERATE_NON_STANDARD_REFEX_HASH:
+                setComponentUuidNoRecompute(computeMemberContentUuid());
+                break;
+            case GENERATE_RANDOM:
+                setComponentUuidNoRecompute(UUID.randomUUID());
+                break;
+
+            case PRESERVE:
+            default:
+                // nothing to do...
+
+        }
         for (RefexCAB annotBp : getAnnotationBlueprints()) {
             annotBp.setReferencedComponentUuid(getComponentUuid());
             annotBp.recomputeUuid();
@@ -177,8 +197,11 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      * @throws InvalidAmendmentSpec
      */
     public RefexCAB(TK_REFSET_TYPE memberType,
-            int rcNid, int collectionNid) throws IOException, InvalidCAB, ContradictionException {
-        this(memberType, Ts.get().getUuidPrimordialForNid(rcNid), collectionNid, null, null, null);
+            int rcNid, int collectionNid,
+            IdDirective idDirective) throws IOException, InvalidCAB, ContradictionException {
+        this(memberType, Ts.get().getUuidPrimordialForNid(rcNid), collectionNid, 
+                null, null, null,
+            idDirective, RefexDirective.EXCLUDE);
 
         this.properties.put(RefexProperty.MEMBER_UUID,
                 computeMemberComponentUuid());
@@ -186,8 +209,10 @@ public class RefexCAB extends CreateOrAmendBlueprint {
 
     public RefexCAB(TK_REFSET_TYPE memberType,
             UUID rcUuid, int collectionNid, RefexVersionBI refex,
-            ViewCoordinate vc) throws IOException, InvalidCAB, ContradictionException {
-        this(memberType, rcUuid, collectionNid, null, refex, vc);
+            ViewCoordinate vc,
+            IdDirective idDirective,
+            RefexDirective refexDirective) throws IOException, InvalidCAB, ContradictionException {
+        this(memberType, rcUuid, collectionNid, null, refex, vc, idDirective, refexDirective);
 
         this.properties.put(RefexProperty.MEMBER_UUID,
                 computeMemberComponentUuid());
@@ -196,8 +221,10 @@ public class RefexCAB extends CreateOrAmendBlueprint {
     public RefexCAB(TK_REFSET_TYPE memberType,
             UUID rcUuid, int collectionNid,
             UUID memberUuid, RefexVersionBI refex,
-            ViewCoordinate vc) throws IOException, InvalidCAB, ContradictionException {
-        super(memberUuid, refex, vc);
+            ViewCoordinate vc,
+            IdDirective idDirective,
+            RefexDirective refexDirective) throws IOException, InvalidCAB, ContradictionException {
+        super(memberUuid, refex, vc, idDirective, refexDirective);
         this.memberType = memberType;
         this.properties.put(RefexProperty.RC_UUID, rcUuid);
         this.properties.put(RefexProperty.COLLECTION_NID, collectionNid);
@@ -250,7 +277,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
     }
 
     @Override
-    public void setStatusUuid(UUID statusUuid) {
+    public final void setStatusUuid(UUID statusUuid) {
         super.setStatusUuid(statusUuid);
         if (this.properties.get(RefexProperty.STATUS_NID) != null) {
             try {
@@ -683,7 +710,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         return (UUID) properties.get(key);
     }
 
-    public UUID getMemberUUID() {
+    public final UUID getMemberUUID() {
         return (UUID) properties.get(RefexProperty.MEMBER_UUID);
     }
 

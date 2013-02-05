@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.Collection;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
 import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RelCAB;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -73,7 +74,7 @@ public class BatchActionTaskRoleReplaceValue extends BatchActionTask {
                     relChType = TkRelType.HISTORIC;
                 }
                 RelCAB rc = new RelCAB(rvbi.getOriginNid(), rvbi.getTypeNid(), valueNewNid, rvbi.getGroup(),
-                        relChType);
+                        relChType, IdDirective.GENERATE_HASH);
                 tsSnapshot.construct(rc);
 
                 BatchActionEventReporter.add(new BatchActionEvent(c, BatchActionTaskType.ROLE_REPLACE_VALUE,

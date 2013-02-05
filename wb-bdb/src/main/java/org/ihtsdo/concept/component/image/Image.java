@@ -43,9 +43,10 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 
 import java.util.*;
-import org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.MediaCAB;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 
 public class Image extends ConceptComponent<ImageRevision, Image>
         implements I_ImageVersioned<ImageRevision>, I_ImagePart<ImageRevision>, MediaAnalogBI<ImageRevision> {
@@ -367,14 +368,17 @@ public class Image extends ConceptComponent<ImageRevision, Image>
      * @see org.dwfa.vodb.types.I_ImageVersioned#getFormat()
      */
     @Override
-    public MediaCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
+    public MediaCAB makeBlueprint(ViewCoordinate vc, IdDirective idDirective, 
+            RefexDirective refexDirective) throws IOException, ContradictionException, InvalidCAB {
         MediaCAB mediaBp = new MediaCAB(getConceptNid(),
                 getTypeNid(),
                 getFormat(),
                 getTextDescription(),
                 getMedia(),
                 getVersion(vc),
-                vc);
+                vc,
+                idDirective,
+                refexDirective);
         return mediaBp;
     }
 
@@ -662,8 +666,9 @@ public class Image extends ConceptComponent<ImageRevision, Image>
         }
 
         @Override
-        public MediaCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
-            return getCv().makeBlueprint(vc);
+        public MediaCAB makeBlueprint(ViewCoordinate vc, IdDirective idDirective, 
+            RefexDirective refexDirective) throws IOException, ContradictionException, InvalidCAB {
+            return getCv().makeBlueprint(vc, idDirective, refexDirective);
         }
 
         @Override

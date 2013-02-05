@@ -1690,7 +1690,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         }
 
         @Override
-        public ConAttrAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException {
+        public ConAttrAB makeBlueprint(ViewCoordinate vc, org.ihtsdo.tk.api.blueprint.IdDirective idDirective, org.ihtsdo.tk.api.blueprint.RefexDirective refexDirective) throws IOException, ContradictionException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
    }
@@ -2347,7 +2347,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         }
 
         @Override
-        public RelCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException {
+        public RelCAB makeBlueprint(ViewCoordinate vc, org.ihtsdo.tk.api.blueprint.IdDirective idDirective, org.ihtsdo.tk.api.blueprint.RefexDirective refexDirective) throws IOException, ContradictionException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
    }

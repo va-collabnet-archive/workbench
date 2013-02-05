@@ -28,7 +28,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 
@@ -54,7 +53,6 @@ import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.*;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
-import org.dwfa.ace.task.profile.NewDefaultProfile;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.jini.ElectronicAddress;
@@ -75,7 +73,6 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.binding.snomed.*;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelType;
@@ -407,7 +404,7 @@ public class GenerateUsers extends AbstractMojo {
 		} else {
 			getLog().info("Creating permission for user " +  user.toString() + " if not current");
 			RelCAB relCab = new RelCAB(user.getPrimUuid(),UUID.fromString(typeUid),
-					UUID.fromString(targetUid),0,TkRelType.STATED_ROLE);
+					UUID.fromString(targetUid),0,TkRelType.STATED_ROLE, IdDirective.GENERATE_HASH);
 			Ts.get().getTerminologyBuilder(config.getEditCoordinate(), 
 					config.getViewCoordinate()).constructIfNotCurrent(relCab);
 			//			old way
@@ -491,6 +488,7 @@ public class GenerateUsers extends AbstractMojo {
                                                                                     username + " dev path",
                                                                                     LANG_CODE.EN,
                                                                                     TermAux.IS_A.getLenient().getPrimUuid(),
+                                                                                    IdDirective.GENERATE_HASH,
                                                                                     editParentPathUuid);
                                                 UUID userDevPathUuid =  newEditPathBp.getComponentUuid();
                                                 if(Ts.get().hasUuid(userDevPathUuid)){
@@ -498,20 +496,22 @@ public class GenerateUsers extends AbstractMojo {
                                                 }else{
                                                     RefexCAB pathRefexBp = new RefexCAB(TK_REFSET_TYPE.CID,
                                                             TermAux.PATH.getLenient().getConceptNid(),
-                                                            RefsetAux.PATH_REFSET.getLenient().getNid());
+                                                            RefsetAux.PATH_REFSET.getLenient().getNid(), IdDirective.GENERATE_HASH);
                                                     pathRefexBp.put(RefexCAB.RefexProperty.UUID1, newEditPathBp.getComponentUuid());
                                                     pathRefexBp.setMemberUuid(UUID.randomUUID());
 
                                                     RefexCAB pathOriginRefexBp = new RefexCAB(TK_REFSET_TYPE.CID_INT,
                                                             newEditPathBp.getComponentUuid(),
-                                                            RefsetAux.PATH_ORIGIN_REFEST.getLenient().getNid(), null, null);
+                                                            RefsetAux.PATH_ORIGIN_REFEST.getLenient().getNid(), null, null,
+                                                            IdDirective.GENERATE_HASH, RefexDirective.EXCLUDE);
                                                     pathOriginRefexBp.put(RefexCAB.RefexProperty.UUID1, editOriginPathUuid);
                                                     pathOriginRefexBp.put(RefexCAB.RefexProperty.INTEGER1, Integer.MAX_VALUE);
                                                     pathRefexBp.setMemberUuid(UUID.randomUUID());
 
                                                     RefexCAB pathOriginRefexOtherBp = new RefexCAB(TK_REFSET_TYPE.CID_INT,
                                                             originFromDevPathUuid,
-                                                            RefsetAux.PATH_ORIGIN_REFEST.getLenient().getNid(), null, null);
+                                                            RefsetAux.PATH_ORIGIN_REFEST.getLenient().getNid(), null, null,
+                                                            IdDirective.GENERATE_HASH, RefexDirective.EXCLUDE);
                                                     pathOriginRefexOtherBp.put(RefexCAB.RefexProperty.UUID1, newEditPathBp.getComponentUuid());
                                                     pathOriginRefexOtherBp.put(RefexCAB.RefexProperty.INTEGER1, Integer.MAX_VALUE);
                                                     pathOriginRefexOtherBp.setMemberUuid(UUID.randomUUID());
@@ -545,6 +545,7 @@ public class GenerateUsers extends AbstractMojo {
                                                             userParentConceptName,
                                                             LANG_CODE.EN_US,
                                                             TermAux.IS_A.getLenient().getPrimUuid(),
+                                                            IdDirective.GENERATE_HASH,
                                                             TermAux.USER.getLenient().getPrimUuid());
                                                 UUID parentConceptUuid = parentConceptBp.getComponentUuid();
                                                 if(Ts.get().hasUuid(parentConceptUuid)){
@@ -665,6 +666,7 @@ public class GenerateUsers extends AbstractMojo {
                                                 userParentConceptName,
                                                 LANG_CODE.EN_US,
                                                 TermAux.IS_A.getLenient().getPrimUuid(),
+                                                IdDirective.GENERATE_HASH,
                                                 TermAux.USER.getLenient().getPrimUuid());
                                         TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(
                                                 Ts.get().getMetadataEC(),
@@ -892,6 +894,7 @@ public class GenerateUsers extends AbstractMojo {
 					userConfig.getUsername(),
 					LANG_CODE.EN,
 					TermAux.IS_A.getLenient().getPrimUuid(),
+                                        IdDirective.GENERATE_HASH,
 					parentConcept.getPrimUuid());
                 if (Ts.get().hasUuid(UUID.fromString("d8ebf7ea-afd7-5db8-aff0-d3028253f6bf"))) {
                     System.out.println("FOUND IT");
@@ -911,13 +914,13 @@ public class GenerateUsers extends AbstractMojo {
                                     Ts.get().getUuidPrimordialForNid(SnomedMetadataRfx.getDES_SYNONYM_NID()),
                                     LANG_CODE.EN,
                                     userConfig.getUsername() + ".inbox",
-                                    false);
+                                    false, IdDirective.GENERATE_HASH);
                     //add workflow relationship
                     RelCAB wfRelBp = new RelCAB(userConceptBp.getComponentUuid(),
                                     ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS.getPrimoridalUid(),
                                     ArchitectonicAuxiliary.Concept.WORKFLOW_ACTIVE_MODELER.getPrimoridalUid(),
                                     0,
-                                    TkRelType.STATED_ROLE);
+                                    TkRelType.STATED_ROLE, IdDirective.GENERATE_HASH);
                     ViewCoordinate vc = userConfig.getViewCoordinate();
                     EditCoordinate oldEc = userConfig.getEditCoordinate();
                     EditCoordinate ec = new EditCoordinate(oldEc.getAuthorNid(),
@@ -947,7 +950,7 @@ public class GenerateUsers extends AbstractMojo {
 					ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS.getPrimoridalUid(),
 					ArchitectonicAuxiliary.Concept.WORKFLOW_ACTIVE_MODELER.getPrimoridalUid(),
 					0,
-					TkRelType.STATED_ROLE);
+					TkRelType.STATED_ROLE, IdDirective.GENERATE_HASH);
 			ViewCoordinate vc = userConfig.getViewCoordinate();
 			EditCoordinate oldEc = userConfig.getEditCoordinate();
 			EditCoordinate ec = new EditCoordinate(oldEc.getAuthorNid(),
@@ -966,7 +969,7 @@ public class GenerateUsers extends AbstractMojo {
 				Ts.get().getUuidPrimordialForNid(SnomedMetadataRfx.getDES_SYNONYM_NID()),
 				LANG_CODE.EN,
 				userConfig.getUsername() + ".inbox",
-				false);
+				false, IdDirective.GENERATE_HASH);
 		ViewCoordinate vc = userConfig.getViewCoordinate();
 		EditCoordinate oldEc = userConfig.getEditCoordinate();
 		EditCoordinate ec = new EditCoordinate(oldEc.getAuthorNid(),

@@ -22,6 +22,12 @@ import java.util.UUID;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
+import static org.ihtsdo.tk.api.blueprint.DescCAB.descSpecNamespace;
+import static org.ihtsdo.tk.api.blueprint.IdDirective.GENERATE_HASH;
+import static org.ihtsdo.tk.api.blueprint.IdDirective.GENERATE_NON_STANDARD_REFEX_HASH;
+import static org.ihtsdo.tk.api.blueprint.IdDirective.GENERATE_RANDOM;
+import static org.ihtsdo.tk.api.blueprint.IdDirective.GENERATE_RANDOM_CONCEPT_REST_HASH;
+import static org.ihtsdo.tk.api.blueprint.IdDirective.PRESERVE;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
@@ -44,41 +50,52 @@ public class RelCAB extends CreateOrAmendBlueprint {
     private UUID refinabilityUuid;
 
     public RelCAB(
-            int sourceNid, int typeNid, int destNid, int group, TkRelType type)
+            int sourceNid, int typeNid, int destNid, int group, 
+            TkRelType type, IdDirective idDirective)
             throws IOException, InvalidCAB, ContradictionException {
         this(Ts.get().getComponent(sourceNid).getPrimUuid(),
                 Ts.get().getComponent(typeNid).getPrimUuid(),
                 Ts.get().getComponent(destNid).getPrimUuid(),
-                group, null, type, null, null);
+                group, null, type, null, null,
+                idDirective, RefexDirective.EXCLUDE);
     }
 
     public RelCAB(
-            UUID sourceUuid, UUID typeUuid, UUID destUuid, int group, TkRelType type)
+            UUID sourceUuid, UUID typeUuid, UUID destUuid, int group, 
+            TkRelType type, IdDirective idDirective)
             throws IOException, InvalidCAB, ContradictionException {
-        this(sourceUuid, typeUuid, destUuid, group, null, type, null, null);
+        this(sourceUuid, typeUuid, destUuid, group, null, type, null, null, 
+                idDirective, RefexDirective.EXCLUDE);
     }
     
     public RelCAB(
             int sourceNid, int typeNid, int destNid, int group, TkRelType type,
-            RelationshipVersionBI rel, ViewCoordinate vc)throws IOException, InvalidCAB, ContradictionException {
+            RelationshipVersionBI rel, ViewCoordinate vc,
+            IdDirective idDirective,
+            RefexDirective refexDirective)throws IOException, InvalidCAB, ContradictionException {
         this(Ts.get().getComponent(sourceNid).getPrimUuid(),
                 Ts.get().getComponent(typeNid).getPrimUuid(),
                 Ts.get().getComponent(destNid).getPrimUuid(),
-                group, null, type, rel, vc);
+                group, null, type, rel, vc, idDirective, refexDirective);
     }
 
     public RelCAB(
             UUID sourceUuid, UUID typeUuid, UUID destUuid, int group,
             TkRelType type, RelationshipVersionBI rel,
-            ViewCoordinate vc) throws IOException, InvalidCAB, ContradictionException {
-        this(sourceUuid, typeUuid, destUuid, group, null, type, rel, vc);
+            ViewCoordinate vc,
+            IdDirective idDirective,
+            RefexDirective refexDirective) throws IOException, InvalidCAB, ContradictionException {
+        this(sourceUuid, typeUuid, destUuid, group, null, type, rel, vc, 
+                idDirective, refexDirective);
     }
 
     public RelCAB(
             UUID sourceUuid, UUID typeUuid, UUID destUuid, int group,
             UUID componentUuid, TkRelType type, RelationshipVersionBI rel,
-            ViewCoordinate vc) throws IOException, InvalidCAB, ContradictionException {
-        super(componentUuid, rel, vc);
+            ViewCoordinate vc,
+            IdDirective idDirective,
+            RefexDirective refexDirective) throws IOException, InvalidCAB, ContradictionException {
+        super(componentUuid, rel, vc, idDirective, refexDirective);
         assert sourceUuid != null;
         assert typeUuid != null;
         assert destUuid != null;
@@ -142,11 +159,25 @@ public class RelCAB extends CreateOrAmendBlueprint {
     
     @Override
     public void recomputeUuid() throws NoSuchAlgorithmException, UnsupportedEncodingException, IOException, InvalidCAB, ContradictionException{
-        setComponentUuid(UuidT5Generator.get(relSpecNamespace,
+        switch (idDirective) {
+            case GENERATE_RANDOM_CONCEPT_REST_HASH:
+            case GENERATE_HASH:
+            case GENERATE_NON_STANDARD_REFEX_HASH:
+                setComponentUuidNoRecompute(UuidT5Generator.get(relSpecNamespace,
                         getPrimoridalUuidStr(sourceUuid)
                         + getPrimoridalUuidStr(typeUuid)
                         + getPrimoridalUuidStr(destUuid)
                         + group));
+                break;
+            case GENERATE_RANDOM:
+                setComponentUuidNoRecompute(UUID.randomUUID());
+                break;
+
+            case PRESERVE:
+            default:
+            // nothing to do...
+
+        }
         for(RefexCAB annotBp: getAnnotationBlueprints()){
             annotBp.setReferencedComponentUuid(getComponentUuid());
             annotBp.recomputeUuid();

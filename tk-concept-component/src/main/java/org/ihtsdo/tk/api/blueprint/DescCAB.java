@@ -41,41 +41,50 @@ public class DescCAB extends CreateOrAmendBlueprint {
     public boolean initialCaseSignificant;
 
     public DescCAB(
-            int conceptNid, int typeNid, LANG_CODE lang, String text, boolean initialCaseSignificant)
+            int conceptNid, int typeNid, LANG_CODE lang, String text,
+            boolean initialCaseSignificant, IdDirective idDirective)
             throws IOException, InvalidCAB, ContradictionException {
         this(Ts.get().getComponent(conceptNid).getPrimUuid(),
                 Ts.get().getComponent(typeNid).getPrimUuid(),
-                lang, text, initialCaseSignificant);
+                lang, text, initialCaseSignificant, idDirective);
     }
 
     public DescCAB(
-            UUID conceptUuid, UUID typeUuid, LANG_CODE lang, String text, boolean initialCaseSignificant)
+            UUID conceptUuid, UUID typeUuid, LANG_CODE lang, String text,
+            boolean initialCaseSignificant, IdDirective idDirective)
             throws IOException, InvalidCAB, ContradictionException {
         this(conceptUuid, typeUuid, lang, text, initialCaseSignificant,
-                null, null, null);
+                null, null, null, idDirective,
+                RefexDirective.EXCLUDE);
     }
 
     public DescCAB(
             int conceptNid, int typeNid, LANG_CODE lang, String text, boolean initialCaseSignificant,
-            DescriptionVersionBI dv, ViewCoordinate vc) throws IOException, InvalidCAB, ContradictionException {
+            DescriptionVersionBI dv, ViewCoordinate vc,
+            IdDirective idDirective,
+            RefexDirective refexDirective) throws IOException, InvalidCAB, ContradictionException {
         this(Ts.get().getComponent(conceptNid).getPrimUuid(),
                 Ts.get().getComponent(typeNid).getPrimUuid(),
-                lang, text, initialCaseSignificant, dv, vc);
+                lang, text, initialCaseSignificant, dv, vc, idDirective, refexDirective);
     }
 
     public DescCAB(
-            UUID conceptUuid, UUID typeUuid, LANG_CODE lang, String text, 
-            boolean initialCaseSignificant, DescriptionVersionBI dv, ViewCoordinate vc) throws
+            UUID conceptUuid, UUID typeUuid, LANG_CODE lang, String text,
+            boolean initialCaseSignificant, DescriptionVersionBI dv, ViewCoordinate vc,
+            IdDirective idDirective,
+            RefexDirective refexDirective) throws
             IOException, InvalidCAB, ContradictionException {
         this(conceptUuid, typeUuid, lang, text, initialCaseSignificant,
-                null, dv, vc);
+                null, dv, vc, idDirective, refexDirective);
     }
 
     public DescCAB(
             UUID conceptUuid, UUID typeUuid, LANG_CODE lang, String text,
             boolean initialCaseSignificant, UUID componentUuid,
-            DescriptionVersionBI dv, ViewCoordinate vc) throws IOException, InvalidCAB, ContradictionException {
-        super(componentUuid, dv, vc);
+            DescriptionVersionBI dv, ViewCoordinate vc,
+            IdDirective idDirective,
+            RefexDirective refexDirective) throws IOException, InvalidCAB, ContradictionException {
+        super(componentUuid, dv, vc, idDirective, refexDirective);
 
         this.conceptUuid = conceptUuid;
         this.lang = lang.getFormatedLanguageNoDialectCode();
@@ -98,17 +107,29 @@ public class DescCAB extends CreateOrAmendBlueprint {
     @Override
     public void recomputeUuid() throws NoSuchAlgorithmException, UnsupportedEncodingException,
             IOException, InvalidCAB, ContradictionException {
-        setComponentUuid(UuidT5Generator.get(descSpecNamespace,
-                getPrimoridalUuidStr(conceptUuid)
-                + typeUuid
-                + lang
-                + text));
-        for(RefexCAB annotBp: getAnnotationBlueprints()){
+        switch (idDirective) {
+            case GENERATE_RANDOM_CONCEPT_REST_HASH:
+            case GENERATE_HASH:
+            case GENERATE_NON_STANDARD_REFEX_HASH:
+                setComponentUuid(UuidT5Generator.get(descSpecNamespace,
+                        getPrimoridalUuidStr(conceptUuid)
+                        + typeUuid
+                        + lang
+                        + text));
+                break;
+            case GENERATE_RANDOM:
+                setComponentUuidNoRecompute(UUID.randomUUID());
+                break;
+
+            case PRESERVE:
+            default:
+            // nothing to do...
+
+        }
+        for (RefexCAB annotBp : getAnnotationBlueprints()) {
             annotBp.setReferencedComponentUuid(getComponentUuid());
             annotBp.recomputeUuid();
-            
         }
-
     }
 
     public UUID getTypeUuid() {
@@ -138,12 +159,12 @@ public class DescCAB extends CreateOrAmendBlueprint {
     public String getText() {
         return text;
     }
-    
-    protected void setConceptUuid(UUID conceptNewUuid){
+
+    protected void setConceptUuid(UUID conceptNewUuid) {
         this.conceptUuid = conceptNewUuid;
     }
-    
-    public void setText(String newText){
+
+    public void setText(String newText) {
         this.text = newText;
     }
 

@@ -10,7 +10,9 @@ import java.io.IOException;
 
 import java.util.Set;
 import org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 
 public interface ComponentVersionBI extends ComponentBI, VersionPointBI {
    boolean sapIsInRange(int min, int max);
@@ -57,6 +59,6 @@ public interface ComponentVersionBI extends ComponentBI, VersionPointBI {
     */
    boolean versionsEqual(ViewCoordinate vc1, ViewCoordinate vc2, Boolean compareAuthoring);
    
-   CreateOrAmendBlueprint makeBlueprint(ViewCoordinate vc) 
+   CreateOrAmendBlueprint makeBlueprint(ViewCoordinate vc, IdDirective idDirective, RefexDirective refexDirective) 
            throws IOException, ContradictionException, InvalidCAB;
 }

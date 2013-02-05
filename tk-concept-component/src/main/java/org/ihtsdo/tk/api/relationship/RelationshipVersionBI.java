@@ -24,6 +24,6 @@ public interface RelationshipVersionBI<A extends RelationshipAnalogBI>
     public boolean isStated();
     
     @Override
-    public RelCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB;
+    public RelCAB makeBlueprint(ViewCoordinate vc, org.ihtsdo.tk.api.blueprint.IdDirective idDirective, org.ihtsdo.tk.api.blueprint.RefexDirective refexDirective) throws IOException, ContradictionException, InvalidCAB;
 
 }

@@ -16,8 +16,6 @@
 package org.ihtsdo.tk.api.blueprint;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
@@ -33,23 +31,26 @@ public class ConAttrAB extends CreateOrAmendBlueprint {
     public boolean defined;
 
     public ConAttrAB(
-            int conceptNid, boolean defined)
+            int conceptNid, boolean defined, RefexDirective refexDirective)
             throws IOException, InvalidCAB, ContradictionException {
         this(Ts.get().getComponent(conceptNid).getPrimUuid(),
-                defined, null, null);
+                defined, null, null, refexDirective);
     }
 
     public ConAttrAB(
             int conceptNid, boolean defined, ConAttrVersionBI conAttr,
-            ViewCoordinate vc) throws IOException, InvalidCAB, ContradictionException {
+            ViewCoordinate vc, RefexDirective refexDirective) throws IOException, InvalidCAB, ContradictionException {
         this(Ts.get().getComponent(conceptNid).getPrimUuid(),
-                defined, conAttr, vc);
+                defined, conAttr, vc, refexDirective);
     }
 
     public ConAttrAB(
             UUID componentUuid, boolean defined, ConAttrVersionBI conAttr,
-            ViewCoordinate vc) throws IOException, InvalidCAB, ContradictionException {
-        super(componentUuid, conAttr, vc);
+            ViewCoordinate vc, 
+            RefexDirective refexDirective) 
+            
+            throws IOException, InvalidCAB, ContradictionException {
+        super(componentUuid, conAttr, vc, IdDirective.PRESERVE, refexDirective);
         this.defined = defined;
     }
 
@@ -67,7 +68,7 @@ public class ConAttrAB extends CreateOrAmendBlueprint {
     }
 
     @Override
-    public void recomputeUuid() throws NoSuchAlgorithmException, UnsupportedEncodingException, IOException, InvalidCAB, ContradictionException {
-        throw new InvalidCAB ("UUID for ConAttrAB is set when concept is created");
+    public void recomputeUuid() throws InvalidCAB {
+        //throw new InvalidCAB ("UUID for ConAttrAB is set when concept is created");
     }
 }

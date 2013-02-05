@@ -46,5 +46,5 @@ public interface DescriptionVersionBI<A extends DescriptionAnalogBI>
          * @throws InvalidCAB
          */
         @Override
-    public DescCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB;
+    public DescCAB makeBlueprint(ViewCoordinate vc, org.ihtsdo.tk.api.blueprint.IdDirective idDirective, org.ihtsdo.tk.api.blueprint.RefexDirective refexDirective) throws IOException, ContradictionException, InvalidCAB;
 }

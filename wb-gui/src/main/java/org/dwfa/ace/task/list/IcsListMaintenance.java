@@ -46,6 +46,7 @@ import org.dwfa.util.bean.Spec;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
@@ -182,7 +183,7 @@ public class IcsListMaintenance extends AbstractTask {
 
     private void addMember(String word, int icsTypeNid) throws IOException, InvalidCAB, ContradictionException {
         RefexCAB wordRefexSpec = new RefexCAB(TK_REFSET_TYPE.CID_STR,
-                caseSensitiveRefexColl.getNid(), caseSensitiveRefexColl.getNid());
+                caseSensitiveRefexColl.getNid(), caseSensitiveRefexColl.getNid(), IdDirective.GENERATE_HASH);
         wordRefexSpec.with(RefexProperty.STRING1, word);
         wordRefexSpec.with(RefexProperty.CNID1, icsTypeNid);
         wordRefexSpec.with(RefexProperty.STATUS_NID, SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());

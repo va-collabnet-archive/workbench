@@ -32,6 +32,8 @@ import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Set;
 import org.ihtsdo.lang.LANG_CODE;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 
 public class DescriptionRevision extends Revision<DescriptionRevision, Description>
         implements I_DescriptionPart<DescriptionRevision>, DescriptionAnalogBI<DescriptionRevision> {
@@ -292,10 +294,10 @@ public class DescriptionRevision extends Revision<DescriptionRevision, Descripti
    }
    
    @Override
-    public DescCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
+    public DescCAB makeBlueprint(ViewCoordinate vc, IdDirective idDirective, RefexDirective refexDirective) throws IOException, ContradictionException, InvalidCAB {
         DescCAB descBp = new DescCAB(getConceptNid(), getTypeNid(),
                 LANG_CODE.getLangCode(lang), getText(), initialCaseSignificant,
-                getVersion(vc), vc);
+                getVersion(vc), vc, idDirective, refexDirective);
         return descBp;
     }
 

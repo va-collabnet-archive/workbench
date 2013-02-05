@@ -32,7 +32,9 @@ import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.NidBitSetItrBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
@@ -289,7 +291,7 @@ public class ContradictionFinderSwingWorker
         while(currentIterator.next()){
             RefexCAB memberBp = new RefexCAB(TK_REFSET_TYPE.MEMBER,
                     currentIterator.nid(),
-                    conflictRefsetNid);
+                    conflictRefsetNid, IdDirective.GENERATE_HASH);
             builder.constructIfNotCurrent(memberBp);
         }
         while(retiredIterator.next()){
@@ -298,7 +300,7 @@ public class ContradictionFinderSwingWorker
                     viewCoord, component.getConceptNid());
             
             if(member != null){
-                RefexCAB memberBp = member.makeBlueprint(viewCoord);
+                RefexCAB memberBp = member.makeBlueprint(viewCoord, IdDirective.PRESERVE, RefexDirective.EXCLUDE);
                 memberBp.setRetired();
                 builder.constructIfNotCurrent(memberBp);
             }

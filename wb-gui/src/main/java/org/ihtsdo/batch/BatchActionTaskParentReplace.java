@@ -19,6 +19,7 @@ package org.ihtsdo.batch;
 import java.util.UUID;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.RelCAB;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
@@ -86,7 +87,8 @@ public class BatchActionTaskParentReplace extends BatchActionTask {
 
         // IF PARENT REMOVED, THEN ADD NEW PARENT
         if (changed) {
-            RelCAB rc = new RelCAB(c.getPrimUuid(), moveToRoleTypeUuid, moveToDestUuid, 0, TkRelType.STATED_HIERARCHY);
+            RelCAB rc = new RelCAB(c.getPrimUuid(), moveToRoleTypeUuid, 
+                    moveToDestUuid, 0, TkRelType.STATED_HIERARCHY, IdDirective.GENERATE_HASH);
             tsSnapshot.construct(rc);
 
             BatchActionEventReporter.add(new BatchActionEvent(c,

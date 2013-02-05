@@ -20,8 +20,10 @@ import java.io.IOException;
 import java.util.Collection;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
 import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
@@ -88,16 +90,16 @@ public class BatchActionTaskRefsetReplaceValue extends BatchActionTask {
                     // ADD new value
                     RefexCAB refexSpec = null;
                     if (refsetType == TK_REFSET_TYPE.BOOLEAN) {
-                        refexSpec = new RefexCAB(TK_REFSET_TYPE.BOOLEAN, rcNid, collectionNid);
+                        refexSpec = new RefexCAB(TK_REFSET_TYPE.BOOLEAN, rcNid, collectionNid, IdDirective.GENERATE_HASH);
                         refexSpec.with(RefexCAB.RefexProperty.BOOLEAN1, (Boolean) refsetValue);
                     } else if (refsetType == TK_REFSET_TYPE.CID) {  // int nid
-                        refexSpec = new RefexCAB(TK_REFSET_TYPE.CID, rcNid, collectionNid);
+                        refexSpec = new RefexCAB(TK_REFSET_TYPE.CID, rcNid, collectionNid, IdDirective.GENERATE_HASH);
                         refexSpec.with(RefexCAB.RefexProperty.CNID1, ((Integer) refsetValue).intValue());
                     } else if (refsetType == TK_REFSET_TYPE.INT) {
-                        refexSpec = new RefexCAB(TK_REFSET_TYPE.INT, rcNid, collectionNid);
+                        refexSpec = new RefexCAB(TK_REFSET_TYPE.INT, rcNid, collectionNid, IdDirective.GENERATE_HASH);
                         refexSpec.with(RefexCAB.RefexProperty.INTEGER1, (Integer) refsetValue);
                     } else if (refsetType == TK_REFSET_TYPE.STR) {
-                        refexSpec = new RefexCAB(TK_REFSET_TYPE.STR, rcNid, collectionNid);
+                        refexSpec = new RefexCAB(TK_REFSET_TYPE.STR, rcNid, collectionNid, IdDirective.GENERATE_HASH);
                         refexSpec.with(RefexCAB.RefexProperty.STRING1, (String) refsetValue);
                     }
                     tsSnapshot.constructIfNotCurrent(refexSpec);
@@ -117,7 +119,7 @@ public class BatchActionTaskRefsetReplaceValue extends BatchActionTask {
                     changed = true;
                 } else {
                     // CHECK FILTER
-                    RefexCAB spec = rvbi.makeBlueprint(vc);
+                    RefexCAB spec = rvbi.makeBlueprint(vc, IdDirective.PRESERVE, RefexDirective.EXCLUDE);
                     boolean matched = false;
                     switch (refsetType) {
                         case BOOLEAN:
@@ -159,16 +161,16 @@ public class BatchActionTaskRefsetReplaceValue extends BatchActionTask {
                         // ADD new value
                         RefexCAB refexSpec = null;
                         if (refsetType == TK_REFSET_TYPE.BOOLEAN) {
-                            refexSpec = new RefexCAB(TK_REFSET_TYPE.BOOLEAN, rcNid, collectionNid);
+                            refexSpec = new RefexCAB(TK_REFSET_TYPE.BOOLEAN, rcNid, collectionNid, IdDirective.GENERATE_HASH);
                             refexSpec.with(RefexCAB.RefexProperty.BOOLEAN1, (Boolean) refsetValue);
                         } else if (refsetType == TK_REFSET_TYPE.CID) {
-                            refexSpec = new RefexCAB(TK_REFSET_TYPE.CID, rcNid, collectionNid);
+                            refexSpec = new RefexCAB(TK_REFSET_TYPE.CID, rcNid, collectionNid, IdDirective.GENERATE_HASH);
                             refexSpec.with(RefexCAB.RefexProperty.CNID1, ((Integer) refsetValue).intValue()); // int nid
                         } else if (refsetType == TK_REFSET_TYPE.INT) {
-                            refexSpec = new RefexCAB(TK_REFSET_TYPE.INT, rcNid, collectionNid);
+                            refexSpec = new RefexCAB(TK_REFSET_TYPE.INT, rcNid, collectionNid, IdDirective.GENERATE_HASH);
                             refexSpec.with(RefexCAB.RefexProperty.INTEGER1, (Integer) refsetValue);
                         } else if (refsetType == TK_REFSET_TYPE.STR) {
-                            refexSpec = new RefexCAB(TK_REFSET_TYPE.STR, rcNid, collectionNid);
+                            refexSpec = new RefexCAB(TK_REFSET_TYPE.STR, rcNid, collectionNid, IdDirective.GENERATE_HASH);
                             refexSpec.with(RefexCAB.RefexProperty.STRING1, (String) refsetValue);
                         }
 

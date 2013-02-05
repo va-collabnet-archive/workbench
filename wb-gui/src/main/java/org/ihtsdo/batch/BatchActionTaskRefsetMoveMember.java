@@ -18,7 +18,9 @@ package org.ihtsdo.batch;
 
 import java.util.Collection;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
@@ -99,7 +101,7 @@ public class BatchActionTaskRefsetMoveMember extends BatchActionTask {
         ConceptChronicleBI collectionToConcept = ts.getConcept(collectionToNid);
         for (RefexVersionBI rvbi : currentRefexes) {
             if (rvbi.getCollectionNid() == collectionFromNid) {
-                RefexCAB specFrom = rvbi.makeBlueprint(vc);
+                RefexCAB specFrom = rvbi.makeBlueprint(vc, IdDirective.PRESERVE, RefexDirective.EXCLUDE);
                 TK_REFSET_TYPE refsetFromType = specFrom.getMemberType();
                 if (matchValue == null) {
 
@@ -115,7 +117,7 @@ public class BatchActionTaskRefsetMoveMember extends BatchActionTask {
                     }
 
                     // ADD MoveTo
-                    RefexCAB specTo = new RefexCAB(refsetFromType, rcNid, collectionToNid);
+                    RefexCAB specTo = new RefexCAB(refsetFromType, rcNid, collectionToNid, IdDirective.GENERATE_HASH);
                     if (refsetFromType == TK_REFSET_TYPE.BOOLEAN) {
                         specTo.with(RefexCAB.RefexProperty.BOOLEAN1,
                                 specFrom.getBoolean(RefexCAB.RefexProperty.BOOLEAN1));
@@ -185,7 +187,7 @@ public class BatchActionTaskRefsetMoveMember extends BatchActionTask {
                         }
 
                         // ADD MoveTo
-                        RefexCAB specTo = new RefexCAB(refsetFromType, rcNid, collectionToNid);
+                        RefexCAB specTo = new RefexCAB(refsetFromType, rcNid, collectionToNid, IdDirective.GENERATE_HASH);
                         if (refsetFromType == TK_REFSET_TYPE.BOOLEAN) {
                             specTo.with(RefexCAB.RefexProperty.BOOLEAN1,
                                     specFrom.getBoolean(RefexCAB.RefexProperty.BOOLEAN1));

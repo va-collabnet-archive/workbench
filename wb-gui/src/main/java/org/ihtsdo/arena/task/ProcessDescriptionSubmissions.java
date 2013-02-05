@@ -51,6 +51,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.DescCAB;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -227,19 +228,19 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
                         SnomedMetadataRfx.getDES_SYNONYM_NID(),
                         lang,
                         descText,
-                        false);
+                        false, IdDirective.GENERATE_HASH);
                 TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(config.getEditCoordinate(), config.getViewCoordinate());
                 DescriptionChronicleBI description = builder.construct(descBp);
                 RefexCAB annotBp = new RefexCAB(TK_REFSET_TYPE.CID,
                         description.getNid(),
-                        langRefexNid);
+                        langRefexNid, IdDirective.GENERATE_HASH);
                 annotBp.put(RefexCAB.RefexProperty.CNID1, acceptabilityNid);
                 RefexChronicleBI<?> annotation = builder.construct(annotBp);
                 description.addAnnotation(annotation);
                 if(addSecondDialectRefex){
                     RefexCAB secondAnnotBp = new RefexCAB(TK_REFSET_TYPE.CID,
                         description.getNid(),
-                        secondDialectRefexNid);
+                        secondDialectRefexNid, IdDirective.GENERATE_HASH);
                     secondAnnotBp.put(RefexCAB.RefexProperty.CNID1, acceptabilityNid);
                     RefexChronicleBI<?> secondAnnotation = builder.construct(secondAnnotBp);
                     description.addAnnotation(secondAnnotation);

@@ -88,6 +88,8 @@ import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.api.*;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
 import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 import org.ihtsdo.tk.binding.snomed.Language;
@@ -345,30 +347,30 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
 
                     //create blueprints
                     if (lang.equals("en")) {
-                        createBlueprintUsFsnRefex(conceptSpec.makeFsnCAB().getComponentNid());
-                        createBlueprintGbFsnRefex(conceptSpec.makeFsnCAB().getComponentNid());
-                        createBlueprintUsPrefRefex(conceptSpec.makePreferredCAB().getComponentNid());
-                        createBlueprintGbPrefRefex(conceptSpec.makePreferredCAB().getComponentNid());
+                        createBlueprintUsFsnRefex(conceptSpec.makeFsnCAB(IdDirective.GENERATE_HASH).getComponentNid());
+                        createBlueprintGbFsnRefex(conceptSpec.makeFsnCAB(IdDirective.GENERATE_HASH).getComponentNid());
+                        createBlueprintUsPrefRefex(conceptSpec.makePreferredCAB(IdDirective.GENERATE_HASH).getComponentNid());
+                        createBlueprintGbPrefRefex(conceptSpec.makePreferredCAB(IdDirective.GENERATE_HASH).getComponentNid());
                     }
                     if (lang.equals("en-us")) {
-                        createBlueprintUsFsnRefex(conceptSpec.makeFsnCAB().getComponentNid());
-                        createBlueprintUsPrefRefex(conceptSpec.makePreferredCAB().getComponentNid());
+                        createBlueprintUsFsnRefex(conceptSpec.makeFsnCAB(IdDirective.GENERATE_HASH).getComponentNid());
+                        createBlueprintUsPrefRefex(conceptSpec.makePreferredCAB(IdDirective.GENERATE_HASH).getComponentNid());
     //                   createBlueprintGbAcctRefex(conceptSpec.getPreferredCAB().getComponentNid()); //removed for rf2
                     }
                     if (lang.equals("en-gb")) {
     //                    createBlueprintGbFsnRefex(conceptSpec.getFsnCAB().getComponentNid());
-                        createBlueprintGbFsnRefex(conceptSpec.makeFsnCAB().getComponentNid()); //only using one fsn
-                        createBlueprintGbPrefRefex(conceptSpec.makePreferredCAB().getComponentNid());
+                        createBlueprintGbFsnRefex(conceptSpec.makeFsnCAB(IdDirective.GENERATE_HASH).getComponentNid()); //only using one fsn
+                        createBlueprintGbPrefRefex(conceptSpec.makePreferredCAB(IdDirective.GENERATE_HASH).getComponentNid());
     //                   createBlueprintUsAcctRefex(conceptSpec.getPreferredCAB().getComponentNid()); //removed for rf2
                     }
                     if (addUsDescFsn) {
     //                    createBlueprintUsFsnDesc();
-                        createBlueprintUsFsnRefex(conceptSpec.makeFsnCAB().getComponentNid());
+                        createBlueprintUsFsnRefex(conceptSpec.makeFsnCAB(IdDirective.GENERATE_HASH).getComponentNid());
                     }
                     if (addGbDescFsn) {
     //                    createBlueprintGbFsnDesc();
     //                    createBlueprintGbFsnRefex(descSpecGbFsn.getComponentNid());
-                        createBlueprintGbFsnRefex(conceptSpec.makeFsnCAB().getComponentNid()); //only using one fsn (US)
+                        createBlueprintGbFsnRefex(conceptSpec.makeFsnCAB(IdDirective.GENERATE_HASH).getComponentNid()); //only using one fsn (US)
                     }
                     if (addUsDescPref) {
                         createBlueprintUsPrefDesc();
@@ -906,10 +908,10 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
             //create concept blue print
             if (lang.equals("en-gb")) {
                 conceptSpec = new ConceptCB(fsnText, prefText, LANG_CODE.EN,
-                        Snomed.IS_A.getLenient().getPrimUuid(), uuidArray);
+                        Snomed.IS_A.getLenient().getPrimUuid(), IdDirective.GENERATE_HASH, uuidArray);
             } else {
                 conceptSpec = new ConceptCB(fsnText, prefText, LANG_CODE.EN,
-                        Snomed.IS_A.getLenient().getPrimUuid(), uuidArray);
+                        Snomed.IS_A.getLenient().getPrimUuid(), IdDirective.GENERATE_HASH, uuidArray);
             }
 
             conceptSpec.setComponentUuid(newConceptUuid);
@@ -951,7 +953,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                     fsnConcept.getPrimUuid(),
                     LANG_CODE.EN_GB,
                     text,
-                    false);
+                    false, IdDirective.GENERATE_HASH);
 
             tc.construct(descSpecGbFsn);
         } catch (IOException ex) {
@@ -966,7 +968,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
             refexSpecGbFsn = new RefexCAB(
                     TK_REFSET_TYPE.CID,
                     componentNid,
-                    Ts.get().getNidForUuids(gbUuid));
+                    Ts.get().getNidForUuids(gbUuid), IdDirective.GENERATE_HASH);
             refexSpecGbFsn.put(RefexProperty.CNID1, preferredConcept.getNid());
             tc.construct(refexSpecGbFsn);
             if (!gbRefexConcept.isAnnotationStyleRefex()) {
@@ -989,7 +991,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                     synConcept.getPrimUuid(),
                     LANG_CODE.EN_GB,
                     text,
-                    false);
+                    false, IdDirective.GENERATE_HASH);
 
             tc.construct(descSpecGbPref);
         } catch (IOException ex) {
@@ -1004,7 +1006,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
             refexSpecGbPref = new RefexCAB(
                     TK_REFSET_TYPE.CID,
                     componentNid,
-                    Ts.get().getNidForUuids(gbUuid));
+                    Ts.get().getNidForUuids(gbUuid), IdDirective.GENERATE_HASH);
             refexSpecGbPref.put(RefexProperty.CNID1, preferredConcept.getNid());
 
             tc.construct(refexSpecGbPref);
@@ -1023,7 +1025,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
             refexSpecGbAcct = new RefexCAB(
                     TK_REFSET_TYPE.CID,
                     componentNid,
-                    Ts.get().getNidForUuids(gbUuid));
+                    Ts.get().getNidForUuids(gbUuid), IdDirective.GENERATE_HASH);
             refexSpecGbAcct.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
 
             tc.construct(refexSpecGbAcct);
@@ -1047,7 +1049,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                     fsnConcept.getPrimUuid(),
                     LANG_CODE.EN_US,
                     text,
-                    false);
+                    false, IdDirective.GENERATE_HASH);
 
             tc.construct(descSpecUsFsn);
         } catch (IOException ex) {
@@ -1062,7 +1064,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
             refexSpecUsFsn = new RefexCAB(
                     TK_REFSET_TYPE.CID,
                     componentNid,
-                    Ts.get().getNidForUuids(usUuid));
+                    Ts.get().getNidForUuids(usUuid), IdDirective.GENERATE_HASH);
 
             refexSpecUsFsn.put(RefexProperty.CNID1, preferredConcept.getNid());
 
@@ -1087,7 +1089,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                     synConcept.getPrimUuid(),
                     LANG_CODE.EN_US,
                     text,
-                    false);
+                    false, IdDirective.GENERATE_HASH);
 
             tc.construct(descSpecUsPref);
         } catch (IOException ex) {
@@ -1102,7 +1104,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
             refexSpecUsPref = new RefexCAB(
                     TK_REFSET_TYPE.CID,
                     componentNid,
-                    Ts.get().getNidForUuids(usUuid));
+                    Ts.get().getNidForUuids(usUuid), IdDirective.GENERATE_HASH);
 
             refexSpecUsPref.put(RefexProperty.CNID1, preferredConcept.getNid());
 
@@ -1122,7 +1124,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
             refexSpecUsAcct = new RefexCAB(
                     TK_REFSET_TYPE.CID,
                     componentNid,
-                    Ts.get().getNidForUuids(usUuid));
+                    Ts.get().getNidForUuids(usUuid), IdDirective.GENERATE_HASH);
 
             refexSpecUsAcct.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
 

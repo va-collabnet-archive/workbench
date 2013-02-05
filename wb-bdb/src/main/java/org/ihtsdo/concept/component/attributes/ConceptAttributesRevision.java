@@ -23,7 +23,9 @@ import org.ihtsdo.tk.api.ext.I_ConceptualizeExternally;
 
 import java.util.Collection;
 import java.util.Set;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 
 public class ConceptAttributesRevision extends Revision<ConceptAttributesRevision, ConceptAttributes>
         implements I_ConceptAttributePart<ConceptAttributesRevision>,
@@ -212,8 +214,10 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
    }
 
     @Override
-    public ConAttrAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
-        ConAttrAB conAttrBp = new ConAttrAB(primordialComponent.getConceptNid(), defined, getVersion(vc), vc);
+    public ConAttrAB makeBlueprint(ViewCoordinate vc, IdDirective idDirective, 
+                        RefexDirective refexDirective) throws IOException, ContradictionException, InvalidCAB {
+        ConAttrAB conAttrBp = new ConAttrAB(primordialComponent.getConceptNid(), 
+                defined, getVersion(vc), vc, refexDirective);
         return conAttrBp;
     }
 }

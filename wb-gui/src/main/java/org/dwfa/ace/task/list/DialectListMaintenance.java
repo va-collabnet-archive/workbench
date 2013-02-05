@@ -46,8 +46,8 @@ import org.dwfa.util.bean.Spec;
 import org.ihtsdo.helper.dialect.UnsupportedDialectOrLanguage;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
-import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
@@ -198,7 +198,7 @@ public class DialectListMaintenance extends AbstractTask {
 
     private void addMember(String variant, String word) throws IOException, InvalidCAB, ContradictionException {
         RefexCAB textRefexSpec = new RefexCAB(TK_REFSET_TYPE.STR,
-                refexColl.getNid(), refexColl.getNid());
+                refexColl.getNid(), refexColl.getNid(), IdDirective.GENERATE_HASH);
         textRefexSpec.with(RefexProperty.STRING1, word);
         textRefexSpec.with(RefexProperty.STATUS_NID,
                 SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
@@ -207,7 +207,7 @@ public class DialectListMaintenance extends AbstractTask {
         RefexChronicleBI<?> textRefex = tc.constructIfNotCurrent(textRefexSpec);
 
         RefexCAB variantRefexSpec = new RefexCAB(TK_REFSET_TYPE.STR,
-                textRefex.getNid(), dialectRefexColl.getNid());
+                textRefex.getNid(), dialectRefexColl.getNid(), IdDirective.GENERATE_HASH);
 
         variantRefexSpec.with(RefexProperty.STRING1, variant);
         variantRefexSpec.with(RefexProperty.STATUS_NID,

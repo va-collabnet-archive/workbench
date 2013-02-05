@@ -109,6 +109,9 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
       destinationsOfChangedRels.removeAll(originsAndDestinationsChanged);
 
       for (int cNid : noTaxonomyChange) {
+          if (cNid == Integer.MAX_VALUE) {
+              continue;
+          }
          Collection<Long> nodeIds = model.getNodeStore().getNodeIdsForConcept(cNid);
 
          if (nodeIds != null) {
@@ -128,6 +131,9 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
       }
 
       for (int cNid : originsOfChangedRels) {
+          if (cNid == Integer.MAX_VALUE) {
+              continue;
+          }
          Collection<Long> nodeIds = model.getNodeStore().getNodeIdsForConcept(cNid);
 
          if (nodeIds != null) {
@@ -150,6 +156,9 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
       }
 
       for (int cNid : destinationsOfChangedRels) {
+          if (cNid == Integer.MAX_VALUE) {
+              continue;
+          }
          Collection<Long> nodeIds = model.getNodeStore().getNodeIdsForConcept(cNid);
 
          if (nodeIds != null) {
@@ -189,7 +198,10 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
       }
 
       for (int cNid : originsAndDestinationsChanged) {
-         Collection<Long> nodeIds = model.getNodeStore().getNodeIdsForConcept(cNid);
+          if (cNid == Integer.MAX_VALUE) {
+              continue;
+          }
+        Collection<Long> nodeIds = model.getNodeStore().getNodeIdsForConcept(cNid);
 
          if (nodeIds != null) {
             for (Long nodeId : nodeIds) {

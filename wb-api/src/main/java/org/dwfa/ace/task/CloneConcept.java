@@ -41,7 +41,9 @@ import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
 import org.ihtsdo.tk.api.blueprint.DescCAB;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -91,7 +93,7 @@ public class CloneConcept extends AbstractTask {
             /*
              * Make blueprint from the orginal concept. Copies exactly.
              */
-            ConceptCB conceptBp = original.makeBlueprint();
+            ConceptCB conceptBp = original.makeBlueprint(vc, IdDirective.GENERATE_RANDOM_CONCEPT_REST_HASH, RefexDirective.INCLUDE);
             
             /*
              * Add clone of to the text for descriptons. Update fsn or pref term will also

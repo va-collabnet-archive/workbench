@@ -22,6 +22,7 @@ import java.util.UUID;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RelCAB;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -83,7 +84,7 @@ public class BatchActionTaskParentAddNew extends BatchActionTask {
 
         // If parent does not already exist, than add a new parent record.
         RelCAB rc = new RelCAB(c.getPrimUuid(), selectedRoleTypeUuid, selectedDestUuid,
-                0, TkRelType.STATED_HIERARCHY);
+                0, TkRelType.STATED_HIERARCHY, IdDirective.GENERATE_HASH);
         tsSnapshot.construct(rc);
 
         BatchActionEventReporter.add(new BatchActionEvent(c,

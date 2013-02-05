@@ -21,6 +21,10 @@ import java.util.Arrays;
 import java.util.UUID;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
+import static org.ihtsdo.tk.api.blueprint.IdDirective.GENERATE_HASH;
+import static org.ihtsdo.tk.api.blueprint.IdDirective.GENERATE_RANDOM;
+import static org.ihtsdo.tk.api.blueprint.IdDirective.GENERATE_RANDOM_CONCEPT_REST_HASH;
+import static org.ihtsdo.tk.api.blueprint.IdDirective.PRESERVE;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.media.MediaVersionBI;
 import org.ihtsdo.tk.uuid.UuidT5Generator;
@@ -41,43 +45,50 @@ public class MediaCAB extends CreateOrAmendBlueprint {
 
     public MediaCAB(
             int conceptNid, int typeNid, String format, String textDescription,
-            byte[] dataBytes)
+            byte[] dataBytes, IdDirective idDirective)
             throws IOException, InvalidCAB, ContradictionException {
         this(Ts.get().getComponent(conceptNid).getPrimUuid(),
                 Ts.get().getComponent(typeNid).getPrimUuid(),
-                format, textDescription, dataBytes);
+                format, textDescription, dataBytes, idDirective);
     }
 
     public MediaCAB(
             UUID conceptUuid, UUID typeUuid, String format, String textDescription,
-            byte[] dataBytes)
+            byte[] dataBytes, IdDirective idDirective)
             throws IOException, InvalidCAB, ContradictionException {
         this(conceptUuid, typeUuid, format, textDescription, dataBytes,
-                null, null, null);
+                null, null, null, idDirective, RefexDirective.EXCLUDE);
     }
 
     public MediaCAB(
             int conceptNid, int typeNid, String format, String textDescription,
-            byte[] dataBytes, MediaVersionBI media, ViewCoordinate vc)
+            byte[] dataBytes, MediaVersionBI media, ViewCoordinate vc,
+            IdDirective idDirective,
+            RefexDirective refexDirective)
             throws IOException, InvalidCAB, ContradictionException {
         this(Ts.get().getComponent(conceptNid).getPrimUuid(),
                 Ts.get().getComponent(typeNid).getPrimUuid(),
-                format, textDescription, dataBytes, media, vc);
+                format, textDescription, dataBytes, media, vc, 
+                idDirective, refexDirective);
     }
 
     public MediaCAB(
             UUID conceptUuid, UUID typeUuid, String format, String textDescription,
-            byte[] dataBytes, MediaVersionBI media, ViewCoordinate vc)
+            byte[] dataBytes, MediaVersionBI media, ViewCoordinate vc,
+            IdDirective idDirective,
+            RefexDirective refexDirective)
             throws IOException, InvalidCAB, ContradictionException {
         this(conceptUuid, typeUuid, format, textDescription, dataBytes,
-                null, media, vc);
+                null, media, vc, idDirective, refexDirective);
     }
 
     public MediaCAB(
             UUID conceptUuid, UUID typeUuid, String format, String textDescription,
             byte[] dataBytes, UUID componentUuid, MediaVersionBI media,
-            ViewCoordinate vc) throws IOException, InvalidCAB, ContradictionException {
-        super(componentUuid, media, vc);
+            ViewCoordinate vc,
+            IdDirective idDirective,
+            RefexDirective refexDirective) throws IOException, InvalidCAB, ContradictionException {
+        super(componentUuid, media, vc, idDirective, refexDirective);
 
         this.conceptUuid = conceptUuid;
         this.typeUuid = typeUuid;
@@ -99,10 +110,23 @@ public class MediaCAB extends CreateOrAmendBlueprint {
 
     @Override
     public void recomputeUuid() throws NoSuchAlgorithmException, IOException, InvalidCAB, ContradictionException {
-        setComponentUuid(
-                UuidT5Generator.get(mediaSpecNamespace,
-                getPrimoridalUuidStr(conceptUuid)
-                + dataBytes));
+        switch (idDirective) {
+            case GENERATE_RANDOM_CONCEPT_REST_HASH:
+            case GENERATE_HASH:
+            case GENERATE_NON_STANDARD_REFEX_HASH:
+                setComponentUuidNoRecompute(UuidT5Generator.get(mediaSpecNamespace,
+                    getPrimoridalUuidStr(conceptUuid)
+                    + dataBytes));
+                break;
+            case GENERATE_RANDOM:
+                setComponentUuidNoRecompute(UUID.randomUUID());
+                break;
+
+            case PRESERVE:
+            default:
+                // nothing to do...
+
+        }
         for(RefexCAB annotBp: getAnnotationBlueprints()){
             annotBp.setReferencedComponentUuid(getComponentUuid());
             annotBp.recomputeUuid();

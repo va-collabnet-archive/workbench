@@ -29,6 +29,7 @@ import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
@@ -141,7 +142,7 @@ public class DescriptionsDiffComputer {
 			RefexCAB newSpec = new RefexCAB(
 					TK_REFSET_TYPE.CID,
 					member.getNid(),
-					refset.getNid());
+					refset.getNid(), IdDirective.GENERATE_HASH);
 			newSpec.put(RefexProperty.CNID1, activeNid);
 			RefexChronicleBI<?> newRefex = tb.construct(newSpec);
 		} catch (IOException e) {
@@ -199,6 +200,7 @@ public class DescriptionsDiffComputer {
 		ConceptCB addedConceptsRefsetCB = new ConceptCB(refsetNamePrefix + " Added Concepts (refset)", 
 				refsetNamePrefix + " Added Concepts",
 				LANG_CODE.EN, ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid(),
+                                IdDirective.GENERATE_HASH,
 				RefsetAuxiliary.Concept.REFSET_IDENTITY.getPrimoridalUid());
 		ConceptChronicleBI ac = tb.constructIfNotCurrent(addedConceptsRefsetCB);
 		addedConceptsRefset = (I_GetConceptData) ac;
@@ -207,6 +209,7 @@ public class DescriptionsDiffComputer {
 		ConceptCB retiredConceptsRefsetCB = new ConceptCB(refsetNamePrefix + " Retired Concepts (refset)", 
 				refsetNamePrefix + " Retired Concepts",
 				LANG_CODE.EN, ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid(),
+                                IdDirective.GENERATE_HASH,
 				RefsetAuxiliary.Concept.REFSET_IDENTITY.getPrimoridalUid());
 		ConceptChronicleBI rcd = tb.constructIfNotCurrent(retiredConceptsRefsetCB);
 		retiredConceptsRefset = (I_GetConceptData) rcd;
@@ -215,6 +218,7 @@ public class DescriptionsDiffComputer {
 		ConceptCB reactivatedConceptsRefsetCB = new ConceptCB(refsetNamePrefix + " Reactivated Concepts (refset)", 
 				refsetNamePrefix + " Reactivated Concepts",
 				LANG_CODE.EN, ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid(),
+                                IdDirective.GENERATE_HASH,
 				RefsetAuxiliary.Concept.REFSET_IDENTITY.getPrimoridalUid());
 		ConceptChronicleBI reacs = tb.constructIfNotCurrent(reactivatedConceptsRefsetCB);
 		reactivatedConceptsRefset = (I_GetConceptData) reacs;
@@ -223,6 +227,7 @@ public class DescriptionsDiffComputer {
 		ConceptCB semtagChangesRefsetCB = new ConceptCB(refsetNamePrefix + " SemTag Changes (refset)", 
 				refsetNamePrefix + " SemTag Changes",
 				LANG_CODE.EN, ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid(),
+                                IdDirective.GENERATE_HASH,
 				RefsetAuxiliary.Concept.REFSET_IDENTITY.getPrimoridalUid());
 		ConceptChronicleBI stc = tb.constructIfNotCurrent(semtagChangesRefsetCB);
 		semtagChangesRefset = (I_GetConceptData) stc;
@@ -231,6 +236,7 @@ public class DescriptionsDiffComputer {
 		ConceptCB fsnChangesRefsetCB = new ConceptCB(refsetNamePrefix + " FSN Changes (refset)", 
 				refsetNamePrefix + " FSN Changes",
 				LANG_CODE.EN, ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid(),
+                                IdDirective.GENERATE_HASH,
 				RefsetAuxiliary.Concept.REFSET_IDENTITY.getPrimoridalUid());
 		ConceptChronicleBI fsnc = tb.constructIfNotCurrent(fsnChangesRefsetCB);
 		fsnChangesRefset = (I_GetConceptData) fsnc;
@@ -239,6 +245,7 @@ public class DescriptionsDiffComputer {
 		ConceptCB prefChangesRefsetCB = new ConceptCB(refsetNamePrefix + " Pref Changes (refset)", 
 				refsetNamePrefix + " Pref Changes",
 				LANG_CODE.EN, ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid(),
+                                IdDirective.GENERATE_HASH,
 				RefsetAuxiliary.Concept.REFSET_IDENTITY.getPrimoridalUid());
 		ConceptChronicleBI prc = tb.constructIfNotCurrent(prefChangesRefsetCB);
 		prefChangesRefset = (I_GetConceptData) prc;
@@ -247,6 +254,7 @@ public class DescriptionsDiffComputer {
 		ConceptCB retiredDescriptionsRefsetCB = new ConceptCB(refsetNamePrefix + " Retired Descriptions (refset)", 
 				refsetNamePrefix + " Retired Descriptions",
 				LANG_CODE.EN, ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid(),
+                                IdDirective.GENERATE_HASH,
 				RefsetAuxiliary.Concept.REFSET_IDENTITY.getPrimoridalUid());
 		ConceptChronicleBI retd = tb.constructIfNotCurrent(retiredDescriptionsRefsetCB);
 		retiredDescriptionsRefset = (I_GetConceptData) retd;
@@ -255,6 +263,7 @@ public class DescriptionsDiffComputer {
 		ConceptCB addedDescriptionsRefsetCB = new ConceptCB(refsetNamePrefix + " New Descriptions (refset)", 
 				refsetNamePrefix + " New Descriptions",
 				LANG_CODE.EN, ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid(),
+                                IdDirective.GENERATE_HASH,
 				RefsetAuxiliary.Concept.REFSET_IDENTITY.getPrimoridalUid());
 		ConceptChronicleBI addd = tb.constructIfNotCurrent(addedDescriptionsRefsetCB);
 		addedDescriptionsRefset = (I_GetConceptData) addd;
@@ -263,6 +272,7 @@ public class DescriptionsDiffComputer {
 		ConceptCB changedAcceptabilityRefsetCB = new ConceptCB(refsetNamePrefix + " Changed Acceptability (refset)", 
 				refsetNamePrefix + " Changed Acceptability",
 				LANG_CODE.EN, ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid(),
+                                IdDirective.GENERATE_HASH,
 				RefsetAuxiliary.Concept.REFSET_IDENTITY.getPrimoridalUid());
 		ConceptChronicleBI cha = tb.constructIfNotCurrent(changedAcceptabilityRefsetCB);
 		changedAcceptabilityRefset = (I_GetConceptData) cha;
@@ -271,6 +281,7 @@ public class DescriptionsDiffComputer {
 		ConceptCB reactivatedDescriptionsRefsetCB = new ConceptCB(refsetNamePrefix + " Reactivated Descriptions (refset)", 
 				refsetNamePrefix + " Reactivated Descriptions",
 				LANG_CODE.EN, ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid(),
+                                IdDirective.GENERATE_HASH,
 				RefsetAuxiliary.Concept.REFSET_IDENTITY.getPrimoridalUid());
 		ConceptChronicleBI read = tb.constructIfNotCurrent(reactivatedDescriptionsRefsetCB);
 		reactivatedDescriptionsRefset = (I_GetConceptData) read;

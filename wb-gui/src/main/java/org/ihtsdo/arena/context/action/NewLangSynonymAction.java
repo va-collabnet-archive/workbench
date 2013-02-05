@@ -11,6 +11,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.DescCAB;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
@@ -50,13 +51,13 @@ public class NewLangSynonymAction extends AbstractAction {
                     SnomedMetadataRfx.getDES_SYNONYM_NID(),
                     lang,
                     "Clone of " + desc.getText(),
-                    false);
+                    false, IdDirective.GENERATE_HASH);
             descBp.setComponentUuidNoRecompute(UUID.randomUUID());
             DescriptionChronicleBI dc = builder.construct(descBp);
             DescriptionVersionBI dv = dc.getVersion(config.getViewCoordinate());
             RefexCAB refexBp = new RefexCAB(TK_REFSET_TYPE.CID,
                     dv.getNid(), 
-                    refex.getStrict(config.getViewCoordinate()).getConceptNid());
+                    refex.getStrict(config.getViewCoordinate()).getConceptNid(), IdDirective.GENERATE_HASH);
             refexBp.put(RefexProperty.CNID1, SnomedMetadataRfx.getDESC_ACCEPTABLE_NID());
             RefexChronicleBI<?> newRefex = builder.construct(refexBp);
             ConceptVersionBI cv = Ts.get().getConceptVersion(config.getViewCoordinate(), desc.getConceptNid());

@@ -88,6 +88,7 @@ import javax.swing.JSeparator;
 import javax.swing.SwingWorker;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 
 /**
  *
@@ -423,9 +424,9 @@ public class NewConcept extends PreviousNextOrCancel {
 
             // create concept blue print
             if (lang.equals(LANG_CODE.EN_GB)) {
-                conceptSpec = new ConceptCB(fsnText, prefText, LANG_CODE.EN, isa, uuidArray);
+                conceptSpec = new ConceptCB(fsnText, prefText, LANG_CODE.EN, isa, IdDirective.GENERATE_HASH, uuidArray);
             } else {
-                conceptSpec = new ConceptCB(fsnText, prefText, LANG_CODE.EN, isa, uuidArray);
+                conceptSpec = new ConceptCB(fsnText, prefText, LANG_CODE.EN, isa, IdDirective.GENERATE_HASH, uuidArray);
             }
 
             conceptSpec.setComponentUuid(UUID.randomUUID());
@@ -445,7 +446,7 @@ public class NewConcept extends PreviousNextOrCancel {
 
         try {
             descSpecGbFsn = new DescCAB(conceptSpec.getComponentUuid(), fsnConcept.getPrimUuid(), LANG_CODE.EN_GB,
-                    text, false);
+                    text, false, IdDirective.GENERATE_HASH);
             tc.construct(descSpecGbFsn);
         } catch (IOException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
@@ -456,7 +457,7 @@ public class NewConcept extends PreviousNextOrCancel {
 
     private void createBlueprintGbFsnRefex(ComponentVersionBI cv) throws ContradictionException {
         try {
-            refexSpecGbFsn = new RefexCAB(TK_REFSET_TYPE.CID, cv.getNid(), Ts.get().getNidForUuids(gbUuid));
+            refexSpecGbFsn = new RefexCAB(TK_REFSET_TYPE.CID, cv.getNid(), Ts.get().getNidForUuids(gbUuid), IdDirective.GENERATE_HASH);
             refexSpecGbFsn.put(RefexProperty.CNID1, preferredConcept.getNid());
 
             RefexChronicleBI<?> annot = tc.construct(refexSpecGbFsn);
@@ -481,7 +482,7 @@ public class NewConcept extends PreviousNextOrCancel {
 
         try {
             descSpecGbPref = new DescCAB(conceptSpec.getComponentUuid(), synConcept.getPrimUuid(), LANG_CODE.EN_GB,
-                    text, false);
+                    text, false, IdDirective.GENERATE_HASH);
 
             DescriptionChronicleBI dc = tc.construct(descSpecGbPref);
 
@@ -497,7 +498,7 @@ public class NewConcept extends PreviousNextOrCancel {
 
     private void createBlueprintGbPrefRefex(ComponentVersionBI cv) throws ContradictionException {
         try {
-            refexSpecGbPref = new RefexCAB(TK_REFSET_TYPE.CID, cv.getNid(), Ts.get().getNidForUuids(gbUuid));
+            refexSpecGbPref = new RefexCAB(TK_REFSET_TYPE.CID, cv.getNid(), Ts.get().getNidForUuids(gbUuid), IdDirective.GENERATE_HASH);
             refexSpecGbPref.put(RefexProperty.CNID1, preferredConcept.getNid());
 
             RefexChronicleBI<?> annot = tc.construct(refexSpecGbPref);
@@ -514,7 +515,7 @@ public class NewConcept extends PreviousNextOrCancel {
 
     private void createBlueprintGbAcctRefex(ComponentVersionBI cv) throws ContradictionException {
         try {
-            refexSpecGbAcct = new RefexCAB(TK_REFSET_TYPE.CID, cv.getNid(), Ts.get().getNidForUuids(gbUuid));
+            refexSpecGbAcct = new RefexCAB(TK_REFSET_TYPE.CID, cv.getNid(), Ts.get().getNidForUuids(gbUuid), IdDirective.GENERATE_HASH);
             refexSpecGbAcct.put(RefexProperty.CNID1,
                     Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
 
@@ -538,7 +539,7 @@ public class NewConcept extends PreviousNextOrCancel {
 
         try {
             descSpecUsFsn = new DescCAB(conceptSpec.getComponentUuid(), fsnConcept.getPrimUuid(), LANG_CODE.EN_US,
-                    text, false);
+                    text, false, IdDirective.GENERATE_HASH);
             tc.construct(descSpecUsFsn);
         } catch (IOException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
@@ -549,7 +550,7 @@ public class NewConcept extends PreviousNextOrCancel {
 
     private void createBlueprintUsFsnRefex(ComponentVersionBI cv) throws ContradictionException {
         try {
-            refexSpecUsFsn = new RefexCAB(TK_REFSET_TYPE.CID, cv.getNid(), Ts.get().getNidForUuids(usUuid));
+            refexSpecUsFsn = new RefexCAB(TK_REFSET_TYPE.CID, cv.getNid(), Ts.get().getNidForUuids(usUuid), IdDirective.GENERATE_HASH);
             refexSpecUsFsn.put(RefexProperty.CNID1, preferredConcept.getNid());
 
             RefexChronicleBI<?> annot = tc.construct(refexSpecUsFsn);
@@ -574,7 +575,7 @@ public class NewConcept extends PreviousNextOrCancel {
 
         try {
             descSpecUsPref = new DescCAB(conceptSpec.getComponentUuid(), synConcept.getPrimUuid(), LANG_CODE.EN_US,
-                    text, false);
+                    text, false, IdDirective.GENERATE_HASH);
 
             DescriptionChronicleBI dc = tc.construct(descSpecUsPref);
 
@@ -590,7 +591,7 @@ public class NewConcept extends PreviousNextOrCancel {
 
     private void createBlueprintUsPrefRefex(ComponentVersionBI cv) throws ContradictionException {
         try {
-            refexSpecUsPref = new RefexCAB(TK_REFSET_TYPE.CID, cv.getNid(), Ts.get().getNidForUuids(usUuid));
+            refexSpecUsPref = new RefexCAB(TK_REFSET_TYPE.CID, cv.getNid(), Ts.get().getNidForUuids(usUuid), IdDirective.GENERATE_HASH);
             refexSpecUsPref.put(RefexProperty.CNID1, preferredConcept.getNid());
 
             RefexChronicleBI<?> annot = tc.construct(refexSpecUsPref);
@@ -607,7 +608,7 @@ public class NewConcept extends PreviousNextOrCancel {
 
     private void createBlueprintUsAcctRefex(ComponentVersionBI cv) throws ContradictionException {
         try {
-            refexSpecUsAcct = new RefexCAB(TK_REFSET_TYPE.CID, cv.getNid(), Ts.get().getNidForUuids(usUuid));
+            refexSpecUsAcct = new RefexCAB(TK_REFSET_TYPE.CID, cv.getNid(), Ts.get().getNidForUuids(usUuid), IdDirective.GENERATE_HASH);
             refexSpecUsAcct.put(RefexProperty.CNID1,
                     Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
 

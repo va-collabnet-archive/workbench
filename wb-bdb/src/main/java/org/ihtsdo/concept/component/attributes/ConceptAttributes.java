@@ -49,8 +49,9 @@ import java.io.IOException;
 
 import java.util.*;
 import org.ihtsdo.tk.api.blueprint.ConAttrAB;
-import org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 
 public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevision, ConceptAttributes>
         implements I_ConceptAttributeVersioned<ConceptAttributesRevision>,
@@ -345,9 +346,9 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
     }
 
     @Override
-    public ConAttrAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
+    public ConAttrAB makeBlueprint(ViewCoordinate vc, IdDirective idDirective, RefexDirective refexDirective) throws IOException, ContradictionException, InvalidCAB {
         ConAttrAB conAttrBp = new ConAttrAB(getConId(), defined,
-                getVersion(vc), vc);
+                getVersion(vc), vc, refexDirective);
         return conAttrBp;
     }
 
@@ -622,8 +623,8 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
         }
 
         @Override
-        public ConAttrAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB{
-            return getCv().makeBlueprint(vc);
+        public ConAttrAB makeBlueprint(ViewCoordinate vc, IdDirective idDirective, RefexDirective refexDirective) throws IOException, ContradictionException, InvalidCAB{
+            return getCv().makeBlueprint(vc, idDirective, refexDirective);
         }
 
         @Override

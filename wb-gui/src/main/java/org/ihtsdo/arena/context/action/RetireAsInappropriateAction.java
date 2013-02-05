@@ -37,6 +37,7 @@ import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
@@ -277,7 +278,7 @@ public class RetireAsInappropriateAction extends AbstractAction {
             RefexCAB newSpec = new RefexCAB(
                     TK_REFSET_TYPE.CID,
                     analogComponent.getNid(),
-                    refexConcept.getNid());
+                    refexConcept.getNid(), IdDirective.GENERATE_HASH);
             newSpec.put(RefexProperty.CNID1, nid);
             TerminologyBuilderBI tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
                     config.getViewCoordinate());

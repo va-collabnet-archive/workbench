@@ -18,6 +18,7 @@ package org.ihtsdo.batch;
 
 import java.util.Collection;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -70,7 +71,7 @@ public class BatchActionTaskRefsetAddMember extends BatchActionTask {
         }
 
         // If not already a member, then a member record is added.
-        RefexCAB refexSpec = new RefexCAB(refsetType, rcNid, collectionNid);
+        RefexCAB refexSpec = new RefexCAB(refsetType, rcNid, collectionNid, IdDirective.GENERATE_HASH);
         if (refsetType == TK_REFSET_TYPE.BOOLEAN) {
             refexSpec.with(RefexCAB.RefexProperty.BOOLEAN1, (Boolean) refsetValue);
         } else if (refsetType == TK_REFSET_TYPE.CID) {

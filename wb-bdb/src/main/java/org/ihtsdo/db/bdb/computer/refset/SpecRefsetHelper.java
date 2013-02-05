@@ -47,10 +47,10 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
-import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
@@ -429,7 +429,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                 RefexChronicleBI<?> existingMember = (RefexChronicleBI) Ts.get().getComponent(memberUuid);
 
                 RefexVersionBI<?> existingVersion = existingMember.getVersion(config.getViewCoordinate().getVcWithAllStatusValues());
-                RefexCAB bluePrint = existingVersion.makeBlueprint(config.getViewCoordinate());
+                RefexCAB bluePrint = existingVersion.makeBlueprint(config.getViewCoordinate(), IdDirective.PRESERVE, RefexDirective.EXCLUDE);
                 bluePrint.setStatusUuid(SnomedMetadataRfx.getSTATUS_CURRENT().getUuids()[0]);
                 bluePrint.setMemberUuid(memberUuid);
                 builder.constructIfNotCurrent(bluePrint);

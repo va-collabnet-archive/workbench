@@ -38,6 +38,7 @@ import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
 import org.ihtsdo.tk.api.blueprint.DescCAB;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.binding.snomed.Snomed;
@@ -101,6 +102,7 @@ public class NewConcept extends AbstractTask {
                     "new concept",
                     LANG_CODE.EN,
                     Snomed.IS_A.getLenient().getPrimUuid(),
+                    IdDirective.GENERATE_HASH,
                     parentConcept.getPrimUuid());
             
             /*

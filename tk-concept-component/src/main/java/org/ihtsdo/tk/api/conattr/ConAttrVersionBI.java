@@ -5,7 +5,9 @@ import org.ihtsdo.tk.api.AnalogGeneratorBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.blueprint.ConAttrAB;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 public interface ConAttrVersionBI<A extends ConAttrAnalogBI>
@@ -16,5 +18,6 @@ public interface ConAttrVersionBI<A extends ConAttrAnalogBI>
     public boolean isDefined();
     
     @Override
-    public ConAttrAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB;
+    public ConAttrAB makeBlueprint(ViewCoordinate vc, IdDirective idDirective, 
+        RefexDirective refexDirective) throws IOException, ContradictionException, InvalidCAB;
 }

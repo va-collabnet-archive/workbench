@@ -9,6 +9,7 @@ import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
@@ -47,7 +48,7 @@ public class AddDescToRefsetAction extends AbstractAction {
                     config.getViewCoordinate());
             RefexCAB refexBp = new RefexCAB(TK_REFSET_TYPE.CID,
                     desc.getNid(), 
-                    refex.getStrict(config.getViewCoordinate()).getConceptNid());
+                    refex.getStrict(config.getViewCoordinate()).getConceptNid(), IdDirective.GENERATE_HASH);
             refexBp.put(RefexProperty.CNID1, conceptValue.getLenient().getNid());
             if(randomUuid){
                 refexBp.setMemberUuid(UUID.randomUUID());

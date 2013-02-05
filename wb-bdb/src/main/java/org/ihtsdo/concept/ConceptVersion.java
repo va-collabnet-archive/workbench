@@ -20,7 +20,6 @@ import org.ihtsdo.tk.api.NidListBI;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
-import org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
@@ -46,7 +45,6 @@ import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
 import org.ihtsdo.tk.binding.snomed.HistoricalRelType;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.contradiction.FoundContradictionVersions;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.spec.ValidationException;
@@ -66,7 +64,9 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
@@ -105,15 +105,11 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
     }
     
     @Override
-    public ConceptCB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
-        return concept.makeBlueprint(vc);
+    public ConceptCB makeBlueprint(ViewCoordinate vc, IdDirective idDirective,
+            RefexDirective refexDirective) throws IOException, ContradictionException, InvalidCAB {
+        return concept.makeBlueprint(vc, idDirective, refexDirective);
     }
-    
-    @Override
-    public ConceptCB makeBlueprint() throws IOException, ContradictionException, InvalidCAB {
-        return concept.makeBlueprint(vc);
-    }
-    
+        
     @Override
     public void cancel() throws IOException {
         concept.cancel();
