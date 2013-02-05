@@ -70,14 +70,12 @@ public class EnumPropertyKeyHelperTest extends TestCase {
     public void testGetKeyStringInnerEnum() {
         Enum e = DummyClassWithEnum.Fields.JUNK;
         String keyString = EnumPropertyKeyHelper.getKeyString(e);
-        System.out.println(keyString);
         assertEquals("org/ihtsdo/ttk/preferences/DummyClassWithEnum.Fields.JUNK", keyString);
     }
 
     public void testGetKeyStringEnumWithLongName() {
         Enum e = DummyClassWithEnumAndLongLongLongLongLongLongLongLongLongLongName.Fields.JUNK;
         String keyString = EnumPropertyKeyHelper.getKeyString(e);
-        System.out.println(keyString);
         assertEquals("org/ihtsdo/ttk/preferences/a4ca5edd-20d0-35d5-82eb-ece575681f58.JUNK", keyString);
         assertTrue(keyString.length() <= Preferences.MAX_KEY_LENGTH);
     }
