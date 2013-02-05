@@ -13,22 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
-
 package org.ihtsdo.ttk.preferences;
-
-//~--- non-JDK imports --------------------------------------------------------
-
-
-//~--- JDK imports ------------------------------------------------------------
 
 import java.io.IOException;
 import java.io.OutputStream;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -39,26 +29,36 @@ import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
 
 /**
+ * A wrapper around the Java {@link Preferences} which allows a "prefixing"
+ * of user preferences to allow different hierarchical trees of preferences.
+ * This allows different WB versions and/or different WB users to have
+ * their own preferences without interfering with each other.
  *
  * @author kec
+ * @author ocarlsen
  */
 public class EnumBasedPreferences {
-    private Preferences preferences;
-    private String      appPrefix;
 
-    enum FIELDS { CLASS_NAME }
+    private Preferences preferences;
+    private String appPrefix;
+
+    enum FIELDS {
+        CLASS_NAME
+    }
 
     /**
-     *
-     * @param appPrefix Of the form "/" + &lt;app node name&gt;
+     * Create an EnumBasedPreferences with the specified appPrefix.
+     * @param appPrefix A unique string to disambiguate subtrees of preferences.
+     * Otherwise, different WB versions and/or different WB users will
+     * overwrite the preferences of the previous version/user.
      */
     public EnumBasedPreferences(String appPrefix) {
-        this.appPrefix   = appPrefix;
+        this.appPrefix = appPrefix;
         this.preferences = Preferences.userRoot().node(appPrefix);
     }
 
     private EnumBasedPreferences(EnumBasedPreferences enumPref, Preferences preferences) {
-        this.appPrefix   = enumPref.appPrefix;
+        this.appPrefix = enumPref.appPrefix;
         this.preferences = preferences;
     }
 
@@ -72,7 +72,7 @@ public class EnumBasedPreferences {
 
     public Enum getEnum(PreferenceWithDefaultEnumBI key) {
         return valueOf(key.getDefaultValue().getClass(),
-                       preferences.get(EnumPropertyKeyHelper.getKeyString(key), 
+                preferences.get(EnumPropertyKeyHelper.getKeyString(key),
                 ((Enum) key.getDefaultValue()).name()));
     }
 
@@ -162,9 +162,9 @@ public class EnumBasedPreferences {
         this.putInt(key, count);
 
         for (int i = 0; i < count; i++) {
-            String               itemNodeKey = EnumPropertyKeyHelper.getKeyString(key) + "." + i;
-            PreferenceObject     item        = value.get(i);
-            EnumBasedPreferences itemNode    = childNode(itemNodeKey);
+            String itemNodeKey = EnumPropertyKeyHelper.getKeyString(key) + "." + i;
+            PreferenceObject item = value.get(i);
+            EnumBasedPreferences itemNode = childNode(itemNodeKey);
 
             itemNode.preferences.put(EnumPropertyKeyHelper.getKeyString(FIELDS.CLASS_NAME), item.getClass().getName());
             item.exportFields(itemNode);
@@ -172,24 +172,24 @@ public class EnumBasedPreferences {
     }
 
     public List<? extends PreferenceObject> getList(PreferenceWithDefaultEnumBI key) {
-        int                    count = getInt(key);
-        List<PreferenceObject> list  = new ArrayList<>(count);
+        int count = getInt(key);
+        List<PreferenceObject> list = new ArrayList<>(count);
 
         for (int i = 0; i < count; i++) {
             try {
-                String               itemNodeKey = EnumPropertyKeyHelper.getKeyString(key) + "." + i;
-                EnumBasedPreferences itemNode    = childNode(itemNodeKey);
-                String               className   =
-                    itemNode.preferences.get(EnumPropertyKeyHelper.getKeyString(FIELDS.CLASS_NAME), "");
-                Class                itemClass   = Class.forName(className);
-                Constructor          constructor = itemClass.getConstructor(EnumBasedPreferences.class);
-                PreferenceObject     item        = (PreferenceObject) constructor.newInstance(itemNode);
+                String itemNodeKey = EnumPropertyKeyHelper.getKeyString(key) + "." + i;
+                EnumBasedPreferences itemNode = childNode(itemNodeKey);
+                String className =
+                        itemNode.preferences.get(EnumPropertyKeyHelper.getKeyString(FIELDS.CLASS_NAME), "");
+                Class itemClass = Class.forName(className);
+                Constructor constructor = itemClass.getConstructor(EnumBasedPreferences.class);
+                PreferenceObject item = (PreferenceObject) constructor.newInstance(itemNode);
 
                 list.add(item);
             } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
                      | InvocationTargetException | NoSuchMethodException | SecurityException
                      | ClassNotFoundException ex) {
-            Logger.getLogger(EnumBasedPreferences.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(EnumBasedPreferences.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
 
@@ -257,7 +257,7 @@ public class EnumBasedPreferences {
     }
 
     public EnumBasedPreferences node(String pathName) {
-        if (pathName.startsWith("/") &&!pathName.startsWith(appPrefix)) {
+        if (pathName.startsWith("/") && !pathName.startsWith(appPrefix)) {
             pathName = appPrefix + pathName;
         }
 
@@ -265,7 +265,7 @@ public class EnumBasedPreferences {
     }
 
     public boolean nodeExists(String pathName) throws BackingStoreException {
-        if (pathName.startsWith("/") &&!pathName.startsWith(appPrefix)) {
+        if (pathName.startsWith("/") && !pathName.startsWith(appPrefix)) {
             pathName = appPrefix + pathName;
         }
 
