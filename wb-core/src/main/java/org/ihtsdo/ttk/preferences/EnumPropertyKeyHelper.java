@@ -13,15 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
-
 package org.ihtsdo.ttk.preferences;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.nio.charset.Charset;
-
 import java.util.UUID;
 import java.util.prefs.Preferences;
 
@@ -30,45 +24,84 @@ import java.util.prefs.Preferences;
  * @author kec
  */
 public class EnumPropertyKeyHelper {
-    static final Charset charset = Charset.forName("UTF-8");
-    
-    public static String getKeyString(Class<?> key) {
-        String keyString = key.getDeclaringClass().getCanonicalName();
-        if (keyString.length() > Preferences.MAX_KEY_LENGTH) {
-            String prefix = keyString.substring(0, Preferences.MAX_KEY_LENGTH -  40 - key.getDeclaringClass().getSimpleName().length());
-            UUID   uuid   = UUID.nameUUIDFromBytes(key.getDeclaringClass().getCanonicalName().getBytes(charset));
 
-            keyString = prefix + "." + uuid + "." + key.getDeclaringClass().getSimpleName();
+    private static final Charset CHARSET = Charset.forName("UTF-8");
+
+    /**
+     * Calculate a full-length key to be used when storing a preference with
+     * the Java {@link Preferences} API.
+     * <p>
+     * Specificaly, this method will take the package name and replace dots with
+     * slashes, and if the class is an inner class, will replace the dollar sign
+     * with a dot.  For example:
+     * <ul>
+     * <li><code>a.b.c.Class</code> will generate a keyString of <code>a/b/c/Class</code>.</li>
+     * <li><code>a.b.c.Class.Inner</code> will generate a keyString of <code>a/b/c/Class.Inner</code>.</li>
+     * </ul>
+     * Thus a preference added with this key will be inserted hierarchically
+     * with a unique path, and properties for inner classes will be visible at
+     * the same level.
+     *
+     * @param keyClass the {@link Class} to use to generate the key.
+     */
+    public static String getFullKeyString(Class<?> keyClass) {
+        return keyClass.getName().replace('.', '/').replace('$', '.');
+    }
+
+   /**
+     * Helper method to calculate a key to be used by the {@link EnumBasedPreferences}
+     * class.  Contains logic to shorten class name portion of key to a {@link UUID}
+     * if it would otherwise exceed {@link Preferences#MAX_KEY_LENGTH}.
+     *
+     * @param keyClass
+     */
+     public static String getKeyString(Class<?> keyClass) {
+        String keyString = getFullKeyString(keyClass);
+
+        if (keyString.length() > Preferences.MAX_KEY_LENGTH) {
+            keyString = shortenClassNameToUUID(keyClass);
         }
 
         return keyString;
-        
     }
 
+    /**
+     * Helper method to cast the {@code preferenceKey} to an {@link Enum} and
+     * call {@link #getKeyString(java.lang.Enum)}.
+     *
+     * @param preferenceKey
+     */
     public static String getKeyString(PreferenceWithDefaultEnumBI preferenceKey) {
         Enum key = (Enum) preferenceKey;
-        String keyString = key.getDeclaringClass().getCanonicalName() + "." + key.name();
+        return getKeyString(key);
+    }
+
+   /**
+     * Helper method to calculate a key to be used by the {@link EnumBasedPreferences}
+     * class.  Contains logic to shorten class name portion of key to a {@link UUID}
+     * if it would otherwise exceed {@link Preferences#MAX_KEY_LENGTH}.
+     *
+     * @param keyEnum
+     */
+    public static String getKeyString(Enum keyEnum) {
+        String keyString = getFullKeyString(keyEnum.getClass()) + "." + keyEnum.name();
 
         if (keyString.length() > Preferences.MAX_KEY_LENGTH) {
-            String prefix = keyString.substring(0, Preferences.MAX_KEY_LENGTH - key.name().length() - 40 - key.getDeclaringClass().getSimpleName().length());
-            UUID   uuid   = UUID.nameUUIDFromBytes(key.getDeclaringClass().getCanonicalName().getBytes(charset));
-
-            keyString = prefix + "." + uuid + "." + key.getDeclaringClass().getSimpleName() + "." + key.name();
+            keyString = shortenEnumNameToUUID(keyEnum);
         }
 
         return keyString;
     }
-    
-    public static String getKeyString(Enum key) {
-        String keyString = key.getDeclaringClass().getCanonicalName() + "." + key.name();
 
-        if (keyString.length() > Preferences.MAX_KEY_LENGTH) {
-            String prefix = keyString.substring(0, Preferences.MAX_KEY_LENGTH - key.name().length() - 40 - key.getDeclaringClass().getSimpleName().length());
-            UUID   uuid   = UUID.nameUUIDFromBytes(key.getDeclaringClass().getCanonicalName().getBytes(charset));
+    private static String shortenClassNameToUUID(Class<?> keyClass) {
+        String prefix = keyClass.getPackage().getName().replace('.', '/');
+        UUID uuid = UUID.nameUUIDFromBytes(keyClass.getSimpleName().getBytes(CHARSET));
+        return prefix + "/" + uuid;
+    }
 
-            keyString = prefix + "." + uuid + "." + key.getDeclaringClass().getSimpleName() + "." + key.name();
-        }
-
-        return keyString;
+    private static String shortenEnumNameToUUID(Enum keyEnum) {
+        Class enumClass = keyEnum.getClass();
+        String shortKeyString = shortenClassNameToUUID(enumClass);
+        return shortKeyString + "." + keyEnum.name();
     }
 }
