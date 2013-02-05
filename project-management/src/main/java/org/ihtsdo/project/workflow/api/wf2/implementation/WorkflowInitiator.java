@@ -29,6 +29,7 @@ public class WorkflowInitiator implements WorkflowInitiatiorBI {
 	private PropertyChangeEvent myEvt;
 
 	public WorkflowInitiator() {
+		alreadySeen = new NidSet();
 	}
 
 	@Override
