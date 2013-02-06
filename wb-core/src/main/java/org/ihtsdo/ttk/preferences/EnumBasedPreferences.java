@@ -39,10 +39,12 @@ import java.util.prefs.Preferences;
  */
 public class EnumBasedPreferences {
 
+    private static final String PROPERTY_COUNT = "count";
+
     private Preferences preferences;
     private String appPrefix;
 
-    enum FIELDS {
+    enum Fields {
         CLASS_NAME
     }
 
@@ -159,28 +161,32 @@ public class EnumBasedPreferences {
     public <T extends Enum<T>> void putList(PreferenceWithDefaultEnumBI key, List<? extends PreferenceObject> value) {
         int count = value.size();
 
-        this.putInt(key, count);
+        String keyString = EnumPropertyKeyHelper.getKeyString(key);
+        EnumBasedPreferences countNode = childNode(keyString);
+        countNode.preferences.putInt(PROPERTY_COUNT, count);
 
         for (int i = 0; i < count; i++) {
-            String itemNodeKey = EnumPropertyKeyHelper.getKeyString(key) + "." + i;
+            String itemNodeKey = "" + i;
             PreferenceObject item = value.get(i);
-            EnumBasedPreferences itemNode = childNode(itemNodeKey);
+            EnumBasedPreferences itemNode = countNode.childNode(itemNodeKey);
 
-            itemNode.preferences.put(EnumPropertyKeyHelper.getKeyString(FIELDS.CLASS_NAME), item.getClass().getName());
+            itemNode.preferences.put(EnumPropertyKeyHelper.getKeyString(Fields.CLASS_NAME), item.getClass().getName());
             item.exportFields(itemNode);
         }
     }
 
     public List<? extends PreferenceObject> getList(PreferenceWithDefaultEnumBI key) {
-        int count = getInt(key);
+        String keyString = EnumPropertyKeyHelper.getKeyString(key);
+        EnumBasedPreferences countNode = childNode(keyString);
+        int count = countNode.preferences.getInt(PROPERTY_COUNT, (Integer) key.getDefaultValue());
         List<PreferenceObject> list = new ArrayList<>(count);
 
         for (int i = 0; i < count; i++) {
             try {
-                String itemNodeKey = EnumPropertyKeyHelper.getKeyString(key) + "." + i;
-                EnumBasedPreferences itemNode = childNode(itemNodeKey);
+                String itemNodeKey = "" + i;
+                EnumBasedPreferences itemNode = countNode.childNode(itemNodeKey);
                 String className =
-                        itemNode.preferences.get(EnumPropertyKeyHelper.getKeyString(FIELDS.CLASS_NAME), "");
+                        itemNode.preferences.get(EnumPropertyKeyHelper.getKeyString(Fields.CLASS_NAME), "");
                 Class itemClass = Class.forName(className);
                 Constructor constructor = itemClass.getConstructor(EnumBasedPreferences.class);
                 PreferenceObject item = (PreferenceObject) constructor.newInstance(itemNode);
