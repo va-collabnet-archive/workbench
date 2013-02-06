@@ -69,8 +69,8 @@ public class EnumBasedPreferencesTest extends TestCase {
         final QueueType queueType = new QueueType(QueueType.Types.OUTBOX);
         QueuePreferences qp1 = new QueuePreferences(queueDisplayName, queueId, queueDirectory,
                 readInsteadOfTake, queueType);
-        final String queueAddress = "qp2 address";
-        qp1.getServiceItemProperties().add(new QueueAddress(queueAddress));
+        final QueueAddress queueAddress = new QueueAddress("qp2 address");
+        qp1.getServiceItemProperties().add(queueAddress);
 
         // Add QueuePreferences to a QueueList.
         QueueList queueList = new QueueList();
@@ -108,12 +108,13 @@ public class EnumBasedPreferencesTest extends TestCase {
         assertEquals(queueId, resultQP1.getId());
         assertEquals(queueDirectory, resultQP1.getQueueDirectory());
         assertEquals(readInsteadOfTake, resultQP1.getReadInsteadOfTake());
-        assertEquals(2, resultQP1.getServiceItemProperties().size());
 
         // Confirm custom service item properties were preserved.
         List<PreferenceObject> serviceItemProperties = resultQP1.getServiceItemProperties();
         assertEquals(2, serviceItemProperties.size());
         QueueType resultQueueType = (QueueType) serviceItemProperties.get(0);
         assertEquals(queueType, resultQueueType);
+        QueueAddress resultQueueAddress = (QueueAddress) serviceItemProperties.get(1);
+        assertEquals(queueAddress, resultQueueAddress);
     }
 }
