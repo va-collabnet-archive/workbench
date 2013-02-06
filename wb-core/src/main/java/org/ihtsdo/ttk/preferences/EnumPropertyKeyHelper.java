@@ -31,12 +31,12 @@ public class EnumPropertyKeyHelper {
      * Calculate a full-length key to be used when storing a preference with
      * the Java {@link Preferences} API.
      * <p>
-     * Specificaly, this method will take the package name and replace dots with
+     * Specifically, this method will take the package name and replace dots with
      * slashes, and if the class is an inner class, will replace the dollar sign
-     * with a dot.  For example:
+     * with a slash.  For example:
      * <ul>
      * <li><code>a.b.c.Class</code> will generate a keyString of <code>a/b/c/Class</code>.</li>
-     * <li><code>a.b.c.Class.Inner</code> will generate a keyString of <code>a/b/c/Class.Inner</code>.</li>
+     * <li><code>a.b.c.Class.Inner</code> will generate a keyString of <code>a/b/c/Class/Inner</code>.</li>
      * </ul>
      * Thus a preference added with this key will be inserted hierarchically
      * with a unique path, and properties for inner classes will be visible at
@@ -45,7 +45,7 @@ public class EnumPropertyKeyHelper {
      * @param keyClass the {@link Class} to use to generate the key.
      */
     public static String getFullKeyString(Class<?> keyClass) {
-        return keyClass.getName().replace('.', '/').replace('$', '.');
+        return keyClass.getName().replace('.', '/').replace('$', '/');
     }
 
    /**

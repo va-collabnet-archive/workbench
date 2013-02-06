@@ -34,7 +34,7 @@ public class EnumPropertyKeyHelperTest extends TestCase {
     public void testGetKeyStringInnerClass() {
         Class c = DummyClassWithEnum.Fields.class;  // Inner class.
         String keyString = EnumPropertyKeyHelper.getKeyString(c);
-        assertEquals("org/ihtsdo/ttk/preferences/DummyClassWithEnum.Fields", keyString);
+        assertEquals("org/ihtsdo/ttk/preferences/DummyClassWithEnum/Fields", keyString);
     }
 
     public void testGetKeyStringClassWithLongName() {
@@ -70,7 +70,7 @@ public class EnumPropertyKeyHelperTest extends TestCase {
     public void testGetKeyStringInnerEnum() {
         Enum e = DummyClassWithEnum.Fields.JUNK;
         String keyString = EnumPropertyKeyHelper.getKeyString(e);
-        assertEquals("org/ihtsdo/ttk/preferences/DummyClassWithEnum.Fields.JUNK", keyString);
+        assertEquals("org/ihtsdo/ttk/preferences/DummyClassWithEnum/Fields.JUNK", keyString);
     }
 
     public void testGetKeyStringEnumWithLongName() {
