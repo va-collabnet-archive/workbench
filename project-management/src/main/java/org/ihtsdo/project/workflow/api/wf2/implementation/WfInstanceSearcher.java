@@ -59,7 +59,7 @@ public class WfInstanceSearcher extends SwingWorker<List<WfProcessInstanceBI>, W
 				for (WfProcessInstanceBI wfProcessInstanceBI : wfinstances) {
 					boolean apply = true;
 					for (WfFilterBI filter : filters) {
-						if (filter.evaluateInstance(wfProcessInstanceBI)) {
+						if (!filter.evaluateInstance(wfProcessInstanceBI)) {
 							apply = false;
 							break;
 						}

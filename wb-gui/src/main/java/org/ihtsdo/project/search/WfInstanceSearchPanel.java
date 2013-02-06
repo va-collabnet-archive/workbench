@@ -138,10 +138,6 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
 				propertyChangeListener.progressBar.setIndeterminate(false);
 				searchButton.setVisible(true);
 				stopButton.setVisible(false);
-			}else{
-				propertyChangeListener.progressBar.setIndeterminate(false);
-				searchButton.setVisible(true);
-				stopButton.setVisible(false);
 			}
 		} catch (Exception e2) {
 			propertyChangeListener.progressBar.setIndeterminate(false);
@@ -167,6 +163,8 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
 		public void propertyChange(PropertyChangeEvent evt) {
 			if (evt.getNewValue().equals(SwingWorker.StateValue.DONE)) {
 				progressBar.setIndeterminate(false);
+				searchButton.setVisible(true);
+				stopButton.setVisible(false);
 			}
 		}
 

@@ -32,12 +32,15 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.filter.WfDestinationFilter;
 import org.ihtsdo.project.filter.WfProjectFilter;
+import org.ihtsdo.project.filter.WfStateFilter;
 import org.ihtsdo.project.filter.WfWorklistFilter;
 import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkSet;
+import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.tk.workflow.api.WfFilterBI;
+import org.ihtsdo.tk.workflow.api.WfStateBI;
 import org.ihtsdo.tk.workflow.api.WfUserBI;
 import org.ihtsdo.tk.workflow.api.WorkListBI;
 
@@ -66,6 +69,7 @@ public class SearchFilterPanel extends JPanel {
 		filterTypeCombo.addItem(new WfDestinationFilter());
 		filterTypeCombo.addItem(new WfWorklistFilter());
 		filterTypeCombo.addItem(new WfProjectFilter());
+		filterTypeCombo.addItem(new WfStateFilter());
 	}
 
 	private void addButtonActionPerformed(ActionEvent e) {
@@ -82,6 +86,8 @@ public class SearchFilterPanel extends JPanel {
 			return new WfDestinationFilter((WfUser) filterCombo.getSelectedItem());
 		} else if (filterObject instanceof WorkList) {
 			return new WfWorklistFilter(((WorkList) filterCombo.getSelectedItem()).getUuid());
+		} else if (filterObject instanceof WfState) {
+			return new WfStateFilter((WfState) filterCombo.getSelectedItem());
 		} else {
 			return null;
 		}
@@ -96,7 +102,14 @@ public class SearchFilterPanel extends JPanel {
 				for (WfUserBI wfUserBI : fitlerOptions) {
 					filterCombo.addItem(wfUserBI);
 				}
-			} else if (e.getItem() instanceof WfWorklistFilter) {
+			} else if(e.getItem() instanceof WfStateFilter){
+				filterCombo.removeAllItems();
+				WfStateFilter sf = (WfStateFilter) e.getItem();
+				List<WfStateBI> states = sf.getFilterOptions();
+				for (WfStateBI wfStateBI : states) {
+					filterCombo.addItem(wfStateBI);
+				}
+			}else if (e.getItem() instanceof WfWorklistFilter) {
 				filterCombo.removeAllItems();
 				try {
 					I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
@@ -135,7 +148,6 @@ public class SearchFilterPanel extends JPanel {
 		}
 	}
 
-	
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
