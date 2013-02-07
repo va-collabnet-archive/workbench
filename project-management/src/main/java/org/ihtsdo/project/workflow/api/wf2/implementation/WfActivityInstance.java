@@ -1,5 +1,7 @@
 package org.ihtsdo.project.workflow.api.wf2.implementation;
 
+import java.sql.Date;
+
 import org.ihtsdo.tk.workflow.api.WfActivityInstanceBI;
 import org.ihtsdo.tk.workflow.api.WfStateBI;
 import org.ihtsdo.tk.workflow.api.WfUserBI;
@@ -44,6 +46,11 @@ public class WfActivityInstance implements WfActivityInstanceBI {
 	@Override
 	public boolean automaticAction() {
 		return this.automaticAction;
+	}
+
+	@Override
+	public String toString() {
+		return state.getName() + " - " + author.getName() + " - " + new Date(time);
 	}
 
 }
