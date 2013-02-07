@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.UUID;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
+import static org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint.getComponentUUID;
 import static org.ihtsdo.tk.api.blueprint.IdDirective.GENERATE_HASH;
 import static org.ihtsdo.tk.api.blueprint.IdDirective.GENERATE_RANDOM;
 import static org.ihtsdo.tk.api.blueprint.IdDirective.GENERATE_RANDOM_CONCEPT_REST_HASH;
@@ -88,7 +89,7 @@ public class MediaCAB extends CreateOrAmendBlueprint {
             ViewCoordinate vc,
             IdDirective idDirective,
             RefexDirective refexDirective) throws IOException, InvalidCAB, ContradictionException {
-        super(componentUuid, media, vc, idDirective, refexDirective);
+        super(getComponentUUID(componentUuid,media,idDirective), media, vc, idDirective, refexDirective);
 
         this.conceptUuid = conceptUuid;
         this.typeUuid = typeUuid;
@@ -111,9 +112,10 @@ public class MediaCAB extends CreateOrAmendBlueprint {
     @Override
     public void recomputeUuid() throws NoSuchAlgorithmException, IOException, InvalidCAB, ContradictionException {
         switch (idDirective) {
+            case PRESERVE_CONCEPT_REST_HASH:
             case GENERATE_RANDOM_CONCEPT_REST_HASH:
             case GENERATE_HASH:
-            case GENERATE_NON_STANDARD_REFEX_HASH:
+            case GENERATE_REFEX_CONTENT_HASH:
                 setComponentUuidNoRecompute(UuidT5Generator.get(mediaSpecNamespace,
                     getPrimoridalUuidStr(conceptUuid)
                     + dataBytes));

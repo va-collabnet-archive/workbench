@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
 import static org.ihtsdo.tk.api.blueprint.IdDirective.GENERATE_HASH;
-import static org.ihtsdo.tk.api.blueprint.IdDirective.GENERATE_NON_STANDARD_REFEX_HASH;
+import static org.ihtsdo.tk.api.blueprint.IdDirective.GENERATE_REFEX_CONTENT_HASH;
 import static org.ihtsdo.tk.api.blueprint.IdDirective.GENERATE_RANDOM;
 import static org.ihtsdo.tk.api.blueprint.IdDirective.PRESERVE;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -65,7 +65,6 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
     private int usRefexNid = SnomedMetadataRfx.getUS_DIALECT_REFEX_NID();
     private int gbRefexNid = SnomedMetadataRfx.getGB_DIALECT_REFEX_NID();
     private Collection<UUID> parents = new TreeSet<UUID>() {
-
         @Override
         public boolean add(UUID e) {
             boolean result = super.add(e);
@@ -104,7 +103,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
             LANG_CODE lang,
             UUID isaType,
             IdDirective idDirective,
-            UUID... parents) throws IOException, InvalidCAB, ContradictionException{
+            UUID... parents) throws IOException, InvalidCAB, ContradictionException {
         super(null, null, null, idDirective, RefexDirective.EXCLUDE);
         this.fsns.add(fullySpecifiedName);
         this.fullySpecifiedName = fullySpecifiedName; //@akf todo: these should be removed when NewConcept, etc. is upated
@@ -124,7 +123,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
             LANG_CODE lang,
             UUID isaType,
             IdDirective idDirective,
-            UUID... parents) throws IOException, InvalidCAB, ContradictionException{
+            UUID... parents) throws IOException, InvalidCAB, ContradictionException {
         super(null, null, null, idDirective, RefexDirective.EXCLUDE);
         this.fsns = fullySpecifiedNames;
         this.prefNames = preferredNames;
@@ -137,7 +136,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
         computeComponentUuid();
     }
 
-    public ConceptCB(ConceptVersionBI cv, UUID newConceptUuid, 
+    public ConceptCB(ConceptVersionBI cv, UUID newConceptUuid,
             IdDirective idDirective, RefexDirective refexDirective) throws IOException, ContradictionException, InvalidCAB {
         super(null, cv, cv.getViewCoordinate(), idDirective, refexDirective);
         pcs.addPropertyChangeListener(this);
@@ -203,22 +202,39 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
     }
 
     public final void computeComponentUuid() throws RuntimeException {
-        try {
-            StringBuilder sb = new StringBuilder();
-            List<String> descs = new ArrayList<String>();
-            descs.addAll(fsns);
-            descs.addAll(prefNames);
-            java.util.Collections.sort(descs);
-            for (String desc : descs) {
-                sb.append(desc);
-            }
-            setComponentUuid(
-                    UuidT5Generator.get(conceptSpecNamespace,
-                    sb.toString()));
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        } catch (NoSuchAlgorithmException ex) {
-            throw new RuntimeException(ex);
+        switch (idDirective) {
+            case GENERATE_HASH:
+            case GENERATE_REFEX_CONTENT_HASH:
+                StringBuilder sb = new StringBuilder();
+                List<String> descs = new ArrayList<String>();
+                descs.addAll(fsns);
+                descs.addAll(prefNames);
+                java.util.Collections.sort(descs);
+                for (String desc : descs) {
+                    sb.append(desc);
+                }
+                try {
+                    setComponentUuid(
+                            UuidT5Generator.get(conceptSpecNamespace,
+                            sb.toString()));
+                } catch (NoSuchAlgorithmException ex) {
+                    throw new RuntimeException(ex);
+                } catch (UnsupportedEncodingException ex) {
+                    throw new RuntimeException(ex);
+                }
+                break;
+                
+            case GENERATE_RANDOM:
+            case GENERATE_RANDOM_CONCEPT_REST_HASH:
+                setComponentUuid(UUID.randomUUID());
+                break;
+                
+            case PRESERVE_CONCEPT_REST_HASH:
+            case PRESERVE:
+                default:
+                    // nothing to generate. 
+                
+
         }
     }
 
@@ -227,7 +243,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
             IOException, InvalidCAB, ContradictionException {
         switch (idDirective) {
             case GENERATE_HASH:
-            case GENERATE_NON_STANDARD_REFEX_HASH:
+            case GENERATE_REFEX_CONTENT_HASH:
                 computeComponentUuid();
                 break;
             case GENERATE_RANDOM:
@@ -235,13 +251,14 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
                 setComponentUuidNoRecompute(UUID.randomUUID());
                 break;
 
+            case PRESERVE_CONCEPT_REST_HASH:
             case PRESERVE:
             default:
             // nothing to do...
 
         }
-        
-        
+
+
         for (DescCAB descBp : getDescCABs()) {
             descBp.setConceptUuid(getComponentUuid());
             descBp.recomputeUuid();
@@ -520,10 +537,10 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
         List<RelCAB> parentCABs = getParentCABs();
 //        if (relCABs.size() != parentCABs.size()) {
 //            relCABs.clear();
-            for (RelCAB parentBp : parentCABs) {
-                if(!relCABs.contains(parentBp)){
-                     relCABs.add(parentBp);
-                }
+        for (RelCAB parentBp : parentCABs) {
+            if (!relCABs.contains(parentBp)) {
+                relCABs.add(parentBp);
+            }
 //            }
         }
         return relCABs;

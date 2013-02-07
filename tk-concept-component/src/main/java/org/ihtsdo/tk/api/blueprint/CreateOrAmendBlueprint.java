@@ -63,6 +63,22 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
     };
     protected IdDirective idDirective;
     protected RefexDirective refexDirective;
+    
+    protected static UUID getComponentUUID(UUID componentUuid, 
+            ComponentVersionBI cv, IdDirective idDirective) {
+        if (componentUuid != null) {
+            return componentUuid;
+        }
+        switch (idDirective) {
+            case GENERATE_RANDOM:
+                return UUID.randomUUID();
+            case PRESERVE:
+                if (cv != null) {
+                    return cv.getPrimUuid();
+                }
+        }
+        return null;
+    }
 
     public synchronized void removePropertyChangeListener(String string, PropertyChangeListener pl) {
         pcs.removePropertyChangeListener(string, pl);
@@ -98,6 +114,9 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
         }
         statusUuid = currentStatusUuid;
         this.componentUuid = componentUuid;
+        if (idDirective == IdDirective.PRESERVE) {
+            this.componentUuid = cv.getPrimUuid();
+        }
         this.cv = cv;
         this.vc = vc;
         this.idDirective = idDirective;
@@ -114,7 +133,7 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent pce) {
         try {
-            if (!pce.getPropagationId().equals(lastPropigationId)) {
+            if (pce.getSource() != this && !pce.getPropagationId().equals(lastPropigationId)) {
                 lastPropigationId = pce.getPropagationId();
                 recomputeUuid();
             }

@@ -21,6 +21,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
@@ -30,7 +31,7 @@ import org.ihtsdo.tk.uuid.UuidT5Generator;
  *
  * @author kec
  */
-public class DescCAB extends CreateOrAmendBlueprint {
+public final class DescCAB extends CreateOrAmendBlueprint {
 
     public static final UUID descSpecNamespace =
             UUID.fromString("457e4a20-5284-11e0-b8af-0800200c9a66");
@@ -84,7 +85,7 @@ public class DescCAB extends CreateOrAmendBlueprint {
             DescriptionVersionBI dv, ViewCoordinate vc,
             IdDirective idDirective,
             RefexDirective refexDirective) throws IOException, InvalidCAB, ContradictionException {
-        super(componentUuid, dv, vc, idDirective, refexDirective);
+        super(getComponentUUID(componentUuid,dv,idDirective), dv, vc, idDirective, refexDirective);
 
         this.conceptUuid = conceptUuid;
         this.lang = lang.getFormatedLanguageNoDialectCode();
@@ -108,9 +109,10 @@ public class DescCAB extends CreateOrAmendBlueprint {
     public void recomputeUuid() throws NoSuchAlgorithmException, UnsupportedEncodingException,
             IOException, InvalidCAB, ContradictionException {
         switch (idDirective) {
+            case PRESERVE_CONCEPT_REST_HASH:
             case GENERATE_RANDOM_CONCEPT_REST_HASH:
             case GENERATE_HASH:
-            case GENERATE_NON_STANDARD_REFEX_HASH:
+            case GENERATE_REFEX_CONTENT_HASH:
                 setComponentUuid(UuidT5Generator.get(descSpecNamespace,
                         getPrimoridalUuidStr(conceptUuid)
                         + typeUuid

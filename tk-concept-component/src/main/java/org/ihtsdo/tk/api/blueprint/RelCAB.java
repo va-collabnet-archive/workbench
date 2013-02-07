@@ -24,7 +24,7 @@ import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import static org.ihtsdo.tk.api.blueprint.DescCAB.descSpecNamespace;
 import static org.ihtsdo.tk.api.blueprint.IdDirective.GENERATE_HASH;
-import static org.ihtsdo.tk.api.blueprint.IdDirective.GENERATE_NON_STANDARD_REFEX_HASH;
+import static org.ihtsdo.tk.api.blueprint.IdDirective.GENERATE_REFEX_CONTENT_HASH;
 import static org.ihtsdo.tk.api.blueprint.IdDirective.GENERATE_RANDOM;
 import static org.ihtsdo.tk.api.blueprint.IdDirective.GENERATE_RANDOM_CONCEPT_REST_HASH;
 import static org.ihtsdo.tk.api.blueprint.IdDirective.PRESERVE;
@@ -160,9 +160,10 @@ public class RelCAB extends CreateOrAmendBlueprint {
     @Override
     public void recomputeUuid() throws NoSuchAlgorithmException, UnsupportedEncodingException, IOException, InvalidCAB, ContradictionException{
         switch (idDirective) {
+            case PRESERVE_CONCEPT_REST_HASH:
             case GENERATE_RANDOM_CONCEPT_REST_HASH:
             case GENERATE_HASH:
-            case GENERATE_NON_STANDARD_REFEX_HASH:
+            case GENERATE_REFEX_CONTENT_HASH:
                 setComponentUuidNoRecompute(UuidT5Generator.get(relSpecNamespace,
                         getPrimoridalUuidStr(sourceUuid)
                         + getPrimoridalUuidStr(typeUuid)

@@ -83,7 +83,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
     }
 
     public UUID setMemberContentUuid() throws InvalidCAB, IOException {
-        this.idDirective = IdDirective.GENERATE_NON_STANDARD_REFEX_HASH;
+        this.idDirective = IdDirective.GENERATE_REFEX_CONTENT_HASH;
         UUID memberContentUuid = computeMemberContentUuid();
         properties.put(RefexProperty.MEMBER_UUID, memberContentUuid);
         return memberContentUuid;
@@ -134,11 +134,12 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      */
     public void recomputeUuid() throws InvalidCAB, IOException, ContradictionException {
         switch (idDirective) {
+            case PRESERVE_CONCEPT_REST_HASH:
             case GENERATE_RANDOM_CONCEPT_REST_HASH:
             case GENERATE_HASH:
                 setComponentUuidNoRecompute(computeMemberComponentUuid());
                 break;
-            case GENERATE_NON_STANDARD_REFEX_HASH:
+            case GENERATE_REFEX_CONTENT_HASH:
                 setComponentUuidNoRecompute(computeMemberContentUuid());
                 break;
             case GENERATE_RANDOM:
