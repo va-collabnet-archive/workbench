@@ -2,6 +2,8 @@ package org.ihtsdo.project.workflow.api.wf2.implementation;
 
 import java.beans.PropertyChangeEvent;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CancellationException;
 
@@ -23,19 +25,31 @@ import org.ihtsdo.tk.workflow.api.WorkflowStoreBI;
 
 public class WorkflowInitiator implements WorkflowInitiatiorBI {
 	
-	public static NidSet alreadySeen;
+	public static Map<Integer,NidSet> alreadySeen;
 	private static ConceptChronicleBI rootConcept;
 	private static WorkflowStoreBI wfStore;
 	private PropertyChangeEvent myEvt;
 
 	public WorkflowInitiator() {
-		alreadySeen = new NidSet();
+		alreadySeen = new HashMap<Integer,NidSet>();
 	}
 
 	@Override
 	public boolean evaluateForWorkflowInitiation(
 			PropertyChangeEvent event) throws Exception {
 		myEvt = event;
+		
+		I_GetConceptData workflow = Terms.get().getActiveAceFrameConfig().getDefaultWorkflowForChangedConcept();
+		final Integer workflowNid;
+		if (workflow == null) {
+			workflowNid = 0;
+		} else {
+			workflowNid = workflow.getNid();
+		}
+		
+		if (alreadySeen.get(workflowNid) == null) {
+			alreadySeen.put(workflowNid, new NidSet());
+		}
 		
 		SwingUtilities.invokeLater(new Runnable() {
 			synchronized
@@ -47,8 +61,8 @@ public class WorkflowInitiator implements WorkflowInitiatiorBI {
 						NidBitSetItrBI possibleItr = idSet.iterator();
 
 						while (possibleItr.next()) {
-							if (!alreadySeen.contains(possibleItr.nid())) {
-								alreadySeen.add(possibleItr.nid());
+							if (!alreadySeen.get(workflowNid).contains(possibleItr.nid())) {
+								alreadySeen.get(workflowNid).add(possibleItr.nid());
 								concept=Ts.get().getConcept(possibleItr.nid());
 								if (concept!=null){
 									System.out.println("Sending to workflow: " + concept.toString());
