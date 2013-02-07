@@ -34,6 +34,7 @@ import java.util.logging.Level;
 
 import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -52,6 +53,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 
+import org.apache.commons.lang.WordUtils;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -402,11 +404,34 @@ public class ConceptViewRenderer extends JLayeredPane {
 							WfUser wfUser = wcp.getUserByUUID(user.getPrimUuid());
 							Collection<WfProcessInstanceBI> incompleteProcessInstances = ws.getIncompleteProcessInstances(concept.getPrimUuid());
 							for (WfProcessInstanceBI wfProcessInstanceBI : incompleteProcessInstances) {
-								separateor();
+								separator();
+								JPanel instancePanel = new JPanel();
+								JPanel instancePanelRow1 = new JPanel();
+								instancePanelRow1.setLayout(new FlowLayout());
+								JPanel instancePanelRow2 = new JPanel();
+								instancePanelRow2.setLayout(new FlowLayout());
+								
+								instancePanel.setLayout(new BoxLayout(instancePanel, BoxLayout.Y_AXIS));
+								instancePanel.add(instancePanelRow1);
+								instancePanel.add(instancePanelRow2);
+								
 								Collection<WfActivityBI> activities = ws.getActivities(wfProcessInstanceBI, wfUser);
-								termmedWorkflowSetup(activities, wfProcessInstanceBI.getWorkList(), wfProcessInstanceBI);
+								
+								JComboBox<WfActivityBI> jcombo = new JComboBox<WfActivityBI>();
+								for (WfActivityBI wfActivityBI : activities) {
+									jcombo.addItem(wfActivityBI);
+								}
+								JButton advanceWorkflowButton = new JButton("GO");
+								advanceWorkflowButton.addActionListener(new MyActionLIstner(jcombo, wfProcessInstanceBI));
+								JLabel worklistName = new JLabel(WordUtils.capitalize(wfProcessInstanceBI.getWorkList().getName()) + ": ");
+								JLabel stateName = new JLabel(WordUtils.capitalize(wfProcessInstanceBI.getState().getName()));
+								instancePanelRow1.add(worklistName);
+								instancePanelRow1.add(stateName);
+								instancePanelRow2.add(jcombo);
+								instancePanelRow2.add(advanceWorkflowButton);
+								conceptWorkflowPanel.add(instancePanel);
 							}
-							separateor();
+							separator();
 						}
 					} catch (Exception e1) {
 						AceLog.getAppLog().log(Level.WARNING, "Error in setting up Workflow with error: " + e1.getMessage());
@@ -537,25 +562,12 @@ public class ConceptViewRenderer extends JLayeredPane {
 				}
 			}
 
-			private void separateor() {
+			private void separator() {
 				JSeparator comp = new JSeparator();
 				comp.setPreferredSize(new Dimension(500, 10));
 				conceptWorkflowPanel.add(comp);
 			}
 
-			private void termmedWorkflowSetup(Collection<WfActivityBI> activities, WorkListBI workList, WfProcessInstanceBI wfProcessInstanceBI) {
-				JComboBox<WfActivityBI> jcombo = new JComboBox<WfActivityBI>();
-				for (WfActivityBI wfActivityBI : activities) {
-					jcombo.addItem(wfActivityBI);
-				}
-				JButton advanceWorkflowButton = new JButton("GO");
-				advanceWorkflowButton.addActionListener(new MyActionLIstner(jcombo, wfProcessInstanceBI));
-				JLabel worklistName = new JLabel(workList.getName());
-				conceptWorkflowPanel.add(worklistName);
-				conceptWorkflowPanel.add(jcombo);
-				conceptWorkflowPanel.add(advanceWorkflowButton);
-				
-			}
 			class MyActionLIstner implements ActionListener {
 				private JComboBox<WfActivityBI> combo;
 				private WfProcessInstanceBI wfInstance;

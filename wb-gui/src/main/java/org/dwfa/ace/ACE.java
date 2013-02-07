@@ -1042,7 +1042,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
 				// INPUT SELECTION
 
-				JPanel             projectChangedConceptSubpanel = new JPanel(new GridBagLayout());
+				JPanel projectChangedConceptSubpanel = new JPanel(new GridBagLayout());
 
 				projectChangedConceptSubpanel.setBorder(BorderFactory.createTitledBorder(" Default configuration for changes review "));
 				GridBagConstraints gbcCC                         = new GridBagConstraints();
@@ -1070,6 +1070,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 					e2.printStackTrace();
 				}
 				JComboBox projectCCSelectCombo = new JComboBox();
+				
 				if (projectsCC!=null){
 					for (ProjectBI proj:projectsCC){
 						I_GetConceptData conceptTmp;
@@ -1081,7 +1082,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 						}
 					}
 				}
+				
 				projectChangedConceptSubpanel.add(projectCCSelectCombo, gbcCC);
+				
 				projectCCSelectCombo.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
@@ -1112,7 +1115,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 							}
 							I_GetConceptData worklistConcept=aceFrameConfig.getDefaultWorkflowForChangedConcept();
 							if (worklistConcept!=null){
-
 								worklistCCSelectCombo.setSelectedItem(worklistConcept);
 							}
 						}
@@ -1136,7 +1138,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 				worklistCCSelectCombo.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						JComboBox                  cb       = (JComboBox) e.getSource();
+						JComboBox cb = (JComboBox) e.getSource();
 
 						I_GetConceptData workList = (I_GetConceptData) cb.getSelectedItem();
 						aceFrameConfig.setDefaultWorkflowForChangedConcept(workList);
@@ -1149,6 +1151,11 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
 				if (projectCConcept!=null){
 					projectCCSelectCombo.setSelectedItem(projectCConcept);
+				}
+				
+				I_GetConceptData worklistConcept=aceFrameConfig.getDefaultWorkflowForChangedConcept();
+				if (worklistConcept!=null){
+					worklistCCSelectCombo.setSelectedItem(worklistConcept);
 				}
 
 				return projectPrefPanel;
