@@ -27,7 +27,9 @@ import javax.swing.table.DefaultTableModel;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.log.AceLog;
+import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WfInstanceContainer;
+import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.workflow.api.WfProcessInstanceBI;
@@ -218,7 +220,7 @@ public class WorkflowInstanceTableModel extends DefaultTableModel implements WfI
 			rowToadd[WORKFLOW_FIELD.FSN.getColumnNumber()] = wisr.getFsn();
 			rowToadd[WORKFLOW_FIELD.EDITOR.getColumnNumber()] = wisr.getModeler();
 			rowToadd[WORKFLOW_FIELD.STATE.getColumnNumber()] = wisr.getState();
-			rowToadd[WORKFLOW_FIELD.TIMESTAMP.getColumnNumber()] = wisr.getTime();
+			rowToadd[WORKFLOW_FIELD.TIMESTAMP.getColumnNumber()] = TimeHelper.formatDate(wisr.getTime());
 			addRow(rowToadd);
 		} catch (Exception ex) {
 		}
