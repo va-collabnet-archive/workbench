@@ -100,8 +100,8 @@ public class WfDestinationFilter implements WfFilterBI {
 		return "Destination";
 	}
 
-	public List<WfUserBI> getFilterOptions() {
-		List<WfUserBI> users = new ArrayList<WfUserBI>();
+	public List<WfUser> getFilterOptions() {
+		List<WfUser> users = new ArrayList<WfUser>();
 		users.addAll(new WfComponentProvider().getUsers());
 		return users;
 	}

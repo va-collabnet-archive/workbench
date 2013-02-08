@@ -24,7 +24,7 @@ import org.ihtsdo.tk.workflow.api.WfStateBI;
 /**
  * The Class WfState.
  */
-public class WfState implements Serializable, WfStateBI {
+public class WfState implements Serializable, WfStateBI, Comparable<WfState>{
 
 	/** The name. */
 	private String name;
@@ -111,6 +111,11 @@ public class WfState implements Serializable, WfStateBI {
 	@Override
 	public UUID getUuid() {
 		return getId();
+	}
+
+	@Override
+	public int compareTo(WfState o) {
+		return this.name.compareTo(o.getName());
 	}
 
 }

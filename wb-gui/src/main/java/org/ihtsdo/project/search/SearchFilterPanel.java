@@ -4,9 +4,6 @@
 
 package org.ihtsdo.project.search;
 
-import java.awt.ComponentOrientation;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -15,15 +12,14 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSeparator;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -35,6 +31,7 @@ import org.ihtsdo.project.filter.WfProjectFilter;
 import org.ihtsdo.project.filter.WfStateFilter;
 import org.ihtsdo.project.filter.WfWorklistFilter;
 import org.ihtsdo.project.model.I_TerminologyProject;
+import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkSet;
 import org.ihtsdo.project.workflow.model.WfState;
@@ -42,7 +39,6 @@ import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.tk.workflow.api.WfFilterBI;
 import org.ihtsdo.tk.workflow.api.WfStateBI;
 import org.ihtsdo.tk.workflow.api.WfUserBI;
-import org.ihtsdo.tk.workflow.api.WorkListBI;
 
 /**
  * @author Guillermo Reynoso
@@ -98,14 +94,16 @@ public class SearchFilterPanel extends JPanel {
 			if (e.getItem() instanceof WfDestinationFilter) {
 				filterCombo.removeAllItems();
 				WfDestinationFilter df = (WfDestinationFilter) e.getItem();
-				List<WfUserBI> fitlerOptions = df.getFilterOptions();
+				List<WfUser> fitlerOptions = df.getFilterOptions();
+				Collections.sort(fitlerOptions);
 				for (WfUserBI wfUserBI : fitlerOptions) {
 					filterCombo.addItem(wfUserBI);
 				}
 			} else if(e.getItem() instanceof WfStateFilter){
 				filterCombo.removeAllItems();
 				WfStateFilter sf = (WfStateFilter) e.getItem();
-				List<WfStateBI> states = sf.getFilterOptions();
+				List<WfState> states = sf.getFilterOptions();
+				Collections.sort(states);
 				for (WfStateBI wfStateBI : states) {
 					filterCombo.addItem(wfStateBI);
 				}
@@ -118,6 +116,7 @@ public class SearchFilterPanel extends JPanel {
 						List<WorkSet> worksets = TerminologyProjectDAO.getAllWorkSetsForProject(i_TerminologyProject, config);
 						for (WorkSet workSet : worksets) {
 							List<WorkList> worklists = TerminologyProjectDAO.getAllWorklistForWorkset(workSet, config);
+							Collections.sort(worklists);
 							for (WorkList workList : worklists) {
 								filterCombo.addItem(workList);
 							}
@@ -132,9 +131,10 @@ public class SearchFilterPanel extends JPanel {
 				filterCombo.removeAllItems();
 				try {
 					I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-					List<I_TerminologyProject> projects = TerminologyProjectDAO.getAllProjects(config);
-					for (I_TerminologyProject i_TerminologyProject : projects) {
-						filterCombo.addItem(i_TerminologyProject);
+					List<TranslationProject> projects = TerminologyProjectDAO.getAllTranslationProjects(config);
+					Collections.sort(projects);
+					for (TranslationProject project : projects) {
+						filterCombo.addItem(project);
 					}
 				} catch (TerminologyException e1) {
 					e1.printStackTrace();

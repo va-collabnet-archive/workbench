@@ -29,7 +29,7 @@ import org.ihtsdo.tk.workflow.api.WfUserBI;
 /**
  * The Class WfUser.
  */
-public class WfUser implements Serializable, WfUserBI {
+public class WfUser implements Serializable, WfUserBI, Comparable<WfUser> {
 
 	/** The username. */
 	private String username;
@@ -174,6 +174,11 @@ public class WfUser implements Serializable, WfUserBI {
 	public Collection<WfPermissionBI> getPermissions(ProjectBI project) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public int compareTo(WfUser o) {
+		return this.username.compareTo(o.getUsername());
 	}
 
 }

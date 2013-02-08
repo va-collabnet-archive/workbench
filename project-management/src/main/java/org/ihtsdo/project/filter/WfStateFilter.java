@@ -97,8 +97,8 @@ public class WfStateFilter implements WfFilterBI {
 		return "State";
 	}
 
-	public List<WfStateBI> getFilterOptions() {
-		List<WfStateBI> users = new ArrayList<WfStateBI>();
+	public List<WfState> getFilterOptions() {
+		List<WfState> users = new ArrayList<WfState>();
 		users.addAll(new WfComponentProvider().getAllStates());
 		return users;
 	}
