@@ -376,4 +376,9 @@ public class TranslationProject implements I_TerminologyProject, Serializable, C
 	public int compareTo(TranslationProject o) {
 		return this.name.compareTo(o.getName());
 	}
+
+	@Override
+	public Type getProjectType() {
+		return Type.TRANSLATION;
+	}
 }

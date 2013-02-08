@@ -26,6 +26,12 @@ import org.dwfa.ace.api.I_GetConceptData;
  * The Interface I_TerminologyProject.
  */
 public interface I_TerminologyProject {
+	
+	public enum Type {
+	    TERMINOLOGY, TRANSLATION, MAPPING 
+	}
+	
+	public Type getProjectType();
 
 	/**
 	 * Gets the name.

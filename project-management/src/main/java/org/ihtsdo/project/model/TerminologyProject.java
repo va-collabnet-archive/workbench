@@ -134,6 +134,11 @@ public class TerminologyProject implements I_TerminologyProject, Serializable {
 	public List<WorkSet> getWorkSets(I_ConfigAceFrame config) {
 		return TerminologyProjectDAO.getAllWorkSetsForProject(this, config);
 	}
+
+	@Override
+	public Type getProjectType() {
+		return Type.TERMINOLOGY;
+	}
 	
 //	/**
 //	 * Gets the exclusion refsets.
