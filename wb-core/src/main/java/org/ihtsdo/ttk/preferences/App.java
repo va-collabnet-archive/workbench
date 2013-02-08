@@ -23,10 +23,10 @@ public class App {
     public static void main(String[] args)
             throws Exception {
 
-        final String appName = "org.kp:cmt-pa";  // TODO: Use ${groupId}, ${artifactId} from Maven during build.
+        final String appId = "org.kp:cmt-pa";  // TODO: Use ${groupId}, ${artifactId} from Maven during build.
         final String userName = "ocarlsen";      // TODO: Get from application.
         final String version = "1.0-SNAPHOT";    // TODO: Use ${version} from Maven during build.
-        final String appPrefix = appName + ":" + userName + "/" + version;
+        final String appPrefix = appId + ":" + userName + "/" + version;
 
         // Check args to try different scenarios.
         int argCount = args.length;
