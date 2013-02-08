@@ -166,7 +166,7 @@ public class InstanceActivitiesPanel extends JPanel {
 		protected boolean isWorklist(Object value) {
 			DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
 			Object nodeInfo = (Object) (node.getUserObject());
-			if (nodeInfo instanceof WorkList) {
+			if (nodeInfo instanceof WorkListBI) {
 				return true;
 			}
 			return false;

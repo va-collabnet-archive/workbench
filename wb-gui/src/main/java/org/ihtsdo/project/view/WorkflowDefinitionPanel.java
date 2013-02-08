@@ -30,6 +30,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -497,6 +498,11 @@ public class WorkflowDefinitionPanel extends JPanel {
 		saveFile();
 	}
 
+	protected void closeButtonActionPerformed(ActionEvent e) {
+		this.getParent().remove(this);
+		this.invalidate();
+	}
+
 	private boolean saveFile() {
 		if (removeButton.getText().equals("Cancel")) {
 			JOptionPane.showMessageDialog(this, "Before save, please finish Action edition or creation.");
@@ -507,9 +513,9 @@ public class WorkflowDefinitionPanel extends JPanel {
 			selStates = new ArrayList<WfState>();
 			for (int i = 0; i < rolesTable.getRowCount(); i++) {
 				if (((Boolean) rolesTable.getValueAt(i, 0)) == true) {
-					if(rolesHash.get((String) rolesTable.getValueAt(i, 1)) != null){
+					if (rolesHash.get((String) rolesTable.getValueAt(i, 1)) != null) {
 						selRoles.add(rolesHash.get((String) rolesTable.getValueAt(i, 1)));
-					}else{
+					} else {
 						System.out.println("Warning: roles not present");
 					}
 				}
@@ -563,19 +569,6 @@ public class WorkflowDefinitionPanel extends JPanel {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
 		panel1 = new JPanel();
-		label1 = new JLabel();
-		wfDefs = new JComboBox();
-		wfDefs.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent e) {
-				wfDefsItemStateChanged(e);
-			}
-		});
-		addWfDef = new JButton();
-		addWfDef.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				addWfActionPreformed(e);
-			}
-		});
 		panel2 = new JPanel();
 		saveButton = new JButton();
 		saveButton.addActionListener(new ActionListener() {
@@ -603,20 +596,53 @@ public class WorkflowDefinitionPanel extends JPanel {
 		// ======== this ========
 		setBorder(new EmptyBorder(5, 5, 5, 5));
 		setLayout(new BorderLayout());
+		GridBagLayout gbl_panel1 = new GridBagLayout();
+		gbl_panel1.columnWidths = new int[] { 133, 153, 75, 0, 79, 0 };
+		gbl_panel1.rowHeights = new int[] { 29, 0 };
+		gbl_panel1.columnWeights = new double[] { 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE };
+		gbl_panel1.rowWeights = new double[] { 0.0, Double.MIN_VALUE };
+		panel1.setLayout(gbl_panel1);
+		addWfDef = new JButton();
+		addWfDef.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				addWfActionPreformed(e);
+			}
+		});
+		label1 = new JLabel();
+
+		// ---- label1 ----
+		label1.setText("Workflow Definitions");
+		GridBagConstraints gbc_label1 = new GridBagConstraints();
+		gbc_label1.anchor = GridBagConstraints.WEST;
+		gbc_label1.insets = new Insets(0, 0, 0, 5);
+		gbc_label1.gridx = 0;
+		gbc_label1.gridy = 0;
+		panel1.add(label1, gbc_label1);
+		wfDefs = new JComboBox();
+		wfDefs.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				wfDefsItemStateChanged(e);
+			}
+		});
 
 		// ======== panel1 ========
 		{
-			panel1.setLayout(new FlowLayout(FlowLayout.LEFT, 2, 2));
-
-			// ---- label1 ----
-			label1.setText("Workflow Definitions");
-			panel1.add(label1);
-			panel1.add(wfDefs);
-
-			// ---- addWfDef ----
-			addWfDef.setText("Add");
-			panel1.add(addWfDef);
+			GridBagConstraints gbc_wfDefs = new GridBagConstraints();
+			gbc_wfDefs.fill = GridBagConstraints.HORIZONTAL;
+			gbc_wfDefs.insets = new Insets(0, 0, 0, 5);
+			gbc_wfDefs.gridx = 1;
+			gbc_wfDefs.gridy = 0;
+			panel1.add(wfDefs, gbc_wfDefs);
 		}
+
+		// ---- addWfDef ----
+		addWfDef.setText("Add");
+		GridBagConstraints gbc_addWfDef = new GridBagConstraints();
+		gbc_addWfDef.anchor = GridBagConstraints.WEST;
+		gbc_addWfDef.insets = new Insets(0, 0, 0, 5);
+		gbc_addWfDef.gridx = 2;
+		gbc_addWfDef.gridy = 0;
+		panel1.add(addWfDef, gbc_addWfDef);
 		add(panel1, BorderLayout.NORTH);
 
 		// ======== panel2 ========
@@ -632,6 +658,15 @@ public class WorkflowDefinitionPanel extends JPanel {
 			panel2.add(revertButton);
 		}
 		add(panel2, BorderLayout.SOUTH);
+
+		btnClose = new JButton("Close");
+		btnClose.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				closeButtonActionPerformed(e);
+			}
+		});
+		panel2.add(btnClose);
+		btnClose.setHorizontalAlignment(SwingConstants.RIGHT);
 
 		// ======== panel3 ========
 		{
@@ -885,5 +920,6 @@ public class WorkflowDefinitionPanel extends JPanel {
 	private JPanel panel;
 	private JLabel lblRoles;
 	private JLabel lblStates;
+	private JButton btnClose;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 }
