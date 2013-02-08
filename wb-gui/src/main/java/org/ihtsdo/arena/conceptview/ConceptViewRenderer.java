@@ -72,6 +72,7 @@ import org.ihtsdo.project.view.details.WorkflowInterperterInitWorker;
 import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.api.WorkflowInterpreter;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WfActivity;
+import org.ihtsdo.project.workflow.api.wf2.implementation.WfProcessDefinition;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WorkflowStore;
 import org.ihtsdo.project.workflow.model.WfAction;
 import org.ihtsdo.project.workflow.model.WfInstance;
@@ -422,7 +423,7 @@ public class ConceptViewRenderer extends JLayeredPane {
 									jcombo.addItem(wfActivityBI);
 								}
 								JButton advanceWorkflowButton = new JButton("GO");
-								advanceWorkflowButton.addActionListener(new MyActionLIstner(jcombo, wfProcessInstanceBI));
+								advanceWorkflowButton.addActionListener(new WorkflowActionListener(jcombo, wfProcessInstanceBI));
 								JLabel worklistName = new JLabel(WordUtils.capitalize(wfProcessInstanceBI.getWorkList().getName()) + ": ");
 								JLabel stateName = new JLabel(WordUtils.capitalize(wfProcessInstanceBI.getState().getName()));
 								instancePanelRow1.add(worklistName);
@@ -568,11 +569,11 @@ public class ConceptViewRenderer extends JLayeredPane {
 				conceptWorkflowPanel.add(comp);
 			}
 
-			class MyActionLIstner implements ActionListener {
+			class WorkflowActionListener implements ActionListener {
 				private JComboBox<WfActivityBI> combo;
 				private WfProcessInstanceBI wfInstance;
 				
-				public MyActionLIstner(JComboBox<WfActivityBI> combo, WfProcessInstanceBI wfInstance) {
+				public WorkflowActionListener(JComboBox<WfActivityBI> combo, WfProcessInstanceBI wfInstance) {
 					this.combo = combo;
 					this.wfInstance = wfInstance;
 				}
@@ -587,6 +588,13 @@ public class ConceptViewRenderer extends JLayeredPane {
 						WfActivity action = (WfActivity) combo.getSelectedItem();
 
 						action.perform(wfInstance);
+						
+						WorkflowInterpreter wi = WorkflowInterpreter.createWorkflowInterpreter(((WfProcessDefinition)wfInstance.getProcessDefinition()).getDefinition());
+						WfUser nextDestination = wi.getNextDestination((WfInstance)wfInstance, (WorkList) wfInstance.getWorkList());
+						
+						if (nextDestination != null) {
+							wfInstance.setAssignedUser(wfUser);
+						}
 
 						WorkflowStore ws = new WorkflowStore();
 						Collection<WfActivityBI> activities = ws.getActivities(wfInstance, wfUser);
