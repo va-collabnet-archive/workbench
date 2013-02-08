@@ -23,9 +23,10 @@ public class App {
     public static void main(String[] args)
             throws Exception {
 
-        final String version = "org.kp:cmt-pa:1.0-SNAPHOT";  // TODO: Get from Maven during build.
-        final String userName = "ocarlsen";  // TODO: Get from application.
-        final String appPrefix = version + ":" + userName;
+        final String appName = "org.kp:cmt-pa";  // TODO: Use ${groupId}, ${artifactId} from Maven during build.
+        final String userName = "ocarlsen";      // TODO: Get from application.
+        final String version = "1.0-SNAPHOT";    // TODO: Use ${version} from Maven during build.
+        final String appPrefix = appName + ":" + userName + "/" + version;
 
         // Check args to try different scenarios.
         int argCount = args.length;
@@ -45,6 +46,8 @@ public class App {
         queueList.exportFields(prefs);
         prefs.exportSubtree(new FileOutputStream(fileName));
 
+        // Clean up.
+        prefs = prefs.parent();  // Walk back up to appName node.
         prefs.removeNode();
         prefs.flush();
     }
