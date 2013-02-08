@@ -80,7 +80,7 @@ public class App {
         System.out.println(queueList);
 
         QueuePreferences qp1 = new QueuePreferences();
-        queueList.getQueueList().add(qp1);
+        queueList.getQueuePreferences().add(qp1);
         System.out.println(queueList);
 
         QueuePreferences qp2 = new QueuePreferences();
@@ -88,7 +88,7 @@ public class App {
         qp2.getServiceItemProperties().clear();
         qp2.getServiceItemProperties().add(new QueueAddress("qp2 address"));
         qp2.getServiceItemProperties().add(new QueueType(QueueType.Types.OUTBOX));
-        queueList.getQueueList().add(qp2);
+        queueList.getQueuePreferences().add(qp2);
         System.out.println(queueList);
 
         return queueList;

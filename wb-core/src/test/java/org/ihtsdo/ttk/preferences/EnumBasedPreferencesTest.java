@@ -74,8 +74,8 @@ public class EnumBasedPreferencesTest extends TestCase {
 
         // Add QueuePreferences to a QueueList.
         QueueList queueList = new QueueList();
-        queueList.getQueueList().add(qp0);
-        queueList.getQueueList().add(qp1);
+        queueList.getQueuePreferences().add(qp0);
+        queueList.getQueuePreferences().add(qp1);
 
         // Export to preferences.
         queueList.exportFields(testPrefs);
@@ -88,7 +88,7 @@ public class EnumBasedPreferencesTest extends TestCase {
 
         // Now look up the QueueList and confirm its QueuePreferences were saved.
         QueueList resultQueueList = new QueueList(testPrefs);
-        List<QueuePreferences> resultQueuePreferences = resultQueueList.getQueueList();
+        List<QueuePreferences> resultQueuePreferences = resultQueueList.getQueuePreferences();
         assertEquals(2, resultQueuePreferences.size());
 
         // Confirm default settings for QueuePreferences #0 were preserved.

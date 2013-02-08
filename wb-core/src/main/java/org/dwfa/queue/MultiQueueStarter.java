@@ -39,7 +39,7 @@ public class MultiQueueStarter {
 
         
         QueueList queueList = new QueueList(new EnumBasedPreferences(args[0]));
-        for (QueuePreferences queuePreferences : queueList.getQueueList()) {
+        for (QueuePreferences queuePreferences : queueList.getQueuePreferences()) {
             processQueue(queuePreferences);
         }
 

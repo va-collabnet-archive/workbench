@@ -34,12 +34,12 @@ import java.util.List;
  * @author kec
  */
 public class QueueList implements PreferenceObject {
-    List<QueuePreferences> queueList = new ArrayList();
+    List<QueuePreferences> queuePreferences = new ArrayList();
 
     public QueueList() {}
 
     public QueueList(EnumBasedPreferences preferences) {
-        queueList = (List<QueuePreferences>) preferences.getList(Fields.QUEUE_LIST);
+        queuePreferences = (List<QueuePreferences>) preferences.getList(Fields.QUEUE_LIST);
     }
 
     public enum Fields implements PreferenceWithDefaultEnumBI {
@@ -53,15 +53,15 @@ public class QueueList implements PreferenceObject {
 
     @Override
     public String toString() {
-        return "QueueList: " + queueList;
+        return "QueueList: " + queuePreferences;
     }
 
-    public List<QueuePreferences> getQueueList() {
-        return queueList;
+    public List<QueuePreferences> getQueuePreferences() {
+        return queuePreferences;
     }
 
     @Override
     public void exportFields(EnumBasedPreferences preferences) {
-        preferences.putList(Fields.QUEUE_LIST, queueList);
+        preferences.putList(Fields.QUEUE_LIST, queuePreferences);
     }
 }
