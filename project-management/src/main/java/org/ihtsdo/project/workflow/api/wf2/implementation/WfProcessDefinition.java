@@ -65,14 +65,20 @@ public class WfProcessDefinition implements WfProcessDefinitionBI {
 
 	@Override
 	public boolean isCompleteState(WfStateBI state) {
-		// TODO Auto-generated method stub
-		return false;
+		if (state.getName().startsWith("Approved") || state.getName().startsWith("Cancel")) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	@Override
 	public boolean isPromoteState(WfStateBI state) {
-		// TODO Auto-generated method stub
-		return false;
+		if (state.getName().startsWith("Approved")) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	/**

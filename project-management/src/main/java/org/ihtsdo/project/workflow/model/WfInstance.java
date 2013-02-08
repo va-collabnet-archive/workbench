@@ -401,12 +401,20 @@ public class WfInstance implements Serializable, WfProcessInstanceBI {
 
 	@Override
 	public boolean isActive() {
-		return true;
+		if (status.getName().startsWith("Approved") || status.getName().startsWith("Cancel")) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 
 	@Override
 	public boolean isCompleted() {
-		return false;
+		if (status.getName().startsWith("Approved") || status.getName().startsWith("Cancel")) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	/**
@@ -459,8 +467,11 @@ public class WfInstance implements Serializable, WfProcessInstanceBI {
 
 	@Override
 	public boolean isPromoted() {
-		// TODO Auto-generated method stub
-		return false;
+		if (status.getName().startsWith("Approved")) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 }
