@@ -33,6 +33,12 @@ import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContradictionException;
+import static org.ihtsdo.tk.api.blueprint.IdDirective.GENERATE_HASH;
+import static org.ihtsdo.tk.api.blueprint.IdDirective.GENERATE_RANDOM;
+import static org.ihtsdo.tk.api.blueprint.IdDirective.GENERATE_RANDOM_CONCEPT_REST_HASH;
+import static org.ihtsdo.tk.api.blueprint.IdDirective.GENERATE_REFEX_CONTENT_HASH;
+import static org.ihtsdo.tk.api.blueprint.IdDirective.PRESERVE;
+import static org.ihtsdo.tk.api.blueprint.IdDirective.PRESERVE_CONCEPT_REST_HASH;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
@@ -210,8 +216,28 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
                 if (cv.getCurrentRefexes(vc) != null) {
                     Collection<? extends RefexVersionBI<?>> originalRefexes = cv.getCurrentRefexes(vc);
                     if (!originalRefexes.isEmpty()) {
-                        for (RefexVersionBI refex : originalRefexes) {
-                            annotations.add(refex.makeBlueprint(vc, IdDirective.PRESERVE, RefexDirective.INCLUDE));
+                            IdDirective refexIdDirective = idDirective;
+                            switch (idDirective) {
+                                case GENERATE_RANDOM:
+                                case GENERATE_HASH:
+                                case GENERATE_RANDOM_CONCEPT_REST_HASH:
+                                case PRESERVE_CONCEPT_REST_HASH:
+                                    idDirective = IdDirective.GENERATE_HASH;
+                                    break;
+                                    
+                                case GENERATE_REFEX_CONTENT_HASH:
+                                    idDirective = IdDirective.GENERATE_REFEX_CONTENT_HASH;
+                                    break;
+                                case PRESERVE:
+                                    idDirective = IdDirective.PRESERVE;
+                                    break;
+                                
+                            }
+                        for (RefexVersionBI refex : originalRefexes) { 
+                            RefexCAB refexCab = refex.makeBlueprint(vc, refexIdDirective, refexDirective);
+                            refexCab.setReferencedComponentUuid(this.componentUuid);
+                            refexCab.recomputeUuid();
+                            annotations.add(refexCab);
                         }
                     }
                 }
