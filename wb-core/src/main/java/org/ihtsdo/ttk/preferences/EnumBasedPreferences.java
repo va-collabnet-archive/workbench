@@ -50,9 +50,9 @@ public class EnumBasedPreferences {
 
     /**
      * Create an EnumBasedPreferences with the specified appPrefix.
-     * @param appPrefix A unique string to disambiguate subtrees of preferences.
      * Otherwise, different WB versions and/or different WB users will
      * overwrite the preferences of the previous version/user.
+     * @param appPrefix A unique string to disambiguate subtrees of preferences.
      */
     public EnumBasedPreferences(String appPrefix) {
         this.appPrefix = appPrefix;
