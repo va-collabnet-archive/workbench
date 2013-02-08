@@ -15,21 +15,6 @@
  */
 package org.ihtsdo.bdb.mojo;
 
-import java.awt.Color;
-import java.io.*;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-import java.util.UUID;
-import java.util.logging.Level;
-
-import javax.swing.JOptionPane;
-
-
 import org.apache.lucene.document.Document;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -47,8 +32,6 @@ import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
-import org.ihtsdo.tk.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.*;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
@@ -74,13 +57,29 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
+import org.ihtsdo.tk.api.cs.ChangeSetWriterThreading;
 import org.ihtsdo.tk.binding.snomed.*;
 import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipType;
 import org.ihtsdo.tk.spec.ConceptSpec;
+import org.ihtsdo.tk.spec.ValidationException;
 import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetSearcher;
 import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetWriter;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
+
+import java.awt.Color;
+import java.io.*;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+import java.util.UUID;
+import java.util.logging.Level;
+import javax.swing.JOptionPane;
 
 /**
  * Goal which generated the users for the application.
@@ -117,7 +116,7 @@ public class GenerateUsersExtended extends AbstractMojo {
      */
     private File relPermissionsFile;
     /**
-     * 
+     *
      * @parameter expression="${project.build.directory}/users"
      */
     private File defaultUserConfig;
@@ -426,313 +425,43 @@ public class GenerateUsersExtended extends AbstractMojo {
             if (create) {
                 createdUsers = true;
                 if (userConfigList.equals("")) {
+                	
                     userConfigFile = new File(defaultUserConfig + File.separator + "userConfig.txt");
                     readUserConfigFile();
+                    
                     userConfig = newProfile(fullname, username, password, adminUsername,
                         adminPassword);
+                    
                 } else {
                     String[] userConfigs = userConfigList.split(",");
                     for (int i = userConfigs.length - 1; i >= 0; i--) {
+                    	
                         userConfigFile = new File(defaultUserConfig + File.separator + userConfigs[i].trim());
                         readUserConfigFile();
+                        
                         if (userConfig == null) { //create new
-                            File userQueueRoot = new File(wbBundleDir, "queues" + File.separator + username);
 
                             userConfig = newProfile(fullname, username, password, adminUsername,
                                     adminPassword);
-                            userConfig.getDbConfig().setProfileFile(userProfile);
-                            UUID moduleUuid = module.getLenient().getPrimUuid();
-                            userConfig.setModuleNid(Ts.get().getNidForUuids(moduleUuid));
-                            Terms.get().setActiveAceFrameConfig(userConfig);
 
-                            //setup changesets
-                            File changeSetRoot = new File(userDir, "changesets");
-                            getLog().info("** Changeset root: " + changeSetRoot.getAbsolutePath());
-                            changeSetRoot.mkdirs();
-
-                            I_ConfigAceDb newDbProfile = userConfig.getDbConfig();
-                            File absoluteChangeSetRoot = new File(wbBundleDir, "profiles/user-creation-changesets");
-
-                            newDbProfile.setChangeSetRoot(changeSetRoot);
-                            getLog().info("** Changeset root from db config: " + newDbProfile.getChangeSetRoot().getAbsolutePath());
-                            getLog().info("** absoluteChangeSetRoot: " + absoluteChangeSetRoot.getAbsolutePath());
-                            newDbProfile.setChangeSetWriterFileName(userConfig.getUsername() + "#1#"
-                                    + UUID.randomUUID().toString() + ".eccs");
-                            newDbProfile.setUsername(userConfig.getUsername());
-
-                            String tempKey = UUID.randomUUID().toString();
-                            ChangeSetGeneratorBI generator =
-                                    Ts.get().createDtoChangeSetGenerator(new File(absoluteChangeSetRoot, newDbProfile.getChangeSetWriterFileName()), new File(absoluteChangeSetRoot, "#0#"
-                                    + newDbProfile.getChangeSetWriterFileName()), ChangeSetGenerationPolicy.MUTABLE_ONLY);
-                            List<ChangeSetGeneratorBI> extraGeneratorList = new ArrayList<>();
-
-                            extraGeneratorList.add(generator);
-                            Ts.get().addChangeSetGenerator(tempKey, generator);
-
-
-                            //make user paths
-                            if (makeUserDevPath) {
-                                if (!username.equals("username")) {
-                                    UUID editParentPathUuid = null;
-                                    if (!projectDevelopmentParentPathUuid.equals("")) {
-                                        editParentPathUuid = UUID.fromString(projectDevelopmentParentPathUuid);
-                                    } else {
-                                        editParentPathUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
-                                                projectDevelopmentParentPathFsn);
-                                    }
-                                    UUID editOriginPathUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
-                                            projectDevelopmentOriginPathFsn);
-                                    UUID originFromDevPathUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
-                                            hasDevPathAsOriginPathFsn);
-                                    PathBI editPath = null;
-                                    ConceptCB newEditPathBp = new ConceptCB(username + " dev path",
-                                            username + " dev path",
-                                            LANG_CODE.EN,
-                                            TermAux.IS_A.getLenient().getPrimUuid(),
-                                            editParentPathUuid);
-                                    UUID userDevPathUuid = newEditPathBp.getComponentUuid();
-                                    if (Ts.get().hasUuid(userDevPathUuid)) {
-                                        editPath = Ts.get().getPath(Ts.get().getNidForUuids(userDevPathUuid));
-                                    } else {
-                                        RefexCAB pathRefexBp = new RefexCAB(TK_REFEX_TYPE.CID,
-                                                TermAux.PATH.getLenient().getConceptNid(),
-                                                RefsetAux.PATH_REFSET.getLenient().getNid());
-                                        pathRefexBp.put(RefexCAB.RefexProperty.UUID1, newEditPathBp.getComponentUuid());
-                                        pathRefexBp.setMemberUuid(UUID.randomUUID());
-
-                                        RefexCAB pathOriginRefexBp = new RefexCAB(TK_REFEX_TYPE.CID_INT,
-                                                newEditPathBp.getComponentUuid(),
-                                                RefsetAux.PATH_ORIGIN_REFEST.getLenient().getNid(), null, null);
-                                        pathOriginRefexBp.put(RefexCAB.RefexProperty.UUID1, editOriginPathUuid);
-                                        pathOriginRefexBp.put(RefexCAB.RefexProperty.INTEGER1, Integer.MAX_VALUE);
-                                        pathRefexBp.setMemberUuid(UUID.randomUUID());
-
-                                        RefexCAB pathOriginRefexOtherBp = new RefexCAB(TK_REFEX_TYPE.CID_INT,
-                                                originFromDevPathUuid,
-                                                RefsetAux.PATH_ORIGIN_REFEST.getLenient().getNid(), null, null);
-                                        pathOriginRefexOtherBp.put(RefexCAB.RefexProperty.UUID1, newEditPathBp.getComponentUuid());
-                                        pathOriginRefexOtherBp.put(RefexCAB.RefexProperty.INTEGER1, Integer.MAX_VALUE);
-                                        pathOriginRefexOtherBp.setMemberUuid(UUID.randomUUID());
-                                        TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(Ts.get().getMetadataEditCoordinate(),
-                                                Ts.get().getMetadataViewCoordinate());
-                                        PathCB pathBp = new PathCB(newEditPathBp,
-                                                pathRefexBp,
-                                                pathOriginRefexBp,
-                                                pathOriginRefexOtherBp,
-                                                Ts.get().getConcept(editOriginPathUuid));
-                                        editPath = builder.construct(pathBp);
-                                    }
-
-                                    userConfig.addEditingPath(editPath);
-                                    userConfig.setColorForPath(editPath.getConceptNid(), new Color(128, 128, 128));
-                                }
+                            if (! processUser(username, userUuid, userDir, userProfile, false)) {
+                            	return false;
                             }
 
-                            if (username != null) {
-                                if (userConfig.getAddressesList().contains(username) == false) {
-                                    userConfig.getAddressesList().add(username);
-                                }
-                            }
-
-                            userQueueRoot.mkdirs();
-
-                            if (userParentConceptName != null && parentConcept == null) {
-                                ConceptCB parentConceptBp = new ConceptCB(
-                                        userParentConceptName,
-                                        userParentConceptName,
-                                        LANG_CODE.EN_US,
-                                        TermAux.IS_A.getLenient().getPrimUuid(),
-                                        TermAux.USER.getLenient().getPrimUuid());
-                                UUID parentConceptUuid = parentConceptBp.getComponentUuid();
-                                if (Ts.get().hasUuid(parentConceptUuid)) {
-                                    parentConcept = Ts.get().getConcept(parentConceptUuid);
-                                } else {
-                                    TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(
-                                            Ts.get().getMetadataEditCoordinate(),
-                                            Ts.get().getMetadataViewCoordinate());
-                                    parentConcept = builder.construct(parentConceptBp);
-                                    Ts.get().addUncommitted(parentConcept);
-                                    Ts.get().commit();
-                                }
-                            } else if (parentConcept == null) {
-                                ConceptSpec userParent = new ConceptSpec("user",
-                                        UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c"));
-                                parentConcept = Ts.get().getConcept(userParent.getLenient().getPrimUuid());
-                            }
-
-                            // Create new concept for user...
-                            if (userUuid == null || userUuid.equals("")) {
-                                createUser();
-                            } else {
-                                setUserConcept(userUuid);
-                                addWfRelIfDoesNotExist(userUuid);
-                            }
-
-
-                            List<AlertToDataConstraintFailure> errorsAndWarnings = Terms.get().getCommitErrorsAndWarnings();
-
-                            if (errorsAndWarnings.size() > 0) {
-                                AceLog.getAppLog().warning(errorsAndWarnings.toString());
-                                Terms.get().cancel();
-
-                                return false;
-                            }
-
-                            try {
-                                Terms.get().commit();
-                            } catch (Exception e) {
-                                throw new MojoExecutionException(e.getLocalizedMessage(), e);
-                            } finally {
-                                Ts.get().removeChangeSetGenerator(tempKey);
-                            }
-
-
-                            // Create inbox
-                            createInbox(userConfig, userConfig.getUsername() + ".inbox", userQueueRoot,
-                                    userConfig.getUsername() + ".inbox");
-
-                            // Create todo box
-                            createInbox(userConfig, userConfig.getUsername() + ".todo", userQueueRoot,
-                                    userConfig.getUsername() + ".inbox");
-
-                            // Create outbox box
-                            createOutbox(userConfig, userConfig.getUsername() + ".outbox", userQueueRoot,
-                                    userConfig.getUsername() + ".inbox");
-
-                            getLog().info("** Before write: " + userConfig.getDbConfig().getUserConcept());
-                            File test = userConfig.getDbConfig().getProfileFile();
-                            getLog().info("** User Profile File: " + test.getAbsolutePath());
-                            FileOutputStream fos = new FileOutputStream(userConfig.getDbConfig().getProfileFile());
-                            ObjectOutputStream oos = new ObjectOutputStream(fos);
-                            I_ConfigAceDb dbConfig = userConfig.getDbConfig();
-                            oos.writeObject(userConfig.getDbConfig());
-                            oos.close();
                         } else {
                             updateConfig();
-                            getLog().info("** Before write: " + userConfig.getDbConfig().getUserConcept());
-                            File test = userConfig.getDbConfig().getProfileFile();
-                            getLog().info("** User Profile File: " + test.getAbsolutePath());
-                            FileOutputStream fos = new FileOutputStream(userConfig.getDbConfig().getProfileFile());
-                            ObjectOutputStream oos = new ObjectOutputStream(fos);
-                            I_ConfigAceDb dbConfig = userConfig.getDbConfig();
-                            oos.writeObject(userConfig.getDbConfig());
-                            oos.close();
                         }
+                        
+                        writeConfig();
                     }
                     return true;
                 }
 
-                File userQueueRoot = new File(wbBundleDir, "queues" + File.separator + username);
-
-                userConfig.getDbConfig().setProfileFile(userProfile);
-                UUID moduleUuid = module.getLenient().getPrimUuid();
-                userConfig.setModuleNid(Ts.get().getNidForUuids(moduleUuid));
-                Terms.get().setActiveAceFrameConfig(userConfig);
-
-                File changeSetRoot = new File(userDir, "changesets");
-                getLog().info("** Changeset root: " + changeSetRoot.getAbsolutePath());
-                changeSetRoot.mkdirs();
-
-                I_ConfigAceDb newDbProfile = userConfig.getDbConfig();
-                File absoluteChangeSetRoot = new File(wbBundleDir, "profiles/user-creation-changesets");
-
-                newDbProfile.setChangeSetRoot(changeSetRoot);
-                getLog().info("** Changeset root from db config: " + newDbProfile.getChangeSetRoot().getAbsolutePath());
-                getLog().info("** absoluteChangeSetRoot: " + absoluteChangeSetRoot.getAbsolutePath());
-                newDbProfile.setChangeSetWriterFileName(userConfig.getUsername() + "#1#"
-                        + UUID.randomUUID().toString() + ".eccs");
-                newDbProfile.setUsername(userConfig.getUsername());
-
-                String tempKey = UUID.randomUUID().toString();
-                ChangeSetGeneratorBI generator =
-                        Ts.get().createDtoChangeSetGenerator(new File(absoluteChangeSetRoot, newDbProfile.getChangeSetWriterFileName()), new File(absoluteChangeSetRoot, "#0#"
-                        + newDbProfile.getChangeSetWriterFileName()), ChangeSetGenerationPolicy.MUTABLE_ONLY);
-                List<ChangeSetGeneratorBI> extraGeneratorList = new ArrayList<ChangeSetGeneratorBI>();
-
-                extraGeneratorList.add(generator);
-                Ts.get().addChangeSetGenerator(tempKey, generator);
-
-                if (userParentConceptName != null && parentConcept == null) {
-                    UUID parentConceptUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, userParentConceptName);
-                    if (Ts.get().hasUuid(parentConceptUuid)) {
-                        parentConcept = Ts.get().getConcept(parentConceptUuid);
-                    } else {
-                        ConceptCB parentConceptBp = new ConceptCB(
-                                userParentConceptName,
-                                userParentConceptName,
-                                LANG_CODE.EN_US,
-                                TermAux.IS_A.getLenient().getPrimUuid(),
-                                TermAux.USER.getLenient().getPrimUuid());
-                        TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(
-                                Ts.get().getMetadataEditCoordinate(),
-                                Ts.get().getMetadataViewCoordinate());
-                        parentConcept = builder.construct(parentConceptBp);
-                        Ts.get().addUncommitted(parentConcept);
-                        Ts.get().commit();
-                    }
-                } else if (parentConcept == null) {
-                    ConceptSpec userParent = new ConceptSpec("user",
-                            UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c"));
-                    parentConcept = Ts.get().getConcept(userParent.getLenient().getPrimUuid());
+                if (! processUser(username, userUuid, userDir, userProfile, true)) {
+                	return false;
                 }
-
-                if (username != null) {
-                    if (userConfig.getAddressesList().contains(username) == false) {
-                        userConfig.getAddressesList().add(username);
-                    }
-                }
-
-                userQueueRoot.mkdirs();
-
-                // Create new concept for user...
-                if (userUuid == null || userUuid.equals("")) {
-                    createUser();
-                } else {
-                    setUserConcept(userUuid);
-                    addWfRelIfDoesNotExist(userUuid);
-                }
-
-
-                List<AlertToDataConstraintFailure> errorsAndWarnings = Terms.get().getCommitErrorsAndWarnings();
-
-                if (errorsAndWarnings.size() > 0) {
-                    AceLog.getAppLog().warning(errorsAndWarnings.toString());
-                    Terms.get().cancel();
-
-                    return false;
-                }
-
-
-
-                try {
-                    Terms.get().commit();
-                } catch (Exception e) {
-                    throw new MojoExecutionException(e.getLocalizedMessage(), e);
-                } finally {
-                    Ts.get().removeChangeSetGenerator(tempKey);
-                }
-
-
-                // Create inbox
-                createInbox(userConfig, userConfig.getUsername() + ".inbox", userQueueRoot,
-                        userConfig.getUsername() + ".inbox");
-
-                // Create todo box
-                createInbox(userConfig, userConfig.getUsername() + ".todo", userQueueRoot,
-                        userConfig.getUsername() + ".inbox");
-
-                // Create outbox box
-                createOutbox(userConfig, userConfig.getUsername() + ".outbox", userQueueRoot,
-                        userConfig.getUsername() + ".inbox");
-
-                getLog().info("** Before write: " + userConfig.getDbConfig().getUserConcept());
-                File test = userConfig.getDbConfig().getProfileFile();
-                getLog().info("** User Profile File: " + test.getAbsolutePath());
-                FileOutputStream fos = new FileOutputStream(userConfig.getDbConfig().getProfileFile());
-                ObjectOutputStream oos = new ObjectOutputStream(fos);
-
-                oos.writeObject(userConfig.getDbConfig());
-                oos.close();
+                
+                writeConfig();
             }
 
             return true;
@@ -740,6 +469,231 @@ public class GenerateUsersExtended extends AbstractMojo {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }
     }
+
+	private boolean processUser(String username, String userUuid, File userDir,
+			File userProfile, boolean getUuidFromFactory)
+			throws ValidationException, IOException, TerminologyException,
+			NoSuchAlgorithmException, UnsupportedEncodingException, InvalidCAB,
+			ContradictionException, MojoExecutionException, Exception {
+		setActiveFrameConfig(userProfile);
+
+		//setup changesets
+		String tempKey = setupChangeSetsAndAddChangeSetGenerator(userDir);
+
+		//make user paths?
+		if (makeUserDevPath) {
+		    makeUserDevPaths(username);
+		}
+
+		// Create user parent concept.
+		if (userParentConceptName != null && parentConcept == null) {
+		    createUserParentConcept(getUuidFromFactory);
+		} else if (parentConcept == null) {
+		    createDefaultUserParentConcept();
+		}
+
+		addUserToAddressList(username);
+
+		File userQueueRoot = new File(wbBundleDir, "queues" + File.separator + username);
+		getLog().info("** userQueueRoot: " + userQueueRoot.getAbsolutePath());
+		userQueueRoot.mkdirs();
+
+		// Create new concept for user...
+		if (userUuid == null || userUuid.equals("")) {
+		    createUser();
+		} else {
+		    setUserConcept(userUuid);
+		    addWfRelIfDoesNotExist(userUuid);
+		}
+
+		List<AlertToDataConstraintFailure> errorsAndWarnings = Terms.get().getCommitErrorsAndWarnings();
+
+		if (errorsAndWarnings.size() > 0) {
+		    AceLog.getAppLog().warning(errorsAndWarnings.toString());
+		    Terms.get().cancel();
+
+		    return false;
+		}
+
+		try {
+		    Terms.get().commit();
+		} catch (Exception e) {
+		    throw new MojoExecutionException(e.getLocalizedMessage(), e);
+		} finally {
+		    Ts.get().removeChangeSetGenerator(tempKey);
+		}
+
+		createQueues(userQueueRoot);
+		
+		return true;
+	}
+
+	private void createUserParentConcept(boolean getUuidFromFactory)
+			throws NoSuchAlgorithmException, UnsupportedEncodingException,
+			IOException, InvalidCAB, ContradictionException,
+			ValidationException {
+		
+		// Default parent concept blueprint.
+	    ConceptCB parentConceptBp = new ConceptCB(
+	            userParentConceptName,
+	            userParentConceptName,
+	            LANG_CODE.EN_US,
+	            TermAux.IS_A.getLenient().getPrimUuid(),
+	            TermAux.USER.getLenient().getPrimUuid());
+	    
+	    // Choose a strategy for the parent concept UUID to use.
+		UUID parentConceptUuid = null;
+		if (getUuidFromFactory) {
+			parentConceptUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, userParentConceptName);
+		} else {
+			parentConceptUuid = parentConceptBp.getComponentUuid();
+		}
+		
+		// Get parentConcept, or create one if it doesn't exist.
+		if (Ts.get().hasUuid(parentConceptUuid)) {
+		    parentConcept = Ts.get().getConcept(parentConceptUuid);
+		} else {
+		    TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(
+			        Ts.get().getMetadataEditCoordinate(),
+			        Ts.get().getMetadataViewCoordinate());
+			parentConcept = builder.construct(parentConceptBp);
+			Ts.get().addUncommitted(parentConcept);
+			Ts.get().commit();
+		}
+	}
+
+	private void setActiveFrameConfig(File userProfile)
+			throws ValidationException, IOException, TerminologyException {
+		userConfig.getDbConfig().setProfileFile(userProfile);
+		UUID moduleUuid = module.getLenient().getPrimUuid();
+		userConfig.setModuleNid(Ts.get().getNidForUuids(moduleUuid));
+		Terms.get().setActiveAceFrameConfig(userConfig);
+	}
+
+	private String setupChangeSetsAndAddChangeSetGenerator(File userDir) {
+		File changeSetRoot = new File(userDir, "changesets");
+		getLog().info("** Changeset root: " + changeSetRoot.getAbsolutePath());
+		changeSetRoot.mkdirs();
+
+		I_ConfigAceDb dbConfig = userConfig.getDbConfig();
+		File absoluteChangeSetRoot = new File(wbBundleDir, "profiles/user-creation-changesets");
+
+		dbConfig.setChangeSetRoot(changeSetRoot);
+		getLog().info("** Changeset root from db config: " + dbConfig.getChangeSetRoot().getAbsolutePath());
+		getLog().info("** absoluteChangeSetRoot: " + absoluteChangeSetRoot.getAbsolutePath());
+		dbConfig.setChangeSetWriterFileName(userConfig.getUsername() + "#1#"
+		        + UUID.randomUUID().toString() + ".eccs");
+		dbConfig.setUsername(userConfig.getUsername());
+
+		String tempKey = UUID.randomUUID().toString();
+		File changeSetFile = new File(absoluteChangeSetRoot, dbConfig.getChangeSetWriterFileName());
+		File changeSetTempFile = new File(absoluteChangeSetRoot, "#0#" + dbConfig.getChangeSetWriterFileName());
+		ChangeSetGeneratorBI generator = Ts.get().createDtoChangeSetGenerator(
+				changeSetFile, changeSetTempFile, ChangeSetGenerationPolicy.MUTABLE_ONLY);
+		Ts.get().addChangeSetGenerator(tempKey, generator);
+
+		return tempKey;
+	}
+
+	private void createDefaultUserParentConcept() throws IOException,
+			ValidationException {
+		UUID userParentConceptUUID = UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c");
+		ConceptSpec userParent = new ConceptSpec("user", userParentConceptUUID);
+		parentConcept = Ts.get().getConcept(userParent.getLenient().getPrimUuid());
+	}
+
+	private void addUserToAddressList(String username) {
+		if (username != null) {
+		    if (userConfig.getAddressesList().contains(username) == false) {
+		        userConfig.getAddressesList().add(username);
+		    }
+		}
+	}
+
+	private void createQueues(File userQueueRoot) throws IOException, Exception {
+		// Create inbox
+		createInbox(userConfig, userConfig.getUsername() + ".inbox", userQueueRoot,
+		        userConfig.getUsername() + ".inbox");
+
+		// Create todo box
+		createInbox(userConfig, userConfig.getUsername() + ".todo", userQueueRoot,
+		        userConfig.getUsername() + ".inbox");
+
+		// Create outbox box
+		createOutbox(userConfig, userConfig.getUsername() + ".outbox", userQueueRoot,
+		        userConfig.getUsername() + ".inbox");
+	}
+
+	private void writeConfig() throws FileNotFoundException, IOException {
+		I_ConfigAceDb dbConfig = userConfig.getDbConfig();
+		getLog().info("** Before write: " + dbConfig.getUserConcept());
+		File profileFile = dbConfig.getProfileFile();
+		getLog().info("** User Profile File: " + profileFile.getAbsolutePath());
+		FileOutputStream fos = new FileOutputStream(profileFile);
+		ObjectOutputStream oos = new ObjectOutputStream(fos);
+		oos.writeObject(dbConfig);
+		oos.close();
+	}
+
+	private void makeUserDevPaths(String username)
+			throws NoSuchAlgorithmException, UnsupportedEncodingException,
+			IOException, InvalidCAB, ContradictionException,
+			ValidationException {
+		if (!username.equals("username")) {
+		    UUID editParentPathUuid = null;
+		    if (!projectDevelopmentParentPathUuid.equals("")) {
+		        editParentPathUuid = UUID.fromString(projectDevelopmentParentPathUuid);
+		    } else {
+		        editParentPathUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+		                projectDevelopmentParentPathFsn);
+		    }
+		    UUID editOriginPathUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+		            projectDevelopmentOriginPathFsn);
+		    UUID originFromDevPathUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+		            hasDevPathAsOriginPathFsn);
+		    PathBI editPath = null;
+		    ConceptCB newEditPathBp = new ConceptCB(username + " dev path",
+		            username + " dev path",
+		            LANG_CODE.EN,
+		            TermAux.IS_A.getLenient().getPrimUuid(),
+		            editParentPathUuid);
+		    UUID userDevPathUuid = newEditPathBp.getComponentUuid();
+		    if (Ts.get().hasUuid(userDevPathUuid)) {
+		        editPath = Ts.get().getPath(Ts.get().getNidForUuids(userDevPathUuid));
+		    } else {
+		        RefexCAB pathRefexBp = new RefexCAB(TK_REFEX_TYPE.CID,
+		                TermAux.PATH.getLenient().getConceptNid(),
+		                RefsetAux.PATH_REFSET.getLenient().getNid());
+		        pathRefexBp.put(RefexCAB.RefexProperty.UUID1, newEditPathBp.getComponentUuid());
+		        pathRefexBp.setMemberUuid(UUID.randomUUID());
+
+		        RefexCAB pathOriginRefexBp = new RefexCAB(TK_REFEX_TYPE.CID_INT,
+		                newEditPathBp.getComponentUuid(),
+		                RefsetAux.PATH_ORIGIN_REFEST.getLenient().getNid(), null, null);
+		        pathOriginRefexBp.put(RefexCAB.RefexProperty.UUID1, editOriginPathUuid);
+		        pathOriginRefexBp.put(RefexCAB.RefexProperty.INTEGER1, Integer.MAX_VALUE);
+		        pathRefexBp.setMemberUuid(UUID.randomUUID());
+
+		        RefexCAB pathOriginRefexOtherBp = new RefexCAB(TK_REFEX_TYPE.CID_INT,
+		                originFromDevPathUuid,
+		                RefsetAux.PATH_ORIGIN_REFEST.getLenient().getNid(), null, null);
+		        pathOriginRefexOtherBp.put(RefexCAB.RefexProperty.UUID1, newEditPathBp.getComponentUuid());
+		        pathOriginRefexOtherBp.put(RefexCAB.RefexProperty.INTEGER1, Integer.MAX_VALUE);
+		        pathOriginRefexOtherBp.setMemberUuid(UUID.randomUUID());
+		        TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(Ts.get().getMetadataEditCoordinate(),
+		                Ts.get().getMetadataViewCoordinate());
+		        PathCB pathBp = new PathCB(newEditPathBp,
+		                pathRefexBp,
+		                pathOriginRefexBp,
+		                pathOriginRefexOtherBp,
+		                Ts.get().getConcept(editOriginPathUuid));
+		        editPath = builder.construct(pathBp);
+		    }
+
+		    userConfig.addEditingPath(editPath);
+		    userConfig.setColorForPath(editPath.getConceptNid(), new Color(128, 128, 128));
+		}
+	}
 
     private ConceptSpec getConceptSpecFromPrefs(String configString) {
         if (configString != null && !configString.equals("")) {
@@ -780,27 +734,24 @@ public class GenerateUsersExtended extends AbstractMojo {
 
     private void createInbox(I_ConfigAceFrame config, String inboxName, File userQueueRoot,
             String nodeInboxAddress) throws IOException, Exception {
-		throw new UnsupportedOperationException("TODO: Jini removal");
+//		throw new UnsupportedOperationException("TODO: Jini removal");
+    	System.out.println("inboxName="+inboxName);
     }
 
     private void createOutbox(I_ConfigAceFrame config, String outboxName, File userQueueRoot,
             String nodeInboxAddress) throws IOException, Exception {
-		throw new UnsupportedOperationException("TODO: Jini removal");
-    }
-
-    private void createQueue(I_ConfigAceFrame config, String queueType, String queueName, File userQueueRoot,
-            String nodeInboxAddress) throws IOException, Exception {
-		throw new UnsupportedOperationException("TODO: Jini removal");
-
+//		throw new UnsupportedOperationException("TODO: Jini removal");
+    	System.out.println("outboxName="+outboxName);
     }
 
     private ConceptChronicleBI createUser()
             throws TerminologyException, IOException, UnsupportedEncodingException,
             NoSuchAlgorithmException, MojoExecutionException, InvalidCAB, ContradictionException {
-        AceLog.getAppLog().info("Create new path for user: " + userConfig.getDbConfig().getFullName());
+        I_ConfigAceDb dbConfig = userConfig.getDbConfig();
+		AceLog.getAppLog().info("Create new path for user: " + dbConfig.getFullName());
 
-        if ((userConfig.getDbConfig().getFullName() == null)
-                || (userConfig.getDbConfig().getFullName().length() == 0)) {
+        if ((dbConfig.getFullName() == null)
+                || (dbConfig.getFullName().length() == 0)) {
             JOptionPane.showMessageDialog(userConfig.getWorkflowPanel().getTopLevelAncestor(),
                     "Full name cannot be empty.");
 
@@ -810,7 +761,7 @@ public class GenerateUsersExtended extends AbstractMojo {
         I_TermFactory tf = Terms.get();
 
         // Needs a concept record...
-        ConceptCB userConceptBp = new ConceptCB(userConfig.getDbConfig().getFullName(),
+        ConceptCB userConceptBp = new ConceptCB(dbConfig.getFullName(),
                 userConfig.getUsername(),
                 LANG_CODE.EN,
                 TermAux.IS_A.getLenient().getPrimUuid(),
@@ -843,7 +794,7 @@ public class GenerateUsersExtended extends AbstractMojo {
             userConceptBp.addDescriptionCAB(inboxDescBp);
             userConceptBp.setRelationshipCAB(wfRelBp);
             ConceptChronicleBI userConcept = builder.construct(userConceptBp);
-            userConfig.getDbConfig().setUserConcept((I_GetConceptData) userConcept);
+            dbConfig.setUserConcept((I_GetConceptData) userConcept);
             Ts.get().addUncommitted(userConcept);
 
             return userConcept;
@@ -978,7 +929,7 @@ public class GenerateUsersExtended extends AbstractMojo {
             }
         }
         activeConfig.setDestRelTypes(destRelTypes);
-        
+
         //set up editing defaults
         activeConfig.setDefaultImageType(tf.getConcept(TermAux.AUX_IMAGE.getLenient().getUUIDs()));
         activeConfig.setDefaultDescriptionType(tf.getConcept(defaultDescType.getLenient().getUUIDs()));
@@ -986,7 +937,7 @@ public class GenerateUsersExtended extends AbstractMojo {
         activeConfig.setDefaultRelationshipRefinability(tf.getConcept(defaultRelRefinability.getLenient().getUUIDs()));
         activeConfig.setDefaultRelationshipType(tf.getConcept(defaultRelType.getLenient().getUUIDs()));
         activeConfig.setDefaultStatus(tf.getConcept(defaultStatus.getLenient().getUUIDs()));
-        
+
         //set up refset defaults for editing
         I_HoldRefsetPreferences attribRefsetPref = activeConfig.getRefsetPreferencesForToggle(TOGGLES.ATTRIBUTES);
         I_RefsetDefaultsTemplate templatePreferences = attribRefsetPref.getTemplatePreferences();
@@ -1001,7 +952,7 @@ public class GenerateUsersExtended extends AbstractMojo {
                 booleanPopupIds.add(spec.getLenient().getConceptNid());
             }
         }
-        
+
         I_RefsetDefaultsConcept conceptPreferences = attribRefsetPref.getConceptPreferences();
         I_IntList conceptPopupIds = conceptPreferences.getRefsetPopupIds();
         conceptPopupIds.clear();
@@ -1332,7 +1283,7 @@ public class GenerateUsersExtended extends AbstractMojo {
             }
         }
         userConfig.setRoots(roots);
-        
+
         //set up allowed statuses
         I_IntSet allowedStatus = tf.newIntSet();
         allowedStatus.add(SnomedMetadataRf1.CURRENT_RF1.getLenient().getNid());
