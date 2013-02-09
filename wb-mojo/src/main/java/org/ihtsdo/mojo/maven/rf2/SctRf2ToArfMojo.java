@@ -112,7 +112,7 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
             ArrayList<Rf2_RefsetCRecord[]> rf2_RefsetCRecordArray = new ArrayList<>();
             int arrayCont = 0;
             for (Rf2File rf2File : filesInStatus) {
-                rf2_RefsetCRecordArray.add(Rf2_RefsetCRecord.parseRefset(rf2File, null));
+                rf2_RefsetCRecordArray.add(Rf2_RefsetCRecord.parseRefset(rf2File, null, pathUuid));
             }
             for (Rf2_RefsetCRecord[] rf2_RefsetCRecordTmp : rf2_RefsetCRecordArray) {
                 arrayCont += rf2_RefsetCRecordTmp.length;
