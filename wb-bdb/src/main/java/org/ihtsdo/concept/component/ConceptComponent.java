@@ -838,7 +838,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     }
 
     private void readAnnotationsFromBdb(TupleInput input) {
-        annotations = annotationWriter.entryToObject(input, enclosingConceptNid);
+        annotations = annotationWriter.entryToObject(input, enclosingConceptNid, nid);
     }
 
     public final void readComponentFromBdb(TupleInput input) {

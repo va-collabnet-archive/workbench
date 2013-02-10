@@ -1198,6 +1198,10 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         Concept c = Bdb.getConceptForComponent(nid);
 
         if (c == null) {
+            List<UUID> uuids = Bdb.getUuidsToNidMap().getUuidsForNid(nid);
+            if (uuids.isEmpty()) {
+                throw new IOException("Nid has no uuid: " + nid);
+            }
             return Bdb.getUuidsToNidMap().getUuidsForNid(nid).get(0);
         }
 

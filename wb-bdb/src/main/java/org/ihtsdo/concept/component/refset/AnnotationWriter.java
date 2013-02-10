@@ -42,7 +42,7 @@ public class AnnotationWriter {
 
 	@SuppressWarnings("unchecked")
 	public ConcurrentSkipListSet<RefsetMember<?,?>> entryToObject(TupleInput input, 
-            int enclosingConceptNid) {
+            int enclosingConceptNid, int enclosingComponentNid) {
         int listSize = input.readShort();
         if (listSize == 0) {
             return null;
@@ -85,6 +85,13 @@ public class AnnotationWriter {
             }
             if (refsetMember.getTime() != Long.MIN_VALUE) {
                 newRefsetMemberList.add(refsetMember);
+            }
+            if (refsetMember.getReferencedComponentNid() != enclosingComponentNid) {
+                System.out.println("## Warning annotation has wrong referencedComponent. \nShould be: " +
+                        enclosingComponentNid + " was: " + refsetMember.getReferencedComponentNid() + 
+                        ". \nNow fixed: " + refsetMember);
+                refsetMember.setReferencedComponentNid(enclosingComponentNid);
+                 
             }
 
         }
