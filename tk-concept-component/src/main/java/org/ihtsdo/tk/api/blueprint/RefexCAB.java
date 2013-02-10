@@ -137,10 +137,14 @@ public class RefexCAB extends CreateOrAmendBlueprint {
             case PRESERVE_CONCEPT_REST_HASH:
             case GENERATE_RANDOM_CONCEPT_REST_HASH:
             case GENERATE_HASH:
-                setComponentUuidNoRecompute(computeMemberComponentUuid());
+                if (getRcUuid() != null) {
+                    setComponentUuidNoRecompute(computeMemberComponentUuid());
+                }
                 break;
             case GENERATE_REFEX_CONTENT_HASH:
-                setComponentUuidNoRecompute(computeMemberContentUuid());
+                if (getRcUuid() != null) {
+                    setComponentUuidNoRecompute(computeMemberContentUuid());
+                }
                 break;
             case GENERATE_RANDOM:
                 setComponentUuidNoRecompute(UUID.randomUUID());
@@ -151,9 +155,11 @@ public class RefexCAB extends CreateOrAmendBlueprint {
                 // nothing to do...
 
         }
-        for (RefexCAB annotBp : getAnnotationBlueprints()) {
-            annotBp.setReferencedComponentUuid(getComponentUuid());
-            annotBp.recomputeUuid();
+        if (getRcUuid() != null) {
+            for (RefexCAB annotBp : getAnnotationBlueprints()) {
+                annotBp.setReferencedComponentUuid(getComponentUuid());
+                annotBp.recomputeUuid();
+            }
         }
     }
 

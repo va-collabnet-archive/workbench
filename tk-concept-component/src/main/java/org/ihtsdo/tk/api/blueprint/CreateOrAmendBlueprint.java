@@ -188,12 +188,15 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
     }
 
     public void setComponentUuid(UUID componentUuid) {
+        setAnnotationsComponentUUID(componentUuid);
+        
         UUID oldUuid = this.componentUuid;
         this.componentUuid = componentUuid;
         pcs.firePropertyChange("componentUuid", oldUuid, this.componentUuid);
     }
 
     public void setComponentUuidNoRecompute(UUID componentUuid) {
+        setAnnotationsComponentUUID(componentUuid);
         this.componentUuid = componentUuid;
     }
 
@@ -276,5 +279,11 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
 
     public void setRetired() {
         this.statusUuid = retiredStatusUuid;
+    }
+
+    private void setAnnotationsComponentUUID(UUID componentUuid) {
+        for (RefexCAB refexCAB: annotations) {
+            refexCAB.setComponentUuid(componentUuid);
+        }
     }
 }

@@ -184,6 +184,18 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
     }
 
     @Override
+    public void setComponentUuid(UUID componentUuid) {
+        setConceptComponentsConceptUuid(componentUuid);
+        super.setComponentUuid(componentUuid); 
+    }
+
+    @Override
+    public void setComponentUuidNoRecompute(UUID componentUuid) {
+        setConceptComponentsConceptUuid(componentUuid);
+        super.setComponentUuidNoRecompute(componentUuid); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
     public void propertyChange(PropertyChangeEvent pce) {
         try {
             recomputeUuid();
@@ -576,5 +588,23 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
 
     public void setConAttrAB(ConAttrAB conAttrBp) {
         this.conAttr = conAttrBp;
+    }
+
+    private void setConceptComponentsConceptUuid(UUID componentUuid) {
+        for (DescCAB descCAB: descCABs) {
+            descCAB.setConceptUuid(componentUuid);
+        }
+        for (DescCAB descCAB: fsnCABs) {
+            descCAB.setConceptUuid(componentUuid);
+        }
+        for (RelCAB relCAB: relCABs) {
+            relCAB.setSourceUuid(componentUuid);
+        }
+        for (MediaCAB mediaCAB: mediaCABs) {
+            mediaCAB.setConceptUuid(componentUuid);
+        }
+        if (conAttr != null) {
+            conAttr.setComponentUuid(componentUuid);
+        }
     }
 }
