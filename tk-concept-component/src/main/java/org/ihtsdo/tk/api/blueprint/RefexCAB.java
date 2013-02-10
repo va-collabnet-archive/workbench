@@ -93,9 +93,8 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      * Use when the 1-1 relationship between a refex and a referenced component
      * does not apply.
      *
-     * @return A
-     * <code>UUID</code> based on a Type 5 generator that uses the content
-     * fields of the refex.
+     * @return A <code>UUID</code> based on a Type 5 generator that uses the
+     * content fields of the refex.
      * @throws InvalidAmendmentSpec
      * @throws IOException
      */
@@ -129,8 +128,8 @@ public class RefexCAB extends CreateOrAmendBlueprint {
 
     @Override
     /**
-     * For a refex the componentUuid methods from CreateOrAmendBlueprint
-     * refer to the member component uuid.
+     * For a refex the componentUuid methods from CreateOrAmendBlueprint refer
+     * to the member component uuid.
      */
     public void recomputeUuid() throws InvalidCAB, IOException, ContradictionException {
         switch (idDirective) {
@@ -152,12 +151,13 @@ public class RefexCAB extends CreateOrAmendBlueprint {
 
             case PRESERVE:
             default:
-                // nothing to do...
+            // nothing to do...
 
         }
-        if (getRcUuid() != null) {
-            for (RefexCAB annotBp : getAnnotationBlueprints()) {
-                annotBp.setReferencedComponentUuid(getComponentUuid());
+
+        for (RefexCAB annotBp : getAnnotationBlueprints()) {
+            annotBp.setReferencedComponentUuid(getComponentUuid());
+            if (getRcUuid() != null) {
                 annotBp.recomputeUuid();
             }
         }
@@ -206,9 +206,9 @@ public class RefexCAB extends CreateOrAmendBlueprint {
     public RefexCAB(TK_REFSET_TYPE memberType,
             int rcNid, int collectionNid,
             IdDirective idDirective) throws IOException, InvalidCAB, ContradictionException {
-        this(memberType, Ts.get().getUuidPrimordialForNid(rcNid), collectionNid, 
+        this(memberType, Ts.get().getUuidPrimordialForNid(rcNid), collectionNid,
                 null, null, null,
-            idDirective, RefexDirective.EXCLUDE);
+                idDirective, RefexDirective.EXCLUDE);
 
         this.properties.put(RefexProperty.MEMBER_UUID,
                 computeMemberComponentUuid());
@@ -348,15 +348,15 @@ public class RefexCAB extends CreateOrAmendBlueprint {
     }
 
     public Object put(RefexProperty key, UUID value) {
-        assert key == RefexProperty.MEMBER_UUID ||
-                key == RefexProperty.UUID1 ||
-                key == RefexProperty.UUID2 ||
-                key == RefexProperty.UUID3;
+        assert key == RefexProperty.MEMBER_UUID
+                || key == RefexProperty.UUID1
+                || key == RefexProperty.UUID2
+                || key == RefexProperty.UUID3;
         return properties.put(key,
                 value);
     }
-    
-    public Object put(RefexProperty key, byte[][] value){
+
+    public Object put(RefexProperty key, byte[][] value) {
         assert key == RefexProperty.ARRAY_BYTEARRAY;
         return properties.put(RefexProperty.ARRAY_BYTEARRAY,
                 value);
@@ -384,14 +384,12 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         properties.put(key, value);
         return this;
     }
-    
+
     public RefexCAB with(RefexProperty key, byte[][] arrayOfByteArray) {
         assert key == RefexProperty.ARRAY_BYTEARRAY;
         properties.put(key, arrayOfByteArray);
         return this;
     }
-    
-    
 
     public boolean hasProperty(RefexProperty key) {
         return properties.containsKey(key);
@@ -675,7 +673,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
                     }
                     break;
                 case ARRAY_BYTEARRAY:
-                    if(!RefexArrayOfBytearrayVersionBI.class.isAssignableFrom(version.getClass())){
+                    if (!RefexArrayOfBytearrayVersionBI.class.isAssignableFrom(version.getClass())) {
                         return false;
                     }
                     RefexArrayOfBytearrayVersionBI<?> arrayPart = (RefexArrayOfBytearrayVersionBI<?>) version;
