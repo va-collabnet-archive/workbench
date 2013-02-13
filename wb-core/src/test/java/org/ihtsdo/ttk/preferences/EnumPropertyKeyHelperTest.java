@@ -52,31 +52,27 @@ public class EnumPropertyKeyHelperTest extends TestCase {
     }
 
     public void testGetKeyStringPreferenceWithDefaultEnumBI() {
-        try {
-            PreferenceWithDefaultEnumBI pref = new DummyPreferenceWithDefaultEnumBI("abc");
-            String keyString = EnumPropertyKeyHelper.getKeyString(pref);
-            fail("Expected ClassCastException to be thrown.");
-        } catch (ClassCastException ex) {
-            // Expected.
-        }
+        PreferenceWithDefaultEnumBI pref = new DummyPreferenceWithDefaultEnumBI("abc");
+        String keyString = EnumPropertyKeyHelper.getKeyString(pref);
+        assertEquals("org/ihtsdo/ttk/preferences/DummyPreferenceWithDefaultEnumBI", keyString);
     }
 
     public void testGetKeyStringEnum() {
-        Enum e = DummyEnum.JUNK;
+        Enum e = DummyEnum.JUNK1;
         String keyString = EnumPropertyKeyHelper.getKeyString(e);
-        assertEquals("org/ihtsdo/ttk/preferences/DummyEnum.JUNK", keyString);
+        assertEquals("org/ihtsdo/ttk/preferences/DummyEnum", keyString);
     }
 
     public void testGetKeyStringInnerEnum() {
         Enum e = DummyClassWithEnum.Fields.JUNK;
         String keyString = EnumPropertyKeyHelper.getKeyString(e);
-        assertEquals("org/ihtsdo/ttk/preferences/DummyClassWithEnum/Fields.JUNK", keyString);
+        assertEquals("org/ihtsdo/ttk/preferences/DummyClassWithEnum/Fields", keyString);
     }
 
     public void testGetKeyStringEnumWithLongName() {
         Enum e = DummyClassWithEnumAndLongLongLongLongLongLongLongLongLongLongName.Fields.JUNK;
         String keyString = EnumPropertyKeyHelper.getKeyString(e);
-        assertEquals("org/ihtsdo/ttk/preferences/a4ca5edd-20d0-35d5-82eb-ece575681f58.JUNK", keyString);
+        assertEquals("org/ihtsdo/ttk/preferences/a4ca5edd-20d0-35d5-82eb-ece575681f58", keyString);
         assertTrue(keyString.length() <= Preferences.MAX_KEY_LENGTH);
     }
 }

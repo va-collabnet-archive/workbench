@@ -34,7 +34,22 @@ public class App {
             getEmptyPrefsGetQueueListExportToFileThenRemove(appPrefix, "Test.xml");
         } else if (argCount == 1) {
             String fileName = args[0];
-            getEmptyPrefsImportFromFileCreateQueueList(fileName, appPrefix);
+            getEmptyPrefsGetQueueListExportToFileThenRemove(appPrefix, fileName);
+        } else if (argCount == 2) {
+            String action = args[0];
+            String fileName = args[1];
+            if (action.equals("import")) {
+                EnumBasedPreferences prefs = importFromFile(fileName, appPrefix);
+                QueueList queueList = new QueueList(prefs);
+                System.out.println(queueList);
+            } else if (action.equals("export")) {
+                EnumBasedPreferences prefs = exportToFile(fileName, appPrefix);
+
+                // Clean up.
+                removeFromBackingStore(prefs);
+            } else {
+                throw new UnsupportedOperationException("Unsupported action: " + action);
+            }
         }
     }
 
@@ -47,20 +62,31 @@ public class App {
         prefs.exportSubtree(new FileOutputStream(fileName));
 
         // Clean up.
+        removeFromBackingStore(prefs);
+    }
+
+    private static void removeFromBackingStore(EnumBasedPreferences prefs)
+            throws BackingStoreException {
         prefs = prefs.parent();  // Walk back up to appName node.
         prefs.removeNode();
         prefs.flush();
     }
 
-    private static void getEmptyPrefsImportFromFileCreateQueueList(String fileName, String appPrefix)
+    private static EnumBasedPreferences importFromFile(String fileName, String appPrefix)
             throws FileNotFoundException, IOException,
             InvalidPreferencesFormatException, BackingStoreException {
         Preferences.importPreferences(new FileInputStream(fileName));
         EnumBasedPreferences prefs = new EnumBasedPreferences(appPrefix);
         prefs.sync();  // Bring up-to-date with backing store.
+        return prefs;
+    }
 
-        QueueList queueList = new QueueList(prefs);
-        System.out.println(queueList);
+    private static EnumBasedPreferences exportToFile(String fileName, String appPrefix)
+            throws FileNotFoundException, IOException,
+            InvalidPreferencesFormatException, BackingStoreException {
+        EnumBasedPreferences prefs = new EnumBasedPreferences(appPrefix);
+        prefs.exportSubtree(new FileOutputStream(fileName));
+        return prefs;
     }
 
     private static EnumBasedPreferences getEmptyPrefs(String appPrefix)

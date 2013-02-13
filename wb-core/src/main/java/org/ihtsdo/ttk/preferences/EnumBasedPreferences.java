@@ -15,7 +15,10 @@
  */
 package org.ihtsdo.ttk.preferences;
 
+import org.ihtsdo.ttk.queue.QueuePreferences.Fields;
+
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -24,6 +27,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
+import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.NodeChangeListener;
 import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
@@ -38,8 +42,6 @@ import java.util.prefs.Preferences;
  * @author ocarlsen
  */
 public class EnumBasedPreferences {
-
-    private static final String PROPERTY_COUNT = "count";
 
     private Preferences preferences;
     private String appPrefix;
@@ -72,124 +74,139 @@ public class EnumBasedPreferences {
         preferences.sync();
     }
 
-    public Enum getEnum(PreferenceWithDefaultEnumBI key) {
-        return valueOf(key.getDefaultValue().getClass(),
-                preferences.get(EnumPropertyKeyHelper.getKeyString(key),
-                ((Enum) key.getDefaultValue()).name()));
+    public void putEnum(PreferenceWithDefaultEnumBI key, Enum value) {
+        EnumBasedPreferences enumNode = getNode(key);
+        enumNode.preferences.put(key.name(), value.name());
     }
 
-    public void putEnum(PreferenceWithDefaultEnumBI key, Enum value) {
-        put(key, value.name());
+    public Enum getEnum(PreferenceWithDefaultEnumBI key) {
+        EnumBasedPreferences enumNode = getNode(key);
+        Enum defaultValue = (Enum) key.getDefaultValue();
+        String name = enumNode.preferences.get(key.name(), defaultValue.name());
+        return Enum.valueOf(defaultValue.getClass(), name);
     }
 
     public void put(PreferenceWithDefaultEnumBI key, String value) {
-        preferences.put(EnumPropertyKeyHelper.getKeyString(key), value);
+        EnumBasedPreferences enumNode = getNode(key);
+        enumNode.preferences.put(key.name(), value);
     }
+
+//  public <T extends Enum<T>> void put(Class<T> key, String value) {
+//      preferences.put(EnumPropertyKeyHelper.getKeyString(key), value);
+//  }
 
     public String get(PreferenceWithDefaultEnumBI key) {
-        return preferences.get(EnumPropertyKeyHelper.getKeyString(key), (String) key.getDefaultValue());
+        EnumBasedPreferences enumNode = getNode(key);
+        return enumNode.preferences.get(key.name(), (String) key.getDefaultValue());
     }
 
-    public <T extends Enum<T>> void put(Class<T> key, String value) {
-        preferences.put(EnumPropertyKeyHelper.getKeyString(key), value);
-    }
-
-    public <T extends Enum<T>> String get(Class<T> key, String value) {
-        return preferences.get(EnumPropertyKeyHelper.getKeyString(key), value);
-    }
+//    public <T extends Enum<T>> String get(Class<T> key, String value) {
+//        return preferences.get(EnumPropertyKeyHelper.getKeyString(key), value);
+//    }
 
     public void remove(PreferenceWithDefaultEnumBI key) {
-        preferences.remove(EnumPropertyKeyHelper.getKeyString(key));
+        EnumBasedPreferences enumNode = getNode(key);
+        enumNode.preferences.remove(key.name());
     }
 
-    public <T extends Enum<T>> void remove(Class<T> key) {
-        preferences.remove(EnumPropertyKeyHelper.getKeyString(key));
-    }
+//    public <T extends Enum<T>> void remove(Class<T> key) {
+//        preferences.remove(EnumPropertyKeyHelper.getKeyString(key));
+//    }
 
     public void clear() throws BackingStoreException {
         preferences.clear();
     }
 
     public void putInt(PreferenceWithDefaultEnumBI key, int value) {
-        preferences.putInt(EnumPropertyKeyHelper.getKeyString(key), value);
+        EnumBasedPreferences enumNode = getNode(key);
+        enumNode.preferences.putInt(key.name(), value);
     }
 
-    public <T extends Enum<T>> void putInt(Class<T> key, int value) {
-        preferences.putInt(EnumPropertyKeyHelper.getKeyString(key), value);
-    }
+//    public <T extends Enum<T>> void putInt(Class<T> key, int value) {
+//        preferences.putInt(EnumPropertyKeyHelper.getKeyString(key), value);
+//    }
 
     public int getInt(PreferenceWithDefaultEnumBI key) {
-        return preferences.getInt(EnumPropertyKeyHelper.getKeyString(key), (Integer) key.getDefaultValue());
+        EnumBasedPreferences enumNode = getNode(key);
+        return enumNode.preferences.getInt(key.name(), (Integer) key.getDefaultValue());
     }
 
-    public <T extends Enum<T>> int getInt(Class<T> key, int value) {
-        return preferences.getInt(EnumPropertyKeyHelper.getKeyString(key), value);
-    }
+//    public <T extends Enum<T>> int getInt(Class<T> key, int value) {
+//        return preferences.getInt(EnumPropertyKeyHelper.getKeyString(key), value);
+//    }
 
     public void putLong(PreferenceWithDefaultEnumBI key, long value) {
-        preferences.putLong(EnumPropertyKeyHelper.getKeyString(key), value);
+        EnumBasedPreferences enumNode = getNode(key);
+        enumNode.preferences.putLong(key.name(), value);
     }
 
-    public <T extends Enum<T>> void putLong(Class<T> key, long value) {
-        preferences.putLong(EnumPropertyKeyHelper.getKeyString(key), value);
-    }
+//    public <T extends Enum<T>> void putLong(Class<T> key, long value) {
+//        preferences.putLong(EnumPropertyKeyHelper.getKeyString(key), value);
+//    }
 
     public long getLong(PreferenceWithDefaultEnumBI key) {
-        return preferences.getLong(EnumPropertyKeyHelper.getKeyString(key), (Long) key.getDefaultValue());
+        EnumBasedPreferences enumNode = getNode(key);
+        return enumNode.preferences.getLong(key.name(), (Long) key.getDefaultValue());
     }
 
-    public <T extends Enum<T>> long getLong(Class<T> key, long value) {
-        return preferences.getLong(EnumPropertyKeyHelper.getKeyString(key), value);
-    }
+//    public <T extends Enum<T>> long getLong(Class<T> key, long value) {
+//        return preferences.getLong(EnumPropertyKeyHelper.getKeyString(key), value);
+//    }
 
     public void putBoolean(PreferenceWithDefaultEnumBI key, boolean value) {
-        preferences.putBoolean(EnumPropertyKeyHelper.getKeyString(key), value);
+        EnumBasedPreferences enumNode = getNode(key);
+        enumNode.preferences.putBoolean(key.name(), value);
     }
 
-    public <T extends Enum<T>> void putBoolean(Class<T> key, boolean value) {
-        preferences.putBoolean(EnumPropertyKeyHelper.getKeyString(key), value);
-    }
+//    public <T extends Enum<T>> void putBoolean(Class<T> key, boolean value) {
+//        preferences.putBoolean(EnumPropertyKeyHelper.getKeyString(key), value);
+//    }
 
     public boolean getBoolean(PreferenceWithDefaultEnumBI key) {
-        return preferences.getBoolean(EnumPropertyKeyHelper.getKeyString(key), (Boolean) key.getDefaultValue());
+        EnumBasedPreferences enumNode = getNode(key);
+        return enumNode.preferences.getBoolean(key.name(), (Boolean) key.getDefaultValue());
     }
 
-    public <T extends Enum<T>> boolean getBoolean(Class<T> key, boolean value) {
-        return preferences.getBoolean(EnumPropertyKeyHelper.getKeyString(key), value);
-    }
+//    public <T extends Enum<T>> boolean getBoolean(Class<T> key, boolean value) {
+//        return preferences.getBoolean(EnumPropertyKeyHelper.getKeyString(key), value);
+//    }
 
-    public <T extends Enum<T>> void putList(PreferenceWithDefaultEnumBI key, List<? extends PreferenceObject> value) {
+    public void putList(PreferenceWithDefaultEnumBI key, List<? extends PreferenceObject> value) {
         int count = value.size();
 
-        String keyString = EnumPropertyKeyHelper.getKeyString(key);
-        EnumBasedPreferences countNode = childNode(keyString);
-        countNode.preferences.putInt(PROPERTY_COUNT, count);
+        EnumBasedPreferences enumNode = getNode(key);
+        enumNode.preferences.putInt(key.name(), count);
 
         for (int i = 0; i < count; i++) {
-            String itemNodeKey = "" + i;
+            String indexNodeKey = Integer.toString(i);
             PreferenceObject item = value.get(i);
-            EnumBasedPreferences itemNode = countNode.childNode(itemNodeKey);
-
-            itemNode.preferences.put(EnumPropertyKeyHelper.getKeyString(Fields.CLASS_NAME), item.getClass().getName());
-            item.exportFields(itemNode);
+            EnumBasedPreferences indexNode = enumNode.childNode(indexNodeKey);
+            String fieldsNodeKey = EnumPropertyKeyHelper.getKeyString(Fields.CLASS_NAME);
+            EnumBasedPreferences fieldsNode = indexNode.childNode(fieldsNodeKey);
+            fieldsNode.preferences.put(Fields.CLASS_NAME.name(), item.getClass().getName());
+            item.exportFields(indexNode);
         }
     }
 
     public List<? extends PreferenceObject> getList(PreferenceWithDefaultEnumBI key) {
-        String keyString = EnumPropertyKeyHelper.getKeyString(key);
-        EnumBasedPreferences countNode = childNode(keyString);
-        int count = countNode.preferences.getInt(PROPERTY_COUNT, (Integer) key.getDefaultValue());
-        List<PreferenceObject> list = new ArrayList<>(count);
+        EnumBasedPreferences enumNode = getNode(key);
+        String keyString = key.name();
+        int count = enumNode.preferences.getInt(keyString,
+                (Integer) key.getDefaultValue());
 
+        List<PreferenceObject> list = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
             try {
-                String itemNodeKey = "" + i;
-                EnumBasedPreferences itemNode = countNode.childNode(itemNodeKey);
-                String className =
-                        itemNode.preferences.get(EnumPropertyKeyHelper.getKeyString(Fields.CLASS_NAME), "");
+                String indexNodeKey = Integer.toString(i);
+                EnumBasedPreferences indexNode = enumNode.childNode(indexNodeKey);
+                String fieldsNodeKey = EnumPropertyKeyHelper.getKeyString(Fields.CLASS_NAME);
+                EnumBasedPreferences fieldsNode = indexNode.childNode(fieldsNodeKey);
+                String className = fieldsNode.preferences.get(Fields.CLASS_NAME.name(), "");
+
+                // Instantiate class.
                 Class itemClass = Class.forName(className);
                 Constructor constructor = itemClass.getConstructor(EnumBasedPreferences.class);
-                PreferenceObject item = (PreferenceObject) constructor.newInstance(itemNode);
+                PreferenceObject item = (PreferenceObject) constructor.newInstance(indexNode);
 
                 list.add(item);
             } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
@@ -203,52 +220,58 @@ public class EnumBasedPreferences {
     }
 
     public void putFloat(PreferenceWithDefaultEnumBI key, float value) {
-        preferences.putFloat(EnumPropertyKeyHelper.getKeyString(key), value);
+        EnumBasedPreferences enumNode = getNode(key);
+        enumNode.preferences.putFloat(key.name(), value);
     }
 
-    public <T extends Enum<T>> void putFloat(Class<T> key, float value) {
-        preferences.putFloat(EnumPropertyKeyHelper.getKeyString(key), value);
-    }
+//    public <T extends Enum<T>> void putFloat(Class<T> key, float value) {
+//        preferences.putFloat(EnumPropertyKeyHelper.getKeyString(key), value);
+//    }
 
     public float getFloat(PreferenceWithDefaultEnumBI key) {
-        return preferences.getFloat(EnumPropertyKeyHelper.getKeyString(key), (Float) key.getDefaultValue());
+        EnumBasedPreferences enumNode = getNode(key);
+        return enumNode.preferences.getFloat(key.name(), (Float) key.getDefaultValue());
     }
 
-    public <T extends Enum<T>> float getFloat(Class<T> key, float value) {
-        return preferences.getFloat(EnumPropertyKeyHelper.getKeyString(key), value);
-    }
+//    public <T extends Enum<T>> float getFloat(Class<T> key, float value) {
+//        return preferences.getFloat(EnumPropertyKeyHelper.getKeyString(key), value);
+//    }
 
     public void putDouble(PreferenceWithDefaultEnumBI key, double value) {
-        preferences.putDouble(EnumPropertyKeyHelper.getKeyString(key), value);
+        EnumBasedPreferences enumNode = getNode(key);
+        enumNode.preferences.putDouble(key.name(), value);
     }
 
-    public <T extends Enum<T>> void putDouble(Class<T> key, double value) {
-        preferences.putDouble(EnumPropertyKeyHelper.getKeyString(key), value);
-    }
+//    public <T extends Enum<T>> void putDouble(Class<T> key, double value) {
+//        preferences.putDouble(EnumPropertyKeyHelper.getKeyString(key), value);
+//    }
 
     public double getDouble(PreferenceWithDefaultEnumBI key) {
-        return preferences.getDouble(EnumPropertyKeyHelper.getKeyString(key), (Double) key.getDefaultValue());
+        EnumBasedPreferences enumNode = getNode(key);
+        return enumNode.preferences.getDouble(key.name(), (Double) key.getDefaultValue());
     }
 
-    public <T extends Enum<T>> double getDouble(Class<T> key, double value) {
-        return preferences.getDouble(EnumPropertyKeyHelper.getKeyString(key), value);
-    }
+//    public <T extends Enum<T>> double getDouble(Class<T> key, double value) {
+//        return preferences.getDouble(EnumPropertyKeyHelper.getKeyString(key), value);
+//    }
 
     public void putByteArray(PreferenceWithDefaultEnumBI key, byte[] value) {
-        preferences.putByteArray(EnumPropertyKeyHelper.getKeyString(key), value);
+        EnumBasedPreferences enumNode = getNode(key);
+        enumNode.preferences.putByteArray(key.name(), value);
     }
 
-    public <T extends Enum<T>> void putByteArray(Class<T> key, byte[] value) {
-        preferences.putByteArray(EnumPropertyKeyHelper.getKeyString(key), value);
-    }
+//    public <T extends Enum<T>> void putByteArray(Class<T> key, byte[] value) {
+//        preferences.putByteArray(EnumPropertyKeyHelper.getKeyString(key), value);
+//    }
 
     public byte[] getByteArray(PreferenceWithDefaultEnumBI key) {
-        return preferences.getByteArray(EnumPropertyKeyHelper.getKeyString(key), (byte[]) key.getDefaultValue());
+        EnumBasedPreferences enumNode = getNode(key);
+        return enumNode.preferences.getByteArray(key.name(), (byte[]) key.getDefaultValue());
     }
 
-    public <T extends Enum<T>> byte[] getByteArray(Class<T> key, byte[] value) {
-        return preferences.getByteArray(EnumPropertyKeyHelper.getKeyString(key), value);
-    }
+//    public <T extends Enum<T>> byte[] getByteArray(Class<T> key, byte[] value) {
+//        return preferences.getByteArray(EnumPropertyKeyHelper.getKeyString(key), value);
+//    }
 
     public String[] keys() throws BackingStoreException {
         return preferences.keys();
@@ -323,31 +346,37 @@ public class EnumBasedPreferences {
         preferences.exportSubtree(os);
     }
 
-    public EnumBasedPreferences appNodeForPackage(Class<?> c) {
-        return new EnumBasedPreferences(this, preferences.node(nodeName(c, true)));
-    }
+//    public EnumBasedPreferences appNodeForPackage(Class<?> c) {
+//        return new EnumBasedPreferences(this, preferences.node(nodeName(c, true)));
+//    }
 
-    public EnumBasedPreferences appNodeForClass(Class<?> c) {
-        return new EnumBasedPreferences(this, preferences.node(nodeName(c, false)));
-    }
+//    public EnumBasedPreferences appNodeForClass(Class<?> c) {
+//        return new EnumBasedPreferences(this, preferences.node(nodeName(c, false)));
+//    }
 
     public EnumBasedPreferences childNode(String name) {
         return new EnumBasedPreferences(this, preferences.node(preferences.absolutePath() + "/" + name));
     }
 
-    private String nodeName(Class c, boolean packageOnly) {
-        String nodeName = c.getName();
-
-        if (packageOnly) {
-            int lastDot = nodeName.lastIndexOf('.');
-
-            nodeName = nodeName.substring(0, lastDot);
-        }
-
-        return appPrefix + "/" + nodeName.replace('.', '/');
+    private EnumBasedPreferences getNode(PreferenceWithDefaultEnumBI key) {
+        String enumNodeKey = EnumPropertyKeyHelper.getKeyString(key);
+        EnumBasedPreferences enumNode = childNode(enumNodeKey);
+        return enumNode;
     }
 
-    private Enum valueOf(Class enumTypeClass, String defaultName) {
-        return Enum.valueOf(enumTypeClass, get(enumTypeClass, defaultName));
-    }
+//    private String nodeName(Class c, boolean packageOnly) {
+//        String nodeName = c.getName();
+//
+//        if (packageOnly) {
+//            int lastDot = nodeName.lastIndexOf('.');
+//
+//            nodeName = nodeName.substring(0, lastDot);
+//        }
+//
+//        return appPrefix + "/" + nodeName.replace('.', '/');
+//    }
+
+//    private Enum valueOf(Class enumTypeClass, String defaultName) {
+//        return Enum.valueOf(enumTypeClass, get(enumTypeClass, defaultName));
+//    }
 }

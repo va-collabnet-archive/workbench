@@ -22,6 +22,7 @@ package org.ihtsdo.ttk.preferences;
  */
 enum DummyEnum {
 
-    JUNK;
+    JUNK1,
+    JUNK2;
 
 }

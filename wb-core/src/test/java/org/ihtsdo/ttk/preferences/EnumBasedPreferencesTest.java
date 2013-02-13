@@ -22,6 +22,7 @@ import org.ihtsdo.ttk.queue.QueueType;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.prefs.BackingStoreException;
@@ -41,11 +42,13 @@ public class EnumBasedPreferencesTest extends TestCase {
     public void setUp() throws BackingStoreException {
 
         // Create EnumBasedPreferences with random appPrefix.
-        String version = ((Long) System.currentTimeMillis()).toString();
-        String userName = UUID.randomUUID().toString();
-        this.appPrefix = version + ":" + userName;
+        this.appPrefix = getRandomString();
 
         this.testPrefs = new EnumBasedPreferences(appPrefix);
+    }
+
+    private static String getRandomString() {
+        return UUID.randomUUID().toString();
     }
 
     @Override
@@ -55,6 +58,63 @@ public class EnumBasedPreferencesTest extends TestCase {
         testPrefs.removeNode();
         testPrefs.flush();
     }
+    
+    public void testPutGet() {
+        PreferenceWithDefaultEnumBI<String> key = new DummyPreferenceWithDefaultEnumBI<>("");
+        String value = getRandomString();
+        testPrefs.put(key, value);
+        assertEquals(value, testPrefs.get(key));
+    }
+
+    public void testPutGetBoolean() {
+        PreferenceWithDefaultEnumBI<Boolean> key = new DummyPreferenceWithDefaultEnumBI<>(false);
+        boolean value = true;
+        testPrefs.putBoolean(key, value);
+        assertEquals(value, testPrefs.getBoolean(key));
+    }
+
+    public void testPutGetByteArray() {
+        byte[] byteArray = new byte[]{0xa,0xb,0xc}; 
+        PreferenceWithDefaultEnumBI<byte[]> key = new DummyPreferenceWithDefaultEnumBI<>(byteArray);
+        byte[] value = new byte[]{0x1,0x2,0x3} ;
+        testPrefs.putByteArray(key, value);
+        assertTrue(Arrays.equals(value, testPrefs.getByteArray(key)));
+    }
+
+    public void testPutGetDouble() {
+        PreferenceWithDefaultEnumBI<Double> key = new DummyPreferenceWithDefaultEnumBI<>(1.0);
+        double value = 2.0;
+        testPrefs.putDouble(key, value);
+        assertEquals(value, testPrefs.getDouble(key));
+    }
+
+    public void testPutGetEnum() {
+        PreferenceWithDefaultEnumBI key = new DummyPreferenceWithDefaultEnumBI<>(DummyEnum.JUNK1);
+        Enum value = DummyEnum.JUNK2;
+        testPrefs.putEnum(key, value);
+        assertEquals(value, testPrefs.getEnum(key));
+    }
+
+    public void testPutGetFloat() {
+        PreferenceWithDefaultEnumBI<Float> key = new DummyPreferenceWithDefaultEnumBI<>(1.0f);
+        float value = 2.0f;
+        testPrefs.putFloat(key, value);
+        assertEquals(value, testPrefs.getFloat(key));
+    }
+
+    public void testPutGetInt() {
+        PreferenceWithDefaultEnumBI<Integer> key = new DummyPreferenceWithDefaultEnumBI<>(1);
+        int value = 2;
+        testPrefs.putInt(key, value);
+        assertEquals(value, testPrefs.getInt(key));
+    }
+
+    public void testPutGetLong() {
+        PreferenceWithDefaultEnumBI<Long> key = new DummyPreferenceWithDefaultEnumBI<>(3l);
+        long value = System.currentTimeMillis();
+        testPrefs.putLong(key, value);
+        assertEquals(value, testPrefs.getLong(key));
+    }
 
     public void testQueueListSettingsPreserved() throws BackingStoreException, IOException {
 
@@ -63,7 +123,7 @@ public class EnumBasedPreferencesTest extends TestCase {
 
         // Construct a custom QueuePreferences object with some service item properties.
         final String queueDisplayName = "some other display";
-        final String queueId = UUID.randomUUID().toString();
+        final String queueId = getRandomString();
         final File queueDirectory = new File("some other location");
         final Boolean readInsteadOfTake = Boolean.TRUE;
         final QueueType queueType = new QueueType(QueueType.Types.OUTBOX);

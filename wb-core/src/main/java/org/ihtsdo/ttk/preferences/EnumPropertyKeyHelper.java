@@ -66,42 +66,29 @@ public class EnumPropertyKeyHelper {
     }
 
     /**
-     * Helper method to cast the {@code preferenceKey} to an {@link Enum} and
-     * call {@link #getKeyString(java.lang.Enum)}.
+     * Helper method to get the class of {@code preferenceKey} and
+     * call {@link #getKeyString(java.lang.Class)}.
      *
      * @param preferenceKey
      */
     public static String getKeyString(PreferenceWithDefaultEnumBI preferenceKey) {
-        Enum key = (Enum) preferenceKey;
-        return getKeyString(key);
+        return getKeyString(preferenceKey.getClass());
     }
 
-   /**
-     * Helper method to calculate a key to be used by the {@link EnumBasedPreferences}
-     * class.  Contains logic to shorten class name portion of key to a {@link UUID}
-     * if it would otherwise exceed {@link Preferences#MAX_KEY_LENGTH}.
+
+    /**
+     * Helper method to get the class of {@code preferenceKey} and
+     * call {@link #getKeyString(java.lang.Class)}.
      *
-     * @param keyEnum
+     * @param enumKey
      */
-    public static String getKeyString(Enum keyEnum) {
-        String keyString = getFullKeyString(keyEnum.getClass()) + "." + keyEnum.name();
-
-        if (keyString.length() > Preferences.MAX_KEY_LENGTH) {
-            keyString = shortenEnumNameToUUID(keyEnum);
-        }
-
-        return keyString;
+    public static String getKeyString(Enum enumKey) {
+        return getKeyString(enumKey.getClass());
     }
 
     private static String shortenClassNameToUUID(Class<?> keyClass) {
         String prefix = keyClass.getPackage().getName().replace('.', '/');
         UUID uuid = UUID.nameUUIDFromBytes(keyClass.getSimpleName().getBytes(CHARSET));
         return prefix + "/" + uuid;
-    }
-
-    private static String shortenEnumNameToUUID(Enum keyEnum) {
-        Class enumClass = keyEnum.getClass();
-        String shortKeyString = shortenClassNameToUUID(enumClass);
-        return shortKeyString + "." + keyEnum.name();
     }
 }
