@@ -40,7 +40,7 @@ public class ServiceId implements PreferenceObject {
         this.id = id;
     }
 
-    enum Fields implements PreferenceWithDefaultEnumBI {
+    enum Fields implements PreferenceWithDefaultEnumBI<String> {
         SERVICE_ID;
 
         @Override

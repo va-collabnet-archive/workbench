@@ -22,4 +22,5 @@ package org.ihtsdo.ttk.preferences;
  */
 public interface PreferenceWithDefaultEnumBI<T> {
     T getDefaultValue();
+    String name();
 }
