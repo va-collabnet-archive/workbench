@@ -67,7 +67,6 @@ public class InstanceActivitiesPanel extends JPanel {
 		gridBagLayout.rowWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
 		setLayout(gridBagLayout);
 
-		
 		panel = new JPanel();
 		FlowLayout flowLayout = (FlowLayout) panel.getLayout();
 		flowLayout.setAlignment(FlowLayout.LEFT);
@@ -84,7 +83,7 @@ public class InstanceActivitiesPanel extends JPanel {
 
 		JLabel title = new JLabel("Instance Activities");
 		panel.add(title);
-		
+
 		tree = new JTree();
 		tree.setCellRenderer(new MyRenderer());
 		GridBagConstraints gbc_tree = new GridBagConstraints();
@@ -136,6 +135,9 @@ public class InstanceActivitiesPanel extends JPanel {
 						wlNodes.get(wl.getName()).add(new DefaultMutableTreeNode(wfActivityInstanceBI));
 					}
 				}
+				for (int i = 0; i < tree.getRowCount(); i++) {
+					tree.expandRow(i);
+				}
 			} else {
 				model = new DefaultTreeModel(new DefaultMutableTreeNode("No process instances"));
 				tree.setModel(model);
@@ -152,7 +154,7 @@ public class InstanceActivitiesPanel extends JPanel {
 		public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
 
 			super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-			if (leaf && isWorklist(value)) {
+			if (isWorklist(value)) {
 				setIcon(new ImageIcon("icons/table.png"));
 				setToolTipText(value.toString());
 			} else {
@@ -166,7 +168,7 @@ public class InstanceActivitiesPanel extends JPanel {
 		protected boolean isWorklist(Object value) {
 			DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
 			Object nodeInfo = (Object) (node.getUserObject());
-			if (nodeInfo instanceof WorkListBI) {
+			if (nodeInfo instanceof WorkList) {
 				return true;
 			}
 			return false;
