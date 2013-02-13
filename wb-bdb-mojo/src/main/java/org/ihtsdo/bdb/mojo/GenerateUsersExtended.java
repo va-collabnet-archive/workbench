@@ -33,7 +33,13 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.ace.refset.*;
+import org.dwfa.ace.refset.I_RefsetDefaultsBoolean;
+import org.dwfa.ace.refset.I_RefsetDefaultsConInt;
+import org.dwfa.ace.refset.I_RefsetDefaultsConcept;
+import org.dwfa.ace.refset.I_RefsetDefaultsInteger;
+import org.dwfa.ace.refset.I_RefsetDefaultsString;
+import org.dwfa.ace.refset.I_RefsetDefaultsTemplate;
+import org.dwfa.ace.refset.I_RefsetsDefaultsConConCon;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -44,7 +50,12 @@ import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.*;
+import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
 import org.ihtsdo.tk.api.blueprint.DescriptionCAB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
@@ -59,7 +70,12 @@ import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
 import org.ihtsdo.tk.api.cs.ChangeSetWriterThreading;
-import org.ihtsdo.tk.binding.snomed.*;
+import org.ihtsdo.tk.binding.snomed.RefsetAux;
+import org.ihtsdo.tk.binding.snomed.Snomed;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.binding.snomed.Taxonomies;
+import org.ihtsdo.tk.binding.snomed.TermAux;
 import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipType;
 import org.ihtsdo.tk.spec.ConceptSpec;
@@ -69,7 +85,14 @@ import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetWriter;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 import java.awt.Color;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -444,7 +467,9 @@ public class GenerateUsersExtended extends AbstractMojo {
                             userConfig = newProfile(fullname, username, password, adminUsername,
                                     adminPassword);
 
-                            if (! processUser(username, userUuid, userDir, userProfile, false)) {
+                            // When we have multiple configs, do not use factory to create initial UUID.
+                            boolean getUuidFromFactory = false;
+                            if (! processUser(username, userUuid, userDir, userProfile, getUuidFromFactory)) {
                             	return false;
                             }
 
@@ -456,8 +481,10 @@ public class GenerateUsersExtended extends AbstractMojo {
                     }
                     return true;
                 }
-
-                if (! processUser(username, userUuid, userDir, userProfile, true)) {
+                
+                // When we have a single config, use factory to create initial UUID.
+                boolean getUuidFromFactory = true;
+                if (! processUser(username, userUuid, userDir, userProfile, getUuidFromFactory)) {
                 	return false;
                 }
                 
@@ -541,7 +568,10 @@ public class GenerateUsersExtended extends AbstractMojo {
 	            TermAux.IS_A.getLenient().getPrimUuid(),
 	            TermAux.USER.getLenient().getPrimUuid());
 	    
-	    // Choose a strategy for the parent concept UUID to use.
+	    // Choose a strategy for creating the parent concept UUID.
+	    // Legacy code used Type5UuidFactory, but KP changes
+	    // merged in subsequently use ConceptCB#getComponentUuid().
+	    // They are both type 5 UUIDs but have different namespaces.
 		UUID parentConceptUuid = null;
 		if (getUuidFromFactory) {
 			parentConceptUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, userParentConceptName);
