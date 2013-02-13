@@ -25,51 +25,51 @@ import junit.framework.TestCase;
  */
 public class EnumPropertyKeyHelperTest extends TestCase {
 
-    public void testGetKeyStringClass() {
+    public void testGetKeyString_Class() {
         Class c = DummyClassWithEnum.class;
         String keyString = EnumPropertyKeyHelper.getKeyString(c);
         assertEquals("org/ihtsdo/ttk/preferences/DummyClassWithEnum", keyString);
     }
 
-    public void testGetKeyStringInnerClass() {
+    public void testGetKeyString_InnerClass() {
         Class c = DummyClassWithEnum.Fields.class;  // Inner class.
         String keyString = EnumPropertyKeyHelper.getKeyString(c);
         assertEquals("org/ihtsdo/ttk/preferences/DummyClassWithEnum/Fields", keyString);
     }
 
-    public void testGetKeyStringClassWithLongName() {
+    public void testGetKeyString_ClassWithLongName() {
         Class c = DummyClassWithEnumAndLongLongLongLongLongLongLongLongLongLongName.class;
         String keyString = EnumPropertyKeyHelper.getKeyString(c);
         assertEquals("org/ihtsdo/ttk/preferences/76d54987-3e59-3400-bd53-d1cb159bdc41", keyString);
         assertTrue(keyString.length() <= Preferences.MAX_KEY_LENGTH);
     }
 
-    public void testGetKeyStringInnerClassWithLongName() {
+    public void testGetKeyString_InnerClassWithLongName() {
         Class c = DummyClassWithEnumAndLongLongLongLongLongLongLongLongLongLongName.Fields.class;
         String keyString = EnumPropertyKeyHelper.getKeyString(c);
         assertEquals("org/ihtsdo/ttk/preferences/a4ca5edd-20d0-35d5-82eb-ece575681f58", keyString);
         assertTrue(keyString.length() <= Preferences.MAX_KEY_LENGTH);
     }
 
-    public void testGetKeyStringPreferenceWithDefaultEnumBI() {
+    public void testGetKeyString_PreferenceWithDefaultEnumBI() {
         PreferenceWithDefaultEnumBI pref = new DummyPreferenceWithDefaultEnumBI("abc");
         String keyString = EnumPropertyKeyHelper.getKeyString(pref);
         assertEquals("org/ihtsdo/ttk/preferences/DummyPreferenceWithDefaultEnumBI", keyString);
     }
 
-    public void testGetKeyStringEnum() {
+    public void testGetKeyString_Enum() {
         Enum e = DummyEnum.JUNK1;
         String keyString = EnumPropertyKeyHelper.getKeyString(e);
         assertEquals("org/ihtsdo/ttk/preferences/DummyEnum", keyString);
     }
 
-    public void testGetKeyStringInnerEnum() {
+    public void testGetKeyString_InnerEnum() {
         Enum e = DummyClassWithEnum.Fields.JUNK;
         String keyString = EnumPropertyKeyHelper.getKeyString(e);
         assertEquals("org/ihtsdo/ttk/preferences/DummyClassWithEnum/Fields", keyString);
     }
 
-    public void testGetKeyStringEnumWithLongName() {
+    public void testGetKeyString_EnumWithLongName() {
         Enum e = DummyClassWithEnumAndLongLongLongLongLongLongLongLongLongLongName.Fields.JUNK;
         String keyString = EnumPropertyKeyHelper.getKeyString(e);
         assertEquals("org/ihtsdo/ttk/preferences/a4ca5edd-20d0-35d5-82eb-ece575681f58", keyString);

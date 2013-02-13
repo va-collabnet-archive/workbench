@@ -66,14 +66,14 @@ public class EnumBasedPreferencesTest extends TestCase {
         assertEquals(value, testPrefs.get(key));
     }
 
-    public void testPutGetBoolean() {
+    public void testPutGet_Boolean() {
         PreferenceWithDefaultEnumBI<Boolean> key = new DummyPreferenceWithDefaultEnumBI<>(false);
         boolean value = true;
         testPrefs.putBoolean(key, value);
         assertEquals(value, testPrefs.getBoolean(key));
     }
 
-    public void testPutGetByteArray() {
+    public void testPutGet_ByteArray() {
         byte[] byteArray = new byte[]{0xa,0xb,0xc}; 
         PreferenceWithDefaultEnumBI<byte[]> key = new DummyPreferenceWithDefaultEnumBI<>(byteArray);
         byte[] value = new byte[]{0x1,0x2,0x3} ;
@@ -81,35 +81,35 @@ public class EnumBasedPreferencesTest extends TestCase {
         assertTrue(Arrays.equals(value, testPrefs.getByteArray(key)));
     }
 
-    public void testPutGetDouble() {
+    public void testPutGet_Double() {
         PreferenceWithDefaultEnumBI<Double> key = new DummyPreferenceWithDefaultEnumBI<>(1.0);
         double value = 2.0;
         testPrefs.putDouble(key, value);
         assertEquals(value, testPrefs.getDouble(key));
     }
 
-    public void testPutGetEnum() {
+    public void testPutGet_Enum() {
         PreferenceWithDefaultEnumBI key = new DummyPreferenceWithDefaultEnumBI<>(DummyEnum.JUNK1);
         Enum value = DummyEnum.JUNK2;
         testPrefs.putEnum(key, value);
         assertEquals(value, testPrefs.getEnum(key));
     }
 
-    public void testPutGetFloat() {
+    public void testPutGet_Float() {
         PreferenceWithDefaultEnumBI<Float> key = new DummyPreferenceWithDefaultEnumBI<>(1.0f);
         float value = 2.0f;
         testPrefs.putFloat(key, value);
         assertEquals(value, testPrefs.getFloat(key));
     }
 
-    public void testPutGetInt() {
+    public void testPutGet_Int() {
         PreferenceWithDefaultEnumBI<Integer> key = new DummyPreferenceWithDefaultEnumBI<>(1);
         int value = 2;
         testPrefs.putInt(key, value);
         assertEquals(value, testPrefs.getInt(key));
     }
 
-    public void testPutGetLong() {
+    public void testPutGet_Long() {
         PreferenceWithDefaultEnumBI<Long> key = new DummyPreferenceWithDefaultEnumBI<>(3l);
         long value = System.currentTimeMillis();
         testPrefs.putLong(key, value);
