@@ -42,7 +42,7 @@ public class QueueList implements PreferenceObject {
         queuePreferences = (List<QueuePreferences>) preferences.getList(Fields.QUEUE_LIST);
     }
 
-    public enum Fields implements PreferenceWithDefaultEnumBI {
+    public enum Fields implements PreferenceWithDefaultEnumBI<Object> {
         QUEUE_LIST;
 
         @Override

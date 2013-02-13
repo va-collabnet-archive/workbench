@@ -64,7 +64,7 @@ public class QueuePreferences implements Comparable<QueuePreferences>, Preferenc
         this.serviceItemProperties.add(queueType);
     }
 
-    public enum Fields implements PreferenceWithDefaultEnumBI {
+    public enum Fields implements PreferenceWithDefaultEnumBI<Object> {
         DISPLAY_NAME("unnamed queue"), ID("00000000-0000-0000-c000-000000000046"), QUEUE_DIRECTORY("queue/inbox"),
         QUEUE_INSTANCE_PROPERTIES_LIST(0), READ_INSTEAD_OF_TAKE(Boolean.FALSE);
 

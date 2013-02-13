@@ -47,7 +47,7 @@ public class QueueAddress implements PreferenceObject {
         this.address = address;
     }
 
-    enum Fields implements PreferenceWithDefaultEnumBI {
+    enum Fields implements PreferenceWithDefaultEnumBI<String> {
         QUEUE_ADDRESS;
 
         @Override

@@ -24,7 +24,7 @@ import org.ihtsdo.ttk.preferences.PreferenceWithDefaultEnumBI;
  * @author kec
  */
 public class QueueType implements PreferenceObject {
-    enum Fields implements PreferenceWithDefaultEnumBI {
+    enum Fields implements PreferenceWithDefaultEnumBI<Types> {
         QUEUE_TYPE;
 
         @Override
