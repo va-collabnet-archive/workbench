@@ -18,7 +18,9 @@ package org.ihtsdo.ttk.preferences;
 /**
  *
  * @author kec
+ * @param <T>  The type of the default value.
  */
-public interface PreferenceWithDefaultEnumBI {
-    Object getDefaultValue();
+public interface PreferenceWithDefaultEnumBI<T> {
+    T getDefaultValue();
+    String name();
 }
