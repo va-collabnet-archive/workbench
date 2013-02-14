@@ -24,17 +24,22 @@ public class App {
             throws Exception {
 
         final String appId = "org.kp:cmt-pa";  // TODO: Use ${groupId}, ${artifactId} from Maven during build.
-        final String userName = "ocarlsen";      // TODO: Get from application.
-        final String version = "1.0-SNAPHOT";    // TODO: Use ${version} from Maven during build.
-        final String appPrefix = appId + ":" + userName + "/" + version;
+        final String userName = "ocarlsen";    // TODO: Get from application.
+        final String version = "1.0-SNAPHOT";  // TODO: Use ${version} from Maven during build.
+        final String appPrefix = appId + ":" + version + ":" + userName;
 
         // Check args to try different scenarios.
         int argCount = args.length;
         if (argCount == 0) {
             getEmptyPrefsGetQueueListExportToFileThenRemove(appPrefix, "Test.xml");
         } else if (argCount == 1) {
-            String fileName = args[0];
-            getEmptyPrefsGetQueueListExportToFileThenRemove(appPrefix, fileName);
+            String action = args[0];
+            if (action.equals("clean")) {
+                EnumBasedPreferences prefs = getSyncedPrefs(appPrefix);
+                removeFromBackingStore(prefs);
+            } else {
+                throw new UnsupportedOperationException("Unsupported action: " + action);
+            }
         } else if (argCount == 2) {
             String action = args[0];
             String fileName = args[1];
@@ -44,9 +49,6 @@ public class App {
                 System.out.println(queueList);
             } else if (action.equals("export")) {
                 EnumBasedPreferences prefs = exportToFile(fileName, appPrefix);
-
-                // Clean up.
-                removeFromBackingStore(prefs);
             } else {
                 throw new UnsupportedOperationException("Unsupported action: " + action);
             }
@@ -67,7 +69,6 @@ public class App {
 
     private static void removeFromBackingStore(EnumBasedPreferences prefs)
             throws BackingStoreException {
-        prefs = prefs.parent();  // Walk back up to appName node.
         prefs.removeNode();
         prefs.flush();
     }
@@ -76,9 +77,7 @@ public class App {
             throws FileNotFoundException, IOException,
             InvalidPreferencesFormatException, BackingStoreException {
         Preferences.importPreferences(new FileInputStream(fileName));
-        EnumBasedPreferences prefs = new EnumBasedPreferences(appPrefix);
-        prefs.sync();  // Bring up-to-date with backing store.
-        return prefs;
+        return getSyncedPrefs(appPrefix);
     }
 
     private static EnumBasedPreferences exportToFile(String fileName, String appPrefix)
@@ -86,6 +85,13 @@ public class App {
             InvalidPreferencesFormatException, BackingStoreException {
         EnumBasedPreferences prefs = new EnumBasedPreferences(appPrefix);
         prefs.exportSubtree(new FileOutputStream(fileName));
+        return prefs;
+    }
+
+    private static EnumBasedPreferences getSyncedPrefs(String appPrefix)
+            throws BackingStoreException {
+        EnumBasedPreferences prefs = new EnumBasedPreferences(appPrefix);
+        prefs.sync();  // Bring up-to-date with backing store.
         return prefs;
     }
 
