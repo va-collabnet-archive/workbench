@@ -60,24 +60,23 @@ public class LogWithAlerts {
     }
 
     public void alertAndLog(final Component parent, final Level level, final String message, final Throwable ex) {
+        // Log immediately, as JVM may exit before SwingUtilities can execute.
+        getLogger().log(level, message, ex);
+        
+        // Now show alert for users, if time permits.
         if (DwfaEnv.isHeadless() == false) {
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        alertAndLogPrivate(getActiveFrame(parent), level, message, ex);
+                        alertPrivate(getActiveFrame(parent), level, message, ex);
                     }
-
                 });
-            
-        } else {
-            getLogger().log(level, message, ex);
         }
     }
 
-    private void alertAndLogPrivate(Component parent, Level level, String message, Throwable ex) {
+    private void alertPrivate(Component parent, Level level, String message, Throwable ex) {
         try {
             parent = getActiveFrame(parent);
-            getLogger().log(level, message, ex);
             message = "<html>" + message;
             if (level.intValue() <= Level.INFO.intValue()) {
                 JOptionPane.showMessageDialog(parent, message, "Information has been logged",
