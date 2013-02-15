@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,6 +41,9 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 
+import org.apache.tools.ant.types.resources.FileResource;
+import org.apache.xmlbeans.ResourceLoader;
+import org.apache.xmlbeans.impl.schema.FileResourceLoader;
 import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.api.WorkflowDefinitionManager;
 import org.ihtsdo.project.workflow.model.WfAction;
@@ -89,8 +93,10 @@ public class WorkflowDefinitionPanel extends JPanel {
 		for (File file : list) {
 			if (file.getName().endsWith(".wfd")) {
 				String wfDefName = file.getName().replaceAll(".wfd", "");
-				workflowsDefinitions.put(wfDefName, file);
-				wfdefString.add(wfDefName);
+				if (!wfDefName.trim().isEmpty()) {
+					workflowsDefinitions.put(wfDefName, file);
+					wfdefString.add(wfDefName);
+				}
 			} else if (file.getName().endsWith(".bp")) {
 				businessFiles.put(file.getName().replaceAll(".bp", ""), file);
 				bps.add(file.getName().replaceAll(".bp", ""));
@@ -102,6 +108,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 		}
 
 		Collections.sort(wfdefString);
+		wfDefs.removeAllItems();
 		wfDefs.addItem("");
 		for (String string : wfdefString) {
 			wfDefs.addItem(string);
@@ -291,7 +298,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 		}
 
 		drlFiles.clearSelection();
-		List<String> rulesFiles = wd.getXlsFileName();
+		List<String> rulesFiles = wd.getDrlFileName();
 		ListModel<String> drlModel = drlFiles.getModel();
 		List<Integer> vectordrl = new ArrayList<Integer>();
 		for (String drlFile : rulesFiles) {
@@ -411,7 +418,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 
 	private void actionsListPopulate() {
 		DefaultListModel<WfAction> lmodel = new DefaultListModel<WfAction>();
-		if (actions.size() > 0) {
+		if (actions != null && actions.size() > 0) {
 			Set<String> keyset = actions.keySet();
 			List<String> keys = new ArrayList<String>();
 			keys = Arrays.asList(keyset.toArray(new String[0]));
@@ -630,6 +637,29 @@ public class WorkflowDefinitionPanel extends JPanel {
 			for (String string : consequenceItems) {
 				actionConsequenceCmbo.addItem(string);
 			}
+
+			drlFilesList = new ArrayList<String>();
+			ListModel<String> drlFilesModel = drlFiles.getModel();
+			List<String> selectedFiles = drlFiles.getSelectedValuesList();
+			for (String string : selectedFiles) {
+				File drlFile = drlHash.get(string);
+				if (drlFile != null) {
+					drlFilesList.add(drlFile.toString());
+				}
+			}
+			xlsFilesList = new ArrayList<String>();
+			List<String> xlsSelectedFiles = xlsFiles.getSelectedValuesList();
+			for (String string : xlsSelectedFiles) {
+				File xlsFile = xlsHash.get(string);
+				if (xlsFile != null) {
+					xlsFilesList.add(xlsFile.toString());
+				}
+			}
+			File f = new File("file.file");
+			if (f.exists()) {
+				f.delete();
+			}
+
 			WorkflowDefinition workflowDefinition = new WorkflowDefinition(selRoles, selStates, actions);
 			workflowDefinition.setName(wfDefs.getSelectedItem().toString());
 			workflowDefinition.setDrlFileName(drlFilesList);
@@ -642,6 +672,12 @@ public class WorkflowDefinitionPanel extends JPanel {
 			JOptionPane.showMessageDialog(this, "Please write a name for the Workflow definition");
 			return false;
 		}
+	}
+
+	public static void main(String[] args) {
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		System.out.println(classLoader.getResource(".").getPath());
+
 	}
 
 	protected void revertButtonActionPerformed(ActionEvent e) {
