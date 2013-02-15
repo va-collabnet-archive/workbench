@@ -339,6 +339,11 @@ public class WorkflowDefinitionPanel extends JPanel {
 		actionNameField.setEnabled(false);
 		actionBpCmbo.setEditable(false);
 		actionConsequenceCmbo.setEnabled(false);
+		revertButton.setEnabled(true);
+		removeButton.setEnabled(true);
+		saveButton.setEnabled(true);
+		newActionButton.setEnabled(true);
+		editActionButton.setEnabled(true);
 	}
 
 	private void addWfActionPreformed(ActionEvent e) {
@@ -660,16 +665,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 		} else {
 			loadFile(workflowDefinitionFile);
 		}
-		editActionButton.setText("Edit");
-		revertButton.setEnabled(true);
-		removeButton.setEnabled(true);
-		saveButton.setEnabled(true);
-		newActionButton.setEnabled(true);
-		editActionButton.setEnabled(true);
-		actionNameField.setEnabled(false);
-		actionUuidField.setEnabled(false);
-		actionBpCmbo.setEnabled(false);
-		actionConsequenceCmbo.setEnabled(false);
+		revertToInitialState();
 	}
 
 	private void initComponents() {
