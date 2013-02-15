@@ -324,11 +324,19 @@ public class WorkflowDefinitionPanel extends JPanel {
 		activeSelection = false;
 		selectedAction = -1;
 
+		actionBpCmbo.setSelectedIndex(-1);
+
+		revertToInitialState();
+	}
+
+	private void revertToInitialState() {
 		actionNameField.setText("");
 		actionUuidField.setText("");
+		newActionButton.setText("New Action");
+		editActionButton.setText("Edit");
+		removeButton.setText("Remove");
 		actionUuidField.setEnabled(false);
 		actionNameField.setEnabled(false);
-		actionBpCmbo.setSelectedIndex(-1);
 		actionBpCmbo.setEditable(false);
 		actionConsequenceCmbo.setEnabled(false);
 	}
