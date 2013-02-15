@@ -102,6 +102,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 		}
 
 		Collections.sort(wfdefString);
+		wfDefs.addItem("");
 		for (String string : wfdefString) {
 			wfDefs.addItem(string);
 		}
@@ -181,8 +182,8 @@ public class WorkflowDefinitionPanel extends JPanel {
 		File[] drlList = new File("drools-rules/").listFiles();
 		drlModel.addElement("No selected files");
 		xlsModel.addElement("No selected files");
-		List<String> xlsFileList = new ArrayList<String>(); 
-		List<String> drlFileList = new ArrayList<String>(); 
+		List<String> xlsFileList = new ArrayList<String>();
+		List<String> drlFileList = new ArrayList<String>();
 		for (File file : drlList) {
 			if (file.getName().endsWith(".drl")) {
 				String fileName = file.getName().replaceAll(".drl", "");
@@ -194,7 +195,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 				xlsFileList.add(fileName);
 			}
 		}
-		
+
 		Collections.sort(drlFileList);
 		for (String string : drlFileList) {
 			drlModel.addElement(string);
@@ -203,8 +204,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 		for (String string : xlsFileList) {
 			xlsModel.addElement(string);
 		}
-		
-		
+
 		drlFiles.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		xlsFiles.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		drlFiles.setSelectedIndex(0);
@@ -324,11 +324,13 @@ public class WorkflowDefinitionPanel extends JPanel {
 		activeSelection = false;
 		selectedAction = -1;
 
-		editActionButton.setEnabled(false);
-		removeButton.setEnabled(false);
 		actionNameField.setText("");
 		actionUuidField.setText("");
+		actionUuidField.setEnabled(false);
+		actionNameField.setEnabled(false);
 		actionBpCmbo.setSelectedIndex(-1);
+		actionBpCmbo.setEditable(false);
+		actionConsequenceCmbo.setEnabled(false);
 	}
 
 	private void addWfActionPreformed(ActionEvent e) {
@@ -374,13 +376,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 				currentAction.setBusinessProcess(aux);
 			}
 			currentAction.setConsequence((WfState) statesHash.get(actionConsequenceCmbo.getSelectedItem()));
-			if (actions.containsKey(currentAction.getName())) {
-				JOptionPane.showMessageDialog(this, "An action with the same name already exist.");
-				return;
-			} else {
-				actions.put(currentAction.getName(), currentAction);
-				actionsListPopulate();
-			}
+			actions.put(currentAction.getName(), currentAction);
 
 			actionUuidField.setText("");
 			actionNameField.setText("");
@@ -653,11 +649,19 @@ public class WorkflowDefinitionPanel extends JPanel {
 				statesModel.setValueAt(false, i, 0);
 			}
 			statesTable.setModel(statesModel);
-			revertButton.setEnabled(false);
-			saveButton.setEnabled(true);
 		} else {
 			loadFile(workflowDefinitionFile);
 		}
+		editActionButton.setText("Edit");
+		revertButton.setEnabled(true);
+		removeButton.setEnabled(true);
+		saveButton.setEnabled(true);
+		newActionButton.setEnabled(true);
+		editActionButton.setEnabled(true);
+		actionNameField.setEnabled(false);
+		actionUuidField.setEnabled(false);
+		actionBpCmbo.setEnabled(false);
+		actionConsequenceCmbo.setEnabled(false);
 	}
 
 	private void initComponents() {
