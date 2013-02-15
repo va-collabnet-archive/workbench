@@ -1028,11 +1028,11 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                 buf.append(" ");
                 buf.append(getTime());
             } catch (Throwable e) {
-                buf.append(" !!! Invalid sapNid. Cannot compute path, time, status. !!! ");
+                buf.append(" !!! Invalid STAMP primordialSapNid. Cannot compute path, time, status. !!! ");
                 buf.append(e.getLocalizedMessage());
             }
         } else {
-            buf.append(" !!! Invalid sapNid. Cannot compute path, time, status. !!! ");
+            buf.append(" !!! Invalid STAMP primordialSapNid. Cannot compute path, time, status. !!! ");
         }
 
         buf.append(" extraVersions: ");
