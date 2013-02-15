@@ -623,6 +623,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 			for (int i = 0; i < statesTable.getRowCount(); i++) {
 				if (((Boolean) statesTable.getValueAt(i, 0)) == true) {
 					consequenceItems.add((String) statesTable.getValueAt(i, 1));
+					selStates.add(statesHash.get((String) statesTable.getValueAt(i, 1)));
 				}
 			}
 			Collections.sort(consequenceItems);
