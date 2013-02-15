@@ -341,7 +341,7 @@ public class ProjectDetailsPanel extends JPanel {
 								try {
 									modulId = ProjectDetailsPanel.this.project.getModuleIdRefset().getNid();
 								} catch (Exception e) {
-									AceLog.getAppLog().alertAndLogException(e);
+									// ignore exception, module is not set
 								}
 								if(addedRfst.getNid() != modulId){
 									button3.setEnabled(true);
