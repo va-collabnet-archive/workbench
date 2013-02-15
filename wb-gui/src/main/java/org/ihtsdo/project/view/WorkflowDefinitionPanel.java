@@ -89,7 +89,6 @@ public class WorkflowDefinitionPanel extends JPanel {
 				actionBpCmbo.addItem(file.getName().replaceAll(".bp", ""));
 			}
 		}
-
 	}
 
 	private void initCustomComponents() {
@@ -320,6 +319,64 @@ public class WorkflowDefinitionPanel extends JPanel {
 		workflowsDefinitions.put(name, file);
 		wfDefs.addItem(name);
 		wfDefs.setSelectedItem(name);
+	}
+
+	protected void editButtonActionPerformed(ActionEvent e) {
+		if (editActionButton.getText().equals("edit")) {
+			editActionButton.setText("Save");
+			WfAction a = actions.get(actionsList.getSelectedValue().getName());
+			actionUuidField.setText(a.getId().toString());
+			actionNameField.setText(a.getName());
+			if (a.getBusinessProcess() != null) {
+				actionBpCmbo.setSelectedItem(a.getBusinessProcess().getName().replaceAll(".bp", ""));
+			}
+			if (a.getConsequence() != null) {
+				actionConsequenceCmbo.setSelectedItem(a.getConsequence().getName());
+			}
+
+			newActionButton.setEnabled(false);
+			editActionButton.setEnabled(true);
+			removeButton.setEnabled(false);
+			actionNameField.setEnabled(true);
+			actionBpCmbo.setEnabled(true);
+			actionConsequenceCmbo.setEnabled(true);
+		} else {
+			currentAction.setName(actionNameField.getText());
+			File aux = businessFiles.get(actionBpCmbo.getSelectedItem().toString());
+			if (aux.isFile()) {
+				currentAction.setBusinessProcess(aux);
+			}
+			currentAction.setConsequence((WfState) statesHash.get(actionConsequenceCmbo.getSelectedItem()));
+			if (actions.containsKey(currentAction.getName())) {
+				JOptionPane.showMessageDialog(this, "An action with the same name already exist.");
+				return;
+			} else {
+				actions.put(currentAction.getName(), currentAction);
+				DefaultListModel<WfAction> lmodel = new DefaultListModel<WfAction>();
+				if (actions.size() > 0)
+					for (WfAction act : actions.values()) {
+						lmodel.addElement(act);
+					}
+				actionsList.setModel(lmodel);
+				actionsList.updateUI();
+			}
+
+			actionUuidField.setText("");
+			actionNameField.setText("");
+			actionBpCmbo.setSelectedIndex(-1);
+			actionConsequenceCmbo.setSelectedIndex(-1);
+
+			newActionButton.setEnabled(true);
+			editActionButton.setEnabled(true);
+			removeButton.setEnabled(true);
+			actionNameField.setEnabled(false);
+			actionBpCmbo.setEnabled(false);
+			actionBpCmbo.setEnabled(false);
+
+			editActionButton.setText("Edit");
+			saveButton.setEnabled(true);
+			revertButton.setEnabled(true);
+		}
 	}
 
 	private void newActionActionPreformed(ActionEvent e) {
@@ -763,6 +820,11 @@ public class WorkflowDefinitionPanel extends JPanel {
 				}
 			});
 			editActionButton = new JButton();
+			editActionButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					editButtonActionPerformed(e);
+				}
+			});
 			removeButton = new JButton();
 			removeButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
