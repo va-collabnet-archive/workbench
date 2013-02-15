@@ -120,6 +120,7 @@ import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
 
 public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI, Comparable<Concept> {
 
@@ -220,14 +221,14 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
     @Override
     public void cancel() throws IOException {
-      ChangeNotifier.touchComponents(getConceptNidsAffectedByCommit());
-      data.cancel();
+        ChangeNotifier.touchComponents(getConceptNidsAffectedByCommit());
+        data.cancel();
 
         if (BdbCommitManager.forget(getConAttrs())) {
             Bdb.getConceptDb().forget(this);
-         canceled = true;
-      }
-   }
+            canceled = true;
+        }
+    }
 
     @Override
     public boolean commit(ChangeSetGenerationPolicy changeSetPolicy,
@@ -402,13 +403,14 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     }
 
     /**
-     * merge from EConcept eConcept into Concept c  
+     * merge from EConcept eConcept into Concept c
+     *
      * @param eConcept
      * @param c
      * @param updateLucene
      * @param indexedAnnotationConcepts
      * @return
-     * @throws IOException 
+     * @throws IOException
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
     private static Concept mergeWithEConcept(EConcept eConcept, Concept c, boolean updateLucene, Set<ConceptChronicleBI> indexedAnnotationConcepts)
@@ -416,7 +418,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         if (c.isAnnotationStyleRefex() == false) {
             c.setAnnotationStyleRefex(eConcept.isAnnotationStyleRefex());
         }
-        
+
         if (c.isAnnotationIndex() == false) {
             c.setAnnotationIndex(eConcept.isAnnotationIndexStyleRefex());
         }
@@ -436,37 +438,88 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         // check if different primordial UUIDs are being merged
         if (c.getPrimUuid().compareTo(UUID.fromString("00000000-0000-0000-c000-000000000046")) != 0
                 && c.getPrimUuid().compareTo(eConcept.getPrimordialUuid()) != 0) {
-            // add EConcept eConcept primordial uuid into Concept c additional ids
-            TerminologyStoreDI ts = Ts.get();
-            ts.getNidForUuids(eConcept.getConceptAttributes().getStatusUuid());
-            int idStatusNid = ts.getNidForUuids(UUID.fromString("d12702ee-c37f-385f-a070-61d56d4d0f1f"));
-            long idTime = eConcept.getConceptAttributes().time;
-            int idAuthorNid = ts.getNidForUuids(eConcept.getConceptAttributes().authorUuid);
-            int idModuleNid = ts.getNidForUuids(eConcept.getConceptAttributes().moduleUuid);
-            int idPathNid = ts.getNidForUuids(eConcept.getConceptAttributes().pathUuid);
+            if (eConcept.getConceptAttributes() == null) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("\r\nmergeWithEConcept eConcept.getConceptAttributes() == null");
+                sb.append(" insufficient information to add UUID_ADDITIONAL:\t");
+                sb.append(c.getPrimUuid());
+                sb.append("\t");
+                sb.append(c.toUserString());
+                sb.append("\tUUID_PRIMORDIAL:\t");
+                sb.append(eConcept.getPrimordialUuid().toString());
+                if (eConcept.getDescriptions() != null && eConcept.getDescriptions().size() > 0) {
+                    sb.append("\t");
+                    sb.append(eConcept.getDescriptions().get(0).text);
+                }
+                sb.append("\r\n");
+                AceLog.getAppLog().log(Level.INFO, sb.toString());
+            } else {
+                TerminologyStoreDI ts = Ts.get();
+                int unspecifiedUuidNid = ts.getNidForUuids(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
+                int snomedT3UuidNid = ts.getNidForUuids(ArchitectonicAuxiliary.Concept.SNOMED_T3_UUID.getUids());
 
-            // int statusNid, long time, int authorNid, int moduleNid, int pathNid
-            IdentifierVersionUuid idToAdd = new IdentifierVersionUuid(
-                    idStatusNid,
-                    idTime,
-                    idAuthorNid,
-                    idModuleNid,
-                    idPathNid);
-            idToAdd.setDenotation(eConcept.getPrimordialUuid());
-            Collection<UUID> authorityUuids = ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids();
-            idToAdd.setAuthorityNid(ts.getNidForUuids(authorityUuids));
-            
-            c.getConceptAttributes().addIdVersion(idToAdd);
+                // check if Concept c already has the extra UUID
+                boolean found = false;
+                for (IdBI aid : c.getAdditionalIds()) {
+                    if (aid.getAuthorityNid() == snomedT3UuidNid
+                            || aid.getAuthorityNid() == unspecifiedUuidNid) {
+                        UUID dUuid = (UUID) aid.getDenotation();
+                        if (dUuid.compareTo(eConcept.getPrimordialUuid()) == 0) {
+                            found = true;
+                            AceLog.getAppLog().log(Level.INFO, "::FYI:: already has additional uuid");
+                        }
+                    }
+                }
 
-            StringBuilder sb = new StringBuilder();
-            sb.append("\r\nmergeWithEConcept .. added eConcept primordial uuid \t");
-            sb.append(c.getPrimUuid());
-            sb.append("\r\n                  .. into Concept c additional ids \t");
-            sb.append(eConcept.getPrimordialUuid().toString());
-            sb.append("\r\n");
-            AceLog.getAppLog().log(Level.INFO, sb.toString());
+                if (!found) {
+                    // add EConcept eConcept primordial uuid into Concept c additional ids
+                    // RF2 Active
+                    int idStatusNid = ts.getNidForUuids(UUID.fromString("d12702ee-c37f-385f-a070-61d56d4d0f1f"));
+                    long idTime = eConcept.getConceptAttributes().time;
+                    int idAuthorNid = ts.getNidForUuids(eConcept.getConceptAttributes().authorUuid);
+                    int idModuleNid = ts.getNidForUuids(eConcept.getConceptAttributes().moduleUuid);
+                    int idPathNid = ts.getNidForUuids(eConcept.getConceptAttributes().pathUuid);
 
-            ChangeNotifier.touch(c.nid, ChangeNotifier.Change.COMPONENT);
+                    c.getConceptAttributes().addUuidId(
+                            eConcept.getPrimordialUuid(), 
+                            unspecifiedUuidNid, 
+                            idStatusNid, 
+                            idTime, 
+                            idAuthorNid, 
+                            idModuleNid, 
+                            idPathNid); // STAMP
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("\r\nmergeWithEConcept SCTID:\t");
+                    if (eConcept.getConceptAttributes() != null
+                            && eConcept.getConceptAttributes().getEIdentifiers() != null) {
+                        List<TkIdentifier> ids = eConcept.getConceptAttributes().getEIdentifiers();
+                        for (TkIdentifier tkIdentifier : ids) {
+                            UUID authorityUuid = tkIdentifier.getAuthorityUuid();
+                            UUID snomedIntIdUuid = UUID.fromString("0418a591-f75b-39ad-be2c-3ab849326da9");
+                            if (authorityUuid.compareTo(snomedIntIdUuid) == 0) {
+                                sb.append(((Long) tkIdentifier.getDenotation()).toString());
+                                sb.append("\t");
+                                break;
+                            }
+                        }
+                    }
+                    sb.append("\tUUID_PRIMORDIAL:\t");
+                    sb.append(c.getPrimUuid());
+                    sb.append("\t");
+                    sb.append(c.toUserString());
+                    sb.append("\tUUID_ADDITIONAL:\t");
+                    sb.append(eConcept.getPrimordialUuid().toString());
+                    if (eConcept.getDescriptions() != null && eConcept.getDescriptions().size() > 0) {
+                        sb.append("\t");
+                        sb.append(eConcept.getDescriptions().get(0).text);
+                    }
+                    sb.append("\r\n");
+                    AceLog.getAppLog().log(Level.INFO, sb.toString());
+
+                    ChangeNotifier.touch(c.nid, ChangeNotifier.Change.COMPONENT);
+                }
+            }
         }
 
         if ((eConcept.getDescriptions() != null) && !eConcept.getDescriptions().isEmpty()) {
@@ -867,9 +920,9 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
     public void updateXrefs() throws IOException {
         for (RefsetMember<?, ?> m : getRefsetMembers()) {
-         NidPairForRefex npr = NidPair.getRefexNidMemberNidPair(m.getRefexNid(), m.getNid());
+            NidPairForRefex npr = NidPair.getRefexNidMemberNidPair(m.getRefexNid(), m.getNid());
             Bdb.addXrefPair(m.referencedComponentNid, npr);
-      }
+        }
     }
 
     //~--- get methods ---------------------------------------------------------
@@ -1028,7 +1081,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             }
         }
 
-        
+
         if (!isAnnotationStyleRefex() && getRefsetMembers() != null) {
             for (ConceptComponent i : getRefsetMembers()) {
                 stamps.addAll(i.getComponentSapNids());
@@ -1497,8 +1550,8 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             throws IOException, TerminologyException {
         Set<Concept> returnValues = new HashSet<Concept>();
 
-        for (I_RelTuple rel :
-                getDestRelTuples(allowedStatus, allowedTypes, positions, precedencePolicy,
+        for (I_RelTuple rel
+                : getDestRelTuples(allowedStatus, allowedTypes, positions, precedencePolicy,
                 contradictionManager)) {
             returnValues.add(Bdb.getConceptDb().getConcept(rel.getC1Id()));
         }
@@ -1520,7 +1573,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     public List<I_RelTuple> getDestRelTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
             PositionSetBI positions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
             throws IOException, TerminologyException {
-            ViewCoordinate coordinate = new ViewCoordinate(precedencePolicy, positions, allowedStatus,
+        ViewCoordinate coordinate = new ViewCoordinate(precedencePolicy, positions, allowedStatus,
                 allowedTypes, contradictionManager, Integer.MIN_VALUE,
                 Terms.get().getActiveAceFrameConfig().getViewCoordinate().getClassifierNid(),
                 Terms.get().getActiveAceFrameConfig().getViewCoordinate().getRelationshipAssertionType(),
@@ -1799,21 +1852,22 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     public I_RepresentIdSet getPossibleChildOfConcepts(I_ConfigAceFrame config) throws IOException, ContradictionException {
         NidBitSetBI childNidSet = Ts.get().getEmptyNidSet();
         int[] childrenConceptNids = Bdb.getNidCNidMap().getChildrenConceptNids(nid, config.getViewCoordinate());
-        for(int childNid : childrenConceptNids){
+        for (int childNid : childrenConceptNids) {
             childNidSet.setMember(childNid);
         }
         return (I_RepresentIdSet) childNidSet;
     }
+
     /**
-     * 
+     *
      * @param relTypes
      * @return
      * @throws IOException
      * @deprecated -- use get dest rel nids instead
      */
-    @Deprecated 
+    @Deprecated
     public Set<Integer> getPossibleDestRelsOfTypes(NidSetBI relTypes) throws IOException {
-        return  new HashSet(Arrays.asList(Bdb.nidCidMapDb.getDestRelNids(nid, relTypes)));
+        return new HashSet(Arrays.asList(Bdb.nidCidMapDb.getDestRelNids(nid, relTypes)));
     }
 
     @Override
@@ -1824,13 +1878,13 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
     public NidBitSetBI getPossibleKindOfConcepts(ViewCoordinate vc)
             throws IOException, ContradictionException {
-      return collectPossibleKindOf(vc, nid);
+        return collectPossibleKindOf(vc, nid);
     }
-    
+
     private NidBitSetBI collectPossibleKindOf(ViewCoordinate vc, int cNid)
-           throws IOException, ContradictionException {
+            throws IOException, ContradictionException {
         return Bdb.getNidCNidMap().getKindOfNids(cNid, vc);
-   }
+    }
 
     private I_DescriptionTuple getPreferredAcceptability(
             Collection<I_DescriptionTuple<DescriptionRevision>> descriptions, int typePrefNid,
@@ -2103,8 +2157,8 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             throws IOException, TerminologyException {
         Set<I_GetConceptData> returnValues = new HashSet<I_GetConceptData>();
 
-        for (I_RelTuple rel :
-                getSourceRelTuples(allowedStatus, allowedTypes, positions, precedencePolicy,
+        for (I_RelTuple rel
+                : getSourceRelTuples(allowedStatus, allowedTypes, positions, precedencePolicy,
                 contradictionMgr)) {
             returnValues.add(Concept.get(rel.getC2Id()));
         }
@@ -2501,7 +2555,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
         return false;
     }
-    
+
     @Override
     public boolean isAnnotationIndex() throws IOException {
         return data.isAnnotationIndex();
@@ -2540,24 +2594,24 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                 }
             }
         }
-        if(Bdb.getNidCNidMap().getDestRelNids(this.nid, srcRelTypes).length == 0){
+        if (Bdb.getNidCNidMap().getDestRelNids(this.nid, srcRelTypes).length == 0) {
             return true;
         }
         return false;
     }
-    
+
     public boolean isParentOf(Concept child, ViewCoordinate vc) throws IOException, ContradictionException {
-      return Ts.get().isKindOf(child.nid, nid, vc);
-   }
+        return Ts.get().isKindOf(child.nid, nid, vc);
+    }
 
-   public boolean isParentOfOrEqualTo(Concept child, ViewCoordinate vc)
-           throws IOException, ContradictionException {
-      if (child == this) {
-         return true;
-      }
+    public boolean isParentOfOrEqualTo(Concept child, ViewCoordinate vc)
+            throws IOException, ContradictionException {
+        if (child == this) {
+            return true;
+        }
 
-      return isParentOf(child, vc);
-   }
+        return isParentOf(child, vc);
+    }
 
     @Override
     public boolean isParentOf(I_GetConceptData child) throws IOException, TerminologyException, ContradictionException {
@@ -2567,8 +2621,9 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                 config.getViewPositionSetReadOnly(), config.getPrecedence(),
                 config.getConflictResolutionStrategy());
     }
+
     /**
-     * 
+     *
      * @param child
      * @param allowedStatus
      * @param allowedTypes
