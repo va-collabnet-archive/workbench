@@ -12,8 +12,11 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.swing.DefaultListModel;
@@ -43,6 +46,8 @@ import org.ihtsdo.project.workflow.model.WfAction;
 import org.ihtsdo.project.workflow.model.WfRole;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
+
+import com.googlecode.sardine.model.Collection;
 
 /**
  * @author Guillermo Reynoso
@@ -79,15 +84,26 @@ public class WorkflowDefinitionPanel extends JPanel {
 
 	private void initWfDefinitionCombo() {
 		File[] list = new File("sampleProcesses/").listFiles();
+		List<String> bps = new ArrayList<String>();
+		List<String> wfdefString = new ArrayList<String>();
 		for (File file : list) {
 			if (file.getName().endsWith(".wfd")) {
 				String wfDefName = file.getName().replaceAll(".wfd", "");
 				workflowsDefinitions.put(wfDefName, file);
-				wfDefs.addItem(wfDefName);
+				wfdefString.add(wfDefName);
 			} else if (file.getName().endsWith(".bp")) {
 				businessFiles.put(file.getName().replaceAll(".bp", ""), file);
-				actionBpCmbo.addItem(file.getName().replaceAll(".bp", ""));
+				bps.add(file.getName().replaceAll(".bp", ""));
 			}
+		}
+		Collections.sort(bps);
+		for (String string : bps) {
+			actionBpCmbo.addItem(string);
+		}
+
+		Collections.sort(wfdefString);
+		for (String string : wfdefString) {
+			wfDefs.addItem(string);
 		}
 	}
 
@@ -141,6 +157,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 
 		WfComponentProvider wp = new WfComponentProvider();
 		List<WfRole> rolesList = wp.getRoles();
+		Collections.sort(rolesList);
 		DefaultTableModel model = (DefaultTableModel) rolesTable.getModel();
 		for (WfRole role : rolesList) {
 			model.addRow(new Object[] { new Boolean(false), role.getName() });
@@ -148,6 +165,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 		}
 
 		List<WfState> states = wp.getAllStates();
+		Collections.sort(states);
 		DefaultTableModel statusModel = (DefaultTableModel) statesTable.getModel();
 		for (WfState state : states) {
 			statusModel.addRow(new Object[] { new Boolean(false), state.getName() });
@@ -163,17 +181,30 @@ public class WorkflowDefinitionPanel extends JPanel {
 		File[] drlList = new File("drools-rules/").listFiles();
 		drlModel.addElement("No selected files");
 		xlsModel.addElement("No selected files");
+		List<String> xlsFileList = new ArrayList<String>(); 
+		List<String> drlFileList = new ArrayList<String>(); 
 		for (File file : drlList) {
 			if (file.getName().endsWith(".drl")) {
 				String fileName = file.getName().replaceAll(".drl", "");
 				drlHash.put(fileName, file);
-				drlModel.addElement(fileName);
+				drlFileList.add(fileName);
 			} else if (file.getName().endsWith(".xls")) {
 				String fileName = file.getName().replaceAll(".xls", "");
 				xlsHash.put(fileName, file);
-				xlsModel.addElement(fileName);
+				xlsFileList.add(fileName);
 			}
 		}
+		
+		Collections.sort(drlFileList);
+		for (String string : drlFileList) {
+			drlModel.addElement(string);
+		}
+		Collections.sort(xlsFileList);
+		for (String string : xlsFileList) {
+			xlsModel.addElement(string);
+		}
+		
+		
 		drlFiles.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		xlsFiles.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		drlFiles.setSelectedIndex(0);
@@ -227,13 +258,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 		}
 
 		actions = (HashMap<String, WfAction>) wd.getActions();
-		DefaultListModel<WfAction> lmodel = new DefaultListModel<WfAction>();
-		actionsList.setModel(lmodel);
-		if (actions.size() > 0) {
-			for (String act : actions.keySet()) {
-				lmodel.addElement(actions.get(act));
-			}
-		}
+		actionsListPopulate();
 
 		xlsFiles.clearSelection();
 		List<String> excelFiles = wd.getXlsFileName();
@@ -322,7 +347,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 	}
 
 	protected void editButtonActionPerformed(ActionEvent e) {
-		if (editActionButton.getText().equals("edit")) {
+		if (editActionButton.getText().equals("Edit")) {
 			editActionButton.setText("Save");
 			WfAction a = actions.get(actionsList.getSelectedValue().getName());
 			actionUuidField.setText(a.getId().toString());
@@ -341,6 +366,8 @@ public class WorkflowDefinitionPanel extends JPanel {
 			actionBpCmbo.setEnabled(true);
 			actionConsequenceCmbo.setEnabled(true);
 		} else {
+			currentAction = new WfAction();
+			currentAction.setId(UUID.fromString(actionUuidField.getText()));
 			currentAction.setName(actionNameField.getText());
 			File aux = businessFiles.get(actionBpCmbo.getSelectedItem().toString());
 			if (aux.isFile()) {
@@ -352,13 +379,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 				return;
 			} else {
 				actions.put(currentAction.getName(), currentAction);
-				DefaultListModel<WfAction> lmodel = new DefaultListModel<WfAction>();
-				if (actions.size() > 0)
-					for (WfAction act : actions.values()) {
-						lmodel.addElement(act);
-					}
-				actionsList.setModel(lmodel);
-				actionsList.updateUI();
+				actionsListPopulate();
 			}
 
 			actionUuidField.setText("");
@@ -371,12 +392,27 @@ public class WorkflowDefinitionPanel extends JPanel {
 			removeButton.setEnabled(true);
 			actionNameField.setEnabled(false);
 			actionBpCmbo.setEnabled(false);
-			actionBpCmbo.setEnabled(false);
+			actionConsequenceCmbo.setEnabled(false);
 
 			editActionButton.setText("Edit");
 			saveButton.setEnabled(true);
 			revertButton.setEnabled(true);
 		}
+	}
+
+	private void actionsListPopulate() {
+		DefaultListModel<WfAction> lmodel = new DefaultListModel<WfAction>();
+		if (actions.size() > 0) {
+			Set<String> keyset = actions.keySet();
+			List<String> keys = new ArrayList<String>();
+			keys = Arrays.asList(keyset.toArray(new String[0]));
+			Collections.sort(keys);
+			for (String act : keys) {
+				lmodel.addElement(actions.get(act));
+			}
+		}
+		actionsList.setModel(lmodel);
+		actionsList.updateUI();
 	}
 
 	private void newActionActionPreformed(ActionEvent e) {
@@ -393,10 +429,15 @@ public class WorkflowDefinitionPanel extends JPanel {
 			selectedAction = -1;
 			activeSelection = false;
 			actionConsequenceCmbo.removeAllItems();
+			List<String> consequenceItems = new ArrayList<String>();
 			for (int i = 0; i < statesTable.getRowCount(); i++) {
 				if (((Boolean) statesTable.getValueAt(i, 0)) == true) {
-					actionConsequenceCmbo.addItem((String) statesTable.getValueAt(i, 1));
+					consequenceItems.add((String) statesTable.getValueAt(i, 1));
 				}
+			}
+			Collections.sort(consequenceItems);
+			for (String string : consequenceItems) {
+				actionConsequenceCmbo.addItem(string);
 			}
 
 			newActionButton.setEnabled(true);
@@ -418,13 +459,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 					return;
 				} else {
 					actions.put(currentAction.getName(), currentAction);
-					DefaultListModel<WfAction> lmodel = new DefaultListModel<WfAction>();
-					if (actions.size() > 0)
-						for (WfAction act : actions.values()) {
-							lmodel.addElement(act);
-						}
-					actionsList.setModel(lmodel);
-					actionsList.updateUI();
+					actionsListPopulate();
 				}
 
 				newActionButton.setText("New Action");
@@ -439,7 +474,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 				removeButton.setEnabled(false);
 				actionNameField.setEnabled(false);
 				actionBpCmbo.setEnabled(false);
-				actionBpCmbo.setEnabled(false);
+				actionConsequenceCmbo.setEnabled(false);
 
 				saveButton.setText("Save");
 				saveButton.setEnabled(true);
@@ -462,14 +497,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 				actionBpCmbo.setSelectedIndex(-1);
 				actionConsequenceCmbo.setSelectedIndex(-1);
 
-				DefaultListModel<WfAction> lmodel = new DefaultListModel<WfAction>();
-				if (actions.size() > 0) {
-					for (WfAction act : actions.values()) {
-						lmodel.addElement(act);
-					}
-				}
-				actionsList.setModel(lmodel);
-				actionsList.updateUI();
+				actionsListPopulate();
 
 				activeSelection = false;
 				selectedAction = -1;
@@ -531,10 +559,15 @@ public class WorkflowDefinitionPanel extends JPanel {
 				actionBpCmbo.setSelectedItem(a.getBusinessProcess().getName().replaceAll(".bp", ""));
 			}
 			actionConsequenceCmbo.removeAllItems();
+			List<String> consequenceItems = new ArrayList<String>();
 			for (int i = 0; i < statesTable.getRowCount(); i++) {
 				if (((Boolean) statesTable.getValueAt(i, 0)) == true) {
-					actionConsequenceCmbo.addItem((String) statesTable.getValueAt(i, 1));
+					consequenceItems.add((String) statesTable.getValueAt(i, 1));
 				}
+			}
+			Collections.sort(consequenceItems);
+			for (String string : consequenceItems) {
+				actionConsequenceCmbo.addItem(string);
 			}
 			if (a.getConsequence() != null) {
 				actionConsequenceCmbo.setSelectedItem(a.getConsequence().getName());
@@ -577,10 +610,15 @@ public class WorkflowDefinitionPanel extends JPanel {
 					}
 				}
 			}
+			List<String> consequenceItems = new ArrayList<String>();
 			for (int i = 0; i < statesTable.getRowCount(); i++) {
 				if (((Boolean) statesTable.getValueAt(i, 0)) == true) {
-					selStates.add(statesHash.get((String) statesTable.getValueAt(i, 1)));
+					consequenceItems.add((String) statesTable.getValueAt(i, 1));
 				}
+			}
+			Collections.sort(consequenceItems);
+			for (String string : consequenceItems) {
+				actionConsequenceCmbo.addItem(string);
 			}
 			WorkflowDefinition workflowDefinition = new WorkflowDefinition(selRoles, selStates, actions);
 			workflowDefinition.setName(wfDefs.getSelectedItem().toString());
@@ -833,12 +871,16 @@ public class WorkflowDefinitionPanel extends JPanel {
 			});
 			label2 = new JLabel();
 			actionUuidField = new JTextField();
+			actionUuidField.setEnabled(false);
 			label3 = new JLabel();
 			actionNameField = new JTextField();
+			actionNameField.setEnabled(false);
 			label4 = new JLabel();
-			actionConsequenceCmbo = new JComboBox();
+			actionConsequenceCmbo = new JComboBox<String>();
+			actionConsequenceCmbo.setEnabled(false);
 			label5 = new JLabel();
 			actionBpCmbo = new JComboBox();
+			actionBpCmbo.setEnabled(false);
 
 			// ======== panel4 ========
 			{
@@ -967,7 +1009,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 	private JLabel label3;
 	private JTextField actionNameField;
 	private JLabel label4;
-	private JComboBox actionConsequenceCmbo;
+	private JComboBox<String> actionConsequenceCmbo;
 	private JLabel label5;
 	private JComboBox actionBpCmbo;
 	private JPanel panel5;
