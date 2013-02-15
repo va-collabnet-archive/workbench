@@ -110,8 +110,7 @@ public class TransformProcessor implements ProcessUnfetchedConceptDataBI{
 		I_GetConceptData c = (I_GetConceptData) fetcher.fetch();
 		TkConcept eC;
 		try {
-                    
-                    boolean watch = watchUuids.contains(c.getPrimUuid());
+			boolean watch = watchUuids.contains(c.getPrimUuid());
 			long ini = Calendar.getInstance().getTimeInMillis();
 
 			if (watch) {
@@ -146,7 +145,7 @@ public class TransformProcessor implements ProcessUnfetchedConceptDataBI{
 				}
 			}
 		} catch (Exception e) {
-			System.out.println("There was an error converting to eConcept: " + c.toString());
+			System.out.println("\r\nThere was an error converting to eConcept: " + c.getPrimUuid() + " " + c.toString());
 			e.printStackTrace();
 		}
 
