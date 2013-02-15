@@ -1368,7 +1368,7 @@ public class TerminologyProjectDAO {
 	public static void setModuleIdRefset(TranslationProject project, I_GetConceptData concept, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 		try {
-			if ((concept != null) && (project.getReleasePath() == null) || (concept.getConceptNid() != project.getReleasePath().getConceptNid())) {
+			if ((concept != null && project != null) && (project.getReleasePath() == null) || (concept.getConceptNid() != project.getReleasePath().getConceptNid())) {
 				List<? extends I_RelTuple> targetRefsetRels = null;
 				I_IntSet allowedDestRelTypes = termFactory.newIntSet();
 				// allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.PATRICIA_HOUGHTON.localize().getNid());

@@ -322,8 +322,8 @@ public class WfComponentProvider {
 
 		try {
 			Set<I_GetConceptData> allStates = new HashSet<I_GetConceptData>();
-			allStates = ProjectPermissionsAPI.getDescendants(allStates, Terms.get().getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_STATUS.getUids()));
-
+			allStates.addAll(ProjectPermissionsAPI.getDescendants(allStates, Terms.get().getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_STATUS.getUids())));
+			allStates.addAll(ProjectPermissionsAPI.getDescendants(allStates, Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_STATES.getUids())));
 			for (I_GetConceptData state : allStates) {
 				returnStates.add(statusConceptToWfState(state));
 			}

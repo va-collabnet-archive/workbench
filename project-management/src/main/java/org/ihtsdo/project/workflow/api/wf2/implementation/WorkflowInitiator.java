@@ -2,6 +2,7 @@ package org.ihtsdo.project.workflow.api.wf2.implementation;
 
 import java.beans.PropertyChangeEvent;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -14,6 +15,8 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
+import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.NidBitSetItrBI;
@@ -24,7 +27,7 @@ import org.ihtsdo.tk.workflow.api.WorkflowInitiatiorBI;
 import org.ihtsdo.tk.workflow.api.WorkflowStoreBI;
 
 public class WorkflowInitiator implements WorkflowInitiatiorBI {
-	
+
 	public static Map<Integer,NidSet> alreadySeen;
 	private static ConceptChronicleBI rootConcept;
 	private static WorkflowStoreBI wfStore;
@@ -38,7 +41,7 @@ public class WorkflowInitiator implements WorkflowInitiatiorBI {
 	public boolean evaluateForWorkflowInitiation(
 			PropertyChangeEvent event) throws Exception {
 		myEvt = event;
-		
+
 		I_GetConceptData workflow = Terms.get().getActiveAceFrameConfig().getDefaultWorkflowForChangedConcept();
 		final Integer workflowNid;
 		if (workflow == null) {
@@ -46,11 +49,11 @@ public class WorkflowInitiator implements WorkflowInitiatiorBI {
 		} else {
 			workflowNid = workflow.getNid();
 		}
-		
+
 		if (alreadySeen.get(workflowNid) == null) {
 			alreadySeen.put(workflowNid, new NidSet());
 		}
-		
+
 		SwingUtilities.invokeLater(new Runnable() {
 			synchronized
 			public void run() {
@@ -81,7 +84,7 @@ public class WorkflowInitiator implements WorkflowInitiatiorBI {
 		});
 		return true;
 	}
-	
+
 	private static boolean addComponentToDefaultWorklist(
 			ConceptChronicleBI concept) {
 		I_ConfigAceFrame config;
@@ -95,6 +98,7 @@ public class WorkflowInitiator implements WorkflowInitiatiorBI {
 			if (Ts.get().isKindOf(concept.getConceptNid(), rootConcept.getConceptNid(), config.getViewCoordinate())) {
 
 				I_GetConceptData worklistConcept = config.getDefaultWorkflowForChangedConcept();
+				I_GetConceptData projectConcept = config.getDefaultProjectForChangedConcept();
 
 				//System.out.println("worklistConcept: " + worklistConcept);
 
@@ -105,16 +109,28 @@ public class WorkflowInitiator implements WorkflowInitiatiorBI {
 					wfStore=new WorkflowStore();
 				}
 				WorkList workList = (WorkList) wfStore.getWorklist(worklistConcept.getPrimUuid());
-				WfProcessInstanceBI instance = wfStore.getProcessInstance(workList, concept.getPrimUuid());
+				Collection<WfProcessInstanceBI> instances = wfStore.getProcessInstances(concept.getPrimUuid());
+
+				boolean alreadyInProject = false;
+				
+				for (WfProcessInstanceBI loopInstance : instances) {
+					if (loopInstance.isActive() && !loopInstance.isCompleted()){
+						I_TerminologyProject loopProject = TerminologyProjectDAO.getProjectForWorklist((WorkList) loopInstance.getWorkList(), config);
+						if (projectConcept.getNid() == loopProject.getId()) {
+							alreadyInProject = true;
+							break;
+						}
+					}
+				}
+
+				//WfProcessInstanceBI instance = wfStore.getProcessInstance(workList, concept.getPrimUuid());
 
 				//System.out.println("instance: " + instance);
+				//System.out.println("instance.isActive(): " + instance.isActive());
+				//System.out.println("instance.isCompleted(): " + instance.isCompleted());
 
-				if (instance!=null){
-					//System.out.println("instance.isActive(): " + instance.isActive());
-					//System.out.println("instance.isCompleted(): " + instance.isCompleted());
-					if (instance.isActive() && !instance.isCompleted()){
-						return false;
-					}
+				if ( alreadyInProject ){ //instance!=null
+					return false;
 				}
 				workList.createInstanceForComponent(concept.getPrimUuid(), new WfProcessDefinition(workList.getWorkflowDefinition()));
 				return true;
