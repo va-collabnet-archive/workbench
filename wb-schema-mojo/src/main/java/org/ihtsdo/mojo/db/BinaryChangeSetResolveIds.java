@@ -15,7 +15,6 @@
  */
 package org.ihtsdo.mojo.db;
 
-import edu.emory.mathcs.backport.java.util.Collections;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
@@ -29,6 +28,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
