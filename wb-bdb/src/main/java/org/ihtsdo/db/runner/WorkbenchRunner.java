@@ -1,12 +1,9 @@
 package org.ihtsdo.db.runner;
 
-//~--- non-JDK imports --------------------------------------------------------
-
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.commitlog.CommitLog;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.AceFrame;
@@ -16,20 +13,17 @@ import org.dwfa.ace.config.AceProtocols;
 import org.dwfa.ace.dnd.DragMonitor;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.svn.SvnPrompter;
-import org.dwfa.ace.tree.ExpandNodeSwingWorker;
 import org.dwfa.app.DwfaEnv;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.util.ComponentFrameBean;
 import org.dwfa.bpa.util.OpenFrames;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.queue.QueueServer;
+import org.dwfa.queue.MultiQueueStarter;
 import org.dwfa.svn.Svn;
 import org.dwfa.swing.SwingWorker;
-import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.io.FileIO;
 import org.dwfa.vodb.types.Position;
-
 import org.ihtsdo.arena.contradiction.ContradictionEditorGenerator;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
@@ -40,36 +34,33 @@ import org.ihtsdo.objectCache.ObjectCacheClassHandler;
 import org.ihtsdo.taxonomy.model.NodeFactory;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
-
-//~--- JDK imports ------------------------------------------------------------
+import org.ihtsdo.ttk.preferences.EnumBasedPreferences;
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
-
 import java.lang.reflect.InvocationTargetException;
-
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
-
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.InvalidPreferencesFormatException;
+import java.util.prefs.Preferences;
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -207,7 +198,7 @@ public class WorkbenchRunner {
                 svnHelper.initialSubversionOperationsAndChangeSetImport(new File("config", WB_PROPERTIES), prompter);
             }
 
-            if ((wbConfigFile == null) ||!wbConfigFile.exists()) {
+            if ((wbConfigFile == null) || !wbConfigFile.exists()) {
                 if (acePropertiesFileExists) {
                     wbProperties.loadFromXML(new FileInputStream(wbPropertiesFile));
                 }
@@ -327,7 +318,6 @@ public class WorkbenchRunner {
                 try {
                     AceConfig.config = (AceConfig) ois.readObject();
                     AceConfig.config.setProfileFile(userProfile);
-                    AceConfig.config.getUsername();
                     prompter.setUsername(AceConfig.config.getUsername());
                     prompter.setPassword(profiler.getPassword());
                 } catch (Exception ex) {
@@ -364,17 +354,20 @@ public class WorkbenchRunner {
                 AceConfig.config.setChangeSetWriterFileName(writerName);
             }
 
-            ChangeSetWriterHandler.addWriter(
-                AceConfig.config.getUsername() + ".eccs",
-                new EConceptChangeSetWriter(
-                    new File(AceConfig.config.getChangeSetRoot(), AceConfig.config.getChangeSetWriterFileName()),
-                    new File(AceConfig.config.getChangeSetRoot(), "." + AceConfig.config.getChangeSetWriterFileName()),
-                    ChangeSetGenerationPolicy.INCREMENTAL, true));
-            ChangeSetWriterHandler.addWriter(AceConfig.config.getUsername() + ".commitLog.xls",
-                                             new CommitLog(new File(AceConfig.config.getChangeSetRoot(),
-                                                 "commitLog.xls"), new File(AceConfig.config.getChangeSetRoot(),
-                                                     "." + "commitLog.xls")));
+            String userName = AceConfig.config.getUsername();
+            File changeSetRoot = AceConfig.config.getChangeSetRoot();
+            ChangeSetWriterHandler.addWriter(userName + ".eccs",
+                    new EConceptChangeSetWriter(
+                            new File(changeSetRoot, writerName),
+                            new File(changeSetRoot, "." + writerName),
+                            ChangeSetGenerationPolicy.INCREMENTAL, true));
+            ChangeSetWriterHandler.addWriter(userName + ".commitLog.xls",
+                    new CommitLog(new File(changeSetRoot, "commitLog.xls"),
+                            new File(changeSetRoot, "." + "commitLog.xls")));
 
+            // Start user queues. 
+            new MultiQueueStarter(loadUserPreferences(userName));
+            
             int successCount = 0;
             int frameCount   = 0;
 
@@ -456,6 +449,33 @@ public class WorkbenchRunner {
             AceLog.getAppLog().info("### exit from WorkbenchRunner 4.");
             System.exit(0);
         }
+    }
+
+    private EnumBasedPreferences loadUserPreferences(String userName) throws BackingStoreException,
+            FileNotFoundException, IOException,
+            InvalidPreferencesFormatException, Exception {
+        
+        // Load app info properties from XML.
+        Properties appInfoProperties = new Properties();
+        File profileRoot = new File("profiles");
+        File appInfoPropertiesFile = new File(profileRoot, "appinfo.properties");
+        appInfoProperties.loadFromXML(new FileInputStream(appInfoPropertiesFile));
+        
+        // Load new-style user preferences.        
+        String appPrefix = EnumBasedPreferences.getDefaultAppPrefix(appInfoProperties, userName);
+        EnumBasedPreferences prefs = new EnumBasedPreferences(appPrefix);
+        
+        // If user preferences don't already exist, load defaults from file.
+        if (prefs.childrenNames().length == 0) {
+            File preferencesFile = new File(userProfile.getParentFile(), "Preferences.xml");
+            InputStream is = new FileInputStream(preferencesFile);
+            Preferences.importPreferences(is);
+        }
+        
+        // Bring up to date.
+        prefs.sync();
+
+        return prefs;
     }
 
     private void checkCustom() {
@@ -740,5 +760,9 @@ public class WorkbenchRunner {
         public void intervalRemoved(ListDataEvent arg0) {
             AceLog.getAppLog().info("intervalRemoved: " + arg0);
         }
+    }
+
+    public static void main(String[] args) {
+        new WorkbenchRunner(args);
     }
 }

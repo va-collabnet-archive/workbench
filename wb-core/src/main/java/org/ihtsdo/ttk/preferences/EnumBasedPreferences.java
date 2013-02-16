@@ -15,19 +15,16 @@
  */
 package org.ihtsdo.ttk.preferences;
 
-import org.ihtsdo.ttk.queue.QueuePreferences.Fields;
-
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
-import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.NodeChangeListener;
 import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
@@ -42,6 +39,10 @@ import java.util.prefs.Preferences;
  * @author ocarlsen
  */
 public class EnumBasedPreferences {
+
+    public static final String GROUP_ID = "groupId";
+    public static final String ARTIFACT_ID = "artifactId";
+    public static final String VERSION = "version";
 
     private Preferences preferences;
     private String appPrefix;
@@ -346,14 +347,6 @@ public class EnumBasedPreferences {
         preferences.exportSubtree(os);
     }
 
-//    public EnumBasedPreferences appNodeForPackage(Class<?> c) {
-//        return new EnumBasedPreferences(this, preferences.node(nodeName(c, true)));
-//    }
-
-//    public EnumBasedPreferences appNodeForClass(Class<?> c) {
-//        return new EnumBasedPreferences(this, preferences.node(nodeName(c, false)));
-//    }
-
     public EnumBasedPreferences childNode(String name) {
         return new EnumBasedPreferences(this, preferences.node(preferences.absolutePath() + "/" + name));
     }
@@ -364,19 +357,32 @@ public class EnumBasedPreferences {
         return enumNode;
     }
 
-//    private String nodeName(Class c, boolean packageOnly) {
-//        String nodeName = c.getName();
-//
-//        if (packageOnly) {
-//            int lastDot = nodeName.lastIndexOf('.');
-//
-//            nodeName = nodeName.substring(0, lastDot);
-//        }
-//
-//        return appPrefix + "/" + nodeName.replace('.', '/');
-//    }
-
-//    private Enum valueOf(Class enumTypeClass, String defaultName) {
-//        return Enum.valueOf(enumTypeClass, get(enumTypeClass, defaultName));
-//    }
+    /**
+     * Compute an 'app prefix' to be used as the root of the user preference hierarchy.
+     * @param groupId The Maven ${groupId} property.
+     * @param artifactId The Maven ${groupId} property.
+     * @param version The Maven ${version} property.
+     * @param userName The name of the workbench user whose preferences will be accessed.
+     * @return A String to pass into the {@link EnumBasedPreferences} constructor.
+     */
+    public static String getDefaultAppPrefix(String groupId, String artifactId, String version, String userName) {
+        return groupId + ";" + artifactId + ";" + version + ";" + userName;
+    }
+    
+    
+    /**
+     * Gets the default app prefix from the specified {@link Properties} object,
+     * using the {@code GROUP_ID}, {@code ARTIFACT_ID}, and {@code VERSION} constants
+     * as keys.  
+     *
+     * @param appInfoProperties the app info properties
+     * @param userName the user name
+     * @return the default app prefix
+     */
+    public static String getDefaultAppPrefix(Properties appInfoProperties, String userName) {
+        String groupId = appInfoProperties.getProperty(GROUP_ID);
+        String artifactId = appInfoProperties.getProperty(ARTIFACT_ID);
+        String version = appInfoProperties.getProperty(VERSION);
+        return getDefaultAppPrefix(groupId, artifactId, version, userName);
+    }
 }

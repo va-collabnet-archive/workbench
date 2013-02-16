@@ -80,6 +80,11 @@ import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipType;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.spec.ValidationException;
+import org.ihtsdo.ttk.preferences.EnumBasedPreferences;
+import org.ihtsdo.ttk.queue.QueueList;
+import org.ihtsdo.ttk.queue.QueuePreferences;
+import org.ihtsdo.ttk.queue.QueueType;
+import org.ihtsdo.ttk.queue.QueueType.Types;
 import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetSearcher;
 import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetWriter;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
@@ -113,6 +118,9 @@ import javax.swing.JOptionPane;
  */
 public class GenerateUsersExtended extends AbstractMojo {
 
+    private static final String QUEUE_ROOT = "queues";
+    private static final String PROFILE_ROOT = "profiles";
+    
     /**
      * Berkeley directory.
      *
@@ -154,6 +162,24 @@ public class GenerateUsersExtended extends AbstractMojo {
      * @parameter
      */
     private String userParentConceptName;
+    /**
+     * The groupId to use when constructing a user preference appPrefix.
+     *
+     * @parameter expression="${project.groupId}"
+     */
+    private String groupId;
+    /**
+     * The artifactId to use when constructing a user preference appPrefix.
+     *
+     * @parameter expression="${project.artifactId}"
+     */
+    private String artifactId;
+    /**
+     * The version to use when constructing a user preference appPrefix.
+     *
+     * @parameter expression="${project.version}"
+     */
+    private String version;
     private File userConfigFile;
     private EditorCategoryRefsetSearcher searcher = null;
     private HashMap<String, ConceptVersionBI> modelers = null;
@@ -335,12 +361,32 @@ public class GenerateUsersExtended extends AbstractMojo {
                 }
 
             }
+            
+            // Finally, export the groupId, artifactId, version to a properties file.
+            // This will be queried when the workbench launches to load user pref's.
+            exportAppInfoProperties();
+
         } catch (Exception ex) {
             throw new MojoExecutionException(ex.getLocalizedMessage(), ex);
         } catch (Throwable ex) {
             throw new MojoExecutionException(ex.getLocalizedMessage(), ex);
         }
 
+    }
+
+    private void exportAppInfoProperties() throws FileNotFoundException, IOException {
+        Properties appInfoProperties = new Properties();  
+        
+        // Set workbench build properties.
+        appInfoProperties.setProperty(EnumBasedPreferences.GROUP_ID, groupId);
+        appInfoProperties.setProperty(EnumBasedPreferences.ARTIFACT_ID, artifactId); 
+        appInfoProperties.setProperty(EnumBasedPreferences.VERSION, version);
+        
+        // Write out to file.
+        File profileRoot = new File(wbBundleDir, PROFILE_ROOT);
+        File appInfoPropertiesFile = new File(profileRoot, "appinfo.properties");
+        String comment = "App Info";
+        appInfoProperties.storeToXML(new FileOutputStream(appInfoPropertiesFile), comment);
     }
 
     private void readUserConfigFile() throws MojoExecutionException {
@@ -442,7 +488,7 @@ public class GenerateUsersExtended extends AbstractMojo {
             String adminUsername, String adminPassword, String userConfigList)
             throws MojoExecutionException {
         try {
-            File userDir = new File(wbBundleDir, "profiles" + File.separator + username);
+            File userDir = new File(wbBundleDir, PROFILE_ROOT + File.separator + username);
             File userProfile = new File(userDir, username + ".wb");
             create = !userProfile.exists();
             if (create) {
@@ -521,10 +567,6 @@ public class GenerateUsersExtended extends AbstractMojo {
 
 		addUserToAddressList(username);
 
-		File userQueueRoot = new File(wbBundleDir, "queues" + File.separator + username);
-		getLog().info("** userQueueRoot: " + userQueueRoot.getAbsolutePath());
-		userQueueRoot.mkdirs();
-
 		// Create new concept for user...
 		if (userUuid == null || userUuid.equals("")) {
 		    createUser();
@@ -549,8 +591,8 @@ public class GenerateUsersExtended extends AbstractMojo {
 		} finally {
 		    Ts.get().removeChangeSetGenerator(tempKey);
 		}
-
-		createQueues(userQueueRoot);
+		
+		setQueuePreferences(userDir);
 		
 		return true;
 	}
@@ -606,7 +648,7 @@ public class GenerateUsersExtended extends AbstractMojo {
 		changeSetRoot.mkdirs();
 
 		I_ConfigAceDb dbConfig = userConfig.getDbConfig();
-		File absoluteChangeSetRoot = new File(wbBundleDir, "profiles/user-creation-changesets");
+		File absoluteChangeSetRoot = new File(wbBundleDir, PROFILE_ROOT + File.separator + "user-creation-changesets");
 
 		dbConfig.setChangeSetRoot(changeSetRoot);
 		getLog().info("** Changeset root from db config: " + dbConfig.getChangeSetRoot().getAbsolutePath());
@@ -640,19 +682,47 @@ public class GenerateUsersExtended extends AbstractMojo {
 		}
 	}
 
-	private void createQueues(File userQueueRoot) throws IOException, Exception {
-		// Create inbox
-		createInbox(userConfig, userConfig.getUsername() + ".inbox", userQueueRoot,
-		        userConfig.getUsername() + ".inbox");
+    private void setQueuePreferences(File userDir) throws IOException, Exception {
+        String userName = userConfig.getUsername();
 
-		// Create todo box
-		createInbox(userConfig, userConfig.getUsername() + ".todo", userQueueRoot,
-		        userConfig.getUsername() + ".inbox");
+        // Create queue root directory (at WB build time).
+        File queueRoot = new File(wbBundleDir, QUEUE_ROOT);
+        File userQueueRoot = new File(queueRoot, userName);
+        getLog().info("** userQueueRoot: " + userQueueRoot);
+        userQueueRoot.mkdirs();
+        
+        // Specify individual queues (to be created at WB run time).
+        QueueList queueList = new QueueList();
 
-		// Create outbox box
-		createOutbox(userConfig, userConfig.getUsername() + ".outbox", userQueueRoot,
-		        userConfig.getUsername() + ".inbox");
-	}
+        // Set inbox prefs.
+        String inboxName = userName + ".inbox";
+        setInboxQueuePreferences(queueList, inboxName, userQueueRoot);
+
+        // Set todo box prefs.
+        String todoBoxName = userName + ".todo";
+        setInboxQueuePreferences(queueList, todoBoxName, userQueueRoot);
+
+        // Set outbox prefs.
+        String outboxName = userName + ".outbox";
+        setOutboxQueuePreferences(queueList, outboxName, userQueueRoot);
+
+        getLog().info("** queueList: " + queueList);
+
+        // Export queue list to user preferences.
+        String appPrefix = EnumBasedPreferences.getDefaultAppPrefix(groupId, artifactId, version, userName);
+        EnumBasedPreferences prefs = new EnumBasedPreferences(appPrefix);
+        queueList.exportFields(prefs);
+
+        // Write user preferences to file.
+        File userPrefsFile = new File(userDir, "Preferences.xml"); 
+        getLog().info("** userPrefsFile: " + userPrefsFile);
+        prefs.exportSubtree(new FileOutputStream(userPrefsFile));
+        
+        // Java Preference API will also store these preferences on
+        // the build server.  Clean them up here.
+        prefs.removeNode();
+        prefs.flush();
+    }
 
 	private void writeConfig() throws FileNotFoundException, IOException {
 		I_ConfigAceDb dbConfig = userConfig.getDbConfig();
@@ -762,16 +832,24 @@ public class GenerateUsersExtended extends AbstractMojo {
         return null;
     }
 
-    private void createInbox(I_ConfigAceFrame config, String inboxName, File userQueueRoot,
-            String nodeInboxAddress) throws IOException, Exception {
-//		throw new UnsupportedOperationException("TODO: Jini removal");
-    	System.out.println("inboxName="+inboxName);
+    private void setInboxQueuePreferences(QueueList queueList, String inboxName, File userQueueRoot)
+    		throws IOException, Exception {
+    	String id = UUID.randomUUID().toString();
+    	File queueDirectory = new File(userQueueRoot, inboxName);
+        QueueType queueType = new QueueType(Types.INBOX);
+		QueuePreferences queuePrefs = new QueuePreferences(inboxName, id, queueDirectory,
+        		Boolean.FALSE, queueType);
+    	queueList.getQueuePreferences().add(queuePrefs);    
     }
 
-    private void createOutbox(I_ConfigAceFrame config, String outboxName, File userQueueRoot,
-            String nodeInboxAddress) throws IOException, Exception {
-//		throw new UnsupportedOperationException("TODO: Jini removal");
-    	System.out.println("outboxName="+outboxName);
+    private void setOutboxQueuePreferences(QueueList queueList, String outboxName, File userQueueRoot) 
+    		throws IOException, Exception {
+    	String id = UUID.randomUUID().toString();
+    	File queueDirectory = new File(userQueueRoot, outboxName);
+        QueueType queueType = new QueueType(Types.OUTBOX);
+		QueuePreferences queuePrefs = new QueuePreferences(outboxName, id, queueDirectory,
+        		Boolean.FALSE, queueType);
+    	queueList.getQueuePreferences().add(queuePrefs);    
     }
 
     private ConceptChronicleBI createUser()

@@ -25,6 +25,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -45,6 +47,8 @@ import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.util.LogWithAlerts;
 
 public class ProcessPopupUtil {
+
+    private static final boolean FAIL = false;
 
     public static class ProcessMenuActionListener implements ActionListener {
 
@@ -150,6 +154,23 @@ public class ProcessPopupUtil {
                 }
                 if (f.listFiles() != null) {
                     for (File processFile : getSortedFiles(f)) {
+                        
+                        // Skip these files, which cannot be de-serialized post-Jini
+                        // because they have fields of type org.dwfa.jini.TermEntry.
+                        // A java.io.InvalidClassException will be thrown with 
+                        // message "class invalid for de-serialization".
+                        Set<File> filesToSkip = new HashSet<>();
+                        filesToSkip.add(new File("plugins/menu/20_Tasks/12_export_current_refset_members_to_TDTF.bp"));
+                        filesToSkip.add(new File("plugins/menu/20_Tasks/201_export_current_refset_members_to_TDTF.bp"));
+                        filesToSkip.add(new File("plugins/menu/20_Tasks/85_ms-batch-import.bp"));
+                        if (filesToSkip.contains(processFile)) {
+                            if (FAIL) {
+                                throw new UnsupportedOperationException("TODO: Remove Jini.");
+                            } else {
+                                continue;
+                            }
+                        }
+                        
                         if (processFile.isDirectory()) {
                             JMenu submenu = new JMenu(processFile.getName());
                             newMenu.add(submenu);

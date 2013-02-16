@@ -16,12 +16,13 @@
  */
 package org.dwfa.queue;
 
-import java.util.Arrays;
-import java.util.logging.Logger;
-import java.util.logging.Level;
 import org.ihtsdo.ttk.preferences.EnumBasedPreferences;
 import org.ihtsdo.ttk.queue.QueueList;
 import org.ihtsdo.ttk.queue.QueuePreferences;
+
+import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MultiQueueStarter {
 
@@ -31,23 +32,22 @@ public class MultiQueueStarter {
      *  queue list to be processed. 
      * @throws Exception 
      */
-    public MultiQueueStarter(String[] args) throws Exception {
-        getLogger().log(
-            Level.INFO,"\n*******************\n\n"
+    public MultiQueueStarter(EnumBasedPreferences prefs) throws Exception {
+        getLogger().log(Level.INFO,"\n*******************\n\n"
                 + "Starting MultiQueueStarter with preferences "
-                + "root of: {0}\n\n******************\n", Arrays.asList(args));
+                + "root of: {0}\n\n******************\n", prefs);
 
-        
-        QueueList queueList = new QueueList(new EnumBasedPreferences(args[0]));
+        QueueList queueList = new QueueList(prefs);
         for (QueuePreferences queuePreferences : queueList.getQueuePreferences()) {
             processQueue(queuePreferences);
         }
-
     }
 
     private void processQueue(QueuePreferences queuePreferences) throws Exception {
-        if (!queuePreferences.getQueueDirectory().exists()) {
-            queuePreferences.getQueueDirectory().mkdirs();
+        File queueDirectory = queuePreferences.getQueueDirectory();
+        if (!queueDirectory.exists()) {
+            getLogger().info(" ** Creating queue directory: " + queueDirectory);
+            queueDirectory.mkdirs();
         }
         
         if (!QueueServer.started(queuePreferences)) {

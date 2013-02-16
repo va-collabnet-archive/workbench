@@ -24,8 +24,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 import java.util.UUID;
 import java.util.prefs.BackingStoreException;
+
 import junit.framework.TestCase;
 
 /**
@@ -35,20 +37,25 @@ import junit.framework.TestCase;
  */
 public class EnumBasedPreferencesTest extends TestCase {
 
+    private static final int STRING_LENGTH = 8;
+    
     private EnumBasedPreferences testPrefs;
     private String appPrefix;
 
     @Override
     public void setUp() throws BackingStoreException {
 
-        // Create EnumBasedPreferences with random appPrefix.
-        this.appPrefix = getRandomString();
+        // Create random appPrefix.
+        // (EnumBasedPreferences.getDefaultAppPrefix is itself tested below.)
+        String groupId = getRandomString(STRING_LENGTH);
+        String artifactId = getRandomString(STRING_LENGTH);
+        String version = getRandomString(STRING_LENGTH);
+        String userName = getRandomString(STRING_LENGTH);
+        this.appPrefix = EnumBasedPreferences.getDefaultAppPrefix(
+                groupId, artifactId, version, userName);
 
+        // Create test EnumBasedPreferences.
         this.testPrefs = new EnumBasedPreferences(appPrefix);
-    }
-
-    private static String getRandomString() {
-        return UUID.randomUUID().toString();
     }
 
     @Override
@@ -58,10 +65,42 @@ public class EnumBasedPreferencesTest extends TestCase {
         testPrefs.removeNode();
         testPrefs.flush();
     }
+
+    public void testGetDefaultAppPrefix_FromStrings() {
+        // Create random arguments.
+        String groupId = getRandomString(STRING_LENGTH);
+        String artifactId = getRandomString(STRING_LENGTH);
+        String version = getRandomString(STRING_LENGTH);
+        String userName = getRandomString(STRING_LENGTH);
+        
+        // Confirm app prefix is calculated as expected.
+        String expectedAppPrefix = groupId + ";" + artifactId + ";" + version + ";" + userName;
+        assertEquals(expectedAppPrefix, EnumBasedPreferences.getDefaultAppPrefix(
+                groupId, artifactId, version, userName));
+    }
+
+    public void testGetDefaultAppPrefix_FromProperties() {
+        // Create random arguments.
+        String groupId = getRandomString(STRING_LENGTH);
+        String artifactId = getRandomString(STRING_LENGTH);
+        String version = getRandomString(STRING_LENGTH);
+        String userName = getRandomString(STRING_LENGTH);
+
+        // Set them on a Properties object.
+        Properties appInfoProperties = new Properties();
+        appInfoProperties.setProperty(EnumBasedPreferences.GROUP_ID, groupId);
+        appInfoProperties.setProperty(EnumBasedPreferences.ARTIFACT_ID, artifactId);
+        appInfoProperties.setProperty(EnumBasedPreferences.VERSION, version);
+        
+        // Confirm app prefix is calculated as expected.
+        String expectedAppPrefix = groupId + ";" + artifactId + ";" + version + ";" + userName;
+        assertEquals(expectedAppPrefix, EnumBasedPreferences.getDefaultAppPrefix(
+                appInfoProperties, userName));
+    }
     
     public void testPutGet() {
         PreferenceWithDefaultEnumBI<String> key = new DummyPreferenceWithDefaultEnumBI<>("");
-        String value = getRandomString();
+        String value = getRandomString(STRING_LENGTH);
         testPrefs.put(key, value);
         assertEquals(value, testPrefs.get(key));
     }
@@ -123,7 +162,7 @@ public class EnumBasedPreferencesTest extends TestCase {
 
         // Construct a custom QueuePreferences object with some service item properties.
         final String queueDisplayName = "some other display";
-        final String queueId = getRandomString();
+        final String queueId = getRandomString(STRING_LENGTH);
         final File queueDirectory = new File("some other location");
         final Boolean readInsteadOfTake = Boolean.TRUE;
         final QueueType queueType = new QueueType(QueueType.Types.OUTBOX);
@@ -176,5 +215,17 @@ public class EnumBasedPreferencesTest extends TestCase {
         assertEquals(queueType, resultQueueType);
         QueueAddress resultQueueAddress = (QueueAddress) serviceItemProperties.get(1);
         assertEquals(queueAddress, resultQueueAddress);
+    }
+
+    /**
+     * @param length
+     * @return A random String of length {@code length} generated from random UUIDs.
+     */
+    private static String getRandomString(int length) {
+        String uuidStr = UUID.randomUUID().toString();
+        long seed = System.currentTimeMillis();
+        int startIndex = (int) (seed % (uuidStr.length() - length));
+        int endIndex = startIndex + length;
+        return uuidStr.substring(startIndex, endIndex);
     }
 }

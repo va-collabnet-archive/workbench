@@ -19,33 +19,34 @@
  */
 package org.dwfa.queue;
 
+import org.dwfa.bpa.BusinessProcessInfo;
+import org.dwfa.bpa.process.EntryID;
+import org.dwfa.bpa.process.I_DescribeBusinessProcess;
+import org.dwfa.bpa.process.I_DescribeObject;
+import org.dwfa.bpa.process.I_EncodeBusinessProcess;
+import org.dwfa.bpa.process.I_QueueProcesses;
+import org.dwfa.bpa.process.I_SelectProcesses;
+import org.dwfa.bpa.process.NoMatchingEntryException;
+import org.dwfa.bpa.process.ProcessID;
+import org.ihtsdo.ttk.queue.QueueAddress;
+import org.ihtsdo.ttk.queue.QueuePreferences;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.rmi.RemoteException;
 import java.util.Collection;
-import java.util.logging.Logger;
-
-import org.dwfa.bpa.BusinessProcessInfo;
-import org.dwfa.bpa.process.EntryID;
-import org.dwfa.bpa.process.I_DescribeBusinessProcess;
-import org.dwfa.bpa.process.I_EncodeBusinessProcess;
-import org.dwfa.bpa.process.I_QueueProcesses;
-import org.dwfa.bpa.process.I_SelectProcesses;
-import org.dwfa.bpa.process.NoMatchingEntryException;
-import org.dwfa.bpa.process.ProcessID;
-
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.logging.Logger;
 import javax.transaction.Transaction;
-import org.ihtsdo.ttk.queue.QueueAddress;
-import org.ihtsdo.ttk.queue.QueuePreferences;
 
 /**
  * @author kec
  * 
  */
-public class QueueServer extends ObjectServerCore<I_DescribeBusinessProcess> implements I_QueueProcesses {
+public class QueueServer extends ObjectServerCore<I_DescribeBusinessProcess>
+        implements I_QueueProcesses, Comparable<ObjectServerCore<I_DescribeObject>> {
 
     private static ConcurrentSkipListSet<QueuePreferences> startedQueues = new ConcurrentSkipListSet<>();
 
@@ -189,6 +190,12 @@ public class QueueServer extends ObjectServerCore<I_DescribeBusinessProcess> imp
             }
         }
         return null;
+    }
+
+
+    @Override
+    public int compareTo(ObjectServerCore<I_DescribeObject> o) {
+        return this.directory.compareTo(o.directory);
     }
 
 }

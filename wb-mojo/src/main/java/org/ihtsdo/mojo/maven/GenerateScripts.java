@@ -147,73 +147,73 @@ public class GenerateScripts extends AbstractMojo {
 
         if (scriptNames == null) {
 
-            startAllScript(jars, "startCore", "start-core.config", "500m", "500m", "128", "Workflow Bundle", true, false,
+            startAllScript(jars, "startCore", "start-core.config", "500m", "500m", "128", "Workflow Bundle", false,
                 false, false);
-            startAllScript(jars, "startJehri", "start-jehri.config", "500m", "500m", "128", "Jehri Bundle", true, false,
+            startAllScript(jars, "startJehri", "start-jehri.config", "500m", "500m", "128", "Jehri Bundle", false,
                 false, false);
             startAllScript(jars, "startJehriAuthoring", "start-jehri-authoring.config", "500m", "500m", "128",
-                "Jehri Authoring Bundle", true, false, false, false);
+                "Jehri Authoring Bundle", false, false, false);
             startAllScript(jars, "startJehriCentral", "start-jehri-central.config", "500m", "500m", "128",
-                "Jehri Central Bundle", true, false, false, false);
+                "Jehri Central Bundle", false, false, false);
             startAllScript(jars, "startJehriSatellite", "start-jehri-satellite.config", "500m", "500m", "128",
-                "Jehri Satellite Bundle", true, false, false, false);
-            startAllScript(jars, "startAce", "start-ace.config", "700m", "1400m", "128", "Ace Bundle", true, false, false,
+                "Jehri Satellite Bundle", false, false, false);
+            startAllScript(jars, "startAce", "start-ace.config", "700m", "1400m", "128", "Ace Bundle", false, false,
                 false);
-            startAllScript(jars, "ace", "start-ace-local.config", "700m", "1400m", "128", "Ace Bundle", true, false, false,
+            startAllScript(jars, "ace", "start-ace-local.config", "700m", "1400m", "128", "Ace Bundle", false, false,
                 false);
-            startAllScript(jars, "dAce", "start-ace-local.config", "700m", "1400m", "128", "Ace Bundle", true, false, true,
+            startAllScript(jars, "dAce", "start-ace-local.config", "700m", "1400m", "128", "Ace Bundle", false, true,
                 false);
-            startAllScript(jars, "pAce", "start-ace-local.config", "700m", "1400m", "128", "Ace Bundle", true, false, false,
+            startAllScript(jars, "pAce", "start-ace-local.config", "700m", "1400m", "128", "Ace Bundle", false, false,
                 true);
-            startAllScript(jars, "dStartJehri", "start-jehri.config", "500m", "500m", "128", "Jehri Bundle", true, false,
+            startAllScript(jars, "dStartJehri", "start-jehri.config", "500m", "500m", "128", "Jehri Bundle", false,
                 true, false);
-            startAllScript(jars, "pStartJehri", "start-jehri.config", "500m", "500m", "128", "Jehri Bundle", true, false,
+            startAllScript(jars, "pStartJehri", "start-jehri.config", "500m", "500m", "128", "Jehri Bundle", false,
                 false, true);
         } else {
             for (String name : scriptNames) {
                 l.info("generating script: " + name);
                 if (name.equalsIgnoreCase("startCore")) {
-                    startAllScript(jars, "startCore", "start-core.config", "500m", "500m", "128", "Workflow Bundle", true,
+                    startAllScript(jars, "startCore", "start-core.config", "500m", "500m", "128", "Workflow Bundle",
                         false, false, false);
                 } else if (name.equalsIgnoreCase("startJehri")) {
-                    startAllScript(jars, "startJehri", "start-jehri.config", "500m", "500m", "128", "Jehri Bundle", true,
+                    startAllScript(jars, "startJehri", "start-jehri.config", "500m", "500m", "128", "Jehri Bundle",
                         false, false, false);
                 } else if (name.equalsIgnoreCase("startAce")) {
-                    startAllScript(jars, "startAce", "start-ace.config", "700m", "1400m", "128", "Ace Bundle", true, false,
+                    startAllScript(jars, "startAce", "start-ace.config", "700m", "1400m", "128", "Ace Bundle", false,
                         false, false);
                     startAllScript(jars, "startAceNoNet", "start-ace-local.config", "700m", "1400m", "128", "Ace Bundle",
-                        true, false, false, false);
+                        false, false, false);
                 } else if (name.equalsIgnoreCase("amtViewer")) {
-                    startAllScript(jars, "amtViewer", "start-ace.config", "700m", "1400m", "128", "AMT Viewer", true, true,
+                    startAllScript(jars, "amtViewer", "start-ace.config", "700m", "1400m", "128", "AMT Viewer", true,
                         false, false);
                 } else if (name.equalsIgnoreCase("dAce")) {
-                    startAllScript(jars, "dAce", "start-ace-local.config", "700m", "1400m", "128", "Ace Bundle", true, false,
+                    startAllScript(jars, "dAce", "start-ace-local.config", "700m", "1400m", "128", "Ace Bundle", false,
                         true, false);
                 } else if (name.equalsIgnoreCase("pAce")) {
-                    startAllScript(jars, "pAce", "start-ace-local.config", "700m", "1400m", "128", "Ace Bundle", true, false,
+                    startAllScript(jars, "pAce", "start-ace-local.config", "700m", "1400m", "128", "Ace Bundle", false,
                         false, true);
                 } else if (name.equalsIgnoreCase("dStartJehri")) {
-                    startAllScript(jars, "dStartJehri", "start-jehri.config", "500m", "500m", "128", "Jehri Bundle", true,
+                    startAllScript(jars, "dStartJehri", "start-jehri.config", "500m", "500m", "128", "Jehri Bundle",
                         false, true, false);
                 } else if (name.equalsIgnoreCase("pStartJehri")) {
-                    startAllScript(jars, "pStartJehri", "start-jehri.config", "500m", "500m", "128", "Jehri Bundle", true,
+                    startAllScript(jars, "pStartJehri", "start-jehri.config", "500m", "500m", "128", "Jehri Bundle",
                         false, false, true);
-                    startAllScript(jars, "pStartJehri", "start-jehri.config", "500m", "500m", "128", "Jehri Bundle", true,
+                    startAllScript(jars, "pStartJehri", "start-jehri.config", "500m", "500m", "128", "Jehri Bundle",
                         false, false, true);
                 }  else if (name.equalsIgnoreCase("wb")) {
-                    startAllScript(jars, "wb", "start-wb-local.config", "1400m", "1400m", "128", "Workbench Bundle", true, false, false,
+                    startAllScript(jars, "wb", null, "1400m", "1400m", "128", "Workbench Bundle", false, false,
                         false);
-                    startAllScript64(jars, "wb", "start-wb-local.config", "5g", "5g", "128", "Workbench Bundle", true, false, false,
+                    startAllScript64(jars, "wb", null, "5g", "5g", "128", "Workbench Bundle", false, false,
                         false);
                 }  else if (name.equalsIgnoreCase("dWb")) {
-                    startAllScript(jars, "dWb", "start-wb-local.config", "1400m", "1400m", "128", "Workbench Bundle", true, false, true,
+                    startAllScript(jars, "dWb", null, "1400m", "1400m", "128", "Workbench Bundle", false, true,
                         false);
-                    startAllScript64(jars, "dWb", "start-wb-local.config", "5g", "5g", "128", "Workbench Bundle", true, false, true,
+                    startAllScript64(jars, "dWb", null, "5g", "5g", "128", "Workbench Bundle", false, true,
                         false);
                 }  else if (name.equalsIgnoreCase("pWb")) {
-                    startAllScript(jars, "pWb", "start-wb-local.config", "1400m", "1400m", "128", "Workbench Bundle", true, false, false,
+                    startAllScript(jars, "pWb", null, "1400m", "1400m", "128", "Workbench Bundle", false, false,
                         true);
-                    startAllScript64(jars, "pWb", "start-wb-local.config", "5g", "5g", "128", "Workbench Bundle", true, false, false,
+                    startAllScript64(jars, "pWb", null, "5g", "5g", "128", "Workbench Bundle", false, false,
                         true);
                 }
             }
@@ -221,23 +221,23 @@ public class GenerateScripts extends AbstractMojo {
     }
 
     private void startAllScript(File[] jars, String scriptName, String startFileName, String startHeap, String maxHeap, String maxPermGen,
-            String xdockName, boolean jiniSecurity, boolean bundledJre, boolean debug, boolean profile) throws MojoExecutionException {
-        startAllScript(jars, scriptName, startFileName, startHeap, maxHeap, maxPermGen,
-            xdockName, jiniSecurity, bundledJre, debug, profile, false);
+            String xdockName, boolean bundledJre, boolean debug, boolean profile) throws MojoExecutionException {
+        writeStartupScripts(jars, scriptName, startFileName, startHeap, maxHeap, maxPermGen,
+            xdockName, bundledJre, debug, profile, false);
     }
 
     private void startAllScript64(File[] jars, String scriptName, String startFileName, String startHeap, String maxHeap, String maxPermGen,
-            String xdockName, boolean jiniSecurity, boolean bundledJre, boolean debug, boolean profile) throws MojoExecutionException {
-        startAllScript(jars, scriptName, startFileName, startHeap, maxHeap, maxPermGen,
-            xdockName, jiniSecurity, bundledJre, debug, profile, true);
+            String xdockName, boolean bundledJre, boolean debug, boolean profile) throws MojoExecutionException {
+        writeStartupScripts(jars, scriptName, startFileName, startHeap, maxHeap, maxPermGen,
+            xdockName, bundledJre, debug, profile, true);
     }
 
     /**
      * @param jars
      * @throws MojoExecutionException
      */
-    private void startAllScript(File[] jars, String scriptName, String startFileName, String startHeap, String maxHeap, String maxPermGen,
-            String xdockName, boolean jiniSecurity, boolean bundledJre, boolean debug, boolean profile, boolean d64)
+    private void writeStartupScripts(File[] jars, String scriptName, String startFileName, String startHeap, String maxHeap, String maxPermGen,
+            String xdockName, boolean bundledJre, boolean debug, boolean profile, boolean d64)
             throws MojoExecutionException {
 
         if (d64) {
@@ -255,7 +255,7 @@ public class GenerateScripts extends AbstractMojo {
 
         for (Scripter scripter : scripters) {
             try {
-                scripter.writeStartupScript(jars, startFileName, startHeap, maxHeap, maxPermGen, xdockName, jiniSecurity,
+                scripter.writeStartupScript(jars, startFileName, startHeap, maxHeap, maxPermGen, xdockName,
                     bundledJre, debug, profile, d64);
             } catch (IOException e) {
                 throw new MojoExecutionException("Error creating script file.", e);
@@ -303,7 +303,7 @@ public class GenerateScripts extends AbstractMojo {
          * @throws IOException Thrown when there is trouble writing to the file
          */
         public void writeStartupScript(File[] jars, String startFileName, String startHeap, String maxHeap, String maxPermGen,
-                String xdockName, boolean jiniSecurity, boolean bundledJre, boolean debug, boolean profile, boolean d64)
+                String xdockName, boolean bundledJre, boolean debug, boolean profile, boolean d64)
                 throws IOException {
             // make parent directories
             scriptFile.getParentFile().mkdirs();
@@ -352,15 +352,6 @@ public class GenerateScripts extends AbstractMojo {
                 writeLine(fw, "-Dapple.laf.useScreenMenuBar=true");
             }
 
-            // write JINI security options
-            writeFileLine(fw, "-Djava.util.logging.config.file=config/logging.properties");
-            writeFileLine(fw, "-Djava.security.policy=config/wb.policy");
-            writeFileLine(fw, "-Djava.security.properties=config/dynamic-policy.security-properties");
-            writeFileLine(fw, "-Djava.security.auth.login.config=config/dwa.login");
-            writeFileLine(fw, "-Djavax.net.ssl.trustStore=config/prebuiltkeys/truststore");
-            writeLine(fw, "-Djava.protocol.handler.pkgs=net.jini.url");
-            writeLine(fw, "-Dorg.dwfa.jiniport=8080");
-
             // write classpath
             indent += 4;
             writeLine(fw, "-cp");
@@ -374,16 +365,19 @@ public class GenerateScripts extends AbstractMojo {
 
             // write start class
             indent += 4;
-            writeLine(fw, "com.sun.jini.start.ServiceStarter");
-            fw.write("config");
-            fw.write(fileSeparator());
-            fw.write(startFileName);
-
+            writeLine(fw, "org.ihtsdo.db.runner.WorkbenchRunner");
+            
+            // Write config file, if specified.
+            if (startFileName != null) {
+                fw.write("config");
+                fw.write(fileSeparator());
+                fw.write(startFileName);
+            }
+            
             fw.close();
 
             // change file permissions
             setFilePermissions(scriptFile);
-
         }
 
         /**

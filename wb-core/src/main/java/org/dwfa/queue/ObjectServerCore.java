@@ -180,7 +180,6 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements Ac
     @SuppressWarnings("unchecked")
     public ObjectServerCore(QueuePreferences qp) throws Exception {
         super();
-        openServers.add((ObjectServerCore<I_DescribeObject>) this);
         getLogger().log(
             Level.INFO,"\n*******************\n\n" + 
                 "Starting {0} with preferences: {1}\n\n******************\n", 
@@ -197,6 +196,10 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements Ac
                 new InstanceWrapper(this, qp.getId(), 
                     qp.getDisplayName(), qp.getServiceItemProperties());
         LookupService.add(instance);
+
+        // Add to openServers after fields are set.
+        // Otherwise, concrete subclasses have nothing to use for comparisons.
+        openServers.add((ObjectServerCore<I_DescribeObject>) this);
     }
 
     /**
