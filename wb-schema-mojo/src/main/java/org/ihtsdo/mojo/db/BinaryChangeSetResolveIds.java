@@ -394,28 +394,28 @@ public class BinaryChangeSetResolveIds {
 
     private List<TkIdentifier> processIdListWithFilter(UUID enclosingConceptUuid,
             List<TkIdentifier> idList) {
-        return idList;
-//        ArrayList<TkIdentifier> filteredIdList = new ArrayList<>();
-//        for (TkIdentifier tki : idList) {
-//            if (tki.authorityUuid.compareTo(snomedIntUuid) == 0) {
-//                if (keepMap.containsKey((Long) tki.getDenotation())) {
-//                    UUID keepUuid = keepMap.get((Long) tki.getDenotation());
-//                    if (enclosingConceptUuid.compareTo(keepUuid) == 0) {
-//                        filteredIdList.add(tki); // match, keep this instance
-//                    } else {
-//                        instancesNotKept.append((Long) tki.getDenotation());
-//                        instancesNotKept.append("\t");
-//                        instancesNotKept.append(enclosingConceptUuid.toString());
-//                        instancesNotKept.append("\r\n");
-//                    }
-//                } else {
-//                    filteredIdList.add(tki); // not a filtered case
-//                }
-//            } else {
-//                filteredIdList.add(tki); // not a filtered authority
-//            }
-//        }
-//        return filteredIdList;
+//        return idList;
+        ArrayList<TkIdentifier> filteredIdList = new ArrayList<>();
+        for (TkIdentifier tki : idList) {
+            if (tki.authorityUuid.compareTo(snomedIntUuid) == 0) {
+                if (keepMap.containsKey((Long) tki.getDenotation())) {
+                    UUID keepUuid = keepMap.get((Long) tki.getDenotation());
+                    if (enclosingConceptUuid.compareTo(keepUuid) == 0) {
+                        filteredIdList.add(tki); // match, keep this instance
+                    } else {
+                        instancesNotKept.append((Long) tki.getDenotation());
+                        instancesNotKept.append("\t");
+                        instancesNotKept.append(enclosingConceptUuid.toString());
+                        instancesNotKept.append("\r\n");
+                    }
+                } else {
+                    filteredIdList.add(tki); // not a filtered case
+                }
+            } else {
+                filteredIdList.add(tki); // not a filtered authority
+            }
+        }
+        return filteredIdList;
     }
 
     private Long processIdListDate(List<TkIdentifier> idList, Long firstDate) {
