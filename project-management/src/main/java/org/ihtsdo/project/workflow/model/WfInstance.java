@@ -404,7 +404,7 @@ public class WfInstance implements Serializable, WfProcessInstanceBI {
 
 	@Override
 	public boolean isActive() {
-		if (status.getName().startsWith("Approved") || status.getName().startsWith("Cancel")) {
+		if (status.getName().toLowerCase().startsWith("approved") || status.getName().toLowerCase().startsWith("cancel")) {
 			return false;
 		} else {
 			return true;
@@ -413,7 +413,7 @@ public class WfInstance implements Serializable, WfProcessInstanceBI {
 
 	@Override
 	public boolean isCompleted() {
-		if (status.getName().startsWith("Approved") || status.getName().startsWith("Cancel")) {
+		if (status.getName().toLowerCase().startsWith("approved") || status.getName().toLowerCase().startsWith("cancel")) {
 			return true;
 		} else {
 			return false;
