@@ -399,40 +399,42 @@ public class ConceptViewRenderer extends JLayeredPane {
 							capWorkflowSetup(capWorkflow, availableActions, wfBpFile, possibleActions);
 							capOopsButton();
 
-							WorkflowStore ws = new WorkflowStore();
-							I_GetConceptData user = Terms.get().getActiveAceFrameConfig().getDbConfig().getUserConcept();
-							WfComponentProvider wcp = new WfComponentProvider();
-							WfUser wfUser = wcp.getUserByUUID(user.getPrimUuid());
-							Collection<WfProcessInstanceBI> incompleteProcessInstances = ws.getIncompleteProcessInstances(concept.getPrimUuid());
-							for (WfProcessInstanceBI wfProcessInstanceBI : incompleteProcessInstances) {
-								separator();
-								JPanel instancePanel = new JPanel();
-								JPanel instancePanelRow1 = new JPanel();
-								instancePanelRow1.setLayout(new FlowLayout());
-								JPanel instancePanelRow2 = new JPanel();
-								instancePanelRow2.setLayout(new FlowLayout());
-								
-								instancePanel.setLayout(new BoxLayout(instancePanel, BoxLayout.Y_AXIS));
-								instancePanel.add(instancePanelRow1);
-								instancePanel.add(instancePanelRow2);
-								
-								Collection<WfActivityBI> activities = ws.getActivities(wfProcessInstanceBI, wfUser);
-								
-								JComboBox<WfActivityBI> jcombo = new JComboBox<WfActivityBI>();
-								for (WfActivityBI wfActivityBI : activities) {
-									jcombo.addItem(wfActivityBI);
+							if (!WorkflowHelper.isWorkflowCapabilityAvailable()) {
+								WorkflowStore ws = new WorkflowStore();
+								I_GetConceptData user = Terms.get().getActiveAceFrameConfig().getDbConfig().getUserConcept();
+								WfComponentProvider wcp = new WfComponentProvider();
+								WfUser wfUser = wcp.getUserByUUID(user.getPrimUuid());
+								Collection<WfProcessInstanceBI> incompleteProcessInstances = ws.getIncompleteProcessInstances(concept.getPrimUuid());
+								for (WfProcessInstanceBI wfProcessInstanceBI : incompleteProcessInstances) {
+									separator();
+									JPanel instancePanel = new JPanel();
+									JPanel instancePanelRow1 = new JPanel();
+									instancePanelRow1.setLayout(new FlowLayout());
+									JPanel instancePanelRow2 = new JPanel();
+									instancePanelRow2.setLayout(new FlowLayout());
+
+									instancePanel.setLayout(new BoxLayout(instancePanel, BoxLayout.Y_AXIS));
+									instancePanel.add(instancePanelRow1);
+									instancePanel.add(instancePanelRow2);
+
+									Collection<WfActivityBI> activities = ws.getActivities(wfProcessInstanceBI, wfUser);
+
+									JComboBox<WfActivityBI> jcombo = new JComboBox<WfActivityBI>();
+									for (WfActivityBI wfActivityBI : activities) {
+										jcombo.addItem(wfActivityBI);
+									}
+									JButton advanceWorkflowButton = new JButton("GO");
+									advanceWorkflowButton.addActionListener(new WorkflowActionListener(jcombo, wfProcessInstanceBI));
+									JLabel worklistName = new JLabel(WordUtils.capitalize(wfProcessInstanceBI.getWorkList().getName()) + ": ");
+									JLabel stateName = new JLabel(WordUtils.capitalize(wfProcessInstanceBI.getState().getName()));
+									instancePanelRow1.add(worklistName);
+									instancePanelRow1.add(stateName);
+									instancePanelRow2.add(jcombo);
+									instancePanelRow2.add(advanceWorkflowButton);
+									conceptWorkflowPanel.add(instancePanel);
 								}
-								JButton advanceWorkflowButton = new JButton("GO");
-								advanceWorkflowButton.addActionListener(new WorkflowActionListener(jcombo, wfProcessInstanceBI));
-								JLabel worklistName = new JLabel(WordUtils.capitalize(wfProcessInstanceBI.getWorkList().getName()) + ": ");
-								JLabel stateName = new JLabel(WordUtils.capitalize(wfProcessInstanceBI.getState().getName()));
-								instancePanelRow1.add(worklistName);
-								instancePanelRow1.add(stateName);
-								instancePanelRow2.add(jcombo);
-								instancePanelRow2.add(advanceWorkflowButton);
-								conceptWorkflowPanel.add(instancePanel);
+								separator();
 							}
-							separator();
 						}
 					} catch (Exception e1) {
 						AceLog.getAppLog().log(Level.WARNING, "Error in setting up Workflow with error: " + e1.getMessage());
@@ -572,12 +574,12 @@ public class ConceptViewRenderer extends JLayeredPane {
 			class WorkflowActionListener implements ActionListener {
 				private JComboBox<WfActivityBI> combo;
 				private WfProcessInstanceBI wfInstance;
-				
+
 				public WorkflowActionListener(JComboBox<WfActivityBI> combo, WfProcessInstanceBI wfInstance) {
 					this.combo = combo;
 					this.wfInstance = wfInstance;
 				}
-				
+
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					try {
@@ -588,10 +590,11 @@ public class ConceptViewRenderer extends JLayeredPane {
 						WfActivity action = (WfActivity) combo.getSelectedItem();
 
 						action.perform(wfInstance);
-						
-						WorkflowInterpreter wi = WorkflowInterpreter.createWorkflowInterpreter(((WfProcessDefinition)wfInstance.getProcessDefinition()).getDefinition());
-						WfUser nextDestination = wi.getNextDestination((WfInstance)wfInstance, (WorkList) wfInstance.getWorkList());
-						
+
+						WorkflowInterpreter wi = WorkflowInterpreter.createWorkflowInterpreter(((WfProcessDefinition) wfInstance
+								.getProcessDefinition()).getDefinition());
+						WfUser nextDestination = wi.getNextDestination((WfInstance) wfInstance, (WorkList) wfInstance.getWorkList());
+
 						if (nextDestination != null) {
 							wfInstance.setAssignedUser(wfUser);
 						}

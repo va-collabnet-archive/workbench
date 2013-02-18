@@ -56,6 +56,7 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
+import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -670,7 +671,9 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 
 		navButton = getNavigatorButton();
 		aiButton = getInstanceActivitiesButton();
-		buttons.add(aiButton);
+		if (!WorkflowHelper.isWorkflowCapabilityAvailable()) {
+			buttons.add(aiButton);
+		}
 		buttons.add(navButton);
 		statedInferredButton = getStatedInferredButton();
 		buttons.add(statedInferredButton);
