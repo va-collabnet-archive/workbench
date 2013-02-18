@@ -420,8 +420,12 @@ public class ConceptViewRenderer extends JLayeredPane {
 									Collection<WfActivityBI> activities = ws.getActivities(wfProcessInstanceBI, wfUser);
 
 									JComboBox<WfActivityBI> jcombo = new JComboBox<WfActivityBI>();
-									for (WfActivityBI wfActivityBI : activities) {
-										jcombo.addItem(wfActivityBI);
+									Set<WfActivityBI> activiteisSet = new HashSet<WfActivityBI>();
+ 									for (WfActivityBI wfActivityBI : activities) {
+ 										activiteisSet.add(wfActivityBI);
+									}
+ 									for (WfActivityBI wfActivityBI2 : activiteisSet) {
+ 										jcombo.addItem(wfActivityBI2);
 									}
 									JButton advanceWorkflowButton = new JButton("GO");
 									advanceWorkflowButton.addActionListener(new WorkflowActionListener(jcombo, wfProcessInstanceBI));
