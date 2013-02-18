@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.UUID;
+import net.jini.core.entry.Entry;
 
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.QueueType;
@@ -34,7 +35,7 @@ import org.dwfa.tapi.impl.LocalFixedTerminology;
  *
  * @author kec
  */
-public class TermEntry implements Comparable {
+public class TermEntry implements Entry, Comparable {
 
     public UUID[] ids;
 
