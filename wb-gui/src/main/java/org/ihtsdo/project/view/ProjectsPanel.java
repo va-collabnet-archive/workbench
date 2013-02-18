@@ -46,6 +46,7 @@ import java.net.URISyntaxException;
 import java.rmi.RemoteException;
 import java.security.PrivilegedActionException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -91,8 +92,11 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.help.HelpApi;
+import org.ihtsdo.project.model.I_TerminologyProject.Type;
+import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.Partition;
 import org.ihtsdo.project.model.PartitionScheme;
+import org.ihtsdo.project.model.TerminologyProject;
 import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkSet;
@@ -106,7 +110,7 @@ import org.ihtsdo.project.view.details.WorkSetDetailsPanel;
 
 /**
  * The Class ProjectsPanel.
- *
+ * 
  * @author Alejandro Rodriguez
  */
 public class ProjectsPanel extends JPanel {
@@ -164,16 +168,16 @@ public class ProjectsPanel extends JPanel {
 
 	/** The tree model. */
 	private DefaultTreeModel treeModel;
-	
+
 	/** The root node. */
 	private DefaultMutableTreeNode rootNode;
-	
+
 	/** The config. */
 	private I_ConfigAceFrame config;
-	
+
 	/** The worker. */
 	private I_Work worker;
-	
+
 	/** The node opener. */
 	private DefaultMutableTreeNode nodeOpener;
 
@@ -182,19 +186,28 @@ public class ProjectsPanel extends JPanel {
 
 	/**
 	 * Instantiates a new projects panel.
-	 *
-	 * @param worker the worker
-	 * @throws RemoteException the remote exception
-	 * @throws TaskFailedException the task failed exception
-	 * @throws LeaseDeniedException the lease denied exception
-	 * @throws IOException Signals that an I/O exception has occurred.
-	 * @throws InterruptedException the interrupted exception
-	 * @throws PrivilegedActionException the privileged action exception
-	 * @throws ConfigurationException the configuration exception
-	 * @throws TerminologyException the terminology exception
+	 * 
+	 * @param worker
+	 *            the worker
+	 * @throws RemoteException
+	 *             the remote exception
+	 * @throws TaskFailedException
+	 *             the task failed exception
+	 * @throws LeaseDeniedException
+	 *             the lease denied exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 * @throws InterruptedException
+	 *             the interrupted exception
+	 * @throws PrivilegedActionException
+	 *             the privileged action exception
+	 * @throws ConfigurationException
+	 *             the configuration exception
+	 * @throws TerminologyException
+	 *             the terminology exception
 	 */
-	public ProjectsPanel(I_Work worker) throws RemoteException, TaskFailedException, LeaseDeniedException, IOException, InterruptedException, PrivilegedActionException, ConfigurationException,
-			TerminologyException {
+	public ProjectsPanel(I_Work worker) throws RemoteException, TaskFailedException, LeaseDeniedException, IOException, InterruptedException,
+			PrivilegedActionException, ConfigurationException, TerminologyException {
 
 		initComponents();
 		label2.setIcon(IconUtilities.helpIcon);
@@ -211,8 +224,9 @@ public class ProjectsPanel extends JPanel {
 		boolean isProjectManager = TerminologyProjectDAO.checkPermissionForProject(config.getDbConfig().getUserConcept(),
 				Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PROJECTS_ROOT_HIERARCHY.localize().getNid()),
 				Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PROJECT_MANAGER_ROLE.localize().getNid()), config);
-		button2.setEnabled(isProjectManager);
-		DragSource.getDefaultDragSource().createDefaultDragGestureRecognizer(jTree1, DnDConstants.ACTION_COPY, new DragGestureListenerWithImage(new TermLabelDragSourceListener(), jTree1));
+		addProjectButton.setEnabled(isProjectManager);
+		DragSource.getDefaultDragSource().createDefaultDragGestureRecognizer(jTree1, DnDConstants.ACTION_COPY,
+				new DragGestureListenerWithImage(new TermLabelDragSourceListener(), jTree1));
 
 	}
 
@@ -221,8 +235,13 @@ public class ProjectsPanel extends JPanel {
 	 */
 	public class TreeIconCellRenderer extends DefaultTreeCellRenderer {
 
-		/* (non-Javadoc)
-		 * @see javax.swing.tree.DefaultTreeCellRenderer#getTreeCellRendererComponent(javax.swing.JTree, java.lang.Object, boolean, boolean, boolean, int, boolean)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * javax.swing.tree.DefaultTreeCellRenderer#getTreeCellRendererComponent
+		 * (javax.swing.JTree, java.lang.Object, boolean, boolean, boolean, int,
+		 * boolean)
 		 */
 		@Override
 		public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
@@ -238,48 +257,65 @@ public class ProjectsPanel extends JPanel {
 	}
 
 	/**
-	 * The listener interface for receiving termLabelDragSource events.
-	 * The class that is interested in processing a termLabelDragSource
-	 * event implements this interface, and the object created
-	 * with that class is registered with a component using the
-	 * component's <code>addTermLabelDragSourceListener<code> method. When
+	 * The listener interface for receiving termLabelDragSource events. The
+	 * class that is interested in processing a termLabelDragSource event
+	 * implements this interface, and the object created with that class is
+	 * registered with a component using the component's
+	 * <code>addTermLabelDragSourceListener<code> method. When
 	 * the termLabelDragSource event occurs, that object's appropriate
 	 * method is invoked.
-	 *
+	 * 
 	 * @see TermLabelDragSourceEvent
 	 */
 	private class TermLabelDragSourceListener implements DragSourceListener {
 
-		/* (non-Javadoc)
-		 * @see java.awt.dnd.DragSourceListener#dragDropEnd(java.awt.dnd.DragSourceDropEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see java.awt.dnd.DragSourceListener#dragDropEnd(java.awt.dnd.
+		 * DragSourceDropEvent)
 		 */
 		public void dragDropEnd(DragSourceDropEvent dsde) {
 			// TODO Auto-generated method stub
 		}
 
-		/* (non-Javadoc)
-		 * @see java.awt.dnd.DragSourceListener#dragEnter(java.awt.dnd.DragSourceDragEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see java.awt.dnd.DragSourceListener#dragEnter(java.awt.dnd.
+		 * DragSourceDragEvent)
 		 */
 		public void dragEnter(DragSourceDragEvent dsde) {
 			// TODO Auto-generated method stub
 		}
 
-		/* (non-Javadoc)
-		 * @see java.awt.dnd.DragSourceListener#dragExit(java.awt.dnd.DragSourceEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * java.awt.dnd.DragSourceListener#dragExit(java.awt.dnd.DragSourceEvent
+		 * )
 		 */
 		public void dragExit(DragSourceEvent dse) {
 			// TODO Auto-generated method stub
 		}
 
-		/* (non-Javadoc)
-		 * @see java.awt.dnd.DragSourceListener#dragOver(java.awt.dnd.DragSourceDragEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * java.awt.dnd.DragSourceListener#dragOver(java.awt.dnd.DragSourceDragEvent
+		 * )
 		 */
 		public void dragOver(DragSourceDragEvent dsde) {
 			// TODO Auto-generated method stub
 		}
 
-		/* (non-Javadoc)
-		 * @see java.awt.dnd.DragSourceListener#dropActionChanged(java.awt.dnd.DragSourceDragEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see java.awt.dnd.DragSourceListener#dropActionChanged(java.awt.dnd.
+		 * DragSourceDragEvent)
 		 */
 		public void dropActionChanged(DragSourceDragEvent dsde) {
 			// TODO Auto-generated method stub
@@ -293,15 +329,17 @@ public class ProjectsPanel extends JPanel {
 
 		/** The dsl. */
 		DragSourceListener dsl;
-		
+
 		/** The j tree. */
 		JTree jTree;
 
 		/**
 		 * Instantiates a new drag gesture listener with image.
-		 *
-		 * @param dsl the dsl
-		 * @param jTree the j tree
+		 * 
+		 * @param dsl
+		 *            the dsl
+		 * @param jTree
+		 *            the j tree
 		 */
 		public DragGestureListenerWithImage(DragSourceListener dsl, JTree jTree) {
 
@@ -310,8 +348,12 @@ public class ProjectsPanel extends JPanel {
 			this.dsl = dsl;
 		}
 
-		/* (non-Javadoc)
-		 * @see java.awt.dnd.DragGestureListener#dragGestureRecognized(java.awt.dnd.DragGestureEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * java.awt.dnd.DragGestureListener#dragGestureRecognized(java.awt.dnd
+		 * .DragGestureEvent)
 		 */
 		public void dragGestureRecognized(DragGestureEvent dge) {
 			int selRow = jTree.getRowForLocation(dge.getDragOrigin().x, dge.getDragOrigin().y);
@@ -359,11 +401,14 @@ public class ProjectsPanel extends JPanel {
 
 		/**
 		 * Gets the transferable.
-		 *
-		 * @param obj the obj
+		 * 
+		 * @param obj
+		 *            the obj
 		 * @return the transferable
-		 * @throws TerminologyException the terminology exception
-		 * @throws IOException Signals that an I/O exception has occurred.
+		 * @throws TerminologyException
+		 *             the terminology exception
+		 * @throws IOException
+		 *             Signals that an I/O exception has occurred.
 		 */
 		private Transferable getTransferable(I_GetConceptData obj) throws TerminologyException, IOException {
 			return new ConceptTransferable(Terms.get().getConcept(obj.getConceptNid()));
@@ -371,10 +416,12 @@ public class ProjectsPanel extends JPanel {
 
 		/**
 		 * Gets the drag image.
-		 *
-		 * @param obj the obj
+		 * 
+		 * @param obj
+		 *            the obj
 		 * @return the drag image
-		 * @throws IOException Signals that an I/O exception has occurred.
+		 * @throws IOException
+		 *             Signals that an I/O exception has occurred.
 		 */
 		public Image getDragImage(I_GetConceptData obj) throws IOException {
 
@@ -398,8 +445,9 @@ public class ProjectsPanel extends JPanel {
 
 	/**
 	 * Load projects.
-	 *
-	 * @throws Exception the exception
+	 * 
+	 * @throws Exception
+	 *             the exception
 	 */
 	private void loadProjects() throws Exception {
 		int i;
@@ -427,10 +475,13 @@ public class ProjectsPanel extends JPanel {
 
 	/**
 	 * Load partition scheme root node detail.
-	 *
-	 * @param node the node
-	 * @param workset the workset
-	 * @param visibleChildren the visible children
+	 * 
+	 * @param node
+	 *            the node
+	 * @param workset
+	 *            the workset
+	 * @param visibleChildren
+	 *            the visible children
 	 */
 	private void loadPartitionSchemeRootNodeDetail(DefaultMutableTreeNode node, WorkSet workset, boolean visibleChildren) {
 		DefaultMutableTreeNode tmpNode;
@@ -452,10 +503,13 @@ public class ProjectsPanel extends JPanel {
 
 	/**
 	 * Load partition scheme root node detail.
-	 *
-	 * @param node the node
-	 * @param partition the partition
-	 * @param visibleChildren the visible children
+	 * 
+	 * @param node
+	 *            the node
+	 * @param partition
+	 *            the partition
+	 * @param visibleChildren
+	 *            the visible children
 	 */
 	private void loadPartitionSchemeRootNodeDetail(DefaultMutableTreeNode node, Partition partition, boolean visibleChildren) {
 		DefaultMutableTreeNode tmpNode;
@@ -477,10 +531,13 @@ public class ProjectsPanel extends JPanel {
 
 	/**
 	 * Load workset root node detail.
-	 *
-	 * @param node the node
-	 * @param project the project
-	 * @param visibleChildren the visible children
+	 * 
+	 * @param node
+	 *            the node
+	 * @param project
+	 *            the project
+	 * @param visibleChildren
+	 *            the visible children
 	 */
 	private void loadWorksetRootNodeDetail(DefaultMutableTreeNode node, TranslationProject project, boolean visibleChildren) {
 
@@ -503,10 +560,13 @@ public class ProjectsPanel extends JPanel {
 
 	/**
 	 * Load workset node detail.
-	 *
-	 * @param node the node
-	 * @param workset the workset
-	 * @param visibleChildren the visible children
+	 * 
+	 * @param node
+	 *            the node
+	 * @param workset
+	 *            the workset
+	 * @param visibleChildren
+	 *            the visible children
 	 */
 	private void loadWorksetNodeDetail(DefaultMutableTreeNode node, WorkSet workset, boolean visibleChildren) {
 		DefaultMutableTreeNode tmpNode;
@@ -558,10 +618,13 @@ public class ProjectsPanel extends JPanel {
 
 	/**
 	 * Load partition scheme node detail.
-	 *
-	 * @param node the node
-	 * @param ps the ps
-	 * @param visibleChildren the visible children
+	 * 
+	 * @param node
+	 *            the node
+	 * @param ps
+	 *            the ps
+	 * @param visibleChildren
+	 *            the visible children
 	 */
 	private void loadPartitionSchemeNodeDetail(DefaultMutableTreeNode node, PartitionScheme ps, boolean visibleChildren) {
 
@@ -586,10 +649,13 @@ public class ProjectsPanel extends JPanel {
 
 	/**
 	 * Load partition node detail.
-	 *
-	 * @param node the node
-	 * @param p the p
-	 * @param visibleChildren the visible children
+	 * 
+	 * @param node
+	 *            the node
+	 * @param p
+	 *            the p
+	 * @param visibleChildren
+	 *            the visible children
 	 */
 	private void loadPartitionNodeDetail(DefaultMutableTreeNode node, Partition p, boolean visibleChildren) {
 		DefaultMutableTreeNode tmpNode;
@@ -632,29 +698,37 @@ public class ProjectsPanel extends JPanel {
 
 	/**
 	 * Adds the project to tree.
-	 *
-	 * @param node the node
-	 * @param project the project
-	 * @param visibleChildren the visible children
+	 * 
+	 * @param node
+	 *            the node
+	 * @param tProj
+	 *            the project
+	 * @param visibleChildren
+	 *            the visible children
 	 * @return the default mutable tree node
-	 * @throws Exception the exception
+	 * @throws Exception
+	 *             the exception
 	 */
-	private DefaultMutableTreeNode addProjectToTree(DefaultMutableTreeNode node, TranslationProject project, boolean visibleChildren) throws Exception {
+	private DefaultMutableTreeNode addProjectToTree(DefaultMutableTreeNode node, I_TerminologyProject tProj, boolean visibleChildren)
+			throws Exception {
 
 		DefaultMutableTreeNode tNode;
-		tNode = addObject(node, new TreeObj(PROJECTNODE, project.getName(), project), visibleChildren);
-		loadProjectNodeDetails(tNode, project, visibleChildren);
+		tNode = addObject(node, new TreeObj(PROJECTNODE, tProj.getName(), tProj), visibleChildren);
+		loadProjectNodeDetails(tNode, tProj, visibleChildren);
 		return tNode;
 	}
 
 	/**
 	 * Load project node details.
-	 *
-	 * @param node the node
-	 * @param project the project
-	 * @param visibleChildren the visible children
+	 * 
+	 * @param node
+	 *            the node
+	 * @param project
+	 *            the project
+	 * @param visibleChildren
+	 *            the visible children
 	 */
-	private void loadProjectNodeDetails(DefaultMutableTreeNode node, TranslationProject project, boolean visibleChildren) {
+	private void loadProjectNodeDetails(DefaultMutableTreeNode node, I_TerminologyProject project, boolean visibleChildren) {
 		DefaultMutableTreeNode tmpNode;
 		try {
 			tmpNode = addObject(node, new TreeObj(EXCREFSETROOTNODE, "Exclusion Refsets", project), visibleChildren);
@@ -674,18 +748,21 @@ public class ProjectsPanel extends JPanel {
 				}
 			}
 
-			tmpNode = addObject(node, new TreeObj(SRCREFSETROOTNODE, "Source Languages", project), visibleChildren);
-			wsl = project.getSourceLanguageRefsets();
-			if (wsl != null) {
-				for (I_GetConceptData ws : wsl) {
-					addObject(tmpNode, new TreeObj(SRCREFSETNODE, ws.getInitialText(), ws), visibleChildren);
+			if (project.getProjectType().equals(Type.TRANSLATION)) {
+				TranslationProject translationProject = (TranslationProject) project;
+				tmpNode = addObject(node, new TreeObj(SRCREFSETROOTNODE, "Source Languages", project), visibleChildren);
+				wsl = translationProject.getSourceLanguageRefsets();
+				if (wsl != null) {
+					for (I_GetConceptData ws : wsl) {
+						addObject(tmpNode, new TreeObj(SRCREFSETNODE, ws.getInitialText(), ws), visibleChildren);
+					}
 				}
-			}
 
-			tmpNode = addObject(node, new TreeObj(TGTREFSETROOTNODE, "Target Language", project), visibleChildren);
-			I_GetConceptData tl = project.getTargetLanguageRefset();
-			if (tl != null) {
-				addObject(tmpNode, new TreeObj(TGTREFSETNODE, tl.getInitialText(), tl), visibleChildren);
+				tmpNode = addObject(node, new TreeObj(TGTREFSETROOTNODE, "Target Language", project), visibleChildren);
+				I_GetConceptData tl = translationProject.getTargetLanguageRefset();
+				if (tl != null) {
+					addObject(tmpNode, new TreeObj(TGTREFSETNODE, tl.getInitialText(), tl), visibleChildren);
+				}
 			}
 
 			tmpNode = addObject(node, new TreeObj(WORKSETROOTNODE, "Worksets", project), false);
@@ -720,8 +797,9 @@ public class ProjectsPanel extends JPanel {
 
 	/**
 	 * Adds the object.
-	 *
-	 * @param child the child
+	 * 
+	 * @param child
+	 *            the child
 	 * @return the default mutable tree node
 	 */
 	public DefaultMutableTreeNode addObject(Object child) {
@@ -740,10 +818,13 @@ public class ProjectsPanel extends JPanel {
 
 	/**
 	 * Adds the object.
-	 *
-	 * @param parent the parent
-	 * @param child the child
-	 * @param shouldBeVisible the should be visible
+	 * 
+	 * @param parent
+	 *            the parent
+	 * @param child
+	 *            the child
+	 * @param shouldBeVisible
+	 *            the should be visible
 	 * @return the default mutable tree node
 	 */
 	public DefaultMutableTreeNode addObject(DefaultMutableTreeNode parent, Object child, boolean shouldBeVisible) {
@@ -760,8 +841,9 @@ public class ProjectsPanel extends JPanel {
 
 	/**
 	 * J tree1 value changed.
-	 *
-	 * @param e the e
+	 * 
+	 * @param e
+	 *            the e
 	 */
 	private void jTree1ValueChanged(TreeSelectionEvent e) {
 		DefaultMutableTreeNode node;
@@ -775,7 +857,7 @@ public class ProjectsPanel extends JPanel {
 
 	/**
 	 * Gets the right panel.
-	 *
+	 * 
 	 * @return the right panel
 	 */
 	private ProjectDetailsContainer getRightPanel() {
@@ -823,10 +905,13 @@ public class ProjectsPanel extends JPanel {
 
 	/**
 	 * Node action.
-	 *
-	 * @param node the node
-	 * @param openEditor the open editor
-	 * @param visibleChildren the visible children
+	 * 
+	 * @param node
+	 *            the node
+	 * @param openEditor
+	 *            the open editor
+	 * @param visibleChildren
+	 *            the visible children
 	 */
 	private void nodeAction(DefaultMutableTreeNode node, boolean openEditor, boolean visibleChildren) {
 		TreeObj to = (TreeObj) node.getUserObject();
@@ -910,8 +995,9 @@ public class ProjectsPanel extends JPanel {
 
 	/**
 	 * Show worklist details.
-	 *
-	 * @param w the w
+	 * 
+	 * @param w
+	 *            the w
 	 */
 	private void showWorklistDetails(WorkList w) {
 		ProjectDetailsContainer panel = getRightPanel();
@@ -924,8 +1010,9 @@ public class ProjectsPanel extends JPanel {
 
 	/**
 	 * Show partition details.
-	 *
-	 * @param p the p
+	 * 
+	 * @param p
+	 *            the p
 	 */
 	private void showPartitionDetails(Partition p) {
 		ProjectDetailsContainer panel = getRightPanel();
@@ -938,8 +1025,9 @@ public class ProjectsPanel extends JPanel {
 
 	/**
 	 * Show partition sch details.
-	 *
-	 * @param ps the ps
+	 * 
+	 * @param ps
+	 *            the ps
 	 */
 	private void showPartitionSchDetails(PartitionScheme ps) {
 		ProjectDetailsContainer panel = getRightPanel();
@@ -952,8 +1040,9 @@ public class ProjectsPanel extends JPanel {
 
 	/**
 	 * Show workset details.
-	 *
-	 * @param ws the ws
+	 * 
+	 * @param ws
+	 *            the ws
 	 */
 	private void showWorksetDetails(WorkSet ws) {
 		ProjectDetailsContainer panel = getRightPanel();
@@ -966,14 +1055,15 @@ public class ProjectsPanel extends JPanel {
 
 	/**
 	 * Show project details.
-	 *
-	 * @param proj the proj
+	 * 
+	 * @param tProj
+	 *            the proj
 	 */
-	private void showProjectDetails(TranslationProject proj) {
+	private void showProjectDetails(I_TerminologyProject tProj) {
 		ProjectDetailsContainer panel = getRightPanel();
 		panel.removeContent();
 
-		panel.addContent(new ProjectDetailsPanel(proj, config));
+		panel.addContent(new ProjectDetailsPanel(tProj, config));
 		panel.revalidate();
 
 	}
@@ -995,8 +1085,9 @@ public class ProjectsPanel extends JPanel {
 
 	/**
 	 * Update node.
-	 *
-	 * @param node the node
+	 * 
+	 * @param node
+	 *            the node
 	 */
 	private void updateNode(DefaultMutableTreeNode node) {
 		TreeObj to = (TreeObj) node.getUserObject();
@@ -1042,8 +1133,9 @@ public class ProjectsPanel extends JPanel {
 
 	/**
 	 * Button1 action performed.
-	 *
-	 * @param e the e
+	 * 
+	 * @param e
+	 *            the e
 	 */
 	private void button1ActionPerformed(ActionEvent e) {
 		AceFrameConfig config;
@@ -1086,15 +1178,30 @@ public class ProjectsPanel extends JPanel {
 
 	/**
 	 * Button2 action performed.
-	 *
-	 * @param e the e
+	 * 
+	 * @param e
+	 *            the e
 	 */
-	private void button2ActionPerformed(ActionEvent e) {
-		// TODO duplicated code with Action Listener = Refactor
-		String projectName = JOptionPane.showInputDialog(null, "Enter new Project Name : ", "", 1);
-		if (projectName != null && !projectName.trim().equals("")) {
+	private void addProjectActionPerformed(ActionEvent e) {
+		HashMap<String, Type> projectInfo = new ProjectNameTypeDialog().showModalDialog();
+		if (projectInfo != null && !projectInfo.isEmpty()) {
 			try {
-				TranslationProject tProj = TerminologyProjectDAO.createNewTranslationProject(projectName, config);
+				String projectName = projectInfo.keySet().iterator().next();
+				I_TerminologyProject.Type projectType = projectInfo.get(projectName);
+				I_TerminologyProject tProj = null;
+				switch (projectType) {
+				case TRANSLATION:
+					tProj = TerminologyProjectDAO.createNewTranslationProject(projectName, config);
+					break;
+				case TERMINOLOGY:
+					tProj = TerminologyProjectDAO.createNewTerminologyProject(projectName, config);
+					break;
+				case MAPPING:
+					tProj = TerminologyProjectDAO.createNewMappingProject(projectName, config);
+					break;
+				default:
+					break;
+				}
 				if (tProj != null) {
 					Terms.get().commit();
 					nodeOpener = addProjectToTree(projectRoot, tProj, false);
@@ -1114,9 +1221,11 @@ public class ProjectsPanel extends JPanel {
 
 	/**
 	 * J tree1 tree will expand.
-	 *
-	 * @param e the e
-	 * @throws ExpandVetoException the expand veto exception
+	 * 
+	 * @param e
+	 *            the e
+	 * @throws ExpandVetoException
+	 *             the expand veto exception
 	 */
 	private void jTree1TreeWillExpand(TreeExpansionEvent e) throws ExpandVetoException {
 		TreePath path = e.getPath();
@@ -1139,8 +1248,9 @@ public class ProjectsPanel extends JPanel {
 
 	/**
 	 * Label2 mouse clicked.
-	 *
-	 * @param e the e
+	 * 
+	 * @param e
+	 *            the e
 	 */
 	private void label2MouseClicked(MouseEvent e) {
 		try {
@@ -1153,14 +1263,14 @@ public class ProjectsPanel extends JPanel {
 	}
 
 	/**
-	 * The listener interface for receiving menuItemAction events.
-	 * The class that is interested in processing a menuItemAction
-	 * event implements this interface, and the object created
-	 * with that class is registered with a component using the
-	 * component's <code>addMenuItemActionListener<code> method. When
+	 * The listener interface for receiving menuItemAction events. The class
+	 * that is interested in processing a menuItemAction event implements this
+	 * interface, and the object created with that class is registered with a
+	 * component using the component's
+	 * <code>addMenuItemActionListener<code> method. When
 	 * the menuItemAction event occurs, that object's appropriate
 	 * method is invoked.
-	 *
+	 * 
 	 * @see MenuItemActionEvent
 	 */
 	class MenuItemActionListener implements ActionListener {
@@ -1168,31 +1278,17 @@ public class ProjectsPanel extends JPanel {
 		/** The node type. */
 		private String nodeType;
 
-		/* (non-Javadoc)
-		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent
+		 * )
 		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (nodeType.equals(PROJECTROOTNODE)) {
-				String projectName = JOptionPane.showInputDialog(null, "Enter new Project Name : ", "", 1);
-				if (projectName != null && !projectName.trim().equals("")) {
-					try {
-						TranslationProject tProj = TerminologyProjectDAO.createNewTranslationProject(projectName, config);
-						if (tProj != null) {
-							Terms.get().commit();
-							nodeOpener = addProjectToTree(projectRoot, tProj, false);
-							showProjectDetails(tProj);
-
-							SwingUtilities.invokeLater(new Runnable() {
-								public void run() {
-									TranslationHelperPanel.refreshProjectPanelNode(config);
-								}
-							});
-						}
-					} catch (Exception e1) {
-						e1.printStackTrace();
-					}
-				}
+				addProjectActionPerformed(e);
 				return;
 			}
 
@@ -1200,8 +1296,9 @@ public class ProjectsPanel extends JPanel {
 
 		/**
 		 * Sets the node type.
-		 *
-		 * @param nodeType the new node type
+		 * 
+		 * @param nodeType
+		 *            the new node type
 		 */
 		public void setNodeType(String nodeType) {
 			this.nodeType = nodeType;
@@ -1213,29 +1310,30 @@ public class ProjectsPanel extends JPanel {
 	 * The Class JTreeMouselistener.
 	 */
 	public class JTreeMouselistener extends MouseAdapter {
-		
+
 		/** The j tree. */
 		private JTree jTree;
-		
+
 		/** The menu. */
 		private JPopupMenu menu;
-		
+
 		/** The m item listener. */
 		private MenuItemActionListener mItemListener;
-		
+
 		/** The m item. */
 		private JMenuItem mItem;
-		
+
 		/** The x point. */
 		private int xPoint;
-		
+
 		/** The y point. */
 		private int yPoint;
 
 		/**
 		 * Instantiates a new j tree mouselistener.
-		 *
-		 * @param jTree the j tree
+		 * 
+		 * @param jTree
+		 *            the j tree
 		 */
 		JTreeMouselistener(JTree jTree) {
 			this.jTree = jTree;
@@ -1246,8 +1344,11 @@ public class ProjectsPanel extends JPanel {
 			menu.add(mItem);
 		}
 
-		/* (non-Javadoc)
-		 * @see java.awt.event.MouseAdapter#mouseClicked(java.awt.event.MouseEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * java.awt.event.MouseAdapter#mouseClicked(java.awt.event.MouseEvent)
 		 */
 		@Override
 		public void mouseClicked(MouseEvent e) {
@@ -1265,8 +1366,8 @@ public class ProjectsPanel extends JPanel {
 						if (to.getObjType().equals(PROJECTROOTNODE)) {
 							try {
 								boolean isProjectManager = TerminologyProjectDAO.checkPermissionForProject(config.getDbConfig().getUserConcept(),
-										Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PROJECTS_ROOT_HIERARCHY.localize().getNid()),
-										Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PROJECT_MANAGER_ROLE.localize().getNid()), config);
+										Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PROJECTS_ROOT_HIERARCHY.localize().getNid()), Terms
+												.get().getConcept(ArchitectonicAuxiliary.Concept.PROJECT_MANAGER_ROLE.localize().getNid()), config);
 								if (isProjectManager) {
 									mItem.setText("Create new project");
 									mItemListener.setNodeType(PROJECTROOTNODE);
@@ -1301,57 +1402,55 @@ public class ProjectsPanel extends JPanel {
 		panel2 = new JPanel();
 		panel1 = new JPanel();
 		label1 = new JLabel();
-		button2 = new JButton();
+		addProjectButton = new JButton();
 		button1 = new JButton();
 		label2 = new JLabel();
 		panel11 = new JPanel();
 		scrollPane1 = new JScrollPane();
 		jTree1 = new JTree();
 
-		//======== this ========
+		// ======== this ========
 		setLayout(new GridBagLayout());
-		((GridBagLayout)getLayout()).columnWidths = new int[] {0, 0};
-		((GridBagLayout)getLayout()).rowHeights = new int[] {0, 0};
-		((GridBagLayout)getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-		((GridBagLayout)getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
+		((GridBagLayout) getLayout()).columnWidths = new int[] { 0, 0 };
+		((GridBagLayout) getLayout()).rowHeights = new int[] { 0, 0 };
+		((GridBagLayout) getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
+		((GridBagLayout) getLayout()).rowWeights = new double[] { 1.0, 1.0E-4 };
 
-		//======== panel2 ========
+		// ======== panel2 ========
 		{
 			panel2.setBackground(new Color(238, 238, 238));
 			panel2.setLayout(new GridBagLayout());
-			((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {20, 0, 0};
-			((GridBagLayout)panel2.getLayout()).rowHeights = new int[] {0, 0, 0};
-			((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {0.0, 1.0, 1.0E-4};
-			((GridBagLayout)panel2.getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0E-4};
+			((GridBagLayout) panel2.getLayout()).columnWidths = new int[] { 20, 0, 0 };
+			((GridBagLayout) panel2.getLayout()).rowHeights = new int[] { 0, 0, 0 };
+			((GridBagLayout) panel2.getLayout()).columnWeights = new double[] { 0.0, 1.0, 1.0E-4 };
+			((GridBagLayout) panel2.getLayout()).rowWeights = new double[] { 0.0, 1.0, 1.0E-4 };
 
-			//======== panel1 ========
+			// ======== panel1 ========
 			{
 				panel1.setBackground(new Color(238, 238, 238));
 				panel1.setLayout(new GridBagLayout());
-				((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 61, 0, 0, 0, 0};
-				((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0};
-				((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {0.0, 0.0, 1.0, 0.0, 0.0, 1.0E-4};
-				((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+				((GridBagLayout) panel1.getLayout()).columnWidths = new int[] { 0, 61, 0, 0, 0, 0 };
+				((GridBagLayout) panel1.getLayout()).rowHeights = new int[] { 0, 0 };
+				((GridBagLayout) panel1.getLayout()).columnWeights = new double[] { 0.0, 0.0, 1.0, 0.0, 0.0, 1.0E-4 };
+				((GridBagLayout) panel1.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
 
-				//---- label1 ----
+				// ---- label1 ----
 				label1.setText("Projects");
-				panel1.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 5), 0, 0));
+				panel1.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0,
+						0, 5), 0, 0));
 
-				//---- button2 ----
-				button2.setText("Add Project");
-				button2.addActionListener(new ActionListener() {
+				// ---- button2 ----
+				addProjectButton.setText("Add Project");
+				addProjectButton.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						button2ActionPerformed(e);
+						addProjectActionPerformed(e);
 					}
 				});
-				panel1.add(button2, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 5), 0, 0));
+				panel1.add(addProjectButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 5), 0, 0));
 
-				//---- button1 ----
+				// ---- button1 ----
 				button1.setText("Close");
 				button1.setIcon(null);
 				button1.addActionListener(new ActionListener() {
@@ -1360,11 +1459,10 @@ public class ProjectsPanel extends JPanel {
 						button1ActionPerformed(e);
 					}
 				});
-				panel1.add(button1, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 5), 0, 0));
+				panel1.add(button1, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0,
+						0, 5), 0, 0));
 
-				//---- label2 ----
+				// ---- label2 ----
 				label2.setText("text");
 				label2.addMouseListener(new MouseAdapter() {
 					@Override
@@ -1372,27 +1470,25 @@ public class ProjectsPanel extends JPanel {
 						label2MouseClicked(e);
 					}
 				});
-				panel1.add(label2, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 0), 0, 0));
+				panel1.add(label2, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0,
+						0, 0), 0, 0));
 			}
-			panel2.add(panel1, new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 0), 0, 0));
+			panel2.add(panel1, new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 0), 0, 0));
 
-			//======== panel11 ========
+			// ======== panel11 ========
 			{
 				panel11.setBackground(new Color(220, 233, 249));
 				panel11.setLayout(new GridBagLayout());
-				((GridBagLayout)panel11.getLayout()).columnWidths = new int[] {0, 0};
-				((GridBagLayout)panel11.getLayout()).rowHeights = new int[] {0, 0};
-				((GridBagLayout)panel11.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-				((GridBagLayout)panel11.getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
+				((GridBagLayout) panel11.getLayout()).columnWidths = new int[] { 0, 0 };
+				((GridBagLayout) panel11.getLayout()).rowHeights = new int[] { 0, 0 };
+				((GridBagLayout) panel11.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
+				((GridBagLayout) panel11.getLayout()).rowWeights = new double[] { 1.0, 1.0E-4 };
 
-				//======== scrollPane1 ========
+				// ======== scrollPane1 ========
 				{
 
-					//---- jTree1 ----
+					// ---- jTree1 ----
 					jTree1.setRootVisible(false);
 					jTree1.addTreeSelectionListener(new TreeSelectionListener() {
 						@Override
@@ -1402,29 +1498,23 @@ public class ProjectsPanel extends JPanel {
 					});
 					jTree1.addTreeWillExpandListener(new TreeWillExpandListener() {
 						@Override
-						public void treeWillExpand(TreeExpansionEvent e)
-							throws ExpandVetoException
-						{
+						public void treeWillExpand(TreeExpansionEvent e) throws ExpandVetoException {
 							jTree1TreeWillExpand(e);
 						}
+
 						@Override
-						public void treeWillCollapse(TreeExpansionEvent e)
-							throws ExpandVetoException
-						{}
+						public void treeWillCollapse(TreeExpansionEvent e) throws ExpandVetoException {
+						}
 					});
 					scrollPane1.setViewportView(jTree1);
 				}
-				panel11.add(scrollPane1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 0), 0, 0));
+				panel11.add(scrollPane1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
+						0, 0, 0, 0), 0, 0));
 			}
-			panel2.add(panel11, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 0), 0, 0));
+			panel2.add(panel11, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0,
+					0), 0, 0));
 		}
-		add(panel2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 0, 0), 0, 0));
+		add(panel2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 		// //GEN-END:initComponents
 	}
 
@@ -1432,30 +1522,31 @@ public class ProjectsPanel extends JPanel {
 	// //GEN-BEGIN:variables
 	/** The panel2. */
 	private JPanel panel2;
-	
+
 	/** The panel1. */
 	private JPanel panel1;
-	
+
 	/** The label1. */
 	private JLabel label1;
-	
+
 	/** The button2. */
-	private JButton button2;
-	
+	private JButton addProjectButton;
+
 	/** The button1. */
 	private JButton button1;
-	
+
 	/** The label2. */
 	private JLabel label2;
-	
+
 	/** The panel11. */
 	private JPanel panel11;
-	
+
 	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
-	
+
 	/** The j tree1. */
 	private JTree jTree1;
+
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 
 	/**

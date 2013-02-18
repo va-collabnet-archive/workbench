@@ -24,6 +24,7 @@ import java.awt.Insets;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
+import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.TranslationProject;
 
 /**
@@ -36,15 +37,15 @@ public class ExportTabPanel extends JPanel {
 	/**
 	 * Instantiates a new export tab panel.
 	 *
-	 * @param project the project
+	 * @param tProj the project
 	 */
-	public ExportTabPanel(TranslationProject project) {
+	public ExportTabPanel(I_TerminologyProject tProj) {
 		initComponents();
-		RF1Export rf1Export=new RF1Export(project);
+		RF1Export rf1Export=new RF1Export(tProj);
 		panel1.add(rf1Export, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 0), 0, 0));
-		RF2Export rf2Export=new RF2Export(project);
+		RF2Export rf2Export=new RF2Export(tProj);
 		panel2.add(rf2Export, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 0), 0, 0));

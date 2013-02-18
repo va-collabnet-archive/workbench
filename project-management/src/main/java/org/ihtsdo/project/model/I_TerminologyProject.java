@@ -16,21 +16,24 @@
  */
 package org.ihtsdo.project.model;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.tapi.TerminologyException;
 
 /**
  * The Interface I_TerminologyProject.
  */
-public interface I_TerminologyProject {
-	
+public interface I_TerminologyProject extends Comparable<I_TerminologyProject> {
+
 	public enum Type {
-	    TERMINOLOGY, TRANSLATION, MAPPING 
+		TERMINOLOGY, TRANSLATION, MAPPING
 	}
-	
+
 	public Type getProjectType();
 
 	/**
@@ -43,7 +46,8 @@ public interface I_TerminologyProject {
 	/**
 	 * Sets the name.
 	 * 
-	 * @param name the new name
+	 * @param name
+	 *            the new name
 	 */
 	public void setName(String name);
 
@@ -57,7 +61,8 @@ public interface I_TerminologyProject {
 	/**
 	 * Sets the id.
 	 * 
-	 * @param id the new id
+	 * @param id
+	 *            the new id
 	 */
 	public void setId(int id);
 
@@ -71,7 +76,8 @@ public interface I_TerminologyProject {
 	/**
 	 * Sets the uids.
 	 * 
-	 * @param uids the new uids
+	 * @param uids
+	 *            the new uids
 	 */
 	public void setUids(List<UUID> uids);
 
@@ -84,17 +90,42 @@ public interface I_TerminologyProject {
 
 	/**
 	 * Gets the work sets.
-	 *
-	 * @param config the config
+	 * 
+	 * @param config
+	 *            the config
 	 * @return the work sets
 	 */
 	public List<WorkSet> getWorkSets(I_ConfigAceFrame config);
-	
+
 	/**
 	 * To string.
-	 *
+	 * 
 	 * @return the string
 	 */
 	public String toString();
+
+	public List<I_GetConceptData> getExclusionRefsets() throws TerminologyException, IOException;
+
+	public List<I_GetConceptData> getCommonRefsets() throws TerminologyException, IOException;
+
+	public String getNamespaceRefset() throws TerminologyException, IOException, Exception;
+
+	public I_GetConceptData getReleasePath() throws TerminologyException, IOException, Exception;
+
+	public I_GetConceptData getModuleIdRefset() throws TerminologyException, IOException, Exception;
+
+	public I_GetConceptData getSourceIssueRepo() throws TerminologyException, IOException, Exception;
+
+	public I_GetConceptData getProjectIssueRepo() throws TerminologyException, IOException, Exception;
+
+	public void setSourceIssueRepo(I_GetConceptData concept) throws TerminologyException, IOException;
+
+	public void setProjectIssueRepo(I_GetConceptData concept) throws TerminologyException, IOException;
+
+	public void setModuleIdRefset(I_GetConceptData i_GetConceptData) throws TerminologyException, IOException;
+
+	public void setReleasePathRefset(I_GetConceptData i_GetConceptData) throws TerminologyException, IOException;
+
+	public void setNamespaceRefset(String namespaceText) throws TerminologyException, IOException;
 
 }

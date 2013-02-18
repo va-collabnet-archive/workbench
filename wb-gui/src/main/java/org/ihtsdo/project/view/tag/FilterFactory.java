@@ -19,6 +19,7 @@ package org.ihtsdo.project.view.tag;
 import java.io.IOException;
 import java.util.UUID;
 
+import org.apache.tools.ant.taskdefs.rmic.WLRmic;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.project.filter.WfDestinationFilter;
 import org.ihtsdo.project.filter.WfStateFilter;
@@ -54,7 +55,7 @@ public class FilterFactory {
 			filter = new WfStateFilter((WfState) obj);
 		} else if (obj instanceof WorkList) {
 			WorkList wl = (WorkList) obj;
-			//filter = new WfWorklistFilter(wl.getUids());
+			filter = new WfWorklistFilter(wl.getUuid());
 		} else if (obj instanceof InboxTag) {
 			InboxTag tag = (InboxTag) obj;
 			InboxTag filterTag = null;

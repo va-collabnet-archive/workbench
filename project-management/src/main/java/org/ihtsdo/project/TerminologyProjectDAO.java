@@ -89,6 +89,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.project.model.I_TerminologyProject;
+import org.ihtsdo.project.model.MappingProject;
 import org.ihtsdo.project.model.Partition;
 import org.ihtsdo.project.model.PartitionMember;
 import org.ihtsdo.project.model.PartitionScheme;
@@ -99,6 +100,7 @@ import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.model.WorkSet;
 import org.ihtsdo.project.model.WorkSetMember;
 import org.ihtsdo.project.model.WorklistMetadata;
+import org.ihtsdo.project.model.I_TerminologyProject.Type;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
 import org.ihtsdo.project.refset.PromotionRefset;
@@ -403,7 +405,7 @@ public class TerminologyProjectDAO {
 			}
 
 			termFactory.setActiveAceFrameConfig(config);
-			I_GetConceptData projectsRoot = termFactory.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_PROJECTS_ROOT.getUids());
+			I_GetConceptData projectsRoot = termFactory.getConcept(ArchitectonicAuxiliary.Concept.TERMINOLOGY_PROJECTS_ROOT.getUids());
 
 			newConcept = termFactory.newConcept(UUID.randomUUID(), false, config);
 
@@ -439,6 +441,65 @@ public class TerminologyProjectDAO {
 		}
 
 		return project;
+	}
+	/**
+	 * Creates the new project.
+	 * 
+	 * @param projectWithMetadata
+	 *            the project with metadata
+	 * @param config
+	 *            the config
+	 * 
+	 * @return the terminology project
+	 */
+	public static MappingProject createNewMappingProject(MappingProject projectWithMetadata, I_ConfigAceFrame config) {
+		I_TermFactory termFactory = Terms.get();
+		I_TerminologyProject project = null;
+		I_GetConceptData newConcept = null;
+		String projectName = projectWithMetadata.getName() + " (mapping project)";
+		try {
+			if (isConceptDuplicate(projectName)) {
+				JOptionPane.showMessageDialog(new JDialog(), "This name is already in use", "Warning", JOptionPane.WARNING_MESSAGE);
+				throw new Exception("This name is already in use");
+			}
+			
+			termFactory.setActiveAceFrameConfig(config);
+			I_GetConceptData projectsRoot = termFactory.getConcept(ArchitectonicAuxiliary.Concept.MAPPING_PROJECTS_ROOT.getUids());
+			
+			newConcept = termFactory.newConcept(UUID.randomUUID(), false, config);
+			
+			termFactory.newDescription(UUID.randomUUID(), newConcept, "en", projectName, termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()), config);
+			
+			termFactory.newDescription(UUID.randomUUID(), newConcept, "en", projectName, termFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()), config);
+			
+			termFactory.newRelationship(UUID.randomUUID(), newConcept, termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()), projectsRoot, termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()),
+					termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
+			
+			project = new MappingProject(projectWithMetadata.getName(), newConcept.getConceptNid(), newConcept.getUids());
+			
+			termFactory.addUncommittedNoChecks(newConcept);
+			termFactory.commit();
+			
+			// promote(newConcept, config);
+			//
+			// termFactory.addUncommittedNoChecks(newConcept);
+			// termFactory.commit();
+			
+			project = getTerminologyProject(newConcept, config);
+			
+			String nacWorkSetName = "Maintenance - " + project.getName().replace("(mapping project)", "");
+			WorkSet nacWorkSet = createNewWorkSet(nacWorkSetName, project, config);
+			createNewPartitionScheme("Maintenance - " + project.getName().replace("(mapping project)", ""), nacWorkSet.getUids().iterator().next(), config);
+			
+		} catch (TerminologyException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		} catch (IOException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		} catch (Exception e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		}
+		
+		return (MappingProject) project;
 	}
 
 	/**
@@ -481,6 +542,48 @@ public class TerminologyProjectDAO {
 		}
 		return project;
 	}
+
+	/**
+	 * Gets the project.
+	 * 
+	 * @param projectConcept
+	 *            the project concept
+	 * @param config
+	 *            the config
+	 * @return the project
+	 * @throws Exception
+	 *             the exception
+	 */
+	public static MappingProject getMappingProject(I_GetConceptData projectConcept, I_ConfigAceFrame config) throws Exception {
+		
+		MappingProject project = null;
+		I_TermFactory termFactory = Terms.get();
+		try {
+			I_IntSet allowedDestRelTypes = termFactory.newIntSet();
+			allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
+			Set<? extends I_GetConceptData> parents = projectConcept.getSourceRelTargets(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
+			
+			if (parents.size() != 1) {
+				throw new Exception("Error: Wrong number of parents in project...");
+			}
+			
+			I_GetConceptData parent = parents.iterator().next();
+			
+			if (parent.getConceptNid() == ArchitectonicAuxiliary.Concept.MAPPING_PROJECTS_ROOT.localize().getNid()) {
+				String name = projectConcept.toString();
+				List<? extends I_DescriptionTuple> descTuples = projectConcept.getDescriptionTuples(config.getAllowedStatus(), config.getDescTypes(), config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
+				for (I_DescriptionTuple tuple : descTuples) {
+					if (tuple.getTypeNid() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()) {
+						name = tuple.getText();
+					}
+				}
+				project = new MappingProject(name, projectConcept.getConceptNid(), projectConcept.getUids());
+			}
+		} catch (IOException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		}
+		return project;
+	}
 	/**
 	 * Gets the project.
 	 * 
@@ -500,13 +603,13 @@ public class TerminologyProjectDAO {
 			I_IntSet allowedDestRelTypes = termFactory.newIntSet();
 			allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
 			Set<? extends I_GetConceptData> parents = projectConcept.getSourceRelTargets(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
-
+			
 			if (parents.size() != 1) {
 				throw new Exception("Error: Wrong number of parents in project...");
 			}
-
+			
 			I_GetConceptData parent = parents.iterator().next();
-
+			
 			if (parent.getConceptNid() == ArchitectonicAuxiliary.Concept.TERMINOLOGY_PROJECTS_ROOT.localize().getNid()) {
 				String name = projectConcept.toString();
 				List<? extends I_DescriptionTuple> descTuples = projectConcept.getDescriptionTuples(config.getAllowedStatus(), config.getDescTypes(), config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
@@ -689,6 +792,65 @@ public class TerminologyProjectDAO {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
 
+		return project;
+	}
+	/**
+	 * Update project metadata.
+	 * 
+	 * @param projectWithMetadata
+	 *            the project with metadata
+	 * @param config
+	 *            the config
+	 * 
+	 * @return the i_ terminology project
+	 */
+	public static I_TerminologyProject updateProjectMetadata(I_TerminologyProject projectWithMetadata, I_ConfigAceFrame config) {
+		I_TermFactory termFactory = Terms.get();
+		I_TerminologyProject project = null;
+		
+		try {
+			
+			I_TerminologyProject currentVersionOfProject = getProject(projectWithMetadata.getConcept(), config);
+			
+			if (!currentVersionOfProject.getName().equals(projectWithMetadata.getName())) {
+				updatePreferredTerm(projectWithMetadata.getConcept(), projectWithMetadata.getName(), config);
+			}
+			
+			I_GetConceptData projectsRefset = termFactory.getConcept(ArchitectonicAuxiliary.Concept.PROJECT_EXTENSION_REFSET.getUids());
+			
+			I_GetConceptData projectConcept = termFactory.getConcept(projectWithMetadata.getUids());
+			
+			String metadata = serialize(projectWithMetadata);
+			
+			List<I_ExtendByRef> extensions = new ArrayList<I_ExtendByRef>();
+			extensions.addAll(termFactory.getAllExtensionsForComponent(projectConcept.getConceptNid()));
+			for (I_ExtendByRef extension : extensions) {
+				for (PathBI editPath : config.getEditingPathSet()) {
+					if (extension.getRefsetId() == projectsRefset.getConceptNid()) {
+						I_ExtendByRefPart lastPart = getLastExtensionPart(extension);
+						I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) lastPart.makeAnalog(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(), Long.MAX_VALUE, config.getDbConfig().getUserConcept().getNid(), config.getEditCoordinate().getModuleNid(), editPath.getConceptNid());
+						part.setStringValue(metadata);
+						extension.addVersion(part);
+						termFactory.addUncommittedNoChecks(projectsRefset);
+						termFactory.addUncommittedNoChecks(extension);
+						// termFactory.commit();
+						// promote(extension, config);
+						// termFactory.addUncommittedNoChecks(projectsRefset);
+						// termFactory.addUncommittedNoChecks(extension);
+						// termFactory.commit();
+					}
+				}
+			}
+			project = getProject(projectConcept, config);
+			
+		} catch (TerminologyException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		} catch (IOException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		} catch (Exception e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		}
+		
 		return project;
 	}
 
@@ -5654,6 +5816,13 @@ public class TerminologyProjectDAO {
 				
 			}
 		}
+		if (project==null){
+			try {
+				project=getMappingProject(projectConcept, aceFrameConfig);
+			} catch (Exception e) {
+				
+			}
+		}
 		return project;
 	}
 	
@@ -5682,6 +5851,12 @@ public class TerminologyProjectDAO {
 		}
 		
 		return members;
+	}
+
+	public static I_TerminologyProject createNewMappingProject(String projectName, I_ConfigAceFrame config) {
+		// TODO Auto-generated method stub
+		MappingProject project = new MappingProject(projectName, 0, null);
+		return createNewMappingProject(project, config);
 	}
 	
 }

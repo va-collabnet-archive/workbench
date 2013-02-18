@@ -36,7 +36,7 @@ import org.ihtsdo.project.TerminologyProjectDAO;
  * Coleccion de business process
  * Issue management
  */
-public class TranslationProject implements I_TerminologyProject, Serializable, Comparable<TranslationProject>{
+public class TranslationProject implements I_TerminologyProject, Serializable, Comparable<I_TerminologyProject>{
 	
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
@@ -373,7 +373,7 @@ public class TranslationProject implements I_TerminologyProject, Serializable, C
 	}
 
 	@Override
-	public int compareTo(TranslationProject o) {
+	public int compareTo(I_TerminologyProject o) {
 		return this.name.compareTo(o.getName());
 	}
 

@@ -136,31 +136,40 @@ public class TerminologyProject implements I_TerminologyProject, Serializable {
 	}
 
 	@Override
+	public int compareTo(I_TerminologyProject o) {
+		return this.name.compareTo(o.getName());
+	}
+
+	@Override
 	public Type getProjectType() {
 		return Type.TERMINOLOGY;
 	}
 	
-//	/**
-//	 * Gets the exclusion refsets.
-//	 *
-//	 * @return the exclusion refsets
-//	 * @throws TerminologyException the terminology exception
-//	 * @throws IOException Signals that an I/O exception has occurred.
-//	 */
-//	public List<I_GetConceptData> getExclusionRefsets() throws TerminologyException, IOException {
-//		return TerminologyProjectDAO.getExclusionRefsetsForProject(this, Terms.get().getActiveAceFrameConfig());
-//	}
-//	
-//	/**
-//	 * Gets the common refsets.
-//	 *
-//	 * @return the common refsets
-//	 * @throws TerminologyException the terminology exception
-//	 * @throws IOException Signals that an I/O exception has occurred.
-//	 */
-//	public List<I_GetConceptData> getCommonRefsets() throws TerminologyException, IOException {
-//		return TerminologyProjectDAO.getCommonRefsetsForProject(this, Terms.get().getActiveAceFrameConfig());
-//	}
+	/**
+	 * Gets the exclusion refsets.
+	 * 
+	 * @return the exclusion refsets
+	 * @throws TerminologyException
+	 *             the terminology exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	public List<I_GetConceptData> getExclusionRefsets() throws TerminologyException, IOException {
+		return TerminologyProjectDAO.getExclusionRefsetsForProject(this, Terms.get().getActiveAceFrameConfig());
+	}
+
+	/**
+	 * Gets the common refsets.
+	 * 
+	 * @return the common refsets
+	 * @throws TerminologyException
+	 *             the terminology exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	public List<I_GetConceptData> getCommonRefsets() throws TerminologyException, IOException {
+		return TerminologyProjectDAO.getCommonRefsetsForProject(this, Terms.get().getActiveAceFrameConfig());
+	}
 //	
 //	/**
 //	 * Gets the source language refsets.
@@ -376,4 +385,64 @@ public class TerminologyProject implements I_TerminologyProject, Serializable {
 //	public void setProjectIssueRepo(I_GetConceptData repo) throws TerminologyException, IOException {
 //		TerminologyProjectDAO.setProjectIssueRepo(this, repo, Terms.get().getActiveAceFrameConfig());
 //	}
+
+	@Override
+	public String getNamespaceRefset() throws TerminologyException, IOException, Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public I_GetConceptData getReleasePath() throws TerminologyException, IOException, Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public I_GetConceptData getModuleIdRefset() throws TerminologyException, IOException, Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public I_GetConceptData getSourceIssueRepo() throws TerminologyException, IOException, Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public I_GetConceptData getProjectIssueRepo() throws TerminologyException, IOException, Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setSourceIssueRepo(I_GetConceptData concept) throws TerminologyException, IOException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setProjectIssueRepo(I_GetConceptData concept) throws TerminologyException, IOException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setModuleIdRefset(I_GetConceptData i_GetConceptData) throws TerminologyException, IOException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setReleasePathRefset(I_GetConceptData i_GetConceptData) throws TerminologyException, IOException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setNamespaceRefset(String namespaceText) throws TerminologyException, IOException {
+		// TODO Auto-generated method stub
+		
+	}
 }
