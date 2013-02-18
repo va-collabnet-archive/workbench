@@ -212,7 +212,7 @@ public class DragPanelExtension extends DragPanelComponentVersion<RefexVersionBI
       }
      
       if (RefexNidNidVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
-         int                cnid = ((RefexNidNidVersionBI) getRefexV()).getNid1();
+         int                cnid = ((RefexNidNidVersionBI) getRefexV()).getNid2();
          TermComponentLabel ext  = getLabel(cnid, canDrop, getSettings().getC2Refex());
 
          ext.setFrozen(canDrop);
@@ -224,7 +224,7 @@ public class DragPanelExtension extends DragPanelComponentVersion<RefexVersionBI
       }
 
       if (RefexNidNidNidVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
-         int                cnid = ((RefexNidNidNidVersionBI) getRefexV()).getNid1();
+         int                cnid = ((RefexNidNidNidVersionBI) getRefexV()).getNid3();
          TermComponentLabel ext  = getLabel(cnid, canDrop, getSettings().getC3Refex());
 
          ext.setFrozen(canDrop);
