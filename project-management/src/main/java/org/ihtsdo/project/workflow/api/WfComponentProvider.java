@@ -452,8 +452,8 @@ public class WfComponentProvider {
 		List<File> retFiles = new ArrayList<File>();
 		for (File file : fileList) {
 			if (file.isDirectory()) {
-				List<File> tmpFiles = loadFiles(file, endFile);
-				retFiles.addAll(tmpFiles);
+//				List<File> tmpFiles = loadFiles(file, endFile);
+//				retFiles.addAll(tmpFiles);
 			} else {
 				if (!file.isHidden() && file.getName().toLowerCase().endsWith(endFile)) {
 					retFiles.add(file);
