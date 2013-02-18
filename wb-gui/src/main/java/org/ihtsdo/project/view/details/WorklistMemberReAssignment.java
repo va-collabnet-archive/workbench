@@ -76,7 +76,7 @@ public class WorklistMemberReAssignment extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	/** The Constant DELETE_OPTION. */
-	private static final String DELETE_OPTION = "Delete from queue";
+	private static final String DELETE_OPTION = "Cancel worklist item";
 
 	/** The work list. */
 	private WorkList workList;
